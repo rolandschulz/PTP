@@ -15,7 +15,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.IMarkerGenerator;
 import org.eclipse.fdt.core.model.ICModelMarker;
 
@@ -61,7 +61,7 @@ public abstract class ACBuilder extends IncrementalProjectBuilder implements IMa
 			}
 		}
 		catch (CoreException e) {
-			FortranCorePlugin.log(e.getStatus());
+			CommonLanguageCore.log(e.getStatus());
 		}
 
 	}
