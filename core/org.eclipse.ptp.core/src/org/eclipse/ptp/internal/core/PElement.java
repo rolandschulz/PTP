@@ -3,6 +3,7 @@ package org.eclipse.ptp.internal.core;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
@@ -82,6 +83,7 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 		return getElementName();
 	}
 	
+	/*
 	public IPUniverse getPUniverse() {
 		IPElement current = this;
 		do {
@@ -90,13 +92,14 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 		return null;
 	}
 	
-	public IPMachine getPMachine() {
+	public IPJob getPRoot() {
 		IPElement current = this;
 		do {
-			if(current instanceof IPMachine) return (IPMachine) current;
+			if(current instanceof IPJob) return (IPJob) current;
 		} while((current = current.getParent()) != null);
 		return null;
 	}
+	*/
 	
 	public boolean exists() {
 		return getElementInfo() != null;

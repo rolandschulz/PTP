@@ -6,34 +6,34 @@ import java.util.List;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.pdt.mi.MISession;
 import org.eclipse.ptp.ParallelPlugin;
 import org.eclipse.ptp.core.IOutputTextFileContants;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPRoot;
+import org.eclipse.ptp.core.IPJob;
+import org.eclipse.pdt.mi.MISession;
 
 /**
  * @author Clement
  *
  */
-public class PRoot extends Parent implements IPRoot {
+public class PJob extends Parent implements IPJob {
     protected String NAME_TAG = "root ";
     
     private MISession miSession = null;
     protected String outputDirPath = null;
     protected int storeLine = 0;
     
-    public PRoot() {
+    public PJob() {
         super(null, "", P_ROOT);
     }
 
-    public PRoot(MISession miSession) {
+    public PJob(MISession miSession) {
         this(miSession, "");
     }
     
-	public PRoot(MISession miSession, String name) {
+	public PJob(MISession miSession, String name) {
 		super(null, name, P_ROOT);
 		this.miSession = miSession;
 		setOutputStore();

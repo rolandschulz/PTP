@@ -3,6 +3,7 @@ package org.eclipse.ptp.internal.core;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.IPMachine;
 
 
 /**
@@ -28,6 +29,14 @@ public class PNode extends Parent implements IPNode {
         this.mode = mode;
     }
 	
+	public IPMachine getPMachine() {
+		IPElement current = this;
+		do {
+			if (current instanceof IPMachine) return (IPMachine) current;
+		} while ((current = current.getParent()) != null);
+		return null;
+	}
+    
 	public String getNodeNumber() {
 	    return getKey();
 	}

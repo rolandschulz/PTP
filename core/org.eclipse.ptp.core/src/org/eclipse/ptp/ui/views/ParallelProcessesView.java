@@ -14,7 +14,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPRoot;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.launch.core.ILaunchManager;
 import org.eclipse.ptp.ui.ParallelElementContentProvider;
 import org.eclipse.ptp.ui.ParallelElementLabelProvider;
@@ -232,9 +232,9 @@ public class ParallelProcessesView extends AbstractParallelView {
             switch (((IPElement)parent).getElementType()) {
                 case IPElement.P_ROOT:
                     if (SHOW_PROCESS_ONLY)
-                        return ((IPRoot)parent).getSortedProcesses();
+                        return ((IPJob)parent).getSortedProcesses();
                 	
-                	return ((IPRoot)parent).getSortedNodes();
+                	return ((IPJob)parent).getSortedNodes();
                 case IPElement.P_NODE:
                     return ((IPNode)parent).getSortedProcesses();
             }

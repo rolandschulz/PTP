@@ -4,7 +4,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.ParallelPlugin;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPRoot;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.launch.core.ILaunchManager;
 
 /**
@@ -28,7 +28,7 @@ public class MatchLocator implements IPSearchConstants {
 	}
 		
 	public void locateMatches(PSearchPattern pattern) throws InterruptedException {
-	    IPRoot root = launchManager.getProcessRoot();
+	    IPJob root = launchManager.getProcessRoot();
 	    
 	    if (pattern.getMode() == IPSearchConstants.EXACT_MATCH && pattern.getPLimiteTo() == IPSearchConstants.LIMIT_NUMBER)
     	    exactNumberMatches(root, pattern);
@@ -36,7 +36,7 @@ public class MatchLocator implements IPSearchConstants {
 	        patternMatches(root, pattern);
 	}
 	
-	private void patternMatches(IPRoot root, PSearchPattern pattern) throws InterruptedException {
+	private void patternMatches(IPJob root, PSearchPattern pattern) throws InterruptedException {
 	    IPElement[] elements = getElements(root, pattern.getPSearchFor());
 		if(progressMonitor != null)
 			progressMonitor.beginTask("Start searching", elements.length);
@@ -56,7 +56,7 @@ public class MatchLocator implements IPSearchConstants {
 		}
 	}
 	
-	private void exactNumberMatches(IPRoot root, PSearchPattern pattern) throws InterruptedException {
+	private void exactNumberMatches(IPJob root, PSearchPattern pattern) throws InterruptedException {
 	    IPElement element = null;
 	    switch (pattern.getPSearchFor()) {
 	    	case IPSearchConstants.SEARCH_NODE:
@@ -187,7 +187,7 @@ public class MatchLocator implements IPSearchConstants {
 	    }	    
 	}
 	
-	private IPElement[] getElements(IPRoot root, int searchFor) {
+	private IPElement[] getElements(IPJob root, int searchFor) {
 	    switch (searchFor) {
 	        case SEARCH_NODE:
 	            return root.getSortedNodes(); 
