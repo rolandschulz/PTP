@@ -19,6 +19,7 @@ import org.eclipse.fdt.core.parser.extension.ExtensionDialect;
 import org.eclipse.fdt.core.parser.extension.IParserExtension;
 import org.eclipse.fdt.core.parser.extension.IParserExtensionFactory;
 import org.eclipse.fdt.internal.core.parser.Parser;
+import org.eclipse.fdt.internal.core.parser.FortranParser;
 import org.eclipse.fdt.internal.core.parser.ParserExtensionFactory;
 import org.eclipse.fdt.internal.core.parser.QuickParseCallback;
 import org.eclipse.fdt.internal.core.parser.StructuralParseCallback;
@@ -65,7 +66,10 @@ public class ParserFactory {
 		ParserMode ourMode = ( (mode == null )? ParserMode.COMPLETE_PARSE : mode ); 
 		ISourceElementRequestor ourCallback = (( callback == null) ? new NullSourceElementRequestor() : callback );
 		IParserExtension extension = extensionFactory.createParserExtension();
-		return new Parser( scanner, ourMode, ourCallback, language, logService, extension );
+		if ( language == ParserLanguage.FORTRAN)
+			return new FortranParser( scanner, ourMode, ourCallback, language, logService, extension );
+		else
+			return new Parser( scanner, ourMode, ourCallback, language, logService, extension );		
     }
  	 	
     /**
