@@ -8,7 +8,7 @@
  * Contributors:
  * QNX Software Systems - Initial API and implementation
 ***********************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.runtime.IPath;
@@ -23,15 +23,15 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 
 /*
- * CViewLabelProvider 
+ * FortranViewLabelProvider 
  */
-public class CViewLabelProvider extends StandardCElementLabelProvider {
+public class FortranViewLabelProvider extends StandardCElementLabelProvider {
 	
 	/**
 	 * @param flags
 	 * @param adormentProviders
 	 */
-	public CViewLabelProvider(int textFlags, int imageFlags) {
+	public FortranViewLabelProvider(int textFlags, int imageFlags) {
 		super(textFlags, imageFlags);
 	}
 

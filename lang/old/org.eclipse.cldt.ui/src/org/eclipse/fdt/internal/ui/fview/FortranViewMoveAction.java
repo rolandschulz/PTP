@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,7 +34,7 @@ import org.eclipse.ui.help.WorkbenchHelp;
  * 
  * @since 2.0
  */
-public class CViewMoveAction extends MoveResourceAction {
+public class FortranViewMoveAction extends MoveResourceAction {
 	private StructuredViewer viewer;
 	private MoveProjectAction moveProjectAction;
 	
@@ -43,7 +43,7 @@ public class CViewMoveAction extends MoveResourceAction {
  * @param shell Shell
  * @param structureViewer StructuredViewer
  */
-public CViewMoveAction(Shell shell, StructuredViewer structureViewer) {
+public FortranViewMoveAction(Shell shell, StructuredViewer structureViewer) {
 	super(shell);
 	WorkbenchHelp.setHelp(this, ICHelpContextIds.MOVE_ACTION);
 	this.viewer = structureViewer;

@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -50,7 +50,7 @@ import org.eclipse.ui.ide.IDEActionFactory;
  * The main action group for the cview. This contains a few actions and several
  * subgroups.
  */
-public class MainActionGroup extends CViewActionGroup {
+public class MainActionGroup extends FortranViewActionGroup {
 
 	// Actions for Menu context.
 	AddBookmarkAction addBookmarkAction;
@@ -81,7 +81,7 @@ public class MainActionGroup extends CViewActionGroup {
 
     private NewWizardMenu newWizardMenu;
 
-	public MainActionGroup(CView cview) {
+	public MainActionGroup(FortranView cview) {
 		super(cview);
 	}
 
@@ -154,7 +154,7 @@ public class MainActionGroup extends CViewActionGroup {
 		collapseAllAction = new CollapseAllAction(getCView());
 
 		toggleLinkingAction = new ToggleLinkingAction(getCView()); //$NON-NLS-1$
-		toggleLinkingAction.setToolTipText(CViewMessages.getString("ToggleLinkingAction.toolTip")); //$NON-NLS-1$
+		toggleLinkingAction.setToolTipText(FortranViewMessages.getString("ToggleLinkingAction.toolTip")); //$NON-NLS-1$
 		toggleLinkingAction.setImageDescriptor(getImageDescriptor("elcl16/synced.gif"));//$NON-NLS-1$
 		toggleLinkingAction.setHoverImageDescriptor(getImageDescriptor("clcl16/synced.gif"));//$NON-NLS-1$
 
@@ -226,7 +226,7 @@ public class MainActionGroup extends CViewActionGroup {
 	}
 
 	void addNewMenu(IMenuManager menu, IStructuredSelection selection) {
-		MenuManager newMenu = new MenuManager(CViewMessages.getString("NewWizardsActionGroup.new")); //$NON-NLS-1$
+		MenuManager newMenu = new MenuManager(FortranViewMessages.getString("NewWizardsActionGroup.new")); //$NON-NLS-1$
         menu.add(newMenu);
         newMenu.add(newWizardMenu);
 	}

@@ -8,7 +8,7 @@
  * Contributors:
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 
 import java.util.ArrayList;
@@ -109,18 +109,18 @@ import org.eclipse.ui.views.navigator.LocalSelectionTransfer;
 
 /**
  * 
- * CView
+ * FortranView
  *  
  */
-public class CView extends ViewPart implements ISetSelectionTarget, IPropertyChangeListener, IShowInTarget {
+public class FortranView extends ViewPart implements ISetSelectionTarget, IPropertyChangeListener, IShowInTarget {
 
 	ProblemTreeViewer viewer;
 	IMemento memento;
 
-	CViewActionGroup actionGroup;
+	FortranViewActionGroup actionGroup;
 
 	FrameList frameList;
-	CViewFrameSource frameSource;
+	FortranViewFrameSource frameSource;
 
 	ResourceWorkingSetFilter workingSetFilter = new ResourceWorkingSetFilter();
 
@@ -182,7 +182,7 @@ public class CView extends ViewPart implements ISetSelectionTarget, IPropertyCha
 		}
 	};
 
-	public CView() {
+	public FortranView() {
 		super();
 	}
 
@@ -306,7 +306,7 @@ public class CView extends ViewPart implements ISetSelectionTarget, IPropertyCha
 	 * 
 	 * @return the action group
 	 */
-	protected CViewActionGroup getActionGroup() {
+	protected FortranViewActionGroup getActionGroup() {
 		return actionGroup;
 	}
 
@@ -316,7 +316,7 @@ public class CView extends ViewPart implements ISetSelectionTarget, IPropertyCha
 	 * @param actionGroup
 	 *            the action group
 	 */
-	protected void setActionGroup(CViewActionGroup actionGroup) {
+	protected void setActionGroup(FortranViewActionGroup actionGroup) {
 		this.actionGroup = actionGroup;
 	}
 
@@ -346,7 +346,7 @@ public class CView extends ViewPart implements ISetSelectionTarget, IPropertyCha
 	 * init the frame source and the framelist.
 	 */
 	void initFrameList() {
-		frameSource = new CViewFrameSource(this);
+		frameSource = new FortranViewFrameSource(this);
 		frameList = new FrameList(frameSource);
 		frameSource.connectTo(frameList);
 	}
@@ -451,7 +451,7 @@ public class CView extends ViewPart implements ISetSelectionTarget, IPropertyCha
 		menuMgr.addMenuListener(new IMenuListener() {
 
 			public void menuAboutToShow(IMenuManager manager) {
-				CView.this.fillContextMenu(manager);
+				FortranView.this.fillContextMenu(manager);
 			}
 		});
 		TreeViewer viewer = getViewer();
@@ -524,7 +524,7 @@ public class CView extends ViewPart implements ISetSelectionTarget, IPropertyCha
 
 		viewer = createViewer(parent);
 		viewer.setUseHashlookup(true);
-		viewer.setComparer(new CViewElementComparer());
+		viewer.setComparer(new FortranViewElementComparer());
 		initContentProvider(viewer);
 		initLabelProvider(viewer);
 		FortranUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
@@ -577,13 +577,13 @@ public class CView extends ViewPart implements ISetSelectionTarget, IPropertyCha
 	protected IContentProvider createContentProvider() {
 		boolean showCUChildren = PreferenceConstants.getPreferenceStore().getBoolean(PreferenceConstants.PREF_SHOW_CU_CHILDREN);
 		boolean groupIncludes = PreferenceConstants.getPreferenceStore().getBoolean(PreferenceConstants.CVIEW_GROUP_INCLUDES);
-		CViewContentProvider provider = new CViewContentProvider(showCUChildren, true);
+		FortranViewContentProvider provider = new FortranViewContentProvider(showCUChildren, true);
 		provider.setIncludesGrouping(groupIncludes);
 		return provider;
 	}
 
 	protected CUILabelProvider createLabelProvider() {
-		return new CViewLabelProvider(AppearanceAwareLabelProvider.DEFAULT_TEXTFLAGS, AppearanceAwareLabelProvider.DEFAULT_IMAGEFLAGS | CElementImageProvider.SMALL_ICONS);
+		return new FortranViewLabelProvider(AppearanceAwareLabelProvider.DEFAULT_TEXTFLAGS, AppearanceAwareLabelProvider.DEFAULT_IMAGEFLAGS | CElementImageProvider.SMALL_ICONS);
 	}
 
 	/*
@@ -677,7 +677,7 @@ public class CView extends ViewPart implements ISetSelectionTarget, IPropertyCha
 	 */
 	protected void fillContextMenu(IMenuManager menu) {
 		IStructuredSelection selection = (IStructuredSelection) getViewer().getSelection();
-		CViewActionGroup actionGroup = getActionGroup();
+		FortranViewActionGroup actionGroup = getActionGroup();
 		if (actionGroup != null) {
 			actionGroup.setContext(new ActionContext(selection));
 			actionGroup.fillContextMenu(menu);
@@ -720,12 +720,12 @@ public class CView extends ViewPart implements ISetSelectionTarget, IPropertyCha
 					if (celement instanceof IBinaryContainer) {
 						ICProject cproj = celement.getCProject();
 						if (cproj != null) {
-							return cproj.getPath() + CViewMessages.getString("CView.binaries"); //$NON-NLS-1$
+							return cproj.getPath() + FortranViewMessages.getString("FortranView.binaries"); //$NON-NLS-1$
 						}
 					} else if (celement instanceof IArchiveContainer) {
 						ICProject cproj = celement.getCProject();
 						if (cproj != null) {
-							return cproj.getPath() + CViewMessages.getString("CView.archives"); //$NON-NLS-1$
+							return cproj.getPath() + FortranViewMessages.getString("FortranView.archives"); //$NON-NLS-1$
 						}
 					} else if (celement instanceof IBinaryModule) {
 						IBinary bin = ((IBinaryModule) celement).getBinary();
@@ -743,7 +743,7 @@ public class CView extends ViewPart implements ISetSelectionTarget, IPropertyCha
 			}
 		}
 		if (selection.size() > 1) {
-			return CViewMessages.getFormattedString("CView.statusLine", //$NON-NLS-1$
+			return FortranViewMessages.getFormattedString("FortranView.statusLine", //$NON-NLS-1$
 					new String[] { Integer.toString(selection.size())});
 		}
 		return "";//$NON-NLS-1$
@@ -756,7 +756,7 @@ public class CView extends ViewPart implements ISetSelectionTarget, IPropertyCha
 	 *            the current selection
 	 */
 	protected void updateActionBars(IStructuredSelection selection) {
-		CViewActionGroup group = getActionGroup();
+		FortranViewActionGroup group = getActionGroup();
 		if (group != null) {
 			group.setContext(new ActionContext(selection));
 			group.updateActionBars();
@@ -824,7 +824,7 @@ public class CView extends ViewPart implements ISetSelectionTarget, IPropertyCha
 			}
 			refreshViewer = true;
 		} else if (property.equals(PreferenceConstants.PREF_LINK_TO_EDITOR)) {
-			CViewActionGroup group = getActionGroup();
+			FortranViewActionGroup group = getActionGroup();
 			if (group instanceof MainActionGroup) {
 				boolean enable = isLinkingEnabled();
 				((MainActionGroup)group).toggleLinkingAction.setChecked(enable);

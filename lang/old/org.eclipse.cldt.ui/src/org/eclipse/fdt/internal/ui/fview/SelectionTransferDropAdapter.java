@@ -9,7 +9,7 @@
  * QNX Software Systems - Initial API and implementation
  ***********************************************************************/
 
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -107,7 +107,7 @@ public class SelectionTransferDropAdapter extends FDTViewerDropAdapter implement
 					break;
 			}
 		} catch (CModelException e){
-			ExceptionHandler.handle(e, CViewMessages.getString("SelectionTransferDropAdapter.error.title"), CViewMessages.getString("SelectionTransferDropAdapter.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
+			ExceptionHandler.handle(e, FortranViewMessages.getString("SelectionTransferDropAdapter.error.title"), FortranViewMessages.getString("SelectionTransferDropAdapter.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
 			event.detail= DND.DROP_NONE;
 		}	
 	}
@@ -141,9 +141,9 @@ public class SelectionTransferDropAdapter extends FDTViewerDropAdapter implement
 					break;
 			}
 		} catch (CModelException e){
-			ExceptionHandler.handle(e, CViewMessages.getString("SelectionTransferDropAdapter.error.title"), CViewMessages.getString("SelectionTransferDropAdapter.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
+			ExceptionHandler.handle(e, FortranViewMessages.getString("SelectionTransferDropAdapter.error.title"), FortranViewMessages.getString("SelectionTransferDropAdapter.error.message")); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch(InvocationTargetException e) {
-			ExceptionHandler.handle(e, CViewMessages.getString("OpenRefactoringWizardAction.refactoring"), CViewMessages.getString("OpenRefactoringWizardAction.exception")); //$NON-NLS-1$ //$NON-NLS-2$
+			ExceptionHandler.handle(e, FortranViewMessages.getString("OpenRefactoringWizardAction.refactoring"), FortranViewMessages.getString("OpenRefactoringWizardAction.exception")); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (InterruptedException e) {
 			//ok
 		} finally {

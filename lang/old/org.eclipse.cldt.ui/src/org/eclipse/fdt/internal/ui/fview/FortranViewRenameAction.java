@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -28,7 +28,7 @@ import org.eclipse.ui.help.WorkbenchHelp;
  * ResourceNavigator that also allows updating after rename.
  * @since 2.0
  */
-public class CViewRenameAction extends RenameResourceAction {
+public class FortranViewRenameAction extends RenameResourceAction {
 	private TreeViewer viewer;
 	/**
 	 * Create a ResourceNavigatorRenameAction and use the tree of the supplied viewer
@@ -36,7 +36,7 @@ public class CViewRenameAction extends RenameResourceAction {
 	 * @param shell Shell
 	 * @param treeViewer TreeViewer
 	 */
-	public CViewRenameAction(Shell shell, TreeViewer treeViewer) {
+	public FortranViewRenameAction(Shell shell, TreeViewer treeViewer) {
 		super(shell, treeViewer.getTree());
 		WorkbenchHelp.setHelp(
 			this,

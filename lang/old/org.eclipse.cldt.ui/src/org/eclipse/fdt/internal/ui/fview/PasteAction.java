@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import java.util.List;
 
@@ -62,12 +62,12 @@ public class PasteAction extends SelectionListenerAction {
 	 * @param shell the shell for any dialogs
 	 */
 	public PasteAction(Shell shell, Clipboard clipboard) {
-		super(CViewMessages.getString("PasteAction.title")); //$NON-NLS-1$
+		super(FortranViewMessages.getString("PasteAction.title")); //$NON-NLS-1$
 		Assert.isNotNull(shell);
 		Assert.isNotNull(clipboard);
 		this.shell = shell;
 		this.clipboard = clipboard;
-		setToolTipText(CViewMessages.getString("PasteAction.toolTip")); //$NON-NLS-1$
+		setToolTipText(FortranViewMessages.getString("PasteAction.toolTip")); //$NON-NLS-1$
 		setId(PasteAction.ID);
 		WorkbenchHelp.setHelp(this, ICHelpContextIds.PASTE_ACTION);
 	}

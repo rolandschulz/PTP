@@ -8,14 +8,14 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.core.model.IWorkingCopy;
 import org.eclipse.jface.viewers.IElementComparer;
 
-public class CViewElementComparer implements IElementComparer {
+public class FortranViewElementComparer implements IElementComparer {
 
 	public boolean equals(Object o1, Object o2) {
 		if (o1 == o2)	// this handles also the case that both are null

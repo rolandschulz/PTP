@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
@@ -20,12 +20,12 @@ import org.eclipse.ui.help.WorkbenchHelp;
  */
 class CollapseAllAction extends Action {
 	
-	private CView cview;
+	private FortranView cview;
 	
-	CollapseAllAction(CView part) {
-		super(CViewMessages.getString("CollapseAllAction.label")); //$NON-NLS-1$
-		setDescription(CViewMessages.getString("CollapseAllAction.description")); //$NON-NLS-1$
-		setToolTipText(CViewMessages.getString("CollapseAllAction.tooltip")); //$NON-NLS-1$
+	CollapseAllAction(FortranView part) {
+		super(FortranViewMessages.getString("CollapseAllAction.label")); //$NON-NLS-1$
+		setDescription(FortranViewMessages.getString("CollapseAllAction.description")); //$NON-NLS-1$
+		setToolTipText(FortranViewMessages.getString("CollapseAllAction.tooltip")); //$NON-NLS-1$
 		FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, FortranPluginImages.IMG_MENU_COLLAPSE_ALL);
 		cview = part;
 		WorkbenchHelp.setHelp(this, ICHelpContextIds.COLLAPSE_ALL_ACTION);

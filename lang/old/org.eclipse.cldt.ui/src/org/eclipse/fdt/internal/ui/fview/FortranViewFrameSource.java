@@ -1,4 +1,4 @@
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 /*
  * (c) Copyright IBM Corp. 2000, 2001.
@@ -8,8 +8,8 @@ package org.eclipse.fdt.internal.ui.cview;
 import org.eclipse.ui.views.framelist.TreeFrame;
 import org.eclipse.ui.views.framelist.TreeViewerFrameSource;
 
-public class CViewFrameSource extends TreeViewerFrameSource {
-        private CView cview;
+public class FortranViewFrameSource extends TreeViewerFrameSource {
+        private FortranView cview;
 
         protected TreeFrame createFrame(Object input) {
                 TreeFrame frame = super.createFrame(input);
@@ -23,7 +23,7 @@ public class CViewFrameSource extends TreeViewerFrameSource {
                 super.frameChanged(frame);
                 cview.updateTitle();
         }
-        public CViewFrameSource(CView cview) {
+        public FortranViewFrameSource(FortranView cview) {
                 super(cview.getViewer());
                 this.cview = cview;
         }

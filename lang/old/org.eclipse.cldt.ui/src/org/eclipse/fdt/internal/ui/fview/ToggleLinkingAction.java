@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import org.eclipse.fdt.internal.ui.actions.AbstractToggleLinkingAction;
 
@@ -21,12 +21,12 @@ import org.eclipse.fdt.internal.ui.actions.AbstractToggleLinkingAction;
  */
 public class ToggleLinkingAction extends AbstractToggleLinkingAction {
 	
-    CView fCView;
+    FortranView fCView;
     
 	/**
 	 * Constructs a new action.
 	 */
-	public ToggleLinkingAction(CView cView) {
+	public ToggleLinkingAction(FortranView cView) {
 		fCView = cView;
 		setChecked(cView.isLinkingEnabled());
 	}

@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.fdt.internal.ui.browser.cbrowsing;
 
-import org.eclipse.fdt.internal.ui.cview.CViewElementComparer;
+import org.eclipse.fdt.internal.ui.fview.FortranViewElementComparer;
 
-public class CBrowsingElementComparer extends CViewElementComparer {
+public class CBrowsingElementComparer extends FortranViewElementComparer {
 
 	public boolean equals(Object o1, Object o2) {
 		//TODO compare ITypeInfos

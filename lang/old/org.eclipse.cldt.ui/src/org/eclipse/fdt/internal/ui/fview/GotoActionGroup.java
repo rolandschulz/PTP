@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -31,14 +31,14 @@ import org.eclipse.ui.views.framelist.UpAction;
 /**
  * This is the action group for the goto actions.
  */
-public class GotoActionGroup extends CViewActionGroup {
+public class GotoActionGroup extends FortranViewActionGroup {
 
 	private BackAction backAction;
 	private ForwardAction forwardAction;
 	private GoIntoAction goIntoAction;
 	private UpAction upAction;
 
-	public GotoActionGroup(CView cview) {
+	public GotoActionGroup(FortranView cview) {
 		super(cview);
 	}
 

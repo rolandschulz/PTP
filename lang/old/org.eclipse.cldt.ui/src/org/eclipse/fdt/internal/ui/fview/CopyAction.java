@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import java.util.Iterator;
 import java.util.List;
@@ -70,12 +70,12 @@ public class CopyAction extends SelectionListenerAction {
 	 * @param clipboard a platform clipboard
 	 */
 	public CopyAction(Shell shell, Clipboard clipboard) {
-		super(CViewMessages.getString("CopyAction.title")); //$NON-NLS-1$
+		super(FortranViewMessages.getString("CopyAction.title")); //$NON-NLS-1$
 		Assert.isNotNull(shell);
 		Assert.isNotNull(clipboard);
 		this.shell = shell;
 		this.clipboard = clipboard;
-		setToolTipText(CViewMessages.getString("CopyAction.toolTip")); //$NON-NLS-1$
+		setToolTipText(FortranViewMessages.getString("CopyAction.toolTip")); //$NON-NLS-1$
 		setId(CopyAction.ID);
 		WorkbenchHelp.setHelp(this, ICHelpContextIds.COPY_ACTION);
 	}

@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -32,11 +32,11 @@ import org.eclipse.ui.actions.OpenWithMenu;
 /**
  * This is the action group for the open actions.
  */
-public class OpenFileGroup extends CViewActionGroup {
+public class OpenFileGroup extends FortranViewActionGroup {
 
 	private OpenFileAction openFileAction;
 
-	public OpenFileGroup(CView cview) {
+	public OpenFileGroup(FortranView cview) {
 		super(cview);
 	}
 
@@ -80,7 +80,7 @@ public class OpenFileGroup extends CViewActionGroup {
 			return;
 		}
 
-		MenuManager submenu = new MenuManager(CViewMessages.getString("OpenWithMenu.label")); //$NON-NLS-1$
+		MenuManager submenu = new MenuManager(FortranViewMessages.getString("OpenWithMenu.label")); //$NON-NLS-1$
 		submenu.add(new OpenWithMenu(getCView().getSite().getPage(), (IFile) element));
 		menu.add(submenu);
 	}

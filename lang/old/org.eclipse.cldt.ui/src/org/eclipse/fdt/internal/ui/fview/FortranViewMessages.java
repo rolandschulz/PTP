@@ -8,15 +8,15 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-public class CViewMessages {
+public class FortranViewMessages {
 
-	private static final String RESOURCE_BUNDLE= "org.eclipse.fdt.internal.ui.cview.CViewMessages";//$NON-NLS-1$
+	private static final String RESOURCE_BUNDLE= "org.eclipse.fdt.internal.ui.fview.FortranViewMessages";//$NON-NLS-1$
 
 	private static ResourceBundle fgResourceBundle;
 	static {
@@ -27,7 +27,7 @@ public class CViewMessages {
 		}
 	}
 
-	private CViewMessages() {
+	private FortranViewMessages() {
 	}
 
 	public static String getString(String key) {

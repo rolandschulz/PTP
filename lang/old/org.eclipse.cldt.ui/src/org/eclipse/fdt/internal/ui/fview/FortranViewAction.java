@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.viewers.Viewer;
@@ -20,14 +20,14 @@ import org.eclipse.ui.actions.SelectionProviderAction;
 /**
  * Superclass of all actions provided by the cview.
  */
-public abstract class CViewAction extends SelectionProviderAction {
+public abstract class FortranViewAction extends SelectionProviderAction {
 	
-	private CView cview;
+	private FortranView cview;
 
 	/**
 	 * Creates a new instance of the class.
 	 */
-	public CViewAction(CView cview, String label) {
+	public FortranViewAction(FortranView cview, String label) {
 		super(cview.getViewer(), label);
 		this.cview = cview;
 	}
@@ -35,7 +35,7 @@ public abstract class CViewAction extends SelectionProviderAction {
 	/**
 	 * Returns the cview for which this action was created.
 	 */
-	public CView getCView() {
+	public FortranView getCView() {
 		return cview;
 	}
 

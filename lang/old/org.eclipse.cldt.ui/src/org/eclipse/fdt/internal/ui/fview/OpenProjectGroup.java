@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import java.util.Iterator;
 
@@ -34,13 +34,13 @@ import org.eclipse.ui.ide.IDEActionFactory;
  * This is the action group for actions such as Refresh Local, and Open/Close
  * Project.
  */
-public class OpenProjectGroup extends CViewActionGroup {
+public class OpenProjectGroup extends FortranViewActionGroup {
 
 	private OpenResourceAction openProjectAction;
 	private CloseResourceAction closeProjectAction;
 	private RefreshAction refreshAction;
 
-	public OpenProjectGroup(CView cview) {
+	public OpenProjectGroup(FortranView cview) {
 		super(cview);
 	}
 

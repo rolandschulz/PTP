@@ -146,7 +146,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 	private ActionGroup fSelectionSearchGroup;
     /** Groups refactoring actions. */
 	private ActionGroup fRefactoringActionGroup;
-    /** Action which shows selected element in CView. */
+    /** Action which shows selected element in FortranView. */
 	private ShowInCViewAction fShowInCViewAction;
 	
 	/** Activity Listeners **/

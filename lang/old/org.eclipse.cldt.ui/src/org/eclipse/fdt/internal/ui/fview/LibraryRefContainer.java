@@ -9,7 +9,7 @@
  * QNX Software Systems - Initial API and implementation
  ***********************************************************************/
 
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import java.util.ArrayList;
 
@@ -83,7 +83,7 @@ public class LibraryRefContainer extends CElementGrouping {
 	 * @see org.eclipse.ui.model.IWorkbenchAdapter#getLabel(java.lang.Object)
 	 */
 	public String getLabel(Object o) {
-		return CViewMessages.getString("LibraryRefContainer.Libraries"); //$NON-NLS-1$
+		return FortranViewMessages.getString("LibraryRefContainer.Libraries"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)

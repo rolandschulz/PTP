@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -33,19 +33,19 @@ import org.eclipse.ui.actions.ActionGroup;
  * @see WorkspaceActionGroup
  * 
  */
-public abstract class CViewActionGroup extends ActionGroup {
+public abstract class FortranViewActionGroup extends ActionGroup {
 
 	/**
 	 * The resource navigator.
 	 */
-	protected CView cview;
+	protected FortranView cview;
 	
 	/**
 	 * Constructs a new navigator action group and creates its actions.
 	 * 
 	 * @param navigator the resource navigator
 	 */
-	public CViewActionGroup(CView cview) {
+	public FortranViewActionGroup(FortranView cview) {
 		this.cview = cview;
 		makeActions();
 	}
@@ -68,7 +68,7 @@ public abstract class CViewActionGroup extends ActionGroup {
 	/**
 	 * Returns the resource navigator.
 	 */
-	public CView getCView() {
+	public FortranView getCView() {
 		return cview;
 	}
 	

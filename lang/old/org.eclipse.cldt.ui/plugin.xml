@@ -255,7 +255,7 @@
             name="%CView.name"
             icon="icons/full/cview16/cview.gif"
             category="org.eclipse.fdt.ui.views"
-            class="org.eclipse.fdt.internal.ui.cview.CView"
+            class="org.eclipse.fdt.internal.ui.fview.FortranView"
             id="org.eclipse.fdt.ui.CView">
       </view>
       <category

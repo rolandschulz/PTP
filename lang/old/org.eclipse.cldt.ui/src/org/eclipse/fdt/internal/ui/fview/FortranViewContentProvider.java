@@ -9,7 +9,7 @@
  * QNX Software Systems - Initial API and implementation
  ***********************************************************************/
 
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import java.util.ArrayList;
 
@@ -27,13 +27,13 @@ import org.eclipse.fdt.core.model.ILibraryReference;
 import org.eclipse.fdt.ui.CElementContentProvider;
 
 /**
- * CViewContentProvider
+ * FortranViewContentProvider
  */
-public class CViewContentProvider extends CElementContentProvider {
+public class FortranViewContentProvider extends CElementContentProvider {
 	/**
 	 * 
 	 */
-	public CViewContentProvider() {
+	public FortranViewContentProvider() {
 		super();
 	}
 
@@ -41,7 +41,7 @@ public class CViewContentProvider extends CElementContentProvider {
 	 * @param provideMembers
 	 * @param provideWorkingCopy
 	 */
-	public CViewContentProvider(boolean provideMembers, boolean provideWorkingCopy) {
+	public FortranViewContentProvider(boolean provideMembers, boolean provideWorkingCopy) {
 		super(provideMembers, provideWorkingCopy);
 	}
 
@@ -79,7 +79,7 @@ public class CViewContentProvider extends CElementContentProvider {
 	public Object[] getIncludeReferenceChildren(IIncludeReference ref) throws CModelException {
 		// We do not want to show children for Include paths that are inside the workspace.
 		// no need to that since they can access elsewhere and that simplifies the
-		// CView code.
+		// FortranView code.
 		IPath location = ref.getPath();
 		IContainer[] containers = ref.getCModel().getWorkspace().getRoot().findContainersForLocation(location);
 		for (int i = 0; i < containers.length; ++i) {

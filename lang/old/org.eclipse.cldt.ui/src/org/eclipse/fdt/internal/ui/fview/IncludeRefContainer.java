@@ -9,7 +9,7 @@
  * QNX Software Systems - Initial API and implementation
  ***********************************************************************/
 
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 
 import org.eclipse.fdt.core.model.CModelException;
@@ -75,7 +75,7 @@ public class IncludeRefContainer extends CElementGrouping {
 	 * @see org.eclipse.ui.model.IWorkbenchAdapter#getLabel(java.lang.Object)
 	 */
 	public String getLabel(Object o) {
-		return CViewMessages.getString("IncludeRefContainer.Includes");  //$NON-NLS-1$
+		return FortranViewMessages.getString("IncludeRefContainer.Includes");  //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)

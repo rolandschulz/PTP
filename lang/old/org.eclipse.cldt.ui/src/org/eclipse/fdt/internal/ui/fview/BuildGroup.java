@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import java.util.Iterator;
 
@@ -30,7 +30,7 @@ import org.eclipse.ui.ide.IDEActionFactory;
 /**
  * This is the action group for workspace actions such as Build
  */
-public class BuildGroup extends CViewActionGroup {
+public class BuildGroup extends FortranViewActionGroup {
 
 	private BuildAction buildAction;
 	private BuildAction rebuildAction;
@@ -39,7 +39,7 @@ public class BuildGroup extends CViewActionGroup {
 	final String BUILD_GROUP_MARKER = "buildGroup"; //$NON-NLS-1$
 	final String BUILD_GROUP_MARKER_END = "end-buildGroup"; //$NON-NLS-1$
 
-	public BuildGroup(CView cview) {
+	public BuildGroup(FortranView cview) {
 		super(cview);
 	}
 

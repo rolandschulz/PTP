@@ -50,7 +50,7 @@ public class PreferenceConstants {
 	public static final String PREF_LINK_TO_EDITOR= "org.eclipse.fdt.ui.editor.linkToEditor"; //$NON-NLS-1$
 
 	/**
-	 * A named preference that speficies whether children of a translation unit are shown in the CView.
+	 * A named preference that speficies whether children of a translation unit are shown in the FortranView.
 	 * <p>
 	 * Value is of type <code>Boolean</code>.
 	 * </p>
@@ -289,7 +289,7 @@ public class PreferenceConstants {
 	public static final String OUTLINE_GROUP_NAMESPACES= "org.eclipse.fdt.ui.outline.groupnamespaces"; //$NON-NLS-1$
 
 	/**
-	 * A named preference that controls if the CView.
+	 * A named preference that controls if the FortranView.
 	 * <p>
 	 * Value is of type <code>Boolean</code>.
 	 * </p>

@@ -11,7 +11,7 @@
 package org.eclipse.fdt.ui;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.fdt.internal.ui.cview.CView;
+import org.eclipse.fdt.internal.ui.fview.FortranView;
 import org.eclipse.fdt.internal.ui.preferences.BuildConsolePreferencePage;
 import org.eclipse.fdt.internal.ui.preferences.CEditorPreferencePage;
 import org.eclipse.fdt.internal.ui.preferences.CPluginPreferencePage;
@@ -40,7 +40,7 @@ public class FortranUIPreferenceInitializer extends AbstractPreferenceInitialize
 		BuildConsolePreferencePage.initDefaults(store);
 		WorkInProgressPreferencePage.initDefaults(store);
 		CSearchPreferencePage.initDefaults(store);
-		CView.initDefaults(store);
+		FortranView.initDefaults(store);
 		CEditorPreferencePage.initDefaults(store);
 		CodeAssistPreferencePage.initDefaults(store);
 

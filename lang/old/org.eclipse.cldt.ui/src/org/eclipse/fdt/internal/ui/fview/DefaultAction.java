@@ -8,7 +8,7 @@
  * Contributors:
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 
 import org.eclipse.swt.widgets.MessageBox;
@@ -27,8 +27,8 @@ public class DefaultAction extends Action {
 
 	public void run() {
 		MessageBox errorMsg = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-		errorMsg.setText(CViewMessages.getString("DefaultAction.WIP")); //$NON-NLS-1$
-		errorMsg.setMessage (CViewMessages.getString("DefaultAction.workInProgress")); //$NON-NLS-1$
+		errorMsg.setText(FortranViewMessages.getString("DefaultAction.WIP")); //$NON-NLS-1$
+		errorMsg.setMessage (FortranViewMessages.getString("DefaultAction.workInProgress")); //$NON-NLS-1$
 		errorMsg.open();
 	}
 }

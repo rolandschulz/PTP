@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.fdt.internal.ui.cview;
+package org.eclipse.fdt.internal.ui.fview;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.fdt.internal.ui.actions.SelectionConverter;
@@ -31,18 +31,18 @@ import org.eclipse.ui.actions.TextActionHandler;
  * including global action handlers for copy, paste and delete.
  * 
  */
-public class RefactorActionGroup extends CViewActionGroup {
+public class RefactorActionGroup extends FortranViewActionGroup {
 
 	private Clipboard clipboard;
 
 	private CopyAction copyAction;
 	private DeleteResourceAction deleteAction;
 	private PasteAction pasteAction;
-	private CViewRenameAction renameAction;
-	private CViewMoveAction moveAction;
+	private FortranViewRenameAction renameAction;
+	private FortranViewMoveAction moveAction;
 	private TextActionHandler textActionHandler;
 	
-	public RefactorActionGroup(CView cview) {
+	public RefactorActionGroup(FortranView cview) {
 		super(cview);
 	}
 
@@ -122,8 +122,8 @@ public class RefactorActionGroup extends CViewActionGroup {
 		copyAction.setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
 		copyAction.setHoverImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
 		
-		moveAction = new CViewMoveAction(shell, treeViewer);
-		renameAction = new CViewRenameAction(shell, treeViewer);
+		moveAction = new FortranViewMoveAction(shell, treeViewer);
+		renameAction = new FortranViewRenameAction(shell, treeViewer);
 		
 		deleteAction = new DeleteResourceAction(shell);
 		deleteAction.setDisabledImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE_DISABLED));
