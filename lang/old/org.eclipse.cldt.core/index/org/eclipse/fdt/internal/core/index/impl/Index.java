@@ -275,7 +275,7 @@ public class Index implements IIndex {
 			addsIndexInput= new SimpleIndexInput(addsIndex);
 			state= MERGED;
 			//flush the FDT log
-			FortranCorePlugin.getDefault().fdtLog.flushLog();
+			FortranCorePlugin.getDefault().cdtLog.flushLog();
 			
 			//Send out notification to listeners;
 			IndexDelta indexDelta = new IndexDelta(null,null,IIndexDelta.MERGE_DELTA);
