@@ -18,7 +18,7 @@ import org.eclipse.fdt.core.browser.ITypeInfo;
 import org.eclipse.fdt.core.browser.ITypeReference;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.ICElement;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
@@ -29,16 +29,16 @@ public class TypeInfoLabelProvider extends LabelProvider {
 	public static final int SHOW_FULLY_QUALIFIED= 0x04;
 	public static final int SHOW_PATH= 0x08;
 
-	private static final Image HEADER_ICON= CPluginImages.get(CPluginImages.IMG_OBJS_TUNIT_HEADER);
-	private static final Image SOURCE_ICON= CPluginImages.get(CPluginImages.IMG_OBJS_TUNIT);
-	private static final Image NAMESPACE_ICON= CPluginImages.get(CPluginImages.IMG_OBJS_NAMESPACE);
-	private static final Image TEMPLATE_ICON= CPluginImages.get(CPluginImages.IMG_OBJS_TEMPLATE);
-	private static final Image CLASS_ICON= CPluginImages.get(CPluginImages.IMG_OBJS_CLASS);
-	private static final Image STRUCT_ICON= CPluginImages.get(CPluginImages.IMG_OBJS_STRUCT);
-	private static final Image TYPEDEF_ICON= CPluginImages.get(CPluginImages.IMG_OBJS_TYPEDEF);
-	private static final Image UNION_ICON= CPluginImages.get(CPluginImages.IMG_OBJS_UNION);
-	private static final Image ENUM_ICON= CPluginImages.get(CPluginImages.IMG_OBJS_ENUMERATION);
-	private static final Image UNKNOWN_TYPE_ICON= CPluginImages.get(CPluginImages.IMG_OBJS_UNKNOWN_TYPE);
+	private static final Image HEADER_ICON= FortranPluginImages.get(FortranPluginImages.IMG_OBJS_TUNIT_HEADER);
+	private static final Image SOURCE_ICON= FortranPluginImages.get(FortranPluginImages.IMG_OBJS_TUNIT);
+	private static final Image NAMESPACE_ICON= FortranPluginImages.get(FortranPluginImages.IMG_OBJS_NAMESPACE);
+	private static final Image TEMPLATE_ICON= FortranPluginImages.get(FortranPluginImages.IMG_OBJS_TEMPLATE);
+	private static final Image CLASS_ICON= FortranPluginImages.get(FortranPluginImages.IMG_OBJS_CLASS);
+	private static final Image STRUCT_ICON= FortranPluginImages.get(FortranPluginImages.IMG_OBJS_STRUCT);
+	private static final Image TYPEDEF_ICON= FortranPluginImages.get(FortranPluginImages.IMG_OBJS_TYPEDEF);
+	private static final Image UNION_ICON= FortranPluginImages.get(FortranPluginImages.IMG_OBJS_UNION);
+	private static final Image ENUM_ICON= FortranPluginImages.get(FortranPluginImages.IMG_OBJS_ENUMERATION);
+	private static final Image UNKNOWN_TYPE_ICON= FortranPluginImages.get(FortranPluginImages.IMG_OBJS_UNKNOWN_TYPE);
 
 	private int fFlags;
 	

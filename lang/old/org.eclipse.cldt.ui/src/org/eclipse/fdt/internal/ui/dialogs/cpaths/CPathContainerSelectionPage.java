@@ -10,10 +10,10 @@ package org.eclipse.fdt.internal.ui.dialogs.cpaths;
 
 import java.util.Arrays;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.util.SelectionUtil;
 import org.eclipse.fdt.internal.ui.viewsupport.ListContentProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -69,11 +69,11 @@ public class CPathContainerSelectionPage extends WizardPage {
 		super("CPathContainerWizardPage"); //$NON-NLS-1$
 		setTitle(CPathEntryMessages.getString("CPathContainerSelectionPage.title")); //$NON-NLS-1$
 		setDescription(CPathEntryMessages.getString("CPathContainerSelectionPage.description")); //$NON-NLS-1$
-		setImageDescriptor(CPluginImages.DESC_WIZBAN_ADD_LIBRARY);
+		setImageDescriptor(FortranPluginImages.DESC_WIZBAN_ADD_LIBRARY);
 
 		fContainers= containerPages;
 
-		IDialogSettings settings= CUIPlugin.getDefault().getDialogSettings();
+		IDialogSettings settings= FortranUIPlugin.getDefault().getDialogSettings();
 		fDialogSettings= settings.getSection(DIALOGSTORE_SECTION);
 		if (fDialogSettings == null) {
 			fDialogSettings= settings.addNewSection(DIALOGSTORE_SECTION);

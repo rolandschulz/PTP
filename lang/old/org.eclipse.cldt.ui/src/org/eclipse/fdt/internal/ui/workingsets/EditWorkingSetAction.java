@@ -13,7 +13,7 @@ package org.eclipse.fdt.internal.ui.workingsets;
 import org.eclipse.swt.widgets.Shell;
 
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.Assert;
@@ -51,7 +51,7 @@ public class EditWorkingSetAction extends Action {
 	 */
 	public void run() {
 		if (fShell == null)
-			fShell= CUIPlugin.getActiveWorkbenchShell();
+			fShell= FortranUIPlugin.getActiveWorkbenchShell();
 		IWorkingSetManager manager= PlatformUI.getWorkbench().getWorkingSetManager();
 		IWorkingSet workingSet= fActionGroup.getWorkingSet();
 		if (workingSet == null) {

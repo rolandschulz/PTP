@@ -33,7 +33,7 @@ import org.eclipse.fdt.internal.corext.refactoring.base.ChangeContext;
 import org.eclipse.fdt.internal.corext.refactoring.base.IChange;
 import org.eclipse.fdt.internal.corext.refactoring.base.IChangeExceptionHandler;
 import org.eclipse.fdt.internal.ui.refactoring.RefactoringMessages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 /**
  * An implementation of <code>IChangeExceptionHandler</code> which pops up a dialog
@@ -73,16 +73,16 @@ public class ChangeExceptionHandler implements IChangeExceptionHandler {
 	}
 	
 	public void handle(ChangeContext context, IChange change, Exception e) {
-		CUIPlugin.getDefault().log(e);
+		FortranUIPlugin.getDefault().log(e);
 		IStatus status= null;
 		if (e instanceof CoreException) {
 			status= ((CoreException)e).getStatus();
 		} else {
 			if (e.getMessage() == null)
-				status= new Status(IStatus.ERROR, CUIPlugin.getPluginId(), IStatus.ERROR, 
+				status= new Status(IStatus.ERROR, FortranUIPlugin.getPluginId(), IStatus.ERROR, 
 					RefactoringMessages.getString("ChangeExceptionHandler.no_details"), e); //$NON-NLS-1$
 			else
-				status= new Status(IStatus.ERROR, CUIPlugin.getPluginId(), IStatus.ERROR, e.getMessage(), e);
+				status= new Status(IStatus.ERROR, FortranUIPlugin.getPluginId(), IStatus.ERROR, e.getMessage(), e);
 		}
 		final ErrorDialog dialog= new RefactorErrorDialog(fParent,
 			RefactoringMessages.getString("ChangeExceptionHandler.refactoring"), //$NON-NLS-1$

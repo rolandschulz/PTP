@@ -8,7 +8,7 @@ package org.eclipse.fdt.internal.ui.text;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.fdt.internal.ui.text.util.CColorManager;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
@@ -73,7 +73,7 @@ public class CTextTools {
      */
 	public CTextTools(IPreferenceStore store, Preferences coreStore) {
 		if(store == null) {
-			store = CUIPlugin.getDefault().getPreferenceStore();
+			store = FortranUIPlugin.getDefault().getPreferenceStore();
 		}
 		fPreferenceStore = store;
 		fPreferenceStore.addPropertyChangeListener(fPreferenceListener);

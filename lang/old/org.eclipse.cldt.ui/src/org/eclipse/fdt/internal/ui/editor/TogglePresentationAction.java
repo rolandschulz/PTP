@@ -12,9 +12,9 @@ package org.eclipse.fdt.internal.ui.editor;
 
 
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IRegion;
@@ -41,7 +41,7 @@ public class TogglePresentationAction extends TextEditorAction implements IPrope
 	 */
 	public TogglePresentationAction() {
 		super(CEditorMessages.getResourceBundle(), "TogglePresentation.", null); //$NON-NLS-1$
-		CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, CPluginImages.IMG_MENU_SEGMENT_EDIT);
+		FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, FortranPluginImages.IMG_MENU_SEGMENT_EDIT);
 		setToolTipText(CEditorMessages.getString("TogglePresentation.tooltip")); //$NON-NLS-1$
 		setActionDefinitionId(ITextEditorActionDefinitionIds.TOGGLE_SHOW_SELECTED_ELEMENT_ONLY);
 		WorkbenchHelp.setHelp(this,	ICHelpContextIds.TOGGLE_PRESENTATION_ACTION);		
@@ -92,7 +92,7 @@ public class TogglePresentationAction extends TextEditorAction implements IPrope
 		if (editor != null) {
 			
 			if (fStore == null) {
-				fStore= CUIPlugin.getDefault().getPreferenceStore();
+				fStore= FortranUIPlugin.getDefault().getPreferenceStore();
 				fStore.addPropertyChangeListener(this);
 			}
 			synchronizeWithPreference(editor);

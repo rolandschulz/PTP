@@ -15,7 +15,7 @@ import org.eclipse.fdt.internal.ui.editor.CEditor;
 import org.eclipse.fdt.internal.ui.text.CSourceViewerConfiguration;
 import org.eclipse.fdt.internal.ui.text.CTextTools;
 import org.eclipse.fdt.internal.ui.text.ICColorConstants;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.fdt.utils.ui.controls.TabFolderLayout;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -90,7 +90,7 @@ public class CEditorPreferencePage extends AbstractPreferencePage implements IWo
 
 	public CEditorPreferencePage() {
 		super();
-		setDescription(CUIPlugin.getResourceString("CEditorPreferencePage.description")); //$NON-NLS-1$
+		setDescription(FortranUIPlugin.getResourceString("CEditorPreferencePage.description")); //$NON-NLS-1$
 	}
 
 	protected OverlayPreferenceStore.OverlayKey[] createOverlayStoreKeys() {
@@ -286,7 +286,7 @@ public class CEditorPreferencePage extends AbstractPreferencePage implements IWo
 
 	private Control createPreviewer(Composite parent) {
 
-		fCTextTools = CUIPlugin.getDefault().getTextTools();
+		fCTextTools = FortranUIPlugin.getDefault().getTextTools();
 		fPreviewViewer = new SourceViewer(parent, null, SWT.V_SCROLL | SWT.H_SCROLL);
 		fPreviewViewer.configure(new CSourceViewerConfiguration(fCTextTools, null));
 		fPreviewViewer.getTextWidget().setFont(JFaceResources.getFontRegistry().get(JFaceResources.TEXT_FONT));
@@ -480,7 +480,7 @@ public class CEditorPreferencePage extends AbstractPreferencePage implements IWo
 				buffer.append(separator);
 			}
 		} catch (IOException io) {
-			CUIPlugin.getDefault().log(io);
+			FortranUIPlugin.getDefault().log(io);
 		} finally {
 			if (reader != null) {
 				try {

@@ -47,7 +47,7 @@ import org.eclipse.fdt.internal.ui.viewsupport.CUILabelProvider;
 import org.eclipse.fdt.internal.ui.viewsupport.DecoratingCLabelProvider;
 import org.eclipse.fdt.ui.CElementContentProvider;
 import org.eclipse.fdt.ui.CElementSorter;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -527,7 +527,7 @@ public class CView extends ViewPart implements ISetSelectionTarget, IPropertyCha
 		viewer.setComparer(new CViewElementComparer());
 		initContentProvider(viewer);
 		initLabelProvider(viewer);
-		CUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
+		FortranUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
 
 		initFilters(viewer);
 		initWorkingSetFilter();
@@ -591,7 +591,7 @@ public class CView extends ViewPart implements ISetSelectionTarget, IPropertyCha
 	 */
 	public void dispose() {
 		getSite().getPage().removePartListener(partListener);
-		CUIPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(this);
+		FortranUIPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(this);
 		if (viewer != null) {
 			viewer.removeTreeListener(expansionListener);
 		}

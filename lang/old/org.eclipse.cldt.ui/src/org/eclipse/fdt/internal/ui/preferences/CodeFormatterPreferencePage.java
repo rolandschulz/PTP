@@ -15,7 +15,7 @@ package org.eclipse.fdt.internal.ui.preferences;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.dialogs.StatusUtil;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.dialogs.CodeFormatterBlock;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
@@ -35,11 +35,11 @@ public class CodeFormatterPreferencePage extends PreferencePage implements IWork
 	CodeFormatterBlock fCodeFormatterBlock;
 	
 	public CodeFormatterPreferencePage() {
-		setPreferenceStore(CUIPlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(FortranUIPlugin.getDefault().getPreferenceStore());
 		// only used when page is shown programatically
 		setTitle(PreferencesMessages.getString("CodeFormatterPreferencePage.title"));		 //$NON-NLS-1$
 		//setDescription(PreferencesMessages.getString("CodeFormatterPreferencePage.description")); //$NON-NLS-1$
-		fCodeFormatterBlock= new CodeFormatterBlock(CUIPlugin.getDefault().getPluginPreferences());
+		fCodeFormatterBlock= new CodeFormatterBlock(FortranUIPlugin.getDefault().getPluginPreferences());
 	}
 	
 

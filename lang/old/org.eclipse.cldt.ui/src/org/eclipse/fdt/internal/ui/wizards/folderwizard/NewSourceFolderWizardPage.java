@@ -52,7 +52,7 @@ import org.eclipse.fdt.internal.ui.wizards.dialogfields.LayoutUtil;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.SelectionButtonDialogField;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.StringButtonDialogField;
 import org.eclipse.fdt.ui.CElementLabelProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -292,7 +292,7 @@ public class NewSourceFolderWizardPage extends NewElementWizardPage {
 				return;
 			}
 		} catch (CoreException e) {
-			CUIPlugin.getDefault().log(e);
+			FortranUIPlugin.getDefault().log(e);
 			fCurrCProject= null;
 		}	
 		fProjectStatus.setError(NewFolderWizardMessages.getString("NewSourceFolderWizardPage.error.NotACProject")); //$NON-NLS-1$
@@ -468,7 +468,7 @@ public class NewSourceFolderWizardPage extends NewElementWizardPage {
 		try {
 			projects= CoreModel.create(fWorkspaceRoot).getCProjects();
 		} catch (CModelException e) {
-			CUIPlugin.getDefault().log(e);
+			FortranUIPlugin.getDefault().log(e);
 			projects= new ICProject[0];
 		}
 		

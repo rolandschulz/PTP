@@ -14,14 +14,14 @@ import org.eclipse.core.runtime.IStatus;
  * support
  */
 
-public class CUIException extends CoreException {
+public class FortranUIException extends CoreException {
 	
 	/**
 	 * Comment for <code>serialVersionUID</code>
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public CUIException(IStatus status) {
+	public FortranUIException(IStatus status) {
 		super(status);
 	}	
 }

@@ -29,7 +29,7 @@ public class StandardCElementLabelProvider extends AppearanceAwareLabelProvider 
 	public StandardCElementLabelProvider(int textFlags, int imageFlags) {
 		super(textFlags, imageFlags);
 		initMasks();
-		CUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
+		FortranUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class StandardCElementLabelProvider extends AppearanceAwareLabelProvider 
 	 * @see IBaseLabelProvider#dispose()
 	 */
 	public void dispose() {
-		CUIPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(this);
+		FortranUIPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(this);
 		super.dispose();
 	}
 

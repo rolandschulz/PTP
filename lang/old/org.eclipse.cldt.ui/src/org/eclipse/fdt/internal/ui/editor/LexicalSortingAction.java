@@ -11,8 +11,8 @@ import org.eclipse.jface.viewers.ViewerSorter;
 
 
 import org.eclipse.fdt.core.model.ICElement;
-import org.eclipse.fdt.internal.ui.CPluginImages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 
 public class LexicalSortingAction extends Action {
@@ -24,17 +24,17 @@ public class LexicalSortingAction extends Action {
 	private TreeViewer fTreeViewer;
 	
 	public LexicalSortingAction(TreeViewer treeViewer) {
-		super(CUIPlugin.getResourceString(ACTION_NAME + ".label")); //$NON-NLS-1$
+		super(FortranUIPlugin.getResourceString(ACTION_NAME + ".label")); //$NON-NLS-1$
 		
-		setDescription(CUIPlugin.getResourceString(ACTION_NAME + ".description")); //$NON-NLS-1$
-		setToolTipText(CUIPlugin.getResourceString(ACTION_NAME + ".tooltip")); //$NON-NLS-1$
+		setDescription(FortranUIPlugin.getResourceString(ACTION_NAME + ".description")); //$NON-NLS-1$
+		setToolTipText(FortranUIPlugin.getResourceString(ACTION_NAME + ".tooltip")); //$NON-NLS-1$
 	
-		CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, CPluginImages.IMG_ALPHA_SORTING);
+		FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, FortranPluginImages.IMG_ALPHA_SORTING);
 	
 		fTreeViewer= treeViewer;
 		fSorter= new LexicalCSorter();
 		
-		boolean checked= CUIPlugin.getDefault().getDialogSettings().getBoolean(DIALOG_STORE_KEY);
+		boolean checked= FortranUIPlugin.getDefault().getDialogSettings().getBoolean(DIALOG_STORE_KEY);
 		valueChanged(checked, false);
 	}
 	
@@ -47,10 +47,10 @@ public class LexicalSortingAction extends Action {
 		fTreeViewer.setSorter(on ? fSorter : null);
 		
 		String key= ACTION_NAME + ".tooltip" + (on ? ".on" : ".off"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		setToolTipText(CUIPlugin.getResourceString(key));
+		setToolTipText(FortranUIPlugin.getResourceString(key));
 		
 		if (store) {
-			CUIPlugin.getDefault().getDialogSettings().put(DIALOG_STORE_KEY, on);
+			FortranUIPlugin.getDefault().getDialogSettings().put(DIALOG_STORE_KEY, on);
 		}
 	}
 	

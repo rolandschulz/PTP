@@ -15,7 +15,7 @@ import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.fdt.internal.ui.editor.CEditorMessages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -74,7 +74,7 @@ public class ShowInCViewAction extends SelectionProviderAction {
 
 	public void run(IStructuredSelection selection) {
 		if (page == null) {
-			page = CUIPlugin.getActivePage();
+			page = FortranUIPlugin.getActivePage();
 			if (page == null) {
 				return;
 			}
@@ -82,7 +82,7 @@ public class ShowInCViewAction extends SelectionProviderAction {
 
 		//Locate a source and a target for us to use
 		try {
-			IWorkbenchPart part = page.showView(CUIPlugin.CVIEW_ID);
+			IWorkbenchPart part = page.showView(FortranUIPlugin.CVIEW_ID);
 			if (part instanceof ISetSelectionTarget) {
 				((ISetSelectionTarget) part).selectReveal(selection);
 			}

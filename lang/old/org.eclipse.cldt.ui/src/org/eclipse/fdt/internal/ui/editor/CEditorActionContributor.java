@@ -7,7 +7,7 @@ package org.eclipse.fdt.internal.ui.editor;
   
 import java.util.ResourceBundle;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.IContextMenuConstants;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -101,11 +101,11 @@ public class CEditorActionContributor extends TextEditorActionContributor {
 	
 		fShiftRight= new SelectionAction("ShiftRight.", ITextOperationTarget.SHIFT_RIGHT);		 //$NON-NLS-1$
 		fShiftRight.setActionDefinitionId(ITextEditorActionDefinitionIds.SHIFT_RIGHT);
-		CPluginImages.setImageDescriptors(fShiftRight, CPluginImages.T_LCL, CPluginImages.IMG_MENU_SHIFT_RIGHT);
+		FortranPluginImages.setImageDescriptors(fShiftRight, FortranPluginImages.T_LCL, FortranPluginImages.IMG_MENU_SHIFT_RIGHT);
 
 		fShiftLeft= new SelectionAction("ShiftLeft.", ITextOperationTarget.SHIFT_LEFT); //$NON-NLS-1$
 		fShiftLeft.setActionDefinitionId(ITextEditorActionDefinitionIds.SHIFT_LEFT);
-		CPluginImages.setImageDescriptors(fShiftLeft, CPluginImages.T_LCL, CPluginImages.IMG_MENU_SHIFT_LEFT);
+		FortranPluginImages.setImageDescriptors(fShiftLeft, FortranPluginImages.T_LCL, FortranPluginImages.IMG_MENU_SHIFT_LEFT);
 		
 		fContentAssist = new RetargetTextEditorAction(bundle, "ContentAssistProposal."); //$NON-NLS-1$
 		fContentAssist.setActionDefinitionId(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);

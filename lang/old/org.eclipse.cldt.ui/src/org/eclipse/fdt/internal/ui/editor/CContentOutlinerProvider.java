@@ -20,7 +20,7 @@ import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.ICElementDelta;
 import org.eclipse.fdt.core.model.IElementChangedListener;
 import org.eclipse.fdt.core.model.ITranslationUnit;
-import org.eclipse.fdt.internal.ui.BaseCElementContentProvider;
+import org.eclipse.fdt.internal.ui.BaseFortranElementContentProvider;
 import org.eclipse.fdt.internal.ui.util.StringMatcher;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -34,7 +34,7 @@ import org.eclipse.jface.viewers.Viewer;
 /**
  * Manages contents of the outliner. 
  */
-public class CContentOutlinerProvider extends BaseCElementContentProvider {
+public class CContentOutlinerProvider extends BaseFortranElementContentProvider {
 
     /** Tree viewer which handles this content provider. */
     TreeViewer treeViewer;
@@ -132,7 +132,7 @@ public class CContentOutlinerProvider extends BaseCElementContentProvider {
     }
 
     /**
-     * @see org.eclipse.fdt.internal.ui.BaseCElementContentProvider#getChildren(java.lang.Object)
+     * @see org.eclipse.fdt.internal.ui.BaseFortranElementContentProvider#getChildren(java.lang.Object)
      */
     public Object[] getChildren(Object element)
     {

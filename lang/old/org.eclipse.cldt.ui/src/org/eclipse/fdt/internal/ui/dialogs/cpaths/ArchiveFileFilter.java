@@ -19,7 +19,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
@@ -75,7 +75,7 @@ public class ArchiveFileFilter extends ViewerFilter {
 					}
 				}
 			} catch (CoreException e) {
-				CUIPlugin.getDefault().log(e.getStatus());
+				FortranUIPlugin.getDefault().log(e.getStatus());
 			}				
 		}
 		return false;

@@ -7,7 +7,7 @@ package org.eclipse.fdt.internal.ui.preferences;
 
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -28,7 +28,7 @@ public class CPluginPreferencePage extends FieldEditorPreferencePage implements 
 	
 	public CPluginPreferencePage() {
 		super(GRID);
-		setPreferenceStore(CUIPlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(FortranUIPlugin.getDefault().getPreferenceStore());
 	}
 	
 	/**
@@ -45,32 +45,32 @@ public class CPluginPreferencePage extends FieldEditorPreferencePage implements 
 	protected void createFieldEditors() {
 		Composite parent= getFieldEditorParent();
 
-		BooleanFieldEditor linkEditor= new BooleanFieldEditor(PreferenceConstants.PREF_LINK_TO_EDITOR, CUIPlugin.getResourceString(LINK_TO_EDITOR_LABEL), parent);
+		BooleanFieldEditor linkEditor= new BooleanFieldEditor(PreferenceConstants.PREF_LINK_TO_EDITOR, FortranUIPlugin.getResourceString(LINK_TO_EDITOR_LABEL), parent);
 		addField(linkEditor);
 
 		
-		BooleanFieldEditor useStructuralParseMode= new BooleanFieldEditor(PreferenceConstants.PREF_USE_STRUCTURAL_PARSE_MODE, CUIPlugin.getResourceString(USE_STRUCTURAL_PARSE_MODE_LABEL), parent);
+		BooleanFieldEditor useStructuralParseMode= new BooleanFieldEditor(PreferenceConstants.PREF_USE_STRUCTURAL_PARSE_MODE, FortranUIPlugin.getResourceString(USE_STRUCTURAL_PARSE_MODE_LABEL), parent);
 		addField(useStructuralParseMode);		
 	}
 	
 
 	public static boolean isLinkToEditor() {
-		return CUIPlugin.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.PREF_LINK_TO_EDITOR);
+		return FortranUIPlugin.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.PREF_LINK_TO_EDITOR);
 	}
 
 	public static void setLinkingEnabled(boolean enable) {
-		CUIPlugin.getDefault().getPreferenceStore().setValue(PreferenceConstants.PREF_LINK_TO_EDITOR, enable);
+		FortranUIPlugin.getDefault().getPreferenceStore().setValue(PreferenceConstants.PREF_LINK_TO_EDITOR, enable);
 	}
 
 	public static boolean useStructuralParseMode() {
-		return CUIPlugin.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.PREF_USE_STRUCTURAL_PARSE_MODE);
+		return FortranUIPlugin.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.PREF_USE_STRUCTURAL_PARSE_MODE);
 	}
 	
 	/**
 	 * @see IWorkbenchPreferencePage#init
 	 */
 	public void init(IWorkbench workbench) {
-		CUIPlugin.getDefault().getPreferenceStore().setValue(FortranCorePlugin.PREF_USE_STRUCTURAL_PARSE_MODE, FortranCorePlugin.getDefault().useStructuralParseMode());
+		FortranUIPlugin.getDefault().getPreferenceStore().setValue(FortranCorePlugin.PREF_USE_STRUCTURAL_PARSE_MODE, FortranCorePlugin.getDefault().useStructuralParseMode());
 	}
 	
 	/**

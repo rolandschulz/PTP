@@ -10,18 +10,18 @@
  *******************************************************************************/
 package org.eclipse.fdt.ui.wizards;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.wizards.filewizard.AbstractFileCreationWizard;
 import org.eclipse.fdt.internal.ui.wizards.filewizard.NewFileWizardMessages;
 import org.eclipse.fdt.internal.ui.wizards.filewizard.NewSourceFileCreationWizardPage;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 public class NewSourceFileCreationWizard extends AbstractFileCreationWizard {
     
     public NewSourceFileCreationWizard() {
         super();
-        setDefaultPageImageDescriptor(CPluginImages.DESC_WIZBAN_NEW_SOURCEFILE);
-        setDialogSettings(CUIPlugin.getDefault().getDialogSettings());
+        setDefaultPageImageDescriptor(FortranPluginImages.DESC_WIZBAN_NEW_SOURCEFILE);
+        setDialogSettings(FortranUIPlugin.getDefault().getDialogSettings());
         setWindowTitle(NewFileWizardMessages.getString("NewSourceFileCreationWizard.title")); //$NON-NLS-1$
     }
     

@@ -16,11 +16,11 @@ import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.IMember;
 import org.eclipse.fdt.core.model.ITranslationUnit;
-import org.eclipse.fdt.internal.ui.CUIMessages;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
 import org.eclipse.fdt.internal.ui.actions.OpenActionUtil;
 import org.eclipse.fdt.internal.ui.util.EditorUtility;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.jface.util.Assert;
 import org.eclipse.ui.IEditorPart;
@@ -48,8 +48,8 @@ public class OpenTypeHierarchyUtil {
 			
 		ICElement input= null;
 		if (candidates.length > 1) {
-			String title= CUIMessages.getString("OpenTypeHierarchyUtil.selectionDialog.title");  //$NON-NLS-1$
-			String message= CUIMessages.getString("OpenTypeHierarchyUtil.selectionDialog.message"); //$NON-NLS-1$
+			String title= FortranUIMessages.getString("OpenTypeHierarchyUtil.selectionDialog.title");  //$NON-NLS-1$
+			String message= FortranUIMessages.getString("OpenTypeHierarchyUtil.selectionDialog.message"); //$NON-NLS-1$
 			input= OpenActionUtil.selectCElement(candidates, window.getShell(), title, message);			
 		} else {
 			input= candidates[0];
@@ -65,11 +65,11 @@ public class OpenTypeHierarchyUtil {
 				
 		} catch (WorkbenchException e) {
 			ExceptionHandler.handle(e, window.getShell(),
-				CUIMessages.getString("OpenTypeHierarchyUtil.error.open_perspective"), //$NON-NLS-1$
+				FortranUIMessages.getString("OpenTypeHierarchyUtil.error.open_perspective"), //$NON-NLS-1$
 				e.getMessage());
 		} catch (CModelException e) {
 			ExceptionHandler.handle(e, window.getShell(),
-				CUIMessages.getString("OpenTypeHierarchyUtil.error.open_editor"), //$NON-NLS-1$
+				FortranUIMessages.getString("OpenTypeHierarchyUtil.error.open_editor"), //$NON-NLS-1$
 				e.getMessage());
 		}
 		return null;
@@ -78,11 +78,11 @@ public class OpenTypeHierarchyUtil {
 	private static TypeHierarchyViewPart openInViewPart(IWorkbenchWindow window, ICElement input) {
 		IWorkbenchPage page= window.getActivePage();
 		try {
-			TypeHierarchyViewPart result= (TypeHierarchyViewPart) page.findView(CUIPlugin.ID_TYPE_HIERARCHY);
+			TypeHierarchyViewPart result= (TypeHierarchyViewPart) page.findView(FortranUIPlugin.ID_TYPE_HIERARCHY);
 			if (result != null) {
 				result.clearNeededRefresh(); // avoid refresh of old hierarchy on 'becomes visible'
 			}
-			result= (TypeHierarchyViewPart) page.showView(CUIPlugin.ID_TYPE_HIERARCHY);
+			result= (TypeHierarchyViewPart) page.showView(FortranUIPlugin.ID_TYPE_HIERARCHY);
 			result.setInputElement(input);
 			
 			if (input instanceof IMember) {
@@ -91,13 +91,13 @@ public class OpenTypeHierarchyUtil {
 			return result;
 		} catch (CoreException e) {
 			ExceptionHandler.handle(e, window.getShell(), 
-				CUIMessages.getString("OpenTypeHierarchyUtil.error.open_view"), e.getMessage()); //$NON-NLS-1$
+				FortranUIMessages.getString("OpenTypeHierarchyUtil.error.open_view"), e.getMessage()); //$NON-NLS-1$
 		}
 		return null;		
 	}
 	
 	private static TypeHierarchyViewPart openInPerspective(IWorkbenchWindow window, ICElement input) throws WorkbenchException, CModelException {
-		IWorkbench workbench= CUIPlugin.getDefault().getWorkbench();
+		IWorkbench workbench= FortranUIPlugin.getDefault().getWorkbench();
 		// The problem is that the input element can be a working copy. So we first convert it to the original element if
 		// it exists.
 		ICElement perspectiveInput= input;
@@ -111,13 +111,13 @@ public class OpenTypeHierarchyUtil {
 				perspectiveInput= input;
 			}
 		}
-		IWorkbenchPage page= workbench.showPerspective(CUIPlugin.ID_CHIERARCHY_PERSPECTIVE, window, perspectiveInput);
+		IWorkbenchPage page= workbench.showPerspective(FortranUIPlugin.ID_CHIERARCHY_PERSPECTIVE, window, perspectiveInput);
 		
-		TypeHierarchyViewPart part= (TypeHierarchyViewPart) page.findView(CUIPlugin.ID_TYPE_HIERARCHY);
+		TypeHierarchyViewPart part= (TypeHierarchyViewPart) page.findView(FortranUIPlugin.ID_TYPE_HIERARCHY);
 		if (part != null) {
 			part.clearNeededRefresh(); // avoid refresh of old hierarchy on 'becomes visible'
 		}		
-		part= (TypeHierarchyViewPart) page.showView(CUIPlugin.ID_TYPE_HIERARCHY);
+		part= (TypeHierarchyViewPart) page.showView(FortranUIPlugin.ID_TYPE_HIERARCHY);
 		part.setInputElement(perspectiveInput);
 		if (input instanceof IMember) {
 			part.selectMember(input);
@@ -168,7 +168,7 @@ public class OpenTypeHierarchyUtil {
 				default:
 			}
 		} catch (CModelException e) {
-			CUIPlugin.getDefault().log(e);
+			FortranUIPlugin.getDefault().log(e);
 		}
 		return null;	
 	}

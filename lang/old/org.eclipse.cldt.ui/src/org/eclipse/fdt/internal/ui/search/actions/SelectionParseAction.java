@@ -32,7 +32,7 @@ import org.eclipse.fdt.core.parser.ParserUtil;
 import org.eclipse.fdt.core.parser.ScannerInfo;
 import org.eclipse.fdt.internal.ui.editor.CEditor;
 import org.eclipse.fdt.internal.ui.search.CSearchMessages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.text.BadLocationException;
@@ -87,7 +87,7 @@ public class SelectionParseAction extends Action {
 		
 		IWorkingCopy workingCopy = null;
 		if( fEditor.isDirty() ){
-			IWorkingCopy [] workingCopies = CUIPlugin.getSharedWorkingCopies();
+			IWorkingCopy [] workingCopies = FortranUIPlugin.getSharedWorkingCopies();
 			if( workingCopies != null ){
 				for( int i = 0; i < workingCopies.length; i++ ){
 					if( workingCopies[i].getUnderlyingResource().equals( resourceFile ) ){

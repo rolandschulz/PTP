@@ -27,7 +27,7 @@ import org.eclipse.fdt.core.model.IOutputEntry;
 import org.eclipse.fdt.core.model.IPathEntry;
 import org.eclipse.fdt.core.model.IPathEntryContainer;
 import org.eclipse.fdt.core.model.ISourceEntry;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 public class CPElement {
 
@@ -437,13 +437,13 @@ public class CPElement {
 			fStatus = Status.OK_STATUS;
 			IResource res = null;
 			IPath path;
-			IWorkspaceRoot root = CUIPlugin.getWorkspace().getRoot();
+			IWorkspaceRoot root = FortranUIPlugin.getWorkspace().getRoot();
 			IPathEntry entry = getPathEntry();
 			switch (getEntryKind()) {
 				case IPathEntry.FDT_CONTAINER :
 					try {
 						if ((CoreModel.getPathEntryContainer(fPath, fCProject) == null)) {
-							fStatus = new Status(IStatus.WARNING, CUIPlugin.PLUGIN_ID, -1,
+							fStatus = new Status(IStatus.WARNING, FortranUIPlugin.PLUGIN_ID, -1,
 									CPathEntryMessages.getString("CPElement.status.pathContainerMissing"), null); //$NON-NLS-1$
 						}
 					} catch (CModelException e) {
@@ -451,7 +451,7 @@ public class CPElement {
 					break;
 				case IPathEntry.FDT_LIBRARY :
 					if (!((ILibraryEntry)entry).getFullLibraryPath().toFile().exists()) {
-						fStatus = new Status(IStatus.WARNING, CUIPlugin.PLUGIN_ID, -1, CPathEntryMessages.getString("CPElement.status.libraryPathNotFound"), null); //$NON-NLS-1$
+						fStatus = new Status(IStatus.WARNING, FortranUIPlugin.PLUGIN_ID, -1, CPathEntryMessages.getString("CPElement.status.libraryPathNotFound"), null); //$NON-NLS-1$
 					}
 					break;
 				case IPathEntry.FDT_SOURCE :
@@ -461,7 +461,7 @@ public class CPElement {
 						if (root.getWorkspace().validatePath(path.toString(), IResource.FOLDER).isOK()) {
 							res = root.getFolder(path);
 						}
-						fStatus = new Status(IStatus.WARNING, CUIPlugin.PLUGIN_ID, -1, CPathEntryMessages.getString("CPElement.status.sourcePathMissing"), null); //$NON-NLS-1$
+						fStatus = new Status(IStatus.WARNING, FortranUIPlugin.PLUGIN_ID, -1, CPathEntryMessages.getString("CPElement.status.sourcePathMissing"), null); //$NON-NLS-1$
 					}
 					break;
 				case IPathEntry.FDT_OUTPUT :
@@ -471,7 +471,7 @@ public class CPElement {
 						if (root.getWorkspace().validatePath(path.toString(), IResource.FOLDER).isOK()) {
 							res = root.getFolder(path);
 						}
-						fStatus = new Status(IStatus.WARNING, CUIPlugin.PLUGIN_ID, -1, CPathEntryMessages.getString("CPElement.status.outputPathMissing"), null); //$NON-NLS-1$
+						fStatus = new Status(IStatus.WARNING, FortranUIPlugin.PLUGIN_ID, -1, CPathEntryMessages.getString("CPElement.status.outputPathMissing"), null); //$NON-NLS-1$
 					}
 					break;
 				case IPathEntry.FDT_INCLUDE :
@@ -484,11 +484,11 @@ public class CPElement {
 					}
 					if (res.getType() != IResource.ROOT && res.getType() != IResource.PROJECT && fCProject != null) {
 						if (!fCProject.isOnSourceRoot(res)) {
-							fStatus = new Status(IStatus.WARNING, CUIPlugin.PLUGIN_ID, -1, CPathEntryMessages.getString("CPElement.status.notOnSourcePath"), null); //$NON-NLS-1$
+							fStatus = new Status(IStatus.WARNING, FortranUIPlugin.PLUGIN_ID, -1, CPathEntryMessages.getString("CPElement.status.notOnSourcePath"), null); //$NON-NLS-1$
 						}
 					}
 					if (!((IIncludeEntry)entry).getFullIncludePath().toFile().exists()) {
-						fStatus = new Status(IStatus.WARNING, CUIPlugin.PLUGIN_ID, -1, CPathEntryMessages.getString("CPElement.status.includePathNotFound"), null); //$NON-NLS-1$
+						fStatus = new Status(IStatus.WARNING, FortranUIPlugin.PLUGIN_ID, -1, CPathEntryMessages.getString("CPElement.status.includePathNotFound"), null); //$NON-NLS-1$
 					}
 					break;
 				case IPathEntry.FDT_MACRO :
@@ -501,14 +501,14 @@ public class CPElement {
 					}
 					if (res.getType() != IResource.ROOT && res.getType() != IResource.PROJECT && fCProject != null) {
 						if (!fCProject.isOnSourceRoot(res)) {
-							fStatus = new Status(IStatus.WARNING, CUIPlugin.PLUGIN_ID, -1, CPathEntryMessages.getString("CPElement.status.notOnSourcePath"), null); //$NON-NLS-1$
+							fStatus = new Status(IStatus.WARNING, FortranUIPlugin.PLUGIN_ID, -1, CPathEntryMessages.getString("CPElement.status.notOnSourcePath"), null); //$NON-NLS-1$
 						}
 					}
 					break;
 				case IPathEntry.FDT_PROJECT :
 					res = root.findMember(fPath);
 					if (res == null) {
-						fStatus = new Status(IStatus.ERROR, CUIPlugin.PLUGIN_ID, -1, CPathEntryMessages.getString("CPElement.status.missingProjectPath"), null); //$NON-NLS-1$
+						fStatus = new Status(IStatus.ERROR, FortranUIPlugin.PLUGIN_ID, -1, CPathEntryMessages.getString("CPElement.status.missingProjectPath"), null); //$NON-NLS-1$
 					}
 					break;
 			}
@@ -551,7 +551,7 @@ public class CPElement {
 
 	public static CPElement createFromExisting(IPathEntry curr, ICProject project) {
 		IPath path = curr.getPath();
-		IWorkspaceRoot root = CUIPlugin.getWorkspace().getRoot();
+		IWorkspaceRoot root = FortranUIPlugin.getWorkspace().getRoot();
 		IPath sourceAttachment = null;
 		IPath[] exclusion = null;
 		IPath include = null;

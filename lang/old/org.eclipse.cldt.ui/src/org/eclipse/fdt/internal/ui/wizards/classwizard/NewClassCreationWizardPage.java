@@ -68,7 +68,7 @@ import org.eclipse.fdt.internal.ui.wizards.dialogfields.Separator;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.StringButtonDialogField;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.StringDialogField;
 import org.eclipse.fdt.internal.ui.wizards.filewizard.NewSourceFileGenerator;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -484,9 +484,9 @@ public class NewClassCreationWizardPage extends NewElementWizardPage {
     		}
     	}
     	if (celem == null) {
-    		IWorkbenchPart part = CUIPlugin.getActivePage().getActivePart();
+    		IWorkbenchPart part = FortranUIPlugin.getActivePage().getActivePart();
     		if (part instanceof ContentOutline) {
-    			part = CUIPlugin.getActivePage().getActiveEditor();
+    			part = FortranUIPlugin.getActivePage().getActiveEditor();
     		}
     		
     		if (part instanceof IViewPartInputProvider) {
@@ -514,7 +514,7 @@ public class NewClassCreationWizardPage extends NewElementWizardPage {
     				celem = projects[0];
     			}
     		} catch (CModelException e) {
-    			CUIPlugin.getDefault().log(e);
+    			FortranUIPlugin.getDefault().log(e);
     		}
     	}
     	return celem;
@@ -565,7 +565,7 @@ public class NewClassCreationWizardPage extends NewElementWizardPage {
     					        folder = roots[0];
     					}
     				} catch (CModelException e) {
-    					CUIPlugin.getDefault().log(e);
+    					FortranUIPlugin.getDefault().log(e);
     				}
     				if (folder == null) {
     				    folder = cproject.findSourceRoot(cproject.getResource());
@@ -622,7 +622,7 @@ public class NewClassCreationWizardPage extends NewElementWizardPage {
      * @since 3.0 
      */
     protected ITextSelection getCurrentTextSelection() {
-    	IWorkbenchPart part = CUIPlugin.getActivePage().getActivePart();
+    	IWorkbenchPart part = FortranUIPlugin.getActivePage().getActivePart();
     	if (part instanceof IEditorPart) {
     		ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
     		if (selectionProvider != null) {

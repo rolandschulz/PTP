@@ -6,19 +6,19 @@ package org.eclipse.fdt.internal.ui;
  */
  
 import org.eclipse.fdt.internal.ui.wizards.CWizardRegistry;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.console.IConsoleConstants;
 
-public class CPerspectiveFactory implements IPerspectiveFactory {
+public class FortranPerspectiveFactory implements IPerspectiveFactory {
 		
 	/**
 	 * Constructs a new Default layout engine.
 	 */
-	public CPerspectiveFactory() {
+	public FortranPerspectiveFactory() {
 		super();
 	}
 
@@ -29,7 +29,7 @@ public class CPerspectiveFactory implements IPerspectiveFactory {
  		String editorArea = layout.getEditorArea();
 		
 		IFolderLayout folder1= layout.createFolder("topLeft", IPageLayout.LEFT, (float)0.25, editorArea); //$NON-NLS-1$
-		folder1.addView(CUIPlugin.CVIEW_ID);
+		folder1.addView(FortranUIPlugin.CVIEW_ID);
 		folder1.addView(IPageLayout.ID_RES_NAV);
 		folder1.addPlaceholder(IPageLayout.ID_BOOKMARKS);
 		
@@ -41,8 +41,8 @@ public class CPerspectiveFactory implements IPerspectiveFactory {
 		IFolderLayout folder3= layout.createFolder("topRight", IPageLayout.RIGHT,(float)0.75, editorArea); //$NON-NLS-1$
 		folder3.addView(IPageLayout.ID_OUTLINE);
 
-		layout.addActionSet(CUIPlugin.SEARCH_ACTION_SET_ID);
-		layout.addActionSet(CUIPlugin.ID_CELEMENT_CREATION_ACTION_SET);
+		layout.addActionSet(FortranUIPlugin.SEARCH_ACTION_SET_ID);
+		layout.addActionSet(FortranUIPlugin.ID_CELEMENT_CREATION_ACTION_SET);
 		
 		// views - build console
 		layout.addShowViewShortcut(IConsoleConstants.ID_CONSOLE_VIEW);
@@ -53,12 +53,12 @@ public class CPerspectiveFactory implements IPerspectiveFactory {
 		// views - standard workbench
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_PROBLEM_VIEW);
-		layout.addShowViewShortcut(CUIPlugin.CVIEW_ID);
+		layout.addShowViewShortcut(FortranUIPlugin.CVIEW_ID);
 		layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
 		layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
 
 		// link - things we should do
-		layout.addShowInPart(CUIPlugin.CVIEW_ID);
+		layout.addShowInPart(FortranUIPlugin.CVIEW_ID);
 		layout.addShowInPart(IPageLayout.ID_RES_NAV);
 		
 		addCWizardShortcuts(layout);

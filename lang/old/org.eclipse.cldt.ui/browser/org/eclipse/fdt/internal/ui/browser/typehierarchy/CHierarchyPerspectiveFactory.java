@@ -11,7 +11,7 @@
 
 package org.eclipse.fdt.internal.ui.browser.typehierarchy;
 
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -32,9 +32,9 @@ public class CHierarchyPerspectiveFactory implements IPerspectiveFactory {
  		String editorArea = layout.getEditorArea();
 		
 		IFolderLayout folder= layout.createFolder("left", IPageLayout.LEFT, (float)0.25, editorArea); //$NON-NLS-1$
-		folder.addView(CUIPlugin.ID_TYPE_HIERARCHY); 
+		folder.addView(FortranUIPlugin.ID_TYPE_HIERARCHY); 
 		folder.addPlaceholder(IPageLayout.ID_OUTLINE);
-		folder.addPlaceholder(CUIPlugin.CVIEW_ID);
+		folder.addPlaceholder(FortranUIPlugin.CVIEW_ID);
 		folder.addPlaceholder(IPageLayout.ID_RES_NAV);
 		
 		IPlaceholderFolderLayout outputfolder= layout.createPlaceholderFolder("bottom", IPageLayout.BOTTOM, (float)0.75, editorArea); //$NON-NLS-1$
@@ -42,17 +42,17 @@ public class CHierarchyPerspectiveFactory implements IPerspectiveFactory {
 		outputfolder.addPlaceholder(NewSearchUI.SEARCH_VIEW_ID);
 		outputfolder.addPlaceholder(IConsoleConstants.ID_CONSOLE_VIEW);
 		outputfolder.addPlaceholder(IPageLayout.ID_BOOKMARKS);
-//		outputfolder.addPlaceholder(CUIPlugin.ID_SOURCE_VIEW);
-//		outputfolder.addPlaceholder(CUIPlugin.ID_JAVADOC_VIEW);
-//		outputfolder.addPlaceholder(CPerspectiveFactory.ID_PROGRESS_VIEW);
+//		outputfolder.addPlaceholder(FortranUIPlugin.ID_SOURCE_VIEW);
+//		outputfolder.addPlaceholder(FortranUIPlugin.ID_JAVADOC_VIEW);
+//		outputfolder.addPlaceholder(FortranPerspectiveFactory.ID_PROGRESS_VIEW);
 		
 //		layout.addActionSet(IDebugUIConstants.LAUNCH_ACTION_SET);
 //		layout.addActionSet(JavaUI.ID_ACTION_SET);
 //		layout.addActionSet(JavaUI.ID_ELEMENT_CREATION_ACTION_SET);		
 		
 		// views - java
-		layout.addShowViewShortcut(CUIPlugin.CVIEW_ID);
-		layout.addShowViewShortcut(CUIPlugin.ID_TYPE_HIERARCHY);
+		layout.addShowViewShortcut(FortranUIPlugin.CVIEW_ID);
+		layout.addShowViewShortcut(FortranUIPlugin.ID_TYPE_HIERARCHY);
 
 		layout.addShowViewShortcut(NewSearchUI.SEARCH_VIEW_ID);
 		

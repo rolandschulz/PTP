@@ -31,7 +31,7 @@ import org.eclipse.fdt.core.search.SearchEngine;
 import org.eclipse.fdt.internal.ui.codemanipulation.StubUtility;
 import org.eclipse.fdt.internal.ui.text.CCodeReader;
 import org.eclipse.fdt.internal.ui.util.Strings;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IWorkingCopyManager;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -66,7 +66,7 @@ public class CSourceHover extends AbstractCEditorTextHover implements ITextHover
 		IEditorPart editor = getEditor();
 		if (editor != null) {
 			IEditorInput input= editor.getEditorInput();
-			IWorkingCopyManager manager= CUIPlugin.getDefault().getWorkingCopyManager();				
+			IWorkingCopyManager manager= FortranUIPlugin.getDefault().getWorkingCopyManager();				
 			IWorkingCopy copy = manager.getWorkingCopy(input);
 			if (copy == null) {
 				return null;
@@ -143,7 +143,7 @@ public class CSourceHover extends AbstractCEditorTextHover implements ITextHover
 				if (reader != null)
 					reader.close();
 			} catch (IOException ex) {
-				CUIPlugin.getDefault().log(ex);
+				FortranUIPlugin.getDefault().log(ex);
 			}
 		}
 
@@ -156,7 +156,7 @@ public class CSourceHover extends AbstractCEditorTextHover implements ITextHover
 		IEditorPart editor = getEditor();
 		if (editor != null) {
 			IEditorInput input= editor.getEditorInput();
-			IWorkingCopyManager manager= CUIPlugin.getDefault().getWorkingCopyManager();				
+			IWorkingCopyManager manager= FortranUIPlugin.getDefault().getWorkingCopyManager();				
 			IWorkingCopy copy = manager.getWorkingCopy(input);
 
 			if (copy != null) {
@@ -180,7 +180,7 @@ public class CSourceHover extends AbstractCEditorTextHover implements ITextHover
 					
 					SearchEngine searchEngine = new SearchEngine();
 					searchEngine.setWaitingPolicy(ICSearchConstants.FORCE_IMMEDIATE_SEARCH);
-					searchEngine.search(CUIPlugin.getWorkspace(), orPattern, scope, searchResultCollector, true);
+					searchEngine.search(FortranUIPlugin.getWorkspace(), orPattern, scope, searchResultCollector, true);
 					
 					Set set = searchResultCollector.getSearchResults();
 					if (set != null && set.size() > 0 ) {

@@ -15,7 +15,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 
 /**
- * Invocation context for the CHelpProviderManager
+ * Invocation context for the FortranHelpProviderManager
  */
 public interface ICHelpInvocationContext {
 	

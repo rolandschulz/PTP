@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.fdt.internal.ui.cview;
 
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
@@ -57,7 +57,7 @@ public abstract class CViewAction extends SelectionProviderAction {
 	 * Returns the workbench.
 	 */
 	protected IWorkbench getWorkbench() {
-		return CUIPlugin.getDefault().getWorkbench();
+		return FortranUIPlugin.getDefault().getWorkbench();
 	}
 
 	/**

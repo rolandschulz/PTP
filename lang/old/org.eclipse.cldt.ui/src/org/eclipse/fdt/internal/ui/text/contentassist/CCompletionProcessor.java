@@ -25,13 +25,13 @@ import org.eclipse.fdt.core.search.ICSearchScope;
 import org.eclipse.fdt.core.search.OrPattern;
 import org.eclipse.fdt.core.search.SearchEngine;
 import org.eclipse.fdt.internal.corext.template.c.CContextType;
-import org.eclipse.fdt.internal.ui.CHelpProviderManager;
-import org.eclipse.fdt.internal.ui.CPluginImages;
-import org.eclipse.fdt.internal.ui.CUIMessages;
+import org.eclipse.fdt.internal.ui.FortranHelpProviderManager;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
 import org.eclipse.fdt.internal.ui.editor.CEditor;
 import org.eclipse.fdt.internal.ui.text.CParameterListValidator;
 import org.eclipse.fdt.internal.ui.text.template.TemplateEngine;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IFunctionSummary;
 import org.eclipse.fdt.ui.IWorkingCopyManager;
 import org.eclipse.fdt.ui.text.ICCompletionProposal;
@@ -123,7 +123,7 @@ public class CCompletionProcessor implements IContentAssistProcessor {
 	
 	public CCompletionProcessor(IEditorPart editor) {
 		fEditor = (CEditor) editor;
-		fManager= CUIPlugin.getDefault().getWorkingCopyManager();
+		fManager= FortranUIPlugin.getDefault().getWorkingCopyManager();
 		// Needed for search
 		searchResultCollector = new BasicSearchResultCollector ();
 		resultCollector = new ResultCollector();
@@ -139,10 +139,10 @@ public class CCompletionProcessor implements IContentAssistProcessor {
 	}
 	
 	private void setupTemplateEngine() {
-		TemplateContextType contextType = CUIPlugin.getDefault().getTemplateContextRegistry().getContextType(CContextType.CCONTEXT_TYPE);			
+		TemplateContextType contextType = FortranUIPlugin.getDefault().getTemplateContextRegistry().getContextType(CContextType.CCONTEXT_TYPE);			
 		if (contextType == null) {
 			contextType= new CContextType();
-			CUIPlugin.getDefault().getTemplateContextRegistry().addContextType(contextType);
+			FortranUIPlugin.getDefault().getTemplateContextRegistry().addContextType(contextType);
 		}
 		if (contextType != null) {
 			fTemplateEngine = new TemplateEngine(contextType);
@@ -165,7 +165,7 @@ public class CCompletionProcessor implements IContentAssistProcessor {
 		if (fNumberOfComputedResults == 0) {
 			String errorMsg= resultCollector.getErrorMessage();
 			if (errorMsg == null || errorMsg.length() == 0)
-				errorMsg= CUIMessages.getString("CEditor.contentassist.noCompletions"); //$NON-NLS-1$
+				errorMsg= FortranUIMessages.getString("CEditor.contentassist.noCompletions"); //$NON-NLS-1$
 			return errorMsg;
 		}
 				
@@ -282,7 +282,7 @@ public class CCompletionProcessor implements IContentAssistProcessor {
 		try {
 			results = evalProposals(document, offset, unit, viewer);
 		} catch (Exception e) {
-			CUIPlugin.getDefault().log(e);
+			FortranUIPlugin.getDefault().log(e);
 		}
 
 		fNumberOfComputedResults= (results == null ? 0 : results.length);
@@ -374,7 +374,7 @@ public class CCompletionProcessor implements IContentAssistProcessor {
 				fTemplateEngine.reset();
 				fTemplateEngine.complete(viewer, fCurrentOffset, fCurrentSourceUnit);
 			} catch (Exception x) {
-				CUIPlugin.getDefault().log(x);
+				FortranUIPlugin.getDefault().log(x);
 			}
 			completions.addAll(fTemplateEngine.getResults());
 		}				
@@ -403,7 +403,7 @@ public class CCompletionProcessor implements IContentAssistProcessor {
 				return fCurrentSourceUnit;
 			}	
 		};
-		summary = CHelpProviderManager.getDefault().getMatchingFunctions(context, prefix);
+		summary = FortranHelpProviderManager.getDefault().getMatchingFunctions(context, prefix);
 		if(summary == null) {
 			return;
 		}
@@ -418,7 +418,7 @@ public class CCompletionProcessor implements IContentAssistProcessor {
 			proposal = new CCompletionProposal(fname, 
 											   offset, 
 											   length,
-											   CPluginImages.get(CPluginImages.IMG_OBJS_FUNCTION), 
+											   FortranPluginImages.get(FortranPluginImages.IMG_OBJS_FUNCTION), 
 											   fproto.getPrototypeString(true),
 											   2,
 											   fTextViewer);
@@ -468,7 +468,7 @@ public class CCompletionProcessor implements IContentAssistProcessor {
 		String searchPrefix = prefix + "*"; //$NON-NLS-1$
 		
 		// figure out the search scope
-		IPreferenceStore store = CUIPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore store = FortranUIPlugin.getDefault().getPreferenceStore();
 		//boolean fileScope = store.getBoolean(ContentAssistPreference.CURRENT_FILE_SEARCH_SCOPE);
 		boolean projectScope = store.getBoolean(ContentAssistPreference.PROJECT_SEARCH_SCOPE);
 		ICSearchScope scope = null;
@@ -506,7 +506,7 @@ public class CCompletionProcessor implements IContentAssistProcessor {
 						searchPrefix, ICSearchConstants.FUNCTION, ICSearchConstants.DECLARATIONS, false ));
 			}
 			try {
-				searchEngine.search(CUIPlugin.getWorkspace(), orPattern, scope, searchResultCollector, true);
+				searchEngine.search(FortranUIPlugin.getWorkspace(), orPattern, scope, searchResultCollector, true);
 			} catch (InterruptedException e) {
 			}
 			elementsFound.addAll(searchResultCollector.getSearchResults());

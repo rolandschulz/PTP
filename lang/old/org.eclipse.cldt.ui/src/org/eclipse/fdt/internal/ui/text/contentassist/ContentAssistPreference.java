@@ -10,7 +10,7 @@ import org.eclipse.swt.graphics.RGB;
 
 import org.eclipse.fdt.internal.ui.text.CTextTools;
 import org.eclipse.fdt.internal.ui.text.IColorManager;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.text.IDocument;
@@ -68,7 +68,7 @@ public class ContentAssistPreference {
 	}
 	
 	private static Color getColor(IPreferenceStore store, String key) {
-		CTextTools textTools= CUIPlugin.getDefault().getTextTools();
+		CTextTools textTools= FortranUIPlugin.getDefault().getTextTools();
 		return getColor(store, key, textTools.getColorManager());
 	}
 	
@@ -115,7 +115,7 @@ public class ContentAssistPreference {
 	 */
 	public static void configure(ContentAssistant assistant, IPreferenceStore store) {	
 			
-		CTextTools textTools= CUIPlugin.getDefault().getTextTools();
+		CTextTools textTools= FortranUIPlugin.getDefault().getTextTools();
 		IColorManager manager= textTools.getColorManager();		
 		
 		boolean enabledDot= store.getBoolean(AUTOACTIVATION_TRIGGERS_DOT);

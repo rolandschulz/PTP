@@ -16,7 +16,7 @@ import java.util.Set;
 import org.eclipse.fdt.core.parser.ast.ASTAccessVisibility;
 import org.eclipse.fdt.internal.ui.util.ImageDescriptorRegistry;
 import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.FunctionPrototypeSummary;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.ITextViewer;
@@ -39,7 +39,7 @@ public class ResultCollector extends CompletionRequestorAdaptor {
 	private final String DEFINE ="#define ";  //$NON-NLS-1$
 	
 	private Set completions = new HashSet();
-	private ImageDescriptorRegistry registry = CUIPlugin.getImageDescriptorRegistry();
+	private ImageDescriptorRegistry registry = FortranUIPlugin.getImageDescriptorRegistry();
 	private IProblem fLastProblem;	
 	private ITextViewer fTextViewer;
 	

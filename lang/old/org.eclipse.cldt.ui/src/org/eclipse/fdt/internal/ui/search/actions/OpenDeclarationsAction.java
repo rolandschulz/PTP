@@ -45,7 +45,7 @@ import org.eclipse.fdt.core.search.ICSearchConstants.SearchFor;
 import org.eclipse.fdt.internal.ui.editor.CEditor;
 import org.eclipse.fdt.internal.ui.editor.CEditorMessages;
 import org.eclipse.fdt.internal.ui.util.EditorUtility;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.text.ITextSelection;
@@ -235,7 +235,7 @@ public class OpenDeclarationsAction extends SelectionParseAction implements IUpd
 	 		}
 
 		} catch(Exception x) {
-		 		 CUIPlugin.getDefault().log(x);
+		 		 FortranUIPlugin.getDefault().log(x);
 		}
 	}
 

@@ -39,7 +39,7 @@ import org.eclipse.fdt.core.model.IWorkingCopy;
 import org.eclipse.fdt.internal.core.model.IBufferFactory;
 import org.eclipse.fdt.internal.corext.refactoring.base.Refactoring;
 import org.eclipse.fdt.internal.corext.template.c.CContextType;
-import org.eclipse.fdt.internal.ui.CElementAdapterFactory;
+import org.eclipse.fdt.internal.ui.FortranElementAdapterFactory;
 import org.eclipse.fdt.internal.ui.ICStatusConstants;
 import org.eclipse.fdt.internal.ui.IContextMenuConstants;
 import org.eclipse.fdt.internal.ui.ResourceAdapterFactory;
@@ -82,7 +82,7 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.ConfigurationElementSorter;
 import org.osgi.framework.BundleContext;
 
-public class CUIPlugin extends AbstractUIPlugin {
+public class FortranUIPlugin extends AbstractUIPlugin {
 
 	private ISharedTextColors fSharedTextColors;
 
@@ -101,7 +101,7 @@ public class CUIPlugin extends AbstractUIPlugin {
 	public static final String SEARCH_ACTION_SET_ID = PLUGIN_ID + ".SearchActionSet"; //$NON-NLS-1$
 	public static final String BUILDER_ID = PLUGIN_CORE_ID + ".cbuilder"; //$NON-NLS-1$
 
-	private static CUIPlugin fgCPlugin;
+	private static FortranUIPlugin fgCPlugin;
 	private static ResourceBundle fgResourceBundle;
 	private ImageDescriptorRegistry fImageDescriptorRegistry;
 	private CEditorTextHoverDescriptor[] fCEditorTextHoverDescriptors;
@@ -121,7 +121,7 @@ public class CUIPlugin extends AbstractUIPlugin {
 
 	static String SEPARATOR = System.getProperty("file.separator"); //$NON-NLS-1$
 
-	private static final String CONTENTASSIST = CUIPlugin.PLUGIN_ID + "/debug/contentassist" ; //$NON-NLS-1$
+	private static final String CONTENTASSIST = FortranUIPlugin.PLUGIN_ID + "/debug/contentassist" ; //$NON-NLS-1$
 
 	
 	/**
@@ -210,7 +210,7 @@ public class CUIPlugin extends AbstractUIPlugin {
 
 	static {
 		try {
-			fgResourceBundle = ResourceBundle.getBundle("org.eclipse.fdt.internal.ui.CPluginResources"); //$NON-NLS-1$
+			fgResourceBundle = ResourceBundle.getBundle("org.eclipse.fdt.internal.ui.FortranPluginResources"); //$NON-NLS-1$
 		}
 		catch (MissingResourceException x) {
 			fgResourceBundle = null;
@@ -275,7 +275,7 @@ public class CUIPlugin extends AbstractUIPlugin {
 		 return null;
 	}
 
-	public static CUIPlugin getDefault() {
+	public static FortranUIPlugin getDefault() {
 		return fgCPlugin;
 	}
 
@@ -325,12 +325,12 @@ public class CUIPlugin extends AbstractUIPlugin {
 				message = null;
 			}
 		} else {
-			status = new Status(IStatus.ERROR, CUIPlugin.PLUGIN_ID, -1, "Internal Error: ", t); //$NON-NLS-1$	
+			status = new Status(IStatus.ERROR, FortranUIPlugin.PLUGIN_ID, -1, "Internal Error: ", t); //$NON-NLS-1$	
 		}
 		ErrorDialog.openError(shell, title, message, status);
 	}
 
-	// ------ CUIPlugin
+	// ------ FortranUIPlugin
 
 	private CoreModel fCoreModel;
 	private CDocumentProvider fDocumentProvider;
@@ -342,7 +342,7 @@ public class CUIPlugin extends AbstractUIPlugin {
 	private ProblemMarkerManager fProblemMarkerManager;
 	private BuildConsoleManager fBuildConsoleManager;
 	private ResourceAdapterFactory fResourceAdapterFactory;
-	private CElementAdapterFactory fCElementAdapterFactory;
+	private FortranElementAdapterFactory fCElementAdapterFactory;
 
 	/** 
 	 * The template context type registry for the java editor. 
@@ -357,7 +357,7 @@ public class CUIPlugin extends AbstractUIPlugin {
 	private TemplateStore fTemplateStore;
 
 
-	public CUIPlugin() {
+	public FortranUIPlugin() {
 		fgCPlugin = this;
 		fDocumentProvider = null;
 		fTextTools = null;		
@@ -432,7 +432,7 @@ public class CUIPlugin extends AbstractUIPlugin {
 		registerAdapters();
 		IWorkingCopyProvider workingCopyProvider = new IWorkingCopyProvider() {
 			public IWorkingCopy[] getWorkingCopies() {
-				return CUIPlugin.getSharedWorkingCopies();
+				return FortranUIPlugin.getSharedWorkingCopies();
 			}
 		};
         AllTypesCache.initialize(workingCopyProvider);
@@ -502,7 +502,7 @@ public class CUIPlugin extends AbstractUIPlugin {
 
 	protected void registerAdapters() {
 		fResourceAdapterFactory = new ResourceAdapterFactory();
-		fCElementAdapterFactory = new CElementAdapterFactory();
+		fCElementAdapterFactory = new FortranElementAdapterFactory();
 
 		IAdapterManager manager = Platform.getAdapterManager();
 		manager.registerAdapters(fResourceAdapterFactory, IResource.class);

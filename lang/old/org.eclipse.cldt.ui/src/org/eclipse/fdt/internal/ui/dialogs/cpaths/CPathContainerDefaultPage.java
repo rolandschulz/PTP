@@ -16,7 +16,7 @@ import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.core.model.IContainerEntry;
 import org.eclipse.fdt.core.model.IPathEntry;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.dialogs.StatusInfo;
 import org.eclipse.fdt.internal.ui.wizards.NewElementWizardPage;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.DialogField;
@@ -43,7 +43,7 @@ public class CPathContainerDefaultPage extends NewElementWizardPage implements I
 		super("CPathContainerDefaultPage"); //$NON-NLS-1$
 		setTitle(CPathEntryMessages.getString("CPathContainerDefaultPage.title")); //$NON-NLS-1$
 		setDescription(CPathEntryMessages.getString("CPathContainerDefaultPage.description")); //$NON-NLS-1$
-		setImageDescriptor(CPluginImages.DESC_WIZBAN_ADD_LIBRARY);
+		setImageDescriptor(FortranPluginImages.DESC_WIZBAN_ADD_LIBRARY);
 		
 		fUsedPaths= new ArrayList();
 		

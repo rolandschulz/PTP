@@ -14,7 +14,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.fdt.core.ConsoleOutputStream;
 import org.eclipse.fdt.core.resources.IConsole;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IBuildConsoleManager;
 
 public class CBuildConsole implements IConsole {
@@ -25,7 +25,7 @@ public class CBuildConsole implements IConsole {
 	 * Constructor for BuildConsole.
 	 */
 	public CBuildConsole() {
-		fConsoleManager = CUIPlugin.getDefault().getConsoleManager();
+		fConsoleManager = FortranUIPlugin.getDefault().getConsoleManager();
 	}
 
 	public void start(IProject project ) {

@@ -5,7 +5,7 @@ package org.eclipse.fdt.internal.ui;
  * All Rights Reserved.
  */
 
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
 /**
@@ -22,7 +22,7 @@ public interface IContextMenuConstants {
 	 * 
 	 * @since 2.0
 	 */
-	public static final String TARGET_ID_SUPERTYPES_VIEW= CUIPlugin.ID_TYPE_HIERARCHY + ".supertypes"; //$NON-NLS-1$	
+	public static final String TARGET_ID_SUPERTYPES_VIEW= FortranUIPlugin.ID_TYPE_HIERARCHY + ".supertypes"; //$NON-NLS-1$	
 
 	/**
 	 * Type hierarchy view part: Pop-up menu target ID for the subtype hierarchy viewer
@@ -30,7 +30,7 @@ public interface IContextMenuConstants {
 	 * 
 	 * @since 2.0
 	 */
-	public static final String TARGET_ID_SUBTYPES_VIEW= CUIPlugin.ID_TYPE_HIERARCHY + ".subtypes"; //$NON-NLS-1$	
+	public static final String TARGET_ID_SUBTYPES_VIEW= FortranUIPlugin.ID_TYPE_HIERARCHY + ".subtypes"; //$NON-NLS-1$	
 
 	/**
 	 * Type hierarchy view part: pop-up menu target ID for the meber viewer
@@ -38,7 +38,7 @@ public interface IContextMenuConstants {
 	 * 
 	 * @since 2.0
 	 */
-	public static final String TARGET_ID_MEMBERS_VIEW= CUIPlugin.ID_TYPE_HIERARCHY + ".members"; //$NON-NLS-1$	
+	public static final String TARGET_ID_MEMBERS_VIEW= FortranUIPlugin.ID_TYPE_HIERARCHY + ".members"; //$NON-NLS-1$	
 
 	/**
 	 * Pop-up menu: name of group for goto actions (value <code>"group.open"</code>).

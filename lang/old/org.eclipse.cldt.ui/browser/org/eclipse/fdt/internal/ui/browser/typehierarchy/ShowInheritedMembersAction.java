@@ -12,7 +12,7 @@ package org.eclipse.fdt.internal.ui.browser.typehierarchy;
 
 import org.eclipse.swt.custom.BusyIndicator;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.jface.action.Action;
 
@@ -34,8 +34,8 @@ public class ShowInheritedMembersAction extends Action {
 		setDescription(TypeHierarchyMessages.getString("ShowInheritedMembersAction.description")); //$NON-NLS-1$
 		setToolTipText(TypeHierarchyMessages.getString("ShowInheritedMembersAction.tooltip")); //$NON-NLS-1$
 		
-//		CPluginImages.setLocalImageDescriptors(this, "inher_co.gif"); //$NON-NLS-1$
-		CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, "inher_co.gif"); //$NON-NLS-1$
+//		FortranPluginImages.setLocalImageDescriptors(this, "inher_co.gif"); //$NON-NLS-1$
+		FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, "inher_co.gif"); //$NON-NLS-1$
 
 		fMethodsViewer= viewer;
 		

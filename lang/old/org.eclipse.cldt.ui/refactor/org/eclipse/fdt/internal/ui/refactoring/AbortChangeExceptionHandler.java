@@ -15,7 +15,7 @@ import org.eclipse.fdt.internal.corext.refactoring.base.ChangeAbortException;
 import org.eclipse.fdt.internal.corext.refactoring.base.ChangeContext;
 import org.eclipse.fdt.internal.corext.refactoring.base.IChange;
 import org.eclipse.fdt.internal.corext.refactoring.base.IChangeExceptionHandler;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 /**
  * A default implementation of <code>IChangeExceptionHandler</code> which
@@ -24,7 +24,7 @@ import org.eclipse.fdt.ui.CUIPlugin;
 public class AbortChangeExceptionHandler implements IChangeExceptionHandler {
 	
 	public void handle(ChangeContext context, IChange change, Exception e) {
-		CUIPlugin.getDefault().log(e);
+		FortranUIPlugin.getDefault().log(e);
 		throw new ChangeAbortException(e);
 	}
 }

@@ -15,7 +15,7 @@ import org.eclipse.fdt.internal.ui.text.contentassist.CCompletionProcessor;
 import org.eclipse.fdt.internal.ui.text.contentassist.CCompletionProcessor2;
 import org.eclipse.fdt.internal.ui.text.contentassist.ContentAssistPreference;
 import org.eclipse.fdt.ui.CElementContentProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
@@ -71,7 +71,7 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 	 * @param editor the editor in which the configured viewer will reside
 	 */
 	public CSourceViewerConfiguration(CTextTools tools, CEditor editor) {
-		super(CUIPlugin.getDefault().getCombinedPreferenceStore());
+		super(FortranUIPlugin.getDefault().getCombinedPreferenceStore());
 		fTextTools= tools;
 		fEditor= editor;
 	}
@@ -333,7 +333,7 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 	 * @since 2.1
 	 */
 	public int[] getConfiguredTextHoverStateMasks(ISourceViewer sourceViewer, String contentType) {
-		CEditorTextHoverDescriptor[] hoverDescs= CUIPlugin.getDefault().getCEditorTextHoverDescriptors();
+		CEditorTextHoverDescriptor[] hoverDescs= FortranUIPlugin.getDefault().getCEditorTextHoverDescriptors();
 		int stateMasks[]= new int[hoverDescs.length];
 		int stateMasksLength= 0;		
 		for (int i= 0; i < hoverDescs.length; i++) {
@@ -362,7 +362,7 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 	 * @since 2.1
 	 */
 	public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType, int stateMask) {
-		CEditorTextHoverDescriptor[] hoverDescs= CUIPlugin.getDefault().getCEditorTextHoverDescriptors();
+		CEditorTextHoverDescriptor[] hoverDescs= FortranUIPlugin.getDefault().getCEditorTextHoverDescriptors();
 		int i= 0;
 		while (i < hoverDescs.length) {
 			if (hoverDescs[i].isEnabled() &&  hoverDescs[i].getStateMask() == stateMask)
@@ -406,7 +406,7 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 	}
 	
 	protected IPreferenceStore getPreferenceStore() {
-		return CUIPlugin.getDefault().getPreferenceStore();
+		return FortranUIPlugin.getDefault().getPreferenceStore();
 	}
 	
 	/*
@@ -484,9 +484,9 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
      * @return the settings
      */
     private IDialogSettings getSettings(String sectionName) {
-        IDialogSettings settings= CUIPlugin.getDefault().getDialogSettings().getSection(sectionName);
+        IDialogSettings settings= FortranUIPlugin.getDefault().getDialogSettings().getSection(sectionName);
         if (settings == null) {
-            settings= CUIPlugin.getDefault().getDialogSettings().addNewSection(sectionName);
+            settings= FortranUIPlugin.getDefault().getDialogSettings().addNewSection(sectionName);
         }
         
         return settings;

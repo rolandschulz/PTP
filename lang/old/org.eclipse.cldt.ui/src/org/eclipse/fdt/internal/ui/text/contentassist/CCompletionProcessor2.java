@@ -31,7 +31,7 @@ import org.eclipse.fdt.core.model.IWorkingCopy;
 import org.eclipse.fdt.core.parser.CodeReader;
 import org.eclipse.fdt.core.parser.ParserUtil;
 import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -60,7 +60,7 @@ public class CCompletionProcessor2 implements IContentAssistProcessor {
 			int offset) {
 		try {
 			long startTime = System.currentTimeMillis();
-			IWorkingCopy workingCopy = CUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(editor.getEditorInput());
+			IWorkingCopy workingCopy = FortranUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(editor.getEditorInput());
 			ASTCompletionNode completionNode = CDOM.getInstance().getCompletionNode(
 				(IFile)workingCopy.getResource(),
 				offset,
@@ -70,7 +70,7 @@ public class CCompletionProcessor2 implements IContentAssistProcessor {
 					}
 					public CodeReader createCodeReaderForInclusion(String path) {
 						return ParserUtil.createReader(path,
-							Arrays.asList(CUIPlugin.getSharedWorkingCopies()).iterator());
+							Arrays.asList(FortranUIPlugin.getSharedWorkingCopies()).iterator());
 					}
 					public int getUniqueIdentifier() {
 						return 99;
@@ -177,7 +177,7 @@ public class CCompletionProcessor2 implements IContentAssistProcessor {
 		}
 		
 		Image image = imageDescriptor != null
-			? CUIPlugin.getImageDescriptorRegistry().get( imageDescriptor )
+			? FortranUIPlugin.getImageDescriptorRegistry().get( imageDescriptor )
 			: null;
 
 		return new CCompletionProposal(binding.getName(), offset, length, image, binding.getName(), 1);

@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.fdt.internal.ui.wizards.NewWizardMessages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -199,7 +199,7 @@ public class LinkToFileGroup extends StringButtonDialogField {
 	private IStatus createStatus(int severity, String message) {
 		return new Status(
 			severity,
-			CUIPlugin.getPluginId(),
+			FortranUIPlugin.getPluginId(),
 			severity,
 			message,	
 			null);

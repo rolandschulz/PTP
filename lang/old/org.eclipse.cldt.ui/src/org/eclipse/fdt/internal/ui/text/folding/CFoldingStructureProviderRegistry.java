@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.fdt.ui.text.folding.ICFoldingStructureProvider;
 
@@ -72,13 +72,13 @@ public class CFoldingStructureProviderRegistry {
 	 * @return the current provider according to the preferences
 	 */
 	public ICFoldingStructureProvider getCurrentFoldingProvider() {
-		String id= CUIPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.EDITOR_FOLDING_PROVIDER);
+		String id= FortranUIPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.EDITOR_FOLDING_PROVIDER);
 		CFoldingStructureProviderDescriptor desc= getFoldingProviderDescriptor(id);
 		if (desc != null) {
 			try {
 				return desc.createProvider();
 			} catch (CoreException e) {
-				CUIPlugin.getDefault().log(e);
+				FortranUIPlugin.getDefault().log(e);
 			}
 		}
 		return null;
@@ -104,7 +104,7 @@ public class CFoldingStructureProviderRegistry {
 		IExtensionRegistry registry= Platform.getExtensionRegistry();
 		Map map= new HashMap();
 
-		IConfigurationElement[] elements= registry.getConfigurationElementsFor(CUIPlugin.getPluginId(), EXTENSION_POINT);
+		IConfigurationElement[] elements= registry.getConfigurationElementsFor(FortranUIPlugin.getPluginId(), EXTENSION_POINT);
 		for (int i= 0; i < elements.length; i++) {
 			CFoldingStructureProviderDescriptor desc= new CFoldingStructureProviderDescriptor(elements[i]);
 			map.put(desc.getId(), desc);

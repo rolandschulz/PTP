@@ -11,7 +11,7 @@ import org.eclipse.fdt.core.model.IBuffer;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.internal.core.model.WorkingCopy;
 
-public class CFileElementWorkingCopy extends WorkingCopy {
+public class FortranFileElementWorkingCopy extends WorkingCopy {
 
 	ITranslationUnit unit;
 
@@ -19,7 +19,7 @@ public class CFileElementWorkingCopy extends WorkingCopy {
 	/**
 	 * Creates a working copy of this element
 	 */
-	public CFileElementWorkingCopy(ITranslationUnit unit) throws CoreException {
+	public FortranFileElementWorkingCopy(ITranslationUnit unit) throws CoreException {
 		super(unit.getParent(), unit.getPath(), null);
 		this.unit = unit;
 	}

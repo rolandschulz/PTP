@@ -19,7 +19,7 @@ import org.eclipse.fdt.internal.corext.refactoring.base.IChange;
 import org.eclipse.fdt.internal.corext.refactoring.base.ICompositeChange;
 import org.eclipse.fdt.internal.corext.refactoring.changes.TextFileChange;
 import org.eclipse.fdt.internal.corext.refactoring.changes.TranslationUnitChange;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.ui.CElementLabelProvider;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -106,19 +106,19 @@ class ChangeElementLabelProvider extends LabelProvider {
 		ImageDescriptor descriptor= null;
 		if (descriptor == null) {
 		   if (element instanceof ICompositeChange) {
-			descriptor= CPluginImages.DESC_OBJS_COMPOSITE_CHANGE;
+			descriptor= FortranPluginImages.DESC_OBJS_COMPOSITE_CHANGE;
 		   }
 		   else if (element instanceof TextEditChangeElement) {
-				descriptor= CPluginImages.DESC_OBJS_TEXT_EDIT;
+				descriptor= FortranPluginImages.DESC_OBJS_TEXT_EDIT;
 			} 
 		   else if (element instanceof TranslationUnitChange) {
-				descriptor= CPluginImages.DESC_OBJS_CU_CHANGE;
+				descriptor= FortranPluginImages.DESC_OBJS_CU_CHANGE;
 			} 
 		   else if (element instanceof TextFileChange) {
-				descriptor= CPluginImages.DESC_OBJS_FILE_CHANGE;
+				descriptor= FortranPluginImages.DESC_OBJS_FILE_CHANGE;
 			} 
 		   else {
-				descriptor= CPluginImages.DESC_OBJS_DEFAULT_CHANGE;
+				descriptor= FortranPluginImages.DESC_OBJS_DEFAULT_CHANGE;
 			}
 		}
 		Image image= (Image)fDescriptorImageMap.get(descriptor);

@@ -25,7 +25,7 @@ import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.core.model.IWorkingCopy;
 import org.eclipse.fdt.internal.ui.editor.CEditor;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IWorkingCopyManager;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
@@ -176,7 +176,7 @@ public class SelectionConverter {
 	public static ICElement getInput(ITextEditor editor) {
 		if (editor == null) return null;
 		IEditorInput input = editor.getEditorInput();
-		IWorkingCopyManager manager = CUIPlugin.getDefault().getWorkingCopyManager();
+		IWorkingCopyManager manager = FortranUIPlugin.getDefault().getWorkingCopyManager();
 		return manager.getWorkingCopy(input);
 	}
 

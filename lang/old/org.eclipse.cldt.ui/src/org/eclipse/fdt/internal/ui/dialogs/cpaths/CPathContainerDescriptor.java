@@ -23,7 +23,7 @@ import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.core.model.IContainerEntry;
 import org.eclipse.fdt.core.model.IPathEntry;
 import org.eclipse.fdt.internal.ui.util.CoreUtility;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.wizards.ICPathContainerPage;
 import org.eclipse.fdt.ui.wizards.IPathEntryContainerPage;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -252,11 +252,11 @@ public class CPathContainerDescriptor implements IContainerDescriptor {
 		String pageClassName = configElement.getAttribute(ATT_PAGE_CLASS);
 
 		if (name == null) {
-			throw new CoreException(new Status(IStatus.ERROR, CUIPlugin.PLUGIN_ID, 0, "Invalid extension (missing name): " + id, //$NON-NLS-1$
+			throw new CoreException(new Status(IStatus.ERROR, FortranUIPlugin.PLUGIN_ID, 0, "Invalid extension (missing name): " + id, //$NON-NLS-1$
 					null));
 		}
 		if (pageClassName == null) {
-			throw new CoreException(new Status(IStatus.ERROR, CUIPlugin.PLUGIN_ID, 0,
+			throw new CoreException(new Status(IStatus.ERROR, FortranUIPlugin.PLUGIN_ID, 0,
 					"Invalid extension (missing page class name): " + id, null)); //$NON-NLS-1$
 		}
 	}
@@ -269,7 +269,7 @@ public class CPathContainerDescriptor implements IContainerDescriptor {
 			return new PathEntryContainerPageAdapter((ICPathContainerPage)elem);
 		}
 		String id = fConfigElement.getAttribute(ATT_ID);
-		throw new CoreException(new Status(IStatus.ERROR, CUIPlugin.PLUGIN_ID, 0,
+		throw new CoreException(new Status(IStatus.ERROR, FortranUIPlugin.PLUGIN_ID, 0,
 				"Invalid extension (page not of type IClasspathContainerPage): " + id, null)); //$NON-NLS-1$
 	}
 
@@ -324,7 +324,7 @@ public class CPathContainerDescriptor implements IContainerDescriptor {
 	public static IContainerDescriptor[] getDescriptors() {
 		ArrayList containers = new ArrayList();
 
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(CUIPlugin.PLUGIN_ID, ATT_EXTENSION);
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(FortranUIPlugin.PLUGIN_ID, ATT_EXTENSION);
 		if (extensionPoint != null) {
 			IContainerDescriptor defaultPage = null;
 			String defaultPageName = CPathContainerDefaultPage.class.getName();
@@ -339,7 +339,7 @@ public class CPathContainerDescriptor implements IContainerDescriptor {
 						containers.add(curr);
 					}
 				} catch (CoreException e) {
-					CUIPlugin.getDefault().log(e);
+					FortranUIPlugin.getDefault().log(e);
 				}
 			}
 			if (defaultPageName != null && containers.isEmpty()) {

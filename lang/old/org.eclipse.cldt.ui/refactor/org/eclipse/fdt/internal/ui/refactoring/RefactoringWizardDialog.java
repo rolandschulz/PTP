@@ -23,7 +23,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 /**
  * A dialog to host refactoring wizards.
@@ -48,7 +48,7 @@ public class RefactoringWizardDialog extends WizardDialog {
 	public RefactoringWizardDialog(Shell parent, RefactoringWizard wizard) {
 		super(parent, wizard);
 		setShellStyle(getShellStyle() | SWT.RESIZE);
-		IDialogSettings settings= CUIPlugin.getDefault().getDialogSettings();
+		IDialogSettings settings= FortranUIPlugin.getDefault().getDialogSettings();
 		wizard.setDialogSettings(settings);
 		fSettings= settings.getSection(DIALOG_SETTINGS);
 		if (fSettings == null) {

@@ -37,7 +37,7 @@ import org.eclipse.fdt.internal.ui.viewsupport.CUILabelProvider;
 import org.eclipse.fdt.internal.ui.viewsupport.IViewPartInputProvider;
 import org.eclipse.fdt.internal.ui.viewsupport.StatusBarUpdater;
 import org.eclipse.fdt.internal.ui.workingsets.WorkingSetFilterActionGroup;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.fdt.ui.actions.OpenViewActionGroup;
 import org.eclipse.jface.action.IMenuListener;
@@ -224,7 +224,7 @@ public class TypeHierarchyViewPart extends ViewPart implements ITypeHierarchyVie
 			new ToggleViewAction(this, VIEW_ID_SUB)
 		};
 		
-		fDialogSettings= CUIPlugin.getDefault().getDialogSettings();
+		fDialogSettings= FortranUIPlugin.getDefault().getDialogSettings();
 		
 		fHistoryDropDownAction= new HistoryDropDownAction(this);
 		fHistoryDropDownAction.setEnabled(false);
@@ -417,7 +417,7 @@ public class TypeHierarchyViewPart extends ViewPart implements ITypeHierarchyVie
 				return;
 			}
 		} else {
-			CUIPlugin.getDefault().logErrorMessage("Invalid type hierarchy input type.");//$NON-NLS-1$
+			FortranUIPlugin.getDefault().logErrorMessage("Invalid type hierarchy input type.");//$NON-NLS-1$
 		}
 		if (element != null && !element.equals(fInputElement)) {
 			addHistoryEntry(element);
@@ -455,7 +455,7 @@ public class TypeHierarchyViewPart extends ViewPart implements ITypeHierarchyVie
 		} else {
 			fInputElement= inputElement;
 			try {
-				fHierarchyLifeCycle.ensureRefreshedTypeHierarchy(inputElement, CUIPlugin.getActiveWorkbenchWindow());
+				fHierarchyLifeCycle.ensureRefreshedTypeHierarchy(inputElement, FortranUIPlugin.getActiveWorkbenchWindow());
 				// fHierarchyLifeCycle.ensureRefreshedTypeHierarchy(inputElement, getSite().getWorkbenchWindow());
 			} catch (InvocationTargetException e) {
 				ExceptionHandler.handle(e, getSite().getShell(), TypeHierarchyMessages.getString("TypeHierarchyViewPart.exception.title"), TypeHierarchyMessages.getString("TypeHierarchyViewPart.exception.message")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -521,7 +521,7 @@ public class TypeHierarchyViewPart extends ViewPart implements ITypeHierarchyVie
 		}
 		
 		if (fPropertyChangeListener != null) {
-			CUIPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(fPropertyChangeListener);
+			FortranUIPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(fPropertyChangeListener);
 			fPropertyChangeListener= null;
 		}
 		
@@ -547,7 +547,7 @@ public class TypeHierarchyViewPart extends ViewPart implements ITypeHierarchyVie
 		if (key == IShowInTargetList.class) {
 			return new IShowInTargetList() {
 				public String[] getShowInTargetIds() {
-					return new String[] { CUIPlugin.CVIEW_ID, IPageLayout.ID_RES_NAV  };
+					return new String[] { FortranUIPlugin.CVIEW_ID, IPageLayout.ID_RES_NAV  };
 				}
 
 			};
@@ -689,7 +689,7 @@ public class TypeHierarchyViewPart extends ViewPart implements ITypeHierarchyVie
     	addResizeListener(container);
 
 		fPagebook= new PageBook(container, SWT.NONE);
-		fWorkingSetActionGroup= new WorkingSetFilterActionGroup(CUIPlugin.ID_TYPE_HIERARCHY, container.getShell(), fPropertyChangeListener);
+		fWorkingSetActionGroup= new WorkingSetFilterActionGroup(FortranUIPlugin.ID_TYPE_HIERARCHY, container.getShell(), fPropertyChangeListener);
 
 		// page 1 of page book (no hierarchy label)
 		
@@ -931,7 +931,7 @@ public class TypeHierarchyViewPart extends ViewPart implements ITypeHierarchyVie
 	 * Creates the context menu for the hierarchy viewers
 	 */
 	protected void fillTypesViewerContextMenu(TypeHierarchyViewer viewer, IMenuManager menu) {
-		CUIPlugin.createStandardGroups(menu);
+		FortranUIPlugin.createStandardGroups(menu);
 		
 		menu.appendToGroup(IContextMenuConstants.GROUP_SHOW, new Separator(GROUP_FOCUS));
 		// viewer entries
@@ -950,7 +950,7 @@ public class TypeHierarchyViewPart extends ViewPart implements ITypeHierarchyVie
 	 * Creates the context menu for the method viewer
 	 */	
 	protected void fillMethodsViewerContextMenu(IMenuManager menu) {
-		CUIPlugin.createStandardGroups(menu);
+		FortranUIPlugin.createStandardGroups(menu);
 		// viewer entries
 		fMethodsViewer.contributeToContextMenu(menu);
 		fActionGroups.setContext(new ActionContext(getSite().getSelectionProvider().getSelection()));

@@ -26,9 +26,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.fdt.internal.corext.CorextMessages;
-import org.eclipse.fdt.internal.ui.CUIStatus;
+import org.eclipse.fdt.internal.ui.FortranUIStatus;
 import org.eclipse.fdt.internal.ui.ICStatusConstants;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 public class Resources {
 
@@ -64,7 +64,7 @@ public class Resources {
 		}
 		if (result != null)
 			return result;
-		return new Status(IStatus.OK, CUIPlugin.getPluginId(), IStatus.OK, "", null); //$NON-NLS-1$		
+		return new Status(IStatus.OK, FortranUIPlugin.getPluginId(), IStatus.OK, "", null); //$NON-NLS-1$		
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class Resources {
 			}
 		}
 		if (readOnlyFiles.size() == 0)
-			return new Status(IStatus.OK, CUIPlugin.getPluginId(), IStatus.OK, "", null); //$NON-NLS-1$
+			return new Status(IStatus.OK, FortranUIPlugin.getPluginId(), IStatus.OK, "", null); //$NON-NLS-1$
 			
 		Map oldTimeStamps= createModificationStampMap(readOnlyFiles);
 		IStatus status= ResourcesPlugin.getWorkspace().validateEdit(
@@ -125,7 +125,7 @@ public class Resources {
 		}
 		if (modified != null)	
 			return modified;
-		return new Status(IStatus.OK, CUIPlugin.getPluginId(), IStatus.OK, "", null); //$NON-NLS-1$
+		return new Status(IStatus.OK, FortranUIPlugin.getPluginId(), IStatus.OK, "", null); //$NON-NLS-1$
 	}
 
 	private static Map createModificationStampMap(List files){
@@ -138,7 +138,7 @@ public class Resources {
 	}
 	
 	private static IStatus addModified(IStatus status, IFile file) {
-		IStatus entry= CUIStatus.createError(
+		IStatus entry= FortranUIStatus.createError(
 			ICStatusConstants.VALIDATE_EDIT_CHANGED_CONTENT, 
 			CorextMessages.getFormattedString("Resources.fileModified", file.getFullPath().toString()), //$NON-NLS-1$ 
 			null);
@@ -148,7 +148,7 @@ public class Resources {
 			((MultiStatus)status).add(entry);
 			return status;
 		} else {
-			MultiStatus result= new MultiStatus(CUIPlugin.getPluginId(),
+			MultiStatus result= new MultiStatus(FortranUIPlugin.getPluginId(),
 				ICStatusConstants.VALIDATE_EDIT_CHANGED_CONTENT,
 				CorextMessages.getString("Resources.modifiedResources"), null); //$NON-NLS-1$ 
 			result.add(status);

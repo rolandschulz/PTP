@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.fdt.core.resources.IConsole;
 import org.eclipse.fdt.internal.ui.preferences.BuildConsolePreferencePage;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IBuildConsoleEvent;
 import org.eclipse.fdt.ui.IBuildConsoleListener;
 import org.eclipse.fdt.ui.IBuildConsoleManager;
@@ -81,7 +81,7 @@ public class BuildConsoleManager implements IBuildConsoleManager, IResourceChang
 	 * front.
 	 */
 	protected void showConsole() {
-		IWorkbenchWindow window = CUIPlugin.getActiveWorkbenchWindow();
+		IWorkbenchWindow window = FortranUIPlugin.getActiveWorkbenchWindow();
 		if (window != null) {
 			IWorkbenchPage page = window.getActivePage();
 			if (page != null) {
@@ -91,7 +91,7 @@ public class BuildConsoleManager implements IBuildConsoleManager, IResourceChang
 					try {
 						consoleView = page.showView(IConsoleConstants.ID_CONSOLE_VIEW);
 					} catch (PartInitException pie) {
-						CUIPlugin.getDefault().log(pie);
+						FortranUIPlugin.getDefault().log(pie);
 					}
 					//restore focus stolen by the creation of the
 					// console
@@ -151,8 +151,8 @@ public class BuildConsoleManager implements IBuildConsoleManager, IResourceChang
 			errorColor.dispose();
 		}
 		ConsolePlugin.getDefault().getConsoleManager().removeConsoles(new org.eclipse.ui.console.IConsole[]{fConsole});
-		CUIPlugin.getWorkspace().removeResourceChangeListener(this);
-		CUIPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(this);
+		FortranUIPlugin.getWorkspace().removeResourceChangeListener(this);
+		FortranUIPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(this);
 	}
 
 	private void runUI(Runnable run) {
@@ -183,18 +183,18 @@ public class BuildConsoleManager implements IBuildConsoleManager, IResourceChang
 				fConsole = new BuildConsole(BuildConsoleManager.this);
 				ConsolePlugin.getDefault().getConsoleManager().addConsoles(new org.eclipse.ui.console.IConsole[]{fConsole});
 				infoStream.setConsole(fConsole);
-				infoColor = createColor(CUIPlugin.getStandardDisplay(), BuildConsolePreferencePage.PREF_BUILDCONSOLE_INFO_COLOR);
+				infoColor = createColor(FortranUIPlugin.getStandardDisplay(), BuildConsolePreferencePage.PREF_BUILDCONSOLE_INFO_COLOR);
 				infoStream.setColor(infoColor);
 				outputStream.setConsole(fConsole);
-				outputColor = createColor(CUIPlugin.getStandardDisplay(), BuildConsolePreferencePage.PREF_BUILDCONSOLE_OUTPUT_COLOR);
+				outputColor = createColor(FortranUIPlugin.getStandardDisplay(), BuildConsolePreferencePage.PREF_BUILDCONSOLE_OUTPUT_COLOR);
 				outputStream.setColor(outputColor);
 				errorStream.setConsole(fConsole);
-				errorColor = createColor(CUIPlugin.getStandardDisplay(), BuildConsolePreferencePage.PREF_BUILDCONSOLE_ERROR_COLOR);
+				errorColor = createColor(FortranUIPlugin.getStandardDisplay(), BuildConsolePreferencePage.PREF_BUILDCONSOLE_ERROR_COLOR);
 				errorStream.setColor(errorColor);
 			}
 		});
-		CUIPlugin.getWorkspace().addResourceChangeListener(this);
-		CUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
+		FortranUIPlugin.getWorkspace().addResourceChangeListener(this);
+		FortranUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
 	}
 
 	/*
@@ -206,17 +206,17 @@ public class BuildConsoleManager implements IBuildConsoleManager, IResourceChang
 		String property = event.getProperty();
 		// colors
 		if (property.equals(BuildConsolePreferencePage.PREF_BUILDCONSOLE_INFO_COLOR)) {
-			Color newColor = createColor(CUIPlugin.getStandardDisplay(), BuildConsolePreferencePage.PREF_BUILDCONSOLE_INFO_COLOR);
+			Color newColor = createColor(FortranUIPlugin.getStandardDisplay(), BuildConsolePreferencePage.PREF_BUILDCONSOLE_INFO_COLOR);
 			infoStream.setColor(newColor);
 			infoColor.dispose();
 			infoColor = newColor;
 		} else if (property.equals(BuildConsolePreferencePage.PREF_BUILDCONSOLE_OUTPUT_COLOR)) {
-			Color newColor = createColor(CUIPlugin.getStandardDisplay(), BuildConsolePreferencePage.PREF_BUILDCONSOLE_OUTPUT_COLOR);
+			Color newColor = createColor(FortranUIPlugin.getStandardDisplay(), BuildConsolePreferencePage.PREF_BUILDCONSOLE_OUTPUT_COLOR);
 			outputStream.setColor(newColor);
 			outputColor.dispose();
 			outputColor = newColor;
 		} else if (property.equals(BuildConsolePreferencePage.PREF_BUILDCONSOLE_ERROR_COLOR)) {
-			Color newColor = createColor(CUIPlugin.getStandardDisplay(), BuildConsolePreferencePage.PREF_BUILDCONSOLE_ERROR_COLOR);
+			Color newColor = createColor(FortranUIPlugin.getStandardDisplay(), BuildConsolePreferencePage.PREF_BUILDCONSOLE_ERROR_COLOR);
 			errorStream.setColor(newColor);
 			errorColor.dispose();
 			errorColor = newColor;
@@ -232,14 +232,14 @@ public class BuildConsoleManager implements IBuildConsoleManager, IResourceChang
 			case BUILD_STREAM_TYPE_OUTPUT :
 				return outputStream;
 		}
-		throw new CoreException(new Status(IStatus.ERROR, CUIPlugin.PLUGIN_ID, -1, "No Such Console", null)); //$NON-NLS-1$
+		throw new CoreException(new Status(IStatus.ERROR, FortranUIPlugin.PLUGIN_ID, -1, "No Such Console", null)); //$NON-NLS-1$
 	}
 
 	/**
 	 * Returns a color instance based on data from a preference field.
 	 */
 	Color createColor(Display display, String preference) {
-		RGB rgb = PreferenceConverter.getColor(CUIPlugin.getDefault().getPreferenceStore(), preference);
+		RGB rgb = PreferenceConverter.getColor(FortranUIPlugin.getDefault().getPreferenceStore(), preference);
 		return new Color(display, rgb);
 	}
 	/**

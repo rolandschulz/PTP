@@ -14,7 +14,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IWorkbenchConstants;
@@ -45,7 +45,7 @@ public class CWizardRegistry {
 	 */
 	public static boolean isCProjectWizard(IConfigurationElement element) {
 	    String category = element.getAttribute(ATT_CATEGORY);
-	    return (category != null && category.equals(CUIPlugin.CWIZARD_CATEGORY_ID));
+	    return (category != null && category.equals(FortranUIPlugin.CWIZARD_CATEGORY_ID));
 	}
     
 	/**
@@ -57,7 +57,7 @@ public class CWizardRegistry {
 	 */
 	public static boolean isCCProjectWizard(IConfigurationElement element) {
 	    String category = element.getAttribute(ATT_CATEGORY);
-	    return (category != null && category.equals(CUIPlugin.CCWIZARD_CATEGORY_ID));
+	    return (category != null && category.equals(FortranUIPlugin.CCWIZARD_CATEGORY_ID));
 	}
 
 	/**
@@ -398,8 +398,8 @@ public class CWizardRegistry {
 				if (element.getName().equals(TAG_WIZARD)) {
 				    String category = element.getAttribute(ATT_CATEGORY);
 				    if (category != null &&
-				        (category.equals(CUIPlugin.CCWIZARD_CATEGORY_ID)
-				           || category.equals(CUIPlugin.CWIZARD_CATEGORY_ID))) {
+				        (category.equals(FortranUIPlugin.CCWIZARD_CATEGORY_ID)
+				           || category.equals(FortranUIPlugin.CWIZARD_CATEGORY_ID))) {
 			            elemList.add(element);
 				    }
 				}

@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.fdt.internal.corext.Assert;
 import org.eclipse.fdt.internal.corext.textmanipulation.TextBuffer;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.MultiTextEdit;
@@ -108,11 +108,11 @@ public class TextBufferEditor extends TextEditProcessor {
 			}
 		} catch (BadLocationException e) {
 			String message= (e != null ? e.getMessage() : ""); //$NON-NLS-1$
-			throw new CoreException(new Status(IStatus.ERROR, CUIPlugin.getPluginId(),
+			throw new CoreException(new Status(IStatus.ERROR, FortranUIPlugin.getPluginId(),
 				IStatus.ERROR, message, e));
 		} catch (MalformedTreeException e) {
 			String message= (e != null ? e.getMessage() : ""); //$NON-NLS-1$
-			throw new CoreException(new Status(IStatus.ERROR, CUIPlugin.getPluginId(),
+			throw new CoreException(new Status(IStatus.ERROR, FortranUIPlugin.getPluginId(),
 				IStatus.ERROR, message, e));
 		}
 	}	

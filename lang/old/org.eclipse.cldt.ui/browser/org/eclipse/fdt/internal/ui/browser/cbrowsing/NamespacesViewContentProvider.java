@@ -22,7 +22,7 @@ import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.core.model.ISourceRoot;
 import org.eclipse.fdt.internal.ui.browser.opentype.OpenTypeMessages;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -165,6 +165,6 @@ class NamespacesViewContentProvider extends CBrowsingContentProvider {
 	}
 	
 	protected Shell getShell() {
-		return CUIPlugin.getActiveWorkbenchShell();
+		return FortranUIPlugin.getActiveWorkbenchShell();
 	}
 }

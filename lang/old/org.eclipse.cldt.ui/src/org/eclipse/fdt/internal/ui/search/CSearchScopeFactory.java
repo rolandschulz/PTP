@@ -24,7 +24,7 @@ import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.search.BasicSearchMatch;
 import org.eclipse.fdt.core.search.ICSearchScope;
 import org.eclipse.fdt.core.search.SearchEngine;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
@@ -148,7 +148,7 @@ public class CSearchScopeFactory {
 	}
 
 	public IWorkingSet[] queryWorkingSets() {
-		Shell shell= CUIPlugin.getActiveWorkbenchShell();
+		Shell shell= FortranUIPlugin.getActiveWorkbenchShell();
 		if (shell == null)
 			return null;
 		IWorkingSetSelectionDialog dialog= PlatformUI.getWorkbench().getWorkingSetManager().createWorkingSetSelectionDialog(shell, true);

@@ -17,7 +17,7 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.ICHelpBook;
 import org.eclipse.fdt.ui.ICHelpProvider;
 import org.eclipse.fdt.ui.ICHelpResourceDescriptor;
@@ -104,7 +104,7 @@ public class CHelpSettings {
 	
 	private static IConfigurationElement[] getConfigElements(){
 		if(fConfigElements == null){
-			fConfigElements= Platform.getExtensionRegistry().getConfigurationElementsFor(CUIPlugin.PLUGIN_ID, CONTRIBUTION_EXTENSION);
+			fConfigElements= Platform.getExtensionRegistry().getConfigurationElementsFor(FortranUIPlugin.PLUGIN_ID, CONTRIBUTION_EXTENSION);
 			if(fConfigElements == null)
 				fConfigElements = new IConfigurationElement[0];
 		}

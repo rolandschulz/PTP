@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.core.model.IPathEntry;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.dialogs.TypedViewerFilter;
 import org.eclipse.fdt.internal.ui.util.PixelConverter;
@@ -35,7 +35,7 @@ import org.eclipse.fdt.internal.ui.wizards.dialogfields.ITreeListAdapter;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.LayoutUtil;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.ListDialogField;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.TreeListDialogField;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.Assert;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -73,7 +73,7 @@ public class CPathSourceEntryPage extends CPathBasePage {
 		super(CPathEntryMessages.getString("SourcePathEntryPage.title")); //$NON-NLS-1$
 		setDescription(CPathEntryMessages.getString("SourcePathEntryPage.description")); //$NON-NLS-1$
 
-		fWorkspaceRoot = CUIPlugin.getWorkspace().getRoot();
+		fWorkspaceRoot = FortranUIPlugin.getWorkspace().getRoot();
 		fCPathList = classPathList;
 
 		SourceContainerAdapter adapter = new SourceContainerAdapter();
@@ -97,7 +97,7 @@ public class CPathSourceEntryPage extends CPathBasePage {
 	}
 
 	public Image getImage() {
-		return CPluginImages.get(CPluginImages.IMG_OBJS_SOURCE_ROOT);
+		return FortranPluginImages.get(FortranPluginImages.IMG_OBJS_SOURCE_ROOT);
 	}
 
 	public void init(ICProject cproject) {

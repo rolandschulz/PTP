@@ -12,9 +12,9 @@ import java.util.List;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.internal.corext.template.c.TranslationUnitContext;
 import org.eclipse.fdt.internal.corext.template.c.TranslationUnitContextType;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.text.c.hover.SourceViewerInformationControl;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.text.ICCompletionProposal;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -126,10 +126,10 @@ public class TemplateEngine {
 		int end= context.getEnd();
 		IRegion region= new Region(start, end - start);
 
-		Template[] templates= CUIPlugin.getDefault().getTemplateStore().getTemplates();
+		Template[] templates= FortranUIPlugin.getDefault().getTemplateStore().getTemplates();
 		for (int i= 0; i != templates.length; i++)
 			if (context.canEvaluate(templates[i]))
-				fProposals.add(new CTemplateProposal(templates[i], context, region, CPluginImages.get(CPluginImages.IMG_OBJS_TEMPLATE)));
+				fProposals.add(new CTemplateProposal(templates[i], context, region, FortranPluginImages.get(FortranPluginImages.IMG_OBJS_TEMPLATE)));
 	}
 	
 }

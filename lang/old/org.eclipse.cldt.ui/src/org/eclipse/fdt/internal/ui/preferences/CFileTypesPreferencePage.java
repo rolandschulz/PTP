@@ -22,7 +22,7 @@ import org.eclipse.fdt.core.filetype.ICFileTypeResolver;
 import org.eclipse.fdt.core.filetype.IResolverModel;
 import org.eclipse.fdt.core.internal.filetype.WorkspaceResolver;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -44,7 +44,7 @@ public class CFileTypesPreferencePage extends PreferencePage implements IWorkben
 
 	public CFileTypesPreferencePage() {
 		setDescription(PreferencesMessages.getString("CFileTypesPreferencePage.description")); //$NON-NLS-1$
-		setPreferenceStore(CUIPlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(FortranUIPlugin.getDefault().getPreferenceStore());
 	}
 
 	/* (non-Javadoc)

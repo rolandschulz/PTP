@@ -13,7 +13,7 @@
  */
 package org.eclipse.fdt.internal.ui.search;
 
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.search.ui.SearchUI;
@@ -56,7 +56,7 @@ public class OpenCSearchPageAction implements IWorkbenchWindowActionDelegate {
 	}
 
 	protected void beep() {
-		Shell shell= CUIPlugin.getActiveWorkbenchShell();
+		Shell shell= FortranUIPlugin.getActiveWorkbenchShell();
 		if (shell != null && shell.getDisplay() != null)
 			shell.getDisplay().beep();
 	}	

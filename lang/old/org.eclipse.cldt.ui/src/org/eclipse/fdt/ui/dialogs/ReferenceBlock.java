@@ -21,8 +21,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.fdt.core.model.CoreModel;
-import org.eclipse.fdt.internal.ui.CUIMessages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.swt.SWT;
@@ -49,8 +49,8 @@ public class ReferenceBlock extends AbstractCOptionPage {
 	private static final int PROJECT_LIST_MULTIPLIER = 10;
 	
 	public ReferenceBlock() {
-		super(CUIPlugin.getResourceString(LABEL));
-		setDescription(CUIPlugin.getResourceString(DESC));
+		super(FortranUIPlugin.getResourceString(LABEL));
+		setDescription(FortranUIPlugin.getResourceString(DESC));
 	}
 
 	public Image getImage() {
@@ -112,7 +112,7 @@ public class ReferenceBlock extends AbstractCOptionPage {
 		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		Label label = new Label(composite, SWT.LEFT);
-		label.setText(CUIPlugin.getResourceString(DESC));
+		label.setText(FortranUIPlugin.getResourceString(DESC));
 		GridData lbldata = new GridData(GridData.FILL_HORIZONTAL);
 		lbldata.horizontalSpan = 1;
 		label.setLayoutData(lbldata);
@@ -162,7 +162,7 @@ public class ReferenceBlock extends AbstractCOptionPage {
 			if (monitor == null) {
 				monitor = new NullProgressMonitor();
 			}
-			monitor.beginTask(CUIMessages.getString("ReferenceBlock.task.ReferenceProjects"), 1); //$NON-NLS-1$
+			monitor.beginTask(FortranUIMessages.getString("ReferenceBlock.task.ReferenceProjects"), 1); //$NON-NLS-1$
 			try {
 				IProjectDescription description = project.getDescription();
 				description.setReferencedProjects(refProjects);

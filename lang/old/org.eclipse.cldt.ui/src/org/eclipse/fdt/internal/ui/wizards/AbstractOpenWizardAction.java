@@ -18,7 +18,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
 import org.eclipse.fdt.internal.ui.util.PixelConverter;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -75,7 +75,7 @@ public abstract class AbstractOpenWizardAction extends Action implements IWorkbe
 	}
 	
 	protected IWorkbench getWorkbench() {
-		return CUIPlugin.getDefault().getWorkbench();
+		return FortranUIPlugin.getDefault().getWorkbench();
 	}
 	
 	private boolean isOfAcceptedType(Object obj) {
@@ -118,7 +118,7 @@ public abstract class AbstractOpenWizardAction extends Action implements IWorkbe
 
 
 	protected IStructuredSelection getCurrentSelection() {
-		IWorkbenchWindow window= CUIPlugin.getActiveWorkbenchWindow();
+		IWorkbenchWindow window= FortranUIPlugin.getActiveWorkbenchWindow();
 		if (window != null) {
 			ISelection selection= window.getSelectionService().getSelection();
 			if (selection instanceof IStructuredSelection) {
@@ -148,7 +148,7 @@ public abstract class AbstractOpenWizardAction extends Action implements IWorkbe
 		if (!checkWorkspaceNotEmpty()) {
 			return;
 		}
-*/		Shell shell= CUIPlugin.getActiveWorkbenchShell();
+*/		Shell shell= FortranUIPlugin.getActiveWorkbenchShell();
 		try {
 			Wizard wizard= createWizard();
 			if (wizard instanceof IWorkbenchWizard) {
@@ -156,7 +156,7 @@ public abstract class AbstractOpenWizardAction extends Action implements IWorkbe
 			}
 			
 			WizardDialog dialog= new WizardDialog(shell, wizard);
-			PixelConverter converter= new PixelConverter(CUIPlugin.getActiveWorkbenchShell());
+			PixelConverter converter= new PixelConverter(FortranUIPlugin.getActiveWorkbenchShell());
 			
 			dialog.setMinimumPageSize(converter.convertWidthInCharsToPixels(70), converter.convertHeightInCharsToPixels(20));
 			dialog.create();
@@ -208,11 +208,11 @@ public abstract class AbstractOpenWizardAction extends Action implements IWorkbe
 	protected boolean checkWorkspaceNotEmpty() {
 		IWorkspace workspace= ResourcesPlugin.getWorkspace();
 		if (workspace.getRoot().getProjects().length == 0) {
-			Shell shell= CUIPlugin.getActiveWorkbenchShell();
+			Shell shell= FortranUIPlugin.getActiveWorkbenchShell();
 			String title= NewWizardMessages.getString("AbstractOpenWizardAction.noproject.title"); //$NON-NLS-1$
 			String message= NewWizardMessages.getString("AbstractOpenWizardAction.noproject.message"); //$NON-NLS-1$
 			if (MessageDialog.openQuestion(shell, title, message)) {
-				IWorkbenchWindow window= CUIPlugin.getActiveWorkbenchWindow();
+				IWorkbenchWindow window= FortranUIPlugin.getActiveWorkbenchWindow();
 				(new NewProjectAction(window)).run();
 				return workspace.getRoot().getProjects().length != 0;
 			}

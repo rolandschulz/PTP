@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.ui.dialogs.ContainerGenerator;
 
 public class NewSourceFileGenerator {
@@ -106,7 +106,7 @@ public class NewSourceFileGenerator {
 
         monitor.beginTask(NewFileWizardMessages.getString("NewSourceFileGenerator.createFile.task"), totalWork); //$NON-NLS-1$
 
-        IWorkspaceRoot root = CUIPlugin.getWorkspace().getRoot();
+        IWorkspaceRoot root = FortranUIPlugin.getWorkspace().getRoot();
         IFile newFile = root.getFileForLocation(newFilePath);
         if (newFile == null)
             newFile = root.getFile(newFilePath);

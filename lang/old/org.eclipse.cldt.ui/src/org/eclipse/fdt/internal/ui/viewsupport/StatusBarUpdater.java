@@ -15,7 +15,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.fdt.core.browser.ITypeInfo;
 import org.eclipse.fdt.core.model.ICElement;
-import org.eclipse.fdt.internal.ui.CUIMessages;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
 import org.eclipse.fdt.ui.browser.typeinfo.TypeInfoLabelProvider;
 
 import org.eclipse.jface.action.IStatusLineManager;
@@ -57,7 +57,7 @@ public class StatusBarUpdater implements ISelectionChangedListener {
 			
 			int nElements= selection.size();
 			if (nElements > 1) {
-				return CUIMessages.getFormattedString("StatusBarUpdater.num_elements_selected", String.valueOf(nElements)); //$NON-NLS-1$
+				return FortranUIMessages.getFormattedString("StatusBarUpdater.num_elements_selected", String.valueOf(nElements)); //$NON-NLS-1$
 			} 
 			Object elem= selection.getFirstElement();
 			if (elem instanceof ICElement) {

@@ -19,7 +19,7 @@ import org.eclipse.fdt.internal.corext.refactoring.base.Refactoring;
 import org.eclipse.fdt.internal.corext.refactoring.base.RefactoringStatus;
 import org.eclipse.fdt.internal.ui.util.BusyIndicatorRunnableContext;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
@@ -64,7 +64,7 @@ public class RefactoringWizard extends Wizard {
 		setNeedsProgressMonitor(true);
 		setChangeCreationCancelable(true);
 		setWindowTitle(RefactoringMessages.getString("RefactoringWizard.title")); //$NON-NLS-1$
-//		setDefaultPageImageDescriptor(CPluginImages.DESC_WIZBAN_REFACTOR);
+//		setDefaultPageImageDescriptor(FortranPluginImages.DESC_WIZBAN_REFACTOR);
 	}
 	
 	/**
@@ -388,7 +388,7 @@ public class RefactoringWizard extends Wizard {
 				} else {
 					status.addFatalError(RefactoringMessages.getString("RefactoringWizard.Internal_error")); //$NON-NLS-1$
 				}
-				CUIPlugin.getDefault().log(exception);
+				FortranUIPlugin.getDefault().log(exception);
 			} else {
 				status= op.getStatus();
 			}
@@ -431,7 +431,7 @@ public class RefactoringWizard extends Wizard {
 		}
 		RefactoringStatus status= null;
 		if (exception != null) {
-			CUIPlugin.getDefault().log(exception);
+			FortranUIPlugin.getDefault().log(exception);
 			status= new RefactoringStatus();
 			status.addFatalError(RefactoringMessages.getString("RefactoringWizard.internal_error_1")); //$NON-NLS-1$
 		} else {

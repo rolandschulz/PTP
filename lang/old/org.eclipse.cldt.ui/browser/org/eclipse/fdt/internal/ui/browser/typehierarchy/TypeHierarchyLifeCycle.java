@@ -227,7 +227,7 @@ public class TypeHierarchyLifeCycle implements ITypeHierarchyChangedListener, IE
 							}
 						}
 //					} catch (CModelException e) {
-//						CUIPlugin.getDefault().log(e);
+//						FortranUIPlugin.getDefault().log(e);
 //					}
 				} else {
 					processChildrenDelta(delta, changedTypes);
@@ -239,7 +239,7 @@ public class TypeHierarchyLifeCycle implements ITypeHierarchyChangedListener, IE
 //						IType type= ((IClassFile) element).getType();
 //						processTypeDelta(type, changedTypes);
 //					} catch (CModelException e) {
-//						CUIPlugin.getDefault().log(e);
+//						FortranUIPlugin.getDefault().log(e);
 //					}
 //				} else {
 //					processChildrenDelta(delta, changedTypes);

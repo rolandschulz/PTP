@@ -15,7 +15,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.fdt.core.FortranCorePlugin;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -31,8 +31,8 @@ public class IndexerBlock extends AbstractCOptionPage {
 	private static final String INDEXER_DESC = "IndexerBlock.desc"; //$NON-NLS-1$
 	
 	public IndexerBlock(){
-		super(CUIPlugin.getResourceString(INDEXER_LABEL));
-		setDescription(CUIPlugin.getResourceString(INDEXER_DESC));
+		super(FortranUIPlugin.getResourceString(INDEXER_LABEL));
+		setDescription(FortranUIPlugin.getResourceString(INDEXER_DESC));
 		optionPage = new IndexerOptionDialogPage();
 	}
 	

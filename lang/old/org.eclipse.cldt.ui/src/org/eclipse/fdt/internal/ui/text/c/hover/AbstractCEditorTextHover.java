@@ -72,7 +72,7 @@ public class AbstractCEditorTextHover implements ICEditorTextHover, ITextHoverEx
 //				return cfeInput.getClassFile();
 //			}
 //			
-//			IWorkingCopyManager manager= CUIPlugin.getDefault().getWorkingCopyManager();				
+//			IWorkingCopyManager manager= FortranUIPlugin.getDefault().getWorkingCopyManager();				
 //			return manager.getWorkingCopy(input);
 //		}
 //		
@@ -104,7 +104,7 @@ public class AbstractCEditorTextHover implements ICEditorTextHover, ITextHoverEx
 //				return getHoverInfo(result);
 //				
 //			} catch (CModelException x) {
-//				CUIPlugin.log(x.getStatus());
+//				FortranUIPlugin.log(x.getStatus());
 //			}
 //		}
 		return null;
@@ -139,7 +139,7 @@ public class AbstractCEditorTextHover implements ICEditorTextHover, ITextHoverEx
 	 * @since 3.0
 	 */
 	protected String getTooltipAffordanceString() {
-//		if (!CUIPlugin.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.EDITOR_SHOW_TEXT_HOVER_AFFORDANCE))
+//		if (!FortranUIPlugin.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.EDITOR_SHOW_TEXT_HOVER_AFFORDANCE))
 //			return null;
 //		
 //		KeySequence[] sequences= getKeySequences();

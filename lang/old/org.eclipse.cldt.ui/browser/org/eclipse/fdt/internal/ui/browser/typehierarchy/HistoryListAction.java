@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.fdt.core.model.ICElement;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.dialogs.StatusDialog;
 import org.eclipse.fdt.internal.ui.dialogs.StatusInfo;
@@ -24,7 +24,7 @@ import org.eclipse.fdt.internal.ui.wizards.dialogfields.IListAdapter;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.LayoutUtil;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.ListDialogField;
 import org.eclipse.fdt.ui.CElementLabelProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -161,7 +161,7 @@ public class HistoryListAction extends Action {
 	public HistoryListAction(TypeHierarchyViewPart view) {
 		fView= view;
 		setText(TypeHierarchyMessages.getString("HistoryListAction.label")); //$NON-NLS-1$
-		CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, "history_list.gif"); //$NON-NLS-1$
+		FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, "history_list.gif"); //$NON-NLS-1$
 		WorkbenchHelp.setHelp(this, ICHelpContextIds.HISTORY_LIST_ACTION);
 	}
 		
@@ -170,7 +170,7 @@ public class HistoryListAction extends Action {
 	 */
 	public void run() {
 		ICElement[] historyEntries= fView.getHistoryEntries();
-		HistoryListDialog dialog= new HistoryListDialog(CUIPlugin.getActiveWorkbenchShell(), historyEntries);
+		HistoryListDialog dialog= new HistoryListDialog(FortranUIPlugin.getActiveWorkbenchShell(), historyEntries);
 		if (dialog.open() == Window.OK) {
 			fView.setHistoryEntries(dialog.getRemaining());
 			fView.setInputElement(dialog.getResult());

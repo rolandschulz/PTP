@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.fdt.internal.ui.util.CoreUtility;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.Wizard;
 
@@ -58,7 +58,7 @@ public class OpenNewWizardAction extends AbstractOpenWizardAction {
 			}
 			return null;
 		} catch (MalformedURLException exception) {
-			CUIPlugin.getDefault().logErrorMessage("Unable to load wizard icon"); //$NON-NLS-1$
+			FortranUIPlugin.getDefault().logErrorMessage("Unable to load wizard icon"); //$NON-NLS-1$
 		}
 		return ImageDescriptor.getMissingImageDescriptor();
 		

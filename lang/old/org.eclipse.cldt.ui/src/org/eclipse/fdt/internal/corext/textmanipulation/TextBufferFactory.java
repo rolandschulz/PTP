@@ -18,8 +18,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.fdt.internal.ui.CStatusConstants;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.internal.ui.FortranStatusConstants;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.IAnnotationModel;
@@ -51,7 +51,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 	public TextBufferFactory() {
 		// XXX http://dev.eclipse.org/bugs/show_bug.cgi?id=5170
 		// Need way to map a file to a document without knowing any kind of document provider.
-		this(CUIPlugin.getDefault().getDocumentProvider());
+		this(FortranUIPlugin.getDefault().getDocumentProvider());
 	}
 	
 	public TextBufferFactory(IDocumentProvider provider) {
@@ -142,7 +142,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 			document.set(buffer.toString());
 			return new TextBuffer(document);
 		} catch (IOException x) {
-			IStatus s= new Status(IStatus.ERROR, CUIPlugin.PLUGIN_ID, CStatusConstants.INTERNAL_ERROR, x.getMessage(), x);
+			IStatus s= new Status(IStatus.ERROR, FortranUIPlugin.PLUGIN_ID, FortranStatusConstants.INTERNAL_ERROR, x.getMessage(), x);
 			throw new CoreException(s);
 		} finally {
 			if (in != null) {
@@ -180,8 +180,8 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 	}
 	
 	private void throwNotManaged() throws CoreException {
-		IStatus s= new Status(IStatus.ERROR, CUIPlugin.PLUGIN_ID, 
-			CStatusConstants.INTERNAL_ERROR, "TextBufferFactory.bufferNotManaged", null); //$NON-NLS-1$
+		IStatus s= new Status(IStatus.ERROR, FortranUIPlugin.PLUGIN_ID, 
+			FortranStatusConstants.INTERNAL_ERROR, "TextBufferFactory.bufferNotManaged", null); //$NON-NLS-1$
 		throw new CoreException(s);
 	}
 }

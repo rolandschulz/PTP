@@ -14,7 +14,7 @@ import org.eclipse.ui.help.WorkbenchHelp;
 
 import org.eclipse.swt.custom.BusyIndicator;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.jface.action.Action;
 
@@ -30,7 +30,7 @@ public class ShowQualifiedTypeNamesAction extends Action {
 		setDescription(TypeHierarchyMessages.getString("ShowQualifiedTypeNamesAction.description")); //$NON-NLS-1$
 		setToolTipText(TypeHierarchyMessages.getString("ShowQualifiedTypeNamesAction.tooltip")); //$NON-NLS-1$
 		
-		CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, "th_showqualified.gif"); //$NON-NLS-1$
+		FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, "th_showqualified.gif"); //$NON-NLS-1$
 		
 		fView= v;
 		setChecked(initValue);

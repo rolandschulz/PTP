@@ -26,7 +26,7 @@ import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.core.model.IContainerEntry;
 import org.eclipse.fdt.core.model.ILibraryEntry;
 import org.eclipse.fdt.core.model.IPathEntry;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.dialogs.TypedElementSelectionValidator;
 import org.eclipse.fdt.internal.ui.util.PixelConverter;
@@ -36,7 +36,7 @@ import org.eclipse.fdt.internal.ui.wizards.dialogfields.ITreeListAdapter;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.LayoutUtil;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.ListDialogField;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.TreeListDialogField;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -79,7 +79,7 @@ public class CPathLibraryEntryPage extends CPathBasePage {
 		super(CPathEntryMessages.getString("LibrariesEntryPage.title")); //$NON-NLS-1$
 		setDescription(CPathEntryMessages.getString("LibrariesEntryPage.description")); //$NON-NLS-1$
 
-		fWorkspaceRoot = CUIPlugin.getWorkspace().getRoot();
+		fWorkspaceRoot = FortranUIPlugin.getWorkspace().getRoot();
 		fCPathList = cPathList;
 
 		LibrariesAdapter adapter = new LibrariesAdapter();
@@ -107,7 +107,7 @@ public class CPathLibraryEntryPage extends CPathBasePage {
 	}
 
 	public Image getImage() {
-		return CPluginImages.get(CPluginImages.IMG_OBJS_ARCHIVE);
+		return FortranPluginImages.get(FortranPluginImages.IMG_OBJS_ARCHIVE);
 	}
 
 	public void init(ICProject cproject) {

@@ -8,7 +8,7 @@
  ******************************************************************************/
 package org.eclipse.fdt.internal.ui.dialogs.cpaths;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.ImageData;
@@ -85,17 +85,17 @@ public class CPListImageDescriptor extends CompositeImageDescriptor {
 		ImageData data = null;
 		int x= getSize().x;
 		if ((flags & PATH_INHERIT) == PATH_INHERIT) {
-			data = CPluginImages.DESC_OVR_PATH_INHERIT.getImageData();
+			data = FortranPluginImages.DESC_OVR_PATH_INHERIT.getImageData();
 			drawImage(data, x, 0);
 		}
 		x= 0;
 		if ((flags & ERROR) != 0) {
-			data= CPluginImages.DESC_OVR_ERROR.getImageData();
+			data= FortranPluginImages.DESC_OVR_ERROR.getImageData();
 			drawImage(data, x, size.y - data.height);
 			x+= data.width;
 		}
 		if ((flags & WARNING) != 0) {
-			data= CPluginImages.DESC_OVR_WARNING.getImageData();
+			data= FortranPluginImages.DESC_OVR_WARNING.getImageData();
 			drawImage(data, x, size.y - data.height);
 			x+= data.width;
 		}

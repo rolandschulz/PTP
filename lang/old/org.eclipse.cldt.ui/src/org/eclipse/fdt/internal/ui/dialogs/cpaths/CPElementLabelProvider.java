@@ -15,10 +15,10 @@ import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.IPathEntry;
 import org.eclipse.fdt.core.model.IPathEntryContainer;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.util.ImageDescriptorRegistry;
 import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -50,18 +50,18 @@ class CPElementLabelProvider extends LabelProvider implements IColorProvider {
 	public CPElementLabelProvider(boolean showExported, boolean showParentInfo) {
 		fNewLabel = CPathEntryMessages.getString("CPElementLabelProvider.new"); //$NON-NLS-1$
 		fCreateLabel = CPathEntryMessages.getString("CPElementLabelProvider.willbecreated"); //$NON-NLS-1$
-		fRegistry = CUIPlugin.getImageDescriptorRegistry();
+		fRegistry = FortranUIPlugin.getImageDescriptorRegistry();
 		fCImages = new CElementImageProvider();
 
-		fLibIcon = CPluginImages.DESC_OBJS_ARCHIVE;
-		fLibWSrcIcon = CPluginImages.DESC_OBJS_ARCHIVE_WSRC;
-		fIncludeIcon = CPluginImages.DESC_OBJS_INCLUDES_FOLDER;
-		fMacroIcon = CPluginImages.DESC_OBJS_MACRO;
-		fFolderImage = CPluginImages.DESC_OBJS_SOURCE_ROOT;
-		fOutputImage = CPluginImages.DESC_OBJS_CONTAINER;
-		fContainerImage = CPluginImages.DESC_OBJS_LIBRARY;
+		fLibIcon = FortranPluginImages.DESC_OBJS_ARCHIVE;
+		fLibWSrcIcon = FortranPluginImages.DESC_OBJS_ARCHIVE_WSRC;
+		fIncludeIcon = FortranPluginImages.DESC_OBJS_INCLUDES_FOLDER;
+		fMacroIcon = FortranPluginImages.DESC_OBJS_MACRO;
+		fFolderImage = FortranPluginImages.DESC_OBJS_SOURCE_ROOT;
+		fOutputImage = FortranPluginImages.DESC_OBJS_CONTAINER;
+		fContainerImage = FortranPluginImages.DESC_OBJS_LIBRARY;
 
-		IWorkbench workbench = CUIPlugin.getDefault().getWorkbench();
+		IWorkbench workbench = FortranUIPlugin.getDefault().getWorkbench();
 
 		fProjectImage = workbench.getSharedImages().getImageDescriptor(IDE.SharedImages.IMG_OBJ_PROJECT);
 		bShowExported = showExported;
@@ -338,20 +338,20 @@ class CPElementLabelProvider extends LabelProvider implements IColorProvider {
 		} else if (element instanceof CPElementAttribute) {
 			String key = ((CPElementAttribute)element).getKey();
 			if (key.equals(CPElement.SOURCEATTACHMENT)) {
-				return fRegistry.get(CPluginImages.DESC_OBJS_SOURCE_ATTACH_ATTRIB);
+				return fRegistry.get(FortranPluginImages.DESC_OBJS_SOURCE_ATTACH_ATTRIB);
 			} else if (key.equals(CPElement.EXCLUSION)) {
-				return CPluginImages.get(CPluginImages.IMG_OBJS_EXCLUDSION_FILTER_ATTRIB);
+				return FortranPluginImages.get(FortranPluginImages.IMG_OBJS_EXCLUDSION_FILTER_ATTRIB);
 			}
 		} else if (element instanceof IPathEntry) {
 			return getImage(CPElement.createFromExisting((IPathEntry)element, null));
 		} else if (element instanceof CPElementGroup) {
 			switch ( ((CPElementGroup)element).getEntryKind()) {
 				case IPathEntry.FDT_INCLUDE :
-					return CPluginImages.get(CPluginImages.IMG_OBJS_INCLUDES_CONTAINER);
+					return FortranPluginImages.get(FortranPluginImages.IMG_OBJS_INCLUDES_CONTAINER);
 				case IPathEntry.FDT_MACRO :
 					return fRegistry.get(fMacroIcon);
 				case IPathEntry.FDT_LIBRARY :
-					return CPluginImages.get(CPluginImages.IMG_OBJS_LIBRARY);
+					return FortranPluginImages.get(FortranPluginImages.IMG_OBJS_LIBRARY);
 				case -1 :
 					IResource res = ((CPElementGroup)element).getResource();
 					IWorkbenchAdapter adapter = (IWorkbenchAdapter)res.getAdapter(IWorkbenchAdapter.class);

@@ -18,8 +18,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.fdt.internal.ui.CStatusConstants;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.internal.ui.FortranStatusConstants;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 
 /**
@@ -266,7 +266,7 @@ public class TextBuffer {
 		try {
 			fDocument.replace(offset, length, text);
 		} catch (BadLocationException e) {
-			IStatus s= new Status(IStatus.ERROR, CUIPlugin.PLUGIN_ID, CStatusConstants.INTERNAL_ERROR, 
+			IStatus s= new Status(IStatus.ERROR, FortranUIPlugin.PLUGIN_ID, FortranStatusConstants.INTERNAL_ERROR, 
 				TextManipulationMessages.getFormattedString(
 					"TextBuffer.wrongRange",  //$NON-NLS-1$
 					new Object[] {new Integer(offset), new Integer(length) } ), e);

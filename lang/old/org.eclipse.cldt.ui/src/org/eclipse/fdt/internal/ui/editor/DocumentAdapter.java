@@ -34,7 +34,7 @@ import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.IBuffer;
 import org.eclipse.fdt.core.model.IBufferChangedListener;
 import org.eclipse.fdt.core.model.IOpenable;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultLineTracker;
 import org.eclipse.jface.text.DocumentEvent;
@@ -444,7 +444,7 @@ public class DocumentAdapter implements IBuffer, IDocumentListener {
 						existingDelimiters.add(curr);
 					}
 				} catch (BadLocationException e) {
-					CUIPlugin.getDefault().log(e);
+					FortranUIPlugin.getDefault().log(e);
 				}
 			}
 			if (existingDelimiters.isEmpty()) {
@@ -469,10 +469,10 @@ public class DocumentAdapter implements IBuffer, IDocumentListener {
 					for (int k= 0; k < curr.length(); k++) {
 						buf.append(String.valueOf((int) curr.charAt(k)));
 					}
-					CUIPlugin.getDefault().log(new Exception(buf.toString()));
+					FortranUIPlugin.getDefault().log(new Exception(buf.toString()));
 				}
 			} catch (BadLocationException e) {
-				CUIPlugin.getDefault().log(e);
+				FortranUIPlugin.getDefault().log(e);
 			}
 		}
 	}

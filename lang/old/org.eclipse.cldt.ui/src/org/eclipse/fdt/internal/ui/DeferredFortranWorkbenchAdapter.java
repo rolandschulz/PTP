@@ -16,7 +16,7 @@ import org.eclipse.fdt.core.model.IParent;
 import org.eclipse.ui.progress.IDeferredWorkbenchAdapter;
 import org.eclipse.ui.progress.IElementCollector;
 
-public class DeferredCWorkbenchAdapter extends CWorkbenchAdapter
+public class DeferredFortranWorkbenchAdapter extends FortranWorkbenchAdapter
     implements IDeferredWorkbenchAdapter {
 
 	private static boolean fSerializeFetching = false;

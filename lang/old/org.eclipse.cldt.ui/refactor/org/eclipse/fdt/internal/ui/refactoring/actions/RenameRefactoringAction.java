@@ -23,7 +23,7 @@ import org.eclipse.fdt.internal.ui.editor.CEditor;
 import org.eclipse.fdt.internal.ui.refactoring.RefactoringMessages;
 import org.eclipse.fdt.internal.ui.refactoring.UserInterfaceStarter;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IWorkingCopyManager;
 import org.eclipse.fdt.ui.actions.SelectionDispatchAction;
 import org.eclipse.jface.action.IAction;
@@ -58,7 +58,7 @@ public class RenameRefactoringAction extends SelectionDispatchAction {
 
 	public void selectionChanged(ITextSelection selection) {
 		boolean enable = true;
-		IWorkingCopyManager manager = CUIPlugin.getDefault().getWorkingCopyManager();
+		IWorkingCopyManager manager = FortranUIPlugin.getDefault().getWorkingCopyManager();
 		ICElement element = manager.getWorkingCopy(fEditor.getEditorInput());
 		if((element == null) || (element instanceof ITranslationUnit)){
 			setEnabled(false);

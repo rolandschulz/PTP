@@ -20,9 +20,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-import org.eclipse.fdt.internal.ui.CStatusConstants;
-import org.eclipse.fdt.internal.ui.CUIMessages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.internal.ui.FortranStatusConstants;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 
@@ -42,8 +42,8 @@ public class ExceptionHandler {
 	 * logged as an error with the error code <code>JavaStatusConstants.INTERNAL_ERROR</code>.
 	 */
 	public static void log(Throwable t, String message) {
-		CUIPlugin.getDefault().log(new Status(IStatus.ERROR, CUIPlugin.getPluginId(), 
-			CStatusConstants.INTERNAL_ERROR, message, t));
+		FortranUIPlugin.getDefault().log(new Status(IStatus.ERROR, FortranUIPlugin.getPluginId(), 
+			FortranStatusConstants.INTERNAL_ERROR, message, t));
 	}
 	
 	/**
@@ -55,7 +55,7 @@ public class ExceptionHandler {
 	 * @param message message to be displayed by the dialog window
 	 */
 	public static void handle(CoreException e, String title, String message) {
-		handle(e, CUIPlugin.getActiveWorkbenchShell(), title, message);
+		handle(e, FortranUIPlugin.getActiveWorkbenchShell(), title, message);
 	}
 	
 	/**
@@ -79,7 +79,7 @@ public class ExceptionHandler {
 	 * @param message message to be displayed by the dialog window
 	 */
 	public static void handle(InvocationTargetException e, String title, String message) {
-		handle(e, CUIPlugin.getActiveWorkbenchShell(), title, message);
+		handle(e, FortranUIPlugin.getActiveWorkbenchShell(), title, message);
 	}
 	
 	/**
@@ -97,7 +97,7 @@ public class ExceptionHandler {
 	//---- Hooks for subclasses to control exception handling ------------------------------------
 	
 	protected void perform(CoreException e, Shell shell, String title, String message) {
-		CUIPlugin.getDefault().log(e);
+		FortranUIPlugin.getDefault().log(e);
 		IStatus status= e.getStatus();
 		if (status != null) {
 			ErrorDialog.openError(shell, title, message, status);
@@ -111,7 +111,7 @@ public class ExceptionHandler {
 		if (target instanceof CoreException) {
 			perform((CoreException)target, shell, title, message);
 		} else {
-			CUIPlugin.getDefault().log(e);
+			FortranUIPlugin.getDefault().log(e);
 			if (e.getMessage() != null && e.getMessage().length() > 0) {
 				displayMessageDialog(e, e.getMessage(), shell, title, message);
 			} else {
@@ -129,7 +129,7 @@ public class ExceptionHandler {
 			msg.write("\n\n"); //$NON-NLS-1$
 		}
 		if (exceptionMessage == null || exceptionMessage.length() == 0)
-			msg.write(CUIMessages.getString("ExceptionDialog.seeErrorLogMessage")); //$NON-NLS-1$
+			msg.write(FortranUIMessages.getString("ExceptionDialog.seeErrorLogMessage")); //$NON-NLS-1$
 		else
 			msg.write(exceptionMessage);
 		MessageDialog.openError(shell, title, msg.toString());			

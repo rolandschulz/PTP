@@ -14,7 +14,7 @@ package org.eclipse.fdt.internal.ui.refactoring;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.fdt.internal.corext.refactoring.base.Refactoring;
 import org.eclipse.fdt.internal.corext.refactoring.base.RefactoringStatus;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.jface.wizard.IWizardPage;
 
 /**
@@ -51,7 +51,7 @@ public abstract class UserInputWizardPage extends RefactoringWizardPage {
 		if (severity == RefactoringStatus.FATAL){
 			setPageComplete(false);
 			setErrorMessage(status.getFirstMessage(severity));	
-			setImageDescriptor(CPluginImages.DESC_OBJS_DEFAULT_CHANGE);
+			setImageDescriptor(FortranPluginImages.DESC_OBJS_DEFAULT_CHANGE);
 		} else {
 			setPageComplete(true);
 			setErrorMessage(null);
@@ -60,7 +60,7 @@ public abstract class UserInputWizardPage extends RefactoringWizardPage {
 				setMessage(null, NONE);
 			else {	
 				setMessage(status.getFirstMessage(severity), getCorrespondingIStatusSeverity(severity));
-				setImageDescriptor(CPluginImages.DESC_OBJS_DEFAULT_CHANGE);
+				setImageDescriptor(FortranPluginImages.DESC_OBJS_DEFAULT_CHANGE);
 			}
 		}
 	}

@@ -15,7 +15,7 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Display;
 
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextPresentation;
@@ -149,7 +149,7 @@ public class HTMLTextPresenter implements DefaultInformationControl.IInformation
 			
 		} catch (IOException e) {
 			
-			CUIPlugin.getDefault().log(e);
+			FortranUIPlugin.getDefault().log(e);
 			return null;
 			
 		} finally {

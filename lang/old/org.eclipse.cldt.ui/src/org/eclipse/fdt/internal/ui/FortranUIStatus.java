@@ -12,14 +12,14 @@ import org.eclipse.fdt.ui.*;
 /**
  * Convenience class for error exceptions thrown inside JavaUI plugin.
  */
-public class CUIStatus extends Status {
+public class FortranUIStatus extends Status {
 
-	public CUIStatus(int code, String message, Throwable throwable) {
-		super(IStatus.ERROR, CUIPlugin.getPluginId(), code, message, throwable);
+	public FortranUIStatus(int code, String message, Throwable throwable) {
+		super(IStatus.ERROR, FortranUIPlugin.getPluginId(), code, message, throwable);
 	}
 	
-	private CUIStatus(int severity, int code, String message, Throwable throwable) {
-		super(severity, CUIPlugin.getPluginId(), code, message, throwable);
+	private FortranUIStatus(int severity, int code, String message, Throwable throwable) {
+		super(severity, FortranUIPlugin.getPluginId(), code, message, throwable);
 	}
 	
 	public static IStatus createError(int code, Throwable throwable) {
@@ -27,19 +27,19 @@ public class CUIStatus extends Status {
 		if (message == null) {
 			message= throwable.getClass().getName();
 		}
-		return new CUIStatus(IStatus.ERROR, code, message, throwable);
+		return new FortranUIStatus(IStatus.ERROR, code, message, throwable);
 	}
 
 	public static IStatus createError(int code, String message, Throwable throwable) {
-		return new CUIStatus(IStatus.ERROR, code, message, throwable);
+		return new FortranUIStatus(IStatus.ERROR, code, message, throwable);
 	}
 	
 	public static IStatus createWarning(int code, String message, Throwable throwable) {
-		return new CUIStatus(IStatus.WARNING, code, message, throwable);
+		return new FortranUIStatus(IStatus.WARNING, code, message, throwable);
 	}
 
 	public static IStatus createInfo(int code, String message, Throwable throwable) {
-		return new CUIStatus(IStatus.INFO, code, message, throwable);
+		return new FortranUIStatus(IStatus.INFO, code, message, throwable);
 	}
 	
 }

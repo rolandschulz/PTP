@@ -15,11 +15,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.fdt.core.model.ITranslationUnit;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.wizards.NewElementWizard;
 import org.eclipse.fdt.internal.ui.wizards.classwizard.NewClassCreationWizardPage;
 import org.eclipse.fdt.internal.ui.wizards.classwizard.NewClassWizardMessages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 public class NewClassCreationWizard extends NewElementWizard {
     
@@ -27,8 +27,8 @@ public class NewClassCreationWizard extends NewElementWizard {
     
     public NewClassCreationWizard() {
         super();
-        setDefaultPageImageDescriptor(CPluginImages.DESC_WIZBAN_NEWCLASS);
-        setDialogSettings(CUIPlugin.getDefault().getDialogSettings());
+        setDefaultPageImageDescriptor(FortranPluginImages.DESC_WIZBAN_NEWCLASS);
+        setDialogSettings(FortranUIPlugin.getDefault().getDialogSettings());
         setWindowTitle(NewClassWizardMessages.getString("NewClassCreationWizard.title")); //$NON-NLS-1$
     }
     

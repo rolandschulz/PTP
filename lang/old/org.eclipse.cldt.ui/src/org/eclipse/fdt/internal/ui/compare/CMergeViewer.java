@@ -15,7 +15,7 @@ import org.eclipse.compare.contentmergeviewer.TextMergeViewer;
 import org.eclipse.compare.internal.TokenComparator;
 import org.eclipse.fdt.internal.ui.text.CSourceViewerConfiguration;
 import org.eclipse.fdt.internal.ui.text.CTextTools;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 
 import org.eclipse.jface.text.IDocumentPartitioner;
@@ -32,7 +32,7 @@ public class CMergeViewer extends TextMergeViewer {
 	}
 	
 	public String getTitle() {
-		return CUIPlugin.getResourceString(TITLE);
+		return FortranUIPlugin.getResourceString(TITLE);
 	}
 
 
@@ -41,12 +41,12 @@ public class CMergeViewer extends TextMergeViewer {
 	}
 	
 	protected IDocumentPartitioner getDocumentPartitioner() {
-		return CUIPlugin.getDefault().getTextTools().createDocumentPartitioner();
+		return FortranUIPlugin.getDefault().getTextTools().createDocumentPartitioner();
 	}
 		
 	protected void configureTextViewer(TextViewer textViewer) {
 		if (textViewer instanceof SourceViewer) {
-			CTextTools tools= CUIPlugin.getDefault().getTextTools();
+			CTextTools tools= FortranUIPlugin.getDefault().getTextTools();
 			((SourceViewer)textViewer).configure(new CSourceViewerConfiguration(tools, null));
 		}
 	}

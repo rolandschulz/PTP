@@ -25,7 +25,7 @@ import org.eclipse.ui.help.WorkbenchHelp;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.dialogs.IStatusChangeListener;
 import org.eclipse.fdt.internal.ui.dialogs.StatusUtil;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 /*
  * The page to configure the compiler options.
@@ -37,7 +37,7 @@ public class TodoTaskPreferencePage extends PreferencePage implements IWorkbench
 	private TodoTaskConfigurationBlock fConfigurationBlock;
 
 	public TodoTaskPreferencePage() {
-		setPreferenceStore(CUIPlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(FortranUIPlugin.getDefault().getPreferenceStore());
 		//setDescription(PreferencesMessages.getString("TodoTaskPreferencePage.description")); //$NON-NLS-1$
 		
 		// only used when page is shown programatically

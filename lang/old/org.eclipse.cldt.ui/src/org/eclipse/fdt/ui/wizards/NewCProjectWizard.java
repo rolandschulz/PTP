@@ -32,8 +32,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.fdt.core.FortranCorePlugin;
-import org.eclipse.fdt.internal.ui.CPluginImages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -75,17 +75,17 @@ public abstract class NewCProjectWizard extends BasicNewResourceWizard implement
 	List tabItemsList = new ArrayList();
 
 	public NewCProjectWizard() {
-		this(CUIPlugin.getResourceString(WZ_TITLE), CUIPlugin.getResourceString(WZ_DESC), 
-			CUIPlugin.getResourceString(OP_ERROR));
+		this(FortranUIPlugin.getResourceString(WZ_TITLE), FortranUIPlugin.getResourceString(WZ_DESC), 
+			FortranUIPlugin.getResourceString(OP_ERROR));
 	}
 
 	public NewCProjectWizard(String title, String description) {
-		this(title, description, CUIPlugin.getResourceString(OP_ERROR));
+		this(title, description, FortranUIPlugin.getResourceString(OP_ERROR));
 	}
 
 	public NewCProjectWizard(String title, String description, String error) {
 		super();
-		setDialogSettings(CUIPlugin.getDefault().getDialogSettings());
+		setDialogSettings(FortranUIPlugin.getDefault().getDialogSettings());
 		setNeedsProgressMonitor(true);
 		wz_title = title;
 		wz_desc = description;
@@ -96,7 +96,7 @@ public abstract class NewCProjectWizard extends BasicNewResourceWizard implement
 	 * @see Wizard#createPages
 	 */		
 	public void addPages() {
-		fMainPage= new NewCProjectWizardPage(CUIPlugin.getResourceString(PREFIX));
+		fMainPage= new NewCProjectWizardPage(FortranUIPlugin.getResourceString(PREFIX));
 		fMainPage.setTitle(wz_title);
 		fMainPage.setDescription(wz_desc);
 		addPage(fMainPage);
@@ -107,7 +107,7 @@ public abstract class NewCProjectWizard extends BasicNewResourceWizard implement
 	protected abstract void doRunEpilogue(IProgressMonitor monitor);
 
 	protected IStatus isValidName(String name) {
-		return new Status(IStatus.OK, CUIPlugin.PLUGIN_ID, 0, "", null); //$NON-NLS-1$
+		return new Status(IStatus.OK, FortranUIPlugin.PLUGIN_ID, 0, "", null); //$NON-NLS-1$
 	}
 
 	/**
@@ -116,7 +116,7 @@ public abstract class NewCProjectWizard extends BasicNewResourceWizard implement
 	 * @return IStatus
 	 */
 	protected IStatus isValidLocation(String projectFieldContents) {
-		return new Status(IStatus.OK, CUIPlugin.PLUGIN_ID, 0, "", null); //$NON-NLS-1$
+		return new Status(IStatus.OK, FortranUIPlugin.PLUGIN_ID, 0, "", null); //$NON-NLS-1$
 	}
 
 	/**
@@ -175,7 +175,7 @@ public abstract class NewCProjectWizard extends BasicNewResourceWizard implement
 						IDE.openEditor(page, file, true);
 				} catch (PartInitException e) {
 					MessageDialog.openError(dw.getShell(),
-						CUIPlugin.getResourceString(OP_ERROR), e.getMessage());
+						FortranUIPlugin.getResourceString(OP_ERROR), e.getMessage());
 				}
 			}
 		}
@@ -196,7 +196,7 @@ public abstract class NewCProjectWizard extends BasicNewResourceWizard implement
 	 * Reimplemented method from superclass
 	 */
 	protected void initializeDefaultPageImageDescriptor() {
-		setDefaultPageImageDescriptor(CPluginImages.DESC_WIZABAN_NEW_PROJ);
+		setDefaultPageImageDescriptor(FortranPluginImages.DESC_WIZABAN_NEW_PROJ);
 	}
 
 	/* (non-Javadoc)
@@ -204,7 +204,7 @@ public abstract class NewCProjectWizard extends BasicNewResourceWizard implement
 	 */
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
 		super.init(workbench, currentSelection);
-		setWindowTitle(CUIPlugin.getResourceString(WINDOW_TITLE));
+		setWindowTitle(FortranUIPlugin.getResourceString(WINDOW_TITLE));
 	}
 
 	public IRunnableWithProgress getRunnable() {
@@ -213,7 +213,7 @@ public abstract class NewCProjectWizard extends BasicNewResourceWizard implement
 				if (monitor == null) {
 					monitor= new NullProgressMonitor();
 				}
-				monitor.beginTask(CUIPlugin.getResourceString(OP_DESC), 3);
+				monitor.beginTask(FortranUIPlugin.getResourceString(OP_DESC), 3);
 
 				doRunPrologue(new SubProgressMonitor(monitor, 1));
 				try {
@@ -238,11 +238,11 @@ public abstract class NewCProjectWizard extends BasicNewResourceWizard implement
 			getContainer().run(false, true, op);
 		} catch (InvocationTargetException e) {
 			Shell shell= getShell();
-			String title= CUIPlugin.getResourceString(OP_ERROR + ".title"); //$NON-NLS-1$
-			String message= CUIPlugin.getResourceString(OP_ERROR + ".message"); //$NON-NLS-1$
+			String title= FortranUIPlugin.getResourceString(OP_ERROR + ".title"); //$NON-NLS-1$
+			String message= FortranUIPlugin.getResourceString(OP_ERROR + ".message"); //$NON-NLS-1$
                        
 			Throwable th= e.getTargetException();
-			CUIPlugin.errorDialog(shell, title, message, th, false);
+			FortranUIPlugin.errorDialog(shell, title, message, th, false);
 			try {
 				getProjectHandle().delete(false, false, null);
 			} catch (CoreException ignore) {
@@ -285,7 +285,7 @@ public abstract class NewCProjectWizard extends BasicNewResourceWizard implement
 		try {
 			newProjectHandle = getProjectHandle();
 		} catch (UnsupportedOperationException e) {
-			throw new CoreException(new Status(IStatus.ERROR, CUIPlugin.PLUGIN_ID, 0, e.getMessage(), null));
+			throw new CoreException(new Status(IStatus.ERROR, FortranUIPlugin.PLUGIN_ID, 0, e.getMessage(), null));
 		}
 
 		// get a project descriptor

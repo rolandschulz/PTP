@@ -372,7 +372,7 @@ public class PreferenceConstants {
 	 * @return the FDT-UI preference store
 	 */
 	public static IPreferenceStore getPreferenceStore() {
-		return CUIPlugin.getDefault().getPreferenceStore();
+		return FortranUIPlugin.getDefault().getPreferenceStore();
 	}
 
     /**

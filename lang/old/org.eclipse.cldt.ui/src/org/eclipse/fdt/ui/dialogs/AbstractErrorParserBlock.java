@@ -25,13 +25,13 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ErrorParserManager;
-import org.eclipse.fdt.internal.ui.CUIMessages;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.CheckedListDialogField;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.DialogField;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.IDialogFieldListener;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.LayoutUtil;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -81,8 +81,8 @@ public abstract class AbstractErrorParserBlock extends AbstractCOptionPage {
 	}
 
 	public AbstractErrorParserBlock() {
-		super(CUIPlugin.getResourceString(LABEL));
-		setDescription(CUIPlugin.getResourceString(DESC));
+		super(FortranUIPlugin.getResourceString(LABEL));
+		setDescription(FortranUIPlugin.getResourceString(DESC));
 	}
 
 	public Image getImage() {
@@ -260,20 +260,20 @@ public abstract class AbstractErrorParserBlock extends AbstractCOptionPage {
 
 		String[] buttonLabels = new String[]{
 		/* 0 */
-		CUIMessages.getString("AbstractErrorParserBlock.label.up"), //$NON-NLS-1$
+		FortranUIMessages.getString("AbstractErrorParserBlock.label.up"), //$NON-NLS-1$
 				/* 1 */
-				CUIMessages.getString("AbstractErrorParserBlock.label.down"), //$NON-NLS-1$
+				FortranUIMessages.getString("AbstractErrorParserBlock.label.down"), //$NON-NLS-1$
 				/* 2 */
 				null,
 				/* 3 */
-				CUIMessages.getString("AbstractErrorParserBlock.label.selectAll"), //$NON-NLS-1$
+				FortranUIMessages.getString("AbstractErrorParserBlock.label.selectAll"), //$NON-NLS-1$
 				/* 4 */
-				CUIMessages.getString("AbstractErrorParserBlock.label.unselectAll") //$NON-NLS-1$
+				FortranUIMessages.getString("AbstractErrorParserBlock.label.unselectAll") //$NON-NLS-1$
 		};
 
 		fErrorParserList = new CheckedListDialogField(null, buttonLabels, getLabelProvider());
 		fErrorParserList.setDialogFieldListener(getFieldListenerAdapter());
-		fErrorParserList.setLabelText(CUIMessages.getString("AbstractErrorParserBlock.label.errorParsers")); //$NON-NLS-1$
+		fErrorParserList.setLabelText(FortranUIMessages.getString("AbstractErrorParserBlock.label.errorParsers")); //$NON-NLS-1$
 		fErrorParserList.setUpButtonIndex(0);
 		fErrorParserList.setDownButtonIndex(1);
 		fErrorParserList.setCheckAllButtonIndex(3);
@@ -291,7 +291,7 @@ public abstract class AbstractErrorParserBlock extends AbstractCOptionPage {
 			if (monitor == null) {
 				monitor = new NullProgressMonitor();
 			}
-			monitor.beginTask(CUIMessages.getString("AbstractErrorParserBlock.task.setErrorParser"), 1); //$NON-NLS-1$
+			monitor.beginTask(FortranUIMessages.getString("AbstractErrorParserBlock.task.setErrorParser"), 1); //$NON-NLS-1$
 			List elements = fErrorParserList.getElements();
 			int count = elements.size();
 			List list = new ArrayList(count);

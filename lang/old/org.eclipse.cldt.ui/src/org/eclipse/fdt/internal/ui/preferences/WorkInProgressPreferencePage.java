@@ -23,7 +23,7 @@ import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.browser.AllTypesCache;
 import org.eclipse.fdt.internal.core.search.indexing.SourceIndexer;
 import org.eclipse.fdt.internal.ui.search.CSearchPage;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.utils.ui.controls.ControlFactory;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -57,7 +57,7 @@ public class WorkInProgressPreferencePage extends PreferencePage
 	protected OverlayPreferenceStore fOverlayStore;
 
 	public WorkInProgressPreferencePage(){
-		setPreferenceStore(CUIPlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(FortranUIPlugin.getDefault().getPreferenceStore());
 		fOverlayStore  = createOverlayStore();
 	}
 

@@ -28,10 +28,10 @@ import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.core.model.IWorkingCopy;
 import org.eclipse.fdt.core.parser.IProblem;
 import org.eclipse.fdt.internal.core.model.IBufferFactory;
-import org.eclipse.fdt.internal.ui.CFileElementWorkingCopy;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranFileElementWorkingCopy;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.text.IProblemRequestorExtension;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
@@ -164,8 +164,8 @@ public class CDocumentProvider extends TextFileDocumentProvider {
 			if (!fQuickFixImagesInitialized) {
 				if (isProblem() && indicateQuixFixableProblems() /*&& JavaCorrectionProcessor.hasCorrections(this)*/) { // no light bulb for tasks
 					if (!fgQuickFixImagesInitialized) {
-						fgQuickFixImage= CPluginImages.get(CPluginImages.IMG_OBJS_FIXABLE_PROBLEM);
-						fgQuickFixErrorImage= CPluginImages.get(CPluginImages.IMG_OBJS_FIXABLE_ERROR);
+						fgQuickFixImage= FortranPluginImages.get(FortranPluginImages.IMG_OBJS_FIXABLE_PROBLEM);
+						fgQuickFixErrorImage= FortranPluginImages.get(FortranPluginImages.IMG_OBJS_FIXABLE_ERROR);
 						fgQuickFixImagesInitialized= true;
 					}
 					if (CMarkerAnnotation.ERROR_ANNOTATION_TYPE.equals(getType()))
@@ -790,7 +790,7 @@ public class CDocumentProvider extends TextFileDocumentProvider {
 					enableHandlingTemporaryProblems();
 			}
 		};
-		CUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fPropertyListener);
+		FortranUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fPropertyListener);
 	}
 
 	/**
@@ -848,10 +848,10 @@ public class CDocumentProvider extends TextFileDocumentProvider {
 		IProblemRequestor requestor= tuInfo.fModel instanceof IProblemRequestor ? (IProblemRequestor) tuInfo.fModel : null;
 		IWorkingCopy copy = null;
 		if (element instanceof IFileEditorInput) {
-			IBufferFactory factory = CUIPlugin.getDefault().getBufferFactory();
+			IBufferFactory factory = FortranUIPlugin.getDefault().getBufferFactory();
 			copy = original.getSharedWorkingCopy(getProgressMonitor(), factory, requestor);
 		} else if (element instanceof ITranslationUnitEditorInput) {
-			copy = new CFileElementWorkingCopy(original);
+			copy = new FortranFileElementWorkingCopy(original);
 		}
 		tuInfo.fCopy = copy;
 
@@ -972,7 +972,7 @@ public class CDocumentProvider extends TextFileDocumentProvider {
 	 * Returns the preference whether handling temporary problems is enabled.
 	 */
 	protected boolean isHandlingTemporaryProblems() {
-		IPreferenceStore store= CUIPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore store= FortranUIPlugin.getDefault().getPreferenceStore();
 		return store.getBoolean(HANDLE_TEMPORARY_PROBLEMS);
 	} 
 	
@@ -1021,7 +1021,7 @@ public class CDocumentProvider extends TextFileDocumentProvider {
 	 * @see org.eclipse.jdt.internal.ui.javaeditor.ICompilationUnitDocumentProvider#shutdown()
 	 */
 	public void shutdown() {
-		//CUIPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(fPropertyListener);
+		//FortranUIPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(fPropertyListener);
 		Iterator e = getConnectedElementsIterator();
 		while (e.hasNext())
 			disconnect(e.next());

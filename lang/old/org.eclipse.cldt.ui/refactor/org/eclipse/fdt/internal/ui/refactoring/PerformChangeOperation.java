@@ -37,7 +37,7 @@ import org.eclipse.fdt.internal.corext.refactoring.base.ChangeContext;
 import org.eclipse.fdt.internal.corext.refactoring.base.IChange;
 import org.eclipse.fdt.internal.corext.refactoring.base.RefactoringStatus;
 import org.eclipse.fdt.internal.ui.ICStatusConstants;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 /**
  * Operation that, when performed, performes a change to the workbench.
@@ -175,7 +175,7 @@ public class PerformChangeOperation implements IRunnableWithProgress {
 						throw new CoreException(
 							new Status(
 								IStatus.ERROR, 
-								CUIPlugin.getPluginId(), ICStatusConstants.CHANGE_ABORTED, 
+								FortranUIPlugin.getPluginId(), ICStatusConstants.CHANGE_ABORTED, 
 								RefactoringMessages.getString("PerformChangeOperation.unrecoverable_error"), e)); //$NON-NLS-1$
 					}
 				}
@@ -205,7 +205,7 @@ public class PerformChangeOperation implements IRunnableWithProgress {
 	}
 	
 	private static IRewriteTarget[] getRewriteTargets() {
-		IEditorPart[] editors= CUIPlugin.getInstanciatedEditors();
+		IEditorPart[] editors= FortranUIPlugin.getInstanciatedEditors();
 		List result= new ArrayList(editors.length);
 		for (int i= 0; i < editors.length; i++) {
 			IRewriteTarget target= (IRewriteTarget)editors[i].getAdapter(IRewriteTarget.class);

@@ -37,7 +37,7 @@ import org.eclipse.ui.actions.GlobalBuildAction;
 import org.eclipse.fdt.internal.ui.refactoring.ListDialog;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
 import org.eclipse.fdt.internal.ui.viewsupport.ListContentProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 public class RefactoringSaveHelper {
 
@@ -48,7 +48,7 @@ public class RefactoringSaveHelper {
 	}
 
 	public boolean saveEditors(Shell shell) {
-		IEditorPart[] dirtyEditors= CUIPlugin.getDirtyEditors();
+		IEditorPart[] dirtyEditors= FortranUIPlugin.getDirtyEditors();
 		if (dirtyEditors.length == 0)
 			return true;
 		if (! saveAllDirtyEditors(shell))
@@ -61,7 +61,7 @@ public class RefactoringSaveHelper {
 			description.setAutoBuilding(false);
 			workspace.setDescription(description);
 			try {
-				CUIPlugin.getActiveWorkbenchWindow().getWorkbench().saveAllEditors(false);
+				FortranUIPlugin.getActiveWorkbenchWindow().getWorkbench().saveAllEditors(false);
 				fFilesSaved= true;
 			} finally {
 				description.setAutoBuilding(autoBuild);
@@ -77,7 +77,7 @@ public class RefactoringSaveHelper {
 
 	public void triggerBuild() {
 		if (fFilesSaved && ResourcesPlugin.getWorkspace().getDescription().isAutoBuilding()) {
-			new GlobalBuildAction(CUIPlugin.getActiveWorkbenchWindow(), IncrementalProjectBuilder.INCREMENTAL_BUILD).run();
+			new GlobalBuildAction(FortranUIPlugin.getActiveWorkbenchWindow(), IncrementalProjectBuilder.INCREMENTAL_BUILD).run();
 		}
 	}
 	
@@ -104,7 +104,7 @@ public class RefactoringSaveHelper {
 		dialog.setLabelProvider(createDialogLabelProvider());
 		dialog.setMessage(RefactoringMessages.getString("RefactoringStarter.must_save")); //$NON-NLS-1$
 		dialog.setContentProvider(new ListContentProvider());
-		dialog.setInput(Arrays.asList(CUIPlugin.getDirtyEditors()));
+		dialog.setInput(Arrays.asList(FortranUIPlugin.getDirtyEditors()));
 		return dialog.open() == Window.OK;
 	}
 	

@@ -30,7 +30,7 @@ import org.eclipse.fdt.core.search.ICSearchConstants;
 import org.eclipse.fdt.core.search.ICSearchScope;
 import org.eclipse.fdt.core.search.SearchEngine;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.DialogPage;
@@ -82,7 +82,7 @@ public class CSearchPage extends DialogPage implements ISearchPage, ICSearchCons
 	public boolean performAction() {
 	    fLineManager.setErrorMessage(null); 
 		SearchPatternData data = getPatternData();
-		IWorkspace workspace = CUIPlugin.getWorkspace();
+		IWorkspace workspace = FortranUIPlugin.getWorkspace();
 		
 		ICSearchScope scope = null;
 		String scopeDescription = ""; //$NON-NLS-1$
@@ -403,7 +403,7 @@ public class CSearchPage extends DialogPage implements ISearchPage, ICSearchCons
 	
 
 	private IDialogSettings getDialogSettings() {
-		IDialogSettings settings = CUIPlugin.getDefault().getDialogSettings();
+		IDialogSettings settings = FortranUIPlugin.getDefault().getDialogSettings();
 		fDialogSettings = settings.getSection( PAGE_NAME );
 		if( fDialogSettings == null )
 			fDialogSettings = settings.addNewSection( PAGE_NAME );

@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.fdt.internal.ui.wizards.classwizard;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -31,9 +31,9 @@ public final class MethodStubsLabelProvider implements ITableLabelProvider {
 	    IMethodStub stub = (IMethodStub) element;
 		ImageDescriptor descriptor = CElementImageProvider.getMethodImageDescriptor(stub.getAccess());
 		if (descriptor != null) {
-			return CUIPlugin.getImageDescriptorRegistry().get(descriptor);
+			return FortranUIPlugin.getImageDescriptorRegistry().get(descriptor);
 		}
-		return CPluginImages.get(CPluginImages.IMG_OBJS_PUBLIC_METHOD);
+		return FortranPluginImages.get(FortranPluginImages.IMG_OBJS_PUBLIC_METHOD);
 	}
 
 	/*

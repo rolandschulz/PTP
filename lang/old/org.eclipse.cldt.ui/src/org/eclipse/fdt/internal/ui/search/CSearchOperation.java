@@ -24,8 +24,8 @@ import org.eclipse.fdt.core.search.ICSearchPattern;
 import org.eclipse.fdt.core.search.ICSearchScope;
 import org.eclipse.fdt.core.search.OrPattern;
 import org.eclipse.fdt.core.search.SearchEngine;
-import org.eclipse.fdt.internal.ui.CPluginImages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 
@@ -59,7 +59,7 @@ public class CSearchOperation implements IRunnableWithProgress,ICSearchConstants
 	{
 		_collector.setProgressMonitor( monitor );	
 		
-		SearchEngine engine = new SearchEngine( CUIPlugin.getSharedWorkingCopies() );
+		SearchEngine engine = new SearchEngine( FortranUIPlugin.getSharedWorkingCopies() );
 
 		ICSearchPattern pattern = null;
 		if( _searchFor.size() > 1 ){
@@ -132,9 +132,9 @@ public class CSearchOperation implements IRunnableWithProgress,ICSearchConstants
 	 */
 	public ImageDescriptor getImageDescriptor() {
 		if( _limitTo == ICSearchConstants.DECLARATIONS ){
-			return CPluginImages.DESC_OBJS_SEARCH_DECL;
+			return FortranPluginImages.DESC_OBJS_SEARCH_DECL;
 		} else {
-			return CPluginImages.DESC_OBJS_SEARCH_REF;
+			return FortranPluginImages.DESC_OBJS_SEARCH_REF;
 		}
 	}
 

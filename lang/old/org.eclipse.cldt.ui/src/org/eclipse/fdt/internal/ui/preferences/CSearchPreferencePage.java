@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.internal.core.search.indexing.SourceIndexer;
 import org.eclipse.fdt.internal.ui.search.CSearchPage;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.utils.ui.controls.ControlFactory;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -48,7 +48,7 @@ public class CSearchPreferencePage extends PreferencePage
 	private static final String TIMEOUT_VALUE = "20000"; //$NON-NLS-1$
 	
 	public CSearchPreferencePage(){
-		setPreferenceStore(CUIPlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(FortranUIPlugin.getDefault().getPreferenceStore());
 		fOverlayStore  = createOverlayStore();
 	}
 

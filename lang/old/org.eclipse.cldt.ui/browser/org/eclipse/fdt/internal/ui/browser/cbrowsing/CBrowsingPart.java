@@ -48,7 +48,7 @@ import org.eclipse.fdt.internal.ui.viewsupport.IViewPartInputProvider;
 import org.eclipse.fdt.internal.ui.viewsupport.StatusBarUpdater;
 import org.eclipse.fdt.internal.ui.workingsets.WorkingSetFilterActionGroup;
 import org.eclipse.fdt.ui.CElementLabelProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IWorkingCopyManager;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.jface.action.IMenuListener;
@@ -496,7 +496,7 @@ public abstract class CBrowsingPart extends ViewPart implements IMenuListener, I
 	 * Override to add your own context dependent menu contributions.
 	 */
 	public void menuAboutToShow(IMenuManager menu) {
-		CUIPlugin.createStandardGroups(menu);
+		FortranUIPlugin.createStandardGroups(menu);
 		
 		IStructuredSelection selection= (IStructuredSelection) fViewer.getSelection();
 		int size= selection.size();		
@@ -1001,7 +1001,7 @@ public abstract class CBrowsingPart extends ViewPart implements IMenuListener, I
 				if (page == null)
 					return;
 
-				if (page.equals(CUIPlugin.getActivePage()) && CBrowsingPart.this.equals(page.getActivePart())) {
+				if (page.equals(FortranUIPlugin.getActivePage()) && CBrowsingPart.this.equals(page.getActivePart())) {
 					linkToEditor((IStructuredSelection)event.getSelection());
 				}
 			}
@@ -1463,7 +1463,7 @@ public abstract class CBrowsingPart extends ViewPart implements IMenuListener, I
 
 //
 //	boolean isInputAWorkingCopy() {
-//		return ((BaseCElementContentProvider)getViewer().getContentProvider()).getProvideWorkingCopy();
+//		return ((BaseFortranElementContentProvider)getViewer().getContentProvider()).getProvideWorkingCopy();
 //	}
 
 	/**
@@ -1478,7 +1478,7 @@ public abstract class CBrowsingPart extends ViewPart implements IMenuListener, I
 //			}
 //		}
 
-		IWorkingCopyManager manager= CUIPlugin.getDefault().getWorkingCopyManager();
+		IWorkingCopyManager manager= FortranUIPlugin.getDefault().getWorkingCopyManager();
 		ITranslationUnit unit= manager.getWorkingCopy(input);
 		if (unit != null)
 			try {

@@ -25,7 +25,7 @@ import org.eclipse.fdt.internal.ui.wizards.dialogfields.DialogField;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.IDialogFieldListener;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.LayoutUtil;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.ListDialogField;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -145,7 +145,7 @@ public class CPathProjectsEntryPage extends CPathBasePage {
 				}
 			}
 		} catch (CModelException e) {
-			CUIPlugin.getDefault().log(e);
+			FortranUIPlugin.getDefault().log(e);
 		}
 		fProjectsList.setElements(projects);
 		fProjectsList.setCheckedElements(checkedProjects);

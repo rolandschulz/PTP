@@ -7,7 +7,7 @@ package org.eclipse.fdt.internal.ui;
  
 import org.eclipse.core.resources.IFile;
 import org.eclipse.fdt.core.model.IBinary;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.viewers.IBasicPropertyConstants;
 import org.eclipse.ui.views.properties.FilePropertySource;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
@@ -36,49 +36,49 @@ public class BinaryPropertySource extends FilePropertySource implements IPropert
 	 */
 	private static IPropertyDescriptor[] getInitialPropertyDescriptor() {
 		// cpu name
-		String cpuName= CUIPlugin.getResourceString(ELF_CPU);
+		String cpuName= FortranUIPlugin.getResourceString(ELF_CPU);
 		PropertyDescriptor cpuDescriptor= new PropertyDescriptor(ICElementPropertyConstants.P_ELF_CPU, cpuName);
 		cpuDescriptor.setAlwaysIncompatible(true);
 		cpuDescriptor.setCategory(ICElementPropertyConstants.P_BINARY_FILE_CATEGORY);
 
 		// elf text
-		String textName = CUIPlugin.getResourceString(ELF_TEXT);
+		String textName = FortranUIPlugin.getResourceString(ELF_TEXT);
 		PropertyDescriptor textDescriptor= new PropertyDescriptor(ICElementPropertyConstants.P_ELF_TEXT, textName);
 		textDescriptor.setAlwaysIncompatible(true);
 		textDescriptor.setCategory(ICElementPropertyConstants.P_BINARY_FILE_CATEGORY);
 		
 		// elf data
-		String dataName = CUIPlugin.getResourceString(ELF_DATA);
+		String dataName = FortranUIPlugin.getResourceString(ELF_DATA);
 		PropertyDescriptor dataDescriptor= new PropertyDescriptor(ICElementPropertyConstants.P_ELF_DATA, dataName);
 		dataDescriptor.setAlwaysIncompatible(true);
 		dataDescriptor.setCategory(ICElementPropertyConstants.P_BINARY_FILE_CATEGORY);
 		
 		// elf bss
-		String bssName = CUIPlugin.getResourceString(ELF_BSS);
+		String bssName = FortranUIPlugin.getResourceString(ELF_BSS);
 		PropertyDescriptor bssDescriptor= new PropertyDescriptor(ICElementPropertyConstants.P_ELF_BSS, bssName);
 		bssDescriptor.setAlwaysIncompatible(true);
 		bssDescriptor.setCategory(ICElementPropertyConstants.P_BINARY_FILE_CATEGORY);
 		
 		// elf type
-		String typeName = CUIPlugin.getResourceString(ELF_TYPE);
+		String typeName = FortranUIPlugin.getResourceString(ELF_TYPE);
 		PropertyDescriptor typeDescriptor= new PropertyDescriptor(ICElementPropertyConstants.P_ELF_TYPE, typeName);
 		typeDescriptor.setAlwaysIncompatible(true);
 		typeDescriptor.setCategory(ICElementPropertyConstants.P_BINARY_FILE_CATEGORY);
 		
 		// elf needed
-		String neededName = CUIPlugin.getResourceString(ELF_NEEDED);
+		String neededName = FortranUIPlugin.getResourceString(ELF_NEEDED);
 		PropertyDescriptor neededDescriptor= new PropertyDescriptor(ICElementPropertyConstants.P_ELF_NEEDED, neededName);
 		neededDescriptor.setAlwaysIncompatible(true);
 		neededDescriptor.setCategory(ICElementPropertyConstants.P_BINARY_FILE_CATEGORY);
 		
 		// elf soname
-		String sonameName = CUIPlugin.getResourceString(ELF_SONAME);
+		String sonameName = FortranUIPlugin.getResourceString(ELF_SONAME);
 		PropertyDescriptor sonameDescriptor= new PropertyDescriptor(ICElementPropertyConstants.P_ELF_SONAME, sonameName);
 		sonameDescriptor.setAlwaysIncompatible(true);
 		sonameDescriptor.setCategory(ICElementPropertyConstants.P_BINARY_FILE_CATEGORY);
 		
 		// elf debug
-		String debugName = CUIPlugin.getResourceString(ELF_HAS_DEBUG);
+		String debugName = FortranUIPlugin.getResourceString(ELF_HAS_DEBUG);
 		PropertyDescriptor debugDescriptor= new PropertyDescriptor(ICElementPropertyConstants.P_ELF_HAS_DEBUG, debugName);
 		debugDescriptor.setAlwaysIncompatible(true);
 		debugDescriptor.setCategory(ICElementPropertyConstants.P_BINARY_FILE_CATEGORY);

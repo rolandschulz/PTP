@@ -23,7 +23,7 @@ import org.eclipse.fdt.internal.ui.text.c.hover.CEditorTextHoverDescriptor;
 import org.eclipse.fdt.internal.ui.util.PixelConverter;
 import org.eclipse.fdt.internal.ui.util.SWTUtil;
 import org.eclipse.fdt.internal.ui.util.TableLayoutComposite;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
@@ -357,7 +357,7 @@ public class CEditorHoverConfigurationBlock {
 	}
 
 	CEditorTextHoverDescriptor[] getContributedHovers() {
-		CEditorTextHoverDescriptor[] hoverDescriptors= CUIPlugin.getDefault().getCEditorTextHoverDescriptors();
+		CEditorTextHoverDescriptor[] hoverDescriptors= FortranUIPlugin.getDefault().getCEditorTextHoverDescriptors();
 
 		// Move Best Match hover to front
 		
@@ -374,7 +374,7 @@ public class CEditorHoverConfigurationBlock {
 		}
 		
 		// return unchanged array if best match hover can't be found
-		return CUIPlugin.getDefault().getCEditorTextHoverDescriptors();
+		return FortranUIPlugin.getDefault().getCEditorTextHoverDescriptors();
 	}
 
 	void initialize() {
@@ -424,7 +424,7 @@ public class CEditorHoverConfigurationBlock {
 		
 		//fStore.setValue(PreferenceConstants.EDITOR_SHOW_TEXT_HOVER_AFFORDANCE, fShowHoverAffordanceCheckbox.getSelection());
 		fStore.setValue(PreferenceConstants.EDITOR_EVALUATE_TEMPORARY_PROBLEMS, fShowEditorAnnotationCheckbox.getSelection());
-		CUIPlugin.getDefault().resetCEditorTextHoverDescriptors();
+		FortranUIPlugin.getDefault().resetCEditorTextHoverDescriptors();
 	}
 
 	void performDefaults() {
@@ -449,7 +449,7 @@ public class CEditorHoverConfigurationBlock {
 				idToModifier.put(id, tokenizer.nextToken());
 		}
 
-		String compiledTextHoverModifierMasks= CUIPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.EDITOR_TEXT_HOVER_MODIFIER_MASKS);
+		String compiledTextHoverModifierMasks= FortranUIPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.EDITOR_TEXT_HOVER_MODIFIER_MASKS);
 
 		tokenizer= new StringTokenizer(compiledTextHoverModifierMasks, CEditorTextHoverDescriptor.VALUE_SEPARATOR);
 		HashMap idToModifierMask= new HashMap(tokenizer.countTokens() / 2);

@@ -1,6 +1,6 @@
 package org.eclipse.fdt.internal.ui;
 
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 /*
  * (c) Copyright IBM Corp. 2000, 2001. All Rights Reserved.
@@ -14,7 +14,7 @@ import org.eclipse.fdt.ui.CUIPlugin;
  *  
  */
 public interface ICHelpContextIds {
-	public static final String PREFIX = CUIPlugin.PLUGIN_ID + "."; //$NON-NLS-1$
+	public static final String PREFIX = FortranUIPlugin.PLUGIN_ID + "."; //$NON-NLS-1$
 
 	// Wizard pages
 	public static final String NEW_CPROJECT_WIZARD_PAGE = PREFIX + "new_cproject_wizard_page_context"; //$NON-NLS-1$

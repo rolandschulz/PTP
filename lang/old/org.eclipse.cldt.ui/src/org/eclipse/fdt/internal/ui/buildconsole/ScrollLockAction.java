@@ -10,7 +10,7 @@
 ***********************************************************************/
 package org.eclipse.fdt.internal.ui.buildconsole;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.jface.action.Action;
 
 /**
@@ -25,7 +25,7 @@ public class ScrollLockAction extends Action {
 		super(ConsoleMessages.getString("ScrollLockAction.Scroll_Lock_1")); //$NON-NLS-1$
 		fConsoleViewer = viewer;
 		setToolTipText(ConsoleMessages.getString("ScrollLockAction.Scroll_Lock_1")); //$NON-NLS-1$
-		CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, CPluginImages.IMG_SCROLL_LOCK);
+		FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, FortranPluginImages.IMG_SCROLL_LOCK);
 		setChecked(false);
 	}
 

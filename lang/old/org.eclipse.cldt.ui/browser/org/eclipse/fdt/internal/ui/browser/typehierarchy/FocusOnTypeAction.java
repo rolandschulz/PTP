@@ -21,7 +21,7 @@ import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.browser.opentype.OpenTypeMessages;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -128,6 +128,6 @@ public class FocusOnTypeAction extends Action {
 	}	
 
 	protected Shell getShell() {
-		return CUIPlugin.getActiveWorkbenchShell();
+		return FortranUIPlugin.getActiveWorkbenchShell();
 	}
 }

@@ -16,7 +16,7 @@ import java.util.Iterator;
 import org.eclipse.fdt.internal.ui.editor.CAnnotationIterator;
 import org.eclipse.fdt.internal.ui.editor.CEditor;
 import org.eclipse.fdt.internal.ui.text.HTMLPrinter;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
@@ -35,7 +35,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
  */
 public class AbstractAnnotationHover extends AbstractCEditorTextHover {
 
-	private IPreferenceStore fStore= CUIPlugin.getDefault().getCombinedPreferenceStore();
+	private IPreferenceStore fStore= FortranUIPlugin.getDefault().getCombinedPreferenceStore();
 	private DefaultMarkerAnnotationAccess fAnnotationAccess= new DefaultMarkerAnnotationAccess();
 	private boolean fAllAnnotations;
 	
@@ -63,7 +63,7 @@ public class AbstractAnnotationHover extends AbstractCEditorTextHover {
 		if (getEditor() == null)
 			return null;
 		
-		IDocumentProvider provider= CUIPlugin.getDefault().getDocumentProvider();
+		IDocumentProvider provider= FortranUIPlugin.getDefault().getDocumentProvider();
 		IAnnotationModel model= provider.getAnnotationModel(getEditor().getEditorInput());
 		
 		if (model != null) {

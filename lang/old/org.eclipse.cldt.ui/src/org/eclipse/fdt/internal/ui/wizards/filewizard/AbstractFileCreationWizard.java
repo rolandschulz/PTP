@@ -15,9 +15,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.fdt.core.model.ITranslationUnit;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.wizards.NewElementWizard;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 public abstract class AbstractFileCreationWizard extends NewElementWizard {
     
@@ -25,8 +25,8 @@ public abstract class AbstractFileCreationWizard extends NewElementWizard {
     
     public AbstractFileCreationWizard() {
         super();
-        setDefaultPageImageDescriptor(CPluginImages.DESC_WIZBAN_NEW_FILE);
-        setDialogSettings(CUIPlugin.getDefault().getDialogSettings());
+        setDefaultPageImageDescriptor(FortranPluginImages.DESC_WIZBAN_NEW_FILE);
+        setDialogSettings(FortranUIPlugin.getDefault().getDialogSettings());
         setWindowTitle(NewFileWizardMessages.getString("AbstractFileCreationWizard.title")); //$NON-NLS-1$
     }
     

@@ -6,13 +6,13 @@ package org.eclipse.fdt.internal.ui;
  */
  
 import org.eclipse.fdt.core.model.ICElement;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.viewers.IBasicPropertyConstants;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 
-public class CElementPropertySource implements IPropertySource {
+public class FortranElementPropertySource implements IPropertySource {
 	
 	private final static String LABEL= "CElementProperties.name"; //$NON-NLS-1$
 	
@@ -23,14 +23,14 @@ public class CElementPropertySource implements IPropertySource {
 	
 	static {
 		// resource name
-		String displayName= CUIPlugin.getResourceString(LABEL);
+		String displayName= FortranUIPlugin.getResourceString(LABEL);
 		PropertyDescriptor descriptor= new PropertyDescriptor(IBasicPropertyConstants.P_TEXT, displayName);
 		descriptor.setAlwaysIncompatible(true);
 		
 		fgPropertyDescriptors= new IPropertyDescriptor[] { descriptor };
 	}
 	
-	public CElementPropertySource(ICElement elem) {
+	public FortranElementPropertySource(ICElement elem) {
 		fCElement= elem;
 	}
 

@@ -56,7 +56,7 @@ import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.internal.ui.dialogs.IStatusChangeListener;
 import org.eclipse.fdt.internal.ui.util.EditorUtility;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 /**
   */
@@ -357,7 +357,7 @@ public abstract class OptionsConfigurationBlock {
 							fProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, new SubProgressMonitor(monitor,1));
 						} else {
 							monitor.setTaskName(PreferencesMessages.getString("OptionsConfigurationBlock.buildall.taskname")); //$NON-NLS-1$
-							CUIPlugin.getWorkspace().build(IncrementalProjectBuilder.FULL_BUILD, new SubProgressMonitor(monitor,1));
+							FortranUIPlugin.getWorkspace().build(IncrementalProjectBuilder.FULL_BUILD, new SubProgressMonitor(monitor,1));
 						}
 					} catch (CoreException e) {
 						throw new InvocationTargetException(e);
@@ -387,7 +387,7 @@ public abstract class OptionsConfigurationBlock {
 						reParseHierarchy(fProject.getResource(), monitor);
 					} else {
 						monitor.setTaskName(PreferencesMessages.getString("OptionsConfigurationBlock.parseall.taskname")); //$NON-NLS-1$
-						reParseHierarchy(CUIPlugin.getWorkspace().getRoot(), monitor);
+						reParseHierarchy(FortranUIPlugin.getWorkspace().getRoot(), monitor);
 					}
 					
 					monitor.done();
@@ -418,7 +418,7 @@ public abstract class OptionsConfigurationBlock {
 								try {
 									IEditorInput input = EditorUtility.getEditorInput(file);
 									if (input != null) {
-										ITranslationUnit workingCopy = CUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(input);
+										ITranslationUnit workingCopy = FortranUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(input);
 										if (workingCopy != null) {
                                             // We have a copy in an editor - use it
                                             translationUnit = workingCopy;

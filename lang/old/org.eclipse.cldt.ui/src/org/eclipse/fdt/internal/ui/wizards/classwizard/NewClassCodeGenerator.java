@@ -127,7 +127,7 @@ public class NewClassCodeGenerator {
 	
 	            // create a working copy with a new owner
 	            headerWorkingCopy = headerTU.getWorkingCopy();
-	            // headerWorkingCopy = headerTU.getSharedWorkingCopy(null, CUIPlugin.getDefault().getBufferFactory());
+	            // headerWorkingCopy = headerTU.getSharedWorkingCopy(null, FortranUIPlugin.getDefault().getBufferFactory());
 	
 	            String headerContent = constructHeaderFileContent(headerTU, publicMethods, protectedMethods, privateMethods, headerWorkingCopy.getBuffer().getContents(), new SubProgressMonitor(monitor, 100));
 	            headerWorkingCopy.getBuffer().setContents(headerContent);

@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.util.PixelConverter;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.DialogField;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.LayoutUtil;
@@ -51,7 +51,7 @@ public class CPathOrderExportPage extends CPathBasePage {
 	}
 
 	public Image getImage() {
-		return CPluginImages.get(CPluginImages.IMG_OBJS_ORDER);
+		return FortranPluginImages.get(FortranPluginImages.IMG_OBJS_ORDER);
 	}
 	/*
 	 * @see BuildPathBasePage#getSelection

@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.internal.ui.util.EditorUtility;
 import org.eclipse.fdt.internal.ui.util.SelectionUtil;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.search.ui.ISearchResultView;
 import org.eclipse.search.ui.ISearchResultViewEntry;
@@ -56,7 +56,7 @@ public class GotoMarkerAction extends Action {
 			return;
 		}
 		
-		IWorkbenchPage page = CUIPlugin.getActivePage();
+		IWorkbenchPage page = FortranUIPlugin.getActivePage();
 		ICElement element = CSearchUtil.getCElement( marker );
 		
 		if( SearchUI.reuseEditor() ){

@@ -13,7 +13,7 @@ package org.eclipse.fdt.internal.corext.refactoring.base;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.fdt.internal.corext.Assert;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 /**
  * An immutable tuple (message, severity) representing an entry in the list in 
@@ -220,7 +220,7 @@ public class RefactoringStatusEntry{
 				statusSeverity= IStatus.WARNING;
 				break; 
 		}
-		return new Status(statusSeverity, CUIPlugin.getPluginId(), fCode, fMessage, null);
+		return new Status(statusSeverity, FortranUIPlugin.getPluginId(), fCode, fMessage, null);
 	}
 	
 	/* non java-doc

@@ -21,7 +21,7 @@ import org.eclipse.ui.views.properties.ResourcePropertySource;
 /**
  * Implements basic UI support for C elements.
  */
-public class CElementAdapterFactory implements IAdapterFactory {
+public class FortranElementAdapterFactory implements IAdapterFactory {
 	
 	private static Class[] PROPERTIES= new Class[] {
 		IPropertySource.class,
@@ -32,18 +32,18 @@ public class CElementAdapterFactory implements IAdapterFactory {
 		IWorkspaceRoot.class
 	};
 	
-	private static CWorkbenchAdapter fgCWorkbenchAdapter= new CWorkbenchAdapter();
-	private static DeferredCWorkbenchAdapter fgDeferredCWorkbenchAdapter= new DeferredCWorkbenchAdapter();
+	private static FortranWorkbenchAdapter fgCWorkbenchAdapter= new FortranWorkbenchAdapter();
+	private static DeferredFortranWorkbenchAdapter fgDeferredCWorkbenchAdapter= new DeferredFortranWorkbenchAdapter();
 	
 	/**
-	 * @see CElementAdapterFactory#getAdapterList
+	 * @see FortranElementAdapterFactory#getAdapterList
 	 */
 	public Class[] getAdapterList() {
 		return PROPERTIES;
 	}
 
 	/**
-	 * @see CElementAdapterFactory#getAdapter
+	 * @see FortranElementAdapterFactory#getAdapter
 	 */	
 	public Object getAdapter(Object element, Class key) {
 		ICElement celem = (ICElement) element;
@@ -60,7 +60,7 @@ public class CElementAdapterFactory implements IAdapterFactory {
 				}
 				return new ResourcePropertySource(res);
 			}
-			return new CElementPropertySource(celem);
+			return new FortranElementPropertySource(celem);
 		} else if (IWorkspaceRoot.class.equals(key)) {
 			 res = celem.getUnderlyingResource();
 			if (res != null)

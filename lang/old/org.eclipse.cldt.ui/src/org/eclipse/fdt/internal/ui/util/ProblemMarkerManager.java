@@ -17,7 +17,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.fdt.internal.ui.editor.TranslationUnitAnnotationModelEvent;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.source.AnnotationModelEvent;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelListener;
@@ -103,7 +103,7 @@ public class ProblemMarkerManager implements IResourceChangeListener, IAnnotatio
 			if (delta != null)
 				delta.accept(new ProjectErrorVisitor(changedElements));
 		} catch (CoreException e) {
-			CUIPlugin.getDefault().log(e.getStatus());
+			FortranUIPlugin.getDefault().log(e.getStatus());
 		}
 
 		if (!changedElements.isEmpty()) {
@@ -146,8 +146,8 @@ public class ProblemMarkerManager implements IResourceChangeListener, IAnnotatio
 	 */
 	public void addListener(IProblemChangedListener listener) {
 		if (fListeners.isEmpty()) {
-			CUIPlugin.getWorkspace().addResourceChangeListener(this);
-			CUIPlugin.getDefault().getDocumentProvider().addGlobalAnnotationModelListener(this);
+			FortranUIPlugin.getWorkspace().addResourceChangeListener(this);
+			FortranUIPlugin.getDefault().getDocumentProvider().addGlobalAnnotationModelListener(this);
 		}
 		fListeners.add(listener);
 	}
@@ -158,8 +158,8 @@ public class ProblemMarkerManager implements IResourceChangeListener, IAnnotatio
 	public void removeListener(IProblemChangedListener listener) {
 		fListeners.remove(listener);
 		if (fListeners.isEmpty()) {
-			CUIPlugin.getWorkspace().removeResourceChangeListener(this);
-			CUIPlugin.getDefault().getDocumentProvider().removeGlobalAnnotationModelListener(this);
+			FortranUIPlugin.getWorkspace().removeResourceChangeListener(this);
+			FortranUIPlugin.getDefault().getDocumentProvider().removeGlobalAnnotationModelListener(this);
 		}
 	}
 

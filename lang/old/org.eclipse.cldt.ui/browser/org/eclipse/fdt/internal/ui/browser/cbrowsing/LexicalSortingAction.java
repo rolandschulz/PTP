@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.fdt.internal.ui.browser.cbrowsing;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -32,10 +32,10 @@ public class LexicalSortingAction extends Action {
 		fViewer= viewer;
 		fPreferenceKey= "LexicalSortingAction." + id + ".isChecked"; //$NON-NLS-1$ //$NON-NLS-2$
 		setText(CBrowsingMessages.getString("LexicalSortingAction.label")); //$NON-NLS-1$
-		CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, CPluginImages.IMG_ALPHA_SORTING); //$NON-NLS-1$ //$NON-NLS-2$
+		FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, FortranPluginImages.IMG_ALPHA_SORTING); //$NON-NLS-1$ //$NON-NLS-2$
 		setToolTipText(CBrowsingMessages.getString("LexicalSortingAction.tooltip")); //$NON-NLS-1$
 		setDescription(CBrowsingMessages.getString("LexicalSortingAction.description")); //$NON-NLS-1$
-		boolean checked= CUIPlugin.getDefault().getPreferenceStore().getBoolean(fPreferenceKey); //$NON-NLS-1$
+		boolean checked= FortranUIPlugin.getDefault().getPreferenceStore().getBoolean(fPreferenceKey); //$NON-NLS-1$
 		valueChanged(checked, false);
 		WorkbenchHelp.setHelp(this, ICHelpContextIds.LEXICAL_SORTING_BROWSING_ACTION);
 	}
@@ -56,6 +56,6 @@ public class LexicalSortingAction extends Action {
 		});
 		
 		if (store)
-			CUIPlugin.getDefault().getPreferenceStore().setValue(fPreferenceKey, on);
+			FortranUIPlugin.getDefault().getPreferenceStore().setValue(fPreferenceKey, on);
 	}
 }

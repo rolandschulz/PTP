@@ -8,7 +8,7 @@ package org.eclipse.fdt.internal.ui;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -17,22 +17,22 @@ import org.eclipse.swt.graphics.Image;
 /**
  * Bundle of all images used by the C plugin.
  */
-public class CPluginImages {
+public class FortranPluginImages {
 	
 	// The plugin registry
-	private static ImageRegistry imageRegistry = new ImageRegistry(CUIPlugin.getStandardDisplay());
+	private static ImageRegistry imageRegistry = new ImageRegistry(FortranUIPlugin.getStandardDisplay());
 
 	// Subdirectory (under the package containing this class) where 16 color images are
 	private static URL fgIconBaseURL;
 
 	static {
 		try {
-			fgIconBaseURL= new URL(CUIPlugin.getDefault().getBundle().getEntry("/"), "icons/" ); //$NON-NLS-1$ //$NON-NLS-2$
+			fgIconBaseURL= new URL(FortranUIPlugin.getDefault().getBundle().getEntry("/"), "icons/" ); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (MalformedURLException e) {
-			CUIPlugin.getDefault().log(e);
+			FortranUIPlugin.getDefault().log(e);
 		}
 	}	
-	private static final String NAME_PREFIX= CUIPlugin.PLUGIN_ID + '.';
+	private static final String NAME_PREFIX= FortranUIPlugin.PLUGIN_ID + '.';
 	private static final int NAME_PREFIX_LENGTH= NAME_PREFIX.length();
 	private static final String T= "full/"; //$NON-NLS-1$
 
@@ -275,7 +275,7 @@ public class CPluginImages {
 		try {
 			return new URL(fgIconBaseURL, buffer.toString());
 		} catch (MalformedURLException e) {
-			CUIPlugin.getDefault().log(e);
+			FortranUIPlugin.getDefault().log(e);
 			return null;
 		}
 	}
@@ -301,7 +301,7 @@ public class CPluginImages {
 	}
 	
 	/**
-	 * Helper method to access the image registry from the CUIPlugin class.
+	 * Helper method to access the image registry from the FortranUIPlugin class.
 	 */
 	static ImageRegistry getImageRegistry() {
 		return imageRegistry;

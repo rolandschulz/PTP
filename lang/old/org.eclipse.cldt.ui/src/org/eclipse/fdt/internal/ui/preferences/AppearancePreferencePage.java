@@ -36,7 +36,7 @@ import org.eclipse.fdt.internal.ui.wizards.dialogfields.DialogField;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.IDialogFieldListener;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.SelectionButtonDialogField;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.Separator;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 
 public class AppearancePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
@@ -160,7 +160,7 @@ public class AppearancePreferencePage extends PreferencePage implements IWorkben
 		prefs.setValue(CVIEW_GROUP_INCLUDES, fCViewGroupIncludes.isSelected());
 		prefs.setValue(OUTLINE_GROUP_INCLUDES, fOutlineGroupIncludes.isSelected());
 		prefs.setValue(OUTLINE_GROUP_NAMESPACES, fOutlineGroupNamespaces.isSelected());
-		CUIPlugin.getDefault().savePluginPreferences();
+		FortranUIPlugin.getDefault().savePluginPreferences();
 		return super.performOk();
 	}	
 	

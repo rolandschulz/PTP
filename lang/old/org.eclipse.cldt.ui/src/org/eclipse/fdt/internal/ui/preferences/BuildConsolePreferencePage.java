@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.fdt.internal.ui.preferences;
 
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -42,42 +42,42 @@ public class BuildConsolePreferencePage extends FieldEditorPreferencePage implem
 
 	public BuildConsolePreferencePage() {
 		super(GRID);
-		setPreferenceStore(CUIPlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(FortranUIPlugin.getDefault().getPreferenceStore());
 	}
 
 	protected void createFieldEditors() {
 		Composite parent = getFieldEditorParent();
 		BooleanFieldEditor clearConsole = new BooleanFieldEditor(PREF_CLEAR_CONSOLE,
-				CUIPlugin.getResourceString("ConsolePreferencePage.clearConsole.label"), parent); //$NON-NLS-1$
+				FortranUIPlugin.getResourceString("ConsolePreferencePage.clearConsole.label"), parent); //$NON-NLS-1$
 		addField(clearConsole);
 
 		BooleanFieldEditor autoOpenConsole = new BooleanFieldEditor(PREF_AUTO_OPEN_CONSOLE,
-				CUIPlugin.getResourceString("ConsolePreferencePage.autoOpenConsole.label"), parent); //$NON-NLS-1$
+				FortranUIPlugin.getResourceString("ConsolePreferencePage.autoOpenConsole.label"), parent); //$NON-NLS-1$
 		addField(autoOpenConsole);
 		BooleanFieldEditor consoleOnTop = new BooleanFieldEditor(PREF_CONSOLE_ON_TOP,
-				CUIPlugin.getResourceString("ConsolePreferencePage.consoleOnTop.label"), parent); //$NON-NLS-1$
+				FortranUIPlugin.getResourceString("ConsolePreferencePage.consoleOnTop.label"), parent); //$NON-NLS-1$
 		addField(consoleOnTop);
 
 		IntegerFieldEditor buildCount = new IntegerFieldEditor(PREF_BUILDCONSOLE_LINES,
-				CUIPlugin.getResourceString("ConsolePreferencePage.consoleLines.label"), parent); //$NON-NLS-1$
-		buildCount.setErrorMessage(CUIPlugin.getResourceString("ConsolePreferencePage.consoleLines.errorMessage")); //$NON-NLS-1$
+				FortranUIPlugin.getResourceString("ConsolePreferencePage.consoleLines.label"), parent); //$NON-NLS-1$
+		buildCount.setErrorMessage(FortranUIPlugin.getResourceString("ConsolePreferencePage.consoleLines.errorMessage")); //$NON-NLS-1$
 		buildCount.setValidRange(10, Integer.MAX_VALUE);
 		addField(buildCount);
 
 		IntegerFieldEditor tabSize = new IntegerFieldEditor(PREF_BUILDCONSOLE_TAB_WIDTH,
-				CUIPlugin.getResourceString("ConsolePreferencePage.tabWidth.label"), parent); //$NON-NLS-1$
+				FortranUIPlugin.getResourceString("ConsolePreferencePage.tabWidth.label"), parent); //$NON-NLS-1$
 		addField(tabSize);
 		tabSize.setValidRange(1, 100);
-		tabSize.setErrorMessage(CUIPlugin.getResourceString("ConsolePreferencePage.tabWidth.errorMessage")); //$NON-NLS-1$
+		tabSize.setErrorMessage(FortranUIPlugin.getResourceString("ConsolePreferencePage.tabWidth.errorMessage")); //$NON-NLS-1$
 
-		createLabel(parent, CUIPlugin.getResourceString("ConsolePreferencePage.colorSettings.label")); //$NON-NLS-1$
+		createLabel(parent, FortranUIPlugin.getResourceString("ConsolePreferencePage.colorSettings.label")); //$NON-NLS-1$
 
 		addField(createColorFieldEditor(PREF_BUILDCONSOLE_OUTPUT_COLOR,
-				CUIPlugin.getResourceString("ConsolePreferencePage.outputColor.label"), parent)); //$NON-NLS-1$
+				FortranUIPlugin.getResourceString("ConsolePreferencePage.outputColor.label"), parent)); //$NON-NLS-1$
 		addField(createColorFieldEditor(PREF_BUILDCONSOLE_INFO_COLOR,
-				CUIPlugin.getResourceString("ConsolePreferencePage.infoColor.label"), parent)); //$NON-NLS-1$
+				FortranUIPlugin.getResourceString("ConsolePreferencePage.infoColor.label"), parent)); //$NON-NLS-1$
 		addField(createColorFieldEditor(PREF_BUILDCONSOLE_ERROR_COLOR,
-				CUIPlugin.getResourceString("ConsolePreferencePage.errorColor.label"), parent)); //$NON-NLS-1$
+				FortranUIPlugin.getResourceString("ConsolePreferencePage.errorColor.label"), parent)); //$NON-NLS-1$
 	}
 
 	private Label createLabel(Composite parent, String text) {
@@ -104,18 +104,18 @@ public class BuildConsolePreferencePage extends FieldEditorPreferencePage implem
 	 * cleared before each build.
 	 */
 	public static boolean isClearBuildConsole() {
-		return CUIPlugin.getDefault().getPreferenceStore().getBoolean(PREF_CLEAR_CONSOLE);
+		return FortranUIPlugin.getDefault().getPreferenceStore().getBoolean(PREF_CLEAR_CONSOLE);
 	}
 	public static boolean isAutoOpenConsole() {
-		return CUIPlugin.getDefault().getPreferenceStore().getBoolean(PREF_AUTO_OPEN_CONSOLE);
+		return FortranUIPlugin.getDefault().getPreferenceStore().getBoolean(PREF_AUTO_OPEN_CONSOLE);
 	}
 
 	public static boolean isConsoleOnTop() {
-		return CUIPlugin.getDefault().getPreferenceStore().getBoolean(PREF_CONSOLE_ON_TOP);
+		return FortranUIPlugin.getDefault().getPreferenceStore().getBoolean(PREF_CONSOLE_ON_TOP);
 	}
 
 	public static int buildConsoleLines() {
-		return CUIPlugin.getDefault().getPreferenceStore().getInt(PREF_BUILDCONSOLE_LINES);
+		return FortranUIPlugin.getDefault().getPreferenceStore().getInt(PREF_BUILDCONSOLE_LINES);
 	}
 
 	public void init(IWorkbench workbench) {

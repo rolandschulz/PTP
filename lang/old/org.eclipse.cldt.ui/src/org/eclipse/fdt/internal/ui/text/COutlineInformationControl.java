@@ -8,7 +8,7 @@
 package org.eclipse.fdt.internal.ui.text;
 
 import org.eclipse.fdt.internal.core.model.CElement;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.actions.ActionMessages;
 import org.eclipse.fdt.internal.ui.editor.CContentOutlinerProvider;
 import org.eclipse.fdt.internal.ui.editor.CEditor;
@@ -16,7 +16,7 @@ import org.eclipse.fdt.internal.ui.util.ProblemTreeViewer;
 import org.eclipse.fdt.internal.ui.viewsupport.DecoratingCLabelProvider;
 import org.eclipse.fdt.internal.ui.viewsupport.StandardCElementLabelProvider;
 import org.eclipse.fdt.ui.CElementGrouping;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IWorkingCopyManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -405,7 +405,7 @@ public class COutlineInformationControl implements IInformationControl,
      * @param treeStyle Tree style.
      */
     private void createTreeeViewer(int treeStyle) {
-        final IWorkingCopyManager manager = CUIPlugin.getDefault()
+        final IWorkingCopyManager manager = FortranUIPlugin.getDefault()
                 .getWorkingCopyManager();
         fTreeViewer = new ProblemTreeViewer(fComposite, treeStyle);
         final Tree tree = fTreeViewer.getTree();
@@ -481,7 +481,7 @@ public class COutlineInformationControl implements IInformationControl,
         data.verticalAlignment= GridData.BEGINNING;
         fToolBar.setLayoutData(data);
 
-        viewMenuButton.setImage(CPluginImages.get(CPluginImages.IMG_VIEW_MENU));
+        viewMenuButton.setImage(FortranPluginImages.get(FortranPluginImages.IMG_VIEW_MENU));
         createSelectionListenerForOptions(viewMenuButton);
     }
 
@@ -770,10 +770,10 @@ public class COutlineInformationControl implements IInformationControl,
      */
     IDialogSettings getSettings() {
         final String sectionName = "org.eclipse.jdt.internal.ui.text.QuickOutline"; //$NON-NLS-1$
-        IDialogSettings settings= CUIPlugin.getDefault().getDialogSettings().getSection(sectionName);
+        IDialogSettings settings= FortranUIPlugin.getDefault().getDialogSettings().getSection(sectionName);
         if (settings == null)
         {
-            settings= CUIPlugin.getDefault().getDialogSettings().addNewSection(sectionName);
+            settings= FortranUIPlugin.getDefault().getDialogSettings().addNewSection(sectionName);
         }
 
         return settings;

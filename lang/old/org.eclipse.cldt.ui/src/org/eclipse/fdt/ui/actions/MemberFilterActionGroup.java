@@ -31,12 +31,12 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.actions.ActionGroup;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.actions.ActionMessages;
 import org.eclipse.fdt.internal.ui.viewsupport.MemberFilter;
 import org.eclipse.fdt.internal.ui.viewsupport.MemberFilterAction;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 
 public class MemberFilterActionGroup extends ActionGroup {
@@ -87,7 +87,7 @@ public class MemberFilterActionGroup extends ActionGroup {
 		fInViewMenu= inViewMenu;
 		
 		// get initial values
-		IPreferenceStore store= CUIPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore store= FortranUIPlugin.getDefault().getPreferenceStore();
 		boolean doHideFields= store.getBoolean(getPreferenceKey(FILTER_FIELDS));
 		boolean doHideStatic= store.getBoolean(getPreferenceKey(FILTER_STATIC));
 		boolean doHidePublic= store.getBoolean(getPreferenceKey(FILTER_NONPUBLIC));
@@ -106,7 +106,7 @@ public class MemberFilterActionGroup extends ActionGroup {
 		MemberFilterAction hideFields= new MemberFilterAction(this, title, FILTER_FIELDS, helpContext, doHideFields);
 		hideFields.setDescription(ActionMessages.getString("MemberFilterActionGroup.hide_fields.description")); //$NON-NLS-1$
 		hideFields.setToolTipText(ActionMessages.getString("MemberFilterActionGroup.hide_fields.tooltip")); //$NON-NLS-1$
-		CPluginImages.setImageDescriptors(hideFields, CPluginImages.T_LCL, CPluginImages.IMG_ACTION_SHOW_FIELDS); //$NON-NLS-1$
+		FortranPluginImages.setImageDescriptors(hideFields, FortranPluginImages.T_LCL, FortranPluginImages.IMG_ACTION_SHOW_FIELDS); //$NON-NLS-1$
 		
 		// static
 		title= ActionMessages.getString("MemberFilterActionGroup.hide_static.label"); //$NON-NLS-1$
@@ -114,7 +114,7 @@ public class MemberFilterActionGroup extends ActionGroup {
 		MemberFilterAction hideStatic= new MemberFilterAction(this, title, FILTER_STATIC, helpContext, doHideStatic);
 		hideStatic.setDescription(ActionMessages.getString("MemberFilterActionGroup.hide_static.description")); //$NON-NLS-1$
 		hideStatic.setToolTipText(ActionMessages.getString("MemberFilterActionGroup.hide_static.tooltip")); //$NON-NLS-1$
-		CPluginImages.setImageDescriptors(hideStatic, CPluginImages.T_LCL, CPluginImages.IMG_ACTION_SHOW_STATIC); //$NON-NLS-1$
+		FortranPluginImages.setImageDescriptors(hideStatic, FortranPluginImages.T_LCL, FortranPluginImages.IMG_ACTION_SHOW_STATIC); //$NON-NLS-1$
 		
 		// non-public
 		title= ActionMessages.getString("MemberFilterActionGroup.hide_nonpublic.label"); //$NON-NLS-1$
@@ -122,7 +122,7 @@ public class MemberFilterActionGroup extends ActionGroup {
 		MemberFilterAction hideNonPublic= new MemberFilterAction(this, title, FILTER_NONPUBLIC, helpContext, doHidePublic);
 		hideNonPublic.setDescription(ActionMessages.getString("MemberFilterActionGroup.hide_nonpublic.description")); //$NON-NLS-1$
 		hideNonPublic.setToolTipText(ActionMessages.getString("MemberFilterActionGroup.hide_nonpublic.tooltip")); //$NON-NLS-1$
-		CPluginImages.setImageDescriptors(hideNonPublic, CPluginImages.T_LCL, CPluginImages.IMG_ACTION_SHOW_PUBLIC); //$NON-NLS-1$
+		FortranPluginImages.setImageDescriptors(hideNonPublic, FortranPluginImages.T_LCL, FortranPluginImages.IMG_ACTION_SHOW_PUBLIC); //$NON-NLS-1$
 	
 		// order corresponds to order in toolbar
 		fFilterActions= new MemberFilterAction[] { hideFields, hideStatic, hideNonPublic };
@@ -166,7 +166,7 @@ public class MemberFilterActionGroup extends ActionGroup {
 			MemberFilterAction hideFields= new MemberFilterAction(this, title, filterProperty, helpContext, filterEnabled);
 			hideFields.setDescription(ActionMessages.getString("MemberFilterActionGroup.hide_fields.description")); //$NON-NLS-1$
 			hideFields.setToolTipText(ActionMessages.getString("MemberFilterActionGroup.hide_fields.tooltip")); //$NON-NLS-1$
-			CPluginImages.setImageDescriptors(hideFields, CPluginImages.T_LCL, "fields_co.gif"); //$NON-NLS-1$
+			FortranPluginImages.setImageDescriptors(hideFields, FortranPluginImages.T_LCL, "fields_co.gif"); //$NON-NLS-1$
 			actions.add(hideFields);
 		}
 			
@@ -182,7 +182,7 @@ public class MemberFilterActionGroup extends ActionGroup {
 			MemberFilterAction hideStatic= new MemberFilterAction(this, title, FILTER_STATIC, helpContext, filterEnabled);
 			hideStatic.setDescription(ActionMessages.getString("MemberFilterActionGroup.hide_static.description")); //$NON-NLS-1$
 			hideStatic.setToolTipText(ActionMessages.getString("MemberFilterActionGroup.hide_static.tooltip")); //$NON-NLS-1$
-			CPluginImages.setImageDescriptors(hideStatic, CPluginImages.T_LCL, "static_co.gif"); //$NON-NLS-1$
+			FortranPluginImages.setImageDescriptors(hideStatic, FortranPluginImages.T_LCL, "static_co.gif"); //$NON-NLS-1$
 			actions.add(hideStatic);
 		}
 		
@@ -198,7 +198,7 @@ public class MemberFilterActionGroup extends ActionGroup {
 			MemberFilterAction hideNonPublic= new MemberFilterAction(this, title, filterProperty, helpContext, filterEnabled);
 			hideNonPublic.setDescription(ActionMessages.getString("MemberFilterActionGroup.hide_nonpublic.description")); //$NON-NLS-1$
 			hideNonPublic.setToolTipText(ActionMessages.getString("MemberFilterActionGroup.hide_nonpublic.tooltip")); //$NON-NLS-1$
-			CPluginImages.setImageDescriptors(hideNonPublic, CPluginImages.T_LCL, "public_co.gif"); //$NON-NLS-1$
+			FortranPluginImages.setImageDescriptors(hideNonPublic, FortranPluginImages.T_LCL, "public_co.gif"); //$NON-NLS-1$
 			actions.add(hideNonPublic);
 		}
 		
@@ -214,7 +214,7 @@ public class MemberFilterActionGroup extends ActionGroup {
 			MemberFilterAction hideLocalTypes= new MemberFilterAction(this, title, filterProperty, helpContext, filterEnabled);
 			hideLocalTypes.setDescription(ActionMessages.getString("MemberFilterActionGroup.hide_localtypes.description")); //$NON-NLS-1$
 			hideLocalTypes.setToolTipText(ActionMessages.getString("MemberFilterActionGroup.hide_localtypes.tooltip")); //$NON-NLS-1$
-			CPluginImages.setImageDescriptors(hideLocalTypes, CPluginImages.T_LCL, "localtypes_co.gif"); //$NON-NLS-1$
+			FortranPluginImages.setImageDescriptors(hideLocalTypes, FortranPluginImages.T_LCL, "localtypes_co.gif"); //$NON-NLS-1$
 			actions.add(hideLocalTypes);
 		}
 		
@@ -259,7 +259,7 @@ public class MemberFilterActionGroup extends ActionGroup {
 			} else {
 				fFilter.removeFilter(filterProperty);
 			}
-			IPreferenceStore store= CUIPlugin.getDefault().getPreferenceStore();
+			IPreferenceStore store= FortranUIPlugin.getDefault().getPreferenceStore();
 			
 			for (int j= 0; j < fFilterActions.length; j++) {
 				int currProperty= fFilterActions[j].getFilterProperty();

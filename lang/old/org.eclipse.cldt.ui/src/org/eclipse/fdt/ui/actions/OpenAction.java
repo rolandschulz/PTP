@@ -29,7 +29,7 @@ import org.eclipse.fdt.internal.ui.actions.OpenActionUtil;
 import org.eclipse.fdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.fdt.internal.ui.editor.CEditor;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -161,7 +161,7 @@ public class OpenAction extends SelectionDispatchAction {
 				boolean activateOnOpen= fEditor != null ? true : OpenStrategy.activateOnOpen();
 				OpenActionUtil.open(element, activateOnOpen);
 			} catch (CModelException e) {
-				CUIPlugin.getDefault().log(new Status(IStatus.ERROR, CUIPlugin.getPluginId(),
+				FortranUIPlugin.getDefault().log(new Status(IStatus.ERROR, FortranUIPlugin.getPluginId(),
 					ICStatusConstants.INTERNAL_ERROR, ActionMessages.getString("OpenAction.error.message"), e)); //$NON-NLS-1$
 				
 				ErrorDialog.openError(getShell(), 

@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.util.Assert;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -69,7 +69,7 @@ public class FilterDescriptor implements Comparable {
 	public static FilterDescriptor[] getFilterDescriptors() {
 		if (fgFilterDescriptors == null) {
 			IExtensionRegistry registory= Platform.getExtensionRegistry();
-			IConfigurationElement[] elements= registory.getConfigurationElementsFor(CUIPlugin.PLUGIN_ID, EXTENSION_POINT_NAME);
+			IConfigurationElement[] elements= registory.getConfigurationElementsFor(FortranUIPlugin.PLUGIN_ID, EXTENSION_POINT_NAME);
 			fgFilterDescriptors= createFilterDescriptors(elements);
 		}	
 		return fgFilterDescriptors;

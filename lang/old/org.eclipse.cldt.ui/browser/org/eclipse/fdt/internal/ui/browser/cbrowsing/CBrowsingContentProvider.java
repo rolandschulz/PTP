@@ -31,15 +31,15 @@ import org.eclipse.fdt.core.model.IElementChangedListener;
 import org.eclipse.fdt.core.model.ISourceRoot;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.core.model.IWorkingCopy;
-import org.eclipse.fdt.internal.ui.BaseCElementContentProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.internal.ui.BaseFortranElementContentProvider;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
-public abstract class CBrowsingContentProvider extends BaseCElementContentProvider implements ITreeContentProvider,
+public abstract class CBrowsingContentProvider extends BaseFortranElementContentProvider implements ITreeContentProvider,
         IElementChangedListener, ITypeCacheChangedListener {
 
     public static final Object CONTENT_CANCELLED = new Object();
@@ -196,7 +196,7 @@ public abstract class CBrowsingContentProvider extends BaseCElementContentProvid
         try {
             processDelta(event.getDelta());
         } catch (CModelException e) {
-            CUIPlugin.getDefault().log(e.getStatus());
+            FortranUIPlugin.getDefault().log(e.getStatus());
         }
     }
 

@@ -23,7 +23,7 @@ import org.eclipse.fdt.core.resources.IPathEntryStore;
 import org.eclipse.fdt.internal.ui.dialogs.IStatusChangeListener;
 import org.eclipse.fdt.internal.ui.dialogs.StatusUtil;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -69,7 +69,7 @@ public class CPathPropertyPage extends PropertyPage implements IStatusChangeList
 	}
 
 	private IDialogSettings getSettings() {
-		IDialogSettings cSettings = CUIPlugin.getDefault().getDialogSettings();
+		IDialogSettings cSettings = FortranUIPlugin.getDefault().getDialogSettings();
 		IDialogSettings pageSettings = cSettings.getSection(PAGE_SETTINGS);
 		if (pageSettings == null) {
 			pageSettings = cSettings.addNewSection(PAGE_SETTINGS);
@@ -154,7 +154,7 @@ public class CPathPropertyPage extends PropertyPage implements IStatusChangeList
 		try {
 			return proj.hasNature(FortranProjectNature.FORTRAN_NATURE_ID);
 		} catch (CoreException e) {
-			CUIPlugin.getDefault().log(e);
+			FortranUIPlugin.getDefault().log(e);
 		}
 		return false;
 	}

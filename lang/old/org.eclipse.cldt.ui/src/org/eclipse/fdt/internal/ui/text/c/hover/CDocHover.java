@@ -13,11 +13,11 @@ package org.eclipse.fdt.internal.ui.text.c.hover;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.fdt.core.model.ITranslationUnit;
-import org.eclipse.fdt.internal.ui.CHelpProviderManager;
+import org.eclipse.fdt.internal.ui.FortranHelpProviderManager;
 import org.eclipse.fdt.internal.ui.editor.CEditorMessages;
 import org.eclipse.fdt.internal.ui.text.CWordFinder;
 import org.eclipse.fdt.internal.ui.text.HTMLPrinter;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IFunctionSummary;
 import org.eclipse.fdt.ui.text.ICHelpInvocationContext;
 import org.eclipse.jface.text.IRegion;
@@ -64,11 +64,11 @@ public class CDocHover extends AbstractCEditorTextHover {
 
 				public ITranslationUnit getTranslationUnit() {
 					IEditorInput editorInput= getEditor().getEditorInput();
-					return CUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(editorInput);
+					return FortranUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(editorInput);
 				}	
 			};
 
-			IFunctionSummary fs = CHelpProviderManager.getDefault().getFunctionInfo(context, expression);
+			IFunctionSummary fs = FortranHelpProviderManager.getDefault().getFunctionInfo(context, expression);
 			if (fs != null) {
 				buffer.append(CEditorMessages.getString("DefaultCEditorTextHover.html.name")); //$NON-NLS-1$
 				buffer.append(HTMLPrinter.convertToHTMLContent(fs.getName()));

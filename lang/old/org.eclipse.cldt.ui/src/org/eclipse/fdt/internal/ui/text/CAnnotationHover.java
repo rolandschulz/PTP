@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.fdt.internal.ui.CUIMessages;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
@@ -149,7 +149,7 @@ public class CAnnotationHover implements IAnnotationHover {
 	private String formatMultipleMessages(List messages) {
 		StringBuffer buffer= new StringBuffer();
 		HTMLPrinter.addPageProlog(buffer);
-		HTMLPrinter.addParagraph(buffer, HTMLPrinter.convertToHTMLContent(CUIMessages.getString("CAnnotationHover.multipleMarkers"))); //$NON-NLS-1$
+		HTMLPrinter.addParagraph(buffer, HTMLPrinter.convertToHTMLContent(FortranUIMessages.getString("CAnnotationHover.multipleMarkers"))); //$NON-NLS-1$
 		
 		HTMLPrinter.startBulletList(buffer);
 		Iterator e= messages.iterator();

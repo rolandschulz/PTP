@@ -15,7 +15,7 @@ package org.eclipse.fdt.internal.ui.cview;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.core.model.IIncludeReference;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.ui.CElementGrouping;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
@@ -68,7 +68,7 @@ public class IncludeRefContainer extends CElementGrouping {
 	 * @see org.eclipse.ui.model.IWorkbenchAdapter#getImageDescriptor(java.lang.Object)
 	 */
 	public ImageDescriptor getImageDescriptor(Object object) {
-		return CPluginImages.DESC_OBJS_INCLUDES_CONTAINER;
+		return FortranPluginImages.DESC_OBJS_INCLUDES_CONTAINER;
 	}
 
 	/* (non-Javadoc)

@@ -28,7 +28,7 @@ import org.eclipse.fdt.internal.corext.refactoring.base.UndoManagerAdapter;
 import org.eclipse.fdt.internal.ui.refactoring.AbortChangeExceptionHandler;
 import org.eclipse.fdt.internal.ui.refactoring.RefactoringMessages;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.actions.SelectionDispatchAction;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -156,11 +156,11 @@ abstract class UndoManagerAction extends SelectionDispatchAction {
 	
 	private MultiStatus createMultiStatus() {
 		MultiStatus status= new MultiStatus(
-			CUIPlugin.getPluginId(), 
+			FortranUIPlugin.getPluginId(), 
 			IStatus.ERROR,
 			RefactoringMessages.getString("UndoManagerAction.unsaved_filed"), //$NON-NLS-1$
 			null);
-		String id= CUIPlugin.getPluginId();
+		String id= FortranUIPlugin.getPluginId();
 		for (Iterator iter= fPreflightStatus.getEntries().iterator(); iter.hasNext(); ) {
 			RefactoringStatusEntry entry= (RefactoringStatusEntry)iter.next();
 			status.merge(new Status(
@@ -174,7 +174,7 @@ abstract class UndoManagerAction extends SelectionDispatchAction {
 	}
 	
 	private IFile[] getUnsavedFiles() {
-		IEditorPart[] parts= CUIPlugin.getDirtyEditors();
+		IEditorPart[] parts= FortranUIPlugin.getDirtyEditors();
 		List result= new ArrayList(parts.length);
 		for (int i= 0; i < parts.length; i++) {
 			IEditorInput input= parts[i].getEditorInput();

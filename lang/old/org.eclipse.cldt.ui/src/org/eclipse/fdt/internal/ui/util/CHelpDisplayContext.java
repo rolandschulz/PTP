@@ -19,10 +19,10 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.fdt.core.model.ITranslationUnit;
-import org.eclipse.fdt.internal.ui.CHelpProviderManager;
+import org.eclipse.fdt.internal.ui.FortranHelpProviderManager;
 import org.eclipse.fdt.internal.ui.editor.CEditor;
 import org.eclipse.fdt.internal.ui.text.CWordFinder;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.ICHelpResourceDescriptor;
 import org.eclipse.fdt.ui.text.ICHelpInvocationContext;
 import org.eclipse.help.HelpSystem;
@@ -82,7 +82,7 @@ public class CHelpDisplayContext implements IContext {
 
 			public ITranslationUnit getTranslationUnit() {
 				IEditorInput editorInput= editor.getEditorInput();
-				return CUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(editorInput);
+				return FortranUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(editorInput);
 			}	
 		};
 
@@ -93,7 +93,7 @@ public class CHelpDisplayContext implements IContext {
 			}
 		}
 
-		ICHelpResourceDescriptor providerResources[] = CHelpProviderManager.getDefault().getHelpResources(invocationContext,selected);
+		ICHelpResourceDescriptor providerResources[] = FortranHelpProviderManager.getDefault().getHelpResources(invocationContext,selected);
 		if(providerResources != null){
 			for(int i = 0; i < providerResources.length; i++){
 				helpResources.addAll(Arrays.asList(providerResources[i].getHelpResources()));

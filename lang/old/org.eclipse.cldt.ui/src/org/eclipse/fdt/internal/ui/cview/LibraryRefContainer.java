@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.core.model.ILibraryReference;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.ui.CElementGrouping;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
@@ -76,7 +76,7 @@ public class LibraryRefContainer extends CElementGrouping {
 	 * @see org.eclipse.ui.model.IWorkbenchAdapter#getImageDescriptor(java.lang.Object)
 	 */
 	public ImageDescriptor getImageDescriptor(Object object) {
-		return CPluginImages.DESC_OBJS_LIBRARY;
+		return FortranPluginImages.DESC_OBJS_LIBRARY;
 	}
 
 	/* (non-Javadoc)

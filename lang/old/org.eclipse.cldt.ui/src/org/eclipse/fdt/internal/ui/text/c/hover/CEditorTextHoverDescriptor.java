@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.fdt.internal.ui.util.EditorUtility;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.fdt.ui.text.c.hover.ICEditorTextHover;
 import org.eclipse.jface.text.Assert;
@@ -110,7 +110,7 @@ public class CEditorTextHoverDescriptor implements Comparable {
 			try {
 				return (ICEditorTextHover)fElement.createExecutableExtension(CLASS_ATTRIBUTE);
 			} catch (CoreException x) {
-				CUIPlugin.getDefault().log(new Status(IStatus.ERROR, CUIPlugin.getPluginId(), 0, "CEditorTextHover.createTextHover", null)); //$NON-NLS-1$
+				FortranUIPlugin.getDefault().log(new Status(IStatus.ERROR, FortranUIPlugin.getPluginId(), 0, "CEditorTextHover.createTextHover", null)); //$NON-NLS-1$
 			}
 		}
 		
@@ -198,7 +198,7 @@ public class CEditorTextHoverDescriptor implements Comparable {
 	}
 
 	private static void initializeFromPreferences(CEditorTextHoverDescriptor[] hovers) {
-		String compiledTextHoverModifiers= CUIPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.EDITOR_TEXT_HOVER_MODIFIERS);
+		String compiledTextHoverModifiers= FortranUIPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.EDITOR_TEXT_HOVER_MODIFIERS);
 		
 		StringTokenizer tokenizer= new StringTokenizer(compiledTextHoverModifiers, VALUE_SEPARATOR);
 		HashMap idToModifier= new HashMap(tokenizer.countTokens() / 2);
@@ -209,7 +209,7 @@ public class CEditorTextHoverDescriptor implements Comparable {
 				idToModifier.put(id, tokenizer.nextToken());
 		}
 
-		String compiledTextHoverModifierMasks= CUIPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.EDITOR_TEXT_HOVER_MODIFIER_MASKS);
+		String compiledTextHoverModifierMasks= FortranUIPlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.EDITOR_TEXT_HOVER_MODIFIER_MASKS);
 
 		tokenizer= new StringTokenizer(compiledTextHoverModifierMasks, VALUE_SEPARATOR);
 		HashMap idToModifierMask= new HashMap(tokenizer.countTokens() / 2);

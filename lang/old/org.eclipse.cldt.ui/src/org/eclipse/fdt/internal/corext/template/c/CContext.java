@@ -8,7 +8,7 @@ package org.eclipse.fdt.internal.corext.template.c;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.internal.corext.util.CodeFormatterUtil;
 import org.eclipse.fdt.internal.ui.util.Strings;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
@@ -138,7 +138,7 @@ public class CContext extends TranslationUnitContext {
 			lineDelimiter= PLATFORM_LINE_DELIMITER;
 		}
 
-		IPreferenceStore prefs= CUIPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore prefs= FortranUIPlugin.getDefault().getPreferenceStore();
 		boolean useCodeFormatter= prefs.getBoolean(PreferenceConstants.TEMPLATES_USE_CODEFORMATTER);			
 
 		CFormatter formatter= new CFormatter(lineDelimiter, getIndentation(), useCodeFormatter);

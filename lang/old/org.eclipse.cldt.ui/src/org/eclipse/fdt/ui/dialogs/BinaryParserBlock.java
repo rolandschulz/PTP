@@ -31,7 +31,7 @@ import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.ICDescriptorOperation;
 import org.eclipse.fdt.core.ICExtensionReference;
-import org.eclipse.fdt.internal.ui.CUIMessages;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.util.PixelConverter;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.CheckedListDialogField;
@@ -40,7 +40,7 @@ import org.eclipse.fdt.internal.ui.wizards.dialogfields.IDialogFieldListener;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.IListAdapter;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.LayoutUtil;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.ListDialogField;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.utils.ui.controls.ControlFactory;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -101,11 +101,11 @@ public class BinaryParserBlock extends AbstractBinaryParserPage {
 	}
 
 	public BinaryParserBlock() {
-		super(CUIPlugin.getResourceString(LABEL));
-		setDescription(CUIPlugin.getResourceString(DESC));
+		super(FortranUIPlugin.getResourceString(LABEL));
+		setDescription(FortranUIPlugin.getResourceString(DESC));
 		String[] buttonLabels = new String[]{
-		/* 0 */CUIMessages.getString("BinaryParserBlock.button.up"), //$NON-NLS-1$
-				/* 1 */CUIMessages.getString("BinaryParserBlock.button.down")}; //$NON-NLS-1$
+		/* 0 */FortranUIMessages.getString("BinaryParserBlock.button.up"), //$NON-NLS-1$
+				/* 1 */FortranUIMessages.getString("BinaryParserBlock.button.down")}; //$NON-NLS-1$
 
 		IListAdapter listAdapter = new IListAdapter() {
 
@@ -137,7 +137,7 @@ public class BinaryParserBlock extends AbstractBinaryParserPage {
 				}
 			}
 		});
-		binaryList.setLabelText(CUIMessages.getString("BinaryParserBlock.binaryParser")); //$NON-NLS-1$
+		binaryList.setLabelText(FortranUIMessages.getString("BinaryParserBlock.binaryParser")); //$NON-NLS-1$
 		binaryList.setUpButtonIndex(0);
 		binaryList.setDownButtonIndex(1);
 		initializeParserList();
@@ -212,7 +212,7 @@ public class BinaryParserBlock extends AbstractBinaryParserPage {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		monitor.beginTask(CUIMessages.getString("BinaryParserBlock.settingBinaryParser"), 2); //$NON-NLS-1$
+		monitor.beginTask(FortranUIMessages.getString("BinaryParserBlock.settingBinaryParser"), 2); //$NON-NLS-1$
 		List parsers = binaryList.getElements();
 		final List selected = new ArrayList(); // must do this to get proper order.
 		for (int i = 0; i < parsers.size(); i++) {

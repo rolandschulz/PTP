@@ -12,11 +12,11 @@ package org.eclipse.fdt.ui.wizards;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.wizards.NewElementWizard;
 import org.eclipse.fdt.internal.ui.wizards.folderwizard.NewFolderWizardMessages;
 import org.eclipse.fdt.internal.ui.wizards.folderwizard.NewSourceFolderWizardPage;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 public class NewSourceFolderCreationWizard extends NewElementWizard {
 
@@ -24,8 +24,8 @@ public class NewSourceFolderCreationWizard extends NewElementWizard {
 
 	public NewSourceFolderCreationWizard() {
 		super();
-		setDefaultPageImageDescriptor(CPluginImages.DESC_WIZBAN_NEWSRCFOLDR);
-		setDialogSettings(CUIPlugin.getDefault().getDialogSettings());
+		setDefaultPageImageDescriptor(FortranPluginImages.DESC_WIZBAN_NEWSRCFOLDR);
+		setDialogSettings(FortranUIPlugin.getDefault().getDialogSettings());
 		setWindowTitle(NewFolderWizardMessages.getString("NewSourceFolderCreationWizard.title")); //$NON-NLS-1$
 	}
 

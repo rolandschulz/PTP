@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.fdt.internal.ui.actions.WorkbenchRunnableAdapter;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Display;
@@ -44,7 +44,7 @@ public abstract class NewElementWizard extends Wizard implements INewWizard {
 	}
 			
 	protected void openResource(final IFile resource) {
-		final IWorkbenchPage activePage= CUIPlugin.getActivePage();
+		final IWorkbenchPage activePage= FortranUIPlugin.getActivePage();
 		if (activePage != null) {
 			final Display display= getShell().getDisplay();
 			if (display != null) {
@@ -53,7 +53,7 @@ public abstract class NewElementWizard extends Wizard implements INewWizard {
 						try {
 							IDE.openEditor(activePage, resource, true);
 						} catch (PartInitException e) {
-							CUIPlugin.getDefault().log(e);
+							FortranUIPlugin.getDefault().log(e);
 						}
 					}
 				});

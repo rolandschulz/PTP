@@ -17,7 +17,7 @@ import org.eclipse.fdt.core.ToolFactory;
 import org.eclipse.fdt.core.formatter.CodeFormatter;
 import org.eclipse.fdt.internal.corext.Assert;
 import org.eclipse.fdt.internal.ui.text.CSourceViewerConfiguration;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.DefaultPositionUpdater;
@@ -51,7 +51,7 @@ public class CodeFormatterUtil {
 			}
 			return doc.get();
 		} catch (BadLocationException e) {
-			CUIPlugin.getDefault().log(e); // bug in the formatter
+			FortranUIPlugin.getDefault().log(e); // bug in the formatter
 			Assert.isTrue(false, "Fromatter created edits with wrong positions: " + e.getMessage()); //$NON-NLS-1$
 		}
 		return null;
@@ -135,7 +135,7 @@ public class CodeFormatterUtil {
 	}
 	
 	public static int getTabWidth() {
-		Preferences preferences= CUIPlugin.getDefault().getPluginPreferences();
+		Preferences preferences= FortranUIPlugin.getDefault().getPluginPreferences();
 		return preferences.getInt(CSourceViewerConfiguration.PREFERENCE_TAB_WIDTH);
 	}
 

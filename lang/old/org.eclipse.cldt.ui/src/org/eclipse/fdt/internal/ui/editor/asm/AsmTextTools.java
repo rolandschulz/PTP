@@ -10,7 +10,7 @@ import org.eclipse.fdt.internal.ui.text.CCommentScanner;
 import org.eclipse.fdt.internal.ui.text.ICColorConstants;
 import org.eclipse.fdt.internal.ui.text.SingleTokenCScanner;
 import org.eclipse.fdt.internal.ui.text.util.CColorManager;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.DefaultPartitioner;
@@ -71,7 +71,7 @@ public class AsmTextTools {
      */
     public AsmTextTools(IPreferenceStore store, Preferences coreStore) {
 		if(store == null) {
-			store = CUIPlugin.getDefault().getPreferenceStore();
+			store = FortranUIPlugin.getDefault().getPreferenceStore();
 		}
         
         fPreferenceStore = store;

@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.fdt.internal.ui.text.folding.CFoldingStructureProviderDescriptor;
 import org.eclipse.fdt.internal.ui.text.folding.CFoldingStructureProviderRegistry;
 import org.eclipse.fdt.internal.ui.util.PixelConverter;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.fdt.ui.text.folding.ICFoldingPreferenceBlock;
 import org.eclipse.jface.text.Assert;
@@ -113,7 +113,7 @@ class FoldingConfigurationBlock {
 	}
 
 	private Map createListModel() {
-		CFoldingStructureProviderRegistry reg= CUIPlugin.getDefault().getFoldingStructureProviderRegistry();
+		CFoldingStructureProviderRegistry reg= FortranUIPlugin.getDefault().getFoldingStructureProviderRegistry();
 		reg.reloadExtensions();
 		CFoldingStructureProviderDescriptor[] descs= reg.getFoldingProviderDescriptors();
 		Map map= new HashMap();
@@ -274,7 +274,7 @@ class FoldingConfigurationBlock {
 		if (desc == null) {
 			// safety in case there is no such descriptor
 			String message= PreferencesMessages.getString("FoldingConfigurationBlock.error.not_exist"); //$NON-NLS-1$
-			CUIPlugin.getDefault().log(new Status(IStatus.WARNING, CUIPlugin.getPluginId(), IStatus.OK, message, null));
+			FortranUIPlugin.getDefault().log(new Status(IStatus.WARNING, FortranUIPlugin.getPluginId(), IStatus.OK, message, null));
 			prefs= new ErrorPreferences(message);
 		} else {
 			prefs= (ICFoldingPreferenceBlock) fProviderPreferences.get(id);
@@ -283,7 +283,7 @@ class FoldingConfigurationBlock {
 					prefs= desc.createPreferences();
 					fProviderPreferences.put(id, prefs);
 				} catch (CoreException e) {
-					CUIPlugin.getDefault().log(e);
+					FortranUIPlugin.getDefault().log(e);
 					prefs= new ErrorPreferences(e.getLocalizedMessage());
 				}
 			}

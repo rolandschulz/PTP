@@ -17,16 +17,16 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.fdt.core.model.ITranslationUnit;
-import org.eclipse.fdt.internal.ui.CHelpProviderManager;
-import org.eclipse.fdt.internal.ui.CPluginImages;
-import org.eclipse.fdt.internal.ui.CUIMessages;
+import org.eclipse.fdt.internal.ui.FortranHelpProviderManager;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
 import org.eclipse.fdt.internal.ui.text.CHelpBookDescriptor;
 import org.eclipse.fdt.internal.ui.util.ImageDescriptorRegistry;
 import org.eclipse.fdt.internal.ui.util.PixelConverter;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.CheckedListDialogField;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.DialogField;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.LayoutUtil;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.text.ICHelpInvocationContext;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -53,8 +53,8 @@ public class CHelpConfigurationPropertyPage extends PropertyPage implements
 		private ImageDescriptorRegistry fRegistry;
 		
 		public CHelpBookListLabelProvider() {
-			fRegistry= CUIPlugin.getImageDescriptorRegistry();
-			fHelpProviderIcon= CPluginImages.DESC_OBJS_LIBRARY;
+			fRegistry= FortranUIPlugin.getImageDescriptorRegistry();
+			fHelpProviderIcon= FortranPluginImages.DESC_OBJS_LIBRARY;
 		}
 		
 		public String getText(Object element) {
@@ -80,12 +80,12 @@ public class CHelpConfigurationPropertyPage extends PropertyPage implements
 		public CHelpSettingsDisplay() {
 		
 			String[] buttonLabels= new String[] {
-				/* 0 */ CUIMessages.getString("CHelpConfigurationPropertyPage.buttonLabels.CheckAll"), //NewWizardMessages.getString("BuildPathsBlock.classpath.checkall.button"), //$NON-NLS-1$
-				/* 1 */ CUIMessages.getString("CHelpConfigurationPropertyPage.buttonLabels.UncheckAll") //NewWizardMessages.getString("BuildPathsBlock.classpath.uncheckall.button") //$NON-NLS-1$
+				/* 0 */ FortranUIMessages.getString("CHelpConfigurationPropertyPage.buttonLabels.CheckAll"), //NewWizardMessages.getString("BuildPathsBlock.classpath.checkall.button"), //$NON-NLS-1$
+				/* 1 */ FortranUIMessages.getString("CHelpConfigurationPropertyPage.buttonLabels.UncheckAll") //NewWizardMessages.getString("BuildPathsBlock.classpath.uncheckall.button") //$NON-NLS-1$
 			};
 		
 			fCHelpBookList= new CheckedListDialogField(null, buttonLabels, new CHelpBookListLabelProvider());
-			fCHelpBookList.setLabelText(CUIMessages.getString("CHelpConfigurationPropertyPage.HelpBooks")); //$NON-NLS-1$
+			fCHelpBookList.setLabelText(FortranUIMessages.getString("CHelpConfigurationPropertyPage.HelpBooks")); //$NON-NLS-1$
 			fCHelpBookList.setCheckAllButtonIndex(0);
 			fCHelpBookList.setUncheckAllButtonIndex(1);
 		}
@@ -108,7 +108,7 @@ public class CHelpConfigurationPropertyPage extends PropertyPage implements
 			if(!(resource instanceof IProject))
 				return;
 			fProject = (IProject)resource;
-			fCHelpBookDescriptors = CHelpProviderManager.getDefault().getCHelpBookDescriptors(new ICHelpInvocationContext(){
+			fCHelpBookDescriptors = FortranHelpProviderManager.getDefault().getCHelpBookDescriptors(new ICHelpInvocationContext(){
 				public IProject getProject(){return (IProject)resource;}
 				public ITranslationUnit getTranslationUnit(){return null;}
 				}
@@ -143,7 +143,7 @@ public class CHelpConfigurationPropertyPage extends PropertyPage implements
 					((CHelpBookDescriptor)obj).enable(fCHelpBookList.isChecked(obj));
 				}
 			}
-			CHelpProviderManager.getDefault().serialize(new ICHelpInvocationContext(){
+			FortranHelpProviderManager.getDefault().serialize(new ICHelpInvocationContext(){
 				public IProject getProject(){return project;}
 				public ITranslationUnit getTranslationUnit(){return null;}
 				});

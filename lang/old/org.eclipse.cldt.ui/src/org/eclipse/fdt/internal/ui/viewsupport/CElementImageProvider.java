@@ -23,9 +23,9 @@ import org.eclipse.fdt.core.model.ISourceRoot;
 import org.eclipse.fdt.core.model.ITemplate;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.core.parser.ast.ASTAccessVisibility;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.ui.CElementImageDescriptor;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -82,7 +82,7 @@ public class CElementImageProvider {
 	private static ImageDescriptor DESC_OBJ_PROJECT;	
 	//private static ImageDescriptor DESC_OBJ_FOLDER;
 	{
-		ISharedImages images= CUIPlugin.getDefault().getWorkbench().getSharedImages(); 
+		ISharedImages images= FortranUIPlugin.getDefault().getWorkbench().getSharedImages(); 
 		DESC_OBJ_PROJECT_CLOSED= images.getImageDescriptor(IDE.SharedImages.IMG_OBJ_PROJECT_CLOSED);
 		DESC_OBJ_PROJECT= 		 images.getImageDescriptor(IDE.SharedImages.IMG_OBJ_PROJECT);
 		//DESC_OBJ_FOLDER= 		 images.getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER);
@@ -106,7 +106,7 @@ public class CElementImageProvider {
 			IFile file = (IFile)element;
 			if (CoreModel.isValidTranslationUnitName(file.getProject(), file.getName()) ||
 					CoreModel.isValidTranslationUnitName(null, file.getName())) {
-				descriptor = CPluginImages.DESC_OBJS_TUNIT_RESOURCE;
+				descriptor = FortranPluginImages.DESC_OBJS_TUNIT_RESOURCE;
 				Point size= useSmallSize(flags) ? SMALL_SIZE : BIG_SIZE;
 				descriptor = new CElementImageDescriptor(descriptor, 0, size);
 			}
@@ -115,7 +115,7 @@ public class CElementImageProvider {
 			descriptor= getWorkbenchImageDescriptor((IAdaptable) element, flags);
 		}
 		if (descriptor != null) {
-			return CUIPlugin.getImageDescriptorRegistry().get(descriptor);
+			return FortranUIPlugin.getImageDescriptorRegistry().get(descriptor);
 		}
 		return null;
 	}
@@ -128,81 +128,81 @@ public class CElementImageProvider {
 	public static ImageDescriptor getImageDescriptor(int type) {
 		switch (type) {
 			case ICElement.C_VCONTAINER:
-				return CPluginImages.DESC_OBJS_CONTAINER;
+				return FortranPluginImages.DESC_OBJS_CONTAINER;
 
 			case ICElement.C_BINARY:
-				return CPluginImages.DESC_OBJS_BINARY;
+				return FortranPluginImages.DESC_OBJS_BINARY;
 	
 			case ICElement.C_ARCHIVE:
-				return CPluginImages.DESC_OBJS_ARCHIVE;
+				return FortranPluginImages.DESC_OBJS_ARCHIVE;
 
 			case ICElement.C_UNIT:
-				return CPluginImages.DESC_OBJS_TUNIT;
+				return FortranPluginImages.DESC_OBJS_TUNIT;
 				
 			case ICElement.C_CCONTAINER:
 				//return DESC_OBJ_FOLDER;
-				return CPluginImages.DESC_OBJS_CFOLDER;
+				return FortranPluginImages.DESC_OBJS_CFOLDER;
 			
 			case ICElement.C_PROJECT:
 				return DESC_OBJ_PROJECT;
 					
 			case ICElement.C_STRUCT:
 			case ICElement.C_TEMPLATE_STRUCT:
-				return CPluginImages.DESC_OBJS_STRUCT;
+				return FortranPluginImages.DESC_OBJS_STRUCT;
 				
 			case ICElement.C_CLASS:
 			case ICElement.C_TEMPLATE_CLASS:
-				return CPluginImages.DESC_OBJS_CLASS;
+				return FortranPluginImages.DESC_OBJS_CLASS;
 
 			case ICElement.C_UNION:
 			case ICElement.C_TEMPLATE_UNION:
-				return CPluginImages.DESC_OBJS_UNION;
+				return FortranPluginImages.DESC_OBJS_UNION;
 
 			case ICElement.C_TYPEDEF:
-				return CPluginImages.DESC_OBJS_TYPEDEF;
+				return FortranPluginImages.DESC_OBJS_TYPEDEF;
 
 			case ICElement.C_ENUMERATION:
-				return CPluginImages.DESC_OBJS_ENUMERATION;
+				return FortranPluginImages.DESC_OBJS_ENUMERATION;
 
 			case ICElement.C_ENUMERATOR:
-				return CPluginImages.DESC_OBJS_ENUMERATOR;
+				return FortranPluginImages.DESC_OBJS_ENUMERATOR;
 
 			case ICElement.C_FIELD:
-				return CPluginImages.DESC_OBJS_PUBLIC_FIELD;
+				return FortranPluginImages.DESC_OBJS_PUBLIC_FIELD;
 			
 			case ICElement.C_VARIABLE:
 			case ICElement.C_TEMPLATE_VARIABLE:
-				return CPluginImages.DESC_OBJS_VARIABLE;
+				return FortranPluginImages.DESC_OBJS_VARIABLE;
 
 			case ICElement.C_METHOD:  
 			case ICElement.C_METHOD_DECLARATION:
 			case ICElement.C_TEMPLATE_METHOD:
-				return CPluginImages.DESC_OBJS_PUBLIC_METHOD;
+				return FortranPluginImages.DESC_OBJS_PUBLIC_METHOD;
 				
 			case ICElement.C_FUNCTION:
-				return CPluginImages.DESC_OBJS_FUNCTION;
+				return FortranPluginImages.DESC_OBJS_FUNCTION;
 
 			case ICElement.C_STRUCT_DECLARATION:
 			case ICElement.C_CLASS_DECLARATION:
 			case ICElement.C_UNION_DECLARATION:
 			case ICElement.C_VARIABLE_DECLARATION:
-				return CPluginImages.DESC_OBJS_VAR_DECLARARION;
+				return FortranPluginImages.DESC_OBJS_VAR_DECLARARION;
 			
 			case ICElement.C_FUNCTION_DECLARATION:
 			case ICElement.C_TEMPLATE_FUNCTION:
-				return CPluginImages.DESC_OBJS_DECLARARION;
+				return FortranPluginImages.DESC_OBJS_DECLARARION;
 
 			case ICElement.C_INCLUDE:
-				return CPluginImages.DESC_OBJS_INCLUDE;
+				return FortranPluginImages.DESC_OBJS_INCLUDE;
 
 			case ICElement.C_MACRO:
-				return CPluginImages.DESC_OBJS_MACRO;
+				return FortranPluginImages.DESC_OBJS_MACRO;
 				
 			case ICElement.C_NAMESPACE:
-				return CPluginImages.DESC_OBJS_NAMESPACE;
+				return FortranPluginImages.DESC_OBJS_NAMESPACE;
 
 			case ICElement.C_USING:
-				return CPluginImages.DESC_OBJS_USING;
+				return FortranPluginImages.DESC_OBJS_USING;
 		}
 		return null;
 	}
@@ -260,49 +260,49 @@ public class CElementImageProvider {
 		switch (type) {
 			case ICElement.C_VCONTAINER:
 				if (celement instanceof IBinaryModule) {
-					return CPluginImages.DESC_OBJS_BINARY;
+					return FortranPluginImages.DESC_OBJS_BINARY;
 				} else if (celement instanceof ILibraryReference) {
-					return CPluginImages.DESC_OBJS_UNKNOWN;
+					return FortranPluginImages.DESC_OBJS_UNKNOWN;
 				} else if (celement instanceof IIncludeReference) {
-					return CPluginImages.DESC_OBJS_INCLUDES_FOLDER;
+					return FortranPluginImages.DESC_OBJS_INCLUDES_FOLDER;
 				}
-				return CPluginImages.DESC_OBJS_CONTAINER;
+				return FortranPluginImages.DESC_OBJS_CONTAINER;
 
 			case ICElement.C_BINARY: {
 				IBinary bin = (IBinary)celement;
 				if (bin.isExecutable()) {
 					if (bin.hasDebug())
-						return CPluginImages.DESC_OBJS_CEXEC_DEBUG;
-					return CPluginImages.DESC_OBJS_CEXEC;
+						return FortranPluginImages.DESC_OBJS_CEXEC_DEBUG;
+					return FortranPluginImages.DESC_OBJS_CEXEC;
 				} else if (bin.isSharedLib()) {
-					return CPluginImages.DESC_OBJS_SHLIB;
+					return FortranPluginImages.DESC_OBJS_SHLIB;
 				} else if (bin.isCore()) {
-					return CPluginImages.DESC_OBJS_CORE;
+					return FortranPluginImages.DESC_OBJS_CORE;
 				}
-				return CPluginImages.DESC_OBJS_BINARY;
+				return FortranPluginImages.DESC_OBJS_BINARY;
 			}
 	
 			case ICElement.C_ARCHIVE:
-				return CPluginImages.DESC_OBJS_ARCHIVE;
+				return FortranPluginImages.DESC_OBJS_ARCHIVE;
 
 			case ICElement.C_UNIT: {
 				ITranslationUnit unit = (ITranslationUnit)celement;
 				if (unit.isHeaderUnit()) {
-					return CPluginImages.DESC_OBJS_TUNIT_HEADER;
+					return FortranPluginImages.DESC_OBJS_TUNIT_HEADER;
 				} else if (unit.isSourceUnit()) {
 					if (unit.isASMLanguage()) {
-						return CPluginImages.DESC_OBJS_TUNIT_ASM;
+						return FortranPluginImages.DESC_OBJS_TUNIT_ASM;
 					}
 				}
-				return CPluginImages.DESC_OBJS_TUNIT;
+				return FortranPluginImages.DESC_OBJS_TUNIT;
 			}
 				
 			case ICElement.C_CCONTAINER:
 				if (celement instanceof ISourceRoot) {
-					return CPluginImages.DESC_OBJS_SOURCE_ROOT;
+					return FortranPluginImages.DESC_OBJS_SOURCE_ROOT;
 				}
 				//return DESC_OBJ_FOLDER;
-				return CPluginImages.DESC_OBJS_CFOLDER;
+				return FortranPluginImages.DESC_OBJS_CFOLDER;
 			
 			case ICElement.C_PROJECT:
 				ICProject cp= (ICProject)celement;
@@ -441,45 +441,45 @@ public class CElementImageProvider {
 	}
 	
 	public static ImageDescriptor getStructImageDescriptor(){
-		return CPluginImages.DESC_OBJS_STRUCT;	
+		return FortranPluginImages.DESC_OBJS_STRUCT;	
 	}
 	
 	public static ImageDescriptor getClassImageDescriptor(){
-		return CPluginImages.DESC_OBJS_CLASS;	
+		return FortranPluginImages.DESC_OBJS_CLASS;	
 	}
 	
 	public static ImageDescriptor getUnionImageDescriptor(){
-		return CPluginImages.DESC_OBJS_UNION;	
+		return FortranPluginImages.DESC_OBJS_UNION;	
 	}
 	
 	public static ImageDescriptor getTypedefImageDescriptor(){
-		return CPluginImages.DESC_OBJS_TYPEDEF;	
+		return FortranPluginImages.DESC_OBJS_TYPEDEF;	
 	}
 	
 	public static ImageDescriptor getEnumerationImageDescriptor(){
-		return CPluginImages.DESC_OBJS_ENUMERATION;	
+		return FortranPluginImages.DESC_OBJS_ENUMERATION;	
 	}
 	
 	public static ImageDescriptor getEnumeratorImageDescriptor(){
-		return CPluginImages.DESC_OBJS_ENUMERATOR;	
+		return FortranPluginImages.DESC_OBJS_ENUMERATOR;	
 	}
 
 	public static ImageDescriptor getFieldImageDescriptor(ASTAccessVisibility visibility) {
 		if (visibility == ASTAccessVisibility.PUBLIC)
-			return CPluginImages.DESC_OBJS_PUBLIC_FIELD;
+			return FortranPluginImages.DESC_OBJS_PUBLIC_FIELD;
 		if( visibility == ASTAccessVisibility.PROTECTED)
-			return CPluginImages.DESC_OBJS_PROTECTED_FIELD;
+			return FortranPluginImages.DESC_OBJS_PROTECTED_FIELD;
 		
-		return CPluginImages.DESC_OBJS_PRIVATE_FIELD;			
+		return FortranPluginImages.DESC_OBJS_PRIVATE_FIELD;			
 	}
 
 	public static ImageDescriptor getMethodImageDescriptor(ASTAccessVisibility visibility) {
 		if( visibility == ASTAccessVisibility.PUBLIC)
-			return CPluginImages.DESC_OBJS_PUBLIC_METHOD;
+			return FortranPluginImages.DESC_OBJS_PUBLIC_METHOD;
 		if( visibility == ASTAccessVisibility.PROTECTED)
-			return CPluginImages.DESC_OBJS_PROTECTED_METHOD;
+			return FortranPluginImages.DESC_OBJS_PROTECTED_METHOD;
 		
-		return CPluginImages.DESC_OBJS_PRIVATE_METHOD;				
+		return FortranPluginImages.DESC_OBJS_PRIVATE_METHOD;				
 	}
 
 	public static ImageDescriptor getVariableImageDescriptor(){
@@ -487,7 +487,7 @@ public class CElementImageProvider {
 	}
 
 	public static ImageDescriptor getLocalVariableImageDescriptor(){
-		return CPluginImages.DESC_OBJS_LOCAL_VARIABLE;	
+		return FortranPluginImages.DESC_OBJS_LOCAL_VARIABLE;	
 	}
 	
 	public static ImageDescriptor getFunctionImageDescriptor(){
@@ -519,7 +519,7 @@ public class CElementImageProvider {
 	}
 
 	public static ImageDescriptor getKeywordImageDescriptor(){
-		return CPluginImages.DESC_OBJS_KEYWORD;
+		return FortranPluginImages.DESC_OBJS_KEYWORD;
 	}
 
 }

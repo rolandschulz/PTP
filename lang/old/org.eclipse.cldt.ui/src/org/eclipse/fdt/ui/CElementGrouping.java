@@ -11,7 +11,7 @@
 package org.eclipse.fdt.ui;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.WorkbenchAdapter;
@@ -53,9 +53,9 @@ public abstract class CElementGrouping extends WorkbenchAdapter implements IAdap
 	public ImageDescriptor getImageDescriptor(Object object) {
 		switch (type) {
 			case INCLUDES_GROUPING:
-				return CPluginImages.DESC_OBJS_INCCONT;
+				return FortranPluginImages.DESC_OBJS_INCCONT;
 			case NAMESPACE_GROUPING:
-				return CPluginImages.DESC_OBJS_NAMESPACE;
+				return FortranPluginImages.DESC_OBJS_NAMESPACE;
 		}
 		return super.getImageDescriptor(object);
 	}

@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.fdt.internal.ui.CPluginImages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.ControlEnableState;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.DialogSettings;
@@ -69,9 +69,9 @@ public class RefactoringWizardDialog2 extends Dialog implements IWizardContainer
 	private static final String WIDTH= "width"; //$NON-NLS-1$
 	private static final String HEIGHT= "height"; //$NON-NLS-1$
 	
-	private static final Image INFO= CPluginImages.get(CPluginImages.IMG_OBJS_REFACTORING_INFO);
-	private static final Image WARNING= CPluginImages.get(CPluginImages.IMG_OBJS_REFACTORING_WARNING);
-	private static final Image ERROR= CPluginImages.get(CPluginImages.IMG_OBJS_REFACTORING_ERROR);
+	private static final Image INFO= FortranPluginImages.get(FortranPluginImages.IMG_OBJS_REFACTORING_INFO);
+	private static final Image WARNING= FortranPluginImages.get(FortranPluginImages.IMG_OBJS_REFACTORING_WARNING);
+	private static final Image ERROR= FortranPluginImages.get(FortranPluginImages.IMG_OBJS_REFACTORING_ERROR);
 	
 	private static class MessageBox extends Composite {
 		private Label fImage;
@@ -149,7 +149,7 @@ public class RefactoringWizardDialog2 extends Dialog implements IWizardContainer
 		super(shell);
 		Assert.isNotNull(wizard);
 		setShellStyle(getShellStyle() | SWT.RESIZE);
-		wizard.setDialogSettings(CUIPlugin.getDefault().getDialogSettings());
+		wizard.setDialogSettings(FortranUIPlugin.getDefault().getDialogSettings());
 		fWizard= wizard; 
 		fWizard.setContainer(this);
 		fWizard.addPages();
@@ -157,7 +157,7 @@ public class RefactoringWizardDialog2 extends Dialog implements IWizardContainer
 	}
 	
 	private void initSize() {
-		IDialogSettings settings= CUIPlugin.getDefault().getDialogSettings();
+		IDialogSettings settings= FortranUIPlugin.getDefault().getDialogSettings();
 		fSettings= settings.getSection(DIALOG_SETTINGS);
 		if (fSettings == null) {
 			fSettings= new DialogSettings(DIALOG_SETTINGS);

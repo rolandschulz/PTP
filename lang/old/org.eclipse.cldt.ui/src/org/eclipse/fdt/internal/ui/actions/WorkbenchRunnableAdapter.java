@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.fdt.core.model.CoreModel;
-import org.eclipse.fdt.internal.ui.CUIStatus;
+import org.eclipse.fdt.internal.ui.FortranUIStatus;
 
 import org.eclipse.jface.operation.IRunnableWithProgress;
 
@@ -81,7 +81,7 @@ public class WorkbenchRunnableAdapter implements IRunnableWithProgress {
 					if (cause instanceof CoreException) {
 						return ((CoreException) cause).getStatus();
 					}
-					return CUIStatus.createError(IStatus.ERROR, cause);
+					return FortranUIStatus.createError(IStatus.ERROR, cause);
 				} catch (InterruptedException e) {
 					return Status.CANCEL_STATUS;
 				} finally {

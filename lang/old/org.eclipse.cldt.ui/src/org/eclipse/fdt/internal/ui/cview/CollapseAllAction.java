@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.fdt.internal.ui.cview;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.help.WorkbenchHelp;
@@ -26,7 +26,7 @@ class CollapseAllAction extends Action {
 		super(CViewMessages.getString("CollapseAllAction.label")); //$NON-NLS-1$
 		setDescription(CViewMessages.getString("CollapseAllAction.description")); //$NON-NLS-1$
 		setToolTipText(CViewMessages.getString("CollapseAllAction.tooltip")); //$NON-NLS-1$
-		CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, CPluginImages.IMG_MENU_COLLAPSE_ALL);
+		FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, FortranPluginImages.IMG_MENU_COLLAPSE_ALL);
 		cview = part;
 		WorkbenchHelp.setHelp(this, ICHelpContextIds.COLLAPSE_ALL_ACTION);
 	}

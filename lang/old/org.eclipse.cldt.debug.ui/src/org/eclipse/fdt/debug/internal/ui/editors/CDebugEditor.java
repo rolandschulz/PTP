@@ -37,7 +37,7 @@ import org.eclipse.fdt.debug.ui.CDebugUIPlugin;
 import org.eclipse.fdt.debug.ui.sourcelookup.INewSourceLocationWizard;
 import org.eclipse.fdt.internal.ui.editor.CEditor;
 import org.eclipse.fdt.internal.ui.util.ExternalEditorInput;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -323,7 +323,7 @@ public class CDebugEditor extends CEditor {
 	 */
 	public CDebugEditor() {
 		super();
-		setDocumentProvider( CUIPlugin.getDefault().getDocumentProvider() );
+		setDocumentProvider( FortranUIPlugin.getDefault().getDocumentProvider() );
 	}
 
 	/*
@@ -350,11 +350,11 @@ public class CDebugEditor extends CEditor {
 			oldInput = ((EditorInputDelegate)oldInput).getDelegate();
 		}
 		if ( oldInput != null ) {
-			CUIPlugin.getDefault().getWorkingCopyManager().disconnect( oldInput );
+			FortranUIPlugin.getDefault().getWorkingCopyManager().disconnect( oldInput );
 		}
 		super.doSetInput( newInput );
 		// This hack should be after the super.doSetInput();
-		CUIPlugin.getDefault().getWorkingCopyManager().connect( newInput );
+		FortranUIPlugin.getDefault().getWorkingCopyManager().connect( newInput );
 	}
 
 	protected void attachSourceLocation() {
@@ -392,7 +392,7 @@ public class CDebugEditor extends CEditor {
 							newInput = new ExternalEditorInput( (IStorage)newElement );
 						}
 						IEditorInput oldInput = ((EditorInputDelegate)getEditorInput()).getDelegate();
-						CUIPlugin.getDefault().getWorkingCopyManager().disconnect( oldInput );
+						FortranUIPlugin.getDefault().getWorkingCopyManager().disconnect( oldInput );
 						((EditorInputDelegate)getEditorInput()).setDelegate( newInput );
 						resetInput( element.getStackFrame() );
 					}
@@ -453,7 +453,7 @@ public class CDebugEditor extends CEditor {
 		if ( input instanceof EditorInputDelegate && ((EditorInputDelegate)input).getDelegate() != null ) {
 			newInput = ((EditorInputDelegate)input).getDelegate();
 		}
-		CUIPlugin.getDefault().getWorkingCopyManager().disconnect( newInput );
+		FortranUIPlugin.getDefault().getWorkingCopyManager().disconnect( newInput );
 		super.dispose();
 	}
 }

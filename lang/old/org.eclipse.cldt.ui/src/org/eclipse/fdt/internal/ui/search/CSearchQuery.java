@@ -28,8 +28,8 @@ import org.eclipse.fdt.core.search.ICSearchPattern;
 import org.eclipse.fdt.core.search.ICSearchScope;
 import org.eclipse.fdt.core.search.OrPattern;
 import org.eclipse.fdt.core.search.SearchEngine;
-import org.eclipse.fdt.internal.ui.CPluginImages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.ISearchResult;
@@ -118,9 +118,9 @@ public class CSearchQuery implements ISearchQuery, ICSearchConstants {
 	 */
 	public ImageDescriptor getImageDescriptor() {
 		if( _limitTo == ICSearchConstants.DECLARATIONS ){
-			return CPluginImages.DESC_OBJS_SEARCH_DECL;
+			return FortranPluginImages.DESC_OBJS_SEARCH_DECL;
 		} else {
-			return CPluginImages.DESC_OBJS_SEARCH_REF;
+			return FortranPluginImages.DESC_OBJS_SEARCH_REF;
 		}
 	}
 
@@ -132,7 +132,7 @@ public class CSearchQuery implements ISearchQuery, ICSearchConstants {
 		final CSearchResult textResult= (CSearchResult) getSearchResult();
 		textResult.removeAll();
 		
-		SearchEngine engine = new SearchEngine( CUIPlugin.getSharedWorkingCopies() );
+		SearchEngine engine = new SearchEngine( FortranUIPlugin.getSharedWorkingCopies() );
 		int matchCount= 0;
 		
 
@@ -167,7 +167,7 @@ public class CSearchQuery implements ISearchQuery, ICSearchConstants {
 		monitor.done();
 		matchCount = finalCollector.getMatchCount();
 		
-		return new Status(IStatus.OK, CUIPlugin.getPluginId(), 0,"", null); //$NON-NLS-1$	
+		return new Status(IStatus.OK, FortranUIPlugin.getPluginId(), 0,"", null); //$NON-NLS-1$	
 	}
 
 	/* (non-Javadoc)

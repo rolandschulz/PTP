@@ -27,7 +27,7 @@ import org.eclipse.fdt.core.search.BasicSearchMatch;
 import org.eclipse.fdt.core.search.BasicSearchResultCollector;
 import org.eclipse.fdt.core.search.IMatch;
 import org.eclipse.fdt.ui.CSearchResultLabelProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.search.ui.IGroupByKeyComputer;
 import org.eclipse.search.ui.ISearchResultView;
@@ -130,7 +130,7 @@ public class CSearchResultCollector extends BasicSearchResultCollector{
 	    }
 	    else {
 	    	//Check to see if external markers are enabled
-	    	IPreferenceStore store =  CUIPlugin.getDefault().getPreferenceStore();
+	    	IPreferenceStore store =  FortranUIPlugin.getDefault().getPreferenceStore();
 	    	if (store.getBoolean(CSearchPage.EXTERNALMATCH_ENABLED)){
 		    	//Create Link in referring file's project
 		    	IPath refLocation = searchMatch.getReferenceLocation();

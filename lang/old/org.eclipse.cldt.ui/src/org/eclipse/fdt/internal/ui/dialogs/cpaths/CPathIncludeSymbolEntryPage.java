@@ -32,7 +32,7 @@ import org.eclipse.fdt.core.model.IIncludeEntry;
 import org.eclipse.fdt.core.model.IMacroEntry;
 import org.eclipse.fdt.core.model.IPathEntry;
 import org.eclipse.fdt.core.model.ITranslationUnit;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.dialogs.IStatusChangeListener;
 import org.eclipse.fdt.internal.ui.dialogs.TypedElementSelectionValidator;
@@ -45,7 +45,7 @@ import org.eclipse.fdt.internal.ui.wizards.dialogfields.LayoutUtil;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.SelectionButtonDialogField;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.TreeListDialogField;
 import org.eclipse.fdt.ui.CElementContentProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -208,7 +208,7 @@ public class CPathIncludeSymbolEntryPage extends CPathBasePage {
 	}
 
 	public Image getImage() {
-		return CPluginImages.get(CPluginImages.IMG_OBJS_INCLUDES_CONTAINER);
+		return FortranPluginImages.get(FortranPluginImages.IMG_OBJS_INCLUDES_CONTAINER);
 	}
 
 	public void init(ICProject cproject, List cPaths) {
@@ -237,7 +237,7 @@ public class CPathIncludeSymbolEntryPage extends CPathBasePage {
 			if (nErrorEntries == 1) {
 				status = entryError.getStatus();
 			} else {
-				status = new Status(IStatus.WARNING, CUIPlugin.PLUGIN_ID, -1, CPathEntryMessages.getFormattedString(
+				status = new Status(IStatus.WARNING, FortranUIPlugin.PLUGIN_ID, -1, CPathEntryMessages.getFormattedString(
 						"CPElement.status.multiplePathErrors", //$NON-NLS-1$
 						String.valueOf(nErrorEntries)), null);
 			}

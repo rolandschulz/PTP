@@ -10,7 +10,7 @@ package org.eclipse.fdt.internal.ui.dialogs.cpaths;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.fdt.core.model.IPathEntry;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.wizards.IPathEntryContainerPage;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ide.IDE;
@@ -31,7 +31,7 @@ public class ProjectContainerDescriptor implements IContainerDescriptor {
 	}
 	
 	public Image getImage() {
-		return CUIPlugin.getDefault().getWorkbench().getSharedImages().getImage(IDE.SharedImages.IMG_OBJ_PROJECT);
+		return FortranUIPlugin.getDefault().getWorkbench().getSharedImages().getImage(IDE.SharedImages.IMG_OBJ_PROJECT);
 
 	}
 

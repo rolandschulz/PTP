@@ -5,7 +5,7 @@
    name="%pluginName"
    version="3.0.0"
    provider-name="%providerName"
-   class="org.eclipse.fdt.ui.CUIPlugin">
+   class="org.eclipse.fdt.ui.FortranUIPlugin">
 
    <runtime>
       <library name="fdtui.jar">
@@ -48,7 +48,7 @@
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            class="org.eclipse.fdt.internal.ui.CElementAdapterFactory"
+            class="org.eclipse.fdt.internal.ui.FortranElementAdapterFactory"
             adaptableType="org.eclipse.fdt.core.model.ICElement">
          <adapter
                type="org.eclipse.core.resources.IResource">
@@ -187,7 +187,7 @@
       <perspective
             name="%perspective.name"
             icon="icons/full/cview16/c_pers.gif"
-            class="org.eclipse.fdt.internal.ui.CPerspectiveFactory"
+            class="org.eclipse.fdt.internal.ui.FortranPerspectiveFactory"
             id="org.eclipse.fdt.ui.CPerspective">
       </perspective>
       <perspective
@@ -1291,7 +1291,7 @@
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.fdt.ui.CUIPreferenceInitializer"/>
+      <initializer class="org.eclipse.fdt.ui.FortranUIPreferenceInitializer"/>
    </extension>
 
 <!-- Default folding -->

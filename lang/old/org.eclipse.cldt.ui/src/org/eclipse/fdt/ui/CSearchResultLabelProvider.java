@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.search.IMatch;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.search.CSearchMessages;
 import org.eclipse.fdt.internal.ui.search.CSearchResultCollector;
 import org.eclipse.fdt.internal.ui.search.CSearchResultPage;
@@ -101,40 +101,40 @@ public class CSearchResultLabelProvider extends LabelProvider {
 		ImageDescriptor imageDescriptor = null;
 		
 		switch( elementType ){
-			case ICElement.C_PROJECT:		imageDescriptor = CPluginImages.DESC_OBJS_SEARCHHIERPROJECT;  break;
-			case ICElement.C_CCONTAINER:    imageDescriptor = CPluginImages.DESC_OBJS_SEARCHHIERFODLER; 	break;
-			case ICElement.C_CLASS:			imageDescriptor = CPluginImages.DESC_OBJS_CLASS;		break;
-			case ICElement.C_STRUCT:		imageDescriptor = CPluginImages.DESC_OBJS_STRUCT;		break;
-			case ICElement.C_UNION:			imageDescriptor = CPluginImages.DESC_OBJS_UNION;		break;
-			case ICElement.C_NAMESPACE:		imageDescriptor = CPluginImages.DESC_OBJS_NAMESPACE;	break;
-			case ICElement.C_ENUMERATION:	imageDescriptor = CPluginImages.DESC_OBJS_ENUMERATION;	break;
-			case ICElement.C_MACRO:			imageDescriptor = CPluginImages.DESC_OBJS_MACRO;		break;
-			case ICElement.C_FUNCTION:		imageDescriptor = CPluginImages.DESC_OBJS_FUNCTION;		break;
-			case ICElement.C_VARIABLE:		imageDescriptor = CPluginImages.DESC_OBJS_VARIABLE;		break;
-			case ICElement.C_ENUMERATOR:	imageDescriptor = CPluginImages.DESC_OBJS_ENUMERATOR;	break;
-			case ICElement.C_TYPEDEF:		imageDescriptor = CPluginImages.DESC_OBJS_TYPEDEF;		break;
-			case ICElement.C_UNIT:			imageDescriptor = CPluginImages.DESC_OBJS_TUNIT;		break;
+			case ICElement.C_PROJECT:		imageDescriptor = FortranPluginImages.DESC_OBJS_SEARCHHIERPROJECT;  break;
+			case ICElement.C_CCONTAINER:    imageDescriptor = FortranPluginImages.DESC_OBJS_SEARCHHIERFODLER; 	break;
+			case ICElement.C_CLASS:			imageDescriptor = FortranPluginImages.DESC_OBJS_CLASS;		break;
+			case ICElement.C_STRUCT:		imageDescriptor = FortranPluginImages.DESC_OBJS_STRUCT;		break;
+			case ICElement.C_UNION:			imageDescriptor = FortranPluginImages.DESC_OBJS_UNION;		break;
+			case ICElement.C_NAMESPACE:		imageDescriptor = FortranPluginImages.DESC_OBJS_NAMESPACE;	break;
+			case ICElement.C_ENUMERATION:	imageDescriptor = FortranPluginImages.DESC_OBJS_ENUMERATION;	break;
+			case ICElement.C_MACRO:			imageDescriptor = FortranPluginImages.DESC_OBJS_MACRO;		break;
+			case ICElement.C_FUNCTION:		imageDescriptor = FortranPluginImages.DESC_OBJS_FUNCTION;		break;
+			case ICElement.C_VARIABLE:		imageDescriptor = FortranPluginImages.DESC_OBJS_VARIABLE;		break;
+			case ICElement.C_ENUMERATOR:	imageDescriptor = FortranPluginImages.DESC_OBJS_ENUMERATOR;	break;
+			case ICElement.C_TYPEDEF:		imageDescriptor = FortranPluginImages.DESC_OBJS_TYPEDEF;		break;
+			case ICElement.C_UNIT:			imageDescriptor = FortranPluginImages.DESC_OBJS_TUNIT;		break;
 			case ICElement.C_FIELD:		
 			{
 				switch( visibility ){
-					case ICElement.CPP_PUBLIC:	imageDescriptor = CPluginImages.DESC_OBJS_PUBLIC_FIELD;		break;
-					case ICElement.CPP_PRIVATE:	imageDescriptor = CPluginImages.DESC_OBJS_PRIVATE_FIELD;	break;
-					default:					imageDescriptor = CPluginImages.DESC_OBJS_PROTECTED_FIELD;	break;
+					case ICElement.CPP_PUBLIC:	imageDescriptor = FortranPluginImages.DESC_OBJS_PUBLIC_FIELD;		break;
+					case ICElement.CPP_PRIVATE:	imageDescriptor = FortranPluginImages.DESC_OBJS_PRIVATE_FIELD;	break;
+					default:					imageDescriptor = FortranPluginImages.DESC_OBJS_PROTECTED_FIELD;	break;
 				}
 				break;
 			}
 			case ICElement.C_METHOD:
 			{
 				switch( visibility ){
-					case ICElement.CPP_PUBLIC:	imageDescriptor = CPluginImages.DESC_OBJS_PUBLIC_METHOD;	break;
-					case ICElement.CPP_PRIVATE:	imageDescriptor = CPluginImages.DESC_OBJS_PRIVATE_METHOD;	break;
-					default:					imageDescriptor = CPluginImages.DESC_OBJS_PROTECTED_METHOD;	break;
+					case ICElement.CPP_PUBLIC:	imageDescriptor = FortranPluginImages.DESC_OBJS_PUBLIC_METHOD;	break;
+					case ICElement.CPP_PRIVATE:	imageDescriptor = FortranPluginImages.DESC_OBJS_PRIVATE_METHOD;	break;
+					default:					imageDescriptor = FortranPluginImages.DESC_OBJS_PROTECTED_METHOD;	break;
 				}
 				break;
 			}
 			
 			case ICElement.C_TEMPLATE_CLASS:{
-				imageDescriptor = CPluginImages.DESC_OBJS_CLASS;	
+				imageDescriptor = FortranPluginImages.DESC_OBJS_CLASS;	
 				flags |= CElementImageDescriptor.TEMPLATE;
 				break;
 			}
@@ -150,7 +150,7 @@ public class CSearchResultLabelProvider extends LabelProvider {
 		
 		imageDescriptor = new CElementImageDescriptor( imageDescriptor, flags, SMALL_SIZE );
 
-		Image image = CUIPlugin.getImageDescriptorRegistry().get( imageDescriptor );
+		Image image = FortranUIPlugin.getImageDescriptorRegistry().get( imageDescriptor );
 				
 		return image;
 	}

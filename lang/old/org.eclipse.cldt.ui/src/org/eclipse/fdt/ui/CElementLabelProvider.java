@@ -174,7 +174,7 @@ public class CElementLabelProvider extends LabelProvider {
 				
 				return name.toString();
 			} catch (CModelException e) {
-				CUIPlugin.getDefault().log(e);
+				FortranUIPlugin.getDefault().log(e);
 			}
 		}
 		return fWorkbenchLabelProvider.getText(element);

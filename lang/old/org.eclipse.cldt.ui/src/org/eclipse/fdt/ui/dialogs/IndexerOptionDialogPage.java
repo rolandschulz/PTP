@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.internal.core.search.indexing.IndexManager;
-import org.eclipse.fdt.internal.ui.CUIMessages;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
 import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
@@ -32,12 +32,12 @@ import org.w3c.dom.Node;
 
 public class IndexerOptionDialogPage extends DialogPage {
 	
-	private static final String ENABLE_PREPROCESSOR_PROBLEMS = CUIMessages.getString( "IndexerOptions.enablePreprocessor" ); //$NON-NLS-1$
-	private static final String ENABLE_SEMANTIC_PROBLEMS = CUIMessages.getString( "IndexerOptions.enableSemantic" ); //$NON-NLS-1$
-	private static final String ENABLE_SYNTACTIC_PROBLEMS = CUIMessages.getString( "IndexerOptions.enableSyntactic" ); //$NON-NLS-1$
-	private static final String ENABLE_INDEXING = CUIMessages.getString( "IndexerOptions.enableIndexing" ); //$NON-NLS-1$
-	private static final String INDEXER = CUIMessages.getString("IndexerOptions.indexer" ); //$NON-NLS-1$ 
-	private static final String INDEXER_PROBLEMS = CUIMessages.getString("IndexerOptions.problemReporting" ); //$NON-NLS-1$
+	private static final String ENABLE_PREPROCESSOR_PROBLEMS = FortranUIMessages.getString( "IndexerOptions.enablePreprocessor" ); //$NON-NLS-1$
+	private static final String ENABLE_SEMANTIC_PROBLEMS = FortranUIMessages.getString( "IndexerOptions.enableSemantic" ); //$NON-NLS-1$
+	private static final String ENABLE_SYNTACTIC_PROBLEMS = FortranUIMessages.getString( "IndexerOptions.enableSyntactic" ); //$NON-NLS-1$
+	private static final String ENABLE_INDEXING = FortranUIMessages.getString( "IndexerOptions.enableIndexing" ); //$NON-NLS-1$
+	private static final String INDEXER = FortranUIMessages.getString("IndexerOptions.indexer" ); //$NON-NLS-1$ 
+	private static final String INDEXER_PROBLEMS = FortranUIMessages.getString("IndexerOptions.problemReporting" ); //$NON-NLS-1$
 	
 	private Button indexerEnabled;
 	private Button preprocessorProblemsEnabled;

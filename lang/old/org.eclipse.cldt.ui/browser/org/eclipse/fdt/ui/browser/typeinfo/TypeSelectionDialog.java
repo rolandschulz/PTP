@@ -23,7 +23,7 @@ import org.eclipse.fdt.core.browser.ITypeInfo;
 import org.eclipse.fdt.core.browser.QualifiedTypeName;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.internal.ui.util.StringMatcher;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -437,7 +437,7 @@ public class TypeSelectionDialog extends TwoPaneElementSelector {
 	 * @return the dialog settings to be used
 	 */
 	protected IDialogSettings getDialogSettings() {
-		IDialogSettings allSettings = CUIPlugin.getDefault().getDialogSettings();
+		IDialogSettings allSettings = FortranUIPlugin.getDefault().getDialogSettings();
 		IDialogSettings section = allSettings.getSection(fDialogSection);		
 		if (section == null) {
 			section = allSettings.addNewSection(fDialogSection);

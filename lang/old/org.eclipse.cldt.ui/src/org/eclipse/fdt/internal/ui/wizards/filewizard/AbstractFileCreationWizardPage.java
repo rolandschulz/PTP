@@ -41,7 +41,7 @@ import org.eclipse.fdt.internal.ui.wizards.dialogfields.IStringButtonAdapter;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.LayoutUtil;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.Separator;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.StringButtonDialogField;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -197,9 +197,9 @@ public abstract class AbstractFileCreationWizardPage extends NewElementWizardPag
     		}
     	}
     	if (celem == null) {
-    		IWorkbenchPart part = CUIPlugin.getActivePage().getActivePart();
+    		IWorkbenchPart part = FortranUIPlugin.getActivePage().getActivePart();
     		if (part instanceof ContentOutline) {
-    			part = CUIPlugin.getActivePage().getActiveEditor();
+    			part = FortranUIPlugin.getActivePage().getActiveEditor();
     		}
     		
     		if (part instanceof IViewPartInputProvider) {
@@ -227,7 +227,7 @@ public abstract class AbstractFileCreationWizardPage extends NewElementWizardPag
     				celem = projects[0];
     			}
     		} catch (CModelException e) {
-    			CUIPlugin.getDefault().log(e);
+    			FortranUIPlugin.getDefault().log(e);
     		}
     	}
     	return celem;
@@ -263,7 +263,7 @@ public abstract class AbstractFileCreationWizardPage extends NewElementWizardPag
     					        folder = roots[0];
     					}
     				} catch (CModelException e) {
-    					CUIPlugin.getDefault().log(e);
+    					FortranUIPlugin.getDefault().log(e);
     				}
     				if (folder == null) {
     				    folder = cproject.findSourceRoot(cproject.getResource());
@@ -294,7 +294,7 @@ public abstract class AbstractFileCreationWizardPage extends NewElementWizardPag
      * @since 3.0 
      */
     protected ITextSelection getCurrentTextSelection() {
-    	IWorkbenchPart part = CUIPlugin.getActivePage().getActivePart();
+    	IWorkbenchPart part = FortranUIPlugin.getActivePage().getActivePart();
     	if (part instanceof IEditorPart) {
     		ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
     		if (selectionProvider != null) {

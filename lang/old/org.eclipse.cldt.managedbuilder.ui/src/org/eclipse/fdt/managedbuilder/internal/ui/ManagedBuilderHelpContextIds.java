@@ -1,6 +1,6 @@
 package org.eclipse.fdt.managedbuilder.internal.ui;
 
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 /**********************************************************************
  * Copyright (c) 2002,2003 Rational Software Corporation and others.
@@ -14,7 +14,7 @@ import org.eclipse.fdt.ui.CUIPlugin;
  * **********************************************************************/
 
 public interface ManagedBuilderHelpContextIds {
-	public static final String PREFIX= CUIPlugin.PLUGIN_ID + "."; //$NON-NLS-1$
+	public static final String PREFIX= FortranUIPlugin.PLUGIN_ID + "."; //$NON-NLS-1$
 
 	// Wizard pages
 	public static final String MAN_PROJ_PLATFORM_HELP = PREFIX + "new_proj_wiz_m_target"; //$NON-NLS-1$

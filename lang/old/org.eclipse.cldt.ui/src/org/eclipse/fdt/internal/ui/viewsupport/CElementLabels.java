@@ -23,8 +23,8 @@ import org.eclipse.fdt.core.model.IMethod;
 import org.eclipse.fdt.core.model.ISourceRoot;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.internal.corext.util.CModelUtil;
-import org.eclipse.fdt.internal.ui.CUIMessages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 /**
@@ -250,9 +250,9 @@ public class CElementLabels {
 	public final static int DEFAULT_POST_QUALIFIED= F_POST_QUALIFIED | M_POST_QUALIFIED | I_POST_QUALIFIED | T_POST_QUALIFIED | D_POST_QUALIFIED | CF_POST_QUALIFIED | CU_POST_QUALIFIED;
 
 
-	public final static String CONCAT_STRING= CUIMessages.getString("CElementLabels.concat_string"); // " - "; //$NON-NLS-1$
-	public final static String COMMA_STRING = CUIMessages.getString("CElementLabels.comma_string"); // ", "; //$NON-NLS-1$
-	public final static String DECL_STRING  = CUIMessages.getString("CElementLabels.declseparator_string"); // "  "; // use for return type //$NON-NLS-1$
+	public final static String CONCAT_STRING= FortranUIMessages.getString("CElementLabels.concat_string"); // " - "; //$NON-NLS-1$
+	public final static String COMMA_STRING = FortranUIMessages.getString("CElementLabels.comma_string"); // ", "; //$NON-NLS-1$
+	public final static String DECL_STRING  = FortranUIMessages.getString("CElementLabels.declseparator_string"); // "  "; // use for return type //$NON-NLS-1$
 
 	public static String getTextLabel(Object obj, int flags) {
 		if (obj instanceof ICElement) {
@@ -396,7 +396,7 @@ public class CElementLabels {
 			getTypeLabel( method.getParent(), T_FULLY_QUALIFIED | (flags & P_COMPRESSED), buf );
 		}
 		} catch (CModelException e) {
-			CUIPlugin.getDefault().log(e);
+			FortranUIPlugin.getDefault().log(e);
 		}
 	}
 	
@@ -471,7 +471,7 @@ public class CElementLabels {
 		
 		String typeName= elem.getElementName();
 		if (typeName.length() == 0) { // anonymous
-		    typeName = CUIMessages.getString("CElementLabels.anonymous");	//$NON-NLS-1$
+		    typeName = FortranUIMessages.getString("CElementLabels.anonymous");	//$NON-NLS-1$
 		}
 		buf.append(typeName);
 		

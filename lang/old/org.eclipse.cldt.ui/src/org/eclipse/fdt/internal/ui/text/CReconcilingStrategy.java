@@ -11,7 +11,7 @@ import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.core.model.IWorkingCopy;
 import org.eclipse.fdt.internal.ui.editor.CEditor;
 import org.eclipse.fdt.internal.ui.editor.IReconcilingParticipant;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IWorkingCopyManager;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -30,7 +30,7 @@ public class CReconcilingStrategy implements IReconcilingStrategy {
 
 	public CReconcilingStrategy(CEditor editor) {
 		fEditor= editor;
-		fManager= CUIPlugin.getDefault().getWorkingCopyManager();
+		fManager= FortranUIPlugin.getDefault().getWorkingCopyManager();
 	}
 	
 	/**

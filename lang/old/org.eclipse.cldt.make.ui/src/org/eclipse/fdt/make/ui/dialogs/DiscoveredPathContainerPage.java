@@ -24,7 +24,7 @@ import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.core.model.IContainerEntry;
 import org.eclipse.fdt.core.model.IPathEntry;
 import org.eclipse.fdt.core.model.IPathEntryContainer;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.util.PixelConverter;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.DialogField;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.IDialogFieldListener;
@@ -115,7 +115,7 @@ public class DiscoveredPathContainerPage extends WizardPage	implements IPathEntr
 
 		setTitle(MakeUIPlugin.getResourceString(CONTAINER_LABEL));
 		setDescription(MakeUIPlugin.getResourceString(CONTAINER_DESCRIPTION));
-		setImageDescriptor(CPluginImages.DESC_WIZBAN_ADD_LIBRARY);
+		setImageDescriptor(FortranPluginImages.DESC_WIZBAN_ADD_LIBRARY);
 
 		String[] buttonLabels = new String[]{
 				/* IDX_UP */	MakeUIPlugin.getResourceString(UP),

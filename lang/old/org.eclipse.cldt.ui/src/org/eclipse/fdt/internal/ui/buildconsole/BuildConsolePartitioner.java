@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.fdt.core.ConsoleOutputStream;
 import org.eclipse.fdt.core.resources.IConsole;
 import org.eclipse.fdt.internal.ui.preferences.BuildConsolePreferencePage;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
@@ -161,7 +161,7 @@ public class BuildConsolePartitioner
 				}
 			}
 		};
-		Display display = CUIPlugin.getStandardDisplay();
+		Display display = FortranUIPlugin.getStandardDisplay();
 		if (addToQueue && display != null) {
 			display.asyncExec(r);
 		}
@@ -185,12 +185,12 @@ public class BuildConsolePartitioner
 	}
 
 	public void connect(IDocument document) {
-		CUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
+		FortranUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
 	}
 
 	public void disconnect() {
 		fDocument.setDocumentPartitioner(null);
-		CUIPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(this);
+		FortranUIPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(this);
 		killed = true;
 	}
 
@@ -364,7 +364,7 @@ public class BuildConsolePartitioner
 	}
 
 	public void start(final IProject project) {
-		Display display = CUIPlugin.getStandardDisplay();
+		Display display = FortranUIPlugin.getStandardDisplay();
 		if (display != null) {
 			display.asyncExec(new Runnable() {
 

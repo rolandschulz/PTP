@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.fdt.internal.ui.text.CTextTools;
 import org.eclipse.fdt.internal.ui.util.ExternalEditorInput;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
@@ -62,10 +62,10 @@ public class ExternalSearchDocumentProvider extends FileDocumentProvider {
 		
 		IProject projectToUseForMarker = null;
 		
-		IFile resourceFile = CUIPlugin.getWorkspace().getRoot().getFileForLocation(externalSearchFile.searchMatch.referringElement);
+		IFile resourceFile = FortranUIPlugin.getWorkspace().getRoot().getFileForLocation(externalSearchFile.searchMatch.referringElement);
 		
 		if (resourceFile == null){
-			IProject[] proj = CUIPlugin.getWorkspace().getRoot().getProjects();
+			IProject[] proj = FortranUIPlugin.getWorkspace().getRoot().getProjects();
 			
 			for (int i=0; i<proj.length; i++){
 				if (proj[i].isOpen()){
@@ -91,7 +91,7 @@ public class ExternalSearchDocumentProvider extends FileDocumentProvider {
 	protected IDocument createDocument(Object element) throws CoreException {
 		IDocument document= super.createDocument(element);
 		if (document != null){
-			CTextTools textTools = CUIPlugin.getDefault().getTextTools();
+			CTextTools textTools = FortranUIPlugin.getDefault().getTextTools();
 			textTools.setupCDocument(document);
 		}
 		return document;

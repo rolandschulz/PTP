@@ -19,9 +19,9 @@ import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.core.model.IPathEntry;
 import org.eclipse.fdt.core.model.IPathEntryContainer;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.viewsupport.ListContentProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -50,7 +50,7 @@ public class CPathFilterPage extends WizardPage {
 		super("CPathFilterPage"); //$NON-NLS-1$
 		setTitle(CPathEntryMessages.getString("CPathFilterPage.title")); //$NON-NLS-1$
 		setDescription(CPathEntryMessages.getString("CPathFilterPage.description")); //$NON-NLS-1$
-		setImageDescriptor(CPluginImages.DESC_WIZBAN_ADD_LIBRARY);
+		setImageDescriptor(FortranPluginImages.DESC_WIZBAN_ADD_LIBRARY);
 		fFilterType = filterType;
 		fCElement = cElement;
 		validatePage();
@@ -93,7 +93,7 @@ public class CPathFilterPage extends WizardPage {
 	public void setParentEntry(IPathEntry entry) {
 		fParentEntry = entry;
 		if (fParentEntry.getEntryKind() == IPathEntry.FDT_PROJECT) {
-			IProject project = CUIPlugin.getWorkspace().getRoot().getProject(fParentEntry.getPath().segment(0));
+			IProject project = FortranUIPlugin.getWorkspace().getRoot().getProject(fParentEntry.getPath().segment(0));
 			if (project.isAccessible()) {
 				ICProject cProject = CoreModel.getDefault().create(project);
 				try {

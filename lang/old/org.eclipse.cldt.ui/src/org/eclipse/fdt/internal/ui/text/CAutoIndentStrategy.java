@@ -11,7 +11,7 @@ import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.IDocument;
 
 
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 /**
  * Auto indent strategy sensitive to brackets.
@@ -161,7 +161,7 @@ public class CAutoIndentStrategy extends DefaultAutoIndentStrategy {
 				}
 			}
 		} catch (BadLocationException excp) {
-			CUIPlugin.getDefault().log(excp);
+			FortranUIPlugin.getDefault().log(excp);
 		}
 	}
 
@@ -194,7 +194,7 @@ public class CAutoIndentStrategy extends DefaultAutoIndentStrategy {
 
 
 		} catch (BadLocationException excp) {
-			CUIPlugin.getDefault().log(excp);
+			FortranUIPlugin.getDefault().log(excp);
 		}
 	}
 	

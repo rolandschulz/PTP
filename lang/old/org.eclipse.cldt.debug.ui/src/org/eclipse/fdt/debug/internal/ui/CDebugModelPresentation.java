@@ -73,7 +73,7 @@ import org.eclipse.fdt.debug.internal.ui.editors.EditorInputDelegate;
 import org.eclipse.fdt.debug.internal.ui.editors.FileNotFoundElement;
 import org.eclipse.fdt.debug.ui.CDebugUIPlugin;
 import org.eclipse.fdt.internal.ui.util.ExternalEditorInput;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
@@ -161,9 +161,9 @@ public class CDebugModelPresentation extends LabelProvider implements IDebugMode
 		if ( input != null ) {
 			IEditorRegistry registry = PlatformUI.getWorkbench().getEditorRegistry();
 			IEditorDescriptor descriptor = registry.getDefaultEditor( input.getName() );
-			id = (descriptor != null) ? descriptor.getId() : CUIPlugin.EDITOR_ID;
+			id = (descriptor != null) ? descriptor.getId() : FortranUIPlugin.EDITOR_ID;
 		}
-		if ( CUIPlugin.EDITOR_ID.equals( id ) ) {
+		if ( FortranUIPlugin.EDITOR_ID.equals( id ) ) {
 			return CDebugEditor.EDITOR_ID;
 		}
 		return id;

@@ -31,7 +31,7 @@ import org.eclipse.fdt.internal.ui.actions.ActionMessages;
 import org.eclipse.fdt.internal.ui.actions.WorkbenchRunnableAdapter;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
 import org.eclipse.fdt.ui.CElementLabelProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.actions.SelectionDispatchAction;
 
 import org.eclipse.jface.viewers.ISelection;
@@ -185,7 +185,7 @@ public class OpenProjectAction extends SelectionDispatchAction implements IResou
 						project.open(new SubProgressMonitor(monitor, 1));
 					} catch (CoreException e) {
 						if (errorStatus == null)
-							errorStatus = new MultiStatus(CUIPlugin.getPluginId(), IStatus.ERROR, ActionMessages.getString("OpenProjectAction.error.message"), e); //$NON-NLS-1$
+							errorStatus = new MultiStatus(FortranUIPlugin.getPluginId(), IStatus.ERROR, ActionMessages.getString("OpenProjectAction.error.message"), e); //$NON-NLS-1$
 						errorStatus.merge(e.getStatus());
 					}
 				}

@@ -11,8 +11,8 @@
 package org.eclipse.fdt.internal.ui.buildconsole;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.fdt.internal.ui.CPluginImages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IBuildConsoleManager;
 import org.eclipse.ui.console.AbstractConsole;
 import org.eclipse.ui.console.IConsoleView;
@@ -23,12 +23,12 @@ public class BuildConsole extends AbstractConsole {
 	/**
 	 * Property constant indicating the color of a stream has changed. 
 	 */
-	public static final String P_STREAM_COLOR = CUIPlugin.PLUGIN_ID  + ".CONSOLE_P_STREAM_COLOR";	 //$NON-NLS-1$
+	public static final String P_STREAM_COLOR = FortranUIPlugin.PLUGIN_ID  + ".CONSOLE_P_STREAM_COLOR";	 //$NON-NLS-1$
 
 	private IBuildConsoleManager fConsoleManager;
 
 	public BuildConsole(IBuildConsoleManager manager) {
-		super(ConsoleMessages.getString("BuildConsole.buildConsole"), CPluginImages.DESC_BUILD_CONSOLE); //$NON-NLS-1$
+		super(ConsoleMessages.getString("BuildConsole.buildConsole"), FortranPluginImages.DESC_BUILD_CONSOLE); //$NON-NLS-1$
 		fConsoleManager = manager;
 	}
 

@@ -33,7 +33,7 @@ import org.eclipse.fdt.core.resources.FileStorage;
 import org.eclipse.fdt.internal.ui.editor.CEditor;
 import org.eclipse.fdt.internal.ui.editor.CEditorMessages;
 import org.eclipse.fdt.internal.ui.editor.ITranslationUnitEditorInput;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
@@ -68,11 +68,11 @@ public class EditorUtility {
 		try {
 			input = getEditorInput(inputElement);
 		} catch (CModelException x) {
-			//CUIPlugin.log(x.getStatus());
+			//FortranUIPlugin.log(x.getStatus());
 		}
                 
 		if (input != null) {
-			IWorkbenchPage p= CUIPlugin.getActivePage();
+			IWorkbenchPage p= FortranUIPlugin.getActivePage();
 			if (p != null) {
 				return p.findEditor(input);
 			}
@@ -141,7 +141,7 @@ public class EditorUtility {
 					
 					if (canonicalPath != null){
 						IPath path = new Path(canonicalPath);
-						file = CUIPlugin.getWorkspace().getRoot().getFileForLocation(path);
+						file = FortranUIPlugin.getWorkspace().getRoot().getFileForLocation(path);
 					}
 				}
 				
@@ -159,9 +159,9 @@ public class EditorUtility {
 	 * 
 	 */
 	private static void closedProject(IProject project) {
-		MessageBox errorMsg = new MessageBox(CUIPlugin.getActiveWorkbenchShell(), SWT.ICON_ERROR | SWT.OK);
-		errorMsg.setText(CUIPlugin.getResourceString("EditorUtility.closedproject")); //$NON-NLS-1$
-		String desc= CUIPlugin.getResourceString("Editorutility.closedproject.description"); //$NON-NLS-1$
+		MessageBox errorMsg = new MessageBox(FortranUIPlugin.getActiveWorkbenchShell(), SWT.ICON_ERROR | SWT.OK);
+		errorMsg.setText(FortranUIPlugin.getResourceString("EditorUtility.closedproject")); //$NON-NLS-1$
+		String desc= FortranUIPlugin.getResourceString("Editorutility.closedproject.description"); //$NON-NLS-1$
 		errorMsg.setMessage (MessageFormat.format(desc, new Object[]{project.getName()})); //$NON-NLS-1$
 		errorMsg.open();
 		
@@ -169,7 +169,7 @@ public class EditorUtility {
 
 	private static IEditorPart openInEditor(IEditorInput input, String editorID, boolean activate) throws PartInitException {
 		if (input != null) {
-			IWorkbenchPage p= CUIPlugin.getActivePage();
+			IWorkbenchPage p= FortranUIPlugin.getActivePage();
 			if (p != null) {
 				IEditorPart editorPart= p.openEditor(input, editorID, activate);
 				initializeHighlightRange(editorPart);
@@ -241,7 +241,7 @@ public class EditorUtility {
 	 * return null
 	 */
 	public static ICElement getActiveEditorCInput() {
-		IWorkbenchPage page= CUIPlugin.getActivePage();
+		IWorkbenchPage page= FortranUIPlugin.getActivePage();
 		if (page != null) {
 			IEditorPart part= page.getActiveEditor();
 			if (part != null) {
@@ -266,7 +266,7 @@ public class EditorUtility {
 		if (cu.isWorkingCopy())
 			return cu;
 
-		return cu.findSharedWorkingCopy(CUIPlugin.getDefault().getBufferFactory());
+		return cu.findSharedWorkingCopy(FortranUIPlugin.getDefault().getBufferFactory());
 	}
 
 

@@ -10,7 +10,7 @@
 ***********************************************************************/
 package org.eclipse.fdt.internal.ui.refactoring;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.refactoring.RefactoringMessages;
 
@@ -19,7 +19,7 @@ public class RenameElementWizard extends RenameRefactoringWizard {
 		super(
 			RefactoringMessages.getString("RenameTypeWizard.defaultPageTitle"), //$NON-NLS-1$
 			RefactoringMessages.getString("RenameTypeWizard.inputPage.description"), //$NON-NLS-1$
-			CPluginImages.DESC_WIZBAN_REFACTOR_TYPE,
+			FortranPluginImages.DESC_WIZBAN_REFACTOR_TYPE,
 			ICHelpContextIds.RENAME_TYPE_WIZARD_PAGE);
 	}
 }

@@ -14,7 +14,7 @@ package org.eclipse.fdt.ui.wizards.conversion;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.fdt.core.FortranCorePlugin;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.wizards.NewCProjectWizard;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbench;
@@ -76,7 +76,7 @@ public abstract class ConversionWizard
      */
     protected static String getWindowTitleResource() {
 
-        return CUIPlugin.getResourceString(WINDOW_TITLE);
+        return FortranUIPlugin.getResourceString(WINDOW_TITLE);
     }
 
     /**
@@ -87,7 +87,7 @@ public abstract class ConversionWizard
      */
     protected static String getWzDescriptionResource() {
 
-        return CUIPlugin.getResourceString(WZ_DESC);
+        return FortranUIPlugin.getResourceString(WZ_DESC);
     }
     
     /**
@@ -98,7 +98,7 @@ public abstract class ConversionWizard
      */
     protected static String getWzTitleResource() {
 
-        return CUIPlugin.getResourceString(WZ_TITLE);
+        return FortranUIPlugin.getResourceString(WZ_TITLE);
     }
 
     /**

@@ -10,7 +10,7 @@
 ***********************************************************************/
 package org.eclipse.fdt.internal.ui.util;
 
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 public class Util implements IDebugLogConstants{
 	public static boolean VERBOSE_CONTENTASSIST = false;
@@ -21,8 +21,8 @@ public class Util implements IDebugLogConstants{
 	 */
 	
 	public static void debugLog(String message, DebugLogConstant client) {
-		if( CUIPlugin.getDefault() == null ) return;
-		if ( CUIPlugin.getDefault().isDebugging() && isActive(client)) {
+		if( FortranUIPlugin.getDefault() == null ) return;
+		if ( FortranUIPlugin.getDefault().isDebugging() && isActive(client)) {
 			while (message.length() > 100) {	
 				String partial = message.substring(0, 100);
 				message = message.substring(100);

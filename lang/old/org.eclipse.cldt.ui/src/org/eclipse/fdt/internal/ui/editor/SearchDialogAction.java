@@ -19,8 +19,8 @@ package org.eclipse.fdt.internal.ui.editor;
 import java.util.List;
 
 import org.eclipse.fdt.core.model.ICElement;
-import org.eclipse.fdt.internal.ui.CPluginImages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
@@ -48,12 +48,12 @@ public class SearchDialogAction extends Action {
 	private IWorkbenchWindow fWorkbenchWindow;
 	
 	public SearchDialogAction(ISelectionProvider provider, CEditor editor) {
-		super(CUIPlugin.getResourceString(PREFIX + "label")); //$NON-NLS-1$
-		setDescription(CUIPlugin.getResourceString(PREFIX + "description")); //$NON-NLS-1$
-		setToolTipText(CUIPlugin.getResourceString(PREFIX + "tooltip")); //$NON-NLS-1$
+		super(FortranUIPlugin.getResourceString(PREFIX + "label")); //$NON-NLS-1$
+		setDescription(FortranUIPlugin.getResourceString(PREFIX + "description")); //$NON-NLS-1$
+		setToolTipText(FortranUIPlugin.getResourceString(PREFIX + "tooltip")); //$NON-NLS-1$
 		
 		if(provider instanceof CContentOutlinePage) {
-			setImageDescriptor( CPluginImages.DESC_OBJS_CSEARCH );
+			setImageDescriptor( FortranPluginImages.DESC_OBJS_CSEARCH );
 		}
 		
 		fSelectionProvider= provider;
@@ -62,12 +62,12 @@ public class SearchDialogAction extends Action {
 	
 	public SearchDialogAction(ISelectionProvider provider, IWorkbenchWindow window) {
 		
-		super(CUIPlugin.getResourceString(PREFIX + "label")); //$NON-NLS-1$
-		setDescription(CUIPlugin.getResourceString(PREFIX + "description")); //$NON-NLS-1$
-		setToolTipText(CUIPlugin.getResourceString(PREFIX + "tooltip")); //$NON-NLS-1$
+		super(FortranUIPlugin.getResourceString(PREFIX + "label")); //$NON-NLS-1$
+		setDescription(FortranUIPlugin.getResourceString(PREFIX + "description")); //$NON-NLS-1$
+		setToolTipText(FortranUIPlugin.getResourceString(PREFIX + "tooltip")); //$NON-NLS-1$
 		
 		if(provider instanceof CContentOutlinePage) {
-			setImageDescriptor( CPluginImages.DESC_OBJS_CSEARCH );
+			setImageDescriptor( FortranPluginImages.DESC_OBJS_CSEARCH );
 		}
 		
 		fSelectionProvider= provider;
@@ -121,14 +121,14 @@ public class SearchDialogAction extends Action {
 ////			scope.addExtension("*.hh");
 //			
 //			TextSearchOperation op= new TextSearchOperation(
-//				CUIPlugin.getWorkspace(),
+//				FortranUIPlugin.getWorkspace(),
 //				search_name,
 //				"",
 //				scope,
 //				col);
 //
 //
-//			//engine.search(CUIPlugin.getWorkspace(), element.getName(),
+//			//engine.search(FortranUIPlugin.getWorkspace(), element.getName(),
 //			//	null, scope, col);
 //			IRunnableContext context=  null;
 //			//context= getContainer().getRunnableContext();

@@ -32,7 +32,7 @@ import org.eclipse.fdt.internal.ui.actions.ActionMessages;
 import org.eclipse.fdt.internal.ui.actions.ActionUtil;
 import org.eclipse.fdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.fdt.internal.ui.editor.CEditor;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.actions.SelectionDispatchAction;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.text.ITextSelection;
@@ -234,7 +234,7 @@ public class OpenTypeHierarchyAction extends SelectionDispatchAction {
 	}
 	
 	private static IStatus compileCandidates(List result, ICElement elem) {
-		IStatus ok = new Status(IStatus.OK, CUIPlugin.getPluginId(), 0, "", null); //$NON-NLS-1$		
+		IStatus ok = new Status(IStatus.OK, FortranUIPlugin.getPluginId(), 0, "", null); //$NON-NLS-1$		
 		switch (elem.getElementType()) {
 			case ICElement.C_CLASS:
 			case ICElement.C_STRUCT:
@@ -246,6 +246,6 @@ public class OpenTypeHierarchyAction extends SelectionDispatchAction {
 	}
 	
 	private static IStatus createStatus(String message) {
-		return new Status(IStatus.INFO, CUIPlugin.getPluginId(), ICStatusConstants.INTERNAL_ERROR, message, null);
+		return new Status(IStatus.INFO, FortranUIPlugin.getPluginId(), ICStatusConstants.INTERNAL_ERROR, message, null);
 	}			
 }

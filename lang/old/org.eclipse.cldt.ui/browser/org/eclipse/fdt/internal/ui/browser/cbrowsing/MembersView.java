@@ -20,7 +20,7 @@ import org.eclipse.fdt.core.model.INamespace;
 import org.eclipse.fdt.core.model.ISourceRoot;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -47,7 +47,7 @@ public class MembersView extends CBrowsingPart implements IPropertyChangeListene
 	public MembersView() {
 		setHasWorkingSetFilter(false);
 		setHasCustomSetFilter(true);
-		CUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
+		FortranUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class MembersView extends CBrowsingPart implements IPropertyChangeListene
 		if (key == IShowInTargetList.class) {
 			return new IShowInTargetList() {
 				public String[] getShowInTargetIds() {
-					return new String[] { CUIPlugin.CVIEW_ID };
+					return new String[] { FortranUIPlugin.CVIEW_ID };
 				}
 
 			};
@@ -112,7 +112,7 @@ public class MembersView extends CBrowsingPart implements IPropertyChangeListene
 	}
 
 	protected void fillToolBar(IToolBarManager tbm) {
-		tbm.add(new LexicalSortingAction(getViewer(), CUIPlugin.ID_MEMBERS_VIEW));
+		tbm.add(new LexicalSortingAction(getViewer(), FortranUIPlugin.ID_MEMBERS_VIEW));
 //		fMemberFilterActionGroup.contributeToToolBar(tbm);
 		super.fillToolBar(tbm);
 	}
@@ -214,7 +214,7 @@ public class MembersView extends CBrowsingPart implements IPropertyChangeListene
 //			fMemberFilterActionGroup= null;
 //		}
 		super.dispose();
-		CUIPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(this);
+		FortranUIPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(this);
 	}
 
 	/* (non-Javadoc)

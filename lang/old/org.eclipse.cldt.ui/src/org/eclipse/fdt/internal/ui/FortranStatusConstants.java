@@ -11,10 +11,10 @@ package org.eclipse.fdt.internal.ui;
  * the cause of the exception. The status objects originating from the
  * C UI plug-in use the codes defined in this interface.
  */
-public class CStatusConstants {
+public class FortranStatusConstants {
 	
 	// Prevent instantiation
-	private CStatusConstants() {
+	private FortranStatusConstants() {
 	}
 
 	/** Status code describing an internal error */

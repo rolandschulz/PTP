@@ -36,14 +36,14 @@ import org.eclipse.fdt.core.search.ICSearchScope;
 import org.eclipse.fdt.core.search.IMatch;
 import org.eclipse.fdt.core.search.OrPattern;
 import org.eclipse.fdt.core.search.SearchEngine;
-import org.eclipse.fdt.internal.ui.CHelpProviderManager;
+import org.eclipse.fdt.internal.ui.FortranHelpProviderManager;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.actions.WorkbenchRunnableAdapter;
 import org.eclipse.fdt.internal.ui.codemanipulation.AddIncludesOperation;
 import org.eclipse.fdt.internal.ui.text.CWordFinder;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
 import org.eclipse.fdt.ui.CSearchResultLabelProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IFunctionSummary;
 import org.eclipse.fdt.ui.IRequiredInclude;
 import org.eclipse.fdt.ui.browser.typeinfo.TypeInfoLabelProvider;
@@ -129,7 +129,7 @@ public class AddIncludeOnSelectionAction extends Action implements IUpdate {
 		ITranslationUnit unit = null;
 		if (fEditor != null) {
 			IEditorInput editorInput= fEditor.getEditorInput();
-			unit = CUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(editorInput);
+			unit = FortranUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(editorInput);
 		}
 		return unit;
 	}
@@ -228,7 +228,7 @@ public class AddIncludeOnSelectionAction extends Action implements IUpdate {
 					}	
 				};
 
-				fs[0] = CHelpProviderManager.getDefault().getFunctionInfo(context, name);
+				fs[0] = FortranHelpProviderManager.getDefault().getFunctionInfo(context, name);
 			}
 		};
 		try {
@@ -302,7 +302,7 @@ public class AddIncludeOnSelectionAction extends Action implements IUpdate {
 
 				SearchEngine searchEngine = new SearchEngine();
 				searchEngine.setWaitingPolicy(ICSearchConstants.FORCE_IMMEDIATE_SEARCH);
-				searchEngine.search(CUIPlugin.getWorkspace(), orPattern, scope, searchResultCollector, true);
+				searchEngine.search(FortranUIPlugin.getWorkspace(), orPattern, scope, searchResultCollector, true);
 			}
 		};
 		try {

@@ -38,7 +38,7 @@ import org.eclipse.fdt.internal.ui.text.CSourceViewerConfiguration;
 import org.eclipse.fdt.internal.ui.text.CTextTools;
 import org.eclipse.fdt.internal.ui.text.contentassist.ContentAssistPreference;
 import org.eclipse.fdt.internal.ui.util.CUIHelp;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IWorkingCopyManager;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.fdt.ui.actions.RefactoringActionGroup;
@@ -214,15 +214,15 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 	 * @see org.eclipse.ui.texteditor.AbstractDecoratedTextEditor#initializeEditor()
 	 */
 	protected void initializeEditor() {
-		CTextTools textTools = CUIPlugin.getDefault().getTextTools();
+		CTextTools textTools = FortranUIPlugin.getDefault().getTextTools();
 		setSourceViewerConfiguration(new CSourceViewerConfiguration(textTools, this));
-		setDocumentProvider(CUIPlugin.getDefault().getDocumentProvider());
+		setDocumentProvider(FortranUIPlugin.getDefault().getDocumentProvider());
 	
 		setEditorContextMenuId("#CEditorContext"); //$NON-NLS-1$
 		setRulerContextMenuId("#CEditorRulerContext"); //$NON-NLS-1$
 		setOutlinerContextMenuId("#CEditorOutlinerContext"); //$NON-NLS-1$
 
-		setPreferenceStore(CUIPlugin.getDefault().getCombinedPreferenceStore());
+		setPreferenceStore(FortranUIPlugin.getDefault().getCombinedPreferenceStore());
 		fCEditorErrorTickUpdater = new CEditorErrorTickUpdater(this);          
 	}
 
@@ -289,7 +289,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 		if (required == IShowInTargetList.class) {
 			return new IShowInTargetList() {
 				public String[] getShowInTargetIds() {
-					return new String[] { CUIPlugin.CVIEW_ID, IPageLayout.ID_OUTLINE, IPageLayout.ID_RES_NAV };
+					return new String[] { FortranUIPlugin.CVIEW_ID, IPageLayout.ID_OUTLINE, IPageLayout.ID_RES_NAV };
 				}
 
 			};
@@ -357,7 +357,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 					if (fProjectionModelUpdater != null)
 						fProjectionModelUpdater.uninstall();
 					// either freshly enabled or provider changed
-					fProjectionModelUpdater= CUIPlugin.getDefault().getFoldingStructureProviderRegistry().getCurrentFoldingProvider();
+					fProjectionModelUpdater= FortranUIPlugin.getDefault().getFoldingStructureProviderRegistry().getCurrentFoldingProvider();
 					if (fProjectionModelUpdater != null) {
 						fProjectionModelUpdater.install(this, asv);
 					}
@@ -753,7 +753,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 	 */
 	public static void setOutlinePageInput(CContentOutlinePage page, IEditorInput input) {
 		if (page != null) {
-			IWorkingCopyManager manager = CUIPlugin.getDefault().getWorkingCopyManager();
+			IWorkingCopyManager manager = FortranUIPlugin.getDefault().getWorkingCopyManager();
 			page.setInput(manager.getWorkingCopy(input));
 		}
 	}
@@ -763,7 +763,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 	 * @return <code>true</code> if folding is enabled, <code>false</code> otherwise.
 	 */
 	boolean isFoldingEnabled() {
-		return CUIPlugin.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.EDITOR_FOLDING_ENABLED);
+		return FortranUIPlugin.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.EDITOR_FOLDING_ENABLED);
 	}
 
 
@@ -788,7 +788,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 		fProjectionSupport.addSummarizableAnnotationType("org.eclipse.ui.workbench.texteditor.warning"); //$NON-NLS-1$
 		fProjectionSupport.install();
 		
-		fProjectionModelUpdater= CUIPlugin.getDefault().getFoldingStructureProviderRegistry().getCurrentFoldingProvider();
+		fProjectionModelUpdater= FortranUIPlugin.getDefault().getFoldingStructureProviderRegistry().getCurrentFoldingProvider();
 		if (fProjectionModelUpdater != null)
 			fProjectionModelUpdater.install(this, projectionViewer);
 
@@ -1229,7 +1229,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 	 */
 	protected ISourceViewer createSourceViewer(Composite parent, IVerticalRuler ruler, int styles) {
 		// Figure out if this is a C or C++ source file
-		IWorkingCopyManager mgr = CUIPlugin.getDefault().getWorkingCopyManager();
+		IWorkingCopyManager mgr = FortranUIPlugin.getDefault().getWorkingCopyManager();
 		ITranslationUnit unit = mgr.getWorkingCopy(getEditorInput());
 		String fileType = LANGUAGE_CPP;
 		if (unit != null) {
@@ -1241,7 +1241,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 
 		fAnnotationAccess = createAnnotationAccess();
 		
-		ISharedTextColors sharedColors = CUIPlugin.getDefault().getSharedTextColors();
+		ISharedTextColors sharedColors = FortranUIPlugin.getDefault().getSharedTextColors();
 		fOverviewRuler = createOverviewRuler(sharedColors);
 
 		ISourceViewer sourceViewer =
@@ -1287,8 +1287,8 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 	 * @see AbstractTextEditor#affectsTextPresentation(PropertyChangeEvent)
 	 */
 	protected boolean affectsTextPresentation(PropertyChangeEvent event) {
-		CTextTools textTools = CUIPlugin.getDefault().getTextTools();
-		AsmTextTools asmTools = CUIPlugin.getDefault().getAsmTextTools();
+		CTextTools textTools = FortranUIPlugin.getDefault().getTextTools();
+		AsmTextTools asmTools = FortranUIPlugin.getDefault().getAsmTextTools();
 		return textTools.affectsBehavior(event) || asmTools.affectsBehavior(event);
 	}
 

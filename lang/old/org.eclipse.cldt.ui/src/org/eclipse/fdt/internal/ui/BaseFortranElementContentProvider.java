@@ -34,7 +34,7 @@ import org.eclipse.fdt.core.model.ISourceRoot;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.core.model.IWorkingCopy;
 import org.eclipse.fdt.ui.CElementGrouping;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IncludesGrouping;
 import org.eclipse.fdt.ui.NamespacesGrouping;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -61,7 +61,7 @@ C model (<code>ICModel</code>)<br>
 
  * </pre>
  */
-public class BaseCElementContentProvider implements ITreeContentProvider {
+public class BaseFortranElementContentProvider implements ITreeContentProvider {
 
 	protected static final Object[] NO_CHILDREN= new Object[0];
 
@@ -70,11 +70,11 @@ public class BaseCElementContentProvider implements ITreeContentProvider {
 	protected boolean fIncludesGrouping= false;
 	protected boolean fNamespacesGrouping= false;
 	
-	public BaseCElementContentProvider() {
+	public BaseFortranElementContentProvider() {
 		this(false, false);
 	}
 	
-	public BaseCElementContentProvider(boolean provideMembers, boolean provideWorkingCopy) {
+	public BaseFortranElementContentProvider(boolean provideMembers, boolean provideWorkingCopy) {
 	    fProvideMembers= provideMembers;
 		fProvideWorkingCopy= provideWorkingCopy;
 	}
@@ -185,7 +185,7 @@ public class BaseCElementContentProvider implements ITreeContentProvider {
 						// if it is not already a working copy
 						if (!(element instanceof IWorkingCopy)){
 							// if it has a valid working copy
-							IWorkingCopy copy = tu.findSharedWorkingCopy(CUIPlugin.getDefault().getBufferFactory());
+							IWorkingCopy copy = tu.findSharedWorkingCopy(FortranUIPlugin.getDefault().getBufferFactory());
 							if (copy != null) {
 								tu = copy;
 							}
@@ -209,7 +209,7 @@ public class BaseCElementContentProvider implements ITreeContentProvider {
 				return ((CElementGrouping)element).getChildren(element);
 			}
 		} catch (CModelException e) {
-			//CUIPlugin.getDefault().log(e);
+			//FortranUIPlugin.getDefault().log(e);
 			return NO_CHILDREN;
 		}
 		return NO_CHILDREN;

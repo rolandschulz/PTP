@@ -61,10 +61,10 @@ import org.eclipse.fdt.core.parser.ast.IASTNode.LookupKind;
 import org.eclipse.fdt.core.parser.util.CharArrayObjectMap;
 import org.eclipse.fdt.core.parser.util.CharArrayUtils;
 import org.eclipse.fdt.internal.core.CharOperation;
-import org.eclipse.fdt.internal.ui.CUIMessages;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
 import org.eclipse.fdt.internal.ui.util.IDebugLogConstants;
 import org.eclipse.fdt.internal.ui.util.Util;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
@@ -79,7 +79,7 @@ public class CompletionEngine implements RelevanceConstants {
 	int completionStart = 0;
 	int completionLength = 0;
 	int completionOrigin = 0;
-	IPreferenceStore store = CUIPlugin.getDefault().getPreferenceStore();
+	IPreferenceStore store = FortranUIPlugin.getDefault().getPreferenceStore();
 	private CharArrayObjectMap macroMap = null;
 	private ContentAssistElementRequestor elementRequestor = null;
 	
@@ -164,7 +164,7 @@ public class CompletionEngine implements RelevanceConstants {
 		IScanner scanner = null;
 		try
 		{
-			scanner = ParserFactory.createScanner( reader, scanInfo, ParserMode.COMPLETION_PARSE, language, elementRequestor, ParserUtil.getScannerLogService(), Arrays.asList(CUIPlugin.getSharedWorkingCopies()) );
+			scanner = ParserFactory.createScanner( reader, scanInfo, ParserMode.COMPLETION_PARSE, language, elementRequestor, ParserUtil.getScannerLogService(), Arrays.asList(FortranUIPlugin.getSharedWorkingCopies()) );
 			parser  = ParserFactory.createParser( scanner, elementRequestor, ParserMode.COMPLETION_PARSE, language, ParserUtil.getParserLogService() );
 			elementRequestor.setParser(parser);
 		}
@@ -176,7 +176,7 @@ public class CompletionEngine implements RelevanceConstants {
 			IASTCompletionNode result = null;
 			try {
 				// set timeout
-				IPreferenceStore prefStore = CUIPlugin.getDefault().getPreferenceStore();
+				IPreferenceStore prefStore = FortranUIPlugin.getDefault().getPreferenceStore();
 				int timeout = prefStore.getInt(ContentAssistPreference.TIMEOUT_DELAY);
 				if( timeout > 0 )
 					elementRequestor.setTimeout(timeout);
@@ -192,7 +192,7 @@ public class CompletionEngine implements RelevanceConstants {
 			} catch (ParseError e ) {
 				if(e.getErrorKind() == ParseError.ParseErrorKind.TIMEOUT_OR_CANCELLED){
 					log("Timeout received !!!!!! "); //$NON-NLS-1$;
-					requestor.acceptError(new Problem(CUIMessages.getString("CEditor.contentassist.timeout"))); //$NON-NLS-1$;
+					requestor.acceptError(new Problem(FortranUIMessages.getString("CEditor.contentassist.timeout"))); //$NON-NLS-1$;
 				}
 			} finally {
 				// stop timer
@@ -859,7 +859,7 @@ public class CompletionEngine implements RelevanceConstants {
 			
 	}
 	private void logKind(String message, IASTCompletionNode.CompletionKind kind){
-		if (! CUIPlugin.getDefault().isDebugging() && Util.isActive(IDebugLogConstants.CONTENTASSIST))
+		if (! FortranUIPlugin.getDefault().isDebugging() && Util.isActive(IDebugLogConstants.CONTENTASSIST))
 			return;
 		
 		String kindStr = ""; //$NON-NLS-1$
@@ -901,7 +901,7 @@ public class CompletionEngine implements RelevanceConstants {
 		log (message + kindStr);
 	}
 	private void logNode(String message, IASTNode node){
-		if (! CUIPlugin.getDefault().isDebugging() && Util.isActive(IDebugLogConstants.CONTENTASSIST))
+		if (! FortranUIPlugin.getDefault().isDebugging() && Util.isActive(IDebugLogConstants.CONTENTASSIST))
 			return;
 		
 		if(node == null){
@@ -946,7 +946,7 @@ public class CompletionEngine implements RelevanceConstants {
 		
 	}
 	private void logLookups(LookupKind[] kinds){
-		if (! CUIPlugin.getDefault().isDebugging() && Util.isActive(IDebugLogConstants.CONTENTASSIST))
+		if (! FortranUIPlugin.getDefault().isDebugging() && Util.isActive(IDebugLogConstants.CONTENTASSIST))
 			return;
 		
 		StringBuffer kindName = new StringBuffer("Looking For "); //$NON-NLS-1$
@@ -992,7 +992,7 @@ public class CompletionEngine implements RelevanceConstants {
 		log (kindName.toString());
 	}
 	private void log(String message){
-		if (! CUIPlugin.getDefault().isDebugging() && Util.isActive(IDebugLogConstants.CONTENTASSIST))
+		if (! FortranUIPlugin.getDefault().isDebugging() && Util.isActive(IDebugLogConstants.CONTENTASSIST))
 			return;
 		Util.debugLog(message, IDebugLogConstants.CONTENTASSIST);
 	}

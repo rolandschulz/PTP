@@ -37,7 +37,7 @@ import org.eclipse.fdt.internal.corext.refactoring.base.IChange;
 import org.eclipse.fdt.internal.corext.refactoring.base.IUndoManager;
 import org.eclipse.fdt.internal.corext.refactoring.base.IUndoManagerListener;
 import org.eclipse.fdt.internal.corext.refactoring.base.RefactoringStatus;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 /**
  * Default implementation of IUndoManager.
@@ -119,7 +119,7 @@ public class UndoManager implements IUndoManager {
 				if (delta != null)
 					delta.accept(visitor);
 			} catch (CoreException e) {
-				CUIPlugin.getDefault().log(e.getStatus());
+				FortranUIPlugin.getDefault().log(e.getStatus());
 			}
 		}
 	}

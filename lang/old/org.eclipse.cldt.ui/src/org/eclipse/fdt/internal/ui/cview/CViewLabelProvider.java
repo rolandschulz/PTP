@@ -18,7 +18,7 @@ import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
 import org.eclipse.fdt.internal.ui.viewsupport.StandardCElementLabelProvider;
 import org.eclipse.fdt.ui.CElementImageDescriptor;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 
@@ -85,12 +85,12 @@ public class CViewLabelProvider extends StandardCElementLabelProvider {
 			if (container != null && container.isAccessible()) {
 				ImageDescriptor desc = CElementImageProvider.getImageDescriptor(ICElement.C_PROJECT);
 				desc = new CElementImageDescriptor(desc, 0, CElementImageProvider.SMALL_SIZE);
-				return CUIPlugin.getImageDescriptorRegistry().get(desc);
+				return FortranUIPlugin.getImageDescriptorRegistry().get(desc);
 			}
 		} else if (element instanceof IIncludeReference) {
 			ImageDescriptor desc = CElementImageProvider.getImageDescriptor(ICElement.C_CCONTAINER);
 			desc = new CElementImageDescriptor(desc, 0, CElementImageProvider.SMALL_SIZE);
-			return CUIPlugin.getImageDescriptorRegistry().get(desc);
+			return FortranUIPlugin.getImageDescriptorRegistry().get(desc);
 		}
 		return super.getImage(element);
 	}

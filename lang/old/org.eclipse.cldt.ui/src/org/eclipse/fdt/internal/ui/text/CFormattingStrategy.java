@@ -27,7 +27,7 @@ import org.eclipse.fdt.core.formatter.CodeFormatterConstants;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.parser.ParserLanguage;
 import org.eclipse.fdt.internal.corext.util.CodeFormatterUtil;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.Assert;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -85,10 +85,10 @@ public class CFormattingStrategy extends ContextBasedFormattingStrategy {
 					edit.apply(document);
 				
 			} catch (MalformedTreeException exception) {
-				CUIPlugin.getDefault().log(exception);
+				FortranUIPlugin.getDefault().log(exception);
 			} catch (BadLocationException exception) {
 				// Can only happen on concurrent document modification - log and bail out
-				CUIPlugin.getDefault().log(exception);
+				FortranUIPlugin.getDefault().log(exception);
 			}
 		}
  	}		
@@ -117,7 +117,7 @@ public class CFormattingStrategy extends ContextBasedFormattingStrategy {
 	private IFile getActiveFile() {
 		IFile file = null;
 		IEditorPart editor = 
-			CUIPlugin.getDefault().getWorkbench().
+			FortranUIPlugin.getDefault().getWorkbench().
 				getActiveWorkbenchWindow().
 					getActivePage().getActiveEditor();
 			IEditorInput input = editor.getEditorInput();
@@ -149,7 +149,7 @@ public class CFormattingStrategy extends ContextBasedFormattingStrategy {
         preferences.put(CodeFormatterConstants.FORMATTER_LANGUAGE, language);
 		preferences.put(CodeFormatterConstants.FORMATTER_CURRENT_FILE, activeFile);
 	          
-		context.storeToMap(CUIPlugin.getDefault().getPreferenceStore(), preferences, false);
+		context.storeToMap(FortranUIPlugin.getDefault().getPreferenceStore(), preferences, false);
         context.setProperty(FormattingContextProperties.CONTEXT_PREFERENCES, preferences);
 
         return;

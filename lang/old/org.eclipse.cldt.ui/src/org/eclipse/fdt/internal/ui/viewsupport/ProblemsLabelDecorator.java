@@ -21,11 +21,11 @@ import org.eclipse.fdt.core.model.ISourceRange;
 import org.eclipse.fdt.core.model.ISourceReference;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.internal.corext.refactoring.ListenerList;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.util.IProblemChangedListener;
 import org.eclipse.fdt.internal.ui.util.ImageDescriptorRegistry;
 import org.eclipse.fdt.ui.CElementImageDescriptor;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
@@ -121,7 +121,7 @@ public class ProblemsLabelDecorator implements ILabelDecorator, ILightweightLabe
 	
 	private ImageDescriptorRegistry getRegistry() {
 		if (fRegistry == null) {
-			fRegistry= fUseNewRegistry ? new ImageDescriptorRegistry() : CUIPlugin.getImageDescriptorRegistry();
+			fRegistry= fUseNewRegistry ? new ImageDescriptorRegistry() : FortranUIPlugin.getImageDescriptorRegistry();
 		}
 		return fRegistry;
 	}
@@ -186,7 +186,7 @@ public class ProblemsLabelDecorator implements ILabelDecorator, ILightweightLabe
 				return 0;
 			}
 			
-			CUIPlugin.getDefault().log(e);
+			FortranUIPlugin.getDefault().log(e);
 		}
 		return 0;
 	}
@@ -233,7 +233,7 @@ public class ProblemsLabelDecorator implements ILabelDecorator, ILightweightLabe
 	private int getErrorTicksFromWorkingCopy(ITranslationUnit original, ISourceReference sourceElement) throws CoreException {
 		int info= 0;
 		FileEditorInput editorInput= new FileEditorInput((IFile) original.getResource());
-//		IAnnotationModel model= CUIPlugin.getDefault().getTranslationUnitDocumentProvider().getAnnotationModel(editorInput);
+//		IAnnotationModel model= FortranUIPlugin.getDefault().getTranslationUnitDocumentProvider().getAnnotationModel(editorInput);
 //		if (model != null) {
 //			Iterator iter= model.getAnnotationIterator();
 //			while ((info != ERRORTICK_ERROR) && iter.hasNext()) {
@@ -291,7 +291,7 @@ public class ProblemsLabelDecorator implements ILabelDecorator, ILightweightLabe
 	 */
 	public void dispose() {
 		if (fProblemChangedListener != null) {
-			CUIPlugin.getDefault().getProblemMarkerManager().removeListener(fProblemChangedListener);
+			FortranUIPlugin.getDefault().getProblemMarkerManager().removeListener(fProblemChangedListener);
 			fProblemChangedListener= null;
 		}
 		if (fRegistry != null && fUseNewRegistry) {
@@ -320,7 +320,7 @@ public class ProblemsLabelDecorator implements ILabelDecorator, ILightweightLabe
 					fireProblemsChanged(changedResources, isMarkerChange);
 				}
 			};
-			CUIPlugin.getDefault().getProblemMarkerManager().addListener(fProblemChangedListener);
+			FortranUIPlugin.getDefault().getProblemMarkerManager().addListener(fProblemChangedListener);
 		}
 	}	
 
@@ -331,7 +331,7 @@ public class ProblemsLabelDecorator implements ILabelDecorator, ILightweightLabe
 		if (fListeners != null) {
 			fListeners.remove(listener);
 			if (fListeners.isEmpty() && fProblemChangedListener != null) {
-				CUIPlugin.getDefault().getProblemMarkerManager().removeListener(fProblemChangedListener);
+				FortranUIPlugin.getDefault().getProblemMarkerManager().removeListener(fProblemChangedListener);
 				fProblemChangedListener= null;
 			}
 		}
@@ -353,9 +353,9 @@ public class ProblemsLabelDecorator implements ILabelDecorator, ILightweightLabe
 	public void decorate(Object element, IDecoration decoration) { 
 		int adornmentFlags= computeAdornmentFlags(element);
 		if (adornmentFlags == ERRORTICK_ERROR) {
-			decoration.addOverlay(CPluginImages.DESC_OVR_ERROR);
+			decoration.addOverlay(FortranPluginImages.DESC_OVR_ERROR);
 		} else if (adornmentFlags == ERRORTICK_WARNING) {
-			decoration.addOverlay(CPluginImages.DESC_OVR_WARNING);
+			decoration.addOverlay(FortranPluginImages.DESC_OVR_WARNING);
 		}		
 	}
 

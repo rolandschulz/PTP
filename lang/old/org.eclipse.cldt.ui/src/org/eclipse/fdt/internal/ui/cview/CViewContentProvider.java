@@ -149,7 +149,7 @@ public class CViewContentProvider extends CElementContentProvider {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.fdt.internal.ui.BaseCElementContentProvider#internalGetParent(java.lang.Object)
+	 * @see org.eclipse.fdt.internal.ui.BaseFortranElementContentProvider#internalGetParent(java.lang.Object)
 	 */
 	public Object internalGetParent(Object element) {
 		// since we insert logical containers we have to fix

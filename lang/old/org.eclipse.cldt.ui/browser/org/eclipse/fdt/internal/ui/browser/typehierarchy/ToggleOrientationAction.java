@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.fdt.internal.ui.browser.typehierarchy;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.util.Assert;
@@ -31,22 +31,22 @@ public class ToggleOrientationAction extends Action {
 			setText(TypeHierarchyMessages.getString("ToggleOrientationAction.horizontal.label")); //$NON-NLS-1$
 			setDescription(TypeHierarchyMessages.getString("ToggleOrientationAction.horizontal.description")); //$NON-NLS-1$
 			setToolTipText(TypeHierarchyMessages.getString("ToggleOrientationAction.horizontal.tooltip")); //$NON-NLS-1$
-			CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, "th_horizontal.gif"); //$NON-NLS-1$
+			FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, "th_horizontal.gif"); //$NON-NLS-1$
 		} else if (orientation == TypeHierarchyViewPart.VIEW_ORIENTATION_VERTICAL) {
 			setText(TypeHierarchyMessages.getString("ToggleOrientationAction.vertical.label")); //$NON-NLS-1$
 			setDescription(TypeHierarchyMessages.getString("ToggleOrientationAction.vertical.description")); //$NON-NLS-1$
 			setToolTipText(TypeHierarchyMessages.getString("ToggleOrientationAction.vertical.tooltip")); //$NON-NLS-1$	
-			CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, "th_vertical.gif"); //$NON-NLS-1$
+			FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, "th_vertical.gif"); //$NON-NLS-1$
 		} else if (orientation == TypeHierarchyViewPart.VIEW_ORIENTATION_AUTOMATIC) {
 			setText(TypeHierarchyMessages.getString("ToggleOrientationAction.automatic.label")); //$NON-NLS-1$
 			setDescription(TypeHierarchyMessages.getString("ToggleOrientationAction.automatic.description")); //$NON-NLS-1$
 			setToolTipText(TypeHierarchyMessages.getString("ToggleOrientationAction.automatic.tooltip")); //$NON-NLS-1$	
-			CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, "th_automatic.gif"); //$NON-NLS-1$
+			FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, "th_automatic.gif"); //$NON-NLS-1$
 		} else if (orientation == TypeHierarchyViewPart.VIEW_ORIENTATION_SINGLE) {
 			setText(TypeHierarchyMessages.getString("ToggleOrientationAction.single.label")); //$NON-NLS-1$
 			setDescription(TypeHierarchyMessages.getString("ToggleOrientationAction.single.description")); //$NON-NLS-1$
 			setToolTipText(TypeHierarchyMessages.getString("ToggleOrientationAction.single.tooltip")); //$NON-NLS-1$	
-			CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, "th_single.gif"); //$NON-NLS-1$
+			FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, "th_single.gif"); //$NON-NLS-1$
 		} else {
 			Assert.isTrue(false);
 		}

@@ -13,18 +13,18 @@ import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.IParent;
 import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
 import org.eclipse.fdt.ui.CElementLabelProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 /**
  * An imlementation of the IWorkbenchAdapter for CElements.
  */
-public class CWorkbenchAdapter implements IWorkbenchAdapter {
+public class FortranWorkbenchAdapter implements IWorkbenchAdapter {
 
 	private static final Object[] fgEmptyArray = new Object[0];
 	private CElementImageProvider fImageProvider;
 	private CElementLabelProvider fLabelProvider;
 
-	public CWorkbenchAdapter() {
+	public FortranWorkbenchAdapter() {
 		fImageProvider = new CElementImageProvider();
 		fLabelProvider = new CElementLabelProvider();
 	}
@@ -40,7 +40,7 @@ public class CWorkbenchAdapter implements IWorkbenchAdapter {
 					return members;
 				}
 			} catch (CModelException e) {
-				CUIPlugin.getDefault().log(e);
+				FortranUIPlugin.getDefault().log(e);
 			}
 		}
 		return fgEmptyArray;

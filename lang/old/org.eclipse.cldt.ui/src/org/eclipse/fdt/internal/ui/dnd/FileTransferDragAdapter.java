@@ -26,9 +26,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.fdt.internal.ui.CUIMessages;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.util.Assert;
@@ -94,8 +94,8 @@ public class FileTransferDragAdapter implements TransferDragSourceListener {
 
 		public void execute(IProgressMonitor monitor) throws CoreException {
 			try {
-				monitor.beginTask(CUIMessages.getString("DragAdapter.refreshing"), roots.size()); //$NON-NLS-1$
-				MultiStatus status = new MultiStatus(CUIPlugin.getPluginId(), IStatus.OK, CUIMessages.getString("DragAdapter.problem"), null); //$NON-NLS-1$
+				monitor.beginTask(FortranUIMessages.getString("DragAdapter.refreshing"), roots.size()); //$NON-NLS-1$
+				MultiStatus status = new MultiStatus(FortranUIPlugin.getPluginId(), IStatus.OK, FortranUIMessages.getString("DragAdapter.problem"), null); //$NON-NLS-1$
 
 				for (Iterator iterator = roots.iterator(); iterator.hasNext();) {
 					IResource resource = (IResource) iterator.next();
@@ -172,7 +172,7 @@ public class FileTransferDragAdapter implements TransferDragSourceListener {
 		boolean fork,
 		boolean cancelable) {
 		try {
-			IWorkbench workbench = CUIPlugin.getDefault().getWorkbench();
+			IWorkbench workbench = FortranUIPlugin.getDefault().getWorkbench();
 			IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
 			Shell parent = window.getShell();
 
@@ -180,8 +180,8 @@ public class FileTransferDragAdapter implements TransferDragSourceListener {
 		} catch (InterruptedException e) {
 			// Do nothing. Operation has been canceled by user.
 		} catch (InvocationTargetException e) {
-			String message = CUIMessages.getString("Problem while moving or copying files."); //$NON-NLS-1$
-			String title = CUIMessages.getString("Drag & Drop"); //$NON-NLS-1$
+			String message = FortranUIMessages.getString("Problem while moving or copying files."); //$NON-NLS-1$
+			String title = FortranUIMessages.getString("Drag & Drop"); //$NON-NLS-1$
 
 			ExceptionHandler.handle(e, title, message);
 		}

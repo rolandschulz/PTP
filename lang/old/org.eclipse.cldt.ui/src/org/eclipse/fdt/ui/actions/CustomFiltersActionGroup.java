@@ -34,7 +34,7 @@ import org.eclipse.fdt.internal.ui.filters.CustomFiltersDialog;
 import org.eclipse.fdt.internal.ui.filters.FilterDescriptor;
 import org.eclipse.fdt.internal.ui.filters.FilterMessages;
 import org.eclipse.fdt.internal.ui.filters.NamePatternFilter;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.GroupMarker;
@@ -70,7 +70,7 @@ public class CustomFiltersActionGroup extends ActionGroup {
 	class ShowFilterDialogAction extends Action {
 		ShowFilterDialogAction() {
 			setText(FilterMessages.getString("OpenCustomFiltersDialogAction.text")); //$NON-NLS-1$
-			//setImageDescriptor(CPluginImages.DESC_CLCL_FILTER);
+			//setImageDescriptor(FortranPluginImages.DESC_CLCL_FILTER);
 		}
 		
 		public void run() {
@@ -416,7 +416,7 @@ public class CustomFiltersActionGroup extends ActionGroup {
 			String id= filterDescs[i].getId();
 			Boolean isEnabled= new Boolean(filterDescs[i].isEnabled());
 			//if (fEnabledFilterIds.containsKey(id))
-			//	CUIPlugin.getDefault().log(new Status("WARNING: Duplicate id for extension-point \"org.eclipse.jdt.ui.CElementFilters\"")); //$NON-NLS-1$
+			//	FortranUIPlugin.getDefault().log(new Status("WARNING: Duplicate id for extension-point \"org.eclipse.jdt.ui.CElementFilters\"")); //$NON-NLS-1$
 			fEnabledFilterIds.put(id, isEnabled);
 			fFilterDescriptorMap.put(id, filterDescs[i]);
 		}
@@ -498,7 +498,7 @@ public class CustomFiltersActionGroup extends ActionGroup {
 		
 	private void initializeWithViewDefaults() {
 		// get default values for view
-		IPreferenceStore store= CUIPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore store= FortranUIPlugin.getDefault().getPreferenceStore();
 
 		// XXX: can be removed once bug 22533 is fixed.
 		if (!store.contains(getPreferenceKey("TAG_DUMMY_TO_TEST_EXISTENCE")))//$NON-NLS-1$
@@ -530,7 +530,7 @@ public class CustomFiltersActionGroup extends ActionGroup {
 
 	private void storeViewDefaults() {
 		// get default values for view
-		IPreferenceStore store= CUIPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore store= FortranUIPlugin.getDefault().getPreferenceStore();
 
 		// XXX: can be removed once bug 22533 is fixed.
 		store.setValue(getPreferenceKey("TAG_DUMMY_TO_TEST_EXISTENCE"), "storedViewPreferences");//$NON-NLS-1$//$NON-NLS-2$

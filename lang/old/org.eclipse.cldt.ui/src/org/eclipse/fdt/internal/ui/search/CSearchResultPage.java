@@ -23,14 +23,14 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.search.BasicSearchMatch;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.editor.ExternalSearchFile;
 import org.eclipse.fdt.internal.ui.search.actions.GroupAction;
 import org.eclipse.fdt.internal.ui.search.actions.SortAction;
 import org.eclipse.fdt.internal.ui.util.EditorUtility;
 import org.eclipse.fdt.ui.CSearchResultLabelProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -87,16 +87,16 @@ public class CSearchResultPage extends AbstractTextSearchViewPage {
 	 */
 	private void initGroupingActions() {
 		_groupProjectAction= new GroupAction(CSearchMessages.getString("CSearchResultPage.groupby_project"),CSearchMessages.getString("CSearchResultPage.groupby_project.tooltip"), this, LevelTreeContentProvider.LEVEL_PROJECT); //$NON-NLS-1$ //$NON-NLS-2$
-		_groupProjectAction.setImageDescriptor(CPluginImages.DESC_OBJS_SEARCHHIERPROJECT);
+		_groupProjectAction.setImageDescriptor(FortranPluginImages.DESC_OBJS_SEARCHHIERPROJECT);
 		
 		_groupFoldersAction= new GroupAction(CSearchMessages.getString("CSearchResultPage.groupby_folder"), CSearchMessages.getString("CSearchResultPage.groupby_folder.tooltip"), this, LevelTreeContentProvider.LEVEL_FOLDER); //$NON-NLS-1$ //$NON-NLS-2$
-		_groupFoldersAction.setImageDescriptor(CPluginImages.DESC_OBJS_SEARCHHIERFODLER);
+		_groupFoldersAction.setImageDescriptor(FortranPluginImages.DESC_OBJS_SEARCHHIERFODLER);
 		
 		_groupFileAction= new GroupAction(CSearchMessages.getString("CSearchResultPage.groupby_file"), CSearchMessages.getString("CSearchResultPage.groupby_file.tooltip"), this, LevelTreeContentProvider.LEVEL_FILE); //$NON-NLS-1$ //$NON-NLS-2$
-		_groupFileAction.setImageDescriptor(CPluginImages.DESC_OBJS_TUNIT);
+		_groupFileAction.setImageDescriptor(FortranPluginImages.DESC_OBJS_TUNIT);
 		
 		_groupClassAction = new GroupAction(CSearchMessages.getString("CSearchResultPage.groupby_class"), CSearchMessages.getString("CSearchResultPage.groupby_class.tooltip"),this, LevelTreeContentProvider.LEVEL_CLASS);  //$NON-NLS-1$//$NON-NLS-2$
-		_groupClassAction.setImageDescriptor(CPluginImages.DESC_OBJS_CLASS);
+		_groupClassAction.setImageDescriptor(FortranPluginImages.DESC_OBJS_CLASS);
 		
 		try {
 			_currentGrouping= getSettings().getInt(KEY_GROUPING);
@@ -121,17 +121,17 @@ public class CSearchResultPage extends AbstractTextSearchViewPage {
 				e.printStackTrace();
 			} 
 		} else if (element instanceof IFile) {
-			editor= IDE.openEditor(CUIPlugin.getActivePage(), getCanonicalFile((IFile) element), false);
+			editor= IDE.openEditor(FortranUIPlugin.getActivePage(), getCanonicalFile((IFile) element), false);
 		} else if (match instanceof CSearchMatch){
 			BasicSearchMatch searchMatch = ((CSearchMatch) match).getSearchMatch();
 			if (searchMatch.resource != null){
-				editor = IDE.openEditor(CUIPlugin.getActivePage(), getCanonicalFile((IFile) searchMatch.resource), false);
+				editor = IDE.openEditor(FortranUIPlugin.getActivePage(), getCanonicalFile((IFile) searchMatch.resource), false);
 				showWithMarker(editor, getCanonicalFile((IFile) searchMatch.resource), currentOffset, currentLength);
 			}
 			else {
 				try {
 					IEditorInput input =EditorUtility.getEditorInput(new ExternalSearchFile(searchMatch.path, searchMatch));
-					IWorkbenchPage p= CUIPlugin.getActivePage();
+					IWorkbenchPage p= FortranUIPlugin.getActivePage();
 					IEditorPart editorPart= p.openEditor(input, "org.eclipse.fdt.ui.editor.ExternalSearchEditor"); //$NON-NLS-1$
 					if (editorPart instanceof ITextEditor) {
 						ITextEditor textEditor= (ITextEditor) editorPart;
@@ -291,7 +291,7 @@ public class CSearchResultPage extends AbstractTextSearchViewPage {
 		if (canonicalPath != null && (!(originalFile.isLinked()))){
 			IPath path = new Path(canonicalPath);
 			
-			IFile[] matches = CUIPlugin.getWorkspace().getRoot().findFilesForLocation(path);
+			IFile[] matches = FortranUIPlugin.getWorkspace().getRoot().findFilesForLocation(path);
 			if (matches.length > 0)
 				originalFile = matches[0];
 		}

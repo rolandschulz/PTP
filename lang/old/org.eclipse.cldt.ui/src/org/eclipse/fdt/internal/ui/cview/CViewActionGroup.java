@@ -13,7 +13,7 @@ package org.eclipse.fdt.internal.ui.cview;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -56,7 +56,7 @@ public abstract class CViewActionGroup extends ActionGroup {
 	protected ImageDescriptor getImageDescriptor(String relativePath) {
 		String iconPath = "icons/full/"; //$NON-NLS-1$
 		try {
-			URL installURL = CUIPlugin.getDefault().getBundle().getEntry("/"); //$NON-NLS-1$
+			URL installURL = FortranUIPlugin.getDefault().getBundle().getEntry("/"); //$NON-NLS-1$
 			URL url = new URL(installURL, iconPath + relativePath);
 			return ImageDescriptor.createFromURL(url);
 		} catch (MalformedURLException e) {

@@ -8,7 +8,7 @@ package org.eclipse.fdt.ui;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.Assert;
@@ -163,22 +163,22 @@ public class CElementImageDescriptor extends CompositeImageDescriptor {
 		int x= getSize().x;
 		ImageData data= null;
 		if ((fFlags & VOLATILE) != 0) {
-			data= CPluginImages.DESC_OVR_VOLATILE.getImageData();
+			data= FortranPluginImages.DESC_OVR_VOLATILE.getImageData();
 			x-= data.width;
 			drawImage(data, x, 0);
 		}
 		if ((fFlags & CONSTANT) != 0) {
-			data= CPluginImages.DESC_OVR_CONSTANT.getImageData();
+			data= FortranPluginImages.DESC_OVR_CONSTANT.getImageData();
 			x-= data.width;
 			drawImage(data, x, 0);
 		}
 		if ((fFlags & STATIC) != 0) {
-			data= CPluginImages.DESC_OVR_STATIC.getImageData();
+			data= FortranPluginImages.DESC_OVR_STATIC.getImageData();
 			x-= data.width;
 			drawImage(data, x, 0);
 		} 
 		if ((fFlags & TEMPLATE) != 0) {
-			data= CPluginImages.DESC_OVR_TEMPLATE.getImageData();
+			data= FortranPluginImages.DESC_OVR_TEMPLATE.getImageData();
 			x-= data.width;
 			drawImage(data, x, 0);
 		}
@@ -189,22 +189,22 @@ public class CElementImageDescriptor extends CompositeImageDescriptor {
 		//int x= size.x;
 		//ImageData data= null;
 		 /*if ((fFlags & SYNCHRONIZED) != 0) {
-			data= CPluginImages.DESC_OVR_SYNCH.getImageData();
+			data= FortranPluginImages.DESC_OVR_SYNCH.getImageData();
 			x-= data.width;
 			drawImage(data, x, size.y - data.height);
 		}
 		if ((fFlags & RUNNABLE) != 0) {
-			data= CPluginImages.DESC_OVR_RUN.getImageData();
+			data= FortranPluginImages.DESC_OVR_RUN.getImageData();
 			x-= data.width;
 			drawImage(data, x, size.y - data.height);
 		}
 		if ((fFlags & OVERRIDES) != 0) {
-			data= CPluginImages.DESC_OVR_OVERRIDES.getImageData();
+			data= FortranPluginImages.DESC_OVR_OVERRIDES.getImageData();
 			x-= data.width;
 			drawImage(data, x, size.y - data.height);
 		}
 		if ((fFlags & IMPLEMENTS) != 0) {
-			data= CPluginImages.DESC_OVR_IMPLEMENTS.getImageData();
+			data= FortranPluginImages.DESC_OVR_IMPLEMENTS.getImageData();
 			x-= data.width;
 			drawImage(data, x, size.y - data.height);
 		}	*/		
@@ -215,12 +215,12 @@ public class CElementImageDescriptor extends CompositeImageDescriptor {
 		int x= 0;
 		ImageData data= null;
 		if ((fFlags & ERROR) != 0) {
-			data= CPluginImages.DESC_OVR_ERROR.getImageData();
+			data= FortranPluginImages.DESC_OVR_ERROR.getImageData();
 			drawImage(data, x, size.y - data.height);
 			x+= data.width;
 		}
 		if ((fFlags & WARNING) != 0) {
-			data= CPluginImages.DESC_OVR_WARNING.getImageData();
+			data= FortranPluginImages.DESC_OVR_WARNING.getImageData();
 			drawImage(data, x, size.y - data.height);
 			x+= data.width;
 		}

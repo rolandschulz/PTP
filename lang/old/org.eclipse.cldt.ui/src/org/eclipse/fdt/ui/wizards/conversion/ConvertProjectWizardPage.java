@@ -21,9 +21,9 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.FortranProjectNature;
-import org.eclipse.fdt.internal.ui.CUIMessages;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
 import org.eclipse.fdt.internal.ui.util.SWTUtil;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.utils.ui.controls.ControlFactory;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -145,7 +145,7 @@ public abstract class ConvertProjectWizardPage
     protected void addToMainPage(Composite container){
        
 		// Add convert to C or C/C++ buttons
-		Composite area = ControlFactory.createGroup(container, CUIMessages.getString("ConvertProjectWizardPage.convertTo"), 2); //$NON-NLS-1$
+		Composite area = ControlFactory.createGroup(container, FortranUIMessages.getString("ConvertProjectWizardPage.convertTo"), 2); //$NON-NLS-1$
 		
 
 		SelectionListener cListener =  new SelectionAdapter() {
@@ -156,12 +156,12 @@ public abstract class ConvertProjectWizardPage
 			}
 		};
 		cRadioButton = ControlFactory.createRadioButton(area, 
-							  CUIMessages.getString("ConvertProjectWizardPage.CProject"), //$NON-NLS-1$
+							  FortranUIMessages.getString("ConvertProjectWizardPage.CProject"), //$NON-NLS-1$
 							  "C ", //$NON-NLS-1$
 			  			      cListener);
 		cRadioButton.setSelection(convertToC);			  			      
 		ccRadioButton = ControlFactory.createRadioButton(area, 
-							  CUIMessages.getString("ConvertProjectWizardPage.CppProject"), //$NON-NLS-1$
+							  FortranUIMessages.getString("ConvertProjectWizardPage.CppProject"), //$NON-NLS-1$
 							  "C++", //$NON-NLS-1$
 			  			      cListener);	
 		ccRadioButton.setSelection(convertToCC);			  			      
@@ -184,7 +184,7 @@ public abstract class ConvertProjectWizardPage
 
         // Add a label
         Label label = new Label(parent, SWT.LEFT);
-        label.setText(CUIPlugin.getResourceString(PROJECT_LIST));
+        label.setText(FortranUIPlugin.getResourceString(PROJECT_LIST));
         
         Composite  container = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout();
@@ -260,7 +260,7 @@ public abstract class ConvertProjectWizardPage
         
         
         selectAllButton= new Button(buttons, SWT.PUSH);
-        selectAllButton.setText(CUIMessages.getString("ConvertProjectWizardPage.SelectAll")); //$NON-NLS-1$
+        selectAllButton.setText(FortranUIMessages.getString("ConvertProjectWizardPage.SelectAll")); //$NON-NLS-1$
         selectAllButton.setLayoutData(getButtonGridData(selectAllButton));
         selectAllButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event e) {
@@ -272,7 +272,7 @@ public abstract class ConvertProjectWizardPage
         });
 
         deselectAllButton= new Button(buttons, SWT.PUSH);
-        deselectAllButton.setText(CUIMessages.getString("ConvertProjectWizardPage.DeselectAll")); //$NON-NLS-1$
+        deselectAllButton.setText(FortranUIMessages.getString("ConvertProjectWizardPage.DeselectAll")); //$NON-NLS-1$
         deselectAllButton.setLayoutData(getButtonGridData(deselectAllButton));
         deselectAllButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event e) {
@@ -386,7 +386,7 @@ public abstract class ConvertProjectWizardPage
      */
     protected Object[] getElements() {
 
-        IWorkspace workspace = CUIPlugin.getWorkspace();
+        IWorkspace workspace = FortranUIPlugin.getWorkspace();
         IProject[] projects = workspace.getRoot().getProjects();
         Vector     candidates = new Vector(projects.length);
         IProject   next = null;
@@ -436,7 +436,7 @@ public abstract class ConvertProjectWizardPage
             if (monitor == null) {
                 monitor = new NullProgressMonitor();
             }
-            monitor.beginTask(CUIPlugin.getResourceString(KEY_TITLE), 1);
+            monitor.beginTask(FortranUIPlugin.getResourceString(KEY_TITLE), 1);
             convertProjects(selection, monitor, projectID);
         }
     }
@@ -452,7 +452,7 @@ public abstract class ConvertProjectWizardPage
      */
     private void convertProjects(Object[] selected, IProgressMonitor monitor, String projectID)
                           throws CoreException {
-        monitor.beginTask(CUIPlugin.getResourceString(KEY_CONVERTING), 
+        monitor.beginTask(FortranUIPlugin.getResourceString(KEY_CONVERTING), 
                           selected.length);
 		try {
 	        for (int i = 0; i < selected.length; i++) {

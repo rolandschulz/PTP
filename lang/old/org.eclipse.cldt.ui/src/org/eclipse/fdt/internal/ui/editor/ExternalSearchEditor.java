@@ -10,7 +10,7 @@ Contributors:
 **********************************************************************/
 package org.eclipse.fdt.internal.ui.editor;
 
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
@@ -19,7 +19,7 @@ public class ExternalSearchEditor extends CEditor {
 	
 	public ExternalSearchEditor(){
 		super();
-		setDocumentProvider(CUIPlugin.getDefault().getExternalSearchDocumentProvider());
+		setDocumentProvider(FortranUIPlugin.getDefault().getExternalSearchDocumentProvider());
 	}
 	public void editorContextMenuAboutToShow(IMenuManager menu) {
 	  super.editorContextMenuAboutToShow(menu);

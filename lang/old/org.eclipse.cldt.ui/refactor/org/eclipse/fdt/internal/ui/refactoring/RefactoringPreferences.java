@@ -15,7 +15,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 
 import org.eclipse.fdt.internal.corext.refactoring.base.RefactoringStatus;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 
 public class RefactoringPreferences {
@@ -24,7 +24,7 @@ public class RefactoringPreferences {
 	public static final String PREF_SAVE_ALL_EDITORS= PreferenceConstants.REFACTOR_SAVE_ALL_EDITORS;
 	
 	public static int getCheckPassedSeverity() {
-		String value= CUIPlugin.getDefault().getPreferenceStore().getString(PREF_ERROR_PAGE_SEVERITY_THRESHOLD);
+		String value= FortranUIPlugin.getDefault().getPreferenceStore().getString(PREF_ERROR_PAGE_SEVERITY_THRESHOLD);
 		try {
 			return Integer.valueOf(value).intValue() - 1;
 		} catch (NumberFormatException e) {
@@ -45,12 +45,12 @@ public class RefactoringPreferences {
 	}
 	
 	public static boolean getSaveAllEditors() {
-		IPreferenceStore store= CUIPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore store= FortranUIPlugin.getDefault().getPreferenceStore();
 		return store.getBoolean(PREF_SAVE_ALL_EDITORS);
 	}
 	
 	public static void setSaveAllEditors(boolean save) {
-		IPreferenceStore store= CUIPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore store= FortranUIPlugin.getDefault().getPreferenceStore();
 		store.setValue(RefactoringPreferences.PREF_SAVE_ALL_EDITORS, save);
 	}	
 }

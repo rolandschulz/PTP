@@ -30,7 +30,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.internal.ui.text.CHelpBookDescriptor;
 import org.eclipse.fdt.internal.ui.text.CHelpSettings;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.ICHelpResourceDescriptor;
 import org.eclipse.fdt.ui.IFunctionSummary;
 import org.eclipse.fdt.ui.text.ICHelpInvocationContext;
@@ -44,7 +44,7 @@ import org.xml.sax.SAXException;
  * C/C++ help information through the CHelpProvider extension point
  */
 
-public class CHelpProviderManager {
+public class FortranHelpProviderManager {
 	final private static String C_HELP_SETTINGS_FILE_NAME = "cHelpSettings.xml"; //$NON-NLS-1$
 	final private static String ELEMENT_ROOT = "cHelpSettings"; //$NON-NLS-1$
 
@@ -52,17 +52,17 @@ public class CHelpProviderManager {
 	private static CHelpSettings fDefaultHelpSettings = null;
 	
 	private static File fSettingsFile = null;
-	static private CHelpProviderManager fInstance = null;
+	static private FortranHelpProviderManager fInstance = null;
 
 	private static IProject fCurrentProject = null;
 	private static CHelpSettings fCurrentSettings = null;
 
-	private CHelpProviderManager() {
+	private FortranHelpProviderManager() {
 	}
 	
 	private static File getSettingsFile(){
 		if(fSettingsFile == null){
-			fSettingsFile = CUIPlugin.getDefault().getStateLocation().append(C_HELP_SETTINGS_FILE_NAME).toFile();
+			fSettingsFile = FortranUIPlugin.getDefault().getStateLocation().append(C_HELP_SETTINGS_FILE_NAME).toFile();
 		}
 		return fSettingsFile;
 	}
@@ -149,9 +149,9 @@ public class CHelpProviderManager {
 		return project;
 	}
 
-	public static CHelpProviderManager getDefault() {
+	public static FortranHelpProviderManager getDefault() {
 		if (fInstance == null) {
-			fInstance = new CHelpProviderManager();
+			fInstance = new FortranHelpProviderManager();
 		}
 		return fInstance;
 	}

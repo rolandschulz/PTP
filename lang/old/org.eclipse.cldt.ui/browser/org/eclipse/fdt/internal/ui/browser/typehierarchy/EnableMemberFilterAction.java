@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.fdt.internal.ui.browser.typehierarchy;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -28,7 +28,7 @@ public class EnableMemberFilterAction extends Action {
 		setDescription(TypeHierarchyMessages.getString("EnableMemberFilterAction.description")); //$NON-NLS-1$
 		setToolTipText(TypeHierarchyMessages.getString("EnableMemberFilterAction.tooltip")); //$NON-NLS-1$
 		
-		CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, "impl_co.gif"); //$NON-NLS-1$
+		FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, "impl_co.gif"); //$NON-NLS-1$
 
 		fView= v;
 		setChecked(initValue);

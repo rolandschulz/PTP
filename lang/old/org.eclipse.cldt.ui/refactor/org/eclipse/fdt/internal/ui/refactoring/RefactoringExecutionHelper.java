@@ -44,7 +44,7 @@ import org.eclipse.fdt.internal.corext.refactoring.base.RefactoringStatus;
 import org.eclipse.fdt.internal.ui.refactoring.AbortChangeExceptionHandler;
 import org.eclipse.fdt.internal.ui.refactoring.ChangeExceptionHandler;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 /**
  * A helper class to execute a refactoring. The class takes care of pushing the
@@ -210,7 +210,7 @@ public class RefactoringExecutionHelper {
 	}
 	
 	private static IRewriteTarget[] getRewriteTargets() {
-		IEditorPart[] editors= CUIPlugin.getInstanciatedEditors();
+		IEditorPart[] editors= FortranUIPlugin.getInstanciatedEditors();
 		List result= new ArrayList(editors.length);
 		for (int i= 0; i < editors.length; i++) {
 			IRewriteTarget target= (IRewriteTarget)editors[i].getAdapter(IRewriteTarget.class);

@@ -94,7 +94,7 @@ public class CFormatter {
 //	private boolean isInsideCommentOrString(String string, int offset) {
 //
 //		IDocument document= new Document(string);
-//		CUIPlugin.getDefault().getTextTools().setupCDocument(document);
+//		FortranUIPlugin.getDefault().getTextTools().setupCDocument(document);
 //
 //		try {		
 //			ITypedRegion partition= document.getPartition(offset);

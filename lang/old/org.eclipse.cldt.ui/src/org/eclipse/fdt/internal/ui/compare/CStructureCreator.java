@@ -28,7 +28,7 @@ import org.eclipse.fdt.core.parser.ParserLanguage;
 import org.eclipse.fdt.core.parser.ParserMode;
 import org.eclipse.fdt.core.parser.ParserUtil;
 import org.eclipse.fdt.core.parser.ScannerInfo;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 /**
@@ -45,7 +45,7 @@ public class CStructureCreator implements IStructureCreator {
 	 * @see IStructureCreator#getTitle
 	 */
 	public String getName() {
-		return CUIPlugin.getResourceString(NAME);
+		return FortranUIPlugin.getResourceString(NAME);
 	}
 
 	/**

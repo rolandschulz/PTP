@@ -27,10 +27,10 @@ import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.core.parser.IScannerInfo;
 import org.eclipse.fdt.core.parser.IScannerInfoProvider;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.fdt.internal.ui.util.EditorUtility;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -57,11 +57,11 @@ public class OpenIncludeAction extends Action {
 
 
 	public OpenIncludeAction(ISelectionProvider provider) {
-		super(CUIPlugin.getResourceString(PREFIX + "label")); //$NON-NLS-1$
-		setDescription(CUIPlugin.getResourceString(PREFIX + "description")); //$NON-NLS-1$
-		setToolTipText(CUIPlugin.getResourceString(PREFIX + "tooltip")); //$NON-NLS-1$
+		super(FortranUIPlugin.getResourceString(PREFIX + "label")); //$NON-NLS-1$
+		setDescription(FortranUIPlugin.getResourceString(PREFIX + "description")); //$NON-NLS-1$
+		setToolTipText(FortranUIPlugin.getResourceString(PREFIX + "tooltip")); //$NON-NLS-1$
 		
-		CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, CPluginImages.IMG_MENU_OPEN_INCLUDE);
+		FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, FortranPluginImages.IMG_MENU_OPEN_INCLUDE);
 		
 		fSelectionProvider= provider;
 	}
@@ -120,9 +120,9 @@ public class OpenIncludeAction extends Action {
 				}
 			} 
 		} catch (CModelException e) {
-			CUIPlugin.getDefault().log(e.getStatus());
+			FortranUIPlugin.getDefault().log(e.getStatus());
 		} catch (CoreException e) {
-			CUIPlugin.getDefault().log(e.getStatus());
+			FortranUIPlugin.getDefault().log(e.getStatus());
 		}
 	}
 
@@ -130,9 +130,9 @@ public class OpenIncludeAction extends Action {
 	 * 
 	 */
 	private void noElementsFound() {
-		MessageBox errorMsg = new MessageBox(CUIPlugin.getActiveWorkbenchShell(), SWT.ICON_ERROR | SWT.OK);
-		errorMsg.setText(CUIPlugin.getResourceString("OpenIncludeAction.error")); //$NON-NLS-1$
-		errorMsg.setMessage (CUIPlugin.getResourceString("OpenIncludeAction.error.description")); //$NON-NLS-1$
+		MessageBox errorMsg = new MessageBox(FortranUIPlugin.getActiveWorkbenchShell(), SWT.ICON_ERROR | SWT.OK);
+		errorMsg.setText(FortranUIPlugin.getResourceString("OpenIncludeAction.error")); //$NON-NLS-1$
+		errorMsg.setMessage (FortranUIPlugin.getResourceString("OpenIncludeAction.error.description")); //$NON-NLS-1$
 		errorMsg.open();
 	}
 
@@ -178,9 +178,9 @@ public class OpenIncludeAction extends Action {
 			}
 		};
 		
-		ElementListSelectionDialog dialog= new ElementListSelectionDialog(CUIPlugin.getActiveWorkbenchShell(), renderer, false, false);
-		dialog.setTitle(CUIPlugin.getResourceString(DIALOG_TITLE));
-		dialog.setMessage(CUIPlugin.getResourceString(DIALOG_MESSAGE));
+		ElementListSelectionDialog dialog= new ElementListSelectionDialog(FortranUIPlugin.getActiveWorkbenchShell(), renderer, false, false);
+		dialog.setTitle(FortranUIPlugin.getResourceString(DIALOG_TITLE));
+		dialog.setMessage(FortranUIPlugin.getResourceString(DIALOG_MESSAGE));
 		dialog.setElements(filesFound);
 		
 		if (dialog.open() == Window.OK) {

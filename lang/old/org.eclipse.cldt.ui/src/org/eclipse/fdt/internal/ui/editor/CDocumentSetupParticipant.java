@@ -13,7 +13,7 @@ package org.eclipse.fdt.internal.ui.editor;
 
 import org.eclipse.core.filebuffers.IDocumentSetupParticipant;
 import org.eclipse.fdt.internal.ui.text.CTextTools;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.IDocument;
 
 /**
@@ -30,7 +30,7 @@ public class CDocumentSetupParticipant implements IDocumentSetupParticipant {
 	 * @see org.eclipse.core.filebuffers.IDocumentSetupParticipant#setup(org.eclipse.jface.text.IDocument)
 	 */
 	public void setup(IDocument document) {
-		CTextTools tools= CUIPlugin.getDefault().getTextTools();
+		CTextTools tools= FortranUIPlugin.getDefault().getTextTools();
 		tools.setupCDocument(document);
 	}
 

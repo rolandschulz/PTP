@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.eclipse.fdt.internal.ui.preferences.OverlayPreferenceStore;
 import org.eclipse.fdt.internal.ui.preferences.OverlayPreferenceStore.OverlayKey;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.fdt.ui.text.folding.ICFoldingPreferenceBlock;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -52,7 +52,7 @@ public class DefaultCFoldingPreferenceBlock implements ICFoldingPreferenceBlock 
 	
 
 	public DefaultCFoldingPreferenceBlock() {
-		fStore= CUIPlugin.getDefault().getPreferenceStore();
+		fStore= FortranUIPlugin.getDefault().getPreferenceStore();
 		fKeys= createKeys();
 		fOverlayStore= new OverlayPreferenceStore(fStore, fKeys);
 	}

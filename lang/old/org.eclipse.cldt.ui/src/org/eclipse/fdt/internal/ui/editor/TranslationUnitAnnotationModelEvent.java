@@ -14,7 +14,7 @@ package org.eclipse.fdt.internal.ui.editor;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
@@ -59,7 +59,7 @@ public class TranslationUnitAnnotationModelEvent  extends AnnotationModelEvent {
 					fIncludesProblemMarkerAnnotations= true;
 				}
 			} catch (CoreException e) {
-				CUIPlugin.getDefault().log(e);
+				FortranUIPlugin.getDefault().log(e);
 			}
 		}	
 	}

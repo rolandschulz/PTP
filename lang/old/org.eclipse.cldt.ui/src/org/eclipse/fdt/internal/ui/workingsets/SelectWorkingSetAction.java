@@ -11,7 +11,7 @@
 package org.eclipse.fdt.internal.ui.workingsets;
 
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.util.Assert;
 import org.eclipse.jface.window.Window;
@@ -47,7 +47,7 @@ public class SelectWorkingSetAction extends Action {
 	 */
 	public void run() {
 		if (fShell == null)
-			fShell= CUIPlugin.getActiveWorkbenchShell();
+			fShell= FortranUIPlugin.getActiveWorkbenchShell();
 		IWorkingSetManager manager= PlatformUI.getWorkbench().getWorkingSetManager();
 		IWorkingSetSelectionDialog dialog= manager.createWorkingSetSelectionDialog(fShell, false);
 		IWorkingSet workingSet= fActionGroup.getWorkingSet();

@@ -13,7 +13,7 @@ package org.eclipse.fdt.internal.ui.util;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.fdt.internal.ui.editor.CEditor;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
@@ -47,7 +47,7 @@ public class CUIHelp {
 			try {
 				CHelpDisplayContext.displayHelp(fContextId, fEditor);
 			} catch (CoreException x) {
-				CUIPlugin.getDefault().log(x);
+				FortranUIPlugin.getDefault().log(x);
 			}
 		}
 	}

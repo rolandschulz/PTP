@@ -18,7 +18,7 @@ import java.util.List;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.fdt.internal.ui.CUIMessages;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
 import org.eclipse.jface.util.Assert;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -74,8 +74,8 @@ public class ResourceTransferDragAdapter implements TransferDragSourceListener {
 			DragSource dragSource = (DragSource) event.widget;
 			Control control = dragSource.getControl();
 			Shell shell = control.getShell();
-			String title = CUIMessages.getString("Drag.move.problem.title"); //$NON-NLS-1$
-			String message = CUIMessages.getString("Drag.move.problem.message"); //$NON-NLS-1$
+			String title = FortranUIMessages.getString("Drag.move.problem.title"); //$NON-NLS-1$
+			String message = FortranUIMessages.getString("Drag.move.problem.message"); //$NON-NLS-1$
 
 			ReadOnlyStateChecker checker = new ReadOnlyStateChecker(shell, title, message);
 

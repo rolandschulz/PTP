@@ -19,7 +19,7 @@ import org.eclipse.fdt.core.model.IMethodDeclaration;
 import org.eclipse.fdt.internal.ui.util.ProblemTableViewer;
 import org.eclipse.fdt.internal.ui.util.SelectionUtil;
 import org.eclipse.fdt.internal.ui.viewsupport.CElementLabels;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.actions.MemberFilterActionGroup;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -268,7 +268,7 @@ public class MethodsViewer extends ProblemTableViewer {
 					newSelection= new StructuredSelection(currElements[0]);
 				}
 			} catch (CModelException e) {
-				CUIPlugin.getDefault().log(e);
+				FortranUIPlugin.getDefault().log(e);
 			}
 		}
 		setSelection(newSelection);

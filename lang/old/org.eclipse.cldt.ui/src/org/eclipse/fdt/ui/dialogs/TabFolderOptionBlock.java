@@ -19,8 +19,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.fdt.internal.ui.CUIMessages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.utils.ui.controls.TabFolderLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -161,9 +161,9 @@ public abstract class TabFolderOptionBlock {
 				try {
 					tab.performApply(new SubProgressMonitor(monitor, 1));
 				} catch (CoreException e) {
-					CUIPlugin.errorDialog(
+					FortranUIPlugin.errorDialog(
 							composite.getShell(),
-							CUIMessages.getString("TabFolderOptionBlock.error"), CUIMessages.getString("TabFolderOptionBlock.error.settingOptions"), e, true); //$NON-NLS-1$ //$NON-NLS-2$
+							FortranUIMessages.getString("TabFolderOptionBlock.error"), FortranUIMessages.getString("TabFolderOptionBlock.error.settingOptions"), e, true); //$NON-NLS-1$ //$NON-NLS-2$
 					return false;
 				}
 			}
@@ -196,7 +196,7 @@ public abstract class TabFolderOptionBlock {
 			if (!ok) {
                 String errorMessage = tab.getErrorMessage();
                 if (!tab.getControl().isVisible()) {
-                    setErrorMessage(CUIMessages.getFormattedString(
+                    setErrorMessage(FortranUIMessages.getFormattedString(
                             "TabFolderOptionBlock.error.message", tab.getTitle())); //$NON-NLS-1$
                 } else {
                     setErrorMessage(errorMessage);

@@ -10,7 +10,7 @@
 ***********************************************************************/
 package org.eclipse.fdt.internal.ui.buildconsole;
 
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.TypedRegion;
 
 public class BuildConsolePartition extends TypedRegion {
@@ -23,7 +23,7 @@ public class BuildConsolePartition extends TypedRegion {
 	/**
 	 * Partition type
 	 */
-	public static final String CONSOLE_PARTITION_TYPE = CUIPlugin.getPluginId() + ".CONSOLE_PARTITION_TYPE"; //$NON-NLS-1$	
+	public static final String CONSOLE_PARTITION_TYPE = FortranUIPlugin.getPluginId() + ".CONSOLE_PARTITION_TYPE"; //$NON-NLS-1$	
 
 	public BuildConsolePartition(BuildConsoleStream stream, int offset, int length) {
 		super(offset, length, CONSOLE_PARTITION_TYPE);

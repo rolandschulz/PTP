@@ -42,7 +42,7 @@ import org.eclipse.fdt.internal.ui.wizards.dialogfields.IStringButtonAdapter;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.LayoutUtil;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.SelectionButtonDialogField;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.StringButtonDialogField;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -405,7 +405,7 @@ public class SourceAttachmentBlock {
 		if (fSWTWidget != null) {
 			return fSWTWidget.getShell();
 		}
-		return CUIPlugin.getActiveWorkbenchShell();
+		return FortranUIPlugin.getActiveWorkbenchShell();
 	}
 
 	/**
@@ -476,7 +476,7 @@ public class SourceAttachmentBlock {
 			public void run() {
 				String title = CPathEntryMessages.getString("SourceAttachmentBlock.putoncpdialog.title"); //$NON-NLS-1$
 				String message = CPathEntryMessages.getString("SourceAttachmentBlock.putoncpdialog.message"); //$NON-NLS-1$
-				result[0] = MessageDialog.openQuestion(CUIPlugin.getActiveWorkbenchShell(), title, message);
+				result[0] = MessageDialog.openQuestion(FortranUIPlugin.getActiveWorkbenchShell(), title, message);
 			}
 		});
 		return result[0];

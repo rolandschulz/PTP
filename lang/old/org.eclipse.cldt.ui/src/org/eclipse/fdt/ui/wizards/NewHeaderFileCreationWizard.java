@@ -10,18 +10,18 @@
  *******************************************************************************/
 package org.eclipse.fdt.ui.wizards;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.wizards.filewizard.AbstractFileCreationWizard;
 import org.eclipse.fdt.internal.ui.wizards.filewizard.NewFileWizardMessages;
 import org.eclipse.fdt.internal.ui.wizards.filewizard.NewHeaderFileCreationWizardPage;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 public class NewHeaderFileCreationWizard extends AbstractFileCreationWizard {
     
     public NewHeaderFileCreationWizard() {
         super();
-        setDefaultPageImageDescriptor(CPluginImages.DESC_WIZBAN_NEW_HEADERFILE);
-        setDialogSettings(CUIPlugin.getDefault().getDialogSettings());
+        setDefaultPageImageDescriptor(FortranPluginImages.DESC_WIZBAN_NEW_HEADERFILE);
+        setDialogSettings(FortranUIPlugin.getDefault().getDialogSettings());
         setWindowTitle(NewFileWizardMessages.getString("NewHeaderFileCreationWizard.title")); //$NON-NLS-1$
     }
     

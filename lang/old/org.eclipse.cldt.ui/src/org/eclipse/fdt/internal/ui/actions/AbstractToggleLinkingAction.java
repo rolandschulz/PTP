@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.fdt.internal.ui.actions;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.help.WorkbenchHelp;
@@ -30,7 +30,7 @@ public abstract class AbstractToggleLinkingAction extends Action {
 		super(ActionMessages.getString("ToggleLinkingAction.label")); //$NON-NLS-1$
 		setDescription(ActionMessages.getString("ToggleLinkingAction.description")); //$NON-NLS-1$
 		setToolTipText(ActionMessages.getString("ToggleLinkingAction.tooltip")); //$NON-NLS-1$
-		CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, "synced.gif"); //$NON-NLS-1$		
+		FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, "synced.gif"); //$NON-NLS-1$		
 		WorkbenchHelp.setHelp(this, ICHelpContextIds.LINK_EDITOR_ACTION);
 	}
 

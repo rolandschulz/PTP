@@ -10,11 +10,11 @@
  **********************************************************************/
 package org.eclipse.fdt.make.internal.ui.scannerconfig;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.dialogs.cpaths.CPathEntryMessages;
 import org.eclipse.fdt.internal.ui.util.ImageDescriptorRegistry;
 import org.eclipse.fdt.make.internal.ui.MakeUIPlugin;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IColorProvider;
@@ -42,10 +42,10 @@ public class DiscoveredElementLabelProvider extends LabelProvider implements ICo
 			getResourceString("ManageScannerConfigDialogCommon.discoveredGroup.annotation.disabled");//$NON-NLS-1$ 
 		
 	public DiscoveredElementLabelProvider() {
-		fRegistry = CUIPlugin.getImageDescriptorRegistry();
-		fIncludeIcon = CPluginImages.DESC_OBJS_INCLUDES_FOLDER;
-		fMacroIcon = CPluginImages.DESC_OBJS_MACRO;
-		fContainerImage = CPluginImages.DESC_OBJS_LIBRARY;
+		fRegistry = FortranUIPlugin.getImageDescriptorRegistry();
+		fIncludeIcon = FortranPluginImages.DESC_OBJS_INCLUDES_FOLDER;
+		fMacroIcon = FortranPluginImages.DESC_OBJS_MACRO;
+		fContainerImage = FortranPluginImages.DESC_OBJS_LIBRARY;
 	}
 	
 	/* (non-Javadoc)
@@ -69,7 +69,7 @@ public class DiscoveredElementLabelProvider extends LabelProvider implements ICo
 		Image image = null;
 		switch (elem.getEntryKind()) {
 			case DiscoveredElement.PATHS_GROUP:
-				image = CPluginImages.get(CPluginImages.IMG_OBJS_INCLUDES_CONTAINER);
+				image = FortranPluginImages.get(FortranPluginImages.IMG_OBJS_INCLUDES_CONTAINER);
 				break;
 			case DiscoveredElement.CONTAINER:
 				image = fRegistry.get(fContainerImage);
@@ -173,7 +173,7 @@ public class DiscoveredElementLabelProvider extends LabelProvider implements ICo
 		protected void drawOverlays() {
 			ImageData data = null;
 			if (showRemoved) {
-				data = CPluginImages.DESC_OVR_ERROR.getImageData();
+				data = FortranPluginImages.DESC_OVR_ERROR.getImageData();
 				drawImage(data, 0, 0);
 			}
 		}

@@ -20,7 +20,7 @@ import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.ISourceReference;
 import org.eclipse.fdt.internal.core.model.WorkingCopy;
 import org.eclipse.fdt.internal.ui.editor.CEditor;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -70,7 +70,7 @@ public class GoToNextPreviousMemberAction extends TextEditorAction {
         final CEditor editor = (CEditor) getTextEditor();
         final ITextSelection selection = (ITextSelection) editor.getSelectionProvider().getSelection();
         final IEditorInput editorInput = editor.getEditorInput();
-        final WorkingCopy workingCopy =  (WorkingCopy) CUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(editorInput);
+        final WorkingCopy workingCopy =  (WorkingCopy) FortranUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(editorInput);
         try {
             final ICElement[] elements =  workingCopy.getChildren();
             final Integer[] elementOffsets = createSourceIndexes(elements);
@@ -87,7 +87,7 @@ public class GoToNextPreviousMemberAction extends TextEditorAction {
                //System.out.println("Selected element class:" + selectedElement.getClass()); //$NON-NLS-1$
             }
         } catch (CModelException e) {
-        	CUIPlugin.getDefault().log(e);
+        	FortranUIPlugin.getDefault().log(e);
             //System.out.println("Exception:" + e.getMessage()); //$NON-NLS-1$
         }
     }

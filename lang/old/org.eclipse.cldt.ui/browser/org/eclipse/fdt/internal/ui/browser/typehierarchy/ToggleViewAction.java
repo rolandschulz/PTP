@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.fdt.internal.ui.browser.typehierarchy;
 
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.util.Assert;
@@ -33,13 +33,13 @@ public class ToggleViewAction extends Action {
 			contextHelpId= ICHelpContextIds.SHOW_SUPERTYPES;
 			setDescription(TypeHierarchyMessages.getString("ToggleViewAction.supertypes.description")); //$NON-NLS-1$
 			setToolTipText(TypeHierarchyMessages.getString("ToggleViewAction.supertypes.tooltip")); //$NON-NLS-1$
-			CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, "super_co.gif"); //$NON-NLS-1$
+			FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, "super_co.gif"); //$NON-NLS-1$
 		} else if (viewerIndex == TypeHierarchyViewPart.VIEW_ID_SUB) {
 			setText(TypeHierarchyMessages.getString("ToggleViewAction.subtypes.label")); //$NON-NLS-1$
 			contextHelpId= ICHelpContextIds.SHOW_SUBTYPES;
 			setDescription(TypeHierarchyMessages.getString("ToggleViewAction.subtypes.description")); //$NON-NLS-1$
 			setToolTipText(TypeHierarchyMessages.getString("ToggleViewAction.subtypes.tooltip")); //$NON-NLS-1$
-			CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, "sub_co.gif"); //$NON-NLS-1$
+			FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, "sub_co.gif"); //$NON-NLS-1$
 		} else {
 			Assert.isTrue(false);
 		}		

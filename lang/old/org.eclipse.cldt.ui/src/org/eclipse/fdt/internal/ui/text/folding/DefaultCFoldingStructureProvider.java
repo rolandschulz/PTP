@@ -28,7 +28,7 @@ import org.eclipse.fdt.core.model.ISourceRange;
 import org.eclipse.fdt.core.model.ISourceReference;
 import org.eclipse.fdt.core.model.IWorkingCopy;
 import org.eclipse.fdt.internal.ui.editor.CEditor;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IWorkingCopyManager;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.fdt.ui.text.folding.ICFoldingStructureProvider;
@@ -196,7 +196,7 @@ public class DefaultCFoldingStructureProvider implements IProjectionListener, IC
 			fAllowCollapsing= true;
 			
 			if (fEditor instanceof CEditor) {
-				IWorkingCopyManager manager= CUIPlugin.getDefault().getWorkingCopyManager();
+				IWorkingCopyManager manager= FortranUIPlugin.getDefault().getWorkingCopyManager();
 				fInput= manager.getWorkingCopy(fEditor.getEditorInput());
 			}
 
@@ -228,7 +228,7 @@ public class DefaultCFoldingStructureProvider implements IProjectionListener, IC
 	}
 
 	private void initializePreferences() {
-		IPreferenceStore store= CUIPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore store= FortranUIPlugin.getDefault().getPreferenceStore();
 		fCollapseFunctions= store.getBoolean(PreferenceConstants.EDITOR_FOLDING_FUNCTIONS);
 		fCollapseStructures= store.getBoolean(PreferenceConstants.EDITOR_FOLDING_STRUCTURES);
 		fCollapseMacros= store.getBoolean(PreferenceConstants.EDITOR_FOLDING_MACROS);

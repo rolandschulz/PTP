@@ -21,7 +21,7 @@ import org.eclipse.fdt.core.model.INamespace;
 import org.eclipse.fdt.core.model.ISourceRoot;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -54,7 +54,7 @@ public class TypesView extends CBrowsingPart {
 		if (key == IShowInTargetList.class) {
 			return new IShowInTargetList() {
 				public String[] getShowInTargetIds() {
-					return new String[] { CUIPlugin.CVIEW_ID, IPageLayout.ID_RES_NAV  };
+					return new String[] { FortranUIPlugin.CVIEW_ID, IPageLayout.ID_RES_NAV  };
 				}
 
 			};

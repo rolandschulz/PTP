@@ -23,7 +23,7 @@ import org.eclipse.fdt.core.model.IStructure;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.core.model.ITypeDef;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -86,7 +86,7 @@ public class ProjectsView extends CBrowsingPart {
 		if (key == IShowInTargetList.class) {
 			return new IShowInTargetList() {
 				public String[] getShowInTargetIds() {
-					return new String[] { CUIPlugin.CVIEW_ID, IPageLayout.ID_RES_NAV  };
+					return new String[] { FortranUIPlugin.CVIEW_ID, IPageLayout.ID_RES_NAV  };
 				}
 
 			};
@@ -132,7 +132,7 @@ public class ProjectsView extends CBrowsingPart {
 	}
 
 	protected void setInitialInput() {
-		ICElement root= CoreModel.create(CUIPlugin.getWorkspace().getRoot());
+		ICElement root= CoreModel.create(FortranUIPlugin.getWorkspace().getRoot());
 		getViewer().setInput(root);
 		updateTitle();
 	}

@@ -14,9 +14,9 @@ import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-public class CUIMessages {
+public class FortranUIMessages {
 
-	private static final String RESOURCE_BUNDLE= "org.eclipse.fdt.internal.ui.CUIMessages";//$NON-NLS-1$
+	private static final String RESOURCE_BUNDLE= "org.eclipse.fdt.internal.ui.FortranUIMessages";//$NON-NLS-1$
 
 	private static ResourceBundle fgResourceBundle;
 	static {
@@ -27,7 +27,7 @@ public class CUIMessages {
 		}
 	}
 	
-	private CUIMessages() {
+	private FortranUIMessages() {
 	}
 
 	public static String getString(String key) {

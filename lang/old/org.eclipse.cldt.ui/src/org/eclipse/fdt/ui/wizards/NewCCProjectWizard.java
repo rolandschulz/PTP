@@ -14,7 +14,7 @@ package org.eclipse.fdt.ui.wizards;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.fdt.core.FortranCorePlugin;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 
 /**
@@ -24,12 +24,12 @@ public abstract class NewCCProjectWizard extends NewCProjectWizard {
 
 	public NewCCProjectWizard() {
 		super();
-		setDialogSettings(CUIPlugin.getDefault().getDialogSettings());
+		setDialogSettings(FortranUIPlugin.getDefault().getDialogSettings());
 	}
 
 	public NewCCProjectWizard(String title, String description) {
 		super();
-		setDialogSettings(CUIPlugin.getDefault().getDialogSettings());
+		setDialogSettings(FortranUIPlugin.getDefault().getDialogSettings());
 	}
 
 

@@ -17,7 +17,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -128,7 +128,7 @@ public class OpenProjectGroup extends CViewActionGroup {
 
 	protected void makeActions() {
 		Shell shell = getCView().getSite().getShell();
-		IWorkspace workspace = CUIPlugin.getWorkspace();
+		IWorkspace workspace = FortranUIPlugin.getWorkspace();
 
 		openProjectAction = new OpenResourceAction(shell);
 		workspace.addResourceChangeListener(openProjectAction, IResourceChangeEvent.POST_CHANGE);
@@ -148,7 +148,7 @@ public class OpenProjectGroup extends CViewActionGroup {
 	}
 
 	public void dispose() {
-		IWorkspace workspace = CUIPlugin.getWorkspace();
+		IWorkspace workspace = FortranUIPlugin.getWorkspace();
 		workspace.removeResourceChangeListener(closeProjectAction);
 		workspace.removeResourceChangeListener(openProjectAction);
 	}

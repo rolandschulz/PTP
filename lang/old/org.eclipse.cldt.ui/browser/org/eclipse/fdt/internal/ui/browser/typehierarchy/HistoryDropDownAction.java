@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 import org.eclipse.fdt.core.model.ICElement;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -36,7 +36,7 @@ public class HistoryDropDownAction extends Action implements IMenuCreator {
 		fHierarchyView= view;
 		fMenu= null;
 		setToolTipText(TypeHierarchyMessages.getString("HistoryDropDownAction.tooltip")); //$NON-NLS-1$
-		CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, "history_list.gif"); //$NON-NLS-1$
+		FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, "history_list.gif"); //$NON-NLS-1$
 		WorkbenchHelp.setHelp(this, ICHelpContextIds.TYPEHIERARCHY_HISTORY_ACTION);
 		setMenuCreator(this);
 	}

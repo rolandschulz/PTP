@@ -27,14 +27,14 @@ import org.eclipse.fdt.core.model.IBinary;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.debug.core.IFDTLaunchConfigurationConstants;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
 import org.eclipse.fdt.launch.internal.ui.LaunchImages;
 import org.eclipse.fdt.launch.internal.ui.LaunchMessages;
 import org.eclipse.fdt.launch.internal.ui.LaunchUIPlugin;
 import org.eclipse.fdt.ui.CElementImageDescriptor;
 import org.eclipse.fdt.ui.CElementLabelProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.utils.pty.PTY;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -323,8 +323,8 @@ public class MainTab extends LaunchConfigurationTab {
 					if (belement.isExecutable()) {
 						Image image = super.getImage(element);
 						Point size = new Point(image.getBounds().width, image.getBounds().height);
-						return CUIPlugin.getImageDescriptorRegistry().get(
-								new CElementImageDescriptor(CPluginImages.DESC_OBJS_CEXEC, 0, size));
+						return FortranUIPlugin.getImageDescriptorRegistry().get(
+								new CElementImageDescriptor(FortranPluginImages.DESC_OBJS_CEXEC, 0, size));
 					}
 				}
 

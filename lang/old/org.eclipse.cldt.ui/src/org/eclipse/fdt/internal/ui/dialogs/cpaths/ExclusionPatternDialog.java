@@ -19,7 +19,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.dialogs.StatusDialog;
 import org.eclipse.fdt.internal.ui.dialogs.TypedElementSelectionValidator;
 import org.eclipse.fdt.internal.ui.dialogs.TypedViewerFilter;
@@ -29,7 +29,7 @@ import org.eclipse.fdt.internal.ui.wizards.dialogfields.IDialogFieldListener;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.IListAdapter;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.LayoutUtil;
 import org.eclipse.fdt.internal.ui.wizards.dialogfields.ListDialogField;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -52,8 +52,8 @@ public class ExclusionPatternDialog extends StatusDialog {
 	private static class ExclusionPatternLabelProvider extends LabelProvider {
 				
 		public Image getImage(Object element) {
-			ImageDescriptorRegistry registry= CUIPlugin.getImageDescriptorRegistry();
-			return registry.get(CPluginImages.DESC_OBJS_EXCLUSION_FILTER_ATTRIB);
+			ImageDescriptorRegistry registry= FortranUIPlugin.getImageDescriptorRegistry();
+			return registry.get(FortranPluginImages.DESC_OBJS_EXCLUSION_FILTER_ATTRIB);
 		}
 
 		public String getText(Object element) {

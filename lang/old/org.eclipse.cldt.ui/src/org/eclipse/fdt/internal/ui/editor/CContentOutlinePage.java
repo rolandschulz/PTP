@@ -10,7 +10,7 @@ import java.util.Iterator;
 
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.ITranslationUnit;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.actions.AbstractToggleLinkingAction;
 import org.eclipse.fdt.internal.ui.actions.ActionMessages;
@@ -24,7 +24,7 @@ import org.eclipse.fdt.internal.ui.search.actions.SelectionSearchGroup;
 import org.eclipse.fdt.internal.ui.util.ProblemTreeViewer;
 import org.eclipse.fdt.internal.ui.viewsupport.DecoratingCLabelProvider;
 import org.eclipse.fdt.internal.ui.viewsupport.StandardCElementLabelProvider;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.fdt.ui.actions.CustomFiltersActionGroup;
 import org.eclipse.fdt.ui.actions.MemberFilterActionGroup;
@@ -92,7 +92,7 @@ public class CContentOutlinePage extends Page implements IContentOutlinePage, IS
 			super(ActionMessages.getString("IncludesGroupingAction.label")); //$NON-NLS-1$
 			setDescription(ActionMessages.getString("IncludesGroupingAction.description")); //$NON-NLS-1$
 			setToolTipText(ActionMessages.getString("IncludeGroupingAction.tooltip")); //$NON-NLS-1$
-			CPluginImages.setImageDescriptors(this, CPluginImages.T_LCL, "synced.gif"); //$NON-NLS-1$		
+			FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, "synced.gif"); //$NON-NLS-1$		
 			PlatformUI.getWorkbench().getHelpSystem().setHelp(this, ICHelpContextIds.LINK_EDITOR_ACTION);
 
 			boolean enabled= isIncludesGroupingEnabled();
@@ -210,7 +210,7 @@ public class CContentOutlinePage extends Page implements IContentOutlinePage, IS
 	 * called to create the context menu of the outline
 	 */
 	protected void contextMenuAboutToShow(IMenuManager menu) {
-		CUIPlugin.createStandardGroups(menu);
+		FortranUIPlugin.createStandardGroups(menu);
 		
 		if (OpenViewActionGroup.canActionBeAdded(getSelection())){
 			fOpenViewActionGroup.setContext(new ActionContext(getSite().getSelectionProvider().getSelection()));

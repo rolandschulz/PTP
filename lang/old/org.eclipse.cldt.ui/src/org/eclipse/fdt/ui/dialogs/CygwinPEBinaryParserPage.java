@@ -24,8 +24,8 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.ICExtensionReference;
-import org.eclipse.fdt.internal.ui.CUIMessages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.internal.ui.FortranUIMessages;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.utils.ui.controls.ControlFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -45,10 +45,10 @@ import org.eclipse.swt.widgets.Text;
  */
 public class CygwinPEBinaryParserPage extends AbstractCOptionPage {
 
-	public final static String PREF_ADDR2LINE_PATH = CUIPlugin.PLUGIN_ID + ".addr2line"; //$NON-NLS-1$
-	public final static String PREF_CPPFILT_PATH = CUIPlugin.PLUGIN_ID + ".cppfilt"; //$NON-NLS-1$
-	public final static String PREF_CYGPATH_PATH = CUIPlugin.PLUGIN_ID + ".cygpath"; //$NON-NLS-1$
-	public final static String PREF_NM_PATH = CUIPlugin.PLUGIN_ID + ".nm"; //$NON-NLS-1$
+	public final static String PREF_ADDR2LINE_PATH = FortranUIPlugin.PLUGIN_ID + ".addr2line"; //$NON-NLS-1$
+	public final static String PREF_CPPFILT_PATH = FortranUIPlugin.PLUGIN_ID + ".cppfilt"; //$NON-NLS-1$
+	public final static String PREF_CYGPATH_PATH = FortranUIPlugin.PLUGIN_ID + ".cygpath"; //$NON-NLS-1$
+	public final static String PREF_NM_PATH = FortranUIPlugin.PLUGIN_ID + ".nm"; //$NON-NLS-1$
 
 	protected Text fAddr2LineCommandText;
 	protected Text fCPPFiltCommandText;
@@ -70,14 +70,14 @@ public class CygwinPEBinaryParserPage extends AbstractCOptionPage {
 		String cygpath = fCygPathCommandText.getText().trim();
 		String nm = fNMCommandText.getText().trim();
 
-		monitor.beginTask(CUIMessages.getString("BinaryParserPage.task.savingAttributes"), 1); //$NON-NLS-1$
+		monitor.beginTask(FortranUIMessages.getString("BinaryParserPage.task.savingAttributes"), 1); //$NON-NLS-1$
 		IProject proj = getContainer().getProject();
 		if (proj != null) {
 			String parserID = ""; //$NON-NLS-1$
 			ICDescriptor cdesc = FortranCorePlugin.getDefault().getCProjectDescription(proj, false);
 			ICExtensionReference[] cext = cdesc.get(FortranCorePlugin.BINARY_PARSER_UNIQ_ID);
 			if (cext.length > 0) {
-				IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(CUIPlugin.PLUGIN_ID, "BinaryParserPage"); //$NON-NLS-1$
+				IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(FortranUIPlugin.PLUGIN_ID, "BinaryParserPage"); //$NON-NLS-1$
 				IConfigurationElement[] infos = point.getConfigurationElements();
 				for (int i = 0; i < infos.length; i++) {
 					String id = infos[i].getAttribute("parserID"); //$NON-NLS-1$
@@ -158,13 +158,13 @@ public class CygwinPEBinaryParserPage extends AbstractCOptionPage {
 	 */
 	public void createControl(Composite composite) {
 		Group comp = new Group(composite, SWT.SHADOW_ETCHED_IN);
-		comp.setText(CUIMessages.getString("BinaryParserBlock.binaryParserOptions")); //$NON-NLS-1$
+		comp.setText(FortranUIMessages.getString("BinaryParserBlock.binaryParserOptions")); //$NON-NLS-1$
 		
 		comp.setLayout(new GridLayout(2, true));
 		comp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		((GridLayout) comp.getLayout()).makeColumnsEqualWidth = false;
 
-		Label label = ControlFactory.createLabel(comp, CUIMessages.getString("BinaryParserPage.label.addr2lineCommand")); //$NON-NLS-1$
+		Label label = ControlFactory.createLabel(comp, FortranUIMessages.getString("BinaryParserPage.label.addr2lineCommand")); //$NON-NLS-1$
 		GridData gd = new GridData();
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
@@ -177,7 +177,7 @@ public class CygwinPEBinaryParserPage extends AbstractCOptionPage {
 			}
 		});
 
-		Button button = ControlFactory.createPushButton(comp, CUIMessages.getString("BinaryParserPage.label.browse")); //$NON-NLS-1$
+		Button button = ControlFactory.createPushButton(comp, FortranUIMessages.getString("BinaryParserPage.label.browse")); //$NON-NLS-1$
 		button.addSelectionListener(new SelectionAdapter() {
 
 			public void widgetSelected(SelectionEvent evt) {
@@ -187,7 +187,7 @@ public class CygwinPEBinaryParserPage extends AbstractCOptionPage {
 
 			private void handleAddr2LineButtonSelected() {
 				FileDialog dialog = new FileDialog(getShell(), SWT.NONE);
-				dialog.setText(CUIMessages.getString("BinaryParserPage.label.addr2lineCommand")); //$NON-NLS-1$
+				dialog.setText(FortranUIMessages.getString("BinaryParserPage.label.addr2lineCommand")); //$NON-NLS-1$
 				String command = fAddr2LineCommandText.getText().trim();
 				int lastSeparatorIndex = command.lastIndexOf(File.separator);
 				if (lastSeparatorIndex != -1) {
@@ -201,7 +201,7 @@ public class CygwinPEBinaryParserPage extends AbstractCOptionPage {
 			}
 		});
 
-		label = ControlFactory.createLabel(comp, CUIMessages.getString("BinaryParserPage.label.cppfiltCommand")); //$NON-NLS-1$
+		label = ControlFactory.createLabel(comp, FortranUIMessages.getString("BinaryParserPage.label.cppfiltCommand")); //$NON-NLS-1$
 		gd = new GridData();
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
@@ -215,7 +215,7 @@ public class CygwinPEBinaryParserPage extends AbstractCOptionPage {
 				//updateLaunchConfigurationDialog();
 			}
 		});
-		button = ControlFactory.createPushButton(comp, CUIMessages.getString("BinaryParserPage.label.browse1")); //$NON-NLS-1$
+		button = ControlFactory.createPushButton(comp, FortranUIMessages.getString("BinaryParserPage.label.browse1")); //$NON-NLS-1$
 		button.addSelectionListener(new SelectionAdapter() {
 
 			public void widgetSelected(SelectionEvent evt) {
@@ -225,7 +225,7 @@ public class CygwinPEBinaryParserPage extends AbstractCOptionPage {
 
 			private void handleCPPFiltButtonSelected() {
 				FileDialog dialog = new FileDialog(getShell(), SWT.NONE);
-				dialog.setText(CUIMessages.getString("BinaryParserPage.label.cppfiltCommand")); //$NON-NLS-1$
+				dialog.setText(FortranUIMessages.getString("BinaryParserPage.label.cppfiltCommand")); //$NON-NLS-1$
 				String command = fCPPFiltCommandText.getText().trim();
 				int lastSeparatorIndex = command.lastIndexOf(File.separator);
 				if (lastSeparatorIndex != -1) {
@@ -239,7 +239,7 @@ public class CygwinPEBinaryParserPage extends AbstractCOptionPage {
 			}
 		});
 
-		label = ControlFactory.createLabel(comp, CUIMessages.getString("BinaryParserPage.label.cygpathCommand")); //$NON-NLS-1$
+		label = ControlFactory.createLabel(comp, FortranUIMessages.getString("BinaryParserPage.label.cygpathCommand")); //$NON-NLS-1$
 		gd = new GridData();
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
@@ -253,7 +253,7 @@ public class CygwinPEBinaryParserPage extends AbstractCOptionPage {
 				//updateLaunchConfigurationDialog();
 			}
 		});
-		button = ControlFactory.createPushButton(comp, CUIMessages.getString("BinaryParserPage.label.browse2")); //$NON-NLS-1$
+		button = ControlFactory.createPushButton(comp, FortranUIMessages.getString("BinaryParserPage.label.browse2")); //$NON-NLS-1$
 		button.addSelectionListener(new SelectionAdapter() {
 
 			public void widgetSelected(SelectionEvent evt) {
@@ -263,7 +263,7 @@ public class CygwinPEBinaryParserPage extends AbstractCOptionPage {
 
 			private void handleCygPathButtonSelected() {
 				FileDialog dialog = new FileDialog(getShell(), SWT.NONE);
-				dialog.setText(CUIMessages.getString("BinaryParserPage.label.cygpathCommand")); //$NON-NLS-1$
+				dialog.setText(FortranUIMessages.getString("BinaryParserPage.label.cygpathCommand")); //$NON-NLS-1$
 				String command = fCygPathCommandText.getText().trim();
 				int lastSeparatorIndex = command.lastIndexOf(File.separator);
 				if (lastSeparatorIndex != -1) {
@@ -278,7 +278,7 @@ public class CygwinPEBinaryParserPage extends AbstractCOptionPage {
 		});
 
 
-		label = ControlFactory.createLabel(comp, CUIMessages.getString("BinaryParserPage.label.nmCommand")); //$NON-NLS-1$
+		label = ControlFactory.createLabel(comp, FortranUIMessages.getString("BinaryParserPage.label.nmCommand")); //$NON-NLS-1$
 		gd = new GridData();
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
@@ -292,7 +292,7 @@ public class CygwinPEBinaryParserPage extends AbstractCOptionPage {
 				//updateLaunchConfigurationDialog();
 			}
 		});
-		button = ControlFactory.createPushButton(comp, CUIMessages.getString("BinaryParserPage.label.browse2")); //$NON-NLS-1$
+		button = ControlFactory.createPushButton(comp, FortranUIMessages.getString("BinaryParserPage.label.browse2")); //$NON-NLS-1$
 		button.addSelectionListener(new SelectionAdapter() {
 
 			public void widgetSelected(SelectionEvent evt) {
@@ -302,7 +302,7 @@ public class CygwinPEBinaryParserPage extends AbstractCOptionPage {
 
 			private void handleCygPathButtonSelected() {
 				FileDialog dialog = new FileDialog(getShell(), SWT.NONE);
-				dialog.setText(CUIMessages.getString("BinaryParserPage.label.nmCommand")); //$NON-NLS-1$
+				dialog.setText(FortranUIMessages.getString("BinaryParserPage.label.nmCommand")); //$NON-NLS-1$
 				String command = fNMCommandText.getText().trim();
 				int lastSeparatorIndex = command.lastIndexOf(File.separator);
 				if (lastSeparatorIndex != -1) {

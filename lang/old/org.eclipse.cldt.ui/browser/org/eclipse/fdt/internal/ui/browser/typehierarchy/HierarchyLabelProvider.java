@@ -17,11 +17,11 @@ import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.IMethod;
 import org.eclipse.fdt.core.model.IMethodDeclaration;
 import org.eclipse.fdt.core.model.IStructure;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
 import org.eclipse.fdt.internal.ui.viewsupport.StandardCElementLabelProvider;
 import org.eclipse.fdt.ui.CElementImageDescriptor;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -45,14 +45,14 @@ public class HierarchyLabelProvider extends StandardCElementLabelProvider // App
 		}
 		protected void drawCompositeImage(int width, int height) {
 			drawImage(getImageData(fBase), 0, 0);
-			drawImage(getImageData(CPluginImages.DESC_OVR_FOCUS), 0, 0);
+			drawImage(getImageData(FortranPluginImages.DESC_OVR_FOCUS), 0, 0);
 		}
 		
 		private ImageData getImageData(ImageDescriptor descriptor) {
 			ImageData data= descriptor.getImageData(); // see bug 51965: getImageData can return null
 			if (data == null) {
 				data= DEFAULT_IMAGE_DATA;
-				CUIPlugin.getDefault().logErrorMessage("Image data not available: " + descriptor.toString()); //$NON-NLS-1$
+				FortranUIPlugin.getDefault().logErrorMessage("Image data not available: " + descriptor.toString()); //$NON-NLS-1$
 			}
 			return data;
 		}
@@ -129,7 +129,7 @@ public class HierarchyLabelProvider extends StandardCElementLabelProvider // App
 				if (element.equals(fHierarchy.getInputElement())) {
 					desc= new FocusDescriptor(desc);
 				}
-				result= CUIPlugin.getImageDescriptorRegistry().get(desc);
+				result= FortranUIPlugin.getImageDescriptorRegistry().get(desc);
 			}
 		} else {
 			result= fImageLabelProvider.getImageLabel(element, getImageFlags());
@@ -140,7 +140,7 @@ public class HierarchyLabelProvider extends StandardCElementLabelProvider // App
 	private ImageDescriptor getTypeImageDescriptor(ICElement type) {
 		ITypeHierarchy hierarchy= fHierarchy.getHierarchy();
 		if (hierarchy == null) {
-			return new CElementImageDescriptor(CPluginImages.DESC_OBJS_CLASS, 0, CElementImageProvider.BIG_SIZE);
+			return new CElementImageDescriptor(FortranPluginImages.DESC_OBJS_CLASS, 0, CElementImageProvider.BIG_SIZE);
 		}
 		
 		ImageDescriptor desc;

@@ -20,9 +20,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.ui.CElementSorter;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -75,7 +75,7 @@ public class CElementWorkingSetPage extends WizardPage implements IWorkingSetPag
 	 * Creates a new instance of the receiver.
 	 */
 	public CElementWorkingSetPage() {
-		super(PAGE_ID, PAGE_TITLE, CPluginImages.DESC_WIZABAN_C_APP);
+		super(PAGE_ID, PAGE_TITLE, FortranPluginImages.DESC_WIZABAN_C_APP);
 		setDescription(WorkingSetMessages.getString("CElementWorkingSetPage.description")); //$NON-NLS-1$
 	}
 
@@ -148,8 +148,8 @@ public class CElementWorkingSetPage extends WizardPage implements IWorkingSetPag
 		tree.setLabelProvider(
 			new DecoratingLabelProvider(
 				new WorkbenchLabelProvider(), 
-				CUIPlugin.getDefault().getWorkbench().getDecoratorManager().getLabelDecorator()));
-		tree.setInput(CUIPlugin.getWorkspace().getRoot());
+				FortranUIPlugin.getDefault().getWorkbench().getDecoratorManager().getLabelDecorator()));
+		tree.setInput(FortranUIPlugin.getWorkspace().getRoot());
 		tree.setSorter(new CElementSorter());
 
 		data = new GridData(GridData.FILL_BOTH | GridData.GRAB_VERTICAL);

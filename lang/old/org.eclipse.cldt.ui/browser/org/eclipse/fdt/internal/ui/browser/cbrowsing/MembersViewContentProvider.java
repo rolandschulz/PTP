@@ -20,7 +20,7 @@ import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.core.model.INamespace;
 import org.eclipse.fdt.core.model.IParent;
 import org.eclipse.fdt.core.model.ISourceRoot;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.swt.widgets.Shell;
 
 class MembersViewContentProvider extends CBrowsingContentProvider {
@@ -147,6 +147,6 @@ class MembersViewContentProvider extends CBrowsingContentProvider {
 	}
 
 	protected Shell getShell() {
-		return CUIPlugin.getActiveWorkbenchShell();
+		return FortranUIPlugin.getActiveWorkbenchShell();
 	}
 }

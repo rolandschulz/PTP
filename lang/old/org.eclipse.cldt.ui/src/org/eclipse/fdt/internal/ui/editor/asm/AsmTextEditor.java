@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.fdt.internal.ui.editor.CEditorMessages;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -52,14 +52,14 @@ public class AsmTextEditor extends AbstractDecoratedTextEditor {
 	 * Initializes this editor.
 	 */
 	protected void initializeEditor() {
-		AsmTextTools textTools= CUIPlugin.getDefault().getAsmTextTools();
+		AsmTextTools textTools= FortranUIPlugin.getDefault().getAsmTextTools();
 		setSourceViewerConfiguration(new AsmSourceViewerConfiguration(textTools, this));
-		setDocumentProvider(CUIPlugin.getDefault().getDocumentProvider());
+		setDocumentProvider(FortranUIPlugin.getDefault().getDocumentProvider());
 		setRangeIndicator(new DefaultRangeIndicator());
 		// FIXME: Should this editor have a different preference store ?
 		// For now we are sharing with the CEditor and any changes will in the
 		// setting of the CEditor will be reflected in this editor.
-		setPreferenceStore(CUIPlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(FortranUIPlugin.getDefault().getPreferenceStore());
 		setEditorContextMenuId("#ASMEditorContext"); //$NON-NLS-1$
 		setRulerContextMenuId("#ASMEditorRulerContext"); //$NON-NLS-1$
 		//setOutlinerContextMenuId("#CEditorOutlinerContext"); //$NON-NLS-1$
@@ -141,7 +141,7 @@ public class AsmTextEditor extends AbstractDecoratedTextEditor {
 		// String p= event.getProperty();
 		
 		boolean affects= false;
-		AsmTextTools textTools= CUIPlugin.getDefault().getAsmTextTools();
+		AsmTextTools textTools= FortranUIPlugin.getDefault().getAsmTextTools();
 		affects |= textTools.affectsBehavior(event);
 									
 		return affects ? affects : super.affectsTextPresentation(event);

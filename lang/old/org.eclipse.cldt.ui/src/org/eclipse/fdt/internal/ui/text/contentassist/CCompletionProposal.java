@@ -13,7 +13,7 @@ package org.eclipse.fdt.internal.ui.text.contentassist;
 
 
 import org.eclipse.fdt.internal.ui.text.CTextTools;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.text.ICCompletionProposal;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -190,7 +190,7 @@ public class CCompletionProposal implements ICCompletionProposal, ICompletionPro
 			if (fTextViewer != null && string != null) {
 				int index= string.indexOf("()"); //$NON-NLS-1$
 				if (index != -1 && index + 1 == fCursorPosition) {
-					IPreferenceStore preferenceStore= CUIPlugin.getDefault().getPreferenceStore();
+					IPreferenceStore preferenceStore= FortranUIPlugin.getDefault().getPreferenceStore();
 //					if (preferenceStore.getBoolean(PreferenceConstants.EDITOR_CLOSE_BRACKETS)) {
 					if(true){
 						int newOffset= fReplacementOffset + fCursorPosition;
@@ -244,7 +244,7 @@ public class CCompletionProposal implements ICCompletionProposal, ICompletionPro
 
 			} catch (BadPositionCategoryException e) {
 				// should not happen
-				CUIPlugin.getDefault().log(e);
+				FortranUIPlugin.getDefault().log(e);
 			}
 		}
 	
@@ -261,7 +261,7 @@ public class CCompletionProposal implements ICCompletionProposal, ICompletionPro
 				 
 			} catch (BadPositionCategoryException e) {
 				// should not happen
-				CUIPlugin.getDefault().log(e);
+				FortranUIPlugin.getDefault().log(e);
 			}
 			return fPosition.getOffset();
 		}
@@ -505,7 +505,7 @@ public class CCompletionProposal implements ICCompletionProposal, ICompletionPro
 	}	
 
 	private static boolean insertCompletion() {
-		IPreferenceStore preference= CUIPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore preference= FortranUIPlugin.getDefault().getPreferenceStore();
 		return preference.getBoolean(ContentAssistPreference.AUTOINSERT);
 	}
 
@@ -529,17 +529,17 @@ public class CCompletionProposal implements ICCompletionProposal, ICompletionPro
 
 	private static Color getForegroundColor(StyledText text) {
 
-		IPreferenceStore preference= CUIPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore preference= FortranUIPlugin.getDefault().getPreferenceStore();
 		RGB rgb= PreferenceConverter.getColor(preference, ContentAssistPreference.PROPOSALS_FOREGROUND);
-		CTextTools textTools= CUIPlugin.getDefault().getTextTools();
+		CTextTools textTools= FortranUIPlugin.getDefault().getTextTools();
 		return textTools.getColorManager().getColor(rgb);
 	}
 
 	private static Color getBackgroundColor(StyledText text) {
 
-		IPreferenceStore preference= CUIPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore preference= FortranUIPlugin.getDefault().getPreferenceStore();
 		RGB rgb= PreferenceConverter.getColor(preference, ContentAssistPreference.PROPOSALS_BACKGROUND);
-		CTextTools textTools= CUIPlugin.getDefault().getTextTools();
+		CTextTools textTools= FortranUIPlugin.getDefault().getTextTools();
 		return textTools.getColorManager().getColor(rgb);
 	}
 	

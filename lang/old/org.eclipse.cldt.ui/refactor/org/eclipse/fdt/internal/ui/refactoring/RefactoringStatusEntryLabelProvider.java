@@ -15,7 +15,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.viewers.LabelProvider;
 
 import org.eclipse.fdt.internal.corext.refactoring.base.RefactoringStatusEntry;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.util.Strings;
 
 public class RefactoringStatusEntryLabelProvider extends LabelProvider{
@@ -25,12 +25,12 @@ public class RefactoringStatusEntryLabelProvider extends LabelProvider{
 		public Image getImage(Object element){
 			RefactoringStatusEntry entry= (RefactoringStatusEntry)element;
 			if (entry.isFatalError())
-				return CPluginImages.get(CPluginImages.IMG_OBJS_REFACTORING_FATAL);
+				return FortranPluginImages.get(FortranPluginImages.IMG_OBJS_REFACTORING_FATAL);
 			else if (entry.isError())
-				return CPluginImages.get(CPluginImages.IMG_OBJS_REFACTORING_ERROR);
+				return FortranPluginImages.get(FortranPluginImages.IMG_OBJS_REFACTORING_ERROR);
 			else if (entry.isWarning())	
-				return CPluginImages.get(CPluginImages.IMG_OBJS_REFACTORING_WARNING);
+				return FortranPluginImages.get(FortranPluginImages.IMG_OBJS_REFACTORING_WARNING);
 			else 
-				return CPluginImages.get(CPluginImages.IMG_OBJS_REFACTORING_INFO);
+				return FortranPluginImages.get(FortranPluginImages.IMG_OBJS_REFACTORING_INFO);
 		}
 }

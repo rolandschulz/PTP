@@ -26,14 +26,14 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 /**
  * This class implements the setting of the CUI initial preference store settings.
  */
-public class CUIPreferenceInitializer extends AbstractPreferenceInitializer {
+public class FortranUIPreferenceInitializer extends AbstractPreferenceInitializer {
 
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
 	 */
 	public void initializeDefaultPreferences() {
-		final IPreferenceStore store = CUIPlugin.getDefault().getPreferenceStore();
+		final IPreferenceStore store = FortranUIPlugin.getDefault().getPreferenceStore();
 
         PreferenceConstants.initializeDefaultValues(store);
 		CPluginPreferencePage.initDefaults(store);
@@ -45,7 +45,7 @@ public class CUIPreferenceInitializer extends AbstractPreferenceInitializer {
 		CodeAssistPreferencePage.initDefaults(store);
 
 		// We need to do this remove any keys that might have been
-		// in the CUIPlugin store prior to the move of the CEditor setting
+		// in the FortranUIPlugin store prior to the move of the CEditor setting
 		// All of those settings are now in the workbench "All TextEditor" preference Page.
 		// Later we should remove this calls, after FDT-3.0
 		EditorsUI.useAnnotationsPreferencePage(store);
@@ -54,7 +54,7 @@ public class CUIPreferenceInitializer extends AbstractPreferenceInitializer {
 	}
 
 	/*
-	 * reset to default, those constants are no longer maintain int CUIPlugin store.
+	 * reset to default, those constants are no longer maintain int FortranUIPlugin store.
 	 */
 	public static void useTextEditorPreferencePage(IPreferenceStore store) {
 		

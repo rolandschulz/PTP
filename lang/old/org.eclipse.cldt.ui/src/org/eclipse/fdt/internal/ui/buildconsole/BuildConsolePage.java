@@ -20,7 +20,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.fdt.internal.ui.preferences.BuildConsolePreferencePage;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IBuildConsoleEvent;
 import org.eclipse.fdt.ui.IBuildConsoleListener;
 import org.eclipse.jface.action.IAction;
@@ -185,7 +185,7 @@ public class BuildConsolePage extends Page
 		fMenu = manager.createContextMenu(getControl());
 		getControl().setMenu(fMenu);
 		IPageSite site = getSite();
-		site.registerContextMenu(CUIPlugin.PLUGIN_ID + ".CBuildConole", manager, getViewer()); //$NON-NLS-1$
+		site.registerContextMenu(FortranUIPlugin.PLUGIN_ID + ".CBuildConole", manager, getViewer()); //$NON-NLS-1$
 		site.setSelectionProvider(getViewer());
 		createActions();
 		configureToolBar(site.getActionBars().getToolBarManager());
@@ -193,7 +193,7 @@ public class BuildConsolePage extends Page
 
 		JFaceResources.getFontRegistry().addListener(this);
 		setFont(JFaceResources.getFont(BuildConsolePreferencePage.PREF_BUILDCONSOLE_FONT));
-		setTabs(CUIPlugin.getDefault().getPluginPreferences().getInt(BuildConsolePreferencePage.PREF_BUILDCONSOLE_TAB_WIDTH));
+		setTabs(FortranUIPlugin.getDefault().getPluginPreferences().getInt(BuildConsolePreferencePage.PREF_BUILDCONSOLE_TAB_WIDTH));
 
 		getConsole().addPropertyChangeListener(this);
 
@@ -239,7 +239,7 @@ public class BuildConsolePage extends Page
 			} else if (property.equals(BuildConsolePreferencePage.PREF_BUILDCONSOLE_FONT)) {
 				setFont(JFaceResources.getFont(BuildConsolePreferencePage.PREF_BUILDCONSOLE_FONT));
 			} else if (property.equals(BuildConsolePreferencePage.PREF_BUILDCONSOLE_TAB_WIDTH)) {
-				setTabs(CUIPlugin.getDefault().getPluginPreferences().getInt(BuildConsolePreferencePage.PREF_BUILDCONSOLE_TAB_WIDTH));
+				setTabs(FortranUIPlugin.getDefault().getPluginPreferences().getInt(BuildConsolePreferencePage.PREF_BUILDCONSOLE_TAB_WIDTH));
 			}
 		}
 

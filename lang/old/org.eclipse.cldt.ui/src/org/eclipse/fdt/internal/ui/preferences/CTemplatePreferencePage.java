@@ -14,7 +14,7 @@ package org.eclipse.fdt.internal.ui.preferences;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.text.CSourceViewerConfiguration;
 import org.eclipse.fdt.internal.ui.text.CTextTools;
-import org.eclipse.fdt.ui.CUIPlugin;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
@@ -36,9 +36,9 @@ import org.eclipse.ui.texteditor.templates.TemplatePreferencePage;
 public class CTemplatePreferencePage extends TemplatePreferencePage {
 
 	public CTemplatePreferencePage() {
-		setPreferenceStore(CUIPlugin.getDefault().getPreferenceStore());
-		setTemplateStore(CUIPlugin.getDefault().getTemplateStore());
-		setContextTypeRegistry(CUIPlugin.getDefault().getTemplateContextRegistry());
+		setPreferenceStore(FortranUIPlugin.getDefault().getPreferenceStore());
+		setTemplateStore(FortranUIPlugin.getDefault().getTemplateStore());
+		setContextTypeRegistry(FortranUIPlugin.getDefault().getTemplateContextRegistry());
 	}
 	
 	/*
@@ -61,7 +61,7 @@ public class CTemplatePreferencePage extends TemplatePreferencePage {
 	 */
 	public boolean performOk() {
 		boolean ok= super.performOk();
-		CUIPlugin.getDefault().savePluginPreferences();
+		FortranUIPlugin.getDefault().savePluginPreferences();
 		return ok;
 	}	
 	
@@ -76,7 +76,7 @@ public class CTemplatePreferencePage extends TemplatePreferencePage {
 		label.setLayoutData(data);
 		
 		SourceViewer viewer= new SourceViewer(parent, null, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-		CTextTools tools= CUIPlugin.getDefault().getTextTools();
+		CTextTools tools= FortranUIPlugin.getDefault().getTextTools();
 		viewer.configure(new CSourceViewerConfiguration(tools, null));
 		viewer.setEditable(false);
 		viewer.setDocument(new Document());

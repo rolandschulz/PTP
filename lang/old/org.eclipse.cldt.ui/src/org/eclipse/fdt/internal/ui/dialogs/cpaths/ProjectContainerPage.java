@@ -17,7 +17,7 @@ import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.core.model.IContainerEntry;
 import org.eclipse.fdt.core.model.IPathEntry;
 import org.eclipse.fdt.core.model.IProjectEntry;
-import org.eclipse.fdt.internal.ui.CPluginImages;
+import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.util.SelectionUtil;
 import org.eclipse.fdt.internal.ui.viewsupport.ListContentProvider;
 import org.eclipse.fdt.ui.wizards.IPathEntryContainerPage;
@@ -46,7 +46,7 @@ public class ProjectContainerPage extends WizardPage implements IPathEntryContai
 		super("projectContainerPage"); //$NON-NLS-1$
 		setTitle(CPathEntryMessages.getString("ProjectContainerPage.title")); //$NON-NLS-1$
 		setDescription(CPathEntryMessages.getString("ProjectContainerPage.description")); //$NON-NLS-1$
-		setImageDescriptor(CPluginImages.DESC_WIZBAN_ADD_LIBRARY);
+		setImageDescriptor(FortranPluginImages.DESC_WIZBAN_ADD_LIBRARY);
 		fFilterType = filterType;
 		validatePage();
 	}

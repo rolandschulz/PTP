@@ -103,7 +103,7 @@ public class MethodsContentProvider extends CElementContentProvider //implements
 					addAll(TypeUtil.getFields(type), res);
 				}
 //			} catch (CModelException e) {
-//				CUIPlugin.getDefault().log(e);
+//				FortranUIPlugin.getDefault().log(e);
 //			}
 			return res.toArray();
 		}

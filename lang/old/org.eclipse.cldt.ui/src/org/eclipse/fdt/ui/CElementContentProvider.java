@@ -28,7 +28,7 @@ import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.core.model.IWorkingCopy;
 import org.eclipse.fdt.internal.core.model.ArchiveContainer;
 import org.eclipse.fdt.internal.core.model.BinaryContainer;
-import org.eclipse.fdt.internal.ui.BaseCElementContentProvider;
+import org.eclipse.fdt.internal.ui.BaseFortranElementContentProvider;
 import org.eclipse.fdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.fdt.internal.ui.text.CWordFinder;
 import org.eclipse.jface.text.IRegion;
@@ -61,7 +61,7 @@ C model (<code>ICModel</code>)<br>
 
  * </pre>
  */
-public class CElementContentProvider extends BaseCElementContentProvider implements ITreeContentProvider, IElementChangedListener, IInformationProvider, IInformationProviderExtension{
+public class CElementContentProvider extends BaseFortranElementContentProvider implements ITreeContentProvider, IElementChangedListener, IInformationProvider, IInformationProviderExtension{
 
 	/** Editor. */
     protected ITextEditor fEditor;
@@ -124,7 +124,7 @@ public class CElementContentProvider extends BaseCElementContentProvider impleme
 		try {
 			processDelta(event.getDelta());
 		} catch(CModelException e) {
-			CUIPlugin.getDefault().log(e);
+			FortranUIPlugin.getDefault().log(e);
 			e.printStackTrace();
 		}
 	}
