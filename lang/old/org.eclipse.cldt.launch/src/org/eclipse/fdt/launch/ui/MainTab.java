@@ -171,7 +171,7 @@ public class MainTab extends LaunchConfigurationTab {
 		gd.horizontalSpan = colSpan;
 		mainComp.setLayoutData(gd);
 		fProgLabel = new Label(mainComp, SWT.NONE);
-		fProgLabel.setText(LaunchMessages.getString("MainTab.C/C++_Application")); //$NON-NLS-1$
+		fProgLabel.setText(LaunchMessages.getString("MainTab.Fortran_Application")); //$NON-NLS-1$
 		gd = new GridData();
 		gd.horizontalSpan = 3;
 		fProgLabel.setLayoutData(gd);

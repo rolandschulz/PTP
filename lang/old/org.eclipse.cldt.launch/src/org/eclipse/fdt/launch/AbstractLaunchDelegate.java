@@ -222,7 +222,7 @@ abstract public class AbstractLaunchDelegate extends LaunchConfigurationDelegate
 				ICProject cProject = getCProject(configuration);
 				if (cProject == null) {
 					abort(LaunchMessages.getString("Launch.common.Project_does_not_exist"), null, //$NON-NLS-1$
-							IFDTLaunchConfigurationConstants.ERR_NOT_A_C_PROJECT);
+							IFDTLaunchConfigurationConstants.ERR_NOT_A_FORTRAN_PROJECT);
 				}
 				sourceLocator = CDebugUIPlugin.createDefaultSourceLocator();
 				sourceLocator.initializeDefaults(configuration);
@@ -354,13 +354,13 @@ abstract public class AbstractLaunchDelegate extends LaunchConfigurationDelegate
 			if (!proj.exists()) {
 				abort(
 						LaunchMessages.getFormattedString("AbstractLaunchDelegate.Project_NAME_does_not_exist", name), null, //$NON-NLS-1$
-						IFDTLaunchConfigurationConstants.ERR_NOT_A_C_PROJECT);
+						IFDTLaunchConfigurationConstants.ERR_NOT_A_FORTRAN_PROJECT);
 			} else if (!proj.isOpen()) {
 				abort(LaunchMessages.getFormattedString("AbstractLaunchDelegate.Project_NAME_is_closed", name), null, //$NON-NLS-1$
-						IFDTLaunchConfigurationConstants.ERR_NOT_A_C_PROJECT);
+						IFDTLaunchConfigurationConstants.ERR_NOT_A_FORTRAN_PROJECT);
 			}
 			abort(LaunchMessages.getString("AbstractLaunchDelegate.Not_a_C_CPP_project"), null, //$NON-NLS-1$
-					IFDTLaunchConfigurationConstants.ERR_NOT_A_C_PROJECT);
+					IFDTLaunchConfigurationConstants.ERR_NOT_A_FORTRAN_PROJECT);
 		}
 		return cproject;
 	}

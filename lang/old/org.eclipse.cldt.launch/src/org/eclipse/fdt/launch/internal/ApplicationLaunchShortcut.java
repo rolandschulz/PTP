@@ -180,7 +180,7 @@ public class ApplicationLaunchShortcut implements ILaunchShortcut {
 	 * @return ILaunchConfigurationType
 	 */
 	protected ILaunchConfigurationType getCLaunchConfigType() {
-		return getLaunchManager().getLaunchConfigurationType(IFDTLaunchConfigurationConstants.ID_LAUNCH_C_APP);
+		return getLaunchManager().getLaunchConfigurationType(IFDTLaunchConfigurationConstants.ID_LAUNCH_FORTRAN_APP);
 	}
 
 	protected ILaunchManager getLaunchManager() {
