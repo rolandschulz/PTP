@@ -12,6 +12,7 @@ import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.pdt.mi.MISession;
 
 /**
@@ -37,6 +38,10 @@ public class PJob extends Parent implements IPJob {
 		super(null, name, P_ROOT);
 		this.miSession = miSession;
 		setOutputStore();
+	}
+	
+	/* returns the Machine that this job is running on */
+	public IPMachine getMachine() {
 	}
 	
 	private void setOutputStore() {

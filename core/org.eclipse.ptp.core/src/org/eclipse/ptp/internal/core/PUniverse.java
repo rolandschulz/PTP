@@ -7,12 +7,9 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPUniverse;
 
-/**
- * @author Nathan DeBardeleben
- *
- */
 public class PUniverse extends Parent implements IPUniverse 
 {
+    protected String NAME_TAG = "universe ";
 	public PUniverse() {
 		super(null, "TheUniverse", P_UNIVERSE);
 	}

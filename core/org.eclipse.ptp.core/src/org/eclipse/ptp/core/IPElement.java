@@ -10,9 +10,11 @@ import org.eclipse.search.ui.ISearchPageScoreComputer;
 public interface IPElement extends ISearchPageScoreComputer {
     public String NAME_TAG = "";
     
-    public static final int P_ROOT = 10;
-    public static final int P_NODE = 11;
-    public static final int P_PROCESS = 12;
+    public static final int P_UNIVERSE = 10;
+    public static final int P_MACHINE = 11;
+    public static final int P_NODE = 12;
+    public static final int P_JOB = 13;
+    public static final int P_PROCESS = 14;
     
     public String getElementName();
     public int getElementType();
