@@ -50,7 +50,8 @@ public class NewMakeCCProjectWizard extends NewMakeProjectWizard {
 		// Add C++ Nature.
 		if (newProject != null) {
 			// Add C++ Nature to the newly created project.
-			FortranCorePlugin.getDefault().convertProjectFromCtoCC(newProject, new SubProgressMonitor(monitor, 1));
+			// TODO get rid of this entire class for FDT?
+//			FortranCorePlugin.getDefault().convertProjectFromCtoCC(newProject, new SubProgressMonitor(monitor, 1));
 		}
 		monitor.done();
 	}
