@@ -20,7 +20,7 @@ import org.eclipse.jface.text.Region;
  * particular offset in a document, various candidates segments for things like
  * context help, proposals and hovering.
  */
-public class CWordFinder {
+public class FortranWordFinder {
 	/**
 	 * This method determines for a given offset into a given document what the
 	 * region is which defines the current word. A word is defined as the set of

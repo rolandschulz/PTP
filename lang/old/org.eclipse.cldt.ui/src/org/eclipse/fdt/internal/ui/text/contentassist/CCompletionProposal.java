@@ -12,7 +12,7 @@
 package org.eclipse.fdt.internal.ui.text.contentassist;
 
 
-import org.eclipse.fdt.internal.ui.text.CTextTools;
+import org.eclipse.fdt.internal.ui.text.FortranTextTools;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.text.ICCompletionProposal;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -531,7 +531,7 @@ public class CCompletionProposal implements ICCompletionProposal, ICompletionPro
 
 		IPreferenceStore preference= FortranUIPlugin.getDefault().getPreferenceStore();
 		RGB rgb= PreferenceConverter.getColor(preference, ContentAssistPreference.PROPOSALS_FOREGROUND);
-		CTextTools textTools= FortranUIPlugin.getDefault().getTextTools();
+		FortranTextTools textTools= FortranUIPlugin.getDefault().getTextTools();
 		return textTools.getColorManager().getColor(rgb);
 	}
 
@@ -539,7 +539,7 @@ public class CCompletionProposal implements ICCompletionProposal, ICompletionPro
 
 		IPreferenceStore preference= FortranUIPlugin.getDefault().getPreferenceStore();
 		RGB rgb= PreferenceConverter.getColor(preference, ContentAssistPreference.PROPOSALS_BACKGROUND);
-		CTextTools textTools= FortranUIPlugin.getDefault().getTextTools();
+		FortranTextTools textTools= FortranUIPlugin.getDefault().getTextTools();
 		return textTools.getColorManager().getColor(rgb);
 	}
 	

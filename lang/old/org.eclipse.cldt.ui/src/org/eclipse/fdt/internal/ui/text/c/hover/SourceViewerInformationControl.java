@@ -11,7 +11,7 @@
 
 package org.eclipse.fdt.internal.ui.text.c.hover;
 
-import org.eclipse.fdt.internal.ui.text.CSourceViewerConfiguration;
+import org.eclipse.fdt.internal.ui.text.FortranSourceViewerConfiguration;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -130,7 +130,7 @@ public class SourceViewerInformationControl implements IInformationControl, IInf
 		// Source viewer
 		//IPreferenceStore store= FortranUIPlugin.getDefault().getCombinedPreferenceStore();
 		fViewer= new SourceViewer(composite, null, null, false, style);
-		fViewer.configure(new CSourceViewerConfiguration(FortranUIPlugin.getDefault().getTextTools(), null));
+		fViewer.configure(new FortranSourceViewerConfiguration(FortranUIPlugin.getDefault().getTextTools(), null));
 		fViewer.setEditable(false);
 		
 		fText= fViewer.getTextWidget();
@@ -249,7 +249,7 @@ public class SourceViewerInformationControl implements IInformationControl, IInf
 		}
 				
 		IDocument doc= new Document(content);
-		FortranUIPlugin.getDefault().getTextTools().setupCDocument(doc);
+		FortranUIPlugin.getDefault().getTextTools().setupFortranDocument(doc);
 		fViewer.setInput(doc);
 	}
 	

@@ -12,7 +12,7 @@
 package org.eclipse.fdt.internal.ui.util;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.HelpEvent;
@@ -24,7 +24,7 @@ import org.eclipse.swt.events.HelpListener;
  */
 public class CUIHelp {
 
-	public static void setHelp(CEditor editor, StyledText text, String contextId) {
+	public static void setHelp(FortranEditor editor, StyledText text, String contextId) {
 		CUIHelpListener listener= new CUIHelpListener(editor, contextId);
 		text.addHelpListener(listener);
 	}
@@ -32,9 +32,9 @@ public class CUIHelp {
 	private static class CUIHelpListener implements HelpListener {
 
 		private String fContextId;
-		private CEditor fEditor;
+		private FortranEditor fEditor;
 
-		public CUIHelpListener(CEditor editor, String contextId) {
+		public CUIHelpListener(FortranEditor editor, String contextId) {
 			fContextId= contextId;
 			fEditor= editor;
 		}

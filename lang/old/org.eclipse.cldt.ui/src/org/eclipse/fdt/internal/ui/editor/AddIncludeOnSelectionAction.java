@@ -40,7 +40,7 @@ import org.eclipse.fdt.internal.ui.FortranHelpProviderManager;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.actions.WorkbenchRunnableAdapter;
 import org.eclipse.fdt.internal.ui.codemanipulation.AddIncludesOperation;
-import org.eclipse.fdt.internal.ui.text.CWordFinder;
+import org.eclipse.fdt.internal.ui.text.FortranWordFinder;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
 import org.eclipse.fdt.ui.CSearchResultLabelProvider;
 import org.eclipse.fdt.ui.FortranUIPlugin;
@@ -169,7 +169,7 @@ public class AddIncludeOnSelectionAction extends Action implements IUpdate {
 	
 		ITextSelection selection= (ITextSelection) s;
 		try {
-			IRegion region = CWordFinder.findWord(doc, selection.getOffset());
+			IRegion region = FortranWordFinder.findWord(doc, selection.getOffset());
 			if (region == null || region.getLength() == 0) {
 				return;
 			}

@@ -14,7 +14,7 @@ package org.eclipse.fdt.internal.ui.editor;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.fdt.internal.ui.text.CTextTools;
+import org.eclipse.fdt.internal.ui.text.FortranTextTools;
 import org.eclipse.fdt.internal.ui.util.ExternalEditorInput;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.IDocument;
@@ -91,8 +91,8 @@ public class ExternalSearchDocumentProvider extends FileDocumentProvider {
 	protected IDocument createDocument(Object element) throws CoreException {
 		IDocument document= super.createDocument(element);
 		if (document != null){
-			CTextTools textTools = FortranUIPlugin.getDefault().getTextTools();
-			textTools.setupCDocument(document);
+			FortranTextTools textTools = FortranUIPlugin.getDefault().getTextTools();
+			textTools.setupFortranDocument(document);
 		}
 		return document;
 	}

@@ -28,7 +28,7 @@ import org.eclipse.fdt.internal.corext.template.c.CContextType;
 import org.eclipse.fdt.internal.ui.FortranHelpProviderManager;
 import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.FortranUIMessages;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.text.CParameterListValidator;
 import org.eclipse.fdt.internal.ui.text.template.TemplateEngine;
 import org.eclipse.fdt.ui.FortranUIPlugin;
@@ -98,7 +98,7 @@ public class CCompletionProcessor implements IContentAssistProcessor {
 	}
 	
 	protected IWorkingCopyManager fManager;
-	private CEditor fEditor;
+	private FortranEditor fEditor;
 	private char[] fProposalAutoActivationSet;
 	private CCompletionProposalComparator fComparator;
 	private IContextInformationValidator fValidator;
@@ -122,7 +122,7 @@ public class CCompletionProcessor implements IContentAssistProcessor {
 	private ITextViewer fTextViewer;
 	
 	public CCompletionProcessor(IEditorPart editor) {
-		fEditor = (CEditor) editor;
+		fEditor = (FortranEditor) editor;
 		fManager= FortranUIPlugin.getDefault().getWorkingCopyManager();
 		// Needed for search
 		searchResultCollector = new BasicSearchResultCollector ();
@@ -165,7 +165,7 @@ public class CCompletionProcessor implements IContentAssistProcessor {
 		if (fNumberOfComputedResults == 0) {
 			String errorMsg= resultCollector.getErrorMessage();
 			if (errorMsg == null || errorMsg.length() == 0)
-				errorMsg= FortranUIMessages.getString("CEditor.contentassist.noCompletions"); //$NON-NLS-1$
+				errorMsg= FortranUIMessages.getString("FortranEditor.contentassist.noCompletions"); //$NON-NLS-1$
 			return errorMsg;
 		}
 				

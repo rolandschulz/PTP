@@ -30,7 +30,7 @@ import org.eclipse.fdt.core.parser.ParserLanguage;
 import org.eclipse.fdt.core.parser.ParserMode;
 import org.eclipse.fdt.core.parser.ParserUtil;
 import org.eclipse.fdt.core.parser.ScannerInfo;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.search.CSearchMessages;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.Action;
@@ -51,13 +51,13 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 public class SelectionParseAction extends Action {
 
 	protected IWorkbenchSite fSite;
-	protected CEditor fEditor;
+	protected FortranEditor fEditor;
 
 	public SelectionParseAction() {
 		super();
 	}
 	
-	public SelectionParseAction( CEditor editor ) {
+	public SelectionParseAction( FortranEditor editor ) {
 		super();
 		fEditor=editor;
 		fSite=editor.getSite();

@@ -64,7 +64,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.eclipse.ui.views.navigator.LocalSelectionTransfer;
 
 public class CContentOutlinePage extends Page implements IContentOutlinePage, ISelectionChangedListener {
-	private CEditor fEditor;
+	private FortranEditor fEditor;
 	private ITranslationUnit fInput;
 	private ProblemTreeViewer treeViewer;
 	private ListenerList selectionChangedListeners = new ListenerList();
@@ -151,11 +151,11 @@ public class CContentOutlinePage extends Page implements IContentOutlinePage, IS
 
 	}
 	
-	public CContentOutlinePage(CEditor editor) {
+	public CContentOutlinePage(FortranEditor editor) {
 		this("#TranslationUnitOutlinerContext", editor); //$NON-NLS-1$
 	}
 	
-	public CContentOutlinePage(String contextMenuID, CEditor editor) {
+	public CContentOutlinePage(String contextMenuID, FortranEditor editor) {
 		super();
 		fEditor= editor;
 		fInput= null;

@@ -101,9 +101,9 @@ public class CFormatter {
 //			String partitionType= partition.getType();
 //		
 //			return partitionType != null && (
-//				partitionType.equals(ICPartitions.C_MULTILINE_COMMENT) ||
-//				partitionType.equals(ICPartitions.C_SINGLE_LINE_COMMENT) ||
-//				partitionType.equals(ICPartitions.C_STRING));
+//				partitionType.equals(IFortranPartitions.C_MULTILINE_COMMENT) ||
+//				partitionType.equals(IFortranPartitions.C_SINGLE_LINE_COMMENT) ||
+//				partitionType.equals(IFortranPartitions.C_STRING));
 //		} catch (BadLocationException e) {
 //			return false;	
 //		}

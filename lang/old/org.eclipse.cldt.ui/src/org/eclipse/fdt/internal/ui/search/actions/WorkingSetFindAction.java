@@ -8,7 +8,7 @@ package org.eclipse.fdt.internal.ui.search.actions;
 
 import org.eclipse.fdt.core.search.ICSearchScope;
 import org.eclipse.fdt.core.search.ICSearchConstants.LimitTo;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -18,7 +18,7 @@ public class WorkingSetFindAction extends FindAction {
 
 	private FindAction findAction;
 	
-	public WorkingSetFindAction(CEditor editor, FindAction action, String string) {
+	public WorkingSetFindAction(FortranEditor editor, FindAction action, String string) {
 		super ( editor );
 		this.findAction = action;
 		setText(string); //$NON-NLS-1$

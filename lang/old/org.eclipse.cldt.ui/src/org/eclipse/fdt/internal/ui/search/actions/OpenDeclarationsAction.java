@@ -42,7 +42,7 @@ import org.eclipse.fdt.core.search.ICSearchConstants;
 import org.eclipse.fdt.core.search.IMatch;
 import org.eclipse.fdt.core.search.SearchEngine;
 import org.eclipse.fdt.core.search.ICSearchConstants.SearchFor;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.editor.CEditorMessages;
 import org.eclipse.fdt.internal.ui.util.EditorUtility;
 import org.eclipse.fdt.ui.FortranUIPlugin;
@@ -65,7 +65,7 @@ public class OpenDeclarationsAction extends SelectionParseAction implements IUpd
 	/**
 	 * Creates a new action with the given editor
 	 */
-	public OpenDeclarationsAction(CEditor editor) {
+	public OpenDeclarationsAction(FortranEditor editor) {
 		super( editor );
 		setText(CEditorMessages.getString("OpenDeclarations.label")); //$NON-NLS-1$
 		setToolTipText(CEditorMessages.getString("OpenDeclarations.tooltip")); //$NON-NLS-1$
@@ -293,8 +293,8 @@ public class OpenDeclarationsAction extends SelectionParseAction implements IUpd
 	private void setSelectionAtOffset(IEditorPart part, int offset, int length) {
 		//int line = element.getStartOffset();
 		//if(line > 0) line--;
-		if(part instanceof CEditor) {
-			CEditor ed = (CEditor)part;
+		if(part instanceof FortranEditor) {
+			FortranEditor ed = (FortranEditor)part;
 			
 			try {					
 				//IDocument document= ed.getDocumentProvider().getDocument(ed.getEditorInput());

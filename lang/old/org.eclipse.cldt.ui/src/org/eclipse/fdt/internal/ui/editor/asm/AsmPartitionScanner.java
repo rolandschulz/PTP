@@ -8,8 +8,8 @@ package org.eclipse.fdt.internal.ui.editor.asm;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.fdt.internal.ui.text.ICColorConstants;
-import org.eclipse.fdt.internal.ui.text.ICPartitions;
+import org.eclipse.fdt.internal.ui.text.IFortranColorConstants;
+import org.eclipse.fdt.internal.ui.text.IFortranPartitions;
 import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
@@ -31,9 +31,9 @@ public class AsmPartitionScanner extends RuleBasedPartitionScanner {
 	//private final static String SKIP= "__skip";
 
 
-	public final static String ASM_MULTILINE_COMMENT= ICColorConstants.C_MULTI_LINE_COMMENT;
-	public final static String ASM_SINGLE_LINE_COMMENT= ICColorConstants.C_SINGLE_LINE_COMMENT;
-	public final static String ASM_STRING= ICColorConstants.C_STRING;
+	public final static String ASM_MULTILINE_COMMENT= IFortranColorConstants.FORTRAN_MULTI_LINE_COMMENT;
+	public final static String ASM_SINGLE_LINE_COMMENT= IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT;
+	public final static String ASM_STRING= IFortranColorConstants.FORTRAN_STRING;
 
 
 	/**
@@ -95,9 +95,9 @@ public class AsmPartitionScanner extends RuleBasedPartitionScanner {
 	public AsmPartitionScanner() {
 		super();
 		
-		IToken comment= new Token(ICPartitions.C_MULTILINE_COMMENT);
-		IToken single_comment= new Token(ICPartitions.C_SINGLE_LINE_COMMENT);
-		IToken string= new Token(ICPartitions.C_STRING);
+		IToken comment= new Token(IFortranPartitions.FORTRAN_MULTILINE_COMMENT);
+		IToken single_comment= new Token(IFortranPartitions.FORTRAN_SINGLE_LINE_COMMENT);
+		IToken string= new Token(IFortranPartitions.FORTRAN_STRING);
 		// IToken skip= new Token(SKIP);
 
 
@@ -106,7 +106,7 @@ public class AsmPartitionScanner extends RuleBasedPartitionScanner {
 
 
 		// Minimize the number of rules, since we have duplicate rules 
-		// in the CCodeScanner...
+		// in the FortranCodeScanner...
 
 
 		// Add rule for single line comments.

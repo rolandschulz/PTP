@@ -11,7 +11,7 @@
 package org.eclipse.fdt.internal.ui.actions;
 
 import org.eclipse.fdt.core.model.ICElement;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 
@@ -37,7 +37,7 @@ public class ActionUtil {
 //		return true;
 	}
 	
-	public static boolean isProcessable(Shell shell, CEditor editor) {
+	public static boolean isProcessable(Shell shell, FortranEditor editor) {
 		if (editor == null)
 			return true;
 		ICElement input= SelectionConverter.getInput(editor);

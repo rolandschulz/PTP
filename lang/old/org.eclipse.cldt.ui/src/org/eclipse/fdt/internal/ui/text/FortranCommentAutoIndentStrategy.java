@@ -14,9 +14,9 @@ import org.eclipse.jface.text.IRegion;
 /**
  * Auto indent strategy for java doc comments
  */
-public class CCommentAutoIndentStrategy extends DefaultAutoIndentStrategy {
+public class FortranCommentAutoIndentStrategy extends DefaultAutoIndentStrategy {
 
-	public CCommentAutoIndentStrategy() {
+	public FortranCommentAutoIndentStrategy() {
 	}
 
 	/**

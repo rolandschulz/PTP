@@ -35,7 +35,7 @@ import org.eclipse.fdt.debug.internal.ui.wizards.AddDirectorySourceLocationWizar
 import org.eclipse.fdt.debug.internal.ui.wizards.AddSourceLocationWizard;
 import org.eclipse.fdt.debug.ui.CDebugUIPlugin;
 import org.eclipse.fdt.debug.ui.sourcelookup.INewSourceLocationWizard;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.util.ExternalEditorInput;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.JFaceResources;
@@ -70,7 +70,7 @@ import org.eclipse.ui.part.FileEditorInput;
 /**
  * The Debugger specific extension fo the C editor.
  */
-public class CDebugEditor extends CEditor {
+public class CDebugEditor extends FortranEditor {
 
 	public class AttachSourceForm implements IPropertyChangeListener {
 

@@ -19,7 +19,7 @@ import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.ISourceReference;
 import org.eclipse.fdt.internal.core.model.WorkingCopy;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ui.IEditorInput;
@@ -67,7 +67,7 @@ public class GoToNextPreviousMemberAction extends TextEditorAction {
      * @see org.eclipse.jface.action.Action#run()
      */
     public void run() {
-        final CEditor editor = (CEditor) getTextEditor();
+        final FortranEditor editor = (FortranEditor) getTextEditor();
         final ITextSelection selection = (ITextSelection) editor.getSelectionProvider().getSelection();
         final IEditorInput editorInput = editor.getEditorInput();
         final WorkingCopy workingCopy =  (WorkingCopy) FortranUIPlugin.getDefault().getWorkingCopyManager().getWorkingCopy(editorInput);

@@ -192,7 +192,7 @@ public class CompletionEngine implements RelevanceConstants {
 			} catch (ParseError e ) {
 				if(e.getErrorKind() == ParseError.ParseErrorKind.TIMEOUT_OR_CANCELLED){
 					log("Timeout received !!!!!! "); //$NON-NLS-1$;
-					requestor.acceptError(new Problem(FortranUIMessages.getString("CEditor.contentassist.timeout"))); //$NON-NLS-1$;
+					requestor.acceptError(new Problem(FortranUIMessages.getString("FortranEditor.contentassist.timeout"))); //$NON-NLS-1$;
 				}
 			} finally {
 				// stop timer

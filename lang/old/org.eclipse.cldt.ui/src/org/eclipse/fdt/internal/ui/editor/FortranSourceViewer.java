@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.fdt.internal.ui.editor.CEditor.ITextConverter;
-import org.eclipse.fdt.internal.ui.text.CSourceViewerConfiguration;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor.ITextConverter;
+import org.eclipse.fdt.internal.ui.text.FortranSourceViewerConfiguration;
 import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
@@ -17,16 +17,16 @@ import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * Adapted source viewer for CEditor
+ * Adapted source viewer for FortranEditor
  */
 
-public class CSourceViewer extends ProjectionViewer implements ITextViewerExtension {
+public class FortranSourceViewer extends ProjectionViewer implements ITextViewerExtension {
 
     /** Show outline operation id. */
     public static final int SHOW_OUTLINE = 101;
     
 	/** Editor. */
-    private final CEditor editor;
+    private final FortranEditor editor;
     /** Presents outline. */
     private IInformationPresenter fOutlinePresenter;
 
@@ -44,8 +44,8 @@ public class CSourceViewer extends ProjectionViewer implements ITextViewerExtens
      * @param isOverviewRulerShowing
      * @param language
 	 */
-    public CSourceViewer(
-		CEditor editor, Composite parent,
+    public FortranSourceViewer(
+		FortranEditor editor, Composite parent,
 		IVerticalRuler ruler,
 		int styles,
 		IOverviewRuler fOverviewRuler,
@@ -65,9 +65,9 @@ public class CSourceViewer extends ProjectionViewer implements ITextViewerExtens
     public void configure(SourceViewerConfiguration configuration)
     {
         super.configure(configuration);
-        if (configuration instanceof CSourceViewerConfiguration)
+        if (configuration instanceof FortranSourceViewerConfiguration)
         {            
-            fOutlinePresenter = ((CSourceViewerConfiguration) configuration).getOutlinePresenter(editor);
+            fOutlinePresenter = ((FortranSourceViewerConfiguration) configuration).getOutlinePresenter(editor);
             fOutlinePresenter.install(this);
         }
     }

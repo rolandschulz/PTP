@@ -9,7 +9,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.core.model.IWorkingCopy;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.editor.IReconcilingParticipant;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IWorkingCopyManager;
@@ -20,7 +20,7 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 
-public class CReconcilingStrategy implements IReconcilingStrategy {
+public class FortranReconcilingStrategy implements IReconcilingStrategy {
 
 
 	private ITextEditor fEditor;	
@@ -28,7 +28,7 @@ public class CReconcilingStrategy implements IReconcilingStrategy {
 	private IProgressMonitor fProgressMonitor;
 
 
-	public CReconcilingStrategy(CEditor editor) {
+	public FortranReconcilingStrategy(FortranEditor editor) {
 		fEditor= editor;
 		fManager= FortranUIPlugin.getDefault().getWorkingCopyManager();
 	}

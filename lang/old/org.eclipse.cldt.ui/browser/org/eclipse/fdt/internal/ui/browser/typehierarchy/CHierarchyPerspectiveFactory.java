@@ -34,7 +34,7 @@ public class CHierarchyPerspectiveFactory implements IPerspectiveFactory {
 		IFolderLayout folder= layout.createFolder("left", IPageLayout.LEFT, (float)0.25, editorArea); //$NON-NLS-1$
 		folder.addView(FortranUIPlugin.ID_TYPE_HIERARCHY); 
 		folder.addPlaceholder(IPageLayout.ID_OUTLINE);
-		folder.addPlaceholder(FortranUIPlugin.CVIEW_ID);
+		folder.addPlaceholder(FortranUIPlugin.FVIEW_ID);
 		folder.addPlaceholder(IPageLayout.ID_RES_NAV);
 		
 		IPlaceholderFolderLayout outputfolder= layout.createPlaceholderFolder("bottom", IPageLayout.BOTTOM, (float)0.75, editorArea); //$NON-NLS-1$
@@ -51,7 +51,7 @@ public class CHierarchyPerspectiveFactory implements IPerspectiveFactory {
 //		layout.addActionSet(JavaUI.ID_ELEMENT_CREATION_ACTION_SET);		
 		
 		// views - java
-		layout.addShowViewShortcut(FortranUIPlugin.CVIEW_ID);
+		layout.addShowViewShortcut(FortranUIPlugin.FVIEW_ID);
 		layout.addShowViewShortcut(FortranUIPlugin.ID_TYPE_HIERARCHY);
 
 		layout.addShowViewShortcut(NewSearchUI.SEARCH_VIEW_ID);

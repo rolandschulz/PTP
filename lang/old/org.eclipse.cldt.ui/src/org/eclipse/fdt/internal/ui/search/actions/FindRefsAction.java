@@ -14,7 +14,7 @@ import org.eclipse.fdt.core.search.ICSearchConstants;
 import org.eclipse.fdt.core.search.ICSearchScope;
 import org.eclipse.fdt.core.search.SearchEngine;
 import org.eclipse.fdt.core.search.ICSearchConstants.LimitTo;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.search.CSearchMessages;
 import org.eclipse.ui.IWorkbenchSite;
 
@@ -23,7 +23,7 @@ public class FindRefsAction extends FindAction {
 	/**
 	 * @param editor
 	 */
-	public FindRefsAction(CEditor editor) {
+	public FindRefsAction(FortranEditor editor) {
 		this(editor,
 		CSearchMessages.getString("CSearch.FindReferencesAction.label"), //$NON-NLS-1$
 		CSearchMessages.getString("CSearch.FindReferencesAction.tooltip")); //$NON-NLS-1$
@@ -40,7 +40,7 @@ public class FindRefsAction extends FindAction {
 	 * @param string2
 	 * @param string3
 	 */
-	public FindRefsAction(CEditor editor, String label, String tooltip) {
+	public FindRefsAction(FortranEditor editor, String label, String tooltip) {
 		super(editor);
 		setText(label); //$NON-NLS-1$
 		setToolTipText(tooltip); //$NON-NLS-1$

@@ -13,7 +13,7 @@ package org.eclipse.fdt.internal.ui.search.actions;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.editor.ExternalSearchEditor;
 import org.eclipse.fdt.internal.ui.editor.ICEditorActionDefinitionIds;
 import org.eclipse.fdt.internal.ui.search.CSearchMessages;
@@ -31,7 +31,7 @@ public class ReferencesSearchGroup extends ActionGroup {
 	private FindRefsAction fFindRefsAction;
 	private FindRefsInWorkingSetAction fFindRefsInWorkingSetAction;
 	
-	private CEditor fEditor;
+	private FortranEditor fEditor;
 	private IWorkbenchSite fSite;
 	
 	private ArrayList actions;
@@ -45,7 +45,7 @@ public class ReferencesSearchGroup extends ActionGroup {
 	/**
 	 * @param editor
 	 */
-	public ReferencesSearchGroup(CEditor editor) {
+	public ReferencesSearchGroup(FortranEditor editor) {
 		fEditor = editor;
 		
 		fFindRefsAction= new FindRefsAction(editor);

@@ -9,8 +9,8 @@ package org.eclipse.fdt.internal.ui.editor.asm;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.fdt.internal.ui.text.AbstractCScanner;
-import org.eclipse.fdt.internal.ui.text.ICColorConstants;
+import org.eclipse.fdt.internal.ui.text.AbstractFortranScanner;
+import org.eclipse.fdt.internal.ui.text.IFortranColorConstants;
 import org.eclipse.fdt.internal.ui.text.IColorManager;
 import org.eclipse.fdt.internal.ui.text.util.CWhitespaceDetector;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -29,7 +29,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 /**
  * A C code scanner.
  */
-public final class AsmCodeScanner extends AbstractCScanner {
+public final class AsmCodeScanner extends AbstractFortranScanner {
 	
 	private static String[] fgKeywords= { 
 			".set", ".section",   							//$NON-NLS-1$ //$NON-NLS-2$
@@ -45,11 +45,11 @@ public final class AsmCodeScanner extends AbstractCScanner {
 	private static String[] fgTypes= { "char", "double", "float", "int", "long", "short", "signed", "unsigned", "void"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
 	
 	private static String[] fgTokenProperties= {
-		ICColorConstants.C_KEYWORD,
-		ICColorConstants.C_TYPE,
-		ICColorConstants.C_STRING,
-		ICColorConstants.C_SINGLE_LINE_COMMENT,
-		ICColorConstants.C_DEFAULT
+		IFortranColorConstants.FORTRAN_KEYWORD,
+		IFortranColorConstants.FORTRAN_TYPE,
+		IFortranColorConstants.FORTRAN_STRING,
+		IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT,
+		IFortranColorConstants.FORTRAN_DEFAULT
 	};
 	
 	/**
@@ -61,31 +61,31 @@ public final class AsmCodeScanner extends AbstractCScanner {
 	}
 	
 	/*
-	 * @see AbstractCScanner#getTokenProperties()
+	 * @see AbstractFortranScanner#getTokenProperties()
 	 */
 	protected String[] getTokenProperties() {
 		return fgTokenProperties;
 	}
 
 	/*
-	 * @see AbstractCScanner#createRules()
+	 * @see AbstractFortranScanner#createRules()
 	 */
 	protected List createRules() {
 				
 		List rules= new ArrayList();		
 		
 		// Add rule for strings
-		Token token= getToken(ICColorConstants.C_SINGLE_LINE_COMMENT);
+		Token token= getToken(IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT);
 		
 		// Add rule for single line comments.
 		rules.add(new EndOfLineRule("#", token)); //$NON-NLS-1$
 		
-		token= getToken(ICColorConstants.C_STRING);
+		token= getToken(IFortranColorConstants.FORTRAN_STRING);
 		// Add rule for strings and character constants.
 		rules.add(new SingleLineRule("'", "'", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 		//rules.add(new SingleLineRule("\"", "\"", token, '\\'));
 				
-		Token other= getToken(ICColorConstants.C_DEFAULT);		
+		Token other= getToken(IFortranColorConstants.FORTRAN_DEFAULT);		
 		
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new CWhitespaceDetector()));
@@ -143,7 +143,7 @@ public final class AsmCodeScanner extends AbstractCScanner {
 			}
 		};
 		
-		token= getToken(ICColorConstants.C_TYPE);
+		token= getToken(IFortranColorConstants.FORTRAN_TYPE);
 		labelRule.addWord(":", token); //$NON-NLS-1$
 		//wordRule.setColumnConstraint(0);
 		rules.add(labelRule);
@@ -156,11 +156,11 @@ public final class AsmCodeScanner extends AbstractCScanner {
 			wordRule.addWord(fgTypes[i], token);
 		rules.add(wordRule);
 		
-		token= getToken(ICColorConstants.C_KEYWORD);
+		token= getToken(IFortranColorConstants.FORTRAN_KEYWORD);
 		WordPatternRule regPattern = new WordPatternRule(new AsmWordDetector('%', (char)0), "%", null, token); //$NON-NLS-1$
 		rules.add(regPattern);
 
-		setDefaultReturnToken(getToken(ICColorConstants.C_DEFAULT));
+		setDefaultReturnToken(getToken(IFortranColorConstants.FORTRAN_DEFAULT));
 		return rules;
 	}
 
@@ -173,14 +173,14 @@ public final class AsmCodeScanner extends AbstractCScanner {
 	}
 
 	/*
-	 * @see AbstractCScanner#affectsBehavior(PropertyChangeEvent)
+	 * @see AbstractFortranScanner#affectsBehavior(PropertyChangeEvent)
 	 */	
 	public boolean affectsBehavior(PropertyChangeEvent event) {
 		return super.affectsBehavior(event);
 	}
 
 	/*
-	 * @see AbstractCScanner#adaptToPreferenceChange(PropertyChangeEvent)
+	 * @see AbstractFortranScanner#adaptToPreferenceChange(PropertyChangeEvent)
 	 */
 	public void adaptToPreferenceChange(PropertyChangeEvent event) {
 			

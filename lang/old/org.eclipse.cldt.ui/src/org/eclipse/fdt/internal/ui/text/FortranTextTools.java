@@ -5,10 +5,12 @@ package org.eclipse.fdt.internal.ui.text;
  * All Rights Reserved.
  */
 
-
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.fdt.internal.ui.text.IFortranColorConstants;
+import org.eclipse.fdt.internal.ui.text.IFortranPartitions;
 import org.eclipse.fdt.internal.ui.text.util.CColorManager;
 import org.eclipse.fdt.ui.FortranUIPlugin;
+
+import org.eclipse.core.runtime.Preferences;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
@@ -25,7 +27,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
  * This type shares all scanners and the color manager between
  * its clients.
  */
-public class CTextTools {
+public class FortranTextTools {
 	
 	private class PreferenceListener implements IPropertyChangeListener, Preferences.IPropertyChangeListener {
 		public void propertyChange(PropertyChangeEvent event) {
@@ -38,18 +40,14 @@ public class CTextTools {
 	
 	/** The color manager */
 	private CColorManager fColorManager;
-	/** The C source code scanner */
-	private CCodeScanner fCodeScanner;
-	/** The C++ source code scanner */
-	private CppCodeScanner fCppCodeScanner;
-	/** The C partitions scanner */
-	private FastCPartitionScanner fPartitionScanner;
-	/** The Java multiline comment scanner */
-	private CCommentScanner fMultilineCommentScanner;
-	/** The Java singleline comment scanner */
-	private CCommentScanner fSinglelineCommentScanner;
-	/** The Java string scanner */
-	private SingleTokenCScanner fStringScanner;
+	/** The Fortran source code scanner */
+	private FortranCodeScanner fCodeScanner;
+	/** The Fortran partitions scanner */
+	private FastFortranPartitionScanner fPartitionScanner;
+	/** The Fortran singleline comment scanner */
+	private FortranCommentScanner fSinglelineCommentScanner;
+	/** The Fortran string scanner */
+	private SingleTokenFortranScanner fStringScanner;
 
 	/** The preference store */
 	private IPreferenceStore fPreferenceStore;
@@ -63,7 +61,7 @@ public class CTextTools {
 	 * Creates a new C text tools collection and eagerly creates 
 	 * and initializes all members of this collection.
 	 */
-    public CTextTools(IPreferenceStore store) {
+    public FortranTextTools(IPreferenceStore store) {
         this(store, null);
     }
     
@@ -71,7 +69,7 @@ public class CTextTools {
      * Creates a new C text tools collection and eagerly creates 
      * and initializes all members of this collection.
      */
-	public CTextTools(IPreferenceStore store, Preferences coreStore) {
+	public FortranTextTools(IPreferenceStore store, Preferences coreStore) {
 		if(store == null) {
 			store = FortranUIPlugin.getDefault().getPreferenceStore();
 		}
@@ -84,20 +82,18 @@ public class CTextTools {
         }
 		
 		fColorManager= new CColorManager();
-		fCodeScanner= new CCodeScanner(fColorManager, store);
-		fCppCodeScanner= new CppCodeScanner(fColorManager, store);
-		fPartitionScanner= new FastCPartitionScanner();
+		fCodeScanner= new FortranCodeScanner(fColorManager, store);
+		fPartitionScanner= new FastFortranPartitionScanner();
 		
-		fMultilineCommentScanner= new CCommentScanner(fColorManager, store, coreStore, ICColorConstants.C_MULTI_LINE_COMMENT);
-		fSinglelineCommentScanner= new CCommentScanner(fColorManager, store, coreStore, ICColorConstants.C_SINGLE_LINE_COMMENT);
-		fStringScanner= new SingleTokenCScanner(fColorManager, store, ICColorConstants.C_STRING);
+		fSinglelineCommentScanner= new FortranCommentScanner(fColorManager, store, coreStore, IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT);
+		fStringScanner= new SingleTokenFortranScanner(fColorManager, store, IFortranColorConstants.FORTRAN_STRING);
 	}
 	
 	/**
 	 * Creates a new C text tools collection and eagerly creates 
 	 * and initializes all members of this collection.
 	 */
-	public CTextTools() {
+	public FortranTextTools() {
 		this((IPreferenceStore)null);
 	}
 	
@@ -110,7 +106,6 @@ public class CTextTools {
 		fPartitionScanner= null;
 		
 		
-		fMultilineCommentScanner= null;
 		fSinglelineCommentScanner= null;
 		fStringScanner= null;
 		
@@ -142,21 +137,13 @@ public class CTextTools {
 	/**
 	 * Gets the code scanner used.
 	 */
-	public RuleBasedScanner getCCodeScanner() {
+	public RuleBasedScanner getFortranCodeScanner() {
 		return fCodeScanner;
 	}
 	
 	/**
-	 * Gets the code scanner used.
-	 */
-	public RuleBasedScanner getCppCodeScanner() {
-		return fCppCodeScanner;
-	}
-	
-	/**
 	 * Returns a scanner which is configured to scan 
-	 * C-specific partitions, which are multi-line comments,
-	 * and regular C source code.
+	 * Fortran-specific partitions.
 	 *
 	 * @return a C partition scanner
 	 */
@@ -170,21 +157,11 @@ public class CTextTools {
 	public IDocumentPartitioner createDocumentPartitioner() {
 		
 		String[] types= new String[] {
-			ICPartitions.C_MULTILINE_COMMENT,
-			ICPartitions.C_SINGLE_LINE_COMMENT,
-			ICPartitions.C_STRING
+			IFortranPartitions.FORTRAN_SINGLE_LINE_COMMENT,
+			IFortranPartitions.FORTRAN_STRING
 		};
 		
 		return new DefaultPartitioner(getPartitionScanner(), types);
-	}
-	
-	/**
-	 * Returns a scanner which is configured to scan C multiline comments.
-	 *
-	 * @return a C multiline comment scanner
-	 */
-	public RuleBasedScanner getMultilineCommentScanner() {
-		return fMultilineCommentScanner;
 	}
 
 	/**
@@ -215,8 +192,6 @@ public class CTextTools {
 	 */
 	public boolean affectsBehavior(PropertyChangeEvent event) {
 		return  fCodeScanner.affectsBehavior(event) ||
-					fCppCodeScanner.affectsBehavior(event) ||
-					fMultilineCommentScanner.affectsBehavior(event) ||
 					fSinglelineCommentScanner.affectsBehavior(event) ||
 					fStringScanner.affectsBehavior(event);
 	}
@@ -230,10 +205,6 @@ public class CTextTools {
 	protected void adaptToPreferenceChange(PropertyChangeEvent event) {
 		if (fCodeScanner.affectsBehavior(event))
 			fCodeScanner.adaptToPreferenceChange(event);
-		if (fCppCodeScanner.affectsBehavior(event))
-			fCppCodeScanner.adaptToPreferenceChange(event);
-		if (fMultilineCommentScanner.affectsBehavior(event))
-			fMultilineCommentScanner.adaptToPreferenceChange(event);
 		if (fSinglelineCommentScanner.affectsBehavior(event))
 			fSinglelineCommentScanner.adaptToPreferenceChange(event);
 		if (fStringScanner.affectsBehavior(event))
@@ -247,7 +218,7 @@ public class CTextTools {
 	 * @param partitioning the document partitioning
 	 * @since 3.0
 	 */
-	public void setupCDocumentPartitioner(IDocument document, String partitioning) {
+	public void setupFortranDocumentPartitioner(IDocument document, String partitioning) {
 		IDocumentPartitioner partitioner= createDocumentPartitioner();
 		if (document instanceof IDocumentExtension3) {
 			IDocumentExtension3 extension3= (IDocumentExtension3) document;
@@ -264,8 +235,8 @@ public class CTextTools {
 	 * @param document the document to be set up
 	 * @since 3.0
 	 */
-	public void setupCDocument(IDocument document) {
-		setupCDocumentPartitioner(document, IDocumentExtension3.DEFAULT_PARTITIONING);
+	public void setupFortranDocument(IDocument document) {
+		setupFortranDocumentPartitioner(document, IDocumentExtension3.DEFAULT_PARTITIONING);
 	}
 	
 }

@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.eclipse.fdt.internal.ui.IContextMenuConstants;
 import org.eclipse.fdt.internal.ui.actions.ActionMessages;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.refactoring.RefactoringMessages;
 import org.eclipse.fdt.internal.ui.refactoring.actions.RedoRefactoringAction;
 import org.eclipse.fdt.internal.ui.refactoring.actions.RenameRefactoringAction;
@@ -96,7 +96,7 @@ public class RefactoringActionGroup extends ActionGroup {
 	public static final String REFACTOR_REDO= "org.eclipse.fdt.ui.actions.refactor.RedoAction"; //$NON-NLS-1$
 	
 	private IWorkbenchSite fSite;
-	private CEditor fEditor;
+	private FortranEditor fEditor;
 	private String fGroupName= IContextMenuConstants.GROUP_REORGANIZE;
 
 	private RenameRefactoringAction fRenameAction;	
@@ -137,7 +137,7 @@ public class RefactoringActionGroup extends ActionGroup {
 	/**
 	 * Note: This constructor is for internal use only. Clients should not call this constructor.
 	 */
-	public RefactoringActionGroup(CEditor editor, String groupName) {
+	public RefactoringActionGroup(FortranEditor editor, String groupName) {
 		fSite= editor.getEditorSite();		
 		fEditor= editor;
 		if((groupName != null) && (groupName.length() > 0))

@@ -357,7 +357,7 @@ public class CEditorHoverConfigurationBlock {
 	}
 
 	CEditorTextHoverDescriptor[] getContributedHovers() {
-		CEditorTextHoverDescriptor[] hoverDescriptors= FortranUIPlugin.getDefault().getCEditorTextHoverDescriptors();
+		CEditorTextHoverDescriptor[] hoverDescriptors= FortranUIPlugin.getDefault().getFEditorTextHoverDescriptors();
 
 		// Move Best Match hover to front
 		
@@ -374,7 +374,7 @@ public class CEditorHoverConfigurationBlock {
 		}
 		
 		// return unchanged array if best match hover can't be found
-		return FortranUIPlugin.getDefault().getCEditorTextHoverDescriptors();
+		return FortranUIPlugin.getDefault().getFEditorTextHoverDescriptors();
 	}
 
 	void initialize() {

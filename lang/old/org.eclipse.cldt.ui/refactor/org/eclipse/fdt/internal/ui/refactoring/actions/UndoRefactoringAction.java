@@ -20,7 +20,7 @@ import org.eclipse.fdt.internal.corext.refactoring.base.ChangeContext;
 import org.eclipse.fdt.internal.corext.refactoring.base.IUndoManager;
 import org.eclipse.fdt.internal.corext.refactoring.base.Refactoring;
 import org.eclipse.fdt.internal.corext.refactoring.base.UndoManagerAdapter;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.refactoring.RefactoringMessages;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -30,9 +30,9 @@ import org.eclipse.ui.IWorkbenchSite;
 public class UndoRefactoringAction extends UndoManagerAction {
 
 	private int fPatternLength;
-	private CEditor fEditor;
+	private FortranEditor fEditor;
 
-	public UndoRefactoringAction(CEditor editor) {
+	public UndoRefactoringAction(FortranEditor editor) {
 		this(editor.getEditorSite());
 		fEditor= editor;
 	}

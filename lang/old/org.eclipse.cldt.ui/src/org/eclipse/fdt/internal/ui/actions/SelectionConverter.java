@@ -23,7 +23,7 @@ import org.eclipse.fdt.core.model.ISourceRange;
 import org.eclipse.fdt.core.model.ISourceReference;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.core.model.IWorkingCopy;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IWorkingCopyManager;
@@ -197,7 +197,7 @@ public class SelectionConverter {
 		return (resource.getType() & resourceMask) != 0;
 	}
 
-	public static ICElement[] codeResolve(CEditor editor) throws CModelException {
+	public static ICElement[] codeResolve(FortranEditor editor) throws CModelException {
 		return codeResolve(getInput(editor), (ITextSelection)editor.getSelectionProvider().getSelection());
 	}
 
@@ -241,7 +241,7 @@ public class SelectionConverter {
 	 * asking the user if code reolve returned more than one result. If the selection 
 	 * doesn't cover a Java element <code>null</code> is returned.
 	 */
-	public static ICElement codeResolve(CEditor editor, Shell shell, String title, String message) throws CModelException {
+	public static ICElement codeResolve(FortranEditor editor, Shell shell, String title, String message) throws CModelException {
 	    ICElement[] elements= codeResolve(editor);
 		if (elements == null || elements.length == 0)
 			return null;
@@ -258,7 +258,7 @@ public class SelectionConverter {
 	 * C elements. If the selection doesn't cover a C element and the selection's
 	 * length is greater than 0 the method returns the editor's input element.
 	 */
-	public static ICElement[] codeResolveOrInput(CEditor editor) throws CModelException {
+	public static ICElement[] codeResolveOrInput(FortranEditor editor) throws CModelException {
 	    ICElement input= getInput(editor);
 		ITextSelection selection= (ITextSelection)editor.getSelectionProvider().getSelection();
 		ICElement[] result= codeResolve(input, selection);
@@ -268,7 +268,7 @@ public class SelectionConverter {
 		return result;
 	}
 
-	public static ICElement[] codeResolveOrInputHandled(CEditor editor, Shell shell, String title) {
+	public static ICElement[] codeResolveOrInputHandled(FortranEditor editor, Shell shell, String title) {
 		try {
 			return codeResolveOrInput(editor);
 		} catch(CModelException e) {
@@ -277,7 +277,7 @@ public class SelectionConverter {
 		return null;
 	}
 	
-	public static boolean canOperateOn(CEditor editor) {
+	public static boolean canOperateOn(FortranEditor editor) {
 		if (editor == null)
 			return false;
 		return getInput(editor) != null;

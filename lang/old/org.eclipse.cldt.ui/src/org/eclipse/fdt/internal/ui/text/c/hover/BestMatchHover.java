@@ -54,7 +54,7 @@ public class BestMatchHover extends AbstractCEditorTextHover implements ITextHov
 		fInstantiatedTextHovers= new ArrayList(2);
 
 		// populate list
-		CEditorTextHoverDescriptor[] hoverDescs= FortranUIPlugin.getDefault().getCEditorTextHoverDescriptors();
+		CEditorTextHoverDescriptor[] hoverDescs= FortranUIPlugin.getDefault().getFEditorTextHoverDescriptors();
 		for (int i= 0; i < hoverDescs.length; i++) {
 			// ensure that we don't add ourselves to the list
 			if (!PreferenceConstants.ID_BESTMATCH_HOVER.equals(hoverDescs[i].getId()))

@@ -31,7 +31,7 @@ import org.eclipse.fdt.internal.ui.ICStatusConstants;
 import org.eclipse.fdt.internal.ui.actions.ActionMessages;
 import org.eclipse.fdt.internal.ui.actions.ActionUtil;
 import org.eclipse.fdt.internal.ui.actions.SelectionConverter;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.actions.SelectionDispatchAction;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -54,7 +54,7 @@ import org.eclipse.ui.help.WorkbenchHelp;
  */
 public class OpenTypeHierarchyAction extends SelectionDispatchAction {
 	
-	private CEditor fEditor;
+	private FortranEditor fEditor;
 	
 	/**
 	 * Creates a new <code>OpenTypeHierarchyAction</code>. The action requires
@@ -74,7 +74,7 @@ public class OpenTypeHierarchyAction extends SelectionDispatchAction {
 	/**
 	 * Note: This constructor is for internal use only. Clients should not call this constructor.
 	 */
-	public OpenTypeHierarchyAction(CEditor editor) {
+	public OpenTypeHierarchyAction(FortranEditor editor) {
 		this(editor.getEditorSite());
 		fEditor= editor;
 		setEnabled(SelectionConverter.canOperateOn(fEditor));

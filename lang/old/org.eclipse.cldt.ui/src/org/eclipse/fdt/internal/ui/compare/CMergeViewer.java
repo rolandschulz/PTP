@@ -13,8 +13,8 @@ import org.eclipse.compare.CompareConfiguration;
 import org.eclipse.compare.contentmergeviewer.ITokenComparator;
 import org.eclipse.compare.contentmergeviewer.TextMergeViewer;
 import org.eclipse.compare.internal.TokenComparator;
-import org.eclipse.fdt.internal.ui.text.CSourceViewerConfiguration;
-import org.eclipse.fdt.internal.ui.text.CTextTools;
+import org.eclipse.fdt.internal.ui.text.FortranSourceViewerConfiguration;
+import org.eclipse.fdt.internal.ui.text.FortranTextTools;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 
 
@@ -46,8 +46,8 @@ public class CMergeViewer extends TextMergeViewer {
 		
 	protected void configureTextViewer(TextViewer textViewer) {
 		if (textViewer instanceof SourceViewer) {
-			CTextTools tools= FortranUIPlugin.getDefault().getTextTools();
-			((SourceViewer)textViewer).configure(new CSourceViewerConfiguration(tools, null));
+			FortranTextTools tools= FortranUIPlugin.getDefault().getTextTools();
+			((SourceViewer)textViewer).configure(new FortranSourceViewerConfiguration(tools, null));
 		}
 	}
 }

@@ -11,10 +11,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
-import org.eclipse.fdt.internal.ui.text.CSourceViewerConfiguration;
-import org.eclipse.fdt.internal.ui.text.CTextTools;
-import org.eclipse.fdt.internal.ui.text.ICColorConstants;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
+import org.eclipse.fdt.internal.ui.text.FortranSourceViewerConfiguration;
+import org.eclipse.fdt.internal.ui.text.FortranTextTools;
+import org.eclipse.fdt.internal.ui.text.IFortranColorConstants;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.fdt.utils.ui.controls.TabFolderLayout;
@@ -52,24 +52,24 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
  */
 public class CEditorPreferencePage extends AbstractPreferencePage implements IWorkbenchPreferencePage {
 
-	protected final String[][] fListModel = new String[][] { { PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.MultiLine"), ICColorConstants.C_MULTI_LINE_COMMENT }, { //$NON-NLS-1$
-		PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.singleLine"), ICColorConstants.C_SINGLE_LINE_COMMENT }, { //$NON-NLS-1$
-		PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.keywords"), ICColorConstants.C_KEYWORD }, { //$NON-NLS-1$
-		PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.builtInTypes"), ICColorConstants.C_TYPE }, { //$NON-NLS-1$
-		PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.strings"), ICColorConstants.C_STRING }, { //$NON-NLS-1$
-        PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.operators"), ICColorConstants.C_OPERATOR }, { //$NON-NLS-1$
-        PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.braces"), ICColorConstants.C_BRACES }, { //$NON-NLS-1$            
-        PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.numbers"), ICColorConstants.C_NUMBER }, { //$NON-NLS-1$            
-		PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.others"), ICColorConstants.C_DEFAULT }, { //$NON-NLS-1$
+	protected final String[][] fListModel = new String[][] { { PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.MultiLine"), IFortranColorConstants.FORTRAN_MULTI_LINE_COMMENT }, { //$NON-NLS-1$
+		PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.singleLine"), IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT }, { //$NON-NLS-1$
+		PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.keywords"), IFortranColorConstants.FORTRAN_KEYWORD }, { //$NON-NLS-1$
+		PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.builtInTypes"), IFortranColorConstants.FORTRAN_TYPE }, { //$NON-NLS-1$
+		PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.strings"), IFortranColorConstants.FORTRAN_STRING }, { //$NON-NLS-1$
+        PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.operators"), IFortranColorConstants.FORTRAN_OPERATOR }, { //$NON-NLS-1$
+        PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.braces"), IFortranColorConstants.FORTRAN_BRACES }, { //$NON-NLS-1$            
+        PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.numbers"), IFortranColorConstants.FORTRAN_NUMBER }, { //$NON-NLS-1$            
+		PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.others"), IFortranColorConstants.FORTRAN_DEFAULT }, { //$NON-NLS-1$
         PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags"), PreferenceConstants.EDITOR_TASK_TAG_COLOR } //$NON-NLS-1$
 	};
 
 	protected final String[][] fAppearanceColorListModel = new String[][] { 
-			{PreferencesMessages.getString("CEditorPreferencePage.behaviorPage.matchingBracketColor"), CEditor.MATCHING_BRACKETS_COLOR, null }, //$NON-NLS-1$
-			{PreferencesMessages.getString("CEditorPreferencePage.behaviorPage.linkedPositionColor"), CEditor.LINKED_POSITION_COLOR, null }, //$NON-NLS-1$
+			{PreferencesMessages.getString("CEditorPreferencePage.behaviorPage.matchingBracketColor"), FortranEditor.MATCHING_BRACKETS_COLOR, null }, //$NON-NLS-1$
+			{PreferencesMessages.getString("CEditorPreferencePage.behaviorPage.linkedPositionColor"), FortranEditor.LINKED_POSITION_COLOR, null }, //$NON-NLS-1$
 	};
 
-	private CTextTools fCTextTools;
+	private FortranTextTools fCTextTools;
 
 	/**
 	 * List of master/slave listeners when there's a dependency.
@@ -96,30 +96,30 @@ public class CEditorPreferencePage extends AbstractPreferencePage implements IWo
 	protected OverlayPreferenceStore.OverlayKey[] createOverlayStoreKeys() {
 		ArrayList overlayKeys = new ArrayList();
 		
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.INT, CSourceViewerConfiguration.PREFERENCE_TAB_WIDTH));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_MULTI_LINE_COMMENT));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_MULTI_LINE_COMMENT + "_bold")); //$NON-NLS-1$
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_SINGLE_LINE_COMMENT));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_SINGLE_LINE_COMMENT + "_bold")); //$NON-NLS-1$
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_KEYWORD));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_KEYWORD + "_bold")); //$NON-NLS-1$
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_TYPE));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_TYPE + "_bold")); //$NON-NLS-1$
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_STRING));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_STRING + "_bold")); //$NON-NLS-1$
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_DEFAULT));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_DEFAULT + "_bold")); //$NON-NLS-1$        
-        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_BRACES));
-        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_BRACES + "_bold")); //$NON-NLS-1$
-        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_NUMBER));
-        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_NUMBER + "_bold")); //$NON-NLS-1$
-        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_OPERATOR));
-        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_OPERATOR + "_bold")); //$NON-NLS-1$
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, CEditor.MATCHING_BRACKETS_COLOR));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, CEditor.MATCHING_BRACKETS));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, CEditor.SPACES_FOR_TABS));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.INT, FortranSourceViewerConfiguration.PREFERENCE_TAB_WIDTH));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_MULTI_LINE_COMMENT));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_MULTI_LINE_COMMENT + "_bold")); //$NON-NLS-1$
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT + "_bold")); //$NON-NLS-1$
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_KEYWORD));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_KEYWORD + "_bold")); //$NON-NLS-1$
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_TYPE));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_TYPE + "_bold")); //$NON-NLS-1$
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_STRING));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_STRING + "_bold")); //$NON-NLS-1$
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_DEFAULT));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_DEFAULT + "_bold")); //$NON-NLS-1$        
+        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_BRACES));
+        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_BRACES + "_bold")); //$NON-NLS-1$
+        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_NUMBER));
+        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_NUMBER + "_bold")); //$NON-NLS-1$
+        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_OPERATOR));
+        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_OPERATOR + "_bold")); //$NON-NLS-1$
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, FortranEditor.MATCHING_BRACKETS_COLOR));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, FortranEditor.MATCHING_BRACKETS));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, FortranEditor.SPACES_FOR_TABS));
 		
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, CEditor.LINKED_POSITION_COLOR));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, FortranEditor.LINKED_POSITION_COLOR));
 		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_TASK_TAG_COLOR));
         overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, PreferenceConstants.EDITOR_TASK_TAG_BOLD));
         overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_TASK_INDICATION_COLOR));
@@ -133,41 +133,41 @@ public class CEditorPreferencePage extends AbstractPreferencePage implements IWo
 
 	public static void initDefaults(IPreferenceStore store) {
 
-		store.setDefault(CEditor.MATCHING_BRACKETS, true);
-		PreferenceConverter.setDefault(store, CEditor.MATCHING_BRACKETS_COLOR, new RGB(170,170,170));
+		store.setDefault(FortranEditor.MATCHING_BRACKETS, true);
+		PreferenceConverter.setDefault(store, FortranEditor.MATCHING_BRACKETS_COLOR, new RGB(170,170,170));
 
-		store.setDefault(CSourceViewerConfiguration.PREFERENCE_TAB_WIDTH, 4);
+		store.setDefault(FortranSourceViewerConfiguration.PREFERENCE_TAB_WIDTH, 4);
 
-		store.setDefault(CEditor.SPACES_FOR_TABS, false);
+		store.setDefault(FortranEditor.SPACES_FOR_TABS, false);
 
-		PreferenceConverter.setDefault(store, ICColorConstants.C_MULTI_LINE_COMMENT, new RGB(63, 127, 95));
-		store.setDefault(ICColorConstants.C_MULTI_LINE_COMMENT + "_bold", false); //$NON-NLS-1$
+		PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_MULTI_LINE_COMMENT, new RGB(63, 127, 95));
+		store.setDefault(IFortranColorConstants.FORTRAN_MULTI_LINE_COMMENT + "_bold", false); //$NON-NLS-1$
 
-		PreferenceConverter.setDefault(store, ICColorConstants.C_SINGLE_LINE_COMMENT, new RGB(63, 125, 95));
-		store.setDefault(ICColorConstants.C_SINGLE_LINE_COMMENT + "_bold", false); //$NON-NLS-1$
+		PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT, new RGB(63, 125, 95));
+		store.setDefault(IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT + "_bold", false); //$NON-NLS-1$
 
-		PreferenceConverter.setDefault(store, ICColorConstants.C_KEYWORD, new RGB(127, 0, 85));
-		store.setDefault(ICColorConstants.C_KEYWORD + "_bold", true); //$NON-NLS-1$
+		PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_KEYWORD, new RGB(127, 0, 85));
+		store.setDefault(IFortranColorConstants.FORTRAN_KEYWORD + "_bold", true); //$NON-NLS-1$
 
-		PreferenceConverter.setDefault(store, ICColorConstants.C_TYPE, new RGB(127, 0, 85));
-		store.setDefault(ICColorConstants.C_TYPE + "_bold", true); //$NON-NLS-1$
+		PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_TYPE, new RGB(127, 0, 85));
+		store.setDefault(IFortranColorConstants.FORTRAN_TYPE + "_bold", true); //$NON-NLS-1$
 
-		PreferenceConverter.setDefault(store, ICColorConstants.C_STRING, new RGB(42, 0, 255));
-		store.setDefault(ICColorConstants.C_STRING + "_bold", false); //$NON-NLS-1$
+		PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_STRING, new RGB(42, 0, 255));
+		store.setDefault(IFortranColorConstants.FORTRAN_STRING + "_bold", false); //$NON-NLS-1$
 
-		PreferenceConverter.setDefault(store, ICColorConstants.C_DEFAULT, new RGB(0, 0, 0));
-		store.setDefault(ICColorConstants.C_DEFAULT + "_bold", false); //$NON-NLS-1$
+		PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_DEFAULT, new RGB(0, 0, 0));
+		store.setDefault(IFortranColorConstants.FORTRAN_DEFAULT + "_bold", false); //$NON-NLS-1$
 
-        PreferenceConverter.setDefault(store, ICColorConstants.C_OPERATOR, new RGB(0, 0, 0));
-        store.setDefault(ICColorConstants.C_DEFAULT + "_bold", false); //$NON-NLS-1$
+        PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_OPERATOR, new RGB(0, 0, 0));
+        store.setDefault(IFortranColorConstants.FORTRAN_DEFAULT + "_bold", false); //$NON-NLS-1$
 
-        PreferenceConverter.setDefault(store, ICColorConstants.C_BRACES, new RGB(0, 0, 0));
-        store.setDefault(ICColorConstants.C_DEFAULT + "_bold", false); //$NON-NLS-1$
+        PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_BRACES, new RGB(0, 0, 0));
+        store.setDefault(IFortranColorConstants.FORTRAN_DEFAULT + "_bold", false); //$NON-NLS-1$
 
-        PreferenceConverter.setDefault(store, ICColorConstants.C_NUMBER, new RGB(0, 0, 0));
-        store.setDefault(ICColorConstants.C_DEFAULT + "_bold", false); //$NON-NLS-1$
+        PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_NUMBER, new RGB(0, 0, 0));
+        store.setDefault(IFortranColorConstants.FORTRAN_DEFAULT + "_bold", false); //$NON-NLS-1$
 
-        PreferenceConverter.setDefault(store, CEditor.LINKED_POSITION_COLOR, new RGB(0, 200, 100));
+        PreferenceConverter.setDefault(store, FortranEditor.LINKED_POSITION_COLOR, new RGB(0, 200, 100));
 
 	}
 
@@ -288,7 +288,7 @@ public class CEditorPreferencePage extends AbstractPreferencePage implements IWo
 
 		fCTextTools = FortranUIPlugin.getDefault().getTextTools();
 		fPreviewViewer = new SourceViewer(parent, null, SWT.V_SCROLL | SWT.H_SCROLL);
-		fPreviewViewer.configure(new CSourceViewerConfiguration(fCTextTools, null));
+		fPreviewViewer.configure(new FortranSourceViewerConfiguration(fCTextTools, null));
 		fPreviewViewer.getTextWidget().setFont(JFaceResources.getFontRegistry().get(JFaceResources.TEXT_FONT));
 		fPreviewViewer.setEditable(false);
 
@@ -330,10 +330,10 @@ public class CEditorPreferencePage extends AbstractPreferencePage implements IWo
 		behaviorComposite.setLayout(layout);
 
 		String label = PreferencesMessages.getString("CEditorPreferencePage.behaviorPage.matchingBrackets"); //$NON-NLS-1$
-		addCheckBox(behaviorComposite, label, CEditor.MATCHING_BRACKETS, 0);
+		addCheckBox(behaviorComposite, label, FortranEditor.MATCHING_BRACKETS, 0);
 
 		label = PreferencesMessages.getString("CEditorPreferencePage.behaviorPage.tabSpace"); //$NON-NLS-1$
-		addCheckBox(behaviorComposite, label, CEditor.SPACES_FOR_TABS, 0);
+		addCheckBox(behaviorComposite, label, FortranEditor.SPACES_FOR_TABS, 0);
 		return behaviorComposite;
 	}
 

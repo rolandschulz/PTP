@@ -16,11 +16,11 @@ package org.eclipse.fdt.internal.ui.text;
  * The name of the C partitioning.
  * @since 3.0
  */
-public interface ICPartitions {
+public interface IFortranPartitions {
 
 	public final static String SKIP= "__skip"; //$NON-NLS-1$
-	public final static String C_MULTILINE_COMMENT= "c_multi_line_comment"; //$NON-NLS-1$
-	public final static String C_SINGLE_LINE_COMMENT= "c_single_line_comment"; //$NON-NLS-1$
-	public final static String C_STRING= "c_string"; //$NON-NLS-1$
+	public final static String FORTRAN_SINGLE_LINE_COMMENT= "fortran_single_line_comment"; //$NON-NLS-1$
+	public final static String FORTRAN_MULTILINE_COMMENT= "fortran_multiline_comment"; //$NON-NLS-1$
+	public final static String FORTRAN_STRING= "fortran_string"; //$NON-NLS-1$
 
 }

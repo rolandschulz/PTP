@@ -16,7 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.fdt.core.model.ICElement;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.editor.ExternalSearchEditor;
 import org.eclipse.fdt.internal.ui.editor.ICEditorActionDefinitionIds;
 import org.eclipse.fdt.internal.ui.search.CSearchMessages;
@@ -35,7 +35,7 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 
 public class DeclarationsSearchGroup extends ActionGroup {
 	
-	private CEditor fEditor;
+	private FortranEditor fEditor;
 	private IWorkbenchSite fSite;
 	
 	private FindDeclarationsAction fFindDeclarationsAction;
@@ -51,7 +51,7 @@ public class DeclarationsSearchGroup extends ActionGroup {
 	/**
 	 * @param editor
 	 */
-	public DeclarationsSearchGroup(CEditor editor) {
+	public DeclarationsSearchGroup(FortranEditor editor) {
 		fEditor = editor;
 
 		fFindDeclarationsAction= new FindDeclarationsAction(editor);

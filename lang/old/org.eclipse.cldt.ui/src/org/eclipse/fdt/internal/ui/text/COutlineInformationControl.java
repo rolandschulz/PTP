@@ -11,7 +11,7 @@ import org.eclipse.fdt.internal.core.model.CElement;
 import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.actions.ActionMessages;
 import org.eclipse.fdt.internal.ui.editor.CContentOutlinerProvider;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.util.ProblemTreeViewer;
 import org.eclipse.fdt.internal.ui.viewsupport.DecoratingCLabelProvider;
 import org.eclipse.fdt.internal.ui.viewsupport.StandardCElementLabelProvider;
@@ -102,7 +102,7 @@ public class COutlineInformationControl implements IInformationControl,
     private static final int MIN_WIDTH = 300;
 
     /** Source viewer which shows this control. */
-    CEditor fEditor;
+    FortranEditor fEditor;
     /** Shell for this control. */
     Shell fShell;
     /** Control's composite. */
@@ -146,7 +146,7 @@ public class COutlineInformationControl implements IInformationControl,
      * Creates new outline control.
      * 
      * @param editor
-     *            CEditor editor which uses this control.
+     *            FortranEditor editor which uses this control.
      * @param parent
      *            Shell parent.
      * @param shellStyle
@@ -154,7 +154,7 @@ public class COutlineInformationControl implements IInformationControl,
      * @param treeStyle
      *            Style of the tree viewer.
      */
-    public COutlineInformationControl(CEditor editor, Shell parent,
+    public COutlineInformationControl(FortranEditor editor, Shell parent,
             int shellStyle, int treeStyle) {
         super();
         this.fEditor = editor;

@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import org.eclipse.fdt.internal.ui.text.ICPartitions;
+import org.eclipse.fdt.internal.ui.text.IFortranPartitions;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPartitioningException;
 import org.eclipse.jface.text.IDocumentExtension3;
@@ -59,7 +59,7 @@ public class RemoveBlockCommentAction extends BlockCommentAction {
 		
 		while (partEndOffset < endOffset) {
 			
-			if (partition.getType() == ICPartitions.C_MULTILINE_COMMENT) {
+			if (partition.getType() == IFortranPartitions.FORTRAN_MULTILINE_COMMENT) {
 				edits.add(factory.createEdit(partOffset, tokenLength, "")); //$NON-NLS-1$
 				edits.add(factory.createEdit(partEndOffset - tokenLength, tokenLength, "")); //$NON-NLS-1$
 			}
@@ -69,7 +69,7 @@ public class RemoveBlockCommentAction extends BlockCommentAction {
 			partEndOffset= partOffset + partition.getLength();
 		}
 
-		if (partition.getType() == ICPartitions.C_MULTILINE_COMMENT) {
+		if (partition.getType() == IFortranPartitions.FORTRAN_MULTILINE_COMMENT) {
 			edits.add(factory.createEdit(partOffset, tokenLength, "")); //$NON-NLS-1$
 			edits.add(factory.createEdit(partEndOffset - tokenLength, tokenLength, "")); //$NON-NLS-1$
 		}

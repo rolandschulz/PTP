@@ -70,7 +70,7 @@ public class MakefileEditor extends TextEditor implements ISelectionChangedListe
 	private ListenerList fReconcilingListeners= new ListenerList();
 
 	/**
-	 * Adapted source viewer for CEditor
+	 * Adapted source viewer for FortranEditor
 	 */
 
 	public class AdaptedSourceViewer extends ProjectionViewer implements ITextViewerExtension {

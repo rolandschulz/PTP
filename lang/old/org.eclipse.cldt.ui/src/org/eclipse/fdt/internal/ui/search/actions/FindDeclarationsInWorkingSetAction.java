@@ -13,7 +13,7 @@ package org.eclipse.fdt.internal.ui.search.actions;
 import org.eclipse.fdt.core.search.ICSearchConstants;
 import org.eclipse.fdt.core.search.ICSearchScope;
 import org.eclipse.fdt.core.search.ICSearchConstants.LimitTo;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.search.CSearchMessages;
 import org.eclipse.fdt.internal.ui.search.CSearchScopeFactory;
 import org.eclipse.fdt.internal.ui.search.CSearchUtil;
@@ -39,7 +39,7 @@ public class FindDeclarationsInWorkingSetAction extends FindAction {
 	/**
 	 * @param editor
 	 */
-	public FindDeclarationsInWorkingSetAction(CEditor editor, IWorkingSet[] wset) {
+	public FindDeclarationsInWorkingSetAction(FortranEditor editor, IWorkingSet[] wset) {
 		this(editor,
 				CSearchMessages.getString("CSearch.FindDeclarationsInWorkingSetAction.label"), //$NON-NLS-1$
 				CSearchMessages.getString("CSearch.FindDeclarationsInWorkingSetAction.tooltip")); //$NON-NLS-1$
@@ -48,7 +48,7 @@ public class FindDeclarationsInWorkingSetAction extends FindAction {
 			fWorkingSet = wset;
 	}
 
-	public FindDeclarationsInWorkingSetAction(CEditor editor, String label, String tooltip){
+	public FindDeclarationsInWorkingSetAction(FortranEditor editor, String label, String tooltip){
 		super(editor);
 		setText(label); //$NON-NLS-1$
 		setToolTipText(tooltip); //$NON-NLS-1$

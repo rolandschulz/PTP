@@ -30,7 +30,7 @@ import org.eclipse.fdt.core.model.ISourceReference;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.core.model.IWorkingCopy;
 import org.eclipse.fdt.core.resources.FileStorage;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.editor.CEditorMessages;
 import org.eclipse.fdt.internal.ui.editor.ITranslationUnitEditorInput;
 import org.eclipse.fdt.ui.FortranUIPlugin;
@@ -118,8 +118,8 @@ public class EditorUtility {
 	 * Selects a C Element in an editor
 	 */     
 	public static void revealInEditor(IEditorPart part, ICElement element) {
-		if (element != null && part instanceof CEditor) {
-			((CEditor) part).setSelection(element);
+		if (element != null && part instanceof FortranEditor) {
+			((FortranEditor) part).setSelection(element);
 		}
 	}
 

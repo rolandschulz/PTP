@@ -41,7 +41,7 @@ public class CElementHyperlinkDetector implements IHyperlinkDetector{
 	}
 
 	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks) {
-		if (region == null || canShowMultipleHyperlinks || !(fTextEditor instanceof CEditor))
+		if (region == null || canShowMultipleHyperlinks || !(fTextEditor instanceof FortranEditor))
 			return null;
 		
 		IAction openAction= fTextEditor.getAction("OpenDeclarations"); //$NON-NLS-1$

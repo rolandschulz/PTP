@@ -547,7 +547,7 @@ public class TypeHierarchyViewPart extends ViewPart implements ITypeHierarchyVie
 		if (key == IShowInTargetList.class) {
 			return new IShowInTargetList() {
 				public String[] getShowInTargetIds() {
-					return new String[] { FortranUIPlugin.CVIEW_ID, IPageLayout.ID_RES_NAV  };
+					return new String[] { FortranUIPlugin.FVIEW_ID, IPageLayout.ID_RES_NAV  };
 				}
 
 			};

@@ -986,7 +986,7 @@
       <editor
             name="%CDebugEditor.name"
             icon="icons/full/obj16/filenotfound_obj.gif"
-            contributorClass="org.eclipse.fdt.internal.ui.editor.CEditorActionContributor"
+            contributorClass="org.eclipse.fdt.internal.ui.editor.FortranEditorActionContributor"
             class="org.eclipse.fdt.debug.internal.ui.editors.CDebugEditor"
             id="org.eclipse.fdt.debug.ui.editor.CDebugEditor">
       </editor>
@@ -1098,7 +1098,7 @@
          point="org.eclipse.core.runtime.adapters">
       <factory
             class="org.eclipse.fdt.debug.internal.ui.actions.RetargettableActionAdapterFactory"
-            adaptableType="org.eclipse.fdt.internal.ui.editor.CEditor">
+            adaptableType="org.eclipse.fdt.internal.ui.editor.FortranEditor">
          <adapter
                type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
          </adapter>

@@ -13,7 +13,7 @@ package org.eclipse.fdt.internal.ui.search.actions;
 import org.eclipse.fdt.core.search.ICSearchConstants;
 import org.eclipse.fdt.core.search.ICSearchScope;
 import org.eclipse.fdt.core.search.ICSearchConstants.LimitTo;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.search.CSearchMessages;
 import org.eclipse.fdt.internal.ui.search.CSearchScopeFactory;
 import org.eclipse.fdt.internal.ui.search.CSearchUtil;
@@ -25,7 +25,7 @@ public class FindRefsInWorkingSetAction extends FindAction {
 	private IWorkingSet[] fWorkingSet;
 	private String scopeDescription = "";
 	
-	public FindRefsInWorkingSetAction(CEditor editor, IWorkingSet[] workingSets) {
+	public FindRefsInWorkingSetAction(FortranEditor editor, IWorkingSet[] workingSets) {
 		this(editor,
 		CSearchMessages.getString("CSearch.FindReferencesInWorkingSetAction.label"), //$NON-NLS-1$
 		CSearchMessages.getString("CSearch.FindReferencesInWorkingSetAction.tooltip")); //$NON-NLS-1$
@@ -48,7 +48,7 @@ public class FindRefsInWorkingSetAction extends FindAction {
 	 * @param string2
 	 * @param string3
 	 */
-	public FindRefsInWorkingSetAction(CEditor editor, String label, String tooltip) {
+	public FindRefsInWorkingSetAction(FortranEditor editor, String label, String tooltip) {
 		super(editor);
 		setText(label); //$NON-NLS-1$
 		setToolTipText(tooltip); //$NON-NLS-1$

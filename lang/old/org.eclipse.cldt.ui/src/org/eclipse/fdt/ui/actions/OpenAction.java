@@ -27,7 +27,7 @@ import org.eclipse.fdt.internal.ui.actions.ActionMessages;
 import org.eclipse.fdt.internal.ui.actions.ActionUtil;
 import org.eclipse.fdt.internal.ui.actions.OpenActionUtil;
 import org.eclipse.fdt.internal.ui.actions.SelectionConverter;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 
@@ -57,7 +57,7 @@ import org.eclipse.ui.texteditor.IEditorStatusLine;
  */
 public class OpenAction extends SelectionDispatchAction {
 	
-	private CEditor fEditor;
+	private FortranEditor fEditor;
 	
 	/**
 	 * Creates a new <code>OpenAction</code>. The action requires
@@ -77,7 +77,7 @@ public class OpenAction extends SelectionDispatchAction {
 	/**
 	 * Note: This constructor is for internal use only. Clients should not call this constructor.
 	 */
-	public OpenAction(CEditor editor) {
+	public OpenAction(FortranEditor editor) {
 		this(editor.getEditorSite());
 		fEditor= editor;
 		setText(ActionMessages.getString("OpenAction.declaration.label")); //$NON-NLS-1$

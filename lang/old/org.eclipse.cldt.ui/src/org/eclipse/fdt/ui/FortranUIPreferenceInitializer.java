@@ -45,7 +45,7 @@ public class FortranUIPreferenceInitializer extends AbstractPreferenceInitialize
 		CodeAssistPreferencePage.initDefaults(store);
 
 		// We need to do this remove any keys that might have been
-		// in the FortranUIPlugin store prior to the move of the CEditor setting
+		// in the FortranUIPlugin store prior to the move of the FortranEditor setting
 		// All of those settings are now in the workbench "All TextEditor" preference Page.
 		// Later we should remove this calls, after FDT-3.0
 		EditorsUI.useAnnotationsPreferencePage(store);

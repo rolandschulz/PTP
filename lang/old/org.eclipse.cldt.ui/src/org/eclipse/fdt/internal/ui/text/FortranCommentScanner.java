@@ -26,9 +26,9 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 
 
 /**
- * CCommentScanner.java
+ * FortranCommentScanner.java
  */
-public class CCommentScanner extends AbstractCScanner
+public class FortranCommentScanner extends AbstractFortranScanner
 {
     private static class TaskTagDetector implements IWordDetector {
 
@@ -75,18 +75,18 @@ public class CCommentScanner extends AbstractCScanner
     }
     
     private static final String TRANSLATION_TASK_TAGS= FortranCorePreferenceConstants.TRANSLATION_TASK_TAGS;    
-    protected static final String TASK_TAG= ICColorConstants.TASK_TAG;
+    protected static final String TASK_TAG= IFortranColorConstants.TASK_TAG;
 
     private TaskTagRule fTaskTagRule;
     private Preferences fCorePreferenceStore;
     private String fDefaultTokenProperty;
     private String[] fTokenProperties;
 
-    public CCommentScanner(IColorManager manager, IPreferenceStore store, Preferences coreStore, String defaultTokenProperty) {
+    public FortranCommentScanner(IColorManager manager, IPreferenceStore store, Preferences coreStore, String defaultTokenProperty) {
         this(manager, store, coreStore, defaultTokenProperty, new String[] { defaultTokenProperty, TASK_TAG });
     }
     
-    public CCommentScanner(IColorManager manager, IPreferenceStore store, Preferences coreStore, String defaultTokenProperty, String[] tokenProperties) {
+    public FortranCommentScanner(IColorManager manager, IPreferenceStore store, Preferences coreStore, String defaultTokenProperty, String[] tokenProperties) {
         super(manager, store);
         
         fCorePreferenceStore= coreStore;
@@ -97,7 +97,7 @@ public class CCommentScanner extends AbstractCScanner
     }
 
     /*
-     * @see AbstractCScanner#createRules()
+     * @see AbstractFortranScanner#createRules()
      */
     protected List createRules() {
         List list= new ArrayList();

@@ -29,7 +29,7 @@ public class FortranPerspectiveFactory implements IPerspectiveFactory {
  		String editorArea = layout.getEditorArea();
 		
 		IFolderLayout folder1= layout.createFolder("topLeft", IPageLayout.LEFT, (float)0.25, editorArea); //$NON-NLS-1$
-		folder1.addView(FortranUIPlugin.CVIEW_ID);
+		folder1.addView(FortranUIPlugin.FVIEW_ID);
 		folder1.addView(IPageLayout.ID_RES_NAV);
 		folder1.addPlaceholder(IPageLayout.ID_BOOKMARKS);
 		
@@ -42,7 +42,7 @@ public class FortranPerspectiveFactory implements IPerspectiveFactory {
 		folder3.addView(IPageLayout.ID_OUTLINE);
 
 		layout.addActionSet(FortranUIPlugin.SEARCH_ACTION_SET_ID);
-		layout.addActionSet(FortranUIPlugin.ID_CELEMENT_CREATION_ACTION_SET);
+		layout.addActionSet(FortranUIPlugin.ID_FELEMENT_CREATION_ACTION_SET);
 		
 		// views - build console
 		layout.addShowViewShortcut(IConsoleConstants.ID_CONSOLE_VIEW);
@@ -53,12 +53,12 @@ public class FortranPerspectiveFactory implements IPerspectiveFactory {
 		// views - standard workbench
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_PROBLEM_VIEW);
-		layout.addShowViewShortcut(FortranUIPlugin.CVIEW_ID);
+		layout.addShowViewShortcut(FortranUIPlugin.FVIEW_ID);
 		layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
 		layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
 
 		// link - things we should do
-		layout.addShowInPart(FortranUIPlugin.CVIEW_ID);
+		layout.addShowInPart(FortranUIPlugin.FVIEW_ID);
 		layout.addShowInPart(IPageLayout.ID_RES_NAV);
 		
 		addCWizardShortcuts(layout);

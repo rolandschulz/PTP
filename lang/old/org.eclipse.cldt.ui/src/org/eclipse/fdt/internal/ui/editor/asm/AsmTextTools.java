@@ -6,9 +6,9 @@ package org.eclipse.fdt.internal.ui.editor.asm;
  */
  
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.fdt.internal.ui.text.CCommentScanner;
-import org.eclipse.fdt.internal.ui.text.ICColorConstants;
-import org.eclipse.fdt.internal.ui.text.SingleTokenCScanner;
+import org.eclipse.fdt.internal.ui.text.FortranCommentScanner;
+import org.eclipse.fdt.internal.ui.text.IFortranColorConstants;
+import org.eclipse.fdt.internal.ui.text.SingleTokenFortranScanner;
 import org.eclipse.fdt.internal.ui.text.util.CColorManager;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -42,11 +42,11 @@ public class AsmTextTools {
 	/** The Asm partitions scanner */
 	private AsmPartitionScanner fPartitionScanner;
 	/** The ASM multiline comment scanner */
-	private CCommentScanner fMultilineCommentScanner;
+	private FortranCommentScanner fMultilineCommentScanner;
 	/** The ASM singleline comment scanner */
-	private CCommentScanner fSinglelineCommentScanner;
+	private FortranCommentScanner fSinglelineCommentScanner;
 	/** The ASM string scanner */
-	private SingleTokenCScanner fStringScanner;
+	private SingleTokenFortranScanner fStringScanner;
 	
 	
 	/** The preference store */
@@ -86,9 +86,9 @@ public class AsmTextTools {
 		fCodeScanner= new AsmCodeScanner(fColorManager, store);
 		fPartitionScanner= new AsmPartitionScanner();
 				
-        fMultilineCommentScanner= new CCommentScanner(fColorManager, store, coreStore, ICColorConstants.C_MULTI_LINE_COMMENT);
-        fSinglelineCommentScanner= new CCommentScanner(fColorManager, store, coreStore, ICColorConstants.C_SINGLE_LINE_COMMENT);
-		fStringScanner= new SingleTokenCScanner(fColorManager, store, ICColorConstants.C_STRING);
+        fMultilineCommentScanner= new FortranCommentScanner(fColorManager, store, coreStore, IFortranColorConstants.FORTRAN_MULTI_LINE_COMMENT);
+        fSinglelineCommentScanner= new FortranCommentScanner(fColorManager, store, coreStore, IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT);
+		fStringScanner= new SingleTokenFortranScanner(fColorManager, store, IFortranColorConstants.FORTRAN_STRING);
 	}
 	
 	/**

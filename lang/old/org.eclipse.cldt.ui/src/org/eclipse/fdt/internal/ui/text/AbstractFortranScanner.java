@@ -28,7 +28,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
  * only responsible for providing a list of preference keys based on which tokens
  * are generated and to use this tokens to define the rules controlling this scanner.
  */
-public abstract class AbstractCScanner extends BufferedRuleBasedScanner {
+public abstract class AbstractFortranScanner extends BufferedRuleBasedScanner {
 			
 	
 	private IColorManager fColorManager;
@@ -56,7 +56,7 @@ public abstract class AbstractCScanner extends BufferedRuleBasedScanner {
 	/**
 	 * Creates an abstract Java scanner.
 	 */
-	public AbstractCScanner(IColorManager manager, IPreferenceStore store) {
+	public AbstractFortranScanner(IColorManager manager, IPreferenceStore store) {
 		super();
 		fColorManager= manager;
 		fPreferenceStore= store;
@@ -65,7 +65,7 @@ public abstract class AbstractCScanner extends BufferedRuleBasedScanner {
 	/**
 	 * Creates an abstract Java scanner.
 	 */
-	public AbstractCScanner(IColorManager manager, IPreferenceStore store, int bufsize) {
+	public AbstractFortranScanner(IColorManager manager, IPreferenceStore store, int bufsize) {
 		super(bufsize);
 		fColorManager= manager;
 		fPreferenceStore= store;

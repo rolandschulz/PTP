@@ -16,10 +16,10 @@ import org.eclipse.fdt.ui.FortranUIPlugin;
 /**
  * Auto indent strategy sensitive to brackets.
  */
-public class CAutoIndentStrategy extends DefaultAutoIndentStrategy {
+public class FortranAutoIndentStrategy extends DefaultAutoIndentStrategy {
 
 
-	public CAutoIndentStrategy() {
+	public FortranAutoIndentStrategy() {
 	}
 
 	// evaluate the line with the opening bracket that matches the closing bracket on the given line

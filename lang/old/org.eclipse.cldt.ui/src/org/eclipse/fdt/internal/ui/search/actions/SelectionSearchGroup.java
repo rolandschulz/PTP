@@ -13,7 +13,7 @@ package org.eclipse.fdt.internal.ui.search.actions;
 import java.util.List;
 
 import org.eclipse.fdt.core.model.ICElement;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
@@ -24,12 +24,12 @@ import org.eclipse.ui.part.Page;
 
 public class SelectionSearchGroup extends ActionGroup {
 	
-	private CEditor fEditor;
+	private FortranEditor fEditor;
 	
 	private DeclarationsSearchGroup fDeclarationsSearchGroup;
 	private ReferencesSearchGroup fRefSearchGroup;
 	
-	public SelectionSearchGroup(CEditor editor){
+	public SelectionSearchGroup(FortranEditor editor){
 		//TODO: Assert editor not null
 		fEditor= editor;
 	

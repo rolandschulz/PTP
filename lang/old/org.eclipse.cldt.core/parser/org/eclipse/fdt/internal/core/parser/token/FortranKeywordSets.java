@@ -22,7 +22,7 @@ import org.eclipse.fdt.core.parser.FortranKeywords;
  */
 public class FortranKeywordSets {
 
-	public static Set getFortranKeywords( FortranKeywordSetKey kind )
+	public static Set getKeywords( FortranKeywordSetKey kind )
 	{
 		if( kind == FortranKeywordSetKey.EMPTY )
 			return EMPTY_TABLE;

@@ -30,10 +30,10 @@ import org.eclipse.ui.IEditorInput;
  */
 public class CEditorErrorTickUpdater implements IProblemChangedListener {
 
-	protected CEditor fCEditor;
+	protected FortranEditor fCEditor;
 	private CUILabelProvider fLabelProvider;
 
-	public CEditorErrorTickUpdater(CEditor editor) {
+	public CEditorErrorTickUpdater(FortranEditor editor) {
 		Assert.isNotNull(editor);
 		fCEditor= editor;
 		fLabelProvider=  new CUILabelProvider(0, CElementImageProvider.SMALL_ICONS);

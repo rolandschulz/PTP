@@ -45,7 +45,7 @@ public class CWizardRegistry {
 	 */
 	public static boolean isCProjectWizard(IConfigurationElement element) {
 	    String category = element.getAttribute(ATT_CATEGORY);
-	    return (category != null && category.equals(FortranUIPlugin.CWIZARD_CATEGORY_ID));
+	    return (category != null && category.equals(FortranUIPlugin.FWIZARD_CATEGORY_ID));
 	}
     
 	/**
@@ -56,8 +56,9 @@ public class CWizardRegistry {
 	 * @return <code>true</code> if the given wizard element applies to a C++ Project
 	 */
 	public static boolean isCCProjectWizard(IConfigurationElement element) {
-	    String category = element.getAttribute(ATT_CATEGORY);
-	    return (category != null && category.equals(FortranUIPlugin.CCWIZARD_CATEGORY_ID));
+	    //String category = element.getAttribute(ATT_CATEGORY);
+	    //return (category != null && category.equals(FortranUIPlugin.CCWIZARD_CATEGORY_ID));
+		return false;
 	}
 
 	/**
@@ -398,8 +399,7 @@ public class CWizardRegistry {
 				if (element.getName().equals(TAG_WIZARD)) {
 				    String category = element.getAttribute(ATT_CATEGORY);
 				    if (category != null &&
-				        (category.equals(FortranUIPlugin.CCWIZARD_CATEGORY_ID)
-				           || category.equals(FortranUIPlugin.CWIZARD_CATEGORY_ID))) {
+				        category.equals(FortranUIPlugin.FWIZARD_CATEGORY_ID)) {
 			            elemList.add(element);
 				    }
 				}

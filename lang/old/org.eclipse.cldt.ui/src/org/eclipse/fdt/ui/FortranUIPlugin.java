@@ -1,4 +1,5 @@
 /*******************************************************************************
+/*******************************************************************************
  * Copyright (c) 2003, 2004 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Common Public License v1.0
@@ -21,15 +22,6 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdapterManager;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.browser.AllTypesCache;
 import org.eclipse.fdt.core.browser.IWorkingCopyProvider;
@@ -38,7 +30,6 @@ import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.IWorkingCopy;
 import org.eclipse.fdt.internal.core.model.IBufferFactory;
 import org.eclipse.fdt.internal.corext.refactoring.base.Refactoring;
-import org.eclipse.fdt.internal.corext.template.c.CContextType;
 import org.eclipse.fdt.internal.ui.FortranElementAdapterFactory;
 import org.eclipse.fdt.internal.ui.ICStatusConstants;
 import org.eclipse.fdt.internal.ui.IContextMenuConstants;
@@ -51,13 +42,25 @@ import org.eclipse.fdt.internal.ui.editor.ExternalSearchDocumentProvider;
 import org.eclipse.fdt.internal.ui.editor.SharedTextColors;
 import org.eclipse.fdt.internal.ui.editor.WorkingCopyManager;
 import org.eclipse.fdt.internal.ui.editor.asm.AsmTextTools;
-import org.eclipse.fdt.internal.ui.text.CTextTools;
 import org.eclipse.fdt.internal.ui.text.PreferencesAdapter;
 import org.eclipse.fdt.internal.ui.text.c.hover.CEditorTextHoverDescriptor;
 import org.eclipse.fdt.internal.ui.text.folding.CFoldingStructureProviderRegistry;
 import org.eclipse.fdt.internal.ui.util.ImageDescriptorRegistry;
 import org.eclipse.fdt.internal.ui.util.ProblemMarkerManager;
 import org.eclipse.fdt.internal.ui.util.Util;
+import org.eclipse.fdt.ui.IBuildConsoleManager;
+import org.eclipse.fdt.ui.IWorkingCopyManager;
+import org.eclipse.fdt.internal.corext.template.c.CContextType;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdapterManager;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.fdt.internal.ui.text.FortranTextTools;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
@@ -89,22 +92,21 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.eclipse.fdt.ui"; //$NON-NLS-1$
 	public static final String PLUGIN_CORE_ID = "org.eclipse.fdt.core"; //$NON-NLS-1$
 	public static final String EDITOR_ID = PLUGIN_ID + ".editor.CEditor"; //$NON-NLS-1$
-	public static final String CVIEW_ID = PLUGIN_ID + ".CView"; //$NON-NLS-1$
+	public static final String FVIEW_ID = PLUGIN_ID + ".FView"; //$NON-NLS-1$
 	public static final String C_PROBLEMMARKER = PLUGIN_CORE_ID + ".problem"; //$NON-NLS-1$
 
-	public static final String C_PROJECT_WIZARD_ID = PLUGIN_ID + ".wizards.StdCWizard"; //$NON-NLS-1$
-	public static final String CPP_PROJECT_WIZARD_ID = PLUGIN_ID + ".wizards.StdCCWizard"; //$NON-NLS-1$
+	public static final String F_PROJECT_WIZARD_ID = PLUGIN_ID + ".wizards.StdFWizard"; //$NON-NLS-1$
 
-	public final static String CWIZARD_CATEGORY_ID = "org.eclipse.fdt.ui.newCWizards"; //$NON-NLS-1$
-	public final static String CCWIZARD_CATEGORY_ID = "org.eclipse.fdt.ui.newCCWizards"; //$NON-NLS-1$
+	public final static String FWIZARD_CATEGORY_ID = "org.eclipse.fdt.ui.newFWizards"; //$NON-NLS-1$
 	
 	public static final String SEARCH_ACTION_SET_ID = PLUGIN_ID + ".SearchActionSet"; //$NON-NLS-1$
-	public static final String BUILDER_ID = PLUGIN_CORE_ID + ".cbuilder"; //$NON-NLS-1$
+	public static final String BUILDER_ID = PLUGIN_CORE_ID + ".fbuilder"; //$NON-NLS-1$
 
-	private static FortranUIPlugin fgCPlugin;
+	private static FortranUIPlugin fgFPlugin;
 	private static ResourceBundle fgResourceBundle;
 	private ImageDescriptorRegistry fImageDescriptorRegistry;
-	private CEditorTextHoverDescriptor[] fCEditorTextHoverDescriptors;
+	/* Change to FEditor... */
+	private CEditorTextHoverDescriptor[] fFEditorTextHoverDescriptors;
 
 	/**
 	 * The extension point registry for the <code>org.eclipse.jdt.ui.javaFoldingStructureProvider</code>
@@ -125,20 +127,20 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 
 	
 	/**
-	 * The id of the C perspective
-	 * (value <code>"org.eclipse.fdt.ui.CPerspective"</code>).
+	 * The id of the Fortran perspective
+	 * (value <code>"org.eclipse.cdt.ui.FPerspective"</code>).
 	 */	
-	public static final String ID_CPERSPECTIVE = PLUGIN_ID + ".CPerspective"; //$NON-NLS-1$
-
+	public static final String ID_FPERSPECTIVE = PLUGIN_ID + ".FPerspective"; //$NON-NLS-1$
+	
 	/**
 	 * The id of the C hierarchy perspective
-	 * (value <code>"org.eclipse.fdt.ui.CHierarchyPerspective"</code>).
+	 * (value <code>"org.eclipse.cdt.ui.CHierarchyPerspective"</code>).
 	 */	
 	public static final String ID_CHIERARCHY_PERSPECTIVE = PLUGIN_ID + ".CHierarchyPerspective"; //$NON-NLS-1$
 
 	/**
 	 * The id of the C Browsing Perspective
-	 * (value <code>"org.eclipse.fdt.ui.CBrowsingPerspective"</code>).
+	 * (value <code>"org.eclipse.cdt.ui.CBrowsingPerspective"</code>).
 	 * 
 	 * @since 2.0
 	 */
@@ -146,7 +148,7 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 
 	/**
 	 * The view part id of the C Browsing Projects view
-	 * (value <code>"org.eclipse.fdt.ui.ProjectsView"</code>).
+	 * (value <code>"org.eclipse.cdt.ui.ProjectsView"</code>).
 	 * 
 	 * @since 2.0
 	 */
@@ -154,7 +156,7 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 
 	/**
 	 * The view part id of the C Browsing Namespaces view
-	 * (value <code>"org.eclipse.fdt.ui.NamespacesView"</code>).
+	 * (value <code>"org.eclipse.cdt.ui.NamespacesView"</code>).
 	 * 
 	 * @since 2.0
 	 */
@@ -162,7 +164,7 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 
 	/**
 	 * The view part id of the C Browsing Types view
-	 * (value <code>"org.eclipse.fdt.ui.TypesView"</code>).
+	 * (value <code>"org.eclipse.cdt.ui.TypesView"</code>).
 	 * 
 	 * @since 2.0
 	 */
@@ -170,15 +172,15 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 
 	/**
 	 * The view part id of the C Browsing Members view
-	 * (value <code>"org.eclipse.fdt.ui.MembersView"</code>).
+	 * (value <code>"org.eclipse.cdt.ui.MembersView"</code>).
 	 * 
 	 * @since 2.0
 	 */
 	public static String ID_MEMBERS_VIEW = PLUGIN_ID + ".MembersView"; //$NON-NLS-1$
-
+	
 	/** 
 	 * The view part id of the type hierarchy part
-	 * (value <code>"org.eclipse.fdt.ui.TypeHierarchy"</code>).
+	 * (value <code>"org.eclipse.cdt.ui.TypeHierarchy"</code>).
 	 * <p>
 	 * When this id is used to access
 	 * a view part with <code>IWorkbenchPage.findView</code> or 
@@ -190,27 +192,27 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.IWorkbenchPage#findView(java.lang.String)
 	 * @see org.eclipse.ui.IWorkbenchPage#showView(java.lang.String)
 	 */ 
-	public static final String ID_TYPE_HIERARCHY = "org.eclipse.fdt.ui.TypeHierarchyView"; //$NON-NLS-1$
+	public static final String ID_TYPE_HIERARCHY = "org.eclipse.cdt.ui.TypeHierarchyView"; //$NON-NLS-1$
 
 	/**
 	 * The key to store customized templates. 
 	 * @since 3.0
 	 */
-	private static final String CUSTOM_TEMPLATES_KEY= "org.eclipse.fdt.ui.text.templates.custom"; //$NON-NLS-1$
-
+	private static final String CUSTOM_TEMPLATES_KEY= "org.eclipse.cdt.ui.text.templates.custom"; //$NON-NLS-1$
+	
 	/**
-	 * The id of the C Element Creation action set
-	 * (value <code>"org.eclipse.fdt.ui.CElementCreationActionSet"</code>).
+	 * The id of the Fortran Element Creation action set
+	 * (value <code>"org.eclipse.fdt.ui.FElementCreationActionSet"</code>).
 	 * 
 	 * @since 2.0
 	 */
-	public static final String ID_CELEMENT_CREATION_ACTION_SET= "org.eclipse.fdt.ui.CElementCreationActionSet"; //$NON-NLS-1$
+	public static final String ID_FELEMENT_CREATION_ACTION_SET= "org.eclipse.fdt.ui.FElementCreationActionSet"; //$NON-NLS-1$
 	
 	// -------- static methods --------
 
 	static {
 		try {
-			fgResourceBundle = ResourceBundle.getBundle("org.eclipse.fdt.internal.ui.FortranPluginResources"); //$NON-NLS-1$
+			fgResourceBundle = ResourceBundle.getBundle("org.eclipse.fdt.internal.ui.FPluginResources"); //$NON-NLS-1$
 		}
 		catch (MissingResourceException x) {
 			fgResourceBundle = null;
@@ -276,7 +278,7 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 	}
 
 	public static FortranUIPlugin getDefault() {
-		return fgCPlugin;
+		return fgFPlugin;
 	}
 
 	public void log(Throwable e) {
@@ -332,18 +334,18 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 
 	// ------ FortranUIPlugin
 
-	private CoreModel fCoreModel;
+	private CoreModel CoreModel;
 	private CDocumentProvider fDocumentProvider;
 	private ExternalSearchDocumentProvider fExternalDocumentProvider;
 	private IBufferFactory fBufferFactory;
 	private WorkingCopyManager fWorkingCopyManager;
-	private CTextTools fTextTools;
+	private FortranTextTools fTextTools;
 	private AsmTextTools fAsmTextTools;
 	private ProblemMarkerManager fProblemMarkerManager;
 	private BuildConsoleManager fBuildConsoleManager;
 	private ResourceAdapterFactory fResourceAdapterFactory;
-	private FortranElementAdapterFactory fCElementAdapterFactory;
-
+	private FortranElementAdapterFactory fElementAdapterFactory;
+	
 	/** 
 	 * The template context type registry for the java editor. 
 	 * @since 3.0
@@ -358,7 +360,7 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 
 
 	public FortranUIPlugin() {
-		fgCPlugin = this;
+		fgFPlugin = this;
 		fDocumentProvider = null;
 		fTextTools = null;		
 	}
@@ -397,9 +399,9 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 	/**
 	 * Returns the shared text tools
 	 */
-	public CTextTools getTextTools() {
+	public FortranTextTools getTextTools() {
 		if (fTextTools == null)
-			fTextTools = new CTextTools(getPreferenceStore(), FortranCorePlugin.getDefault().getPluginPreferences());
+			fTextTools = new FortranTextTools(getPreferenceStore(), FortranCorePlugin.getDefault().getPluginPreferences());
 		return fTextTools;
 	}
 
@@ -430,14 +432,11 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 		configurePluginDebugOptions();
 		
 		registerAdapters();
-		IWorkingCopyProvider workingCopyProvider = new IWorkingCopyProvider() {
+		AllTypesCache.initialize(new IWorkingCopyProvider() {
 			public IWorkingCopy[] getWorkingCopies() {
 				return FortranUIPlugin.getSharedWorkingCopies();
 			}
-		};
-        AllTypesCache.initialize(workingCopyProvider);
-		FortranCorePlugin.getDefault().getDOM().setWorkingCopyProvider(workingCopyProvider);
-		
+		});
 	}
 
 	/* (non-Javadoc)
@@ -474,7 +473,7 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 	}
 
 	public CoreModel getCoreModel() {
-		return fCoreModel;
+		return CoreModel;
 	}
 
 	public static String getPluginId() {
@@ -502,17 +501,17 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 
 	protected void registerAdapters() {
 		fResourceAdapterFactory = new ResourceAdapterFactory();
-		fCElementAdapterFactory = new FortranElementAdapterFactory();
+		fElementAdapterFactory = new FortranElementAdapterFactory();
 
 		IAdapterManager manager = Platform.getAdapterManager();
 		manager.registerAdapters(fResourceAdapterFactory, IResource.class);
-		manager.registerAdapters(fCElementAdapterFactory, ICElement.class);
+		manager.registerAdapters(fElementAdapterFactory, ICElement.class);
 	}
         
 	private void unregisterAdapters() {
 		IAdapterManager manager = Platform.getAdapterManager();
 		manager.unregisterAdapters(fResourceAdapterFactory);
-		manager.unregisterAdapters(fCElementAdapterFactory);
+		manager.unregisterAdapters(fElementAdapterFactory);
 	}
 
 	public ISharedTextColors getSharedTextColors() {
@@ -630,9 +629,9 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 	 * 
 	 * @return an array of CEditorTextHoverDescriptor
 	 */
-	public CEditorTextHoverDescriptor[] getCEditorTextHoverDescriptors() {
-		if (fCEditorTextHoverDescriptors == null) {
-			fCEditorTextHoverDescriptors= CEditorTextHoverDescriptor.getContributedHovers();
+	public CEditorTextHoverDescriptor[] getFEditorTextHoverDescriptors() {
+		if (fFEditorTextHoverDescriptors == null) {
+			fFEditorTextHoverDescriptors= CEditorTextHoverDescriptor.getContributedHovers();
 			ConfigurationElementSorter sorter= new ConfigurationElementSorter() {
 				/**
 				 * {@inheritDoc}
@@ -641,30 +640,31 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 					return ((CEditorTextHoverDescriptor)object).getConfigurationElement();
 				}
 			};
-			sorter.sort(fCEditorTextHoverDescriptors);
+			sorter.sort(fFEditorTextHoverDescriptors);
 		
-			// The Problem hover has to be the first and the Annotation hover has to be the last one in the FDT UI's hover list
-			int length= fCEditorTextHoverDescriptors.length;
+			// The Problem hover has to be the first and the Annotation hover has to be the last one in the CDT UI's hover list
+			int length= fFEditorTextHoverDescriptors.length;
 			int first= -1;
 			int last= length - 1;
 			int problemHoverIndex= -1;
 			int annotationHoverIndex= -1;
 			for (int i= 0; i < length; i++) {
-				if (!fCEditorTextHoverDescriptors[i].getId().startsWith(PLUGIN_ID)) {
-					if (problemHoverIndex == -1 || annotationHoverIndex == -1) {
+				if (!fFEditorTextHoverDescriptors[i].getId().startsWith(PLUGIN_ID)) {
+					if (problemHoverIndex == -1 || annotationHoverIndex == -1)
 						continue;
+					else {
+						last= i - 1;
+						break;
 					}
-					last= i - 1;
-					break;
 				}
 				if (first == -1)
 					first= i;
 				
-				if (fCEditorTextHoverDescriptors[i].getId().equals("org.eclipse.fdt.ui.AnnotationHover")) { //$NON-NLS-1$
+				if (fFEditorTextHoverDescriptors[i].getId().equals("org.eclipse.cdt.ui.AnnotationHover")) { //$NON-NLS-1$
 					annotationHoverIndex= i;
 					continue;
 				}
-				if (fCEditorTextHoverDescriptors[i].getId().equals("org.eclipse.fdt.ui.ProblemHover")) { //$NON-NLS-1$
+				if (fFEditorTextHoverDescriptors[i].getId().equals("org.eclipse.cdt.ui.ProblemHover")) { //$NON-NLS-1$
 					problemHoverIndex= i;
 					continue;
 				}
@@ -674,9 +674,9 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 			
 			if (first > -1 && problemHoverIndex > -1 && problemHoverIndex != first) {
 				// move problem hover to beginning
-				hoverDescriptor= fCEditorTextHoverDescriptors[first];
-				fCEditorTextHoverDescriptors[first]= fCEditorTextHoverDescriptors[problemHoverIndex];
-				fCEditorTextHoverDescriptors[problemHoverIndex]= hoverDescriptor;
+				hoverDescriptor= fFEditorTextHoverDescriptors[first];
+				fFEditorTextHoverDescriptors[first]= fFEditorTextHoverDescriptors[problemHoverIndex];
+				fFEditorTextHoverDescriptors[problemHoverIndex]= hoverDescriptor;
 
 				// update annotation hover index if needed
 				if (annotationHoverIndex == first)
@@ -685,13 +685,13 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 			
 			if (annotationHoverIndex > -1 && annotationHoverIndex != last) {
 				// move annotation hover to end
-				hoverDescriptor= fCEditorTextHoverDescriptors[last];
-				fCEditorTextHoverDescriptors[last]= fCEditorTextHoverDescriptors[annotationHoverIndex];
-				fCEditorTextHoverDescriptors[annotationHoverIndex]= hoverDescriptor;
+				hoverDescriptor= fFEditorTextHoverDescriptors[last];
+				fFEditorTextHoverDescriptors[last]= fFEditorTextHoverDescriptors[annotationHoverIndex];
+				fFEditorTextHoverDescriptors[annotationHoverIndex]= hoverDescriptor;
 			}
 		}
 		
-		return fCEditorTextHoverDescriptors;
+		return fFEditorTextHoverDescriptors;
 	} 
 
 	/**
@@ -703,7 +703,7 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 	 * 
 	 */
 	public void resetCEditorTextHoverDescriptors() {
-		fCEditorTextHoverDescriptors= null;
+		fFEditorTextHoverDescriptors= null;
 	}
 
 	/**
@@ -718,7 +718,7 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 			fFoldingStructureProviderRegistry= new CFoldingStructureProviderRegistry();
 		return fFoldingStructureProviderRegistry;
 	}
-
+	
 	/**
 	 * Returns the template context type registry for the java plugin.
 	 * 

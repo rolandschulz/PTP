@@ -16,7 +16,7 @@ import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.internal.ui.IContextMenuConstants;
 import org.eclipse.fdt.internal.ui.browser.typehierarchy.OpenTypeHierarchyAction;
 import org.eclipse.fdt.internal.ui.browser.typehierarchy.TypeHierarchyViewPart;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.editor.ICEditorActionDefinitionIds;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
@@ -83,7 +83,7 @@ public class OpenViewActionGroup extends ActionGroup {
 	/**
 	 * Note: This constructor is for internal use only. Clients should not call this constructor.
 	 */
-	public OpenViewActionGroup(CEditor part) {
+	public OpenViewActionGroup(FortranEditor part) {
 		fEditorIsOwner= true;
 
 //		fOpenSuperImplementation= new OpenSuperImplementationAction(part);

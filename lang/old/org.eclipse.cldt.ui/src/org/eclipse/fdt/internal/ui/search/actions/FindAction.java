@@ -28,7 +28,7 @@ import org.eclipse.fdt.core.parser.ast.IASTQualifiedNameElement;
 import org.eclipse.fdt.core.search.ICSearchScope;
 import org.eclipse.fdt.core.search.ICSearchConstants.LimitTo;
 import org.eclipse.fdt.core.search.ICSearchConstants.SearchFor;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.search.CSearchQuery;
 import org.eclipse.fdt.internal.ui.search.CSearchResultCollector;
 import org.eclipse.fdt.internal.ui.search.CSearchUtil;
@@ -40,7 +40,7 @@ import org.eclipse.ui.IWorkbenchSite;
 
 
 public abstract class FindAction extends SelectionParseAction {
-	public FindAction(CEditor editor){
+	public FindAction(FortranEditor editor){
 		super( editor );
 	}
 	

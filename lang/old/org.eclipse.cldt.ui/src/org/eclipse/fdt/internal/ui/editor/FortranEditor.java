@@ -33,9 +33,9 @@ import org.eclipse.fdt.internal.ui.browser.typehierarchy.OpenTypeHierarchyAction
 import org.eclipse.fdt.internal.ui.editor.asm.AsmTextTools;
 import org.eclipse.fdt.internal.ui.search.actions.OpenDeclarationsAction;
 import org.eclipse.fdt.internal.ui.search.actions.SelectionSearchGroup;
-import org.eclipse.fdt.internal.ui.text.CPairMatcher;
-import org.eclipse.fdt.internal.ui.text.CSourceViewerConfiguration;
-import org.eclipse.fdt.internal.ui.text.CTextTools;
+import org.eclipse.fdt.internal.ui.text.FortranPairMatcher;
+import org.eclipse.fdt.internal.ui.text.FortranSourceViewerConfiguration;
+import org.eclipse.fdt.internal.ui.text.FortranTextTools;
 import org.eclipse.fdt.internal.ui.text.contentassist.ContentAssistPreference;
 import org.eclipse.fdt.internal.ui.util.CUIHelp;
 import org.eclipse.fdt.ui.FortranUIPlugin;
@@ -113,7 +113,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 /**
  * C specific text editor.
  */
-public class CEditor extends TextEditor implements ISelectionChangedListener, IShowInSource , IReconcilingParticipant{
+public class FortranEditor extends TextEditor implements ISelectionChangedListener, IShowInSource , IReconcilingParticipant{
 
 	/**
 	 * Updates the Java outline page selection and this editor's range indicator.
@@ -127,7 +127,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 		 */
 		public void selectionChanged(SelectionChangedEvent event) {
 			// XXX: see https://bugs.eclipse.org/bugs/show_bug.cgi?id=56161
-			CEditor.this.selectionChanged();
+			FortranEditor.this.selectionChanged();
 		}
 	}
 	
@@ -157,7 +157,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
     protected final static char[] BRACKETS = { '{', '}', '(', ')', '[', ']', '<', '>' };
 
 	/** Matches the brackets. */
-    protected CPairMatcher fBracketMatcher = new CPairMatcher(BRACKETS);
+    protected FortranPairMatcher fBracketMatcher = new FortranPairMatcher(BRACKETS);
 
 	/** The editor's tab converter */
 	private TabConverter fTabConverter;
@@ -206,7 +206,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 	/**
 	 * Default constructor.
 	 */
-	public CEditor() {
+	public FortranEditor() {
 		super();
 	}
 
@@ -214,8 +214,8 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 	 * @see org.eclipse.ui.texteditor.AbstractDecoratedTextEditor#initializeEditor()
 	 */
 	protected void initializeEditor() {
-		CTextTools textTools = FortranUIPlugin.getDefault().getTextTools();
-		setSourceViewerConfiguration(new CSourceViewerConfiguration(textTools, this));
+		FortranTextTools textTools = FortranUIPlugin.getDefault().getTextTools();
+		setSourceViewerConfiguration(new FortranSourceViewerConfiguration(textTools, this));
 		setDocumentProvider(FortranUIPlugin.getDefault().getDocumentProvider());
 	
 		setEditorContextMenuId("#CEditorContext"); //$NON-NLS-1$
@@ -289,7 +289,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 		if (required == IShowInTargetList.class) {
 			return new IShowInTargetList() {
 				public String[] getShowInTargetIds() {
-					return new String[] { FortranUIPlugin.CVIEW_ID, IPageLayout.ID_OUTLINE, IPageLayout.ID_RES_NAV };
+					return new String[] { FortranUIPlugin.FVIEW_ID, IPageLayout.ID_OUTLINE, IPageLayout.ID_RES_NAV };
 				}
 
 			};
@@ -311,14 +311,14 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 	 * @param event the property change event
 	 */
 	protected void handlePreferenceStoreChanged(PropertyChangeEvent event) {
-		CSourceViewer asv = (CSourceViewer) getSourceViewer();
+		FortranSourceViewer asv = (FortranSourceViewer) getSourceViewer();
 
 		try {
 			if (asv != null) {
 
 				String property = event.getProperty();
 
-				if (CSourceViewerConfiguration.PREFERENCE_TAB_WIDTH.equals(property)) {
+				if (FortranSourceViewerConfiguration.PREFERENCE_TAB_WIDTH.equals(property)) {
 					SourceViewerConfiguration configuration = getSourceViewerConfiguration();
 					String[] types = configuration.getConfiguredContentTypes(asv);
 					for (int i = 0; i < types.length; i++)
@@ -326,7 +326,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 
 					if (fTabConverter != null)
 						fTabConverter.setNumberOfSpacesPerTab(
-							getPreferenceStore().getInt(CSourceViewerConfiguration.PREFERENCE_TAB_WIDTH));
+							getPreferenceStore().getInt(FortranSourceViewerConfiguration.PREFERENCE_TAB_WIDTH));
 
 					Object value = event.getNewValue();
 
@@ -551,7 +551,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 			fCEditorErrorTickUpdater = null;
 		}
 		
-        final CSourceViewer sourceViewer = (CSourceViewer) getSourceViewer();
+        final FortranSourceViewer sourceViewer = (FortranSourceViewer) getSourceViewer();
         if (fSelectionUpdateListener != null) {
 			getSelectionProvider().addSelectionChangedListener(fSelectionUpdateListener);
 			fSelectionUpdateListener = null;
@@ -696,7 +696,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 		action.setActionDefinitionId(ICEditorActionDefinitionIds.OPEN_CVIEW);
 		setAction("ShowInCView", action); //$NON-NLS-1$
         
-        action = new TextOperationAction(CEditorMessages.getResourceBundle(), "OpenOutline.", this, CSourceViewer.SHOW_OUTLINE);
+        action = new TextOperationAction(CEditorMessages.getResourceBundle(), "OpenOutline.", this, FortranSourceViewer.SHOW_OUTLINE);
         action.setActionDefinitionId(ICEditorActionDefinitionIds.OPEN_OUTLINE);
         setAction("OpenOutline", action); //$NON-NLS-1$*/
         
@@ -1121,15 +1121,15 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 		if (fTabConverter == null) {
 			fTabConverter = new TabConverter();
 			configureTabConverter();
-			fTabConverter.setNumberOfSpacesPerTab(getPreferenceStore().getInt(CSourceViewerConfiguration.PREFERENCE_TAB_WIDTH));
-			CSourceViewer asv = (CSourceViewer) getSourceViewer();
+			fTabConverter.setNumberOfSpacesPerTab(getPreferenceStore().getInt(FortranSourceViewerConfiguration.PREFERENCE_TAB_WIDTH));
+			FortranSourceViewer asv = (FortranSourceViewer) getSourceViewer();
 			asv.addTextConverter(fTabConverter);
 		}
 	}
 
 	private void stopTabConversion() {
 		if (fTabConverter != null) {
-			CSourceViewer asv = (CSourceViewer) getSourceViewer();
+			FortranSourceViewer asv = (FortranSourceViewer) getSourceViewer();
 			asv.removeTextConverter(fTabConverter);
 			fTabConverter = null;
 		}
@@ -1221,8 +1221,8 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 	}
 
 	/* Source code language to display */
-	public final static String LANGUAGE_CPP = "CEditor.language.cpp"; //$NON-NLS-1$
-	public final static String LANGUAGE_C = "CEditor.language.c"; //$NON-NLS-1$
+	public final static String LANGUAGE_CPP = "FortranEditor.language.cpp"; //$NON-NLS-1$
+	public final static String LANGUAGE_C = "FortranEditor.language.c"; //$NON-NLS-1$
 
 	/*
 	 * @see AbstractTextEditor#createSourceViewer(Composite, IVerticalRuler, int)
@@ -1245,7 +1245,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 		fOverviewRuler = createOverviewRuler(sharedColors);
 
 		ISourceViewer sourceViewer =
-			new CSourceViewer(
+			new FortranSourceViewer(
 				this, parent,
 				ruler,
 				styles,
@@ -1287,7 +1287,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 	 * @see AbstractTextEditor#affectsTextPresentation(PropertyChangeEvent)
 	 */
 	protected boolean affectsTextPresentation(PropertyChangeEvent event) {
-		CTextTools textTools = FortranUIPlugin.getDefault().getTextTools();
+		FortranTextTools textTools = FortranUIPlugin.getDefault().getTextTools();
 		AsmTextTools asmTools = FortranUIPlugin.getDefault().getAsmTextTools();
 		return textTools.affectsBehavior(event) || asmTools.affectsBehavior(event);
 	}

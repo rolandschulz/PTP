@@ -11,7 +11,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 
-import org.eclipse.fdt.internal.ui.text.ICColorConstants;
+import org.eclipse.fdt.internal.ui.text.IFortranColorConstants;
 
 /**
  * Preference constants used in the FDT-UI preference store. Clients should only read the
@@ -83,7 +83,7 @@ public class PreferenceConstants {
      * @see org.eclipse.jface.resource.StringConverter
      * @see org.eclipse.jface.preference.PreferenceConverter
      */
-    public final static String EDITOR_TASK_TAG_COLOR= ICColorConstants.TASK_TAG;
+    public final static String EDITOR_TASK_TAG_COLOR= IFortranColorConstants.TASK_TAG;
 
     /**
      * A named preference that controls whether task tags are rendered in bold.
@@ -91,7 +91,7 @@ public class PreferenceConstants {
      * Value is of type <code>Boolean</code>.
      * </p>
      */
-    public final static String EDITOR_TASK_TAG_BOLD= ICColorConstants.TASK_TAG + EDITOR_BOLD_SUFFIX;
+    public final static String EDITOR_TASK_TAG_BOLD= IFortranColorConstants.TASK_TAG + EDITOR_BOLD_SUFFIX;
     
     /**
      * A named preference that controls whether the editor shows task indicators in text (squiggly lines). 
@@ -130,7 +130,7 @@ public class PreferenceConstants {
 	 * Value is of type <code>Boolean</code>.
 	 * </p>
 	 */
-	public final static String EDITOR_CORRECTION_INDICATION= "CEditor.ShowTemporaryProblem"; //$NON-NLS-1$
+	public final static String EDITOR_CORRECTION_INDICATION= "FortranEditor.ShowTemporaryProblem"; //$NON-NLS-1$
 
 	/**
 	 * A named preference that controls if temporary problems are evaluated and shown in the UI.

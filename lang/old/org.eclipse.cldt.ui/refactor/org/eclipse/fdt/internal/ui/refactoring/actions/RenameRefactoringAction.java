@@ -19,7 +19,7 @@ import org.eclipse.fdt.core.model.ISourceReference;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.internal.corext.refactoring.RenameRefactoring;
 import org.eclipse.fdt.internal.ui.actions.SelectionConverter;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.refactoring.RefactoringMessages;
 import org.eclipse.fdt.internal.ui.refactoring.UserInterfaceStarter;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
@@ -37,9 +37,9 @@ import org.eclipse.ui.IWorkbenchSite;
 
 public class RenameRefactoringAction extends SelectionDispatchAction {
 
-	private CEditor fEditor;
+	private FortranEditor fEditor;
 
-	public RenameRefactoringAction(CEditor editor) {
+	public RenameRefactoringAction(FortranEditor editor) {
 		this(editor.getEditorSite());
 		fEditor= editor;
 	}

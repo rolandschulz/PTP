@@ -82,7 +82,7 @@ public class ShowInCViewAction extends SelectionProviderAction {
 
 		//Locate a source and a target for us to use
 		try {
-			IWorkbenchPart part = page.showView(FortranUIPlugin.CVIEW_ID);
+			IWorkbenchPart part = page.showView(FortranUIPlugin.FVIEW_ID);
 			if (part instanceof ISetSelectionTarget) {
 				((ISetSelectionTarget) part).selectReveal(selection);
 			}

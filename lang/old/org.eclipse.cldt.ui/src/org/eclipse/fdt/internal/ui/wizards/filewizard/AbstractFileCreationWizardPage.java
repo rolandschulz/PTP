@@ -31,7 +31,7 @@ import org.eclipse.fdt.core.model.ISourceRoot;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.internal.corext.util.CModelUtil;
 import org.eclipse.fdt.internal.ui.dialogs.StatusInfo;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.viewsupport.IViewPartInputProvider;
 import org.eclipse.fdt.internal.ui.wizards.NewElementWizardPage;
 import org.eclipse.fdt.internal.ui.wizards.SourceFolderSelectionDialog;
@@ -209,7 +209,7 @@ public abstract class AbstractFileCreationWizardPage extends NewElementWizardPag
     			}
     		}
 
-    		if (celem == null && part instanceof CEditor) {
+    		if (celem == null && part instanceof FortranEditor) {
 		    	IEditorInput input = ((IEditorPart)part).getEditorInput();
 		    	if (input != null) {
 					final IResource res = (IResource) input.getAdapter(IResource.class);

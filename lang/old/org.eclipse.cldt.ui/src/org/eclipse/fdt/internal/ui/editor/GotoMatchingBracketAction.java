@@ -23,9 +23,9 @@ public class GotoMatchingBracketAction extends Action {
 
 	public final static String GOTO_MATCHING_BRACKET= "GotoMatchingBracket"; //$NON-NLS-1$
 	
-	private final CEditor fEditor;
+	private final FortranEditor fEditor;
 	
-	public GotoMatchingBracketAction(CEditor editor) {
+	public GotoMatchingBracketAction(FortranEditor editor) {
 		super(CEditorMessages.getString("GotoMatchingBracket.label")); //$NON-NLS-1$
 		Assert.isNotNull(editor);
 		fEditor= editor;

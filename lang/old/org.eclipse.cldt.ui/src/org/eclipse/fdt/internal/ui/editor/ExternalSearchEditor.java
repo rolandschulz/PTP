@@ -15,7 +15,7 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
 
-public class ExternalSearchEditor extends CEditor {
+public class ExternalSearchEditor extends FortranEditor {
 	
 	public ExternalSearchEditor(){
 		super();

@@ -38,8 +38,8 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 public class AsmTextEditor extends AbstractDecoratedTextEditor {
 //public class AsmTextEditor extends StatusTextEditor {
 // FIXME: Should this editor have a different preference store ?
-// For now we are sharing with the CEditor and any changes will in the
-// setting of the CEditor will be reflected in this editor.
+// For now we are sharing with the FortranEditor and any changes will in the
+// setting of the FortranEditor will be reflected in this editor.
 
 	/**
 	 * Creates a new text editor.
@@ -57,8 +57,8 @@ public class AsmTextEditor extends AbstractDecoratedTextEditor {
 		setDocumentProvider(FortranUIPlugin.getDefault().getDocumentProvider());
 		setRangeIndicator(new DefaultRangeIndicator());
 		// FIXME: Should this editor have a different preference store ?
-		// For now we are sharing with the CEditor and any changes will in the
-		// setting of the CEditor will be reflected in this editor.
+		// For now we are sharing with the FortranEditor and any changes will in the
+		// setting of the FortranEditor will be reflected in this editor.
 		setPreferenceStore(FortranUIPlugin.getDefault().getPreferenceStore());
 		setEditorContextMenuId("#ASMEditorContext"); //$NON-NLS-1$
 		setRulerContextMenuId("#ASMEditorRulerContext"); //$NON-NLS-1$
@@ -120,8 +120,8 @@ public class AsmTextEditor extends AbstractDecoratedTextEditor {
 		} catch (InterruptedException x) {
 		} catch (InvocationTargetException x) {
 			// Shared with C editor
-			String title= CEditorMessages.getString("CEditor.error.saving.title"); //$NON-NLS-1$
-			String msg= MessageFormat.format(CEditorMessages.getString("CEditor.error.saving.message"), new Object[] { x.getTargetException().getMessage() }); //$NON-NLS-1$
+			String title= CEditorMessages.getString("FortranEditor.error.saving.title"); //$NON-NLS-1$
+			String msg= MessageFormat.format(CEditorMessages.getString("FortranEditor.error.saving.message"), new Object[] { x.getTargetException().getMessage() }); //$NON-NLS-1$
 			MessageDialog.openError(shell, title, msg);
 		} finally {
 			getDocumentProvider().changed(newInput);

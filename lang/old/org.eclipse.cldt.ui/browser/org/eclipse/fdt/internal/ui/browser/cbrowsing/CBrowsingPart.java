@@ -39,7 +39,7 @@ import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.core.model.IWorkingCopy;
 import org.eclipse.fdt.core.resources.FileStorage;
 import org.eclipse.fdt.internal.ui.browser.opentype.OpenTypeMessages;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.util.EditorUtility;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
 import org.eclipse.fdt.internal.ui.viewsupport.AppearanceAwareLabelProvider;
@@ -1126,8 +1126,8 @@ public abstract class CBrowsingPart extends ViewPart implements IMenuListener, I
 		}
 		
 		// highlight the type in the editor
-		if (cElement != null && editorPart instanceof CEditor) {
-			CEditor editor = (CEditor) editorPart;
+		if (cElement != null && editorPart instanceof FortranEditor) {
+			FortranEditor editor = (FortranEditor) editorPart;
 			editor.setSelection(cElement);
 			return true;
 		}

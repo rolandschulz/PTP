@@ -15,26 +15,26 @@ import org.eclipse.jface.text.rules.Token;
 /**
  * 
  */
-public final class SingleTokenCScanner extends AbstractCScanner{
+public final class SingleTokenFortranScanner extends AbstractFortranScanner{
 	
 	protected IToken fDefaultReturnToken;
 	private String[] fProperty;
 	
-	public SingleTokenCScanner(IColorManager manager, IPreferenceStore store, String property) {
+	public SingleTokenFortranScanner(IColorManager manager, IPreferenceStore store, String property) {
 		super(manager, store, 20);
 		fProperty= new String[] { property };
 		initialize();
 	}
 
 	/*
-	 * @see AbstractCScanner#getTokenProperties()
+	 * @see AbstractFortranScanner#getTokenProperties()
 	 */
 	protected String[] getTokenProperties() {
 		return fProperty;
 	}
 
 	/*
-	 * @see AbstractCScanner#createRules()
+	 * @see AbstractFortranScanner#createRules()
 	 */
 	protected List createRules() {
 		fDefaultReturnToken= getToken(fProperty[0]);

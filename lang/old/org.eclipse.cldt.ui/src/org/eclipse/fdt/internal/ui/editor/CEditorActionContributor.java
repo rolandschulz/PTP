@@ -82,7 +82,7 @@ public class CEditorActionContributor extends TextEditorActionContributor {
 		}
 	}
 
-	protected CEditor fCEditor;
+	protected FortranEditor fCEditor;
 	protected RetargetTextEditorAction fContentAssist;
 	protected RetargetTextEditorAction fFormatter;
 	protected RetargetTextEditorAction fAddInclude;

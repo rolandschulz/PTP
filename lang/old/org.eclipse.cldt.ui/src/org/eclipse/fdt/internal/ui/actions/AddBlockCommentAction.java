@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import org.eclipse.fdt.internal.ui.text.ICPartitions;
+import org.eclipse.fdt.internal.ui.text.IFortranPartitions;
 import org.eclipse.jface.text.Assert;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPartitioningException;
@@ -116,7 +116,7 @@ public class AddBlockCommentAction extends BlockCommentAction {
 			wasJavadoc= true;
 			
 		} else*/
-		if (partType == ICPartitions.C_MULTILINE_COMMENT) {
+		if (partType == IFortranPartitions.FORTRAN_MULTILINE_COMMENT) {
 			
 			// already in a comment - remove ending mark
 			edits.add(factory.createEdit(partEndOffset - tokenLength, tokenLength, "")); //$NON-NLS-1$
@@ -141,7 +141,7 @@ public class AddBlockCommentAction extends BlockCommentAction {
 			/*if (partType == IJavaPartitions.JAVA_DOC) {
 				// if next is javadoc, end block comment before
 				edits.add(factory.createEdit(partition.getOffset(), 0, getCommentEnd()));
-			}  else*/ if (partType == ICPartitions.C_MULTILINE_COMMENT) {
+			}  else*/ if (partType == IFortranPartitions.FORTRAN_MULTILINE_COMMENT) {
 				// already in a comment - remove startToken
 				edits.add(factory.createEdit(partition.getOffset(), getCommentStart().length(), "")); //$NON-NLS-1$
 			}
@@ -181,8 +181,8 @@ public class AddBlockCommentAction extends BlockCommentAction {
 	 */
 	private boolean isSpecialPartition(String partType) {
 		return /*partType == IJavaPartitions.JAVA_CHARACTER
-				|| */partType == ICPartitions.C_STRING
-				|| partType == ICPartitions.C_SINGLE_LINE_COMMENT;
+				|| */partType == IFortranPartitions.FORTRAN_STRING
+				|| partType == IFortranPartitions.FORTRAN_SINGLE_LINE_COMMENT;
 	}
 
 	/*

@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.fdt.core.ToolFactory;
 import org.eclipse.fdt.core.formatter.CodeFormatter;
 import org.eclipse.fdt.internal.corext.Assert;
-import org.eclipse.fdt.internal.ui.text.CSourceViewerConfiguration;
+import org.eclipse.fdt.internal.ui.text.FortranSourceViewerConfiguration;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
@@ -136,7 +136,7 @@ public class CodeFormatterUtil {
 	
 	public static int getTabWidth() {
 		Preferences preferences= FortranUIPlugin.getDefault().getPluginPreferences();
-		return preferences.getInt(CSourceViewerConfiguration.PREFERENCE_TAB_WIDTH);
+		return preferences.getInt(FortranSourceViewerConfiguration.PREFERENCE_TAB_WIDTH);
 	}
 
 }

@@ -519,8 +519,8 @@
             name="%CEditor.name"
             extensions="c,C,cc,cpp,cxx,h,hh,hpp"
             icon="icons/full/obj16/c_file_obj.gif"
-            class="org.eclipse.fdt.internal.ui.editor.CEditor"
-            contributorClass="org.eclipse.fdt.internal.ui.editor.CEditorActionContributor"
+            class="org.eclipse.fdt.internal.ui.editor.FortranEditor"
+            contributorClass="org.eclipse.fdt.internal.ui.editor.FortranEditorActionContributor"
             symbolicFontName="org.eclipse.fdt.ui.editors.textfont"
             id="org.eclipse.fdt.ui.editor.CEditor">
       </editor>

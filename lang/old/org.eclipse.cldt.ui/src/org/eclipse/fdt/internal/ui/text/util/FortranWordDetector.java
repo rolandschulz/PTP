@@ -11,7 +11,7 @@ import org.eclipse.jface.text.rules.IWordDetector;
 /**
  * A C aware word detector.
  */
-public class CWordDetector implements IWordDetector {
+public class FortranWordDetector implements IWordDetector {
 			
 	/**
 	 * @see IWordDetector#isWordIdentifierStart

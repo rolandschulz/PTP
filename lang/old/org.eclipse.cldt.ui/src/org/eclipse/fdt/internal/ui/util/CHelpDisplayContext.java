@@ -20,8 +20,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.internal.ui.FortranHelpProviderManager;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
-import org.eclipse.fdt.internal.ui.text.CWordFinder;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
+import org.eclipse.fdt.internal.ui.text.FortranWordFinder;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.ICHelpResourceDescriptor;
 import org.eclipse.fdt.ui.text.ICHelpInvocationContext;
@@ -42,7 +42,7 @@ public class CHelpDisplayContext implements IContext {
 	private IHelpResource[] fHelpResources;
 	private String fText;
 	
-	public static void displayHelp(String contextId, CEditor editor) throws CoreException {
+	public static void displayHelp(String contextId, FortranEditor editor) throws CoreException {
 		String selected = getSelectedString(editor);
 		IContext context= HelpSystem.getContext(contextId);
 		if (context != null) {
@@ -53,12 +53,12 @@ public class CHelpDisplayContext implements IContext {
 		}
 	}
 	
-	private static String getSelectedString(CEditor editor){
+	private static String getSelectedString(FortranEditor editor){
 		String expression = null;
 		try{
 			ITextSelection selection = (ITextSelection)editor.getSite().getSelectionProvider().getSelection();
 			IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-			IRegion region = CWordFinder.findWord(document, selection.getOffset());
+			IRegion region = FortranWordFinder.findWord(document, selection.getOffset());
 			expression = document.get(region.getOffset(), region.getLength());
 		}
 		catch(Exception e){
@@ -66,7 +66,7 @@ public class CHelpDisplayContext implements IContext {
 		return expression;
 	}
 
-	public CHelpDisplayContext(IContext context, final CEditor editor , String selected) throws CoreException {
+	public CHelpDisplayContext(IContext context, final FortranEditor editor , String selected) throws CoreException {
 
 		List helpResources= new ArrayList();
 		

@@ -47,7 +47,7 @@ public class SearchDialogAction extends Action {
 	private ITextEditor fEditor;
 	private IWorkbenchWindow fWorkbenchWindow;
 	
-	public SearchDialogAction(ISelectionProvider provider, CEditor editor) {
+	public SearchDialogAction(ISelectionProvider provider, FortranEditor editor) {
 		super(FortranUIPlugin.getResourceString(PREFIX + "label")); //$NON-NLS-1$
 		setDescription(FortranUIPlugin.getResourceString(PREFIX + "description")); //$NON-NLS-1$
 		setToolTipText(FortranUIPlugin.getResourceString(PREFIX + "tooltip")); //$NON-NLS-1$

@@ -49,7 +49,7 @@ import org.eclipse.fdt.core.parser.IScannerInfoProvider;
 import org.eclipse.fdt.core.parser.ast.ASTAccessVisibility;
 import org.eclipse.fdt.internal.corext.util.CModelUtil;
 import org.eclipse.fdt.internal.ui.dialogs.StatusInfo;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
 import org.eclipse.fdt.internal.ui.util.SWTUtil;
 import org.eclipse.fdt.internal.ui.viewsupport.IViewPartInputProvider;
@@ -496,7 +496,7 @@ public class NewClassCreationWizardPage extends NewElementWizardPage {
     			}
     		}
 
-    		if (celem == null && part instanceof CEditor) {
+    		if (celem == null && part instanceof FortranEditor) {
 		    	IEditorInput input = ((IEditorPart)part).getEditorInput();
 		    	if (input != null) {
 					final IResource res = (IResource) input.getAdapter(IResource.class);

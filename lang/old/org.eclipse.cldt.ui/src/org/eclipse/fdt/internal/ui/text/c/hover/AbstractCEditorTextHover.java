@@ -14,7 +14,7 @@ package org.eclipse.fdt.internal.ui.text.c.hover;
 import java.util.List;
 
 import org.eclipse.fdt.core.model.ICElement;
-import org.eclipse.fdt.internal.ui.text.CWordFinder;
+import org.eclipse.fdt.internal.ui.text.FortranWordFinder;
 import org.eclipse.fdt.internal.ui.text.HTMLTextPresenter;
 import org.eclipse.fdt.ui.text.c.hover.ICEditorTextHover;
 import org.eclipse.jface.text.DefaultInformationControl;
@@ -61,7 +61,7 @@ public class AbstractCEditorTextHover implements ICEditorTextHover, ITextHoverEx
 	 * @see ITextHover#getHoverRegion(ITextViewer, int)
 	 */
 	public IRegion getHoverRegion(ITextViewer textViewer, int offset) {
-		return CWordFinder.findWord(textViewer.getDocument(), offset);
+		return FortranWordFinder.findWord(textViewer.getDocument(), offset);
 	}
 
 //	protected ICodeAssist getCodeAssist() {

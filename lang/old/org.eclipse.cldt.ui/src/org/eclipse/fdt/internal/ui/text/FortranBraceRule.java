@@ -7,14 +7,14 @@ import org.eclipse.jface.text.rules.IToken;
  *
  * @author P.Tomaszewski
  */
-public class CBraceRule extends SingleCharRule
+public class FortranBraceRule extends SingleCharRule
 {
 
     /**
      * Creates new rule. 
      * @param token Style token.
      */
-    public CBraceRule(IToken token)
+    public FortranBraceRule(IToken token)
     {
         super(token);
     }

@@ -43,7 +43,7 @@ public class CBrowsingPerspectiveFactory implements IPerspectiveFactory {
  		String editorArea = layout.getEditorArea();
 		
 		IFolderLayout folder1= layout.createFolder("topLeft", IPageLayout.LEFT, (float)0.25, editorArea); //$NON-NLS-1$
-		folder1.addView(FortranUIPlugin.CVIEW_ID);
+		folder1.addView(FortranUIPlugin.FVIEW_ID);
 		folder1.addView(IPageLayout.ID_RES_NAV);
 		folder1.addPlaceholder(IPageLayout.ID_BOOKMARKS);
 		
@@ -56,7 +56,7 @@ public class CBrowsingPerspectiveFactory implements IPerspectiveFactory {
 		folder3.addView(IPageLayout.ID_OUTLINE);
 
 		layout.addActionSet(FortranUIPlugin.SEARCH_ACTION_SET_ID);
-		layout.addActionSet(FortranUIPlugin.ID_CELEMENT_CREATION_ACTION_SET);
+		layout.addActionSet(FortranUIPlugin.ID_FELEMENT_CREATION_ACTION_SET);
 		
 		// views - build console
 		layout.addShowViewShortcut(IConsoleConstants.ID_CONSOLE_VIEW);
@@ -67,12 +67,12 @@ public class CBrowsingPerspectiveFactory implements IPerspectiveFactory {
 		// views - standard workbench
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_PROBLEM_VIEW);
-		layout.addShowViewShortcut(FortranUIPlugin.CVIEW_ID);
+		layout.addShowViewShortcut(FortranUIPlugin.FVIEW_ID);
 		layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
 		layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
 
 		// link - things we should do
-		layout.addShowInPart(FortranUIPlugin.CVIEW_ID);
+		layout.addShowInPart(FortranUIPlugin.FVIEW_ID);
 		layout.addShowInPart(IPageLayout.ID_RES_NAV);
 
 		addCWizardShortcuts(layout);
@@ -88,12 +88,12 @@ public class CBrowsingPerspectiveFactory implements IPerspectiveFactory {
 		layout.addActionSet(FortranUIPlugin.SEARCH_ACTION_SET_ID);
 //		layout.addActionSet(IDebugUIConstants.LAUNCH_ACTION_SET);
 //		layout.addActionSet(JavaUI.ID_ACTION_SET);
-		layout.addActionSet(FortranUIPlugin.ID_CELEMENT_CREATION_ACTION_SET);
+		layout.addActionSet(FortranUIPlugin.ID_FELEMENT_CREATION_ACTION_SET);
 		layout.addActionSet(IPageLayout.ID_NAVIGATE_ACTION_SET);
 		
 		// views - java
 		layout.addShowViewShortcut(FortranUIPlugin.ID_TYPE_HIERARCHY);
-		layout.addShowViewShortcut(FortranUIPlugin.CVIEW_ID);
+		layout.addShowViewShortcut(FortranUIPlugin.FVIEW_ID);
 		layout.addShowViewShortcut(FortranUIPlugin.ID_PROJECTS_VIEW);
 		layout.addShowViewShortcut(FortranUIPlugin.ID_NAMESPACES_VIEW);
 		layout.addShowViewShortcut(FortranUIPlugin.ID_TYPES_VIEW);
@@ -145,7 +145,7 @@ public class CBrowsingPerspectiveFactory implements IPerspectiveFactory {
 		IPlaceholderFolderLayout placeHolderLeft= layout.createPlaceholderFolder("left", IPageLayout.LEFT, (float)0.25, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
 		placeHolderLeft.addPlaceholder(FortranUIPlugin.ID_TYPE_HIERARCHY); 
 		placeHolderLeft.addPlaceholder(IPageLayout.ID_OUTLINE);
-		placeHolderLeft.addPlaceholder(FortranUIPlugin.CVIEW_ID);
+		placeHolderLeft.addPlaceholder(FortranUIPlugin.FVIEW_ID);
 		placeHolderLeft.addPlaceholder(IPageLayout.ID_RES_NAV);
 		
 		if (shouldShowProjectsView()) {
@@ -190,7 +190,7 @@ public class CBrowsingPerspectiveFactory implements IPerspectiveFactory {
 		IPlaceholderFolderLayout placeHolderLeft= layout.createPlaceholderFolder("left", IPageLayout.LEFT, (float)0.25, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
 		placeHolderLeft.addPlaceholder(FortranUIPlugin.ID_TYPE_HIERARCHY); 
 		placeHolderLeft.addPlaceholder(IPageLayout.ID_OUTLINE);
-		placeHolderLeft.addPlaceholder(FortranUIPlugin.CVIEW_ID);
+		placeHolderLeft.addPlaceholder(FortranUIPlugin.FVIEW_ID);
 		placeHolderLeft.addPlaceholder(IPageLayout.ID_RES_NAV);
 		
 		IPlaceholderFolderLayout placeHolderBottom= layout.createPlaceholderFolder("bottom", IPageLayout.BOTTOM, (float)0.75, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$

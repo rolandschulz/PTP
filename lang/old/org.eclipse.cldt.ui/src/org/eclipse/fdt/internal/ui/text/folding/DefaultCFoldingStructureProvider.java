@@ -27,7 +27,7 @@ import org.eclipse.fdt.core.model.IParent;
 import org.eclipse.fdt.core.model.ISourceRange;
 import org.eclipse.fdt.core.model.ISourceReference;
 import org.eclipse.fdt.core.model.IWorkingCopy;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IWorkingCopyManager;
 import org.eclipse.fdt.ui.PreferenceConstants;
@@ -133,7 +133,7 @@ public class DefaultCFoldingStructureProvider implements IProjectionListener, IC
 	}
 	
 	public void install(ITextEditor editor, ProjectionViewer viewer) {
-		if (editor instanceof CEditor) {
+		if (editor instanceof FortranEditor) {
 			fEditor= editor;
 			fViewer= viewer;
 			fViewer.addProjectionListener(this);
@@ -164,7 +164,7 @@ public class DefaultCFoldingStructureProvider implements IProjectionListener, IC
 		// message.
 		projectionDisabled();
 		
-		if (fEditor instanceof CEditor) {
+		if (fEditor instanceof FortranEditor) {
 			initialize();
 			fElementListener= new ElementChangedListener();
 			CoreModel.getDefault().addElementChangedListener(fElementListener);
@@ -195,7 +195,7 @@ public class DefaultCFoldingStructureProvider implements IProjectionListener, IC
 			fCachedDocument= provider.getDocument(fEditor.getEditorInput());
 			fAllowCollapsing= true;
 			
-			if (fEditor instanceof CEditor) {
+			if (fEditor instanceof FortranEditor) {
 				IWorkingCopyManager manager= FortranUIPlugin.getDefault().getWorkingCopyManager();
 				fInput= manager.getWorkingCopy(fEditor.getEditorInput());
 			}

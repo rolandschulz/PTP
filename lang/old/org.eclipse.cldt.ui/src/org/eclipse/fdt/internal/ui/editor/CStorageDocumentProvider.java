@@ -11,7 +11,7 @@
 
 package org.eclipse.fdt.internal.ui.editor;
 
-import org.eclipse.fdt.internal.ui.text.CTextTools;
+import org.eclipse.fdt.internal.ui.text.FortranTextTools;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.editors.text.StorageDocumentProvider;
@@ -33,8 +33,8 @@ public class CStorageDocumentProvider extends StorageDocumentProvider {
 	 */
 	protected void setupDocument(Object element, IDocument document) {
 		if (document != null) {
-			CTextTools tools= FortranUIPlugin.getDefault().getTextTools();
-			tools.setupCDocument(document);
+			FortranTextTools tools= FortranUIPlugin.getDefault().getTextTools();
+			tools.setupFortranDocument(document);
 		}
 	}
 

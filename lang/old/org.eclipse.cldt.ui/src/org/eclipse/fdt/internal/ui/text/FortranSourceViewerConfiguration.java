@@ -6,9 +6,11 @@ package org.eclipse.fdt.internal.ui.text;
 
 import java.util.Vector;
 
-import org.eclipse.fdt.internal.ui.editor.CEditor;
-import org.eclipse.fdt.internal.ui.editor.CElementHyperlinkDetector;
-import org.eclipse.fdt.internal.ui.editor.CSourceViewer;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranSourceViewer;
+import org.eclipse.fdt.internal.ui.text.CDoubleClickSelector;
+import org.eclipse.fdt.internal.ui.text.IFortranPartitions;
+import org.eclipse.fdt.internal.ui.text.IColorManager;
 import org.eclipse.fdt.internal.ui.text.c.hover.CEditorTextHoverDescriptor;
 import org.eclipse.fdt.internal.ui.text.c.hover.CEditorTextHoverProxy;
 import org.eclipse.fdt.internal.ui.text.contentassist.CCompletionProcessor;
@@ -31,7 +33,6 @@ import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.formatter.IContentFormatter;
 import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
-import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.information.InformationPresenter;
@@ -46,58 +47,47 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
-import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 
 
 /**
- * Configuration for an <code>SourceViewer</code> which shows C code.
+ * Configuration for an <code>SourceViewer</code> which shows Fortran code.
  */
-public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
+public class FortranSourceViewerConfiguration extends SourceViewerConfiguration {
 	
 	/** Key used to look up display tab width */
-	public final static String PREFERENCE_TAB_WIDTH= "org.eclipse.fdt.editor.tab.width"; //$NON-NLS-1$
+	public final static String PREFERENCE_TAB_WIDTH= "org.eclipse.cdt.editor.tab.width"; //$NON-NLS-1$
 
-    private CTextTools fTextTools;
-	private CEditor fEditor;
+    private FortranTextTools fTextTools;
+	private FortranEditor fEditor;
 	
 	/**
-	 * Creates a new C source viewer configuration for viewers in the given editor using
-	 * the given C tools collection.
+	 * Creates a new Fortran source viewer configuration for viewers in the given editor using
+	 * the given Fortran tools collection.
 	 *
-	 * @param tools the C text tools collection to be used
+	 * @param tools the Fortran text tools collection to be used
 	 * @param editor the editor in which the configured viewer will reside
 	 */
-	public CSourceViewerConfiguration(CTextTools tools, CEditor editor) {
-		super(FortranUIPlugin.getDefault().getCombinedPreferenceStore());
+	public FortranSourceViewerConfiguration(FortranTextTools tools, FortranEditor editor) {
 		fTextTools= tools;
 		fEditor= editor;
 	}
 
-	/**
-	 * Returns the C multiline comment scanner for this configuration.
-	 *
-	 * @return the C multiline comment scanner
-	 */
-	protected RuleBasedScanner getMultilineCommentScanner() {
-		return fTextTools.getMultilineCommentScanner();
-	}
 	
 	/**
-	 * Returns the C singleline comment scanner for this configuration.
+	 * Returns the Fortran singleline comment scanner for this configuration.
 	 *
-	 * @return the C singleline comment scanner
+	 * @return the Fortran singleline comment scanner
 	 */
 	protected RuleBasedScanner getSinglelineCommentScanner() {
 		return fTextTools.getSinglelineCommentScanner();
 	}
 	
 	/**
-	 * Returns the C string scanner for this configuration.
+	 * Returns the Fortran string scanner for this configuration.
 	 *
-	 * @return the C string scanner
+	 * @return the Fortran string scanner
 	 */
 	protected RuleBasedScanner getStringScanner() {
 		return fTextTools.getStringScanner();
@@ -126,8 +116,10 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
      * @param editor Editor.
      * @return Presenter with outline view.
      */
-    public IInformationPresenter getOutlinePresenter(CEditor editor)
+    public IInformationPresenter getOutlinePresenter(FortranEditor editor)
     {
+		return null;
+		/*
         final IInformationControlCreator outlineControlCreator = getOutlineContolCreator(editor);
         final InformationPresenter presenter = new InformationPresenter(outlineControlCreator);
         final IInformationProvider provider = new CElementContentProvider(getEditor());
@@ -138,6 +130,7 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
         presenter.setSizeConstraints(20, 20, true, false);
         presenter.setRestoreInformationControlBounds(getSettings("outline_presenter_bounds"), true, true); //$NON-NLS-1$        
         return presenter;
+        */
     }
 
     /**
@@ -147,37 +140,22 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 
 		PresentationReconciler reconciler= new PresentationReconciler();
 
-		RuleBasedScanner scanner;
-
-		if(sourceViewer instanceof CSourceViewer) {
-			String language = ((CSourceViewer)sourceViewer).getDisplayLanguage();
-			if(language != null && language.equals(CEditor.LANGUAGE_CPP)) {
-				scanner= fTextTools.getCppCodeScanner();
-			} else {
-				scanner= fTextTools.getCCodeScanner();
-			}
-		} else {
-			scanner= fTextTools.getCCodeScanner();
-		}
+		RuleBasedScanner scanner = fTextTools.getFortranCodeScanner();
 
 		DefaultDamagerRepairer dr= new DefaultDamagerRepairer(scanner);
 
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
-		//TextAttribute attr = new TextAttribute(manager.getColor(ICColorConstants.C_DEFAULT));
+		//TextAttribute attr = new TextAttribute(manager.getColor(IFortranColorConstants.FORTRAN_DEFAULT));
 		
 		dr= new DefaultDamagerRepairer(getSinglelineCommentScanner());		
-		reconciler.setDamager(dr, ICPartitions.C_SINGLE_LINE_COMMENT);
-		reconciler.setRepairer(dr, ICPartitions.C_SINGLE_LINE_COMMENT);
+		reconciler.setDamager(dr, IFortranPartitions.FORTRAN_SINGLE_LINE_COMMENT);
+		reconciler.setRepairer(dr, IFortranPartitions.FORTRAN_SINGLE_LINE_COMMENT);
 		
 		dr= new DefaultDamagerRepairer(getStringScanner());
-		reconciler.setDamager(dr, ICPartitions.C_STRING);
-		reconciler.setRepairer(dr, ICPartitions.C_STRING);
-		
-		dr= new DefaultDamagerRepairer(getMultilineCommentScanner());		
-		reconciler.setDamager(dr, ICPartitions.C_MULTILINE_COMMENT);
-		reconciler.setRepairer(dr, ICPartitions.C_MULTILINE_COMMENT);
+		reconciler.setDamager(dr, IFortranPartitions.FORTRAN_STRING);
+		reconciler.setRepairer(dr, IFortranPartitions.FORTRAN_STRING);
 
 		return reconciler;
 	}
@@ -187,6 +165,9 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 	 * @see SourceViewerConfiguration#getContentAssistant(ISourceViewer)
 	 */
 	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
+		return null;
+		
+		/*
 		if(getEditor() == null) {
 			return null;
 		}
@@ -206,7 +187,7 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_ABOVE);
 		assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
 
-		return assistant;
+		return assistant;*/
 	}
 	
 	
@@ -226,7 +207,7 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 			};
 			reconciler.setDelay(1000);
 			reconciler.setIsIncrementalReconciler(false);
-			reconciler.setReconcilingStrategy(new CReconcilingStrategy(fEditor), IDocument.DEFAULT_CONTENT_TYPE);
+			reconciler.setReconcilingStrategy(new FortranReconcilingStrategy(fEditor), IDocument.DEFAULT_CONTENT_TYPE);
 			return reconciler;
 		}
 		return null;
@@ -237,10 +218,7 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 	 * @see SourceViewerConfiguration#getAutoIndentStrategy(ISourceViewer, String)
 	 */
 	public IAutoIndentStrategy getAutoIndentStrategy(ISourceViewer sourceViewer, String contentType) {
-		if(ICPartitions.C_MULTILINE_COMMENT.equals(contentType)) {
-			return new CCommentAutoIndentStrategy();
-		}
-		return new CAutoIndentStrategy();
+		return new FortranAutoIndentStrategy();
 	}
 
 
@@ -255,7 +233,7 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getDefaultPrefixes(ISourceViewer, String)
 	 */
 	public String[] getDefaultPrefixes(ISourceViewer sourceViewer, String contentType) {
-		return new String[] { "//", "" }; //$NON-NLS-1$ //$NON-NLS-2$
+		return new String[] { "!", "" }; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -263,12 +241,9 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 	 */
 	public String getDefaultPrefix(ISourceViewer sourceViewer, String contentType) {
 		if(IDocument.DEFAULT_CONTENT_TYPE.equals(contentType))
-			return "//"; //$NON-NLS-1$
-		if(ICPartitions.C_SINGLE_LINE_COMMENT.equals(contentType)) {
-			return "//"; //$NON-NLS-1$
-		}
-		if(ICPartitions.C_MULTILINE_COMMENT.equals(contentType)) {
-			return "//"; //$NON-NLS-1$
+			return "!"; //$NON-NLS-1$
+		if(IFortranPartitions.FORTRAN_SINGLE_LINE_COMMENT.equals(contentType)) {
+			return "!"; //$NON-NLS-1$
 		}
 		return null;
 	}
@@ -283,7 +258,7 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 
 		// prefix[0] is either '\t' or ' ' x tabWidth, depending on useSpaces
 		int tabWidth= getPreferenceStore().getInt(PREFERENCE_TAB_WIDTH);
-		boolean useSpaces= getPreferenceStore().getBoolean(CEditor.SPACES_FOR_TABS); //$NON-NLS-1$
+		boolean useSpaces= getPreferenceStore().getBoolean(FortranEditor.SPACES_FOR_TABS); //$NON-NLS-1$
 
 		for (int i= 0; i <= tabWidth; i++) {
 		    StringBuffer prefix= new StringBuffer();
@@ -323,7 +298,7 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 	 * @see SourceViewerConfiguration#getAnnotationHover(ISourceViewer)
 	 */
 	public IAnnotationHover getAnnotationHover(ISourceViewer sourceViewer) {
-		return new CAnnotationHover();
+		return null; //new CAnnotationHover();
 	}
 
 
@@ -333,7 +308,7 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 	 * @since 2.1
 	 */
 	public int[] getConfiguredTextHoverStateMasks(ISourceViewer sourceViewer, String contentType) {
-		CEditorTextHoverDescriptor[] hoverDescs= FortranUIPlugin.getDefault().getCEditorTextHoverDescriptors();
+		CEditorTextHoverDescriptor[] hoverDescs= FortranUIPlugin.getDefault().getFEditorTextHoverDescriptors();
 		int stateMasks[]= new int[hoverDescs.length];
 		int stateMasksLength= 0;		
 		for (int i= 0; i < hoverDescs.length; i++) {
@@ -362,7 +337,7 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 	 * @since 2.1
 	 */
 	public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType, int stateMask) {
-		CEditorTextHoverDescriptor[] hoverDescs= FortranUIPlugin.getDefault().getCEditorTextHoverDescriptors();
+		CEditorTextHoverDescriptor[] hoverDescs= FortranUIPlugin.getDefault().getFEditorTextHoverDescriptors();
 		int i= 0;
 		while (i < hoverDescs.length) {
 			if (hoverDescs[i].isEnabled() &&  hoverDescs[i].getStateMask() == stateMask)
@@ -385,9 +360,8 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 	 */
 	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
 		return new String[] { 	IDocument.DEFAULT_CONTENT_TYPE, 
-								ICPartitions.C_MULTILINE_COMMENT,
-								ICPartitions.C_SINGLE_LINE_COMMENT,
-								ICPartitions.C_STRING };
+								IFortranPartitions.FORTRAN_SINGLE_LINE_COMMENT,
+								IFortranPartitions.FORTRAN_STRING };
 	}
 	
 	/**
@@ -395,13 +369,13 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 	 */
 	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer) {
 		
-		final MultiPassContentFormatter formatter = 
+		/*final MultiPassContentFormatter formatter = 
 			new MultiPassContentFormatter(getConfiguredDocumentPartitioning(sourceViewer), 
 				IDocument.DEFAULT_CONTENT_TYPE);
 		
 		formatter.setMasterStrategy(new CFormattingStrategy());
-		return formatter;
-		
+		return formatter;*/
+		return null;
 		
 	}
 	
@@ -419,62 +393,42 @@ public class CSourceViewerConfiguration extends TextSourceViewerConfiguration {
 	
 
 	public IInformationControlCreator getInformationControlCreator(ISourceViewer sourceViewer, final boolean cutDown) {
-			return new IInformationControlCreator() {
+			/*return new IInformationControlCreator() {
 			public IInformationControl createInformationControl(Shell parent) {
 				int style = cutDown ? SWT.NONE : (SWT.V_SCROLL | SWT.H_SCROLL);
 				return new DefaultInformationControl(parent, style, new HTMLTextPresenter(cutDown));
 				// return new HoverBrowserControl(parent);
 			}
-		};
+		};*/
+		return null;
 	}
 
 	public IInformationPresenter getInformationPresenter(ISourceViewer sourceViewer) {
 		return super.getInformationPresenter(sourceViewer);
 	}
     
-	/*
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getHyperlinkDetectors(org.eclipse.jface.text.source.ISourceViewer)
-	 * @since 3.1
-	 */
-	public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
-		if (!fPreferenceStore.getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_HYPERLINKS_ENABLED))
-			return null;
-		
-		IHyperlinkDetector[] inheritedDetectors= super.getHyperlinkDetectors(sourceViewer);
-		
-		if (fEditor == null)
-			return inheritedDetectors;
-		
-		int inheritedDetectorsLength= inheritedDetectors != null ? inheritedDetectors.length : 0;
-		IHyperlinkDetector[] detectors= new IHyperlinkDetector[inheritedDetectorsLength + 1];
-		detectors[0]= new CElementHyperlinkDetector(fEditor); 
-		for (int i= 0; i < inheritedDetectorsLength; i++) {
-			detectors[i+1]= inheritedDetectors[i];
-		}
-		
-		return detectors;
-	}
- 
+    
     /**
      * Creates control for outline presentation in editor.
      * @param editor Editor.
      * @return Control.
      */
-    private IInformationControlCreator getOutlineContolCreator(final CEditor editor)
+    private IInformationControlCreator getOutlineContolCreator(final FortranEditor editor)
     {
-        final IInformationControlCreator conrolCreator = new IInformationControlCreator()
-        {
+        //final IInformationControlCreator conrolCreator = new IInformationControlCreator()
+        //{
             /**
              * @see org.eclipse.jface.text.IInformationControlCreator#createInformationControl(org.eclipse.swt.widgets.Shell)
              */
-            public IInformationControl createInformationControl(Shell parent)
-            {
-                int shellStyle= SWT.RESIZE;
-                int treeStyle= SWT.V_SCROLL | SWT.H_SCROLL;
-                return new COutlineInformationControl(editor, parent, shellStyle, treeStyle);   
-            }
-        };
-        return conrolCreator;
+        //    public IInformationControl createInformationControl(Shell parent)
+        //    {
+        //        int shellStyle= SWT.RESIZE;
+        //        int treeStyle= SWT.V_SCROLL | SWT.H_SCROLL;
+        //        return new COutlineInformationControl(editor, parent, shellStyle, treeStyle);   
+        //    }
+        //};
+        //return conrolCreator;*/
+		return null;
     }
 
     /**

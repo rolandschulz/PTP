@@ -16,7 +16,7 @@ import org.eclipse.jface.text.source.ICharacterPairMatcher;
 /**
  * Helper class for match pairs of characters.
  */
-public class CPairMatcher implements ICharacterPairMatcher {
+public class FortranPairMatcher implements ICharacterPairMatcher {
 
 	protected char[] fPairs;
 	protected IDocument fDocument;
@@ -28,7 +28,7 @@ public class CPairMatcher implements ICharacterPairMatcher {
 
 	protected CCodeReader fReader = new CCodeReader();
 
-	public CPairMatcher(char[] pairs) {
+	public FortranPairMatcher(char[] pairs) {
 		fPairs = pairs;
 	}
 

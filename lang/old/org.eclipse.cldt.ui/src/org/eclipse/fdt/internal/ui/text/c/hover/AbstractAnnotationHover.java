@@ -14,7 +14,7 @@ package org.eclipse.fdt.internal.ui.text.c.hover;
 import java.util.Iterator;
 
 import org.eclipse.fdt.internal.ui.editor.CAnnotationIterator;
-import org.eclipse.fdt.internal.ui.editor.CEditor;
+import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.text.HTMLPrinter;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -100,7 +100,7 @@ public class AbstractAnnotationHover extends AbstractCEditorTextHover {
 	 * @see IJavaEditorTextHover#setEditor(IEditorPart)
 	 */
 	public void setEditor(IEditorPart editor) {
-		if (editor instanceof CEditor)
+		if (editor instanceof FortranEditor)
 			super.setEditor(editor);
 		else
 			super.setEditor(null);

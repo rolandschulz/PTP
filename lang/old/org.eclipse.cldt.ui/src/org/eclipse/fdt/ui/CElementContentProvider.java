@@ -30,7 +30,7 @@ import org.eclipse.fdt.internal.core.model.ArchiveContainer;
 import org.eclipse.fdt.internal.core.model.BinaryContainer;
 import org.eclipse.fdt.internal.ui.BaseFortranElementContentProvider;
 import org.eclipse.fdt.internal.ui.actions.SelectionConverter;
-import org.eclipse.fdt.internal.ui.text.CWordFinder;
+import org.eclipse.fdt.internal.ui.text.FortranWordFinder;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
@@ -356,7 +356,7 @@ public class CElementContentProvider extends BaseFortranElementContentProvider i
      */
     public IRegion getSubject(ITextViewer textViewer, int offset) {
 		if (textViewer != null && fEditor != null) {
-			IRegion region = CWordFinder.findWord(textViewer.getDocument(),
+			IRegion region = FortranWordFinder.findWord(textViewer.getDocument(),
 					offset);
 			if (region != null) {
 				return region;

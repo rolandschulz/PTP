@@ -57,7 +57,7 @@ public class MembersView extends CBrowsingPart implements IPropertyChangeListene
 		if (key == IShowInTargetList.class) {
 			return new IShowInTargetList() {
 				public String[] getShowInTargetIds() {
-					return new String[] { FortranUIPlugin.CVIEW_ID };
+					return new String[] { FortranUIPlugin.FVIEW_ID };
 				}
 
 			};

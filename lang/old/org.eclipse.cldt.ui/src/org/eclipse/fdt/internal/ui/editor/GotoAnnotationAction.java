@@ -32,17 +32,17 @@ public class GotoAnnotationAction extends TextEditorAction {
 	}
 	
 	public void run() {
-		CEditor e= (CEditor) getTextEditor();
+		FortranEditor e= (FortranEditor) getTextEditor();
 		e.gotoAnnotation(fForward);
 	}
 	
 	public void setEditor(ITextEditor editor) {
-		if (editor instanceof CEditor) 
+		if (editor instanceof FortranEditor) 
 			super.setEditor(editor);
 		update();
 	}
 	
 	public void update() {
-		setEnabled(getTextEditor() instanceof CEditor);
+		setEnabled(getTextEditor() instanceof FortranEditor);
 	}
 }

@@ -15,7 +15,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.internal.ui.FortranHelpProviderManager;
 import org.eclipse.fdt.internal.ui.editor.CEditorMessages;
-import org.eclipse.fdt.internal.ui.text.CWordFinder;
+import org.eclipse.fdt.internal.ui.text.FortranWordFinder;
 import org.eclipse.fdt.internal.ui.text.HTMLPrinter;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IFunctionSummary;
@@ -103,7 +103,7 @@ public class CDocHover extends AbstractCEditorTextHover {
 			 offset <= selectedRange.x + selectedRange.y)
 			return new Region( selectedRange.x, selectedRange.y );
 		if (viewer != null)
-			return CWordFinder.findWord(viewer.getDocument(), offset);
+			return FortranWordFinder.findWord(viewer.getDocument(), offset);
 		return null;
 	}
 	
