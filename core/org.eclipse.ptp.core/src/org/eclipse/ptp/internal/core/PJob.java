@@ -10,10 +10,6 @@ import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
 
-/**
- * @author Clement
- *
- */
 public class PJob extends Parent implements IPJob {
     protected String NAME_TAG = "root ";
     
