@@ -1,0 +1,435 @@
+package org.eclipse.ptp.ui.views;
+
+import java.util.ArrayList;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.IOpenListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.OpenEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ptp.core.IPElement;
+import org.eclipse.ptp.core.IPNode;
+import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.IPRoot;
+import org.eclipse.ptp.launch.core.ILaunchManager;
+import org.eclipse.ptp.ui.ParallelElementContentProvider;
+import org.eclipse.ptp.ui.ParallelElementLabelProvider;
+import org.eclipse.ptp.ui.UIUtils;
+import org.eclipse.ptp.ui.actions.ShowAllNodesAction;
+import org.eclipse.ptp.ui.actions.ShowProcessesAction;
+import org.eclipse.ptp.ui.actions.TerminateAllAction;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.part.DrillDownComposite;
+
+/**
+ * @author Clement
+ *
+ */
+public class ParallelProcessesView extends AbstractParallelView {
+    public static ParallelProcessesView instance = null;    
+    private ParallelElementLabelProvider labelProvider = new ParallelElementLabelProvider();
+
+    private IPElement selectedElement = null;
+    
+    private TerminateAllAction terminateAllAction = null;
+    private ShowProcessesAction showProcessesAction = null;
+    private ShowAllNodesAction showAllNodesAction = null;    
+    
+    private boolean SHOW_PROCESS_ONLY = false;
+    /*
+    private SearchAction searchAction = null;
+    private ExitAction exitAction = null;
+    private AbortAction abortAction = null;
+    private ViewStatusAction viewStatusAction = null;
+    */
+
+    private TreeViewer treeViewer = null;
+    
+    public ParallelProcessesView() {
+        super();
+        instance = this;
+    }
+    
+    public void dispose() {
+        super.dispose();
+        instance = null;
+    }
+    
+    public static ParallelProcessesView getInstance() {
+        //if (instance == null)
+        //  UIUtils.showView(UIUtils.ParallelProcessesView_ID);        
+        return instance;
+    }
+    
+    public void reset(int style) {
+        setInput(launchManager.getProcessRoot(), style);
+    }
+
+    public void refresh(final IPElement[] elements) {
+        Runnable runnable = new Runnable() {
+            public void run() {
+            	for (int i=0; i<elements.length; i++) {
+                    treeViewer.refresh(elements[i]);
+            	}
+            }
+        };
+        execStyle(ASYN_STYLE, runnable);
+    }
+    
+    public void refreshAll(int state, final boolean isUpdateLabel) {
+        Runnable runnable = new Runnable() {
+            public void run() {
+                treeViewer.refresh(isUpdateLabel);
+            }
+        };
+        execStyle(state, runnable);
+    }
+
+    public void refresh(final IPElement element) {    	
+        Runnable runnable = new Runnable() {
+            public void run() {
+            	treeViewer.refresh(element, true);
+            	//if (element.isAllStop())
+            	//	treeViewer.refresh(element.getParent());
+            	/*
+		        Object data = element.getData();
+		        if (data != null && data instanceof TreeItem) {
+		            TreeItem item = (TreeItem)data;
+		        	if (!item.isDisposed())		        		
+		        	    item.setForeground(labelProvider.getForeground(element));
+		        }*/
+            }
+        };
+        execStyle(ASYN_STYLE, runnable);
+    }
+    
+    public void start() {
+    	System.out.println("ParallelProcessesView - start");
+    	updateButton();
+    	initNode();
+    }
+    
+    public void stopped() {
+        System.out.println("ParallelProcessesView - stopped");
+        //refresh Node only
+        //refresh(launchManager.getProcessRoot().getNodes());
+        updateButton();
+    }
+
+    public void run() {
+        System.out.println("ParallelProcessesView - run");        
+        updateButton();
+        //removerAllProcessViewer();
+    }
+    public void abort() {
+        System.out.println("ParallelProcessesView - abort");
+        //reset(ASYN_STYLE);
+        refreshAll(ASYN_STYLE, true);
+        updateButton();
+    }
+    public void exit() {
+        System.out.println("ParallelProcessesView - exit");
+        updateButton();
+    }
+    public void updatedStatusEvent() {
+        //reset(ASYN_STYLE);
+        refreshAll(ASYN_STYLE, true);
+    }
+    public void execStatusChangeEvent(Object object) {
+        if (object instanceof IPElement)
+            refresh((IPElement)object);
+
+        updateButton();
+    }
+    public void sysStatusChangeEvent(Object object) {
+        //initNode();
+        //reset(ASYN_STYLE);
+        refreshAll(ASYN_STYLE, true);
+    }    
+    public void processOutputEvent(Object object) {        
+    }
+    public void errorEvent(Object object) {
+        //refresh Node only
+        refresh(launchManager.getProcessRoot().getNodes());
+        updateButton();
+    }
+    public void updateButton() {
+        terminateAllAction.setEnabled(launchManager.getCurrentState() == ILaunchManager.STATE_RUN);
+        
+        boolean isEnabled = launchManager.isMPIRuning();
+        showAllNodesAction.setEnabled(isEnabled);
+        showProcessesAction.setEnabled(isEnabled);
+        /*
+        searchAction.setEnabled(isEnabled);
+        viewStatusAction.setEnabled(isRuning);
+        abortAction.setEnabled(isRuning);
+        exitAction.setEnabled(isRuning);
+        */
+    }
+    
+    private void initNode() {
+    	System.out.println("ParallelProcessView: initNode");
+    	try {
+	    	launchManager.mpisysstatus();
+	        reset(ASYN_STYLE);
+    	} catch (CoreException e) {
+    	}
+    	
+    }
+    public void setFocus() {
+        setSelection();
+    }
+    
+    public void createPartControl(Composite parent) {
+        createAction();
+        addActionsToToolbar();
+        createControl(parent);
+        updateButton();
+        registerViewer();
+        initNode();
+    }
+    
+    protected void createAction() {
+        terminateAllAction = new TerminateAllAction(this);
+        showAllNodesAction = new ShowAllNodesAction(this);
+        showProcessesAction = new ShowProcessesAction(this);
+
+        showAllNodesAction.setChecked(true);        
+        /*
+        searchAction = new SearchAction(this);
+        viewStatusAction = new ViewStatusAction(this);
+        abortAction = new AbortAction(this);
+        exitAction = new ExitAction(this);
+        */
+    }
+    
+    protected void addActionsToToolbar() {
+        IToolBarManager toolbarManager = getViewSite().getActionBars().getToolBarManager();
+        toolbarManager.add(showAllNodesAction);
+        toolbarManager.add(showProcessesAction);
+        
+        toolbarManager.add(new Separator());
+        toolbarManager.add(terminateAllAction);
+        /*
+        toolbarManager.add(searchAction);
+        toolbarManager.add(viewStatusAction);
+        toolbarManager.add(abortAction);
+        toolbarManager.add(exitAction);
+        toolbarManager.add(new Separator());
+        */
+    }
+    
+    public Object[] getElements(Object parent) {
+        if (parent instanceof IPElement) {         
+            switch (((IPElement)parent).getElementType()) {
+                case IPElement.P_ROOT:
+                    if (SHOW_PROCESS_ONLY)
+                        return ((IPRoot)parent).getSortedProcesses();
+                	
+                	return ((IPRoot)parent).getSortedNodes();
+                case IPElement.P_NODE:
+                    return ((IPNode)parent).getSortedProcesses();
+            }
+        }
+        return null;        
+    }
+    
+    protected void createControl(Composite parent) {
+        Composite controlComp = new Composite(parent, SWT.NONE);
+        controlComp.setLayout(new FillLayout());
+
+        DrillDownComposite drillDown = new DrillDownComposite(controlComp, SWT.BORDER);
+        drillDown.setLayout(createGridLayout(1, false, 0, 0));
+        drillDown.setLayoutData(createDefaultGridData(GridData.FILL_HORIZONTAL));
+
+        treeViewer = new TreeViewer(drillDown, SWT.H_SCROLL | SWT.V_SCROLL) {
+            protected Object[] getFilteredChildren(Object parentElement) {
+                Object[] objectArray = getElements(parentElement);
+                if (objectArray != null)
+                    return objectArray;
+                return new ArrayList().toArray();
+            }
+            /*
+            protected void createTreeItem(Widget parent, Object element, int index) {
+        		Item item = newItem(parent, SWT.NULL, index);
+        		updateItem(item, element);
+        		updatePlus(item, element);
+        		if (element instanceof IPElement)
+        		    ((IPElement)element).setData(item);
+            }*/
+        };
+        drillDown.setChildTree(treeViewer);
+        treeViewer.addOpenListener(new IOpenListener() {
+            public void open(OpenEvent event) {
+               ISelection selection = event.getSelection();
+               if (selection instanceof IStructuredSelection) {
+                   openEditorAction(((IStructuredSelection) selection).getFirstElement());
+               }
+           }
+        });
+        
+        treeViewer.setLabelProvider(labelProvider);
+        treeViewer.setContentProvider(new ParallelElementContentProvider(false, false));
+        treeViewer.setInput(launchManager.getProcessRoot());
+        setSelection();
+    }
+    
+    protected void openEditorAction(Object element) {
+        if (element instanceof IPProcess) {
+        	openProcessViewer((IPProcess)element);
+        }
+    }
+    
+    private void setSelection() {
+        if (selectedElement == null && !treeViewer.getSelection().isEmpty())
+            return;
+
+        if (selectedElement == null) {            
+        	//treeViewer.getTree().setSelection(new TreeItem[] { treeViewer.getTree().getTopItem() });
+            treeViewer.setSelection(StructuredSelection.EMPTY);
+        }
+        else
+        	treeViewer.setSelection(new StructuredSelection(selectedElement));
+
+        /*
+        Tree tree = treeViewer.getTree();
+        TreeItem item = null;
+        if (selectedElement != null) {
+            Object data = selectedElement.getData();
+            if (data != null && data instanceof TreeItem)
+                item = (TreeItem)data;
+            
+            selectedElement = null;
+        }
+
+        if (item == null)
+            item = tree.getTopItem();
+        
+        tree.setSelection(new TreeItem[] { item });        
+        */
+    }
+        
+    public void setInput(final Object input, int style) {
+        Runnable runnable = new Runnable() {
+            public void run() {
+                treeViewer.setInput(input);
+                setSelection();
+            }
+        };
+        execStyle(style, runnable);
+    }
+    
+    private void showAllNodes(int style) {
+        if (SHOW_PROCESS_ONLY) {
+	        SHOW_PROCESS_ONLY = false;
+	        showAllNodesAction.setChecked(true);
+	        showProcessesAction.setChecked(false);
+	        reset(style);
+        }
+    }
+    
+    public void showAllNodes() {
+        if (SHOW_PROCESS_ONLY) {
+	        SHOW_PROCESS_ONLY = false;
+	        showAllNodesAction.setChecked(true);
+	        showProcessesAction.setChecked(false);
+	        reset(ASYN_STYLE);
+        }
+	}
+    public void showProcesses() {
+        if (!SHOW_PROCESS_ONLY) {
+	        SHOW_PROCESS_ONLY = true;
+	        showAllNodesAction.setChecked(false);
+	        showProcessesAction.setChecked(true);
+	        reset(ASYN_STYLE);
+        }
+    }
+    public void showProcesses(int style) {
+        if (!SHOW_PROCESS_ONLY) {
+	        SHOW_PROCESS_ONLY = true;
+	        showAllNodesAction.setChecked(false);
+	        showProcessesAction.setChecked(true);
+	        reset(style);
+        }
+    }    
+    public void searchForNode(int nodeNumber) {
+        if (launchManager.getProcessRoot() == null) return;
+
+        boolean found = false;
+        IPNode node = launchManager.getProcessRoot().findNode(String.valueOf(nodeNumber));
+        if (node != null) {
+	        showAllNodes(BUSY_STYLE);
+	        treeViewer.setSelection(new StructuredSelection(node));
+	        found = true;
+	        /*
+            Object data = node.getData();
+            if (data != null && data instanceof TreeItem) {
+                treeViewer.getTree().setSelection(new TreeItem[] {(TreeItem) data});
+                found = true;
+            }
+            */
+        }
+        if (!found)
+            UIUtils.showErrorDialog(getViewSite().getShell(), "Search not found", "Node " + nodeNumber + " cannot be found", UIUtils.NORMAL);        
+    }
+    public void searchForProcess(int processNumber) {
+        if (launchManager.getProcessRoot() == null) return;
+
+        boolean found = false;
+        IPProcess process = launchManager.getProcessRoot().findProcess(String.valueOf(processNumber));
+        if (process != null) {
+           	treeViewer.expandToLevel(process.getParent(), 1);
+	        treeViewer.setSelection(new StructuredSelection(process));
+            found = true;
+           	
+            /*
+            Object data = process.getData();
+            if (data != null && data instanceof TreeItem) {
+                treeViewer.getTree().setSelection(new TreeItem[] {(TreeItem) data});
+                found = true;
+            }
+            */
+        }
+        if (!found)
+            UIUtils.showErrorDialog(getViewSite().getShell(), "Search not found", "Process " + processNumber + " cannot be found", UIUtils.NORMAL);
+    } 
+
+    public void selectReveal(IPElement element) {
+		Control ctrl= treeViewer.getControl();
+		if (ctrl == null || ctrl.isDisposed())
+			return;
+		
+		selectedElement = element;
+	    if (SHOW_PROCESS_ONLY)
+	        showAllNodes(BUSY_STYLE);
+	    else
+	        setSelection();
+
+		/*
+		if (element instanceof IPNode) {
+		    if (SHOW_PROCESS_ONLY)
+		        showAllNodes(BUSY_STYLE);
+		    else
+		        setSelection();
+		}
+		else if (element instanceof IPProcess) {
+		    if (SHOW_PROCESS_ONLY)
+		        setSelection();
+		    else
+		        showProcesses(BUSY_STYLE);
+		}*/
+	}
+	
+	public void registerViewer() {
+		// Register viewer with site. This must be done before making the actions.
+		getSite().setSelectionProvider(treeViewer);
+	}	
+}
