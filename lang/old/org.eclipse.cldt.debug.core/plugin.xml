@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin
-   id="org.eclipse.fdt.debug.core"
+   id="org.eclipse.cldt.debug.core"
    name="%pluginName"
    version="3.0.0"
    provider-name="%providerName"
-   class="org.eclipse.fdt.debug.core.CDebugCorePlugin">
+   class="org.eclipse.cldt.debug.core.CDebugCorePlugin">
 
    <runtime>
-      <library name="fdtdebugcore.jar">
+      <library name="cldtdebugcore.jar">
          <export name="*"/>
       </library>
    </runtime>
    <requires>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.debug.core"/>
-      <import plugin="org.eclipse.fdt.core"/>
+      <import plugin="org.eclipse.cldt.core"/>
       <import plugin="org.eclipse.core.runtime"/>
    </requires>
 
@@ -32,26 +32,26 @@
             value="true">
       </persistent>
       <attribute
-            name="org.eclipse.fdt.debug.core.condition">
+            name="org.eclipse.cldt.debug.core.condition">
       </attribute>
       <attribute
-            name="org.eclipse.fdt.debug.core.ignoreCount">
+            name="org.eclipse.cldt.debug.core.ignoreCount">
       </attribute>
       <attribute
-            name="org.eclipse.fdt.debug.core.threadId">
+            name="org.eclipse.cldt.debug.core.threadId">
       </attribute>
       <attribute
-            name="org.eclipse.fdt.debug.core.installCount">
+            name="org.eclipse.cldt.debug.core.installCount">
       </attribute>
       <attribute
-            name="org.eclipse.fdt.debug.core.sourceHandle">
+            name="org.eclipse.cldt.debug.core.sourceHandle">
       </attribute>
    </extension>
    <extension
          id="commonCLineBreakpointMarker"
          point="org.eclipse.core.resources.markers">
       <super
-            type="org.eclipse.fdt.debug.core.cBreakpointMarker">
+            type="org.eclipse.cldt.debug.core.cBreakpointMarker">
       </super>
       <super
             type="org.eclipse.debug.core.lineBreakpointMarker">
@@ -64,23 +64,23 @@
          id="cLineBreakpointMarker"
          point="org.eclipse.core.resources.markers">
       <super
-            type="org.eclipse.fdt.debug.core.commonCLineBreakpointMarker">
+            type="org.eclipse.cldt.debug.core.commonCLineBreakpointMarker">
       </super>
       <persistent
             value="true">
       </persistent>
       <attribute
-            name="org.eclipse.fdt.debug.core.function">
+            name="org.eclipse.cldt.debug.core.function">
       </attribute>
       <attribute
-            name="org.eclipse.fdt.debug.core.address">
+            name="org.eclipse.cldt.debug.core.address">
       </attribute>
    </extension>
    <extension
          id="cAddressBreakpointMarker"
          point="org.eclipse.core.resources.markers">
       <super
-            type="org.eclipse.fdt.debug.core.commonCLineBreakpointMarker">
+            type="org.eclipse.cldt.debug.core.commonCLineBreakpointMarker">
       </super>
       <persistent
             value="true">
@@ -90,7 +90,7 @@
          id="cFunctionBreakpointMarker"
          point="org.eclipse.core.resources.markers">
       <super
-            type="org.eclipse.fdt.debug.core.commonCLineBreakpointMarker">
+            type="org.eclipse.cldt.debug.core.commonCLineBreakpointMarker">
       </super>
       <persistent
             value="true">
@@ -100,51 +100,51 @@
          id="cWatchpointMarker"
          point="org.eclipse.core.resources.markers">
       <super
-            type="org.eclipse.fdt.debug.core.cBreakpointMarker">
+            type="org.eclipse.cldt.debug.core.cBreakpointMarker">
       </super>
       <persistent
             value="true">
       </persistent>
       <attribute
-            name="org.eclipse.fdt.debug.core.expression">
+            name="org.eclipse.cldt.debug.core.expression">
       </attribute>
       <attribute
-            name="org.eclipse.fdt.debug.core.write">
+            name="org.eclipse.cldt.debug.core.write">
       </attribute>
       <attribute
-            name="org.eclipse.fdt.debug.core.read">
+            name="org.eclipse.cldt.debug.core.read">
       </attribute>
    </extension>
    <extension
          point="org.eclipse.debug.core.breakpoints">
       <breakpoint
-            class="org.eclipse.fdt.debug.internal.core.breakpoints.CLineBreakpoint"
+            class="org.eclipse.cldt.debug.internal.core.breakpoints.CLineBreakpoint"
             name="%cLineBreakpoints.name"
-            markerType="org.eclipse.fdt.debug.core.cLineBreakpointMarker"
+            markerType="org.eclipse.cldt.debug.core.cLineBreakpointMarker"
             id="cLineBreakpoint">
       </breakpoint>
       <breakpoint
-            class="org.eclipse.fdt.debug.internal.core.breakpoints.CAddressBreakpoint"
+            class="org.eclipse.cldt.debug.internal.core.breakpoints.CAddressBreakpoint"
             name="%cAddressBreakpoints.name"
-            markerType="org.eclipse.fdt.debug.core.cAddressBreakpointMarker"
+            markerType="org.eclipse.cldt.debug.core.cAddressBreakpointMarker"
             id="cAddressBreakpoint">
       </breakpoint>
       <breakpoint
-            class="org.eclipse.fdt.debug.internal.core.breakpoints.CFunctionBreakpoint"
+            class="org.eclipse.cldt.debug.internal.core.breakpoints.CFunctionBreakpoint"
             name="%cFunctionBreakpoints.name"
-            markerType="org.eclipse.fdt.debug.core.cFunctionBreakpointMarker"
+            markerType="org.eclipse.cldt.debug.core.cFunctionBreakpointMarker"
             id="cFunctionBreakpoint">
       </breakpoint>
       <breakpoint
-            class="org.eclipse.fdt.debug.internal.core.breakpoints.CWatchpoint"
+            class="org.eclipse.cldt.debug.internal.core.breakpoints.CWatchpoint"
             name="%cWatchpoints.name"
-            markerType="org.eclipse.fdt.debug.core.cWatchpointMarker"
+            markerType="org.eclipse.cldt.debug.core.cWatchpointMarker"
             id="cWatchpoint">
       </breakpoint>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.fdt.debug.internal.core.CDebugCorePreferenceInitializer"/>
+      <initializer class="org.eclipse.cldt.debug.internal.core.CDebugCorePreferenceInitializer"/>
    </extension>
 
 </plugin>

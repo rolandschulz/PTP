@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin
-   id="org.eclipse.fdt.make.core"
+   id="org.eclipse.cldt.make.core"
    name="%pluginName"
    version="3.0.0"
    provider-name="%providerName"
-   class="org.eclipse.fdt.make.core.MakeCorePlugin">
+   class="org.eclipse.cldt.make.core.MakeCorePlugin">
 
    <runtime>
-      <library name="fdtmakecore.jar">
+      <library name="cldtmakecore.jar">
          <export name="*"/>
       </library>
    </runtime>
    <requires>
       <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.fdt.core"/>
+      <import plugin="org.eclipse.cldt.core"/>
       <import plugin="org.eclipse.core.runtime"/>
    </requires>
 
@@ -24,10 +24,10 @@
 
    <extension
          id="MakeScannerProvider"
-         point="org.eclipse.fdt.core.ScannerInfoProvider">
+         point="org.eclipse.cldt.core.ScannerInfoProvider">
       <cextension>
          <run
-               class="org.eclipse.fdt.make.core.MakeScannerProvider">
+               class="org.eclipse.cldt.make.core.MakeScannerProvider">
          </run>
       </cextension>
    </extension>
@@ -36,15 +36,15 @@
          name="%natureMake.name"
          point="org.eclipse.core.resources.natures">
       <requires-nature
-            id="org.eclipse.fdt.core.fnature">
+            id="org.eclipse.cldt.core.fnature">
       </requires-nature>
       <runtime>
          <run
-               class="org.eclipse.fdt.make.core.MakeProjectNature">
+               class="org.eclipse.cldt.make.core.MakeProjectNature">
          </run>
       </runtime>
       <builder
-            id="org.eclipse.fdt.make.core.makeBuilder">
+            id="org.eclipse.cldt.make.core.makeBuilder">
       </builder>
    </extension>
    <extension
@@ -54,7 +54,7 @@
       <builder
             hasNature="true">
          <run
-               class="org.eclipse.fdt.make.core.MakeBuilder">
+               class="org.eclipse.cldt.make.core.MakeBuilder">
             <!--parameter
                   name="defaultCommand"
                   value="make">
@@ -65,17 +65,17 @@
    <extension
          id="make"
          name="%makeproject.name"
-         point="org.eclipse.fdt.core.CProject">
+         point="org.eclipse.cldt.core.CProject">
       <cproject
-            class="org.eclipse.fdt.make.internal.core.MakeProject"
-            natureID="org.eclipse.fdt.make.core.makeNature">
+            class="org.eclipse.cldt.make.internal.core.MakeProject"
+            natureID="org.eclipse.cldt.make.core.makeNature">
       </cproject>
    </extension>
    <extension
-         point="org.eclipse.fdt.make.core.MakeTargetBuilder">
+         point="org.eclipse.cldt.make.core.MakeTargetBuilder">
       <builder
-            builderID="org.eclipse.fdt.make.core.makeBuilder"
-            id="org.eclipse.fdt.make.MakeTargetBuilder">
+            builderID="org.eclipse.cldt.make.core.makeBuilder"
+            id="org.eclipse.cldt.make.MakeTargetBuilder">
       </builder>
    </extension>
    <extension
@@ -83,15 +83,15 @@
          name="%epScannerConfigNature.name"
          point="org.eclipse.core.resources.natures">
       <requires-nature
-            id="org.eclipse.fdt.make.core.makeNature">
+            id="org.eclipse.cldt.make.core.makeNature">
       </requires-nature>
       <runtime>
          <run
-               class="org.eclipse.fdt.make.core.scannerconfig.ScannerConfigNature">
+               class="org.eclipse.cldt.make.core.scannerconfig.ScannerConfigNature">
          </run>
       </runtime>
       <builder
-            id="org.eclipse.fdt.make.core.ScannerConfigBuilder">
+            id="org.eclipse.cldt.make.core.ScannerConfigBuilder">
       </builder>
    </extension>
    <extension
@@ -101,66 +101,66 @@
       <builder
             hasNature="true">
          <run
-               class="org.eclipse.fdt.make.core.scannerconfig.ScannerConfigBuilder">
+               class="org.eclipse.cldt.make.core.scannerconfig.ScannerConfigBuilder">
          </run>
       </builder>
    </extension>
    <extension
          id="DiscoveredScannerInfoProvider"
-         point="org.eclipse.fdt.core.ScannerInfoProvider">
+         point="org.eclipse.cldt.core.ScannerInfoProvider">
       <cextension>
          <run
-               class="org.eclipse.fdt.make.core.scannerconfig.DiscoveredScannerInfoProvider">
+               class="org.eclipse.cldt.make.core.scannerconfig.DiscoveredScannerInfoProvider">
          </run>
       </cextension>
    </extension>
    <extension
-         point="org.eclipse.fdt.core.PathEntryContainerInitializer">
+         point="org.eclipse.cldt.core.PathEntryContainerInitializer">
       <pathEntryContainerInitializer
-            class="org.eclipse.fdt.make.internal.core.scannerconfig.DiscoveredPathInitializer"
-            id="org.eclipse.fdt.make.core.DISCOVERED_SCANNER_INFO">
+            class="org.eclipse.cldt.make.internal.core.scannerconfig.DiscoveredPathInitializer"
+            id="org.eclipse.cldt.make.core.DISCOVERED_SCANNER_INFO">
       </pathEntryContainerInitializer>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.fdt.make.internal.core.PreferenceInitializer"/>
+      <initializer class="org.eclipse.cldt.make.internal.core.PreferenceInitializer"/>
    </extension>
    <extension
          id="GCCStandardMakePerProjectProfile"
          name="%extensionGCCPerProjectProfile.name"
-         point="org.eclipse.fdt.make.core.ScannerConfigurationDiscoveryProfile">
+         point="org.eclipse.cldt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
-            class="org.eclipse.fdt.make.internal.core.scannerconfig2.PerProjectSICollector"
+            class="org.eclipse.cldt.make.internal.core.scannerconfig2.PerProjectSICollector"
             scope="project"/>
       <buildOutputProvider>
          <open/>
-         <scannerInfoConsoleParser class="org.eclipse.fdt.make.internal.core.scannerconfig.gnu.GCCScannerInfoConsoleParser"/>
+         <scannerInfoConsoleParser class="org.eclipse.cldt.make.internal.core.scannerconfig.gnu.GCCScannerInfoConsoleParser"/>
       </buildOutputProvider>
       <scannerInfoProvider providerId="specsFile">
          <run
                command="gcc"
                arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}"
-               class="org.eclipse.fdt.make.internal.core.scannerconfig2.GCCSpecsRunSIProvider"/>
-         <scannerInfoConsoleParser class="org.eclipse.fdt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser"/>
+               class="org.eclipse.cldt.make.internal.core.scannerconfig2.GCCSpecsRunSIProvider"/>
+         <scannerInfoConsoleParser class="org.eclipse.cldt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser"/>
       </scannerInfoProvider>
    </extension>
    <extension
          id="GCCStandardMakePerFileProfile"
          name="%extensionGCCPerFileProfile.name"
-         point="org.eclipse.fdt.make.core.ScannerConfigurationDiscoveryProfile">
+         point="org.eclipse.cldt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
-            class="org.eclipse.fdt.make.internal.core.scannerconfig2.PerFileSICollector"
+            class="org.eclipse.cldt.make.internal.core.scannerconfig2.PerFileSICollector"
             scope="file"/>
       <buildOutputProvider>
          <open/>
-         <scannerInfoConsoleParser class="org.eclipse.fdt.make.internal.core.scannerconfig.gnu.GCCPerFileBOPConsoleParser"/>
+         <scannerInfoConsoleParser class="org.eclipse.cldt.make.internal.core.scannerconfig.gnu.GCCPerFileBOPConsoleParser"/>
       </buildOutputProvider>
       <scannerInfoProvider providerId="makefileGenerator">
          <run
                arguments="-f ${project_name}_scd.mk"
                command="make"
-               class="org.eclipse.fdt.make.internal.core.scannerconfig2.SCDMakefileGenerator"/>
-         <scannerInfoConsoleParser class="org.eclipse.fdt.make.internal.core.scannerconfig.gnu.GCCPerFileSIPConsoleParser"/>
+               class="org.eclipse.cldt.make.internal.core.scannerconfig2.SCDMakefileGenerator"/>
+         <scannerInfoConsoleParser class="org.eclipse.cldt.make.internal.core.scannerconfig.gnu.GCCPerFileSIPConsoleParser"/>
       </scannerInfoProvider>
    </extension>
 

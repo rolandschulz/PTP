@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.eclipse.fdt.launch</name>
+	<name>org.eclipse.cldt.launch</name>
 	<comment></comment>
 	<projects>
 		<project>org.eclipse.fdt.core</project>

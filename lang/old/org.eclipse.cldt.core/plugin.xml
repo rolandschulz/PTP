@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin
-   id="org.eclipse.fdt.core"
+   id="org.eclipse.cldt.core"
    name="%pluginName"
    version="3.0.0"
    provider-name="%providerName"
-   class="org.eclipse.fdt.core.FortranCorePlugin">
+   class="org.eclipse.cldt.core.FortranCorePlugin">
 
    <runtime>
-      <library name="fdtcore.jar">
+      <library name="cldtcore.jar">
          <export name="*"/>
       </library>
-      <library name="fdtparser.jar">
+      <library name="cldtparser.jar">
          <export name="*"/>
       </library>
    </runtime>
@@ -63,65 +63,65 @@
    <extension-point id="CodeFormatter" name="%CodeFormatter.name" schema="schema/CodeFormatter.exsd"/>
 
 <!-- =================================================================================== -->
-<!-- Define the list of the Binary Parser provided by the FDT                            -->
+<!-- Define the list of the Binary Parser provided by the CDT                            -->
 <!-- =================================================================================== -->
    <extension
          id="ELF"
          name="%ElfParser.name"
-         point="org.eclipse.fdt.core.BinaryParser">
+         point="org.eclipse.cldt.core.BinaryParser">
       <cextension>
          <run
-               class="org.eclipse.fdt.utils.elf.parser.ElfParser">
+               class="org.eclipse.cldt.utils.elf.parser.ElfParser">
          </run>
       </cextension>
    </extension>
    <extension
          id="GNU_ELF"
          name="%GNUElfParser.name"
-         point="org.eclipse.fdt.core.BinaryParser">
+         point="org.eclipse.cldt.core.BinaryParser">
       <cextension>
          <run
-               class="org.eclipse.fdt.utils.elf.parser.GNUElfParser">
+               class="org.eclipse.cldt.utils.elf.parser.GNUElfParser">
          </run>
       </cextension>
    </extension>
    <extension
          id="PE"
          name="%PEWindowsParser.name"
-         point="org.eclipse.fdt.core.BinaryParser">
+         point="org.eclipse.cldt.core.BinaryParser">
       <cextension>
          <run
-               class="org.eclipse.fdt.utils.coff.parser.PEParser">
+               class="org.eclipse.cldt.utils.coff.parser.PEParser">
          </run>
       </cextension>
    </extension>
    <extension
          id="Cygwin_PE"
          name="%CygwinPEParser.name"
-         point="org.eclipse.fdt.core.BinaryParser">
+         point="org.eclipse.cldt.core.BinaryParser">
       <cextension>
          <run
-               class="org.eclipse.fdt.utils.coff.parser.CygwinPEParser">
+               class="org.eclipse.cldt.utils.coff.parser.CygwinPEParser">
          </run>
       </cextension>
    </extension>
    <extension
          id="XCOFF32"
          name="%XCOFF32Parser.name"
-         point="org.eclipse.fdt.core.BinaryParser">
+         point="org.eclipse.cldt.core.BinaryParser">
       <cextension>
          <run
-               class="org.eclipse.fdt.utils.xcoff.parser.XCOFF32Parser">
+               class="org.eclipse.cldt.utils.xcoff.parser.XCOFF32Parser">
          </run>
       </cextension>
    </extension>
    <extension
          id="SOM"
          name="%SOMParser.name"
-         point="org.eclipse.fdt.core.BinaryParser">
+         point="org.eclipse.cldt.core.BinaryParser">
       <cextension>
          <run
-               class="org.eclipse.fdt.utils.som.parser.SOMParser">
+               class="org.eclipse.cldt.utils.som.parser.SOMParser">
          </run>
       </cextension>
    </extension>
@@ -130,72 +130,72 @@
    <extension
          id="Elf"
          name="%ElfParser.name"
-         point="org.eclipse.fdt.core.BinaryParser">
+         point="org.eclipse.cldt.core.BinaryParser">
       <cextension>
          <filter
             name = "visibility"
             value = "private">
          </filter>
          <run
-               class="org.eclipse.fdt.utils.elf.parser.ElfParser">
+               class="org.eclipse.cldt.utils.elf.parser.ElfParser">
          </run>
       </cextension>
    </extension>
    <extension
          id="MachO"
          name="%MachOParser.name"
-         point="org.eclipse.fdt.core.BinaryParser">
+         point="org.eclipse.cldt.core.BinaryParser">
       <cextension>
          <run
-               class="org.eclipse.fdt.utils.macho.parser.MachOParser">
+               class="org.eclipse.cldt.utils.macho.parser.MachOParser">
          </run>
       </cextension>
    </extension>
 <!-- =================================================================================== -->
-<!-- Define the list of Error Parser provided by the FDT                                 -->
+<!-- Define the list of Error Parser provided by the CDT                                 -->
 <!-- =================================================================================== -->
    <extension
          id="MakeErrorParser"
-         name="%FDTGNUMakeErrorParser.name"
-         point="org.eclipse.fdt.core.ErrorParser">
+         name="%CDTGNUMakeErrorParser.name"
+         point="org.eclipse.cldt.core.ErrorParser">
       <errorparser
-            class="org.eclipse.fdt.internal.errorparsers.MakeErrorParser">
+            class="org.eclipse.cldt.internal.errorparsers.MakeErrorParser">
       </errorparser>
    </extension>
    <extension
          id="XLFErrorParser"
          name="%FDTXLFErrorParser.name"
-         point="org.eclipse.fdt.core.ErrorParser">
+         point="org.eclipse.cldt.core.ErrorParser">
       <errorparser
-            class="org.eclipse.fdt.internal.errorparsers.XLFErrorParser">
+            class="org.eclipse.cldt.internal.errorparsers.XLFErrorParser">
       </errorparser>
    </extension>
    <extension
          id="GASErrorParser"
-         name="%FDTGNUAssemblerErrorParser.name"
-         point="org.eclipse.fdt.core.ErrorParser">
+         name="%CDTGNUAssemblerErrorParser.name"
+         point="org.eclipse.cldt.core.ErrorParser">
       <errorparser
-            class="org.eclipse.fdt.internal.errorparsers.GASErrorParser">
+            class="org.eclipse.cldt.internal.errorparsers.GASErrorParser">
       </errorparser>
    </extension>
    <extension
          id="GLDErrorParser"
-         name="%FDTGNULinkerErrorParser.name"
-         point="org.eclipse.fdt.core.ErrorParser">
+         name="%CDTGNULinkerErrorParser.name"
+         point="org.eclipse.cldt.core.ErrorParser">
       <errorparser
-            class="org.eclipse.fdt.internal.errorparsers.GLDErrorParser">
+            class="org.eclipse.cldt.internal.errorparsers.GLDErrorParser">
       </errorparser>
    </extension>
    <extension
          id="VCErrorParser"
-         name="%FDTVisualCErrorParser.name"
-         point="org.eclipse.fdt.core.ErrorParser">
+         name="%CDTVisualCErrorParser.name"
+         point="org.eclipse.cldt.core.ErrorParser">
       <errorparser
-            class="org.eclipse.fdt.internal.errorparsers.VCErrorParser">
+            class="org.eclipse.cldt.internal.errorparsers.VCErrorParser">
       </errorparser>
    </extension>
 <!-- =================================================================================== -->
-<!-- FDT customized problem markers: C Problem markers                                   -->
+<!-- CDT customized problem markers: C Problem markers                                   -->
 <!-- =================================================================================== -->
    <extension
          id="problem"
@@ -220,12 +220,12 @@
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="org.eclipse.fdt.core.FortranProjectNature">
+               class="org.eclipse.cldt.core.FortranProjectNature">
          </run>
       </runtime>
    </extension>
 <!-- =================================================================================== -->
-<!-- FDT C++ Nature                                                                      -->
+<!-- CDT C++ Nature                                                                      -->
 <!-- =================================================================================== -->
    <extension
          id="ccnature"
@@ -233,106 +233,106 @@
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="org.eclipse.fdt.core.CCProjectNature">
+               class="org.eclipse.cldt.core.CCProjectNature">
          </run>
       </runtime>
    </extension>
 <!-- =================================================================================== -->
-<!-- FDT file type mappings                                                              -->
+<!-- CDT file type mappings                                                              -->
 <!-- =================================================================================== -->
    <extension
-         point="org.eclipse.fdt.core.CLanguage">
+         point="org.eclipse.cldt.core.CLanguage">
       <language
             name="Fortran"
-            id="org.eclipse.fdt.core.language.fortran">
+            id="org.eclipse.cldt.core.language.fortran">
       </language>
       <language
             name="C"
-            id="org.eclipse.fdt.core.language.c">
+            id="org.eclipse.cldt.core.language.c">
       </language>
       <language
             name="C++"
-            id="org.eclipse.fdt.core.language.cxx">
+            id="org.eclipse.cldt.core.language.cxx">
       </language>
       <language
             name="%fileTypeMapping.AssemblyLanguage"
-            id="org.eclipse.fdt.core.language.asm">
+            id="org.eclipse.cldt.core.language.asm">
       </language>
    </extension>
    <extension
-         point="org.eclipse.fdt.core.CFileType">
+         point="org.eclipse.cldt.core.CFileType">
       <fileType
             name="%fileTypeMapping.fortranSourceFile"
             type="source"
-            id="org.eclipse.fdt.core.fileType.fortran_source"
-            language="org.eclipse.fdt.core.language.fortran">
+            id="org.eclipse.cldt.core.fileType.fortran_source"
+            language="org.eclipse.cldt.core.language.fortran">
       </fileType>
       <fileType
             name="%fileTypeMapping.fortranHeaderFile"
             type="header"
-            id="org.eclipse.fdt.core.fileType.fortran_header"
-            language="org.eclipse.fdt.core.language.fortran">
+            id="org.eclipse.cldt.core.fileType.fortran_header"
+            language="org.eclipse.cldt.core.language.fortran">
       </fileType>
       <fileType
             name="%fileTypeMapping.cSourceFile"
             type="source"
-            id="org.eclipse.fdt.core.fileType.c_source"
-            language="org.eclipse.fdt.core.language.c">
+            id="org.eclipse.cldt.core.fileType.c_source"
+            language="org.eclipse.cldt.core.language.c">
       </fileType>
       <fileType
             name="%fileTypeMapping.cHeaderFile"
             type="header"
-            id="org.eclipse.fdt.core.fileType.c_header"
-            language="org.eclipse.fdt.core.language.c">
+            id="org.eclipse.cldt.core.fileType.c_header"
+            language="org.eclipse.cldt.core.language.c">
       </fileType>
       <fileType
             name="%fileTypeMapping.cppSourceFile"
             type="source"
-            id="org.eclipse.fdt.core.fileType.cxx_source"
-            language="org.eclipse.fdt.core.language.cxx">
+            id="org.eclipse.cldt.core.fileType.cxx_source"
+            language="org.eclipse.cldt.core.language.cxx">
       </fileType>
       <fileType
             name="%fileTypeMapping.cppHeaderFile"
             type="header"
-            id="org.eclipse.fdt.core.fileType.cxx_header"
-            language="org.eclipse.fdt.core.language.cxx">
+            id="org.eclipse.cldt.core.fileType.cxx_header"
+            language="org.eclipse.cldt.core.language.cxx">
       </fileType>
       <fileType
             name="%fileTypeMapping.assemblySourceFile"
             type="source"
-            id="org.eclipse.fdt.core.fileType.asm_source"
-            language="org.eclipse.fdt.core.language.asm">
+            id="org.eclipse.cldt.core.fileType.asm_source"
+            language="org.eclipse.cldt.core.language.asm">
       </fileType>
    </extension>
    <extension
-         point="org.eclipse.fdt.core.CFileTypeAssociation">
+         point="org.eclipse.cldt.core.CFileTypeAssociation">
       <association
-            type="org.eclipse.fdt.core.fileType.fortran_source"
+            type="org.eclipse.cldt.core.fileType.fortran_source"
             pattern="*.f,*.f77,*.f90,*.f95">
       </association>
       <association
-            type="org.eclipse.fdt.core.fileType.fortran_header"
+            type="org.eclipse.cldt.core.fileType.fortran_header"
             pattern="*.h">
       </association>
       <association
-            type="org.eclipse.fdt.core.fileType.c_source"
+            type="org.eclipse.cldt.core.fileType.c_source"
             pattern="*.c">
       </association>
       <association
-            type="org.eclipse.fdt.core.fileType.c_header"
+            type="org.eclipse.cldt.core.fileType.c_header"
             pattern="*.h">
       </association>
       <association
-            type="org.eclipse.fdt.core.fileType.cxx_source"
+            type="org.eclipse.cldt.core.fileType.cxx_source"
             pattern="*.cpp,*.cxx,*.cc,*.C">
       </association>
       <association
             file="template/cpp_headers"
-            type="org.eclipse.fdt.core.fileType.cxx_header"
+            type="org.eclipse.cldt.core.fileType.cxx_header"
             pattern="*.hpp,*.hxx,*.hh,*.H">
       </association>
       <association
-            type="org.eclipse.fdt.core.fileType.asm_source"
+            type="org.eclipse.cldt.core.fileType.asm_source"
             pattern="*.asm,*.s,*.S">
       </association>
    </extension>
@@ -411,7 +411,7 @@
       </fileTypes>
       <fileTypes
             type="text"
-            extension="fdtproject">
+            extension="cldtproject">
       </fileTypes>
    </extension>
 <!-- =================================================================================== -->
@@ -498,11 +498,11 @@
    <!--extension
          id="codeFormatters"
          name="%CodeFormatters.name"
-         point="org.eclipse.fdt.core.CodeFormatter">
+         point="org.eclipse.cldt.core.CodeFormatter">
       <codeFormatter
-            class="org.eclipse.fdt.internal.formatter.DefaultCodeFormatter"
+            class="org.eclipse.cldt.internal.formatter.DefaultCodeFormatter"
             name="%DefaultCodeFormatter.name"
-            id="org.eclipse.fdt.core.defaultCodeFormatter"/>
+            id="org.eclipse.cldt.core.defaultCodeFormatter"/>
    </extension-->
 
 <!-- =================================================================================== -->
@@ -537,37 +537,37 @@
 
    <extension point="org.eclipse.core.runtime.contentTypes"> 
       <file-association 
-       content-type="org.eclipse.fdt.core.fortranSource"
+       content-type="org.eclipse.cldt.core.fortranSource"
        file-extensions="f,f77,f90,f95"/>
    </extension> 
 
    <extension point="org.eclipse.core.runtime.contentTypes"> 
       <file-association 
-       content-type="org.eclipse.fdt.core.cSource"
+       content-type="org.eclipse.cldt.core.cSource"
        file-extensions="c"/>
    </extension> 
 
    <extension point="org.eclipse.core.runtime.contentTypes"> 
       <file-association 
-       content-type="org.eclipse.fdt.core.cxxSource"
+       content-type="org.eclipse.cldt.core.cxxSource"
        file-extensions="cpp,cxx,cc"/>
    </extension> 
 
    <extension point="org.eclipse.core.runtime.contentTypes"> 
       <file-association 
-       content-type="org.eclipse.fdt.core.cxxHeader"
+       content-type="org.eclipse.cldt.core.cxxHeader"
        file-extensions="hpp,hh"/>
    </extension> 
 
    <extension point="org.eclipse.core.runtime.contentTypes"> 
       <file-association 
-       content-type="org.eclipse.fdt.core.cHeader"
+       content-type="org.eclipse.cldt.core.cHeader"
        file-extensions="h"/>
    </extension> 
 
    <extension point="org.eclipse.core.runtime.contentTypes"> 
       <file-association 
-       content-type="org.eclipse.fdt.core.asmSource"
+       content-type="org.eclipse.cldt.core.asmSource"
        file-extensions="asm,s"/>
    </extension> 
 
@@ -575,7 +575,7 @@
 <!-- Initialize the preference for the Core Plugin                                       -->
 <!-- =================================================================================== -->
    <extension point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.fdt.internal.core.FortranCorePreferenceInitializer"/>
+      <initializer class="org.eclipse.cldt.internal.core.FortranCorePreferenceInitializer"/>
    </extension>
  
 </plugin>

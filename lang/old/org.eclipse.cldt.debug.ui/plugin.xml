@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin
-   id="org.eclipse.fdt.debug.ui"
+   id="org.eclipse.cldt.debug.ui"
    name="%pluginName"
    version="3.0.0"
    provider-name="%providerName"
-   class="org.eclipse.fdt.debug.ui.CDebugUIPlugin">
+   class="org.eclipse.cldt.debug.ui.CDebugUIPlugin">
 
    <runtime>
-      <library name="fdtdebugui.jar">
+      <library name="cldtdebugui.jar">
          <export name="*"/>
       </library>
    </runtime>
@@ -21,9 +21,9 @@
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.debug.ui"/>
       <import plugin="org.eclipse.debug.core"/>
-      <import plugin="org.eclipse.fdt.debug.core"/>
-      <import plugin="org.eclipse.fdt.ui"/>
-      <import plugin="org.eclipse.fdt.core"/>
+      <import plugin="org.eclipse.cldt.debug.core"/>
+      <import plugin="org.eclipse.cldt.ui"/>
+      <import plugin="org.eclipse.cldt.core"/>
       <import plugin="org.eclipse.core.runtime"/>
    </requires>
 
@@ -34,8 +34,8 @@
    <extension
          point="org.eclipse.debug.ui.debugModelPresentations">
       <debugModelPresentation
-            class="org.eclipse.fdt.debug.internal.ui.CDebugModelPresentation"
-            id="org.eclipse.fdt.debug.core">
+            class="org.eclipse.cldt.debug.internal.ui.CDebugModelPresentation"
+            id="org.eclipse.cldt.debug.core">
       </debugModelPresentation>
    </extension>
    <extension
@@ -44,22 +44,22 @@
             name="%SignalsView.name"
             icon="icons/full/cview16/signals_view.gif"
             category="org.eclipse.debug.ui"
-            class="org.eclipse.fdt.debug.internal.ui.views.signals.SignalsView"
-            id="org.eclipse.fdt.debug.ui.SignalsView">
+            class="org.eclipse.cldt.debug.internal.ui.views.signals.SignalsView"
+            id="org.eclipse.cldt.debug.ui.SignalsView">
       </view>
       <view
             name="%DisassemblyView.name"
             icon="icons/full/cview16/disassembly_view.gif"
             category="org.eclipse.debug.ui"
-            class="org.eclipse.fdt.debug.internal.ui.views.disassembly.DisassemblyView"
-            id="org.eclipse.fdt.debug.ui.DisassemblyView">
+            class="org.eclipse.cldt.debug.internal.ui.views.disassembly.DisassemblyView"
+            id="org.eclipse.cldt.debug.ui.DisassemblyView">
       </view>
       <view
             icon="icons/full/cview16/modules_view.gif"
-            class="org.eclipse.fdt.debug.internal.ui.views.modules.ModulesView"
+            class="org.eclipse.cldt.debug.internal.ui.views.modules.ModulesView"
             category="org.eclipse.debug.ui"
             name="%ModulesView.name"
-            id="org.eclipse.fdt.debug.ui.ModulesView"/>
+            id="org.eclipse.cldt.debug.ui.ModulesView"/>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
@@ -69,10 +69,10 @@
                relative="org.eclipse.debug.ui.VariableView"
                visible="false"
                relationship="stack"
-               id="org.eclipse.fdt.debug.ui.SignalsView">
+               id="org.eclipse.cldt.debug.ui.SignalsView">
          </view>
          <viewShortcut
-               id="org.eclipse.fdt.debug.ui.SignalsView">
+               id="org.eclipse.cldt.debug.ui.SignalsView">
          </viewShortcut>
          <viewShortcut
                id="org.eclipse.debug.ui.RegisterView">
@@ -84,22 +84,22 @@
                relative="org.eclipse.ui.views.ContentOutline"
                visible="false"
                relationship="stack"
-               id="org.eclipse.fdt.debug.ui.DisassemblyView">
+               id="org.eclipse.cldt.debug.ui.DisassemblyView">
          </view>
          <viewShortcut
-               id="org.eclipse.fdt.debug.ui.DisassemblyView">
+               id="org.eclipse.cldt.debug.ui.DisassemblyView">
          </viewShortcut>
          <view
                visible="false"
                relative="org.eclipse.debug.ui.VariableView"
                relationship="stack"
-               id="org.eclipse.fdt.debug.ui.ModulesView">
+               id="org.eclipse.cldt.debug.ui.ModulesView">
          </view>
          <viewShortcut
-               id="org.eclipse.fdt.debug.ui.ModulesView">
+               id="org.eclipse.cldt.debug.ui.ModulesView">
          </viewShortcut>
          <actionSet
-               id="org.eclipse.fdt.debug.ui.debugActionSet">
+               id="org.eclipse.cldt.debug.ui.debugActionSet">
          </actionSet>
       </perspectiveExtension>
    </extension>
@@ -107,31 +107,31 @@
          point="org.eclipse.ui.preferencePages">
       <page
             name="%CDebugPreferencePage.name"
-            category="org.eclipse.fdt.ui.preferences.CPluginPreferencePage"
-            class="org.eclipse.fdt.debug.internal.ui.preferences.CDebugPreferencePage"
-            id="org.eclipse.fdt.debug.ui.CDebugPreferencePage">
+            category="org.eclipse.cldt.ui.preferences.CPluginPreferencePage"
+            class="org.eclipse.cldt.debug.internal.ui.preferences.CDebugPreferencePage"
+            id="org.eclipse.cldt.debug.ui.CDebugPreferencePage">
       </page>
       <page
             name="%SourcePreferencePage.name"
-            category="org.eclipse.fdt.debug.ui.CDebugPreferencePage"
-            class="org.eclipse.fdt.debug.internal.ui.preferences.SourcePreferencePage"
-            id="org.eclipse.fdt.debug.ui.SourcePreferencePage">
+            category="org.eclipse.cldt.debug.ui.CDebugPreferencePage"
+            class="org.eclipse.cldt.debug.internal.ui.preferences.SourcePreferencePage"
+            id="org.eclipse.cldt.debug.ui.SourcePreferencePage">
       </page>
    </extension>
    <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
             label="%DebugActionSet.label"
-            id="org.eclipse.fdt.debug.ui.debugActionSet">
+            id="org.eclipse.cldt.debug.ui.debugActionSet">
          <menu
                label="%RunMenu.label"
                path="additions"
                id="org.eclipse.ui.run">
          </menu>
          <action
-               id="org.eclipse.fdt.debug.ui.actions.ResumeAtLine"
+               id="org.eclipse.cldt.debug.ui.actions.ResumeAtLine"
                hoverIcon="icons/full/clcl16/jump_co.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.RetargetResumeAtLineAction"
+               class="org.eclipse.cldt.debug.internal.ui.actions.RetargetResumeAtLineAction"
                disabledIcon="icons/full/dlcl16/jump_co.gif"
                enablesFor="1"
                icon="icons/full/elcl16/jump_co.gif"
@@ -141,14 +141,14 @@
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui">
+                     id="org.eclipse.cldt.debug.ui">
                </pluginState>
             </enablement>
          </action>
          <action
-               id="org.eclipse.fdt.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
+               id="org.eclipse.cldt.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
                hoverIcon="icons/full/clcl16/signal0_co.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
                disabledIcon="icons/full/dlcl16/signal0_co.gif"
                enablesFor="1"
                icon="icons/full/elcl16/signal0_co.gif"
@@ -159,14 +159,14 @@
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui">
+                     id="org.eclipse.cldt.debug.ui">
                </pluginState>
             </enablement>
          </action>
          <action
-               id="org.eclipse.fdt.debug.ui.internal.actions.RestartActionDelegate"
+               id="org.eclipse.cldt.debug.ui.internal.actions.RestartActionDelegate"
                hoverIcon="icons/full/clcl16/restart.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.RestartActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.RestartActionDelegate"
                disabledIcon="icons/full/dlcl16/restart.gif"
                enablesFor="1"
                icon="icons/full/elcl16/restart.gif"
@@ -176,7 +176,7 @@
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui">
+                     id="org.eclipse.cldt.debug.ui">
                </pluginState>
             </enablement>
          </action>
@@ -186,22 +186,22 @@
          point="org.eclipse.ui.popupMenus">
       <viewerContribution
             targetID="org.eclipse.debug.ui.DebugView"
-            id="org.eclipse.fdt.debug.ui.debugview.popupMenu">
+            id="org.eclipse.cldt.debug.ui.debugview.popupMenu">
          <action
                label="%RestartAction.label"
                icon="icons/full/clcl16/restart.gif"
                helpContextId="restart_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.RestartActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.RestartActionDelegate"
                menubarPath="stepGroup"
                enablesFor="1"
-               id="org.eclipse.fdt.debug.internal.ui.actions.RestartActionDelegate">
-            <selection class="org.eclipse.fdt.debug.core.model.IRestart"/>
+               id="org.eclipse.cldt.debug.internal.ui.actions.RestartActionDelegate">
+            <selection class="org.eclipse.cldt.debug.core.model.IRestart"/>
          </action>
          <action
                state="false"
                style="toggle"
-               id="org.eclipse.fdt.debug.internal.ui.actions.ToggleInstructionStepModeActionDelegate"
-               class="org.eclipse.fdt.debug.internal.ui.actions.ToggleInstructionStepModeActionDelegate"
+               id="org.eclipse.cldt.debug.internal.ui.actions.ToggleInstructionStepModeActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.ToggleInstructionStepModeActionDelegate"
                enablesFor="1"
                icon="icons/full/clcl16/instr_step.gif"
                helpContextId="toggle_instruction_step_mode_action_context"
@@ -211,7 +211,7 @@
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui">
+                     id="org.eclipse.cldt.debug.ui">
                </pluginState>
             </enablement>
          </action>
@@ -221,45 +221,45 @@
                label="%SignalZeroAction.label"
                tooltip="%SignalZeroAction.tooltip"
                icon="icons/full/clcl16/signal0_co.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
                menubarPath="threadGroup"
-               id="org.eclipse.fdt.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate">
-            <selection class="org.eclipse.fdt.debug.core.model.IResumeWithoutSignal"/>
+               id="org.eclipse.cldt.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate">
+            <selection class="org.eclipse.cldt.debug.core.model.IResumeWithoutSignal"/>
          </action>
       </viewerContribution>
       <viewerContribution
             targetID="#CEditorRulerContext"
-            id="org.eclipse.fdt.debug.ui.CEditorRulerActions">
+            id="org.eclipse.cldt.debug.ui.CEditorRulerActions">
          <action
                label="%BreakpointProperties.label"
                helpContextId="breakpoint_properties_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.CBreakpointPropertiesRulerActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.CBreakpointPropertiesRulerActionDelegate"
                menubarPath="debug"
-               id="org.eclipse.fdt.debug.internal.ui.actions.CBreakpointPropertiesRulerActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.CBreakpointPropertiesRulerActionDelegate">
          </action>
          <action
                label="%EnableBreakpoint.label"
                helpContextId="enable_disable_breakpoint_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
                menubarPath="debug"
-               id="org.eclipse.fdt.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate">
          </action>
          <action
                label="%AddBreakpoint.label"
                helpContextId="manage_breakpoint_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
                menubarPath="debug"
-               id="org.eclipse.fdt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate">
          </action>
       </viewerContribution>
       <viewerContribution
             targetID="#CEditorContext"
-            id="org.eclipse.fdt.debug.ui.CEditorPopupActions">
+            id="org.eclipse.cldt.debug.ui.CEditorPopupActions">
          <visibility>
             <and>
                <systemProperty
                      value="true"
-                     name="org.eclipse.fdt.debug.ui.debuggerActive"/>
+                     name="org.eclipse.cldt.debug.ui.debuggerActive"/>
                <objectClass name="org.eclipse.jface.text.ITextSelection"/>
             </and>
          </visibility>
@@ -267,18 +267,18 @@
                label="%AddExpressionAction.label"
                icon="icons/full/etool16/watch_exp.gif"
                helpContextId="add_expression_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.AddExpressionEditorActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.AddExpressionEditorActionDelegate"
                menubarPath="additions"
-               id="org.eclipse.fdt.debug.internal.ui.actions.AddExpressionActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.AddExpressionActionDelegate">
          </action>
          <action
                label="%JumpToLineAction.label"
                icon="icons/full/clcl16/jump_co.gif"
                helpContextId="jump_to_line_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.ResumeAtLineActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.ResumeAtLineActionDelegate"
                menubarPath="additions"
                enablesFor="1"
-               id="org.eclipse.fdt.debug.internal.ui.actions.JumpToLineActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.JumpToLineActionDelegate">
          </action>
          <action
                helpContextId="run_to_line_action_context"
@@ -286,87 +286,87 @@
                definitionId="org.eclipse.debug.ui.commands.RunToLine"
                class="org.eclipse.debug.ui.actions.RunToLineActionDelegate"
                menubarPath="additions"
-               id="org.eclipse.fdt.debug.ui.actions.popup.RunToLine">
+               id="org.eclipse.cldt.debug.ui.actions.popup.RunToLine">
          </action>
       </viewerContribution>
       <objectContribution
-            objectClass="org.eclipse.fdt.debug.core.model.ICBreakpoint"
-            id="org.eclipse.fdt.debug.ui.CBreakpointActions">
+            objectClass="org.eclipse.cldt.debug.core.model.ICBreakpoint"
+            id="org.eclipse.cldt.debug.ui.CBreakpointActions">
          <action
                label="%BreakpointPropertiesAction.label"
                helpContextId="breakpoint_properties_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.CBreakpointPropertiesAction"
+               class="org.eclipse.cldt.debug.internal.ui.actions.CBreakpointPropertiesAction"
                menubarPath="additions"
                enablesFor="1"
-               id="org.eclipse.fdt.debug.internal.ui.actions.CBreakpointPropertiesAction">
+               id="org.eclipse.cldt.debug.internal.ui.actions.CBreakpointPropertiesAction">
          </action>
       </objectContribution>
       <viewerContribution
             targetID="org.eclipse.debug.ui.BreakpointView"
-            id="org.eclipse.fdt.debug.ui.breakpointview.popupMenu">
+            id="org.eclipse.cldt.debug.ui.breakpointview.popupMenu">
       </viewerContribution>
       <viewerContribution
             targetID="#ASMEditorRulerContext"
-            id="org.eclipse.fdt.debug.ui.AsmEditorRulerActions">
+            id="org.eclipse.cldt.debug.ui.AsmEditorRulerActions">
 <!--
          <action
                label="%RunToLineAction.label"
                icon="icons/full/clcl16/runtoline_co.gif"
                helpContextId="run_to_line_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.RunToLineRulerActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.RunToLineRulerActionDelegate"
                menubarPath="debug"
-               id="org.eclipse.fdt.debug.internal.ui.actions.RunToLineRulerActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.RunToLineRulerActionDelegate">
          </action>
 -->
          <action
                label="%BreakpointProperties.label"
                helpContextId="breakpoint_properties_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.CBreakpointPropertiesRulerActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.CBreakpointPropertiesRulerActionDelegate"
                menubarPath="debug"
-               id="org.eclipse.fdt.debug.internal.ui.actions.CBreakpointPropertiesRulerActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.CBreakpointPropertiesRulerActionDelegate">
          </action>
          <action
                label="%EnableBreakpoint.label"
                helpContextId="enable_disable_breakpoint_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
                menubarPath="debug"
-               id="org.eclipse.fdt.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate">
          </action>
          <action
                label="%AddBreakpoint.label"
                helpContextId="manage_breakpoint_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
                menubarPath="debug"
-               id="org.eclipse.fdt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate">
          </action>
       </viewerContribution>
       <viewerContribution
             targetID="#ASMEditorContext"
-            id="org.eclipse.fdt.debug.ui.AsmEditorPopupActions">
+            id="org.eclipse.cldt.debug.ui.AsmEditorPopupActions">
          <visibility>
             <and>
                <objectClass name="org.eclipse.jface.text.ITextSelection"/>
                <systemProperty
                      value="true"
-                     name="org.eclipse.fdt.debug.ui.debuggerActive"/>
+                     name="org.eclipse.cldt.debug.ui.debuggerActive"/>
             </and>
          </visibility>
          <action
                label="%AddExpressionAction.label"
                icon="icons/full/etool16/watch_exp.gif"
                helpContextId="add_expression_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.AddExpressionEditorActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.AddExpressionEditorActionDelegate"
                menubarPath="additions"
-               id="org.eclipse.fdt.debug.internal.ui.actions.AddExpressionActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.AddExpressionActionDelegate">
          </action>
          <action
                label="%JumpToLineAction.label"
                icon="icons/full/clcl16/jump_co.gif"
                helpContextId="jump_to_line_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.ResumeAtLineActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.ResumeAtLineActionDelegate"
                menubarPath="additions"
                enablesFor="1"
-               id="org.eclipse.fdt.debug.internal.ui.actions.JumpToLineActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.JumpToLineActionDelegate">
          </action>
          <action
                helpContextId="run_to_line_action_context"
@@ -374,16 +374,16 @@
                definitionId="org.eclipse.debug.ui.commands.RunToLine"
                class="org.eclipse.debug.ui.actions.RunToLineActionDelegate"
                menubarPath="additions"
-               id="org.eclipse.fdt.debug.ui.actions.popup.RunToLine">
+               id="org.eclipse.cldt.debug.ui.actions.popup.RunToLine">
          </action>
       </viewerContribution>
       <objectContribution
-            objectClass="org.eclipse.fdt.debug.core.model.ICVariable"
-            id="org.eclipse.fdt.debug.ui.CVariableActions">
+            objectClass="org.eclipse.cldt.debug.core.model.ICVariable"
+            id="org.eclipse.cldt.debug.ui.CVariableActions">
          <menu
                label="%CVariableFormatMenu.label"
                path="renderGroup"
-               id="org.eclipse.fdt.debug.ui.CVariableFormatMenu">
+               id="org.eclipse.cldt.debug.ui.CVariableFormatMenu">
             <separator
                   name="formatGroup">
             </separator>
@@ -391,44 +391,44 @@
          <action
                label="%HexVariableFormatAction.label"
                helpContextId="hexadecimal_variable_format_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.HexVariableFormatActionDelegate"
-               menubarPath="org.eclipse.fdt.debug.ui.CVariableFormatMenu/formatGroup"
+               class="org.eclipse.cldt.debug.internal.ui.actions.HexVariableFormatActionDelegate"
+               menubarPath="org.eclipse.cldt.debug.ui.CVariableFormatMenu/formatGroup"
                enablesFor="1"
-               id="org.eclipse.fdt.debug.internal.ui.actions.HexVariableFormatActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.HexVariableFormatActionDelegate">
          </action>
          <action
                label="%DecVariableFormatAction.label"
                helpContextId="decimal_variable_format_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.DecVariableFormatActionDelegate"
-               menubarPath="org.eclipse.fdt.debug.ui.CVariableFormatMenu/formatGroup"
+               class="org.eclipse.cldt.debug.internal.ui.actions.DecVariableFormatActionDelegate"
+               menubarPath="org.eclipse.cldt.debug.ui.CVariableFormatMenu/formatGroup"
                enablesFor="1"
-               id="org.eclipse.fdt.debug.internal.ui.actions.DecVariableFormatActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.DecVariableFormatActionDelegate">
          </action>
          <action
                label="%NaturalVariableFormatAction.label"
                helpContextId="naturall_variable_format_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.NaturalVariableFormatActionDelegate"
-               menubarPath="org.eclipse.fdt.debug.ui.CVariableFormatMenu/formatGroup"
+               class="org.eclipse.cldt.debug.internal.ui.actions.NaturalVariableFormatActionDelegate"
+               menubarPath="org.eclipse.cldt.debug.ui.CVariableFormatMenu/formatGroup"
                enablesFor="1"
-               id="org.eclipse.fdt.debug.internal.ui.actions.NaturalVariableFormatActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.NaturalVariableFormatActionDelegate">
          </action>
       </objectContribution>
       <objectContribution
-            objectClass="org.eclipse.fdt.debug.core.model.ICSignal"
-            id="org.eclipse.fdt.debug.ui.SignalActions">
+            objectClass="org.eclipse.cldt.debug.core.model.ICSignal"
+            id="org.eclipse.cldt.debug.ui.SignalActions">
          <action
                label="%SignalAction.label"
                icon="icons/full/clcl16/signal_co.gif"
                helpContextId="signal_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.SignalActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.SignalActionDelegate"
                tooltip="%SignalAction.tooltip"
                menubarPath="additions"
                enablesFor="1"
-               id="org.eclipse.fdt.debug.internal.ui.actions.SignalActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.SignalActionDelegate">
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui">
+                     id="org.eclipse.cldt.debug.ui">
                </pluginState>
             </enablement>
          </action>
@@ -436,37 +436,37 @@
                label="%SignalPropertiesAction.label"
                style="pulldown"
                helpContextId="signal_properties_action_context"
-               class="org.eclipse.fdt.debug.internal.ui.actions.SignalPropertiesActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.SignalPropertiesActionDelegate"
                tooltip="%SignalPropertiesAction.tooltip"
                enablesFor="1"
-               id="org.eclipse.fdt.debug.ui.SignalPropertiesAction">
+               id="org.eclipse.cldt.debug.ui.SignalPropertiesAction">
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui">
+                     id="org.eclipse.cldt.debug.ui">
                </pluginState>
             </enablement>
          </action>
       </objectContribution>
       <objectContribution
-            objectClass="org.eclipse.fdt.debug.core.model.IResumeWithoutSignal"
-            id="org.eclipse.fdt.debug.ui.DebugTargetActions">
+            objectClass="org.eclipse.cldt.debug.core.model.IResumeWithoutSignal"
+            id="org.eclipse.cldt.debug.ui.DebugTargetActions">
       </objectContribution>
       <objectContribution
-            objectClass="org.eclipse.fdt.debug.core.model.ICastToType"
-            id="org.eclipse.fdt.debug.ui.VariableActions">
+            objectClass="org.eclipse.cldt.debug.core.model.ICastToType"
+            id="org.eclipse.cldt.debug.ui.VariableActions">
          <action
                label="%RestoreDefaultTypeAction.label"
                helpContextId="restore_default_type_action_context"
                tooltip="%RestoreDefaultTypeAction.tooltip"
-               class="org.eclipse.fdt.debug.internal.ui.actions.RestoreDefaultTypeActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.RestoreDefaultTypeActionDelegate"
                menubarPath="variableGroup"
                enablesFor="1"
-               id="org.eclipse.fdt.debug.internal.ui.actions.RestoreDefaultTypeActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.RestoreDefaultTypeActionDelegate">
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui">
+                     id="org.eclipse.cldt.debug.ui">
                </pluginState>
             </enablement>
          </action>
@@ -475,14 +475,14 @@
                icon="icons/full/clcl16/casttotype_co.gif"
                helpContextId="cast_to_type_action_context"
                tooltip="%CastToTypeAction.tooltip"
-               class="org.eclipse.fdt.debug.internal.ui.actions.CastToTypeActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.CastToTypeActionDelegate"
                menubarPath="variableGroup"
                enablesFor="1"
-               id="org.eclipse.fdt.debug.internal.ui.actions.CastToTypeActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.CastToTypeActionDelegate">
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui">
+                     id="org.eclipse.cldt.debug.ui">
                </pluginState>
             </enablement>
          </action>
@@ -491,58 +491,58 @@
                icon="icons/full/clcl16/showasarray_co.gif"
                helpContextId="cast_to_array_action_context"
                tooltip="%CastToArrayAction.tooltip"
-               class="org.eclipse.fdt.debug.internal.ui.actions.CastToArrayActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.CastToArrayActionDelegate"
                menubarPath="variableGroup"
                enablesFor="1"
-               id="org.eclipse.fdt.debug.internal.ui.actions.CastToArrayActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.CastToArrayActionDelegate">
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui">
+                     id="org.eclipse.cldt.debug.ui">
                </pluginState>
             </enablement>
          </action>
       </objectContribution>
       <objectContribution
-            objectClass="org.eclipse.fdt.core.model.IFunction"
-            id="org.eclipse.fdt.debug.ui.FunctionBreakpointActions">
+            objectClass="org.eclipse.cldt.core.model.IFunction"
+            id="org.eclipse.cldt.debug.ui.FunctionBreakpointActions">
          <action
                label="%ManageFunctionBreakpointAction.label"
                icon="icons/full/elcl16/function_brkpt_co.gif"
                helpContextId="manage_function_breakpoint_action_context"
                tooltip="%ManageFunctionBreakpointAction.tooltip"
-               class="org.eclipse.fdt.debug.internal.ui.actions.ManageFunctionBreakpointActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.ManageFunctionBreakpointActionDelegate"
                menubarPath="additions"
                enablesFor="1"
-               id="org.eclipse.fdt.debug.internal.ui.actions.ManageFunctionBreakpointActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.ManageFunctionBreakpointActionDelegate">
          </action>
       </objectContribution>
       <objectContribution
-            objectClass="org.eclipse.fdt.core.model.IMethod"
-            id="org.eclipse.fdt.debug.ui.FunctionBreakpointActions">
+            objectClass="org.eclipse.cldt.core.model.IMethod"
+            id="org.eclipse.cldt.debug.ui.FunctionBreakpointActions">
          <action
                label="%ManageFunctionBreakpointAction.label"
                icon="icons/full/elcl16/function_brkpt_co.gif"
                helpContextId="manage_function_breakpoint_action_context"
                tooltip="%ManageFunctionBreakpointAction.tooltip"
-               class="org.eclipse.fdt.debug.internal.ui.actions.ManageFunctionBreakpointActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.ManageFunctionBreakpointActionDelegate"
                menubarPath="additions"
                enablesFor="1"
-               id="org.eclipse.fdt.debug.internal.ui.actions.ManageFunctionBreakpointActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.ManageFunctionBreakpointActionDelegate">
          </action>
       </objectContribution>
       <objectContribution
-            objectClass="org.eclipse.fdt.core.model.IVariable"
-            id="org.eclipse.fdt.debug.ui.WatchpointActions">
+            objectClass="org.eclipse.cldt.core.model.IVariable"
+            id="org.eclipse.cldt.debug.ui.WatchpointActions">
          <action
                helpContextId="toggle_watchpoint_action_context"
                enablesFor="1"
                label="%ToggleWatchpointAction.label"
                icon="icons/full/elcl16/watchpoint_co.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.ToggleWatchpointActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.ToggleWatchpointActionDelegate"
                tooltip="%ToggleWatchpointAction.tooltip"
                menubarPath="additions"
-               id="org.eclipse.fdt.debug.internal.ui.actions.ToggleWatchpointActionDelegate"/>
+               id="org.eclipse.cldt.debug.internal.ui.actions.ToggleWatchpointActionDelegate"/>
       </objectContribution>
       <viewerContribution
             targetID="org.eclipse.debug.ui.VariableView"
@@ -553,13 +553,13 @@
                label="%RemoveAllGlobalsAction.label"
                tooltip="%RemoveAllGlobalsAction.tooltip"
                icon="icons/full/elcl16/rem_all_co.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.RemoveAllGlobalsActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.RemoveAllGlobalsActionDelegate"
                menubarPath="additions"
-               id="org.eclipse.fdt.debug.internal.ui.actions.RemoveAllGlobalsActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.RemoveAllGlobalsActionDelegate">
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui"/>
+                     id="org.eclipse.cldt.debug.ui"/>
             </enablement>
          </action>
          <action
@@ -568,27 +568,27 @@
                label="%RemoveGlobalsAction.label"
                tooltip="%RemoveGlobalsAction.tooltip"
                icon="icons/full/elcl16/rem_co.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.RemoveGlobalsActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.RemoveGlobalsActionDelegate"
                menubarPath="additions"
-               id="org.eclipse.fdt.debug.internal.ui.actions.RemoveGlobalsActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.RemoveGlobalsActionDelegate">
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui"/>
+                     id="org.eclipse.cldt.debug.ui"/>
             </enablement>
          </action>
          <action
                helpContextId="add_globals_action_context"
                enablesFor="1"
                label="%AddGlobalsAction.label"
-               class="org.eclipse.fdt.debug.internal.ui.actions.AddGlobalsActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.AddGlobalsActionDelegate"
                icon="icons/full/clcl16/watch_globals.gif"
                menubarPath="additions"
-               id="org.eclipse.fdt.debug.internal.ui.actions.AddGlobalsActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.AddGlobalsActionDelegate">
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui"/>
+                     id="org.eclipse.cldt.debug.ui"/>
             </enablement>
          </action>
          <action
@@ -596,12 +596,12 @@
                icon="icons/full/clcl16/disabled_co.gif"
                helpContextId="disable_variables_action_context"
                tooltip="%DisableVariablesAction.tooltip"
-               class="org.eclipse.fdt.debug.internal.ui.actions.DisableVariablesActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.DisableVariablesActionDelegate"
                menubarPath="variableGroup"
                enablesFor="2+"
-               id="org.eclipse.fdt.debug.internal.ui.actions.DisableVariablesActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.DisableVariablesActionDelegate">
             <selection
-                  class="org.eclipse.fdt.debug.core.model.ICVariable">
+                  class="org.eclipse.cldt.debug.core.model.ICVariable">
             </selection>
          </action>
          <action
@@ -609,12 +609,12 @@
                icon="icons/full/clcl16/enabled_co.gif"
                helpContextId="enable_variables_action_context"
                tooltip="%EnableVariablesAction.tooltip"
-               class="org.eclipse.fdt.debug.internal.ui.actions.EnableVariablesActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.EnableVariablesActionDelegate"
                menubarPath="variableGroup"
                enablesFor="2+"
-               id="org.eclipse.fdt.debug.internal.ui.actions.EnableVariablesActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.EnableVariablesActionDelegate">
             <selection
-                  class="org.eclipse.fdt.debug.core.model.ICVariable">
+                  class="org.eclipse.cldt.debug.core.model.ICVariable">
             </selection>
          </action>
       </viewerContribution>
@@ -623,7 +623,7 @@
             id="org.eclipse.debug.ui.registersView.popupMenu">
          <menu
                label="%Dummy"
-               id="org.eclipse.fdt.debug.ui.refresh">
+               id="org.eclipse.cldt.debug.ui.refresh">
             <separator name="refreshGroup"/>
             <separator name="emptyRefreshGroup"/>
          </menu>
@@ -632,12 +632,12 @@
                icon="icons/full/clcl16/disabled_co.gif"
                helpContextId="disable_variables_action_context"
                tooltip="%DisableVariablesAction.tooltip"
-               class="org.eclipse.fdt.debug.internal.ui.actions.DisableVariablesActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.DisableVariablesActionDelegate"
                menubarPath="variableGroup"
                enablesFor="2+"
-               id="org.eclipse.fdt.debug.internal.ui.actions.DisableVariablesActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.DisableVariablesActionDelegate">
             <selection
-                  class="org.eclipse.fdt.debug.core.model.ICVariable">
+                  class="org.eclipse.cldt.debug.core.model.ICVariable">
             </selection>
          </action>
          <action
@@ -645,23 +645,23 @@
                icon="icons/full/clcl16/enabled_co.gif"
                helpContextId="enable_variables_action_context"
                tooltip="%EnableVariablesAction.tooltip"
-               class="org.eclipse.fdt.debug.internal.ui.actions.EnableVariablesActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.EnableVariablesActionDelegate"
                menubarPath="variableGroup"
                enablesFor="2+"
-               id="org.eclipse.fdt.debug.internal.ui.actions.EnableVariablesActionDelegate">
+               id="org.eclipse.cldt.debug.internal.ui.actions.EnableVariablesActionDelegate">
             <selection
-                  class="org.eclipse.fdt.debug.core.model.ICVariable">
+                  class="org.eclipse.cldt.debug.core.model.ICVariable">
             </selection>
          </action>
       </viewerContribution>
       <viewerContribution
             targetID="#DisassemblyViewContext"
-            id="org.eclipse.fdt.debug.ui.disassemblyView.popupMenu">
+            id="org.eclipse.cldt.debug.ui.disassemblyView.popupMenu">
          <visibility>
             <and>
                <systemProperty
                      value="true"
-                     name="org.eclipse.fdt.debug.ui.debuggerActive"/>
+                     name="org.eclipse.cldt.debug.ui.debuggerActive"/>
                <objectClass name="org.eclipse.jface.text.ITextSelection"/>
             </and>
          </visibility>
@@ -670,48 +670,48 @@
                enablesFor="1"
                label="%JumpToLineAction.label"
                icon="icons/full/clcl16/jump_co.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.ResumeAtLineActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.ResumeAtLineActionDelegate"
                menubarPath="additions"
-               id="org.eclipse.fdt.debug.internal.ui.actions.JumpToLineActionDelegate"/>
+               id="org.eclipse.cldt.debug.internal.ui.actions.JumpToLineActionDelegate"/>
       </viewerContribution>
       <objectContribution
-            objectClass="org.eclipse.fdt.debug.core.model.ICModule"
-            id="org.eclipse.fdt.debug.ui.ModuleActions">
+            objectClass="org.eclipse.cldt.debug.core.model.ICModule"
+            id="org.eclipse.cldt.debug.ui.ModuleActions">
          <action
                helpContextId="load_symbols_action_context"
                enablesFor="1"
                label="%LoadSymbolsAction.label"
                tooltip="%LoadSymbolsAction.tooltip"
                icon="icons/full/elcl16/load_symbols_co.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.LoadModuleSymbolsActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.LoadModuleSymbolsActionDelegate"
                menubarPath="modulesGroup"
-               id="org.eclipse.fdt.debug.ui.LoadSymbolsAction"/>
+               id="org.eclipse.cldt.debug.ui.LoadSymbolsAction"/>
          <action
                helpContextId="module_properties_action_context"
                enablesFor="1"
                label="%ModulePropertiesAction.label"
                tooltip="%ModulePropertiesAction.tooltip"
-               class="org.eclipse.fdt.debug.internal.ui.actions.ModulesPropertiesActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.ModulesPropertiesActionDelegate"
                style="pulldown"
-               id="org.eclipse.fdt.debug.ui.ModulePropertiesAction">
+               id="org.eclipse.cldt.debug.ui.ModulePropertiesAction">
          </action>
       </objectContribution>
       <viewerContribution
-            targetID="org.eclipse.fdt.debug.ui.ModulesView"
-            id="org.eclipse.fdt.debug.ui.modulesView.popupMenu">
+            targetID="org.eclipse.cldt.debug.ui.ModulesView"
+            id="org.eclipse.cldt.debug.ui.modulesView.popupMenu">
          <action
                helpContextId="load_symbols_for_all_context"
                label="%LoadSymbolsForAllAction.label"
                tooltip="%LoadSymbolsForAllAction.tooltip"
                icon="icons/full/elcl16/load_all_symbols_co.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.LoadSymbolsForAllActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.LoadSymbolsForAllActionDelegate"
                style="push"
                menubarPath="modulesGroup"
-               id="org.eclipse.fdt.debug.ui.LoadSymbolsForAllAction">
+               id="org.eclipse.cldt.debug.ui.LoadSymbolsForAllAction">
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui"/>
+                     id="org.eclipse.cldt.debug.ui"/>
             </enablement>
          </action>
       </viewerContribution>
@@ -720,27 +720,27 @@
          point="org.eclipse.ui.viewActions">
       <viewContribution
             targetID="org.eclipse.debug.ui.DebugView"
-            id="org.eclipse.fdt.debug.ui.debugview.toolbar">
+            id="org.eclipse.cldt.debug.ui.debugview.toolbar">
          <action
-               id="org.eclipse.fdt.debug.internal.ui.actions.RestartActionDelegate"
+               id="org.eclipse.cldt.debug.internal.ui.actions.RestartActionDelegate"
                toolbarPath="threadGroup"
                hoverIcon="icons/full/clcl16/restart.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.RestartActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.RestartActionDelegate"
                disabledIcon="icons/full/dlcl16/restart.gif"
                enablesFor="1"
                icon="icons/full/elcl16/restart.gif"
                helpContextId="restart_action_context"
                label="%RestartAction.label"
                tooltip="%RestartAction.tooltip">
-            <selection class="org.eclipse.fdt.debug.core.model.IRestart"/>
+            <selection class="org.eclipse.cldt.debug.core.model.IRestart"/>
          </action>
          <action
                state="false"
                style="toggle"
-               id="org.eclipse.fdt.debug.internal.ui.actions.ToggleInstructionStepModeActionDelegate"
+               id="org.eclipse.cldt.debug.internal.ui.actions.ToggleInstructionStepModeActionDelegate"
                toolbarPath="renderGroup"
                hoverIcon="icons/full/clcl16/instr_step.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.ToggleInstructionStepModeActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.ToggleInstructionStepModeActionDelegate"
                disabledIcon="icons/full/dlcl16/instr_step.gif"
                icon="icons/full/elcl16/instr_step.gif"
                enablesFor="1"
@@ -750,41 +750,41 @@
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui">
+                     id="org.eclipse.cldt.debug.ui">
                </pluginState>
             </enablement>
          </action>
       </viewContribution>
       <viewContribution
             targetID="org.eclipse.debug.ui.DebugView"
-            id="org.eclipse.fdt.debug.ui.debugView.menu">
+            id="org.eclipse.cldt.debug.ui.debugView.menu">
          <action
                label="%ShowFullPathsAction.label"
                icon="icons/full/clcl16/show_paths.gif"
                style="toggle"
                helpContextId="show_full_paths_context"
                tooltip="%ShowFullPathsAction.tooltip"
-               class="org.eclipse.fdt.debug.internal.ui.actions.ShowFullPathsAction"
+               class="org.eclipse.cldt.debug.internal.ui.actions.ShowFullPathsAction"
                menubarPath="cDebugActions"
-               id="org.eclipse.fdt.debug.internal.ui.actions.ShowFullPathsAction">
+               id="org.eclipse.cldt.debug.internal.ui.actions.ShowFullPathsAction">
          </action>
       </viewContribution>
       <viewContribution
             targetID="org.eclipse.debug.ui.BreakpointView"
-            id="org.eclipse.fdt.debug.ui.breakpointView.toolbar">
+            id="org.eclipse.cldt.debug.ui.breakpointView.toolbar">
       </viewContribution>
       <viewContribution
             targetID="org.eclipse.debug.ui.BreakpointView"
-            id="org.eclipse.fdt.debug.ui.breakpointView.menu">
+            id="org.eclipse.cldt.debug.ui.breakpointView.menu">
          <action
                label="%ShowFullPathsAction.label"
                icon="icons/full/clcl16/show_paths.gif"
                style="toggle"
                helpContextId="show_full_paths_context"
                tooltip="%ShowFullPathsAction.tooltip"
-               class="org.eclipse.fdt.debug.internal.ui.actions.ShowFullPathsAction"
+               class="org.eclipse.cldt.debug.internal.ui.actions.ShowFullPathsAction"
                menubarPath="cDebugActions"
-               id="org.eclipse.fdt.debug.internal.ui.actions.ShowFullPathsAction">
+               id="org.eclipse.cldt.debug.internal.ui.actions.ShowFullPathsAction">
          </action>
       </viewContribution>
       <viewContribution
@@ -799,12 +799,12 @@
                label="%RemoveAllGlobalsAction.label"
                tooltip="%RemoveAllGlobalsAction.tooltip"
                icon="icons/full/elcl16/rem_all_co.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.RemoveAllGlobalsActionDelegate"
-               id="org.eclipse.fdt.debug.internal.ui.actions.RemoveAllGlobalsActionDelegate">
+               class="org.eclipse.cldt.debug.internal.ui.actions.RemoveAllGlobalsActionDelegate"
+               id="org.eclipse.cldt.debug.internal.ui.actions.RemoveAllGlobalsActionDelegate">
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui"/>
+                     id="org.eclipse.cldt.debug.ui"/>
             </enablement>
          </action>
          <action
@@ -816,12 +816,12 @@
                label="%RemoveGlobalsAction.label"
                tooltip="%RemoveGlobalsAction.tooltip"
                icon="icons/full/elcl16/rem_co.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.RemoveGlobalsActionDelegate"
-               id="org.eclipse.fdt.debug.internal.ui.actions.RemoveGlobalsActionDelegate">
+               class="org.eclipse.cldt.debug.internal.ui.actions.RemoveGlobalsActionDelegate"
+               id="org.eclipse.cldt.debug.internal.ui.actions.RemoveGlobalsActionDelegate">
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui"/>
+                     id="org.eclipse.cldt.debug.ui"/>
             </enablement>
          </action>
          <action
@@ -833,12 +833,12 @@
                label="%AddGlobalsAction.label"
                tooltip="%AddGlobalsAction.tooltip"
                icon="icons/full/elcl16/watch_globals.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.AddGlobalsActionDelegate"
-               id="org.eclipse.fdt.debug.internal.ui.actions.AddGlobalsActionDelegate">
+               class="org.eclipse.cldt.debug.internal.ui.actions.AddGlobalsActionDelegate"
+               id="org.eclipse.cldt.debug.internal.ui.actions.AddGlobalsActionDelegate">
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui"/>
+                     id="org.eclipse.cldt.debug.ui"/>
             </enablement>
          </action>
       </viewContribution>
@@ -847,13 +847,13 @@
             id="org.eclipse.debug.ui.registersView.toolbar">
          <menu
                label="%Dummy"
-               id="org.eclipse.fdt.debug.ui.refresh">
+               id="org.eclipse.cldt.debug.ui.refresh">
             <separator name="refreshGroup"/>
             <separator name="emptyRefreshGroup"/>
          </menu>
       </viewContribution>
       <viewContribution
-            targetID="org.eclipse.fdt.debug.ui.ModulesView"
+            targetID="org.eclipse.cldt.debug.ui.ModulesView"
             id="org.eclipse.debug.ui.modulesView.toolbar">
          <action
                helpContextId="load_symbols_for_all_context"
@@ -863,13 +863,13 @@
                label="%LoadSymbolsForAllAction.label"
                tooltip="%LoadSymbolsForAllAction.tooltip"
                icon="icons/full/elcl16/load_all_symbols_co.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.LoadSymbolsForAllActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.LoadSymbolsForAllActionDelegate"
                style="push"
-               id="org.eclipse.fdt.debug.ui.LoadSymbolsForAllAction">
+               id="org.eclipse.cldt.debug.ui.LoadSymbolsForAllAction">
             <enablement>
                <pluginState
                      value="activated"
-                     id="org.eclipse.fdt.debug.ui"/>
+                     id="org.eclipse.cldt.debug.ui"/>
             </enablement>
          </action>
          <action
@@ -880,128 +880,128 @@
                label="%CollapseAllModulesAction.label"
                tooltip="%CollapseAllModulesAction.tooltip"
                icon="icons/full/elcl16/collapseall.gif"
-               class="org.eclipse.fdt.debug.internal.ui.actions.CollapseAllModulesAction"
+               class="org.eclipse.cldt.debug.internal.ui.actions.CollapseAllModulesAction"
                style="push"
-               id="org.eclipse.fdt.debug.ui.CollapseAllModulesAction"/>
+               id="org.eclipse.cldt.debug.ui.CollapseAllModulesAction"/>
       </viewContribution>
    </extension>
    <extension
          point="org.eclipse.ui.editorActions">
       <editorContribution
-            targetID="org.eclipse.fdt.ui.editor.CEditor"
-            id="org.eclipse.fdt.debug.ui.CEditor.BreakpointRulerActions">
+            targetID="org.eclipse.cldt.ui.editor.CEditor"
+            id="org.eclipse.cldt.debug.ui.CEditor.BreakpointRulerActions">
          <action
                label="%Dummy.label"
-               class="org.eclipse.fdt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
                actionID="RulerDoubleClick"
-               id="org.eclipse.fdt.debug.ui.CEditor.ManageBreakpointRulerAction">
+               id="org.eclipse.cldt.debug.ui.CEditor.ManageBreakpointRulerAction">
          </action>
       </editorContribution>
       <editorContribution
-            targetID="org.eclipse.fdt.debug.ui.editor.CDebugEditor"
-            id="org.eclipse.fdt.debug.ui.CDebugEditor.BreakpointRulerActions">
+            targetID="org.eclipse.cldt.debug.ui.editor.CDebugEditor"
+            id="org.eclipse.cldt.debug.ui.CDebugEditor.BreakpointRulerActions">
          <action
                label="%Dummy.label"
-               class="org.eclipse.fdt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
                actionID="RulerDoubleClick"
-               id="org.eclipse.fdt.debug.ui.CEditor.ManageBreakpointRulerAction">
+               id="org.eclipse.cldt.debug.ui.CEditor.ManageBreakpointRulerAction">
          </action>
       </editorContribution>
       <editorContribution
-            targetID="org.eclipse.fdt.ui.editor.asm.AsmEditor"
-            id="org.eclipse.fdt.ui.editor.asm.AsmEditor.BreakpointRulerActions">
+            targetID="org.eclipse.cldt.ui.editor.asm.AsmEditor"
+            id="org.eclipse.cldt.ui.editor.asm.AsmEditor.BreakpointRulerActions">
          <action
                label="%Dummy.label"
-               class="org.eclipse.fdt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
+               class="org.eclipse.cldt.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
                actionID="RulerDoubleClick"
-               id="org.eclipse.fdt.debug.ui.CEditor.ManageBreakpointRulerAction">
+               id="org.eclipse.cldt.debug.ui.CEditor.ManageBreakpointRulerAction">
          </action>
       </editorContribution>
    </extension>
    <extension
-         point="org.eclipse.fdt.ui.textHovers">
+         point="org.eclipse.cldt.ui.textHovers">
       <hover
             label="%DebugTextHover.label"
             description="%DebugTextHover.description"
             perspective="org.eclipse.debug.ui.DebugPerspective"
-            class="org.eclipse.fdt.debug.internal.ui.editors.DebugTextHover"
-            id="org.eclipse.fdt.debug.internal.ui.editors.DebugTextHover">
+            class="org.eclipse.cldt.debug.internal.ui.editors.DebugTextHover"
+            id="org.eclipse.cldt.debug.internal.ui.editors.DebugTextHover">
       </hover>
    </extension>
    <extension
          point="org.eclipse.debug.core.statusHandlers">
       <statusHandler
-            plugin="org.eclipse.fdt.debug.core"
+            plugin="org.eclipse.cldt.debug.core"
             code="10000"
-            class="org.eclipse.fdt.debug.internal.ui.QuestionStatusHandler"
-            id="org.eclipse.fdt.debug.internal.ui.QuestionStatusHandler">
+            class="org.eclipse.cldt.debug.internal.ui.QuestionStatusHandler"
+            id="org.eclipse.cldt.debug.internal.ui.QuestionStatusHandler">
       </statusHandler>
       <statusHandler
-            plugin="org.eclipse.fdt.debug.core"
+            plugin="org.eclipse.cldt.debug.core"
             code="10001"
-            class="org.eclipse.fdt.debug.internal.ui.InfoStatusHandler"
-            id="org.eclipse.fdt.debug.internal.ui.InfoStatusHandler">
+            class="org.eclipse.cldt.debug.internal.ui.InfoStatusHandler"
+            id="org.eclipse.cldt.debug.internal.ui.InfoStatusHandler">
       </statusHandler>
       <statusHandler
-            plugin="org.eclipse.fdt.debug.core"
+            plugin="org.eclipse.cldt.debug.core"
             code="10002"
-            class="org.eclipse.fdt.debug.internal.ui.ErrorStatusHandler"
-            id="org.eclipse.fdt.debug.internal.ui.ErrorStatusHandler">
+            class="org.eclipse.cldt.debug.internal.ui.ErrorStatusHandler"
+            id="org.eclipse.cldt.debug.internal.ui.ErrorStatusHandler">
       </statusHandler>
    </extension>
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
-            objectClass="org.eclipse.fdt.debug.core.model.ICDebugTarget"
+            objectClass="org.eclipse.cldt.debug.core.model.ICDebugTarget"
             name="%SourcePropertyPage.name"
-            class="org.eclipse.fdt.debug.ui.sourcelookup.SourcePropertyPage"
-            id="org.eclipse.fdt.debug.ui.sourcelookup.SourcePropertyPage">
+            class="org.eclipse.cldt.debug.ui.sourcelookup.SourcePropertyPage"
+            id="org.eclipse.cldt.debug.ui.sourcelookup.SourcePropertyPage">
       </page>
       <page
             adaptable="true"
-            objectClass="org.eclipse.fdt.debug.core.model.ICBreakpoint"
-            class="org.eclipse.fdt.debug.internal.ui.propertypages.CBreakpointPropertyPage"
+            objectClass="org.eclipse.cldt.debug.core.model.ICBreakpoint"
+            class="org.eclipse.cldt.debug.internal.ui.propertypages.CBreakpointPropertyPage"
             name="%CommonBreakpointPage.label"
-            id="org.eclipse.fdt.debug.ui.propertypages.breakpoint.common"/>
+            id="org.eclipse.cldt.debug.ui.propertypages.breakpoint.common"/>
       <page
             adaptable="true"
-            objectClass="org.eclipse.fdt.debug.core.model.ICBreakpoint"
-            class="org.eclipse.fdt.debug.internal.ui.propertypages.CBreakpointFilteringPage"
+            objectClass="org.eclipse.cldt.debug.core.model.ICBreakpoint"
+            class="org.eclipse.cldt.debug.internal.ui.propertypages.CBreakpointFilteringPage"
             name="%FilteringBreakpointPage.label"
-            id="org.eclipse.fdt.debug.ui.propertypages.breakpoint.filtering"/>
+            id="org.eclipse.cldt.debug.ui.propertypages.breakpoint.filtering"/>
       <page
-            objectClass="org.eclipse.fdt.debug.core.model.ICSignal"
-            class="org.eclipse.fdt.debug.internal.ui.propertypages.SignalPropertyPage"
+            objectClass="org.eclipse.cldt.debug.core.model.ICSignal"
+            class="org.eclipse.cldt.debug.internal.ui.propertypages.SignalPropertyPage"
             name="%CommonSignalPage.label"
-            id="org.eclipse.fdt.debug.ui.propertypages.signal.common"/>
+            id="org.eclipse.cldt.debug.ui.propertypages.signal.common"/>
       <page
-            objectClass="org.eclipse.fdt.debug.core.model.ICModule"
-            class="org.eclipse.fdt.debug.internal.ui.propertypages.ModulePropertyPage"
+            objectClass="org.eclipse.cldt.debug.core.model.ICModule"
+            class="org.eclipse.cldt.debug.internal.ui.propertypages.ModulePropertyPage"
             name="%CommonModulePage.label"
-            id="org.eclipse.fdt.debug.ui.propertypages.module.common"/>
+            id="org.eclipse.cldt.debug.ui.propertypages.module.common"/>
    </extension>
    <extension
-         id="org.eclipse.fdt.debug.ui.editors"
+         id="org.eclipse.cldt.debug.ui.editors"
          point="org.eclipse.ui.editors">
       <editor
             name="%CDebugEditor.name"
             icon="icons/full/obj16/filenotfound_obj.gif"
-            contributorClass="org.eclipse.fdt.internal.ui.editor.FortranEditorActionContributor"
-            class="org.eclipse.fdt.debug.internal.ui.editors.CDebugEditor"
-            id="org.eclipse.fdt.debug.ui.editor.CDebugEditor">
+            contributorClass="org.eclipse.cldt.internal.ui.editor.FortranEditorActionContributor"
+            class="org.eclipse.cldt.debug.internal.ui.editors.CDebugEditor"
+            id="org.eclipse.cldt.debug.ui.editor.CDebugEditor">
       </editor>
    </extension>
    <extension
          point="org.eclipse.debug.core.sourceLocators">
       <sourceLocator
             name="%DefaultSourceLocator.name"
-            class="org.eclipse.fdt.debug.ui.sourcelookup.DefaultSourceLocator"
-            id="org.eclipse.fdt.debug.ui.DefaultSourceLocator">
+            class="org.eclipse.cldt.debug.ui.sourcelookup.DefaultSourceLocator"
+            id="org.eclipse.cldt.debug.ui.DefaultSourceLocator">
       </sourceLocator>
       <sourceLocator
             name="%OldDefaultSourceLocator.name"
-            class="org.eclipse.fdt.debug.ui.sourcelookup.DefaultSourceLocator"
-            id="org.eclipse.fdt.launch.DefaultSourceLocator">
+            class="org.eclipse.cldt.debug.ui.sourcelookup.DefaultSourceLocator"
+            id="org.eclipse.cldt.launch.DefaultSourceLocator">
       </sourceLocator>
    </extension>
    <extension
@@ -1010,60 +1010,60 @@
             name="%DebuggingCContext.name"
             description="%DebuggingCContext.description"
             parentId="org.eclipse.debug.ui.debugging"
-            id="org.eclipse.fdt.debug.ui.debugging">
+            id="org.eclipse.cldt.debug.ui.debugging">
       </context>
    </extension>
    <extension
          point="org.eclipse.debug.ui.debugModelContextBindings">
       <modelContextBinding
-            debugModelId="org.eclipse.fdt.debug.core"
-            contextId="org.eclipse.fdt.debug.ui.debugging">
+            debugModelId="org.eclipse.cldt.debug.core"
+            contextId="org.eclipse.cldt.debug.ui.debugging">
       </modelContextBinding>
    </extension>
    <extension
          point="org.eclipse.debug.ui.contextViewBindings">
       <contextViewBinding
             viewId="org.eclipse.debug.ui.MemoryView"
-            contextId="org.eclipse.fdt.debug.ui.debugging">
+            contextId="org.eclipse.cldt.debug.ui.debugging">
       </contextViewBinding>
       <contextViewBinding
-            viewId="org.eclipse.fdt.debug.ui.SignalsView"
-            contextId="org.eclipse.fdt.debug.ui.debugging">
+            viewId="org.eclipse.cldt.debug.ui.SignalsView"
+            contextId="org.eclipse.cldt.debug.ui.debugging">
       </contextViewBinding>
       <contextViewBinding
             viewId="org.eclipse.debug.ui.RegisterView"
-            contextId="org.eclipse.fdt.debug.ui.debugging">
+            contextId="org.eclipse.cldt.debug.ui.debugging">
       </contextViewBinding>
       <contextViewBinding
-            contextId="org.eclipse.fdt.debug.ui.debugging"
-            viewId="org.eclipse.fdt.debug.ui.ModulesView"/>
+            contextId="org.eclipse.cldt.debug.ui.debugging"
+            viewId="org.eclipse.cldt.debug.ui.ModulesView"/>
    </extension>
    <extension
          point="org.eclipse.ui.editors.annotationTypes">
       <type
-            markerType="org.eclipse.fdt.debug.core.cBreakpointMarker"
+            markerType="org.eclipse.cldt.debug.core.cBreakpointMarker"
             super="org.eclipse.debug.core.breakpoint"
-            name="org.eclipse.fdt.debug.core.breakpoint">
+            name="org.eclipse.cldt.debug.core.breakpoint">
       </type>
       <type
-            markerType="org.eclipse.fdt.debug.ui.disassemblyInstructionPointer.current"
-            name="org.eclipse.fdt.debug.ui.currentDisassemblyIP">
+            markerType="org.eclipse.cldt.debug.ui.disassemblyInstructionPointer.current"
+            name="org.eclipse.cldt.debug.ui.currentDisassemblyIP">
       </type>
       <type
-            markerType="org.eclipse.fdt.debug.ui.disassemblyInstructionPointer.secondary"
-            name="org.eclipse.fdt.debug.ui.secondaryDisassemblyIP">
+            markerType="org.eclipse.cldt.debug.ui.disassemblyInstructionPointer.secondary"
+            name="org.eclipse.cldt.debug.ui.secondaryDisassemblyIP">
       </type>
    </extension>
    <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
       <specification
-            annotationImageProvider="org.eclipse.fdt.debug.internal.ui.BreakpointImageProvider"
+            annotationImageProvider="org.eclipse.cldt.debug.internal.ui.BreakpointImageProvider"
             icon="icons/full/obj16/brkp_obj.gif"
-            annotationType="org.eclipse.fdt.debug.core.breakpoint">
+            annotationType="org.eclipse.cldt.debug.core.breakpoint">
       </specification>
       <specification
             colorPreferenceValue="217,255,226"
-            annotationType="org.eclipse.fdt.debug.ui.currentDisassemblyIP"
+            annotationType="org.eclipse.cldt.debug.ui.currentDisassemblyIP"
             verticalRulerPreferenceValue="true"
             colorPreferenceKey="currentDisassemblyIPColor"
             highlightPreferenceKey="currentDisassemblyIPHighlight"
@@ -1079,7 +1079,7 @@
       </specification>
       <specification
             colorPreferenceValue="217,255,226"
-            annotationType="org.eclipse.fdt.debug.ui.secondaryDisassemblyIP"
+            annotationType="org.eclipse.cldt.debug.ui.secondaryDisassemblyIP"
             verticalRulerPreferenceValue="true"
             colorPreferenceKey="secondaryDisassemblyIPColor"
             highlightPreferenceKey="secondaryDisassemblyIPHighlight"
@@ -1097,48 +1097,48 @@
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            class="org.eclipse.fdt.debug.internal.ui.actions.RetargettableActionAdapterFactory"
-            adaptableType="org.eclipse.fdt.internal.ui.editor.FortranEditor">
+            class="org.eclipse.cldt.debug.internal.ui.actions.RetargettableActionAdapterFactory"
+            adaptableType="org.eclipse.cldt.internal.ui.editor.FortranEditor">
          <adapter
                type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
          </adapter>
          <adapter
                type="org.eclipse.debug.ui.actions.IRunToLineTarget">
          </adapter>
-         <adapter type="org.eclipse.fdt.debug.internal.ui.actions.IResumeAtLineTarget"/>
+         <adapter type="org.eclipse.cldt.debug.internal.ui.actions.IResumeAtLineTarget"/>
       </factory>
       <factory
-            class="org.eclipse.fdt.debug.internal.ui.actions.RetargettableActionAdapterFactory"
-            adaptableType="org.eclipse.fdt.internal.ui.editor.asm.AsmTextEditor">
+            class="org.eclipse.cldt.debug.internal.ui.actions.RetargettableActionAdapterFactory"
+            adaptableType="org.eclipse.cldt.internal.ui.editor.asm.AsmTextEditor">
          <adapter
                type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
          </adapter>
          <adapter
                type="org.eclipse.debug.ui.actions.IRunToLineTarget">
          </adapter>
-         <adapter type="org.eclipse.fdt.debug.internal.ui.actions.IResumeAtLineTarget"/>
+         <adapter type="org.eclipse.cldt.debug.internal.ui.actions.IResumeAtLineTarget"/>
       </factory>
       <factory
-            class="org.eclipse.fdt.debug.internal.ui.actions.RetargettableActionAdapterFactory"
-            adaptableType="org.eclipse.fdt.debug.internal.ui.views.disassembly.DisassemblyView">
+            class="org.eclipse.cldt.debug.internal.ui.actions.RetargettableActionAdapterFactory"
+            adaptableType="org.eclipse.cldt.debug.internal.ui.views.disassembly.DisassemblyView">
          <adapter
                type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
          </adapter>
          <adapter
                type="org.eclipse.debug.ui.actions.IRunToLineTarget">
          </adapter>
-         <adapter type="org.eclipse.fdt.debug.internal.ui.actions.IResumeAtLineTarget"/>
+         <adapter type="org.eclipse.cldt.debug.internal.ui.actions.IResumeAtLineTarget"/>
       </factory>
       <factory
-            class="org.eclipse.fdt.debug.internal.ui.actions.RetargettableActionAdapterFactory"
+            class="org.eclipse.cldt.debug.internal.ui.actions.RetargettableActionAdapterFactory"
             adaptableType="org.eclipse.ui.views.contentoutline.ContentOutline">
          <adapter
                type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
          </adapter>
       </factory>
       <factory
-            class="org.eclipse.fdt.debug.internal.ui.CBreakpointWorkbenchAdapterFactory"
-            adaptableType="org.eclipse.fdt.debug.core.model.ICBreakpoint">
+            class="org.eclipse.cldt.debug.internal.ui.CBreakpointWorkbenchAdapterFactory"
+            adaptableType="org.eclipse.cldt.debug.core.model.ICBreakpoint">
          <adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
       </factory>   </extension>
    <extension
@@ -1147,7 +1147,7 @@
             label="%DisassemblyFontDefinition.label"
             categoryId="org.eclipse.debug.ui.presentation"
             defaultsTo="org.eclipse.jface.textfont"
-            id="org.eclipse.fdt.debug.ui.disassemblyFont">
+            id="org.eclipse.cldt.debug.ui.disassemblyFont">
          <description>
             %DisassemblyFontDefinition.description
          </description>
@@ -1156,7 +1156,7 @@
             defaultsTo="org.eclipse.jface.textfont"
             label="%ModulesDetailPaneFontDefinition.label"
             categoryId="org.eclipse.debug.ui.presentation"
-            id="org.eclipse.fdt.debug.ui.ModulesDetailPaneFont">
+            id="org.eclipse.cldt.debug.ui.ModulesDetailPaneFont">
          <description>
             %ModulesDetailPaneFontDefinition.description
          </description>
@@ -1165,12 +1165,12 @@
    <extension
          point="org.eclipse.debug.core.watchExpressionDelegates">
       <watchExpressionDelegate
-            debugModel="org.eclipse.fdt.debug.core"
-            delegateClass="org.eclipse.fdt.debug.internal.ui.CWatchExpressionDelegate"/>
+            debugModel="org.eclipse.cldt.debug.core"
+            delegateClass="org.eclipse.cldt.debug.internal.ui.CWatchExpressionDelegate"/>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.fdt.debug.internal.ui.CDebugUIPreferenceInitializer"/>
+      <initializer class="org.eclipse.cldt.debug.internal.ui.CDebugUIPreferenceInitializer"/>
    </extension>
    <extension
          point="org.eclipse.debug.ui.memoryRenderings">
@@ -1179,7 +1179,7 @@
             primaryId="org.eclipse.debug.ui.rendering.raw_memory"
             renderingIds="org.eclipse.debug.ui.rendering.raw_memory,org.eclipse.debug.ui.rendering.ascii,org.eclipse.debug.ui.rendering.signedint,org.eclipse.debug.ui.rendering.unsignedint">
          <enablement>
-            <instanceof value="org.eclipse.fdt.debug.internal.core.model.CMemoryBlockExtension"/>
+            <instanceof value="org.eclipse.cldt.debug.internal.core.model.CMemoryBlockExtension"/>
          </enablement>
       </renderingBindings>
    </extension>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin
-   id="org.eclipse.fdt.managedbuilder.core"
+   id="org.eclipse.cldt.managedbuilder.core"
    name="%pluginName"
    version="3.0.0"
    provider-name="%providerName"
-   class="org.eclipse.fdt.managedbuilder.core.ManagedBuilderCorePlugin">
+   class="org.eclipse.cldt.managedbuilder.core.ManagedBuilderCorePlugin">
 
    <runtime>
       <library name="mngbuildcore.jar">
@@ -13,10 +13,10 @@
       </library>
    </runtime>
    <requires>
-      <import plugin="org.eclipse.fdt.core"/>
+      <import plugin="org.eclipse.cldt.core"/>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.fdt.make.core"/>
+      <import plugin="org.eclipse.cldt.make.core"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.team.core"/>
    </requires>
@@ -30,10 +30,10 @@
 <!-- =================================================================================== -->
    <extension
          id="ManagedBuildManager"
-         point="org.eclipse.fdt.core.ScannerInfoProvider">
+         point="org.eclipse.cldt.core.ScannerInfoProvider">
       <cextension>
          <run
-               class="org.eclipse.fdt.managedbuilder.core.ManagedBuildManager">
+               class="org.eclipse.cldt.managedbuilder.core.ManagedBuildManager">
          </run>
       </cextension>
    </extension>
@@ -47,7 +47,7 @@
       <builder
             hasNature="true">
          <run
-               class="org.eclipse.fdt.managedbuilder.internal.core.GeneratedMakefileBuilder">
+               class="org.eclipse.cldt.managedbuilder.internal.core.GeneratedMakefileBuilder">
          </run>
       </builder>
    </extension>
@@ -59,59 +59,59 @@
          name="%ManagedBuildNature.name"
          point="org.eclipse.core.resources.natures">
       <requires-nature
-            id="org.eclipse.fdt.core.fnature">
+            id="org.eclipse.cldt.core.fnature">
       </requires-nature>
       <runtime>
          <run
-               class="org.eclipse.fdt.managedbuilder.core.ManagedProjectNature">
+               class="org.eclipse.cldt.managedbuilder.core.ManagedProjectNature">
          </run>
       </runtime>
       <builder
-            id="org.eclipse.fdt.managedbuilder.core.genmakebuilder">
+            id="org.eclipse.cldt.managedbuilder.core.genmakebuilder">
       </builder>
    </extension>
    <extension
-         point="org.eclipse.fdt.core.PathEntryContainerInitializer">
+         point="org.eclipse.cldt.core.PathEntryContainerInitializer">
       <pathEntryContainerInitializer
-            class="org.eclipse.fdt.managedbuilder.internal.scannerconfig.ManagedBuildPathEntryContainerInitializer"
-            id="org.eclipse.fdt.managedbuilder.MANAGED_CONTAINER"/>
+            class="org.eclipse.cldt.managedbuilder.internal.scannerconfig.ManagedBuildPathEntryContainerInitializer"
+            id="org.eclipse.cldt.managedbuilder.MANAGED_CONTAINER"/>
    </extension>
    <extension
          id="managedMake"
          name="%ManagedMakeProject.name"
-         point="org.eclipse.fdt.core.CProject">
+         point="org.eclipse.cldt.core.CProject">
       <cproject
-            natureID="org.eclipse.fdt.managedbuilder.core.managedBuildNature"
-            class="org.eclipse.fdt.managedbuilder.internal.core.ManagedMakeProject"/>
+            natureID="org.eclipse.cldt.managedbuilder.core.managedBuildNature"
+            class="org.eclipse.cldt.managedbuilder.internal.core.ManagedMakeProject"/>
    </extension>
    <extension
          id="GCCManagedMakePerProjectProfile"
          name="GNU Fortran managed make per project SCD profile"
-         point="org.eclipse.fdt.make.core.ScannerConfigurationDiscoveryProfile">
+         point="org.eclipse.cldt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
-            class="org.eclipse.fdt.managedbuilder.internal.scannerconfig.DefaultGCCScannerInfoCollector"
+            class="org.eclipse.cldt.managedbuilder.internal.scannerconfig.DefaultGCCScannerInfoCollector"
             scope="project"/>
       <scannerInfoProvider providerId="specsFile">
          <run
                arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}"
                command="gcc"
-               class="org.eclipse.fdt.make.internal.core.scannerconfig2.GCCSpecsRunSIProvider"/>
-         <scannerInfoConsoleParser class="org.eclipse.fdt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser"/>
+               class="org.eclipse.cldt.make.internal.core.scannerconfig2.GCCSpecsRunSIProvider"/>
+         <scannerInfoConsoleParser class="org.eclipse.cldt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser"/>
       </scannerInfoProvider>
    </extension>
    <extension
          id="GCCWinManagedMakePerProjectProfile"
          name="GNU Fortran managed make per project SCD profile (Windows)"
-         point="org.eclipse.fdt.make.core.ScannerConfigurationDiscoveryProfile">
+         point="org.eclipse.cldt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
-            class="org.eclipse.fdt.managedbuilder.internal.scannerconfig.DefaultGnuWinScannerInfoCollector"
+            class="org.eclipse.cldt.managedbuilder.internal.scannerconfig.DefaultGnuWinScannerInfoCollector"
             scope="project"/>
       <scannerInfoProvider providerId="specsFile">
          <run
                arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}"
                command="gcc"
-               class="org.eclipse.fdt.make.internal.core.scannerconfig2.GCCSpecsRunSIProvider"/>
-         <scannerInfoConsoleParser class="org.eclipse.fdt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser"/>
+               class="org.eclipse.cldt.make.internal.core.scannerconfig2.GCCSpecsRunSIProvider"/>
+         <scannerInfoConsoleParser class="org.eclipse.cldt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser"/>
       </scannerInfoProvider>
    </extension>
    <extension

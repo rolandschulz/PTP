@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.eclipse.fdt.debug.mi.ui</name>
+	<name>org.eclipse.cldt.debug.mi.ui</name>
 	<comment></comment>
 	<projects>
 		<project>org.eclipse.fdt.debug.core</project>

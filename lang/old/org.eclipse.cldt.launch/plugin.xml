@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin
-   id="org.eclipse.fdt.launch"
+   id="org.eclipse.cldt.launch"
    name="%pluginName"
    version="3.0.0"
    provider-name="%providerName"
-   class="org.eclipse.fdt.launch.internal.ui.LaunchUIPlugin">
+   class="org.eclipse.cldt.launch.internal.ui.LaunchUIPlugin">
 
    <runtime>
-      <library name="fdtlaunch.jar">
+      <library name="cldtlaunch.jar">
          <export name="*"/>
       </library>
    </runtime>
@@ -19,10 +19,10 @@
       <import plugin="org.eclipse.debug.core"/>
       <import plugin="org.eclipse.debug.ui"/>
       <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.fdt.core"/>
-      <import plugin="org.eclipse.fdt.ui"/>
-      <import plugin="org.eclipse.fdt.debug.core"/>
-      <import plugin="org.eclipse.fdt.debug.ui"/>
+      <import plugin="org.eclipse.cldt.core"/>
+      <import plugin="org.eclipse.cldt.ui"/>
+      <import plugin="org.eclipse.cldt.debug.core"/>
+      <import plugin="org.eclipse.cldt.debug.ui"/>
       <import plugin="org.eclipse.core.boot"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.variables"/>
@@ -32,61 +32,61 @@
    <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
-            name="%LocalFDTLaunch.name"
-            delegate="org.eclipse.fdt.launch.internal.LocalRunLaunchDelegate"
+            name="%LocalCDTLaunch.name"
+            delegate="org.eclipse.cldt.launch.internal.LocalRunLaunchDelegate"
             modes="run,debug"
             public="true"
-            id="org.eclipse.fdt.launch.localCLaunch">
+            id="org.eclipse.cldt.launch.localCLaunch">
       </launchConfigurationType>
       <launchConfigurationType
-            name="%LocalAttachFDTLaunch.name"
-            delegate="org.eclipse.fdt.launch.internal.LocalAttachLaunchDelegate"
+            name="%LocalAttachCDTLaunch.name"
+            delegate="org.eclipse.cldt.launch.internal.LocalAttachLaunchDelegate"
             modes="debug"
             public="true"
-            id="org.eclipse.fdt.launch.localAttachCLaunch">
+            id="org.eclipse.cldt.launch.localAttachCLaunch">
       </launchConfigurationType>
       <launchConfigurationType
-            name="%CoreFileFDTLaunch.name"
-            delegate="org.eclipse.fdt.launch.internal.CoreFileLaunchDelegate"
+            name="%CoreFileCDTLaunch.name"
+            delegate="org.eclipse.cldt.launch.internal.CoreFileLaunchDelegate"
             modes="debug"
             public="true"
-            id="org.eclipse.fdt.launch.coreFileCLaunch">
+            id="org.eclipse.cldt.launch.coreFileCLaunch">
       </launchConfigurationType>
    </extension>
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTypeImages">
       <launchConfigurationTypeImage
             icon="icons/f_app.gif"
-            configTypeID="org.eclipse.fdt.launch.localCLaunch"
-            id="org.eclipse.fdt.launch.localRunLaunchImage">
+            configTypeID="org.eclipse.cldt.launch.localCLaunch"
+            id="org.eclipse.cldt.launch.localRunLaunchImage">
       </launchConfigurationTypeImage>
       <launchConfigurationTypeImage
             icon="icons/f_app.gif"
-            configTypeID="org.eclipse.fdt.launch.localAttachCLaunch"
-            id="org.eclipse.fdt.launch.localAttachLaunchImage">
+            configTypeID="org.eclipse.cldt.launch.localAttachCLaunch"
+            id="org.eclipse.cldt.launch.localAttachLaunchImage">
       </launchConfigurationTypeImage>
       <launchConfigurationTypeImage
             icon="icons/f_app.gif"
-            configTypeID="org.eclipse.fdt.launch.coreFileCLaunch"
-            id="org.eclipse.fdt.launch.coreFileLaunchImage">
+            configTypeID="org.eclipse.cldt.launch.coreFileCLaunch"
+            id="org.eclipse.cldt.launch.coreFileLaunchImage">
       </launchConfigurationTypeImage>
    </extension>
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
-            type="org.eclipse.fdt.launch.localCLaunch"
-            class="org.eclipse.fdt.launch.internal.ui.LocalRunLaunchConfigurationTabGroup"
-            id="org.eclipse.fdt.launch.localRunLaunchTabGroup">
+            type="org.eclipse.cldt.launch.localCLaunch"
+            class="org.eclipse.cldt.launch.internal.ui.LocalRunLaunchConfigurationTabGroup"
+            id="org.eclipse.cldt.launch.localRunLaunchTabGroup">
       </launchConfigurationTabGroup>
       <launchConfigurationTabGroup
-            type="org.eclipse.fdt.launch.localAttachCLaunch"
-            class="org.eclipse.fdt.launch.internal.ui.LocalAttachLaunchConfigurationTabGroup"
-            id="org.eclipse.fdt.launch.localAttachLaunchTabGroup">
+            type="org.eclipse.cldt.launch.localAttachCLaunch"
+            class="org.eclipse.cldt.launch.internal.ui.LocalAttachLaunchConfigurationTabGroup"
+            id="org.eclipse.cldt.launch.localAttachLaunchTabGroup">
       </launchConfigurationTabGroup>
       <launchConfigurationTabGroup
-            type="org.eclipse.fdt.launch.coreFileCLaunch"
-            class="org.eclipse.fdt.launch.internal.ui.CoreFileLaunchConfigurationTabGroup"
-            id="org.eclipse.fdt.launch.voreFileCLaunchTabGroup">
+            type="org.eclipse.cldt.launch.coreFileCLaunch"
+            class="org.eclipse.cldt.launch.internal.ui.CoreFileLaunchConfigurationTabGroup"
+            id="org.eclipse.cldt.launch.voreFileCLaunchTabGroup">
       </launchConfigurationTabGroup>
    </extension>
    <extension
@@ -95,14 +95,14 @@
             label="%ApplicationShortcut.label"
             icon="icons/f_app.gif"
             modes="run, debug"
-            class="org.eclipse.fdt.launch.internal.ApplicationLaunchShortcut"
-            id="org.eclipse.fdt.debug.ui.localCShortcut">
+            class="org.eclipse.cldt.launch.internal.ApplicationLaunchShortcut"
+            id="org.eclipse.cldt.debug.ui.localCShortcut">
          <contextualLaunch>
            <enablement>
              <with variable="selection">
                <count value="1"/>
                <iterate>
-                 <test property="org.eclipse.fdt.launch.isExecutable"/>
+                 <test property="org.eclipse.cldt.launch.isExecutable"/>
                </iterate>
              </with>
            </enablement>
@@ -114,7 +114,7 @@
   		 	  label="%ContextualDebugApplication.label"/>
   		 </contextualLaunch>
          <perspective
-               id="org.eclipse.fdt.ui.FortranPerspective">
+               id="org.eclipse.cldt.ui.FortranPerspective">
          </perspective>
          <perspective
                id="org.eclipse.debug.ui.DebugPerspective">
@@ -124,26 +124,26 @@
 <!-- Property testers -->
    <extension point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-      		namespace="org.eclipse.fdt.launch"
+      		namespace="org.eclipse.cldt.launch"
             properties="isExecutable"
             type="org.eclipse.core.runtime.IAdaptable"
-            class="org.eclipse.fdt.launch.internal.ExecutablePropertyTester"
-            id="org.eclipse.fdt.launch.CPropertyTester">
+            class="org.eclipse.cldt.launch.internal.ExecutablePropertyTester"
+            id="org.eclipse.cldt.launch.CPropertyTester">
       </propertyTester>
    </extension>
    <extension
          point="org.eclipse.debug.core.statusHandlers">
       <statusHandler
             code="100"
-            plugin="org.eclipse.fdt.launch"
-            class="org.eclipse.fdt.launch.internal.ui.ProcessPrompter"
-            id="org.eclipse.fdt.launch.statusHandler.processPrompter">
+            plugin="org.eclipse.cldt.launch"
+            class="org.eclipse.cldt.launch.internal.ui.ProcessPrompter"
+            id="org.eclipse.cldt.launch.statusHandler.processPrompter">
       </statusHandler>  
       <statusHandler
             code="101"
-            plugin="org.eclipse.fdt.launch"
-            class="org.eclipse.fdt.launch.internal.ui.CoreFilePrompter"
-            id="org.eclipse.fdt.launch.statusHandler.coreFilePrompter">
+            plugin="org.eclipse.cldt.launch"
+            class="org.eclipse.cldt.launch.internal.ui.CoreFilePrompter"
+            id="org.eclipse.cldt.launch.statusHandler.coreFilePrompter">
       </statusHandler>  
 	</extension>
 	
@@ -151,7 +151,7 @@
 	<extension point="org.eclipse.core.runtime.adapters">
          <factory 
             class="" 
-            adaptableType="org.eclipse.fdt.core.model.IBinary">
+            adaptableType="org.eclipse.cldt.core.model.IBinary">
             <adapter type="org.eclipse.debug.ui.actions.ILaunchable"/>
          </factory>
          <factory 

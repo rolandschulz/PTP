@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin
-   id="org.eclipse.fdt.ui"
+   id="org.eclipse.cldt.ui"
    name="%pluginName"
    version="3.0.0"
    provider-name="%providerName"
-   class="org.eclipse.fdt.ui.FortranUIPlugin">
+   class="org.eclipse.cldt.ui.FortranUIPlugin">
 
    <runtime>
-      <library name="fdtui.jar">
+      <library name="cldtui.jar">
          <export name="*"/>
       </library>
    </runtime>
@@ -22,7 +22,7 @@
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.search"/>
       <import plugin="org.eclipse.compare"/>
-      <import plugin="org.eclipse.fdt.core"/>
+      <import plugin="org.eclipse.cldt.core"/>
       <import plugin="org.eclipse.ui.console"/>
       <import plugin="org.eclipse.core.filebuffers"/>
       <import plugin="org.eclipse.core.runtime"/>
@@ -39,7 +39,7 @@
    <!--extension-point id="foldingStructureProviders" name="%foldingStructureProvidersExtensionPoint" schema="schema/foldingStructureProviders.exsd"/-->
    
 <!-- =========================================================================== -->
-<!-- Extension point: org.eclipse.fdt.ui.textHovers                        -->
+<!-- Extension point: org.eclipse.cldt.ui.textHovers                        -->
 <!-- Extension Implementation: must implement org.eclipse.jface.text.ITextHover  -->
 <!-- Purpose: Provide a perspective specific text hovering for FortranEditor files     -->
 <!-- =========================================================================== -->
@@ -48,8 +48,8 @@
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            class="org.eclipse.fdt.internal.ui.FortranElementAdapterFactory"
-            adaptableType="org.eclipse.fdt.core.model.ICElement">
+            class="org.eclipse.cldt.internal.ui.FortranElementAdapterFactory"
+            adaptableType="org.eclipse.cldt.core.model.ICElement">
          <adapter
                type="org.eclipse.core.resources.IResource">
          </adapter>
@@ -67,118 +67,118 @@
 
 <!-- Implement our filters.  -->
    <extension
-         point="org.eclipse.fdt.ui.CElementFilters">
+         point="org.eclipse.cldt.ui.CElementFilters">
 <!-- Implement our filters for C-View.  -->
       <filter
-            targetId="org.eclipse.fdt.ui.FortranView"
+            targetId="org.eclipse.cldt.ui.FortranView"
             selected="true"
             pattern=".*">
       </filter>
       <filter
-            class="org.eclipse.fdt.internal.ui.filters.ExecutableFilter"
+            class="org.eclipse.cldt.internal.ui.filters.ExecutableFilter"
             description="%HideExecutableFiles.description"
             enabled="false"
-            id="org.eclipse.fdt.internal.ui.FortranView.ExecutableFilter"
+            id="org.eclipse.cldt.internal.ui.FortranView.ExecutableFilter"
             name="%HideExecutableFiles.label"
-            targetId="org.eclipse.fdt.ui.FortranView">
+            targetId="org.eclipse.cldt.ui.FortranView">
       </filter>
       <filter
-            targetId="org.eclipse.fdt.ui.FortranView"
+            targetId="org.eclipse.cldt.ui.FortranView"
             name="%HideSharedFiles.label"
             enabled="false"
             description="%HideSharedFiles.description"
-            class="org.eclipse.fdt.internal.ui.filters.SharedFilter"
-            id="org.eclipse.fdt.internal.ui.FortranView.SharedFilter">
+            class="org.eclipse.cldt.internal.ui.filters.SharedFilter"
+            id="org.eclipse.cldt.internal.ui.FortranView.SharedFilter">
       </filter>
       <filter
-            targetId="org.eclipse.fdt.ui.FortranView"
+            targetId="org.eclipse.cldt.ui.FortranView"
             name="%HideObjectFiles.label"
             enabled="false"
             description="%HideObjectFiles.description"
-            class="org.eclipse.fdt.internal.ui.filters.ObjectFilter"
-            id="org.eclipse.fdt.internal.ui.FortranView.ObjectFilter">
+            class="org.eclipse.cldt.internal.ui.filters.ObjectFilter"
+            id="org.eclipse.cldt.internal.ui.FortranView.ObjectFilter">
       </filter>
       <filter
-            targetId="org.eclipse.fdt.ui.FortranView"
+            targetId="org.eclipse.cldt.ui.FortranView"
             name="%HideArchiveFiles.label"
             enabled="false"
             description="%HideArchiveFiles.description"
-            class="org.eclipse.fdt.internal.ui.filters.ArchiveFilter"
-            id="org.eclipse.fdt.internal.ui.FortranView.ArchiveFilter">
+            class="org.eclipse.cldt.internal.ui.filters.ArchiveFilter"
+            id="org.eclipse.cldt.internal.ui.FortranView.ArchiveFilter">
       </filter>
       <filter
-            targetId="org.eclipse.fdt.ui.FortranView"
+            targetId="org.eclipse.cldt.ui.FortranView"
             name="%HideClosedProjects.label"
             enabled="false"
             description="%HideClosedProjects.description"
-            class="org.eclipse.fdt.internal.ui.filters.ClosedProjectFilter"
-            id="org.eclipse.fdt.internal.ui.FortranView.ClosedProjectFilter">
+            class="org.eclipse.cldt.internal.ui.filters.ClosedProjectFilter"
+            id="org.eclipse.cldt.internal.ui.FortranView.ClosedProjectFilter">
       </filter>
       <filter
-            targetId="org.eclipse.fdt.ui.FortranView"
+            targetId="org.eclipse.cldt.ui.FortranView"
             name="%HideNonCProjects.label"
             enabled="false"
             description="%HideNonCProjects.description"
-            class="org.eclipse.fdt.internal.ui.filters.NonCProjectsFilter"
-            id="org.eclipse.fdt.internal.ui.FortranView.NonCProjectsFilter">
+            class="org.eclipse.cldt.internal.ui.filters.NonCProjectsFilter"
+            id="org.eclipse.cldt.internal.ui.FortranView.NonCProjectsFilter">
       </filter>
       <filter
-            targetId="org.eclipse.fdt.ui.FortranView"
+            targetId="org.eclipse.cldt.ui.FortranView"
             name="%HideNonCElements.label"
             enabled="false"
             description="%HideNonCElements.description"
-            class="org.eclipse.fdt.internal.ui.filters.NonCElementFilter"
-            id="org.eclipse.fdt.internal.ui.FortranView.NonCElementFilter">
+            class="org.eclipse.cldt.internal.ui.filters.NonCElementFilter"
+            id="org.eclipse.cldt.internal.ui.FortranView.NonCElementFilter">
       </filter>
 <!-- Outline Page -->
       <filter
-            targetId="org.eclipse.fdt.ui.COutlinePage"
+            targetId="org.eclipse.cldt.ui.COutlinePage"
             name="%HideUsingDirective.label"
             enabled="false"
             description="%HideUsingDirective.description"
-            class="org.eclipse.fdt.internal.ui.filters.UsingDirectiveFilter"
-            id="org.eclipse.fdt.ui.COutlinePage.UsingDeclarationFilter">
+            class="org.eclipse.cldt.internal.ui.filters.UsingDirectiveFilter"
+            id="org.eclipse.cldt.ui.COutlinePage.UsingDeclarationFilter">
       </filter>
       <filter
-            targetId="org.eclipse.fdt.ui.COutlinePage"
+            targetId="org.eclipse.cldt.ui.COutlinePage"
             name="%HideMacroDirective.label"
             enabled="false"
             description="%HideMacroDirective.description"
-            class="org.eclipse.fdt.internal.ui.filters.MacroDirectiveFilter"
-            id="org.eclipse.fdt.ui.COutlinePage.MacroDirectiveFilter">
+            class="org.eclipse.cldt.internal.ui.filters.MacroDirectiveFilter"
+            id="org.eclipse.cldt.ui.COutlinePage.MacroDirectiveFilter">
       </filter>
    </extension>
       <extension
-         point="org.eclipse.fdt.ui.textHovers">
+         point="org.eclipse.cldt.ui.textHovers">
       <hover
             label="%cdocHover"
             description="%cdocHoverDescription"
-            class="org.eclipse.fdt.internal.ui.text.c.hover.CDocHover"
-            id="org.eclipse.fdt.ui.CDocHover">
+            class="org.eclipse.cldt.internal.ui.text.c.hover.CDocHover"
+            id="org.eclipse.cldt.ui.CDocHover">
       </hover>
       <hover
             label="%sequentialHover"
             description="%sequentialHoverDescription"
-            class="org.eclipse.fdt.internal.ui.text.c.hover.BestMatchHover"
-            id="org.eclipse.fdt.ui.BestMatchHover">
+            class="org.eclipse.cldt.internal.ui.text.c.hover.BestMatchHover"
+            id="org.eclipse.cldt.ui.BestMatchHover">
       </hover>
       <hover
             label="%sourceHover"
             description="%sourceHoverDescription"
-            class="org.eclipse.fdt.internal.ui.text.c.hover.CSourceHover"
-            id="org.eclipse.fdt.ui.CSourceHover">
+            class="org.eclipse.cldt.internal.ui.text.c.hover.CSourceHover"
+            id="org.eclipse.cldt.ui.CSourceHover">
       </hover>
       <!--hover
             label="%problemHover"
             description="%problemHoverDescription"
-            class="org.eclipse.fdt.internal.ui.text.c.hover.ProblemHover"
-            id="org.eclipse.fdt.ui.ProblemHover">
+            class="org.eclipse.cldt.internal.ui.text.c.hover.ProblemHover"
+            id="org.eclipse.cldt.ui.ProblemHover">
       </hover-->
       <hover
             label="%annotationHover"
             description="%annotationHoverDescription"
-            class="org.eclipse.fdt.internal.ui.text.c.hover.AnnotationHover"
-            id="org.eclipse.fdt.ui.AnnotationHover">
+            class="org.eclipse.cldt.internal.ui.text.c.hover.AnnotationHover"
+            id="org.eclipse.cldt.ui.AnnotationHover">
       </hover>
    </extension>
    
@@ -187,20 +187,20 @@
       <perspective
             name="%perspective.name"
             icon="icons/full/cview16/f_pers.gif"
-            class="org.eclipse.fdt.internal.ui.FortranPerspectiveFactory"
-            id="org.eclipse.fdt.ui.FortranPerspective">
+            class="org.eclipse.cldt.internal.ui.FortranPerspectiveFactory"
+            id="org.eclipse.cldt.ui.FortranPerspective">
       </perspective>
       <perspective
             name="%CBrowsing.perspective.name"
             icon="icons/full/cview16/cbrowsing_pers.gif"
-            class="org.eclipse.fdt.internal.ui.browser.cbrowsing.CBrowsingPerspectiveFactory"
-            id="org.eclipse.fdt.ui.CBrowsingPerspective">
+            class="org.eclipse.cldt.internal.ui.browser.cbrowsing.CBrowsingPerspectiveFactory"
+            id="org.eclipse.cldt.ui.CBrowsingPerspective">
       </perspective>
       <perspective
             name="%CHierarchy.perspective.name"
             icon="icons/full/eview16/chierch_pers.gif"
-            class="org.eclipse.fdt.internal.ui.browser.typehierarchy.CHierarchyPerspectiveFactory"
-            id="org.eclipse.fdt.ui.CHierarchyPerspective">
+            class="org.eclipse.cldt.internal.ui.browser.typehierarchy.CHierarchyPerspectiveFactory"
+            id="org.eclipse.cldt.ui.CHierarchyPerspective">
       </perspective>
    </extension>
    <extension
@@ -208,23 +208,23 @@
       <perspectiveExtension
             targetID="org.eclipse.ui.resourcePerspective">
          <perspectiveShortcut
-               id="org.eclipse.fdt.ui.FortranPerspective">
+               id="org.eclipse.cldt.ui.FortranPerspective">
          </perspectiveShortcut>
          <perspectiveShortcut
-               id="org.eclipse.fdt.ui.CBrowsingPerspective">
+               id="org.eclipse.cldt.ui.CBrowsingPerspective">
          </perspectiveShortcut>
       </perspectiveExtension>
       <perspectiveExtension
             targetID="org.eclipse.debug.ui.DebugPerspective">
          <perspectiveShortcut
-               id="org.eclipse.fdt.ui.FortranPerspective">
+               id="org.eclipse.cldt.ui.FortranPerspective">
          </perspectiveShortcut>
          <perspectiveShortcut
-               id="org.eclipse.fdt.ui.CBrowsingPerspective">
+               id="org.eclipse.cldt.ui.CBrowsingPerspective">
          </perspectiveShortcut>
       </perspectiveExtension>
       <perspectiveExtension
-            targetID="org.eclipse.fdt.ui.FortranPerspective">
+            targetID="org.eclipse.cldt.ui.FortranPerspective">
          <perspectiveShortcut
                id="org.eclipse.debug.ui.DebugPerspective">
          </perspectiveShortcut>
@@ -235,13 +235,13 @@
                id="org.eclipse.debug.ui.launchActionSet">
          </actionSet>
          <perspectiveShortcut
-               id="org.eclipse.fdt.ui.CBrowsingPerspective">
+               id="org.eclipse.cldt.ui.CBrowsingPerspective">
          </perspectiveShortcut>
       </perspectiveExtension>
       <perspectiveExtension
-            targetID="org.eclipse.fdt.ui.CBrowsingPerspective">
+            targetID="org.eclipse.cldt.ui.CBrowsingPerspective">
          <perspectiveShortcut
-               id="org.eclipse.fdt.ui.FortranPerspective">
+               id="org.eclipse.cldt.ui.FortranPerspective">
          </perspectiveShortcut>
       </perspectiveExtension>
    </extension>
@@ -249,57 +249,57 @@
          point="org.eclipse.ui.views">
       <category
             name="%viewsCategory.name"
-            id="org.eclipse.fdt.ui.views">
+            id="org.eclipse.cldt.ui.views">
       </category>
       <view
             name="%FortranView.name"
             icon="icons/full/cview16/fview.gif"
-            category="org.eclipse.fdt.ui.views"
-            class="org.eclipse.fdt.internal.ui.fview.FortranView"
-            id="org.eclipse.fdt.ui.FortranView">
+            category="org.eclipse.cldt.ui.views"
+            class="org.eclipse.cldt.internal.ui.fview.FortranView"
+            id="org.eclipse.cldt.ui.FortranView">
       </view>
       <category
             name="%CBrowsing.viewCategoryName"
-            id="org.eclipse.fdt.ui.c.browsing">
+            id="org.eclipse.cldt.ui.c.browsing">
       </category>
       <view
             name="%CBrowsing.projectsViewName"
             icon="icons/full/eview16/fprojects.gif"
-            category="org.eclipse.fdt.ui.c.browsing"
-            class="org.eclipse.fdt.internal.ui.browser.cbrowsing.ProjectsView"
-            id="org.eclipse.fdt.ui.ProjectsView">
+            category="org.eclipse.cldt.ui.c.browsing"
+            class="org.eclipse.cldt.internal.ui.browser.cbrowsing.ProjectsView"
+            id="org.eclipse.cldt.ui.ProjectsView">
       </view>
       <view
             name="%CBrowsing.namespacesViewName"
             icon="icons/full/eview16/namespaces.gif"
-            category="org.eclipse.fdt.ui.c.browsing"
-            class="org.eclipse.fdt.internal.ui.browser.cbrowsing.NamespacesView"
-            id="org.eclipse.fdt.ui.NamespacesView">
+            category="org.eclipse.cldt.ui.c.browsing"
+            class="org.eclipse.cldt.internal.ui.browser.cbrowsing.NamespacesView"
+            id="org.eclipse.cldt.ui.NamespacesView">
       </view>
       <view
             name="%CBrowsing.typesViewName"
             icon="icons/full/eview16/types.gif"
-            category="org.eclipse.fdt.ui.c.browsing"
-            class="org.eclipse.fdt.internal.ui.browser.cbrowsing.TypesView"
-            id="org.eclipse.fdt.ui.TypesView">
+            category="org.eclipse.cldt.ui.c.browsing"
+            class="org.eclipse.cldt.internal.ui.browser.cbrowsing.TypesView"
+            id="org.eclipse.cldt.ui.TypesView">
       </view>
       <view
             name="%CBrowsing.membersViewName"
             icon="icons/full/eview16/members.gif"
-            category="org.eclipse.fdt.ui.c.browsing"
-            class="org.eclipse.fdt.internal.ui.browser.cbrowsing.MembersView"
-            id="org.eclipse.fdt.ui.MembersView">
+            category="org.eclipse.cldt.ui.c.browsing"
+            class="org.eclipse.cldt.internal.ui.browser.cbrowsing.MembersView"
+            id="org.eclipse.cldt.ui.MembersView">
       </view>
      <category
             name="%CHierarchy.viewCategoryName"
-            id="org.eclipse.fdt.ui.c.hierarchy">
+            id="org.eclipse.cldt.ui.c.hierarchy">
       </category>
       <view
             name="%CHierarchy.hierarchyViewName"
             icon="icons/full/eview16/class_hi.gif"
-            category="org.eclipse.fdt.ui.c.hierarchy"
-            class="org.eclipse.fdt.internal.ui.browser.typehierarchy.TypeHierarchyViewPart"
-            id="org.eclipse.fdt.ui.TypeHierarchyView">
+            category="org.eclipse.cldt.ui.c.hierarchy"
+            class="org.eclipse.cldt.internal.ui.browser.typehierarchy.TypeHierarchyViewPart"
+            id="org.eclipse.cldt.ui.TypeHierarchyView">
       </view>
    </extension>
 <!-- The wizards -->
@@ -308,15 +308,15 @@
          point="org.eclipse.ui.newWizards">
       <category
             name="%newFortranWizardsCategory.name"
-            id="org.eclipse.fdt.ui.newFortranWizards">
+            id="org.eclipse.cldt.ui.newFortranWizards">
       </category>
       <wizard
             name="%NewWizards.sourceFile"
             icon="icons/full/ctool16/newffile_wiz.gif"
-            category="org.eclipse.fdt.ui.newFortranWizards"
-            finalPerspective="org.eclipse.fdt.ui.FortranPerspective"
-            id="org.eclipse.fdt.ui.wizards.NewSourceFileCreationWizard">
-         <class class="org.eclipse.fdt.ui.wizards.NewSourceFileCreationWizard">
+            category="org.eclipse.cldt.ui.newFortranWizards"
+            finalPerspective="org.eclipse.cldt.ui.FortranPerspective"
+            id="org.eclipse.cldt.ui.wizards.NewSourceFileCreationWizard">
+         <class class="org.eclipse.cldt.ui.wizards.NewSourceFileCreationWizard">
             <parameter name="cfile" value="true"/>
          </class>
          <description>
@@ -326,10 +326,10 @@
       <wizard
             name="%NewWizards.headerFile"
             icon="icons/full/ctool16/newhfile_wiz.gif"
-            category="org.eclipse.fdt.ui.newFortranWizards"
-            finalPerspective="org.eclipse.fdt.ui.FortranPerspective"
-            id="org.eclipse.fdt.ui.wizards.NewHeaderFileCreationWizard">
-         <class class="org.eclipse.fdt.ui.wizards.NewHeaderFileCreationWizard">
+            category="org.eclipse.cldt.ui.newFortranWizards"
+            finalPerspective="org.eclipse.cldt.ui.FortranPerspective"
+            id="org.eclipse.cldt.ui.wizards.NewHeaderFileCreationWizard">
+         <class class="org.eclipse.cldt.ui.wizards.NewHeaderFileCreationWizard">
             <parameter name="cfile" value="true"/>
          </class>
          <description>
@@ -339,10 +339,10 @@
       <wizard
             name="%NewWizards.file"
             icon="icons/full/ctool16/newfile_wiz.gif"
-            category="org.eclipse.fdt.ui.newFortranWizards"
-            finalPerspective="org.eclipse.fdt.ui.FortranPerspective"
-            id="org.eclipse.fdt.ui.wizards.NewFileCreationWizard">
-         <class class="org.eclipse.fdt.ui.wizards.NewFileCreationWizard">
+            category="org.eclipse.cldt.ui.newFortranWizards"
+            finalPerspective="org.eclipse.cldt.ui.FortranPerspective"
+            id="org.eclipse.cldt.ui.wizards.NewFileCreationWizard">
+         <class class="org.eclipse.cldt.ui.wizards.NewFileCreationWizard">
             <parameter name="cfile" value="true"/>
          </class>
          <description>
@@ -352,10 +352,10 @@
       <wizard
             name="%NewWizards.sourceFolder"
             icon="icons/full/ctool16/newsrcfldr_wiz.gif"
-            category="org.eclipse.fdt.ui.newFortranWizards"
-            finalPerspective="org.eclipse.fdt.ui.FortranPerspective"
-            id="org.eclipse.fdt.ui.wizards.NewSourceFolderCreationWizard">
-         <class class="org.eclipse.fdt.ui.wizards.NewSourceFolderCreationWizard">
+            category="org.eclipse.cldt.ui.newFortranWizards"
+            finalPerspective="org.eclipse.cldt.ui.FortranPerspective"
+            id="org.eclipse.cldt.ui.wizards.NewSourceFolderCreationWizard">
+         <class class="org.eclipse.cldt.ui.wizards.NewSourceFolderCreationWizard">
             <parameter name="cfolder" value="true"/>
          </class>
          <description>
@@ -365,10 +365,10 @@
       <wizard
             name="%NewWizards.folder"
             icon="icons/full/ctool16/newfolder_wiz.gif"
-            category="org.eclipse.fdt.ui.newFortranWizards"
-            finalPerspective="org.eclipse.fdt.ui.FortranPerspective"
-            id="org.eclipse.fdt.ui.wizards.NewFolderCreationWizard">
-         <class class="org.eclipse.fdt.ui.wizards.NewFolderCreationWizard">
+            category="org.eclipse.cldt.ui.newFortranWizards"
+            finalPerspective="org.eclipse.cldt.ui.FortranPerspective"
+            id="org.eclipse.cldt.ui.wizards.NewFolderCreationWizard">
+         <class class="org.eclipse.cldt.ui.wizards.NewFolderCreationWizard">
             <parameter name="cfolder" value="true"/>
          </class>
          <description>
@@ -378,92 +378,92 @@
    </extension>
 <!-- Define the document provider and partitionner for the FortranEditor -->
    <extension
-         id="org.eclipse.fdt.ui.CDocumentSetupParticipant"
+         id="org.eclipse.cldt.ui.CDocumentSetupParticipant"
          name="%cDocumentSetupParticipant"
          point="org.eclipse.core.filebuffers.documentSetup">
       <participant
-            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentSetupParticipant"
-            contentTypeId="org.eclipse.fdt.core.cSource">
+            class="org.eclipse.cldt.internal.ui.editor.FortranDocumentSetupParticipant"
+            contentTypeId="org.eclipse.cldt.core.cSource">
       </participant>
       <participant
-            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentSetupParticipant"
-            contentTypeId="org.eclipse.fdt.core.cHeader">
+            class="org.eclipse.cldt.internal.ui.editor.FortranDocumentSetupParticipant"
+            contentTypeId="org.eclipse.cldt.core.cHeader">
       </participant>
       <participant
-            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentSetupParticipant"
-            contentTypeId="org.eclipse.fdt.core.cxxSource">
+            class="org.eclipse.cldt.internal.ui.editor.FortranDocumentSetupParticipant"
+            contentTypeId="org.eclipse.cldt.core.cxxSource">
       </participant>
       <participant
-            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentSetupParticipant"
-            contentTypeId="org.eclipse.fdt.core.cxxHeader">
+            class="org.eclipse.cldt.internal.ui.editor.FortranDocumentSetupParticipant"
+            contentTypeId="org.eclipse.cldt.core.cxxHeader">
       </participant>
       <participant
-            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentSetupParticipant"
-            contentTypeId="org.eclipse.fdt.core.asmSource">
+            class="org.eclipse.cldt.internal.ui.editor.FortranDocumentSetupParticipant"
+            contentTypeId="org.eclipse.cldt.core.asmSource">
       </participant>
    </extension>
    <extension
-         id="org.eclipse.fdt.ui.CDocumentFactory"
+         id="org.eclipse.cldt.ui.CDocumentFactory"
          name="%cDocumentFactory"
          point="org.eclipse.core.filebuffers.documentCreation">
       <factory
-            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentFactory"
-            contentTypeId="org.eclipse.fdt.core.cSource">
+            class="org.eclipse.cldt.internal.ui.editor.FortranDocumentFactory"
+            contentTypeId="org.eclipse.cldt.core.cSource">
       </factory>
       <factory
-            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentFactory"
-            contentTypeId="org.eclipse.fdt.core.cHeader">
+            class="org.eclipse.cldt.internal.ui.editor.FortranDocumentFactory"
+            contentTypeId="org.eclipse.cldt.core.cHeader">
       </factory>
       <factory
-            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentFactory"
-            contentTypeId="org.eclipse.fdt.core.cxxSource">
+            class="org.eclipse.cldt.internal.ui.editor.FortranDocumentFactory"
+            contentTypeId="org.eclipse.cldt.core.cxxSource">
       </factory>
       <factory
-            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentFactory"
-            contentTypeId="org.eclipse.fdt.core.cxxHeader">
+            class="org.eclipse.cldt.internal.ui.editor.FortranDocumentFactory"
+            contentTypeId="org.eclipse.cldt.core.cxxHeader">
       </factory>
       <factory
-            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentFactory"
-            contentTypeId="org.eclipse.fdt.core.asmSource">
+            class="org.eclipse.cldt.internal.ui.editor.FortranDocumentFactory"
+            contentTypeId="org.eclipse.cldt.core.asmSource">
       </factory>
    </extension>
    <extension
-         id="org.eclipse.fdt.ui.ceditor"
+         id="org.eclipse.cldt.ui.ceditor"
          point="org.eclipse.ui.editors">
       <editor
             default="true"
             name="%FortranEditor.name"
             extensions="f,f77,f90,f95"
             icon="icons/full/obj16/f_file_obj.gif"
-            class="org.eclipse.fdt.internal.ui.editor.FortranEditor"
-            contributorClass="org.eclipse.fdt.internal.ui.editor.FortranEditorActionContributor"
-            symbolicFontName="org.eclipse.fdt.ui.editors.textfont"
-            id="org.eclipse.fdt.ui.editor.FortranEditor">
+            class="org.eclipse.cldt.internal.ui.editor.FortranEditor"
+            contributorClass="org.eclipse.cldt.internal.ui.editor.FortranEditorActionContributor"
+            symbolicFontName="org.eclipse.cldt.ui.editors.textfont"
+            id="org.eclipse.cldt.ui.editor.FortranEditor">
       </editor>
       <editor
             name="%AsmEditor.name"
             extensions="s,asm,S"
             icon="icons/full/obj16/s_file_obj.gif"
-            class="org.eclipse.fdt.internal.ui.editor.asm.AsmTextEditor"
-            id="org.eclipse.fdt.ui.editor.asm.AsmEditor">
+            class="org.eclipse.cldt.internal.ui.editor.asm.AsmTextEditor"
+            id="org.eclipse.cldt.ui.editor.asm.AsmEditor">
       </editor>
       <editor
-            symbolicFontName="org.eclipse.fdt.ui.editors.textfont"
-            class="org.eclipse.fdt.internal.ui.editor.ExternalSearchEditor"
+            symbolicFontName="org.eclipse.cldt.ui.editors.textfont"
+            class="org.eclipse.cldt.internal.ui.editor.ExternalSearchEditor"
             icon="icons/full/obj16/f_file_obj.gif"
             name="%ExternalSearchEditor.name"
-            id="org.eclipse.fdt.ui.editor.ExternalSearchEditor"/>
+            id="org.eclipse.cldt.ui.editor.ExternalSearchEditor"/>
       
    </extension>
    <extension
        point="org.eclipse.ui.themes">
-       <themeElementCategory label="%CPresentation.label" id="org.eclipse.fdt.ui.presentation"/>
-	   <themeElementCategory label="%CEditorPresentation.label" id="org.eclipse.fdt.ui.CEditor.presentation" parentId= "org.eclipse.fdt.ui.presentation"/>
+       <themeElementCategory label="%CPresentation.label" id="org.eclipse.cldt.ui.presentation"/>
+	   <themeElementCategory label="%CEditorPresentation.label" id="org.eclipse.cldt.ui.CEditor.presentation" parentId= "org.eclipse.cldt.ui.presentation"/>
        <fontDefinition
             label="%CEditorFontDefiniton.label"
             defaultsTo="org.eclipse.jface.textfont"
-            categoryId="org.eclipse.fdt.ui.CEditor.presentation"
-            id="org.eclipse.fdt.ui.editors.textfont">
+            categoryId="org.eclipse.cldt.ui.CEditor.presentation"
+            id="org.eclipse.cldt.ui.editors.textfont">
          <description>
             %CEditorFontDefinition.description
          </description>
@@ -471,17 +471,17 @@
              <fontDefinition
             label="%BuildConsoleFontDefinition.label"
             defaultsTo="org.eclipse.jface.textfont"
-            categoryId="org.eclipse.fdt.ui.presentation"
-            id="org.eclipse.fdt.ui.buildconsole.ConsoleFont">
+            categoryId="org.eclipse.cldt.ui.presentation"
+            id="org.eclipse.cldt.ui.buildconsole.ConsoleFont">
          <description>
             %BuildConsoleFontDefinition.description
          </description>
       </fontDefinition>
             <fontDefinition
             label="%cCompareFontDefiniton.label"
-            defaultsTo="org.eclipse.fdt.ui.editors.textfont"
+            defaultsTo="org.eclipse.cldt.ui.editors.textfont"
             categoryId="org.eclipse.compare.contentmergeviewer.TextMergeViewer"
-            id="org.eclipse.fdt.internal.ui.compare.CMergeViewer">
+            id="org.eclipse.cldt.internal.ui.compare.CMergeViewer">
          <description>
             %cCompareFontDefiniton.description
          </description>
@@ -492,67 +492,67 @@
          point="org.eclipse.ui.preferencePages">
       <page
             name="%CPluginPreferencePage.name"
-            class="org.eclipse.fdt.internal.ui.preferences.FortranPluginPreferencePage"
-            id="org.eclipse.fdt.ui.preferences.CPluginPreferencePage">
+            class="org.eclipse.cldt.internal.ui.preferences.FortranPluginPreferencePage"
+            id="org.eclipse.cldt.ui.preferences.CPluginPreferencePage">
       </page>
       <page
             name="%CPluginEditorPreferencePage.name"
-            category="org.eclipse.fdt.ui.preferences.CPluginPreferencePage"
-            class="org.eclipse.fdt.internal.ui.preferences.FortranEditorPreferencePage"
-            id="org.eclipse.fdt.ui.preferences.FortranEditorPreferencePage">
+            category="org.eclipse.cldt.ui.preferences.CPluginPreferencePage"
+            class="org.eclipse.cldt.internal.ui.preferences.FortranEditorPreferencePage"
+            id="org.eclipse.cldt.ui.preferences.FortranEditorPreferencePage">
       </page>
       <page
             name="%CodeAssistPreferencePage.name"
-            category="org.eclipse.fdt.ui.preferences.FortranEditorPreferencePage"
-            class="org.eclipse.fdt.internal.ui.preferences.CodeAssistPreferencePage"
-            id="org.eclipse.fdt.ui.preferences.CodeAssistPreferencePage">
+            category="org.eclipse.cldt.ui.preferences.FortranEditorPreferencePage"
+            class="org.eclipse.cldt.internal.ui.preferences.CodeAssistPreferencePage"
+            id="org.eclipse.cldt.ui.preferences.CodeAssistPreferencePage">
       </page>
       <page
             name="%CPluginTemplatePreferencePage.name"
-            category="org.eclipse.fdt.ui.preferences.FortranEditorPreferencePage"
-            class="org.eclipse.fdt.internal.ui.preferences.FortranTemplatePreferencePage"
-            id="org.eclipse.fdt.ui.preferences.TemplatePreferencePage">
+            category="org.eclipse.cldt.ui.preferences.FortranEditorPreferencePage"
+            class="org.eclipse.cldt.internal.ui.preferences.FortranTemplatePreferencePage"
+            id="org.eclipse.cldt.ui.preferences.TemplatePreferencePage">
       </page>
       <page
             name="%CodeFormatterPreferencePage.name"
-            category="org.eclipse.fdt.ui.preferences.CPluginPreferencePage"
-            class="org.eclipse.fdt.internal.ui.preferences.CodeFormatterPreferencePage"
-            id="org.eclipse.fdt.ui.preferences.CodeFormatterPreferencePage">
+            category="org.eclipse.cldt.ui.preferences.CPluginPreferencePage"
+            class="org.eclipse.cldt.internal.ui.preferences.CodeFormatterPreferencePage"
+            id="org.eclipse.cldt.ui.preferences.CodeFormatterPreferencePage">
       </page>
       <page
             name="%CPluginBuildConsolePreferencePage.name"
-            category="org.eclipse.fdt.ui.preferences.CPluginPreferencePage"
-            class="org.eclipse.fdt.internal.ui.preferences.BuildConsolePreferencePage"
-            id="org.eclipse.fdt.ui.preferneces.CBuildConsolePreferernces">
+            category="org.eclipse.cldt.ui.preferences.CPluginPreferencePage"
+            class="org.eclipse.cldt.internal.ui.preferences.BuildConsolePreferencePage"
+            id="org.eclipse.cldt.ui.preferneces.CBuildConsolePreferernces">
       </page>
       <page
             name="%CPluginFileTypesPreferencePage.name"
-            category="org.eclipse.fdt.ui.preferences.CPluginPreferencePage"
-            class="org.eclipse.fdt.internal.ui.preferences.CFileTypesPreferencePage"
-            id="org.eclipse.fdt.ui.preferences.CFileTypesPreferences">
+            category="org.eclipse.cldt.ui.preferences.CPluginPreferencePage"
+            class="org.eclipse.cldt.internal.ui.preferences.CFileTypesPreferencePage"
+            id="org.eclipse.cldt.ui.preferences.CFileTypesPreferences">
       </page>
       <page
-            class="org.eclipse.fdt.internal.ui.preferences.FortranSearchPreferencePage"
-            category="org.eclipse.fdt.ui.preferences.CPluginPreferencePage"
-            name="%FDTSearch.name"
-            id="org.eclipse.fdt.ui.preferences.CSearchPreferencePage"/>
+            class="org.eclipse.cldt.internal.ui.preferences.FortranSearchPreferencePage"
+            category="org.eclipse.cldt.ui.preferences.CPluginPreferencePage"
+            name="%cldtSearch.name"
+            id="org.eclipse.cldt.ui.preferences.CSearchPreferencePage"/>
       <page
             name="%appearancePrefName"
-            category="org.eclipse.fdt.ui.preferences.CPluginPreferencePage"
-            class="org.eclipse.fdt.internal.ui.preferences.AppearancePreferencePage"
-            id="org.eclipse.fdt.ui.preferences.AppearancePreferencePage">
+            category="org.eclipse.cldt.ui.preferences.CPluginPreferencePage"
+            class="org.eclipse.cldt.internal.ui.preferences.AppearancePreferencePage"
+            id="org.eclipse.cldt.ui.preferences.AppearancePreferencePage">
       </page>
       <!--page
             name="%WorkInProgress.name"
-            category="org.eclipse.fdt.ui.preferences.CPluginPreferencePage"
-            class="org.eclipse.fdt.internal.ui.preferences.WorkInProgressPreferencePage"
-            id="org.eclipse.fdt.ui.preferneces.WorkInProgressPreferencePage">
+            category="org.eclipse.cldt.ui.preferences.CPluginPreferencePage"
+            class="org.eclipse.cldt.internal.ui.preferences.WorkInProgressPreferencePage"
+            id="org.eclipse.cldt.ui.preferneces.WorkInProgressPreferencePage">
       </page-->
    </extension>
    <extension
          point="org.eclipse.ui.editorActions">
       <editorContribution
-            targetID="org.eclipse.fdt.ui.editor.FortranEditor"
+            targetID="org.eclipse.cldt.ui.editor.FortranEditor"
             id="org.eclipse.ui.texteditor.ruler.actions">
          <action
                label="%Dummy.label"
@@ -567,23 +567,23 @@
          point="org.eclipse.ui.popupMenus">
       <objectContribution
             objectClass="org.eclipse.core.resources.IMarker"
-            id="org.eclipse.fdt.ui.action.DeleteTaskAction">
+            id="org.eclipse.cldt.ui.action.DeleteTaskAction">
          <filter
                name="type"
-               value="org.eclipse.fdt.core.problem">
+               value="org.eclipse.cldt.core.problem">
          </filter>
          <action
                label="%DeleteTaskAction.label"
                icon="icons/full/ovr16/error_co.gif"
-               class="org.eclipse.fdt.internal.ui.util.DeleteTaskAction"
+               class="org.eclipse.cldt.internal.ui.util.DeleteTaskAction"
                menubarPath="additions"
                enablesFor="+"
-               id="org.eclipse.fdt.ui.action.DeleteTaskAction">
+               id="org.eclipse.cldt.ui.action.DeleteTaskAction">
          </action>
       </objectContribution>
       <viewerContribution
             targetID="#CEditorRulerContext"
-            id="org.eclipse.fdt.ui.editor.FortranEditorPopupActions">
+            id="org.eclipse.cldt.ui.editor.FortranEditorPopupActions">
          <action
                label="%AddTask.label"
                helpContextId="org.eclipse.ui.AddTask_action_context"
@@ -603,7 +603,7 @@
       </viewerContribution>
       <viewerContribution
             targetID="#ASMEditorRulerContext"
-            id="org.eclipse.fdt.ui.editor.ASMEditorPopupActions">
+            id="org.eclipse.cldt.ui.editor.ASMEditorPopupActions">
          <action
                label="%AddTask.label"
                helpContextId="org.eclipse.ui.AddTask_action_context"
@@ -623,15 +623,15 @@
       </viewerContribution>
       <objectContribution
             objectClass="org.eclipse.core.resources.IMarker"
-            id="org.eclipse.fdt.ui.action.DeleteIProblemMarkers">
+            id="org.eclipse.cldt.ui.action.DeleteIProblemMarkers">
          <action
                label="%DeleteIProblemMarkerAction.label"
                icon="icons/full/ovr16/error_co.gif"
-               class="org.eclipse.fdt.internal.ui.util.DeleteIProblemMarkerAction"
+               class="org.eclipse.cldt.internal.ui.util.DeleteIProblemMarkerAction"
                menubarPath="additions"
-               id="org.eclipse.fdt.ui.action.DeleteIProblemMarkers"/>
+               id="org.eclipse.cldt.ui.action.DeleteIProblemMarkers"/>
          <filter
-               value="org.eclipse.fdt.core.indexermarker"
+               value="org.eclipse.cldt.core.indexermarker"
                name="type"/>
       </objectContribution>
    </extension>
@@ -639,48 +639,48 @@
          point="org.eclipse.compare.structureCreators">
       <structureCreator
             extensions="c,cc,cpp,cxx,h,hpp"
-            class="org.eclipse.fdt.internal.ui.compare.CStructureCreator"
-            id="org.eclipse.fdt.ui.compare.CStructureCreator">
+            class="org.eclipse.cldt.internal.ui.compare.CStructureCreator"
+            id="org.eclipse.cldt.ui.compare.CStructureCreator">
       </structureCreator>
       <contentTypeBinding
-			contentTypeId="org.eclipse.fdt.core.cSource"
-            structureCreatorId="org.eclipse.fdt.ui.compare.CStructureCreator">
+			contentTypeId="org.eclipse.cldt.core.cSource"
+            structureCreatorId="org.eclipse.cldt.ui.compare.CStructureCreator">
 	  </contentTypeBinding>
       <contentTypeBinding
-			contentTypeId="org.eclipse.fdt.core.cHeader"
-            structureCreatorId="org.eclipse.fdt.ui.compare.CStructureCreator">
+			contentTypeId="org.eclipse.cldt.core.cHeader"
+            structureCreatorId="org.eclipse.cldt.ui.compare.CStructureCreator">
 	  </contentTypeBinding>
       <contentTypeBinding
-			contentTypeId="org.eclipse.fdt.core.cxxSource"
-            structureCreatorId="org.eclipse.fdt.ui.compare.CStructureCreator">
+			contentTypeId="org.eclipse.cldt.core.cxxSource"
+            structureCreatorId="org.eclipse.cldt.ui.compare.CStructureCreator">
 	  </contentTypeBinding>
       <contentTypeBinding
-			contentTypeId="org.eclipse.fdt.core.cxxHeader"
-            structureCreatorId="org.eclipse.fdt.ui.compare.CStructureCreator">
+			contentTypeId="org.eclipse.cldt.core.cxxHeader"
+            structureCreatorId="org.eclipse.cldt.ui.compare.CStructureCreator">
 	  </contentTypeBinding>
    </extension>
    <extension
          point="org.eclipse.compare.contentMergeViewers">
       <viewer
             extensions="c,cc,cpp,cxx,h,c2,hpp"
-            class="org.eclipse.fdt.internal.ui.compare.CContentViewerCreator"
-            id="org.eclipse.fdt.ui.compare.CContentViewerCreator">
+            class="org.eclipse.cldt.internal.ui.compare.CContentViewerCreator"
+            id="org.eclipse.cldt.ui.compare.CContentViewerCreator">
       </viewer>
       <contentTypeBinding
-			contentTypeId="org.eclipse.fdt.core.cSource"
-            contentMergeViewerId="org.eclipse.fdt.ui.compare.CContentViewerCreator">
+			contentTypeId="org.eclipse.cldt.core.cSource"
+            contentMergeViewerId="org.eclipse.cldt.ui.compare.CContentViewerCreator">
 	  </contentTypeBinding>
       <contentTypeBinding
-			contentTypeId="org.eclipse.fdt.core.cHeader"
-            contentMergeViewerId="org.eclipse.fdt.ui.compare.CContentViewerCreator">
+			contentTypeId="org.eclipse.cldt.core.cHeader"
+            contentMergeViewerId="org.eclipse.cldt.ui.compare.CContentViewerCreator">
 	  </contentTypeBinding>
       <contentTypeBinding
-			contentTypeId="org.eclipse.fdt.core.cxxSource"
-            contentMergeViewerId="org.eclipse.fdt.ui.compare.CContentViewerCreator">
+			contentTypeId="org.eclipse.cldt.core.cxxSource"
+            contentMergeViewerId="org.eclipse.cldt.ui.compare.CContentViewerCreator">
 	  </contentTypeBinding>
       <contentTypeBinding
-			contentTypeId="org.eclipse.fdt.core.cxxHeader"
-            contentMergeViewerId="org.eclipse.fdt.ui.compare.CContentViewerCreator">
+			contentTypeId="org.eclipse.cldt.core.cxxHeader"
+            contentMergeViewerId="org.eclipse.cldt.ui.compare.CContentViewerCreator">
 	  </contentTypeBinding>
    </extension>
    <extension
@@ -689,21 +689,21 @@
             label="%FortranElementCreationActionSet.label"
             description="%FortranElementCreationActionSet.description"
             visible="false"
-            id="org.eclipse.fdt.ui.FortranElementCreationActionSet">
+            id="org.eclipse.cldt.ui.FortranElementCreationActionSet">
          <action
-               class="org.eclipse.fdt.internal.ui.wizards.NewFileDropDownAction"
+               class="org.eclipse.cldt.internal.ui.wizards.NewFileDropDownAction"
                disabledIcon="icons/full/dtool16/newcfile_wiz.gif"
                icon="icons/full/etool16/newffile_wiz.gif"
-               id="org.eclipse.fdt.ui.actions.NewFileDropDown"
+               id="org.eclipse.cldt.ui.actions.NewFileDropDown"
                label="%NewFileDropDownAction.label"
                pulldown="true"
                toolbarPath="Normal/CCWizards"
                tooltip="%NewFileDropDownAction.tooltip">
          </action>
          <action
-               id="org.eclipse.fdt.ui.actions.NewFolderDropDown"
+               id="org.eclipse.cldt.ui.actions.NewFolderDropDown"
                toolbarPath="Normal/CCWizards"
-               class="org.eclipse.fdt.internal.ui.wizards.NewFolderDropDownAction"
+               class="org.eclipse.cldt.internal.ui.wizards.NewFolderDropDownAction"
                disabledIcon="icons/full/dtool16/newsrcfldr_wiz.gif"
                icon="icons/full/etool16/newsrcfldr_wiz.gif"
                label="%NewFolderDropDownAction.label"
@@ -711,10 +711,10 @@
                tooltip="%NewFolderDropDownAction.tooltip">
          </action>
          <action
-               class="org.eclipse.fdt.internal.ui.wizards.NewProjectDropDownAction"
+               class="org.eclipse.cldt.internal.ui.wizards.NewProjectDropDownAction"
                disabledIcon="icons/full/dtool16/newcprj_wiz.gif"
                icon="icons/full/etool16/newfprj_wiz.gif"
-               id="org.eclipse.fdt.ui.actions.NewProjectDropDown"
+               id="org.eclipse.cldt.ui.actions.NewProjectDropDown"
                label="%NewProjectDropDownAction.label"
                pulldown="true"
                toolbarPath="Normal/CCWizards"
@@ -726,14 +726,14 @@
          point="org.eclipse.ui.ide.projectNatureImages">
       <image
             icon="icons/full/ovr16/f_ovr.gif"
-            id="org.eclipse.fdt.ui.fProjectNatureImage"
-            natureId="org.eclipse.fdt.core.fnature">
+            id="org.eclipse.cldt.ui.fProjectNatureImage"
+            natureId="org.eclipse.cldt.core.fnature">
       </image>
    </extension>
    <extension
-         point="org.eclipse.fdt.core.CBuildConsole">
+         point="org.eclipse.cldt.core.CBuildConsole">
       <CBuildConsole
-            class="org.eclipse.fdt.internal.ui.buildconsole.CBuildConsole">
+            class="org.eclipse.cldt.internal.ui.buildconsole.CBuildConsole">
       </CBuildConsole>
    </extension>
    <extension
@@ -742,211 +742,211 @@
             name="%scope.cEditor.name"
             parent="org.eclipse.ui.textEditorScope"
             description="%cEditor.description"
-            id="org.eclipse.fdt.ui.cEditorScope">
+            id="org.eclipse.cldt.ui.cEditorScope">
       </scope>
       <category
             name="%category.source.name"
             description="%category.source.description"
-            id="org.eclipse.fdt.ui.category.source">
+            id="org.eclipse.cldt.ui.category.source">
       </category>
       <command
             name="%ActionDefinition.format.name"
             description="%ActionDefinition.format.description"
-            category="org.eclipse.fdt.ui.category.source"
-            id="org.eclipse.fdt.ui.edit.text.c.format">
+            category="org.eclipse.cldt.ui.category.source"
+            id="org.eclipse.cldt.ui.edit.text.c.format">
       </command>
       <keyBinding
             string="Ctrl+Shift+F"
-            scope="org.eclipse.fdt.ui.cEditorScope"
-            command="org.eclipse.fdt.ui.edit.text.c.format"
+            scope="org.eclipse.cldt.ui.cEditorScope"
+            command="org.eclipse.cldt.ui.edit.text.c.format"
             configuration="org.eclipse.ui.defaultAcceleratorConfiguration">
       </keyBinding>
       <command
             name="%ActionDefinition.comment.name"
-            category="org.eclipse.fdt.ui.category.source"
+            category="org.eclipse.cldt.ui.category.source"
             description="%ActionDefinition.comment.description"
-            id="org.eclipse.fdt.ui.edit.text.c.comment">
+            id="org.eclipse.cldt.ui.edit.text.c.comment">
       </command>
       <keyBinding
             string="Ctrl+/"
-            scope="org.eclipse.fdt.ui.cEditorScope"
-            command="org.eclipse.fdt.ui.edit.text.c.comment"
+            scope="org.eclipse.cldt.ui.cEditorScope"
+            command="org.eclipse.cldt.ui.edit.text.c.comment"
             configuration="org.eclipse.ui.defaultAcceleratorConfiguration">
       </keyBinding>
       <command
             name="%ActionDefinition.uncomment.name"
-            category="org.eclipse.fdt.ui.category.source"
+            category="org.eclipse.cldt.ui.category.source"
             description="%ActionDefinition.uncomment.description"
-            id="org.eclipse.fdt.ui.edit.text.c.uncomment">
+            id="org.eclipse.cldt.ui.edit.text.c.uncomment">
       </command>
       <keyBinding
             string="Ctrl+\"
-            scope="org.eclipse.fdt.ui.cEditorScope"
-            command="org.eclipse.fdt.ui.edit.text.c.uncomment"
+            scope="org.eclipse.cldt.ui.cEditorScope"
+            command="org.eclipse.cldt.ui.edit.text.c.uncomment"
             configuration="org.eclipse.ui.defaultAcceleratorConfiguration">
       </keyBinding>
       <command
             name="%ActionDefinition.addBlockComment.name"
             description="%ActionDefinition.addBlockComment.description"
-            category="org.eclipse.fdt.ui.category.source"
-            id="org.eclipse.fdt.ui.edit.text.c.add.block.comment">
+            category="org.eclipse.cldt.ui.category.source"
+            id="org.eclipse.cldt.ui.edit.text.c.add.block.comment">
       </command>
       <keyBinding
             string="Ctrl+Shift+/"
-            scope="org.eclipse.fdt.ui.cEditorScope"
-            command="org.eclipse.fdt.ui.edit.text.c.add.block.comment"
+            scope="org.eclipse.cldt.ui.cEditorScope"
+            command="org.eclipse.cldt.ui.edit.text.c.add.block.comment"
             configuration="org.eclipse.ui.defaultAcceleratorConfiguration">
       </keyBinding>
       <command
             name="%ActionDefinition.removeBlockComment.name"
             description="%ActionDefinition.removeBlockComment.description"
-            category="org.eclipse.fdt.ui.category.source"
-            id="org.eclipse.fdt.ui.edit.text.c.remove.block.comment">
+            category="org.eclipse.cldt.ui.category.source"
+            id="org.eclipse.cldt.ui.edit.text.c.remove.block.comment">
       </command>
       <keyBinding
             string="Ctrl+Shift+\"
-            scope="org.eclipse.fdt.ui.cEditorScope"
-            command="org.eclipse.fdt.ui.edit.text.c.remove.block.comment"
+            scope="org.eclipse.cldt.ui.cEditorScope"
+            command="org.eclipse.cldt.ui.edit.text.c.remove.block.comment"
             configuration="org.eclipse.ui.defaultAcceleratorConfiguration">
       </keyBinding>
       <command
             name="%ActionDefinition.opendecl.name"
-            category="org.eclipse.fdt.ui.category.source"
+            category="org.eclipse.cldt.ui.category.source"
             description="%ActionDefinition.opendecl.description"
-            id="org.eclipse.fdt.ui.edit.opendecl">
+            id="org.eclipse.cldt.ui.edit.opendecl">
       </command>
       <keyBinding
             string="F3"
-            scope="org.eclipse.fdt.ui.cEditorScope"
-            command="org.eclipse.fdt.ui.edit.opendecl"
+            scope="org.eclipse.cldt.ui.cEditorScope"
+            command="org.eclipse.cldt.ui.edit.opendecl"
             configuration="org.eclipse.ui.defaultAcceleratorConfiguration">
       </keyBinding>
       <command
             name="%ActionDefinition.openType.name"
-            category="org.eclipse.fdt.ui.category.source"
+            category="org.eclipse.cldt.ui.category.source"
             description="%ActionDefinition.openType.description"
-            id="org.eclipse.fdt.ui.navigate.opentype">
+            id="org.eclipse.cldt.ui.navigate.opentype">
       </command>
       <keyBinding
             string="Ctrl+Shift+T"
-            scope="org.eclipse.fdt.ui.cEditorScope"
-            command="org.eclipse.fdt.ui.navigate.opentype"
+            scope="org.eclipse.cldt.ui.cEditorScope"
+            command="org.eclipse.cldt.ui.navigate.opentype"
             configuration="org.eclipse.ui.defaultAcceleratorConfiguration">
       </keyBinding>
       <command
             name="%ActionDefinition.opencview.name"
             description="%ActionDefinition.opencview.description"
-            category="org.eclipse.fdt.ui.category.source"
-            id="org.eclipse.fdt.ui.edit.opencview">
+            category="org.eclipse.cldt.ui.category.source"
+            id="org.eclipse.cldt.ui.edit.opencview">
       </command>
       <command
             description="%ActionDefinition.finddecl.description"
-            category="org.eclipse.fdt.ui.category.source"
+            category="org.eclipse.cldt.ui.category.source"
             name="%ActionDefinition.finddecl.name"
-            id="org.eclipse.fdt.ui.search.finddecl"/>
+            id="org.eclipse.cldt.ui.search.finddecl"/>
       <command
-            category="org.eclipse.fdt.ui.category.source"
+            category="org.eclipse.cldt.ui.category.source"
             description="%ActionDefinition.findrefs.description"
             name="%ActionDefinition.findrefs.name"
-            id="org.eclipse.fdt.ui.search.findrefs"/>
+            id="org.eclipse.cldt.ui.search.findrefs"/>
       <keyBinding
-            command="org.eclipse.fdt.ui.search.findrefs"
+            command="org.eclipse.cldt.ui.search.findrefs"
             string="Ctrl+Shift+G"
-            scope="org.eclipse.fdt.ui.cEditorScope"
+            scope="org.eclipse.cldt.ui.cEditorScope"
             configuration="org.eclipse.ui.defaultAcceleratorConfiguration"/>
       <keyBinding
-            command="org.eclipse.fdt.ui.search.finddecl"
+            command="org.eclipse.cldt.ui.search.finddecl"
             string="Ctrl+G"
-            scope="org.eclipse.fdt.ui.cEditorScope"
+            scope="org.eclipse.cldt.ui.cEditorScope"
             configuration="org.eclipse.ui.defaultAcceleratorConfiguration"/>
       <command
             name="%ActionDefinition.openTypeHierarchy.name"
             description="%ActionDefinition.openTypeHierarchy.description"
             category="org.eclipse.ui.category.navigate"
-            id="org.eclipse.fdt.ui.edit.text.c.open.type.hierarchy">
+            id="org.eclipse.cldt.ui.edit.text.c.open.type.hierarchy">
       </command>
       <keyBinding
             string="F4"
-            scope="org.eclipse.fdt.ui.cEditorScope"
-            command="org.eclipse.fdt.ui.edit.text.c.open.type.hierarchy"
+            scope="org.eclipse.cldt.ui.cEditorScope"
+            command="org.eclipse.cldt.ui.edit.text.c.open.type.hierarchy"
             configuration="org.eclipse.ui.defaultAcceleratorConfiguration">
       </keyBinding>
       <command
             name="%ActionDefinition.openTypeInHierarchy.name"
             description="%ActionDefinition.openTypeInHierarchy.description"
             category="org.eclipse.ui.category.navigate"
-            id="org.eclipse.fdt.ui.navigate.open.type.in.hierarchy">
+            id="org.eclipse.cldt.ui.navigate.open.type.in.hierarchy">
       </command>
       <keyBinding
             string="Ctrl+Shift+H"
-            scope="org.eclipse.fdt.ui.cEditorScope"
-            command="org.eclipse.fdt.ui.navigate.open.type.in.hierarchy"
+            scope="org.eclipse.cldt.ui.cEditorScope"
+            command="org.eclipse.cldt.ui.navigate.open.type.in.hierarchy"
             configuration="org.eclipse.ui.defaultAcceleratorConfiguration">
       </keyBinding>
       <command
             name="%ActionDefinition.addInclude.name"
             description="%ActionDefinition.addInclude.description"
-            category="org.eclipse.fdt.ui.category.source"
-            id="org.eclipse.fdt.ui.edit.text.c.add.include">
+            category="org.eclipse.cldt.ui.category.source"
+            id="org.eclipse.cldt.ui.edit.text.c.add.include">
       </command>
       <keyBinding
             string="Ctrl+Shift+N"
-            scope="org.eclipse.fdt.ui.cEditorScope"
-            command="org.eclipse.fdt.ui.edit.text.c.add.include"
+            scope="org.eclipse.cldt.ui.cEditorScope"
+            command="org.eclipse.cldt.ui.edit.text.c.add.include"
             configuration="org.eclipse.ui.defaultAcceleratorConfiguration">
       </keyBinding>
       <command
             name="%ActionDefinition.showOutline.name"
             description="%ActionDefinition.showOutline.description"
-            category="org.eclipse.fdt.ui.category.source"
-            id="org.eclipse.fdt.ui.edit.open.outline">
+            category="org.eclipse.cldt.ui.category.source"
+            id="org.eclipse.cldt.ui.edit.open.outline">
       </command>
       <keyBinding
             string="Ctrl+O"
-            scope="org.eclipse.fdt.ui.cEditorScope"
-            command="org.eclipse.fdt.ui.edit.open.outline"
+            scope="org.eclipse.cldt.ui.cEditorScope"
+            command="org.eclipse.cldt.ui.edit.open.outline"
             configuration="org.eclipse.ui.defaultAcceleratorConfiguration">
       </keyBinding>
       <command
             name="%ActionDefinition.GotoNextMember.name"
             description="%ActionDefinition.GotoNextMember.description"
-            category="org.eclipse.fdt.ui.category.source"
-            id="org.eclipse.fdt.ui.edit.text.c.goto.next.member">
+            category="org.eclipse.cldt.ui.category.source"
+            id="org.eclipse.cldt.ui.edit.text.c.goto.next.member">
       </command>
       <keyBinding
             string="Ctrl+Shift+ARROW_DOWN"
-            scope="org.eclipse.fdt.ui.cEditorScope"
-            command="org.eclipse.fdt.ui.edit.text.c.goto.next.member"
+            scope="org.eclipse.cldt.ui.cEditorScope"
+            command="org.eclipse.cldt.ui.edit.text.c.goto.next.member"
             configuration="org.eclipse.ui.defaultAcceleratorConfiguration">
       </keyBinding>
       <command
             name="%ActionDefinition.GotoPrevMember.name"
             description="%ActionDefinition.GotoPrevMember.description"
-            category="org.eclipse.fdt.ui.category.source"
-            id="org.eclipse.fdt.ui.edit.text.c.goto.prev.member">
+            category="org.eclipse.cldt.ui.category.source"
+            id="org.eclipse.cldt.ui.edit.text.c.goto.prev.member">
       </command>
       <keyBinding
             string="Ctrl+Shift+ARROW_UP"
-            scope="org.eclipse.fdt.ui.cEditorScope"
-            command="org.eclipse.fdt.ui.edit.text.c.goto.prev.member"
+            scope="org.eclipse.cldt.ui.cEditorScope"
+            command="org.eclipse.cldt.ui.edit.text.c.goto.prev.member"
             configuration="org.eclipse.ui.defaultAcceleratorConfiguration">
       </keyBinding>
 
       <command
             name="%ActionDefinition.gotoMatchingBracket.name"
             description="%ActionDefinition.gotoMatchingBracket.description"
-            category="org.eclipse.fdt.ui.category.source"
-            id="org.eclipse.fdt.ui.edit.text.c.goto.matching.bracket">
+            category="org.eclipse.cldt.ui.category.source"
+            id="org.eclipse.cldt.ui.edit.text.c.goto.matching.bracket">
       </command>
       <keyBinding
             string="Ctrl+Shift+P"
-            scope="org.eclipse.fdt.ui.cEditorScope"
-            command="org.eclipse.fdt.ui.edit.text.c.goto.matching.bracket"
+            scope="org.eclipse.cldt.ui.cEditorScope"
+            command="org.eclipse.cldt.ui.edit.text.c.goto.matching.bracket"
             configuration="org.eclipse.ui.defaultAcceleratorConfiguration">
       </keyBinding>
    </extension>
    <extension
-         id="org.eclipse.fdt.ui.CSearchPage"
+         id="org.eclipse.cldt.ui.CSearchPage"
          name="CSearchPage"
          point="org.eclipse.search.searchPages">
       <page
@@ -954,36 +954,36 @@
             label="%CSearchPage.label"
             extensions="c:90,cpp:90, cxx:90, cc:90,C:90, h:90, hh:90, hpp:90, H:90"
             icon="icons/full/obj16/csearch_obj.gif"
-            class="org.eclipse.fdt.internal.ui.search.CSearchPage"
+            class="org.eclipse.cldt.internal.ui.search.CSearchPage"
             sizeHint="460, 160"
-            id="org.eclipse.fdt.ui.CSearchPage">
+            id="org.eclipse.cldt.ui.CSearchPage">
       </page>
    </extension>
    <extension
          point="org.eclipse.search.searchResultSorters">
       <sorter
-            pageId="org.eclipse.fdt.ui.CSearchPage"
+            pageId="org.eclipse.cldt.ui.CSearchPage"
             label="%ElementNameSorter.label"
             icon="icons/full/clcl16/search_sortmatch.gif"
-            class="org.eclipse.fdt.internal.ui.search.ElementNameSorter"
+            class="org.eclipse.cldt.internal.ui.search.ElementNameSorter"
             tooltip="%ElementNameSorter.tooltip"
-            id="org.eclipse.fdt.search.internal.ui.ElementNameSorter">
+            id="org.eclipse.cldt.search.internal.ui.ElementNameSorter">
       </sorter>
       <sorter
-            pageId="org.eclipse.fdt.ui.CSearchPage"
+            pageId="org.eclipse.cldt.ui.CSearchPage"
             label="%ParentNameSorter.label"
             icon="icons/full/clcl16/search_sortmatch.gif"
-            class="org.eclipse.fdt.internal.ui.search.ParentNameSorter"
+            class="org.eclipse.cldt.internal.ui.search.ParentNameSorter"
             tooltip="%ParentNameSorter.tooltip"
-            id="org.eclipse.fdt.search.internal.ui.ParentNameSorter">
+            id="org.eclipse.cldt.search.internal.ui.ParentNameSorter">
       </sorter>
       <sorter
-            pageId="org.eclipse.fdt.ui.CSearchPage"
+            pageId="org.eclipse.cldt.ui.CSearchPage"
             label="%PathNameSorter.label"
             icon="icons/full/clcl16/search_sortmatch.gif"
-            class="org.eclipse.fdt.internal.ui.search.PathNameSorter"
+            class="org.eclipse.cldt.internal.ui.search.PathNameSorter"
             tooltip="%PathNameSorter.tooltip"
-            id="org.eclipse.fdt.search.internal.ui.PathNameSorter">
+            id="org.eclipse.cldt.search.internal.ui.PathNameSorter">
       </sorter>
    </extension>
    <extension
@@ -992,38 +992,38 @@
             label="%CSearchActionSet.label"
             description="%CSearchActionSet.description"
             visible="false"
-            id="org.eclipse.fdt.ui.SearchActionSet">
+            id="org.eclipse.cldt.ui.SearchActionSet">
          <action
                label="%openCSearchPageAction.label"
                icon="icons/full/obj16/csearch_obj.gif"
-               class="org.eclipse.fdt.internal.ui.search.OpenCSearchPageAction"
+               class="org.eclipse.cldt.internal.ui.search.OpenCSearchPageAction"
                menubarPath="org.eclipse.search.menu/dialogGroup"
-               id="org.eclipse.fdt.ui.actions.OpenCSearchPage">
+               id="org.eclipse.cldt.ui.actions.OpenCSearchPage">
          </action>
          <action
-               id="org.eclipse.fdt.ui.actions.OpenType"
+               id="org.eclipse.cldt.ui.actions.OpenType"
                toolbarPath="org.eclipse.search.searchActionSet/Search"
-               class="org.eclipse.fdt.internal.ui.browser.opentype.OpenTypeAction"
-               definitionId="org.eclipse.fdt.ui.navigate.opentype"
+               class="org.eclipse.cldt.internal.ui.browser.opentype.OpenTypeAction"
+               definitionId="org.eclipse.cldt.ui.navigate.opentype"
                icon="icons/full/etool16/opentype.gif"
-               helpContextId="org.eclipse.fdt.ui.open_type_action"
+               helpContextId="org.eclipse.cldt.ui.open_type_action"
                label="%OpenTypeAction.label"
                menubarPath="navigate/open.ext2"
                tooltip="%OpenTypeAction.tooltip">
          </action>
         <action
-               definitionId="org.eclipse.fdt.ui.edit.text.c.open.type.hierarchy"
+               definitionId="org.eclipse.cldt.ui.edit.text.c.open.type.hierarchy"
                label="%OpenTypeHierarchyAction.label"
                retarget="true"
                menubarPath="navigate/open.ext"
-               id="org.eclipse.fdt.ui.actions.OpenTypeHierarchy">
+               id="org.eclipse.cldt.ui.actions.OpenTypeHierarchy">
          </action>
          <action
-               id="org.eclipse.fdt.ui.actions.openTypeInHierarchy"
-               class="org.eclipse.fdt.internal.ui.browser.typehierarchy.OpenTypeInHierarchyAction"
-               definitionId="org.eclipse.fdt.ui.navigate.open.type.in.hierarchy"
+               id="org.eclipse.cldt.ui.actions.openTypeInHierarchy"
+               class="org.eclipse.cldt.internal.ui.browser.typehierarchy.OpenTypeInHierarchyAction"
+               definitionId="org.eclipse.cldt.ui.navigate.open.type.in.hierarchy"
                label="%OpenTypeInHierarchyAction.label"
-               helpContextId="org.eclipse.fdt.ui.open_type_in_hierarchy_action"
+               helpContextId="org.eclipse.cldt.ui.open_type_in_hierarchy_action"
                menubarPath="navigate/open.ext2"
                tooltip="%OpenTypeInHierarchyAction.tooltip">
          </action>
@@ -1036,12 +1036,12 @@
    <extension
          point="org.eclipse.ui.actionSetPartAssociations">
       <actionSetPartAssociation
-            targetID="org.eclipse.fdt.ui.SearchActionSet">
+            targetID="org.eclipse.cldt.ui.SearchActionSet">
          <part
-               id="org.eclipse.fdt.ui.FortranView">
+               id="org.eclipse.cldt.ui.FortranView">
          </part>
          <part
-               id="org.eclipse.fdt.ui.editor.FortranEditor">
+               id="org.eclipse.cldt.ui.editor.FortranEditor">
          </part>
          <part
                id="org.eclipse.search.SearchResultView">
@@ -1050,35 +1050,35 @@
       <actionSetPartAssociation
             targetID="org.eclipse.ui.edit.text.actionSet.annotationNavigation">
          <part
-               id="org.eclipse.fdt.ui.editor.FortranEditor">
+               id="org.eclipse.cldt.ui.editor.FortranEditor">
          </part>
       </actionSetPartAssociation>      
    </extension>
    <extension
-         point="org.eclipse.fdt.ui.BinaryParserPage">
+         point="org.eclipse.cldt.ui.BinaryParserPage">
       <parserPage
-            class="org.eclipse.fdt.ui.dialogs.GNUElfBinaryParserPage"
-            parserID="org.eclipse.fdt.core.GNU_ELF"
+            class="org.eclipse.cldt.ui.dialogs.GNUElfBinaryParserPage"
+            parserID="org.eclipse.cldt.core.GNU_ELF"
             id="ElfBinaryParserPage">
       </parserPage>
       <parserPage
-            class="org.eclipse.fdt.ui.dialogs.CygwinPEBinaryParserPage"
-            parserID="org.eclipse.fdt.core.Cygwin_PE"
+            class="org.eclipse.cldt.ui.dialogs.CygwinPEBinaryParserPage"
+            parserID="org.eclipse.cldt.core.Cygwin_PE"
             id="PEBinaryParserPage">
       </parserPage>
       <parserPage
-            class="org.eclipse.fdt.ui.dialogs.GNUXCoffBinaryParserPage"
-            parserID="org.eclipse.fdt.core.XCOFF32"
+            class="org.eclipse.cldt.ui.dialogs.GNUXCoffBinaryParserPage"
+            parserID="org.eclipse.cldt.core.XCOFF32"
             id="XcoffBinaryParserPage">
       </parserPage>
       <parserPage
-            class="org.eclipse.fdt.ui.dialogs.MachOBinaryParserPage"
-            parserID="org.eclipse.fdt.core.MachO"
+            class="org.eclipse.cldt.ui.dialogs.MachOBinaryParserPage"
+            parserID="org.eclipse.cldt.core.MachO"
             id="MachOBinaryParserPage">
       </parserPage>
       <parserPage
-            class="org.eclipse.fdt.ui.dialogs.GNUSomBinaryParserPage"
-            parserID="org.eclipse.fdt.core.SOM"
+            class="org.eclipse.cldt.ui.dialogs.GNUSomBinaryParserPage"
+            parserID="org.eclipse.cldt.core.SOM"
             id="SomBinaryParserPage">
       </parserPage>
    </extension>
@@ -1086,16 +1086,16 @@
          point="org.eclipse.ui.workingSets">
       <workingSet
             name="%CElementWorkingSetPage.name"
-            pageClass="org.eclipse.fdt.internal.ui.workingsets.CElementWorkingSetPage"
+            pageClass="org.eclipse.cldt.internal.ui.workingsets.CElementWorkingSetPage"
             icon="icons/full/cview16/cview.gif"
-            id="org.eclipse.fdt.ui.CElementWorkingSetPage">
+            id="org.eclipse.cldt.ui.CElementWorkingSetPage">
       </workingSet>
    </extension>
    <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
       <specification
       		colorPreferenceValue="254,155,0"
-            annotationType="org.eclipse.fdt.ui.indexmarker"
+            annotationType="org.eclipse.cldt.ui.indexmarker"
             verticalRulerPreferenceValue="true"
             colorPreferenceKey="indexResultIndicationColor"
             contributesToHeader="false"
@@ -1104,7 +1104,7 @@
             textStylePreferenceValue="NONE"
             symbolicIcon="warning"
             icon="icons/full/obj16/unknown_obj.gif"
-            label="%FDTIndexerMarker.label"
+            label="%CDTIndexerMarker.label"
             textPreferenceValue="true"
             textPreferenceKey="indexResultIndication"
             verticalRulerPreferenceKey="indexResultIndicationInVerticalRuler"
@@ -1120,9 +1120,9 @@
    <extension
          point="org.eclipse.search.searchResultViewPages">
       <viewPage
-            class="org.eclipse.fdt.internal.ui.search.CSearchResultPage"
-            searchResultClass="org.eclipse.fdt.internal.ui.search.CSearchResult"
-            id="org.eclipse.fdt.ui.CSearchResultPage">
+            class="org.eclipse.cldt.internal.ui.search.CSearchResultPage"
+            searchResultClass="org.eclipse.cldt.internal.ui.search.CSearchResult"
+            id="org.eclipse.cldt.ui.CSearchResultPage">
       </viewPage>
    </extension>
    <extension
@@ -1130,42 +1130,42 @@
       <page
             adaptable="true"
             objectClass="org.eclipse.core.resources.IProject"
-            name="%FDTIndexerProperty.name"
-            class="org.eclipse.fdt.ui.dialogs.IndexerOptionPropertyPage"
-            id="org.eclipse.fdt.ui.indexer">
+            name="%CDTIndexerProperty.name"
+            class="org.eclipse.cldt.ui.dialogs.IndexerOptionPropertyPage"
+            id="org.eclipse.cldt.ui.indexer">
 			<filter
                	name="nature"
-        		value="org.eclipse.fdt.core.fnature">
+        		value="org.eclipse.cldt.core.fnature">
     	     </filter>            
       </page>
       <page
             adaptable="true"
             objectClass="org.eclipse.core.resources.IProject"
-            name="%FDTFileTypesProperty.name"
-            class="org.eclipse.fdt.internal.ui.preferences.CFileTypesPropertyPage"
-            id="org.eclipse.fdt.ui.fileTypes">
+            name="%CDTFileTypesProperty.name"
+            class="org.eclipse.cldt.internal.ui.preferences.CFileTypesPropertyPage"
+            id="org.eclipse.cldt.ui.fileTypes">
          <filter
                name="nature"
-               value="org.eclipse.fdt.core.fnature">
+               value="org.eclipse.cldt.core.fnature">
          </filter>
        </page>
       <page
             adaptable="true"
             objectClass="org.eclipse.core.resources.IProject"
-            name="%FDTHelpProperty.name"
-            class="org.eclipse.fdt.ui.dialogs.CHelpConfigurationPropertyPage"
-            id="org.eclipse.fdt.ui.cHelp">
+            name="%CDTHelpProperty.name"
+            class="org.eclipse.cldt.ui.dialogs.CHelpConfigurationPropertyPage"
+            id="org.eclipse.cldt.ui.cHelp">
              <filter
                	name="nature"
-        		value="org.eclipse.fdt.core.fnature">
+        		value="org.eclipse.cldt.core.fnature">
     	     </filter>            
       </page>
    </extension>
    <extension
-         point="org.eclipse.fdt.ui.PathContainerPage">
+         point="org.eclipse.cldt.ui.PathContainerPage">
       <PathContainerPage
             name="%defaultPathContainerPage"
-            class="org.eclipse.fdt.internal.ui.dialogs.cpaths.CPathContainerDefaultPage"
+            class="org.eclipse.cldt.internal.ui.dialogs.cpaths.CPathContainerDefaultPage"
             id="*">
       </PathContainerPage>
    </extension>
@@ -1173,41 +1173,41 @@
    <extension
          point="org.eclipse.ui.editors.annotationTypes">
       <type
-         name="org.eclipse.fdt.ui.error"
+         name="org.eclipse.cldt.ui.error"
          super="org.eclipse.ui.workbench.texteditor.error"
-         markerType="org.eclipse.fdt.core.problem"
+         markerType="org.eclipse.cldt.core.problem"
          markerSeverity="2">
       </type>
       <type
-         name="org.eclipse.fdt.ui.warning"
+         name="org.eclipse.cldt.ui.warning"
          super="org.eclipse.ui.workbench.texteditor.warning"
-         markerType="org.eclipse.fdt.core.problem"
+         markerType="org.eclipse.cldt.core.problem"
          markerSeverity="1">
       </type>
       <type
-         name="org.eclipse.fdt.ui.info"
+         name="org.eclipse.cldt.ui.info"
          super="org.eclipse.ui.workbench.texteditor.info"
-         markerType="org.eclipse.fdt.core.problem"
+         markerType="org.eclipse.cldt.core.problem"
          markerSeverity="0">
       </type>
       <type
-         markerType="org.eclipse.fdt.core.indexermarker"
-         name="org.eclipse.fdt.ui.indexmarker">
+         markerType="org.eclipse.cldt.core.indexermarker"
+         name="org.eclipse.cldt.ui.indexmarker">
       </type>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.fdt.ui.FortranUIPreferenceInitializer"/>
+      <initializer class="org.eclipse.cldt.ui.FortranUIPreferenceInitializer"/>
    </extension>
 
 <!-- Default folding -->
 	<extension
-		point= "org.eclipse.fdt.ui.foldingStructureProviders">
+		point= "org.eclipse.cldt.ui.foldingStructureProviders">
 		<provider
-			id="org.eclipse.fdt.ui.text.defaultFoldingProvider"
+			id="org.eclipse.cldt.ui.text.defaultFoldingProvider"
 			name= "%defaultFoldingStructureProviderName"
-			class="org.eclipse.fdt.internal.ui.text.folding.DefaultCFoldingStructureProvider"
-			preferencesClass="org.eclipse.fdt.internal.ui.text.folding.DefaultCFoldingPreferenceBlock">
+			class="org.eclipse.cldt.internal.ui.text.folding.DefaultCFoldingStructureProvider"
+			preferencesClass="org.eclipse.cldt.internal.ui.text.folding.DefaultCFoldingPreferenceBlock">
 		</provider>
 	</extension>
 
@@ -1216,8 +1216,8 @@
          point="org.eclipse.ui.editors.templates">
       <contextType
             name="%c.contextType.name"
-            class="org.eclipse.fdt.internal.corext.template.c.CContextType"
-            id="org.eclipse.fdt.ui.text.templates.c">
+            class="org.eclipse.cldt.internal.corext.template.c.CContextType"
+            id="org.eclipse.cldt.ui.text.templates.c">
       </contextType>
       <include
       		file="templates/default-templates.xml">

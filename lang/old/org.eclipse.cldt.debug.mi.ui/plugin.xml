@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin
-   id="org.eclipse.fdt.debug.mi.ui"
+   id="org.eclipse.cldt.debug.mi.ui"
    name="%pluginName"
    version="3.0.0"
    provider-name="%providerName"
-   class="org.eclipse.fdt.debug.mi.internal.ui.MIUIPlugin">
+   class="org.eclipse.cldt.debug.mi.internal.ui.MIUIPlugin">
 
    <runtime>
-      <library name="fdtmiui.jar">
+      <library name="cldtmiui.jar">
          <export name="*"/>
       </library>
    </runtime>
    <requires>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.fdt.debug.mi.core"/>
-      <import plugin="org.eclipse.fdt.debug.ui"/>
-      <import plugin="org.eclipse.fdt.debug.core"/>
-      <import plugin="org.eclipse.fdt.ui"/>
+      <import plugin="org.eclipse.cldt.debug.mi.core"/>
+      <import plugin="org.eclipse.cldt.debug.ui"/>
+      <import plugin="org.eclipse.cldt.debug.core"/>
+      <import plugin="org.eclipse.cldt.ui"/>
       <import plugin="org.eclipse.debug.core"/>
       <import plugin="org.eclipse.debug.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
@@ -26,39 +26,39 @@
 
 
    <extension
-         point="org.eclipse.fdt.debug.ui.CDebuggerPage">
+         point="org.eclipse.cldt.debug.ui.CDebuggerPage">
       <debugPage
-            class="org.eclipse.fdt.debug.mi.internal.ui.GDBDebuggerPage"
-            debuggerID="org.eclipse.fdt.debug.mi.core.CDebugger"
-            id="org.eclipse.fdt.debug.mi.GDBDebuggerPage">
+            class="org.eclipse.cldt.debug.mi.internal.ui.GDBDebuggerPage"
+            debuggerID="org.eclipse.cldt.debug.mi.core.CDebugger"
+            id="org.eclipse.cldt.debug.mi.GDBDebuggerPage">
       </debugPage>
       <debugPage
-            class="org.eclipse.fdt.debug.mi.internal.ui.CygwinDebuggerPage"
-            debuggerID="org.eclipse.fdt.debug.mi.core.CygwinCDebugger"
-            id="org.eclipse.fdt.debug.mi.CygwinDebuggerPage">
+            class="org.eclipse.cldt.debug.mi.internal.ui.CygwinDebuggerPage"
+            debuggerID="org.eclipse.cldt.debug.mi.core.CygwinCDebugger"
+            id="org.eclipse.cldt.debug.mi.CygwinDebuggerPage">
       </debugPage>
       <debuggerPage
-            class="org.eclipse.fdt.debug.mi.internal.ui.GDBServerDebuggerPage"
-            debuggerID="org.eclipse.fdt.debug.mi.core.GDBServerCDebugger"
-            id="org.eclipse.fdt.debug.mi.GDBServerDebuggerPage">
+            class="org.eclipse.cldt.debug.mi.internal.ui.GDBServerDebuggerPage"
+            debuggerID="org.eclipse.cldt.debug.mi.core.GDBServerCDebugger"
+            id="org.eclipse.cldt.debug.mi.GDBServerDebuggerPage">
       </debuggerPage>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
             name="%MIPreferencePage.name"
-            category="org.eclipse.fdt.debug.ui.CDebugPreferencePage"
-            class="org.eclipse.fdt.debug.mi.internal.ui.preferences.MIPreferencePage"
-            id="org.eclipse.fdt.debug.mi.ui.MIPreferencePage">
+            category="org.eclipse.cldt.debug.ui.CDebugPreferencePage"
+            class="org.eclipse.cldt.debug.mi.internal.ui.preferences.MIPreferencePage"
+            id="org.eclipse.cldt.debug.mi.ui.MIPreferencePage">
       </page>
    </extension>
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
-            objectClass="org.eclipse.fdt.debug.core.model.ICDebugTarget"
-            class="org.eclipse.fdt.debug.mi.internal.ui.propertypages.OptionsPropertyPage"
+            objectClass="org.eclipse.cldt.debug.core.model.ICDebugTarget"
+            class="org.eclipse.cldt.debug.mi.internal.ui.propertypages.OptionsPropertyPage"
             name="%TargetOptionsPage.label"
-            id="org.eclipse.fdt.debug.mi.ui.propertypages.target.options">
+            id="org.eclipse.cldt.debug.mi.ui.propertypages.target.options">
          <filter
                value="isGDBTarget"
                name="GDBTargetActionFilter"/>
@@ -67,8 +67,8 @@
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            class="org.eclipse.fdt.debug.mi.internal.ui.ActionFilterAdapterFactory"
-            adaptableType="org.eclipse.fdt.debug.core.model.ICDebugTarget">
+            class="org.eclipse.cldt.debug.mi.internal.ui.ActionFilterAdapterFactory"
+            adaptableType="org.eclipse.cldt.debug.core.model.ICDebugTarget">
          <adapter type="org.eclipse.ui.IActionFilter"/>
       </factory>
    </extension>
