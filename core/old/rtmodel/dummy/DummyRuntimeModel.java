@@ -60,10 +60,18 @@ public class DummyRuntimeModel implements IRuntimeModel {
 	protected int spawned_num_procs = 0;
 	protected int spawned_procs_per_node = 0;
 	protected int spawned_first_node = 0;
+	protected String spawned_app_signal = new String("");
+	protected String spawned_app_exit_code = new String("");
 	
 	protected String fake_job1_state = null;
 	protected String fake_job2_state = null;
 	protected String fake_job3_state = null;
+	protected String fake_job1_signal = new String("");
+	protected String fake_job2_signal = new String("");
+	protected String fake_job3_signal = new String("");
+	protected String fake_job1_exit_code = new String("");
+	protected String fake_job2_exit_code = new String("");
+	protected String fake_job3_exit_code = new String("");
 	protected HashMap job3ProcessMap = null;
 	
 	protected Thread runningAppEventsThread = null;
@@ -262,6 +270,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 						nodeStateMap.put(s, new String("down"));
 						/* ok so now that this node went down - what about any processes running on it? */
 						if(job3ProcessMap.containsValue(new Integer(pick))) {
+							fake_job3_signal = new String("SIGTERM");
 							fake_job3_state = IPProcess.ERROR;
 						}
 						fireEvent(new NamedEntity("machine2_node"+pick), 
@@ -302,6 +311,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 					}
 					if(cnt == 10) {
 						fake_job1_state = IPProcess.EXITED;
+						fake_job1_exit_code = new String("0");
 						fireEvent(new NamedEntity("job1"), new RuntimeEvent(RuntimeEvent.EVENT_JOB_STATE_CHANGED));
 					}
 					else if(cnt == 15) {
@@ -331,6 +341,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 								break;
 							}
 						}
+						fake_job1_exit_code = new String("");
 						processMap.put(new String("job1"), new Integer(newnum));
 						fake_job1_state = IPProcess.STARTING;
 						fireEvent(new NamedEntity("job1"), new RuntimeEvent(RuntimeEvent.EVENT_NEW_JOB));
@@ -379,6 +390,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 					}
 					if(cnt == 10) {
 						fake_job2_state = IPProcess.EXITED;
+						fake_job2_exit_code = new String("0");
 						fireEvent(new NamedEntity("job2"), new RuntimeEvent(RuntimeEvent.EVENT_JOB_STATE_CHANGED));
 					}
 					else if(cnt == 15) {
@@ -414,6 +426,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 						}
 						processMap.put(new String("job2"), new Integer(newnum));
 						fake_job2_state = IPProcess.STARTING;
+						fake_job2_exit_code = new String("");
 						fireEvent(new NamedEntity("job2"), new RuntimeEvent(RuntimeEvent.EVENT_NEW_JOB));
 					}
 					else if(cnt == 20) {
@@ -488,6 +501,8 @@ public class DummyRuntimeModel implements IRuntimeModel {
 		processMap.put(s, new Integer(spawned_num_procs));
 		
 		spawned_app_state = IPProcess.RUNNING;
+		spawned_app_exit_code = new String("");
+		spawned_app_signal = new String("");
 		
 		Runnable runningAppEventsRunnable = new Runnable() {
 			public void run() {
@@ -520,6 +535,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 				if(!spawned_app_state.equals(IPProcess.RUNNING)) return;
 				
 				spawned_app_state = IPProcess.EXITED;
+				spawned_app_exit_code = new String("0");
 				
 				System.out.println("Simulating spawned application terminating normally.");
 				
@@ -537,6 +553,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 	
 	public NamedEntity abortJob() {
 		spawned_app_state = IPProcess.EXITED_SIGNALLED;
+		spawned_app_signal = new String("SIGTERM");
 		String s = new String("job"+numFakeJobs);
 		processMap.remove(s);
 		return new NamedEntity(s);
@@ -736,6 +753,51 @@ public class DummyRuntimeModel implements IRuntimeModel {
 		}
 		else if(job.equals("job3")) {
 			return fake_job3_state;
+		}
+		return "-1";
+	}
+	
+	public String getProcessExitCode(String procName) {
+		String job = procName.substring(0, 4);
+		/* ok, this is coming from a fake job */
+		if(job.equals("job"+numFakeJobs)) {
+			//System.out.println("PROCSTATE = "+spawned_app_state);
+			return spawned_app_exit_code;
+		}
+		else if(job.equals("job0")) {
+			return new String("");
+		}
+		else if(job.equals("job1")) {
+			return fake_job1_exit_code;
+		}
+		else if(job.equals("job2")) {
+			return fake_job2_exit_code;
+		}
+		else if(job.equals("job3")) {
+			return fake_job3_exit_code;
+		}
+		return "-1";
+	}
+
+	
+	public String getProcessSignal(String procName) {
+		String job = procName.substring(0, 4);
+		/* ok, this is coming from a fake job */
+		if(job.equals("job"+numFakeJobs)) {
+			//System.out.println("PROCSTATE = "+spawned_app_state);
+			return spawned_app_signal;
+		}
+		else if(job.equals("job0")) {
+			return new String("");
+		}
+		else if(job.equals("job1")) {
+			return fake_job1_signal;
+		}
+		else if(job.equals("job2")) {
+			return fake_job2_signal;
+		}
+		else if(job.equals("job3")) {
+			return fake_job3_signal;
 		}
 		return "-1";
 	}

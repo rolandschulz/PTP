@@ -29,6 +29,8 @@ public interface IRuntimeModel {
 	public String getProcessNodeName(String procName);
 	public String getNodeMachineName(String nodeName);
 	public String getProcessStatus(String procName);
+	public String getProcessExitCode(String procName);
+	public String getProcessSignal(String procName);
 	
 	public String getNodeAttribute(String nodeName, String attrib);
 	
