@@ -116,6 +116,13 @@
 			id="org.eclipse.ptp.ui.views.parallelProcessesView">
 		</view>
 		<view
+			name="%ParallelJobsView.name"
+			icon="icons/parallel_perspective.gif"
+			category="org.parallel.ptp.ui.views"
+			class="org.eclipse.ptp.ui.views.ParallelJobsView"
+			id="org.eclipse.ptp.ui.views.parallelJobsView">
+		</view>
+		<view
 			name="%ParallelNodeView.name"
 			icon="icons/parallel_perspective.gif"
 			category="org.parallel.ptp.ui.views"
