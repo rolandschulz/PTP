@@ -25,6 +25,6 @@ public interface ICLogConstants {
 	
 	
    public static final LogConst PDE = new LogConst( 1 );
-   public static final LogConst FDT = new LogConst( 2 );
+   public static final LogConst CDT = new LogConst( 2 );
    
 }
