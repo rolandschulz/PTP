@@ -40,8 +40,8 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.internal.core.PNode;
 import org.eclipse.ptp.internal.core.PProcess;
-import org.eclipse.ptp.launch.core.ILaunchManager;
-import org.eclipse.ptp.launch.core.IParallelLaunchListener;
+import org.eclipse.ptp.launch.core.IModelManager;
+import org.eclipse.ptp.launch.core.IParallelModelListener;
 import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.actions.ShowAllNodesAction;
 import org.eclipse.ptp.ui.actions.ShowLegendAction;
@@ -83,7 +83,7 @@ import org.eclipse.swt.widgets.TableItem;
 /**
  * @author ndebard
  */
-public class ParallelNodeStatusView extends AbstractParallelView implements IParallelLaunchListener, ISelectionProvider
+public class ParallelNodeStatusView extends AbstractParallelView implements IParallelModelListener, ISelectionProvider
 {
     public static ParallelNodeStatusView instance = null;
     
@@ -807,7 +807,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
 	}
     
     public void updateButton() {
-    	terminateAllAction.setEnabled(launchManager.getCurrentState() == ILaunchManager.STATE_RUN);
+    	terminateAllAction.setEnabled(launchManager.getCurrentState() == IModelManager.STATE_RUN);
     	
         boolean isRuning = launchManager.isMPIRuning();
         //System.out.println("updateButton - isMPIRunning? "+isRuning);

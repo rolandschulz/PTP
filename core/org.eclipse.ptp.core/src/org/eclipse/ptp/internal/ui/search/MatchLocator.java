@@ -23,7 +23,7 @@ import org.eclipse.ptp.ParallelPlugin;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.launch.core.ILaunchManager;
+import org.eclipse.ptp.launch.core.IModelManager;
 
 /**
  *
@@ -32,7 +32,7 @@ public class MatchLocator implements IPSearchConstants {
     private PSearchPattern pattern = null;
     private PSearchResultCollector collector = null;
     private IProgressMonitor progressMonitor;
-    private ILaunchManager launchManager = null;
+    private IModelManager launchManager = null;
     
     public MatchLocator(PSearchPattern pattern, PSearchResultCollector collector) {
         this.pattern = pattern;

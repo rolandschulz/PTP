@@ -51,8 +51,8 @@ import org.eclipse.ptp.internal.core.PProcess;
 import org.eclipse.ptp.internal.core.PMachine;
 import org.eclipse.ptp.internal.core.PJob;
 import org.eclipse.ptp.internal.core.PUniverse;
-import org.eclipse.ptp.launch.core.ILaunchManager;
-import org.eclipse.ptp.launch.core.IParallelLaunchListener;
+import org.eclipse.ptp.launch.core.IModelManager;
+import org.eclipse.ptp.launch.core.IParallelModelListener;
 import org.eclipse.ptp.rtmodel.IRuntimeListener;
 import org.eclipse.ptp.rtmodel.IRuntimeModel;
 import org.eclipse.ptp.rtmodel.NamedEntity;
@@ -67,7 +67,7 @@ import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.internal.Model;
 import org.eclipse.ui.progress.IProgressService;
 
-public class LaunchManager implements ILaunchManager, IRuntimeListener {
+public class ModelManager implements IModelManager, IRuntimeListener {
 	
     /*
      * 
@@ -96,7 +96,7 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
         return config;
     }
 
-    public LaunchManager() {
+    public ModelManager() {
         ParallelPlugin.getDefault().addPerspectiveListener(perspectiveListener);
         testing();
     }
@@ -458,11 +458,11 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
         return processRoot;
     }
 
-    public void addParallelLaunchListener(IParallelLaunchListener listener) {
+    public void addParallelLaunchListener(IParallelModelListener listener) {
         listeners.add(listener);
     }
 
-    public void removeParallelLaunchListener(IParallelLaunchListener listener) {
+    public void removeParallelLaunchListener(IParallelModelListener listener) {
         listeners.remove(listener);
     }
 
@@ -470,7 +470,7 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
         setCurrentState(state);
         Iterator i = listeners.iterator();
         while (i.hasNext()) {
-            IParallelLaunchListener listener = (IParallelLaunchListener) i.next();
+            IParallelModelListener listener = (IParallelModelListener) i.next();
             switch (state) {
             case STATE_START:
                 listener.start();
@@ -496,7 +496,7 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
     protected synchronized void fireEvent(Object object, int event) {
         Iterator i = listeners.iterator();
         while (i.hasNext()) {
-            IParallelLaunchListener listener = (IParallelLaunchListener) i.next();
+            IParallelModelListener listener = (IParallelModelListener) i.next();
             switch (event) {
             case EVENT_EXEC_STATUS_CHANGE:
                 listener.execStatusChangeEvent(object);

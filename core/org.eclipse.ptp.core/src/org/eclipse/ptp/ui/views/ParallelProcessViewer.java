@@ -26,7 +26,7 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.debug.AbstractAttachDebugger;
 import org.eclipse.ptp.debug.CDTAttachDebuger;
-import org.eclipse.ptp.launch.core.ParallelLaunchAdapter;
+import org.eclipse.ptp.launch.core.ParallelModelAdapter;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -66,7 +66,7 @@ public class ParallelProcessViewer extends AbstractTextEditor implements IProces
     private FormToolkit toolkit = null;
     private ScrolledForm myForm = null;
     
-    private ParallelLaunchAdapter launchAdapter = new ParallelLaunchAdapter() {
+    private ParallelModelAdapter launchAdapter = new ParallelModelAdapter() {
         public void run() {
             close();
         }        

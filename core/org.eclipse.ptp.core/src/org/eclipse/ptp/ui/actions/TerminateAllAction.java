@@ -19,7 +19,7 @@
 package org.eclipse.ptp.ui.actions;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.launch.core.ILaunchManager;
+import org.eclipse.ptp.launch.core.IModelManager;
 import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -48,7 +48,7 @@ public class TerminateAllAction extends ParallelAction {
 	    this.setImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_TERMINATE_ACTION_NORMAL));
 	    this.setDisabledImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_TERMINATE_ACTION_DISABLE));
 	    this.setHoverImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_TERMINATE_ACTION_HOVER));
-	    this.setEnabled(getLaunchManager().getCurrentState() == ILaunchManager.STATE_RUN);
+	    this.setEnabled(getLaunchManager().getCurrentState() == IModelManager.STATE_RUN);
 	}
 	
 	public void run() {

@@ -21,7 +21,7 @@ package org.eclipse.ptp.internal.ui.search;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.ParallelPlugin;
-import org.eclipse.ptp.launch.core.ParallelLaunchAdapter;
+import org.eclipse.ptp.launch.core.ParallelModelAdapter;
 
 /**
  *
@@ -30,7 +30,7 @@ public abstract class PSearchContentProvider implements IStructuredContentProvid
 	protected PSearchResult result;
 	protected final Object[] EMPTY_ARR= new Object[0];
 
-    private ParallelLaunchAdapter launchAdapter = new ParallelLaunchAdapter() {
+    private ParallelModelAdapter launchAdapter = new ParallelModelAdapter() {
         public void run() {
             result.removeAll();
             refresh();
