@@ -407,7 +407,7 @@ public class TypeParser implements ISourceElementRequestor {
 	private ParserLanguage getLanguage(IProject project, IWorkingCopy workingCopy) {
 		ParserLanguage projectLanguage = null;
 		if (project != null) {
-			if (CoreModel.hasCNature(project)) {
+			if (CoreModel.hasFortranNature(project)) {
 				projectLanguage = ParserLanguage.C;
 			}
 		}

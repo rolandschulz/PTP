@@ -243,6 +243,10 @@
    <extension
          point="org.eclipse.fdt.core.CLanguage">
       <language
+            name="Fortran"
+            id="org.eclipse.fdt.core.language.fortran">
+      </language>
+      <language
             name="C"
             id="org.eclipse.fdt.core.language.c">
       </language>
@@ -257,6 +261,18 @@
    </extension>
    <extension
          point="org.eclipse.fdt.core.CFileType">
+      <fileType
+            name="%fileTypeMapping.fortranSourceFile"
+            type="source"
+            id="org.eclipse.fdt.core.fileType.fortran_source"
+            language="org.eclipse.fdt.core.language.fortran">
+      </fileType>
+      <fileType
+            name="%fileTypeMapping.fortranHeaderFile"
+            type="header"
+            id="org.eclipse.fdt.core.fileType.fortran_header"
+            language="org.eclipse.fdt.core.language.fortran">
+      </fileType>
       <fileType
             name="%fileTypeMapping.cSourceFile"
             type="source"
@@ -291,6 +307,14 @@
    <extension
          point="org.eclipse.fdt.core.CFileTypeAssociation">
       <association
+            type="org.eclipse.fdt.core.fileType.fortran_source"
+            pattern="*.f,*.f77,*.f90,*.f95">
+      </association>
+      <association
+            type="org.eclipse.fdt.core.fileType.fortran_header"
+            pattern="*.h">
+      </association>
+      <association
             type="org.eclipse.fdt.core.fileType.c_source"
             pattern="*.c">
       </association>
@@ -317,6 +341,22 @@
 <!-- =================================================================================== -->
    <extension
          point="org.eclipse.team.core.fileTypes">
+      <fileTypes
+            type="text"
+            extension="f">
+      </fileTypes>
+      <fileTypes
+            type="text"
+            extension="f77">
+      </fileTypes>
+      <fileTypes
+            type="text"
+            extension="f90">
+      </fileTypes>
+      <fileTypes
+            type="text"
+            extension="f95">
+      </fileTypes>
       <fileTypes
             type="text"
             extension="c">
@@ -469,6 +509,10 @@
 <!-- Define C/C++ files ContentTypes                                                     -->
 <!-- =================================================================================== -->
   <extension point="org.eclipse.core.runtime.contentTypes">
+	  <!-- declares a content type for Fortran source files -->
+	  <content-type id="fortranSource" name="%fortranSourceName" 
+		  base-type="org.eclipse.core.runtime.text"
+		  priority="high"/>
 	  <!-- declares a content type for C source files -->
 	  <content-type id="cSource" name="%cSourceName" 
 		  base-type="org.eclipse.core.runtime.text"
@@ -490,6 +534,12 @@
           base-type="org.eclipse.core.runtime.text"
           priority="high"/>
   </extension>
+
+   <extension point="org.eclipse.core.runtime.contentTypes"> 
+      <file-association 
+       content-type="org.eclipse.fdt.core.fortranSource"
+       file-extensions="f,f77,f90,f95"/>
+   </extension> 
 
    <extension point="org.eclipse.core.runtime.contentTypes"> 
       <file-association 
