@@ -85,11 +85,11 @@ public class LaunchManager implements ILaunchManager {
         return isPerspectiveOpen;
     }
 
-    public void setPDTConfiguration(ILaunchConfiguration config) {
+    public void setPTPConfiguration(ILaunchConfiguration config) {
         this.config = config;
     }
 
-    public ILaunchConfiguration getPDTConfiguration() {
+    public ILaunchConfiguration getPTPConfiguration() {
         return config;
     }
 
@@ -135,8 +135,7 @@ public class LaunchManager implements ILaunchManager {
     			for(int j=0; j<ne2.length; j++) {
     				PProcess proc;
     				System.out.println("process name = "+ne2[j].name);
-    				proc = new PProcess(job, ne2[j].name, ""+j+"", "noPIDdefined", 
-    						"noSTATUSdefined", "noEXITCODEdefined", "noSIGNALNAMEdefined");
+    				proc = new PProcess(job, ne2[j].name, ""+j+"", "-1", "-1", "-1", "-1");
     				job.addChild(proc);
     				
     				String pname = proc.getElementName();

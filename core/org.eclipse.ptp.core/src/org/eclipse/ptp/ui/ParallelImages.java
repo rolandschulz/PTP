@@ -31,7 +31,7 @@ import org.eclipse.swt.graphics.Image;
  *
  */
 public class ParallelImages {
-	private static final String NAME_PREFIX = "org.eclipse.pdt.ui.";
+	private static final String NAME_PREFIX = "org.eclipse.ptp.ui.";
 	private static final int NAME_PREFIX_LENGTH = NAME_PREFIX.length();
     
 	private static URL iconBaseURL = null;

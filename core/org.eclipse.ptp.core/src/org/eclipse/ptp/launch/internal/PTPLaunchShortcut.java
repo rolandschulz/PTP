@@ -35,14 +35,14 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.ParallelPlugin;
-import org.eclipse.ptp.core.IPDTLaunchConfigurationConstants;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 
 /**
  *
  */
-public class PDTLaunchShortcut implements ILaunchShortcut {
+public class PTPLaunchShortcut implements ILaunchShortcut {
     public static final String LauncherGroupID = "org.eclipse.debug.ui.launchGroup.run";
     
 	/**
@@ -85,20 +85,20 @@ public class PDTLaunchShortcut implements ILaunchShortcut {
 	public ILaunchConfiguration getILaunchConfigure(IFile file) {
 	    String projectName = file.getProject().getName();
 	    ILaunchManager lm = getLaunchManager();
-	    ILaunchConfigurationType configType = lm.getLaunchConfigurationType(IPDTLaunchConfigurationConstants.PDT_LAUNCHCONFIGURETYPE_ID);
+	    ILaunchConfigurationType configType = lm.getLaunchConfigurationType(IPTPLaunchConfigurationConstants.PTP_LAUNCHCONFIGURETYPE_ID);
 		try {
 		    ILaunchConfiguration[] configs = lm.getLaunchConfigurations(configType);
 		    for (int i=0; i<configs.length; i++) {
-		        if (configs[i].getAttribute(IPDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, "").equals(projectName))
+		        if (configs[i].getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, "").equals(projectName))
 		            return configs[i];
 		    }
 		    ILaunchConfigurationWorkingCopy wc = configType.newInstance(file.getProject(), projectName);		    
-		    wc.setAttribute(IPDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, projectName);
-		    wc.setAttribute(IPDTLaunchConfigurationConstants.ATTR_APPLICATION_NAME, file.getName());
-	        wc.setAttribute(IPDTLaunchConfigurationConstants.NUMBER_OF_PROCESSES, IPDTLaunchConfigurationConstants.DEF_NUMBER_OF_PROCESSES);
-	        wc.setAttribute(IPDTLaunchConfigurationConstants.NETWORK_TYPE, IPDTLaunchConfigurationConstants.DEF_NETWORK_TYPE);
-	        wc.setAttribute(IPDTLaunchConfigurationConstants.PROCESSES_PER_NODE, IPDTLaunchConfigurationConstants.DEF_PROCESSES_PER_NODE);
-	        wc.setAttribute(IPDTLaunchConfigurationConstants.FIRST_NODE_NUMBER, IPDTLaunchConfigurationConstants.DEF_FIRST_NODE_NUMBER);
+		    wc.setAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, projectName);
+		    wc.setAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, file.getName());
+	        wc.setAttribute(IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES, IPTPLaunchConfigurationConstants.DEF_NUMBER_OF_PROCESSES);
+	        wc.setAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, IPTPLaunchConfigurationConstants.DEF_NETWORK_TYPE);
+	        wc.setAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE, IPTPLaunchConfigurationConstants.DEF_PROCESSES_PER_NODE);
+	        wc.setAttribute(IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER, IPTPLaunchConfigurationConstants.DEF_FIRST_NODE_NUMBER);
 
 		    return wc.doSave();
 		} catch (CoreException e) {

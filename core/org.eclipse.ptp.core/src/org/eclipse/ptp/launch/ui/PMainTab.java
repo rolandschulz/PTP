@@ -38,7 +38,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.ParallelPlugin;
-import org.eclipse.ptp.core.IPDTLaunchConfigurationConstants;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.swt.SWT;
@@ -153,9 +153,9 @@ public class PMainTab extends PLaunchConfigurationTab {
     		configuration.rename(name);
         }
         
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, projectName);       
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.ATTR_APPLICATION_NAME, (String) null);
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false);
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, projectName);       
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, (String) null);
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false);
     }    
 
     /**
@@ -163,9 +163,9 @@ public class PMainTab extends PLaunchConfigurationTab {
      */
     public void initializeFrom(ILaunchConfiguration configuration) {
         try {
-            projText.setText(configuration.getAttribute(IPDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, EMPTY_STRING));
-            appText.setText(configuration.getAttribute(IPDTLaunchConfigurationConstants.ATTR_APPLICATION_NAME, EMPTY_STRING));
-            stopInMainCheckButton.setSelection(configuration.getAttribute(IPDTLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false));
+            projText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, EMPTY_STRING));
+            appText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, EMPTY_STRING));
+            stopInMainCheckButton.setSelection(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false));
         } catch (CoreException e) {
             setErrorMessage(UIMessage.getFormattedResourceString("CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION", e.getStatus().getMessage()));
         }
@@ -175,9 +175,9 @@ public class PMainTab extends PLaunchConfigurationTab {
      * @see ILaunchConfigurationTab#performApply(ILaunchConfigurationWorkingCopy)
      */
     public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, getFieldContent(projText.getText()));
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.ATTR_APPLICATION_NAME, getFieldContent(appText.getText()));
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, stopInMainCheckButton.getSelection());
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, getFieldContent(projText.getText()));
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, getFieldContent(appText.getText()));
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, stopInMainCheckButton.getSelection());
     }    
     
 	/* (non-Javadoc)
@@ -329,7 +329,7 @@ public class PMainTab extends PLaunchConfigurationTab {
 	protected IProject getDefaultProject(ILaunchConfiguration configuration) {
 		String projectName = null;
 		try {
-		    projectName = configuration.getAttribute(IPDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
+		    projectName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
 		} catch (CoreException e) {
 		    return null;
 		}

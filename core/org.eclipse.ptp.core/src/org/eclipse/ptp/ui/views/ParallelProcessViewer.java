@@ -208,7 +208,7 @@ public class ParallelProcessViewer extends AbstractTextEditor implements IProces
         if (process != null) {
             rankLabel.setText("Rank: " + process.getProcessNumber());
             totalLabel.setText("Total: " + process.getParent().size());
-            nodeLabel.setText("Node: " + ((IPNode) process.getParent()).getNodeNumber());
+            nodeLabel.setText("Node: " + ((IPNode) process.getNode()).getNodeNumber());
             pidLabel.setText("PID: " + process.getPid());
             statusLabel.setText("Status: " + process.getStatus());
             if (process.getExitCode() != null)
@@ -304,7 +304,7 @@ public class ParallelProcessViewer extends AbstractTextEditor implements IProces
                 IPProcess process = getProcess();
                 AbstractAttachDebugger debugger = new CDTAttachDebuger(process.getPid(), process.getElementName());
                 try {
-                    debugger.attachDebugger(ParallelPlugin.getDefault().getLaunchManager().getPDTConfiguration());
+                    debugger.attachDebugger(ParallelPlugin.getDefault().getLaunchManager().getPTPConfiguration());
                     debugButton.setEnabled(false);
 				} catch (CoreException e) {
 				    String msg = e.getMessage() + "\n" + "Process not debuggable.";

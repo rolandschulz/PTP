@@ -37,7 +37,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.ParallelPlugin;
-import org.eclipse.ptp.core.IPDTLaunchConfigurationConstants;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.launch.core.ILaunchManager;
 import org.eclipse.ptp.ui.UIMessage;
 
@@ -160,27 +160,27 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 	
 	protected static String getProjectName(ILaunchConfiguration configuration) throws CoreException {
-	    return configuration.getAttribute(IPDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String)null);
+	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String)null);
 	}
 	protected static String getProgramName(ILaunchConfiguration configuration) throws CoreException {
-	    return configuration.getAttribute(IPDTLaunchConfigurationConstants.ATTR_APPLICATION_NAME, (String)null);
+	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, (String)null);
 	}
 	protected static String getNumberOfProcess(ILaunchConfiguration configuration) throws CoreException {
-	    return configuration.getAttribute(IPDTLaunchConfigurationConstants.NUMBER_OF_PROCESSES, (String)null);
+	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES, (String)null);
 	}
 	protected static String getCommunication(ILaunchConfiguration configuration) throws CoreException {
-	    return configuration.getAttribute(IPDTLaunchConfigurationConstants.NETWORK_TYPE, (String)null);
+	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, (String)null);
 	}
 	protected static String getNumberOfProcessStart(ILaunchConfiguration configuration) throws CoreException {
-	    return configuration.getAttribute(IPDTLaunchConfigurationConstants.PROCESSES_PER_NODE, (String)null);
+	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE, (String)null);
 	}
 	protected static String getFirstNodeNumber(ILaunchConfiguration configuration) throws CoreException {
-	    return configuration.getAttribute(IPDTLaunchConfigurationConstants.FIRST_NODE_NUMBER, (String)null);
+	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER, (String)null);
 	}
 	protected static String getArgument(ILaunchConfiguration configuration) throws CoreException {
-	    return configuration.getAttribute(IPDTLaunchConfigurationConstants.ATTR_ARGUMENT, (String)null);
+	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENT, (String)null);
 	}
 	protected static String getWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
-	    return configuration.getAttribute(IPDTLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, (String)null);
+	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, (String)null);
 	}
 }

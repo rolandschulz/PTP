@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
-import org.eclipse.ptp.core.IPDTLaunchConfigurationConstants;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 
@@ -63,7 +63,7 @@ public abstract class PLaunchConfigurationTab extends AbstractLaunchConfiguratio
     protected IProject getProject(ILaunchConfiguration configuration) {
         String proName = null;
         try {
-            proName = configuration.getAttribute(IPDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String)null);
+            proName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String)null);
         } catch (CoreException e) {
             return null;
         }        

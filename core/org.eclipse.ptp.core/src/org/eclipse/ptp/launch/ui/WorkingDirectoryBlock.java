@@ -28,7 +28,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.ptp.core.IPDTLaunchConfigurationConstants;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -123,7 +123,7 @@ public class WorkingDirectoryBlock extends PLaunchConfigurationTab {
      * @see ILaunchConfigurationTab#setDefaults(ILaunchConfigurationWorkingCopy)
      */
     public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, (String) null);
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, (String) null);
     }
     
     /**
@@ -132,7 +132,7 @@ public class WorkingDirectoryBlock extends PLaunchConfigurationTab {
     public void initializeFrom(ILaunchConfiguration configuration) {
         setLaunchConfiguration(configuration);
         try {            
-			String wd = configuration.getAttribute(IPDTLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, (String) null);
+			String wd = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, (String) null);
 			workspaceDirText.setText(EMPTY_STRING);
 			workingDirText.setText(EMPTY_STRING);
 			if (wd == null) {
@@ -169,7 +169,7 @@ public class WorkingDirectoryBlock extends PLaunchConfigurationTab {
 				wd = path.makeRelative().toOSString();
 			}
 		} 
-		configuration.setAttribute(IPDTLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, wd);
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, wd);
     }    
 
     

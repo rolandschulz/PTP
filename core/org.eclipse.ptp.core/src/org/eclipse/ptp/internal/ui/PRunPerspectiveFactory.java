@@ -50,7 +50,7 @@ public class PRunPerspectiveFactory implements IPerspectiveFactory {
 
 		// set toolbar or menu icon
 		layout.addActionSet(IDebugUIConstants.LAUNCH_ACTION_SET);
-		layout.addActionSet(UIUtils.PDT_ACTION_SET);
+		layout.addActionSet(UIUtils.PTP_ACTION_SET);
 
 		// views - build console
 		layout.addShowViewShortcut(IConsoleConstants.ID_CONSOLE_VIEW);

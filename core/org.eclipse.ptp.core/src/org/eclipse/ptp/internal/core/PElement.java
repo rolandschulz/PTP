@@ -141,7 +141,7 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 	}
 	
 	public int computeScore(String pageId, Object element) {
-		if (!UIUtils.PDT_SEARCHPAGE_ID.equals(pageId))
+		if (!UIUtils.PTP_SEARCHPAGE_ID.equals(pageId))
 			return ISearchPageScoreComputer.UNKNOWN;
 		
 		if (element instanceof IPElement)

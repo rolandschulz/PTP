@@ -37,13 +37,13 @@ import org.eclipse.ui.WorkbenchException;
  *
  */
 public class UIUtils {
-    public static final String ParallelProcessesView_ID = "org.eclipse.pdt.ui.views.parallelProcessesView";
-	public static final String PPerspectiveFactory_ID = "org.eclipse.pdt.ui.PRunPerspective";
-    public static final String ParallelProcessViewer_ID = "org.eclipse.pdt.ui.views.parallelProcessViewer";
-    public static final String ParallelNodeStatusView_ID = "org.eclipse.pdt.ui.views.parallelNodeStatusView";
+    public static final String ParallelProcessesView_ID = "org.eclipse.ptp.ui.views.parallelProcessesView";
+	public static final String PPerspectiveFactory_ID = "org.eclipse.ptp.ui.PRunPerspective";
+    public static final String ParallelProcessViewer_ID = "org.eclipse.ptp.ui.views.parallelProcessViewer";
+    public static final String ParallelNodeStatusView_ID = "org.eclipse.ptp.ui.views.parallelNodeStatusView";
     public static final String ParallelProcessStatusView_ID = "org.ecliipse.ptd.ui.views.parallelProcessStatusView";
-    public static final String PDT_ACTION_SET = "org.eclipse.pdt.actionSets";
-    public static final String PDT_SEARCHPAGE_ID = "org.eclipse.pdt.ui.PSearchPage";        
+    public static final String PTP_ACTION_SET = "org.eclipse.ptp.actionSets";
+    public static final String PTP_SEARCHPAGE_ID = "org.eclipse.ptp.ui.PSearchPage";        
     
     public static final int NORMAL = 0;
     public static final int ASYNC = 1;

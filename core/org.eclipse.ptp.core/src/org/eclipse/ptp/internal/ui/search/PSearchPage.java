@@ -105,7 +105,7 @@ public class PSearchPage extends DialogPage implements ISearchPage, IPSearchCons
 		layouter.perform(createExpression(result));
 		layouter.perform(createSearchFor(result), createLimitTo(result), 2);
 		
-		SelectionAdapter pdtElementInitializer = new SelectionAdapter() {
+		SelectionAdapter ptpElementInitializer = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				if(getSearchFor() == fInitialData.getSearchFor())
 					fElement = fInitialData.getElement();
@@ -115,8 +115,8 @@ public class PSearchPage extends DialogPage implements ISearchPage, IPSearchCons
 				setLimitToEnable(getSearchFor());
 			}
 		};
-		fSearchFor[SEARCH_NODE].addSelectionListener(pdtElementInitializer);
-		fSearchFor[SEARCH_PROCESS].addSelectionListener(pdtElementInitializer);
+		fSearchFor[SEARCH_NODE].addSelectionListener(ptpElementInitializer);
+		fSearchFor[SEARCH_PROCESS].addSelectionListener(ptpElementInitializer);
 
 		setControl(result);
 		Dialog.applyDialogFont(result);

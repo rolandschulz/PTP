@@ -22,6 +22,7 @@ import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IProcessListener;
 
 public class PProcess extends Parent implements IPProcess {
@@ -46,7 +47,8 @@ public class PProcess extends Parent implements IPProcess {
 		this.exitCode = exitCode;
 		setStatus(status);
 		IPJob job = getJob();
-		//outputFile = new OutputTextFile(processNumber, job.getOutputStoreDirectory(), job.getStoreLine());
+		IPUniverse uni = job.getUniverse();
+		outputFile = new OutputTextFile(name, uni.getOutputStoreDirectory(), uni.getStoreLine());
 	}
 	
 	public IPJob getJob() {
