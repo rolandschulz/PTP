@@ -45,7 +45,7 @@ import org.eclipse.fdt.core.parser.IScannerInfoProvider;
 import org.eclipse.fdt.core.resources.IConsole;
 import org.eclipse.fdt.core.resources.ScannerProvider;
 import org.eclipse.fdt.core.search.SearchEngine;
-import org.eclipse.fdt.internal.core.FDTLogWriter;
+import org.eclipse.fdt.internal.core.CDTLogWriter;
 import org.eclipse.fdt.internal.core.CDescriptorManager;
 import org.eclipse.fdt.internal.core.model.BufferManager;
 import org.eclipse.fdt.internal.core.model.CModelManager;
@@ -58,7 +58,7 @@ import org.eclipse.fdt.internal.core.search.matching.MatchLocator;
 import org.eclipse.fdt.internal.core.search.processing.JobManager;
 import org.osgi.framework.BundleContext;
 
-public class FortranCorePlugin extends Plugin {
+public class FortranCorePlugin extends CCorePlugin {
 
 	public static final int STATUS_FDTPROJECT_EXISTS = 1;
 	public static final int STATUS_FDTPROJECT_MISMATCH = 2;
@@ -108,7 +108,7 @@ public class FortranCorePlugin extends Plugin {
      * @see #getDefaultOptions
      */
     public static final String CORE_ENCODING = PLUGIN_ID + ".encoding"; //$NON-NLS-1$
-	public FDTLogWriter fdtLog = null;
+	public CDTLogWriter fdtLog = null;
 
 	private static FortranCorePlugin fgFortranPlugin;
 	private static ResourceBundle fgResourceBundle;
@@ -176,27 +176,28 @@ public class FortranCorePlugin extends Plugin {
 		return fgResourceBundle;
 	}
 
-	public static FortranCorePlugin getDefault() {
+	public static CCorePlugin getDefault() {
 		return fgFortranPlugin;
 	}
 
-	public static void log(Throwable e) {
-		if ( e instanceof CoreException ) {
-			log(((CoreException)e).getStatus());
-		} else {
-			log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Error", e)); //$NON-NLS-1$
-		}
-	}
+//	public static void log(Throwable e) {
+//		if ( e instanceof CoreException ) {
+//			log(((CoreException)e).getStatus());
+//		} else {
+//			log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Error", e)); //$NON-NLS-1$
+//		}
+//	}
 
-	public static void log(IStatus status) {
-		((Plugin) getDefault()).getLog().log(status);
-	}
+//	public static void log(IStatus status) {
+//		((Plugin) getDefault()).getLog().log(status);
+//	}
 
 	// ------ CPlugin
 
 	public FortranCorePlugin() {
 		super();
 		fgFortranPlugin = this;
+		fgCLCore.setDefault(this, PLUGIN_ID, fgResourceBundle);
 	}
 
 	/**
@@ -227,7 +228,7 @@ public class FortranCorePlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		
-		fdtLog = new FDTLogWriter(FortranCorePlugin.getDefault().getStateLocation().append(".log").toFile()); //$NON-NLS-1$
+		fdtLog = new CDTLogWriter(FortranCorePlugin.getDefault().getStateLocation().append(".log").toFile()); //$NON-NLS-1$
 		
 		//Set debug tracing options
 		FortranCorePlugin.getDefault().configurePluginDebugOptions();
@@ -442,7 +443,7 @@ public class FortranCorePlugin extends Plugin {
 				}
 			}
 		} catch (CoreException e) {
-			log(e);
+			CommonLanguageCore.log(e);
 		}
 		return new IConsole() { // return a null console
 			private ConsoleOutputStream nullStream = new ConsoleOutputStream() {
@@ -487,7 +488,7 @@ public class FortranCorePlugin extends Plugin {
 					ext = (ICExtensionReference[])list.toArray(ext);
 				}
 			} catch (CoreException e) {
-				log(e);
+				CommonLanguageCore.log(e);
 			}
 		}
 		return ext;
@@ -752,7 +753,7 @@ public class FortranCorePlugin extends Plugin {
 				return (IErrorParser[]) list.toArray(empty);
 			}
 		} catch (CoreException e) {
-			log(e);
+			CommonLanguageCore.log(e);
 		}
 		return empty;
 	}
@@ -766,7 +767,7 @@ public class FortranCorePlugin extends Plugin {
 				if (extensions.length > 0)
 					provider = (IScannerInfoProvider) extensions[0].createExtension();
 			} catch (CoreException e) {
-				// log(e);
+				// CommonLanguageCore.log(e);
 			}
 			if ( provider == null) {
 				return ScannerProvider.getInstance();

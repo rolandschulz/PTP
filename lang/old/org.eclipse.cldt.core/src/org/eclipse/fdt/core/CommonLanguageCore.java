@@ -6,6 +6,11 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
+
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.fdt.core.model.IWorkingCopy;
@@ -15,18 +20,14 @@ import org.eclipse.fdt.internal.core.model.IBufferFactory;
 
 public class CommonLanguageCore {
 
+	private static CCorePlugin fgCLCorePlugin = null;
 	private static ResourceBundle fgResourceBundle;
+	
+	// TODO Default use org.eclipse.cdt.core
+	public static String PLUGIN_ID = "org.eclipse.cdt.core"; //$NON-NLS-1$
+
 
 	// -------- static methods --------
-
-	static {
-		try {
-			fgResourceBundle = ResourceBundle.getBundle("org.eclipse.fdt.internal.core.FortranCorePluginResources"); //$NON-NLS-1$
-		} catch (MissingResourceException x) {
-			fgResourceBundle = null;
-		}
-	}
-
 	
 	public static String getResourceString(String key) {
 		try {
@@ -38,7 +39,6 @@ public class CommonLanguageCore {
 		}
 	}
 
-	
 	public static IWorkspace getWorkspace() {
 		return ResourcesPlugin.getWorkspace();
 	}
@@ -55,4 +55,39 @@ public class CommonLanguageCore {
 		return fgResourceBundle;
 	}
 	
+	public static void setResoureBundle(ResourceBundle resourceBundle) {
+		fgResourceBundle = resourceBundle;
+	}
+
+	public static Plugin getDefault() {
+		return fgCLCorePlugin;
+	}
+	
+	public static void log(Throwable e) {
+		if ( e instanceof CoreException ) {
+			log(((CoreException)e).getStatus());
+		} else {
+			log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Error", e)); //$NON-NLS-1$
+		}
+	}
+
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
+	}
+
+
+
+	public CommonLanguageCore() {
+		super();
+		fgCLCorePlugin = CCorePlugin.getDefault();	// Default value
+		fgResourceBundle = CCorePlugin.getResourceBundle();	// Default value
+	}
+
+	public void setDefault(CCorePlugin corePlugin, String pluginID, ResourceBundle resourceBundle) {
+		fgCLCorePlugin = corePlugin;
+		PLUGIN_ID = pluginID;
+		fgResourceBundle = resourceBundle;
+	}
+	
+
 }

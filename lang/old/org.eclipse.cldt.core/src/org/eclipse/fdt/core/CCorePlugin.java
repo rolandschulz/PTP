@@ -112,7 +112,7 @@ public class CCorePlugin extends Plugin {
 
 	private static CCorePlugin fgCPlugin;
 	private static ResourceBundle fgResourceBundle;
-	private static CommonLanguageCore fgCLCore;
+	protected static CommonLanguageCore fgCLCore;
 
 	private CDescriptorManager fDescriptorManager = new CDescriptorManager();
 
