@@ -16,27 +16,10 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.rtmodel;
 
-/* simple class which is used to specify entities coming from the runtime model
- * by a name.  This name is intended to be used to name the objects in the
- * core parallel model (Node, Job, Machine, etc.).  Then, the system can/will
- * use this name to map between the parallel model object and the entity
- * contained below the runtime layer.
- */
-public class NamedEntity {
-	public String name;
-	
-	public NamedEntity(String name) {
-		this.name = name;
-	}
-	
-	public String getName() {
-		return this.name;
-	}
-	
-	public String toString() { 
-		return this.name; 
-	}
+public interface IRuntimeListener {
+    public static final int EVENT_NODE_STATUS_CHANGE = 1;
+    
+    public void runtimeNodeStatusChange(Object object);
 }

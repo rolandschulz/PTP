@@ -19,12 +19,17 @@
 
 package org.eclipse.ptp.rtmodel.dummy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.internal.core.PUniverse;
+import org.eclipse.ptp.launch.core.IParallelLaunchListener;
+import org.eclipse.ptp.rtmodel.IRuntimeListener;
 import org.eclipse.ptp.rtmodel.IRuntimeModel;
 import org.eclipse.ptp.rtmodel.NamedEntity;
 
@@ -37,6 +42,10 @@ public class DummyRuntimeModel implements IRuntimeModel {
 	 */
 	final static int[] numNodes = { 2, 4, 6, 8 };
 	protected HashMap nodeMap;
+	protected HashMap nodeUserMap;
+	protected HashMap nodeGroupMap;
+	protected HashMap nodeModeMap;
+	protected HashMap nodeStateMap;
 	
 	/* define the number of jobs here */
 	final static int numJobs = 2;
@@ -45,6 +54,8 @@ public class DummyRuntimeModel implements IRuntimeModel {
 	 */
 	final static int[] numProcesses = { 3, 5 };
 	protected HashMap processMap;
+	
+	protected List listeners = new ArrayList(2);
 	
 	public DummyRuntimeModel() {
 		nodeMap = new HashMap();
@@ -57,6 +68,68 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			String s = new String("job"+i);
 			processMap.put(s, new Integer(numProcesses[i]));
 		}
+		int totnodes = 0;
+		for(int i=0; i<numMachines; i++) {
+			totnodes += numNodes[i];
+		}
+		nodeUserMap = new HashMap();
+		nodeGroupMap = new HashMap();
+		nodeModeMap = new HashMap();
+		nodeStateMap = new HashMap();
+		for(int i=0; i<numMachines; i++) {
+			for(int j=0; j<numNodes[i]; j++) {
+				String s = new String("machine"+i+"_node"+j);
+				nodeStateMap.put(s, new String("up"));
+				nodeUserMap.put(s, new String("root"));
+				nodeGroupMap.put(s, new String("root"));
+				nodeModeMap.put(s, new String("0111"));
+			}
+		}
+		
+		startDummyEventGeneration();
+	}
+	
+	protected void startDummyEventGeneration() {
+		Runnable runnable = new Runnable() {
+			public void run() {
+				for(int i=0; i<10; i++) {
+					try {
+						Thread.sleep(10000);
+					} catch(Exception e) {	
+					}
+					System.out.println("10000 passed!");
+					int rmac = (int)(Math.random() * numMachines);
+					int rnod = (int)(Math.random() * numNodes[rmac]);
+					fireEvent(new NamedEntity("machine"+rmac+"_node"+rnod), IRuntimeListener.EVENT_NODE_STATUS_CHANGE);
+				}
+			}
+		};
+		new Thread(runnable).start();
+	}
+	
+	public void addRuntimeListener(IRuntimeListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeRuntimeListener(IRuntimeListener listener) {
+		listeners.remove(listener);
+	}
+	
+	protected synchronized void fireEvent(Object object, int event) {
+		Iterator i = listeners.iterator();
+		while (i.hasNext()) {
+			IRuntimeListener listener = (IRuntimeListener) i.next();
+			switch (event) {
+			case IRuntimeListener.EVENT_NODE_STATUS_CHANGE:
+				listener.runtimeNodeStatusChange(object);
+				break;
+			}
+		}
+	}
+	
+	public void shutdown() {
+		listeners.clear();
+		listeners = null;
 	}
 
 	public NamedEntity[] getMachines() {
@@ -145,5 +218,22 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			return nodeName.substring(0, idx);
 		}
 		return "";
+	}
+	
+	public String getNodeAttribute(String nodeName, String attrib) {
+		String s = null;
+		if(attrib.equals("state")) {
+			s = (String)nodeStateMap.get(nodeName);
+		}
+		else if(attrib.equals("mode")) {
+			s = (String)nodeModeMap.get(nodeName);
+		}
+		else if(attrib.equals("user")) {
+			s = (String)nodeUserMap.get(nodeName);
+		}
+		else if(attrib.equals("group")) {
+			s = (String)nodeGroupMap.get(nodeName);
+		}
+		return s;
 	}
 }

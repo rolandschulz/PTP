@@ -25,6 +25,9 @@ public interface IPUniverse extends IPElement {
 	public IPJob[] getJobs();
 	public IPJob[] getSortedJobs();
 	public IPJob findJobByName(String jname);
+	
+	public IPNode findNodeByName(String nname);
+	
 	public String getOutputStoreDirectory();
 	public int getStoreLine();
 }

@@ -122,6 +122,19 @@ public class PUniverse extends Parent implements IPUniverse
 		return null;
 	}
 	
+	public synchronized IPNode findNodeByName(String nname) {
+		Collection col = getCollection();
+		Iterator it = col.iterator();
+		while(it.hasNext()) {
+			Object ob = it.next();
+			if(ob instanceof IPMachine) {
+				IPNode node = ((IPMachine)ob).findNodeByName(nname);
+				if(node != null) return node;
+			}
+		}
+		return null;
+	}
+	
 	/* there is a single collection but in this collection we keep two different kinds
 	 * of classes - they are the machines and the jobs.  So we have to go through the
 	 * entire collection pulling out the right class and return an array of them

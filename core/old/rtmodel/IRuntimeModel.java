@@ -28,4 +28,11 @@ public interface IRuntimeModel {
 	
 	public String getProcessNodeName(String procName);
 	public String getNodeMachineName(String nodeName);
+	
+	public String getNodeAttribute(String nodeName, String attrib);
+	
+	/* event stuff */
+	public void addRuntimeListener(IRuntimeListener listener);
+	public void removeRuntimeListener(IRuntimeListener listener);
+	public void shutdown();
 }
