@@ -118,6 +118,7 @@ public class ParallelElementLabelProvider extends LabelProvider implements IColo
 	        		return NODE_EXITED;
 	        
 	        }
+	        /*
 	        else {
 		        String nodeState = node.getState();
 
@@ -146,6 +147,7 @@ public class ParallelElementLabelProvider extends LabelProvider implements IColo
 	       	  		return NODE_ERROR;
 	       	  	}
 	        }
+	        */
 	    }
 	    else {
 	        if (element instanceof IPProcess) {

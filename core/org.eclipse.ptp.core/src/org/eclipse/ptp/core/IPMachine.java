@@ -34,6 +34,8 @@ public interface IPMachine extends IPElement {
 	public int totalProcesses();	
 	public void removeAllProcesses();
 	
+	public IPNode findNodeByName(String nname);
+	
 	/* returns the parent universe */
 	public IPUniverse getUniverse();
 	

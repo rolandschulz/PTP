@@ -40,8 +40,8 @@ public class PProcess extends Parent implements IPProcess {
     /* the node that this process is running on, or was scheduled on / will be, etc */
     protected IPNode node;
     
-	public PProcess(IPElement element, String processNumber, String pid, String status, String exitCode, String signalName) {
-		super(element, processNumber, P_PROCESS);
+	public PProcess(IPElement element, String name, String key, String pid, String status, String exitCode, String signalName) {
+		super(element, name, key, P_PROCESS);
 		this.pid = pid;
 		this.exitCode = exitCode;
 		setStatus(status);
@@ -144,12 +144,10 @@ public class PProcess extends Parent implements IPProcess {
     public boolean isAllStop() {
         return getStatus().startsWith(EXITED);
     }
-    public String getElementName() {
-        return NAME_TAG + getKey();
-    }
     
 	public void setNode(IPNode node) {
 		this.node = node;
+		if(node != null) node.addChild(this);
 	}
 
 	public IPNode getNode() {

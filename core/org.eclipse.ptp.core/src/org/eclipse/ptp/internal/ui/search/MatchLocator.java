@@ -76,9 +76,11 @@ public class MatchLocator implements IPSearchConstants {
 	private void exactNumberMatches(IPJob root, PSearchPattern pattern) throws InterruptedException {
 	    IPElement element = null;
 	    switch (pattern.getPSearchFor()) {
+	    /*
 	    	case IPSearchConstants.SEARCH_NODE:
 	    	    element = root.findNode(pattern.getPattern());
 	    	    break;
+	    	    */
 	    	case IPSearchConstants.SEARCH_PROCESS:
 	    	    element = root.findProcess(pattern.getPattern());
 	    	    break;

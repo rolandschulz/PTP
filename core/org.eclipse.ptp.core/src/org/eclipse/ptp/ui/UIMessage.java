@@ -24,15 +24,12 @@ import java.util.ResourceBundle;
 
 import org.eclipse.ptp.ParallelPlugin;
 
-/**
- *
- * TODO To change the template for this generated type comment go to
- */
 public class UIMessage {
     private static final String BUNDLE_NAME = ParallelPlugin.PLUGIN_ID + ".ui.UIMessages";
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
     public static String getResourceString(String key) {
+    		System.out.println("UIMessage.getResourceString("+key+")");
 		// No point trying if bundle is null as exceptions are costly
 		if (RESOURCE_BUNDLE != null) {
 			try {

@@ -20,7 +20,9 @@ package org.eclipse.ptp.ui.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
+/*
 import org.eclipse.ptp.ui.LegendDialog;
+*/
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
@@ -31,7 +33,9 @@ public class ShowLegendAction implements IWorkbenchWindowActionDelegate {
 	private IWorkbenchWindow window;
 
 	public void run(IAction action) {
+		/*
 		new LegendDialog(window.getShell()).open();
+		*/
 	}
 	public void selectionChanged(IAction action, ISelection selection) {
 	}	

@@ -41,6 +41,8 @@ public class TerminateAllAction extends ParallelAction {
 	}
 
 	public void init(boolean isEnable) {
+		String foo = UIMessage.getResourceString("TerminationAllAction.text");
+		
 	    this.setText(UIMessage.getResourceString("TerminationAllAction.text"));
 	    this.setToolTipText(UIMessage.getResourceString("TerminationAllAction.tooltip"));
 	    this.setImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_TERMINATE_ACTION_NORMAL));

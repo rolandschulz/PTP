@@ -19,6 +19,8 @@
 package org.eclipse.ptp.internal.core;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.ptp.core.IPElement;
@@ -33,9 +35,16 @@ public class PMachine extends Parent implements IPMachine
 	protected String NAME_TAG = "machine ";
 	protected String arch = "undefined";
 	
-	public PMachine(IPUniverse uni, String name) {
-		super(uni, name, P_MACHINE);
+	public PMachine(IPUniverse uni, String name, String key) {
+		super(uni, name, key, P_MACHINE);
+		System.out.println("Name is "+name+", key is "+key);
+		System.out.println("NAME_TAG = "+NAME_TAG+", toString = "+this.toString()+", key# = "+this.getKeyNumber());
 	}
+	
+	/*
+    public String getElementName() {
+        return NAME_TAG + getKey();
+    }*/
 	
 	public IPUniverse getUniverse() {
 		IPElement current = this;
@@ -63,6 +72,18 @@ public class PMachine extends Parent implements IPMachine
         if (element != null)
             return (IPNode)element;
         return null;
+	}
+	public synchronized IPNode findNodeByName(String nname) {
+		Collection col = getCollection();
+		Iterator it = col.iterator();
+		while(it.hasNext()) {
+			Object ob = it.next();
+			if(ob instanceof IPNode) {
+				IPNode node = (IPNode)ob;
+				if(node.getElementName().equals(nname)) return node;
+			}
+		}
+		return null;
 	}
 	
 	/* helper function to get all the processes running on this machine - doing so

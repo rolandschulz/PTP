@@ -30,9 +30,10 @@ import org.eclipse.ptp.core.IPUniverse;
 
 public class PJob extends Parent implements IPJob {
     protected String NAME_TAG = "root ";
+    final public static int BASE_OFFSET = 10000;
     
-	public PJob(IPUniverse uni, String name) {
-		super(uni, name, P_JOB);
+	public PJob(IPUniverse uni, String name, String key) {
+		super(uni, name, key, P_JOB);
 	}
 	
 	/* returns the Machines that this job is running on.  this is accomplished by

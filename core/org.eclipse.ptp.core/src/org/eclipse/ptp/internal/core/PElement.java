@@ -32,14 +32,16 @@ import org.eclipse.search.ui.ISearchPageScoreComputer;
 public abstract class PElement extends PlatformObject implements IPElement, Comparable {
     private IPElement fParent = null;
     private String fName = null;
+    private String fKey = null;
     private int fType;
     private Object data = null;
     
     private PElementInfo elementInfo = null;
 
-	protected PElement(IPElement parent, String name, int type) {
+	protected PElement(IPElement parent, String name, String key, int type) {
 		fParent = parent;
 		fName = name;
+		fKey = key;
 		fType = type;
 	}
     
@@ -50,11 +52,12 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 	}
 	
 	public String getKey() {
-	    return fName;
+	    return fKey;
 	}
 	
     public String getElementName() {
-        return NAME_TAG + getKey();
+        //return NAME_TAG + getKey();
+    		return fName;
     }	
 	
 	public int getKeyNumber() {
