@@ -43,7 +43,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 	/* define how many nodes each machine has - the array length must equal
 	 * numMachines
 	 */
-	final static int[] numNodes = { 256, 256, 64, 512 };
+	final static int[] numNodes = { 256, 256, 256, 512 };
 	protected HashMap nodeMap;
 	protected HashMap nodeUserMap;
 	protected HashMap nodeGroupMap;
@@ -51,7 +51,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 	protected HashMap nodeStateMap;
 	
 	/* define the number of jobs here */
-	final static int numFakeJobs = 3;
+	final static int numFakeJobs = 4;
 	protected HashMap processMap;
 	
 	protected List listeners = new ArrayList(2);
@@ -63,6 +63,8 @@ public class DummyRuntimeModel implements IRuntimeModel {
 	
 	protected String fake_job1_state = null;
 	protected String fake_job2_state = null;
+	protected String fake_job3_state = null;
+	protected HashMap job3ProcessMap = null;
 	
 	protected Thread runningAppEventsThread = null;
 	protected Thread runningAppFinishThread = null;
@@ -100,21 +102,6 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			else if(r < 30) nodeStateMap.put(s, new String("down"));
 			else {
 				nodeStateMap.put(s, new String("up"));
-				/*
-				r = ((int)(Math.random() * 100));
-				if(r < 10) {
-					nodeUserMap.put(s, new String("ndebard"));
-					nodeGroupMap.put(s, new String("ptp"));
-				}
-				else if(r < 20) {
-					nodeUserMap.put(s, new String("gwatson"));
-					nodeGroupMap.put(s, new String("ptp"));
-				}
-				else if(r < 30) {
-					nodeUserMap.put(s, new String("crasmussen"));
-					nodeGroupMap.put(s, new String("ptp"));
-				}
-				*/
 			}
 		}
 		int nstart = ((int)(Math.random() * 50));
@@ -209,13 +196,84 @@ public class DummyRuntimeModel implements IRuntimeModel {
 		runningAppEventsThread = new Thread(runningAppEventsRunnable);
 		runningAppEventsThread.start();
 		
-		for(int i=0; i<numNodes[2]; i++) {
+		/* setup machine[2]'s hardware - a machine w/ a bunch of nodes w/ different state */
+		for(int i=0; i<numNodes[3]; i++) {
 			s = new String("machine2_node"+i);
-			nodeStateMap.put(s, new String("up"));
-			nodeUserMap.put(s, new String(System.getProperty("user.name")));
-			nodeGroupMap.put(s, new String("ptp"));
-			nodeModeMap.put(s, new String("0100"));
+			int r = ((int)(Math.random() * 100));
+			if(r < 3) {
+				nodeStateMap.put(s, new String("error"));
+			}
+			else if(r < 6) nodeStateMap.put(s, new String("down"));
+			else {
+				nodeStateMap.put(s, new String("up"));
+				nodeUserMap.put(s, new String(System.getProperty("user.name")));
+				nodeGroupMap.put(s, new String("ptp"));
+				nodeModeMap.put(s, new String("0100"));
+			}
 		}
+		/* now setup which nodes the job running on machine[2] will run on - use the
+		 * nodes that aren't down!
+		 */
+		/* there will be 128 processes - we'll have a map which maps the process # to
+		 * a node #
+		 */
+		int cur = 0;
+		processMap.put(new String("job3"), new Integer(128));
+		job3ProcessMap = new HashMap();
+		fake_job3_state = IPProcess.RUNNING;
+		for(int i=0; i<128; i++) {
+			while(true) {
+				/* see if node[cur] is up */
+				String sta = (String) nodeStateMap.get(new String("machine2_node"+cur));
+				if(sta.equals("up")) {
+					/* so this is up! */
+					job3ProcessMap.put(new Integer(i), new Integer(cur));
+					cur++;
+					break;
+				}
+				cur++;
+			}
+		}
+		runningAppEventsRunnable = new Runnable() {
+			public void run() {
+				String job = new String("job3");
+				int numProcsInJob = ((Integer)(processMap.get(job))).intValue();
+			
+				while(true) {
+					try {
+						Thread.sleep(1000 + ((int)(Math.random() * 1000)));
+					} catch(Exception e) {	
+					}
+					for(int i=0; i<numProcsInJob; i++) {
+						RuntimeEvent event = new RuntimeEvent(RuntimeEvent.EVENT_PROCESS_OUTPUT);
+						event.setText((int)(Math.random() * 10000)+" random text");
+						fireEvent(new NamedEntity("job3_process"+i), event);
+					}
+					if(((int)(Math.random() * 2) == 0)) {
+						/* randomly pick a node to go down */
+						int pick = ((int)(Math.random() * numNodes[2]));
+						if(pick < 128) pick = ((int)(Math.random() * numNodes[2]));
+						if(pick < 128) pick = ((int)(Math.random() * numNodes[2]));
+						if(pick < 128) pick = ((int)(Math.random() * numNodes[2]));
+						System.out.println("chose node "+pick+" of machine 3 to go down");
+						String s = new String("machine2_node"+pick);
+						nodeStateMap.remove(s);
+						nodeStateMap.put(s, new String("down"));
+						/* ok so now that this node went down - what about any processes running on it? */
+						if(job3ProcessMap.containsValue(new Integer(pick))) {
+							fake_job3_state = IPProcess.ERROR;
+						}
+						fireEvent(new NamedEntity("machine2_node"+pick), 
+							new RuntimeEvent(RuntimeEvent.EVENT_NODE_STATUS_CHANGE));
+						fireEvent(new NamedEntity("job3"), new RuntimeEvent(RuntimeEvent.EVENT_JOB_STATE_CHANGED));
+					}
+				}
+			}
+		};
+		runningAppEventsThread = new Thread(runningAppEventsRunnable);
+		runningAppEventsThread.start();
+		
+		
 		
 		/* fake job 1 running on machine[1] */
 		s = new String("job1");
@@ -223,6 +281,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 		if(ra == 0) processMap.put(s, new Integer(4));
 		else if(ra == 1) processMap.put(s, new Integer(8));
 		else if(ra == 2) processMap.put(s, new Integer(16));
+		else if(ra == 3) processMap.put(s, new Integer(32));
 		else if(ra == 3) processMap.put(s, new Integer(32));
 		else if(ra == 4) processMap.put(s, new Integer(64));
 
@@ -387,7 +446,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			}
 		}*/
 		
-		startDummyEventGeneration();
+		//startDummyEventGeneration();
 	}
 	
 	/* returns the new job name that it started - unique */
@@ -482,6 +541,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 		return new NamedEntity(s);
 	}
 	
+	/*
 	protected void startDummyEventGeneration() {
 		Runnable runnable = new Runnable() {
 			public void run() {
@@ -500,6 +560,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 		};
 		new Thread(runnable).start();
 	}
+	*/
 	
 	public void addRuntimeListener(IRuntimeListener listener) {
 		listeners.add(listener);
@@ -644,6 +705,14 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			else if(job.equals("job2")) {
 				return "machine1_node"+(procNum + 128);
 			}
+			else if(job.equals("job3")) {
+				/* ok so figure out what node this process runs on */
+				Integer foo = (Integer)job3ProcessMap.get(new Integer(procNum));
+				if(foo != null) {
+					int bar = foo.intValue();
+					return "machine2_node"+bar;
+				}
+			}
 		}
 		return "";
 	}
@@ -663,6 +732,9 @@ public class DummyRuntimeModel implements IRuntimeModel {
 		}
 		else if(job.equals("job2")) {
 			return fake_job2_state;
+		}
+		else if(job.equals("job3")) {
+			return fake_job3_state;
 		}
 		return "-1";
 	}

@@ -45,11 +45,8 @@ public class OutputTextFile implements IOutputTextFileContants {
     
     public OutputTextFile(String processNumber, String outputPath, int storeLine) {
         this.filename = "process" + processNumber + ".tmp";
-        System.out.println("filename = "+filename);
         this.outputPath = outputPath;
-        System.out.println("outpath = "+outputPath);
         this.storeLine = storeLine;
-        System.out.println("storelin = "+storeLine);
         init();
     }
     

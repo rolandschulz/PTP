@@ -200,11 +200,11 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
     }
 
 	public void runtimeNodeStatusChange(NamedEntity ne) {
-		System.out.println("LaunchManager.runtimeNodeStatusChange("+ne+")");
 		/* so let's find which node this is */
 		IPNode n = universe.findNodeByName(ne.getName());
 		if(n != null) {
-			System.out.println("FOUND THE NODE! - "+n);
+			n.setAttrib("state", runtimeModel.getNodeAttribute(ne.name, "state"));
+			fireEvent(n, EVENT_SYS_STATUS_CHANGE);
 		}
 	}
 	
@@ -497,9 +497,7 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
                 listener.execStatusChangeEvent(object);
                 break;
             case EVENT_SYS_STATUS_CHANGE:
-            	/*
-                listener.sysStatusChangeEvent(object);session
-                */
+                listener.sysStatusChangeEvent(object);
                 break;
             case EVENT_PROCESS_OUTPUT:
                 listener.processOutputEvent(object);
