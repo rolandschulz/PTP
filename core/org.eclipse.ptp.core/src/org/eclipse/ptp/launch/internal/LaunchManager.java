@@ -38,11 +38,13 @@ import org.eclipse.pdt.mi.output.MISystemDescription;
 import org.eclipse.ptp.ParallelPlugin;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPRoot;
+import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.internal.console.OutputConsole;
 import org.eclipse.ptp.internal.core.PNode;
 import org.eclipse.ptp.internal.core.PProcess;
-import org.eclipse.ptp.internal.core.PRoot;
+import org.eclipse.ptp.internal.core.PMachine;
+import org.eclipse.ptp.internal.core.PJob;
 import org.eclipse.ptp.launch.core.ILaunchManager;
 import org.eclipse.ptp.launch.core.IParallelLaunchListener;
 import org.eclipse.ptp.ui.UIMessage;
@@ -63,7 +65,8 @@ public class LaunchManager implements ILaunchManager {
 
     protected List listeners = new ArrayList(2);
     protected int currentState = STATE_EXIT;
-    protected IPRoot processRoot = null;
+    //protected IPMachine machine = null;
+    protected IPJob processRoot = null;
     protected MISession session = null;
     protected OutputConsole outputConsole = null;
     protected boolean isPerspectiveOpen = false;
@@ -87,8 +90,8 @@ public class LaunchManager implements ILaunchManager {
     }
     
     public void testing() {
-        processRoot = new PRoot();
-
+    	    processRoot = new PJob();
+        
         int pn = 0;
         int nn = 20;
         int ppn = 3;
@@ -295,7 +298,7 @@ public class LaunchManager implements ILaunchManager {
         return session;
     }
 
-    public IPRoot getProcessRoot() {
+    public IPJob getProcessRoot() {
         return processRoot;
     }
 
@@ -480,7 +483,7 @@ public class LaunchManager implements ILaunchManager {
             try {
                 session = miPlugin.createSession();
                 session.addObserver(mpiObserver);
-                processRoot = new PRoot(session);
+                processRoot = new PMachine(session);
 
                 fireState(STATE_START);
                 createConsole();

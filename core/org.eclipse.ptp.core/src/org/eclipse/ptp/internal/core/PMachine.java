@@ -13,12 +13,21 @@ import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.core.IPUniverse;
 
 /**
  * @author Clement
  *
  */
 public class PMachine extends Parent implements IPMachine {
+	public IPUniverse getPUniverse() {
+		IPElement current = this;
+		do {
+			if (current instanceof IPUniverse) return (IPUniverse) current;
+		} while ((current = current.getParent()) != null);
+		return null;
+	}
+	/*
     protected String NAME_TAG = "root ";
     
     private MISession miSession = null;
@@ -138,14 +147,20 @@ public class PMachine extends Parent implements IPMachine {
             processes[i].clearOutput();
         
         removeChildren();
-	}	
+	}
+	*/	
 	
 	/* returns a String representing the architecture in some form */
+	
+	/*
 	public String getArch() {
 		return this.arch;
 	}
 	/* sets the architecture, should be used by instantiating classes and such */
+	
+	/*
 	public void setArch(String arch) {
 		this.arch = arch;
 	}
+	*/
 }

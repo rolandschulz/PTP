@@ -28,4 +28,6 @@ public interface IPNode extends IPElement {
     public String getState();
 
     public void setState(String state);
+    
+    public IPMachine getPMachine();
 }

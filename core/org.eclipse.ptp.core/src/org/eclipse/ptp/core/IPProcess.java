@@ -36,4 +36,6 @@ public interface IPProcess extends IPElement {
     
     public void addProcessListener(IProcessListener listener);
     public void removerProcessListener(); 
+    
+    public IPJob getPJob();
 }

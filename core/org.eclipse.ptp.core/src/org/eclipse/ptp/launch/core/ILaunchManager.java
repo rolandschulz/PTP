@@ -7,7 +7,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.pdt.mi.MISession;
-import org.eclipse.ptp.core.IPRoot;
+import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.core.IPJob;
 
 /**
  * @author Clement
@@ -33,7 +35,9 @@ public interface ILaunchManager {
     
     public void shutdown();
     public MISession getSession();
-    public IPRoot getProcessRoot();
+    public IPMachine getMachine();
+    public IPUniverse getUniverse();
+    public IPJob getProcessRoot();
     
     public void addParallelLaunchListener(IParallelLaunchListener listener);
     public void removeParallelLaunchListener(IParallelLaunchListener listener);

@@ -10,7 +10,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.internal.IInternalPerspectiveListener;
 import org.eclipse.ui.internal.IPerspectiveService;
-import org.eclipse.ui.internal.WorkbenchWindow;
+//import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 

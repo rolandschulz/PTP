@@ -4,7 +4,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPRoot;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.ParallelModeException;
 
 /**
@@ -81,8 +81,8 @@ public class ParallelElementContentProvider implements ITreeContentProvider {
 			return NO_CHILDREN;
 
 		try {
-			if (element instanceof IPRoot)
-				return  getPNodes((IPRoot)element);
+			if (element instanceof IPJob)
+				return  getPNodes((IPJob)element);
 			
 			if  (element instanceof IPNode)
 				return getPProcesses((IPNode)element);
@@ -139,7 +139,7 @@ public class ParallelElementContentProvider implements ITreeContentProvider {
 		return null;
 	}
 	
-	protected Object[] getPNodes(IPRoot root) {
+	protected Object[] getPNodes(IPJob root) {
 	    return root.getSortedChildren();
 	}
 	
