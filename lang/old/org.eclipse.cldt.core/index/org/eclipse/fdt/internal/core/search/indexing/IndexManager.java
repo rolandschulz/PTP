@@ -102,7 +102,7 @@ public class IndexManager extends JobManager implements IIndexConstants {
 	protected List indexChangeListeners = Collections.synchronizedList(new ArrayList());
 	public static final String INDEX_NOTIFICATION_NAME = Util.bind( "indexNotificationJob" ); //$NON-NLS-1$
 	
-	public final static String INDEX_MODEL_ID = FortranCorePlugin.PLUGIN_ID + ".newindexmodel"; //$NON-NLS-1$
+	public final static String INDEX_MODEL_ID = CommonLanguageCore.PLUGIN_ID + ".newindexmodel"; //$NON-NLS-1$
 	public final static String ACTIVATION = "enable"; //$NON-NLS-1$
 	public final static String PROBLEM_ACTIVATION = "problemEnable"; //$NON-NLS-1$
 	public final static QualifiedName activationKey = new QualifiedName(INDEX_MODEL_ID, ACTIVATION);
@@ -168,9 +168,9 @@ public class IndexManager extends JobManager implements IIndexConstants {
 		if (project != null)
 			indexEnabled = isIndexEnabled(project);
 		else
-			org.eclipse.fdt.internal.core.model.Util.log(null, "IndexManager addSource: File has no project associated : " + resource.getName(), ICLogConstants.FDT); //$NON-NLS-1$ 
+			org.eclipse.fdt.internal.core.model.Util.log(null, "IndexManager addSource: File has no project associated : " + resource.getName(), ICLogConstants.CDT); //$NON-NLS-1$ 
 			
-		if (FortranCorePlugin.getDefault() == null) return;	
+		if (CommonLanguageCore.getDefault() == null) return;	
 		
 		if (indexEnabled){
 			AddCompilationUnitToIndex job = new AddCompilationUnitToIndex(resource, indexedContainers, this, checkEncounteredHeaders);
@@ -191,7 +191,7 @@ public class IndexManager extends JobManager implements IIndexConstants {
 	}
 	
 	public void updateDependencies(IResource resource){
-		if (FortranCorePlugin.getDefault() == null || !isIndexEnabled( resource.getProject() ) )
+		if (CommonLanguageCore.getDefault() == null || !isIndexEnabled( resource.getProject() ) )
 			return;	
 	
 		UpdateDependency job = new UpdateDependency(resource);
@@ -358,7 +358,7 @@ public class IndexManager extends JobManager implements IIndexConstants {
 	 * Note: the actual operation is performed in background 
 	 */
 	public void indexAll(IProject project) {
-		if (FortranCorePlugin.getDefault() == null) return;
+		if (CommonLanguageCore.getDefault() == null) return;
 	 
 		//check to see if indexing isEnabled for this project
 		boolean indexEnabled = isIndexEnabled(project);
@@ -918,7 +918,7 @@ public class IndexManager extends JobManager implements IIndexConstants {
 					protected IStatus run(IProgressMonitor monitor)	{	
 						Platform.run(new ISafeRunnable() {
 							public void handleException(Throwable exception) {
-								FortranCorePlugin.log(exception);
+								CommonLanguageCore.log(exception);
 							}
 							public void run() throws Exception {
 								listener.indexChanged(indexEvent);
