@@ -30,6 +30,7 @@ import org.eclipse.ptp.core.IOutputTextFileContants;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
 
 public class PUniverse extends Parent implements IPUniverse 
@@ -174,6 +175,19 @@ public class PUniverse extends Parent implements IPUniverse
 			if(ob instanceof IPJob) {
 				IPJob job = (IPJob)ob;
 				if(job.getElementName().equals(jname)) return job;
+			}
+		}
+		return null;
+	}
+	
+	public synchronized IPProcess findProcessByName(String pname) {
+		Collection col = getCollection();
+		Iterator it = col.iterator();
+		while(it.hasNext()) {
+			Object ob = it.next();
+			if(ob instanceof IPJob) {
+				IPProcess proc = ((IPJob)ob).findProcessByName(pname);
+				if(proc != null) return proc;
 			}
 		}
 		return null;

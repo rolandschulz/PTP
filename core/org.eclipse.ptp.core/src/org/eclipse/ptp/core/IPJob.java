@@ -27,6 +27,7 @@ public interface IPJob extends IPElement {
     public IPNode[] getSortedNodes();
 
     public IPProcess findProcess(String processNumber);
+    public IPProcess findProcessByName(String pname);
 	
 	public IPProcess[] getSortedProcesses();
 	public IPProcess[] getProcesses();

@@ -22,6 +22,10 @@ package org.eclipse.ptp.ui.views;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
@@ -30,8 +34,10 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.core.IPElement;
+import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.internal.core.PNode;
 import org.eclipse.ptp.internal.core.PProcess;
 import org.eclipse.ptp.launch.core.ILaunchManager;
@@ -88,6 +94,10 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     private ShowMyUsedNodesAction showMyUsedNodesAction = null;
     private ShowLegendAction showLegendAction = null;
     private ShowProcessesAction showProcessesAction = null;
+    
+    protected IPElement[] displayElements = null;
+    protected IPUniverse universe = null;
+    protected int machine_number = -1;
     
     /* images */
     public static Image[][] statusImages = {
@@ -207,7 +217,9 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
    	int num_nodes = 0;
    	
    	/* variables used to keep status of the nodes and the session */
+   	/* PORT
     private IPNode launchedNodes[];
+    */
     private IPProcess[] processList;
     
     /* a silly flag used to force a refresh after the MPI application
@@ -220,7 +232,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
      */
 	final int x_offset = 10;
 	final int x_spacing = 4;
-	final int y_offset = 10;
+	final int y_offset = 20;
    	final int y_spacing = 4;
    	final int node_width = 16;
    	final int node_height = 16;
@@ -318,7 +330,9 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     
     private void filterNodes(boolean user_changed_filter)
     {
-    	/*
+    	grabSystemStatus();
+
+    	/* PORT
     	if(session == null) return;
     	
     	// refresh the sysDescNodes array
@@ -381,6 +395,16 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
         } catch (MIException e) {
         }
         */
+    	universe = launchManager.getUniverse();
+    	
+    	IPMachine[] macs = universe.getSortedMachines();
+    	
+    	/*
+    	machine_number = 0;
+    	*/
+    	displayElements = macs[machine_number].getSortedNodes();
+    	System.out.println("DisplayElements size = "+displayElements.length);
+    	num_nodes = displayElements.length;
     }
 
     private void getInitialStatus()
@@ -418,6 +442,8 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     
     public void abort() {
         System.out.println("ParallelNodeStatusView - abort");
+        updateSystemStatus();
+        refreshAllProcsStatus();
         updateButton();
         /*
         updateSystemStatus();
@@ -446,22 +472,44 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
      * to a particular node number
      */
     private IPNode systemNodeToIPNode(String nodeNumber) {
+    	if(displayElements == null) return null;
+    	
+    	for(int i=0; i<displayElements.length; i++) {
+    		if(!(displayElements[i] instanceof IPNode)) {
+    			System.out.println("**** ERROR ERROR - called systemNodeToIPNode and iterated through an element that wasn't an IPNode!");
+    		}
+    		else {
+    			if(((IPNode)displayElements[i]).getNodeNumber().equals(nodeNumber)) 
+    				return (IPNode)displayElements[i];
+    		}
+    	}
+    	
+    	return null;
+    	
+    	/* PORT
+   
     	if(launchedNodes == null) return null;
     	for(int i=0; i<launchedNodes.length; i++) {
     		if(launchedNodes[i].getNodeNumber().equals(nodeNumber)) return launchedNodes[i];
     	}
     	return null;
+    	*/
     }
     
     private int IPNodeToSystemIndex(IPNode node) {
-    	if(node == null) return -1;
+    	if(node == null || displayElements == null) return -1;
     	
+    	for(int i=0; i<displayElements.length; i++) {
+    		if(displayElements[i] == node) return i;
+    	}
     	
+    	/* PORT 
     	for(int i=0; i<sysDescNodes.length; i++) {
     		if(sysDescNodes[i].getNode().equals(node.getNodeNumber())) return i;
     	}
-    	
+    	*/
     	return -1;
+
     }
     
     public void refreshAllProcsStatus() {
@@ -491,6 +539,8 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     {
     	System.out.println("*** fillUpProcessArray");
     	/* run through and count all processes */
+    	
+    	/* PORT
     	int num_procs = 0;
     	for(int i=0; i<launchedNodes.length; i++) {
     		if(launchedNodes[i].hasChildren())
@@ -507,6 +557,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     			}
     		}
     	}
+    	*/
     }
     
     public IPProcess[] getSortedProcessList(IPNode node) 
@@ -519,7 +570,29 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     	return tmp;
     }
 
-	protected void createControl(Composite parent) {        
+	protected void createControl(Composite parent) 
+	{    
+    	universe = launchManager.getUniverse();
+    	
+    	IPMachine[] macs = universe.getSortedMachines();
+    	
+    	machine_number = 0;
+    	
+		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+		for(int i=0; i<macs.length; i++) {
+			final int mnum = i;
+			menuMgr.add(new Action("Machine "+(mnum+1), IAction.AS_RADIO_BUTTON) {
+				public void run() {
+					System.out.println("MACHINE "+(mnum+1)+" now being displayed.");
+					machine_number = mnum;
+					grabSystemStatus();
+					updateButton();
+			        refreshAllProcsStatus();
+			        refresh(false, null);
+				}
+			});
+		}
+		
 	    /*
 	    this.getViewSite().getShell().addFocusListener(new FocusAdapter() {
 	    	public void focusLost(FocusEvent e) {
@@ -622,16 +695,16 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
 				public void widgetSelected(SelectionEvent e) { }
 				/* double click - throw up an editor to look at the process */
 				public void widgetDefaultSelected(SelectionEvent e) {
-					System.out.println("double click: "+e);
 					int idx = BRtable.getSelectionIndex();
-					System.out.println("\tindex = "+idx);
 					
 					if(mode == NODES) {
-						IPNode somenode = systemNodeToIPNode(sysDescNodes[selected_node_num].getNode());
+						IPNode somenode = (IPNode)displayElements[selected_node_num];
+						/* PORT
+							IPNode somenode = systemNodeToIPNode(sysDescNodes[selected_node_num].getNode());
+							*/
 				    
 						if(somenode != null) {
 							IPProcess procs[] = getSortedProcessList(somenode);
-						
 							if(idx >= 0 && idx < procs.length)
 								launchProcessViewer(procs[idx]);
 				    	}
@@ -883,7 +956,10 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     		
     		int which = 0;
     		
+    		/* PORT 
     		IPNode somenode = systemNodeToIPNode(sysDescNodes[procNode].getNode());
+    		*/
+    		IPNode somenode = (IPNode)displayElements[procNode];
     		IPProcess procs[] = getSortedProcessList(somenode);
     		
     		for(int i=0; i<procs.length; i++) {
@@ -902,6 +978,8 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     
     public int findNodeFromProcess(int process)
     {
+    	System.out.println("findNodeFromProcess("+process+")");
+    	/* PORT
     	if(sysDescNodes == null) return -1;
     	for(int i=0; i<sysDescNodes.length; i++) {
     		IPNode somenode = systemNodeToIPNode(sysDescNodes[i].getNode());
@@ -911,16 +989,31 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     				String procString = procs[j].getProcessNumber();
     				try {
     					Integer procInt = new Integer(procString);
-    					/* if we find it, return the NODE this process is on */
+    					// if we find it, return the NODE this process is on
     					if(procInt.intValue() == process) return i;
     				} catch(NumberFormatException e) { }
     			}
     		}
     	}
+    	*/
     	return -1;
     }
     
     public int findNodeIndexNumber(int node_num) {
+    	if(displayElements == null) return -1;
+    	for(int i=0; i<displayElements.length; i++) {
+    		if(!(displayElements[i] instanceof IPNode)) {
+    			System.out.println("**** ERROR ERROR - findNodeIndexNumber("+node_num+") and one element wasn't a node");
+    		}
+    		else {
+    			try {
+    				Integer nodeInt = new Integer(((IPNode)displayElements[i]).getNodeNumber());
+    				if(nodeInt.intValue() == node_num) return i;
+    			}
+    			catch(NumberFormatException e) { }
+    		}
+    	}
+    	/* PORT
     	if(sysDescNodes == null) return -1;
     	for(int i=0; i<sysDescNodes.length; i++) {
     		String nodeString = sysDescNodes[i].getNode();
@@ -929,11 +1022,13 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     			if(nodeInt.intValue() == node_num) return i;
     		} catch(NumberFormatException e) { }
     	}
+    	*/
     	return -1;
     }
 
     public void paintCanvas(GC gc)
     {
+    	gc.drawText("Machine "+(machine_number+1), 2, 2);
     	if(mode == NODES) {
     		for(int i=0; i<num_nodes; i++) {
     			drawElement(i, gc);
@@ -983,7 +1078,10 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     {
     	if(mode == NODES) {
         	/* first check if I have any processes on these nodes */
+    		IPNode somenode = (IPNode)displayElements[index];
+    		/*
         	IPNode somenode = systemNodeToIPNode(sysDescNodes[index].getNode());
+        	*/
         	if(somenode != null && somenode.hasChildren()) {
         		/* so I have jobs on these nodes - are they running? */
         		IPProcess procs[] = somenode.getProcesses();
@@ -1010,20 +1108,35 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
         	}
 
        	  	/* node up */
+        	else if(somenode != null && somenode.getAttrib("state").equals("up")) {
+        	/* PORT
        	  	else if(sysDescNodes[index].getBprocState().equals("up")) {
+       	  	*/
             	/* what if I have the node allocated to me? */
+        		if(somenode.getAttrib("user").equals(System.getProperty("user.name"))) {
+        		/* PORT
        	  		if(sysDescNodes[index].getBprocUser().equals(System.getProperty("user.name"))) {
+       	  		*/
        	  			/* check the mode */
+        			String mode = (String)somenode.getAttrib("mode");
+        			/* PORT
        	  			String mode = sysDescNodes[index].getBprocMode();
+       	  			*/
        	  			if(mode.equals("0100")) 
        	  				return NODE_USER_ALLOC_EXCL;
        	  			else if(mode.equals("0110") || mode.equals("0111") || mode.equals("0101"))
        	  				return NODE_USER_ALLOC_SHARED;
        	  		}
        	  		/* someone else owns it */
+        		else if(somenode.getAttrib("user").equals("root")) {
+        		/* PORT
        	  		else if(!sysDescNodes[index].getBprocUser().equals("root")) {
+       	  		*/
        	  		/* check the mode */
+        			String mode = (String)somenode.getAttrib("mode");
+        			/* PORT
        	  			String mode = sysDescNodes[index].getBprocMode();
+       	  			*/
        	  			if(mode.equals("0100")) 
        	  				return NODE_OTHER_ALLOC_EXCL;
        	  			else if(mode.equals("0110") || mode.equals("0111") || mode.equals("0101"))
@@ -1033,10 +1146,16 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
        	  		return NODE_UP;
        	  	}
        	  	/* node down */
+        	else if(somenode != null && somenode.getAttrib("state").equals("down")) {
+        	/* PORT
        	  	else if(sysDescNodes[index].getBprocState().equals("down")) {
+       	  	*/
        	  		return NODE_DOWN;
        	  	}
+        	else if(somenode != null && somenode.getAttrib("state").equals("error")) {
+        	/* PORT 
        	  	else if(sysDescNodes[index].getBprocState().equals("error")) {
+       	  	*/
        	  		return NODE_ERROR;
        	  	}
     	}
@@ -1164,7 +1283,10 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
 				selected_node_num = node_num;
 				if(old_node_num != selected_node_num && old_node_num >= 0) {
 					if(mode == NODES) {
+						refresh(false, displayElements[old_node_num]);
+						/* PORT
 						refresh(false, systemNodeToIPNode(sysDescNodes[old_node_num].getNode()));
+						*/
 					}
 					else {
 						refresh(false, processList[old_node_num]);
@@ -1181,14 +1303,20 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
 				updateLowerTextRegions();
 				if(old_node_num != selected_node_num && old_node_num >= 0) {
 					if(mode == NODES) {
+						refresh(false, displayElements[old_node_num]);
+						/* PORT
 						refresh(false, systemNodeToIPNode(sysDescNodes[old_node_num].getNode()));
+						*/
 					}
 					else {
 						refresh(false, processList[old_node_num]);
 					}
 				}
 				if(mode == NODES) {
+					ret = displayElements[selected_node_num];
+					/* PORT
 					ret = systemNodeToIPNode(sysDescNodes[selected_node_num].getNode());
+					*/
 				}
 				else
 					ret = processList[selected_node_num];
@@ -1211,7 +1339,10 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
 				tipy += selection;
 				
 				if(mode == NODES)
+					showToolTip(tipx, tipy, ((IPNode)displayElements[node_num]).getNodeNumber());
+					/* PORT
 					showToolTip(tipx, tipy, sysDescNodes[node_num].getNode());
+					*/
 				else
 					showToolTip(tipx, tipy, new String(""+node_num+""));
 				last_tooltip_node = node_num;
@@ -1323,12 +1454,16 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
 		TableItem item;
 		
 		if(selected_node_num < 0) return;
+		/* PORT
 		if(mode == NODES && selected_node_num >= sysDescNodes.length) return;
+		*/
+		if(mode == NODES && selected_node_num >= displayElements.length) return;
 		if(mode == PROCESSES && (processList == null || selected_node_num >= processList.length)) return;
 
 		if(mode == NODES) {
 			item = new TableItem(BLtable, 0);
 
+			/* PORT
 			item.setText(1, sysDescNodes[selected_node_num].getNode());
 			item.setText(new String[]{"Node #",sysDescNodes[selected_node_num].getNode()});
 			item = new TableItem(BLtable, 0);
@@ -1341,6 +1476,20 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
 			item.setText(new String[]{"Mode",sysDescNodes[selected_node_num].getBprocMode()});
    
 			IPNode somenode = systemNodeToIPNode(sysDescNodes[selected_node_num].getNode());
+			*/
+			item.setText(1, ((IPNode)displayElements[selected_node_num]).getNodeNumber());
+			item.setText(new String[]{"Node #",((IPNode)displayElements[selected_node_num]).getNodeNumber()});
+			item = new TableItem(BLtable, 0);
+			item.setText(new String[]{"State",(String) ((IPNode)displayElements[selected_node_num]).getAttrib("state")});
+			item = new TableItem(BLtable, 0);
+			item.setText(new String[]{"User",(String) ((IPNode)displayElements[selected_node_num]).getAttrib("user")});
+			item = new TableItem(BLtable, 0);
+			item.setText(new String[]{"Group",(String) ((IPNode)displayElements[selected_node_num]).getAttrib("group")});
+			item = new TableItem(BLtable, 0);
+			item.setText(new String[]{"Mode",(String) ((IPNode)displayElements[selected_node_num]).getAttrib("mode")});
+   
+			IPNode somenode = (IPNode)displayElements[selected_node_num];
+			
 			if(somenode != null && somenode.hasChildren()) {
 				IPProcess procs[] = getSortedProcessList(somenode);
 				for(int i=0; i<procs.length; i++) {
@@ -1382,9 +1531,15 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
 			}
 			if(procnumint != null) {
 				int node_idx = findNodeFromProcess(procnumint.intValue());
+				/* PORT
 				if(node_idx >= 0 && node_idx < sysDescNodes.length) {
 					item = new TableItem(BLtable, 0);
 					item.setText(new String[]{"On node",sysDescNodes[node_idx].getNode()});
+				}
+				*/
+				if(node_idx >= 0 && node_idx < displayElements.length) {
+					item = new TableItem(BLtable, 0);
+					item.setText(new String[]{"On node",((IPNode)displayElements[node_idx]).getNodeNumber()});
 				}
 			}
 			
@@ -1474,7 +1629,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
      */
     public void selectReveal(IPElement element) {
     	Control ctrl = sc.getContent();
-		if (ctrl == null || ctrl.isDisposed() || sysDescNodes == null)
+		if (ctrl == null || ctrl.isDisposed() || displayElements == null)
 			return;
 		filterSelection = ALL_NODES;
 		if (element instanceof IPNode) {
@@ -1518,7 +1673,10 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
 		
 		IPElement element = null;
 		if (mode == NODES)
+			/* PORT
 		    element = systemNodeToIPNode(sysDescNodes[selected_node_num].getNode());
+		    */
+			element = displayElements[selected_node_num];
 		else
 		    element = processList[selected_node_num];
 		System.out.println("getSelection() - element = "+element);

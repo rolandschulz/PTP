@@ -19,6 +19,8 @@
 package org.eclipse.ptp.internal.core;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.ptp.core.IPElement;
@@ -87,6 +89,18 @@ public class PJob extends Parent implements IPJob {
 		IPElement element = findChild(processNumber);
 		if(element != null)
 			return (IPProcess)element;
+		return null;
+	}
+	public synchronized IPProcess findProcessByName(String pname) {
+		Collection col = getCollection();
+		Iterator it = col.iterator();
+		while(it.hasNext()) {
+			Object ob = it.next();
+			if(ob instanceof IPProcess) {
+				IPProcess proc = (IPProcess)ob;
+				if(proc.getElementName().equals(pname)) return proc;
+			}
+		}
 		return null;
 	}
 	
