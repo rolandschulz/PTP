@@ -110,7 +110,7 @@ public class FortranCorePlugin extends Plugin {
     public static final String CORE_ENCODING = PLUGIN_ID + ".encoding"; //$NON-NLS-1$
 	public FDTLogWriter fdtLog = null;
 
-	private static FortranCorePlugin fgCPlugin;
+	private static FortranCorePlugin fgFortranPlugin;
 	private static ResourceBundle fgResourceBundle;
 
 	private CDescriptorManager fDescriptorManager = new CDescriptorManager();
@@ -177,7 +177,7 @@ public class FortranCorePlugin extends Plugin {
 	}
 
 	public static FortranCorePlugin getDefault() {
-		return fgCPlugin;
+		return fgFortranPlugin;
 	}
 
 	public static void log(Throwable e) {
@@ -196,7 +196,7 @@ public class FortranCorePlugin extends Plugin {
 
 	public FortranCorePlugin() {
 		super();
-		fgCPlugin = this;
+		fgFortranPlugin = this;
 	}
 
 	/**
@@ -634,7 +634,7 @@ public class FortranCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Creates a C project resource given the project handle and description.
+	 * Creates a Fortran project resource given the project handle and description.
 	 *
 	 * @param description the project description to create a project resource for
 	 * @param projectHandle the project handle to create a project resource for
@@ -657,7 +657,7 @@ public class FortranCorePlugin extends Plugin {
 					if (monitor == null) {
 						monitor = new NullProgressMonitor();
 					}
-					monitor.beginTask("Creating C Project...", 3); //$NON-NLS-1$
+					monitor.beginTask("Creating Fortran Project...", 3); //$NON-NLS-1$
 					if (!projectHandle.exists()) {
 						projectHandle.create(description, new SubProgressMonitor(monitor, 1));
 					}
@@ -671,72 +671,14 @@ public class FortranCorePlugin extends Plugin {
 
 					mapCProjectOwner(projectHandle, projectID, false);
 
-					// Add C Nature ... does not add duplicates
-					FortranProjectNature.addCNature(projectHandle, new SubProgressMonitor(monitor, 1));
+					// Add Fortran Nature ... does not add duplicates
+					FortranProjectNature.addFortranNature(projectHandle, new SubProgressMonitor(monitor, 1));
 				} finally {
 					monitor.done();
 				}
 			}
 		}, getWorkspace().getRoot(), 0, monitor);
 		return projectHandle;
-	}
-
-	/**
-	 * Method convertProjectFromCtoCC converts
-	 * a C Project to a C++ Project
-	 * The newProject MUST, not be null, already have a C Nature 
-	 * && must NOT already have a C++ Nature
-	 * 
-	 * @param projectHandle
-	 * @param monitor
-	 * @throws CoreException
-	 */
-
-	public void convertProjectFromCtoCC(IProject projectHandle, IProgressMonitor monitor) throws CoreException {
-	}
-
-	/**
-	 * Method to convert a project to a C nature 
-	 * All checks should have been done externally
-	 * (as in the Conversion Wizards). 
-	 * This method blindly does the conversion.
-	 * 
-	 * @param project
-	 * @param String targetNature
-	 * @param monitor
-	 * @param projectID
-	 * @exception CoreException
-	 */
-
-	public void convertProjectToC(IProject projectHandle, IProgressMonitor monitor, String projectID)
-		throws CoreException {
-		if ((projectHandle == null) || (monitor == null) || (projectID == null)) {
-			return;
-		}
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IProjectDescription description = workspace.newProjectDescription(projectHandle.getName());
-		description.setLocation(projectHandle.getFullPath());
-		createCProject(description, projectHandle, monitor, projectID);
-	}
-
-	/**
-	 * Method to convert a project to a C++ nature 
-	 * 
-	 * @param project
-	 * @param String targetNature
-	 * @param monitor
-	 * @param projectID
-	 * @exception CoreException
-	 */
-
-	public void convertProjectToCC(IProject projectHandle, IProgressMonitor monitor, String projectID)
-		throws CoreException {
-		if ((projectHandle == null) || (monitor == null) || (projectID == null)) {
-			return;
-		}
-		createCProject(projectHandle.getDescription(), projectHandle, monitor, projectID);
-		// now add C++ nature
-		convertProjectFromCtoCC(projectHandle, monitor);
 	}
 
 	/**

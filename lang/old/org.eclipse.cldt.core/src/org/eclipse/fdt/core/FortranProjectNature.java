@@ -27,11 +27,11 @@ public class FortranProjectNature implements IProjectNature {
 		setProject(project);
 	}
 
-	public static void addCNature(IProject project, IProgressMonitor mon) throws CoreException {
+	public static void addFortranNature(IProject project, IProgressMonitor mon) throws CoreException {
 		addNature(project, FORTRAN_NATURE_ID, mon);
 	}
 
-	public static void removeCNature(IProject project, IProgressMonitor mon) throws CoreException {
+	public static void removeFortranNature(IProject project, IProgressMonitor mon) throws CoreException {
 		removeNature(project, FORTRAN_NATURE_ID, mon);
 	}
 
