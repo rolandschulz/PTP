@@ -73,20 +73,17 @@ public class PUniverse extends Parent implements IPUniverse
 	 * entire collection pulling out the right class and return an array of them
 	 */
 	public synchronized IPMachine[] getMachines() {
-		System.out.println("Universe.getMachines()");
 		Collection col = getCollection();
 		Iterator it = col.iterator();
 		Vector m = new Vector();
 		
 		while(it.hasNext()) {
 			Object ob = it.next();
-		
-			System.out.println("\tchild is: "+ob);
+
 			if(ob instanceof IPMachine)
 				m.add((IPMachine)ob);
 		}
 		
-		System.out.println("Final vector: "+m);
 		/* this wouldnt work, oddly enough so have to do a brute force approach */
 		//return (IPMachine[])(m.toArray());		
 		
@@ -103,10 +100,7 @@ public class PUniverse extends Parent implements IPUniverse
 	public synchronized IPMachine[] getSortedMachines() {
 	    IPMachine[] macs = getMachines();
 	    sort(macs);
-	    for(int i=0; i<macs.length; i++) {
-	    		System.out.println("SORTED MAC: "+macs[i]);
-	    		System.out.println("\tKeyNumber = "+macs[i].getKeyNumber());
-	    }
+
 	    return macs;
 	}
 	

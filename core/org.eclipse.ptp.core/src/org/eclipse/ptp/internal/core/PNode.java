@@ -73,7 +73,6 @@ public class PNode extends Parent implements IPNode {
     }*/
     
     public void setAttrib(String key, Object val) {
-    		System.out.println("NODE: "+this+" setAttrib("+key+", "+val+")");
     		if(attribs.containsKey(key))
     			attribs.remove(key);
     		attribs.put(key, val);

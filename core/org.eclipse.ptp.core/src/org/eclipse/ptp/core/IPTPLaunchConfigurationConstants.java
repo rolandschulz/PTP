@@ -33,7 +33,7 @@ public interface IPTPLaunchConfigurationConstants {
     public static final String ATTR_STOP_IN_MAIN = PTP_LAUNCH_ID + ".STOP_IN_MAIN";
 
     public static final String NUMBER_OF_PROCESSES = PTP_LAUNCH_ID + ".NUMBER_OF_PROCESSES";
-    public static final String NETWORK_TYPE = PTP_LAUNCH_ID + ".COMMUNICATION";
+    //public static final String NETWORK_TYPE = PTP_LAUNCH_ID + ".COMMUNICATION";
     public static final String PROCESSES_PER_NODE = PTP_LAUNCH_ID + ".NUMBER_OF_PROCESSES_START";
     public static final String FIRST_NODE_NUMBER = PTP_LAUNCH_ID + ".NODE_NUMBER";
 

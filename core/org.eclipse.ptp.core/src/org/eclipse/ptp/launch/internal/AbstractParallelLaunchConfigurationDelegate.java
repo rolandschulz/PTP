@@ -99,7 +99,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		
 		arguments.add(NUM_PROC);		
 		arguments.add(temp);
-		arguments.add(HYPHEN + getCommunication(configuration));
+		//arguments.add(HYPHEN + getCommunication(configuration));
 		temp = getNumberOfProcessStart(configuration);
 		if (temp != null  && !temp.equals("0")) {
 			arguments.add(PROC_PER_NODE);		
@@ -168,9 +168,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	protected static String getNumberOfProcess(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES, (String)null);
 	}
+	/*
 	protected static String getCommunication(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, (String)null);
 	}
+	*/
 	protected static String getNumberOfProcessStart(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE, (String)null);
 	}

@@ -96,7 +96,7 @@ public class PTPLaunchShortcut implements ILaunchShortcut {
 		    wc.setAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, projectName);
 		    wc.setAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, file.getName());
 	        wc.setAttribute(IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES, IPTPLaunchConfigurationConstants.DEF_NUMBER_OF_PROCESSES);
-	        wc.setAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, IPTPLaunchConfigurationConstants.DEF_NETWORK_TYPE);
+	        //wc.setAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, IPTPLaunchConfigurationConstants.DEF_NETWORK_TYPE);
 	        wc.setAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE, IPTPLaunchConfigurationConstants.DEF_PROCESSES_PER_NODE);
 	        wc.setAttribute(IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER, IPTPLaunchConfigurationConstants.DEF_FIRST_NODE_NUMBER);
 
