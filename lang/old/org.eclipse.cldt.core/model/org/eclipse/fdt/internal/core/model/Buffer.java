@@ -228,7 +228,7 @@ public class Buffer implements IBuffer {
 				final IBufferChangedListener listener = (IBufferChangedListener) this.changeListeners.get(i);
 				Platform.run(new ISafeRunnable() {
 					public void handleException(Throwable exception) {
-						Util.log(exception, "Exception occurred in listener of buffer change notification", ICLogConstants.FDT); //$NON-NLS-1$
+						Util.log(exception, "Exception occurred in listener of buffer change notification", ICLogConstants.CDT); //$NON-NLS-1$
 					}
 					public void run() throws Exception {
 						listener.bufferChanged(event);

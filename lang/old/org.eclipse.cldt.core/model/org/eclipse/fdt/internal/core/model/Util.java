@@ -14,6 +14,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICLogConstants;
 import org.eclipse.fdt.core.model.CModelException;
@@ -170,20 +171,20 @@ public class Util implements ICLogConstants {
 	 * Add a log entry
 	 */
 	public static void log(Throwable e, String message, LogConst logType) {
-		IStatus status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, IStatus.ERROR, message,e);
+		IStatus status = new Status(IStatus.ERROR, CommonLanguageCore.PLUGIN_ID, IStatus.ERROR, message,e);
 		Util.log(status, logType);
 	}
 
 	public static void log(IStatus status, LogConst logType) {
 		if (logType.equals(ICLogConstants.PDE)) {
-			FortranCorePlugin.getDefault().getLog().log(status);
-		} else if (logType.equals(ICLogConstants.FDT)) {
-			FortranCorePlugin.getDefault().fdtLog.log(status);
+			CommonLanguageCore.getDefault().getLog().log(status);
+		} else if (logType.equals(ICLogConstants.CDT)) {
+			FortranCorePlugin.getDefault().cdtLog.log(status);
 		}
 	}
 
 	public static void log(String message, LogConst logType) {
-		IStatus status = new Status(IStatus.INFO, FortranCorePlugin.PLUGIN_ID, IStatus.INFO, message,	null);
+		IStatus status = new Status(IStatus.INFO, CommonLanguageCore.PLUGIN_ID, IStatus.INFO, message,	null);
 		Util.log(status, logType);
 	}
 
@@ -193,7 +194,7 @@ public class Util implements ICLogConstants {
 
 	public static void debugLog(String message, DebugLogConstant client,
 			boolean addTimeStamp) {
-		if (FortranCorePlugin.getDefault() == null)
+		if (CommonLanguageCore.getDefault() == null)
 			return;
 		if (FortranCorePlugin.getDefault().isDebugging() && isActive(client)) {
 			// Time stamp

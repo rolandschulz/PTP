@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.CDescriptorEvent;
 import org.eclipse.fdt.core.FortranProjectNature;
@@ -863,8 +864,8 @@ public class CModelManager implements IResourceChangeListener, ICDescriptorListe
 				Platform.run(new ISafeRunnable() {
 
 					public void handleException(Throwable exception) {
-						//FortranCorePlugin.log(exception, "Exception occurred in listener of C element change notification"); //$NON-NLS-1$
-						FortranCorePlugin.log(exception);
+						//CommonLanguageCore.log(exception, "Exception occurred in listener of C element change notification"); //$NON-NLS-1$
+						CommonLanguageCore.log(exception);
 					}
 					public void run() throws Exception {
 						listener.elementChanged(extraEvent);

@@ -81,7 +81,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 
 	// PathEntry extension
 	public final static String PATHENTRY_STORE_ID = "PathEntryStore"; //$NON-NLS-1$
-	public final static String PATHENTRY_STORE_UNIQ_ID = FortranCorePlugin.PLUGIN_ID + "." + PATHENTRY_STORE_ID; //$NON-NLS-1$
+	public final static String PATHENTRY_STORE_UNIQ_ID = CommonLanguageCore.PLUGIN_ID + "." + PATHENTRY_STORE_ID; //$NON-NLS-1$
 
 	static String CONTAINER_INITIALIZER_EXTPOINT_ID = "PathEntryContainerInitializer"; //$NON-NLS-1$
 	/**
@@ -862,9 +862,9 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 					Platform.run(new ISafeRunnable() {
 
 						public void handleException(Throwable exception) {
-							IStatus status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, IStatus.ERROR,
+							IStatus status = new Status(IStatus.ERROR, CommonLanguageCore.PLUGIN_ID, IStatus.ERROR,
 									"Exception occurred in container initializer: " + initializer, exception); //$NON-NLS-1$
-							FortranCorePlugin.log(status);
+							CommonLanguageCore.log(status);
 						}
 
 						public void run() throws Exception {
@@ -900,11 +900,11 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 	 *         initializer or <code>null</code> if none was found.
 	 */
 	public PathEntryContainerInitializer getPathEntryContainerInitializer(String containerID) {
-		Plugin core = FortranCorePlugin.getDefault();
+		Plugin core = CommonLanguageCore.getDefault();
 		if (core == null) {
 			return null;
 		}
-		IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID,
+		IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(CommonLanguageCore.PLUGIN_ID,
 				CONTAINER_INITIALIZER_EXTPOINT_ID);
 		if (extension != null) {
 			IExtension[] extensions = extension.getExtensions();
@@ -1327,12 +1327,12 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 	}
 
 	static String[] getRegisteredContainerIDs() {
-		Plugin core = FortranCorePlugin.getDefault();
+		Plugin core = CommonLanguageCore.getDefault();
 		if (core == null) {
 			return null;
 		}
 		ArrayList containerIDList = new ArrayList(5);
-		IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID,
+		IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(CommonLanguageCore.PLUGIN_ID,
 				CONTAINER_INITIALIZER_EXTPOINT_ID);
 		if (extension != null) {
 			IExtension[] extensions = extension.getExtensions();
@@ -1389,7 +1389,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 								break;
 							} catch (ClassCastException e) {
 								//
-								FortranCorePlugin.log(e);
+								CommonLanguageCore.log(e);
 							}
 						}
 					}
@@ -1437,7 +1437,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 					manager.fire(ElementChangedEvent.POST_CHANGE);
 				}
 			} catch (CModelException e) {
-				FortranCorePlugin.log(e);
+				CommonLanguageCore.log(e);
 			}
 		} else {
 			resolvedMap.remove(cproject);
