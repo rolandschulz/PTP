@@ -204,7 +204,7 @@ public class DiscoveredPathManager implements IDiscoveredPathManager, IResourceC
 					public void handleException(Throwable exception) {
 						IStatus status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1,
 								CommonLanguageCore.getResourceString("CDescriptorManager.exception.listenerError"), exception); //$NON-NLS-1$
-						FortranCorePlugin.log(status);
+						CommonLanguageCore.log(status);
 					}
 		
 					public void run() throws Exception {

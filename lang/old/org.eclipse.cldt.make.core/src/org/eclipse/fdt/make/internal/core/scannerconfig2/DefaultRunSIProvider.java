@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.CommandLauncher;
 import org.eclipse.fdt.core.IMarkerGenerator;
@@ -141,7 +142,7 @@ public class DefaultRunSIProvider implements IExternalScannerInfoProvider {
             cos.close();
         }
         catch (Exception e) {
-            FortranCorePlugin.log(e);
+            CommonLanguageCore.log(e);
         }
         finally {
             monitor.done();
