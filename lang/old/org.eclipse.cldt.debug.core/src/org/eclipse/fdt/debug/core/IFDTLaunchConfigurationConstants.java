@@ -189,7 +189,7 @@ public interface IFDTLaunchConfigurationConstants {
 	 * Status code indicating a launch configuration does not specify a vaild
 	 * project.
 	 */
-	public static final int ERR_NOT_A_C_PROJECT = 103;
+	public static final int ERR_NOT_A_FORTRAN_PROJECT = 103;
 
 	/**
 	 * Status code indicating a launch configuration does not specify a vaild
