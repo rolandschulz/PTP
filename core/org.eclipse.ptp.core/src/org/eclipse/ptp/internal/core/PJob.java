@@ -1,19 +1,14 @@
 package org.eclipse.ptp.internal.core;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.ParallelPlugin;
-import org.eclipse.ptp.core.IOutputTextFileContants;
 import org.eclipse.ptp.core.IPElement;
-import org.eclipse.ptp.core.IPNode;
-import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.pdt.mi.MISession;
+import org.eclipse.ptp.core.IPNode;
+import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.IPUniverse;
 
 /**
  * @author Clement
@@ -22,60 +17,24 @@ import org.eclipse.pdt.mi.MISession;
 public class PJob extends Parent implements IPJob {
     protected String NAME_TAG = "root ";
     
-    private MISession miSession = null;
-    protected String outputDirPath = null;
-    protected int storeLine = 0;
-    
-    public PJob() {
-        super(null, "", P_ROOT);
-    }
-
-    public PJob(MISession miSession) {
-        this(miSession, "");
-    }
-    
-	public PJob(MISession miSession, String name) {
-		super(null, name, P_ROOT);
-		this.miSession = miSession;
-		setOutputStore();
+	public PJob(IPUniverse uni, String name) {
+		super(uni, name, P_JOB);
 	}
 	
-	/* returns the Machine that this job is running on */
-	public IPMachine getMachine() {
-	}
-	
-	private void setOutputStore() {
-		Preferences preferences = ParallelPlugin.getDefault().getPluginPreferences();
-		outputDirPath = preferences.getString(IOutputTextFileContants.OUTPUT_DIR);
-		storeLine = preferences.getInt(IOutputTextFileContants.STORE_LINE);		
-        if (outputDirPath == null || outputDirPath.length() == 0)
-            outputDirPath = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(IOutputTextFileContants.DEF_OUTPUT_DIR_NAME).toOSString();
-            
-        if (storeLine == 0)
-            storeLine = IOutputTextFileContants.DEF_STORE_LINE;
-        
-        File outputDirectory = new File(outputDirPath);
-        if (!outputDirectory.exists())
-            outputDirectory.mkdir();
-	}
-	
-	public String getOutputStoreDirectory() {
-	    return outputDirPath;
-	}
-	public int getStoreLine() {
-	    return storeLine;
-	}
-	
-	public MISession getMISession() {
-	    return miSession;
-	}
-	
-	public Process getMPIProcess() {
-	    return miSession.getGDBProcess();
-	}
-	
-	public synchronized IPNode[] getNodes() {
-	    return (IPNode[])getCollection().toArray(new IPNode[size()]);
+	/* returns the Machines that this job is running on.  this is accomplished by
+	 * drilling down to the processes, finding the nodes they are running on, 
+	 * and then seeing which machines those nodes are part of
+	 */
+	public IPMachine[] getMachines() {
+		IPNode[] nodes = getNodes();
+		List array = new ArrayList(0);
+		for(int i=0; i<nodes.length; i++) {
+			if(!array.contains(nodes[i].getMachine())) {
+				array.add(nodes[i].getMachine());
+			}
+		}
+		
+		return (IPMachine[])array.toArray(new IPMachine[array.size()]);
 	}
 	
 	public synchronized IPNode[] getSortedNodes() {
@@ -84,13 +43,23 @@ public class PJob extends Parent implements IPJob {
 	    return nodes;
 	}
 
+	public synchronized IPNode[] getNodes() {
+		IPProcess[] processes = getProcesses();
+		List array = new ArrayList(0);
+		for(int i=0; i<processes.length; i++) {
+			if(!array.contains(processes[i].getNode())) {
+				array.add(processes[i].getNode());
+			}
+		}
+		
+		return (IPNode[])array.toArray(new IPNode[array.size()]);
+	}
+	
+	/* returns all the processes in this job, which are the children of
+	 * the job
+	 */
 	public synchronized IPProcess[] getProcesses() {
-	    List array = new ArrayList(0);
-	    IPNode[] nodes = getNodes();
-        for (int i=0; i<nodes.length; i++)
-            array.addAll(nodes[i].getCollection());
-
-        return (IPProcess[])array.toArray(new IPProcess[array.size()]);
+	    return (IPProcess[])getCollection().toArray(new IPProcess[size()]);
 	}
 	
 	public synchronized IPProcess[] getSortedProcesses() {
@@ -98,42 +67,24 @@ public class PJob extends Parent implements IPJob {
 	    sort(processes);
 	    return processes;
 	}
-		
-	public synchronized IPNode findNode(String nodeNumber) {
-        IPElement element = findChild(nodeNumber);
-        if (element != null)
-            return (IPNode)element;
-        return null;
-	}
 	
 	public synchronized IPProcess findProcess(String processNumber) {
-        IPNode[] nodes = getNodes();
-        for (int i=0; i<nodes.length; i++) {
-	        IPProcess process = nodes[i].findProcess(processNumber);
-	        if (process != null)
-	            return process;
-        }
-	    return null;
+		IPElement element = findChild(processNumber);
+		if(element != null)
+			return (IPProcess)element;
+		return null;
 	}
 	
-	public synchronized IPProcess findProcess(String nodeNumber, String processNumber) {
-	    IPNode node = findNode(nodeNumber);
-	    if (node != null)
-	        return node.findProcess(processNumber);
-
-	    return findProcess(processNumber);
-	}
-	
+	/* returns the number of nodes that this job is running on by
+	 * counting each node that each process in this job is running
+	 * on
+	 */
 	public int totalNodes() {
-	    return size();
+		return getNodes().length;
 	}
+	
 	public int totalProcesses() {
-	    int counter = 0;
-        IPNode[] nodes = getNodes();
-        for (int i=0; i<nodes.length; i++)
-            counter += nodes[i].size();
-
-        return counter;
+		return size();
 	}
 	
 	public void removeAllProcesses() {
@@ -142,5 +93,13 @@ public class PJob extends Parent implements IPJob {
             processes[i].clearOutput();
         
         removeChildren();
-	}	
+	}
+
+	public IPUniverse getUniverse() {
+		IPElement current = this;
+		do {
+			if (current instanceof IPUniverse) return (IPUniverse) current;
+		} while ((current = current.getParent()) != null);
+		return null;
+	}
 }

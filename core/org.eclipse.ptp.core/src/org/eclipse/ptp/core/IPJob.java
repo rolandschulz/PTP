@@ -13,12 +13,8 @@ public interface IPJob extends IPElement {
 	 */
     public IPNode[] getNodes();
     public IPNode[] getSortedNodes();
-    
-    public IPNode findNode(String nodeNumber);
-	public MISession getMISession();
-	
-	public IPProcess findProcess(String nodeNumber, String processNumber);
-	public IPProcess findProcess(String processNumber);
+
+    public IPProcess findProcess(String processNumber);
 	
 	public IPProcess[] getSortedProcesses();
 	public IPProcess[] getProcesses();
@@ -26,9 +22,6 @@ public interface IPJob extends IPElement {
 	public int totalNodes();
 	public int totalProcesses();	
 	public void removeAllProcesses();
-	
-	public String getOutputStoreDirectory();
-	public int getStoreLine();
 	
 	/* returns an array of machines that this job is running on.  For many cases
 	 * this will be a single element array as a job often resides on a single

@@ -12,7 +12,7 @@ public interface IPNode extends IPElement {
 	public IPProcess findProcess(String processNumber);
 
     /* returns the parent machine that comprises this node */
-    public IPMachine getPMachine();
+    public IPMachine getMachine();
     
     /* returns an array of jobs that are running on this node - accomplishes this
      * by looking through the processes that are running on this node and seeing
