@@ -30,12 +30,15 @@ import org.eclipse.jface.viewers.OpenEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ptp.core.IPElement;
+import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.launch.core.ILaunchManager;
 import org.eclipse.ptp.ui.ParallelElementContentProvider;
 import org.eclipse.ptp.ui.ParallelElementLabelProvider;
+import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.actions.ShowAllNodesAction;
 import org.eclipse.ptp.ui.actions.ShowProcessesAction;
@@ -72,6 +75,7 @@ public class ParallelProcessesView extends AbstractParallelView {
     
     public ParallelProcessesView() {
         super();
+        System.out.println("ParallelProcessesView starting up.");
         instance = this;
     }
     
@@ -87,7 +91,7 @@ public class ParallelProcessesView extends AbstractParallelView {
     }
     
     public void reset(int style) {
-        setInput(launchManager.getProcessRoot(), style);
+        setInput(launchManager.getUniverse(), style);
     }
 
     public void refresh(final IPElement[] elements) {
@@ -211,6 +215,7 @@ public class ParallelProcessesView extends AbstractParallelView {
         createControl(parent);
         updateButton();
         registerViewer();
+        System.out.println("ParallelProcessesView - calling initNode");
         initNode();
     }
     
@@ -218,7 +223,6 @@ public class ParallelProcessesView extends AbstractParallelView {
         terminateAllAction = new TerminateAllAction(this);
         showAllNodesAction = new ShowAllNodesAction(this);
         showProcessesAction = new ShowProcessesAction(this);
-
         showAllNodesAction.setChecked(true);        
         /*
         searchAction = new SearchAction(this);
@@ -245,21 +249,35 @@ public class ParallelProcessesView extends AbstractParallelView {
     }
     
     public Object[] getElements(Object parent) {
+    		System.out.println("PPV.getElements("+parent+")");
         if (parent instanceof IPElement) {         
             switch (((IPElement)parent).getElementType()) {
+            		case IPElement.P_UNIVERSE:
+            			return ((IPUniverse)parent).getSortedMachines();
+            		case IPElement.P_MACHINE:
+            			return ((IPMachine)parent).getSortedNodes();
+            		case IPElement.P_NODE:
+            			return ((IPNode)parent).getSortedProcesses();
+            /*
                 case IPElement.P_ROOT:
                     if (SHOW_PROCESS_ONLY)
                         return ((IPJob)parent).getSortedProcesses();
                 	
                 	return ((IPJob)parent).getSortedNodes();
+                	*/
+            			
+            			/*
                 case IPElement.P_NODE:
                     return ((IPNode)parent).getSortedProcesses();
+                    */
             }
         }
+        System.out.println("returning null from PPV.getElements()");
         return null;        
     }
     
     protected void createControl(Composite parent) {
+    		System.out.println("ParallelProcessesView - createControl");
         Composite controlComp = new Composite(parent, SWT.NONE);
         controlComp.setLayout(new FillLayout());
 
@@ -295,11 +313,13 @@ public class ParallelProcessesView extends AbstractParallelView {
         
         treeViewer.setLabelProvider(labelProvider);
         treeViewer.setContentProvider(new ParallelElementContentProvider(false, false));
-        treeViewer.setInput(launchManager.getProcessRoot());
+        treeViewer.setInput(launchManager.getUniverse());
+        treeViewer.expandAll();
         setSelection();
     }
     
     protected void openEditorAction(Object element) {
+    		System.out.println("PPV.openEditorAction("+element+")");
         if (element instanceof IPProcess) {
         	openProcessViewer((IPProcess)element);
         }
@@ -338,6 +358,7 @@ public class ParallelProcessesView extends AbstractParallelView {
         Runnable runnable = new Runnable() {
             public void run() {
                 treeViewer.setInput(input);
+                treeViewer.expandAll();
                 setSelection();
             }
         };
@@ -381,7 +402,10 @@ public class ParallelProcessesView extends AbstractParallelView {
         if (launchManager.getProcessRoot() == null) return;
 
         boolean found = false;
+        /*
         IPNode node = launchManager.getProcessRoot().findNode(String.valueOf(nodeNumber));
+        */
+        /*
         if (node != null) {
 	        showAllNodes(BUSY_STYLE);
 	        treeViewer.setSelection(new StructuredSelection(node));
@@ -393,7 +417,9 @@ public class ParallelProcessesView extends AbstractParallelView {
                 found = true;
             }
             */
+        /*
         }
+    */
         if (!found)
             UIUtils.showErrorDialog(getViewSite().getShell(), "Search not found", "Node " + nodeNumber + " cannot be found", UIUtils.NORMAL);        
     }
@@ -403,7 +429,7 @@ public class ParallelProcessesView extends AbstractParallelView {
         boolean found = false;
         IPProcess process = launchManager.getProcessRoot().findProcess(String.valueOf(processNumber));
         if (process != null) {
-           	treeViewer.expandToLevel(process.getParent(), 1);
+        		treeViewer.expandToLevel(process.getParent(), 1);
 	        treeViewer.setSelection(new StructuredSelection(process));
             found = true;
            	
@@ -420,6 +446,7 @@ public class ParallelProcessesView extends AbstractParallelView {
     } 
 
     public void selectReveal(IPElement element) {
+    		System.out.println("SelectReveal called on: "+element);
 		Control ctrl= treeViewer.getControl();
 		if (ctrl == null || ctrl.isDisposed())
 			return;

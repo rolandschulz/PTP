@@ -39,32 +39,23 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.pdt.mi.MIException;
-import org.eclipse.pdt.mi.MIPlugin;
-import org.eclipse.pdt.mi.MISession;
-import org.eclipse.pdt.mi.command.CommandFactory;
-import org.eclipse.pdt.mi.command.MIExecAbort;
-import org.eclipse.pdt.mi.command.MIExecRun;
-import org.eclipse.pdt.mi.command.MIExecStatus;
-import org.eclipse.pdt.mi.command.MISysStatus;
-import org.eclipse.pdt.mi.event.MIErrorEvent;
-import org.eclipse.pdt.mi.event.MIExecStatusChangeEvent;
-import org.eclipse.pdt.mi.event.MIProcessOutputEvent;
-import org.eclipse.pdt.mi.event.MISysStatusChangeEvent;
-import org.eclipse.pdt.mi.output.MIProcessDescription;
-import org.eclipse.pdt.mi.output.MISystemDescription;
 import org.eclipse.ptp.ParallelPlugin;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.internal.console.OutputConsole;
 import org.eclipse.ptp.internal.core.PNode;
 import org.eclipse.ptp.internal.core.PProcess;
 import org.eclipse.ptp.internal.core.PMachine;
 import org.eclipse.ptp.internal.core.PJob;
+import org.eclipse.ptp.internal.core.PUniverse;
 import org.eclipse.ptp.launch.core.ILaunchManager;
 import org.eclipse.ptp.launch.core.IParallelLaunchListener;
+import org.eclipse.ptp.rtmodel.IRuntimeModel;
+import org.eclipse.ptp.rtmodel.NamedEntity;
+import org.eclipse.ptp.rtmodel.dummy.DummyRuntimeModel;
 import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.views.ParallelProcessesView;
@@ -74,17 +65,18 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.progress.IProgressService;
 
-/**
- *  
- */
 public class LaunchManager implements ILaunchManager {
-    protected CommandFactory factory = new CommandFactory();
+	
+    /*
+     * 
+     protected CommandFactory factory = new CommandFactory();
+     */
 
     protected List listeners = new ArrayList(2);
     protected int currentState = STATE_EXIT;
     //protected IPMachine machine = null;
     protected IPJob processRoot = null;
-    protected MISession session = null;
+    protected IPUniverse universe = null;
     protected OutputConsole outputConsole = null;
     protected boolean isPerspectiveOpen = false;
     protected ILaunchConfiguration config = null;
@@ -103,10 +95,72 @@ public class LaunchManager implements ILaunchManager {
 
     public LaunchManager() {
         ParallelPlugin.getDefault().addPerspectiveListener(perspectiveListener);
-        //testing();
+        testing();
     }
     
     public void testing() {
+    		System.out.println("Launch Manager: Testing function");
+    		
+    		universe = new PUniverse();
+    		
+    		IRuntimeModel rtm = new DummyRuntimeModel();
+    		NamedEntity[] ne = rtm.getMachines();
+    		for(int i=0; i<ne.length; i++) {
+    			PMachine mac;
+    			
+    			System.out.println("MACHINE: "+ne[i].name);
+    			
+    			mac = new PMachine(universe, ne[i].name, ne[i].name.substring(new String("machine").length()));
+    			
+    			universe.addChild(mac);
+    			
+    			NamedEntity[] ne2 = rtm.getNodes(ne[i].name);
+    			for(int j=0; j<ne2.length; j++) {
+    				PNode node;
+    				node = new PNode(mac, ne2[j].name, ""+j+"");
+    				
+    				mac.addChild(node);
+    			}
+    		}
+    		ne = rtm.getJobs();
+    		for(int i=0; i<ne.length; i++) {
+    			PJob job;
+    			
+    			System.out.println("JOB: "+ne[i].name);
+    			
+    			job = new PJob(universe, ne[i].name, PJob.BASE_OFFSET+ne[i].name.substring(new String("job").length()));
+    			universe.addChild(job);
+    			
+    			NamedEntity[] ne2 = rtm.getProcesses(ne[i].name);
+    			for(int j=0; j<ne2.length; j++) {
+    				PProcess proc;
+    				System.out.println("process name = "+ne2[j].name);
+    				proc = new PProcess(job, ne2[j].name, ""+j+"", "noPIDdefined", 
+    						"noSTATUSdefined", "noEXITCODEdefined", "noSIGNALNAMEdefined");
+    				job.addChild(proc);
+    				
+    				String pname = proc.getElementName();
+    				String nname = rtm.getProcessNodeName(pname);
+    				String mname = rtm.getNodeMachineName(nname);
+    				System.out.println("Process "+pname+" running on node:");
+    				System.out.println("\t"+nname);
+    				System.out.println("\tand that's running on machine: "+mname);
+    				IPMachine mac = universe.findMachineByName(mname);
+    				if(mac != null) {
+    					IPNode node = mac.findNodeByName(nname);
+    					if(node != null) {
+    						System.out.println("**** THIS NODE IS WHERE THIS PROCESS IS RUNNING!");
+    						/* this sets the data member in both classes stating that this process
+    						 * is running on this node and telling this node that it now has a 
+    						 * child process running on it.
+    						 */
+    						proc.setNode(node);
+    					}
+    				}
+    			}
+    		}
+
+    	/*
     	    processRoot = new PJob();
         
         int pn = 0;
@@ -143,6 +197,7 @@ public class LaunchManager implements ILaunchManager {
         new Thread(runnable).start();
 
         System.out.println("Created all dumy nodes and processes");
+        */
     }
 
     private IPerspectiveListener perspectiveListener = new IPerspectiveListener() {
@@ -206,10 +261,10 @@ public class LaunchManager implements ILaunchManager {
         }
 
         public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-            //System.out.println("Active: " + perspective.getId());
+            System.out.println("Active: " + perspective.getId());
             if (perspective.getId().equals(UIUtils.PPerspectiveFactory_ID)) {
                 isPerspectiveOpen = true;
-                //System.out.println("Active: " + perspective.getId());
+                System.out.println("Active: " + perspective.getId());
                 try {
                     createMPISession();
                 } catch (CoreException e) {
@@ -226,6 +281,7 @@ public class LaunchManager implements ILaunchManager {
 
     private Observer mpiObserver = new Observer() {
         public synchronized void update(Observable o, Object arg) {
+        	/*
             if (arg instanceof MIExecStatusChangeEvent) {
                 MIExecStatusChangeEvent ev = (MIExecStatusChangeEvent) arg;
                 MIProcessDescription[] pdes = ev.getMIProcessDescription();
@@ -278,8 +334,10 @@ public class LaunchManager implements ILaunchManager {
                  * setCurrentState(STATE_ERROR);
                  * //UIUtils.showErrorDialog("MIErrorEvent", err, null); }
                  */
+ /*
                 fireEvent(err, EVENT_ERROR);
             }
+            */
         }
     };
 
@@ -292,7 +350,9 @@ public class LaunchManager implements ILaunchManager {
         listeners = null;
     }
 
+    
     public void clearAll() {
+    	/*
         if (session == null)
             return;
         
@@ -301,6 +361,7 @@ public class LaunchManager implements ILaunchManager {
         session = null;
         processRoot.removeAllProcesses();
         processRoot = null;
+        */
     }
 
     /*
@@ -311,9 +372,11 @@ public class LaunchManager implements ILaunchManager {
      * null; } } }
      */
 
+    /*
     public MISession getSession() {
         return session;
     }
+    */
 
     public IPJob getProcessRoot() {
         return processRoot;
@@ -363,7 +426,9 @@ public class LaunchManager implements ILaunchManager {
                 listener.execStatusChangeEvent(object);
                 break;
             case EVENT_SYS_STATUS_CHANGE:
-                listener.sysStatusChangeEvent(object);
+            	/*
+                listener.sysStatusChangeEvent(object);session
+                */
                 break;
             case EVENT_PROCESS_OUTPUT:
                 listener.processOutputEvent(object);
@@ -396,15 +461,20 @@ public class LaunchManager implements ILaunchManager {
     }
 
     protected void isSessionExist() throws CoreException {
+    	/*
         if (session == null) {
             createMPISession();
             //Status status = new Status(IStatus.ERROR, ParallelPlugin.getUniqueIdentifier(), IStatus.INFO, "No MI session is created", null);
             //throw new CoreException(status);
         }
+        */
     }
 
     public boolean isMPIRuning() {
+    		return true;
+    	/*
         return (session != null || (processRoot != null && processRoot.hasChildren()));
+        */
     }
 
     public boolean hasProcessRunning() {
@@ -424,6 +494,7 @@ public class LaunchManager implements ILaunchManager {
          * are stilling running", null); throw new CoreException(status); }
          */
 
+        /*
         try {
             MIExecRun execRun = factory.createMIExecRun(args);
             session.postCommand(execRun);
@@ -432,11 +503,13 @@ public class LaunchManager implements ILaunchManager {
             Status status = new Status(IStatus.ERROR, ParallelPlugin.getUniqueIdentifier(), IStatus.INFO, e.getMessage(), e);
             throw new CoreException(status);
         }
+        */
     }
 
     public synchronized void mpisysstatus() throws CoreException {
         isSessionExist();
 
+        /*
         try {
             MISysStatus sysStatus = new MISysStatus();
             session.postCommand(sysStatus);
@@ -446,11 +519,13 @@ public class LaunchManager implements ILaunchManager {
             Status status = new Status(IStatus.ERROR, ParallelPlugin.getUniqueIdentifier(), IStatus.INFO, "Cannot exec SYS STATUS command", e);
             throw new CoreException(status);
         }
+        */
     }
 
     public synchronized void mpistatus() throws CoreException {
         isSessionExist();
 
+        /*
         try {
             MIExecStatus execStatus = factory.createMIExecStatus();
             session.postCommand(execStatus);
@@ -460,11 +535,13 @@ public class LaunchManager implements ILaunchManager {
             Status status = new Status(IStatus.ERROR, ParallelPlugin.getUniqueIdentifier(), IStatus.INFO, "Cannot exec STATUS command", e);
             throw new CoreException(status);
         }
+        */
     }
 
     public synchronized void mpiabort() throws CoreException {
         isSessionExist();
 
+        /*
         try {
             MIExecAbort execAbort = factory.createMIExecAbort();
             session.postCommand(execAbort);
@@ -473,6 +550,7 @@ public class LaunchManager implements ILaunchManager {
             Status status = new Status(IStatus.ERROR, ParallelPlugin.getUniqueIdentifier(), IStatus.INFO, "Cannot exec ABORT command", e);
             throw new CoreException(status);
         }
+        */
     }
 
     public synchronized void mpiexit() throws CoreException {
@@ -481,7 +559,9 @@ public class LaunchManager implements ILaunchManager {
         try {
             //MIExit gdbExit = factory.createMIExit();
             //session.postCommand(gdbExit);
+        	/*
             session.terminate();
+            */
             if (getCurrentState() != STATE_EXIT)
                 fireState(STATE_EXIT);            
         } catch (Exception e) {
@@ -493,6 +573,7 @@ public class LaunchManager implements ILaunchManager {
     }
 
     public synchronized void createMPISession() throws CoreException {
+    	/*
         if (session == null) {
             MIPlugin miPlugin = MIPlugin.getDefault(ParallelPlugin.getDefault().getPluginPreferences());
             // Turn of the debugging output
@@ -514,6 +595,7 @@ public class LaunchManager implements ILaunchManager {
                 throw new CoreException(status);
             }
         }
+        */
     }
 
     public void execMI(final ILaunch launch, File workingDirectory, String[] envp, final String[] args, IProgressMonitor monitor) throws CoreException {
@@ -551,12 +633,15 @@ public class LaunchManager implements ILaunchManager {
     }
 
     private void createConsole() {
+    	/*
         if (outputConsole == null) {
             outputConsole = new OutputConsole(renderLabel("mpictrl"), session.getMIConsoleStream());
         }
+        */
     }
 
     private void updateProcessInfo(Object[] objects) {
+    	/*
         for (int i = 0; i < objects.length; i++) {
             if (objects instanceof MIProcessDescription[]) {
                 MIProcessDescription[] pDesc = (MIProcessDescription[]) objects;
@@ -582,11 +667,13 @@ public class LaunchManager implements ILaunchManager {
                 }
             }
         }
+        */
     }
 
     private void waitFor() {
         Thread waitForThread = new Thread("Wait for finish") {
             public void run() {
+            	/*
                 try {
                     if (!session.isTerminated())
                         session.getGDBProcess().waitFor();
@@ -594,11 +681,14 @@ public class LaunchManager implements ILaunchManager {
                     // clear interrupted state
                     Thread.interrupted();
                 } finally {
+                */
                     System.out.println("Launch Manager Exit");
                     clearAll();
                     //if (getCurrentState() != STATE_EXIT)
                       //  fireState(STATE_EXIT);
+                    /*
                 }
+                */
             }
         };
         waitForThread.start();
@@ -616,4 +706,19 @@ public class LaunchManager implements ILaunchManager {
         } while (isFree > wasFree);
         rt.runFinalization();
     }
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.launch.core.ILaunchManager#getMachine()
+	 */
+	public IPMachine getMachine() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.launch.core.ILaunchManager#getUniverse()
+	 */
+	public IPUniverse getUniverse() {
+		return universe;
+	}
 }

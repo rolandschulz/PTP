@@ -20,5 +20,9 @@ package org.eclipse.ptp.core;
 
 public interface IPUniverse extends IPElement {
 	public IPMachine[] getMachines();
+	public IPMachine[] getSortedMachines();
+	public IPMachine findMachineByName(String mname);
 	public IPJob[] getJobs();
+	public IPJob[] getSortedJobs();
+	public IPJob findJobByName(String jname);
 }

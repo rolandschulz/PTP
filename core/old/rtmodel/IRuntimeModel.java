@@ -25,4 +25,7 @@ public interface IRuntimeModel {
 	public NamedEntity[] getNodes(String machineName);
 	public NamedEntity[] getJobs();
 	public NamedEntity[] getProcesses(String jobName);
+	
+	public String getProcessNodeName(String procName);
+	public String getNodeMachineName(String nodeName);
 }

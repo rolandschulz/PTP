@@ -23,24 +23,27 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.internal.core.PUniverse;
 import org.eclipse.ptp.rtmodel.IRuntimeModel;
 import org.eclipse.ptp.rtmodel.NamedEntity;
 
 public class DummyRuntimeModel implements IRuntimeModel {
+	
 	/* define the number of machines here */
 	final static int numMachines = 4;
 	/* define how many nodes each machine has - the array length must equal
 	 * numMachines
 	 */
-	final static int[] numNodes = { 16, 32, 64, 128 };
+	final static int[] numNodes = { 2, 4, 6, 8 };
 	protected HashMap nodeMap;
 	
 	/* define the number of jobs here */
-	final static int numJobs = 3;
+	final static int numJobs = 2;
 	/* define how many processes are in each job - the array length must
 	 * equal numJobs
 	 */
-	final static int[] numProcesses = { 10, 20, 30, 40 };
+	final static int[] numProcesses = { 3, 5 };
 	protected HashMap processMap;
 	
 	public DummyRuntimeModel() {
@@ -55,7 +58,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			processMap.put(s, new Integer(numProcesses[i]));
 		}
 	}
-	
+
 	public NamedEntity[] getMachines() {
 		int i = 0;
 		NamedEntity[] ne = new NamedEntity[numMachines];
@@ -89,7 +92,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 	
 	public NamedEntity[] getJobs() {
 		int i = 0;
-		NamedEntity[] ne = new NamedEntity[numMachines];
+		NamedEntity[] ne = new NamedEntity[numJobs];
 		Set set = processMap.keySet();
 		Iterator it = set.iterator();
 		
@@ -117,5 +120,30 @@ public class DummyRuntimeModel implements IRuntimeModel {
 		
 		return ne;
 	}
-
+	
+	/* this is a major kludge, sorry but this is a dummy implementation anyway
+	 * so hack this up if you want to change the process to node mapping - this
+	 * assumes a certain number of jobs with a set number of processes in each
+	 * job
+	 */
+	public String getProcessNodeName(String procName) {
+		if(procName.equals("job0_process0")) return "machine1_node0";
+		if(procName.equals("job0_process1")) return "machine1_node0";
+		if(procName.equals("job0_process2")) return "machine1_node1";
+		if(procName.equals("job1_process0")) return "machine1_node2";
+		if(procName.equals("job1_process1")) return "machine1_node1";
+		if(procName.equals("job1_process2")) return "machine2_node0";
+		if(procName.equals("job1_process3")) return "machine2_node1";
+		if(procName.equals("job1_process4")) return "machine2_node2";
+		return "";
+	}
+	
+	public String getNodeMachineName(String nodeName) {
+		int idx;
+		idx = nodeName.indexOf("_");
+		if(idx >= 0) {
+			return nodeName.substring(0, idx);
+		}
+		return "";
+	}
 }

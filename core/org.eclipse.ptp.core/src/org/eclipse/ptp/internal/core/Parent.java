@@ -28,8 +28,8 @@ import org.eclipse.ptp.core.IPElement;
  *  
  */
 public abstract class Parent extends PElement {
-    public Parent(IPElement parent, String name, int type) {
-        super(parent, name, type);
+    public Parent(IPElement parent, String name, String key, int type) {
+        super(parent, name, key, type);
     }
 
     public void addChild(IPElement member) {

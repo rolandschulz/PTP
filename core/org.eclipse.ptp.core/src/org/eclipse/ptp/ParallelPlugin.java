@@ -31,11 +31,8 @@ import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-/**
- * 
- */
 public class ParallelPlugin extends AbstractUIPlugin {
-    public static final String PLUGIN_ID = "org.eclipse.pdt";
+    public static final String PLUGIN_ID = "org.eclipse.ptp";
     
     private ILaunchManager launchManager = null;
     

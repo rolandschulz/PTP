@@ -43,8 +43,8 @@ public class PNode extends Parent implements IPNode {
     private String mode = null;
     */
     	
-    public PNode(IPElement element, String nodeNumber) {
-    		super(element, nodeNumber, P_NODE);
+    public PNode(IPElement element, String name, String key) {
+    		super(element, name, key, P_NODE);
     		attribs = new HashMap(0);
     }
 	
@@ -77,9 +77,10 @@ public class PNode extends Parent implements IPNode {
         return null;
     }
     
+    /*
     public String getElementName() {
         return NAME_TAG + getKey();
-    }
+    }*/
     
     public void setAttrib(String key, Object val) {
     		if(attribs.containsKey(key))

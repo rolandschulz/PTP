@@ -28,9 +28,6 @@ import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IPJob;
 
-/**
- *
- */
 public interface ILaunchManager {
     public static final int STATE_ERROR = -1;
     public static final int STATE_RUN = 1;

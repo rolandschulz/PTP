@@ -29,7 +29,6 @@ import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.pdt.mi.IMIConstants;
 import org.eclipse.ptp.ParallelPlugin;
 import org.eclipse.ptp.core.IOutputTextFileContants;
 import org.eclipse.ptp.launch.core.ILaunchManager;
@@ -53,9 +52,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-/**
- *
- */
 public class PDTPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage, IOutputTextFileContants {
     public static final String EMPTY_STRING = "";
     
@@ -69,8 +65,10 @@ public class PDTPreferencesPage extends PreferencePage implements IWorkbenchPref
     protected IntegerFieldEditor storeLineField = null;
 
     private String mpiFile = EMPTY_STRING;
+    /*
     private int requestTimeout = IMIConstants.DEF_REQUEST_TIMEOUT;
     private int launchTimeout = IMIConstants.DEF_REQUEST_LAUNCH_TIMEOUT;
+    */
 
     private String outputDIR = EMPTY_STRING;
     private int storeLine = DEF_STORE_LINE;
@@ -160,19 +158,23 @@ public class PDTPreferencesPage extends PreferencePage implements IWorkbenchPref
 		timeoutComposite.setLayout(new FillLayout());
 		timeoutComposite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 
+		/*
 		requestTimeoutField = new IntegerFieldEditor(IMIConstants.PREF_REQUEST_TIMEOUT, UIMessage.getResourceString("PDTPreferencesPage.Request_timeout_text"), timeoutComposite);
 		requestTimeoutField.setPropertyChangeListener(listener);
 		requestTimeoutField.setEmptyStringAllowed(false);
 		
 		launchTimoutField = new IntegerFieldEditor(IMIConstants.PREF_REQUEST_LAUNCH_TIMEOUT, UIMessage.getResourceString("PDTPreferencesPage.Launch_timeout_text"), timeoutComposite);
 		launchTimoutField.setPropertyChangeListener(listener);
-		launchTimoutField.setEmptyStringAllowed(false);        
+		launchTimoutField.setEmptyStringAllowed(false);
+		*/        
     }
 
     protected void defaultSetting() {
-        mpiPathText.setText(mpiFile);        
+        mpiPathText.setText(mpiFile);
+        /*
         requestTimeoutField.setStringValue(String.valueOf(requestTimeout));
         launchTimoutField.setStringValue(String.valueOf(launchTimeout));
+        */
         
 	    outputDirText.setText(outputDIR);
 	    storeLineField.setStringValue(String.valueOf(storeLine));
@@ -181,7 +183,8 @@ public class PDTPreferencesPage extends PreferencePage implements IWorkbenchPref
     public void init(IWorkbench workbench) {
         //IPreferenceStore store = getPreferenceStore();
     	
-    	Preferences preferences = ParallelPlugin.getDefault().getPluginPreferences();    	
+    	Preferences preferences = ParallelPlugin.getDefault().getPluginPreferences();
+    	/*
         mpiFile = preferences.getString(IMIConstants.PREF_MPICTRL_LOCATION);
         
         requestTimeout = preferences.getInt(IMIConstants.PREF_REQUEST_TIMEOUT);
@@ -198,7 +201,8 @@ public class PDTPreferencesPage extends PreferencePage implements IWorkbenchPref
             
         storeLine = preferences.getInt(STORE_LINE);
         if (storeLine == 0)
-            storeLine = DEF_STORE_LINE;    
+            storeLine = DEF_STORE_LINE;
+            */    
     }
     
     public void dispose() {
@@ -212,8 +216,10 @@ public class PDTPreferencesPage extends PreferencePage implements IWorkbenchPref
 	
 	private void store() {
 	    mpiFile = mpiPathText.getText();
+	    /*
 	    requestTimeout = requestTimeoutField.getIntValue();
 	    launchTimeout = launchTimoutField.getIntValue();
+	    */
 	    
 	    outputDIR = outputDirText.getText();
 	    storeLine = storeLineField.getIntValue();
@@ -222,9 +228,11 @@ public class PDTPreferencesPage extends PreferencePage implements IWorkbenchPref
     public boolean performOk() {
         store();
         Preferences preferences = ParallelPlugin.getDefault().getPluginPreferences();
+        /*
         preferences.setValue(IMIConstants.PREF_MPICTRL_LOCATION, mpiFile);
         preferences.setValue(IMIConstants.PREF_REQUEST_TIMEOUT, requestTimeout);
         preferences.setValue(IMIConstants.PREF_REQUEST_LAUNCH_TIMEOUT, launchTimeout);
+        */
         
         preferences.setValue(OUTPUT_DIR, outputDIR);
         preferences.setValue(STORE_LINE, storeLine);
