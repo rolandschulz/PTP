@@ -26,9 +26,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.internal.core.PUniverse;
 import org.eclipse.ptp.launch.core.IParallelLaunchListener;
+import org.eclipse.ptp.launch.internal.AbstractParallelLaunchConfigurationDelegate;
 import org.eclipse.ptp.rtmodel.IRuntimeListener;
 import org.eclipse.ptp.rtmodel.IRuntimeModel;
 import org.eclipse.ptp.rtmodel.NamedEntity;
@@ -41,7 +43,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 	/* define how many nodes each machine has - the array length must equal
 	 * numMachines
 	 */
-	final static int[] numNodes = { 16, 4, 6, 8 };
+	final static int[] numNodes = { 256, 64, 128, 512 };
 	protected HashMap nodeMap;
 	protected HashMap nodeUserMap;
 	protected HashMap nodeGroupMap;
@@ -58,9 +60,13 @@ public class DummyRuntimeModel implements IRuntimeModel {
 	
 	protected List listeners = new ArrayList(2);
 	
-	protected boolean am_running_spawned_app = false;
+	protected String spawned_app_state = null;
+	protected int spawned_num_procs = 0;
 	protected int spawned_procs_per_node = 0;
 	protected int spawned_first_node = 0;
+	
+	protected Thread runningAppEventsThread = null;
+	protected Thread runningAppFinishThread = null;
 	
 	public DummyRuntimeModel() {
 		nodeMap = new HashMap();
@@ -83,7 +89,67 @@ public class DummyRuntimeModel implements IRuntimeModel {
 		nodeGroupMap = new HashMap();
 		nodeModeMap = new HashMap();
 		nodeStateMap = new HashMap();
-		for(int i=0; i<numMachines; i++) {
+		
+		/* machine 3 has a bunch of nodes w/ different states */
+		for(int i=0; i<numNodes[3]; i++) {
+			String s = new String("machine3_node"+i);
+			int r = ((int)(Math.random() * 100));
+			if(r < 10) nodeStateMap.put(s, new String("error"));
+			else if(r < 30) nodeStateMap.put(s, new String("down"));
+			else {
+				nodeStateMap.put(s, new String("up"));
+				/*
+				r = ((int)(Math.random() * 100));
+				if(r < 10) {
+					nodeUserMap.put(s, new String("ndebard"));
+					nodeGroupMap.put(s, new String("ptp"));
+				}
+				else if(r < 20) {
+					nodeUserMap.put(s, new String("gwatson"));
+					nodeGroupMap.put(s, new String("ptp"));
+				}
+				else if(r < 30) {
+					nodeUserMap.put(s, new String("crasmussen"));
+					nodeGroupMap.put(s, new String("ptp"));
+				}
+				*/
+			}
+		}
+		int nstart = ((int)(Math.random() * 50));
+		int nlen = ((int)(Math.random() * 40 + 10));
+		String nmode = new String(((int)(Math.random() * 2)) == 0 ? "0111" : "0100");
+		int gstart = ((int)(Math.random() * 50 + (nstart + nlen)));
+		int glen = ((int)(Math.random() * 100 + 40));
+		String gmode = new String(((int)(Math.random() * 2)) == 0 ? "0111" : "0100");
+		int cstart = ((int)(Math.random() * 50 + (nstart + nlen + gstart + glen)));
+		int clen = ((int)(Math.random() * 75 + 25));
+		String cmode = new String(((int)(Math.random() * 2)) == 0 ? "0111" : "0100");
+		for(int i=0; i<numNodes[3]; i++) {
+			String s = new String("machine3_node"+i);
+			if(i >= nstart && i <= (nstart + nlen)) {
+				nodeUserMap.put(s, new String(System.getProperty("user.name")));
+				nodeGroupMap.put(s, new String("ptp"));
+				nodeModeMap.put(s, nmode);
+			}
+			else if(i >= gstart && i <= (gstart + glen)) {
+				nodeUserMap.put(s, new String("gwatson"));
+				nodeGroupMap.put(s, new String("ptp"));
+				nodeModeMap.put(s, gmode);
+			}
+			else if(i >= cstart && i <= (cstart + clen)) {
+				nodeUserMap.put(s, new String("crasmussen"));
+				nodeGroupMap.put(s, new String("ptp"));
+				nodeModeMap.put(s, cmode);
+			}
+			else {
+				nodeUserMap.put(s, new String(""));
+				nodeGroupMap.put(s, new String(""));
+				nodeModeMap.put(s, new String("0111"));
+			}
+			
+		}
+		
+		for(int i=0; i<numMachines - 1; i++) {
 			for(int j=0; j<numNodes[i]; j++) {
 				String s = new String("machine"+i+"_node"+j);
 				nodeStateMap.put(s, new String("up"));
@@ -98,31 +164,44 @@ public class DummyRuntimeModel implements IRuntimeModel {
 	
 	/* returns the new job name that it started - unique */
 	public NamedEntity run(String[] args) {
-		if(am_running_spawned_app) {
+		if(spawned_app_state != null && (spawned_app_state.equals(IPProcess.STARTING) || spawned_app_state.equals(IPProcess.RUNNING))) {
 			System.out.println("Another job already running, unable to start a new one.");
 			return null;
 		}
+		/*
 		System.out.println("DummyRTM.run("+args+")");
 		for(int i=0; i<args.length; i++) {
 			System.out.println("\targs["+i+"] = "+args[i]);
-		}
+		}*/
 		
 		/* the next job will logically be the number of fake jobs
 		 * we've already spawned, like fakeJob = 2 would take
 		 * up elements 0 and 1, so '2' would be next!
 		 */
 		String s = new String("job"+numFakeJobs);
-		/* args[1] is the number processes
-		 * args[4] is the number of processes/node
-		 * args[6] is the first node to run on
-		 */
-		processMap.put(s, new Integer(args[1]));
-		this.spawned_procs_per_node = (new Integer(args[4]).intValue());
-		this.spawned_first_node = (new Integer(args[6]).intValue());
+
+		spawned_num_procs = spawned_procs_per_node = spawned_first_node = 0;
 		
-		am_running_spawned_app = true;
+		for(int i=0; i<args.length; i++) {
+			if(args[i].equals(AbstractParallelLaunchConfigurationDelegate.NUM_PROC)) {
+				this.spawned_num_procs = (new Integer(args[i+1]).intValue());
+				i++;
+			}
+			else if(args[i].equals(AbstractParallelLaunchConfigurationDelegate.PROC_PER_NODE)) {
+				this.spawned_procs_per_node = (new Integer(args[i+1]).intValue());
+				i++;
+			}
+			else if(args[i].equals(AbstractParallelLaunchConfigurationDelegate.START_NODE)) {
+				this.spawned_first_node = (new Integer(args[i+1]).intValue());
+				i++;
+			}
+		}
 		
-		Runnable runnable = new Runnable() {
+		processMap.put(s, new Integer(spawned_num_procs));
+		
+		spawned_app_state = IPProcess.RUNNING;
+		
+		Runnable runningAppEventsRunnable = new Runnable() {
 			public void run() {
 				String job = new String("job"+numFakeJobs);
 				int numProcsInJob = ((Integer)(processMap.get(job))).intValue();
@@ -132,7 +211,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 						Thread.sleep(1000 + ((int)(Math.random() * 3000)));
 					} catch(Exception e) {	
 					}
-					if(!am_running_spawned_app) return;
+					if(!spawned_app_state.equals(IPProcess.RUNNING)) return;
 					for(int i=0; i<numProcsInJob; i++) {
 						RuntimeEvent event = new RuntimeEvent(RuntimeEvent.EVENT_PROCESS_OUTPUT);
 						event.setText((int)(Math.random() * 10000)+" random text");
@@ -141,13 +220,33 @@ public class DummyRuntimeModel implements IRuntimeModel {
 				}
 			}
 		};
-		new Thread(runnable).start();
+		runningAppEventsThread = new Thread(runningAppEventsRunnable);
+		runningAppEventsThread.start();
+		
+		Runnable runningAppFinishRunnable = new Runnable() {
+			public void run() {
+				try {
+					Thread.sleep(10000);
+				} catch(Exception e) { 
+				}
+				if(!spawned_app_state.equals(IPProcess.RUNNING)) return;
+				
+				spawned_app_state = IPProcess.EXITED;
+				
+				System.out.println("Application terminated normally.");
+				
+				fireEvent(new NamedEntity("job"+numFakeJobs), new RuntimeEvent(RuntimeEvent.EVENT_JOB_EXITED));
+			}
+		};
+		
+		runningAppFinishThread = new Thread(runningAppFinishRunnable);
+		runningAppFinishThread.start();
 		
 		return new NamedEntity(s);
 	}
 	
 	public NamedEntity abortJob() {
-		am_running_spawned_app = false;
+		spawned_app_state = IPProcess.EXITED_SIGNALLED;
 		String s = new String("job"+numFakeJobs);
 		processMap.remove(s);
 		return new NamedEntity(s);
@@ -191,6 +290,9 @@ public class DummyRuntimeModel implements IRuntimeModel {
 				break;
 			case RuntimeEvent.EVENT_PROCESS_OUTPUT:
 				listener.runtimeProcessOutput(ne, event.getText());
+				break;
+			case RuntimeEvent.EVENT_JOB_EXITED:
+				listener.runtimeJobExited(ne);
 				break;
 			}
 		}
@@ -269,15 +371,15 @@ public class DummyRuntimeModel implements IRuntimeModel {
 	 * job
 	 */
 	public String getProcessNodeName(String procName) {
-		System.out.println("getProcessNodeName("+procName+")");
+		//System.out.println("getProcessNodeName("+procName+")");
 		String job = procName.substring(0, procName.indexOf("process")-1);
-		System.out.println("job = "+job);
+		//System.out.println("job = "+job);
 		//String job = procName.substring(0, 4);
 		/* ok this is coming from the fake job */
 		if(job.equals("job"+numFakeJobs)) {
 			int numProcsInJob = ((Integer)(processMap.get(job))).intValue();
 			String s = procName.substring(procName.indexOf("process")+7, procName.length());
-			System.out.println("proc # = "+s);
+			//System.out.println("proc # = "+s);
 			int procNum = -1;
 			try {
 				procNum = (new Integer(s)).intValue();
@@ -304,8 +406,8 @@ public class DummyRuntimeModel implements IRuntimeModel {
 		String job = procName.substring(0, 4);
 		/* ok, this is coming from a fake job */
 		if(job.equals("job"+numFakeJobs)) {
-			if(am_running_spawned_app) return "running";
-			else return "exited-signalled";
+			//System.out.println("PROCSTATE = "+spawned_app_state);
+			return spawned_app_state;
 		}
 		return "-1";
 	}

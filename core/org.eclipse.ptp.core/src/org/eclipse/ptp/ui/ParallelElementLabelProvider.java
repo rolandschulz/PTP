@@ -120,7 +120,7 @@ public class ParallelElementLabelProvider extends LabelProvider implements IColo
 			
 			else {
 				String nodeState = (String)node.getAttrib("state");
-				System.out.println("NODE: "+node+" - state = "+nodeState);
+				//System.out.println("NODE: "+node+" - state = "+nodeState);
 				
 				if (nodeState != null && nodeState.equals("up")) {
 					String user = (String)node.getAttrib("user");

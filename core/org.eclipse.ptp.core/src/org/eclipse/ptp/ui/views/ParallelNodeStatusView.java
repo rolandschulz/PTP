@@ -93,7 +93,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     private ShowMyAllocatedNodesAction showMyAllocNodesAction = null;
     private ShowMyUsedNodesAction showMyUsedNodesAction = null;
     private ShowLegendAction showLegendAction = null;
-    private ShowProcessesAction showProcessesAction = null;
+    //private ShowProcessesAction showProcessesAction = null;
     
     protected IPElement[] displayElements = null;
     protected IPUniverse universe = null;
@@ -331,6 +331,43 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     private void filterNodes(boolean user_changed_filter)
     {
     	grabSystemStatus();
+    	
+    	if(filterSelection != ALL_NODES) {
+    		IPElement[] tmpNodes = new IPElement[displayElements.length];
+
+    		int copied_elements = 0;
+    		// we're going to go through the displayElements array and choose to copy elements
+    		// into tmpNodes as necessary - as we do so we'll increment a variable that
+    		// will help us to keep track of our progress through this array
+    		
+    		for(int i=0; i<displayElements.length; i++) {
+    			IPNode somenode = (IPNode)displayElements[i];
+    			if(filterSelection == USED_NODES) {
+    				if(somenode != null && somenode.hasChildren()) {
+    					IPProcess procs[] = somenode.getProcesses();
+    					if(procs != null && procs.length > 0) {
+    						tmpNodes[copied_elements] = displayElements[i];
+    						copied_elements++;
+    					}
+    				}
+    			}
+    			else if(filterSelection == ALLOCATED_NODES && 
+    					((String)somenode.getAttrib("user")).equals(System.getProperty("user.name")))
+    			{
+    				tmpNodes[copied_elements] = displayElements[i];
+    				copied_elements++;
+    			}
+    		}
+    		System.out.println("FILTER: of "+displayElements.length+" nodes I filtered down to "+copied_elements);
+    		// reallocate that array and then copy our elements into it
+    		displayElements = new IPElement[copied_elements];
+    		System.arraycopy(tmpNodes, 0, displayElements, 0, copied_elements);
+    	}
+    	
+    	if(user_changed_filter)
+    		selected_node_num = -1;
+    	
+    	num_nodes = displayElements.length;
 
     	/* PORT
     	if(session == null) return;
@@ -586,6 +623,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
 					System.out.println("MACHINE "+(mnum+1)+" now being displayed.");
 					machine_number = mnum;
 					grabSystemStatus();
+					computeNewCanvasSize();
 					updateButton();
 			        refreshAllProcsStatus();
 			        refresh(false, null);
@@ -778,7 +816,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
         showMyAllocNodesAction.setEnabled(isRuning);
         showMyUsedNodesAction.setEnabled(isRuning);
         //showLegendAction.setEnabled(isRuning);
-        showProcessesAction.setEnabled(isRuning);
+        //showProcessesAction.setEnabled(isRuning);
     }
     
     /* we don't do anything special on focus, yet */
@@ -800,7 +838,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
         showMyAllocNodesAction = new ShowMyAllocatedNodesAction(this);
         showMyUsedNodesAction = new ShowMyUsedNodesAction(this);
         //showLegendAction = new ShowLegendAction(this);
-        showProcessesAction = new ShowProcessesAction(this);
+        //showProcessesAction = new ShowProcessesAction(this);
         
         showAllNodesAction.setChecked(true);
     }
@@ -815,7 +853,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
         toolbarManager.add(showAllNodesAction);
         toolbarManager.add(showMyAllocNodesAction);
         toolbarManager.add(showMyUsedNodesAction);
-        toolbarManager.add(showProcessesAction);
+        //toolbarManager.add(showProcessesAction);
         
         toolbarManager.add(new Separator());
         toolbarManager.add(terminateAllAction);
@@ -1128,7 +1166,8 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
        	  				return NODE_USER_ALLOC_SHARED;
        	  		}
        	  		/* someone else owns it */
-        		else if(somenode.getAttrib("user").equals("root")) {
+        		else if(!somenode.getAttrib("user").equals("")) {
+        		//else if(somenode.getAttrib("user").equals("root")) {
         		/* PORT
        	  		else if(!sysDescNodes[index].getBprocUser().equals("root")) {
        	  		*/
@@ -1635,7 +1674,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
 		if (element instanceof IPNode) {
 			if (mode != NODES) {
 		        showAllNodesAction.setChecked(true);
-		        showProcessesAction.setChecked(false);
+		        //showProcessesAction.setChecked(false);
 		        
 		        mode = NODES;
 				filterNodes(true);
@@ -1647,7 +1686,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
 		else if (element instanceof IPProcess) {
 			if (mode != PROCESSES) {
 		        showAllNodesAction.setChecked(false);
-		        showProcessesAction.setChecked(true);
+		        //showProcessesAction.setChecked(true);
 				
 				mode = PROCESSES;
 				filterNodes(false);

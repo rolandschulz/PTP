@@ -45,9 +45,9 @@ import org.eclipse.swt.widgets.Label;
  */
 public class ParallelTab extends PLaunchConfigurationTab {
     // Program arguments UI widgets
-    protected Combo startupCombo = null;
+    //protected Combo startupCombo = null;
     protected Composite dynamicComp = null;
-    protected Combo networkTypeCombo = null;
+    //protected Combo networkTypeCombo = null;
     
     protected IntegerFieldEditor numberOfProcessField = null;
     protected IntegerFieldEditor numberOfProcessStartField = null;
@@ -55,9 +55,11 @@ public class ParallelTab extends PLaunchConfigurationTab {
 
     protected class WidgetListener extends SelectionAdapter implements IPropertyChangeListener {
 	    public void widgetSelected(SelectionEvent e) {
+	    	/*
 	        if (e.getSource() == startupCombo)
 	            updateComboFromSelection();
 	        else
+	        */
 	            updateLaunchConfigurationDialog();
 	    }
         public void propertyChange(PropertyChangeEvent event) {
@@ -84,11 +86,13 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		parallelComp.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));        
                 
 		new Label(parallelComp, SWT.NONE).setText(UIMessage.getResourceString("ParallelTab.StartupLabel"));
+		/*
 		startupCombo = new Combo(parallelComp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		startupCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		startupCombo.setItems(new String[] {"BProc"});
 		startupCombo.select(0);
 		startupCombo.addSelectionListener(listener);
+		*/
 		
 		createVerticalSpacer(parallelComp, 2);
 		
@@ -115,11 +119,13 @@ public class ParallelTab extends PLaunchConfigurationTab {
         //gRadio = createRadioButton(parallelComp, UIMessage.getResourceString("ParallelTab.Myrinet_For_Communication"));
         //gRadio.addSelectionListener(listener);
         
+        /*
 		new Label(dynamicComp, SWT.NONE).setText(UIMessage.getResourceString("ParallelTab.NetworkTypeLabel"));
 		networkTypeCombo = new Combo(dynamicComp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		networkTypeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		networkTypeCombo.setItems(new String[] {"P4", "GM"});
 		networkTypeCombo.addSelectionListener(listener);
+		*/
         
         numberOfProcessStartField = new IntegerFieldEditor("numberOfProcessStar", UIMessage.getResourceString("ParallelTab.Processes_Per_Node"), dynamicComp);
         numberOfProcessStartField.setValidRange(0, 5000);
@@ -142,7 +148,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
      */
     public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
         configuration.setAttribute(IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES, IPTPLaunchConfigurationConstants.DEF_NUMBER_OF_PROCESSES);
-        configuration.setAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, IPTPLaunchConfigurationConstants.DEF_NETWORK_TYPE);
+        //configuration.setAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, IPTPLaunchConfigurationConstants.DEF_NETWORK_TYPE);
         configuration.setAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE, IPTPLaunchConfigurationConstants.DEF_PROCESSES_PER_NODE);
         configuration.setAttribute(IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER, IPTPLaunchConfigurationConstants.DEF_FIRST_NODE_NUMBER);
     }
@@ -153,8 +159,8 @@ public class ParallelTab extends PLaunchConfigurationTab {
     public void initializeFrom(ILaunchConfiguration configuration) {
         try {
             numberOfProcessField.setStringValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES, EMPTY_STRING));
-            String type = configuration.getAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, EMPTY_STRING);
-            networkTypeCombo.select(type.equals(IPTPLaunchConfigurationConstants.P_TYPE)?0:1);            
+            //String type = configuration.getAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, EMPTY_STRING);
+            //networkTypeCombo.select(type.equals(IPTPLaunchConfigurationConstants.P_TYPE)?0:1);            
             numberOfProcessStartField.setStringValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE, EMPTY_STRING));
             firstNodeNumberField.setStringValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER, EMPTY_STRING));
         } catch (CoreException e) {
@@ -167,7 +173,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
      */
     public void performApply(ILaunchConfigurationWorkingCopy configuration) {
         configuration.setAttribute(IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES, getFieldContent(numberOfProcessField));
-        configuration.setAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, networkTypeCombo.getSelectionIndex()==0?IPTPLaunchConfigurationConstants.P_TYPE:IPTPLaunchConfigurationConstants.G_TYPE);
+        //configuration.setAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, networkTypeCombo.getSelectionIndex()==0?IPTPLaunchConfigurationConstants.P_TYPE:IPTPLaunchConfigurationConstants.G_TYPE);
         configuration.setAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE, getFieldContent(numberOfProcessStartField));
         configuration.setAttribute(IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER, getFieldContent(firstNodeNumberField));
     }

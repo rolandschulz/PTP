@@ -148,6 +148,7 @@ public class ParallelProcessesView extends AbstractParallelView {
     public void run() {
         System.out.println("ParallelProcessesView - run");        
         updateButton();
+        refreshAll(ASYN_STYLE, true);
         //removerAllProcessViewer();
     }
     public void abort() {
@@ -249,7 +250,6 @@ public class ParallelProcessesView extends AbstractParallelView {
     }
     
     public Object[] getElements(Object parent) {
-    		System.out.println("PPV.getElements("+parent+")");
         if (parent instanceof IPElement) {         
             switch (((IPElement)parent).getElementType()) {
             		case IPElement.P_UNIVERSE:
@@ -272,7 +272,6 @@ public class ParallelProcessesView extends AbstractParallelView {
                     */
             }
         }
-        System.out.println("returning null from PPV.getElements()");
         return null;        
     }
     

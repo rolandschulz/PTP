@@ -21,4 +21,5 @@ package org.eclipse.ptp.rtmodel;
 public interface IRuntimeListener {
     public void runtimeNodeStatusChange(NamedEntity ne);
     public void runtimeProcessOutput(NamedEntity ne, String output);
+    public void runtimeJobExited(NamedEntity ne);
 }
