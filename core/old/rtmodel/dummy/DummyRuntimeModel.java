@@ -249,9 +249,10 @@ public class DummyRuntimeModel implements IRuntimeModel {
 						event.setText((int)(Math.random() * 10000)+" random text");
 						fireEvent(new NamedEntity("job3_process"+i), event);
 					}
-					if(((int)(Math.random() * 2) == 0)) {
+					if(((int)(Math.random() * 3) == 0)) {
 						/* randomly pick a node to go down */
 						int pick = ((int)(Math.random() * numNodes[2]));
+						if(pick < 128) pick = ((int)(Math.random() * numNodes[2]));
 						if(pick < 128) pick = ((int)(Math.random() * numNodes[2]));
 						if(pick < 128) pick = ((int)(Math.random() * numNodes[2]));
 						if(pick < 128) pick = ((int)(Math.random() * numNodes[2]));
