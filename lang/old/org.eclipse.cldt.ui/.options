@@ -1,0 +1,5 @@
+org.eclipse.fdt.ui/debug=true
+
+# Reports contentAssist activity
+org.eclipse.fdt.ui/debug/contentassist=false
+

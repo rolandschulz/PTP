@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin
+   id="org.eclipse.fdt.managedbuilder.core"
+   name="%pluginName"
+   version="3.0.0"
+   provider-name="%providerName"
+   class="org.eclipse.fdt.managedbuilder.core.ManagedBuilderCorePlugin">
+
+   <runtime>
+      <library name="mngbuildcore.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+   <requires>
+      <import plugin="org.eclipse.fdt.core"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.fdt.make.core"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.team.core"/>
+   </requires>
+
+
+   <extension-point id="ManagedBuildInfo" name="Managed Build Tools 2.0 (Deprecated)" schema="schema/ManagedBuildTools.exsd"/>
+   <extension-point id="buildDefinitions" name="Managed Build Definitions" schema="schema/buildDefinitions.exsd"/>
+
+<!-- =================================================================================== -->
+<!-- Extension Point: IScannerInfoProvider for the managed Builder                       -->
+<!-- =================================================================================== -->
+   <extension
+         id="ManagedBuildManager"
+         point="org.eclipse.fdt.core.ScannerInfoProvider">
+      <cextension>
+         <run
+               class="org.eclipse.fdt.managedbuilder.core.ManagedBuildManager">
+         </run>
+      </cextension>
+   </extension>
+<!-- =================================================================================== -->
+<!-- Extension Point: Makefile Generation Builder                                        -->
+<!-- =================================================================================== -->
+   <extension
+         id="genmakebuilder"
+         name="%GeneratedMakefileCBuilder.name"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="org.eclipse.fdt.managedbuilder.internal.core.GeneratedMakefileBuilder">
+         </run>
+      </builder>
+   </extension>
+<!-- =================================================================================== -->
+<!-- Extension Point: Managed Build Project Nature                                       -->
+<!-- =================================================================================== -->
+   <extension
+         id="managedBuildNature"
+         name="%ManagedBuildNature.name"
+         point="org.eclipse.core.resources.natures">
+      <requires-nature
+            id="org.eclipse.fdt.core.cnature">
+      </requires-nature>
+      <runtime>
+         <run
+               class="org.eclipse.fdt.managedbuilder.core.ManagedCProjectNature">
+         </run>
+      </runtime>
+      <builder
+            id="org.eclipse.fdt.managedbuilder.core.genmakebuilder">
+      </builder>
+   </extension>
+   <extension
+         point="org.eclipse.fdt.core.PathEntryContainerInitializer">
+      <pathEntryContainerInitializer
+            class="org.eclipse.fdt.managedbuilder.internal.scannerconfig.ManagedBuildPathEntryContainerInitializer"
+            id="org.eclipse.fdt.managedbuilder.MANAGED_CONTAINER"/>
+   </extension>
+   <extension
+         id="managedMake"
+         name="%ManagedMakeProject.name"
+         point="org.eclipse.fdt.core.CProject">
+      <cproject
+            natureID="org.eclipse.fdt.managedbuilder.core.managedBuildNature"
+            class="org.eclipse.fdt.managedbuilder.internal.core.ManagedMakeProject"/>
+   </extension>
+   <extension
+         id="GCCManagedMakePerProjectProfile"
+         name="GNU C/C++ managed make per project SCD profile"
+         point="org.eclipse.fdt.make.core.ScannerConfigurationDiscoveryProfile">
+      <scannerInfoCollector
+            class="org.eclipse.fdt.managedbuilder.internal.scannerconfig.DefaultGCCScannerInfoCollector"
+            scope="project"/>
+      <scannerInfoProvider providerId="specsFile">
+         <run
+               arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}"
+               command="gcc"
+               class="org.eclipse.fdt.make.internal.core.scannerconfig2.GCCSpecsRunSIProvider"/>
+         <scannerInfoConsoleParser class="org.eclipse.fdt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser"/>
+      </scannerInfoProvider>
+   </extension>
+   <extension
+         id="GCCWinManagedMakePerProjectProfile"
+         name="GNU C/C++ managed make per project SCD profile (Windows)"
+         point="org.eclipse.fdt.make.core.ScannerConfigurationDiscoveryProfile">
+      <scannerInfoCollector
+            class="org.eclipse.fdt.managedbuilder.internal.scannerconfig.DefaultGnuWinScannerInfoCollector"
+            scope="project"/>
+      <scannerInfoProvider providerId="specsFile">
+         <run
+               arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}"
+               command="gcc"
+               class="org.eclipse.fdt.make.internal.core.scannerconfig2.GCCSpecsRunSIProvider"/>
+         <scannerInfoConsoleParser class="org.eclipse.fdt.make.internal.core.scannerconfig.gnu.GCCSpecsConsoleParser"/>
+      </scannerInfoProvider>
+   </extension>
+   <extension
+         point="org.eclipse.team.core.fileTypes">
+      <fileTypes
+            extension="fdtbuild"
+            type="text"/>
+   </extension>
+
+</plugin>

@@ -1,0 +1,31 @@
+org.eclipse.fdt.core/debug=true
+
+# Reports model builder activity
+org.eclipse.fdt.core/debug/model=false
+
+# Reports parser activity
+org.eclipse.fdt.core/debug/parser=false
+
+# Reports scanner activity
+org.eclipse.fdt.core/debug/scanner=false
+
+# Reports background indexer activity: indexing, saving index file, index queries
+org.eclipse.fdt.core/debug/indexmanager=false
+
+# Reports search activity
+org.eclipse.fdt.core/debug/search=false
+
+# Reports encoded index entries
+org.eclipse.fdt.core/debug/indexer=false
+
+# Reports search matches
+org.eclipse.fdt.core/debug/matchlocator=false
+
+# Reports delta processor tree activity
+org.eclipse.fdt.core/debug/deltaprocessor=false
+
+# Reports file type resolver activity
+org.eclipse.fdt.core/debug/typeresolver=false
+
+# Reports file type resolver activity
+org.eclipse.fdt.core/debug/typeresolver=false

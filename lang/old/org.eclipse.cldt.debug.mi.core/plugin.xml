@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin
+   id="org.eclipse.fdt.debug.mi.core"
+   name="%pluginName"
+   version="3.0.0"
+   provider-name="%providerName"
+   class="org.eclipse.fdt.debug.mi.core.MIPlugin">
+
+   <runtime>
+      <library name="fdtmicore.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+   <requires>
+      <import plugin="org.eclipse.fdt.debug.core"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.debug.core"/>
+      <import plugin="org.eclipse.fdt.core"/>
+      <import plugin="org.eclipse.core.runtime"/>
+   </requires>
+
+
+   <extension
+         point="org.eclipse.fdt.debug.core.CDebugger">
+      <debugger
+            platform="*"
+            name="%GDBDebugger.name"
+            modes="run,core,attach"
+            cpu="native"
+            class="org.eclipse.fdt.debug.mi.core.GDBCDIDebugger"
+            id="org.eclipse.fdt.debug.mi.core.CDebugger">
+      </debugger>
+      <debugger
+            platform="win32"
+            name="%CygwinGDBDebugger.name"
+            modes="run,core,attach"
+            cpu="native"
+            class="org.eclipse.fdt.debug.mi.core.CygwinGDBCDIDebugger"
+            id="org.eclipse.fdt.debug.mi.core.CygwinCDebugger">
+      </debugger>
+      <debugger
+            platform="*"
+            name="%GDBServer.name"
+            modes="run"
+            cpu="*"
+            class="org.eclipse.fdt.debug.mi.core.GDBServerCDIDebugger"
+            id="org.eclipse.fdt.debug.mi.core.GDBServerCDebugger">
+      </debugger>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.fdt.debug.mi.core.MIPreferenceInitializer"/>
+   </extension>
+
+</plugin>

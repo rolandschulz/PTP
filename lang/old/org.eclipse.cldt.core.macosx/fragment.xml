@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<fragment
+   id="org.eclipse.fdt.core.macosx"
+   name="%fragmentName.macosx"
+   version="3.0.0"
+   provider-name="%providerName"
+   plugin-id="org.eclipse.fdt.core"
+   plugin-version="3.0.0">
+
+   <runtime>
+      <library name="fdt_macosx.jar"/>
+   </runtime>
+
+
+   <extension
+         point="org.eclipse.fdt.core.ProcessList">
+      <processList
+      		platform="macosx"
+            class="org.eclipse.fdt.internal.core.macosx.ProcessList">
+      </processList>
+   </extension>
+</fragment>
