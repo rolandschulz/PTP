@@ -59,8 +59,7 @@ public class OutputConsole extends MessageConsole {
 	}
 	
 	private void appendText(String text) {
-		newMessageStream().print(text);
-		//appendToDocument(text, newMessageStream());
+		appendToDocument(text, newMessageStream());
 	}
 	
 	public void kill() {
