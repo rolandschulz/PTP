@@ -53,6 +53,7 @@ import org.eclipse.ptp.internal.core.PJob;
 import org.eclipse.ptp.internal.core.PUniverse;
 import org.eclipse.ptp.launch.core.ILaunchManager;
 import org.eclipse.ptp.launch.core.IParallelLaunchListener;
+import org.eclipse.ptp.rtmodel.IRuntimeListener;
 import org.eclipse.ptp.rtmodel.IRuntimeModel;
 import org.eclipse.ptp.rtmodel.NamedEntity;
 import org.eclipse.ptp.rtmodel.dummy.DummyRuntimeModel;
@@ -63,9 +64,10 @@ import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IPerspectiveListener;
+import org.eclipse.ui.internal.Model;
 import org.eclipse.ui.progress.IProgressService;
 
-public class LaunchManager implements ILaunchManager {
+public class LaunchManager implements ILaunchManager, IRuntimeListener {
 	
     /*
      * 
@@ -80,6 +82,7 @@ public class LaunchManager implements ILaunchManager {
     protected OutputConsole outputConsole = null;
     protected boolean isPerspectiveOpen = false;
     protected ILaunchConfiguration config = null;
+    protected IRuntimeModel runtimeModel = null;
 
     public boolean isParallelPerspectiveOpen() {
         return isPerspectiveOpen;
@@ -103,8 +106,8 @@ public class LaunchManager implements ILaunchManager {
     		
     		universe = new PUniverse();
     		
-    		IRuntimeModel rtm = new DummyRuntimeModel();
-    		NamedEntity[] ne = rtm.getMachines();
+    		runtimeModel = new DummyRuntimeModel();
+    		NamedEntity[] ne = runtimeModel.getMachines();
     		for(int i=0; i<ne.length; i++) {
     			PMachine mac;
     			
@@ -114,15 +117,19 @@ public class LaunchManager implements ILaunchManager {
     			
     			universe.addChild(mac);
     			
-    			NamedEntity[] ne2 = rtm.getNodes(ne[i].name);
+    			NamedEntity[] ne2 = runtimeModel.getNodes(ne[i].name);
     			for(int j=0; j<ne2.length; j++) {
     				PNode node;
     				node = new PNode(mac, ne2[j].name, ""+j+"");
+    				node.setAttrib("user", runtimeModel.getNodeAttribute(ne2[j].name, "user"));
+    				node.setAttrib("group", runtimeModel.getNodeAttribute(ne2[j].name, "group"));
+    				node.setAttrib("state", runtimeModel.getNodeAttribute(ne2[j].name, "state"));
+    				node.setAttrib("mode", runtimeModel.getNodeAttribute(ne2[j].name, "mode"));
     				
     				mac.addChild(node);
     			}
     		}
-    		ne = rtm.getJobs();
+    		ne = runtimeModel.getJobs();
     		for(int i=0; i<ne.length; i++) {
     			PJob job;
     			
@@ -131,7 +138,7 @@ public class LaunchManager implements ILaunchManager {
     			job = new PJob(universe, ne[i].name, PJob.BASE_OFFSET+ne[i].name.substring(new String("job").length()));
     			universe.addChild(job);
     			
-    			NamedEntity[] ne2 = rtm.getProcesses(ne[i].name);
+    			NamedEntity[] ne2 = runtimeModel.getProcesses(ne[i].name);
     			for(int j=0; j<ne2.length; j++) {
     				PProcess proc;
     				System.out.println("process name = "+ne2[j].name);
@@ -139,8 +146,8 @@ public class LaunchManager implements ILaunchManager {
     				job.addChild(proc);
     				
     				String pname = proc.getElementName();
-    				String nname = rtm.getProcessNodeName(pname);
-    				String mname = rtm.getNodeMachineName(nname);
+    				String nname = runtimeModel.getProcessNodeName(pname);
+    				String mname = runtimeModel.getNodeMachineName(nname);
     				System.out.println("Process "+pname+" running on node:");
     				System.out.println("\t"+nname);
     				System.out.println("\tand that's running on machine: "+mname);
@@ -158,46 +165,18 @@ public class LaunchManager implements ILaunchManager {
     				}
     			}
     		}
-
-    	/*
-    	    processRoot = new PJob();
-        
-        int pn = 0;
-        int nn = 20;
-        int ppn = 3;
-        for (int h = 0; h < nn; h++) {
-            IPNode pNode = new PNode(processRoot, "" + h);
-            for (int i = 0; i < ppn; i++) {
-                IPProcess p = new PProcess(pNode, "" + (pn++), "123", "starting", null, null);
-                for (int j = 0; j < 100; j++) {
-                    p.addOutput("random output from process: " + j);
-                }
-                pNode.addChild(p);
-            }
-            processRoot.addChild(pNode);
-        }
-
-        final int tpn = nn * ppn;
-        Runnable runnable = new Runnable() {
-            public void run() {
-                try {
-                    Thread.sleep(10000);
-                } catch (Exception e) {
-                }
-
-                for (int i = 0; i < tpn; i++) {
-                    IPProcess p = processRoot.findProcess("" + i);
-                    p.setStatus(IPProcess.EXITED_SIGNALLED);
-                    ParallelProcessesView.getInstance().refresh(p);
-                    //System.out.println("Called updated");
-                }
-            }
-        };
-        new Thread(runnable).start();
-
-        System.out.println("Created all dumy nodes and processes");
-        */
+    		
+    		runtimeModel.addRuntimeListener(this);
     }
+
+	public void runtimeNodeStatusChange(Object object) {
+		System.out.println("LaunchManager.runtimeNodeStatusChange("+object+")");
+		/* so let's find which node this is */
+		IPNode n = universe.findNodeByName(((NamedEntity)object).getName());
+		if(n != null) {
+			System.out.println("FOUND THE NODE! - "+n);
+		}
+	}
 
     private IPerspectiveListener perspectiveListener = new IPerspectiveListener() {
         public void perspectiveClosed(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
@@ -347,6 +326,7 @@ public class LaunchManager implements ILaunchManager {
         perspectiveListener = null;
         listeners.clear();
         listeners = null;
+        runtimeModel.shutdown();
     }
 
     

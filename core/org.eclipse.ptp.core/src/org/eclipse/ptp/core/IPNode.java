@@ -18,9 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.core;
 
-/**
- *
- */
 public interface IPNode extends IPElement {
     public IPProcess[] getProcesses();
     public IPProcess[] getSortedProcesses();

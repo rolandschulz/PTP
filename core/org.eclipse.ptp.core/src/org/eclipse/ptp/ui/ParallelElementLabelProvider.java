@@ -108,70 +108,69 @@ public class ParallelElementLabelProvider extends LabelProvider implements IColo
 	}
 		
 	public int getParallelStatusIndex(Object element) {
-	    if (element instanceof IPNode) {
-	        IPNode node = (IPNode)element;
-	        
-	        if(node.hasChildren()) {
-	        	if (!node.isAllStop())
-	        		return NODE_RUNNING;
-	        	else
-	        		return NODE_EXITED;
-	        
-	        }
-	        /*
-	        else {
-		        String nodeState = node.getState();
+		if (element instanceof IPNode) {
+			IPNode node = (IPNode)element;
+			
+			if(node.hasChildren()) {
+				if (!node.isAllStop())
+					return NODE_RUNNING;
+				else
+					return NODE_EXITED;	
+			}
+			
+			else {
+				String nodeState = (String)node.getAttrib("state");
+				System.out.println("NODE: "+node+" - state = "+nodeState);
+				
+				if (nodeState != null && nodeState.equals("up")) {
+					String user = (String)node.getAttrib("user");
 
-	        	if (nodeState != null && nodeState.equals("up")) {
-	                String user = node.getUser();
-	                if (node.isCurrentUser()) {
-	                    String mode = node.getMode();
-	                    if (mode != null && mode.equals("0100"))
-	                        return NODE_USER_ALLOC_EXCL;
-	                    else if (mode != null && (mode.equals("0110") || mode.equals("0111") || mode.equals("0101")))
-	                        return NODE_USER_ALLOC_SHARED;
-	                }
-	                else if (user != null && !user.equals("root")) {
-	                    String mode = node.getMode();
-	                    if (mode != null && mode.equals("0100"))
-	                        return NODE_OTHER_ALLOC_EXCL;
-	                    else if (mode != null && (mode.equals("0110") || mode.equals("0111") || mode.equals("0101")))
-	                        return NODE_OTHER_ALLOC_SHARED;
-	                }
-	                return NODE_UP;
-		        }
-	       	  	else if(nodeState != null && nodeState.equals("down")) {
-	       	  		return NODE_DOWN;
-	       	  	}
-	       	  	else if(nodeState != null && nodeState.equals("error")) {
-	       	  		return NODE_ERROR;
-	       	  	}
-	        }
-	        */
-	    }
-	    else {
-	        if (element instanceof IPProcess) {
-		        IPProcess process = (IPProcess)element;
-		        String state = process.getStatus();
-		        if (state == null)
-		            return PROC_ERROR;
-		        else if (state.equals(IPProcess.STARTING))
-		        	return PROC_STARTING;
-		        else if (state.equals(IPProcess.RUNNING))
-		        	return PROC_RUNNING;
-	        	else if(state.equals(IPProcess.EXITED))
-	        		return PROC_EXITED;
-	        	else if(state.equals(IPProcess.EXITED_SIGNALLED))
-	        		return PROC_EXITED_SIGNAL;
-	        	else if(state.equals(IPProcess.STOPPED))
-	        		return PROC_STOPPED;
-	        	else if(state.equals(IPProcess.ERROR))
-	        		return PROC_ERROR;
-	        	else
-	        		return PROC_ERROR;
-	        }
-	    }
-	    return -1;
+					if (user.equals(System.getProperty("user.name"))) {
+						String mode = (String)node.getAttrib("mode");
+						if (mode != null && mode.equals("0100"))
+							return NODE_USER_ALLOC_EXCL;
+						else if (mode != null && (mode.equals("0110") || mode.equals("0111") || mode.equals("0101")))
+							return NODE_USER_ALLOC_SHARED;
+					}
+					else if (user != null && !user.equals("root")) {
+						String mode = (String)node.getAttrib("mode");
+						if (mode != null && mode.equals("0100"))
+							return NODE_OTHER_ALLOC_EXCL;
+						else if (mode != null && (mode.equals("0110") || mode.equals("0111") || mode.equals("0101")))
+							return NODE_OTHER_ALLOC_SHARED;
+					}
+					return NODE_UP;
+				}
+				else if(nodeState != null && nodeState.equals("down")) {
+					return NODE_DOWN;
+				}
+				else if(nodeState != null && nodeState.equals("error")) {
+					return NODE_ERROR;
+				}
+			}
+			
+		}
+		else if (element instanceof IPProcess) {
+				IPProcess process = (IPProcess)element;
+				String state = process.getStatus();
+				if (state == null)
+					return PROC_ERROR;
+				else if (state.equals(IPProcess.STARTING))
+					return PROC_STARTING;
+				else if (state.equals(IPProcess.RUNNING))
+					return PROC_RUNNING;
+				else if(state.equals(IPProcess.EXITED))
+					return PROC_EXITED;
+				else if(state.equals(IPProcess.EXITED_SIGNALLED))
+					return PROC_EXITED_SIGNAL;
+				else if(state.equals(IPProcess.STOPPED))
+					return PROC_STOPPED;
+				else if(state.equals(IPProcess.ERROR))
+					return PROC_ERROR;
+				else
+					return PROC_ERROR;
+		}
+		return -1;
 	}
 
 	/**

@@ -29,19 +29,9 @@ import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPMachine;
 
-
-/**
- *
- */
 public class PNode extends Parent implements IPNode {
     protected String NAME_TAG = "node ";
     protected Map attribs = null;
-    /*
-    private String user = null;
-    private String group = null;
-    private String state = null;
-    private String mode = null;
-    */
     	
     public PNode(IPElement element, String name, String key) {
     		super(element, name, key, P_NODE);
@@ -83,6 +73,7 @@ public class PNode extends Parent implements IPNode {
     }*/
     
     public void setAttrib(String key, Object val) {
+    		System.out.println("NODE: "+this+" setAttrib("+key+", "+val+")");
     		if(attribs.containsKey(key))
     			attribs.remove(key);
     		attribs.put(key, val);

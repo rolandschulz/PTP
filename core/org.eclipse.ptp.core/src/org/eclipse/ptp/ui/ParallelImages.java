@@ -27,9 +27,6 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ptp.ParallelPlugin;
 import org.eclipse.swt.graphics.Image;
 
-/**
- *
- */
 public class ParallelImages {
 	private static final String NAME_PREFIX = "org.eclipse.ptp.ui.";
 	private static final int NAME_PREFIX_LENGTH = NAME_PREFIX.length();

@@ -38,9 +38,6 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
-/**
- *
- */
 public abstract class AbstractParallelView extends ViewPart implements IParallelLaunchListener {
    	/* colors so that we can hold them in one place and everyone can
    	 * access them
