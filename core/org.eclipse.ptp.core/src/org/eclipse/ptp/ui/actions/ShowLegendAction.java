@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.ISelection;
 /*
 import org.eclipse.ptp.ui.LegendDialog;
 */
+import org.eclipse.ptp.ui.LegendDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
