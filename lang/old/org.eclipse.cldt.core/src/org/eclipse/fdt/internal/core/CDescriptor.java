@@ -108,10 +108,10 @@ public class CDescriptor implements ICDescriptor {
 			String ownerID = readFDTProjectFile(descriptionPath);
 			if (!ownerID.equals("")) { //$NON-NLS-1$
 				if (ownerID.equals(id)) {
-					status = new Status(IStatus.WARNING, FortranCorePlugin.PLUGIN_ID, FortranCorePlugin.STATUS_FDTPROJECT_EXISTS,
+					status = new Status(IStatus.WARNING, CommonLanguageCore.PLUGIN_ID, FortranCorePlugin.STATUS_FDTPROJECT_EXISTS,
 							CommonLanguageCore.getResourceString("CDescriptor.exception.projectAlreadyExists"), (Throwable)null); //$NON-NLS-1$
 				} else {
-					status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, FortranCorePlugin.STATUS_FDTPROJECT_MISMATCH,
+					status = new Status(IStatus.ERROR, CommonLanguageCore.PLUGIN_ID, FortranCorePlugin.STATUS_FDTPROJECT_MISMATCH,
 							CommonLanguageCore.getResourceString("CDescriptor.exception.unmatchedOwnerId") + "<requested:" +id +"/ In file:" +ownerID+">", (Throwable)null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ 
 				}
 				throw new CoreException(status);
@@ -177,11 +177,11 @@ public class CDescriptor implements ICDescriptor {
 				readProjectDescription(node);
 				return ownerID;
 			}
-			IStatus status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1,
+			IStatus status = new Status(IStatus.ERROR, CommonLanguageCore.PLUGIN_ID, -1,
 					CommonLanguageCore.getResourceString("CDescriptor.exception.missingElement"), null); //$NON-NLS-1$
 			throw new CoreException(status);
 		} catch (Exception e) {
-			IStatus status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, e.toString(), e);
+			IStatus status = new Status(IStatus.ERROR, CommonLanguageCore.PLUGIN_ID, -1, e.toString(), e);
 			throw new CoreException(status);
 		}
 	}
@@ -331,13 +331,13 @@ public class CDescriptor implements ICDescriptor {
 				try {
 					xml = getAsXML();
 				} catch (IOException e) {
-					IStatus s = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, e.getMessage(), e);
+					IStatus s = new Status(IStatus.ERROR, CommonLanguageCore.PLUGIN_ID, -1, e.getMessage(), e);
 					throw new CoreException(s);
 				} catch (TransformerException e) {
-					IStatus s = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, e.getMessage(), e);
+					IStatus s = new Status(IStatus.ERROR, CommonLanguageCore.PLUGIN_ID, -1, e.getMessage(), e);
 					throw new CoreException(s);
 				} catch (ParserConfigurationException e) {
-					IStatus s = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, e.getMessage(), e);
+					IStatus s = new Status(IStatus.ERROR, CommonLanguageCore.PLUGIN_ID, -1, e.getMessage(), e);
 					throw new CoreException(s);
 				}
 
@@ -355,7 +355,7 @@ public class CDescriptor implements ICDescriptor {
 						rscFile.create(inputStream, IResource.FORCE, null);
 					}
 				} catch (UnsupportedEncodingException e) {
-					IStatus s = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, e.getMessage(), e);
+					IStatus s = new Status(IStatus.ERROR, CommonLanguageCore.PLUGIN_ID, -1, e.getMessage(), e);
 					throw new CoreException(s);
 				}
 				fUpdating = false;
@@ -415,7 +415,7 @@ public class CDescriptor implements ICDescriptor {
 				String ownerId = readFDTProjectFile(descriptionPath);
 				fOwner = new COwner(fManager.getOwnerConfiguration(ownerId));
 			} catch (CoreException e) {
-				FortranCorePlugin.log(e);
+				CommonLanguageCore.log(e);
 				fOwner = origOwner;
 				extMap = origExtMap;
 				extInfoMap = origExtInfoMap;
@@ -462,13 +462,13 @@ public class CDescriptor implements ICDescriptor {
 					try {
 						decodeProjectExtension((Element)childNode);
 					} catch (CoreException e) {
-						FortranCorePlugin.log(e);
+						CommonLanguageCore.log(e);
 					}
 				} else if (childNode.getNodeName().equals(PROJECT_DATA)) {
 					try {
 						decodeProjectData((Element)childNode);
 					} catch (CoreException e) {
-						FortranCorePlugin.log(e);
+						CommonLanguageCore.log(e);
 					}
 				}
 			}
@@ -535,7 +535,7 @@ public class CDescriptor implements ICDescriptor {
 		IExtensionPoint extensionPoint = extensionRegistry.getExtensionPoint(ext.getExtension());
 		IExtension extension = extensionPoint.getExtension(ext.getID());
 		if (extension == null) {
-			throw new CoreException(new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1,
+			throw new CoreException(new Status(IStatus.ERROR, CommonLanguageCore.PLUGIN_ID, -1,
 					CommonLanguageCore.getResourceString("CDescriptor.exception.providerNotFound") + ":" + ext.getID(), null)); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		IConfigurationElement element[] = extension.getConfigurationElements();
@@ -555,7 +555,7 @@ public class CDescriptor implements ICDescriptor {
 		IExtensionPoint extensionPoint = extensionRegistry.getExtensionPoint(ext.getExtension());
 		IExtension extension = extensionPoint.getExtension(ext.getID());
 		if (extension == null) {
-			throw new CoreException(new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1,
+			throw new CoreException(new Status(IStatus.ERROR, CommonLanguageCore.PLUGIN_ID, -1,
 					CommonLanguageCore.getResourceString("CDescriptor.exception.providerNotFound"), null)); //$NON-NLS-1$
 		}
 		IConfigurationElement element[] = extension.getConfigurationElements();
@@ -595,7 +595,7 @@ public class CDescriptor implements ICDescriptor {
 			try {
 				dataDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 			} catch (ParserConfigurationException e) {
-				throw new CoreException(new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, IStatus.ERROR,
+				throw new CoreException(new Status(IStatus.ERROR, CommonLanguageCore.PLUGIN_ID, IStatus.ERROR,
 						CommonLanguageCore.getResourceString("CDescriptor.extension.internalError"), e)); //$NON-NLS-1$
 			}
 			Element rootElem = dataDoc.createElement(PROJECT_DATA);
