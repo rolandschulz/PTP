@@ -29,5 +29,5 @@ public interface IPMachine extends IPElement {
 	/* returns a String representing the architecture in some form */
 	public String getArch();
 	/* sets the architecture, should be used by instantiating classes and such */
-	public void setArch(String a);
+	public void setArch(String arch);
 }

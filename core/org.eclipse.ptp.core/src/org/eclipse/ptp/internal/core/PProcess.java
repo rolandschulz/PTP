@@ -3,7 +3,7 @@ package org.eclipse.ptp.internal.core;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPRoot;
+import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IProcessListener;
 
 /**
@@ -28,8 +28,8 @@ public class PProcess extends Parent implements IPProcess {
 		this.pid = pid;
 		this.exitCode = exitCode;
 		setStatus(status);
-		IPRoot root = getPRoot();
-		outputFile = new OutputTextFile(processNumber, root.getOutputStoreDirectory(), root.getStoreLine());
+		IPMachine machine = getPMachine();
+		outputFile = new OutputTextFile(processNumber, machine.getOutputStoreDirectory(), machine.getStoreLine());
 		
 	}
 	
