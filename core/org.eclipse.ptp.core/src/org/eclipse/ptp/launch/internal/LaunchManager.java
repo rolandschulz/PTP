@@ -156,7 +156,8 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
 		for(int j=0; j<ne.length; j++) {
 			PProcess proc;
 			//System.out.println("process name = "+ne[j].name);
-			proc = new PProcess(job, ne[j].name, ""+j+"", "-1", "-1", "-1", "-1");
+			int pid = ((int)(Math.random() * 10000)) + 1000;
+			proc = new PProcess(job, ne[j].name, ""+j+"", ""+pid+"", "-1", "", "");
 			job.addChild(proc);
 			
 			String pname = proc.getElementName();
@@ -193,6 +194,10 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
     				String status = runtimeModel.getProcessStatus(procName);
     				//System.out.println("Status = "+status+" on process - "+procName);
     				procs[i].setStatus(status);
+    				String signal = runtimeModel.getProcessSignal(procName);
+    				String exitCode = runtimeModel.getProcessExitCode(procName);
+    				if(!signal.equals("")) procs[i].setSignalName(signal);
+    				if(!exitCode.equals("")) procs[i].setExitCode(exitCode);
     			}
     		}
     		fireEvent(job, EVENT_UPDATED_STATUS);
