@@ -137,11 +137,11 @@ public class SourceIndexer extends AbstractIndexer {
 		}
 		catch ( VirtualMachineError vmErr){
 			if (vmErr instanceof OutOfMemoryError){
-				org.eclipse.fdt.internal.core.model.Util.log(null, "Out Of Memory error: " + vmErr.getMessage() + " on File: " + resourceFile.getName(), ICLogConstants.FDT); //$NON-NLS-1$ //$NON-NLS-2$
+				org.eclipse.fdt.internal.core.model.Util.log(null, "Out Of Memory error: " + vmErr.getMessage() + " on File: " + resourceFile.getName(), ICLogConstants.CDT); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		catch (ParseError e){
-			org.eclipse.fdt.internal.core.model.Util.log(null, "Parser Timeout on File: " + resourceFile.getName(), ICLogConstants.FDT); //$NON-NLS-1$ //$NON-NLS-2$
+			org.eclipse.fdt.internal.core.model.Util.log(null, "Parser Timeout on File: " + resourceFile.getName(), ICLogConstants.CDT); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch ( Exception ex ){
 			if (ex instanceof IOException)

@@ -44,7 +44,7 @@ public class ParserLogService implements IParserLogService
 	 */
 	public void errorLog(String message)
 	{
-		Util.log( message, ICLogConstants.FDT );
+		Util.log( message, ICLogConstants.CDT );
 	}
 
 	public boolean isTracing(){

@@ -151,7 +151,7 @@ public abstract class FindAction extends SelectionParseAction {
 		catch (Exception ex){}
 		catch ( VirtualMachineError vmErr){
 			if (vmErr instanceof OutOfMemoryError){
-				org.eclipse.fdt.internal.core.model.Util.log(null, "Selection Search Out Of Memory error: " + vmErr.getMessage() + " on File: " + resourceFile.getName(), ICLogConstants.FDT); //$NON-NLS-1$ //$NON-NLS-2$
+				org.eclipse.fdt.internal.core.model.Util.log(null, "Selection Search Out Of Memory error: " + vmErr.getMessage() + " on File: " + resourceFile.getName(), ICLogConstants.CDT); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		

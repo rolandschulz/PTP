@@ -298,7 +298,7 @@ public class TypeHierarchy implements ITypeHierarchy, IElementChangedListener {
     		final ITypeHierarchyChangedListener listener= (ITypeHierarchyChangedListener)listeners.get(i);
     		Platform.run(new ISafeRunnable() {
     			public void handleException(Throwable exception) {
-    				Util.log(exception, "Exception occurred in listener of Type hierarchy change notification", ICLogConstants.FDT); //$NON-NLS-1$
+    				Util.log(exception, "Exception occurred in listener of Type hierarchy change notification", ICLogConstants.CDT); //$NON-NLS-1$
     			}
     			public void run() throws Exception {
     				listener.typeHierarchyChanged(TypeHierarchy.this);

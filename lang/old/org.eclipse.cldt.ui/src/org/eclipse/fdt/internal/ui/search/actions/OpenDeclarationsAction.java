@@ -167,7 +167,7 @@ public class OpenDeclarationsAction extends SelectionParseAction implements IUpd
 				catch (ParseError er){}
 				catch ( VirtualMachineError vmErr){
 					if (vmErr instanceof OutOfMemoryError){
-						org.eclipse.fdt.internal.core.model.Util.log(null, "Open Declarations Out Of Memory error: " + vmErr.getMessage() + " on File: " + resourceFile.getName(), ICLogConstants.FDT); //$NON-NLS-1$ //$NON-NLS-2$
+						org.eclipse.fdt.internal.core.model.Util.log(null, "Open Declarations Out Of Memory error: " + vmErr.getMessage() + " on File: " + resourceFile.getName(), ICLogConstants.CDT); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				}
 				catch (Exception ex){}

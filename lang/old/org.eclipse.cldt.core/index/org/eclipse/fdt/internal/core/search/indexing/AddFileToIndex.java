@@ -58,7 +58,7 @@ public abstract class AddFileToIndex extends IndexRequest {
 			monitor.enterWrite(); // ask permission to write
 			if (!indexDocument(index)) return false;
 		} catch (IOException e) {
-			org.eclipse.fdt.internal.core.model.Util.log(null, "Index I/O Exception: " + e.getMessage() + " on File: " + resource.getName(), ICLogConstants.FDT); //$NON-NLS-1$ //$NON-NLS-2$
+			org.eclipse.fdt.internal.core.model.Util.log(null, "Index I/O Exception: " + e.getMessage() + " on File: " + resource.getName(), ICLogConstants.CDT); //$NON-NLS-1$ //$NON-NLS-2$
 			if (IndexManager.VERBOSE) {
 				JobManager.verbose("-> failed to index " + this.resource + " because of the following exception:"); //$NON-NLS-1$ //$NON-NLS-2$
 				e.printStackTrace();
