@@ -136,7 +136,7 @@ public class CModelBuilder {
 		// pick the language
 		ParserLanguage language = ParserLanguage.C;
 		if (hasFortranNature) {
-			//TODO - ParserLanguage.F
+			language = ParserLanguage.FORTRAN;
 		}		
 
 		
