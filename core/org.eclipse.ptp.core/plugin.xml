@@ -50,10 +50,10 @@
 		point="org.eclipse.debug.core.launchConfigurationTypes">
 		<launchConfigurationType
 			name="%ParallelLaunch.name"
-			delegate="org.eclipse.pdt.launch.internal.ParallelLaunchConfigurationDelegate"
+			delegate="org.eclipse.ptp.launch.internal.ParallelLaunchConfigurationDelegate"
 			modes="run,debug"
 			public="true"
-			id="org.eclipse.pdt.launch.parallelLaunch">
+			id="org.eclipse.ptp.launch.parallelLaunch">
 		</launchConfigurationType>
 	</extension>
 
@@ -61,17 +61,17 @@
 		point="org.eclipse.debug.ui.launchConfigurationTypeImages">
 		<launchConfigurationTypeImage
 			icon="icons/parallel_run.gif"
-			configTypeID="org.eclipse.pdt.launch.parallelLaunch"
-			id="org.eclipse.pdt.launch.parallelLaunchImage">
+			configTypeID="org.eclipse.ptp.launch.parallelLaunch"
+			id="org.eclipse.ptp.launch.parallelLaunchImage">
 		</launchConfigurationTypeImage>
 	</extension>   
    
 	<extension
 		point="org.eclipse.debug.ui.launchConfigurationTabGroups">
 		<launchConfigurationTabGroup
-			type="org.eclipse.pdt.launch.parallelLaunch"
-			class="org.eclipse.pdt.launch.internal.ui.ParallelLaunchConfigurationTabGroup"
-			id="org.eclipse.pdt.launch.parallelLaunchConfigurationTabGroup">
+			type="org.eclipse.ptp.launch.parallelLaunch"
+			class="org.eclipse.ptp.launch.internal.ui.ParallelLaunchConfigurationTabGroup"
+			id="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup">
 		</launchConfigurationTabGroup>
 	</extension>
 
@@ -79,13 +79,13 @@
    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
-            label="%PDTShortcut.label"
+            label="%PTPShortcut.label"
 			icon="icons/parallel_run.gif"
-            class="org.eclipse.pdt.launch.internal.PDTLaunchShortcut"
+            class="org.eclipse.ptp.launch.internal.PTPLaunchShortcut"
             modes="run, debug"
-            id="org.eclipse.pdt.pdtShortcut">
+            id="org.eclipse.ptp.ptpShortcut">
          <perspective
-               id="org.eclipse.pdt.ui.PRunPerspective">
+               id="org.eclipse.ptp.ui.PRunPerspective">
          </perspective>
          <perspective
                id="org.eclipse.debug.ui.DebugPerspective">
@@ -106,21 +106,21 @@
 		point="org.eclipse.ui.views">
 		<category
 			name="%ParallelViewCategory.name"
-			id="org.parallel.pdt.ui.views">
+			id="org.parallel.ptp.ui.views">
 		</category>
 		<view
 			name="%ParallelControlView.name"
 			icon="icons/parallel_perspective.gif"
-			category="org.parallel.pdt.ui.views"
-			class="org.eclipse.pdt.ui.views.ParallelProcessesView"
-			id="org.eclipse.pdt.ui.views.parallelProcessesView">
+			category="org.parallel.ptp.ui.views"
+			class="org.eclipse.ptp.ui.views.ParallelProcessesView"
+			id="org.eclipse.ptp.ui.views.parallelProcessesView">
 		</view>
 		<view
 			name="%ParallelNodeView.name"
 			icon="icons/parallel_perspective.gif"
-			category="org.parallel.pdt.ui.views"
-			class="org.eclipse.pdt.ui.views.ParallelNodeStatusView"
-			id="org.eclipse.pdt.ui.views.parallelNodeStatusView">
+			category="org.parallel.ptp.ui.views"
+			class="org.eclipse.ptp.ui.views.ParallelNodeStatusView"
+			id="org.eclipse.ptp.ui.views.parallelNodeStatusView">
 		</view>
 	</extension>
 
@@ -131,8 +131,8 @@
 			icon="icons/parallel_perspective.gif"
             default="true"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"            
-			class="org.eclipse.pdt.ui.views.ParallelProcessViewer"
-			id="org.eclipse.pdt.ui.views.parallelProcessViewer">
+			class="org.eclipse.ptp.ui.views.ParallelProcessViewer"
+			id="org.eclipse.ptp.ui.views.parallelProcessViewer">
 		</editor>
 	</extension>
 	
@@ -140,9 +140,9 @@
 		point="org.eclipse.ui.perspectives">
 		<perspective
 			icon="icons/parallel_perspective.gif"
-			class="org.eclipse.pdt.internal.ui.PRunPerspectiveFactory"
+			class="org.eclipse.ptp.internal.ui.PRunPerspectiveFactory"
 			name="%perspective.name"
-			id="org.eclipse.pdt.ui.PRunPerspective"/>
+			id="org.eclipse.ptp.ui.PRunPerspective"/>
 	</extension>   
 
 <!-- create preference page //-->
@@ -150,8 +150,8 @@
          point="org.eclipse.ui.preferencePages">
       <page
             name="%preferencePages.name"
-            class="org.eclipse.pdt.preferences.PDTPreferencesPage"
-            id="org.eclipse.pdt.preferences.pdtPreferencesPage">
+            class="org.eclipse.ptp.preferences.PTPPreferencesPage"
+            id="org.eclipse.ptp.preferences.ptpPreferencesPage">
       </page>
    </extension>
    
@@ -161,14 +161,14 @@
       <actionSet
             label="%actionSets.name"
             visible="false"
-            id="org.eclipse.pdt.actionSets">
+            id="org.eclipse.ptp.actionSets">
          <action
                label="%legendAction.name"
                icon="icons/legend.gif"
-               class="org.eclipse.pdt.ui.actions.ShowLegendAction"
+               class="org.eclipse.ptp.ui.actions.ShowLegendAction"
                tooltip="%legendAction.tooltip"
-               toolbarPath="org.eclipse.pdt.actionSets"
-               id="org.eclipse.pdt.ui.actions.showLegendAction">
+               toolbarPath="org.eclipse.ptp.actionSets"
+               id="org.eclipse.ptp.ui.actions.showLegendAction">
          </action>
          <!--
          <action
@@ -184,24 +184,24 @@
    </extension>
    
    <extension
-         id="org.eclipse.pdt.ui.PSearchPage"
+         id="org.eclipse.ptp.ui.PSearchPage"
          name="PSearchPage"
          point="org.eclipse.search.searchPages">
       <page
             showScopeSection="false"
             label="%PSearchPage.label"
             icon="icons/search.gif"
-            class="org.eclipse.pdt.internal.ui.search.PSearchPage"
+            class="org.eclipse.ptp.internal.ui.search.PSearchPage"
             sizeHint="360, 160"
-            id="org.eclipse.pdt.ui.PSearchPage">
+            id="org.eclipse.ptp.ui.PSearchPage">
       </page>
    </extension>
    <extension
          point="org.eclipse.search.searchResultViewPages">
       <viewPage
-            class="org.eclipse.pdt.internal.ui.search.PSearchResultPage"
-            searchResultClass="org.eclipse.pdt.internal.ui.search.PSearchResult"
-            id="org.eclipse.pdt.ui.PSearchResultPage">
+            class="org.eclipse.ptp.internal.ui.search.PSearchResultPage"
+            searchResultClass="org.eclipse.ptp.internal.ui.search.PSearchResult"
+            id="org.eclipse.ptp.ui.PSearchResultPage">
       </viewPage>
    </extension>   
 </plugin>
