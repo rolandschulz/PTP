@@ -25,13 +25,13 @@ import java.util.Vector;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.ParallelPlugin;
 import org.eclipse.ptp.core.IOutputTextFileContants;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.core.ParallelPlugin;
 
 public class PUniverse extends Parent implements IPUniverse 
 {

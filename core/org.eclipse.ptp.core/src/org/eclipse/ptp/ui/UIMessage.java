@@ -22,7 +22,7 @@ import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.eclipse.ptp.ParallelPlugin;
+import org.eclipse.ptp.core.ParallelPlugin;
 
 public class UIMessage {
     private static final String BUNDLE_NAME = ParallelPlugin.PLUGIN_ID + ".ui.UIMessages";

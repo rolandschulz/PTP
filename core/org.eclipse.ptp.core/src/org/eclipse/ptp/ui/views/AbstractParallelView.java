@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.ptp.ParallelPlugin;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.ParallelPlugin;
 import org.eclipse.ptp.launch.core.IModelManager;
 import org.eclipse.ptp.launch.core.IParallelModelListener;
 import org.eclipse.ptp.ui.UIUtils;

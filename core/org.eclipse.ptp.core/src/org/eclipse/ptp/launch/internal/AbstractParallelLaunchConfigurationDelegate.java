@@ -36,8 +36,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
-import org.eclipse.ptp.ParallelPlugin;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.ParallelPlugin;
 import org.eclipse.ptp.launch.core.IModelManager;
 import org.eclipse.ptp.ui.UIMessage;
 
