@@ -53,7 +53,7 @@ import org.eclipse.ptp.ui.views.ParallelProcessesView;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.internal.IInternalPerspectiveListener;
+import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.progress.IProgressService;
 
 /**
@@ -128,7 +128,7 @@ public class LaunchManager implements ILaunchManager {
         System.out.println("Created all dumy nodes and processes");
     }
 
-    private IInternalPerspectiveListener perspectiveListener = new IInternalPerspectiveListener() {
+    private IPerspectiveListener perspectiveListener = new IPerspectiveListener() {
         public void perspectiveClosed(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
             if (perspective.getId().equals(UIUtils.PPerspectiveFactory_ID)) {
                 isPerspectiveOpen = false;
