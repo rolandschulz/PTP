@@ -15,7 +15,7 @@ public interface IFDTLaunchConfigurationConstants {
 	/**
 	 * This is the launch type id.
 	 */
-	public static final String ID_LAUNCH_C_APP = "org.eclipse.fdt.launch.localCLaunch"; //$NON-NLS-1$
+	public static final String ID_LAUNCH_FORTRAN_APP = "org.eclipse.fdt.launch.localFortranLaunch"; //$NON-NLS-1$
 
 	/**
 	 * Launch configuration attribute key. The value is a name of a C/C++
