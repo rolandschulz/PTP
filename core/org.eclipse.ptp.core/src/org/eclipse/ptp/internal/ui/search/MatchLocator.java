@@ -19,10 +19,10 @@
 package org.eclipse.ptp.internal.ui.search;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.ParallelPlugin;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.ParallelPlugin;
 import org.eclipse.ptp.launch.core.IModelManager;
 
 /**

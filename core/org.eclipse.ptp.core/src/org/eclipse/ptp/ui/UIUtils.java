@@ -21,7 +21,7 @@ package org.eclipse.ptp.ui;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ptp.ParallelPlugin;
+import org.eclipse.ptp.core.ParallelPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;

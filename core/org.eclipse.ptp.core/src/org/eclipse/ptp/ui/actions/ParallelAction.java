@@ -19,7 +19,7 @@
 package org.eclipse.ptp.ui.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.ptp.ParallelPlugin;
+import org.eclipse.ptp.core.ParallelPlugin;
 import org.eclipse.ptp.launch.core.IModelManager;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.ViewPart;

@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.ParallelPlugin;
+import org.eclipse.ptp.core.ParallelPlugin;
 import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.search.ui.ISearchQuery;

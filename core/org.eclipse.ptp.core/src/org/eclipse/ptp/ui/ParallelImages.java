@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.ptp.ParallelPlugin;
+import org.eclipse.ptp.core.ParallelPlugin;
 import org.eclipse.swt.graphics.Image;
 
 public class ParallelImages {

@@ -20,10 +20,10 @@ package org.eclipse.ptp.ui.views;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.ParallelPlugin;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IProcessListener;
+import org.eclipse.ptp.core.ParallelPlugin;
 import org.eclipse.ptp.debug.AbstractAttachDebugger;
 import org.eclipse.ptp.debug.CDTAttachDebuger;
 import org.eclipse.ptp.launch.core.ParallelModelAdapter;

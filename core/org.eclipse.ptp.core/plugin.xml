@@ -5,7 +5,7 @@
 	name="Parallel Tools Platform Plug-in"
 	version="1.0.0"
 	provider-name="LANL"
-	class="org.eclipse.ptp.ParallelPlugin">
+	class="org.eclipse.ptp.core.ParallelPlugin">
 
 	<runtime>
 		<library name="parallel.jar">
