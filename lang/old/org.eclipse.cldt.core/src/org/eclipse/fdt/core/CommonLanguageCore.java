@@ -59,7 +59,7 @@ public class CommonLanguageCore {
 		fgResourceBundle = resourceBundle;
 	}
 
-	public static Plugin getDefault() {
+	public static CCorePlugin getDefault() {
 		return fgCLCorePlugin;
 	}
 	
@@ -89,5 +89,4 @@ public class CommonLanguageCore {
 		fgResourceBundle = resourceBundle;
 	}
 	
-
 }
