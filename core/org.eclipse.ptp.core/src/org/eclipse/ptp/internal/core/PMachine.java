@@ -73,6 +73,7 @@ public class PMachine extends Parent implements IPMachine
             return (IPNode)element;
         return null;
 	}
+	
 	public synchronized IPNode findNodeByName(String nname) {
 		Collection col = getCollection();
 		Iterator it = col.iterator();
