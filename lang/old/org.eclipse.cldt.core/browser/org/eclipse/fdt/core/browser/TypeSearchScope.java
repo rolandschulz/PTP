@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.FortranProjectNature;
 import org.eclipse.fdt.core.model.ICElement;
@@ -233,7 +234,7 @@ public class TypeSearchScope implements ITypeSearchScope {
 	}
 	
 	private static IProject[] getCProjects() {
-		IProject[] allProjects = FortranCorePlugin.getWorkspace().getRoot().getProjects();
+		IProject[] allProjects = CommonLanguageCore.getWorkspace().getRoot().getProjects();
 		if (allProjects != null) {
 			IProject[] cProjects = new IProject[allProjects.length];
 			int count = 0;

@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.ICProject;
@@ -125,17 +125,17 @@ public class SearchEngine implements ICSearchConstants{
 		if (sourceFile != null){
 			//Add the source file and project
 			scope.addFile(sourceFile.getFullPath(), sourceFile.getProject());
-			IPath rootPath = FortranCorePlugin.getWorkspace().getRoot().getLocation();
-			int segCount = FortranCorePlugin.getWorkspace().getRoot().getLocation().segmentCount();
+			IPath rootPath = CommonLanguageCore.getWorkspace().getRoot().getLocation();
+			int segCount = CommonLanguageCore.getWorkspace().getRoot().getLocation().segmentCount();
 			if (elements!=null){
 				Iterator i = elements.iterator();
 				while (i.hasNext()){
 				  IPath tempPath = new Path((String) i.next());
 				  if (rootPath.isPrefixOf(tempPath)){
 					//path is in workspace  
-					IFile tempFile = FortranCorePlugin.getWorkspace().getRoot().getFile(tempPath);
+					IFile tempFile = CommonLanguageCore.getWorkspace().getRoot().getFile(tempPath);
 					IPath finalPath = tempFile.getFullPath().removeFirstSegments(segCount);
-					tempFile = FortranCorePlugin.getWorkspace().getRoot().getFile(finalPath);
+					tempFile = CommonLanguageCore.getWorkspace().getRoot().getFile(finalPath);
 					scope.addFile(tempFile.getFullPath(), tempFile.getProject());
 				  }
 				  else{

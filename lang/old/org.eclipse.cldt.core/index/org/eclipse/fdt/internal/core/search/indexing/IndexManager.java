@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.ICLogConstants;
@@ -541,7 +542,7 @@ public class IndexManager extends JobManager implements IIndexConstants {
 	 * Note: the actual operation is performed in background
 	 */
 	public void remove(String resourceName, IPath indexedContainer){
-		IProject project = FortranCorePlugin.getWorkspace().getRoot().getProject(indexedContainer.toString());
+		IProject project = CommonLanguageCore.getWorkspace().getRoot().getProject(indexedContainer.toString());
       	if( isIndexEnabled( project ) )
       		request(new RemoveFromIndex(resourceName, indexedContainer, this));
 	}

@@ -18,6 +18,7 @@ package org.eclipse.fdt.core.index;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.internal.core.search.indexing.IndexManager;
 
@@ -32,7 +33,7 @@ public class Indexer {
 	private static IndexManager manager= FortranCorePlugin.getDefault().getCoreModel().getIndexManager();
 	
 	public static boolean indexEnabledOnAllProjects(){
-		IProject[] projects= FortranCorePlugin.getWorkspace().getRoot().getProjects();
+		IProject[] projects= CommonLanguageCore.getWorkspace().getRoot().getProjects();
 		boolean allEnabled = true;
 		for (int i=0; i<projects.length; i++){
 		  if (!indexEnabledOnProject(projects[i])){
@@ -45,7 +46,7 @@ public class Indexer {
 	}
 	
 	public static boolean indexEnabledOnAnyProjects(){
-		IProject[] projects= FortranCorePlugin.getWorkspace().getRoot().getProjects();
+		IProject[] projects= CommonLanguageCore.getWorkspace().getRoot().getProjects();
 		boolean allEnabled = false;
 		for (int i=0; i<projects.length; i++){
 		  if (!projects[i].isOpen())

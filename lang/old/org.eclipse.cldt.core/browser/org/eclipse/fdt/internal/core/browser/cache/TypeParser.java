@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.browser.ITypeInfo;
 import org.eclipse.fdt.core.browser.ITypeReference;
@@ -375,7 +376,7 @@ public class TypeParser implements ISourceElementRequestor {
 				}
 				stackObject = workingCopy;
 			} else {
-				IWorkspace workspace = FortranCorePlugin.getWorkspace();
+				IWorkspace workspace = CommonLanguageCore.getWorkspace();
 				if (workspace != null) {
 					IWorkspaceRoot wsRoot = workspace.getRoot();
 					if (wsRoot != null) {
@@ -662,7 +663,7 @@ public class TypeParser implements ISourceElementRequestor {
 		path = PathUtil.getWorkspaceRelativePath(path);
 
 		IResource resource = null;
-		IWorkspace workspace = FortranCorePlugin.getWorkspace();
+		IWorkspace workspace = CommonLanguageCore.getWorkspace();
 		if (workspace != null) {
 			IWorkspaceRoot wsRoot = workspace.getRoot();
 			if (wsRoot != null) {

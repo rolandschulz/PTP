@@ -45,7 +45,7 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IRegisterGroup;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.debug.core.model.IThread;
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.IAddress;
 import org.eclipse.fdt.core.IAddressFactory;
 import org.eclipse.fdt.core.IBinaryParser.IBinaryObject;
@@ -322,7 +322,7 @@ public class CDebugTarget extends CDebugElement implements ICDebugTarget, ICDIEv
 			}
 			IResourceChangeListener listener = (IResourceChangeListener)((IAdaptable)locator).getAdapter( IResourceChangeListener.class );
 			if ( listener != null )
-				FortranCorePlugin.getWorkspace().addResourceChangeListener( listener );
+				CommonLanguageCore.getWorkspace().addResourceChangeListener( listener );
 		}
 	}
 
@@ -1558,7 +1558,7 @@ public class CDebugTarget extends CDebugElement implements ICDebugTarget, ICDIEv
 		if ( locator instanceof IAdaptable ) {
 			IResourceChangeListener listener = (IResourceChangeListener)((IAdaptable)locator).getAdapter( IResourceChangeListener.class );
 			if ( listener != null )
-				FortranCorePlugin.getWorkspace().removeResourceChangeListener( listener );
+				CommonLanguageCore.getWorkspace().removeResourceChangeListener( listener );
 		}
 	}
 

@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.IWorkingCopy;
@@ -519,7 +520,7 @@ public class MatchLocator implements IMatchLocator{
 			if( matchStorage.size() > 0 ){
 				AcceptMatchOperation acceptMatchOp = new AcceptMatchOperation( resultCollector, matchStorage );
 				try {
-					FortranCorePlugin.getWorkspace().run(acceptMatchOp,null);
+					CommonLanguageCore.getWorkspace().run(acceptMatchOp,null);
 				} catch (CoreException e) {}
 				
 				matchStorage.clear();

@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.ICExtensionReference;
@@ -1171,7 +1172,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 			 */
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
-					FortranCorePlugin.getWorkspace().run(new IWorkspaceRunnable() {
+					CommonLanguageCore.getWorkspace().run(new IWorkspaceRunnable() {
 						
 						/* (non-Javadoc)
 						 * @see org.eclipse.core.resources.IWorkspaceRunnable#run(org.eclipse.core.runtime.IProgressMonitor)
@@ -1190,7 +1191,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 				return Status.OK_STATUS;
 			}
 		};
-		markerTask.setRule(FortranCorePlugin.getWorkspace().getRoot());
+		markerTask.setRule(CommonLanguageCore.getWorkspace().getRoot());
 		markerTask.schedule();
 	}
 

@@ -40,6 +40,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.CommandLauncher;
 import org.eclipse.fdt.core.ConsoleOutputStream;
@@ -197,7 +198,7 @@ public class GeneratedMakefileBuilder extends ACBuilder {
 	 * @param epm
 	 */
 	private void addBuilderMarkers(ErrorParserManager epm) {
-		IWorkspaceRoot root = FortranCorePlugin.getWorkspace().getRoot();
+		IWorkspaceRoot root = CommonLanguageCore.getWorkspace().getRoot();
 		Iterator iter = getGenerationProblems().iterator();
 		while (iter.hasNext()) {
 			IStatus stat = (IStatus)iter.next();
@@ -291,7 +292,7 @@ public class GeneratedMakefileBuilder extends ACBuilder {
 			return;
 		}
 		IPath buildDirPath = getProject().getLocation().append(info.getConfigurationName());
-		IWorkspace workspace = FortranCorePlugin.getWorkspace();
+		IWorkspace workspace = CommonLanguageCore.getWorkspace();
 		IContainer buildDir = workspace.getRoot().getContainerForLocation(buildDirPath);
 		if (buildDir == null || !buildDir.isAccessible()){
 			outputError(buildDir.getName(), "Could not delete the build directory");	//$NON-NLS-1$
@@ -346,7 +347,7 @@ public class GeneratedMakefileBuilder extends ACBuilder {
 			buildDir = new Path(info.getConfigurationName());
 		}
 		IPath makefilePath = getProject().getLocation().append(buildDir.append(generator.getMakefileName()));		
-		IWorkspaceRoot root = FortranCorePlugin.getWorkspace().getRoot();
+		IWorkspaceRoot root = CommonLanguageCore.getWorkspace().getRoot();
 		IFile makefile = root.getFileForLocation(makefilePath);
 		
 		if (buildDir != null && makefile != null && makefile.isAccessible()) {		

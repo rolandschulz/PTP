@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.ICLogConstants;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.parser.IParser;
@@ -68,7 +68,7 @@ public abstract class FindAction extends SelectionParseAction {
 		
 		LimitTo limitTo = getLimitTo();
 		
-		op = new CSearchQuery(FortranCorePlugin.getWorkspace(), pattern,true,search,limitTo,scope,scopeDescription,collector);
+		op = new CSearchQuery(CommonLanguageCore.getWorkspace(), pattern,true,search,limitTo,scope,scopeDescription,collector);
 		return op;
 		
 	}
