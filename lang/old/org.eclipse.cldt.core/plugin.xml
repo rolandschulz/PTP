@@ -163,11 +163,11 @@
       </errorparser>
    </extension>
    <extension
-         id="GCCErrorParser"
-         name="%FDTGNUCErrorParser.name"
+         id="XLFErrorParser"
+         name="%FDTXLFErrorParser.name"
          point="org.eclipse.fdt.core.ErrorParser">
       <errorparser
-            class="org.eclipse.fdt.internal.errorparsers.GCCErrorParser">
+            class="org.eclipse.fdt.internal.errorparsers.XLFErrorParser">
       </errorparser>
    </extension>
    <extension
@@ -525,7 +525,7 @@
 <!-- Initialize the preference for the Core Plugin                                       -->
 <!-- =================================================================================== -->
    <extension point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.fdt.internal.core.CCorePreferenceInitializer"/>
+      <initializer class="org.eclipse.fdt.internal.core.FortranCorePreferenceInitializer"/>
    </extension>
  
 </plugin>

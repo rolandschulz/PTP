@@ -19,7 +19,7 @@ import org.eclipse.fdt.core.FortranCorePreferenceConstants;
 import org.eclipse.fdt.internal.core.model.CModelManager;
 
 
-public class CCorePreferenceInitializer extends AbstractPreferenceInitializer {
+public class FortranCorePreferenceInitializer extends AbstractPreferenceInitializer {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()

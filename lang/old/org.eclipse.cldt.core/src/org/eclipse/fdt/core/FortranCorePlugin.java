@@ -121,7 +121,7 @@ public class FortranCorePlugin extends Plugin {
 
 	static {
 		try {
-			fgResourceBundle = ResourceBundle.getBundle("org.eclipse.fdt.internal.core.CCorePluginResources"); //$NON-NLS-1$
+			fgResourceBundle = ResourceBundle.getBundle("org.eclipse.fdt.internal.core.FortranCorePluginResources"); //$NON-NLS-1$
 		} catch (MissingResourceException x) {
 			fgResourceBundle = null;
 		}
