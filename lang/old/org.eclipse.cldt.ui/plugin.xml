@@ -534,7 +534,7 @@
       <page
             class="org.eclipse.cldt.internal.ui.preferences.FortranSearchPreferencePage"
             category="org.eclipse.cldt.ui.preferences.CPluginPreferencePage"
-            name="%cldtSearch.name"
+            name="%CDTSearch.name"
             id="org.eclipse.cldt.ui.preferences.CSearchPreferencePage"/>
       <page
             name="%appearancePrefName"
