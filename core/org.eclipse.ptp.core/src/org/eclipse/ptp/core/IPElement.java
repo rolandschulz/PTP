@@ -20,7 +20,8 @@ public interface IPElement extends ISearchPageScoreComputer {
     public IPElement[] getChildren();
     
     public IPElement getParent();
-    public IPMachine getPRoot();
+    public IPUniverse getPUniverse();
+    public IPMachine getPMachine();
     
     public void addChild(IPElement member);
 	public void removeChild(IPElement member);
