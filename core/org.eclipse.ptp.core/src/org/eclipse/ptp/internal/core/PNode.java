@@ -1,6 +1,12 @@
 package org.eclipse.ptp.internal.core;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.ptp.core.IPElement;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPMachine;
@@ -12,21 +18,17 @@ import org.eclipse.ptp.core.IPMachine;
  */
 public class PNode extends Parent implements IPNode {
     protected String NAME_TAG = "node ";
+    protected Map attribs = null;
+    /*
     private String user = null;
     private String group = null;
     private String state = null;
     private String mode = null;
+    */
     	
     public PNode(IPElement element, String nodeNumber) {
-		this(element, nodeNumber, null, null, null, null);
-	}
-    
-    public PNode(IPElement element, String nodeNumber, String user, String group, String state, String mode) {
-        super(element, nodeNumber, P_NODE);
-        this.user = user;
-        this.group = group;
-        this.state = state;
-        this.mode = mode;
+    		super(element, nodeNumber, P_NODE);
+    		attribs = new HashMap(0);
     }
 	
 	public IPMachine getPMachine() {
@@ -62,31 +64,30 @@ public class PNode extends Parent implements IPNode {
         return NAME_TAG + getKey();
     }
     
-    public void setUser(String user) {
-        this.user = user;
+    public void setAttrib(String key, Object val) {
+    		if(attribs.containsKey(key))
+    			attribs.remove(key);
+    		attribs.put(key, val);
     }
-    public String getUser() {
-        return user;
+    
+    public Object getAttrib(String key) {
+    		if(!attribs.containsKey(key)) return null;
+    		return attribs.get(key);
     }
-    public boolean isCurrentUser() {
-        return user.equals(System.getProperty("user.name"));
-    }
-    public String getGroup() {
-        return group;
-    }
-    public void setGroup(String group) {
-        this.group = group;
-    }
-    public String getMode() {
-        return mode;
-    }
-    public void setMode(String mode) {
-        this.mode = mode;
-    }
-    public String getState() {
-        return state;
-    }
-    public void setState(String state) {
-        this.state = state;
-    }
+
+    /* returns a list of jobs that are running on this node - does this
+     * by looking at the processes running on this node and seeing which
+     * jobs they are part of
+     */
+	public IPJob[] getJobs() {
+		IPProcess[] processes = getProcesses();
+		List array = new ArrayList(0);
+		for(int i=0; i<processes.length; i++) {
+			if(!array.contains(processes[i].getJob())) {
+				array.add(processes[i].getJob());
+			}
+		}
+		
+		return (IPJob[])array.toArray(new IPJob[array.size()]);
+	}
 }

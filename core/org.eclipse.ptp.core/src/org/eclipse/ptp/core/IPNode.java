@@ -10,25 +10,7 @@ public interface IPNode extends IPElement {
     
     public String getNodeNumber();
 	public IPProcess findProcess(String processNumber);
-	
-	public void setUser(String user);
 
-    public String getUser();
-
-    public boolean isCurrentUser();
-
-    public String getGroup();
-
-    public void setGroup(String group);
-
-    public String getMode();
-
-    public void setMode(String mode);
-
-    public String getState();
-
-    public void setState(String state);
-    
     /* returns the parent machine that comprises this node */
     public IPMachine getPMachine();
     
@@ -37,4 +19,8 @@ public interface IPNode extends IPElement {
      * which parent jobs they belong to
      */
     public IPJob[] getJobs();
+    
+    public void setAttrib(String key, Object val);
+    
+    public Object getAttrib(String key);
 }
