@@ -20,7 +20,7 @@ package org.eclipse.ptp.ui.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.ptp.ParallelPlugin;
-import org.eclipse.ptp.launch.core.ILaunchManager;
+import org.eclipse.ptp.launch.core.IModelManager;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.ViewPart;
 
@@ -53,7 +53,7 @@ public abstract class ParallelAction extends Action {
         return viewPart.getViewSite().getShell();
     }
     
-    protected ILaunchManager getLaunchManager() {
+    protected IModelManager getLaunchManager() {
         return ParallelPlugin.getDefault().getLaunchManager();
     }
     

@@ -25,8 +25,8 @@ import java.util.List;
 import org.eclipse.ptp.ParallelPlugin;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.launch.core.ILaunchManager;
-import org.eclipse.ptp.launch.core.IParallelLaunchListener;
+import org.eclipse.ptp.launch.core.IModelManager;
+import org.eclipse.ptp.launch.core.IParallelModelListener;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -38,7 +38,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
-public abstract class AbstractParallelView extends ViewPart implements IParallelLaunchListener {
+public abstract class AbstractParallelView extends ViewPart implements IParallelModelListener {
    	/* colors so that we can hold them in one place and everyone can
    	 * access them
    	 */
@@ -48,7 +48,7 @@ public abstract class AbstractParallelView extends ViewPart implements IParallel
 	protected final int BUSY_STYLE = 1; 
 	protected final int SYN_STYLE = 2; 
 
-	protected ILaunchManager launchManager = ParallelPlugin.getDefault().getLaunchManager();
+	protected IModelManager launchManager = ParallelPlugin.getDefault().getLaunchManager();
     protected List editorList = new ArrayList(0);
     
     public AbstractParallelView() {

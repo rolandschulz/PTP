@@ -28,7 +28,7 @@ import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IPJob;
 
-public interface ILaunchManager {
+public interface IModelManager {
     public static final int STATE_ERROR = -1;
     public static final int STATE_RUN = 1;
     public static final int STATE_EXIT = 3;
@@ -51,8 +51,8 @@ public interface ILaunchManager {
     public IPUniverse getUniverse();
     public IPJob getProcessRoot();
     
-    public void addParallelLaunchListener(IParallelLaunchListener listener);
-    public void removeParallelLaunchListener(IParallelLaunchListener listener);
+    public void addParallelLaunchListener(IParallelModelListener listener);
+    public void removeParallelLaunchListener(IParallelModelListener listener);
     
     public int getCurrentState();
     public boolean isMPIRuning();

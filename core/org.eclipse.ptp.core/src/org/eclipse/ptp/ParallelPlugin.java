@@ -21,8 +21,8 @@ package org.eclipse.ptp;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.eclipse.ptp.launch.core.ILaunchManager;
-import org.eclipse.ptp.launch.internal.LaunchManager;
+import org.eclipse.ptp.launch.core.IModelManager;
+import org.eclipse.ptp.launch.internal.ModelManager;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -34,7 +34,7 @@ import org.osgi.framework.BundleContext;
 public class ParallelPlugin extends AbstractUIPlugin {
     public static final String PLUGIN_ID = "org.eclipse.ptp";
     
-    private ILaunchManager launchManager = null;
+    private IModelManager launchManager = null;
     
     //The shared instance.
     private static ParallelPlugin plugin;
@@ -59,7 +59,7 @@ public class ParallelPlugin extends AbstractUIPlugin {
      */
     public void start(BundleContext context) throws Exception {
         super.start(context);  
-        launchManager = new LaunchManager();
+        launchManager = new ModelManager();
     }
 
     /**
@@ -73,7 +73,7 @@ public class ParallelPlugin extends AbstractUIPlugin {
     /**
      * @return Returns the launchManager.
      */
-    public ILaunchManager getLaunchManager() {
+    public IModelManager getLaunchManager() {
         return launchManager;
     }
 

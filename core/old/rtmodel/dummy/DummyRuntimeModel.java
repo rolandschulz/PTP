@@ -29,7 +29,7 @@ import java.util.Set;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.internal.core.PUniverse;
-import org.eclipse.ptp.launch.core.IParallelLaunchListener;
+import org.eclipse.ptp.launch.core.IParallelModelListener;
 import org.eclipse.ptp.launch.internal.AbstractParallelLaunchConfigurationDelegate;
 import org.eclipse.ptp.rtmodel.IRuntimeListener;
 import org.eclipse.ptp.rtmodel.IRuntimeModel;

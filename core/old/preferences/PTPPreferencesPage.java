@@ -31,7 +31,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.ParallelPlugin;
 import org.eclipse.ptp.core.IOutputTextFileContants;
-import org.eclipse.ptp.launch.core.ILaunchManager;
+import org.eclipse.ptp.launch.core.IModelManager;
 import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -246,7 +246,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
         
         ParallelPlugin.getDefault().savePluginPreferences();
         
-        ILaunchManager manager = ParallelPlugin.getDefault().getLaunchManager();
+        IModelManager manager = ParallelPlugin.getDefault().getLaunchManager();
         if (!manager.isMPIRuning() && manager.isParallelPerspectiveOpen()) {
         	try {
         		manager.createMPISession();

@@ -38,7 +38,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.ParallelPlugin;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.launch.core.ILaunchManager;
+import org.eclipse.ptp.launch.core.IModelManager;
 import org.eclipse.ptp.ui.UIMessage;
 
 /**
@@ -51,7 +51,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
     public static final String START_NODE = HYPHEN + "o";
     public static final String PROG_NAME = HYPHEN + HYPHEN;
 
-    protected ILaunchManager getLaunchManager() {
+    protected IModelManager getLaunchManager() {
         return ParallelPlugin.getDefault().getLaunchManager();
     }
     
