@@ -167,7 +167,7 @@ public class CoreModel {
 	public static boolean isTranslationUnit(IFile file) {
 		if (file != null) {
 			IProject p = file.getProject();
-			if (hasCNature(p)) {
+			if (hasFortranNature(p)) {
 				ICFileType type = FortranCorePlugin.getDefault().getFileType(file.getProject(), file.getName());
 				return type.isTranslationUnit();
 			}
@@ -200,9 +200,9 @@ public class CoreModel {
 	}
 
 	/**
-	 * Return true if project has C nature.
+	 * Return true if project has Fortran nature.
 	 */
-	public static boolean hasCNature(IProject project) {
+	public static boolean hasFortranNature(IProject project) {
 		boolean ok = false;
 		try {
 			ok = (project.isOpen() && project.hasNature(FortranProjectNature.FORTRAN_NATURE_ID));

@@ -490,7 +490,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 						IResource res = cproject.getCModel().getWorkspace().getRoot().findMember(refPath);
 						if (res != null && res.getType() == IResource.PROJECT) {
 							IProject project = (IProject)res;
-							if (CoreModel.hasCNature(project)) {
+							if (CoreModel.hasFortranNature(project)) {
 								ICProject refCProject = CoreModel.getDefault().create(project);
 								if (refCProject != null) {
 									IPathEntry[] entries = getResolvedPathEntries(refCProject);
@@ -554,7 +554,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 						IResource res = cproject.getCModel().getWorkspace().getRoot().findMember(refPath);
 						if (res != null && res.getType() == IResource.PROJECT) {
 							IProject project = (IProject)res;
-							if (CoreModel.hasCNature(project)) {
+							if (CoreModel.hasFortranNature(project)) {
 								ICProject refCProject = CoreModel.getDefault().create(project);
 								if (refCProject != null) {
 									IPathEntry[] entries = getResolvedPathEntries(refCProject);
@@ -598,7 +598,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 						IResource res = cproject.getCModel().getWorkspace().getRoot().findMember(refPath);
 						if (res != null && res.getType() == IResource.PROJECT) {
 							IProject project = (IProject)res;
-							if (CoreModel.hasCNature(project)) {
+							if (CoreModel.hasFortranNature(project)) {
 								ICProject refCProject = CoreModel.getDefault().create(project);
 								if (refCProject != null) {
 									IPathEntry[] entries = getResolvedPathEntries(refCProject);
@@ -676,7 +676,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 	public IPathEntry[] getRawPathEntries(ICProject cproject) throws CModelException {
 		IProject project = cproject.getProject();
 		// Check if the Project is accesible.
-		if (! CoreModel.hasCNature(project)) {
+		if (! CoreModel.hasFortranNature(project)) {
 			throw new CModelException(new CModelStatus(ICModelStatusConstants.ELEMENT_DOES_NOT_EXIST));
 		}
 		IPathEntry[] pathEntries;
@@ -1717,7 +1717,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 					return new CModelStatus(ICModelStatusConstants.INVALID_PATHENTRY,
 							CoreModelMessages.getString("PathEntryManager.5")); //$NON-NLS-1$
 				}
-				if (! CoreModel.hasCNature(reqProject)) {
+				if (! CoreModel.hasFortranNature(reqProject)) {
 					return new CModelStatus(ICModelStatusConstants.INVALID_PATHENTRY,
 							CoreModelMessages.getString("PathEntryManager.6")); //$NON-NLS-1$
 				}

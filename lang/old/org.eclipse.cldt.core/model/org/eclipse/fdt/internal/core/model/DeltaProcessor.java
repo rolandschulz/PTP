@@ -67,7 +67,7 @@ public class DeltaProcessor {
 		// Check for C nature or if the was a CNature
 		if (!(resource instanceof IWorkspaceRoot)) {
 			IProject project = resource.getProject();
-			if (!CoreModel.hasCNature(project)) {
+			if (!CoreModel.hasFortranNature(project)) {
 				shouldProcess = false;
 				CModel root = manager.getCModel();
 				CModelInfo rootInfo = (CModelInfo)manager.peekAtInfo(root);
@@ -413,7 +413,7 @@ public class DeltaProcessor {
 		// ensure the project has a C nature (if open)
 		IProject project = resource.getProject();
 		if (project.isOpen()) {
-			return CoreModel.hasCNature(project);
+			return CoreModel.hasFortranNature(project);
 		}
 		return false;
 	}

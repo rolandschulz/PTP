@@ -103,12 +103,17 @@ public class CModelBuilder {
 	private IASTCompilationUnit parse(boolean quickParseMode, boolean throwExceptionOnError) throws ParserException
 	{
 		IProject currentProject = null;
-		boolean hasCppNature = false;
+		boolean hasFortranNature = false;
 		char[] code = EMPTY_CHAR_ARRAY; //$NON-NLS-1$
 		
 		// get the current project
 		if (translationUnit != null && translationUnit.getCProject() != null) {
 			currentProject = translationUnit.getCProject().getProject();
+		}
+		// check the project's nature
+		if( currentProject != null )
+		{
+			hasFortranNature = CoreModel.hasFortranNature(currentProject);
 		}
 		// get the code to parse
 		try{
@@ -128,13 +133,11 @@ public class CModelBuilder {
 		}
 
 		// pick the language
-		ParserLanguage language;
-		if (hasCppNature) {
-			language = ParserLanguage.CPP;
-		} else {
-			// for C project try to guess.
-			language = translationUnit.isCXXLanguage() ? ParserLanguage.CPP : ParserLanguage.C;
-		}
+		ParserLanguage language = ParserLanguage.C;
+		if (hasFortranNature) {
+			//TODO - ParserLanguage.F
+		}		
+
 		
 		// create the parser
 		IParser parser = null;
