@@ -60,8 +60,8 @@ import org.osgi.framework.BundleContext;
 
 public class CCorePlugin extends Plugin {
 
-	public static final int STATUS_FDTPROJECT_EXISTS = 1;
-	public static final int STATUS_FDTPROJECT_MISMATCH = 2;
+	public static final int STATUS_CDTPROJECT_EXISTS = 1;
+	public static final int STATUS_CDTPROJECT_MISMATCH = 2;
 	public static final int CDT_PROJECT_NATURE_ID_MISMATCH = 3;
 
 	public static final String PLUGIN_ID = "org.eclipse.cdt.core"; //$NON-NLS-1$
@@ -181,17 +181,17 @@ public class CCorePlugin extends Plugin {
 		return fgCPlugin;
 	}
 
-	public static void log(Throwable e) {
-		if ( e instanceof CoreException ) {
-			log(((CoreException)e).getStatus());
-		} else {
-			log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Error", e)); //$NON-NLS-1$
-		}
-	}
+//	public static void log(Throwable e) {
+//		if ( e instanceof CoreException ) {
+//			log(((CoreException)e).getStatus());
+//		} else {
+//			log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, "Error", e)); //$NON-NLS-1$
+//		}
+//	}
 
-	public static void log(IStatus status) {
-		((Plugin) getDefault()).getLog().log(status);
-	}
+//	public static void log(IStatus status) {
+//		((Plugin) getDefault()).getLog().log(status);
+//	}
 
 	// ------ CPlugin
 
@@ -444,7 +444,7 @@ public class CCorePlugin extends Plugin {
 				}
 			}
 		} catch (CoreException e) {
-			log(e);
+			CommonLanguageCore.log(e);
 		}
 		return new IConsole() { // return a null console
 			private ConsoleOutputStream nullStream = new ConsoleOutputStream() {
@@ -489,7 +489,7 @@ public class CCorePlugin extends Plugin {
 					ext = (ICExtensionReference[])list.toArray(ext);
 				}
 			} catch (CoreException e) {
-				log(e);
+				CommonLanguageCore.log(e);
 			}
 		}
 		return ext;
@@ -754,7 +754,7 @@ public class CCorePlugin extends Plugin {
 				return (IErrorParser[]) list.toArray(empty);
 			}
 		} catch (CoreException e) {
-			log(e);
+			CommonLanguageCore.log(e);
 		}
 		return empty;
 	}
