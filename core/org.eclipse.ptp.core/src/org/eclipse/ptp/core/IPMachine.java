@@ -23,7 +23,14 @@ public interface IPMachine extends IPElement {
 	public int totalProcesses();	
 	public void removeAllProcesses();
 	
+	/* returns the parent universe */
 	public IPUniverse getPUniverse();
+	
+	/* gets all the jobs that are running on this machine - should do this by
+	 * seeing which processes are mapped to the nodes comprised by this machine
+	 * and then looking at which jobs they reside under
+	 */
+	public IPJob[] getJobs();
 	
 	/*
 	public String getOutputStoreDirectory();

@@ -37,5 +37,9 @@ public interface IPProcess extends IPElement {
     public void addProcessListener(IProcessListener listener);
     public void removerProcessListener(); 
     
+    /* returns the parent job that this process is encompassed by */
     public IPJob getPJob();
+    
+    /* returns the node that this process is running on */
+    public IPNode getNode();
 }
