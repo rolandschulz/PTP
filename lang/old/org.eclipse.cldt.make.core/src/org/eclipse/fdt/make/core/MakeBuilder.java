@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.CommandLauncher;
 import org.eclipse.fdt.core.ErrorParserManager;
@@ -244,7 +245,7 @@ public class MakeBuilder extends ACBuilder {
 				cos.close();
 			}
 		} catch (Exception e) {
-			FortranCorePlugin.log(e);
+			CommonLanguageCore.log(e);
 		} finally {
 			monitor.done();
 		}
