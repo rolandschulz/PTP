@@ -303,7 +303,7 @@
       </view>
    </extension>
 <!-- The wizards -->
-<!-- For C Wizards -->
+<!-- For Fortran Wizards -->
    <extension
          point="org.eclipse.ui.newWizards">
       <category
