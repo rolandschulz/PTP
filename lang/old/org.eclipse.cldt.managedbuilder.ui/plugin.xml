@@ -60,316 +60,620 @@
             objectClass="org.eclipse.core.resources.IFile"
             adaptable="true"
             name="%MngResourceProp.name"
+            nameFilter="*.f"
+            class="org.eclipse.fdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
+            id="org.eclipse.fdt.managedbuilder.ui.properties.ResourceBuildProperties">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            objectClass="org.eclipse.core.resources.IFile"
+            adaptable="true"
+            name="%MngResourceProp.name"
+            nameFilter="*.f90"
+            class="org.eclipse.fdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
+            id="org.eclipse.fdt.managedbuilder.ui.properties.ResourceBuildProperties">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            objectClass="org.eclipse.core.resources.IFile"
+            adaptable="true"
+            name="%MngResourceProp.name"
+            nameFilter="*.f95"
+            class="org.eclipse.fdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
+            id="org.eclipse.fdt.managedbuilder.ui.properties.ResourceBuildProperties">
+      </page>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            objectClass="org.eclipse.core.resources.IFile"
+            adaptable="true"
+            name="%MngResourceProp.name"
             nameFilter="*.c"
             class="org.eclipse.fdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
             id="org.eclipse.fdt.managedbuilder.ui.properties.ResourceBuildProperties">
       </page>
    </extension>
-      
-   <extension
-         point="org.eclipse.ui.propertyPages">
-      <page
-            objectClass="org.eclipse.core.resources.IFile"
-            adaptable="true"
-            name="%MngResourceProp.name"
-            nameFilter="*.cpp"
-            class="org.eclipse.fdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
-            id="org.eclipse.fdt.managedbuilder.ui.properties.ResourceBuildProperties">
-      </page>
-   </extension>
-      
-   <extension
-         point="org.eclipse.ui.propertyPages">
-      <page
-            objectClass="org.eclipse.core.resources.IFile"
-            adaptable="true"
-            name="%MngResourceProp.name"
-            nameFilter="*.cc"
-            class="org.eclipse.fdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
-            id="org.eclipse.fdt.managedbuilder.ui.properties.ResourceBuildProperties">
-      </page>
-   </extension>
-      
-   <extension
-         point="org.eclipse.ui.propertyPages">
-      <page
-            objectClass="org.eclipse.core.resources.IFile"
-            adaptable="true"
-            name="%MngResourceProp.name"
-            nameFilter="*.cxx"
-            class="org.eclipse.fdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
-            id="org.eclipse.fdt.managedbuilder.ui.properties.ResourceBuildProperties">
-      </page>
-   </extension>
-      
+            
 <!-- Managed Make Builder Tool Specifications -->
    <extension
          id="fdt.managed.build.info"
          name="Managed Build Tools Description"
          point="org.eclipse.fdt.managedbuilder.core.buildDefinitions">
-      <managedBuildRevision
+     <managedBuildRevision
             fileVersion="2.1.0">
-      </managedBuildRevision>
-      <tool
-            natureFilter="fnature"
-            sources="o"
-			outputs=""
-            name="%ToolName.linker.gnu.c"
-            outputFlag="-o"
-            command="gcc"
-            dependencyCalculator="org.eclipse.fdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
-            id="fdt.managedbuild.tool.gnu.c.linker">
+     </managedBuildRevision>
+     <tool
+           command="/opt/ibmcmp/xlf/8.1/bin/xlf95"
+           sources="o"
+           isAbstract="false"
+           name="%ToolName.linker.xlf.f"
+           id="fdt.managedbuild.tool.xlf.f.linker"
+           outputFlag="-o"
+           natureFilter="fnature">
          <optionCategory
-               owner="fdt.managedbuild.tool.gnu.c.linker"
+               owner="fdt.managedbuild.tool.xlf.f.linker"
                name="%OptionCategory.General"
-               id="gnu.c.link.category.general">
+               id="xlf.f.link.category.general">
          </optionCategory>
          <option
                defaultValue="false"
                name="%Option.Posix.Linker.NoStartFiles"
-               category="gnu.c.link.category.general"
+               category="xlf.f.link.category.general"
                command="-nostartfiles"
-               id="gnu.c.link.option.nostart"
+               id="xlf.f.link.option.nostart"
                valueType="boolean">
          </option>
          <option
                defaultValue="false"
                name="%Option.Posix.Linker.NoDefLibs"
-               category="gnu.c.link.category.general"
+               category="xlf.f.link.category.general"
                command="-nodefaultlibs"
-               id="gnu.c.link.option.nodeflibs"
+               id="xlf.f.link.option.nodeflibs"
                valueType="boolean">
          </option>
          <option
                defaultValue="false"
                name="%Option.Posix.Linker.NoStdLibs"
-               category="gnu.c.link.category.general"
+               category="xlf.f.link.category.general"
                command="-nostdlib"
-               id="gnu.c.link.option.nostdlibs"
+               id="xlf.f.link.option.nostdlibs"
                valueType="boolean">
          </option>
          <option
                defaultValue="false"
                name="%Option.Posix.Linker.Strip"
-               category="gnu.c.link.category.general"
+               category="xlf.f.link.category.general"
                command="--strip-all"
-               id="gnu.c.link.option.strip"
+               id="xlf.f.link.option.strip"
                valueType="boolean">
          </option>
          <option
                defaultValue="false"
                name="%Option.Posix.Linker.Static"
-               category="gnu.c.link.category.general"
+               category="xlf.f.link.category.general"
                command="-static"
-               id="gnu.c.link.option.noshared"
+               id="xlf.f.link.option.noshared"
                valueType="boolean">
          </option>
          <optionCategory
-               owner="fdt.managedbuild.tool.gnu.c.linker"
+               owner="fdt.managedbuild.tool.xlf.f.linker"
                name="%OptionCategory.Libs"
-               id="gnu.c.link.category.libs">
+               id="xlf.f.link.category.libs">
          </optionCategory>
          <option
                name="%Option.Posix.Libs"
-               category="gnu.c.link.category.libs"
+               category="xlf.f.link.category.libs"
                command="-l"
-               id="gnu.c.link.option.libs"
+               id="xlf.f.link.option.libs"
                browseType="file"
                valueType="libs">
          </option>
          <option
                name="%Option.Posix.Libsearch"
-               category="gnu.c.link.category.libs"
+               category="xlf.f.link.category.libs"
                command="-L"
-               id="gnu.c.link.option.paths"
+               id="xlf.f.link.option.paths"
                browseType="directory"
                valueType="stringList">
          </option>
          <optionCategory
-               owner="fdt.managedbuild.tool.gnu.c.linker"
+               owner="fdt.managedbuild.tool.xlf.f.linker"
                name="%OptionCategory.Misc"
-               id="gnu.c.link.category.other">
+               id="xlf.f.link.category.other">
          </optionCategory>
          <option
                name="%Option.Posix.Linker.Flags"
-               category="gnu.c.link.category.other"
+               category="xlf.f.link.category.other"
                valueType="string"
-               id="gnu.c.link.option.ldflags">
+               id="xlf.f.link.option.ldflags">
          </option>
          <option
                name="%Option.Posix.Linker.XLinker"
-               category="gnu.c.link.category.other"
+               category="xlf.f.link.category.other"
                command="-Xlinker ${VALUE}"
                valueType="stringList"
-               id="gnu.c.link.option.other">
+               id="xlf.f.link.option.other">
          </option>
          <option
                name="%Option.Posix.UserObjs"
-               category="gnu.c.link.category.other"
+               category="xlf.f.link.category.other"
                browseType="file"
                valueType="userObjs"
-               id="gnu.c.link.option.userobjs">
+               id="xlf.f.link.option.userobjs">
          </option>
          <optionCategory
-               owner="fdt.managedbuild.tool.gnu.c.linker"
+               owner="fdt.managedbuild.tool.xlf.f.linker"
                name="%OptionCategory.Shared.Settings"
-               id="gnu.c.link.category.shared">
+               id="xlf.f.link.category.shared">
          </optionCategory>
          <option
                defaultValue="false"
                name="%Option.Posix.Linker.Shared"
-               category="gnu.c.link.category.shared"
+               category="xlf.f.link.category.shared"
                command="-shared"
-               id="gnu.c.link.option.shared"
+               id="xlf.f.link.option.shared"
                valueType="boolean">
          </option>
          <option
                name="%Option.Posix.Linker.SOName"
-               category="gnu.c.link.category.shared"
+               category="xlf.f.link.category.shared"
                command="-Wl,-soname="
-               id="gnu.c.link.option.soname"
+               id="xlf.f.link.option.soname"
                valueType="string">
          </option>
          <option
                name="%Option.Posix.Linker.Implib"
-               category="gnu.c.link.category.shared"
+               category="xlf.f.link.category.shared"
                command="-Wl,--out-implib="
-               id="gnu.c.link.option.implname"
+               id="xlf.f.link.option.implname"
                valueType="string">
          </option>
          <option
                name="%Option.Posix.Linker.Defname"
-               category="gnu.c.link.category.shared"
+               category="xlf.f.link.category.shared"
                command="-Wl,--output-def="
-               id="gnu.c.link.option.defname"
+               id="xlf.f.link.option.defname"
                valueType="string">
          </option>
       </tool>
+      
       <tool
-            natureFilter="ccnature"
+		  name="%ToolName.compiler.xlf.f"
+		  id="fdt.managedbuild.tool.xlf.f.compiler"
+		  isAbstract="false"
+		  sources="f,f90,f95,F,F90,F95"
+		  command="/opt/ibmcmp/xlf/8.1/bin/xlf95"
+		  headerExtensions="h"
+		  natureFilter="fnature"
+		  outputs="o"
+		  outputFlag="-o">
+		  <optionCategory
+			  owner="fdt.managedbuild.tool.xlf.f.compiler"
+			  name="%OptionCategory.Source"
+			  id="xlf.f.compiler.category.source">
+		  </optionCategory>
+		  <option
+			  name="%Option.XLF.Source.extension"
+			  category="xlf.f.compiler.category.source"
+			  id="xlf.f.compiler.option.source.extention"
+			  valueType="enumerated">
+		  <enumeratedOptionValue
+		  		  name="f"
+				  isDefault="false"
+				  command=""
+				  id="xlf.f.source.extention.f">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+		  		  name="f90"
+				  isDefault="true"
+				  command="-qsuffix=f=f90"
+				  id="xlf.f.source.extention.f90">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+		  		  name="f95"
+				  isDefault="false"
+				  command="-qsuffix=f=f95"
+				  id="xlf.f.source.extention.f95">
+		  </enumeratedOptionValue>
+                  </option>
+		  <option
+			  defaultValue=""
+			  name="%Option.OtherFlags"
+			  category="xlf.f.compiler.category.source"
+			  id="xlf.f.compiler.option.source.other"
+			  valueType="string">
+		  </option>
+		  <option
+			  name="%Option.XLF.Source.free"
+			  category="xlf.f.compiler.category.source"
+			  command="-qfree=f90"
+			  id="xlf.f.compiler.option.source.free"
+			  valueType="boolean">
+		  </option>
+		  <option
+			  name="%Option.XLF.Source.free.ibm"
+			  category="xlf.f.compiler.category.source"
+			  command="-qfree=ibm"
+			  id="xlf.f.compiler.option.source.free.ibm"
+			  valueType="boolean">
+		  </option>
+		  <optionCategory
+			  owner="fdt.managedbuild.tool.xlf.f.compiler"
+			  name="%OptionCategory.Symbols"
+			  id="xlf.f.compiler.category.symbols">
+		  </optionCategory>
+		  <option
+			  name="%Option.Posix.DefSym"
+			  category="xlf.f.compiler.category.symbols"
+			  command="-D"
+			  id="xlf.f.compiler.option.preprocessor.def.symbols"
+			  valueType="definedSymbols">
+		  </option>
+		  <option
+			  name="%Option.Posix.UndefSym"
+			  category="xlf.f.compiler.category.symbols"
+			  command="-U"
+			  id="xlf.f.compiler.option.preprocessor.undef.symbol"
+			  valueType="stringList">
+		  </option>
+		  <optionCategory
+			  owner="fdt.managedbuild.tool.xlf.f.compiler"
+			  name="%OptionCategory.Dirs"
+			  id="xlf.f.compiler.category.dirs">
+		  </optionCategory>
+		  <option
+			  name="%Option.Posix.InclPaths"
+			  category="xlf.f.compiler.category.dirs"
+			  command="-I"
+			  id="xlf.f.compiler.option.include.paths"
+			  valueType="includePath"
+			  browseType="directory">
+		  </option>
+		  <optionCategory
+			  owner="fdt.managedbuild.tool.xlf.f.compiler"
+			  name="%OptionCategory.Optimize"
+			  id="xlf.f.compiler.category.optimization">
+		  </optionCategory>
+		  <option
+			  name="%Option.Posix.OptLevel"
+			  category="xlf.f.compiler.category.optimization"
+			  id="xlf.f.compiler.option.optimization.level"
+			  valueType="enumerated">
+		  <enumeratedOptionValue
+		  		  name="%Option.Posix.Optimize.None"
+				  isDefault="false"
+				  command="-O0"
+				  id="xlf.f.optimization.level.none">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="%Option.Posix.Optimize.Optimize"
+				  command="-O1"
+				  id="xlf.f.optimization.level.optimize">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="%Option.Posix.Optimize.More"
+				  isDefault="true"
+				  command="-O2"
+				  id="xlf.f.optimization.level.more">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="%Option.Posix.Optimize.Most"
+				  command="-O3"
+				  id="xlf.f.optimization.level.most">
+		  </enumeratedOptionValue>
+		  </option>
+		  <option
+			  name="%Option.Posix.Optimize.Flags"
+			  category="xlf.f.compiler.category.optimization"
+			  id="xlf.f.compiler.option.optimization.flags"
+			  valueType="string">
+		  </option>
+		  <optionCategory
+			  owner="fdt.managedbuild.tool.xlf.f.compiler"
+			  name="%OptionCategory.Debug"
+			  id="xlf.f.compiler.category.debug">
+		  </optionCategory>
+		  <option
+			  name="%Option.Posix.DebugLevel"
+			  category="xlf.f.compiler.category.debug"
+			  id="xlf.f.compiler.option.debugging.level"
+			  valueType="enumerated">
+		  <enumeratedOptionValue
+				  name="%Option.Posix.Debug.None"
+				  isDefault="false"
+				  id="xlf.f.debugging.level.none">
+		  </enumeratedOptionValue>
+		  <enumeratedOptionValue
+				  name="%Option.Posix.Debug.Def"
+				  isDefault="true"
+				  command="-g"
+				  id="xlf.f.debugging.level.default">
+		  </enumeratedOptionValue>
+		  </option>
+		  <option
+			  name="%Option.Posix.Debug.Other"
+			  category="xlf.f.compiler.category.debug"
+			  id="xlf.f.compiler.option.debugging.other"
+			  valueType="string">
+		  </option>
+		  <option
+			  defaultValue="false"
+			  name="%Option.Posix.Debug.gprof"
+			  category="xlf.f.compiler.category.debug"
+			  command="-pg"
+			  id="xlf.f.compiler.option.debugging.gprof"
+			  valueType="boolean">
+		  </option>
+		  <option
+			  defaultValue="false"
+			  name="%Option.Posix.Debug.prof"
+			  category="xlf.f.compiler.category.debug"
+			  command="-p"
+			  id="xlf.f.compiler.option.debugging.prof"
+			  valueType="boolean">
+		  </option>
+		  <optionCategory
+			  owner="fdt.managedbuild.tool.xlf.f.compiler"
+			  name="%OptionCategory.Warn"
+			  id="xlf.f.compiler.category.warnings">
+		  </optionCategory>
+		  <option
+			  defaultValue="false"
+			  name="%Option.Posix.Warn.nowarn"
+			  category="xlf.f.compiler.category.warnings"
+			  command="-w"
+			  id="xlf.f.compiler.option.warnings.nowarn"
+			  valueType="boolean">
+		  </option>
+		  <option
+			  defaultValue="false"
+			  name="%Option.Posix.Warn.allwarn"
+			  category="xlf.f.compiler.category.warnings"
+			  command="-qflag=i:u"
+			  id="xlf.f.compiler.option.warnings.allwarn"
+			  valueType="boolean">
+		  </option>
+		  <optionCategory
+			  owner="fdt.managedbuild.tool.xlf.f.compiler"
+			  name="%OptionCategory.Misc"
+			  id="xlf.f.compiler.category.other">
+		  </optionCategory>
+		  <option
+			  defaultValue="-c"
+			  name="%Option.OtherFlags"
+			  category="xlf.f.compiler.category.other"
+			  id="xlf.f.compiler.option.misc.other"
+			  valueType="string">
+		  </option>
+		  <option
+			  defaultValue="false"
+			  name="%Option.Posix.Verbose"
+			  category="xlf.f.compiler.category.other"
+			  command="-v"
+			  id="xlf.f.compiler.option.misc.verbose"
+			  valueType="boolean">
+		  </option>
+	  </tool>
+
+      <projectType 
+            name="%TargetName.macosx.exe"
+            id="fdt.managedbuild.target.macosx.exe"
+            isTest="false"
+            isAbstract="false">
+         <configuration
+               name="%ConfigName.Dbg"
+               artifactExtension=""               
+               cleanCommand="rm -rf"
+			   errorParsers="org.eclipse.fdt.core.MakeErrorParser;org.eclipse.fdt.core.XLFErrorParser;org.eclipse.fdt.core.GLDErrorParser;org.eclipse.fdt.core.GASErrorParser"               
+               id="fdt.managedbuild.config.xlf.macosx.exe.debug">
+               <toolChain   
+                  id="fdt.managedbuild.toolchain.xlf.macosx.exe.debug"
+                  name="%ToolChainName.Dbg"
+                  osList="macosx"
+                  archList="all">
+                  <targetPlatform
+					  id="fdt.managedbuild.target.xlf.platform.macosx.exe.debug"
+				 	  name="%PlatformName.Dbg"
+                       binaryParser="org.eclipse.fdt.core.MachO"
+					  osList="macosx"					  
+					  archList="all">
+				  </targetPlatform>
+			  	  <builder
+					  id="fdt.managedbuild.target.xlf.builder.macosx.exe.debug"
+					  name="%BuilderName.Dbg"
+					  command="make"
+					  arguments="-k"
+					  buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
+			      </builder>               		         
+		          <tool
+                      id="fdt.managedbuild.tool.xlf.f.compiler.macosx.exe.debug"
+                      superClass="fdt.managedbuild.tool.xlf.f.compiler">
+		          </tool>
+		          <tool
+			        id="fdt.managedbuild.tool.macosx.f.linker.macosx.exe.debug"
+			        outputs=""
+			        superClass="fdt.managedbuild.tool.xlf.f.linker">
+		          </tool>
+             </toolChain>                    
+         </configuration>
+         <configuration
+               name="%ConfigName.Rel"
+               artifactExtension=""               
+               cleanCommand="rm -rf"
+			   errorParsers="org.eclipse.fdt.core.MakeErrorParser;org.eclipse.fdt.core.XLFErrorParser;org.eclipse.fdt.core.GLDErrorParser;org.eclipse.fdt.core.GASErrorParser"               
+               id="fdt.managedbuild.config.xlf.macosx.exe.release">
+               <toolChain   
+                  id="fdt.managedbuild.toolchain.xlf.macosx.exe.release"
+                  name="%ToolChainName.Rel"
+                  osList="macosx"
+                  archList="all">
+                  <targetPlatform
+					  id="fdt.managedbuild.target.xlf.platform.macosx.exe.release"
+				 	  name="%PlatformName.Rel"
+                       binaryParser="org.eclipse.fdt.core.MachO"
+					  osList="macosx"					  
+					  archList="all">
+				  </targetPlatform>
+			  	  <builder
+					  id="fdt.managedbuild.target.xlf.builder.macosx.exe.release"
+					  name="%BuilderName.Rel"
+					  command="make"
+					  arguments="-k"
+					  buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
+			      </builder>               		         
+		          <tool
+                      id="fdt.managedbuild.tool.xlf.f.compiler.macosx.exe.release"
+                      superClass="fdt.managedbuild.tool.xlf.f.compiler">
+		          </tool>
+		          <tool
+			        id="fdt.managedbuild.tool.macosx.f.linker.macosx.exe.release"
+			        outputs=""
+			        superClass="fdt.managedbuild.tool.xlf.f.linker">
+		          </tool>
+             </toolChain>                    
+         </configuration>
+       </projectType>      
+
+<!-- Managed Make Builder Tool Specifications from CDT -->
+      <tool
+            natureFilter="fnature"
             sources="o"
-            outputs=""
-            name="%ToolName.linker.gnu.cpp"
+			outputs=""
+            name="%ToolName.linker.gnu.fortran"
             outputFlag="-o"
-            command="g++"
+            command="gfortran"
             dependencyCalculator="org.eclipse.fdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
-            id="fdt.managedbuild.tool.gnu.cpp.linker">
+            id="fdt.managedbuild.tool.gnu.fortran.linker">
          <optionCategory
-               owner="fdt.managedbuild.tool.gnu.cpp.linker"
+               owner="fdt.managedbuild.tool.gnu.fortran.linker"
                name="%OptionCategory.General"
-               id="gnu.cpp.link.category.options">
+               id="gnu.fortran.link.category.general">
          </optionCategory>
          <option
                defaultValue="false"
                name="%Option.Posix.Linker.NoStartFiles"
-               category="gnu.cpp.link.category.options"
+               category="gnu.fortran.link.category.general"
                command="-nostartfiles"
-               id="gnu.cpp.link.option.nostart"
+               id="gnu.fortran.link.option.nostart"
                valueType="boolean">
          </option>
          <option
                defaultValue="false"
                name="%Option.Posix.Linker.NoDefLibs"
-               category="gnu.cpp.link.category.options"
+               category="gnu.fortran.link.category.general"
                command="-nodefaultlibs"
-               id="gnu.cpp.link.option.nodeflibs"
+               id="gnu.fortran.link.option.nodeflibs"
                valueType="boolean">
          </option>
          <option
                defaultValue="false"
                name="%Option.Posix.Linker.NoStdLibs"
-               category="gnu.cpp.link.category.options"
+               category="gnu.fortran.link.category.general"
                command="-nostdlib"
-               id="gnu.cpp.link.option.nostdlibs"
+               id="gnu.fortran.link.option.nostdlibs"
                valueType="boolean">
          </option>
          <option
                defaultValue="false"
                name="%Option.Posix.Linker.Strip"
-               category="gnu.cpp.link.category.options"
+               category="gnu.fortran.link.category.general"
                command="--strip-all"
-               id="gnu.cpp.link.option.strip"
+               id="gnu.fortran.link.option.strip"
+               valueType="boolean">
+         </option>
+         <option
+               defaultValue="false"
+               name="%Option.Posix.Linker.Static"
+               category="gnu.fortran.link.category.general"
+               command="-static"
+               id="gnu.fortran.link.option.noshared"
                valueType="boolean">
          </option>
          <optionCategory
-               owner="fdt.managedbuild.tool.gnu.cpp.linker"
+               owner="fdt.managedbuild.tool.gnu.fortran.linker"
                name="%OptionCategory.Libs"
-               id="gnu.cpp.link.category.libs">
+               id="gnu.fortran.link.category.libs">
          </optionCategory>
          <option
                name="%Option.Posix.Libs"
-               category="gnu.cpp.link.category.libs"
+               category="gnu.fortran.link.category.libs"
                command="-l"
-               id="gnu.cpp.link.option.libs"
+               id="gnu.fortran.link.option.libs"
                browseType="file"
                valueType="libs">
          </option>
          <option
                name="%Option.Posix.Libsearch"
-               category="gnu.cpp.link.category.libs"
+               category="gnu.fortran.link.category.libs"
                command="-L"
-               id="gnu.cpp.link.option.paths"
+               id="gnu.fortran.link.option.paths"
                browseType="directory"
                valueType="stringList">
          </option>
          <optionCategory
-               owner="fdt.managedbuild.tool.gnu.cpp.linker"
+               owner="fdt.managedbuild.tool.gnu.fortran.linker"
                name="%OptionCategory.Misc"
-               id="gnu.cpp.link.category.other">
+               id="gnu.fortran.link.category.other">
          </optionCategory>
          <option
                name="%Option.Posix.Linker.Flags"
-               category="gnu.cpp.link.category.other"
+               category="gnu.fortran.link.category.other"
                valueType="string"
-               id="gnu.cpp.link.option.flags">
+               id="gnu.fortran.link.option.ldflags">
          </option>
          <option
                name="%Option.Posix.Linker.XLinker"
-               category="gnu.cpp.link.category.other"
+               category="gnu.fortran.link.category.other"
                command="-Xlinker ${VALUE}"
                valueType="stringList"
-               id="gnu.cpp.link.option.other">
+               id="gnu.fortran.link.option.other">
          </option>
          <option
                name="%Option.Posix.UserObjs"
-               category="gnu.cpp.link.category.other"
+               category="gnu.fortran.link.category.other"
                browseType="file"
                valueType="userObjs"
-               id="gnu.cpp.link.option.userobjs">
+               id="gnu.fortran.link.option.userobjs">
          </option>
          <optionCategory
-               owner="fdt.managedbuild.tool.gnu.cpp.linker"
+               owner="fdt.managedbuild.tool.gnu.fortran.linker"
                name="%OptionCategory.Shared.Settings"
-               id="gnu.cpp.link.category.shared">
+               id="gnu.fortran.link.category.shared">
          </optionCategory>
          <option
                defaultValue="false"
                name="%Option.Posix.Linker.Shared"
-               category="gnu.cpp.link.category.shared"
+               category="gnu.fortran.link.category.shared"
                command="-shared"
-               valueType="boolean"
-               id="gnu.cpp.link.option.shared">
+               id="gnu.fortran.link.option.shared"
+               valueType="boolean">
          </option>
          <option
                name="%Option.Posix.Linker.SOName"
-               category="gnu.cpp.link.category.shared"
+               category="gnu.fortran.link.category.shared"
                command="-Wl,-soname="
-               valueType="string"
-               id="gnu.cpp.link.option.soname">
+               id="gnu.fortran.link.option.soname"
+               valueType="string">
          </option>
          <option
                name="%Option.Posix.Linker.Implib"
-               category="gnu.cpp.link.category.shared"
+               category="gnu.fortran.link.category.shared"
                command="-Wl,--out-implib="
-               valueType="string"
-               id="gnu.cpp.link.option.implname">
+               id="gnu.fortran.link.option.implname"
+               valueType="string">
          </option>
          <option
                name="%Option.Posix.Linker.Defname"
-               category="gnu.cpp.link.category.shared"
+               category="gnu.fortran.link.category.shared"
                command="-Wl,--output-def="
-               valueType="string"
-               id="gnu.cpp.link.option.defname">
+               id="gnu.fortran.link.option.defname"
+               valueType="string">
          </option>
       </tool>
       <tool
@@ -503,690 +807,358 @@
             natureFilter="fnature"
             sources="o"
             outputs=""
-            name="%ToolName.linker.macosx.c"
+            name="%ToolName.linker.macosx.gfortran"
             outputFlag="-o"
-            command="gcc"
+            command="gfortran"
             dependencyCalculator="org.eclipse.fdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
-            id="fdt.managedbuild.tool.macosx.c.linker">
+            id="fdt.managedbuild.tool.macosx.fortran.linker">
          <optionCategory
-               owner="fdt.managedbuild.tool.macosx.c.linker"
+               owner="fdt.managedbuild.tool.macosx.fortran.linker"
                name="%OptionCategory.General"
-               id="macosx.c.link.category.general">
+               id="macosx.fortran.link.category.general">
          </optionCategory>
          <option
                defaultValue="false"
                name="%Option.Posix.Linker.NoStartFiles"
-               category="macosx.c.link.category.general"
+               category="macosx.fortran.link.category.general"
                command="-nostartfiles"
-               id="macosx.c.link.option.nostart"
+               id="macosx.fortran.link.option.nostart"
                valueType="boolean">
          </option>
          <option
                defaultValue="false"
                name="%Option.Posix.Linker.NoDefLibs"
-               category="macosx.c.link.category.general"
+               category="macosx.fortran.link.category.general"
                command="-nodefaultlibs"
-               id="macosx.c.link.option.nodeflibs"
+               id="macosx.fortran.link.option.nodeflibs"
                valueType="boolean">
          </option>
          <option
                defaultValue="false"
                name="%Option.Posix.Linker.NoStdLibs"
-               category="macosx.c.link.category.general"
+               category="macosx.fortran.link.category.general"
                command="-nostdlib"
-               id="macosx.c.link.option.nostdlibs"
+               id="macosx.fortran.link.option.nostdlibs"
                valueType="boolean">
          </option>
          <option
                defaultValue="false"
                name="%Option.Posix.Linker.Strip"
-               category="macosx.c.link.category.general"
+               category="macosx.fortran.link.category.general"
                command="--strip-all"
-               id="macosx.c.link.option.strip"
+               id="macosx.fortran.link.option.strip"
                valueType="boolean">
          </option>
          <option
                defaultValue="false"
                name="%Option.Posix.Linker.Static"
-               category="macosx.c.link.category.general"
+               category="macosx.fortran.link.category.general"
                command="-static"
-               id="macosx.c.link.option.noshared"
+               id="macosx.fortran.link.option.noshared"
                valueType="boolean">
          </option>
          <optionCategory
-               owner="fdt.managedbuild.tool.macosx.c.linker"
+               owner="fdt.managedbuild.tool.macosx.fortran.linker"
                name="%OptionCategory.Libs"
-               id="macosx.c.link.category.libs">
+               id="macosx.fortran.link.category.libs">
          </optionCategory>
          <option
                name="%Option.Posix.Libs"
-               category="macosx.c.link.category.libs"
+               category="macosx.fortran.link.category.libs"
                command="-l"
-               id="macosx.c.link.option.libs"
+               id="macosx.fortran.link.option.libs"
                browseType="file"
                valueType="libs">
          </option>
          <option
                name="%Option.Posix.Libsearch"
-               category="macosx.c.link.category.libs"
+               category="macosx.fortran.link.category.libs"
                command="-L"
-               id="macosx.c.link.option.paths"
+               id="macosx.fortran.link.option.paths"
                browseType="directory"
                valueType="stringList">
          </option>
          <optionCategory
-               owner="fdt.managedbuild.tool.macosx.c.linker"
+               owner="fdt.managedbuild.tool.macosx.fortran.linker"
                name="%OptionCategory.Misc"
-               id="macosx.c.link.category.other">
+               id="macosx.fortran.link.category.other">
          </optionCategory>
          <option
                name="%Option.Posix.Linker.Flags"
-               category="macosx.c.link.category.other"
+               category="macosx.fortran.link.category.other"
                valueType="string"
-               id="macosx.c.link.option.ldflags">
+               id="macosx.fortran.link.option.ldflags">
          </option>
          <option
                name="%Option.Posix.Linker.XLinker"
-               category="macosx.c.link.category.other"
+               category="macosx.fortran.link.category.other"
                command="-Xlinker ${VALUE}"
                valueType="stringList"
-               id="macosx.c.link.option.other">
+               id="macosx.fortran.link.option.other">
          </option>
          <option
                name="%Option.Posix.UserObjs"
-               category="macosx.c.link.category.other"
+               category="macosx.fortran.link.category.other"
                browseType="file"
                valueType="userObjs"
-               id="macosx.c.link.option.userobjs">
+               id="macosx.fortran.link.option.userobjs">
          </option>
          <optionCategory
-               owner="fdt.managedbuild.tool.macosx.c.linker"
+               owner="fdt.managedbuild.tool.macosx.fortran.linker"
                name="%OptionCategory.Shared.Settings"
-               id="macosx.c.link.category.shared">
+               id="macosx.fortran.link.category.shared">
          </optionCategory>
          <option
                defaultValue="false"
                name="%Option.MacOSX.Linker.Shared"
-               category="macosx.c.link.category.shared"
+               category="macosx.fortran.link.category.shared"
                command="-Wl,-dylib"
-               id="macosx.c.link.option.shared"
+               id="macosx.fortran.link.option.shared"
                valueType="boolean">
-         </option>
-      </tool>
-      <tool
-            natureFilter="ccnature"
-            sources="o"
-            outputs=""
-            name="%ToolName.linker.macosx.cpp"
-            outputFlag="-o"
-            command="g++"
-            dependencyCalculator="org.eclipse.fdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
-            id="fdt.managedbuild.tool.macosx.cpp.linker">
-         <optionCategory
-               owner="fdt.managedbuild.tool.macosx.cpp.linker"
-               name="%OptionCategory.General"
-               id="macosx.cpp.link.category.options">
-         </optionCategory>
-         <option
-               defaultValue="false"
-               name="%Option.Posix.Linker.NoStartFiles"
-               category="macosx.cpp.link.category.options"
-               command="-nostartfiles"
-               id="macosx.cpp.link.option.nostart"
-               valueType="boolean">
-         </option>
-         <option
-               defaultValue="false"
-               name="%Option.Posix.Linker.NoDefLibs"
-               category="macosx.cpp.link.category.options"
-               command="-nodefaultlibs"
-               id="macosx.cpp.link.option.nodeflibs"
-               valueType="boolean">
-         </option>
-         <option
-               defaultValue="false"
-               name="%Option.Posix.Linker.NoStdLibs"
-               category="macosx.cpp.link.category.options"
-               command="-nostdlib"
-               id="macosx.cpp.link.option.nostdlibs"
-               valueType="boolean">
-         </option>
-         <option
-               defaultValue="false"
-               name="%Option.Posix.Linker.Strip"
-               category="macosx.cpp.link.category.options"
-               command="--strip-all"
-               id="macosx.cpp.link.option.strip"
-               valueType="boolean">
-         </option>
-         <optionCategory
-               owner="fdt.managedbuild.tool.macosx.cpp.linker"
-               name="%OptionCategory.Libs"
-               id="macosx.cpp.link.category.libs">
-         </optionCategory>
-         <option
-               name="%Option.Posix.Libs"
-               category="macosx.cpp.link.category.libs"
-               command="-l"
-               id="macosx.cpp.link.option.libs"
-               browseType="file"
-               valueType="libs">
-         </option>
-         <option
-               name="%Option.Posix.Libsearch"
-               category="macosx.cpp.link.category.libs"
-               command="-L"
-               id="macosx.cpp.link.option.paths"
-               browseType="directory"
-               valueType="stringList">
-         </option>
-         <optionCategory
-               owner="fdt.managedbuild.tool.macosx.cpp.linker"
-               name="%OptionCategory.Misc"
-               id="macosx.cpp.link.category.other">
-         </optionCategory>
-         <option
-               name="%Option.Posix.Linker.Flags"
-               category="macosx.cpp.link.category.other"
-               valueType="string"
-               id="macosx.cpp.link.option.flags">
-         </option>
-         <option
-               name="%Option.Posix.Linker.XLinker"
-               category="macosx.cpp.link.category.other"
-               command="-Xlinker ${VALUE}"
-               valueType="stringList"
-               id="macosx.cpp.link.option.other">
-         </option>
-         <option
-               name="%Option.Posix.UserObjs"
-               category="macosx.cpp.link.category.other"
-               browseType="file"
-               valueType="userObjs"
-               id="macosx.cpp.link.option.userobjs">
-         </option>
-         <optionCategory
-               owner="fdt.managedbuild.tool.macosx.cpp.linker"
-               name="%OptionCategory.Shared.Settings"
-               id="macosx.cpp.link.category.shared">
-         </optionCategory>
-         <option
-               defaultValue="false"
-               name="%Option.MacOSX.Linker.Shared"
-               category="macosx.cpp.link.category.shared"
-               command="-Wl,-dylib"
-               valueType="boolean"
-               id="macosx.cpp.link.option.shared">
          </option>
       </tool>
       
       <tool
-		  name="%ToolName.compiler.gnu.c"
-		  id="fdt.managedbuild.tool.gnu.c.compiler"
+		  name="%ToolName.compiler.gnu.fortran"
+		  id="fdt.managedbuild.tool.gnu.fortran.compiler"
 		  isAbstract="true"
-		  sources="c"
-		  command="gcc"
+		  sources="f,f77,f90,f95"
+		  command="gfortran"
 		  dependencyCalculator="org.eclipse.fdt.managedbuilder.makegen.gnu.DefaultGCCDependencyCalculator"
 		  headerExtensions="h"
 		  natureFilter="fnature"
 		  outputs="o"
 		  outputFlag="-o">
 		  <optionCategory
-		      owner="fdt.managedbuild.tool.gnu.c.compiler"
+		      owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Preproc"
-			  id="gnu.c.compiler.category.preprocessor">
+			  id="gnu.fortran.compiler.category.preprocessor">
 		  </optionCategory>
 		  <option
 			  defaultValue="false"
 			  name="%Option.Posix.Nostdinc"
-			  category="gnu.c.compiler.category.preprocessor"
+			  category="gnu.fortran.compiler.category.preprocessor"
 			  command="-nostdinc"
-			  id="gnu.c.compiler.option.preprocessor.nostdinc"
+			  id="gnu.fortran.compiler.option.preprocessor.nostdinc"
 			  valueType="boolean">
 		  </option>
 		  <option
 			  defaultValue="false"
 			  name="%Option.Posix.PreprocOnly"
-			  category="gnu.c.compiler.category.preprocessor"
+			  category="gnu.fortran.compiler.category.preprocessor"
 			  command="-E"
-			  id="gnu.c.compiler.option.preprocessor.preprocess"
+			  id="gnu.fortran.compiler.option.preprocessor.preprocess"
 			  valueType="boolean">
 		  </option>
 		  <optionCategory
-			  owner="fdt.managedbuild.tool.gnu.c.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Symbols"
-			  id="gnu.c.compiler.category.symbols">
+			  id="gnu.fortran.compiler.category.symbols">
 		  </optionCategory>
 		  <option
 			  name="%Option.Posix.DefSym"
-			  category="gnu.c.compiler.category.symbols"
+			  category="gnu.fortran.compiler.category.symbols"
 			  command="-D"
-			  id="gnu.c.compiler.option.preprocessor.def.symbols"
+			  id="gnu.fortran.compiler.option.preprocessor.def.symbols"
 			  valueType="definedSymbols">
 		  </option>
 		  <option
 			  name="%Option.Posix.UndefSym"
-			  category="gnu.c.compiler.category.symbols"
+			  category="gnu.fortran.compiler.category.symbols"
 			  command="-U"
-			  id="gnu.c.compiler.option.preprocessor.undef.symbol"
+			  id="gnu.fortran.compiler.option.preprocessor.undef.symbol"
 			  valueType="stringList">
 		  </option>
 		  <optionCategory
-			  owner="fdt.managedbuild.tool.gnu.c.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Dirs"
-			  id="gnu.c.compiler.category.dirs">
+			  id="gnu.fortran.compiler.category.dirs">
 		  </optionCategory>
 		  <option
 			  name="%Option.Posix.InclPaths"
-			  category="gnu.c.compiler.category.dirs"
+			  category="gnu.fortran.compiler.category.dirs"
 			  command="-I"
-			  id="gnu.c.compiler.option.include.paths"
+			  id="gnu.fortran.compiler.option.include.paths"
 			  valueType="includePath"
 			  browseType="directory">
 		  </option>
 		  <optionCategory
-			  owner="fdt.managedbuild.tool.gnu.c.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Optimize"
-			  id="gnu.c.compiler.category.optimization">
+			  id="gnu.fortran.compiler.category.optimization">
 		  </optionCategory>
 		  <option
 			  name="%Option.Posix.OptLevel"
-			  category="gnu.c.compiler.category.optimization"
-			  id="gnu.c.compiler.option.optimization.level"
+			  category="gnu.fortran.compiler.category.optimization"
+			  id="gnu.fortran.compiler.option.optimization.level"
 			  valueType="enumerated">
 		  <enumeratedOptionValue
 		  		  name="%Option.Posix.Optimize.None"
 				  isDefault="false"
 				  command="-O0"
-				  id="gnu.c.optimization.level.none">
+				  id="gnu.fortran.optimization.level.none">
 		  </enumeratedOptionValue>
 		  <enumeratedOptionValue
 				  name="%Option.Posix.Optimize.Optimize"
 				  command="-O1"
-				  id="gnu.c.optimization.level.optimize">
+				  id="gnu.fortran.optimization.level.optimize">
 		  </enumeratedOptionValue>
 		  <enumeratedOptionValue
 				  name="%Option.Posix.Optimize.More"
 				  isDefault="true"
 				  command="-O2"
-				  id="gnu.c.optimization.level.more">
+				  id="gnu.fortran.optimization.level.more">
 		  </enumeratedOptionValue>
 		  <enumeratedOptionValue
 				  name="%Option.Posix.Optimize.Most"
 				  command="-O3"
-				  id="gnu.c.optimization.level.most">
+				  id="gnu.fortran.optimization.level.most">
 		  </enumeratedOptionValue>
 		  </option>
 		  <option
 			  name="%Option.Posix.Optimize.Flags"
-			  category="gnu.c.compiler.category.optimization"
-			  id="gnu.c.compiler.option.optimization.flags"
+			  category="gnu.fortran.compiler.category.optimization"
+			  id="gnu.fortran.compiler.option.optimization.flags"
 			  valueType="string">
 		  </option>
 		  <optionCategory
-			  owner="fdt.managedbuild.tool.gnu.c.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Debug"
-			  id="gnu.c.compiler.category.debug">
+			  id="gnu.fortran.compiler.category.debug">
 		  </optionCategory>
 		  <option
 			  name="%Option.Posix.DebugLevel"
-			  category="gnu.c.compiler.category.debug"
-			  id="gnu.c.compiler.option.debugging.level"
+			  category="gnu.fortran.compiler.category.debug"
+			  id="gnu.fortran.compiler.option.debugging.level"
 			  valueType="enumerated">
 		  <enumeratedOptionValue
 				  name="%Option.Posix.Debug.None"
 				  isDefault="false"
-				  id="gnu.c.debugging.level.none">
+				  id="gnu.fortran.debugging.level.none">
 		  </enumeratedOptionValue>
 		  <enumeratedOptionValue
 				  name="%Option.Posix.Debug.Min"
 				  command="-g1"
-				  id="gnu.c.debugging.level.minimal">
+				  id="gnu.fortran.debugging.level.minimal">
 		  </enumeratedOptionValue>
 		  <enumeratedOptionValue
 				  name="%Option.Posix.Debug.Def"
 				  isDefault="true"
 				  command="-g"
-				  id="gnu.c.debugging.level.default">
+				  id="gnu.fortran.debugging.level.default">
 		  </enumeratedOptionValue>
 		  <enumeratedOptionValue
 				  name="%Option.Posix.Debug.Max"
 				  isDefault="false"
 				  command="-g3"
-				  id="gnu.c.debugging.level.max">
+				  id="gnu.fortran.debugging.level.max">
 		  </enumeratedOptionValue>
 		  </option>
 		  <option
 			  name="%Option.Posix.Debug.Other"
-			  category="gnu.c.compiler.category.debug"
-			  id="gnu.c.compiler.option.debugging.other"
+			  category="gnu.fortran.compiler.category.debug"
+			  id="gnu.fortran.compiler.option.debugging.other"
 			  valueType="string">
 		  </option>
 		  <option
 			  defaultValue="false"
 			  name="%Option.Posix.Debug.gprof"
-			  category="gnu.c.compiler.category.debug"
+			  category="gnu.fortran.compiler.category.debug"
 			  command="-pg"
-			  id="gnu.c.compiler.option.debugging.gprof"
+			  id="gnu.fortran.compiler.option.debugging.gprof"
 			  valueType="boolean">
 		  </option>
 		  <option
 			  defaultValue="false"
 			  name="%Option.Posix.Debug.prof"
-			  category="gnu.c.compiler.category.debug"
+			  category="gnu.fortran.compiler.category.debug"
 			  command="-p"
-			  id="gnu.c.compiler.option.debugging.prof"
+			  id="gnu.fortran.compiler.option.debugging.prof"
 			  valueType="boolean">
 		  </option>
 		  <optionCategory
-			  owner="fdt.managedbuild.tool.gnu.c.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Warn"
-			  id="gnu.c.compiler.category.warnings">
+			  id="gnu.fortran.compiler.category.warnings">
 		  </optionCategory>
 		  <option
 			  defaultValue="false"
 			  name="%Option.Posix.Warn.Syntax"
-			  category="gnu.c.compiler.category.warnings"
+			  category="gnu.fortran.compiler.category.warnings"
 			  command="-fsyntax-only"
-			  id="gnu.c.compiler.option.warnings.syntax"
+			  id="gnu.fortran.compiler.option.warnings.syntax"
 			  valueType="boolean">
 		  </option>
 		  <option
 			  defaultValue="false"
 			  name="%Option.Posix.Warn.Pedandic"
-			  category="gnu.c.compiler.category.warnings"
+			  category="gnu.fortran.compiler.category.warnings"
 			  command="-pedantic"
-			  id="gnu.c.compiler.option.warnings.pedantic"
+			  id="gnu.fortran.compiler.option.warnings.pedantic"
 			  valueType="boolean">
 		  </option>
 		  <option
 			  defaultValue="false"
 			  name="%Option.Posix.Warn.PedErrors"
-			  category="gnu.c.compiler.category.warnings"
+			  category="gnu.fortran.compiler.category.warnings"
 			  command="-pedantic-errors"
-			  id="gnu.c.compiler.option.warnings.pedantic.error"
+			  id="gnu.fortran.compiler.option.warnings.pedantic.error"
 			  valueType="boolean">
 		  </option>
 		  <option
 			  defaultValue="false"
 			  name="%Option.Posix.Warn.nowarn"
-			  category="gnu.c.compiler.category.warnings"
+			  category="gnu.fortran.compiler.category.warnings"
 			  command="-w"
-			  id="gnu.c.compiler.option.warnings.nowarn"
+			  id="gnu.fortran.compiler.option.warnings.nowarn"
 			  valueType="boolean">
 		  </option>
 		  <option
 			  defaultValue="true"
 			  name="%Option.Posix.Warn.allwarn"
-			  category="gnu.c.compiler.category.warnings"
+			  category="gnu.fortran.compiler.category.warnings"
 			  command="-Wall"
-			  id="gnu.c.compiler.option.warnings.allwarn"
+			  id="gnu.fortran.compiler.option.warnings.allwarn"
 			  valueType="boolean">
 		  </option>
 		  <option
 			  defaultValue="false"
 			  name="%Option.Posix.Warn.toerrs"
-			  category="gnu.c.compiler.category.warnings"
+			  category="gnu.fortran.compiler.category.warnings"
 			  command="-Werror"
-			  id="gnu.c.compiler.option.warnings.toerrors"
+			  id="gnu.fortran.compiler.option.warnings.toerrors"
 			  valueType="boolean">
 		  </option>
 		  <optionCategory
-			  owner="fdt.managedbuild.tool.gnu.c.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Misc"
-			  id="gnu.c.compiler.category.other">
+			  id="gnu.fortran.compiler.category.other">
 		  </optionCategory>
 		  <option
 			  defaultValue="-c -fmessage-length=0"
 			  name="%Option.OtherFlags"
-			  category="gnu.c.compiler.category.other"
-			  id="gnu.c.compiler.option.misc.other"
+			  category="gnu.fortran.compiler.category.other"
+			  id="gnu.fortran.compiler.option.misc.other"
 			  valueType="string">
 		  </option>
 		  <option
 			  defaultValue="false"
 			  name="%Option.Posix.Verbose"
-			  category="gnu.c.compiler.category.other"
+			  category="gnu.fortran.compiler.category.other"
 			  command="-v"
-			  id="gnu.c.compiler.option.misc.verbose"
+			  id="gnu.fortran.compiler.option.misc.verbose"
 			  valueType="boolean">
 		  </option>
 		  <option
 			  defaultValue="false"
 			  name="%Option.Posix.Ansi"
-			  category="gnu.c.compiler.category.other"
+			  category="gnu.fortran.compiler.category.other"
 			  command="-ansi"
-			  id="gnu.c.compiler.option.misc.ansi"
+			  id="gnu.fortran.compiler.option.misc.ansi"
 			  valueType="boolean">
 		  </option>
 	  </tool>
-	  <tool
-		  name="%ToolName.compiler.gnu.cpp"
-		  id="fdt.managedbuild.tool.gnu.cpp.compiler"
-		  isAbstract="true"
-		  sources="c,C,cc,cxx,cpp"
-		  command="g++"
-		  dependencyCalculator="org.eclipse.fdt.managedbuilder.makegen.gnu.DefaultGCCDependencyCalculator"
-		  headerExtensions="h,H,hpp"
-		  natureFilter="ccnature"
-		  outputs="o"
-		  outputFlag="-o">
-		  <optionCategory
-			  owner="fdt.managedbuild.tool.gnu.cpp.compiler"
-			  name="%OptionCategory.Preproc"
-			  id="gnu.cpp.compiler.category.preprocessor">
-		  </optionCategory>
-		  <option
-			  defaultValue="false"
-			  name="%Option.Posix.Nostdinc"
-			  category="gnu.cpp.compiler.category.preprocessor"
-			  command="-nostdinc"
-			  id="gnu.cpp.compiler.option.preprocessor.nostdinc"
-			  valueType="boolean">
-		  </option>
-		  <option
-			  defaultValue="false"
-			  name="%Option.Posix.PreprocOnly"
-			  category="gnu.cpp.compiler.category.preprocessor"
-			  command="-E"
-			  id="gnu.cpp.compiler.option.preprocessor.preprocess"
-			  valueType="boolean">
-		  </option>
-		  <option
-			  name="%Option.Posix.DefSym"
-			  category="gnu.cpp.compiler.category.preprocessor"
-			  command="-D"
-			  id="gnu.cpp.compiler.option.preprocessor.def"
-			  valueType="definedSymbols">
-		  </option>
-		  <option
-			  name="%Option.Posix.UndefSym"
-			  category="gnu.cpp.compiler.category.preprocessor"
-			  command="-U"
-			  id="gnu.cpp.compiler.option.preprocessor.undef"
-			  valueType="stringList">
-		  </option>
-		  <optionCategory
-			  owner="fdt.managedbuild.tool.gnu.cpp.compiler"
-			  name="%OptionCategory.Dirs"
-			  id="gnu.cpp.compiler.category.dirs">
-		  </optionCategory>
-		  <option
-			  name="%Option.Posix.InclPaths"
-			  category="gnu.cpp.compiler.category.dirs"
-			  command="-I"
-			  id="gnu.cpp.compiler.option.include.paths"
-			  valueType="includePath"
-			  browseType="directory">
-		  </option>
-		  <optionCategory
-			  owner="fdt.managedbuild.tool.gnu.cpp.compiler"
-			  name="%OptionCategory.Optimize"
-			  id="gnu.cpp.compiler.category.optimization">
-		  </optionCategory>
-		  <option
-			  name="%Option.Posix.OptLevel"
-			  category="gnu.cpp.compiler.category.optimization"
-			  id="gnu.cpp.compiler.option.optimization.level"
-			  valueType="enumerated">
-		  <enumeratedOptionValue
-				  name="%Option.Posix.Optimize.None"
-				  command="-O0"
-				  id="gnu.cpp.compiler.optimization.level.none">
-		  </enumeratedOptionValue>
-		  <enumeratedOptionValue
-				  name="%Option.Posix.Optimize.Optimize"
-				  command="-O1"
-				  id="gnu.cpp.compiler.optimization.level.optimize">
-		  </enumeratedOptionValue>
-		  <enumeratedOptionValue
-				  name="%Option.Posix.Optimize.More"
-				  isDefault="true"
-				  command="-O2"
-				  id="gnu.cpp.compiler.optimization.level.more">
-		  </enumeratedOptionValue>
-		  <enumeratedOptionValue
-				  name="%Option.Posix.Optimize.Most"
-				  command="-O3"
-				  id="gnu.cpp.compiler.optimization.level.most">
-		  </enumeratedOptionValue>
-		  </option>
-		  <option
-			  name="%Option.Posix.Optimize.Flags"
-			  category="gnu.cpp.compiler.category.optimization"
-			  id="gnu.cpp.compiler.option.optimization.flags"
-			  valueType="string">
-		  </option>
-		  <optionCategory
-			  owner="fdt.managedbuild.tool.gnu.cpp.compiler"
-			  name="%OptionCategory.Debug"
-			  id="gnu.cpp.compiler.category.debug">
-		  </optionCategory>
-		  <option
-			  name="%Option.Posix.DebugLevel"
-			  category="gnu.cpp.compiler.category.debug"
-			  id="gnu.cpp.compiler.option.debugging.level"
-			  valueType="enumerated">
-		  <enumeratedOptionValue
-				  name="%Option.Posix.Debug.None"
-				  isDefault="false"
-				  id="gnu.cpp.compiler.debugging.level.none">
-		  </enumeratedOptionValue>
-		  <enumeratedOptionValue
-				  name="%Option.Posix.Debug.Min"
-				  command="-g1"
-				  id="gnu.cpp.compiler.debugging.level.minimal">
-		  </enumeratedOptionValue>
-		  <enumeratedOptionValue
-				  name="%Option.Posix.Debug.Def"
-				  isDefault="true"
-				  command="-g"
-				  id="gnu.cpp.compiler.debugging.level.default">
-		  </enumeratedOptionValue>
-		  <enumeratedOptionValue
-				  name="%Option.Posix.Debug.Max"
-				  isDefault="false"
-				  command="-g3"
-				  id="gnu.cpp.compiler.debugging.level.max">
-		  </enumeratedOptionValue>
-		  </option>
-		  <option
-			  name="%Option.Posix.Debug.Other"
-			  category="gnu.cpp.compiler.category.debug"
-			  id="gnu.cpp.compiler.option.debugging.other"
-			  valueType="string">
-		  </option>
-		  <option
-			  defaultValue="false"
-			  name="%Option.Posix.Debug.prof"
-			  category="gnu.cpp.compiler.category.debug"
-			  command="-p"
-			  id="gnu.cpp.compiler.option.debugging.prof"
-			  valueType="boolean">
-		  </option>
-		  <option
-			  defaultValue="false"
-			  name="%Option.Posix.Debug.gprof"
-			  category="gnu.cpp.compiler.category.debug"
-			  command="-pg"
-			  id="gnu.cpp.compiler.option.debugging.gprof"
-			  valueType="boolean">
-		  </option>
-		  <optionCategory
-			  owner="fdt.managedbuild.tool.gnu.cpp.compiler"
-			  name="%OptionCategory.Warn"
-			  id="gnu.cpp.compiler.category.warnings">
-		  </optionCategory>
-		  <option
-			  defaultValue="false"
-			  name="%Option.Posix.Warn.Syntax"
-			  category="gnu.cpp.compiler.category.warnings"
-			  command="-fsyntax-only"
-			  id="gnu.cpp.compiler.option.warnings.syntax"
-			  valueType="boolean">
-		   </option>
-		  <option
-			  defaultValue="false"
-			  name="%Option.Posix.Warn.Pedandic"
-			  category="gnu.cpp.compiler.category.warnings"
-			  command="-pedantic"
-			  id="gnu.cpp.compiler.option.warnings.pedantic"
-			  valueType="boolean">
-		  </option>
-		  <option
-			  defaultValue="false"
-			  name="%Option.Posix.Warn.PedErrors"
-			  category="gnu.cpp.compiler.category.warnings"
-			  command="-pedantic-errors"
-			  id="gnu.cpp.compiler.option.warnings.pedantic.error"
-			  valueType="boolean">
-		  </option>
-		  <option
-			  defaultValue="false"
-			  name="%Option.Posix.Warn.nowarn"
-			  category="gnu.cpp.compiler.category.warnings"
-			  command="-w"
-			  id="gnu.cpp.compiler.option.warnings.nowarn"
-			  valueType="boolean">
-		  </option>
-		  <option
-			  defaultValue="true"
-			  name="%Option.Posix.Warn.allwarn"
-			  category="gnu.cpp.compiler.category.warnings"
-			  command="-Wall"
-			  id="gnu.cpp.compiler.option.warnings.allwarn"
-			  valueType="boolean">
-		  </option>
-		  <option
-			  defaultValue="false"
-			  name="%Option.Posix.Warn.toerrs"
-			  category="gnu.cpp.compiler.category.warnings"
-			  command="-Werror"
-			  id="gnu.cpp.compiler.option.warnings.toerrors"
-			  valueType="boolean">
-		  </option>
-		  <optionCategory
-			  owner="fdt.managedbuild.tool.gnu.cpp.compiler"
-			  name="%OptionCategory.Misc"
-			  id="gnu.cpp.compiler.category.other">
-		  </optionCategory>
-		  <option
-			  defaultValue="-c -fmessage-length=0"
-			  name="%Option.OtherFlags"
-			  category="gnu.cpp.compiler.category.other"
-			  id="gnu.cpp.compiler.option.other.other"
-			  valueType="string">
-		  </option>
-		  <option
-			  defaultValue="false"
-			  name="%Option.Posix.Verbose"
-			  category="gnu.cpp.compiler.category.other"
-			  command="-v"
-			  id="gnu.cpp.compiler.option.other.verbose"
-			  valueType="boolean">
-		  </option>
-	  </tool>
-      
+     
       <projectType      
             isAbstract="false"     
             isTest="false"
@@ -1218,40 +1190,22 @@
 		              buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
 		     	  </builder>               
                   <tool
-                      id="fdt.managedbuild.tool.gnu.c.compiler.exe.debug"
-                      superClass="fdt.managedbuild.tool.gnu.c.compiler">                          
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.exe.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">                          
 			  	      <option
-					      id="gnu.c.compiler.exe.debug.option.optimization.level"
-						  defaultValue="gnu.c.optimization.level.none"
-						  superClass="gnu.c.compiler.option.optimization.level">
+					      id="gnu.fortran.compiler.exe.debug.option.optimization.level"
+						  defaultValue="gnu.fortran.optimization.level.none"
+						  superClass="gnu.fortran.compiler.option.optimization.level">
 					  </option>
 					  <option   
-					      id="gnu.c.compiler.exe.debug.option.debugging.level"					     
-						  defaultValue="gnu.c.debugging.level.max"
-					      superClass="gnu.c.compiler.option.debugging.level">
+					      id="gnu.fortran.compiler.exe.debug.option.debugging.level"					     
+						  defaultValue="gnu.fortran.debugging.level.max"
+					      superClass="gnu.fortran.compiler.option.debugging.level">
 					  </option>
 				  </tool>
-				  <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.compiler.exe.debug"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.compiler">                         
-                      <option
-				          id="gnu.cpp.compiler.exe.debug.option.optimization.level"
-                          defaultValue="gnu.cpp.compiler.optimization.level.none"
-                          superClass="gnu.cpp.compiler.option.optimization.level">
-                      </option>
-                      <option
-						  id="gnu.cpp.compiler.exe.debug.option.debugging.level"
-                          defaultValue="gnu.cpp.compiler.debugging.level.max"
-                          superClass="gnu.cpp.compiler.option.debugging.level">
-                      </option>
-                  </tool>
                   <tool
-                      id="fdt.managedbuild.tool.gnu.c.linker.exe.debug"
-                      superClass="fdt.managedbuild.tool.gnu.c.linker">
-                  </tool> 
-                  <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.linker.exe.debug"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.linker">
+                      id="fdt.managedbuild.tool.gnu.fortran.linker.exe.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.linker">
                   </tool> 
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.exe.debug"
@@ -1285,41 +1239,23 @@
 		              buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
 				  </builder> 
                   <tool
-                      id="fdt.managedbuild.tool.gnu.c.compiler.exe.release"
-                      superClass="fdt.managedbuild.tool.gnu.c.compiler">                          
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.exe.release"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">                          
 					  <option
-						  id="gnu.c.compiler.exe.release.option.optimization.level"
-						  defaultValue="gnu.c.optimization.level.most"
-						  superClass="gnu.c.compiler.option.optimization.level">
+						  id="gnu.fortran.compiler.exe.release.option.optimization.level"
+						  defaultValue="gnu.fortran.optimization.level.most"
+						  superClass="gnu.fortran.compiler.option.optimization.level">
 					  </option>
 					  <option
-						  id="gnu.c.compiler.exe.release.option.debugging.level"
-						  defaultValue="gnu.c.debugging.level.none"
-						  superClass="gnu.c.compiler.option.debugging.level">
-					  </option>
-                  </tool>
-                  <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.compiler.exe.release"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.compiler">                     
-					  <option
-						  id="gnu.cpp.compiler.exe.release.option.optimization.level"
-						  defaultValue="gnu.cpp.compiler.optimization.level.most"
-						  superClass="gnu.cpp.compiler.option.optimization.level">
-					  </option>
-					  <option
-						  id="gnu.cpp.compiler.exe.release.option.debugging.level"
-						  defaultValue="gnu.cpp.compiler.debugging.level.none"
-						  superClass="gnu.cpp.compiler.option.debugging.level">
+						  id="gnu.fortran.compiler.exe.release.option.debugging.level"
+						  defaultValue="gnu.fortran.debugging.level.none"
+						  superClass="gnu.fortran.compiler.option.debugging.level">
 					  </option>
                   </tool>
                   <tool
-                      id="fdt.managedbuild.tool.gnu.c.linker.exe.release"
-                      superClass="fdt.managedbuild.tool.gnu.c.linker">
+                      id="fdt.managedbuild.tool.gnu.fortran.linker.exe.release"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.linker">
                   </tool> 
-                  <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.linker.exe.release"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.linker">
-                  </tool>  
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.exe.release"
 					  superClass="fdt.managedbuild.tool.gnu.assembler">
@@ -1360,53 +1296,28 @@
 		              buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 				  </builder>               		         
 				  <tool
-				      id="fdt.managedbuild.tool.gnu.c.compiler.so.debug"
-					  superClass="fdt.managedbuild.tool.gnu.c.compiler">
+				      id="fdt.managedbuild.tool.gnu.fortran.compiler.so.debug"
+					  superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
 					  <option
-						  id="gnu.c.compiler.so.debug.option.optimization.level"
-						  defaultValue="gnu.c.optimization.level.none"
-						  superClass="gnu.c.compiler.option.optimization.level">
+						  id="gnu.fortran.compiler.so.debug.option.optimization.level"
+						  defaultValue="gnu.fortran.optimization.level.none"
+						  superClass="gnu.fortran.compiler.option.optimization.level">
 					  </option>
 					  <option
-					      id="gnu.c.compiler.so.debug.option.debugging.level"
-						  defaultValue="gnu.c.debugging.level.max"
-						  superClass="gnu.c.compiler.option.debugging.level">
-					  </option>
-				  </tool>
-				  <tool
-				      id="fdt.managedbuild.tool.gnu.cpp.compiler.so.debug"
-					  superClass="fdt.managedbuild.tool.gnu.cpp.compiler">
-					  <option
-					      id="gnu.cpp.compiler.so.debug.option.optimization.level"
-						  defaultValue="gnu.cpp.compiler.optimization.level.none"
-						  superClass="gnu.cpp.compiler.option.optimization.level">
-					  </option>
-					  <option
-					      id="gnu.cpp.compiler.so.debug.option.debugging.level"
-						  defaultValue="gnu.cpp.compiler.debugging.level.max"
-						  superClass="gnu.cpp.compiler.option.debugging.level">
+					      id="gnu.fortran.compiler.so.debug.option.debugging.level"
+						  defaultValue="gnu.fortran.debugging.level.max"
+						  superClass="gnu.fortran.compiler.option.debugging.level">
 					  </option>
 				  </tool>
 				  <tool
-				      id="fdt.managedbuild.tool.gnu.c.linker.so.debug"
+				      id="fdt.managedbuild.tool.gnu.fortran.linker.so.debug"
 					  outputs="so"
 					  outputPrefix="lib"
-					  superClass="fdt.managedbuild.tool.gnu.c.linker">
+					  superClass="fdt.managedbuild.tool.gnu.fortran.linker">
 					  <option
-						  id="gnu.c.link.so.debug.option.shared"
+						  id="gnu.fortran.link.so.debug.option.shared"
 						  defaultValue="true"
-						  superClass="gnu.c.link.option.shared">
-					  </option>
-				  </tool>
-				  <tool
-					  id="fdt.managedbuild.tool.gnu.cpp.linker.so.debug"
-					  outputs="so"
-					  outputPrefix="lib"
-					  superClass="fdt.managedbuild.tool.gnu.cpp.linker">
-					  <option
-						  id="gnu.cpp.link.so.debug.option.shared"
-						  defaultValue="true"
-						  superClass="gnu.cpp.link.option.shared">
+						  superClass="gnu.fortran.link.option.shared">
 					  </option>
 				  </tool>
 				  <tool
@@ -1442,53 +1353,28 @@
 		              buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 				  </builder>               
 				  <tool				     
-				      id="fdt.managedbuild.tool.gnu.c.compiler.so.release"
-					  superClass="fdt.managedbuild.tool.gnu.c.compiler">
+				      id="fdt.managedbuild.tool.gnu.fortran.compiler.so.release"
+					  superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
 				      <option
-				          id="gnu.c.compiler.so.release.option.optimization.level"
-						  defaultValue="gnu.c.optimization.level.most"
-						  superClass="gnu.c.compiler.option.optimization.level">
+				          id="gnu.fortran.compiler.so.release.option.optimization.level"
+						  defaultValue="gnu.fortran.optimization.level.most"
+						  superClass="gnu.fortran.compiler.option.optimization.level">
 				      </option>
 				      <option
-				          id="gnu.c.compiler.so.release.option.debugging.level"
-						  defaultValue="gnu.c.debugging.level.none"
-						  superClass="gnu.c.compiler.option.debugging.level">
+				          id="gnu.fortran.compiler.so.release.option.debugging.level"
+						  defaultValue="gnu.fortran.debugging.level.none"
+						  superClass="gnu.fortran.compiler.option.debugging.level">
 				      </option>
 				  </tool>
 				  <tool
-				      id="fdt.managedbuild.tool.gnu.cpp.compiler.so.release"
-					  superClass="fdt.managedbuild.tool.gnu.cpp.compiler">
-				      <option
-				          id="gnu.cpp.compiler.so.release.option.optimization.level"
-						  defaultValue="gnu.cpp.compiler.optimization.level.most"
-						  superClass="gnu.cpp.compiler.option.optimization.level">
-				      </option>
-				      <option
-				          id="gnu.cpp.compiler.so.release.option.debugging.level"
-						  defaultValue="gnu.cpp.compiler.debugging.level.none"
-						  superClass="gnu.cpp.compiler.option.debugging.level">
-				      </option>
-				  </tool>				
-				  <tool
-				      id="fdt.managedbuild.tool.gnu.c.linker.so.release"
+				      id="fdt.managedbuild.tool.gnu.fortran.linker.so.release"
 					  outputs="so"
 					  outputPrefix="lib"
-					  superClass="fdt.managedbuild.tool.gnu.c.linker">
+					  superClass="fdt.managedbuild.tool.gnu.fortran.linker">
 					  <option
-						  id="gnu.c.link.so.release.option.shared"
+						  id="gnu.fortran.link.so.release.option.shared"
 						  defaultValue="true"
-						  superClass="gnu.c.link.option.shared">
-					  </option>
-				  </tool>
-				  <tool
-					  id="fdt.managedbuild.tool.gnu.cpp.linker.so.release"
-					  outputs="so"
-					  outputPrefix="lib"
-					  superClass="fdt.managedbuild.tool.gnu.cpp.linker">
-					  <option
-						  id="gnu.cpp.link.so.release.option.shared"
-						  defaultValue="true"
-						  superClass="gnu.cpp.link.option.shared">
+						  superClass="gnu.fortran.link.option.shared">
 					  </option>
 				  </tool>
 				  <tool
@@ -1531,33 +1417,19 @@
 					  buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
 				  <tool
-					  id="fdt.managedbuild.tool.gnu.c.compiler.lib.debug"
-					  superClass="fdt.managedbuild.tool.gnu.c.compiler">
+					  id="fdt.managedbuild.tool.gnu.fortran.compiler.lib.debug"
+					  superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
 				      <option
-					      id="gnu.c.compiler.lib.debug.option.optimization.level"
-						  defaultValue="gnu.c.optimization.level.none"
-						  superClass="gnu.c.compiler.option.optimization.level">
+					      id="gnu.fortran.compiler.lib.debug.option.optimization.level"
+						  defaultValue="gnu.fortran.optimization.level.none"
+						  superClass="gnu.fortran.compiler.option.optimization.level">
 				      </option>
 				      <option
-						  id="gnu.c.compiler.lib.debug.option.debugging.level"						
-						  defaultValue="gnu.c.debugging.level.max"
-						  superClass="gnu.c.compiler.option.debugging.level">
+						  id="gnu.fortran.compiler.lib.debug.option.debugging.level"						
+						  defaultValue="gnu.fortran.debugging.level.max"
+						  superClass="gnu.fortran.compiler.option.debugging.level">
 				      </option>
 				  </tool>
-                  <tool
-					  id="fdt.managedbuild.tool.gnu.cpp.compiler.lib.debug"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.compiler">
-					  <option
-					      id="gnu.cpp.compiler.lib.debug.option.optimization.level"
-					      defaultValue="gnu.cpp.compiler.optimization.level.none"
-					      superClass="gnu.cpp.compiler.option.optimization.level">
-					  </option>
-					  <option
-					      id="gnu.cpp.compiler.lib.debug.option.debugging.level"
-					      defaultValue="gnu.cpp.compiler.debugging.level.max"
-					      superClass="gnu.cpp.compiler.option.debugging.level">
-					  </option>
-                  </tool>
 			      <tool
 		    		  id="fdt.managedbuild.tool.gnu.archiver.lib.debug"
 				      outputs="a"
@@ -1597,31 +1469,17 @@
 		              buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 				  </builder>               		            
 		          <tool
-					  id="fdt.managedbuild.tool.gnu.c.compiler.lib.release"
-					  superClass="fdt.managedbuild.tool.gnu.c.compiler">
+					  id="fdt.managedbuild.tool.gnu.fortran.compiler.lib.release"
+					  superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
 					  <option
-						  id="gnu.c.compiler.lib.release.option.optimization.level"
-						  defaultValue="gnu.c.optimization.level.most"
-						  superClass="gnu.c.compiler.option.optimization.level">
+						  id="gnu.fortran.compiler.lib.release.option.optimization.level"
+						  defaultValue="gnu.fortran.optimization.level.most"
+						  superClass="gnu.fortran.compiler.option.optimization.level">
 					  </option>
 					  <option
-						  id="gnu.c.compiler.lib.release.option.debugging.level"
-					      defaultValue="gnu.c.debugging.level.none"
-					      superClass="gnu.c.compiler.option.debugging.level">
-					  </option>
-				  </tool>
-				  <tool
-					  id="fdt.managedbuild.tool.gnu.cpp.compiler.lib.release"
-					  superClass="fdt.managedbuild.tool.gnu.cpp.compiler">
-					  <option
-						  id="gnu.cpp.compiler.lib.release.option.optimization.level"
-						  defaultValue="gnu.cpp.compiler.optimization.level.most"
-						  superClass="gnu.cpp.compiler.option.optimization.level">
-					  </option>
-					  <option
-						  id="gnu.cpp.compiler.lib.release.option.debugging.level"
-						  defaultValue="gnu.cpp.compiler.debugging.level.none"
-						  superClass="gnu.cpp.compiler.option.debugging.level">
+						  id="gnu.fortran.compiler.lib.release.option.debugging.level"
+					      defaultValue="gnu.fortran.debugging.level.none"
+					      superClass="gnu.fortran.compiler.option.debugging.level">
 					  </option>
 				  </tool>
 				  <tool
@@ -1670,43 +1528,24 @@
 					  buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
                   <tool
-					  id="fdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.debug"
-                      superClass="fdt.managedbuild.tool.gnu.c.compiler">
+					  id="fdt.managedbuild.tool.gnu.fortran.compiler.cygwin.exe.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
 					  <option
-						  id="gnu.c.compiler.cygwin.exe.debug.option.optimization.level"
-						  defaultValue="gnu.c.optimization.level.none"
-						  superClass="gnu.c.compiler.option.optimization.level">
+						  id="gnu.fortran.compiler.cygwin.exe.debug.option.optimization.level"
+						  defaultValue="gnu.fortran.optimization.level.none"
+						  superClass="gnu.fortran.compiler.option.optimization.level">
 					  </option>
 					  <option
-						  id="gnu.c.compiler.cygwin.exe.debug.option.debugging.level"
-						  defaultValue="gnu.c.debugging.level.max"
-						  superClass="gnu.c.compiler.option.debugging.level">
+						  id="gnu.fortran.compiler.cygwin.exe.debug.option.debugging.level"
+						  defaultValue="gnu.fortran.debugging.level.max"
+						  superClass="gnu.fortran.compiler.option.debugging.level">
 					  </option>
                   </tool>
                   <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.compiler.cygwin.exe.debug"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.compiler">
-                      <option
-                          id="gnu.cpp.compiler.cygwin.exe.debug.option.optimization.level"
-                          defaultValue="gnu.cpp.compiler.optimization.level.none"
-                          superClass="gnu.cpp.compiler.option.optimization.level">
-                      </option>
-                      <option
-						  id="gnu.cpp.compiler.cygwin.exe.debug.option.debugging.level"
-                          defaultValue="gnu.cpp.compiler.debugging.level.max"
-                          superClass="gnu.cpp.compiler.option.debugging.level">
-                      </option>
-                  </tool>
-                  <tool
-                      id="fdt.managedbuild.tool.gnu.c.linker.cygwin.exe.debug"
+                      id="fdt.managedbuild.tool.gnu.fortran.linker.cygwin.exe.debug"
                       outputs="exe"
-                      superClass="fdt.managedbuild.tool.gnu.c.linker">
+                      superClass="fdt.managedbuild.tool.gnu.fortran.linker">
                   </tool>
-                  <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.linker.cygwin.exe.debug"
-                      outputs="exe"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.linker">
-                  </tool>                  
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.cygwin.exe.debug"
 					  superClass="fdt.managedbuild.tool.gnu.assembler">
@@ -1740,42 +1579,23 @@
 					  buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		                       
                   <tool
-					  id="fdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.release"
-                      superClass="fdt.managedbuild.tool.gnu.c.compiler">
+					  id="fdt.managedbuild.tool.gnu.fortran.compiler.cygwin.exe.release"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
-                          id="gnu.c.compiler.cygwin.exe.release.option.optimization.level"
-                          defaultValue="gnu.c.optimization.level.most"
-                          superClass="gnu.c.compiler.option.optimization.level">
+                          id="gnu.fortran.compiler.cygwin.exe.release.option.optimization.level"
+                          defaultValue="gnu.fortran.optimization.level.most"
+                          superClass="gnu.fortran.compiler.option.optimization.level">
                       </option>
                       <option
-                          id="gnu.c.compiler.cygwin.exe.release.option.debugging.level"
-                          defaultValue="gnu.c.debugging.level.none"
-                          superClass="gnu.c.compiler.option.debugging.level">
+                          id="gnu.fortran.compiler.cygwin.exe.release.option.debugging.level"
+                          defaultValue="gnu.fortran.debugging.level.none"
+                          superClass="gnu.fortran.compiler.option.debugging.level">
                       </option>
                   </tool>
                   <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.compiler.cygwin.exe.release"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.compiler">
-                      <option
-                          id="gnu.cpp.compiler.cygwin.exe.release.option.optimization.level"
-                          defaultValue="gnu.cpp.compiler.optimization.level.most"
-                          superClass="gnu.cpp.compiler.option.optimization.level">
-                      </option>
-                      <option
-                          id="gnu.cpp.compiler.cygwin.exe.release.option.debugging.level"
-                          defaultValue="gnu.cpp.compiler.debugging.level.none"
-                          superClass="gnu.cpp.compiler.option.debugging.level">
-                      </option>
-                  </tool>                      
-                  <tool
-                      id="fdt.managedbuild.tool.gnu.c.linker.cygwin.exe.release"
+                      id="fdt.managedbuild.tool.gnu.fortran.linker.cygwin.exe.release"
                       outputs="exe"
-                      superClass="fdt.managedbuild.tool.gnu.c.linker">
-                  </tool>
-                  <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.linker.cygwin.exe.release"
-                      outputs="exe"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.linker">
+                      superClass="fdt.managedbuild.tool.gnu.fortran.linker">
                   </tool>
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.cygwin.exe.release"
@@ -1817,53 +1637,29 @@
 					  buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
                   <tool
-					  id="fdt.managedbuild.tool.gnu.c.compiler.cygwin.so.debug"
-                      superClass="fdt.managedbuild.tool.gnu.c.compiler">
+					  id="fdt.managedbuild.tool.gnu.fortran.compiler.cygwin.so.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
 					  <option
-						  id="gnu.c.compiler.cygwin.so.debug.option.optimization.level"
-						  defaultValue="gnu.c.optimization.level.none"
-						  superClass="gnu.c.compiler.option.optimization.level">
+						  id="gnu.fortran.compiler.cygwin.so.debug.option.optimization.level"
+						  defaultValue="gnu.fortran.optimization.level.none"
+						  superClass="gnu.fortran.compiler.option.optimization.level">
 					  </option>
 					  <option
-						  id="gnu.c.compiler.cygwin.so.debug.option.debugging.level"
-						  defaultValue="gnu.c.debugging.level.max"
-						  superClass="gnu.c.compiler.option.debugging.level">
+						  id="gnu.fortran.compiler.cygwin.so.debug.option.debugging.level"
+						  defaultValue="gnu.fortran.debugging.level.max"
+						  superClass="gnu.fortran.compiler.option.debugging.level">
 					  </option>
                   </tool>
                   <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.compiler.cygwin.so.debug"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.linker.cygwin.so.debug"
+                      outputs="dll,a.dll"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.linker">
                       <option
-                          id="gnu.cpp.compiler.cygwin.so.debug.option.optimization.level"
-                          defaultValue="gnu.cpp.compiler.optimization.level.none"
-                          superClass="gnu.cpp.compiler.option.optimization.level">
-                      </option>
-                      <option
-                          id="gnu.cpp.compiler.cygwin.so.debug.option.debugging.level"
-                          defaultValue="gnu.cpp.compiler.debugging.level.max"
-                          superClass="gnu.cpp.compiler.option.debugging.level">
+                          id="gnu.fortran.link.cygwin.so.debug.option.shared"
+                          defaultValue="true"
+                          superClass="gnu.fortran.link.option.shared">
                       </option>
                   </tool>
-                  <tool
-                      id="fdt.managedbuild.tool.gnu.c.linker.cygwin.so.debug"
-                      outputs="dll,a.dll"
-                      superClass="fdt.managedbuild.tool.gnu.c.linker">
-                      <option
-                          id="gnu.c.link.cygwin.so.debug.option.shared"
-                          defaultValue="true"
-                          superClass="gnu.c.link.option.shared">
-                      </option>
-                  </tool>
-                  <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.linker.cygwin.so.debug"
-                      outputs="dll,a.dll"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.linker">
-                      <option
-                          id="gnu.cpp.link.cygwin.so.debug.option.shared"
-                          defaultValue="true"
-                          superClass="gnu.cpp.link.option.shared">
-                      </option>
-                  </tool>                  
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.cygwin.so.debug"
 					  superClass="fdt.managedbuild.tool.gnu.assembler">
@@ -1897,51 +1693,27 @@
 					  buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		                                       
                   <tool
-                      id="fdt.managedbuild.tool.gnu.c.compiler.cygwin.so.release"
-                      superClass="fdt.managedbuild.tool.gnu.c.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.cygwin.so.release"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option 
-                          id="gnu.c.compiler.cygwin.so.release.option.optimization.level"
-                          defaultValue="gnu.c.optimization.level.most"
-                          superClass="gnu.c.compiler.option.optimization.level">
+                          id="gnu.fortran.compiler.cygwin.so.release.option.optimization.level"
+                          defaultValue="gnu.fortran.optimization.level.most"
+                          superClass="gnu.fortran.compiler.option.optimization.level">
                       </option>
                       <option
-                          id="gnu.c.compiler.cygwin.so.release.option.debugging.level"
-                          defaultValue="gnu.c.debugging.level.none"
-                          superClass="gnu.c.compiler.option.debugging.level">
+                          id="gnu.fortran.compiler.cygwin.so.release.option.debugging.level"
+                          defaultValue="gnu.fortran.debugging.level.none"
+                          superClass="gnu.fortran.compiler.option.debugging.level">
                       </option>
                   </tool>
                   <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.compiler.cygwin.so.release"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.compiler">
-                      <option
-                          id="gnu.cpp.compiler.cygwin.so.release.option.optimization.level"
-                          defaultValue="gnu.cpp.compiler.optimization.level.most"
-                          superClass="gnu.cpp.compiler.option.optimization.level">
-                      </option>
-                      <option
-                          id="gnu.cpp.compiler.cygwin.so.release.option.debugging.level"
-                          defaultValue="gnu.cpp.compiler.debugging.level.none"
-                          superClass="gnu.cpp.compiler.option.debugging.level">
-                      </option>
-                  </tool>
-                  <tool
-                      id="fdt.managedbuild.tool.gnu.c.linker.cygwin.so.release"
+                      id="fdt.managedbuild.tool.gnu.fortran.linker.cygwin.so.release"
                       outputs="dll,a.dll"
-                      superClass="fdt.managedbuild.tool.gnu.c.linker">
+                      superClass="fdt.managedbuild.tool.gnu.fortran.linker">
                       <option
-                          id="gnu.c.link.cygwin.so.release.option.shared"
+                          id="gnu.fortran.link.cygwin.so.release.option.shared"
                           defaultValue="true"
-                          superClass="gnu.c.link.option.shared">
-                      </option>
-                  </tool>
-                  <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.linker.cygwin.so.release"
-                      outputs="dll,a.dll"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.linker">
-                      <option
-                          id="gnu.cpp.link.cygwin.so.release.option.shared"
-                          defaultValue="true"
-                          superClass="gnu.cpp.link.option.shared">
+                          superClass="gnu.fortran.link.option.shared">
                       </option>
                   </tool>
 				  <tool
@@ -1984,33 +1756,19 @@
 					  buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		                                                              
                   <tool
-                      id="fdt.managedbuild.tool.gnu.c.compiler.cygwin.lib.debug"
-                      superClass="fdt.managedbuild.tool.gnu.c.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.cygwin.lib.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
-                          id="gnu.c.compiler.cygwin.lib.debug.option.optimization.level"
-                          defaultValue="gnu.c.optimization.level.none"
-                          superClass="gnu.c.compiler.option.optimization.level">
+                          id="gnu.fortran.compiler.cygwin.lib.debug.option.optimization.level"
+                          defaultValue="gnu.fortran.optimization.level.none"
+                          superClass="gnu.fortran.compiler.option.optimization.level">
                       </option>
                       <option
-                          id="gnu.c.compiler.cygwin.lib.debug.option.debugging.level"
-                          defaultValue="gnu.c.debugging.level.max"
-                          superClass="gnu.c.compiler.option.debugging.level">
+                          id="gnu.fortran.compiler.cygwin.lib.debug.option.debugging.level"
+                          defaultValue="gnu.fortran.debugging.level.max"
+                          superClass="gnu.fortran.compiler.option.debugging.level">
                       </option>
                   </tool>
-			      <tool
-			          id="fdt.managedbuild.tool.gnu.cpp.compiler.cygwin.lib.debug"
-					  superClass="fdt.managedbuild.tool.gnu.cpp.compiler">
-					  <option
-					      id="gnu.cpp.compiler.cygwin.lib.debug.option.optimization.level"
-						  defaultValue="gnu.cpp.compiler.optimization.level.none"
-					      superClass="gnu.cpp.compiler.option.optimization.level">
-					  </option>
-					  <option
-					        id="gnu.cpp.compiler.cygwin.lib.debug.option.debugging.level"
-							defaultValue="gnu.cpp.compiler.debugging.level.max"
-							superClass="gnu.cpp.compiler.option.debugging.level">
-					  </option>
-				  </tool>  
                   <tool
                       id="fdt.managedbuild.tool.gnu.archiver.cygwin.lib.debug"
                       outputPrefix="lib"
@@ -2050,33 +1808,19 @@
 					  buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		                                                                                              
                   <tool
-                     id="fdt.managedbuild.tool.gnu.c.compiler.cygwin.lib.release"
-                     superClass="fdt.managedbuild.tool.gnu.c.compiler">
+                     id="fdt.managedbuild.tool.gnu.fortran.compiler.cygwin.lib.release"
+                     superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                      <option
-                         id="gnu.c.compiler.cygwin.lib.release.option.optimization.level"
-                         defaultValue="gnu.c.optimization.level.most"
-                         superClass="gnu.c.compiler.option.optimization.level">
+                         id="gnu.fortran.compiler.cygwin.lib.release.option.optimization.level"
+                         defaultValue="gnu.fortran.optimization.level.most"
+                         superClass="gnu.fortran.compiler.option.optimization.level">
                      </option>
                      <option
-                         id="gnu.c.compiler.cygwin.lib.release.option.debugging.level"                        
-                         defaultValue="gnu.c.debugging.level.none"
-                         superClass="gnu.c.compiler.option.debugging.level">                         
+                         id="gnu.fortran.compiler.cygwin.lib.release.option.debugging.level"                        
+                         defaultValue="gnu.fortran.debugging.level.none"
+                         superClass="gnu.fortran.compiler.option.debugging.level">                         
                      </option>
                   </tool>
-                  <tool
-                     id="fdt.managedbuild.tool.gnu.cpp.compiler.cygwin.lib.release"
-                     superClass="fdt.managedbuild.tool.gnu.cpp.compiler">
-                     <option       
-                         id="gnu.cpp.compiler.cygwin.lib.release.option.optimization.level"         
-                         defaultValue="gnu.cpp.compiler.optimization.level.most"
-                         superClass="gnu.cpp.compiler.option.optimization.level">
-                     </option>
-                     <option
-                         id="gnu.cpp.compiler.cygwin.lib.release.option.debugging.level"
-                         defaultValue="gnu.cpp.compiler.debugging.level.none"
-                         superClass="gnu.cpp.compiler.option.debugging.level">
-                     </option>
-                 </tool>
                  <tool
                     id="fdt.managedbuild.tool.gnu.archiver.cygwin.lib.release"
                     outputPrefix="lib"
@@ -2122,41 +1866,23 @@
 					  buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
                   <tool
-                      id="fdt.managedbuild.tool.gnu.c.compiler.macosx.exe.debug"
-                      superClass="fdt.managedbuild.tool.gnu.c.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.macosx.exe.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
-                          id="gnu.c.compiler.macosx.exe.debug.option.optimization.level"
-                          defaultValue="gnu.c.optimization.level.none"
-                          superClass="gnu.c.compiler.option.optimization.level">
+                          id="gnu.fortran.compiler.macosx.exe.debug.option.optimization.level"
+                          defaultValue="gnu.fortran.optimization.level.none"
+                          superClass="gnu.fortran.compiler.option.optimization.level">
                       </option>
                       <option
-                          id="gnu.c.compiler.macosx.exe.debug.option.debugging.level"
-                          defaultValue="gnu.c.debugging.level.max"
-                          superClass="gnu.c.compiler.option.debugging.level">
-                      </option>
-                  </tool>
-                  <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.debug"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.compiler">
-                      <option
-                          id="gnu.cpp.compilermacosx.exe.debug.option.optimization.level"
-                          defaultValue="gnu.cpp.compiler.optimization.level.none"
-                          superClass="gnu.cpp.compiler.option.optimization.level">
-                      </option>
-                      <option
-                          id="gnu.cpp.compiler.macosx.exe.debug.option.debugging.level"
-                          defaultValue="gnu.cpp.compiler.debugging.level.max"
-                          superClass="gnu.cpp.compiler.option.debugging.level">
+                          id="gnu.fortran.compiler.macosx.exe.debug.option.debugging.level"
+                          defaultValue="gnu.fortran.debugging.level.max"
+                          superClass="gnu.fortran.compiler.option.debugging.level">
                       </option>
                   </tool>
 				  <tool
-				      id="fdt.managedbuild.tool.macosx.c.linker.macosx.exe.debug"
-					  superClass="fdt.managedbuild.tool.macosx.c.linker">
+				      id="fdt.managedbuild.tool.macosx.fortran.linker.macosx.exe.debug"
+					  superClass="fdt.managedbuild.tool.macosx.fortran.linker">
 				  </tool>
-				  <tool
-					  id="fdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.debug"
-					  superClass="fdt.managedbuild.tool.macosx.cpp.linker">
-				  </tool>                                     
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.macosx.exe.debug"
 					  superClass="fdt.managedbuild.tool.gnu.assembler">
@@ -2189,41 +1915,23 @@
 					  buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
                   <tool
-                      id="fdt.managedbuild.tool.gnu.c.compiler.macosx.exe.release"
-                      superClass="fdt.managedbuild.tool.gnu.c.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.macosx.exe.release"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
-                          id="gnu.c.compiler.macosx.exe.release.option.optimization.level"
-                          defaultValue="gnu.c.optimization.level.most"
-                          superClass="gnu.c.compiler.option.optimization.level">
+                          id="gnu.fortran.compiler.macosx.exe.release.option.optimization.level"
+                          defaultValue="gnu.fortran.optimization.level.most"
+                          superClass="gnu.fortran.compiler.option.optimization.level">
                       </option>
                       <option
-                          id="gnu.c.compiler.macosx.exe.release.option.debugging.level"
-                          defaultValue="gnu.c.debugging.level.none"
-                          superClass="gnu.c.compiler.option.debugging.level">
-                      </option>
-                   </tool>
-                   <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.release"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.compiler">
-                      <option
-                          id="gnu.cpp.compiler.macosx.exe.release.option.optimization.level"
-                          defaultValue="gnu.cpp.compiler.optimization.level.most"
-                          superClass="gnu.cpp.compiler.option.optimization.level">
-                      </option>
-                      <option
-                          id="gnu.cpp.compiler.macosx.exe.release.option.debugging.level"
-                          defaultValue="gnu.cpp.compiler.debugging.level.none"
-                          superClass="gnu.cpp.compiler.option.debugging.level">
+                          id="gnu.fortran.compiler.macosx.exe.release.option.debugging.level"
+                          defaultValue="gnu.fortran.debugging.level.none"
+                          superClass="gnu.fortran.compiler.option.debugging.level">
                       </option>
                    </tool>
 				   <tool
-				       id="fdt.managedbuild.tool.macosx.c.linker.macosx.exe.release"
-					   superClass="fdt.managedbuild.tool.macosx.c.linker">
+				       id="fdt.managedbuild.tool.macosx.fortran.linker.macosx.exe.release"
+					   superClass="fdt.managedbuild.tool.macosx.fortran.linker">
 					</tool>
-					<tool
-					    id="fdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.release"
-						superClass="fdt.managedbuild.tool.macosx.cpp.linker">
-					</tool>                   
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.macosx.exe.release"
 					  superClass="fdt.managedbuild.tool.gnu.assembler">
@@ -2264,64 +1972,40 @@
 					  buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		                       
                   <tool
-                      id="fdt.managedbuild.tool.gnu.c.compiler.macosx.so.debug"
-                      superClass="fdt.managedbuild.tool.gnu.c.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.macosx.so.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
-                          id="gnu.c.compiler.macosx.so.debug.option.optimization.level"
-                          defaultValue="gnu.c.optimization.level.none"
-                          superClass="gnu.c.compiler.option.optimization.level">
+                          id="gnu.fortran.compiler.macosx.so.debug.option.optimization.level"
+                          defaultValue="gnu.fortran.optimization.level.none"
+                          superClass="gnu.fortran.compiler.option.optimization.level">
                       </option>
                       <option
-                          id="gnu.c.compiler.macosx.so.debug.option.debugging.level"
-                          defaultValue="gnu.c.debugging.level.max"
-                          superClass="gnu.c.compiler.option.debugging.level">
+                          id="gnu.fortran.compiler.macosx.so.debug.option.debugging.level"
+                          defaultValue="gnu.fortran.debugging.level.max"
+                          superClass="gnu.fortran.compiler.option.debugging.level">
                       </option>
-                  </tool>
-                  <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.compiler.macosx.so.debug"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.compiler">
-					  <option
-						  id="gnu.cpp.compiler.macosx.so.debug.option.optimization.level"
-						  defaultValue="gnu.cpp.compiler.optimization.level.none"
-						  superClass="gnu.cpp.compiler.option.optimization.level">
-					  </option>
-					  <option
-						  id="gnu.cpp.compiler.macosx.so.debug.option.debugging.level"
-						  defaultValue="gnu.cpp.compiler.debugging.level.max"
-						  superClass="gnu.cpp.compiler.option.debugging.level">
-					  </option>
                   </tool>
 				  <tool
-				      id="fdt.managedbuild.tool.macosx.c.linker.macosx.so.debug"
+				      id="fdt.managedbuild.tool.macosx.fortran.linker.macosx.so.debug"
 					  outputs="dylib"
 					  outputPrefix="lib"
-					  superClass="fdt.managedbuild.tool.macosx.c.linker">
+					  superClass="fdt.managedbuild.tool.macosx.fortran.linker">
 					  <option
-					      id="macosx.c.link.macosx.so.debug.option.shared"
+					      id="macosx.fortran.link.macosx.so.debug.option.shared"
 						  defaultValue="true"
-						  superClass="macosx.c.link.option.shared">
+						  superClass="macosx.fortran.link.option.shared">
 					  </option>
 					  <option
-					      id="macosx.c.link.macosx.so.debug.option.nostart"
+					      id="macosx.fortran.link.macosx.so.debug.option.nostart"
             			  defaultValue="true"
-            			  superClass="macosx.c.link.option.nostart">
+            			  superClass="macosx.fortran.link.option.nostart">
             		  </option>
 					  <option
-					      id="macosx.c.link.macosx.so.debug.option.nodeflibs"
+					      id="macosx.fortran.link.macosx.so.debug.option.nodeflibs"
 						  defaultValue="true"
-						  superClass="macosx.c.link.option.nodeflibs">
+						  superClass="macosx.fortran.link.option.nodeflibs">
 					  </option>
 				  </tool>
-				  <tool
-				      id="fdt.managedbuild.tool.macosx.cpp.linker.macosx.so.debug"
-					  outputs="dylib"
-					  superClass="fdt.managedbuild.tool.macosx.cpp.linker">
-					  <option
-					      id="macosx.cpp.link.macosx.so.debug.option.shared"
-						  defaultValue="true"
-						  superClass="macosx.cpp.link.option.shared">
-					  </option>
-				  </tool>                                  
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.macosx.so.debug"
 					  superClass="fdt.managedbuild.tool.gnu.assembler">
@@ -2355,64 +2039,40 @@
 					  buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		                                                     
                   <tool
-                      id="fdt.managedbuild.tool.gnu.c.compiler.macosx.so.release"
-                      superClass="fdt.managedbuild.tool.gnu.c.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.macosx.so.release"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
-                          id="gnu.c.compiler.macosx.so.release.option.optimization.level"
-                          defaultValue="gnu.c.optimization.level.most"
-                          superClass="gnu.c.compiler.option.optimization.level">
+                          id="gnu.fortran.compiler.macosx.so.release.option.optimization.level"
+                          defaultValue="gnu.fortran.optimization.level.most"
+                          superClass="gnu.fortran.compiler.option.optimization.level">
                       </option>
                       <option
-                          id="gnu.c.compiler.macosx.so.release.option.debugging.level"
-                          defaultValue="gnu.c.debugging.level.none"
-                          superClass="gnu.c.compiler.option.debugging.level">
-                      </option>
-                  </tool>
-                  <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.compiler.macosx.so.release"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.compiler">
-                      <option
-                          id="gnu.cpp.compiler.macosx.so.release.option.optimization.level"
-                          defaultValue="gnu.cpp.compiler.optimization.level.most"
-                          superClass="gnu.cpp.compiler.option.optimization.level">
-                      </option>
-                      <option
-                          id="gnu.cpp.compiler.macosx.so.release.option.debugging.level"
-                          defaultValue="gnu.cpp.compiler.debugging.level.none"
-                          superClass="gnu.cpp.compiler.option.debugging.level">
+                          id="gnu.fortran.compiler.macosx.so.release.option.debugging.level"
+                          defaultValue="gnu.fortran.debugging.level.none"
+                          superClass="gnu.fortran.compiler.option.debugging.level">
                       </option>
                   </tool>
 				  <tool
-				      id="fdt.managedbuild.tool.macosx.c.linker.macosx.so.release"
+				      id="fdt.managedbuild.tool.macosx.fortran.linker.macosx.so.release"
 					  outputs="dylib"
 					  outputPrefix="lib"
-					  superClass="fdt.managedbuild.tool.macosx.c.linker">
+					  superClass="fdt.managedbuild.tool.macosx.fortran.linker">
 					  <option
-					      id="macosx.c.link.macosx.so.release.option.shared"
+					      id="macosx.fortran.link.macosx.so.release.option.shared"
 						  defaultValue="true"
-						  superClass="macosx.c.link.option.shared">
+						  superClass="macosx.fortran.link.option.shared">
 					  </option>
 					  <option
-					      id="macosx.c.link.macosx.so.release.option.nostart"
+					      id="macosx.fortran.link.macosx.so.release.option.nostart"
             			  defaultValue="true"
-            			  superClass="macosx.c.link.option.nostart">
+            			  superClass="macosx.fortran.link.option.nostart">
             		  </option>
 					  <option
-					      id="macosx.c.link.macosx.so.release.option.nodeflibs"
+					      id="macosx.fortran.link.macosx.so.release.option.nodeflibs"
 						  defaultValue="true"
-						  superClass="macosx.c.link.option.nodeflibs">
+						  superClass="macosx.fortran.link.option.nodeflibs">
 					  </option>
 				  </tool>
-				  <tool
-				      id="fdt.managedbuild.tool.macosx.cpp.linker.macosx.so.release"
-					  outputs="dylib"
-					  superClass="fdt.managedbuild.tool.macosx.cpp.linker">
-					  <option
-					      id="macosx.cpp.link.macosx.so.release.option.shared"
-						  defaultValue="true"
-						  superClass="macosx.cpp.link.option.shared">
-					  </option>
-				  </tool>                
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.macosx.so.release"
 					  superClass="fdt.managedbuild.tool.gnu.assembler">
@@ -2453,31 +2113,17 @@
 					  buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
                   <tool
-                      id="fdt.managedbuild.tool.gnu.c.compiler.macosx.lib.debug"
-                      superClass="fdt.managedbuild.tool.gnu.c.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.macosx.lib.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
-                          id="gnu.c.compiler.macosx.lib.debug.option.optimization.level"
-                          defaultValue="gnu.c.optimization.level.none"
-                          superClass="gnu.c.compiler.option.optimization.level">
+                          id="gnu.fortran.compiler.macosx.lib.debug.option.optimization.level"
+                          defaultValue="gnu.fortran.optimization.level.none"
+                          superClass="gnu.fortran.compiler.option.optimization.level">
                       </option>
                       <option
-                          id="gnu.c.compiler.macosx.lib.debug.option.debugging.level"
-                          defaultValue="gnu.c.debugging.level.max"
-                          superClass="gnu.c.compiler.option.debugging.level">
-                      </option>
-                  </tool>
-                  <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.compiler.macosx.lib.debug"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.compiler">
-                      <option
-                          id="gnu.cpp.compiler.macosx.lib.debug.option.optimization.level"
-                          defaultValue="gnu.cpp.compiler.optimization.level.none"
-                          superClass="gnu.cpp.compiler.option.optimization.level">
-                      </option>
-                      <option
-                          id="gnu.cpp.compiler.macosx.lib.debug.option.debugging.level"
-                          defaultValue="gnu.cpp.compiler.debugging.level.max"
-                          superClass="gnu.cpp.compiler.option.debugging.level">
+                          id="gnu.fortran.compiler.macosx.lib.debug.option.debugging.level"
+                          defaultValue="gnu.fortran.debugging.level.max"
+                          superClass="gnu.fortran.compiler.option.debugging.level">
                       </option>
                   </tool>
                   <tool
@@ -2519,31 +2165,17 @@
 					  buildfileGenerator="org.eclipse.fdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
                   <tool
-                      id="fdt.managedbuild.tool.gnu.c.compiler.macosx.lib.release"
-                      superClass="fdt.managedbuild.tool.gnu.c.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.macosx.lib.release"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
-                          id="gnu.c.compiler.macosx.lib.release.option.optimization.level"
-                          defaultValue="gnu.c.optimization.level.most"
-                          superClass="gnu.c.compiler.option.optimization.level">
+                          id="gnu.fortran.compiler.macosx.lib.release.option.optimization.level"
+                          defaultValue="gnu.fortran.optimization.level.most"
+                          superClass="gnu.fortran.compiler.option.optimization.level">
                       </option>
                       <option
-                          id="gnu.c.compiler.macosx.lib.release.option.debugging.level"
-                          defaultValue="gnu.c.debugging.level.none"
-                          superClass="gnu.c.compiler.option.debugging.level">
-                      </option>
-                  </tool>
-                  <tool
-                      id="fdt.managedbuild.tool.gnu.cpp.compiler.macosx.lib.release"
-                      superClass="fdt.managedbuild.tool.gnu.cpp.compiler">
-                      <option
-                          id="gnu.cpp.compiler.macosx.lib.release.option.optimization.level"
-                          defaultValue="gnu.cpp.compiler.optimization.level.most"
-                          superClass="gnu.cpp.compiler.option.optimization.level">
-                      </option>
-                      <option
-                          id="gnu.cpp.compiler.macosx.lib.release.option.debugging.level"
-                          defaultValue="gnu.cpp.compiler.debugging.level.none"
-                          superClass="gnu.cpp.compiler.option.debugging.level">
+                          id="gnu.fortran.compiler.macosx.lib.release.option.debugging.level"
+                          defaultValue="gnu.fortran.debugging.level.none"
+                          superClass="gnu.fortran.compiler.option.debugging.level">
                       </option>
                   </tool>
                   <tool
