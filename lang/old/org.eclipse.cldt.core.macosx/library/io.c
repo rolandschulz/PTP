@@ -4,16 +4,16 @@
 #include <SpawnerOutputStream.h>
 #include <unistd.h>
 
-/* Header for class _org_eclipse_fdt_utils_spawner_SpawnerInputStream */
-/* Header for class _org_eclipse_fdt_utils_spawner_SpawnerOutputStream */
+/* Header for class _org_eclipse_cldt_utils_spawner_SpawnerInputStream */
+/* Header for class _org_eclipse_cldt_utils_spawner_SpawnerOutputStream */
 
 /*
- * Class:     org_eclipse_fdt_utils_spawner_SpawnerInputStream
+ * Class:     org_eclipse_cldt_utils_spawner_SpawnerInputStream
  * Method:    read0
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_org_eclipse_fdt_utils_spawner_SpawnerInputStream_read0(JNIEnv * env,
+Java_org_eclipse_cldt_utils_spawner_SpawnerInputStream_read0(JNIEnv * env,
                                                           jobject jobj,
                                                           jint jfd,
                                                           jbyteArray buf,
@@ -49,12 +49,12 @@ Java_org_eclipse_fdt_utils_spawner_SpawnerInputStream_read0(JNIEnv * env,
 
 
 /*
- * Class:     org_eclipse_fdt_utils_spawner_SpawnerInputStream
+ * Class:     org_eclipse_cldt_utils_spawner_SpawnerInputStream
  * Method:    close0
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_org_eclipse_fdt_utils_spawner_SpawnerInputStream_close0(JNIEnv * env,
+Java_org_eclipse_cldt_utils_spawner_SpawnerInputStream_close0(JNIEnv * env,
                                                            jobject jobj,
                                                            jint fd)
 {
@@ -62,12 +62,12 @@ Java_org_eclipse_fdt_utils_spawner_SpawnerInputStream_close0(JNIEnv * env,
 }
 
 /*
- * Class:     org_eclipse_fdt_utils_spawner_SpawnerOutputStream
+ * Class:     org_eclipse_cldt_utils_spawner_SpawnerOutputStream
  * Method:    write0
  * Signature: (II)I
  */
 JNIEXPORT jint JNICALL
-Java_org_eclipse_fdt_utils_spawner_SpawnerOutputStream_write0(JNIEnv * env,
+Java_org_eclipse_cldt_utils_spawner_SpawnerOutputStream_write0(JNIEnv * env,
                                                             jobject jobj,
                                                             jint jfd,
                                                             jbyteArray buf,
@@ -90,12 +90,12 @@ Java_org_eclipse_fdt_utils_spawner_SpawnerOutputStream_write0(JNIEnv * env,
 
 
 /*
- * Class:     org_eclipse_fdt_utils_spawner_SpawnerOutputStream
+ * Class:     org_eclipse_cldt_utils_spawner_SpawnerOutputStream
  * Method:    close0
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_org_eclipse_fdt_utils_spawner_SpawnerOutputStream_close0(JNIEnv * env,
+Java_org_eclipse_cldt_utils_spawner_SpawnerOutputStream_close0(JNIEnv * env,
                                                             jobject jobj,
                                                             jint fd)
 {

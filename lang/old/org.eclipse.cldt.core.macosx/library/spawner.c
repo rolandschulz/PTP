@@ -13,7 +13,7 @@
 
 
 /*
- * Header for class org_eclipse_fdt_utils_spawner_Spawner 
+ * Header for class org_eclipse_cldt_utils_spawner_Spawner 
  */
 
 
@@ -72,11 +72,11 @@ static void free_c_array(char **c_array)
 
 
 /*
- * Class:     org_eclipse_fdt_utils_spawner_Spawner
+ * Class:     org_eclipse_cldt_utils_spawner_Spawner
  * Method:    exec2
- * Signature: ([Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;[ILorg/eclipse/fdt/utils/pty/PTY;)I
+ * Signature: ([Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;[ILorg/eclipse/cldt/utils/pty/PTY;)I
  */
-JNIEXPORT jint JNICALL Java_org_eclipse_fdt_utils_spawner_Spawner_exec2
+JNIEXPORT jint JNICALL Java_org_eclipse_cldt_utils_spawner_Spawner_exec2
   (JNIEnv *env, jobject jobj, jobjectArray jcmd, jobjectArray jenv, jstring jdir, jintArray jchannels,
    jstring jslaveName, jint masterFD)
 {
@@ -128,7 +128,7 @@ JNIEXPORT jint JNICALL Java_org_eclipse_fdt_utils_spawner_Spawner_exec2
 }
 
 JNIEXPORT jint JNICALL
-Java_org_eclipse_fdt_utils_spawner_Spawner_exec1(JNIEnv * env, jobject jobj,
+Java_org_eclipse_cldt_utils_spawner_Spawner_exec1(JNIEnv * env, jobject jobj,
                                                jobjectArray jcmd,
                                                jobjectArray jenv,
                                                jstring jdir)
@@ -168,12 +168,12 @@ Java_org_eclipse_fdt_utils_spawner_Spawner_exec1(JNIEnv * env, jobject jobj,
 }
 
 /*
- * Class:     org_eclipse_fdt_utils_spawner_Spawner
+ * Class:     org_eclipse_cldt_utils_spawner_Spawner
  * Method:    exec0
  * Signature: ([Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;[I)I
  */
 JNIEXPORT jint JNICALL
-Java_org_eclipse_fdt_utils_spawner_Spawner_exec0(JNIEnv * env, jobject jobj,
+Java_org_eclipse_cldt_utils_spawner_Spawner_exec0(JNIEnv * env, jobject jobj,
                                                jobjectArray jcmd,
                                                jobjectArray jenv,
                                                jstring jdir,
@@ -224,12 +224,12 @@ Java_org_eclipse_fdt_utils_spawner_Spawner_exec0(JNIEnv * env, jobject jobj,
 }
 
 /*
- * Class:     org_eclipse_fdt_utils_spawner_Spawner
+ * Class:     org_eclipse_cldt_utils_spawner_Spawner
  * Method:    raise
  * Signature: (II)I
  */
 JNIEXPORT jint JNICALL
-Java_org_eclipse_fdt_utils_spawner_Spawner_raise(JNIEnv * env, jobject jobj,
+Java_org_eclipse_cldt_utils_spawner_Spawner_raise(JNIEnv * env, jobject jobj,
                                                jint pid, jint sig)
 {
     int status = -1;
@@ -262,12 +262,12 @@ Java_org_eclipse_fdt_utils_spawner_Spawner_raise(JNIEnv * env, jobject jobj,
 
 
 /*
- * Class:     org_eclipse_fdt_utils_spawner_Spawner
+ * Class:     org_eclipse_cldt_utils_spawner_Spawner
  * Method:    waitFor
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_org_eclipse_fdt_utils_spawner_Spawner_waitFor(JNIEnv * env,
+Java_org_eclipse_cldt_utils_spawner_Spawner_waitFor(JNIEnv * env,
                                                  jobject jobj, jint pid)
 {
     return wait0(pid);

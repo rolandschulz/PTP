@@ -8,19 +8,19 @@
 extern "C" {
 #endif
 /*
- * Class:     org_eclipse_fdt_utils_spawner_SpawnerOutputStream
+ * Class:     org_eclipse_cldt_utils_spawner_SpawnerOutputStream
  * Method:    write0
  * Signature: (I[BI)I
  */
-JNIEXPORT jint JNICALL Java_org_eclipse_fdt_utils_spawner_SpawnerOutputStream_write0
+JNIEXPORT jint JNICALL Java_org_eclipse_cldt_utils_spawner_SpawnerOutputStream_write0
   (JNIEnv *, jobject, jint, jbyteArray, jint);
 
 /*
- * Class:     org_eclipse_fdt_utils_spawner_SpawnerOutputStream
+ * Class:     org_eclipse_cldt_utils_spawner_SpawnerOutputStream
  * Method:    close0
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_org_eclipse_fdt_utils_spawner_SpawnerOutputStream_close0
+JNIEXPORT jint JNICALL Java_org_eclipse_cldt_utils_spawner_SpawnerOutputStream_close0
   (JNIEnv *, jobject, jint);
 
 #ifdef __cplusplus

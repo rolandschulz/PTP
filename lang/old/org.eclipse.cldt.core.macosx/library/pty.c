@@ -2,12 +2,12 @@
 #include "openpty.h"
 
 /*
- * Class:     org_eclipse_fdt_utils_pty_PTY
+ * Class:     org_eclipse_cldt_utils_pty_PTY
  * Method:    forkpty
  * Signature: ()I
  */
 JNIEXPORT jstring JNICALL
-Java_org_eclipse_fdt_utils_pty_PTY_openMaster (JNIEnv *env, jobject jobj) {
+Java_org_eclipse_cldt_utils_pty_PTY_openMaster (JNIEnv *env, jobject jobj) {
 	jfieldID fid; /* Store the field ID */
 	jstring jstr = NULL;
 	int master = -1;

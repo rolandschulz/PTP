@@ -4,16 +4,16 @@
 #include <PTYOutputStream.h>
 #include <unistd.h>
 
-/* Header for class _org_eclipse_fdt_utils_pty_PTYInputStream */
-/* Header for class _org_eclipse_fdt_utils_pty_PTYOutputStream */
+/* Header for class _org_eclipse_cldt_utils_pty_PTYInputStream */
+/* Header for class _org_eclipse_cldt_utils_pty_PTYOutputStream */
 
 /*
- * Class:     org_eclipse_fdt_utils_pty_PTYInputStream
+ * Class:     org_eclipse_cldt_utils_pty_PTYInputStream
  * Method:    read0
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_org_eclipse_fdt_utils_pty_PTYInputStream_read0(JNIEnv * env,
+Java_org_eclipse_cldt_utils_pty_PTYInputStream_read0(JNIEnv * env,
                                                           jobject jobj,
                                                           jint jfd,
                                                           jbyteArray buf,
@@ -53,12 +53,12 @@ Java_org_eclipse_fdt_utils_pty_PTYInputStream_read0(JNIEnv * env,
 
 
 /*
- * Class:     org_eclipse_fdt_utils_pty_PTYInputStream
+ * Class:     org_eclipse_cldt_utils_pty_PTYInputStream
  * Method:    close0
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_org_eclipse_fdt_utils_pty_PTYInputStream_close0(JNIEnv * env,
+Java_org_eclipse_cldt_utils_pty_PTYInputStream_close0(JNIEnv * env,
                                                            jobject jobj,
                                                            jint fd)
 {
@@ -66,12 +66,12 @@ Java_org_eclipse_fdt_utils_pty_PTYInputStream_close0(JNIEnv * env,
 }
 
 /*
- * Class:     org_eclipse_fdt_utils_pty_PTYOutputStream
+ * Class:     org_eclipse_cldt_utils_pty_PTYOutputStream
  * Method:    write0
  * Signature: (II)I
  */
 JNIEXPORT jint JNICALL
-Java_org_eclipse_fdt_utils_pty_PTYOutputStream_write0(JNIEnv * env,
+Java_org_eclipse_cldt_utils_pty_PTYOutputStream_write0(JNIEnv * env,
                                                             jobject jobj,
                                                             jint jfd,
                                                             jbyteArray buf,
@@ -94,12 +94,12 @@ Java_org_eclipse_fdt_utils_pty_PTYOutputStream_write0(JNIEnv * env,
 
 
 /*
- * Class:     org_eclipse_fdt_utils_pty_PTYOutputStream
+ * Class:     org_eclipse_cldt_utils_pty_PTYOutputStream
  * Method:    close0
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_org_eclipse_fdt_utils_pty_PTYOutputStream_close0(JNIEnv * env,
+Java_org_eclipse_cldt_utils_pty_PTYOutputStream_close0(JNIEnv * env,
                                                             jobject jobj,
                                                             jint fd)
 {
