@@ -427,53 +427,6 @@ public class FortranCorePlugin extends CCorePlugin {
     }    
     
 
-	public IConsole getConsole(String id) {
-		try {
-	        IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID, "CBuildConsole"); //$NON-NLS-1$
-			if (extension != null) {
-				IExtension[] extensions = extension.getExtensions();
-				for (int i = 0; i < extensions.length; i++) {
-					IConfigurationElement[] configElements = extensions[i].getConfigurationElements();
-					for (int j = 0; j < configElements.length; j++) {
-						String builderID = configElements[j].getAttribute("id"); //$NON-NLS-1$
-						if ((id == null && builderID == null) || (id != null && id.equals(builderID))) {
-							return (IConsole) configElements[j].createExecutableExtension("class"); //$NON-NLS-1$
-						}
-					}
-				}
-			}
-		} catch (CoreException e) {
-			CommonLanguageCore.log(e);
-		}
-		return new IConsole() { // return a null console
-			private ConsoleOutputStream nullStream = new ConsoleOutputStream() {
-			    public void write(byte[] b) throws IOException {
-			    }			    
-				public void write(byte[] b, int off, int len) throws IOException {
-				}					
-				public void write(int c) throws IOException {
-				}
-			};
-			
-			public void start(IProject project) {
-			}
-		    // this can be a null console....
-			public ConsoleOutputStream getOutputStream() {
-				return nullStream;
-			}
-			public ConsoleOutputStream getInfoStream() {
-				return nullStream; 
-			}
-			public ConsoleOutputStream getErrorStream() {
-				return nullStream;
-			}
-		};
-	}
-
-	public IConsole getConsole() {
-		return getConsole(null);
-	}
-
 	public ICExtensionReference[] getBinaryParserExtensions(IProject project) throws CoreException {
 		ICExtensionReference ext[] = new ICExtensionReference[0];
 		if (project != null) {
