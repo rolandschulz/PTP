@@ -462,8 +462,8 @@
 	  </tool>
 
       <projectType 
-            name="%TargetName.macosx.exe"
-            id="fdt.managedbuild.target.macosx.exe"
+            name="%TargetName.xlf.macosx.exe"
+            id="fdt.managedbuild.target.xlf.macosx.exe"
             isTest="false"
             isAbstract="false">
          <configuration
@@ -807,7 +807,7 @@
             natureFilter="fnature"
             sources="o"
             outputs=""
-            name="%ToolName.linker.macosx.gfortran"
+            name="%ToolName.linker.macosx.fortran"
             outputFlag="-o"
             command="gfortran"
             dependencyCalculator="org.eclipse.fdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
@@ -924,7 +924,7 @@
 		  isAbstract="true"
 		  sources="f,f77,f90,f95"
 		  command="gfortran"
-		  dependencyCalculator="org.eclipse.fdt.managedbuilder.makegen.gnu.DefaultGCCDependencyCalculator"
+		  dependencyCalculator="org.eclipse.fdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
 		  headerExtensions="h"
 		  natureFilter="fnature"
 		  outputs="o"
@@ -1836,8 +1836,8 @@
       </projectType>
       
       <projectType 
-            name="%TargetName.macosx.exe"
-            id="fdt.managedbuild.target.macosx.exe"
+            name="%TargetName.gnu.macosx.exe"
+            id="fdt.managedbuild.target.gnu.macosx.exe"
             isTest="false"
             isAbstract="false">
          <configuration
@@ -1941,8 +1941,8 @@
        </projectType>      
             
       <projectType             
-            name="%TargetName.macosx.so"
-            id="fdt.managedbuild.target.macosx.so"
+            name="%TargetName.gnu.macosx.so"
+            id="fdt.managedbuild.target.gnu.macosx.so"
             isTest="false"
             isAbstract="false">            
          <configuration
@@ -2082,8 +2082,8 @@
       </projectType>
       
       <projectType            
-            name="%TargetName.macosx.lib"
-            id="fdt.managedbuild.target.macosx.lib"
+            name="%TargetName.gnu.macosx.lib"
+            id="fdt.managedbuild.target.gnu.macosx.lib"
             isTest="false"
 			isAbstract="false">
          <configuration
