@@ -440,7 +440,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     	machine_number = 0;
     	*/
     	displayElements = macs[machine_number].getSortedNodes();
-    	System.out.println("DisplayElements size = "+displayElements.length);
+    	//System.out.println("DisplayElements size = "+displayElements.length);
     	num_nodes = displayElements.length;
     }
 
@@ -500,7 +500,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     }
 
     public void updatedStatusEvent() {
-        System.out.println("ParallelNodeStatusView - status");
+        //System.out.println("ParallelNodeStatusView - status");
         refreshAllProcsStatus();
         updateButton();
         refresh(false, null);
@@ -810,7 +810,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     	terminateAllAction.setEnabled(launchManager.getCurrentState() == ILaunchManager.STATE_RUN);
     	
         boolean isRuning = launchManager.isMPIRuning();
-        System.out.println("updateButton - isMPIRunning? "+isRuning);
+        //System.out.println("updateButton - isMPIRunning? "+isRuning);
 
         //searchAction.setEnabled(isRuning);
         showAllNodesAction.setEnabled(isRuning);
@@ -1651,7 +1651,6 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
     }
     
     public void sysStatusChangeEvent(Object object) {
-    	System.out.println("sysStatusChangeEvent");
         updateSystemStatus();
     }
     public void processOutputEvent(Object object) {
