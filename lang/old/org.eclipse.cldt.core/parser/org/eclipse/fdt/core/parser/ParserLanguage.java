@@ -20,6 +20,7 @@ package org.eclipse.fdt.core.parser;
 public class ParserLanguage extends Enum {
 	public final static ParserLanguage C   = new ParserLanguage( 1 );
 	public final static ParserLanguage CPP = new ParserLanguage( 2 );
+	public final static ParserLanguage FORTRAN = new ParserLanguage( 3 );
 
 	private ParserLanguage( int value )
 	{
