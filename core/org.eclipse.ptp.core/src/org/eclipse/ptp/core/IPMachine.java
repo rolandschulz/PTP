@@ -1,7 +1,5 @@
 package org.eclipse.ptp.core;
 
-import org.eclipse.pdt.mi.MISession;
-
 /**
  * @author Clement
  *
@@ -11,7 +9,6 @@ public interface IPMachine extends IPElement {
     public IPNode[] getSortedNodes();
     
     public IPNode findNode(String nodeNumber);
-	public MISession getMISession();
 	
 	public IPProcess findProcess(String nodeNumber, String processNumber);
 	public IPProcess findProcess(String processNumber);
