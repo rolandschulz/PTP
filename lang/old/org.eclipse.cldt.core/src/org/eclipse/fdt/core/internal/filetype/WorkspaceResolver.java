@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.filetype.ICFileType;
 import org.eclipse.fdt.core.filetype.ICFileTypeAssociation;
@@ -37,8 +38,8 @@ import org.eclipse.fdt.core.filetype.ResolverDelta;
  */
 public class WorkspaceResolver extends CFileTypeResolver {
 
-	public static final String PREFS_ASSOCIATIONS_INCLUSION = FortranCorePlugin.PLUGIN_ID + ".associationInclusion"; //$NON-NLS-1$
-	public static final String PREFS_ASSOCIATIONS_EXCLUSION = FortranCorePlugin.PLUGIN_ID + ".associationExclusion"; //$NON-NLS-1$
+	public static final String PREFS_ASSOCIATIONS_INCLUSION = CommonLanguageCore.PLUGIN_ID + ".associationInclusion"; //$NON-NLS-1$
+	public static final String PREFS_ASSOCIATIONS_EXCLUSION = CommonLanguageCore.PLUGIN_ID + ".associationExclusion"; //$NON-NLS-1$
 
 	ResolverModel fModel;
 	List extensionsList;
@@ -284,7 +285,7 @@ public class WorkspaceResolver extends CFileTypeResolver {
 				try {
 					assocs.add(fModel.createAssocation(item[i].trim(), typeRef));
 				} catch (IllegalArgumentException e) {
-					FortranCorePlugin.log(e);
+					CommonLanguageCore.log(e);
 				}
 			}
 		}
@@ -301,7 +302,7 @@ public class WorkspaceResolver extends CFileTypeResolver {
 				try {
 					assocs.add(fModel.createAssocation(pattern, typeRef));
 				} catch (IllegalArgumentException e) {
-					FortranCorePlugin.log(e);
+					CommonLanguageCore.log(e);
 				}
 			}
 		}
@@ -338,20 +339,20 @@ public class WorkspaceResolver extends CFileTypeResolver {
 		        	try {
 		        		assocs.add(fModel.createAssocation(line.trim(), typeRef));
 					} catch (IllegalArgumentException e) {
-						FortranCorePlugin.log(e);
+						CommonLanguageCore.log(e);
 					}
 		        	line = in.readLine();
 		        }
 		        in.close();
 		    } catch (IOException e) {
-		    	FortranCorePlugin.log(e);
+		    	CommonLanguageCore.log(e);
 		    }
 		}
 		return assocs;
 	}
 
 	private IExtensionPoint getExtensionPoint(String extensionPointId) {
-        return Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID, extensionPointId);
+        return Platform.getExtensionRegistry().getExtensionPoint(CommonLanguageCore.PLUGIN_ID, extensionPointId);
 	}
 
 }

@@ -102,7 +102,7 @@ public class ResolverModel implements IResolverModel {
 	private static ResolverModel fInstance = null;
 
 	// Qualified names used to identify project session properties
-	private static final String			QN_RESOLVER_MODEL_ID = FortranCorePlugin.PLUGIN_ID + ".resolver"; //$NON-NLS-1$
+	private static final String			QN_RESOLVER_MODEL_ID = CommonLanguageCore.PLUGIN_ID + ".resolver"; //$NON-NLS-1$
 	private static final QualifiedName	QN_CUSTOM_RESOLVER = new QualifiedName(QN_RESOLVER_MODEL_ID, "custom"); //$NON-NLS-1$
 
 	// List of listeners on the model
@@ -120,7 +120,7 @@ public class ResolverModel implements IResolverModel {
 			initRegistryChangeListener();
 			initPreferenceChangeListener();
 		} catch (Exception e) {
-			FortranCorePlugin.log(e);
+			CommonLanguageCore.log(e);
 		}
 	}
 
@@ -341,7 +341,7 @@ public class ResolverModel implements IResolverModel {
 	//----------------------------------------------------------------------
 
 	private IExtensionPoint getExtensionPoint(String extensionPointId) {
-        return Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID, extensionPointId);
+        return Platform.getExtensionRegistry().getExtensionPoint(CommonLanguageCore.PLUGIN_ID, extensionPointId);
 	}
 
 	private static boolean isDebugging() {
@@ -376,9 +376,9 @@ public class ResolverModel implements IResolverModel {
 			final int index = i;
 			Platform.run(new ISafeRunnable() {
 				public void handleException(Throwable exception) {
-					IStatus status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1,
+					IStatus status = new Status(IStatus.ERROR, CommonLanguageCore.PLUGIN_ID, -1,
 							CommonLanguageCore.getResourceString("ResolverModel.exception.listenerError"), exception); //$NON-NLS-1$
-					FortranCorePlugin.log(status);
+					CommonLanguageCore.log(status);
 				}
 				public void run() throws Exception {
 					listeners[index].resolverChanged(event);
@@ -412,7 +412,7 @@ public class ResolverModel implements IResolverModel {
 			public void registryChanged(IRegistryChangeEvent event) {
 				handleRegistryChanged(event);
 			}
-		}, FortranCorePlugin.PLUGIN_ID);
+		}, CommonLanguageCore.PLUGIN_ID);
 	}
 
 	private void initPreferenceChangeListener() {
@@ -441,17 +441,17 @@ public class ResolverModel implements IResolverModel {
 		IExtensionDelta[]	deltas = null;
 		ResolverChangeEvent	modelEvent = new ResolverChangeEvent(this, getResolver());
 		
-		deltas = event.getExtensionDeltas(FortranCorePlugin.PLUGIN_ID, EXTENSION_LANG);
+		deltas = event.getExtensionDeltas(CommonLanguageCore.PLUGIN_ID, EXTENSION_LANG);
 		for (int i = 0; i < deltas.length; i++) {
 			processLanguageExtension(modelEvent, deltas[i].getExtension(), IExtensionDelta.ADDED == deltas[i].getKind());
 		}
 		
-		deltas = event.getExtensionDeltas(FortranCorePlugin.PLUGIN_ID, EXTENSION_TYPE);
+		deltas = event.getExtensionDeltas(CommonLanguageCore.PLUGIN_ID, EXTENSION_TYPE);
 		for (int i = 0; i < deltas.length; i++) {
 			processTypeExtension(modelEvent, deltas[i].getExtension(), IExtensionDelta.ADDED == deltas[i].getKind());
 		}
 		
-		deltas = event.getExtensionDeltas(FortranCorePlugin.PLUGIN_ID, EXTENSION_ASSOC);			
+		deltas = event.getExtensionDeltas(CommonLanguageCore.PLUGIN_ID, EXTENSION_ASSOC);			
 		if (deltas.length != 0) {
 			fWorkspaceResolver	= loadWorkspaceResolver();
 		}
@@ -581,7 +581,7 @@ public class ResolverModel implements IResolverModel {
 				ICLanguage element = new CLanguage(id, name);
 				list.add (element);
 			} catch (IllegalArgumentException e) {
-				FortranCorePlugin.log(e);
+				CommonLanguageCore.log(e);
 			}
 		}
 		ICLanguage[] langs = (ICLanguage[]) list.toArray(new ICLanguage[list.size()]);
@@ -605,7 +605,7 @@ public class ResolverModel implements IResolverModel {
 				ICFileType element = new CFileType(id, getLanguageById(lang), name, parseType(type));
 				list.add(element);
 			} catch (IllegalArgumentException e) {
-				FortranCorePlugin.log(e);
+				CommonLanguageCore.log(e);
 			}
 		}
 		ICFileType[] types = (ICFileType[]) list.toArray(new ICFileType[list.size()]);
@@ -794,12 +794,12 @@ public class ResolverModel implements IResolverModel {
 		        	try {
 		        		assocs.add(createAssocation(element.getKey().toString(), type));
 		        	} catch (IllegalArgumentException e) {
-						FortranCorePlugin.log(e);
+						CommonLanguageCore.log(e);
 					}
 				}
 				
 		    } catch (IOException e) {
-		    	FortranCorePlugin.log(e);
+		    	CommonLanguageCore.log(e);
 		    } finally {
 		    	if (in != null) {
 		    		try {
