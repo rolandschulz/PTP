@@ -57,7 +57,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 public class FortranSourceViewerConfiguration extends SourceViewerConfiguration {
 	
 	/** Key used to look up display tab width */
-	public final static String PREFERENCE_TAB_WIDTH= "org.eclipse.cdt.editor.tab.width"; //$NON-NLS-1$
+	public final static String PREFERENCE_TAB_WIDTH= "org.eclipse.fdt.editor.tab.width"; //$NON-NLS-1$
 
     private FortranTextTools fTextTools;
 	private FortranEditor fEditor;

@@ -16,7 +16,7 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
  * <p>
  * Example useage:
  * <pre>
- * mainPage = new CProjectWizardPage("basicCProjectPage");
+ * mainPage = new FortranProjectWizardPage("basicCProjectPage");
  * mainPage.setTitle("Project");
  * mainPage.setDescription("Create a new project resource.");
  * </pre>

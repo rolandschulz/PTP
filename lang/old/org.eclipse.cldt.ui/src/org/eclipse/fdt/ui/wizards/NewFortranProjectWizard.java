@@ -54,14 +54,14 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
  */
 public abstract class NewFortranProjectWizard extends BasicNewResourceWizard implements IExecutableExtension {
 
-	private static final String OP_ERROR= "CProjectWizard.op_error"; //$NON-NLS-1$
-	private static final String OP_DESC= "CProjectWizard.op_description"; //$NON-NLS-1$
+	private static final String OP_ERROR= "FortranProjectWizard.op_error"; //$NON-NLS-1$
+	private static final String OP_DESC= "FortranProjectWizard.op_description"; //$NON-NLS-1$
 
-	private static final String PREFIX= "CProjectWizard"; //$NON-NLS-1$
-	private static final String WZ_TITLE= "CProjectWizard.title"; //$NON-NLS-1$
-	private static final String WZ_DESC= "CProjectWizard.description"; //$NON-NLS-1$
+	private static final String PREFIX= "FortranProjectWizard"; //$NON-NLS-1$
+	private static final String WZ_TITLE= "FortranProjectWizard.title"; //$NON-NLS-1$
+	private static final String WZ_DESC= "FortranProjectWizard.description"; //$NON-NLS-1$
 
-	private static final String WINDOW_TITLE = "CProjectWizard.windowTitle"; //$NON-NLS-1$
+	private static final String WINDOW_TITLE = "FortranProjectWizard.windowTitle"; //$NON-NLS-1$
 	
 
 	private String wz_title;

@@ -68,7 +68,8 @@ public class FortranSourceViewer extends ProjectionViewer implements ITextViewer
         if (configuration instanceof FortranSourceViewerConfiguration)
         {            
             fOutlinePresenter = ((FortranSourceViewerConfiguration) configuration).getOutlinePresenter(editor);
-            fOutlinePresenter.install(this);
+            if (fOutlinePresenter != null)
+				fOutlinePresenter.install(this);
         }
     }
 

@@ -33,9 +33,9 @@
             class="org.eclipse.fdt.managedbuilder.ui.wizards.NewManagedFortranProjectWizard"
             project="true"
             finalPerspective="org.eclipse.fdt.ui.FortranPerspective"
-            id="org.eclipse.fdt.managedbuilder.ui.wizards.StdCWizard">
+            id="org.eclipse.fdt.managedbuilder.ui.wizards.StdFortranWizard">
          <description>
-            %MngCWizard.description
+            %MngFortranWizard.description
          </description>
       </wizard>
    </extension>

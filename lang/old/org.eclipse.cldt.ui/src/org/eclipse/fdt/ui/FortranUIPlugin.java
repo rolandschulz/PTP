@@ -212,7 +212,7 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 
 	static {
 		try {
-			fgResourceBundle = ResourceBundle.getBundle("org.eclipse.fdt.internal.ui.FPluginResources"); //$NON-NLS-1$
+			fgResourceBundle = ResourceBundle.getBundle("org.eclipse.fdt.internal.ui.FortranPluginResources"); //$NON-NLS-1$
 		}
 		catch (MissingResourceException x) {
 			fgResourceBundle = null;

@@ -434,7 +434,7 @@
             default="true"
             name="%FortranEditor.name"
             extensions="f,f77,f90,f95"
-            icon="icons/full/obj16/c_file_obj.gif"
+            icon="icons/full/obj16/f_file_obj.gif"
             class="org.eclipse.fdt.internal.ui.editor.FortranEditor"
             contributorClass="org.eclipse.fdt.internal.ui.editor.FortranEditorActionContributor"
             symbolicFontName="org.eclipse.fdt.ui.editors.textfont"
@@ -450,7 +450,7 @@
       <editor
             symbolicFontName="org.eclipse.fdt.ui.editors.textfont"
             class="org.eclipse.fdt.internal.ui.editor.ExternalSearchEditor"
-            icon="icons/full/obj16/c_file_obj.gif"
+            icon="icons/full/obj16/f_file_obj.gif"
             name="%ExternalSearchEditor.name"
             id="org.eclipse.fdt.ui.editor.ExternalSearchEditor"/>
       
