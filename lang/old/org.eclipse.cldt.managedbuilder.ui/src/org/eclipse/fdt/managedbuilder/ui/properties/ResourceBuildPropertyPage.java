@@ -20,7 +20,7 @@ import org.eclipse.fdt.managedbuilder.core.IConfiguration;
 import org.eclipse.fdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.fdt.managedbuilder.core.IResourceConfiguration;
 import org.eclipse.fdt.managedbuilder.core.ManagedBuildManager;
-import org.eclipse.fdt.managedbuilder.core.ManagedCProjectNature;
+import org.eclipse.fdt.managedbuilder.core.ManagedProjectNature;
 import org.eclipse.fdt.managedbuilder.internal.ui.ManagedBuildOptionBlock;
 import org.eclipse.fdt.managedbuilder.internal.ui.ManagedBuilderHelpContextIds;
 import org.eclipse.fdt.managedbuilder.internal.ui.ManagedBuilderUIMessages;
@@ -127,7 +127,7 @@ public class ResourceBuildPropertyPage extends PropertyPage implements
 		//  Check to see if we are dealing with a managed build project
 		boolean openMBSProject;
 		try {
-		    openMBSProject = (getProject().hasNature(ManagedCProjectNature.MNG_NATURE_ID));
+		    openMBSProject = (getProject().hasNature(ManagedProjectNature.MNG_NATURE_ID));
 		} catch (CoreException e) {
 		    openMBSProject = false;
 		}

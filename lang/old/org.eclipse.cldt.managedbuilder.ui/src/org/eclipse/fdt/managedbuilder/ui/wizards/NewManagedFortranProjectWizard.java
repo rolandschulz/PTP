@@ -13,18 +13,18 @@ package org.eclipse.fdt.managedbuilder.ui.wizards;
 
 import org.eclipse.fdt.managedbuilder.internal.ui.ManagedBuilderUIMessages;
 
-public class NewManagedCProjectWizard extends NewManagedProjectWizard {
+public class NewManagedFortranProjectWizard extends NewManagedProjectWizard {
 	// String constants
-	private static final String WZ_TITLE = "MngCWizard.title"; //$NON-NLS-1$
-	private static final String WZ_DESC = "MngCWizard.description"; //$NON-NLS-1$
-	private static final String SETTINGS_TITLE= "MngCWizardSettings.title"; //$NON-NLS-1$
-	private static final String SETTINGS_DESC= "MngCWizardSettings.description"; //$NON-NLS-1$
+	private static final String WZ_TITLE = "MngFortranWizard.title"; //$NON-NLS-1$
+	private static final String WZ_DESC = "MngFortranWizard.description"; //$NON-NLS-1$
+	private static final String SETTINGS_TITLE= "MngFortranWizardSettings.title"; //$NON-NLS-1$
+	private static final String SETTINGS_DESC= "MngFortranWizardSettings.description"; //$NON-NLS-1$
 
-	public NewManagedCProjectWizard() {
+	public NewManagedFortranProjectWizard() {
 		this(ManagedBuilderUIMessages.getResourceString(WZ_TITLE), ManagedBuilderUIMessages.getResourceString(WZ_DESC));
 	}
 
-	public NewManagedCProjectWizard(String title, String description) {
+	public NewManagedFortranProjectWizard(String title, String description) {
 		super(title, description);
 	}
 

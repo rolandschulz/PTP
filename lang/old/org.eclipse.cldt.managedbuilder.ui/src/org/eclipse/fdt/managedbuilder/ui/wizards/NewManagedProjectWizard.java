@@ -26,7 +26,7 @@ import org.eclipse.fdt.managedbuilder.core.ITargetPlatform;
 import org.eclipse.fdt.managedbuilder.core.IToolChain;
 import org.eclipse.fdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.fdt.managedbuilder.core.ManagedBuilderCorePlugin;
-import org.eclipse.fdt.managedbuilder.core.ManagedCProjectNature;
+import org.eclipse.fdt.managedbuilder.core.ManagedProjectNature;
 import org.eclipse.fdt.managedbuilder.internal.ui.ManagedBuilderHelpContextIds;
 import org.eclipse.fdt.managedbuilder.internal.ui.ManagedBuilderUIMessages;
 import org.eclipse.fdt.managedbuilder.internal.ui.ManagedBuilderUIPlugin;
@@ -121,9 +121,9 @@ public class NewManagedProjectWizard extends NewCProjectWizard {
 		// Add the managed build nature and builder
 		try {
 			monitor.subTask(ManagedBuilderUIMessages.getResourceString(MSG_ADD_NATURE));
-			ManagedCProjectNature.addManagedNature(newProject, new SubProgressMonitor(monitor, 1));
+			ManagedProjectNature.addManagedNature(newProject, new SubProgressMonitor(monitor, 1));
 			monitor.subTask(ManagedBuilderUIMessages.getResourceString(MSG_ADD_BUILDER));
-			ManagedCProjectNature.addManagedBuilder(newProject, new SubProgressMonitor(monitor, 1));
+			ManagedProjectNature.addManagedBuilder(newProject, new SubProgressMonitor(monitor, 1));
 		} catch (CoreException e) {
 			ManagedBuilderUIPlugin.log(e);
 		}

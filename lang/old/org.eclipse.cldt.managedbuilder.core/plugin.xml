@@ -63,7 +63,7 @@
       </requires-nature>
       <runtime>
          <run
-               class="org.eclipse.fdt.managedbuilder.core.ManagedCProjectNature">
+               class="org.eclipse.fdt.managedbuilder.core.ManagedProjectNature">
          </run>
       </runtime>
       <builder
