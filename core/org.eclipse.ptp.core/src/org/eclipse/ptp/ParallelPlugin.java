@@ -8,9 +8,8 @@ import org.eclipse.ptp.launch.internal.LaunchManager;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.internal.IInternalPerspectiveListener;
-import org.eclipse.ui.internal.IPerspectiveService;
-//import org.eclipse.ui.internal.WorkbenchWindow;
+import org.eclipse.ui.IPerspectiveListener;
+import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -129,18 +128,16 @@ public class ParallelPlugin extends AbstractUIPlugin {
 		return null;
 	}
 	
-    public void addPerspectiveListener(final IInternalPerspectiveListener perspectiveListener) {
+    public void addPerspectiveListener(final IPerspectiveListener perspectiveListener) {
         IWorkbenchWindow workBenchWindow = ParallelPlugin.getActiveWorkbenchWindow();
         if (workBenchWindow instanceof WorkbenchWindow) {
-            IPerspectiveService perspectiveService = ((WorkbenchWindow)workBenchWindow).getPerspectiveService();
-            perspectiveService.addPerspectiveListener(perspectiveListener);
+            workBenchWindow.addPerspectiveListener(perspectiveListener);
         }
     }
-    public void removePerspectiveListener(final IInternalPerspectiveListener perspectiveListener) {
+    public void removePerspectiveListener(final IPerspectiveListener perspectiveListener) {
         IWorkbenchWindow workBenchWindow = ParallelPlugin.getActiveWorkbenchWindow();
         if (workBenchWindow instanceof WorkbenchWindow) {
-            IPerspectiveService perspectiveService = ((WorkbenchWindow)workBenchWindow).getPerspectiveService();
-            perspectiveService.removePerspectiveListener(perspectiveListener);
+            workBenchWindow.removePerspectiveListener(perspectiveListener);
         }
     }	
 }
