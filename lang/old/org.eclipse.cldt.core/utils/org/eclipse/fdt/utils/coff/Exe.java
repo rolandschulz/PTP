@@ -13,7 +13,7 @@ package org.eclipse.fdt.utils.coff;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 
 public class Exe {
 
@@ -70,7 +70,7 @@ public class Exe {
 			}
 			memory.getBytes(e_signature);
 			if (e_signature[0] != 'M' || e_signature[1] != 'Z') {
-				throw new IOException(FortranCorePlugin.getResourceString("Util.exception.notDOSFormat")); //$NON-NLS-1$
+				throw new IOException(CommonLanguageCore.getResourceString("Util.exception.notDOSFormat")); //$NON-NLS-1$
 			}
 			e_lastsize = memory.getShort();
 			e_nblocks = memory.getShort();

@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Vector;
 
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.FortranCorePlugin;
 
 /**
@@ -98,7 +99,7 @@ public class AR {
 		header = new ARHeader();
 		if (!header.isXcoffARHeader()) {
 			file.close();
-			throw new IOException(FortranCorePlugin.getResourceString("Util.exception.invalidArchive")); //$NON-NLS-1$
+			throw new IOException(CommonLanguageCore.getResourceString("Util.exception.invalidArchive")); //$NON-NLS-1$
 		}
 	}
 

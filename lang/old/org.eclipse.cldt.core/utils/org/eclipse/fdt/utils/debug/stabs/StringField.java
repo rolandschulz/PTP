@@ -11,7 +11,7 @@
 
 package org.eclipse.fdt.utils.debug.stabs;
 
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 
 
 /**
@@ -80,7 +80,7 @@ public class StringField {
 				/* SunPRO (3.0 at least) static variable encoding. */
 				break;
 			default :
-				name = FortranCorePlugin.getResourceString("StringField.unknownName"); //$NON-NLS-1$
+				name = CommonLanguageCore.getResourceString("StringField.unknownName"); //$NON-NLS-1$
 				break;
 			}
 		}

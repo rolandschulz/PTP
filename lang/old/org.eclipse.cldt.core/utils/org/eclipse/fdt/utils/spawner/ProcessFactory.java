@@ -14,7 +14,7 @@ package org.eclipse.fdt.utils.spawner;
 import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.utils.pty.PTY;
 
 public class ProcessFactory {
@@ -90,6 +90,6 @@ public class ProcessFactory {
 		throws IOException {
 		if (hasSpawner)
 			return new Spawner(cmdarray, envp, dir, pty);
-		throw new UnsupportedOperationException(FortranCorePlugin.getResourceString("Util.exception.cannotCreatePty")); //$NON-NLS-1$
+		throw new UnsupportedOperationException(CommonLanguageCore.getResourceString("Util.exception.cannotCreatePty")); //$NON-NLS-1$
 	}
 }

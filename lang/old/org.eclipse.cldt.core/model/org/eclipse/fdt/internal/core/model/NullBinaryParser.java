@@ -9,7 +9,7 @@ import java.io.IOException;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.IBinaryParser;
 
 /**
@@ -20,21 +20,21 @@ public class NullBinaryParser extends PlatformObject implements IBinaryParser {
 	 * @see org.eclipse.fdt.core.IBinaryParser#getBinary(org.eclipse.core.runtime.IPath)
 	 */
 	public IBinaryFile getBinary(byte[] data, IPath path) throws IOException {
-		throw new IOException(FortranCorePlugin.getResourceString("CoreModel.NullBinaryParser.Not_binary_file")); //$NON-NLS-1$
+		throw new IOException(CommonLanguageCore.getResourceString("CoreModel.NullBinaryParser.Not_binary_file")); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.fdt.core.IBinaryParser#getBinary(org.eclipse.core.runtime.IPath)
 	 */
 	public IBinaryFile getBinary(IPath path) throws IOException {
-		throw new IOException(FortranCorePlugin.getResourceString("CoreModel.NullBinaryParser.Not_binary_file")); //$NON-NLS-1$
+		throw new IOException(CommonLanguageCore.getResourceString("CoreModel.NullBinaryParser.Not_binary_file")); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.fdt.core.IBinaryParser#getFormat()
 	 */
 	public String getFormat() {
-		return FortranCorePlugin.getResourceString("CoreModel.NullBinaryParser.Null_Format"); //$NON-NLS-1$
+		return CommonLanguageCore.getResourceString("CoreModel.NullBinaryParser.Null_Format"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)

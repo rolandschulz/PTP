@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.CoreModel;
@@ -180,7 +181,7 @@ public class CModelBuilder {
 		}
 		catch( ParserFactoryError pfe )
 		{
-			throw new ParserException( FortranCorePlugin.getResourceString("CModelBuilder.Parser_Construction_Failure")); //$NON-NLS-1$
+			throw new ParserException( CommonLanguageCore.getResourceString("CModelBuilder.Parser_Construction_Failure")); //$NON-NLS-1$
 		}
 		// call parse
 		if (problemRequestor != null) {
@@ -191,7 +192,7 @@ public class CModelBuilder {
 			problemRequestor.endReporting();
 		}
 		if( (!hasNoErrors)  && throwExceptionOnError )
-			throw new ParserException(FortranCorePlugin.getResourceString("CModelBuilder.Parse_Failure")); //$NON-NLS-1$
+			throw new ParserException(CommonLanguageCore.getResourceString("CModelBuilder.Parse_Failure")); //$NON-NLS-1$
 		return quickParseCallback.getCompilationUnit(); 
 	}
 	

@@ -14,7 +14,7 @@ package org.eclipse.fdt.internal.core.model;
 import java.util.Map;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.IArchive;
 import org.eclipse.fdt.core.model.IArchiveContainer;
@@ -23,7 +23,7 @@ import org.eclipse.fdt.core.model.ICElement;
 public class ArchiveContainer extends Openable implements IArchiveContainer {
 
 	public ArchiveContainer (CProject cProject) {
-		super (cProject, null, FortranCorePlugin.getResourceString("CoreModel.ArchiveContainer.Archives"), ICElement.C_VCONTAINER); //$NON-NLS-1$
+		super (cProject, null, CommonLanguageCore.getResourceString("CoreModel.ArchiveContainer.Archives"), ICElement.C_VCONTAINER); //$NON-NLS-1$
 	}
 
 	public IArchive[] getArchives() throws CModelException {

@@ -1586,7 +1586,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 					continue;
 				}
 				if (entry != otherEntry && otherEntry.equals(entry)) {
-					StringBuffer errMesg = new StringBuffer(FortranCorePlugin.getResourceString("CoreModel.PathEntry.DuplicateEntry")); //$NON-NLS-1$
+					StringBuffer errMesg = new StringBuffer(CommonLanguageCore.getResourceString("CoreModel.PathEntry.DuplicateEntry")); //$NON-NLS-1$
 					return new CModelStatus(ICModelStatusConstants.INVALID_PATHENTRY, errMesg.toString());
 				}
 			}
@@ -1597,7 +1597,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 		if (dups.size() > 0) {
 			ICModelStatus[] cmodelStatus = new ICModelStatus[dups.size()];
 			for (int i = 0; i < dups.size(); ++i) {
-				StringBuffer errMesg = new StringBuffer(FortranCorePlugin.getResourceString("CoreModel.PathEntry.DuplicateEntry")); //$NON-NLS-1$
+				StringBuffer errMesg = new StringBuffer(CommonLanguageCore.getResourceString("CoreModel.PathEntry.DuplicateEntry")); //$NON-NLS-1$
 				cmodelStatus[i] = new CModelStatus(ICModelStatusConstants.INVALID_PATHENTRY, errMesg.toString());
 			}
 			return CModelStatus.newMultiStatus(ICModelStatusConstants.INVALID_PATHENTRY, cmodelStatus);
@@ -1608,7 +1608,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 		if (dups.size() > 0) {
 			ICModelStatus[] cmodelStatus = new ICModelStatus[dups.size()];
 			for (int i = 0; i < dups.size(); ++i) {
-				StringBuffer errMesg = new StringBuffer(FortranCorePlugin.getResourceString("CoreModel.PathEntry.DuplicateEntry")); //$NON-NLS-1$
+				StringBuffer errMesg = new StringBuffer(CommonLanguageCore.getResourceString("CoreModel.PathEntry.DuplicateEntry")); //$NON-NLS-1$
 				cmodelStatus[i] = new CModelStatus(ICModelStatusConstants.NAME_COLLISION, errMesg.toString());
 			}
 			return CModelStatus.newMultiStatus(ICModelStatusConstants.INVALID_PATHENTRY, cmodelStatus);
@@ -1639,16 +1639,16 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 							String exclusionPattern = entryPath.removeFirstSegments(otherPath.segmentCount()).segment(0);
 							if (CoreModelUtil.isExcluded(entryPath, exclusionPatterns)) {
 								StringBuffer errMesg = new StringBuffer(
-										FortranCorePlugin.getResourceString("CoreModel.PathEntry.NestedEntry")); //$NON-NLS-1$
+										CommonLanguageCore.getResourceString("CoreModel.PathEntry.NestedEntry")); //$NON-NLS-1$
 								return new CModelStatus(ICModelStatusConstants.INVALID_PATHENTRY, errMesg.toString());
 							} else if (otherKind == IPathEntry.FDT_SOURCE) {
 								exclusionPattern += '/';
 								StringBuffer errMesg = new StringBuffer(
-										FortranCorePlugin.getResourceString("CoreModel.PathEntry.NestedEntry")); //$NON-NLS-1$
+										CommonLanguageCore.getResourceString("CoreModel.PathEntry.NestedEntry")); //$NON-NLS-1$
 								return new CModelStatus(ICModelStatusConstants.INVALID_PATHENTRY, errMesg.toString());
 							} else {
 								StringBuffer errMesg = new StringBuffer(
-										FortranCorePlugin.getResourceString("CoreModel.PathEntry.NestedEntry")); //$NON-NLS-1$
+										CommonLanguageCore.getResourceString("CoreModel.PathEntry.NestedEntry")); //$NON-NLS-1$
 								return new CModelStatus(ICModelStatusConstants.INVALID_PATHENTRY, errMesg.toString()); //$NON-NLS-1$
 							}
 						}

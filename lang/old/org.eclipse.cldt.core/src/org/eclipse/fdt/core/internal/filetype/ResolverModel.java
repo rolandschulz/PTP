@@ -41,6 +41,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.filetype.ICFileType;
 import org.eclipse.fdt.core.filetype.ICFileTypeAssociation;
@@ -376,7 +377,7 @@ public class ResolverModel implements IResolverModel {
 			Platform.run(new ISafeRunnable() {
 				public void handleException(Throwable exception) {
 					IStatus status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1,
-							FortranCorePlugin.getResourceString("ResolverModel.exception.listenerError"), exception); //$NON-NLS-1$
+							CommonLanguageCore.getResourceString("ResolverModel.exception.listenerError"), exception); //$NON-NLS-1$
 					FortranCorePlugin.log(status);
 				}
 				public void run() throws Exception {

@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.IBinaryParser.IBinaryFile;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.CoreModel;
@@ -38,7 +38,7 @@ public class BinaryRunner {
 	}
 
 	public void start() {
-		String taskName = FortranCorePlugin.getResourceString("CoreModel.BinaryRunner.Binary_Search_Thread"); //$NON-NLS-1$
+		String taskName = CommonLanguageCore.getResourceString("CoreModel.BinaryRunner.Binary_Search_Thread"); //$NON-NLS-1$
 		runner = new Job(taskName) {
 
 			/*

@@ -16,7 +16,7 @@ import java.io.IOException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.fdt.core.AbstractCExtension;
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.IBinaryParser;
 import org.eclipse.fdt.core.ICExtensionReference;
 import org.eclipse.fdt.utils.CPPFilt;
@@ -38,7 +38,7 @@ public class MachOParser extends AbstractCExtension implements IBinaryParser {
 
 	public IBinaryFile getBinary(byte[] hints, IPath path) throws IOException {
 		if (path == null) {
-			throw new IOException(FortranCorePlugin.getResourceString("Util.exception.nullPath")); //$NON-NLS-1$
+			throw new IOException(CommonLanguageCore.getResourceString("Util.exception.nullPath")); //$NON-NLS-1$
 		}
 
 		IBinaryFile binary = null;

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.IBinary;
 import org.eclipse.fdt.core.model.IBinaryContainer;
@@ -24,7 +24,7 @@ import org.eclipse.fdt.core.model.ICElement;
 public class BinaryContainer extends Openable implements IBinaryContainer {
 
 	public BinaryContainer (CProject cProject) {
-		super (cProject, null, FortranCorePlugin.getResourceString("CoreModel.BinaryContainer.Binaries"), ICElement.C_VCONTAINER); //$NON-NLS-1$
+		super (cProject, null, CommonLanguageCore.getResourceString("CoreModel.BinaryContainer.Binaries"), ICElement.C_VCONTAINER); //$NON-NLS-1$
 	}
 
 	public IBinary[] getBinaries() throws CModelException {

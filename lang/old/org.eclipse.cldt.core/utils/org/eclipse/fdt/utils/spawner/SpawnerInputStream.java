@@ -14,7 +14,7 @@ package org.eclipse.fdt.utils.spawner;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 
 class SpawnerInputStream extends InputStream {
 	private int fd;
@@ -74,7 +74,7 @@ class SpawnerInputStream extends InputStream {
 			return;
 		int status = close0(fd);
 		if (status == -1)
-			throw new IOException(FortranCorePlugin.getResourceString("Util.exception.closeError")); //$NON-NLS-1$
+			throw new IOException(CommonLanguageCore.getResourceString("Util.exception.closeError")); //$NON-NLS-1$
 		fd = -1;
 	}
 

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.IAddress;
 import org.eclipse.fdt.core.IAddressFactory;
 import org.eclipse.fdt.utils.Addr32;
@@ -146,7 +146,7 @@ public class Elf {
 			efile.readFully(e_ident);
 			if (e_ident[ELFhdr.EI_MAG0] != 0x7f || e_ident[ELFhdr.EI_MAG1] != 'E' || e_ident[ELFhdr.EI_MAG2] != 'L'
 					|| e_ident[ELFhdr.EI_MAG3] != 'F')
-				throw new IOException(FortranCorePlugin.getResourceString("Util.exception.notELF")); //$NON-NLS-1$
+				throw new IOException(CommonLanguageCore.getResourceString("Util.exception.notELF")); //$NON-NLS-1$
 			efile.setEndian(e_ident[ELFhdr.EI_DATA] == ELFhdr.ELFDATA2LSB);
 			e_type = efile.readShortE();
 			e_machine = efile.readShortE();
@@ -183,12 +183,12 @@ public class Elf {
 
 		protected ELFhdr(byte[] bytes) throws IOException {
 			if (bytes.length <= e_ident.length) {
-				throw new EOFException(FortranCorePlugin.getResourceString("Util.exception.notELF")); //$NON-NLS-1$
+				throw new EOFException(CommonLanguageCore.getResourceString("Util.exception.notELF")); //$NON-NLS-1$
 			}
 			System.arraycopy(bytes, 0, e_ident, 0, e_ident.length);
 			if (e_ident[ELFhdr.EI_MAG0] != 0x7f || e_ident[ELFhdr.EI_MAG1] != 'E' || e_ident[ELFhdr.EI_MAG2] != 'L'
 					|| e_ident[ELFhdr.EI_MAG3] != 'F')
-				throw new IOException(FortranCorePlugin.getResourceString("Util.exception.notELF")); //$NON-NLS-1$
+				throw new IOException(CommonLanguageCore.getResourceString("Util.exception.notELF")); //$NON-NLS-1$
 			boolean isle = (e_ident[ELFhdr.EI_DATA] == ELFhdr.ELFDATA2LSB);
 			int offset = e_ident.length;
 			e_type = makeShort(bytes, offset, isle);

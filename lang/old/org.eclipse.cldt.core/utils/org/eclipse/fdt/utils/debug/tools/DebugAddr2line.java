@@ -13,7 +13,7 @@ package org.eclipse.fdt.utils.debug.tools;
 
 import java.io.IOException;
 
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.utils.debug.dwarf.Dwarf;
 import org.eclipse.fdt.utils.debug.stabs.Stabs;
 import org.eclipse.fdt.utils.elf.Elf;
@@ -48,7 +48,7 @@ public class DebugAddr2line {
 			Dwarf dwarf = new Dwarf(elf);
 			dwarf.parse(symreq);
 		} else {
-			throw new IOException(FortranCorePlugin.getResourceString("Util.unknownFormat")); //$NON-NLS-1$
+			throw new IOException(CommonLanguageCore.getResourceString("Util.unknownFormat")); //$NON-NLS-1$
 		}
 	}
 

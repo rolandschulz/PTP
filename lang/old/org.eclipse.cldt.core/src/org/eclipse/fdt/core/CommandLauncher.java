@@ -150,7 +150,7 @@ public class CommandLauncher {
 		if (monitor.isCanceled()) {
 			closure.terminate();
 			state = COMMAND_CANCELED;
-			setErrorMessage(FortranCorePlugin.getResourceString("CommandLauncher.error.commandCanceled")); //$NON-NLS-1$
+			setErrorMessage(CommonLanguageCore.getResourceString("CommandLauncher.error.commandCanceled")); //$NON-NLS-1$
 		}
 
 		try {

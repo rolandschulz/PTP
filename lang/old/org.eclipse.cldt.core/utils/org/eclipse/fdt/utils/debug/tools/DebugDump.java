@@ -18,7 +18,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.utils.debug.DebugBaseType;
 import org.eclipse.fdt.utils.debug.DebugParameterKind;
 import org.eclipse.fdt.utils.debug.DebugType;
@@ -61,7 +61,7 @@ public class DebugDump implements IDebugEntryRequestor {
 			Dwarf dwarf = new Dwarf(elf);
 			dwarf.parse(this);
 		} else {
-			throw new IOException(FortranCorePlugin.getResourceString("Util.unknownFormat")); //$NON-NLS-1$
+			throw new IOException(CommonLanguageCore.getResourceString("Util.unknownFormat")); //$NON-NLS-1$
 		}
 		bwriter.flush();
 	}
