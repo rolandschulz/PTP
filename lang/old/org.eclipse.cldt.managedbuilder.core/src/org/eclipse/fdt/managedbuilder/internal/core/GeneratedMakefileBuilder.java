@@ -41,7 +41,6 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.fdt.core.CommonLanguageCore;
-import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.CommandLauncher;
 import org.eclipse.fdt.core.ConsoleOutputStream;
 import org.eclipse.fdt.core.ErrorParserManager;
@@ -306,7 +305,7 @@ public class GeneratedMakefileBuilder extends ACBuilder {
 			workspace.delete(new IResource[]{buildDir}, true, monitor);
 			StringBuffer buf = new StringBuffer();
 			// write to the console
-			IConsole console = FortranCorePlugin.getDefault().getConsole();
+			IConsole console = CommonLanguageCore.getDefault().getConsole();
 			console.start(getProject());
 			ConsoleOutputStream consoleOutStream = console.getOutputStream();
 			String[] consoleHeader = new String[3];
@@ -580,7 +579,7 @@ public class GeneratedMakefileBuilder extends ACBuilder {
 
 				// Get a build console for the project
 				StringBuffer buf = new StringBuffer();
-				IConsole console = FortranCorePlugin.getDefault().getConsole();
+				IConsole console = CommonLanguageCore.getDefault().getConsole();
 				console.start(currentProject);
 				ConsoleOutputStream consoleOutStream = console.getOutputStream();
 				String[] consoleHeader = new String[3];

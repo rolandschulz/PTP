@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.fdt.core.CommonLanguageCore;
-import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.CommandLauncher;
 import org.eclipse.fdt.core.IMarkerGenerator;
 import org.eclipse.fdt.core.resources.IConsole;
@@ -85,7 +84,7 @@ public class DefaultRunSIProvider implements IExternalScannerInfoProvider {
         monitor.beginTask(MakeMessages.getString("ExternalScannerInfoProvider.Reading_Specs"), 100); //$NON-NLS-1$
         
         try {
-            IConsole console = FortranCorePlugin.getDefault().getConsole(EXTERNAL_SI_PROVIDER_CONSOLE_ID);
+            IConsole console = CommonLanguageCore.getDefault().getConsole(EXTERNAL_SI_PROVIDER_CONSOLE_ID);
             console.start(currentProject);
             OutputStream cos = console.getOutputStream();
 

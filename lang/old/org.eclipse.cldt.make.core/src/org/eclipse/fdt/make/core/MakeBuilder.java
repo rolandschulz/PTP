@@ -35,7 +35,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.fdt.core.CommonLanguageCore;
-import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.CommandLauncher;
 import org.eclipse.fdt.core.ErrorParserManager;
 import org.eclipse.fdt.core.model.ICModelMarker;
@@ -117,7 +116,7 @@ public class MakeBuilder extends ACBuilder {
 		try {
 			IPath buildCommand = info.getBuildCommand();
 			if (buildCommand != null) {
-				IConsole console = FortranCorePlugin.getDefault().getConsole();
+				IConsole console = CommonLanguageCore.getDefault().getConsole();
 				console.start(currProject);
 
 				OutputStream cos = console.getOutputStream();
