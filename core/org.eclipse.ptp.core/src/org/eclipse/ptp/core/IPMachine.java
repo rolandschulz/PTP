@@ -9,9 +9,6 @@ public interface IPMachine extends IPElement {
     public IPNode[] getSortedNodes();
     
     public IPNode findNode(String nodeNumber);
-	
-	public IPProcess findProcess(String nodeNumber, String processNumber);
-	public IPProcess findProcess(String processNumber);
 	 
 	public IPProcess[] getSortedProcesses();
 	public IPProcess[] getProcesses();

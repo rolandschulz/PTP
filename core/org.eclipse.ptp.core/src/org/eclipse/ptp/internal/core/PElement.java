@@ -83,15 +83,7 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 		return getElementName();
 	}
 	
-	/*
-	public IPUniverse getPUniverse() {
-		IPElement current = this;
-		do {
-			if (current instanceof IPUniverse) return (IPUniverse) current;
-		} while ((current = current.getParent()) != null);
-		return null;
-	}
-	
+	/*	
 	public IPJob getPRoot() {
 		IPElement current = this;
 		do {
