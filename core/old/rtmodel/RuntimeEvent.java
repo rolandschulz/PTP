@@ -16,32 +16,27 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.core;
 
-public interface IPJob extends IPElement {
-	/* helper functions to get the nodes that this job is running on.  This should
-	 * be accomplished by going through all the processes of this job and seeing
-	 * which nodes they are running on
-	 */
-    public IPNode[] getNodes();
-    public IPNode[] getSortedNodes();
+package org.eclipse.ptp.rtmodel;
 
-    public IPProcess findProcess(String processNumber);
-    public IPProcess findProcessByName(String pname);
+
+public class RuntimeEvent {
+	int eventNumber;
+	String text;
+    public static final int EVENT_NODE_STATUS_CHANGE = 1;
+    public static final int EVENT_PROCESS_OUTPUT = 2;
 	
-	public IPProcess[] getSortedProcesses();
-	public IPProcess[] getProcesses();
-	
-	public int totalNodes();
-	public int totalProcesses();	
-	public void removeAllProcesses();
-	
-	/* returns an array of machines that this job is running on.  For many cases
-	 * this will be a single element array as a job often resides on a single
-	 * machine
-	 */
-	public IPMachine[] getMachines();
-	
-	/* gets the parent universe that this job is running inside of */
-	public IPUniverse getUniverse();
+	public RuntimeEvent(int eventNumber) {
+		this.eventNumber = eventNumber;
+		text = new String("");
+	}
+	public int getEventNumber() { 
+		return eventNumber;
+	}
+	public String getText() {
+		return text;
+	}
+	public void setText(String text) {
+		this.text = text;
+	}
 }

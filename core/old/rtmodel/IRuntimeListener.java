@@ -19,7 +19,6 @@
 package org.eclipse.ptp.rtmodel;
 
 public interface IRuntimeListener {
-    public static final int EVENT_NODE_STATUS_CHANGE = 1;
-    
-    public void runtimeNodeStatusChange(Object object);
+    public void runtimeNodeStatusChange(NamedEntity ne);
+    public void runtimeProcessOutput(NamedEntity ne, String output);
 }

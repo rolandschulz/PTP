@@ -28,8 +28,13 @@ public interface IRuntimeModel {
 	
 	public String getProcessNodeName(String procName);
 	public String getNodeMachineName(String nodeName);
+	public String getProcessStatus(String procName);
 	
 	public String getNodeAttribute(String nodeName, String attrib);
+	
+	/* returns the new job name string that it spawns, unique */
+	public NamedEntity run(String[] args);
+	public NamedEntity abortJob();
 	
 	/* event stuff */
 	public void addRuntimeListener(IRuntimeListener listener);

@@ -137,44 +137,73 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
     			
     			job = new PJob(universe, ne[i].name, PJob.BASE_OFFSET+ne[i].name.substring(new String("job").length()));
     			universe.addChild(job);
-    			
-    			NamedEntity[] ne2 = runtimeModel.getProcesses(ne[i].name);
-    			for(int j=0; j<ne2.length; j++) {
-    				PProcess proc;
-    				System.out.println("process name = "+ne2[j].name);
-    				proc = new PProcess(job, ne2[j].name, ""+j+"", "-1", "-1", "-1", "-1");
-    				job.addChild(proc);
-    				
-    				String pname = proc.getElementName();
-    				String nname = runtimeModel.getProcessNodeName(pname);
-    				String mname = runtimeModel.getNodeMachineName(nname);
-    				System.out.println("Process "+pname+" running on node:");
-    				System.out.println("\t"+nname);
-    				System.out.println("\tand that's running on machine: "+mname);
-    				IPMachine mac = universe.findMachineByName(mname);
-    				if(mac != null) {
-    					IPNode node = mac.findNodeByName(nname);
-    					if(node != null) {
-    						System.out.println("**** THIS NODE IS WHERE THIS PROCESS IS RUNNING!");
-    						/* this sets the data member in both classes stating that this process
-    						 * is running on this node and telling this node that it now has a 
-    						 * child process running on it.
-    						 */
-    						proc.setNode(node);
-    					}
-    				}
-    			}
+    			getProcsForNewJob(ne[i], job);
+
     		}
     		
     		runtimeModel.addRuntimeListener(this);
     }
+   
+    private void getProcsForNewJob(NamedEntity nejob, IPJob job) {
+		NamedEntity[] ne = runtimeModel.getProcesses(nejob.name);
+		for(int j=0; j<ne.length; j++) {
+			PProcess proc;
+			System.out.println("process name = "+ne[j].name);
+			proc = new PProcess(job, ne[j].name, ""+j+"", "-1", "-1", "-1", "-1");
+			job.addChild(proc);
+			
+			String pname = proc.getElementName();
+			String nname = runtimeModel.getProcessNodeName(pname);
+			String mname = runtimeModel.getNodeMachineName(nname);
+			System.out.println("Process "+pname+" running on node:");
+			System.out.println("\t"+nname);
+			System.out.println("\tand that's running on machine: "+mname);
+			IPMachine mac = universe.findMachineByName(mname);
+			if(mac != null) {
+				IPNode node = mac.findNodeByName(nname);
+				if(node != null) {
+					System.out.println("**** THIS NODE IS WHERE THIS PROCESS IS RUNNING!");
+					/* this sets the data member in both classes stating that this process
+					 * is running on this node and telling this node that it now has a 
+					 * child process running on it.
+					 */
+					proc.setNode(node);
+				}
+			}
+			String status = runtimeModel.getProcessStatus(ne[j].name);
+			proc.setStatus(status);
+		}
+    }
+    
+    private void refreshJobStatus(NamedEntity nejob) {
+    	System.out.println("refreshJobStatus("+nejob.name+")");
+    	IPJob job = universe.findJobByName(nejob.name);
+    	if(job != null) {
+    		IPProcess[] procs = job.getProcesses();
+    		if(procs != null) {
+    			for(int i=0; i<procs.length; i++) {
+    				String procName = procs[i].getElementName();
+    				String status = runtimeModel.getProcessStatus(procName);
+    				System.out.println("Status = "+status+" on process - "+procName);
+    				procs[i].setStatus(status);
+    			}
+    		}
+    	}
+    }
 
-	public void runtimeNodeStatusChange(Object object) {
-		System.out.println("LaunchManager.runtimeNodeStatusChange("+object+")");
+	public void runtimeNodeStatusChange(NamedEntity ne) {
+		System.out.println("LaunchManager.runtimeNodeStatusChange("+ne+")");
 		/* so let's find which node this is */
-		IPNode n = universe.findNodeByName(((NamedEntity)object).getName());
+		IPNode n = universe.findNodeByName(ne.getName());
 		if(n != null) {
 			System.out.println("FOUND THE NODE! - "+n);
+		}
+	}
+	
+	public void runtimeProcessOutput(NamedEntity ne, String output) {
+		IPProcess p = universe.findProcessByName(ne.getName());
+		if(p != null) {
+			p.addOutput(output);
 		}
 	}
 
@@ -520,6 +549,9 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
     public synchronized void mpiabort() throws CoreException {
         isSessionExist();
 
+        NamedEntity nejob = runtimeModel.abortJob();
+        refreshJobStatus(nejob);
+        fireState(STATE_ABORT);
         /*
         try {
             MIExecAbort execAbort = factory.createMIExecAbort();
@@ -578,6 +610,7 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
     }
 
     public void execMI(final ILaunch launch, File workingDirectory, String[] envp, final String[] args, IProgressMonitor monitor) throws CoreException {
+    	/* PORT
         IProgressMonitor subMonitor = new SubProgressMonitor(monitor, 5);
         subMonitor.beginTask("Executing job", 10);
         
@@ -602,6 +635,15 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
 	
         subMonitor.subTask("Executing status command");
         mpistatus();
+        */
+    	NamedEntity nejob = runtimeModel.run(args);
+    	if(nejob != null) {
+    		PJob job;
+    		job = new PJob(universe, nejob.name, PJob.BASE_OFFSET+nejob.name.substring(new String("job").length()));
+    		universe.addChild(job);
+    		getProcsForNewJob(nejob, job);
+    		fireState(STATE_RUN);
+    	}
     }
 
     private void removeConsole() {

@@ -29,7 +29,6 @@ public class UIMessage {
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
     public static String getResourceString(String key) {
-    		System.out.println("UIMessage.getResourceString("+key+")");
 		// No point trying if bundle is null as exceptions are costly
 		if (RESOURCE_BUNDLE != null) {
 			try {
