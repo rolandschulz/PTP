@@ -99,22 +99,4 @@ public interface IPUniverse extends IPElement {
 	 * @return		The Process object if found, else null
 	 */
 	public IPProcess findProcessByName(String pname);
-	
-	/**
-	 * If the model or UI or whatever needs to write output this returns a
-	 * directory there can do it in.
-	 * <br>TODO: <i>SLATED FOR REMOVAL</i>
-	 * 
-	 * @return	Directory output can be written to.
-	 */
-	public String getOutputStoreDirectory();
-	
-	/**
-	 * Returns the current line number we have stored up to in an output
-	 * file.
-	 * <br>TODO: <i>SLATED FOR REMOVAL</i>
-	 * 
-	 * @return	The current line output has been written to
-	 */
-	public int getStoreLine();
 }

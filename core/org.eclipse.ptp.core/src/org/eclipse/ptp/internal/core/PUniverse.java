@@ -37,36 +37,21 @@ public class PUniverse extends Parent implements IPUniverse
 {
     protected String NAME_TAG = "universe ";
     
-    protected String outputDirPath = null;
-    protected int storeLine = 0;
-    
+
 	public PUniverse() {
 		/* '1' because this is the only universe */
 		super(null, "TheUniverse", ""+1+"", P_UNIVERSE);
-		setOutputStore();
+		//setOutputStore();
 	}
 	
-	private void setOutputStore() {
-		Preferences preferences = ParallelPlugin.getDefault().getPluginPreferences();
-		outputDirPath = preferences.getString(IOutputTextFileContants.OUTPUT_DIR);
-		storeLine = preferences.getInt(IOutputTextFileContants.STORE_LINE);		
-        if (outputDirPath == null || outputDirPath.length() == 0)
-            outputDirPath = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(IOutputTextFileContants.DEF_OUTPUT_DIR_NAME).toOSString();
-            
-        if (storeLine == 0)
-            storeLine = IOutputTextFileContants.DEF_STORE_LINE;
-        
-        File outputDirectory = new File(outputDirPath);
-        if (!outputDirectory.exists())
-            outputDirectory.mkdir();
-	}
-	
+	/*
 	public String getOutputStoreDirectory() {
 	    return outputDirPath;
 	}
 	public int getStoreLine() {
 	    return storeLine;
 	}
+	*/
 	
 	/* there is a single collection but in this collection we keep two different kinds
 	 * of classes - they are the machines and the jobs.  So we have to go through the

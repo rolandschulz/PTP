@@ -47,9 +47,22 @@ public class ProcessEditorInput implements IEditorInput {
 		return process.equals(other.process);
 	}
 	
+	/**
+	 * From the implementing class IEditorInput.  This method only has to do
+	 * with whether "an editor input should appear in the "File Most Recently 
+	 * Used" menu.  In our case, just return true.
+	 * 
+	 * @see	IEditorInput
+	 */
+	public boolean exists() {
+		/* return process.exists(); */
+		return true;
+	}
+	/*
 	public boolean exists() {
 		return process.exists();
 	}
+	*/
 	
 	public IPProcess getProcess() {
 	    MultiEditorInput l;

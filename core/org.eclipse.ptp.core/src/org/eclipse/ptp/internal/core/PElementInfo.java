@@ -42,11 +42,11 @@ public class PElementInfo {
 	}    
     
 	public void addChild(IPElement member) {
-	    fChildren.put(member.getKey(), member);
+	    fChildren.put(member.getKeyString(), member);
 	}
 
 	public void removeChild(IPElement member) {
-	    fChildren.remove(member.getKey());
+	    fChildren.remove(member.getKeyString());
 	}
 	
 	public IPElement findChild(String key) {
@@ -68,7 +68,7 @@ public class PElementInfo {
 	}
 		
 	public boolean includesChild(IPElement child) {
-		if(fChildren.containsKey(child.getKey()))
+		if(fChildren.containsKey(child.getKeyString()))
 			return true;
 		return false;
 	}	
