@@ -32,7 +32,7 @@ public class ErrorParserManager extends OutputStream {
 	private int nOpens;
 
 	private final static String OLD_PREF_ERROR_PARSER = "errorOutputParser"; //$NON-NLS-1$
-	public final static String PREF_ERROR_PARSER = FortranCorePlugin.PLUGIN_ID + ".errorOutputParser"; //$NON-NLS-1$
+	public final static String PREF_ERROR_PARSER = CommonLanguageCore.PLUGIN_ID + ".errorOutputParser"; //$NON-NLS-1$
 
 	private IProject fProject;
 	private IMarkerGenerator fMarkerGenerator;
@@ -165,7 +165,7 @@ public class ErrorParserManager extends OutputStream {
 				}
 			}, IResource.NONE);
 		} catch (CoreException e) {
-			FortranCorePlugin.log(e.getStatus());
+			CommonLanguageCore.log(e.getStatus());
 		}
 	}
 
