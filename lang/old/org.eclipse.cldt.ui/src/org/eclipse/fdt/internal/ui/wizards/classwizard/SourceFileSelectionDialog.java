@@ -273,7 +273,7 @@ public class SourceFileSelectionDialog extends SelectionStatusDialog {
 					status.setError(NewClassWizardMessages.getFormattedString("SourceFileSelectionDialog.error.NotASourceFolder", str)); //$NON-NLS-1$
 					return status;
 				}
-			    if (!CoreModel.hasCNature(proj)) {
+			    if (!CoreModel.hasFortranNature(proj)) {
 					if (resType == IResource.PROJECT) {
 						status.setError(NewClassWizardMessages.getString("SourceFileSelectionDialog.warning.NotACProject")); //$NON-NLS-1$
 						return status;
@@ -324,7 +324,7 @@ public class SourceFileSelectionDialog extends SelectionStatusDialog {
 						status.setError(NewClassWizardMessages.getFormattedString("SourceFileSelectionDialog.error.NotASourceFile", str)); //$NON-NLS-1$
 						return status;
 					}
-				    if (!CoreModel.hasCNature(proj)) {
+				    if (!CoreModel.hasFortranNature(proj)) {
 						status.setWarning(NewClassWizardMessages.getString("SourceFileSelectionDialog.warning.NotInACProject")); //$NON-NLS-1$
 					}
 				} else {

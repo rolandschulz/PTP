@@ -918,7 +918,7 @@ public class NewClassCreationWizardPage extends NewElementWizardPage {
 					status.setError(NewClassWizardMessages.getFormattedString("NewClassCreationWizardPage.error.NotAFolder", folderPath)); //$NON-NLS-1$
 					return status;
 				}
-			    if (!CoreModel.hasCNature(proj)) {
+			    if (!CoreModel.hasFortranNature(proj)) {
 					if (resType == IResource.PROJECT) {
 						status.setError(NewClassWizardMessages.getString("NewClassCreationWizardPage.warning.NotACProject")); //$NON-NLS-1$
 						return status;
@@ -1306,7 +1306,7 @@ public class NewClassCreationWizardPage extends NewElementWizardPage {
 				}
 
 				fileExists = true;
-			    if (!CoreModel.hasCNature(proj)) {
+			    if (!CoreModel.hasFortranNature(proj)) {
 					status.setWarning(NewClassWizardMessages.getString("NewClassCreationWizardPage.warning.NotInACProject")); //$NON-NLS-1$
 				} else {
 				    status.setWarning(NewClassWizardMessages.getString("NewClassCreationWizardPage.warning.HeaderFileExists")); //$NON-NLS-1$
@@ -1375,7 +1375,7 @@ public class NewClassCreationWizardPage extends NewElementWizardPage {
 				}
 
 				fileExists = true;
-			    if (!CoreModel.hasCNature(proj)) {
+			    if (!CoreModel.hasFortranNature(proj)) {
 					status.setWarning(NewClassWizardMessages.getString("NewClassCreationWizardPage.warning.NotInACProject")); //$NON-NLS-1$
 				} else {
 				    status.setWarning(NewClassWizardMessages.getString("NewClassCreationWizardPage.warning.SourceFileExists")); //$NON-NLS-1$

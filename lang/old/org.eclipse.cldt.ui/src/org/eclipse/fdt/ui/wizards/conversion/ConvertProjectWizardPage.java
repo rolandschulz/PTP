@@ -504,16 +504,19 @@ public abstract class ConvertProjectWizardPage
     }
 	protected void addCNature(IProject project, IProgressMonitor monitor, boolean addMakeBuilder) throws CoreException{
 		if ( getWizard() instanceof ConversionWizard) {
-     		FortranCorePlugin.getDefault().convertProjectToC(project, monitor, ((ConversionWizard)getWizard()).getProjectID());
+			// TODO Remove convert option
+     		// FortranCorePlugin.getDefault().convertProjectToC(project, monitor, ((ConversionWizard)getWizard()).getProjectID());
 		}
      }
      
      protected void addCCNature(IProject project, IProgressMonitor monitor, boolean addMakeBuilder) throws CoreException{
 		if ( getWizard() instanceof ConversionWizard) {
 	     	if (project.hasNature(FortranProjectNature.FORTRAN_NATURE_ID)) {     		
-		     	FortranCorePlugin.getDefault().convertProjectFromCtoCC(project, monitor);
+				// TODO Remove convert option
+		     	// FortranCorePlugin.getDefault().convertProjectFromCtoCC(project, monitor);
      		} else {
-	     		FortranCorePlugin.getDefault().convertProjectToCC(project, monitor, ((ConversionWizard)getWizard()).getProjectID());
+				// TODO Remove convert option
+	     		// FortranCorePlugin.getDefault().convertProjectToCC(project, monitor, ((ConversionWizard)getWizard()).getProjectID());
      		}
 		}
      }
