@@ -103,7 +103,7 @@ public interface IPUniverse extends IPElement {
 	/**
 	 * If the model or UI or whatever needs to write output this returns a
 	 * directory there can do it in.
-	 * <br><i>SLATED FOR REMOVAL</i>
+	 * <br>TODO: <i>SLATED FOR REMOVAL</i>
 	 * 
 	 * @return	Directory output can be written to.
 	 */
@@ -112,7 +112,7 @@ public interface IPUniverse extends IPElement {
 	/**
 	 * Returns the current line number we have stored up to in an output
 	 * file.
-	 * <br><i>SLATED FOR REMOVAL</i>
+	 * <br>TODO: <i>SLATED FOR REMOVAL</i>
 	 * 
 	 * @return	The current line output has been written to
 	 */
