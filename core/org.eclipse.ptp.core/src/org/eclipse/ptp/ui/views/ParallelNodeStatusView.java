@@ -503,6 +503,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
         System.out.println("ParallelNodeStatusView - status");
         refreshAllProcsStatus();
         updateButton();
+        refresh(false, null);
     }
     
     /* iterates through the IPNode array to find the one that corresponds
@@ -712,7 +713,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
 	    col1 = new TableColumn(BRtable, SWT.LEFT);
 	    col1.setWidth(25);
 	    col2 = new TableColumn(BRtable, SWT.LEFT);
-	    col2.setWidth(80);
+	    col2.setWidth(120);
 	
 	    GridData gdtext = new GridData();
 	    gdtext.grabExcessVerticalSpace = true;
@@ -1551,7 +1552,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements IPar
 					else if(procs[i].getStatus().equals(IPProcess.ERROR)) {
 						item.setImage(0, statusImages[PROC_ERROR][NOT_SELECTED]);
 					}
-					item.setText(1, "Process "+procs[i].getProcessNumber());
+					item.setText(1, "Process "+procs[i].getProcessNumber()+", Job "+procs[i].getJob().getJobNumber());
 				}
 			}
 		}

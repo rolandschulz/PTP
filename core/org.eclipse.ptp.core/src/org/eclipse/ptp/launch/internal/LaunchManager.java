@@ -135,7 +135,13 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
     			
     			System.out.println("JOB: "+ne[i].name);
     			
-    			job = new PJob(universe, ne[i].name, PJob.BASE_OFFSET+ne[i].name.substring(new String("job").length()));
+    			int x = 0;
+    			try {
+    				x = (new Integer(ne[i].name.substring(3))).intValue();
+    			}
+    			catch(NumberFormatException e) {
+    			}
+    			job = new PJob(universe, ne[i].name, ""+(PJob.BASE_OFFSET+x)+"");
     			universe.addChild(job);
     			getProcsForNewJob(ne[i], job);
 
@@ -146,6 +152,7 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
    
     private void getProcsForNewJob(NamedEntity nejob, IPJob job) {
 		NamedEntity[] ne = runtimeModel.getProcesses(nejob.name);
+		System.out.println("getProcsForNewJob:"+nejob.name+" - #procs = "+ne.length);
 		for(int j=0; j<ne.length; j++) {
 			PProcess proc;
 			//System.out.println("process name = "+ne[j].name);
@@ -188,6 +195,7 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
     				procs[i].setStatus(status);
     			}
     		}
+    		fireEvent(job, EVENT_UPDATED_STATUS);
     	}
     }
 
@@ -227,6 +235,39 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
                 clearUsedMemory();
             }
         }*/
+	}
+	
+	public void runtimeJobStateChanged(NamedEntity ne) {
+		refreshJobStatus(ne);
+	}
+	
+	public void runtimeNewJob(NamedEntity ne) {
+		IPJob job = universe.findJobByName(ne.getName());
+		/* if it already existed, then destroy it first */
+		if(job != null) {
+    		IPProcess[] procs = job.getProcesses();
+    		for(int i=0; i<procs.length; i++) {
+    			IPNode node = procs[i].getNode();
+    			node.removeChild(procs[i]);
+    		}
+    		job.removeChildren();
+    		universe.removeChild(job);	
+		}
+		
+    	PJob pjob;
+    	
+		int x = 0;
+		try {
+			x = (new Integer(ne.name.substring(3))).intValue();
+		}
+		catch(NumberFormatException e) {
+		}
+		pjob = new PJob(universe, ne.name, ""+(PJob.BASE_OFFSET+x)+"");
+    	
+       	universe.addChild(pjob);
+    	getProcsForNewJob(ne, pjob);
+    	
+    	fireEvent(job, EVENT_UPDATED_STATUS);
 	}
 
     private IPerspectiveListener perspectiveListener = new IPerspectiveListener() {
@@ -674,12 +715,19 @@ public class LaunchManager implements ILaunchManager, IRuntimeListener {
     		myjob = null;
     	}
 
-    	
     	NamedEntity nejob = runtimeModel.run(args);
     	if(nejob != null) {
     		PJob job;
-    		job = new PJob(universe, nejob.name, PJob.BASE_OFFSET+nejob.name.substring(new String("job").length()));
-    		myjob = job;
+    	
+			int x = 0;
+			try {
+				x = (new Integer(nejob.name.substring(3))).intValue();
+			}
+			catch(NumberFormatException e) {
+			}
+			job = new PJob(universe, nejob.name, ""+(PJob.BASE_OFFSET+x)+"");
+    
+			myjob = job;
     		universe.addChild(job);
     		getProcsForNewJob(nejob, job);
     		fireState(STATE_RUN);

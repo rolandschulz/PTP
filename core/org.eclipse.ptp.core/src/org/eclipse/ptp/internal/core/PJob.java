@@ -54,6 +54,20 @@ public class PJob extends Parent implements IPJob {
 		return (IPMachine[])array.toArray(new IPMachine[array.size()]);
 	}
 	
+	public String getJobNumber() {
+		String s = getKey();
+		int i = -1;
+		try {
+			i = (new Integer(s)).intValue();
+		}
+		catch(NumberFormatException e) {
+		}
+		if(i != -1) {
+			return ""+(i - BASE_OFFSET)+"";
+		}
+		else return "";
+	}
+	
 	public synchronized IPNode[] getSortedNodes() {
 	    IPNode[] nodes = getNodes();
 	    sort(nodes);

@@ -43,7 +43,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 	/* define how many nodes each machine has - the array length must equal
 	 * numMachines
 	 */
-	final static int[] numNodes = { 256, 64, 128, 512 };
+	final static int[] numNodes = { 256, 256, 64, 512 };
 	protected HashMap nodeMap;
 	protected HashMap nodeUserMap;
 	protected HashMap nodeGroupMap;
@@ -51,11 +51,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 	protected HashMap nodeStateMap;
 	
 	/* define the number of jobs here */
-	final static int numFakeJobs = 2;
-	/* define how many processes are in each job - the array length must
-	 * equal numJobs
-	 */
-	final static int[] numFakeProcesses = { 3, 5 };
+	final static int numFakeJobs = 3;
 	protected HashMap processMap;
 	
 	protected List listeners = new ArrayList(2);
@@ -64,6 +60,9 @@ public class DummyRuntimeModel implements IRuntimeModel {
 	protected int spawned_num_procs = 0;
 	protected int spawned_procs_per_node = 0;
 	protected int spawned_first_node = 0;
+	
+	protected String fake_job1_state = null;
+	protected String fake_job2_state = null;
 	
 	protected Thread runningAppEventsThread = null;
 	protected Thread runningAppFinishThread = null;
@@ -75,11 +74,14 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			nodeMap.put(s, new Integer(numNodes[i]));
 		}
 
+		
 		processMap = new HashMap();
+		/*
 		for(int i=0; i<numFakeJobs; i++) {
 			String s = new String("job"+i);
 			processMap.put(s, new Integer(numFakeProcesses[i]));
 		}
+		*/
 		
 		int totnodes = 0;
 		for(int i=0; i<numMachines; i++) {
@@ -149,6 +151,232 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			
 		}
 		
+		for(int i=0; i<numNodes[0]; i++) {
+			String s = new String("machine0_node"+i);
+			nodeStateMap.put(s, new String("up"));
+			nodeUserMap.put(s, new String(System.getProperty("user.name")));
+			nodeGroupMap.put(s, new String("ptp"));
+			nodeModeMap.put(s, new String("0100"));
+		}
+		
+		for(int i=0; i<numNodes[1]; i++) {
+			String s = new String("machine1_node"+i);
+			nodeStateMap.put(s, new String("up"));
+			if(i < 32) {
+				nodeUserMap.put(s, new String(System.getProperty("user.name")));
+				nodeGroupMap.put(s, new String("ptp"));
+				nodeModeMap.put(s, new String("0100"));
+			}
+			else if(i < 64) {
+				nodeUserMap.put(s, new String(""));
+				nodeGroupMap.put(s, new String(""));
+				nodeModeMap.put(s, new String("0111"));
+			}
+			else if(i < 128) {
+				nodeUserMap.put(s, new String("wjones"));
+				nodeGroupMap.put(s, new String("parl"));
+				nodeModeMap.put(s, new String("0100"));
+			}
+			else {
+				nodeUserMap.put(s, new String("jsmith"));
+				nodeGroupMap.put(s, new String("awhere"));
+				nodeModeMap.put(s, new String("0111"));	
+			}
+		}
+		
+		/* fake job 0 running on machine[1] */
+		String s = new String("job0");
+		processMap.put(s, new Integer(32));
+		
+		Runnable runningAppEventsRunnable = new Runnable() {
+			public void run() {
+				String job = new String("job0");
+				int numProcsInJob = ((Integer)(processMap.get(job))).intValue();
+			
+				while(true) {
+					try {
+						Thread.sleep(1000 + ((int)(Math.random() * 3000)));
+					} catch(Exception e) {	
+					}
+					for(int i=0; i<numProcsInJob; i++) {
+						RuntimeEvent event = new RuntimeEvent(RuntimeEvent.EVENT_PROCESS_OUTPUT);
+						event.setText((int)(Math.random() * 10000)+" random text");
+						fireEvent(new NamedEntity("job0_process"+i), event);
+					}
+				}
+			}
+		};
+		runningAppEventsThread = new Thread(runningAppEventsRunnable);
+		runningAppEventsThread.start();
+		
+		for(int i=0; i<numNodes[2]; i++) {
+			s = new String("machine2_node"+i);
+			nodeStateMap.put(s, new String("up"));
+			nodeUserMap.put(s, new String(System.getProperty("user.name")));
+			nodeGroupMap.put(s, new String("ptp"));
+			nodeModeMap.put(s, new String("0100"));
+		}
+		
+		/* fake job 1 running on machine[1] */
+		s = new String("job1");
+		int ra = ((int)(Math.random() * 5));
+		if(ra == 0) processMap.put(s, new Integer(4));
+		else if(ra == 1) processMap.put(s, new Integer(8));
+		else if(ra == 2) processMap.put(s, new Integer(16));
+		else if(ra == 3) processMap.put(s, new Integer(32));
+		else if(ra == 4) processMap.put(s, new Integer(64));
+
+		fake_job1_state = IPProcess.RUNNING;
+		
+		runningAppEventsRunnable = new Runnable() {
+			public void run() {
+				String job = new String("job1");
+				int numProcsInJob = ((Integer)(processMap.get(job))).intValue();
+				int cnt = 0;
+			
+				while(true) {
+					try {
+						Thread.sleep(1000 + ((int)(Math.random() * 3000)));
+						cnt++;
+					} catch(Exception e) {	
+					}
+					if(cnt == 10) {
+						fake_job1_state = IPProcess.EXITED;
+						fireEvent(new NamedEntity("job1"), new RuntimeEvent(RuntimeEvent.EVENT_JOB_STATE_CHANGED));
+					}
+					else if(cnt == 15) {
+						numProcsInJob = ((Integer)(processMap.get(job))).intValue();
+						processMap.remove(new String("job1"));
+						int newnum = 0;
+						while(true) {
+							int r = ((int)(Math.random() * 5));
+							if(r == 0 && numProcsInJob != 4) {
+								newnum = 4;
+								break;
+							}
+							else if(r == 1 && numProcsInJob != 8) {
+								newnum = 8;
+								break;
+							}
+							else if(r == 2 && numProcsInJob != 16) {
+								newnum = 16;
+								break;
+							}
+							else if(r == 3 && numProcsInJob != 32) {
+								newnum = 32;
+								break;
+							}
+							else if(r == 4 && numProcsInJob != 64) {
+								newnum = 64;
+								break;
+							}
+						}
+						processMap.put(new String("job1"), new Integer(newnum));
+						fake_job1_state = IPProcess.STARTING;
+						fireEvent(new NamedEntity("job1"), new RuntimeEvent(RuntimeEvent.EVENT_NEW_JOB));
+					}
+					else if(cnt == 20) {
+						fake_job1_state = IPProcess.RUNNING;
+						fireEvent(new NamedEntity("job1"), new RuntimeEvent(RuntimeEvent.EVENT_JOB_STATE_CHANGED));
+						cnt = 0;
+					}
+					else if(fake_job1_state == IPProcess.RUNNING) {
+						for(int i=0; i<numProcsInJob; i++) {
+							RuntimeEvent event = new RuntimeEvent(RuntimeEvent.EVENT_PROCESS_OUTPUT);
+							event.setText((int)(Math.random() * 10000)+" random text");
+							fireEvent(new NamedEntity("job1_process"+i), event);
+						}
+					}
+				}
+			}
+		};
+		runningAppEventsThread = new Thread(runningAppEventsRunnable);
+		runningAppEventsThread.start();
+		
+		/* fake job 2 running on machine[1] */
+		s = new String("job2");
+		ra = ((int)(Math.random() * 6));
+		if(ra == 0) processMap.put(s, new Integer(4));
+		else if(ra == 1) processMap.put(s, new Integer(8));
+		else if(ra == 2) processMap.put(s, new Integer(16));
+		else if(ra == 3) processMap.put(s, new Integer(32));
+		else if(ra == 4) processMap.put(s, new Integer(64));
+		else if(ra == 5) processMap.put(s, new Integer(128));
+
+		fake_job2_state = IPProcess.RUNNING;
+		
+		runningAppEventsRunnable = new Runnable() {
+			public void run() {
+				String job = new String("job2");
+				int numProcsInJob = ((Integer)(processMap.get(job))).intValue();
+				int cnt = 0;
+			
+				while(true) {
+					try {
+						Thread.sleep(1000 + ((int)(Math.random() * 1000)));
+						cnt++;
+					} catch(Exception e) {	
+					}
+					if(cnt == 10) {
+						fake_job2_state = IPProcess.EXITED;
+						fireEvent(new NamedEntity("job2"), new RuntimeEvent(RuntimeEvent.EVENT_JOB_STATE_CHANGED));
+					}
+					else if(cnt == 15) {
+						numProcsInJob = ((Integer)(processMap.get(job))).intValue();
+						processMap.remove(new String("job2"));
+						int newnum = 0;
+						while(true) {
+							int r = ((int)(Math.random() * 5));
+							if(r == 0 && numProcsInJob != 4) {
+								newnum = 4;
+								break;
+							}
+							else if(r == 1 && numProcsInJob != 8) {
+								newnum = 8;
+								break;
+							}
+							else if(r == 2 && numProcsInJob != 16) {
+								newnum = 16;
+								break;
+							}
+							else if(r == 3 && numProcsInJob != 32) {
+								newnum = 32;
+								break;
+							}
+							else if(r == 4 && numProcsInJob != 64) {
+								newnum = 64;
+								break;
+							}
+							else if(r == 5 && numProcsInJob != 128) {
+								newnum = 128;
+								break;
+							}
+						}
+						processMap.put(new String("job2"), new Integer(newnum));
+						fake_job2_state = IPProcess.STARTING;
+						fireEvent(new NamedEntity("job2"), new RuntimeEvent(RuntimeEvent.EVENT_NEW_JOB));
+					}
+					else if(cnt == 20) {
+						fake_job2_state = IPProcess.RUNNING;
+						fireEvent(new NamedEntity("job2"), new RuntimeEvent(RuntimeEvent.EVENT_JOB_STATE_CHANGED));
+						cnt = 0;
+					}
+					else if(fake_job2_state == IPProcess.RUNNING) {
+						for(int i=0; i<numProcsInJob; i++) {
+							RuntimeEvent event = new RuntimeEvent(RuntimeEvent.EVENT_PROCESS_OUTPUT);
+							event.setText((int)(Math.random() * 10000)+" random text");
+							fireEvent(new NamedEntity("job1_process"+i), event);
+						}
+					}
+				}
+			}
+		};
+		runningAppEventsThread = new Thread(runningAppEventsRunnable);
+		runningAppEventsThread.start();
+		
+		
+		
+		/*]\
 		for(int i=0; i<numMachines - 1; i++) {
 			for(int j=0; j<numNodes[i]; j++) {
 				String s = new String("machine"+i+"_node"+j);
@@ -157,7 +385,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 				nodeGroupMap.put(s, new String("root"));
 				nodeModeMap.put(s, new String("0111"));
 			}
-		}
+		}*/
 		
 		startDummyEventGeneration();
 	}
@@ -178,7 +406,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 		 * we've already spawned, like fakeJob = 2 would take
 		 * up elements 0 and 1, so '2' would be next!
 		 */
-		String s = new String("job"+numFakeJobs);
+		final String s = new String("job"+numFakeJobs);
 
 		spawned_num_procs = spawned_procs_per_node = spawned_first_node = 0;
 		
@@ -226,16 +454,18 @@ public class DummyRuntimeModel implements IRuntimeModel {
 		Runnable runningAppFinishRunnable = new Runnable() {
 			public void run() {
 				try {
-					Thread.sleep(10000);
+					Thread.sleep(30000);
 				} catch(Exception e) { 
 				}
 				if(!spawned_app_state.equals(IPProcess.RUNNING)) return;
 				
 				spawned_app_state = IPProcess.EXITED;
 				
-				System.out.println("Application terminated normally.");
+				System.out.println("Simulating spawned application terminating normally.");
 				
+				processMap.remove(s);
 				fireEvent(new NamedEntity("job"+numFakeJobs), new RuntimeEvent(RuntimeEvent.EVENT_JOB_EXITED));
+				
 			}
 		};
 		
@@ -293,6 +523,12 @@ public class DummyRuntimeModel implements IRuntimeModel {
 				break;
 			case RuntimeEvent.EVENT_JOB_EXITED:
 				listener.runtimeJobExited(ne);
+				break;
+			case RuntimeEvent.EVENT_JOB_STATE_CHANGED:
+				listener.runtimeJobStateChanged(ne);
+				break;
+			case RuntimeEvent.EVENT_NEW_JOB:
+				listener.runtimeNewJob(ne);
 				break;
 			}
 		}
@@ -391,14 +627,24 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			}
 		}
 		
-		if(procName.equals("job0_process0")) return "machine1_node0";
-		if(procName.equals("job0_process1")) return "machine1_node0";
-		if(procName.equals("job0_process2")) return "machine1_node1";
-		if(procName.equals("job1_process0")) return "machine1_node2";
-		if(procName.equals("job1_process1")) return "machine1_node1";
-		if(procName.equals("job1_process2")) return "machine2_node0";
-		if(procName.equals("job1_process3")) return "machine2_node1";
-		if(procName.equals("job1_process4")) return "machine2_node2";
+		String s = procName.substring(procName.indexOf("process")+7, procName.length());
+		int procNum = -1;
+		try {
+			procNum = (new Integer(s)).intValue();
+		}
+		catch(NumberFormatException e) {
+		}
+		if(procNum != -1) {
+			if(job.equals("job0")) {
+				return "machine1_node"+procNum;
+			}
+			else if(job.equals("job1")) {
+				return "machine1_node"+(procNum + 64);
+			}
+			else if(job.equals("job2")) {
+				return "machine1_node"+(procNum + 128);
+			}
+		}
 		return "";
 	}
 	
@@ -408,6 +654,15 @@ public class DummyRuntimeModel implements IRuntimeModel {
 		if(job.equals("job"+numFakeJobs)) {
 			//System.out.println("PROCSTATE = "+spawned_app_state);
 			return spawned_app_state;
+		}
+		else if(job.equals("job0")) {
+			return IPProcess.RUNNING;
+		}
+		else if(job.equals("job1")) {
+			return fake_job1_state;
+		}
+		else if(job.equals("job2")) {
+			return fake_job2_state;
 		}
 		return "-1";
 	}

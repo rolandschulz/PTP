@@ -22,4 +22,6 @@ public interface IRuntimeListener {
     public void runtimeNodeStatusChange(NamedEntity ne);
     public void runtimeProcessOutput(NamedEntity ne, String output);
     public void runtimeJobExited(NamedEntity ne);
+    public void runtimeJobStateChanged(NamedEntity ne);
+    public void runtimeNewJob(NamedEntity ne);
 }
