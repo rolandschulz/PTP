@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin
-	id="org.eclipse.pdt"
-	name="Parallel Plug-in"
+	id="org.eclipse.ptp"
+	name="Parallel Tools Platform Plug-in"
 	version="1.0.0"
 	provider-name="LANL"
-	class="org.eclipse.pdt.ParallelPlugin">
+	class="org.eclipse.ptp.ParallelPlugin">
 
 	<runtime>
 		<library name="parallel.jar">
@@ -25,7 +25,8 @@
 		<import plugin="org.eclipse.ui.workbench.texteditor"/>
 		<import plugin="org.eclipse.ui.editors"/>
 		<import plugin="org.eclipse.jface.text"/>
-		<import plugin="org.eclipse.pdt.mi"/>
+<!--		<import plugin="org.eclipse.pdt.mi"/>
+-->
 		<import plugin="org.eclipse.ui.forms"/>
 		<import plugin="org.eclipse.cdt.debug.core"/>
 		<import plugin="org.eclipse.cdt.launch"/>
