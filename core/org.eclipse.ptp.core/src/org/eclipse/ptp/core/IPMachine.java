@@ -79,7 +79,7 @@ public interface IPMachine extends IPElement {
 	
 	/**
 	 * Returns a sorted array of all the Processes on Nodes of this Machine.
-	 * May return <code>null</null> if there are none.  The type of sorting is
+	 * May return <code>null</code> if there are none.  The type of sorting is
 	 * left open to the implementers of this interface.
 	 * 
 	 * @return	The Processes on this Machine, sorted - <code>null</code> if there
