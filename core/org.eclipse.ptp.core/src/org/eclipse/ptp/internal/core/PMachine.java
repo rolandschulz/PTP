@@ -1,24 +1,19 @@
 package org.eclipse.ptp.internal.core;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.pdt.mi.MISession;
-import org.eclipse.ptp.ParallelPlugin;
-import org.eclipse.ptp.core.IOutputTextFileContants;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPUniverse;
 
 public class PMachine extends Parent implements IPMachine 
 {
 	protected String NAME_TAG = "machine ";
+	protected String arch = "undefined";
 	
 	public PMachine(IPUniverse uni, String name) {
 		super(uni, name, P_MACHINE);
@@ -186,91 +181,71 @@ public class PMachine extends Parent implements IPMachine
 
         return (IPProcess[])array.toArray(new IPProcess[array.size()]);
 	}
-
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPMachine#findProcess(java.lang.String, java.lang.String)
+	
+	/* returns a sorted list of processes running on this machine (which may span
+	 * multiple jobs) 
 	 */
-	public IPProcess findProcess(String nodeNumber, String processNumber) {
-		// TODO Auto-generated method stub
-		return null;
+	public synchronized IPProcess[] getSortedProcesses() {
+	    IPProcess[] processes = getProcesses();
+	    sort(processes);
+	    return processes;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPMachine#findProcess(java.lang.String)
-	 */
-	public IPProcess findProcess(String processNumber) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPMachine#getSortedProcesses()
-	 */
-	public IPProcess[] getSortedProcesses() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPMachine#totalNodes()
-	 */
-	public int totalNodes() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPMachine#totalProcesses()
-	 */
-	public int totalProcesses() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPMachine#removeAllProcesses()
+	
+	/* removes all the processes assocated with this machine.  NOTE: this can 
+	 * remove processes from multiple jobs.  the children of this machine, the
+	 * nodes, are NOT removed as they need to be present for machine status
 	 */
 	public void removeAllProcesses() {
-		// TODO Auto-generated method stub
-		
+	    IPProcess[] processes = getProcesses();
+        for (int i=0; i<processes.length; i++)
+            processes[i].clearOutput();
+        
+        removeChildren();
+	}
+	
+	/* returns all the nodes comprised by this machine, which is just the size() of
+	 * its children group
+	 */
+	public int totalNodes() {
+	    return size();
+	}
+	
+	/* counts all the processes running on this machine, which may span multiple
+	 * jobs.  accomplished by checking all the children processes running on
+	 * all the nodes comprised by this machine
+	 */
+	public int totalProcesses() {
+	    int counter = 0;
+        IPNode[] nodes = getNodes();
+        for (int i=0; i<nodes.length; i++)
+            counter += nodes[i].size();
+
+        return counter;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPMachine#getJobs()
+	/* returns all the jobs that are running on this machine.  this is accomplished
+	 * by looking at all the processes running on the nodes and finding the unique
+	 * set of jobs that those processes belong to
 	 */
-	public IPJob[] getJobs() {
-		// TODO Auto-generated method stub
-		return null;
+	public synchronized IPJob[] getJobs() {
+		IPProcess[] processes = getProcesses();
+	    List array = new ArrayList(0);
+	    for(int i=0; i<processes.length; i++) {
+	    		if(!array.contains(processes[i].getJob())) {
+	    			array.add(processes[i].getJob());
+	    		}
+	    }
+	    return (IPJob[])array.toArray(new IPJob[array.size()]);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPMachine#getArch()
-	 */
+	/* returns a string representation of the architecture of this machine */
 	public String getArch() {
-		// TODO Auto-generated method stub
-		return null;
+		return arch;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.core.IPMachine#setArch(java.lang.String)
-	 */
-	public void setArch(String arch) {
-		// TODO Auto-generated method stub
-		
-	}	
-	
-	/* returns a String representing the architecture in some form */
-	
-	/*
-	public String getArch() {
-		return this.arch;
-	}
-	/* sets the architecture, should be used by instantiating classes and such */
-	
-	/*
+
+	/* sets the architecture of this machine, which is merely a string */
 	public void setArch(String arch) {
 		this.arch = arch;
-	}
-	*/
+	}	
 }

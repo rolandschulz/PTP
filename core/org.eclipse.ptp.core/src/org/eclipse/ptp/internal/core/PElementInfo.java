@@ -1,3 +1,4 @@
+
 package org.eclipse.ptp.internal.core;
 
 import java.util.Collection;
