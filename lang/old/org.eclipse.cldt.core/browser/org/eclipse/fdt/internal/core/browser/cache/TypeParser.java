@@ -526,14 +526,14 @@ public class TypeParser implements ISourceElementRequestor {
 			
 			fParser.parse();
 		} catch (ParserFactoryError e) {
-			FortranCorePlugin.log(e);
+			CommonLanguageCore.log(e);
 		} catch (ParseError e) {
 			// no need to log
-			// FortranCorePlugin.log(e);
+			// CommonLanguageCore.log(e);
 		} catch (OperationCanceledException e) {
 			throw new InterruptedException();
 		} catch (Exception e) {
-			FortranCorePlugin.log(e);
+			CommonLanguageCore.log(e);
 		} finally {
 			// stop timer
 			fTimeoutThread.stopTimer();

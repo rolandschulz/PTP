@@ -16,7 +16,7 @@ import java.io.RandomAccessFile;
 import java.util.Vector;
 
 import org.eclipse.fdt.core.CommonLanguageCore;
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.utils.coff.ReadMemoryAccess;
 
 /**
@@ -74,7 +74,7 @@ public class AR {
 				file.read(ar_fmag);
 			} catch (IOException e) {
 				dispose();
-				FortranCorePlugin.log(e);
+				CommonLanguageCore.log(e);
 			}
 		}
 
@@ -171,7 +171,7 @@ public class AR {
 				checksum = memory.getInt();
 			} catch (IOException e) {
 				dispose();
-				FortranCorePlugin.log(e);
+				CommonLanguageCore.log(e);
 			}
 		}
 		

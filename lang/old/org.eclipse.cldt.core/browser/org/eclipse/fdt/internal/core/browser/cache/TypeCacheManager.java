@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.core.browser.IQualifiedTypeName;
 import org.eclipse.fdt.core.browser.ITypeCacheChangedListener;
 import org.eclipse.fdt.core.browser.ITypeInfo;
@@ -352,8 +352,8 @@ public class TypeCacheManager implements ITypeCacheChangedListener {
 		    final ITypeCacheChangedListener listener = (ITypeCacheChangedListener) i.next();
     		Platform.run(new ISafeRunnable() {
     			public void handleException(Throwable e) {
-    				IStatus status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, IStatus.ERROR, "Exception occurred in listener of type cache change notification", e); //$NON-NLS-1$
-    			    FortranCorePlugin.log(status);
+    				IStatus status = new Status(IStatus.ERROR, CommonLanguageCore.PLUGIN_ID, IStatus.ERROR, "Exception occurred in listener of type cache change notification", e); //$NON-NLS-1$
+    			    CommonLanguageCore.log(status);
     			}
     			public void run() throws Exception {
     				listener.typeCacheChanged(project);

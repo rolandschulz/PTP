@@ -16,7 +16,7 @@ import java.io.RandomAccessFile;
 import java.util.Vector;
 
 import org.eclipse.fdt.core.CommonLanguageCore;
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 
 /**
  *  The <code>AR</code> class is used for parsing standard XCOFF32 archive (ar) files.
@@ -73,7 +73,7 @@ public class AR {
 				
 			} catch (IOException e) {
 				dispose();
-				FortranCorePlugin.log(e);
+				CommonLanguageCore.log(e);
 			}
 		}
 

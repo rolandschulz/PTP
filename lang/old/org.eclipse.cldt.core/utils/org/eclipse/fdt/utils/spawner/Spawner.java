@@ -18,7 +18,7 @@ import java.io.OutputStream;
 import java.util.StringTokenizer;
 
 import org.eclipse.fdt.core.CommonLanguageCore;
-import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.CommonLanguageCore;
 import org.eclipse.fdt.utils.pty.PTY;
 
 public class Spawner extends Process {
@@ -319,9 +319,9 @@ public class Spawner extends Process {
 		try {
 			System.loadLibrary("spawner"); //$NON-NLS-1$
 		} catch (SecurityException e) {
-			FortranCorePlugin.log(e);
+			CommonLanguageCore.log(e);
 		} catch (UnsatisfiedLinkError e) {
-			FortranCorePlugin.log(e);
+			CommonLanguageCore.log(e);
 		}
 	}
 
