@@ -18,11 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.core;
 
-import org.eclipse.pdt.mi.MISession;
-
-/**
- * 
- */
 public interface IPJob extends IPElement {
 	/* helper functions to get the nodes that this job is running on.  This should
 	 * be accomplished by going through all the processes of this job and seeing

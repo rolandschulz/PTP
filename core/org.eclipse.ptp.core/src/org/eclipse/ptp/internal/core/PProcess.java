@@ -46,7 +46,7 @@ public class PProcess extends Parent implements IPProcess {
 		this.exitCode = exitCode;
 		setStatus(status);
 		IPJob job = getJob();
-		outputFile = new OutputTextFile(processNumber, job.getOutputStoreDirectory(), job.getStoreLine());
+		//outputFile = new OutputTextFile(processNumber, job.getOutputStoreDirectory(), job.getStoreLine());
 	}
 	
 	public IPJob getJob() {
@@ -127,7 +127,6 @@ public class PProcess extends Parent implements IPProcess {
 		//return (String[]) outputList.toArray( array );
         return null;
     }
-    
 
     public void clearOutput() {
         outputFile.delete();
