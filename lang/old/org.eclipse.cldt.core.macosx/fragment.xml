@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <fragment
-   id="org.eclipse.fdt.core.macosx"
+   id="org.eclipse.cldt.core.macosx"
    name="%fragmentName.macosx"
    version="3.0.0"
    provider-name="%providerName"
-   plugin-id="org.eclipse.fdt.core"
+   plugin-id="org.eclipse.cldt.core"
    plugin-version="3.0.0">
 
    <runtime>
-      <library name="fdt_macosx.jar"/>
+      <library name="cldt_macosx.jar"/>
    </runtime>
 
 
    <extension
-         point="org.eclipse.fdt.core.ProcessList">
+         point="org.eclipse.cldt.core.ProcessList">
       <processList
       		platform="macosx"
-            class="org.eclipse.fdt.internal.core.macosx.ProcessList">
+            class="org.eclipse.cldt.internal.core.macosx.ProcessList">
       </processList>
    </extension>
 </fragment>

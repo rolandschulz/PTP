@@ -1,12 +1,12 @@
-package org.eclipse.fdt.internal.core.macosx;
+package org.eclipse.cldt.internal.core.macosx;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import org.eclipse.fdt.core.IProcessInfo;
-import org.eclipse.fdt.core.IProcessList;
-import org.eclipse.fdt.utils.spawner.ProcessFactory;
+import org.eclipse.cldt.core.IProcessInfo;
+import org.eclipse.cldt.core.IProcessList;
+import org.eclipse.cldt.utils.spawner.ProcessFactory;
 
 /**
  * Insert the type's description here.

@@ -1,6 +1,6 @@
-package org.eclipse.fdt.internal.core.macosx;
+package org.eclipse.cldt.internal.core.macosx;
 
-import org.eclipse.fdt.core.IProcessInfo;
+import org.eclipse.cldt.core.IProcessInfo;
 
 /**
  * @author alain
@@ -29,14 +29,14 @@ public class ProcessInfo implements IProcessInfo {
 	}
 	
 	/**
-	 * @see org.eclipse.fdt.core.IProcessInfo#getName()
+	 * @see org.eclipse.cldt.core.IProcessInfo#getName()
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * @see org.eclipse.fdt.core.IProcessInfo#getPid()
+	 * @see org.eclipse.cldt.core.IProcessInfo#getPid()
 	 */
 	public int getPid() {
 		return pid;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.eclipse.fdt.core.macosx</name>
+	<name>org.eclipse.cldt.core.macosx</name>
 	<comment></comment>
 	<projects>
 		<project>org.eclipse.fdt.core</project>
