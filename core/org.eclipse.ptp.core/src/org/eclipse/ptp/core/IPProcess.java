@@ -1,10 +1,5 @@
 package org.eclipse.ptp.core;
 
-
-/**
- * @author Clement
- *
- */
 public interface IPProcess extends IPElement {
     public static final String STARTING = "starting";
     public static final String RUNNING = "running";
@@ -39,6 +34,9 @@ public interface IPProcess extends IPElement {
     
     /* returns the parent job that this process is encompassed by */
     public IPJob getJob();
+    
+    /* sets the node that this process is running on */
+    public void setNode(IPNode node);
     
     /* returns the node that this process is running on */
     public IPNode getNode();

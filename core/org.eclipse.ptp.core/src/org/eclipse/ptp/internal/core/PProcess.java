@@ -6,10 +6,6 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IProcessListener;
 
-/**
- * @author Clement
- *
- */
 public class PProcess extends Parent implements IPProcess {
     protected String NAME_TAG = "process ";
     
@@ -23,17 +19,19 @@ public class PProcess extends Parent implements IPProcess {
     
     private IProcessListener listener = null;
     
+    /* the node that this process is running on, or was scheduled on / will be, etc */
+    protected IPNode node;
+    
 	public PProcess(IPElement element, String processNumber, String pid, String status, String exitCode, String signalName) {
 		super(element, processNumber, P_PROCESS);
 		this.pid = pid;
 		this.exitCode = exitCode;
 		setStatus(status);
-		IPJob job = getPJob();
+		IPJob job = getJob();
 		outputFile = new OutputTextFile(processNumber, job.getOutputStoreDirectory(), job.getStoreLine());
-		
 	}
 	
-	public IPJob getPJob() {
+	public IPJob getJob() {
 		IPElement current = this;
 		do {
 			if(current instanceof IPJob) return (IPJob) current;
@@ -131,5 +129,13 @@ public class PProcess extends Parent implements IPProcess {
     }
     public String getElementName() {
         return NAME_TAG + getKey();
-    }    
+    }
+    
+	public void setNode(IPNode node) {
+		this.node = node;
+	}
+
+	public IPNode getNode() {
+		return this.node;
+	}    
 }
