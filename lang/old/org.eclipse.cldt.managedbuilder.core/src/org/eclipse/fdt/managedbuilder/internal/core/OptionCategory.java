@@ -77,7 +77,7 @@ public class OptionCategory extends BuildObject implements IOptionCategory {
 
 	/**
 	 * Create an <codeOptionCategory</code> based on the specification stored in the 
-	 * project file (.fdtbuild).
+	 * project file (.cdtbuild).
 	 * 
 	 * @param parent The <code>Tool</code> the OptionCategory will be added to. 
 	 * @param element The XML element that contains the OptionCategory settings.

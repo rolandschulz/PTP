@@ -95,7 +95,7 @@ public class ManagedBuildManager extends AbstractCExtension implements IScannerI
 
 	private static final QualifiedName buildInfoProperty = new QualifiedName(ManagedBuilderCorePlugin.getUniqueIdentifier(), "managedBuildInfo");	//$NON-NLS-1$
 	private static final String ROOT_NODE_NAME = "ManagedProjectBuildInfo";	//$NON-NLS-1$
-	public  static final String SETTINGS_FILE_NAME = ".fdtbuild";	//$NON-NLS-1$
+	public  static final String SETTINGS_FILE_NAME = ".cdtbuild";	//$NON-NLS-1$
 	private static final ITarget[] emptyTargets = new ITarget[0];
 	public  static final String INTERFACE_IDENTITY = ManagedBuilderCorePlugin.getUniqueIdentifier() + ".ManagedBuildManager";	//$NON-NLS-1$
 	public  static final String EXTENSION_POINT_ID = ManagedBuilderCorePlugin.getUniqueIdentifier() + ".buildDefinitions";		//$NON-NLS-1$
@@ -1243,7 +1243,7 @@ public class ManagedBuildManager extends AbstractCExtension implements IScannerI
 				PluginVersionIdentifier version = new PluginVersionIdentifier(fileVersion);
 				//  isCompatibleWith will return FALSE, if:
 				//   o  The major versions are not equal
-				//   o  The major versions are equal, but the remainder of the .fdtbuild version # is
+				//   o  The major versions are equal, but the remainder of the .cdtbuild version # is
 				//      greater than the MBS version #
 				if (!buildInfoVersion.isCompatibleWith(version)) {
 					throw new BuildException(ManagedMakeMessages.getFormattedString(PROJECT_VERSION_ERROR, project.getName())); 
@@ -1350,7 +1350,7 @@ public class ManagedBuildManager extends AbstractCExtension implements IScannerI
 				//
 				// Here are notes on "references" within the managed build system.
 				// References are "pointers" from one model element to another.
-				// These are encoded in manifest and managed build system project files (.fdtbuild)
+				// These are encoded in manifest and managed build system project files (.cdtbuild)
 				// using unique string IDs (e.g. "fdt.managedbuild.tool.gnu.c.linker").
 				// These string IDs are "resolved" to pointers to interfaces in model 
 				// elements in the in-memory represent of the managed build system information.
@@ -1360,7 +1360,7 @@ public class ManagedBuildManager extends AbstractCExtension implements IScannerI
 				//      referenced object.
 				//  2.  A reference is always TO an extension object - that is, an object
 				//      loaded from a manifest file or a dynamic element provider.  It cannot
-				//      be to an object loaded from a managed build system project file (.fdtbuild).
+				//      be to an object loaded from a managed build system project file (.cdtbuild).
 				//
 		
 				Iterator projectTypeIter = getExtensionProjectTypeMap().values().iterator();
@@ -1713,12 +1713,12 @@ public class ManagedBuildManager extends AbstractCExtension implements IScannerI
 		if(buildInfo == null && resource instanceof IProject)
 			buildInfo = findBuildInfoSynchronized((IProject)resource);
 /*		
-		// Nothing in session store, so see if we can load it from fdtbuild
+		// Nothing in session store, so see if we can load it from cdtbuild
 		if (buildInfo == null && resource instanceof IProject) {
 			try {
 				buildInfo = loadBuildInfo((IProject)resource);
 			} catch (Exception e) {
-				// TODO:  Issue error reagarding not being able to load the project file (.fdtbuild)
+				// TODO:  Issue error reagarding not being able to load the project file (.cdtbuild)
 			}
 			
 			try {
@@ -1774,12 +1774,12 @@ public class ManagedBuildManager extends AbstractCExtension implements IScannerI
 				if (buildInfo != null) return buildInfo;
 			}
 			
-			// Nothing in session store, so see if we can load it from fdtbuild
+			// Nothing in session store, so see if we can load it from cdtbuild
 			if (buildInfo == null) {
 				try {
 					buildInfo = loadBuildInfo(project);
 				} catch (Exception e) {
-					// Issue error regarding not being able to load the project file (.fdtbuild)
+					// Issue error regarding not being able to load the project file (.cdtbuild)
 					if (buildInfo == null) {
 						buildInfo = createBuildInfo(project); 
 					}

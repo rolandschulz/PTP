@@ -81,7 +81,7 @@ public class ResourceConfiguration extends BuildObject implements IResourceConfi
 
 	/**
 	 * Create a <code>ResourceConfiguration</code> based on the specification stored in the 
-	 * project file (.fdtbuild).
+	 * project file (.cdtbuild).
 	 * 
 	 * @param parent The <code>IConfiguration</code> the resource configuration will be added to. 
 	 * @param element The XML element that contains the resource configuration settings.
@@ -496,7 +496,7 @@ public class ResourceConfiguration extends BuildObject implements IResourceConfi
 						newSuperClass = newSuperClass.getSuperClass();
 					}
 				}
-				//  Create an Option element for the managed build project file (.FDTBUILD)
+				//  Create an Option element for the managed build project file (.CDTBUILD)
 				String subId;
 				int nnn = ManagedBuildManager.getRandomNumber();
 				subId = newSuperClass.getId() + "." + nnn; //$NON-NLS-1$
@@ -536,7 +536,7 @@ public class ResourceConfiguration extends BuildObject implements IResourceConfi
 						newSuperClass = newSuperClass.getSuperClass();
 					}
 				}
-				//  Create an Option element for the managed build project file (.FDTBUILD)
+				//  Create an Option element for the managed build project file (.CDTBUILD)
 				String subId;
 				int nnn = ManagedBuildManager.getRandomNumber();
 				subId = newSuperClass.getId() + "." + nnn; //$NON-NLS-1$
@@ -599,7 +599,7 @@ public class ResourceConfiguration extends BuildObject implements IResourceConfi
 						newSuperClass = newSuperClass.getSuperClass();
 					}
 				}
-				//  Create an Option element for the managed build project file (.FDTBUILD)
+				//  Create an Option element for the managed build project file (.CDTBUILD)
 				String subId;
 				int nnn = ManagedBuildManager.getRandomNumber();
 				subId = newSuperClass.getId() + "." + nnn; //$NON-NLS-1$

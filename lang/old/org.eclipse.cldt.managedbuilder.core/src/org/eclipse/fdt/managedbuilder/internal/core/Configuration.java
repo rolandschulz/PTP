@@ -165,7 +165,7 @@ public class Configuration extends BuildObject implements IConfiguration {
 
 	/**
 	 * Create a <code>Configuration</code> based on the specification stored in the 
-	 * project file (.fdtbuild).
+	 * project file (.cdtbuild).
 	 * 
 	 * @param managedProject The <code>ManagedProject</code> the configuration will be added to. 
 	 * @param element The XML element that contains the configuration settings.
@@ -568,7 +568,7 @@ public class Configuration extends BuildObject implements IConfiguration {
 				if (option.overridesOnlyValue()) {
 					newSuperClass = option.getSuperClass();
 				}
-				//  Create an Option element for the managed build project file (.FDTBUILD)
+				//  Create an Option element for the managed build project file (.CDTBUILD)
 				String subId;
 				int nnn = ManagedBuildManager.getRandomNumber();
 				subId = newSuperClass.getId() + "." + nnn; //$NON-NLS-1$
@@ -602,7 +602,7 @@ public class Configuration extends BuildObject implements IConfiguration {
 				if (option.overridesOnlyValue()) {
 					newSuperClass = option.getSuperClass();
 				}
-				//  Create an Option element for the managed build project file (.FDTBUILD)
+				//  Create an Option element for the managed build project file (.CDTBUILD)
 				String subId;
 				int nnn = ManagedBuildManager.getRandomNumber();
 				subId = newSuperClass.getId() + "." + nnn; //$NON-NLS-1$
@@ -656,7 +656,7 @@ public class Configuration extends BuildObject implements IConfiguration {
 				if (option.overridesOnlyValue()) {
 					newSuperClass = option.getSuperClass();
 				}
-				//  Create an Option element for the managed build project file (.FDTBUILD)
+				//  Create an Option element for the managed build project file (.CDTBUILD)
 				String subId;
 				int nnn = ManagedBuildManager.getRandomNumber();
 				subId = newSuperClass.getId() + "." + nnn; //$NON-NLS-1$

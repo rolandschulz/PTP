@@ -341,7 +341,7 @@ public interface IOption extends IBuildObject {
 	
 	/**
 	 * Returns <code>true</code> if this option was loaded from a manifest file,
-	 * and <code>false</code> if it was loaded from a project (.fdtbuild) file.
+	 * and <code>false</code> if it was loaded from a project (.cdtbuild) file.
 	 * 
 	 * @return boolean
 	 */

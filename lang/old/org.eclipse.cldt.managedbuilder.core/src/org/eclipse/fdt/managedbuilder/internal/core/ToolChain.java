@@ -138,7 +138,7 @@ public class ToolChain extends BuildObject implements IToolChain {
 
 	/**
 	 * Create a <code>ToolChain</code> based on the specification stored in the 
-	 * project file (.fdtbuild).
+	 * project file (.cdtbuild).
 	 * 
 	 * @param parent The <code>IConfiguration</code> the tool-chain will be added to. 
 	 * @param element The XML element that contains the tool-chain settings.

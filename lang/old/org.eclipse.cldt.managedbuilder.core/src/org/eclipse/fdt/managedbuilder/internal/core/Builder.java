@@ -100,7 +100,7 @@ public class Builder extends BuildObject implements IBuilder {
 
 	/**
 	 * Create a <code>Builder</code> based on the specification stored in the 
-	 * project file (.fdtbuild).
+	 * project file (.cdtbuild).
 	 * 
 	 * @param parent The <code>IToolChain</code> the Builder will be added to. 
 	 * @param element The XML element that contains the Builder settings.

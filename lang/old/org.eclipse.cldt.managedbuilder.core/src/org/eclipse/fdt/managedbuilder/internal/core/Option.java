@@ -118,7 +118,7 @@ public class Option extends BuildObject implements IOption {
 
 	/**
 	 * Create an <code>Option</code> based on the specification stored in the 
-	 * project file (.fdtbuild).
+	 * project file (.cdtbuild).
 	 * 
 	 * @param parent The <code>ITool</code> the option will be added to. 
 	 * @param element The XML element that contains the option settings.

@@ -17,7 +17,7 @@ package org.eclipse.fdt.managedbuilder.core;
  * The project-type contains one or more children of type configuration.
  * These are the default configurations that the user can choose from.
  * Note that there is no reason to define a project-type element in a 
- * .fdtbuild file.  It would never be used since project-type elements 
+ * .cdtbuild file.  It would never be used since project-type elements 
  * are used to primarily populate the "New Project" dialog boxes.
  * Project types can be arranged into hierarchies to promote the efficient
  * sharing of configurations. If you have defined a project type that 
@@ -53,7 +53,7 @@ public interface IProjectType extends IBuildObject {
 	 * <p>
 	 * NOTE: This routine affects the in-memory representation of the
 	 *       project-type, but since project-types are never written to the
-	 *       .fdtbuild file, the manifest definition does not change. 
+	 *       .cdtbuild file, the manifest definition does not change. 
 	 * 
 	 * @param parent The <code>IConfiguration</code> to use as a settings template
 	 * @param id The unique id the new configuration will have
@@ -67,7 +67,7 @@ public interface IProjectType extends IBuildObject {
 	 * <p>
 	 * NOTE: This routine affects the in-memory representation of the
 	 *       project-type, but since project-types are never written to the
-	 *       .fdtbuild file, the manifest definition does not change. 
+	 *       .cdtbuild file, the manifest definition does not change. 
 	 * 
 	 * @param id The unique id of the configuration
 	 */

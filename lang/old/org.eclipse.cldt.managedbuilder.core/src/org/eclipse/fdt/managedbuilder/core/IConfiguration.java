@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IResource;
 /**
  * A tool-integrator defines default configurations as children of the project type.
  * These provide a template for the configurations added to the user's project, 
- * which are stored in the project's .fdtbuild file.  
+ * which are stored in the project's .cdtbuild file.  
  * <p>
  * The configuration contains one child of type tool-chain.  This describes how the 
  * project's resources are transformed into the build artifact. The configuration can
@@ -211,7 +211,7 @@ public interface IConfiguration extends IBuildObject {
 	
 	/**
 	 * Returns <code>true</code> if this configuration was loaded from a manifest file,
-	 * and <code>false</code> if it was loaded from a project (.fdtbuild) file.
+	 * and <code>false</code> if it was loaded from a project (.cdtbuild) file.
 	 * 
 	 * @return boolean 
 	 */

@@ -99,7 +99,7 @@ public class TargetPlatform extends BuildObject implements ITargetPlatform {
 
 	/**
 	 * Create a <code>TargetPlatform</code> based on the specification stored in the 
-	 * project file (.fdtbuild).
+	 * project file (.cdtbuild).
 	 * 
 	 * @param parent The <code>IToolChain</code> the TargetPlatform will be added to. 
 	 * @param element The XML element that contains the TargetPlatform settings.

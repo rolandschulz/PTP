@@ -80,7 +80,7 @@ public class GeneratedMakefileBuilder extends ACBuilder {
 			} else {
 				buildGoalName = buildInfo.getBuildArtifactName();
 			}
-			reservedNames = Arrays.asList(new String[]{".fdtbuild", ".fdtproject", ".project"});	//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			reservedNames = Arrays.asList(new String[]{".cdtbuild", ".fdtproject", ".project"});	//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 
 		/**

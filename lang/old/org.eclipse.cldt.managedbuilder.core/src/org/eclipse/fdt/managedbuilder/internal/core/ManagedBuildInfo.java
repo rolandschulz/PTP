@@ -945,7 +945,7 @@ public class ManagedBuildInfo implements IManagedBuildInfo, IScannerInfo {
 
 	/*
 	 * Note:  "Target" routines are only currently applicable when loading a FDT 2.0
-	 *        or earlier managed build project file (.fdtbuild)
+	 *        or earlier managed build project file (.cdtbuild)
 	 */
 	
 	/* (non-Javadoc)

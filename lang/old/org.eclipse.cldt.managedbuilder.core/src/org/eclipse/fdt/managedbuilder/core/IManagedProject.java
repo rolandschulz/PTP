@@ -16,7 +16,7 @@ import org.w3c.dom.Element;
 
 /**
  * This class represents a project instance in the managed build system.
- * Project instances are stored in the .fdtbuild file.  Note that there 
+ * Project instances are stored in the .cdtbuild file.  Note that there 
  * is no reason to define a project element in a manifest file – it 
  * would never be used.
  * <p>
@@ -146,7 +146,7 @@ public interface IManagedProject extends IBuildObject {
 	public void setValid(boolean isValid);
 
 	/**
-	 * Persist the managed project to the project file (.fdtbuild).
+	 * Persist the managed project to the project file (.cdtbuild).
 	 * 
 	 * @param doc
 	 * @param element

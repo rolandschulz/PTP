@@ -191,7 +191,7 @@ public class Tool extends BuildObject implements ITool, IOptionCategory {
 
 	/**
 	 * Create a <code>Tool</code> based on the specification stored in the 
-	 * project file (.fdtbuild).
+	 * project file (.cdtbuild).
 	 * 
 	 * @param parent The <code>IToolChain</code> or <code>IResourceConfiguration</code>
 	 *               the tool will be added to. 
