@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.CDescriptorEvent;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.ICDescriptorListener;
@@ -78,11 +78,11 @@ public class DefaultPathEntryStore implements IPathEntryStore, ICDescriptorListe
 		listeners = Collections.synchronizedList(new ArrayList());
 		// Register the Core Model on the Descriptor
 		// Manager, it needs to know about changes.
-		CCorePlugin.getDefault().getCDescriptorManager().addDescriptorListener(this);
+		FortranCorePlugin.getDefault().getCDescriptorManager().addDescriptorListener(this);
 	}
 
 	public IPathEntry[] getRawPathEntries() throws CoreException {
-		ICDescriptor cdesc = CCorePlugin.getDefault().getCProjectDescription(fProject, false);
+		ICDescriptor cdesc = FortranCorePlugin.getDefault().getCProjectDescription(fProject, false);
 		if (cdesc != null) {
 			ArrayList pathEntries = new ArrayList();
 			Element element = cdesc.getProjectData(PATH_ENTRY_ID);
@@ -106,7 +106,7 @@ public class DefaultPathEntryStore implements IPathEntryStore, ICDescriptorListe
 		if (Arrays.equals(newRawEntries, getRawPathEntries())) {
 			return;
 		}	
-		ICDescriptor descriptor = CCorePlugin.getDefault().getCProjectDescription(fProject, true);
+		ICDescriptor descriptor = FortranCorePlugin.getDefault().getCProjectDescription(fProject, true);
 		Element rootElement = descriptor.getProjectData(PATH_ENTRY_ID);
 		// Clear out all current children
 		Node child = rootElement.getFirstChild();
@@ -392,7 +392,7 @@ public class DefaultPathEntryStore implements IPathEntryStore, ICDescriptorListe
 		for (int i = 0; i < observers.length; i++) {
 			observers[i].pathEntryStoreChanged(evt);
 		}
-		CCorePlugin.getDefault().getCDescriptorManager().removeDescriptorListener(this);
+		FortranCorePlugin.getDefault().getCDescriptorManager().removeDescriptorListener(this);
 	}
 
 	public IProject getProject() {

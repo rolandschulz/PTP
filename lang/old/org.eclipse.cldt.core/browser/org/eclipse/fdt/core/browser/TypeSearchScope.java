@@ -20,8 +20,8 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.fdt.core.CCorePlugin;
-import org.eclipse.fdt.core.CProjectNature;
+import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.FortranProjectNature;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.core.model.IWorkingCopy;
@@ -207,7 +207,7 @@ public class TypeSearchScope implements ITypeSearchScope {
 	}
 
 	private static IPath[] getIncludePaths(IProject project) {
-		IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(project);
+		IScannerInfoProvider provider = FortranCorePlugin.getDefault().getScannerInfoProvider(project);
 		if (provider != null) {
 			IScannerInfo info = provider.getScannerInformation(project);
 			if (info != null) {
@@ -233,7 +233,7 @@ public class TypeSearchScope implements ITypeSearchScope {
 	}
 	
 	private static IProject[] getCProjects() {
-		IProject[] allProjects = CCorePlugin.getWorkspace().getRoot().getProjects();
+		IProject[] allProjects = FortranCorePlugin.getWorkspace().getRoot().getProjects();
 		if (allProjects != null) {
 			IProject[] cProjects = new IProject[allProjects.length];
 			int count = 0;
@@ -267,7 +267,7 @@ public class TypeSearchScope implements ITypeSearchScope {
 		String[] natures = projDesc.getNatureIds();
 		if (natures != null) {
 			for (int i = 0; i < natures.length; ++i) {
-				if (natures[i].equals(CProjectNature.C_NATURE_ID)) {
+				if (natures[i].equals(FortranProjectNature.FORTRAN_NATURE_ID)) {
 					return true;
 				}
 			}

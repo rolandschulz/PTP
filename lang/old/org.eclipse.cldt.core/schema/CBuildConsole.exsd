@@ -44,7 +44,7 @@
          <attribute name="id" type="string">
             <annotation>
                <documentation>
-                  id of the build console, if not present then its the default console, (org.eclipse.fdt.ui provides the default console, so should never be specified). Builders can request a specific console via org.eclipse.fdt.core.CCorePlugin.getDefault().getConsole(String id);
+                  id of the build console, if not present then its the default console, (org.eclipse.fdt.ui provides the default console, so should never be specified). Builders can request a specific console via org.eclipse.fdt.core.FortranCorePlugin.getDefault().getConsole(String id);
                </documentation>
             </annotation>
          </attribute>

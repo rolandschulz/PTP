@@ -14,8 +14,8 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.fdt.core.CCorePlugin;
-import org.eclipse.fdt.core.CCorePreferenceConstants;
+import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.FortranCorePreferenceConstants;
 import org.eclipse.fdt.core.filetype.ICFileType;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.CoreModel;
@@ -175,7 +175,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 	public final static String LINKED_POSITION_COLOR = "linkedPositionColor"; //$NON-NLS-1$
 
     /** Preference key for compiler task tags */
-    private final static String TRANSLATION_TASK_TAGS= CCorePreferenceConstants.TRANSLATION_TASK_TAGS;
+    private final static String TRANSLATION_TASK_TAGS= FortranCorePreferenceConstants.TRANSLATION_TASK_TAGS;
 
 	/** 
 	 * This editor's projection support 
@@ -606,7 +606,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 		if (originalElement instanceof IFileEditorInput) {
 			IFile file= ((IFileEditorInput) originalElement).getFile();
 			if (file != null) {
-				ICFileType type = CCorePlugin.getDefault().getFileType(file.getProject(), file.getName());
+				ICFileType type = FortranCorePlugin.getDefault().getFileType(file.getProject(), file.getName());
 				oldLanguage = type.getLanguage().getId();
 				if (oldLanguage == null) {
 					return false;
@@ -618,7 +618,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 		if (movedElement instanceof IFileEditorInput) {
 			IFile file = ((IFileEditorInput) movedElement).getFile();
 			if (file != null) {
-				ICFileType type = CCorePlugin.getDefault().getFileType(file.getProject(), file.getName());
+				ICFileType type = FortranCorePlugin.getDefault().getFileType(file.getProject(), file.getName());
 				newLanguage = type.getLanguage().getId();
 				if (newLanguage == null) {
 					return false;
@@ -1236,9 +1236,7 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
 			// default is C++ unless the project as C Nature Only
 			// we can then be smarter.
 			IProject p = unit.getCProject().getProject();
-			if (!CoreModel.hasCCNature(p)) {
-				fileType = unit.isCXXLanguage() ? LANGUAGE_CPP : LANGUAGE_C;
-			}
+			fileType = unit.isCXXLanguage() ? LANGUAGE_CPP : LANGUAGE_C;
 		}
 
 		fAnnotationAccess = createAnnotationAccess();

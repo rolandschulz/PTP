@@ -23,8 +23,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.fdt.core.CCProjectNature;
-import org.eclipse.fdt.core.CProjectNature;
+import org.eclipse.fdt.core.FortranProjectNature;
 import org.eclipse.fdt.make.core.MakeCorePlugin;
 import org.eclipse.fdt.make.core.MakeProjectNature;
 import org.eclipse.fdt.make.core.scannerconfig.IScannerInfoCollector2;
@@ -107,8 +106,7 @@ public class PerProjectSICollector implements IScannerInfoCollector2, IScannerIn
         }
 		try {
 			if (project.hasNature(MakeProjectNature.NATURE_ID) && // limits to StandardMake projects
-					(project.hasNature(CProjectNature.C_NATURE_ID) ||
-					 project.hasNature(CCProjectNature.CC_NATURE_ID))) { 
+					project.hasNature(FortranProjectNature.FORTRAN_NATURE_ID)) { 
 
 			    for (Iterator I = scannerInfo.keySet().iterator(); I.hasNext(); ) {
 			        ScannerInfoTypes siType = (ScannerInfoTypes) I.next();

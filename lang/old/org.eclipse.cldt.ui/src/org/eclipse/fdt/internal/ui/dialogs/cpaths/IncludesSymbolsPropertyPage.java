@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.fdt.core.CProjectNature;
+import org.eclipse.fdt.core.FortranProjectNature;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.ICElement;
@@ -173,7 +173,7 @@ public class IncludesSymbolsPropertyPage extends PropertyPage implements IStatus
 
 	private boolean isCProject(IProject proj) {
 		try {
-			return proj.hasNature(CProjectNature.C_NATURE_ID);
+			return proj.hasNature(FortranProjectNature.FORTRAN_NATURE_ID);
 		} catch (CoreException e) {
 			CUIPlugin.getDefault().log(e);
 		}

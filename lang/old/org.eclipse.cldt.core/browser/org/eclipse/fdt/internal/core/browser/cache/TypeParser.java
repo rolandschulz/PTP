@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.browser.ITypeInfo;
 import org.eclipse.fdt.core.browser.ITypeReference;
 import org.eclipse.fdt.core.browser.ITypeSearchScope;
@@ -375,7 +375,7 @@ public class TypeParser implements ISourceElementRequestor {
 				}
 				stackObject = workingCopy;
 			} else {
-				IWorkspace workspace = CCorePlugin.getWorkspace();
+				IWorkspace workspace = FortranCorePlugin.getWorkspace();
 				if (workspace != null) {
 					IWorkspaceRoot wsRoot = workspace.getRoot();
 					if (wsRoot != null) {
@@ -407,9 +407,7 @@ public class TypeParser implements ISourceElementRequestor {
 	private ParserLanguage getLanguage(IProject project, IWorkingCopy workingCopy) {
 		ParserLanguage projectLanguage = null;
 		if (project != null) {
-			if (CoreModel.hasCCNature(project)) {
-				projectLanguage = ParserLanguage.CPP;
-			} else if (CoreModel.hasCNature(project)) {
+			if (CoreModel.hasCNature(project)) {
 				projectLanguage = ParserLanguage.C;
 			}
 		}
@@ -490,7 +488,7 @@ public class TypeParser implements ISourceElementRequestor {
 		if (project != null) {
 			//TODO temporary workaround to catch managed build exceptions
 			try {
-				IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(project);
+				IScannerInfoProvider provider = FortranCorePlugin.getDefault().getScannerInfoProvider(project);
 				if (provider != null) {
 					IScannerInfo buildScanInfo = provider.getScannerInformation(resource != null ? resource : project);
 					if (buildScanInfo != null)
@@ -527,14 +525,14 @@ public class TypeParser implements ISourceElementRequestor {
 			
 			fParser.parse();
 		} catch (ParserFactoryError e) {
-			CCorePlugin.log(e);
+			FortranCorePlugin.log(e);
 		} catch (ParseError e) {
 			// no need to log
-			// CCorePlugin.log(e);
+			// FortranCorePlugin.log(e);
 		} catch (OperationCanceledException e) {
 			throw new InterruptedException();
 		} catch (Exception e) {
-			CCorePlugin.log(e);
+			FortranCorePlugin.log(e);
 		} finally {
 			// stop timer
 			fTimeoutThread.stopTimer();
@@ -664,7 +662,7 @@ public class TypeParser implements ISourceElementRequestor {
 		path = PathUtil.getWorkspaceRelativePath(path);
 
 		IResource resource = null;
-		IWorkspace workspace = CCorePlugin.getWorkspace();
+		IWorkspace workspace = FortranCorePlugin.getWorkspace();
 		if (workspace != null) {
 			IWorkspaceRoot wsRoot = workspace.getRoot();
 			if (wsRoot != null) {
@@ -929,7 +927,7 @@ public class TypeParser implements ISourceElementRequestor {
 	
 	public int getParserTimeout() {
 		// here we just reuse the indexer timeout
-		String timeOut = CCorePlugin.getDefault().getPluginPreferences().getString("FDT_INDEXER_TIMEOUT");
+		String timeOut = FortranCorePlugin.getDefault().getPluginPreferences().getString("FDT_INDEXER_TIMEOUT");
 		return Integer.valueOf(timeOut).intValue();
 	}
 	

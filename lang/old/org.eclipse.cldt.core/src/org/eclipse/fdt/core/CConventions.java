@@ -84,11 +84,11 @@ public class CConventions {
 	 */
 	public static IStatus validateClassName(String name) {
 		if (name == null) {
-			return new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.class.nullName"), null); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.class.nullName"), null); //$NON-NLS-1$
 		}
 		String trimmed = name.trim();
 		if ((!name.equals(trimmed)) || (name.indexOf(" ") != -1) ){ //$NON-NLS-1$
-			return new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.class.nameWithBlanks"), null); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.class.nameWithBlanks"), null); //$NON-NLS-1$
 		}
 		int index = name.lastIndexOf(scopeResolutionOperator);
 		char[] scannedID;
@@ -117,17 +117,17 @@ public class CConventions {
 
 		if (scannedID != null) {
 			if (CharOperation.contains('$', scannedID)) {
-				return new Status(IStatus.WARNING, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.class.dollarName"), null); //$NON-NLS-1$
+				return new Status(IStatus.WARNING, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.class.dollarName"), null); //$NON-NLS-1$
 			}
 			if (scannedID.length > 0 && scannedID[0] == '_') {
-				return new Status(IStatus.WARNING, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.class.leadingUnderscore"), null); //$NON-NLS-1$
+				return new Status(IStatus.WARNING, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.class.leadingUnderscore"), null); //$NON-NLS-1$
 			}
 			if (scannedID.length > 0 && Character.isLowerCase(scannedID[0])) {
-				return new Status(IStatus.WARNING, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.class.lowercaseName"), null); //$NON-NLS-1$
+				return new Status(IStatus.WARNING, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.class.lowercaseName"), null); //$NON-NLS-1$
 			}
 			return CModelStatus.VERIFIED_OK;
 		}
-		return new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.class.invalidName", name), null); //$NON-NLS-1$
+		return new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.class.invalidName", name), null); //$NON-NLS-1$
 	}
 
 	/**
@@ -145,11 +145,11 @@ public class CConventions {
 	 */
 	public static IStatus validateNamespaceName(String name) {
 		if (name == null) {
-			return new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.namespace.nullName"), null); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.namespace.nullName"), null); //$NON-NLS-1$
 		}
 		String trimmed = name.trim();
 		if ((!name.equals(trimmed)) || (name.indexOf(" ") != -1) ){ //$NON-NLS-1$
-			return new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.namespace.nameWithBlanks"), null); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.namespace.nameWithBlanks"), null); //$NON-NLS-1$
 		}
 		int index = name.lastIndexOf(scopeResolutionOperator);
 		char[] scannedID;
@@ -178,17 +178,17 @@ public class CConventions {
 
 		if (scannedID != null) {
 			if (CharOperation.contains('$', scannedID)) {
-				return new Status(IStatus.WARNING, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.namespace.dollarName"), null); //$NON-NLS-1$
+				return new Status(IStatus.WARNING, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.namespace.dollarName"), null); //$NON-NLS-1$
 			}
 			if (scannedID.length > 0 && scannedID[0] == '_') {
-				return new Status(IStatus.WARNING, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.namespace.leadingUnderscore"), null); //$NON-NLS-1$
+				return new Status(IStatus.WARNING, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.namespace.leadingUnderscore"), null); //$NON-NLS-1$
 			}
 //			if (scannedID.length > 0 && Character.isLowerCase(scannedID[0])) {
-//				return new Status(IStatus.WARNING, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.namespace.lowercaseName"), null); //$NON-NLS-1$
+//				return new Status(IStatus.WARNING, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.namespace.lowercaseName"), null); //$NON-NLS-1$
 //			}
 			return CModelStatus.VERIFIED_OK;
 		}
-		return new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.class.invalidName", name), null); //$NON-NLS-1$
+		return new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.class.invalidName", name), null); //$NON-NLS-1$
 	}
 
 	/**
@@ -201,17 +201,17 @@ public class CConventions {
 	public static IStatus validateScopeName(String name) {
 
 		if (name == null) {
-			return new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.scope.nullName"), null); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.scope.nullName"), null); //$NON-NLS-1$
 		}
 		int length;
 		if ((length = name.length()) == 0) {
-			return new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.scope.emptyName"), null); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.scope.emptyName"), null); //$NON-NLS-1$
 		}
 		if (name.charAt(0) == fgDot || name.charAt(length-1) == fgDot) {
-			return new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.scope.dotName"), null); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.scope.dotName"), null); //$NON-NLS-1$
 		}
 		if (CharOperation.isWhitespace(name.charAt(0)) || CharOperation.isWhitespace(name.charAt(name.length() - 1))) {
-			return new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.scope.nameWithBlanks"), null); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.scope.nameWithBlanks"), null); //$NON-NLS-1$
 		}
 
 		StringTokenizer st = new StringTokenizer(name, scopeResolutionOperator);
@@ -221,13 +221,13 @@ public class CConventions {
 			typeName = typeName.trim(); // grammar allows spaces
 			char[] scannedID = typeName.toCharArray();
 			if (scannedID == null) {
-				return new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.illegalIdentifier", typeName), null); //$NON-NLS-1$
+				return new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.illegalIdentifier", typeName), null); //$NON-NLS-1$
 			}
 			if (firstToken && scannedID.length > 0 && scannedID[0] == '_') {
-				return new Status(IStatus.WARNING, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.scope.leadingUnderscore"), null); //$NON-NLS-1$
+				return new Status(IStatus.WARNING, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.scope.leadingUnderscore"), null); //$NON-NLS-1$
 			}
 			if (firstToken && scannedID.length > 0 && Character.isLowerCase(scannedID[0])) {
-				return new Status(IStatus.WARNING, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.scope.lowercaseName"), null); //$NON-NLS-1$
+				return new Status(IStatus.WARNING, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.scope.lowercaseName"), null); //$NON-NLS-1$
 			}
 			firstToken = false;
 		}
@@ -262,11 +262,11 @@ public class CConventions {
 	 */
 	public static IStatus validateIdentifier(String id) {
 		if (!isLegalIdentifier(id)) {
-			return new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.illegalIdentifier", id), null); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.illegalIdentifier", id), null); //$NON-NLS-1$
 		}
 
 		if (!isValidIdentifier(id)) {
-			return new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.invalid", id), null); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.invalid", id), null); //$NON-NLS-1$
 		}
 
 		return CModelStatus.VERIFIED_OK;
@@ -386,17 +386,17 @@ public class CConventions {
 	public static IStatus validateFileName(String name) {
 		//TODO could use a prefs option for file naming conventions
 		if (name == null || name.length() == 0) {
-			return new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.filename.nullName"), null); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.filename.nullName"), null); //$NON-NLS-1$
 		}
 		if (!isLegalFilename(name)) {
 			//TODO we need platform-independent validation, see bug#24152
-			//return new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.filename.invalid"), null); //$NON-NLS-1$
-			return new Status(IStatus.WARNING, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.filename.possiblyInvalid"), null); //$NON-NLS-1$
+			//return new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.filename.invalid"), null); //$NON-NLS-1$
+			return new Status(IStatus.WARNING, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.filename.possiblyInvalid"), null); //$NON-NLS-1$
 		}
 
 		String trimmed = name.trim();
 		if ((!name.equals(trimmed)) || (name.indexOf(" ") != -1)) { //$NON-NLS-1$
-			return new Status(IStatus.WARNING, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.filename.nameWithBlanks"), null); //$NON-NLS-1$
+			return new Status(IStatus.WARNING, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.filename.nameWithBlanks"), null); //$NON-NLS-1$
 		}
 		
 		return CModelStatus.VERIFIED_OK;
@@ -423,7 +423,7 @@ public class CConventions {
 	    }
 
 	    if (!CoreModel.isValidHeaderUnitName(project, name)) {
-			return new Status(IStatus.WARNING, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.headerFilename.filetype"), null); //$NON-NLS-1$
+			return new Status(IStatus.WARNING, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.headerFilename.filetype"), null); //$NON-NLS-1$
 	    }
 
 		return val;
@@ -450,7 +450,7 @@ public class CConventions {
 	    }
 
 	    if (!CoreModel.isValidSourceUnitName(project, name)) {
-			return new Status(IStatus.WARNING, CCorePlugin.PLUGIN_ID, -1, Util.bind("convention.sourceFilename.filetype"), null); //$NON-NLS-1$
+			return new Status(IStatus.WARNING, FortranCorePlugin.PLUGIN_ID, -1, Util.bind("convention.sourceFilename.filetype"), null); //$NON-NLS-1$
 	    }
 
 		return val;

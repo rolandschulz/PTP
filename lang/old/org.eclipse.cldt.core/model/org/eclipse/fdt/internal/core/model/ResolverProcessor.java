@@ -20,7 +20,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.filetype.ICFileTypeAssociation;
 import org.eclipse.fdt.core.filetype.ICFileTypeResolver;
 import org.eclipse.fdt.core.filetype.IResolverModel;
@@ -219,7 +219,7 @@ public class ResolverProcessor  {
 
 	private ICElement[] getAffectedElements(ICFileTypeResolver resolver) {
 		try {
-			IResolverModel rmodel = CCorePlugin.getDefault().getResolverModel();
+			IResolverModel rmodel = FortranCorePlugin.getDefault().getResolverModel();
 			ICModel cmodel = CoreModel.getDefault().getCModel();
 			ICProject[] cprojects = cmodel.getCProjects();
 			IContainer container = resolver.getContainer();

@@ -20,7 +20,7 @@ import java.util.Vector;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.managedbuilder.core.IBuilder;
 import org.eclipse.fdt.managedbuilder.core.IConfiguration;
 import org.eclipse.fdt.managedbuilder.core.IConfigurationV2;
@@ -480,7 +480,7 @@ public class Target extends BuildObject implements ITarget {
 		} else {
 			// If no error parsers are specified by the target, the default is 
 			// all error parsers
-			errorParsers = CCorePlugin.getDefault().getAllErrorParsersIDs();
+			errorParsers = FortranCorePlugin.getDefault().getAllErrorParsersIDs();
 		}
 		return errorParsers;
 	}

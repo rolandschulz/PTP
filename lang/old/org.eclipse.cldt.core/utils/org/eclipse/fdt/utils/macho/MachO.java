@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Vector;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.utils.CPPFilt;
 
 // test checkin
@@ -155,7 +155,7 @@ public class MachO {
 			if ( magic == MH_CIGAM )
 				efile.setEndian(true);
 			else if ( magic != MH_MAGIC )
-				throw new IOException(CCorePlugin.getResourceString("Util.exception.notMACHO")); //$NON-NLS-1$
+				throw new IOException(FortranCorePlugin.getResourceString("Util.exception.notMACHO")); //$NON-NLS-1$
 			cputype = efile.readIntE();
 			cpusubtype = efile.readIntE();
 			filetype = efile.readIntE();
@@ -171,7 +171,7 @@ public class MachO {
 			if ( magic == MH_CIGAM )
 				isle = true;
 			else if ( magic != MH_MAGIC )
-				throw new IOException(CCorePlugin.getResourceString("Util.exception.notMACHO")); //$NON-NLS-1$
+				throw new IOException(FortranCorePlugin.getResourceString("Util.exception.notMACHO")); //$NON-NLS-1$
 			cputype = makeInt(bytes, offset, isle); offset += 4;
 			cpusubtype = makeInt(bytes, offset, isle); offset += 4;
 			filetype = makeInt(bytes, offset, isle); offset += 4;

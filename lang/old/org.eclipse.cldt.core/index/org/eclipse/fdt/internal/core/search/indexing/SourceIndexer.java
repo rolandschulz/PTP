@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICLogConstants;
 import org.eclipse.fdt.core.index.IIndexDelta;
 import org.eclipse.fdt.core.model.CoreModel;
@@ -80,7 +80,7 @@ public class SourceIndexer extends AbstractIndexer {
 		// Create a new Parser
 		SourceIndexerRequestor requestor = new SourceIndexerRequestor(this, resourceFile, timeOut);
 		
-		IndexManager manager = CCorePlugin.getDefault().getCoreModel().getIndexManager();
+		IndexManager manager = FortranCorePlugin.getDefault().getCoreModel().getIndexManager();
 		int problems = manager.indexProblemsEnabled( resourceFile.getProject() );
 		requestor.setProblemMarkersEnabled( problems );
 		requestor.requestRemoveMarkers( resourceFile, null );
@@ -88,7 +88,7 @@ public class SourceIndexer extends AbstractIndexer {
 		//Get the scanner info
 		IProject currentProject = resourceFile.getProject();
 		IScannerInfo scanInfo = new ScannerInfo();
-		IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(currentProject);
+		IScannerInfoProvider provider = FortranCorePlugin.getDefault().getScannerInfoProvider(currentProject);
 		if (provider != null){
 		  IScannerInfo buildScanInfo = provider.getScannerInformation(resourceFile);
 		  if (buildScanInfo != null){
@@ -97,7 +97,7 @@ public class SourceIndexer extends AbstractIndexer {
 		}
 		
 		//C or CPP?
-		ParserLanguage language = CoreModel.hasCCNature(currentProject) ? ParserLanguage.CPP : ParserLanguage.C;
+		ParserLanguage language = ParserLanguage.C;
 		
 		IParser parser = null;
 
@@ -120,7 +120,7 @@ public class SourceIndexer extends AbstractIndexer {
 		try{
 
 			// start timer
-			String timeOut = CCorePlugin.getDefault().getPluginPreferences().getString(FDT_INDEXER_TIMEOUT);
+			String timeOut = FortranCorePlugin.getDefault().getPluginPreferences().getString(FDT_INDEXER_TIMEOUT);
 			Integer timeOutValue = new Integer(timeOut);
 			if (timeOutValue.intValue() > 0) {
 				requestor.setTimeout(timeOutValue.intValue());
@@ -156,7 +156,7 @@ public class SourceIndexer extends AbstractIndexer {
 			//Report events
 			ArrayList filesTrav = requestor.getFilesTraversed();
 			IndexDelta indexDelta = new IndexDelta(resourceFile.getProject(),filesTrav, IIndexDelta.INDEX_FINISHED_DELTA);
-			CCorePlugin.getDefault().getCoreModel().getIndexManager().notifyListeners(indexDelta);
+			FortranCorePlugin.getDefault().getCoreModel().getIndexManager().notifyListeners(indexDelta);
 			//Release all resources
 			parser=null;
 			currentProject = null;

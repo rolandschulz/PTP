@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.ICDescriptorOperation;
 import org.eclipse.fdt.core.ICExtensionReference;
@@ -144,7 +144,7 @@ public class BinaryParserBlock extends AbstractBinaryParserPage {
 	}
 
 	private void initializeParserList() {
-		IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(CCorePlugin.PLUGIN_ID, CCorePlugin.BINARY_PARSER_SIMPLE_ID);
+		IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID, FortranCorePlugin.BINARY_PARSER_SIMPLE_ID);
 		if (point != null) {
 			IExtension[] exts = point.getExtensions();
 			configMap = new HashMap(exts.length);
@@ -226,9 +226,9 @@ public class BinaryParserBlock extends AbstractBinaryParserPage {
 
 					public void execute(ICDescriptor descriptor, IProgressMonitor monitor) throws CoreException {
 						if (initialSelected == null || !selected.equals(initialSelected)) {
-							descriptor.remove(CCorePlugin.BINARY_PARSER_UNIQ_ID);
+							descriptor.remove(FortranCorePlugin.BINARY_PARSER_UNIQ_ID);
 							for (int i = 0; i < selected.size(); i++) {
-								descriptor.create(CCorePlugin.BINARY_PARSER_UNIQ_ID,
+								descriptor.create(FortranCorePlugin.BINARY_PARSER_UNIQ_ID,
 										((BinaryParserConfiguration) selected.get(i)).getID());
 							}
 						}
@@ -245,12 +245,12 @@ public class BinaryParserBlock extends AbstractBinaryParserPage {
 						}
 					}
 				};
-				CCorePlugin.getDefault().getCDescriptorManager().runDescriptorOperation(getContainer().getProject(), op, monitor);
+				FortranCorePlugin.getDefault().getCDescriptorManager().runDescriptorOperation(getContainer().getProject(), op, monitor);
 			} else {
 				if (initialSelected == null || !selected.equals(initialSelected)) {
 					Preferences store = getContainer().getPreferences();
 					if (store != null) {
-						store.setValue(CCorePlugin.PREF_BINARY_PARSER, arrayToString(selected.toArray()));
+						store.setValue(FortranCorePlugin.PREF_BINARY_PARSER, arrayToString(selected.toArray()));
 					}
 				}
 				monitor.worked(1);
@@ -274,8 +274,8 @@ public class BinaryParserBlock extends AbstractBinaryParserPage {
 
 		if (getContainer().getProject() != null) {
 			try {
-				ICDescriptor desc = CCorePlugin.getDefault().getCProjectDescription(getContainer().getProject(), true);
-				ICExtensionReference[] ref = desc.get(CCorePlugin.BINARY_PARSER_UNIQ_ID);
+				ICDescriptor desc = FortranCorePlugin.getDefault().getCProjectDescription(getContainer().getProject(), true);
+				ICExtensionReference[] ref = desc.get(FortranCorePlugin.BINARY_PARSER_UNIQ_ID);
 				initialSelected = new ArrayList(ref.length);
 				for (int i = 0; i < ref.length; i++) {
 					if (configMap.get(ref[i].getID()) != null) {
@@ -300,7 +300,7 @@ public class BinaryParserBlock extends AbstractBinaryParserPage {
 			Preferences store = getContainer().getPreferences();
 			String id = null;
 			if (store != null) {
-				id = store.getString(CCorePlugin.PREF_BINARY_PARSER);
+				id = store.getString(FortranCorePlugin.PREF_BINARY_PARSER);
 			}
 
 			if (id != null && id.length() > 0) {
@@ -362,9 +362,9 @@ public class BinaryParserBlock extends AbstractBinaryParserPage {
 		Preferences store = getContainer().getPreferences();
 		if (store != null) {
 			if (getContainer().getProject() != null) {
-				id = store.getString(CCorePlugin.PREF_BINARY_PARSER);
+				id = store.getString(FortranCorePlugin.PREF_BINARY_PARSER);
 			} else {
-				id = store.getDefaultString(CCorePlugin.PREF_BINARY_PARSER);
+				id = store.getDefaultString(FortranCorePlugin.PREF_BINARY_PARSER);
 			}
 		}
 		//default selection

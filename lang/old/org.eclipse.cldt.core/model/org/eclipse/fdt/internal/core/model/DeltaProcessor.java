@@ -67,7 +67,7 @@ public class DeltaProcessor {
 		// Check for C nature or if the was a CNature
 		if (!(resource instanceof IWorkspaceRoot)) {
 			IProject project = resource.getProject();
-			if (!(CoreModel.hasCNature(project) || CoreModel.hasCCNature(project))) {
+			if (!CoreModel.hasCNature(project)) {
 				shouldProcess = false;
 				CModel root = manager.getCModel();
 				CModelInfo rootInfo = (CModelInfo)manager.peekAtInfo(root);

@@ -15,7 +15,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.ICElement;
@@ -103,17 +103,12 @@ public class CModelBuilder {
 	private IASTCompilationUnit parse(boolean quickParseMode, boolean throwExceptionOnError) throws ParserException
 	{
 		IProject currentProject = null;
-		boolean hasCppNature = true;
+		boolean hasCppNature = false;
 		char[] code = EMPTY_CHAR_ARRAY; //$NON-NLS-1$
 		
 		// get the current project
 		if (translationUnit != null && translationUnit.getCProject() != null) {
 			currentProject = translationUnit.getCProject().getProject();
-		}
-		// check the project's nature
-		if( currentProject != null )
-		{
-			hasCppNature = CoreModel.hasCCNature(currentProject);
 		}
 		// get the code to parse
 		try{
@@ -146,7 +141,7 @@ public class CModelBuilder {
 		try
 		{
 			IScannerInfo scanInfo = new ScannerInfo();
-			IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(currentProject);
+			IScannerInfoProvider provider = FortranCorePlugin.getDefault().getScannerInfoProvider(currentProject);
 			if (provider != null){
 				IScannerInfo buildScanInfo = null;
 				IResource res = translationUnit.getResource();
@@ -182,7 +177,7 @@ public class CModelBuilder {
 		}
 		catch( ParserFactoryError pfe )
 		{
-			throw new ParserException( CCorePlugin.getResourceString("CModelBuilder.Parser_Construction_Failure")); //$NON-NLS-1$
+			throw new ParserException( FortranCorePlugin.getResourceString("CModelBuilder.Parser_Construction_Failure")); //$NON-NLS-1$
 		}
 		// call parse
 		if (problemRequestor != null) {
@@ -193,7 +188,7 @@ public class CModelBuilder {
 			problemRequestor.endReporting();
 		}
 		if( (!hasNoErrors)  && throwExceptionOnError )
-			throw new ParserException(CCorePlugin.getResourceString("CModelBuilder.Parse_Failure")); //$NON-NLS-1$
+			throw new ParserException(FortranCorePlugin.getResourceString("CModelBuilder.Parse_Failure")); //$NON-NLS-1$
 		return quickParseCallback.getCompilationUnit(); 
 	}
 	

@@ -84,7 +84,7 @@ public abstract class CElement extends PlatformObject implements ICElement {
 			return getElementInfo() != null;
 		} catch (CModelException e) {
 			// Do not log it, it will fil the .log alarming the user.
-			//CCorePlugin.log(e);
+			//FortranCorePlugin.log(e);
 			return false;
 		}
 	}

@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ErrorParserManager;
 import org.eclipse.fdt.internal.ui.CUIMessages;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
@@ -188,8 +188,8 @@ public abstract class AbstractErrorParserBlock extends AbstractCOptionPage {
 
 	protected void initMapParsers() {
 		mapParsers.clear();
-		IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(CCorePlugin.PLUGIN_ID,
-				CCorePlugin.ERROR_PARSER_SIMPLE_ID);
+		IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID,
+				FortranCorePlugin.ERROR_PARSER_SIMPLE_ID);
 		if (point != null) {
 			IExtension[] exts = point.getExtensions();
 			for (int i = 0; i < exts.length; i++) {

@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.browser.typehierarchy.ITypeHierarchy;
 import org.eclipse.fdt.core.browser.typehierarchy.TypeHierarchyBuilder;
 import org.eclipse.fdt.core.model.CModelException;
@@ -68,13 +68,13 @@ public class AllTypesCache {
 		fgTypeHierarchyBuilder = new TypeHierarchyBuilder();
 
 		// load prefs
-		Preferences prefs = CCorePlugin.getDefault().getPluginPreferences();
+		Preferences prefs = FortranCorePlugin.getDefault().getPluginPreferences();
 		if (prefs.contains(ENABLE_BACKGROUND_TYPE_CACHE)) {
 			fgEnableIndexing = prefs.getBoolean(ENABLE_BACKGROUND_TYPE_CACHE);
 		} else {
 			prefs.setDefault(ENABLE_BACKGROUND_TYPE_CACHE, true);
 			prefs.setValue(ENABLE_BACKGROUND_TYPE_CACHE, true);
-			CCorePlugin.getDefault().savePluginPreferences();
+			FortranCorePlugin.getDefault().savePluginPreferences();
 			fgEnableIndexing = true;
 		}
 		
@@ -117,7 +117,7 @@ public class AllTypesCache {
 		
 		// remove property change listener
 		if (fgPropertyChangeListener != null)
-			CCorePlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fgPropertyChangeListener);
+			FortranCorePlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fgPropertyChangeListener);
 
 		// terminate all running jobs
 		if (TypeCacheManager.getInstance() != null) {

@@ -15,8 +15,7 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.fdt.core.CCProjectNature;
-import org.eclipse.fdt.core.CProjectNature;
+import org.eclipse.fdt.core.FortranProjectNature;
 import org.eclipse.fdt.make.core.MakeCorePlugin;
 import org.eclipse.fdt.make.core.scannerconfig.ScannerInfoTypes;
 import org.eclipse.fdt.make.internal.core.scannerconfig.gnu.GCCScannerConfigUtil;
@@ -38,10 +37,7 @@ public class GCCSpecsRunSIProvider extends DefaultRunSIProvider {
             String targetFile = "dummy";    //$NON-NLS-1$
             IProject project = resource.getProject();
             try {
-                if (project.hasNature(CCProjectNature.CC_NATURE_ID)) {
-                    targetFile = GCCScannerConfigUtil.CPP_SPECS_FILE;
-                }
-                else if (project.hasNature(CProjectNature.C_NATURE_ID)) {
+				if (project.hasNature(FortranProjectNature.FORTRAN_NATURE_ID)) {
                     targetFile = GCCScannerConfigUtil.C_SPECS_FILE;
                 }
                 IPath path2File = MakeCorePlugin.getWorkingDirectory().append(targetFile);

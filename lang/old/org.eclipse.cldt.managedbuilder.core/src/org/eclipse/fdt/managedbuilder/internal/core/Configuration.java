@@ -24,9 +24,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.fdt.core.CCProjectNature;
-import org.eclipse.fdt.core.CCorePlugin;
-import org.eclipse.fdt.core.CProjectNature;
+import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.FortranProjectNature;
 import org.eclipse.fdt.managedbuilder.core.BuildException;
 import org.eclipse.fdt.managedbuilder.core.IBuilder;
 import org.eclipse.fdt.managedbuilder.core.IConfiguration;
@@ -503,12 +502,7 @@ public class Configuration extends BuildObject implements IConfiguration {
 				// Make sure the tool is right for the project
 				switch (tool.getNatureFilter()) {
 					case ITool.FILTER_C:
-						if (project.hasNature(CProjectNature.C_NATURE_ID) && !project.hasNature(CCProjectNature.CC_NATURE_ID)) {
-							tools.add(tool);
-						}
-						break;
-					case ITool.FILTER_CC:
-						if (project.hasNature(CCProjectNature.CC_NATURE_ID)) {
+						if (project.hasNature(FortranProjectNature.FORTRAN_NATURE_ID)) {
 							tools.add(tool);
 						}
 						break;
@@ -847,7 +841,7 @@ public class Configuration extends BuildObject implements IConfiguration {
 		} else {
 			// If no error parsers are specified, the default is 
 			// all error parsers
-			errorParsers = CCorePlugin.getDefault().getAllErrorParsersIDs();
+			errorParsers = FortranCorePlugin.getDefault().getAllErrorParsersIDs();
 		}
 		return errorParsers;
 	}

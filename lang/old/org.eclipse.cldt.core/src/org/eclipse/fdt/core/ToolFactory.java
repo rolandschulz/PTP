@@ -27,18 +27,18 @@ public class ToolFactory {
 	/**
 	 * Create an instance of the built-in code formatter. 
 	 * @param options - the options map to use for formatting with the default code formatter. Recognized options
-	 * 	are documented on <code>CCorePlugin#getDefaultOptions()</code>. If set to <code>null</code>, then use 
-	 * 	the current settings from <code>CCorePlugin#getOptions</code>.
+	 * 	are documented on <code>FortranCorePlugin#getDefaultOptions()</code>. If set to <code>null</code>, then use 
+	 * 	the current settings from <code>FortranCorePlugin#getOptions</code>.
 	 * @return an instance of the built-in code formatter
 	 * @see CodeFormatter
-	 * @see CCorePlugin#getOptions()
+	 * @see FortranCorePlugin#getOptions()
 	 */
 	public static CodeFormatter createCodeFormatter(Map options){
 		if (options == null) 
-			options = CCorePlugin.getOptions();
-		String formatterID = (String)options.get(CCorePreferenceConstants.CODE_FORMATTER);
-		String extID = CCorePlugin.FORMATTER_EXTPOINT_ID;
-		IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(CCorePlugin.PLUGIN_ID, extID);
+			options = FortranCorePlugin.getOptions();
+		String formatterID = (String)options.get(FortranCorePreferenceConstants.CODE_FORMATTER);
+		String extID = FortranCorePlugin.FORMATTER_EXTPOINT_ID;
+		IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID, extID);
 		if (extension != null) {
 			IExtension[] extensions =  extension.getExtensions();
 			for(int i = 0; i < extensions.length; i++){

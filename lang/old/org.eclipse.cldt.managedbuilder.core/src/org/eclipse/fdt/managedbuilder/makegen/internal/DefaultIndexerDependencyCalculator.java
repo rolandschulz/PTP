@@ -16,7 +16,7 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.search.ICSearchConstants;
 import org.eclipse.fdt.core.search.ICSearchScope;
 import org.eclipse.fdt.core.search.SearchEngine;
@@ -39,7 +39,7 @@ public class DefaultIndexerDependencyCalculator implements IManagedDependencyGen
 		PathCollector pathCollector = new PathCollector();
 		ICSearchScope scope = SearchEngine.createWorkspaceScope();
 		CSearchPattern pattern = CSearchPattern.createPattern(resource.getLocation().toOSString(), ICSearchConstants.INCLUDE, ICSearchConstants.REFERENCES, ICSearchConstants.EXACT_MATCH, true);
-		IndexManager indexManager = CCorePlugin.getDefault().getCoreModel().getIndexManager();
+		IndexManager indexManager = FortranCorePlugin.getDefault().getCoreModel().getIndexManager();
 		indexManager.performConcurrentJob(
 			new PatternSearchJob(
 				(CSearchPattern) pattern,

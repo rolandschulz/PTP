@@ -18,7 +18,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.ICProject;
@@ -110,8 +110,8 @@ public class DiscoveredScannerInfoProvider extends ScannerProvider {
 					cProject.setRawPathEntries((IPathEntry[])newEntries.toArray(new IPathEntry[newEntries.size()]), null);
 				}
 			}
-			ICDescriptor descriptor = CCorePlugin.getDefault().getCProjectDescription(project);
-			descriptor.remove(CCorePlugin.BUILD_SCANNER_INFO_UNIQ_ID); // remove scanner provider which will fallback to default
+			ICDescriptor descriptor = FortranCorePlugin.getDefault().getCProjectDescription(project);
+			descriptor.remove(FortranCorePlugin.BUILD_SCANNER_INFO_UNIQ_ID); // remove scanner provider which will fallback to default
 																	   // cpath provider.
 			// place holder to that we don't convert again.
 			project.setSessionProperty(scannerInfoProperty, scannerInfo);

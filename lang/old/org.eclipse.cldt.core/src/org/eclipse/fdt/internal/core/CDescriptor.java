@@ -48,7 +48,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.CDescriptorEvent;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.ICExtension;
@@ -107,11 +107,11 @@ public class CDescriptor implements ICDescriptor {
 			String ownerID = readFDTProjectFile(descriptionPath);
 			if (!ownerID.equals("")) { //$NON-NLS-1$
 				if (ownerID.equals(id)) {
-					status = new Status(IStatus.WARNING, CCorePlugin.PLUGIN_ID, CCorePlugin.STATUS_FDTPROJECT_EXISTS,
-							CCorePlugin.getResourceString("CDescriptor.exception.projectAlreadyExists"), (Throwable)null); //$NON-NLS-1$
+					status = new Status(IStatus.WARNING, FortranCorePlugin.PLUGIN_ID, FortranCorePlugin.STATUS_FDTPROJECT_EXISTS,
+							FortranCorePlugin.getResourceString("CDescriptor.exception.projectAlreadyExists"), (Throwable)null); //$NON-NLS-1$
 				} else {
-					status = new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, CCorePlugin.STATUS_FDTPROJECT_MISMATCH,
-							CCorePlugin.getResourceString("CDescriptor.exception.unmatchedOwnerId") + "<requested:" +id +"/ In file:" +ownerID+">", (Throwable)null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ 
+					status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, FortranCorePlugin.STATUS_FDTPROJECT_MISMATCH,
+							FortranCorePlugin.getResourceString("CDescriptor.exception.unmatchedOwnerId") + "<requested:" +id +"/ In file:" +ownerID+">", (Throwable)null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ 
 				}
 				throw new CoreException(status);
 			}
@@ -176,11 +176,11 @@ public class CDescriptor implements ICDescriptor {
 				readProjectDescription(node);
 				return ownerID;
 			}
-			IStatus status = new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1,
-					CCorePlugin.getResourceString("CDescriptor.exception.missingElement"), null); //$NON-NLS-1$
+			IStatus status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1,
+					FortranCorePlugin.getResourceString("CDescriptor.exception.missingElement"), null); //$NON-NLS-1$
 			throw new CoreException(status);
 		} catch (Exception e) {
-			IStatus status = new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, e.toString(), e);
+			IStatus status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, e.toString(), e);
 			throw new CoreException(status);
 		}
 	}
@@ -330,13 +330,13 @@ public class CDescriptor implements ICDescriptor {
 				try {
 					xml = getAsXML();
 				} catch (IOException e) {
-					IStatus s = new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, e.getMessage(), e);
+					IStatus s = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, e.getMessage(), e);
 					throw new CoreException(s);
 				} catch (TransformerException e) {
-					IStatus s = new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, e.getMessage(), e);
+					IStatus s = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, e.getMessage(), e);
 					throw new CoreException(s);
 				} catch (ParserConfigurationException e) {
-					IStatus s = new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, e.getMessage(), e);
+					IStatus s = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, e.getMessage(), e);
 					throw new CoreException(s);
 				}
 
@@ -354,7 +354,7 @@ public class CDescriptor implements ICDescriptor {
 						rscFile.create(inputStream, IResource.FORCE, null);
 					}
 				} catch (UnsupportedEncodingException e) {
-					IStatus s = new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, e.getMessage(), e);
+					IStatus s = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, e.getMessage(), e);
 					throw new CoreException(s);
 				}
 				fUpdating = false;
@@ -414,7 +414,7 @@ public class CDescriptor implements ICDescriptor {
 				String ownerId = readFDTProjectFile(descriptionPath);
 				fOwner = new COwner(fManager.getOwnerConfiguration(ownerId));
 			} catch (CoreException e) {
-				CCorePlugin.log(e);
+				FortranCorePlugin.log(e);
 				fOwner = origOwner;
 				extMap = origExtMap;
 				extInfoMap = origExtInfoMap;
@@ -461,13 +461,13 @@ public class CDescriptor implements ICDescriptor {
 					try {
 						decodeProjectExtension((Element)childNode);
 					} catch (CoreException e) {
-						CCorePlugin.log(e);
+						FortranCorePlugin.log(e);
 					}
 				} else if (childNode.getNodeName().equals(PROJECT_DATA)) {
 					try {
 						decodeProjectData((Element)childNode);
 					} catch (CoreException e) {
-						CCorePlugin.log(e);
+						FortranCorePlugin.log(e);
 					}
 				}
 			}
@@ -534,8 +534,8 @@ public class CDescriptor implements ICDescriptor {
 		IExtensionPoint extensionPoint = extensionRegistry.getExtensionPoint(ext.getExtension());
 		IExtension extension = extensionPoint.getExtension(ext.getID());
 		if (extension == null) {
-			throw new CoreException(new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1,
-					CCorePlugin.getResourceString("CDescriptor.exception.providerNotFound") + ":" + ext.getID(), null)); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new CoreException(new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1,
+					FortranCorePlugin.getResourceString("CDescriptor.exception.providerNotFound") + ":" + ext.getID(), null)); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		IConfigurationElement element[] = extension.getConfigurationElements();
 		for (int i = 0; i < element.length; i++) {
@@ -554,8 +554,8 @@ public class CDescriptor implements ICDescriptor {
 		IExtensionPoint extensionPoint = extensionRegistry.getExtensionPoint(ext.getExtension());
 		IExtension extension = extensionPoint.getExtension(ext.getID());
 		if (extension == null) {
-			throw new CoreException(new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1,
-					CCorePlugin.getResourceString("CDescriptor.exception.providerNotFound"), null)); //$NON-NLS-1$
+			throw new CoreException(new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1,
+					FortranCorePlugin.getResourceString("CDescriptor.exception.providerNotFound"), null)); //$NON-NLS-1$
 		}
 		IConfigurationElement element[] = extension.getConfigurationElements();
 		for (int i = 0; i < element.length; i++) {
@@ -594,8 +594,8 @@ public class CDescriptor implements ICDescriptor {
 			try {
 				dataDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 			} catch (ParserConfigurationException e) {
-				throw new CoreException(new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, IStatus.ERROR,
-						CCorePlugin.getResourceString("CDescriptor.extension.internalError"), e)); //$NON-NLS-1$
+				throw new CoreException(new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, IStatus.ERROR,
+						FortranCorePlugin.getResourceString("CDescriptor.extension.internalError"), e)); //$NON-NLS-1$
 			}
 			Element rootElem = dataDoc.createElement(PROJECT_DATA);
 			dataDoc.appendChild(rootElem);

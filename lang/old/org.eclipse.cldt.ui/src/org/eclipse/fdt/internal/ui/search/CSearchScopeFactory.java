@@ -19,7 +19,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.search.BasicSearchMatch;
 import org.eclipse.fdt.core.search.ICSearchScope;
@@ -141,7 +141,7 @@ public class CSearchScopeFactory {
 	private void addCElements(Set elements, BasicSearchMatch match) {
 		IResource tempResource=match.getResource(); 
 		if (tempResource!=null ){ 
-			ICElement cTransUnit = CCorePlugin.getDefault().getCoreModel().create(tempResource);
+			ICElement cTransUnit = FortranCorePlugin.getDefault().getCoreModel().create(tempResource);
 			if (cTransUnit != null)
 				elements.add(cTransUnit);
 		}

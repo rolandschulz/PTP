@@ -30,7 +30,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.make.core.IMakeBuilderInfo;
 import org.eclipse.fdt.make.core.IMakeTarget;
@@ -207,7 +207,7 @@ public class UpdateMakeProjectAction implements IWorkbenchWindowActionDelegate {
 					new SubProgressMonitor(monitor, 1));
 
 				// convert .fdtproject
-				CCorePlugin.getDefault().mapCProjectOwner(project[i], MakeCorePlugin.MAKE_PROJECT_ID, true);
+				FortranCorePlugin.getDefault().mapCProjectOwner(project[i], MakeCorePlugin.MAKE_PROJECT_ID, true);
 				// add new nature
 				MakeProjectNature.addNature(project[i], new SubProgressMonitor(monitor, 1));
 
@@ -215,11 +215,11 @@ public class UpdateMakeProjectAction implements IWorkbenchWindowActionDelegate {
 				IMakeBuilderInfo newInfo = MakeCorePlugin.createBuildInfo(project[i], MakeBuilder.BUILDER_ID);
 				final int LOCATION = 0, FULL_ARGS = 1, INC_ARGS = 2, STOP_ERORR = 3, USE_DEFAULT = 4;
 				QualifiedName[] qName = new QualifiedName[USE_DEFAULT + 1];
-				qName[LOCATION] = new QualifiedName(CCorePlugin.PLUGIN_ID, "buildLocation"); //$NON-NLS-1$
-				qName[FULL_ARGS] = new QualifiedName(CCorePlugin.PLUGIN_ID, "buildFullArguments"); //$NON-NLS-1$
-				qName[INC_ARGS] = new QualifiedName(CCorePlugin.PLUGIN_ID, "buildIncrementalArguments"); //$NON-NLS-1$
-				qName[STOP_ERORR] = new QualifiedName(CCorePlugin.PLUGIN_ID, "stopOnError"); //$NON-NLS-1$
-				qName[USE_DEFAULT] = new QualifiedName(CCorePlugin.PLUGIN_ID, "useDefaultBuildCmd"); //$NON-NLS-1$
+				qName[LOCATION] = new QualifiedName(FortranCorePlugin.PLUGIN_ID, "buildLocation"); //$NON-NLS-1$
+				qName[FULL_ARGS] = new QualifiedName(FortranCorePlugin.PLUGIN_ID, "buildFullArguments"); //$NON-NLS-1$
+				qName[INC_ARGS] = new QualifiedName(FortranCorePlugin.PLUGIN_ID, "buildIncrementalArguments"); //$NON-NLS-1$
+				qName[STOP_ERORR] = new QualifiedName(FortranCorePlugin.PLUGIN_ID, "stopOnError"); //$NON-NLS-1$
+				qName[USE_DEFAULT] = new QualifiedName(FortranCorePlugin.PLUGIN_ID, "useDefaultBuildCmd"); //$NON-NLS-1$
 
 				String property = project[i].getPersistentProperty(qName[LOCATION]);
 				if (property != null) {

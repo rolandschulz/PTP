@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.IStatus;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 
 /**
  *
@@ -37,7 +37,7 @@ public class FileStorage extends PlatformObject implements IStorage {
 			try {
 				return new FileInputStream(path.toFile());
 			} catch (FileNotFoundException e) {
-				throw new CoreException(new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID,
+				throw new CoreException(new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID,
 						IStatus.ERROR, e.toString(), e));
 			}
 		}

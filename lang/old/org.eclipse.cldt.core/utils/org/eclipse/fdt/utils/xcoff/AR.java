@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Vector;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 
 /**
  *  The <code>AR</code> class is used for parsing standard XCOFF32 archive (ar) files.
@@ -72,7 +72,7 @@ public class AR {
 				
 			} catch (IOException e) {
 				dispose();
-				CCorePlugin.log(e);
+				FortranCorePlugin.log(e);
 			}
 		}
 
@@ -98,7 +98,7 @@ public class AR {
 		header = new ARHeader();
 		if (!header.isXcoffARHeader()) {
 			file.close();
-			throw new IOException(CCorePlugin.getResourceString("Util.exception.invalidArchive")); //$NON-NLS-1$
+			throw new IOException(FortranCorePlugin.getResourceString("Util.exception.invalidArchive")); //$NON-NLS-1$
 		}
 	}
 

@@ -10,7 +10,7 @@
 ***********************************************************************/
 package org.eclipse.fdt.internal.ui.preferences;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.filetype.ICFileType;
 import org.eclipse.fdt.core.filetype.IResolverModel;
 import org.eclipse.jface.dialogs.Dialog;
@@ -125,7 +125,7 @@ public class CFileTypeDialog extends Dialog {
 	}
 
 	private IResolverModel getResolverModel() {
-		return CCorePlugin.getDefault().getResolverModel();
+		return FortranCorePlugin.getDefault().getResolverModel();
 	}
 	
 	Button getOkayButton() {

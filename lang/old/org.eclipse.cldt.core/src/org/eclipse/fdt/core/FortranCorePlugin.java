@@ -58,7 +58,7 @@ import org.eclipse.fdt.internal.core.search.matching.MatchLocator;
 import org.eclipse.fdt.internal.core.search.processing.JobManager;
 import org.osgi.framework.BundleContext;
 
-public class CCorePlugin extends Plugin {
+public class FortranCorePlugin extends Plugin {
 
 	public static final int STATUS_FDTPROJECT_EXISTS = 1;
 	public static final int STATUS_FDTPROJECT_MISMATCH = 2;
@@ -110,7 +110,7 @@ public class CCorePlugin extends Plugin {
     public static final String CORE_ENCODING = PLUGIN_ID + ".encoding"; //$NON-NLS-1$
 	public FDTLogWriter fdtLog = null;
 
-	private static CCorePlugin fgCPlugin;
+	private static FortranCorePlugin fgCPlugin;
 	private static ResourceBundle fgResourceBundle;
 
 	private CDescriptorManager fDescriptorManager = new CDescriptorManager();
@@ -176,7 +176,7 @@ public class CCorePlugin extends Plugin {
 		return fgResourceBundle;
 	}
 
-	public static CCorePlugin getDefault() {
+	public static FortranCorePlugin getDefault() {
 		return fgCPlugin;
 	}
 
@@ -194,7 +194,7 @@ public class CCorePlugin extends Plugin {
 
 	// ------ CPlugin
 
-	public CCorePlugin() {
+	public FortranCorePlugin() {
 		super();
 		fgCPlugin = this;
 	}
@@ -227,10 +227,10 @@ public class CCorePlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		
-		fdtLog = new FDTLogWriter(CCorePlugin.getDefault().getStateLocation().append(".log").toFile()); //$NON-NLS-1$
+		fdtLog = new FDTLogWriter(FortranCorePlugin.getDefault().getStateLocation().append(".log").toFile()); //$NON-NLS-1$
 		
 		//Set debug tracing options
-		CCorePlugin.getDefault().configurePluginDebugOptions();
+		FortranCorePlugin.getDefault().configurePluginDebugOptions();
 		
 		fDescriptorManager.startup();
 
@@ -255,7 +255,7 @@ public class CCorePlugin extends Plugin {
      * The client may safely use the result as a template that they can modify and
      * then pass to <code>setOptions</code>.
      * 
-     * Helper constants have been defined on CCorePlugin for each of the option ID and 
+     * Helper constants have been defined on FortranCorePlugin for each of the option ID and 
      * their possible constant values.
      * 
      * Note: more options might be added in further releases.
@@ -327,7 +327,7 @@ public class CCorePlugin extends Plugin {
 
    
     /**
-     * Helper method for returning one option value only. Equivalent to <code>(String)CCorePlugin.getOptions().get(optionName)</code>
+     * Helper method for returning one option value only. Equivalent to <code>(String)FortranCorePlugin.getOptions().get(optionName)</code>
      * Note that it may answer <code>null</code> if this option does not exist.
      * <p>
      * For a complete description of the configurable options, see <code>getDefaultOptions</code>.
@@ -335,7 +335,7 @@ public class CCorePlugin extends Plugin {
      * 
      * @param optionName the name of an option
      * @return the String value of a given option
-     * @see CCorePlugin#getDefaultOptions
+     * @see FortranCorePlugin#getDefaultOptions
      */
     public static String getOption(String optionName) {
         
@@ -358,7 +358,7 @@ public class CCorePlugin extends Plugin {
      * 
      * @return table of current settings of all options 
      *   (key type: <code>String</code>; value type: <code>String</code>)
-     * @see CCorePlugin#getDefaultOptions
+     * @see FortranCorePlugin#getDefaultOptions
      */
     public static HashMap getOptions() {
         
@@ -402,7 +402,7 @@ public class CCorePlugin extends Plugin {
      * 
      * @param newOptions the new options (key type: <code>String</code>; value type: <code>String</code>),
      *   or <code>null</code> to reset all options to their default values
-     * @see CCorePlugin#getDefaultOptions
+     * @see FortranCorePlugin#getDefaultOptions
      */
     public static void setOptions(HashMap newOptions) {
     
@@ -428,7 +428,7 @@ public class CCorePlugin extends Plugin {
 
 	public IConsole getConsole(String id) {
 		try {
-	        IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(CCorePlugin.PLUGIN_ID, "CBuildConsole"); //$NON-NLS-1$
+	        IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID, "CBuildConsole"); //$NON-NLS-1$
 			if (extension != null) {
 				IExtension[] extensions = extension.getExtensions();
 				for (int i = 0; i < extensions.length; i++) {
@@ -540,7 +540,7 @@ public class CCorePlugin extends Plugin {
 		if (id == null || id.length() == 0) {
 			id = DEFAULT_BINARY_PARSER_UNIQ_ID;
 		}
-        IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(CCorePlugin.PLUGIN_ID, BINARY_PARSER_SIMPLE_ID);
+        IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID, BINARY_PARSER_SIMPLE_ID);
 		IExtension extension = extensionPoint.getExtension(id);
 		if (extension != null) {
 			IConfigurationElement element[] = extension.getConfigurationElements();
@@ -551,7 +551,7 @@ public class CCorePlugin extends Plugin {
 				}
 			}
 		} else {
-			IStatus s = new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, CCorePlugin.getResourceString("CCorePlugin.exception.noBinaryFormat"), null); //$NON-NLS-1$
+			IStatus s = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, FortranCorePlugin.getResourceString("FortranCorePlugin.exception.noBinaryFormat"), null); //$NON-NLS-1$
 			throw new CoreException(s);
 		}
 		return parser;
@@ -672,7 +672,7 @@ public class CCorePlugin extends Plugin {
 					mapCProjectOwner(projectHandle, projectID, false);
 
 					// Add C Nature ... does not add duplicates
-					CProjectNature.addCNature(projectHandle, new SubProgressMonitor(monitor, 1));
+					FortranProjectNature.addCNature(projectHandle, new SubProgressMonitor(monitor, 1));
 				} finally {
 					monitor.done();
 				}
@@ -693,12 +693,6 @@ public class CCorePlugin extends Plugin {
 	 */
 
 	public void convertProjectFromCtoCC(IProject projectHandle, IProgressMonitor monitor) throws CoreException {
-		if ((projectHandle != null)
-			&& projectHandle.hasNature(CProjectNature.C_NATURE_ID)
-			&& !projectHandle.hasNature(CCProjectNature.CC_NATURE_ID)) {
-			// Add C++ Nature ... does not add duplicates        
-			CCProjectNature.addCCNature(projectHandle, monitor);
-		}
 	}
 
 	/**
@@ -750,7 +744,7 @@ public class CCorePlugin extends Plugin {
 	 * @return IProcessList
 	 */
 	public IProcessList getProcessList() throws CoreException {
-        IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(CCorePlugin.PLUGIN_ID, "ProcessList"); //$NON-NLS-1$
+        IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID, "ProcessList"); //$NON-NLS-1$
 		if (extension != null) {
 			IExtension[] extensions = extension.getExtensions();
 			IConfigurationElement defaultContributor = null;
@@ -783,7 +777,7 @@ public class CCorePlugin extends Plugin {
 	 * @return
 	 */
 	public String[] getAllErrorParsersIDs() {
-        IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(CCorePlugin.PLUGIN_ID, ERROR_PARSER_SIMPLE_ID);
+        IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID, ERROR_PARSER_SIMPLE_ID);
 		String[] empty = new String[0];
 		if (extension != null) {
 			IExtension[] extensions = extension.getExtensions();
@@ -799,7 +793,7 @@ public class CCorePlugin extends Plugin {
 	public IErrorParser[] getErrorParser(String id) {
 		IErrorParser[] empty = new IErrorParser[0];
 		try {
-	        IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(CCorePlugin.PLUGIN_ID, ERROR_PARSER_SIMPLE_ID);
+	        IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID, ERROR_PARSER_SIMPLE_ID);
 			if (extension != null) {
 				IExtension[] extensions = extension.getExtensions();
 				List list = new ArrayList(extensions.length);
@@ -839,23 +833,23 @@ public class CCorePlugin extends Plugin {
 		return provider;
 	}
 
-	private static final String MODEL = CCorePlugin.PLUGIN_ID + "/debug/model" ; //$NON-NLS-1$
-	private static final String INDEXER = CCorePlugin.PLUGIN_ID + "/debug/indexer"; //$NON-NLS-1$
-	private static final String INDEX_MANAGER = CCorePlugin.PLUGIN_ID + "/debug/indexmanager"; //$NON-NLS-1$
-	private static final String SEARCH  = CCorePlugin.PLUGIN_ID + "/debug/search" ; //$NON-NLS-1$
-	private static final String MATCH_LOCATOR  = CCorePlugin.PLUGIN_ID + "/debug/matchlocator" ; //$NON-NLS-1$
-	private static final String PARSER = CCorePlugin.PLUGIN_ID + "/debug/parser" ; //$NON-NLS-1$
-	private static final String SCANNER = CCorePlugin.PLUGIN_ID + "/debug/scanner"; //$NON-NLS-1$
-	private static final String DELTA = CCorePlugin.PLUGIN_ID + "/debug/deltaprocessor" ; //$NON-NLS-1$
-	private static final String RESOLVER = CCorePlugin.PLUGIN_ID + "/debug/typeresolver" ; //$NON-NLS-1$
-	//private static final String CONTENTASSIST = CCorePlugin.PLUGIN_ID + "/debug/contentassist" ; //$NON-NLS-1$
+	private static final String MODEL = FortranCorePlugin.PLUGIN_ID + "/debug/model" ; //$NON-NLS-1$
+	private static final String INDEXER = FortranCorePlugin.PLUGIN_ID + "/debug/indexer"; //$NON-NLS-1$
+	private static final String INDEX_MANAGER = FortranCorePlugin.PLUGIN_ID + "/debug/indexmanager"; //$NON-NLS-1$
+	private static final String SEARCH  = FortranCorePlugin.PLUGIN_ID + "/debug/search" ; //$NON-NLS-1$
+	private static final String MATCH_LOCATOR  = FortranCorePlugin.PLUGIN_ID + "/debug/matchlocator" ; //$NON-NLS-1$
+	private static final String PARSER = FortranCorePlugin.PLUGIN_ID + "/debug/parser" ; //$NON-NLS-1$
+	private static final String SCANNER = FortranCorePlugin.PLUGIN_ID + "/debug/scanner"; //$NON-NLS-1$
+	private static final String DELTA = FortranCorePlugin.PLUGIN_ID + "/debug/deltaprocessor" ; //$NON-NLS-1$
+	private static final String RESOLVER = FortranCorePlugin.PLUGIN_ID + "/debug/typeresolver" ; //$NON-NLS-1$
+	//private static final String CONTENTASSIST = FortranCorePlugin.PLUGIN_ID + "/debug/contentassist" ; //$NON-NLS-1$
 
 	/**
 	 * Configure the plugin with respect to option settings defined in ".options" file
 	 */
 	public void configurePluginDebugOptions(){
 		
-		if(CCorePlugin.getDefault().isDebugging()){
+		if(FortranCorePlugin.getDefault().isDebugging()){
 			String option = Platform.getDebugOption(PARSER);
 			if(option != null) Util.VERBOSE_PARSER = option.equalsIgnoreCase("true") ; //$NON-NLS-1$
 		

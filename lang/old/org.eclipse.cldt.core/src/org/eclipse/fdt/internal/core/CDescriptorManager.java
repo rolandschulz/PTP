@@ -40,7 +40,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.CDescriptorEvent;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.ICDescriptorListener;
@@ -55,14 +55,14 @@ public class CDescriptorManager implements ICDescriptorManager, IResourceChangeL
 	List listeners = Collections.synchronizedList(new Vector());
 
 	private static final COwnerConfiguration NULLCOwner = new COwnerConfiguration("", //$NON-NLS-1$
-			CCorePlugin.getResourceString("CDescriptorManager.internal_owner")); //$NON-NLS-1$
+			FortranCorePlugin.getResourceString("CDescriptorManager.internal_owner")); //$NON-NLS-1$
 
 	class CDescriptorUpdater extends Job {
 
 		CDescriptor fDescriptor;
 
 		public CDescriptorUpdater(CDescriptor descriptor) {
-			super(CCorePlugin.getResourceString("CDescriptorManager.async_updater")); //$NON-NLS-1$
+			super(FortranCorePlugin.getResourceString("CDescriptorManager.async_updater")); //$NON-NLS-1$
 			fDescriptor = descriptor;
 			setPriority(Job.INTERACTIVE);
 			setSystem(true);
@@ -99,7 +99,7 @@ public class CDescriptorManager implements ICDescriptorManager, IResourceChangeL
 							getDescriptor(project);
 						}
 					} catch (CoreException e) {
-						CCorePlugin.log(e);
+						FortranCorePlugin.log(e);
 					}
 					return false;
 				}
@@ -176,7 +176,7 @@ public class CDescriptorManager implements ICDescriptorManager, IResourceChangeL
 							}
 						});
 					} catch (CoreException e) {
-						CCorePlugin.log(e);
+						FortranCorePlugin.log(e);
 					}
 					break;
 			}
@@ -184,7 +184,7 @@ public class CDescriptorManager implements ICDescriptorManager, IResourceChangeL
 	}
 
 	private void initializeOwnerConfiguration() {
-        IExtensionPoint extpoint = Platform.getExtensionRegistry().getExtensionPoint(CCorePlugin.PLUGIN_ID, "CProject"); //$NON-NLS-1$
+        IExtensionPoint extpoint = Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID, "CProject"); //$NON-NLS-1$
 		IExtension extension[] = extpoint.getExtensions();
 		fOwnerConfigMap = new HashMap(extension.length);
 		for (int i = 0; i < extension.length; i++) {
@@ -207,7 +207,7 @@ public class CDescriptorManager implements ICDescriptorManager, IResourceChangeL
 		}
 		COwnerConfiguration config = (COwnerConfiguration)fOwnerConfigMap.get(id);
 		if (config == null) { // no install owner, lets create place holder config for it.
-			config = new COwnerConfiguration(id, CCorePlugin.getResourceString("CDescriptorManager.owner_not_Installed")); //$NON-NLS-1$
+			config = new COwnerConfiguration(id, FortranCorePlugin.getResourceString("CDescriptorManager.owner_not_Installed")); //$NON-NLS-1$
 			fOwnerConfigMap.put(id, config);
 		}
 		return config;
@@ -262,8 +262,8 @@ public class CDescriptorManager implements ICDescriptorManager, IResourceChangeL
 	public void configure(IProject project, String id) throws CoreException {
 		CDescriptor descriptor;
 		if (id.equals(NULLCOwner.getOwnerID())) { //$NON-NLS-1$
-			IStatus status = new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1,
-					CCorePlugin.getResourceString("CDescriptorManager.exception.invalid_ownerID"), //$NON-NLS-1$
+			IStatus status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1,
+					FortranCorePlugin.getResourceString("CDescriptorManager.exception.invalid_ownerID"), //$NON-NLS-1$
 					(Throwable)null);
 			throw new CoreException(status);
 		}
@@ -274,8 +274,8 @@ public class CDescriptorManager implements ICDescriptorManager, IResourceChangeL
 					// non owned descriptors are simply configure to the new owner no questions ask!
 					descriptor = new CDescriptor(this, project, new COwner(getOwnerConfiguration(id)));
 				} else if (!descriptor.getProjectOwner().getID().equals(id)) {
-					IStatus status = new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, CCorePlugin.STATUS_FDTPROJECT_EXISTS,
-							CCorePlugin.getResourceString("CDescriptorManager.exception.alreadyConfigured"), //$NON-NLS-1$
+					IStatus status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, FortranCorePlugin.STATUS_FDTPROJECT_EXISTS,
+							FortranCorePlugin.getResourceString("CDescriptorManager.exception.alreadyConfigured"), //$NON-NLS-1$
 							(Throwable)null);
 					throw new CoreException(status);
 				} else {
@@ -286,7 +286,7 @@ public class CDescriptorManager implements ICDescriptorManager, IResourceChangeL
 					descriptor = new CDescriptor(this, project, id);
 				} catch (CoreException e) { // if .fdtproject already exists we'll use that
 					IStatus status = e.getStatus();
-					if (status.getCode() == CCorePlugin.STATUS_FDTPROJECT_EXISTS) {
+					if (status.getCode() == FortranCorePlugin.STATUS_FDTPROJECT_EXISTS) {
 						descriptor = new CDescriptor(this, project);
 					} else
 						throw e;
@@ -345,9 +345,9 @@ public class CDescriptorManager implements ICDescriptorManager, IResourceChangeL
 			Platform.run(new ISafeRunnable() {
 
 				public void handleException(Throwable exception) {
-					IStatus status = new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1,
-							CCorePlugin.getResourceString("CDescriptorManager.exception.listenerError"), exception); //$NON-NLS-1$
-					CCorePlugin.log(status);
+					IStatus status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1,
+							FortranCorePlugin.getResourceString("CDescriptorManager.exception.listenerError"), exception); //$NON-NLS-1$
+					FortranCorePlugin.log(status);
 				}
 
 				public void run() throws Exception {
@@ -360,7 +360,7 @@ public class CDescriptorManager implements ICDescriptorManager, IResourceChangeL
 	public void runDescriptorOperation(IProject project, ICDescriptorOperation op, IProgressMonitor monitor) throws CoreException {
 		ICDescriptor descriptor = getDescriptor(project, true);
 		if (descriptor == null) {
-			throw new CoreException(new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1, "Failed to create descriptor", null)); //$NON-NLS-1$
+			throw new CoreException(new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1, "Failed to create descriptor", null)); //$NON-NLS-1$
 		}
 		CDescriptorEvent event = null;
 		synchronized (descriptor) {

@@ -15,7 +15,7 @@ import java.io.IOException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.internal.core.index.IIndex;
 import org.eclipse.fdt.internal.core.search.processing.IJob;
 
@@ -40,7 +40,7 @@ public abstract class IndexRequest implements IJob {
 	}
 	
 	public boolean isReadyToRun() {
-		IProject project = CCorePlugin.getWorkspace().getRoot().getProject(indexPath.segment(0));
+		IProject project = FortranCorePlugin.getWorkspace().getRoot().getProject(indexPath.segment(0));
 		if ( !project.isAccessible() || !this.manager.isIndexEnabled( project ) )
 			return false;
 		

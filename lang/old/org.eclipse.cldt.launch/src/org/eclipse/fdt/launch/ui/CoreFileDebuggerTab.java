@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.debug.core.CDebugCorePlugin;
@@ -160,7 +160,7 @@ public class CoreFileDebuggerTab extends AbstractCDebuggerTab {
 		String projectPlatform = "*"; //$NON-NLS-1$
 		if (ce != null) {
 			try {
-				ICDescriptor descriptor = CCorePlugin.getDefault().getCProjectDescription(ce.getCProject().getProject(), false);
+				ICDescriptor descriptor = FortranCorePlugin.getDefault().getCProjectDescription(ce.getCProject().getProject(), false);
 				if (descriptor != null) {
 					projectPlatform = descriptor.getPlatform();
 				}

@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.make.internal.ui.MakeUIPlugin;
 
 /**
@@ -50,7 +50,7 @@ public class NewMakeCCProjectWizard extends NewMakeProjectWizard {
 		// Add C++ Nature.
 		if (newProject != null) {
 			// Add C++ Nature to the newly created project.
-			CCorePlugin.getDefault().convertProjectFromCtoCC(newProject, new SubProgressMonitor(monitor, 1));
+			FortranCorePlugin.getDefault().convertProjectFromCtoCC(newProject, new SubProgressMonitor(monitor, 1));
 		}
 		monitor.done();
 	}

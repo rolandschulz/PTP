@@ -20,7 +20,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.parser.IScannerInfo;
 import org.eclipse.fdt.core.parser.IScannerInfoProvider;
 
@@ -104,7 +104,7 @@ public class PathUtil {
     }
 
     public static IPath makeRelativePathToProjectIncludes(IPath fullPath, IProject project) {
-        IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(project);
+        IScannerInfoProvider provider = FortranCorePlugin.getDefault().getScannerInfoProvider(project);
         if (provider != null) {
             IScannerInfo info = provider.getScannerInformation(project);
             if (info != null) {

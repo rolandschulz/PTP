@@ -5,7 +5,7 @@
    name="%pluginName"
    version="3.0.0"
    provider-name="%providerName"
-   class="org.eclipse.fdt.core.CCorePlugin">
+   class="org.eclipse.fdt.core.FortranCorePlugin">
 
    <runtime>
       <library name="fdtcore.jar">
@@ -212,15 +212,15 @@
       </persistent>
    </extension>
 <!-- =================================================================================== -->
-<!-- FDT C Nature                                                                        -->
+<!-- FDT Fortran Nature                                                                        -->
 <!-- =================================================================================== -->
    <extension
-         id="cnature"
-         name="%cnature.name"
+         id="fnature"
+         name="%fnature.name"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="org.eclipse.fdt.core.CProjectNature">
+               class="org.eclipse.fdt.core.FortranProjectNature">
          </run>
       </runtime>
    </extension>

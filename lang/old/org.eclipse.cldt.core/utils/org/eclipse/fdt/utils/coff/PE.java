@@ -14,7 +14,7 @@ package org.eclipse.fdt.utils.coff;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.IAddressFactory;
 import org.eclipse.fdt.utils.Addr32Factory;
 import org.eclipse.fdt.utils.coff.Coff.FileHeader;
@@ -323,7 +323,7 @@ public class PE {
 				rfile.readFully(sig);
 				if (!((sig[0] == 'P') && (sig[1] == 'E')
 				   && (sig[2] == '\0') && (sig[3] == '\0'))) {
-					throw new IOException(CCorePlugin.getResourceString("Util.exception.notPE")); //$NON-NLS-1$
+					throw new IOException(FortranCorePlugin.getResourceString("Util.exception.notPE")); //$NON-NLS-1$
 				}
 			} catch (IOException e) {
 				rfile.seek(pos);
@@ -333,7 +333,7 @@ public class PE {
 
 			// Check if this a valid machine.
 			if (!isValidMachine(fileHeader.f_magic)) {
-				throw new IOException(CCorePlugin.getResourceString("Util.exception.unknownFormat")); //$NON-NLS-1$
+				throw new IOException(FortranCorePlugin.getResourceString("Util.exception.unknownFormat")); //$NON-NLS-1$
 			}
 
 			if (fileHeader.f_opthdr > 0) {
@@ -492,7 +492,7 @@ public class PE {
 			if (idx + 4 < data.length) {
 				if (!((data[idx + 0] == 'P') && (data[idx + 1] == 'E')
 						&& (data[idx + 2] == '\0') && (data[idx + 3] == '\0'))) {
-					throw new IOException(CCorePlugin.getResourceString("Util.exception.notPE")); //$NON-NLS-1$
+					throw new IOException(FortranCorePlugin.getResourceString("Util.exception.notPE")); //$NON-NLS-1$
 				}
 				idx += 4;
 			}
@@ -506,7 +506,7 @@ public class PE {
 				return getAttributes(filehdr);
 			}
 		}
-		throw new IOException(CCorePlugin.getResourceString("Util.exception.notPE")); //$NON-NLS-1$
+		throw new IOException(FortranCorePlugin.getResourceString("Util.exception.notPE")); //$NON-NLS-1$
 	}
 
 	public static Attribute getAttribute(String file) throws IOException {

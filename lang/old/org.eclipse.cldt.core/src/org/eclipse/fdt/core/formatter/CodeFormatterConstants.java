@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.fdt.core.formatter;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 
 /**
  */
@@ -25,7 +25,7 @@ public class CodeFormatterConstants {
 	 *     - default:           ParserLanguage.CPP
 	 * </pre>
 	 */
-	public static final String FORMATTER_LANGUAGE = CCorePlugin.PLUGIN_ID + ".formatter.language";	 //$NON-NLS-1$
+	public static final String FORMATTER_LANGUAGE = FortranCorePlugin.PLUGIN_ID + ".formatter.language";	 //$NON-NLS-1$
 	
 	/**
 	 * <pre>
@@ -35,7 +35,7 @@ public class CodeFormatterConstants {
 	 *     - default:           null
 	 * </pre>
 	 */
-	public static final String FORMATTER_CURRENT_FILE = CCorePlugin.PLUGIN_ID + ".formatter.current_file";	 //$NON-NLS-1$
+	public static final String FORMATTER_CURRENT_FILE = FortranCorePlugin.PLUGIN_ID + ".formatter.current_file";	 //$NON-NLS-1$
 	
 	
 

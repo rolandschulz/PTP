@@ -13,7 +13,7 @@ package org.eclipse.fdt.internal.ui.preferences;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.filetype.ICFileTypeAssociation;
 import org.eclipse.fdt.core.filetype.ICFileTypeResolver;
 import org.eclipse.fdt.core.filetype.IResolverModel;
@@ -326,7 +326,7 @@ public class CFileTypesPreferenceBlock {
 	}
 
 	private IResolverModel getResolverModel() {
-		return CCorePlugin.getDefault().getResolverModel();
+		return FortranCorePlugin.getDefault().getResolverModel();
 	}
 	
 	protected void handleAdd() {

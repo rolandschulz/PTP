@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.filetype.ICFileType;
 import org.eclipse.fdt.core.filetype.ICFileTypeConstants;
 import org.eclipse.fdt.core.formatter.CodeFormatter;
@@ -135,20 +135,16 @@ public class CFormattingStrategy extends ContextBasedFormattingStrategy {
 			IProject currentProject = activeFile.getProject();
 			Assert.isNotNull(currentProject);
 			// pick the language
-			if (CoreModel.hasCCNature(currentProject)) {
-				language = ParserLanguage.CPP;
-			} else {
-				// for C project try to guess.
-				ICFileType type = CCorePlugin.getDefault().getFileType(currentProject, 
-						activeFile.getFullPath().lastSegment());
-				String lid = type.getLanguage().getId();
-				if(lid != null && lid.equals(ICFileTypeConstants.LANG_C))
-					language = ParserLanguage.C;
-			}
+			// for C project try to guess.
+			ICFileType type = FortranCorePlugin.getDefault().getFileType(currentProject, 
+					activeFile.getFullPath().lastSegment());
+			String lid = type.getLanguage().getId();
+			if(lid != null && lid.equals(ICFileTypeConstants.LANG_C))
+				language = ParserLanguage.C;
 	        preferences= new HashMap(CoreModel.getDefault().create(
 	                activeFile.getProject()).getOptions(true));
 		} else
-            preferences= new HashMap(CCorePlugin.getOptions());
+            preferences= new HashMap(FortranCorePlugin.getOptions());
 
         preferences.put(CodeFormatterConstants.FORMATTER_LANGUAGE, language);
 		preferences.put(CodeFormatterConstants.FORMATTER_CURRENT_FILE, activeFile);

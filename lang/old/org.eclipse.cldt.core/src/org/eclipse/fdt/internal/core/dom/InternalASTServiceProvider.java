@@ -14,8 +14,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.fdt.core.CCProjectNature;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.dom.IASTServiceProvider;
 import org.eclipse.fdt.core.dom.ICodeReaderFactory;
 import org.eclipse.fdt.core.dom.IParserConfiguration;
@@ -91,7 +90,7 @@ public class InternalASTServiceProvider implements IASTServiceProvider {
 		
 		if( configuration == null )
 		{
-			IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(currentProject);
+			IScannerInfoProvider provider = FortranCorePlugin.getDefault().getScannerInfoProvider(currentProject);
 			if (provider != null){
 			  IScannerInfo buildScanInfo = provider.getScannerInformation(fileToParse);
 			  if (buildScanInfo != null){
@@ -174,7 +173,7 @@ public class InternalASTServiceProvider implements IASTServiceProvider {
 		IProject currentProject = fileToParse.getProject();
 		IScannerInfo scanInfo = null;
 
-		IScannerInfoProvider provider = CCorePlugin.getDefault()
+		IScannerInfoProvider provider = FortranCorePlugin.getDefault()
 				.getScannerInfoProvider(currentProject);
 		if (provider != null) {
 			IScannerInfo buildScanInfo = provider
@@ -229,7 +228,7 @@ public class InternalASTServiceProvider implements IASTServiceProvider {
     private ParserLanguage getLanguage( IResource resource )
     {    
 		IProject project = resource.getProject();
-		ICFileType type = CCorePlugin.getDefault().getFileType(project, resource.getLocation().lastSegment());
+		ICFileType type = FortranCorePlugin.getDefault().getFileType(project, resource.getLocation().lastSegment());
 		String lid = type.getLanguage().getId();
 		if( lid != null )
 		{
@@ -238,11 +237,6 @@ public class InternalASTServiceProvider implements IASTServiceProvider {
 		    if( lid.equals(ICFileTypeConstants.LANG_CXX))
 		        return ParserLanguage.CPP;
 		}
-		try {
-            if( project.hasNature( CCProjectNature.CC_NATURE_ID ))
-                return ParserLanguage.CPP;
-        } catch (CoreException e) {
-        }
 		return ParserLanguage.C;
     }
 }

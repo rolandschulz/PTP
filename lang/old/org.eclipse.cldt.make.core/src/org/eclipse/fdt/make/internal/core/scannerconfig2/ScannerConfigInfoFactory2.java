@@ -20,7 +20,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.ICDescriptorOperation;
 import org.eclipse.fdt.make.core.MakeCorePlugin;
@@ -441,7 +441,7 @@ public class ScannerConfigInfoFactory2 {
             List profileIds = ScannerConfigProfileManager.getInstance().getProfileIds();
             List loadedProfiles = new ArrayList();
 			try {
-				descriptor = CCorePlugin.getDefault().getCProjectDescription(project, false);
+				descriptor = FortranCorePlugin.getDefault().getCProjectDescription(project, false);
 				for (Node sc = descriptor.getProjectData(SCANNER_CONFIG).getFirstChild();
                         sc != null; sc = sc.getNextSibling()) {
                     if (sc.getNodeName().equals(SC_AUTODISCOVERY)) {
@@ -649,7 +649,7 @@ public class ScannerConfigInfoFactory2 {
 
 		private boolean store() throws CoreException {
 			if (isDirty) {
-				ICDescriptor descriptor = CCorePlugin.getDefault().getCProjectDescription(project, true);
+				ICDescriptor descriptor = FortranCorePlugin.getDefault().getCProjectDescription(project, true);
 				Element sc = descriptor.getProjectData(SCANNER_CONFIG);
                 Document doc = sc.getOwnerDocument();
 
@@ -752,7 +752,7 @@ public class ScannerConfigInfoFactory2 {
                      }
                       
                  };
-                 CCorePlugin.getDefault().getCDescriptorManager().
+                 FortranCorePlugin.getDefault().getCDescriptorManager().
                          runDescriptorOperation(project, op, null);
             }
         }

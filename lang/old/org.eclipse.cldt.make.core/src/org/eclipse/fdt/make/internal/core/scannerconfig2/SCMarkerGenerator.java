@@ -13,7 +13,7 @@ package org.eclipse.fdt.make.internal.core.scannerconfig2;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.IMarkerGenerator;
 import org.eclipse.fdt.core.model.ICModelMarker;
 
@@ -63,7 +63,7 @@ public class SCMarkerGenerator implements IMarkerGenerator {
             }
         }
         catch (CoreException e) {
-            CCorePlugin.log(e.getStatus());
+            FortranCorePlugin.log(e.getStatus());
         }
     }
 

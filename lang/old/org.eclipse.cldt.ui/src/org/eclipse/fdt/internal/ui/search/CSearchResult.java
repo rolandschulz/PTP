@@ -23,7 +23,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.ICElement;
@@ -67,7 +67,7 @@ public class CSearchResult extends AbstractTextSearchResult implements IEditorMa
 	
 	private ICElement create(IFile file){
 		IProject project = file.getProject();
-		ICProject cProject = CCorePlugin.getDefault().getCoreModel().create(project);
+		ICProject cProject = FortranCorePlugin.getDefault().getCoreModel().create(project);
 		return cProject;
 	}
 	

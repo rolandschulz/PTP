@@ -15,7 +15,7 @@ import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.ICOwner;
 import org.eclipse.fdt.make.core.MakeCorePlugin;
@@ -23,25 +23,25 @@ import org.eclipse.fdt.make.core.MakeCorePlugin;
 public class MakeProject implements ICOwner {
 
 	public void configure(ICDescriptor cDescriptor) throws CoreException {
-		cDescriptor.remove(CCorePlugin.BUILD_SCANNER_INFO_UNIQ_ID);
-		cDescriptor.remove(CCorePlugin.BUILDER_MODEL_ID);
+		cDescriptor.remove(FortranCorePlugin.BUILD_SCANNER_INFO_UNIQ_ID);
+		cDescriptor.remove(FortranCorePlugin.BUILDER_MODEL_ID);
 		updateBinaryParsers(cDescriptor);
 	}
 
 	public void update(ICDescriptor cDescriptor, String extensionID) throws CoreException {
-		if (extensionID.equals(CCorePlugin.BINARY_PARSER_UNIQ_ID)) {
+		if (extensionID.equals(FortranCorePlugin.BINARY_PARSER_UNIQ_ID)) {
 			updateBinaryParsers(cDescriptor);
 		}
 	}
 
 	private void updateBinaryParsers(ICDescriptor cDescriptor) throws CoreException {
-		cDescriptor.remove(CCorePlugin.BINARY_PARSER_UNIQ_ID);
+		cDescriptor.remove(FortranCorePlugin.BINARY_PARSER_UNIQ_ID);
 		Preferences makePrefs = MakeCorePlugin.getDefault().getPluginPreferences();
-		String id = makePrefs.getString(CCorePlugin.PREF_BINARY_PARSER);
+		String id = makePrefs.getString(FortranCorePlugin.PREF_BINARY_PARSER);
 		if (id != null && id.length() != 0) {
 			String[] ids = parseStringToArray(id);
 			for (int i = 0; i < ids.length; i++) {
-				cDescriptor.create(CCorePlugin.BINARY_PARSER_UNIQ_ID, ids[i]);
+				cDescriptor.create(FortranCorePlugin.BINARY_PARSER_UNIQ_ID, ids[i]);
 			}
 		}
 	}

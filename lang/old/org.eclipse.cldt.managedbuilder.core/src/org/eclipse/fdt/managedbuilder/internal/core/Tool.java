@@ -342,7 +342,7 @@ public class Tool extends BuildObject implements ITool, IOptionCategory {
 		if (nature != null) {
 			if ("both".equals(nature)) {	//$NON-NLS-1$
 				natureFilter = new Integer(FILTER_BOTH);
-			} else if ("cnature".equals(nature)) {	//$NON-NLS-1$
+			} else if ("fnature".equals(nature)) {	//$NON-NLS-1$
 				natureFilter = new Integer(FILTER_C);
 			} else if ("ccnature".equals(nature)) {	//$NON-NLS-1$
 				natureFilter = new Integer(FILTER_CC);
@@ -451,7 +451,7 @@ public class Tool extends BuildObject implements ITool, IOptionCategory {
 			if (nature != null) {
 				if ("both".equals(nature)) {	//$NON-NLS-1$
 					natureFilter = new Integer(FILTER_BOTH);
-				} else if ("cnature".equals(nature)) {	//$NON-NLS-1$
+				} else if ("fnature".equals(nature)) {	//$NON-NLS-1$
 					natureFilter = new Integer(FILTER_C);
 				} else if ("ccnature".equals(nature)) {	//$NON-NLS-1$
 					natureFilter = new Integer(FILTER_CC);
@@ -547,7 +547,7 @@ public class Tool extends BuildObject implements ITool, IOptionCategory {
 			if (natureFilter != null) {
 				String nature;
 				if (natureFilter.intValue() == FILTER_C) {
-					nature = "cnature";	//$NON-NLS-1$
+					nature = "fnature";	//$NON-NLS-1$
 				} else if (natureFilter.intValue() == FILTER_CC) {
 					nature = "ccnature";	//$NON-NLS-1$
 				} else {

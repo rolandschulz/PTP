@@ -26,7 +26,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IProcess;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.debug.core.CDebugCorePlugin;
@@ -102,7 +102,7 @@ public class CDebugAdapter implements ICDIDebugger {
 			projectName = projectName.trim();
 			if (projectName.length() > 0) {
 				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-				ICProject cProject = CCorePlugin.getDefault().getCoreModel().create(project);
+				ICProject cProject = FortranCorePlugin.getDefault().getCoreModel().create(project);
 				if (cProject != null && cProject.exists()) {
 					return cProject;
 				}

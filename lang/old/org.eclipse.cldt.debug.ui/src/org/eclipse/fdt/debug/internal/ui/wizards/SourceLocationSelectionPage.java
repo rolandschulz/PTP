@@ -181,7 +181,7 @@ public class SourceLocationSelectionPage extends WizardSelectionPage implements 
 		IProject[] allProjects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		ArrayList result = new ArrayList( allProjects.length );
 		for( int i = 0; i < allProjects.length; ++i ) {
-			if ( (CoreModel.hasCNature( allProjects[i] ) || CoreModel.hasCCNature( allProjects[i] )) && allProjects[i].isOpen() && !projects.contains( allProjects[i] ) ) {
+			if ( CoreModel.hasCNature( allProjects[i] ) && allProjects[i].isOpen() && !projects.contains( allProjects[i] ) ) {
 				result.add( allProjects[i] );
 			}
 		}

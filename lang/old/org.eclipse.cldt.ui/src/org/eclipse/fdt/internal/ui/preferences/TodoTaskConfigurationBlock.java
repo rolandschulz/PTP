@@ -28,8 +28,8 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
 
 
-import org.eclipse.fdt.core.CCorePlugin;
-import org.eclipse.fdt.core.CCorePreferenceConstants;
+import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.FortranCorePreferenceConstants;
 import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.internal.ui.dialogs.IStatusChangeListener;
 import org.eclipse.fdt.internal.ui.dialogs.StatusInfo;
@@ -45,12 +45,12 @@ import org.eclipse.fdt.internal.ui.wizards.dialogfields.ListDialogField;
   */
 public class TodoTaskConfigurationBlock extends OptionsConfigurationBlock {
 
-	private static final String PREF_TRANSLATION_TASK_TAGS= CCorePreferenceConstants.TRANSLATION_TASK_TAGS;
-	private static final String PREF_TRANSLATION_TASK_PRIORITIES= CCorePreferenceConstants.TRANSLATION_TASK_PRIORITIES;
+	private static final String PREF_TRANSLATION_TASK_TAGS= FortranCorePreferenceConstants.TRANSLATION_TASK_TAGS;
+	private static final String PREF_TRANSLATION_TASK_PRIORITIES= FortranCorePreferenceConstants.TRANSLATION_TASK_PRIORITIES;
 	
-	private static final String PRIORITY_HIGH= CCorePlugin.TRANSLATION_TASK_PRIORITY_HIGH;
-	private static final String PRIORITY_NORMAL= CCorePlugin.TRANSLATION_TASK_PRIORITY_NORMAL;
-	private static final String PRIORITY_LOW= CCorePlugin.TRANSLATION_TASK_PRIORITY_LOW;		
+	private static final String PRIORITY_HIGH= FortranCorePlugin.TRANSLATION_TASK_PRIORITY_HIGH;
+	private static final String PRIORITY_NORMAL= FortranCorePlugin.TRANSLATION_TASK_PRIORITY_NORMAL;
+	private static final String PRIORITY_LOW= FortranCorePlugin.TRANSLATION_TASK_PRIORITY_LOW;		
 	
 	public static class TodoTask {
 		public String name;

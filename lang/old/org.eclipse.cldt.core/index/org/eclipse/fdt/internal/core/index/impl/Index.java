@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.index.IIndexDelta;
 import org.eclipse.fdt.internal.core.index.IDocument;
 import org.eclipse.fdt.internal.core.index.IEntryResult;
@@ -275,11 +275,11 @@ public class Index implements IIndex {
 			addsIndexInput= new SimpleIndexInput(addsIndex);
 			state= MERGED;
 			//flush the FDT log
-			CCorePlugin.getDefault().fdtLog.flushLog();
+			FortranCorePlugin.getDefault().fdtLog.flushLog();
 			
 			//Send out notification to listeners;
 			IndexDelta indexDelta = new IndexDelta(null,null,IIndexDelta.MERGE_DELTA);
-			CCorePlugin.getDefault().getCoreModel().getIndexManager().notifyListeners(indexDelta);
+			FortranCorePlugin.getDefault().getCoreModel().getIndexManager().notifyListeners(indexDelta);
 		}
 	}
 	/**

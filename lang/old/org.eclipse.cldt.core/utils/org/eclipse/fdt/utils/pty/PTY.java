@@ -12,7 +12,7 @@ package org.eclipse.fdt.utils.pty;
 
 import java.io.IOException;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 
 /**
  * PTY
@@ -51,7 +51,7 @@ public class PTY {
 		}
 
 		if (slave == null) {
-			throw new IOException(CCorePlugin.getResourceString("Util.exception.cannotCreatePty")); //$NON-NLS-1$
+			throw new IOException(FortranCorePlugin.getResourceString("Util.exception.cannotCreatePty")); //$NON-NLS-1$
 		}
 
 		in = new PTYInputStream(new MasterFD());
@@ -86,10 +86,10 @@ public class PTY {
 			hasPTY = true;
 		} catch (SecurityException e) {
 			// Comment out it worries the users too much
-			//CCorePlugin.log(e);
+			//FortranCorePlugin.log(e);
 		} catch (UnsatisfiedLinkError e) {
 			// Comment out it worries the users too much
-			//CCorePlugin.log(e);
+			//FortranCorePlugin.log(e);
 		}			
 	}
 	

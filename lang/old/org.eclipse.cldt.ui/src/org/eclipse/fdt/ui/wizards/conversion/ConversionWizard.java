@@ -13,7 +13,7 @@ package org.eclipse.fdt.ui.wizards.conversion;
  
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.ui.CUIPlugin;
 import org.eclipse.fdt.ui.wizards.NewCProjectWizard;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -121,7 +121,7 @@ public abstract class ConversionWizard
         try{
             mainPage.doRun(monitor, getProjectID());
         } catch (CoreException ce){
-            CCorePlugin.log(ce);
+            FortranCorePlugin.log(ce);
             throw ce;
         } finally{
             doRunEpilogue(monitor);

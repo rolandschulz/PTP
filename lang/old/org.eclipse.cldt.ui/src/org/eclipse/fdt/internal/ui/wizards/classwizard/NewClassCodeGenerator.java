@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.browser.IQualifiedTypeName;
 import org.eclipse.fdt.core.browser.ITypeReference;
 import org.eclipse.fdt.core.browser.PathUtil;
@@ -544,7 +544,7 @@ public class NewClassCodeGenerator {
         }
 
         // get the include paths
-        IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(project);
+        IScannerInfoProvider provider = FortranCorePlugin.getDefault().getScannerInfoProvider(project);
         if (provider != null) {
             IScannerInfo info = provider.getScannerInformation(sourceFolder.getResource());
             if (info != null) {

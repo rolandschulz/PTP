@@ -21,7 +21,7 @@ import org.eclipse.core.resources.IResourceProxyVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.filetype.ICFileType;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.internal.core.Util;
@@ -132,7 +132,7 @@ class AddFolderToIndex extends IndexRequest {
 	protected void sortFiles(IFile file){
 		
 		/* Check to see if this is a header file */ 
-		ICFileType type = CCorePlugin.getDefault().getFileType(file.getProject(), file.getName());
+		ICFileType type = FortranCorePlugin.getDefault().getFileType(file.getProject(), file.getName());
 		
 		/* See if this file has been encountered before */
 		if (type.isHeader())

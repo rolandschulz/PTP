@@ -15,7 +15,7 @@ import java.util.HashSet;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.ICElementDelta;
@@ -48,7 +48,7 @@ public class CWorkspaceScope extends CSearchScope {
 	public void initialize() {
 		super.initialize();
 		try {
-		IProject[] projects = CCorePlugin.getWorkspace().getRoot().getProjects();
+		IProject[] projects = FortranCorePlugin.getWorkspace().getRoot().getProjects();
 		for (int i = 0, length = projects.length; i < length; i++)
 				this.add(projects[i], false, new HashSet(2));
 		} catch (CModelException e) {

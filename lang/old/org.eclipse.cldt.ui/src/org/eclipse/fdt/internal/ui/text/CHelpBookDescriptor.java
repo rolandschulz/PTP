@@ -12,8 +12,7 @@ package org.eclipse.fdt.internal.ui.text;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.fdt.core.CCProjectNature;
-import org.eclipse.fdt.core.CProjectNature;
+import org.eclipse.fdt.core.FortranProjectNature;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.ui.ICHelpBook;
 import org.eclipse.fdt.ui.text.ICHelpInvocationContext;
@@ -79,15 +78,11 @@ public class CHelpBookDescriptor {
 		boolean bMatches = false;
 		switch(book.getCHelpType()){
 			case ICHelpBook.HELP_TYPE_CPP:
-				try{
-					bMatches = project.hasNature(CCProjectNature.CC_NATURE_ID);
-				}catch(CoreException e){
-				}
 				break;
 			case ICHelpBook.HELP_TYPE_C:
 			case ICHelpBook.HELP_TYPE_ASM:
 				try{
-					bMatches = project.hasNature(CProjectNature.C_NATURE_ID);
+					bMatches = project.hasNature(FortranProjectNature.FORTRAN_NATURE_ID);
 				}catch(CoreException e){
 				}
 				break;

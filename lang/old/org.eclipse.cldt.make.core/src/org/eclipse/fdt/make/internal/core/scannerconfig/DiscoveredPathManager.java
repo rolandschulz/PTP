@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.ICProject;
@@ -201,9 +201,9 @@ public class DiscoveredPathManager implements IDiscoveredPathManager, IResourceC
 				Platform.run(new ISafeRunnable() {
 		
 					public void handleException(Throwable exception) {
-						IStatus status = new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, -1,
-								CCorePlugin.getResourceString("CDescriptorManager.exception.listenerError"), exception); //$NON-NLS-1$
-						CCorePlugin.log(status);
+						IStatus status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, -1,
+								FortranCorePlugin.getResourceString("CDescriptorManager.exception.listenerError"), exception); //$NON-NLS-1$
+						FortranCorePlugin.log(status);
 					}
 		
 					public void run() throws Exception {

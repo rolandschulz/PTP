@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.filetype.ICFileType;
 import org.eclipse.fdt.core.filetype.ICFileTypeAssociation;
 import org.eclipse.fdt.core.filetype.ResolverChangeEvent;
@@ -37,8 +37,8 @@ import org.eclipse.fdt.core.filetype.ResolverDelta;
  */
 public class WorkspaceResolver extends CFileTypeResolver {
 
-	public static final String PREFS_ASSOCIATIONS_INCLUSION = CCorePlugin.PLUGIN_ID + ".associationInclusion"; //$NON-NLS-1$
-	public static final String PREFS_ASSOCIATIONS_EXCLUSION = CCorePlugin.PLUGIN_ID + ".associationExclusion"; //$NON-NLS-1$
+	public static final String PREFS_ASSOCIATIONS_INCLUSION = FortranCorePlugin.PLUGIN_ID + ".associationInclusion"; //$NON-NLS-1$
+	public static final String PREFS_ASSOCIATIONS_EXCLUSION = FortranCorePlugin.PLUGIN_ID + ".associationExclusion"; //$NON-NLS-1$
 
 	ResolverModel fModel;
 	List extensionsList;
@@ -140,7 +140,7 @@ public class WorkspaceResolver extends CFileTypeResolver {
 		}
 
 		if ((null != addAssocs && addAssocs.length > 0) || (null != delAssocs && delAssocs.length > 0)) {
-			CCorePlugin.getDefault().savePluginPreferences();
+			FortranCorePlugin.getDefault().savePluginPreferences();
 		}
 
 		// fire the deltas.
@@ -177,7 +177,7 @@ public class WorkspaceResolver extends CFileTypeResolver {
 	}
 
 	public List getDefaultInclusionAssociations() {
-		Preferences prefs = CCorePlugin.getDefault().getPluginPreferences();
+		Preferences prefs = FortranCorePlugin.getDefault().getPluginPreferences();
 		String s = prefs.getDefaultString(PREFS_ASSOCIATIONS_INCLUSION);
 		String[] items = s.split(";"); //$NON-NLS-1$
 		List assoc = getAssocFromPreferences(items);
@@ -185,7 +185,7 @@ public class WorkspaceResolver extends CFileTypeResolver {
 	}
 
 	public List getInclusionAssociations() {
-		Preferences prefs = CCorePlugin.getDefault().getPluginPreferences();
+		Preferences prefs = FortranCorePlugin.getDefault().getPluginPreferences();
 		String s = prefs.getString(PREFS_ASSOCIATIONS_INCLUSION);
 		String[] items = s.split(";"); //$NON-NLS-1$
 		List assoc = getAssocFromPreferences(items);
@@ -202,7 +202,7 @@ public class WorkspaceResolver extends CFileTypeResolver {
 			sb.append("!!"); //$NON-NLS-1$
 			sb.append(addAssocs[i].getType().getId());
 		}
-		Preferences prefs = CCorePlugin.getDefault().getPluginPreferences();
+		Preferences prefs = FortranCorePlugin.getDefault().getPluginPreferences();
 		String s = prefs.getString(PREFS_ASSOCIATIONS_INCLUSION);
 		
 		if (s.length() > 0) {
@@ -212,7 +212,7 @@ public class WorkspaceResolver extends CFileTypeResolver {
 	}
 
 	public List getDefaultExclusionAssociations() {
-		Preferences prefs = CCorePlugin.getDefault().getPluginPreferences();
+		Preferences prefs = FortranCorePlugin.getDefault().getPluginPreferences();
 		String s = prefs.getDefaultString(PREFS_ASSOCIATIONS_EXCLUSION);
 		String[] items = s.split(";"); //$NON-NLS-1$
 		List assocs = getAssocFromPreferences(items);
@@ -220,7 +220,7 @@ public class WorkspaceResolver extends CFileTypeResolver {
 	}
 
 	public List getExclusionAssociations() {
-		Preferences prefs = CCorePlugin.getDefault().getPluginPreferences();
+		Preferences prefs = FortranCorePlugin.getDefault().getPluginPreferences();
 		String s = prefs.getString(PREFS_ASSOCIATIONS_EXCLUSION);
 		String[] items = s.split(";"); //$NON-NLS-1$
 		List assocs = getAssocFromPreferences(items);
@@ -237,7 +237,7 @@ public class WorkspaceResolver extends CFileTypeResolver {
 			sb.append("!!"); //$NON-NLS-1$
 			sb.append(addAssocs[i].getType().getId());
 		}
-		Preferences prefs = CCorePlugin.getDefault().getPluginPreferences();
+		Preferences prefs = FortranCorePlugin.getDefault().getPluginPreferences();
 		String s = prefs.getString(PREFS_ASSOCIATIONS_EXCLUSION);
 		if (s.length() > 0) {
 			sb.append(';').append(s);
@@ -284,7 +284,7 @@ public class WorkspaceResolver extends CFileTypeResolver {
 				try {
 					assocs.add(fModel.createAssocation(item[i].trim(), typeRef));
 				} catch (IllegalArgumentException e) {
-					CCorePlugin.log(e);
+					FortranCorePlugin.log(e);
 				}
 			}
 		}
@@ -301,7 +301,7 @@ public class WorkspaceResolver extends CFileTypeResolver {
 				try {
 					assocs.add(fModel.createAssocation(pattern, typeRef));
 				} catch (IllegalArgumentException e) {
-					CCorePlugin.log(e);
+					FortranCorePlugin.log(e);
 				}
 			}
 		}
@@ -338,20 +338,20 @@ public class WorkspaceResolver extends CFileTypeResolver {
 		        	try {
 		        		assocs.add(fModel.createAssocation(line.trim(), typeRef));
 					} catch (IllegalArgumentException e) {
-						CCorePlugin.log(e);
+						FortranCorePlugin.log(e);
 					}
 		        	line = in.readLine();
 		        }
 		        in.close();
 		    } catch (IOException e) {
-		    	CCorePlugin.log(e);
+		    	FortranCorePlugin.log(e);
 		    }
 		}
 		return assocs;
 	}
 
 	private IExtensionPoint getExtensionPoint(String extensionPointId) {
-        return Platform.getExtensionRegistry().getExtensionPoint(CCorePlugin.PLUGIN_ID, extensionPointId);
+        return Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID, extensionPointId);
 	}
 
 }

@@ -13,7 +13,7 @@ package org.eclipse.fdt.ui.wizards;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.ui.CUIPlugin;
 
 
@@ -37,7 +37,7 @@ public abstract class NewCCProjectWizard extends NewCProjectWizard {
 		super.doRun(monitor);
 		// Add C++ Nature to the newly created project.
         if (newProject != null){
-            CCorePlugin.getDefault().convertProjectFromCtoCC(newProject, monitor);
+            FortranCorePlugin.getDefault().convertProjectFromCtoCC(newProject, monitor);
         }
 	}
 }

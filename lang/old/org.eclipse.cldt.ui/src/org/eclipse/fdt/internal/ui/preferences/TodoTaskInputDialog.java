@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.help.WorkbenchHelp;
 
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.dialogs.StatusDialog;
 import org.eclipse.fdt.internal.ui.dialogs.StatusInfo;
@@ -84,9 +84,9 @@ public class TodoTaskInputDialog extends StatusDialog {
 		fPriorityDialogField.setLabelText(PreferencesMessages.getString("TodoTaskInputDialog.priority.label")); //$NON-NLS-1$
 		fPriorityDialogField.setItems(items);
 		if (task != null) {
-			if (CCorePlugin.TRANSLATION_TASK_PRIORITY_HIGH.equals(task.priority)) {
+			if (FortranCorePlugin.TRANSLATION_TASK_PRIORITY_HIGH.equals(task.priority)) {
 				fPriorityDialogField.selectItem(0);
-			} else if (CCorePlugin.TRANSLATION_TASK_PRIORITY_NORMAL.equals(task.priority)) {
+			} else if (FortranCorePlugin.TRANSLATION_TASK_PRIORITY_NORMAL.equals(task.priority)) {
 				fPriorityDialogField.selectItem(1);
 			} else {
 				fPriorityDialogField.selectItem(2);
@@ -101,13 +101,13 @@ public class TodoTaskInputDialog extends StatusDialog {
 		task.name= fNameDialogField.getText().trim();
 		switch (fPriorityDialogField.getSelectionIndex()) {
 			case 0 :
-					task.priority= CCorePlugin.TRANSLATION_TASK_PRIORITY_HIGH;
+					task.priority= FortranCorePlugin.TRANSLATION_TASK_PRIORITY_HIGH;
 				break;
 			case 1 :
-					task.priority= CCorePlugin.TRANSLATION_TASK_PRIORITY_NORMAL;
+					task.priority= FortranCorePlugin.TRANSLATION_TASK_PRIORITY_NORMAL;
 				break;
 			default :
-					task.priority= CCorePlugin.TRANSLATION_TASK_PRIORITY_LOW;
+					task.priority= FortranCorePlugin.TRANSLATION_TASK_PRIORITY_LOW;
 				break;				
 		}
 		return task;

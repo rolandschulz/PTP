@@ -19,8 +19,7 @@ import java.util.Vector;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.fdt.core.CCProjectNature;
-import org.eclipse.fdt.core.CProjectNature;
+import org.eclipse.fdt.core.FortranProjectNature;
 import org.eclipse.fdt.managedbuilder.core.BuildException;
 import org.eclipse.fdt.managedbuilder.core.IConfiguration;
 import org.eclipse.fdt.managedbuilder.core.IConfigurationV2;
@@ -313,12 +312,7 @@ public class ConfigurationV2 extends BuildObject implements IConfigurationV2 {
 				// Make sure the tool is right for the project
 				switch (tool.getNatureFilter()) {
 					case ITool.FILTER_C:
-						if (project.hasNature(CProjectNature.C_NATURE_ID) && !project.hasNature(CCProjectNature.CC_NATURE_ID)) {
-							tools.add(tool);
-						}
-						break;
-					case ITool.FILTER_CC:
-						if (project.hasNature(CCProjectNature.CC_NATURE_ID)) {
+						if (project.hasNature(FortranProjectNature.FORTRAN_NATURE_ID)) {
 							tools.add(tool);
 						}
 						break;
@@ -377,16 +371,7 @@ public class ConfigurationV2 extends BuildObject implements IConfigurationV2 {
 				switch (tool.getNatureFilter()) {
 					case ITool.FILTER_C:
 						try {
-							if (project.hasNature(CProjectNature.C_NATURE_ID) && !project.hasNature(CCProjectNature.CC_NATURE_ID)) {
-								validTools.add(tool);
-							}
-						} catch (CoreException e) {
-							continue;
-						}
-						break;
-					case ITool.FILTER_CC:
-						try {
-							if (project.hasNature(CCProjectNature.CC_NATURE_ID)) {
+							if (project.hasNature(FortranProjectNature.FORTRAN_NATURE_ID)) {
 								validTools.add(tool);
 							}
 						} catch (CoreException e) {

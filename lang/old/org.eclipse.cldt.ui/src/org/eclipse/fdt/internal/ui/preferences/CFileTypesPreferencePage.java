@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.filetype.ICFileTypeAssociation;
 import org.eclipse.fdt.core.filetype.ICFileTypeResolver;
 import org.eclipse.fdt.core.filetype.IResolverModel;
@@ -73,7 +73,7 @@ public class CFileTypesPreferencePage extends PreferencePage implements IWorkben
 	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
 	 */
 	protected void performDefaults() {
-		Preferences prefs = CCorePlugin.getDefault().getPluginPreferences();
+		Preferences prefs = FortranCorePlugin.getDefault().getPluginPreferences();
 		prefs.setToDefault(WorkspaceResolver.PREFS_ASSOCIATIONS_EXCLUSION);
 		prefs.setToDefault(WorkspaceResolver.PREFS_ASSOCIATIONS_INCLUSION);
 		fPrefsBlock.setResolver(getResolverModel().getResolver());
@@ -117,6 +117,6 @@ public class CFileTypesPreferencePage extends PreferencePage implements IWorkben
 	}
 
 	private IResolverModel getResolverModel() {
-		return CCorePlugin.getDefault().getResolverModel();
+		return FortranCorePlugin.getDefault().getResolverModel();
 	}
 }

@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Vector;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.utils.ERandomAccessFile;
 
 /**
@@ -239,7 +239,7 @@ public class AR {
 		String hdr = efile.readLine();
 		if (hdr == null || hdr.compareTo("!<arch>") != 0) { //$NON-NLS-1$
 			efile.close();
-			throw new IOException(CCorePlugin.getResourceString("Util.exception.invalidArchive")); //$NON-NLS-1$
+			throw new IOException(FortranCorePlugin.getResourceString("Util.exception.invalidArchive")); //$NON-NLS-1$
 		}
 	}
 

@@ -5,7 +5,7 @@ package org.eclipse.fdt.internal.ui.preferences;
  * All Rights Reserved.
  */
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.ui.CUIPlugin;
 import org.eclipse.fdt.ui.PreferenceConstants;
@@ -70,7 +70,7 @@ public class CPluginPreferencePage extends FieldEditorPreferencePage implements 
 	 * @see IWorkbenchPreferencePage#init
 	 */
 	public void init(IWorkbench workbench) {
-		CUIPlugin.getDefault().getPreferenceStore().setValue(CCorePlugin.PREF_USE_STRUCTURAL_PARSE_MODE, CCorePlugin.getDefault().useStructuralParseMode());
+		CUIPlugin.getDefault().getPreferenceStore().setValue(FortranCorePlugin.PREF_USE_STRUCTURAL_PARSE_MODE, FortranCorePlugin.getDefault().useStructuralParseMode());
 	}
 	
 	/**
@@ -80,7 +80,7 @@ public class CPluginPreferencePage extends FieldEditorPreferencePage implements 
 		prefs.setDefault(PreferenceConstants.PREF_LINK_TO_EDITOR, false);
 		// The field is under Appearance page/preference
 		prefs.setDefault(PreferenceConstants.PREF_SHOW_CU_CHILDREN, true);
-		prefs.setDefault(PreferenceConstants.PREF_USE_STRUCTURAL_PARSE_MODE, CCorePlugin.getDefault().useStructuralParseMode());
+		prefs.setDefault(PreferenceConstants.PREF_USE_STRUCTURAL_PARSE_MODE, FortranCorePlugin.getDefault().useStructuralParseMode());
 		prefs.setDefault(PreferenceConstants.EDITOR_SHOW_SEGMENTS, false);
 	}
 	
@@ -91,7 +91,7 @@ public class CPluginPreferencePage extends FieldEditorPreferencePage implements 
 		if (!super.performOk())
 			return false;
 		// tell the Core Plugin about this preference
-		CCorePlugin.getDefault().setStructuralParseMode(useStructuralParseMode());
+		FortranCorePlugin.getDefault().setStructuralParseMode(useStructuralParseMode());
 		return true;
 	}
 

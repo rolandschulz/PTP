@@ -22,7 +22,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.search.ICSearchConstants;
 import org.eclipse.fdt.core.search.ICSearchScope;
 import org.eclipse.fdt.core.search.SearchEngine;
@@ -78,7 +78,7 @@ public class UpdateDependency implements IJob {
 			//SubProgressMonitor subMonitor = (progressMonitor == null ) ? null : new SubProgressMonitor( progressMonitor, 5 );
 			ICSearchScope scope = SearchEngine.createWorkspaceScope();
 			CSearchPattern pattern = CSearchPattern.createPattern(location.toOSString(),ICSearchConstants.INCLUDE, ICSearchConstants.REFERENCES,ICSearchConstants.EXACT_MATCH,true);
-			IndexManager indexManager = CCorePlugin.getDefault().getCoreModel().getIndexManager();
+			IndexManager indexManager = FortranCorePlugin.getDefault().getCoreModel().getIndexManager();
 			indexManager.performConcurrentJob( 
 				new PatternSearchJob(
 					pattern,

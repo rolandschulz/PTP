@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.IStatusHandler;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.IProcessInfo;
 import org.eclipse.fdt.core.IProcessList;
 import org.eclipse.fdt.debug.core.IFDTLaunchConfigurationConstants;
@@ -83,7 +83,7 @@ public class ProcessPrompter implements IStatusHandler {
 		dialog.setMessage(LaunchMessages.getString("LocalAttachLaunchDelegate.Select_Process_to_attach_debugger_to")); //$NON-NLS-1$
 		IProcessList plist = null;
 		try {
-			plist = CCorePlugin.getDefault().getProcessList();
+			plist = FortranCorePlugin.getDefault().getProcessList();
 		} catch (CoreException e) {
 			LaunchUIPlugin.errorDialog(LaunchMessages.getString("LocalAttachLaunchDelegate.FDT_Launch_Error"), e.getStatus()); //$NON-NLS-1$
 		}

@@ -48,7 +48,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.IStatusHandler;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.IBinaryParser;
 import org.eclipse.fdt.core.ICExtensionReference;
 import org.eclipse.fdt.core.IBinaryParser.IBinaryObject;
@@ -162,7 +162,7 @@ abstract public class AbstractCLaunchDelegate extends LaunchConfigurationDelegat
 			projectName = projectName.trim();
 			if (projectName.length() > 0) {
 				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-				ICProject cProject = CCorePlugin.getDefault().getCoreModel().create(project);
+				ICProject cProject = FortranCorePlugin.getDefault().getCoreModel().create(project);
 				if (cProject != null && cProject.exists()) {
 					return cProject;
 				}
@@ -726,7 +726,7 @@ abstract public class AbstractCLaunchDelegate extends LaunchConfigurationDelegat
 	 * @throws CoreException
 	 */
 	protected IBinaryObject verifyBinary(ICProject project, IPath exePath) throws CoreException {
-		ICExtensionReference[] parserRef = CCorePlugin.getDefault().getBinaryParserExtensions(project.getProject());
+		ICExtensionReference[] parserRef = FortranCorePlugin.getDefault().getBinaryParserExtensions(project.getProject());
 		for (int i = 0; i < parserRef.length; i++) {
 			try {
 				IBinaryParser parser = (IBinaryParser)parserRef[i].createExtension();
@@ -738,7 +738,7 @@ abstract public class AbstractCLaunchDelegate extends LaunchConfigurationDelegat
 			} catch (IOException e) {
 			}
 		}
-		IBinaryParser parser = CCorePlugin.getDefault().getDefaultBinaryParser();
+		IBinaryParser parser = FortranCorePlugin.getDefault().getDefaultBinaryParser();
 		try {
 			return (IBinaryObject)parser.getBinary(exePath);
 		} catch (ClassCastException e) {

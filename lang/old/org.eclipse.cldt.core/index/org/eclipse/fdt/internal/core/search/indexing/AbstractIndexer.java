@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.filetype.ICFileType;
 import org.eclipse.fdt.core.parser.ast.ASTClassKind;
 import org.eclipse.fdt.core.parser.ast.ASTNotImplementedException;
@@ -507,7 +507,7 @@ public abstract class AbstractIndexer implements IIndexer, IIndexConstants, ICSe
 	 */
 	public boolean shouldIndex(IFile fileToBeIndexed) {
 		if (fileToBeIndexed != null){
-			ICFileType type = CCorePlugin.getDefault().getFileType(fileToBeIndexed.getProject(),fileToBeIndexed.getName());
+			ICFileType type = FortranCorePlugin.getDefault().getFileType(fileToBeIndexed.getProject(),fileToBeIndexed.getName());
 			if (type.isSource() || type.isHeader()){
 			  String id = type.getId();
 			  if (id.equals(AbstractIndexer.C_SOURCE_ID) ||

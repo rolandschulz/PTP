@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.CoreModel;
@@ -503,7 +503,7 @@ public class CMainTab extends CLaunchConfigurationTab {
 		for (int i = 0; i < cproject.length; i++) {
 			ICDescriptor cdesciptor = null;
 			try {
-				cdesciptor = CCorePlugin.getDefault().getCProjectDescription((IProject) cproject[i].getResource(), false);
+				cdesciptor = FortranCorePlugin.getDefault().getCProjectDescription((IProject) cproject[i].getResource(), false);
 				if (cdesciptor != null) {
 					String projectPlatform = cdesciptor.getPlatform();
 					if (filterPlatform.equals("*") //$NON-NLS-1$

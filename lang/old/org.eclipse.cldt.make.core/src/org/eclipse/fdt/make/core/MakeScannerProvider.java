@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.ICProject;
@@ -88,8 +88,8 @@ public class MakeScannerProvider extends ScannerProvider {
 		if (scannerInfo != null) {
 			updateScannerInfo(scannerInfo);
 		}
-		ICDescriptor descriptor = CCorePlugin.getDefault().getCProjectDescription(project);
-		descriptor.remove(CCorePlugin.BUILD_SCANNER_INFO_UNIQ_ID); // remove scanner provider which will fallback to default cpath
+		ICDescriptor descriptor = FortranCorePlugin.getDefault().getCProjectDescription(project);
+		descriptor.remove(FortranCorePlugin.BUILD_SCANNER_INFO_UNIQ_ID); // remove scanner provider which will fallback to default cpath
 		// provider.
 		return scannerInfo;
 	}
@@ -112,7 +112,7 @@ public class MakeScannerProvider extends ScannerProvider {
 	 * duration of the session.
 	 */
 	private MakeScannerInfo loadScannerInfo(IProject project) throws CoreException {
-		ICDescriptor descriptor = CCorePlugin.getDefault().getCProjectDescription(project);
+		ICDescriptor descriptor = FortranCorePlugin.getDefault().getCProjectDescription(project);
 		Node child = descriptor.getProjectData(CDESCRIPTOR_ID).getFirstChild();
 		ArrayList includes = new ArrayList();
 		ArrayList symbols = new ArrayList();
@@ -191,7 +191,7 @@ public class MakeScannerProvider extends ScannerProvider {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				IProject project = scannerInfo.getProject();
 
-				ICDescriptor descriptor = CCorePlugin.getDefault().getCProjectDescription(project);
+				ICDescriptor descriptor = FortranCorePlugin.getDefault().getCProjectDescription(project);
 
 				Element rootElement = descriptor.getProjectData(CDESCRIPTOR_ID);
 

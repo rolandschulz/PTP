@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.utils.coff.ReadMemoryAccess;
 
 /**
@@ -107,10 +107,10 @@ public class SOM {
 
 		public void commonSetup(byte[] hdr, boolean little) throws IOException {
 			if (hdr == null || hdr.length < FILHSZ) {
-				throw new EOFException(CCorePlugin.getResourceString("Util.exception.arrayToSmall")); //$NON-NLS-1$
+				throw new EOFException(FortranCorePlugin.getResourceString("Util.exception.arrayToSmall")); //$NON-NLS-1$
 			}
 			if (!isSOMHeader(hdr)) {
-				throw new IOException(CCorePlugin.getResourceString("Util.exception.notSOM")); //$NON-NLS-1$
+				throw new IOException(FortranCorePlugin.getResourceString("Util.exception.notSOM")); //$NON-NLS-1$
 			}
 			ReadMemoryAccess memory = new ReadMemoryAccess(hdr, little);
 			

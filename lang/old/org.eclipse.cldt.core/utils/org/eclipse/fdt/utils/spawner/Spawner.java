@@ -17,7 +17,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.StringTokenizer;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.utils.pty.PTY;
 
 public class Spawner extends Process {
@@ -318,9 +318,9 @@ public class Spawner extends Process {
 		try {
 			System.loadLibrary("spawner"); //$NON-NLS-1$
 		} catch (SecurityException e) {
-			CCorePlugin.log(e);
+			FortranCorePlugin.log(e);
 		} catch (UnsatisfiedLinkError e) {
-			CCorePlugin.log(e);
+			FortranCorePlugin.log(e);
 		}
 	}
 
@@ -339,7 +339,7 @@ public class Spawner extends Process {
 			fCmdarray = array;
 			fEnvp = env;
 			fDirpath = dir;
-			fErrMesg = new String(CCorePlugin.getResourceString("Util.error.cannotRun") + fCmdarray[0]); //$NON-NLS-1$
+			fErrMesg = new String(FortranCorePlugin.getResourceString("Util.error.cannotRun") + fCmdarray[0]); //$NON-NLS-1$
 		}
 
 		int execute(String[] cmdarray, String[] envp, String dir, int[] channels) throws IOException {

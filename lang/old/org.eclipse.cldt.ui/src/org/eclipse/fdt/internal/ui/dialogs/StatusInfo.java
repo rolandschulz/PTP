@@ -7,7 +7,7 @@ package org.eclipse.fdt.internal.ui.dialogs;
  
 import org.eclipse.core.runtime.IStatus;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 
 /**
  * A settable IStatus
@@ -65,7 +65,7 @@ public class StatusInfo implements IStatus {
 	 * @see IStatus#getPlugin()
 	 */
 	public String getPlugin() {
-		return CCorePlugin.PLUGIN_ID;
+		return FortranCorePlugin.PLUGIN_ID;
 	}
 	/**
 	 * @see IStatus#getSeverity()

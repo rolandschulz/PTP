@@ -33,7 +33,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IProcess;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.IAddress;
 import org.eclipse.fdt.core.IBinaryParser;
 import org.eclipse.fdt.core.ICExtensionReference;
@@ -474,7 +474,7 @@ public class CDIDebugModel {
 
 	private static IBinaryExecutable getBinary( IFile file ) throws CoreException {
 		IProject project = file.getProject();
-		ICExtensionReference[] binaryParsersExt = CCorePlugin.getDefault().getBinaryParserExtensions( project );
+		ICExtensionReference[] binaryParsersExt = FortranCorePlugin.getDefault().getBinaryParserExtensions( project );
 		for( int i = 0; i < binaryParsersExt.length; i++ ) {
 			IBinaryParser parser = (IBinaryParser)binaryParsersExt[i].createExtension();
 			try {

@@ -401,7 +401,7 @@
                      </objectState>
                   </not>
                   <objectState
-                        value="org.eclipse.fdt.core.cnature"
+                        value="org.eclipse.fdt.core.fnature"
                         name="projectNature">
                   </objectState>
                </and>

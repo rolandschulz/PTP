@@ -13,7 +13,7 @@ package org.eclipse.fdt.ui.dialogs;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.internal.core.search.indexing.IndexManager;
 import org.eclipse.fdt.internal.ui.CUIMessages;
@@ -123,7 +123,7 @@ public class IndexerOptionDialogPage extends DialogPage {
 		
 		try {
 			newProject = project;
-			descriptor = CCorePlugin.getDefault().getCProjectDescription(newProject, true);
+			descriptor = FortranCorePlugin.getDefault().getCProjectDescription(newProject, true);
 			rootElement = descriptor.getProjectData(IndexManager.FDT_INDEXER);
 		
 			// Clear out all current children

@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.fdt.core.CConventions;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.browser.AllTypesCache;
 import org.eclipse.fdt.core.browser.IQualifiedTypeName;
 import org.eclipse.fdt.core.browser.ITypeInfo;
@@ -918,7 +918,7 @@ public class NewClassCreationWizardPage extends NewElementWizardPage {
 					status.setError(NewClassWizardMessages.getFormattedString("NewClassCreationWizardPage.error.NotAFolder", folderPath)); //$NON-NLS-1$
 					return status;
 				}
-			    if (!CoreModel.hasCCNature(proj) && !CoreModel.hasCNature(proj)) {
+			    if (!CoreModel.hasCNature(proj)) {
 					if (resType == IResource.PROJECT) {
 						status.setError(NewClassWizardMessages.getString("NewClassCreationWizardPage.warning.NotACProject")); //$NON-NLS-1$
 						return status;
@@ -1211,7 +1211,7 @@ public class NewClassCreationWizardPage extends NewElementWizardPage {
 			    if (baseClasses != null && baseClasses.length > 0) {
 					// filter out classes not reachable from current source folder
 			        IProject project = PathUtil.getEnclosingProject(folderPath);
-			        IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(project);
+			        IScannerInfoProvider provider = FortranCorePlugin.getDefault().getScannerInfoProvider(project);
 			        if (provider != null) {
 				        //TODO get the scanner info for the actual source folder
 			            IScannerInfo info = provider.getScannerInformation(project);
@@ -1306,7 +1306,7 @@ public class NewClassCreationWizardPage extends NewElementWizardPage {
 				}
 
 				fileExists = true;
-			    if (!CoreModel.hasCCNature(proj) && !CoreModel.hasCNature(proj)) {
+			    if (!CoreModel.hasCNature(proj)) {
 					status.setWarning(NewClassWizardMessages.getString("NewClassCreationWizardPage.warning.NotInACProject")); //$NON-NLS-1$
 				} else {
 				    status.setWarning(NewClassWizardMessages.getString("NewClassCreationWizardPage.warning.HeaderFileExists")); //$NON-NLS-1$
@@ -1375,7 +1375,7 @@ public class NewClassCreationWizardPage extends NewElementWizardPage {
 				}
 
 				fileExists = true;
-			    if (!CoreModel.hasCCNature(proj) && !CoreModel.hasCNature(proj)) {
+			    if (!CoreModel.hasCNature(proj)) {
 					status.setWarning(NewClassWizardMessages.getString("NewClassCreationWizardPage.warning.NotInACProject")); //$NON-NLS-1$
 				} else {
 				    status.setWarning(NewClassWizardMessages.getString("NewClassCreationWizardPage.warning.SourceFileExists")); //$NON-NLS-1$
@@ -2036,7 +2036,7 @@ public class NewClassCreationWizardPage extends NewElementWizardPage {
 			IPath folderPath = getSourceFolderFullPath();
 			if (folderPath != null) {
 		        IProject project = PathUtil.getEnclosingProject(folderPath);
-		        IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(project);
+		        IScannerInfoProvider provider = FortranCorePlugin.getDefault().getScannerInfoProvider(project);
 		        if (provider != null) {
 			        //TODO get the scanner info for the actual source folder
 		            IScannerInfo info = provider.getScannerInformation(project);

@@ -19,9 +19,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.fdt.core.CCProjectNature;
-import org.eclipse.fdt.core.CCorePlugin;
-import org.eclipse.fdt.core.CProjectNature;
+import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.FortranProjectNature;
 import org.eclipse.fdt.internal.ui.CUIMessages;
 import org.eclipse.fdt.internal.ui.util.SWTUtil;
 import org.eclipse.fdt.ui.CUIPlugin;
@@ -498,32 +497,23 @@ public abstract class ConvertProjectWizardPage
                                 throws CoreException{
         // Add the correct nature
     	if (convertToC) {
-    		if (!project.hasNature(CProjectNature.C_NATURE_ID)){
+    		if (!project.hasNature(FortranProjectNature.FORTRAN_NATURE_ID)){
     			addCNature(project, monitor, true);          	
-    		} else {
-    			if (project.hasNature(CCProjectNature.CC_NATURE_ID)){
-    				// remove the C++ nature
-    				CCProjectNature.removeCCNature(project, monitor);
-    			}    			
     		}
-    	} else {
-    		if (convertToCC && !project.hasNature(CCProjectNature.CC_NATURE_ID)) {
-    			addCCNature(project, monitor, true);          	
-    		}            			
-    	}                           	
+    	}               	
     }
 	protected void addCNature(IProject project, IProgressMonitor monitor, boolean addMakeBuilder) throws CoreException{
 		if ( getWizard() instanceof ConversionWizard) {
-     		CCorePlugin.getDefault().convertProjectToC(project, monitor, ((ConversionWizard)getWizard()).getProjectID());
+     		FortranCorePlugin.getDefault().convertProjectToC(project, monitor, ((ConversionWizard)getWizard()).getProjectID());
 		}
      }
      
      protected void addCCNature(IProject project, IProgressMonitor monitor, boolean addMakeBuilder) throws CoreException{
 		if ( getWizard() instanceof ConversionWizard) {
-	     	if (project.hasNature(CProjectNature.C_NATURE_ID)) {     		
-		     	CCorePlugin.getDefault().convertProjectFromCtoCC(project, monitor);
+	     	if (project.hasNature(FortranProjectNature.FORTRAN_NATURE_ID)) {     		
+		     	FortranCorePlugin.getDefault().convertProjectFromCtoCC(project, monitor);
      		} else {
-	     		CCorePlugin.getDefault().convertProjectToCC(project, monitor, ((ConversionWizard)getWizard()).getProjectID());
+	     		FortranCorePlugin.getDefault().convertProjectToCC(project, monitor, ((ConversionWizard)getWizard()).getProjectID());
      		}
 		}
      }

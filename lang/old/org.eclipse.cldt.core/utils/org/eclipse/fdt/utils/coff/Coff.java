@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 
 public class Coff {
 
@@ -72,7 +72,7 @@ public class Coff {
 
 		public void commonSetup(byte[] hdr, boolean little) throws EOFException {
 			if (hdr == null || hdr.length < FILHSZ) {
-				throw new EOFException(CCorePlugin.getResourceString("Util.exception.arrayToSmall")); //$NON-NLS-1$
+				throw new EOFException(FortranCorePlugin.getResourceString("Util.exception.arrayToSmall")); //$NON-NLS-1$
 			}
 			ReadMemoryAccess memory = new ReadMemoryAccess(hdr, little);
 			f_magic = memory.getUnsignedShort();

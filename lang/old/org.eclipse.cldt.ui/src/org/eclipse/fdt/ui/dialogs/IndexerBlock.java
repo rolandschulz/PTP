@@ -14,7 +14,7 @@ package org.eclipse.fdt.ui.dialogs;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.ui.CUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -48,7 +48,7 @@ public class IndexerBlock extends AbstractCOptionPage {
 		boolean indexProject = optionPage.getIndexerValue();
 		
 		if (indexProject && newProject != null)
-			CCorePlugin.getDefault().getCoreModel().getIndexManager().indexAll(newProject);
+			FortranCorePlugin.getDefault().getCoreModel().getIndexManager().indexAll(newProject);
 	    
 	}
 	/* (non-Javadoc)

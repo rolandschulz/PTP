@@ -14,7 +14,7 @@ package org.eclipse.fdt.internal.ui.preferences;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.internal.core.search.indexing.SourceIndexer;
 import org.eclipse.fdt.internal.ui.search.CSearchPage;
 import org.eclipse.fdt.ui.CUIPlugin;
@@ -163,11 +163,11 @@ public class CSearchPreferencePage extends PreferencePage
 		fOverlayStore.setValue(SourceIndexer.FDT_INDEXER_TIMEOUT, timeOut);
 		fOverlayStore.propagate();
 		
-//		Store IProblem Marker value in CCorePlugin Preferences 
-		Preferences prefs = CCorePlugin.getDefault().getPluginPreferences();
+//		Store IProblem Marker value in FortranCorePlugin Preferences 
+		Preferences prefs = FortranCorePlugin.getDefault().getPluginPreferences();
 		
 		prefs.setValue(SourceIndexer.FDT_INDEXER_TIMEOUT,timeOut);
-		CCorePlugin.getDefault().savePluginPreferences();
+		FortranCorePlugin.getDefault().savePluginPreferences();
 		
 		return true;
 	}

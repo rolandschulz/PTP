@@ -36,7 +36,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.filetype.ICFileType;
 import org.eclipse.fdt.core.model.ICModelMarker;
 import org.eclipse.fdt.core.parser.CodeReader;
@@ -135,7 +135,7 @@ public class SourceIndexerRequestor implements ISourceElementRequestor, IIndexCo
 			//If we are in an include file, get the include file
 			if (include != null){
 				IPath newPath = new Path(include.getFullFileName());
-		 		tempFile = CCorePlugin.getWorkspace().getRoot().getFileForLocation(newPath);
+		 		tempFile = FortranCorePlugin.getWorkspace().getRoot().getFileForLocation(newPath);
 			}
 			
 			if( tempFile != null ){
@@ -214,7 +214,7 @@ public class SourceIndexerRequestor implements ISourceElementRequestor, IIndexCo
 	public void enterInclusion(IASTInclusion inclusion) {
 		if( areProblemMarkersEnabled() ){
 			IPath newPath = new Path(inclusion.getFullFileName());
-			IFile tempFile = CCorePlugin.getWorkspace().getRoot().getFileForLocation(newPath);
+			IFile tempFile = FortranCorePlugin.getWorkspace().getRoot().getFileForLocation(newPath);
 			if (tempFile !=null){
 				requestRemoveMarkers(tempFile, resourceFile);
 			} else{
@@ -231,12 +231,12 @@ public class SourceIndexerRequestor implements ISourceElementRequestor, IIndexCo
 		
 		IProject resourceProject = resourceFile.getProject();
 		/* Check to see if this is a header file */
-		ICFileType type = CCorePlugin.getDefault().getFileType(resourceProject,
+		ICFileType type = FortranCorePlugin.getDefault().getFileType(resourceProject,
 				inclusion.getFullFileName());
 
 		/* See if this file has been encountered before */
 		if (type.isHeader())
-			CCorePlugin.getDefault().getCoreModel().getIndexManager().haveEncounteredHeader(resourceProject.getFullPath(),new Path(inclusion.getFullFileName()));
+			FortranCorePlugin.getDefault().getCoreModel().getIndexManager().haveEncounteredHeader(resourceProject.getFullPath(),new Path(inclusion.getFullFileName()));
 		
 	}
 
@@ -313,7 +313,7 @@ public class SourceIndexerRequestor implements ISourceElementRequestor, IIndexCo
 			//We are not in the file that has triggered the index. Thus, we need to find the
 			//file number for the current file (if it has one). If the current file does not
 			//have a file number, we need to add it to the index.
-			IFile tempFile = CCorePlugin.getWorkspace().getRoot().getFileForLocation(new Path(include.getFullFileName()));   
+			IFile tempFile = FortranCorePlugin.getWorkspace().getRoot().getFileForLocation(new Path(include.getFullFileName()));   
 			String filePath = "";
 			if (tempFile != null){
 				//File is local to workspace
@@ -667,7 +667,7 @@ public class SourceIndexerRequestor implements ISourceElementRequestor, IIndexCo
 			
 			ProcessMarkersJob job = new ProcessMarkersJob(  resource, problemList, jobName );
 			
-			IndexManager indexManager = CCorePlugin.getDefault().getCoreModel().getIndexManager();
+			IndexManager indexManager = FortranCorePlugin.getDefault().getCoreModel().getIndexManager();
 			IProgressMonitor group = indexManager.getIndexJobProgressGroup();
 			
 			job.setRule( resource );
@@ -730,7 +730,7 @@ public class SourceIndexerRequestor implements ISourceElementRequestor, IIndexCo
 				}
 			};
 			try {
-				CCorePlugin.getWorkspace().run(job, resource, 0, null);
+				FortranCorePlugin.getWorkspace().run(job, resource, 0, null);
 			} catch (CoreException e) {
 			}
 			return Status.OK_STATUS;

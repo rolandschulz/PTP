@@ -14,7 +14,7 @@ package org.eclipse.fdt.managedbuilder.internal.ui;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.managedbuilder.core.IConfiguration;
 import org.eclipse.fdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.fdt.managedbuilder.core.IProjectType;
@@ -40,7 +40,7 @@ public class ErrorParserBlock extends AbstractErrorParserBlock {
 		else {
 			// If no error parsers are specified by the configuration, the default is 
 			// all error parsers
-			return CCorePlugin.getDefault().getAllErrorParsersIDs();
+			return FortranCorePlugin.getDefault().getAllErrorParsersIDs();
 		}
 	}
 	
@@ -58,7 +58,7 @@ public class ErrorParserBlock extends AbstractErrorParserBlock {
 		if (config != null) {
 			return getErrorParserIDs(config);
 		} else {
-			return CCorePlugin.getDefault().getAllErrorParsersIDs();
+			return FortranCorePlugin.getDefault().getAllErrorParsersIDs();
 		}
 	}
 
@@ -78,7 +78,7 @@ public class ErrorParserBlock extends AbstractErrorParserBlock {
 			else
 				return new String[0];
 		}
-		return CCorePlugin.getDefault().getAllErrorParsersIDs();
+		return FortranCorePlugin.getDefault().getAllErrorParsersIDs();
 	}
 
 	public void saveErrorParsers(IProject project, String[] parsers) {

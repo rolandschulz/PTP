@@ -206,7 +206,7 @@ public class CModel extends Openable implements ICModel {
 		IProject[] projects = root.getProjects();
 		for (int i = 0, max = projects.length; i < max; i++) {
 			IProject project = projects[i];
-			if (CoreModel.hasCNature(project) || CoreModel.hasCCNature(project)) {
+			if (CoreModel.hasCNature(project)) {
 				ICProject cproject = new CProject(this, project);
 				info.addChild(cproject);
 			}

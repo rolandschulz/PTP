@@ -44,7 +44,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.internal.core.model.Util;
 import org.eclipse.fdt.managedbuilder.core.BuildException;
 import org.eclipse.fdt.managedbuilder.core.IConfiguration;
@@ -866,7 +866,7 @@ public class GnuMakefileGenerator implements IManagedBuilderMakefileGenerator {
 	 */
 	private IFile createFile(IPath makefilePath) throws CoreException {
 		// Create or get the handle for the makefile
-		IWorkspaceRoot root = CCorePlugin.getWorkspace().getRoot();
+		IWorkspaceRoot root = FortranCorePlugin.getWorkspace().getRoot();
 		IFile newFile = root.getFileForLocation(makefilePath);
 		if (newFile == null) {
 			newFile = root.getFile(makefilePath);
@@ -962,7 +962,7 @@ public class GnuMakefileGenerator implements IManagedBuilderMakefileGenerator {
 	 */
 	public void generateDependencies() throws CoreException {
 		// This is a hack for the pre-3.x GCC compilers
-		IWorkspaceRoot root = CCorePlugin.getWorkspace().getRoot();
+		IWorkspaceRoot root = FortranCorePlugin.getWorkspace().getRoot();
 		Iterator subDirs = getSubdirList().listIterator();
 		while(subDirs.hasNext()) {
 			// The builder creates a subdir with same name as source in the build location
@@ -1683,7 +1683,7 @@ public class GnuMakefileGenerator implements IManagedBuilderMakefileGenerator {
 	 */
 	public void regenerateDependencies(boolean force) throws CoreException {
 		// A hack for the pre-3.x GCC compilers is to put dummy targets for deps
-		IWorkspaceRoot root = CCorePlugin.getWorkspace().getRoot();
+		IWorkspaceRoot root = FortranCorePlugin.getWorkspace().getRoot();
 
 		Iterator iter = getDependencyMakefiles().listIterator();
 		while (iter.hasNext()) {

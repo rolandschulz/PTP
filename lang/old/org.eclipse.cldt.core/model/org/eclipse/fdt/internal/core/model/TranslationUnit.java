@@ -14,7 +14,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.fdt.core.filetype.ICFileType;
 import org.eclipse.fdt.core.filetype.ICFileTypeConstants;
@@ -570,7 +570,7 @@ public class TranslationUnit extends Openable implements ITranslationUnit {
 	private void parse(Map newElements){
 		try {
 			CModelBuilder modelBuilder = new CModelBuilder(this, newElements);
-			boolean quickParseMode = ! (CCorePlugin.getDefault().useStructuralParseMode());
+			boolean quickParseMode = ! (FortranCorePlugin.getDefault().useStructuralParseMode());
 			modelBuilder.parse(quickParseMode);
 		} catch (Exception e) {
 			// use the debug log for this exception.
@@ -603,7 +603,7 @@ public class TranslationUnit extends Openable implements ITranslationUnit {
 	 */
 	public boolean isCLanguage() {
 		IProject project = getCProject().getProject();
-		ICFileType type = CCorePlugin.getDefault().getFileType(project, getPath().lastSegment());
+		ICFileType type = FortranCorePlugin.getDefault().getFileType(project, getPath().lastSegment());
 		String lid = type.getLanguage().getId();
 		return lid != null && lid.equals(ICFileTypeConstants.LANG_C);
 	}
@@ -613,7 +613,7 @@ public class TranslationUnit extends Openable implements ITranslationUnit {
 	 */
 	public boolean isCXXLanguage() {
 		IProject project = getCProject().getProject();
-		ICFileType type = CCorePlugin.getDefault().getFileType(project, getPath().lastSegment());
+		ICFileType type = FortranCorePlugin.getDefault().getFileType(project, getPath().lastSegment());
 		String lid = type.getLanguage().getId();
 		return lid != null && lid.equals(ICFileTypeConstants.LANG_CXX);
 	}
@@ -623,7 +623,7 @@ public class TranslationUnit extends Openable implements ITranslationUnit {
 	 */
 	public boolean isASMLanguage() {
 		IProject project = getCProject().getProject();
-		ICFileType type = CCorePlugin.getDefault().getFileType(project, getPath().lastSegment());
+		ICFileType type = FortranCorePlugin.getDefault().getFileType(project, getPath().lastSegment());
 		String lid = type.getLanguage().getId();
 		return lid != null && lid.equals(ICFileTypeConstants.LANG_ASM);
 	}

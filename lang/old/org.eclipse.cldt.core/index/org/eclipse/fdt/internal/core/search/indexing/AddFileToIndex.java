@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICLogConstants;
 import org.eclipse.fdt.core.filetype.ICFileType;
 import org.eclipse.fdt.internal.core.index.IIndex;
@@ -42,7 +42,7 @@ public abstract class AddFileToIndex extends IndexRequest {
 		if (checkEncounteredHeaders) {
 			IProject resourceProject = resource.getProject();
 			/* Check to see if this is a header file */ 
-			ICFileType type = CCorePlugin.getDefault().getFileType(resourceProject,resource.getName());
+			ICFileType type = FortranCorePlugin.getDefault().getFileType(resourceProject,resource.getName());
 			
 			/* See if this file has been encountered before */
 			if (type.isHeader() &&

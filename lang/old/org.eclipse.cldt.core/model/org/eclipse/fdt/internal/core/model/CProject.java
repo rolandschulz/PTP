@@ -26,9 +26,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.fdt.core.CCProjectNature;
-import org.eclipse.fdt.core.CCorePlugin;
-import org.eclipse.fdt.core.CProjectNature;
+import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.FortranProjectNature;
 import org.eclipse.fdt.core.IBinaryParser;
 import org.eclipse.fdt.core.IBinaryParser.IBinaryArchive;
 import org.eclipse.fdt.core.IBinaryParser.IBinaryFile;
@@ -90,16 +89,7 @@ public class CProject extends Openable implements ICProject {
 
 	public static boolean hasCNature(IProject p) {
 		try {
-			return p.hasNature(CProjectNature.C_NATURE_ID);
-		} catch (CoreException e) {
-			//throws exception if the project is not open.
-		}
-		return false;
-	}
-
-	public static boolean hasCCNature(IProject p) {
-		try {
-			return p.hasNature(CCProjectNature.CC_NATURE_ID);
+			return p.hasNature(FortranProjectNature.FORTRAN_NATURE_ID);
 		} catch (CoreException e) {
 			//throws exception if the project is not open.
 		}
@@ -107,7 +97,7 @@ public class CProject extends Openable implements ICProject {
 	}
 
 	private boolean isCProject() {
-		return hasCNature(getProject()) || hasCCNature(getProject());
+		return hasCNature(getProject());
 	}
 
 	/**
@@ -244,7 +234,7 @@ public class CProject extends Openable implements ICProject {
 			Preferences preferences = getPreferences();
 
 			if (preferences == null || preferences.isDefault(optionName)) {
-				return inheritCCoreOptions ? CCorePlugin.getOption(optionName) : null;
+				return inheritCCoreOptions ? FortranCorePlugin.getOption(optionName) : null;
 			}
 
 			return preferences.getString(optionName).trim();
@@ -257,8 +247,8 @@ public class CProject extends Openable implements ICProject {
 	 * @see org.eclipse.fdt.core.model.ICProject#getOptions(boolean)
 	 */
 	public Map getOptions(boolean inheritCCoreOptions) {
-		// initialize to the defaults from CCorePlugin options pool
-		Map options = inheritCCoreOptions ? CCorePlugin.getOptions() : new HashMap(5);
+		// initialize to the defaults from FortranCorePlugin options pool
+		Map options = inheritCCoreOptions ? FortranCorePlugin.getOptions() : new HashMap(5);
 
 		Preferences preferences = getPreferences();
 		if (preferences == null)
@@ -339,11 +329,11 @@ public class CProject extends Openable implements ICProject {
 
 		while (iter.hasNext()) {
 			String qualifiedName = (String) iter.next();
-			String dequalifiedName = qualifiedName.substring(CCorePlugin.PLUGIN_ID.length() + 1);
+			String dequalifiedName = qualifiedName.substring(FortranCorePlugin.PLUGIN_ID.length() + 1);
 			String value = null;
 
 			try {
-				value = resource.getPersistentProperty(new QualifiedName(CCorePlugin.PLUGIN_ID, dequalifiedName));
+				value = resource.getPersistentProperty(new QualifiedName(FortranCorePlugin.PLUGIN_ID, dequalifiedName));
 			} catch (CoreException e) {
 			}
 
@@ -367,16 +357,16 @@ public class CProject extends Openable implements ICProject {
 
 		while (iter.hasNext()) {
 			String qualifiedName = (String) iter.next();
-			String dequalifiedName = qualifiedName.substring(CCorePlugin.PLUGIN_ID.length() + 1);
+			String dequalifiedName = qualifiedName.substring(FortranCorePlugin.PLUGIN_ID.length() + 1);
 			String value = null;
 
 			try {
 				value = preferences.getString(qualifiedName);
 
 				if (value != null && !value.equals(preferences.getDefaultString(qualifiedName))) {
-					resource.setPersistentProperty(new QualifiedName(CCorePlugin.PLUGIN_ID, dequalifiedName), value);
+					resource.setPersistentProperty(new QualifiedName(FortranCorePlugin.PLUGIN_ID, dequalifiedName), value);
 				} else {
-					resource.setPersistentProperty(new QualifiedName(CCorePlugin.PLUGIN_ID, dequalifiedName), null);
+					resource.setPersistentProperty(new QualifiedName(FortranCorePlugin.PLUGIN_ID, dequalifiedName), null);
 				}
 			} catch (CoreException e) {
 			}

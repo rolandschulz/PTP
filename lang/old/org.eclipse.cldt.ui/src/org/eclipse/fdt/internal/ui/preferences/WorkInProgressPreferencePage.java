@@ -19,7 +19,7 @@ package org.eclipse.fdt.internal.ui.preferences;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.browser.AllTypesCache;
 import org.eclipse.fdt.internal.core.search.indexing.SourceIndexer;
 import org.eclipse.fdt.internal.ui.search.CSearchPage;
@@ -177,11 +177,11 @@ public class WorkInProgressPreferencePage extends PreferencePage
 		
 		fOverlayStore.propagate();
 		
-//		Store IProblem Marker value in CCorePlugin Preferences 
-		Preferences prefs = CCorePlugin.getDefault().getPluginPreferences();
+//		Store IProblem Marker value in FortranCorePlugin Preferences 
+		Preferences prefs = FortranCorePlugin.getDefault().getPluginPreferences();
 		
 		prefs.setValue(AllTypesCache.ENABLE_BACKGROUND_TYPE_CACHE, fOverlayStore.getString(AllTypesCache.ENABLE_BACKGROUND_TYPE_CACHE));
-		CCorePlugin.getDefault().savePluginPreferences();
+		FortranCorePlugin.getDefault().savePluginPreferences();
 		
 		return true;
 	}
@@ -191,11 +191,11 @@ public class WorkInProgressPreferencePage extends PreferencePage
 	 */
 	public static void initDefaults(IPreferenceStore store) {
 		store.setDefault(AllTypesCache.ENABLE_BACKGROUND_TYPE_CACHE, false);
-		Preferences prefs = CCorePlugin.getDefault().getPluginPreferences();
+		Preferences prefs = FortranCorePlugin.getDefault().getPluginPreferences();
 		
 		if (prefs != null){
 			prefs.setValue(AllTypesCache.ENABLE_BACKGROUND_TYPE_CACHE, store.getString(AllTypesCache.ENABLE_BACKGROUND_TYPE_CACHE));
-			CCorePlugin.getDefault().savePluginPreferences();
+			FortranCorePlugin.getDefault().savePluginPreferences();
 		}
 	}
 	

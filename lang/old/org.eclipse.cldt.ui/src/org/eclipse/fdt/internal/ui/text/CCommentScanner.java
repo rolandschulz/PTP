@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.fdt.core.CCorePreferenceConstants;
+import org.eclipse.fdt.core.FortranCorePreferenceConstants;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
@@ -74,7 +74,7 @@ public class CCommentScanner extends AbstractCScanner
         }
     }
     
-    private static final String TRANSLATION_TASK_TAGS= CCorePreferenceConstants.TRANSLATION_TASK_TAGS;    
+    private static final String TRANSLATION_TASK_TAGS= FortranCorePreferenceConstants.TRANSLATION_TASK_TAGS;    
     protected static final String TASK_TAG= ICColorConstants.TASK_TAG;
 
     private TaskTagRule fTaskTagRule;

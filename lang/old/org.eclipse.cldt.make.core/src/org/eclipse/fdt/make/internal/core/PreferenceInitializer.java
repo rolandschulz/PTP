@@ -11,7 +11,7 @@ package org.eclipse.fdt.make.internal.core;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.make.core.IMakeBuilderInfo;
 import org.eclipse.fdt.make.core.MakeBuilder;
 import org.eclipse.fdt.make.core.MakeCorePlugin;
@@ -41,10 +41,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 			info.setFullBuildTarget("clean all"); //$NON-NLS-1$
 			info.setCleanBuildEnable(true);
 			info.setCleanBuildTarget("clean"); //$NON-NLS-1$
-			info.setErrorParsers(CCorePlugin.getDefault().getAllErrorParsersIDs());
+			info.setErrorParsers(FortranCorePlugin.getDefault().getAllErrorParsersIDs());
 		} catch (CoreException e) {
 		}
-		MakeCorePlugin.getDefault().getPluginPreferences().setDefault(CCorePlugin.PREF_BINARY_PARSER, CCorePlugin.PLUGIN_ID + ".ELF"); //$NON-NLS-1$
+		MakeCorePlugin.getDefault().getPluginPreferences().setDefault(FortranCorePlugin.PREF_BINARY_PARSER, FortranCorePlugin.PLUGIN_ID + ".ELF"); //$NON-NLS-1$
 
 		// default plugin preferences for scanner configuration discovery
 		IScannerConfigBuilderInfo scInfo = MakeCorePlugin.createScannerConfigBuildInfo(MakeCorePlugin.getDefault().getPluginPreferences(), ScannerConfigBuilder.BUILDER_ID, true);

@@ -820,7 +820,7 @@
          point="org.eclipse.ui.ide.projectNatureImages">
       <image
             icon="icons/full/ovr16/c_ovr.gif"
-            natureId="org.eclipse.fdt.core.cnature"
+            natureId="org.eclipse.fdt.core.fnature"
             id="org.eclipse.fdt.ui.cProjectNatureImage">
       </image>
    </extension>
@@ -1229,7 +1229,7 @@
             id="org.eclipse.fdt.ui.indexer">
 			<filter
                	name="nature"
-        		value="org.eclipse.fdt.core.cnature">
+        		value="org.eclipse.fdt.core.fnature">
     	     </filter>            
       </page>
       <page
@@ -1240,7 +1240,7 @@
             id="org.eclipse.fdt.ui.fileTypes">
          <filter
                name="nature"
-               value="org.eclipse.fdt.core.cnature">
+               value="org.eclipse.fdt.core.fnature">
          </filter>
        </page>
       <page
@@ -1251,7 +1251,7 @@
             id="org.eclipse.fdt.ui.cHelp">
              <filter
                	name="nature"
-        		value="org.eclipse.fdt.core.cnature">
+        		value="org.eclipse.fdt.core.fnature">
     	     </filter>            
       </page>
    </extension>

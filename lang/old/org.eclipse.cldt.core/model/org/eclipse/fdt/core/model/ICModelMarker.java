@@ -11,7 +11,7 @@
 package org.eclipse.fdt.core.model;
 
  
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 
 
 /**
@@ -28,7 +28,7 @@ public interface ICModelMarker {
 	 * This can be used to recognize those markers in the workspace that flag problems 
 	 * detected by the C compilers.
 	 */
-	public static final String C_MODEL_PROBLEM_MARKER = CCorePlugin.PLUGIN_ID + ".problem"; //$NON-NLS-1$
+	public static final String C_MODEL_PROBLEM_MARKER = FortranCorePlugin.PLUGIN_ID + ".problem"; //$NON-NLS-1$
 	
 	/**
 	 * C model extension to the marker problem markers which may hold a hint on
@@ -41,19 +41,19 @@ public interface ICModelMarker {
 	 * C model task marker type (value <code>"org.eclipse.fdt.core.task"</code>).
 	 * This can be used to recognize task markers in the workspace that correspond to tasks
 	 * specified in C/C++ source comments and detected during translation (for example, 'TO-DO: ...').
-	 * Tasks are identified by a task tag, which can be customized through <code>CCorePlugin</code>
+	 * Tasks are identified by a task tag, which can be customized through <code>FortranCorePlugin</code>
 	 * option <code>"org.eclipse.fdt.core.translation.taskTag"</code>.
 	 */
-	public static final String TASK_MARKER = CCorePlugin.PLUGIN_ID + ".task"; //$NON-NLS-1$
+	public static final String TASK_MARKER = FortranCorePlugin.PLUGIN_ID + ".task"; //$NON-NLS-1$
 	
-	public static final String INDEXER_MARKER = CCorePlugin.PLUGIN_ID + ".indexermarker"; //$NON-NLS-1$
+	public static final String INDEXER_MARKER = FortranCorePlugin.PLUGIN_ID + ".indexermarker"; //$NON-NLS-1$
 
 	/**
 	 * PatheEtnry problem marker type (value <code>"org.eclipse.fdt.core.pathentry_problem"</code>).
 	 * This can be used to recognize those markers in the workspace that flag problems 
 	 * detected by the C tooling during pathEntry setting.
 	 */
-	public static final String PATHENTRY_PROBLEM_MARKER = CCorePlugin.PLUGIN_ID + ".pathentry_problem"; //$NON-NLS-1$
+	public static final String PATHENTRY_PROBLEM_MARKER = FortranCorePlugin.PLUGIN_ID + ".pathentry_problem"; //$NON-NLS-1$
 	
 	/** 
 	 * PathEntry file format marker attribute (value <code>"PathEntryFileFormat"</code>).

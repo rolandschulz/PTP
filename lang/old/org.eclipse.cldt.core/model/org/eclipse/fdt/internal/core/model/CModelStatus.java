@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.ICModelStatus;
 import org.eclipse.fdt.core.model.ICModelStatusConstants;
@@ -77,7 +77,7 @@ public class CModelStatus extends Status implements ICModelStatus, ICModelStatus
 	 * Constructs an C model status with the given corresponding elements.
 	 */
 	public CModelStatus(int code, ICElement[] elements) {
-		super(ERROR, CCorePlugin.PLUGIN_ID, code, DEFAULT_STRING, null);
+		super(ERROR, FortranCorePlugin.PLUGIN_ID, code, DEFAULT_STRING, null);
 		fElements = elements;
 		fPath = Path.EMPTY;
 	}
@@ -90,7 +90,7 @@ public class CModelStatus extends Status implements ICModelStatus, ICModelStatus
 	}
 
 	public CModelStatus(int severity, int code, String string) {
-		super(severity, CCorePlugin.PLUGIN_ID, code, DEFAULT_STRING, null);
+		super(severity, FortranCorePlugin.PLUGIN_ID, code, DEFAULT_STRING, null);
 		fElements = CElement.NO_ELEMENTS;
 		fPath = Path.EMPTY;
 		fString = string;
@@ -100,7 +100,7 @@ public class CModelStatus extends Status implements ICModelStatus, ICModelStatus
 	 * Constructs an C model status with no corresponding elements.
 	 */
 	public CModelStatus(int code, IPath path) {
-		super(ERROR, CCorePlugin.PLUGIN_ID, code, DEFAULT_STRING, null);
+		super(ERROR, FortranCorePlugin.PLUGIN_ID, code, DEFAULT_STRING, null);
 		fElements = CElement.NO_ELEMENTS;
 		fPath = path;
 	}
@@ -137,7 +137,7 @@ public class CModelStatus extends Status implements ICModelStatus, ICModelStatus
 	 * Constructs an C model status with no corresponding elements.
 	 */
 	public CModelStatus(int code, Throwable throwable) {
-		super(ERROR, CCorePlugin.PLUGIN_ID, code, DEFAULT_STRING, throwable);
+		super(ERROR, FortranCorePlugin.PLUGIN_ID, code, DEFAULT_STRING, throwable);
 		fElements = CElement.NO_ELEMENTS;
 		fPath = Path.EMPTY;
 	}

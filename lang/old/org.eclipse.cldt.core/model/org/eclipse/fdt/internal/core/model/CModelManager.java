@@ -33,10 +33,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.fdt.core.CCProjectNature;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.CDescriptorEvent;
-import org.eclipse.fdt.core.CProjectNature;
+import org.eclipse.fdt.core.FortranProjectNature;
 import org.eclipse.fdt.core.IBinaryParser;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.ICDescriptorListener;
@@ -162,10 +161,10 @@ public class CModelManager implements IResourceChangeListener, ICDescriptorListe
 
 			// Register the Core Model on the Descriptor
 			// Manager, it needs to know about changes.
-			CCorePlugin.getDefault().getCDescriptorManager().addDescriptorListener(factory);
+			FortranCorePlugin.getDefault().getCDescriptorManager().addDescriptorListener(factory);
 			// Register the Core Model on the Resolver
 			// Manager, it needs to know about changes.
-			CCorePlugin.getDefault().getResolverModel().addResolverChangeListener(factory);
+			FortranCorePlugin.getDefault().getResolverModel().addResolverChangeListener(factory);
 		}
 		return factory;
 	}
@@ -508,9 +507,9 @@ public class CModelManager implements IResourceChangeListener, ICDescriptorListe
 		BinaryParserConfig[] parsers = (BinaryParserConfig[])binaryParsersMap.get(project);
 		if (parsers == null) {
 			try {
-				ICDescriptor cdesc = CCorePlugin.getDefault().getCProjectDescription(project, false);
+				ICDescriptor cdesc = FortranCorePlugin.getDefault().getCProjectDescription(project, false);
 				if (cdesc != null) {
-					ICExtensionReference[] cextensions = cdesc.get(CCorePlugin.BINARY_PARSER_UNIQ_ID, true);
+					ICExtensionReference[] cextensions = cdesc.get(FortranCorePlugin.BINARY_PARSER_UNIQ_ID, true);
 					if (cextensions.length > 0) {
 						ArrayList list = new ArrayList(cextensions.length);
 						for (int i = 0; i < cextensions.length; i++) {
@@ -525,7 +524,7 @@ public class CModelManager implements IResourceChangeListener, ICDescriptorListe
 			}
 			if (parsers == null) {
 				try {
-					BinaryParserConfig config = new BinaryParserConfig(CCorePlugin.getDefault().getDefaultBinaryParser(), CCorePlugin.DEFAULT_BINARY_PARSER_UNIQ_ID);
+					BinaryParserConfig config = new BinaryParserConfig(FortranCorePlugin.getDefault().getDefaultBinaryParser(), FortranCorePlugin.DEFAULT_BINARY_PARSER_UNIQ_ID);
 					parsers = new BinaryParserConfig[]{config};
 				} catch (CoreException e1) {
 				}
@@ -699,8 +698,7 @@ public class CModelManager implements IResourceChangeListener, ICDescriptorListe
 				case IResourceChangeEvent.PRE_DELETE :
 					try {
 					if (resource.getType() == IResource.PROJECT && 	
-					    ( ((IProject)resource).hasNature(CProjectNature.C_NATURE_ID) ||
-					      ((IProject)resource).hasNature(CCProjectNature.CC_NATURE_ID) )){
+					   ((IProject)resource).hasNature(FortranProjectNature.FORTRAN_NATURE_ID)){
 						this.deleting((IProject) resource);}
 					} catch (CoreException e) {
 					}
@@ -735,7 +733,7 @@ public class CModelManager implements IResourceChangeListener, ICDescriptorListe
 			if (cdesc != null) {
 				IProject project = cdesc.getProject();
 				try {
-					ICExtensionReference[] newExts = CCorePlugin.getDefault().getBinaryParserExtensions(project);
+					ICExtensionReference[] newExts = FortranCorePlugin.getDefault().getBinaryParserExtensions(project);
 					BinaryParserConfig[] currentConfigs = getBinaryParser(project);
 					// anything added/removed
 					if (newExts.length != currentConfigs.length) {
@@ -865,8 +863,8 @@ public class CModelManager implements IResourceChangeListener, ICDescriptorListe
 				Platform.run(new ISafeRunnable() {
 
 					public void handleException(Throwable exception) {
-						//CCorePlugin.log(exception, "Exception occurred in listener of C element change notification"); //$NON-NLS-1$
-						CCorePlugin.log(exception);
+						//FortranCorePlugin.log(exception, "Exception occurred in listener of C element change notification"); //$NON-NLS-1$
+						FortranCorePlugin.log(exception);
 					}
 					public void run() throws Exception {
 						listener.elementChanged(extraEvent);
@@ -1097,9 +1095,9 @@ public class CModelManager implements IResourceChangeListener, ICDescriptorListe
 		}
 
 		// Remove ourself from the DescriptorManager.
-		CCorePlugin.getDefault().getCDescriptorManager().removeDescriptorListener(factory);
+		FortranCorePlugin.getDefault().getCDescriptorManager().removeDescriptorListener(factory);
 		// Remove ourself from the ResolverManager.
-		CCorePlugin.getDefault().getResolverModel().removeResolverChangeListener(factory);
+		FortranCorePlugin.getDefault().getResolverModel().removeResolverChangeListener(factory);
 
 		// Do any shutdown of services.
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(factory);

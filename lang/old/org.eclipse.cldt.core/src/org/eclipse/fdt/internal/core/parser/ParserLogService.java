@@ -10,7 +10,7 @@
 ***********************************************************************/
 package org.eclipse.fdt.internal.core.parser;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICLogConstants;
 import org.eclipse.fdt.core.parser.IParserLogService;
 import org.eclipse.fdt.internal.core.model.Util;
@@ -48,9 +48,9 @@ public class ParserLogService implements IParserLogService
 	}
 
 	public boolean isTracing(){
-		if( CCorePlugin.getDefault() == null )
+		if( FortranCorePlugin.getDefault() == null )
 			return false;
 		
-		return ( CCorePlugin.getDefault().isDebugging() && Util.isActive( topic ) ); 
+		return ( FortranCorePlugin.getDefault().isDebugging() && Util.isActive( topic ) ); 
 	}
 }

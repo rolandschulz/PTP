@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.filetype.ICFileTypeAssociation;
 import org.eclipse.fdt.core.filetype.IResolverModel;
@@ -33,7 +33,7 @@ public class CustomResolver extends CFileTypeResolver {
 
 	// XML tag names, etc.
 	private static final String OLD_RESOLVER 	= "fdt_resolver"; //$NON-NLS-1$
-	private static final String FDT_RESOLVER 	= CCorePlugin.PLUGIN_ID + ".resolver"; //$NON-NLS-1$
+	private static final String FDT_RESOLVER 	= FortranCorePlugin.PLUGIN_ID + ".resolver"; //$NON-NLS-1$
 	private static final String TAG_CUSTOM 		= "custom"; //$NON-NLS-1$
 	private static final String TAG_ASSOC 		= "associations"; //$NON-NLS-1$
 	private static final String TAG_ENTRY 		= "entry"; //$NON-NLS-1$
@@ -80,7 +80,7 @@ public class CustomResolver extends CFileTypeResolver {
 			try {
 				getProjectDescriptor(project, true).saveProjectData();
 			} catch (CoreException e) {
-				CCorePlugin.log(e);
+				FortranCorePlugin.log(e);
 			}
 		}
 	}
@@ -148,7 +148,7 @@ public class CustomResolver extends CFileTypeResolver {
 		try {
 			getProjectDescriptor(project, true).saveProjectData();
 		} catch (CoreException e) {
-			CCorePlugin.log(e);
+			FortranCorePlugin.log(e);
 		}
 	}
 	
@@ -175,7 +175,7 @@ public class CustomResolver extends CFileTypeResolver {
 						try {
 							assocs.add(fModel.createAssocation(pattern, fModel.getFileTypeById(typeId)));
 						} catch (IllegalArgumentException e) {
-							CCorePlugin.log(e);
+							FortranCorePlugin.log(e);
 						}
 					}
 					assoc = assoc.getNextSibling();
@@ -201,7 +201,7 @@ public class CustomResolver extends CFileTypeResolver {
 	
 	private static ICDescriptor getProjectDescriptor(IProject project, boolean create) throws CoreException {
 		ICDescriptor descriptor = null;
-		descriptor = CCorePlugin.getDefault().getCProjectDescription(project, create);
+		descriptor = FortranCorePlugin.getDefault().getCProjectDescription(project, create);
 		return descriptor;
 	}
 
@@ -237,7 +237,7 @@ public class CustomResolver extends CFileTypeResolver {
 							try {
 								assocList.add(model.createAssocation(pattern, model.getFileTypeById(typeId)));
 							} catch (IllegalArgumentException e) {
-								CCorePlugin.log(e);
+								FortranCorePlugin.log(e);
 							}
 						}
 						assoc = assoc.getNextSibling();
@@ -290,7 +290,7 @@ public class CustomResolver extends CFileTypeResolver {
 			try {
 				getProjectDescriptor(project, true).saveProjectData();
 			} catch (CoreException e) {
-				CCorePlugin.log(e);
+				FortranCorePlugin.log(e);
 			}
 		}
 	}

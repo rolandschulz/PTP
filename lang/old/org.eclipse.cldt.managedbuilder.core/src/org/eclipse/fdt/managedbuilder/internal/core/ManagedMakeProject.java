@@ -12,7 +12,7 @@
 package org.eclipse.fdt.managedbuilder.internal.core;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.ICOwner;
 
@@ -33,9 +33,9 @@ public class ManagedMakeProject implements ICOwner {
 	 * @see org.eclipse.fdt.core.ICOwner#configure(org.eclipse.fdt.core.ICDescriptor)
 	 */
 	public void configure(ICDescriptor cproject) throws CoreException {
-		cproject.remove(CCorePlugin.BUILD_SCANNER_INFO_UNIQ_ID);
-		cproject.remove(CCorePlugin.BUILDER_MODEL_ID);
-		cproject.remove(CCorePlugin.BINARY_PARSER_UNIQ_ID);
+		cproject.remove(FortranCorePlugin.BUILD_SCANNER_INFO_UNIQ_ID);
+		cproject.remove(FortranCorePlugin.BUILDER_MODEL_ID);
+		cproject.remove(FortranCorePlugin.BINARY_PARSER_UNIQ_ID);
 	}
 
 	/* (non-Javadoc)

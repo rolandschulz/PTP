@@ -24,7 +24,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.resources.IConsole;
 import org.eclipse.fdt.make.core.IMakeBuilderInfo;
 import org.eclipse.fdt.make.core.MakeBuilder;
@@ -62,7 +62,7 @@ public class DefaultSIFileReader implements IExternalScannerInfoProvider {
         if (reader == null)
             return rc;
         // output
-        IConsole console = CCorePlugin.getDefault().getConsole(EXTERNAL_SI_PROVIDER_CONSOLE_ID);
+        IConsole console = FortranCorePlugin.getDefault().getConsole(EXTERNAL_SI_PROVIDER_CONSOLE_ID);
         console.start(project);
         OutputStream ostream, cos;
         try {

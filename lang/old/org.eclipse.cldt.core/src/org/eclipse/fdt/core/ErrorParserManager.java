@@ -32,7 +32,7 @@ public class ErrorParserManager extends OutputStream {
 	private int nOpens;
 
 	private final static String OLD_PREF_ERROR_PARSER = "errorOutputParser"; //$NON-NLS-1$
-	public final static String PREF_ERROR_PARSER = CCorePlugin.PLUGIN_ID + ".errorOutputParser"; //$NON-NLS-1$
+	public final static String PREF_ERROR_PARSER = FortranCorePlugin.PLUGIN_ID + ".errorOutputParser"; //$NON-NLS-1$
 
 	private IProject fProject;
 	private IMarkerGenerator fMarkerGenerator;
@@ -70,7 +70,7 @@ public class ErrorParserManager extends OutputStream {
 		} else {
 			fErrorParsers = new LinkedHashMap(parsersIDs.length);
 			for (int i = 0; i < parsersIDs.length; i++) {
-				IErrorParser[] parsers = CCorePlugin.getDefault().getErrorParser(parsersIDs[i]);
+				IErrorParser[] parsers = FortranCorePlugin.getDefault().getErrorParser(parsersIDs[i]);
 				fErrorParsers.put(parsersIDs[i], parsers);
 			}
 		}
@@ -134,21 +134,21 @@ public class ErrorParserManager extends OutputStream {
 
 	private void enableAllParsers() {
 		fErrorParsers = new LinkedHashMap();
-		String[] parserIDs = CCorePlugin.getDefault().getAllErrorParsersIDs();
+		String[] parserIDs = FortranCorePlugin.getDefault().getAllErrorParsersIDs();
 		for (int i = 0; i < parserIDs.length; i++) {
-			IErrorParser[] parsers = CCorePlugin.getDefault().getErrorParser(parserIDs[i]);
+			IErrorParser[] parsers = FortranCorePlugin.getDefault().getErrorParser(parserIDs[i]);
 			fErrorParsers.put(parserIDs[i], parsers);
 		}
 		if (fErrorParsers.size() == 0) {
 			initErrorParsersMap();
-			CCorePlugin.getDefault().getPluginPreferences().setValue(OLD_PREF_ERROR_PARSER, ""); // remove old prefs //$NON-NLS-1$
+			FortranCorePlugin.getDefault().getPluginPreferences().setValue(OLD_PREF_ERROR_PARSER, ""); // remove old prefs //$NON-NLS-1$
 		}
 	}
 
 	private void initErrorParsersMap() {
-		String[] parserIDs = CCorePlugin.getDefault().getAllErrorParsersIDs();
+		String[] parserIDs = FortranCorePlugin.getDefault().getAllErrorParsersIDs();
 		for (int i = 0; i < parserIDs.length; i++) {
-			IErrorParser[] parsers = CCorePlugin.getDefault().getErrorParser(parserIDs[i]);
+			IErrorParser[] parsers = FortranCorePlugin.getDefault().getErrorParser(parserIDs[i]);
 			fErrorParsers.put(parserIDs[i], parsers);
 		}
 	}
@@ -165,7 +165,7 @@ public class ErrorParserManager extends OutputStream {
 				}
 			}, IResource.NONE);
 		} catch (CoreException e) {
-			CCorePlugin.log(e.getStatus());
+			FortranCorePlugin.log(e.getStatus());
 		}
 	}
 

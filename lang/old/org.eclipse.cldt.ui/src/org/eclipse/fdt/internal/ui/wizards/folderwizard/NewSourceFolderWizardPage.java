@@ -27,8 +27,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.fdt.core.CCProjectNature;
-import org.eclipse.fdt.core.CProjectNature;
+import org.eclipse.fdt.core.FortranProjectNature;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.CoreModelUtil;
@@ -167,7 +166,7 @@ public class NewSourceFolderWizardPage extends NewElementWizardPage {
 			IProject[] projects= fWorkspaceRoot.getProjects();
 			for (int i= 0; i < projects.length; i++) {
 				IProject proj= projects[i];
-				if (proj.hasNature(CProjectNature.C_NATURE_ID) || proj.hasNature(CCProjectNature.CC_NATURE_ID)) {
+				if (proj.hasNature(FortranProjectNature.FORTRAN_NATURE_ID)) {
 					projPath= proj.getFullPath().makeRelative().toString();
 					break;
 				}
@@ -286,7 +285,7 @@ public class NewSourceFolderWizardPage extends NewElementWizardPage {
 			return;
 		}
 		try {
-			if (project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID)) {
+			if (project.hasNature(FortranProjectNature.FORTRAN_NATURE_ID)) {
 				fCurrCProject= CoreModel.getDefault().create(project);
 				fEntries= fCurrCProject.getRawPathEntries();
 				fProjectStatus.setOK();

@@ -37,7 +37,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.make.core.IMakeTarget;
 import org.eclipse.fdt.make.core.MakeCorePlugin;
@@ -259,7 +259,7 @@ public class ProjectTargets {
 	 */
 	protected void translateDocumentToFDTProject(Document doc) throws CoreException {
 		ICDescriptor descriptor;
-		descriptor = CCorePlugin.getDefault().getCProjectDescription(getProject(), true);
+		descriptor = FortranCorePlugin.getDefault().getCProjectDescription(getProject(), true);
 
 		Element rootElement = descriptor.getProjectData(MAKE_TARGET_KEY);
 
@@ -294,7 +294,7 @@ public class ProjectTargets {
 		try {
 			document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 			ICDescriptor descriptor;
-			descriptor = CCorePlugin.getDefault().getCProjectDescription(getProject(), true);
+			descriptor = FortranCorePlugin.getDefault().getCProjectDescription(getProject(), true);
 
 			rootElement = descriptor.getProjectData(MAKE_TARGET_KEY);
 		} catch (ParserConfigurationException e) {

@@ -18,7 +18,7 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.IWorkingCopy;
@@ -150,7 +150,7 @@ public class CompletionEngine implements RelevanceConstants {
 		
 		//Get the scanner info
 		IScannerInfo scanInfo = new ScannerInfo();
-		IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(project);
+		IScannerInfoProvider provider = FortranCorePlugin.getDefault().getScannerInfoProvider(project);
 		if (provider != null){
 			IScannerInfo buildScanInfo = provider.getScannerInformation(currentResource);
 			if( buildScanInfo != null )
@@ -158,7 +158,7 @@ public class CompletionEngine implements RelevanceConstants {
 		} 			
 	
 		//C or CPP?
-		ParserLanguage language = CoreModel.hasCCNature(project) ? ParserLanguage.CPP : ParserLanguage.C;
+		ParserLanguage language = ParserLanguage.C;
 	
 		IParser parser = null;
 		IScanner scanner = null;

@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.managedbuilder.core.BuildException;
 import org.eclipse.fdt.managedbuilder.core.IConfiguration;
@@ -152,15 +152,15 @@ public class NewManagedProjectWizard extends NewCProjectWizard {
 				ManagedBuildManager.setNewProjectVersion(newProject);
 				ICDescriptor desc = null;
 				try {
-					desc = CCorePlugin.getDefault().getCProjectDescription(newProject, true);
-					desc.create(CCorePlugin.BUILD_SCANNER_INFO_UNIQ_ID, ManagedBuildManager.INTERFACE_IDENTITY);
+					desc = FortranCorePlugin.getDefault().getCProjectDescription(newProject, true);
+					desc.create(FortranCorePlugin.BUILD_SCANNER_INFO_UNIQ_ID, ManagedBuildManager.INTERFACE_IDENTITY);
 					//  TODO:  The binary parser setting is currently per-project in the rest of FDT.
 					//         In the MBS, it is per-coonfiguration.  For now, select the binary parser of the
 					//         first configuration.
 					if (newConfigs.length > 0) {
 						IToolChain tc = newConfigs[0].getToolChain();
 						ITargetPlatform targetPlatform = tc.getTargetPlatform();
-					    desc.create(CCorePlugin.BINARY_PARSER_UNIQ_ID, targetPlatform.getBinaryParserId());
+					    desc.create(FortranCorePlugin.BINARY_PARSER_UNIQ_ID, targetPlatform.getBinaryParserId());
 					}
 				} catch (CoreException e) {
 					ManagedBuilderUIPlugin.log(e);

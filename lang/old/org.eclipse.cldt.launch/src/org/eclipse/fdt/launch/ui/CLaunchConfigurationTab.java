@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.ICElement;
@@ -54,7 +54,7 @@ public abstract class CLaunchConfigurationTab extends AbstractLaunchConfiguratio
 		}
 		if (projectName != null && !projectName.equals("")) { //$NON-NLS-1$
 			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-			ICProject cProject = CCorePlugin.getDefault().getCoreModel().create(project);
+			ICProject cProject = FortranCorePlugin.getDefault().getCoreModel().create(project);
 			if (cProject != null && cProject.exists()) {
 				obj = cProject;
 			}
@@ -81,7 +81,7 @@ public abstract class CLaunchConfigurationTab extends AbstractLaunchConfiguratio
 			if (platform != null && !platform.equals("*")) { //$NON-NLS-1$
 				ICDescriptor descriptor;
 				try {
-					descriptor = CCorePlugin.getDefault().getCProjectDescription( ((ICElement)obj).getCProject().getProject(),
+					descriptor = FortranCorePlugin.getDefault().getCProjectDescription( ((ICElement)obj).getCProject().getProject(),
 							false);
 					if (descriptor != null) {
 						String projectPlatform = descriptor.getPlatform();
@@ -100,7 +100,7 @@ public abstract class CLaunchConfigurationTab extends AbstractLaunchConfiguratio
 				IProject project;
 				project = (IProject)ce.getCProject().getResource();
 				IPath programFile = project.getFile(programName).getLocation();
-				ce = CCorePlugin.getDefault().getCoreModel().create(programFile);
+				ce = FortranCorePlugin.getDefault().getCoreModel().create(programFile);
 				if (ce != null && ce.exists()) {
 					return ce;
 				}

@@ -38,7 +38,7 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.ICLogConstants;
 import org.eclipse.fdt.core.index.IIndexChangeListener;
@@ -101,7 +101,7 @@ public class IndexManager extends JobManager implements IIndexConstants {
 	protected List indexChangeListeners = Collections.synchronizedList(new ArrayList());
 	public static final String INDEX_NOTIFICATION_NAME = Util.bind( "indexNotificationJob" ); //$NON-NLS-1$
 	
-	public final static String INDEX_MODEL_ID = CCorePlugin.PLUGIN_ID + ".newindexmodel"; //$NON-NLS-1$
+	public final static String INDEX_MODEL_ID = FortranCorePlugin.PLUGIN_ID + ".newindexmodel"; //$NON-NLS-1$
 	public final static String ACTIVATION = "enable"; //$NON-NLS-1$
 	public final static String PROBLEM_ACTIVATION = "problemEnable"; //$NON-NLS-1$
 	public final static QualifiedName activationKey = new QualifiedName(INDEX_MODEL_ID, ACTIVATION);
@@ -169,7 +169,7 @@ public class IndexManager extends JobManager implements IIndexConstants {
 		else
 			org.eclipse.fdt.internal.core.model.Util.log(null, "IndexManager addSource: File has no project associated : " + resource.getName(), ICLogConstants.FDT); //$NON-NLS-1$ 
 			
-		if (CCorePlugin.getDefault() == null) return;	
+		if (FortranCorePlugin.getDefault() == null) return;	
 		
 		if (indexEnabled){
 			AddCompilationUnitToIndex job = new AddCompilationUnitToIndex(resource, indexedContainers, this, checkEncounteredHeaders);
@@ -190,7 +190,7 @@ public class IndexManager extends JobManager implements IIndexConstants {
 	}
 	
 	public void updateDependencies(IResource resource){
-		if (CCorePlugin.getDefault() == null || !isIndexEnabled( resource.getProject() ) )
+		if (FortranCorePlugin.getDefault() == null || !isIndexEnabled( resource.getProject() ) )
 			return;	
 	
 		UpdateDependency job = new UpdateDependency(resource);
@@ -342,7 +342,7 @@ public class IndexManager extends JobManager implements IIndexConstants {
 	private IPath getCCorePluginWorkingLocation() {
 		if (this.cCorePluginLocation != null) return this.cCorePluginLocation;
 
-		return this.cCorePluginLocation = CCorePlugin.getDefault().getStateLocation();
+		return this.cCorePluginLocation = FortranCorePlugin.getDefault().getStateLocation();
 	}
 	/**
 	 * Index access is controlled through a read-write monitor so as
@@ -357,7 +357,7 @@ public class IndexManager extends JobManager implements IIndexConstants {
 	 * Note: the actual operation is performed in background 
 	 */
 	public void indexAll(IProject project) {
-		if (CCorePlugin.getDefault() == null) return;
+		if (FortranCorePlugin.getDefault() == null) return;
 	 
 		//check to see if indexing isEnabled for this project
 		boolean indexEnabled = isIndexEnabled(project);
@@ -541,7 +541,7 @@ public class IndexManager extends JobManager implements IIndexConstants {
 	 * Note: the actual operation is performed in background
 	 */
 	public void remove(String resourceName, IPath indexedContainer){
-		IProject project = CCorePlugin.getWorkspace().getRoot().getProject(indexedContainer.toString());
+		IProject project = FortranCorePlugin.getWorkspace().getRoot().getProject(indexedContainer.toString());
       	if( isIndexEnabled( project ) )
       		request(new RemoveFromIndex(resourceName, indexedContainer, this));
 	}
@@ -614,7 +614,7 @@ public class IndexManager extends JobManager implements IIndexConstants {
 			this.timeoutThread = new ParserTimeOut("Indexer TimeOut Thread");  //$NON-NLS-1$
 			this.timeoutThread.setThreadPriority(Thread.MAX_PRIORITY);
 			
-			Preferences prefs = CCorePlugin.getDefault().getPluginPreferences();
+			Preferences prefs = FortranCorePlugin.getDefault().getPluginPreferences();
 			prefs.setDefault(SourceIndexer.FDT_INDEXER_TIMEOUT,20000);
 		}
 		
@@ -809,7 +809,7 @@ public class IndexManager extends JobManager implements IIndexConstants {
 	private Boolean loadIndexerEnabledFromCDescriptor(IProject project) throws CoreException {
 		// Check if we have the property in the descriptor
 		// We pass false since we do not want to create the descriptor if it does not exists.
-		ICDescriptor descriptor = CCorePlugin.getDefault().getCProjectDescription(project, false);
+		ICDescriptor descriptor = FortranCorePlugin.getDefault().getCProjectDescription(project, false);
 		Boolean strBool = null;
 		if (descriptor != null) {
 			Node child = descriptor.getProjectData(FDT_INDEXER).getFirstChild();
@@ -827,7 +827,7 @@ public class IndexManager extends JobManager implements IIndexConstants {
 	}
 	private Integer loadIndexerProblemsEnabledFromCDescriptor(IProject project) throws CoreException {
 	// we are only checking for the settings do not create the descriptor.
-		ICDescriptor descriptor = CCorePlugin.getDefault().getCProjectDescription(project, false);
+		ICDescriptor descriptor = FortranCorePlugin.getDefault().getCProjectDescription(project, false);
 		Integer strInt = null;
 		if( descriptor != null ){
 			Node child = descriptor.getProjectData(FDT_INDEXER).getFirstChild();
@@ -917,7 +917,7 @@ public class IndexManager extends JobManager implements IIndexConstants {
 					protected IStatus run(IProgressMonitor monitor)	{	
 						Platform.run(new ISafeRunnable() {
 							public void handleException(Throwable exception) {
-								CCorePlugin.log(exception);
+								FortranCorePlugin.log(exception);
 							}
 							public void run() throws Exception {
 								listener.indexChanged(indexEvent);

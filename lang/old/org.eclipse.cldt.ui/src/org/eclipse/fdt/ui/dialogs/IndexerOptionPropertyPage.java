@@ -13,7 +13,7 @@ package org.eclipse.fdt.ui.dialogs;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.internal.core.search.indexing.IndexManager;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
@@ -90,14 +90,14 @@ public class IndexerOptionPropertyPage extends PropertyPage {
 			optionPage.persistIndexerValues(tempProject);
 		
 			if( problemsChanged && newIndexerProblemsValue == 0)
-				CCorePlugin.getDefault().getCoreModel().getIndexManager().removeIndexerProblems(tempProject);
+				FortranCorePlugin.getDefault().getCoreModel().getIndexManager().removeIndexerProblems(tempProject);
 						
 			//if indexer is now on send a index all request 
 			if( indexChanged && newIndexerValue && !requestedIndexAll ) {
-				CCorePlugin.getDefault().getCoreModel().getIndexManager().indexAll(tempProject);
+				FortranCorePlugin.getDefault().getCoreModel().getIndexManager().indexAll(tempProject);
 				requestedIndexAll = true;
 			} else if( indexChanged && !newIndexerValue ) {
-				CCorePlugin.getDefault().getCoreModel().getIndexManager().discardJobs( tempProject.getName() );
+				FortranCorePlugin.getDefault().getCoreModel().getIndexManager().discardJobs( tempProject.getName() );
 			}
 		}
 		return true;
@@ -168,7 +168,7 @@ public class IndexerOptionPropertyPage extends PropertyPage {
 	 * @throws CoreException
 	 */
 	private Boolean loadIndexerEnabledFromCDescriptor(IProject project) throws CoreException {
-		ICDescriptor descriptor = CCorePlugin.getDefault().getCProjectDescription(project, true);
+		ICDescriptor descriptor = FortranCorePlugin.getDefault().getCProjectDescription(project, true);
 		
 		Node child = descriptor.getProjectData(IndexManager.FDT_INDEXER).getFirstChild();
 		Boolean strBool = null;
@@ -186,7 +186,7 @@ public class IndexerOptionPropertyPage extends PropertyPage {
 	
 	private Integer loadIndexerProblemsEnabledFromCDescriptor( IProject project ) throws CoreException
 	{
-		ICDescriptor descriptor = CCorePlugin.getDefault().getCProjectDescription(project, true);
+		ICDescriptor descriptor = FortranCorePlugin.getDefault().getCProjectDescription(project, true);
 		
 		Node child = descriptor.getProjectData(IndexManager.FDT_INDEXER).getFirstChild();
 		Integer strInt = null;

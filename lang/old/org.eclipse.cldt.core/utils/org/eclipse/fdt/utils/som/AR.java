@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Vector;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.utils.coff.ReadMemoryAccess;
 
 /**
@@ -73,7 +73,7 @@ public class AR {
 				file.read(ar_fmag);
 			} catch (IOException e) {
 				dispose();
-				CCorePlugin.log(e);
+				FortranCorePlugin.log(e);
 			}
 		}
 
@@ -170,7 +170,7 @@ public class AR {
 				checksum = memory.getInt();
 			} catch (IOException e) {
 				dispose();
-				CCorePlugin.log(e);
+				FortranCorePlugin.log(e);
 			}
 		}
 		
@@ -189,7 +189,7 @@ public class AR {
 		file.read(ar_magic);
 		if (!isARHeader(ar_magic)) {
 			file.close();
-			throw new IOException(CCorePlugin.getResourceString("Util.exception.invalidArchive")); //$NON-NLS-1$
+			throw new IOException(FortranCorePlugin.getResourceString("Util.exception.invalidArchive")); //$NON-NLS-1$
 		}
 		// load a LST header
 		lstHeader = new LSTHeader();

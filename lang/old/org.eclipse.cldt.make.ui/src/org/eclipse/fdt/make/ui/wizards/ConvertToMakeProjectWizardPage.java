@@ -15,7 +15,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.make.core.MakeProjectNature;
 import org.eclipse.fdt.make.core.scannerconfig.ScannerConfigNature;
 import org.eclipse.fdt.make.internal.ui.MakeUIPlugin;
@@ -86,7 +86,7 @@ public class ConvertToMakeProjectWizardPage extends ConvertProjectWizardPage {
 			super.convertProject(project, new SubProgressMonitor(monitor, 1), projectID);
 			MakeProjectNature.addNature(project, new SubProgressMonitor(monitor, 1));
 			ScannerConfigNature.addScannerConfigNature(project);
-			CCorePlugin.getDefault().mapCProjectOwner(project, projectID, true);
+			FortranCorePlugin.getDefault().mapCProjectOwner(project, projectID, true);
 		} finally {
 			monitor.done();
 		}

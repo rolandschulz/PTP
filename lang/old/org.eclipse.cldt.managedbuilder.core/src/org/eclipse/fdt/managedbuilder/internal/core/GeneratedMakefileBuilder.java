@@ -40,7 +40,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.CommandLauncher;
 import org.eclipse.fdt.core.ConsoleOutputStream;
 import org.eclipse.fdt.core.ErrorParserManager;
@@ -197,7 +197,7 @@ public class GeneratedMakefileBuilder extends ACBuilder {
 	 * @param epm
 	 */
 	private void addBuilderMarkers(ErrorParserManager epm) {
-		IWorkspaceRoot root = CCorePlugin.getWorkspace().getRoot();
+		IWorkspaceRoot root = FortranCorePlugin.getWorkspace().getRoot();
 		Iterator iter = getGenerationProblems().iterator();
 		while (iter.hasNext()) {
 			IStatus stat = (IStatus)iter.next();
@@ -291,7 +291,7 @@ public class GeneratedMakefileBuilder extends ACBuilder {
 			return;
 		}
 		IPath buildDirPath = getProject().getLocation().append(info.getConfigurationName());
-		IWorkspace workspace = CCorePlugin.getWorkspace();
+		IWorkspace workspace = FortranCorePlugin.getWorkspace();
 		IContainer buildDir = workspace.getRoot().getContainerForLocation(buildDirPath);
 		if (buildDir == null || !buildDir.isAccessible()){
 			outputError(buildDir.getName(), "Could not delete the build directory");	//$NON-NLS-1$
@@ -305,7 +305,7 @@ public class GeneratedMakefileBuilder extends ACBuilder {
 			workspace.delete(new IResource[]{buildDir}, true, monitor);
 			StringBuffer buf = new StringBuffer();
 			// write to the console
-			IConsole console = CCorePlugin.getDefault().getConsole();
+			IConsole console = FortranCorePlugin.getDefault().getConsole();
 			console.start(getProject());
 			ConsoleOutputStream consoleOutStream = console.getOutputStream();
 			String[] consoleHeader = new String[3];
@@ -346,7 +346,7 @@ public class GeneratedMakefileBuilder extends ACBuilder {
 			buildDir = new Path(info.getConfigurationName());
 		}
 		IPath makefilePath = getProject().getLocation().append(buildDir.append(generator.getMakefileName()));		
-		IWorkspaceRoot root = CCorePlugin.getWorkspace().getRoot();
+		IWorkspaceRoot root = FortranCorePlugin.getWorkspace().getRoot();
 		IFile makefile = root.getFileForLocation(makefilePath);
 		
 		if (buildDir != null && makefile != null && makefile.isAccessible()) {		
@@ -579,7 +579,7 @@ public class GeneratedMakefileBuilder extends ACBuilder {
 
 				// Get a build console for the project
 				StringBuffer buf = new StringBuffer();
-				IConsole console = CCorePlugin.getDefault().getConsole();
+				IConsole console = FortranCorePlugin.getDefault().getConsole();
 				console.start(currentProject);
 				ConsoleOutputStream consoleOutStream = console.getOutputStream();
 				String[] consoleHeader = new String[3];

@@ -24,7 +24,7 @@ import org.eclipse.fdt.internal.core.dom.WorkingCopyCodeReaderFactory;
  * @author jcamelon
  * 
  * This class serves as the manager of the AST/DOM mechanisms for the FDT.
- * It should be eventually added to CCorePlugin for startup.  
+ * It should be eventually added to FortranCorePlugin for startup.  
  */
 public class CDOM implements IASTServiceProvider {
     

@@ -23,9 +23,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
-import org.eclipse.fdt.core.CCProjectNature;
-import org.eclipse.fdt.core.CCorePlugin;
-import org.eclipse.fdt.core.CProjectNature;
+import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.FortranProjectNature;
 import org.eclipse.fdt.core.filetype.ICFileType;
 import org.eclipse.fdt.core.resources.IPathEntryStore;
 import org.eclipse.fdt.internal.core.model.APathEntry;
@@ -46,7 +45,7 @@ public class CoreModel {
 	private static CoreModel cmodel = null;
 	private static CModelManager manager = CModelManager.getDefault();
 	private static PathEntryManager pathEntryManager = PathEntryManager.getDefault();
-	public final static String CORE_MODEL_ID = CCorePlugin.PLUGIN_ID + ".coremodel"; //$NON-NLS-1$
+	public final static String CORE_MODEL_ID = FortranCorePlugin.PLUGIN_ID + ".coremodel"; //$NON-NLS-1$
 
 	/**
 	 * Creates an ICElement form and IPath. Returns null if not found.
@@ -168,8 +167,8 @@ public class CoreModel {
 	public static boolean isTranslationUnit(IFile file) {
 		if (file != null) {
 			IProject p = file.getProject();
-			if (hasCNature(p) || hasCCNature(p)) {
-				ICFileType type = CCorePlugin.getDefault().getFileType(file.getProject(), file.getName());
+			if (hasCNature(p)) {
+				ICFileType type = FortranCorePlugin.getDefault().getFileType(file.getProject(), file.getName());
 				return type.isTranslationUnit();
 			}
 		}
@@ -180,7 +179,7 @@ public class CoreModel {
 	 * Return true if name is a valid name for a translation unit.
 	 */
 	public static boolean isValidTranslationUnitName(IProject project, String name) {
-		ICFileType type = CCorePlugin.getDefault().getFileType(project, name);
+		ICFileType type = FortranCorePlugin.getDefault().getFileType(project, name);
 		return type.isTranslationUnit();
 	}
 
@@ -188,7 +187,7 @@ public class CoreModel {
 	 * Return true if name is a valid name for a translation unit.
 	 */
 	public static boolean isValidHeaderUnitName(IProject project, String name) {
-		ICFileType type = CCorePlugin.getDefault().getFileType(project, name);
+		ICFileType type = FortranCorePlugin.getDefault().getFileType(project, name);
 		return type.isHeader();
 	}
 
@@ -196,7 +195,7 @@ public class CoreModel {
 	 * Return true if name is a valid name for a translation unit.
 	 */
 	public static boolean isValidSourceUnitName(IProject project, String name) {
-		ICFileType type = CCorePlugin.getDefault().getFileType(project, name);
+		ICFileType type = FortranCorePlugin.getDefault().getFileType(project, name);
 		return type.isSource();
 	}
 
@@ -206,22 +205,7 @@ public class CoreModel {
 	public static boolean hasCNature(IProject project) {
 		boolean ok = false;
 		try {
-			ok = (project.isOpen() && project.hasNature(CProjectNature.C_NATURE_ID));
-		} catch (CoreException e) {
-			//throws exception if the project is not open.
-			//System.out.println (e);
-			//e.printStackTrace();
-		}
-		return ok;
-	}
-
-	/**
-	 * Return true if project has C++ nature.
-	 */
-	public static boolean hasCCNature(IProject project) {
-		boolean ok = false;
-		try {
-			ok = (project.isOpen() && project.hasNature(CCProjectNature.CC_NATURE_ID));
+			ok = (project.isOpen() && project.hasNature(FortranProjectNature.FORTRAN_NATURE_ID));
 		} catch (CoreException e) {
 			//throws exception if the project is not open.
 			//System.out.println (e);

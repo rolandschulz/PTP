@@ -19,7 +19,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.ICElement;
@@ -79,7 +79,7 @@ public class OpenIncludeAction extends Action {
 				IProject proj = res.getProject();
 				String includeName = include.getElementName();
 				// Search in the scannerInfo information
-				IScannerInfoProvider provider =  CCorePlugin.getDefault().getScannerInfoProvider(proj);
+				IScannerInfoProvider provider =  FortranCorePlugin.getDefault().getScannerInfoProvider(proj);
 				if (provider != null) {
 					IScannerInfo info = provider.getScannerInformation(res);
 					// XXXX this should fall back to project by itself

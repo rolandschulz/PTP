@@ -5,7 +5,7 @@ package org.eclipse.fdt.internal.corext.template.c;
  * All Rights Reserved.
  */
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.formatter.CodeFormatter;
 import org.eclipse.fdt.internal.corext.util.CodeFormatterUtil;
 import org.eclipse.fdt.internal.ui.util.Strings;
@@ -159,7 +159,7 @@ public class CFormatter {
 		if (context.getTranslationUnit() != null)
 			options= context.getTranslationUnit().getCProject().getOptions(true); 
 		else
-			options= CCorePlugin.getOptions();
+			options= FortranCorePlugin.getOptions();
 		
 		TextEdit edit= CodeFormatterUtil.format(CodeFormatter.K_UNKNOWN, doc.get(), fInitialIndentLevel, fLineDelimiter, options);
 		if (edit == null)

@@ -30,7 +30,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.browser.AllTypesCache;
 import org.eclipse.fdt.core.browser.IWorkingCopyProvider;
 import org.eclipse.fdt.core.model.CoreModel;
@@ -224,7 +224,7 @@ public class CUIPlugin extends AbstractUIPlugin {
 	}
 	
 	public static IWorkingCopy[] getSharedWorkingCopies() {
-		return CCorePlugin.getSharedWorkingCopies(getDefault().getBufferFactory());
+		return FortranCorePlugin.getSharedWorkingCopies(getDefault().getBufferFactory());
 	}
 	
 	public static String getResourceString(String key) {
@@ -399,7 +399,7 @@ public class CUIPlugin extends AbstractUIPlugin {
 	 */
 	public CTextTools getTextTools() {
 		if (fTextTools == null)
-			fTextTools = new CTextTools(getPreferenceStore(), CCorePlugin.getDefault().getPluginPreferences());
+			fTextTools = new CTextTools(getPreferenceStore(), FortranCorePlugin.getDefault().getPluginPreferences());
 		return fTextTools;
 	}
 
@@ -408,7 +408,7 @@ public class CUIPlugin extends AbstractUIPlugin {
 	 */
 	public AsmTextTools getAsmTextTools() {
 		if (fAsmTextTools == null)
-			fAsmTextTools = new AsmTextTools(getPreferenceStore(), CCorePlugin.getDefault().getPluginPreferences());
+			fAsmTextTools = new AsmTextTools(getPreferenceStore(), FortranCorePlugin.getDefault().getPluginPreferences());
 		return fAsmTextTools;
 	}
 
@@ -436,7 +436,7 @@ public class CUIPlugin extends AbstractUIPlugin {
 			}
 		};
         AllTypesCache.initialize(workingCopyProvider);
-		CCorePlugin.getDefault().getDOM().setWorkingCopyProvider(workingCopyProvider);
+		FortranCorePlugin.getDefault().getDOM().setWorkingCopyProvider(workingCopyProvider);
 		
 	}
 
@@ -538,7 +538,7 @@ public class CUIPlugin extends AbstractUIPlugin {
 	public IPreferenceStore getCombinedPreferenceStore() {
 		if (fCombinedPreferenceStore == null) {
 			IPreferenceStore generalTextStore= EditorsUI.getPreferenceStore(); 
-			fCombinedPreferenceStore= new ChainedPreferenceStore(new IPreferenceStore[] { getPreferenceStore(), new PreferencesAdapter(CCorePlugin.getDefault().getPluginPreferences()), generalTextStore });
+			fCombinedPreferenceStore= new ChainedPreferenceStore(new IPreferenceStore[] { getPreferenceStore(), new PreferencesAdapter(FortranCorePlugin.getDefault().getPluginPreferences()), generalTextStore });
 		}
 		return fCombinedPreferenceStore;
 	}

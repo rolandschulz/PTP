@@ -25,8 +25,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.fdt.core.CCProjectNature;
-import org.eclipse.fdt.core.CProjectNature;
+import org.eclipse.fdt.core.FortranProjectNature;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.ICProject;
@@ -720,12 +719,7 @@ public class ManagedBuildInfo implements IManagedBuildInfo, IScannerInfo {
 				// Make sure the tool is right for the project
 				switch (tool.getNatureFilter()) {
 					case ITool.FILTER_C:
-						if (project.hasNature(CProjectNature.C_NATURE_ID) && !project.hasNature(CCProjectNature.CC_NATURE_ID)) {
-							return tool.isHeaderFile(ext);
-						}
-						break;
-					case ITool.FILTER_CC:
-						if (project.hasNature(CCProjectNature.CC_NATURE_ID)) {
+						if (project.hasNature(FortranProjectNature.FORTRAN_NATURE_ID)) {
 							return tool.isHeaderFile(ext);
 						}
 						break;

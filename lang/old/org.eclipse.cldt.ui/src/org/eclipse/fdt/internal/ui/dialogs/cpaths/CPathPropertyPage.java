@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.fdt.core.CProjectNature;
+import org.eclipse.fdt.core.FortranProjectNature;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.ICProject;
@@ -152,7 +152,7 @@ public class CPathPropertyPage extends PropertyPage implements IStatusChangeList
 
 	private boolean isCProject(IProject proj) {
 		try {
-			return proj.hasNature(CProjectNature.C_NATURE_ID);
+			return proj.hasNature(FortranProjectNature.FORTRAN_NATURE_ID);
 		} catch (CoreException e) {
 			CUIPlugin.getDefault().log(e);
 		}

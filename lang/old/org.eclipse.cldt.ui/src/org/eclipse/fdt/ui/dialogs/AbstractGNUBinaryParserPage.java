@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.ICExtensionReference;
 import org.eclipse.fdt.internal.ui.CUIMessages;
@@ -69,8 +69,8 @@ public abstract class AbstractGNUBinaryParserPage extends AbstractCOptionPage {
 		monitor.beginTask(CUIMessages.getString("BinaryParserPage.task.savingAttributes"), 1); //$NON-NLS-1$
 		IProject proj = getContainer().getProject();
 		if (proj != null) {
-			ICDescriptor cdesc = CCorePlugin.getDefault().getCProjectDescription(proj, false);
-			ICExtensionReference[] cext = cdesc.get(CCorePlugin.BINARY_PARSER_UNIQ_ID);
+			ICDescriptor cdesc = FortranCorePlugin.getDefault().getCProjectDescription(proj, false);
+			ICExtensionReference[] cext = cdesc.get(FortranCorePlugin.BINARY_PARSER_UNIQ_ID);
 			if (cext.length > 0) {
 				initializeParserId();
 				for (int i = 0; i < cext.length; i++) {
@@ -238,8 +238,8 @@ public abstract class AbstractGNUBinaryParserPage extends AbstractCOptionPage {
 		IProject proj = getContainer().getProject();
 		if (proj != null) {
 			try {
-				ICDescriptor cdesc = CCorePlugin.getDefault().getCProjectDescription(proj, false);
-				ICExtensionReference[] cext = cdesc.get(CCorePlugin.BINARY_PARSER_UNIQ_ID);
+				ICDescriptor cdesc = FortranCorePlugin.getDefault().getCProjectDescription(proj, false);
+				ICExtensionReference[] cext = cdesc.get(FortranCorePlugin.BINARY_PARSER_UNIQ_ID);
 				if (cext.length > 0) {
 					initializeParserId();
 					for (int i = 0; i < cext.length; i++) {

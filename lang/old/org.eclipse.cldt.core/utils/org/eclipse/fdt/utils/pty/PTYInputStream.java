@@ -14,7 +14,7 @@ package org.eclipse.fdt.utils.pty;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.utils.pty.PTY.MasterFD;
 
 class PTYInputStream extends InputStream {
@@ -73,7 +73,7 @@ class PTYInputStream extends InputStream {
 			return;
 		int status = close0(master.getFD());
 		if (status == -1)
-			throw new IOException(CCorePlugin.getResourceString("Util.exception.closeError")); //$NON-NLS-1$
+			throw new IOException(FortranCorePlugin.getResourceString("Util.exception.closeError")); //$NON-NLS-1$
 		master.setFD(-1);
 	}
 

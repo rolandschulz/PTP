@@ -22,7 +22,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.search.BasicSearchMatch;
 import org.eclipse.fdt.core.search.BasicSearchResultCollector;
 import org.eclipse.fdt.core.search.IMatch;
@@ -134,7 +134,7 @@ public class CSearchResultCollector extends BasicSearchResultCollector{
 	    	if (store.getBoolean(CSearchPage.EXTERNALMATCH_ENABLED)){
 		    	//Create Link in referring file's project
 		    	IPath refLocation = searchMatch.getReferenceLocation();
-		    	IFile refFile = CCorePlugin.getWorkspace().getRoot().getFileForLocation(refLocation);
+		    	IFile refFile = FortranCorePlugin.getWorkspace().getRoot().getFileForLocation(refLocation);
 		    	IProject refProject = refFile.getProject();
 		    	IPath externalMatchLocation = searchMatch.getLocation();
 		    	IFile linksFile = refProject.getFile(externalMatchLocation.lastSegment());

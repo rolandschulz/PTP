@@ -31,7 +31,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.internal.ui.CPluginImages;
 import org.eclipse.fdt.ui.CUIPlugin;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -297,7 +297,7 @@ public abstract class NewCProjectWizard extends BasicNewResourceWizard implement
 		IProjectDescription description = workspace.newProjectDescription(newProjectHandle.getName());
 		description.setLocation(newPath);
 
-		newProject = CCorePlugin.getDefault().createCProject(description, newProjectHandle, monitor, getProjectID());
+		newProject = FortranCorePlugin.getDefault().createCProject(description, newProjectHandle, monitor, getProjectID());
 		return newProject;
 	}
 

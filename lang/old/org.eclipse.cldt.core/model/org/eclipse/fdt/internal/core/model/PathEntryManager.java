@@ -39,7 +39,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.ICExtensionReference;
 import org.eclipse.fdt.core.model.CModelException;
@@ -80,7 +80,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 
 	// PathEntry extension
 	public final static String PATHENTRY_STORE_ID = "PathEntryStore"; //$NON-NLS-1$
-	public final static String PATHENTRY_STORE_UNIQ_ID = CCorePlugin.PLUGIN_ID + "." + PATHENTRY_STORE_ID; //$NON-NLS-1$
+	public final static String PATHENTRY_STORE_UNIQ_ID = FortranCorePlugin.PLUGIN_ID + "." + PATHENTRY_STORE_ID; //$NON-NLS-1$
 
 	static String CONTAINER_INITIALIZER_EXTPOINT_ID = "PathEntryContainerInitializer"; //$NON-NLS-1$
 	/**
@@ -490,7 +490,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 						IResource res = cproject.getCModel().getWorkspace().getRoot().findMember(refPath);
 						if (res != null && res.getType() == IResource.PROJECT) {
 							IProject project = (IProject)res;
-							if (CoreModel.hasCNature(project) || CoreModel.hasCCNature(project)) {
+							if (CoreModel.hasCNature(project)) {
 								ICProject refCProject = CoreModel.getDefault().create(project);
 								if (refCProject != null) {
 									IPathEntry[] entries = getResolvedPathEntries(refCProject);
@@ -554,7 +554,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 						IResource res = cproject.getCModel().getWorkspace().getRoot().findMember(refPath);
 						if (res != null && res.getType() == IResource.PROJECT) {
 							IProject project = (IProject)res;
-							if (CoreModel.hasCNature(project) || CoreModel.hasCCNature(project)) {
+							if (CoreModel.hasCNature(project)) {
 								ICProject refCProject = CoreModel.getDefault().create(project);
 								if (refCProject != null) {
 									IPathEntry[] entries = getResolvedPathEntries(refCProject);
@@ -598,7 +598,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 						IResource res = cproject.getCModel().getWorkspace().getRoot().findMember(refPath);
 						if (res != null && res.getType() == IResource.PROJECT) {
 							IProject project = (IProject)res;
-							if (CoreModel.hasCNature(project) || CoreModel.hasCCNature(project)) {
+							if (CoreModel.hasCNature(project)) {
 								ICProject refCProject = CoreModel.getDefault().create(project);
 								if (refCProject != null) {
 									IPathEntry[] entries = getResolvedPathEntries(refCProject);
@@ -676,7 +676,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 	public IPathEntry[] getRawPathEntries(ICProject cproject) throws CModelException {
 		IProject project = cproject.getProject();
 		// Check if the Project is accesible.
-		if (! (CoreModel.hasCNature(project) || CoreModel.hasCCNature(project))) {
+		if (! CoreModel.hasCNature(project)) {
 			throw new CModelException(new CModelStatus(ICModelStatusConstants.ELEMENT_DOES_NOT_EXIST));
 		}
 		IPathEntry[] pathEntries;
@@ -861,9 +861,9 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 					Platform.run(new ISafeRunnable() {
 
 						public void handleException(Throwable exception) {
-							IStatus status = new Status(IStatus.ERROR, CCorePlugin.PLUGIN_ID, IStatus.ERROR,
+							IStatus status = new Status(IStatus.ERROR, FortranCorePlugin.PLUGIN_ID, IStatus.ERROR,
 									"Exception occurred in container initializer: " + initializer, exception); //$NON-NLS-1$
-							CCorePlugin.log(status);
+							FortranCorePlugin.log(status);
 						}
 
 						public void run() throws Exception {
@@ -899,11 +899,11 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 	 *         initializer or <code>null</code> if none was found.
 	 */
 	public PathEntryContainerInitializer getPathEntryContainerInitializer(String containerID) {
-		Plugin core = CCorePlugin.getDefault();
+		Plugin core = FortranCorePlugin.getDefault();
 		if (core == null) {
 			return null;
 		}
-		IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(CCorePlugin.PLUGIN_ID,
+		IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID,
 				CONTAINER_INITIALIZER_EXTPOINT_ID);
 		if (extension != null) {
 			IExtension[] extensions = extension.getExtensions();
@@ -1171,7 +1171,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 			 */
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
-					CCorePlugin.getWorkspace().run(new IWorkspaceRunnable() {
+					FortranCorePlugin.getWorkspace().run(new IWorkspaceRunnable() {
 						
 						/* (non-Javadoc)
 						 * @see org.eclipse.core.resources.IWorkspaceRunnable#run(org.eclipse.core.runtime.IProgressMonitor)
@@ -1190,7 +1190,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 				return Status.OK_STATUS;
 			}
 		};
-		markerTask.setRule(CCorePlugin.getWorkspace().getRoot());
+		markerTask.setRule(FortranCorePlugin.getWorkspace().getRoot());
 		markerTask.schedule();
 	}
 
@@ -1326,12 +1326,12 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 	}
 
 	static String[] getRegisteredContainerIDs() {
-		Plugin core = CCorePlugin.getDefault();
+		Plugin core = FortranCorePlugin.getDefault();
 		if (core == null) {
 			return null;
 		}
 		ArrayList containerIDList = new ArrayList(5);
-		IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(CCorePlugin.PLUGIN_ID,
+		IExtensionPoint extension = Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID,
 				CONTAINER_INITIALIZER_EXTPOINT_ID);
 		if (extension != null) {
 			IExtension[] extensions = extension.getExtensions();
@@ -1378,7 +1378,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 		IPathEntryStore store = null;
 		if (project != null) {
 			try {
-				ICDescriptor cdesc = CCorePlugin.getDefault().getCProjectDescription(project, false);
+				ICDescriptor cdesc = FortranCorePlugin.getDefault().getCProjectDescription(project, false);
 				if (cdesc != null) {
 					ICExtensionReference[] cextensions = cdesc.get(PATHENTRY_STORE_UNIQ_ID, true);
 					if (cextensions.length > 0) {
@@ -1388,7 +1388,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 								break;
 							} catch (ClassCastException e) {
 								//
-								CCorePlugin.log(e);
+								FortranCorePlugin.log(e);
 							}
 						}
 					}
@@ -1436,7 +1436,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 					manager.fire(ElementChangedEvent.POST_CHANGE);
 				}
 			} catch (CModelException e) {
-				CCorePlugin.log(e);
+				FortranCorePlugin.log(e);
 			}
 		} else {
 			resolvedMap.remove(cproject);
@@ -1585,7 +1585,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 					continue;
 				}
 				if (entry != otherEntry && otherEntry.equals(entry)) {
-					StringBuffer errMesg = new StringBuffer(CCorePlugin.getResourceString("CoreModel.PathEntry.DuplicateEntry")); //$NON-NLS-1$
+					StringBuffer errMesg = new StringBuffer(FortranCorePlugin.getResourceString("CoreModel.PathEntry.DuplicateEntry")); //$NON-NLS-1$
 					return new CModelStatus(ICModelStatusConstants.INVALID_PATHENTRY, errMesg.toString());
 				}
 			}
@@ -1596,7 +1596,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 		if (dups.size() > 0) {
 			ICModelStatus[] cmodelStatus = new ICModelStatus[dups.size()];
 			for (int i = 0; i < dups.size(); ++i) {
-				StringBuffer errMesg = new StringBuffer(CCorePlugin.getResourceString("CoreModel.PathEntry.DuplicateEntry")); //$NON-NLS-1$
+				StringBuffer errMesg = new StringBuffer(FortranCorePlugin.getResourceString("CoreModel.PathEntry.DuplicateEntry")); //$NON-NLS-1$
 				cmodelStatus[i] = new CModelStatus(ICModelStatusConstants.INVALID_PATHENTRY, errMesg.toString());
 			}
 			return CModelStatus.newMultiStatus(ICModelStatusConstants.INVALID_PATHENTRY, cmodelStatus);
@@ -1607,7 +1607,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 		if (dups.size() > 0) {
 			ICModelStatus[] cmodelStatus = new ICModelStatus[dups.size()];
 			for (int i = 0; i < dups.size(); ++i) {
-				StringBuffer errMesg = new StringBuffer(CCorePlugin.getResourceString("CoreModel.PathEntry.DuplicateEntry")); //$NON-NLS-1$
+				StringBuffer errMesg = new StringBuffer(FortranCorePlugin.getResourceString("CoreModel.PathEntry.DuplicateEntry")); //$NON-NLS-1$
 				cmodelStatus[i] = new CModelStatus(ICModelStatusConstants.NAME_COLLISION, errMesg.toString());
 			}
 			return CModelStatus.newMultiStatus(ICModelStatusConstants.INVALID_PATHENTRY, cmodelStatus);
@@ -1638,16 +1638,16 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 							String exclusionPattern = entryPath.removeFirstSegments(otherPath.segmentCount()).segment(0);
 							if (CoreModelUtil.isExcluded(entryPath, exclusionPatterns)) {
 								StringBuffer errMesg = new StringBuffer(
-										CCorePlugin.getResourceString("CoreModel.PathEntry.NestedEntry")); //$NON-NLS-1$
+										FortranCorePlugin.getResourceString("CoreModel.PathEntry.NestedEntry")); //$NON-NLS-1$
 								return new CModelStatus(ICModelStatusConstants.INVALID_PATHENTRY, errMesg.toString());
 							} else if (otherKind == IPathEntry.FDT_SOURCE) {
 								exclusionPattern += '/';
 								StringBuffer errMesg = new StringBuffer(
-										CCorePlugin.getResourceString("CoreModel.PathEntry.NestedEntry")); //$NON-NLS-1$
+										FortranCorePlugin.getResourceString("CoreModel.PathEntry.NestedEntry")); //$NON-NLS-1$
 								return new CModelStatus(ICModelStatusConstants.INVALID_PATHENTRY, errMesg.toString());
 							} else {
 								StringBuffer errMesg = new StringBuffer(
-										CCorePlugin.getResourceString("CoreModel.PathEntry.NestedEntry")); //$NON-NLS-1$
+										FortranCorePlugin.getResourceString("CoreModel.PathEntry.NestedEntry")); //$NON-NLS-1$
 								return new CModelStatus(ICModelStatusConstants.INVALID_PATHENTRY, errMesg.toString()); //$NON-NLS-1$
 							}
 						}
@@ -1717,7 +1717,7 @@ public class PathEntryManager implements IPathEntryStoreListener, IElementChange
 					return new CModelStatus(ICModelStatusConstants.INVALID_PATHENTRY,
 							CoreModelMessages.getString("PathEntryManager.5")); //$NON-NLS-1$
 				}
-				if (! (CoreModel.hasCNature(reqProject) || CoreModel.hasCCNature(reqProject))) {
+				if (! CoreModel.hasCNature(reqProject)) {
 					return new CModelStatus(ICModelStatusConstants.INVALID_PATHENTRY,
 							CoreModelMessages.getString("PathEntryManager.6")); //$NON-NLS-1$
 				}

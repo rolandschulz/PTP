@@ -19,7 +19,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.fdt.core.CProjectNature;
+import org.eclipse.fdt.core.FortranProjectNature;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.ICContainer;
 import org.eclipse.fdt.core.model.ICElement;
@@ -108,7 +108,7 @@ public class CSearchScope implements ICSearchScope {
 		
 		boolean flag = false;
 		for (int i=0; i< natures.length; i++){
-			if (natures[i].equals(CProjectNature.C_NATURE_ID)){	
+			if (natures[i].equals(FortranProjectNature.FORTRAN_NATURE_ID)){	
 			  flag=true;
 			  break;
 			} 

@@ -25,7 +25,7 @@ import java.util.Date;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 
 
 public class FDTLogWriter {
@@ -53,7 +53,7 @@ public class FDTLogWriter {
 		this.logFile = log;
 		if(log.length() > MAXLOG_SIZE){
 		  log.delete();
-		  this.logFile = CCorePlugin.getDefault().getStateLocation().append(".log").toFile(); //$NON-NLS-1$
+		  this.logFile = FortranCorePlugin.getDefault().getStateLocation().append(".log").toFile(); //$NON-NLS-1$
 		}
 		openLogFile();
 	}

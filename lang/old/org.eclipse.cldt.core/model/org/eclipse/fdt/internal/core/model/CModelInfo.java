@@ -33,7 +33,7 @@ public class CModelInfo extends OpenableInfo {
 		int index = 0;
 		for (int i = 0; i < length; i++) {
 			IProject project = projects[i];
-			if (!(CoreModel.hasCNature(project) || CoreModel.hasCCNature(project))) {
+			if (!CoreModel.hasCNature(project)) {
 				if (nonCProjects == null) {
 					nonCProjects = new Object[length];
 				}

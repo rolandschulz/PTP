@@ -48,7 +48,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ui.IEditorInput;
 
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.ICProject;
@@ -126,11 +126,11 @@ public abstract class OptionsConfigurationBlock {
 		if (fProject != null) {
 			return fProject.getOptions(inheritCCoreOptions);
 		}
-		return CCorePlugin.getOptions();
+		return FortranCorePlugin.getOptions();
 	}
 	
 	protected Map getDefaultOptions() {
-		return CCorePlugin.getDefaultOptions();
+		return FortranCorePlugin.getDefaultOptions();
 	}	
 	
 	public final boolean hasProjectSpecificOptions() {
@@ -150,7 +150,7 @@ public abstract class OptionsConfigurationBlock {
 		if (fProject != null) {
 			fProject.setOptions(map);
 		} else {
-			CCorePlugin.setOptions((HashMap) map);
+			FortranCorePlugin.setOptions((HashMap) map);
 		}	
 	} 
 	

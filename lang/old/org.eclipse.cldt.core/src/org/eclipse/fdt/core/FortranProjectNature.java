@@ -14,25 +14,25 @@ import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-public class CProjectNature implements IProjectNature {
+public class FortranProjectNature implements IProjectNature {
 
-	public static final String C_NATURE_ID = CCorePlugin.PLUGIN_ID + ".cnature"; //$NON-NLS-1$
+	public static final String FORTRAN_NATURE_ID = FortranCorePlugin.PLUGIN_ID + ".fnature"; //$NON-NLS-1$
 
 	private IProject fProject;
 
-	public CProjectNature() {
+	public FortranProjectNature() {
 	}
 
-	public CProjectNature(IProject project) {
+	public FortranProjectNature(IProject project) {
 		setProject(project);
 	}
 
 	public static void addCNature(IProject project, IProgressMonitor mon) throws CoreException {
-		addNature(project, C_NATURE_ID, mon);
+		addNature(project, FORTRAN_NATURE_ID, mon);
 	}
 
 	public static void removeCNature(IProject project, IProgressMonitor mon) throws CoreException {
-		removeNature(project, C_NATURE_ID, mon);
+		removeNature(project, FORTRAN_NATURE_ID, mon);
 	}
 
 	/**

@@ -376,7 +376,7 @@ public abstract class AbstractFileCreationWizardPage extends NewElementWizardPag
 					status.setError(NewFileWizardMessages.getFormattedString("AbstractFileCreationWizardPage.error.NotAFolder", folderPath)); //$NON-NLS-1$
 					return status;
 				}
-			    if (!CoreModel.hasCCNature(proj) && !CoreModel.hasCNature(proj)) {
+			    if (!CoreModel.hasCNature(proj)) {
 					if (resType == IResource.PROJECT) {
 						status.setError(NewFileWizardMessages.getString("AbstractFileCreationWizardPage.warning.NotACProject")); //$NON-NLS-1$
 						return status;

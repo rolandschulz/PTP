@@ -11,13 +11,13 @@
 package org.eclipse.fdt.core;
 
 
-public class CCorePreferenceConstants {
+public class FortranCorePreferenceConstants {
 
 	/**
 	 * Possible configurable option ID.
 	 * @see #getDefaultOptions
 	 */
-	public static final String TRANSLATION_TASK_TAGS = CCorePlugin.PLUGIN_ID + ".translation.taskTags"; //$NON-NLS-1$
+	public static final String TRANSLATION_TASK_TAGS = FortranCorePlugin.PLUGIN_ID + ".translation.taskTags"; //$NON-NLS-1$
 
 	/**
 	 * Default task tag
@@ -27,22 +27,22 @@ public class CCorePreferenceConstants {
 	/**
 	 * Default task priority
 	 */
-	public static final String DEFAULT_TASK_PRIORITY = CCorePlugin.TRANSLATION_TASK_PRIORITY_NORMAL;
+	public static final String DEFAULT_TASK_PRIORITY = FortranCorePlugin.TRANSLATION_TASK_PRIORITY_NORMAL;
 	/**
 	 * Possible configurable option ID.
 	 * @see #getDefaultOptions
 	 */
-	public static final String TRANSLATION_TASK_PRIORITIES = CCorePlugin.PLUGIN_ID + ".translation.taskPriorities"; //$NON-NLS-1$
+	public static final String TRANSLATION_TASK_PRIORITIES = FortranCorePlugin.PLUGIN_ID + ".translation.taskPriorities"; //$NON-NLS-1$
 
 	/**
 	 * Active code formatter ID.
 	 * @see #getDefaultOptions
 	 */
-	public static final String CODE_FORMATTER = CCorePlugin.PLUGIN_ID + ".code_formatter"; //$NON-NLS-1$
+	public static final String CODE_FORMATTER = FortranCorePlugin.PLUGIN_ID + ".code_formatter"; //$NON-NLS-1$
 	
 	/**
 	 * Default code formatter
 	 */
-	public static final String DEFAULT_CODE_FORMATTER = CCorePlugin.PLUGIN_ID + ".defaultCodeFormatter"; //$NON-NLS-1$
+	public static final String DEFAULT_CODE_FORMATTER = FortranCorePlugin.PLUGIN_ID + ".defaultCodeFormatter"; //$NON-NLS-1$
 	
 }

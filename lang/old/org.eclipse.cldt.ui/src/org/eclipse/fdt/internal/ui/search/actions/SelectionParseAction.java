@@ -16,7 +16,7 @@ import java.io.IOException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.IWorkingCopy;
 import org.eclipse.fdt.core.parser.CodeReader;
@@ -74,7 +74,7 @@ public class SelectionParseAction extends Action {
 		//Get the scanner info
 		IProject currentProject = resourceFile.getProject();
 		IScannerInfo scanInfo = new ScannerInfo();
-		IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(currentProject);
+		IScannerInfoProvider provider = FortranCorePlugin.getDefault().getScannerInfoProvider(currentProject);
 		if (provider != null){
 		  IScannerInfo buildScanInfo = provider.getScannerInformation(resourceFile);
 		  if (buildScanInfo != null){
@@ -83,7 +83,7 @@ public class SelectionParseAction extends Action {
 		}
 		
 		//C or CPP?
-		ParserLanguage language = CoreModel.hasCCNature(currentProject) ? ParserLanguage.CPP : ParserLanguage.C;
+		ParserLanguage language = ParserLanguage.C;
 		
 		IWorkingCopy workingCopy = null;
 		if( fEditor.isDirty() ){

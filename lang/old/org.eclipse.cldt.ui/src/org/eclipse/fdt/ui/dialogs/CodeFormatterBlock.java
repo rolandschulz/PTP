@@ -20,8 +20,8 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.fdt.core.CCorePlugin;
-import org.eclipse.fdt.core.CCorePreferenceConstants;
+import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.core.FortranCorePreferenceConstants;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.util.PixelConverter;
 import org.eclipse.fdt.utils.ui.controls.ControlFactory;
@@ -60,11 +60,11 @@ public class CodeFormatterBlock {
 		String text = fFormatterCombo.getText();
 		String selection = (String)idMap.get(text);
 		if (selection != null && selection.length() > 0) {
-			HashMap options = CCorePlugin.getOptions();
-			String formatterID = (String)options.get(CCorePreferenceConstants.CODE_FORMATTER);
+			HashMap options = FortranCorePlugin.getOptions();
+			String formatterID = (String)options.get(FortranCorePreferenceConstants.CODE_FORMATTER);
 			if (formatterID == null || !formatterID.equals(selection)) {
-				options.put(CCorePreferenceConstants.CODE_FORMATTER, selection);
-				CCorePlugin.setOptions(options);
+				options.put(FortranCorePreferenceConstants.CODE_FORMATTER, selection);
+				FortranCorePlugin.setOptions(options);
 			}
 		} else {
 			// simply reset to the default one.
@@ -73,11 +73,11 @@ public class CodeFormatterBlock {
 	}
 
 	public void performDefaults() {
-		HashMap optionsDefault = CCorePlugin.getDefaultOptions();
-		HashMap options = CCorePlugin.getOptions();
-		String formatterID = (String)optionsDefault.get(CCorePreferenceConstants.CODE_FORMATTER);
-		options.put(CCorePreferenceConstants.CODE_FORMATTER, formatterID);
-		CCorePlugin.setOptions(options);
+		HashMap optionsDefault = FortranCorePlugin.getDefaultOptions();
+		HashMap options = FortranCorePlugin.getOptions();
+		String formatterID = (String)optionsDefault.get(FortranCorePreferenceConstants.CODE_FORMATTER);
+		options.put(FortranCorePreferenceConstants.CODE_FORMATTER, formatterID);
+		FortranCorePlugin.setOptions(options);
 
 		fFormatterCombo.clearSelection();
 		fFormatterCombo.setText(NONE);
@@ -132,7 +132,7 @@ public class CodeFormatterBlock {
 
 	public void initDefault() {
 		boolean init = false;
-		String selection = CCorePlugin.getOption(CCorePreferenceConstants.CODE_FORMATTER);
+		String selection = FortranCorePlugin.getOption(FortranCorePreferenceConstants.CODE_FORMATTER);
 		if (selection != null) {
 			Iterator iterator = idMap.entrySet().iterator();
 			while (iterator.hasNext()) {
@@ -152,7 +152,7 @@ public class CodeFormatterBlock {
 	private void initializeFormatters() {
 		idMap = new HashMap();
 		idMap.put(NONE, null);
-		IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(CCorePlugin.PLUGIN_ID, CCorePlugin.FORMATTER_EXTPOINT_ID);
+		IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(FortranCorePlugin.PLUGIN_ID, FortranCorePlugin.FORMATTER_EXTPOINT_ID);
 		if (point != null) {
 			IExtension[] exts = point.getExtensions();
 			for (int i = 0; i < exts.length; i++) {

@@ -232,7 +232,7 @@ public class CMarkerAnnotation extends MarkerAnnotation implements IProblemAnnot
 	public String[] getArguments() {
 		String [] s = {"problem", "here"}; //$NON-NLS-1$ //$NON-NLS-2$
 		//if (fIsProblemMarker)
-		//	return Util.getProblemArgumentsFromMarker(getMarker().getAttribute(CCorePlugin.C_PROBLEMMARKER));
+		//	return Util.getProblemArgumentsFromMarker(getMarker().getAttribute(FortranCorePlugin.C_PROBLEMMARKER));
 		return s;
 		//returnm null;
 	}

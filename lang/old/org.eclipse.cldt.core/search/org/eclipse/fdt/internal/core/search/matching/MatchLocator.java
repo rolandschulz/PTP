@@ -30,7 +30,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.model.CoreModel;
 import org.eclipse.fdt.core.model.IWorkingCopy;
 import org.eclipse.fdt.core.parser.CodeReader;
@@ -465,7 +465,7 @@ public class MatchLocator implements IMatchLocator{
 			
 			//Get the scanner info
 			IScannerInfo scanInfo = new ScannerInfo();
-			IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(project);
+			IScannerInfoProvider provider = FortranCorePlugin.getDefault().getScannerInfoProvider(project);
 			if (provider != null){
 				IScannerInfo buildScanInfo = provider.getScannerInformation(currentResource != null ? currentResource : project);
 				if( buildScanInfo != null )
@@ -474,7 +474,7 @@ public class MatchLocator implements IMatchLocator{
 			
 			ParserLanguage language = null;
 			if( project != null ){
-				language = CoreModel.hasCCNature( project ) ? ParserLanguage.CPP : ParserLanguage.C;
+				language = ParserLanguage.C;
 			} else {
 				//TODO no project, what language do we use?
 				language = ParserLanguage.CPP;
@@ -519,7 +519,7 @@ public class MatchLocator implements IMatchLocator{
 			if( matchStorage.size() > 0 ){
 				AcceptMatchOperation acceptMatchOp = new AcceptMatchOperation( resultCollector, matchStorage );
 				try {
-					CCorePlugin.getWorkspace().run(acceptMatchOp,null);
+					FortranCorePlugin.getWorkspace().run(acceptMatchOp,null);
 				} catch (CoreException e) {}
 				
 				matchStorage.clear();

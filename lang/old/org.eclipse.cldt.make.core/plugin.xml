@@ -36,7 +36,7 @@
          name="%natureMake.name"
          point="org.eclipse.core.resources.natures">
       <requires-nature
-            id="org.eclipse.fdt.core.cnature">
+            id="org.eclipse.fdt.core.fnature">
       </requires-nature>
       <runtime>
          <run

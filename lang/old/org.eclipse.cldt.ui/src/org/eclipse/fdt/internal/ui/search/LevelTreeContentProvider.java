@@ -18,7 +18,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.ITranslationUnit;
@@ -68,7 +68,7 @@ public class LevelTreeContentProvider extends CSearchContentProvider implements 
 		
 		if (child instanceof CSearchMatch){ 
 			BasicSearchMatch tempMatch = ((CSearchMatch) child).getSearchMatch();
-			ICElement cTransUnit = CCorePlugin.getDefault().getCoreModel().create(tempMatch.getResource());
+			ICElement cTransUnit = FortranCorePlugin.getDefault().getCoreModel().create(tempMatch.getResource());
 			
 			if (cTransUnit instanceof ITranslationUnit){
 				try {

@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.core.ICDescriptor;
 import org.eclipse.fdt.core.ICExtensionReference;
 import org.eclipse.fdt.internal.ui.CUIMessages;
@@ -74,8 +74,8 @@ public class CygwinPEBinaryParserPage extends AbstractCOptionPage {
 		IProject proj = getContainer().getProject();
 		if (proj != null) {
 			String parserID = ""; //$NON-NLS-1$
-			ICDescriptor cdesc = CCorePlugin.getDefault().getCProjectDescription(proj, false);
-			ICExtensionReference[] cext = cdesc.get(CCorePlugin.BINARY_PARSER_UNIQ_ID);
+			ICDescriptor cdesc = FortranCorePlugin.getDefault().getCProjectDescription(proj, false);
+			ICExtensionReference[] cext = cdesc.get(FortranCorePlugin.BINARY_PARSER_UNIQ_ID);
 			if (cext.length > 0) {
 				IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(CUIPlugin.PLUGIN_ID, "BinaryParserPage"); //$NON-NLS-1$
 				IConfigurationElement[] infos = point.getConfigurationElements();
@@ -328,8 +328,8 @@ public class CygwinPEBinaryParserPage extends AbstractCOptionPage {
 		IProject proj = getContainer().getProject();
 		if (proj != null) {
 			try {
-				ICDescriptor cdesc = CCorePlugin.getDefault().getCProjectDescription(proj, false);
-				ICExtensionReference[] cext = cdesc.get(CCorePlugin.BINARY_PARSER_UNIQ_ID);
+				ICDescriptor cdesc = FortranCorePlugin.getDefault().getCProjectDescription(proj, false);
+				ICExtensionReference[] cext = cdesc.get(FortranCorePlugin.BINARY_PARSER_UNIQ_ID);
 				if (cext.length > 0) {
 					addr2line = cext[0].getExtensionData("addr2line"); //$NON-NLS-1$;
 					cppfilt = cext[0].getExtensionData("c++filt"); //$NON-NLS-1$;

@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.fdt.core.CCorePlugin;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.utils.debug.DebugUnknownType;
 import org.eclipse.fdt.utils.debug.IDebugEntryRequestor;
 import org.eclipse.fdt.utils.debug.tools.DebugSym;
@@ -193,11 +193,11 @@ public class Dwarf {
 			byte[] bytes = new byte[4];
 			int n = in.read(bytes, 0, bytes.length);
 			if (n != 4) {
-				throw new IOException(CCorePlugin.getResourceString("Util.exception.missingBytes")); //$NON-NLS-1$
+				throw new IOException(FortranCorePlugin.getResourceString("Util.exception.missingBytes")); //$NON-NLS-1$
 			}
 			return read_4_bytes(bytes, 0);
 		} catch (IndexOutOfBoundsException e) {
-			throw new IOException(CCorePlugin.getResourceString("Util.exception.missingBytes")); //$NON-NLS-1$
+			throw new IOException(FortranCorePlugin.getResourceString("Util.exception.missingBytes")); //$NON-NLS-1$
 		}
 	}
 
@@ -222,11 +222,11 @@ public class Dwarf {
 			byte[] bytes = new byte[8];
 			int n = in.read(bytes, 0, bytes.length);
 			if (n != 8) {
-				throw new IOException(CCorePlugin.getResourceString("Util.exception.missingBytes")); //$NON-NLS-1$
+				throw new IOException(FortranCorePlugin.getResourceString("Util.exception.missingBytes")); //$NON-NLS-1$
 			}
 			return read_8_bytes(bytes, 0);
 		} catch (IndexOutOfBoundsException e) {
-			throw new IOException(CCorePlugin.getResourceString("Util.exception.missingBytes")); //$NON-NLS-1$
+			throw new IOException(FortranCorePlugin.getResourceString("Util.exception.missingBytes")); //$NON-NLS-1$
 		}
 	}
 
@@ -259,11 +259,11 @@ public class Dwarf {
 			byte[] bytes = new byte[2];
 			int n = in.read(bytes, 0, bytes.length);
 			if (n != 2) {
-				throw new IOException(CCorePlugin.getResourceString("Util.exception.missingBytes")); //$NON-NLS-1$
+				throw new IOException(FortranCorePlugin.getResourceString("Util.exception.missingBytes")); //$NON-NLS-1$
 			}
 			return read_2_bytes(bytes, 0);
 		} catch (IndexOutOfBoundsException e) {
-			throw new IOException(CCorePlugin.getResourceString("Util.exception.missingBytes")); //$NON-NLS-1$
+			throw new IOException(FortranCorePlugin.getResourceString("Util.exception.missingBytes")); //$NON-NLS-1$
 		}
 	}
 
@@ -310,7 +310,7 @@ public class Dwarf {
 		while (true) {
 			b = (short) in.read();
 			if (b == -1)
-				throw new IOException(CCorePlugin.getResourceString("Util.exception.noData")); //$NON-NLS-1$
+				throw new IOException(FortranCorePlugin.getResourceString("Util.exception.noData")); //$NON-NLS-1$
 			num_leb128_read++;
 			result |= ((long) (b & 0x7f) << shift);
 			shift += 7;
