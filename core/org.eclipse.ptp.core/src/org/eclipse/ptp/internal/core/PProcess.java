@@ -18,12 +18,18 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
+import java.io.File;
+
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.core.IOutputTextFileContants;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IProcessListener;
+import org.eclipse.ptp.core.ParallelPlugin;
 
 public class PProcess extends Parent implements IPProcess {
     protected String NAME_TAG = "process ";
@@ -34,7 +40,9 @@ public class PProcess extends Parent implements IPProcess {
     private String signalName = null;
     private boolean isTerminated = false;
     //private List outputList = new ArrayList();
-    private OutputTextFile outputFile = null;   
+    private OutputTextFile outputFile = null;
+    protected String outputDirPath = null;
+    protected int storeLine = 0;
     
     private IProcessListener listener = null;
     
@@ -47,8 +55,23 @@ public class PProcess extends Parent implements IPProcess {
 		this.exitCode = exitCode;
 		setStatus(status);
 		IPJob job = getJob();
-		IPUniverse uni = job.getUniverse();
-		outputFile = new OutputTextFile(name, uni.getOutputStoreDirectory(), uni.getStoreLine());
+		setOutputStore();
+		outputFile = new OutputTextFile(name, outputDirPath, storeLine);
+	}
+	
+	private void setOutputStore() {
+		Preferences preferences = ParallelPlugin.getDefault().getPluginPreferences();
+		outputDirPath = preferences.getString(IOutputTextFileContants.OUTPUT_DIR);
+		storeLine = preferences.getInt(IOutputTextFileContants.STORE_LINE);		
+		if (outputDirPath == null || outputDirPath.length() == 0)
+			outputDirPath = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(IOutputTextFileContants.DEF_OUTPUT_DIR_NAME).toOSString();
+		
+		if (storeLine == 0)
+			storeLine = IOutputTextFileContants.DEF_STORE_LINE;
+
+		File outputDirectory = new File(outputDirPath);
+		if (!outputDirectory.exists())
+			outputDirectory.mkdir();
 	}
 	
 	public IPJob getJob() {
@@ -60,7 +83,7 @@ public class PProcess extends Parent implements IPProcess {
 	}
 	
 	public String getProcessNumber() {
-	    return getKey();
+	    return ""+getKeyNumber()+"";
 	}
 	
 	public void setStatus(String status) {

@@ -82,14 +82,6 @@ public interface IPElement extends ISearchPageScoreComputer {
     public int getElementType();
     
     /**
-     * I have no idea what this was for.
-     * <br>TODO: <i>SLATED FOR REMOVAL / STUDY</i>
-     * 
-     * @return	True or false if it exists, apparently
-     */
-    public boolean exists();
-    
-    /**
      * Returns an Element array of the children of this Element.  If this 
      * Element does not yet have any children, then null is returned.
      * 
@@ -158,22 +150,6 @@ public interface IPElement extends ISearchPageScoreComputer {
 	 * @return	I have no idea, T/F obviously though :)
 	 */
     public boolean isAllStop();
- 
-    /**
-     * This method really doesn't make sense anymore, it needs to be fixed.
-     * <br>TODO: <i>SLATED FOR REMOVAL</i>
-     * 
-     * @param data	God only knows
-     */
-	public void setData(Object data);
-	
-	/**
-	 * This method really doesn't make sense anymore, it needs to be fixed.
-	 * <br>TODO: <i>SLATED FOR REMOVAL</i>
-	 * 
-	 * @return	God only knows
-	 */
-	public Object getData();
 	
 	/**
 	 * Returns a sorted Element array of this Element's children.  Left
@@ -187,15 +163,15 @@ public interface IPElement extends ISearchPageScoreComputer {
 
 	/**
 	 * Returns the String key for this Element.
-	 * <br>TODO: <i>Change this to an int, as it is with getKeyNumber below</i>
 	 * 
 	 * @return	The key for this Element	
 	 */
-	public String getKey();
+	public String getKeyString();
 	
 	/**
-	 * TODO: <i>Need to look at this too with the above getKey method</i>
-	 * @return	An int.
+	 * Returns an int version of the key for this Element
+	 * 
+	 * @return	The key for this Element
 	 */
 	public int getKeyNumber();	
 	

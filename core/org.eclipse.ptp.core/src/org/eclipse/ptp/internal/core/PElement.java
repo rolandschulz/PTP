@@ -34,7 +34,6 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
     private String fName = null;
     private String fKey = null;
     private int fType;
-    private Object data = null;
     
     private PElementInfo elementInfo = null;
 
@@ -51,9 +50,11 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 		return elementInfo;
 	}
 	
+	/*
 	public String getKey() {
 	    return fKey;
 	}
+	*/
 	
     public String getElementName() {
         //return NAME_TAG + getKey();
@@ -62,10 +63,14 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 	
 	public int getKeyNumber() {
 	    try {
-	        return Integer.parseInt(getKey());
+	        return Integer.parseInt(fKey);
 	    } catch (NumberFormatException e) {
 	        return -1;
 	    }
+	}
+	
+	public String getKeyString() {
+		return fKey;
 	}
 	
     /**
@@ -103,30 +108,8 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 		return getElementName();
 	}
 	
-	/*	
-	public IPJob getPRoot() {
-		IPElement current = this;
-		do {
-			if(current instanceof IPJob) return (IPJob) current;
-		} while((current = current.getParent()) != null);
-		return null;
-	}
-	*/
-	
-	public boolean exists() {
-		return getElementInfo() != null;
-	}
-	
 	public int size() {
 	    return getElementInfo().size();
-	}
-	
-	public void setData(Object data) {
-	    this.data = data;
-	}
-	
-	public Object getData() {
-	    return data;
 	}
 	
 	public int compareTo(Object obj) {

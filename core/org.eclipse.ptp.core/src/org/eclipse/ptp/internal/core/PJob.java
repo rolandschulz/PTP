@@ -55,6 +55,9 @@ public class PJob extends Parent implements IPJob {
 	}
 	
 	public String getJobNumber() {
+		int i = getKeyNumber();
+		return ""+(i - BASE_OFFSET)+"";
+		/*
 		String s = getKey();
 		int i = -1;
 		try {
@@ -66,6 +69,7 @@ public class PJob extends Parent implements IPJob {
 			return ""+(i - BASE_OFFSET)+"";
 		}
 		else return "";
+		*/
 	}
 	
 	public synchronized IPNode[] getSortedNodes() {
