@@ -60,7 +60,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		monitor.worked(5);
 		
 		
-		getLaunchManager().setPDTConfiguration(configuration);
+		getLaunchManager().setPTPConfiguration(configuration);
 				
 		if (monitor.isCanceled())
 			return;

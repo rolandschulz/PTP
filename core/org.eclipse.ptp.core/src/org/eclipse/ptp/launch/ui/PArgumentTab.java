@@ -23,7 +23,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.ptp.core.IPDTLaunchConfigurationConstants;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.swt.SWT;
@@ -88,7 +88,7 @@ public class PArgumentTab extends PLaunchConfigurationTab {
      * @see ILaunchConfigurationTab#setDefaults(ILaunchConfigurationWorkingCopy)
      */
     public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.ATTR_ARGUMENT, (String) null);
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENT, (String) null);
         workingDirectoryBlock.setDefaults(configuration);
     }
 
@@ -97,7 +97,7 @@ public class PArgumentTab extends PLaunchConfigurationTab {
      */
     public void initializeFrom(ILaunchConfiguration configuration) {
         try {
-            argumentText.setText(configuration.getAttribute(IPDTLaunchConfigurationConstants.ATTR_ARGUMENT, EMPTY_STRING));            
+            argumentText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENT, EMPTY_STRING));            
             workingDirectoryBlock.initializeFrom(configuration);
         } catch (CoreException e) {
             setErrorMessage(UIMessage.getFormattedResourceString("CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION", e.getStatus().getMessage()));
@@ -108,7 +108,7 @@ public class PArgumentTab extends PLaunchConfigurationTab {
      * @see ILaunchConfigurationTab#performApply(ILaunchConfigurationWorkingCopy)
      */
     public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.ATTR_ARGUMENT, argumentText.getText());
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENT, argumentText.getText());
         workingDirectoryBlock.performApply(configuration);
     }    
     

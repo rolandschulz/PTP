@@ -65,6 +65,6 @@ public interface ILaunchManager {
     public void createMPISession() throws CoreException;
     public void execMI(ILaunch launch, File workingDirectory, String[] envp, String[] args, IProgressMonitor pm) throws CoreException;
     
-    public void setPDTConfiguration(ILaunchConfiguration config);
-    public ILaunchConfiguration getPDTConfiguration();
+    public void setPTPConfiguration(ILaunchConfiguration config);
+    public ILaunchConfiguration getPTPConfiguration();
 }

@@ -38,7 +38,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.ParallelPlugin;
-import org.eclipse.ptp.core.IPDTLaunchConfigurationConstants;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 
 /**
  *
@@ -59,11 +59,11 @@ public abstract class AbstractAttachDebugger {
     
     protected abstract ILaunchConfiguration createDebugConfiguration(IFile exeFile) throws CoreException;
 	protected abstract boolean createLaunch(ILaunchConfiguration config) throws CoreException;
-    public abstract void attachDebugger(ILaunchConfiguration pdtConfig) throws CoreException;
+    public abstract void attachDebugger(ILaunchConfiguration ptpConfig) throws CoreException;
     
-    protected IFile findExeFile(ILaunchConfiguration pdtConfig) throws CoreException {
-        String projectName = pdtConfig.getAttribute(IPDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String)null);
-        String programName = pdtConfig.getAttribute(IPDTLaunchConfigurationConstants.ATTR_APPLICATION_NAME, (String)null);
+    protected IFile findExeFile(ILaunchConfiguration ptpConfig) throws CoreException {
+        String projectName = ptpConfig.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String)null);
+        String programName = ptpConfig.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, (String)null);
 
 		if (projectName != null && !projectName.equals("")) {
 			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);

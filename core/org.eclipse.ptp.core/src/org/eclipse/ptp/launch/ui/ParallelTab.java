@@ -26,7 +26,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.ptp.core.IPDTLaunchConfigurationConstants;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.UIMessage;
 import org.eclipse.swt.SWT;
@@ -141,10 +141,10 @@ public class ParallelTab extends PLaunchConfigurationTab {
      * @see ILaunchConfigurationTab#setDefaults(ILaunchConfigurationWorkingCopy)
      */
     public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.NUMBER_OF_PROCESSES, IPDTLaunchConfigurationConstants.DEF_NUMBER_OF_PROCESSES);
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.NETWORK_TYPE, IPDTLaunchConfigurationConstants.DEF_NETWORK_TYPE);
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.PROCESSES_PER_NODE, IPDTLaunchConfigurationConstants.DEF_PROCESSES_PER_NODE);
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.FIRST_NODE_NUMBER, IPDTLaunchConfigurationConstants.DEF_FIRST_NODE_NUMBER);
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES, IPTPLaunchConfigurationConstants.DEF_NUMBER_OF_PROCESSES);
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, IPTPLaunchConfigurationConstants.DEF_NETWORK_TYPE);
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE, IPTPLaunchConfigurationConstants.DEF_PROCESSES_PER_NODE);
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER, IPTPLaunchConfigurationConstants.DEF_FIRST_NODE_NUMBER);
     }
 
     /**
@@ -152,11 +152,11 @@ public class ParallelTab extends PLaunchConfigurationTab {
      */
     public void initializeFrom(ILaunchConfiguration configuration) {
         try {
-            numberOfProcessField.setStringValue(configuration.getAttribute(IPDTLaunchConfigurationConstants.NUMBER_OF_PROCESSES, EMPTY_STRING));
-            String type = configuration.getAttribute(IPDTLaunchConfigurationConstants.NETWORK_TYPE, EMPTY_STRING);
-            networkTypeCombo.select(type.equals(IPDTLaunchConfigurationConstants.P_TYPE)?0:1);            
-            numberOfProcessStartField.setStringValue(configuration.getAttribute(IPDTLaunchConfigurationConstants.PROCESSES_PER_NODE, EMPTY_STRING));
-            firstNodeNumberField.setStringValue(configuration.getAttribute(IPDTLaunchConfigurationConstants.FIRST_NODE_NUMBER, EMPTY_STRING));
+            numberOfProcessField.setStringValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES, EMPTY_STRING));
+            String type = configuration.getAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, EMPTY_STRING);
+            networkTypeCombo.select(type.equals(IPTPLaunchConfigurationConstants.P_TYPE)?0:1);            
+            numberOfProcessStartField.setStringValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE, EMPTY_STRING));
+            firstNodeNumberField.setStringValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER, EMPTY_STRING));
         } catch (CoreException e) {
             setErrorMessage(UIMessage.getFormattedResourceString("CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION", e.getStatus().getMessage()));
         }
@@ -166,10 +166,10 @@ public class ParallelTab extends PLaunchConfigurationTab {
      * @see ILaunchConfigurationTab#performApply(ILaunchConfigurationWorkingCopy)
      */
     public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.NUMBER_OF_PROCESSES, getFieldContent(numberOfProcessField));
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.NETWORK_TYPE, networkTypeCombo.getSelectionIndex()==0?IPDTLaunchConfigurationConstants.P_TYPE:IPDTLaunchConfigurationConstants.G_TYPE);
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.PROCESSES_PER_NODE, getFieldContent(numberOfProcessStartField));
-        configuration.setAttribute(IPDTLaunchConfigurationConstants.FIRST_NODE_NUMBER, getFieldContent(firstNodeNumberField));
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES, getFieldContent(numberOfProcessField));
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, networkTypeCombo.getSelectionIndex()==0?IPTPLaunchConfigurationConstants.P_TYPE:IPTPLaunchConfigurationConstants.G_TYPE);
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE, getFieldContent(numberOfProcessStartField));
+        configuration.setAttribute(IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER, getFieldContent(firstNodeNumberField));
     }
     
     protected String getFieldContent(IntegerFieldEditor editorField) {

@@ -18,9 +18,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
+
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.ParallelPlugin;
+import org.eclipse.ptp.core.IOutputTextFileContants;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
@@ -29,9 +35,36 @@ import org.eclipse.ptp.core.IPUniverse;
 public class PUniverse extends Parent implements IPUniverse 
 {
     protected String NAME_TAG = "universe ";
+    
+    protected String outputDirPath = null;
+    protected int storeLine = 0;
+    
 	public PUniverse() {
 		/* '1' because this is the only universe */
 		super(null, "TheUniverse", ""+1+"", P_UNIVERSE);
+		setOutputStore();
+	}
+	
+	private void setOutputStore() {
+		Preferences preferences = ParallelPlugin.getDefault().getPluginPreferences();
+		outputDirPath = preferences.getString(IOutputTextFileContants.OUTPUT_DIR);
+		storeLine = preferences.getInt(IOutputTextFileContants.STORE_LINE);		
+        if (outputDirPath == null || outputDirPath.length() == 0)
+            outputDirPath = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(IOutputTextFileContants.DEF_OUTPUT_DIR_NAME).toOSString();
+            
+        if (storeLine == 0)
+            storeLine = IOutputTextFileContants.DEF_STORE_LINE;
+        
+        File outputDirectory = new File(outputDirPath);
+        if (!outputDirectory.exists())
+            outputDirectory.mkdir();
+	}
+	
+	public String getOutputStoreDirectory() {
+	    return outputDirPath;
+	}
+	public int getStoreLine() {
+	    return storeLine;
 	}
 	
 	/* there is a single collection but in this collection we keep two different kinds

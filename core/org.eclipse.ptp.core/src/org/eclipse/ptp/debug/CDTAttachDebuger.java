@@ -60,8 +60,8 @@ public class CDTAttachDebuger extends AbstractAttachDebugger {
 		return wc.doSave();
     }
 
-    public void attachDebugger(ILaunchConfiguration pdtConfig) throws CoreException {
-	    IFile exeFile = findExeFile(pdtConfig);
+    public void attachDebugger(ILaunchConfiguration ptpConfig) throws CoreException {
+	    IFile exeFile = findExeFile(ptpConfig);
 	    ILaunchConfiguration config = createDebugConfiguration(exeFile);
         config.launch(ILaunchManager.DEBUG_MODE, null);
     }
@@ -89,11 +89,11 @@ public class CDTAttachDebuger extends AbstractAttachDebugger {
      */
     
 	/*
-	public void attachDebugger(ILaunchConfiguration pdtConfig) throws CoreException {
+	public void attachDebugger(ILaunchConfiguration ptpConfig) throws CoreException {
         ICDISession dsession = null;
         IProcess debuggerProcess = null;
 		try {
-		    IFile exeFile = findExeFile(pdtConfig);
+		    IFile exeFile = findExeFile(ptpConfig);
 		    ILaunchConfiguration config = createDebugConfiguration(exeFile);
 		    if (createLaunch(config)) {
 			    int pid = config.getAttribute(ICDTLaunchConfigurationConstants.ATTR_ATTACH_PROCESS_ID, -1);
