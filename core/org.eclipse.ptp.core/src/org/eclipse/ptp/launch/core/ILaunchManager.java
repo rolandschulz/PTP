@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.pdt.mi.MISession;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IPJob;
@@ -51,7 +50,6 @@ public interface ILaunchManager {
     public boolean isParallelPerspectiveOpen();
     
     public void shutdown();
-    public MISession getSession();
     public IPMachine getMachine();
     public IPUniverse getUniverse();
     public IPJob getProcessRoot();
