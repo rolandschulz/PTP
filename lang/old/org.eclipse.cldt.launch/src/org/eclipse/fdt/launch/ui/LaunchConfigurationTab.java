@@ -32,7 +32,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 
-public abstract class CLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
+public abstract class LaunchConfigurationTab extends AbstractLaunchConfigurationTab {
 
 	/**
 	 * Returns the current C element context from which to initialize default

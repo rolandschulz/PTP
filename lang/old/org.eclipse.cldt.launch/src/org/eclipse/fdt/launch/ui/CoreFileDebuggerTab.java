@@ -22,14 +22,14 @@ import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.debug.core.CDebugCorePlugin;
 import org.eclipse.fdt.debug.core.IFDTLaunchConfigurationConstants;
 import org.eclipse.fdt.debug.core.ICDebugConfiguration;
-import org.eclipse.fdt.launch.internal.ui.AbstractCDebuggerTab;
+import org.eclipse.fdt.launch.internal.ui.AbstractDebuggerTab;
 import org.eclipse.fdt.launch.internal.ui.LaunchMessages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.help.WorkbenchHelp;
 
-public class CoreFileDebuggerTab extends AbstractCDebuggerTab {
+public class CoreFileDebuggerTab extends AbstractDebuggerTab {
 
 	/*
 	 * (non-Javadoc)
@@ -39,7 +39,7 @@ public class CoreFileDebuggerTab extends AbstractCDebuggerTab {
 	public void createControl(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
 		setControl(comp);
-		WorkbenchHelp.setHelp(getControl(), IFDTLaunchHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_DEBBUGER_TAB);
+		WorkbenchHelp.setHelp(getControl(), ILaunchHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_DEBBUGER_TAB);
 		GridLayout topLayout = new GridLayout(1, false);
 		comp.setLayout(topLayout);
 		createDebuggerCombo(comp, 1);
@@ -86,7 +86,7 @@ public class CoreFileDebuggerTab extends AbstractCDebuggerTab {
 
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.fdt.launch.internal.ui.AbstractCDebuggerTab#activated(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	 * @see org.eclipse.fdt.launch.internal.ui.AbstractDebuggerTab#activated(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void activated(ILaunchConfigurationWorkingCopy workingCopy) {
 		setInitializing(true);

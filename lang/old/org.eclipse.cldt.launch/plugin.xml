@@ -92,10 +92,10 @@
    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
-            label="%CApplicationShortcut.label"
+            label="%ApplicationShortcut.label"
             icon="icons/c_app.gif"
             modes="run, debug"
-            class="org.eclipse.fdt.launch.internal.CApplicationLaunchShortcut"
+            class="org.eclipse.fdt.launch.internal.ApplicationLaunchShortcut"
             id="org.eclipse.fdt.debug.ui.localCShortcut">
          <contextualLaunch>
            <enablement>
@@ -108,10 +108,10 @@
            </enablement>
            <contextLabel
          	  mode="run"
-         	  label="%ContextualRunCApplication.label"/>
+         	  label="%ContextualRunApplication.label"/>
   		   <contextLabel
   		 	  mode="debug"
-  		 	  label="%ContextualDebugCApplication.label"/>
+  		 	  label="%ContextualDebugApplication.label"/>
   		 </contextualLaunch>
          <perspective
                id="org.eclipse.fdt.ui.CPerspective">
@@ -127,7 +127,7 @@
       		namespace="org.eclipse.fdt.launch"
             properties="isExecutable"
             type="org.eclipse.core.runtime.IAdaptable"
-            class="org.eclipse.fdt.launch.internal.CPropertyTester"
+            class="org.eclipse.fdt.launch.internal.ExecutablePropertyTester"
             id="org.eclipse.fdt.launch.CPropertyTester">
       </propertyTester>
    </extension>

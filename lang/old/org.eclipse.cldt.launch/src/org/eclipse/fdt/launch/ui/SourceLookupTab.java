@@ -31,7 +31,7 @@ import org.eclipse.ui.help.WorkbenchHelp;
  * 
  * @since: Feb 13, 2003
  */
-public class CSourceLookupTab extends CLaunchConfigurationTab
+public class SourceLookupTab extends LaunchConfigurationTab
 {
 	private SourceLookupBlock fBlock = null;
 
@@ -44,7 +44,7 @@ public class CSourceLookupTab extends CLaunchConfigurationTab
 		control.setLayout( new GridLayout() );
 		setControl( control );
 
-		WorkbenchHelp.setHelp(getControl(), IFDTLaunchHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_SOURCELOOKUP_TAB);
+		WorkbenchHelp.setHelp(getControl(), ILaunchHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_SOURCELOOKUP_TAB);
 		
 		fBlock = new SourceLookupBlock();
 		fBlock.createControl( control );
@@ -83,7 +83,7 @@ public class CSourceLookupTab extends CLaunchConfigurationTab
 	 */
 	public String getName()
 	{
-		return LaunchMessages.getString("CSourceLookupTab.Source"); //$NON-NLS-1$
+		return LaunchMessages.getString("SourceLookupTab.Source"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)

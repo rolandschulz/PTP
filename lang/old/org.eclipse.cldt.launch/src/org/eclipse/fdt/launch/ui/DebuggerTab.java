@@ -27,7 +27,7 @@ import org.eclipse.fdt.debug.core.CDebugCorePlugin;
 import org.eclipse.fdt.debug.core.IFDTLaunchConfigurationConstants;
 import org.eclipse.fdt.debug.core.ICDebugConfiguration;
 import org.eclipse.fdt.debug.internal.ui.PixelConverter;
-import org.eclipse.fdt.launch.internal.ui.AbstractCDebuggerTab;
+import org.eclipse.fdt.launch.internal.ui.AbstractDebuggerTab;
 import org.eclipse.fdt.launch.internal.ui.LaunchMessages;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.help.WorkbenchHelp;
 
-public class CDebuggerTab extends AbstractCDebuggerTab {
+public class DebuggerTab extends AbstractDebuggerTab {
 
 	public class AdvancedDebuggerOptionsDialog extends Dialog {
 
@@ -64,14 +64,14 @@ public class CDebuggerTab extends AbstractCDebuggerTab {
 		protected Control createDialogArea( Composite parent ) {
 			Composite composite = (Composite)super.createDialogArea( parent );
 			Group group = new Group( composite, SWT.NONE );
-			group.setText( LaunchMessages.getString( "CDebuggerTab.Automatically_track_values_of" ) ); //$NON-NLS-1$
+			group.setText( LaunchMessages.getString( "DebuggerTab.Automatically_track_values_of" ) ); //$NON-NLS-1$
 			GridLayout layout = new GridLayout();
 			group.setLayout( layout );
 			group.setLayoutData( new GridData( GridData.FILL_HORIZONTAL ) );
 			fVarBookKeeping = new Button( group, SWT.CHECK );
-			fVarBookKeeping.setText( LaunchMessages.getString( "CDebuggerTab.Variables" ) ); //$NON-NLS-1$
+			fVarBookKeeping.setText( LaunchMessages.getString( "DebuggerTab.Variables" ) ); //$NON-NLS-1$
 			fRegBookKeeping = new Button( group, SWT.CHECK );
-			fRegBookKeeping.setText( LaunchMessages.getString( "CDebuggerTab.Registers" ) ); //$NON-NLS-1$
+			fRegBookKeeping.setText( LaunchMessages.getString( "DebuggerTab.Registers" ) ); //$NON-NLS-1$
 			initialize();
 			return composite;
 		}
@@ -103,7 +103,7 @@ public class CDebuggerTab extends AbstractCDebuggerTab {
 		 */
 		protected void configureShell( Shell newShell ) {
 			super.configureShell( newShell );
-			newShell.setText( LaunchMessages.getString( "CDebuggerTab.Advanced_Options_Dialog_Title" ) ); //$NON-NLS-1$
+			newShell.setText( LaunchMessages.getString( "DebuggerTab.Advanced_Options_Dialog_Title" ) ); //$NON-NLS-1$
 		}
 	}
 
@@ -115,7 +115,7 @@ public class CDebuggerTab extends AbstractCDebuggerTab {
 
 	private Map fAdvancedAttributes = new HashMap( 5 );
 
-	public CDebuggerTab(boolean attachMode) {
+	public DebuggerTab(boolean attachMode) {
 		fAttachMode = attachMode;
 	}
 	
@@ -123,7 +123,7 @@ public class CDebuggerTab extends AbstractCDebuggerTab {
 	public void createControl( Composite parent ) {
 		Composite comp = new Composite( parent, SWT.NONE );
 		setControl( comp );
-		WorkbenchHelp.setHelp( getControl(), IFDTLaunchHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_DEBBUGER_TAB );
+		WorkbenchHelp.setHelp( getControl(), ILaunchHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_DEBBUGER_TAB );
 		GridLayout layout = new GridLayout( 2, true );
 		comp.setLayout( layout );
 		GridData gd = new GridData();
@@ -222,7 +222,7 @@ public class CDebuggerTab extends AbstractCDebuggerTab {
 		ICDebugConfiguration debugConfig = getDebugConfig();
 		String mode = fAttachMode ? IFDTLaunchConfigurationConstants.DEBUGGER_MODE_ATTACH : IFDTLaunchConfigurationConstants.DEBUGGER_MODE_RUN;
 		if ( !debugConfig.supportsMode( mode ) ) {
-			setErrorMessage( MessageFormat.format( LaunchMessages.getString( "CDebuggerTab.Mode_not_supported" ), new String[] { mode } ) ); //$NON-NLS-1$
+			setErrorMessage( MessageFormat.format( LaunchMessages.getString( "DebuggerTab.Mode_not_supported" ), new String[] { mode } ) ); //$NON-NLS-1$
 			return false;
 		}
 		if ( super.isValid( config ) == false ) {
@@ -252,15 +252,15 @@ public class CDebuggerTab extends AbstractCDebuggerTab {
 	protected boolean validateDebuggerConfig( ILaunchConfiguration config ) {
 		ICDebugConfiguration debugConfig = getDebugConfig();
 		if ( debugConfig == null ) {
-			setErrorMessage( LaunchMessages.getString( "CDebuggerTab.No_debugger_available" ) ); //$NON-NLS-1$
+			setErrorMessage( LaunchMessages.getString( "DebuggerTab.No_debugger_available" ) ); //$NON-NLS-1$
 			return false;
 		}
 		if ( !validatePlatform( config, debugConfig ) ) {
-			setErrorMessage( LaunchMessages.getString( "CDebuggerTab.Platform_is_not_supported" ) ); //$NON-NLS-1$
+			setErrorMessage( LaunchMessages.getString( "DebuggerTab.Platform_is_not_supported" ) ); //$NON-NLS-1$
 			return false;
 		}
 		if (!validateCPU( config, debugConfig ) ) {
-			setErrorMessage( LaunchMessages.getString( "CDebuggerTab.CPU_is_not_supported" ) ); //$NON-NLS-1$
+			setErrorMessage( LaunchMessages.getString( "DebuggerTab.CPU_is_not_supported" ) ); //$NON-NLS-1$
 			return false;
 		}
 		return true;
@@ -284,7 +284,7 @@ public class CDebuggerTab extends AbstractCDebuggerTab {
 			GridLayout layout = new GridLayout( 2, false );
 			optionsComp.setLayout( layout );
 			optionsComp.setLayoutData( new GridData( GridData.END, GridData.CENTER, true, false, 1, 1 ) );
-			fStopInMain = createCheckButton( optionsComp, LaunchMessages.getString( "CDebuggerTab.Stop_at_main_on_startup" ) ); //$NON-NLS-1$
+			fStopInMain = createCheckButton( optionsComp, LaunchMessages.getString( "DebuggerTab.Stop_at_main_on_startup" ) ); //$NON-NLS-1$
 			GridData data = new GridData();
 			data.horizontalAlignment = GridData.BEGINNING;
 			fStopInMain.setLayoutData( data );
@@ -297,7 +297,7 @@ public class CDebuggerTab extends AbstractCDebuggerTab {
 				}
 			} );
 		}
-		fAdvancedButton = createPushButton( optionsComp, LaunchMessages.getString( "CDebuggerTab.Advanced" ), null ); //$NON-NLS-1$
+		fAdvancedButton = createPushButton( optionsComp, LaunchMessages.getString( "DebuggerTab.Advanced" ), null ); //$NON-NLS-1$
 		GridData data = new GridData();
 		data.horizontalAlignment = GridData.END;
 		PixelConverter pc = new PixelConverter( parent );
@@ -366,7 +366,7 @@ public class CDebuggerTab extends AbstractCDebuggerTab {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.fdt.launch.internal.ui.AbstractCDebuggerTab#setInitializeDefault(boolean)
+	 * @see org.eclipse.fdt.launch.internal.ui.AbstractDebuggerTab#setInitializeDefault(boolean)
 	 */
 	protected void setInitializeDefault( boolean init ) {
 		super.setInitializeDefault( init );

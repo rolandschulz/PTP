@@ -38,7 +38,7 @@ import org.eclipse.fdt.debug.core.CDebugCorePlugin;
 import org.eclipse.fdt.debug.core.IFDTLaunchConfigurationConstants;
 import org.eclipse.fdt.debug.core.ICDebugConfiguration;
 import org.eclipse.fdt.debug.ui.CDebugUIPlugin;
-import org.eclipse.fdt.launch.AbstractCLaunchDelegate;
+import org.eclipse.fdt.launch.AbstractLaunchDelegate;
 import org.eclipse.fdt.launch.internal.ui.LaunchMessages;
 import org.eclipse.fdt.launch.internal.ui.LaunchUIPlugin;
 import org.eclipse.fdt.ui.CElementLabelProvider;
@@ -55,7 +55,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.TwoPaneElementSelector;
 
-public class CApplicationLaunchShortcut implements ILaunchShortcut {
+public class ApplicationLaunchShortcut implements ILaunchShortcut {
 
 	public void launch(IEditorPart editor, String mode) {
 		searchAndLaunch(new Object[] { editor.getEditorInput()}, mode);
@@ -75,7 +75,7 @@ public class CApplicationLaunchShortcut implements ILaunchShortcut {
 				config.launch(mode, null);
 			}
 		} catch (CoreException e) {
-			LaunchUIPlugin.errorDialog(LaunchMessages.getString("CApplicationLaunchShortcut.LaunchFailed"), e.getStatus());  //$NON-NLS-1$
+			LaunchUIPlugin.errorDialog(LaunchMessages.getString("ApplicationLaunchShortcut.LaunchFailed"), e.getStatus());  //$NON-NLS-1$
 		}
 	}
 
@@ -93,8 +93,8 @@ public class CApplicationLaunchShortcut implements ILaunchShortcut {
 			candidateConfigs = new ArrayList(configs.length);
 			for (int i = 0; i < configs.length; i++) {
 				ILaunchConfiguration config = configs[i];
-				IPath programPath = AbstractCLaunchDelegate.getProgramPath(config);
-				String projectName = AbstractCLaunchDelegate.getProjectName(config);
+				IPath programPath = AbstractLaunchDelegate.getProgramPath(config);
+				String projectName = AbstractLaunchDelegate.getProjectName(config);
 				IPath name = bin.getResource().getProjectRelativePath();
 				if (programPath != null && programPath.equals(name)) {
 					if (projectName != null && projectName.equals(bin.getCProject().getProject().getName())) {
@@ -230,16 +230,16 @@ public class CApplicationLaunchShortcut implements ILaunchShortcut {
 	}
 
 	protected String getDebugConfigDialogTitleString(ICDebugConfiguration [] configList, String mode) {
-		return LaunchMessages.getString("CApplicationLaunchShortcut.LaunchDebugConfigSelection");  //$NON-NLS-1$
+		return LaunchMessages.getString("ApplicationLaunchShortcut.LaunchDebugConfigSelection");  //$NON-NLS-1$
 	}
 	
 	protected String getDebugConfigDialogMessageString(ICDebugConfiguration [] configList, String mode) {
 		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-			return LaunchMessages.getString("CApplicationLaunchShortcut.ChooseConfigToDebug");  //$NON-NLS-1$
+			return LaunchMessages.getString("ApplicationLaunchShortcut.ChooseConfigToDebug");  //$NON-NLS-1$
 		} else if (mode.equals(ILaunchManager.RUN_MODE)) {
-			return LaunchMessages.getString("CApplicationLaunchShortcut.ChooseConfigToRun");  //$NON-NLS-1$
+			return LaunchMessages.getString("ApplicationLaunchShortcut.ChooseConfigToRun");  //$NON-NLS-1$
 		}
-		return LaunchMessages.getString("CApplicationLaunchShortcut.Invalid_launch_mode_1"); //$NON-NLS-1$
+		return LaunchMessages.getString("ApplicationLaunchShortcut.Invalid_launch_mode_1"); //$NON-NLS-1$
 	}
 
 
@@ -264,16 +264,16 @@ public class CApplicationLaunchShortcut implements ILaunchShortcut {
 	}
 
 	protected String getLaunchSelectionDialogTitleString(List configList, String mode) {
-		return LaunchMessages.getString("CApplicationLaunchShortcut.LaunchConfigSelection");  //$NON-NLS-1$
+		return LaunchMessages.getString("ApplicationLaunchShortcut.LaunchConfigSelection");  //$NON-NLS-1$
 	}
 	
 	protected String getLaunchSelectionDialogMessageString(List binList, String mode) {
 		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-			return LaunchMessages.getString("CApplicationLaunchShortcut.ChooseLaunchConfigToDebug");  //$NON-NLS-1$
+			return LaunchMessages.getString("ApplicationLaunchShortcut.ChooseLaunchConfigToDebug");  //$NON-NLS-1$
 		} else if (mode.equals(ILaunchManager.RUN_MODE)) {
-			return LaunchMessages.getString("CApplicationLaunchShortcut.ChooseLaunchConfigToRun");  //$NON-NLS-1$
+			return LaunchMessages.getString("ApplicationLaunchShortcut.ChooseLaunchConfigToRun");  //$NON-NLS-1$
 		}
-		return LaunchMessages.getString("CApplicationLaunchShortcut.Invalid_launch_mode_2"); //$NON-NLS-1$
+		return LaunchMessages.getString("ApplicationLaunchShortcut.Invalid_launch_mode_2"); //$NON-NLS-1$
 	}
 
 	/**
@@ -323,16 +323,16 @@ public class CApplicationLaunchShortcut implements ILaunchShortcut {
 	}
 	
 	protected String getBinarySelectionDialogTitleString(List binList, String mode) {
-		return LaunchMessages.getString("CApplicationLaunchShortcut.CLocalApplication");  //$NON-NLS-1$
+		return LaunchMessages.getString("ApplicationLaunchShortcut.CLocalApplication");  //$NON-NLS-1$
 	}
 	
 	protected String getBinarySelectionDialogMessageString(List binList, String mode) {
 		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-			return LaunchMessages.getString("CApplicationLaunchShortcut.ChooseLocalAppToDebug");  //$NON-NLS-1$
+			return LaunchMessages.getString("ApplicationLaunchShortcut.ChooseLocalAppToDebug");  //$NON-NLS-1$
 		} else if (mode.equals(ILaunchManager.RUN_MODE)) {
-			return LaunchMessages.getString("CApplicationLaunchShortcut.ChooseLocalAppToRun");  //$NON-NLS-1$
+			return LaunchMessages.getString("ApplicationLaunchShortcut.ChooseLocalAppToRun");  //$NON-NLS-1$
 		}
-		return LaunchMessages.getString("CApplicationLaunchShortcut.Invalid_launch_mode_3"); //$NON-NLS-1$
+		return LaunchMessages.getString("ApplicationLaunchShortcut.Invalid_launch_mode_3"); //$NON-NLS-1$
 	}
 
 	/**
@@ -388,12 +388,12 @@ public class CApplicationLaunchShortcut implements ILaunchShortcut {
 				} catch (InterruptedException e) {
 					return;
 				} catch (InvocationTargetException e) {
-					MessageDialog.openError(getShell(), LaunchMessages.getString("CApplicationLaunchShortcut.Application_Launcher"), e.getMessage()); //$NON-NLS-1$
+					MessageDialog.openError(getShell(), LaunchMessages.getString("ApplicationLaunchShortcut.Application_Launcher"), e.getMessage()); //$NON-NLS-1$
 					return;
 				}
 				int count = results.size();
 				if (count == 0) {
-					MessageDialog.openError(getShell(), LaunchMessages.getString("CApplicationLaunchShortcut.Application_Launcher"), LaunchMessages.getString("CApplicationLaunchShortcut.Launch_failed_no_binaries")); //$NON-NLS-1$ //$NON-NLS-2$
+					MessageDialog.openError(getShell(), LaunchMessages.getString("ApplicationLaunchShortcut.Application_Launcher"), LaunchMessages.getString("ApplicationLaunchShortcut.Launch_failed_no_binaries")); //$NON-NLS-1$ //$NON-NLS-2$
 				} else if (count > 1) {
 					bin = chooseBinary(results, mode);
 				} else {
@@ -404,7 +404,7 @@ public class CApplicationLaunchShortcut implements ILaunchShortcut {
 				launch(bin, mode);
 			}
 		} else {
-			MessageDialog.openError(getShell(), LaunchMessages.getString("CApplicationLaunchShortcut.Application_Launcher"), LaunchMessages.getString("CApplicationLaunchShortcut.Launch_failed_no_project_selected")); //$NON-NLS-1$ //$NON-NLS-2$
+			MessageDialog.openError(getShell(), LaunchMessages.getString("ApplicationLaunchShortcut.Application_Launcher"), LaunchMessages.getString("ApplicationLaunchShortcut.Launch_failed_no_project_selected")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 

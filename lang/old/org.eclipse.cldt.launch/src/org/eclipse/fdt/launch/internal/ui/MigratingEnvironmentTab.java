@@ -19,11 +19,11 @@ import org.eclipse.fdt.debug.core.IFDTLaunchConfigurationConstants;
 /**
  * @deprecated - temporary class for while configs are migrated to new EnvironmentTab
  */
-public class MigratingCEnvironmentTab extends EnvironmentTab {
+public class MigratingEnvironmentTab extends EnvironmentTab {
 
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.fdt.launch.ui.CEnvironmentTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.fdt.launch.ui.EnvironmentTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public void initializeFrom(ILaunchConfiguration config) {
 		if (config instanceof ILaunchConfigurationWorkingCopy) {

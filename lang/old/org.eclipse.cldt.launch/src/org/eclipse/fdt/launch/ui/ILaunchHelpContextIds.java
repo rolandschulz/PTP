@@ -12,7 +12,7 @@ package org.eclipse.fdt.launch.ui;
 
 import org.eclipse.fdt.launch.internal.ui.LaunchUIPlugin;
 
-public interface IFDTLaunchHelpContextIds {
+public interface ILaunchHelpContextIds {
 
 	public static final String PREFIX = LaunchUIPlugin.PLUGIN_ID + "."; //$NON-NLS-1$
 

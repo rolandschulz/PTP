@@ -30,11 +30,11 @@ import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.debug.core.CDIDebugModel;
 import org.eclipse.fdt.debug.core.IFDTLaunchConfigurationConstants;
 import org.eclipse.fdt.debug.core.ICDebugConfiguration;
-import org.eclipse.fdt.launch.AbstractCLaunchDelegate;
+import org.eclipse.fdt.launch.AbstractLaunchDelegate;
 import org.eclipse.fdt.launch.internal.ui.LaunchMessages;
 import org.eclipse.fdt.launch.internal.ui.LaunchUIPlugin;
 
-public class CoreFileLaunchDelegate extends AbstractCLaunchDelegate {
+public class CoreFileLaunchDelegate extends AbstractLaunchDelegate {
 
 	public void launch(ILaunchConfiguration config, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
 

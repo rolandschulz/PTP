@@ -23,8 +23,8 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.StringVariableSelectionDialog;
 import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.debug.core.IFDTLaunchConfigurationConstants;
-import org.eclipse.fdt.launch.AbstractCLaunchDelegate;
-import org.eclipse.fdt.launch.ui.CLaunchConfigurationTab;
+import org.eclipse.fdt.launch.AbstractLaunchDelegate;
+import org.eclipse.fdt.launch.ui.LaunchConfigurationTab;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -43,7 +43,7 @@ import org.eclipse.ui.dialogs.ContainerSelectionDialog;
  * A control for setting the working directory associated with a launch
  * configuration.
  */
-public class WorkingDirectoryBlock extends CLaunchConfigurationTab {
+public class WorkingDirectoryBlock extends LaunchConfigurationTab {
 
 	// Local directory
 	protected Text fWorkingDirText;
@@ -237,7 +237,7 @@ public class WorkingDirectoryBlock extends CLaunchConfigurationTab {
 		try {
 			ILaunchConfiguration config = getLaunchConfiguration();
 			if (config != null) {
-				ICProject cProject = AbstractCLaunchDelegate.getCProject(config);
+				ICProject cProject = AbstractLaunchDelegate.getCProject(config);
 				if (cProject != null) {
 					fWorkingDirText.setText("${workspace_loc:" + cProject.getPath().makeRelative().toOSString() + "}"); //$NON-NLS-1$ //$NON-NLS-2$
 					return;

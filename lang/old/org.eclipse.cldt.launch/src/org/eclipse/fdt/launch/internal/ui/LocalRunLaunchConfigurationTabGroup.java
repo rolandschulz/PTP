@@ -14,10 +14,10 @@ import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.fdt.launch.ui.CArgumentsTab;
-import org.eclipse.fdt.launch.ui.CDebuggerTab;
-import org.eclipse.fdt.launch.ui.CMainTab;
-import org.eclipse.fdt.launch.ui.CSourceLookupTab;
+import org.eclipse.fdt.launch.ui.ArgumentsTab;
+import org.eclipse.fdt.launch.ui.DebuggerTab;
+import org.eclipse.fdt.launch.ui.MainTab;
+import org.eclipse.fdt.launch.ui.SourceLookupTab;
 
 public class LocalRunLaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabGroup {
 	
@@ -26,11 +26,11 @@ public class LocalRunLaunchConfigurationTabGroup extends AbstractLaunchConfigura
 	 */
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode)  {
 		ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
-			new CMainTab(true),
-			new CArgumentsTab(),
-			new MigratingCEnvironmentTab(),
-			new CDebuggerTab(false),
-			new CSourceLookupTab(),
+			new MainTab(true),
+			new ArgumentsTab(),
+			new MigratingEnvironmentTab(),
+			new DebuggerTab(false),
+			new SourceLookupTab(),
 			new CommonTab() 
 		};
 		setTabs(tabs);

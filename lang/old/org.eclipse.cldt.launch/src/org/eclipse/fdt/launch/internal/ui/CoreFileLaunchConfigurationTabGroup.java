@@ -16,8 +16,8 @@ import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.fdt.debug.core.IFDTLaunchConfigurationConstants;
-import org.eclipse.fdt.launch.ui.CMainTab;
-import org.eclipse.fdt.launch.ui.CSourceLookupTab;
+import org.eclipse.fdt.launch.ui.MainTab;
+import org.eclipse.fdt.launch.ui.SourceLookupTab;
 import org.eclipse.fdt.launch.ui.CoreFileDebuggerTab;
 
 public class CoreFileLaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabGroup {
@@ -27,9 +27,9 @@ public class CoreFileLaunchConfigurationTabGroup extends AbstractLaunchConfigura
 	 */
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode)  {
 		ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
-			new CMainTab(),
+			new MainTab(),
 			new CoreFileDebuggerTab(),
-			new CSourceLookupTab(),
+			new SourceLookupTab(),
 			new CommonTab()
 		};
 		setTabs(tabs);

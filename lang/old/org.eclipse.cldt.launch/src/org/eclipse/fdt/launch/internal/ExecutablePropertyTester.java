@@ -20,7 +20,7 @@ import org.eclipse.fdt.core.model.ICElement;
 /**
  * A property tester that determines if a file is an executable.
  */
-public class CPropertyTester extends PropertyTester {
+public class ExecutablePropertyTester extends PropertyTester {
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.expressions.IPropertyTester#test(java.lang.Object, java.lang.String, java.lang.Object[], java.lang.Object)

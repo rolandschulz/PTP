@@ -66,7 +66,7 @@ import org.eclipse.ui.help.WorkbenchHelp;
 /**
  * @deprecated
  */
-public class CEnvironmentTab extends CLaunchConfigurationTab {
+public class EnvironmentTab extends LaunchConfigurationTab {
 
 	protected Properties fElements;
 
@@ -120,7 +120,7 @@ public class CEnvironmentTab extends CLaunchConfigurationTab {
 		private Text fTextValue = null;
 
 		public EntryDialog(String name, String value, boolean edit) {
-			super(CEnvironmentTab.this.getControl().getShell());
+			super(EnvironmentTab.this.getControl().getShell());
 			fName = name;
 			fValue = value;
 			fEdit = edit;
@@ -134,7 +134,7 @@ public class CEnvironmentTab extends CLaunchConfigurationTab {
 
 		protected void configureShell(Shell shell) {
 			super.configureShell(shell);
-			String title = (fEdit) ? LaunchMessages.getString("CEnvironmentTab.Edit_Variable") : LaunchMessages.getString("CEnvironmentTab.New_Variable"); //$NON-NLS-1$ //$NON-NLS-2$
+			String title = (fEdit) ? LaunchMessages.getString("EnvironmentTab.Edit_Variable") : LaunchMessages.getString("EnvironmentTab.New_Variable"); //$NON-NLS-1$ //$NON-NLS-2$
 			shell.setText(title);
 		}
 
@@ -152,14 +152,14 @@ public class CEnvironmentTab extends CLaunchConfigurationTab {
 			int fieldWidthHint = convertWidthInCharsToPixels(metrics, 50);
 
 			Label label = new Label(composite, SWT.NONE);
-			label.setText(LaunchMessages.getString("CEnvironmentTab.NameColon")); //$NON-NLS-1$
+			label.setText(LaunchMessages.getString("EnvironmentTab.NameColon")); //$NON-NLS-1$
 			fTextName = new Text(composite, SWT.SINGLE | SWT.BORDER);
 			GridData gd = new GridData(GridData.FILL_BOTH);
 			gd.grabExcessHorizontalSpace = true;
 			gd.widthHint = fieldWidthHint;
 			fTextName.setLayoutData(gd);
 			label = new Label(composite, SWT.NONE);
-			label.setText(LaunchMessages.getString("CEnvironmentTab.ValueColon")); //$NON-NLS-1$
+			label.setText(LaunchMessages.getString("EnvironmentTab.ValueColon")); //$NON-NLS-1$
 			fTextValue = new Text(composite, SWT.SINGLE | SWT.BORDER);
 			gd = new GridData(GridData.FILL_BOTH);
 			gd.grabExcessHorizontalSpace = true;
@@ -212,7 +212,7 @@ public class CEnvironmentTab extends CLaunchConfigurationTab {
 		Composite control = new Composite(parent, SWT.NONE);
 		setControl(control);
 
-		WorkbenchHelp.setHelp(getControl(), IFDTLaunchHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_ENVIRONMENT_TAB);
+		WorkbenchHelp.setHelp(getControl(), ILaunchHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_ENVIRONMENT_TAB);
 
 		GridLayout gl = new GridLayout(2, false);
 
@@ -275,11 +275,11 @@ public class CEnvironmentTab extends CLaunchConfigurationTab {
 		table.setLinesVisible(true);
 
 		TableColumn column1 = new TableColumn(table, SWT.NULL);
-		column1.setText(LaunchMessages.getString("CEnvironmentTab.Name")); //$NON-NLS-1$
+		column1.setText(LaunchMessages.getString("EnvironmentTab.Name")); //$NON-NLS-1$
 		tableLayout.addColumnData(new ColumnWeightData(30));
 
 		TableColumn column2 = new TableColumn(table, SWT.NULL);
-		column2.setText(LaunchMessages.getString("CEnvironmentTab.Value")); //$NON-NLS-1$
+		column2.setText(LaunchMessages.getString("EnvironmentTab.Value")); //$NON-NLS-1$
 		tableLayout.addColumnData(new ColumnWeightData(30));
 
 		fVariableList.addDoubleClickListener(new IDoubleClickListener() {
@@ -299,7 +299,7 @@ public class CEnvironmentTab extends CLaunchConfigurationTab {
 		composite.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 		composite.setLayout(new GridLayout(1, true));
 		fBtnNew = new Button(composite, SWT.NONE);
-		fBtnNew.setText(LaunchMessages.getString("CEnvironmentTab.New...")); //$NON-NLS-1$
+		fBtnNew.setText(LaunchMessages.getString("EnvironmentTab.New...")); //$NON-NLS-1$
 		fBtnNew.setLayoutData(new GridData(GridData.FILL_BOTH));
 		fBtnNew.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -307,7 +307,7 @@ public class CEnvironmentTab extends CLaunchConfigurationTab {
 			}
 		});
 		fBtnImport = new Button(composite, SWT.NONE);
-		fBtnImport.setText(LaunchMessages.getString("CEnvironmentTab.Import...")); //$NON-NLS-1$
+		fBtnImport.setText(LaunchMessages.getString("EnvironmentTab.Import...")); //$NON-NLS-1$
 		fBtnImport.setLayoutData(new GridData(GridData.FILL_BOTH));
 		fBtnImport.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -315,7 +315,7 @@ public class CEnvironmentTab extends CLaunchConfigurationTab {
 			}
 		});
 		fBtnEdit = new Button(composite, SWT.NONE);
-		fBtnEdit.setText(LaunchMessages.getString("CEnvironmentTab.Edit...")); //$NON-NLS-1$
+		fBtnEdit.setText(LaunchMessages.getString("EnvironmentTab.Edit...")); //$NON-NLS-1$
 		fBtnEdit.setLayoutData(new GridData(GridData.FILL_BOTH));
 		fBtnEdit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -323,7 +323,7 @@ public class CEnvironmentTab extends CLaunchConfigurationTab {
 			}
 		});
 		fBtnRemove = new Button(composite, SWT.NONE);
-		fBtnRemove.setText(LaunchMessages.getString("CEnvironmentTab.Remove")); //$NON-NLS-1$
+		fBtnRemove.setText(LaunchMessages.getString("EnvironmentTab.Remove")); //$NON-NLS-1$
 		fBtnRemove.setLayoutData(new GridData(GridData.FILL_BOTH));
 		fBtnRemove.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -395,7 +395,7 @@ public class CEnvironmentTab extends CLaunchConfigurationTab {
 
 				if(fElements.getProperty(key) != null) {
 					boolean overwrite;
-					overwrite = MessageDialog.openQuestion(getShell(), LaunchMessages.getString("CEnvironmentTab.Existing_Environment_Variable"), LaunchMessages.getFormattedString("CEnvironmentTab.Environment_variable_NAME_exists", key)); //$NON-NLS-1$ //$NON-NLS-2$
+					overwrite = MessageDialog.openQuestion(getShell(), LaunchMessages.getString("EnvironmentTab.Existing_Environment_Variable"), LaunchMessages.getFormattedString("EnvironmentTab.Environment_variable_NAME_exists", key)); //$NON-NLS-1$ //$NON-NLS-2$
 					if(!overwrite) {
 						continue;
 					}
@@ -464,7 +464,7 @@ public class CEnvironmentTab extends CLaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
 	 */
 	public String getName() {
-		return LaunchMessages.getString("CEnvironmentTab.Environment"); //$NON-NLS-1$
+		return LaunchMessages.getString("EnvironmentTab.Environment"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)

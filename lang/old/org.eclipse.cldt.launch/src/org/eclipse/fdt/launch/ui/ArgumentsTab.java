@@ -45,7 +45,7 @@ import org.eclipse.ui.help.WorkbenchHelp;
  * This class may be instantiated. This class is not intended to be subclassed.
  * </p>
  */
-public class CArgumentsTab extends CLaunchConfigurationTab {
+public class ArgumentsTab extends LaunchConfigurationTab {
 
 	// Program arguments UI widgets
 	protected Label fPrgmArgumentsLabel;
@@ -63,7 +63,7 @@ public class CArgumentsTab extends CLaunchConfigurationTab {
 		Composite comp = new Composite(parent, SWT.NONE);
 		setControl(comp);
 		
-		WorkbenchHelp.setHelp(getControl(), IFDTLaunchHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_ARGUMNETS_TAB);
+		WorkbenchHelp.setHelp(getControl(), ILaunchHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_ARGUMNETS_TAB);
 		
 		GridLayout topLayout = new GridLayout();
 		comp.setLayout(topLayout);
@@ -87,7 +87,7 @@ public class CArgumentsTab extends CLaunchConfigurationTab {
 		argsComp.setLayoutData(gd);
 
 		fPrgmArgumentsLabel = new Label(argsComp, SWT.NONE);
-		fPrgmArgumentsLabel.setText(LaunchMessages.getString("CArgumentsTab.C/C++_Program_Arguments")); //$NON-NLS-1$
+		fPrgmArgumentsLabel.setText(LaunchMessages.getString("ArgumentsTab.C/C++_Program_Arguments")); //$NON-NLS-1$
 		fPrgmArgumentsText = new Text(argsComp, SWT.MULTI | SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.heightHint = 40;
@@ -97,7 +97,7 @@ public class CArgumentsTab extends CLaunchConfigurationTab {
 				updateLaunchConfigurationDialog();
 			}
 		});
-		fArgumentVariablesButton= createPushButton(argsComp, LaunchMessages.getString("CArgumentsTab.Variables"), null); //$NON-NLS-1$
+		fArgumentVariablesButton= createPushButton(argsComp, LaunchMessages.getString("ArgumentsTab.Variables"), null); //$NON-NLS-1$
 		gd = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		fArgumentVariablesButton.setLayoutData(gd);
 		fArgumentVariablesButton.addSelectionListener(new SelectionAdapter() {
@@ -211,7 +211,7 @@ public class CArgumentsTab extends CLaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
 	 */
 	public String getName() {
-		return LaunchMessages.getString("CArgumentsTab.Arguments"); //$NON-NLS-1$
+		return LaunchMessages.getString("ArgumentsTab.Arguments"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
