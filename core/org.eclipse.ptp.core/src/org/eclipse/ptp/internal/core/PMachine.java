@@ -10,16 +10,20 @@ import org.eclipse.pdt.mi.MISession;
 import org.eclipse.ptp.ParallelPlugin;
 import org.eclipse.ptp.core.IOutputTextFileContants;
 import org.eclipse.ptp.core.IPElement;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPUniverse;
 
-/**
- * @author Clement
- *
- */
-public class PMachine extends Parent implements IPMachine {
+public class PMachine extends Parent implements IPMachine 
+{
+	protected String NAME_TAG = "machine ";
+	
+	public PMachine(IPUniverse uni, String name) {
+		super(uni, name, P_MACHINE);
+	}
+	
 	public IPUniverse getPUniverse() {
 		IPElement current = this;
 		do {
@@ -148,7 +152,113 @@ public class PMachine extends Parent implements IPMachine {
         
         removeChildren();
 	}
-	*/	
+	*/
+
+	/* returns an array of the nodes that are comprised by this machine */
+	public synchronized IPNode[] getNodes() {
+		return (IPNode[])getCollection().toArray(new IPNode[size()]);
+	}
+	
+	/* returns a list of the nodes comprised by this machine - but sorted */
+	public synchronized IPNode[] getSortedNodes() {
+	    IPNode[] nodes = getNodes();
+	    sort(nodes);
+	    return nodes;
+	}
+	
+	/* finds a node using a string identifier - returns null if none found */
+	public synchronized IPNode findNode(String nodeNumber) {
+        IPElement element = findChild(nodeNumber);
+        if (element != null)
+            return (IPNode)element;
+        return null;
+	}
+	
+	/* helper function to get all the processes running on this machine - doing so
+	 * by looking at all the processes on each of the nodes comprised by this
+	 * machine
+	 */
+	public synchronized IPProcess[] getProcesses() {
+	    List array = new ArrayList(0);
+	    IPNode[] nodes = getNodes();
+        for (int i=0; i<nodes.length; i++)
+            array.addAll(nodes[i].getCollection());
+
+        return (IPProcess[])array.toArray(new IPProcess[array.size()]);
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPMachine#findProcess(java.lang.String, java.lang.String)
+	 */
+	public IPProcess findProcess(String nodeNumber, String processNumber) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPMachine#findProcess(java.lang.String)
+	 */
+	public IPProcess findProcess(String processNumber) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPMachine#getSortedProcesses()
+	 */
+	public IPProcess[] getSortedProcesses() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPMachine#totalNodes()
+	 */
+	public int totalNodes() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPMachine#totalProcesses()
+	 */
+	public int totalProcesses() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPMachine#removeAllProcesses()
+	 */
+	public void removeAllProcesses() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPMachine#getJobs()
+	 */
+	public IPJob[] getJobs() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPMachine#getArch()
+	 */
+	public String getArch() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.core.IPMachine#setArch(java.lang.String)
+	 */
+	public void setArch(String arch) {
+		// TODO Auto-generated method stub
+		
+	}	
 	
 	/* returns a String representing the architecture in some form */
 	
