@@ -30,9 +30,9 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
  */
 public class StatusBarUpdater implements ISelectionChangedListener {
 	
-	private final int LABEL_FLAGS= CElementLabels.DEFAULT_QUALIFIED | CElementLabels.ROOT_POST_QUALIFIED | CElementLabels.APPEND_ROOT_PATH |
-			CElementLabels.M_PARAMETER_TYPES | CElementLabels.M_PARAMETER_NAMES | CElementLabels.M_APP_RETURNTYPE | CElementLabels.M_EXCEPTIONS | 
-		 	CElementLabels.F_APP_TYPE_SIGNATURE;
+	private final int LABEL_FLAGS= FortranElementLabels.DEFAULT_QUALIFIED | FortranElementLabels.ROOT_POST_QUALIFIED | FortranElementLabels.APPEND_ROOT_PATH |
+			FortranElementLabels.M_PARAMETER_TYPES | FortranElementLabels.M_PARAMETER_NAMES | FortranElementLabels.M_APP_RETURNTYPE | FortranElementLabels.M_EXCEPTIONS | 
+		 	FortranElementLabels.F_APP_TYPE_SIGNATURE;
 
 	private final TypeInfoLabelProvider fTypeInfoLabelProvider = new TypeInfoLabelProvider(TypeInfoLabelProvider.SHOW_FULLY_QUALIFIED + TypeInfoLabelProvider.SHOW_PATH);
 		 	
@@ -72,7 +72,7 @@ public class StatusBarUpdater implements ISelectionChangedListener {
 	}
 		
 	private String formatCElementMessage(ICElement element) {
-		return CElementLabels.getElementLabel(element, LABEL_FLAGS);
+		return FortranElementLabels.getElementLabel(element, LABEL_FLAGS);
 	}
 		
 	private String formatTypeInfoMessage(ITypeInfo info) {
@@ -82,7 +82,7 @@ public class StatusBarUpdater implements ISelectionChangedListener {
 	private String formatResourceMessage(IResource element) {
 		IContainer parent= element.getParent();
 		if (parent != null && parent.getType() != IResource.ROOT)
-			return element.getName() + CElementLabels.CONCAT_STRING + parent.getFullPath().makeRelative().toString();
+			return element.getName() + FortranElementLabels.CONCAT_STRING + parent.getFullPath().makeRelative().toString();
 		return element.getName();
 	}	
 

@@ -29,7 +29,7 @@ import org.eclipse.ui.IEditorInput;
  */
 public class WorkingCopyManager implements IWorkingCopyManager, IWorkingCopyManagerExtension {
 	
-	private CDocumentProvider fDocumentProvider;
+	private FortranDocumentProvider fDocumentProvider;
 	private Map fMap;
 	private boolean fIsShuttingDown;
 
@@ -39,7 +39,7 @@ public class WorkingCopyManager implements IWorkingCopyManager, IWorkingCopyMana
 	 * 
 	 * @param provider the provider
 	 */
-	public WorkingCopyManager(CDocumentProvider provider) {
+	public WorkingCopyManager(FortranDocumentProvider provider) {
 		Assert.isNotNull(provider);
 		fDocumentProvider= provider;
 	}

@@ -24,7 +24,7 @@ public class DecoratingCLabelProvider extends DecoratingLabelProvider implements
 	 * with problem and override indicuator with the workbench decorator (label
 	 * decorator extension point).
 	 */
-	public DecoratingCLabelProvider(CUILabelProvider labelProvider) {
+	public DecoratingCLabelProvider(FortranUILabelProvider labelProvider) {
 		this(labelProvider, true);
 	}
 
@@ -33,7 +33,7 @@ public class DecoratingCLabelProvider extends DecoratingLabelProvider implements
 	 * (if enabled with problem indicator) with the workbench
 	 * decorator (label decorator extension point).
 	 */
-	public DecoratingCLabelProvider(CUILabelProvider labelProvider, boolean errorTick) {
+	public DecoratingCLabelProvider(FortranUILabelProvider labelProvider, boolean errorTick) {
 		super(labelProvider, PlatformUI.getWorkbench().getDecoratorManager().getLabelDecorator());
 		if (errorTick) {
 			labelProvider.addLabelDecorator(new ProblemsLabelDecorator(null));

@@ -40,9 +40,9 @@ public class TogglePresentationAction extends TextEditorAction implements IPrope
 	 * Constructs and updates the action.
 	 */
 	public TogglePresentationAction() {
-		super(CEditorMessages.getResourceBundle(), "TogglePresentation.", null); //$NON-NLS-1$
+		super(FortranEditorMessages.getResourceBundle(), "TogglePresentation.", null); //$NON-NLS-1$
 		FortranPluginImages.setImageDescriptors(this, FortranPluginImages.T_LCL, FortranPluginImages.IMG_MENU_SEGMENT_EDIT);
-		setToolTipText(CEditorMessages.getString("TogglePresentation.tooltip")); //$NON-NLS-1$
+		setToolTipText(FortranEditorMessages.getString("TogglePresentation.tooltip")); //$NON-NLS-1$
 		setActionDefinitionId(ITextEditorActionDefinitionIds.TOGGLE_SHOW_SELECTED_ELEMENT_ONLY);
 		WorkbenchHelp.setHelp(this,	ICHelpContextIds.TOGGLE_PRESENTATION_ACTION);		
 		update();

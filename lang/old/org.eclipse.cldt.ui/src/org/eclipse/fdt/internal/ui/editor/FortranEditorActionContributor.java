@@ -29,7 +29,7 @@ import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import org.eclipse.ui.texteditor.RetargetTextEditorAction;
 import org.eclipse.ui.texteditor.TextEditorAction;
 
-public class CEditorActionContributor extends TextEditorActionContributor {
+public class FortranEditorActionContributor extends TextEditorActionContributor {
 
 	protected static class SelectionAction extends TextEditorAction implements ISelectionChangedListener {
 		
@@ -38,7 +38,7 @@ public class CEditorActionContributor extends TextEditorActionContributor {
 		
 		
 		public SelectionAction(String prefix, int operation) {
-			super(CEditorMessages.getResourceBundle(), prefix, null);
+			super(FortranEditorMessages.getResourceBundle(), prefix, null);
 			fOperationCode= operation;
 			setEnabled(false);
 		}
@@ -94,10 +94,10 @@ public class CEditorActionContributor extends TextEditorActionContributor {
 	private GotoAnnotationAction fNextAnnotation;
 	
 	
-	public CEditorActionContributor() {
+	public FortranEditorActionContributor() {
 		super();
 		
-		ResourceBundle bundle = CEditorMessages.getResourceBundle();
+		ResourceBundle bundle = FortranEditorMessages.getResourceBundle();
 	
 		fShiftRight= new SelectionAction("ShiftRight.", ITextOperationTarget.SHIFT_RIGHT);		 //$NON-NLS-1$
 		fShiftRight.setActionDefinitionId(ITextEditorActionDefinitionIds.SHIFT_RIGHT);

@@ -73,7 +73,7 @@ public class GotoActionGroup extends FortranViewActionGroup {
 	}
 
 	protected void makeActions() {
-		FrameList frameList = getCView().getFrameList();
+		FrameList frameList = getFView().getFrameList();
 		goIntoAction = new GoIntoAction(frameList);
 		backAction = new BackAction(frameList);
 		forwardAction = new ForwardAction(frameList);

@@ -30,7 +30,7 @@ import org.eclipse.fdt.core.dom.ast.cpp.ICPPClassType;
 import org.eclipse.fdt.core.model.IWorkingCopy;
 import org.eclipse.fdt.core.parser.CodeReader;
 import org.eclipse.fdt.core.parser.ParserUtil;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementImageProvider;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.ITextViewer;
@@ -160,18 +160,18 @@ public class CCompletionProcessor2 implements IContentAssistProcessor {
 		
 		try {
 			if (binding instanceof ITypedef) {
-				imageDescriptor = CElementImageProvider.getTypedefImageDescriptor();
+				imageDescriptor = FortranElementImageProvider.getTypedefImageDescriptor();
 			} else if (binding instanceof ICompositeType) {
 				if (((ICompositeType)binding).getKey() == ICPPClassType.k_class)
-					imageDescriptor = CElementImageProvider.getClassImageDescriptor();
+					imageDescriptor = FortranElementImageProvider.getClassImageDescriptor();
 				else if (((ICompositeType)binding).getKey() == ICompositeType.k_struct)
-					imageDescriptor = CElementImageProvider.getStructImageDescriptor();
+					imageDescriptor = FortranElementImageProvider.getStructImageDescriptor();
 				else if (((ICompositeType)binding).getKey() == ICompositeType.k_union)
-					imageDescriptor = CElementImageProvider.getUnionImageDescriptor();
+					imageDescriptor = FortranElementImageProvider.getUnionImageDescriptor();
 			} else if (binding instanceof IFunction) {
-				imageDescriptor = CElementImageProvider.getFunctionImageDescriptor();
+				imageDescriptor = FortranElementImageProvider.getFunctionImageDescriptor();
 			} else if (binding instanceof IVariable) {
-				imageDescriptor = CElementImageProvider.getVariableImageDescriptor();
+				imageDescriptor = FortranElementImageProvider.getVariableImageDescriptor();
 			}
 		} catch (DOMException e) {
 		}

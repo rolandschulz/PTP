@@ -27,12 +27,12 @@
          point="org.eclipse.ui.newWizards">
 <!-- Managed Make Builder Projects -->
       <wizard
-            name="%MngCWizard.name"
-            icon="icons/full/wizban/newmngc_app.gif"
-            category="org.eclipse.fdt.ui.newCWizards"
+            name="%MngFortranWizard.name"
+            icon="icons/full/wizban/newmngf_app.gif"
+            category="org.eclipse.fdt.ui.newFortranWizards"
             class="org.eclipse.fdt.managedbuilder.ui.wizards.NewManagedFortranProjectWizard"
             project="true"
-            finalPerspective="org.eclipse.fdt.ui.CPerspective"
+            finalPerspective="org.eclipse.fdt.ui.FortranPerspective"
             id="org.eclipse.fdt.managedbuilder.ui.wizards.StdCWizard">
          <description>
             %MngCWizard.description

@@ -19,15 +19,15 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
 
-public abstract class NewCProjectWizardOptionPage extends WizardPage implements ICOptionContainer {
+public abstract class NewFortranProjectWizardOptionPage extends WizardPage implements ICOptionContainer {
 
 	private TabFolderOptionBlock fOptionBlock;
 
-	public NewCProjectWizardOptionPage(String pageName) {
+	public NewFortranProjectWizardOptionPage(String pageName) {
 		this(pageName, null, null);
 	}
 
-	public NewCProjectWizardOptionPage(String pageName, String title, ImageDescriptor titleImage) {
+	public NewFortranProjectWizardOptionPage(String pageName, String title, ImageDescriptor titleImage) {
 		super(pageName, title, titleImage);
 	}
 

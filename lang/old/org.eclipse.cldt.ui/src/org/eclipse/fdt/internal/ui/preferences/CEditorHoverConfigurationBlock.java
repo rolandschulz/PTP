@@ -151,11 +151,11 @@ public class CEditorHoverConfigurationBlock {
 	//private Button fShowHoverAffordanceCheckbox;
 	private Button fShowEditorAnnotationCheckbox;
 	
-	private CEditorPreferencePage fMainPreferencePage;
+	private FortranEditorPreferencePage fMainPreferencePage;
 
 	private StatusInfo fStatus;
 	
-	public CEditorHoverConfigurationBlock(CEditorPreferencePage mainPreferencePage, OverlayPreferenceStore store) {
+	public CEditorHoverConfigurationBlock(FortranEditorPreferencePage mainPreferencePage, OverlayPreferenceStore store) {
 		Assert.isNotNull(mainPreferencePage);
 		Assert.isNotNull(store);
 		fMainPreferencePage= mainPreferencePage;
@@ -204,7 +204,7 @@ public class CEditorHoverConfigurationBlock {
 		
 		// Disable/enable editor problem annotaion checkbox
 		fShowEditorAnnotationCheckbox = new Button(hoverComposite, SWT.CHECK);
-		fShowEditorAnnotationCheckbox.setText(PreferencesMessages.getString("CEditorPreferencePage.behaviourPage.EnableEditorProblemAnnotation")); //$NON-NLS-1$
+		fShowEditorAnnotationCheckbox.setText(PreferencesMessages.getString("FortranEditorPreferencePage.behaviourPage.EnableEditorProblemAnnotation")); //$NON-NLS-1$
 		gd= new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		gd.horizontalIndent= 0;
 		gd.horizontalSpan= 2;

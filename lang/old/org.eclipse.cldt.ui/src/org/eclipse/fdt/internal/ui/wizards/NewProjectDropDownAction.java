@@ -22,6 +22,6 @@ public class NewProjectDropDownAction extends AbstractWizardDropDownAction {
 	}
 	
 	protected IAction[] getWizardActions() {
-		return CWizardRegistry.getProjectWizardActions();
+		return FortranWizardRegistry.getProjectWizardActions();
 	}
 }

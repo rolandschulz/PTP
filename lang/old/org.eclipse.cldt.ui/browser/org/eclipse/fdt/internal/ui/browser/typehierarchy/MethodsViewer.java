@@ -18,7 +18,7 @@ import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.IMethodDeclaration;
 import org.eclipse.fdt.internal.ui.util.ProblemTableViewer;
 import org.eclipse.fdt.internal.ui.util.SelectionUtil;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementLabels;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementLabels;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.actions.MemberFilterActionGroup;
 import org.eclipse.jface.action.IMenuListener;
@@ -92,9 +92,9 @@ public class MethodsViewer extends ProblemTableViewer {
 		cprovider.showInheritedMethods(on);
 		fShowInheritedMembersAction.setChecked(on);
 		if (on) {
-		    fLabelProvider.setTextFlags(fLabelProvider.getTextFlags() | CElementLabels.T_POST_QUALIFIED);
+		    fLabelProvider.setTextFlags(fLabelProvider.getTextFlags() | FortranElementLabels.T_POST_QUALIFIED);
 		} else {
-		    fLabelProvider.setTextFlags(fLabelProvider.getTextFlags() & ~CElementLabels.T_POST_QUALIFIED);
+		    fLabelProvider.setTextFlags(fLabelProvider.getTextFlags() & ~FortranElementLabels.T_POST_QUALIFIED);
 		}
 		if (on) {
 			sortByDefiningTypeNoRedraw(false);

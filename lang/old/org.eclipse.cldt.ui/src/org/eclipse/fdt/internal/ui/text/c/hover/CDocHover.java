@@ -14,7 +14,7 @@ package org.eclipse.fdt.internal.ui.text.c.hover;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.internal.ui.FortranHelpProviderManager;
-import org.eclipse.fdt.internal.ui.editor.CEditorMessages;
+import org.eclipse.fdt.internal.ui.editor.FortranEditorMessages;
 import org.eclipse.fdt.internal.ui.text.FortranWordFinder;
 import org.eclipse.fdt.internal.ui.text.HTMLPrinter;
 import org.eclipse.fdt.ui.FortranUIPlugin;
@@ -70,12 +70,12 @@ public class CDocHover extends AbstractCEditorTextHover {
 
 			IFunctionSummary fs = FortranHelpProviderManager.getDefault().getFunctionInfo(context, expression);
 			if (fs != null) {
-				buffer.append(CEditorMessages.getString("DefaultCEditorTextHover.html.name")); //$NON-NLS-1$
+				buffer.append(FortranEditorMessages.getString("DefaultCEditorTextHover.html.name")); //$NON-NLS-1$
 				buffer.append(HTMLPrinter.convertToHTMLContent(fs.getName()));
-				buffer.append(CEditorMessages.getString("DefaultCEditorTextHover.html.prototype")); //$NON-NLS-1$
+				buffer.append(FortranEditorMessages.getString("DefaultCEditorTextHover.html.prototype")); //$NON-NLS-1$
 				buffer.append(HTMLPrinter.convertToHTMLContent(fs.getPrototype().getPrototypeString(false)));
 				if(fs.getDescription() != null) {
-					buffer.append(CEditorMessages.getString("DefaultCEditorTextHover.html.description")); //$NON-NLS-1$
+					buffer.append(FortranEditorMessages.getString("DefaultCEditorTextHover.html.description")); //$NON-NLS-1$
 					//Don't convert this description since it could already be formatted
 					buffer.append(fs.getDescription());
 				}

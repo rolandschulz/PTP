@@ -42,7 +42,7 @@ import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.IWorkingCopyManager;
 import org.eclipse.fdt.ui.PreferenceConstants;
 import org.eclipse.fdt.ui.actions.RefactoringActionGroup;
-import org.eclipse.fdt.ui.actions.ShowInCViewAction;
+import org.eclipse.fdt.ui.actions.ShowInFViewAction;
 import org.eclipse.fdt.ui.text.folding.ICFoldingStructureProvider;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -147,7 +147,7 @@ public class FortranEditor extends TextEditor implements ISelectionChangedListen
     /** Groups refactoring actions. */
 	private ActionGroup fRefactoringActionGroup;
     /** Action which shows selected element in FortranView. */
-	private ShowInCViewAction fShowInCViewAction;
+	private ShowInFViewAction fShowInCViewAction;
 	
 	/** Activity Listeners **/
 	protected ISelectionChangedListener fStatusLineClearer;
@@ -508,7 +508,7 @@ public class FortranEditor extends TextEditor implements ISelectionChangedListen
 					getSourceViewer().revealRange(start, length);
 					getSourceViewer().setSelectedRange(start, length);
 				}
-				updateStatusField(CTextEditorActionConstants.STATUS_CURSOR_POS);
+				updateStatusField(FortranTextEditorActionConstants.STATUS_CURSOR_POS);
 			}
 			return;
 		} catch (IllegalArgumentException x) {
@@ -641,41 +641,41 @@ public class FortranEditor extends TextEditor implements ISelectionChangedListen
 		action.setActionDefinitionId(ICEditorActionDefinitionIds.GOTO_MATCHING_BRACKET);				
 		setAction(GotoMatchingBracketAction.GOTO_MATCHING_BRACKET, action);
 
-		action = new TextOperationAction(CEditorMessages.getResourceBundle(), "Comment.", this, ITextOperationTarget.PREFIX); //$NON-NLS-1$
+		action = new TextOperationAction(FortranEditorMessages.getResourceBundle(), "Comment.", this, ITextOperationTarget.PREFIX); //$NON-NLS-1$
 		action.setActionDefinitionId(ICEditorActionDefinitionIds.COMMENT);
 		setAction("Comment", action); //$NON-NLS-1$
 		markAsStateDependentAction("Comment", true); //$NON-NLS-1$
 
-		action = new TextOperationAction(CEditorMessages.getResourceBundle(), "Uncomment.", this, ITextOperationTarget.STRIP_PREFIX); //$NON-NLS-1$
+		action = new TextOperationAction(FortranEditorMessages.getResourceBundle(), "Uncomment.", this, ITextOperationTarget.STRIP_PREFIX); //$NON-NLS-1$
 		action.setActionDefinitionId(ICEditorActionDefinitionIds.UNCOMMENT);
 		setAction("Uncomment", action); //$NON-NLS-1$
 		markAsStateDependentAction("Uncomment", true); //$NON-NLS-1$
 
-		action= new AddBlockCommentAction(CEditorMessages.getResourceBundle(), "AddBlockComment.", this);  //$NON-NLS-1$
+		action= new AddBlockCommentAction(FortranEditorMessages.getResourceBundle(), "AddBlockComment.", this);  //$NON-NLS-1$
 		action.setActionDefinitionId(ICEditorActionDefinitionIds.ADD_BLOCK_COMMENT);		
 		setAction("AddBlockComment", action); //$NON-NLS-1$
 		markAsStateDependentAction("AddBlockComment", true); //$NON-NLS-1$
 		markAsSelectionDependentAction("AddBlockComment", true); //$NON-NLS-1$		
 		//WorkbenchHelp.setHelp(action, ICHelpContextIds.ADD_BLOCK_COMMENT_ACTION);
 
-		action= new RemoveBlockCommentAction(CEditorMessages.getResourceBundle(), "RemoveBlockComment.", this);  //$NON-NLS-1$
+		action= new RemoveBlockCommentAction(FortranEditorMessages.getResourceBundle(), "RemoveBlockComment.", this);  //$NON-NLS-1$
 		action.setActionDefinitionId(ICEditorActionDefinitionIds.REMOVE_BLOCK_COMMENT);		
 		setAction("RemoveBlockComment", action); //$NON-NLS-1$
 		markAsStateDependentAction("RemoveBlockComment", true); //$NON-NLS-1$
 		markAsSelectionDependentAction("RemoveBlockComment", true); //$NON-NLS-1$		
 		//WorkbenchHelp.setHelp(action, ICHelpContextIds.REMOVE_BLOCK_COMMENT_ACTION);
 
-		action = new TextOperationAction(CEditorMessages.getResourceBundle(), "Format.", this, ISourceViewer.FORMAT); //$NON-NLS-1$
+		action = new TextOperationAction(FortranEditorMessages.getResourceBundle(), "Format.", this, ISourceViewer.FORMAT); //$NON-NLS-1$
 		action.setActionDefinitionId(ICEditorActionDefinitionIds.FORMAT);
 		setAction("Format", action); //$NON-NLS-1$
 		markAsStateDependentAction("Format", true); //$NON-NLS-1$
 
-		action = new ContentAssistAction(CEditorMessages.getResourceBundle(), "ContentAssistProposal.", this); //$NON-NLS-1$
+		action = new ContentAssistAction(FortranEditorMessages.getResourceBundle(), "ContentAssistProposal.", this); //$NON-NLS-1$
 		action.setActionDefinitionId(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
 		setAction("ContentAssistProposal", action); //$NON-NLS-1$
 		markAsStateDependentAction("ContentAssistProposal", true); //$NON-NLS-1$
 
-		action = new TextOperationAction(CEditorMessages.getResourceBundle(), "ContentAssistTip.", this, ISourceViewer.CONTENTASSIST_CONTEXT_INFORMATION); //$NON-NLS-1$
+		action = new TextOperationAction(FortranEditorMessages.getResourceBundle(), "ContentAssistTip.", this, ISourceViewer.CONTENTASSIST_CONTEXT_INFORMATION); //$NON-NLS-1$
 		action.setActionDefinitionId(ITextEditorActionDefinitionIds.CONTENT_ASSIST_CONTEXT_INFORMATION);
 		setAction("ContentAssistTip", action); //$NON-NLS-1$
 
@@ -691,20 +691,20 @@ public class FortranEditor extends TextEditor implements ISelectionChangedListen
 		action.setActionDefinitionId(ICEditorActionDefinitionIds.OPEN_TYPE_HIERARCHY);
 		setAction("OpenTypeHierarchy", action); //$NON-NLS-1$
 
-		fShowInCViewAction = new ShowInCViewAction(this);
+		fShowInCViewAction = new ShowInFViewAction(this);
 		action = fShowInCViewAction;
 		action.setActionDefinitionId(ICEditorActionDefinitionIds.OPEN_CVIEW);
 		setAction("ShowInCView", action); //$NON-NLS-1$
         
-        action = new TextOperationAction(CEditorMessages.getResourceBundle(), "OpenOutline.", this, FortranSourceViewer.SHOW_OUTLINE);
+        action = new TextOperationAction(FortranEditorMessages.getResourceBundle(), "OpenOutline.", this, FortranSourceViewer.SHOW_OUTLINE);
         action.setActionDefinitionId(ICEditorActionDefinitionIds.OPEN_OUTLINE);
         setAction("OpenOutline", action); //$NON-NLS-1$*/
         
-        action = new GoToNextPreviousMemberAction(CEditorMessages.getResourceBundle(), "GotoNextMember.", this, true);
+        action = new GoToNextPreviousMemberAction(FortranEditorMessages.getResourceBundle(), "GotoNextMember.", this, true);
         action.setActionDefinitionId(ICEditorActionDefinitionIds.GOTO_NEXT_MEMBER);
         setAction("GotoNextMember", action); //$NON-NLS-1$*/
 
-        action = new GoToNextPreviousMemberAction(CEditorMessages.getResourceBundle(), "GotoPrevMember.", this, false);
+        action = new GoToNextPreviousMemberAction(FortranEditorMessages.getResourceBundle(), "GotoPrevMember.", this, false);
         action.setActionDefinitionId(ICEditorActionDefinitionIds.GOTO_PREVIOUS_MEMBER);
         setAction("GotoPrevMember", action); //$NON-NLS-1$*/
 
@@ -856,7 +856,7 @@ public class FortranEditor extends TextEditor implements ISelectionChangedListen
 
 		int selectionLength= Math.abs(selection.getLength());
 		if (selectionLength > 1) {
-			setStatusLineErrorMessage(CEditorMessages.getString("GotoMatchingBracket.error.invalidSelection"));	//$NON-NLS-1$		
+			setStatusLineErrorMessage(FortranEditorMessages.getString("GotoMatchingBracket.error.invalidSelection"));	//$NON-NLS-1$		
 			sourceViewer.getTextWidget().getDisplay().beep();
 			return;
 		}
@@ -868,7 +868,7 @@ public class FortranEditor extends TextEditor implements ISelectionChangedListen
 
 		IRegion region= fBracketMatcher.match(document, sourceCaretOffset);
 		if (region == null) {
-			setStatusLineErrorMessage(CEditorMessages.getString("GotoMatchingBracket.error.noMatchingBracket"));	//$NON-NLS-1$		
+			setStatusLineErrorMessage(FortranEditorMessages.getString("GotoMatchingBracket.error.noMatchingBracket"));	//$NON-NLS-1$		
 			sourceViewer.getTextWidget().getDisplay().beep();
 			return;		
 		}
@@ -894,7 +894,7 @@ public class FortranEditor extends TextEditor implements ISelectionChangedListen
 		}
 		
 		if (!visible) {
-			setStatusLineErrorMessage(CEditorMessages.getString("GotoMatchingBracket.error.bracketOutsideSelectedElement"));	//$NON-NLS-1$		
+			setStatusLineErrorMessage(FortranEditorMessages.getString("GotoMatchingBracket.error.bracketOutsideSelectedElement"));	//$NON-NLS-1$		
 			sourceViewer.getTextWidget().getDisplay().beep();
 			return;
 		}
@@ -1108,8 +1108,8 @@ public class FortranEditor extends TextEditor implements ISelectionChangedListen
 	private void configureTabConverter() {
 		if (fTabConverter != null) {
 			IDocumentProvider provider= getDocumentProvider();
-			if (provider instanceof CDocumentProvider) {
-				CDocumentProvider prov= (CDocumentProvider) provider;
+			if (provider instanceof FortranDocumentProvider) {
+				FortranDocumentProvider prov= (FortranDocumentProvider) provider;
 				fTabConverter.setLineTracker(prov.createLineTracker(getEditorInput()));
 			} else {
 				fTabConverter.setLineTracker(new DefaultLineTracker());

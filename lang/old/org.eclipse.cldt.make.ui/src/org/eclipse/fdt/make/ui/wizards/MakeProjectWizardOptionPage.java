@@ -18,8 +18,8 @@ import org.eclipse.fdt.ui.dialogs.ICOptionPage;
 import org.eclipse.fdt.ui.dialogs.IndexerBlock;
 import org.eclipse.fdt.ui.dialogs.ReferenceBlock;
 import org.eclipse.fdt.ui.dialogs.TabFolderOptionBlock;
-import org.eclipse.fdt.ui.wizards.NewCProjectWizard;
-import org.eclipse.fdt.ui.wizards.NewCProjectWizardOptionPage;
+import org.eclipse.fdt.ui.wizards.NewFortranProjectWizard;
+import org.eclipse.fdt.ui.wizards.NewFortranProjectWizardOptionPage;
 import org.eclipse.ui.help.WorkbenchHelp;
 
 /**
@@ -36,7 +36,7 @@ import org.eclipse.ui.help.WorkbenchHelp;
  * </pre>
  * </p>
  */
-public class MakeProjectWizardOptionPage extends NewCProjectWizardOptionPage {
+public class MakeProjectWizardOptionPage extends NewFortranProjectWizardOptionPage {
 	MakeWizardOptionBlock makeWizardBlock; 
 	
 	public class MakeWizardOptionBlock extends MakeProjectOptionBlock {
@@ -84,7 +84,7 @@ public class MakeProjectWizardOptionPage extends NewCProjectWizardOptionPage {
 	}
 
 	public IProject getProject() {
-		return ((NewCProjectWizard)getWizard()).getNewProject();
+		return ((NewFortranProjectWizard)getWizard()).getNewProject();
 	}
 
 	/* (non-Javadoc)

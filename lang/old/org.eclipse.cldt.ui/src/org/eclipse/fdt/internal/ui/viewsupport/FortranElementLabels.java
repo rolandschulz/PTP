@@ -33,7 +33,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
  * To change the template for this generated type comment go to
  * Window>Preferences>Java>Code Generation>Code and Comments
  */
-public class CElementLabels {
+public class FortranElementLabels {
 
 	/**
 	 * Method names contain parameter types.
@@ -250,9 +250,9 @@ public class CElementLabels {
 	public final static int DEFAULT_POST_QUALIFIED= F_POST_QUALIFIED | M_POST_QUALIFIED | I_POST_QUALIFIED | T_POST_QUALIFIED | D_POST_QUALIFIED | CF_POST_QUALIFIED | CU_POST_QUALIFIED;
 
 
-	public final static String CONCAT_STRING= FortranUIMessages.getString("CElementLabels.concat_string"); // " - "; //$NON-NLS-1$
-	public final static String COMMA_STRING = FortranUIMessages.getString("CElementLabels.comma_string"); // ", "; //$NON-NLS-1$
-	public final static String DECL_STRING  = FortranUIMessages.getString("CElementLabels.declseparator_string"); // "  "; // use for return type //$NON-NLS-1$
+	public final static String CONCAT_STRING= FortranUIMessages.getString("FortranElementLabels.concat_string"); // " - "; //$NON-NLS-1$
+	public final static String COMMA_STRING = FortranUIMessages.getString("FortranElementLabels.comma_string"); // ", "; //$NON-NLS-1$
+	public final static String DECL_STRING  = FortranUIMessages.getString("FortranElementLabels.declseparator_string"); // "  "; // use for return type //$NON-NLS-1$
 
 	public static String getTextLabel(Object obj, int flags) {
 		if (obj instanceof ICElement) {
@@ -471,7 +471,7 @@ public class CElementLabels {
 		
 		String typeName= elem.getElementName();
 		if (typeName.length() == 0) { // anonymous
-		    typeName = FortranUIMessages.getString("CElementLabels.anonymous");	//$NON-NLS-1$
+		    typeName = FortranUIMessages.getString("FortranElementLabels.anonymous");	//$NON-NLS-1$
 		}
 		buf.append(typeName);
 		

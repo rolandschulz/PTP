@@ -7,7 +7,7 @@ package org.eclipse.fdt.internal.ui.text;
 
 import org.eclipse.fdt.internal.ui.text.IFortranColorConstants;
 import org.eclipse.fdt.internal.ui.text.IFortranPartitions;
-import org.eclipse.fdt.internal.ui.text.util.CColorManager;
+import org.eclipse.fdt.internal.ui.text.util.FortranColorManager;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 
 import org.eclipse.core.runtime.Preferences;
@@ -39,7 +39,7 @@ public class FortranTextTools {
 	}
 	
 	/** The color manager */
-	private CColorManager fColorManager;
+	private FortranColorManager fColorManager;
 	/** The Fortran source code scanner */
 	private FortranCodeScanner fCodeScanner;
 	/** The Fortran partitions scanner */
@@ -81,7 +81,7 @@ public class FortranTextTools {
             fCorePreferenceStore.addPropertyChangeListener(fPreferenceListener);
         }
 		
-		fColorManager= new CColorManager();
+		fColorManager= new FortranColorManager();
 		fCodeScanner= new FortranCodeScanner(fColorManager, store);
 		fPartitionScanner= new FastFortranPartitionScanner();
 		
@@ -130,7 +130,7 @@ public class FortranTextTools {
 	/**
 	 * Gets the color manager.
 	 */
-	public CColorManager getColorManager() {
+	public FortranColorManager getColorManager() {
 		return fColorManager;
 	}
 	

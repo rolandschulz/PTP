@@ -11,14 +11,14 @@
 package org.eclipse.fdt.internal.ui.browser.cbrowsing;
 
 import org.eclipse.fdt.internal.ui.viewsupport.AppearanceAwareLabelProvider;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementLabels;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementImageProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementLabels;
 import org.eclipse.swt.graphics.Image;
 
 class CBrowsingLabelProvider extends AppearanceAwareLabelProvider {
 
-	private static final int TEXTFLAGS = DEFAULT_TEXTFLAGS | CElementLabels.F_APP_TYPE_SIGNATURE;
-    private static final int IMAGEFLAGS = DEFAULT_IMAGEFLAGS | CElementImageProvider.SMALL_ICONS;
+	private static final int TEXTFLAGS = DEFAULT_TEXTFLAGS | FortranElementLabels.F_APP_TYPE_SIGNATURE;
+    private static final int IMAGEFLAGS = DEFAULT_IMAGEFLAGS | FortranElementImageProvider.SMALL_ICONS;
 
     CBrowsingLabelProvider() {
         super(TEXTFLAGS, IMAGEFLAGS);

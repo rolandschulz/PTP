@@ -11,7 +11,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.IParent;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementImageProvider;
 import org.eclipse.fdt.ui.CElementLabelProvider;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 
@@ -21,11 +21,11 @@ import org.eclipse.fdt.ui.FortranUIPlugin;
 public class FortranWorkbenchAdapter implements IWorkbenchAdapter {
 
 	private static final Object[] fgEmptyArray = new Object[0];
-	private CElementImageProvider fImageProvider;
+	private FortranElementImageProvider fImageProvider;
 	private CElementLabelProvider fLabelProvider;
 
 	public FortranWorkbenchAdapter() {
-		fImageProvider = new CElementImageProvider();
+		fImageProvider = new FortranElementImageProvider();
 		fLabelProvider = new CElementLabelProvider();
 	}
 
@@ -53,7 +53,7 @@ public class FortranWorkbenchAdapter implements IWorkbenchAdapter {
 		if (element instanceof ICElement) {
 			return fImageProvider.getCImageDescriptor(
 				(ICElement) element,
-				CElementImageProvider.OVERLAY_ICONS | CElementImageProvider.SMALL_ICONS);
+				FortranElementImageProvider.OVERLAY_ICONS | FortranElementImageProvider.SMALL_ICONS);
 		}
 		return null;
 	}

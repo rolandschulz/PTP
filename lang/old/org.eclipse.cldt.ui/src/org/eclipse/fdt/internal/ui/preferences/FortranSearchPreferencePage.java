@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class CSearchPreferencePage extends PreferencePage
+public class FortranSearchPreferencePage extends PreferencePage
 		implements
 			IWorkbenchPreferencePage {
 	
@@ -47,7 +47,7 @@ public class CSearchPreferencePage extends PreferencePage
 	
 	private static final String TIMEOUT_VALUE = "20000"; //$NON-NLS-1$
 	
-	public CSearchPreferencePage(){
+	public FortranSearchPreferencePage(){
 		setPreferenceStore(FortranUIPlugin.getDefault().getPreferenceStore());
 		fOverlayStore  = createOverlayStore();
 	}

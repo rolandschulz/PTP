@@ -127,7 +127,7 @@ public class OpenProjectGroup extends FortranViewActionGroup {
 	}
 
 	protected void makeActions() {
-		Shell shell = getCView().getSite().getShell();
+		Shell shell = getFView().getSite().getShell();
 		IWorkspace workspace = FortranUIPlugin.getWorkspace();
 
 		openProjectAction = new OpenResourceAction(shell);

@@ -32,8 +32,8 @@ import org.eclipse.fdt.internal.ui.actions.CompositeActionGroup;
 import org.eclipse.fdt.internal.ui.actions.SelectAllAction;
 import org.eclipse.fdt.internal.ui.util.EditorUtility;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementLabels;
-import org.eclipse.fdt.internal.ui.viewsupport.CUILabelProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementLabels;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranUILabelProvider;
 import org.eclipse.fdt.internal.ui.viewsupport.IViewPartInputProvider;
 import org.eclipse.fdt.internal.ui.viewsupport.StatusBarUpdater;
 import org.eclipse.fdt.internal.ui.workingsets.WorkingSetFilterActionGroup;
@@ -173,7 +173,7 @@ public class TypeHierarchyViewPart extends ViewPart implements ITypeHierarchyVie
 	private ViewForm fMethodViewerViewForm;
 	
 	private CLabel fMethodViewerPaneLabel;
-	private CUILabelProvider fPaneLabelProvider;
+	private FortranUILabelProvider fPaneLabelProvider;
 	private Composite fParent;
 	
 	private ToggleViewAction[] fViewActions;
@@ -241,7 +241,7 @@ public class TypeHierarchyViewPart extends ViewPart implements ITypeHierarchyVie
 		
 		fFocusOnTypeAction= new FocusOnTypeAction(this);
 		
-		fPaneLabelProvider= new CUILabelProvider();
+		fPaneLabelProvider= new FortranUILabelProvider();
 //		
 //		fAddStubAction= new AddMethodStubAction();
 		fFocusOnSelectionAction= new FocusOnSelectionAction(this);	
@@ -1165,7 +1165,7 @@ public class TypeHierarchyViewPart extends ViewPart implements ITypeHierarchyVie
 	    }
 			
 		if (fInputElement != null) {
-			String[] args= new String[] { viewerTitle, CElementLabels.getElementLabel(fInputElement, CElementLabels.ALL_DEFAULT) };
+			String[] args= new String[] { viewerTitle, FortranElementLabels.getElementLabel(fInputElement, FortranElementLabels.ALL_DEFAULT) };
 			title= TypeHierarchyMessages.getFormattedString("TypeHierarchyViewPart.title", args); //$NON-NLS-1$
 			tooltip= TypeHierarchyMessages.getFormattedString("TypeHierarchyViewPart.tooltip", args); //$NON-NLS-1$
 		} else {

@@ -23,11 +23,11 @@ import org.eclipse.fdt.ui.dialogs.ICOptionPage;
 import org.eclipse.fdt.ui.dialogs.IndexerBlock;
 import org.eclipse.fdt.ui.dialogs.ReferenceBlock;
 import org.eclipse.fdt.ui.dialogs.TabFolderOptionBlock;
-import org.eclipse.fdt.ui.wizards.NewCProjectWizard;
-import org.eclipse.fdt.ui.wizards.NewCProjectWizardOptionPage;
+import org.eclipse.fdt.ui.wizards.NewFortranProjectWizard;
+import org.eclipse.fdt.ui.wizards.NewFortranProjectWizardOptionPage;
 import org.eclipse.ui.help.WorkbenchHelp;
 
-public class NewManagedProjectOptionPage extends NewCProjectWizardOptionPage {
+public class NewManagedProjectOptionPage extends NewFortranProjectWizardOptionPage {
 	
 
 	public class ManagedWizardOptionBlock extends ManagedProjectOptionBlock {
@@ -98,7 +98,7 @@ public class NewManagedProjectOptionPage extends NewCProjectWizardOptionPage {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.fdt.ui.wizards.NewCProjectWizardOptionPage#createOptionBlock()
+	 * @see org.eclipse.fdt.ui.wizards.NewFortranProjectWizardOptionPage#createOptionBlock()
 	 */
 	protected TabFolderOptionBlock createOptionBlock() {
 		return optionBlock;
@@ -108,7 +108,7 @@ public class NewManagedProjectOptionPage extends NewCProjectWizardOptionPage {
 	 * @see org.eclipse.fdt.ui.dialogs.ICOptionContainer#getProject()
 	 */
 	public IProject getProject() {
-		return ((NewCProjectWizard)getWizard()).getNewProject();
+		return ((NewFortranProjectWizard)getWizard()).getNewProject();
 	}
 
 	/* (non-Javadoc)

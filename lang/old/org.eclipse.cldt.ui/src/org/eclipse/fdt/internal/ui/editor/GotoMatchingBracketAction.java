@@ -26,7 +26,7 @@ public class GotoMatchingBracketAction extends Action {
 	private final FortranEditor fEditor;
 	
 	public GotoMatchingBracketAction(FortranEditor editor) {
-		super(CEditorMessages.getString("GotoMatchingBracket.label")); //$NON-NLS-1$
+		super(FortranEditorMessages.getString("GotoMatchingBracket.label")); //$NON-NLS-1$
 		Assert.isNotNull(editor);
 		fEditor= editor;
 		setEnabled(true);

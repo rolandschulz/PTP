@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.IIncludeReference;
 import org.eclipse.fdt.core.model.ITranslationUnit;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementImageProvider;
 import org.eclipse.fdt.internal.ui.viewsupport.StandardCElementLabelProvider;
 import org.eclipse.fdt.ui.CElementImageDescriptor;
 import org.eclipse.fdt.ui.FortranUIPlugin;
@@ -83,13 +83,13 @@ public class FortranViewLabelProvider extends StandardCElementLabelProvider {
 			IPath path = reference.getPath();
 			IContainer container = reference.getCModel().getWorkspace().getRoot().getContainerForLocation(path);
 			if (container != null && container.isAccessible()) {
-				ImageDescriptor desc = CElementImageProvider.getImageDescriptor(ICElement.C_PROJECT);
-				desc = new CElementImageDescriptor(desc, 0, CElementImageProvider.SMALL_SIZE);
+				ImageDescriptor desc = FortranElementImageProvider.getImageDescriptor(ICElement.C_PROJECT);
+				desc = new CElementImageDescriptor(desc, 0, FortranElementImageProvider.SMALL_SIZE);
 				return FortranUIPlugin.getImageDescriptorRegistry().get(desc);
 			}
 		} else if (element instanceof IIncludeReference) {
-			ImageDescriptor desc = CElementImageProvider.getImageDescriptor(ICElement.C_CCONTAINER);
-			desc = new CElementImageDescriptor(desc, 0, CElementImageProvider.SMALL_SIZE);
+			ImageDescriptor desc = FortranElementImageProvider.getImageDescriptor(ICElement.C_CCONTAINER);
+			desc = new CElementImageDescriptor(desc, 0, FortranElementImageProvider.SMALL_SIZE);
 			return FortranUIPlugin.getImageDescriptorRegistry().get(desc);
 		}
 		return super.getImage(element);

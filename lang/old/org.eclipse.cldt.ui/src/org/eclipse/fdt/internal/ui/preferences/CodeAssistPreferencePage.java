@@ -82,60 +82,60 @@ public class CodeAssistPreferencePage extends AbstractPreferencePage {
 		
 		//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 		// The following three radio buttons are grouped together
-		String label = PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.searchGroupTitle"); //$NON-NLS-1$
+		String label = PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.searchGroupTitle"); //$NON-NLS-1$
 		Group searchGroup = addGroupBox(contentAssistComposite, label, 2);
 		
-		label= PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.searchGroupCurrentFileOption"); //$NON-NLS-1$
+		label= PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.searchGroupCurrentFileOption"); //$NON-NLS-1$
 		addRadioButton(searchGroup, label, ContentAssistPreference.CURRENT_FILE_SEARCH_SCOPE, 0);
 		
-		label= PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.searchGroupCurrentProjectOption"); //$NON-NLS-1$
+		label= PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.searchGroupCurrentProjectOption"); //$NON-NLS-1$
 		addRadioButton(searchGroup, label, ContentAssistPreference.PROJECT_SEARCH_SCOPE, 0);
 		
 		//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-		label = PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.insertionGroupTitle"); //$NON-NLS-1$
+		label = PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.insertionGroupTitle"); //$NON-NLS-1$
 		Group insertionGroup = addGroupBox(contentAssistComposite, label, 2);
 		
-		label = PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.insertSingleProposalAutomatically"); //$NON-NLS-1$
+		label = PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.insertSingleProposalAutomatically"); //$NON-NLS-1$
 		addCheckBox(insertionGroup, label, ContentAssistPreference.AUTOINSERT, 0);
 
-		label = PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.insertCommonProposalAutomatically"); //$NON-NLS-1$
+		label = PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.insertCommonProposalAutomatically"); //$NON-NLS-1$
 		addCheckBox(insertionGroup, label, ContentAssistPreference.CODEASSIST_PREFIX_COMPLETION, 0);
 		
-		label= PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.showProposalsInAlphabeticalOrder"); //$NON-NLS-1$
+		label= PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.showProposalsInAlphabeticalOrder"); //$NON-NLS-1$
 		addCheckBox(insertionGroup, label, ContentAssistPreference.ORDER_PROPOSALS, 0);
 
-		label = PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.timeoutDelay"); //$NON-NLS-1$
+		label = PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.timeoutDelay"); //$NON-NLS-1$
 		addTextField(insertionGroup, label, ContentAssistPreference.TIMEOUT_DELAY, 6, 0, true);
 
 
 		//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 		// The following items are grouped for Auto Activation
-		label = PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.autoActivationGroupTitle"); //$NON-NLS-1$
+		label = PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.autoActivationGroupTitle"); //$NON-NLS-1$
 		Group enableGroup = addGroupBox(contentAssistComposite, label, 2);
 		
-		label = PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.autoActivationEnableDot"); //$NON-NLS-1$
+		label = PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.autoActivationEnableDot"); //$NON-NLS-1$
 		addCheckBox(enableGroup, label, ContentAssistPreference.AUTOACTIVATION_TRIGGERS_DOT, 0);
 
-		label = PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.autoActivationEnableArrow"); //$NON-NLS-1$
+		label = PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.autoActivationEnableArrow"); //$NON-NLS-1$
 		addCheckBox(enableGroup, label, ContentAssistPreference.AUTOACTIVATION_TRIGGERS_ARROW, 0);
 		
-		label = PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.autoActivationEnableDoubleColon"); //$NON-NLS-1$
+		label = PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.autoActivationEnableDoubleColon"); //$NON-NLS-1$
 		addCheckBox(enableGroup, label, ContentAssistPreference.AUTOACTIVATION_TRIGGERS_DOUBLECOLON, 0);
 		
-		label = PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.autoActivationDelay"); //$NON-NLS-1$
+		label = PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.autoActivationDelay"); //$NON-NLS-1$
 		addTextField(enableGroup, label, ContentAssistPreference.AUTOACTIVATION_DELAY, 4, 0, true);
 
 		//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&		
-		label = PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.completionProposalBackgroundColor"); //$NON-NLS-1$
+		label = PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.completionProposalBackgroundColor"); //$NON-NLS-1$
 		addColorButton(contentAssistComposite, label, ContentAssistPreference.PROPOSALS_BACKGROUND, 0);
 
-		label= PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.completionProposalForegroundColor"); //$NON-NLS-1$
+		label= PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.completionProposalForegroundColor"); //$NON-NLS-1$
 		addColorButton(contentAssistComposite, label, ContentAssistPreference.PROPOSALS_FOREGROUND, 0);
 
-//		label= PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.parameterBackgroundColor"); 
+//		label= PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.parameterBackgroundColor"); 
 //		addColorButton(contentAssistComposite, label, ContentAssistPreference.PARAMETERS_BACKGROUND, 0);
 //
-//		label= PreferencesMessages.getString("CEditorPreferencePage.ContentAssistPage.parameterForegroundColor");
+//		label= PreferencesMessages.getString("FortranEditorPreferencePage.ContentAssistPage.parameterForegroundColor");
 //		addColorButton(contentAssistComposite, label, ContentAssistPreference.PARAMETERS_FOREGROUND, 0);
 
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(contentAssistComposite, ICHelpContextIds.C_EDITOR_CONTENT_ASSIST_PREF_PAGE);

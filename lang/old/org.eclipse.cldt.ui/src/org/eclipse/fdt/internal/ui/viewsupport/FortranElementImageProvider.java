@@ -37,7 +37,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 /**
  * Default strategy of the C plugin for the construction of C element icons.
  */
-public class CElementImageProvider {
+public class FortranElementImageProvider {
 	
 	/**
 	 * Flags for the CImageLabelProvider:
@@ -88,7 +88,7 @@ public class CElementImageProvider {
 		//DESC_OBJ_FOLDER= 		 images.getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER);
 	}
 	
-	public CElementImageProvider() {
+	public FortranElementImageProvider() {
 	}	
 		
 	/**

@@ -114,7 +114,7 @@
   		 	  label="%ContextualDebugApplication.label"/>
   		 </contextualLaunch>
          <perspective
-               id="org.eclipse.fdt.ui.CPerspective">
+               id="org.eclipse.fdt.ui.FortranPerspective">
          </perspective>
          <perspective
                id="org.eclipse.debug.ui.DebugPerspective">

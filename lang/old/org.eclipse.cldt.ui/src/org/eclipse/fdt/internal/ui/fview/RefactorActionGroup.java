@@ -107,8 +107,8 @@ public class RefactorActionGroup extends FortranViewActionGroup {
 	}
 
 	protected void makeActions() {
-		TreeViewer treeViewer = getCView().getViewer();
-		Shell shell = getCView().getSite().getShell();
+		TreeViewer treeViewer = getFView().getViewer();
+		Shell shell = getFView().getSite().getShell();
 		clipboard = new Clipboard(shell.getDisplay());
 		
 		pasteAction = new PasteAction(shell, clipboard);

@@ -19,11 +19,11 @@ import org.eclipse.jface.util.PropertyChangeEvent;
  * JavaUILabelProvider that respects settings from the Appearance preference page.
  * Triggers a viewer update when a preference changes.
  */
-public class AppearanceAwareLabelProvider extends CUILabelProvider implements IPropertyChangeListener {
+public class AppearanceAwareLabelProvider extends FortranUILabelProvider implements IPropertyChangeListener {
 
-	public final static int DEFAULT_TEXTFLAGS= CElementLabels.ROOT_VARIABLE | CElementLabels.M_PARAMETER_TYPES |  
-		CElementLabels.M_APP_RETURNTYPE | CElementLabels.REFERENCED_ROOT_POST_QUALIFIED;
-	public final static int DEFAULT_IMAGEFLAGS= CElementImageProvider.OVERLAY_ICONS;
+	public final static int DEFAULT_TEXTFLAGS= FortranElementLabels.ROOT_VARIABLE | FortranElementLabels.M_PARAMETER_TYPES |  
+		FortranElementLabels.M_APP_RETURNTYPE | FortranElementLabels.REFERENCED_ROOT_POST_QUALIFIED;
+	public final static int DEFAULT_IMAGEFLAGS= FortranElementImageProvider.OVERLAY_ICONS;
 	
 	private int fTextFlagMask;
 	private int fImageFlagMask;
@@ -48,10 +48,10 @@ public class AppearanceAwareLabelProvider extends CUILabelProvider implements IP
 		IPreferenceStore store= PreferenceConstants.getPreferenceStore();
 		fTextFlagMask= -1;
 //		if (!store.getBoolean(PreferenceConstants.APPEARANCE_METHOD_RETURNTYPE)) {
-//			fTextFlagMask ^= CElementLabels.M_APP_RETURNTYPE;
+//			fTextFlagMask ^= FortranElementLabels.M_APP_RETURNTYPE;
 //		}
 //		if (!store.getBoolean(PreferenceConstants.APPEARANCE_COMPRESS_PACKAGE_NAMES)) {
-//			fTextFlagMask ^= CElementLabels.P_COMPRESSED;
+//			fTextFlagMask ^= FortranElementLabels.P_COMPRESSED;
 //		}
 		
 		fImageFlagMask= -1;

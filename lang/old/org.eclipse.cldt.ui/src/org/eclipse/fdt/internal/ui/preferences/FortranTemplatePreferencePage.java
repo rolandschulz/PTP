@@ -31,11 +31,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.templates.TemplatePreferencePage;
 
 /**
- * CTemplatePreferencePage
+ * FortranTemplatePreferencePage
  */
-public class CTemplatePreferencePage extends TemplatePreferencePage {
+public class FortranTemplatePreferencePage extends TemplatePreferencePage {
 
-	public CTemplatePreferencePage() {
+	public FortranTemplatePreferencePage() {
 		setPreferenceStore(FortranUIPlugin.getDefault().getPreferenceStore());
 		setTemplateStore(FortranUIPlugin.getDefault().getTemplateStore());
 		setContextTypeRegistry(FortranUIPlugin.getDefault().getTemplateContextRegistry());

@@ -41,7 +41,7 @@
 <!-- =========================================================================== -->
 <!-- Extension point: org.eclipse.fdt.ui.textHovers                        -->
 <!-- Extension Implementation: must implement org.eclipse.jface.text.ITextHover  -->
-<!-- Purpose: Provide a perspective specific text hovering for CEditor files     -->
+<!-- Purpose: Provide a perspective specific text hovering for FortranEditor files     -->
 <!-- =========================================================================== -->
    <extension-point id="textHovers" name="%textHoversName"/>
 
@@ -70,65 +70,65 @@
          point="org.eclipse.fdt.ui.CElementFilters">
 <!-- Implement our filters for C-View.  -->
       <filter
-            targetId="org.eclipse.fdt.ui.CView"
+            targetId="org.eclipse.fdt.ui.FortranView"
             selected="true"
             pattern=".*">
       </filter>
       <filter
-            targetId="org.eclipse.fdt.ui.CView"
-            name="%HideExecutableFiles.label"
-            enabled="false"
-            description="%HideExecutableFiles.description"
             class="org.eclipse.fdt.internal.ui.filters.ExecutableFilter"
-            id="org.eclipse.fdt.internal.ui.CView.ExecutableFilter">
+            description="%HideExecutableFiles.description"
+            enabled="false"
+            id="org.eclipse.fdt.internal.ui.FortranView.ExecutableFilter"
+            name="%HideExecutableFiles.label"
+            targetId="org.eclipse.fdt.ui.FortranView">
       </filter>
       <filter
-            targetId="org.eclipse.fdt.ui.CView"
+            targetId="org.eclipse.fdt.ui.FortranView"
             name="%HideSharedFiles.label"
             enabled="false"
             description="%HideSharedFiles.description"
             class="org.eclipse.fdt.internal.ui.filters.SharedFilter"
-            id="org.eclipse.fdt.internal.ui.CView.SharedFilter">
+            id="org.eclipse.fdt.internal.ui.FortranView.SharedFilter">
       </filter>
       <filter
-            targetId="org.eclipse.fdt.ui.CView"
+            targetId="org.eclipse.fdt.ui.FortranView"
             name="%HideObjectFiles.label"
             enabled="false"
             description="%HideObjectFiles.description"
             class="org.eclipse.fdt.internal.ui.filters.ObjectFilter"
-            id="org.eclipse.fdt.internal.ui.CView.ObjectFilter">
+            id="org.eclipse.fdt.internal.ui.FortranView.ObjectFilter">
       </filter>
       <filter
-            targetId="org.eclipse.fdt.ui.CView"
+            targetId="org.eclipse.fdt.ui.FortranView"
             name="%HideArchiveFiles.label"
             enabled="false"
             description="%HideArchiveFiles.description"
             class="org.eclipse.fdt.internal.ui.filters.ArchiveFilter"
-            id="org.eclipse.fdt.internal.ui.CView.ArchiveFilter">
+            id="org.eclipse.fdt.internal.ui.FortranView.ArchiveFilter">
       </filter>
       <filter
-            targetId="org.eclipse.fdt.ui.CView"
+            targetId="org.eclipse.fdt.ui.FortranView"
             name="%HideClosedProjects.label"
             enabled="false"
             description="%HideClosedProjects.description"
             class="org.eclipse.fdt.internal.ui.filters.ClosedProjectFilter"
-            id="org.eclipse.fdt.internal.ui.CView.ClosedProjectFilter">
+            id="org.eclipse.fdt.internal.ui.FortranView.ClosedProjectFilter">
       </filter>
       <filter
-            targetId="org.eclipse.fdt.ui.CView"
+            targetId="org.eclipse.fdt.ui.FortranView"
             name="%HideNonCProjects.label"
             enabled="false"
             description="%HideNonCProjects.description"
             class="org.eclipse.fdt.internal.ui.filters.NonCProjectsFilter"
-            id="org.eclipse.fdt.internal.ui.CView.NonCProjectsFilter">
+            id="org.eclipse.fdt.internal.ui.FortranView.NonCProjectsFilter">
       </filter>
       <filter
-            targetId="org.eclipse.fdt.ui.CView"
+            targetId="org.eclipse.fdt.ui.FortranView"
             name="%HideNonCElements.label"
             enabled="false"
             description="%HideNonCElements.description"
             class="org.eclipse.fdt.internal.ui.filters.NonCElementFilter"
-            id="org.eclipse.fdt.internal.ui.CView.NonCElementFilter">
+            id="org.eclipse.fdt.internal.ui.FortranView.NonCElementFilter">
       </filter>
 <!-- Outline Page -->
       <filter
@@ -186,9 +186,9 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             name="%perspective.name"
-            icon="icons/full/cview16/c_pers.gif"
+            icon="icons/full/cview16/f_pers.gif"
             class="org.eclipse.fdt.internal.ui.FortranPerspectiveFactory"
-            id="org.eclipse.fdt.ui.CPerspective">
+            id="org.eclipse.fdt.ui.FortranPerspective">
       </perspective>
       <perspective
             name="%CBrowsing.perspective.name"
@@ -208,7 +208,7 @@
       <perspectiveExtension
             targetID="org.eclipse.ui.resourcePerspective">
          <perspectiveShortcut
-               id="org.eclipse.fdt.ui.CPerspective">
+               id="org.eclipse.fdt.ui.FortranPerspective">
          </perspectiveShortcut>
          <perspectiveShortcut
                id="org.eclipse.fdt.ui.CBrowsingPerspective">
@@ -217,14 +217,14 @@
       <perspectiveExtension
             targetID="org.eclipse.debug.ui.DebugPerspective">
          <perspectiveShortcut
-               id="org.eclipse.fdt.ui.CPerspective">
+               id="org.eclipse.fdt.ui.FortranPerspective">
          </perspectiveShortcut>
          <perspectiveShortcut
                id="org.eclipse.fdt.ui.CBrowsingPerspective">
          </perspectiveShortcut>
       </perspectiveExtension>
       <perspectiveExtension
-            targetID="org.eclipse.fdt.ui.CPerspective">
+            targetID="org.eclipse.fdt.ui.FortranPerspective">
          <perspectiveShortcut
                id="org.eclipse.debug.ui.DebugPerspective">
          </perspectiveShortcut>
@@ -241,7 +241,7 @@
       <perspectiveExtension
             targetID="org.eclipse.fdt.ui.CBrowsingPerspective">
          <perspectiveShortcut
-               id="org.eclipse.fdt.ui.CPerspective">
+               id="org.eclipse.fdt.ui.FortranPerspective">
          </perspectiveShortcut>
       </perspectiveExtension>
    </extension>
@@ -252,11 +252,11 @@
             id="org.eclipse.fdt.ui.views">
       </category>
       <view
-            name="%CView.name"
-            icon="icons/full/cview16/cview.gif"
+            name="%FortranView.name"
+            icon="icons/full/cview16/fview.gif"
             category="org.eclipse.fdt.ui.views"
             class="org.eclipse.fdt.internal.ui.fview.FortranView"
-            id="org.eclipse.fdt.ui.CView">
+            id="org.eclipse.fdt.ui.FortranView">
       </view>
       <category
             name="%CBrowsing.viewCategoryName"
@@ -264,7 +264,7 @@
       </category>
       <view
             name="%CBrowsing.projectsViewName"
-            icon="icons/full/eview16/cprojects.gif"
+            icon="icons/full/eview16/fprojects.gif"
             category="org.eclipse.fdt.ui.c.browsing"
             class="org.eclipse.fdt.internal.ui.browser.cbrowsing.ProjectsView"
             id="org.eclipse.fdt.ui.ProjectsView">
@@ -307,14 +307,14 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <category
-            name="%newCWizardsCategory.name"
-            id="org.eclipse.fdt.ui.newCWizards">
+            name="%newFortranWizardsCategory.name"
+            id="org.eclipse.fdt.ui.newFortranWizards">
       </category>
       <wizard
             name="%NewWizards.sourceFile"
-            icon="icons/full/ctool16/newcfile_wiz.gif"
-            category="org.eclipse.fdt.ui.newCWizards"
-            finalPerspective="org.eclipse.fdt.ui.CPerspective"
+            icon="icons/full/ctool16/newffile_wiz.gif"
+            category="org.eclipse.fdt.ui.newFortranWizards"
+            finalPerspective="org.eclipse.fdt.ui.FortranPerspective"
             id="org.eclipse.fdt.ui.wizards.NewSourceFileCreationWizard">
          <class class="org.eclipse.fdt.ui.wizards.NewSourceFileCreationWizard">
             <parameter name="cfile" value="true"/>
@@ -326,8 +326,8 @@
       <wizard
             name="%NewWizards.headerFile"
             icon="icons/full/ctool16/newhfile_wiz.gif"
-            category="org.eclipse.fdt.ui.newCWizards"
-            finalPerspective="org.eclipse.fdt.ui.CPerspective"
+            category="org.eclipse.fdt.ui.newFortranWizards"
+            finalPerspective="org.eclipse.fdt.ui.FortranPerspective"
             id="org.eclipse.fdt.ui.wizards.NewHeaderFileCreationWizard">
          <class class="org.eclipse.fdt.ui.wizards.NewHeaderFileCreationWizard">
             <parameter name="cfile" value="true"/>
@@ -339,8 +339,8 @@
       <wizard
             name="%NewWizards.file"
             icon="icons/full/ctool16/newfile_wiz.gif"
-            category="org.eclipse.fdt.ui.newCWizards"
-            finalPerspective="org.eclipse.fdt.ui.CPerspective"
+            category="org.eclipse.fdt.ui.newFortranWizards"
+            finalPerspective="org.eclipse.fdt.ui.FortranPerspective"
             id="org.eclipse.fdt.ui.wizards.NewFileCreationWizard">
          <class class="org.eclipse.fdt.ui.wizards.NewFileCreationWizard">
             <parameter name="cfile" value="true"/>
@@ -352,8 +352,8 @@
       <wizard
             name="%NewWizards.sourceFolder"
             icon="icons/full/ctool16/newsrcfldr_wiz.gif"
-            category="org.eclipse.fdt.ui.newCWizards"
-            finalPerspective="org.eclipse.fdt.ui.CPerspective"
+            category="org.eclipse.fdt.ui.newFortranWizards"
+            finalPerspective="org.eclipse.fdt.ui.FortranPerspective"
             id="org.eclipse.fdt.ui.wizards.NewSourceFolderCreationWizard">
          <class class="org.eclipse.fdt.ui.wizards.NewSourceFolderCreationWizard">
             <parameter name="cfolder" value="true"/>
@@ -365,92 +365,8 @@
       <wizard
             name="%NewWizards.folder"
             icon="icons/full/ctool16/newfolder_wiz.gif"
-            category="org.eclipse.fdt.ui.newCWizards"
-            finalPerspective="org.eclipse.fdt.ui.CPerspective"
-            id="org.eclipse.fdt.ui.wizards.NewFolderCreationWizard">
-         <class class="org.eclipse.fdt.ui.wizards.NewFolderCreationWizard">
-            <parameter name="cfolder" value="true"/>
-         </class>
-         <description>
-            %NewWizards.folder.description
-         </description>
-      </wizard>
-<!-- For C++ Wizards -->
-      <category
-            name="%newCCWizardsCategory.name"
-            id="org.eclipse.fdt.ui.newCCWizards">
-      </category>
-      <wizard
-            name="%NewWizards.class"
-            icon="icons/full/ctool16/newclass_wiz.gif"
-            category="org.eclipse.fdt.ui.newCCWizards"
-            finalPerspective="org.eclipse.fdt.ui.CPerspective"
-            id="org.eclipse.fdt.ui.wizards.NewClassCreationWizard">
-         <class class="org.eclipse.fdt.ui.wizards.NewClassCreationWizard">
-            <parameter name="ctype" value="true"/>
-            <parameter targetId="org.eclipse.fdt.ui.actions.NewTypeDropDown"/>
-         </class>
-         <description>
-            %NewWizards.class.description
-         </description>
-      </wizard>
-      <wizard
-            name="%NewWizards.sourceFile"
-            icon="icons/full/ctool16/newcfile_wiz.gif"
-            category="org.eclipse.fdt.ui.newCCWizards"
-            finalPerspective="org.eclipse.fdt.ui.CPerspective"
-            id="org.eclipse.fdt.ui.wizards.NewSourceFileCreationWizard">
-         <class class="org.eclipse.fdt.ui.wizards.NewSourceFileCreationWizard">
-            <parameter name="cfile" value="true"/>
-         </class>
-         <description>
-            %NewWizards.sourceFile.description
-         </description>
-      </wizard>
-      <wizard
-            name="%NewWizards.headerFile"
-            icon="icons/full/ctool16/newhfile_wiz.gif"
-            category="org.eclipse.fdt.ui.newCCWizards"
-            finalPerspective="org.eclipse.fdt.ui.CPerspective"
-            id="org.eclipse.fdt.ui.wizards.NewHeaderFileCreationWizard">
-         <class class="org.eclipse.fdt.ui.wizards.NewHeaderFileCreationWizard">
-            <parameter name="cfile" value="true"/>
-         </class>
-         <description>
-            %NewWizards.headerFile.description
-         </description>
-      </wizard>
-      <wizard
-            name="%NewWizards.file"
-            icon="icons/full/ctool16/newfile_wiz.gif"
-            category="org.eclipse.fdt.ui.newCCWizards"
-            finalPerspective="org.eclipse.fdt.ui.CPerspective"
-            id="org.eclipse.fdt.ui.wizards.NewFileCreationWizard">
-         <class class="org.eclipse.fdt.ui.wizards.NewFileCreationWizard">
-            <parameter name="cfile" value="true"/>
-         </class>
-         <description>
-            %NewWizards.file.description
-         </description>
-      </wizard>
-      <wizard
-            name="%NewWizards.sourceFolder"
-            icon="icons/full/ctool16/newsrcfldr_wiz.gif"
-            category="org.eclipse.fdt.ui.newCCWizards"
-            finalPerspective="org.eclipse.fdt.ui.CPerspective"
-            id="org.eclipse.fdt.ui.wizards.NewSourceFolderCreationWizard">
-         <class class="org.eclipse.fdt.ui.wizards.NewSourceFolderCreationWizard">
-            <parameter name="cfolder" value="true"/>
-         </class>
-         <description>
-            %NewWizards.sourceFolder.description
-         </description>
-      </wizard>
-      <wizard
-            name="%NewWizards.folder"
-            icon="icons/full/ctool16/newfolder_wiz.gif"
-            category="org.eclipse.fdt.ui.newCCWizards"
-            finalPerspective="org.eclipse.fdt.ui.CPerspective"
+            category="org.eclipse.fdt.ui.newFortranWizards"
+            finalPerspective="org.eclipse.fdt.ui.FortranPerspective"
             id="org.eclipse.fdt.ui.wizards.NewFolderCreationWizard">
          <class class="org.eclipse.fdt.ui.wizards.NewFolderCreationWizard">
             <parameter name="cfolder" value="true"/>
@@ -460,29 +376,29 @@
          </description>
       </wizard>
    </extension>
-<!-- Define the document provider and partitionner for the CEditor -->
+<!-- Define the document provider and partitionner for the FortranEditor -->
    <extension
          id="org.eclipse.fdt.ui.CDocumentSetupParticipant"
          name="%cDocumentSetupParticipant"
          point="org.eclipse.core.filebuffers.documentSetup">
       <participant
-            class="org.eclipse.fdt.internal.ui.editor.CDocumentSetupParticipant"
+            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentSetupParticipant"
             contentTypeId="org.eclipse.fdt.core.cSource">
       </participant>
       <participant
-            class="org.eclipse.fdt.internal.ui.editor.CDocumentSetupParticipant"
+            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentSetupParticipant"
             contentTypeId="org.eclipse.fdt.core.cHeader">
       </participant>
       <participant
-            class="org.eclipse.fdt.internal.ui.editor.CDocumentSetupParticipant"
+            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentSetupParticipant"
             contentTypeId="org.eclipse.fdt.core.cxxSource">
       </participant>
       <participant
-            class="org.eclipse.fdt.internal.ui.editor.CDocumentSetupParticipant"
+            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentSetupParticipant"
             contentTypeId="org.eclipse.fdt.core.cxxHeader">
       </participant>
       <participant
-            class="org.eclipse.fdt.internal.ui.editor.CDocumentSetupParticipant"
+            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentSetupParticipant"
             contentTypeId="org.eclipse.fdt.core.asmSource">
       </participant>
    </extension>
@@ -491,23 +407,23 @@
          name="%cDocumentFactory"
          point="org.eclipse.core.filebuffers.documentCreation">
       <factory
-            class="org.eclipse.fdt.internal.ui.editor.CDocumentFactory"
+            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentFactory"
             contentTypeId="org.eclipse.fdt.core.cSource">
       </factory>
       <factory
-            class="org.eclipse.fdt.internal.ui.editor.CDocumentFactory"
+            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentFactory"
             contentTypeId="org.eclipse.fdt.core.cHeader">
       </factory>
       <factory
-            class="org.eclipse.fdt.internal.ui.editor.CDocumentFactory"
+            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentFactory"
             contentTypeId="org.eclipse.fdt.core.cxxSource">
       </factory>
       <factory
-            class="org.eclipse.fdt.internal.ui.editor.CDocumentFactory"
+            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentFactory"
             contentTypeId="org.eclipse.fdt.core.cxxHeader">
       </factory>
       <factory
-            class="org.eclipse.fdt.internal.ui.editor.CDocumentFactory"
+            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentFactory"
             contentTypeId="org.eclipse.fdt.core.asmSource">
       </factory>
    </extension>
@@ -516,13 +432,13 @@
          point="org.eclipse.ui.editors">
       <editor
             default="true"
-            name="%CEditor.name"
-            extensions="c,C,cc,cpp,cxx,h,hh,hpp"
+            name="%FortranEditor.name"
+            extensions="f,f77,f90,f95"
             icon="icons/full/obj16/c_file_obj.gif"
             class="org.eclipse.fdt.internal.ui.editor.FortranEditor"
             contributorClass="org.eclipse.fdt.internal.ui.editor.FortranEditorActionContributor"
             symbolicFontName="org.eclipse.fdt.ui.editors.textfont"
-            id="org.eclipse.fdt.ui.editor.CEditor">
+            id="org.eclipse.fdt.ui.editor.FortranEditor">
       </editor>
       <editor
             name="%AsmEditor.name"
@@ -576,25 +492,25 @@
          point="org.eclipse.ui.preferencePages">
       <page
             name="%CPluginPreferencePage.name"
-            class="org.eclipse.fdt.internal.ui.preferences.CPluginPreferencePage"
+            class="org.eclipse.fdt.internal.ui.preferences.FortranPluginPreferencePage"
             id="org.eclipse.fdt.ui.preferences.CPluginPreferencePage">
       </page>
       <page
             name="%CPluginEditorPreferencePage.name"
             category="org.eclipse.fdt.ui.preferences.CPluginPreferencePage"
-            class="org.eclipse.fdt.internal.ui.preferences.CEditorPreferencePage"
-            id="org.eclipse.fdt.ui.preferences.CEditorPreferencePage">
+            class="org.eclipse.fdt.internal.ui.preferences.FortranEditorPreferencePage"
+            id="org.eclipse.fdt.ui.preferences.FortranEditorPreferencePage">
       </page>
       <page
             name="%CodeAssistPreferencePage.name"
-            category="org.eclipse.fdt.ui.preferences.CEditorPreferencePage"
+            category="org.eclipse.fdt.ui.preferences.FortranEditorPreferencePage"
             class="org.eclipse.fdt.internal.ui.preferences.CodeAssistPreferencePage"
             id="org.eclipse.fdt.ui.preferences.CodeAssistPreferencePage">
       </page>
       <page
             name="%CPluginTemplatePreferencePage.name"
-            category="org.eclipse.fdt.ui.preferences.CEditorPreferencePage"
-            class="org.eclipse.fdt.internal.ui.preferences.CTemplatePreferencePage"
+            category="org.eclipse.fdt.ui.preferences.FortranEditorPreferencePage"
+            class="org.eclipse.fdt.internal.ui.preferences.FortranTemplatePreferencePage"
             id="org.eclipse.fdt.ui.preferences.TemplatePreferencePage">
       </page>
       <page
@@ -616,7 +532,7 @@
             id="org.eclipse.fdt.ui.preferences.CFileTypesPreferences">
       </page>
       <page
-            class="org.eclipse.fdt.internal.ui.preferences.CSearchPreferencePage"
+            class="org.eclipse.fdt.internal.ui.preferences.FortranSearchPreferencePage"
             category="org.eclipse.fdt.ui.preferences.CPluginPreferencePage"
             name="%FDTSearch.name"
             id="org.eclipse.fdt.ui.preferences.CSearchPreferencePage"/>
@@ -636,7 +552,7 @@
    <extension
          point="org.eclipse.ui.editorActions">
       <editorContribution
-            targetID="org.eclipse.fdt.ui.editor.CEditor"
+            targetID="org.eclipse.fdt.ui.editor.FortranEditor"
             id="org.eclipse.ui.texteditor.ruler.actions">
          <action
                label="%Dummy.label"
@@ -667,7 +583,7 @@
       </objectContribution>
       <viewerContribution
             targetID="#CEditorRulerContext"
-            id="org.eclipse.fdt.ui.editor.CEditorPopupActions">
+            id="org.eclipse.fdt.ui.editor.FortranEditorPopupActions">
          <action
                label="%AddTask.label"
                helpContextId="org.eclipse.ui.AddTask_action_context"
@@ -770,28 +686,18 @@
    <extension
          point="org.eclipse.ui.actionSets">
      <actionSet
-            label="%CElementCreationActionSet.label"
-            description="%CElementCreationActionSet.description"
+            label="%FortranElementCreationActionSet.label"
+            description="%FortranElementCreationActionSet.description"
             visible="false"
-            id="org.eclipse.fdt.ui.CElementCreationActionSet">
+            id="org.eclipse.fdt.ui.FortranElementCreationActionSet">
          <action
-               id="org.eclipse.fdt.ui.actions.NewTypeDropDown"
-               toolbarPath="Normal/CCWizards"
-               class="org.eclipse.fdt.internal.ui.wizards.NewTypeDropDownAction"
-               disabledIcon="icons/full/dtool16/newclass_wiz.gif"
-               icon="icons/full/etool16/newclass_wiz.gif"
-               label="%NewTypeDropDownAction.label"
-               pulldown="true"
-               tooltip="%NewTypeDropDownAction.tooltip">
-         </action>
-         <action
-               id="org.eclipse.fdt.ui.actions.NewFileDropDown"
-               toolbarPath="Normal/CCWizards"
                class="org.eclipse.fdt.internal.ui.wizards.NewFileDropDownAction"
                disabledIcon="icons/full/dtool16/newcfile_wiz.gif"
-               icon="icons/full/etool16/newcfile_wiz.gif"
+               icon="icons/full/etool16/newffile_wiz.gif"
+               id="org.eclipse.fdt.ui.actions.NewFileDropDown"
                label="%NewFileDropDownAction.label"
                pulldown="true"
+               toolbarPath="Normal/CCWizards"
                tooltip="%NewFileDropDownAction.tooltip">
          </action>
          <action
@@ -805,13 +711,13 @@
                tooltip="%NewFolderDropDownAction.tooltip">
          </action>
          <action
-               id="org.eclipse.fdt.ui.actions.NewProjectDropDown"
-               toolbarPath="Normal/CCWizards"
                class="org.eclipse.fdt.internal.ui.wizards.NewProjectDropDownAction"
                disabledIcon="icons/full/dtool16/newcprj_wiz.gif"
-               icon="icons/full/etool16/newcprj_wiz.gif"
+               icon="icons/full/etool16/newfprj_wiz.gif"
+               id="org.eclipse.fdt.ui.actions.NewProjectDropDown"
                label="%NewProjectDropDownAction.label"
                pulldown="true"
+               toolbarPath="Normal/CCWizards"
                tooltip="%NewProjectDropDownAction.tooltip">
          </action>
       </actionSet>
@@ -819,9 +725,9 @@
    <extension
          point="org.eclipse.ui.ide.projectNatureImages">
       <image
-            icon="icons/full/ovr16/c_ovr.gif"
-            natureId="org.eclipse.fdt.core.fnature"
-            id="org.eclipse.fdt.ui.cProjectNatureImage">
+            icon="icons/full/ovr16/f_ovr.gif"
+            id="org.eclipse.fdt.ui.fProjectNatureImage"
+            natureId="org.eclipse.fdt.core.fnature">
       </image>
    </extension>
    <extension
@@ -1132,10 +1038,10 @@
       <actionSetPartAssociation
             targetID="org.eclipse.fdt.ui.SearchActionSet">
          <part
-               id="org.eclipse.fdt.ui.CView">
+               id="org.eclipse.fdt.ui.FortranView">
          </part>
          <part
-               id="org.eclipse.fdt.ui.editor.CEditor">
+               id="org.eclipse.fdt.ui.editor.FortranEditor">
          </part>
          <part
                id="org.eclipse.search.SearchResultView">
@@ -1144,7 +1050,7 @@
       <actionSetPartAssociation
             targetID="org.eclipse.ui.edit.text.actionSet.annotationNavigation">
          <part
-               id="org.eclipse.fdt.ui.editor.CEditor">
+               id="org.eclipse.fdt.ui.editor.FortranEditor">
          </part>
       </actionSetPartAssociation>      
    </extension>

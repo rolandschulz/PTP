@@ -5,7 +5,7 @@ package org.eclipse.fdt.internal.ui;
  * All Rights Reserved.
  */
  
-import org.eclipse.fdt.internal.ui.wizards.CWizardRegistry;
+import org.eclipse.fdt.internal.ui.wizards.FortranWizardRegistry;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.ui.IFolderLayout;
@@ -66,22 +66,22 @@ public class FortranPerspectiveFactory implements IPerspectiveFactory {
 	
 	private void addCWizardShortcuts(IPageLayout layout) {
 		// new actions - C project creation wizard
-		String[] wizIDs = CWizardRegistry.getProjectWizardIDs();
+		String[] wizIDs = FortranWizardRegistry.getProjectWizardIDs();
 		for (int i = 0; i < wizIDs.length; ++i) {
 			layout.addNewWizardShortcut(wizIDs[i]);
 		}
 		// new actions - C folder creation wizard
-		wizIDs = CWizardRegistry.getFolderWizardIDs();
+		wizIDs = FortranWizardRegistry.getFolderWizardIDs();
 		for (int i = 0; i < wizIDs.length; ++i) {
 			layout.addNewWizardShortcut(wizIDs[i]);
 		}
 		// new actions - C file creation wizard
-		wizIDs = CWizardRegistry.getFileWizardIDs();
+		wizIDs = FortranWizardRegistry.getFileWizardIDs();
 		for (int i = 0; i < wizIDs.length; ++i) {
 			layout.addNewWizardShortcut(wizIDs[i]);
 		}
 		// new actions - C type creation wizard
-		wizIDs = CWizardRegistry.getTypeWizardIDs();
+		wizIDs = FortranWizardRegistry.getTypeWizardIDs();
 		for (int i = 0; i < wizIDs.length; ++i) {
 			layout.addNewWizardShortcut(wizIDs[i]);
 		}

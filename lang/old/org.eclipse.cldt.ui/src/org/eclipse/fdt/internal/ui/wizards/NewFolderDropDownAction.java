@@ -18,6 +18,6 @@ public class NewFolderDropDownAction extends AbstractWizardDropDownAction {
 	}
 
 	protected IAction[] getWizardActions() {
-		return CWizardRegistry.getFolderWizardActions();
+		return FortranWizardRegistry.getFolderWizardActions();
 	}
 }

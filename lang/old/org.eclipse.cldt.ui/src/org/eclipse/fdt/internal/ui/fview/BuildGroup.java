@@ -136,7 +136,7 @@ public class BuildGroup extends FortranViewActionGroup {
 	}
 
 	protected void makeActions() {
-		Shell shell = getCView().getSite().getShell();
+		Shell shell = getFView().getSite().getShell();
 		buildAction = new BuildAction(shell, IncrementalProjectBuilder.INCREMENTAL_BUILD);
 		rebuildAction = new BuildAction(shell, IncrementalProjectBuilder.FULL_BUILD);
 	}

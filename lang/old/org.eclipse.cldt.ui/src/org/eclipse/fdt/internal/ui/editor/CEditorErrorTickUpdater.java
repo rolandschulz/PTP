@@ -14,8 +14,8 @@ package org.eclipse.fdt.internal.ui.editor;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.internal.ui.util.IProblemChangedListener;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
-import org.eclipse.fdt.internal.ui.viewsupport.CUILabelProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementImageProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranUILabelProvider;
 import org.eclipse.fdt.internal.ui.viewsupport.ProblemsLabelDecorator;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.util.Assert;
@@ -31,12 +31,12 @@ import org.eclipse.ui.IEditorInput;
 public class CEditorErrorTickUpdater implements IProblemChangedListener {
 
 	protected FortranEditor fCEditor;
-	private CUILabelProvider fLabelProvider;
+	private FortranUILabelProvider fLabelProvider;
 
 	public CEditorErrorTickUpdater(FortranEditor editor) {
 		Assert.isNotNull(editor);
 		fCEditor= editor;
-		fLabelProvider=  new CUILabelProvider(0, CElementImageProvider.SMALL_ICONS);
+		fLabelProvider=  new FortranUILabelProvider(0, FortranElementImageProvider.SMALL_ICONS);
 		fLabelProvider.addLabelDecorator(new ProblemsLabelDecorator(null));
 		FortranUIPlugin.getDefault().getProblemMarkerManager().addListener(this);
 	}

@@ -22,6 +22,6 @@ public class NewTypeDropDownAction extends AbstractWizardDropDownAction {
 	}
 
 	protected IAction[] getWizardActions() {
-		return CWizardRegistry.getTypeWizardActions();
+		return FortranWizardRegistry.getTypeWizardActions();
 	}
 }

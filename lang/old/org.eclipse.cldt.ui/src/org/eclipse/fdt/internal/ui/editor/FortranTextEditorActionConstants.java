@@ -14,7 +14,7 @@ package org.eclipse.fdt.internal.ui.editor;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
 
-public interface CTextEditorActionConstants extends IWorkbenchActionConstants {
+public interface FortranTextEditorActionConstants extends IWorkbenchActionConstants {
 		/**
 	 * Status category "input position".
 	 */

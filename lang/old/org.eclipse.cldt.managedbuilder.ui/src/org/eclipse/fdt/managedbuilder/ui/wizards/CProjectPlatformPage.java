@@ -23,7 +23,7 @@ import org.eclipse.fdt.managedbuilder.core.IToolChain;
 import org.eclipse.fdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.fdt.managedbuilder.internal.ui.ManagedBuilderHelpContextIds;
 import org.eclipse.fdt.managedbuilder.internal.ui.ManagedBuilderUIMessages;
-import org.eclipse.fdt.ui.wizards.NewCProjectWizard;
+import org.eclipse.fdt.ui.wizards.NewFortranProjectWizard;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -207,7 +207,7 @@ public class CProjectPlatformPage extends WizardPage {
 		});
 		
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		// Make this the same as NewCProjectWizardPage.SIZING_TEXT_FIELD_WIDTH
+		// Make this the same as NewFortranProjectWizardPage.SIZING_TEXT_FIELD_WIDTH
 		gd.widthHint = IDialogConstants.ENTRY_FIELD_WIDTH + 50;
 		platformSelection.setLayoutData(gd);
 	}
@@ -216,7 +216,7 @@ public class CProjectPlatformPage extends WizardPage {
 	 * @see org.eclipse.fdt.ui.dialogs.ICOptionContainer#getProject()
 	 */
 	public IProject getProject() {
-		return ((NewCProjectWizard)getWizard()).getNewProject();
+		return ((NewFortranProjectWizard)getWizard()).getNewProject();
 	}
 	
 	/**

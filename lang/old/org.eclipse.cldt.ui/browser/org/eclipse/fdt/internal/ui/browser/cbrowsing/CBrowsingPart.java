@@ -43,7 +43,7 @@ import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.util.EditorUtility;
 import org.eclipse.fdt.internal.ui.util.ExceptionHandler;
 import org.eclipse.fdt.internal.ui.viewsupport.AppearanceAwareLabelProvider;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementLabels;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementLabels;
 import org.eclipse.fdt.internal.ui.viewsupport.IViewPartInputProvider;
 import org.eclipse.fdt.internal.ui.viewsupport.StatusBarUpdater;
 import org.eclipse.fdt.internal.ui.workingsets.WorkingSetFilterActionGroup;
@@ -380,7 +380,7 @@ public abstract class CBrowsingPart extends ViewPart implements IMenuListener, I
 		};
 	}
 
-//	protected DecoratingLabelProvider createDecoratingLabelProvider(CUILabelProvider provider) {
+//	protected DecoratingLabelProvider createDecoratingLabelProvider(FortranUILabelProvider provider) {
 ////		XXX: Work in progress for problem decorator being a workbench decorator//
 ////		return new ExcludingDecoratingLabelProvider(provider, decorationMgr, "org.eclipse.jdt.ui.problem.decorator"); //$NON-NLS-1$
 //		return new DecoratingCLabelProvider(provider);
@@ -839,7 +839,7 @@ public abstract class CBrowsingPart extends ViewPart implements IMenuListener, I
 	String getToolTipText(Object element) {
 		String result;
 		if (!(element instanceof IResource)) {
-			result= CElementLabels.getTextLabel(element, AppearanceAwareLabelProvider.DEFAULT_TEXTFLAGS);		
+			result= FortranElementLabels.getTextLabel(element, AppearanceAwareLabelProvider.DEFAULT_TEXTFLAGS);		
 		} else {
 			IPath path= ((IResource) element).getFullPath();
 			if (path.isRoot()) {

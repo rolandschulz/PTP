@@ -68,7 +68,7 @@ import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModel;
 /**
  * CDocumentProvider2
  */
-public class CDocumentProvider extends TextFileDocumentProvider {
+public class FortranDocumentProvider extends TextFileDocumentProvider {
 	/**
 	 * Bundle of all required informations to allow working copy management.
 	 */
@@ -780,9 +780,9 @@ public class CDocumentProvider extends TextFileDocumentProvider {
 	/**
 	 *  
 	 */
-	public CDocumentProvider() {
+	public FortranDocumentProvider() {
 		super();
-		setParentDocumentProvider(new TextFileDocumentProvider(new CStorageDocumentProvider()));
+		setParentDocumentProvider(new TextFileDocumentProvider(new FortranStorageDocumentProvider()));
 		fGlobalAnnotationModelListener= new GlobalAnnotationModelListener();
 		fPropertyListener= new IPropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent event) {

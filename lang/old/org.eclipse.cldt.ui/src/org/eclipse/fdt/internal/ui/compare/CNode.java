@@ -7,7 +7,7 @@ package org.eclipse.fdt.internal.ui.compare;
  
 import org.eclipse.compare.ITypedElement;
 import org.eclipse.compare.structuremergeviewer.DocumentRangeNode;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementImageProvider;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IDocument;
@@ -50,7 +50,7 @@ class CNode extends DocumentRangeNode implements ITypedElement {
 	 * @see ITypedInput#getImage
 	 */
 	public Image getImage() {
-		ImageDescriptor descriptor = CElementImageProvider.getImageDescriptor(getTypeCode());
+		ImageDescriptor descriptor = FortranElementImageProvider.getImageDescriptor(getTypeCode());
 		return FortranUIPlugin.getImageDescriptorRegistry().get(descriptor);
 	}
 }

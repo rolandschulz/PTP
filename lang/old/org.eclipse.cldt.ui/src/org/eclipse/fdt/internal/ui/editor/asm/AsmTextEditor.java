@@ -13,7 +13,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.fdt.internal.ui.editor.CEditorMessages;
+import org.eclipse.fdt.internal.ui.editor.FortranEditorMessages;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -120,8 +120,8 @@ public class AsmTextEditor extends AbstractDecoratedTextEditor {
 		} catch (InterruptedException x) {
 		} catch (InvocationTargetException x) {
 			// Shared with C editor
-			String title= CEditorMessages.getString("FortranEditor.error.saving.title"); //$NON-NLS-1$
-			String msg= MessageFormat.format(CEditorMessages.getString("FortranEditor.error.saving.message"), new Object[] { x.getTargetException().getMessage() }); //$NON-NLS-1$
+			String title= FortranEditorMessages.getString("FortranEditor.error.saving.title"); //$NON-NLS-1$
+			String msg= MessageFormat.format(FortranEditorMessages.getString("FortranEditor.error.saving.message"), new Object[] { x.getTargetException().getMessage() }); //$NON-NLS-1$
 			MessageDialog.openError(shell, title, msg);
 		} finally {
 			getDocumentProvider().changed(newInput);

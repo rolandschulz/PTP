@@ -20,14 +20,14 @@ import org.eclipse.fdt.make.core.MakeProjectNature;
 import org.eclipse.fdt.make.core.scannerconfig.ScannerConfigNature;
 import org.eclipse.fdt.make.internal.ui.MakeUIPlugin;
 import org.eclipse.fdt.make.ui.IMakeHelpContextIds;
-import org.eclipse.fdt.ui.wizards.NewCProjectWizard;
+import org.eclipse.fdt.ui.wizards.NewFortranProjectWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.help.WorkbenchHelp;
 
 /**
  */
-public abstract class NewMakeProjectWizard extends NewCProjectWizard {
+public abstract class NewMakeProjectWizard extends NewFortranProjectWizard {
 	
 	protected MakeProjectWizardOptionPage fOptionPage;
 	

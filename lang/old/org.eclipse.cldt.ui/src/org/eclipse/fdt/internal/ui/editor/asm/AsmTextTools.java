@@ -9,7 +9,7 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.fdt.internal.ui.text.FortranCommentScanner;
 import org.eclipse.fdt.internal.ui.text.IFortranColorConstants;
 import org.eclipse.fdt.internal.ui.text.SingleTokenFortranScanner;
-import org.eclipse.fdt.internal.ui.text.util.CColorManager;
+import org.eclipse.fdt.internal.ui.text.util.FortranColorManager;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocumentPartitioner;
@@ -36,7 +36,7 @@ public class AsmTextTools {
     }
     
 	/** The color manager -- use the same as for C code */
-	private CColorManager fColorManager;
+	private FortranColorManager fColorManager;
 	/** The Asm source code scanner */
 	private AsmCodeScanner fCodeScanner;
 	/** The Asm partitions scanner */
@@ -82,7 +82,7 @@ public class AsmTextTools {
             fCorePreferenceStore.addPropertyChangeListener(fPreferenceListener);
         }
         
-		fColorManager= new CColorManager();
+		fColorManager= new FortranColorManager();
 		fCodeScanner= new AsmCodeScanner(fColorManager, store);
 		fPartitionScanner= new AsmPartitionScanner();
 				
@@ -131,7 +131,7 @@ public class AsmTextTools {
 	/**
 	 * Gets the color manager.
 	 */
-	public CColorManager getColorManager() {
+	public FortranColorManager getColorManager() {
 		return fColorManager;
 	}
 	

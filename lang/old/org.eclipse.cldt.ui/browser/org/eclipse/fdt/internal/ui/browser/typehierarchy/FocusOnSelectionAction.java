@@ -13,7 +13,7 @@ package org.eclipse.fdt.internal.ui.browser.typehierarchy;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
 import org.eclipse.fdt.internal.ui.util.SelectionUtil;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementLabels;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementLabels;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -61,7 +61,7 @@ public class FocusOnSelectionAction extends Action {
 		    ICElement type= (ICElement)element;
 			setText(TypeHierarchyMessages.getFormattedString(
 					"FocusOnSelectionAction.label", //$NON-NLS-1$
-					CElementLabels.getTextLabel(type, 0))); 
+					FortranElementLabels.getTextLabel(type, 0))); 
 			return true;
 		}
 		return false;

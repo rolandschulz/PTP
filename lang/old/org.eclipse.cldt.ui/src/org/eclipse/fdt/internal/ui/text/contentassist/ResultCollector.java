@@ -15,7 +15,7 @@ import java.util.Set;
 
 import org.eclipse.fdt.core.parser.ast.ASTAccessVisibility;
 import org.eclipse.fdt.internal.ui.util.ImageDescriptorRegistry;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementImageProvider;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.fdt.ui.FunctionPrototypeSummary;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -106,7 +106,7 @@ public class ResultCollector extends CompletionRequestorAdaptor {
 			displayString+= " : " + returnType; //$NON-NLS-1$
 	
 		// get the image 	
-		ImageDescriptor imageDescriptor = CElementImageProvider.getFieldImageDescriptor(visibility);
+		ImageDescriptor imageDescriptor = FortranElementImageProvider.getFieldImageDescriptor(visibility);
 		image = registry.get( imageDescriptor );
 
 		// create proposal and add it to completions list
@@ -133,7 +133,7 @@ public class ResultCollector extends CompletionRequestorAdaptor {
 			displayString = name;
 	
 			// get the image 	
-			ImageDescriptor imageDescriptor = CElementImageProvider.getClassImageDescriptor();
+			ImageDescriptor imageDescriptor = FortranElementImageProvider.getClassImageDescriptor();
 			image = registry.get( imageDescriptor );
 
 			// create proposal and add it to completions list
@@ -183,7 +183,7 @@ public class ResultCollector extends CompletionRequestorAdaptor {
 			}
 	
 			// get the image 	
-			ImageDescriptor imageDescriptor = CElementImageProvider.getFunctionImageDescriptor();
+			ImageDescriptor imageDescriptor = FortranElementImageProvider.getFunctionImageDescriptor();
 			image = registry.get( imageDescriptor );
 
 			if( !insertFunctionName ){
@@ -228,7 +228,7 @@ public class ResultCollector extends CompletionRequestorAdaptor {
 			displayString+= " : " + returnType; //$NON-NLS-1$
 		
 		// get the image 	
-		ImageDescriptor imageDescriptor = CElementImageProvider.getLocalVariableImageDescriptor();
+		ImageDescriptor imageDescriptor = FortranElementImageProvider.getLocalVariableImageDescriptor();
 		image = registry.get( imageDescriptor );
 
 		// create proposal and add it to completions list
@@ -278,7 +278,7 @@ public class ResultCollector extends CompletionRequestorAdaptor {
 				}
 			}
 			// get the image 	
-			ImageDescriptor imageDescriptor = CElementImageProvider.getMacroImageDescriptor();
+			ImageDescriptor imageDescriptor = FortranElementImageProvider.getMacroImageDescriptor();
 			image = registry.get( imageDescriptor );
 
 			// create proposal and add it to completions list
@@ -337,7 +337,7 @@ public class ResultCollector extends CompletionRequestorAdaptor {
 			}
 	
 			// get the image 	
-			ImageDescriptor imageDescriptor = CElementImageProvider.getMethodImageDescriptor(visibility);
+			ImageDescriptor imageDescriptor = FortranElementImageProvider.getMethodImageDescriptor(visibility);
 			image = registry.get( imageDescriptor );
 
 			if( !insertFunctionName ){
@@ -379,7 +379,7 @@ public class ResultCollector extends CompletionRequestorAdaptor {
 			displayString = name;
 	
 			// get the image 	
-			ImageDescriptor imageDescriptor = CElementImageProvider.getNamespaceImageDescriptor();
+			ImageDescriptor imageDescriptor = FortranElementImageProvider.getNamespaceImageDescriptor();
 			image = registry.get( imageDescriptor );
 
 			// create proposal and add it to completions list
@@ -407,7 +407,7 @@ public class ResultCollector extends CompletionRequestorAdaptor {
 			displayString = name;
 	
 			// get the image 	
-			ImageDescriptor imageDescriptor = CElementImageProvider.getStructImageDescriptor();
+			ImageDescriptor imageDescriptor = FortranElementImageProvider.getStructImageDescriptor();
 			image = registry.get( imageDescriptor );
 
 			// create proposal and add it to completions list
@@ -434,7 +434,7 @@ public class ResultCollector extends CompletionRequestorAdaptor {
 			displayString = name;
 	
 			// get the image 	
-			ImageDescriptor imageDescriptor = CElementImageProvider.getUnionImageDescriptor();
+			ImageDescriptor imageDescriptor = FortranElementImageProvider.getUnionImageDescriptor();
 			image = registry.get( imageDescriptor );
 
 			// create proposal and add it to completions list
@@ -464,7 +464,7 @@ public class ResultCollector extends CompletionRequestorAdaptor {
 				displayString+= " : " + returnType; //$NON-NLS-1$
 	
 			// get the image 	
-			ImageDescriptor imageDescriptor = CElementImageProvider.getVariableImageDescriptor();
+			ImageDescriptor imageDescriptor = FortranElementImageProvider.getVariableImageDescriptor();
 			image = registry.get( imageDescriptor );
 
 			// create proposal and add it to completions list
@@ -490,7 +490,7 @@ public class ResultCollector extends CompletionRequestorAdaptor {
 			displayString = name;
 	
 			// get the image 	
-			ImageDescriptor imageDescriptor = CElementImageProvider.getEnumerationImageDescriptor();
+			ImageDescriptor imageDescriptor = FortranElementImageProvider.getEnumerationImageDescriptor();
 			image = registry.get( imageDescriptor );
 
 			// create proposal and add it to completions list
@@ -519,7 +519,7 @@ public class ResultCollector extends CompletionRequestorAdaptor {
 			displayString = name;
 	
 			// get the image 	
-			ImageDescriptor imageDescriptor = CElementImageProvider.getEnumeratorImageDescriptor();
+			ImageDescriptor imageDescriptor = FortranElementImageProvider.getEnumeratorImageDescriptor();
 			image = registry.get( imageDescriptor );
 
 			// create proposal and add it to completions list
@@ -546,7 +546,7 @@ public class ResultCollector extends CompletionRequestorAdaptor {
 		displayString = name;
 
 		// get the image 	
-		ImageDescriptor imageDescriptor = CElementImageProvider.getTypedefImageDescriptor();
+		ImageDescriptor imageDescriptor = FortranElementImageProvider.getTypedefImageDescriptor();
 		image = registry.get( imageDescriptor );
 
 		// create proposal and add it to completions list
@@ -573,7 +573,7 @@ public class ResultCollector extends CompletionRequestorAdaptor {
 		replaceString = name;
 		displayString = name;
 
-		ImageDescriptor imageDescriptor = CElementImageProvider.getKeywordImageDescriptor();
+		ImageDescriptor imageDescriptor = FortranElementImageProvider.getKeywordImageDescriptor();
 		image = registry.get( imageDescriptor );
 
 		// no image for keywords 	

@@ -22,9 +22,9 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
  * </pre>
  * </p>
  */
-public class NewCProjectWizardPage extends WizardNewProjectCreationPage {
+public class NewFortranProjectWizardPage extends WizardNewProjectCreationPage {
 
-	public NewCProjectWizardPage(String pageName) {
+	public NewFortranProjectWizardPage(String pageName) {
 		super(pageName);
 	}
 
@@ -39,14 +39,14 @@ public class NewCProjectWizardPage extends WizardNewProjectCreationPage {
 		if (super.validatePage() == true) {
 
 			// Give a chance to the wizard to do its own validation
-			IStatus validName = ((NewCProjectWizard) getWizard()).isValidName(getProjectName());
+			IStatus validName = ((NewFortranProjectWizard) getWizard()).isValidName(getProjectName());
 			if (!validName.isOK()) {
 				setErrorMessage(validName.getMessage());
 				return false;
 			}
 
 			// Give a chance to the wizard to do its own validation
-			IStatus validLocation = ((NewCProjectWizard) getWizard()).isValidLocation(getLocationPath().toOSString());
+			IStatus validLocation = ((NewFortranProjectWizard) getWizard()).isValidLocation(getLocationPath().toOSString());
 			if (!validLocation.isOK()) {
 				setErrorMessage(validLocation.getMessage());
 				return false;

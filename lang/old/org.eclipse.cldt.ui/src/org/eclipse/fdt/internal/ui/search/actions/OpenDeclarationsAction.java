@@ -43,7 +43,7 @@ import org.eclipse.fdt.core.search.IMatch;
 import org.eclipse.fdt.core.search.SearchEngine;
 import org.eclipse.fdt.core.search.ICSearchConstants.SearchFor;
 import org.eclipse.fdt.internal.ui.editor.FortranEditor;
-import org.eclipse.fdt.internal.ui.editor.CEditorMessages;
+import org.eclipse.fdt.internal.ui.editor.FortranEditorMessages;
 import org.eclipse.fdt.internal.ui.util.EditorUtility;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -67,11 +67,11 @@ public class OpenDeclarationsAction extends SelectionParseAction implements IUpd
 	 */
 	public OpenDeclarationsAction(FortranEditor editor) {
 		super( editor );
-		setText(CEditorMessages.getString("OpenDeclarations.label")); //$NON-NLS-1$
-		setToolTipText(CEditorMessages.getString("OpenDeclarations.tooltip")); //$NON-NLS-1$
-		setDescription(CEditorMessages.getString("OpenDeclarations.description")); //$NON-NLS-1$
-//		setDialogTitle(CEditorMessages.getString("OpenDeclarations.dialog.title")); //$NON-NLS-1$
-//		setDialogMessage(CEditorMessages.getString("OpenDeclarations.dialog.message")); //$NON-NLS-1$
+		setText(FortranEditorMessages.getString("OpenDeclarations.label")); //$NON-NLS-1$
+		setToolTipText(FortranEditorMessages.getString("OpenDeclarations.tooltip")); //$NON-NLS-1$
+		setDescription(FortranEditorMessages.getString("OpenDeclarations.description")); //$NON-NLS-1$
+//		setDialogTitle(FortranEditorMessages.getString("OpenDeclarations.dialog.title")); //$NON-NLS-1$
+//		setDialogMessage(FortranEditorMessages.getString("OpenDeclarations.dialog.message")); //$NON-NLS-1$
 
 		searchEngine = new SearchEngine();
 	}

@@ -11,27 +11,31 @@
 
 package org.eclipse.fdt.internal.ui.editor;
 
-import org.eclipse.core.filebuffers.IDocumentSetupParticipant;
 import org.eclipse.fdt.internal.ui.text.FortranTextTools;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.ui.editors.text.StorageDocumentProvider;
 
 /**
- * CDocumentSetupParticipant
+ * FortranStorageDocumentProvider
  */
-public class CDocumentSetupParticipant implements IDocumentSetupParticipant {
+public class FortranStorageDocumentProvider extends StorageDocumentProvider {
+	
 	/**
 	 * 
 	 */
-	public CDocumentSetupParticipant() {
+	public FortranStorageDocumentProvider() {
+		super();
 	}
-	
+
 	/*
-	 * @see org.eclipse.core.filebuffers.IDocumentSetupParticipant#setup(org.eclipse.jface.text.IDocument)
+	 * @see org.eclipse.ui.editors.text.StorageDocumentProvider#setupDocument(java.lang.Object, org.eclipse.jface.text.IDocument)
 	 */
-	public void setup(IDocument document) {
-		FortranTextTools tools= FortranUIPlugin.getDefault().getTextTools();
-		tools.setupFortranDocument(document);
+	protected void setupDocument(Object element, IDocument document) {
+		if (document != null) {
+			FortranTextTools tools= FortranUIPlugin.getDefault().getTextTools();
+			tools.setupFortranDocument(document);
+		}
 	}
 
 }

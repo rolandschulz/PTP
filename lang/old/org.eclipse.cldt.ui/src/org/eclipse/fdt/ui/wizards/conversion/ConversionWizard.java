@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.ui.FortranUIPlugin;
-import org.eclipse.fdt.ui.wizards.NewCProjectWizard;
+import org.eclipse.fdt.ui.wizards.NewFortranProjectWizard;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbench;
 
@@ -30,7 +30,7 @@ import org.eclipse.ui.IWorkbench;
  * @see CtoCCConversionWizard#addPages
  */
 public abstract class ConversionWizard
-    extends NewCProjectWizard {
+    extends NewFortranProjectWizard {
 
     // Titles and descriptions may be overwritten by subclasses through the accessor methods.
     private static final String WZ_TITLE = "ConversionWizard.title"; //$NON-NLS-1$

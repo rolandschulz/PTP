@@ -11,7 +11,7 @@ import org.eclipse.jface.text.rules.IWhitespaceDetector;
 /**
  * A C aware white space detector.
  */
-public class CWhitespaceDetector implements IWhitespaceDetector {
+public class FortranWhitespaceDetector implements IWhitespaceDetector {
 
 	/**
 	 * @see IWhitespaceDetector#isWhitespace

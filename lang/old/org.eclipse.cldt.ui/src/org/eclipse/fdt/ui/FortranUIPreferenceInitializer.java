@@ -13,9 +13,9 @@ package org.eclipse.fdt.ui;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.fdt.internal.ui.fview.FortranView;
 import org.eclipse.fdt.internal.ui.preferences.BuildConsolePreferencePage;
-import org.eclipse.fdt.internal.ui.preferences.CEditorPreferencePage;
-import org.eclipse.fdt.internal.ui.preferences.CPluginPreferencePage;
-import org.eclipse.fdt.internal.ui.preferences.CSearchPreferencePage;
+import org.eclipse.fdt.internal.ui.preferences.FortranEditorPreferencePage;
+import org.eclipse.fdt.internal.ui.preferences.FortranPluginPreferencePage;
+import org.eclipse.fdt.internal.ui.preferences.FortranSearchPreferencePage;
 import org.eclipse.fdt.internal.ui.preferences.CodeAssistPreferencePage;
 import org.eclipse.fdt.internal.ui.preferences.WorkInProgressPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -36,12 +36,12 @@ public class FortranUIPreferenceInitializer extends AbstractPreferenceInitialize
 		final IPreferenceStore store = FortranUIPlugin.getDefault().getPreferenceStore();
 
         PreferenceConstants.initializeDefaultValues(store);
-		CPluginPreferencePage.initDefaults(store);
+		FortranPluginPreferencePage.initDefaults(store);
 		BuildConsolePreferencePage.initDefaults(store);
 		WorkInProgressPreferencePage.initDefaults(store);
-		CSearchPreferencePage.initDefaults(store);
+		FortranSearchPreferencePage.initDefaults(store);
 		FortranView.initDefaults(store);
-		CEditorPreferencePage.initDefaults(store);
+		FortranEditorPreferencePage.initDefaults(store);
 		CodeAssistPreferencePage.initDefaults(store);
 
 		// We need to do this remove any keys that might have been

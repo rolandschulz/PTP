@@ -13,7 +13,7 @@ package org.eclipse.fdt.internal.ui.browser.typehierarchy;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.IMember;
 import org.eclipse.fdt.internal.ui.util.ProblemTreeViewer;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementLabels;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementLabels;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -56,9 +56,9 @@ public abstract class TypeHierarchyViewer extends ProblemTreeViewer {
 	
 	public void setQualifiedTypeName(boolean on) {
 		if (on) {
-		    fLabelProvider.setTextFlags(fLabelProvider.getTextFlags() | CElementLabels.T_POST_QUALIFIED);
+		    fLabelProvider.setTextFlags(fLabelProvider.getTextFlags() | FortranElementLabels.T_POST_QUALIFIED);
 		} else {
-		    fLabelProvider.setTextFlags(fLabelProvider.getTextFlags() & ~CElementLabels.T_POST_QUALIFIED);
+		    fLabelProvider.setTextFlags(fLabelProvider.getTextFlags() & ~FortranElementLabels.T_POST_QUALIFIED);
 		}
 		refresh();
 	}

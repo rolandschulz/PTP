@@ -20,13 +20,13 @@ import org.eclipse.ui.help.WorkbenchHelp;
 /**
  * The page for setting c plugin preferences.
  */
-public class CPluginPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class FortranPluginPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 	
 
 	private static final String LINK_TO_EDITOR_LABEL= "CBasePreferencePage.linkToEditor.label"; //$NON-NLS-1$
 	private static final String USE_STRUCTURAL_PARSE_MODE_LABEL= "CBasePreferencePage.OutlineView.structuralParseMode.label"; //$NON-NLS-1$
 	
-	public CPluginPreferencePage() {
+	public FortranPluginPreferencePage() {
 		super(GRID);
 		setPreferenceStore(FortranUIPlugin.getDefault().getPreferenceStore());
 	}

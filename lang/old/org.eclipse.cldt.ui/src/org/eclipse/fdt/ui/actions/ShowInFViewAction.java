@@ -14,7 +14,7 @@ package org.eclipse.fdt.ui.actions;
 import org.eclipse.fdt.core.model.CModelException;
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.internal.ui.actions.SelectionConverter;
-import org.eclipse.fdt.internal.ui.editor.CEditorMessages;
+import org.eclipse.fdt.internal.ui.editor.FortranEditorMessages;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
@@ -30,32 +30,32 @@ import org.eclipse.ui.part.ISetSelectionTarget;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
- * This class will open the C/C++ Projects view and highlight the
+ * This class will open the Fortran Projects view and highlight the
  * selected resource matching the current resouce being edited in
- * the C/C++ Editor.  It uses the IShowInSource/IShowInTarget to 
+ * the Fortran Editor.  It uses the IShowInSource/IShowInTarget to 
  * accomplish this task so as to provide some additional portability
  * and future proofing.
  */
-public class ShowInCViewAction extends SelectionProviderAction {
+public class ShowInFViewAction extends SelectionProviderAction {
 
 	private IWorkbenchPage page;
 	private ITextEditor fEditor;
 
-	public ShowInCViewAction(IWorkbenchSite site) {
+	public ShowInFViewAction(IWorkbenchSite site) {
 		this(site.getPage(), site.getSelectionProvider());
 	}
 
-	public ShowInCViewAction(ITextEditor editor) {	
+	public ShowInFViewAction(ITextEditor editor) {	
 		this(editor.getEditorSite().getWorkbenchWindow().getActivePage(), editor.getSelectionProvider());
 		fEditor = editor;
 	}
 
-	public ShowInCViewAction(IWorkbenchPage page, ISelectionProvider viewer) {
-		super(viewer, CEditorMessages.getString("ShowInCView.label")); //$NON-NLS-1$
-		setToolTipText(CEditorMessages.getString("ShowInCView.tooltip")); //$NON-NLS-1$
-		setDescription(CEditorMessages.getString("ShowInCView.description")); //$NON-NLS-1$
+	public ShowInFViewAction(IWorkbenchPage page, ISelectionProvider viewer) {
+		super(viewer, FortranEditorMessages.getString("ShowInFView.label")); //$NON-NLS-1$
+		setToolTipText(FortranEditorMessages.getString("ShowInFView.tooltip")); //$NON-NLS-1$
+		setDescription(FortranEditorMessages.getString("ShowInFView.description")); //$NON-NLS-1$
 		this.page = page;
-		setDescription(CEditorMessages.getString("ShowInCView.toolTip")); //$NON-NLS-1$
+		setDescription(FortranEditorMessages.getString("ShowInFView.toolTip")); //$NON-NLS-1$
 		//WorkbenchHelp.setHelp(this, ICHelpContextIds.SHOW_IN_CVIEW_ACTION);
 	}
 

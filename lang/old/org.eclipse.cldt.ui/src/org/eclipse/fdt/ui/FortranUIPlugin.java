@@ -36,7 +36,7 @@ import org.eclipse.fdt.internal.ui.IContextMenuConstants;
 import org.eclipse.fdt.internal.ui.ResourceAdapterFactory;
 import org.eclipse.fdt.internal.ui.browser.typehierarchy.ITypeHierarchyViewPart;
 import org.eclipse.fdt.internal.ui.buildconsole.BuildConsoleManager;
-import org.eclipse.fdt.internal.ui.editor.CDocumentProvider;
+import org.eclipse.fdt.internal.ui.editor.FortranDocumentProvider;
 import org.eclipse.fdt.internal.ui.editor.CustomBufferFactory;
 import org.eclipse.fdt.internal.ui.editor.ExternalSearchDocumentProvider;
 import org.eclipse.fdt.internal.ui.editor.SharedTextColors;
@@ -91,13 +91,13 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 
 	public static final String PLUGIN_ID = "org.eclipse.fdt.ui"; //$NON-NLS-1$
 	public static final String PLUGIN_CORE_ID = "org.eclipse.fdt.core"; //$NON-NLS-1$
-	public static final String EDITOR_ID = PLUGIN_ID + ".editor.CEditor"; //$NON-NLS-1$
-	public static final String FVIEW_ID = PLUGIN_ID + ".FView"; //$NON-NLS-1$
+	public static final String EDITOR_ID = PLUGIN_ID + ".editor.FortranEditor"; //$NON-NLS-1$
+	public static final String FVIEW_ID = PLUGIN_ID + ".FortranView"; //$NON-NLS-1$
 	public static final String C_PROBLEMMARKER = PLUGIN_CORE_ID + ".problem"; //$NON-NLS-1$
 
 	public static final String F_PROJECT_WIZARD_ID = PLUGIN_ID + ".wizards.StdFWizard"; //$NON-NLS-1$
 
-	public final static String FWIZARD_CATEGORY_ID = "org.eclipse.fdt.ui.newFWizards"; //$NON-NLS-1$
+	public final static String FWIZARD_CATEGORY_ID = "org.eclipse.fdt.ui.newFortranWizards"; //$NON-NLS-1$
 	
 	public static final String SEARCH_ACTION_SET_ID = PLUGIN_ID + ".SearchActionSet"; //$NON-NLS-1$
 	public static final String BUILDER_ID = PLUGIN_CORE_ID + ".fbuilder"; //$NON-NLS-1$
@@ -130,7 +130,7 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 	 * The id of the Fortran perspective
 	 * (value <code>"org.eclipse.cdt.ui.FPerspective"</code>).
 	 */	
-	public static final String ID_FPERSPECTIVE = PLUGIN_ID + ".FPerspective"; //$NON-NLS-1$
+	public static final String ID_FPERSPECTIVE = PLUGIN_ID + ".FortranPerspective"; //$NON-NLS-1$
 	
 	/**
 	 * The id of the C hierarchy perspective
@@ -202,11 +202,11 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 	
 	/**
 	 * The id of the Fortran Element Creation action set
-	 * (value <code>"org.eclipse.fdt.ui.FElementCreationActionSet"</code>).
+	 * (value <code>"org.eclipse.fdt.ui.FortranElementCreationActionSet"</code>).
 	 * 
 	 * @since 2.0
 	 */
-	public static final String ID_FELEMENT_CREATION_ACTION_SET= "org.eclipse.fdt.ui.FElementCreationActionSet"; //$NON-NLS-1$
+	public static final String ID_FELEMENT_CREATION_ACTION_SET= "org.eclipse.fdt.ui.FortranElementCreationActionSet"; //$NON-NLS-1$
 	
 	// -------- static methods --------
 
@@ -335,7 +335,7 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 	// ------ FortranUIPlugin
 
 	private CoreModel CoreModel;
-	private CDocumentProvider fDocumentProvider;
+	private FortranDocumentProvider fDocumentProvider;
 	private ExternalSearchDocumentProvider fExternalDocumentProvider;
 	private IBufferFactory fBufferFactory;
 	private WorkingCopyManager fWorkingCopyManager;
@@ -368,9 +368,9 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 	/**
 	 * Returns the used document provider
 	 */
-	public synchronized CDocumentProvider getDocumentProvider() {
+	public synchronized FortranDocumentProvider getDocumentProvider() {
 		if (fDocumentProvider == null) {
-			fDocumentProvider = new CDocumentProvider();
+			fDocumentProvider = new FortranDocumentProvider();
 		}
 		return fDocumentProvider;
 	}
@@ -390,7 +390,7 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 	 */
 	public synchronized IWorkingCopyManager getWorkingCopyManager() {
 		if (fWorkingCopyManager == null) {
-			CDocumentProvider provider = getDocumentProvider();
+			FortranDocumentProvider provider = getDocumentProvider();
 			fWorkingCopyManager = new WorkingCopyManager(provider);
 		}
 		return fWorkingCopyManager;

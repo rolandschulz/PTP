@@ -13,8 +13,8 @@ import org.eclipse.fdt.core.model.INamespace;
 import org.eclipse.fdt.core.model.ITemplate;
 import org.eclipse.fdt.core.model.ITypeDef;
 import org.eclipse.fdt.core.model.IVariableDeclaration;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementLabels;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementImageProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementLabels;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -80,7 +80,7 @@ public class CElementLabelProvider extends LabelProvider {
 	public final static int SHOW_DEFAULT= new Integer(SHOW_PARAMETERS | SHOW_OVERLAY_ICONS).intValue();
 	
 	private WorkbenchLabelProvider fWorkbenchLabelProvider;
-	protected CElementImageProvider fImageLabelProvider;
+	protected FortranElementImageProvider fImageLabelProvider;
 
 	private int fFlags;
 	private int fImageFlags;
@@ -93,7 +93,7 @@ public class CElementLabelProvider extends LabelProvider {
 	public CElementLabelProvider(int flags) {
 		fWorkbenchLabelProvider= new WorkbenchLabelProvider();
 		
-		fImageLabelProvider= new CElementImageProvider();
+		fImageLabelProvider= new FortranElementImageProvider();
 
 		fFlags = flags;
 	}
@@ -206,10 +206,10 @@ public class CElementLabelProvider extends LabelProvider {
 	public int getImageFlags() {
 		fImageFlags = 0;
 		if (getFlag(SHOW_OVERLAY_ICONS)) {
-			fImageFlags |= CElementImageProvider.OVERLAY_ICONS;
+			fImageFlags |= FortranElementImageProvider.OVERLAY_ICONS;
 		}
 		if (getFlag(SHOW_SMALL_ICONS)) {
-			fImageFlags |= CElementImageProvider.SMALL_ICONS;
+			fImageFlags |= FortranElementImageProvider.SMALL_ICONS;
 		}
 		return fImageFlags;
 	}
@@ -221,16 +221,16 @@ public class CElementLabelProvider extends LabelProvider {
 	public int getTextFlags() {
 		fTextFlags = 0;
 		if (getFlag(SHOW_RETURN_TYPE)) {
-			fTextFlags |= CElementLabels.M_APP_RETURNTYPE;
+			fTextFlags |= FortranElementLabels.M_APP_RETURNTYPE;
 		}
 		if (getFlag(SHOW_PARAMETERS)) {
-			fTextFlags |= CElementLabels.M_PARAMETER_TYPES;
+			fTextFlags |= FortranElementLabels.M_PARAMETER_TYPES;
 		}
 		if (getFlag(SHOW_EXCEPTION)) {
-			fTextFlags |= CElementLabels.M_EXCEPTIONS;
+			fTextFlags |= FortranElementLabels.M_EXCEPTIONS;
 		}
 		if (getFlag(SHOW_POST_QUALIFIED)) {
-			fTextFlags |= CElementLabels.M_POST_QUALIFIED;
+			fTextFlags |= FortranElementLabels.M_POST_QUALIFIED;
 		}
 		return fTextFlags;
 	}

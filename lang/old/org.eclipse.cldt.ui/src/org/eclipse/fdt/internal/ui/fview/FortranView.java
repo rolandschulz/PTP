@@ -38,12 +38,12 @@ import org.eclipse.fdt.internal.ui.dnd.ResourceTransferDragAdapter;
 import org.eclipse.fdt.internal.ui.dnd.ResourceTransferDropAdapter;
 import org.eclipse.fdt.internal.ui.dnd.TransferDragSourceListener;
 import org.eclipse.fdt.internal.ui.dnd.TransferDropTargetListener;
-import org.eclipse.fdt.internal.ui.preferences.CPluginPreferencePage;
+import org.eclipse.fdt.internal.ui.preferences.FortranPluginPreferencePage;
 import org.eclipse.fdt.internal.ui.util.EditorUtility;
 import org.eclipse.fdt.internal.ui.util.ProblemTreeViewer;
 import org.eclipse.fdt.internal.ui.viewsupport.AppearanceAwareLabelProvider;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
-import org.eclipse.fdt.internal.ui.viewsupport.CUILabelProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementImageProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranUILabelProvider;
 import org.eclipse.fdt.internal.ui.viewsupport.DecoratingCLabelProvider;
 import org.eclipse.fdt.ui.CElementContentProvider;
 import org.eclipse.fdt.ui.CElementSorter;
@@ -438,7 +438,7 @@ public class FortranView extends ViewPart implements ISetSelectionTarget, IPrope
 	 * Sets the label provider for the viewer.
 	 */
 	void initLabelProvider(TreeViewer viewer) {
-		CUILabelProvider cProvider = createLabelProvider();
+		FortranUILabelProvider cProvider = createLabelProvider();
 		viewer.setLabelProvider(new DecoratingCLabelProvider(cProvider, true));
 	}
 
@@ -582,8 +582,8 @@ public class FortranView extends ViewPart implements ISetSelectionTarget, IPrope
 		return provider;
 	}
 
-	protected CUILabelProvider createLabelProvider() {
-		return new FortranViewLabelProvider(AppearanceAwareLabelProvider.DEFAULT_TEXTFLAGS, AppearanceAwareLabelProvider.DEFAULT_IMAGEFLAGS | CElementImageProvider.SMALL_ICONS);
+	protected FortranUILabelProvider createLabelProvider() {
+		return new FortranViewLabelProvider(AppearanceAwareLabelProvider.DEFAULT_TEXTFLAGS, AppearanceAwareLabelProvider.DEFAULT_IMAGEFLAGS | FortranElementImageProvider.SMALL_ICONS);
 	}
 
 	/*
@@ -614,7 +614,7 @@ public class FortranView extends ViewPart implements ISetSelectionTarget, IPrope
 	 * the editor's input, if linking is enabled.
 	 */
 	void editorActivated(IEditorPart editor) {
-		if (!CPluginPreferencePage.isLinkToEditor()) {
+		if (!FortranPluginPreferencePage.isLinkToEditor()) {
 			return;
 		}
 
@@ -851,11 +851,11 @@ public class FortranView extends ViewPart implements ISetSelectionTarget, IPrope
 	 *         if not
 	 */
 	public boolean isLinkingEnabled() {
-		return CPluginPreferencePage.isLinkToEditor();
+		return FortranPluginPreferencePage.isLinkToEditor();
 	}
 
 	public void setLinkingEnabled(boolean enable) {
-		CPluginPreferencePage.setLinkingEnabled(enable);
+		FortranPluginPreferencePage.setLinkingEnabled(enable);
 	}
 
 	/**

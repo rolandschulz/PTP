@@ -12,8 +12,8 @@ package org.eclipse.fdt.internal.ui.browser.typehierarchy;
 
 import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.internal.ui.ICHelpContextIds;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementLabels;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementImageProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementLabels;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 
@@ -32,7 +32,7 @@ public class HistoryAction extends Action {
 		fViewPart= viewPart;
 		fElement= element;		
 		
-		String elementName= CElementLabels.getElementLabel(element, CElementLabels.ALL_POST_QUALIFIED | CElementLabels.M_PARAMETER_TYPES);
+		String elementName= FortranElementLabels.getElementLabel(element, FortranElementLabels.ALL_POST_QUALIFIED | FortranElementLabels.M_PARAMETER_TYPES);
 		setText(elementName);
 		setImageDescriptor(getImageDescriptor(element));
 				
@@ -42,7 +42,7 @@ public class HistoryAction extends Action {
 	}
 	
 	private ImageDescriptor getImageDescriptor(ICElement elem) {
-		CElementImageProvider imageProvider= new CElementImageProvider();
+		FortranElementImageProvider imageProvider= new FortranElementImageProvider();
 		ImageDescriptor desc= imageProvider.getBaseImageDescriptor(elem, 0);
 		imageProvider.dispose();
 		return desc;

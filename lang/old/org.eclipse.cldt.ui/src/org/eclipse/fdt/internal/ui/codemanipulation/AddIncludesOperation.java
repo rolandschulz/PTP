@@ -28,7 +28,7 @@ import org.eclipse.fdt.core.model.IInclude;
 import org.eclipse.fdt.core.model.ISourceRange;
 import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.core.model.IUsing;
-import org.eclipse.fdt.internal.ui.editor.CEditorMessages;
+import org.eclipse.fdt.internal.ui.editor.FortranEditorMessages;
 import org.eclipse.fdt.ui.IRequiredInclude;
 
 
@@ -74,7 +74,7 @@ public class AddIncludesOperation implements IWorkspaceRunnable {
 		if (fTranslationUnit != null) {
 			ArrayList toAdd = new ArrayList();
 			
-			monitor.beginTask(CEditorMessages.getString("AddIncludesOperation.description"), 2); //$NON-NLS-1$
+			monitor.beginTask(FortranEditorMessages.getString("AddIncludesOperation.description"), 2); //$NON-NLS-1$
 			
 			List elements = fTranslationUnit.getChildrenOfType(ICElement.C_INCLUDE);
 			for (int i = 0; i < fIncludes.length; ++i) {
@@ -128,7 +128,7 @@ public class AddIncludesOperation implements IWorkspaceRunnable {
 		if (fTranslationUnit != null) {
 			ArrayList toAdd = new ArrayList();
 			
-			monitor.beginTask(CEditorMessages.getString("AddIncludesOperation.description"), 2); //$NON-NLS-1$
+			monitor.beginTask(FortranEditorMessages.getString("AddIncludesOperation.description"), 2); //$NON-NLS-1$
 			
 			List elements = fTranslationUnit.getChildrenOfType(ICElement.C_USING);
 			for (int i = 0; i < fUsings.length; ++i) {

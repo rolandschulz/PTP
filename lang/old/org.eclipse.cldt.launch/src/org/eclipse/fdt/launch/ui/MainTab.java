@@ -28,7 +28,7 @@ import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.ICProject;
 import org.eclipse.fdt.debug.core.IFDTLaunchConfigurationConstants;
 import org.eclipse.fdt.internal.ui.FortranPluginImages;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementImageProvider;
 import org.eclipse.fdt.launch.internal.ui.LaunchImages;
 import org.eclipse.fdt.launch.internal.ui.LaunchMessages;
 import org.eclipse.fdt.launch.internal.ui.LaunchUIPlugin;
@@ -300,7 +300,7 @@ public class MainTab extends LaunchConfigurationTab {
 
 		ILabelProvider programLabelProvider = new CElementLabelProvider() {
 
-			CElementImageProvider imageProvider = new CElementImageProvider();
+			FortranElementImageProvider imageProvider = new FortranElementImageProvider();
 
 			public String getText(Object element) {
 				if (element instanceof IBinary) {

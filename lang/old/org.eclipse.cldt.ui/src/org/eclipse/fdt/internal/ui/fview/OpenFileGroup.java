@@ -41,7 +41,7 @@ public class OpenFileGroup extends FortranViewActionGroup {
 	}
 
 	protected void makeActions() {
-		openFileAction = new OpenFileAction(getCView().getSite().getPage());
+		openFileAction = new OpenFileAction(getFView().getSite().getPage());
 	}
 
 	public void fillContextMenu(IMenuManager menu) {
@@ -81,7 +81,7 @@ public class OpenFileGroup extends FortranViewActionGroup {
 		}
 
 		MenuManager submenu = new MenuManager(FortranViewMessages.getString("OpenWithMenu.label")); //$NON-NLS-1$
-		submenu.add(new OpenWithMenu(getCView().getSite().getPage(), (IFile) element));
+		submenu.add(new OpenWithMenu(getFView().getSite().getPage(), (IFile) element));
 		menu.add(submenu);
 	}
 
@@ -107,7 +107,7 @@ public class OpenFileGroup extends FortranViewActionGroup {
 			return;
 		}
 
-		menu.add(new OpenInNewWindowAction(getCView().getSite().getWorkbenchWindow(), (IContainer) element));
+		menu.add(new OpenInNewWindowAction(getFView().getSite().getWorkbenchWindow(), (IContainer) element));
 	}
 
     /* (non-Javadoc)
@@ -132,7 +132,7 @@ public class OpenFileGroup extends FortranViewActionGroup {
 			try {
 				IEditorPart part = EditorUtility.openInEditor(celement);
 				if (part != null) {
-					IWorkbenchPage page = getCView().getSite().getPage();
+					IWorkbenchPage page = getFView().getSite().getPage();
 					page.bringToTop(part);
 					if (celement instanceof ISourceReference) {
 						EditorUtility.revealInEditor(part, celement);

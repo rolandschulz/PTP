@@ -11,7 +11,7 @@
 package org.eclipse.fdt.internal.ui.wizards.classwizard;
 
 import org.eclipse.fdt.internal.ui.FortranPluginImages;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementImageProvider;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -29,7 +29,7 @@ public final class MethodStubsLabelProvider implements ITableLabelProvider {
 			return null;
 		
 	    IMethodStub stub = (IMethodStub) element;
-		ImageDescriptor descriptor = CElementImageProvider.getMethodImageDescriptor(stub.getAccess());
+		ImageDescriptor descriptor = FortranElementImageProvider.getMethodImageDescriptor(stub.getAccess());
 		if (descriptor != null) {
 			return FortranUIPlugin.getImageDescriptorRegistry().get(descriptor);
 		}

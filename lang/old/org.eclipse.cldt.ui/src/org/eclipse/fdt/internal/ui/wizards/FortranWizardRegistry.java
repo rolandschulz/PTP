@@ -22,7 +22,7 @@ import org.eclipse.ui.internal.IWorkbenchConstants;
 /**
  * Convenience class for drop-in C/C++ Wizard contributions.
  */
-public class CWizardRegistry {
+public class FortranWizardRegistry {
 
 	private final static String TAG_WIZARD = "wizard"; //$NON-NLS-1$
 	private final static String ATT_CATEGORY = "category";//$NON-NLS-1$
@@ -43,26 +43,13 @@ public class CWizardRegistry {
 	 * 
 	 * @return <code>true</code> if the given wizard element applies to a C Project
 	 */
-	public static boolean isCProjectWizard(IConfigurationElement element) {
+	public static boolean isFortranProjectWizard(IConfigurationElement element) {
 	    String category = element.getAttribute(ATT_CATEGORY);
 	    return (category != null && category.equals(FortranUIPlugin.FWIZARD_CATEGORY_ID));
 	}
     
 	/**
-	 * Checks if wizard supports C++ project.
-	 * 
-	 * @param element the wizard element
-	 * 
-	 * @return <code>true</code> if the given wizard element applies to a C++ Project
-	 */
-	public static boolean isCCProjectWizard(IConfigurationElement element) {
-	    //String category = element.getAttribute(ATT_CATEGORY);
-	    //return (category != null && category.equals(FortranUIPlugin.CCWIZARD_CATEGORY_ID));
-		return false;
-	}
-
-	/**
-	 * Returns IDs of all C/C++ project wizards contributed to the workbench.
+	 * Returns IDs of all Fortran project wizards contributed to the workbench.
 	 * 
 	 * @return an array of wizard ids
 	 */
@@ -318,17 +305,7 @@ public class CWizardRegistry {
 	    // add C wizards first
 	    for (int i = 0; i < elements.length; ++i) {
 			IConfigurationElement element= elements[i];
-			if (isCProjectWizard(element)) {
-	            String id = element.getAttribute(IWorkbenchConstants.TAG_ID);
-	            if (id != null && !idList.contains(id)) {
-	            	idList.add(id);
-	            }
-			}
-	    }
-	    // now add C++ wizards
-	    for (int i = 0; i < elements.length; ++i) {
-			IConfigurationElement element= elements[i];
-			if (isCCProjectWizard(element)) {
+			if (isFortranProjectWizard(element)) {
 	            String id = element.getAttribute(IWorkbenchConstants.TAG_ID);
 	            if (id != null && !idList.contains(id)) {
 	            	idList.add(id);
@@ -346,21 +323,7 @@ public class CWizardRegistry {
 	    // add C wizards first
 	    for (int i = 0; i < elements.length; ++i) {
 			IConfigurationElement element = elements[i];
-			if (isCProjectWizard(element)) {
-	            String id = element.getAttribute(IWorkbenchConstants.TAG_ID);
-	            if (id != null && !idList.contains(id)) {
-	            	idList.add(id);
-	    	        IAction action = new OpenNewWizardAction(element);
-	    	        if (action != null) {
-	    	        	actionList.add(action);
-	    	        }
-	            }
-			}
-	    }
-	    // now add C++ wizards
-	    for (int i = 0; i < elements.length; ++i) {
-			IConfigurationElement element = elements[i];
-			if (isCCProjectWizard(element)) {
+			if (isFortranProjectWizard(element)) {
 	            String id = element.getAttribute(IWorkbenchConstants.TAG_ID);
 	            if (id != null && !idList.contains(id)) {
 	            	idList.add(id);

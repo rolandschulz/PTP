@@ -31,58 +31,18 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
-            name="%WizardNewCMakeProject.name"
-            icon="icons/ctool16/newc_app.gif"
-            category="org.eclipse.fdt.ui.newCWizards"
+            name="%WizardNewFortranMakeProject.name"
+            icon="icons/ctool16/newf_app.gif"
+            category="org.eclipse.fdt.ui.newFortranWizards"
             class="org.eclipse.fdt.make.ui.wizards.NewMakeCProjectWizard"
             project="true"
-            finalPerspective="org.eclipse.fdt.ui.CPerspective"
-            id="org.eclipse.fdt.ui.wizards.NewMakeCProjectWizard">
+            finalPerspective="org.eclipse.fdt.ui.FortranPerspective"
+            id="org.eclipse.fdt.ui.wizards.NewMakeFortranProjectWizard">
          <description>
             %WizardNewCMakeProject.description
          </description>
       </wizard>
-      <wizard
-            name="%WizardConvertMakeProject.name"
-            icon="icons/ctool16/convert-normal.gif"
-            category="org.eclipse.fdt.ui.newCWizards"
-            class="org.eclipse.fdt.make.ui.wizards.ConvertToMakeProjectWizard"
-            finalPerspective="org.eclipse.fdt.ui.CPerspective"
-            id="org.eclipse.fdt.ui.wizards.ConvertToMakeWizard">
-         <description>
-            %WizardConvertMakeProject.description
-         </description>
-         <selection
-               class="org.eclipse.core.resources.IProject">
-         </selection>
-      </wizard>
 <!-- For C++ Wizards -->
-      <wizard
-            name="%WizardNewCCMakeProject.name"
-            icon="icons/ctool16/newcc_app.gif"
-            category="org.eclipse.fdt.ui.newCCWizards"
-            class="org.eclipse.fdt.make.ui.wizards.NewMakeCCProjectWizard"
-            project="true"
-            finalPerspective="org.eclipse.fdt.ui.CPerspective"
-            id="org.eclipse.fdt.make.ui.wizards.NewMakeCCProjectWizard">
-         <description>
-            %WizardNewCCMakeProject.description
-         </description>
-      </wizard>
-      <wizard
-            name="%WizardConvertMakeProject.name"
-            icon="icons/ctool16/convert-normal.gif"
-            category="org.eclipse.fdt.ui.newCCWizards"
-            class="org.eclipse.fdt.make.ui.wizards.ConvertToMakeProjectWizard"
-            finalPerspective="org.eclipse.fdt.ui.CPerspective"
-            id="org.eclipse.fdt.ui.wizards.ConvertToMakeWizard">
-         <description>
-            %WizardConvertMakeProject.description
-         </description>
-         <selection
-               class="org.eclipse.core.resources.IProject">
-         </selection>
-      </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">
@@ -500,7 +460,7 @@
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
-            targetID="org.eclipse.fdt.ui.CPerspective">
+            targetID="org.eclipse.fdt.ui.FortranPerspective">
          <view
                relative="org.eclipse.ui.views.ContentOutline"
                visible="true"

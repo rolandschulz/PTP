@@ -31,7 +31,7 @@ import org.eclipse.fdt.core.model.ITranslationUnit;
 import org.eclipse.fdt.core.model.IWorkingCopy;
 import org.eclipse.fdt.core.resources.FileStorage;
 import org.eclipse.fdt.internal.ui.editor.FortranEditor;
-import org.eclipse.fdt.internal.ui.editor.CEditorMessages;
+import org.eclipse.fdt.internal.ui.editor.FortranEditorMessages;
 import org.eclipse.fdt.internal.ui.editor.ITranslationUnitEditorInput;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.action.Action;
@@ -407,7 +407,7 @@ public class EditorUtility {
 		String newModifierString= Action.findModifierString(modifier);
 		if (modifierString.length() == 0)
 			return newModifierString;
-		return CEditorMessages.getFormattedString("EditorUtility.concatModifierStrings", new String[] {modifierString, newModifierString}); //$NON-NLS-1$
+		return FortranEditorMessages.getFormattedString("EditorUtility.concatModifierStrings", new String[] {modifierString, newModifierString}); //$NON-NLS-1$
 	}
 
 	public static IStorage getStorage(IBinary bin) {

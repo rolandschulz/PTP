@@ -16,8 +16,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 
-public class CEditorMessages  {
-	private static final String RESOURCE_BUNDLE = "org.eclipse.fdt.internal.ui.editor.CEditorMessages"; //$NON-NLS-1$
+public class FortranEditorMessages  {
+	private static final String RESOURCE_BUNDLE = "org.eclipse.fdt.internal.ui.editor.FortranEditorMessages"; //$NON-NLS-1$
 
 
 	private static ResourceBundle fgResourceBundle;
@@ -30,7 +30,7 @@ public class CEditorMessages  {
 	}
 
 
-	private CEditorMessages() {
+	private FortranEditorMessages() {
 	}
 
 

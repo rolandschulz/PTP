@@ -19,13 +19,13 @@ import org.eclipse.swt.widgets.Display;
 /**
  * Java color manager.
  */
-public class CColorManager implements IColorManager, IColorManagerExtension {
+public class FortranColorManager implements IColorManager, IColorManagerExtension {
 	
 	protected Map fKeyTable= new HashMap(10);
 	protected Map fDisplayTable= new HashMap(2);
 	
 	
-	public CColorManager() {
+	public FortranColorManager() {
 	}
 	
 	protected void dispose(Display display) {		

@@ -11,24 +11,27 @@
 
 package org.eclipse.fdt.internal.ui.editor;
 
-import org.eclipse.core.filebuffers.IDocumentFactory;
+import org.eclipse.core.filebuffers.IDocumentSetupParticipant;
+import org.eclipse.fdt.internal.ui.text.FortranTextTools;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.text.IDocument;
 
 /**
- * CDocumentFactory
+ * FortranDocumentSetupParticipant
  */
-public class CDocumentFactory implements IDocumentFactory {
+public class FortranDocumentSetupParticipant implements IDocumentSetupParticipant {
 	/**
 	 * 
 	 */
-	public CDocumentFactory() {
+	public FortranDocumentSetupParticipant() {
 	}
-
+	
 	/*
-	 * @see org.eclipse.core.filebuffers.IDocumentFactory#createDocument()
+	 * @see org.eclipse.core.filebuffers.IDocumentSetupParticipant#setup(org.eclipse.jface.text.IDocument)
 	 */
-	public IDocument createDocument() {
-		return new PartiallySynchronizedDocument();
+	public void setup(IDocument document) {
+		FortranTextTools tools= FortranUIPlugin.getDefault().getTextTools();
+		tools.setupFortranDocument(document);
 	}
 
 }

@@ -17,7 +17,7 @@ import org.eclipse.fdt.core.model.IPathEntry;
 import org.eclipse.fdt.core.model.IPathEntryContainer;
 import org.eclipse.fdt.internal.ui.FortranPluginImages;
 import org.eclipse.fdt.internal.ui.util.ImageDescriptorRegistry;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementImageProvider;
 import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IColorProvider;
@@ -41,7 +41,7 @@ class CPElementLabelProvider extends LabelProvider implements IColorProvider {
 	private boolean bShowExported;
 	private boolean bShowParentInfo;
 	private ImageDescriptorRegistry fRegistry;
-	private CElementImageProvider fCImages;
+	private FortranElementImageProvider fCImages;
 
 	public CPElementLabelProvider() {
 		this(true, false);
@@ -51,7 +51,7 @@ class CPElementLabelProvider extends LabelProvider implements IColorProvider {
 		fNewLabel = CPathEntryMessages.getString("CPElementLabelProvider.new"); //$NON-NLS-1$
 		fCreateLabel = CPathEntryMessages.getString("CPElementLabelProvider.willbecreated"); //$NON-NLS-1$
 		fRegistry = FortranUIPlugin.getImageDescriptorRegistry();
-		fCImages = new CElementImageProvider();
+		fCImages = new FortranElementImageProvider();
 
 		fLibIcon = FortranPluginImages.DESC_OBJS_ARCHIVE;
 		fLibWSrcIcon = FortranPluginImages.DESC_OBJS_ARCHIVE_WSRC;

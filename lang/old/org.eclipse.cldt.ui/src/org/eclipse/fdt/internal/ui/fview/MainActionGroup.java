@@ -108,16 +108,16 @@ public class MainActionGroup extends FortranViewActionGroup {
 	}
 
 	protected void makeActions() {
-		final Viewer viewer = getCView().getViewer();
-		Shell shell = getCView().getViewSite().getShell();
+		final Viewer viewer = getFView().getViewer();
+		Shell shell = getFView().getViewSite().getShell();
 
-		openFileGroup = new OpenFileGroup(getCView());
-		openProjectGroup = new OpenProjectGroup(getCView());
-		gotoGroup = new GotoActionGroup(getCView());
-		buildGroup = new BuildGroup(getCView());
-		refactorGroup = new RefactorActionGroup(getCView());
+		openFileGroup = new OpenFileGroup(getFView());
+		openProjectGroup = new OpenProjectGroup(getFView());
+		gotoGroup = new GotoActionGroup(getFView());
+		buildGroup = new BuildGroup(getFView());
+		refactorGroup = new RefactorActionGroup(getFView());
 
-        newWizardMenu = new NewWizardMenu(getCView().getSite().getWorkbenchWindow());
+        newWizardMenu = new NewWizardMenu(getFView().getSite().getWorkbenchWindow());
 
 		openIncludeAction = new OpenIncludeAction(viewer);
 
@@ -132,34 +132,34 @@ public class MainActionGroup extends FortranViewActionGroup {
 					Object newValue = event.getNewValue();
                                          
 					if (newValue instanceof IWorkingSet) {
-						getCView().setWorkingSet((IWorkingSet) newValue);
+						getFView().setWorkingSet((IWorkingSet) newValue);
 					} else if (newValue == null) {
-						getCView().setWorkingSet(null);
+						getFView().setWorkingSet(null);
 					}
 				}
 			}
 		};
 		workingSetGroup = new WorkingSetFilterActionGroup(shell, workingSetUpdater);
-		workingSetGroup.setWorkingSet(getCView().getWorkingSet());
-		fCustomFiltersActionGroup= new CustomFiltersActionGroup(getCView(), getCView().getViewer());
+		workingSetGroup.setWorkingSet(getFView().getWorkingSet());
+		fCustomFiltersActionGroup= new CustomFiltersActionGroup(getFView(), getFView().getViewer());
 
 		addBookmarkAction = new AddBookmarkAction(shell);
 		addTaskAction = new AddTaskAction(shell);
 		propertyDialogAction = new PropertyDialogAction(shell, viewer);
 
 		// Importing/exporting.
-		importAction = new ImportResourcesAction(getCView().getSite().getWorkbenchWindow());
-		exportAction = new ExportResourcesAction(getCView().getSite().getWorkbenchWindow());
+		importAction = new ImportResourcesAction(getFView().getSite().getWorkbenchWindow());
+		exportAction = new ExportResourcesAction(getFView().getSite().getWorkbenchWindow());
 
-		collapseAllAction = new CollapseAllAction(getCView());
+		collapseAllAction = new CollapseAllAction(getFView());
 
-		toggleLinkingAction = new ToggleLinkingAction(getCView()); //$NON-NLS-1$
+		toggleLinkingAction = new ToggleLinkingAction(getFView()); //$NON-NLS-1$
 		toggleLinkingAction.setToolTipText(FortranViewMessages.getString("ToggleLinkingAction.toolTip")); //$NON-NLS-1$
 		toggleLinkingAction.setImageDescriptor(getImageDescriptor("elcl16/synced.gif"));//$NON-NLS-1$
 		toggleLinkingAction.setHoverImageDescriptor(getImageDescriptor("clcl16/synced.gif"));//$NON-NLS-1$
 
-		selectionSearchGroup = new SelectionSearchGroup(getCView().getSite());
-		refactoringActionGroup = new RefactoringActionGroup(getCView().getSite(), null);	
+		selectionSearchGroup = new SelectionSearchGroup(getFView().getSite());
+		refactoringActionGroup = new RefactoringActionGroup(getFView().getSite(), null);	
 		
 	}
 
@@ -168,7 +168,7 @@ public class MainActionGroup extends FortranViewActionGroup {
 	 * context dependent menu contributions.
 	 */
 	public void fillContextMenu(IMenuManager menu) {
-		IStructuredSelection celements = (IStructuredSelection) getCView().getViewer().getSelection();
+		IStructuredSelection celements = (IStructuredSelection) getFView().getViewer().getSelection();
 		IStructuredSelection resources = SelectionConverter.convertSelectionToResources(celements);
 
 		addNewMenu(menu, resources);

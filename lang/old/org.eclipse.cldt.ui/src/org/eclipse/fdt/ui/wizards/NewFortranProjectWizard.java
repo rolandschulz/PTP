@@ -52,7 +52,7 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
  * C Project wizard that creates a new project resource in
  * a location of the user's choice.
  */
-public abstract class NewCProjectWizard extends BasicNewResourceWizard implements IExecutableExtension {
+public abstract class NewFortranProjectWizard extends BasicNewResourceWizard implements IExecutableExtension {
 
 	private static final String OP_ERROR= "CProjectWizard.op_error"; //$NON-NLS-1$
 	private static final String OP_DESC= "CProjectWizard.op_description"; //$NON-NLS-1$
@@ -69,21 +69,21 @@ public abstract class NewCProjectWizard extends BasicNewResourceWizard implement
 	private String op_error;
 
 	protected IConfigurationElement fConfigElement;
-	protected NewCProjectWizardPage fMainPage; 
+	protected NewFortranProjectWizardPage fMainPage; 
 	protected IProject newProject;
 
 	List tabItemsList = new ArrayList();
 
-	public NewCProjectWizard() {
+	public NewFortranProjectWizard() {
 		this(FortranUIPlugin.getResourceString(WZ_TITLE), FortranUIPlugin.getResourceString(WZ_DESC), 
 			FortranUIPlugin.getResourceString(OP_ERROR));
 	}
 
-	public NewCProjectWizard(String title, String description) {
+	public NewFortranProjectWizard(String title, String description) {
 		this(title, description, FortranUIPlugin.getResourceString(OP_ERROR));
 	}
 
-	public NewCProjectWizard(String title, String description, String error) {
+	public NewFortranProjectWizard(String title, String description, String error) {
 		super();
 		setDialogSettings(FortranUIPlugin.getDefault().getDialogSettings());
 		setNeedsProgressMonitor(true);
@@ -96,7 +96,7 @@ public abstract class NewCProjectWizard extends BasicNewResourceWizard implement
 	 * @see Wizard#createPages
 	 */		
 	public void addPages() {
-		fMainPage= new NewCProjectWizardPage(FortranUIPlugin.getResourceString(PREFIX));
+		fMainPage= new NewFortranProjectWizardPage(FortranUIPlugin.getResourceString(PREFIX));
 		fMainPage.setTitle(wz_title);
 		fMainPage.setDescription(wz_desc);
 		addPage(fMainPage);

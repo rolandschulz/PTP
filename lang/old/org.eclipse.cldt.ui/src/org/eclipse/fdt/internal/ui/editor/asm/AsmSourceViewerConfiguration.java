@@ -69,7 +69,7 @@ public class AsmSourceViewerConfiguration extends SourceViewerConfiguration {
 
 
 
-		// CColorManager manager= fTextTools.getColorManager();
+		// FortranColorManager manager= fTextTools.getColorManager();
 		PresentationReconciler reconciler= new PresentationReconciler();
 
 

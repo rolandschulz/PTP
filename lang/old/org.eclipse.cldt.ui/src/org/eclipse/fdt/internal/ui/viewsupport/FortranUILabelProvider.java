@@ -20,9 +20,9 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 
-public class CUILabelProvider extends LabelProvider implements IColorProvider {
+public class FortranUILabelProvider extends LabelProvider implements IColorProvider {
 	
-	protected CElementImageProvider fImageLabelProvider;
+	protected FortranElementImageProvider fImageLabelProvider;
 	protected StorageLabelProvider fStorageLabelProvider;
 	
 	private ArrayList fLabelDecorators;
@@ -33,16 +33,16 @@ public class CUILabelProvider extends LabelProvider implements IColorProvider {
 	/**
 	 * Creates a new label provider with default flags.
 	 */
-	public CUILabelProvider() {
-		this(CElementLabels.M_PARAMETER_TYPES, CElementImageProvider.OVERLAY_ICONS);
+	public FortranUILabelProvider() {
+		this(FortranElementLabels.M_PARAMETER_TYPES, FortranElementImageProvider.OVERLAY_ICONS);
 	}
 
 	/**
 	 * @param textFlags Flags defined in <code>JavaElementLabels</code>.
 	 * @param imageFlags Flags defined in <code>JavaElementImageProvider</code>.
 	 */
-	public CUILabelProvider(int textFlags, int imageFlags) {
-		fImageLabelProvider= new CElementImageProvider();
+	public FortranUILabelProvider(int textFlags, int imageFlags) {
+		fImageLabelProvider= new FortranElementImageProvider();
 		fLabelDecorators= null; 
 		
 		fStorageLabelProvider= new StorageLabelProvider();
@@ -147,7 +147,7 @@ public class CUILabelProvider extends LabelProvider implements IColorProvider {
 	 * @see ILabelProvider#getText
 	 */
 	public String getText(Object element) {
-		String result= CElementLabels.getTextLabel(element, evaluateTextFlags(element));
+		String result= FortranElementLabels.getTextLabel(element, evaluateTextFlags(element));
 		if (result.length() == 0 && (element instanceof IStorage)) {
 			result= fStorageLabelProvider.getText(element);
 		}

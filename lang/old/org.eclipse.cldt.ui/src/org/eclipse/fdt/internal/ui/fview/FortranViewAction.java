@@ -35,7 +35,7 @@ public abstract class FortranViewAction extends SelectionProviderAction {
 	/**
 	 * Returns the cview for which this action was created.
 	 */
-	public FortranView getCView() {
+	public FortranView getFView() {
 		return cview;
 	}
 
@@ -43,14 +43,14 @@ public abstract class FortranViewAction extends SelectionProviderAction {
 	 * Returns the viewer
 	 */
 	protected Viewer getViewer() {
-		return getCView().getViewer();
+		return getFView().getViewer();
 	}
 
 	/**
 	 * Returns the shell to use within actions.
 	 */
 	protected Shell getShell() {
-		return getCView().getSite().getShell();
+		return getFView().getSite().getShell();
 	}
 
 	/**
@@ -64,6 +64,6 @@ public abstract class FortranViewAction extends SelectionProviderAction {
 	 * Returns the workbench window.
 	 */
 	protected IWorkbenchWindow getWorkbenchWindow() {
-		return getCView().getSite().getWorkbenchWindow();
+		return getFView().getSite().getWorkbenchWindow();
 	}
 }

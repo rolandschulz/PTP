@@ -30,14 +30,14 @@ import org.eclipse.fdt.managedbuilder.core.ManagedProjectNature;
 import org.eclipse.fdt.managedbuilder.internal.ui.ManagedBuilderHelpContextIds;
 import org.eclipse.fdt.managedbuilder.internal.ui.ManagedBuilderUIMessages;
 import org.eclipse.fdt.managedbuilder.internal.ui.ManagedBuilderUIPlugin;
-import org.eclipse.fdt.ui.wizards.NewCProjectWizard;
-import org.eclipse.fdt.ui.wizards.NewCProjectWizardPage;
+import org.eclipse.fdt.ui.wizards.NewFortranProjectWizard;
+import org.eclipse.fdt.ui.wizards.NewFortranProjectWizardPage;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.help.WorkbenchHelp;
 
 
-public class NewManagedProjectWizard extends NewCProjectWizard {
+public class NewManagedProjectWizard extends NewFortranProjectWizard {
 
 	/* (non-Javadoc)
 	 * String constants
@@ -93,7 +93,7 @@ public class NewManagedProjectWizard extends NewCProjectWizard {
 		if (pages != null) {
 			for (int i = 0; i < pages.length; i++) {
 				IWizardPage page = pages[i];
-				if (page instanceof NewCProjectWizardPage) {
+				if (page instanceof NewFortranProjectWizardPage) {
 					WorkbenchHelp.setHelp(page.getControl(), ManagedBuilderHelpContextIds.MAN_PROJ_WIZ_NAME_PAGE);
 				}
 				else if (page instanceof NewManagedProjectOptionPage) {
@@ -185,7 +185,7 @@ public class NewManagedProjectWizard extends NewCProjectWizard {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.fdt.ui.wizards.NewCProjectWizard#doRunPrologue(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.fdt.ui.wizards.NewFortranProjectWizard#doRunPrologue(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	protected void doRunPrologue(IProgressMonitor monitor) {
 		// Auto-generated method stub
@@ -193,7 +193,7 @@ public class NewManagedProjectWizard extends NewCProjectWizard {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.fdt.ui.wizards.NewCProjectWizard#doRunEpilogue(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.fdt.ui.wizards.NewFortranProjectWizard#doRunEpilogue(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	protected void doRunEpilogue(IProgressMonitor monitor) {
 		// Get my initializer to run
@@ -205,7 +205,7 @@ public class NewManagedProjectWizard extends NewCProjectWizard {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.fdt.ui.wizards.NewCProjectWizard#getProjectID()
+	 * @see org.eclipse.fdt.ui.wizards.NewFortranProjectWizard#getProjectID()
 	 */
 	public String getProjectID() {
 //		return "org.eclipse.fdt.make.core.make"; //$NON-NLS-1$

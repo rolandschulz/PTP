@@ -17,7 +17,7 @@ import org.eclipse.fdt.core.model.ICElement;
 import org.eclipse.fdt.core.model.IMethod;
 import org.eclipse.fdt.core.model.IMethodDeclaration;
 import org.eclipse.fdt.core.parser.ast.ASTAccessVisibility;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementLabels;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementLabels;
 import org.eclipse.fdt.internal.ui.viewsupport.StandardCElementLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -85,13 +85,13 @@ public class MethodsLabelProvider extends StandardCElementLabelProvider //extend
 	 */ 	
 	public String getText(Object element) {
 		String text= super.getText(element);
-		if ((getTextFlags() & CElementLabels.M_POST_QUALIFIED) != 0) {
+		if ((getTextFlags() & FortranElementLabels.M_POST_QUALIFIED) != 0) {
 			if (element instanceof ICElement) {
 			    ICElement parent = ((ICElement)element).getParent();
 			    if (parent != null) {
 			        StringBuffer name = new StringBuffer();
 			        name.append(text);
-			        name.append(CElementLabels.CONCAT_STRING);
+			        name.append(FortranElementLabels.CONCAT_STRING);
 			        name.append(TypeUtil.getFullyQualifiedName(parent).toString());
 			        text = name.toString();
 			    }
@@ -103,7 +103,7 @@ public class MethodsLabelProvider extends StandardCElementLabelProvider //extend
 			    ICElement type= getDefiningType(element);
 				if (type != null) {
 					StringBuffer buf= new StringBuffer(super.getText(type));
-					buf.append(CElementLabels.CONCAT_STRING);
+					buf.append(FortranElementLabels.CONCAT_STRING);
 					buf.append(text);
 					return buf.toString();			
 				}

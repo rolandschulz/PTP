@@ -85,7 +85,7 @@ public final class FortranCodeScanner extends AbstractFortranScanner {
 		rules.add(new SingleLineRule("\"", "\"", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 				
 		// Add generic white space rule.
-		//rules.add(new WhitespaceRule(new CWhitespaceDetector()));
+		//rules.add(new WhitespaceRule(new FortranWhitespaceDetector()));
 
 		// Add word rule for keywords, types, and constants.
 		token= getToken(IFortranColorConstants.FORTRAN_DEFAULT);

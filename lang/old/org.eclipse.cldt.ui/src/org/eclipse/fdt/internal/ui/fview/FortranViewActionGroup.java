@@ -68,7 +68,7 @@ public abstract class FortranViewActionGroup extends ActionGroup {
 	/**
 	 * Returns the resource navigator.
 	 */
-	public FortranView getCView() {
+	public FortranView getFView() {
 		return cview;
 	}
 	

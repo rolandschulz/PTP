@@ -12,7 +12,7 @@ import java.util.List;
 import org.eclipse.fdt.internal.ui.text.AbstractFortranScanner;
 import org.eclipse.fdt.internal.ui.text.IFortranColorConstants;
 import org.eclipse.fdt.internal.ui.text.IColorManager;
-import org.eclipse.fdt.internal.ui.text.util.CWhitespaceDetector;
+import org.eclipse.fdt.internal.ui.text.util.FortranWhitespaceDetector;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.ICharacterScanner;
@@ -88,7 +88,7 @@ public final class AsmCodeScanner extends AbstractFortranScanner {
 		Token other= getToken(IFortranColorConstants.FORTRAN_DEFAULT);		
 		
 		// Add generic whitespace rule.
-		rules.add(new WhitespaceRule(new CWhitespaceDetector()));
+		rules.add(new WhitespaceRule(new FortranWhitespaceDetector()));
 
 		// Add word rule for labels
 		WordRule labelRule = new WordRule(new AsmWordDetector(false), other) {

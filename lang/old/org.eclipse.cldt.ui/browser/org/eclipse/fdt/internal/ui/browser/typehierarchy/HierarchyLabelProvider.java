@@ -18,7 +18,7 @@ import org.eclipse.fdt.core.model.IMethod;
 import org.eclipse.fdt.core.model.IMethodDeclaration;
 import org.eclipse.fdt.core.model.IStructure;
 import org.eclipse.fdt.internal.ui.FortranPluginImages;
-import org.eclipse.fdt.internal.ui.viewsupport.CElementImageProvider;
+import org.eclipse.fdt.internal.ui.viewsupport.FortranElementImageProvider;
 import org.eclipse.fdt.internal.ui.viewsupport.StandardCElementLabelProvider;
 import org.eclipse.fdt.ui.CElementImageDescriptor;
 import org.eclipse.fdt.ui.FortranUIPlugin;
@@ -58,7 +58,7 @@ public class HierarchyLabelProvider extends StandardCElementLabelProvider // App
 		}
 		
 		protected Point getSize() {
-			return CElementImageProvider.BIG_SIZE;
+			return FortranElementImageProvider.BIG_SIZE;
 		}
 		public int hashCode() {
 			return fBase.hashCode();
@@ -140,12 +140,12 @@ public class HierarchyLabelProvider extends StandardCElementLabelProvider // App
 	private ImageDescriptor getTypeImageDescriptor(ICElement type) {
 		ITypeHierarchy hierarchy= fHierarchy.getHierarchy();
 		if (hierarchy == null) {
-			return new CElementImageDescriptor(FortranPluginImages.DESC_OBJS_CLASS, 0, CElementImageProvider.BIG_SIZE);
+			return new CElementImageDescriptor(FortranPluginImages.DESC_OBJS_CLASS, 0, FortranElementImageProvider.BIG_SIZE);
 		}
 		
 		ImageDescriptor desc;
 		if (isDifferentScope(type)) {
-			desc = CElementImageProvider.getClassImageDescriptor();
+			desc = FortranElementImageProvider.getClassImageDescriptor();
 		} else {
 			desc= fImageLabelProvider.getBaseImageDescriptor(type, 0);
 		}
@@ -167,7 +167,7 @@ public class HierarchyLabelProvider extends StandardCElementLabelProvider // App
 //		    TypeCacheManager.getInstance().getCache(type.getCProject().getProject()).getSupertypeAccess();
 		}
 		
-		return new CElementImageDescriptor(desc, adornmentFlags, CElementImageProvider.BIG_SIZE);
+		return new CElementImageDescriptor(desc, adornmentFlags, FortranElementImageProvider.BIG_SIZE);
 	}
 		
 	/* (non-Javadoc)
