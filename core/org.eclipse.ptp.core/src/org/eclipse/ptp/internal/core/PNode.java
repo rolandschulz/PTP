@@ -31,7 +31,7 @@ public class PNode extends Parent implements IPNode {
     		attribs = new HashMap(0);
     }
 	
-	public IPMachine getPMachine() {
+	public IPMachine getMachine() {
 		IPElement current = this;
 		do {
 			if (current instanceof IPMachine) return (IPMachine) current;
