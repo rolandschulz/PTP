@@ -22,7 +22,7 @@ import java.util.Collection;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
 /**
- *
+ * 
  */
 public interface IPElement extends ISearchPageScoreComputer {
     public String NAME_TAG = "";
@@ -51,8 +51,15 @@ public interface IPElement extends ISearchPageScoreComputer {
 	public IPElement findChild(String elementName);
 	
 	public int size();
-	
-    public boolean isAllStop();	
+
+	/**
+	 * This method really doesn't make sense anymore, it needs to be fixed.
+	 * <br>
+	 * <i>SLATED FOR REMOVAL</i>
+	 * 
+	 * @return	I have no idea
+	 */
+    public boolean isAllStop();
     
 	public void setData(Object data);
 	public Object getData();
