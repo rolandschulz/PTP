@@ -41,7 +41,7 @@ public class UIUtils {
 	public static final String PPerspectiveFactory_ID = "org.eclipse.ptp.ui.PRunPerspective";
     public static final String ParallelProcessViewer_ID = "org.eclipse.ptp.ui.views.parallelProcessViewer";
     public static final String ParallelNodeStatusView_ID = "org.eclipse.ptp.ui.views.parallelNodeStatusView";
-    public static final String ParallelJobsView_ID = "org,.eclipse.ptp.ui.views.parallelJobsView";
+    public static final String ParallelJobsView_ID = "org.eclipse.ptp.ui.views.parallelJobsView";
     public static final String ParallelProcessStatusView_ID = "org.ecliipse.ptd.ui.views.parallelProcessStatusView";
     public static final String PTP_ACTION_SET = "org.eclipse.ptp.actionSets";
     public static final String PTP_SEARCHPAGE_ID = "org.eclipse.ptp.ui.PSearchPage";        
