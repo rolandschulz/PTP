@@ -29,7 +29,7 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IProcessListener;
-import org.eclipse.ptp.core.ParallelPlugin;
+import org.eclipse.ptp.core.PTPCorePlugin;
 
 public class PProcess extends Parent implements IPProcess {
     protected String NAME_TAG = "process ";
@@ -60,7 +60,7 @@ public class PProcess extends Parent implements IPProcess {
 	}
 	
 	private void setOutputStore() {
-		Preferences preferences = ParallelPlugin.getDefault().getPluginPreferences();
+		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		outputDirPath = preferences.getString(IOutputTextFileContants.OUTPUT_DIR);
 		storeLine = preferences.getInt(IOutputTextFileContants.STORE_LINE);		
 		if (outputDirPath == null || outputDirPath.length() == 0)

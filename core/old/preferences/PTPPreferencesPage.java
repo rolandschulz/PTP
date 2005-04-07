@@ -29,10 +29,10 @@ import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IOutputTextFileContants;
-import org.eclipse.ptp.core.ParallelPlugin;
-import org.eclipse.ptp.launch.core.IModelManager;
-import org.eclipse.ptp.ui.UIMessage;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.internal.core.CoreMessages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -74,8 +74,8 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
     private int storeLine = DEF_STORE_LINE;
     
     public PTPPreferencesPage() {
-        setPreferenceStore(ParallelPlugin.getDefault().getPreferenceStore());
-        //setDescription(UIMessage.getResourceString("PTPPreferencesPage.preferencesDescription"));
+        setPreferenceStore(PTPCorePlugin.getDefault().getPreferenceStore());
+        //setDescription(CoreMessages.getResourceString("PTPPreferencesPage.preferencesDescription"));
     }
        
     protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
@@ -115,24 +115,24 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		aGroup.setText(UIMessage.getResourceString("PTPPreferencesPage.group_output"));			
+		aGroup.setText(CoreMessages.getResourceString("PTPPreferencesPage.group_output"));			
 
 		Composite outputComposite = new Composite(aGroup, SWT.NONE);
 		outputComposite.setLayout(createGridLayout(3, false, 0, 0));
 		outputComposite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 
-		new Label(outputComposite, SWT.NONE).setText(UIMessage.getResourceString("PTPPreferencesPage.output_text"));
+		new Label(outputComposite, SWT.NONE).setText(CoreMessages.getResourceString("PTPPreferencesPage.output_text"));
 		outputDirText = new Text(outputComposite, SWT.SINGLE | SWT.BORDER);
 		outputDirText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		outputDirText.addModifyListener(listener);
-		browseButton2 = SWTUtil.createPushButton(outputComposite, UIMessage.getResourceString("PTPPreferencesPage.browseButton"), null);
+		browseButton2 = SWTUtil.createPushButton(outputComposite, CoreMessages.getResourceString("PTPPreferencesPage.browseButton"), null);
 		browseButton2.addSelectionListener(listener);
 
 		Composite lineComposite = new Composite(aGroup, SWT.NONE);
 		lineComposite.setLayout(new FillLayout());
 		lineComposite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 
-		storeLineField = new IntegerFieldEditor(STORE_LINE, UIMessage.getResourceString("PTPPreferencesPage.store_line_text"), lineComposite);
+		storeLineField = new IntegerFieldEditor(STORE_LINE, CoreMessages.getResourceString("PTPPreferencesPage.store_line_text"), lineComposite);
 		storeLineField.setPropertyChangeListener(listener);
 		storeLineField.setEmptyStringAllowed(false);		
     }
@@ -141,17 +141,17 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		aGroup.setText(UIMessage.getResourceString("PTPPreferencesPage.group_mpictrl"));			
+		aGroup.setText(CoreMessages.getResourceString("PTPPreferencesPage.group_mpictrl"));			
         
 		Composite mpiFilecomposite = new Composite(aGroup, SWT.NONE);
 		mpiFilecomposite.setLayout(createGridLayout(3, false, 0, 0));
 		mpiFilecomposite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 		
-		new Label(mpiFilecomposite, SWT.NONE).setText(UIMessage.getResourceString("PTPPreferencesPage.mpiFile_text"));
+		new Label(mpiFilecomposite, SWT.NONE).setText(CoreMessages.getResourceString("PTPPreferencesPage.mpiFile_text"));
 		mpiPathText = new Text(mpiFilecomposite, SWT.SINGLE | SWT.BORDER);
 		mpiPathText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		mpiPathText.addModifyListener(listener);
-		browseButton1 = SWTUtil.createPushButton(mpiFilecomposite, UIMessage.getResourceString("PTPPreferencesPage.browseButton"), null);
+		browseButton1 = SWTUtil.createPushButton(mpiFilecomposite, CoreMessages.getResourceString("PTPPreferencesPage.browseButton"), null);
 		browseButton1.addSelectionListener(listener);
 
 		Composite timeoutComposite = new Composite(aGroup, SWT.NONE);
@@ -159,11 +159,11 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		timeoutComposite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 
 		/*
-		requestTimeoutField = new IntegerFieldEditor(IMIConstants.PREF_REQUEST_TIMEOUT, UIMessage.getResourceString("PTPPreferencesPage.Request_timeout_text"), timeoutComposite);
+		requestTimeoutField = new IntegerFieldEditor(IMIConstants.PREF_REQUEST_TIMEOUT, CoreMessages.getResourceString("PTPPreferencesPage.Request_timeout_text"), timeoutComposite);
 		requestTimeoutField.setPropertyChangeListener(listener);
 		requestTimeoutField.setEmptyStringAllowed(false);
 		
-		launchTimoutField = new IntegerFieldEditor(IMIConstants.PREF_REQUEST_LAUNCH_TIMEOUT, UIMessage.getResourceString("PTPPreferencesPage.Launch_timeout_text"), timeoutComposite);
+		launchTimoutField = new IntegerFieldEditor(IMIConstants.PREF_REQUEST_LAUNCH_TIMEOUT, CoreMessages.getResourceString("PTPPreferencesPage.Launch_timeout_text"), timeoutComposite);
 		launchTimoutField.setPropertyChangeListener(listener);
 		launchTimoutField.setEmptyStringAllowed(false);
 		*/        
@@ -183,7 +183,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
     public void init(IWorkbench workbench) {
         //IPreferenceStore store = getPreferenceStore();
     	
-    	Preferences preferences = ParallelPlugin.getDefault().getPluginPreferences();
+    	Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
     	/*
         mpiFile = preferences.getString(IMIConstants.PREF_MPICTRL_LOCATION);
         
@@ -227,7 +227,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	
     public boolean performOk() {
         store();
-        Preferences preferences = ParallelPlugin.getDefault().getPluginPreferences();
+        Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
         /*
         preferences.setValue(IMIConstants.PREF_MPICTRL_LOCATION, mpiFile);
         preferences.setValue(IMIConstants.PREF_REQUEST_TIMEOUT, requestTimeout);
@@ -244,9 +244,9 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
         store.setValue(LAUNCH_TIMEOUT, launchTimeout);
         */
         
-        ParallelPlugin.getDefault().savePluginPreferences();
+        PTPCorePlugin.getDefault().savePluginPreferences();
         
-        IModelManager manager = ParallelPlugin.getDefault().getLaunchManager();
+        IModelManager manager = PTPCorePlugin.getDefault().getLaunchManager();
         if (!manager.isMPIRuning() && manager.isParallelPerspectiveOpen()) {
         	try {
         		manager.createMPISession();
@@ -267,7 +267,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	 */
 	protected void handleMPIPathBrowseButtonSelected() {
 		FileDialog dialog = new FileDialog(getShell());
-		dialog.setText(UIMessage.getResourceString("PTPPreferencesPage.Select_MPI_FILE"));
+		dialog.setText(CoreMessages.getResourceString("PTPPreferencesPage.Select_MPI_FILE"));
 		String currectMPIPath = getFieldContent(mpiPathText.getText());
 		if (currectMPIPath != null) {
 			File path = new File(currectMPIPath);
@@ -282,7 +282,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 
 	protected void handleOutputDirectoryBrowseButtonSelected() {
 	    DirectoryDialog dialog = new DirectoryDialog(getShell());
-		dialog.setText(UIMessage.getResourceString("PTPPreferencesPage.Select_Output_Directory"));
+		dialog.setText(CoreMessages.getResourceString("PTPPreferencesPage.Select_Output_Directory"));
 		String currectDirPath = getFieldContent(outputDirText.getText());
 		if (currectDirPath != null) {
 			File path = new File(currectDirPath);
@@ -298,14 +298,14 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	protected boolean isValidMPISetting() {
 		String name = getFieldContent(mpiPathText.getText());
 		if (name == null) {
-			setErrorMessage(UIMessage.getResourceString("PTPPreferencesPage.Incorrect_MPI_file"));
+			setErrorMessage(CoreMessages.getResourceString("PTPPreferencesPage.Incorrect_MPI_file"));
 			setValid(false);
 			return false;
 		}
 		
 		File path = new File(name);
 		if (!path.exists() || !path.isFile()) {
-			setErrorMessage(UIMessage.getResourceString("PTPPreferencesPage.Incorrect_MPI_file"));
+			setErrorMessage(CoreMessages.getResourceString("PTPPreferencesPage.Incorrect_MPI_file"));
 			setValid(false);
 			return false;
 		}
@@ -328,7 +328,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	protected boolean isValidOutputSetting() {
 		String name = getFieldContent(outputDirText.getText());
 		if (name == null) {
-			setErrorMessage(UIMessage.getResourceString("PTPPreferencesPage.Incorrect_Output_directory"));
+			setErrorMessage(CoreMessages.getResourceString("PTPPreferencesPage.Incorrect_Output_directory"));
 			setValid(false);
 			return false;
 		}
@@ -337,7 +337,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		if (!path.exists()) {
 		    File parent = path.getParentFile();
 		    if (parent == null || !parent.exists()) {
-				setErrorMessage(UIMessage.getResourceString("PTPPreferencesPage.Incorrect_Output_directory"));
+				setErrorMessage(CoreMessages.getResourceString("PTPPreferencesPage.Incorrect_Output_directory"));
 				setValid(false);
 				return false;
 			}

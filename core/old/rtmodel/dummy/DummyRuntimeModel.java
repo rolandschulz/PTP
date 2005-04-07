@@ -27,10 +27,6 @@ import java.util.Random;
 import java.util.Set;
 
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPUniverse;
-import org.eclipse.ptp.internal.core.PUniverse;
-import org.eclipse.ptp.launch.core.IParallelModelListener;
-import org.eclipse.ptp.launch.internal.AbstractParallelLaunchConfigurationDelegate;
 import org.eclipse.ptp.rtmodel.IRuntimeListener;
 import org.eclipse.ptp.rtmodel.IRuntimeModel;
 import org.eclipse.ptp.rtmodel.NamedEntity;
@@ -202,7 +198,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			}
 		};
 		runningAppEventsThread = new Thread(runningAppEventsRunnable);
-		runningAppEventsThread.start();
+		//runningAppEventsThread.start();
 		
 		/* setup machine[2]'s hardware - a machine w/ a bunch of nodes w/ different state */
 		for(int i=0; i<numNodes[3]; i++) {
@@ -281,7 +277,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			}
 		};
 		runningAppEventsThread = new Thread(runningAppEventsRunnable);
-		runningAppEventsThread.start();
+		//runningAppEventsThread.start();
 		
 		
 		
@@ -362,7 +358,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			}
 		};
 		runningAppEventsThread = new Thread(runningAppEventsRunnable);
-		runningAppEventsThread.start();
+		//runningAppEventsThread.start();
 		
 		/* fake job 2 running on machine[1] */
 		s = new String("job2");
@@ -445,7 +441,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			}
 		};
 		runningAppEventsThread = new Thread(runningAppEventsRunnable);
-		runningAppEventsThread.start();
+		//runningAppEventsThread.start();
 		
 		
 		
@@ -484,15 +480,15 @@ public class DummyRuntimeModel implements IRuntimeModel {
 		spawned_num_procs = spawned_procs_per_node = spawned_first_node = 0;
 		
 		for(int i=0; i<args.length; i++) {
-			if(args[i].equals(AbstractParallelLaunchConfigurationDelegate.NUM_PROC)) {
+			if(args[i].equals("-p")) {
 				this.spawned_num_procs = (new Integer(args[i+1]).intValue());
 				i++;
 			}
-			else if(args[i].equals(AbstractParallelLaunchConfigurationDelegate.PROC_PER_NODE)) {
+			else if(args[i].equals("-N")) {
 				this.spawned_procs_per_node = (new Integer(args[i+1]).intValue());
 				i++;
 			}
-			else if(args[i].equals(AbstractParallelLaunchConfigurationDelegate.START_NODE)) {
+			else if(args[i].equals("-o")) {
 				this.spawned_first_node = (new Integer(args[i+1]).intValue());
 				i++;
 			}

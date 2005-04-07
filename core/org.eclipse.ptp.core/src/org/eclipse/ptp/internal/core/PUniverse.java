@@ -31,7 +31,7 @@ import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
-import org.eclipse.ptp.core.ParallelPlugin;
+import org.eclipse.ptp.core.PTPCorePlugin;
 
 public class PUniverse extends Parent implements IPUniverse 
 {

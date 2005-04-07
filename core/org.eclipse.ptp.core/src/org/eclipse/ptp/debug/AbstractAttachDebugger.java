@@ -38,7 +38,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.ParallelPlugin;
+import org.eclipse.ptp.core.PTPCorePlugin;
 
 /**
  *
@@ -72,7 +72,7 @@ public abstract class AbstractAttachDebugger {
 			    return programPath;
 		}
 
-        Status status = new Status(IStatus.ERROR, ParallelPlugin.getUniqueIdentifier(), IStatus.INFO, "No such program("+ programName +") found.", null);
+        Status status = new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, "No such program("+ programName +") found.", null);
         throw new CoreException(status);
     }
     

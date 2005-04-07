@@ -23,7 +23,7 @@ import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.ui.UIUtils;
+import org.eclipse.ptp.internal.core.CoreUtils;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
 /**
@@ -124,7 +124,7 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 	}
 	
 	public int computeScore(String pageId, Object element) {
-		if (!UIUtils.PTP_SEARCHPAGE_ID.equals(pageId))
+		if (!CoreUtils.PTP_SEARCHPAGE_ID.equals(pageId))
 			return ISearchPageScoreComputer.UNKNOWN;
 		
 		if (element instanceof IPElement)
