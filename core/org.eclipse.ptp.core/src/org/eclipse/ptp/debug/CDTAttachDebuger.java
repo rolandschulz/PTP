@@ -117,7 +117,7 @@ public class CDTAttachDebuger extends AbstractAttachDebugger {
 					// ignore
 				}
 			}
-            Status status = new Status(IStatus.ERROR, ParallelPlugin.getUniqueIdentifier(), IStatus.INFO, e.getMessage(), e);
+            Status status = new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, e.getMessage(), e);
             throw new CoreException(status);
 		}
     }
@@ -138,7 +138,7 @@ public class CDTAttachDebuger extends AbstractAttachDebugger {
 		try {
 			dbgCfg = CDebugCorePlugin.getDefault().getDebugConfiguration(config.getAttribute(ICDTLaunchConfigurationConstants.ATTR_DEBUGGER_ID, ""));
 		} catch (CoreException e) {
-			IStatus status = new Status(IStatus.ERROR, ParallelPlugin.getUniqueIdentifier(), ICDTLaunchConfigurationConstants.ERR_DEBUGGER_NOT_INSTALLED, e.getMessage(), e);
+			IStatus status = new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), ICDTLaunchConfigurationConstants.ERR_DEBUGGER_NOT_INSTALLED, e.getMessage(), e);
 			IStatusHandler handler = DebugPlugin.getDefault().getStatusHandler(status);
 
 			if (handler != null) {
