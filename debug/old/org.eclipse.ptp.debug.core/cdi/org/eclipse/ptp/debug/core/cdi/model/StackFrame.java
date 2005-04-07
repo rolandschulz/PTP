@@ -35,6 +35,8 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 		super((Target)thread.getTarget());
 		cthread = thread;
 		level = l;
+		argDescs = new ICDIArgumentDescriptor[0];
+		localDescs = new ICDILocalVariableDescriptor[0];
 	}
 
 	/**
