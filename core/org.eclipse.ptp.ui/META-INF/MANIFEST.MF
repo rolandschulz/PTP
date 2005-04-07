@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Parallel Tools Platform UI Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.ui
+Bundle-Version: 1.0.0
+Bundle-ClassPath: ptp_ui.jar
+Bundle-Activator: org.eclipse.ptp.ui.PTPUIPlugin
+Bundle-Vendor: LANL
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.debug.ui,
+ org.eclipse.debug.core,
+ org.eclipse.ui.console,
+ org.eclipse.search,
+ org.eclipse.ui.forms,
+ org.eclipse.ui.editors,
+ org.eclipse.ui.workbench.texteditor,
+ org.eclipse.ptp.core,
+ org.eclipse.ptp.launch
+Eclipse-AutoStart: true
