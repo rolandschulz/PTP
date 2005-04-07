@@ -26,7 +26,7 @@ import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.debug.AbstractAttachDebugger;
 import org.eclipse.ptp.debug.CDTAttachDebuger;
-import org.eclipse.ptp.launch.core.ParallelModelAdapter;
+import org.eclipse.ptp.internal.core.ParallelModelAdapter;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
