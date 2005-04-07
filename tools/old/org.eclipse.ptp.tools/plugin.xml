@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin
+   id="org.eclipse.ptp.tools"
+   name="Tools Plug-in"
+   version="1.0.0"
+   provider-name=""
+   class="org.eclipse.ptp.tools.ToolsPlugin">
+
+   <runtime>
+      <library name="tools.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.debug.core"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="org.eclipse.cdt.debug.core"/>
+   </requires>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Parallel Visualization Tools"
+            id="org.eclipse.ptp.tools">
+      </category>
+      <view
+            name="Vector Visualizer View"
+            icon="icons/sample.gif"
+            category="org.eclipse.ptp.tools"
+            class="org.eclipse.ptp.tools.views.VectorView"
+            id="org.eclipse.ptp.tools.views.VectorView">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.debug.ui.DebugPerspective">
+         <view
+               visible="false"
+               relationship="stack"
+               relative="org.eclipse.debug.ui.VariableView"
+               id="org.eclipse.ptp.tools.views.VectorView"/>
+         <viewShortcut id="org.eclipse.ptp.tools.views.VectorView"/>
+      </perspectiveExtension>
+   </extension>
+
+</plugin>
