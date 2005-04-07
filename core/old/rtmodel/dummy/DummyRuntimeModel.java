@@ -198,7 +198,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			}
 		};
 		runningAppEventsThread = new Thread(runningAppEventsRunnable);
-		//runningAppEventsThread.start();
+		runningAppEventsThread.start();
 		
 		/* setup machine[2]'s hardware - a machine w/ a bunch of nodes w/ different state */
 		for(int i=0; i<numNodes[3]; i++) {
@@ -277,7 +277,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			}
 		};
 		runningAppEventsThread = new Thread(runningAppEventsRunnable);
-		//runningAppEventsThread.start();
+		runningAppEventsThread.start();
 		
 		
 		
@@ -358,7 +358,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			}
 		};
 		runningAppEventsThread = new Thread(runningAppEventsRunnable);
-		//runningAppEventsThread.start();
+		runningAppEventsThread.start();
 		
 		/* fake job 2 running on machine[1] */
 		s = new String("job2");
@@ -441,7 +441,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 			}
 		};
 		runningAppEventsThread = new Thread(runningAppEventsRunnable);
-		//runningAppEventsThread.start();
+		runningAppEventsThread.start();
 		
 		
 		
