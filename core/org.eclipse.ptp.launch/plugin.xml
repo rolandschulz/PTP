@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+	<extension
+		point="org.eclipse.debug.core.launchConfigurationTypes">
+		<launchConfigurationType
+			name="%ParallelLaunch.name"
+			delegate="org.eclipse.ptp.launch.internal.ParallelLaunchConfigurationDelegate"
+			modes="run,debug"
+			public="true"
+			id="org.eclipse.ptp.launch.parallelLaunch">
+		</launchConfigurationType>
+	</extension>
+
+	<extension
+		point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+		<launchConfigurationTypeImage
+			icon="icons/parallel_run.gif"
+			configTypeID="org.eclipse.ptp.launch.parallelLaunch"
+			id="org.eclipse.ptp.launch.parallelLaunchImage">
+		</launchConfigurationTypeImage>
+	</extension>   
+   
+	<extension
+		point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+		<launchConfigurationTabGroup
+			type="org.eclipse.ptp.launch.parallelLaunch"
+			class="org.eclipse.ptp.launch.internal.ui.ParallelLaunchConfigurationTabGroup"
+			id="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup">
+		</launchConfigurationTabGroup>
+	</extension>
+
+<!-- PDT Shortcut //-->	
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            label="%PTPShortcut.label"
+			icon="icons/parallel_run.gif"
+            class="org.eclipse.ptp.launch.internal.PTPLaunchShortcut"
+            modes="run, debug"
+            id="org.eclipse.ptp.ptpShortcut">
+         <perspective
+               id="org.eclipse.ptp.ui.PRunPerspective">
+         </perspective>
+         <perspective
+               id="org.eclipse.debug.ui.DebugPerspective">
+         </perspective>
+         <perspective
+               id="org.eclipse.ui.resourcePerspective">
+         </perspective>
+         <perspective
+               id="org.eclipse.jdt.ui.JavaPerspective">
+         </perspective>                  
+         <perspective
+               id="org.eclipse.cdt.ui.CPerspective">
+         </perspective>                  
+      </shortcut>
+   </extension>	
+</plugin>
