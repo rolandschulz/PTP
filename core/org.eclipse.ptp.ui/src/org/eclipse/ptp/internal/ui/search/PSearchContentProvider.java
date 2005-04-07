@@ -21,7 +21,7 @@ package org.eclipse.ptp.internal.ui.search;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.launch.core.ParallelModelAdapter;
+import org.eclipse.ptp.internal.core.ParallelModelAdapter;
 
 /**
  *
