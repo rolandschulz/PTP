@@ -3,7 +3,7 @@
 	<name>org.eclipse.cldt.core.linux</name>
 	<comment></comment>
 	<projects>
-		<project>org.eclipse.cdt.core</project>
+		<project>org.eclipse.cldt.core</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

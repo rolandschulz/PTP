@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <fragment
-   id="org.eclipse.cdt.core.linux"
+   id="org.eclipse.cldt.core.linux"
    name="%fragmentName.linux"
    version="3.0.0"
    provider-name="%providerName"
@@ -9,7 +9,7 @@
    plugin-version="3.0.0">
 
    <runtime>
-      <library name="cdt_linux.jar"/>
+      <library name="cldt_linux.jar"/>
    </runtime>
 
 
@@ -17,7 +17,7 @@
          point="org.eclipse.cldt.core.ProcessList">
       <processList
       		platform="linux"
-            class="org.eclipse.cdt.internal.core.linux.ProcessList">
+            class="org.eclipse.cldt.internal.core.linux.ProcessList">
       </processList>
    </extension>
 </fragment>

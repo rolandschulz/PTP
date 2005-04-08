@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <fragment
-   id="org.eclipse.cdt.core.linux.ppc"
+   id="org.eclipse.cldt.core.linux.ppc"
    name="CDT Core ppc Fragment"
    version="3.0.0"
    provider-name="Eclipse.org"
