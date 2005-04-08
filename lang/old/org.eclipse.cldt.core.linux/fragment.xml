@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<fragment
+   id="org.eclipse.cdt.core.linux"
+   name="%fragmentName.linux"
+   version="3.0.0"
+   provider-name="%providerName"
+   plugin-id="org.eclipse.cldt.core"
+   plugin-version="3.0.0">
+
+   <runtime>
+      <library name="cdt_linux.jar"/>
+   </runtime>
+
+
+   <extension
+         point="org.eclipse.cldt.core.ProcessList">
+      <processList
+      		platform="linux"
+            class="org.eclipse.cdt.internal.core.linux.ProcessList">
+      </processList>
+   </extension>
+</fragment>
