@@ -64,7 +64,7 @@ public class CCorePlugin extends Plugin {
 	public static final int STATUS_CDTPROJECT_MISMATCH = 2;
 	public static final int CDT_PROJECT_NATURE_ID_MISMATCH = 3;
 
-	public static final String PLUGIN_ID = "org.eclipse.cdt.core"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "org.eclipse.cldt.core"; //$NON-NLS-1$
 
 	public static final String BUILDER_MODEL_ID = PLUGIN_ID + ".CBuildModel"; //$NON-NLS-1$
 	public static final String BINARY_PARSER_SIMPLE_ID = "BinaryParser"; //$NON-NLS-1$
