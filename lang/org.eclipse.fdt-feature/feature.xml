@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.fdt"
+      label="%featureName"
+      version="1.0.0"
+      provider-name="%providerName">
+
+   <description>
+      %feature
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license>
+      %license
+   </license>
+
+   <url>
+      <discovery label="%updateSiteName" url="http://update.eclipse.org/technology/ptp/updates/release"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.team.core"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.text"/>
+      <import plugin="org.eclipse.debug.core"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.core.expressions"/>
+      <import plugin="org.eclipse.core.boot"/>
+      <import plugin="org.eclipse.core.variables"/>
+      <import plugin="org.eclipse.ui.views"/>
+      <import plugin="org.eclipse.search"/>
+      <import plugin="org.eclipse.compare"/>
+      <import plugin="org.eclipse.ui.console"/>
+      <import plugin="org.eclipse.core.filebuffers"/>
+      <import plugin="org.eclipse.help"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.cldt.core"
+         download-size="0"
+         install-size="0"
+         version="3.0.0"/>
+
+   <plugin
+         id="org.eclipse.cldt.core.linux"
+         download-size="0"
+         install-size="0"
+         version="3.0.0"
+         fragment="true"/>
+
+   <plugin
+         id="org.eclipse.cldt.core.linux.ppc"
+         download-size="0"
+         install-size="0"
+         version="3.0.0"
+         fragment="true"/>
+
+   <plugin
+         id="org.eclipse.cldt.core.linux.x86"
+         download-size="0"
+         install-size="0"
+         version="3.0.0"
+         fragment="true"/>
+
+   <plugin
+         id="org.eclipse.cldt.core.macosx"
+         download-size="0"
+         install-size="0"
+         version="3.0.0"
+         fragment="true"/>
+
+   <plugin
+         id="org.eclipse.cldt.debug.core"
+         download-size="0"
+         install-size="0"
+         version="3.0.0"/>
+
+   <plugin
+         id="org.eclipse.cldt.debug.mi.core"
+         download-size="0"
+         install-size="0"
+         version="3.0.0"/>
+
+   <plugin
+         id="org.eclipse.cldt.debug.mi.ui"
+         download-size="0"
+         install-size="0"
+         version="3.0.0"/>
+
+   <plugin
+         id="org.eclipse.cldt.debug.ui"
+         download-size="0"
+         install-size="0"
+         version="3.0.0"/>
+
+   <plugin
+         id="org.eclipse.cldt.launch"
+         download-size="0"
+         install-size="0"
+         version="3.0.0"/>
+
+   <plugin
+         id="org.eclipse.cldt.make.core"
+         download-size="0"
+         install-size="0"
+         version="3.0.0"/>
+
+   <plugin
+         id="org.eclipse.cldt.make.ui"
+         download-size="0"
+         install-size="0"
+         version="3.0.0"/>
+
+   <plugin
+         id="org.eclipse.cldt.managedbuilder.core"
+         download-size="0"
+         install-size="0"
+         version="3.0.0"/>
+
+   <plugin
+         id="org.eclipse.cldt.managedbuilder.ui"
+         download-size="0"
+         install-size="0"
+         version="3.0.0"/>
+
+   <plugin
+         id="org.eclipse.cldt.ui"
+         download-size="0"
+         install-size="0"
+         version="3.0.0"/>
+
+</feature>
