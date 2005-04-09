@@ -112,7 +112,7 @@
            command="/opt/ibmcmp/xlf/8.1/bin/xlf95"
            sources="o"
            isAbstract="false"
-           name="%ToolName.linker.xlf.f"
+           name="%ToolName.linker.xlf.fortran"
            id="cldt.managedbuild.tool.xlf.f.linker"
            outputFlag="-o"
            natureFilter="fnature">
@@ -244,7 +244,7 @@
       </tool>
       
       <tool
-		  name="%ToolName.compiler.xlf.f"
+		  name="%ToolName.compiler.xlf.fortran"
 		  id="cldt.managedbuild.tool.xlf.f.compiler"
 		  isAbstract="false"
 		  sources="f,f90,f95,F,F90,F95"
