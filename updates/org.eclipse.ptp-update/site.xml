@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.eclipse.fdt_0.9.0.jar" id="org.eclipse.fdt" version="0.9.0">
+      <category name="FDT 0.9-31M5a"/>
+   </feature>
+   <category-def name="FDT 0.9-31M5a" label="FDT_0_9_31M5a">
+      <description>
+         Fortran Development Tools Pre-release (requires Eclipse 3.1M5a)
+      </description>
+   </category-def>
+</site>
