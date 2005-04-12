@@ -123,17 +123,19 @@ public class SearchDialog extends Dialog implements IPSearchConstants {
 		result.setLayout(layout);
 		result.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		RowLayouter layouter = new RowLayouter(layout.numColumns);
+		//RowLayouter layouter = new RowLayouter(layout.numColumns);
 		GridData gd = new GridData();
 		gd.horizontalAlignment = GridData.FILL;
 		gd.verticalAlignment = GridData.VERTICAL_ALIGN_BEGINNING | GridData.VERTICAL_ALIGN_FILL;
 		
+		/*
 		layouter.setDefaultGridData(gd, 0);
 		layouter.setDefaultGridData(gd, 1);
 		layouter.setDefaultSpan();
 		
 		layouter.perform(createExpression(result));
 		layouter.perform(createSearchFor(result), createLimitTo(result), 2);
+		*/
 		
 		SelectionAdapter ptpElementInitializer = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
