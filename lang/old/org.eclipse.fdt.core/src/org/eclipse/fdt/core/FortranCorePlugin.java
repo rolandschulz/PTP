@@ -32,6 +32,7 @@ import org.eclipse.cdt.core.filetype.ICFileTypeResolver;
 import org.eclipse.cdt.core.filetype.IResolverModel;
 import org.eclipse.cdt.core.internal.filetype.ResolverModel;
 import org.eclipse.cdt.core.model.CoreModel;
+import org.eclipse.cdt.core.model.ICoreModel;
 import org.eclipse.cdt.core.model.IWorkingCopy;
 import org.eclipse.cdt.core.parser.IScannerInfoProvider;
 import org.eclipse.cdt.core.resources.IConsole;
@@ -622,7 +623,7 @@ public class FortranCorePlugin extends CCorePlugin {
 		return ResolverModel.getDefault();
 	}
 	
-	public CoreModel getCoreModel() {
+	public ICoreModel getCoreModel() {
 		return fCoreModel;
 	}
 
