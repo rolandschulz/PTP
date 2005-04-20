@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin
-   id="org.eclipse.cldt.managedbuilder.ui"
+   id="org.eclipse.fdt.managedbuilder.ui"
    name="%pluginName"
    version="3.0.0"
    provider-name="%providerName"
    class="org.eclipse.fdt.managedbuilder.internal.ui.ManagedBuilderUIPlugin">
 
    <runtime>
-      <library name="mgdbuildui.jar">
+      <library name="fortranmgdbuildui.jar">
          <export name="*"/>
       </library>
    </runtime>
@@ -30,28 +30,14 @@
             name="%MngFortranWizard.name"
             icon="icons/full/wizban/newmngf_app.gif"
             category="org.eclipse.fdt.ui.newFortranWizards"
-            class="org.eclipse.fdt.managedbuilder.ui.wizards.NewManagedFortranProjectWizard"
+            class="org.eclipse.cdt.managedbuilder.ui.wizards.NewManagedCProjectWizard"
             project="true"
-            finalPerspective="org.eclipse.fdt.ui.FortranPerspective"
+            finalPerspective="org.eclipse.cdt.ui.CPerspective"
             id="org.eclipse.fdt.managedbuilder.ui.wizards.StdFortranWizard">
          <description>
             %MngFortranWizard.description
          </description>
       </wizard>
-   </extension>
-   <extension
-         point="org.eclipse.ui.propertyPages">
-      <page
-            objectClass="org.eclipse.core.resources.IProject"
-            adaptable="true"
-            name="%MngBuildProp.name"
-            class="org.eclipse.cdt.managedbuilder.ui.properties.BuildPropertyPage"
-            id="org.eclipse.cdt.managedbuilder.ui.properties.BuildProperties">
-         <filter
-               name="nature"
-               value="org.eclipse.cdt.managedbuilder.core.managedBuildNature">
-         </filter>
-      </page>
    </extension>
        
    <extension
@@ -87,22 +73,10 @@
             id="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildProperties">
       </page>
    </extension>
-
-   <extension
-         point="org.eclipse.ui.propertyPages">
-      <page
-            objectClass="org.eclipse.core.resources.IFile"
-            adaptable="true"
-            name="%MngResourceProp.name"
-            nameFilter="*.c"
-            class="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
-            id="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildProperties">
-      </page>
-   </extension>
-            
+           
 <!-- Managed Make Builder Tool Specifications -->
    <extension
-         id="cldt.managed.build.info"
+         id="fdt.managed.build.info"
          name="Managed Build Tools Description"
          point="org.eclipse.cdt.managedbuilder.core.buildDefinitions">
      <managedBuildRevision
@@ -113,11 +87,11 @@
            sources="o"
            isAbstract="false"
            name="%ToolName.linker.xlf.fortran"
-           id="cldt.managedbuild.tool.xlf.f.linker"
+           id="fdt.managedbuild.tool.xlf.f.linker"
            outputFlag="-o"
            natureFilter="fnature">
          <optionCategory
-               owner="cldt.managedbuild.tool.xlf.f.linker"
+               owner="fdt.managedbuild.tool.xlf.f.linker"
                name="%OptionCategory.General"
                id="xlf.f.link.category.general">
          </optionCategory>
@@ -162,7 +136,7 @@
                valueType="boolean">
          </option>
          <optionCategory
-               owner="cldt.managedbuild.tool.xlf.f.linker"
+               owner="fdt.managedbuild.tool.xlf.f.linker"
                name="%OptionCategory.Libs"
                id="xlf.f.link.category.libs">
          </optionCategory>
@@ -183,7 +157,7 @@
                valueType="stringList">
          </option>
          <optionCategory
-               owner="cldt.managedbuild.tool.xlf.f.linker"
+               owner="fdt.managedbuild.tool.xlf.f.linker"
                name="%OptionCategory.Misc"
                id="xlf.f.link.category.other">
          </optionCategory>
@@ -208,7 +182,7 @@
                id="xlf.f.link.option.userobjs">
          </option>
          <optionCategory
-               owner="cldt.managedbuild.tool.xlf.f.linker"
+               owner="fdt.managedbuild.tool.xlf.f.linker"
                name="%OptionCategory.Shared.Settings"
                id="xlf.f.link.category.shared">
          </optionCategory>
@@ -245,7 +219,7 @@
       
       <tool
 		  name="%ToolName.compiler.xlf.fortran"
-		  id="cldt.managedbuild.tool.xlf.f.compiler"
+		  id="fdt.managedbuild.tool.xlf.f.compiler"
 		  isAbstract="false"
 		  sources="f,f90,f95,F,F90,F95"
 		  command="/opt/ibmcmp/xlf/8.1/bin/xlf95"
@@ -254,7 +228,7 @@
 		  outputs="o"
 		  outputFlag="-o">
 		  <optionCategory
-			  owner="cldt.managedbuild.tool.xlf.f.compiler"
+			  owner="fdt.managedbuild.tool.xlf.f.compiler"
 			  name="%OptionCategory.Source"
 			  id="xlf.f.compiler.category.source">
 		  </optionCategory>
@@ -304,7 +278,7 @@
 			  valueType="boolean">
 		  </option>
 		  <optionCategory
-			  owner="cldt.managedbuild.tool.xlf.f.compiler"
+			  owner="fdt.managedbuild.tool.xlf.f.compiler"
 			  name="%OptionCategory.Symbols"
 			  id="xlf.f.compiler.category.symbols">
 		  </optionCategory>
@@ -323,7 +297,7 @@
 			  valueType="stringList">
 		  </option>
 		  <optionCategory
-			  owner="cldt.managedbuild.tool.xlf.f.compiler"
+			  owner="fdt.managedbuild.tool.xlf.f.compiler"
 			  name="%OptionCategory.Dirs"
 			  id="xlf.f.compiler.category.dirs">
 		  </optionCategory>
@@ -336,7 +310,7 @@
 			  browseType="directory">
 		  </option>
 		  <optionCategory
-			  owner="cldt.managedbuild.tool.xlf.f.compiler"
+			  owner="fdt.managedbuild.tool.xlf.f.compiler"
 			  name="%OptionCategory.Optimize"
 			  id="xlf.f.compiler.category.optimization">
 		  </optionCategory>
@@ -375,7 +349,7 @@
 			  valueType="string">
 		  </option>
 		  <optionCategory
-			  owner="cldt.managedbuild.tool.xlf.f.compiler"
+			  owner="fdt.managedbuild.tool.xlf.f.compiler"
 			  name="%OptionCategory.Debug"
 			  id="xlf.f.compiler.category.debug">
 		  </optionCategory>
@@ -419,7 +393,7 @@
 			  valueType="boolean">
 		  </option>
 		  <optionCategory
-			  owner="cldt.managedbuild.tool.xlf.f.compiler"
+			  owner="fdt.managedbuild.tool.xlf.f.compiler"
 			  name="%OptionCategory.Warn"
 			  id="xlf.f.compiler.category.warnings">
 		  </optionCategory>
@@ -440,7 +414,7 @@
 			  valueType="boolean">
 		  </option>
 		  <optionCategory
-			  owner="cldt.managedbuild.tool.xlf.f.compiler"
+			  owner="fdt.managedbuild.tool.xlf.f.compiler"
 			  name="%OptionCategory.Misc"
 			  id="xlf.f.compiler.category.other">
 		  </optionCategory>
@@ -463,7 +437,7 @@
 
       <projectType 
             name="%TargetName.xlf.macosx.exe"
-            id="cldt.managedbuild.target.xlf.macosx.exe"
+            id="fdt.managedbuild.target.xlf.macosx.exe"
             isTest="false"
             isAbstract="false">
          <configuration
@@ -471,34 +445,34 @@
                artifactExtension=""               
                cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.fdt.core.XLFErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"               
-               id="cldt.managedbuild.config.xlf.macosx.exe.debug">
+               id="fdt.managedbuild.config.xlf.macosx.exe.debug">
                <toolChain   
-                  id="cldt.managedbuild.toolchain.xlf.macosx.exe.debug"
+                  id="fdt.managedbuild.toolchain.xlf.macosx.exe.debug"
                   name="%ToolChainName.Dbg"
                   osList="macosx"
                   archList="all">
                   <targetPlatform
-					  id="cldt.managedbuild.target.xlf.platform.macosx.exe.debug"
+					  id="fdt.managedbuild.target.xlf.platform.macosx.exe.debug"
 				 	  name="%PlatformName.Dbg"
                        binaryParser="org.eclipse.cdt.core.MachO"
 					  osList="macosx"					  
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
-					  id="cldt.managedbuild.target.xlf.builder.macosx.exe.debug"
+					  id="fdt.managedbuild.target.xlf.builder.macosx.exe.debug"
 					  name="%BuilderName.Dbg"
 					  command="make"
 					  arguments="-k"
 					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
 		          <tool
-                      id="cldt.managedbuild.tool.xlf.f.compiler.macosx.exe.debug"
-                      superClass="cldt.managedbuild.tool.xlf.f.compiler">
+                      id="fdt.managedbuild.tool.xlf.f.compiler.macosx.exe.debug"
+                      superClass="fdt.managedbuild.tool.xlf.f.compiler">
 		          </tool>
 		          <tool
-			        id="cldt.managedbuild.tool.macosx.f.linker.macosx.exe.debug"
+			        id="fdt.managedbuild.tool.macosx.f.linker.macosx.exe.debug"
 			        outputs=""
-			        superClass="cldt.managedbuild.tool.xlf.f.linker">
+			        superClass="fdt.managedbuild.tool.xlf.f.linker">
 		          </tool>
              </toolChain>                    
          </configuration>
@@ -507,34 +481,34 @@
                artifactExtension=""               
                cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.fdt.core.XLFErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"               
-               id="cldt.managedbuild.config.xlf.macosx.exe.release">
+               id="fdt.managedbuild.config.xlf.macosx.exe.release">
                <toolChain   
-                  id="cldt.managedbuild.toolchain.xlf.macosx.exe.release"
+                  id="fdt.managedbuild.toolchain.xlf.macosx.exe.release"
                   name="%ToolChainName.Rel"
                   osList="macosx"
                   archList="all">
                   <targetPlatform
-					  id="cldt.managedbuild.target.xlf.platform.macosx.exe.release"
+					  id="fdt.managedbuild.target.xlf.platform.macosx.exe.release"
 				 	  name="%PlatformName.Rel"
                        binaryParser="org.eclipse.cdt.core.MachO"
 					  osList="macosx"					  
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
-					  id="cldt.managedbuild.target.xlf.builder.macosx.exe.release"
+					  id="fdt.managedbuild.target.xlf.builder.macosx.exe.release"
 					  name="%BuilderName.Rel"
 					  command="make"
 					  arguments="-k"
 					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
 		          <tool
-                      id="cldt.managedbuild.tool.xlf.f.compiler.macosx.exe.release"
-                      superClass="cldt.managedbuild.tool.xlf.f.compiler">
+                      id="fdt.managedbuild.tool.xlf.f.compiler.macosx.exe.release"
+                      superClass="fdt.managedbuild.tool.xlf.f.compiler">
 		          </tool>
 		          <tool
-			        id="cldt.managedbuild.tool.macosx.f.linker.macosx.exe.release"
+			        id="fdt.managedbuild.tool.macosx.f.linker.macosx.exe.release"
 			        outputs=""
-			        superClass="cldt.managedbuild.tool.xlf.f.linker">
+			        superClass="fdt.managedbuild.tool.xlf.f.linker">
 		          </tool>
              </toolChain>                    
          </configuration>
@@ -549,9 +523,9 @@
             outputFlag="-o"
             command="gfortran"
             dependencyCalculator="org.eclipse.cdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
-            id="cldt.managedbuild.tool.gnu.fortran.linker">
+            id="fdt.managedbuild.tool.gnu.fortran.linker">
          <optionCategory
-               owner="cldt.managedbuild.tool.gnu.fortran.linker"
+               owner="fdt.managedbuild.tool.gnu.fortran.linker"
                name="%OptionCategory.General"
                id="gnu.fortran.link.category.general">
          </optionCategory>
@@ -596,7 +570,7 @@
                valueType="boolean">
          </option>
          <optionCategory
-               owner="cldt.managedbuild.tool.gnu.fortran.linker"
+               owner="fdt.managedbuild.tool.gnu.fortran.linker"
                name="%OptionCategory.Libs"
                id="gnu.fortran.link.category.libs">
          </optionCategory>
@@ -617,7 +591,7 @@
                valueType="stringList">
          </option>
          <optionCategory
-               owner="cldt.managedbuild.tool.gnu.fortran.linker"
+               owner="fdt.managedbuild.tool.gnu.fortran.linker"
                name="%OptionCategory.Misc"
                id="gnu.fortran.link.category.other">
          </optionCategory>
@@ -642,7 +616,7 @@
                id="gnu.fortran.link.option.userobjs">
          </option>
          <optionCategory
-               owner="cldt.managedbuild.tool.gnu.fortran.linker"
+               owner="fdt.managedbuild.tool.gnu.fortran.linker"
                name="%OptionCategory.Shared.Settings"
                id="gnu.fortran.link.category.shared">
          </optionCategory>
@@ -685,9 +659,9 @@
             command="ar"
             outputPrefix="lib"
             dependencyCalculator="org.eclipse.cdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
-            id="cldt.managedbuild.tool.gnu.archiver">
+            id="fdt.managedbuild.tool.gnu.archiver">
          <optionCategory
-               owner="cldt.managedbuild.tool.gnu.archiver"
+               owner="fdt.managedbuild.tool.gnu.archiver"
                name="%OptionCategory.General"
                id="gnu.lib.category.general">
          </optionCategory>
@@ -705,11 +679,11 @@
             outputs="res"
             headerExtensions="h,H,hpp"
             name="%ToolName.windres"
-            id="cldt.managedbuild.tool.gnu.windres"
+            id="fdt.managedbuild.tool.gnu.windres"
             outputFlag="-o"
             natureFilter="both">
          <optionCategory
-               owner="cldt.managedbuild.tool.gnu.windres"
+               owner="fdt.managedbuild.tool.gnu.windres"
                name="%OptionCategory.General"
                id="gnu.windres.category.general"/>
          <option
@@ -768,10 +742,10 @@
             outputs="o"
             name="%ToolName.assembler.gnu"
             outputFlag="-o"
-            id="cldt.managedbuild.tool.gnu.assembler"
+            id="fdt.managedbuild.tool.gnu.assembler"
             natureFilter="both">
          <optionCategory
-               owner="cldt.managedbuild.tool.gnu.assembler"
+               owner="fdt.managedbuild.tool.gnu.assembler"
                name="%OptionCategory.General"
                id="gnu.asm.category.general">
          </optionCategory>
@@ -811,9 +785,9 @@
             outputFlag="-o"
             command="gfortran"
             dependencyCalculator="org.eclipse.cdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
-            id="cldt.managedbuild.tool.macosx.fortran.linker">
+            id="fdt.managedbuild.tool.macosx.fortran.linker">
          <optionCategory
-               owner="cldt.managedbuild.tool.macosx.fortran.linker"
+               owner="fdt.managedbuild.tool.macosx.fortran.linker"
                name="%OptionCategory.General"
                id="macosx.fortran.link.category.general">
          </optionCategory>
@@ -858,7 +832,7 @@
                valueType="boolean">
          </option>
          <optionCategory
-               owner="cldt.managedbuild.tool.macosx.fortran.linker"
+               owner="fdt.managedbuild.tool.macosx.fortran.linker"
                name="%OptionCategory.Libs"
                id="macosx.fortran.link.category.libs">
          </optionCategory>
@@ -879,7 +853,7 @@
                valueType="stringList">
          </option>
          <optionCategory
-               owner="cldt.managedbuild.tool.macosx.fortran.linker"
+               owner="fdt.managedbuild.tool.macosx.fortran.linker"
                name="%OptionCategory.Misc"
                id="macosx.fortran.link.category.other">
          </optionCategory>
@@ -904,7 +878,7 @@
                id="macosx.fortran.link.option.userobjs">
          </option>
          <optionCategory
-               owner="cldt.managedbuild.tool.macosx.fortran.linker"
+               owner="fdt.managedbuild.tool.macosx.fortran.linker"
                name="%OptionCategory.Shared.Settings"
                id="macosx.fortran.link.category.shared">
          </optionCategory>
@@ -920,7 +894,7 @@
       
       <tool
 		  name="%ToolName.compiler.gnu.fortran"
-		  id="cldt.managedbuild.tool.gnu.fortran.compiler"
+		  id="fdt.managedbuild.tool.gnu.fortran.compiler"
 		  isAbstract="true"
 		  sources="f,f77,f90,f95"
 		  command="gfortran"
@@ -930,7 +904,7 @@
 		  outputs="o"
 		  outputFlag="-o">
 		  <optionCategory
-		      owner="cldt.managedbuild.tool.gnu.fortran.compiler"
+		      owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Preproc"
 			  id="gnu.fortran.compiler.category.preprocessor">
 		  </optionCategory>
@@ -951,7 +925,7 @@
 			  valueType="boolean">
 		  </option>
 		  <optionCategory
-			  owner="cldt.managedbuild.tool.gnu.fortran.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Symbols"
 			  id="gnu.fortran.compiler.category.symbols">
 		  </optionCategory>
@@ -970,7 +944,7 @@
 			  valueType="stringList">
 		  </option>
 		  <optionCategory
-			  owner="cldt.managedbuild.tool.gnu.fortran.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Dirs"
 			  id="gnu.fortran.compiler.category.dirs">
 		  </optionCategory>
@@ -983,7 +957,7 @@
 			  browseType="directory">
 		  </option>
 		  <optionCategory
-			  owner="cldt.managedbuild.tool.gnu.fortran.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Optimize"
 			  id="gnu.fortran.compiler.category.optimization">
 		  </optionCategory>
@@ -1022,7 +996,7 @@
 			  valueType="string">
 		  </option>
 		  <optionCategory
-			  owner="cldt.managedbuild.tool.gnu.fortran.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Debug"
 			  id="gnu.fortran.compiler.category.debug">
 		  </optionCategory>
@@ -1077,7 +1051,7 @@
 			  valueType="boolean">
 		  </option>
 		  <optionCategory
-			  owner="cldt.managedbuild.tool.gnu.fortran.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Warn"
 			  id="gnu.fortran.compiler.category.warnings">
 		  </optionCategory>
@@ -1130,7 +1104,7 @@
 			  valueType="boolean">
 		  </option>
 		  <optionCategory
-			  owner="cldt.managedbuild.tool.gnu.fortran.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Misc"
 			  id="gnu.fortran.compiler.category.other">
 		  </optionCategory>
@@ -1163,10 +1137,10 @@
             isAbstract="false"     
             isTest="false"
             name="%TargetName.gnu.exe"
-            id="cldt.managedbuild.target.gnu.exe">
+            id="fdt.managedbuild.target.gnu.exe">
          <configuration
                name="%ConfigName.Dbg"
-               id="cldt.managedbuild.config.gnu.exe.debug"
+               id="fdt.managedbuild.config.gnu.exe.debug"
                cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">
                <toolChain
@@ -1174,24 +1148,24 @@
                      osList="solaris,linux,hpux,aix,qnx"
                      name="%ToolChainName.Dbg"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.exe.debug">
+                     id="fdt.managedbuild.toolchain.gnu.exe.debug">
 		          <targetPlatform
-		              id="cldt.managedbuild.target.gnu.platform.exe.debug"
+		              id="fdt.managedbuild.target.gnu.platform.exe.debug"
 		              name="%PlatformName.Dbg"
 		              binaryParser="org.eclipse.cdt.core.ELF"
 		              osList="solaris,linux,hpux,aix,qnx"
 		              archList="all">
 	              </targetPlatform>
 				  <builder
-				      id="cldt.managedbuild.target.gnu.builder.exe.debug"
+				      id="fdt.managedbuild.target.gnu.builder.exe.debug"
 		              name="%BuilderName.Dbg"
 		              command="make"
 		              arguments="-k"
 		              buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
 		     	  </builder>               
                   <tool
-                      id="cldt.managedbuild.tool.gnu.fortran.compiler.exe.debug"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.compiler">                          
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.exe.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">                          
 			  	      <option
 					      id="gnu.fortran.compiler.exe.debug.option.optimization.level"
 						  defaultValue="gnu.fortran.optimization.level.none"
@@ -1204,18 +1178,18 @@
 					  </option>
 				  </tool>
                   <tool
-                      id="cldt.managedbuild.tool.gnu.fortran.linker.exe.debug"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.linker">
+                      id="fdt.managedbuild.tool.gnu.fortran.linker.exe.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.linker">
                   </tool> 
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.exe.debug"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.exe.debug"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
 			  </toolChain>
          </configuration>
          <configuration
                name="%ConfigName.Rel"
-               id="cldt.managedbuild.config.gnu.exe.release"
+               id="fdt.managedbuild.config.gnu.exe.release"
                cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser">               
                <toolChain
@@ -1223,24 +1197,24 @@
                      osList="solaris,linux,hpux,aix,qnx"
                      name="%ToolChainName.Rel"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.exe.release">
+                     id="fdt.managedbuild.toolchain.gnu.exe.release">
 		          <targetPlatform
-		              id="cldt.managedbuild.target.gnu.platform.exe.release"
+		              id="fdt.managedbuild.target.gnu.platform.exe.release"
 		              name="%PlatformName.Rel"		             
 		              binaryParser="org.eclipse.cdt.core.ELF"
 		              osList="solaris,linux,hpux,aix,qnx"
 		              archList="all">		              
 		          </targetPlatform>
 				  <builder
-				      id="cldt.managedbuild.target.gnu.builder.exe.release"
+				      id="fdt.managedbuild.target.gnu.builder.exe.release"
 		              name="%BuilderName.Rel"		              
 		              command="make"
 		              arguments="-k"
 		              buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">
 				  </builder> 
                   <tool
-                      id="cldt.managedbuild.tool.gnu.fortran.compiler.exe.release"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.compiler">                          
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.exe.release"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">                          
 					  <option
 						  id="gnu.fortran.compiler.exe.release.option.optimization.level"
 						  defaultValue="gnu.fortran.optimization.level.most"
@@ -1253,12 +1227,12 @@
 					  </option>
                   </tool>
                   <tool
-                      id="cldt.managedbuild.tool.gnu.fortran.linker.exe.release"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.linker">
+                      id="fdt.managedbuild.tool.gnu.fortran.linker.exe.release"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.linker">
                   </tool> 
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.exe.release"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.exe.release"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>
          </configuration>
@@ -1268,36 +1242,36 @@
             isAbstract="false"     
             isTest="false"
             name="%TargetName.gnu.so"
-            id="cldt.managedbuild.target.gnu.so">
+            id="fdt.managedbuild.target.gnu.so">
          <configuration
                name="%ConfigName.Dbg"
                cleanCommand="rm -rf"
                artifactExtension="so"               
                errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"                          
-               id="cldt.managedbuild.config.gnu.so.debug">
+               id="fdt.managedbuild.config.gnu.so.debug">
                <toolChain
                      archList="all"
                      osList="solaris,linux,hpux,aix,qnx"
                      name="%ToolChainName.Dbg"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.so.debug">
+                     id="fdt.managedbuild.toolchain.gnu.so.debug">
 		          <targetPlatform
-		              id="cldt.managedbuild.target.gnu.platform.so.debug"
+		              id="fdt.managedbuild.target.gnu.platform.so.debug"
 		              name="%PlatformName.Dbg"
 		              binaryParser="org.eclipse.cdt.core.ELF"		            
 		              osList="solaris,linux,hpux,aix,qnx"
 		              archList="all">
 		          </targetPlatform>
 				  <builder
-				      id="cldt.managedbuild.target.gnu.builder.so.debug"
+				      id="fdt.managedbuild.target.gnu.builder.so.debug"
 		              name="%BuilderName.Dbg"
 		              command="make"
 		              arguments="-k"
 		              buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 				  </builder>               		         
 				  <tool
-				      id="cldt.managedbuild.tool.gnu.fortran.compiler.so.debug"
-					  superClass="cldt.managedbuild.tool.gnu.fortran.compiler">
+				      id="fdt.managedbuild.tool.gnu.fortran.compiler.so.debug"
+					  superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
 					  <option
 						  id="gnu.fortran.compiler.so.debug.option.optimization.level"
 						  defaultValue="gnu.fortran.optimization.level.none"
@@ -1310,10 +1284,10 @@
 					  </option>
 				  </tool>
 				  <tool
-				      id="cldt.managedbuild.tool.gnu.fortran.linker.so.debug"
+				      id="fdt.managedbuild.tool.gnu.fortran.linker.so.debug"
 					  outputs="so"
 					  outputPrefix="lib"
-					  superClass="cldt.managedbuild.tool.gnu.fortran.linker">
+					  superClass="fdt.managedbuild.tool.gnu.fortran.linker">
 					  <option
 						  id="gnu.fortran.link.so.debug.option.shared"
 						  defaultValue="true"
@@ -1321,8 +1295,8 @@
 					  </option>
 				  </tool>
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.so.debug"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.so.debug"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
 			   </toolChain>
          </configuration>
@@ -1331,30 +1305,30 @@
                cleanCommand="rm -rf"
                artifactExtension="so"
                errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"
-               id="cldt.managedbuild.config.gnu.so.release">
+               id="fdt.managedbuild.config.gnu.so.release">
                <toolChain
                      archList="all"
                      osList="solaris,linux,hpux,aix,qnx"
                      name="%ToolChainName.Rel"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.so.release">
+                     id="fdt.managedbuild.toolchain.gnu.so.release">
 		          <targetPlatform
-		              id="cldt.managedbuild.target.gnu.platform.so.release"
+		              id="fdt.managedbuild.target.gnu.platform.so.release"
 		              name="%PlatformName.Rel"
 		              binaryParser="org.eclipse.cdt.core.ELF"		            
 		              osList="solaris,linux,hpux,aix,qnx"
 		              archList="all">
 		          </targetPlatform>
 				  <builder
-				      id="cldt.managedbuild.target.gnu.builder.so.release"
+				      id="fdt.managedbuild.target.gnu.builder.so.release"
 		              name="%BuilderName.Rel"
 		              command="make"
 		              arguments="-k"
 		              buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 				  </builder>               
 				  <tool				     
-				      id="cldt.managedbuild.tool.gnu.fortran.compiler.so.release"
-					  superClass="cldt.managedbuild.tool.gnu.fortran.compiler">
+				      id="fdt.managedbuild.tool.gnu.fortran.compiler.so.release"
+					  superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
 				      <option
 				          id="gnu.fortran.compiler.so.release.option.optimization.level"
 						  defaultValue="gnu.fortran.optimization.level.most"
@@ -1367,10 +1341,10 @@
 				      </option>
 				  </tool>
 				  <tool
-				      id="cldt.managedbuild.tool.gnu.fortran.linker.so.release"
+				      id="fdt.managedbuild.tool.gnu.fortran.linker.so.release"
 					  outputs="so"
 					  outputPrefix="lib"
-					  superClass="cldt.managedbuild.tool.gnu.fortran.linker">
+					  superClass="fdt.managedbuild.tool.gnu.fortran.linker">
 					  <option
 						  id="gnu.fortran.link.so.release.option.shared"
 						  defaultValue="true"
@@ -1378,8 +1352,8 @@
 					  </option>
 				  </tool>
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.so.release"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.so.release"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
 			   </toolChain>  
          </configuration>         
@@ -1389,36 +1363,36 @@
             isTest="false"
             name="%TargetName.gnu.lib"
             isAbstract="false"
-            id="cldt.managedbuild.target.gnu.lib">                        
+            id="fdt.managedbuild.target.gnu.lib">                        
          <configuration
 			   name="%ConfigName.Dbg"
 			   artifactExtension="a"
 			   cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"
-			   id="cldt.managedbuild.config.gnu.lib.debug">
+			   id="fdt.managedbuild.config.gnu.lib.debug">
                <toolChain
                      archList="all"
                      osList="solaris,linux,hpux,aix,qnx"
                      name="%ToolChainName.Dbg"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.lib.debug">
+                     id="fdt.managedbuild.toolchain.gnu.lib.debug">
 				  <targetPlatform
-					  id="cldt.managedbuild.target.gnu.platform.lib.debug"
+					  id="fdt.managedbuild.target.gnu.platform.lib.debug"
 				 	  name="%PlatformName.Dbg"
 					  binaryParser="org.eclipse.cdt.core.ELF"		            
 					  osList="solaris,linux,hpux,aix,qnx"
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
-					  id="cldt.managedbuild.target.gnu.builder.lib.debug"
+					  id="fdt.managedbuild.target.gnu.builder.lib.debug"
 					  name="%BuilderName.Dbg"
 					  command="make"
 					  arguments="-k"
 					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.fortran.compiler.lib.debug"
-					  superClass="cldt.managedbuild.tool.gnu.fortran.compiler">
+					  id="fdt.managedbuild.tool.gnu.fortran.compiler.lib.debug"
+					  superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
 				      <option
 					      id="gnu.fortran.compiler.lib.debug.option.optimization.level"
 						  defaultValue="gnu.fortran.optimization.level.none"
@@ -1431,14 +1405,14 @@
 				      </option>
 				  </tool>
 			      <tool
-		    		  id="cldt.managedbuild.tool.gnu.archiver.lib.debug"
+		    		  id="fdt.managedbuild.tool.gnu.archiver.lib.debug"
 				      outputs="a"
                       outputPrefix="lib"
-			          superClass="cldt.managedbuild.tool.gnu.archiver">
+			          superClass="fdt.managedbuild.tool.gnu.archiver">
 				  </tool>                 
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.lib.debug"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.lib.debug"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                 
          </configuration>
@@ -1447,30 +1421,30 @@
                artifactExtension="a"
                cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"
-               id="cldt.managedbuild.config.gnu.lib.release">
+               id="fdt.managedbuild.config.gnu.lib.release">
                <toolChain
                      archList="all"
                      osList="solaris,linux,hpux,aix,qnx"
                      name="%ToolChainName.Rel"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.lib.release">
+                     id="fdt.managedbuild.toolchain.gnu.lib.release">
 		          <targetPlatform
-		              id="cldt.managedbuild.target.gnu.platform.lib.release"
+		              id="fdt.managedbuild.target.gnu.platform.lib.release"
 		              name="%PlatformName.Rel"
 		              binaryParser="org.eclipse.cdt.core.ELF"		            
 		              osList="solaris,linux,hpux,aix,qnx"
 		              archList="all">
 		          </targetPlatform>
 				  <builder
-				      id="cldt.managedbuild.target.gnu.builder.lib.release"
+				      id="fdt.managedbuild.target.gnu.builder.lib.release"
 		              name="%BuilderName.Rel"
 		              command="make"
 		              arguments="-k"
 		              buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 				  </builder>               		            
 		          <tool
-					  id="cldt.managedbuild.tool.gnu.fortran.compiler.lib.release"
-					  superClass="cldt.managedbuild.tool.gnu.fortran.compiler">
+					  id="fdt.managedbuild.tool.gnu.fortran.compiler.lib.release"
+					  superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
 					  <option
 						  id="gnu.fortran.compiler.lib.release.option.optimization.level"
 						  defaultValue="gnu.fortran.optimization.level.most"
@@ -1483,14 +1457,14 @@
 					  </option>
 				  </tool>
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.archiver.lib.release"
+					  id="fdt.managedbuild.tool.gnu.archiver.lib.release"
 					  outputs="a"
                       outputPrefix="lib"
-				      superClass="cldt.managedbuild.tool.gnu.archiver">
+				      superClass="fdt.managedbuild.tool.gnu.archiver">
 				  </tool>
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.lib.release"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.lib.release"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>				  
          </configuration>                  
@@ -1498,7 +1472,7 @@
       
       <projectType 
             name="%TargetName.cygw.exe"
-            id="cldt.managedbuild.target.gnu.cygwin.exe"
+            id="fdt.managedbuild.target.gnu.cygwin.exe"
             isTest="false"
             isAbstract="false">                                  
          <configuration
@@ -1506,30 +1480,30 @@
                artifactExtension="exe"
                cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"
-               id="cldt.managedbuild.config.gnu.cygwin.exe.debug">
+               id="fdt.managedbuild.config.gnu.cygwin.exe.debug">
                <toolChain
                      archList="all"
                      osList="win32"
                      name="%ToolChainName.Dbg"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.cygwin.exe.debug">
+                     id="fdt.managedbuild.toolchain.gnu.cygwin.exe.debug">
                   <targetPlatform
-					  id="cldt.managedbuild.target.gnu.platform.cygwin.exe.debug"
+					  id="fdt.managedbuild.target.gnu.platform.cygwin.exe.debug"
 				 	  name="%PlatformName.Dbg"
                       binaryParser="org.eclipse.cdt.core.PE"            					  
 					  osList="win32"					  
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
-					  id="cldt.managedbuild.target.gnu.builder.cygwin.exe.debug"
+					  id="fdt.managedbuild.target.gnu.builder.cygwin.exe.debug"
 					  name="%BuilderName.Dbg"
 					  command="make"
 					  arguments="-k"
 					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
                   <tool
-					  id="cldt.managedbuild.tool.gnu.fortran.compiler.cygwin.exe.debug"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.compiler">
+					  id="fdt.managedbuild.tool.gnu.fortran.compiler.cygwin.exe.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
 					  <option
 						  id="gnu.fortran.compiler.cygwin.exe.debug.option.optimization.level"
 						  defaultValue="gnu.fortran.optimization.level.none"
@@ -1542,13 +1516,13 @@
 					  </option>
                   </tool>
                   <tool
-                      id="cldt.managedbuild.tool.gnu.fortran.linker.cygwin.exe.debug"
+                      id="fdt.managedbuild.tool.gnu.fortran.linker.cygwin.exe.debug"
                       outputs="exe"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.linker">
+                      superClass="fdt.managedbuild.tool.gnu.fortran.linker">
                   </tool>
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.cygwin.exe.debug"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.cygwin.exe.debug"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                                   
          </configuration>
@@ -1557,30 +1531,30 @@
                artifactExtension="exe"
                cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"               
-               id="cldt.managedbuild.config.gnu.cygwin.exe.release">
+               id="fdt.managedbuild.config.gnu.cygwin.exe.release">
                <toolChain
                      archList="all"
                      osList="win32"
                      name="%ToolChainName.Rel"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.cygwin.exe.release">
+                     id="fdt.managedbuild.toolchain.gnu.cygwin.exe.release">
                   <targetPlatform
-					  id="cldt.managedbuild.target.gnu.platform.cygwin.exe.release"
+					  id="fdt.managedbuild.target.gnu.platform.cygwin.exe.release"
 				 	  name="%PlatformName.Rel"
                       binaryParser="org.eclipse.cdt.core.PE"            					  
 					  osList="win32"					  
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
-					  id="cldt.managedbuild.target.gnu.builder.cygwin.exe.release"
+					  id="fdt.managedbuild.target.gnu.builder.cygwin.exe.release"
 					  name="%BuilderName.Rel"
 					  command="make"
 					  arguments="-k"
 					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		                       
                   <tool
-					  id="cldt.managedbuild.tool.gnu.fortran.compiler.cygwin.exe.release"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.compiler">
+					  id="fdt.managedbuild.tool.gnu.fortran.compiler.cygwin.exe.release"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
                           id="gnu.fortran.compiler.cygwin.exe.release.option.optimization.level"
                           defaultValue="gnu.fortran.optimization.level.most"
@@ -1593,13 +1567,13 @@
                       </option>
                   </tool>
                   <tool
-                      id="cldt.managedbuild.tool.gnu.fortran.linker.cygwin.exe.release"
+                      id="fdt.managedbuild.tool.gnu.fortran.linker.cygwin.exe.release"
                       outputs="exe"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.linker">
+                      superClass="fdt.managedbuild.tool.gnu.fortran.linker">
                   </tool>
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.cygwin.exe.release"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.cygwin.exe.release"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                                                     
          </configuration>
@@ -1607,7 +1581,7 @@
          
       <projectType                  
             name="%TargetName.cygw.so"
-            id="cldt.managedbuild.target.gnu.cygwin.so"
+            id="fdt.managedbuild.target.gnu.cygwin.so"
             isAbstract="false"
             isTest="false">            
          <configuration
@@ -1615,30 +1589,30 @@
                cleanCommand="rm -rf"
                artifactExtension="dll"
                errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"               
-               id="cldt.managedbuild.config.gnu.cygwin.so.debug">
+               id="fdt.managedbuild.config.gnu.cygwin.so.debug">
                <toolChain
                      archList="all"
                      osList="win32"
                      name="%ToolChainName.Dbg"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.cygwin.so.debug">
+                     id="fdt.managedbuild.toolchain.gnu.cygwin.so.debug">
                   <targetPlatform
-					  id="cldt.managedbuild.target.gnu.platform.cygwin.so.debug"
+					  id="fdt.managedbuild.target.gnu.platform.cygwin.so.debug"
 				 	  name="%PlatformName.Dbg"
                       binaryParser="org.eclipse.cdt.core.PE"            					  
 					  osList="win32"					  
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
-					  id="cldt.managedbuild.target.gnu.builder.cygwin.so.debug"
+					  id="fdt.managedbuild.target.gnu.builder.cygwin.so.debug"
 					  name="%BuilderName.Dbg"
 					  command="make"
 					  arguments="-k"
 					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
                   <tool
-					  id="cldt.managedbuild.tool.gnu.fortran.compiler.cygwin.so.debug"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.compiler">
+					  id="fdt.managedbuild.tool.gnu.fortran.compiler.cygwin.so.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
 					  <option
 						  id="gnu.fortran.compiler.cygwin.so.debug.option.optimization.level"
 						  defaultValue="gnu.fortran.optimization.level.none"
@@ -1651,9 +1625,9 @@
 					  </option>
                   </tool>
                   <tool
-                      id="cldt.managedbuild.tool.gnu.fortran.linker.cygwin.so.debug"
+                      id="fdt.managedbuild.tool.gnu.fortran.linker.cygwin.so.debug"
                       outputs="dll,a.dll"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.linker">
+                      superClass="fdt.managedbuild.tool.gnu.fortran.linker">
                       <option
                           id="gnu.fortran.link.cygwin.so.debug.option.shared"
                           defaultValue="true"
@@ -1661,8 +1635,8 @@
                       </option>
                   </tool>
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.cygwin.so.debug"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.cygwin.so.debug"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                                                     
          </configuration>
@@ -1671,30 +1645,30 @@
                cleanCommand="rm -rf"
                artifactExtension="dll"
                errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"               
-               id="cldt.managedbuild.config.gnu.cygwin.so.release">               
+               id="fdt.managedbuild.config.gnu.cygwin.so.release">               
                <toolChain
                      archList="all"
                      osList="win32"
                      name="%ToolChainName.Rel"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.cygwin.so.release">
+                     id="fdt.managedbuild.toolchain.gnu.cygwin.so.release">
                   <targetPlatform
-					  id="cldt.managedbuild.target.gnu.platform.cygwin.so.release"
+					  id="fdt.managedbuild.target.gnu.platform.cygwin.so.release"
 				 	  name="%PlatformName.Rel"
                       binaryParser="org.eclipse.cdt.core.PE"            					  
 					  osList="win32"					  
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
-					  id="cldt.managedbuild.target.gnu.builder.cygwin.so.release"
+					  id="fdt.managedbuild.target.gnu.builder.cygwin.so.release"
 					  name="%BuilderName.Rel"
 					  command="make"
 					  arguments="-k"
 					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		                                       
                   <tool
-                      id="cldt.managedbuild.tool.gnu.fortran.compiler.cygwin.so.release"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.cygwin.so.release"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option 
                           id="gnu.fortran.compiler.cygwin.so.release.option.optimization.level"
                           defaultValue="gnu.fortran.optimization.level.most"
@@ -1707,9 +1681,9 @@
                       </option>
                   </tool>
                   <tool
-                      id="cldt.managedbuild.tool.gnu.fortran.linker.cygwin.so.release"
+                      id="fdt.managedbuild.tool.gnu.fortran.linker.cygwin.so.release"
                       outputs="dll,a.dll"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.linker">
+                      superClass="fdt.managedbuild.tool.gnu.fortran.linker">
                       <option
                           id="gnu.fortran.link.cygwin.so.release.option.shared"
                           defaultValue="true"
@@ -1717,8 +1691,8 @@
                       </option>
                   </tool>
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.cygwin.so.release"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.cygwin.so.release"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                                                                                
          </configuration>
@@ -1726,7 +1700,7 @@
                        
       <projectType 
             name="%TargetName.cygw.lib"
-            id="cldt.managedbuild.target.gnu.cygwin.lib"
+            id="fdt.managedbuild.target.gnu.cygwin.lib"
             isTest="false"
             isAbstract="false">            
          <configuration
@@ -1734,30 +1708,30 @@
                artifactExtension="a"
                cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"
-               id="cldt.managedbuild.config.gnu.cygwin.lib.debug">
+               id="fdt.managedbuild.config.gnu.cygwin.lib.debug">
                <toolChain
                      archList="all"
                      osList="win32"
                      name="%ToolChainName.Dbg"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.cygwin.lib.debug">
+                     id="fdt.managedbuild.toolchain.gnu.cygwin.lib.debug">
                   <targetPlatform
-					  id="cldt.managedbuild.target.gnu.platform.cygwin.lib.debug"
+					  id="fdt.managedbuild.target.gnu.platform.cygwin.lib.debug"
 				 	  name="%PlatformName.Dbg"
                       binaryParser="org.eclipse.cdt.core.PE"            					  
 					  osList="win32"					  
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
-					  id="cldt.managedbuild.target.gnu.builder.cygwin.lib.debug"
+					  id="fdt.managedbuild.target.gnu.builder.cygwin.lib.debug"
 					  name="%BuilderName.Dbg"
 					  command="make"
 					  arguments="-k"
 					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		                                                              
                   <tool
-                      id="cldt.managedbuild.tool.gnu.fortran.compiler.cygwin.lib.debug"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.cygwin.lib.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
                           id="gnu.fortran.compiler.cygwin.lib.debug.option.optimization.level"
                           defaultValue="gnu.fortran.optimization.level.none"
@@ -1770,14 +1744,14 @@
                       </option>
                   </tool>
                   <tool
-                      id="cldt.managedbuild.tool.gnu.archiver.cygwin.lib.debug"
+                      id="fdt.managedbuild.tool.gnu.archiver.cygwin.lib.debug"
                       outputPrefix="lib"
                       outputs="a"
-                      superClass="cldt.managedbuild.tool.gnu.archiver">
+                      superClass="fdt.managedbuild.tool.gnu.archiver">
                   </tool>
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.cygwin.lib.debug"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.cygwin.lib.debug"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                                                                                				               				  
          </configuration>
@@ -1786,30 +1760,30 @@
                artifactExtension="a"
                cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"               
-               id="cldt.managedbuild.config.gnu.cygwin.lib.release">
+               id="fdt.managedbuild.config.gnu.cygwin.lib.release">
                <toolChain
                      archList="all"
                      osList="win32"
                      name="%ToolChainName.Rel"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.cygwin.lib.release">
+                     id="fdt.managedbuild.toolchain.gnu.cygwin.lib.release">
                   <targetPlatform
-					  id="cldt.managedbuild.target.gnu.platform.cygwin.lib.release"
+					  id="fdt.managedbuild.target.gnu.platform.cygwin.lib.release"
 				 	  name="%PlatformName.Rel"
                       binaryParser="org.eclipse.cdt.core.PE"            					  
 					  osList="win32"					  
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
-					  id="cldt.managedbuild.target.gnu.builder.cygwin.lib.release"
+					  id="fdt.managedbuild.target.gnu.builder.cygwin.lib.release"
 					  name="%BuilderName.Rel"
 					  command="make"
 					  arguments="-k"
 					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		                                                                                              
                   <tool
-                     id="cldt.managedbuild.tool.gnu.fortran.compiler.cygwin.lib.release"
-                     superClass="cldt.managedbuild.tool.gnu.fortran.compiler">
+                     id="fdt.managedbuild.tool.gnu.fortran.compiler.cygwin.lib.release"
+                     superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                      <option
                          id="gnu.fortran.compiler.cygwin.lib.release.option.optimization.level"
                          defaultValue="gnu.fortran.optimization.level.most"
@@ -1822,14 +1796,14 @@
                      </option>
                   </tool>
                  <tool
-                    id="cldt.managedbuild.tool.gnu.archiver.cygwin.lib.release"
+                    id="fdt.managedbuild.tool.gnu.archiver.cygwin.lib.release"
                     outputPrefix="lib"
                     outputs="a"
-                    superClass="cldt.managedbuild.tool.gnu.archiver">
+                    superClass="fdt.managedbuild.tool.gnu.archiver">
                  </tool>
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.cygwin.lib.release"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.cygwin.lib.release"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
               </toolChain>                                                                                				                    
          </configuration>         
@@ -1837,37 +1811,37 @@
       
       <projectType 
             name="%TargetName.gnu.macosx.exe"
-            id="cldt.managedbuild.target.gnu.macosx.exe"
+            id="fdt.managedbuild.target.gnu.macosx.exe"
             isTest="false"
             isAbstract="false">
          <configuration
                name="%ConfigName.Dbg"
                cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"               
-               id="cldt.managedbuild.config.gnu.macosx.exe.debug">
+               id="fdt.managedbuild.config.gnu.macosx.exe.debug">
                <toolChain
                      archList="all"
                      osList="macosx"
                      name="%ToolChainName.Dbg"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.macosx.exe.debug">
+                     id="fdt.managedbuild.toolchain.gnu.macosx.exe.debug">
                   <targetPlatform
-					  id="cldt.managedbuild.target.gnu.platform.macosx.exe.debug"
+					  id="fdt.managedbuild.target.gnu.platform.macosx.exe.debug"
 				 	  name="%PlatformName.Dbg"
                       binaryParser="org.eclipse.cdt.core.MachO"
 					  osList="macosx"					  
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
-					  id="cldt.managedbuild.target.gnu.builder.macosx.exe.debug"
+					  id="fdt.managedbuild.target.gnu.builder.macosx.exe.debug"
 					  name="%BuilderName.Dbg"
 					  command="make"
 					  arguments="-k"
 					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
                   <tool
-                      id="cldt.managedbuild.tool.gnu.fortran.compiler.macosx.exe.debug"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.macosx.exe.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
                           id="gnu.fortran.compiler.macosx.exe.debug.option.optimization.level"
                           defaultValue="gnu.fortran.optimization.level.none"
@@ -1880,12 +1854,12 @@
                       </option>
                   </tool>
 				  <tool
-				      id="cldt.managedbuild.tool.macosx.fortran.linker.macosx.exe.debug"
-					  superClass="cldt.managedbuild.tool.macosx.fortran.linker">
+				      id="fdt.managedbuild.tool.macosx.fortran.linker.macosx.exe.debug"
+					  superClass="fdt.managedbuild.tool.macosx.fortran.linker">
 				  </tool>
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.macosx.exe.debug"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.macosx.exe.debug"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                    
          </configuration>
@@ -1893,30 +1867,30 @@
                name="%ConfigName.Rel"
                cleanCommand="rm -rf"               
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"                              
-               id="cldt.managedbuild.config.macosx.exe.release">
+               id="fdt.managedbuild.config.macosx.exe.release">
                <toolChain
                      archList="all"
                      osList="macosx"
                      name="%ToolChainName.Rel"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.macosx.exe.release">
+                     id="fdt.managedbuild.toolchain.gnu.macosx.exe.release">
                   <targetPlatform
-					  id="cldt.managedbuild.target.gnu.platform.macosx.exe.release"
+					  id="fdt.managedbuild.target.gnu.platform.macosx.exe.release"
 				 	  name="%PlatformName.Rel"
                       binaryParser="org.eclipse.cdt.core.MachO"
 					  osList="macosx"					  
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
-					  id="cldt.managedbuild.target.gnu.builder.macosx.exe.release"
+					  id="fdt.managedbuild.target.gnu.builder.macosx.exe.release"
 					  name="%BuilderName.Rel"
 					  command="make"
 					  arguments="-k"
 					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
                   <tool
-                      id="cldt.managedbuild.tool.gnu.fortran.compiler.macosx.exe.release"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.macosx.exe.release"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
                           id="gnu.fortran.compiler.macosx.exe.release.option.optimization.level"
                           defaultValue="gnu.fortran.optimization.level.most"
@@ -1929,12 +1903,12 @@
                       </option>
                    </tool>
 				   <tool
-				       id="cldt.managedbuild.tool.macosx.fortran.linker.macosx.exe.release"
-					   superClass="cldt.managedbuild.tool.macosx.fortran.linker">
+				       id="fdt.managedbuild.tool.macosx.fortran.linker.macosx.exe.release"
+					   superClass="fdt.managedbuild.tool.macosx.fortran.linker">
 					</tool>
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.macosx.exe.release"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.macosx.exe.release"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                             
          </configuration>
@@ -1942,7 +1916,7 @@
             
       <projectType             
             name="%TargetName.gnu.macosx.so"
-            id="cldt.managedbuild.target.gnu.macosx.so"
+            id="fdt.managedbuild.target.gnu.macosx.so"
             isTest="false"
             isAbstract="false">            
          <configuration
@@ -1950,30 +1924,30 @@
                artifactExtension="dylib"
                cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"                              
-               id="cldt.managedbuild.config.macosx.so.debug">
+               id="fdt.managedbuild.config.macosx.so.debug">
                <toolChain
                      archList="all"
                      osList="macosx"
                      name="%ToolChainName.Dbg"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.macosx.so.debug">
+                     id="fdt.managedbuild.toolchain.gnu.macosx.so.debug">
                   <targetPlatform
-					  id="cldt.managedbuild.target.gnu.platform.macosx.so.debug"
+					  id="fdt.managedbuild.target.gnu.platform.macosx.so.debug"
 				 	  name="%PlatformName.Dbg"
                       binaryParser="org.eclipse.cdt.core.MachO"
 					  osList="macosx"					  
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
-					  id="cldt.managedbuild.target.gnu.builder.macosx.so.debug"
+					  id="fdt.managedbuild.target.gnu.builder.macosx.so.debug"
 					  name="%BuilderName.Dbg"
 					  command="make"
 					  arguments="-k"
 					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		                       
                   <tool
-                      id="cldt.managedbuild.tool.gnu.fortran.compiler.macosx.so.debug"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.macosx.so.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
                           id="gnu.fortran.compiler.macosx.so.debug.option.optimization.level"
                           defaultValue="gnu.fortran.optimization.level.none"
@@ -1986,10 +1960,10 @@
                       </option>
                   </tool>
 				  <tool
-				      id="cldt.managedbuild.tool.macosx.fortran.linker.macosx.so.debug"
+				      id="fdt.managedbuild.tool.macosx.fortran.linker.macosx.so.debug"
 					  outputs="dylib"
 					  outputPrefix="lib"
-					  superClass="cldt.managedbuild.tool.macosx.fortran.linker">
+					  superClass="fdt.managedbuild.tool.macosx.fortran.linker">
 					  <option
 					      id="macosx.fortran.link.macosx.so.debug.option.shared"
 						  defaultValue="true"
@@ -2007,8 +1981,8 @@
 					  </option>
 				  </tool>
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.macosx.so.debug"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.macosx.so.debug"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                                                                       
          </configuration>
@@ -2017,30 +1991,30 @@
                artifactExtension="dylib"
                cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"               
-               id="cldt.managedbuild.config.macosx.so.release">
+               id="fdt.managedbuild.config.macosx.so.release">
                <toolChain
                      archList="all"
                      osList="macosx"
                      name="%ToolChainName.Rel"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.macosx.so.release">
+                     id="fdt.managedbuild.toolchain.gnu.macosx.so.release">
                   <targetPlatform
-					  id="cldt.managedbuild.target.gnu.platform.macosx.so.release"
+					  id="fdt.managedbuild.target.gnu.platform.macosx.so.release"
 				 	  name="%PlatformName.Rel"
                       binaryParser="org.eclipse.cdt.core.MachO"
 					  osList="macosx"					  
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
-					  id="cldt.managedbuild.target.gnu.builder.macosx.so.release"
+					  id="fdt.managedbuild.target.gnu.builder.macosx.so.release"
 					  name="%BuilderName.Rel"
 					  command="make"
 					  arguments="-k"
 					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		                                                     
                   <tool
-                      id="cldt.managedbuild.tool.gnu.fortran.compiler.macosx.so.release"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.macosx.so.release"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
                           id="gnu.fortran.compiler.macosx.so.release.option.optimization.level"
                           defaultValue="gnu.fortran.optimization.level.most"
@@ -2053,10 +2027,10 @@
                       </option>
                   </tool>
 				  <tool
-				      id="cldt.managedbuild.tool.macosx.fortran.linker.macosx.so.release"
+				      id="fdt.managedbuild.tool.macosx.fortran.linker.macosx.so.release"
 					  outputs="dylib"
 					  outputPrefix="lib"
-					  superClass="cldt.managedbuild.tool.macosx.fortran.linker">
+					  superClass="fdt.managedbuild.tool.macosx.fortran.linker">
 					  <option
 					      id="macosx.fortran.link.macosx.so.release.option.shared"
 						  defaultValue="true"
@@ -2074,8 +2048,8 @@
 					  </option>
 				  </tool>
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.macosx.so.release"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.macosx.so.release"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
               </toolChain>                  
          </configuration>
@@ -2083,7 +2057,7 @@
       
       <projectType            
             name="%TargetName.gnu.macosx.lib"
-            id="cldt.managedbuild.target.gnu.macosx.lib"
+            id="fdt.managedbuild.target.gnu.macosx.lib"
             isTest="false"
 			isAbstract="false">
          <configuration
@@ -2091,30 +2065,30 @@
                artifactExtension="a"
                cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"               
-               id="cldt.managedbuild.config.macosx.lib.debug">
+               id="fdt.managedbuild.config.macosx.lib.debug">
                <toolChain
                      archList="all"
                      osList="macosx"
                      name="%ToolChainName.Dbg"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.macosx.lib.debug">
+                     id="fdt.managedbuild.toolchain.gnu.macosx.lib.debug">
                   <targetPlatform
-					  id="cldt.managedbuild.target.gnu.platform.macosx.lib.debug"
+					  id="fdt.managedbuild.target.gnu.platform.macosx.lib.debug"
 				 	  name="%PlatformName.Dbg"
                       binaryParser="org.eclipse.cdt.core.MachO"
 					  osList="macosx"					  
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
-					  id="cldt.managedbuild.target.gnu.builder.macosx.lib.debug"
+					  id="fdt.managedbuild.target.gnu.builder.macosx.lib.debug"
 					  name="%BuilderName.Dbg"
 					  command="make"
 					  arguments="-k"
 					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
                   <tool
-                      id="cldt.managedbuild.tool.gnu.fortran.compiler.macosx.lib.debug"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.macosx.lib.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
                           id="gnu.fortran.compiler.macosx.lib.debug.option.optimization.level"
                           defaultValue="gnu.fortran.optimization.level.none"
@@ -2127,14 +2101,14 @@
                       </option>
                   </tool>
                   <tool
-                      id="cldt.managedbuild.toolmacosx.lib.debug.gnu.archiver"
+                      id="fdt.managedbuild.toolmacosx.lib.debug.gnu.archiver"
                       outputPrefix="lib"
                       outputs="a"
-                      superClass="cldt.managedbuild.tool.gnu.archiver">
+                      superClass="fdt.managedbuild.tool.gnu.archiver">
                   </tool>                                   
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.macosx.lib.debug"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.macosx.lib.debug"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                                                        
          </configuration>
@@ -2143,30 +2117,30 @@
                artifactExtension="a"
                cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"               
-               id="cldt.managedbuild.config.macosx.lib.release">
+               id="fdt.managedbuild.config.macosx.lib.release">
                <toolChain
                      archList="all"
                      osList="macosx"
                      name="%ToolChainName.Rel"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-                     id="cldt.managedbuild.toolchain.gnu.macosx.lib.release">
+                     id="fdt.managedbuild.toolchain.gnu.macosx.lib.release">
                   <targetPlatform
-					  id="cldt.managedbuild.target.gnu.platform.macosx.lib.release"
+					  id="fdt.managedbuild.target.gnu.platform.macosx.lib.release"
 				 	  name="%PlatformName.Rel"
                       binaryParser="org.eclipse.cdt.core.MachO"
 					  osList="macosx"					  
 					  archList="all">
 				  </targetPlatform>
 			  	  <builder
-					  id="cldt.managedbuild.target.gnu.builder.macosx.lib.release"
+					  id="fdt.managedbuild.target.gnu.builder.macosx.lib.release"
 					  name="%BuilderName.Rel"
 					  command="make"
 					  arguments="-k"
 					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
                   <tool
-                      id="cldt.managedbuild.tool.gnu.fortran.compiler.macosx.lib.release"
-                      superClass="cldt.managedbuild.tool.gnu.fortran.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.macosx.lib.release"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
                           id="gnu.fortran.compiler.macosx.lib.release.option.optimization.level"
                           defaultValue="gnu.fortran.optimization.level.most"
@@ -2179,14 +2153,14 @@
                       </option>
                   </tool>
                   <tool
-                      id="cldt.managedbuild.toolmacosx.lib.release.gnu.archiver"
+                      id="fdt.managedbuild.toolmacosx.lib.release.gnu.archiver"
                       outputPrefix="lib"
                       outputs="a"
-                      superClass="cldt.managedbuild.tool.gnu.archiver">
+                      superClass="fdt.managedbuild.tool.gnu.archiver">
                   </tool>                 
 				  <tool
-					  id="cldt.managedbuild.tool.gnu.assembler.macosx.lib.release"
-					  superClass="cldt.managedbuild.tool.gnu.assembler">
+					  id="fdt.managedbuild.tool.gnu.assembler.macosx.lib.release"
+					  superClass="fdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                                                                   
          </configuration>      
