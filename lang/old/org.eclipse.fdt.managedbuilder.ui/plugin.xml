@@ -48,11 +48,8 @@
             name="%MngResourceProp.name"
             nameFilter="*.f"
             class="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
-            id="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildProperties">
+            id="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildProperties.fortran">
       </page>
-   </extension>
-   <extension
-         point="org.eclipse.ui.propertyPages">
       <page
             objectClass="org.eclipse.core.resources.IFile"
             adaptable="true"
@@ -61,9 +58,6 @@
             class="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
             id="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildProperties">
       </page>
-   </extension>
-   <extension
-         point="org.eclipse.ui.propertyPages">
       <page
             objectClass="org.eclipse.core.resources.IFile"
             adaptable="true"
@@ -474,6 +468,34 @@
 			        outputs=""
 			        superClass="fdt.managedbuild.tool.xlf.f.linker">
 		          </tool>
+                  <tool
+                      id="fdt.managedbuild.tool.gnu.c.compiler.macosx.exe.debug"
+                      superClass="cdt.managedbuild.tool.gnu.c.compiler">
+                      <option
+                          id="fdt.gnu.c.compiler.macosx.exe.debug.option.optimization.level"
+                          defaultValue="gnu.c.optimization.level.none"
+                          superClass="gnu.c.compiler.option.optimization.level">
+                      </option>
+                      <option
+                          id="fdt.gnu.c.compiler.macosx.exe.debug.option.debugging.level"
+                          defaultValue="gnu.c.debugging.level.max"
+                          superClass="gnu.c.compiler.option.debugging.level">
+                      </option>
+                  </tool>
+                  <tool
+                      id="fdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.debug"
+                      superClass="cdt.managedbuild.tool.gnu.cpp.compiler">
+                      <option
+                          id="fdt.gnu.cpp.compilermacosx.exe.debug.option.optimization.level"
+                          defaultValue="gnu.cpp.compiler.optimization.level.none"
+                          superClass="gnu.cpp.compiler.option.optimization.level">
+                      </option>
+                      <option
+                          id="fdt.gnu.cpp.compiler.macosx.exe.debug.option.debugging.level"
+                          defaultValue="gnu.cpp.compiler.debugging.level.max"
+                          superClass="gnu.cpp.compiler.option.debugging.level">
+                      </option>
+                  </tool>
              </toolChain>                    
          </configuration>
          <configuration
@@ -650,29 +672,6 @@
                valueType="string">
          </option>
       </tool>
-      <tool
-            natureFilter="both"
-            isAbstract="true"
-            sources="o"
-            name="%ToolName.archiver.gnu"
-            outputs="a"
-            command="ar"
-            outputPrefix="lib"
-            dependencyCalculator="org.eclipse.cdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
-            id="fdt.managedbuild.tool.gnu.archiver">
-         <optionCategory
-               owner="fdt.managedbuild.tool.gnu.archiver"
-               name="%OptionCategory.General"
-               id="gnu.lib.category.general">
-         </optionCategory>
-         <option
-               defaultValue="-r"
-               name="%Option.Posix.Archiver.Flags"
-               category="gnu.lib.category.general"
-               valueType="string"
-               id="gnu.both.lib.option.flags">
-         </option>
-      </tool>
       <!--tool
             command="windres"
             sources="rc"
@@ -736,47 +735,6 @@
                name="%Option.Posix.UndefSym"
                id="gnu.windres.option.preprocessor.undefined.symbols"/>
       </tool-->
-      <tool
-            command="as"
-            sources="s,S"
-            outputs="o"
-            name="%ToolName.assembler.gnu"
-            outputFlag="-o"
-            id="fdt.managedbuild.tool.gnu.assembler"
-            natureFilter="both">
-         <optionCategory
-               owner="fdt.managedbuild.tool.gnu.assembler"
-               name="%OptionCategory.General"
-               id="gnu.asm.category.general">
-         </optionCategory>
-         <option
-               name="%Option.Gnu.Assembler.Flags"
-               category="gnu.asm.category.general"
-               valueType="string"
-               id="gnu.both.asm.option.flags">
-         </option>
-         <option
-               command="-I"
-               valueType="includePath"
-               category="gnu.asm.category.general"
-               browseType="directory"
-               name="%Option.Posix.InclPaths"
-               id="gnu.both.asm.option.include.paths"/>
-         <option
-               command="-W"
-               defaultValue="false"
-               valueType="boolean"
-               category="gnu.asm.category.general"
-               name="%Option.Gnu.Assembler.warn.suppress"
-               id="gnu.both.asm.option.warnings.nowarn"/>
-         <option
-               command="-v"
-               defaultValue="false"
-               valueType="boolean"
-               category="gnu.asm.category.general"
-               name="%Option.Gnu.Assembler.version"
-               id="gnu.both.asm.option.version"/>
-      </tool>
       <tool
             natureFilter="fnature"
             sources="o"
@@ -1183,7 +1141,7 @@
                   </tool> 
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.exe.debug"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
 			  </toolChain>
          </configuration>
@@ -1232,7 +1190,7 @@
                   </tool> 
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.exe.release"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>
          </configuration>
@@ -1296,7 +1254,7 @@
 				  </tool>
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.so.debug"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
 			   </toolChain>
          </configuration>
@@ -1353,7 +1311,7 @@
 				  </tool>
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.so.release"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
 			   </toolChain>  
          </configuration>         
@@ -1408,11 +1366,11 @@
 		    		  id="fdt.managedbuild.tool.gnu.archiver.lib.debug"
 				      outputs="a"
                       outputPrefix="lib"
-			          superClass="fdt.managedbuild.tool.gnu.archiver">
+			          superClass="cdt.managedbuild.tool.gnu.archiver">
 				  </tool>                 
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.lib.debug"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                 
          </configuration>
@@ -1460,11 +1418,11 @@
 					  id="fdt.managedbuild.tool.gnu.archiver.lib.release"
 					  outputs="a"
                       outputPrefix="lib"
-				      superClass="fdt.managedbuild.tool.gnu.archiver">
+				      superClass="cdt.managedbuild.tool.gnu.archiver">
 				  </tool>
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.lib.release"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>				  
          </configuration>                  
@@ -1522,7 +1480,7 @@
                   </tool>
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.cygwin.exe.debug"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                                   
          </configuration>
@@ -1573,7 +1531,7 @@
                   </tool>
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.cygwin.exe.release"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                                                     
          </configuration>
@@ -1636,7 +1594,7 @@
                   </tool>
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.cygwin.so.debug"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                                                     
          </configuration>
@@ -1692,7 +1650,7 @@
                   </tool>
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.cygwin.so.release"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                                                                                
          </configuration>
@@ -1747,11 +1705,11 @@
                       id="fdt.managedbuild.tool.gnu.archiver.cygwin.lib.debug"
                       outputPrefix="lib"
                       outputs="a"
-                      superClass="fdt.managedbuild.tool.gnu.archiver">
+                      superClass="cdt.managedbuild.tool.gnu.archiver">
                   </tool>
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.cygwin.lib.debug"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                                                                                				               				  
          </configuration>
@@ -1799,11 +1757,11 @@
                     id="fdt.managedbuild.tool.gnu.archiver.cygwin.lib.release"
                     outputPrefix="lib"
                     outputs="a"
-                    superClass="fdt.managedbuild.tool.gnu.archiver">
+                    superClass="cdt.managedbuild.tool.gnu.archiver">
                  </tool>
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.cygwin.lib.release"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
               </toolChain>                                                                                				                    
          </configuration>         
@@ -1859,7 +1817,7 @@
 				  </tool>
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.macosx.exe.debug"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                    
          </configuration>
@@ -1908,7 +1866,7 @@
 					</tool>
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.macosx.exe.release"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                             
          </configuration>
@@ -1982,7 +1940,7 @@
 				  </tool>
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.macosx.so.debug"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                                                                       
          </configuration>
@@ -2049,7 +2007,7 @@
 				  </tool>
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.macosx.so.release"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
               </toolChain>                  
          </configuration>
@@ -2104,11 +2062,11 @@
                       id="fdt.managedbuild.toolmacosx.lib.debug.gnu.archiver"
                       outputPrefix="lib"
                       outputs="a"
-                      superClass="fdt.managedbuild.tool.gnu.archiver">
+                      superClass="cdt.managedbuild.tool.gnu.archiver">
                   </tool>                                   
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.macosx.lib.debug"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                                                        
          </configuration>
@@ -2156,11 +2114,11 @@
                       id="fdt.managedbuild.toolmacosx.lib.release.gnu.archiver"
                       outputPrefix="lib"
                       outputs="a"
-                      superClass="fdt.managedbuild.tool.gnu.archiver">
+                      superClass="cdt.managedbuild.tool.gnu.archiver">
                   </tool>                 
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.macosx.lib.release"
-					  superClass="fdt.managedbuild.tool.gnu.assembler">
+					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                                                                   
          </configuration>      
