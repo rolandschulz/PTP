@@ -28,6 +28,7 @@ import org.eclipse.cldt.core.search.ICSearchConstants;
 import org.eclipse.cldt.core.search.ICSearchScope;
 import org.eclipse.cldt.core.search.SearchEngine;
 import org.eclipse.cldt.internal.ui.ICHelpContextIds;
+import org.eclipse.cldt.internal.ui.util.RowLayouter;
 import org.eclipse.cldt.ui.FortranUIPlugin;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.IAdaptable;
@@ -40,7 +41,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.search.internal.ui.util.RowLayouter;
 import org.eclipse.search.ui.ISearchPage;
 import org.eclipse.search.ui.ISearchPageContainer;
 import org.eclipse.search.ui.ISearchResultViewEntry;
@@ -134,7 +134,7 @@ public class CSearchPage extends DialogPage implements ISearchPage, ICSearchCons
 		CSearchQuery job = new CSearchQuery(workspace, data.pattern, data.isCaseSensitive, searching, data.limitTo, scope, scopeDescription, null);
 		NewSearchUI.activateSearchResultView();
 		
-		NewSearchUI.runQuery(job);
+		NewSearchUI.runQueryInBackground(job);
 		
 		return true;
 	}
