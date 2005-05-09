@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin
+   id="org.eclipse.fdt.ui"
+   name="%pluginName"
+   version="3.0.0"
+   provider-name="%providerName"
+   class="org.eclipse.cldt.ui.CUIPlugin">
+
+   <runtime>
+      <library name="fdtui.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+   <requires>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.ui.views"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.search"/>
+      <import plugin="org.eclipse.compare"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.cdt.ui"/>
+      <import plugin="org.eclipse.fdt.core"/>
+      <import plugin="org.eclipse.ui.console"/>
+      <import plugin="org.eclipse.core.filebuffers"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.expressions"/>
+      <import plugin="org.eclipse.help"/>
+   </requires>
+   
+<!-- =========================================================================== -->
+<!-- Extension point: org.eclipse.cldt.ui.textHovers                        -->
+<!-- Extension Implementation: must implement org.eclipse.jface.text.ITextHover  -->
+<!-- Purpose: Provide a perspective specific text hovering for FortranEditor files     -->
+<!-- =========================================================================== -->
+   <extension-point id="textHovers" name="%textHoversName"/>
+
+   <!--extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            class="org.eclipse.fdt.internal.ui.FortranElementAdapterFactory"
+            adaptableType="org.eclipse.cdt.core.model.ICElement">
+         <adapter
+               type="org.eclipse.core.resources.IResource">
+         </adapter>
+         <adapter
+               type="org.eclipse.core.resources.IProject">
+         </adapter>
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
+         </adapter>
+         <adapter
+               type="org.eclipse.ui.views.properties.IPropertySource">
+         </adapter>
+      </factory>
+   </extension-->
+
+<!-- Define the document provider and partitionner for the FortranEditor -->
+   <!--extension
+         id="org.eclipse.fdt.ui.FortranDocumentSetupParticipant"
+         name="%FortranDocumentSetupParticipant"
+         point="org.eclipse.core.filebuffers.documentSetup">
+      <participant
+            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentSetupParticipant"
+            contentTypeId="org.eclipse.cdt.core.cSource">
+      </participant>
+      <participant
+            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentSetupParticipant"
+            contentTypeId="org.eclipse.cdt.core.cHeader">
+      </participant>
+   </extension-->
+   
+   <!--extension
+         id="org.eclipse.fdt.ui.FortranDocumentFactory"
+         name="%FortranDocumentFactory"
+         point="org.eclipse.core.filebuffers.documentCreation">
+      <factory
+            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentFactory"
+            contentTypeId="org.eclipse.cdt.core.cSource">
+      </factory>
+      <factory
+            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentFactory"
+            contentTypeId="org.eclipse.cdt.core.cHeader">
+      </factory>
+   </extension-->
+   <extension
+         id="org.eclipse.fdt.ui.fortraneditor"
+         point="org.eclipse.ui.editors">
+      <editor
+            default="true"
+            name="%FortranEditor.name"
+            extensions="f,f77,f90,f95"
+            icon="icons/full/obj16/f_file_obj.gif"
+            class="org.eclipse.fdt.internal.ui.editor.FortranEditor"
+            contributorClass="org.eclipse.fdt.internal.ui.editor.FortranEditorActionContributor"
+            symbolicFontName="org.eclipse.cdt.ui.editors.textfont"
+            id="org.eclipse.fdt.ui.editor.FortranEditor">
+      </editor>
+   </extension>
+   <!--extension
+         point="org.eclipse.ui.editorActions">
+      <editorContribution
+            targetID="org.eclipse.fdt.ui.editor.FortranEditor"
+            id="org.eclipse.ui.texteditor.ruler.actions">
+         <action
+               label="%Dummy.label"
+               helpContextId="org.eclipse.ui.bookmark_action_context"
+               class="org.eclipse.ui.texteditor.BookmarkRulerAction"
+               actionID="RulerDoubleClick"
+               id="org.eclipse.ui.texteditor.BookmarkRulerAction">
+         </action>
+      </editorContribution>
+   </extension-->
+   <extension
+         point="org.eclipse.ui.actionSetPartAssociations">
+      <actionSetPartAssociation
+            targetID="org.eclipse.fdt.ui.SearchActionSet">
+         <!--part
+               id="org.eclipse.fdt.ui.FortranView">
+         </part-->
+         <part
+               id="org.eclipse.fdt.ui.editor.FortranEditor">
+         </part>
+         <part
+               id="org.eclipse.search.SearchResultView">
+         </part>
+      </actionSetPartAssociation>
+      <actionSetPartAssociation
+            targetID="org.eclipse.ui.edit.text.actionSet.annotationNavigation">
+         <part
+               id="org.eclipse.fdt.ui.editor.FortranEditor">
+         </part>
+      </actionSetPartAssociation>      
+   </extension>
+
+</plugin>
