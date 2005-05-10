@@ -22,7 +22,7 @@ public class FortranBraceRule extends SingleCharRule
     }
 
     /**
-     * @see org.eclipse.cldt.internal.ui.text.SingleCharRule#isRuleChar(int)
+     * @see org.eclipse.cdt.internal.ui.text.SingleCharRule#isRuleChar(int)
      */
     protected boolean isRuleChar(int ch)
     {

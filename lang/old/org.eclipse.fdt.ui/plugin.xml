@@ -5,7 +5,7 @@
    name="%pluginName"
    version="3.0.0"
    provider-name="%providerName"
-   class="org.eclipse.cldt.ui.CUIPlugin">
+   class="org.eclipse.cdt.ui.CUIPlugin">
 
    <runtime>
       <library name="fdtui.jar">
@@ -33,7 +33,7 @@
    </requires>
    
 <!-- =========================================================================== -->
-<!-- Extension point: org.eclipse.cldt.ui.textHovers                        -->
+<!-- Extension point: org.eclipse.cdt.ui.textHovers                        -->
 <!-- Extension Implementation: must implement org.eclipse.jface.text.ITextHover  -->
 <!-- Purpose: Provide a perspective specific text hovering for FortranEditor files     -->
 <!-- =========================================================================== -->

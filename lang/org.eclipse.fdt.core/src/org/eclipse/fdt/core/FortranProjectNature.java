@@ -1,5 +1,9 @@
 package org.eclipse.fdt.core;
 
+/*
+ * (c) Copyright IBM Corp. 2000, 2001. All Rights Reserved.
+ */
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,13 +13,11 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.cdt.core.CCorePlugin;
 
 public class FortranProjectNature implements IProjectNature {
 
-	// TODO - fix location of FortranCorePlugin
-//	public static final String FORTRAN_NATURE_ID = FortranCorePlugin.PLUGIN_ID + ".fnature"; //$NON-NLS-1$
-	public static final String FORTRAN_NATURE_ID = "org.eclipse.fdt.core" + ".fnature"; //$NON-NLS-1$
-
+	public static final String FORTRAN_NATURE_ID = CCorePlugin.PLUGIN_ID + ".fnature"; //$NON-NLS-1$
 
 	private IProject fProject;
 
