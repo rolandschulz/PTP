@@ -40,8 +40,6 @@ import org.eclipse.cdt.internal.ui.editor.IReconcilingParticipant;
 import org.eclipse.cdt.internal.ui.search.actions.OpenDeclarationsAction;
 import org.eclipse.cdt.internal.ui.search.actions.SelectionSearchGroup;
 import org.eclipse.cdt.internal.ui.text.CPairMatcher;
-import org.eclipse.cdt.internal.ui.text.CSourceViewerConfiguration;
-import org.eclipse.cdt.internal.ui.text.CTextTools;
 import org.eclipse.cdt.internal.ui.text.contentassist.ContentAssistPreference;
 import org.eclipse.cdt.internal.ui.util.CUIHelp;
 import org.eclipse.cdt.internal.ui.editor.CSourceViewer;
@@ -51,6 +49,9 @@ import org.eclipse.cdt.ui.PreferenceConstants;
 import org.eclipse.cdt.ui.actions.RefactoringActionGroup;
 import org.eclipse.cdt.ui.actions.ShowInCViewAction;
 import org.eclipse.cdt.ui.text.folding.ICFoldingStructureProvider;
+import org.eclipse.fdt.internal.ui.text.FortranSourceViewerConfiguration;
+import org.eclipse.fdt.internal.ui.text.FortranTextTools;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -225,8 +226,8 @@ public class FortranEditor extends CEditor implements ISelectionChangedListener,
 	 * @see org.eclipse.ui.texteditor.AbstractDecoratedTextEditor#initializeEditor()
 	 */
 	protected void initializeEditor() {
-		CTextTools textTools = CUIPlugin.getDefault().getTextTools();
-		setSourceViewerConfiguration(new CSourceViewerConfiguration(textTools, this));
+		FortranTextTools textTools = FortranUIPlugin.getDefault().getTextTools();
+		setSourceViewerConfiguration(new FortranSourceViewerConfiguration(textTools, this));
 		setDocumentProvider(CUIPlugin.getDefault().getDocumentProvider());
 	
 		setEditorContextMenuId("#CEditorContext"); //$NON-NLS-1$
@@ -329,7 +330,7 @@ public class FortranEditor extends CEditor implements ISelectionChangedListener,
 
 				String property = event.getProperty();
 
-				if (CSourceViewerConfiguration.PREFERENCE_TAB_WIDTH.equals(property)) {
+				if (FortranSourceViewerConfiguration.PREFERENCE_TAB_WIDTH.equals(property)) {
 					SourceViewerConfiguration configuration = getSourceViewerConfiguration();
 					String[] types = configuration.getConfiguredContentTypes(asv);
 					for (int i = 0; i < types.length; i++)
@@ -337,7 +338,7 @@ public class FortranEditor extends CEditor implements ISelectionChangedListener,
 
 					if (fTabConverter != null)
 						fTabConverter.setNumberOfSpacesPerTab(
-							getPreferenceStore().getInt(CSourceViewerConfiguration.PREFERENCE_TAB_WIDTH));
+							getPreferenceStore().getInt(FortranSourceViewerConfiguration.PREFERENCE_TAB_WIDTH));
 
 					Object value = event.getNewValue();
 
@@ -1132,7 +1133,7 @@ public class FortranEditor extends CEditor implements ISelectionChangedListener,
 		if (fTabConverter == null) {
 			fTabConverter = new TabConverter();
 			configureTabConverter();
-			fTabConverter.setNumberOfSpacesPerTab(getPreferenceStore().getInt(CSourceViewerConfiguration.PREFERENCE_TAB_WIDTH));
+			fTabConverter.setNumberOfSpacesPerTab(getPreferenceStore().getInt(FortranSourceViewerConfiguration.PREFERENCE_TAB_WIDTH));
 			FortranSourceViewer asv = (FortranSourceViewer) getSourceViewer();
 			asv.addTextConverter(fTabConverter);
 		}
@@ -1251,7 +1252,7 @@ public class FortranEditor extends CEditor implements ISelectionChangedListener,
 
 		fAnnotationAccess = createAnnotationAccess();
 		
-		ISharedTextColors sharedColors = CUIPlugin.getDefault().getSharedTextColors();
+		ISharedTextColors sharedColors = FortranUIPlugin.getDefault().getSharedTextColors();
 		fOverviewRuler = createOverviewRuler(sharedColors);
 
 		ISourceViewer sourceViewer =
@@ -1297,7 +1298,7 @@ public class FortranEditor extends CEditor implements ISelectionChangedListener,
 	 * @see AbstractTextEditor#affectsTextPresentation(PropertyChangeEvent)
 	 */
 	protected boolean affectsTextPresentation(PropertyChangeEvent event) {
-		CTextTools textTools = CUIPlugin.getDefault().getTextTools();
+		FortranTextTools textTools = FortranUIPlugin.getDefault().getTextTools();
 		AsmTextTools asmTools = CUIPlugin.getDefault().getAsmTextTools();
 		return textTools.affectsBehavior(event) || asmTools.affectsBehavior(event);
 	}
