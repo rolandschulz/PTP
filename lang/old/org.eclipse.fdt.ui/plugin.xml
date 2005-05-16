@@ -5,7 +5,7 @@
    name="%pluginName"
    version="3.0.0"
    provider-name="%providerName"
-   class="org.eclipse.cdt.ui.CUIPlugin">
+   class="org.eclipse.fdt.ui.FortranUIPlugin">
 
    <runtime>
       <library name="fdtui.jar">
@@ -32,11 +32,11 @@
       <import plugin="org.eclipse.help"/>
    </requires>
    
-<!-- =========================================================================== -->
-<!-- Extension point: org.eclipse.cdt.ui.textHovers                        -->
-<!-- Extension Implementation: must implement org.eclipse.jface.text.ITextHover  -->
-<!-- Purpose: Provide a perspective specific text hovering for FortranEditor files     -->
-<!-- =========================================================================== -->
+<!-- ===========================================================================   -->
+<!-- Extension point: org.eclipse.cdt.ui.textHovers                                -->
+<!-- Extension Implementation: must implement org.eclipse.jface.text.ITextHover    -->
+<!-- Purpose: Provide a perspective specific text hovering for FortranEditor files -->
+<!-- ===========================================================================   -->
    <extension-point id="textHovers" name="%textHoversName"/>
 
    <!--extension
@@ -59,34 +59,25 @@
       </factory>
    </extension-->
 
-<!-- Define the document provider and partitionner for the FortranEditor -->
-   <!--extension
+<!-- Define the document provider and partitioner for the FortranEditor -->
+   <extension
          id="org.eclipse.fdt.ui.FortranDocumentSetupParticipant"
          name="%FortranDocumentSetupParticipant"
          point="org.eclipse.core.filebuffers.documentSetup">
       <participant
             class="org.eclipse.fdt.internal.ui.editor.FortranDocumentSetupParticipant"
-            contentTypeId="org.eclipse.cdt.core.cSource">
+            contentTypeId="org.eclipse.fdt.core.fortranSource">
       </participant>
-      <participant
-            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentSetupParticipant"
-            contentTypeId="org.eclipse.cdt.core.cHeader">
-      </participant>
-   </extension-->
-   
-   <!--extension
+   </extension>
+   <extension
          id="org.eclipse.fdt.ui.FortranDocumentFactory"
          name="%FortranDocumentFactory"
          point="org.eclipse.core.filebuffers.documentCreation">
       <factory
             class="org.eclipse.fdt.internal.ui.editor.FortranDocumentFactory"
-            contentTypeId="org.eclipse.cdt.core.cSource">
+            contentTypeId="org.eclipse.fdt.core.fortranSource">
       </factory>
-      <factory
-            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentFactory"
-            contentTypeId="org.eclipse.cdt.core.cHeader">
-      </factory>
-   </extension-->
+   </extension>
    <extension
          id="org.eclipse.cdt.ui.FortranEditor"
          point="org.eclipse.ui.editors">
