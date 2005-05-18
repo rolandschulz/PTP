@@ -36,7 +36,6 @@ import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.internal.ui.search.IPSearchConstants;
 import org.eclipse.ptp.internal.ui.search.PSearchQuery;
 import org.eclipse.ptp.internal.ui.search.SelectionConverter;
-import org.eclipse.search.internal.ui.util.RowLayouter;
 import org.eclipse.search.ui.ISearchPageContainer;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.swt.SWT;
