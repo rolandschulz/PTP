@@ -11,13 +11,14 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import org.eclipse.cdt.internal.ui.ICHelpContextIds;
+import org.eclipse.cdt.internal.ui.preferences.AbstractPreferencePage;
+import org.eclipse.cdt.ui.PreferenceConstants;
+import org.eclipse.cdt.utils.ui.controls.TabFolderLayout;
 import org.eclipse.fdt.internal.ui.editor.FortranEditor;
 import org.eclipse.fdt.internal.ui.text.FortranSourceViewerConfiguration;
 import org.eclipse.fdt.internal.ui.text.FortranTextTools;
 import org.eclipse.fdt.internal.ui.text.IFortranColorConstants;
 import org.eclipse.fdt.ui.FortranUIPlugin;
-import org.eclipse.cdt.ui.PreferenceConstants;
-import org.eclipse.cdt.utils.ui.controls.TabFolderLayout;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.JFaceResources;
@@ -25,8 +26,6 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.source.SourceViewer;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -52,32 +51,24 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
  */
 public class FortranEditorPreferencePage extends AbstractPreferencePage implements IWorkbenchPreferencePage {
 
-	protected final String[][] fListModel = new String[][] { { PreferencesMessages.getString("FortranEditorPreferencePage.cCommentTaskTags.MultiLine"), IFortranColorConstants.FORTRAN_MULTI_LINE_COMMENT }, { //$NON-NLS-1$
-		PreferencesMessages.getString("FortranEditorPreferencePage.cCommentTaskTags.singleLine"), IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT }, { //$NON-NLS-1$
-		PreferencesMessages.getString("FortranEditorPreferencePage.cCommentTaskTags.keywords"), IFortranColorConstants.FORTRAN_KEYWORD }, { //$NON-NLS-1$
-		PreferencesMessages.getString("FortranEditorPreferencePage.cCommentTaskTags.builtInTypes"), IFortranColorConstants.FORTRAN_TYPE }, { //$NON-NLS-1$
-		PreferencesMessages.getString("FortranEditorPreferencePage.cCommentTaskTags.strings"), IFortranColorConstants.FORTRAN_STRING }, { //$NON-NLS-1$
-        PreferencesMessages.getString("FortranEditorPreferencePage.cCommentTaskTags.operators"), IFortranColorConstants.FORTRAN_OPERATOR }, { //$NON-NLS-1$
-        PreferencesMessages.getString("FortranEditorPreferencePage.cCommentTaskTags.braces"), IFortranColorConstants.FORTRAN_BRACES }, { //$NON-NLS-1$            
-        PreferencesMessages.getString("FortranEditorPreferencePage.cCommentTaskTags.numbers"), IFortranColorConstants.FORTRAN_NUMBER }, { //$NON-NLS-1$            
-		PreferencesMessages.getString("FortranEditorPreferencePage.cCommentTaskTags.others"), IFortranColorConstants.FORTRAN_DEFAULT }, { //$NON-NLS-1$
-        PreferencesMessages.getString("FortranEditorPreferencePage.cCommentTaskTags"), PreferenceConstants.EDITOR_TASK_TAG_COLOR } //$NON-NLS-1$
+	protected final String[][] fListModel = new String[][] { { PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.MultiLine"), ICColorConstants.C_MULTI_LINE_COMMENT }, { //$NON-NLS-1$
+		PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.singleLine"), ICColorConstants.C_SINGLE_LINE_COMMENT }, { //$NON-NLS-1$
+		PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.keywords"), ICColorConstants.C_KEYWORD }, { //$NON-NLS-1$
+		PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.builtInTypes"), ICColorConstants.C_TYPE }, { //$NON-NLS-1$
+		PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.strings"), ICColorConstants.C_STRING }, { //$NON-NLS-1$
+        PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.operators"), ICColorConstants.C_OPERATOR }, { //$NON-NLS-1$
+        PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.braces"), ICColorConstants.C_BRACES }, { //$NON-NLS-1$            
+        PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.numbers"), ICColorConstants.C_NUMBER }, { //$NON-NLS-1$            
+		PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags.others"), ICColorConstants.C_DEFAULT }, { //$NON-NLS-1$
+        PreferencesMessages.getString("CEditorPreferencePage.cCommentTaskTags"), PreferenceConstants.EDITOR_TASK_TAG_COLOR } //$NON-NLS-1$
 	};
 
 	protected final String[][] fAppearanceColorListModel = new String[][] { 
-			{PreferencesMessages.getString("FortranEditorPreferencePage.behaviorPage.matchingBracketColor"), FortranEditor.MATCHING_BRACKETS_COLOR, null }, //$NON-NLS-1$
-			{PreferencesMessages.getString("FortranEditorPreferencePage.behaviorPage.linkedPositionColor"), FortranEditor.LINKED_POSITION_COLOR, null }, //$NON-NLS-1$
+			{PreferencesMessages.getString("CEditorPreferencePage.behaviorPage.matchingBracketColor"), CEditor.MATCHING_BRACKETS_COLOR, null }, //$NON-NLS-1$
+			{PreferencesMessages.getString("CEditorPreferencePage.behaviorPage.linkedPositionColor"), CEditor.LINKED_POSITION_COLOR, null }, //$NON-NLS-1$
 	};
 
-	private FortranTextTools fCTextTools;
-
-	/**
-	 * List of master/slave listeners when there's a dependency.
-	 * 
-	 * @see #createDependency(Button, String, Control)
-	 * @since 3.0
-	 */
-	private ArrayList fMasterSlaveListeners= new ArrayList();
+	private CTextTools fCTextTools;
 
 	protected List fList;
 	protected ColorEditor fForegroundColorEditor;
@@ -88,38 +79,38 @@ public class FortranEditorPreferencePage extends AbstractPreferencePage implemen
 	private FoldingConfigurationBlock fFoldingConfigurationBlock;
 
 
-	public FortranEditorPreferencePage() {
+	public CEditorPreferencePage() {
 		super();
-		setDescription(FortranUIPlugin.getResourceString("FortranEditorPreferencePage.description")); //$NON-NLS-1$
+		setDescription(CUIPlugin.getResourceString("CEditorPreferencePage.description")); //$NON-NLS-1$
 	}
 
 	protected OverlayPreferenceStore.OverlayKey[] createOverlayStoreKeys() {
 		ArrayList overlayKeys = new ArrayList();
 		
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.INT, FortranSourceViewerConfiguration.PREFERENCE_TAB_WIDTH));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_MULTI_LINE_COMMENT));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_MULTI_LINE_COMMENT + "_bold")); //$NON-NLS-1$
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT + "_bold")); //$NON-NLS-1$
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_KEYWORD));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_KEYWORD + "_bold")); //$NON-NLS-1$
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_TYPE));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_TYPE + "_bold")); //$NON-NLS-1$
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_STRING));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_STRING + "_bold")); //$NON-NLS-1$
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_DEFAULT));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_DEFAULT + "_bold")); //$NON-NLS-1$        
-        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_BRACES));
-        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_BRACES + "_bold")); //$NON-NLS-1$
-        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_NUMBER));
-        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_NUMBER + "_bold")); //$NON-NLS-1$
-        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_OPERATOR));
-        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_OPERATOR + "_bold")); //$NON-NLS-1$
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, FortranEditor.MATCHING_BRACKETS_COLOR));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, FortranEditor.MATCHING_BRACKETS));
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, FortranEditor.SPACES_FOR_TABS));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.INT, CSourceViewerConfiguration.PREFERENCE_TAB_WIDTH));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_MULTI_LINE_COMMENT));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_MULTI_LINE_COMMENT + "_bold")); //$NON-NLS-1$
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_SINGLE_LINE_COMMENT));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_SINGLE_LINE_COMMENT + "_bold")); //$NON-NLS-1$
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_KEYWORD));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_KEYWORD + "_bold")); //$NON-NLS-1$
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_TYPE));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_TYPE + "_bold")); //$NON-NLS-1$
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_STRING));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_STRING + "_bold")); //$NON-NLS-1$
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_DEFAULT));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_DEFAULT + "_bold")); //$NON-NLS-1$        
+        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_BRACES));
+        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_BRACES + "_bold")); //$NON-NLS-1$
+        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_NUMBER));
+        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_NUMBER + "_bold")); //$NON-NLS-1$
+        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, ICColorConstants.C_OPERATOR));
+        overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, ICColorConstants.C_OPERATOR + "_bold")); //$NON-NLS-1$
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, CEditor.MATCHING_BRACKETS_COLOR));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, CEditor.MATCHING_BRACKETS));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, CEditor.SPACES_FOR_TABS));
 		
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, FortranEditor.LINKED_POSITION_COLOR));
+		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, CEditor.LINKED_POSITION_COLOR));
 		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_TASK_TAG_COLOR));
         overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, PreferenceConstants.EDITOR_TASK_TAG_BOLD));
         overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_TASK_INDICATION_COLOR));
@@ -133,41 +124,41 @@ public class FortranEditorPreferencePage extends AbstractPreferencePage implemen
 
 	public static void initDefaults(IPreferenceStore store) {
 
-		store.setDefault(FortranEditor.MATCHING_BRACKETS, true);
-		PreferenceConverter.setDefault(store, FortranEditor.MATCHING_BRACKETS_COLOR, new RGB(170,170,170));
+		store.setDefault(CEditor.MATCHING_BRACKETS, true);
+		PreferenceConverter.setDefault(store, CEditor.MATCHING_BRACKETS_COLOR, new RGB(170,170,170));
 
-		store.setDefault(FortranSourceViewerConfiguration.PREFERENCE_TAB_WIDTH, 4);
+		store.setDefault(CSourceViewerConfiguration.PREFERENCE_TAB_WIDTH, 4);
 
-		store.setDefault(FortranEditor.SPACES_FOR_TABS, false);
+		store.setDefault(CEditor.SPACES_FOR_TABS, false);
 
-		PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_MULTI_LINE_COMMENT, new RGB(63, 127, 95));
-		store.setDefault(IFortranColorConstants.FORTRAN_MULTI_LINE_COMMENT + "_bold", false); //$NON-NLS-1$
+		PreferenceConverter.setDefault(store, ICColorConstants.C_MULTI_LINE_COMMENT, new RGB(63, 127, 95));
+		store.setDefault(ICColorConstants.C_MULTI_LINE_COMMENT + "_bold", false); //$NON-NLS-1$
 
-		PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT, new RGB(63, 125, 95));
-		store.setDefault(IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT + "_bold", false); //$NON-NLS-1$
+		PreferenceConverter.setDefault(store, ICColorConstants.C_SINGLE_LINE_COMMENT, new RGB(63, 125, 95));
+		store.setDefault(ICColorConstants.C_SINGLE_LINE_COMMENT + "_bold", false); //$NON-NLS-1$
 
-		PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_KEYWORD, new RGB(127, 0, 85));
-		store.setDefault(IFortranColorConstants.FORTRAN_KEYWORD + "_bold", true); //$NON-NLS-1$
+		PreferenceConverter.setDefault(store, ICColorConstants.C_KEYWORD, new RGB(127, 0, 85));
+		store.setDefault(ICColorConstants.C_KEYWORD + "_bold", true); //$NON-NLS-1$
 
-		PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_TYPE, new RGB(127, 0, 85));
-		store.setDefault(IFortranColorConstants.FORTRAN_TYPE + "_bold", true); //$NON-NLS-1$
+		PreferenceConverter.setDefault(store, ICColorConstants.C_TYPE, new RGB(127, 0, 85));
+		store.setDefault(ICColorConstants.C_TYPE + "_bold", true); //$NON-NLS-1$
 
-		PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_STRING, new RGB(42, 0, 255));
-		store.setDefault(IFortranColorConstants.FORTRAN_STRING + "_bold", false); //$NON-NLS-1$
+		PreferenceConverter.setDefault(store, ICColorConstants.C_STRING, new RGB(42, 0, 255));
+		store.setDefault(ICColorConstants.C_STRING + "_bold", false); //$NON-NLS-1$
 
-		PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_DEFAULT, new RGB(0, 0, 0));
-		store.setDefault(IFortranColorConstants.FORTRAN_DEFAULT + "_bold", false); //$NON-NLS-1$
+		PreferenceConverter.setDefault(store, ICColorConstants.C_DEFAULT, new RGB(0, 0, 0));
+		store.setDefault(ICColorConstants.C_DEFAULT + "_bold", false); //$NON-NLS-1$
 
-        PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_OPERATOR, new RGB(0, 0, 0));
-        store.setDefault(IFortranColorConstants.FORTRAN_DEFAULT + "_bold", false); //$NON-NLS-1$
+        PreferenceConverter.setDefault(store, ICColorConstants.C_OPERATOR, new RGB(0, 0, 0));
+        store.setDefault(ICColorConstants.C_DEFAULT + "_bold", false); //$NON-NLS-1$
 
-        PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_BRACES, new RGB(0, 0, 0));
-        store.setDefault(IFortranColorConstants.FORTRAN_DEFAULT + "_bold", false); //$NON-NLS-1$
+        PreferenceConverter.setDefault(store, ICColorConstants.C_BRACES, new RGB(0, 0, 0));
+        store.setDefault(ICColorConstants.C_DEFAULT + "_bold", false); //$NON-NLS-1$
 
-        PreferenceConverter.setDefault(store, IFortranColorConstants.FORTRAN_NUMBER, new RGB(0, 0, 0));
-        store.setDefault(IFortranColorConstants.FORTRAN_DEFAULT + "_bold", false); //$NON-NLS-1$
+        PreferenceConverter.setDefault(store, ICColorConstants.C_NUMBER, new RGB(0, 0, 0));
+        store.setDefault(ICColorConstants.C_DEFAULT + "_bold", false); //$NON-NLS-1$
 
-        PreferenceConverter.setDefault(store, FortranEditor.LINKED_POSITION_COLOR, new RGB(0, 200, 100));
+        PreferenceConverter.setDefault(store, CEditor.LINKED_POSITION_COLOR, new RGB(0, 200, 100));
 
 	}
 
@@ -193,7 +184,7 @@ public class FortranEditorPreferencePage extends AbstractPreferencePage implemen
 		colorComposite.setLayout(new GridLayout());
 
 		Label label = new Label(colorComposite, SWT.LEFT);
-		label.setText(PreferencesMessages.getString("FortranEditorPreferencePage.colorPage.foreground")); //$NON-NLS-1$
+		label.setText(PreferencesMessages.getString("CEditorPreferencePage.colorPage.foreground")); //$NON-NLS-1$
 		label.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		Composite editorComposite = new Composite(colorComposite, SWT.NULL);
@@ -219,7 +210,7 @@ public class FortranEditorPreferencePage extends AbstractPreferencePage implemen
 		stylesComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		label = new Label(stylesComposite, SWT.LEFT);
-		label.setText(PreferencesMessages.getString("FortranEditorPreferencePage.colorPage.color")); //$NON-NLS-1$
+		label.setText(PreferencesMessages.getString("CEditorPreferencePage.colorPage.color")); //$NON-NLS-1$
 		gd = new GridData();
 		gd.horizontalAlignment = GridData.BEGINNING;
 		label.setLayoutData(gd);
@@ -231,14 +222,14 @@ public class FortranEditorPreferencePage extends AbstractPreferencePage implemen
 		foregroundColorButton.setLayoutData(gd);
 
 		fBoldCheckBox = new Button(stylesComposite, SWT.CHECK);
-		fBoldCheckBox.setText(PreferencesMessages.getString("FortranEditorPreferencePage.colorPage.bold")); //$NON-NLS-1$
+		fBoldCheckBox.setText(PreferencesMessages.getString("CEditorPreferencePage.colorPage.bold")); //$NON-NLS-1$
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan=2;
 		gd.horizontalAlignment = GridData.BEGINNING;
 		fBoldCheckBox.setLayoutData(gd);
 
 		label = new Label(colorComposite, SWT.LEFT);
-		label.setText(PreferencesMessages.getString("FortranEditorPreferencePage.colorPage.preview")); //$NON-NLS-1$
+		label.setText(PreferencesMessages.getString("CEditorPreferencePage.colorPage.preview")); //$NON-NLS-1$
 		label.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		Control previewer = createPreviewer(colorComposite);
@@ -286,9 +277,10 @@ public class FortranEditorPreferencePage extends AbstractPreferencePage implemen
 
 	private Control createPreviewer(Composite parent) {
 
-		fCTextTools = FortranUIPlugin.getDefault().getTextTools();
+		fCTextTools = CUIPlugin.getDefault().getTextTools();
+		CSourceViewerConfiguration configuration = new CSourceViewerConfiguration(fCTextTools, null);
 		fPreviewViewer = new SourceViewer(parent, null, SWT.V_SCROLL | SWT.H_SCROLL);
-		fPreviewViewer.configure(new FortranSourceViewerConfiguration(fCTextTools, null));
+		fPreviewViewer.configure(configuration);
 		fPreviewViewer.getTextWidget().setFont(JFaceResources.getFontRegistry().get(JFaceResources.TEXT_FONT));
 		fPreviewViewer.setEditable(false);
 
@@ -300,14 +292,7 @@ public class FortranEditorPreferencePage extends AbstractPreferencePage implemen
 
 		fPreviewViewer.setDocument(document);
 
-		fOverlayStore.addPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent event) {
-				fPreviewViewer.getDocument().set(fPreviewViewer.getDocument().get());
-				fPreviewViewer.invalidateTextPresentation();
-				//fPreviewViewer.refresh();
-			}
-		});
-
+		CSourcePreviewerUpdater.registerPreviewer(fPreviewViewer, configuration, fOverlayStore);
 		return fPreviewViewer.getControl();
 	}
 
@@ -329,16 +314,16 @@ public class FortranEditorPreferencePage extends AbstractPreferencePage implemen
 		layout.numColumns = 2;
 		behaviorComposite.setLayout(layout);
 
-		String label = PreferencesMessages.getString("FortranEditorPreferencePage.behaviorPage.matchingBrackets"); //$NON-NLS-1$
-		addCheckBox(behaviorComposite, label, FortranEditor.MATCHING_BRACKETS, 0);
+		String label = PreferencesMessages.getString("CEditorPreferencePage.behaviorPage.matchingBrackets"); //$NON-NLS-1$
+		addCheckBox(behaviorComposite, label, CEditor.MATCHING_BRACKETS, 0);
 
-		label = PreferencesMessages.getString("FortranEditorPreferencePage.behaviorPage.tabSpace"); //$NON-NLS-1$
-		addCheckBox(behaviorComposite, label, FortranEditor.SPACES_FOR_TABS, 0);
+		label = PreferencesMessages.getString("CEditorPreferencePage.behaviorPage.tabSpace"); //$NON-NLS-1$
+		addCheckBox(behaviorComposite, label, CEditor.SPACES_FOR_TABS, 0);
 		return behaviorComposite;
 	}
 
 	private Control createHeader(Composite parent) {
-		String text = PreferencesMessages.getString("FortranEditorPreferencePage.link"); //$NON-NLS-1$
+		String text = PreferencesMessages.getString("CEditorPreferencePage.link"); //$NON-NLS-1$
 		Link link = new Link(parent, SWT.NONE);
 		link.setText(text);
 		link.addListener (SWT.Selection, new Listener () {
@@ -355,21 +340,6 @@ public class FortranEditorPreferencePage extends AbstractPreferencePage implemen
 		return link;
 	}
 
-	private void createDependency(final Button master, String masterKey, final Control slave) {
-		indent(slave);
-		boolean masterState= fOverlayStore.getBoolean(masterKey);
-		slave.setEnabled(masterState);
-		SelectionListener listener= new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				slave.setEnabled(master.getSelection());
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {}
-		};
-		master.addSelectionListener(listener);
-		fMasterSlaveListeners.add(listener);
-	}
-
 	/*
 	 * @see PreferencePage#createContents(Composite)
 	 */
@@ -378,6 +348,9 @@ public class FortranEditorPreferencePage extends AbstractPreferencePage implemen
 		fCEditorHoverConfigurationBlock= new CEditorHoverConfigurationBlock(this, fOverlayStore);
 		fFoldingConfigurationBlock= new FoldingConfigurationBlock(fOverlayStore);
 
+		fOverlayStore.load();
+		fOverlayStore.start();
+
 		createHeader(parent);
 
 		TabFolder folder = new TabFolder(parent, SWT.NONE);
@@ -385,19 +358,19 @@ public class FortranEditorPreferencePage extends AbstractPreferencePage implemen
 		folder.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		TabItem item = new TabItem(folder, SWT.NONE);
-		item.setText(PreferencesMessages.getString("FortranEditorPreferencePage.generalTabTitle")); //$NON-NLS-1$
+		item.setText(PreferencesMessages.getString("CEditorPreferencePage.generalTabTitle")); //$NON-NLS-1$
 		item.setControl(createAppearancePage(folder));
 
 		item = new TabItem(folder, SWT.NONE);
-		item.setText(PreferencesMessages.getString("FortranEditorPreferencePage.colorsTabTitle")); //$NON-NLS-1$
+		item.setText(PreferencesMessages.getString("CEditorPreferencePage.colorsTabTitle")); //$NON-NLS-1$
 		item.setControl(createSyntaxPage(folder));
 
 		item= new TabItem(folder, SWT.NONE);
-		item.setText(PreferencesMessages.getString("FortranEditorPreferencePage.hoverTab.title")); //$NON-NLS-1$
+		item.setText(PreferencesMessages.getString("CEditorPreferencePage.hoverTab.title")); //$NON-NLS-1$
 		item.setControl(fCEditorHoverConfigurationBlock.createControl(folder));
 
 		item= new TabItem(folder, SWT.NONE);
-		item.setText(PreferencesMessages.getString("FortranEditorPreferencePage.folding.title")); //$NON-NLS-1$
+		item.setText(PreferencesMessages.getString("CEditorPreferencePage.folding.title")); //$NON-NLS-1$
 		item.setControl(fFoldingConfigurationBlock.createControl(folder));
 
 		initialize();
@@ -409,8 +382,9 @@ public class FortranEditorPreferencePage extends AbstractPreferencePage implemen
 
 		initializeFields();
 
-		for (int i = 0; i < fListModel.length; i++)
+		for (int i = 0; i < fListModel.length; i++) {
 			fList.add(fListModel[i][0]);
+		}
 		fList.getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				fList.select(0);
@@ -436,14 +410,12 @@ public class FortranEditorPreferencePage extends AbstractPreferencePage implemen
 	 */
 	protected void performDefaults() {
 
-		fOverlayStore.loadDefaults();
-		initializeFields();
+		super.performDefaults();
+
 		handleListSelection();
 
 		fCEditorHoverConfigurationBlock.performDefaults();
 		fFoldingConfigurationBlock.performDefaults();
-
-		super.performDefaults();
 
 		fPreviewViewer.invalidateTextPresentation();
 	}
@@ -480,7 +452,7 @@ public class FortranEditorPreferencePage extends AbstractPreferencePage implemen
 				buffer.append(separator);
 			}
 		} catch (IOException io) {
-			FortranUIPlugin.getDefault().log(io);
+			CUIPlugin.getDefault().log(io);
 		} finally {
 			if (reader != null) {
 				try {

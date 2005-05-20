@@ -51,7 +51,7 @@ public final class FortranCodeScanner extends AbstractCScanner {
 	};
 	
 	/**
-	 * Creates a C code scanner.
+	 * Creates a Fortran code scanner.
      * @param manager Color manager.
      * @param store Preference store.
 	 */

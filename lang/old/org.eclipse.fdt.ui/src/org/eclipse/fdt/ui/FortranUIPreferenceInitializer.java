@@ -10,14 +10,14 @@
  *******************************************************************************/
 package org.eclipse.fdt.ui;
 
-import org.eclipse.fdt.internal.ui.fview.FortranView;
+import org.eclipse.cdt.internal.ui.cview.CView;
 import org.eclipse.cdt.internal.ui.preferences.BuildConsolePreferencePage;
+import org.eclipse.cdt.internal.ui.preferences.CParserPreferencePage;
+import org.eclipse.cdt.internal.ui.preferences.CPluginPreferencePage;
 import org.eclipse.cdt.internal.ui.preferences.CodeAssistPreferencePage;
-import org.eclipse.fdt.internal.ui.preferences.FortranEditorPreferencePage;
-import org.eclipse.fdt.internal.ui.preferences.FortranPluginPreferencePage;
-import org.eclipse.fdt.internal.ui.preferences.FortranSearchPreferencePage;
-import org.eclipse.cdt.internal.ui.preferences.WorkInProgressPreferencePage;
+import org.eclipse.cdt.ui.PreferenceConstants;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.fdt.internal.ui.preferences.FortranEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
@@ -36,16 +36,15 @@ public class FortranUIPreferenceInitializer extends AbstractPreferenceInitialize
 		final IPreferenceStore store = FortranUIPlugin.getDefault().getPreferenceStore();
 
         PreferenceConstants.initializeDefaultValues(store);
-		FortranPluginPreferencePage.initDefaults(store);
+		CPluginPreferencePage.initDefaults(store);
 		BuildConsolePreferencePage.initDefaults(store);
-		WorkInProgressPreferencePage.initDefaults(store);
-		FortranSearchPreferencePage.initDefaults(store);
-		FortranView.initDefaults(store);
+		CView.initDefaults(store);
+		CParserPreferencePage.initDefaults(store);
 		FortranEditorPreferencePage.initDefaults(store);
 		CodeAssistPreferencePage.initDefaults(store);
 
 		// We need to do this remove any keys that might have been
-		// in the FortranUIPlugin store prior to the move of the FortranEditor setting
+		// in the CUIPlugin store prior to the move of the CEditor setting
 		// All of those settings are now in the workbench "All TextEditor" preference Page.
 		// Later we should remove this calls, after CDT-3.0
 		EditorsUI.useAnnotationsPreferencePage(store);
@@ -54,7 +53,7 @@ public class FortranUIPreferenceInitializer extends AbstractPreferenceInitialize
 	}
 
 	/*
-	 * reset to default, those constants are no longer maintain int FortranUIPlugin store.
+	 * reset to default, those constants are no longer maintain int CUIPlugin store.
 	 */
 	public static void useTextEditorPreferencePage(IPreferenceStore store) {
 		

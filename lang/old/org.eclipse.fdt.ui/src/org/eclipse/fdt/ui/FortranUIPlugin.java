@@ -58,6 +58,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.fdt.core.FortranCorePlugin;
 import org.eclipse.fdt.internal.ui.text.FortranTextTools;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuManager;
@@ -399,7 +400,7 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 	 */
 	public FortranTextTools getTextTools() {
 		if (fTextTools == null)
-			fTextTools = new FortranTextTools(getPreferenceStore(), CCorePlugin.getDefault().getPluginPreferences());
+			fTextTools = new FortranTextTools(getPreferenceStore(), FortranCorePlugin.getDefault().getPluginPreferences());
 		return fTextTools;
 	}
 
