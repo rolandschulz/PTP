@@ -42,7 +42,7 @@
    <!--extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            class="org.eclipse.fdt.internal.ui.FortranElementAdapterFactory"
+            class="org.eclipse.cdt.internal.ui.CElementAdapterFactory"
             adaptableType="org.eclipse.cdt.core.model.ICElement">
          <adapter
                type="org.eclipse.core.resources.IResource">
@@ -59,7 +59,7 @@
       </factory>
    </extension-->
 
-<!-- Define the document provider and partitioner for the FortranEditor -->
+<!-- Define the document provider and participant for the FortranEditor -->
    <extension
          id="org.eclipse.fdt.ui.FortranDocumentSetupParticipant"
          name="%FortranDocumentSetupParticipant"
@@ -68,18 +68,26 @@
             class="org.eclipse.fdt.internal.ui.editor.FortranDocumentSetupParticipant"
             contentTypeId="org.eclipse.fdt.core.fortranSource">
       </participant>
+      <participant
+            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentSetupParticipant"
+            contentTypeId="org.eclipse.fdt.core.fortranHeader">
+      </participant>
    </extension>
    <extension
          id="org.eclipse.fdt.ui.FortranDocumentFactory"
          name="%FortranDocumentFactory"
          point="org.eclipse.core.filebuffers.documentCreation">
       <factory
-            class="org.eclipse.fdt.internal.ui.editor.FortranDocumentFactory"
+            class="org.eclipse.cdt.internal.ui.editor.CDocumentFactory"
             contentTypeId="org.eclipse.fdt.core.fortranSource">
+      </factory>
+      <factory
+            class="org.eclipse.cdt.internal.ui.editor.CDocumentFactory"
+            contentTypeId="org.eclipse.fdt.core.fortranHeader">
       </factory>
    </extension>
    <extension
-         id="org.eclipse.cdt.ui.FortranEditor"
+         id="org.eclipse.fdt.ui.FortranEditor"
          point="org.eclipse.ui.editors">
       <editor
             default="true"
@@ -92,7 +100,7 @@
             id="org.eclipse.fdt.ui.editor.FortranEditor">
       </editor>
    </extension>
-   <!--extension
+   <extension
          point="org.eclipse.ui.editorActions">
       <editorContribution
             targetID="org.eclipse.fdt.ui.editor.FortranEditor"
@@ -105,7 +113,7 @@
                id="org.eclipse.ui.texteditor.BookmarkRulerAction">
          </action>
       </editorContribution>
-   </extension-->
+   </extension>
    <extension
          point="org.eclipse.ui.actionSetPartAssociations">
       <actionSetPartAssociation
@@ -114,7 +122,7 @@
                id="org.eclipse.fdt.ui.FortranView">
          </part-->
          <part
-               id="org.eclipse.cdt.ui.editor.FortranEditor">
+               id="org.eclipse.fdt.ui.editor.FortranEditor">
          </part>
          <!--part
                id="org.eclipse.search.SearchResultView">
@@ -123,7 +131,7 @@
       <actionSetPartAssociation
             targetID="org.eclipse.ui.edit.text.actionSet.annotationNavigation">
          <part
-               id="org.eclipse.cdt.ui.editor.FortranEditor">
+               id="org.eclipse.fdt.ui.editor.FortranEditor">
          </part>
       </actionSetPartAssociation>      
    </extension>

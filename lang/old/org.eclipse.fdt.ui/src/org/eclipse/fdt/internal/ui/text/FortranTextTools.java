@@ -6,17 +6,16 @@ package org.eclipse.fdt.internal.ui.text;
  */
 
 
+import org.eclipse.cdt.internal.ui.text.CTextTools;
+import org.eclipse.cdt.internal.ui.text.util.CColorManager;
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.fdt.internal.ui.text.IFortranColorConstants;
 import org.eclipse.fdt.internal.ui.text.IFortranPartitions;
-import org.eclipse.cdt.internal.ui.text.util.CColorManager;
-import org.eclipse.cdt.ui.CUIPlugin;
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.fdt.ui.FortranUIPlugin;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentExtension3;
 import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.rules.DefaultPartitioner;
+import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -27,7 +26,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
  * This type shares all scanners and the color manager between
  * its clients.
  */
-public class FortranTextTools {
+public class FortranTextTools extends CTextTools {
 	
 	private class PreferenceListener implements IPropertyChangeListener, Preferences.IPropertyChangeListener {
 		public void propertyChange(PropertyChangeEvent event) {
@@ -71,7 +70,7 @@ public class FortranTextTools {
      */
 	public FortranTextTools(IPreferenceStore store, Preferences coreStore) {
 		if(store == null) {
-			store = CUIPlugin.getDefault().getPreferenceStore();
+			store = FortranUIPlugin.getDefault().getPreferenceStore();
 		}
 		fPreferenceStore = store;
 		fPreferenceStore.addPropertyChangeListener(fPreferenceListener);
@@ -161,20 +160,20 @@ public class FortranTextTools {
 			IFortranPartitions.FORTRAN_STRING
 		};
 		
-		return new DefaultPartitioner(getPartitionScanner(), types);
+		return new FastPartitioner(getPartitionScanner(), types);
 	}
 
 	/**
 	 * Returns a scanner which is configured to scan C singleline comments.
 	 *
-	 * @return a C singleline comment scanner
+	 * @return a Fortran singleline comment scanner
 	 */
 	public RuleBasedScanner getSinglelineCommentScanner() {
 		return fSinglelineCommentScanner;
 	}
 	
 	/**
-	 * Returns a scanner which is configured to scan Java strings.
+	 * Returns a scanner which is configured to scan Fortran strings.
 	 *
 	 * @return a Java string scanner
 	 */
@@ -202,7 +201,7 @@ public class FortranTextTools {
 	 * 
 	 * @param event the event to whch to adapt
 	 */
-	protected void adaptToPreferenceChange(PropertyChangeEvent event) {
+	public void adaptToPreferenceChange(PropertyChangeEvent event) {
 		if (fCodeScanner.affectsBehavior(event))
 			fCodeScanner.adaptToPreferenceChange(event);
 		if (fSinglelineCommentScanner.affectsBehavior(event))
@@ -211,32 +210,4 @@ public class FortranTextTools {
 			fStringScanner.adaptToPreferenceChange(event);
 	}
 
-	/**
-	 * Sets up the document partitioner for the given document for the given partitioning.
-	 * 
-	 * @param document the document to be set up
-	 * @param partitioning the document partitioning
-	 * @since 3.0
-	 */
-	public void setupFortranDocumentPartitioner(IDocument document, String partitioning) {
-		IDocumentPartitioner partitioner= createDocumentPartitioner();
-		if (document instanceof IDocumentExtension3) {
-			IDocumentExtension3 extension3= (IDocumentExtension3) document;
-			extension3.setDocumentPartitioner(partitioning, partitioner);
-		} else {
-			document.setDocumentPartitioner(partitioner);
-		}
-		partitioner.connect(document);
-	}
-	
-	/**
-	 * Sets up the given document for the default partitioning.
-	 * 
-	 * @param document the document to be set up
-	 * @since 3.0
-	 */
-	public void setupFortranDocument(IDocument document) {
-		setupFortranDocumentPartitioner(document, IDocumentExtension3.DEFAULT_PARTITIONING);
-	}
-	
 }

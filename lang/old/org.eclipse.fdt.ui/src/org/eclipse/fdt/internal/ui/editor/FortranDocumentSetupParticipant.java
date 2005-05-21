@@ -31,7 +31,7 @@ public class FortranDocumentSetupParticipant implements IDocumentSetupParticipan
 	 */
 	public void setup(IDocument document) {
 		FortranTextTools tools= FortranUIPlugin.getDefault().getTextTools();
-		tools.setupFortranDocument(document);
+		tools.setupCDocument(document);
 	}
 
 }
