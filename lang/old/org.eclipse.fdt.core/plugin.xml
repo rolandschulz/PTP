@@ -23,13 +23,13 @@
    </requires>
 
 <!-- =================================================================================== -->
-<!-- Extension Point: CFileType and CFileTypeAssociation for translation unit ident      -->
+<!-- Extension Point: FortranFileType and FortranFileTypeAssociation                     -->
+<!--                  for translation unit ident                                         -->
 <!-- =================================================================================== -->
- <!-- need Fortran versions?
-   <extension-point id="CLanguage" name="CLanguage" schema="schema/CLanguage.exsd"/>
-   <extension-point id="CFileType" name="CFileType" schema="schema/CFileType.exsd"/>
-   <extension-point id="CFileTypeAssociation" name="CFileTypeAssociation" schema="schema/CFileTypeAssociation.exsd"/>
--->
+<!-- I do not think these are needed, as can use the CDT extension points -->
+   <extension-point id="FortranLanguage" name="FortranLanguage" schema="schema/FortranLanguage.exsd"/>
+   <extension-point id="FortranFileType" name="FortranFileType" schema="schema/FortranFileType.exsd"/>
+   <extension-point id="FortranFileTypeAssociation" name="FortranFileTypeAssociation" schema="schema/FortranFileTypeAssociation.exsd"/>
 
 <!-- =================================================================================== -->
 <!-- Define the list of Error Parser provided by the FDT                                 -->
@@ -43,7 +43,7 @@
       </errorparser>
    </extension>
 <!-- =================================================================================== -->
-<!-- FDT Fortran Nature                                                                        -->
+<!-- FDT Fortran Nature                                                                  -->
 <!-- =================================================================================== -->
    <extension
          id="fnature"
@@ -88,7 +88,7 @@
       </association>
       <association
             type="org.eclipse.fdt.core.fileType.fortran_header"
-            pattern="*.h">
+            pattern="*.fh">
       </association>
    </extension>
 <!-- =================================================================================== -->
@@ -112,22 +112,36 @@
             type="text"
             extension="f95">
       </fileTypes>
+      <fileTypes
+            type="text"
+            extension="fh">
+      </fileTypes>
    </extension>
 
 <!-- =================================================================================== -->
-<!-- Define Fortran files ContentTypes                                                     -->
+<!-- Define Fortran files ContentTypes                                                   -->
 <!-- =================================================================================== -->
   <extension point="org.eclipse.core.runtime.contentTypes">
 	  <!-- declares a content type for Fortran source files -->
 	  <content-type id="fortranSource" name="%fortranSourceName" 
 		  base-type="org.eclipse.core.runtime.text"
 		  priority="high"/>
+	  <!-- declares a content type for Fortran header files -->
+      <content-type id="fortranHeader" name="%fortranHeaderName" 
+          base-type="org.eclipse.fdt.core.fortranSource"
+          priority="high"/>
   </extension>
 
    <extension point="org.eclipse.core.runtime.contentTypes"> 
       <file-association 
        content-type="org.eclipse.fdt.core.fortranSource"
        file-extensions="f,f77,f90,f95"/>
+   </extension> 
+
+   <extension point="org.eclipse.core.runtime.contentTypes"> 
+      <file-association 
+       content-type="org.eclipse.fdt.core.fortranHeader"
+       file-extensions="fh"/>
    </extension> 
 
 <!-- =================================================================================== -->
