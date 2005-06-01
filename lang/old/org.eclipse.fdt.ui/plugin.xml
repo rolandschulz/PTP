@@ -136,6 +136,9 @@
       </actionSetPartAssociation>      
    </extension>
 
+   <!-- This extension point allows preferences to be loaded. Without it, color highlighting
+        in the editor won't work.
+     -->
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer class="org.eclipse.fdt.ui.FortranUIPreferenceInitializer"/>
