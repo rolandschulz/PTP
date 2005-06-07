@@ -22,7 +22,7 @@ package org.eclipse.ptp.core;
  *
  */
 public class ParallelModeException extends Exception {
-    public ParallelModeException(String msg) {
-        super(msg);
-    }
+	public ParallelModeException(String msg) {
+		super(msg);
+	}
 }

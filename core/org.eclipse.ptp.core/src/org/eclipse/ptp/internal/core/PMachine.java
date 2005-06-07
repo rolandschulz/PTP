@@ -30,130 +30,138 @@ import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
 
-public class PMachine extends Parent implements IPMachine 
-{
+public class PMachine extends Parent implements IPMachine {
 	protected String NAME_TAG = "machine ";
+
 	protected String arch = "undefined";
-	
+
 	public PMachine(IPUniverse uni, String name, String key) {
 		super(uni, name, key, P_MACHINE);
-		System.out.println("Name is "+name+", key is "+key);
-		System.out.println("NAME_TAG = "+NAME_TAG+", toString = "+this.toString()+", key# = "+this.getKeyNumber());
+		System.out.println("Name is " + name + ", key is " + key);
+		System.out.println("NAME_TAG = " + NAME_TAG + ", toString = "
+				+ this.toString() + ", key# = " + this.getKeyNumber());
 	}
-	
+
 	/*
-    public String getElementName() {
-        return NAME_TAG + getKey();
-    }*/
-	
+	 * public String getElementName() { return NAME_TAG + getKey(); }
+	 */
+
 	public IPUniverse getUniverse() {
 		IPElement current = this;
 		do {
-			if (current instanceof IPUniverse) return (IPUniverse) current;
+			if (current instanceof IPUniverse)
+				return (IPUniverse) current;
 		} while ((current = current.getParent()) != null);
 		return null;
 	}
-	
+
 	/* returns an array of the nodes that are comprised by this machine */
 	public synchronized IPNode[] getNodes() {
-		return (IPNode[])getCollection().toArray(new IPNode[size()]);
+		return (IPNode[]) getCollection().toArray(new IPNode[size()]);
 	}
-	
+
 	/* returns a list of the nodes comprised by this machine - but sorted */
 	public synchronized IPNode[] getSortedNodes() {
-	    IPNode[] nodes = getNodes();
-	    sort(nodes);
-	    return nodes;
+		IPNode[] nodes = getNodes();
+		sort(nodes);
+		return nodes;
 	}
-	
+
 	/* finds a node using a string identifier - returns null if none found */
 	public synchronized IPNode findNode(String nodeNumber) {
-        IPElement element = findChild(nodeNumber);
-        if (element != null)
-            return (IPNode)element;
-        return null;
+		IPElement element = findChild(nodeNumber);
+		if (element != null)
+			return (IPNode) element;
+		return null;
 	}
-	
+
 	public synchronized IPNode findNodeByName(String nname) {
 		Collection col = getCollection();
 		Iterator it = col.iterator();
-		while(it.hasNext()) {
+		while (it.hasNext()) {
 			Object ob = it.next();
-			if(ob instanceof IPNode) {
-				IPNode node = (IPNode)ob;
-				if(node.getElementName().equals(nname)) return node;
+			if (ob instanceof IPNode) {
+				IPNode node = (IPNode) ob;
+				if (node.getElementName().equals(nname))
+					return node;
 			}
 		}
 		return null;
 	}
-	
-	/* helper function to get all the processes running on this machine - doing so
-	 * by looking at all the processes on each of the nodes comprised by this
+
+	/*
+	 * helper function to get all the processes running on this machine - doing
+	 * so by looking at all the processes on each of the nodes comprised by this
 	 * machine
 	 */
 	public synchronized IPProcess[] getProcesses() {
-	    List array = new ArrayList(0);
-	    IPNode[] nodes = getNodes();
-        for (int i=0; i<nodes.length; i++)
-            array.addAll(nodes[i].getCollection());
+		List array = new ArrayList(0);
+		IPNode[] nodes = getNodes();
+		for (int i = 0; i < nodes.length; i++)
+			array.addAll(nodes[i].getCollection());
 
-        return (IPProcess[])array.toArray(new IPProcess[array.size()]);
+		return (IPProcess[]) array.toArray(new IPProcess[array.size()]);
 	}
-	
-	/* returns a sorted list of processes running on this machine (which may span
-	 * multiple jobs) 
+
+	/*
+	 * returns a sorted list of processes running on this machine (which may
+	 * span multiple jobs)
 	 */
 	public synchronized IPProcess[] getSortedProcesses() {
-	    IPProcess[] processes = getProcesses();
-	    sort(processes);
-	    return processes;
+		IPProcess[] processes = getProcesses();
+		sort(processes);
+		return processes;
 	}
-	
-	/* removes all the processes assocated with this machine.  NOTE: this can 
-	 * remove processes from multiple jobs.  the children of this machine, the
+
+	/*
+	 * removes all the processes assocated with this machine. NOTE: this can
+	 * remove processes from multiple jobs. the children of this machine, the
 	 * nodes, are NOT removed as they need to be present for machine status
 	 */
 	public void removeAllProcesses() {
-	    IPProcess[] processes = getProcesses();
-        for (int i=0; i<processes.length; i++)
-            processes[i].clearOutput();
-        
-        removeChildren();
+		IPProcess[] processes = getProcesses();
+		for (int i = 0; i < processes.length; i++)
+			processes[i].clearOutput();
+
+		removeChildren();
 	}
-	
-	/* returns all the nodes comprised by this machine, which is just the size() of
-	 * its children group
+
+	/*
+	 * returns all the nodes comprised by this machine, which is just the size()
+	 * of its children group
 	 */
 	public int totalNodes() {
-	    return size();
+		return size();
 	}
-	
-	/* counts all the processes running on this machine, which may span multiple
-	 * jobs.  accomplished by checking all the children processes running on
-	 * all the nodes comprised by this machine
+
+	/*
+	 * counts all the processes running on this machine, which may span multiple
+	 * jobs. accomplished by checking all the children processes running on all
+	 * the nodes comprised by this machine
 	 */
 	public int totalProcesses() {
-	    int counter = 0;
-        IPNode[] nodes = getNodes();
-        for (int i=0; i<nodes.length; i++)
-            counter += nodes[i].size();
+		int counter = 0;
+		IPNode[] nodes = getNodes();
+		for (int i = 0; i < nodes.length; i++)
+			counter += nodes[i].size();
 
-        return counter;
+		return counter;
 	}
 
-	/* returns all the jobs that are running on this machine.  this is accomplished
-	 * by looking at all the processes running on the nodes and finding the unique
-	 * set of jobs that those processes belong to
+	/*
+	 * returns all the jobs that are running on this machine. this is
+	 * accomplished by looking at all the processes running on the nodes and
+	 * finding the unique set of jobs that those processes belong to
 	 */
 	public synchronized IPJob[] getJobs() {
 		IPProcess[] processes = getProcesses();
-	    List array = new ArrayList(0);
-	    for(int i=0; i<processes.length; i++) {
-	    		if(!array.contains(processes[i].getJob())) {
-	    			array.add(processes[i].getJob());
-	    		}
-	    }
-	    return (IPJob[])array.toArray(new IPJob[array.size()]);
+		List array = new ArrayList(0);
+		for (int i = 0; i < processes.length; i++) {
+			if (!array.contains(processes[i].getJob())) {
+				array.add(processes[i].getJob());
+			}
+		}
+		return (IPJob[]) array.toArray(new IPJob[array.size()]);
 	}
 
 	/* returns a string representation of the architecture of this machine */
@@ -161,9 +169,8 @@ public class PMachine extends Parent implements IPMachine
 		return arch;
 	}
 
-
 	/* sets the architecture of this machine, which is merely a string */
 	public void setArch(String arch) {
 		this.arch = arch;
-	}	
+	}
 }

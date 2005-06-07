@@ -19,106 +19,109 @@
 package org.eclipse.ptp.core;
 
 /**
- * A Job can be a parallel or sequential job, consisting of one or more processes
- * which are residing on Nodes.  Jobs may span Machines, though this may not be
- * very common in reality, but the model allows for this.  Finally, a Job may or
- * may not belong to the current user, it just means that if it is visible then
- * this user can see the Job in his or her Universe.  This may have ramifications
- * on what the user can do to the Job if it is not owned by them.
+ * A Job can be a parallel or sequential job, consisting of one or more
+ * processes which are residing on Nodes. Jobs may span Machines, though this
+ * may not be very common in reality, but the model allows for this. Finally, a
+ * Job may or may not belong to the current user, it just means that if it is
+ * visible then this user can see the Job in his or her Universe. This may have
+ * ramifications on what the user can do to the Job if it is not owned by them.
  * 
  * @author Nathan DeBardeleben
  */
 public interface IPJob extends IPElement {
-    /**
-     * Returns the Job number of this Job as a String.
-     * 
-     * @return	The Job number of this Job
-     */
-    public String getJobNumber();
-	
 	/**
-	 * Returns an array of the Processes comprised by this Job.  Might return
+	 * Returns the Job number of this Job as a String.
+	 * 
+	 * @return The Job number of this Job
+	 */
+	public String getJobNumber();
+
+	/**
+	 * Returns an array of the Processes comprised by this Job. Might return
 	 * <code>null</code> if no Processes have yet been assigned.
 	 * 
-	 * @return	The Processes in this Job.
+	 * @return The Processes in this Job.
 	 */
 	public IPProcess[] getProcesses();
-	
-    /**
-     * Returns a sorted array of the Processes comprised by this Job.  Might
-     * return <code>null</code> if no Processes have yet been assigned.
-     * @return
-     */
+
+	/**
+	 * Returns a sorted array of the Processes comprised by this Job. Might
+	 * return <code>null</code> if no Processes have yet been assigned.
+	 * 
+	 * @return
+	 */
 	public IPProcess[] getSortedProcesses();
-	
+
 	/**
 	 * Returns the number of Processes in this Job.
 	 * 
-	 * @return	The number of Processes in this Job.
+	 * @return The number of Processes in this Job.
 	 */
 	public int totalProcesses();
-	
+
 	/**
-	 * Removes all Processes from this Job.
-	 * <br>TODO: <i>LOOK AT THIS, THIS MAY BE INAPPROPRIATE HERE</i>
+	 * Removes all Processes from this Job. <br>
+	 * TODO: <i>LOOK AT THIS, THIS MAY BE INAPPROPRIATE HERE</i>
 	 */
 	public void removeAllProcesses();
-	
+
 	/**
-	 * Find a Process in this Job by the Process number.  Returns the Process
+	 * Find a Process in this Job by the Process number. Returns the Process
 	 * object if found, else returns <code>null</code>.
-	 *
-	 * @param 	processNumber	The Process number to search for
-	 * @return					The Process object if found, else <code>null</code>
-	 * @see 	IPProcess
+	 * 
+	 * @param processNumber
+	 *            The Process number to search for
+	 * @return The Process object if found, else <code>null</code>
+	 * @see IPProcess
 	 */
-    public IPProcess findProcess(String processNumber);
-    
-    /**
-     * Finds a Process in this Job by the Process's name.  Returns the Process
-     * object if found, else returns <code>null</code>.
-     * 
-     * @param pname	The Process name to search for
-     * @return		The Process object if found, else <code>null</code>
-     */
-    public IPProcess findProcessByName(String pname);
-	
-    /**
-     * Returns an array of the Nodes that this Job has Processes on.
-     * 
-     * @return	The Nodes that this Job has Processes on
-     */
-    public IPNode[] getNodes();
-    
-    /**
-     * Returns a sorted array of the Nodes that this Job has Processes on.
-     * 
-     * @return	The Nodes that this Job has Processes on
-     */
-    public IPNode[] getSortedNodes();
-	
-    /**
-     * Returns the number of Nodes that this Job has Processes on.  This may
-     * not be the same size as the number of Processes if some Processes are
-     * residing on the same Node as others.
-     * 
-     * @return	The number of Nodes that this Job has Processes on
-     */
+	public IPProcess findProcess(String processNumber);
+
+	/**
+	 * Finds a Process in this Job by the Process's name. Returns the Process
+	 * object if found, else returns <code>null</code>.
+	 * 
+	 * @param pname
+	 *            The Process name to search for
+	 * @return The Process object if found, else <code>null</code>
+	 */
+	public IPProcess findProcessByName(String pname);
+
+	/**
+	 * Returns an array of the Nodes that this Job has Processes on.
+	 * 
+	 * @return The Nodes that this Job has Processes on
+	 */
+	public IPNode[] getNodes();
+
+	/**
+	 * Returns a sorted array of the Nodes that this Job has Processes on.
+	 * 
+	 * @return The Nodes that this Job has Processes on
+	 */
+	public IPNode[] getSortedNodes();
+
+	/**
+	 * Returns the number of Nodes that this Job has Processes on. This may not
+	 * be the same size as the number of Processes if some Processes are
+	 * residing on the same Node as others.
+	 * 
+	 * @return The number of Nodes that this Job has Processes on
+	 */
 	public int totalNodes();
 
 	/**
-	 * Returns an array of the Machines that this Job has Processes on.  For
-	 * most realistic systems this will be a single Machine, so a one element
-	 * array.  However, the model allows for something more advanced.
+	 * Returns an array of the Machines that this Job has Processes on. For most
+	 * realistic systems this will be a single Machine, so a one element array.
+	 * However, the model allows for something more advanced.
 	 * 
-	 * @return	The Machines this Job has Processes on
+	 * @return The Machines this Job has Processes on
 	 */
 	public IPMachine[] getMachines();
-	
+
 	/**
 	 * Returns the Universe that this Job resides within.
 	 * 
-	 * @return	The Universe that this Job resides within
+	 * @return The Universe that this Job resides within
 	 */
 	public IPUniverse getUniverse();
 }

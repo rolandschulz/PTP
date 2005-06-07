@@ -33,113 +33,112 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
 
-public class PUniverse extends Parent implements IPUniverse 
-{
-    protected String NAME_TAG = "universe ";
-    
+public class PUniverse extends Parent implements IPUniverse {
+	protected String NAME_TAG = "universe ";
 
 	public PUniverse() {
 		/* '1' because this is the only universe */
-		super(null, "TheUniverse", ""+1+"", P_UNIVERSE);
-		//setOutputStore();
+		super(null, "TheUniverse", "" + 1 + "", P_UNIVERSE);
+		// setOutputStore();
 	}
-	
+
 	/*
-	public String getOutputStoreDirectory() {
-	    return outputDirPath;
-	}
-	public int getStoreLine() {
-	    return storeLine;
-	}
-	*/
-	
-	/* there is a single collection but in this collection we keep two different kinds
-	 * of classes - they are the machines and the jobs.  So we have to go through the
-	 * entire collection pulling out the right class and return an array of them
+	 * public String getOutputStoreDirectory() { return outputDirPath; } public
+	 * int getStoreLine() { return storeLine; }
+	 */
+
+	/*
+	 * there is a single collection but in this collection we keep two different
+	 * kinds of classes - they are the machines and the jobs. So we have to go
+	 * through the entire collection pulling out the right class and return an
+	 * array of them
 	 */
 	public synchronized IPMachine[] getMachines() {
 		Collection col = getCollection();
 		Iterator it = col.iterator();
 		Vector m = new Vector();
-		
-		while(it.hasNext()) {
+
+		while (it.hasNext()) {
 			Object ob = it.next();
 
-			if(ob instanceof IPMachine)
-				m.add((IPMachine)ob);
+			if (ob instanceof IPMachine)
+				m.add((IPMachine) ob);
 		}
-		
+
 		/* this wouldnt work, oddly enough so have to do a brute force approach */
-		//return (IPMachine[])(m.toArray());		
-		
+		// return (IPMachine[])(m.toArray());
 		Object[] o = m.toArray();
 		IPMachine[] mac = new IPMachine[o.length];
-		
-		for(int i=0; i<o.length; i++) {
-			mac[i] = (IPMachine)o[i];
+
+		for (int i = 0; i < o.length; i++) {
+			mac[i] = (IPMachine) o[i];
 		}
-		
+
 		return mac;
 	}
-	
-	public synchronized IPMachine[] getSortedMachines() {
-	    IPMachine[] macs = getMachines();
-	    sort(macs);
 
-	    return macs;
+	public synchronized IPMachine[] getSortedMachines() {
+		IPMachine[] macs = getMachines();
+		sort(macs);
+
+		return macs;
 	}
-	
+
 	public synchronized IPMachine findMachineByName(String mname) {
 		Collection col = getCollection();
 		Iterator it = col.iterator();
-		while(it.hasNext()) {
+		while (it.hasNext()) {
 			Object ob = it.next();
-			if(ob instanceof IPMachine) {
-				IPMachine mac = (IPMachine)ob;
-				if(mac.getElementName().equals(mname)) return mac;
+			if (ob instanceof IPMachine) {
+				IPMachine mac = (IPMachine) ob;
+				if (mac.getElementName().equals(mname))
+					return mac;
 			}
 		}
 		return null;
 	}
-	
+
 	public synchronized IPNode findNodeByName(String nname) {
 		Collection col = getCollection();
 		Iterator it = col.iterator();
-		while(it.hasNext()) {
+		while (it.hasNext()) {
 			Object ob = it.next();
-			if(ob instanceof IPMachine) {
-				IPNode node = ((IPMachine)ob).findNodeByName(nname);
-				if(node != null) return node;
+			if (ob instanceof IPMachine) {
+				IPNode node = ((IPMachine) ob).findNodeByName(nname);
+				if (node != null)
+					return node;
 			}
 		}
 		return null;
 	}
-	
-	/* there is a single collection but in this collection we keep two different kinds
-	 * of classes - they are the machines and the jobs.  So we have to go through the
-	 * entire collection pulling out the right class and return an array of them
+
+	/*
+	 * there is a single collection but in this collection we keep two different
+	 * kinds of classes - they are the machines and the jobs. So we have to go
+	 * through the entire collection pulling out the right class and return an
+	 * array of them
 	 */
 	public synchronized IPJob[] getJobs() {
 		Collection col = getCollection();
 		Iterator it = col.iterator();
 		Vector m = new Vector();
-		
-		while(it.hasNext()) {
+
+		while (it.hasNext()) {
 			Object ob = it.next();
-			
-			if(ob instanceof IPJob)
-				m.add((IPJob)ob);
+
+			if (ob instanceof IPJob)
+				m.add((IPJob) ob);
 		}
-		
+
 		Object[] o = m.toArray();
 		IPJob[] job = new IPJob[o.length];
-		for(int i=0; i<o.length; i++) {
-			job[i] = (IPJob)o[i];
+		for (int i = 0; i < o.length; i++) {
+			job[i] = (IPJob) o[i];
 		}
-		
+
 		return job;
-	}	
-	
+	}
+
 	public synchronized IPJob[] getSortedJobs() {
 		IPJob[] jobs = getJobs();
 		sort(jobs);
@@ -149,24 +148,26 @@ public class PUniverse extends Parent implements IPUniverse
 	public synchronized IPJob findJobByName(String jname) {
 		Collection col = getCollection();
 		Iterator it = col.iterator();
-		while(it.hasNext()) {
+		while (it.hasNext()) {
 			Object ob = it.next();
-			if(ob instanceof IPJob) {
-				IPJob job = (IPJob)ob;
-				if(job.getElementName().equals(jname)) return job;
+			if (ob instanceof IPJob) {
+				IPJob job = (IPJob) ob;
+				if (job.getElementName().equals(jname))
+					return job;
 			}
 		}
 		return null;
 	}
-	
+
 	public synchronized IPProcess findProcessByName(String pname) {
 		Collection col = getCollection();
 		Iterator it = col.iterator();
-		while(it.hasNext()) {
+		while (it.hasNext()) {
 			Object ob = it.next();
-			if(ob instanceof IPJob) {
-				IPProcess proc = ((IPJob)ob).findProcessByName(pname);
-				if(proc != null) return proc;
+			if (ob instanceof IPJob) {
+				IPProcess proc = ((IPJob) ob).findProcessByName(pname);
+				if (proc != null)
+					return proc;
 			}
 		}
 		return null;
