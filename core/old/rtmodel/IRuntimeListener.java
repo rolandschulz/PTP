@@ -19,9 +19,13 @@
 package org.eclipse.ptp.rtmodel;
 
 public interface IRuntimeListener {
-    public void runtimeNodeStatusChange(NamedEntity ne);
-    public void runtimeProcessOutput(NamedEntity ne, String output);
-    public void runtimeJobExited(NamedEntity ne);
-    public void runtimeJobStateChanged(NamedEntity ne);
-    public void runtimeNewJob(NamedEntity ne);
+	public void runtimeNodeStatusChange(String ID);
+
+	public void runtimeProcessOutput(String ID, String output);
+
+	public void runtimeJobExited(String ID);
+
+	public void runtimeJobStateChanged(String ID);
+
+	public void runtimeNewJob(String ID);
 }

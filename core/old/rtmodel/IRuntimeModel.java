@@ -21,25 +21,35 @@ package org.eclipse.ptp.rtmodel;
 
 public interface IRuntimeModel {
 	/* constructor will establish a new parallel session / a handle */
-	public NamedEntity[] getMachines();
-	public NamedEntity[] getNodes(String machineName);
-	public NamedEntity[] getJobs();
-	public NamedEntity[] getProcesses(String jobName);
-	
+	public String[] getMachines();
+
+	public String[] getNodes(String machineName);
+
+	public String[] getJobs();
+
+	public String[] getProcesses(String jobName);
+
 	public String getProcessNodeName(String procName);
+
 	public String getNodeMachineName(String nodeName);
+
 	public String getProcessStatus(String procName);
+
 	public String getProcessExitCode(String procName);
+
 	public String getProcessSignal(String procName);
-	
+
 	public String getNodeAttribute(String nodeName, String attrib);
-	
+
 	/* returns the new job name string that it spawns, unique */
-	public NamedEntity run(String[] args);
-	public NamedEntity abortJob();
-	
+	public String run(String[] args);
+
+	public void abortJob(String jobID);
+
 	/* event stuff */
 	public void addRuntimeListener(IRuntimeListener listener);
+
 	public void removeRuntimeListener(IRuntimeListener listener);
+
 	public void shutdown();
 }

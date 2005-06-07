@@ -31,62 +31,64 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 public class PTPCorePlugin extends AbstractUIPlugin {
-    public static final String PLUGIN_ID = "org.eclipse.ptp.core";
-    
-    private IModelManager launchManager = null;
-    
-    //The shared instance.
-    private static PTPCorePlugin plugin;
-    //Resource bundle.
-    private ResourceBundle resourceBundle;
-    
-    /**
-     * The constructor.
-     */
-    public PTPCorePlugin() {
-        super();
-        plugin = this;        
-        try {
-            resourceBundle = ResourceBundle.getBundle(PLUGIN_ID + ".ParallelPluginResources");
-        } catch (MissingResourceException x) {
-            resourceBundle = null;
-        }
-    }
+	public static final String PLUGIN_ID = "org.eclipse.ptp.core";
 
-    /**
-     * This method is called upon plug-in activation
-     */
-    public void start(BundleContext context) throws Exception {
-        super.start(context);  
-        launchManager = new ModelManager();
-    }
+	private IModelManager launchManager = null;
 
-    /**
-     * This method is called when the plug-in is stopped
-     */
-    public void stop(BundleContext context) throws Exception {
-        launchManager.shutdown();
-        super.stop(context);
-    }
+	// The shared instance.
+	private static PTPCorePlugin plugin;
 
-    /**
-     * @return Returns the launchManager.
-     */
-    public IModelManager getLaunchManager() {
-        return launchManager;
-    }
+	// Resource bundle.
+	private ResourceBundle resourceBundle;
 
-    /**
-     * Returns the shared instance.
-     */
-    public static PTPCorePlugin getDefault() {
-        return plugin;
-    }
-    
-    public void refreshParallelPluginActions() {
-        refreshPluginActions();
-    }    
-    
+	/**
+	 * The constructor.
+	 */
+	public PTPCorePlugin() {
+		super();
+		plugin = this;
+		try {
+			resourceBundle = ResourceBundle.getBundle(PLUGIN_ID
+					+ ".ParallelPluginResources");
+		} catch (MissingResourceException x) {
+			resourceBundle = null;
+		}
+	}
+
+	/**
+	 * This method is called upon plug-in activation
+	 */
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+		launchManager = new ModelManager();
+	}
+
+	/**
+	 * This method is called when the plug-in is stopped
+	 */
+	public void stop(BundleContext context) throws Exception {
+		launchManager.shutdown();
+		super.stop(context);
+	}
+
+	/**
+	 * @return Returns the launchManager.
+	 */
+	public IModelManager getLaunchManager() {
+		return launchManager;
+	}
+
+	/**
+	 * Returns the shared instance.
+	 */
+	public static PTPCorePlugin getDefault() {
+		return plugin;
+	}
+
+	public void refreshParallelPluginActions() {
+		refreshPluginActions();
+	}
+
 	public static String getUniqueIdentifier() {
 		if (getDefault() == null) {
 			// If the default instance is not yet initialized,
@@ -95,39 +97,40 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 			return PLUGIN_ID;
 		}
 		return getDefault().getBundle().getSymbolicName();
-	}    
+	}
 
-    /**
-     * Returns the string from the plugin's resource bundle, or 'key' if not found.
-     */
-    public static String getResourceString(String key) {
-        ResourceBundle bundle = PTPCorePlugin.getDefault().getResourceBundle();
-        try {
-            return (bundle != null) ? bundle.getString(key) : key;
-        } catch (MissingResourceException e) {
-            return key;
-        }
-    }
+	/**
+	 * Returns the string from the plugin's resource bundle, or 'key' if not
+	 * found.
+	 */
+	public static String getResourceString(String key) {
+		ResourceBundle bundle = PTPCorePlugin.getDefault().getResourceBundle();
+		try {
+			return (bundle != null) ? bundle.getString(key) : key;
+		} catch (MissingResourceException e) {
+			return key;
+		}
+	}
 
-    /**
-     * Returns the plugin's resource bundle,
-     */
-    public ResourceBundle getResourceBundle() {
-        return resourceBundle;
-    }
- 
+	/**
+	 * Returns the plugin's resource bundle,
+	 */
+	public ResourceBundle getResourceBundle() {
+		return resourceBundle;
+	}
+
 	public static IWorkbenchWindow getActiveWorkbenchWindow() {
 		return getDefault().getWorkbench().getActiveWorkbenchWindow();
-	}	
-	
+	}
+
 	public static IWorkbenchPage getActivePage() {
 		IWorkbenchWindow w = getActiveWorkbenchWindow();
 		if (w != null) {
 			return w.getActivePage();
 		}
 		return null;
-	}	
-	
+	}
+
 	/**
 	 * Returns the active workbench shell or <code>null</code> if none
 	 * 
@@ -140,17 +143,22 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		}
 		return null;
 	}
-	
-    public void addPerspectiveListener(final IPerspectiveListener perspectiveListener) {
-        IWorkbenchWindow workBenchWindow = PTPCorePlugin.getActiveWorkbenchWindow();
-        if (workBenchWindow instanceof WorkbenchWindow) {
-            workBenchWindow.addPerspectiveListener(perspectiveListener);
-        }
-    }
-    public void removePerspectiveListener(final IPerspectiveListener perspectiveListener) {
-        IWorkbenchWindow workBenchWindow = PTPCorePlugin.getActiveWorkbenchWindow();
-        if (workBenchWindow instanceof WorkbenchWindow) {
-            workBenchWindow.removePerspectiveListener(perspectiveListener);
-        }
-    }	
+
+	public void addPerspectiveListener(
+			final IPerspectiveListener perspectiveListener) {
+		IWorkbenchWindow workBenchWindow = PTPCorePlugin
+				.getActiveWorkbenchWindow();
+		if (workBenchWindow instanceof WorkbenchWindow) {
+			workBenchWindow.addPerspectiveListener(perspectiveListener);
+		}
+	}
+
+	public void removePerspectiveListener(
+			final IPerspectiveListener perspectiveListener) {
+		IWorkbenchWindow workBenchWindow = PTPCorePlugin
+				.getActiveWorkbenchWindow();
+		if (workBenchWindow instanceof WorkbenchWindow) {
+			workBenchWindow.removePerspectiveListener(perspectiveListener);
+		}
+	}
 }

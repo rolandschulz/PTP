@@ -19,26 +19,34 @@
 
 package org.eclipse.ptp.rtmodel;
 
-
 public class RuntimeEvent {
 	int eventNumber;
+
 	String text;
-    public static final int EVENT_NODE_STATUS_CHANGE = 1;
-    public static final int EVENT_PROCESS_OUTPUT = 2;
-    public static final int EVENT_JOB_EXITED = 3;
+
+	public static final int EVENT_NODE_STATUS_CHANGE = 1;
+
+	public static final int EVENT_PROCESS_OUTPUT = 2;
+
+	public static final int EVENT_JOB_EXITED = 3;
+
 	public static final int EVENT_JOB_STATE_CHANGED = 4;
+
 	public static final int EVENT_NEW_JOB = 5;
-	
+
 	public RuntimeEvent(int eventNumber) {
 		this.eventNumber = eventNumber;
 		text = new String("");
 	}
-	public int getEventNumber() { 
+
+	public int getEventNumber() {
 		return eventNumber;
 	}
+
 	public String getText() {
 		return text;
 	}
+
 	public void setText(String text) {
 		this.text = text;
 	}

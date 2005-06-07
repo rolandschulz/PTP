@@ -44,52 +44,69 @@ import org.eclipse.ptp.core.PTPCorePlugin;
  *
  */
 public abstract class AbstractAttachDebugger {
-    protected String pidText = null;
-    protected String debugConfigName = "";
-    protected ILaunch debugLaunch = null;
-    
-    public AbstractAttachDebugger(String pidText, String debugConfigName) {
-        this.pidText = pidText;
-        this.debugConfigName = debugConfigName;
-    }
-    
-    protected ILaunchManager getLaunchManager() {
-        return DebugPlugin.getDefault().getLaunchManager();
-    }
-    
-    protected abstract ILaunchConfiguration createDebugConfiguration(IFile exeFile) throws CoreException;
-	protected abstract boolean createLaunch(ILaunchConfiguration config) throws CoreException;
-    public abstract void attachDebugger(ILaunchConfiguration ptpConfig) throws CoreException;
-    
-    protected IFile findExeFile(ILaunchConfiguration ptpConfig) throws CoreException {
-        String projectName = ptpConfig.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String)null);
-        String programName = ptpConfig.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, (String)null);
+	protected String pidText = null;
+
+	protected String debugConfigName = "";
+
+	protected ILaunch debugLaunch = null;
+
+	public AbstractAttachDebugger(String pidText, String debugConfigName) {
+		this.pidText = pidText;
+		this.debugConfigName = debugConfigName;
+	}
+
+	protected ILaunchManager getLaunchManager() {
+		return DebugPlugin.getDefault().getLaunchManager();
+	}
+
+	protected abstract ILaunchConfiguration createDebugConfiguration(
+			IFile exeFile) throws CoreException;
+
+	protected abstract boolean createLaunch(ILaunchConfiguration config)
+			throws CoreException;
+
+	public abstract void attachDebugger(ILaunchConfiguration ptpConfig)
+			throws CoreException;
+
+	protected IFile findExeFile(ILaunchConfiguration ptpConfig)
+			throws CoreException {
+		String projectName = ptpConfig.getAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME,
+				(String) null);
+		String programName = ptpConfig.getAttribute(
+				IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME,
+				(String) null);
 
 		if (projectName != null && !projectName.equals("")) {
-			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+			IProject project = ResourcesPlugin.getWorkspace().getRoot()
+					.getProject(projectName);
 			IFile programPath = project.getFile(programName);
-			if (programPath != null && programPath.exists() && programPath.getLocation().toFile().exists())
-			    return programPath;
+			if (programPath != null && programPath.exists()
+					&& programPath.getLocation().toFile().exists())
+				return programPath;
 		}
 
-        Status status = new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, "No such program("+ programName +") found.", null);
-        throw new CoreException(status);
-    }
-    
+		Status status = new Status(IStatus.ERROR, PTPCorePlugin
+				.getUniqueIdentifier(), IStatus.INFO, "No such program("
+				+ programName + ") found.", null);
+		throw new CoreException(status);
+	}
+
 	protected String renderTargetLabel(String name) {
 		String format = "{0} ({1})";
-		String timestamp = DateFormat.getInstance().format(new Date(System.currentTimeMillis()));
-		return MessageFormat.format(format, new String[]{name, timestamp});
+		String timestamp = DateFormat.getInstance().format(
+				new Date(System.currentTimeMillis()));
+		return MessageFormat.format(format, new String[] { name, timestamp });
 	}
-	
+
 	protected int getPid() throws CoreException {
-	    int pid = -1;
-	    if (pidText != null && !pidText.equals("")) {
-		    try {
-		        pid = Integer.parseInt(pidText);
-		    } catch (NumberFormatException e) {
-		    }
-	    }
-        return pid;
-    }
+		int pid = -1;
+		if (pidText != null && !pidText.equals("")) {
+			try {
+				pid = Integer.parseInt(pidText);
+			} catch (NumberFormatException e) {
+			}
+		}
+		return pid;
+	}
 }

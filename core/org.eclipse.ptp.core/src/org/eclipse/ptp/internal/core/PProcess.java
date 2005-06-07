@@ -32,24 +32,35 @@ import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
 
 public class PProcess extends Parent implements IPProcess {
-    protected String NAME_TAG = "process ";
-    
-    private String pid = null;    
-    private String status = null;
-    private String exitCode = null;
-    private String signalName = null;
-    private boolean isTerminated = false;
-    //private List outputList = new ArrayList();
-    private OutputTextFile outputFile = null;
-    protected String outputDirPath = null;
-    protected int storeLine = 0;
-    
-    private IProcessListener listener = null;
-    
-    /* the node that this process is running on, or was scheduled on / will be, etc */
-    protected IPNode node;
-    
-	public PProcess(IPElement element, String name, String key, String pid, String status, String exitCode, String signalName) {
+	protected String NAME_TAG = "process ";
+
+	private String pid = null;
+
+	private String status = null;
+
+	private String exitCode = null;
+
+	private String signalName = null;
+
+	private boolean isTerminated = false;
+
+	// private List outputList = new ArrayList();
+	private OutputTextFile outputFile = null;
+
+	protected String outputDirPath = null;
+
+	protected int storeLine = 0;
+
+	private IProcessListener listener = null;
+
+	/*
+	 * the node that this process is running on, or was scheduled on / will be,
+	 * etc
+	 */
+	protected IPNode node;
+
+	public PProcess(IPElement element, String name, String key, String pid,
+			String status, String exitCode, String signalName) {
 		super(element, name, key, P_PROCESS);
 		this.pid = pid;
 		this.exitCode = exitCode;
@@ -58,14 +69,19 @@ public class PProcess extends Parent implements IPProcess {
 		setOutputStore();
 		outputFile = new OutputTextFile(name, outputDirPath, storeLine);
 	}
-	
+
 	private void setOutputStore() {
-		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		outputDirPath = preferences.getString(IOutputTextFileContants.OUTPUT_DIR);
-		storeLine = preferences.getInt(IOutputTextFileContants.STORE_LINE);		
+		Preferences preferences = PTPCorePlugin.getDefault()
+				.getPluginPreferences();
+		outputDirPath = preferences
+				.getString(IOutputTextFileContants.OUTPUT_DIR);
+		storeLine = preferences.getInt(IOutputTextFileContants.STORE_LINE);
 		if (outputDirPath == null || outputDirPath.length() == 0)
-			outputDirPath = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(IOutputTextFileContants.DEF_OUTPUT_DIR_NAME).toOSString();
-		
+			outputDirPath = ResourcesPlugin.getWorkspace().getRoot()
+					.getLocation().append(
+							IOutputTextFileContants.DEF_OUTPUT_DIR_NAME)
+					.toOSString();
+
 		if (storeLine == 0)
 			storeLine = IOutputTextFileContants.DEF_STORE_LINE;
 
@@ -73,109 +89,114 @@ public class PProcess extends Parent implements IPProcess {
 		if (!outputDirectory.exists())
 			outputDirectory.mkdir();
 	}
-	
+
 	public IPJob getJob() {
 		IPElement current = this;
 		do {
-			if(current instanceof IPJob) return (IPJob) current;
-		} while((current = current.getParent()) != null);
+			if (current instanceof IPJob)
+				return (IPJob) current;
+		} while ((current = current.getParent()) != null);
 		return null;
 	}
-	
+
 	public String getProcessNumber() {
-	    return ""+getKeyNumber()+"";
+		return "" + getKeyNumber() + "";
 	}
-	
+
 	public void setStatus(String status) {
-	    this.status = status==null?"unknown":status;
-        if (listener != null && status != null)
-            listener.changeStatus(status);
+		this.status = status == null ? "unknown" : status;
+		if (listener != null && status != null)
+			listener.changeStatus(status);
 	}
-	
+
 	public void setExitCode(String exitCode) {
-	    this.exitCode = exitCode;
-        if (listener != null && exitCode != null)
-            listener.changeExitCode(exitCode);
+		this.exitCode = exitCode;
+		if (listener != null && exitCode != null)
+			listener.changeExitCode(exitCode);
 	}
 
 	public void setSignalName(String signalName) {
-	    this.signalName = signalName;
-        if (listener != null && signalName != null)
-            listener.changeSignalName(signalName);
+		this.signalName = signalName;
+		if (listener != null && signalName != null)
+			listener.changeSignalName(signalName);
 	}
 
 	public void setPid(String pid) {
-	    this.pid = pid;
+		this.pid = pid;
 	}
-	
+
 	public String getPid() {
-	    return pid;
+		return pid;
 	}
+
 	public String getExitCode() {
-	    return exitCode;
+		return exitCode;
 	}
+
 	public String getSignalName() {
-	    return signalName;
+		return signalName;
 	}
+
 	public String getStatus() {
-	    return status;
+		return status;
 	}
-	
-    public boolean isTerminated() {
-        return isTerminated;
-    }
-    
-    public void removeProcess() {
-        ((IPNode)getParent()).removeChild(this);
-    }
-    
-    public void setTerminated(boolean isTerminated) {
-        this.isTerminated = isTerminated;
-    }
 
-    public void addOutput(String output) {
-        //outputList.add(output);
-        //outputList.add("random output from process: " + (counter++));
-        outputFile.write(output + "\n");
-        if (listener != null)
-            listener.addOutput(output + "\n");
-    }
-    
-    public String getContents() {
-        //String[] array = new String[outputList.size()];
-		//return (String[]) outputList.toArray( array );
-        return outputFile.getContents();
-    }
-    
-    public String[] getOutputs() {
-        //String[] array = new String[outputList.size()];
-		//return (String[]) outputList.toArray( array );
-        return null;
-    }
+	public boolean isTerminated() {
+		return isTerminated;
+	}
 
-    public void clearOutput() {
-        outputFile.delete();
-        //outputList.clear();
-    }
-    
-    public void addProcessListener(IProcessListener listener) {
-        this.listener = listener;
-    }
-    
-    public void removerProcessListener() {
-        listener = null;
-    }
-    
-    public boolean isAllStop() {
-        return getStatus().startsWith(EXITED);
-    }
-    
+	public void removeProcess() {
+		((IPNode) getParent()).removeChild(this);
+	}
+
+	public void setTerminated(boolean isTerminated) {
+		this.isTerminated = isTerminated;
+	}
+
+	public void addOutput(String output) {
+		// outputList.add(output);
+		// outputList.add("random output from process: " + (counter++));
+		outputFile.write(output + "\n");
+		if (listener != null)
+			listener.addOutput(output + "\n");
+	}
+
+	public String getContents() {
+		// String[] array = new String[outputList.size()];
+		// return (String[]) outputList.toArray( array );
+		return outputFile.getContents();
+	}
+
+	public String[] getOutputs() {
+		// String[] array = new String[outputList.size()];
+		// return (String[]) outputList.toArray( array );
+		return null;
+	}
+
+	public void clearOutput() {
+		outputFile.delete();
+		// outputList.clear();
+	}
+
+	public void addProcessListener(IProcessListener listener) {
+		this.listener = listener;
+	}
+
+	public void removerProcessListener() {
+		listener = null;
+	}
+
+	public boolean isAllStop() {
+		return getStatus().startsWith(EXITED);
+	}
+
 	public void setNode(IPNode node) {
 		this.node = node;
-		if(node != null) node.addChild(this);
+		if (node != null)
+			node.addChild(this);
 	}
 
 	public IPNode getNode() {
 		return this.node;
-	}    
+	}
 }

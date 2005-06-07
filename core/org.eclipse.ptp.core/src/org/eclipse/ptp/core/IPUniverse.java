@@ -20,83 +20,89 @@
 package org.eclipse.ptp.core;
 
 /**
- * A Universe represents a user's view of the world.  It is comprised of a
- * set of Machines and Jobs.  This class has helper methods to get access
- * to those sets as well as other things down inside those sets (such as
- * finding a node, which may require searching all machines).
+ * A Universe represents a user's view of the world. It is comprised of a set of
+ * Machines and Jobs. This class has helper methods to get access to those sets
+ * as well as other things down inside those sets (such as finding a node, which
+ * may require searching all machines).
  * 
- * @author      Nathan DeBardeleben
- * @see         IPMachine
- * @see         IPJob
+ * @author Nathan DeBardeleben
+ * @see IPMachine
+ * @see IPJob
  */
 public interface IPUniverse extends IPElement {
 	/**
-	 * Returns all the Machines that are visible by this Universe, or null
-	 * if there are none.
+	 * Returns all the Machines that are visible by this Universe, or null if
+	 * there are none.
 	 * 
-	 * @return	An array of all Machines in this Universe, null if there are none
+	 * @return An array of all Machines in this Universe, null if there are none
 	 */
 	public IPMachine[] getMachines();
-	
+
 	/**
 	 * Returns all the Machines that are visible by this Universe sorted by
 	 * their name, or null if there are none.
 	 * 
-	 * @return	A sorted array of all Machines in this Universe, null if there are none
+	 * @return A sorted array of all Machines in this Universe, null if there
+	 *         are none
 	 */
 	public IPMachine[] getSortedMachines();
-	
+
 	/**
-	 * Given a Machine name, returns the Machine object if it can be found
-	 * in this Universe.  Returns null if it cannot be found.
+	 * Given a Machine name, returns the Machine object if it can be found in
+	 * this Universe. Returns null if it cannot be found.
 	 * 
-	 * @param mname	A name of a Machine to search for in this Universe
-	 * @return		The Machine object if found, else null
+	 * @param mname
+	 *            A name of a Machine to search for in this Universe
+	 * @return The Machine object if found, else null
 	 */
 	public IPMachine findMachineByName(String mname);
-	
+
 	/**
-	 * Returns all the Jobs that are visible by this Universe, or null if
-	 * there are none.
+	 * Returns all the Jobs that are visible by this Universe, or null if there
+	 * are none.
 	 * 
-	 * @return	An array of all Jobs in this Universe, null if there are none
+	 * @return An array of all Jobs in this Universe, null if there are none
 	 */
 	public IPJob[] getJobs();
-	
+
 	/**
 	 * Returns all the Jobs that are visible bythis Universe sorted by their
 	 * name, or null if there are none.
 	 * 
-	 * @return	A sorted array of all Jobs in this Universe, null if there are none
+	 * @return A sorted array of all Jobs in this Universe, null if there are
+	 *         none
 	 */
 	public IPJob[] getSortedJobs();
-	
+
 	/**
 	 * Given a Job name, returns a Job object if the Job can be found in this
-	 * Universe.  Returns null if it cannot be found.
+	 * Universe. Returns null if it cannot be found.
 	 * 
-	 * @param jname	A name of the Job to search for in this Universe
-	 * @return		The Job object if found, else null
+	 * @param jname
+	 *            A name of the Job to search for in this Universe
+	 * @return The Job object if found, else null
 	 */
 	public IPJob findJobByName(String jname);
-	
+
 	/**
-	 * Given a Node name, returns the Node object located on one of the 
-	 * Machines in this Universe.  Returns null if the Node cannot be found.
-	 * This method traverses the Machines.
+	 * Given a Node name, returns the Node object located on one of the Machines
+	 * in this Universe. Returns null if the Node cannot be found. This method
+	 * traverses the Machines.
 	 * 
-	 * @param nname	A name of a Job to search for in this Universe
-	 * @return		The Node object if found, else null
+	 * @param nname
+	 *            A name of a Job to search for in this Universe
+	 * @return The Node object if found, else null
 	 */
 	public IPNode findNodeByName(String nname);
-	
+
 	/**
 	 * Given a Process name, returns the Process object located on one of the
-	 * Machines in this Universe.  Returns null if the Node cannot be found.
-	 * This method traverses the Jobs.
+	 * Machines in this Universe. Returns null if the Node cannot be found. This
+	 * method traverses the Jobs.
 	 * 
-	 * @param pname	A name of a Process to esarch for in this Universe
-	 * @return		The Process object if found, else null
+	 * @param pname
+	 *            A name of a Process to esarch for in this Universe
+	 * @return The Process object if found, else null
 	 */
 	public IPProcess findProcessByName(String pname);
 }

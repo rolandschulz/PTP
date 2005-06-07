@@ -25,10 +25,12 @@ import java.util.ResourceBundle;
 import org.eclipse.ptp.core.PTPCorePlugin;
 
 public class CoreMessages {
-    private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.core.CoreMessages";
-    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.core.CoreMessages";
 
-    public static String getResourceString(String key) {
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
+			.getBundle(BUNDLE_NAME);
+
+	public static String getResourceString(String key) {
 		// No point trying if bundle is null as exceptions are costly
 		if (RESOURCE_BUNDLE != null) {
 			try {
@@ -45,7 +47,8 @@ public class CoreMessages {
 	}
 
 	public static String getFormattedResourceString(String key, String arg) {
-		return MessageFormat.format(getResourceString(key), new String[]{arg});
+		return MessageFormat.format(getResourceString(key),
+				new String[] { arg });
 	}
 
 	public static String getFormattedResourceString(String key, String[] args) {
