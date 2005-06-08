@@ -5,6 +5,8 @@
 package org.eclipse.ptp.debug.external;
 
 
+import java.util.Observer;
+
 import org.eclipse.ptp.debug.external.actionpoint.DebugActionpoint;
 import org.eclipse.ptp.debug.external.command.DebugCommand;
 import org.eclipse.ptp.debug.external.gdb.GDBDebugger;
@@ -43,6 +45,9 @@ public class DebugSession {
 		return debugConfig;
 	}
 	
+	public void addDebuggerObserver(Observer obs) {
+		debugger.addDebuggerObserver(obs);
+	}
 
 	public void quit() {
 		debugger.quit();

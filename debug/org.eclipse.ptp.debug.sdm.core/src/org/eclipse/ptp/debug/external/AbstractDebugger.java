@@ -7,6 +7,8 @@ package org.eclipse.ptp.debug.external;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Observable;
+import java.util.Observer;
 
 import org.eclipse.ptp.debug.external.actionpoint.ABreakpoint;
 import org.eclipse.ptp.debug.external.actionpoint.AWatchpoint;
@@ -38,8 +40,10 @@ import org.eclipse.ptp.debug.external.command.CUnsetAll;
 import org.eclipse.ptp.debug.external.command.CViewSet;
 import org.eclipse.ptp.debug.external.command.CWatch;
 import org.eclipse.ptp.debug.external.command.DebugCommand;
+import org.eclipse.ptp.debug.external.event.DebugEvent;
 import org.eclipse.ptp.debug.external.model.MProcess;
 import org.eclipse.ptp.debug.external.model.MProcessSet;
+import org.eclipse.ptp.debug.external.utils.Queue;
 import org.eclipse.ptp.debug.external.variable.DebugVariable;
 import org.eclipse.ptp.debug.external.variable.VMaxHistory;
 import org.eclipse.ptp.debug.external.variable.VMode;
@@ -53,13 +57,15 @@ import org.eclipse.ptp.debug.external.variable.VStopModel;
  * @author donny
  *
  */
-public abstract class AbstractDebugger implements IDebugger {
+public abstract class AbstractDebugger extends Observable implements IDebugger {
 	/* We use an array to store the actionpoints, the
 	 * index of the array (plus 1) corresponds to the id of the actionpoint
 	 * Note: actionpoint id starts at 1, array index starts at 0
 	 */
 	protected ArrayList actionpointList = null;
 	protected ArrayList commandHistory = null;
+	protected Queue eventQueue = null;
+	protected EventThread eventThread = null;
 	protected HashMap stateVariables = null;
 	
 	protected ArrayList userDefinedProcessSetList = null;
@@ -71,12 +77,17 @@ public abstract class AbstractDebugger implements IDebugger {
 	
 	protected DebugConfig debugConfig = null;
 	
+	public boolean isExitingFlag = false; /* Checked by the eventThread */
+	
 	public AbstractDebugger(DebugConfig dConf) {
 		debugConfig = dConf;
 	}
 	
 	public void initDebugger() {
 		commandHistory = new ArrayList();
+		eventQueue = new Queue();
+		eventThread = new EventThread(this);
+		eventThread.start();
 		stateVariables = new HashMap();
 		userDefinedProcessSetList = new ArrayList();
 		actionpointList = new ArrayList();
@@ -91,15 +102,55 @@ public abstract class AbstractDebugger implements IDebugger {
 		stateVariables.put("STOP_MODEL", new VStopModel());
 	}
 	
+	public void addDebuggerObserver(Observer obs) {
+		this.addObserver(obs);
+	}
+	
 	public abstract void destroyDebugger();
 	
+	public boolean isExiting() {
+		return isExitingFlag;
+	}
+	
 	public void exit() {
+		isExitingFlag = true;
 		destroyDebugger();
+		// Allow (10 secs) for the EventThread  to finish processing the queue.
+		for (int i = 0; !eventQueue.isEmpty() && i < 5; i++) {
+			try {
+				java.lang.Thread.sleep(2000);
+			} catch (InterruptedException e) {
+			}
+		}
+		// Kill the event Thread.
+		try {
+			if (eventThread.isAlive()) {
+				eventThread.interrupt();
+				eventThread.join(); // Should use a timeout ?
+			}
+		} catch (InterruptedException e) {
+		}		
 		commandHistory.add(new CExit());
 	}
 	
 	public void quit() {
+		isExitingFlag = true;
 		destroyDebugger();
+		// Allow (10 secs) for the EventThread  to finish processing the queue.
+		for (int i = 0; !eventQueue.isEmpty() && i < 5; i++) {
+			try {
+				java.lang.Thread.sleep(2000);
+			} catch (InterruptedException e) {
+			}
+		}
+		// Kill the event Thread.
+		try {
+			if (eventThread.isAlive()) {
+				eventThread.interrupt();
+				eventThread.join(); // Should use a timeout ?
+			}
+		} catch (InterruptedException e) {
+		}		
 		commandHistory.add(new CQuit());
 	}
 
@@ -484,4 +535,26 @@ public abstract class AbstractDebugger implements IDebugger {
 		commandHistory.add(new CFocus(name));
 	}
 	
+	public void notifyObservers(Object arg) {
+		setChanged();
+		super.notifyObservers(arg);
+	}
+
+	public Queue getEventQueue() {
+		return eventQueue;
+	}
+	
+	public void fireEvents(DebugEvent[] events) {
+		if (events != null && events.length > 0) {
+			for (int i = 0; i < events.length; i++) {
+				fireEvent(events[i]);
+			}
+		}
+	}
+
+	public void fireEvent(DebugEvent event) {
+		if (event != null) {
+			eventQueue.addItem(event);
+		}
+	}
 }

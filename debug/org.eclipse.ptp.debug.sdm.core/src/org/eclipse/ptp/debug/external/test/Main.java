@@ -6,16 +6,11 @@
  */
 package org.eclipse.ptp.debug.external.test;
 
-import java.io.File;
+import java.util.Observable;
+import java.util.Observer;
 
-import org.eclipse.ptp.debug.external.gdb.mi.GDBSession;
-import org.eclipse.ptp.debug.external.gdb.mi.MIException;
-import org.eclipse.ptp.debug.external.gdb.mi.MISession;
-import org.eclipse.ptp.debug.external.gdb.mi.command.CommandFactory;
-
-
-
-
+import org.eclipse.ptp.debug.external.DebugSession;
+import org.eclipse.ptp.debug.external.event.EExit;
 
 /**
  * @author donny
@@ -27,38 +22,40 @@ public class Main {
 
 	public static void main(String[] args) {
 		System.out.println("Hello World");
+		final boolean stopObserver = false;
 		
-		GDBSession gdbSession = null;
-		CommandFactory factory = null;
-		MISession miSession = null;
-
-		System.out.println(System.getProperty("user.dir"));
-		
-		String prg_arg = "/home/donny/tmp/gt3_debugging_test/test";
-		String cwd_arg = "/home/donny/tmp/gt3_debugging_test";
-		gdbSession = new GDBSession();
-		factory = new CommandFactory();
-
-		File cwd = new File(cwd_arg);
-		File prg = new File(prg_arg);
+		Observer observer = new Observer() {
+			public void update(Observable arg0, Object arg1) {
+				if (arg1 instanceof EExit) {
+					System.out.println("Exit Event Received");
+				} else {
+					System.out.println("Unknown Event");
+				}
 				
-		try {
-			miSession = gdbSession.createSession(new String[] {"/usr/bin/gdb"}, prg, cwd, null);
-		} catch (Exception e) {
-		}    	
-
-		try {
-			//miSession.postCommand(factory.createMIBreakInsert("main"));
-			miSession.postCommand(factory.createMIExecRun());
-			//miSession.postCommand(factory.createMIExecNext());
-			//miSession.postCommand(factory.createMIExecContinue());
-			Thread.sleep(3000);
-			miSession.postCommand(factory.createMIGDBExit());
-			Thread.sleep(3000);
-		} catch (MIException e) {
-		} catch (Exception e) {
-		}
+			};
+		};
 		
+		try {
+			int marker = 0;
+			
+			DebugSession debug = new DebugSession();			Thread.sleep(3000); System.out.println("marker " + marker++);
+			
+			debug.addDebuggerObserver(observer);
+			
+			debug.load("/home/donny/tmp/gt3_debugging_test/test"); 		Thread.sleep(3000); System.out.println("marker " + marker++);
+
+			debug.breakpoint("main"); 							Thread.sleep(3000); System.out.println("marker " + marker++);
+			
+			debug.run(); 										Thread.sleep(3000); System.out.println("marker " + marker++);
+
+			debug.cont(); 										Thread.sleep(3000); System.out.println("marker " + marker++);
+
+			debug.exit();										Thread.sleep(3000); System.out.println("marker " + marker++);
+			
+		} catch (Exception e) {
+			//System.out.println("EXCEPTION: " + e.getMessage());
+			e.printStackTrace();
+		}
 		System.out.println("Hello World End");
 	}
 }
