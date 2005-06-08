@@ -33,72 +33,19 @@ import org.eclipse.ptp.rtmodel.NamedEntity;
 import org.eclipse.ptp.rtmodel.RuntimeEvent;
 
 public class OMPIRuntimeModel implements IRuntimeModel {
-
-	/* define the number of machines here */
-	final static int numMachines = 4;
-
-	/*
-	 * define how many nodes each machine has - the array length must equal
-	 * numMachines
-	 */
-	final static int[] numNodes = { 256, 256, 256, 512 };
-
-	protected HashMap nodeMap;
-
-	protected HashMap nodeUserMap;
-
-	protected HashMap nodeGroupMap;
-
-	protected HashMap nodeModeMap;
-
-	protected HashMap nodeStateMap;
-
-	/* define the number of jobs here */
-	final static int numFakeJobs = 4;
-
-	protected HashMap processMap;
-
 	protected List listeners = new ArrayList(2);
-
-	protected String spawned_app_state = null;
-
-	protected int spawned_num_procs = 0;
-
-	protected int spawned_procs_per_node = 0;
-
-	protected int spawned_first_node = 0;
-
-	protected String spawned_app_signal = new String("");
-
-	protected String spawned_app_exit_code = new String("");
-
-	protected String fake_job1_state = null;
-
-	protected String fake_job2_state = null;
-
-	protected String fake_job3_state = null;
-
-	protected String fake_job1_signal = new String("");
-
-	protected String fake_job2_signal = new String("");
-
-	protected String fake_job3_signal = new String("");
-
-	protected String fake_job1_exit_code = new String("");
-
-	protected String fake_job2_exit_code = new String("");
-
-	protected String fake_job3_exit_code = new String("");
-
-	protected HashMap job3ProcessMap = null;
-
-	protected Thread runningAppEventsThread = null;
-
-	protected Thread runningAppFinishThread = null;
 
 	public OMPIRuntimeModel() {
 		System.out.println("JAVA OMPI: constructor called");
 	}
+	
+	
+	public native void testHelloWorld();
+	
+	static {
+        System.loadLibrary("ptp_ompi_jni");
+    }
+    
 
 	/* returns the new job name that it started - unique */
 	public String run(String[] args) {
@@ -111,6 +58,7 @@ public class OMPIRuntimeModel implements IRuntimeModel {
 
 	public void abortJob(String jobID) {
 		System.out.println("JAVA OMPI: abortJob() with args: " + jobID);
+		testHelloWorld();
 	}
 
 	public void addRuntimeListener(IRuntimeListener listener) {
