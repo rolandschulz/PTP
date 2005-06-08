@@ -17,6 +17,7 @@ import org.eclipse.ptp.debug.external.DebugConfig;
 import org.eclipse.ptp.debug.external.actionpoint.ABreakpoint;
 import org.eclipse.ptp.debug.external.actionpoint.AWatchpoint;
 import org.eclipse.ptp.debug.external.actionpoint.DebugActionpoint;
+import org.eclipse.ptp.debug.external.event.EExit;
 import org.eclipse.ptp.debug.external.gdb.mi.GDBSession;
 import org.eclipse.ptp.debug.external.gdb.mi.MIException;
 import org.eclipse.ptp.debug.external.gdb.mi.MISession;
@@ -51,6 +52,7 @@ public class GDBDebugger extends AbstractDebugger {
 	public void destroyDebugger() {
 		postGDBCommand(allSet, factory.createMIGDBExit());
 		allSet.clear();
+		fireEvent(new EExit());
 	}
 	
 	public void exit() {
@@ -73,7 +75,8 @@ public class GDBDebugger extends AbstractDebugger {
 	/* Parallel progam */
 	public void load(String prg, int numProcs) {
 		super.load(prg, numProcs);
-		destroyDebugger();
+		if (allSet.getSize() != 0)
+			destroyDebugger();
 		MProcess.resetGlobalCounter();
 		File cwd = new File(debugConfig.getUserHome());
 		try {
@@ -81,6 +84,7 @@ public class GDBDebugger extends AbstractDebugger {
 				MProcess proc = new MProcess();
 				String[] gdbPath = debugConfig.getDebuggerPath();
 				MISession miS = gdbSession.createSession(gdbPath, null, cwd, null);
+				miS.setParentDebugger(this);
 				miS.postCommand(factory.createMIFileSymbolFile(prg));
 				miS.postCommand(factory.createMIFileExecFile(prg));
 				proc.setDebugInfo(miS);

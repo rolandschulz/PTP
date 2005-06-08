@@ -19,6 +19,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.Observable;
 
+import org.eclipse.ptp.debug.external.gdb.GDBDebugger;
 import org.eclipse.ptp.debug.external.gdb.mi.command.Command;
 import org.eclipse.ptp.debug.external.gdb.mi.command.CommandFactory;
 import org.eclipse.ptp.debug.external.gdb.mi.command.MIExecInterrupt;
@@ -86,6 +87,8 @@ public class MISession extends Observable {
 
 	long cmdTimeout;
 
+	private GDBDebugger parentDebugger;
+	
 	MIInferior inferior;
 	
 	/**
@@ -478,7 +481,7 @@ public class MISession extends Observable {
 
 		// Tell the observers that the session is terminated
 		notifyObservers(new MIGDBExitEvent(this, 0));
-
+		
 		// Should not be necessary but just to be safe.
 		deleteObservers();
 	}
@@ -542,4 +545,11 @@ public class MISession extends Observable {
 		}
 	}
 
+	public void setParentDebugger(GDBDebugger p) {
+		parentDebugger = p;
+	}
+	
+	public GDBDebugger getParentDebugger() {
+		return parentDebugger;
+	}
 }
