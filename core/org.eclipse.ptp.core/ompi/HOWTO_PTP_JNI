@@ -1,0 +1,33 @@
+## At some point we'll figure out how to put this in the toolchain but for
+## now, here's how to do this:
+
+## Assumption: the class that is making the JNI calls is
+##  org.eclipse.ptp.rtmodel.ompi.OMPIRuntimeModel(.class)
+## Assumption: the directory you're placing this is
+##  /Users/ndebard/eclipse-workspace
+## Assumption: MAC-OSX
+
+## GOTO THE CORRECT PLACE SO THAT YOU CAN RUN JAVAH
+cd ~/eclipse-workspace/org.eclipse.ptp.core/bin
+javah -jni -o ptp_ompi_jni.h org.eclipse.ptp.rtmodel.ompi.OMPIRuntimeModel
+
+## MOVE THE RESULTING HEADER FILE INTO PLACE
+mv ptp_ompi_jni.h ~/eclipse-workspace/org.eclipse.ptp.core/ompi
+
+## RELOCATE TO THE DIRECTORY WHERE THE JNI WILL RESIDE
+cd ~/eclipse-workspace/org.eclipse.ptp.core/ompi
+
+## CREATE/EDIT ptp_ompi_jni.c
+. . .
+
+## COMPILE ptp_ompi_jni.c INTO AN OBJECT
+cc -c -I/System/Library/Frameworks/JavaVM.framework/Headers ptp_ompi_jni.c
+
+## MAKE THE JNILIB
+cc -dynamiclib -o libptp_ompi_jni.jnilib ptp_ompi_jni.o -framework JavaVM
+
+## SETUP ECLIPSE TO UNDERSTAND WHERE TO FIND THE JNILIB
+## IN THE RUN.. FOR THE NEW INSTANCE OF ECLIPSE/PTP SET THE VM ARGUMENTS
+-Djava.library.path=/Users/ndebard/eclipse-workspace/org.eclipse.ptp.core/ompi
+
+## RUN PTP - SHOULD WORK
