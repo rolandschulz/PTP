@@ -8,6 +8,10 @@
 		<attributes>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" path="simulator">
+		<attributes>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="src" path="gdb">
 		<attributes>
 		</attributes>

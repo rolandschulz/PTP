@@ -1,6 +1,6 @@
 package org.eclipse.ptp.debug.external.test;
 
-import org.eclipse.ptp.debug.external.RemoteDebugManager;
+import org.eclipse.ptp.debug.external.gdbserver.RemoteDebugManager;
 
 
 public class RemoteDebugManagerTesting {

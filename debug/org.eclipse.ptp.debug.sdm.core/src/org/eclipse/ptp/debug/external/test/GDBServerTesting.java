@@ -1,6 +1,6 @@
 package org.eclipse.ptp.debug.external.test;
 
-import org.eclipse.ptp.debug.external.GDBServer;
+import org.eclipse.ptp.debug.external.gdbserver.GDBServer;
 
 
 

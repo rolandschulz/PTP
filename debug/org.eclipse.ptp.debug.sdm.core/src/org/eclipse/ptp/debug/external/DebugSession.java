@@ -4,17 +4,14 @@
  */
 package org.eclipse.ptp.debug.external;
 
-
 import java.util.Observer;
 
 import org.eclipse.ptp.debug.external.actionpoint.DebugActionpoint;
 import org.eclipse.ptp.debug.external.command.DebugCommand;
-import org.eclipse.ptp.debug.external.gdb.GDBDebugger;
+import org.eclipse.ptp.debug.external.gdbserver.RemoteDebugManager;
 import org.eclipse.ptp.debug.external.model.MProcess;
+import org.eclipse.ptp.debug.external.simulator.DebugSimulator;
 import org.eclipse.ptp.debug.external.variable.DebugVariable;
-
-
-
 
 /**
  * @author donny
@@ -30,25 +27,20 @@ public class DebugSession {
 		debugConfig = new DebugConfig();
 		
 		/* Default for Donny */
+		/*
 		debugConfig.setMpirunPath("/home/donny/local/mpich/bin/mpirun");
 		debugConfig.setMpirunMasterHost("chloe");
 		debugConfig.setMpirunMasterPort("33333");
 		debugConfig.setUserHome("/home/donny");
 		debugConfig.setUserName("donny");
 		debugConfig.setDebuggerPath(new String[] {"/usr/bin/gdb"});
-		
 		debugger = new GDBDebugger(debugConfig);
+		*/
+		
+		debugger = new DebugSimulator(debugConfig);
 		debugger.initDebugger();
 	}
 	
-	public DebugConfig getDebugConfig() {
-		return debugConfig;
-	}
-	
-	public void addDebuggerObserver(Observer obs) {
-		debugger.addDebuggerObserver(obs);
-	}
-
 	public void quit() {
 		debugger.quit();
 	}
@@ -249,11 +241,11 @@ public class DebugSession {
 		debugger.focus(name);
 	}
 	
+	/* Remote Debugging Methods */
+	
 	public void remote(String host, int port) {
 		debugger.remote(host, port);
 	}
-	
-	// Remote Debug Manager Calls
 	
 	public void remoteManagerServe() {
 		remoteManager = new RemoteDebugManager();
@@ -272,4 +264,18 @@ public class DebugSession {
 		return remoteManager.isSuperiorConnected();
 	}
 
+	/* Miscellaneous Methods */
+	
+	public DebugConfig getDebugConfig() {
+		return debugConfig;
+	}
+	
+	public IDebugger getDebugger() {
+		return debugger;
+	}
+	
+	public void addDebuggerObserver(Observer obs) {
+		debugger.addDebuggerObserver(obs);
+	}
+	
 }

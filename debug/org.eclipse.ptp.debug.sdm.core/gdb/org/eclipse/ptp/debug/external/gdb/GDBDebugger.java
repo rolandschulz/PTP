@@ -429,4 +429,28 @@ public class GDBDebugger extends AbstractDebugger {
 		}
 	}
 	
+	/* GDBDebugger Specific Methods */
+	
+	public Process[] getProcesses() {
+		int listSize = allSet.getSize();
+		Process[] procs = new Process[listSize];
+		for (int i = 0; i < listSize; i++) {
+			MISession miS = (MISession) (allSet.getProcess(i)).getDebugInfo();
+			procs[i] = miS.getMIInferior();
+		}
+		return procs;
+	}
+	
+	public Process getSessionProcess() {
+		int listSize = allSet.getSize();
+		Process proc = null;
+		/* GDBDebugger somehow needs to combine output stream (i.e. SessionProcess)
+		 * from all processes, currently we return SessionProcess of Process 0
+		 */
+		if (listSize > 0) {
+			MISession miS = (MISession) (allSet.getProcess(0)).getDebugInfo();
+			proc = miS.getSessionProcess(); 
+		}
+		return proc;
+	}
 }

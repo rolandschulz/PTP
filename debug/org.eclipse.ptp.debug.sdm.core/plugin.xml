@@ -8,7 +8,9 @@
    class="org.eclipse.ptp.debug.external.PTPDebugExternalPlugin">
 
    <runtime>
-      <library name="ptpdebugexternal.jar"/>
+      <library name="ptpdebugexternal.jar">
+      	<export name="*"/>
+      </library>
    </runtime>
 
    <requires>
@@ -20,5 +22,17 @@
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.debug.core"/>
    </requires>
+
+   <extension
+         point="org.eclipse.ptp.debug.core.PTPDebugger">
+      <debugger
+            platform="*"
+            name="PTP"
+            modes="run"
+            cpu="native"
+            class="org.eclipse.ptp.debug.external.PTPDebugger"
+            id="org.eclipse.ptp.debug.external.PTPDebugger">
+      </debugger>
+   </extension>
 
 </plugin>
