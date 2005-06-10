@@ -1,4 +1,4 @@
-package org.eclipse.ptp.debug.external;
+package org.eclipse.ptp.debug.external.gdbserver;
 
 import java.io.BufferedReader;
 import java.io.IOException;

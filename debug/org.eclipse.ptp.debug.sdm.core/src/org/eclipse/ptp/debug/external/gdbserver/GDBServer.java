@@ -2,7 +2,7 @@
  * Created on Mar 8, 2005
  *
  */
-package org.eclipse.ptp.debug.external;
+package org.eclipse.ptp.debug.external.gdbserver;
 
 import java.io.IOException;
 

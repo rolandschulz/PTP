@@ -9,7 +9,9 @@ import java.util.Observer;
 
 import org.eclipse.ptp.debug.external.actionpoint.DebugActionpoint;
 import org.eclipse.ptp.debug.external.command.DebugCommand;
+import org.eclipse.ptp.debug.external.event.DebugEvent;
 import org.eclipse.ptp.debug.external.model.MProcess;
+import org.eclipse.ptp.debug.external.utils.Queue;
 import org.eclipse.ptp.debug.external.variable.DebugVariable;
 
 
@@ -21,8 +23,6 @@ import org.eclipse.ptp.debug.external.variable.DebugVariable;
 public interface IDebugger {
 	public void initDebugger();
 	public void destroyDebugger();
-	public void addDebuggerObserver(Observer obs);
-
 	
 	
 	/* General Debugger Interface */
@@ -89,6 +89,21 @@ public interface IDebugger {
 	public void enable(int[] ids);
 	public void enable(String type);
 	
-	/* Miscellaneous */
+	/* The methods below will not be found in the HPDF Spec */
+	
+	/* Events */
+	public void addDebuggerObserver(Observer obs);
+	public void notifyObservers(Object arg);
+	public Queue getEventQueue();
+	public boolean isExiting();
+	public void fireEvents(DebugEvent[] events);
+	public void fireEvent(DebugEvent event);
+	
+	/* Remote Debugging */
 	public void remote(String host, int port);
+	
+	/* Methods that are required to interface with Eclipse Debug/CDI Model */
+	public abstract Process getSessionProcess();
+	public abstract Process[] getProcesses();
+
 }

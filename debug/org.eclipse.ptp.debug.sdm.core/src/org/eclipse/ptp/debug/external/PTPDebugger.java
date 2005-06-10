@@ -3,31 +3,45 @@ package org.eclipse.ptp.debug.external;
 import java.io.File;
 
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.cdt.debug.core.ICDIDebugger;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.ptp.debug.core.IPCDIDebugger;
+import org.eclipse.ptp.debug.external.cdi.Session;
 
-public class PTPDebugger implements ICDIDebugger {
+public class PTPDebugger implements IPCDIDebugger {
 	public ICDISession createDebuggerSession(ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) {
-		return createDebuggerSession(1, launch, exe, monitor);
+		return null;
+	}
+
+	public ICDISession createDebuggerSession(int nprocs, ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) {
+		return null;
 	}
 	
-	public ICDISession createDebuggerSession(int nprocs, ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) {
-		System.out.println("PTPdebugger.createDebuggerSession(" + nprocs + ")");
+	public ICDISession createDebuggerSession(int nprocs, ILaunch launch, File exe, IProgressMonitor monitor) {
 		
 		try {
+			/* Currently, we ignore the executable
 			File cwd = new File("/tmp/");
-			File prog = exe.getPath().toFile();
-			//MISession[] miSessions = new MISession[nprocs];
+			File prog = exe;
+			*/
+
+			DebugSession debug = new DebugSession();
+			debug.load(null, nprocs);
+
+			Session session = new Session(debug);
 			
-			//for (int i = 0; i < nprocs; i++) {
-			//	miSessions[i] = GDBSession.getDefault().createSession(null, prog, cwd, null);
-			//}
+			Process debugger = session.getSessionProcess();
 			
-			//return new Session(miSessions);
+			if (debugger != null) {
+				IProcess debuggerProcess = DebugPlugin.newProcess(launch, debugger, "Debugger");
+				launch.addProcess(debuggerProcess);
+			}
 			
-			return null;
+			return session;
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}		 

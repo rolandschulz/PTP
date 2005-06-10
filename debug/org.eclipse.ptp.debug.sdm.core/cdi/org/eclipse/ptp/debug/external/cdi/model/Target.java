@@ -33,6 +33,8 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.external.DebugSession;
+import org.eclipse.ptp.debug.external.cdi.Location;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
 
@@ -40,16 +42,23 @@ import org.eclipse.ptp.debug.external.cdi.SessionObject;
  */
 public class Target extends SessionObject implements IPCDITarget {
 	private TargetConfiguration fConfiguration;
+	private DebugSession dSession;
 	
-	public Target(Session s) {
+	public Target(Session s, DebugSession dS) {
 		super(s);
+		dSession = dS;
 		fConfiguration = new TargetConfiguration(this);
 	}
 
+	public DebugSession getDebugSession() {
+		System.out.println("Target.getDebugSession()");
+		return dSession;
+	}
+	
 	public Process[] getProcesses() {
 		// Auto-generated method stub
 		System.out.println("Target.getProcesses()");
-		return null;
+		return dSession.getDebugger().getProcesses();
 	}
 
 	public Process getProcess() {
@@ -61,7 +70,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public ICDITargetConfiguration getConfiguration() {
 		// Auto-generated method stub
 		System.out.println("Target.getConfiguration()");
-		return null;
+		return fConfiguration;
 	}
 
 	public String evaluateExpressionToString(ICDIStackFrame context, String expressionText) throws CDIException {
@@ -187,7 +196,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public ICDILocation createLocation(String file, String function, int line) {
 		// Auto-generated method stub
 		System.out.println("Target.createLocation()");
-		return null;
+		return new Location(file, function, line);
 	}
 
 	public ICDILocation createLocation(BigInteger address) {

@@ -102,12 +102,6 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 		stateVariables.put("STOP_MODEL", new VStopModel());
 	}
 	
-	public void addDebuggerObserver(Observer obs) {
-		this.addObserver(obs);
-	}
-	
-	public abstract void destroyDebugger();
-	
 	public boolean isExiting() {
 		return isExitingFlag;
 	}
@@ -154,9 +148,6 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 		commandHistory.add(new CQuit());
 	}
 
-	/* Serial program */
-	public abstract void load(String prg);
-
 	/* Parallel program */
 	public void load(String prg, int numProcs) {
 		debuggedProgram = prg;
@@ -173,8 +164,6 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 			commandHistory.add(new CRun(args));
 	}
 	
-	public abstract void run();
-		
 	public DebugCommand[] history() {
 		DebugCommand[] retValue;
 		int hSize = commandHistory.size();
@@ -533,6 +522,10 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 		}
 			
 		commandHistory.add(new CFocus(name));
+	}
+
+	public void addDebuggerObserver(Observer obs) {
+		this.addObserver(obs);
 	}
 	
 	public void notifyObservers(Object arg) {

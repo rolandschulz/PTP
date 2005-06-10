@@ -38,7 +38,7 @@ public class TargetConfiguration extends PTPObject implements ICDITargetConfigur
 	public boolean supportsResume() {
 		// Auto-generated method stub
 		System.out.println("TargetConfiguration.supportsResume()");
-		return false;
+		return true;
 	}
 
 	public boolean supportsRestart() {
@@ -62,7 +62,7 @@ public class TargetConfiguration extends PTPObject implements ICDITargetConfigur
 	public boolean supportsBreakpoints() {
 		// Auto-generated method stub
 		System.out.println("TargetConfiguration.supportsBreakpoints()");
-		return false;
+		return true;
 	}
 
 	public boolean supportsRegisters() {

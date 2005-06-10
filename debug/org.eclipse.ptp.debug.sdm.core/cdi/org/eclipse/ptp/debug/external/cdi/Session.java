@@ -9,6 +9,7 @@ import org.eclipse.cdt.debug.core.cdi.ICDISessionConfiguration;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
 public class Session implements IPCDISession, ICDISessionObject {
@@ -16,10 +17,10 @@ public class Session implements IPCDISession, ICDISessionObject {
 	SessionConfiguration configuration;
 	Target[] targets;
 	
-	public Session() {
+	public Session(DebugSession dSession) {
 		props = new Properties();
 		configuration = new SessionConfiguration(this);
-		targets = new Target[] {new Target(this)};
+		targets = new Target[] {new Target(this, dSession)};
 	}
 
 	public ICDITarget[] getTargets() {
@@ -60,8 +61,8 @@ public class Session implements IPCDISession, ICDISessionObject {
 		// Auto-generated method stub
 		System.out.println("Session.getSessionProcess()");
 		if (targets != null && targets.length > 0) {
-			//MISession miSession = ((Target)targets[0]).getMISession();
-			//return miSession.getSessionProcess();
+			DebugSession dS = ((Target) targets[0]).getDebugSession();
+			return dS.getDebugger().getSessionProcess();
 		}
 		return null;
 	}
