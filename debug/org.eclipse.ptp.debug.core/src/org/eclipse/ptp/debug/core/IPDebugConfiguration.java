@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core;
 
-import org.eclipse.cdt.debug.core.ICDIDebugger;
 import org.eclipse.core.runtime.CoreException;
 
 public interface IPDebugConfiguration {
@@ -21,9 +20,9 @@ public interface IPDebugConfiguration {
 	 * @throws CoreException
 	 * @deprecated
 	 */
-	ICDIDebugger getDebugger() throws CoreException;
+	IPCDIDebugger getDebugger() throws CoreException;
 	
-	ICDIDebugger createDebugger() throws CoreException;
+	IPCDIDebugger createDebugger() throws CoreException;
 	String getName();
 	String getID();
 	String getPlatform();
