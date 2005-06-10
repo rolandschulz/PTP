@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.debug.core.IPCDIDebugger;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 
 public class PDebugConfiguration implements IPDebugConfiguration {
@@ -41,20 +42,20 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 		return fElement;
 	}
 
-	public ICDIDebugger getDebugger() throws CoreException {
+	public IPCDIDebugger getDebugger() throws CoreException {
 		Object debugger = getConfigurationElement().createExecutableExtension("class"); //$NON-NLS-1$
-		if (debugger instanceof ICDIDebugger) {
-			return (ICDIDebugger)debugger;
+		if (debugger instanceof IPCDIDebugger) {
+			return (IPCDIDebugger)debugger;
 		}
 		throw new CoreException(new Status(IStatus.ERROR, "PTPDebugCorePlugin", -1, "Error", null)); //$NON-NLS-1$
 	}
 
-	public ICDIDebugger createDebugger() throws CoreException {
+	public IPCDIDebugger createDebugger() throws CoreException {
 		Object debugger = getConfigurationElement().createExecutableExtension("class"); //$NON-NLS-1$
-		if (debugger instanceof ICDIDebugger) {
-			return (ICDIDebugger)debugger;
+		if (debugger instanceof IPCDIDebugger) {
+			return (IPCDIDebugger)debugger;
 		}
-		return (ICDIDebugger)debugger;
+		return (IPCDIDebugger)debugger;
 	}
 
 	public String getName() {

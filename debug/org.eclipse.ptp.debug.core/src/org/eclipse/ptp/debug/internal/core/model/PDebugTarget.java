@@ -1,9 +1,16 @@
 package org.eclipse.ptp.debug.internal.core.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
+import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.cdt.debug.core.cdi.ICDILocation;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.cdt.debug.core.model.CDebugElementState;
 import org.eclipse.cdt.debug.core.model.ICBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
@@ -11,15 +18,16 @@ import org.eclipse.cdt.debug.core.model.ICModule;
 import org.eclipse.cdt.debug.core.model.ICSignal;
 import org.eclipse.cdt.debug.core.model.IDisassembly;
 import org.eclipse.cdt.debug.core.model.IGlobalVariableDescriptor;
+import org.eclipse.cdt.debug.internal.core.CBreakpointManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.IExpressionListener;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchListener;
 import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IExpression;
 import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
@@ -27,13 +35,50 @@ import org.eclipse.debug.core.model.IThread;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.IPProcess;
+import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
 
 public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEventListener, ILaunchListener, IExpressionListener {
-	IPCDITarget target;
+	private ArrayList fThreads;
+
+	private String fName;
+	private ILaunch fLaunch;
+	private IProcess[] fDebuggeeProcesses;
+	private IPCDITarget fPCDITarget;
+	private ICDITargetConfiguration fConfig;
+	private PBreakpointManager fBreakpointManager;
 	
-	public PDebugTarget(ILaunch launch, IPCDITarget t) {
-		target = t;
-		launch.addDebugTarget(this);
+	public PDebugTarget(ILaunch launch, IPCDITarget target, IProcess[] iprocs) {
+		fName = "DebugSimulator";
+		fLaunch = launch;
+		setDebugTarget(this);
+		fDebuggeeProcesses = iprocs;
+		fPCDITarget = target;
+		fConfig = target.getConfiguration();
+		
+		setState( CDebugElementState.SUSPENDED );
+		
+		fThreads = new ArrayList( 5 );
+		fBreakpointManager = new PBreakpointManager(this);
+		
+		ArrayList debugEvents = new ArrayList( 1 );
+		debugEvents.add( createCreateEvent() );
+		
+		getLaunch().addDebugTarget( this );
+		fireEventSet( (DebugEvent[])debugEvents.toArray( new DebugEvent[debugEvents.size()] ) );
+		
+		//DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener( this );
+		//DebugPlugin.getDefault().getLaunchManager().addLaunchListener( this );
+		//DebugPlugin.getDefault().getExpressionManager().addExpressionListener( this );
+		//getCDISession().getEventManager().addEventListener( this );
+	}
+	
+	public void setInternalTemporaryBreakpoint( ICDILocation location ) throws DebugException {
+		try {
+			fPCDITarget.setLocationBreakpoint( ICDIBreakpoint.TEMPORARY, location, null, false );
+		}
+		catch( CDIException e ) {
+			targetRequestFailed( e.getMessage(), null );
+		}
 	}
 	
 	public boolean hasProcesses() throws DebugException {
@@ -96,19 +141,28 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return null;
 	}
 
+	protected ArrayList getThreadList() {
+		return fThreads;
+	}
+
+	private void setThreadList( ArrayList threads ) {
+		fThreads = threads;
+	}
+	
 	public IThread[] getThreads() throws DebugException {
 		System.out.println("PDebugTarget.getThreads()");
-		return null;
+		List threads = getThreadList();
+		return (IThread[])threads.toArray( new IThread[threads.size()] );
 	}
 
 	public boolean hasThreads() throws DebugException {
 		System.out.println("PDebugTarget.hasThreads()");
-		return false;
+		return getThreadList().size() > 0;
 	}
 
 	public String getName() throws DebugException {
 		System.out.println("PDebugTarget.getName()");
-		return null;
+		return fName;
 	}
 
 	public boolean supportsBreakpoint(IBreakpoint breakpoint) {
@@ -116,19 +170,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return false;
 	}
 
-	public String getModelIdentifier() {
-		System.out.println("PDebugTarget.getModelIdentifier()");
-		return null;
-	}
-
-	public IDebugTarget getDebugTarget() {
-		System.out.println("PDebugTarget.getDebugTarget()");
-		return null;
-	}
-
 	public ILaunch getLaunch() {
 		System.out.println("PDebugTarget.getLaunch()");
-		return null;
+		return fLaunch;
 	}
 
 	public boolean canTerminate() {
@@ -138,7 +182,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 
 	public boolean isTerminated() {
 		System.out.println("PDebugTarget.isTerminated()");
-		return false;
+		return ( getState().equals( CDebugElementState.TERMINATED ) );
 	}
 
 	public void terminate() throws DebugException {
@@ -148,7 +192,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 
 	public boolean canResume() {
 		System.out.println("PDebugTarget.canResume()");
-		return false;
+		return fConfig.supportsResume() && isSuspended();
 	}
 
 	public boolean canSuspend() {
@@ -161,9 +205,29 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return false;
 	}
 
+	private void changeState( CDebugElementState state ) {
+		System.out.println("PDebugTarget.changeState()");
+		setState( state );
+//		Iterator it = getThreadList().iterator();
+//		while( it.hasNext() ) {
+//			((CThread)it.next()).setState( state );
+//		}
+	}
+	
 	public void resume() throws DebugException {
 		System.out.println("PDebugTarget.resume()");
 		
+		if ( !canResume() )
+			return;
+		changeState( CDebugElementState.RESUMING );
+		try {
+			fPCDITarget.resume( false );
+		}
+		catch( CDIException e ) {
+			System.out.println("Error in PDebugTarget.resume()");
+			targetRequestFailed( e.getMessage(), null );
+		}
+
 	}
 
 	public void suspend() throws DebugException {
@@ -198,7 +262,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 
 	public boolean isDisconnected() {
 		System.out.println("PDebugTarget.isDisconnected()");
-		return false;
+		return ( getState().equals( CDebugElementState.DISCONNECTED ) );
 	}
 
 	public boolean supportsStorageRetrieval() {
@@ -301,11 +365,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return false;
 	}
 
-	public CDebugElementState getState() {
-		System.out.println("PDebugTarget.getState()");
-		return null;
-	}
-
 	public Object getCurrentStateInfo() {
 		System.out.println("PDebugTarget.getCurrentStateInfo()");
 		return null;
@@ -395,4 +454,14 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		System.out.println("PDebugTarget.getMessage()");
 		return null;
 	}
+	
+	public Object getAdapter( Class adapter ) {
+		System.out.println("PDebugTarget.getAdapter() - " + adapter.getName());
+		if ( adapter.equals( IPCDITarget.class ) )
+			return fPCDITarget;
+		if ( adapter.equals( CBreakpointManager.class ) )
+			return fBreakpointManager;
+		return super.getAdapter( adapter );
+	}
+	
 }

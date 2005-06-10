@@ -19,6 +19,7 @@
       <import plugin="org.eclipse.debug.core"/>
       <import plugin="org.eclipse.cdt.core"/>
       <import plugin="org.eclipse.cdt.debug.core"/>
+      <import plugin="org.eclipse.ptp.core"/>
    </requires>
    
    <extension-point id="PTPDebugger" name="Parallel Tools Core Debugger Extension" schema="schema/PTPDebugger.exsd"/>
