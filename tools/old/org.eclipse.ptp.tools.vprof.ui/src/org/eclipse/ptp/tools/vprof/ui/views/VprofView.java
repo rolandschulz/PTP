@@ -21,6 +21,8 @@ package org.eclipse.ptp.tools.vprof.ui.views;
 
 import java.util.ArrayList;
 
+import org.eclipse.ptp.tools.vprof.internal.ui.views.VprofViewContentProvider;
+import org.eclipse.ptp.tools.vprof.internal.ui.views.VprofViewLabelProvider;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.*;
 import org.eclipse.jface.viewers.*;
@@ -30,6 +32,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.*;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.SWT;
+import org.eclipse.cdt.core.model.CoreModel;
+import org.eclipse.cdt.internal.ui.viewsupport.AppearanceAwareLabelProvider;
+import org.eclipse.cdt.internal.ui.viewsupport.CElementImageProvider;
 import org.eclipse.core.runtime.IAdaptable;
 
 
@@ -172,6 +177,7 @@ public class VprofView extends ViewPart {
 			invisibleRoot.addChild(root);
 		}
 	}
+	
 	class ViewLabelProvider extends LabelProvider {
 
 		public String getText(Object obj) {
@@ -200,10 +206,10 @@ public class VprofView extends ViewPart {
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		drillDownAdapter = new DrillDownAdapter(viewer);
-		viewer.setContentProvider(new ViewContentProvider());
-		viewer.setLabelProvider(new ViewLabelProvider());
+		viewer.setContentProvider(new VprofViewContentProvider(false, false));
+		viewer.setLabelProvider(new VprofViewLabelProvider(AppearanceAwareLabelProvider.DEFAULT_TEXTFLAGS, AppearanceAwareLabelProvider.DEFAULT_IMAGEFLAGS | CElementImageProvider.SMALL_ICONS));
 		viewer.setSorter(new NameSorter());
-		viewer.setInput(getViewSite());
+		viewer.setInput(CoreModel.getDefault().getCModel());
 		makeActions();
 		hookContextMenu();
 		hookDoubleClickAction();
