@@ -14,6 +14,13 @@ extern "C" {
  */
 JNIEXPORT void JNICALL Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_testHelloWorld
   (JNIEnv *, jobject);
+/*
+ * Class:     org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel
+ * Method:    OMPIRun
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIRun
+  (JNIEnv *, jobject);
 
 #ifdef __cplusplus
 }
