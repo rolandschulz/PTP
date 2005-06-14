@@ -527,6 +527,10 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 	public void addDebuggerObserver(Observer obs) {
 		this.addObserver(obs);
 	}
+
+	public void deleteDebuggerObserver(Observer obs) {
+		this.deleteObserver(obs);
+	}
 	
 	public void notifyObservers(Object arg) {
 		setChanged();
