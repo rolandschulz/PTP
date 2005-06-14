@@ -277,5 +277,8 @@ public class DebugSession {
 	public void addDebuggerObserver(Observer obs) {
 		debugger.addDebuggerObserver(obs);
 	}
-	
+
+	public void deleteDebuggerObserver(Observer obs) {
+		debugger.deleteDebuggerObserver(obs);
+	}
 }

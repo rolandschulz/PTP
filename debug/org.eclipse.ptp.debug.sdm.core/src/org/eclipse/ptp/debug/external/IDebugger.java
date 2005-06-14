@@ -93,6 +93,7 @@ public interface IDebugger {
 	
 	/* Events */
 	public void addDebuggerObserver(Observer obs);
+	public void deleteDebuggerObserver(Observer obs);
 	public void notifyObservers(Object arg);
 	public Queue getEventQueue();
 	public boolean isExiting();
@@ -107,3 +108,4 @@ public interface IDebugger {
 	public abstract Process[] getProcesses();
 
 }
+

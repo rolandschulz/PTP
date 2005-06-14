@@ -13,42 +13,69 @@ import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
 public class Session implements IPCDISession, ICDISessionObject {
+	
+	public final static Target[] EMPTY_TARGETS = {};
+	ProcessManager processManager;
+	EventManager eventManager;
+	BreakpointManager breakpointManager;
+	
 	Properties props;
 	SessionConfiguration configuration;
-	Target[] targets;
 	
 	public Session(DebugSession dSession) {
 		props = new Properties();
 		configuration = new SessionConfiguration(this);
-		targets = new Target[] {new Target(this, dSession)};
+		
+		processManager = new ProcessManager(this);
+		eventManager = new EventManager(this);
+		breakpointManager = new BreakpointManager(this);
+		
+		Target target = new Target(this, dSession);
+		addTargets(new Target[] { target });
 	}
 
+	public void addTargets(Target[] targets) {
+		processManager.addTargets(targets);
+	}
+
+	public void removeTargets(Target[] targets) {
+		processManager.removeTargets(targets);
+	}
+
+	public Target getTarget(DebugSession miSession) {
+		return processManager.getTarget(miSession);
+	}
+	
 	public ICDITarget[] getTargets() {
-		return targets;
+		return processManager.getCDITargets();
 	}
 
 	public void setAttribute(String key, String value) {
 		// Auto-generated method stub
 		System.out.println("Session.setAttribute()");
-		
+		props.setProperty(key, value);
 	}
 
 	public String getAttribute(String key) {
 		// Auto-generated method stub
 		System.out.println("Session.getAttribute()");
-		return null;
+		return props.getProperty(key);
 	}
 
+	public BreakpointManager getBreakpointManager() {
+		System.out.println("Session.getBreakpointManager()");
+		return breakpointManager;
+	}
+	
 	public ICDIEventManager getEventManager() {
-		// Auto-generated method stub
 		System.out.println("Session.getEventManager()");
-		return null;
+		return eventManager;
 	}
 
 	public ICDISessionConfiguration getConfiguration() {
 		// Auto-generated method stub
 		System.out.println("Session.getConfiguration()");
-		return null;
+		return configuration;
 	}
 
 	public void terminate() throws CDIException {
@@ -57,9 +84,16 @@ public class Session implements IPCDISession, ICDISessionObject {
 		
 	}
 
+	public Process getSessionProcess(ICDITarget target) {
+		DebugSession miSession = ((Target)target).getDebugSession();
+		return miSession.getDebugger().getSessionProcess();
+	}
+
 	public Process getSessionProcess() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Session.getSessionProcess()");
+		
+		ICDITarget[] targets = getTargets();
 		if (targets != null && targets.length > 0) {
 			DebugSession dS = ((Target) targets[0]).getDebugSession();
 			return dS.getDebugger().getSessionProcess();
@@ -70,6 +104,6 @@ public class Session implements IPCDISession, ICDISessionObject {
 	public ICDISession getSession() {
 		// Auto-generated method stub
 		System.out.println("Session.getSession()");
-		return null;
+		return this;
 	}
 }

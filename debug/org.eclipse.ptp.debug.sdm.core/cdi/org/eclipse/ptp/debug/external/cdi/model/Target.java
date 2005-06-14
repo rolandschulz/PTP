@@ -34,7 +34,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.DebugSession;
-import org.eclipse.ptp.debug.external.cdi.Location;
+import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
 
@@ -56,19 +56,16 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 	
 	public Process[] getProcesses() {
-		// Auto-generated method stub
 		System.out.println("Target.getProcesses()");
 		return dSession.getDebugger().getProcesses();
 	}
 
 	public Process getProcess() {
-		// Auto-generated method stub
 		System.out.println("Target.getProcess()");
-		return null;
+		return getProcesses()[0];
 	}
 
 	public ICDITargetConfiguration getConfiguration() {
-		// Auto-generated method stub
 		System.out.println("Target.getConfiguration()");
 		return fConfiguration;
 	}
@@ -196,13 +193,15 @@ public class Target extends SessionObject implements IPCDITarget {
 	public ICDILocation createLocation(String file, String function, int line) {
 		// Auto-generated method stub
 		System.out.println("Target.createLocation()");
-		return new Location(file, function, line);
+		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
+		return bMgr.createLocation(file, function, line);
 	}
 
 	public ICDILocation createLocation(BigInteger address) {
 		// Auto-generated method stub
 		System.out.println("Target.createLocation()");
-		return null;
+		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
+		return bMgr.createLocation(address);
 	}
 
 	public ICDIThread[] getThreads() throws CDIException {

@@ -52,7 +52,7 @@ public class GDBDebugger extends AbstractDebugger {
 	public void destroyDebugger() {
 		postGDBCommand(allSet, factory.createMIGDBExit());
 		allSet.clear();
-		fireEvent(new EExit());
+		//fireEvent(new EExit());
 	}
 	
 	public void exit() {
