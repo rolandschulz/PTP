@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Core Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.tools.vprof.core
+Bundle-Version: 1.0.0
+Bundle-ClassPath: vprof_core.jar
+Bundle-Activator: org.eclipse.ptp.tools.vprof.core.CorePlugin
+Bundle-Localization: plugin
+Eclipse-AutoStart: true
