@@ -38,7 +38,7 @@ public class VMonFile {
 		
 		efile.setEndian(false);
 		
-		int magic = efile.readIntE();
+		int magic = (int)efile.readIntE();
 		
 		if (magic == VMON_MAGIC_BE)
 			efile.setEndian(true);
@@ -50,7 +50,7 @@ public class VMonFile {
 		if (version < 3)
 			return;
 		
-		int count = efile.readIntE();
+		int count = (int)efile.readIntE();
 		data = new VMonData[count];
 		
 		for (int i = 0; i < count; i++) {

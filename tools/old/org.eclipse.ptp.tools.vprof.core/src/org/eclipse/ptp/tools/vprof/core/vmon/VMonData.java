@@ -56,11 +56,11 @@ public class VMonData {
 		}
 		
 		if (file_version > 3) {
-			oor = efile.readIntE();
-			ovr = efile.readIntE();
+			oor = (int)efile.readIntE();
+			ovr = (int)efile.readIntE();
 		}
 		
-		int npc = efile.readIntE();
+		int npc = (int)efile.readIntE();
 		byte off[] = efile.readBytesE(VMON_OFF64);
 		offset = new BigInteger(off);
 		

@@ -21,6 +21,11 @@ package org.eclipse.ptp.tools.vprof.core.vmon;
 
 import java.io.IOException;
 
+import org.eclipse.cdt.utils.elf.parser.ElfParser;
+import org.eclipse.cdt.core.IBinaryParser;
+import org.eclipse.cdt.core.IBinaryParser.IBinaryFile;
+import org.eclipse.core.runtime.Path;
+
 public class test {
 
 	/**
@@ -34,6 +39,7 @@ public class test {
 			vf.Read("vmon.out");
 		} catch (IOException e) {
 			System.out.println("could not open file: " + e.getMessage());
+			return;
 		}
 		
 		for (int i = 0; i < vf.getData().length; i++) {
@@ -48,6 +54,23 @@ public class test {
 				System.out.println(" count = " + vi[j].count);
 			}
 		}
+		
+		IBinaryFile bf;
+		ElfParser parser = new ElfParser();
+		Path p = new Path("test2");
+	
+		try {
+			bf = parser.getBinary(p);
+		} catch (IOException e) {
+			System.out.println("could not open binary: " + e.getMessage());
+			return;
+		}
+		
+		if (bf.getType() == IBinaryFile.EXECUTABLE)
+			System.out.println("is an executable");
+		else
+			System.out.println("isnt an executable");
+		
 	}
 
 }

@@ -1,14 +1,13 @@
 package org.eclipse.ptp.tools.vprof.core;
 
-import org.eclipse.ui.plugin.*;
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 import java.util.*;
 
 /**
  * The main plugin class to be used in the desktop.
  */
-public class CorePlugin extends AbstractUIPlugin {
+public class CorePlugin extends Plugin {
 	//The shared instance.
 	private static CorePlugin plugin;
 	//Resource bundle.
@@ -69,16 +68,5 @@ public class CorePlugin extends AbstractUIPlugin {
 			resourceBundle = null;
 		}
 		return resourceBundle;
-	}
-
-	/**
-	 * Returns an image descriptor for the image file at the given
-	 * plug-in relative path.
-	 *
-	 * @param path the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.tools.vprof.core", path);
 	}
 }
