@@ -19,8 +19,11 @@
 
 package org.eclipse.ptp.tools.vprof.ui.views;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
+import org.eclipse.ptp.tools.vprof.core.vmon.VMonData;
+import org.eclipse.ptp.tools.vprof.core.vmon.VMonFile;
 import org.eclipse.ptp.tools.vprof.internal.ui.views.VprofViewContentProvider;
 import org.eclipse.ptp.tools.vprof.internal.ui.views.VprofViewLabelProvider;
 import org.eclipse.swt.widgets.Composite;
@@ -32,10 +35,36 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.*;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.SWT;
+import org.eclipse.cdt.core.CCorePlugin;
+import org.eclipse.cdt.core.IAddress;
+import org.eclipse.cdt.core.IBinaryParser;
+import org.eclipse.cdt.core.ICDescriptor;
+import org.eclipse.cdt.core.ICExtensionReference;
+import org.eclipse.cdt.core.IBinaryParser.IBinaryFile;
+import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
+import org.eclipse.cdt.core.IBinaryParser.ISymbol;
 import org.eclipse.cdt.core.model.CoreModel;
+import org.eclipse.cdt.core.model.ElementChangedEvent;
+import org.eclipse.cdt.core.model.IBinary;
+import org.eclipse.cdt.core.model.ICElement;
+import org.eclipse.cdt.core.model.ICModel;
+import org.eclipse.cdt.core.model.IElementChangedListener;
+import org.eclipse.cdt.internal.core.model.BinaryParserConfig;
+import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.ui.viewsupport.AppearanceAwareLabelProvider;
 import org.eclipse.cdt.internal.ui.viewsupport.CElementImageProvider;
+import org.eclipse.cdt.utils.CPPFilt;
+import org.eclipse.cdt.utils.IGnuToolFactory;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 
 
 /**
@@ -59,8 +88,7 @@ import org.eclipse.core.runtime.IAdaptable;
 public class VprofView extends ViewPart {
 	private TreeViewer viewer;
 	private DrillDownAdapter drillDownAdapter;
-	private Action action1;
-	private Action action2;
+	private Action analyzeAction;
 	private Action doubleClickAction;
 
 	/*
@@ -190,14 +218,16 @@ public class VprofView extends ViewPart {
 			return PlatformUI.getWorkbench().getSharedImages().getImage(imageKey);
 		}
 	}
+	
 	class NameSorter extends ViewerSorter {
 	}
-
+	
 	/**
 	 * The constructor.
 	 */
 	public VprofView() {
 	}
+
 
 	/**
 	 * This is a callback that will allow us
@@ -210,12 +240,18 @@ public class VprofView extends ViewPart {
 		viewer.setLabelProvider(new VprofViewLabelProvider(AppearanceAwareLabelProvider.DEFAULT_TEXTFLAGS, AppearanceAwareLabelProvider.DEFAULT_IMAGEFLAGS | CElementImageProvider.SMALL_ICONS));
 		viewer.setSorter(new NameSorter());
 		viewer.setInput(CoreModel.getDefault().getCModel());
+		CModelManager.getDefault().addElementChangedListener(new IElementChangedListener() {
+			public void elementChanged(ElementChangedEvent event) {
+				System.out.println("elementChanged()");
+				viewer.refresh();
+			}
+		});
 		makeActions();
 		hookContextMenu();
 		hookDoubleClickAction();
 		contributeToActionBars();
 	}
-
+	
 	private void hookContextMenu() {
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
@@ -235,15 +271,20 @@ public class VprofView extends ViewPart {
 		fillLocalToolBar(bars.getToolBarManager());
 	}
 
+	/**
+	 * Returns the tree viewer which shows the resource hierarchy.
+	 */
+	public TreeViewer getViewer() {
+		return viewer;
+	}
+	
 	private void fillLocalPullDown(IMenuManager manager) {
-		manager.add(action1);
-		manager.add(new Separator());
-		manager.add(action2);
+		manager.add(analyzeAction);
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
-		manager.add(action1);
-		manager.add(action2);
+		IStructuredSelection selection = (IStructuredSelection) getViewer().getSelection();
+		manager.add(analyzeAction);
 		manager.add(new Separator());
 		drillDownAdapter.addNavigationActions(manager);
 		// Other plug-ins can contribute there actions here
@@ -251,32 +292,84 @@ public class VprofView extends ViewPart {
 	}
 	
 	private void fillLocalToolBar(IToolBarManager manager) {
-		manager.add(action1);
-		manager.add(action2);
+		manager.add(analyzeAction);
 		manager.add(new Separator());
 		drillDownAdapter.addNavigationActions(manager);
 	}
-
+	
+	public ISymbol findNearestSym(IAddress addr, ISymbol[] syms) {
+		for (int i = 0; i < syms.length; i++) {
+			if (addr.getValue().compareTo(syms[i].getAddress().getValue()) < 0) {
+				if (i == 0)
+					return syms[0];
+				else
+					return syms[i-1];
+			}
+		}
+		
+		return syms[syms.length-1];
+	}
+	
 	private void makeActions() {
-		action1 = new Action() {
+		analyzeAction = new Action() {
 			public void run() {
-				showMessage("Action 1 executed");
+				
+				ISelection selection = viewer.getSelection();
+				if (!(selection instanceof StructuredSelection))
+					return;
+				
+				Object obj = ((StructuredSelection)selection).getFirstElement();
+				
+				if (!(obj instanceof IBinary)){
+					return;
+				}
+				
+				IBinaryObject bo = (IBinaryObject) ((IBinary)obj).getAdapter(IBinaryObject.class);
+				IBinaryParser parser = bo.getBinaryParser();
+				
+				System.out.println("name=" + bo.getName() + " cpu=" + bo.getCPU());
+			
+				VMonFile vf = new VMonFile();
+				try {
+					vf.Read("/Volumes/Home/greg/Desktop/workspaces/M6/vprof/vmon.out");
+				} catch (IOException e) {
+					System.out.println("could not open file: " + e.getMessage());
+					return;
+				}
+				
+				ISymbol[] syms = bo.getSymbols();
+				for (int i = 0; i < syms.length; i++) {
+					System.out.println(syms[i].getName() + " = " + syms[i].getAddress().toHexAddressString());
+				}
+				
+				for (int i = 0; i < vf.getData().length; i++) {
+					VMonData vd = vf.getData()[i];
+					
+					System.out.println("event " + vd.getEvent().getEventName() + ": " + vd.getEvent().getEventDescription());
+					
+					VMonData.VMonInfo vi[] = vd.getData();
+					
+					for (int j = 0; j < vi.length; j++) {
+						System.out.print(" addr = " + vi[j].address.toHexAddressString());
+						System.out.print(" (" + vi[j].count + ") ");
+						
+						ISymbol sym = findNearestSym(vi[j].address, bo.getSymbols());
+						
+						if (sym != null) {
+							System.out.print(": " + sym.getName());
+						}
+						
+						System.out.println();
+					}
+				}
+				
 			}
 		};
-		action1.setText("Action 1");
-		action1.setToolTipText("Action 1 tooltip");
-		action1.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
+		analyzeAction.setText("Analyze");
+		analyzeAction.setToolTipText("Analyse profile information");
+		analyzeAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
 			getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 		
-		action2 = new Action() {
-			public void run() {
-				showMessage("Action 2 executed");
-			}
-		};
-		action2.setText("Action 2");
-		action2.setToolTipText("Action 2 tooltip");
-		action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
-				getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 		doubleClickAction = new Action() {
 			public void run() {
 				ISelection selection = viewer.getSelection();

@@ -14,5 +14,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.cdt.core,
  org.eclipse.cdt.ui,
  org.eclipse.core.resources,
- org.eclipse.jface.text
+ org.eclipse.jface.text,
+ org.eclipse.ptp.tools.vprof.core,
+ org.eclipse.ui.ide
 Eclipse-AutoStart: true
