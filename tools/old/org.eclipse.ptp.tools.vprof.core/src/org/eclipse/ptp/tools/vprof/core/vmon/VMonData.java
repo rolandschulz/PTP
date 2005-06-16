@@ -22,6 +22,9 @@ package org.eclipse.ptp.tools.vprof.core.vmon;
 import java.io.IOException;
 import java.math.BigInteger;
 
+import org.eclipse.cdt.core.IAddress;
+import org.eclipse.cdt.utils.Addr64;
+
 public class VMonData {
 	public final static int VMON_OFF = 4;
 	public final static int VMON_OFF64 = 8;
@@ -33,8 +36,8 @@ public class VMonData {
 	private int overflow;
 	
 	public class VMonInfo {
-		BigInteger address; // format needs to include size of address
-		int count;
+		public IAddress address; // format needs to include size of address
+		public int count;
 	}
 	
 	public VMonData(VMonEvents evts) {
@@ -44,7 +47,7 @@ public class VMonData {
 	
 	public void Read(ERandomAccessFile efile, int file_version) throws IOException {
 		StringBuffer name = new StringBuffer();
-		BigInteger offset;
+		Addr64 offset;
 		int oor = 0;
 		int ovr = 0;
 		
@@ -62,7 +65,7 @@ public class VMonData {
 		
 		int npc = (int)efile.readIntE();
 		byte off[] = efile.readBytesE(VMON_OFF64);
-		offset = new BigInteger(off);
+		offset = new Addr64(off);
 		
 		event = events.findEventByName(name.toString());
 		
@@ -73,7 +76,7 @@ public class VMonData {
 			
 			int count = efile.readShortE();
 			data[i].count = count;
-			data[i].address = offset.add(BigInteger.valueOf(count));
+			data[i].address = offset.add(count);
 		}
 	}
 	

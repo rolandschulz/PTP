@@ -9,3 +9,4 @@ Bundle-Localization: plugin
 Eclipse-AutoStart: true
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.cdt.core
+Export-Package: org.eclipse.ptp.tools.vprof.core.vmon
