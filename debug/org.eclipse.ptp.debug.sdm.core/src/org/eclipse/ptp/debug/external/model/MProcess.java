@@ -10,6 +10,13 @@ package org.eclipse.ptp.debug.external.model;
  *
  */
 public class MProcess {
+	final static int SUSPENDED = 1;
+	final static int RUNNING = 2;
+	final static int TERMINATED = 4;
+	int state = 0;
+	boolean connected = false;
+
+	
 	/* debugInfo holds an internal state of the debugger associated
 	 * with this MProcess
 	 * It is an Object so that it's generic and not tied to any
@@ -74,5 +81,41 @@ public class MProcess {
 	
 	public String getDebuggerOutput() {
 		return debuggerOutput;
+	}
+	
+	public boolean isSuspended() {
+		return state == SUSPENDED;
+	}
+
+	public boolean isRunning() {
+		return state == RUNNING;
+	}
+
+	public boolean isTerminated() {
+		return state == TERMINATED;
+	}
+
+	public boolean isConnected() {
+		return connected;
+	}
+	
+	public void setConnected() {
+		connected = true;
+	}
+
+	public void setDisconnected() {
+		connected = false;
+	}
+
+	public void setSuspended() {
+		state = SUSPENDED;
+	}
+
+	public void setRunning() {
+		state = RUNNING;
+	}
+
+	public void setTerminated() {
+		state = TERMINATED;
 	}
 }

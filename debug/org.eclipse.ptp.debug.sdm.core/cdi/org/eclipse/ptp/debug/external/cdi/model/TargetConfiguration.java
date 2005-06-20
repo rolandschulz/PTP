@@ -20,19 +20,19 @@ public class TargetConfiguration extends PTPObject implements ICDITargetConfigur
 	public boolean supportsTerminate() {
 		// Auto-generated method stub
 		System.out.println("TargetConfiguration.supportsTerminate()");
-		return false;
+		return true;
 	}
 
 	public boolean supportsDisconnect() {
 		// Auto-generated method stub
 		System.out.println("TargetConfiguration.supportsDisconnect()");
-		return false;
+		return true;
 	}
 
 	public boolean supportsSuspend() {
 		// Auto-generated method stub
 		System.out.println("TargetConfiguration.supportsSuspend()");
-		return false;
+		return true;
 	}
 
 	public boolean supportsResume() {
@@ -44,7 +44,7 @@ public class TargetConfiguration extends PTPObject implements ICDITargetConfigur
 	public boolean supportsRestart() {
 		// Auto-generated method stub
 		System.out.println("TargetConfiguration.supportsRestart()");
-		return false;
+		return true;
 	}
 
 	public boolean supportsStepping() {

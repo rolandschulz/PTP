@@ -15,6 +15,10 @@ import java.util.Observer;
 
 import org.eclipse.cdt.debug.core.cdi.ICDIEventManager;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
+import org.eclipse.ptp.debug.external.event.EBreakpointCreated;
+import org.eclipse.ptp.debug.external.event.EBreakpointHit;
+import org.eclipse.ptp.debug.external.event.EExit;
+import org.eclipse.ptp.debug.external.event.EInferiorCreated;
 
 /**
  */
@@ -41,5 +45,16 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 		// Auto-generated method stub
 		System.out.println("EventManager.update()");
 		
+		if (arg1 instanceof EExit) {
+			System.out.println("Exit Event Received");
+		} else if (arg1 instanceof EBreakpointCreated) {
+			System.out.println("BreakpointCreated Event Received");
+		} else if (arg1 instanceof EBreakpointHit) {
+			System.out.println("BreakpointHit Event Received");
+		} else if (arg1 instanceof EInferiorCreated) {
+			System.out.println("InferiorCreated Event Received");
+		} else {
+			System.out.println("Unknown Event");
+		}
 	}
 }
