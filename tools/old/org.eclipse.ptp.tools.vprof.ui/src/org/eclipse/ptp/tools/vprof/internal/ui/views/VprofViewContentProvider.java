@@ -40,20 +40,22 @@ public class VprofViewContentProvider extends CElementContentProvider {
 	/*
 	 * Look for vmon.out
 	 */
-	protected boolean findVprofProject(Object object) throws CModelException {
+	public static IFile findVprofProject(Object object) throws CModelException {
 		if (object instanceof ICProject) {
 			Object[] nonC = ((ICProject)object).getNonCResources();
 			for (int i = 0; i < nonC.length; i++) {
-				if (findVprofProject(nonC[i]))
-					return true;
+				IFile f = findVprofProject(nonC[i]);
+				if (f != null)
+					return f;
 			}
 		} else if (object instanceof IFolder) {
 			IFolder folder = (IFolder)object;
 			try {
 				IResource res[] = folder.members();
 				for (int i = 0; i < res.length; i++) {
-					if (findVprofProject(res[i]))
-						return true;
+					IFile f = findVprofProject(res[i]);
+					if (f != null)
+						return f;
 				}
 			} catch (CoreException e) {
 				//
@@ -61,12 +63,12 @@ public class VprofViewContentProvider extends CElementContentProvider {
 		} else if (object instanceof File) {
 			IFile file = (IFile)object;
 			if (file.getName().compareTo("vmon.out") == 0)
-					return true;
+					return file;
 		} else {
 			System.out.println("unknown");
 		}
 		
-		return false;
+		return null;
 	}
 	
 	/* (non-Javadoc)
@@ -80,7 +82,8 @@ public class VprofViewContentProvider extends CElementContentProvider {
 			try {
 				ICProject[] cproj = cModel.getCProjects();
 				for (int i = 0; i < cproj.length; i++) {
-					if (findVprofProject(cproj[i]))
+					IFile file = findVprofProject(cproj[i]);
+					if (file != null)
 							list.add(cproj[i]);
 				}
 			} catch (CModelException e) {

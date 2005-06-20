@@ -43,24 +43,29 @@ import org.eclipse.cdt.core.ICExtensionReference;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryFile;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.core.IBinaryParser.ISymbol;
+import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ElementChangedEvent;
 import org.eclipse.cdt.core.model.IBinary;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICModel;
+import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.core.model.IElementChangedListener;
+import org.eclipse.cdt.core.model.ISourceRoot;
 import org.eclipse.cdt.internal.core.model.BinaryParserConfig;
 import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.ui.viewsupport.AppearanceAwareLabelProvider;
 import org.eclipse.cdt.internal.ui.viewsupport.CElementImageProvider;
 import org.eclipse.cdt.utils.CPPFilt;
 import org.eclipse.cdt.utils.IGnuToolFactory;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -329,9 +334,25 @@ public class VprofView extends ViewPart {
 				
 				System.out.println("name=" + bo.getName() + " cpu=" + bo.getCPU());
 			
+				IFile vmon;
+				IPath root;
+				try {
+					ICProject cp = ((IBinary)obj).getCProject();
+					root = cp.getCModel().getWorkspace().getRoot().getLocation();
+					System.out.println("workspace path = " + root);
+					vmon = VprofViewContentProvider.findVprofProject(cp);
+				} catch (CModelException e) {
+					System.out.println(e.getMessage());
+					return;
+				}
+				if (vmon == null) {
+					System.out.println("no vmon file!");
+					return;
+				}
+				
 				VMonFile vf = new VMonFile();
 				try {
-					vf.Read("/Volumes/Home/greg/Desktop/workspaces/M6/vprof/vmon.out");
+					vf.Read(root.append(vmon.getFullPath()).toString());
 				} catch (IOException e) {
 					System.out.println("could not open file: " + e.getMessage());
 					return;
