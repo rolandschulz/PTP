@@ -11,7 +11,6 @@ import java.util.Iterator;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.CCorePreferenceConstants;
-import org.eclipse.cdt.core.filetype.ICFileType;
 import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ISourceRange;
@@ -57,6 +56,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
@@ -152,7 +152,7 @@ public class FortranEditor extends CEditor implements ISelectionChangedListener,
 	
 
 	/** The outline page */
-	protected CContentOutlinePage fOutlinePage;
+	protected FortranContentOutlinePage fOutlinePage;
 	
 	/** Search actions **/
 	private ActionGroup fSelectionSearchGroup;
@@ -228,7 +228,7 @@ public class FortranEditor extends CEditor implements ISelectionChangedListener,
 	protected void initializeEditor() {
 		FortranTextTools textTools = FortranUIPlugin.getDefault().getTextTools();
 		setSourceViewerConfiguration(new FortranSourceViewerConfiguration(textTools, this));
-		setDocumentProvider(CUIPlugin.getDefault().getDocumentProvider());
+		setDocumentProvider(FortranUIPlugin.getDefault().getDocumentProvider());
 	
 		setEditorContextMenuId("#CEditorContext"); //$NON-NLS-1$
 		setRulerContextMenuId("#CEditorRulerContext"); //$NON-NLS-1$
@@ -282,9 +282,9 @@ public class FortranEditor extends CEditor implements ISelectionChangedListener,
 	 * Gets the outline page of the c-editor.
      * @return Outline page.
 	 */
-	public CContentOutlinePage getOutlinePage() {
+	public IContentOutlinePage getOutlinePage() {
 		if (fOutlinePage == null) {
-			fOutlinePage = new CContentOutlinePage(this);
+			fOutlinePage = new FortranContentOutlinePage(this);
 			fOutlinePage.addSelectionChangedListener(this);
 		}
 		setOutlinePageInput(fOutlinePage, getEditorInput());
@@ -618,8 +618,10 @@ public class FortranEditor extends CEditor implements ISelectionChangedListener,
 		if (originalElement instanceof IFileEditorInput) {
 			IFile file= ((IFileEditorInput) originalElement).getFile();
 			if (file != null) {
-				ICFileType type = CCorePlugin.getDefault().getFileType(file.getProject(), file.getName());
-				oldLanguage = type.getLanguage().getId();
+				IContentType type = CCorePlugin.getContentType(file.getProject(), file.getName());
+				if (type != null) {
+					oldLanguage = type.getId();
+				}
 				if (oldLanguage == null) {
 					return false;
 				}
@@ -630,8 +632,10 @@ public class FortranEditor extends CEditor implements ISelectionChangedListener,
 		if (movedElement instanceof IFileEditorInput) {
 			IFile file = ((IFileEditorInput) movedElement).getFile();
 			if (file != null) {
-				ICFileType type = CCorePlugin.getDefault().getFileType(file.getProject(), file.getName());
-				newLanguage = type.getLanguage().getId();
+				IContentType type = CCorePlugin.getContentType(file.getProject(), file.getName());
+				if (type != null) {
+					newLanguage = type.getId();
+				}
 				if (newLanguage == null) {
 					return false;
 				}
@@ -763,7 +767,7 @@ public class FortranEditor extends CEditor implements ISelectionChangedListener,
 	 * @param page Page to set the input.
 	 * @param input Input to set.
 	 */
-	public static void setOutlinePageInput(CContentOutlinePage page, IEditorInput input) {
+	public static void setOutlinePageInput(FortranContentOutlinePage page, IEditorInput input) {
 		if (page != null) {
 			IWorkingCopyManager manager = CUIPlugin.getDefault().getWorkingCopyManager();
 			page.setInput(manager.getWorkingCopy(input));
@@ -771,10 +775,10 @@ public class FortranEditor extends CEditor implements ISelectionChangedListener,
 	}
 
 	/**
-     * Determines is folding enabled.
+     * Determines if folding is enabled.
 	 * @return <code>true</code> if folding is enabled, <code>false</code> otherwise.
 	 */
-	boolean isFoldingEnabled() {
+	protected boolean isFoldingEnabled() {
 		return CUIPlugin.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.EDITOR_FOLDING_ENABLED);
 	}
 
