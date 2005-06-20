@@ -20,6 +20,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.eclipse.core.internal.runtime.InternalPlatform;
+
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.browser.AllTypesCache;
 import org.eclipse.cdt.core.browser.IWorkingCopyProvider;
@@ -34,7 +36,6 @@ import org.eclipse.cdt.internal.ui.ICStatusConstants;
 import org.eclipse.cdt.internal.ui.IContextMenuConstants;
 import org.eclipse.cdt.internal.ui.ResourceAdapterFactory;
 import org.eclipse.cdt.internal.ui.buildconsole.BuildConsoleManager;
-import org.eclipse.cdt.internal.ui.editor.CDocumentProvider;
 import org.eclipse.cdt.internal.ui.editor.CustomBufferFactory;
 import org.eclipse.cdt.internal.ui.editor.ExternalSearchDocumentProvider;
 import org.eclipse.cdt.internal.ui.editor.SharedTextColors;
@@ -59,6 +60,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.fdt.core.FortranCorePlugin;
+import org.eclipse.fdt.internal.ui.editor.FortranDocumentProvider;
 import org.eclipse.fdt.internal.ui.text.FortranTextTools;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuManager;
@@ -334,7 +336,7 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 	// ------ FortranUIPlugin
 
 	private CoreModel fCoreModel;
-	private CDocumentProvider fDocumentProvider;
+	private FortranDocumentProvider fDocumentProvider;
 	private ExternalSearchDocumentProvider fExternalDocumentProvider;
 	private IBufferFactory fBufferFactory;
 	private WorkingCopyManager fWorkingCopyManager;
@@ -361,15 +363,17 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 	public FortranUIPlugin() {
 		fgFortranPlugin = this;
 		fDocumentProvider = null;
-		fTextTools = null;		
+		fTextTools = null;
+		// Optionally (remove comments) turn on debuggin messages for preferences
+		// InternalPlatform.DEBUG_PREFERENCE_GET = true;
 	}
 		
 	/**
 	 * Returns the used document provider
 	 */
-	public synchronized CDocumentProvider getDocumentProvider() {
+	public synchronized FortranDocumentProvider getDocumentProvider() {
 		if (fDocumentProvider == null) {
-			fDocumentProvider = new CDocumentProvider();
+			fDocumentProvider = new FortranDocumentProvider();
 		}
 		return fDocumentProvider;
 	}
@@ -389,7 +393,7 @@ public class FortranUIPlugin extends AbstractUIPlugin {
 	 */
 	public synchronized IWorkingCopyManager getWorkingCopyManager() {
 		if (fWorkingCopyManager == null) {
-			CDocumentProvider provider = getDocumentProvider();
+			FortranDocumentProvider provider = getDocumentProvider();
 			fWorkingCopyManager = new WorkingCopyManager(provider);
 		}
 		return fWorkingCopyManager;
