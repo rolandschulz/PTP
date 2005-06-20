@@ -453,4 +453,53 @@ public class GDBDebugger extends AbstractDebugger {
 		}
 		return proc;
 	}
+
+	public void disconnect() {
+		// Auto-generated method stub
+		System.out.println("GDBDebugger.disconnect()");
+		int listSize = allSet.getSize();
+		for (int i = 0; i < listSize; i++) {
+			System.out.println("disconnecting: " + allSet.getProcess(i).getName());
+		}
+
+	}
+
+	public void resume() {
+		// Auto-generated method stub
+		System.out.println("GDBDebugger.resume()");
+		int listSize = allSet.getSize();
+		for (int i = 0; i < listSize; i++) {
+			System.out.println("resuming: " + allSet.getProcess(i).getName());
+		}
+
+	}
+
+	public void restart() {
+		// Auto-generated method stub
+		System.out.println("GDBDebugger.restart()");
+		int listSize = allSet.getSize();
+		for (int i = 0; i < listSize; i++) {
+			System.out.println("restarting: " + allSet.getProcess(i).getName());
+		}
+
+	}
+
+	public void terminate() {
+		// Auto-generated method stub
+		System.out.println("GDBDebugger.terminate()");
+		int listSize = allSet.getSize();
+		for (int i = 0; i < listSize; i++) {
+			System.out.println("terminating: " + allSet.getProcess(i).getName());
+		}
+	}
+
+	public void suspend() {
+		// Auto-generated method stub
+		System.out.println("GDBDebugger.suspend()");
+		int listSize = allSet.getSize();
+		for (int i = 0; i < listSize; i++) {
+			System.out.println("suspending: " + allSet.getProcess(i).getName());
+		}
+
+	}
 }

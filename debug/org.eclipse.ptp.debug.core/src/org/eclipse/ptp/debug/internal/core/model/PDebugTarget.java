@@ -24,6 +24,7 @@ import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IExpressionListener;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchListener;
@@ -64,6 +65,10 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		debugEvents.add( createCreateEvent() );
 		
 		getLaunch().addDebugTarget( this );
+		
+		// The line that switches to Debug Perspective
+		DebugPlugin.getDefault().fireDebugEventSet( new DebugEvent[]{( new DebugEvent( this, DebugEvent.SUSPEND, DebugEvent.BREAKPOINT ) )} );
+		
 		fireEventSet( (DebugEvent[])debugEvents.toArray( new DebugEvent[debugEvents.size()] ) );
 		
 		//DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener( this );
@@ -175,9 +180,22 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return fLaunch;
 	}
 
+	protected boolean isTerminating() {
+		return ( getState().equals( CDebugElementState.TERMINATING ) );
+	}
+
+	protected boolean isDisconnecting() {
+		return ( getState().equals( CDebugElementState.DISCONNECTING ) );
+	}
+	
+	public boolean isAvailable() {
+		System.out.println("PDebugTarget.isAvailable()");
+		return !(isTerminated() || isTerminating() || isDisconnected() || isDisconnecting());
+	}
+
 	public boolean canTerminate() {
 		System.out.println("PDebugTarget.canTerminate()");
-		return false;
+		return fConfig.supportsTerminate() && isAvailable();
 	}
 
 	public boolean isTerminated() {
@@ -188,6 +206,17 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	public void terminate() throws DebugException {
 		System.out.println("PDebugTarget.terminate()");
 		
+		if ( !canTerminate() ) {
+			return;
+		}
+		changeState( CDebugElementState.TERMINATING );
+		try {
+			fPCDITarget.terminate();
+		}
+		catch( CDIException e ) {
+			System.out.println("Error in PDebugTarget.terminate()");
+			targetRequestFailed( e.getMessage(), null );
+		}
 	}
 
 	public boolean canResume() {
@@ -197,16 +226,31 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 
 	public boolean canSuspend() {
 		System.out.println("PDebugTarget.canSuspend()");
-		return false;
+		
+		if ( !fConfig.supportsSuspend() )
+			return false;
+//		if ( getState().equals( CDebugElementState.RESUMED ) ) {
+//			// only allow suspend if no threads are currently suspended
+//			IThread[] threads = getThreads();
+//			for( int i = 0; i < threads.length; i++ ) {
+//				if ( threads[i].isSuspended() ) {
+//					return false;
+//				}
+//			}
+//			return true;
+//		}
+//		return false;
+		
+		return true;
 	}
 
 	public boolean isSuspended() {
 		System.out.println("PDebugTarget.isSuspended()");
-		return false;
+		return ( getState().equals( CDebugElementState.SUSPENDED ) );
 	}
 
 	private void changeState( CDebugElementState state ) {
-		System.out.println("PDebugTarget.changeState()");
+		System.out.println("PDebugTarget.changeState() - " + state.toString());
 		setState( state );
 //		Iterator it = getThreadList().iterator();
 //		while( it.hasNext() ) {
@@ -233,6 +277,16 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	public void suspend() throws DebugException {
 		System.out.println("PDebugTarget.suspend()");
 		
+		if ( !canSuspend() )
+			return;
+		changeState( CDebugElementState.SUSPENDING );
+		try {
+			fPCDITarget.suspend();
+		}
+		catch( CDIException e ) {
+			System.out.println("Error in PDebugTarget.suspend()");
+			targetRequestFailed( e.getMessage(), null );
+		}
 	}
 
 	public void breakpointAdded(IBreakpoint breakpoint) {
@@ -258,6 +312,17 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	public void disconnect() throws DebugException {
 		System.out.println("PDebugTarget.disconnect()");
 		
+		if ( getState().equals( CDebugElementState.DISCONNECTING ) ) {
+			return;
+		}
+		changeState( CDebugElementState.DISCONNECTING );
+		try {
+			fPCDITarget.disconnect();
+		}
+		catch( CDIException e ) {
+			System.out.println("Error in PDebugTarget.disconnect()");
+			targetRequestFailed( e.getMessage(), null );
+		}
 	}
 
 	public boolean isDisconnected() {
@@ -287,12 +352,25 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 
 	public boolean canRestart() {
 		System.out.println("PDebugTarget.canRestart()");
-		return false;
+		return fConfig.supportsRestart() && isSuspended();
 	}
 
 	public void restart() throws DebugException {
 		System.out.println("PDebugTarget.restart()");
 		
+		if ( !canRestart() ) {
+			return;
+		}
+		changeState( CDebugElementState.RESTARTING );
+		ICDILocation location = fPCDITarget.createLocation( "", "main", 0 ); //$NON-NLS-1$ //$NON-NLS-2$
+		setInternalTemporaryBreakpoint( location );
+		try {
+			fPCDITarget.restart();
+		}
+		catch( CDIException e ) {
+			System.out.println("Error in PDebugTarget.restart()");
+			targetRequestFailed( e.getMessage(), e );
+		}
 	}
 
 	public boolean canRunToLine(IFile file, int lineNumber) {

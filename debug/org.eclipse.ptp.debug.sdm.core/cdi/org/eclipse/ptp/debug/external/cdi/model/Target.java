@@ -97,7 +97,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void terminate() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.terminate()");
-		
+		dSession.getDebugger().terminate();
 	}
 
 	public boolean isDisconnected() {
@@ -109,19 +109,19 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void disconnect() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.disconnect()");
-		
+		dSession.getDebugger().disconnect();
 	}
 
 	public void restart() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.restart()");
-		
+		dSession.getDebugger().restart();
 	}
 
 	public void resume() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.resume()");
-		
+		resume(false);
 	}
 
 	public void stepOver() throws CDIException {
@@ -225,7 +225,8 @@ public class Target extends SessionObject implements IPCDITarget {
 	public ICDILocationBreakpoint setLocationBreakpoint(int type, ICDILocation location, ICDICondition condition, boolean deferred) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.setLocationBreakpoint()");
-		return null;
+		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
+		return bMgr.setLocationBreakpoint(this, type, location, condition, deferred);
 	}
 
 	public ICDIWatchpoint setWatchpoint(int type, int watchType, String expression, ICDICondition condition) throws CDIException {
@@ -285,7 +286,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void resume(boolean passSignal) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.resume()");
-		
+		dSession.getDebugger().resume();
 	}
 
 	public void resume(ICDILocation location) throws CDIException {
@@ -303,7 +304,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void suspend() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.suspend()");
-		
+		dSession.getDebugger().suspend();
 	}
 
 	public boolean isSuspended() {

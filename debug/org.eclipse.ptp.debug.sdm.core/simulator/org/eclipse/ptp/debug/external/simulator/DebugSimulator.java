@@ -59,6 +59,11 @@ public class DebugSimulator extends AbstractDebugger {
 		return debugProcess;
 	}
 
+	public void breakpoint(String loc) {
+		super.breakpoint(loc);
+		System.out.println("DebugSimulator.breakpoint()");
+	}
+	
 	public Process[] getProcesses() {
 		int listSize = allSet.getSize();
 		Process[] procs = new Process[listSize];
@@ -67,4 +72,54 @@ public class DebugSimulator extends AbstractDebugger {
 		}
 		return procs;
 	}
+
+	public void disconnect() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.disconnect()");
+		int listSize = allSet.getSize();
+		for (int i = 0; i < listSize; i++) {
+			System.out.println("disconnecting: " + allSet.getProcess(i).getName());
+		}
+
+	}
+
+	public void resume() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.resume()");
+		int listSize = allSet.getSize();
+		for (int i = 0; i < listSize; i++) {
+			System.out.println("resuming: " + allSet.getProcess(i).getName());
+		}
+
+	}
+
+	public void restart() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.restart()");
+		int listSize = allSet.getSize();
+		for (int i = 0; i < listSize; i++) {
+			System.out.println("restarting: " + allSet.getProcess(i).getName());
+		}
+
+	}
+
+	public void terminate() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.terminate()");
+		int listSize = allSet.getSize();
+		for (int i = 0; i < listSize; i++) {
+			System.out.println("terminating: " + allSet.getProcess(i).getName());
+		}
+	}
+
+	public void suspend() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.suspend()");
+		int listSize = allSet.getSize();
+		for (int i = 0; i < listSize; i++) {
+			System.out.println("suspending: " + allSet.getProcess(i).getName());
+		}
+
+	}
+
 }
