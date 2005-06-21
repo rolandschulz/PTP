@@ -9,10 +9,24 @@ extern "C" {
 #endif
 /*
  * Class:     org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel
- * Method:    testHelloWorld
+ * Method:    OMPIInit
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_testHelloWorld
+JNIEXPORT void JNICALL Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIInit
+  (JNIEnv *, jobject);
+/*
+ * Class:     org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel
+ * Method:    OMPIFinalize
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIFinalize
+  (JNIEnv *, jobject);
+/*
+ * Class:     org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel
+ * Method:    OMPIProgress
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIProgress
   (JNIEnv *, jobject);
 /*
  * Class:     org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel
