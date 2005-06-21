@@ -37,20 +37,46 @@ public class OMPIRuntimeModel implements IRuntimeModel {
 
 	public OMPIRuntimeModel() {
 		System.out.println("JAVA OMPI: constructor called");
+		OMPIInit();
+		startProgressMaker();
 	}
 	
-	
-	public native void testHelloWorld();
+	public native void OMPIInit();
+	public native void OMPIFinalize();
+	public native void OMPIProgress();
+	public native void OMPIRun();
 	
 	static {
         System.loadLibrary("ptp_ompi_jni");
     }
     
-
+	public void startProgressMaker() {
+		Thread progressThread = new Thread("PTP RTE OMPI Progress Thread") {
+			public void run() {
+				OMPIProgress();
+			}
+		};
+		progressThread.start();
+	}
+	
 	/* returns the new job name that it started - unique */
 	public String run(String[] args) {
 		System.out.println("JAVA OMPI: run() with args: " + args);
 
+		/*
+		Thread runThread = new Thread("PTP RTE Run Thread") {
+			public void run() {
+				System.out.println("PTP RTE Run Thread - run()");
+				 
+				 */
+				OMPIRun();
+				/*
+				System.out.println("************ DONE RUNNING");
+			}
+		};
+		runThread.start();
+		*/
+		
 		/* replace this job# here with a real job# coming out of the RTE */
 		String s = new String("job0");
 		return s;
@@ -58,7 +84,6 @@ public class OMPIRuntimeModel implements IRuntimeModel {
 
 	public void abortJob(String jobID) {
 		System.out.println("JAVA OMPI: abortJob() with args: " + jobID);
-		testHelloWorld();
 	}
 
 	public void addRuntimeListener(IRuntimeListener listener) {
@@ -97,6 +122,7 @@ public class OMPIRuntimeModel implements IRuntimeModel {
 
 	public void shutdown() {
 		System.out.println("JAVA OMPI: shutdown() called");
+		OMPIFinalize();
 		listeners.clear();
 		listeners = null;
 	}

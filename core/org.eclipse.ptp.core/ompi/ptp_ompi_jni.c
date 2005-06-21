@@ -11,6 +11,7 @@
 #include "mca/gpr/gpr.h"
 #include "mca/rmgr/rmgr.h"
 #include "mca/base/base.h"
+#include "event/event.h"
 
 #include "threads/condition.h"
 
@@ -21,17 +22,63 @@ ompi_condition_t ptp_cond;
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
 static int ptp_ompi_spawn(char *app, int num_procs);
 
+ompi_mutex_t eclipse_orte_lock; 
+
 /***********************************************************************
  * THE JNI FUNCTIONS THAT THE RUNTIME ENVIRONMENT WILL CALL - THESE ARE
  * JUST STUBS THAT WILL CALL ADDITIONAL FUNCTIONS TO DO THE 'REAL'
  * WORK
  **********************************************************************/
+
 JNIEXPORT void JNICALL 
-Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_testHelloWorld(JNIEnv *env, jobject obj) 
+Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIInit(JNIEnv *env, jobject obj) 
 {
-	printf("JNI (C) OMPI: Hello world!\n");
+    	int rc;
+
+    	printf("JNI (C) OMPI: OMPIInit()\n");
 	fflush(stdout);
-	return;
+
+	/* setup the runtime environment */
+	if (ORTE_SUCCESS != (rc = orte_init())) {
+	    printf("ERROR: orte_init() failed - return code = %d!\n", rc);
+	    fflush(stdout);
+	    ORTE_ERROR_LOG(rc);
+	    return;
+	}
+	printf("Registry initted.\n");
+	fflush(stdout);
+
+	OBJ_CONSTRUCT(&eclipse_orte_lock, ompi_mutex_t); 
+}
+
+JNIEXPORT void JNICALL 
+Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIFinalize(JNIEnv *env, jobject obj) 
+{
+    	printf("JNI (C) OMPI: OMPIFinalize()\n");
+	fflush(stdout);
+	orte_finalize();
+
+	printf("Registry finalized.\n");
+	fflush(stdout);
+}
+
+JNIEXPORT void JNICALL 
+Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIProgress(JNIEnv *env, jobject obj) 
+{
+    	printf("JNI (C) OMPI: OMPIProgress() starting . . .\n");
+	fflush(stdout);
+
+	while(1) {
+	    ompi_mutex_lock(&eclipse_orte_lock);
+	    ompi_event_loop(OMPI_EVLOOP_NONBLOCK);
+	    ompi_mutex_unlock(&eclipse_orte_lock);
+	    usleep(1000);
+	} 
+
+	//ompi_event_loop(0); 
+
+    	printf("JNI (C) OMPI: OMPIProgress() exiting . . .\n");
+	fflush(stdout);
 }
 
 JNIEXPORT void JNICALL 
@@ -40,7 +87,9 @@ Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIRun(JNIEnv *env, jobject 
 	printf("JNI (C) OMPI: OMPIRun() starting . . .\n");
 	fflush(stdout);
 
-	ptp_ompi_spawn("/Users/ndebard/ompi-test/mpi-test", 2);
+	ompi_mutex_lock(&eclipse_orte_lock);
+	ptp_ompi_spawn("/Users/ndebard/ompi-test/test-mpi", 2);
+	ompi_mutex_unlock(&eclipse_orte_lock); 
 	
 	return;
 }
@@ -56,12 +105,12 @@ Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIRun(JNIEnv *env, jobject 
 int ptp_ompi_spawn(char *app, int num_procs)
 {
 	int rc;
-	int num_apps;
 	int i;
-	orte_app_context_t **apps;
 	orte_jobid_t jobid = ORTE_JOBID_MAX;
 	char pgm_name[128], cwd[128];
 	char *c;
+	orte_app_context_t **apps;
+	int num_apps;
 
 	c = rindex(app, '/');
 	printf("str = %s\n", app);
@@ -69,24 +118,21 @@ int ptp_ompi_spawn(char *app, int num_procs)
 	    printf("index = NULL\n");
 	else
 	    printf("index = %s\n", c);
+	fflush(stdout);
+
 	strncpy(pgm_name, c + 1, strlen(c));
 	printf("program name = %s\n", pgm_name);
+	fflush(stdout);
 	strncpy(cwd, app, c - app + 1);
 	cwd[c-app+1] = '\0';
 	printf("cwd = %s\n", cwd);
+	fflush(stdout);
 	
 	/* to copy i -> j 
 	 *  strncpy(new_buffer, old_buffer + i, j-i+1);
 	 *          new_buffer[j-i+1] = '\0';
 	 */
 	
-	/* setup the runtime environment */
-	if (ORTE_SUCCESS != (rc = orte_init())) {
-	    ORTE_ERROR_LOG(rc);
-	    return rc;
-	}
-	printf("Registry initted.\n");
-
 	/* hard coded test for spawning just 1 job */
 	num_apps = 1;
 	
@@ -111,37 +157,27 @@ int ptp_ompi_spawn(char *app, int num_procs)
 
 	printf("Spawning %d processes of job '%s'\n", 
 	  apps[0]->num_procs, apps[0]->app);
+	fflush(stdout);
 
 	/* spawn the job */
 	rc = orte_rmgr.spawn(apps, num_apps, &jobid, job_state_callback);
-	printf("after spawn - jobid = %d\n", jobid);
-
 	if(rc != ORTE_SUCCESS) {
 	    ompi_output(0, "%s: failed with errno=%d\n", app,
 	      rc);
+	    return rc;
 	}
-	else {
-	    OMPI_THREAD_LOCK(&ptp_lock);
-	    while(!ptp_exitted) {
-		ompi_condition_wait(&ptp_cond, &ptp_lock);
-	    }
-	    printf("Broke out of wait!\n");
-	    OMPI_THREAD_UNLOCK(&ptp_lock);
-	}
-	
+	printf("after spawn - jobid = %d\n", jobid);
+	fflush(stdout);
 	for(i=0; i<num_apps; i++) OBJ_RELEASE(apps[i]);
 	free(apps);
-
-	orte_finalize();
-
-	printf("Registry finalized.\n");
 
 	return 0;
 }
 
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 {
-    	printf("CALLED: job_state_callback()\n");
+    	printf("CALLED: job_state_callback() - jobid = %d\n", jobid);
+	fflush(stdout);
     	switch(state) {
 	    case ORTE_PROC_STATE_INIT:
 	    	printf("    state = ORTE_PROC_STATE_INIT\n");
@@ -166,13 +202,10 @@ static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 		break;
 	    case ORTE_PROC_STATE_TERMINATED:
 	    	printf("    state = ORTE_PROC_STATE_TERMINATED\n");
-		OMPI_THREAD_LOCK(&ptp_lock);
-		ptp_exitted = true;
-		ompi_condition_signal(&ptp_cond);
-		OMPI_THREAD_UNLOCK(&ptp_lock);
 		break;
 	    case ORTE_PROC_STATE_ABORTED:
 	    	printf("    state = ORTE_PROC_STATE_ABORTED\n");
 		break;
 	}
+	fflush(stdout);
 }
