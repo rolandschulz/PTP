@@ -19,7 +19,6 @@ import org.eclipse.cdt.core.IBinaryParser.IBinaryFile;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryArchive;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.core.model.CModelException;
-import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.IArchive;
 import org.eclipse.cdt.core.model.IBinary;
 import org.eclipse.cdt.core.model.ICContainer;
@@ -33,7 +32,6 @@ import org.eclipse.cdt.internal.core.model.Binary;
 import org.eclipse.cdt.internal.core.model.BinaryContainer;
 import org.eclipse.cdt.internal.core.model.CContainerInfo;
 import org.eclipse.cdt.internal.core.model.CElementInfo;
-import org.eclipse.cdt.internal.core.model.CModelManager;
 import org.eclipse.cdt.internal.core.model.Openable;
 import org.eclipse.cdt.internal.core.model.OpenableInfo;
 import org.eclipse.cdt.internal.core.model.TranslationUnit;
@@ -44,9 +42,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.fdt.core.model.FortranCoreModel;
+import org.eclipse.fdt.internal.core.model.FortranModelManager;
 
 public class FortranContainer extends Openable implements ICContainer {
-	CModelManager factory = CModelManager.getDefault();
+	FortranModelManager factory = FortranModelManager.getDefault();
 
 	public FortranContainer(ICElement parent, IResource res) {
 		this(parent, res, ICElement.C_CCONTAINER);
@@ -133,7 +133,7 @@ public class FortranContainer extends Openable implements ICContainer {
 	}
 
 	public ITranslationUnit getTranslationUnit(IFile file) {
-		String id = CoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
+		String id = FortranCoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
 		return new TranslationUnit(this, file, id);
 	}
 
@@ -191,7 +191,7 @@ public class FortranContainer extends Openable implements ICContainer {
 			}
 		} finally {
 			if (!validInfo) {
-				CModelManager.getDefault().removeInfo(this);
+				FortranModelManager.getDefault().removeInfo(this);
 			}
 		}
 		return validInfo;
@@ -248,7 +248,7 @@ public class FortranContainer extends Openable implements ICContainer {
 		switch (res.getType()) {
 			case IResource.FILE : {
 				IFile file = (IFile) res;
-				String id = CoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
+				String id = FortranCoreModel.getRegistedContentTypeId(file.getProject(), file.getName());
 				if (id != null) {
 					celement = new TranslationUnit(this, file, id);
 				} else if (cproject.isOnOutputEntry(file)) {
