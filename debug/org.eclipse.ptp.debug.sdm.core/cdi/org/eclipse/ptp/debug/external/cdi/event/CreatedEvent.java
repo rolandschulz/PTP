@@ -12,10 +12,26 @@ package org.eclipse.ptp.debug.external.cdi.event;
 
 import org.eclipse.cdt.debug.core.cdi.event.ICDICreatedEvent;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
+import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.event.EBreakpointCreated;
+import org.eclipse.ptp.debug.external.event.EInferiorCreated;
 
 /**
  */
 public class CreatedEvent implements ICDICreatedEvent {
+
+	Session session;
+	ICDIObject source;
+
+	public CreatedEvent(Session s, EBreakpointCreated ev) {
+		session = s;
+		source = null;
+	}
+
+	public CreatedEvent(Session s, EInferiorCreated ev) {
+		session = s;
+		source = null;
+	}
 
 	public ICDIObject getSource() {
 		// Auto-generated method stub
