@@ -19,7 +19,7 @@ public class DebugSimulator extends AbstractDebugger {
 	public void initDebugger() {
 		super.initDebugger();
 		try {
-			debugProcess = Runtime.getRuntime().exec("/bin/bash /tmp/process.sh debugger 6");
+			debugProcess = Runtime.getRuntime().exec("/bin/bash /tmp/process.sh debugger 200");
 		} catch (IOException e) {
 		}
 	}
@@ -39,7 +39,7 @@ public class DebugSimulator extends AbstractDebugger {
 		try {
 			for (int i = 0; i < numProcs; i++) {
 				MProcess proc = new MProcess();
-				Process p = Runtime.getRuntime().exec("/bin/bash /tmp/process.sh proc" + i + " 2");
+				Process p = Runtime.getRuntime().exec("/bin/bash /tmp/process.sh proc" + i + " 160");
 				proc.setDebugInfo(p); /* We store the process in the "debug info" */
 				allSet.addProcess(proc);
 			}
@@ -88,7 +88,7 @@ public class DebugSimulator extends AbstractDebugger {
 		System.out.println("DebugSimulator.resume()");
 		int listSize = allSet.getSize();
 		for (int i = 0; i < listSize; i++) {
-			System.out.println("resuming: " + allSet.getProcess(i).getName());
+			//System.out.println("resuming: " + allSet.getProcess(i).getName());
 		}
 
 	}
@@ -107,9 +107,19 @@ public class DebugSimulator extends AbstractDebugger {
 		// Auto-generated method stub
 		System.out.println("DebugSimulator.terminate()");
 		int listSize = allSet.getSize();
+		
+		long start = System.currentTimeMillis();
+		
 		for (int i = 0; i < listSize; i++) {
-			System.out.println("terminating: " + allSet.getProcess(i).getName());
+			//System.out.println("terminating: " + allSet.getProcess(i).getName());
+			((Process) allSet.getProcess(i).getDebugInfo()).destroy();
 		}
+
+		long end = System.currentTimeMillis();
+		
+		double totalseconds = (double)(end - start) / (double)1000;
+		System.out.println("DebugSimulator.terminate() takes " + totalseconds + " seconds");
+
 	}
 
 	public void suspend() {
@@ -117,7 +127,7 @@ public class DebugSimulator extends AbstractDebugger {
 		System.out.println("DebugSimulator.suspend()");
 		int listSize = allSet.getSize();
 		for (int i = 0; i < listSize; i++) {
-			System.out.println("suspending: " + allSet.getProcess(i).getName());
+			//System.out.println("suspending: " + allSet.getProcess(i).getName());
 		}
 
 	}

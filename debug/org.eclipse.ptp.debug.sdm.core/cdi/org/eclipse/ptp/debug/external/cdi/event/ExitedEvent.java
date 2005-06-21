@@ -13,11 +13,21 @@ package org.eclipse.ptp.debug.external.cdi.event;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIExitedEvent;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
+import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.event.EExit;
 
 /**
  */
 public class ExitedEvent implements ICDIExitedEvent {
 
+	Session session;
+	ICDIObject source;
+
+	public ExitedEvent(Session s, EExit ev) {
+		session = s;
+		source = null;
+	}
+	
 	public ICDISessionObject getReason() {
 		// Auto-generated method stub
 		System.out.println("ExitedEvent.getReason()");

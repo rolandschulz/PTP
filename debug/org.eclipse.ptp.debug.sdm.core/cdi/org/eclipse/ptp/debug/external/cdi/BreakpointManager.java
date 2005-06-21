@@ -79,8 +79,19 @@ public class BreakpointManager extends Manager {
 		try {
 			setLocationBreakpoint(bkpt);
 			
+			int procsNum = target.getProcesses().length;
+			
+			/* testing lots and lots of breakpoints */
+			long start = System.currentTimeMillis();
+			for (int j = 0; j < procsNum; j++)
+				dSession.getDebugger().fireEvent(new EBreakpointCreated(dSession));
+			long end = System.currentTimeMillis();
+			double totalseconds = (double)(end - start) / (double)1000;
+			System.out.println("BreakpointManager.setLocationBreakpoint() takes " + totalseconds + " seconds");
+			/* testing lots and lots of breakpoints */
+			
 			// Fire a created Event.
-			dSession.getDebugger().fireEvent(new EBreakpointCreated(dSession));
+			//dSession.getDebugger().fireEvent(new EBreakpointCreated(dSession));
 			
 		} catch (CDIException e) {
 		}

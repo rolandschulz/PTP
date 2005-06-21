@@ -74,7 +74,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		//DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener( this );
 		//DebugPlugin.getDefault().getLaunchManager().addLaunchListener( this );
 		//DebugPlugin.getDefault().getExpressionManager().addExpressionListener( this );
-		//getCDISession().getEventManager().addEventListener( this );
+		
+		getPCDISession().getEventManager().addEventListener( this );
 	}
 	
 	public void setInternalTemporaryBreakpoint( ICDILocation location ) throws DebugException {
@@ -485,7 +486,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 
 	public void handleDebugEvents(ICDIEvent[] event) {
 		System.out.println("PDebugTarget.handleDebugEvents()");
-		
 	}
 
 	public void launchRemoved(ILaunch launch) {
