@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.IProblemRequestor;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.cdt.core.model.IWorkingCopy;
@@ -22,10 +21,10 @@ import org.eclipse.cdt.core.parser.IProblem;
 import org.eclipse.cdt.internal.core.model.IBufferFactory;
 import org.eclipse.cdt.internal.ui.CFileElementWorkingCopy;
 import org.eclipse.cdt.internal.ui.CPluginImages;
-import org.eclipse.cdt.internal.ui.editor.CDocumentProvider;
 import org.eclipse.cdt.internal.ui.editor.CMarkerAnnotation;
 import org.eclipse.cdt.internal.ui.editor.CStorageDocumentProvider;
 import org.eclipse.cdt.internal.ui.editor.ICAnnotation;
+import org.eclipse.cdt.internal.ui.editor.ICDocumentProvider;
 import org.eclipse.cdt.internal.ui.editor.ITranslationUnitEditorInput;
 import org.eclipse.cdt.internal.ui.editor.TranslationUnitAnnotationModelEvent;
 import org.eclipse.cdt.internal.ui.text.IProblemRequestorExtension;
@@ -39,6 +38,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.fdt.core.model.FortranCoreModel;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultLineTracker;
@@ -74,7 +74,7 @@ import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModel;
 /**
  * CDocumentProvider2
  */
-public class FortranDocumentProvider extends CDocumentProvider {
+public class FortranDocumentProvider extends TextFileDocumentProvider implements ICDocumentProvider {
 	/**
 	 * Bundle of all required informations to allow working copy management.
 	 */
@@ -806,7 +806,7 @@ public class FortranDocumentProvider extends CDocumentProvider {
 	 *            the file from which to create the translation unit
 	 */
 	protected ITranslationUnit createTranslationUnit(IFile file) {
-		Object element = CoreModel.getDefault().create(file);
+		Object element = FortranCoreModel.getDefault().create(file);
 		if (element instanceof ITranslationUnit) {
 			return (ITranslationUnit) element;
 		}
@@ -827,7 +827,7 @@ public class FortranDocumentProvider extends CDocumentProvider {
 		//return new CMarkerAnnotationModel(file);
 		return new TranslationUnitAnnotationModel(file);
 	}
-
+	
 	/*
 	 * @see org.eclipse.ui.editors.text.TextFileDocumentProvider#createFileInfo(java.lang.Object)
 	 */
@@ -844,7 +844,7 @@ public class FortranDocumentProvider extends CDocumentProvider {
 		if (original == null) {
 			return null;
 		}
-		
+
 		FileInfo info = super.createFileInfo(element);
 		if (!(info instanceof TranslationUnitInfo))
 			return null;
