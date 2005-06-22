@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Parallel Tools Platform Launch Plug-in
-Bundle-SymbolicName: org.eclipse.ptp.launch
+Bundle-SymbolicName: org.eclipse.ptp.launch; singleton:=true
 Bundle-Version: 1.0.0
 Bundle-ClassPath: ptp_launch.jar
 Bundle-Activator: org.eclipse.ptp.launch.PTPLaunchPlugin
