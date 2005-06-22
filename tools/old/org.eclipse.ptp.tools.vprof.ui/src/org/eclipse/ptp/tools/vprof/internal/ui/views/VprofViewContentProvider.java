@@ -72,50 +72,25 @@ public class VprofViewContentProvider extends CElementContentProvider {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getCElements(java.lang.Object)
-	 */
-	public Object[] getElements(Object parent) {
-		List list = new ArrayList();
-		System.out.println("getElements()");
-		if (parent instanceof ICModel) {
-			ICModel cModel = (ICModel)parent;
-			try {
-				ICProject[] cproj = cModel.getCProjects();
-				for (int i = 0; i < cproj.length; i++) {
-					IFile file = findVprofProject(cproj[i]);
-					if (file != null)
-							list.add(cproj[i]);
-				}
-			} catch (CModelException e) {
-				return NO_CHILDREN;
-			}
-		}
-		
-		Object[] objects = list.toArray();
-		
-		return objects;
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 	 */
 	public Object[] getChildren(Object element) {
-		//Object[] objs = super.getChildren(element);
-		System.out.println("getChildren ()");
-		Object[] extras = null;
+		Object[] objs = null;
 		try {
-			if (element instanceof ICProject) {
-				extras = getProjectChildren((ICProject)element);
+			if (element instanceof ICModel) {
+				return  getCProjects((ICModel)element);
+			} else if (element instanceof ICProject) {
+				objs = getProjectChildren((ICProject)element);
 			} else if (element instanceof IBinaryContainer) {
-				extras = getExecutables((IBinaryContainer)element);
+				objs = getExecutables((IBinaryContainer)element);
 			}
 		} catch (CModelException e) {
-			extras = null;
+			objs = null;
 		}
-		if (extras != null && extras.length > 0) {
-			return extras;
-			//objs = concatenate(objs, extras);
+		if (objs != null && objs.length > 0) {
+			return objs;
 		}
+
 		return NO_CHILDREN;
 	}
 	
@@ -124,6 +99,9 @@ public class VprofViewContentProvider extends CElementContentProvider {
 	 */
 	private Object[] getProjectChildren(ICProject cproject) throws CModelException {
 		Object[] extras = null;
+		IFile file = findVprofProject(cproject);
+		if (file == null)
+			return NO_CHILDREN;
 		IBinaryContainer bin = cproject.getBinaryContainer(); 
 		if (getExecutables(bin).length > 0) {
 			Object[] o = new Object[] {bin};
@@ -167,7 +145,6 @@ public class VprofViewContentProvider extends CElementContentProvider {
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
 	 */
 	public boolean hasChildren(Object element) {
-		System.out.println("hasChildren()");
 		if (element instanceof IBinaryContainer) {
 			try {
 				IBinaryContainer cont = (IBinaryContainer)element;
@@ -179,16 +156,4 @@ public class VprofViewContentProvider extends CElementContentProvider {
 		}
 		return super.hasChildren(element);
 	}
-	
-	public Object getParent(Object element) {
-		System.out.println("getParent()");
-		return super.getParent(element);
-	}
-
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		System.out.println("inputChanged()");
-		super.inputChanged(viewer, oldInput, newInput);
-	}
-	
-	
 }

@@ -245,12 +245,15 @@ public class VprofView extends ViewPart {
 		viewer.setLabelProvider(new VprofViewLabelProvider(AppearanceAwareLabelProvider.DEFAULT_TEXTFLAGS, AppearanceAwareLabelProvider.DEFAULT_IMAGEFLAGS | CElementImageProvider.SMALL_ICONS));
 		viewer.setSorter(new NameSorter());
 		viewer.setInput(CoreModel.getDefault().getCModel());
-		CModelManager.getDefault().addElementChangedListener(new IElementChangedListener() {
+		/*CModelManager.getDefault().addElementChangedListener(new IElementChangedListener() {
 			public void elementChanged(ElementChangedEvent event) {
-				System.out.println("elementChanged()");
+				System.out.println("elementChangedListener()");
+				viewer.setInput(null);
+				viewer.refresh();
+				viewer.setInput(CoreModel.getDefault().getCModel());
 				viewer.refresh();
 			}
-		});
+		});*/
 		makeActions();
 		hookContextMenu();
 		hookDoubleClickAction();
@@ -288,7 +291,6 @@ public class VprofView extends ViewPart {
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
-		IStructuredSelection selection = (IStructuredSelection) getViewer().getSelection();
 		manager.add(analyzeAction);
 		manager.add(new Separator());
 		drillDownAdapter.addNavigationActions(manager);
@@ -330,7 +332,6 @@ public class VprofView extends ViewPart {
 				}
 				
 				IBinaryObject bo = (IBinaryObject) ((IBinary)obj).getAdapter(IBinaryObject.class);
-				IBinaryParser parser = bo.getBinaryParser();
 				
 				System.out.println("name=" + bo.getName() + " cpu=" + bo.getCPU());
 			
@@ -339,7 +340,7 @@ public class VprofView extends ViewPart {
 				try {
 					ICProject cp = ((IBinary)obj).getCProject();
 					root = cp.getCModel().getWorkspace().getRoot().getLocation();
-					System.out.println("workspace path = " + root);
+					//System.out.println("workspace path = " + root);
 					vmon = VprofViewContentProvider.findVprofProject(cp);
 				} catch (CModelException e) {
 					System.out.println(e.getMessage());
@@ -359,9 +360,9 @@ public class VprofView extends ViewPart {
 				}
 				
 				ISymbol[] syms = bo.getSymbols();
-				for (int i = 0; i < syms.length; i++) {
-					System.out.println(syms[i].getName() + " = " + syms[i].getAddress().toHexAddressString());
-				}
+				//for (int i = 0; i < syms.length; i++) {
+				//	System.out.println(syms[i].getName() + " = " + syms[i].getAddress().toHexAddressString());
+				//}
 				
 				for (int i = 0; i < vf.getData().length; i++) {
 					VMonData vd = vf.getData()[i];
