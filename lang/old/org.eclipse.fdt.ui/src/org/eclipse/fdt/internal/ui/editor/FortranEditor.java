@@ -23,10 +23,8 @@ import org.eclipse.cdt.internal.ui.actions.FoldingActionGroup;
 import org.eclipse.cdt.internal.ui.actions.GoToNextPreviousMemberAction;
 import org.eclipse.cdt.internal.ui.actions.RemoveBlockCommentAction;
 import org.eclipse.cdt.internal.ui.browser.typehierarchy.OpenTypeHierarchyAction;
-import org.eclipse.cdt.internal.ui.editor.asm.AsmTextTools;
 import org.eclipse.cdt.internal.ui.editor.AddIncludeOnSelectionAction;
 import org.eclipse.cdt.internal.ui.editor.CAnnotationIterator;
-import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
 import org.eclipse.cdt.internal.ui.editor.CDocumentProvider;
 import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.editor.CEditorErrorTickUpdater;
@@ -39,6 +37,7 @@ import org.eclipse.cdt.internal.ui.editor.IReconcilingParticipant;
 import org.eclipse.cdt.internal.ui.search.actions.OpenDeclarationsAction;
 import org.eclipse.cdt.internal.ui.search.actions.SelectionSearchGroup;
 import org.eclipse.cdt.internal.ui.text.CPairMatcher;
+import org.eclipse.cdt.internal.ui.text.CSourceViewerConfiguration;
 import org.eclipse.cdt.internal.ui.text.contentassist.ContentAssistPreference;
 import org.eclipse.cdt.internal.ui.util.CUIHelp;
 import org.eclipse.cdt.internal.ui.editor.CSourceViewer;
@@ -1302,9 +1301,11 @@ public class FortranEditor extends CEditor implements ISelectionChangedListener,
 	 * @see AbstractTextEditor#affectsTextPresentation(PropertyChangeEvent)
 	 */
 	protected boolean affectsTextPresentation(PropertyChangeEvent event) {
-		FortranTextTools textTools = FortranUIPlugin.getDefault().getTextTools();
-		AsmTextTools asmTools = CUIPlugin.getDefault().getAsmTextTools();
-		return textTools.affectsBehavior(event) || asmTools.affectsBehavior(event);
+		SourceViewerConfiguration configuration = getSourceViewerConfiguration();
+		if (configuration instanceof CSourceViewerConfiguration) {
+			return ((CSourceViewerConfiguration)configuration).affectsBehavior(event);
+		}
+		return false;
 	}
 
 	/**
