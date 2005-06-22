@@ -42,6 +42,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -52,47 +53,44 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PTPPreferencesPage extends PreferencePage implements
-		IWorkbenchPreferencePage, IOutputTextFileContants {
+public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage, IOutputTextFileContants 
+{
 	public static final String EMPTY_STRING = "";
-
-	protected Text mpiPathText = null;
-
-	protected Button browseButton1 = null;
-
-	protected IntegerFieldEditor requestTimeoutField = null;
-
-	protected IntegerFieldEditor launchTimoutField = null;
 
 	protected Text outputDirText = null;
 
-	protected Button browseButton2 = null;
+	protected Button browseButton = null;
 
 	protected IntegerFieldEditor storeLineField = null;
 
-	private String mpiFile = EMPTY_STRING;
-
-	/*
-	 * private int requestTimeout = IMIConstants.DEF_REQUEST_TIMEOUT; private
-	 * int launchTimeout = IMIConstants.DEF_REQUEST_LAUNCH_TIMEOUT;
-	 */
+	protected Combo combo = null;
 
 	private String outputDIR = EMPTY_STRING;
 
 	private int storeLine = DEF_STORE_LINE;
+	
+	private String[] RTEChoices = new String[] {
+		"Simulated", 
+		"Open Runtime Environment (ORTE)",
+		"Los Alamos MPI (LAMPI)",
+		"LAM-MPI",
+		"MPICH 1.x",
+		"MPICH 2.x (MPD)" };
+	
+	private String RTEChoice = null;
 
-	public PTPPreferencesPage() {
+	public PTPPreferencesPage() 
+	{
 		setPreferenceStore(PTPCorePlugin.getDefault().getPreferenceStore());
 		// setDescription(CoreMessages.getResourceString("PTPPreferencesPage.preferencesDescription"));
 	}
 
-	protected class WidgetListener extends SelectionAdapter implements
-			ModifyListener, IPropertyChangeListener {
+	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener 
+	{
 		public void widgetSelected(SelectionEvent e) {
 			Object source = e.getSource();
-			if (source == browseButton1)
-				handleMPIPathBrowseButtonSelected();
-			else if (source == browseButton2)
+
+			if (source == browseButton)
 				handleOutputDirectoryBrowseButtonSelected();
 			else
 				updatePreferencePage();
@@ -110,19 +108,23 @@ public class PTPPreferencesPage extends PreferencePage implements
 
 	protected WidgetListener listener = new WidgetListener();
 
-	protected Control createContents(Composite parent) {
+	protected Control createContents(Composite parent) 
+	{
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(createGridLayout(1, true, 0, 0));
 		composite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 
-		createMPICTRLContents(composite);
+		createChooseRTEContents(composite);
+		//createMPICTRLContents(composite);
 		createOutputContents(composite);
 
+		loadSaved();
 		defaultSetting();
 		return composite;
 	}
 
-	private void createOutputContents(Composite parent) {
+	private void createOutputContents(Composite parent) 
+	{
 		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
@@ -139,9 +141,9 @@ public class PTPPreferencesPage extends PreferencePage implements
 		outputDirText = new Text(outputComposite, SWT.SINGLE | SWT.BORDER);
 		outputDirText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		outputDirText.addModifyListener(listener);
-		browseButton2 = SWTUtil.createPushButton(outputComposite, CoreMessages
+		browseButton = SWTUtil.createPushButton(outputComposite, CoreMessages
 				.getResourceString("PTPPreferencesPage.browseButton"), null);
-		browseButton2.addSelectionListener(listener);
+		browseButton.addSelectionListener(listener);
 
 		Composite lineComposite = new Composite(aGroup, SWT.NONE);
 		lineComposite.setLayout(new FillLayout());
@@ -153,121 +155,83 @@ public class PTPPreferencesPage extends PreferencePage implements
 		storeLineField.setPropertyChangeListener(listener);
 		storeLineField.setEmptyStringAllowed(false);
 	}
-
-	private void createMPICTRLContents(Composite parent) {
+	
+	private void createChooseRTEContents(Composite parent) 
+	{
 		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		aGroup.setText(CoreMessages
-				.getResourceString("PTPPreferencesPage.group_mpictrl"));
-
-		Composite mpiFilecomposite = new Composite(aGroup, SWT.NONE);
-		mpiFilecomposite.setLayout(createGridLayout(3, false, 0, 0));
-		mpiFilecomposite
-				.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-
-		new Label(mpiFilecomposite, SWT.NONE).setText(CoreMessages
-				.getResourceString("PTPPreferencesPage.mpiFile_text"));
-		mpiPathText = new Text(mpiFilecomposite, SWT.SINGLE | SWT.BORDER);
-		mpiPathText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		mpiPathText.addModifyListener(listener);
-		browseButton1 = SWTUtil.createPushButton(mpiFilecomposite, CoreMessages
-				.getResourceString("PTPPreferencesPage.browseButton"), null);
-		browseButton1.addSelectionListener(listener);
-
-		Composite timeoutComposite = new Composite(aGroup, SWT.NONE);
-		timeoutComposite.setLayout(new FillLayout());
-		timeoutComposite
-				.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-
-		/*
-		 * requestTimeoutField = new
-		 * IntegerFieldEditor(IMIConstants.PREF_REQUEST_TIMEOUT,
-		 * CoreMessages.getResourceString("PTPPreferencesPage.Request_timeout_text"),
-		 * timeoutComposite);
-		 * requestTimeoutField.setPropertyChangeListener(listener);
-		 * requestTimeoutField.setEmptyStringAllowed(false); launchTimoutField =
-		 * new IntegerFieldEditor(IMIConstants.PREF_REQUEST_LAUNCH_TIMEOUT,
-		 * CoreMessages.getResourceString("PTPPreferencesPage.Launch_timeout_text"),
-		 * timeoutComposite);
-		 * launchTimoutField.setPropertyChangeListener(listener);
-		 * launchTimoutField.setEmptyStringAllowed(false);
-		 */
+		aGroup.setText(CoreMessages.getResourceString("PTPPreferencesPage.group_rte"));
+		
+		combo = new Combo(aGroup, SWT.READ_ONLY);
+		combo.setItems(RTEChoices);
+		combo.addSelectionListener(listener);
 	}
 
-	protected void defaultSetting() {
-		mpiPathText.setText(mpiFile);
-		/*
-		 * requestTimeoutField.setStringValue(String.valueOf(requestTimeout));
-		 * launchTimoutField.setStringValue(String.valueOf(launchTimeout));
-		 */
-
+	protected void defaultSetting() 
+	{
+		combo.select(getRTEChoiceIndex());
 		outputDirText.setText(outputDIR);
 		storeLineField.setStringValue(String.valueOf(storeLine));
 	}
-
-	public void init(IWorkbench workbench) {
-		// IPreferenceStore store = getPreferenceStore();
-
+	
+	private void loadSaved() 
+	{
 		Preferences preferences = PTPCorePlugin.getDefault()
 				.getPluginPreferences();
-		/*
-		 * mpiFile = preferences.getString(IMIConstants.PREF_MPICTRL_LOCATION);
-		 * requestTimeout =
-		 * preferences.getInt(IMIConstants.PREF_REQUEST_TIMEOUT); if
-		 * (requestTimeout == 0) requestTimeout =
-		 * IMIConstants.DEF_REQUEST_TIMEOUT; launchTimeout =
-		 * preferences.getInt(IMIConstants.PREF_REQUEST_LAUNCH_TIMEOUT); if
-		 * (launchTimeout == 0) launchTimeout =
-		 * IMIConstants.DEF_REQUEST_LAUNCH_TIMEOUT; outputDIR =
-		 * getFieldContent(preferences.getString(OUTPUT_DIR)); if (outputDIR ==
-		 * null) outputDIR =
-		 * ResourcesPlugin.getWorkspace().getRoot().getLocation().append(DEF_OUTPUT_DIR_NAME).toOSString();
-		 * storeLine = preferences.getInt(STORE_LINE); if (storeLine == 0)
-		 * storeLine = DEF_STORE_LINE;
-		 */
+		
+		outputDIR = preferences.getString(OUTPUT_DIR);
+		if(outputDIR != null) outputDirText.setText(outputDIR);
+		storeLine = preferences.getInt(STORE_LINE);
+		storeLineField.setStringValue(String.valueOf(storeLine));
+		RTEChoice = preferences.getString("RUNTIME_ENGINE_SELECTION");
+		combo.select(getRTEChoiceIndex());
+	}
+	
+	private int getRTEChoiceIndex() 
+	{
+		/* figure out which index this string is */
+		int i;
+		for(i=0; i<RTEChoices.length; i++) {
+			if(RTEChoice.equals(RTEChoices[i])) break;
+		}
+		if(i > RTEChoices.length) i = 0;
+		
+		return i;
 	}
 
-	public void dispose() {
+	/* do stuff on init() of preferences, if anything */
+	public void init(IWorkbench workbench) 
+	{
+	}
+
+	public void dispose() 
+	{
 		super.dispose();
 	}
 
-	public void performDefaults() {
+	public void performDefaults() 
+	{
 		defaultSetting();
 		updateApplyButton();
 	}
 
-	private void store() {
-		mpiFile = mpiPathText.getText();
-		/*
-		 * requestTimeout = requestTimeoutField.getIntValue(); launchTimeout =
-		 * launchTimoutField.getIntValue();
-		 */
-
+	private void store() 
+	{
+		RTEChoice = RTEChoices[combo.getSelectionIndex()];
 		outputDIR = outputDirText.getText();
 		storeLine = storeLineField.getIntValue();
 	}
 
-	public boolean performOk() {
+	public boolean performOk() 
+	{
 		store();
 		Preferences preferences = PTPCorePlugin.getDefault()
 				.getPluginPreferences();
-		/*
-		 * preferences.setValue(IMIConstants.PREF_MPICTRL_LOCATION, mpiFile);
-		 * preferences.setValue(IMIConstants.PREF_REQUEST_TIMEOUT,
-		 * requestTimeout);
-		 * preferences.setValue(IMIConstants.PREF_REQUEST_LAUNCH_TIMEOUT,
-		 * launchTimeout);
-		 */
 
+		preferences.setValue("RUNTIME_ENGINE_SELECTION", RTEChoice);
 		preferences.setValue(OUTPUT_DIR, outputDIR);
 		preferences.setValue(STORE_LINE, storeLine);
-
-		/*
-		 * IPreferenceStore store = getPreferenceStore();
-		 * store.setValue(MPI_PATH, mpiFile); store.setValue(REQUEST_TIMEOUT,
-		 * requestTimeout); store.setValue(LAUNCH_TIMEOUT, launchTimeout);
-		 */
 
 		PTPCorePlugin.getDefault().savePluginPreferences();
 
@@ -288,31 +252,10 @@ public class PTPPreferencesPage extends PreferencePage implements
 		return true;
 	}
 
-	/**
-	 * Show a dialog that lets the user select a file
-	 */
-	protected void handleMPIPathBrowseButtonSelected() {
-		FileDialog dialog = new FileDialog(getShell());
-		dialog.setText(CoreMessages
-				.getResourceString("PTPPreferencesPage.Select_MPI_FILE"));
-		String currectMPIPath = getFieldContent(mpiPathText.getText());
-		if (currectMPIPath != null) {
-			File path = new File(currectMPIPath);
-			if (path.exists())
-				dialog.setFilterPath(path.isFile() ? currectMPIPath : path
-						.getParent());
-		}
-
-		String selectedMPIPath = dialog.open();
-		if (selectedMPIPath != null)
-			mpiPathText.setText(selectedMPIPath);
-	}
-
-	protected void handleOutputDirectoryBrowseButtonSelected() {
+	protected void handleOutputDirectoryBrowseButtonSelected() 
+	{
 		DirectoryDialog dialog = new DirectoryDialog(getShell());
-		dialog
-				.setText(CoreMessages
-						.getResourceString("PTPPreferencesPage.Select_Output_Directory"));
+		dialog.setText(CoreMessages.getResourceString("PTPPreferencesPage.Select_Output_Directory"));
 		String currectDirPath = getFieldContent(outputDirText.getText());
 		if (currectDirPath != null) {
 			File path = new File(currectDirPath);
@@ -324,40 +267,26 @@ public class PTPPreferencesPage extends PreferencePage implements
 		if (selectedDirPath != null)
 			outputDirText.setText(selectedDirPath);
 	}
-
-	protected boolean isValidMPISetting() {
-		String name = getFieldContent(mpiPathText.getText());
-		if (name == null) {
-			setErrorMessage(CoreMessages
-					.getResourceString("PTPPreferencesPage.Incorrect_MPI_file"));
+	
+	protected boolean isValidRTESetting() 
+	{
+		int intchoice = combo.getSelectionIndex();
+		if(intchoice > 1) {
+			setErrorMessage("Sorry, that RTE choice is not yet implemented.");
 			setValid(false);
 			return false;
 		}
-
-		File path = new File(name);
-		if (!path.exists() || !path.isFile()) {
-			setErrorMessage(CoreMessages
-					.getResourceString("PTPPreferencesPage.Incorrect_MPI_file"));
+		else if(intchoice < 0) {
+			setErrorMessage("Select an RTE.");
 			setValid(false);
 			return false;
 		}
-
-		if (!requestTimeoutField.isValid()) {
-			setErrorMessage(requestTimeoutField.getErrorMessage());
-			setValid(false);
-			return false;
-		}
-
-		if (!launchTimoutField.isValid()) {
-			setErrorMessage(launchTimoutField.getErrorMessage());
-			setValid(false);
-			return false;
-		}
-
+		
 		return true;
 	}
 
-	protected boolean isValidOutputSetting() {
+	protected boolean isValidOutputSetting() 
+	{
 		String name = getFieldContent(outputDirText.getText());
 		if (name == null) {
 			setErrorMessage(CoreMessages
@@ -386,28 +315,30 @@ public class PTPPreferencesPage extends PreferencePage implements
 		return true;
 	}
 
-	protected void updatePreferencePage() {
+	protected void updatePreferencePage() 
+	{
 		setErrorMessage(null);
 		setMessage(null);
 
-		if (!isValidMPISetting())
+		if (!isValidRTESetting())
 			return;
-
+		
 		if (!isValidOutputSetting())
 			return;
 
 		setValid(true);
 	}
 
-	protected String getFieldContent(String text) {
+	protected String getFieldContent(String text) 
+	{
 		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
 			return null;
 
 		return text;
 	}
 
-	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh,
-			int mw) {
+	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) 
+	{
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
 		gridLayout.makeColumnsEqualWidth = isEqual;
@@ -416,7 +347,8 @@ public class PTPPreferencesPage extends PreferencePage implements
 		return gridLayout;
 	}
 
-	protected GridData spanGridData(int style, int space) {
+	protected GridData spanGridData(int style, int space) 
+	{
 		GridData gd = null;
 		if (style == -1)
 			gd = new GridData();
