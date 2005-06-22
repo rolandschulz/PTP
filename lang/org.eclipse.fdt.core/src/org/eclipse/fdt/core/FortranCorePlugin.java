@@ -131,26 +131,9 @@ public class FortranCorePlugin extends CCorePlugin {
     public static final String CORE_ENCODING = PLUGIN_ID + ".encoding"; //$NON-NLS-1$
 	
 	/**
-	 * IContentType id for C Source Unit
+	 * IContentType id for Fortran Source Unit
 	 */
-	public final static String CONTENT_TYPE_CSOURCE =  "org.eclipse.cdt.core.cSource"; //$NON-NLS-1$
-	/**
-	 * IContentType id for C Header Unit
-	 */
-	public final static String CONTENT_TYPE_CHEADER =  "org.eclipse.cdt.core.cHeader"; //$NON-NLS-1$
-	/**
-	 * IContentType id for C++ Source Unit
-	 */
-	public final static String CONTENT_TYPE_CXXSOURCE = "org.eclipse.cdt.core.cxxSource"; //$NON-NLS-1$
-	/**
-	 * IContentType id for C++ Header Unit
-	 */
-	public final static String CONTENT_TYPE_CXXHEADER = "org.eclipse.cdt.core.cxxHeader"; //$NON-NLS-1$
-	/**
-	 * IContentType id for ASM Unit
-	 */
-	public final static String CONTENT_TYPE_ASMSOURCE = "org.eclipse.cdt.core.asmSource"; //$NON-NLS-1$
-
+	public final static String CONTENT_TYPE_FORTRANSOURCE =  "org.eclipse.fdt.core.fortranSource"; //$NON-NLS-1$
 
     public CDTLogWriter cdtLog = null;
 
