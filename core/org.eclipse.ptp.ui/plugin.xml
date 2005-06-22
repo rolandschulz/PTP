@@ -59,6 +59,18 @@
             class="org.eclipse.ptp.preferences.PTPPreferencesPage"
             id="org.eclipse.ptp.preferences.ptpPreferencesPage">
       </page>
+      <page
+            name="%SimulationpreferencePage.name"
+            class="org.eclipse.ptp.preferences.SimulationPreferencesPage"
+            id="org.eclipse.ptp.preferences.simulationPreferencesPage"
+            category="org.eclipse.ptp.preferences.ptpPreferencesPage">
+      </page>
+      <page
+            name="%OMPIpreferencePage.name"
+            class="org.eclipse.ptp.preferences.OMPIPreferencesPage"
+            id="org.eclipse.ptp.preferences.ompiPreferencesPage"
+            category="org.eclipse.ptp.preferences.ptpPreferencesPage">
+      </page>
    </extension>
    
 <!-- add buttons to editor action toolbar //-->
