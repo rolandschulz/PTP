@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IParallelModelListener;
+import org.eclipse.ptp.launch.internal.JobRunConfiguration;
 
 public interface IModelManager {
 	public static final int STATE_ERROR = -1;
@@ -84,7 +85,7 @@ public interface IModelManager {
 	public void createMPISession() throws CoreException;
 
 	public void execMI(ILaunch launch, File workingDirectory, String[] envp,
-			String[] args, IProgressMonitor pm) throws CoreException;
+			JobRunConfiguration jobRunConfig, IProgressMonitor pm) throws CoreException;
 
 	public void setPTPConfiguration(ILaunchConfiguration config);
 
