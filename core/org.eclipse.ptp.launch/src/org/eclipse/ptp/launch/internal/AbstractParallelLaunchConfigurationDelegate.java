@@ -41,6 +41,7 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
+import org.eclipse.ptp.rtmodel.JobRunConfiguration;
 
 /**
  *
@@ -115,7 +116,33 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		return (String[]) arguments.toArray(new String[arguments.size()]);
 	}
 	
-	protected String[] vertifyArgument(ILaunchConfiguration configuration) throws CoreException {
+	protected JobRunConfiguration getJobRunConfiguration(ILaunchConfiguration configuration) throws CoreException
+	{
+		IFile programFile = getProgramFile(configuration);
+		String path, nprocs_str, nprocpnode_str, firstnode_str;
+		
+		path = programFile.getLocation().toString();
+		nprocs_str = getNumberOfProcesses(configuration);
+		nprocpnode_str = getNumberOfProcessesPerNode(configuration);
+		firstnode_str = getFirstNodeNumber(configuration);
+		
+		int nprocs, nprocpnode, firstnode;
+		nprocs = nprocpnode = firstnode = -1;
+		
+		try {
+			nprocs = (new Integer(nprocs_str)).intValue();
+			nprocpnode = (new Integer(nprocpnode_str)).intValue();
+			firstnode = (new Integer(firstnode_str)).intValue();
+		}
+		catch(NumberFormatException e) {	}
+		
+		JobRunConfiguration jrc = new JobRunConfiguration(
+			programFile.getLocation().toString(), nprocs, nprocpnode, firstnode);
+		
+		return jrc;
+	}
+	
+	protected String[] verifyArgument(ILaunchConfiguration configuration) throws CoreException {
 		IFile programFile = getProgramFile(configuration);
 		String[] arguments = getProgramParameters(configuration);
 		List cmdLine = new ArrayList(arguments.length);

@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Parallel Tools Platform Core Plug-in
-Bundle-SymbolicName: org.eclipse.ptp.core
+Bundle-SymbolicName: org.eclipse.ptp.core; singleton:=true
 Bundle-Version: 1.0.0
 Bundle-ClassPath: ptp_core.jar
 Bundle-Activator: org.eclipse.ptp.core.PTPCorePlugin
