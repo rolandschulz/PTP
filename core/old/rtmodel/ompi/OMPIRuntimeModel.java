@@ -61,7 +61,10 @@ public class OMPIRuntimeModel implements IRuntimeModel {
 	
 	/* returns the new job name that it started - unique */
 	public String run(String[] args) {
-		System.out.println("JAVA OMPI: run() with args: " + args);
+		System.out.println("JAVA OMPI: run() with args: ");
+		for(int i=0; i<args.length; i++) {
+			System.out.println("\t[arg "+i+"] = "+args[i]);
+		}
 
 		/*
 		Thread runThread = new Thread("PTP RTE Run Thread") {
