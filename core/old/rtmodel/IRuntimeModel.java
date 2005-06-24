@@ -19,7 +19,7 @@
 
 package org.eclipse.ptp.rtmodel;
 
-import org.eclipse.ptp.launch.internal.JobRunConfiguration;
+import org.eclipse.ptp.rtmodel.JobRunConfiguration;
 
 public interface IRuntimeModel {
 	/* constructor will establish a new parallel session / a handle */

@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IParallelModelListener;
-import org.eclipse.ptp.launch.internal.JobRunConfiguration;
+import org.eclipse.ptp.rtmodel.JobRunConfiguration;
 
 public interface IModelManager {
 	public static final int STATE_ERROR = -1;

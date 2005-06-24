@@ -28,6 +28,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.launch.internal.ui.LaunchUtils;
+import org.eclipse.ptp.rtmodel.JobRunConfiguration;
 
 /**
  * 
@@ -57,7 +58,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		//String[] args = verifyArgument(configuration);
 		File workDirectory = vertifyWorkDirectory(configuration);
 
-		//getLaunchManager().execMI(launch, workDirectory, null, jrunconfig, monitor);
+		getLaunchManager().execMI(launch, workDirectory, null, jrunconfig, monitor);
 		monitor.worked(5);
 		
 		

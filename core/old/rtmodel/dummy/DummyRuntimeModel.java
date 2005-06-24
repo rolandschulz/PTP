@@ -27,7 +27,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.launch.internal.JobRunConfiguration;
+import org.eclipse.ptp.rtmodel.JobRunConfiguration;
 import org.eclipse.ptp.rtmodel.IRuntimeListener;
 import org.eclipse.ptp.rtmodel.IRuntimeModel;
 import org.eclipse.ptp.rtmodel.RuntimeEvent;
