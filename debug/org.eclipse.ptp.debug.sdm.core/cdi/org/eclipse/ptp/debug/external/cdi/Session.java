@@ -8,16 +8,16 @@ import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionConfiguration;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
-public class Session implements IPCDISession, ICDISessionObject {
+public class Session implements ICDISession, ICDISessionObject {
 	
 	public final static Target[] EMPTY_TARGETS = {};
 	ProcessManager processManager;
 	EventManager eventManager;
 	BreakpointManager breakpointManager;
+	RegisterManager registerManager;
 	
 	Properties props;
 	SessionConfiguration configuration;
@@ -29,6 +29,7 @@ public class Session implements IPCDISession, ICDISessionObject {
 		processManager = new ProcessManager(this);
 		eventManager = new EventManager(this);
 		breakpointManager = new BreakpointManager(this);
+		registerManager = new RegisterManager(this);
 		
 		Target target = new Target(this, dSession);
 		addTargets(new Target[] { target });
@@ -67,6 +68,11 @@ public class Session implements IPCDISession, ICDISessionObject {
 		return breakpointManager;
 	}
 	
+	public RegisterManager getRegisterManager() {
+		System.out.println("Session.getRegisterManager()");
+		return registerManager;
+	}
+
 	public ICDIEventManager getEventManager() {
 		System.out.println("Session.getEventManager()");
 		return eventManager;
@@ -85,8 +91,8 @@ public class Session implements IPCDISession, ICDISessionObject {
 	}
 
 	public Process getSessionProcess(ICDITarget target) {
-		DebugSession miSession = ((Target)target).getDebugSession();
-		return miSession.getDebugger().getSessionProcess();
+		DebugSession dSession = ((Target)target).getDebugSession();
+		return dSession.getDebugger().getSessionProcess();
 	}
 
 	public Process getSessionProcess() throws CDIException {
@@ -104,6 +110,6 @@ public class Session implements IPCDISession, ICDISessionObject {
 	public ICDISession getSession() {
 		// Auto-generated method stub
 		System.out.println("Session.getSession()");
-		return this;
+		return null;
 	}
 }

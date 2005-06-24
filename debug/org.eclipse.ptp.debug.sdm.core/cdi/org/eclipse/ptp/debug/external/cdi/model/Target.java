@@ -13,13 +13,18 @@ package org.eclipse.ptp.debug.external.cdi.model;
 import java.math.BigInteger;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
+import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
+import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILocation;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIAddressBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIExceptionpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIInstruction;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocationBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIMemoryBlock;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIMixedInstruction;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRegisterGroup;
@@ -35,19 +40,25 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
+import org.eclipse.ptp.debug.external.cdi.RegisterManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
 
 /**
  */
 public class Target extends SessionObject implements IPCDITarget {
+	
 	private TargetConfiguration fConfiguration;
 	private DebugSession dSession;
+	Thread[] noThreads = new Thread[0];
+	Thread[] currentThreads;
+	int currentThreadId;
 	
 	public Target(Session s, DebugSession dS) {
 		super(s);
 		dSession = dS;
 		fConfiguration = new TargetConfiguration(this);
+		currentThreads = noThreads;
 	}
 
 	public DebugSession getDebugSession() {
@@ -85,7 +96,8 @@ public class Target extends SessionObject implements IPCDITarget {
 	public ICDIRegisterGroup[] getRegisterGroups() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.getRegisterGroups()");
-		return null;
+		RegisterManager regMgr = ((Session)getSession()).getRegisterManager();
+		return regMgr.getRegisterGroups(this);
 	}
 
 	public boolean isTerminated() {
@@ -189,25 +201,14 @@ public class Target extends SessionObject implements IPCDITarget {
 		System.out.println("Target.createCondition()");
 		return null;
 	}
-
-	public ICDILocation createLocation(String file, String function, int line) {
-		// Auto-generated method stub
-		System.out.println("Target.createLocation()");
-		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
-		return bMgr.createLocation(file, function, line);
-	}
-
-	public ICDILocation createLocation(BigInteger address) {
-		// Auto-generated method stub
-		System.out.println("Target.createLocation()");
-		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
-		return bMgr.createLocation(address);
-	}
-
 	public ICDIThread[] getThreads() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.getThreads()");
-		return null;
+		if (currentThreads.length == 0) {
+			currentThreads = new Thread[]{new Thread(this, 0)};
+			currentThreadId = currentThreads[0].getId();
+		}
+		return currentThreads;
 	}
 
 	public ICDIThread getCurrentThread() throws CDIException {
@@ -220,13 +221,6 @@ public class Target extends SessionObject implements IPCDITarget {
 		// Auto-generated method stub
 		System.out.println("Target.getBreakpoints()");
 		return null;
-	}
-
-	public ICDILocationBreakpoint setLocationBreakpoint(int type, ICDILocation location, ICDICondition condition, boolean deferred) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.setLocationBreakpoint()");
-		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
-		return bMgr.setLocationBreakpoint(this, type, location, condition, deferred);
 	}
 
 	public ICDIWatchpoint setWatchpoint(int type, int watchType, String expression, ICDICondition condition) throws CDIException {
@@ -322,7 +316,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public ICDITarget getTarget() {
 		// Auto-generated method stub
 		System.out.println("Target.getTarget()");
-		return null;
+		return this;
 	}
 
 	public ICDIExpression createExpression(String code) throws CDIException {
@@ -425,6 +419,54 @@ public class Target extends SessionObject implements IPCDITarget {
 		// Auto-generated method stub
 		System.out.println("Target.getMemoryBlocks()");
 		return null;
+	}
+
+	public ICDILineLocation createLineLocation(String file, int line) {
+		// Auto-generated method stub
+		System.out.println("Target.createLineLocation()");
+		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
+		return bMgr.createLineLocation(file, line);
+	}
+
+	public ICDIFunctionLocation createFunctionLocation(String file, String function) {
+		// Auto-generated method stub
+		System.out.println("Target.createFunctionLocation()");
+		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
+		return bMgr.createFunctionLocation(file, function);
+	}
+
+	public ICDIAddressLocation createAddressLocation(BigInteger address) {
+		// Auto-generated method stub
+		System.out.println("Target.createAddressLocation()");
+		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
+		return bMgr.createAddressLocation(address);
+	}
+
+	public ICDILineBreakpoint setLineBreakpoint(int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException {
+		// Auto-generated method stub
+		System.out.println("Target.setLineBreakpoint()");
+		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
+		return bMgr.setLineBreakpoint(this, type, location, condition, deferred);
+	}
+
+	public ICDIFunctionBreakpoint setFunctionBreakpoint(int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException {
+		// Auto-generated method stub
+		System.out.println("Target.setFunctionBreakpoint()");
+		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
+		return bMgr.setFunctionBreakpoint(this, type, location, condition, deferred);
+	}
+
+	public ICDIAddressBreakpoint setAddressBreakpoint(int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException {
+		// Auto-generated method stub
+		System.out.println("Target.setAddressBreakpoint()");
+		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
+		return bMgr.setAddressBreakpoint(this, type, location, condition, deferred);
+	}
+
+	public void setSourcePaths(String[] srcPaths) throws CDIException {
+		// Auto-generated method stub
+		System.out.println("Target.setSourcePaths()");
+		
 	}
 
 }

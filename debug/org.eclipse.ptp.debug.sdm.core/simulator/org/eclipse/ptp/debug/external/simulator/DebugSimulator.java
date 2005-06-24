@@ -19,7 +19,7 @@ public class DebugSimulator extends AbstractDebugger {
 	public void initDebugger() {
 		super.initDebugger();
 		try {
-			debugProcess = Runtime.getRuntime().exec("/bin/bash /tmp/process.sh debugger 200");
+			debugProcess = Runtime.getRuntime().exec("/bin/bash /tmp/process.sh debugger 2000");
 		} catch (IOException e) {
 		}
 	}
@@ -39,7 +39,7 @@ public class DebugSimulator extends AbstractDebugger {
 		try {
 			for (int i = 0; i < numProcs; i++) {
 				MProcess proc = new MProcess();
-				Process p = Runtime.getRuntime().exec("/bin/bash /tmp/process.sh proc" + i + " 160");
+				Process p = Runtime.getRuntime().exec("/bin/bash /tmp/process.sh proc" + i + " 1600");
 				proc.setDebugInfo(p); /* We store the process in the "debug info" */
 				allSet.addProcess(proc);
 			}
