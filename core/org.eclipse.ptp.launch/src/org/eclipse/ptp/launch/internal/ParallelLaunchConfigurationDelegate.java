@@ -53,10 +53,11 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		
 		// done the verification phase
 		String projectName = verifyProject(configuration).getName();
-		String[] args = vertifyArgument(configuration);
+		JobRunConfiguration jrunconfig = getJobRunConfiguration(configuration); 
+		//String[] args = verifyArgument(configuration);
 		File workDirectory = vertifyWorkDirectory(configuration);
 
-		getLaunchManager().execMI(launch, workDirectory, null, args, monitor);
+		//getLaunchManager().execMI(launch, workDirectory, null, jrunconfig, monitor);
 		monitor.worked(5);
 		
 		

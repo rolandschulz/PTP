@@ -47,6 +47,7 @@ import org.eclipse.ptp.core.IParallelModelListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.internal.core.CoreUtils;
 import org.eclipse.ptp.internal.core.CoreMessages;
+import org.eclipse.ptp.launch.internal.JobRunConfiguration;
 import org.eclipse.ptp.rtmodel.IRuntimeListener;
 import org.eclipse.ptp.rtmodel.IRuntimeModel;
 import org.eclipse.ptp.rtmodel.NamedEntity;
@@ -710,7 +711,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	protected IPJob myjob = null;
 
 	public void execMI(final ILaunch launch, File workingDirectory,
-			String[] envp, final String[] args, IProgressMonitor monitor)
+			String[] envp, final JobRunConfiguration jobRunConfig, IProgressMonitor monitor)
 			throws CoreException {
 		/*
 		 * PORT IProgressMonitor subMonitor = new SubProgressMonitor(monitor,
@@ -742,7 +743,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			myjob = null;
 		}
 
-		String nejob = runtimeModel.run(args);
+		String nejob = runtimeModel.run(jobRunConfig);
 		if (nejob != null) {
 			PJob job;
 

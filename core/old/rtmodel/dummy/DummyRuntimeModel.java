@@ -27,6 +27,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.launch.internal.JobRunConfiguration;
 import org.eclipse.ptp.rtmodel.IRuntimeListener;
 import org.eclipse.ptp.rtmodel.IRuntimeModel;
 import org.eclipse.ptp.rtmodel.RuntimeEvent;
@@ -504,7 +505,7 @@ public class DummyRuntimeModel implements IRuntimeModel {
 	}
 
 	/* returns the new job name that it started - unique */
-	public String run(String[] args) {
+	public String run(JobRunConfiguration jobRunConfig) {
 		if (spawned_app_state != null
 				&& (spawned_app_state.equals(IPProcess.STARTING) || spawned_app_state
 						.equals(IPProcess.RUNNING))) {
@@ -526,19 +527,9 @@ public class DummyRuntimeModel implements IRuntimeModel {
 
 		spawned_num_procs = spawned_procs_per_node = spawned_first_node = 0;
 
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].equals("-p")) {
-				this.spawned_num_procs = (new Integer(args[i + 1]).intValue());
-				i++;
-			} else if (args[i].equals("-N")) {
-				this.spawned_procs_per_node = (new Integer(args[i + 1])
-						.intValue());
-				i++;
-			} else if (args[i].equals("-o")) {
-				this.spawned_first_node = (new Integer(args[i + 1]).intValue());
-				i++;
-			}
-		}
+		this.spawned_num_procs = jobRunConfig.getNumberOfProcesses();
+		this.spawned_procs_per_node = jobRunConfig.getNumberOfProcessesPerNode();
+		this.spawned_first_node = jobRunConfig.getFirstNodeNumber();
 
 		processMap.put(s, new Integer(spawned_num_procs));
 

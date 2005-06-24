@@ -19,6 +19,8 @@
 
 package org.eclipse.ptp.rtmodel;
 
+import org.eclipse.ptp.launch.internal.JobRunConfiguration;
+
 public interface IRuntimeModel {
 	/* constructor will establish a new parallel session / a handle */
 	public String[] getMachines();
@@ -42,7 +44,7 @@ public interface IRuntimeModel {
 	public String getNodeAttribute(String nodeName, String attrib);
 
 	/* returns the new job name string that it spawns, unique */
-	public String run(String[] args);
+	public String run(JobRunConfiguration jobRunConfig);
 
 	public void abortJob(String jobID);
 

@@ -27,6 +27,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.launch.internal.JobRunConfiguration;
 import org.eclipse.ptp.rtmodel.IRuntimeListener;
 import org.eclipse.ptp.rtmodel.IRuntimeModel;
 import org.eclipse.ptp.rtmodel.NamedEntity;
@@ -60,11 +61,8 @@ public class OMPIRuntimeModel implements IRuntimeModel {
 	}
 	
 	/* returns the new job name that it started - unique */
-	public String run(String[] args) {
-		System.out.println("JAVA OMPI: run() with args: ");
-		for(int i=0; i<args.length; i++) {
-			System.out.println("\t[arg "+i+"] = "+args[i]);
-		}
+	public String run(JobRunConfiguration jobRunConfig) {
+		System.out.println("JAVA OMPI: run() with args: "+jobRunConfig.toString());
 
 		/*
 		Thread runThread = new Thread("PTP RTE Run Thread") {
