@@ -21,10 +21,10 @@ cd ~/eclipse-workspace/org.eclipse.ptp.core/ompi
 . . .
 
 ## COMPILE ptp_ompi_jni.c INTO AN OBJECT
-cc -c -I/System/Library/Frameworks/JavaVM.framework/Headers ptp_ompi_jni.c
+mpicc -c -I/System/Library/Frameworks/JavaVM.framework/Headers ptp_ompi_jni.c
 
 ## MAKE THE JNILIB
-cc -dynamiclib -o libptp_ompi_jni.jnilib ptp_ompi_jni.o -framework JavaVM
+mpicc -dynamiclib -o libptp_ompi_jni.jnilib ptp_ompi_jni.o -framework JavaVM -single_module
 
 ## SETUP ECLIPSE TO UNDERSTAND WHERE TO FIND THE JNILIB
 ## IN THE RUN.. FOR THE NEW INSTANCE OF ECLIPSE/PTP SET THE VM ARGUMENTS
