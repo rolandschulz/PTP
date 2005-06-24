@@ -94,14 +94,14 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 
 	protected String[] getProgramParameters(ILaunchConfiguration configuration) throws CoreException {
 		List arguments = new ArrayList();
-		String temp = getNumberOfProcess(configuration);
+		String temp = getNumberOfProcesses(configuration);
 		if (temp == null) 
 		    abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Number_of_process_not_specified"), null, IStatus.INFO);
 		
 		arguments.add(NUM_PROC);		
 		arguments.add(temp);
 		//arguments.add(HYPHEN + getCommunication(configuration));
-		temp = getNumberOfProcessStart(configuration);
+		temp = getNumberOfProcessesPerNode(configuration);
 		if (temp != null  && !temp.equals("0")) {
 			arguments.add(PROC_PER_NODE);		
 		    arguments.add(temp);
@@ -166,7 +166,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	protected static String getProgramName(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, (String)null);
 	}
-	protected static String getNumberOfProcess(ILaunchConfiguration configuration) throws CoreException {
+	protected static String getNumberOfProcesses(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES, (String)null);
 	}
 	/*
@@ -174,7 +174,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, (String)null);
 	}
 	*/
-	protected static String getNumberOfProcessStart(ILaunchConfiguration configuration) throws CoreException {
+	protected static String getNumberOfProcessesPerNode(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE, (String)null);
 	}
 	protected static String getFirstNodeNumber(ILaunchConfiguration configuration) throws CoreException {
