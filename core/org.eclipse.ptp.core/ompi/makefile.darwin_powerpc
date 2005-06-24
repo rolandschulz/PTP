@@ -1,0 +1,5 @@
+all:
+	javah -classpath ../bin -jni -o ptp_ompi_jni.h org.eclipse.ptp.rtmodel.ompi.OMPIRuntimeModel
+	mpicc -c -I/System/Library/Frameworks/JavaVM.framework/Headers ptp_ompi_jni.c
+	mpicc -dynamiclib -o libptp_ompi_jni.jnilib ptp_ompi_jni.o -framework JavaVM -single_module
+
