@@ -43,13 +43,7 @@ public class ProcessManager extends Manager {
 			DebugSession miSession = target.getDebugSession();
 			if (miSession != null) {
 				miSession.addDebuggerObserver(eventManager);
-				
-				//int procsNum = target.getProcesses().length;
-				//for (int j = 0; j < procsNum; j++)
-				//	miSession.getDebugger().fireEvent(new EInferiorCreated(miSession));
-				
 				miSession.getDebugger().fireEvent(new EInferiorCreated(miSession));
-							
 				if (!debugTargetList.contains(target)) {
 					debugTargetList.add(target);
 				}

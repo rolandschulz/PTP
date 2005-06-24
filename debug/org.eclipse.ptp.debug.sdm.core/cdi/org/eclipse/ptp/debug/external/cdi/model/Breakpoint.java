@@ -13,26 +13,22 @@ package org.eclipse.ptp.debug.external.cdi.model;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
-import org.eclipse.cdt.debug.core.cdi.ICDILocation;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocationBreakpoint;
 import org.eclipse.ptp.debug.external.actionpoint.DebugActionpoint;
 
 /**
  */
-public class Breakpoint extends PTPObject implements ICDILocationBreakpoint {
+public class Breakpoint extends PTPObject implements ICDIBreakpoint {
 
-	ICDILocation fLocation;
 	ICDICondition condition;
 	DebugActionpoint[] debugActionpoints;
 	
 	int type;
 	boolean enable;
 
-	public Breakpoint(Target target, int kind, ICDILocation loc, ICDICondition cond) {
+	public Breakpoint(Target target, int kind, ICDICondition cond) {
 		super(target);
 		type = kind;
-		fLocation = loc;
 		condition = cond;
 		enable = true;
 	}
@@ -41,7 +37,7 @@ public class Breakpoint extends PTPObject implements ICDILocationBreakpoint {
 		return debugActionpoints;
 	}
 
-	public void setMIBreakpoints(DebugActionpoint[] newDebugActionpoints) {
+	public void setDebugActionpoints(DebugActionpoint[] newDebugActionpoints) {
 		debugActionpoints = newDebugActionpoints;
 	}
 
@@ -88,33 +84,10 @@ public class Breakpoint extends PTPObject implements ICDILocationBreakpoint {
 		System.out.println("Breakpoint.setCondition()");
 	}
 
-	public void setCondition0(ICDICondition newCondition) {
-		condition = newCondition;
-	}
-
 	/**
 	 * @see org.eclipse.cdt.debug.core.cdi.ICDIBreakpoint#setEnabled(boolean)
 	 */
 	public void setEnabled(boolean on) throws CDIException {
 		System.out.println("Breakpoint.setEnabled()");
-	}
-
-	public void setEnabled0(boolean on) {
-		enable = on;
-	}
-
-	/**
-	 * @see org.eclipse.cdt.debug.core.cdi.ICDILocationBreakpoint#getLocation()
-	 */
-	public ICDILocation getLocation() throws CDIException {
-		System.out.println("Breakpoint.getLocation()");
-		if (fLocation == null) {
-			return null;
-		}
-		return fLocation;
-	}
-
-	public void setLocation(ICDILocation loc) {
-		fLocation = loc;
 	}
 }

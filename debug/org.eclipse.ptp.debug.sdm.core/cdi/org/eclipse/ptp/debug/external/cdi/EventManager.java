@@ -36,10 +36,8 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	
 	public EventManager(Session session) {
 		super(session);
-		// TODO Auto-generated constructor stub
 	}
 
-	
 	/**
 	 * @see org.eclipse.cdt.debug.core.cdi.ICDIEventManager#addEventListener(ICDIEventListener)
 	 */
@@ -57,6 +55,7 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	}
 
 	public void removeEventListeners() {
+		System.out.println("EventManager.removeEventListeners()");
 		list.clear();
 	}
 
@@ -72,8 +71,11 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 		}
 	}
 
+	/**
+	 * Process the event from the back end debugger, do any state work on the CDI,
+	 * and fire the corresponding CDI event.
+	 */
 	public void update(Observable obs, Object ev) {
-		// Auto-generated method stub
 		System.out.println("EventManager.update()");
 		
 		DebugEvent event = (DebugEvent) ev;
