@@ -1,9 +1,20 @@
+/**********************************************************************
+ * Copyright (c) 2004 QNX Software Systems and others.
+ * All rights reserved.   This program and the accompanying materials
+ * are made available under the terms of the Common Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/cpl-v10.html
+ * 
+ * Contributors: 
+ * QNX Software Systems - Initial API and implementation
+***********************************************************************/
 package org.eclipse.ptp.debug.core;
 
 import java.util.HashMap;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
+import org.eclipse.cdt.debug.core.ICBreakpointListener;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -11,25 +22,55 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.IBreakpointManager;
+import org.eclipse.debug.core.model.IBreakpoint;
+import org.eclipse.cdt.debug.core.sourcelookup.ICSourceLocation;
+import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
+import org.eclipse.ptp.debug.internal.core.ListenerList;
 import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
+import org.eclipse.ptp.debug.internal.core.SessionManager;
+import org.eclipse.ptp.debug.internal.core.breakpoints.CBreakpoint;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupDirector;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.CommonSourceLookupDirector;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.SourceUtils;
 import org.osgi.framework.BundleContext;
 
 /**
- * The main plugin class to be used in the desktop.
+ * The plugin class for C/C++ debug core.
  */
 public class PTPDebugCorePlugin extends Plugin {
-	//The shared instance.
-	private static PTPDebugCorePlugin plugin;
-	//Resource bundle.
-	private ResourceBundle resourceBundle;
-	
+
 	/**
 	 * The plug-in identifier (value <code>"org.eclipse.ptp.debug.core"</code>).
 	 */
 	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.core" ; //$NON-NLS-1$
-	
+
+	/**
+	 * Status code indicating an unexpected internal error.
+	 */
+	public static final int INTERNAL_ERROR = 1000;
+
+	/**
+	 * The shared instance.
+	 */
+	private static PTPDebugCorePlugin plugin;
+
 	private HashMap fDebugConfigurations;
+
+	/**
+	 * Breakpoint listener list.
+	 */
+	private ListenerList fBreakpointListeners;
 	
+	/**
+	 * Dummy source lookup director needed to manage common source containers.
+	 */
+	private CommonSourceLookupDirector fCommonSourceLookupDirector;
+
+	private SessionManager fSessionManager = null;
+
 	/**
 	 * The constructor.
 	 */
@@ -39,52 +80,21 @@ public class PTPDebugCorePlugin extends Plugin {
 	}
 
 	/**
-	 * This method is called upon plug-in activation
-	 */
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-	}
-
-	/**
-	 * This method is called when the plug-in is stopped
-	 */
-	public void stop(BundleContext context) throws Exception {
-		super.stop(context);
-		plugin = null;
-		resourceBundle = null;
-	}
-
-	/**
 	 * Returns the shared instance.
+	 * 
+	 * @return the shared instance
 	 */
 	public static PTPDebugCorePlugin getDefault() {
 		return plugin;
 	}
 
 	/**
-	 * Returns the string from the plugin's resource bundle,
-	 * or 'key' if not found.
+	 * Returns the workspace instance.
+	 * 
+	 * @return the workspace instance
 	 */
-	public static String getResourceString(String key) {
-		ResourceBundle bundle = PTPDebugCorePlugin.getDefault().getResourceBundle();
-		try {
-			return (bundle != null) ? bundle.getString(key) : key;
-		} catch (MissingResourceException e) {
-			return key;
-		}
-	}
-
-	/**
-	 * Returns the plugin's resource bundle,
-	 */
-	public ResourceBundle getResourceBundle() {
-		try {
-			if (resourceBundle == null)
-				resourceBundle = ResourceBundle.getBundle("org.eclipse.ptp.debug.core.PTPDebugCorePluginResources");
-		} catch (MissingResourceException x) {
-			resourceBundle = null;
-		}
-		return resourceBundle;
+	public static IWorkspace getWorkspace() {
+		return ResourcesPlugin.getWorkspace();
 	}
 
 	/**
@@ -101,14 +111,51 @@ public class PTPDebugCorePlugin extends Plugin {
 		}
 		return getDefault().getBundle().getSymbolicName();
 	}
-	
+
+	/**
+	 * Logs the specified throwable with this plug-in's log.
+	 * 
+	 * @param t throwable to log 
+	 */
+	public static void log( Throwable t ) {
+		Throwable top = t;
+		if ( t instanceof DebugException ) {
+			DebugException de = (DebugException)t;
+			IStatus status = de.getStatus();
+			if ( status.getException() != null ) {
+				top = status.getException();
+			}
+		}
+		// this message is intentionally not internationalized, as an exception may
+		// be due to the resource bundle itself
+		log( new Status( IStatus.ERROR, getUniqueIdentifier(), INTERNAL_ERROR, "Internal error logged from CDI Debug: ", top ) ); //$NON-NLS-1$		
+	}
+
+	/**
+	 * Logs the specified status with this plug-in's log.
+	 * 
+	 * @param status status to log
+	 */
+	public static void log( IStatus status ) {
+		getDefault().getLog().log( status );
+	}
+
+	/**
+	 * Logs the specified message with this plug-in's log.
+	 * 
+	 * @param status status to log
+	 */
+	public static void log( String message ) {
+		getDefault().getLog().log( new Status( IStatus.ERROR, PCDIDebugModel.getPluginIdentifier(), INTERNAL_ERROR, message, null ) );
+	}
+
 	private void initializeDebugConfiguration() {
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint( getUniqueIdentifier(), "PTPDebugger" ); //$NON-NLS-1$
 		IConfigurationElement[] infos = extensionPoint.getConfigurationElements();
 		fDebugConfigurations = new HashMap( infos.length );
 		for( int i = 0; i < infos.length; i++ ) {
 			IConfigurationElement configurationElement = infos[i];
-			IPDebugConfiguration configType = new PDebugConfiguration( configurationElement );
+			PDebugConfiguration configType = new PDebugConfiguration( configurationElement );
 			fDebugConfigurations.put( configType.getID(), configType );
 		}
 	}
@@ -117,7 +164,7 @@ public class PTPDebugCorePlugin extends Plugin {
 		if ( fDebugConfigurations == null ) {
 			initializeDebugConfiguration();
 		}
-		return (IPDebugConfiguration[])fDebugConfigurations.values().toArray( new PDebugConfiguration[0] );
+		return (IPDebugConfiguration[])fDebugConfigurations.values().toArray( new IPDebugConfiguration[0] );
 	}
 
 	public IPDebugConfiguration getDebugConfiguration( String id ) throws CoreException {
@@ -126,9 +173,132 @@ public class PTPDebugCorePlugin extends Plugin {
 		}
 		IPDebugConfiguration dbgCfg = (IPDebugConfiguration)fDebugConfigurations.get( id );
 		if ( dbgCfg == null ) {
-			IStatus status = new Status( IStatus.ERROR, getUniqueIdentifier(), 100, "Error", null ); //$NON-NLS-1$
+			IStatus status = new Status( IStatus.ERROR, getUniqueIdentifier(), 100, DebugCoreMessages.getString( "CDebugCorePlugin.0" ), null ); //$NON-NLS-1$
 			throw new CoreException( status );
 		}
 		return dbgCfg;
+	}
+
+	protected void resetBreakpointsInstallCount() {
+		IBreakpointManager bm = DebugPlugin.getDefault().getBreakpointManager();
+		IBreakpoint[] breakpoints = bm.getBreakpoints( getUniqueIdentifier() );
+		for( int i = 0; i < breakpoints.length; ++i ) {
+			if ( breakpoints[i] instanceof CBreakpoint ) {
+				try {
+					((CBreakpoint)breakpoints[i]).resetInstallCount();
+				}
+				catch( CoreException e ) {
+					log( e.getStatus() );
+				}
+			}
+		}
+	}
+
+	protected SessionManager getSessionManager() {
+		return fSessionManager;
+	}
+
+	protected void setSessionManager( SessionManager sm ) {
+		if ( fSessionManager != null )
+			fSessionManager.dispose();
+		fSessionManager = sm;
+	}
+
+	public void saveCommonSourceLocations( ICSourceLocation[] locations ) {
+		PTPDebugCorePlugin.getDefault().getPluginPreferences().setValue( IPDebugConstants.PREF_SOURCE_LOCATIONS, SourceUtils.getCommonSourceLocationsMemento( locations ) );
+	}
+
+	public ICSourceLocation[] getCommonSourceLocations() {
+		return SourceUtils.getCommonSourceLocationsFromMemento( PTPDebugCorePlugin.getDefault().getPluginPreferences().getString( IPDebugConstants.PREF_SOURCE_LOCATIONS ) );
+	}
+
+	/**
+	 * Adds the given breakpoint listener to the debug model.
+	 * 
+	 * @param listener breakpoint listener
+	 */
+	public void addCBreakpointListener( ICBreakpointListener listener ) {
+		fBreakpointListeners.add( listener );
+	}
+
+	/**
+	 * Removes the given breakpoint listener from the debug model.
+	 * 
+	 * @param listener breakpoint listener
+	 */
+	public void removeCBreakpointListener( ICBreakpointListener listener ) {
+		fBreakpointListeners.remove( listener );
+	}
+
+	/**
+	 * Returns the list of breakpoint listeners registered with this plugin.
+	 *   
+	 * @return the list of breakpoint listeners registered with this plugin
+	 */
+	public Object[] getCBreakpointListeners() {
+		return fBreakpointListeners.getListeners();
+	}
+
+	private void createBreakpointListenersList() {
+		fBreakpointListeners = new ListenerList( 1 );
+	}
+
+	private void disposeBreakpointListenersList() {
+		fBreakpointListeners.removeAll();
+		fBreakpointListeners = null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+	 */
+	public void start( BundleContext context ) throws Exception {
+		super.start( context );
+		initializeCommonSourceLookupDirector();
+		createBreakpointListenersList();
+		resetBreakpointsInstallCount();
+		setSessionManager( new SessionManager() );
+	}
+
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
+	 */
+	public void stop( BundleContext context ) throws Exception {
+		setSessionManager( null );
+		disposeBreakpointListenersList();
+		resetBreakpointsInstallCount();
+		disposeCommonSourceLookupDirector();
+		super.stop( context );
+	}
+
+	private void initializeCommonSourceLookupDirector() {
+		if ( fCommonSourceLookupDirector == null ) {
+			fCommonSourceLookupDirector = new CommonSourceLookupDirector();
+			String newMemento = PTPDebugCorePlugin.getDefault().getPluginPreferences().getString( IPDebugInternalConstants.PREF_COMMON_SOURCE_CONTAINERS );
+			if ( newMemento.length() == 0 ) {
+				// Convert source locations to source containers
+				convertSourceLocations( fCommonSourceLookupDirector );
+			}
+			else {
+				try {
+					fCommonSourceLookupDirector.initializeFromMemento( newMemento );
+				}
+				catch( CoreException e ) {
+					log( e.getStatus() );
+				}
+			}
+		}
+	}
+
+	private void disposeCommonSourceLookupDirector() {
+		if ( fCommonSourceLookupDirector != null )
+			fCommonSourceLookupDirector.dispose();
+	}
+
+	public CSourceLookupDirector getCommonSourceLookupDirector() {
+		return fCommonSourceLookupDirector;
+	}
+
+	private void convertSourceLocations( CommonSourceLookupDirector director ) {
+		director.setSourceContainers( SourceUtils.convertSourceLocations( getCommonSourceLocations() ) );
 	}
 }
