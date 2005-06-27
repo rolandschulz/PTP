@@ -56,6 +56,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage, IOutputTextFileContants 
 {
 	public static final String EMPTY_STRING = "";
+	public static final String MONITORING_SYSTEM_SELECTION = "MONITORING_SYSTEM_SELECTION";
 
 	protected Text outputDirText = null;
 
@@ -69,15 +70,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 
 	private int storeLine = DEF_STORE_LINE;
 	
-	private String[] RTEChoices = new String[] {
-		"Simulated", 
-		"Open Runtime Environment (ORTE)",
-		"Los Alamos MPI (LAMPI)",
-		"LAM-MPI",
-		"MPICH 1.x",
-		"MPICH 2.x (MPD)" };
-	
-	private String RTEChoice = null;
+	private int MSChoiceID = -1;
 
 	public PTPPreferencesPage() 
 	{
@@ -114,7 +107,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		composite.setLayout(createGridLayout(1, true, 0, 0));
 		composite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 
-		createChooseRTEContents(composite);
+		createChooseMSContents(composite);
 		//createMPICTRLContents(composite);
 		createOutputContents(composite);
 
@@ -156,21 +149,21 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		storeLineField.setEmptyStringAllowed(false);
 	}
 	
-	private void createChooseRTEContents(Composite parent) 
+	private void createChooseMSContents(Composite parent) 
 	{
 		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		aGroup.setText(CoreMessages.getResourceString("PTPPreferencesPage.group_rte"));
+		aGroup.setText(CoreMessages.getResourceString("PTPPreferencesPage.group_ms"));
 		
 		combo = new Combo(aGroup, SWT.READ_ONLY);
-		combo.setItems(RTEChoices);
+		combo.setItems(MonitoringSystemChoices.getMSStrings());
 		combo.addSelectionListener(listener);
 	}
 
 	protected void defaultSetting() 
 	{
-		combo.select(getRTEChoiceIndex());
+		combo.select(MonitoringSystemChoices.getMSArrayIndexByID(MSChoiceID));
 		outputDirText.setText(outputDIR);
 		storeLineField.setStringValue(String.valueOf(storeLine));
 	}
@@ -184,20 +177,8 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		if(outputDIR != null) outputDirText.setText(outputDIR);
 		storeLine = preferences.getInt(STORE_LINE);
 		storeLineField.setStringValue(String.valueOf(storeLine));
-		RTEChoice = preferences.getString("RUNTIME_ENGINE_SELECTION");
-		combo.select(getRTEChoiceIndex());
-	}
-	
-	private int getRTEChoiceIndex() 
-	{
-		/* figure out which index this string is */
-		int i;
-		for(i=0; i<RTEChoices.length; i++) {
-			if(RTEChoice.equals(RTEChoices[i])) break;
-		}
-		if(i > RTEChoices.length) i = 0;
-		
-		return i;
+		MSChoiceID = preferences.getInt(MONITORING_SYSTEM_SELECTION);
+		combo.select(MonitoringSystemChoices.getMSArrayIndexByID(MSChoiceID));
 	}
 
 	/* do stuff on init() of preferences, if anything */
@@ -218,7 +199,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 
 	private void store() 
 	{
-		RTEChoice = RTEChoices[combo.getSelectionIndex()];
+		MSChoiceID = MonitoringSystemChoices.getMSIDByIndex(combo.getSelectionIndex());
 		outputDIR = outputDirText.getText();
 		storeLine = storeLineField.getIntValue();
 	}
@@ -229,7 +210,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		Preferences preferences = PTPCorePlugin.getDefault()
 				.getPluginPreferences();
 
-		preferences.setValue("RUNTIME_ENGINE_SELECTION", RTEChoice);
+		preferences.setValue(MONITORING_SYSTEM_SELECTION, MSChoiceID);
 		preferences.setValue(OUTPUT_DIR, outputDIR);
 		preferences.setValue(STORE_LINE, storeLine);
 
@@ -268,16 +249,16 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 			outputDirText.setText(selectedDirPath);
 	}
 	
-	protected boolean isValidRTESetting() 
+	protected boolean isValidMSSetting() 
 	{
 		int intchoice = combo.getSelectionIndex();
 		if(intchoice > 1) {
-			setErrorMessage("Sorry, that RTE choice is not yet implemented.");
+			setErrorMessage("Sorry, that MS choice is not yet implemented.");
 			setValid(false);
 			return false;
 		}
 		else if(intchoice < 0) {
-			setErrorMessage("Select an RTE.");
+			setErrorMessage("Select an MS.");
 			setValid(false);
 			return false;
 		}
@@ -320,7 +301,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		setErrorMessage(null);
 		setMessage(null);
 
-		if (!isValidRTESetting())
+		if (!isValidMSSetting())
 			return;
 		
 		if (!isValidOutputSetting())

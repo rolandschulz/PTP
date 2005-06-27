@@ -33,6 +33,7 @@ import java.util.Observer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -47,6 +48,8 @@ import org.eclipse.ptp.core.IParallelModelListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.internal.core.CoreUtils;
 import org.eclipse.ptp.internal.core.CoreMessages;
+import org.eclipse.ptp.preferences.MonitoringSystemChoices;
+import org.eclipse.ptp.preferences.PTPPreferencesPage;
 import org.eclipse.ptp.rtmodel.IRuntimeListener;
 import org.eclipse.ptp.rtmodel.IRuntimeModel;
 import org.eclipse.ptp.rtmodel.JobRunConfiguration;
@@ -94,6 +97,12 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 	public ModelManager() {
 		PTPCorePlugin.getDefault().addPerspectiveListener(perspectiveListener);
+		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
+		int MSChoiceID = preferences.getInt(PTPPreferencesPage.MONITORING_SYSTEM_SELECTION);
+		String MSChoice = MonitoringSystemChoices.getMSNameByID(MSChoiceID);
+		
+		System.out.println("Your Monitoring System Choice: '"+MSChoice+"'");
+
 		// testDummyRTM();
 		testOMPIRTM();
 	}
