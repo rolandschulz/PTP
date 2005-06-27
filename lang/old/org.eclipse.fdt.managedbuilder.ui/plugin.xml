@@ -83,7 +83,7 @@
            name="%ToolName.linker.xlf.fortran"
            id="fdt.managedbuild.tool.xlf.f.linker"
            outputFlag="-o"
-           natureFilter="fnature">
+           natureFilter="cnature">
          <optionCategory
                owner="fdt.managedbuild.tool.xlf.f.linker"
                name="%OptionCategory.General"
@@ -218,7 +218,7 @@
 		  sources="f,f90,f95,F,F90,F95"
 		  command="/opt/ibmcmp/xlf/8.1/bin/xlf95"
 		  headerExtensions="h"
-		  natureFilter="fnature"
+		  natureFilter="cnature"
 		  outputs="o"
 		  outputFlag="-o">
 		  <optionCategory
@@ -538,7 +538,7 @@
 
 <!-- Managed Make Builder Tool Specifications from CDT -->
       <tool
-            natureFilter="fnature"
+            natureFilter="cnature"
             sources="o"
 			outputs=""
             name="%ToolName.linker.gnu.fortran"
@@ -736,7 +736,7 @@
                id="gnu.windres.option.preprocessor.undefined.symbols"/>
       </tool-->
       <tool
-            natureFilter="fnature"
+            natureFilter="cnature"
             sources="o"
             outputs=""
             name="%ToolName.linker.macosx.fortran"
@@ -858,7 +858,7 @@
 		  command="gfortran"
 		  dependencyCalculator="org.eclipse.cdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
 		  headerExtensions="h"
-		  natureFilter="fnature"
+		  natureFilter="cnature"
 		  outputs="o"
 		  outputFlag="-o">
 		  <optionCategory
