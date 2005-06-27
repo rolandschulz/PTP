@@ -54,8 +54,8 @@ import org.eclipse.ptp.rtmodel.IRuntimeListener;
 import org.eclipse.ptp.rtmodel.IRuntimeModel;
 import org.eclipse.ptp.rtmodel.JobRunConfiguration;
 import org.eclipse.ptp.rtmodel.NamedEntity;
-import org.eclipse.ptp.rtmodel.dummy.DummyRuntimeModel;
 import org.eclipse.ptp.rtmodel.ompi.OMPIRuntimeModel;
+import org.eclipse.ptp.rtmodel.simulation.SimulationRuntimeModel;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -126,7 +126,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 		universe = new PUniverse();
 
-		runtimeModel = new DummyRuntimeModel();
+		runtimeModel = new SimulationRuntimeModel();
 		String[] ne = runtimeModel.getMachines();
 		for (int i = 0; i < ne.length; i++) {
 			PMachine mac;

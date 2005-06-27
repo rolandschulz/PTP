@@ -12,7 +12,7 @@ Export-Package: org.eclipse.ptp.core,
  org.eclipse.ptp.internal.core,
  org.eclipse.ptp.preferences,
  org.eclipse.ptp.rtmodel,
- org.eclipse.ptp.rtmodel.dummy
+ org.eclipse.ptp.rtmodel.simulation
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.core.runtime,
