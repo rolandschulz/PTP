@@ -37,7 +37,7 @@ public class MatchLocator implements IPSearchConstants {
     public MatchLocator(PSearchPattern pattern, PSearchResultCollector collector) {
         this.pattern = pattern;
         this.collector = collector;
-        launchManager = PTPCorePlugin.getDefault().getLaunchManager();
+        launchManager = PTPCorePlugin.getDefault().getModelManager();
     }
     
 	public void setProgressMonitor(IProgressMonitor progressMonitor) {

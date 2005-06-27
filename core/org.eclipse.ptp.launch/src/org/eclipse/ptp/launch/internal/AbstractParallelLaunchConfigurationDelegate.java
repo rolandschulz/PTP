@@ -54,7 +54,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
     public static final String PROG_NAME = HYPHEN + HYPHEN;
 
     protected IModelManager getLaunchManager() {
-        return PTPCorePlugin.getDefault().getLaunchManager();
+        return PTPCorePlugin.getDefault().getModelManager();
     }
     
     protected IWorkspaceRoot getWorkspaceRoot() {

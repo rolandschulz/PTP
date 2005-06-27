@@ -207,8 +207,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	public boolean performOk() 
 	{
 		store();
-		Preferences preferences = PTPCorePlugin.getDefault()
-				.getPluginPreferences();
+		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 
 		preferences.setValue(MONITORING_SYSTEM_SELECTION, MSChoiceID);
 		preferences.setValue(OUTPUT_DIR, outputDIR);
@@ -216,14 +215,9 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 
 		PTPCorePlugin.getDefault().savePluginPreferences();
 
-		IModelManager manager = PTPCorePlugin.getDefault().getLaunchManager();
-		if (!manager.isMPIRuning() && manager.isParallelPerspectiveOpen()) {
-			try {
-				manager.createMPISession();
-			} catch (CoreException e) {
-				System.out.println("Cannot creation MPI session: "
-						+ e.getMessage());
-			}
+		IModelManager manager = PTPCorePlugin.getDefault().getModelManager();
+		if (manager.isParallelPerspectiveOpen()) {
+			manager.refreshMonitoringSystem(MSChoiceID);
 		}
 
 		File outputDirPath = new File(outputDIR);

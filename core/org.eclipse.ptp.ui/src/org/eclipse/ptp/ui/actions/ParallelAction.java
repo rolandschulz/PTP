@@ -54,7 +54,7 @@ public abstract class ParallelAction extends Action {
     }
     
     protected IModelManager getLaunchManager() {
-        return PTPCorePlugin.getDefault().getLaunchManager();
+        return PTPCorePlugin.getDefault().getModelManager();
     }
     
     protected abstract void init(boolean isEnable);    
