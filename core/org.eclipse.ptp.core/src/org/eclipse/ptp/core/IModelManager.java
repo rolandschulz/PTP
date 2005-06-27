@@ -53,6 +53,8 @@ public interface IModelManager {
 	public static final int ALL_PROCESSES_STOPPED = 6;
 
 	public boolean isParallelPerspectiveOpen();
+	
+	public void refreshMonitoringSystem(int ID);
 
 	public void shutdown();
 

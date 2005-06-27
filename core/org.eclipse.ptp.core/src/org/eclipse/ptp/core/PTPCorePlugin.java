@@ -33,7 +33,7 @@ import org.osgi.framework.BundleContext;
 public class PTPCorePlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.eclipse.ptp.core";
 
-	private IModelManager launchManager = null;
+	private IModelManager modelManager = null;
 
 	// The shared instance.
 	private static PTPCorePlugin plugin;
@@ -60,22 +60,22 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		launchManager = new ModelManager();
+		modelManager = new ModelManager();
 	}
 
 	/**
 	 * This method is called when the plug-in is stopped
 	 */
 	public void stop(BundleContext context) throws Exception {
-		launchManager.shutdown();
+		modelManager.shutdown();
 		super.stop(context);
 	}
 
 	/**
-	 * @return Returns the launchManager.
+	 * @return Returns the modelManager.
 	 */
-	public IModelManager getLaunchManager() {
-		return launchManager;
+	public IModelManager getModelManager() {
+		return modelManager;
 	}
 
 	/**

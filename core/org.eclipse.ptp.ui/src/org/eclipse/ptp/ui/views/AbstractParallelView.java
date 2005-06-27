@@ -49,7 +49,7 @@ public abstract class AbstractParallelView extends ViewPart implements IParallel
 	protected final int BUSY_STYLE = 1; 
 	protected final int SYN_STYLE = 2; 
 
-	protected IModelManager launchManager = PTPCorePlugin.getDefault().getLaunchManager();
+	protected IModelManager launchManager = PTPCorePlugin.getDefault().getModelManager();
     protected List editorList = new ArrayList(0);
     
     public AbstractParallelView() {

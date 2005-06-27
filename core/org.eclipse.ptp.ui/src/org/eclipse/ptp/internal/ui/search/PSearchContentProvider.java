@@ -68,11 +68,11 @@ public abstract class PSearchContentProvider implements IStructuredContentProvid
     };
     
     public PSearchContentProvider() {
-        PTPCorePlugin.getDefault().getLaunchManager().addParallelLaunchListener(launchAdapter);
+        PTPCorePlugin.getDefault().getModelManager().addParallelLaunchListener(launchAdapter);
     }
 
 	public void dispose() {
-        PTPCorePlugin.getDefault().getLaunchManager().removeParallelLaunchListener(launchAdapter);
+        PTPCorePlugin.getDefault().getModelManager().removeParallelLaunchListener(launchAdapter);
 	}
 	
 	public Object[] getElements(Object inputElement) {

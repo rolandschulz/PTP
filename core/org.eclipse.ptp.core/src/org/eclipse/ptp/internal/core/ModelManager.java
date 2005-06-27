@@ -103,12 +103,25 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		
 		System.out.println("Your Monitoring System Choice: '"+MSChoice+"'");
 
-		// testDummyRTM();
-		testOMPIRTM();
+		refreshMonitoringSystem(MSChoiceID);
+	}
+	
+	public void refreshMonitoringSystem(int ID)
+	{
+		if(ID == MonitoringSystemChoices.SIMULATED_ID) {
+			execSimulatedMS();
+		}
+		else if(ID == MonitoringSystemChoices.ORTE) {
+			execORTEMS();
+		}
+		else {
+			System.out.println("No valid monitoring system selected, see the preferences page!");
+		}
 	}
 
 	/* test out the dummy (simulation) RTM (runtime model) */
-	public void testDummyRTM() {
+	public void execSimulatedMS()
+	{
 		System.out.println("Launch Manager: Testing function");
 
 		universe = new PUniverse();
@@ -162,7 +175,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	}
 
 	/* test out the OMPI (Open MPI) RTM (runtime model) */
-	public void testOMPIRTM() {
+	public void execORTEMS() 
+	{
 		System.out.println("Model Manager - testing function: OMPI RTM");
 
 		universe = new PUniverse();

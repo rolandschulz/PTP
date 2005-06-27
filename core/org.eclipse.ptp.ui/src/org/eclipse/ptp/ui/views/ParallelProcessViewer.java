@@ -78,11 +78,11 @@ public class ParallelProcessViewer extends AbstractTextEditor implements IProces
     public ParallelProcessViewer() {
 		super();
         setDocumentProvider(new StorageDocumentProvider());
-        PTPCorePlugin.getDefault().getLaunchManager().addParallelLaunchListener(launchAdapter);
+        PTPCorePlugin.getDefault().getModelManager().addParallelLaunchListener(launchAdapter);
     }
 
     public void dispose() {
-        PTPCorePlugin.getDefault().getLaunchManager().removeParallelLaunchListener(launchAdapter);
+        PTPCorePlugin.getDefault().getModelManager().removeParallelLaunchListener(launchAdapter);
         getProcess().removerProcessListener();
         myForm.dispose();
         toolkit.dispose();
@@ -304,7 +304,7 @@ public class ParallelProcessViewer extends AbstractTextEditor implements IProces
                 IPProcess process = getProcess();
                 AbstractAttachDebugger debugger = new CDTAttachDebuger(process.getPid(), process.getElementName());
                 try {
-                    debugger.attachDebugger(PTPCorePlugin.getDefault().getLaunchManager().getPTPConfiguration());
+                    debugger.attachDebugger(PTPCorePlugin.getDefault().getModelManager().getPTPConfiguration());
                     debugButton.setEnabled(false);
 				} catch (CoreException e) {
 				    String msg = e.getMessage() + "\n" + "Process not debuggable.";
