@@ -50,7 +50,9 @@ public interface IModelManager {
 
 	public static final int EVENT_UPDATED_STATUS = 5;
 
-	public static final int ALL_PROCESSES_STOPPED = 6;
+	public static final int EVENT_ALL_PROCESSES_STOPPED = 6;
+	
+	public static final int EVENT_MONITORING_SYSTEM_CHANGE = 7;
 
 	public boolean isParallelPerspectiveOpen();
 	

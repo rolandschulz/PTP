@@ -168,6 +168,11 @@ public class ParallelJobsView extends AbstractParallelView {
 
         updateButton();
     }
+    public void monitoringSystemChangeEvent(Object object) {
+    		treeViewer.setInput(launchManager.getUniverse());
+    		treeViewer.expandAll();
+    		refreshAll(ASYN_STYLE, true);
+    }
     public void sysStatusChangeEvent(Object object) {
         //initNode();
         //reset(ASYN_STYLE);

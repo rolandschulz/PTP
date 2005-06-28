@@ -32,6 +32,8 @@ public interface IParallelModelListener {
 
 	public void stopped();
 
+	public void monitoringSystemChangeEvent(Object object);
+	
 	public void execStatusChangeEvent(Object object);
 
 	public void sysStatusChangeEvent(Object object);
