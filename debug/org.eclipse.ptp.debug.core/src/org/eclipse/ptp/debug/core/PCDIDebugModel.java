@@ -48,6 +48,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.breakpoints.CAddressBreakpoint;
@@ -94,7 +95,9 @@ public class PCDIDebugModel {
 		final IDebugTarget[] target = new IDebugTarget[1];
 		IWorkspaceRunnable r = new IWorkspaceRunnable() {
 			public void run( IProgressMonitor m ) throws CoreException {
-				boolean stop = launch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_STOP_AT_MAIN, false );
+				/* ptp.core and ptp.debug.core have IPTPLaunchConfigurationConstants */
+				/* Be careful of the class that you import */
+				boolean stop = launch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
 				target[0] = new PDebugTarget( launch, project, cdiTarget, name, debuggeeProcs, file, allowTerminate, allowDisconnect );
 				ICDITargetConfiguration config = cdiTarget.getConfiguration();
 				if ( config.supportsBreakpoints() && stop ) {
@@ -436,6 +439,7 @@ public class PCDIDebugModel {
 	}
 
 	protected static void stopInMain( PDebugTarget target ) throws DebugException {
+		System.out.println("PCDIDebugModel.stopInMain()");
 		ICDILocation location = target.getCDITarget().createFunctionLocation( "", "main" ); //$NON-NLS-1$ //$NON-NLS-2$
 		try {
 			target.setInternalTemporaryBreakpoint( location );
