@@ -39,6 +39,8 @@ public abstract class ParallelModelAdapter implements IParallelModelListener {
 	public void stopped() {
 	}
 
+	public void monitoringSystemChangeEvent(Object object) {
+	}
 	public void execStatusChangeEvent(Object object) {
 	}
 
