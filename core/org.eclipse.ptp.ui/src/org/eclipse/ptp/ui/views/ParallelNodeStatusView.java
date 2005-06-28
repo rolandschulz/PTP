@@ -627,13 +627,21 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 	{
 		universe = launchManager.getUniverse();
 		
-		if(universe == null) return 0;
+		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+		
+		if(universe == null) {
+			menuMgr.removeAll();
+			menuMgr.add(new Action("<No Machines Found>", IAction.AS_RADIO_BUTTON) {
+				public void run() {
+				}
+			});
+			return 0;	
+		}
 
 		IPMachine[] macs = universe.getSortedMachines();
 
 		machine_number = 0;
 
-		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		menuMgr.removeAll();
 		for (int i = 0; i < macs.length; i++) {
 			final int mnum = i;
@@ -660,7 +668,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 
 		universe = launchManager.getUniverse();
 		if(setupMachineMenu() == 0) {
-			return;
+			//return;
 		}
 		
 		/*
@@ -842,16 +850,15 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 	}
 
 	public void updateButton() {
-		terminateAllAction
-				.setEnabled(launchManager.getCurrentState() == IModelManager.STATE_RUN);
-
-		boolean isRuning = launchManager.isMPIRuning();
+		boolean isRunning = launchManager.getCurrentState() == IModelManager.STATE_RUN;
 		// System.out.println("updateButton - isMPIRunning? "+isRuning);
 
+		terminateAllAction.setEnabled(isRunning);
+
 		// searchAction.setEnabled(isRuning);
-		showAllNodesAction.setEnabled(isRuning);
-		showMyAllocNodesAction.setEnabled(isRuning);
-		showMyUsedNodesAction.setEnabled(isRuning);
+		showAllNodesAction.setEnabled(isRunning);
+		showMyAllocNodesAction.setEnabled(isRunning);
+		showMyUsedNodesAction.setEnabled(isRunning);
 		// showLegendAction.setEnabled(isRuning);
 		// showProcessesAction.setEnabled(isRuning);
 	}
@@ -1095,7 +1102,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 	}
 
 	public void paintCanvas(GC gc) {
-		gc.drawText("Machine " + (machine_number + 1), 2, 2);
+		if(num_nodes > 0) gc.drawText("Machine " + (machine_number + 1), 2, 2);
 		if (mode == NODES) {
 			for (int i = 0; i < num_nodes; i++) {
 				drawElement(i, gc);
