@@ -321,6 +321,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 	 * update of the GUI async
 	 */
 	public void refresh(final boolean resize, final IPElement el) {
+		if(sc == null) return;
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
 				if (runflag) {
@@ -408,7 +409,8 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 		if (user_changed_filter)
 			selected_node_num = -1;
 
-		num_nodes = displayElements.length;
+		if(displayElements == null) num_nodes = 0;
+		else num_nodes = displayElements.length;
 
 		/*
 		 * PORT if(session == null) return;
@@ -456,6 +458,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 		 * sysStatus.getMISysStatusInfo().getMISystemDescription(); } catch
 		 * (MIException e) { }
 		 */
+		if(universe == null) return;
 		universe = launchManager.getUniverse();
 
 		IPMachine[] macs = universe.getSortedMachines();
@@ -620,10 +623,11 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 		return tmp;
 	}
 
-	protected void setupMachineMenu()
+	protected int setupMachineMenu()
 	{
-		
 		universe = launchManager.getUniverse();
+		
+		if(universe == null) return 0;
 
 		IPMachine[] macs = universe.getSortedMachines();
 
@@ -647,13 +651,17 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 				}
 			});
 		}
+		
+		return 1;
 	}
 
 	protected void createControl(Composite parent)
 	{
 
 		universe = launchManager.getUniverse();
-		setupMachineMenu();
+		if(setupMachineMenu() == 0) {
+			return;
+		}
 		
 		/*
 		 * this.getViewSite().getShell().addFocusListener(new FocusAdapter() {
@@ -1827,10 +1835,10 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 
 	public void removeSelectionChangedListener(
 			ISelectionChangedListener listener) {
-
 	}
 
 	public ISelection getSelection() {
+		if(sc == null) return StructuredSelection.EMPTY;
 		Control ctrl = sc.getContent();
 		if (ctrl == null || ctrl.isDisposed() || selected_node_num == -1)
 			return StructuredSelection.EMPTY;
