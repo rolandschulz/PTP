@@ -71,9 +71,14 @@ public class Target extends SessionObject implements IPCDITarget {
 		return dSession.getDebugger().getProcesses();
 	}
 
+	public Process getProcess(int num) {
+		System.out.println("Target.getProcess()");
+		return dSession.getDebugger().getProcess(num);
+	}
+	
 	public Process getProcess() {
 		System.out.println("Target.getProcess()");
-		return getProcesses()[0];
+		return getProcess(0);
 	}
 
 	public ICDITargetConfiguration getConfiguration() {

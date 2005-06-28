@@ -38,7 +38,7 @@ public class DebugSession {
 		*/
 		
 		debugger = new DebugSimulator(debugConfig);
-		debugger.initDebugger();
+		debugger.initDebugger(this);
 	}
 	
 	public void quit() {

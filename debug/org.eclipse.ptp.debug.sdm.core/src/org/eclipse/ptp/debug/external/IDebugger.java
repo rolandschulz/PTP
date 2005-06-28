@@ -22,6 +22,7 @@ import org.eclipse.ptp.debug.external.variable.DebugVariable;
  */
 public interface IDebugger {
 	public void initDebugger();
+	public void initDebugger(DebugSession dS);
 	public void destroyDebugger();
 	
 	
@@ -105,6 +106,7 @@ public interface IDebugger {
 	
 	/* Methods that are required to interface with Eclipse Debug/CDI Model */
 	public abstract Process getSessionProcess();
+	public abstract Process getProcess(int number);
 	public abstract Process[] getProcesses();
 	public abstract void disconnect();
 	public abstract void resume();

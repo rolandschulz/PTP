@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.DebugConfig;
+import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.actionpoint.ABreakpoint;
 import org.eclipse.ptp.debug.external.actionpoint.AWatchpoint;
 import org.eclipse.ptp.debug.external.actionpoint.DebugActionpoint;
@@ -440,6 +441,11 @@ public class GDBDebugger extends AbstractDebugger {
 		}
 		return procs;
 	}
+
+	public Process getProcess(int num) {
+		MISession miS = (MISession) (allSet.getProcess(num)).getDebugInfo();
+		return miS.getMIInferior();
+	}
 	
 	public Process getSessionProcess() {
 		int listSize = allSet.getSize();
@@ -501,5 +507,11 @@ public class GDBDebugger extends AbstractDebugger {
 			System.out.println("suspending: " + allSet.getProcess(i).getName());
 		}
 
+	}
+
+	public void initDebugger(DebugSession dS) {
+		// Auto-generated method stub
+		System.out.println("GDBDebugger.initDebugger()");
+		
 	}
 }

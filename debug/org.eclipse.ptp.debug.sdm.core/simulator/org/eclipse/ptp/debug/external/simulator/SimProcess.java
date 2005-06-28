@@ -15,8 +15,9 @@ public class SimProcess extends Process {
 		super();
 		finished = false;
 		name = nm;
-		err = new SimInputStream(name, 3);
-		in = new SimInputStream(name, 6);
+		//err = new SimInputStream(name, 3, 10);
+		err = null;
+		in = new SimInputStream(name, 10, 6);
 		out = new SimOutputStream();
 	}
 	

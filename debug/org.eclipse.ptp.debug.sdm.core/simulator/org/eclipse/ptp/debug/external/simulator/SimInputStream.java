@@ -7,19 +7,22 @@ public class SimInputStream extends InputStream {
 
 	int counter = 0;
 	int max;
+	
+	int pause;
 	String str;
 	int strLen;
 	
-	public SimInputStream(String s, int times) {
+	public SimInputStream(String s, int times, int delay) {
 		super();
 		max = times;
 		str = s;
+		pause = delay;
 		strLen = s.length();
 	}
 	
 	public int read() throws IOException {
 		// Auto-generated method stub
-		System.out.println("SimInputStream.read()");
+		//System.out.println("SimInputStream.read()");
 
 		counter++;
 		
@@ -28,7 +31,7 @@ public class SimInputStream extends InputStream {
 		}
 		else if ((counter % (strLen + 2)) == strLen + 1) {
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(pause * 1000);
 			} catch (InterruptedException e) {
 			}
 			return '\n';
