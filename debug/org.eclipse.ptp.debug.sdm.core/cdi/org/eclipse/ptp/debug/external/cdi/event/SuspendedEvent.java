@@ -13,7 +13,10 @@ package org.eclipse.ptp.debug.external.cdi.event;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
+import org.eclipse.ptp.debug.external.cdi.BreakpointHit;
 import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.cdi.model.Target;
+import org.eclipse.ptp.debug.external.event.DebugEvent;
 import org.eclipse.ptp.debug.external.event.EBreakpointHit;
 
 /**
@@ -21,23 +24,31 @@ import org.eclipse.ptp.debug.external.event.EBreakpointHit;
  */
 public class SuspendedEvent implements ICDISuspendedEvent {
 
+	DebugEvent event;
 	Session session;
-	ICDIObject source;
 
 	public SuspendedEvent(Session s, EBreakpointHit ev) {
 		session = s;
-		source = null;
+		event = ev;
 	}
 	
 	public ICDISessionObject getReason() {
 		// Auto-generated method stub
 		System.out.println("SuspendedEvent.getReason()");
-		return null;
+		if (event instanceof EBreakpointHit) {
+			return new BreakpointHit(session, (EBreakpointHit)event);
+		}
+		return session;
 	}
 
 	public ICDIObject getSource() {
 		// Auto-generated method stub
 		System.out.println("SuspendedEvent.getSource()");
-		return null;
+		Target target = session.getTarget(event.getDebugSession()); 
+		// We can send the target as the Source.  CDI
+		// Will assume that all threads are supended for this.
+		// This is true for gdb when it suspend the inferior
+		// all threads are suspended.
+		return target;
 	}
 }

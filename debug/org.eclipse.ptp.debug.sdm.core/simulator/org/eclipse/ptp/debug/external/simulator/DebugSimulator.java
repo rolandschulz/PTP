@@ -1,30 +1,57 @@
 package org.eclipse.ptp.debug.external.simulator;
 
-import java.io.IOException;
-
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.DebugConfig;
+import org.eclipse.ptp.debug.external.DebugSession;
+import org.eclipse.ptp.debug.external.event.EBreakpointHit;
 import org.eclipse.ptp.debug.external.model.MProcess;
 
 public class DebugSimulator extends AbstractDebugger {
 
-	/* NOTE: copy the file process.sh in this folder to /tmp */
-	
 	private Process debugProcess = null;
+	private DebugSession debugSession = null;
+	
+	final int RUNNING = 10;
+	final int SUSPENDED = 11;
+	
+	int state = 0;
+	boolean finished = false;
+	Thread dThread = null;
 	
 	public DebugSimulator(DebugConfig dConf) {
 		super(dConf);
 	}
 
-	public void initDebugger() {
+	public void initDebugger(DebugSession dS) {
 		super.initDebugger();
 		//debugProcess = Runtime.getRuntime().exec("/bin/bash /tmp/process.sh debugger 6");
 		debugProcess = new SimProcess("Debugger");
+		debugSession = dS;
+		
+		state = SUSPENDED;
+		
+		dThread = new Thread() {
+			public void run() {
+				while (!finished) {
+					try {
+						if (state == RUNNING) {
+							state = SUSPENDED;
+							fireEvent(new EBreakpointHit(debugSession));
+						}
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+		};
+		
+		dThread.start();
 	}
 	
 	public void destroyDebugger() {
 		// Auto-generated method stub
 		System.out.println("DebugSimulator.destroyDebugger()");
+		finished = true;
 	}
 
 	public void load(String prg) {
@@ -69,6 +96,10 @@ public class DebugSimulator extends AbstractDebugger {
 		return procs;
 	}
 
+	public Process getProcess(int num) {
+		return (Process) (allSet.getProcess(num)).getDebugInfo();
+	}
+	
 	public void disconnect() {
 		// Auto-generated method stub
 		System.out.println("DebugSimulator.disconnect()");
@@ -84,9 +115,9 @@ public class DebugSimulator extends AbstractDebugger {
 		System.out.println("DebugSimulator.resume()");
 		int listSize = allSet.getSize();
 		for (int i = 0; i < listSize; i++) {
-			//System.out.println("resuming: " + allSet.getProcess(i).getName());
+			System.out.println("resuming: " + allSet.getProcess(i).getName());
 		}
-
+		state = RUNNING;
 	}
 
 	public void restart() {
@@ -123,9 +154,9 @@ public class DebugSimulator extends AbstractDebugger {
 		System.out.println("DebugSimulator.suspend()");
 		int listSize = allSet.getSize();
 		for (int i = 0; i < listSize; i++) {
-			//System.out.println("suspending: " + allSet.getProcess(i).getName());
+			System.out.println("suspending: " + allSet.getProcess(i).getName());
 		}
-
+		state = SUSPENDED;
 	}
 
 }
