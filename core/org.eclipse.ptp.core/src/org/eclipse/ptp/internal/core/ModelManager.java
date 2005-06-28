@@ -117,7 +117,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			fireEvent(null, EVENT_MONITORING_SYSTEM_CHANGE);
 		}
 		else {
-			System.out.println("No valid monitoring system selected, see the preferences page!");
+			CoreUtils.showErrorDialog("Monitoring System Error", "Invalid monitoring system selected.  Set using the PTP preferences page.", null);
 		}
 	}
 

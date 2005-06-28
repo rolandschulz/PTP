@@ -175,6 +175,16 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		Preferences preferences = PTPCorePlugin.getDefault()
 				.getPluginPreferences();
 		
+		System.out.println("PREFS:");
+		String[] foo = preferences.defaultPropertyNames();
+		for(int i=0; i<foo.length; i++) {
+			System.out.println("DEFAULT["+i+"] = "+foo[i]);
+		}
+		foo = preferences.propertyNames();
+		for(int i=0; i<foo.length; i++) {
+			System.out.println("non-default prop["+i+"] = "+foo[i]);
+		}
+		
 		outputDIR = preferences.getString(OUTPUT_DIR);
 		if(outputDIR != null) outputDirText.setText(outputDIR);
 		storeLine = preferences.getInt(STORE_LINE);
@@ -252,12 +262,12 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	{
 		int intchoice = combo.getSelectionIndex();
 		if(intchoice > 1) {
-			setErrorMessage("Sorry, that MS choice is not yet implemented.");
+			setErrorMessage("Sorry, that monitoring system choice is not yet implemented.");
 			setValid(false);
 			return false;
 		}
 		else if(intchoice < 0) {
-			setErrorMessage("Select an MS.");
+			setErrorMessage("Select a monitoring system.");
 			setValid(false);
 			return false;
 		}
