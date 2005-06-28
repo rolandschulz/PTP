@@ -19,13 +19,38 @@
 package org.eclipse.ptp.launch.internal;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.MessageFormat;
 
+import org.eclipse.cdt.core.CCorePlugin;
+import org.eclipse.cdt.core.IBinaryParser;
+import org.eclipse.cdt.core.ICExtensionReference;
+import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
+import org.eclipse.cdt.core.model.ICProject;
+import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
+import org.eclipse.cdt.debug.core.cdi.ICDISession;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.debug.core.IPDebugConfiguration;
+import org.eclipse.ptp.debug.core.PCDIDebugModel;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.launch.internal.ui.LaunchUtils;
 import org.eclipse.ptp.rtmodel.JobRunConfiguration;
@@ -34,10 +59,118 @@ import org.eclipse.ptp.rtmodel.JobRunConfiguration;
  * 
  */
 public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchConfigurationDelegate {
+	
+	private IBinaryObject verifyBinary(ICProject project, IPath exePath) throws CoreException {
+		ICExtensionReference[] parserRef = CCorePlugin.getDefault().getBinaryParserExtensions(project.getProject());
+		for (int i = 0; i < parserRef.length; i++) {
+			try {
+				IBinaryParser parser = (IBinaryParser)parserRef[i].createExtension();
+				IBinaryObject exe = (IBinaryObject)parser.getBinary(exePath);
+				if (exe != null) {
+					return exe;
+				}
+			} catch (ClassCastException e) {
+			} catch (IOException e) {
+			}
+		}
+		IBinaryParser parser = CCorePlugin.getDefault().getDefaultBinaryParser();
+		try {
+			return (IBinaryObject)parser.getBinary(exePath);
+		} catch (ClassCastException e) {
+		} catch (IOException e) {
+		}
+		Throwable exception = new FileNotFoundException(
+				"AbstractCLaunchDelegate.Program_is_not_a_recongnized_executable"); //$NON-NLS-1$
+		int code = ICDTLaunchConfigurationConstants.ERR_PROGRAM_NOT_BINARY;
+		MultiStatus status = new MultiStatus("PluginID", code, "AbstractCLaunchDelegate.Program_is_not_a_recongnized_executable", exception); //$NON-NLS-1$
+		status.add(new Status(IStatus.ERROR, "PluginID", code, exception == null ? "" : exception.getLocalizedMessage(), //$NON-NLS-1$
+				exception));
+		throw new CoreException(status);
+	}
+	
+	private static IPath getProgramPath(ILaunchConfiguration configuration) throws CoreException {
+		String path = getProgramName(configuration);
+		if (path == null) {
+			return null;
+		}
+		return new Path(path);
+	}
+	
+	private IPath verifyProgramPath(ILaunchConfiguration config) throws CoreException {
+		ICProject cproject = verifyCProject(config);
+		IPath programPath = getProgramPath(config);
+		if (programPath == null || programPath.isEmpty()) {
+			return null;
+		}
+		if (!programPath.isAbsolute()) {
+			IFile wsProgramPath = cproject.getProject().getFile(programPath);
+			programPath = wsProgramPath.getLocation();
+		}
+		if (!programPath.toFile().exists()) {
+			abort(
+					"AbstractCLaunchDelegate.Program_file_does_not_exist", //$NON-NLS-1$
+					new FileNotFoundException(
+							"AbstractCLaunchDelegate.PROGRAM_PATH_not_found"), //$NON-NLS-1$
+					ICDTLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
+		}
+		return programPath;
+	}
+
+	public static ICProject getCProject(ILaunchConfiguration configuration) throws CoreException {
+		String projectName = getProjectName(configuration);
+		if (projectName != null) {
+			projectName = projectName.trim();
+			if (projectName.length() > 0) {
+				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+				ICProject cProject = CCorePlugin.getDefault().getCoreModel().create(project);
+				if (cProject != null && cProject.exists()) {
+					return cProject;
+				}
+			}
+		}
+		return null;
+	}
+
+	private ICProject verifyCProject(ILaunchConfiguration config) throws CoreException {
+		String name = getProjectName(config);
+		if (name == null) {
+			abort("AbstractCLaunchDelegate.C_Project_not_specified", null, //$NON-NLS-1$
+					ICDTLaunchConfigurationConstants.ERR_UNSPECIFIED_PROJECT);
+		}
+		ICProject cproject = getCProject(config);
+		if (cproject == null) {
+			IProject proj = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
+			if (!proj.exists()) {
+				abort(
+						"AbstractCLaunchDelegate.Project_NAME_does_not_exist", null, //$NON-NLS-1$
+						ICDTLaunchConfigurationConstants.ERR_NOT_A_C_PROJECT);
+			} else if (!proj.isOpen()) {
+				abort("AbstractCLaunchDelegate.Project_NAME_is_closed", null, //$NON-NLS-1$
+						ICDTLaunchConfigurationConstants.ERR_NOT_A_C_PROJECT);
+			}
+			abort("AbstractCLaunchDelegate.Not_a_C_CPP_project", null, //$NON-NLS-1$
+					ICDTLaunchConfigurationConstants.ERR_NOT_A_C_PROJECT);
+		}
+		return cproject;
+	}
+
+    private IPDebugConfiguration getDebugConfig(ILaunchConfiguration config) throws CoreException {
+        IPDebugConfiguration dbgCfg = null;
+        try {
+            dbgCfg = PTPDebugCorePlugin.getDefault().getDebugConfiguration("org.eclipse.ptp.debug.external.PTPDebugger");
+        } catch (CoreException e) {
+            System.out.println("ParallelLaunchConfigurationDelegate.getDebugConfig() Error");
+            throw e;
+        }
+        return dbgCfg;
+    }
+
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
+		IBinaryObject exeFile = null;
 		if (monitor == null)
 		    monitor = new NullProgressMonitor();		
 				
@@ -58,11 +191,52 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		//String[] args = verifyArgument(configuration);
 		File workDirectory = vertifyWorkDirectory(configuration);
 
+		/* Assuming we have parsed the configuration */
+		IPath exePath = verifyProgramPath(configuration);
+		ICProject project = verifyCProject(configuration);
+		if (exePath != null) {
+			exeFile = verifyBinary(project, exePath);
+		}
+		
+		String[] commandLine = new String[] {"/bin/date"};
+		int numProcs = 3;
+		
+		try {	
+			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
+				ICDISession dsession = null;
+				
+				dsession = (ICDISession) debugConfig.createDebugger().createDebuggerSession(numProcs, launch, (File) null, monitor);
+				
+				boolean stopInMain = launch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
+
+				IPCDITarget[] targets = (IPCDITarget[]) dsession.getTargets();
+				
+				for (int i = 0; i < targets.length; i++) {
+					
+					Process process = targets[i].getProcess(0);
+					IProcess[] iprocesses = new IProcess[1];
+					
+					iprocesses[0] = DebugPlugin.newProcess(launch, process, "Launch Label - 0");
+					
+					PCDIDebugModel.newDebugTarget(launch, null, targets[i], "Name", iprocesses, exeFile, true, false, stopInMain, true);
+				}
+			}
+			else if (mode.equals(ILaunchManager.RUN_MODE)) {
+				Process process = DebugPlugin.exec(commandLine, null);
+				IProcess p = DebugPlugin.newProcess(launch, process, "Launch Label");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		//getLaunchManager().execMI(launch, workDirectory, null, args, monitor);
 		getLaunchManager().execMI(launch, workDirectory, null, jrunconfig, monitor);
+		
 		monitor.worked(5);
 		
 		
-		getLaunchManager().setPTPConfiguration(configuration);
+		//getLaunchManager().setPTPConfiguration(configuration);
 				
 		if (monitor.isCanceled())
 			return;
