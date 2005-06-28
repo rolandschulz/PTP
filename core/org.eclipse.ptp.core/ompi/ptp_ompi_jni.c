@@ -33,18 +33,31 @@ ompi_mutex_t eclipse_orte_lock;
 JNIEXPORT void JNICALL 
 Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIInit(JNIEnv *env, jobject obj) 
 {
-    	int rc;
+    	int rc, id;
 
     	printf("JNI (C) OMPI: OMPIInit()\n");
 	fflush(stdout);
 
+	/* this makes the orte_init() below fail if the orte daemon
+	 * isn't running */
+	id = mca_base_param_register_int("orte", "univ", "exist",NULL,0);
+	mca_base_param_set_int(id, 1);
+	
 	/* setup the runtime environment */
-	if (ORTE_SUCCESS != (rc = orte_init())) {
+	rc = orte_init();
+	if(rc == ORTE_ERR_UNREACH) {
+	    /* unreachable orted */
+	    printf("ORTED unreachable!  Sorry!\n");
+	    return;
+	}
+
+	/*
 	    printf("ERROR: orte_init() failed - return code = %d!\n", rc);
 	    fflush(stdout);
 	    ORTE_ERROR_LOG(rc);
 	    return;
 	}
+	*/
 	printf("Registry initted.\n");
 	fflush(stdout);
 
@@ -56,7 +69,9 @@ Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIFinalize(JNIEnv *env, job
 {
     	printf("JNI (C) OMPI: OMPIFinalize()\n");
 	fflush(stdout);
+	ompi_mutex_lock(&ompi_event_lock);
 	orte_finalize();
+	ompi_mutex_unlock(&ompi_event_lock);
 
 	printf("Registry finalized.\n");
 	fflush(stdout);
@@ -68,14 +83,18 @@ Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIProgress(JNIEnv *env, job
     	printf("JNI (C) OMPI: OMPIProgress() starting . . .\n");
 	fflush(stdout);
 
+	ompi_mutex_lock(&ompi_event_lock);
+	ompi_event_loop(0); 
+	ompi_mutex_unlock(&ompi_event_lock);
+#if 0
 	while(1) {
 	    ompi_mutex_lock(&eclipse_orte_lock);
 	    ompi_event_loop(OMPI_EVLOOP_NONBLOCK);
 	    ompi_mutex_unlock(&eclipse_orte_lock);
 	    usleep(1000);
 	} 
+#endif
 
-	//ompi_event_loop(0); 
 
     	printf("JNI (C) OMPI: OMPIProgress() exiting . . .\n");
 	fflush(stdout);
@@ -160,7 +179,9 @@ int ptp_ompi_spawn(char *app, int num_procs)
 	fflush(stdout);
 
 	/* spawn the job */
+	ompi_mutex_lock(&ompi_event_lock);
 	rc = orte_rmgr.spawn(apps, num_apps, &jobid, job_state_callback);
+	ompi_mutex_unlock(&ompi_event_lock);
 	if(rc != ORTE_SUCCESS) {
 	    ompi_output(0, "%s: failed with errno=%d\n", app,
 	      rc);
