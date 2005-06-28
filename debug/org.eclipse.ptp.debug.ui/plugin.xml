@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+    
+<!-- create perspective //-->
+	<extension
+		point="org.eclipse.ui.perspectives">
+		<perspective
+			name="%DebugParallelPerspective.name"
+			icon="icons/ptp.gif"
+			class="org.eclipse.ptp.debug.ui.PTPPerspectiveFactory"
+			id="org.eclipse.ptp.debug.ui.ptpPerspectiveFactory"/>
+	</extension>   
+
+	<extension
+		point="org.eclipse.ui.views">
+		<category
+			name="%DebugParallelViewCategory.name"
+			id="org.eclipse.ptp.debug.ui.views">
+		</category>
+		<view
+			name="%DebugParallelProcessView.name"
+			icon="icons/ptp.gif"
+			category="org.eclipse.ptp.debug.ui.views"
+			class="org.eclipse.ptp.debug.ui.views.DebugParallelProcessView"
+			id="org.eclipse.ptp.debug.ui.views.debugParallelProcessView">
+		</view>
+	</extension>
+	<!--
+	<extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="%ActionSets.name"
+            visible="true"
+            id="rg.eclipse.ptp.debug.ui..actionSets">
+         <action
+               label="%legendAction.name"
+               icon="icons/legend.gif"
+               class="org.eclipse.ptp.ui.actions.ShowLegendAction"
+               tooltip="%legendAction.tooltip"
+               toolbarPath="org.eclipse.ptp.debug.ui.actionSets"
+               id="org.eclipse.ptp.ui.actions.showLegendAction">
+         </action>
+	</extension>
+	//-->
+
+</plugin>
