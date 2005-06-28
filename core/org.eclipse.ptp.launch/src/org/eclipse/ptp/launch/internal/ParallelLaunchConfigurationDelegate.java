@@ -230,7 +230,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			e.printStackTrace();
 		}
 		
-		//getLaunchManager().execMI(launch, workDirectory, null, args, monitor);
 		getLaunchManager().execMI(launch, workDirectory, null, jrunconfig, monitor);
 		
 		monitor.worked(5);
