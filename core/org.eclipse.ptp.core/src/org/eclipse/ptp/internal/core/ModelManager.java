@@ -110,9 +110,11 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	{
 		if(ID == MonitoringSystemChoices.SIMULATED_ID) {
 			execSimulatedMS();
+			fireEvent(null, EVENT_MONITORING_SYSTEM_CHANGE);
 		}
 		else if(ID == MonitoringSystemChoices.ORTE) {
 			execORTEMS();
+			fireEvent(null, EVENT_MONITORING_SYSTEM_CHANGE);
 		}
 		else {
 			System.out.println("No valid monitoring system selected, see the preferences page!");
@@ -311,7 +313,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		refreshJobStatus(ne);
 		IPJob job = universe.findJobByName(ne);
 
-		fireEvent(job, ALL_PROCESSES_STOPPED);
+		fireEvent(job, EVENT_ALL_PROCESSES_STOPPED);
 		fireState(STATE_STOPPED);
 		clearUsedMemory();
 
@@ -565,6 +567,9 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		while (i.hasNext()) {
 			IParallelModelListener listener = (IParallelModelListener) i.next();
 			switch (event) {
+			case EVENT_MONITORING_SYSTEM_CHANGE:
+				listener.monitoringSystemChangeEvent(object);
+				break;
 			case EVENT_EXEC_STATUS_CHANGE:
 				listener.execStatusChangeEvent(object);
 				break;
@@ -580,7 +585,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			case EVENT_UPDATED_STATUS:
 				listener.updatedStatusEvent();
 				break;
-			case ALL_PROCESSES_STOPPED:
+			case EVENT_ALL_PROCESSES_STOPPED:
 				listener.execStatusChangeEvent(object);
 				break;
 			}

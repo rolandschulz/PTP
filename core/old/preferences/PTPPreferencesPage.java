@@ -71,6 +71,8 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	private int storeLine = DEF_STORE_LINE;
 	
 	private int MSChoiceID = -1;
+	
+	private int lastMSChoiceID = -1;
 
 	public PTPPreferencesPage() 
 	{
@@ -179,6 +181,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		storeLineField.setStringValue(String.valueOf(storeLine));
 		MSChoiceID = preferences.getInt(MONITORING_SYSTEM_SELECTION);
 		combo.select(MonitoringSystemChoices.getMSArrayIndexByID(MSChoiceID));
+		lastMSChoiceID = MSChoiceID;
 	}
 
 	/* do stuff on init() of preferences, if anything */
@@ -216,13 +219,15 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		PTPCorePlugin.getDefault().savePluginPreferences();
 
 		IModelManager manager = PTPCorePlugin.getDefault().getModelManager();
-		if (manager.isParallelPerspectiveOpen()) {
+		if (manager.isParallelPerspectiveOpen() && lastMSChoiceID != MSChoiceID) {
 			manager.refreshMonitoringSystem(MSChoiceID);
 		}
 
 		File outputDirPath = new File(outputDIR);
 		if (!outputDirPath.exists())
 			outputDirPath.mkdir();
+		
+		lastMSChoiceID = MSChoiceID;
 
 		return true;
 	}

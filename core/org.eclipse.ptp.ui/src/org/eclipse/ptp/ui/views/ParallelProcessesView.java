@@ -317,6 +317,11 @@ public class ParallelProcessesView extends AbstractParallelView {
         setSelection();
     }
     
+	public void monitoringSystemChangeEvent(Object object) {
+		treeViewer.setInput(launchManager.getUniverse());
+		treeViewer.expandAll();
+	}
+    
     protected void openEditorAction(Object element) {
     		System.out.println("PPV.openEditorAction("+element+")");
         if (element instanceof IPProcess) {

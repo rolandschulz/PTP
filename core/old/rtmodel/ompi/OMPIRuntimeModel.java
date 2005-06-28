@@ -38,8 +38,8 @@ public class OMPIRuntimeModel implements IRuntimeModel {
 
 	public OMPIRuntimeModel() {
 		System.out.println("JAVA OMPI: constructor called");
-		OMPIInit();
-		startProgressMaker();
+		///OMPIInit();
+		//startProgressMaker();
 	}
 	
 	public native void OMPIInit();

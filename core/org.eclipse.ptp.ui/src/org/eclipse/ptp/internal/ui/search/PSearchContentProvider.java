@@ -65,6 +65,9 @@ public abstract class PSearchContentProvider implements IStructuredContentProvid
         public void updatedStatusEvent() {
             refresh();
         }
+		public void monitoringSystemChangeEvent(Object object) {
+			refresh();
+		}
     };
     
     public PSearchContentProvider() {
