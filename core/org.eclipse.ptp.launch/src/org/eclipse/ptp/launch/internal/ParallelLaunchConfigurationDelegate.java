@@ -199,7 +199,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		}
 		
 		String[] commandLine = new String[] {"/bin/date"};
-		int numProcs = 3;
+		int numProcs = jrunconfig.getNumberOfProcesses();
 		
 		try {	
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
