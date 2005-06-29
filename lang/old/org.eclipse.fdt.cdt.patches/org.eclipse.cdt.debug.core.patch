@@ -1,0 +1,16 @@
+Index: src/org/eclipse/cdt/debug/internal/core/sourcelookup/InternalSourceLookupMessages.properties
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-debug/org.eclipse.cdt.debug.core/src/org/eclipse/cdt/debug/internal/core/sourcelookup/InternalSourceLookupMessages.properties,v
+retrieving revision 1.5
+diff -u -r1.5 InternalSourceLookupMessages.properties
+--- src/org/eclipse/cdt/debug/internal/core/sourcelookup/InternalSourceLookupMessages.properties	23 Jun 2005 16:01:14 -0000	1.5
++++ src/org/eclipse/cdt/debug/internal/core/sourcelookup/InternalSourceLookupMessages.properties	28 Jun 2005 16:51:25 -0000
+@@ -16,7 +16,7 @@
+ CDirectorySourceContainerType.0=Unable to restore directory source lookup entry - missing path attribute.
+ CDirectorySourceContainerType.1=Unable to restore directory source lookup entry - expecting directory element.
+ CDirectorySourceContainerType.2=Unable to restore directory source lookup entry - invalid memento.
+-CProjectSourceLocation.0=Unable to create memento for C/C++ project source location {0}.
++CProjectSourceLocation.0=Unable to create memento for Make project source location {0}.
+ CProjectSourceLocation.1=Unable to initialize source location - missing project name
+ CProjectSourceLocation.2=Exception occurred initializing source location.
+ CSourceLocator.0=Unable to create memento for C/C++ source locator.

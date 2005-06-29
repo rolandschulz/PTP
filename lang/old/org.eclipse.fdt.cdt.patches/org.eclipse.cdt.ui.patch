@@ -1,0 +1,198 @@
+Index: plugin.properties
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/plugin.properties,v
+retrieving revision 1.86
+diff -u -r1.86 plugin.properties
+--- plugin.properties	23 Jun 2005 16:02:26 -0000	1.86
++++ plugin.properties	29 Jun 2005 14:51:39 -0000
+@@ -19,9 +19,9 @@
+ editorRulerActionsName=Editor Ruler Actions
+ cHelpProviderName=C Help Provider
+ nature.name=C Nature
+-perspective.name=C/C++
++perspective.name=Make
+ viewsCategory.name=&C
+-CView.name=C/C++ Projects
++CView.name=Make Projects
+ 
+ AddBlockCommentAction.label= Add &Block Comment
+ 
+Index: src/org/eclipse/cdt/internal/ui/buildconsole/ConsoleMessages.properties
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/buildconsole/ConsoleMessages.properties,v
+retrieving revision 1.3
+diff -u -r1.3 ConsoleMessages.properties
+--- src/org/eclipse/cdt/internal/ui/buildconsole/ConsoleMessages.properties	23 Jun 2005 16:01:25 -0000	1.3
++++ src/org/eclipse/cdt/internal/ui/buildconsole/ConsoleMessages.properties	29 Jun 2005 14:51:40 -0000
+@@ -8,7 +8,7 @@
+ # Contributors:
+ # QNX Software Systems - Initial API and implementation
+ ###############################################################################
+-BuildConsole.buildConsole=C-Build
++BuildConsole.buildConsole=Managed Make Build
+ 
+ find_replace_action.label=&Find/Replace...@Ctrl+F
+ find_replace_action.tooltip=Find/Replace
+Index: src/org/eclipse/cdt/internal/ui/editor/CDocumentProvider.java
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/CDocumentProvider.java,v
+retrieving revision 1.31
+diff -u -r1.31 CDocumentProvider.java
+--- src/org/eclipse/cdt/internal/ui/editor/CDocumentProvider.java	23 Jun 2005 16:01:24 -0000	1.31
++++ src/org/eclipse/cdt/internal/ui/editor/CDocumentProvider.java	29 Jun 2005 14:51:40 -0000
+@@ -68,7 +68,7 @@
+ /**
+  * CDocumentProvider2
+  */
+-public class CDocumentProvider extends TextFileDocumentProvider {
++public class CDocumentProvider extends TextFileDocumentProvider implements ICDocumentProvider {
+ 	/**
+ 	 * Bundle of all required informations to allow working copy management.
+ 	 */
+Index: src/org/eclipse/cdt/internal/ui/editor/CEditor.java
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/CEditor.java,v
+retrieving revision 1.89
+diff -u -r1.89 CEditor.java
+--- src/org/eclipse/cdt/internal/ui/editor/CEditor.java	9 Jun 2005 16:06:54 -0000	1.89
++++ src/org/eclipse/cdt/internal/ui/editor/CEditor.java	29 Jun 2005 14:51:41 -0000
+@@ -270,7 +270,7 @@
+ 	 * Gets the outline page of the c-editor.
+      * @return Outline page.
+ 	 */
+-	public CContentOutlinePage getOutlinePage() {
++	public IContentOutlinePage getOutlinePage() {
+ 		if (fOutlinePage == null) {
+ 			fOutlinePage = new CContentOutlinePage(this);
+ 			fOutlinePage.addSelectionChangedListener(this);
+Index: src/org/eclipse/cdt/internal/ui/editor/WorkingCopyManager.java
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/WorkingCopyManager.java,v
+retrieving revision 1.11
+diff -u -r1.11 WorkingCopyManager.java
+--- src/org/eclipse/cdt/internal/ui/editor/WorkingCopyManager.java	23 Jun 2005 16:02:25 -0000	1.11
++++ src/org/eclipse/cdt/internal/ui/editor/WorkingCopyManager.java	29 Jun 2005 14:51:41 -0000
+@@ -29,7 +29,7 @@
+  */
+ public class WorkingCopyManager implements IWorkingCopyManager, IWorkingCopyManagerExtension {
+ 	
+-	private CDocumentProvider fDocumentProvider;
++	private ICDocumentProvider fDocumentProvider;
+ 	private Map fMap;
+ 	private boolean fIsShuttingDown;
+ 
+@@ -39,7 +39,7 @@
+ 	 * 
+ 	 * @param provider the provider
+ 	 */
+-	public WorkingCopyManager(CDocumentProvider provider) {
++	public WorkingCopyManager(ICDocumentProvider provider) {
+ 		Assert.isNotNull(provider);
+ 		fDocumentProvider= provider;
+ 	}
+Index: src/org/eclipse/cdt/internal/ui/preferences/CEditorHoverConfigurationBlock.java
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/preferences/CEditorHoverConfigurationBlock.java,v
+retrieving revision 1.9
+diff -u -r1.9 CEditorHoverConfigurationBlock.java
+--- src/org/eclipse/cdt/internal/ui/preferences/CEditorHoverConfigurationBlock.java	23 Jun 2005 16:01:24 -0000	1.9
++++ src/org/eclipse/cdt/internal/ui/preferences/CEditorHoverConfigurationBlock.java	29 Jun 2005 14:51:41 -0000
+@@ -402,7 +402,7 @@
+ 		fHoverTableViewer.refresh();
+ 	}
+ 
+-	void performOk() {
++	public void performOk() {
+ 		StringBuffer buf= new StringBuffer();
+ 		StringBuffer maskBuf= new StringBuffer();
+ 		for (int i= 0; i < fHoverConfigs.length; i++) {
+@@ -429,7 +429,7 @@
+ 		CUIPlugin.getDefault().resetCEditorTextHoverDescriptors();
+ 	}
+ 
+-	void performDefaults() {
++	public void performDefaults() {
+ 		fStatus= new StatusInfo();
+ 		restoreFromPreferences();
+ 		initializeFields();
+Index: src/org/eclipse/cdt/internal/ui/preferences/FoldingConfigurationBlock.java
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/preferences/FoldingConfigurationBlock.java,v
+retrieving revision 1.2
+diff -u -r1.2 FoldingConfigurationBlock.java
+--- src/org/eclipse/cdt/internal/ui/preferences/FoldingConfigurationBlock.java	23 Jun 2005 16:01:24 -0000	1.2
++++ src/org/eclipse/cdt/internal/ui/preferences/FoldingConfigurationBlock.java	29 Jun 2005 14:51:41 -0000
+@@ -53,7 +53,7 @@
+  * 
+  * @since 3.0
+  */
+-class FoldingConfigurationBlock {
++public class FoldingConfigurationBlock {
+ 	
+ 	private static class ErrorPreferences implements ICFoldingPreferenceBlock {
+ 		private String fMessage;
+@@ -141,7 +141,7 @@
+ 	 * @param parent the parent composite
+ 	 * @return the control for the preference page
+ 	 */
+-	Control createControl(Composite parent) {
++	public Control createControl(Composite parent) {
+ 
+ 		Composite composite= new Composite(parent, SWT.NULL);
+ 		// assume parent page uses griddata
+@@ -307,18 +307,18 @@
+ 		prefs.initialize();
+ 	}
+ 
+-	void initialize() {
++	public void initialize() {
+ 		restoreFromPreferences();
+ 	}
+ 
+-	void performOk() {
++	public void performOk() {
+ 		for (Iterator it= fProviderPreferences.values().iterator(); it.hasNext();) {
+ 			ICFoldingPreferenceBlock prefs= (ICFoldingPreferenceBlock) it.next();
+ 			prefs.performOk();
+ 		}
+ 	}
+ 	
+-	void performDefaults() {
++	public void performDefaults() {
+ 		restoreFromPreferences();
+ 		for (Iterator it= fProviderPreferences.values().iterator(); it.hasNext();) {
+ 			ICFoldingPreferenceBlock prefs= (ICFoldingPreferenceBlock) it.next();
+@@ -326,7 +326,7 @@
+ 		}
+ 	}
+ 	
+-	void dispose() {
++	public void dispose() {
+ 		for (Iterator it= fProviderPreferences.values().iterator(); it.hasNext();) {
+ 			ICFoldingPreferenceBlock prefs= (ICFoldingPreferenceBlock) it.next();
+ 			prefs.dispose();
+Index: src/org/eclipse/cdt/internal/ui/editor/ICDocumentProvider.java
+===================================================================
+RCS file: src/org/eclipse/cdt/internal/ui/editor/ICDocumentProvider.java
+diff -N src/org/eclipse/cdt/internal/ui/editor/ICDocumentProvider.java
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ src/org/eclipse/cdt/internal/ui/editor/ICDocumentProvider.java	1 Jan 1970 00:00:00 -0000
+@@ -0,0 +1,18 @@
++package org.eclipse.cdt.internal.ui.editor;
++
++import org.eclipse.cdt.core.model.IWorkingCopy;
++import org.eclipse.ui.texteditor.IDocumentProvider;
++
++public interface ICDocumentProvider extends IDocumentProvider {
++
++	/*
++	 * @see org.eclipse.jdt.internal.ui.javaeditor.ICompilationUnitDocumentProvider#getWorkingCopy(java.lang.Object)
++	 */
++	public abstract IWorkingCopy getWorkingCopy(Object element);
++
++	/*
++	 * @see org.eclipse.jdt.internal.ui.javaeditor.ICompilationUnitDocumentProvider#shutdown()
++	 */
++	public abstract void shutdown();
++
++}
