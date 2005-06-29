@@ -1,13 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2001 Rational Software Corp. and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v0.5 
+ * Copyright (c) 2001, 2005 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v05.html
- * 
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
  * Contributors:
  *     Rational Software - initial implementation
- ******************************************************************************/
+ *******************************************************************************/
 package org.eclipse.fdt.internal.core.model;
 
 import java.util.Iterator;
@@ -66,20 +66,27 @@ import org.eclipse.cdt.internal.core.model.Enumerator;
 import org.eclipse.cdt.internal.core.model.Field;
 import org.eclipse.cdt.internal.core.model.Function;
 import org.eclipse.cdt.internal.core.model.FunctionDeclaration;
+import org.eclipse.cdt.internal.core.model.FunctionTemplate;
+import org.eclipse.cdt.internal.core.model.FunctionTemplateDeclaration;
 import org.eclipse.cdt.internal.core.model.IDebugLogConstants;
 import org.eclipse.cdt.internal.core.model.Include;
 import org.eclipse.cdt.internal.core.model.Macro;
 import org.eclipse.cdt.internal.core.model.Method;
 import org.eclipse.cdt.internal.core.model.MethodDeclaration;
+import org.eclipse.cdt.internal.core.model.MethodTemplate;
+import org.eclipse.cdt.internal.core.model.MethodTemplateDeclaration;
 import org.eclipse.cdt.internal.core.model.Namespace;
 import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.cdt.internal.core.model.SourceManipulation;
 import org.eclipse.cdt.internal.core.model.Structure;
 import org.eclipse.cdt.internal.core.model.StructureDeclaration;
+import org.eclipse.cdt.internal.core.model.StructureTemplate;
+import org.eclipse.cdt.internal.core.model.StructureTemplateDeclaration;
 import org.eclipse.cdt.internal.core.model.Using;
 import org.eclipse.cdt.internal.core.model.Util;
 import org.eclipse.cdt.internal.core.model.Variable;
 import org.eclipse.cdt.internal.core.model.VariableDeclaration;
+import org.eclipse.cdt.internal.core.model.VariableTemplate;
 import org.eclipse.cdt.internal.core.parser.ParserException;
 import org.eclipse.cdt.internal.core.parser.StructuralParseCallback;
 import org.eclipse.cdt.internal.core.model.TypeDef;
@@ -132,12 +139,11 @@ public class FortranModelBuilder {
 			currentProject = translationUnit.getCProject().getProject();
 		}
 		// check the project's nature
-		if( currentProject != null )
-		{
+		if (currentProject != null) {
 			hasCppNature = CoreModel.hasCCNature(currentProject);
 		}
 		// get the code to parse
-		try{
+		try {
 			code = translationUnit.getBuffer().getCharacters();
 		} catch (CModelException e) {
 			
@@ -158,8 +164,7 @@ public class FortranModelBuilder {
 		
 		// create the parser
 		IParser parser = null;
-		try
-		{
+		try {
 			IScannerInfo scanInfo = new ScannerInfo();
 			IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(currentProject);
 			if (provider != null){
@@ -194,9 +199,7 @@ public class FortranModelBuilder {
 				mode, 
 				language, 
 				ParserUtil.getParserLogService() );
-		}
-		catch( ParserFactoryError pfe )
-		{
+		} catch(ParserFactoryError pfe) {
 			throw new ParserException( CCorePlugin.getResourceString("CModelBuilder.Parser_Construction_Failure")); //$NON-NLS-1$
 		}
 		// call parse
@@ -215,27 +218,20 @@ public class FortranModelBuilder {
 
 	public Map parse(boolean quickParseMode) throws Exception {
 		long startTime = System.currentTimeMillis();
-		try
-		{
+		try {
 			parse(quickParseMode, true);		
-		}
-			
-		catch( ParserException e )
-		{
+		} catch( ParserException e ) {
 			Util.debugLog( "Parse Exception in FortranModelBuilder", IDebugLogConstants.MODEL );  //$NON-NLS-1$
 			//e.printStackTrace();
 		}
 		Util.debugLog("CModel parsing: "+ ( System.currentTimeMillis() - startTime ) + "ms", IDebugLogConstants.MODEL); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		startTime = System.currentTimeMillis();
-		try
-		{ 
+		try { 
 			generateModelElements();
 			// important to know if the unit has parse errors or not
 			translationUnit.getElementInfo().setIsStructureKnown(hasNoErrors && quickParseCallback.hasNoProblems());
-		}
-		catch( NullPointerException npe )
-		{
+		} catch( NullPointerException npe ) {
 			Util.debugLog( "NullPointer exception in CModelBuilder", IDebugLogConstants.MODEL);  //$NON-NLS-1$
 		}
 				 
@@ -329,47 +325,70 @@ public class FortranModelBuilder {
 
 	private void generateModelElements (Parent parent, IASTTemplateDeclaration templateDeclaration) throws CModelException, ASTNotImplementedException
 	{				
+		CElement element = null;
 		// Template Declaration 
 		IASTDeclaration declaration = templateDeclaration.getOwnedDeclaration();
 		if (declaration instanceof IASTAbstractTypeSpecifierDeclaration){
+			// Class Template Declation ?
 			IASTAbstractTypeSpecifierDeclaration abstractDeclaration = (IASTAbstractTypeSpecifierDeclaration)declaration ;
-			CElement element = createAbstractElement(parent, abstractDeclaration , true, true);
-			if (element instanceof SourceManipulation) {
-				SourceManipulation sourceRef = (SourceManipulation)element;
-				// set the element position		
-				sourceRef.setPos(templateDeclaration.getStartingOffset(), templateDeclaration.getEndingOffset() - templateDeclaration.getStartingOffset());
-				sourceRef.setLines( templateDeclaration.getStartingLine(), templateDeclaration.getEndingLine() );
+			element = createAbstractElement(parent, abstractDeclaration , true, true);
+			String[] parameterTypes = ASTUtil.getTemplateParameters(templateDeclaration);
+			if (element instanceof StructureTemplate) {
 				// set the template parameters				
-				String[] parameterTypes = ASTUtil.getTemplateParameters(templateDeclaration);
-				ITemplate classTemplate = (ITemplate) element;
+				StructureTemplate classTemplate = (StructureTemplate) element;
+				classTemplate.setTemplateParameterTypes(parameterTypes);				
+			} else if (element instanceof StructureTemplate) {
+				// set the template parameters				
+				StructureTemplateDeclaration classTemplate = (StructureTemplateDeclaration) element;
 				classTemplate.setTemplateParameterTypes(parameterTypes);				
 			}
 		} else if (declaration instanceof IASTClassSpecifier){
 			// special case for Structural parse
+			// Class template definiton ?
 			IASTClassSpecifier classSpecifier = (IASTClassSpecifier)declaration ;
-			CElement element = createClassSpecifierElement(parent, classSpecifier , true);
-			if (element instanceof SourceManipulation) {
-				SourceManipulation sourceRef = (SourceManipulation)element;
-				// set the element position		
-				sourceRef.setPos(templateDeclaration.getStartingOffset(), templateDeclaration.getEndingOffset() - templateDeclaration.getStartingOffset());
-				sourceRef.setLines( templateDeclaration.getStartingLine(), templateDeclaration.getEndingLine() );
+			element = createClassSpecifierElement(parent, classSpecifier , true);
+			String[] parameterTypes = ASTUtil.getTemplateParameters(templateDeclaration);
+			if (element instanceof StructureTemplate) {
 				// set the template parameters				
-				String[] parameterTypes = ASTUtil.getTemplateParameters(templateDeclaration);
-				ITemplate classTemplate = (ITemplate) element;
+				StructureTemplate classTemplate = (StructureTemplate) element;
+				classTemplate.setTemplateParameterTypes(parameterTypes);				
+			} else if (element instanceof StructureTemplate) {
+				// set the template parameters				
+				StructureTemplateDeclaration classTemplate = (StructureTemplateDeclaration) element;
 				classTemplate.setTemplateParameterTypes(parameterTypes);				
 			}
+		} else if (declaration instanceof IASTVariable) {
+			// Template variable
+			element = createSimpleElement(parent, declaration, true);			
+			// set the template parameters
+			String[] parameterTypes = ASTUtil.getTemplateParameters(templateDeclaration);
+			VariableTemplate varTemplate = (VariableTemplate) element;
+			varTemplate.setTemplateParameterTypes(parameterTypes);				
+		} else if (declaration instanceof IASTFunction) {
+			// Function template declaration/Definition
+			element = createSimpleElement(parent, declaration, true);
+			String[] parameterTypes = ASTUtil.getTemplateParameters(templateDeclaration);
+			if (element instanceof FunctionTemplate) {
+				// set the template parameters				
+				FunctionTemplate functionTemplate = (FunctionTemplate) element;
+				functionTemplate.setTemplateParameterTypes(parameterTypes);				
+			} else if (element instanceof FunctionTemplateDeclaration) {
+				// set the template parameters				
+				FunctionTemplateDeclaration functionTemplate = (FunctionTemplateDeclaration) element;
+				functionTemplate.setTemplateParameterTypes(parameterTypes);				
+			} else if (element instanceof MethodTemplate) {
+				MethodTemplate methodTemplate = (MethodTemplate) element;
+				methodTemplate.setTemplateParameterTypes(parameterTypes);				
+			} else if (element instanceof MethodTemplateDeclaration) {
+				MethodTemplateDeclaration methodTemplate = (MethodTemplateDeclaration) element;
+				methodTemplate.setTemplateParameterTypes(parameterTypes);				
+			}
 		}
-		ITemplate template = null;
-		template = (ITemplate) createSimpleElement(parent, declaration, true);
-	 	 
- 		if (template instanceof SourceManipulation){
-			SourceManipulation sourceRef = (SourceManipulation)template;
+		if (element instanceof SourceManipulation){
+			SourceManipulation sourceRef = (SourceManipulation)element;
 			// set the element position		
 			sourceRef.setPos(templateDeclaration.getStartingOffset(), templateDeclaration.getEndingOffset() - templateDeclaration.getStartingOffset());
 			sourceRef.setLines( templateDeclaration.getStartingLine(), templateDeclaration.getEndingLine() );
-			// set the template parameters
-			String[] parameterTypes = ASTUtil.getTemplateParameters(templateDeclaration);	
-			template.setTemplateParameterTypes(parameterTypes);				
 		}
 	}
 
@@ -403,16 +422,15 @@ public class FortranModelBuilder {
 				IASTEnumerationSpecifier enumSpecifier = (IASTEnumerationSpecifier) typeSpec;
 				IParent enumElement = createEnumeration (parent, enumSpecifier);
 				element = (CElement) enumElement;
-			}
-			// IASTClassSpecifier
-			else if (typeSpec instanceof IASTClassSpecifier) {
+			} else if (typeSpec instanceof IASTClassSpecifier) {
+				// IASTClassSpecifier
 				IASTClassSpecifier classSpecifier = (IASTClassSpecifier) typeSpec;
 				element = createClassSpecifierElement (parent, classSpecifier, isTemplate);
 			} else if (isDeclaration && typeSpec instanceof IASTElaboratedTypeSpecifier) {
 				// This is not a model element, so we don't create anything here.
 				// However, do we need to do anything else?
 				IASTElaboratedTypeSpecifier elabSpecifier = (IASTElaboratedTypeSpecifier) typeSpec;
-				element = createElaboratedTypeSpecifier(parent, elabSpecifier);				
+				element = createElaboratedTypeSpecifier(parent, elabSpecifier, isTemplate);				
 			}
 		}				
 		return element;		
@@ -433,21 +451,27 @@ public class FortranModelBuilder {
 		return element;
 	}
 	
-	private StructureDeclaration createElaboratedTypeSpecifier(Parent parent, IASTElaboratedTypeSpecifier typeSpec) throws CModelException{
+	private StructureDeclaration createElaboratedTypeSpecifier(Parent parent, IASTElaboratedTypeSpecifier typeSpec, boolean isTemplate) throws CModelException{
 		// create element
 		ASTClassKind classkind = typeSpec.getClassKind();
 		int kind = -1;
 		if (classkind == ASTClassKind.CLASS) {
-			kind = ICElement.C_CLASS_DECLARATION;
+			kind = (isTemplate) ? ICElement.C_TEMPLATE_CLASS_DECLARATION : ICElement.C_CLASS_DECLARATION;
 		} else if (classkind == ASTClassKind.STRUCT) {
-			kind = ICElement.C_STRUCT_DECLARATION;
+			kind = (isTemplate) ? ICElement.C_TEMPLATE_STRUCT_DECLARATION : ICElement.C_STRUCT_DECLARATION;
 		} else if (classkind == ASTClassKind.UNION) {
-			kind = ICElement.C_UNION_DECLARATION;
+			kind = (isTemplate) ? ICElement.C_TEMPLATE_UNION_DECLARATION : ICElement.C_UNION_DECLARATION;
 		}
 		String className = (typeSpec.getName() == null)
 		? "" //$NON-NLS-1$
-		: typeSpec.getName().toString();				
-		StructureDeclaration element = new StructureDeclaration(parent, className, kind);
+		: typeSpec.getName().toString();		
+
+		StructureDeclaration element;
+		if (isTemplate) {
+			element = new StructureTemplateDeclaration(parent, kind, className);
+		} else {
+			element = new StructureDeclaration(parent, className, kind);
+		}
 
 		// add to parent
 		parent.addChild(element);
@@ -554,39 +578,26 @@ public class FortranModelBuilder {
 		int kind = ICElement.C_CLASS;
 		ASTClassKind classkind = classSpecifier.getClassKind();
 		if(classkind == ASTClassKind.CLASS){
-			if(!isTemplate)
-				kind = ICElement.C_CLASS;
-			else
-				kind = ICElement.C_TEMPLATE_CLASS;
+			kind = (isTemplate) ? ICElement.C_TEMPLATE_CLASS : ICElement.C_CLASS;
 			type = "class"; //$NON-NLS-1$
-			className = (classSpecifier.getName() == null )
-						? "" //$NON-NLS-1$
-						: classSpecifier.getName().toString();				
-		}
-		if(classkind == ASTClassKind.STRUCT){
-			if(!isTemplate)
-				kind = ICElement.C_STRUCT;
-			else
-				kind = ICElement.C_TEMPLATE_STRUCT;
+		} else if(classkind == ASTClassKind.STRUCT){
+			kind = (isTemplate) ? ICElement.C_TEMPLATE_STRUCT : ICElement.C_STRUCT;
 			type = "struct"; //$NON-NLS-1$
-			className = (classSpecifier.getName() == null ) 
-						? ""  //$NON-NLS-1$
-						: classSpecifier.getName().toString();				
-		}
-		if(classkind == ASTClassKind.UNION){
-			if(!isTemplate)
-				kind = ICElement.C_UNION;
-			else
-				kind = ICElement.C_TEMPLATE_UNION;
+		} else if(classkind == ASTClassKind.UNION){
+			kind = (isTemplate) ? ICElement.C_TEMPLATE_UNION : ICElement.C_UNION;
 			type = "union"; //$NON-NLS-1$
-			className = (classSpecifier.getName() == null )
-						? ""  //$NON-NLS-1$
-						: classSpecifier.getName().toString();				
 		}
 		
-		Structure element;	
-		Structure classElement = new Structure( parent, kind, className );
-		element = classElement;
+		className = (classSpecifier.getName() == null ) ? "" : classSpecifier.getName().toString();	//$NON-NLS-1$
+
+		Structure element;
+		if(!isTemplate){		
+			Structure classElement = new Structure( parent, kind, className );
+			element = classElement;
+		} else {
+			StructureTemplate classTemplate = new StructureTemplate( parent, kind, className );
+			element = classTemplate;
+		}
 		
 		// store super classes names
 		Iterator baseClauses = classSpecifier.getBaseClauses();
@@ -650,17 +661,21 @@ public class FortranModelBuilder {
 			newElement.setMutable(fieldDeclaration.isMutable());
 			newElement.setVisibility(fieldDeclaration.getVisiblity());
 			element = newElement;			
-		}
-		else {
-			if(varDeclaration.isExtern()){
-				// variableDeclaration
-				VariableDeclaration newElement = new VariableDeclaration( parent, variableName );
-				element = newElement;
-			}
-			else {
+		} else {
+			if (isTemplate) {
 				// variable
-				Variable newElement = new Variable( parent, variableName );
-				element = newElement;				
+				VariableTemplate newElement = new VariableTemplate( parent, variableName );
+				element = newElement;									
+			} else {
+				if(varDeclaration.isExtern()){
+					// variableDeclaration
+					VariableDeclaration newElement = new VariableDeclaration( parent, variableName );
+					element = newElement;
+				} else {
+					// variable
+					Variable newElement = new Variable( parent, variableName );
+					element = newElement;				
+				}
 			}
 		}
 		element.setTypeName ( ASTUtil.getType(varDeclaration.getAbstractDeclaration()) );
@@ -701,14 +716,25 @@ public class FortranModelBuilder {
 			if (methodDeclaration.hasFunctionBody())
 			{
 				// method
-				Method newElement = new Method( parent, name );
-				methodElement = newElement;
+				if(!isTemplate){
+					Method newElement = new Method( parent, name );
+					methodElement = newElement;				
+				}else {
+					MethodTemplate newElement = new MethodTemplate(parent, name);
+					methodElement = newElement;				
+				}
 			}
 			else
 			{
 				// method declaration
-				MethodDeclaration newElement = new MethodDeclaration( parent, name );
-				methodElement = newElement;
+				if(!isTemplate){
+					MethodDeclaration newElement = new MethodDeclaration( parent, name );
+					methodElement = newElement;				
+				}else {
+					MethodTemplateDeclaration newElement = new MethodTemplateDeclaration(parent, name);
+					methodElement = newElement;				
+				}
+				
 			}
 			methodElement.setParameterTypes(parameterTypes);
 			methodElement.setReturnType( ASTUtil.getType(functionDeclaration.getReturnType()) );
@@ -732,15 +758,24 @@ public class FortranModelBuilder {
 			if (functionDeclaration.hasFunctionBody())
 			{				
 				// function
-				Function newElement = new Function( parent, name );
-				functionElement = newElement;				
-
+				if(!isTemplate){
+					Function newElement = new Function( parent, name );
+					functionElement = newElement;				
+				} else {
+					FunctionTemplate newElement = new FunctionTemplate( parent, name );
+					functionElement = newElement;				
+				}
 			}
 			else
 			{
 				// functionDeclaration
-				FunctionDeclaration newElement = new FunctionDeclaration( parent, name );
-				functionElement = newElement;				
+				if(!isTemplate){
+					FunctionDeclaration newElement = new FunctionDeclaration( parent, name );
+					functionElement = newElement;				
+				} else {
+					FunctionTemplateDeclaration newElement = new FunctionTemplateDeclaration( parent, name );
+					functionElement = newElement;				
+				}
 			}
 			functionElement.setParameterTypes(parameterTypes);
 			functionElement.setReturnType( ASTUtil.getType(functionDeclaration.getReturnType()) );
