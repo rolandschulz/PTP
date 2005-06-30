@@ -317,6 +317,10 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 		}
 		return "-1";
 	}
+	
+	public int getProcessPID(String procName) {
+		return ((int)(Math.random() * 10000)) + 1000;
+	}
 
 	public String getNodeMachineName(String nodeName) {
 		int idx;

@@ -38,7 +38,8 @@ public class ShowMyUsedNodesAction extends ParallelAction {
 	    this.setImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWMYUSEDNODES_ACTION_NORMAL));
 	    this.setDisabledImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWMYUSEDNODES_ACTION_DISABLE));
 	    this.setHoverImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWMYUSEDNODES_ACTION_HOVER));
-	    this.setEnabled(getLaunchManager().isMPIRuning());
+	    /*this.setEnabled(getLaunchManager().isMPIRuning());*/
+	    this.setEnabled(true);
 	}
 
 	public void run() {

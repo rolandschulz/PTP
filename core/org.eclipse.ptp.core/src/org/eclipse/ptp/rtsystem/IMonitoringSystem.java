@@ -41,6 +41,8 @@ public interface IMonitoringSystem {
 	public String getProcessExitCode(String procName);
 
 	public String getProcessSignal(String procName);
+	
+	public int getProcessPID(String procName);
 
 	public String getNodeAttribute(String nodeName, String attrib);
 

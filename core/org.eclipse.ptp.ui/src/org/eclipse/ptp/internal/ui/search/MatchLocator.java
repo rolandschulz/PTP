@@ -44,13 +44,18 @@ public class MatchLocator implements IPSearchConstants {
 		this.progressMonitor = progressMonitor;
 	}
 		
+
 	public void locateMatches(PSearchPattern pattern) throws InterruptedException {
+		System.err.println("TEMPORARY: MatchLocator.locateMatches() stubbed out - uses deprecated code.  "+
+				"If you see this message please explain how to replicate getting it on the PTP devel list.");
+		/*
 	    IPJob root = launchManager.getProcessRoot();
 	    
 	    if (pattern.getMode() == IPSearchConstants.EXACT_MATCH && pattern.getPLimiteTo() == IPSearchConstants.LIMIT_NUMBER)
     	    exactNumberMatches(root, pattern);
 	    else
 	        patternMatches(root, pattern);
+	        */
 	}
 	
 	private void patternMatches(IPJob root, PSearchPattern pattern) throws InterruptedException {

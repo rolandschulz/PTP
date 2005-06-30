@@ -66,11 +66,6 @@ import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.progress.IProgressService;
 
 public class ModelManager implements IModelManager, IRuntimeListener {
-
-	/*
-	 * protected CommandFactory factory = new CommandFactory();
-	 */
-
 	protected List listeners = new ArrayList(2);
 
 	protected int currentState = STATE_EXIT;
@@ -255,6 +250,9 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		controlSystem.addRuntimeListener(this);
 	}
 
+	/* given a Job, this contacts the monitoring system and populates the runtime 
+	 * model with the processes that correspond to that Job
+	 */
 	private void getProcsForNewJob(String nejob, IPJob job) {
 		String[] ne = monitoringSystem.getProcesses(nejob);
 		if (ne != null)
@@ -263,7 +261,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		for (int j = 0; ne != null && j < ne.length; j++) {
 			PProcess proc;
 			// System.out.println("process name = "+ne[j]);
-			int pid = ((int) (Math.random() * 10000)) + 1000;
+			
+			int pid = monitoringSystem.getProcessPID(ne[j]);
 			proc = new PProcess(job, ne[j], "" + j + "", "" + pid + "", "-1",
 					"", "");
 			job.addChild(proc);
@@ -385,66 +384,10 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	}
 
 	private IPerspectiveListener perspectiveListener = new IPerspectiveListener() {
-		public void perspectiveClosed(IWorkbenchPage page,
-				IPerspectiveDescriptor perspective) {
-			if (perspective.getId().equals(CoreUtils.PPerspectiveFactory_ID)) {
-				isPerspectiveOpen = false;
-				// System.out.println("Close: " + perspective.getId());
-				IWorkbench workbench = PTPCorePlugin.getDefault()
-						.getWorkbench();
-				IProgressService progressService = workbench
-						.getProgressService();
-
-				final IRunnableWithProgress runnable = new IRunnableWithProgress() {
-					public void run(IProgressMonitor monitor)
-							throws InvocationTargetException {
-						if (!monitor.isCanceled()) {
-							try {
-								mpiexit();
-							} catch (CoreException e) {
-								throw new InvocationTargetException(e);
-							}
-						}
-					}
-				};
-				try {
-					progressService.busyCursorWhile(runnable);
-				} catch (InterruptedException e) {
-					System.out.println("Closing Parallel Perspective: "
-							+ e.getMessage());
-				} catch (InvocationTargetException e2) {
-					System.out.println("Closing Parallel Perspective: "
-							+ e2.getMessage());
-				}
-			}
-		}
-
 		public void perspectiveOpened(IWorkbenchPage page,
 				IPerspectiveDescriptor perspective) {
 			if (perspective.getId().equals(CoreUtils.PPerspectiveFactory_ID)) {
 				isPerspectiveOpen = true;
-
-				// System.out.println("Open: " + perspective.getId());
-				/*
-				 * if (page instanceof WorkbenchPage) { Perspective perspect =
-				 * ((WorkbenchPage)page).findPerspective(perspective);
-				 * IActionSetDescriptor[] actionSetDesciptors =
-				 * perspect.getActionSets(); List visibleActionSets = new
-				 * ArrayList(); for (int i=0; i <actionSetDesciptors.length;
-				 * i++) { if
-				 * (!actionSetDesciptors[i].getId().equals(NewSearchUI.ACTION_SET_ID))
-				 * visibleActionSets.add(actionSetDesciptors[i]); }
-				 * IActionSetDescriptor[] newActionSets = new
-				 * IActionSetDescriptor[visibleActionSets.size()];
-				 * visibleActionSets.toArray(newActionSets);
-				 * perspect.setActionSets(newActionSets); }
-				 */
-
-				/*
-				 * try { createMPISession(); } catch (CoreException e) {
-				 * System.out.println("Cannot creation MPI session: " +
-				 * e.getMessage()); }
-				 */
 			}
 		}
 
@@ -454,12 +397,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			if (perspective.getId().equals(CoreUtils.PPerspectiveFactory_ID)) {
 				isPerspectiveOpen = true;
 				System.out.println("Active: " + perspective.getId());
-				try {
-					createMPISession();
-				} catch (CoreException e) {
-					System.out.println("Cannot creation MPI session: "
-							+ e.getMessage());
-				}
 			}
 		}
 
@@ -470,85 +407,14 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		}
 	};
 
-	private Observer mpiObserver = new Observer() {
-		public synchronized void update(Observable o, Object arg) {
-			/*
-			 * if (arg instanceof MIExecStatusChangeEvent) {
-			 * MIExecStatusChangeEvent ev = (MIExecStatusChangeEvent) arg;
-			 * MIProcessDescription[] pdes = ev.getMIProcessDescription(); for
-			 * (int i = 0; i < pdes.length; i++) { IPProcess process =
-			 * getProcessRoot().findProcess(pdes[i].getRank()); if (process !=
-			 * null) { process.setExitCode(pdes[i].getExitCode());
-			 * process.setSignalName(pdes[i].getSignalName());
-			 * process.setStatus(pdes[i].getStatus()); fireEvent(process,
-			 * EVENT_EXEC_STATUS_CHANGE); if (process.getParent().isAllStop()) {
-			 * fireEvent(process.getParent(), ALL_PROCESSES_STOPPED); if
-			 * (processRoot.isAllStop()) { fireState(STATE_STOPPED);
-			 * clearUsedMemory(); } } break; }
-			 * //System.out.println("================== exit code: " + //
-			 * pd.getExitCode() + ", node: " + pd.getNode() + ", pid: " // +
-			 * pd.getPid() + ", status: " + pd.getStatus() + ", rank: // " +
-			 * pd.getRank()); } } else if (arg instanceof MIProcessOutputEvent) {
-			 * MIProcessOutputEvent ev = (MIProcessOutputEvent) arg; IPProcess
-			 * process =
-			 * getProcessRoot().findProcess(String.valueOf(ev.getProcNumber()));
-			 * if (process != null) { if
-			 * (process.getStatus().equals(IPProcess.STARTING)) {
-			 * process.setStatus(IPProcess.RUNNING); fireEvent(process,
-			 * EVENT_EXEC_STATUS_CHANGE); } process.addOutput(ev.getOutput());
-			 * //fireEvent(process, EVENT_PROCESS_OUTPUT); }
-			 * //System.out.println("+++++++++++++++++++++ node: " + //
-			 * ev.getProcNumber() + ", output: " + ev.getOutput()); } else if
-			 * (arg instanceof MISysStatusChangeEvent) { try { mpisysstatus(); }
-			 * catch (CoreException e) { System.out.println("+++++++ Observer -
-			 * mpisysstatus err: " + e.getMessage()); } fireEvent(null,
-			 * EVENT_SYS_STATUS_CHANGE); } else if (arg instanceof MIErrorEvent) {
-			 * String err = ((MIErrorEvent) arg).getMessage();
-			 * System.out.println("MIErrorEvent: " + err); /* try { mpiabort(); }
-			 * catch (CoreException e) { } finally {
-			 * setCurrentState(STATE_ERROR);
-			 * //CoreUtils.showErrorDialog("MIErrorEvent", err, null); }
-			 */
-			/*
-			 * fireEvent(err, EVENT_ERROR); }
-			 */
-		}
-	};
-
 	public void shutdown() {
 		PTPCorePlugin.getDefault().removePerspectiveListener(
 				perspectiveListener);
-		clearAll();
-		mpiObserver = null;
 		perspectiveListener = null;
 		listeners.clear();
 		listeners = null;
 		controlSystem.shutdown();
 		monitoringSystem.shutdown();
-	}
-
-	public void clearAll() {
-		/*
-		 * if (session == null) return; removeConsole();
-		 * session.deleteObservers(); session = null;
-		 * processRoot.removeAllProcesses(); processRoot = null;
-		 */
-	}
-
-	/*
-	 * private void terminateDebugProcess() { if (debugProcess != null &&
-	 * !debugProcess.isTerminated()) { try { debugProcess.terminate(); } catch
-	 * (DebugException e) { System.out.println("LaunchManager -
-	 * terminateDebugProcess: " + e.getMessage()); } finally { debugProcess =
-	 * null; } } }
-	 */
-
-	/*
-	 * public MISession getSession() { return session; }
-	 */
-
-	public IPJob getProcessRoot() {
-		return processRoot;
 	}
 
 	public void addParallelLaunchListener(IParallelModelListener listener) {
@@ -568,7 +434,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			case STATE_START:
 				listener.start();
 				System.out
-						.println("++++++++++++ Started mpictrl ++++++++++++++");
+						.println("++++++++++++ Started ++++++++++++++");
 				break;
 			case STATE_RUN:
 				listener.run();
@@ -627,138 +493,18 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 	protected String renderLabel(String name) {
 		String format = CoreMessages
-				.getResourceString("LaunchManager.{0}_({1})");
+				.getResourceString("ModelManager.{0}_({1})");
 		String timestamp = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
 				DateFormat.MEDIUM).format(new Date(System.currentTimeMillis()));
 		return MessageFormat.format(format, new String[] { name, timestamp });
 	}
 
-	protected void isSessionExist() throws CoreException {
-		/*
-		 * if (session == null) { createMPISession(); //Status status = new
-		 * Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(),
-		 * IStatus.INFO, "No MI session is created", null); //throw new
-		 * CoreException(status); }
-		 */
-	}
-
-	public boolean isMPIRuning() {
-		return true;
-		/*
-		 * return (session != null || (processRoot != null &&
-		 * processRoot.hasChildren()));
-		 */
-	}
-
-	public boolean hasProcessRunning() {
-		if (isMPIRuning() && !processRoot.isAllStop())
-			return true;
-
-		return false;
-	}
-
-	public synchronized void mpirun(String[] args) throws CoreException {
-		isSessionExist();
-
-		/*
-		 * if (getCurrentState() != STATE_ERROR && hasProcessRunning()) { Status
-		 * status = new Status(IStatus.ERROR,
-		 * PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, "Some processes
-		 * are stilling running", null); throw new CoreException(status); }
-		 */
-
-		/*
-		 * try { MIExecRun execRun = factory.createMIExecRun(args);
-		 * session.postCommand(execRun); fireState(STATE_RUN); } catch
-		 * (MIException e) { Status status = new Status(IStatus.ERROR,
-		 * PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, e.getMessage(),
-		 * e); throw new CoreException(status); }
-		 */
-	}
-
-	public synchronized void mpisysstatus() throws CoreException {
-		isSessionExist();
-
-		/*
-		 * try { MISysStatus sysStatus = new MISysStatus();
-		 * session.postCommand(sysStatus);
-		 * updateProcessInfo(sysStatus.getMISysStatusInfo().getMISystemDescription());
-		 * fireEvent(null, EVENT_SYS_STATUS_CHANGE); } catch (MIException e) {
-		 * Status status = new Status(IStatus.ERROR,
-		 * PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, "Cannot exec SYS
-		 * STATUS command", e); throw new CoreException(status); }
-		 */
-	}
-
-	public synchronized void mpistatus() throws CoreException {
-		isSessionExist();
-
-		/*
-		 * try { MIExecStatus execStatus = factory.createMIExecStatus();
-		 * session.postCommand(execStatus);
-		 * updateProcessInfo(execStatus.getMIExecStatusInfo().getMIProcessDescription());
-		 * fireEvent(null, EVENT_UPDATED_STATUS); } catch (MIException e) {
-		 * Status status = new Status(IStatus.ERROR,
-		 * PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, "Cannot exec
-		 * STATUS command", e); throw new CoreException(status); }
-		 */
-	}
-
-	public synchronized void mpiabort() throws CoreException {
-		isSessionExist();
-
-		controlSystem.abortJob("foo");
+	public synchronized void abortJob(String jobName) throws CoreException {
+		controlSystem.abortJob(jobName);
 		System.out
-				.println("***** NEED TO REFRESH JOB STATUS HERE in mpiabort() of ModelManager ONCE WE KNOW THE JOBID!");
+				.println("***** NEED TO REFRESH JOB STATUS HERE in abortJob() of ModelManager ONCE WE KNOW THE JOBID!");
 		// refreshJobStatus(nejob);
 		fireState(STATE_ABORT);
-		/*
-		 * try { MIExecAbort execAbort = factory.createMIExecAbort();
-		 * session.postCommand(execAbort); fireState(STATE_ABORT); } catch
-		 * (MIException e) { Status status = new Status(IStatus.ERROR,
-		 * PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO, "Cannot exec ABORT
-		 * command", e); throw new CoreException(status); }
-		 */
-	}
-
-	public synchronized void mpiexit() throws CoreException {
-		isSessionExist();
-
-		try {
-			// MIExit gdbExit = factory.createMIExit();
-			// session.postCommand(gdbExit);
-			/*
-			 * session.terminate();
-			 */
-			if (getCurrentState() != STATE_EXIT)
-				fireState(STATE_EXIT);
-		} catch (Exception e) {
-			Status status = new Status(IStatus.ERROR, PTPCorePlugin
-					.getUniqueIdentifier(), IStatus.INFO,
-					"Cannot exec EXIT command", e);
-			throw new CoreException(status);
-		} finally {
-			clearAll();
-		}
-	}
-
-	public synchronized void createMPISession() throws CoreException {
-		/*
-		 * if (session == null) { MIPlugin miPlugin =
-		 * MIPlugin.getDefault(PTPCorePlugin.getDefault().getPluginPreferences()); //
-		 * Turn of the debugging output //miPlugin.setDebugging(true); try {
-		 * session = miPlugin.createSession(); session.addObserver(mpiObserver);
-		 * processRoot = new PMachine(session); fireState(STATE_START);
-		 * createConsole(); waitFor(); } catch (MIException e) { Status status =
-		 * new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(),
-		 * IStatus.INFO,
-		 * CoreMessages.getResourceString("LaunchManager.Exception_occurred_executing_command_line"),
-		 * e); throw new CoreException(status); } catch (IOException e) { Status
-		 * status = new Status(IStatus.ERROR,
-		 * PTPCorePlugin.getUniqueIdentifier(), IStatus.INFO,
-		 * CoreMessages.getResourceString("LaunchManager.Exception_occurred_executing_command_line"),
-		 * e); throw new CoreException(status); } }
-		 */
 	}
 
 	protected IPJob myjob = null;
@@ -814,53 +560,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		}
 	}
 
-	private void updateProcessInfo(Object[] objects) {
-		/*
-		 * for (int i = 0; i < objects.length; i++) { if (objects instanceof
-		 * MIProcessDescription[]) { MIProcessDescription[] pDesc =
-		 * (MIProcessDescription[]) objects; IPNode pNode =
-		 * processRoot.findNode(pDesc[i].getNode()); if (pNode == null) { pNode =
-		 * new PNode(processRoot, pDesc[i].getNode()); pNode.addChild(new
-		 * PProcess(pNode, pDesc[i].getRank(), pDesc[i].getPid(),
-		 * pDesc[i].getStatus(), pDesc[i].getExitCode(),
-		 * pDesc[i].getSignalName())); processRoot.addChild(pNode); } else {
-		 * pNode.addChild(new PProcess(pNode, pDesc[i].getRank(),
-		 * pDesc[i].getPid(), pDesc[i].getStatus(), pDesc[i].getExitCode(),
-		 * pDesc[i].getSignalName())); } } else if (objects instanceof
-		 * MISystemDescription[]) { MISystemDescription[] sDesc =
-		 * (MISystemDescription[]) objects; IPNode pNode =
-		 * processRoot.findNode(sDesc[i].getNode()); if (pNode == null) { pNode =
-		 * new PNode(processRoot, sDesc[i].getNode(), sDesc[i].getBprocUser(),
-		 * sDesc[i].getBprocGroup(), sDesc[i].getBprocState(),
-		 * sDesc[i].getBprocMode()); processRoot.addChild(pNode); } else {
-		 * pNode.setGroup(sDesc[i].getBprocGroup());
-		 * pNode.setUser(sDesc[i].getBprocUser());
-		 * pNode.setState(sDesc[i].getBprocState());
-		 * pNode.setMode(sDesc[i].getBprocMode()); } } }
-		 */
-	}
-
-	private void waitFor() {
-		Thread waitForThread = new Thread("Wait for finish") {
-			public void run() {
-				/*
-				 * try { if (!session.isTerminated())
-				 * session.getGDBProcess().waitFor(); } catch
-				 * (InterruptedException ie) { // clear interrupted state
-				 * Thread.interrupted(); } finally {
-				 */
-				System.out.println("Launch Manager Exit");
-				clearAll();
-				// if (getCurrentState() != STATE_EXIT)
-				// fireState(STATE_EXIT);
-				/*
-				 * }
-				 */
-			}
-		};
-		waitForThread.start();
-	}
-
 	protected void clearUsedMemory() {
 		System.out.println("********** clearUsedMemory");
 		Runtime rt = Runtime.getRuntime();
@@ -874,21 +573,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		rt.runFinalization();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.launch.core.ILaunchManager#getMachine()
-	 */
-	public IPMachine getMachine() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.launch.core.ILaunchManager#getUniverse()
-	 */
 	public IPUniverse getUniverse() {
 		return universe;
 	}
