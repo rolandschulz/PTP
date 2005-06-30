@@ -31,12 +31,12 @@ import java.io.InputStreamReader;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.ptp.core.IOutputTextFileContants;
+import org.eclipse.ptp.core.PreferenceConstants;
 
 /**
  *
  */
-public class OutputTextFile implements IOutputTextFileContants {
+public class OutputTextFile implements PreferenceConstants {
 	private String filename = "";
 
 	private File file = null;

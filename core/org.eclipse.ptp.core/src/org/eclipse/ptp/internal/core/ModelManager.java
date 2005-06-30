@@ -45,17 +45,20 @@ import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IParallelModelListener;
+import org.eclipse.ptp.core.MonitoringSystemChoices;
+import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.internal.core.CoreUtils;
 import org.eclipse.ptp.internal.core.CoreMessages;
-import org.eclipse.ptp.preferences.MonitoringSystemChoices;
-import org.eclipse.ptp.preferences.PTPPreferencesPage;
-import org.eclipse.ptp.rtmodel.IRuntimeListener;
-import org.eclipse.ptp.rtmodel.IRuntimeModel;
-import org.eclipse.ptp.rtmodel.JobRunConfiguration;
-import org.eclipse.ptp.rtmodel.NamedEntity;
-import org.eclipse.ptp.rtmodel.ompi.OMPIRuntimeModel;
-import org.eclipse.ptp.rtmodel.simulation.SimulationRuntimeModel;
+import org.eclipse.ptp.rtsystem.IControlSystem;
+import org.eclipse.ptp.rtsystem.IMonitoringSystem;
+import org.eclipse.ptp.rtsystem.IRuntimeListener;
+import org.eclipse.ptp.rtsystem.JobRunConfiguration;
+import org.eclipse.ptp.rtsystem.NamedEntity;
+import org.eclipse.ptp.rtsystem.ompi.OMPIControlSystem;
+import org.eclipse.ptp.rtsystem.ompi.OMPIMonitoringSystem;
+import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
+import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -81,7 +84,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 	protected ILaunchConfiguration config = null;
 
-	protected IRuntimeModel runtimeModel = null;
+	protected IControlSystem controlSystem = null;
+	protected IMonitoringSystem monitoringSystem = null;
 
 	public boolean isParallelPerspectiveOpen() {
 		return isPerspectiveOpen;
@@ -98,12 +102,20 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	public ModelManager() {
 		PTPCorePlugin.getDefault().addPerspectiveListener(perspectiveListener);
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		int MSChoiceID = preferences.getInt(PTPPreferencesPage.MONITORING_SYSTEM_SELECTION);
+		int MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
 		String MSChoice = MonitoringSystemChoices.getMSNameByID(MSChoiceID);
 		
 		System.out.println("Your Monitoring System Choice: '"+MSChoice+"'");
 
 		refreshMonitoringSystem(MSChoiceID);
+	}
+	
+	public IControlSystem getControlSystem() {
+		return controlSystem;
+	}
+	
+	public IMonitoringSystem getMonitoringSystem() {
+		return monitoringSystem;
 	}
 	
 	public void refreshMonitoringSystem(int ID)
@@ -127,9 +139,14 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		System.out.println("Launch Manager: Testing function");
 
 		universe = new PUniverse();
-
-		runtimeModel = new SimulationRuntimeModel();
-		String[] ne = runtimeModel.getMachines();
+		
+		/* load up the control and monitoring systems for the simulation */
+		monitoringSystem = new SimulationMonitoringSystem();
+		controlSystem = new SimulationControlSystem();
+		monitoringSystem.startup();
+		controlSystem.startup();
+		
+		String[] ne = monitoringSystem.getMachines();
 		for (int i = 0; i < ne.length; i++) {
 			PMachine mac;
 
@@ -140,23 +157,23 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 			universe.addChild(mac);
 
-			String[] ne2 = runtimeModel.getNodes(ne[i]);
+			String[] ne2 = monitoringSystem.getNodes(ne[i]);
 			for (int j = 0; j < ne2.length; j++) {
 				PNode node;
 				node = new PNode(mac, ne2[j], "" + j + "");
-				node.setAttrib("user", runtimeModel.getNodeAttribute(ne2[j],
+				node.setAttrib("user", monitoringSystem.getNodeAttribute(ne2[j],
 						"user"));
-				node.setAttrib("group", runtimeModel.getNodeAttribute(ne2[j],
+				node.setAttrib("group", monitoringSystem.getNodeAttribute(ne2[j],
 						"group"));
-				node.setAttrib("state", runtimeModel.getNodeAttribute(ne2[j],
+				node.setAttrib("state", monitoringSystem.getNodeAttribute(ne2[j],
 						"state"));
-				node.setAttrib("mode", runtimeModel.getNodeAttribute(ne2[j],
+				node.setAttrib("mode", monitoringSystem.getNodeAttribute(ne2[j],
 						"mode"));
 
 				mac.addChild(node);
 			}
 		}
-		ne = runtimeModel.getJobs();
+		ne = monitoringSystem.getJobs();
 		for (int i = 0; ne != null && i < ne.length; i++) {
 			PJob job;
 
@@ -173,7 +190,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 		}
 
-		runtimeModel.addRuntimeListener(this);
+		monitoringSystem.addRuntimeListener(this);
+		controlSystem.addRuntimeListener(this);
 	}
 
 	/* test out the OMPI (Open MPI) RTM (runtime model) */
@@ -183,8 +201,13 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 		universe = new PUniverse();
 
-		runtimeModel = new OMPIRuntimeModel();
-		String[] ne = runtimeModel.getMachines();
+		/* load up the control and monitoring systems for OMPI */
+		monitoringSystem = new OMPIMonitoringSystem();
+		controlSystem = new OMPIControlSystem();
+		monitoringSystem.startup();
+		controlSystem.startup();
+		
+		String[] ne = monitoringSystem.getMachines();
 		for (int i = 0; i < ne.length; i++) {
 			PMachine mac;
 
@@ -195,23 +218,23 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 			universe.addChild(mac);
 
-			String[] ne2 = runtimeModel.getNodes(ne[i]);
+			String[] ne2 = monitoringSystem.getNodes(ne[i]);
 			for (int j = 0; j < ne2.length; j++) {
 				PNode node;
 				node = new PNode(mac, ne2[j], "" + j + "");
-				node.setAttrib("user", runtimeModel.getNodeAttribute(ne2[j],
+				node.setAttrib("user", monitoringSystem.getNodeAttribute(ne2[j],
 						"user"));
-				node.setAttrib("group", runtimeModel.getNodeAttribute(ne2[j],
+				node.setAttrib("group", monitoringSystem.getNodeAttribute(ne2[j],
 						"group"));
-				node.setAttrib("state", runtimeModel.getNodeAttribute(ne2[j],
+				node.setAttrib("state", monitoringSystem.getNodeAttribute(ne2[j],
 						"state"));
-				node.setAttrib("mode", runtimeModel.getNodeAttribute(ne2[j],
+				node.setAttrib("mode", monitoringSystem.getNodeAttribute(ne2[j],
 						"mode"));
 
 				mac.addChild(node);
 			}
 		}
-		ne = runtimeModel.getJobs();
+		ne = monitoringSystem.getJobs();
 		for (int i = 0; i < ne.length; i++) {
 			PJob job;
 
@@ -228,11 +251,12 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 		}
 
-		runtimeModel.addRuntimeListener(this);
+		monitoringSystem.addRuntimeListener(this);
+		controlSystem.addRuntimeListener(this);
 	}
 
 	private void getProcsForNewJob(String nejob, IPJob job) {
-		String[] ne = runtimeModel.getProcesses(nejob);
+		String[] ne = monitoringSystem.getProcesses(nejob);
 		if (ne != null)
 			System.out.println("getProcsForNewJob:" + nejob + " - #procs = "
 					+ ne.length);
@@ -245,8 +269,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			job.addChild(proc);
 
 			String pname = proc.getElementName();
-			String nname = runtimeModel.getProcessNodeName(pname);
-			String mname = runtimeModel.getNodeMachineName(nname);
+			String nname = monitoringSystem.getProcessNodeName(pname);
+			String mname = monitoringSystem.getNodeMachineName(nname);
 			// System.out.println("Process "+pname+" running on node:");
 			// System.out.println("\t"+nname);
 			// System.out.println("\tand that's running on machine: "+mname);
@@ -264,7 +288,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					proc.setNode(node);
 				}
 			}
-			String status = runtimeModel.getProcessStatus(ne[j]);
+			String status = monitoringSystem.getProcessStatus(ne[j]);
 			proc.setStatus(status);
 		}
 	}
@@ -277,12 +301,12 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			if (procs != null) {
 				for (int i = 0; i < procs.length; i++) {
 					String procName = procs[i].getElementName();
-					String status = runtimeModel.getProcessStatus(procName);
+					String status = monitoringSystem.getProcessStatus(procName);
 					// System.out.println("Status = "+status+" on process -
 					// "+procName);
 					procs[i].setStatus(status);
-					String signal = runtimeModel.getProcessSignal(procName);
-					String exitCode = runtimeModel.getProcessExitCode(procName);
+					String signal = monitoringSystem.getProcessSignal(procName);
+					String exitCode = monitoringSystem.getProcessExitCode(procName);
 					if (!signal.equals(""))
 						procs[i].setSignalName(signal);
 					if (!exitCode.equals(""))
@@ -297,7 +321,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		/* so let's find which node this is */
 		IPNode n = universe.findNodeByName(ne);
 		if (n != null) {
-			n.setAttrib("state", runtimeModel.getNodeAttribute(ne, "state"));
+			n.setAttrib("state", monitoringSystem.getNodeAttribute(ne, "state"));
 			fireEvent(n, EVENT_SYS_STATUS_CHANGE);
 		}
 	}
@@ -499,7 +523,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		perspectiveListener = null;
 		listeners.clear();
 		listeners = null;
-		runtimeModel.shutdown();
+		controlSystem.shutdown();
+		monitoringSystem.shutdown();
 	}
 
 	public void clearAll() {
@@ -682,7 +707,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	public synchronized void mpiabort() throws CoreException {
 		isSessionExist();
 
-		runtimeModel.abortJob("foo");
+		controlSystem.abortJob("foo");
 		System.out
 				.println("***** NEED TO REFRESH JOB STATUS HERE in mpiabort() of ModelManager ONCE WE KNOW THE JOBID!");
 		// refreshJobStatus(nejob);
@@ -771,7 +796,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			myjob = null;
 		}
 
-		String nejob = runtimeModel.run(jobRunConfig);
+		String nejob = controlSystem.run(jobRunConfig);
 		if (nejob != null) {
 			PJob job;
 
