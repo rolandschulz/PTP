@@ -26,7 +26,6 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.ptp.debug.core.IDebugParallelEventListener;
 import org.eclipse.ptp.debug.core.IDebugParallelModelListener;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.ui.part.ViewPart;
 /**
  * @author clement chu

@@ -29,24 +29,30 @@ public class DebugManager {
 	public DebugManager() {
 		groupManager = new GroupManager();
 		PProcessGroup group = new PProcessGroup(0);
-		for (int i=0; i<100; i++) {
-			group.addProcess(new PProcess(i));
+		for (int i=0; i<350; i++) {
+			PProcess p = new PProcess(i);
+			p.setStatus(randomStatus());
+			group.addProcess(p);
 		}
 		groupManager.addGroup(group);
 		group = new PProcessGroup(1);
 		for (int i=0; i<66; i++) {
 			PProcess p = new PProcess(i);
-			p.setStatus(IProcessDebugEvent.STATUS_STARTED);
+			p.setStatus(randomStatus());
 			group.addProcess(p);
 		}
 		groupManager.addGroup(group);
 		group = new PProcessGroup(2);
-		for (int i=0; i<150; i++) {
+		for (int i=0; i<15; i++) {
 			PProcess p = new PProcess(i);
-			p.setStatus(IProcessDebugEvent.STATUS_SUSPENDED);
+			p.setStatus(randomStatus());
 			group.addProcess(p);
 		}
 		groupManager.addGroup(group);
+	}
+	
+	private int randomStatus() {
+		return (int)Math.round(Math.random() * 4);
 	}
 	
 	public static DebugManager getInstance() {
