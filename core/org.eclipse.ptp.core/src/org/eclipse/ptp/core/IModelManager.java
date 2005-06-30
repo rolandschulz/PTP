@@ -25,7 +25,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IParallelModelListener;
-import org.eclipse.ptp.rtmodel.JobRunConfiguration;
+import org.eclipse.ptp.rtsystem.IControlSystem;
+import org.eclipse.ptp.rtsystem.IMonitoringSystem;
+import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 public interface IModelManager {
 	public static final int STATE_ERROR = -1;
@@ -53,6 +55,10 @@ public interface IModelManager {
 	public static final int EVENT_ALL_PROCESSES_STOPPED = 6;
 	
 	public static final int EVENT_MONITORING_SYSTEM_CHANGE = 7;
+	
+	public IControlSystem getControlSystem();
+	
+	public IMonitoringSystem getMonitoringSystem();
 
 	public boolean isParallelPerspectiveOpen();
 	

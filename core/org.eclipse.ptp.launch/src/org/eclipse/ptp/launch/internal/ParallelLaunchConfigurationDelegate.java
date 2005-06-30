@@ -53,7 +53,7 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.launch.internal.ui.LaunchUtils;
-import org.eclipse.ptp.rtmodel.JobRunConfiguration;
+import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 /**
  * 
