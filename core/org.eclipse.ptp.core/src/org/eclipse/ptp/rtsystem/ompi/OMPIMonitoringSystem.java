@@ -109,6 +109,10 @@ public class OMPIMonitoringSystem implements IMonitoringSystem {
 
 		return "-1";
 	}
+	
+	public int getProcessPID(String procName) {
+		return ((int)(Math.random() * 10000)) + 1000;
+	}
 
 	public String getNodeMachineName(String nodeName) {
 		System.out.println("JAVA OMPI: getNodeMachineName(" + nodeName

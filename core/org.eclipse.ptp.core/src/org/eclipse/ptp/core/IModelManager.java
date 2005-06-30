@@ -66,11 +66,7 @@ public interface IModelManager {
 
 	public void shutdown();
 
-	public IPMachine getMachine();
-
 	public IPUniverse getUniverse();
-
-	public IPJob getProcessRoot();
 
 	public void addParallelLaunchListener(IParallelModelListener listener);
 
@@ -78,21 +74,7 @@ public interface IModelManager {
 
 	public int getCurrentState();
 
-	public boolean isMPIRuning();
-
-	public boolean hasProcessRunning();
-
-	public void mpirun(String[] args) throws CoreException;
-
-	public void mpistatus() throws CoreException;
-
-	public void mpiabort() throws CoreException;
-
-	public void mpiexit() throws CoreException;
-
-	public void mpisysstatus() throws CoreException;
-
-	public void createMPISession() throws CoreException;
+	public void abortJob(String jobName) throws CoreException;
 
 	public void execMI(ILaunch launch, File workingDirectory, String[] envp,
 			JobRunConfiguration jobRunConfig, IProgressMonitor pm) throws CoreException;

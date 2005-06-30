@@ -38,7 +38,8 @@ public class ShowMyAllocatedNodesAction extends ParallelAction {
 	    this.setImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWMYALLOCNODES_ACTION_NORMAL));
 	    this.setDisabledImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWMYALLOCNODES_ACTION_DISABLE));
 	    this.setHoverImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWMYALLOCNODES_ACTION_HOVER));
-	    this.setEnabled(getLaunchManager().isMPIRuning());
+	    /*this.setEnabled(getLaunchManager().isMPIRuning());*/
+	    this.setEnabled(true);
 	}
 
 	public void run() {
