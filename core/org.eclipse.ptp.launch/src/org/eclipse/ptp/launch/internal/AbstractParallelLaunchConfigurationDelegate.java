@@ -41,7 +41,7 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
-import org.eclipse.ptp.rtmodel.JobRunConfiguration;
+import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 /**
  *

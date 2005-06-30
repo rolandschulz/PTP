@@ -56,20 +56,20 @@
          point="org.eclipse.ui.preferencePages">
       <page
             name="%preferencePages.name"
-            class="org.eclipse.ptp.preferences.PTPPreferencesPage"
-            id="org.eclipse.ptp.preferences.ptpPreferencesPage">
+            class="org.eclipse.ptp.ui.preferences.PTPPreferencesPage"
+            id="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
       </page>
       <page
             name="%SimulationpreferencePage.name"
-            class="org.eclipse.ptp.preferences.SimulationPreferencesPage"
-            id="org.eclipse.ptp.preferences.simulationPreferencesPage"
-            category="org.eclipse.ptp.preferences.ptpPreferencesPage">
+            class="org.eclipse.ptp.ui.preferences.SimulationPreferencesPage"
+            id="org.eclipse.ptp.ui.preferences.simulationPreferencesPage"
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
       </page>
       <page
             name="%OMPIpreferencePage.name"
-            class="org.eclipse.ptp.preferences.OMPIPreferencesPage"
-            id="org.eclipse.ptp.preferences.ompiPreferencesPage"
-            category="org.eclipse.ptp.preferences.ptpPreferencesPage">
+            class="org.eclipse.ptp.ui.preferences.OMPIPreferencesPage"
+            id="org.eclipse.ptp.ui.preferences.ompiPreferencesPage"
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
       </page>
    </extension>
    
