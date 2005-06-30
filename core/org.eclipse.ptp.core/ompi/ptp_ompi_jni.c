@@ -15,12 +15,16 @@
 
 #include "threads/condition.h"
 
+char error_msg[256];
+
 bool ptp_exitted;
 ompi_mutex_t ptp_lock;
 ompi_condition_t ptp_cond;
 
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
 static int ptp_ompi_spawn(char *app, int num_procs);
+
+void set_error(char *msg);
 
 ompi_mutex_t eclipse_orte_lock; 
 
@@ -30,13 +34,28 @@ ompi_mutex_t eclipse_orte_lock;
  * WORK
  **********************************************************************/
 
-JNIEXPORT void JNICALL 
-Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIInit(JNIEnv *env, jobject obj) 
+JNIEXPORT jstring JNICALL
+Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIGetError(JNIEnv *env, jobject obj)
+{
+    	return (*env)->NewStringUTF(env, error_msg);
+}
+
+/* returns  0 if orted was already started and we connected to it
+ * returns  1 if orted was NOT started but we went ahead and started it
+ * returns -1 if there was some error of any kind - call OMPIGetError()
+ *            to get the error string
+ */
+JNIEXPORT int JNICALL 
+Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIInit(JNIEnv *env, jobject obj, jstring orted_bin_str) 
 {
     	int rc, id;
+	const char *orted_bin = (*env)->GetStringUTFChars(env, 
+	  orted_bin_str, 0);
 
-    	printf("JNI (C) OMPI: OMPIInit()\n");
+    	printf("JNI (C) OMPI: OMPIInit(%s)\n", orted_bin);
+	set_error("no error");
 	fflush(stdout);
+	(*env)->ReleaseStringUTFChars(env, orted_bin_str, orted_bin);
 
 	/* this makes the orte_init() below fail if the orte daemon
 	 * isn't running */
@@ -47,8 +66,9 @@ Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIInit(JNIEnv *env, jobject
 	rc = orte_init();
 	if(rc == ORTE_ERR_UNREACH) {
 	    /* unreachable orted */
+	    set_error("ORTED unreachable!  Sorry!");
 	    printf("ORTED unreachable!  Sorry!\n");
-	    return;
+	    return 666;
 	}
 
 	/*
@@ -62,10 +82,11 @@ Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIInit(JNIEnv *env, jobject
 	fflush(stdout);
 
 	OBJ_CONSTRUCT(&eclipse_orte_lock, ompi_mutex_t); 
+	return 777;
 }
 
 JNIEXPORT void JNICALL 
-Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIFinalize(JNIEnv *env, jobject obj) 
+Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIFinalize(JNIEnv *env, jobject obj) 
 {
     	printf("JNI (C) OMPI: OMPIFinalize()\n");
 	fflush(stdout);
@@ -78,7 +99,7 @@ Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIFinalize(JNIEnv *env, job
 }
 
 JNIEXPORT void JNICALL 
-Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIProgress(JNIEnv *env, jobject obj) 
+Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIProgress(JNIEnv *env, jobject obj) 
 {
     	printf("JNI (C) OMPI: OMPIProgress() starting . . .\n");
 	fflush(stdout);
@@ -101,7 +122,7 @@ Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIProgress(JNIEnv *env, job
 }
 
 JNIEXPORT void JNICALL 
-Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIRun(JNIEnv *env, jobject obj) 
+Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIRun(JNIEnv *env, jobject obj) 
 {
 	printf("JNI (C) OMPI: OMPIRun() starting . . .\n");
 	fflush(stdout);
@@ -116,6 +137,11 @@ Java_org_eclipse_ptp_rtmodel_ompi_OMPIRuntimeModel_OMPIRun(JNIEnv *env, jobject 
 /**********************************************************************
  * THE FUNCTIONS THAT DO THE ACTUAL WORK
  *********************************************************************/
+
+void set_error(char *msg)
+{
+    	strncpy(error_msg, msg, 256);
+}
 
 /* 'app' needs to be a full pathname to the app as we'll extract the
  * current working directory from it as well

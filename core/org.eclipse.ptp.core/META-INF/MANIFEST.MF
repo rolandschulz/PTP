@@ -10,9 +10,8 @@ Bundle-Localization: plugin
 Export-Package: org.eclipse.ptp.core,
  org.eclipse.ptp.debug,
  org.eclipse.ptp.internal.core,
- org.eclipse.ptp.preferences,
- org.eclipse.ptp.rtmodel,
- org.eclipse.ptp.rtmodel.simulation
+ org.eclipse.ptp.rtsystem,
+ org.eclipse.ptp.rtsystem.simulation
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.core.runtime,

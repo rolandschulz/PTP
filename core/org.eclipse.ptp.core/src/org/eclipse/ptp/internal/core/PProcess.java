@@ -22,7 +22,7 @@ import java.io.File;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.core.IOutputTextFileContants;
+import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
@@ -74,16 +74,16 @@ public class PProcess extends Parent implements IPProcess {
 		Preferences preferences = PTPCorePlugin.getDefault()
 				.getPluginPreferences();
 		outputDirPath = preferences
-				.getString(IOutputTextFileContants.OUTPUT_DIR);
-		storeLine = preferences.getInt(IOutputTextFileContants.STORE_LINE);
+				.getString(PreferenceConstants.OUTPUT_DIR);
+		storeLine = preferences.getInt(PreferenceConstants.STORE_LINE);
 		if (outputDirPath == null || outputDirPath.length() == 0)
 			outputDirPath = ResourcesPlugin.getWorkspace().getRoot()
 					.getLocation().append(
-							IOutputTextFileContants.DEF_OUTPUT_DIR_NAME)
+							PreferenceConstants.DEF_OUTPUT_DIR_NAME)
 					.toOSString();
 
 		if (storeLine == 0)
-			storeLine = IOutputTextFileContants.DEF_STORE_LINE;
+			storeLine = PreferenceConstants.DEF_STORE_LINE;
 
 		File outputDirectory = new File(outputDirPath);
 		if (!outputDirectory.exists())
