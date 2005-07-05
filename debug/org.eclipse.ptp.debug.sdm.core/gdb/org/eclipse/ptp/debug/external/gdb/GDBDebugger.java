@@ -446,7 +446,11 @@ public class GDBDebugger extends AbstractDebugger {
 		MISession miS = (MISession) (allSet.getProcess(num)).getDebugInfo();
 		return miS.getMIInferior();
 	}
-	
+
+	public Process getProcess() {
+		return getProcess(0);
+	}
+
 	public Process getSessionProcess() {
 		int listSize = allSet.getSize();
 		Process proc = null;

@@ -107,6 +107,7 @@ public interface IDebugger {
 	/* Methods that are required to interface with Eclipse Debug/CDI Model */
 	public abstract Process getSessionProcess();
 	public abstract Process getProcess(int number);
+	public abstract Process getProcess();
 	public abstract Process[] getProcesses();
 	public abstract void disconnect();
 	public abstract void resume();

@@ -17,6 +17,7 @@ public class Session implements ICDISession, ICDISessionObject {
 	ProcessManager processManager;
 	EventManager eventManager;
 	BreakpointManager breakpointManager;
+	VariableManager variableManager;
 	RegisterManager registerManager;
 	
 	Properties props;
@@ -29,6 +30,7 @@ public class Session implements ICDISession, ICDISessionObject {
 		processManager = new ProcessManager(this);
 		eventManager = new EventManager(this);
 		breakpointManager = new BreakpointManager(this);
+		variableManager = new VariableManager(this);
 		registerManager = new RegisterManager(this);
 		
 		Target target = new Target(this, dSession);
@@ -68,6 +70,11 @@ public class Session implements ICDISession, ICDISessionObject {
 		return breakpointManager;
 	}
 	
+	public VariableManager getVariableManager() {
+		System.out.println("Session.getVariableManager()");
+		return variableManager;
+	}
+
 	public RegisterManager getRegisterManager() {
 		System.out.println("Session.getRegisterManager()");
 		return registerManager;

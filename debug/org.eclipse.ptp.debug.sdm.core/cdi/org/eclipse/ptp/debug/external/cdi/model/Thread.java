@@ -10,24 +10,37 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDILocation;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISignal;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorageDescriptor;
+import org.eclipse.ptp.debug.external.simulator.SimProcess;
+import org.eclipse.ptp.debug.external.simulator.SimStackFrame;
 
 public class Thread extends PTPObject implements ICDIThread {
 	
+	static ICDIStackFrame[] noStack = new ICDIStackFrame[0];
 	int id;
 	String name;
+	StackFrame currentFrame;
+	List currentFrames;
+	int stackdepth = 0;
+	int procNumber;
+	
+	final public static int STACKFRAME_DEFAULT_DEPTH = 200;
 
-	public Thread(Target target, int threadId) {
-		this(target, threadId, null);
+	public Thread(Target target, int pNumber, int threadId) {
+		this(target, pNumber, threadId, null);
 	}
 
-	public Thread(Target target, int threadId, String threadName) {
+	public Thread(Target target, int pNumber, int threadId, String threadName) {
 		super(target);
+		procNumber = pNumber;
 		id = threadId;
 		name = threadName;
 	}
@@ -39,19 +52,44 @@ public class Thread extends PTPObject implements ICDIThread {
 	public ICDIStackFrame[] getStackFrames() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.getStackFrames()");
-		return null;
+		
+		// get the frames depth
+		int depth = getStackFrameCount();
+
+		// refresh if we have nothing or if we have just a subset get everything.
+		if (currentFrames == null || currentFrames.size() < depth) {
+			currentFrames = new ArrayList();
+			Target target = (Target) getTarget();
+			SimProcess proc = (SimProcess) target.getDebugSession().getDebugger().getProcess(procNumber);
+			SimStackFrame[] frames = proc.getThread(id).getStackFrames();
+			for (int i = 0; i < frames.length; i++) {
+				currentFrames.add(new StackFrame(this, frames[i], depth - frames[i].getLevel()));
+			}
+			//target.setCurrentThread(currentThread, false);
+		}
+		return (ICDIStackFrame[]) currentFrames.toArray(noStack);
 	}
 
 	public ICDIStackFrame[] getStackFrames(int fromIndex, int len) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.getStackFrames()");
-		return null;
+		
+		getStackFrames();
+		
+		List list = currentFrames.subList(fromIndex, len);
+		return (ICDIStackFrame[]) list.toArray(noStack);
 	}
 
 	public int getStackFrameCount() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.getStackFrameCount()");
-		return 0;
+		
+		if (stackdepth == 0) {
+			Target target = (Target) getTarget();
+			SimProcess proc = (SimProcess) target.getDebugSession().getDebugger().getProcess(procNumber);
+			stackdepth = proc.getThread(id).getStackFrameCount();
+		}
+		return stackdepth;
 	}
 
 	public ICDIThreadStorageDescriptor[] getThreadStorageDescriptors() throws CDIException {
@@ -76,6 +114,14 @@ public class Thread extends PTPObject implements ICDIThread {
 		// Auto-generated method stub
 		System.out.println("Thread.stepInto()");
 		
+	}
+	
+	public String toString() {
+		String str = Integer.toString(id);
+		if (name != null) {
+			str += " " + name; //$NON-NLS-1$
+		}
+		return str;
 	}
 
 	public void stepOverInstruction() throws CDIException {
