@@ -22,6 +22,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.debug.ui.model.Element;
 import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
 import org.eclipse.swt.widgets.Shell;
 
@@ -51,14 +52,17 @@ public abstract class ParallelDebugAction extends Action {
         return debugView.getViewSite().getShell();
     }
     
-    public abstract void run(Object[] elements);
+    public abstract void run(Element[] elements);
     
     public void run() {
     	ISelection selection = debugView.getSelection();
-    	if (selection != null && !selection.isEmpty()) {
-	        if (selection instanceof IStructuredSelection) {
-	            run(((IStructuredSelection)selection).toArray());
-	        }
+    	if (selection != null && !selection.isEmpty() && selection instanceof IStructuredSelection) {
+        	Object[] objs = ((IStructuredSelection)selection).toArray();
+        	Element[] elements = new Element[objs.length];
+        	System.arraycopy(objs, 0, elements, 0, objs.length);
+        	run(elements);
     	}
+    	else
+    		run(new Element[0]);
     }
 }

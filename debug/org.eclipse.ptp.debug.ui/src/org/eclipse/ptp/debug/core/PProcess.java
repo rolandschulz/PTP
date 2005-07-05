@@ -22,24 +22,17 @@ package org.eclipse.ptp.debug.core;
  *
  */
 public class PProcess {
-	private boolean selected = false;
 	private int id = 0;
-	private int status = IProcessDebugEvent.STATUS_STOPPED;
-
+	private int status = IProcessDebugEvent.STATUS_STOPPED; 
+	
 	public PProcess(int id) {
 		this.id = id;
 	}
-	public int getProcess_id() {
+	public int getID() {
 		return id;
 	}
-	public void setProcess_id(int process_id) {
-		this.id = process_id;
-	}
-	public boolean isSelected() {
-		return selected;
-	}
-	public void setSelected(boolean selected) {
-		this.selected = selected;
+	public void setID(int id) {
+		this.id = id;
 	}
 	public int getStatus() {
 		return status;

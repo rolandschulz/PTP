@@ -18,37 +18,32 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author clement
  *
  */
 public class DebugManager {
 	private static DebugManager instance = null;
-	protected GroupManager groupManager = null; 
+	protected List processes = new ArrayList();
 	
 	public DebugManager() {
-		groupManager = new GroupManager();
-		PProcessGroup group = new PProcessGroup(0);
-		for (int i=0; i<350; i++) {
+		int total = 11500;
+		for (int i=0; i<total; i++) {
 			PProcess p = new PProcess(i);
 			p.setStatus(randomStatus());
-			group.addProcess(p);
+			processes.add(p);
 		}
-		groupManager.addGroup(group);
-		group = new PProcessGroup(1);
-		for (int i=0; i<66; i++) {
-			PProcess p = new PProcess(i);
-			p.setStatus(randomStatus());
-			group.addProcess(p);
-		}
-		groupManager.addGroup(group);
-		group = new PProcessGroup(2);
-		for (int i=0; i<15; i++) {
-			PProcess p = new PProcess(i);
-			p.setStatus(randomStatus());
-			group.addProcess(p);
-		}
-		groupManager.addGroup(group);
+	}
+	
+	public PProcess getProcess(int index) {
+		return (PProcess)processes.get(index);
+	}
+	
+	public PProcess[] getProcesses() {
+		return (PProcess[])processes.toArray(new PProcess[processes.size()]);
 	}
 	
 	private int randomStatus() {
@@ -59,10 +54,5 @@ public class DebugManager {
 		if (instance == null)
 			instance = new DebugManager();
 		return instance;
-	}
-	
-	public GroupManager getGroupManager() {
-		return groupManager;
-	}
-	
+	}	
 }

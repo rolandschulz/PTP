@@ -16,28 +16,21 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.actions;
+package org.eclipse.ptp.debug.ui;
 
-import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.model.Element;
-import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author clement chu
  *
  */
-public class SuspendAction extends ParallelDebugAction {
-	public static final String name = "Suspend";
-
-	public SuspendAction(AbstractDebugParallelView debugView) {
-		super(name, debugView);
-	    this.setImageDescriptor(ImageUtil.ID_ICON_SUSPEND_NORMAL);
-	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_SUSPEND_NORMAL);
-	}
-
-	public void run(Element[] elements) {
-		// TODO Auto-generated method stub
-
-	}
-
+public class UIDialog {
+	
+    public static int showDialog(final Shell shell, final String title, final String message, final int style) {
+        MessageBox dialog = new MessageBox(shell, style);
+        dialog.setMessage(message);
+        dialog.setText(title);
+        return dialog.open();
+    }
 }

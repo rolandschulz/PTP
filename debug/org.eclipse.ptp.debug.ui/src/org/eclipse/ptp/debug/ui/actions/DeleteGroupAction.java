@@ -18,25 +18,28 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.actions;
 
-import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ptp.debug.ui.ImageUtil;
+import org.eclipse.ptp.debug.ui.UIDialog;
 import org.eclipse.ptp.debug.ui.model.Element;
+import org.eclipse.ptp.debug.ui.model.ElementGroup;
 import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
+import org.eclipse.swt.SWT;
+
 /**
  * @author clement chu
  *
  */
-public class GroupAction extends ParallelDebugAction {
-	private int group_id = 0;
+public class DeleteGroupAction extends ParallelDebugAction {
+	public static final String name = "Delete Group";
 	
-	public GroupAction(String text, int group_id, AbstractDebugParallelView debugView) {
-		super(text, IAction.AS_CHECK_BOX, debugView);
-	    this.setImageDescriptor(ImageUtil.ID_ICON_GROUP_NORMAL);
-	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_GROUP_NORMAL);
-	    this.setEnabled(true);
-		this.setId(text);
-		this.group_id = group_id;
+	public DeleteGroupAction(AbstractDebugParallelView debugView) {
+		super(name, debugView);
+	    this.setImageDescriptor(ImageUtil.ID_ICON_DELETEGROUP_NORMAL);
+	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_DELETEGROUP_NORMAL);
 	}
 
 	public void run(Element[] elements) {
@@ -44,11 +47,23 @@ public class GroupAction extends ParallelDebugAction {
 	public void run() {
 		if (debugView instanceof DebugParallelProcessView) {
 			DebugParallelProcessView view = (DebugParallelProcessView)debugView;
-			if (view.getCurrentGroupID() != group_id) {
-				view.selectGroup(getId());
-				view.updateMenu();
-				view.redraw();
+
+			ElementGroup group = view.getCurrentGroup();
+			if (group.getID() > 0) {
+				 if (UIDialog.showDialog(getShell(), "Delete " + group.getText(), "All elements in this group will be deleted.", SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL) == SWT.OK) {
+					IMenuManager manager = view.getViewSite().getActionBars().getMenuManager();
+					manager.remove(group.getText());
+					view.getGroupManager().removeGroup(group.getText());
+									
+					IContributionItem[] items = manager.getItems();
+					if (items.length > 0) {
+						IContributionItem lastItem = items[items.length-1];				
+						if (lastItem != null && lastItem instanceof ActionContributionItem) {
+							((ActionContributionItem)lastItem).getAction().run();
+						}
+					}
+				 }
 			}
-		}
-	}	
+		}		
+	}
 }
