@@ -5,16 +5,24 @@ import java.io.OutputStream;
 
 public class SimProcess extends Process {
 
+	SimThread[] threads;
+	
 	boolean finished;
 	InputStream err;
 	InputStream in;
 	OutputStream out;
 	String name;
 	
-	public SimProcess(String nm) {
+	public SimProcess(String nm, int numThreads, int numStackFrames) {
 		super();
 		finished = false;
 		name = nm;
+		
+		threads = new SimThread[numThreads];
+		for (int i = 0; i < numThreads; i++) {
+			threads[i] = new SimThread(numStackFrames, i);
+		}
+		
 		//err = new SimInputStream(name, 3, 10);
 		err = null;
 		in = new SimInputStream(name, 10, 6);
@@ -46,25 +54,29 @@ public class SimProcess extends Process {
 	public void destroy() {
 		// Auto-generated method stub
 		System.out.println("SimProcess.destroy()");
-		
 	}
 
 	public InputStream getErrorStream() {
-		// Auto-generated method stub
-		System.out.println("SimProcess.getErrorStream()");
 		return err;
 	}
 
 	public InputStream getInputStream() {
-		// Auto-generated method stub
-		System.out.println("SimProcess.getInputStream()");
 		return in;
 	}
 
 	public OutputStream getOutputStream() {
-		// Auto-generated method stub
-		System.out.println("SimProcess.getOutputStream()");
 		return out;
 	}
 
+	public SimThread getThread(int tId) {
+		return threads[tId];
+	}
+	
+	public SimThread[] getThreads() {
+		return threads;
+	}
+	
+	public int getThreadCount() {
+		return threads.length;
+	}
 }

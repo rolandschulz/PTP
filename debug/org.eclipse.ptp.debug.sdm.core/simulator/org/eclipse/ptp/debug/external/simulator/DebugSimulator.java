@@ -25,7 +25,7 @@ public class DebugSimulator extends AbstractDebugger {
 	public void initDebugger(DebugSession dS) {
 		super.initDebugger();
 		//debugProcess = Runtime.getRuntime().exec("/bin/bash /tmp/process.sh debugger 6");
-		debugProcess = new SimProcess("Debugger");
+		debugProcess = new SimProcess("Debugger", 1, 1);
 		debugSession = dS;
 		
 		state = SUSPENDED;
@@ -64,7 +64,7 @@ public class DebugSimulator extends AbstractDebugger {
 		for (int i = 0; i < numProcs; i++) {
 			MProcess proc = new MProcess();
 			//Process p = Runtime.getRuntime().exec("/bin/bash /tmp/process.sh proc" + i + " 4");
-			Process p = new SimProcess("proc" + i);
+			Process p = new SimProcess("proc" + i, 1, 1);
 			proc.setDebugInfo(p); /* We store the process in the "debug info" */
 			allSet.addProcess(proc);
 		}
@@ -98,6 +98,10 @@ public class DebugSimulator extends AbstractDebugger {
 
 	public Process getProcess(int num) {
 		return (Process) (allSet.getProcess(num)).getDebugInfo();
+	}
+	
+	public Process getProcess() {
+		return getProcess(0);
 	}
 	
 	public void disconnect() {

@@ -43,6 +43,8 @@ import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
 import org.eclipse.ptp.debug.external.cdi.RegisterManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
+import org.eclipse.ptp.debug.external.simulator.SimProcess;
+import org.eclipse.ptp.debug.external.simulator.SimThread;
 
 /**
  */
@@ -206,11 +208,24 @@ public class Target extends SessionObject implements IPCDITarget {
 		System.out.println("Target.createCondition()");
 		return null;
 	}
+	
 	public ICDIThread[] getThreads() throws CDIException {
+		return getThreads(0);
+	}
+	
+	public ICDIThread[] getThreads(int procNumber) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.getThreads()");
 		if (currentThreads.length == 0) {
-			currentThreads = new Thread[]{new Thread(this, 0)};
+			
+			SimThread[] threads = ((SimProcess) dSession.getDebugger().getProcess(procNumber)).getThreads();
+			
+			currentThreads = new Thread[threads.length];
+			
+			for (int i = 0; i < threads.length; i++) {
+				currentThreads[i] = new Thread(this, procNumber, threads[i].getThreadId());
+			}
+			
 			currentThreadId = currentThreads[0].getId();
 		}
 		return currentThreads;
