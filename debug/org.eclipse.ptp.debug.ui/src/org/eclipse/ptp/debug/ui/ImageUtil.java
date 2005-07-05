@@ -37,29 +37,23 @@ public class ImageUtil {
     private static ImageRegistry imageRegistry = null;
     
 	public static final String ICON_RESUME_DISABLE = "resume_disable.gif";
-	public static final String ICON_RESUME_HOVER = "resume_hover.gif";
 	public static final String ICON_RESUME_NORMAL = "resume_normal.gif";
 	public static final String ICON_SUSPEND_DISABLE = "suspend_disable.gif";
-	public static final String ICON_SUSPEND_HOVER = "suspend_hover.gif";
 	public static final String ICON_SUSPEND_NORMAL = "suspend_normal.gif";
 	public static final String ICON_TERMINATE_DISABLE = "terminate_disable.gif";
-	public static final String ICON_TERMINATE_HOVER = "terminate_hover.gif";
 	public static final String ICON_TERMINATE_NORMAL = "terminate_normal.gif";
 	public static final String ICON_STEPINTO_DISABLE = "stepinto_disable.gif";
-	public static final String ICON_STEPINTO_HOVER = "stepinto_hover.gif";
 	public static final String ICON_STEPINTO_NORMAL = "stepinto_normal.gif";
 	public static final String ICON_STEPOVER_DISABLE = "stepover_disable.gif";
-	public static final String ICON_STEPOVER_HOVER = "stepover_hover.gif";
 	public static final String ICON_STEPOVER_NORMAL = "stepover_normal.gif";
 	public static final String ICON_STEPRETURN_DISABLE = "stepreturn_disable.gif";
-	public static final String ICON_STEPRETURN_HOVER = "stepreturn_hover.gif";
 	public static final String ICON_STEPRETURN_NORMAL = "stepreturn_normal.gif";
 	public static final String ICON_GROUP_DISABLE = "group_disable.gif";
-	public static final String ICON_GROUP_HOVER = "group_hover.gif";
 	public static final String ICON_GROUP_NORMAL = "group_normal.gif";
 	public static final String ICON_CREATEGROUP_DISABLE = "creategroup_disable.gif";
-	public static final String ICON_CREATEGROUP_HOVER = "creategroup_hover.gif";
 	public static final String ICON_CREATEGROUP_NORMAL = "creategroup_normal.gif";
+	public static final String ICON_DELETEGROUP_DISABLE = "deletegroup_disable.gif";
+	public static final String ICON_DELETEGROUP_NORMAL = "deletegroup_normal.gif";
 	
 	public static final String IMG_PRO_ERROR_SEL = "error_sel.gif";
 	public static final String IMG_PRO_ERROR = "error.gif";
@@ -73,29 +67,23 @@ public class ImageUtil {
 	public static final String IMG_PRO_SUSPENDED = "suspended.gif";
 	
 	public static final ImageDescriptor ID_ICON_RESUME_DISABLE = createImageDescriptor(TOOLICONURL, ICON_RESUME_DISABLE, ICON_RESUME_DISABLE);
-	public static final ImageDescriptor ID_ICON_RESUME_HOVER = createImageDescriptor(TOOLICONURL, ICON_RESUME_HOVER, ICON_RESUME_HOVER);
 	public static final ImageDescriptor ID_ICON_RESUME_NORMAL = createImageDescriptor(TOOLICONURL, ICON_RESUME_NORMAL, ICON_RESUME_NORMAL);
 	public static final ImageDescriptor ID_ICON_SUSPEND_DISABLE = createImageDescriptor(TOOLICONURL, ICON_SUSPEND_DISABLE, ICON_SUSPEND_DISABLE);
-	public static final ImageDescriptor ID_ICON_SUSPEND_HOVER = createImageDescriptor(TOOLICONURL, ICON_SUSPEND_HOVER, ICON_SUSPEND_HOVER);
 	public static final ImageDescriptor ID_ICON_SUSPEND_NORMAL = createImageDescriptor(TOOLICONURL, ICON_SUSPEND_NORMAL, ICON_SUSPEND_NORMAL);
 	public static final ImageDescriptor ID_ICON_TERMINATE_DISABLE = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_DISABLE, ICON_TERMINATE_DISABLE);
-	public static final ImageDescriptor ID_ICON_TERMINATE_HOVER = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_HOVER, ICON_TERMINATE_HOVER);
 	public static final ImageDescriptor ID_ICON_TERMINATE_NORMAL = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_NORMAL, ICON_TERMINATE_NORMAL);
 	public static final ImageDescriptor ID_ICON_STEPINTO_DISABLE = createImageDescriptor(TOOLICONURL, ICON_STEPINTO_DISABLE, ICON_STEPINTO_DISABLE);
-	public static final ImageDescriptor ID_ICON_STEPINTO_HOVER = createImageDescriptor(TOOLICONURL, ICON_STEPINTO_HOVER, ICON_STEPINTO_HOVER);
 	public static final ImageDescriptor ID_ICON_STEPINTO_NORMAL = createImageDescriptor(TOOLICONURL, ICON_STEPINTO_NORMAL, ICON_STEPINTO_NORMAL);
 	public static final ImageDescriptor ID_ICON_STEPOVER_DISABLE = createImageDescriptor(TOOLICONURL, ICON_STEPOVER_DISABLE, ICON_STEPOVER_DISABLE);
-	public static final ImageDescriptor ID_ICON_STEPOVER_HOVER = createImageDescriptor(TOOLICONURL, ICON_STEPOVER_HOVER, ICON_STEPOVER_HOVER);
 	public static final ImageDescriptor ID_ICON_STEPOVER_NORMAL = createImageDescriptor(TOOLICONURL, ICON_STEPOVER_NORMAL, ICON_STEPOVER_NORMAL);
 	public static final ImageDescriptor ID_ICON_STEPRETURN_DISABLE = createImageDescriptor(TOOLICONURL, ICON_STEPRETURN_DISABLE, ICON_STEPRETURN_DISABLE);
-	public static final ImageDescriptor ID_ICON_STEPRETURN_HOVER = createImageDescriptor(TOOLICONURL, ICON_STEPRETURN_HOVER, ICON_STEPRETURN_HOVER);
 	public static final ImageDescriptor ID_ICON_STEPRETURN_NORMAL = createImageDescriptor(TOOLICONURL, ICON_STEPRETURN_NORMAL, ICON_STEPRETURN_NORMAL);
 	public static final ImageDescriptor ID_ICON_GROUP_DISABLE = createImageDescriptor(TOOLICONURL, ICON_GROUP_DISABLE, ICON_GROUP_DISABLE);
-	public static final ImageDescriptor ID_ICON_GROUP_HOVER = createImageDescriptor(TOOLICONURL, ICON_GROUP_HOVER, ICON_GROUP_HOVER);
 	public static final ImageDescriptor ID_ICON_GROUP_NORMAL = createImageDescriptor(TOOLICONURL, ICON_GROUP_NORMAL, ICON_GROUP_NORMAL);
 	public static final ImageDescriptor ID_ICON_CREATEGROUP_DISABLE = createImageDescriptor(TOOLICONURL, ICON_CREATEGROUP_DISABLE, ICON_CREATEGROUP_DISABLE);
-	public static final ImageDescriptor ID_ICON_CREATEGROUP_HOVER = createImageDescriptor(TOOLICONURL, ICON_CREATEGROUP_HOVER, ICON_CREATEGROUP_HOVER);
 	public static final ImageDescriptor ID_ICON_CREATEGROUP_NORMAL = createImageDescriptor(TOOLICONURL, ICON_CREATEGROUP_NORMAL, ICON_CREATEGROUP_NORMAL);
+	public static final ImageDescriptor ID_ICON_DELETEGROUP_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DELETEGROUP_DISABLE, ICON_DELETEGROUP_DISABLE);
+	public static final ImageDescriptor ID_ICON_DELETEGROUP_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DELETEGROUP_NORMAL, ICON_DELETEGROUP_NORMAL);
 
 	public static final ImageDescriptor ID_IMG_PRO_ERROR_SEL = createImageDescriptor(PROCESSICONURL, IMG_PRO_ERROR_SEL, IMG_PRO_ERROR_SEL);
 	public static final ImageDescriptor ID_IMG_PRO_ERROR = createImageDescriptor(PROCESSICONURL, IMG_PRO_ERROR, IMG_PRO_ERROR);

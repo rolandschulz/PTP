@@ -24,8 +24,11 @@ import java.util.List;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.ptp.debug.core.DebugManager;
 import org.eclipse.ptp.debug.core.IDebugParallelEventListener;
 import org.eclipse.ptp.debug.core.IDebugParallelModelListener;
+import org.eclipse.ptp.debug.ui.UIDebugManager;
+import org.eclipse.ptp.debug.ui.UIPlugin;
 import org.eclipse.ui.part.ViewPart;
 /**
  * @author clement chu
@@ -36,7 +39,13 @@ public abstract class AbstractDebugParallelView extends ViewPart implements ISel
 	 * store debug event listener
 	 */
 	protected List listeners = new ArrayList(0);
+	protected UIDebugManager uiDebugManager = null;
+	protected DebugManager debugManager = null;
 	
+	public AbstractDebugParallelView() {
+		uiDebugManager = UIPlugin.getDefault().getUIDebugManager();
+		debugManager = DebugManager.getInstance();
+	}
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.debug.core.IDebugParallelModelListener#addDebugeEventListener(org.eclipse.ptp.debug.core.IDebugParallelEventListener)
 	 */
@@ -67,6 +76,10 @@ public abstract class AbstractDebugParallelView extends ViewPart implements ISel
 	public void dispose() {
 		listeners.clear();
 		super.dispose();
+	}
+	
+	public UIDebugManager getUIDebugManger() {
+		return uiDebugManager;
 	}
 	
 	public abstract ISelection getSelection();	

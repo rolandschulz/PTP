@@ -41,7 +41,7 @@ public class PTPPerspectiveFactory implements IPerspectiveFactory {
 		IFolderLayout folder1= layout.createFolder("bottom", IPageLayout.BOTTOM, (float)0.8, editorArea);
 		folder1.addView(IConsoleConstants.ID_CONSOLE_VIEW);
 
-		IFolderLayout folder2= layout.createFolder("topLeftUp", IPageLayout.TOP, (float)0.4, editorArea);
+		IFolderLayout folder2= layout.createFolder("topLeftUp", IPageLayout.TOP, (float)0.5, editorArea);
 		folder2.addView(DebugParallelProcessView.VIEW_ID);
 
 		IFolderLayout folder4= layout.createFolder("topRight", IPageLayout.RIGHT, (float)0.6, "topLeftUp");
@@ -49,9 +49,8 @@ public class PTPPerspectiveFactory implements IPerspectiveFactory {
 		folder4.addView(IDebugUIConstants.ID_EXPRESSION_VIEW);
 		folder4.addView(IDebugUIConstants.ID_VARIABLE_VIEW);
 
-		//IFolderLayout folder3= layout.createFolder("topLeftDown", IPageLayout.BOTTOM, (float)0.5, "topLeftUp");
-		//folder3.addView(IDebugUIConstants.ID_DEBUG_VIEW);
-
+		IFolderLayout folder3= layout.createFolder("topLeftDown", IPageLayout.BOTTOM, (float)0.6, "topLeftUp");
+		folder3.addView(IDebugUIConstants.ID_DEBUG_VIEW);
 
 		IFolderLayout folder5= layout.createFolder("right", IPageLayout.RIGHT,(float)0.8, editorArea);
 		folder5.addView(IPageLayout.ID_OUTLINE);

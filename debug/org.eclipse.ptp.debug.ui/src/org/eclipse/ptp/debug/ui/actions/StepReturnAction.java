@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.ptp.debug.ui.ImageUtil;
+import org.eclipse.ptp.debug.ui.model.Element;
 import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
 
 /**
@@ -26,14 +27,15 @@ import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
  *
  */
 public class StepReturnAction extends StepAction {
+	public static final String name = "Step Return";
+
 	public StepReturnAction(AbstractDebugParallelView debugView) {
-		super("Step Return", debugView);
+		super(name, debugView);
 	    this.setImageDescriptor(ImageUtil.ID_ICON_STEPRETURN_NORMAL);
 	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_STEPRETURN_NORMAL);
-	    this.setHoverImageDescriptor(ImageUtil.ID_ICON_STEPRETURN_NORMAL);
 	}
 	
-	public void run(Object[] elements) {
+	public void run(Element[] elements) {
 		// TODO Auto-generated method stub
 
 	}

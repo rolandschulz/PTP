@@ -16,28 +16,54 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.actions;
+package org.eclipse.ptp.debug.ui.model;
 
-import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.model.Element;
-import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
 
 /**
  * @author clement chu
  *
  */
-public class SuspendAction extends ParallelDebugAction {
-	public static final String name = "Suspend";
-
-	public SuspendAction(AbstractDebugParallelView debugView) {
-		super(name, debugView);
-	    this.setImageDescriptor(ImageUtil.ID_ICON_SUSPEND_NORMAL);
-	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_SUSPEND_NORMAL);
+public class Element implements Cloneable, Comparable {
+	protected int id = 0;
+	protected boolean selected = false; 
+	
+	public Element(int id, boolean selected) {
+		this.id = id;
 	}
-
-	public void run(Element[] elements) {
-		// TODO Auto-generated method stub
-
+	public Element(int id) {
+		this(id, false);
 	}
-
+	public int getID() {
+		return id;
+	}
+	public boolean isSelected() {
+		return selected;
+	}	
+	public void setSelected(boolean selected) {
+		this.selected = selected;
+	}
+	public Element cloneElement() {
+		try {
+			return (Element)clone();
+		} catch (CloneNotSupportedException e) {
+			return null;
+		}
+	}
+	/**
+	 * @param obj compare to
+	 * @return -1 if smaller than obj, 1 if bigger than obj, otherwise they equal
+	 */
+	public int compareTo(Object obj) {
+		if (obj instanceof Element) {
+			int my_rank = id;
+			int his_rank = ((Element) obj).getID();
+			if (my_rank < his_rank)
+				return -1;
+			if (my_rank == his_rank)
+				return 0;
+			if (my_rank > his_rank)
+				return 1;
+		}
+		return 0;
+	}	
 }

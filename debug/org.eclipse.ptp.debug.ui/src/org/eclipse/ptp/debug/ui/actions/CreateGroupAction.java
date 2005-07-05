@@ -19,20 +19,51 @@
 package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.ptp.debug.ui.ImageUtil;
+import org.eclipse.ptp.debug.ui.UIDialog;
+import org.eclipse.ptp.debug.ui.model.Element;
+import org.eclipse.ptp.debug.ui.model.ElementGroup;
+import org.eclipse.ptp.debug.ui.model.GroupManager;
 import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
+import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
+import org.eclipse.swt.SWT;
 /**
  * @author clement chu
  *
  */
 public class CreateGroupAction extends ParallelDebugAction {
+	public static final String name = "Create Group";
+
 	public CreateGroupAction(AbstractDebugParallelView debugView) {
-		super("Create Group", debugView);
+		super(name, debugView);
 	    this.setImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
 	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
-	    this.setHoverImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
 	}
 
-	public void run(Object[] elements) {
+	public void run(Element[] elements) {
+		if (elements == null || elements.length == 0) {
+			UIDialog.showDialog(getShell(), "No selected elements", "Please select some elements first", SWT.ICON_ERROR | SWT.OK);
+			return;
+		}	
 		
+		if (debugView instanceof DebugParallelProcessView) {
+			DebugParallelProcessView view = (DebugParallelProcessView)debugView;
+			createNewGroup(view, elements);
+			view.updateMenu();
+			view.redraw();
+		}
+	}
+	
+	public void createNewGroup(DebugParallelProcessView view, Element[] elements) {
+		if (elements != null && elements.length > 0) {
+			GroupManager groupManager = view.getGroupManager();
+			ElementGroup group = new ElementGroup(groupManager.size(), true);
+			for (int i=0; i<elements.length; i++) {
+				Element newElement = elements[i].cloneElement();
+				newElement.setSelected(false);
+				group.addElement(newElement);
+			}
+			groupManager.addGroup(group);
+			view.createGroupActions(group);
+		}
 	}	
 }

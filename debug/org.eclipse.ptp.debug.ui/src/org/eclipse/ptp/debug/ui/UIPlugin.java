@@ -18,10 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui;
 
-import org.eclipse.ui.plugin.*;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-import java.util.*;
 /**
  * @author clement chu
  * The main plugin class to be used in the desktop.
@@ -31,6 +33,8 @@ public class UIPlugin extends AbstractUIPlugin {
 	private static UIPlugin plugin;
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
+	
+	private UIDebugManager uiDebugManager = null;
 	
 	/**
 	 * The constructor.
@@ -45,6 +49,11 @@ public class UIPlugin extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		uiDebugManager = new UIDebugManager();
+	}
+	
+	public UIDebugManager getUIDebugManager() {
+		return uiDebugManager;
 	}
 
 	/**

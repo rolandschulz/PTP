@@ -16,28 +16,26 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.actions;
+package org.eclipse.ptp.debug.ui;
 
-import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.model.Element;
-import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
+import org.eclipse.ptp.debug.ui.model.GroupManager;
 
 /**
  * @author clement chu
  *
  */
-public class SuspendAction extends ParallelDebugAction {
-	public static final String name = "Suspend";
-
-	public SuspendAction(AbstractDebugParallelView debugView) {
-		super(name, debugView);
-	    this.setImageDescriptor(ImageUtil.ID_ICON_SUSPEND_NORMAL);
-	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_SUSPEND_NORMAL);
+public class UIDebugManager {
+	private GroupManager groupManager = null;
+	
+	public UIDebugManager() {
+		groupManager = new GroupManager();
 	}
-
-	public void run(Element[] elements) {
-		// TODO Auto-generated method stub
-
+	
+	public GroupManager getGroupManager() {
+		return groupManager;
 	}
-
+	
+	public void shutdown() {
+		groupManager.shutdown();
+	}
 }
