@@ -22,8 +22,6 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 	protected HashMap nodeModeMap;
 
 	protected HashMap nodeStateMap;
-	
-	protected HashMap processMap;
 
 	/* define the number of machines here */
 	final static int numMachines = 4;
@@ -40,24 +38,12 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 		
 	}
 	
-	public void addToProcessMap(String s, Integer i)
-	{
-		processMap.put(s, i);
-	}
-	
-	public void removeFromProcessMap(String s)
-	{
-		processMap.remove(s);
-	}
-	
 	public void startup() {
 		nodeMap = new HashMap();
 		for (int i = 0; i < numMachines; i++) {
 			String s = new String("machine" + i);
 			nodeMap.put(s, new Integer(numNodes[i]));
 		}
-
-		processMap = new HashMap();
 		
 		int totnodes = 0;
 		for (int i = 0; i < numMachines; i++) {
@@ -206,120 +192,6 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 		}
 
 		return ne;
-	}
-
-	public String[] getJobs() {
-		int i = 0;
-		Set set = processMap.keySet();
-		String[] ne = new String[set.size()];
-		Iterator it = set.iterator();
-
-		while (it.hasNext()) {
-			String key = (String) it.next();
-			ne[i++] = new String(key);
-		}
-
-		return ne;
-	}
-
-	/* get the processes pertaining to a certain job */
-	public String[] getProcesses(String jobName) {
-		/* find this machineName in the map - if it's there */
-		if (!processMap.containsKey(jobName))
-			return null;
-
-		int n = ((Integer) (processMap.get(jobName))).intValue();
-
-		String[] ne = new String[n];
-
-		for (int i = 0; i < ne.length; i++) {
-			/* prepend this node name with the machine name */
-			ne[i] = new String(jobName + "_process" + i);
-		}
-
-		return ne;
-	}
-
-	/*
-	 * this is a major kludge, sorry but this is a dummy implementation anyway
-	 * so hack this up if you want to change the process to node mapping - this
-	 * assumes a certain number of jobs with a set number of processes in each
-	 * job
-	 */
-	public String getProcessNodeName(String procName) {
-		/* gets the monitoring system that is paired up with this control system */
-		IControlSystem cs = PTPCorePlugin.getDefault().getModelManager().getControlSystem();
-		if(!(cs instanceof SimulationControlSystem)) return "ERROR";
-		SimulationControlSystem scs = (SimulationControlSystem)cs;
-		
-		// System.out.println("getProcessNodeName("+procName+")");
-		String job = procName.substring(0, procName.indexOf("process") - 1);
-		// System.out.println("job = "+job);
-		// String job = procName.substring(0, 4);
-		/* ok this is coming from the fake job */
-		if (job.equals("job" + scs.getNumJobs())) {
-			int numProcsInJob = ((Integer) (processMap.get(job))).intValue();
-			String s = procName.substring(procName.indexOf("process") + 7,
-					procName.length());
-			// System.out.println("proc # = "+s);
-			int procNum = -1;
-			try {
-				procNum = (new Integer(s)).intValue();
-			} catch (NumberFormatException e) {
-			}
-			if (procNum != -1) {
-				return "machine0_node"
-						+ (scs.getSpawnedFirstNode() + (procNum / scs.getSpawnedProcsPerNode()));
-			}
-		}
-
-		return "";
-	}
-
-	public String getProcessStatus(String procName) {
-		/* gets the monitoring system that is paired up with this control system */
-		IControlSystem cs = PTPCorePlugin.getDefault().getModelManager().getControlSystem();
-		if(!(cs instanceof SimulationControlSystem)) return "ERROR";
-		SimulationControlSystem scs = (SimulationControlSystem)cs;
-		
-		String job = procName.substring(0, 4);
-		if (job.equals("job" + scs.getNumJobs())) {
-			// System.out.println("PROCSTATE = "+spawned_app_state);
-			return scs.getSpawnedAppState();
-		}
-		return "-1";
-	}
-
-	public String getProcessExitCode(String procName) {
-		/* gets the monitoring system that is paired up with this control system */
-		IControlSystem cs = PTPCorePlugin.getDefault().getModelManager().getControlSystem();
-		if(!(cs instanceof SimulationControlSystem)) return "ERROR";
-		SimulationControlSystem scs = (SimulationControlSystem)cs;
-		
-		String job = procName.substring(0, 4);
-		if (job.equals("job" + scs.getNumJobs())) {
-			// System.out.println("PROCSTATE = "+spawned_app_state);
-			return scs.getSpawnedAppExitCode();
-		}
-		return "-1";
-	}
-
-	public String getProcessSignal(String procName) {
-		/* gets the monitoring system that is paired up with this control system */
-		IControlSystem cs = PTPCorePlugin.getDefault().getModelManager().getControlSystem();
-		if(!(cs instanceof SimulationControlSystem)) return "ERROR";
-		SimulationControlSystem scs = (SimulationControlSystem)cs;
-		
-		String job = procName.substring(0, 4);
-		if (job.equals("job" + scs.getNumJobs())) {
-			// System.out.println("PROCSTATE = "+spawned_app_state);
-			return scs.getSpawnedAppSignal();
-		}
-		return "-1";
-	}
-	
-	public int getProcessPID(String procName) {
-		return ((int)(Math.random() * 10000)) + 1000;
 	}
 
 	public String getNodeMachineName(String nodeName) {

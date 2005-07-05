@@ -29,6 +29,20 @@ public interface IControlSystem {
 	public String run(JobRunConfiguration jobRunConfig);
 
 	public void abortJob(String jobID);
+	
+	public String[] getJobs();
+
+	public String[] getProcesses(String jobName);
+
+	public String getProcessNodeName(String procName);
+	
+	public String getProcessStatus(String procName);
+
+	public String getProcessExitCode(String procName);
+
+	public String getProcessSignal(String procName);
+	
+	public int getProcessPID(String procName);
 
 	/* event stuff */
 	public void addRuntimeListener(IRuntimeListener listener);

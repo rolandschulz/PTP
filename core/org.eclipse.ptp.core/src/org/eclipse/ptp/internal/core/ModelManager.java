@@ -168,7 +168,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				mac.addChild(node);
 			}
 		}
-		ne = monitoringSystem.getJobs();
+		ne = controlSystem.getJobs();
 		for (int i = 0; ne != null && i < ne.length; i++) {
 			PJob job;
 
@@ -229,7 +229,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				mac.addChild(node);
 			}
 		}
-		ne = monitoringSystem.getJobs();
+		ne = controlSystem.getJobs();
 		for (int i = 0; i < ne.length; i++) {
 			PJob job;
 
@@ -254,7 +254,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	 * model with the processes that correspond to that Job
 	 */
 	private void getProcsForNewJob(String nejob, IPJob job) {
-		String[] ne = monitoringSystem.getProcesses(nejob);
+		String[] ne = controlSystem.getProcesses(nejob);
 		if (ne != null)
 			System.out.println("getProcsForNewJob:" + nejob + " - #procs = "
 					+ ne.length);
@@ -262,13 +262,13 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			PProcess proc;
 			// System.out.println("process name = "+ne[j]);
 			
-			int pid = monitoringSystem.getProcessPID(ne[j]);
+			int pid = controlSystem.getProcessPID(ne[j]);
 			proc = new PProcess(job, ne[j], "" + j + "", "" + pid + "", "-1",
 					"", "");
 			job.addChild(proc);
 
 			String pname = proc.getElementName();
-			String nname = monitoringSystem.getProcessNodeName(pname);
+			String nname = controlSystem.getProcessNodeName(pname);
 			String mname = monitoringSystem.getNodeMachineName(nname);
 			// System.out.println("Process "+pname+" running on node:");
 			// System.out.println("\t"+nname);
@@ -287,7 +287,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					proc.setNode(node);
 				}
 			}
-			String status = monitoringSystem.getProcessStatus(ne[j]);
+			String status = controlSystem.getProcessStatus(ne[j]);
 			proc.setStatus(status);
 		}
 	}
@@ -300,12 +300,12 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			if (procs != null) {
 				for (int i = 0; i < procs.length; i++) {
 					String procName = procs[i].getElementName();
-					String status = monitoringSystem.getProcessStatus(procName);
+					String status = controlSystem.getProcessStatus(procName);
 					// System.out.println("Status = "+status+" on process -
 					// "+procName);
 					procs[i].setStatus(status);
-					String signal = monitoringSystem.getProcessSignal(procName);
-					String exitCode = monitoringSystem.getProcessExitCode(procName);
+					String signal = controlSystem.getProcessSignal(procName);
+					String exitCode = controlSystem.getProcessExitCode(procName);
 					if (!signal.equals(""))
 						procs[i].setSignalName(signal);
 					if (!exitCode.equals(""))
