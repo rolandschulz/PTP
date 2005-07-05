@@ -47,11 +47,27 @@ public class OMPIControlSystem implements IControlSystem {
 	public native void OMPIProgress();
 	public native void OMPIRun();
 	
+	private static int failed_load = 0;
+	
 	static {
-        System.loadLibrary("ptp_ompi_jni");
+        try { 
+        		System.loadLibrary("ptp_ompi_jni");
+        } catch(UnsatisfiedLinkError e) {
+        		String str = "Unable to load library 'libptp_ompi_jni.jnilib'.  Make sure "+
+        				"the library exists and the VM arguments point to the directory where "+
+        				"it resides.";
+        		System.err.println(str);
+        		CoreUtils.showErrorDialog("Dynamic Library Load Failed", str, null);
+        		failed_load = 1;
+        }
     }
 	
 	public void startup() {
+		if(failed_load == 1) {
+			System.err.println("Unable to startup OMPI Control System because of a failed "+
+					"library load.");
+			return;
+		}
 		int rc = OMPIInit("foo/bar");
 		System.out.println("OMPI Init() return code = "+rc);
 		if(rc != 0) {
@@ -63,6 +79,11 @@ public class OMPIControlSystem implements IControlSystem {
 	}
     
 	public void startProgressMaker() {
+		if(failed_load == 1) {
+			System.err.println("Unable to startup OMPI Control System because of a failed "+
+					"library load.");
+			return;
+		}
 		Thread progressThread = new Thread("PTP RTE OMPI Progress Thread") {
 			public void run() {
 				OMPIProgress();
@@ -133,6 +154,11 @@ public class OMPIControlSystem implements IControlSystem {
 	}
 
 	public void shutdown() {
+		if(failed_load == 1) {
+			System.err.println("Unable to startup OMPI Control System because of a failed "+
+					"library load.");
+			return;
+		}
 		System.out.println("JAVA OMPI: shutdown() called");
 		OMPIFinalize();
 		listeners.clear();
