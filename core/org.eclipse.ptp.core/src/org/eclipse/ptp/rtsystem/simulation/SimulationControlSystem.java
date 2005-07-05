@@ -57,28 +57,17 @@ public class SimulationControlSystem implements IControlSystem {
 
 	protected Thread runningAppFinishThread = null;
 
+	protected HashMap processMap;
+
 	public SimulationControlSystem() {
 	}
 	
 	public void startup() {
+		processMap = new HashMap();
 	}
-
-	public int getNumJobs() { return numJobs; }
-	public String getSpawnedAppState() { return spawned_app_state; }
-	public int getSpawnedNumProcs() { return spawned_num_procs; }
-	public int getSpawnedProcsPerNode() { return spawned_procs_per_node; }
-	public int getSpawnedFirstNode() { return spawned_first_node; }
-	public String getSpawnedAppSignal() { return spawned_app_signal; }
-	public String getSpawnedAppExitCode() { return spawned_app_exit_code; }
-
 	
 	/* returns the new job name that it started - unique */
 	public String run(JobRunConfiguration jobRunConfig) {
-		/* gets the monitoring system that is paired up with this control system */
-		IMonitoringSystem ms = PTPCorePlugin.getDefault().getModelManager().getMonitoringSystem();
-		if(!(ms instanceof SimulationMonitoringSystem)) return "ERROR";
-		SimulationMonitoringSystem sms = (SimulationMonitoringSystem)ms;
-		
 		if (spawned_app_state != null
 				&& (spawned_app_state.equals(IPProcess.STARTING) || spawned_app_state
 						.equals(IPProcess.RUNNING))) {
@@ -96,7 +85,7 @@ public class SimulationControlSystem implements IControlSystem {
 		this.spawned_procs_per_node = jobRunConfig.getNumberOfProcessesPerNode();
 		this.spawned_first_node = jobRunConfig.getFirstNodeNumber();
 
-		sms.addToProcessMap(s, new Integer("spawned_num_procs"));
+		processMap.put(s, new Integer("spawned_num_procs"));
 
 		spawned_app_state = IPProcess.RUNNING;
 		spawned_app_exit_code = new String("");
@@ -161,15 +150,102 @@ public class SimulationControlSystem implements IControlSystem {
 	}
 
 	public void abortJob(String jobName) {
-		/* gets the monitoring system that is paired up with this control system */
-		IMonitoringSystem ms = PTPCorePlugin.getDefault().getModelManager().getMonitoringSystem();
-		if(!(ms instanceof SimulationMonitoringSystem)) return;
-		SimulationMonitoringSystem sms = (SimulationMonitoringSystem)ms;
-		
 		spawned_app_state = IPProcess.EXITED_SIGNALLED;
 		spawned_app_signal = new String("SIGTERM");
 		String s = new String("job" + numJobs);
-		sms.removeFromProcessMap(s);
+		processMap.remove(s);
+	}
+	
+	public String[] getJobs() {
+		int i = 0;
+		Set set = processMap.keySet();
+		String[] ne = new String[set.size()];
+		Iterator it = set.iterator();
+
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			ne[i++] = new String(key);
+		}
+
+		return ne;
+	}
+
+	/* get the processes pertaining to a certain job */
+	public String[] getProcesses(String jobName) {
+		/* find this machineName in the map - if it's there */
+		if (!processMap.containsKey(jobName))
+			return null;
+
+		int n = ((Integer) (processMap.get(jobName))).intValue();
+
+		String[] ne = new String[n];
+
+		for (int i = 0; i < ne.length; i++) {
+			/* prepend this node name with the machine name */
+			ne[i] = new String(jobName + "_process" + i);
+		}
+
+		return ne;
+	}
+
+	/*
+	 * this is a major kludge, sorry but this is a dummy implementation anyway
+	 * so hack this up if you want to change the process to node mapping - this
+	 * assumes a certain number of jobs with a set number of processes in each
+	 * job
+	 */
+	public String getProcessNodeName(String procName) {
+		// System.out.println("getProcessNodeName("+procName+")");
+		String job = procName.substring(0, procName.indexOf("process") - 1);
+		// System.out.println("job = "+job);
+		// String job = procName.substring(0, 4);
+		/* ok this is coming from the fake job */
+		if (job.equals("job" + numJobs)) {
+			String s = procName.substring(procName.indexOf("process") + 7,
+					procName.length());
+			// System.out.println("proc # = "+s);
+			int procNum = -1;
+			try {
+				procNum = (new Integer(s)).intValue();
+			} catch (NumberFormatException e) {
+			}
+			if (procNum != -1) {
+				return "machine0_node" + spawned_first_node + (procNum / spawned_procs_per_node);
+			}
+		}
+
+		return "";
+	}
+
+	public String getProcessStatus(String procName) {
+		String job = procName.substring(0, 4);
+		if (job.equals("job" + numJobs)) {
+			// System.out.println("PROCSTATE = "+spawned_app_state);
+			return spawned_app_state;
+		}
+		return "-1";
+	}
+
+	public String getProcessExitCode(String procName) {
+		String job = procName.substring(0, 4);
+		if (job.equals("job" + numJobs)) {
+			// System.out.println("PROCSTATE = "+spawned_app_state);
+			return spawned_app_exit_code;
+		}
+		return "-1";
+	}
+
+	public String getProcessSignal(String procName) {
+		String job = procName.substring(0, 4);
+		if (job.equals("job" + numJobs)) {
+			// System.out.println("PROCSTATE = "+spawned_app_state);
+			return spawned_app_signal;
+		}
+		return "-1";
+	}
+	
+	public int getProcessPID(String procName) {
+		return ((int)(Math.random() * 10000)) + 1000;
 	}
 
 	public void addRuntimeListener(IRuntimeListener listener) {

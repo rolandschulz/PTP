@@ -55,65 +55,6 @@ public class OMPIMonitoringSystem implements IMonitoringSystem {
 		return ne;
 	}
 
-	public String[] getJobs() {
-		System.out.println("JAVA OMPI: getJobs() called");
-
-		String[] ne = new String[1];
-		ne[0] = new String("job0");
-		return ne;
-	}
-
-	/* get the processes pertaining to a certain job */
-	public String[] getProcesses(String jobName) {
-		System.out.println("JAVA OMPI: getProcesses(" + jobName + ") called");
-
-		/* need to check is jobName is a valid job name */
-
-		String[] ne = new String[1];
-		ne[0] = new String("job0_process0");
-		return ne;
-	}
-
-	public String getProcessNodeName(String procName) {
-		System.out.println("JAVA OMPI: getProcessNodeName(" + procName
-				+ ") called");
-
-		/* check if procName is a valid process name */
-
-		return "machine0_node0";
-	}
-
-	public String getProcessStatus(String procName) {
-		System.out.println("JAVA OMPI: getProcessStatus(" + procName
-				+ ") called");
-
-		/* check is procName is a valid process name */
-
-		return "-1";
-	}
-
-	public String getProcessExitCode(String procName) {
-		System.out.println("JAVA OMPI: getProcessExitCode(" + procName
-				+ ") called");
-
-		/* check if procName is a valid process name */
-
-		return "-1";
-	}
-
-	public String getProcessSignal(String procName) {
-		System.out.println("JAVA OMPI: getProcessSignal(" + procName
-				+ ") called");
-
-		/* check is procName is a valid process name */
-
-		return "-1";
-	}
-	
-	public int getProcessPID(String procName) {
-		return ((int)(Math.random() * 10000)) + 1000;
-	}
-
 	public String getNodeMachineName(String nodeName) {
 		System.out.println("JAVA OMPI: getNodeMachineName(" + nodeName
 				+ ") called");

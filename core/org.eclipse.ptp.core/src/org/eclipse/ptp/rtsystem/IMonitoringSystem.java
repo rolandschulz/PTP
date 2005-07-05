@@ -28,21 +28,7 @@ public interface IMonitoringSystem {
 
 	public String[] getNodes(String machineName);
 
-	public String[] getJobs();
-
-	public String[] getProcesses(String jobName);
-
-	public String getProcessNodeName(String procName);
-
 	public String getNodeMachineName(String nodeName);
-
-	public String getProcessStatus(String procName);
-
-	public String getProcessExitCode(String procName);
-
-	public String getProcessSignal(String procName);
-	
-	public int getProcessPID(String procName);
 
 	public String getNodeAttribute(String nodeName, String attrib);
 
