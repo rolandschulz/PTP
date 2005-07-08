@@ -1,5 +1,7 @@
 package org.eclipse.ptp.debug.external.simulator;
 
+import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.DebugConfig;
 import org.eclipse.ptp.debug.external.DebugSession;
@@ -161,6 +163,22 @@ public class DebugSimulator extends AbstractDebugger {
 			System.out.println("suspending: " + allSet.getProcess(i).getName());
 		}
 		state = SUSPENDED;
+	}
+
+	public void initPTP(IPJob job) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.initPTP()");
+		
+		MProcess.resetGlobalCounter();
+		IPProcess[] procs = job.getProcesses();
+		
+		for (int i = 0; i < procs.length; i++) {
+			MProcess proc = new MProcess();
+			Process p = new SimProcess("proc" + i, 1, 1);
+			proc.setDebugInfo(p); /* We store the process in the "debug info" */
+			proc.setPProcess(procs[i]);
+			allSet.addProcess(proc);
+		}
 	}
 
 }
