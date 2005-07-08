@@ -85,7 +85,7 @@ public class SimulationControlSystem implements IControlSystem {
 		this.spawned_procs_per_node = jobRunConfig.getNumberOfProcessesPerNode();
 		this.spawned_first_node = jobRunConfig.getFirstNodeNumber();
 
-		processMap.put(s, new Integer("spawned_num_procs"));
+		processMap.put(s, new Integer(spawned_num_procs));
 
 		spawned_app_state = IPProcess.RUNNING;
 		spawned_app_exit_code = new String("");
