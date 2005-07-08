@@ -6,6 +6,7 @@ package org.eclipse.ptp.debug.external;
 
 import java.util.Observer;
 
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.external.actionpoint.DebugActionpoint;
 import org.eclipse.ptp.debug.external.command.DebugCommand;
 import org.eclipse.ptp.debug.external.gdbserver.RemoteDebugManager;
@@ -55,6 +56,10 @@ public class DebugSession {
 
 	public void load(String prg, int numProcs) {
 		debugger.load(prg, numProcs);
+	}
+	
+	public void initPTP(IPJob job) {
+		debugger.initPTP(job);
 	}
 
 	public void run() {

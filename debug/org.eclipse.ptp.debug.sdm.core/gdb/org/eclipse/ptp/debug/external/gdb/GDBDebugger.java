@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.DebugConfig;
 import org.eclipse.ptp.debug.external.DebugSession;
@@ -516,6 +517,12 @@ public class GDBDebugger extends AbstractDebugger {
 	public void initDebugger(DebugSession dS) {
 		// Auto-generated method stub
 		System.out.println("GDBDebugger.initDebugger()");
+		
+	}
+
+	public void initPTP(IPJob job) {
+		// Auto-generated method stub
+		System.out.println("GDBDebugger.initPTP()");
 		
 	}
 }

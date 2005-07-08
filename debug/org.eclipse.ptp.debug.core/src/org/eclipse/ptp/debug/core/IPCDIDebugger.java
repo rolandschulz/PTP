@@ -16,9 +16,10 @@ import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.ptp.core.IPJob;
 
 
 public interface IPCDIDebugger extends ICDIDebugger {
-	public ICDISession createDebuggerSession(int nprocs, ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException;
-	public ICDISession createDebuggerSession(int nprocs, ILaunch launch, File exe, IProgressMonitor monitor) throws CoreException;
+	public ICDISession createDebuggerSession(IPJob[] jobs, ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException;
+	public ICDISession createDebuggerSession(IPJob[] jobs, ILaunch launch, File exe, IProgressMonitor monitor) throws CoreException;
 }

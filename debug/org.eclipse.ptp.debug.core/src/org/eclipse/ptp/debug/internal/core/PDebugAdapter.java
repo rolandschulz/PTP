@@ -32,6 +32,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.IPCDIDebugger;
 import org.eclipse.ptp.debug.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -140,13 +141,13 @@ public class PDebugAdapter implements IPCDIDebugger {
 		return new Path(path);
 	}
 
-	public ICDISession createDebuggerSession(int nprocs, ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException {
+	public ICDISession createDebuggerSession(IPJob[] jobs, ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException {
 		// Auto-generated method stub
 		System.out.println("PDebugAdapter.createDebuggerSession()");
 		return null;
 	}
 
-	public ICDISession createDebuggerSession(int nprocs, ILaunch launch, File exe, IProgressMonitor monitor) throws CoreException {
+	public ICDISession createDebuggerSession(IPJob[] jobs, ILaunch launch, File exe, IProgressMonitor monitor) throws CoreException {
 		// Auto-generated method stub
 		System.out.println("PDebugAdapter.createDebuggerSession()");
 		return null;

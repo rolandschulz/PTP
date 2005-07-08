@@ -7,6 +7,7 @@ package org.eclipse.ptp.debug.external;
 
 import java.util.Observer;
 
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.external.actionpoint.DebugActionpoint;
 import org.eclipse.ptp.debug.external.command.DebugCommand;
 import org.eclipse.ptp.debug.external.event.DebugEvent;
@@ -105,6 +106,7 @@ public interface IDebugger {
 	public void remote(String host, int port);
 	
 	/* Methods that are required to interface with Eclipse Debug/CDI Model */
+	public abstract void initPTP(IPJob job);
 	public abstract Process getSessionProcess();
 	public abstract Process getProcess(int number);
 	public abstract Process getProcess();

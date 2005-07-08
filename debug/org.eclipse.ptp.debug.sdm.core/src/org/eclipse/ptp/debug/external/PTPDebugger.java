@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.IPCDIDebugger;
 import org.eclipse.ptp.debug.external.cdi.Session;
 
@@ -16,11 +17,11 @@ public class PTPDebugger implements IPCDIDebugger {
 		return null;
 	}
 
-	public ICDISession createDebuggerSession(int nprocs, ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) {
+	public ICDISession createDebuggerSession(IPJob[] jobs, ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) {
 		return null;
 	}
 	
-	public ICDISession createDebuggerSession(int nprocs, ILaunch launch, File exe, IProgressMonitor monitor) {
+	public ICDISession createDebuggerSession(IPJob[] jobs, ILaunch launch, File exe, IProgressMonitor monitor) {
 		
 		try {
 			/* Currently, we ignore the executable
@@ -28,8 +29,10 @@ public class PTPDebugger implements IPCDIDebugger {
 			File prog = exe;
 			*/
 
+			/* Currently, we only use jobs[0] */
+			
 			DebugSession debug = new DebugSession();
-			debug.load(null, nprocs);
+			debug.initPTP(jobs[0]);
 
 			Session session = new Session(debug);
 			
