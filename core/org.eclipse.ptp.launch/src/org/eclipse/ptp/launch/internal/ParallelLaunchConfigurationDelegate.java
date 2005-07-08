@@ -46,6 +46,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
@@ -198,27 +199,28 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			exeFile = verifyBinary(project, exePath);
 		}
 		
+		getLaunchManager().execMI(launch, workDirectory, null, jrunconfig, monitor);
+		IPJob[] jobs = getLaunchManager().getUniverse().getJobs();
+		
 		String[] commandLine = new String[] {"/bin/date"};
-		int numProcs = jrunconfig.getNumberOfProcesses();
 		
 		try {	
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				ICDISession dsession = null;
 				
-				dsession = (ICDISession) debugConfig.createDebugger().createDebuggerSession(numProcs, launch, (File) null, monitor);
+				dsession = (ICDISession) debugConfig.createDebugger().createDebuggerSession(jobs, launch, (File) null, monitor);
 				
 				boolean stopInMain = launch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
 
 				IPCDITarget[] targets = (IPCDITarget[]) dsession.getTargets();
 				
+				/* Even though ICDISession supports multiple targets but it only creates one target */
+				
 				for (int i = 0; i < targets.length; i++) {
-					
 					Process process = targets[i].getProcess(0);
 					IProcess[] iprocesses = new IProcess[1];
-					
 					iprocesses[0] = DebugPlugin.newProcess(launch, process, "Launch Label - 0");
-					
 					PCDIDebugModel.newDebugTarget(launch, null, targets[i], "Name", iprocesses, exeFile, true, false, stopInMain, true);
 				}
 			}
@@ -229,8 +231,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		getLaunchManager().execMI(launch, workDirectory, null, jrunconfig, monitor);
 		
 		monitor.worked(5);
 		
