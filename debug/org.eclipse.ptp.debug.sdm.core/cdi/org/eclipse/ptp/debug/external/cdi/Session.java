@@ -8,6 +8,7 @@ import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionConfiguration;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
@@ -23,7 +24,7 @@ public class Session implements ICDISession, ICDISessionObject {
 	Properties props;
 	SessionConfiguration configuration;
 	
-	public Session(DebugSession dSession) {
+	public Session(DebugSession dSession, IPJob job) {
 		props = new Properties();
 		configuration = new SessionConfiguration(this);
 		
@@ -33,7 +34,7 @@ public class Session implements ICDISession, ICDISessionObject {
 		variableManager = new VariableManager(this);
 		registerManager = new RegisterManager(this);
 		
-		Target target = new Target(this, dSession);
+		Target target = new Target(this, dSession, job);
 		addTargets(new Target[] { target });
 	}
 
