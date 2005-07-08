@@ -37,7 +37,10 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
+import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
 import org.eclipse.ptp.debug.external.cdi.RegisterManager;
@@ -52,13 +55,23 @@ public class Target extends SessionObject implements IPCDITarget {
 	
 	private TargetConfiguration fConfiguration;
 	private DebugSession dSession;
+	private IPCDIDebugProcess[] pDebugProcesses;
+	
 	Thread[] noThreads = new Thread[0];
 	Thread[] currentThreads;
 	int currentThreadId;
 	
-	public Target(Session s, DebugSession dS) {
+	public Target(Session s, DebugSession dS, IPJob job) {
 		super(s);
 		dSession = dS;
+		
+		IPProcess[] pProcesses = job.getProcesses();
+		pDebugProcesses = new IPCDIDebugProcess[pProcesses.length];
+		
+		for (int i = 0; i < pProcesses.length; i++) {
+			pDebugProcesses[i] = new DebugProcess(pProcesses[i]);
+		}
+		
 		fConfiguration = new TargetConfiguration(this);
 		currentThreads = noThreads;
 	}

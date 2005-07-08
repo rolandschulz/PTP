@@ -115,7 +115,6 @@ import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
-import org.eclipse.ptp.debug.core.model.IPProcess;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
 import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
@@ -1799,13 +1798,13 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return false;
 	}
 
-	public IPProcess[] getProcesses() {
+	public IProcess[] getProcesses() {
 		// Auto-generated method stub
 		System.out.println("PDebugTarget.getProcesses()");
 		return null;
 	}
 
-	public IThread[] getProcessThreads(IPProcess process) throws DebugException {
+	public IThread[] getProcessThreads(IProcess process) throws DebugException {
 		// Auto-generated method stub
 		System.out.println("PDebugTarget.getProcessThreads()");
 		return null;

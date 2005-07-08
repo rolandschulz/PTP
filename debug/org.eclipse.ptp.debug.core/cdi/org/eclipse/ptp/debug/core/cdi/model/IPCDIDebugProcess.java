@@ -1,10 +1,9 @@
-package org.eclipse.ptp.debug.core.model;
+package org.eclipse.ptp.debug.core.cdi.model;
 
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
 
-public interface IPProcess extends IProcess {
+public interface IPCDIDebugProcess {
 	/**
 	 * Modeled after IDebugTarget.getThreads();
 	 * 

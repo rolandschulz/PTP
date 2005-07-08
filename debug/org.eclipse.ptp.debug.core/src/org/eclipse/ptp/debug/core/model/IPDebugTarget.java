@@ -2,6 +2,7 @@ package org.eclipse.ptp.debug.core.model;
 
 import org.eclipse.cdt.debug.core.model.ICDebugTarget;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
 
 public interface IPDebugTarget extends ICDebugTarget {
@@ -21,7 +22,7 @@ public interface IPDebugTarget extends ICDebugTarget {
 	 * 
 	 * @return
 	 */
-	public IPProcess[] getProcesses();
+	public IProcess[] getProcesses();
 	
-	public IThread[] getProcessThreads(IPProcess process) throws DebugException;
+	public IThread[] getProcessThreads(IProcess process) throws DebugException;
 }
