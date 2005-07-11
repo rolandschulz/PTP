@@ -113,6 +113,7 @@ import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessGroup;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
@@ -250,6 +251,22 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		getCDISession().getEventManager().addEventListener( this );
 	}
 
+	public void setCurrentFocus(int procNum) {
+		getCDITarget().setCurrentFocus(procNum);
+	}
+
+	public void setCurrentFocus(String name) {
+		getCDITarget().setCurrentFocus(name);
+	}
+	
+	public IPCDIDebugProcessGroup newProcessGroup(String name) {
+		return getCDITarget().newProcessGroup(name);
+	}
+	
+	public void delProcessGroup(String name) {
+		getCDITarget().delProcessGroup(name);
+	}
+	
 	protected void initialize() {
 		initializeSourceLookupPath();
 		ArrayList debugEvents = new ArrayList( 1 );
