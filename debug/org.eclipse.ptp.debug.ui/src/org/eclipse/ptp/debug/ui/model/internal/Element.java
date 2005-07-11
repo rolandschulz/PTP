@@ -16,40 +16,56 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core;
+package org.eclipse.ptp.debug.ui.model.internal;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.eclipse.ptp.debug.ui.model.IElement;
+
 
 /**
  * @author clement chu
  *
  */
-public class PProcessGroup extends PProcess {
-	private List processes = new ArrayList();
+public class Element implements IElement, Cloneable, Comparable {
+	protected String id = "0";
+	protected boolean selected = false; 
 	
-	public PProcessGroup(int id) {
-		super(id);
+	public Element(String id, boolean selected) {
+		this.id = id;
 	}
-	public PProcess[] getProcesses() {
-		return (PProcess[])processes.toArray(new PProcess[processes.size()]);
+	public Element(String id) {
+		this(id, false);
 	}
-	public void addProcess(PProcess p) {
-		processes.add(p);
+	public String getID() {
+		return id;
 	}
-	public void removeProcess(PProcess p) {
-		processes.remove(p);
+	public boolean isSelected() {
+		return selected;
+	}	
+	public void setSelected(boolean selected) {
+		this.selected = selected;
 	}
-	public void removeProcess(int index) {
-		processes.remove(index);
+	public IElement cloneElement() {
+		try {
+			return (IElement)clone();
+		} catch (CloneNotSupportedException e) {
+			return null;
+		}
 	}
-	public void clearAll() {
-		processes.clear();
-	}
-	public PProcess getProcess(int index) {
-		return (PProcess)processes.get(index);
-	}
-	public int size() {
-		return processes.size();
-	}
+	/**
+	 * @param obj compare to
+	 * @return -1 if smaller than obj, 1 if bigger than obj, otherwise they equal
+	 */
+	public int compareTo(Object obj) {
+		if (obj instanceof Element) {
+			int my_rank = Integer.parseInt(id);
+			int his_rank = Integer.parseInt(((Element) obj).getID());
+			if (my_rank < his_rank)
+				return -1;
+			if (my_rank == his_rank)
+				return 0;
+			if (my_rank > his_rank)
+				return 1;
+		}
+		return 0;
+	}	
 }

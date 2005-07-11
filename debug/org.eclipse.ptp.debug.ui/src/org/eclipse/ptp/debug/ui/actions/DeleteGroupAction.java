@@ -23,8 +23,8 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ptp.debug.ui.ImageUtil;
 import org.eclipse.ptp.debug.ui.UIDialog;
-import org.eclipse.ptp.debug.ui.model.Element;
-import org.eclipse.ptp.debug.ui.model.ElementGroup;
+import org.eclipse.ptp.debug.ui.model.IElementGroup;
+import org.eclipse.ptp.debug.ui.model.internal.Element;
 import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 import org.eclipse.swt.SWT;
@@ -48,12 +48,12 @@ public class DeleteGroupAction extends ParallelDebugAction {
 		if (debugView instanceof DebugParallelProcessView) {
 			DebugParallelProcessView view = (DebugParallelProcessView)debugView;
 
-			ElementGroup group = view.getCurrentGroup();
-			if (group.getID() > 0) {
-				 if (UIDialog.showDialog(getShell(), "Delete " + group.getText(), "All elements in this group will be deleted.", SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL) == SWT.OK) {
+			IElementGroup group = view.getCurrentGroup();
+			if (group != null && group.size() > 0) {
+				 if (UIDialog.showDialog(getShell(), name + " " + group.getID(), "All elements in this group will be deleted.", SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL) == SWT.OK) {
 					IMenuManager manager = view.getViewSite().getActionBars().getMenuManager();
-					manager.remove(group.getText());
-					view.getGroupManager().removeGroup(group.getText());
+					manager.remove(group.getID());
+					view.getGroupManager().removeGroup(group.getID());
 									
 					IContributionItem[] items = manager.getItems();
 					if (items.length > 0) {

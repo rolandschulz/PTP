@@ -18,11 +18,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.actions;
 
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ptp.debug.ui.ImageUtil;
 import org.eclipse.ptp.debug.ui.UIDialog;
-import org.eclipse.ptp.debug.ui.model.Element;
-import org.eclipse.ptp.debug.ui.model.ElementGroup;
-import org.eclipse.ptp.debug.ui.model.GroupManager;
+import org.eclipse.ptp.debug.ui.model.IElement;
+import org.eclipse.ptp.debug.ui.model.IElementGroup;
+import org.eclipse.ptp.debug.ui.model.IGroupManager;
+import org.eclipse.ptp.debug.ui.model.internal.Element;
+import org.eclipse.ptp.debug.ui.model.internal.ElementGroup;
 import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 import org.eclipse.swt.SWT;
@@ -46,24 +49,22 @@ public class CreateGroupAction extends ParallelDebugAction {
 		}	
 		
 		if (debugView instanceof DebugParallelProcessView) {
-			DebugParallelProcessView view = (DebugParallelProcessView)debugView;
-			createNewGroup(view, elements);
-			view.updateMenu();
-			view.redraw();
-		}
-	}
-	
-	public void createNewGroup(DebugParallelProcessView view, Element[] elements) {
-		if (elements != null && elements.length > 0) {
-			GroupManager groupManager = view.getGroupManager();
-			ElementGroup group = new ElementGroup(groupManager.size(), true);
+			final DebugParallelProcessView view = (DebugParallelProcessView)debugView;
+
+			IGroupManager groupManager = view.getGroupManager();
+			final IElementGroup group = new ElementGroup(true);
 			for (int i=0; i<elements.length; i++) {
-				Element newElement = elements[i].cloneElement();
+				IElement newElement = elements[i].cloneElement();
 				newElement.setSelected(false);
 				group.addElement(newElement);
 			}
 			groupManager.addGroup(group);
-			view.createGroupActions(group);
+
+			IMenuManager manager = view.getViewSite().getActionBars().getMenuManager();
+			manager.add(new GroupAction(group.getID(), view));
+			view.selectGroup(group.getID());
+			view.updateMenu(manager);			
+			view.redraw();
 		}
 	}	
 }

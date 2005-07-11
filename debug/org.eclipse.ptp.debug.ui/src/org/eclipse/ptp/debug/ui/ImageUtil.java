@@ -48,8 +48,8 @@ public class ImageUtil {
 	public static final String ICON_STEPOVER_NORMAL = "stepover_normal.gif";
 	public static final String ICON_STEPRETURN_DISABLE = "stepreturn_disable.gif";
 	public static final String ICON_STEPRETURN_NORMAL = "stepreturn_normal.gif";
-	public static final String ICON_GROUP_DISABLE = "group_disable.gif";
-	public static final String ICON_GROUP_NORMAL = "group_normal.gif";
+	public static final String ICON_DESELECTALL_DISABLE = "deselectall_disable.gif";
+	public static final String ICON_DESELECTALL_NORMAL = "deselectall_normal.gif";
 	public static final String ICON_CREATEGROUP_DISABLE = "creategroup_disable.gif";
 	public static final String ICON_CREATEGROUP_NORMAL = "creategroup_normal.gif";
 	public static final String ICON_DELETEGROUP_DISABLE = "deletegroup_disable.gif";
@@ -78,8 +78,8 @@ public class ImageUtil {
 	public static final ImageDescriptor ID_ICON_STEPOVER_NORMAL = createImageDescriptor(TOOLICONURL, ICON_STEPOVER_NORMAL, ICON_STEPOVER_NORMAL);
 	public static final ImageDescriptor ID_ICON_STEPRETURN_DISABLE = createImageDescriptor(TOOLICONURL, ICON_STEPRETURN_DISABLE, ICON_STEPRETURN_DISABLE);
 	public static final ImageDescriptor ID_ICON_STEPRETURN_NORMAL = createImageDescriptor(TOOLICONURL, ICON_STEPRETURN_NORMAL, ICON_STEPRETURN_NORMAL);
-	public static final ImageDescriptor ID_ICON_GROUP_DISABLE = createImageDescriptor(TOOLICONURL, ICON_GROUP_DISABLE, ICON_GROUP_DISABLE);
-	public static final ImageDescriptor ID_ICON_GROUP_NORMAL = createImageDescriptor(TOOLICONURL, ICON_GROUP_NORMAL, ICON_GROUP_NORMAL);
+	public static final ImageDescriptor ID_ICON_DESELECTALL_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DESELECTALL_DISABLE, ICON_DESELECTALL_DISABLE);
+	public static final ImageDescriptor ID_ICON_DESELECTALL_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DESELECTALL_NORMAL, ICON_DESELECTALL_NORMAL);
 	public static final ImageDescriptor ID_ICON_CREATEGROUP_DISABLE = createImageDescriptor(TOOLICONURL, ICON_CREATEGROUP_DISABLE, ICON_CREATEGROUP_DISABLE);
 	public static final ImageDescriptor ID_ICON_CREATEGROUP_NORMAL = createImageDescriptor(TOOLICONURL, ICON_CREATEGROUP_NORMAL, ICON_CREATEGROUP_NORMAL);
 	public static final ImageDescriptor ID_ICON_DELETEGROUP_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DELETEGROUP_DISABLE, ICON_DELETEGROUP_DISABLE);

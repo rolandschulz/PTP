@@ -16,23 +16,36 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core;
+package org.eclipse.ptp.debug.ui.actions;
+
+import org.eclipse.ptp.debug.ui.ImageUtil;
+import org.eclipse.ptp.debug.ui.UIDialog;
+import org.eclipse.ptp.debug.ui.model.internal.Element;
+import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
+import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
+import org.eclipse.swt.SWT;
 /**
  * @author clement chu
  *
  */
-public interface IDebugParallelModelListener {
-	public static final String STATUS_ERROR = "error";
-	public static final String STATUS_RUNNING = "running";
-	public static final String STATUS_STARTING = "starting";
-	public static final String STATUS_SUSPENDED = "suspended";
-	public static final String STATUS_STOPPED = "stopped";	
-	public static final String STATUS_EXITED = "exited";	
+public class DeselectAllAction extends ParallelDebugAction {
+	public static final String name = "Deselect All";
 	
-	public void run();
-	public void suspend();
-	public void stop();
-	public void exit();
-	public void start();
-	public void error();
+	public DeselectAllAction(AbstractDebugParallelView debugView) {
+		super(name, debugView);
+	    this.setImageDescriptor(ImageUtil.ID_ICON_DESELECTALL_NORMAL);
+	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_DESELECTALL_NORMAL);
+	}
+
+	public void run(Element[] elements) {
+	}
+	public void run() {
+		if (debugView instanceof DebugParallelProcessView) {
+			DebugParallelProcessView view = (DebugParallelProcessView)debugView;
+			if (UIDialog.showDialog(getShell(), "Deselect All", "Deselect all elements in this group?", SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL) == SWT.OK) {			
+				view.getCurrentGroup().setAllSelect(false);
+				view.redraw();
+			}
+		}
+	}	
 }

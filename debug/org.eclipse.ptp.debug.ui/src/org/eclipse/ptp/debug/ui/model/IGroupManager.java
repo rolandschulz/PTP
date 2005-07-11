@@ -16,34 +16,25 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core;
+package org.eclipse.ptp.debug.ui.model;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * @author clement
+ * @author clement chu
  *
  */
-public class GroupManager {
-	private List groups = new ArrayList();
+public interface IGroupManager {
+	public static final String GROUP_ROOT_ID = "0";
 	
-	public void addGroup(PProcessGroup aGroup) {
-		groups.add(aGroup);
-	}
-	public void removeGroup(PProcessGroup aGroup) {
-		groups.remove(aGroup);
-	}
-	public void removeGroup(int index) {
-		groups.remove(index);
-	}
-	public PProcessGroup[] getGroups() {
-		return (PProcessGroup[])groups.toArray(new PProcessGroup[size()]);
-	}
-	public PProcessGroup getGroup(int index) {
-		return (PProcessGroup)groups.get(index);
-	}
-	public int size() {
-		return groups.size();
-	}
+	public IElementGroup getGroupRoot();
+	public void addGroup(IElementGroup aGroup);
+	public void removeGroup(IElementGroup aGroup);
+	public void removeGroup(String id);
+	public IElementGroup[] getGroups();
+	public IElementGroup[] getSortedGroups();
+	public IElementGroup getGroup(String id);
+	public IElementGroup getGroup(int index);
+	public String getGroupID(int index);	
+	public int size();
+	public void clearAll();
 }

@@ -61,6 +61,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
+		uiDebugManager.shutdown();
 		plugin = null;
 		resourceBundle = null;
 	}

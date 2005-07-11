@@ -21,12 +21,6 @@ package org.eclipse.ptp.debug.core;
  * @author clement chu
  *
  */
-public interface IProcessDebugEvent {
-	public static final int STATUS_ERROR = 0;
-	public static final int STATUS_RUNNING = 1;
-	public static final int STATUS_STARTED = 2;
-	public static final int STATUS_SUSPENDED = 3;
-	public static final int STATUS_STOPPED = 4;
-	
+public interface IProcessDebugEvent {	
 	public Object getSource();
 }

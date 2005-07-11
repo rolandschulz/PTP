@@ -17,27 +17,30 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.debug.core;
+
+import org.eclipse.ptp.core.IPProcess;
+
 /**
  * @author clement chu
  *
  */
 public class PProcess {
-	private int id = 0;
-	private int status = IProcessDebugEvent.STATUS_STOPPED; 
+	private String id = "0";
+	private String status = IPProcess.EXITED; 
 	
-	public PProcess(int id) {
+	public PProcess(String id) {
 		this.id = id;
 	}
-	public int getID() {
+	public String getID() {
 		return id;
 	}
-	public void setID(int id) {
+	public void setID(String id) {
 		this.id = id;
 	}
-	public int getStatus() {
+	public String getStatus() {
 		return status;
 	}
-	public void setStatus(int status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 }

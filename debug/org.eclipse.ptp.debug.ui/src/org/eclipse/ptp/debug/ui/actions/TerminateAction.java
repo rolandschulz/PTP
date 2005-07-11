@@ -19,7 +19,7 @@
 package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.model.Element;
+import org.eclipse.ptp.debug.ui.model.internal.Element;
 import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
 
 /**

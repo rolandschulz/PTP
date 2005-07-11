@@ -19,8 +19,7 @@
 package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.jface.action.IAction;
-import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.model.Element;
+import org.eclipse.ptp.debug.ui.model.internal.Element;
 import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 /**
@@ -28,15 +27,13 @@ import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
  *
  */
 public class GroupAction extends ParallelDebugAction {
-	private int group_id = 0;
+	public static final String GROUP_ROOT = "Root";
+	public static final String name = "Group";
 	
-	public GroupAction(String text, int group_id, AbstractDebugParallelView debugView) {
-		super(text, IAction.AS_CHECK_BOX, debugView);
-	    this.setImageDescriptor(ImageUtil.ID_ICON_GROUP_NORMAL);
-	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_GROUP_NORMAL);
+	public GroupAction(String id, AbstractDebugParallelView debugView) {
+		super(name + " " + id, IAction.AS_CHECK_BOX, debugView);
 	    this.setEnabled(true);
-		this.setId(text);
-		this.group_id = group_id;
+		this.setId(id);
 	}
 
 	public void run(Element[] elements) {
@@ -44,9 +41,9 @@ public class GroupAction extends ParallelDebugAction {
 	public void run() {
 		if (debugView instanceof DebugParallelProcessView) {
 			DebugParallelProcessView view = (DebugParallelProcessView)debugView;
-			if (view.getCurrentGroupID() != group_id) {
+			if (!view.getCurrentGroupID().equals(getId())) {
 				view.selectGroup(getId());
-				view.updateMenu();
+				view.updateMenu(view.getViewSite().getActionBars().getMenuManager());
 				view.redraw();
 			}
 		}

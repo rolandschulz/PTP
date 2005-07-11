@@ -24,8 +24,9 @@ import java.util.List;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.ptp.core.IModelManager;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.debug.core.DebugManager;
-import org.eclipse.ptp.debug.core.IDebugParallelEventListener;
 import org.eclipse.ptp.debug.core.IDebugParallelModelListener;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.UIPlugin;
@@ -40,23 +41,15 @@ public abstract class AbstractDebugParallelView extends ViewPart implements ISel
 	 */
 	protected List listeners = new ArrayList(0);
 	protected UIDebugManager uiDebugManager = null;
-	protected DebugManager debugManager = null;
+	protected IModelManager modelManager = null;
 	
 	public AbstractDebugParallelView() {
 		uiDebugManager = UIPlugin.getDefault().getUIDebugManager();
-		debugManager = DebugManager.getInstance();
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.IDebugParallelModelListener#addDebugeEventListener(org.eclipse.ptp.debug.core.IDebugParallelEventListener)
-	 */
-	public void addDebugeEventListener(IDebugParallelEventListener listener) {
-		listeners.add(listener);
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.debug.core.IDebugParallelModelListener#removeDebugeEventListener(org.eclipse.ptp.debug.core.IDebugParallelEventListener)
-	 */
-	public void removeDebugeEventListener(IDebugParallelEventListener listener) {
-		listeners.remove(listener);
+		modelManager = PTPCorePlugin.getDefault().getModelManager();
+		/* FIXME
+		 * add ModelListener 
+		 */		
+		DebugManager.getInstance().addListener(this);
 	}
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
@@ -75,6 +68,10 @@ public abstract class AbstractDebugParallelView extends ViewPart implements ISel
 	 */
 	public void dispose() {
 		listeners.clear();
+		/* FIXME
+		 * remove ModelListener 
+		 */
+		DebugManager.getInstance().removeListener(this);
 		super.dispose();
 	}
 	
