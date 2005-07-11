@@ -16,78 +16,100 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.model;
+package org.eclipse.ptp.debug.ui.model.internal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.eclipse.ptp.debug.ui.model.IElement;
+import org.eclipse.ptp.debug.ui.model.IElementGroup;
 /**
  * @author clement chu
  *
  */
-public class ElementGroup extends Element {
-	private static final String GROUP_PREFIX = "Group";
-	private Map elements = new HashMap(0);
+public class ElementGroup extends Element implements IElementGroup {
+	private Map elements = new HashMap();
+	private IElement[] sortedElements = new IElement[0];
+	private static int group_counter = 1;
 	
-	public ElementGroup(int id, boolean selected) {
-		super(id, selected);
+	public ElementGroup(boolean selected) {
+		this(group_counter++, selected);
 	}
-	public ElementGroup(int id) {
+	public ElementGroup(int num) {
+		this(String.valueOf(num), false);
+	}
+	public ElementGroup(int num, boolean selected) {
+		this(String.valueOf(num), selected);
+	}
+	public ElementGroup(String id) {
 		this(id, false);
 	}
-	public String getText() {
-		return GROUP_PREFIX + " " + (id + 1);
+	public ElementGroup(String id, boolean selected) {
+		super(id, selected);
 	}
-	public Element[] getElements() {
-		return (Element[])elements.values().toArray(new Element[elements.size()]);
+	public IElement[] getElements() {
+		return (IElement[])elements.values().toArray(new IElement[elements.size()]);
 	}	
-	public Element[] getSortedElements() {
-		Element[] sortElements = getElements();
-		GroupManager.sort(sortElements);
-		return sortElements;		
+	public IElement[] getSortedElements() {
+		if (sortedElements.length != size())
+			refresh();
+		
+		return sortedElements;		
 	}
-	public Element[] getSelectedElements() {
+	public IElement[] getSelectedElements() {
 		List selectedElements = new ArrayList();
 		for (Iterator i=elements.values().iterator(); i.hasNext();) {
-			Element element = (Element)i.next();
+			IElement element = (IElement)i.next();
 			if (element.isSelected())
 				selectedElements.add(element);
 		}
-		return (Element[])selectedElements.toArray(new Element[selectedElements.size()]);
+		return (IElement[])selectedElements.toArray(new IElement[selectedElements.size()]);
 	}
-	public void addElement(Element element) {
-		elements.put(new Integer(element.getID()), element);
+	public void addElement(IElement element) {
+		elements.put(element.getID(), element);
 	}
-	public void removeElement(Element element) {
-		elements.remove(new Integer(element.getID()));
+	public void removeElement(IElement element) {
+		elements.remove(element.getID());
 	}
-	public Element getElementByID(int id) {
-		return (Element)elements.get(new Integer(id));
+	public IElement getElement(String id) {
+		return (IElement)elements.get(id);
 	}
-	public Element getElement(int index) {
+	public IElement getElement(int index) {
 		return getSortedElements()[index];
 	}
-	public int getElementID(int index) {
+	public String getElementID(int index) {
 		return getElement(index).getID();
 	}
 	public void removeAllSelected() {
 		for (Iterator i=elements.values().iterator(); i.hasNext();) {
-			Element element = (Element)i.next();
+			IElement element = (IElement)i.next();
 			if (element.isSelected())
 				element.setSelected(false);
 		}
 	}
 	public void select(int index) {
-		Element element = getElement(index);
+		IElement element = getElement(index);
 		element.setSelected(!element.isSelected());
+	}
+	public void setAllSelect(boolean select) {
+		for (Iterator i=elements.values().iterator(); i.hasNext();) {
+			((IElement)i.next()).setSelected(select);
+		}
 	}
 	
 	public void clearAll() {
 		elements.clear();
+		sortedElements = new IElement[0];
 	}
 	public int size() {
 		return elements.size();
+	}
+	public void refresh() {
+		IElement[] sortingElements = getElements();
+		GroupManager.sort(sortingElements);
+		sortedElements = sortingElements;
 	}
 }

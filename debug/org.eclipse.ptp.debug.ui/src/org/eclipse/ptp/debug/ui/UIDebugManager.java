@@ -18,24 +18,25 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui;
 
-import org.eclipse.ptp.debug.ui.model.GroupManager;
+import org.eclipse.ptp.debug.ui.model.IGroupManager;
+import org.eclipse.ptp.debug.ui.model.internal.GroupManager;
 
 /**
  * @author clement chu
  *
  */
 public class UIDebugManager {
-	private GroupManager groupManager = null;
+	private IGroupManager groupManager = null;
 	
 	public UIDebugManager() {
 		groupManager = new GroupManager();
 	}
 	
-	public GroupManager getGroupManager() {
+	public IGroupManager getGroupManager() {
 		return groupManager;
 	}
 	
 	public void shutdown() {
-		groupManager.shutdown();
+		groupManager.clearAll();
 	}
 }

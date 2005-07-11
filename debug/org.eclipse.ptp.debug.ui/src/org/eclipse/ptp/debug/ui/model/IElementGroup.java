@@ -23,47 +23,18 @@ package org.eclipse.ptp.debug.ui.model;
  * @author clement chu
  *
  */
-public class Element implements Cloneable, Comparable {
-	protected int id = 0;
-	protected boolean selected = false; 
-	
-	public Element(int id, boolean selected) {
-		this.id = id;
-	}
-	public Element(int id) {
-		this(id, false);
-	}
-	public int getID() {
-		return id;
-	}
-	public boolean isSelected() {
-		return selected;
-	}	
-	public void setSelected(boolean selected) {
-		this.selected = selected;
-	}
-	public Element cloneElement() {
-		try {
-			return (Element)clone();
-		} catch (CloneNotSupportedException e) {
-			return null;
-		}
-	}
-	/**
-	 * @param obj compare to
-	 * @return -1 if smaller than obj, 1 if bigger than obj, otherwise they equal
-	 */
-	public int compareTo(Object obj) {
-		if (obj instanceof Element) {
-			int my_rank = id;
-			int his_rank = ((Element) obj).getID();
-			if (my_rank < his_rank)
-				return -1;
-			if (my_rank == his_rank)
-				return 0;
-			if (my_rank > his_rank)
-				return 1;
-		}
-		return 0;
-	}	
+public interface IElementGroup extends IElement {
+	public IElement[] getElements();
+	public IElement[] getSortedElements();
+	public IElement[] getSelectedElements();
+	public void addElement(IElement element);
+	public void removeElement(IElement element);
+	public IElement getElement(String id);
+	public IElement getElement(int index);
+	public String getElementID(int index);
+	public void removeAllSelected();
+	public void select(int index);
+	public void setAllSelect(boolean select);	
+	public void clearAll();
+	public int size();
 }

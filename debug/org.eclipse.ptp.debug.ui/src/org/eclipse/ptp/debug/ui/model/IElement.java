@@ -16,23 +16,16 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core;
+package org.eclipse.ptp.debug.ui.model;
+
+
 /**
  * @author clement chu
  *
  */
-public interface IDebugParallelModelListener {
-	public static final String STATUS_ERROR = "error";
-	public static final String STATUS_RUNNING = "running";
-	public static final String STATUS_STARTING = "starting";
-	public static final String STATUS_SUSPENDED = "suspended";
-	public static final String STATUS_STOPPED = "stopped";	
-	public static final String STATUS_EXITED = "exited";	
-	
-	public void run();
-	public void suspend();
-	public void stop();
-	public void exit();
-	public void start();
-	public void error();
+public interface IElement {
+	public String getID();
+	public boolean isSelected();
+	public void setSelected(boolean selected);
+	public IElement cloneElement();
 }
