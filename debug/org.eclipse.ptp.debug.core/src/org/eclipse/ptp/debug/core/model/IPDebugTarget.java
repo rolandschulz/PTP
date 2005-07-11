@@ -4,6 +4,7 @@ import org.eclipse.cdt.debug.core.model.ICDebugTarget;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessGroup;
 
 public interface IPDebugTarget extends ICDebugTarget {
 	/**
@@ -25,4 +26,9 @@ public interface IPDebugTarget extends ICDebugTarget {
 	public IProcess[] getProcesses();
 	
 	public IThread[] getProcessThreads(IProcess process) throws DebugException;
+	
+	public IPCDIDebugProcessGroup newProcessGroup(String name);
+	public void delProcessGroup(String name);
+	public void setCurrentFocus(int procNum);
+	public void setCurrentFocus(String name);
 }
