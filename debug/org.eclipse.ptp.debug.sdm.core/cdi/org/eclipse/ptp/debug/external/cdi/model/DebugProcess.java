@@ -29,4 +29,8 @@ public class DebugProcess implements IPCDIDebugProcess {
 		return false;
 	}
 
+	public String getName() {
+		return pProcess.getElementName();
+	}
+
 }

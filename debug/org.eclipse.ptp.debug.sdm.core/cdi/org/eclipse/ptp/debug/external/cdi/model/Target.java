@@ -11,6 +11,8 @@
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
@@ -39,6 +41,8 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugFocus;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessGroup;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.external.DebugSession;
@@ -55,7 +59,10 @@ public class Target extends SessionObject implements IPCDITarget {
 	
 	private TargetConfiguration fConfiguration;
 	private DebugSession dSession;
-	private IPCDIDebugProcess[] pDebugProcesses;
+	
+	private HashMap allDebugGroups;
+	private IPCDIDebugProcessGroup grpAllProcesses;
+	private IPCDIDebugFocus currentDebugFocus;
 	
 	Thread[] noThreads = new Thread[0];
 	Thread[] currentThreads;
@@ -65,15 +72,38 @@ public class Target extends SessionObject implements IPCDITarget {
 		super(s);
 		dSession = dS;
 		
-		IPProcess[] pProcesses = job.getProcesses();
-		pDebugProcesses = new IPCDIDebugProcess[pProcesses.length];
+		allDebugGroups = new HashMap();
 		
+		grpAllProcesses = new DebugProcessGroup("allProcesses");
+		IPProcess[] pProcesses = job.getProcesses();
 		for (int i = 0; i < pProcesses.length; i++) {
-			pDebugProcesses[i] = new DebugProcess(pProcesses[i]);
+			grpAllProcesses.addProcess(new DebugProcess(pProcesses[i]));
 		}
+		allDebugGroups.put(grpAllProcesses.getName(), grpAllProcesses);
+		
+		setCurrentFocus(0);
 		
 		fConfiguration = new TargetConfiguration(this);
 		currentThreads = noThreads;
+	}
+	
+	public IPCDIDebugProcessGroup newProcessGroup(String name) {
+		DebugProcessGroup newGroup = new DebugProcessGroup(name);
+		allDebugGroups.put(newGroup.getName(), newGroup);
+		return newGroup;
+	}
+	
+	public void delProcessGroup(String name) {
+		allDebugGroups.remove(name);
+	}
+	
+	public void setCurrentFocus(int procNum) {
+		currentDebugFocus = (DebugProcess) grpAllProcesses.getProcess(procNum);
+	}
+	
+	public void setCurrentFocus(String name) {
+		if (allDebugGroups.containsKey(name))
+			currentDebugFocus = (DebugProcessGroup) allDebugGroups.get(name);
 	}
 
 	public DebugSession getDebugSession() {

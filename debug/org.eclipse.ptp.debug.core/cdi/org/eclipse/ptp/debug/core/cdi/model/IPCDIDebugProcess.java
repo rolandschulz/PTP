@@ -3,7 +3,7 @@ package org.eclipse.ptp.debug.core.cdi.model;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IThread;
 
-public interface IPCDIDebugProcess {
+public interface IPCDIDebugProcess extends IPCDIDebugFocus {
 	/**
 	 * Modeled after IDebugTarget.getThreads();
 	 * 
