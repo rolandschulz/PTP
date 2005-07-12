@@ -81,14 +81,14 @@
             name="%ToolName.linker.gnu.fortran"
             outputFlag="-o"
             command="gfortran"
-            id="cdt.managedbuild.tool.gnu.fortran.linker">
+            id="fdt.managedbuild.tool.gnu.fortran.linker">
          <envVarBuildPath 
          	pathType="buildpathLibrary"
          	variableList="LIBRARY_PATH">
          </envVarBuildPath>
          
          <optionCategory
-               owner="cdt.managedbuild.tool.gnu.fortran.linker"
+               owner="fdt.managedbuild.tool.gnu.fortran.linker"
                name="%OptionCategory.General"
                id="gnu.fortran.link.category.general">
          </optionCategory>
@@ -133,7 +133,7 @@
                valueType="boolean">
          </option>
          <optionCategory
-               owner="cdt.managedbuild.tool.gnu.fortran.linker"
+               owner="fdt.managedbuild.tool.gnu.fortran.linker"
                name="%OptionCategory.Libs"
                id="gnu.fortran.link.category.libs">
          </optionCategory>
@@ -154,7 +154,7 @@
                valueType="stringList">
          </option>
          <optionCategory
-               owner="cdt.managedbuild.tool.gnu.fortran.linker"
+               owner="fdt.managedbuild.tool.gnu.fortran.linker"
                name="%OptionCategory.Misc"
                id="gnu.fortran.link.category.other">
          </optionCategory>
@@ -179,7 +179,7 @@
                id="gnu.fortran.link.option.userobjs">
          </option>
          <optionCategory
-               owner="cdt.managedbuild.tool.gnu.fortran.linker"
+               owner="fdt.managedbuild.tool.gnu.fortran.linker"
                name="%OptionCategory.Shared.Settings"
                id="gnu.fortran.link.category.shared">
          </optionCategory>
@@ -218,7 +218,7 @@
 			multipleOfType="true"
             dependencyCalculator="org.eclipse.cdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
             buildVariable="OBJS"
-            id="cdt.managedbuild.tool.gnu.fortran.linker.input">
+            id="fdt.managedbuild.tool.gnu.fortran.linker.input">
             <additionalInput
             	paths="$(USER_OBJS)"
             	kind="additionalinputdependency">
@@ -232,7 +232,7 @@
 			outputs=""
             buildVariable="EXECUTABLES"
             nameProvider="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuLinkOutputNameProvider"
-            id="cdt.managedbuild.tool.gnu.fortran.linker.output">
+            id="fdt.managedbuild.tool.gnu.fortran.linker.output">
          </outputType>
       </tool>
       <tool
@@ -241,14 +241,14 @@
             outputFlag="-o"
             command="gfortran"
             commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}"
-            id="cdt.managedbuild.tool.macosx.fortran.linker">
+            id="fdt.managedbuild.tool.macosx.fortran.linker">
          <envVarBuildPath 
          	pathType="buildpathLibrary"
          	variableList="LIBRARY_PATH">
          </envVarBuildPath>
          
          <optionCategory
-               owner="cdt.managedbuild.tool.macosx.fortran.linker"
+               owner="fdt.managedbuild.tool.macosx.fortran.linker"
                name="%OptionCategory.General"
                id="macosx.fortran.link.category.general">
          </optionCategory>
@@ -293,7 +293,7 @@
                valueType="boolean">
          </option>
          <optionCategory
-               owner="cdt.managedbuild.tool.macosx.fortran.linker"
+               owner="fdt.managedbuild.tool.macosx.fortran.linker"
                name="%OptionCategory.Libs"
                id="macosx.fortran.link.category.libs">
          </optionCategory>
@@ -314,7 +314,7 @@
                valueType="stringList">
          </option>
          <optionCategory
-               owner="cdt.managedbuild.tool.macosx.fortran.linker"
+               owner="fdt.managedbuild.tool.macosx.fortran.linker"
                name="%OptionCategory.Misc"
                id="macosx.fortran.link.category.other">
          </optionCategory>
@@ -339,7 +339,7 @@
                id="macosx.fortran.link.option.userobjs">
          </option>
          <optionCategory
-               owner="cdt.managedbuild.tool.macosx.fortran.linker"
+               owner="fdt.managedbuild.tool.macosx.fortran.linker"
                name="%OptionCategory.Shared.Settings"
                id="macosx.fortran.link.category.shared">
          </optionCategory>
@@ -357,7 +357,7 @@
 			multipleOfType="true"
             dependencyCalculator="org.eclipse.cdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
             buildVariable="OBJS"
-            id="cdt.managedbuild.tool.macosx.fortran.linker.input">
+            id="fdt.managedbuild.tool.macosx.fortran.linker.input">
             <additionalInput
             	paths="$(USER_OBJS)"
             	kind="additionalinputdependency">
@@ -371,13 +371,13 @@
 			outputs=""
             buildVariable="EXECUTABLES"
             nameProvider="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuLinkOutputNameProvider"
-            id="cdt.managedbuild.tool.macosx.fortran.linker.output">
+            id="fdt.managedbuild.tool.macosx.fortran.linker.output">
          </outputType>
       </tool>
 
       <tool
 		  name="%ToolName.compiler.gnu.fortran"
-		  id="cdt.managedbuild.tool.gnu.fortran.compiler"
+		  id="fdt.managedbuild.tool.gnu.fortran.compiler"
 		  isAbstract="true"
 		  command="gfortran"
 		  natureFilter="cnature"
@@ -387,32 +387,32 @@
          	variableList="CPATH,C_INCLUDE_PATH">
          </envVarBuildPath>
 		  <optionCategory
-			  owner="cdt.managedbuild.tool.gnu.fortran.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Symbols"
 			  id="gnu.fortran.compiler.category.symbols">
 		  </optionCategory>
 		  <option
-			  name="%Option.Posix.OptLevel"
+			  name="%Option.Gnu.Fortran.symbols.underscoring"
 			  category="gnu.fortran.compiler.category.symbols"
 			  id="gnu.fortran.compiler.option.underscoring.level"
 			  valueType="enumerated">
 		  <enumeratedOptionValue
-		  		  name="%Option.Posix.Underscoring.None"
+		  		  name="%Option.Gnu.Fortran.symbols.underscoring.none"
 				  isDefault="false"
 				  command="-fno-underscoring"
-				  id="gnu.fortran.underscoring.level.none">
+				  id="gnu.fortran.underscoring.none">
 		  </enumeratedOptionValue>
 		  <enumeratedOptionValue
-				  name="%Option.Posix.Underscoring.Underscore"
+				  name="%Option.Gnu.Fortran.symbols.underscoring.one"
 				  isDefault="true"
 				  command="-funderscoring"
-				  id="gnu.fortran.underscoring.level.underscore">
+				  id="gnu.fortran.underscoring.one">
 		  </enumeratedOptionValue>
 		  <enumeratedOptionValue
-				  name="%Option.Posix.Underscoring.Second"
+				  name="%Option.Gnu.Fortran.symbols.underscoring.notwo"
 				  isDefault="false"
 				  command="-fno-second-underscore"
-				  id="gnu.fortran.underscoring.level.second">
+				  id="gnu.fortran.underscoring.notwo">
 		  </enumeratedOptionValue>
 		  </option>
 		  <option
@@ -424,7 +424,7 @@
 			  valueType="boolean">
 		  </option>
 		  <optionCategory
-			  owner="cdt.managedbuild.tool.gnu.fortran.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Dirs"
 			  id="gnu.fortran.compiler.category.dirs">
 		  </optionCategory>
@@ -437,7 +437,7 @@
 			  browseType="directory">
 		  </option>
 		  <optionCategory
-			  owner="cdt.managedbuild.tool.gnu.fortran.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Optimize"
 			  id="gnu.fortran.compiler.category.optimization">
 		  </optionCategory>
@@ -476,7 +476,7 @@
 			  valueType="string">
 		  </option>
 		  <optionCategory
-			  owner="cdt.managedbuild.tool.gnu.fortran.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Debug"
 			  id="gnu.fortran.compiler.category.debug">
 		  </optionCategory>
@@ -531,7 +531,7 @@
 			  valueType="boolean">
 		  </option>
 		  <optionCategory
-			  owner="cdt.managedbuild.tool.gnu.fortran.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Warn"
 			  id="gnu.fortran.compiler.category.warnings">
 		  </optionCategory>
@@ -584,7 +584,7 @@
 			  valueType="boolean">
 		  </option>
 		  <optionCategory
-			  owner="cdt.managedbuild.tool.gnu.fortran.compiler"
+			  owner="fdt.managedbuild.tool.gnu.fortran.compiler"
 			  name="%OptionCategory.Misc"
 			  id="gnu.fortran.compiler.category.other">
 		  </optionCategory>
@@ -609,32 +609,32 @@
               dependencyContentType="org.eclipse.cdt.core.fortranHeader"
               dependencyExtensions="h"
               dependencyCalculator="org.eclipse.cdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
-              id="cdt.managedbuild.tool.gnu.fortran.compiler.input">
+              id="fdt.managedbuild.tool.gnu.fortran.compiler.input">
           </inputType>
           <outputType
 			  outputs="o"
               buildVariable="OBJS"
-              id="cdt.managedbuild.tool.gnu.fortran.compiler.output">
+              id="fdt.managedbuild.tool.gnu.fortran.compiler.output">
           </outputType>
 	  </tool>  
      
       <projectType 
             name="%TargetName.gnu.fortran.macosx.exe"
-            id="cdt.managedbuild.target.gnu.fortran.macosx.exe"
+            id="fdt.managedbuild.target.gnu.fortran.macosx.exe"
             isTest="false"
             isAbstract="false">
          <configuration
                name="%ConfigName.Dbg"
                cleanCommand="rm -rf"
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"               
-               id="cdt.managedbuild.config.gnu.fortran.macosx.exe.debug">
+               id="fdt.managedbuild.config.gnu.fortran.macosx.exe.debug">
                <toolChain
                      archList="all"
                      osList="macosx"
                      name="%ToolChainName.Dbg"
-                     targetTool="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.debug;cdt.managedbuild.tool.macosx.fortran.linker.macosx.exe.debug"
+                     targetTool="fdt.managedbuild.tool.macosx.fortran.linker.macosx.exe.debug"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-                     id="cdt.managedbuild.toolchain.gnu.fortran.macosx.exe.debug">
+                     id="fdt.managedbuild.toolchain.gnu.fortran.macosx.exe.debug">
                   <targetPlatform
 					  id="fdt.managedbuild.target.gnu.platform.macosx.exe.debug"
 				 	  name="%PlatformName.Dbg"
@@ -651,24 +651,24 @@
 					  buildfileGenerator="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuMakefileGenerator">		              
 			      </builder>               		         
                   <tool
-                      id="cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.debug"
+                      id="fdt.managedbuild.tool.gnu.c.compiler.macosx.exe.debug"
                       superClass="cdt.managedbuild.tool.gnu.c.compiler">
                       <option
-                          id="gnu.c.compiler.macosx.exe.debug.option.optimization.level"
+                          id="fdt.gnu.c.compiler.macosx.exe.debug.option.optimization.level"
                           defaultValue="gnu.c.optimization.level.none"
                           superClass="gnu.c.compiler.option.optimization.level">
                       </option>
                       <option
-                          id="gnu.c.compiler.macosx.exe.debug.option.debugging.level"
+                          id="fdt.gnu.c.compiler.macosx.exe.debug.option.debugging.level"
                           defaultValue="gnu.c.debugging.level.max"
                           superClass="gnu.c.compiler.option.debugging.level">
                       </option>
                   </tool>
                   <tool
-                      id="cdt.managedbuild.tool.gnu.fortran.compiler.macosx.exe.debug"
-                      superClass="cdt.managedbuild.tool.gnu.fortran.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.macosx.exe.debug"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
-                          id="gnu.cpp.compilermacosx.exe.debug.option.optimization.level"
+                          id="gnu.fortran.compiler.macosx.exe.debug.option.optimization.level"
                           defaultValue="gnu.fortran.compiler.optimization.level.none"
                           superClass="gnu.fortran.compiler.option.optimization.level">
                       </option>
@@ -679,11 +679,11 @@
                       </option>
                   </tool>
 				  <tool
-				      id="cdt.managedbuild.tool.macosx.fortran.linker.macosx.exe.debug"
-					  superClass="cdt.managedbuild.tool.macosx.fortran.linker">
+				      id="fdt.managedbuild.tool.macosx.fortran.linker.macosx.exe.debug"
+					  superClass="fdt.managedbuild.tool.macosx.fortran.linker">
 				  </tool>
 				  <tool
-					  id="cdt.managedbuild.tool.gnu.assembler.macosx.exe.debug"
+					  id="fdt.managedbuild.tool.gnu.assembler.macosx.exe.debug"
 					  superClass="cdt.managedbuild.tool.gnu.assembler">
 				  </tool>   
                </toolChain>                    
@@ -692,16 +692,16 @@
                name="%ConfigName.Rel"
                cleanCommand="rm -rf"               
 			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"                              
-               id="cdt.managedbuild.config.gnu.fortran.macosx.exe.release">
+               id="fdt.managedbuild.config.gnu.fortran.macosx.exe.release">
                <toolChain
                      archList="all"
                      osList="macosx"
                      name="%ToolChainName.Rel"
-                     targetTool="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.release;cdt.managedbuild.tool.macosx.fortran.linker.macosx.exe.release"
+                     targetTool="fdt.managedbuild.tool.macosx.fortran.linker.macosx.exe.release"
                      scannerConfigDiscoveryProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"
-                     id="cdt.managedbuild.toolchain.gnu.macosx.exe.release">
+                     id="fdt.managedbuild.toolchain.gnu.fortran.macosx.exe.release">
                   <targetPlatform
-					  id="cdt.managedbuild.target.gnu.platform.fortran.macosx.exe.release"
+					  id="fdt.managedbuild.target.gnu.platform.fortran.macosx.exe.release"
 				 	  name="%PlatformName.Rel"
                       binaryParser="org.eclipse.cdt.core.MachO"
 					  osList="macosx"					  
@@ -719,19 +719,19 @@
                       id="fdt.managedbuild.tool.gnu.c.compiler.macosx.exe.release"
                       superClass="cdt.managedbuild.tool.gnu.c.compiler">
                       <option
-                          id="gnu.c.compiler.macosx.exe.release.option.optimization.level"
+                          id="fdt.gnu.c.compiler.macosx.exe.release.option.optimization.level"
                           defaultValue="gnu.c.optimization.level.most"
                           superClass="gnu.c.compiler.option.optimization.level">
                       </option>
                       <option
-                          id="gnu.c.compiler.macosx.exe.release.option.debugging.level"
+                          id="fdt.gnu.c.compiler.macosx.exe.release.option.debugging.level"
                           defaultValue="gnu.c.debugging.level.none"
                           superClass="gnu.c.compiler.option.debugging.level">
                       </option>
                    </tool>
                    <tool
-                      id="cdt.managedbuild.tool.gnu.fortran.compiler.macosx.exe.release"
-                      superClass="cdt.managedbuild.tool.gnu.fortran.compiler">
+                      id="fdt.managedbuild.tool.gnu.fortran.compiler.macosx.exe.release"
+                      superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
                           id="gnu.fortran.compiler.macosx.exe.release.option.optimization.level"
                           defaultValue="gnu.fortran.compiler.optimization.level.most"
@@ -744,13 +744,9 @@
                       </option>
                    </tool>
 				   <tool
-				       id="cdt.managedbuild.tool.macosx.fortran.linker.macosx.exe.release"
-					   superClass="cdt.managedbuild.tool.macosx.fortran.linker">
+				       id="fdt.managedbuild.tool.macosx.fortran.linker.macosx.exe.release"
+					   superClass="fdt.managedbuild.tool.macosx.fortran.linker">
 					</tool>
-					<tool
-					    id="cdt.managedbuild.tool.macosx.fortran.linker.macosx.exe.release"
-						superClass="cdt.managedbuild.tool.macosx.fortran.linker">
-					</tool>                   
 				  <tool
 					  id="fdt.managedbuild.tool.gnu.assembler.macosx.exe.release"
 					  superClass="cdt.managedbuild.tool.gnu.assembler">
