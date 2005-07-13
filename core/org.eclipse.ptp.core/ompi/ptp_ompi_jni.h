@@ -7,10 +7,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+/* Inaccessible static: failed_load */
 /*
  * Class:     org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem
- * Method:    OMPIInit
- * Signature: ()V
+ * Method:    OMPIGetError
+ * Signature: ()Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIGetError
   (JNIEnv *, jobject);
@@ -18,10 +19,26 @@ JNIEXPORT jstring JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_O
 /*
  * Class:     org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem
  * Method:    OMPIInit
- * Signature: (Ljava/lang/String;)V
+ * Signature: ()I
  */
-JNIEXPORT int JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIInit
-  (JNIEnv *, jobject, jstring);
+JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIInit
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem
+ * Method:    OMPIStartDaemon
+ * Signature: (Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIStartDaemon
+  (JNIEnv *, jobject, jstring, jstring, jobjectArray);
+
+/*
+ * Class:     org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem
+ * Method:    OMPIShutdown
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIShutdown
+  (JNIEnv *, jobject);
 
 /*
  * Class:     org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem
@@ -42,10 +59,10 @@ JNIEXPORT void JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
 /*
  * Class:     org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem
  * Method:    OMPIRun
- * Signature: ()V
+ * Signature: ([Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIRun
-  (JNIEnv *, jobject);
+  (JNIEnv *, jobject, jobjectArray);
 
 #ifdef __cplusplus
 }
