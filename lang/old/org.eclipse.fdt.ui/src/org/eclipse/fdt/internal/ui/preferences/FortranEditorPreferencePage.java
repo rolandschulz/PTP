@@ -18,6 +18,7 @@ import org.eclipse.cdt.internal.ui.preferences.ColorEditor;
 import org.eclipse.cdt.internal.ui.preferences.FoldingConfigurationBlock;
 import org.eclipse.cdt.internal.ui.preferences.OverlayPreferenceStore;
 import org.eclipse.cdt.internal.ui.preferences.PreferencesMessages;
+import org.eclipse.cdt.internal.ui.preferences.PreviewSourceViewer;
 import org.eclipse.cdt.internal.ui.text.CSourceViewerConfiguration;
 import org.eclipse.cdt.ui.PreferenceConstants;
 import org.eclipse.cdt.utils.ui.controls.TabFolderLayout;
@@ -79,7 +80,7 @@ public class FortranEditorPreferencePage extends CEditorPreferencePage implement
 	protected List fList;
 	protected ColorEditor fForegroundColorEditor;
 	protected Button fBoldCheckBox;
-	protected SourceViewer fPreviewViewer;
+	protected PreviewSourceViewer fPreviewViewer;
 
 	private CEditorHoverConfigurationBlock fCEditorHoverConfigurationBlock;
 	private FoldingConfigurationBlock fFoldingConfigurationBlock;
@@ -93,7 +94,6 @@ public class FortranEditorPreferencePage extends CEditorPreferencePage implement
 	protected OverlayPreferenceStore.OverlayKey[] createOverlayStoreKeys() {
 		ArrayList overlayKeys = new ArrayList();
 		
-		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.INT, CSourceViewerConfiguration.PREFERENCE_TAB_WIDTH));
 		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT));
 		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, IFortranColorConstants.FORTRAN_SINGLE_LINE_COMMENT + "_bold")); //$NON-NLS-1$
 		overlayKeys.add(new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, IFortranColorConstants.FORTRAN_KEYWORD));
@@ -130,8 +130,6 @@ public class FortranEditorPreferencePage extends CEditorPreferencePage implement
 
 		store.setDefault(FortranEditor.MATCHING_BRACKETS, true);
 		PreferenceConverter.setDefault(store, FortranEditor.MATCHING_BRACKETS_COLOR, new RGB(170,170,170));
-
-		store.setDefault(CSourceViewerConfiguration.PREFERENCE_TAB_WIDTH, 4);
 
 		store.setDefault(FortranEditor.SPACES_FOR_TABS, false);
 
@@ -280,7 +278,9 @@ public class FortranEditorPreferencePage extends CEditorPreferencePage implement
 
 		fFortranTextTools = FortranUIPlugin.getDefault().getTextTools();
 		CSourceViewerConfiguration configuration = new CSourceViewerConfiguration(fFortranTextTools, null);
-		fPreviewViewer = new SourceViewer(parent, null, SWT.V_SCROLL | SWT.H_SCROLL);
+		//fPreviewViewer = new SourceViewer(parent, null, SWT.V_SCROLL | SWT.H_SCROLL);
+		fPreviewViewer = new PreviewSourceViewer(parent, SWT.V_SCROLL | SWT.H_SCROLL);
+		fPreviewViewer.setPreferenceStore(FortranUIPlugin.getDefault().getCombinedPreferenceStore());
 		fPreviewViewer.configure(configuration);
 		fPreviewViewer.getTextWidget().setFont(JFaceResources.getFontRegistry().get(JFaceResources.TEXT_FONT));
 		fPreviewViewer.setEditable(false);
@@ -330,7 +330,6 @@ public class FortranEditorPreferencePage extends CEditorPreferencePage implement
 		link.addListener (SWT.Selection, new Listener () {
 			public void handleEvent(Event event) {
 				String u = event.text;
-				System.out.println("Selection: " + u);
 				PreferencesUtil.createPreferenceDialogOn(getShell(), u, null, null);
 			}
 		});
