@@ -1,0 +1,532 @@
+Index: plugin.properties
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/plugin.properties,v
+retrieving revision 1.86
+diff -u -r1.86 plugin.properties
+--- plugin.properties	23 Jun 2005 16:02:26 -0000	1.86
++++ plugin.properties	13 Jul 2005 19:46:15 -0000
+@@ -19,9 +19,9 @@
+ editorRulerActionsName=Editor Ruler Actions
+ cHelpProviderName=C Help Provider
+ nature.name=C Nature
+-perspective.name=C/C++
++perspective.name=Make
+ viewsCategory.name=&C
+-CView.name=C/C++ Projects
++CView.name=Make Projects
+ 
+ AddBlockCommentAction.label= Add &Block Comment
+ 
+@@ -42,17 +42,17 @@
+ CElementCreationActionSet.description= C/C++ Element Creation Action Set
+ 
+ NewProjectDropDownAction.label=&Project...
+-NewProjectDropDownAction.tooltip=New C/C++ Project
++NewProjectDropDownAction.tooltip=New Make Project
+ 
+ NewFolderDropDownAction.label=&Source Folder...
+-NewFolderDropDownAction.tooltip=New C/C++ Source Folder
++NewFolderDropDownAction.tooltip=New Source Folder
+ NewWizards.sourceFolder = Source Folder
+ NewWizards.sourceFolder.description = Create a new source folder
+ NewWizards.folder = Folder
+ NewWizards.folder.description = Create a new folder resource
+ 
+ NewFileDropDownAction.label=&Source File...
+-NewFileDropDownAction.tooltip=New C/C++ Source File
++NewFileDropDownAction.tooltip=New Source File
+ 
+ NewWizards.sourceFile = Source File
+ NewWizards.sourceFile.description = Create a new source file
+Index: plugin.xml
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/plugin.xml,v
+retrieving revision 1.168
+diff -u -r1.168 plugin.xml
+--- plugin.xml	4 Jul 2005 16:21:11 -0000	1.168
++++ plugin.xml	13 Jul 2005 19:46:15 -0000
+@@ -28,6 +28,7 @@
+       <import plugin="org.eclipse.core.runtime"/>
+       <import plugin="org.eclipse.core.expressions"/>
+       <import plugin="org.eclipse.help"/>
++      <import plugin="org.eclipse.fdt.core"/>
+    </requires>
+ 
+ 
+@@ -191,7 +192,7 @@
+          point="org.eclipse.ui.perspectives">
+       <perspective
+             name="%perspective.name"
+-            icon="icons/view16/c_pers.gif"
++            icon="icons/view16/m_pers.gif"
+             class="org.eclipse.cdt.internal.ui.CPerspectiveFactory"
+             id="org.eclipse.cdt.ui.CPerspective">
+       </perspective>
+@@ -258,7 +259,7 @@
+       </category>
+       <view
+             name="%CView.name"
+-            icon="icons/view16/cview.gif"
++            icon="icons/view16/mview.gif"
+             category="org.eclipse.cdt.ui.views"
+             class="org.eclipse.cdt.internal.ui.cview.CView"
+             id="org.eclipse.cdt.ui.CView">
+@@ -269,7 +270,7 @@
+       </category>
+       <view
+             name="%CBrowsing.projectsViewName"
+-            icon="icons/view16/cprojects.gif"
++            icon="icons/view16/mmprojects.gif"
+             category="org.eclipse.cdt.ui.c.browsing"
+             class="org.eclipse.cdt.internal.ui.browser.cbrowsing.ProjectsView"
+             id="org.eclipse.cdt.ui.ProjectsView">
+@@ -317,7 +318,7 @@
+       </category>
+       <wizard
+             name="%NewWizards.sourceFile"
+-            icon="icons/etool16/newcfile_wiz.gif"
++            icon="icons/etool16/newsrcfile_wiz.gif"
+             category="org.eclipse.cdt.ui.newCWizards"
+             finalPerspective="org.eclipse.cdt.ui.CPerspective"
+             id="org.eclipse.cdt.ui.wizards.NewSourceFileCreationWizard">
+@@ -356,7 +357,7 @@
+       </wizard>
+       <wizard
+             name="%NewWizards.sourceFolder"
+-            icon="icons/etool16/newsrcfldr_wiz.gif"
++            icon="icons/etool16/newmsrcfldr_wiz.gif"
+             category="org.eclipse.cdt.ui.newCWizards"
+             finalPerspective="org.eclipse.cdt.ui.CPerspective"
+             id="org.eclipse.cdt.ui.wizards.NewSourceFolderCreationWizard">
+@@ -401,7 +402,7 @@
+       </wizard>
+       <wizard
+             name="%NewWizards.sourceFile"
+-            icon="icons/etool16/newcfile_wiz.gif"
++            icon="icons/etool16/newsrcfile_wiz.gif"
+             category="org.eclipse.cdt.ui.newCCWizards"
+             finalPerspective="org.eclipse.cdt.ui.CPerspective"
+             id="org.eclipse.cdt.ui.wizards.NewSourceFileCreationWizard">
+@@ -440,7 +441,7 @@
+       </wizard>
+       <wizard
+             name="%NewWizards.sourceFolder"
+-            icon="icons/etool16/newsrcfldr_wiz.gif"
++            icon="icons/etool16/newmsrcfldr_wiz.gif"
+             category="org.eclipse.cdt.ui.newCCWizards"
+             finalPerspective="org.eclipse.cdt.ui.CPerspective"
+             id="org.eclipse.cdt.ui.wizards.NewSourceFolderCreationWizard">
+@@ -806,8 +807,8 @@
+                id="org.eclipse.cdt.ui.actions.NewFileDropDown"
+                toolbarPath="Normal/CCWizards"
+                class="org.eclipse.cdt.internal.ui.wizards.NewFileDropDownAction"
+-               disabledIcon="icons/dtool16/newcfile_wiz.gif"
+-               icon="icons/etool16/newcfile_wiz.gif"
++               disabledIcon="icons/dtool16/newsrcfile_wiz.gif"
++               icon="icons/etool16/newsrcfile_wiz.gif"
+                label="%NewFileDropDownAction.label"
+                style="pulldown"
+                tooltip="%NewFileDropDownAction.tooltip">
+@@ -816,8 +817,8 @@
+                id="org.eclipse.cdt.ui.actions.NewFolderDropDown"
+                toolbarPath="Normal/CCWizards"
+                class="org.eclipse.cdt.internal.ui.wizards.NewFolderDropDownAction"
+-               disabledIcon="icons/dtool16/newsrcfldr_wiz.gif"
+-               icon="icons/etool16/newsrcfldr_wiz.gif"
++               disabledIcon="icons/dtool16/newmsrcfldr_wiz.gif"
++               icon="icons/etool16/newmsrcfldr_wiz.gif"
+                label="%NewFolderDropDownAction.label"
+                style="pulldown"
+                tooltip="%NewFolderDropDownAction.tooltip">
+@@ -826,8 +827,8 @@
+                id="org.eclipse.cdt.ui.actions.NewProjectDropDown"
+                toolbarPath="Normal/CCWizards"
+                class="org.eclipse.cdt.internal.ui.wizards.NewProjectDropDownAction"
+-               disabledIcon="icons/dtool16/newcprj_wiz.gif"
+-               icon="icons/etool16/newcprj_wiz.gif"
++               disabledIcon="icons/dtool16/newmprj_wiz.gif"
++               icon="icons/etool16/newmprj_wiz.gif"
+                label="%NewProjectDropDownAction.label"
+                style="pulldown"
+                tooltip="%NewProjectDropDownAction.tooltip">
+@@ -837,7 +838,7 @@
+    <extension
+          point="org.eclipse.ui.ide.projectNatureImages">
+       <image
+-            icon="icons/ovr16/c_ovr.gif"
++            icon="icons/ovr16/m_ovr.gif"
+             natureId="org.eclipse.cdt.core.cnature"
+             id="org.eclipse.cdt.ui.cProjectNatureImage">
+       </image>
+@@ -1201,7 +1202,7 @@
+       <workingSet
+             name="%CElementWorkingSetPage.name"
+             pageClass="org.eclipse.cdt.internal.ui.workingsets.CElementWorkingSetPage"
+-            icon="icons/view16/cview.gif"
++            icon="icons/view16/mview.gif"
+             id="org.eclipse.cdt.ui.CElementWorkingSetPage">
+       </workingSet>
+    </extension>
+Index: src/org/eclipse/cdt/internal/ui/CPluginImages.java
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/CPluginImages.java,v
+retrieving revision 1.57
+diff -u -r1.57 CPluginImages.java
+--- src/org/eclipse/cdt/internal/ui/CPluginImages.java	22 Apr 2005 16:04:05 -0000	1.57
++++ src/org/eclipse/cdt/internal/ui/CPluginImages.java	13 Jul 2005 19:46:15 -0000
+@@ -200,7 +200,7 @@
+ 	public static final ImageDescriptor DESC_OVR_WARNING= create(T_OVR, "warning_co.gif"); //$NON-NLS-1$
+ 	public static final ImageDescriptor DESC_OVR_ERROR= create(T_OVR, "error_co.gif"); //$NON-NLS-1$
+ 
+-	public static final ImageDescriptor DESC_WIZABAN_NEW_PROJ= create(T_WIZBAN, "newcprj_wiz.gif"); //$NON-NLS-1$
++	public static final ImageDescriptor DESC_WIZABAN_NEW_PROJ= create(T_WIZBAN, "newmprj_wiz.gif"); //$NON-NLS-1$
+ 	public static final ImageDescriptor DESC_WIZBAN_NEWCLASS= create(T_WIZBAN, "newclass_wiz.gif");	 //$NON-NLS-1$
+ 	public static final ImageDescriptor DESC_WIZABAN_C_APP= create(T_WIZBAN, "c_app_wiz.gif"); //$NON-NLS-1$
+ 	public static final ImageDescriptor DESC_WIZBAN_NEW_FILE= create(T_WIZBAN, "newfile_wiz.gif"); //$NON-NLS-1$
+@@ -221,7 +221,7 @@
+ 	public static final String IMG_OBJS_CSEARCH     = NAME_PREFIX + "csearch_obj.gif"; //$NON-NLS-1$
+ 	
+ 	public static final String IMG_OBJS_SEARCHFOLDER = NAME_PREFIX + "fldr_obj.gif";  //$NON-NLS-1$
+-	public static final String IMG_OBJS_SEARCHPROJECT = NAME_PREFIX + "cprojects.gif";  //$NON-NLS-1$
++	public static final String IMG_OBJS_SEARCHPROJECT = NAME_PREFIX + "mmprojects.gif";  //$NON-NLS-1$
+ 	
+ 	public static final ImageDescriptor DESC_OBJS_SEARCH_DECL = createManaged(T_OBJ, IMG_OBJS_SEARCH_DECL);
+ 	public static final ImageDescriptor DESC_OBJS_SEARCH_REF  = createManaged(T_OBJ, IMG_OBJS_SEARCH_REF);
+Index: src/org/eclipse/cdt/internal/ui/CPluginResources.properties
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/CPluginResources.properties,v
+retrieving revision 1.43
+diff -u -r1.43 CPluginResources.properties
+--- src/org/eclipse/cdt/internal/ui/CPluginResources.properties	14 Jun 2005 15:49:26 -0000	1.43
++++ src/org/eclipse/cdt/internal/ui/CPluginResources.properties	13 Jul 2005 19:46:15 -0000
+@@ -113,10 +113,10 @@
+ MngMakeProjectWizardSettings.title=Managed Make Settings
+ MngMakeProjectWizardSettings.description=Define the Managed Make build settings.
+ 
+-MngCWizard.title=Managed Make C Project
+-MngCWizard.description=Create a new Managed Make C project.
+-MngCWizardSettings.title=Managed Make C Settings
+-MngCWizardSettings.description=Define the Managed Make C build settings.
++MngCWizard.title=Managed Make Project
++MngCWizard.description=Create a new Managed Make project.
++MngCWizardSettings.title=Managed Make Settings
++MngCWizardSettings.description=Define the Managed Make build settings.
+ 
+ MngCCWizard.title=Managed Make C++ Project
+ MngCCWizard.description=Create a new Managed Make C++ Project.
+Index: src/org/eclipse/cdt/internal/ui/buildconsole/ConsoleMessages.properties
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/buildconsole/ConsoleMessages.properties,v
+retrieving revision 1.3
+diff -u -r1.3 ConsoleMessages.properties
+--- src/org/eclipse/cdt/internal/ui/buildconsole/ConsoleMessages.properties	23 Jun 2005 16:01:25 -0000	1.3
++++ src/org/eclipse/cdt/internal/ui/buildconsole/ConsoleMessages.properties	13 Jul 2005 19:46:15 -0000
+@@ -8,7 +8,7 @@
+ # Contributors:
+ # QNX Software Systems - Initial API and implementation
+ ###############################################################################
+-BuildConsole.buildConsole=C-Build
++BuildConsole.buildConsole=Managed Make Build
+ 
+ find_replace_action.label=&Find/Replace...@Ctrl+F
+ find_replace_action.tooltip=Find/Replace
+Index: src/org/eclipse/cdt/internal/ui/editor/CDocumentProvider.java
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/CDocumentProvider.java,v
+retrieving revision 1.31
+diff -u -r1.31 CDocumentProvider.java
+--- src/org/eclipse/cdt/internal/ui/editor/CDocumentProvider.java	23 Jun 2005 16:01:24 -0000	1.31
++++ src/org/eclipse/cdt/internal/ui/editor/CDocumentProvider.java	13 Jul 2005 19:46:16 -0000
+@@ -68,7 +68,7 @@
+ /**
+  * CDocumentProvider2
+  */
+-public class CDocumentProvider extends TextFileDocumentProvider {
++public class CDocumentProvider extends TextFileDocumentProvider implements ICDocumentProvider {
+ 	/**
+ 	 * Bundle of all required informations to allow working copy management.
+ 	 */
+Index: src/org/eclipse/cdt/internal/ui/editor/CEditor.java
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/CEditor.java,v
+retrieving revision 1.91
+diff -u -r1.91 CEditor.java
+--- src/org/eclipse/cdt/internal/ui/editor/CEditor.java	10 Jul 2005 03:44:55 -0000	1.91
++++ src/org/eclipse/cdt/internal/ui/editor/CEditor.java	13 Jul 2005 19:46:16 -0000
+@@ -288,7 +288,7 @@
+ 	 * Gets the outline page of the c-editor.
+      * @return Outline page.
+ 	 */
+-	public CContentOutlinePage getOutlinePage() {
++	public IContentOutlinePage getOutlinePage() {
+ 		if (fOutlinePage == null) {
+ 			fOutlinePage = new CContentOutlinePage(this);
+ 			fOutlinePage.addSelectionChangedListener(this);
+Index: src/org/eclipse/cdt/internal/ui/editor/WorkingCopyManager.java
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/WorkingCopyManager.java,v
+retrieving revision 1.11
+diff -u -r1.11 WorkingCopyManager.java
+--- src/org/eclipse/cdt/internal/ui/editor/WorkingCopyManager.java	23 Jun 2005 16:02:25 -0000	1.11
++++ src/org/eclipse/cdt/internal/ui/editor/WorkingCopyManager.java	13 Jul 2005 19:46:16 -0000
+@@ -29,7 +29,7 @@
+  */
+ public class WorkingCopyManager implements IWorkingCopyManager, IWorkingCopyManagerExtension {
+ 	
+-	private CDocumentProvider fDocumentProvider;
++	private ICDocumentProvider fDocumentProvider;
+ 	private Map fMap;
+ 	private boolean fIsShuttingDown;
+ 
+@@ -39,7 +39,7 @@
+ 	 * 
+ 	 * @param provider the provider
+ 	 */
+-	public WorkingCopyManager(CDocumentProvider provider) {
++	public WorkingCopyManager(ICDocumentProvider provider) {
+ 		Assert.isNotNull(provider);
+ 		fDocumentProvider= provider;
+ 	}
+Index: src/org/eclipse/cdt/internal/ui/preferences/CEditorHoverConfigurationBlock.java
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/preferences/CEditorHoverConfigurationBlock.java,v
+retrieving revision 1.9
+diff -u -r1.9 CEditorHoverConfigurationBlock.java
+--- src/org/eclipse/cdt/internal/ui/preferences/CEditorHoverConfigurationBlock.java	23 Jun 2005 16:01:24 -0000	1.9
++++ src/org/eclipse/cdt/internal/ui/preferences/CEditorHoverConfigurationBlock.java	13 Jul 2005 19:46:16 -0000
+@@ -402,7 +402,7 @@
+ 		fHoverTableViewer.refresh();
+ 	}
+ 
+-	void performOk() {
++	public void performOk() {
+ 		StringBuffer buf= new StringBuffer();
+ 		StringBuffer maskBuf= new StringBuffer();
+ 		for (int i= 0; i < fHoverConfigs.length; i++) {
+@@ -429,7 +429,7 @@
+ 		CUIPlugin.getDefault().resetCEditorTextHoverDescriptors();
+ 	}
+ 
+-	void performDefaults() {
++	public void performDefaults() {
+ 		fStatus= new StatusInfo();
+ 		restoreFromPreferences();
+ 		initializeFields();
+Index: src/org/eclipse/cdt/internal/ui/preferences/FoldingConfigurationBlock.java
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/preferences/FoldingConfigurationBlock.java,v
+retrieving revision 1.2
+diff -u -r1.2 FoldingConfigurationBlock.java
+--- src/org/eclipse/cdt/internal/ui/preferences/FoldingConfigurationBlock.java	23 Jun 2005 16:01:24 -0000	1.2
++++ src/org/eclipse/cdt/internal/ui/preferences/FoldingConfigurationBlock.java	13 Jul 2005 19:46:16 -0000
+@@ -53,7 +53,7 @@
+  * 
+  * @since 3.0
+  */
+-class FoldingConfigurationBlock {
++public class FoldingConfigurationBlock {
+ 	
+ 	private static class ErrorPreferences implements ICFoldingPreferenceBlock {
+ 		private String fMessage;
+@@ -141,7 +141,7 @@
+ 	 * @param parent the parent composite
+ 	 * @return the control for the preference page
+ 	 */
+-	Control createControl(Composite parent) {
++	public Control createControl(Composite parent) {
+ 
+ 		Composite composite= new Composite(parent, SWT.NULL);
+ 		// assume parent page uses griddata
+@@ -307,18 +307,18 @@
+ 		prefs.initialize();
+ 	}
+ 
+-	void initialize() {
++	public void initialize() {
+ 		restoreFromPreferences();
+ 	}
+ 
+-	void performOk() {
++	public void performOk() {
+ 		for (Iterator it= fProviderPreferences.values().iterator(); it.hasNext();) {
+ 			ICFoldingPreferenceBlock prefs= (ICFoldingPreferenceBlock) it.next();
+ 			prefs.performOk();
+ 		}
+ 	}
+ 	
+-	void performDefaults() {
++	public void performDefaults() {
+ 		restoreFromPreferences();
+ 		for (Iterator it= fProviderPreferences.values().iterator(); it.hasNext();) {
+ 			ICFoldingPreferenceBlock prefs= (ICFoldingPreferenceBlock) it.next();
+@@ -326,7 +326,7 @@
+ 		}
+ 	}
+ 	
+-	void dispose() {
++	public void dispose() {
+ 		for (Iterator it= fProviderPreferences.values().iterator(); it.hasNext();) {
+ 			ICFoldingPreferenceBlock prefs= (ICFoldingPreferenceBlock) it.next();
+ 			prefs.dispose();
+Index: src/org/eclipse/cdt/internal/ui/preferences/PreviewSourceViewer.java
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-core/org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/preferences/PreviewSourceViewer.java,v
+retrieving revision 1.1
+diff -u -r1.1 PreviewSourceViewer.java
+--- src/org/eclipse/cdt/internal/ui/preferences/PreviewSourceViewer.java	10 Jul 2005 23:43:05 -0000	1.1
++++ src/org/eclipse/cdt/internal/ui/preferences/PreviewSourceViewer.java	13 Jul 2005 19:46:16 -0000
+@@ -25,7 +25,7 @@
+ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
+ import org.eclipse.ui.texteditor.AbstractTextEditor;
+ 
+-class PreviewSourceViewer extends SourceViewer implements IPropertyChangeListener {
++public class PreviewSourceViewer extends SourceViewer implements IPropertyChangeListener {
+ 
+ 	/**
+ 	 * This viewer's foreground color.
+Index: icons/dtool16/newmsrcfldr_wiz.gif
+===================================================================
+RCS file: icons/dtool16/newmsrcfldr_wiz.gif
+diff -N icons/dtool16/newmsrcfldr_wiz.gif
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ icons/dtool16/newmsrcfldr_wiz.gif	1 Jan 1970 00:00:00 -0000
+@@ -0,0 +1,3 @@
++GIF89a  Ä  ÿÿÿûûû÷÷÷ïïïêêêæææâââŞŞŞÚÚÚÖÖÖÎÎÎÅÅÅµµµ±±±©©©ŒŒŒˆˆˆ„„„€€€{{{wwwsssÿÿÿ                        !ù  ,       là%diÏ¹¬Ëø )é 4 \äãB„" ©Ñ$¢…±F¡&“Qd:5V(ÂZE`€`ØÒ´È`= n—y)Øï³RY7øı
++z+ †		q,
++‘’$TS'—˜™'! ;
+Index: icons/etool16/newmprj_wiz.gif
+===================================================================
+RCS file: icons/etool16/newmprj_wiz.gif
+diff -N icons/etool16/newmprj_wiz.gif
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ icons/etool16/newmprj_wiz.gif	1 Jan 1970 00:00:00 -0000
+@@ -0,0 +1,4 @@
++GIF89a  æ  şıïıôÏıóÏßòşŞïıØñşØïşüç£üâÑúãÑÔçışàÄÏæúÍà÷ûİƒ°âıÉÜö±ÜüÜÏË¬Ùø¬Øû«ÖùÔÍÏÓÊĞÕÇÈ¨Ïø¨Ïú§ÍúŸÌõû¸¢ÈõšÀï˜Àô—¿ó“¸í“¸ì¸éw¾ö³è±é°æ‰«èˆªéƒªåk¯ğº—&ZŸìµ’#…Êµ‘#¦‹‚g—È§Š†¦‰ƒˆƒ®Šˆ“‹“|Œ~Š¦‚Kˆã¦¥‚yuq’™t>wŞVmÊcf™3kØV`IY¤(b–?Uª?U¨?S¬4N«-J°*F´)E²ÿÿÿ                                                                                                                                          !ù Q ,       ¢€Q‚ƒ„…†‡-‡ˆ ‰Šƒ11 //†4–7šš7„6		??<<‚:89%,.=CF@@;QL+À¾B0K‚AI33IAƒE
++IÌÚ
++ŞEƒGIËËèGƒH!
++åÀIóHƒJ#ğË$şJƒš˜0á¡ Á›r¢¢aŠ‡:DŠÅ'3b$% ;
+Index: icons/etool16/newmsrcfldr_wiz.gif
+===================================================================
+RCS file: icons/etool16/newmsrcfldr_wiz.gif
+diff -N icons/etool16/newmsrcfldr_wiz.gif
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ icons/etool16/newmsrcfldr_wiz.gif	1 Jan 1970 00:00:00 -0000
+@@ -0,0 +1,5 @@
++GIF89a  Õ  ÿÿÿşıïÿûëÿùçÿ÷áÿõÛÿõÌıôÏıóÏÿñÂÿë³úéüç£ÿå¤ğàÆÿß•ÿß–öß–ìÜÄûİƒÿÚ‰ÿÚˆÿÚ‡Ê×ÿÿÒtÿÑuìÑ‹ãÁ}®çĞ™<Ó’,º—&µ’#µ‘#Äˆ1Å…,®Š¦‚¦¥‚¶x'k‚°s&y­p%™t±kÿÿÿ                                                !ù / ,       yÀ—pH,Ÿãh9~I¢@x^¡P ‹ˆfã Îg’pdh»§£T¦î÷„~°š¬$B)ƒƒ)
++‡-TT)
++’
++
++")œ( ¡)¥¦* ƒ )­®,„),¶·DxwG¼½¾GA ;
+Index: icons/etool16/newsrcfile_wiz.gif
+===================================================================
+RCS file: icons/etool16/newsrcfile_wiz.gif
+diff -N icons/etool16/newsrcfile_wiz.gif
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ icons/etool16/newsrcfile_wiz.gif	1 Jan 1970 00:00:00 -0000
+@@ -0,0 +1,6 @@
++GIF89a  æ  ùùûõöû÷øüøùü÷øûíñúêïùòõûöøüõ÷ûùúüåìùèîùìñúëğùğôûïóú‘¥ÇàéøçîùæíøíòúìñùóöûŞè÷áêøâëøåíùäìøéğúçîøëñúêğùéïøñõûğôúr‘¹ßé÷àê÷ãìøëñùîóúíòùçïùéğùïôúòöûêñùGv¥õøû÷ùû(b–|p>{p>„t<|o>‰v;ˆv;…s<‚q<q<p=’{8“{9w9w9¨†3¥„4¤ƒ4 ‚5œ6·”@–|7Å¡I²’BàÈ²Š0¯ˆ1¬‡2©…3Ô²hÔ²iÚ½|Õ²iÿÿÿ                                                                                                                                 !ù  T ,       £€T‚ƒ„…„Lˆ‰ˆ†‚M
++1QLŒN
++RS•…B 23		.KRPO…D¤$)**C…G	3"#((E…I3-²0!!F…J3 H…>3
++Ê?…@)3/,+A…9
++3Ê8…:×í$H°Qˆ‡
++Nh0Q†…zÜ A£FE7nô`ÄqP  ;
+Index: icons/ovr16/m_ovr.gif
+===================================================================
+RCS file: icons/ovr16/m_ovr.gif
+diff -N icons/ovr16/m_ovr.gif
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ icons/ovr16/m_ovr.gif	1 Jan 1970 00:00:00 -0000
+@@ -0,0 +1,1 @@
++GIF89a  ¢  ÿÿÿİİİq”¯(b–ÿÿÿ         !ù  ,       H¬4ˆ<éfÙÇU-L“  ;
+Index: icons/view16/m_pers.gif
+===================================================================
+RCS file: icons/view16/m_pers.gif
+diff -N icons/view16/m_pers.gif
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ icons/view16/m_pers.gif	1 Jan 1970 00:00:00 -0000
+@@ -0,0 +1,7 @@
++GIF89a  æ  ùıÿ÷üÿúüÿóûÿôûÿğûÿîúÿëúÿíúÿêúÿéùÿòõûğõûíòúêğùÕóÿæîùäìùØîÿáêøÜç÷ĞéşÆäı»İú¯×÷¤Òõ¹ÆÇ™ËóÆğ‡Áï¾í« u§y¡š}™–„™–ƒ³=‘’‰²=³=±>°>«Œ?‰ƒŠ” …A„Cœ„C™€>•z7–y/“w3‘w5’v1‘v1‹r3Šr5ƒn5€k7|i8)oÄ)nÁsd;)mÁ*k¼*l½*j¸)j·*g²l_=)g²*d¬f\?*c«*a¥(b–aYA*^ +[™*\š*Y”+Y”+X‘+X+Vÿÿÿ                                                                                                                              !ù U ,       º€UTTPOMJIFBB??UU<<‚TQQ‡GDCC==2¬¬¯25
++
++¶¹
++67		 &ÄÅÅU9,!)ĞÑ*U;#×,-KK.U>%1
++Kİí
++/UE+3KKú0U<  € öiHF&#îˆ°Ú’:<Aò1Á4
++|h|„„‚É“Œ|±%“•0« ;
+Index: icons/view16/mmprojects.gif
+===================================================================
+RCS file: icons/view16/mmprojects.gif
+diff -N icons/view16/mmprojects.gif
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ icons/view16/mmprojects.gif	1 Jan 1970 00:00:00 -0000
+@@ -0,0 +1,2 @@
++GIF89a  Õ  ":˜ßßßĞ¬yÿÿÿOXŠìÑ‹©Öø’µì <¡ÿë³q”¯(b–úéEO‡ÿÚ‰Åòmi*CœÿñÂ±áı;M•…‘ÈÿÑuLUÿòÒ!Bœÿå¤öß–AO’[`„2H™ÿÕ}wn{BJ”ÿß–.CœEQ                                                                                 !ù ÿ ,       }ÀA@H‹Çd‘X8Š )®‹…"«@A`cSXÌÜ,¤"i·¸<>è$îwó}4€€QBf$""
++“–—— ¡¡#ª««#C ³´´FCº»¼GKJIÀ¿DA ;
+Index: icons/view16/mprojects.gif
+===================================================================
+RCS file: icons/view16/mprojects.gif
+diff -N icons/view16/mprojects.gif
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ icons/view16/mprojects.gif	1 Jan 1970 00:00:00 -0000
+@@ -0,0 +1,2 @@
++GIF89a  Õ  ":˜ãÁ}’µìwn{ÿÿÿßßß¹ÆÇEO‡ÿë³©Öø(b–Ğ¬yq”¯úé*CœÿÚ‰OXŠÿñÂÅòÿÑu±áı…‘ÈÿòÒmi;M•AN“ <¡ìÑ‹ÅÆÙÿå¤LUÙ²qöß–2H™[`„!BœÿÕ}ÿß–.CœEQAO’                                                                     !ù ÿ ,       ~@BAH‹Çd‘X\8Bƒ -¡„,TÁåàF´	|ŠB:}©DŞğ·‚8'ˆø<>-T
++‚ƒ‚†C'%%‘’–(™šš!$$!	£¤¤!V&¬­­&‰ ´µµ#FC»¼½GKJIÁÀDA ;
+Index: icons/view16/mview.gif
+===================================================================
+RCS file: icons/view16/mview.gif
+diff -N icons/view16/mview.gif
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ icons/view16/mview.gif	1 Jan 1970 00:00:00 -0000
+@@ -0,0 +1,7 @@
++GIF89a  æ  ùıÿúüÿ÷üÿôûÿóûÿğûÿîúÿíúÿëúÿêúÿéùÿòõûğõûíòúêğùæîùÕóÿäìùØîÿáêøÜç÷ĞéşÆäı»İú¯×÷¤Òõ™ËóÆğ‡Áï¾í« u§y¡š}™–„™–ƒ³=‘’‰³=²=±>°>q”¯«Œ?‰ƒŠ” …A„Cœ„C™€>•z7–y/“w3‘w5’v1‘v1‹r3Šr5ƒn5€k7|i8)oÄ)nÁsd;)mÁ*k¼*l½*j¸)j·*g²l_=)g²*d¬f\?*c«*a¥(b–aYA*^ +[™*\š*Y”+Y”+X‘+X+Vÿÿÿ                                                                                                                              !ù U ,       ¸€UTTPOMJIFBB??UU<<‚TQQ‡GDCC==2¬¬¯25
++
++¶¹
++67		&ÄÅÅU9, (ĞÑ*U;"×,-K))K.U>$1
++Kİí
++/UE+3áKú0UH   À á |@£
++“‡wDÇ€[ ù˜@‘Û!¡@²$$!B\É$¥Ë*  ;
+Index: icons/wizban/newmprj_wiz.gif
+===================================================================
+RCS file: icons/wizban/newmprj_wiz.gif
+diff -N icons/wizban/newmprj_wiz.gif
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ icons/wizban/newmprj_wiz.gif	1 Jan 1970 00:00:00 -0000
+@@ -0,0 +1,14 @@
++GIF89aK B æ  RˆÄäûÛ¼{ÂğŸ|!Şæø›ÎÿÿÿÚÜê•ÁvzÀÂÅµØ÷íñû•‰›÷ã§Iz¦ĞÚåû÷â>r¡¹ŸZåĞèïör‰ÏÌÌÌ×îıåÛÃ0N¶¤¦ª–‰pœ¿æµµµ¨Íô÷Ó{¹·Íe{Çøì¿âÙ½k‹ÓÄ¼§îøş¼Şùëğú¥¼³—NQªA\¼†¼¯Ğò±İöíÈ½ÒïRsÉYm·ÙÆ‘/]‹õ÷ı÷Ü”çõşÌéüıüóøè´÷ßœĞ¼…°³ÆâË–Ç¯k®»åäêùíİ°¢Çò®Óö—{CÌÄ°¸Ûøù÷ñ¥©Ã‘¯â®©˜ùñÏÓĞİyÒJs¥÷ØŠÆŞ÷w„·j…Îw¾—›Åº¼À“·èİòşMhÁUƒ¬ƒÇÑìıÂÍìÜßî××åÈ²{}…ªôèÂöñİñáºi{±âÄ‰¬?ì×¨3f™šÀï¼»Ìøæ®«¯Ä‡¨×ÑÚò}Ê«Ğõ—§Û÷Ş¥ÖÕàĞ±n‹¬Ú‘—¥ ÉüùêÑæùÙË§–¸á!ù ÿ ,    K B  ÿ€‚ƒ„…†‡ˆ‰Š‹Œ‘’“”•–—˜™š›œŸ ¡¢£¤¥¦§¨©ª«¬­Œ8
++
++®–8°*·*³’µ8¸¾º¼
++¾¿À‹¼½ÄÅÆ‡ÈÃÊËÌƒÈÉĞÑÌÔÕÖ¸ÒÙ±ÛÄÒßàáÜÀÙ°±Ïæ¹ºéëåí³éêñí·®õñëøî&  ‚·A(ŒŸ<sŸJW6Úsèï„Ş0áF@7rÄ÷©…Ë!)bœğñeAû±ô„BÆ‰=åd‘'„—W~N¸òòãPóù¡À¢ªÕ«Vm¶À‘tâZqíØh‰
++%4¨]«¶„[·ZÿqèºT®Ö§¡ÙëhŒA<óàC¸pá—]ºà°Àué Ä/ñ½µ·€åËÌX2Ø°gÃˆóòÆ²KÉ±ö¹ÌÚ2¢b;@òƒ„Û¸sëNÌ[¶ïØ¼À[¹µqB88|XÎ¡ƒsf<‘!£L™3Ø‹Y³¦B… Á»8O>üåî¬S]Ü8kB²|À°ÂB~P—Ñ£ÿöîA˜† àaSB$¨ ‚]Ø„Å,§{ª¹×!b| "Hğ	 †(âˆ$ì§U‰$’ Õ±d…ZˆÙ!{¸áaŠ8Šx"+Â£Œ3R£üõgä‘HÙÿIÙ>R¤k4ÚHB“XÙS–OFÉŞ” ²G‡$¼aæ™h¦‰fOjÙ¥—íÉˆöĞfIä©çIôÄç=yÆ „*ÇjSÎYçŒ6ú #XqÁ¤”VZi˜fªi¦^lê)
++ˆ©¨=4ZÁ	'pÀÅ¬¶êê«°Æ*««3ŒEaˆzH¾áÃ¯N|pB
++d0ë±³f ,¬ÊFÅ·êjH@HğÀ¯>8áÄ	\|Â·à†+.¸:èÀª²|¡îºì²ÃD„ÁÒB­µ9ä›/Md0î¸æ*»ÃÀlğÁG1Dœ"òBµè›C.ğïÿ·:d°C wìñÇ ƒl¼»ç0ÄS¤<Qx+®_„,óÌ!+c½„¼ ‡>¨lÃJèn4môÈ_&zˆÎ<OÂ
++D±¹¤`õÕXg­õÖZ_°ğÍrâÅÎ>„BQ.ÌJ´íöÛpÇ-·ÜH'ó UìœƒÙ
++˜@¹0 øà„nøá‡ÃER*mHLH°· €T ®ùæ‡ƒ\Ğøİ‚@.Ó}§ CG´îúë°Ç.»ìFaã£‡ıxäSPnDAÇğÄoüñÈ_û\„Q2éT±Âé
++XÁ€€ ıöÜwïı÷Şá¶VÔa\è£ßğ!ÒKÄôAøô×ÿı ãÇÀ…é÷ï®:¦§À µK ÈÀ6øÃ€€
++Zğ‚Hßq¸3l@}€Á FHÂšğ„(4¡"ƒ8p
++bˆ¡ehÁõb€0 RÈÃ…1È
++ …;Ü¡ˆF¼CÕgÃB !hÂÛ@Å*ZñŠXÌbµ …1sp @Æ2*1ƒS
++ ;
+Index: src/org/eclipse/cdt/internal/ui/editor/ICDocumentProvider.java
+===================================================================
+RCS file: src/org/eclipse/cdt/internal/ui/editor/ICDocumentProvider.java
+diff -N src/org/eclipse/cdt/internal/ui/editor/ICDocumentProvider.java
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ src/org/eclipse/cdt/internal/ui/editor/ICDocumentProvider.java	1 Jan 1970 00:00:00 -0000
+@@ -0,0 +1,18 @@
++package org.eclipse.cdt.internal.ui.editor;
++
++import org.eclipse.cdt.core.model.IWorkingCopy;
++import org.eclipse.ui.texteditor.IDocumentProvider;
++
++public interface ICDocumentProvider extends IDocumentProvider {
++
++	/*
++	 * @see org.eclipse.jdt.internal.ui.javaeditor.ICompilationUnitDocumentProvider#getWorkingCopy(java.lang.Object)
++	 */
++	public abstract IWorkingCopy getWorkingCopy(Object element);
++
++	/*
++	 * @see org.eclipse.jdt.internal.ui.javaeditor.ICompilationUnitDocumentProvider#shutdown()
++	 */
++	public abstract void shutdown();
++
++}

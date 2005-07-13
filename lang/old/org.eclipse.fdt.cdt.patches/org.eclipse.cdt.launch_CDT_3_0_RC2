@@ -1,0 +1,65 @@
+Index: plugin.properties
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-launch/org.eclipse.cdt.launch/plugin.properties,v
+retrieving revision 1.14
+diff -u -r1.14 plugin.properties
+--- plugin.properties	23 Jun 2005 16:01:10 -0000	1.14
++++ plugin.properties	13 Jul 2005 19:44:56 -0000
+@@ -11,11 +11,11 @@
+ pluginName=C/C++ Development Tools Launching Support
+ providerName=Eclipse.org
+ 
+-LocalCDTLaunch.name=C/C++ Local Application
+-LocalAttachCDTLaunch.name=C/C++ Attach to Local Application
+-CoreFileCDTLaunch.name=C/C++ Postmortem debugger
++LocalCDTLaunch.name=Local Application
++LocalAttachCDTLaunch.name=Attach to Local Application
++CoreFileCDTLaunch.name=Postmortem debugger
+ 
+-CApplicationShortcut.label=Local C/C++ Application
+-ContextualRunCApplication.label=Run Local C/C++ Application
+-ContextualDebugCApplication.label=Debug Local C/C++ Application
++CApplicationShortcut.label=Local Application
++ContextualRunCApplication.label=Run Local Application
++ContextualDebugCApplication.label=Debug Local Application
+ 
+Index: src/org/eclipse/cdt/launch/internal/ui/LaunchMessages.properties
+===================================================================
+RCS file: /home/tools/org.eclipse.cdt-launch/org.eclipse.cdt.launch/src/org/eclipse/cdt/launch/internal/ui/LaunchMessages.properties,v
+retrieving revision 1.10
+diff -u -r1.10 LaunchMessages.properties
+--- src/org/eclipse/cdt/launch/internal/ui/LaunchMessages.properties	23 Jun 2005 16:01:10 -0000	1.10
++++ src/org/eclipse/cdt/launch/internal/ui/LaunchMessages.properties	13 Jul 2005 19:44:56 -0000
+@@ -28,12 +28,12 @@
+ AbstractCLaunchDelegate.20=Building prerequisite project list
+ AbstractCLaunchDelegate.Program_is_not_a_recongnized_executable=Program is not a recognized executable.
+ 
+-LocalRunLaunchDelegate.Launching_Local_C_Application=Launching Local C/C++ Application
++LocalRunLaunchDelegate.Launching_Local_C_Application=Launching Local Application
+ LocalRunLaunchDelegate.Failed_setting_runtime_option_though_debugger=Failed to set program arguments, environment or working directory.
+ LocalRunLaunchDelegate.Error_starting_process=Error starting process
+ LocalRunLaunchDelegate.Does_not_support_working_dir=Eclipse runtime does not support working directory
+ 
+-LocalAttachLaunchDelegate.Attaching_to_Local_C_Application=Attaching to Local C/C++ Application
++LocalAttachLaunchDelegate.Attaching_to_Local_C_Application=Attaching to Local Application
+ LocalAttachLaunchDelegate.No_Process_ID_selected=No Process ID selected
+ LocalAttachLaunchDelegate.Select_Process=Select Process
+ LocalAttachLaunchDelegate.Platform_cannot_list_processes=Current platform does not support listing processes
+@@ -86,7 +86,7 @@
+ CMainTab.Program_does_not_exist=Program does not exist
+ CMainTab.Main=Main
+ CMainTab.&ProjectColon=&Project:
+-CMainTab.C/C++_Application=C/C++ Application:
++CMainTab.C/C++_Application=Application:
+ CMainTab.Search...=Searc&h Project...
+ CMainTab.Choose_program_to_run=Choose a &program to run:
+ CMainTab.Choose_program_to_run_from_NAME=Choose a program to run from {0}:
+@@ -122,7 +122,7 @@
+ CEnvironmentTab.Existing_Environment_Variable=Existing Environment Variable
+ CEnvironmentTab.Environment_variable_NAME_exists=Environment variable \" {0} \" exists.\nDo you want to overwrite?
+ 
+-CArgumentsTab.C/C++_Program_Arguments=C/C++ Program Arguments:
++CArgumentsTab.C/C++_Program_Arguments=Program Arguments:
+ CArgumentsTab.Arguments=Arguments
+ CArgumentsTab.Variables=Variables...
+ 
