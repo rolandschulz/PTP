@@ -199,7 +199,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			exeFile = verifyBinary(project, exePath);
 		}
 		
-		getLaunchManager().execMI(launch, workDirectory, null, jrunconfig, monitor);
+		getLaunchManager().run(launch, workDirectory, null, jrunconfig, monitor);
 		IPJob[] jobs = getLaunchManager().getUniverse().getJobs();
 		
 		String[] commandLine = new String[] {"/bin/date"};
