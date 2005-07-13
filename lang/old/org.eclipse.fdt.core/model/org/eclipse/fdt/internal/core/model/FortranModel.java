@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
+ * Copyright (c) 2000, 2005 QNX Software Systems and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
  * Contributors:
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
@@ -19,6 +19,7 @@ import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICModel;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.internal.core.model.CModelInfo;
+import org.eclipse.cdt.internal.core.model.CModelOperation;
 import org.eclipse.cdt.internal.core.model.CElementInfo;
 import org.eclipse.cdt.internal.core.model.CopyElementsOperation;
 import org.eclipse.cdt.internal.core.model.CopyResourceElementsOperation;
@@ -128,11 +129,13 @@ public class FortranModel extends Openable implements ICModel {
 
 	public void delete(ICElement[] elements, boolean force, IProgressMonitor monitor)
 		throws CModelException {
+		CModelOperation op;
 		if (elements != null && elements[0] != null && elements[0].getElementType() <= ICElement.C_UNIT) {
-			runOperation(new DeleteResourceElementsOperation(elements, force), monitor);
+			op = new DeleteResourceElementsOperation(elements, force);
 		} else {
-			runOperation(new DeleteElementsOperation(elements, force), monitor);
+			op = new DeleteElementsOperation(elements, force);
 		}
+		op.runOperation(monitor);
 	}
 
 	public void move(ICElement[] elements, ICElement[] containers, ICElement[] siblings,
@@ -146,12 +149,13 @@ public class FortranModel extends Openable implements ICModel {
 
 	public void rename(ICElement[] elements, ICElement[] destinations, String[] renamings,
 		boolean force, IProgressMonitor monitor) throws CModelException {
+		CModelOperation op;
 		if (elements != null && elements[0] != null && elements[0].getElementType() <= ICElement.C_UNIT) {
-			runOperation(new RenameResourceElementsOperation(elements, destinations,
-					renamings, force), monitor);
+			op = new RenameResourceElementsOperation(elements, destinations, renamings, force);
 		} else {
-			runOperation(new RenameElementsOperation(elements, destinations, renamings, force), monitor);
+			op = new RenameElementsOperation(elements, destinations, renamings, force);
 		}
+		op.runOperation(monitor);
 	}
 
 	/**
@@ -164,7 +168,7 @@ public class FortranModel extends Openable implements ICModel {
 				op.setInsertBefore(elements[i], siblings[i]);
 			}
 		}
-		runOperation(op, monitor);
+		op.runOperation(monitor);
 	}
 
 	protected CElementInfo createElementInfo () {

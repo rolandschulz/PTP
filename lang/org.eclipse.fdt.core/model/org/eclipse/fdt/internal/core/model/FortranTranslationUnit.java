@@ -41,6 +41,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.content.IContentType;
 
 /**
  * @see ITranslationUnit
@@ -84,7 +85,7 @@ public class FortranTranslationUnit extends Openable implements ITranslationUnit
 		if (sibling != null) {
 			op.createBefore(sibling);
 		}
-		CModelManager.getDefault().runOperation(op, monitor);
+		op.runOperation(monitor);
 		return getInclude(includeName);
 	}
 
@@ -93,7 +94,7 @@ public class FortranTranslationUnit extends Openable implements ITranslationUnit
 		if (sibling != null) {
 			op.createBefore(sibling);
 		}
-		CModelManager.getDefault().runOperation(op, monitor);
+		op.runOperation(monitor);
 		return getUsing(usingName);
 	}
 
@@ -102,7 +103,7 @@ public class FortranTranslationUnit extends Openable implements ITranslationUnit
 		if (sibling != null) {
 			op.createBefore(sibling);
 		}
-		CModelManager.getDefault().runOperation(op, monitor);
+		op.runOperation(monitor);
 		return getNamespace(namespace);
 	}
 
@@ -478,7 +479,7 @@ public class FortranTranslationUnit extends Openable implements ITranslationUnit
 			return workingCopy;
 		}
 		CreateWorkingCopyOperation op = new CreateWorkingCopyOperation(this, perFactoryWorkingCopies, factory, requestor);
-		runOperation(op, monitor);
+		op.runOperation(monitor);
 		return (IWorkingCopy)op.getResultElements()[0];
 	}
 
@@ -672,5 +673,16 @@ public class FortranTranslationUnit extends Openable implements ITranslationUnit
 
 	protected void setContentTypeID(String id) {
 		fContentTypeID = id;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.internal.core.model.Openable#closing(java.lang.Object)
+	 */
+	public void closing(Object info) throws CModelException {
+		IContentType cType = CCorePlugin.getContentType(getCProject().getProject(), getElementName());
+		if (cType != null) {
+			setContentTypeID(cType.getId());
+		}
+		super.closing(info);
 	}
 }

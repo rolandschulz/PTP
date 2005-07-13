@@ -37,7 +37,6 @@ import org.eclipse.cdt.internal.core.model.CElement;
 import org.eclipse.cdt.internal.core.model.CElementDelta;
 import org.eclipse.cdt.internal.core.model.CElementInfo;
 import org.eclipse.cdt.internal.core.model.CModelCache;
-import org.eclipse.cdt.internal.core.model.CModelOperation;
 import org.eclipse.cdt.internal.core.model.ContentTypeProcessor;
 import org.eclipse.cdt.internal.core.model.CProjectInfo;
 import org.eclipse.cdt.internal.core.model.DeltaProcessor;
@@ -64,13 +63,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceStatus;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentTypeManager.IContentTypeChangeListener;
@@ -95,8 +92,6 @@ public class FortranModelManager implements IResourceChangeListener, ICDescripto
 	 * Used to convert <code>IResourceDelta</code>s into <code>ICElementDelta</code>s.
 	 */
 	protected DeltaProcessor fDeltaProcessor = new DeltaProcessor();
-
-	protected ContentTypeProcessor fContentTypeProcessor = new ContentTypeProcessor();
 
 	/**
 	 * Queue of deltas created explicily by the C Model that
@@ -437,7 +432,7 @@ public class FortranModelManager implements IResourceChangeListener, ICDescripto
 					if (file != null && file.isFile()) {
 						String id = FortranCoreModel.getRegistedContentTypeId(cproject.getProject(), includePath.lastSegment());
 						if (id == null) {
-							// fallbakc to C Header (no Fortran headers)
+							// fallback to C Header (no Fortran headers)
 							// id = FortranCorePlugin.CONTENT_TYPE_CHEADER;
 						}
 						return new ExternalTranslationUnit(includeReferences[i], includePath, id);
@@ -579,10 +574,17 @@ public class FortranModelManager implements IResourceChangeListener, ICDescripto
 		}
 		byte[] bytes = new byte[hints];
 		if (hints > 0) {
+			InputStream is = null;
 			try {
-				InputStream is = file.getContents();
-				int count = is.read(bytes);
-				is.close();
+				is = file.getContents();
+				int count = 0;
+				// Make sure we read up to 'hints' bytes if we possibly can
+				while (count < hints) {
+					int bytesRead = is.read(bytes, count, hints - count);
+					if (bytesRead < 0)
+						break;
+					count += bytesRead;
+				}
 				if (count > 0 && count < bytes.length) {
 					byte[] array = new byte[count];
 					System.arraycopy(bytes, 0, array, 0, count);
@@ -592,6 +594,14 @@ public class FortranModelManager implements IResourceChangeListener, ICDescripto
 				return null;
 			} catch (IOException e) {
 				return null;
+			} finally {
+				if (is != null) {
+					try {
+						is.close();
+					} catch (IOException e) {
+						// ignore
+					}
+				}
 			}
 		}
 
@@ -600,9 +610,11 @@ public class FortranModelManager implements IResourceChangeListener, ICDescripto
 		for (int i = 0; i < parsers.length; i++) {
 			try {
 				IBinaryParser parser = parsers[i].getBinaryParser();
-				IBinaryFile binFile = parser.getBinary(bytes, location);
-				if (binFile != null) {
-					return binFile;
+				if (parser.isBinary(bytes, location)) {
+    			    IBinaryFile binFile = parser.getBinary(bytes, location);
+    			    if (binFile != null) {
+    			    	return binFile;
+    			    }
 				}
 			} catch (IOException e) {
 			} catch (CoreException e) {
@@ -610,10 +622,7 @@ public class FortranModelManager implements IResourceChangeListener, ICDescripto
 		}
 		return null;
 	}
-	/**
-	 * TODO: this is a temporary hack until, the CDescriptor manager is
-	 * in place and could fire deltas of Parser change.
-	 */
+
 	public void resetBinaryParser(IProject project) {
 		if (project != null) {
 			ICProject cproject = create(project);
@@ -785,7 +794,11 @@ public class FortranModelManager implements IResourceChangeListener, ICDescripto
 	 * @see org.eclipse.core.runtime.content.IContentTypeManager.IContentTypeListener#contentTypeChanged()
 	 */
 	public void contentTypeChanged(ContentTypeChangeEvent event) {
-		fContentTypeProcessor.processContentTypeChanges(event);
+		ContentTypeProcessor.processContentTypeChanges(new ContentTypeChangeEvent[]{ event });
+	}
+
+	public void contentTypeChanged(ContentTypeChangeEvent[] events) {
+		ContentTypeProcessor.processContentTypeChanges(events);
 	}
 
 	public void fire(int eventType) {
@@ -796,7 +809,7 @@ public class FortranModelManager implements IResourceChangeListener, ICDescripto
 	 * Fire C Model deltas, flushing them after the fact. 
 	 * If the firing mode has been turned off, this has no effect. 
 	 */
-	public void fire(ICElementDelta customDeltas, int eventType) {
+	void fire(ICElementDelta customDeltas, int eventType) {
 		if (fFire) {
 			ICElementDelta deltaToNotify;
 			if (customDeltas == null) {
@@ -956,38 +969,6 @@ public class FortranModelManager implements IResourceChangeListener, ICDescripto
 	}
 
 	/**
-	 * Runs a C Model Operation
-	 */
-	public void runOperation(CModelOperation operation, IProgressMonitor monitor) throws CModelException {
-		boolean hadAwaitingDeltas = !fCModelDeltas.isEmpty();
-		try {
-			if (operation.isReadOnly()) {
-				operation.run(monitor);
-			} else {
-		// use IWorkspace.run(...) to ensure that a build will be done in autobuild mode
-				getCModel().getUnderlyingResource().getWorkspace()
-					.run(operation, operation.getSchedulingRule(), IWorkspace.AVOID_UPDATE, monitor);
-			}
-		} catch (CoreException ce) {
-			if (ce instanceof CModelException) {
-				throw (CModelException)ce;
-			} else if (ce.getStatus().getCode() == IResourceStatus.OPERATION_FAILED) {
-				Throwable e = ce.getStatus().getException();
-				if (e instanceof CModelException) {
-					throw (CModelException)e;
-				}
-			}
-			throw new CModelException(ce);
-		} finally {
-// fire only if there were no awaiting deltas (if there were, they would come from a resource modifying operation)
-			// and the operation has not modified any resource
-			if (!hadAwaitingDeltas && !operation.hasModifiedResource()) {
-				fire(ElementChangedEvent.POST_CHANGE);
-			} // else deltas are fired while processing the resource delta
-		}
-	}
-
-	/**
 	 * Returns the set of elements which are out of synch with their buffers.
 	 */
 	public Map getElementsOutOfSynchWithBuffers() {
@@ -1076,7 +1057,7 @@ public class FortranModelManager implements IResourceChangeListener, ICDescripto
 	/**
 	 * Removes the info of this model element.
 	 */
-	public synchronized void removeInfo(ICElement element) {
+	protected synchronized void removeInfo(ICElement element) {
 		this.cache.removeInfo(element);
 	}
 

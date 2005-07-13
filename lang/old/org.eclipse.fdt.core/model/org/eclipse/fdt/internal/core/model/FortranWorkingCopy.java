@@ -1,15 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2002, 2005 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * Rational Software - Initial API and implementation
+ *******************************************************************************/
 package org.eclipse.fdt.internal.core.model;
 
-/**********************************************************************
- * Copyright (c) 2002,2003 Rational Software Corporation and others.
- * All rights reserved.   This program and the accompanying materials
- * are made available under the terms of the Common Public License v0.5
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v05.html
- * 
- * Contributors: 
- * Rational Software - Initial API and implementation
-***********************************************************************/
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -91,7 +91,7 @@ public class FortranWorkingCopy extends FortranTranslationUnit implements IWorki
 			ITranslationUnit original = this.getOriginalElement();
 			if (original.exists()) {
 				CommitWorkingCopyOperation op= new CommitWorkingCopyOperation(this, force);
-				runOperation(op, monitor);
+				op.runOperation(monitor);
 			} else {
 				String contents = this.getSource();
 				if (contents == null) return;
@@ -143,7 +143,7 @@ public class FortranWorkingCopy extends FortranTranslationUnit implements IWorki
 		}
 		try {
 			DestroyWorkingCopyOperation op = new DestroyWorkingCopyOperation(this);
-			runOperation(op, null);
+			op.runOperation(null);
 		} catch (CModelException e) {
 			// do nothing
 		}
@@ -364,7 +364,7 @@ public class FortranWorkingCopy extends FortranTranslationUnit implements IWorki
 		if (this.useCount == 0) throw newNotPresentException(); //was destroyed
 
         ReconcileWorkingCopyOperation op = new ReconcileWorkingCopyOperation(this, forceProblemDetection);
-        runOperation(op, monitor);
+        op.runOperation(monitor);
 	}
 
 	/**

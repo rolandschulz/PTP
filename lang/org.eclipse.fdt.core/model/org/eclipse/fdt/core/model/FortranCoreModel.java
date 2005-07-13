@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.fdt.core.model;
 
-
 import org.eclipse.cdt.core.CCProjectNature;
 import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.cdt.core.model.CModelException;
