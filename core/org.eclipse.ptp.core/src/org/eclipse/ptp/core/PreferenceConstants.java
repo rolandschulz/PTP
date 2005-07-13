@@ -28,4 +28,8 @@ public interface PreferenceConstants {
 	public int DEF_STORE_LINE = 100;
 
 	public String DEF_OUTPUT_DIR_NAME = "output";
+	
+	public static final String ORTE_ORTED_PATH = "ORTE_ORTED_PATH";
+	
+	public static final String ORTE_ORTED_ARGS = "ORTE_ORTED_ARGS";
 }

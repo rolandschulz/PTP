@@ -2,14 +2,14 @@
 ## now, here's how to do this:
 
 ## Assumption: the class that is making the JNI calls is
-##  org.eclipse.ptp.rtmodel.ompi.OMPIRuntimeModel(.class)
+##  org.eclipse.ptp.rtsystem.ompi.OMPIControlSystem(.class)
 ## Assumption: the directory you're placing this is
 ##  /Users/ndebard/eclipse-workspace
 ## Assumption: MAC-OSX
 
 ## GOTO THE CORRECT PLACE SO THAT YOU CAN RUN JAVAH
 cd ~/eclipse-workspace/org.eclipse.ptp.core/bin
-javah -jni -o ptp_ompi_jni.h org.eclipse.ptp.rtmodel.ompi.OMPIRuntimeModel
+javah -jni -o ptp_ompi_jni.h org.eclipse.ptp.rtsystem.ompi.OMPIControlSystem
 
 ## MOVE THE RESULTING HEADER FILE INTO PLACE
 mv ptp_ompi_jni.h ~/eclipse-workspace/org.eclipse.ptp.core/ompi

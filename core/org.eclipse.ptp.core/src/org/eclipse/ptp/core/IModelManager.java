@@ -76,7 +76,7 @@ public interface IModelManager {
 
 	public void abortJob(String jobName) throws CoreException;
 
-	public void execMI(ILaunch launch, File workingDirectory, String[] envp,
+	public void run(ILaunch launch, File workingDirectory, String[] envp,
 			JobRunConfiguration jobRunConfig, IProgressMonitor pm) throws CoreException;
 
 	public void setPTPConfiguration(ILaunchConfiguration config);

@@ -509,7 +509,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 	protected IPJob myjob = null;
 
-	public void execMI(final ILaunch launch, File workingDirectory,
+	public void run(final ILaunch launch, File workingDirectory,
 			String[] envp, final JobRunConfiguration jobRunConfig, IProgressMonitor monitor)
 			throws CoreException {
 		/*
