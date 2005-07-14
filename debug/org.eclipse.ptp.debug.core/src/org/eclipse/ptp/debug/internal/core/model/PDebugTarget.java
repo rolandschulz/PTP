@@ -116,6 +116,7 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessGroup;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
+import org.eclipse.ptp.debug.core.model.IPFocus;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
 import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
@@ -130,6 +131,8 @@ import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceManager;
  */
 public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEventListener, ILaunchListener, IExpressionListener, ISourceLookupChangeListener {
 
+	private IPFocus currentFocus;
+	
 	/**
 	 * Threads contained in this debug target. 
 	 * When a thread starts it is added to the list. 
@@ -225,12 +228,12 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	/**
 	 * Constructor for CDebugTarget.
 	 */
-	public PDebugTarget( ILaunch launch, IProject project, IPCDITarget cdiTarget, String name, IProcess[] debuggeeProcesses, IBinaryObject file, boolean allowsTerminate, boolean allowsDisconnect) {
+	public PDebugTarget( ILaunch launch, IProject project, IPCDITarget cdiTarget, String name, IBinaryObject file, boolean allowsTerminate, boolean allowsDisconnect) {
 		super( null );
 		setLaunch( launch );
 		setDebugTarget( this );
 		setName( name );
-		setProcess( debuggeeProcesses );
+		//setProcess( debuggeeProcesses );
 		setProject(project);
 		setExecFile( file );
 		setCDITarget( cdiTarget );
@@ -252,11 +255,25 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	}
 
 	public void setCurrentFocus(int procNum) {
-		getCDITarget().setCurrentFocus(procNum);
+		PDebugProcess pProc = new PDebugProcess(this, getCDITarget().setCurrentFocus(procNum));
+		currentFocus = pProc;
+		
+		if (fDebuggeeProcesses != null) {
+			for (int i = 0; i < fDebuggeeProcesses.length; i++) {
+				getLaunch().removeProcess(fDebuggeeProcesses[i]);
+			}
+		}
+		
+		Process process = getCDITarget().getProcess(procNum);
+		IProcess[] iprocesses = new IProcess[1];
+		iprocesses[0] = DebugPlugin.newProcess(getLaunch(), process, "Launch Label - " + procNum);
+
+		setProcess( iprocesses );
 	}
 
 	public void setCurrentFocus(String name) {
-		getCDITarget().setCurrentFocus(name);
+		PDebugProcessGroup pProcGrp = new PDebugProcessGroup(this, getCDITarget().setCurrentFocus(name));
+		currentFocus = pProcGrp;
 	}
 	
 	public IPCDIDebugProcessGroup newProcessGroup(String name) {
@@ -268,6 +285,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	}
 	
 	protected void initialize() {
+		setCurrentFocus(0);
 		initializeSourceLookupPath();
 		ArrayList debugEvents = new ArrayList( 1 );
 		debugEvents.add( createCreateEvent() );
@@ -595,7 +613,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		List oldList = (List)getThreadList().clone();
 		ICDIThread[] cdiThreads = new ICDIThread[0];
 		ICDIThread currentCDIThread = null;
-		try {
+ 		try {
 			cdiThreads = getCDITarget().getThreads();
 			currentCDIThread = getCDITarget().getCurrentThread();
 		}

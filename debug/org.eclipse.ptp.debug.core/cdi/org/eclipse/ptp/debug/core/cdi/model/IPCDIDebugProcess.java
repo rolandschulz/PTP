@@ -1,7 +1,7 @@
 package org.eclipse.ptp.debug.core.cdi.model;
 
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.debug.core.model.IThread;
+import org.eclipse.ptp.core.IPProcess;
 
 public interface IPCDIDebugProcess extends IPCDIDebugFocus {
 	/**
@@ -10,7 +10,7 @@ public interface IPCDIDebugProcess extends IPCDIDebugFocus {
 	 * @return
 	 * @throws DebugException
 	 */
-	public IThread[] getThreads() throws DebugException;
+	public Thread[] getThreads() throws DebugException;
 	
 	/**
 	 * Modeled after IDebugTarget.hasThreads();
@@ -19,4 +19,6 @@ public interface IPCDIDebugProcess extends IPCDIDebugFocus {
 	 * @throws DebugException
 	 */
 	public boolean hasThreads() throws DebugException;
+	
+	public IPProcess getPProcess();
 }

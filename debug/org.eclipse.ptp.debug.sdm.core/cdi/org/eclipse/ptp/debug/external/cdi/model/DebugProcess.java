@@ -1,9 +1,9 @@
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.debug.core.model.IThread;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
+import java.lang.Thread;
 
 public class DebugProcess implements IPCDIDebugProcess {
 	
@@ -17,7 +17,7 @@ public class DebugProcess implements IPCDIDebugProcess {
 		return pProcess;
 	}
 	
-	public IThread[] getThreads() throws DebugException {
+	public Thread[] getThreads() throws DebugException {
 		// Auto-generated method stub
 		System.out.println("PDebugProcess.getThreads()");
 		return null;

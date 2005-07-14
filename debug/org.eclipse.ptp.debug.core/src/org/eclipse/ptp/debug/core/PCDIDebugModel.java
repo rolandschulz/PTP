@@ -91,14 +91,14 @@ public class PCDIDebugModel {
 	 * @return a debug target
 	 * @throws DebugException
 	 */
-	public static IDebugTarget newDebugTarget( final ILaunch launch, final IProject project, final IPCDITarget cdiTarget, final String name, final IProcess[] debuggeeProcs, final IBinaryObject file, final boolean allowTerminate, final boolean allowDisconnect, final boolean stopInMain, final boolean resumeTarget ) throws DebugException {
+	public static IDebugTarget newDebugTarget( final ILaunch launch, final IProject project, final IPCDITarget cdiTarget, final String name, final IBinaryObject file, final boolean allowTerminate, final boolean allowDisconnect, final boolean stopInMain, final boolean resumeTarget ) throws DebugException {
 		final IDebugTarget[] target = new IDebugTarget[1];
 		IWorkspaceRunnable r = new IWorkspaceRunnable() {
 			public void run( IProgressMonitor m ) throws CoreException {
 				/* ptp.core and ptp.debug.core have IPTPLaunchConfigurationConstants */
 				/* Be careful of the class that you import */
 				boolean stop = launch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
-				target[0] = new PDebugTarget( launch, project, cdiTarget, name, debuggeeProcs, file, allowTerminate, allowDisconnect );
+				target[0] = new PDebugTarget( launch, project, cdiTarget, name, file, allowTerminate, allowDisconnect );
 				ICDITargetConfiguration config = cdiTarget.getConfiguration();
 				if ( config.supportsBreakpoints() && stop ) {
 					stopInMain( (PDebugTarget)target[0] );
@@ -134,8 +134,8 @@ public class PCDIDebugModel {
 	 * @return a debug target
 	 * @throws DebugException
 	 */
-	public static IDebugTarget newDebugTarget( ILaunch launch, IProject project, IPCDITarget cdiTarget, final String name, IProcess[] debuggeeProcs, IBinaryObject file, boolean allowTerminate, boolean allowDisconnect, boolean resumeTarget ) throws DebugException {
-		return newDebugTarget( launch, project, cdiTarget, name, debuggeeProcs, file, allowTerminate, allowDisconnect, false, resumeTarget );
+	public static IDebugTarget newDebugTarget( ILaunch launch, IProject project, IPCDITarget cdiTarget, final String name, IBinaryObject file, boolean allowTerminate, boolean allowDisconnect, boolean resumeTarget ) throws DebugException {
+		return newDebugTarget( launch, project, cdiTarget, name, file, allowTerminate, allowDisconnect, false, resumeTarget );
 	}
 
 	/**
