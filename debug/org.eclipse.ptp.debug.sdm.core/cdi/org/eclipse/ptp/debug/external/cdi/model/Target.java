@@ -97,15 +97,16 @@ public class Target extends SessionObject implements IPCDITarget {
 		allDebugGroups.remove(name);
 	}
 	
-	public void setCurrentFocus(int procNum) {
+	public IPCDIDebugProcess setCurrentFocus(int procNum) {
 		System.out.println("Target.setCurrentFocus() to process " + procNum);
 		currentDebugFocus = (DebugProcess) grpAllProcesses.getProcess(procNum);
+		return (DebugProcess) currentDebugFocus;
 	}
 	
-	public void setCurrentFocus(String name) {
+	public IPCDIDebugProcessGroup setCurrentFocus(String name) {
 		System.out.println("Target.setCurrentFocus() to group " + name);
-		if (allDebugGroups.containsKey(name))
-			currentDebugFocus = (DebugProcessGroup) allDebugGroups.get(name);
+		currentDebugFocus = (DebugProcessGroup) allDebugGroups.get(name);
+		return (DebugProcessGroup) currentDebugFocus;
 	}
 
 	public DebugSession getDebugSession() {

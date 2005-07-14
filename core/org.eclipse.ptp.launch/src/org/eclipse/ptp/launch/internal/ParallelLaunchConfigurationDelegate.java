@@ -218,10 +218,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				/* Even though ICDISession supports multiple targets but it only creates one target */
 				
 				for (int i = 0; i < targets.length; i++) {
-					Process process = targets[i].getProcess(0);
-					IProcess[] iprocesses = new IProcess[1];
-					iprocesses[0] = DebugPlugin.newProcess(launch, process, "Launch Label - 0");
-					PCDIDebugModel.newDebugTarget(launch, null, targets[i], "Name", iprocesses, exeFile, true, false, stopInMain, true);
+					PCDIDebugModel.newDebugTarget(launch, null, targets[i], "Name", exeFile, true, false, stopInMain, true);
 				}
 			}
 			else if (mode.equals(ILaunchManager.RUN_MODE)) {
