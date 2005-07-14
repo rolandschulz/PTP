@@ -22,24 +22,6 @@
       <import plugin="org.eclipse.core.runtime"/>
    </requires>
 
-
-   <extension
-         point="org.eclipse.ui.newWizards">
-<!-- Managed Make Builder Projects -->
-      <wizard
-            name="%MngFortranWizard.name"
-            icon="icons/full/wizban/newmngf_app.gif"
-            category="org.eclipse.fdt.ui.newFortranWizards"
-            class="org.eclipse.cdt.managedbuilder.ui.wizards.NewManagedCProjectWizard"
-            project="true"
-            finalPerspective="org.eclipse.cdt.ui.CPerspective"
-            id="org.eclipse.fdt.managedbuilder.ui.wizards.StdFortranWizard">
-         <description>
-            %MngFortranWizard.description
-         </description>
-      </wizard>
-   </extension>
-       
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
