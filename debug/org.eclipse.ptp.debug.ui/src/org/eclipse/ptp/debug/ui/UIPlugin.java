@@ -29,6 +29,7 @@ import org.osgi.framework.BundleContext;
  * The main plugin class to be used in the desktop.
  */
 public class UIPlugin extends AbstractUIPlugin {
+	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.ui";
 	//The shared instance.
 	private static UIPlugin plugin;
 	//Resource bundle.
@@ -43,6 +44,14 @@ public class UIPlugin extends AbstractUIPlugin {
 		super();
 		plugin = this;
 	}
+
+	public static String getUniqueIdentifier() {
+		if (getDefault() == null)
+			return PLUGIN_ID;
+
+		return getDefault().getBundle().getSymbolicName();
+	}
+	
 
 	/**
 	 * This method is called upon plug-in activation

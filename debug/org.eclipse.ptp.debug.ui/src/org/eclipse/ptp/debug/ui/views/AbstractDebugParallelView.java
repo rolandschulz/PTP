@@ -25,7 +25,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.IParallelModelListener;
 import org.eclipse.ptp.debug.core.DebugManager;
 import org.eclipse.ptp.debug.core.IDebugParallelModelListener;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
@@ -35,7 +35,7 @@ import org.eclipse.ui.part.ViewPart;
  * @author clement chu
  *
  */
-public abstract class AbstractDebugParallelView extends ViewPart implements ISelectionProvider, IDebugParallelModelListener {
+public abstract class AbstractDebugParallelView extends ViewPart implements ISelectionProvider, IDebugParallelModelListener, IParallelModelListener {
 	/**
 	 * store debug event listener
 	 */
@@ -45,7 +45,8 @@ public abstract class AbstractDebugParallelView extends ViewPart implements ISel
 	
 	public AbstractDebugParallelView() {
 		uiDebugManager = UIPlugin.getDefault().getUIDebugManager();
-		modelManager = PTPCorePlugin.getDefault().getModelManager();
+		modelManager = uiDebugManager.getModelManager();
+		modelManager.addParallelLaunchListener(this);
 		/* FIXME
 		 * add ModelListener 
 		 */		
@@ -72,6 +73,7 @@ public abstract class AbstractDebugParallelView extends ViewPart implements ISel
 		 * remove ModelListener 
 		 */
 		DebugManager.getInstance().removeListener(this);
+		modelManager.removeParallelLaunchListener(this);
 		super.dispose();
 	}
 	

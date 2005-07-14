@@ -35,6 +35,13 @@ public class Element implements IElement, Cloneable, Comparable {
 	public Element(String id) {
 		this(id, false);
 	}
+	public int getIDNum() {
+		try {
+			return Integer.parseInt(id);
+		} catch (NumberFormatException e) {
+			return -1;
+		}
+	}
 	public String getID() {
 		return id;
 	}

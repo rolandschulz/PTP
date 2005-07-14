@@ -28,13 +28,13 @@ import org.eclipse.swt.SWT;
  * @author clement chu
  *
  */
-public class DeselectAllAction extends ParallelDebugAction {
-	public static final String name = "Deselect All";
+public class RegisterAction extends ParallelDebugAction {
+	public static final String name = "Register Selected Elements";
 	
-	public DeselectAllAction(AbstractDebugParallelView debugView) {
+	public RegisterAction(AbstractDebugParallelView debugView) {
 		super(name, debugView);
-	    this.setImageDescriptor(ImageUtil.ID_ICON_DESELECTALL_NORMAL);
-	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_DESELECTALL_NORMAL);
+	    this.setImageDescriptor(ImageUtil.ID_ICON_REGISTER_NORMAL);
+	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_REGISTER_NORMAL);
 	}
 
 	public void run(Element[] elements) {
@@ -42,10 +42,8 @@ public class DeselectAllAction extends ParallelDebugAction {
 	public void run() {
 		if (debugView instanceof DebugParallelProcessView) {
 			DebugParallelProcessView view = (DebugParallelProcessView)debugView;
-			if (UIDialog.showDialog(getShell(), "Deselect All", "Deselect all elements in this group?", SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL) == SWT.OK) {			
-				view.getCurrentGroup().setAllSelect(false);
-				view.redraw();
-			}
+			view.registerSelectedElements();
+			view.redraw();
 		}
 	}	
 }

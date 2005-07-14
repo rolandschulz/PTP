@@ -29,7 +29,7 @@ import java.util.Map;
  *
  */
 public class DebugManager {
-	private static final int total = 256;
+	private static final int total = 10000;
 	private static DebugManager instance = null;
 	private List listeners = new ArrayList();
 	private Map processMap = new HashMap();
@@ -38,7 +38,7 @@ public class DebugManager {
 		Runnable startSim = new Runnable() {
 			public void run() {
 				try {
-					Thread.sleep(getRandom(10000 + 1));
+					Thread.sleep(getRandom(5000 + 1));
 					startSimulation();
 				} catch (Exception e) {
 				}
@@ -49,7 +49,7 @@ public class DebugManager {
 	
 	public void startSimulation() {
 		createProcess();
-		fireListener(IDebugParallelModelListener.STATUS_STARTING);
+		fireListener(IDebugParallelModelListener.STATUS_RUNNING);
 		Runnable sim = new Runnable() {
 			private int counter = 0;
 			public void run() {
@@ -81,7 +81,7 @@ public class DebugManager {
 				listener.run();
 			else if (status.equals(IDebugParallelModelListener.STATUS_STARTING))
 				listener.start();
-			else if (status.equals(IDebugParallelModelListener.STATUS_STOPPED))
+			if (status.equals(IDebugParallelModelListener.STATUS_STOPPED))
 				listener.stop();
 			else if (status.equals(IDebugParallelModelListener.STATUS_SUSPENDED))
 				listener.suspend();
@@ -123,8 +123,8 @@ public class DebugManager {
 		int random = getRandom(5);
 		//NOTE: NO STARTING
 		switch(random) {
-			case 1:
-				return IDebugParallelModelListener.STATUS_RUNNING;
+			//case 1:
+			//	return IDebugParallelModelListener.STATUS_RUNNING;
 			case 3:
 				return IDebugParallelModelListener.STATUS_STOPPED;
 			case 4:

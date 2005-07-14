@@ -90,13 +90,17 @@ public class ElementGroup extends Element implements IElementGroup {
 				element.setSelected(false);
 		}
 	}
+	public void select(int index, boolean selectIt) {
+		IElement element = getElement(index);
+		element.setSelected(selectIt);
+	}
 	public void select(int index) {
 		IElement element = getElement(index);
 		element.setSelected(!element.isSelected());
 	}
-	public void setAllSelect(boolean select) {
+	public void setAllSelect(boolean selectIt) {
 		for (Iterator i=elements.values().iterator(); i.hasNext();) {
-			((IElement)i.next()).setSelected(select);
+			((IElement)i.next()).setSelected(selectIt);
 		}
 	}
 	

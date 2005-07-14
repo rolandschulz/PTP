@@ -34,6 +34,7 @@ public interface IElementGroup extends IElement {
 	public String getElementID(int index);
 	public void removeAllSelected();
 	public void select(int index);
+	public void select(int index, boolean selectIt);
 	public void setAllSelect(boolean select);	
 	public void clearAll();
 	public int size();
