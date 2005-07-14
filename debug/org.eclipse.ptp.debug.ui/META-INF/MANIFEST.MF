@@ -12,5 +12,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.debug.ui,
  org.eclipse.debug.core,
- org.eclipse.ptp.core
+ org.eclipse.ptp.core,
+ org.eclipse.ptp.debug.core
 Eclipse-AutoStart: true

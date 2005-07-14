@@ -24,6 +24,7 @@ package org.eclipse.ptp.debug.ui.model;
  *
  */
 public interface IElement {
+	public int getIDNum();
 	public String getID();
 	public boolean isSelected();
 	public void setSelected(boolean selected);

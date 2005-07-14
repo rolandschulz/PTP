@@ -18,7 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.views;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,9 +39,10 @@ import org.eclipse.ptp.debug.core.DebugManager;
 import org.eclipse.ptp.debug.core.IDebugParallelModelListener;
 import org.eclipse.ptp.debug.core.PProcess;
 import org.eclipse.ptp.debug.ui.ImageUtil;
+import org.eclipse.ptp.debug.ui.UIDialog;
 import org.eclipse.ptp.debug.ui.actions.CreateGroupAction;
 import org.eclipse.ptp.debug.ui.actions.DeleteGroupAction;
-import org.eclipse.ptp.debug.ui.actions.DeselectAllAction;
+import org.eclipse.ptp.debug.ui.actions.RegisterAction;
 import org.eclipse.ptp.debug.ui.actions.GroupAction;
 import org.eclipse.ptp.debug.ui.actions.ParallelDebugAction;
 import org.eclipse.ptp.debug.ui.actions.ResumeAction;
@@ -97,6 +100,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 	protected String cur_group_id = IGroupManager.GROUP_ROOT_ID;
 	protected IElementGroup cur_element_group = null;
 	protected int cur_group_size = 0;
+	protected int fisrt_selected_element_id = -1;
 	
 	//node info
 	protected final int e_offset_x = 5;
@@ -118,6 +122,10 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 	protected Shell toolTipShell = null;
 	protected Timer hovertimer = null;
 	protected final int hide_time = 1000;
+	
+	//mouse
+	protected boolean isDoubleClick = false;
+	protected int keyCode = SWT.None;
 	
 	//selection area
 	protected int drag_x = 0;
@@ -237,22 +245,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 					group.addElement(new Element(processes[j].getID()));
 				}
 			}
-			/*
-			IPJob[] jobs = modelManager.getUniverse().getJobs();
-			int total_jobs = jobs.length;
-
-			if (total_jobs > 0) {			
-				groupManager.clearAll();
-				IElementGroup group = groupManager.getGroupRoot();
-				for (int i=0; i<total_jobs; i++) {
-					IPProcess[] processes = jobs[i].getProcesses();
-					for (int j=0; j<processes.length; j++) {
-						group.addElement(new Element(processes[j].getKeyString()));
-					}
-				}
-				groupManager.addGroup(group);
-			}
-			*/
+			//uiDebugManager.initialProcess();
 		}
 	}
 	
@@ -309,7 +302,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		//stepIntoAction = new StepIntoAction(this);
 		//stepOverAction = new StepOverAction(this);
 		//stepReturnAction = new StepReturnAction(this);
-		deselectAllAction = new DeselectAllAction(this);
+		deselectAllAction = new RegisterAction(this);
 		createGroupAction = new CreateGroupAction(this);
 		deleteGroupAction = new DeleteGroupAction(this);
 		
@@ -386,6 +379,9 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 	    drawComp.addListener(SWT.MouseMove, myDrawingMouseListener);
 	    drawComp.addListener(SWT.MouseUp, myDrawingMouseListener);
 	    drawComp.addListener(SWT.MouseExit, myDrawingMouseListener);
+	    drawComp.addListener(SWT.MouseDoubleClick, myDrawingMouseListener);
+	    drawComp.addListener(SWT.KeyDown, myDrawingMouseListener);
+	    drawComp.addListener(SWT.KeyUp, myDrawingMouseListener);
 	}
 	
 	protected void drawingMouseHandleEvent(Event e) {
@@ -395,8 +391,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		switch (e.type) {
 			case SWT.MouseDown:
 				//System.out.println("Down("+mx+":"+my+")");
-				drag_x = 0;
-				drag_y = 0;					
+				clearMouseSetting();
 				break;
 			case SWT.DragDetect:
 				//System.out.println("Draf("+mx+":"+my+")");
@@ -419,25 +414,49 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 				break;				
 			case SWT.MouseUp:
 				disposeSelectionArea();
-				
-				//selection area
-				if (isDragOnView(mx, my)) {
-					selectedElements(drag_x, drag_y, mx, my);
-					drag_x = 0;
-					drag_y = 0;					
-				} else {
-					selectedElement(mx, my);
+
+				//unselected all elements only occurred when there is no double click and no press ctrl button
+				if (keyCode != SWT.CTRL && !isDoubleClick) {
+					if (cur_element_group != null)
+						cur_element_group.setAllSelect(false);
 				}
 
+				if (isDoubleClick)
+					registerSelectedElements();
+				else
+					selectElements(drag_x, drag_y, mx, my);					
+				
+				clearMouseSetting();
 				drawComp.redraw();
+				break;
+			case SWT.MouseDoubleClick:
+				isDoubleClick = true;
+				break;
+			case SWT.KeyDown:
+				keyCode = e.keyCode;
+				break;
+			case SWT.KeyUp:
+				keyCode = SWT.None;
 				break;
 			default:
 				//System.out.println("Other("+mx+":"+my+")");
 				disposeSelectionArea();
-				drag_x = 0;
-				drag_y = 0;					
+				clearMouseSetting();
 				break;
 		}	
+	}
+	
+	public void registerSelectedElements() {
+		IElement[] elements = cur_element_group.getSelectedElements();
+		//register selected processes into Debug View
+		//uiDebugManager.registerElements(elements);
+		UIDialog.showDialog(getViewSite().getShell(), "Register to Debug View", "There are total " + elements.length + " selected element(s) should be registered to Debug View", SWT.ICON_INFORMATION);
+	}
+	
+	protected void clearMouseSetting() {
+		isDoubleClick = false;
+		drag_x = 0;
+		drag_y = 0;					
 	}
 	
 	protected boolean isDragOnView(int mx, int my) {
@@ -571,14 +590,35 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		}
 	}
 	
-	protected void selectedElement(int e_x, int e_y) {
-		int element_num = findElementNum(e_x, e_y);
-		if (element_num > -1) {
-			cur_element_group.select(element_num);
-		}		
-	}
+	protected void selectElements(int cur_element_num) {
+		if (keyCode != SWT.SHIFT)
+			fisrt_selected_element_id = cur_element_num;
+		else {
+			if (cur_element_num > -1) {
+				int start_element_id = fisrt_selected_element_id>cur_element_num?cur_element_num:fisrt_selected_element_id;
+				int end_element_id = (start_element_id==cur_element_num?fisrt_selected_element_id:cur_element_num) + 1;
+				
+				IElement[] elements = cur_element_group.getSortedElements();
+				for (int num=start_element_id; num<end_element_id; num++) {
+					if (num >= elements.length)
+						break;
+					
+					elements[num].setSelected(true);
+				}
+			}
+		}
+	}	
+		
+	protected void selectElements(int s_x, int s_y, int e_x, int e_y) {
+		if (!isDragOnView(e_x, e_y)) {
+			int element_num = findElementNum(e_x, e_y);
+			if (element_num > -1)
+				cur_element_group.select(element_num, true);
 
-	protected void selectedElements(int s_x, int s_y, int e_x, int e_y) {
+			selectElements(element_num);
+			return;
+		}
+
 		//switch s_x and e_x or s_y and e_y
 		int start_x = s_x;
 		int start_y = s_y;
@@ -620,11 +660,16 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		for (int row_count=0; row_count<total_row; row_count++) {
 			for (int col_count=0; col_count<total_col; col_count++) {
 				int num = init_element_num + col_count + (row_count * visible_e_col); 
-				if (num < elements.length) {
-					elements[num].setSelected(true);
-				}
+				if (num >= elements.length)
+					break;
+
+				//store the first selected element id in this selection area
+				if (row_count == 0 && col_count == 0)
+					selectElements(num);
+				
+				elements[num].setSelected(true);
 			}
-		}	
+		}
 	}
 	
 	protected Point FindElementLocation(int mx, int my) {
@@ -716,16 +761,10 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 
 		//FIXME
 		PProcess process = DebugManager.getInstance().getProcess(element.getID());
-		//IPProcess process = modelManager.getUniverse().findProcessByName(getProcessName(element.getID()));
+		//IPProcess process = uiDebugManager.findProcess(element.getID());
 		if (process != null)
 			g.drawImage(getStatusIcon(process.getStatus(), element.isSelected()), x_loc, y_loc);
     }
-	
-	//FIXME
-	private String getProcessName(String id) {
-		//HARD CODE
-		return "job0_process" + id;
-	}
 	
 	//FIXME
 	protected Image getStatusIcon(String status, boolean selected) {
@@ -815,7 +854,8 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 	 * Should implemented IParallelModelListener
 	 */
 	public void run() {
-		refresh();
+		initialView();
+		redraw();		
 	}
 	public void start() {
 		initialView();
@@ -833,4 +873,13 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 	public void error() {
 		refresh();
 	}
+	
+	public void abort() {}
+	public void stopped() {}
+	public void monitoringSystemChangeEvent(Object object) {}
+	public void execStatusChangeEvent(Object object) {}
+	public void sysStatusChangeEvent(Object object) {}
+	public void processOutputEvent(Object object) {}
+	public void errorEvent(Object object) {}
+	public void updatedStatusEvent() {}
 }
