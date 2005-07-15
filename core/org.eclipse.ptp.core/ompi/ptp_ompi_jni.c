@@ -19,6 +19,7 @@
 #include "event/event.h"
 
 #include "threads/condition.h"
+#include "tools/orted/orted.h"
 
 char error_msg[256];
 
@@ -27,9 +28,7 @@ static int pgid;
 
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
 static int ptp_ompi_spawn(char *app, int num_procs);
-/*
-static void ptp_ompi_sendcmd(uint16_t usercmd);
-*/
+static void ptp_ompi_sendcmd(orte_daemon_cmd_flag_t usercmd);
 
 void set_error(char *msg);
 
@@ -95,6 +94,7 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
 		/* exec() requires the array be NULL terminated */
 		orted_args[len+1] = NULL;
 
+		printf("PATH: '%s'\n", orted_path);
 		for(i=0; i<len+2; i++) {
 		    if(orted_args[i] != NULL) 
 		    	printf("[C] #%d = '%s'\n", i, orted_args[i]);
@@ -105,6 +105,9 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
 		
 		/* spawn the daemon */
 		ret = execv(orted_path, orted_args);
+		printf("exec returned: %d\n", ret);
+		fflush(stdout);
+		printf("error: %s\n", strerror(errno));
 
 		//ret = execl("/Users/ndebard/local/bin/orted", "orted", 0);
 		/* release str */
@@ -248,16 +251,8 @@ Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIShutdown(JNIEnv *env, j
     	int ret;
 
     	printf("JNI (C) OMPI: OMPIShutdown()\n");
-	printf("PID = %d\n", pid);
-	printf("PGID = %d\n", pgid);
-	if(pid != -1) {
-	   // ret = killpg(pgid, SIGHUP);
-	    printf("return from killpg = %d\n", ret);
-	    if(ret == -1) {
-		printf("errormessage = %s\n", strerror(errno));
-	    }
-	}
-    	///ptp_ompi_sendcmd(ORTE_DAEMON_EXIT_CMD);
+	fflush(stdout);
+    	ptp_ompi_sendcmd(ORTE_DAEMON_EXIT_CMD);
 }
 
 /**********************************************************************
@@ -383,8 +378,7 @@ static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 	fflush(stdout);
 }
 
-/*
-static void ptp_ompi_sendcmd(uint16_t usercmd)
+static void ptp_ompi_sendcmd(orte_daemon_cmd_flag_t usercmd)
 {
 	orte_buffer_t *cmd;
 	orte_daemon_cmd_flag_t command;
@@ -410,4 +404,3 @@ static void ptp_ompi_sendcmd(uint16_t usercmd)
 	}
 	OBJ_RELEASE(cmd);
 }
-*/

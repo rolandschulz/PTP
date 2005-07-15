@@ -19,6 +19,7 @@
 
 package org.eclipse.ptp.rtsystem.ompi;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,7 +27,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.internal.core.CoreUtils;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
@@ -35,6 +39,8 @@ import org.eclipse.ptp.rtsystem.NamedEntity;
 import org.eclipse.ptp.rtsystem.RuntimeEvent;
 
 public class OMPIControlSystem implements IControlSystem {
+	private Process orted_process = null;
+	
 	protected List listeners = new ArrayList(2);
 
 	public OMPIControlSystem() {
@@ -42,10 +48,12 @@ public class OMPIControlSystem implements IControlSystem {
 	}
 	
 	public native String OMPIGetError();
-	public native int OMPIInit(String orted_bin_path);
+	public native int OMPIInit();
+	public native int OMPIStartDaemon(String orted_path, String orted_bin, String[] args);
+	public native void OMPIShutdown();
 	public native void OMPIFinalize();
 	public native void OMPIProgress();
-	public native void OMPIRun();
+	public native void OMPIRun(String[] args);
 	
 	private static int failed_load = 0;
 	
@@ -68,14 +76,56 @@ public class OMPIControlSystem implements IControlSystem {
 					"library load.");
 			return;
 		}
-		int rc = OMPIInit("foo/bar");
+		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
+		String orted_path = preferences.getString(PreferenceConstants.ORTE_ORTED_PATH);
+		System.out.println("ORTED path = ."+orted_path+".");
+		if(orted_path == "") {
+			String err = "Some error occurred trying to spawn the ORTEd (ORTE daemon).  Check the "+
+				"PTP/OPen MPI preferences page and be certain that the path and arguments "+
+				"are correct.";
+			System.err.println(err);
+			CoreUtils.showErrorDialog("ORTEd Start Failure", err, null);
+			return;
+		}
+		
+		String orted_args = preferences.getString(PreferenceConstants.ORTE_ORTED_ARGS);
+		String orted_full = orted_path + " " + orted_args;
+		System.out.println("ORTED = "+orted_full);
+		/* start the orted */
+		String[] split_args = orted_args.split("\\s");
+		for (int x=0; x<split_args.length; x++)
+	         System.out.println("["+x+"] = "+split_args[x]);
+		String[] split_path = orted_path.split("\\/");
+		for(int x=0; x<split_path.length; x++)
+			System.out.println("["+x+"] = "+split_path[x]);
+		OMPIStartDaemon(orted_path, split_path[split_path.length - 1], split_args);
+		//OMPIStartORTEd(orted_full);
+		
+		int rc = OMPIInit();
 		System.out.println("OMPI Init() return code = "+rc);
 		if(rc != 0) {
 			String error_msg = OMPIGetError();
 			CoreUtils.showErrorDialog("OMPI Runtime Initialization Error", error_msg, null);
 			return;
 		}
+
 		startProgressMaker();
+	}
+	
+	/* we do this part in Java (not native) because we want to maintain control over the
+	 * process that we start - so we can stop it 
+	 */
+	private void OMPIStartORTEd(String cmd)
+	{
+		try {
+			orted_process = Runtime.getRuntime().exec(cmd);
+		} catch(IOException e) {
+			String err = "Some error occurred trying to spawn the ORTEd (ORTE daemon).  Check the "+
+				"PTP/OPen MPI preferences page and be certain that the path and arguments "+
+				"are correct.";
+			System.err.println(err);
+			CoreUtils.showErrorDialog("Failed to Spawn ORTED", err, null);
+		}
 	}
     
 	public void startProgressMaker() {
@@ -96,19 +146,16 @@ public class OMPIControlSystem implements IControlSystem {
 	public String run(JobRunConfiguration jobRunConfig) {
 		System.out.println("JAVA OMPI: run() with args:\n"+jobRunConfig.toString());
 
-		/*
-		Thread runThread = new Thread("PTP RTE Run Thread") {
-			public void run() {
-				System.out.println("PTP RTE Run Thread - run()");
-				 
-				 */
-				OMPIRun();
-				/*
-				System.out.println("************ DONE RUNNING");
-			}
-		};
-		runThread.start();
-		*/
+		String[] args = new String[8];
+		args[0] = "pathToExecutable";
+		args[1] = jobRunConfig.getPathToExec();
+		args[2] = "numberOfProcesses";
+		args[3] = ""+jobRunConfig.getNumberOfProcesses()+"";
+		args[4] = "numberOfProcessesPerNode";
+		args[5] = ""+jobRunConfig.getNumberOfProcessesPerNode()+"";
+		args[6] = "firstNodeNumber";
+		args[7] = ""+jobRunConfig.getFirstNodeNumber()+"";
+		OMPIRun(args);
 		
 		/* replace this job# here with a real job# coming out of the RTE */
 		String s = new String("job0");
@@ -219,7 +266,17 @@ public class OMPIControlSystem implements IControlSystem {
 			return;
 		}
 		System.out.println("JAVA OMPI: shutdown() called");
+		
+		OMPIShutdown();
 		OMPIFinalize();
+		/*
+		if(orted_process != null) {
+			System.out.println("DESTROY ORTED!");
+			orted_process.destroy();
+			orted_process = null;
+			orted_process = null;
+		}
+		*/
 		listeners.clear();
 		listeners = null;
 	}

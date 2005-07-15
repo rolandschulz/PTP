@@ -20,32 +20,25 @@ package org.eclipse.ptp.ui.preferences;
 
 import java.io.File;
 
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.debug.internal.ui.SWTUtil;
 import org.eclipse.jface.preference.FieldEditor;
-import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.internal.core.CoreMessages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -169,9 +162,9 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 	private void loadSaved()
 	{
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		ortedFile = preferences.getString("ORTED_PATH");
+		ortedFile = preferences.getString(PreferenceConstants.ORTE_ORTED_PATH);
 		ortedPathText.setText(ortedFile);
-		ortedArgs = preferences.getString("ORTED_ARGS");
+		ortedArgs = preferences.getString(PreferenceConstants.ORTE_ORTED_ARGS);
 		if(ortedArgs.equals("")) ortedArgs = defaultOrtedArgs;
 		ortedArgsText.setText(ortedArgs);
 	}
@@ -203,8 +196,8 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		Preferences preferences = PTPCorePlugin.getDefault()
 				.getPluginPreferences();
 
-		preferences.setValue("ORTED_PATH", ortedFile);
-		preferences.setValue("ORTED_ARGS", ortedArgs);
+		preferences.setValue(PreferenceConstants.ORTE_ORTED_PATH, ortedFile);
+		preferences.setValue(PreferenceConstants.ORTE_ORTED_ARGS, ortedArgs);
 
 		PTPCorePlugin.getDefault().savePluginPreferences();
 
