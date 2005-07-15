@@ -20,8 +20,6 @@ package org.eclipse.ptp.ui.preferences;
 
 import java.io.File;
 
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.debug.internal.ui.SWTUtil;
 import org.eclipse.jface.preference.FieldEditor;
@@ -30,9 +28,9 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.internal.core.CoreMessages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -47,14 +45,13 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage, PreferenceConstants 
+public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage
 {
 	public static final String EMPTY_STRING = "";
 
@@ -70,7 +67,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	
 	private String defaultOutputDIR = "/tmp";
 
-	private int storeLine = DEF_STORE_LINE;
+	private int storeLine = PreferenceConstants.DEF_STORE_LINE;
 	
 	private int MSChoiceID = -1;
 	
@@ -146,7 +143,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		lineComposite.setLayout(new FillLayout());
 		lineComposite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 
-		storeLineField = new IntegerFieldEditor(STORE_LINE, CoreMessages
+		storeLineField = new IntegerFieldEditor(PreferenceConstants.STORE_LINE, CoreMessages
 				.getResourceString("PTPPreferencesPage.store_line_text"),
 				lineComposite);
 		storeLineField.setPropertyChangeListener(listener);
@@ -187,12 +184,12 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 			System.out.println("non-default prop["+i+"] = "+foo[i]);
 		}
 		
-		outputDIR = preferences.getString(OUTPUT_DIR);
+		outputDIR = preferences.getString(PreferenceConstants.OUTPUT_DIR);
 		if(outputDIR.equals("")) outputDIR = defaultOutputDIR;
 		if(outputDIR != null) outputDirText.setText(outputDIR);
-		storeLine = preferences.getInt(STORE_LINE);
+		storeLine = preferences.getInt(PreferenceConstants.STORE_LINE);
 		storeLineField.setStringValue(String.valueOf(storeLine));
-		MSChoiceID = preferences.getInt(MONITORING_SYSTEM_SELECTION);
+		MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
 		combo.select(MonitoringSystemChoices.getMSArrayIndexByID(MSChoiceID));
 		lastMSChoiceID = MSChoiceID;
 	}
@@ -225,9 +222,9 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		store();
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 
-		preferences.setValue(MONITORING_SYSTEM_SELECTION, MSChoiceID);
-		preferences.setValue(OUTPUT_DIR, outputDIR);
-		preferences.setValue(STORE_LINE, storeLine);
+		preferences.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSChoiceID);
+		preferences.setValue(PreferenceConstants.OUTPUT_DIR, outputDIR);
+		preferences.setValue(PreferenceConstants.STORE_LINE, storeLine);
 
 		PTPCorePlugin.getDefault().savePluginPreferences();
 
