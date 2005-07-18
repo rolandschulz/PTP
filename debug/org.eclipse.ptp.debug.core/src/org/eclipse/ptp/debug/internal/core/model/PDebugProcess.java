@@ -15,4 +15,8 @@ public class PDebugProcess extends PDebugElement implements IPDebugProcess {
 	public IPCDIDebugProcess getCDIProcess() {
 		return fPCDIProcess;
 	}
+	
+	public int getProcessNumber() {
+		return fPCDIProcess.getPProcessNumber();
+	}
 }
