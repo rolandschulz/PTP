@@ -15,4 +15,5 @@ package org.eclipse.ptp.debug.core.model;
  * C/C++ extension of <code>IThread</code>.
  */
 public interface IPDebugProcess extends IPFocus {
+	int getProcessNumber();
 }

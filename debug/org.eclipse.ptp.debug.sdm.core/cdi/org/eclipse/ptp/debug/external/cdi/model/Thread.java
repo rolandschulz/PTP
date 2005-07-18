@@ -117,7 +117,8 @@ public class Thread extends PTPObject implements ICDIThread {
 	}
 	
 	public String toString() {
-		String str = Integer.toString(id);
+		String str = Integer.toString(procNumber);
+		str += " - " + Integer.toString(id);
 		if (name != null) {
 			str += " " + name; //$NON-NLS-1$
 		}

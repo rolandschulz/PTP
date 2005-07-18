@@ -21,4 +21,6 @@ public interface IPCDIDebugProcess extends IPCDIDebugFocus {
 	public boolean hasThreads() throws DebugException;
 	
 	public IPProcess getPProcess();
+	
+	public int getPProcessNumber();
 }

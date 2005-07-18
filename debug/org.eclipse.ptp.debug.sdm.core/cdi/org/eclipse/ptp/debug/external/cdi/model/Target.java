@@ -75,7 +75,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		allDebugGroups = new HashMap();
 		
 		grpAllProcesses = new DebugProcessGroup("allProcesses");
-		IPProcess[] pProcesses = job.getProcesses();
+		IPProcess[] pProcesses = job.getSortedProcesses();
 		for (int i = 0; i < pProcesses.length; i++) {
 			grpAllProcesses.addProcess(new DebugProcess(pProcesses[i]));
 		}
@@ -261,8 +261,8 @@ public class Target extends SessionObject implements IPCDITarget {
 	
 	public ICDIThread[] getThreads(int procNumber) throws CDIException {
 		// Auto-generated method stub
-		System.out.println("Target.getThreads()");
-		if (currentThreads.length == 0) {
+		System.out.println("Target.getThreads(" + procNumber+ ")");
+		//if (currentThreads.length == 0) {
 			
 			SimThread[] threads = ((SimProcess) dSession.getDebugger().getProcess(procNumber)).getThreads();
 			
@@ -273,7 +273,7 @@ public class Target extends SessionObject implements IPCDITarget {
 			}
 			
 			currentThreadId = currentThreads[0].getId();
-		}
+		//}
 		return currentThreads;
 	}
 

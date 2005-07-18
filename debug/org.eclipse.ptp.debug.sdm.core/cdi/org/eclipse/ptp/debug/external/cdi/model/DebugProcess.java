@@ -33,4 +33,8 @@ public class DebugProcess implements IPCDIDebugProcess {
 		return pProcess.getElementName();
 	}
 
+	public int getPProcessNumber() {
+		return pProcess.getKeyNumber();
+	}
+
 }

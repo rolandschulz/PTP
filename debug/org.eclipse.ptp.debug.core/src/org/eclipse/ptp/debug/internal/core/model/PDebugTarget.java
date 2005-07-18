@@ -269,6 +269,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		iprocesses[0] = DebugPlugin.newProcess(getLaunch(), process, "Launch Label - " + procNum);
 
 		setProcess( iprocesses );
+		refreshThreads();
 	}
 
 	public void setCurrentFocus(String name) {
@@ -614,7 +615,11 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		ICDIThread[] cdiThreads = new ICDIThread[0];
 		ICDIThread currentCDIThread = null;
  		try {
-			cdiThreads = getCDITarget().getThreads();
+ 			int procNum = 0;
+ 			if (currentFocus instanceof PDebugProcess) {
+ 				procNum = ((PDebugProcess) currentFocus).getProcessNumber();
+ 			}
+			cdiThreads = getCDITarget().getThreads(procNum);
 			currentCDIThread = getCDITarget().getCurrentThread();
 		}
 		catch( CDIException e ) {
