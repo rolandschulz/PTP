@@ -50,8 +50,10 @@ public class ParallelTab extends PLaunchConfigurationTab {
     //protected Combo networkTypeCombo = null;
     
     protected IntegerFieldEditor numberOfProcessField = null;
+    /*
     protected IntegerFieldEditor numberOfProcessStartField = null;
     protected IntegerFieldEditor firstNodeNumberField = null;
+    */
 
     protected class WidgetListener extends SelectionAdapter implements IPropertyChangeListener {
 	    public void widgetSelected(SelectionEvent e) {
@@ -127,6 +129,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		networkTypeCombo.addSelectionListener(listener);
 		*/
         
+        /* disabled temporarily
         numberOfProcessStartField = new IntegerFieldEditor("numberOfProcessStar", CoreMessages.getResourceString("ParallelTab.Processes_Per_Node"), dynamicComp);
         numberOfProcessStartField.setValidRange(0, 5000);
         numberOfProcessStartField.setPropertyChangeListener(listener);
@@ -134,6 +137,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
         firstNodeNumberField = new IntegerFieldEditor("firstNodeNumber", CoreMessages.getResourceString("ParallelTab.First_Node_Number"), dynamicComp);
         firstNodeNumberField.setValidRange(0, 5000);
         firstNodeNumberField.setPropertyChangeListener(listener);
+        */
         
         createVerticalSpacer(parallelComp, 2);
     }
@@ -161,8 +165,8 @@ public class ParallelTab extends PLaunchConfigurationTab {
             numberOfProcessField.setStringValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES, EMPTY_STRING));
             //String type = configuration.getAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, EMPTY_STRING);
             //networkTypeCombo.select(type.equals(IPTPLaunchConfigurationConstants.P_TYPE)?0:1);            
-            numberOfProcessStartField.setStringValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE, EMPTY_STRING));
-            firstNodeNumberField.setStringValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER, EMPTY_STRING));
+            //numberOfProcessStartField.setStringValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE, EMPTY_STRING));
+            //firstNodeNumberField.setStringValue(configuration.getAttribute(IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER, EMPTY_STRING));
         } catch (CoreException e) {
             setErrorMessage(CoreMessages.getFormattedResourceString("CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION", e.getStatus().getMessage()));
         }
@@ -174,8 +178,8 @@ public class ParallelTab extends PLaunchConfigurationTab {
     public void performApply(ILaunchConfigurationWorkingCopy configuration) {
         configuration.setAttribute(IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES, getFieldContent(numberOfProcessField));
         //configuration.setAttribute(IPTPLaunchConfigurationConstants.NETWORK_TYPE, networkTypeCombo.getSelectionIndex()==0?IPTPLaunchConfigurationConstants.P_TYPE:IPTPLaunchConfigurationConstants.G_TYPE);
-        configuration.setAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE, getFieldContent(numberOfProcessStartField));
-        configuration.setAttribute(IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER, getFieldContent(firstNodeNumberField));
+        //configuration.setAttribute(IPTPLaunchConfigurationConstants.PROCESSES_PER_NODE, getFieldContent(numberOfProcessStartField));
+        //configuration.setAttribute(IPTPLaunchConfigurationConstants.FIRST_NODE_NUMBER, getFieldContent(firstNodeNumberField));
     }
     
     protected String getFieldContent(IntegerFieldEditor editorField) {
@@ -194,6 +198,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
             return false;
         }
 
+        /*
         if (getFieldContent(numberOfProcessStartField) != null && !numberOfProcessStartField.isValid()) {
             setErrorMessage(numberOfProcessStartField.getErrorMessage());
             return false;
@@ -203,6 +208,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
             setErrorMessage(firstNodeNumberField.getErrorMessage());
             return false;
         }
+        */
         
 		return true;
 	}    
