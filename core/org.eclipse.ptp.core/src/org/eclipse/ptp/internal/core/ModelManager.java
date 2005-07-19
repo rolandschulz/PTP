@@ -509,7 +509,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		fireState(STATE_ABORT);
 	}
 
-	protected IPJob myjob = null;
+	//protected IPJob myjob = null;
 
 	public void run(final ILaunch launch, File workingDirectory,
 			String[] envp, final JobRunConfiguration jobRunConfig, IProgressMonitor monitor)
@@ -533,6 +533,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		 * what if I had already run a job? Better clean that up first! this is
 		 * a hack - we should remove this one day
 		 */
+		/*
 		if (myjob != null) {
 			IPProcess[] procs = myjob.getProcesses();
 			for (int i = 0; i < procs.length; i++) {
@@ -543,6 +544,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			universe.removeChild(myjob);
 			myjob = null;
 		}
+		*/
 
 		String nejob = controlSystem.run(jobRunConfig);
 		if (nejob != null) {
@@ -555,7 +557,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			}
 			job = new PJob(universe, nejob, "" + (PJob.BASE_OFFSET + x) + "");
 
-			myjob = job;
+		//	myjob = job;
 			universe.addChild(job);
 			getProcsForNewJob(nejob, job);
 			fireState(STATE_RUN);

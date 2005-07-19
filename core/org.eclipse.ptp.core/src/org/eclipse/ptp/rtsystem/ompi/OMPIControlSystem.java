@@ -189,10 +189,6 @@ public class OMPIControlSystem implements IControlSystem {
 		}
 		a = knownJobs.toArray();
 		if(a == null) return null;
-		System.out.println("size of A = "+a.length);
-		for(int i=0; i<a.length; i++) {
-			System.out.println("a["+i+"] = "+a[i]);
-		}
 		if(a.length == 0) return null;
 		return (String[])a;
 	}
