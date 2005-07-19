@@ -18,109 +18,49 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.model.internal;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
+import org.eclipse.ptp.debug.ui.model.IContainer;
 import org.eclipse.ptp.debug.ui.model.IElement;
 import org.eclipse.ptp.debug.ui.model.IElementGroup;
 import org.eclipse.ptp.debug.ui.model.IGroupManager;
-
 
 /**
  * @author clement chu
  *
  */
-public class GroupManager implements IGroupManager {
-	private Map groups = new HashMap();
-	private IElementGroup[] sortedElementGroups = new IElementGroup[0];
-	
+public class GroupManager extends Parent implements IGroupManager {
 	public GroupManager() {
+		super(GROUP_ROOT_ID, false);
 		//create root 
-		addGroup(new ElementGroup(GROUP_ROOT_ID));
+		add(new ElementGroup(GROUP_ROOT_ID));
 	}
 	public IElementGroup getGroupRoot() {
 		if (size() == 0)
-			addGroup(new ElementGroup(GROUP_ROOT_ID));
+			add(new ElementGroup(GROUP_ROOT_ID));
 		
-		return getGroup(GROUP_ROOT_ID);
-	}
-	public void addGroup(IElementGroup aGroup) {
-		groups.put(aGroup.getID(), aGroup);
-	}
-	public void removeGroup(IElementGroup aGroup) {
-		aGroup.clearAll();
-		groups.remove(aGroup.getID());
-	}
-	public void removeGroup(String id) {
-		((IElementGroup)groups.remove(id)).clearAll();
-	}
-	public IElementGroup[] getGroups() {
-		return (IElementGroup[])groups.values().toArray(new IElementGroup[size()]);
-	}
-	public IElementGroup[] getSortedGroups() {
-		if (sortedElementGroups.length != size())
-			refresh();
-		
-		return sortedElementGroups;
-	}
-	public IElementGroup getGroup(String id) {
-		return (IElementGroup)groups.get(id);
-	}
-	public IElementGroup getGroup(int index) {
-		return getSortedGroups()[index];
-	}
-	public String getGroupID(int index) {
-		return getGroup(index).getID();
-	}	
-	public int size() {
-		return groups.size();
+		return (IElementGroup)get(GROUP_ROOT_ID);
 	}
 	public void clearAll() {
-		for (Iterator i=groups.values().iterator(); i.hasNext();) {
-			((IElementGroup)i.next()).clearAll();
+		for (Iterator i=elementMap.values().iterator(); i.hasNext();) {
+			((IContainer)i.next()).clearAll();
 		}
-		groups.clear();
-		sortedElementGroups = new IElementGroup[0];
+		super.clearAll();
 	}
-	public void refresh() {
-		IElementGroup[] sortingElementGroups = getGroups();
-		GroupManager.sort(sortingElementGroups);
-		sortedElementGroups = sortingElementGroups;
+	
+	public IElement[] get() {
+		return (IElement[])getGroups();
+	}		
+	public IElementGroup[] getSortedGroups() {
+		return (IElementGroup[])getSorted();
 	}
-
-	private static void quickSort(IElement element[], int low, int high) {
-		int lo = low;
-		int hi = high;
-		int mid;
-		if (high > low) {
-			mid = Integer.parseInt(element[(low + high) / 2].getID());
-			while (lo <= hi) {
-				while ((lo < high) && (Integer.parseInt(element[lo].getID()) < mid))
-					++lo;
-				while ((hi > low) && (Integer.parseInt(element[hi].getID()) > mid))
-					--hi;
-				if (lo <= hi) {
-					swap(element, lo, hi);
-					++lo;
-					--hi;
-				}
-			}
-			if (low < hi)
-				quickSort(element, low, hi);
-			if (lo < high)
-				quickSort(element, lo, high);
-		}
+	public IElementGroup[] getGroups() {
+		return (IElementGroup[])elementMap.values().toArray(new IElementGroup[elementMap.size()]);
 	}
-
-	private static void swap(IElement element[], int i, int j) {
-		IElement tempElement;
-		tempElement = element[i];
-		element[i] = element[j];
-		element[j] = tempElement;
+	public IElementGroup getGroup(String id) {
+		return (IElementGroup)get(id);
 	}
-
-	public static void sort(IElement element[]) {
-		quickSort(element, 0, element.length - 1);
+	public IElementGroup getGroup(int index) {
+		return (IElementGroup)get(index);
 	}
 }

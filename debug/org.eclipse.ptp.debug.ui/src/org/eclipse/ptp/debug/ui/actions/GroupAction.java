@@ -19,7 +19,7 @@
 package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.jface.action.IAction;
-import org.eclipse.ptp.debug.ui.model.internal.Element;
+import org.eclipse.ptp.debug.ui.model.IElement;
 import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 /**
@@ -36,16 +36,16 @@ public class GroupAction extends ParallelDebugAction {
 		this.setId(id);
 	}
 
-	public void run(Element[] elements) {
-	}
+	public void run(IElement[] elements) {}
+	
 	public void run() {
 		if (debugView instanceof DebugParallelProcessView) {
 			DebugParallelProcessView view = (DebugParallelProcessView)debugView;
-			if (!view.getCurrentGroupID().equals(getId())) {
-				view.selectGroup(getId());
-				view.updateMenu(view.getViewSite().getActionBars().getMenuManager());
-				view.redraw();
-			}
+			view.selectGroup(getId());
+			//deselect all elements each time changed the group
+			view.getCurrentGroup().setAllSelect(false);
+			view.updateMenu(view.getViewSite().getActionBars().getMenuManager());
+			view.redraw();
 		}
 	}	
 }
