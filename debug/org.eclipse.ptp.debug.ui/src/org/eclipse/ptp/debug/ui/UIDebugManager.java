@@ -59,9 +59,7 @@ public class UIDebugManager {
 	
 	private void addToGroup(IElement[] elements, IElementGroup group) {
 		for (int i=0; i<elements.length; i++) {
-			IElement newElement = elements[i].cloneElement();
-			newElement.setSelected(false);
-			group.add(newElement);
+			group.add(elements[i].cloneElement());
 		}
 	}
 	public void addToGroup(IElement[] elements, String groupID) {

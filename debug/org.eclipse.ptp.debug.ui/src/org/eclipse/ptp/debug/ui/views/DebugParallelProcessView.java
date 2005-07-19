@@ -450,13 +450,6 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		}	
 	}
 	
-	public void registerSelectedElements() {
-		IElement[] elements = cur_element_group.getSelectedElements();
-		//register selected processes into Debug View
-		//uiDebugManager.registerElements(elements);
-		UIDialog.showDialog(getViewSite().getShell(), "Register to Debug View", "There are total " + elements.length + " selected element(s) should be registered to Debug View", SWT.ICON_INFORMATION);
-	}
-	
 	protected void clearMouseSetting() {
 		isDoubleClick = false;
 		drag_x = 0;
@@ -797,6 +790,19 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 			}
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
+	 */
+	public void dispose() {
+		super.dispose();
+	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
+	 */
+	public void setFocus() {
+		drawComp.setFocus();
+	}
+	
 	public ISelection getSelection() {
 		return new StructuredSelection(cur_element_group.getSelectedElements());
 	}
@@ -837,20 +843,14 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		});
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
-	 */
-	public void dispose() {
-		super.dispose();
+	//FIXME
+	public void registerSelectedElements() {
+		IElement[] elements = cur_element_group.getSelectedElements();
+		//register selected processes into Debug View
+		//uiDebugManager.registerElements(elements);
+		UIDialog.showDialog(getViewSite().getShell(), "Register to Debug View", "There are total " + elements.length + " selected element(s) should be registered to Debug View", SWT.ICON_INFORMATION);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
-	 */
-	public void setFocus() {
-		drawComp.setFocus();
-	}
-	
+		
 	/* FIXME
 	 * Should implemented IParallelModelListener
 	 */

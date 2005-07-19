@@ -115,8 +115,9 @@ public class CreateGroupAction extends ParallelDebugAction {
 			view.getUIDebugManger().addToGroup(elements, groupID);
 		
 		view.selectGroup(groupID);
-		view.redraw();
+		view.getCurrentGroup().setAllSelect(false);
 		view.updateMenu(manager);
+		view.redraw();
 	}
 	
 	private class InternalGroupAction extends ParallelDebugAction {
