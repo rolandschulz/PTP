@@ -32,6 +32,7 @@ import org.eclipse.ptp.debug.ui.model.IElement;
 import org.eclipse.ptp.debug.ui.model.IElementGroup;
 import org.eclipse.ptp.debug.ui.model.IGroupManager;
 import org.eclipse.ptp.debug.ui.model.internal.Element;
+import org.eclipse.ptp.debug.ui.model.internal.ElementGroup;
 import org.eclipse.ptp.debug.ui.model.internal.GroupManager;
 
 /**
@@ -46,16 +47,42 @@ public class UIDebugManager {
 		groupManager = new GroupManager();
 		modelManager = PTPCorePlugin.getDefault().getModelManager();
 	}
-	
+	public void shutdown() {
+		groupManager.clearAll();
+	}	
 	public IGroupManager getGroupManager() {
 		return groupManager;
 	}	
-	public void shutdown() {
-		groupManager.clearAll();
-	}
 	public IModelManager getModelManager() {
 		return modelManager;
 	}
+	
+	private void addToGroup(IElement[] elements, IElementGroup group) {
+		for (int i=0; i<elements.length; i++) {
+			IElement newElement = elements[i].cloneElement();
+			newElement.setSelected(false);
+			group.add(newElement);
+		}
+	}
+	public void addToGroup(IElement[] elements, String groupID) {
+		addToGroup(elements, groupManager.getGroup(groupID));
+	}
+	public String createGroup(IElement[] elements) {
+		IElementGroup group = new ElementGroup(true);
+		addToGroup(elements, group);
+		groupManager.add(group);
+		return group.getID();
+	}
+	public void removeGroup(String groupID) {
+		groupManager.remove(groupID);
+	}
+	public void removeFromGroup(IElement[] elements, String groupID) {
+		IElementGroup group = groupManager.getGroup(groupID);
+		for (int i=0; i<elements.length; i++) {
+			group.remove(elements[i]);
+		}
+	}	
+	
 	public void registerElements(ILaunch launch, PDebugTarget target, IElement[] elements) {
 		for (int i=0; i<elements.length; i++) {
 			target.setCurrentFocus(elements[i].getIDNum());
@@ -81,7 +108,7 @@ public class UIDebugManager {
 	}
 	
 	public IPProcess findProcess(String id) {
-		return modelManager.getUniverse().findProcessByName(getProcessName(id));		
+		return modelManager.getUniverse().findProcessByName(getProcessName(id));
 	}
 	
 	public void initialProcess() {
@@ -94,10 +121,10 @@ public class UIDebugManager {
 			for (int i=0; i<total_jobs; i++) {
 				IPProcess[] processes = jobs[i].getProcesses();
 				for (int j=0; j<processes.length; j++) {
-					group.addElement(new Element(processes[j].getKeyString()));
+					group.add(new Element(processes[j].getKeyString()));
 				}
 			}
-			groupManager.addGroup(group);
+			groupManager.add(group);
 		}		
 	}
 	

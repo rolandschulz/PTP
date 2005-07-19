@@ -19,11 +19,9 @@
 package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.UIDialog;
-import org.eclipse.ptp.debug.ui.model.internal.Element;
+import org.eclipse.ptp.debug.ui.model.IElement;
 import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
-import org.eclipse.swt.SWT;
 /**
  * @author clement chu
  *
@@ -37,8 +35,7 @@ public class RegisterAction extends ParallelDebugAction {
 	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_REGISTER_NORMAL);
 	}
 
-	public void run(Element[] elements) {
-	}
+	public void run(IElement[] elements) {}
 	public void run() {
 		if (debugView instanceof DebugParallelProcessView) {
 			DebugParallelProcessView view = (DebugParallelProcessView)debugView;

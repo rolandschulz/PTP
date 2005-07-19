@@ -18,9 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.views;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -42,9 +40,9 @@ import org.eclipse.ptp.debug.ui.ImageUtil;
 import org.eclipse.ptp.debug.ui.UIDialog;
 import org.eclipse.ptp.debug.ui.actions.CreateGroupAction;
 import org.eclipse.ptp.debug.ui.actions.DeleteGroupAction;
-import org.eclipse.ptp.debug.ui.actions.RegisterAction;
 import org.eclipse.ptp.debug.ui.actions.GroupAction;
 import org.eclipse.ptp.debug.ui.actions.ParallelDebugAction;
+import org.eclipse.ptp.debug.ui.actions.RegisterAction;
 import org.eclipse.ptp.debug.ui.actions.ResumeAction;
 import org.eclipse.ptp.debug.ui.actions.SuspendAction;
 import org.eclipse.ptp.debug.ui.actions.TerminateAction;
@@ -91,7 +89,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 	//protected ParallelDebugAction stepIntoAction = null;
 	//protected ParallelDebugAction stepOverAction = null;
 	//protected ParallelDebugAction stepReturnAction = null;
-	protected ParallelDebugAction deselectAllAction = null;
+	protected ParallelDebugAction registerAction = null;
 	protected ParallelDebugAction createGroupAction = null;
 	protected ParallelDebugAction deleteGroupAction = null;
 
@@ -186,6 +184,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 	public void createPartControl(Composite parent) {
 		createElementView(parent);
 		createToolBarActions();
+		
 		initialView();
 		createContextMenu();
 	}
@@ -209,16 +208,17 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
     	manager.add(suspendAction);
     	manager.add(terminateAction);
     	manager.add(new Separator());
-    	manager.add(deselectAllAction);
+    	manager.add(registerAction);
     	manager.add(new Separator());
 		//manager.add(stepIntoAction);
 		//manager.add(stepOverAction);
 		//manager.add(stepReturnAction);
 		//manager.add(new Separator());
-    	manager.add(createGroupAction);
-    	manager.add(deleteGroupAction);
-
-    	manager.add(new Separator());
+    	
+    	//manager.add(createGroupAction);
+    	//manager.add(deleteGroupAction);
+    	//manager.add(new Separator());
+    	
 		IElementGroup[] groups = groupManager.getSortedGroups();
 		for (int i=0; i<groups.length; i++) {
 			IAction action = new GroupAction(groups[i].getID(), this);
@@ -242,7 +242,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 				groupManager.clearAll();
 				IElementGroup group = groupManager.getGroupRoot();
 				for (int j=0; j<processes.length; j++) {
-					group.addElement(new Element(processes[j].getID()));
+					group.add(new Element(processes[j].getID()));
 				}
 			}
 			//uiDebugManager.initialProcess();
@@ -283,7 +283,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 	}
 	
 	public void enableDeselectAllAction(boolean enable) {
-		deselectAllAction.setEnabled(enable);		
+		registerAction.setEnabled(enable);		
 	}
 	public void enableDeleteGroupAction(boolean enable) {
 		deleteGroupAction.setEnabled(enable);		
@@ -302,7 +302,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		//stepIntoAction = new StepIntoAction(this);
 		//stepOverAction = new StepOverAction(this);
 		//stepReturnAction = new StepReturnAction(this);
-		deselectAllAction = new RegisterAction(this);
+		registerAction = new RegisterAction(this);
 		createGroupAction = new CreateGroupAction(this);
 		deleteGroupAction = new DeleteGroupAction(this);
 		
@@ -311,7 +311,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		toolBarMgr.add(suspendAction);
 		toolBarMgr.add(terminateAction);
 		toolBarMgr.add(new Separator());
-		toolBarMgr.add(deselectAllAction);
+		toolBarMgr.add(registerAction);
 		toolBarMgr.add(new Separator());
 		//toolBarMgr.add(stepIntoAction);
 		//toolBarMgr.add(stepOverAction);
@@ -395,10 +395,14 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 				break;
 			case SWT.DragDetect:
 				//System.out.println("Draf("+mx+":"+my+")");
+				if (keyCode == SWT.SHIFT)
+					break;
+				
 				drag_x = mx;
 				drag_y = my;
 				break;
 			case SWT.MouseMove:
+				//no drawing selection area if the shift key is pressed
 				if (isDragOnView(mx, my)) {
 					if (selectionShell == null) {
 						selectionShell = new Shell(drawComp.getShell(), SWT.NO_TRIM | SWT.NO_REDRAW_RESIZE| SWT.ON_TOP);
@@ -594,7 +598,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		if (keyCode != SWT.SHIFT)
 			fisrt_selected_element_id = cur_element_num;
 		else {
-			if (cur_element_num > -1) {
+			if (fisrt_selected_element_id > -1 && cur_element_num > -1) {
 				int start_element_id = fisrt_selected_element_id>cur_element_num?cur_element_num:fisrt_selected_element_id;
 				int end_element_id = (start_element_id==cur_element_num?fisrt_selected_element_id:cur_element_num) + 1;
 				
@@ -618,7 +622,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 			selectElements(element_num);
 			return;
 		}
-
+		
 		//switch s_x and e_x or s_y and e_y
 		int start_x = s_x;
 		int start_y = s_y;
@@ -664,8 +668,8 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 					break;
 
 				//store the first selected element id in this selection area
-				if (row_count == 0 && col_count == 0)
-					selectElements(num);
+				//if (row_count == 0 && col_count == 0)
+				//selectElements(num);
 				
 				elements[num].setSelected(true);
 			}
@@ -832,9 +836,6 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 			}
 		});
 	}
-	public IGroupManager getGroupManager() {
-		return groupManager;
-	}		
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPart#dispose()

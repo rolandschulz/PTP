@@ -23,19 +23,15 @@ package org.eclipse.ptp.debug.ui.model;
  * @author clement chu
  *
  */
-public interface IElementGroup extends IElement {
-	public IElement[] getElements();
-	public IElement[] getSortedElements();
+public interface IElementGroup extends IContainer {
 	public IElement[] getSelectedElements();
-	public void addElement(IElement element);
-	public void removeElement(IElement element);
-	public IElement getElement(String id);
-	public IElement getElement(int index);
-	public String getElementID(int index);
 	public void removeAllSelected();
 	public void select(int index);
 	public void select(int index, boolean selectIt);
 	public void setAllSelect(boolean select);	
-	public void clearAll();
-	public int size();
+
+	public IElement[] getSortedElements();
+	public IElement[] getElements();
+	public IElement getElement(String id);
+	public IElement getElement(int index);
 }

@@ -19,10 +19,8 @@
 package org.eclipse.ptp.debug.ui.model.internal;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.ptp.debug.ui.model.IElement;
 import org.eclipse.ptp.debug.ui.model.IElementGroup;
@@ -30,9 +28,7 @@ import org.eclipse.ptp.debug.ui.model.IElementGroup;
  * @author clement chu
  *
  */
-public class ElementGroup extends Element implements IElementGroup {
-	private Map elements = new HashMap();
-	private IElement[] sortedElements = new IElement[0];
+public class ElementGroup extends Parent implements IElementGroup {
 	private static int group_counter = 1;
 	
 	public ElementGroup(boolean selected) {
@@ -50,41 +46,17 @@ public class ElementGroup extends Element implements IElementGroup {
 	public ElementGroup(String id, boolean selected) {
 		super(id, selected);
 	}
-	public IElement[] getElements() {
-		return (IElement[])elements.values().toArray(new IElement[elements.size()]);
-	}	
-	public IElement[] getSortedElements() {
-		if (sortedElements.length != size())
-			refresh();
-		
-		return sortedElements;		
-	}
 	public IElement[] getSelectedElements() {
 		List selectedElements = new ArrayList();
-		for (Iterator i=elements.values().iterator(); i.hasNext();) {
+		for (Iterator i=elementMap.values().iterator(); i.hasNext();) {
 			IElement element = (IElement)i.next();
 			if (element.isSelected())
 				selectedElements.add(element);
 		}
 		return (IElement[])selectedElements.toArray(new IElement[selectedElements.size()]);
 	}
-	public void addElement(IElement element) {
-		elements.put(element.getID(), element);
-	}
-	public void removeElement(IElement element) {
-		elements.remove(element.getID());
-	}
-	public IElement getElement(String id) {
-		return (IElement)elements.get(id);
-	}
-	public IElement getElement(int index) {
-		return getSortedElements()[index];
-	}
-	public String getElementID(int index) {
-		return getElement(index).getID();
-	}
 	public void removeAllSelected() {
-		for (Iterator i=elements.values().iterator(); i.hasNext();) {
+		for (Iterator i=elementMap.values().iterator(); i.hasNext();) {
 			IElement element = (IElement)i.next();
 			if (element.isSelected())
 				element.setSelected(false);
@@ -99,21 +71,24 @@ public class ElementGroup extends Element implements IElementGroup {
 		element.setSelected(!element.isSelected());
 	}
 	public void setAllSelect(boolean selectIt) {
-		for (Iterator i=elements.values().iterator(); i.hasNext();) {
+		for (Iterator i=elementMap.values().iterator(); i.hasNext();) {
 			((IElement)i.next()).setSelected(selectIt);
 		}
 	}
 	
-	public void clearAll() {
-		elements.clear();
-		sortedElements = new IElement[0];
+	public IElement[] get() {
+		return getElements();
 	}
-	public int size() {
-		return elements.size();
+	public IElement[] getSortedElements() {
+		return getSorted();		
 	}
-	public void refresh() {
-		IElement[] sortingElements = getElements();
-		GroupManager.sort(sortingElements);
-		sortedElements = sortingElements;
+	public IElement[] getElements() {
+		return (IElement[])elementMap.values().toArray(new IElement[elementMap.size()]);
+	}
+	public IElement getElement(String id) {
+		return get(id);
+	}
+	public IElement getElement(int index) {
+		return get(index);
 	}
 }

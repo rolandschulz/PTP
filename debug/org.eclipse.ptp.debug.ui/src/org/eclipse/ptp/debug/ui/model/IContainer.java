@@ -17,18 +17,20 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.model;
-
-
 /**
  * @author clement chu
  *
  */
-public interface IGroupManager extends IContainer {
-	public static final String GROUP_ROOT_ID = "0";	
-	public IElementGroup getGroupRoot();
-	
-	public IElementGroup[] getSortedGroups();
-	public IElementGroup[] getGroups();
-	public IElementGroup getGroup(String id);
-	public IElementGroup getGroup(int index);
+public interface IContainer extends IElement {
+	public String getElementID(int index);
+	public void add(IElement element);
+	public void remove(IElement element);
+	public void remove(String id);
+	public void clearAll();
+	public int size();	
+
+	public IElement[] get();
+	public IElement[] getSorted();
+	public IElement get(String id);
+	public IElement get(int index);
 }

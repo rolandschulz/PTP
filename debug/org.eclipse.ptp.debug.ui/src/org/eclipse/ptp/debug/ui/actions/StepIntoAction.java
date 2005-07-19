@@ -19,7 +19,7 @@
 package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.model.internal.Element;
+import org.eclipse.ptp.debug.ui.model.IElement;
 import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
 
 /**
@@ -35,9 +35,7 @@ public class StepIntoAction extends StepAction {
 	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_STEPINTO_NORMAL);
 	}
 
-	public void run(Element[] elements) {
+	public void run(IElement[] elements) {
 		// TODO Auto-generated method stub
-
 	}
-
 }
