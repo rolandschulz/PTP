@@ -27,8 +27,6 @@ public interface IPDebugTarget extends ICDebugTarget {
 	
 	public IThread[] getProcessThreads(IProcess process) throws DebugException;
 	
-	public IPCDIDebugProcessGroup newProcessGroup(String name);
-	public void delProcessGroup(String name);
 	public void setCurrentFocus(int procNum);
 	public void setCurrentFocus(String name);
 }

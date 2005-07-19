@@ -120,6 +120,7 @@ import org.eclipse.ptp.debug.core.model.IPFocus;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
 import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
+import org.eclipse.ptp.debug.internal.core.PGroupManager;
 import org.eclipse.ptp.debug.internal.core.PMemoryBlockRetrievalExtension;
 import org.eclipse.ptp.debug.internal.core.PRegisterManager;
 import org.eclipse.ptp.debug.internal.core.PSignalManager;
@@ -179,6 +180,11 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	 * The signal manager for this target.
 	 */
 	private PSignalManager fSignalManager;
+
+	/**
+	 * The group manager for this target.
+	 */
+	private PGroupManager fGroupManager;
 
 	/**
 	 * The register manager for this target.
@@ -244,6 +250,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		createDisassembly();
 		setModuleManager( new CModuleManager( this ) );
 		setSignalManager( new PSignalManager( this ) );
+		setGroupManager( new PGroupManager( this ) );
 		setRegisterManager( new PRegisterManager( this ) );
 		setBreakpointManager( new PBreakpointManager( this ) );
 		setGlobalVariableManager( new PGlobalVariableManager( this ) );
@@ -277,7 +284,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		currentFocus = pProcGrp;
 	}
 	
-	public IPCDIDebugProcessGroup newProcessGroup(String name) {
+/*	public IPCDIDebugProcessGroup newProcessGroup(String name) {
 		return getCDITarget().newProcessGroup(name);
 	}
 	
@@ -285,6 +292,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		getCDITarget().delProcessGroup(name);
 	}
 	
+*/	
 	protected void initialize() {
 		setCurrentFocus(0);
 		initializeSourceLookupPath();
@@ -864,6 +872,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			return getBreakpointManager();
 		if ( adapter.equals( PSignalManager.class ) )
 			return getSignalManager();
+		if ( adapter.equals( PGroupManager.class ) )
+			return getGroupManager();
 		if ( adapter.equals( PRegisterManager.class ) )
 			return getRegisterManager();
 		if ( adapter.equals( ICGlobalVariableManager.class ) )
@@ -1035,6 +1045,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		disposeGlobalVariableManager();
 		disposeModuleManager();
 		disposeSignalManager();
+		disposeGroupManager();
 		saveRegisterGroups();
 		disposeRegisterManager();
 		saveMemoryBlocks();
@@ -1440,6 +1451,18 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 
 	protected void disposeSignalManager() {
 		fSignalManager.dispose();
+	}
+
+	protected void setGroupManager( PGroupManager gm ) {
+		fGroupManager = gm;
+	}
+
+	protected PGroupManager getGroupManager() {
+		return fGroupManager;
+	}
+
+	protected void disposeGroupManager() {
+		fGroupManager.dispose();
 	}
 
 	protected void saveRegisterGroups() {

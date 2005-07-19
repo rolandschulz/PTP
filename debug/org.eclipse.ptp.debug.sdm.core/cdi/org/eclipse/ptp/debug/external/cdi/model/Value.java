@@ -29,13 +29,13 @@ public class Value extends PTPObject implements ICDIValue {
 	public String getTypeName() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Value.getTypeName()");
-		return null;
+		return variable.getTypeName();
 	}
 
 	public ICDIType getType() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Value.getType()");
-		return null;
+		return variable.getType();
 	}
 
 	public String getValueString() throws CDIException {
