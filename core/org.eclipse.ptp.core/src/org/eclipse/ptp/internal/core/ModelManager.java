@@ -169,20 +169,21 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			}
 		}
 		ne = controlSystem.getJobs();
-		for (int i = 0; ne != null && i < ne.length; i++) {
-			PJob job;
+		if(ne != null) {
+			for (int i = 0; i < ne.length; i++) {
+				PJob job;
 
-			System.out.println("JOB: " + ne[i]);
+				System.out.println("JOB: " + ne[i]);
 
-			int x = 0;
-			try {
-				x = (new Integer(ne[i].substring(3))).intValue();
-			} catch (NumberFormatException e) {
+				int x = 0;
+				try {
+					x = (new Integer(ne[i].substring(3))).intValue();
+				} catch (NumberFormatException e) {
+				}
+				job = new PJob(universe, ne[i], "" + (PJob.BASE_OFFSET + x) + "");
+				universe.addChild(job);
+				getProcsForNewJob(ne[i], job);
 			}
-			job = new PJob(universe, ne[i], "" + (PJob.BASE_OFFSET + x) + "");
-			universe.addChild(job);
-			getProcsForNewJob(ne[i], job);
-
 		}
 
 		monitoringSystem.addRuntimeListener(this);
@@ -230,20 +231,21 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			}
 		}
 		ne = controlSystem.getJobs();
-		for (int i = 0; i < ne.length; i++) {
-			PJob job;
+		if(ne != null) {
+			for (int i = 0; i < ne.length; i++) {
+				PJob job;
 
-			System.out.println("JOB: " + ne[i]);
+				System.out.println("JOB: " + ne[i]);
 
-			int x = 0;
-			try {
-				x = (new Integer(ne[i].substring(3))).intValue();
-			} catch (NumberFormatException e) {
+				int x = 0;
+				try {
+					x = (new Integer(ne[i].substring(3))).intValue();
+				} catch (NumberFormatException e) {
+				}
+				job = new PJob(universe, ne[i], "" + (PJob.BASE_OFFSET + x) + "");
+				universe.addChild(job);
+				getProcsForNewJob(ne[i], job);
 			}
-			job = new PJob(universe, ne[i], "" + (PJob.BASE_OFFSET + x) + "");
-			universe.addChild(job);
-			getProcsForNewJob(ne[i], job);
-
 		}
 
 		monitoringSystem.addRuntimeListener(this);

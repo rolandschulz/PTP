@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.Vector;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.IPProcess;
@@ -40,6 +41,7 @@ import org.eclipse.ptp.rtsystem.RuntimeEvent;
 
 public class OMPIControlSystem implements IControlSystem {
 	private Process orted_process = null;
+	private Vector knownJobs = null;
 	
 	protected List listeners = new ArrayList(2);
 
@@ -53,7 +55,7 @@ public class OMPIControlSystem implements IControlSystem {
 	public native void OMPIShutdown();
 	public native void OMPIFinalize();
 	public native void OMPIProgress();
-	public native void OMPIRun(String[] args);
+	public native int OMPIRun(String[] args);
 	
 	private static int failed_load = 0;
 	
@@ -88,6 +90,8 @@ public class OMPIControlSystem implements IControlSystem {
 			return;
 		}
 		
+		knownJobs = new Vector();
+		
 		String orted_args = preferences.getString(PreferenceConstants.ORTE_ORTED_ARGS);
 		String orted_full = orted_path + " " + orted_args;
 		System.out.println("ORTED = "+orted_full);
@@ -98,7 +102,7 @@ public class OMPIControlSystem implements IControlSystem {
 		String[] split_path = orted_path.split("\\/");
 		for(int x=0; x<split_path.length; x++)
 			System.out.println("["+x+"] = "+split_path[x]);
-		OMPIStartDaemon(orted_path, split_path[split_path.length - 1], split_args);
+		//OMPIStartDaemon(orted_path, split_path[split_path.length - 1], split_args);
 		//OMPIStartORTEd(orted_full);
 		
 		int rc = OMPIInit();
@@ -144,6 +148,7 @@ public class OMPIControlSystem implements IControlSystem {
 	
 	/* returns the new job name that it started - unique */
 	public String run(JobRunConfiguration jobRunConfig) {
+		int jobID = -1;
 		System.out.println("JAVA OMPI: run() with args:\n"+jobRunConfig.toString());
 
 		String[] args = new String[8];
@@ -155,11 +160,19 @@ public class OMPIControlSystem implements IControlSystem {
 		args[5] = ""+jobRunConfig.getNumberOfProcessesPerNode()+"";
 		args[6] = "firstNodeNumber";
 		args[7] = ""+jobRunConfig.getFirstNodeNumber()+"";
-		OMPIRun(args);
-		
-		/* replace this job# here with a real job# coming out of the RTE */
-		String s = new String("job0");
-		return s;
+		jobID = OMPIRun(args);
+		if(jobID == -1) {
+			/* error occurred */
+			String error_msg = OMPIGetError();
+			CoreUtils.showErrorDialog("OMPI Parallel Run/Spawn Error", error_msg, null);
+			return null;
+		}
+		else {
+			/* the job creation worked - we have a new job, tell the caller the new job name */
+			String s = new String("job"+jobID);
+			knownJobs.addElement(s);
+			return s;
+		}
 	}
 
 	public void abortJob(String jobID) {
@@ -167,11 +180,21 @@ public class OMPIControlSystem implements IControlSystem {
 	}
 	
 	public String[] getJobs() {
+		Object a[];
 		System.out.println("JAVA OMPI: getJobs() called");
 
-		String[] ne = new String[1];
-		ne[0] = new String("job0");
-		return ne;
+		if(knownJobs == null) {
+			System.out.println("NULL JOBS!");
+			return null;
+		}
+		a = knownJobs.toArray();
+		if(a == null) return null;
+		System.out.println("size of A = "+a.length);
+		for(int i=0; i<a.length; i++) {
+			System.out.println("a["+i+"] = "+a[i]);
+		}
+		if(a.length == 0) return null;
+		return (String[])a;
 	}
 
 	/* get the processes pertaining to a certain job */
@@ -267,7 +290,7 @@ public class OMPIControlSystem implements IControlSystem {
 		}
 		System.out.println("JAVA OMPI: shutdown() called");
 		
-		OMPIShutdown();
+		//OMPIShutdown();
 		OMPIFinalize();
 		/*
 		if(orted_process != null) {
