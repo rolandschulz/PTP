@@ -87,7 +87,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 		IParallelModelListener, ISelectionProvider {
 	public static ParallelNodeStatusView instance = null;
 
-	private TerminateAllAction terminateAllAction = null;
+	//private TerminateAllAction terminateAllAction = null;
 
 	// private SearchAction searchAction = null;
 	private ShowAllNodesAction showAllNodesAction = null;
@@ -853,7 +853,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 		boolean isRunning = launchManager.getCurrentState() == IModelManager.STATE_RUN;
 		// System.out.println("updateButton - isMPIRunning? "+isRuning);
 
-		terminateAllAction.setEnabled(isRunning);
+		//terminateAllAction.setEnabled(isRunning);
 
 		// searchAction.setEnabled(isRuning);
 		showAllNodesAction.setEnabled(isRunning);
@@ -877,7 +877,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 	}
 
 	protected void createAction() {
-		terminateAllAction = new TerminateAllAction(this);
+		//terminateAllAction = new TerminateAllAction(this);
 		// searchAction = new SearchAction(this);
 		showAllNodesAction = new ShowAllNodesAction(this);
 		showMyAllocNodesAction = new ShowMyAllocatedNodesAction(this);
@@ -901,8 +901,8 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 		toolbarManager.add(showMyUsedNodesAction);
 		// toolbarManager.add(showProcessesAction);
 
-		toolbarManager.add(new Separator());
-		toolbarManager.add(terminateAllAction);
+		//toolbarManager.add(new Separator());
+		//toolbarManager.add(terminateAllAction);
 	}
 
 	public Object[] getElements(Object parent) {

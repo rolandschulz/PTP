@@ -500,7 +500,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				DateFormat.MEDIUM).format(new Date(System.currentTimeMillis()));
 		return MessageFormat.format(format, new String[] { name, timestamp });
 	}
-
+	
 	public synchronized void abortJob(String jobName) throws CoreException {
 		controlSystem.abortJob(jobName);
 		System.out
