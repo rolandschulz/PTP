@@ -102,7 +102,7 @@ public class OMPIControlSystem implements IControlSystem {
 		String[] split_path = orted_path.split("\\/");
 		for(int x=0; x<split_path.length; x++)
 			System.out.println("["+x+"] = "+split_path[x]);
-		//OMPIStartDaemon(orted_path, split_path[split_path.length - 1], split_args);
+		OMPIStartDaemon(orted_path, split_path[split_path.length - 1], split_args);
 		//OMPIStartORTEd(orted_full);
 		
 		int rc = OMPIInit();
@@ -176,7 +176,11 @@ public class OMPIControlSystem implements IControlSystem {
 	}
 
 	public void abortJob(String jobID) {
-		System.out.println("JAVA OMPI: abortJob() with args: " + jobID);
+		if(jobID != null)
+			System.out.println("JAVA OMPI: abortJob() with args: " + jobID);
+		else {
+			System.err.println("ERROR: Tried to abort a null job.");
+		}
 	}
 	
 	public String[] getJobs() {

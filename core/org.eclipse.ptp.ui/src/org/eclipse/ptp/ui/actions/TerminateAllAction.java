@@ -22,11 +22,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.UIMessage;
+import org.eclipse.ptp.ui.views.ParallelJobsView;
 import org.eclipse.ui.part.ViewPart;
 
 public class TerminateAllAction extends ParallelAction {
+	protected ViewPart vp;
+	
 	public TerminateAllAction(ViewPart viewPart) {
 	    super(viewPart);
+	    this.vp = viewPart;
 	}
 	
 	public TerminateAllAction(ViewPart viewPart, boolean isEnable) {
@@ -45,8 +49,13 @@ public class TerminateAllAction extends ParallelAction {
 	public void run() {
 	    //System.out.println("Stop all processes - run");
 		try {
-			System.err.println("TEMPORARY: Aborting job named 'foo' because havn't yet worked out how to get the job ID to this point in the code - in TerminateAllAction.java");
-	        getLaunchManager().abortJob("foo");
+			String selection = null;
+			
+			/* see if we can figure out who did this */
+			if(vp instanceof ParallelJobsView) {
+				selection = ((ParallelJobsView)vp).getSelectedJob();
+			}
+	        getLaunchManager().abortJob(selection);
 		} catch (CoreException e) {
 		    System.out.println("Error in terminate all processes: " + e.getMessage());
 		}

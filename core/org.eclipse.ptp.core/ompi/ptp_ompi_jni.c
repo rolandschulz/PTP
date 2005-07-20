@@ -23,9 +23,6 @@
 
 char error_msg[256];
 
-static int pid;
-static int pgid;
-
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
 static int ptp_ompi_spawn(char *app, int num_procs);
 static void ptp_ompi_sendcmd(orte_daemon_cmd_flag_t usercmd);
@@ -56,11 +53,21 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
 	jsize len;
 	int i;
 
+	char args[256];
+	char spawn_cmd[512];
+
 	printf("JNI (C) OMPI: OMPI_StartDaemon()\n");
 
-	pid = pgid = -1;
-
-	switch(pid = fork()) {
+	/* the below, if 0ed out code uses fork() and exec() to spawn
+	 * the orte daemon.  it works, but you don't seem to be able to
+	 * run MPI jobs through that daemon once it's spawned.  we
+	 * theorize that this has something to do with the environment
+	 * not being copied over and we might need to switch to execle()
+	 * in the future and specify the environment.  for now, let's go
+	 * with a much simpler (albiet less portable) solution of
+	 * system() */
+#if 0
+	switch(fork()) {
 	    case -1:
 		set_error("Unable to fork() for the orted spawn.");
 		return -1;
@@ -105,12 +112,7 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
 		
 		/* spawn the daemon */
 		ret = execv(orted_path, orted_args);
-		printf("exec returned: %d\n", ret);
-		fflush(stdout);
-		printf("error: %s\n", strerror(errno));
 
-		//ret = execl("/Users/ndebard/local/bin/orted", "orted", 0);
-		/* release str */
 		(*env)->ReleaseStringUTFChars(env, jorted_path, orted_path);
 		(*env)->ReleaseStringUTFChars(env, jorted_bin, orted_bin);
 		for(i=0; i<len + 1; i++) {
@@ -120,19 +122,34 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
 		break;
 	    /* parent */
 	    default:
-		printf("PARENT!\n");
-		pgid = getpgid(pid);
-		printf("[p] GROUP PID = %d\n", pgid);
+		/* sleep - letting the daemon get started up */
 		sleep(1);
-		pgid = getpgid(pid);
-		printf("[p] GROUP PID = %d\n", pgid);
 		wait(&ret);
-		printf("parent ret from child = %d\n", ret);
-		printf("PID = %d\n", pid);
-		printf("GROUP PID = %d\n", pgid);
-		fflush(stdout);
+		//printf("parent ret from child = %d\n", ret);
 		break;
 	}
+#endif
+	orted_path = (char *)(*env)->GetStringUTFChars(env,
+	  jorted_path, NULL);
+	orted_bin = (char *)(*env)->GetStringUTFChars(env, 
+	  jorted_bin, NULL);
+	len = (*env)->GetArrayLength(env, array);
+	
+	for(i=0; i<len; i++) {
+	    jstring astr;
+	    char *bstr;
+	    astr = (*env)->GetObjectArrayElement(env, array, i);
+	    bstr = (char *)(*env)->GetStringUTFChars(env, astr, NULL);
+	    
+	    sprintf(args, "%s %s", args, bstr);
+	    (*env)->ReleaseStringUTFChars(env, astr, bstr);
+	}
+
+	//printf("final args = '%s'\n", args);
+	//sprintf(spawn_cmd, "%s %s", orted_path, args);
+	//printf("running: '%s'\n", spawn_cmd);
+	//system(spawn_cmd);
+	//sleep(1);
 }
 
 /* returns  0 if orted was already started and we connected to it
@@ -151,29 +168,33 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
 	/* this makes the orte_init() below fail if the orte daemon
 	 * isn't running */
 	putenv("OMPI_MCA_orte_univ_exist=1");
-	/*
-	id = mca_base_param_register_int("orte", "univ", "exist",NULL,0);
-	mca_base_param_set_int(id, 1);
-	*/
 	
 	/* setup the runtime environment */
 	rc = orte_init();
 	if(rc == ORTE_ERR_UNREACH) {
 	    /* unreachable orted */
-	    set_error("ORTED unreachable!  Sorry!");
-	    printf("ORTED unreachable!  Sorry!\n");
+	    char foo[256];
+	    snprintf(foo, sizeof(foo), "ORTEd unreachable.  Check the "
+	      "preferences and be sure the path and arguments to the ORTEd "
+	      "are valid: %s", 
+	      ORTE_ERROR_NAME(rc));
+	    set_error(foo);
+	    printf(foo);
+	    printf("\n");
 	    fflush(stdout);
 	    return 1;
 	}
-
-	/*
-	    printf("ERROR: orte_init() failed - return code = %d!\n", rc);
+	else if(rc != ORTE_SUCCESS) {
+	    char foo[256];
+	    snprintf(foo, sizeof(foo), "ORTEd initilization failure: %s", 
+	      ORTE_ERROR_NAME(rc));
+	    set_error(foo);
+	    printf(foo);
+	    printf("\n");
 	    fflush(stdout);
-	    ORTE_ERROR_LOG(rc);
-	    return;
 	}
-	*/
-	printf("Registry initted.\n");
+
+	printf("Registry initted successfully.\n");
 	fflush(stdout);
 
 	OBJ_CONSTRUCT(&eclipse_orte_lock, opal_mutex_t); 
@@ -216,33 +237,59 @@ Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIProgress(JNIEnv *env, j
 	fflush(stdout);
 }
 
-JNIEXPORT void JNICALL 
+/* Invokes an OMPI parallel job run.  The string array passed in is
+ * composed of key-value pairs (keys are even 0, 2, 4, etc - values are
+ * 1, 3, 5, etc).  The KVPs specify what program to run, the number of
+ * processes, etc.
+ *
+ * RETURN:
+ *   Upon error a -1 will be returned and the error string will be set
+ *   through set_error();
+ *   Any other integer return signifies a successful spawn and the
+ *   integer represents the OMPI JobID of the created parallel job
+ */
+JNIEXPORT jint JNICALL 
 Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIRun(JNIEnv *env, jobject obj, jobjectArray array)
 {
 	printf("JNI (C) OMPI: OMPIRun() starting . . .\n");
 	fflush(stdout);
 
-	jstring jstr;
-	char *str;
-	int i;
+	jstring jstr, jstr2;
+	char *str, *str2;
+	char *exec_path;
+	int num_procs;
+	int i, rc;
 
 	jsize len = (*env)->GetArrayLength(env, array);
 	
-	for(i=0; i<len; i++) {
+	/* hop in twos because we're sending Key-Value pairs */
+	for(i=0; i<len; i+=2) {
 	    jstr = (*env)->GetObjectArrayElement(env, array, i);
 	    str = (char *)(*env)->GetStringUTFChars(env, jstr, NULL);
+	    jstr2 = (*env)->GetObjectArrayElement(env, array, i+1);
+	    str2 = (char *)(*env)->GetStringUTFChars(env, jstr2, NULL);
 
 	    printf("string[%d] = %s\n", i, str);
+	    if(strcmp(str, "pathToExecutable") == 0) {
+		exec_path = strdup(str2);
+	    }
+	    else if(strcmp(str, "numberOfProcesses") == 0) {
+		num_procs = atoi(str2);
+	    }
 
 	    /* release str */
 	    (*env)->ReleaseStringUTFChars(env, jstr, str);
+	    (*env)->ReleaseStringUTFChars(env, jstr2, str2);
 	}
 
+	printf("path = '%s', #procs = %d\n", exec_path, num_procs);
+
 	opal_mutex_lock(&eclipse_orte_lock);
-	ptp_ompi_spawn("/Users/ndebard/ompi-test/test-mpi", 2);
+	rc = ptp_ompi_spawn(exec_path, num_procs);
 	opal_mutex_unlock(&eclipse_orte_lock); 
 	
-	return;
+	free(exec_path);
+	return rc;
 }
 
 JNIEXPORT void JNICALL 
@@ -267,7 +314,14 @@ void set_error(char *msg)
 /* 'app' needs to be a full pathname to the app as we'll extract the
  * current working directory from it as well
  *
- * 'num_procs' is the number of processes to spawn */
+ * 'num_procs' is the number of processes to spawn
+ *
+ * RETURN:
+ *   returns -1 if there was an error and the error string will be set
+ *   with set_error()
+ *   returns any other integer indicating the OMPI JobID number of this
+ *   new job
+ */
 int ptp_ompi_spawn(char *app, int num_procs)
 {
 	int rc;
@@ -330,16 +384,23 @@ int ptp_ompi_spawn(char *app, int num_procs)
 	rc = orte_rmgr.spawn(apps, num_apps, &jobid, job_state_callback);
 	opal_mutex_unlock(&opal_event_lock);
 	if(rc != ORTE_SUCCESS) {
+	    char foo[256];
 	    opal_output(0, "%s: failed with errno=%d\n", app,
 	      rc);
-	    return rc;
+	    snprintf(foo, sizeof(foo), "OMPI spawn() failure: %s", 
+	      ORTE_ERROR_NAME(rc));
+	    set_error(foo);
+	    printf(foo);
+	    printf("\n");
+	    fflush(stdout);
+	    return -1;
 	}
 	printf("after spawn - jobid = %d\n", jobid);
 	fflush(stdout);
 	for(i=0; i<num_apps; i++) OBJ_RELEASE(apps[i]);
 	free(apps);
 
-	return 0;
+	return jobid;
 }
 
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
