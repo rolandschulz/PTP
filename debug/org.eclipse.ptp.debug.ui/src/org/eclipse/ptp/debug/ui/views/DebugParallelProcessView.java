@@ -236,6 +236,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 	protected void initialRoot() {
 		if (groupManager.size() == 1) {
 			//FIXME
+			/*
 			PProcess[] processes = DebugManager.getInstance().getProcesses();
 			if (processes.length > 0) {
 				//Restart again
@@ -245,7 +246,8 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 					group.add(new Element(processes[j].getID()));
 				}
 			}
-			//uiDebugManager.initialProcess();
+			*/
+			uiDebugManager.initialProcess();
 		}
 	}
 	
@@ -757,8 +759,8 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		int y_loc = e_offset_x + ((y-1) * (e_height + e_spacing_y));
 
 		//FIXME
-		PProcess process = DebugManager.getInstance().getProcess(element.getID());
-		//IPProcess process = uiDebugManager.findProcess(element.getID());
+		//PProcess process = DebugManager.getInstance().getProcess(element.getID());
+		IPProcess process = uiDebugManager.findProcess(element.getID());
 		if (process != null)
 			g.drawImage(getStatusIcon(process.getStatus(), element.isSelected()), x_loc, y_loc);
     }
@@ -847,8 +849,8 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 	public void registerSelectedElements() {
 		IElement[] elements = cur_element_group.getSelectedElements();
 		//register selected processes into Debug View
-		//uiDebugManager.registerElements(elements);
-		UIDialog.showDialog(getViewSite().getShell(), "Register to Debug View", "There are total " + elements.length + " selected element(s) should be registered to Debug View", SWT.ICON_INFORMATION);
+		uiDebugManager.registerElements(elements);
+		//UIDialog.showDialog(getViewSite().getShell(), "Register to Debug View", "There are total " + elements.length + " selected element(s) should be registered to Debug View", SWT.ICON_INFORMATION);
 	}
 		
 	/* FIXME
