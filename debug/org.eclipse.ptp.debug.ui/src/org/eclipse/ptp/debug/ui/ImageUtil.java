@@ -54,6 +54,8 @@ public class ImageUtil {
 	public static final String ICON_CREATEGROUP_NORMAL = "creategroup_normal.gif";
 	public static final String ICON_DELETEGROUP_DISABLE = "deletegroup_disable.gif";
 	public static final String ICON_DELETEGROUP_NORMAL = "deletegroup_normal.gif";
+	public static final String ICON_DELETEPROCESS_DISABLE = "deleteprocess_disable.gif";
+	public static final String ICON_DELETEPROCESS_NORMAL = "deleteprocess_normal.gif";
 	
 	public static final String IMG_PRO_ERROR_SEL = "error_sel.gif";
 	public static final String IMG_PRO_ERROR = "error.gif";
@@ -84,6 +86,8 @@ public class ImageUtil {
 	public static final ImageDescriptor ID_ICON_CREATEGROUP_NORMAL = createImageDescriptor(TOOLICONURL, ICON_CREATEGROUP_NORMAL, ICON_CREATEGROUP_NORMAL);
 	public static final ImageDescriptor ID_ICON_DELETEGROUP_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DELETEGROUP_DISABLE, ICON_DELETEGROUP_DISABLE);
 	public static final ImageDescriptor ID_ICON_DELETEGROUP_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DELETEGROUP_NORMAL, ICON_DELETEGROUP_NORMAL);
+	public static final ImageDescriptor ID_ICON_DELETEPROCESS_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DELETEPROCESS_DISABLE, ICON_DELETEPROCESS_DISABLE);
+	public static final ImageDescriptor ID_ICON_DELETEPROCESS_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DELETEPROCESS_NORMAL, ICON_DELETEPROCESS_NORMAL);
 
 	public static final ImageDescriptor ID_IMG_PRO_ERROR_SEL = createImageDescriptor(PROCESSICONURL, IMG_PRO_ERROR_SEL, IMG_PRO_ERROR_SEL);
 	public static final ImageDescriptor ID_IMG_PRO_ERROR = createImageDescriptor(PROCESSICONURL, IMG_PRO_ERROR, IMG_PRO_ERROR);

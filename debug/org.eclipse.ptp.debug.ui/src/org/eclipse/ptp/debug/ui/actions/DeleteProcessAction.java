@@ -20,50 +20,47 @@ package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
-import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.UIDialog;
 import org.eclipse.ptp.debug.ui.model.IElement;
 import org.eclipse.ptp.debug.ui.model.IElementGroup;
 import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
-import org.eclipse.swt.SWT;
 
 /**
  * @author clement chu
  *
  */
-public class DeleteGroupAction extends ParallelDebugAction {
-	public static final String name = "Delete Group";
+public class DeleteProcessAction extends ParallelDebugAction {
+	public static final String name = "Delete Process";
 	
-	public DeleteGroupAction(AbstractDebugParallelView debugView) {
+	public DeleteProcessAction(AbstractDebugParallelView debugView) {
 		super(name, debugView);
-	    setImageDescriptor(ImageUtil.ID_ICON_DELETEGROUP_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_DELETEGROUP_NORMAL);
-	    setId(name);
+	    setImageDescriptor(ImageUtil.ID_ICON_DELETEPROCESS_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_DELETEPROCESS_NORMAL);
 	}
 
-	public void run(IElement[] elements) {}
-	public void run() {
-		if (debugView instanceof DebugParallelProcessView) {
-			DebugParallelProcessView view = (DebugParallelProcessView)debugView;
+	public void run(IElement[] elements) {
+		if (validation(elements)) {
+			if (debugView instanceof DebugParallelProcessView) {
+				DebugParallelProcessView view = (DebugParallelProcessView)debugView;
 
-			IElementGroup group = view.getCurrentGroup();
-			if (group != null && group.size() > 0) {
-				 if (UIDialog.showDialog(getShell(), name + " " + group.getID(), "All elements in this group will be deleted.", SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL) == SWT.OK) {
-					IMenuManager manager = view.getViewSite().getActionBars().getMenuManager();
-					manager.remove(group.getID());
-					view.getUIDebugManger().removeGroup(group.getID());
-									
-					IContributionItem[] items = manager.getItems();
-					if (items.length > 0) {
-						IContributionItem lastItem = items[items.length-1];				
-						if (lastItem != null && lastItem instanceof ActionContributionItem) {
-							((ActionContributionItem)lastItem).getAction().run();
-						}
-					}
-				 }
+				IElementGroup group = view.getCurrentGroup();
+				if (group.size() == elements.length) {
+					callDeleteGroupAction(view);
+				} else {
+					view.getUIDebugManger().removeFromGroup(elements, group.getID());
+					view.redraw();
+				}
 			}
 		}		
+	}
+	
+	private void callDeleteGroupAction(DebugParallelProcessView view) {
+		IToolBarManager manager = view.getViewSite().getActionBars().getToolBarManager();
+		IContributionItem item = manager.find(DeleteGroupAction.name);
+		if (item != null && item instanceof ActionContributionItem) {
+			((ActionContributionItem)item).getAction().run();
+		}
 	}
 }

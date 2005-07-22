@@ -30,8 +30,9 @@ public class ResumeAction extends ParallelDebugAction {
 
 	public ResumeAction(AbstractDebugParallelView debugView) {
 		super(name, debugView);
-	    this.setImageDescriptor(ImageUtil.ID_ICON_RESUME_NORMAL);
-	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_RESUME_NORMAL);
+	    setImageDescriptor(ImageUtil.ID_ICON_RESUME_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_RESUME_NORMAL);
+	    setId(name);
 	}
 
 	public void run(IElement[] elements) {}

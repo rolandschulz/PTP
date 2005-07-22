@@ -22,8 +22,10 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.debug.ui.UIDialog;
 import org.eclipse.ptp.debug.ui.model.IElement;
 import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -40,8 +42,8 @@ public abstract class ParallelDebugAction extends Action {
 	public ParallelDebugAction(String text, int style, AbstractDebugParallelView debugView) {
 		super(text, style);
 		this.debugView = debugView;
-	    this.setToolTipText(text);
-	    this.setEnabled(false);
+	    setToolTipText(text);
+	    setEnabled(false);
 	}
 	
 	public AbstractDebugParallelView getViewPart() {
@@ -65,4 +67,12 @@ public abstract class ParallelDebugAction extends Action {
     	else
     		run(new IElement[0]);
     }
+    
+	protected boolean validation(IElement[] elements) {
+		if (elements == null || elements.length == 0) {
+			UIDialog.showDialog(getShell(), "No selected elements", "Please select some elements first", SWT.ICON_ERROR | SWT.OK);
+			return false;
+		}
+		return true;
+	}
 }

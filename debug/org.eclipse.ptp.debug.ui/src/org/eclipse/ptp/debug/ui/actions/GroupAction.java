@@ -32,8 +32,8 @@ public class GroupAction extends ParallelDebugAction {
 	
 	public GroupAction(String id, AbstractDebugParallelView debugView) {
 		super(name + " " + id, IAction.AS_CHECK_BOX, debugView);
-	    this.setEnabled(true);
-		this.setId(id);
+	    setEnabled(true);
+		setId(id);
 	}
 
 	public void run(IElement[] elements) {}
