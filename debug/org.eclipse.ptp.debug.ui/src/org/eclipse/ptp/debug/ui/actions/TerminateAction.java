@@ -31,8 +31,9 @@ public class TerminateAction extends ParallelDebugAction {
 
 	public TerminateAction(AbstractDebugParallelView debugView) {
 		super(name, debugView);
-	    this.setImageDescriptor(ImageUtil.ID_ICON_TERMINATE_NORMAL);
-	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_TERMINATE_NORMAL);
+	    setImageDescriptor(ImageUtil.ID_ICON_TERMINATE_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_TERMINATE_NORMAL);
+	    setId(name);
 	}
 	
 	public void run(IElement[] elements) {

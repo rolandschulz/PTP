@@ -31,8 +31,9 @@ public class RegisterAction extends ParallelDebugAction {
 	
 	public RegisterAction(AbstractDebugParallelView debugView) {
 		super(name, debugView);
-	    this.setImageDescriptor(ImageUtil.ID_ICON_REGISTER_NORMAL);
-	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_REGISTER_NORMAL);
+	    setImageDescriptor(ImageUtil.ID_ICON_REGISTER_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_REGISTER_NORMAL);
+	    setId(name);
 	}
 
 	public void run(IElement[] elements) {}

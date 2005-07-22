@@ -27,5 +27,6 @@ import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
 public abstract class StepAction extends ParallelDebugAction {
 	public StepAction(String text, AbstractDebugParallelView debugView) {
 		super(text, debugView);
+		setId(text);
 	}
 }

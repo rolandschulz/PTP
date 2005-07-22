@@ -31,8 +31,8 @@ public class StepIntoAction extends StepAction {
 
 	public StepIntoAction(AbstractDebugParallelView debugView) {
 		super(name, debugView);
-	    this.setImageDescriptor(ImageUtil.ID_ICON_STEPINTO_NORMAL);
-	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_STEPINTO_NORMAL);
+	    setImageDescriptor(ImageUtil.ID_ICON_STEPINTO_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_STEPINTO_NORMAL);
 	}
 
 	public void run(IElement[] elements) {

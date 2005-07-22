@@ -25,11 +25,9 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.UIDialog;
 import org.eclipse.ptp.debug.ui.model.IElement;
 import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 /**
@@ -84,9 +82,10 @@ public class CreateGroupAction extends ParallelDebugAction {
     
 	public CreateGroupAction(AbstractDebugParallelView debugView) {
 		super(name, IAction.AS_DROP_DOWN_MENU, debugView);
-	    this.setImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
-	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
+	    setImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
 	    setMenuCreator(menuCreator);
+	    setId(name);
 	}
 	
 	public void run(IElement[] elements) {
@@ -95,14 +94,6 @@ public class CreateGroupAction extends ParallelDebugAction {
 				groupAction(elements, (DebugParallelProcessView)debugView, null);
 			}
 		}
-	}
-	
-	private boolean validation(IElement[] elements) {
-		if (elements == null || elements.length == 0) {
-			UIDialog.showDialog(getShell(), "No selected elements", "Please select some elements first", SWT.ICON_ERROR | SWT.OK);
-			return false;
-		}
-		return true;
 	}
 	
 	private void groupAction(IElement[] elements, DebugParallelProcessView view, String groupID) {
@@ -125,9 +116,9 @@ public class CreateGroupAction extends ParallelDebugAction {
 		private InternalGroupAction(String group_id, DebugParallelProcessView view) {
 			super(GroupAction.name + " " + group_id, view);
 			this.group_id = group_id;
-		    this.setImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
-		    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
-		    this.setEnabled(!view.getCurrentGroupID().equals(group_id));
+		    setImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
+		    setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
+		    setEnabled(!view.getCurrentGroupID().equals(group_id));
 		}
 		
 		public void run(IElement[] elements) {

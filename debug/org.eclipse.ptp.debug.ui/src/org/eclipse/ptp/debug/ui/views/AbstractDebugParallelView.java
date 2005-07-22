@@ -30,6 +30,7 @@ import org.eclipse.ptp.debug.core.DebugManager;
 import org.eclipse.ptp.debug.core.IDebugParallelModelListener;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.UIPlugin;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 /**
  * @author clement chu
@@ -79,6 +80,10 @@ public abstract class AbstractDebugParallelView extends ViewPart implements ISel
 	
 	public UIDebugManager getUIDebugManger() {
 		return uiDebugManager;
+	}
+	
+	protected Display getDisplay() {
+		return getViewSite().getShell().getDisplay();
 	}
 	
 	public abstract ISelection getSelection();	

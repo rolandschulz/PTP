@@ -31,8 +31,8 @@ public class StepOverAction extends StepAction {
 
 	public StepOverAction(AbstractDebugParallelView debugView) {
 		super(name, debugView);
-	    this.setImageDescriptor(ImageUtil.ID_ICON_STEPOVER_NORMAL);
-	    this.setDisabledImageDescriptor(ImageUtil.ID_ICON_STEPOVER_NORMAL);
+	    setImageDescriptor(ImageUtil.ID_ICON_STEPOVER_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_STEPOVER_NORMAL);
 	}
 
 	public void run(IElement[] elements) {
