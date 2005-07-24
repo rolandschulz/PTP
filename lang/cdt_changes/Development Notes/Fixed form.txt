@@ -1,0 +1,56 @@
+From: Dirk Rossow <rossow@foni.net>
+Date: 04/19/2005 01:00 PM
+
+Subject: FixedFormParser
+
+
+Hi Jeff,
+
+i have worked on the fixed form lexer and sending you my first results. It
+looks very promising that far. The details:
+
+FixedFormLexerPrepass preprocesses the input stream. It discards all
+whitespaces and comment lines and concatenates continuation lines.
+Additional it holds a mapping to the character-positions in the file (for
+correct start/end line/col in the Token objects).
+
+The modified InputStream is feed to FixedFormLexerPhase1, which is a
+modified copy of your FreeFormLexerPhase1. The mods are:
+
+Handling of hollerith constants (This is missing in your
+FreeFormLexerPhase1)
+A new state which is active at the start of line. Needed this for
+hollerith-handling
+A new state for IDENT-matching. It only gets active if no keyword matches. I
+added this because there are no whitespaces delimiting the tokens and for
+example callsubname needs to get matched as T_CALL T_IDENT. So the lexer
+tries first to match a token ignoring IDENTs. If there is no match, an IDENT
+is matched and returned.
+
+
+FixedFormLexerPhase1 feeds FixedFormLexerPhase2, which uses your
+FreeFormLexerPhase2.
+After your phase2lexer has processed the tokens, it checks if IDENT-Tokens
+need to get concatenated. This can happen if for example:
+callsubname=0
+T_CALL T_IDENT T_EQUAL T_ICON
+gets converted by your phase2lexer to
+T_IDENT T_IDENT T_EQUAL T_ICON
+
+Finally i modified your FreeFormLexerPhase2 and the generated Parser to
+support different Lexers. I simply added an Interface Ilexer.
+
+I did not commit anything to the repository, i thought you first want to
+have a look.
+There are still some bugs in the FreeFormLexerPhase2. You can find examples
+for them in the fixedTestFiles/regressionTestFiles folder. They are
+slashesInFormat.f, statusEqAfterIf.f, typeSpecAsIdent.f and impliedLoop.f.
+
+I added some of our fortran-code for testing my work, please dont add it to
+the repository.
+
+I hope my explanations are understandable and you like what i did :-) Dont
+hesitate to contact me if you have questions.
+
+Have a nice day
+  Dirk

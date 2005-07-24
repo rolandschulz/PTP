@@ -1,0 +1,9 @@
+To change the version number,
+
+- Do a global search-and-replace (e.g., replacing 2.1.0 to 2.2.0).
+  This will update all plugin.xmls, including dependencies!
+
+- Change the value of the buildInfoVersion field in ManagedBuildManager.java
+
+
+--Jeff Overbey 7/14/05

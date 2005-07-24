@@ -1,0 +1,70 @@
+Getting the Photran 3.0 ("???") Sources from CVS
+
+Unlike Photran 2.1 and its predecessor(s), Photran 3.0 is built *on top of*
+the CDT.  However, there are still a few minor changes that have to be made
+to the CDT to get it to support additional languages.  We are hoping the CDT
+folks will commit those changes to the CDT proper, but until they do, things
+are a bit more complicated for us.
+
+PART I.  Check out the CDT sources from CVS.
+
+1.  In Eclipse, switch to the CVS Repository Exploring perspective.
+2.  Right-click the CVS Repositories view; choose New > Repository Location
+3.  Enter the following information, then click Finish:
+         Host name:         dev.eclipse.org
+         Repository path:   /home/tools
+         Connection type:   pserver
+         Username:          anonymous
+         Password:          (no password)
+4.  Right-click on :pserver:anonymous@dev.eclipse.org:/home/tools, and choose
+    Refresh Branches...
+5.  Select the following, and click OK:
+         org.eclipse.cdt-build
+         org.eclipse.cdt-core
+         org.eclipse.cdt-doc
+         org.eclipse.cdt-debug
+         org.eclipse.cdt-launch
+    When prompted, tell it to Search Deeply.
+6.  Expand :pserver:anonymous@dev.eclipse.org:/home/tools,
+    and then expand Versions (in the CVS Repositories view)
+7.  Under org.eclipse.cdt-build, expand org.eclipse.cdt-build CDT_3_0_RC2
+8.  Right click and check out all of the org.eclipse.cdt.* packages
+    EXCEPT for the ones ending in "tests" (why bother testing?)
+9.  Do the same with org.eclipse.cdt-core, org.eclipse.cdt-debug,
+    org.eclipse.cdt-doc, and org.eclipse.cdt-launch
+10. You now have the CDT source code.  Make sure it compiles successfully
+    (lots of warnings, but no errors).
+
+PART II.  Check out the Photran source and the CDT patches.
+
+11. In Eclipse, switch to the CVS Repository Exploring perspective.
+12. Right-click the CVS Repositories view; choose New > Repository Location
+13. Enter the following information, then click Finish:
+        Host name:         www.photran.org
+>>>>>>  Repository path:   /usr/local/photran30  <<<<<< THIS HAS CHANGED!!!
+        Connection type:   extssh
+        Username/passwd:   (we gave you this)
+14. Expand extssh:username@www.photran.org:/usr/local/photran30,
+    then expand HEAD (in the CVS Repositories view)
+15. Right-click and check out all of the org.eclipse.fdt projects as well
+    as org.eclipse.photran.  DO NOT check out org.eclipse.photran.parser.
+    You only need this project if you will be regenerating the parser from the
+    grammar.  (The parser is included in the org.eclipse.fdt.core plugin
+    as a JAR file.  This way, the parser does not have to be recompiled
+    every time you rebuild Photran.)
+
+The sources will NOT compile at this point; you must complete the following...
+
+PART III.  Patch the CDT sources
+
+16. Go to a bash prompt.  Change to your Eclipse workspace directory
+    (the one containing all of the org.eclipse.cdt, org.eclipse.fdt, and
+    org.eclipse.photran projects).
+17. Change to the org.eclipse.photran directory.
+18. Run ./install
+19. Go back into eclipse.  Refresh all of the org.eclipse.cdt packages.
+    (Click the first, shift-click the last, right-click, choose Refresh.)
+
+The sources should all compile (albeit with about 640 warnings).
+
+--Jeff Overbey 7/21/05

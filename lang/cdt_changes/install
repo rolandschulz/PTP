@@ -1,0 +1,98 @@
+#
+# Run this script to copy modified (and new) CDT files
+# into a CDT respository.  The script should be run
+# from this directory (org.eclipse.photran).
+# After running this script, select the CDT project
+# and right-click refresh (to see the installed files
+# from Eclipse.
+#
+
+#! /bin/sh
+
+# org.eclipse.cdt.core
+
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/core/model/CoreModel.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/core/model/CoreModel.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/core/model/ICoreModel.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/core/model/ICoreModel.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/ArchiveContainerInfo.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/ArchiveContainerInfo.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/Binary.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/Binary.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/BinaryContainerInfo.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/BinaryContainerInfo.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/BufferManager.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/BufferManager.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CContainerInfo.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CContainerInfo.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CElement.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CElement.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CElementDelta.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CElementDelta.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CElementInfo.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CElementInfo.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CModelBuilder.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CModelBuilder.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CModelCache.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CModelCache.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CModelInfo.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CModelInfo.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CModelManager.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CModelManager.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CoreModelMessages.properties ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CoreModelMessages.properties
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CProject.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CProject.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CProjectInfo.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/CProjectInfo.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/DeleteResourceElementsOperation.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/DeleteResourceElementsOperation.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/DeltaProcessor.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/DeltaProcessor.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/Openable.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/Openable.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/SourceManipulationInfo.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/SourceManipulationInfo.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/SourceRange.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/SourceRange.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/TranslationUnit.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/TranslationUnit.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/TranslationUnitInfo.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/TranslationUnitInfo.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/Archive.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/Archive.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/TranslationUnitInfo.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/TranslationUnitInfo.java
+cp -vp org.eclipse.cdt.core/parser/org/eclipse/cdt/core/parser/ParserLanguage.java ../org.eclipse.cdt.core/parser/org/eclipse/cdt/core/parser/ParserLanguage.java
+cp -vp org.eclipse.cdt.core/src/org/eclipse/cdt/core/CCorePlugin.java ../org.eclipse.cdt.core/src/org/eclipse/cdt/core/CCorePlugin.java
+cp -rvp org.eclipse.cdt.core/src/org/eclipse/cdt/core/addl_langs ../org.eclipse.cdt.core/src/org/eclipse/cdt/core/
+cp -vp org.eclipse.cdt.core/plugin.xml ../org.eclipse.cdt.core/plugin.xml
+cp -vp org.eclipse.cdt.core/schema/AdditionalLanguages.exsd ../org.eclipse.cdt.core/schema/AdditionalLanguages.exsd
+
+
+# org.eclipse.cdt.debug.core
+
+cp -vp org.eclipse.cdt.debug.core/src/org/eclipse/cdt/debug/internal/core/sourcelookup/InternalSourceLookupMessages.properties  ../org.eclipse.cdt.debug.core/src/org/eclipse/cdt/debug/internal/core/sourcelookup/InternalSourceLookupMessages.properties
+
+
+# org.eclipse.cdt.launch
+
+cp -vp org.eclipse.cdt.launch/src/org/eclipse/cdt/launch/internal/ui/LaunchMessages.properties ../org.eclipse.cdt.launch/src/org/eclipse/cdt/launch/internal/ui/LaunchMessages.properties
+cp -vp org.eclipse.cdt.launch/plugin.properties ../org.eclipse.cdt.launch/plugin.properties
+
+
+# org.eclipse.cdt.make.ui
+
+cp -vp org.eclipse.cdt.make.ui/icons/etool16/newm_app.gif ../org.eclipse.cdt.make.ui/icons/etool16/newm_app.gif
+cp -vp org.eclipse.cdt.make.ui/src/org/eclipse/cdt/make/internal/ui/MakeResources.properties ../org.eclipse.cdt.make.ui/src/org/eclipse/cdt/make/internal/ui/MakeResources.properties
+cp -vp org.eclipse.cdt.make.ui/plugin.properties ../org.eclipse.cdt.make.ui/plugin.properties
+cp -vp org.eclipse.cdt.make.ui/plugin.xml ../org.eclipse.cdt.make.ui/plugin.xml
+
+
+# org.eclipse.cdt.managedbuilder.ui
+
+cp -vp org.eclipse.cdt.managedbuilder.ui/icons/elcl16/newmngm_app.gif ../org.eclipse.cdt.managedbuilder.ui/icons/elcl16/newmngm_app.gif
+cp -vp org.eclipse.cdt.managedbuilder.ui/src/org/eclipse/cdt/managedbuilder/internal/ui/PluginResources.properties ../org.eclipse.cdt.managedbuilder.ui/src/org/eclipse/cdt/managedbuilder/internal/ui/PluginResources.properties
+cp -vp org.eclipse.cdt.managedbuilder.ui/plugin.properties ../org.eclipse.cdt.managedbuilder.ui/plugin.properties
+cp -vp org.eclipse.cdt.managedbuilder.ui/plugin.xml ../org.eclipse.cdt.managedbuilder.ui/plugin.xml
+
+
+# org.eclipse.cdt.ui
+
+cp -vp org.eclipse.cdt.ui/icons/dtool16/newmsrcfldr_wiz.gif ../org.eclipse.cdt.ui/icons/dtool16/newmsrcfldr_wiz.gif
+cp -vp org.eclipse.cdt.ui/icons/etool16/newmprj_wiz.gif ../org.eclipse.cdt.ui/icons/etool16/newmprj_wiz.gif
+cp -vp org.eclipse.cdt.ui/icons/etool16/newmsrcfldr_wiz.gif ../org.eclipse.cdt.ui/icons/etool16/newmsrcfldr_wiz.gif
+cp -vp org.eclipse.cdt.ui/icons/etool16/newsrcfile_wiz.gif ../org.eclipse.cdt.ui/icons/etool16/newsrcfile_wiz.gif
+cp -vp org.eclipse.cdt.ui/icons/ovr16/m_ovr.gif ../org.eclipse.cdt.ui/icons/ovr16/m_ovr.gif
+cp -vp org.eclipse.cdt.ui/icons/view16/m_pers.gif ../org.eclipse.cdt.ui/icons/view16/m_pers.gif
+cp -vp org.eclipse.cdt.ui/icons/view16/mmprojects.gif ../org.eclipse.cdt.ui/icons/view16/mmprojects.gif
+cp -vp org.eclipse.cdt.ui/icons/view16/mprojects.gif ../org.eclipse.cdt.ui/icons/view16/mprojects.gif
+cp -vp org.eclipse.cdt.ui/icons/view16/mview.gif ../org.eclipse.cdt.ui/icons/view16/mview.gif
+cp -vp org.eclipse.cdt.ui/icons/wizban/newmprj_wiz.gif ../org.eclipse.cdt.ui/icons/wizban/newmprj_wiz.gif
+cp -vp org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/buildconsole/ConsoleMessages.properties ../org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/buildconsole/ConsoleMessages.properties
+cp -vp org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/CDocumentProvider.java ../org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/CDocumentProvider.java
+cp -vp org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/CEditor.java ../org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/CEditor.java
+cp -vp org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/ICDocumentProvider.java ../org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/ICDocumentProvider.java
+cp -vp org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/WorkingCopyManager.java ../org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/WorkingCopyManager.java
+cp -vp org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/preferences/CEditorHoverConfigurationBlock.java ../org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/preferences/CEditorHoverConfigurationBlock.java
+cp -vp org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/preferences/FoldingConfigurationBlock.java ../org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/preferences/FoldingConfigurationBlock.java
+cp -vp org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/preferences/PreviewSourceViewer.java ../org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/preferences/PreviewSourceViewer.java
+cp -vp org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/viewsupport/CElementImageProvider.java ../org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/viewsupport/CElementImageProvider.java
+cp -vp org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/CPluginImages.java ../org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/CPluginImages.java
+cp -vp org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/CPluginResources.properties ../org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/CPluginResources.properties
+cp -vp org.eclipse.cdt.ui/plugin.properties ../org.eclipse.cdt.ui/plugin.properties
+cp -vp org.eclipse.cdt.ui/plugin.xml ../org.eclipse.cdt.ui/plugin.xml

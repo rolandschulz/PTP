@@ -1,0 +1,27 @@
+Nicholas and Cheah integrated lexer-based syntax highlighting based on
+similar code from my EBNF editor.  The files involved were:
+
+- F90DamageRepairer (created)
+- Fortran90Partitioner (created)
+- CTextTools (modified, but I later deleted it)
+- CSourceViewer (modified)
+- SingleTokenFScanner (copy of SingleTokenCScanner, but I later deleted it)
+
+--Jeff Overbey 7/14/05
+
+With the latest changes from CVS taken on July 14, 2005 (11.44 pm) we made the
+following changes to reenable lexer based syntax highlighting:
+
+- FortranDamageRepairer (modifed renamed from F90DamageRepairer)
+- FortranPartitioner (modified renamed from Fortran90Partitioner)
+- FortranTextTools (renamed and modified CTextTools)
+-- this rename caused a few modifications to other files that used to reference CTextTools
+- CSourceViewerConfiguration (modified)
+- ColorSettingPreviewCode (modified)
+-- included the photran sample file
+-- deleted the lines that have C ... ... in them since the lexer
+balks at those
+- CCodeScanner (deleted)
+- CPPCodeScanner (deleted)
+- FastCPartitionScanner (deleted)
+

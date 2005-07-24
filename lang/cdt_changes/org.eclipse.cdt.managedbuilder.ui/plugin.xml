@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin
+   id="org.eclipse.cdt.managedbuilder.ui"
+   name="%pluginName"
+   version="3.0.0"
+   provider-name="%providerName"
+   class="org.eclipse.cdt.managedbuilder.internal.ui.ManagedBuilderUIPlugin">
+
+   <runtime>
+      <library name="mgdbuildui.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+   <requires>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.cdt.ui"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.core"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.variables"/>
+   </requires>
+
+   <extension-point id="newWizardPages" name="Custom MBS New Wizard Pages" schema="schema/newWizardPages.exsd"/>
+
+   <extension
+         point="org.eclipse.ui.newWizards">
+<!-- Managed Make Builder Projects -->
+      <!--wizard
+            name="%MngCCWizard.name"
+            icon="icons/elcl16/newmngcc_app.gif"
+            category="org.eclipse.cdt.ui.newCCWizards"
+            class="org.eclipse.cdt.managedbuilder.ui.wizards.NewManagedCCProjectWizard"
+            project="true"
+            finalPerspective="org.eclipse.cdt.ui.CPerspective"
+            id="org.eclipse.cdt.managedbuilder.ui.wizards.StdCCWizard">
+         <description>
+            %MngCCWizard.description
+         </description>
+      </wizard-->
+      <wizard
+            name="%MngCWizard.name"
+            icon="icons/elcl16/newmngm_app.gif"
+            category="org.eclipse.cdt.ui.newCWizards"
+            class="org.eclipse.cdt.managedbuilder.ui.wizards.NewManagedCProjectWizard"
+            project="true"
+            finalPerspective="org.eclipse.cdt.ui.CPerspective"
+            id="org.eclipse.cdt.managedbuilder.ui.wizards.StdCWizard">
+         <description>
+            %MngCWizard.description
+         </description>
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            objectClass="org.eclipse.core.resources.IProject"
+            adaptable="true"
+            name="%MngBuildProp.name"
+            class="org.eclipse.cdt.managedbuilder.ui.properties.BuildPropertyPage"
+            id="org.eclipse.cdt.managedbuilder.ui.properties.BuildProperties">
+         <filter
+               name="nature"
+               value="org.eclipse.cdt.managedbuilder.core.managedBuildNature">
+         </filter>
+      </page>
+      <page
+            objectClass="org.eclipse.core.resources.IFile"
+            adaptable="true"
+            name="%MngResourceProp.name"
+            class="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
+            id="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildProperties">
+	         <filter
+	               name="projectNature"
+	               value="org.eclipse.cdt.managedbuilder.core.managedBuildNature">
+	         </filter>
+      </page>
+
+      <!--page
+            objectClass="org.eclipse.core.resources.IFile"
+            adaptable="true"
+            name="%MngResourceProp.name"
+            nameFilter="*.c"
+            class="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
+            id="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildProperties.c">
+      </page>
+      <page
+            objectClass="org.eclipse.core.resources.IFile"
+            adaptable="true"
+            name="%MngResourceProp.name"
+            nameFilter="*.cpp"
+            class="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
+            id="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildProperties.cpp">
+      </page>
+      <page
+            objectClass="org.eclipse.core.resources.IFile"
+            adaptable="true"
+            name="%MngResourceProp.name"
+            nameFilter="*.cc"
+            class="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
+            id="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildProperties.cc">
+      </page>
+      <page
+            objectClass="org.eclipse.core.resources.IFile"
+            adaptable="true"
+            name="%MngResourceProp.name"
+            nameFilter="*.cxx"
+            class="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildPropertyPage"
+            id="org.eclipse.cdt.managedbuilder.ui.properties.ResourceBuildProperties.cxx">
+      </page-->
+   </extension>
+      
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            name="%MngBuildPref.name"
+            category="org.eclipse.cdt.ui.preferences.CPluginPreferencePage"
+            class="org.eclipse.cdt.managedbuilder.ui.properties.BuildPreferencePage"
+            id="org.eclipse.cdt.managedbuilder.ui.preferences.BuildPreferences">
+      </page>
+   </extension>
+  
+</plugin>
