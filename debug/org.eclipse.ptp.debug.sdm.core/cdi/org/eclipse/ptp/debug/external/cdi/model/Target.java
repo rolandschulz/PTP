@@ -262,6 +262,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public ICDIThread[] getThreads(int procNumber) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.getThreads(" + procNumber+ ")");
+		// FIXME Donny
 		//if (currentThreads.length == 0) {
 			
 			SimThread[] threads = ((SimProcess) dSession.getDebugger().getProcess(procNumber)).getThreads();
