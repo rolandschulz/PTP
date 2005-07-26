@@ -27,7 +27,8 @@ import org.eclipse.ptp.debug.ui.model.IElement;
  */
 public class Element implements IElement, Cloneable, Comparable {
 	protected String id = "0";
-	protected boolean selected = false; 
+	protected boolean selected = false;
+	protected boolean registered = false;
 	
 	public Element(String id, boolean selected) {
 		this.id = id;
@@ -50,6 +51,12 @@ public class Element implements IElement, Cloneable, Comparable {
 	}	
 	public void setSelected(boolean selected) {
 		this.selected = selected;
+	}
+	public boolean isRegistered() {
+		return registered;
+	}
+	public void setRegistered(boolean registered) {
+		this.registered = registered;
 	}
 	public IElement cloneElement() {
 		try {

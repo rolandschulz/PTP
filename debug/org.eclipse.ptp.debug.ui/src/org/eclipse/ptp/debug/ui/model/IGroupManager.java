@@ -27,6 +27,7 @@ public interface IGroupManager extends IContainer {
 	public static final String GROUP_ROOT_ID = "0";	
 	public IElementGroup getGroupRoot();
 	
+	public IElementGroup[] getGroupsWithElement(String id);
 	public IElementGroup[] getSortedGroups();
 	public IElementGroup[] getGroups();
 	public IElementGroup getGroup(String id);

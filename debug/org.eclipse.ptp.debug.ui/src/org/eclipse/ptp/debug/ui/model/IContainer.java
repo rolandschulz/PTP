@@ -22,6 +22,7 @@ package org.eclipse.ptp.debug.ui.model;
  *
  */
 public interface IContainer extends IElement {
+	public boolean contains(String id);
 	public String getElementID(int index);
 	public void add(IElement element);
 	public void remove(IElement element);
