@@ -362,7 +362,7 @@
 		  id="fdt.managedbuild.tool.gnu.fortran.compiler"
 		  isAbstract="true"
 		  command="gfortran"
-		  natureFilter="cnature"
+		  natureFilter="both"
 		  outputFlag="-o">
          <envVarBuildPath 
          	pathType="buildpathInclude"
