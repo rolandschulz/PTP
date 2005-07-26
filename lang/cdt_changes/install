@@ -52,7 +52,9 @@ cp -vp org.eclipse.cdt.debug.core/src/org/eclipse/cdt/debug/internal/core/source
 # org.eclipse.cdt.launch
 
 cp -vp org.eclipse.cdt.launch/src/org/eclipse/cdt/launch/internal/ui/LaunchMessages.properties ../org.eclipse.cdt.launch/src/org/eclipse/cdt/launch/internal/ui/LaunchMessages.properties
+cp -vp org.eclipse.cdt.launch/icons/obj16/m_app.gif ../org.eclipse.cdt.launch/icons/obj16/m_app.gif
 cp -vp org.eclipse.cdt.launch/plugin.properties ../org.eclipse.cdt.launch/plugin.properties
+cp -vp org.eclipse.cdt.launch/plugin.xml ../org.eclipse.cdt.launch/plugin.xml
 
 
 # org.eclipse.cdt.make.ui
