@@ -129,6 +129,7 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
 		break;
 	}
 #endif
+//#if 0
 	orted_path = (char *)(*env)->GetStringUTFChars(env,
 	  jorted_path, NULL);
 	orted_bin = (char *)(*env)->GetStringUTFChars(env, 
@@ -145,11 +146,12 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
 	    (*env)->ReleaseStringUTFChars(env, astr, bstr);
 	}
 
-	//printf("final args = '%s'\n", args);
-	//sprintf(spawn_cmd, "%s %s", orted_path, args);
-	//printf("running: '%s'\n", spawn_cmd);
-	//system(spawn_cmd);
-	//sleep(1);
+	printf("final args = '%s'\n", args);
+	sprintf(spawn_cmd, "%s %s", orted_path, args);
+	printf("running: '%s'\n", spawn_cmd);
+	system(spawn_cmd);
+	sleep(1);
+//#endif
 }
 
 /* returns  0 if orted was already started and we connected to it
@@ -236,6 +238,18 @@ Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIProgress(JNIEnv *env, j
     	printf("JNI (C) OMPI: OMPIProgress() exiting . . .\n");
 	fflush(stdout);
 }
+
+JNIEXPORT void JNICALL 
+Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPITerminateJob(JNIEnv *env, jobject obj, jint jjobid)
+{
+    	int jobid;
+
+	jobid = jjobid;
+	printf("JNI (C) OMPI: OMPITerminateJob(%d)\n", jobid);
+	fflush(stdout);
+	orte_rmgr.terminate_job(jobid);
+}
+
 
 /* Invokes an OMPI parallel job run.  The string array passed in is
  * composed of key-value pairs (keys are even 0, 2, 4, etc - values are

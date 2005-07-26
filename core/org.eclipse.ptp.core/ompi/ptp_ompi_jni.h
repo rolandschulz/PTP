@@ -59,10 +59,18 @@ JNIEXPORT void JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
 /*
  * Class:     org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem
  * Method:    OMPIRun
- * Signature: ([Ljava/lang/String;)V
+ * Signature: ([Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIRun
   (JNIEnv *, jobject, jobjectArray);
+
+/*
+ * Class:     org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem
+ * Method:    OMPITerminateJob
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPITerminateJob
+  (JNIEnv *, jobject, jint);
 
 #ifdef __cplusplus
 }

@@ -19,6 +19,7 @@
 
 package org.eclipse.ptp.rtsystem;
 
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 /* This is the interface to a control system which controls a runtime system.
@@ -28,7 +29,7 @@ public interface IControlSystem {
 	/* returns the new job name string that it spawns, unique */
 	public String run(JobRunConfiguration jobRunConfig);
 
-	public void abortJob(String jobID);
+	public void terminateJob(IPJob job);
 	
 	public String[] getJobs();
 
