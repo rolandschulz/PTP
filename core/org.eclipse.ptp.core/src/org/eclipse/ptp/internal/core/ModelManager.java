@@ -502,7 +502,13 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	}
 	
 	public synchronized void abortJob(String jobName) throws CoreException {
-		controlSystem.abortJob(jobName);
+		/* we have a job name, so let's find it in the Universe - if it exists */
+		IPJob j = getUniverse().findJobByName(jobName);
+		if(j == null) {
+			System.err.println("ERROR: tried to delete a job that was not found '"+jobName+"'");
+			return;
+		}
+		controlSystem.terminateJob(j);
 		System.out
 				.println("***** NEED TO REFRESH JOB STATUS HERE in abortJob() of ModelManager ONCE WE KNOW THE JOBID!");
 		// refreshJobStatus(nejob);

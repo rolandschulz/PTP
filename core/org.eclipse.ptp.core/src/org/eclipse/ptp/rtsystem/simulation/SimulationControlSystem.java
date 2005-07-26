@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.rtsystem.IControlSystem;
@@ -149,7 +150,7 @@ public class SimulationControlSystem implements IControlSystem {
 		return new String(s);
 	}
 
-	public void abortJob(String jobName) {
+	public void terminateJob(IPJob jobName) {
 		spawned_app_state = IPProcess.EXITED_SIGNALLED;
 		spawned_app_signal = new String("SIGTERM");
 		String s = new String("job" + numJobs);

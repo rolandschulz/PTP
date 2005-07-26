@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
@@ -38,6 +39,7 @@ import org.eclipse.ptp.rtsystem.IRuntimeListener;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.NamedEntity;
 import org.eclipse.ptp.rtsystem.RuntimeEvent;
+
 
 public class OMPIControlSystem implements IControlSystem {
 	private Process orted_process = null;
@@ -56,6 +58,7 @@ public class OMPIControlSystem implements IControlSystem {
 	public native void OMPIFinalize();
 	public native void OMPIProgress();
 	public native int OMPIRun(String[] args);
+	public native void OMPITerminateJob(int jobID);
 	
 	private static int failed_load = 0;
 	
@@ -102,7 +105,11 @@ public class OMPIControlSystem implements IControlSystem {
 		String[] split_path = orted_path.split("\\/");
 		for(int x=0; x<split_path.length; x++)
 			System.out.println("["+x+"] = "+split_path[x]);
-		OMPIStartDaemon(orted_path, split_path[split_path.length - 1], split_args);
+		
+		/* start the daemon using JNI */
+		//OMPIStartDaemon(orted_path, split_path[split_path.length - 1], split_args);
+		
+		/* start the daemon using Java */
 		//OMPIStartORTEd(orted_full);
 		
 		int rc = OMPIInit();
@@ -116,8 +123,9 @@ public class OMPIControlSystem implements IControlSystem {
 		startProgressMaker();
 	}
 	
-	/* we do this part in Java (not native) because we want to maintain control over the
-	 * process that we start - so we can stop it 
+	/* this is how we can/would start the daemon from Java.  Call this if you really
+	 * want to do this, but for OMPI it's probably required to start it through
+	 * JNI.
 	 */
 	private void OMPIStartORTEd(String cmd)
 	{
@@ -175,9 +183,23 @@ public class OMPIControlSystem implements IControlSystem {
 		}
 	}
 
-	public void abortJob(String jobID) {
-		if(jobID != null)
-			System.out.println("JAVA OMPI: abortJob() with args: " + jobID);
+	public void terminateJob(IPJob job) {
+		if(job == null) {
+			System.err.println("ERROR: Tried to abort a null job.");
+			return;
+		}
+		
+		String jobIDs = job.getJobNumber();
+		int jobID = -1;
+		try {
+			jobID = Integer.parseInt(jobIDs);
+		} catch (NumberFormatException e) {
+			jobID = -1;
+		}
+		if(jobID >= 0) {
+			System.out.println("JAVA OMPI: abortJob() with name "+job.toString()+" and ID "+jobID);
+			OMPITerminateJob(jobID);
+		}
 		else {
 			System.err.println("ERROR: Tried to abort a null job.");
 		}
@@ -290,8 +312,12 @@ public class OMPIControlSystem implements IControlSystem {
 		}
 		System.out.println("JAVA OMPI: shutdown() called");
 		
+		/* shutdown/kill the ORTE daemon */
 		//OMPIShutdown();
+		
+		/* finalize the registry - yes, it's odd it is in this order */
 		OMPIFinalize();
+		
 		/*
 		if(orted_process != null) {
 			System.out.println("DESTROY ORTED!");
