@@ -17,28 +17,13 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.debug.core;
-
 /**
- * @author clement chu
+ * @author clement
  *
  */
-public class PProcess implements IPProcess {
-	private String id = "0";
-	private String status = "exit"; 
-	
-	public PProcess(String id) {
-		this.id = id;
-	}
-	public String getID() {
-		return id;
-	}
-	public void setID(String id) {
-		this.id = id;
-	}
-	public String getStatus() {
-		return status;
-	}
-	public void setStatus(String status) {
-		this.status = status;
-	}
+public interface IPProcess {
+	public String getID();
+	public void setID(String id);
+	public String getStatus();
+	public void setStatus(String status);
 }

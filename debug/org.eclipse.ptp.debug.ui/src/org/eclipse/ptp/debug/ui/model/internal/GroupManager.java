@@ -18,7 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.model.internal;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.ptp.debug.ui.model.IContainer;
 import org.eclipse.ptp.debug.ui.model.IElement;
@@ -62,5 +64,14 @@ public class GroupManager extends Parent implements IGroupManager {
 	}
 	public IElementGroup getGroup(int index) {
 		return (IElementGroup)get(index);
+	}
+	public IElementGroup[] getGroupsWithElement(String id) {
+		List aList = new ArrayList();
+		IElementGroup[] groups = getSortedGroups();
+		for (int i=0; i<groups.length; i++) {
+			if (groups[i].contains(id))
+				aList.add(groups[i]);
+		}
+		return (IElementGroup[])aList.toArray(new IElementGroup[aList.size()]);
 	}
 }

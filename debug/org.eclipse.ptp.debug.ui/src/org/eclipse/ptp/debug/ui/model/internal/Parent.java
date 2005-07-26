@@ -36,15 +36,19 @@ public abstract class Parent extends Element implements IContainer {
 		super(id, selected);
 	}
 	
+	public boolean contains(String id) {
+		return elementMap.containsKey(id);
+	}
+	
 	public void add(IElement element) {
-		if (!elementMap.containsKey(element.getID()))		
+		if (!contains(element.getID()))		
 			elementMap.put(element.getID(), element);
 	}
 	public void remove(IElement element) {
 		remove(element.getID());
 	}
 	public void remove(String id) {
-		if (elementMap.containsKey(id))
+		if (contains(id))
 			elementMap.remove(id);
 	}
 		

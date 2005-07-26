@@ -29,7 +29,7 @@ import java.util.Map;
  *
  */
 public class DebugManager {
-	private static final int total = 10000;
+	private static final int total = 1000;
 	private static DebugManager instance = null;
 	private List listeners = new ArrayList();
 	private Map processMap = new HashMap();
@@ -60,7 +60,7 @@ public class DebugManager {
 						System.out.println("Sleep err: " + e.getMessage());
 					}
 					int randomPnum = getRandom(processMap.size());
-					PProcess p = getProcess(String.valueOf(randomPnum));
+					IPProcess p = getProcess(String.valueOf(randomPnum));
 					if (p != null && !p.getStatus().equals(IDebugParallelModelListener.STATUS_EXITED)) {
 						String status = getRandomStatus();
 						if (status.equals(IDebugParallelModelListener.STATUS_EXITED))
@@ -107,8 +107,8 @@ public class DebugManager {
 		}
 	}
 	
-	public PProcess getProcess(String id) {
-		return (PProcess)processMap.get(id);
+	public IPProcess getProcess(String id) {
+		return (IPProcess)processMap.get(id);
 	}
 	
 	public PProcess[] getProcesses() {

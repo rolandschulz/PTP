@@ -27,6 +27,8 @@ import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.debug.core.DebugManager;
+import org.eclipse.ptp.debug.core.PProcess;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
 import org.eclipse.ptp.debug.ui.model.IElement;
 import org.eclipse.ptp.debug.ui.model.IElementGroup;
@@ -41,7 +43,10 @@ import org.eclipse.ptp.debug.ui.model.internal.GroupManager;
  */
 public class UIDebugManager {
 	private IGroupManager groupManager = null;
-	protected IModelManager modelManager = null;	
+	protected IModelManager modelManager = null;
+	
+	//FIXME dummy only
+	private boolean dummy = true;
 	
 	public UIDebugManager() {
 		groupManager = new GroupManager();
@@ -79,14 +84,29 @@ public class UIDebugManager {
 		for (int i=0; i<elements.length; i++) {
 			group.remove(elements[i]);
 		}
-	}	
+	}
 	
-	public void registerElements(ILaunch launch, PDebugTarget target, IElement[] elements) {
+	public void unregisterElements(ILaunch launch, PDebugTarget target, IElement[] elements) {
 		for (int i=0; i<elements.length; i++) {
-			target.setCurrentFocus(elements[i].getIDNum());
+			//TODO unregister in selected elements in debug view 
 		}
 	}
 	
+	public void unregisterElements(IElement[] elements) {
+		try {
+			ILaunch launch = getLaunch();
+			unregisterElements(launch, (PDebugTarget)launch.getDebugTarget(), elements);
+		} catch (CoreException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	public void registerElements(ILaunch launch, PDebugTarget target, IElement[] elements) {
+		for (int i=0; i<elements.length; i++) {
+			//TODO register in selected elements in debug view
+			//target.setCurrentFocus(elements[i].getIDNum());
+		}
+	}
 	public void registerElements(IElement[] elements) {
 		try {
 			ILaunch launch = getLaunch();
@@ -105,11 +125,25 @@ public class UIDebugManager {
 		throw new CoreException(new Status(IStatus.ERROR, UIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No launch found", null));
 	}
 	
+	public String getProcessStatus(String id) throws NullPointerException {
+		//FIXME dummy only 
+		if (dummy)
+			return DebugManager.getInstance().getProcess(id).getStatus();
+		
+		return findProcess(id).getStatus();
+		
+	}
 	public IPProcess findProcess(String id) {
 		return modelManager.getUniverse().findProcessByName(getProcessName(id));
 	}
 	
 	public void initialProcess() {
+		//FIXME dummy only
+		if (dummy) {
+			dummyInitialProcess();
+			return;
+		}
+		
 		IPJob[] jobs = modelManager.getUniverse().getJobs();
 		int total_jobs = jobs.length;
 
@@ -130,5 +164,17 @@ public class UIDebugManager {
 	private String getProcessName(String id) {
 		//HARD CODE
 		return "job0_process" + id;
-	}	
+	}
+	
+	//FIXME dummny only
+	private void dummyInitialProcess() {
+		PProcess[] processes = DebugManager.getInstance().getProcesses();
+		if (processes.length > 0) {
+			groupManager.clearAll();
+			IElementGroup group = groupManager.getGroupRoot();
+			for (int j=0; j<processes.length; j++) {
+				group.add(new Element(processes[j].getID()));
+			}
+		}		
+	}
 }
