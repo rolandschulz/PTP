@@ -1,7 +1,7 @@
 #
 # Run this script to copy modified (and new) CDT files
 # into a CDT respository.  The script should be run
-# from this directory (org.eclipse.photran).
+# from this directory (cdt_changes).
 # After running this script, select the CDT project
 # and right-click refresh (to see the installed files
 # from Eclipse.

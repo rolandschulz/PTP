@@ -70,7 +70,7 @@
             %WizardNewCCMakeProject.description
          </description>
       </wizard-->
-      <wizard
+      <!--wizard
             name="%WizardConvertMakeProject.name"
             icon="icons/etool16/convert-normal.gif"
             category="org.eclipse.cdt.ui.newCCWizards"
@@ -83,7 +83,7 @@
          <selection
                class="org.eclipse.core.resources.IProject">
          </selection>
-      </wizard>
+      </wizard-->
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">
