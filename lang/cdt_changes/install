@@ -60,9 +60,15 @@ cp -vp org.eclipse.cdt.launch/plugin.xml ../org.eclipse.cdt.launch/plugin.xml
 # org.eclipse.cdt.make.ui
 
 cp -vp org.eclipse.cdt.make.ui/icons/etool16/newm_app.gif ../org.eclipse.cdt.make.ui/icons/etool16/newm_app.gif
+cp -vp org.eclipse.cdt.make.ui/icons/etool16/newmngm_app.gif ../org.eclipse.cdt.make.ui/icons/etool16/newmngm_app.gif
 cp -vp org.eclipse.cdt.make.ui/src/org/eclipse/cdt/make/internal/ui/MakeResources.properties ../org.eclipse.cdt.make.ui/src/org/eclipse/cdt/make/internal/ui/MakeResources.properties
 cp -vp org.eclipse.cdt.make.ui/plugin.properties ../org.eclipse.cdt.make.ui/plugin.properties
 cp -vp org.eclipse.cdt.make.ui/plugin.xml ../org.eclipse.cdt.make.ui/plugin.xml
+
+
+# org.eclipse.cdt.managedbuilder.gnu.ui
+
+cp -vp org.eclipse.cdt.managedbuilder.gnu.ui/plugin.xml ../org.eclipse.cdt.managedbuilder.gnu.ui/plugin.xml
 
 
 # org.eclipse.cdt.managedbuilder.ui
@@ -85,6 +91,7 @@ cp -vp org.eclipse.cdt.ui/icons/view16/mmprojects.gif ../org.eclipse.cdt.ui/icon
 cp -vp org.eclipse.cdt.ui/icons/view16/mprojects.gif ../org.eclipse.cdt.ui/icons/view16/mprojects.gif
 cp -vp org.eclipse.cdt.ui/icons/view16/mview.gif ../org.eclipse.cdt.ui/icons/view16/mview.gif
 cp -vp org.eclipse.cdt.ui/icons/wizban/newmprj_wiz.gif ../org.eclipse.cdt.ui/icons/wizban/newmprj_wiz.gif
+cp -vp org.eclipse.cdt.ui/icons/wizban/newsrcfile_wiz.gif ../org.eclipse.cdt.ui/icons/wizban/newsrcfile_wiz.gif
 cp -vp org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/buildconsole/ConsoleMessages.properties ../org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/buildconsole/ConsoleMessages.properties
 cp -vp org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/CDocumentProvider.java ../org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/CDocumentProvider.java
 cp -vp org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/CEditor.java ../org.eclipse.cdt.ui/src/org/eclipse/cdt/internal/ui/editor/CEditor.java

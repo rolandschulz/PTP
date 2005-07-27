@@ -45,7 +45,7 @@
       </wizard>
       <wizard
             name="%WizardConvertMakeProject.name"
-            icon="icons/etool16/newm_app.gif"
+            icon="icons/etool16/newmngm_app.gif"
             category="org.eclipse.cdt.ui.newCWizards"
             class="org.eclipse.cdt.make.ui.wizards.ConvertToMakeProjectWizard"
             finalPerspective="org.eclipse.cdt.ui.CPerspective"
