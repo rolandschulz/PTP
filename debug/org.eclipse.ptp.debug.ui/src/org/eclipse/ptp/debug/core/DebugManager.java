@@ -29,7 +29,7 @@ import java.util.Map;
  *
  */
 public class DebugManager {
-	private static final int total = 1000;
+	private static final int total = 30000;
 	private static DebugManager instance = null;
 	private List listeners = new ArrayList();
 	private Map processMap = new HashMap();
