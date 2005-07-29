@@ -18,7 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.views;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -60,7 +62,6 @@ import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -273,8 +274,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 				}
 			}
 		}
-		enableDeleteAction(groups.length > 1
-				&& !cur_group_id.equals(IGroupManager.GROUP_ROOT_ID));
+		enableDeleteAction(groups.length > 1 && !cur_group_id.equals(IGroupManager.GROUP_ROOT_ID));
 		enableCreateGroupAction(cur_group_size > 0);
 		enableRegisterAction(cur_group_size > 0);
 	}
@@ -316,8 +316,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		deleteGroupAction = new DeleteGroupAction(this);
 		deleteProcessAction = new DeleteProcessAction(this);
 
-		IToolBarManager toolBarMgr = getViewSite().getActionBars()
-				.getToolBarManager();
+		IToolBarManager toolBarMgr = getViewSite().getActionBars().getToolBarManager();
 		toolBarMgr.add(resumeAction);
 		toolBarMgr.add(suspendAction);
 		toolBarMgr.add(terminateAction);
@@ -394,7 +393,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		case SWT.MouseDown:
 			clearMouseSetting();
 			// unselected all elements only occurred when there is click no press ctrl button
-			delselect();
+			deselect();
 			break;
 		case SWT.DragDetect:
 			// System.out.println("Draf("+mx+":"+my+")");
@@ -414,9 +413,10 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 					selectionShell.setBackground(selectionShell.getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
 				}
 				//only select the bounded area
-				delselect();
+				deselect(groupManager.getBoundedElements());
 				drawSelectedArea(drag_x, drag_y, mx, my);
-				selectElements(getSelectedRect(drag_x, drag_y, mx, my));
+				IElement[] elements = selectElements(getSelectedRect(drag_x, drag_y, mx, my));
+				groupManager.add
 				drawComp.redraw();
 			}
 			break;
@@ -456,8 +456,14 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 			break;
 		}
 	}
+
+	protected void deselect(IElement[] elements) {
+		for (int i=0; i<elements.length; i++) {
+			elements[i].setSelected(false);
+		}
+	}
 	
-	protected void delselect() {
+	protected void deselect() {
 		//MAC use command, but others machine should use control key
 		if (keyCode != DEFAULT_CTRL_KEY) {
 			if (cur_element_group != null)
@@ -706,7 +712,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		selectElements(element_num);
 	}
 
-	protected void selectElements(Rectangle rect) {
+	protected IElement[] selectElements(Rectangle rect) {
 		//add the selection area size by 2 to prevent selection edge on element
 		rect.x += rect_dot_size * 2;
 		rect.y += rect_dot_size * 2;
@@ -726,7 +732,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 
 		// finish it if the total_col is 0
 		if (total_col == 0)
-			return;
+			return new IElement[0];
 
 		int total_row = 0;
 		if (rect.y + rect.height > e_loc.y)
@@ -734,11 +740,13 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 
 		// finish it if the total_row is 0
 		if (total_row == 0)
-			return;
+			return new IElement[0];
 
 		// the first element
 		int init_element_num = (visible_e_col * (e_loc.row - 1) + e_loc.col) - 1;
 		IElement[] elements = cur_element_group.getSortedElements();
+		List selectedElements = new ArrayList();
+		
 		for (int row_count = 0; row_count < total_row; row_count++) {
 			for (int col_count = 0; col_count < total_col; col_count++) {
 				int num = init_element_num + col_count + (row_count * visible_e_col);
@@ -750,8 +758,10 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 				// selectElements(num);
 
 				elements[num].setSelected(true);
+				selectedElements.add(elements[num]);
 			}
 		}
+		return (IElement[])selectedElements.toArray(new IElement[selectedElements.size()]);
 	}
 
 	protected Loc findEstimateLocation(int mx, int my) {
