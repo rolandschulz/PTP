@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
@@ -59,6 +60,7 @@ import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -78,99 +80,78 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 	public static final String VIEW_ID = "org.eclipse.ptp.debug.ui.views.debugParallelProcessView";
 
 	private final static String DEFAULT_TITLE = "Parallel";
-
 	private static DebugParallelProcessView instance = null;
 
 	// actions
 	protected ParallelDebugAction resumeAction = null;
-
 	protected ParallelDebugAction suspendAction = null;
-
 	protected ParallelDebugAction terminateAction = null;
-
 	// protected ParallelDebugAction stepIntoAction = null;
 	// protected ParallelDebugAction stepOverAction = null;
 	// protected ParallelDebugAction stepReturnAction = null;
 	protected ParallelDebugAction registerAction = null;
-
 	protected ParallelDebugAction createGroupAction = null;
-
 	protected ParallelDebugAction deleteGroupAction = null;
-
 	protected ParallelDebugAction deleteProcessAction = null;
 
 	// group
 	protected IGroupManager groupManager = null;
-
 	protected String cur_group_id = IGroupManager.GROUP_ROOT_ID;
-
 	protected IElementGroup cur_element_group = null;
-
 	protected int cur_group_size = 0;
-
 	protected int fisrt_selected_element_id = -1;
 
 	// node info
 	protected final int e_offset_x = 5;
-
 	protected final int e_spacing_x = 4;
-
 	protected final int e_offset_y = 5;
-
 	protected final int e_spacing_y = 4;
-
 	protected final int e_width = 16;
-
 	protected final int e_height = 16;
-
 	protected int view_width = 200;
-
 	protected int view_height = 40;
-
 	protected int visible_e_col = 10;
-
 	protected int visible_e_row = 5;
-
 	protected ScrolledComposite sc = null;
-
 	protected Composite drawComp = null;
 
 	// tooltip
 	protected Shell toolTipShell = null;
-
 	protected Timer hovertimer = null;
-
 	protected final int hide_time = 2000;
 
 	// mouse
 	protected boolean isDoubleClick = false;
-
 	protected int keyCode = SWT.None;
 
 	// selection area
 	protected int drag_x = -1;
-
 	protected int drag_y = -1;
-
 	protected Shell selectionShell = null;
-
 	protected final boolean fill_rect_dot = false;
-
 	protected final int rect_dot_size = 2;
-
 	protected final int rect_dot_disc = 3;
+	
+	//key
+	protected int DEFAULT_CTRL_KEY = Platform.getOS().equals(Platform.OS_MACOSX)?SWT.COMMAND:SWT.CTRL;
 
 	public static Image[][] statusImages = {
-			{ ImageUtil.getImage(ImageUtil.IMG_PRO_ERROR),
-					ImageUtil.getImage(ImageUtil.IMG_PRO_ERROR_SEL), },
-			{ ImageUtil.getImage(ImageUtil.IMG_PRO_RUNNING),
-					ImageUtil.getImage(ImageUtil.IMG_PRO_RUNNING_SEL), },
-			{ ImageUtil.getImage(ImageUtil.IMG_PRO_STARTED),
-					ImageUtil.getImage(ImageUtil.IMG_PRO_STARTED_SEL), },
-			{ ImageUtil.getImage(ImageUtil.IMG_PRO_SUSPENDED),
-					ImageUtil.getImage(ImageUtil.IMG_PRO_SUSPENDED_SEL), },
-			{ ImageUtil.getImage(ImageUtil.IMG_PRO_STOPPED),
-					ImageUtil.getImage(ImageUtil.IMG_PRO_STOPPED_SEL), } };
+		{
+			ImageUtil.getImage(ImageUtil.IMG_PRO_ERROR),
+			ImageUtil.getImage(ImageUtil.IMG_PRO_ERROR_SEL), },
+		{
+			ImageUtil.getImage(ImageUtil.IMG_PRO_RUNNING),
+			ImageUtil.getImage(ImageUtil.IMG_PRO_RUNNING_SEL), },
+		{
+			ImageUtil.getImage(ImageUtil.IMG_PRO_STARTED),
+			ImageUtil.getImage(ImageUtil.IMG_PRO_STARTED_SEL), },
+		{
+			ImageUtil.getImage(ImageUtil.IMG_PRO_SUSPENDED),
+			ImageUtil.getImage(ImageUtil.IMG_PRO_SUSPENDED_SEL), },
+		{
+			ImageUtil.getImage(ImageUtil.IMG_PRO_STOPPED),
+			ImageUtil.getImage(ImageUtil.IMG_PRO_STOPPED_SEL), }
+	};
 
 	protected Listener myDrawingMouseListener = new Listener() {
 		public void handleEvent(Event e) {
@@ -372,7 +353,6 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		sc.addListener(SWT.Resize, new Listener() {
 			public void handleEvent(Event event) {
 				adjustDrawingView();
-				drawComp.redraw();
 			}
 		});
 
@@ -401,9 +381,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 	protected void drawingMouseHandleEvent(Event e) {
 		final int mx = e.x;
 		final int my = e.y;
-		// System.out.println("drag:("+drag_x+":"+drag_y+"),
-		// mouse:("+mx+":"+my+"), view:("+view_width+":"+view_height+"), " +
-		// drawComp.getBounds());
+		// System.out.println("drag:("+drag_x+":"+drag_y+"), mouse:("+mx+":"+my+"), view:("+view_width+":"+view_height+"), " + drawComp.getBounds());
 		switch (e.type) {
 		case SWT.MouseHover:
 			// show tool tips only the mouse is in the view
@@ -415,13 +393,8 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 			break;
 		case SWT.MouseDown:
 			clearMouseSetting();
-			// unselected all elements only occurred when there is click no
-			// press ctrl button
-			// TODO MAC use command, but others machine should use control key
-			if (keyCode != SWT.COMMAND) {
-				if (cur_element_group != null)
-					cur_element_group.setAllSelect(false);
-			}
+			// unselected all elements only occurred when there is click no press ctrl button
+			delselect();
 			break;
 		case SWT.DragDetect:
 			// System.out.println("Draf("+mx+":"+my+")");
@@ -435,13 +408,13 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		case SWT.MouseMove:
 			if (isDragging()) {
 				if (selectionShell == null) {
-					selectionShell = new Shell(drawComp.getShell(), SWT.NO_TRIM
-							| SWT.NO_REDRAW_RESIZE | SWT.ON_TOP);
+					selectionShell = new Shell(drawComp.getShell(), SWT.NO_TRIM | SWT.NO_REDRAW_RESIZE | SWT.ON_TOP);
 					selectionShell.setSize(0, 0);
 					selectionShell.setVisible(true);
-					selectionShell.setBackground(selectionShell.getDisplay()
-							.getSystemColor(SWT.COLOR_DARK_RED));
+					selectionShell.setBackground(selectionShell.getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
 				}
+				//only select the bounded area
+				delselect();
 				drawSelectedArea(drag_x, drag_y, mx, my);
 				selectElements(getSelectedRect(drag_x, drag_y, mx, my));
 				drawComp.redraw();
@@ -482,6 +455,14 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 			clearMouseSetting();
 			break;
 		}
+	}
+	
+	protected void delselect() {
+		//MAC use command, but others machine should use control key
+		if (keyCode != DEFAULT_CTRL_KEY) {
+			if (cur_element_group != null)
+				cur_element_group.setAllSelect(false);
+		}		
 	}
 
 	protected void clearMouseSetting() {
@@ -544,8 +525,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		}
 
 		// System.out.println(start_y+":"+end_y+","+my);
-		return new Rectangle(start_x, start_y, (end_x - start_x),
-				(end_y - start_y));
+		return new Rectangle(start_x, start_y, (end_x - start_x), (end_y - start_y));
 	}
 
 	protected void autoScroll(int mx, int my) {
@@ -558,11 +538,9 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		}
 	}
 
-	protected void drawSelectedArea(Rectangle rect, boolean hasTop,
-			boolean hasBottom) {
+	protected void drawSelectedArea(Rectangle rect, boolean hasTop, boolean hasBottom) {
 		selectionShell.setLocation(rect.x, rect.y);
-		selectionShell.setBounds(rect.x, rect.y, rect.width + rect_dot_disc,
-				rect.height + rect_dot_disc);
+		selectionShell.setBounds(rect.x, rect.y, rect.width + rect_dot_disc, rect.height + rect_dot_disc);
 
 		int last_x = rect.width - rect_dot_disc;
 		int last_y = rect.height - rect_dot_disc;
@@ -571,9 +549,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		Rectangle pixel = new Rectangle(0, 0, rect_dot_size, rect_dot_size);
 		for (int y = 0; y < rect.height; y += rect_dot_disc) {
 			for (int x = 0; x < rect.width; x += rect_dot_disc) {
-				if (fill_rect_dot || (y == 0 && hasTop)
-						|| (y >= last_y && hasBottom)
-						|| (x == 0 || x >= last_x)) {
+				if (fill_rect_dot || (y == 0 && hasTop) || (y >= last_y && hasBottom) || (x == 0 || x >= last_x)) {
 					pixel.x = x;
 					pixel.y = y;
 					region.add(pixel);
@@ -591,8 +567,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		Rectangle rect = getSelectedRect(dx, dy, mx, my);
 
 		Point start_pt = getViewActualLocation(drawComp, null, rect.x, rect.y);
-		Point end_pt = getViewActualLocation(drawComp, null, rect.x
-				+ rect.width, rect.y + rect.height);
+		Point end_pt = getViewActualLocation(drawComp, null, rect.x + rect.width, rect.y + rect.height);
 		int top_y = getDisplay().map(sc, null, 0, 0).y;
 		int bottom_y = getDisplay().map(sc, null, sc.getSize()).y;
 
@@ -623,8 +598,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 	protected void showToolTip(IElement element, int mx, int my) {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("ID: " + element.getID());
-		IElementGroup[] groups = groupManager.getGroupsWithElement(element
-				.getID());
+		IElementGroup[] groups = groupManager.getGroupsWithElement(element.getID());
 		if (groups.length > 1)
 			buffer.append("\nGroup: ");
 		for (int i = 1; i < groups.length; i++) {
@@ -632,8 +606,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 			if (i < groups.length - 1)
 				buffer.append(",");
 		}
-		buffer.append("\nStatus: "
-				+ uiDebugManager.getProcessStatus(element.getID()));
+		buffer.append("\nStatus: " + uiDebugManager.getProcessStatus(element.getID()));
 		showToolTip(buffer.toString(), mx, my);
 	}
 
@@ -642,10 +615,8 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		toolTipShell = new Shell(drawComp.getShell(), SWT.ON_TOP | SWT.TOOL);
 		Label toolTipLabel = new Label(toolTipShell, SWT.LEFT);
 		Display display = toolTipShell.getDisplay();
-		toolTipLabel.setForeground(display
-				.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-		toolTipLabel.setBackground(display
-				.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+		toolTipLabel.setForeground(display.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+		toolTipLabel.setBackground(display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		toolTipLabel.setText(text);
 
 		Point l_size = toolTipLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT);
@@ -664,22 +635,17 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		int new_x = e_loc.x - (s_size.x / 2);
 		Rectangle shell_rect = Display.getCurrent().getBounds();
 		// reset the x to fit into screen size
-		new_x = (new_x < shell_rect.x) ? 0
-				: ((new_x + s_size.x) > shell_rect.width) ? (shell_rect.width
-						- s_size.x - 10) : new_x;
+		new_x = (new_x < shell_rect.x) ? 0 : ((new_x + s_size.x) > shell_rect.width) ? (shell_rect.width - s_size.x - 10) : new_x;
 		int new_y = e_loc.y - s_size.y;
-		new_y = (new_y <= sc.getOrigin().y) ? (e_loc.y + e_height + e_spacing_y)
-				: new_y;
+		new_y = (new_y <= sc.getOrigin().y) ? (e_loc.y + e_height + e_spacing_y) : new_y;
 
-		toolTipShell.setLocation(getViewActualLocation(drawComp, null, new_x,
-				new_y));
+		toolTipShell.setLocation(getViewActualLocation(drawComp, null, new_x, new_y));
 		toolTipShell.setVisible(true);
 
 		createToolTipTimer();
 	}
 
-	protected Point getViewActualLocation(Control from, Control to, int mx,
-			int my) {
+	protected Point getViewActualLocation(Control from, Control to, int mx, int my) {
 		Point mappedpt = getDisplay().map(from, to, 0, 0);
 		Point newpt = new Point(mx, my);
 
@@ -718,10 +684,8 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 			fisrt_selected_element_id = cur_element_num;
 		else {
 			if (fisrt_selected_element_id > -1 && cur_element_num > -1) {
-				int start_element_id = fisrt_selected_element_id > cur_element_num ? cur_element_num
-						: fisrt_selected_element_id;
-				int end_element_id = (start_element_id == cur_element_num ? fisrt_selected_element_id
-						: cur_element_num) + 1;
+				int start_element_id = fisrt_selected_element_id > cur_element_num ? cur_element_num : fisrt_selected_element_id;
+				int end_element_id = (start_element_id == cur_element_num ? fisrt_selected_element_id : cur_element_num) + 1;
 
 				IElement[] elements = cur_element_group.getSortedElements();
 				for (int num = start_element_id; num < end_element_id; num++) {
@@ -743,9 +707,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 	}
 
 	protected void selectElements(Rectangle rect) {
-		/*
-		 * add the selection area size by 2 to prevent selection edge on element
-		 */
+		//add the selection area size by 2 to prevent selection edge on element
 		rect.x += rect_dot_size * 2;
 		rect.y += rect_dot_size * 2;
 		rect.width -= rect_dot_size * 4;
@@ -755,13 +717,10 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 
 		// Complex calculation
 		int total_col = 0;
-		int max_col_width = (visible_e_col * (e_width + e_spacing_x))
-				+ e_offset_x;
+		int max_col_width = (visible_e_col * (e_width + e_spacing_x)) + e_offset_x;
 		if (rect.x + rect.width > e_loc.x && rect.x < max_col_width)
-			total_col = (rect.x + rect.width - e_loc.x)
-					/ (e_width + e_spacing_x) + 1;
-		// prevent to calculate the gap between the element and vertical
-		// scrollbar
+			total_col = (rect.x + rect.width - e_loc.x) / (e_width + e_spacing_x) + 1;
+		// prevent to calculate the gap between the element and vertical scrollbar
 		if (rect.x + rect.width > max_col_width)
 			total_col--;
 
@@ -771,8 +730,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 
 		int total_row = 0;
 		if (rect.y + rect.height > e_loc.y)
-			total_row = ((rect.y + rect.height - e_loc.y)
-					/ (e_height + e_spacing_y) + 1);
+			total_row = ((rect.y + rect.height - e_loc.y) / (e_height + e_spacing_y) + 1);
 
 		// finish it if the total_row is 0
 		if (total_row == 0)
@@ -783,8 +741,7 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		IElement[] elements = cur_element_group.getSortedElements();
 		for (int row_count = 0; row_count < total_row; row_count++) {
 			for (int col_count = 0; col_count < total_col; col_count++) {
-				int num = init_element_num + col_count
-						+ (row_count * visible_e_col);
+				int num = init_element_num + col_count + (row_count * visible_e_col);
 				if (num >= elements.length)
 					break;
 
@@ -838,18 +795,15 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 
 	protected void updateViewSize(boolean isVSrcoll) {
 		Point pt = sc.getSize();
-		view_width = isVSrcoll ? (pt.x - sc.getVerticalBar().getSize().x)
-				: pt.x;
+		view_width = isVSrcoll ? (pt.x - sc.getVerticalBar().getSize().x) : pt.x;
 		view_height = pt.y;
 		visible_e_col = (view_width - e_offset_x) / (e_width + e_spacing_x);
-		visible_e_row = (view_height - e_offset_x) / (e_height + e_spacing_y)
-				+ 1;
+		visible_e_row = (view_height - e_offset_x) / (e_height + e_spacing_y) + 1;
 	}
 
 	protected int calculateHeight() {
 		if (visible_e_col > 0) {
-			int max_element_row = (cur_group_size / visible_e_col)
-					+ ((cur_group_size % visible_e_col == 0) ? 0 : 1);
+			int max_element_row = (cur_group_size / visible_e_col) + ((cur_group_size % visible_e_col == 0) ? 0 : 1);
 			return max_element_row * (e_height + e_spacing_y) + e_offset_x;
 		}
 		return view_height;
@@ -867,12 +821,11 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 			new_height = calculateHeight();
 		}
 		drawComp.setSize(view_width, new_height);
+		//System.out.println(view_width + ":" + new_height);
 	}
 
 	/**
 	 * Print visible area ONLY Find out process numbers of beginning and ending
-	 * 
-	 * @param g
 	 */
 	protected void paintCanvas(GC g) {
 		IElement[] elements = cur_element_group.getSortedElements();
@@ -896,19 +849,16 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 		x = (x == 0) ? visible_e_col : x;
 		int x_loc = e_offset_x + ((x - 1) * (e_width + e_spacing_x));
 
-		int y = (x == visible_e_col) ? index / visible_e_col
-				: (visible_e_col > index) ? 1 : ((index / visible_e_col) + 1);
+		int y = (x == visible_e_col) ? index / visible_e_col : (visible_e_col > index) ? 1 : ((index / visible_e_col) + 1);
 		int y_loc = e_offset_x + ((y - 1) * (e_height + e_spacing_y));
 
 		try {
-			drawing(g, uiDebugManager.getProcessStatus(element.getID()),
-					element.isSelected(), element.isRegistered(), x_loc, y_loc);
+			drawing(g, uiDebugManager.getProcessStatus(element.getID()), element.isSelected(), element.isRegistered(), x_loc, y_loc);
 		} catch (NullPointerException e) {
 		}
 	}
 
-	protected void drawing(GC g, String status, boolean selected,
-			boolean registered, int x_loc, int y_loc) {
+	protected void drawing(GC g, String status, boolean selected, boolean registered, int x_loc, int y_loc) {
 		g.drawImage(getStatusIcon(status, selected), x_loc, y_loc);
 		if (registered) {
 			g.drawRectangle(x_loc, y_loc, e_width, e_height);
@@ -932,12 +882,10 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 
 	public void setSelection(ISelection selection) {
 		if (selection instanceof StructuredSelection) {
-			for (Iterator i = ((StructuredSelection) selection).iterator(); i
-					.hasNext();) {
+			for (Iterator i = ((StructuredSelection) selection).iterator(); i.hasNext();) {
 				Object obj = i.next();
 				if (obj instanceof IPProcess) {
-					IElement element = cur_element_group
-							.getElement(((IPProcess) obj).getKeyString());
+					IElement element = cur_element_group.getElement(((IPProcess) obj).getKeyString());
 					if (element != null)
 						element.setSelected(true);
 				}
@@ -1088,11 +1036,8 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 
 	private class Loc {
 		private int x = 0;
-
 		private int y = 0;
-
 		private int col = 0;
-
 		private int row = 0;
 
 		public Loc(int x, int y, int col, int row) {
@@ -1101,35 +1046,27 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 			this.col = col;
 			this.row = row;
 		}
-
 		public int getCol() {
 			return col;
 		}
-
 		public void setCol(int col) {
 			this.col = col;
 		}
-
 		public int getRow() {
 			return row;
 		}
-
 		public void setRow(int row) {
 			this.row = row;
 		}
-
 		public int getX() {
 			return x;
 		}
-
 		public void setX(int x) {
 			this.x = x;
 		}
-
 		public int getY() {
 			return y;
 		}
-
 		public void setY(int y) {
 			this.y = y;
 		}
