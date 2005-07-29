@@ -42,8 +42,8 @@ import org.eclipse.ptp.debug.ui.model.internal.GroupManager;
  *
  */
 public class UIDebugManager {
-	private IGroupManager groupManager = null;
 	protected IModelManager modelManager = null;
+	private IGroupManager groupManager = null;
 	
 	//FIXME dummy only
 	private boolean dummy = true;
