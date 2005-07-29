@@ -32,4 +32,10 @@ public interface IGroupManager extends IContainer {
 	public IElementGroup[] getGroups();
 	public IElementGroup getGroup(String id);
 	public IElementGroup getGroup(int index);
+	
+	//drag
+	public void addBoundedElement(IElement element);
+	public void removeBoundedElement(IElement element);
+	public IElement[] getBoundedElements();
+	public void removeAllBoundedElements();	
 }
