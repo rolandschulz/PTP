@@ -45,17 +45,14 @@ public class GroupManager extends Parent implements IGroupManager {
 		
 		return (IElementGroup)get(GROUP_ROOT_ID);
 	}
-	public void addBoundedElement(IElement element) {
-		boundedElements.add(element);
-	}
 	public void addBoundedElement(IElement[] elements) {
 		boundedElements.add(elements);
 	}
-	public void removeBoundedElement(IElement element) {
-		boundedElements.remove(element);
-	}
 	public IElement[] getBoundedElements() {
-		return (IElement[])boundedElements.toArray(new IElement[boundedElements.size()]);
+		if (boundedElements.size() == 0)
+			return new IElement[0];
+		
+		return (IElement[])boundedElements.remove(0);
 	}
 	public void removeAllBoundedElements() {
 		boundedElements.clear();

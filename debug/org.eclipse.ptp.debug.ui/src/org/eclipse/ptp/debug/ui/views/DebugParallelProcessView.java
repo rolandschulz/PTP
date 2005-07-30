@@ -416,14 +416,16 @@ public class DebugParallelProcessView extends AbstractDebugParallelView {
 				deselect(groupManager.getBoundedElements());
 				drawSelectedArea(drag_x, drag_y, mx, my);
 				IElement[] elements = selectElements(getSelectedRect(drag_x, drag_y, mx, my));
-				groupManager.add
+				groupManager.addBoundedElement(elements);
 				drawComp.redraw();
 			}
 			break;
 		case SWT.MouseUp:
 			disposeSelectionArea();
 
-			if (!isDragging())
+			if (isDragging())
+				groupManager.removeAllBoundedElements();
+			else
 				selectElement(mx, my);
 
 			clearMouseSetting();
