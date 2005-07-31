@@ -30,10 +30,11 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.debug.core.DebugManager;
 import org.eclipse.ptp.debug.core.PProcess;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
-import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.model.IElementGroup;
-import org.eclipse.ptp.debug.ui.model.IGroupManager;
-import org.eclipse.ptp.debug.ui.model.internal.Element;
+import org.eclipse.ptp.ui.UIManager;
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.model.IElementGroup;
+import org.eclipse.ptp.ui.model.IGroupManager;
+import org.eclipse.ptp.ui.model.internal.Element;
 
 /**
  * @author clement chu

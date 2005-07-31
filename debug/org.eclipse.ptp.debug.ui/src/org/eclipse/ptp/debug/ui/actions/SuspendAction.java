@@ -19,14 +19,15 @@
 package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.views.AbstractParallelView;
+import org.eclipse.ptp.ui.actions.ParallelAction;
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.view.AbstractParallelView;
 
 /**
  * @author clement chu
  *
  */
-public class SuspendAction extends ParallelDebugAction {
+public class SuspendAction extends ParallelAction {
 	public static final String name = "Suspend";
 
 	public SuspendAction(AbstractParallelView debugView) {

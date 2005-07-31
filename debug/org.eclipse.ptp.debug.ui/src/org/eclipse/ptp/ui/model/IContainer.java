@@ -16,22 +16,22 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.model;
-
-
+package org.eclipse.ptp.ui.model;
 /**
  * @author clement chu
  *
  */
-public interface IElementGroup extends IContainer {
-	public IElement[] getSelectedElements();
-	public void removeAllSelected();
-	public void select(int index);
-	public void select(int index, boolean selectIt);
-	public void setAllSelect(boolean select);	
+public interface IContainer extends IElement {
+	public boolean contains(String id);
+	public String getElementID(int index);
+	public void add(IElement element);
+	public void remove(IElement element);
+	public void remove(String id);
+	public void clearAll();
+	public int size();	
 
-	public IElement[] getSortedElements();
-	public IElement[] getElements();
-	public IElement getElement(String id);
-	public IElement getElement(int index);
+	public IElement[] get();
+	public IElement[] getSorted();
+	public IElement get(String id);
+	public IElement get(int index);
 }

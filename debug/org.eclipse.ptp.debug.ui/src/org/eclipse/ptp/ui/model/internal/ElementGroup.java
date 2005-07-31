@@ -16,19 +16,19 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.model.internal;
+package org.eclipse.ptp.ui.model.internal;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.model.IElementGroup;
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.model.IElementGroup;
 /**
  * @author clement chu
  *
  */
-public class ElementGroup extends Parent implements IElementGroup {
+public class ElementGroup extends Container implements IElementGroup {
 	private static int group_counter = 1;
 	
 	public ElementGroup(boolean selected) {

@@ -16,25 +16,22 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.model;
+package org.eclipse.ptp.ui.model;
 
 
 /**
  * @author clement chu
  *
  */
-public interface IGroupManager extends IContainer {
-	public static final String GROUP_ROOT_ID = "0";	
-	public IElementGroup getGroupRoot();
-	
-	public IElementGroup[] getGroupsWithElement(String id);
-	public IElementGroup[] getSortedGroups();
-	public IElementGroup[] getGroups();
-	public IElementGroup getGroup(String id);
-	public IElementGroup getGroup(int index);
-	
-	//drag
-	public void addBoundedElement(IElement[] elements);
-	public IElement[] getBoundedElements();
-	public void removeAllBoundedElements();	
+public interface IElementGroup extends IContainer {
+	public IElement[] getSelectedElements();
+	public void removeAllSelected();
+	public void select(int index);
+	public void select(int index, boolean selectIt);
+	public void setAllSelect(boolean select);	
+
+	public IElement[] getSortedElements();
+	public IElement[] getElements();
+	public IElement getElement(String id);
+	public IElement getElement(int index);
 }

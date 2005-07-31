@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.views;
+package org.eclipse.ptp.ui.view;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -33,14 +33,14 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.ptp.debug.ui.actions.CreateGroupAction;
-import org.eclipse.ptp.debug.ui.actions.DeleteGroupAction;
-import org.eclipse.ptp.debug.ui.actions.DeleteProcessAction;
-import org.eclipse.ptp.debug.ui.actions.GroupAction;
-import org.eclipse.ptp.debug.ui.actions.ParallelDebugAction;
-import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.model.IElementGroup;
-import org.eclipse.ptp.debug.ui.model.IGroupManager;
+import org.eclipse.ptp.ui.actions.CreateGroupAction;
+import org.eclipse.ptp.ui.actions.DeleteGroupAction;
+import org.eclipse.ptp.ui.actions.DeleteProcessAction;
+import org.eclipse.ptp.ui.actions.GroupAction;
+import org.eclipse.ptp.ui.actions.ParallelAction;
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.model.IElementGroup;
+import org.eclipse.ptp.ui.model.IGroupManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.PaintEvent;
@@ -76,9 +76,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	protected Composite drawComp = null;
 
 	// default actions
-	protected ParallelDebugAction createGroupAction = null;
-	protected ParallelDebugAction deleteGroupAction = null;
-	protected ParallelDebugAction deleteProcessAction = null;
+	protected ParallelAction createGroupAction = null;
+	protected ParallelAction deleteGroupAction = null;
+	protected ParallelAction deleteProcessAction = null;
 	
 	// group
 	protected IGroupManager groupManager = null;

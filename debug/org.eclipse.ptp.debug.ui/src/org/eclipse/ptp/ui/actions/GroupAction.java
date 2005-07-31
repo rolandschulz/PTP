@@ -16,17 +16,17 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.actions;
+package org.eclipse.ptp.ui.actions;
 
 import org.eclipse.jface.action.IAction;
-import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.views.AbstractParallelView;
-import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
+import org.eclipse.ptp.debug.ui.view.DebugParallelProcessView;
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.view.AbstractParallelView;
 /**
  * @author clement chu
  *
  */
-public class GroupAction extends ParallelDebugAction {
+public class GroupAction extends ParallelAction {
 	public static final String GROUP_ROOT = "Root";
 	public static final String name = "Group";
 	

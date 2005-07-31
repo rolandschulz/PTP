@@ -19,7 +19,7 @@
 package org.eclipse.ptp.debug.ui;
 
 import org.eclipse.debug.ui.IDebugUIConstants;
-import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
+import org.eclipse.ptp.debug.ui.view.DebugParallelProcessView;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;

@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.views;
+package org.eclipse.ptp.debug.ui.view;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -26,14 +26,15 @@ import org.eclipse.ptp.debug.core.IDebugParallelModelListener;
 import org.eclipse.ptp.debug.ui.ImageUtil;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.UIPlugin;
-import org.eclipse.ptp.debug.ui.actions.ParallelDebugAction;
 import org.eclipse.ptp.debug.ui.actions.ResumeAction;
 import org.eclipse.ptp.debug.ui.actions.StepOverAction;
 import org.eclipse.ptp.debug.ui.actions.StepReturnAction;
 import org.eclipse.ptp.debug.ui.actions.SuspendAction;
 import org.eclipse.ptp.debug.ui.actions.TerminateAction;
-import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.model.IElementGroup;
+import org.eclipse.ptp.ui.actions.ParallelAction;
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.model.IElementGroup;
+import org.eclipse.ptp.ui.view.AbstractParallelElementView;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -47,12 +48,12 @@ public class DebugParallelProcessView extends AbstractParallelElementView implem
 	private UIDebugManager uiDebugManager = null;
 
 	// actions
-	protected ParallelDebugAction resumeAction = null;
-	protected ParallelDebugAction suspendAction = null;
-	protected ParallelDebugAction terminateAction = null;
-	protected ParallelDebugAction stepIntoAction = null;
-	protected ParallelDebugAction stepOverAction = null;
-	protected ParallelDebugAction stepReturnAction = null;
+	protected ParallelAction resumeAction = null;
+	protected ParallelAction suspendAction = null;
+	protected ParallelAction terminateAction = null;
+	protected ParallelAction stepIntoAction = null;
+	protected ParallelAction stepOverAction = null;
+	protected ParallelAction stepReturnAction = null;
 
 	private Image[][] statusImages = {
 		{

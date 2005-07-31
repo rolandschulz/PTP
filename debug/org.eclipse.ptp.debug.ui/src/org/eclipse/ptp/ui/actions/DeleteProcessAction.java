@@ -16,22 +16,22 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.actions;
+package org.eclipse.ptp.ui.actions;
 
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.model.IElementGroup;
-import org.eclipse.ptp.debug.ui.views.AbstractParallelView;
-import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
+import org.eclipse.ptp.debug.ui.view.DebugParallelProcessView;
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.model.IElementGroup;
+import org.eclipse.ptp.ui.view.AbstractParallelView;
 
 /**
  * @author clement chu
  *
  */
-public class DeleteProcessAction extends ParallelDebugAction {
+public class DeleteProcessAction extends ParallelAction {
 	public static final String name = "Delete Process";
 	
 	public DeleteProcessAction(AbstractParallelView debugView) {
