@@ -162,7 +162,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void terminate() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.terminate()");
-		dSession.getDebugger().terminate();
+		dSession.getDebugger().kill();
 	}
 
 	public boolean isDisconnected() {
@@ -174,7 +174,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void disconnect() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.disconnect()");
-		dSession.getDebugger().disconnect();
+		dSession.getDebugger().detach();
 	}
 
 	public void restart() throws CDIException {
@@ -347,7 +347,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void resume(boolean passSignal) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.resume()");
-		dSession.getDebugger().resume();
+		dSession.getDebugger().go();
 	}
 
 	public void resume(ICDILocation location) throws CDIException {
@@ -365,7 +365,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void suspend() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.suspend()");
-		dSession.getDebugger().suspend();
+		dSession.getDebugger().halt();
 	}
 
 	public boolean isSuspended() {

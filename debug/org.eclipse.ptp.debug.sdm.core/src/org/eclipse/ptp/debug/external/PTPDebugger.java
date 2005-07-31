@@ -32,7 +32,7 @@ public class PTPDebugger implements IPCDIDebugger {
 			/* Currently, we only use jobs[0] */
 			
 			DebugSession debug = new DebugSession();
-			debug.initPTP(jobs[0]);
+			debug.getDebugger().initPTP(jobs[0]);
 
 			Session session = new Session(debug, jobs[0]);
 			

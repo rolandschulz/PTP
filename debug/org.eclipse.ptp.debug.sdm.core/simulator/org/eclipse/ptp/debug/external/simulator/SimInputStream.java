@@ -6,17 +6,16 @@ import java.io.InputStream;
 public class SimInputStream extends InputStream {
 
 	int counter = 0;
-	int max;
 	
-	int pause;
+	int max = 1000; /* print "max" lines */
+	int delay = 1; /* pause for "delay" second between each line */
+	
 	String str;
 	int strLen;
 	
-	public SimInputStream(String s, int times, int delay) {
+	public SimInputStream(String s) {
 		super();
-		max = times;
 		str = s;
-		pause = delay;
 		strLen = s.length();
 	}
 	
@@ -31,7 +30,7 @@ public class SimInputStream extends InputStream {
 		}
 		else if ((counter % (strLen + 2)) == strLen + 1) {
 			try {
-				Thread.sleep(pause * 1000);
+				Thread.sleep(delay * 1000);
 			} catch (InterruptedException e) {
 			}
 			return '\n';
