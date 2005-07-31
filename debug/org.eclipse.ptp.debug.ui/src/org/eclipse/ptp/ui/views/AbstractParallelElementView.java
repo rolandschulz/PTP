@@ -23,21 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IContributionItem;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.ptp.ui.actions.CreateGroupAction;
-import org.eclipse.ptp.ui.actions.DeleteGroupAction;
-import org.eclipse.ptp.ui.actions.DeleteProcessAction;
-import org.eclipse.ptp.ui.actions.GroupAction;
-import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementGroup;
 import org.eclipse.ptp.ui.model.IGroupManager;
@@ -59,33 +46,17 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbenchActionConstants;
 
 /**
  * @author clement chu
  *
  */
 public abstract class AbstractParallelElementView extends AbstractParallelView {
-	protected final String DEFAULT_TITLE = "Parallel";
-
 	//Composite
 	protected ScrolledComposite sc = null;
 	protected Composite drawComp = null;
-
-	// default actions
-	protected ParallelAction createGroupAction = null;
-	protected ParallelAction deleteGroupAction = null;
-	protected ParallelAction deleteProcessAction = null;
-	
-	// group
-	protected IGroupManager groupManager = null;
-	protected String cur_group_id = IGroupManager.GROUP_ROOT_ID;
-	protected IElementGroup cur_element_group = null;
-	protected int cur_group_size = 0;
-	protected int fisrt_selected_element_id = -1;
 
 	// default element info
 	protected int e_offset_x = 5;
@@ -95,7 +66,14 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	protected int e_width = 16;
 	protected int e_height = 16;
 
-	//view info
+	// group
+	protected IGroupManager groupManager = null;
+	protected String cur_group_id = IGroupManager.GROUP_ROOT_ID;
+	protected IElementGroup cur_element_group = null;
+	protected int cur_group_size = 0;
+	protected int fisrt_selected_element_id = -1;
+
+	// view info
 	protected int view_width = 200;
 	protected int view_height = 40;
 	protected int visible_e_col = 10;
@@ -128,123 +106,16 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	};
 	
 	public AbstractParallelElementView() {
-		groupManager = uiManager.getGroupManager();
+		groupManager = uiManager.getGroupManager();		
 		initElementAttribute();
 	}
 	
 	//Set element info
 	protected abstract void initElementAttribute();
-	//Set element to display 
-	protected abstract void initialElement();
 	
 	public void createPartControl(Composite parent) {
 		createElementView(parent);
-		createBuildInToolBarActions();
-		createBuildInMenuActions();
-		initialView();
-		createContextMenu();
-	}	
-	
-	protected void initialView() {
-		if (groupManager.size() == 1)
-			initialElement();
-
-		IMenuManager manager = getViewSite().getActionBars().getMenuManager();
-		IElementGroup[] groups = groupManager.getSortedGroups();
-		for (int i = 1; i < groups.length; i++) {
-			IAction action = new GroupAction(groups[i].getID(), this);
-			groups[i].setSelected(false);
-			manager.add(action);
-		}
-		selectGroup(groupManager.getGroupRoot().getID());
-		updateMenu(manager);
 	}
-
-	
-	protected void createBuildInToolBarActions() {		
-		IToolBarManager toolBarMgr = getViewSite().getActionBars().getToolBarManager();
-		if (createToolBarActions(toolBarMgr))
-			toolBarMgr.add(new Separator());
-
-		//default actions
-		createGroupAction = new CreateGroupAction(this);
-		deleteGroupAction = new DeleteGroupAction(this);
-		deleteProcessAction = new DeleteProcessAction(this);
-
-		toolBarMgr.add(createGroupAction);
-		toolBarMgr.add(deleteGroupAction);
-		toolBarMgr.add(deleteProcessAction);
-	}
-	protected abstract boolean createToolBarActions(IToolBarManager toolBarMgr);
-	
-	protected void createBuildInMenuActions() {
-		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-		if (createMenuActions(menuMgr))
-			menuMgr.add(new Separator());
-		
-		//default Root menu
-		IAction action = new GroupAction(IGroupManager.GROUP_ROOT_ID, this);
-		action.setText(GroupAction.GROUP_ROOT);
-		menuMgr.add(action);
-	}
-	protected abstract boolean createMenuActions(IMenuManager menuMgr);
-
-	protected void createContextMenu() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
-				//if right click occur, eclipse will ignore the key up event, so clear keyCode when popup occur.
-				keyCode = SWT.NONE;
-				fillBuildInContextMenu(manager);
-			}
-		});
-		Menu menu = menuMgr.createContextMenu(drawComp);
-		drawComp.setMenu(menu);
-		// Be sure to register it so that other plug-ins can add actions.
-		getSite().registerContextMenu(menuMgr, this);
-	}
-
-	protected void fillBuildInContextMenu(IMenuManager manager) {
-		if (fillContextMenu(manager))
-			manager.add(new Separator());
-		
-		IElementGroup[] groups = groupManager.getSortedGroups();
-		for (int i = 0; i < groups.length; i++) {
-			IAction action = new GroupAction(groups[i].getID(), this);
-			if (i == 0)
-				action.setText(GroupAction.GROUP_ROOT);
-
-			action.setChecked(groups[i].getID().equals(cur_group_id));
-			manager.add(action);
-		}
-
-		// Other plug-ins can contribute there actions here
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-	}	
-	protected abstract boolean fillContextMenu(IMenuManager manager);
-	
-	 //Before this please make sure the group is set
-	public void updateMenu(IMenuManager manager) {
-		IElementGroup[] groups = groupManager.getGroups();
-		for (int i = 0; i < groups.length; i++) {
-			IContributionItem item = manager.find(groups[i].getID());
-			if (item != null && item instanceof ActionContributionItem) {
-				IAction action = ((ActionContributionItem) item).getAction();
-				action.setChecked(groups[i].isSelected());
-				if (action.isChecked()) {
-					changeTitle(action.getText(), groups[i].size());
-				}
-			}
-		}
-		boolean deleteActionEnable = groups.length > 1 && !cur_group_id.equals(IGroupManager.GROUP_ROOT_ID);
-		deleteGroupAction.setEnabled(deleteActionEnable);
-		deleteProcessAction.setEnabled(deleteActionEnable);
-		createGroupAction.setEnabled(cur_group_size > 0);
-		setActionEnable();
-	}
-	//set which action need to be enable or disenale
-	protected abstract void setActionEnable();
 
 	protected void changeTitle(final String title, final int size) {
 		getDisplay().asyncExec(new Runnable() {
@@ -279,7 +150,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 
 		drawComp.addPaintListener(new PaintListener() {
 		public void paintControl(PaintEvent e) {
-				if (cur_element_group != null)
+				if (groupManager.size() > 0)
 					paintCanvas(e.gc);
 			}
 		});
@@ -378,24 +249,23 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		drawComp.redraw();		
 	}
 	
-	protected abstract void doubleClickAction(IElement element);
+	protected abstract void doubleClickAction(int element_num);
 	
 	protected void mouseDoubleClickEvent(int mx, int my) {
 		int element_num = findElementNum(mx, my);
 		if (element_num > -1)
-			doubleClickAction(cur_element_group.get(element_num));
+			doubleClickAction(element_num);
 
 		isDoubleClick = true;
 	}
 	protected void keyDownEvent(int mx, int my, int keyCode) {
 		this.keyCode = keyCode;
-		if (keyCode == '\u007f') // delete key
-			removeProcess();
-		else if (keyCode == SWT.PAGE_UP) // page up key
+		if (keyCode == SWT.PAGE_UP) // page up key
 			scrollUp();
 		else if (keyCode == SWT.PAGE_DOWN) // page down key
 			scrollDown();
 	}
+	
 	protected void keyUpEvent(int mx, int my, int keyCode) {
 		this.keyCode = SWT.None;
 	}
@@ -550,7 +420,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		if (element_num == -1)
 			return;
 		
-		String text = getToolTipText(cur_element_group.get(element_num));
+		String text = getToolTipText(element_num);
 		
 		toolTipShell = new Shell(drawComp.getShell(), SWT.ON_TOP | SWT.TOOL);
 		Label toolTipLabel = new Label(toolTipShell, SWT.LEFT);
@@ -583,7 +453,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		toolTipShell.setVisible(true);
 		//createToolTipTimer();
 	}
-	protected abstract String getToolTipText(IElement element);
+	protected abstract String getToolTipText(int element_num);
 
 	protected Point getViewActualLocation(Control from, Control to, int mx, int my) {
 		Point mappedpt = getDisplay().map(from, to, 0, 0);
@@ -627,6 +497,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	}
 	*/
 
+	//TODO not quite good idea for fisrt_selected_element_id
 	protected void selectElements(int cur_element_num) {
 		if (keyCode != SWT.SHIFT)
 			fisrt_selected_element_id = cur_element_num;
@@ -884,11 +755,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		});
 	}
 	
-	public void removeProcess() {
-		if (!cur_group_id.equals(IGroupManager.GROUP_ROOT_ID)) {
-			deleteProcessAction.run(cur_element_group.getSelectedElements());
-		}
-	}	
 	private class Loc {
 		private int x = 0;
 		private int y = 0;

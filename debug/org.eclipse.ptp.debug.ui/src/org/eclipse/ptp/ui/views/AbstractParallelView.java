@@ -35,6 +35,8 @@ import org.eclipse.ui.part.ViewPart;
  *
  */
 public abstract class AbstractParallelView extends ViewPart implements ISelectionProvider, IParallelModelListener {
+	protected final String DEFAULT_TITLE = "Parallel";
+
 	/**
 	 * store debug event listener
 	 */

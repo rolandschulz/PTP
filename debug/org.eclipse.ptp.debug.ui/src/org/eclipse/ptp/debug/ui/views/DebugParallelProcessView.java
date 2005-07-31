@@ -34,14 +34,14 @@ import org.eclipse.ptp.debug.ui.actions.TerminateAction;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementGroup;
-import org.eclipse.ptp.ui.views.AbstractParallelElementView;
+import org.eclipse.ptp.ui.views.AbstractParallelGroupView;
 import org.eclipse.swt.graphics.Image;
 
 /**
  * @author clement chu
  * 
  */
-public class DebugParallelProcessView extends AbstractParallelElementView implements IDebugParallelModelListener {
+public class DebugParallelProcessView extends AbstractParallelGroupView implements IDebugParallelModelListener {
 	public static final String VIEW_ID = "org.eclipse.ptp.debug.ui.views.debugParallelProcessView";
 
 	private static DebugParallelProcessView instance = null;
@@ -135,11 +135,17 @@ public class DebugParallelProcessView extends AbstractParallelElementView implem
 		
 	}
 
-	protected void doubleClickAction(IElement element) {
-		registerElement(element);
+	protected void doubleClickAction(int element_num) {
+		IElement element = cur_element_group.get(element_num);
+		if (element != null)
+			registerElement(element);
 	}
 
-	protected String getToolTipText(IElement element) {
+	protected String getToolTipText(int element_num) {
+		IElement element = cur_element_group.get(element_num);
+		if (element == null)
+			return "Unknown element";
+		
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("ID: " + element.getID());
 		IElementGroup[] groups = groupManager.getGroupsWithElement(element.getID());
