@@ -126,6 +126,9 @@ public class DebugParallelProcessView extends AbstractParallelElementView implem
 		toolBarMgr.add(stepReturnAction);
 		return true;
 	}
+	protected boolean createMenuActions(IMenuManager menuMgr) {
+		return false;
+	}
 	
 	protected void setActionEnable() {
 		

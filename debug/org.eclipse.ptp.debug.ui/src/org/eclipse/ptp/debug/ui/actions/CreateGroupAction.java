@@ -83,7 +83,7 @@ public class CreateGroupAction extends ParallelDebugAction {
 	public CreateGroupAction(AbstractParallelView debugView) {
 		super(name, IAction.AS_DROP_DOWN_MENU, debugView);
 	    setImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_DISABLE);
 	    setMenuCreator(menuCreator);
 	    setId(name);
 	}
@@ -117,7 +117,7 @@ public class CreateGroupAction extends ParallelDebugAction {
 			super("Add To: " + GroupAction.name + " " + group_id, view);
 			this.group_id = group_id;
 		    setImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
-		    setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
+		    setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_DISABLE);
 		    setEnabled(!view.getCurrentGroupID().equals(group_id));
 		}
 		

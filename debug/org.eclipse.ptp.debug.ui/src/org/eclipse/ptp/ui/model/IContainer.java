@@ -16,26 +16,22 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.actions;
-
-import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.views.AbstractParallelView;
-
+package org.eclipse.ptp.ui.model;
 /**
  * @author clement chu
  *
  */
-public class SuspendAction extends ParallelDebugAction {
-	public static final String name = "Suspend";
+public interface IContainer extends IElement {
+	public boolean contains(String id);
+	public String getElementID(int index);
+	public void add(IElement element);
+	public void remove(IElement element);
+	public void remove(String id);
+	public void clearAll();
+	public int size();	
 
-	public SuspendAction(AbstractParallelView debugView) {
-		super(name, debugView);
-	    setImageDescriptor(ImageUtil.ID_ICON_SUSPEND_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_SUSPEND_DISABLE);
-	}
-
-	public void run(IElement[] elements) {
-		// TODO Auto-generated method stub
-	}
+	public IElement[] get();
+	public IElement[] getSorted();
+	public IElement get(String id);
+	public IElement get(int index);
 }

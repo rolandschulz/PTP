@@ -32,7 +32,7 @@ public class StepOverAction extends StepAction {
 	public StepOverAction(AbstractParallelView debugView) {
 		super(name, debugView);
 	    setImageDescriptor(ImageUtil.ID_ICON_STEPOVER_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_STEPOVER_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_STEPOVER_DISABLE);
 	}
 
 	public void run(IElement[] elements) {

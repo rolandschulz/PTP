@@ -32,7 +32,7 @@ public class StepReturnAction extends StepAction {
 	public StepReturnAction(AbstractParallelView debugView) {
 		super(name, debugView);
 	    setImageDescriptor(ImageUtil.ID_ICON_STEPRETURN_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_STEPRETURN_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_STEPRETURN_DISABLE);
 	}
 	
 	public void run(IElement[] elements) {
