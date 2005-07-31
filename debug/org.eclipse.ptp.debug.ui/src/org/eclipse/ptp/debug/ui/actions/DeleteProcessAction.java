@@ -37,7 +37,7 @@ public class DeleteProcessAction extends ParallelDebugAction {
 	public DeleteProcessAction(AbstractParallelView debugView) {
 		super(name, debugView);
 	    setImageDescriptor(ImageUtil.ID_ICON_DELETEPROCESS_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_DELETEPROCESS_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_DELETEPROCESS_DISABLE);
 	}
 
 	public void run(IElement[] elements) {

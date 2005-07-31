@@ -32,7 +32,7 @@ public class TerminateAction extends ParallelDebugAction {
 	public TerminateAction(AbstractParallelView debugView) {
 		super(name, debugView);
 	    setImageDescriptor(ImageUtil.ID_ICON_TERMINATE_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_TERMINATE_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_TERMINATE_DISABLE);
 	    setId(name);
 	}
 	

@@ -140,6 +140,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	public void createPartControl(Composite parent) {
 		createElementView(parent);
 		createBuildInToolBarActions();
+		createBuildInMenuActions();
 		initialView();
 		createContextMenu();
 	}	
@@ -173,13 +174,20 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		toolBarMgr.add(createGroupAction);
 		toolBarMgr.add(deleteGroupAction);
 		toolBarMgr.add(deleteProcessAction);
-
-		//create Root menu
+	}
+	protected abstract boolean createToolBarActions(IToolBarManager toolBarMgr);
+	
+	protected void createBuildInMenuActions() {
+		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+		if (createMenuActions(menuMgr))
+			menuMgr.add(new Separator());
+		
+		//default Root menu
 		IAction action = new GroupAction(IGroupManager.GROUP_ROOT_ID, this);
 		action.setText(GroupAction.GROUP_ROOT);
-		getViewSite().getActionBars().getMenuManager().add(action);
+		menuMgr.add(action);
 	}
-	protected abstract boolean createToolBarActions(IToolBarManager toolBarMgr);	
+	protected abstract boolean createMenuActions(IMenuManager menuMgr);
 
 	protected void createContextMenu() {
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
@@ -861,7 +869,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 			public void run() {
 				if (!drawComp.isDisposed()) {
 					adjustDrawingView();
-					drawComp.redraw();
 				}
 			}
 		});

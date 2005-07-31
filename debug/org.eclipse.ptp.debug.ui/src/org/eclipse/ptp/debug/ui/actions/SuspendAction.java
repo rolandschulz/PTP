@@ -32,7 +32,7 @@ public class SuspendAction extends ParallelDebugAction {
 	public SuspendAction(AbstractParallelView debugView) {
 		super(name, debugView);
 	    setImageDescriptor(ImageUtil.ID_ICON_SUSPEND_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_SUSPEND_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_SUSPEND_DISABLE);
 	}
 
 	public void run(IElement[] elements) {

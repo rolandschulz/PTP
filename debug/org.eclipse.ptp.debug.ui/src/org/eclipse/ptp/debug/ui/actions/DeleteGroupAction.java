@@ -39,7 +39,7 @@ public class DeleteGroupAction extends ParallelDebugAction {
 	public DeleteGroupAction(AbstractParallelView debugView) {
 		super(name, debugView);
 	    setImageDescriptor(ImageUtil.ID_ICON_DELETEGROUP_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_DELETEGROUP_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_DELETEGROUP_DISABLE);
 	    setId(name);
 	}
 
