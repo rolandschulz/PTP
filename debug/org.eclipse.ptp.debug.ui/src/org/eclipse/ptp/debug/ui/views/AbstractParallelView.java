@@ -26,9 +26,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IParallelModelListener;
-import org.eclipse.ptp.debug.core.DebugManager;
-import org.eclipse.ptp.debug.core.IDebugParallelModelListener;
-import org.eclipse.ptp.debug.ui.UIDebugManager;
+import org.eclipse.ptp.debug.ui.UIManager;
 import org.eclipse.ptp.debug.ui.UIPlugin;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
@@ -36,22 +34,18 @@ import org.eclipse.ui.part.ViewPart;
  * @author clement chu
  *
  */
-public abstract class AbstractDebugParallelView extends ViewPart implements ISelectionProvider, IDebugParallelModelListener, IParallelModelListener {
+public abstract class AbstractParallelView extends ViewPart implements ISelectionProvider, IParallelModelListener {
 	/**
 	 * store debug event listener
 	 */
 	protected List listeners = new ArrayList(0);
-	protected UIDebugManager uiDebugManager = null;
+	protected UIManager uiManager = null;
 	protected IModelManager modelManager = null;
 	
-	public AbstractDebugParallelView() {
-		uiDebugManager = UIPlugin.getDefault().getUIDebugManager();
-		modelManager = uiDebugManager.getModelManager();
+	public AbstractParallelView() {
+		uiManager = UIPlugin.getDefault().getUIManager();
+		modelManager = uiManager.getModelManager();
 		modelManager.addParallelLaunchListener(this);
-		/* FIXME
-		 * add ModelListener 
-		 */		
-		DebugManager.getInstance().addListener(this);
 	}
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
@@ -70,16 +64,12 @@ public abstract class AbstractDebugParallelView extends ViewPart implements ISel
 	 */
 	public void dispose() {
 		listeners.clear();
-		/* FIXME
-		 * remove ModelListener 
-		 */
-		DebugManager.getInstance().removeListener(this);
 		modelManager.removeParallelLaunchListener(this);
 		super.dispose();
 	}
 	
-	public UIDebugManager getUIDebugManger() {
-		return uiDebugManager;
+	public UIManager getUIDebugManger() {
+		return uiManager;
 	}
 	
 	protected Display getDisplay() {

@@ -35,6 +35,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
 	
+	private UIManager uiManager = null;
 	private UIDebugManager uiDebugManager = null;
 	
 	/**
@@ -58,9 +59,13 @@ public class UIPlugin extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		uiManager = new UIManager();
 		uiDebugManager = new UIDebugManager();
 	}
 	
+	public UIManager getUIManager() {
+		return uiManager;
+	}
 	public UIDebugManager getUIDebugManager() {
 		return uiDebugManager;
 	}
@@ -70,7 +75,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
-		uiDebugManager.shutdown();
+		uiManager.shutdown();
 		plugin = null;
 		resourceBundle = null;
 	}
