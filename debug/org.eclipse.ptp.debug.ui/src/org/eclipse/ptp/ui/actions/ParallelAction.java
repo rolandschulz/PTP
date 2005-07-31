@@ -16,15 +16,15 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.actions;
+package org.eclipse.ptp.ui.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.debug.ui.UIDialog;
-import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.views.AbstractParallelView;
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.view.AbstractParallelView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 
@@ -32,14 +32,14 @@ import org.eclipse.swt.widgets.Shell;
  * @author clement chu
  *
  */
-public abstract class ParallelDebugAction extends Action {
+public abstract class ParallelAction extends Action {
 	protected AbstractParallelView debugView = null;
 	
-	public ParallelDebugAction(String text, AbstractParallelView debugView) {
+	public ParallelAction(String text, AbstractParallelView debugView) {
 		this(text, IAction.AS_PUSH_BUTTON, debugView);
 	}
 	
-	public ParallelDebugAction(String text, int style, AbstractParallelView debugView) {
+	public ParallelAction(String text, int style, AbstractParallelView debugView) {
 		super(text, style);
 		this.debugView = debugView;
 	    setToolTipText(text);

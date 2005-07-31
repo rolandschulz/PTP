@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.views;
+package org.eclipse.ptp.ui.view;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +26,8 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IParallelModelListener;
-import org.eclipse.ptp.debug.ui.UIManager;
 import org.eclipse.ptp.debug.ui.UIPlugin;
+import org.eclipse.ptp.ui.UIManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 /**

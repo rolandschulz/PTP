@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.actions;
+package org.eclipse.ptp.ui.actions;
 
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
@@ -25,16 +25,16 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.views.AbstractParallelView;
-import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
+import org.eclipse.ptp.debug.ui.view.DebugParallelProcessView;
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.view.AbstractParallelView;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 /**
  * @author clement chu
  *
  */
-public class CreateGroupAction extends ParallelDebugAction {
+public class CreateGroupAction extends ParallelAction {
 	public static final String name = "Create Group";
 
     private IMenuCreator menuCreator = new IMenuCreator() {
@@ -111,7 +111,7 @@ public class CreateGroupAction extends ParallelDebugAction {
 		view.redraw();
 	}
 	
-	private class InternalGroupAction extends ParallelDebugAction {
+	private class InternalGroupAction extends ParallelAction {
 		private String group_id = "";
 		private InternalGroupAction(String group_id, DebugParallelProcessView view) {
 			super("Add To: " + GroupAction.name + " " + group_id, view);

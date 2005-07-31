@@ -16,22 +16,22 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.model.internal;
+package org.eclipse.ptp.ui.model.internal;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.ptp.debug.ui.model.IContainer;
-import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.model.IElementGroup;
-import org.eclipse.ptp.debug.ui.model.IGroupManager;
+import org.eclipse.ptp.ui.model.IContainer;
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.model.IElementGroup;
+import org.eclipse.ptp.ui.model.IGroupManager;
 
 /**
  * @author clement chu
  *
  */
-public class GroupManager extends Parent implements IGroupManager {
+public class GroupManager extends Container implements IGroupManager {
 	private List boundedElements = new ArrayList();
 		
 	public GroupManager() {

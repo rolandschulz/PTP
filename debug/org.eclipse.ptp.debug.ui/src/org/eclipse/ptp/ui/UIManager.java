@@ -16,15 +16,15 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui;
+package org.eclipse.ptp.ui;
 
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.model.IElementGroup;
-import org.eclipse.ptp.debug.ui.model.IGroupManager;
-import org.eclipse.ptp.debug.ui.model.internal.ElementGroup;
-import org.eclipse.ptp.debug.ui.model.internal.GroupManager;
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.model.IElementGroup;
+import org.eclipse.ptp.ui.model.IGroupManager;
+import org.eclipse.ptp.ui.model.internal.ElementGroup;
+import org.eclipse.ptp.ui.model.internal.GroupManager;
 
 /**
  * @author clement chu

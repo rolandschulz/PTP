@@ -16,23 +16,23 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.model.internal;
+package org.eclipse.ptp.ui.model.internal;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.ptp.debug.ui.model.IContainer;
-import org.eclipse.ptp.debug.ui.model.IElement;
+import org.eclipse.ptp.ui.model.IContainer;
+import org.eclipse.ptp.ui.model.IElement;
 
 /**
  * @author clement chu
  *
  */
-public abstract class Parent extends Element implements IContainer {
+public abstract class Container extends Element implements IContainer {
 	protected Map elementMap = new HashMap();
 	protected IElement[] sortedArray = new IElement[0];
 	
-	public Parent(String id, boolean selected) {
+	public Container(String id, boolean selected) {
 		super(id, selected);
 	}
 	

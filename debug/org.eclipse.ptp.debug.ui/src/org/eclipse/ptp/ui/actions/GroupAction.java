@@ -16,22 +16,36 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.model;
+package org.eclipse.ptp.ui.actions;
 
-
+import org.eclipse.jface.action.IAction;
+import org.eclipse.ptp.debug.ui.view.DebugParallelProcessView;
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.view.AbstractParallelView;
 /**
  * @author clement chu
  *
  */
-public interface IElementGroup extends IContainer {
-	public IElement[] getSelectedElements();
-	public void removeAllSelected();
-	public void select(int index);
-	public void select(int index, boolean selectIt);
-	public void setAllSelect(boolean select);	
+public class GroupAction extends ParallelAction {
+	public static final String GROUP_ROOT = "Root";
+	public static final String name = "Group";
+	
+	public GroupAction(String id, AbstractParallelView debugView) {
+		super(name + " " + id, IAction.AS_CHECK_BOX, debugView);
+	    setEnabled(true);
+		setId(id);
+	}
 
-	public IElement[] getSortedElements();
-	public IElement[] getElements();
-	public IElement getElement(String id);
-	public IElement getElement(int index);
+	public void run(IElement[] elements) {}
+	
+	public void run() {
+		if (debugView instanceof DebugParallelProcessView) {
+			DebugParallelProcessView view = (DebugParallelProcessView)debugView;
+			view.selectGroup(getId());
+			//deselect all elements each time changed the group
+			view.getCurrentGroup().setAllSelect(false);
+			view.updateMenu(view.getViewSite().getActionBars().getMenuManager());
+			view.redraw();
+		}
+	}	
 }

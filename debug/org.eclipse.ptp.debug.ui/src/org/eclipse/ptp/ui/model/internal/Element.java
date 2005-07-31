@@ -16,9 +16,9 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.model.internal;
+package org.eclipse.ptp.ui.model.internal;
 
-import org.eclipse.ptp.debug.ui.model.IElement;
+import org.eclipse.ptp.ui.model.IElement;
 
 
 /**
