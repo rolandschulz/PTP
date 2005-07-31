@@ -22,10 +22,10 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.view.DebugParallelProcessView;
+import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementGroup;
-import org.eclipse.ptp.ui.view.AbstractParallelView;
+import org.eclipse.ptp.ui.views.AbstractParallelView;
 
 /**
  * @author clement chu

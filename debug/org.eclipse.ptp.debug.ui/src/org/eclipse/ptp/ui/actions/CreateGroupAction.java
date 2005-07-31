@@ -25,9 +25,9 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.view.DebugParallelProcessView;
+import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.view.AbstractParallelView;
+import org.eclipse.ptp.ui.views.AbstractParallelView;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 /**

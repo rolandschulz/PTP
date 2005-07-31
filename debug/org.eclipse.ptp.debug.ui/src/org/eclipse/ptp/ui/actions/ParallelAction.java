@@ -24,7 +24,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.debug.ui.UIDialog;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.view.AbstractParallelView;
+import org.eclipse.ptp.ui.views.AbstractParallelView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 

@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.view;
+package org.eclipse.ptp.debug.ui.views;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -34,7 +34,7 @@ import org.eclipse.ptp.debug.ui.actions.TerminateAction;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementGroup;
-import org.eclipse.ptp.ui.view.AbstractParallelElementView;
+import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 import org.eclipse.swt.graphics.Image;
 
 /**
