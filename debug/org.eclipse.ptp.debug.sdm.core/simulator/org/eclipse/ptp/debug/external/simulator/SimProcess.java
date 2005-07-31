@@ -25,7 +25,7 @@ public class SimProcess extends Process {
 		
 		//err = new SimInputStream(name, 3, 10);
 		err = null;
-		in = new SimInputStream(name, 10, 6);
+		in = new SimInputStream(name);
 		out = new SimOutputStream();
 	}
 	

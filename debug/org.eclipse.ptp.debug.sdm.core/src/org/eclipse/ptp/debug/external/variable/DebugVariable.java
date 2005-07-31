@@ -8,7 +8,7 @@ package org.eclipse.ptp.debug.external.variable;
  * @author donny
  *
  */
-public class DebugVariable {
+public abstract class DebugVariable {
 	String name = "";
 	String value = "";
 	String defaultValue = "";

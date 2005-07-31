@@ -42,7 +42,7 @@ public class ProcessManager extends Manager {
 			Target target = targets[i];
 			DebugSession miSession = target.getDebugSession();
 			if (miSession != null) {
-				miSession.addDebuggerObserver(eventManager);
+				miSession.getDebugger().addDebuggerObserver(eventManager);
 				miSession.getDebugger().fireEvent(new EInferiorCreated(miSession));
 				if (!debugTargetList.contains(target)) {
 					debugTargetList.add(target);
@@ -58,7 +58,7 @@ public class ProcessManager extends Manager {
 			Target target = targets[i];
 			DebugSession miSession = target.getDebugSession();
 			if (miSession != null) {
-				miSession.deleteDebuggerObserver(eventManager);
+				miSession.getDebugger().deleteDebuggerObserver(eventManager);
 			}
 			debugTargetList.remove(target);
 		}

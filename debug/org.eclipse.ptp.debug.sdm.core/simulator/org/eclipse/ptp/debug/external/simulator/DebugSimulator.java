@@ -3,15 +3,12 @@ package org.eclipse.ptp.debug.external.simulator;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
-import org.eclipse.ptp.debug.external.DebugConfig;
-import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.event.EBreakpointHit;
 import org.eclipse.ptp.debug.external.model.MProcess;
 
 public class DebugSimulator extends AbstractDebugger {
 
 	private Process debugProcess = null;
-	private DebugSession debugSession = null;
 	
 	final int RUNNING = 10;
 	final int SUSPENDED = 11;
@@ -20,15 +17,13 @@ public class DebugSimulator extends AbstractDebugger {
 	boolean finished = false;
 	Thread dThread = null;
 	
-	public DebugSimulator(DebugConfig dConf) {
-		super(dConf);
+	public DebugSimulator() {
+		super();
 	}
 
-	public void initDebugger(DebugSession dS) {
-		super.initDebugger();
+	protected void startDebugger() {
 		//debugProcess = Runtime.getRuntime().exec("/bin/bash /tmp/process.sh debugger 6");
 		debugProcess = new SimProcess("Debugger", 1, 1);
-		debugSession = dS;
 		
 		state = SUSPENDED;
 		
@@ -50,7 +45,7 @@ public class DebugSimulator extends AbstractDebugger {
 		dThread.start();
 	}
 	
-	public void destroyDebugger() {
+	protected void stopDebugger() {
 		// Auto-generated method stub
 		System.out.println("DebugSimulator.destroyDebugger()");
 		finished = true;
@@ -61,7 +56,6 @@ public class DebugSimulator extends AbstractDebugger {
 	}
 	
 	public void load(String prg, int numProcs) {
-		super.load(prg, numProcs);
 		MProcess.resetGlobalCounter();
 		for (int i = 0; i < numProcs; i++) {
 			MProcess proc = new MProcess();
@@ -77,7 +71,6 @@ public class DebugSimulator extends AbstractDebugger {
 	}
 	
 	public void run(String[] args) {
-		super.run(args);
 	}
 
 	public Process getSessionProcess() {
@@ -85,7 +78,6 @@ public class DebugSimulator extends AbstractDebugger {
 	}
 
 	public void breakpoint(String loc) {
-		super.breakpoint(loc);
 		System.out.println("DebugSimulator.breakpoint()");
 	}
 	
@@ -106,7 +98,7 @@ public class DebugSimulator extends AbstractDebugger {
 		return getProcess(0);
 	}
 	
-	public void disconnect() {
+	public void detach() {
 		// Auto-generated method stub
 		System.out.println("DebugSimulator.disconnect()");
 		int listSize = allSet.getSize();
@@ -116,9 +108,9 @@ public class DebugSimulator extends AbstractDebugger {
 
 	}
 
-	public void resume() {
+	public void go() {
 		// Auto-generated method stub
-		System.out.println("DebugSimulator.resume()");
+		System.out.println("DebugSimulator.go()");
 		int listSize = allSet.getSize();
 		for (int i = 0; i < listSize; i++) {
 			System.out.println("resuming: " + allSet.getProcess(i).getName());
@@ -136,9 +128,9 @@ public class DebugSimulator extends AbstractDebugger {
 
 	}
 
-	public void terminate() {
+	public void kill() {
 		// Auto-generated method stub
-		System.out.println("DebugSimulator.terminate()");
+		System.out.println("DebugSimulator.kill()");
 		int listSize = allSet.getSize();
 		
 		long start = System.currentTimeMillis();
@@ -155,9 +147,9 @@ public class DebugSimulator extends AbstractDebugger {
 
 	}
 
-	public void suspend() {
+	public void halt() {
 		// Auto-generated method stub
-		System.out.println("DebugSimulator.suspend()");
+		System.out.println("DebugSimulator.halt()");
 		int listSize = allSet.getSize();
 		for (int i = 0; i < listSize; i++) {
 			System.out.println("suspending: " + allSet.getProcess(i).getName());
@@ -179,6 +171,90 @@ public class DebugSimulator extends AbstractDebugger {
 			proc.setPProcess(procs[i]);
 			allSet.addProcess(proc);
 		}
+	}
+
+	public void step() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.step()");
+		
+	}
+
+	public void step(int count) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.step()");
+		
+	}
+
+	public void stepOver() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.stepOver()");
+		
+	}
+
+	public void stepOver(int count) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.stepOver()");
+		
+	}
+
+	public void stepFinish() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.stepFinish()");
+		
+	}
+
+	public void breakpoint(String loc, int count) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.breakpoint()");
+		
+	}
+
+	public void breakpoint(String loc, String cond) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.breakpoint()");
+		
+	}
+
+	public void watchpoint(String var) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.watchpoint()");
+		
+	}
+
+	public void delete(int[] ids) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.delete()");
+		
+	}
+
+	public void delete(String type) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.delete()");
+		
+	}
+
+	public void disable(int[] ids) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.disable()");
+		
+	}
+
+	public void disable(String type) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.disable()");
+		
+	}
+
+	public void enable(int[] ids) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.enable()");
+		
+	}
+
+	public void enable(String type) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.enable()");
+		
 	}
 
 }
