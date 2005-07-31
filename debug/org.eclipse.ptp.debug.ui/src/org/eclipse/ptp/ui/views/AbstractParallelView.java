@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.view;
+package org.eclipse.ptp.ui.views;
 
 import java.util.ArrayList;
 import java.util.List;

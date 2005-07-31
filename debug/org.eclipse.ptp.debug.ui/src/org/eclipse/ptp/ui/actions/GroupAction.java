@@ -19,9 +19,9 @@
 package org.eclipse.ptp.ui.actions;
 
 import org.eclipse.jface.action.IAction;
-import org.eclipse.ptp.debug.ui.view.DebugParallelProcessView;
+import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.view.AbstractParallelView;
+import org.eclipse.ptp.ui.views.AbstractParallelView;
 /**
  * @author clement chu
  *

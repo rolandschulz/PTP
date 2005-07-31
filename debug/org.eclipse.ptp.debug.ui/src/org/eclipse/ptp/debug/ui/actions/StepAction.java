@@ -19,7 +19,7 @@
 package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.ptp.ui.actions.ParallelAction;
-import org.eclipse.ptp.ui.view.AbstractParallelView;
+import org.eclipse.ptp.ui.views.AbstractParallelView;
 
 /**
  * @author clement chu

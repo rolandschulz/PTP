@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.view;
+package org.eclipse.ptp.ui.views;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -194,6 +194,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
+				//if right click occur, eclipse will ignore the key up event, so clear keyCode when popup occur.
+				keyCode = SWT.NONE;
 				fillBuildInContextMenu(manager);
 			}
 		});
@@ -395,7 +397,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 			scrollDown();
 	}
 	protected void keyUpEvent(int mx, int my, int keyCode) {
-		keyCode = SWT.None;
+		this.keyCode = SWT.None;
 	}
 	protected void otherEvent(int mx, int my, int keyCode) {
 		// System.out.println("Other("+mx+":"+my+")");
@@ -867,9 +869,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	public void redraw() {
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				if (!drawComp.isDisposed()) {
+				if (!drawComp.isDisposed())
 					adjustDrawingView();
-				}
 			}
 		});
 	}
