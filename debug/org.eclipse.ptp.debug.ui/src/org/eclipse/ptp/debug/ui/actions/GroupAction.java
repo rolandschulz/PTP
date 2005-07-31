@@ -20,7 +20,7 @@ package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
+import org.eclipse.ptp.debug.ui.views.AbstractParallelView;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 /**
  * @author clement chu
@@ -30,7 +30,7 @@ public class GroupAction extends ParallelDebugAction {
 	public static final String GROUP_ROOT = "Root";
 	public static final String name = "Group";
 	
-	public GroupAction(String id, AbstractDebugParallelView debugView) {
+	public GroupAction(String id, AbstractParallelView debugView) {
 		super(name + " " + id, IAction.AS_CHECK_BOX, debugView);
 	    setEnabled(true);
 		setId(id);

@@ -24,7 +24,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.debug.ui.UIDialog;
 import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
+import org.eclipse.ptp.debug.ui.views.AbstractParallelView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 
@@ -33,20 +33,20 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public abstract class ParallelDebugAction extends Action {
-	protected AbstractDebugParallelView debugView = null;
+	protected AbstractParallelView debugView = null;
 	
-	public ParallelDebugAction(String text, AbstractDebugParallelView debugView) {
+	public ParallelDebugAction(String text, AbstractParallelView debugView) {
 		this(text, IAction.AS_PUSH_BUTTON, debugView);
 	}
 	
-	public ParallelDebugAction(String text, int style, AbstractDebugParallelView debugView) {
+	public ParallelDebugAction(String text, int style, AbstractParallelView debugView) {
 		super(text, style);
 		this.debugView = debugView;
 	    setToolTipText(text);
 	    setEnabled(false);
 	}
 	
-	public AbstractDebugParallelView getViewPart() {
+	public AbstractParallelView getViewPart() {
         return debugView;
     }
     

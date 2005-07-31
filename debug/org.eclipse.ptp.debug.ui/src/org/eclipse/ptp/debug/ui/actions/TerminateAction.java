@@ -20,7 +20,7 @@ package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.ptp.debug.ui.ImageUtil;
 import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
+import org.eclipse.ptp.debug.ui.views.AbstractParallelView;
 
 /**
  * @author clement chu
@@ -29,7 +29,7 @@ import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
 public class TerminateAction extends ParallelDebugAction {
 	public static final String name = "Terminate";
 
-	public TerminateAction(AbstractDebugParallelView debugView) {
+	public TerminateAction(AbstractParallelView debugView) {
 		super(name, debugView);
 	    setImageDescriptor(ImageUtil.ID_ICON_TERMINATE_NORMAL);
 	    setDisabledImageDescriptor(ImageUtil.ID_ICON_TERMINATE_NORMAL);

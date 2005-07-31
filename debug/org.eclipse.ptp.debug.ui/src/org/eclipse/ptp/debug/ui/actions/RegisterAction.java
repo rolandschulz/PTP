@@ -20,7 +20,7 @@ package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.ptp.debug.ui.ImageUtil;
 import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
+import org.eclipse.ptp.debug.ui.views.AbstractParallelView;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 /**
  * @author clement chu
@@ -29,7 +29,7 @@ import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 public class RegisterAction extends ParallelDebugAction {
 	public static final String name = "Register Selected Elements";
 	
-	public RegisterAction(AbstractDebugParallelView debugView) {
+	public RegisterAction(AbstractParallelView debugView) {
 		super(name, debugView);
 	    setImageDescriptor(ImageUtil.ID_ICON_REGISTER_NORMAL);
 	    setDisabledImageDescriptor(ImageUtil.ID_ICON_REGISTER_NORMAL);

@@ -24,7 +24,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.debug.ui.ImageUtil;
 import org.eclipse.ptp.debug.ui.model.IElement;
 import org.eclipse.ptp.debug.ui.model.IElementGroup;
-import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
+import org.eclipse.ptp.debug.ui.views.AbstractParallelView;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 
 /**
@@ -34,7 +34,7 @@ import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 public class DeleteProcessAction extends ParallelDebugAction {
 	public static final String name = "Delete Process";
 	
-	public DeleteProcessAction(AbstractDebugParallelView debugView) {
+	public DeleteProcessAction(AbstractParallelView debugView) {
 		super(name, debugView);
 	    setImageDescriptor(ImageUtil.ID_ICON_DELETEPROCESS_NORMAL);
 	    setDisabledImageDescriptor(ImageUtil.ID_ICON_DELETEPROCESS_NORMAL);
@@ -50,6 +50,8 @@ public class DeleteProcessAction extends ParallelDebugAction {
 					callDeleteGroupAction(view);
 				} else {
 					view.getUIDebugManger().removeFromGroup(elements, group.getID());
+					view.selectGroup(group.getID());
+					view.updateTitle();
 					view.redraw();
 				}
 			}

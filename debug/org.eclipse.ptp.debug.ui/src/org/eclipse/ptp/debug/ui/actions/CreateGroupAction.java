@@ -26,7 +26,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.ptp.debug.ui.ImageUtil;
 import org.eclipse.ptp.debug.ui.model.IElement;
-import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
+import org.eclipse.ptp.debug.ui.views.AbstractParallelView;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
@@ -45,7 +45,7 @@ public class CreateGroupAction extends ParallelDebugAction {
         		dispose();
         	
         	dropDownMenuMgr = new MenuManager();                
-        	AbstractDebugParallelView debugView = CreateGroupAction.this.debugView;
+        	AbstractParallelView debugView = CreateGroupAction.this.debugView;
         	if (debugView instanceof DebugParallelProcessView) {
         		DebugParallelProcessView view = (DebugParallelProcessView)debugView;
         		IContributionItem[] items = view.getViewSite().getActionBars().getMenuManager().getItems();
@@ -80,7 +80,7 @@ public class CreateGroupAction extends ParallelDebugAction {
         }
     };
     
-	public CreateGroupAction(AbstractDebugParallelView debugView) {
+	public CreateGroupAction(AbstractParallelView debugView) {
 		super(name, IAction.AS_DROP_DOWN_MENU, debugView);
 	    setImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
 	    setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
@@ -114,7 +114,7 @@ public class CreateGroupAction extends ParallelDebugAction {
 	private class InternalGroupAction extends ParallelDebugAction {
 		private String group_id = "";
 		private InternalGroupAction(String group_id, DebugParallelProcessView view) {
-			super(GroupAction.name + " " + group_id, view);
+			super("Add To: " + GroupAction.name + " " + group_id, view);
 			this.group_id = group_id;
 		    setImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
 		    setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);

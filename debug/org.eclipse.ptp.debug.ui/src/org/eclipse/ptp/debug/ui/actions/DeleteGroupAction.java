@@ -25,7 +25,7 @@ import org.eclipse.ptp.debug.ui.ImageUtil;
 import org.eclipse.ptp.debug.ui.UIDialog;
 import org.eclipse.ptp.debug.ui.model.IElement;
 import org.eclipse.ptp.debug.ui.model.IElementGroup;
-import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
+import org.eclipse.ptp.debug.ui.views.AbstractParallelView;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 import org.eclipse.swt.SWT;
 
@@ -36,7 +36,7 @@ import org.eclipse.swt.SWT;
 public class DeleteGroupAction extends ParallelDebugAction {
 	public static final String name = "Delete Group";
 	
-	public DeleteGroupAction(AbstractDebugParallelView debugView) {
+	public DeleteGroupAction(AbstractParallelView debugView) {
 		super(name, debugView);
 	    setImageDescriptor(ImageUtil.ID_ICON_DELETEGROUP_NORMAL);
 	    setDisabledImageDescriptor(ImageUtil.ID_ICON_DELETEGROUP_NORMAL);

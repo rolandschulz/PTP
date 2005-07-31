@@ -34,8 +34,6 @@ import org.eclipse.ptp.debug.ui.model.IElement;
 import org.eclipse.ptp.debug.ui.model.IElementGroup;
 import org.eclipse.ptp.debug.ui.model.IGroupManager;
 import org.eclipse.ptp.debug.ui.model.internal.Element;
-import org.eclipse.ptp.debug.ui.model.internal.ElementGroup;
-import org.eclipse.ptp.debug.ui.model.internal.GroupManager;
 
 /**
  * @author clement chu
@@ -43,47 +41,17 @@ import org.eclipse.ptp.debug.ui.model.internal.GroupManager;
  */
 public class UIDebugManager {
 	protected IModelManager modelManager = null;
-	private IGroupManager groupManager = null;
-	
+	protected UIManager uiManager = null;
 	//FIXME dummy only
 	private boolean dummy = true;
-	
+		
 	public UIDebugManager() {
-		groupManager = new GroupManager();
 		modelManager = PTPCorePlugin.getDefault().getModelManager();
-	}
-	public void shutdown() {
-		groupManager.clearAll();
-	}	
-	public IGroupManager getGroupManager() {
-		return groupManager;
-	}	
-	public IModelManager getModelManager() {
-		return modelManager;
+		uiManager = UIPlugin.getDefault().getUIManager();
 	}
 	
-	private void addToGroup(IElement[] elements, IElementGroup group) {
-		for (int i=0; i<elements.length; i++) {
-			group.add(elements[i].cloneElement());
-		}
-	}
-	public void addToGroup(IElement[] elements, String groupID) {
-		addToGroup(elements, groupManager.getGroup(groupID));
-	}
-	public String createGroup(IElement[] elements) {
-		IElementGroup group = new ElementGroup(true);
-		addToGroup(elements, group);
-		groupManager.add(group);
-		return group.getID();
-	}
-	public void removeGroup(String groupID) {
-		groupManager.remove(groupID);
-	}
-	public void removeFromGroup(IElement[] elements, String groupID) {
-		IElementGroup group = groupManager.getGroup(groupID);
-		for (int i=0; i<elements.length; i++) {
-			group.remove(elements[i]);
-		}
+	public IGroupManager getGroupManager() {
+		return uiManager.getGroupManager();
 	}
 	
 	public void unregisterElements(ILaunch launch, PDebugTarget target, IElement[] elements) {
@@ -137,6 +105,12 @@ public class UIDebugManager {
 		return modelManager.getUniverse().findProcessByName(getProcessName(id));
 	}
 	
+	//FIXME
+	private String getProcessName(String id) {
+		//HARD CODE
+		return "job0_process" + id;
+	}
+	
 	public void initialProcess() {
 		//FIXME dummy only
 		if (dummy) {
@@ -147,7 +121,8 @@ public class UIDebugManager {
 		IPJob[] jobs = modelManager.getUniverse().getJobs();
 		int total_jobs = jobs.length;
 
-		if (total_jobs > 0) {			
+		if (total_jobs > 0) {
+			IGroupManager groupManager = getGroupManager();
 			groupManager.clearAll();
 			IElementGroup group = groupManager.getGroupRoot();
 			for (int i=0; i<total_jobs; i++) {
@@ -159,17 +134,11 @@ public class UIDebugManager {
 			groupManager.add(group);
 		}		
 	}
-	
-	//FIXME
-	private String getProcessName(String id) {
-		//HARD CODE
-		return "job0_process" + id;
-	}
-	
 	//FIXME dummny only
 	private void dummyInitialProcess() {
 		PProcess[] processes = DebugManager.getInstance().getProcesses();
 		if (processes.length > 0) {
+			IGroupManager groupManager = getGroupManager();
 			groupManager.clearAll();
 			IElementGroup group = groupManager.getGroupRoot();
 			for (int j=0; j<processes.length; j++) {

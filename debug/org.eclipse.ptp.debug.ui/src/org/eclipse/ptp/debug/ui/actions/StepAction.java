@@ -18,14 +18,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.actions;
 
-import org.eclipse.ptp.debug.ui.views.AbstractDebugParallelView;
+import org.eclipse.ptp.debug.ui.views.AbstractParallelView;
 
 /**
  * @author clement chu
  *
  */
 public abstract class StepAction extends ParallelDebugAction {
-	public StepAction(String text, AbstractDebugParallelView debugView) {
+	public StepAction(String text, AbstractParallelView debugView) {
 		super(text, debugView);
 		setId(text);
 	}
