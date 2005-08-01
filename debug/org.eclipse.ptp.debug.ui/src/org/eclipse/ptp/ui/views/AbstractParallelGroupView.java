@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
@@ -48,8 +49,17 @@ public abstract class AbstractParallelGroupView extends AbstractParallelElementV
 	protected ParallelAction deleteGroupAction = null;
 	protected ParallelAction deleteProcessAction = null;
 	
+	protected int DEFAULT_DEL_KEY = '\u007f';
+	
 	//Set element to display 
 	protected abstract void initialElement();
+	
+	protected void initialKey(String os) {
+		super.initialKey(os);
+		if (os.equals(Platform.OS_MACOSX)) {
+			DEFAULT_DEL_KEY = 8;
+		}
+	}	
 	
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
@@ -164,7 +174,7 @@ public abstract class AbstractParallelGroupView extends AbstractParallelElementV
 
 	protected void keyDownEvent(int mx, int my, int keyCode) {
 		super.keyDownEvent(mx, my, keyCode);
-		if (this.keyCode == '\u007f') // delete key
+		if (keyCode == DEFAULT_DEL_KEY) // delete key
 			removeProcess();
 	}
 
