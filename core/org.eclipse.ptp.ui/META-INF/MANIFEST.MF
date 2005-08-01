@@ -20,3 +20,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.core,
  org.eclipse.ptp.launch
 Eclipse-AutoStart: true
+Export-Package: org.eclipse.ptp.ui
