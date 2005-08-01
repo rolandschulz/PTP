@@ -17,11 +17,11 @@ public class PTPDebugger implements IPCDIDebugger {
 		return null;
 	}
 
-	public ICDISession createDebuggerSession(IPJob[] jobs, ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) {
+	public ICDISession createDebuggerSession(IPJob job, ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) {
 		return null;
 	}
 	
-	public ICDISession createDebuggerSession(IPJob[] jobs, ILaunch launch, File exe, IProgressMonitor monitor) {
+	public ICDISession createDebuggerSession(IPJob job, ILaunch launch, File exe, IProgressMonitor monitor) {
 		
 		try {
 			/* Currently, we ignore the executable
@@ -29,11 +29,9 @@ public class PTPDebugger implements IPCDIDebugger {
 			File prog = exe;
 			*/
 
-			/* Currently, we only use jobs[0] */
-			
-			DebugSession debug = new DebugSession(jobs[0]);
+			DebugSession debug = new DebugSession(job);
 
-			Session session = new Session(debug, jobs[0]);
+			Session session = new Session(debug, job);
 			
 			Process debugger = session.getSessionProcess();
 			

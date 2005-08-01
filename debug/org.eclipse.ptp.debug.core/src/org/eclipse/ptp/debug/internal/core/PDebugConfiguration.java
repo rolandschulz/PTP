@@ -42,25 +42,12 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 		return fElement;
 	}
 
-	public IPCDIDebugger getDebugger() throws CoreException {
-		Object debugger = getConfigurationElement().createExecutableExtension("class"); //$NON-NLS-1$
-		if (debugger instanceof IPCDIDebugger) {
-			return (IPCDIDebugger)debugger;
-		}
-		throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), -1, InternalDebugCoreMessages.getString("DebugConfiguration.0"), null)); //$NON-NLS-1$
-	}
-
 	public IPCDIDebugger createDebugger() throws CoreException {
 		Object debugger = getConfigurationElement().createExecutableExtension("class"); //$NON-NLS-1$
 		if (debugger instanceof IPCDIDebugger) {
 			return (IPCDIDebugger)debugger;
 		}
-		
-		/* ICDebugger is deprecated */
-		// return new PDebugAdapter((ICDebugger)debugger);
-		
-		/* Check this Donny */
-		return new PDebugAdapter((IPCDIDebugger) debugger);
+		throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), -1, InternalDebugCoreMessages.getString("DebugConfiguration.0"), null)); //$NON-NLS-1$
 	}
 
 	public String getName() {
@@ -100,6 +87,7 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 		}
 		return ret || getCPUs().contains(cpu) || getCPUs().contains("*"); //$NON-NLS-1$
 	}
+	
 	/**
 	 * Returns the set of modes specified in the configuration data.
 	 * 

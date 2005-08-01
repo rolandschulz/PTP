@@ -2,9 +2,9 @@ package org.eclipse.ptp.debug.external.cdi.model;
 
 import java.util.ArrayList;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessGroup;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 
-public class DebugProcessGroup implements IPCDIDebugProcessGroup {
+public class DebugProcessGroup implements IPCDIDebugProcessSet {
 	
 	private ArrayList pGroup;
 	private String pGroupName;

@@ -4,12 +4,12 @@ import org.eclipse.cdt.debug.core.model.ICDebugTarget;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessGroup;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 
 public interface IPDebugTarget extends ICDebugTarget {
 	/**
 	 * The IPDebugTarget always has one process, this method checks
-	 * whether the debug target is a multi-processes target or not.
+	 * whether the debug target is a multi-process target or not.
 	 * 
 	 * @return
 	 * @throws DebugException

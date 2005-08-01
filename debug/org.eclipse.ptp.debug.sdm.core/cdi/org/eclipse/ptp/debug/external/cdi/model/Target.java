@@ -42,7 +42,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugFocus;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessGroup;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.external.DebugSession;
@@ -61,7 +61,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	private DebugSession dSession;
 	
 	private HashMap allDebugGroups;
-	private IPCDIDebugProcessGroup grpAllProcesses;
+	private IPCDIDebugProcessSet grpAllProcesses;
 	private IPCDIDebugFocus currentDebugFocus;
 	
 	Thread[] noThreads = new Thread[0];
@@ -87,7 +87,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		currentThreads = noThreads;
 	}
 	
-	public IPCDIDebugProcessGroup newProcessGroup(String name) {
+	public IPCDIDebugProcessSet newProcessGroup(String name) {
 		DebugProcessGroup newGroup = new DebugProcessGroup(name);
 		allDebugGroups.put(newGroup.getName(), newGroup);
 		return newGroup;
@@ -103,7 +103,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		return (DebugProcess) currentDebugFocus;
 	}
 	
-	public IPCDIDebugProcessGroup setCurrentFocus(String name) {
+	public IPCDIDebugProcessSet setCurrentFocus(String name) {
 		System.out.println("Target.setCurrentFocus() to group " + name);
 		currentDebugFocus = (DebugProcessGroup) allDebugGroups.get(name);
 		return (DebugProcessGroup) currentDebugFocus;
