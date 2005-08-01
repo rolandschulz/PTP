@@ -16,13 +16,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessGroup;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
 
 /**
  * Manages the process groups
  */
-public class PGroupManager {
+public class PSetManager {
 
 	/**
 	 * The debug target associated with this manager.
@@ -39,13 +39,13 @@ public class PGroupManager {
 	/**
 	 * Constructor for CSignalManager.
 	 */
-	public PGroupManager( PDebugTarget target ) {
+	public PSetManager( PDebugTarget target ) {
 		fDebugTarget = target;
 		fProcessGroups = new HashMap();
 	}
 
 	public void newProcessGroup(String name) {
-		IPCDIDebugProcessGroup grp;
+		IPCDIDebugProcessSet grp;
 		grp = getDebugTarget().getCDITarget().newProcessGroup(name);
 		fProcessGroups.put(name, grp);
 	}

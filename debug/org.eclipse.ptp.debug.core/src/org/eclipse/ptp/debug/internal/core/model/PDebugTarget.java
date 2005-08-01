@@ -98,8 +98,6 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IExpression;
 import org.eclipse.debug.core.model.IMemoryBlock;
-import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
-import org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IRegisterGroup;
 import org.eclipse.debug.core.model.ISourceLocator;
@@ -112,16 +110,14 @@ import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessGroup;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.IPFocus;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
 import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
-import org.eclipse.ptp.debug.internal.core.PGroupManager;
-import org.eclipse.ptp.debug.internal.core.PMemoryBlockRetrievalExtension;
 import org.eclipse.ptp.debug.internal.core.PRegisterManager;
+import org.eclipse.ptp.debug.internal.core.PSetManager;
 import org.eclipse.ptp.debug.internal.core.PSignalManager;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupParticipant;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceManager;
@@ -183,7 +179,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	/**
 	 * The group manager for this target.
 	 */
-	private PGroupManager fGroupManager;
+	private PSetManager fGroupManager;
 
 	/**
 	 * The register manager for this target.
@@ -226,11 +222,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	private IAddressFactory fAddressFactory;
 
 	/**
-	 * Support for the memory retrival on this target.
-	 */
-	private PMemoryBlockRetrievalExtension fMemoryBlockRetrieval;
-
-	/**
 	 * Constructor for CDebugTarget.
 	 */
 	public PDebugTarget( ILaunch launch, IProject project, IPCDITarget cdiTarget, String name, IBinaryObject file, boolean allowsTerminate, boolean allowsDisconnect) {
@@ -249,11 +240,10 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		createDisassembly();
 		setModuleManager( new CModuleManager( this ) );
 		setSignalManager( new PSignalManager( this ) );
-		setGroupManager( new PGroupManager( this ) );
+		setGroupManager( new PSetManager( this ) );
 		setRegisterManager( new PRegisterManager( this ) );
 		setBreakpointManager( new PBreakpointManager( this ) );
 		setGlobalVariableManager( new PGlobalVariableManager( this ) );
-		setMemoryBlockRetrieval( new PMemoryBlockRetrievalExtension( this ) );
 		initialize();
 		DebugPlugin.getDefault().getLaunchManager().addLaunchListener( this );
 		DebugPlugin.getDefault().getExpressionManager().addExpressionListener( this );
@@ -279,7 +269,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	}
 
 	public void setCurrentFocus(String name) {
-		PDebugProcessGroup pProcGrp = new PDebugProcessGroup(this, getCDITarget().setCurrentFocus(name));
+		PDebugProcessSet pProcGrp = new PDebugProcessSet(this, getCDITarget().setCurrentFocus(name));
 		currentFocus = pProcGrp;
 	}
 	
@@ -302,7 +292,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		initializeRegisters();
 		initializeSourceManager();
 		initializeModuleManager();
-		initializeMemoryBlocks();
 		getLaunch().addDebugTarget( this );
 		fireEventSet( (DebugEvent[])debugEvents.toArray( new DebugEvent[debugEvents.size()] ) );
 	}
@@ -397,10 +386,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 
 	protected void initializeModuleManager() {
 		getModuleManager().addModules( new ICModule[] { CModule.createExecutable( this, getExecFile().getPath() ) } );
-	}
-
-	protected void initializeMemoryBlocks() {
-		getMemoryBlockRetrieval().initialize();
 	}
 
 	/* (non-Javadoc)
@@ -869,7 +854,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			return getBreakpointManager();
 		if ( adapter.equals( PSignalManager.class ) )
 			return getSignalManager();
-		if ( adapter.equals( PGroupManager.class ) )
+		if ( adapter.equals( PSetManager.class ) )
 			return getGroupManager();
 		if ( adapter.equals( PRegisterManager.class ) )
 			return getRegisterManager();
@@ -877,10 +862,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			return getGlobalVariableManager();
 		if ( adapter.equals( ICDISession.class ) )
 			return getCDISession();
-		if ( adapter.equals( IMemoryBlockRetrievalExtension.class ) )
-			return getMemoryBlockRetrieval();
-		if ( adapter.equals( IMemoryBlockRetrieval.class ) )
-			return getMemoryBlockRetrieval();
 		return super.getAdapter( adapter );
 	}
 
@@ -1045,8 +1026,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		disposeGroupManager();
 		saveRegisterGroups();
 		disposeRegisterManager();
-		saveMemoryBlocks();
-		disposeMemoryBlockRetrieval();
 		disposeDisassembly();
 		disposeSourceManager();
 		disposeSourceLookupPath();
@@ -1450,11 +1429,11 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		fSignalManager.dispose();
 	}
 
-	protected void setGroupManager( PGroupManager gm ) {
+	protected void setGroupManager( PSetManager gm ) {
 		fGroupManager = gm;
 	}
 
-	protected PGroupManager getGroupManager() {
+	protected PSetManager getGroupManager() {
 		return fGroupManager;
 	}
 
@@ -1533,14 +1512,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 				}
 			}
 		}
-	}
-
-	protected void saveMemoryBlocks() {
-		getMemoryBlockRetrieval().save();
-	}
-
-	protected void disposeMemoryBlockRetrieval() {
-		getMemoryBlockRetrieval().dispose();
 	}
 
 	public IFile getCurrentBreakpointFile() {
@@ -1705,14 +1676,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			}
 		}
 		return fAddressFactory;
-	}
-
-	private PMemoryBlockRetrievalExtension getMemoryBlockRetrieval() {
-		return fMemoryBlockRetrieval;
-	}
-
-	private void setMemoryBlockRetrieval( PMemoryBlockRetrievalExtension memoryBlockRetrieval ) {
-		fMemoryBlockRetrieval = memoryBlockRetrieval;
 	}
 
 	private void changeState( CDebugElementState state ) {

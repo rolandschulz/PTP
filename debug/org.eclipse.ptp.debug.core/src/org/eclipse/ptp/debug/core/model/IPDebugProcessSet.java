@@ -10,9 +10,5 @@
  ***********************************************************************/ 
 package org.eclipse.ptp.debug.core.model; 
 
-
-/**
- * C/C++ extension of <code>IThread</code>.
- */
-public interface IPDebugProcessGroup extends IPFocus {
+public interface IPDebugProcessSet extends IPFocus {
 }

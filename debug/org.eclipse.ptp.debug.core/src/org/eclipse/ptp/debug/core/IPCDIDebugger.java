@@ -20,6 +20,6 @@ import org.eclipse.ptp.core.IPJob;
 
 
 public interface IPCDIDebugger extends ICDIDebugger {
-	public ICDISession createDebuggerSession(IPJob[] jobs, ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException;
-	public ICDISession createDebuggerSession(IPJob[] jobs, ILaunch launch, File exe, IProgressMonitor monitor) throws CoreException;
+	public ICDISession createDebuggerSession(IPJob job, ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException;
+	public ICDISession createDebuggerSession(IPJob job, ILaunch launch, File exe, IProgressMonitor monitor) throws CoreException;
 }
