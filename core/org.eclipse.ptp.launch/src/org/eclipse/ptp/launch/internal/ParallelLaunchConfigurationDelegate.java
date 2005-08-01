@@ -209,7 +209,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				ICDISession dsession = null;
 				
-				dsession = (ICDISession) debugConfig.createDebugger().createDebuggerSession(jobs, launch, (File) null, monitor);
+				dsession = (ICDISession) debugConfig.createDebugger().createDebuggerSession(jobs[0], launch, (File) null, monitor);
 				
 				boolean stopInMain = launch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
 
