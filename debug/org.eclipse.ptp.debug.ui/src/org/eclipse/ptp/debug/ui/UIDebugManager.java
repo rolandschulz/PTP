@@ -71,9 +71,12 @@ public class UIDebugManager {
 	}
 	
 	public void registerElements(ILaunch launch, PDebugTarget target, IElement[] elements) {
+		//FIXME dummy only 
+		if (dummy)
+			return;
+		
 		for (int i=0; i<elements.length; i++) {
-			//TODO register in selected elements in debug view
-			//target.setCurrentFocus(elements[i].getIDNum());
+			target.setCurrentFocus(elements[i].getIDNum());
 		}
 	}
 	public void registerElements(IElement[] elements) {
