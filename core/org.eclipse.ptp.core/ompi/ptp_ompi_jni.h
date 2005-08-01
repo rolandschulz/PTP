@@ -30,7 +30,7 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
  * Signature: (Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIStartDaemon
-  (JNIEnv *, jobject, jstring, jstring, jobjectArray);
+  (JNIEnv *, jobject, jstring, jstring, jstring, jobjectArray);
 
 /*
  * Class:     org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem
