@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
-
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.core.IAddressFactory;
@@ -127,8 +126,6 @@ import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceManager;
  */
 public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEventListener, ILaunchListener, IExpressionListener, ISourceLookupChangeListener {
 
-	private IPFocus currentFocus;
-	
 	/**
 	 * Threads contained in this debug target. 
 	 * When a thread starts it is added to the list. 
@@ -177,7 +174,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	private PSignalManager fSignalManager;
 
 	/**
-	 * The group manager for this target.
+	 * The set manager for this target.
 	 */
 	private PSetManager fGroupManager;
 
@@ -250,7 +247,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		getCDISession().getEventManager().addEventListener( this );
 	}
 
-	public void setCurrentFocus(int procNum) {
+	public void register(int procNum) {
 		PDebugProcess pProc = new PDebugProcess(this, getCDITarget().setCurrentFocus(procNum));
 		currentFocus = pProc;
 		
@@ -267,23 +264,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		setProcess( iprocesses );
 		refreshThreads();
 	}
-
-	public void setCurrentFocus(String name) {
-		PDebugProcessSet pProcGrp = new PDebugProcessSet(this, getCDITarget().setCurrentFocus(name));
-		currentFocus = pProcGrp;
-	}
 	
-/*	public IPCDIDebugProcessGroup newProcessGroup(String name) {
-		return getCDITarget().newProcessGroup(name);
-	}
-	
-	public void delProcessGroup(String name) {
-		getCDITarget().delProcessGroup(name);
-	}
-	
-*/	
 	protected void initialize() {
-		setCurrentFocus(0);
+		register(0);
 		initializeSourceLookupPath();
 		ArrayList debugEvents = new ArrayList( 1 );
 		debugEvents.add( createCreateEvent() );
@@ -608,9 +591,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		ICDIThread currentCDIThread = null;
  		try {
  			int procNum = 0;
- 			if (currentFocus instanceof PDebugProcess) {
- 				procNum = ((PDebugProcess) currentFocus).getProcessNumber();
- 			}
+ 			//if (currentFocus instanceof PDebugProcess) {
+ 			//	procNum = ((PDebugProcess) currentFocus).getProcessNumber();
+ 			//}
 			cdiThreads = getCDITarget().getThreads(procNum);
 			currentCDIThread = getCDITarget().getCurrentThread();
 		}

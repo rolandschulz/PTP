@@ -11,7 +11,6 @@
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
@@ -44,7 +43,6 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugFocus;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
 import org.eclipse.ptp.debug.external.cdi.RegisterManager;
@@ -81,13 +79,14 @@ public class Target extends SessionObject implements IPCDITarget {
 		}
 		allDebugGroups.put(grpAllProcesses.getName(), grpAllProcesses);
 		
-		setCurrentFocus(0);
+		setCurrentFocus(grpAllProcesses.getProcess(0));
 		
 		fConfiguration = new TargetConfiguration(this);
 		currentThreads = noThreads;
 	}
 	
 	public IPCDIDebugProcessSet newProcessGroup(String name) {
+		//dSession.getDebugger().defSet()
 		DebugProcessGroup newGroup = new DebugProcessGroup(name);
 		allDebugGroups.put(newGroup.getName(), newGroup);
 		return newGroup;
@@ -97,18 +96,14 @@ public class Target extends SessionObject implements IPCDITarget {
 		allDebugGroups.remove(name);
 	}
 	
-	public IPCDIDebugProcess setCurrentFocus(int procNum) {
-		System.out.println("Target.setCurrentFocus() to process " + procNum);
-		currentDebugFocus = (DebugProcess) grpAllProcesses.getProcess(procNum);
-		return (DebugProcess) currentDebugFocus;
+	public void addProcess
+	public void removeProcess
+	
+	public void setCurrentFocus(IPCDIDebugFocus focus) {
+		System.out.println("Target.setCurrentFocus()");
+		currentDebugFocus = focus;
 	}
 	
-	public IPCDIDebugProcessSet setCurrentFocus(String name) {
-		System.out.println("Target.setCurrentFocus() to group " + name);
-		currentDebugFocus = (DebugProcessGroup) allDebugGroups.get(name);
-		return (DebugProcessGroup) currentDebugFocus;
-	}
-
 	public DebugSession getDebugSession() {
 		System.out.println("Target.getDebugSession()");
 		return dSession;

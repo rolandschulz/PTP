@@ -1,4 +1,4 @@
-package org.eclipse.ptp.debug.external.simulator;
+ package org.eclipse.ptp.debug.external.simulator;
 
 import java.util.ArrayList;
 
@@ -153,7 +153,7 @@ public class DebugSimulator extends AbstractDebugger {
 		System.out.println("DebugSimulator.halt()");
 		state = SUSPENDED;
 	}
-
+	
 	public void load(String prg) {
 		// Auto-generated method stub
 		System.out.println("DebugSimulator2.load()");

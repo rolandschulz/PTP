@@ -37,7 +37,7 @@ public class PSetManager {
 	private boolean fIsDisposed = false;
 
 	/**
-	 * Constructor for CSignalManager.
+	 * Constructor for PSetManager.
 	 */
 	public PSetManager( PDebugTarget target ) {
 		fDebugTarget = target;

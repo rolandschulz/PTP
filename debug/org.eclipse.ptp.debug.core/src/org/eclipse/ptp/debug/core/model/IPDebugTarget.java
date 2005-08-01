@@ -27,6 +27,5 @@ public interface IPDebugTarget extends ICDebugTarget {
 	
 	public IThread[] getProcessThreads(IProcess process) throws DebugException;
 	
-	public void setCurrentFocus(int procNum);
-	public void setCurrentFocus(String name);
+	public void register(int procNum);
 }

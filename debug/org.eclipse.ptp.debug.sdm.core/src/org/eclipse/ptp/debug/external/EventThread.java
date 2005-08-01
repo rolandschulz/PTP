@@ -19,9 +19,9 @@ import org.eclipse.ptp.debug.external.utils.Queue;
  * when events are available and notify all the observers.
  */
 public class EventThread extends Thread {
-	IDebugger dbg;
+	AbstractDebugger dbg;
 	
-	public EventThread(IDebugger d) {
+	public EventThread(AbstractDebugger d) {
 		super("IDebugger Event Thread"); //$NON-NLS-1$
 		dbg = d;
 	}
