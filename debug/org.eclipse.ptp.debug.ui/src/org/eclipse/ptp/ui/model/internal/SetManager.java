@@ -24,26 +24,26 @@ import java.util.List;
 
 import org.eclipse.ptp.ui.model.IContainer;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementGroup;
-import org.eclipse.ptp.ui.model.IGroupManager;
+import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.ptp.ui.model.ISetManager;
 
 /**
  * @author clement chu
  *
  */
-public class GroupManager extends Container implements IGroupManager {
+public class SetManager extends Container implements ISetManager {
 	private List boundedElements = new ArrayList();
 		
-	public GroupManager() {
-		super(GROUP_ROOT_ID, false);
+	public SetManager() {
+		super(SET_ROOT_ID, false);
 		//create root 
-		add(new ElementGroup(GROUP_ROOT_ID));
+		add(new ElementSet(SET_ROOT_ID));
 	}
-	public IElementGroup getGroupRoot() {
+	public IElementSet getSetRoot() {
 		if (size() == 0)
-			add(new ElementGroup(GROUP_ROOT_ID));
+			add(new ElementSet(SET_ROOT_ID));
 		
-		return (IElementGroup)get(GROUP_ROOT_ID);
+		return (IElementSet)get(SET_ROOT_ID);
 	}
 	public void addBoundedElement(IElement[] elements) {
 		boundedElements.add(elements);
@@ -67,27 +67,27 @@ public class GroupManager extends Container implements IGroupManager {
 	}
 	
 	public IElement[] get() {
-		return (IElement[])getGroups();
+		return (IElement[])getSets();
 	}		
-	public IElementGroup[] getSortedGroups() {
-		return (IElementGroup[])getSorted();
+	public IElementSet[] getSortedSets() {
+		return (IElementSet[])getSorted();
 	}
-	public IElementGroup[] getGroups() {
-		return (IElementGroup[])elementMap.values().toArray(new IElementGroup[elementMap.size()]);
+	public IElementSet[] getSets() {
+		return (IElementSet[])elementMap.values().toArray(new IElementSet[elementMap.size()]);
 	}
-	public IElementGroup getGroup(String id) {
-		return (IElementGroup)get(id);
+	public IElementSet getSet(String id) {
+		return (IElementSet)get(id);
 	}
-	public IElementGroup getGroup(int index) {
-		return (IElementGroup)get(index);
+	public IElementSet getSet(int index) {
+		return (IElementSet)get(index);
 	}
-	public IElementGroup[] getGroupsWithElement(String id) {
+	public IElementSet[] getSetsWithElement(String id) {
 		List aList = new ArrayList();
-		IElementGroup[] groups = getSortedGroups();
-		for (int i=0; i<groups.length; i++) {
-			if (groups[i].contains(id))
-				aList.add(groups[i]);
+		IElementSet[] sets = getSortedSets();
+		for (int i=0; i<sets.length; i++) {
+			if (sets[i].contains(id))
+				aList.add(sets[i]);
 		}
-		return (IElementGroup[])aList.toArray(new IElementGroup[aList.size()]);
+		return (IElementSet[])aList.toArray(new IElementSet[aList.size()]);
 	}
 }

@@ -16,24 +16,35 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.model;
+package org.eclipse.ptp.debug.ui.actions;
 
+import org.eclipse.ptp.debug.ui.ImageUtil;
+import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
+import org.eclipse.ptp.ui.actions.ParallelAction;
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.views.AbstractParallelView;
 /**
  * @author clement chu
  *
  */
-public interface IGroupManager extends IContainer {
-	public static final String GROUP_ROOT_ID = "0";	
-	public IElementGroup getGroupRoot();
+public class UnRegisterAction extends ParallelAction {
+	public static final String name = "UnRegister Selected Elements";
 	
-	public IElementGroup[] getGroupsWithElement(String id);
-	public IElementGroup[] getSortedGroups();
-	public IElementGroup[] getGroups();
-	public IElementGroup getGroup(String id);
-	public IElementGroup getGroup(int index);
-	
-	//drag
-	public void addBoundedElement(IElement[] elements);
-	public IElement[] getBoundedElements();
-	public void removeAllBoundedElements();	
+	public UnRegisterAction(AbstractParallelView debugView) {
+		super(name, debugView);
+	    setImageDescriptor(ImageUtil.ID_ICON_UNREGISTER_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_UNREGISTER_DISABLE);
+	    setId(name);
+	    setEnabled(true);
+	}
+
+	public void run(IElement[] elements) {
+		if (validation(elements)) {
+			if (debugView instanceof DebugParallelProcessView) {
+				DebugParallelProcessView view = (DebugParallelProcessView)debugView;
+				view.unregisterSelectedElements();
+				view.redraw();
+			}
+		}
+	}	
 }

@@ -16,36 +16,24 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.actions;
+package org.eclipse.ptp.ui.model;
 
-import org.eclipse.jface.action.IAction;
-import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
-import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.views.AbstractParallelView;
 /**
  * @author clement chu
  *
  */
-public class GroupAction extends ParallelAction {
-	public static final String GROUP_ROOT = "Root";
-	public static final String name = "Group";
+public interface ISetManager extends IContainer {
+	public static final String SET_ROOT_ID = "0";	
+	public IElementSet getSetRoot();
 	
-	public GroupAction(String id, AbstractParallelView debugView) {
-		super(name + " " + id, IAction.AS_CHECK_BOX, debugView);
-	    setEnabled(true);
-		setId(id);
-	}
-
-	public void run(IElement[] elements) {}
+	public IElementSet[] getSetsWithElement(String id);
+	public IElementSet[] getSortedSets();
+	public IElementSet[] getSets();
+	public IElementSet getSet(String id);
+	public IElementSet getSet(int index);
 	
-	public void run() {
-		if (debugView instanceof DebugParallelProcessView) {
-			DebugParallelProcessView view = (DebugParallelProcessView)debugView;
-			view.selectGroup(getId());
-			//deselect all elements each time changed the group
-			view.getCurrentGroup().setAllSelect(false);
-			view.updateMenu(view.getViewSite().getActionBars().getMenuManager());
-			view.redraw();
-		}
-	}	
+	//drag
+	public void addBoundedElement(IElement[] elements);
+	public IElement[] getBoundedElements();
+	public void removeAllBoundedElements();	
 }

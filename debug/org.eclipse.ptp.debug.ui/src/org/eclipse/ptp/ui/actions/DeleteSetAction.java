@@ -25,20 +25,20 @@ import org.eclipse.ptp.debug.ui.ImageUtil;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementGroup;
+import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.views.AbstractParallelView;
 
 /**
  * @author clement chu
  *
  */
-public class DeleteGroupAction extends ParallelAction {
-	public static final String name = "Delete Group";
+public class DeleteSetAction extends ParallelAction {
+	public static final String name = "Delete Set";
 	
-	public DeleteGroupAction(AbstractParallelView debugView) {
+	public DeleteSetAction(AbstractParallelView debugView) {
 		super(name, debugView);
-	    setImageDescriptor(ImageUtil.ID_ICON_DELETEGROUP_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_DELETEGROUP_DISABLE);
+	    setImageDescriptor(ImageUtil.ID_ICON_DELETESET_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_DELETESET_DISABLE);
 	    setId(name);
 	}
 
@@ -47,12 +47,12 @@ public class DeleteGroupAction extends ParallelAction {
 		if (debugView instanceof DebugParallelProcessView) {
 			DebugParallelProcessView view = (DebugParallelProcessView)debugView;
 
-			IElementGroup group = view.getCurrentGroup();
-			if (group != null && group.size() > 0) {
-				 if (UIUtils.showQuestionDialog(name + " " + group.getID(), "All elements in this group will be deleted.")) {
+			IElementSet set = view.getCurrentGroup();
+			if (set != null && set.size() > 0) {
+				 if (UIUtils.showQuestionDialog(name + " " + set.getID(), "All elements in this group will be deleted.")) {
 					IMenuManager manager = view.getViewSite().getActionBars().getMenuManager();
-					manager.remove(group.getID());
-					view.getUIDebugManger().removeGroup(group.getID());
+					manager.remove(set.getID());
+					view.getUIDebugManger().removeSet(set.getID());
 									
 					IContributionItem[] items = manager.getItems();
 					if (items.length > 0) {
