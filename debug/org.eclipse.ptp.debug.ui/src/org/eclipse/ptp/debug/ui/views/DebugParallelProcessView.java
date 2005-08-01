@@ -96,13 +96,14 @@ public class DebugParallelProcessView extends AbstractParallelSetView implements
 	protected void initialElement() {
 		uiDebugManager.initialProcess();
 	}
-	              
+/*	              
 	public static DebugParallelProcessView getInstance() {
 		if (instance == null)
 			instance = new DebugParallelProcessView();
 		return instance;
 	}
-
+*/
+	
 	protected boolean fillContextMenu(IMenuManager manager) {
 		manager.add(resumeAction);
 		manager.add(suspendAction);

@@ -41,6 +41,8 @@ public class RegisterAction extends ParallelAction {
 	}
 
 	public void run(IElement[] elements) {
+		AbstractParallelView pview = new DebugParallelProcessView();
+		/*
 		if (validation(elements)) {
 			if (elements.length > NUM_PROCESS_WARNING) {
 				if (!UIUtils.showQuestionDialog("Register Confirmation", "Are you sure you want to register (" + elements.length + ") processes?")) {
@@ -53,6 +55,6 @@ public class RegisterAction extends ParallelAction {
 				view.registerSelectedElements();
 				view.redraw();
 			}
-		}
+		}*/
 	}	
 }

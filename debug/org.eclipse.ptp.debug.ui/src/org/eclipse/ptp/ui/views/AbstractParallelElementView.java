@@ -129,15 +129,17 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	protected void changeTitle(final String title, final int size) {
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				setPartName(DEFAULT_TITLE + " - " + title + " (" + size + ")");
+				setContentDescription(title + " [" + size + "]");
 			}
 		});
 	}
 
 	protected void createElementView(Composite parent) {
-		parent.setLayout(new GridLayout(1, false));
+		//parent.setLayout(new GridLayout(1, false));
+		parent.setLayout(new FillLayout());
 		parent.setLayoutData(new GridData(GridData.FILL_BOTH));
-
+		parent.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));		
+		
 		sc = new ScrolledComposite(parent, SWT.V_SCROLL);
 		sc.setLayout(new FillLayout());
 		sc.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -155,6 +157,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		drawComp = new Composite(sc, SWT.NONE);
 		drawComp.setLayout(new FillLayout());
 		drawComp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		drawComp.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));		
 		sc.setContent(drawComp);
 
 		drawComp.addPaintListener(new PaintListener() {
