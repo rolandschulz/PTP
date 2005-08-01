@@ -4,6 +4,7 @@
  */
 package org.eclipse.ptp.debug.external;
 
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.external.simulator.DebugSimulator;
 
 /**
@@ -13,9 +14,9 @@ import org.eclipse.ptp.debug.external.simulator.DebugSimulator;
 public class DebugSession {
 	IDebugger debugger;
 
-	public DebugSession() {
+	public DebugSession(IPJob job) {
 		debugger = new DebugSimulator();
-		debugger.initialize(this);
+		debugger.initialize(this, job);
 	}
 	
 	public IDebugger getDebugger() {

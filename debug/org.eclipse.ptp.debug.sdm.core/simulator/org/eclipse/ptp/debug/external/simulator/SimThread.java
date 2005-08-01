@@ -5,8 +5,9 @@ public class SimThread {
 	SimStackFrame[] stackFrames;
 	int threadId;
 	
-	public SimThread(int numStackFrames, int id) {
+	public SimThread(int id) {
 		threadId = id;
+		int numStackFrames = 1;
 		
 		stackFrames = new SimStackFrame[numStackFrames];
 		for (int i = 0; i < numStackFrames; i++) {

@@ -21,7 +21,7 @@ import org.eclipse.ptp.debug.external.variable.DebugVariable;
  *
  */
 public interface IDebugger {
-	public void initialize(DebugSession dS);
+	public void initialize(DebugSession dS, IPJob job);
 	
 	/* General Debugger Interface */
 	public DebugVariable[] set();
@@ -98,7 +98,6 @@ public interface IDebugger {
 	public boolean isExiting();
 	
 	/* Methods that are required to interface with Eclipse Debug/CDI Model */
-	public abstract void initPTP(IPJob job);
 	public abstract Process getSessionProcess();
 	public abstract Process getProcess(int number);
 	public abstract Process getProcess();
