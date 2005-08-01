@@ -196,6 +196,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 			mouseDoubleClickEvent(mx, my);
 			break;
 		case SWT.KeyDown:
+			System.out.println("key: " + e.keyCode);
 			keyDownEvent(mx, my, e.keyCode);
 			break;
 		case SWT.KeyUp:
