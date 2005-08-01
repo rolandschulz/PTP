@@ -23,6 +23,7 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.debug.ui.ImageUtil;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
+import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.views.AbstractParallelView;
@@ -49,10 +50,12 @@ public class DeleteProcessAction extends ParallelAction {
 				if (group.size() == elements.length) {
 					callDeleteGroupAction(view);
 				} else {
-					view.getUIDebugManger().removeFromSet(elements, group.getID());
-					view.selectSet(group.getID());
-					view.updateTitle();
-					view.redraw();
+					if (UIUtils.showQuestionDialog("Delete Confirmation", "Are you sure you want to delete (" + elements.length + ") processes in this set?"))	{			
+						view.getUIDebugManger().removeFromSet(elements, group.getID());
+						view.selectSet(group.getID());
+						view.updateTitle();
+						view.redraw();
+					}
 				}
 			}
 		}		
