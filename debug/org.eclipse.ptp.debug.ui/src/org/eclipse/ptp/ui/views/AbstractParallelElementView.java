@@ -81,6 +81,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 
 	// tooltip
 	protected Shell toolTipShell = null;
+	protected Label toolTipLabel = null;
 	//protected Timer hovertimer = null;
 	//protected final int hide_time = 2000;
 
@@ -97,7 +98,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	protected int rect_dot_disc = 3;
 	
 	//key
-	protected int DEFAULT_CTRL_KEY = Platform.getOS().equals(Platform.OS_MACOSX)?SWT.COMMAND:SWT.CTRL;
+	protected int DEFAULT_CTRL_KEY = SWT.CTRL;
 	
 	protected Listener myDrawingMouseListener = new Listener() {
 		public void handleEvent(Event e) {
@@ -110,10 +111,17 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		initElementAttribute();
 	}
 	
+	protected void initialKey(String os) {
+		if (os.equals(Platform.OS_MACOSX)) {
+			DEFAULT_CTRL_KEY = SWT.COMMAND;
+		}
+	}
+	
 	//Set element info
 	protected abstract void initElementAttribute();
 	
 	public void createPartControl(Composite parent) {
+		initialKey(Platform.getOS());
 		createElementView(parent);
 	}
 
@@ -171,7 +179,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		// System.out.println("drag:("+drag_x+":"+drag_y+"), mouse:("+mx+":"+my+"), view:("+view_width+":"+view_height+"), " + drawComp.getBounds());
 		switch (e.type) {
 		case SWT.MouseHover:
-			mouseHoverEvent(mx, my);
 			break;
 		case SWT.MouseDown:
 			mouseDownEvent(mx, my);
@@ -201,10 +208,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	}
 	
 	protected void mouseHoverEvent(int mx, int my) {
-		// show tool tips only the mouse is in the view
-		if (isInView(mx, my))
-			showToolTip(mx, my);
 	}
+	
 	protected void mouseDownEvent(int mx, int my) {
 		clearMouseSetting();
 		// unselected all elements only occurred when there is click no press ctrl button
@@ -219,7 +224,10 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		}
 	}
 	protected void mouseMoveEvent(int mx, int my) {
-		if (!isInView(mx, my))
+		// show tool tips only the mouse is in the view
+		if (isInView(mx, my))
+			showToolTip(mx, my);
+		else
 			hideToolTip();
 		
 		if (isDragging()) {
@@ -414,21 +422,21 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	}
 	
 	protected void showToolTip(int mx, int my) {
-		hideToolTip();
-
 		int element_num = findElementNum(mx, my);
-		if (element_num == -1)
+		if (element_num == -1) {
+			hideToolTip();
 			return;
+		}
 		
-		String text = getToolTipText(element_num);
-		
-		toolTipShell = new Shell(drawComp.getShell(), SWT.ON_TOP | SWT.TOOL);
-		Label toolTipLabel = new Label(toolTipShell, SWT.LEFT);
-		Display display = toolTipShell.getDisplay();
-		toolTipLabel.setForeground(display.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-		toolTipLabel.setBackground(display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-		toolTipLabel.setText(text);
+		if (toolTipShell == null) {
+			toolTipShell = new Shell(drawComp.getShell(), SWT.ON_TOP | SWT.TOOL);
+			toolTipLabel = new Label(toolTipShell, SWT.LEFT);
+			Display display = toolTipShell.getDisplay();
+			toolTipLabel.setForeground(display.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+			toolTipLabel.setBackground(display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+		}
 
+		toolTipLabel.setText(getToolTipText(element_num));
 		Point l_size = toolTipLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		l_size.x += 2;
 		l_size.y += 2;
@@ -466,7 +474,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 
 	protected void hideToolTip() {
 		if (toolTipShell != null) {
+			toolTipLabel.dispose();
 			toolTipShell.dispose();
+			toolTipLabel = null;
 			toolTipShell = null;
 		}
 	}
