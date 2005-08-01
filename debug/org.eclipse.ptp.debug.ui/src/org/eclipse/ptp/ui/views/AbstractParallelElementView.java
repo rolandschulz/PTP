@@ -224,7 +224,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		
 		if (isDragging()) {
 			if (selectionShell == null) {
-				selectionShell = new Shell(drawComp.getShell(), SWT.NO_TRIM | SWT.NO_REDRAW_RESIZE | SWT.ON_TOP);
+				selectionShell = new Shell(drawComp.getShell(), SWT.NO_TRIM | SWT.ON_TOP);
 				selectionShell.setSize(0, 0);
 				selectionShell.setVisible(true);
 				selectionShell.setBackground(selectionShell.getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
@@ -234,7 +234,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 			drawSelectedArea(drag_x, drag_y, mx, my);
 			IElement[] elements = selectElements(getSelectedRect(drag_x, drag_y, mx, my));
 			groupManager.addBoundedElement(elements);
-			drawComp.redraw();
+			elementRedraw();
 		}
 	}
 	protected void mouseUpEvent(int mx, int my) {
@@ -246,7 +246,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 			selectElement(mx, my);
 
 		clearMouseSetting();
-		drawComp.redraw();		
+		elementRedraw();		
 	}
 	
 	protected abstract void doubleClickAction(int element_num);
@@ -675,7 +675,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 
 		drawingElement(g, element, x_loc, y_loc);
 	}
-	protected void drawingElement(GC g, IElement element, int x_loc, int y_loc) {
+	protected void drawingElement(GC g, IElement element, int x_loc, int y_loc) {		
 		Image statusImage = getStatusIcon(element);
 		if (statusImage != null) {
 			g.drawImage(statusImage, x_loc, y_loc);
@@ -749,10 +749,14 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	public void refresh() {
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				if (!drawComp.isDisposed())
-					drawComp.redraw();
+				elementRedraw();
 			}
 		});
+	}
+	
+	private void elementRedraw() {
+		if (!drawComp.isDisposed())
+			drawComp.redraw(0, sc.getOrigin().y, view_width, view_height, false);
 	}
 	
 	private class Loc {
