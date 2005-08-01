@@ -180,6 +180,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		// System.out.println("drag:("+drag_x+":"+drag_y+"), mouse:("+mx+":"+my+"), view:("+view_width+":"+view_height+"), " + drawComp.getBounds());
 		switch (e.type) {
 		case SWT.MouseHover:
+			mouseHoverEvent(mx, my);
 			break;
 		case SWT.MouseDown:
 			mouseDownEvent(mx, my);
@@ -197,7 +198,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 			mouseDoubleClickEvent(mx, my);
 			break;
 		case SWT.KeyDown:
-			System.out.println("key: " + e.keyCode);
 			keyDownEvent(mx, my, e.keyCode);
 			break;
 		case SWT.KeyUp:
@@ -276,7 +276,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		else if (keyCode == A_KEY) {
 			if (this.keyCode == DEFAULT_CTRL_KEY)
 				selectAll();
-		}
+		}		
 		this.keyCode = keyCode;
 	}
 	protected void keyUpEvent(int mx, int my, int keyCode) {

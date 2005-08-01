@@ -169,7 +169,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		if (keyCode == DEFAULT_DEL_KEY || keyCode == DEFAULT_BACK_KEY) // delete key
 			removeProcess();
 		else
-			super.keyDownEvent(mx, my, keyCode);			
+			super.keyDownEvent(mx, my, keyCode);
 	}
 
 	public void removeProcess() {

@@ -49,7 +49,7 @@ public class DeleteSetAction extends ParallelAction {
 
 			IElementSet set = view.getCurrentGroup();
 			if (set != null && set.size() > 0) {
-				 if (UIUtils.showQuestionDialog(name + " " + set.getID(), "All elements in this group will be deleted.")) {
+				 if (UIUtils.showQuestionDialog(name + " " + set.getID() + " Confirmation", "Are you sure you want to delete all elements in this set?")) {
 					IMenuManager manager = view.getViewSite().getActionBars().getMenuManager();
 					manager.remove(set.getID());
 					view.getUIDebugManger().removeSet(set.getID());
