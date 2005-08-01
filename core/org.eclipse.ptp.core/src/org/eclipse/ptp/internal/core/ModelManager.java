@@ -517,7 +517,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 	//protected IPJob myjob = null;
 
-	public void run(final ILaunch launch, File workingDirectory,
+	public IPJob run(final ILaunch launch, File workingDirectory,
 			String[] envp, final JobRunConfiguration jobRunConfig, IProgressMonitor monitor)
 			throws CoreException {
 		/*
@@ -568,7 +568,11 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			universe.addChild(job);
 			getProcsForNewJob(nejob, job);
 			fireState(STATE_RUN);
+			
+			return job;
 		}
+		
+		return null;
 	}
 
 	protected void clearUsedMemory() {
