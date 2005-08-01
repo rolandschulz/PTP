@@ -45,9 +45,9 @@ Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIGetError(JNIEnv *env, j
     	return (*env)->NewStringUTF(env, error_msg);
 }
 
-JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIStartDaemon(JNIEnv *env, jobject obj, jstring jorted_path, jstring jorted_bin, jobjectArray array)
+JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIStartDaemon(JNIEnv *env, jobject obj, jstring jompi_bin_path, jstring jorted_path, jstring jorted_bin, jobjectArray array)
 {
-    	char *orted_path, *orted_bin;
+    	char *orted_path, *orted_bin, *ompi_bin_path;
 	char **orted_args;
 	int ret;
 	jsize len;
@@ -55,6 +55,7 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
 
 	char args[256];
 	char spawn_cmd[512];
+	char *user_path, *user_path_new, *user_path_new_tmp;
 
 	printf("JNI (C) OMPI: OMPI_StartDaemon()\n");
 
@@ -66,7 +67,6 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
 	 * in the future and specify the environment.  for now, let's go
 	 * with a much simpler (albiet less portable) solution of
 	 * system() */
-#if 0
 	switch(fork()) {
 	    case -1:
 		set_error("Unable to fork() for the orted spawn.");
@@ -74,11 +74,28 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
 		break;
 	    /* child */
 	    case 0:
+		ompi_bin_path = (char *)(*env)->GetStringUTFChars(env,
+		  jompi_bin_path, NULL);
 		orted_path = (char *)(*env)->GetStringUTFChars(env, 
 		  jorted_path, NULL);
 		orted_bin = (char *)(*env)->GetStringUTFChars(env, 
 		  jorted_bin, NULL);
 		len = (*env)->GetArrayLength(env, array);
+
+		user_path = (char*)malloc(2048 * sizeof(char));
+		user_path_new_tmp = (char*)malloc((2048+strlen(ompi_bin_path+2))*sizeof(char));
+		user_path_new = (char*)malloc((2048+strlen(ompi_bin_path+2))*sizeof(char));
+		user_path = getenv("PATH");
+		printf("Original user's PATH: %s\n", user_path);
+		user_path_new_tmp = strcat(ompi_bin_path, ":");
+		user_path_new = strcat(user_path_new_tmp, user_path);
+		setenv("PATH", user_path_new, 1);
+		user_path = getenv("PATH");
+		printf("New user's PATH (temporarily) after prepending "
+		  "OMPI bin: %s\n", user_path);
+		free(user_path_new_tmp);
+		free(user_path_new);
+		free(user_path);
 
 		/* we need 'len + 2' args for len args, 1 for NULL
 		 * termination, and 1 preface for the program name
@@ -115,6 +132,7 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
 
 		(*env)->ReleaseStringUTFChars(env, jorted_path, orted_path);
 		(*env)->ReleaseStringUTFChars(env, jorted_bin, orted_bin);
+		(*env)->ReleaseStringUTFChars(env, jompi_bin_path, ompi_bin_path);
 		for(i=0; i<len + 1; i++) {
 		    free(orted_args[i]);
 		}
@@ -125,33 +143,9 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
 		/* sleep - letting the daemon get started up */
 		sleep(1);
 		wait(&ret);
-		//printf("parent ret from child = %d\n", ret);
+		printf("parent ret from child = %d\n", ret);
 		break;
 	}
-#endif
-//#if 0
-	orted_path = (char *)(*env)->GetStringUTFChars(env,
-	  jorted_path, NULL);
-	orted_bin = (char *)(*env)->GetStringUTFChars(env, 
-	  jorted_bin, NULL);
-	len = (*env)->GetArrayLength(env, array);
-	
-	for(i=0; i<len; i++) {
-	    jstring astr;
-	    char *bstr;
-	    astr = (*env)->GetObjectArrayElement(env, array, i);
-	    bstr = (char *)(*env)->GetStringUTFChars(env, astr, NULL);
-	    
-	    sprintf(args, "%s %s", args, bstr);
-	    (*env)->ReleaseStringUTFChars(env, astr, bstr);
-	}
-
-	printf("final args = '%s'\n", args);
-	sprintf(spawn_cmd, "%s %s", orted_path, args);
-	printf("running: '%s'\n", spawn_cmd);
-	system(spawn_cmd);
-	sleep(1);
-//#endif
 }
 
 /* returns  0 if orted was already started and we connected to it

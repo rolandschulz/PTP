@@ -53,7 +53,7 @@ public class OMPIControlSystem implements IControlSystem {
 	
 	public native String OMPIGetError();
 	public native int OMPIInit();
-	public native int OMPIStartDaemon(String orted_path, String orted_bin, String[] args);
+	public native int OMPIStartDaemon(String ompi_bin_path, String orted_path, String orted_bin, String[] args);
 	public native void OMPIShutdown();
 	public native void OMPIFinalize();
 	public native void OMPIProgress();
@@ -95,6 +95,8 @@ public class OMPIControlSystem implements IControlSystem {
 		
 		knownJobs = new Vector();
 		
+		String ompi_bin_path = orted_path.substring(0, orted_path.lastIndexOf("/"));
+		
 		String orted_args = preferences.getString(PreferenceConstants.ORTE_ORTED_ARGS);
 		String orted_full = orted_path + " " + orted_args;
 		System.out.println("ORTED = "+orted_full);
@@ -107,7 +109,7 @@ public class OMPIControlSystem implements IControlSystem {
 			System.out.println("["+x+"] = "+split_path[x]);
 		
 		/* start the daemon using JNI */
-		//OMPIStartDaemon(orted_path, split_path[split_path.length - 1], split_args);
+		OMPIStartDaemon(ompi_bin_path, orted_path, split_path[split_path.length - 1], split_args);
 		
 		/* start the daemon using Java */
 		//OMPIStartORTEd(orted_full);
@@ -117,6 +119,7 @@ public class OMPIControlSystem implements IControlSystem {
 		if(rc != 0) {
 			String error_msg = OMPIGetError();
 			CoreUtils.showErrorDialog("OMPI Runtime Initialization Error", error_msg, null);
+			failed_load = 1;
 			return;
 		}
 
@@ -137,6 +140,7 @@ public class OMPIControlSystem implements IControlSystem {
 				"are correct.";
 			System.err.println(err);
 			CoreUtils.showErrorDialog("Failed to Spawn ORTED", err, null);
+			failed_load = 1;
 		}
 	}
     
@@ -313,7 +317,7 @@ public class OMPIControlSystem implements IControlSystem {
 		System.out.println("JAVA OMPI: shutdown() called");
 		
 		/* shutdown/kill the ORTE daemon */
-		//OMPIShutdown();
+		OMPIShutdown();
 		
 		/* finalize the registry - yes, it's odd it is in this order */
 		OMPIFinalize();
