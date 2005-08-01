@@ -137,7 +137,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		catch(NumberFormatException e) {	}
 		
 		JobRunConfiguration jrc = new JobRunConfiguration(
-			programFile.getLocation().toString(), nprocs, nprocpnode, firstnode);
+			programFile.getLocation().toString(), nprocs, nprocpnode, firstnode, false);
 		
 		return jrc;
 	}

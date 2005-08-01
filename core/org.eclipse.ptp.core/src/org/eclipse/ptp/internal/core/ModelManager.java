@@ -562,6 +562,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			} catch (NumberFormatException e) {
 			}
 			job = new PJob(universe, nejob, "" + (PJob.BASE_OFFSET + x) + "");
+			if(jobRunConfig.isDebug()) job.setDebug();
 
 		//	myjob = job;
 			universe.addChild(job);
