@@ -26,22 +26,24 @@ import org.eclipse.ptp.debug.core.IDebugParallelModelListener;
 import org.eclipse.ptp.debug.ui.ImageUtil;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.UIPlugin;
+import org.eclipse.ptp.debug.ui.actions.RegisterAction;
 import org.eclipse.ptp.debug.ui.actions.ResumeAction;
 import org.eclipse.ptp.debug.ui.actions.StepOverAction;
 import org.eclipse.ptp.debug.ui.actions.StepReturnAction;
 import org.eclipse.ptp.debug.ui.actions.SuspendAction;
 import org.eclipse.ptp.debug.ui.actions.TerminateAction;
+import org.eclipse.ptp.debug.ui.actions.UnRegisterAction;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementGroup;
-import org.eclipse.ptp.ui.views.AbstractParallelGroupView;
+import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.ptp.ui.views.AbstractParallelSetView;
 import org.eclipse.swt.graphics.Image;
 
 /**
  * @author clement chu
  * 
  */
-public class DebugParallelProcessView extends AbstractParallelGroupView implements IDebugParallelModelListener {
+public class DebugParallelProcessView extends AbstractParallelSetView implements IDebugParallelModelListener {
 	public static final String VIEW_ID = "org.eclipse.ptp.debug.ui.views.debugParallelProcessView";
 
 	private static DebugParallelProcessView instance = null;
@@ -54,6 +56,8 @@ public class DebugParallelProcessView extends AbstractParallelGroupView implemen
 	protected ParallelAction stepIntoAction = null;
 	protected ParallelAction stepOverAction = null;
 	protected ParallelAction stepReturnAction = null;
+	protected ParallelAction registerAction = null;
+	protected ParallelAction unregisterAction = null;
 
 	private Image[][] statusImages = {
 		{
@@ -118,6 +122,9 @@ public class DebugParallelProcessView extends AbstractParallelGroupView implemen
 		stepOverAction = new StepOverAction(this);
 		stepReturnAction = new StepReturnAction(this);
 		
+		registerAction = new RegisterAction(this);
+		unregisterAction = new UnRegisterAction(this);
+
 		toolBarMgr.add(resumeAction);
 		toolBarMgr.add(suspendAction);
 		toolBarMgr.add(terminateAction);
@@ -125,6 +132,9 @@ public class DebugParallelProcessView extends AbstractParallelGroupView implemen
 		toolBarMgr.add(stepIntoAction);
 		toolBarMgr.add(stepOverAction);
 		toolBarMgr.add(stepReturnAction);
+		toolBarMgr.add(new Separator());
+		toolBarMgr.add(registerAction);
+		toolBarMgr.add(unregisterAction);
 		return true;
 	}
 	protected boolean createMenuActions(IMenuManager menuMgr) {
@@ -136,19 +146,19 @@ public class DebugParallelProcessView extends AbstractParallelGroupView implemen
 	}
 
 	protected void doubleClickAction(int element_num) {
-		IElement element = cur_element_group.get(element_num);
+		IElement element = cur_element_set.get(element_num);
 		if (element != null)
 			registerElement(element);
 	}
 
 	protected String getToolTipText(int element_num) {
-		IElement element = cur_element_group.get(element_num);
+		IElement element = cur_element_set.get(element_num);
 		if (element == null)
 			return "Unknown element";
 		
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("ID: " + element.getID());
-		IElementGroup[] groups = groupManager.getGroupsWithElement(element.getID());
+		IElementSet[] groups = setManager.getSetsWithElement(element.getID());
 		if (groups.length > 1)
 			buffer.append("\nGroup: ");
 		for (int i = 1; i < groups.length; i++) {
@@ -194,8 +204,8 @@ public class DebugParallelProcessView extends AbstractParallelGroupView implemen
 	}
 
 	public void registerSelectedElements() {
-		if (cur_element_group != null) {
-			IElement[] elements = cur_element_group.getSelectedElements();
+		if (cur_element_set != null) {
+			IElement[] elements = cur_element_set.getSelectedElements();
 			for (int i = 0; i < elements.length; i++) {
 				elements[i].setRegistered(true);
 			}
@@ -203,6 +213,16 @@ public class DebugParallelProcessView extends AbstractParallelGroupView implemen
 		}
 	}
 
+	public void unregisterSelectedElements() {
+		if (cur_element_set != null) {
+			IElement[] elements = cur_element_set.getSelectedElements();
+			for (int i = 0; i < elements.length; i++) {
+				elements[i].setRegistered(false);
+			}
+			uiDebugManager.unregisterElements(elements);
+		}
+	}
+	
 	/*
 	 * FIXME Should implemented IParallelModelListener
 	 */

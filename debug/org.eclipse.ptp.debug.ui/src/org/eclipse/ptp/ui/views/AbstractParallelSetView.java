@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
@@ -27,13 +26,13 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.ptp.ui.actions.CreateGroupAction;
-import org.eclipse.ptp.ui.actions.DeleteGroupAction;
+import org.eclipse.ptp.ui.actions.CreateSetAction;
 import org.eclipse.ptp.ui.actions.DeleteProcessAction;
-import org.eclipse.ptp.ui.actions.GroupAction;
+import org.eclipse.ptp.ui.actions.DeleteSetAction;
 import org.eclipse.ptp.ui.actions.ParallelAction;
-import org.eclipse.ptp.ui.model.IElementGroup;
-import org.eclipse.ptp.ui.model.IGroupManager;
+import org.eclipse.ptp.ui.actions.SetAction;
+import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.ptp.ui.model.ISetManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -43,23 +42,17 @@ import org.eclipse.ui.IWorkbenchActionConstants;
  * @author Clement chu
  *
  */
-public abstract class AbstractParallelGroupView extends AbstractParallelElementView {
+public abstract class AbstractParallelSetView extends AbstractParallelElementView {
 	// default actions
-	protected ParallelAction createGroupAction = null;
-	protected ParallelAction deleteGroupAction = null;
+	protected ParallelAction createSetAction = null;
+	protected ParallelAction deleteSetAction = null;
 	protected ParallelAction deleteProcessAction = null;
 	
 	protected int DEFAULT_DEL_KEY = '\u007f';
+	protected int DEFAULT_BACK_KEY = '\u0008';
 	
 	//Set element to display 
 	protected abstract void initialElement();
-	
-	protected void initialKey(String os) {
-		super.initialKey(os);
-		if (os.equals(Platform.OS_MACOSX)) {
-			DEFAULT_DEL_KEY = 8;
-		}
-	}	
 	
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
@@ -70,17 +63,17 @@ public abstract class AbstractParallelGroupView extends AbstractParallelElementV
 	}	
 	
 	protected void initialView() {
-		if (groupManager.size() == 1)
+		if (setManager.size() == 1)
 			initialElement();
 
 		IMenuManager manager = getViewSite().getActionBars().getMenuManager();
-		IElementGroup[] groups = groupManager.getSortedGroups();
-		for (int i = 1; i < groups.length; i++) {
-			IAction action = new GroupAction(groups[i].getID(), this);
-			groups[i].setSelected(false);
+		IElementSet[] sets = setManager.getSortedSets();
+		for (int i = 1; i < sets.length; i++) {
+			IAction action = new SetAction(sets[i].getID(), this);
+			sets[i].setSelected(false);
 			manager.add(action);
 		}
-		selectGroup(groupManager.getGroupRoot().getID());
+		selectSet(setManager.getSetRoot().getID());
 		updateMenu(manager);
 	}	
 	
@@ -90,12 +83,12 @@ public abstract class AbstractParallelGroupView extends AbstractParallelElementV
 			toolBarMgr.add(new Separator());
 
 		//default actions
-		createGroupAction = new CreateGroupAction(this);
-		deleteGroupAction = new DeleteGroupAction(this);
+		createSetAction = new CreateSetAction(this);
+		deleteSetAction = new DeleteSetAction(this);
 		deleteProcessAction = new DeleteProcessAction(this);
 
-		toolBarMgr.add(createGroupAction);
-		toolBarMgr.add(deleteGroupAction);
+		toolBarMgr.add(createSetAction);
+		toolBarMgr.add(deleteSetAction);
 		toolBarMgr.add(deleteProcessAction);
 	}
 	/**
@@ -109,8 +102,8 @@ public abstract class AbstractParallelGroupView extends AbstractParallelElementV
 			menuMgr.add(new Separator());
 		
 		//default Root menu
-		IAction action = new GroupAction(IGroupManager.GROUP_ROOT_ID, this);
-		action.setText(GroupAction.GROUP_ROOT);
+		IAction action = new SetAction(ISetManager.SET_ROOT_ID, this);
+		action.setText(SetAction.SET_ROOT);
 		menuMgr.add(action);
 	}
 	protected abstract boolean createMenuActions(IMenuManager menuMgr);
@@ -135,13 +128,13 @@ public abstract class AbstractParallelGroupView extends AbstractParallelElementV
 		if (fillContextMenu(manager))
 			manager.add(new Separator());
 		
-		IElementGroup[] groups = groupManager.getSortedGroups();
-		for (int i = 0; i < groups.length; i++) {
-			IAction action = new GroupAction(groups[i].getID(), this);
+		IElementSet[] sets = setManager.getSortedSets();
+		for (int i = 0; i < sets.length; i++) {
+			IAction action = new SetAction(sets[i].getID(), this);
 			if (i == 0)
-				action.setText(GroupAction.GROUP_ROOT);
+				action.setText(SetAction.SET_ROOT);
 
-			action.setChecked(groups[i].getID().equals(cur_group_id));
+			action.setChecked(sets[i].getID().equals(cur_set_id));
 			manager.add(action);
 		}
 
@@ -152,7 +145,7 @@ public abstract class AbstractParallelGroupView extends AbstractParallelElementV
 	
 	 //Before this please make sure the group is set
 	public void updateMenu(IMenuManager manager) {
-		IElementGroup[] groups = groupManager.getGroups();
+		IElementSet[] groups = setManager.getSets();
 		for (int i = 0; i < groups.length; i++) {
 			IContributionItem item = manager.find(groups[i].getID());
 			if (item != null && item instanceof ActionContributionItem) {
@@ -163,24 +156,25 @@ public abstract class AbstractParallelGroupView extends AbstractParallelElementV
 				}
 			}
 		}
-		boolean deleteActionEnable = groups.length > 1 && !cur_group_id.equals(IGroupManager.GROUP_ROOT_ID);
-		deleteGroupAction.setEnabled(deleteActionEnable);
+		boolean deleteActionEnable = groups.length > 1 && !cur_set_id.equals(ISetManager.SET_ROOT_ID);
+		deleteSetAction.setEnabled(deleteActionEnable);
 		deleteProcessAction.setEnabled(deleteActionEnable);
-		createGroupAction.setEnabled(cur_group_size > 0);
+		createSetAction.setEnabled(cur_set_size > 0);
 		setActionEnable();
 	}
 	//set which action need to be enable or disenale
 	protected abstract void setActionEnable();	
 
 	protected void keyDownEvent(int mx, int my, int keyCode) {
-		super.keyDownEvent(mx, my, keyCode);
-		if (keyCode == DEFAULT_DEL_KEY) // delete key
+		if (keyCode == DEFAULT_DEL_KEY || keyCode == DEFAULT_BACK_KEY) // delete key
 			removeProcess();
+		else
+			super.keyDownEvent(mx, my, keyCode);			
 	}
 
 	public void removeProcess() {
-		if (!cur_group_id.equals(IGroupManager.GROUP_ROOT_ID)) {
-			deleteProcessAction.run(cur_element_group.getSelectedElements());
+		if (!cur_set_id.equals(ISetManager.SET_ROOT_ID)) {
+			deleteProcessAction.run(cur_element_set.getSelectedElements());
 		}
 	}	
 }

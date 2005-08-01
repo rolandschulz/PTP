@@ -22,7 +22,7 @@ package org.eclipse.ptp.ui.model;
  * @author clement chu
  *
  */
-public interface IElementGroup extends IContainer {
+public interface IElementSet extends IContainer {
 	public IElement[] getSelectedElements();
 	public void removeAllSelected();
 	public void select(int index);

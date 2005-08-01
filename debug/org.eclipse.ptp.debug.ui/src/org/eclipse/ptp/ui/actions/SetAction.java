@@ -16,41 +16,36 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.actions;
+package org.eclipse.ptp.ui.actions;
 
-import org.eclipse.ptp.debug.ui.ImageUtil;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
-import org.eclipse.ptp.ui.UIUtils;
-import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelView;
 /**
  * @author clement chu
  *
  */
-public class RegisterAction extends ParallelAction {
-	public static final String name = "Register Selected Elements";
-	private int NUM_PROCESS_WARNING = 10;
+public class SetAction extends ParallelAction {
+	public static final String SET_ROOT = "Root";
+	public static final String name = "Set";
 	
-	public RegisterAction(AbstractParallelView debugView) {
-		super(name, debugView);
-	    setImageDescriptor(ImageUtil.ID_ICON_REGISTER_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_REGISTER_DISABLE);
-	    setId(name);
+	public SetAction(String id, AbstractParallelView debugView) {
+		super(name + " " + id, IAction.AS_CHECK_BOX, debugView);
 	    setEnabled(true);
+		setId(id);
 	}
 
-	public void run(IElement[] elements) {
-		if (validation(elements)) {
-			if (elements.length > NUM_PROCESS_WARNING) {
-				if (UIUtils.showQuestionDialog("Register Confirmation", "Are you going to register " + elements.length + " processes?")) {
-					if (debugView instanceof DebugParallelProcessView) {
-						DebugParallelProcessView view = (DebugParallelProcessView)debugView;
-						view.registerSelectedElements();
-						view.redraw();
-					}
-				}
-			}
+	public void run(IElement[] elements) {}
+	
+	public void run() {
+		if (debugView instanceof DebugParallelProcessView) {
+			DebugParallelProcessView view = (DebugParallelProcessView)debugView;
+			view.selectSet(getId());
+			//deselect all elements each time changed the group
+			view.getCurrentGroup().setAllSelect(false);
+			view.updateMenu(view.getViewSite().getActionBars().getMenuManager());
+			view.redraw();
 		}
 	}	
 }

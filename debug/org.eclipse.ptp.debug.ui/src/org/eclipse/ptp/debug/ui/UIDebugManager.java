@@ -32,8 +32,8 @@ import org.eclipse.ptp.debug.core.PProcess;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
 import org.eclipse.ptp.ui.UIManager;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementGroup;
-import org.eclipse.ptp.ui.model.IGroupManager;
+import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.ptp.ui.model.ISetManager;
 import org.eclipse.ptp.ui.model.internal.Element;
 
 /**
@@ -51,13 +51,16 @@ public class UIDebugManager {
 		uiManager = UIPlugin.getDefault().getUIManager();
 	}
 	
-	public IGroupManager getGroupManager() {
-		return uiManager.getGroupManager();
+	public ISetManager getGroupManager() {
+		return uiManager.getSetManager();
 	}
 	
 	public void unregisterElements(ILaunch launch, PDebugTarget target, IElement[] elements) {
 		for (int i=0; i<elements.length; i++) {
-			//TODO unregister in selected elements in debug view 
+			//only unregister some registered elements
+			if (elements[i].isRegistered()) {
+				//TODO unregister in selected elements in debug view 
+			}
 		}
 	}
 	
@@ -76,7 +79,9 @@ public class UIDebugManager {
 			return;
 		
 		for (int i=0; i<elements.length; i++) {
-			target.setCurrentFocus(elements[i].getIDNum());
+			//only register some unregistered elements
+			if (!elements[i].isRegistered())
+				target.setCurrentFocus(elements[i].getIDNum());
 		}
 	}
 	public void registerElements(IElement[] elements) {
@@ -126,9 +131,9 @@ public class UIDebugManager {
 		int total_jobs = jobs.length;
 
 		if (total_jobs > 0) {
-			IGroupManager groupManager = getGroupManager();
+			ISetManager groupManager = getGroupManager();
 			groupManager.clearAll();
-			IElementGroup group = groupManager.getGroupRoot();
+			IElementSet group = groupManager.getSetRoot();
 			for (int i=0; i<total_jobs; i++) {
 				IPProcess[] processes = jobs[i].getProcesses();
 				for (int j=0; j<processes.length; j++) {
@@ -142,9 +147,9 @@ public class UIDebugManager {
 	private void dummyInitialProcess() {
 		PProcess[] processes = DebugManager.getInstance().getProcesses();
 		if (processes.length > 0) {
-			IGroupManager groupManager = getGroupManager();
+			ISetManager groupManager = getGroupManager();
 			groupManager.clearAll();
-			IElementGroup group = groupManager.getGroupRoot();
+			IElementSet group = groupManager.getSetRoot();
 			for (int j=0; j<processes.length; j++) {
 				group.add(new Element(processes[j].getID()));
 			}

@@ -34,8 +34,8 @@ import org.eclipse.swt.widgets.Menu;
  * @author clement chu
  *
  */
-public class CreateGroupAction extends ParallelAction {
-	public static final String name = "Create Group";
+public class CreateSetAction extends ParallelAction {
+	public static final String name = "Create Set";
 
     private IMenuCreator menuCreator = new IMenuCreator() {
         private MenuManager dropDownMenuMgr = null;
@@ -45,7 +45,7 @@ public class CreateGroupAction extends ParallelAction {
         		dispose();
         	
         	dropDownMenuMgr = new MenuManager();                
-        	AbstractParallelView debugView = CreateGroupAction.this.debugView;
+        	AbstractParallelView debugView = CreateSetAction.this.debugView;
         	if (debugView instanceof DebugParallelProcessView) {
         		DebugParallelProcessView view = (DebugParallelProcessView)debugView;
         		IContributionItem[] items = view.getViewSite().getActionBars().getMenuManager().getItems();
@@ -80,10 +80,10 @@ public class CreateGroupAction extends ParallelAction {
         }
     };
     
-	public CreateGroupAction(AbstractParallelView debugView) {
+	public CreateSetAction(AbstractParallelView debugView) {
 		super(name, IAction.AS_DROP_DOWN_MENU, debugView);
-	    setImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_DISABLE);
+	    setImageDescriptor(ImageUtil.ID_ICON_CREATESET_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATESET_DISABLE);
 	    setMenuCreator(menuCreator);
 	    setId(name);
 	}
@@ -96,35 +96,35 @@ public class CreateGroupAction extends ParallelAction {
 		}
 	}
 	
-	private void groupAction(IElement[] elements, DebugParallelProcessView view, String groupID) {
+	private void groupAction(IElement[] elements, DebugParallelProcessView view, String setID) {
 		IMenuManager manager = view.getViewSite().getActionBars().getMenuManager();
-		if (groupID == null) {
-			groupID = view.getUIDebugManger().createGroup(elements);
-			manager.add(new GroupAction(groupID, view));
+		if (setID == null) {
+			setID = view.getUIDebugManger().createSet(elements);
+			manager.add(new SetAction(setID, view));
 		}
 		else
-			view.getUIDebugManger().addToGroup(elements, groupID);
+			view.getUIDebugManger().addToSet(elements, setID);
 		
-		view.selectGroup(groupID);
+		view.selectSet(setID);
 		view.getCurrentGroup().setAllSelect(false);
 		view.updateMenu(manager);
 		view.redraw();
 	}
 	
 	private class InternalGroupAction extends ParallelAction {
-		private String group_id = "";
-		private InternalGroupAction(String group_id, DebugParallelProcessView view) {
-			super("Add To: " + GroupAction.name + " " + group_id, view);
-			this.group_id = group_id;
-		    setImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_NORMAL);
-		    setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATEGROUP_DISABLE);
-		    setEnabled(!view.getCurrentGroupID().equals(group_id));
+		private String set_id = "";
+		private InternalGroupAction(String set_id, DebugParallelProcessView view) {
+			super("Add To: " + SetAction.name + " " + set_id, view);
+			this.set_id = set_id;
+		    setImageDescriptor(ImageUtil.ID_ICON_CREATESET_NORMAL);
+		    setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATESET_DISABLE);
+		    setEnabled(!view.getCurrentGroupID().equals(set_id));
 		}
 		
 		public void run(IElement[] elements) {
 			if (validation(elements)) {
 				if (debugView instanceof DebugParallelProcessView) {
-					groupAction(elements, (DebugParallelProcessView)debugView, group_id);
+					groupAction(elements, (DebugParallelProcessView)debugView, set_id);
 				}
 			}
 		}

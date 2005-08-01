@@ -24,7 +24,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.debug.ui.ImageUtil;
 import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementGroup;
+import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.views.AbstractParallelView;
 
 /**
@@ -45,12 +45,12 @@ public class DeleteProcessAction extends ParallelAction {
 			if (debugView instanceof DebugParallelProcessView) {
 				DebugParallelProcessView view = (DebugParallelProcessView)debugView;
 
-				IElementGroup group = view.getCurrentGroup();
+				IElementSet group = view.getCurrentGroup();
 				if (group.size() == elements.length) {
 					callDeleteGroupAction(view);
 				} else {
-					view.getUIDebugManger().removeFromGroup(elements, group.getID());
-					view.selectGroup(group.getID());
+					view.getUIDebugManger().removeFromSet(elements, group.getID());
+					view.selectSet(group.getID());
 					view.updateTitle();
 					view.redraw();
 				}
@@ -60,7 +60,7 @@ public class DeleteProcessAction extends ParallelAction {
 	
 	private void callDeleteGroupAction(DebugParallelProcessView view) {
 		IToolBarManager manager = view.getViewSite().getActionBars().getToolBarManager();
-		IContributionItem item = manager.find(DeleteGroupAction.name);
+		IContributionItem item = manager.find(DeleteSetAction.name);
 		if (item != null && item instanceof ActionContributionItem) {
 			((ActionContributionItem)item).getAction().run();
 		}

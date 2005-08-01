@@ -26,8 +26,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementGroup;
-import org.eclipse.ptp.ui.model.IGroupManager;
+import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.ptp.ui.model.ISetManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.PaintEvent;
@@ -67,10 +67,10 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	protected int e_height = 16;
 
 	// group
-	protected IGroupManager groupManager = null;
-	protected String cur_group_id = IGroupManager.GROUP_ROOT_ID;
-	protected IElementGroup cur_element_group = null;
-	protected int cur_group_size = 0;
+	protected ISetManager setManager = null;
+	protected String cur_set_id = ISetManager.SET_ROOT_ID;
+	protected IElementSet cur_element_set = null;
+	protected int cur_set_size = 0;
 	protected int fisrt_selected_element_id = -1;
 
 	// view info
@@ -99,6 +99,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	
 	//key
 	protected int DEFAULT_CTRL_KEY = SWT.CTRL;
+	protected int A_KEY = '\u0061';
 	
 	protected Listener myDrawingMouseListener = new Listener() {
 		public void handleEvent(Event e) {
@@ -107,7 +108,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	};
 	
 	public AbstractParallelElementView() {
-		groupManager = uiManager.getGroupManager();		
+		setManager = uiManager.getSetManager();		
 		initElementAttribute();
 	}
 	
@@ -158,7 +159,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 
 		drawComp.addPaintListener(new PaintListener() {
 		public void paintControl(PaintEvent e) {
-				if (groupManager.size() > 0)
+				if (setManager.size() > 0)
 					paintCanvas(e.gc);
 			}
 		});
@@ -239,10 +240,10 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 				selectionShell.setBackground(selectionShell.getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
 			}
 			//only select the bounded area
-			deselect(groupManager.getBoundedElements());
+			deselect(setManager.getBoundedElements());
 			drawSelectedArea(drag_x, drag_y, mx, my);
 			IElement[] elements = selectElements(getSelectedRect(drag_x, drag_y, mx, my));
-			groupManager.addBoundedElement(elements);
+			setManager.addBoundedElement(elements);
 			elementRedraw();
 		}
 	}
@@ -250,7 +251,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		disposeSelectionArea();
 
 		if (isDragging())
-			groupManager.removeAllBoundedElements();
+			setManager.removeAllBoundedElements();
 		else
 			selectElement(mx, my);
 
@@ -268,13 +269,16 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		isDoubleClick = true;
 	}
 	protected void keyDownEvent(int mx, int my, int keyCode) {
-		this.keyCode = keyCode;
-		if (keyCode == SWT.PAGE_UP) // page up key
+		if (keyCode == SWT.PAGE_UP)
 			scrollUp();
-		else if (keyCode == SWT.PAGE_DOWN) // page down key
+		else if (keyCode == SWT.PAGE_DOWN)
 			scrollDown();
+		else if (keyCode == A_KEY) {
+			if (this.keyCode == DEFAULT_CTRL_KEY)
+				selectAll();
+		}
+		this.keyCode = keyCode;
 	}
-	
 	protected void keyUpEvent(int mx, int my, int keyCode) {
 		this.keyCode = SWT.None;
 	}
@@ -283,6 +287,11 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		hideToolTip();
 		disposeSelectionArea();
 		clearMouseSetting();
+	}
+	
+	protected void selectAll() {
+		cur_element_set.setAllSelect(true);
+		elementRedraw();
 	}
 
 	protected void deselect(IElement[] elements) {
@@ -294,8 +303,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	protected void deselect() {
 		//MAC use command, but others machine should use control key
 		if (keyCode != DEFAULT_CTRL_KEY) {
-			if (cur_element_group != null)
-				cur_element_group.setAllSelect(false);
+			if (cur_element_set != null)
+				cur_element_set.setAllSelect(false);
 		}		
 	}
 
@@ -517,7 +526,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 				int start_element_id = fisrt_selected_element_id > cur_element_num ? cur_element_num : fisrt_selected_element_id;
 				int end_element_id = (start_element_id == cur_element_num ? fisrt_selected_element_id : cur_element_num) + 1;
 
-				IElement[] elements = cur_element_group.getSortedElements();
+				IElement[] elements = cur_element_set.getSortedElements();
 				for (int num = start_element_id; num < end_element_id; num++) {
 					if (num >= elements.length)
 						break;
@@ -531,7 +540,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	protected void selectElement(int e_x, int e_y) {
 		int element_num = findElementNum(e_x, e_y);
 		if (element_num > -1)
-			cur_element_group.select(element_num, true);
+			cur_element_set.select(element_num, true);
 
 		selectElements(element_num);
 	}
@@ -568,7 +577,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 
 		// the first element
 		int init_element_num = (visible_e_col * (e_loc.row - 1) + e_loc.col) - 1;
-		IElement[] elements = cur_element_group.getSortedElements();
+		IElement[] elements = cur_element_set.getSortedElements();
 		List selectedElements = new ArrayList();
 		
 		for (int row_count = 0; row_count < total_row; row_count++) {
@@ -581,8 +590,10 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 				// if (row_count == 0 && col_count == 0)
 				// selectElements(num);
 
-				elements[num].setSelected(true);
-				selectedElements.add(elements[num]);
+				if (!elements[num].isSelected()) {
+					selectedElements.add(elements[num]);
+					elements[num].setSelected(true);
+				}
 			}
 		}
 		return (IElement[])selectedElements.toArray(new IElement[selectedElements.size()]);
@@ -621,7 +632,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 			return -1;
 
 		int element_num = visible_e_col * (e_loc.row - 1) + e_loc.col;
-		if (element_num <= cur_group_size)
+		if (element_num <= cur_set_size)
 			return (element_num - 1);
 
 		return -1;
@@ -637,7 +648,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 
 	private int calculateHeight() {
 		if (visible_e_col > 0) {
-			int max_element_row = (cur_group_size / visible_e_col) + ((cur_group_size % visible_e_col == 0) ? 0 : 1);
+			int max_element_row = (cur_set_size / visible_e_col) + ((cur_set_size % visible_e_col == 0) ? 0 : 1);
 			int max_height = max_element_row * (e_height + e_spacing_y) + e_offset_x;
 			return (max_height<view_height?view_height:max_height);
 		}
@@ -663,7 +674,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	 * Print visible area ONLY Find out process numbers of beginning and ending
 	 */
 	private void paintCanvas(GC g) {
-		IElement[] elements = cur_element_group.getSortedElements();
+		IElement[] elements = cur_element_set.getSortedElements();
 
 		int start_row = Math.round((sc.getOrigin().y - e_offset_x) / (e_height + e_spacing_y));
 		int start_num = start_row * visible_e_col;
@@ -720,32 +731,32 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	}
 
 	public ISelection getSelection() {
-		return new StructuredSelection(cur_element_group.getSelectedElements());
+		return new StructuredSelection(cur_element_set.getSelectedElements());
 	}
 
 	public String getCurrentGroupID() {
-		return cur_group_id;
+		return cur_set_id;
 	}
 
-	public void selectGroup(String groupID) {
+	public void selectSet(String groupID) {
 		deSelectGroup();
-		this.cur_element_group = groupManager.getGroup(groupID);
-		this.cur_group_id = cur_element_group.getID();
-		this.cur_group_size = cur_element_group.size();
-		cur_element_group.setSelected(true);
+		this.cur_element_set = setManager.getSet(groupID);
+		this.cur_set_id = cur_element_set.getID();
+		this.cur_set_size = cur_element_set.size();
+		cur_element_set.setSelected(true);
 	}
 
 	public void deSelectGroup() {
-		if (cur_element_group != null)
-			cur_element_group.setSelected(false);
+		if (cur_element_set != null)
+			cur_element_set.setSelected(false);
 	}
 
-	public IElementGroup getCurrentGroup() {
-		return cur_element_group;
+	public IElementSet getCurrentGroup() {
+		return cur_element_set;
 	}
 
 	public void updateTitle() {
-		changeTitle(cur_element_group.getID(), cur_group_size);
+		changeTitle(cur_element_set.getID(), cur_set_size);
 	}
 
 	public void redraw() {

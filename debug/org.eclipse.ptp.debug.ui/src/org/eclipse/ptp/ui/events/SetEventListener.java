@@ -16,41 +16,18 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.actions;
+package org.eclipse.ptp.ui.events;
 
-import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
-import org.eclipse.ptp.ui.UIUtils;
-import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.views.AbstractParallelView;
+import org.eclipse.ptp.ui.model.IElementSet;
+
 /**
  * @author clement chu
  *
  */
-public class RegisterAction extends ParallelAction {
-	public static final String name = "Register Selected Elements";
-	private int NUM_PROCESS_WARNING = 10;
-	
-	public RegisterAction(AbstractParallelView debugView) {
-		super(name, debugView);
-	    setImageDescriptor(ImageUtil.ID_ICON_REGISTER_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_REGISTER_DISABLE);
-	    setId(name);
-	    setEnabled(true);
-	}
-
-	public void run(IElement[] elements) {
-		if (validation(elements)) {
-			if (elements.length > NUM_PROCESS_WARNING) {
-				if (UIUtils.showQuestionDialog("Register Confirmation", "Are you going to register " + elements.length + " processes?")) {
-					if (debugView instanceof DebugParallelProcessView) {
-						DebugParallelProcessView view = (DebugParallelProcessView)debugView;
-						view.registerSelectedElements();
-						view.redraw();
-					}
-				}
-			}
-		}
-	}	
+public interface SetEventListener {
+	public void createSetEvent(IElementSet set, IElement[] elements);
+	public void deleteSetEvent(IElementSet set);
+	public void addElementEvent(IElementSet set, IElement[] elements);
+	public void removeElementEvent(IElementSet set, IElement[] elements);
 }

@@ -23,27 +23,27 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementGroup;
+import org.eclipse.ptp.ui.model.IElementSet;
 /**
  * @author clement chu
  *
  */
-public class ElementGroup extends Container implements IElementGroup {
-	private static int group_counter = 1;
+public class ElementSet extends Container implements IElementSet {
+	private static int set_counter = 1;
 	
-	public ElementGroup(boolean selected) {
-		this(group_counter++, selected);
+	public ElementSet(boolean selected) {
+		this(set_counter++, selected);
 	}
-	public ElementGroup(int num) {
+	public ElementSet(int num) {
 		this(String.valueOf(num), false);
 	}
-	public ElementGroup(int num, boolean selected) {
+	public ElementSet(int num, boolean selected) {
 		this(String.valueOf(num), selected);
 	}
-	public ElementGroup(String id) {
+	public ElementSet(String id) {
 		this(id, false);
 	}
-	public ElementGroup(String id, boolean selected) {
+	public ElementSet(String id, boolean selected) {
 		super(id, selected);
 	}
 	public IElement[] getSelectedElements() {

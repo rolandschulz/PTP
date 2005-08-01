@@ -21,10 +21,10 @@ package org.eclipse.ptp.ui;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementGroup;
-import org.eclipse.ptp.ui.model.IGroupManager;
-import org.eclipse.ptp.ui.model.internal.ElementGroup;
-import org.eclipse.ptp.ui.model.internal.GroupManager;
+import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.ptp.ui.model.ISetManager;
+import org.eclipse.ptp.ui.model.internal.ElementSet;
+import org.eclipse.ptp.ui.model.internal.SetManager;
 
 /**
  * @author clement chu
@@ -32,43 +32,43 @@ import org.eclipse.ptp.ui.model.internal.GroupManager;
  */
 public class UIManager {
 	protected IModelManager modelManager = null;
-	private IGroupManager groupManager = null;
+	private ISetManager setManager = null;
 	
 	public UIManager() {
-		groupManager = new GroupManager();
+		setManager = new SetManager();
 		modelManager = PTPCorePlugin.getDefault().getModelManager();
 	}
 	public void shutdown() {
-		groupManager.clearAll();
+		setManager.clearAll();
 	}	
-	public IGroupManager getGroupManager() {
-		return groupManager;
+	public ISetManager getSetManager() {
+		return setManager;
 	}	
 	public IModelManager getModelManager() {
 		return modelManager;
 	}
 	
-	private void addToGroup(IElement[] elements, IElementGroup group) {
+	private void addToSet(IElement[] elements, IElementSet set) {
 		for (int i=0; i<elements.length; i++) {
-			group.add(elements[i].cloneElement());
+			set.add(elements[i].cloneElement());
 		}
 	}
-	public void addToGroup(IElement[] elements, String groupID) {
-		addToGroup(elements, groupManager.getGroup(groupID));
+	public void addToSet(IElement[] elements, String setID) {
+		addToSet(elements, setManager.getSet(setID));
 	}
-	public String createGroup(IElement[] elements) {
-		IElementGroup group = new ElementGroup(true);
-		addToGroup(elements, group);
-		groupManager.add(group);
-		return group.getID();
+	public String createSet(IElement[] elements) {
+		IElementSet set = new ElementSet(true);
+		addToSet(elements, set);
+		setManager.add(set);
+		return set.getID();
 	}
-	public void removeGroup(String groupID) {
-		groupManager.remove(groupID);
+	public void removeSet(String setID) {
+		setManager.remove(setID);
 	}
-	public void removeFromGroup(IElement[] elements, String groupID) {
-		IElementGroup group = groupManager.getGroup(groupID);
+	public void removeFromSet(IElement[] elements, String setID) {
+		IElementSet set = setManager.getSet(setID);
 		for (int i=0; i<elements.length; i++) {
-			group.remove(elements[i]);
+			set.remove(elements[i]);
 		}
 	}	
 }
