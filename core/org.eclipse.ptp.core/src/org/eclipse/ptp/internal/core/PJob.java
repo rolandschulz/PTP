@@ -32,11 +32,20 @@ import org.eclipse.ptp.core.IPUniverse;
 
 public class PJob extends Parent implements IPJob {
 	protected String NAME_TAG = "root ";
+	protected boolean isDebugJob = false;
 
 	final public static int BASE_OFFSET = 10000;
 
 	public PJob(IPUniverse uni, String name, String key) {
 		super(uni, name, key, P_JOB);
+	}
+	
+	public boolean isDebug() {
+		return isDebugJob;
+	}
+	
+	public void setDebug() {
+		isDebugJob = true;
 	}
 
 	/*

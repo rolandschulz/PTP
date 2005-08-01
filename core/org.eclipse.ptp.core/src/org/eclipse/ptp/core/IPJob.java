@@ -35,6 +35,19 @@ public interface IPJob extends IPElement {
 	 * @return The Job number of this Job
 	 */
 	public String getJobNumber();
+	
+	/**
+	 * Returns true/false regarding whether this Job is a debug job 
+	 * 
+	 * @return True if this job is a debug job
+	 */
+	public boolean isDebug();
+	
+	/**
+	 * Sets this job to be a debug job
+	 *
+	 */
+	public void setDebug();
 
 	/**
 	 * Returns an array of the Processes comprised by this Job. Might return
