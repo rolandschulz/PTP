@@ -206,4 +206,10 @@ public class DisassemblyBlock implements IDisassemblyBlock, IAdaptable {
 	private void setSourceLines( IAsmSourceLine[] sourceLines ) {
 		this.fSourceLines = sourceLines;
 	}
+
+	public Object getSourceElement() {
+		// Auto-generated method stub
+		System.out.println("DisassemblyBlock.getSourceElement");
+		return null;
+	}
 }

@@ -38,7 +38,6 @@ public class DebugSimulator extends AbstractDebugger {
 						command.add(1, "1");
 						command.add(2, "DebuggerOutput");
 						debuggerCommands.addItem(command);
-						System.out.println("---------------- DebuggerOutput");
 						Thread.sleep(5000);
 					} catch (InterruptedException e) {
 					}
@@ -57,7 +56,6 @@ public class DebugSimulator extends AbstractDebugger {
 						for (int i = 0; i < pCommands.size(); i++) {
 							((Queue) pCommands.get(i)).addItem(command);
 						}
-						System.out.println("---------------- ProcessOutput");
 						Thread.sleep(3000);
 					} catch (InterruptedException e) {
 					}

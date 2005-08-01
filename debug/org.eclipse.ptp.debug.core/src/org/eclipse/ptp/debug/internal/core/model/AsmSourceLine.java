@@ -45,4 +45,10 @@ public class AsmSourceLine implements IAsmSourceLine {
 	public String toString() {
 		return fText;
 	}
+
+	public int getLineNumber() {
+		// Auto-generated method stub
+		System.out.println("AsmSourceLine.getLineNumber");
+		return 0;
+	}
 }
