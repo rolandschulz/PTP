@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.external.actionpoint.ABreakpoint;
 import org.eclipse.ptp.debug.external.actionpoint.AWatchpoint;
 import org.eclipse.ptp.debug.external.actionpoint.DebugActionpoint;
@@ -47,9 +48,9 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 	
 	protected boolean isExitingFlag = false; /* Checked by the eventThread */
 
-	protected abstract void startDebugger();
+	protected abstract void startDebugger(IPJob job);
 	
-	public void initialize(DebugSession dS) {
+	public void initialize(DebugSession dS, IPJob job) {
 		actionpointList = new ArrayList();
 		eventQueue = new Queue();
 		eventThread = new EventThread(this);
@@ -66,7 +67,7 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 		stateVariables.put("MODE", new VMode());
 		stateVariables.put("START_MODEL", new VStartModel());
 		stateVariables.put("STOP_MODEL", new VStopModel());
-		startDebugger();
+		startDebugger(job);
 	}
 	
 	protected abstract void stopDebugger();

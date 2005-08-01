@@ -5,41 +5,58 @@ import java.io.InputStream;
 
 public class SimInputStream extends InputStream {
 
-	int counter = 0;
-	
-	int max = 1000; /* print "max" lines */
-	int delay = 1; /* pause for "delay" second between each line */
+	boolean finished;
+	Queue queue;
 	
 	String str;
 	int strLen;
 	
-	public SimInputStream(String s) {
+	public SimInputStream() {
 		super();
-		str = s;
-		strLen = s.length();
+		queue = new Queue();
+		finished = false;
+		str = null;
+		strLen = -2;
+	}
+	
+	public void printString(String s) {
+		queue.addItem(s);
+	}
+	
+	public void destroy() {
+		finished = true;
+		queue.addItem("destroy");
 	}
 	
 	public int read() throws IOException {
-		// Auto-generated method stub
-		//System.out.println("SimInputStream.read()");
-
-		counter++;
-		
-		if (counter > ((strLen + 2) * max)) {
-			return -1;
-		}
-		else if ((counter % (strLen + 2)) == strLen + 1) {
-			try {
-				Thread.sleep(delay * 1000);
-			} catch (InterruptedException e) {
-			}
+		if (strLen == 0) {
+			strLen--;
 			return '\n';
 		}
-		else if ((counter % (strLen + 2)) == 0)
+		
+		if (strLen == -1) {
+			strLen--;
 			return -1;
-		else {
-			int pos = counter % (strLen + 2);
-			return str.charAt(pos - 1);
 		}
+			
+		if (strLen == -2) {
+			try {
+				if (finished) {
+					return -1;
+				}
+				Thread.sleep(1000);
+				str = (String) queue.removeItem();
+				if (str.equals("destroy")) {
+					return -1;
+				}
+				strLen = str.length();
+			} catch (InterruptedException e) {
+				//e.printStackTrace();
+			}
+		}
+			
+		int chr = str.charAt(str.length() - strLen);
+		strLen--;
+		return chr;
 	}
 }
