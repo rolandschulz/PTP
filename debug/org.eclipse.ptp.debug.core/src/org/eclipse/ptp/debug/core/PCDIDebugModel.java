@@ -100,12 +100,12 @@ public class PCDIDebugModel {
 				boolean stop = launch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
 				target[0] = new PDebugTarget( launch, project, cdiTarget, name, file, allowTerminate, allowDisconnect );
 				ICDITargetConfiguration config = cdiTarget.getConfiguration();
-				//if ( config.supportsBreakpoints() && stop ) {
-				//	stopInMain( (PDebugTarget)target[0] );
-				//}
-				//if ( config.supportsResume() && resumeTarget ) {
-				//	target[0].resume();
-				//}
+				if ( config.supportsBreakpoints() && stop ) {
+					stopInMain( (PDebugTarget)target[0] );
+				}
+				if ( config.supportsResume() && resumeTarget ) {
+					target[0].resume();
+				}
 			}
 		};
 		try {

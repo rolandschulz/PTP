@@ -48,7 +48,6 @@ import org.eclipse.cdt.debug.core.cdi.event.ICDIResumedEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
-import org.eclipse.cdt.debug.core.cdi.model.ICDISharedLibrary;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
@@ -138,11 +137,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	private ICDITargetConfiguration fConfig;
 
 	/**
-	 * The module manager for this target.
-	 */
-	private CModuleManager fModuleManager;
-
-	/**
 	 * The set manager for this target.
 	 */
 	private PSetManager fGroupManager;
@@ -195,7 +189,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		initializePreferences();
 		setConfiguration( cdiTarget.getConfiguration() );
 		setThreadList( new ArrayList( 5 ) );
-		setModuleManager( new CModuleManager( this ) );
 		setGroupManager( new PSetManager( this ) );
 		setBreakpointManager( new PBreakpointManager( this ) );
 		initialize();
@@ -233,7 +226,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		debugEvents.add( createCreateEvent() );
 		initializeThreads( debugEvents );
 		initializeBreakpoints();
-		initializeModuleManager();
 		getLaunch().addDebugTarget( this );
 		fireEventSet( (DebugEvent[])debugEvents.toArray( new DebugEvent[debugEvents.size()] ) );
 	}
@@ -292,10 +284,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 				breakpointAdded0( bps[i] );
 			}
 		}
-	}
-
-	protected void initializeModuleManager() {
-		getModuleManager().addModules( new ICModule[] { CModule.createExecutable( this, getExecFile().getPath() ) } );
 	}
 
 	/* (non-Javadoc)
@@ -784,9 +772,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 					if ( source instanceof ICDIThread ) {
 						handleThreadCreatedEvent( (ICDICreatedEvent)event );
 					}
-					if ( source instanceof ICDISharedLibrary ) {
-						getModuleManager().sharedLibraryLoaded( (ICDISharedLibrary)source );
-					}
 				}
 				else if ( event instanceof ICDISuspendedEvent ) {
 					if ( source instanceof IPCDITarget ) {
@@ -807,9 +792,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 					if ( source instanceof ICDIThread ) {
 						handleThreadTerminatedEvent( (ICDIDestroyedEvent)event );
 					}
-					if ( source instanceof ICDISharedLibrary ) {
-						getModuleManager().sharedLibraryUnloaded( (ICDISharedLibrary)source );
-					}
 				}
 				else if ( event instanceof ICDIDisconnectedEvent ) {
 					if ( source instanceof IPCDITarget ) {
@@ -819,9 +801,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 				else if ( event instanceof ICDIChangedEvent ) {
 					if ( source instanceof IPCDITarget ) {
 						handleChangedEvent( (ICDIChangedEvent)event );
-					}
-					if ( source instanceof ICDISharedLibrary ) {
-						handleSymbolsLoaded( (ICDISharedLibrary)source );
 					}
 				}
 				else if ( event instanceof ICDIRestartedEvent ) {
@@ -920,7 +899,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener( this );
 		DebugPlugin.getDefault().getExpressionManager().removeExpressionListener( this );
 		DebugPlugin.getDefault().getLaunchManager().removeLaunchListener( this );
-		disposeModuleManager();
 		disposeGroupManager();
 		disposeBreakpointManager();
 		removeAllExpressions();
@@ -1291,19 +1269,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return list;
 	}
 
-	protected void setModuleManager( CModuleManager mm ) {
-		fModuleManager = mm;
-	}
-
-	protected CModuleManager getModuleManager() {
-		return fModuleManager;
-	}
-
-	protected void disposeModuleManager() {
-		fModuleManager.dispose();
-		fModuleManager = null;
-	}
-
 	protected void setGroupManager( PSetManager gm ) {
 		fGroupManager = gm;
 	}
@@ -1488,10 +1453,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		}
 	}
 
-	private void handleSymbolsLoaded( ICDISharedLibrary library ) {
-		getModuleManager().symbolsLoaded( library );
-	}
-
 	public ICGlobalVariable createGlobalVariable( IGlobalVariableDescriptor info ) throws DebugException {
 		ICDIVariableDescriptor vo = null;
 		try {
@@ -1501,30 +1462,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			throw new DebugException( new Status( IStatus.ERROR, PCDIDebugModel.getPluginIdentifier(), DebugException.TARGET_REQUEST_FAILED, (vo != null) ? vo.getName() + ": " + e.getMessage() : e.getMessage(), null ) ); //$NON-NLS-1$
 		}
 		return CVariableFactory.createGlobalVariable( this, info, vo );
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.ICDebugTarget#hasModules()
-	 */
-	public boolean hasModules() throws DebugException {
-		CModuleManager mm = getModuleManager();
-		return ( mm != null ) ? mm.hasModules() : false;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.ICDebugTarget#getModules()
-	 */
-	public ICModule[] getModules() throws DebugException {
-		CModuleManager mm = getModuleManager();
-		return ( mm != null ) ? mm.getModules() : new ICModule[0];
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.ICDebugTarget#loadSymbolsForAllModules()
-	 */
-	public void loadSymbolsForAllModules() throws DebugException {
-		CModuleManager mm = getModuleManager();
-		mm.loadSymbolsForAll();
 	}
 
 	protected void skipBreakpoints( boolean enabled ) {
@@ -1583,5 +1520,23 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		// Auto-generated method stub
 		System.out.println("PDebugTarget.getDisassembly");
 		return null;
+	}
+
+	public boolean hasModules() throws DebugException {
+		// Auto-generated method stub
+		System.out.println("PDebugTarget.hasModules");
+		return false;
+	}
+
+	public ICModule[] getModules() throws DebugException {
+		// Auto-generated method stub
+		System.out.println("PDebugTarget.getModules");
+		return null;
+	}
+
+	public void loadSymbolsForAllModules() throws DebugException {
+		// Auto-generated method stub
+		System.out.println("PDebugTarget.loadSymbolsForAllModules");
+		
 	}
 }
