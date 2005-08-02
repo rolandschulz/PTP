@@ -19,7 +19,7 @@ OMPI_LIB=lib$(PREFIX)-$(ARCH_PREFIX)-$(VERSION).jnilib
 
 #DEBUG = -g
 CFLAGS = -c $(DEBUG) -I/System/Library/Frameworks/JavaVM.framework/Headers
-LFLAGS = -dynamiclib -single_module -framework JavaVM
+LFLAGS = -dynamiclib -single_module -framework JavaVM -flat_namespace -undefined suppress
 OBJECTS = ptp_ompi_jni.o
 
 all: $(OMPI_LIB)
