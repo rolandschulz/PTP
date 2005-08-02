@@ -11,6 +11,7 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.external.actionpoint.DebugActionpoint;
 import org.eclipse.ptp.debug.external.event.DebugEvent;
 import org.eclipse.ptp.debug.external.model.MProcess;
+import org.eclipse.ptp.debug.external.model.MProcessSet;
 import org.eclipse.ptp.debug.external.utils.Queue;
 import org.eclipse.ptp.debug.external.variable.DebugVariable;
 
@@ -32,7 +33,7 @@ public interface IDebugger {
 
 	/* Process/Thread Sets */
 	public void focus(String name);
-	public void defSet(String name, int[] procs);
+	public MProcessSet defSet(String name, int[] procs);
 	public void undefSet(String name);
 	public void undefSetAll();
 	public MProcess[] viewSet(String name);

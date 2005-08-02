@@ -24,7 +24,7 @@ public class Session implements ICDISession, ICDISessionObject {
 	Properties props;
 	SessionConfiguration configuration;
 	
-	public Session(DebugSession dSession, IPJob job) {
+	public Session(DebugSession dSession) {
 		props = new Properties();
 		configuration = new SessionConfiguration(this);
 		
@@ -34,7 +34,7 @@ public class Session implements ICDISession, ICDISessionObject {
 		variableManager = new VariableManager(this);
 		registerManager = new RegisterManager(this);
 		
-		Target target = new Target(this, dSession, job);
+		Target target = new Target(this, dSession);
 		addTargets(new Target[] { target });
 	}
 

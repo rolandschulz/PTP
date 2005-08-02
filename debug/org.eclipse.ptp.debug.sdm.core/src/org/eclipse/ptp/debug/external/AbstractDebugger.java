@@ -254,14 +254,17 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 		currentFocus = savedFocus;
 	}
 	
-	public final void defSet(String name, int[] procs) {
+	public final MProcessSet defSet(String name, int[] procs) {
 		int size = userDefinedProcessSetList.size();
+		
+		if (name.equals("all"))
+			return allSet;
 		
 		/* to avoid duplicates */
 		for (int i = 0; i < size; i++) {
 			MProcessSet set = (MProcessSet) userDefinedProcessSetList.get(i);
 			if (set.getName().equals(name)) {
-				return;
+				return set;
 			}
 		}
 		
@@ -274,6 +277,7 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 			procSet.addProcess(allSet.getProcess(procs[i]));
 		}
 		userDefinedProcessSetList.add(procSet);
+		return procSet;
 	}
 	
 	public final void undefSet(String name) {
