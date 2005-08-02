@@ -33,7 +33,7 @@ import org.eclipse.ptp.debug.ui.actions.StepReturnAction;
 import org.eclipse.ptp.debug.ui.actions.SuspendAction;
 import org.eclipse.ptp.debug.ui.actions.TerminateAction;
 import org.eclipse.ptp.debug.ui.actions.UnregisterAction;
-import org.eclipse.ptp.ui.actions.ParallelAction;
+import org.eclipse.ptp.ui.actions.old.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.views.AbstractParallelSetView;
@@ -62,19 +62,19 @@ public class DebugParallelView extends AbstractParallelSetView implements IDebug
 	private Image[][] statusImages = {
 		{
 			ImageUtil.getImage(ImageUtil.IMG_PRO_ERROR),
-			ImageUtil.getImage(ImageUtil.IMG_PRO_ERROR_SEL), },
+			ImageUtil.getImage(ImageUtil.IMG_PRO_ERROR_SEL) },
 		{
 			ImageUtil.getImage(ImageUtil.IMG_PRO_RUNNING),
-			ImageUtil.getImage(ImageUtil.IMG_PRO_RUNNING_SEL), },
+			ImageUtil.getImage(ImageUtil.IMG_PRO_RUNNING_SEL) },
 		{
 			ImageUtil.getImage(ImageUtil.IMG_PRO_STARTED),
-			ImageUtil.getImage(ImageUtil.IMG_PRO_STARTED_SEL), },
+			ImageUtil.getImage(ImageUtil.IMG_PRO_STARTED_SEL) },
 		{
 			ImageUtil.getImage(ImageUtil.IMG_PRO_SUSPENDED),
-			ImageUtil.getImage(ImageUtil.IMG_PRO_SUSPENDED_SEL), },
+			ImageUtil.getImage(ImageUtil.IMG_PRO_SUSPENDED_SEL) },
 		{
 			ImageUtil.getImage(ImageUtil.IMG_PRO_STOPPED),
-			ImageUtil.getImage(ImageUtil.IMG_PRO_STOPPED_SEL), }
+			ImageUtil.getImage(ImageUtil.IMG_PRO_STOPPED_SEL) }
 	};
 
 
