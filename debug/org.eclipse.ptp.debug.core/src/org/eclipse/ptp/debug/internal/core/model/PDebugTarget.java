@@ -154,11 +154,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	private ICDITargetConfiguration fConfig;
 
 	/**
-	 * The disassembly manager for this target.
-	 */
-	private Disassembly fDisassembly;
-
-	/**
 	 * The module manager for this target.
 	 */
 	private CModuleManager fModuleManager;
@@ -216,7 +211,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		initializePreferences();
 		setConfiguration( cdiTarget.getConfiguration() );
 		setThreadList( new ArrayList( 5 ) );
-		createDisassembly();
 		setModuleManager( new CModuleManager( this ) );
 		setGroupManager( new PSetManager( this ) );
 		setBreakpointManager( new PBreakpointManager( this ) );
@@ -974,7 +968,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		DebugPlugin.getDefault().getLaunchManager().removeLaunchListener( this );
 		disposeModuleManager();
 		disposeGroupManager();
-		disposeDisassembly();
 		disposeSourceManager();
 		disposeSourceLookupPath();
 		disposeBreakpointManager();
@@ -1457,13 +1450,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.ICDebugTarget#getDisassembly()
-	 */
-	public IDisassembly getDisassembly() throws DebugException {
-		return fDisassembly;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.core.model.ICDebugTarget#getSignals()
 	 */
 	public ICSignal[] getSignals() throws DebugException {
@@ -1476,16 +1462,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	public boolean hasSignals() throws DebugException {
 		System.out.println("PDebugTarget.hasSignals()");
 		return false;
-	}
-
-	private void createDisassembly() {
-		this.fDisassembly = new Disassembly( this );
-	}
-
-	private void disposeDisassembly() {
-		if ( fDisassembly != null )
-			fDisassembly.dispose();
-		fDisassembly = null;
 	}
 
 	/* (non-Javadoc)
@@ -1717,5 +1693,11 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		// Auto-generated method stub
 		System.out.println("PDebugTarget.restoreDefaultRegisterGroups");
 		
+	}
+
+	public IDisassembly getDisassembly() throws DebugException {
+		// Auto-generated method stub
+		System.out.println("PDebugTarget.getDisassembly");
+		return null;
 	}
 }

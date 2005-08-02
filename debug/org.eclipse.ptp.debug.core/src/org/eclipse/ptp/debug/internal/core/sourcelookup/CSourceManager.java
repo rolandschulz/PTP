@@ -18,13 +18,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.debug.core.model.IStackFrame;
-import org.eclipse.ptp.debug.internal.core.model.Disassembly;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
 
 /**
@@ -75,21 +73,21 @@ public class CSourceManager implements ICSourceLocator, IPersistableSourceLocato
 	 * @see org.eclipse.cdt.debug.core.sourcelookup.ICSourceLocator#setSourceLocations(ICSourceLocation[])
 	 */
 	public void setSourceLocations( ICSourceLocation[] locations ) {
-		if ( getCSourceLocator() != null ) {
-			getCSourceLocator().setSourceLocations( locations );
-			PDebugTarget target = getDebugTarget();
-			if ( target != null ) {
-				Disassembly d = null;
-				try {
-					d = (Disassembly)target.getDisassembly();
-				}
-				catch( DebugException e ) {
-				}
-				if ( d != null ) {
-					d.reset();
-				}
-			}
-		}
+		//if ( getCSourceLocator() != null ) {
+		//	getCSourceLocator().setSourceLocations( locations );
+		//	PDebugTarget target = getDebugTarget();
+		//	if ( target != null ) {
+		//		Disassembly d = null;
+		//		try {
+		//			d = (Disassembly)target.getDisassembly();
+		//		}
+		//		catch( DebugException e ) {
+		//		}
+		//		if ( d != null ) {
+		//			d.reset();
+		//		}
+		//	}
+		//}
 	}
 
 	/*
