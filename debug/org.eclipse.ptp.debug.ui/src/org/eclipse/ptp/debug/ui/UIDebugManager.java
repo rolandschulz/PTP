@@ -81,7 +81,7 @@ public class UIDebugManager {
 		for (int i=0; i<elements.length; i++) {
 			//only register some unregistered elements
 			if (!elements[i].isRegistered()) {
-				//target.register(elements[i].getIDNum());
+				target.register(elements[i].getIDNum());
 			}
 		}
 	}
