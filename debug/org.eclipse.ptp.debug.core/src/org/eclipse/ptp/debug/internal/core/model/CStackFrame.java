@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.core.IAddressFactory;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
@@ -38,7 +39,6 @@ import org.eclipse.cdt.debug.core.model.IResumeWithoutSignal;
 import org.eclipse.cdt.debug.core.model.IRunToAddress;
 import org.eclipse.cdt.debug.core.model.IRunToLine;
 import org.eclipse.cdt.debug.core.sourcelookup.ICSourceLocator;
-import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.debug.core.DebugException;
@@ -675,10 +675,6 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 	}
 
 	private ICGlobalVariable[] getGlobals() {
-		PGlobalVariableManager gvm = ((PDebugTarget)getDebugTarget()).getGlobalVariableManager();
-		if ( gvm != null ) {
-			return gvm.getGlobals();
-		}
 		return new ICGlobalVariable[0];
 	}
 

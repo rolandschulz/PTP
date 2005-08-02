@@ -23,7 +23,6 @@ import org.eclipse.cdt.core.IAddressFactory;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.core.IBinaryParser.ISymbol;
 import org.eclipse.cdt.debug.core.CDebugUtils;
-import org.eclipse.cdt.debug.core.ICGlobalVariableManager;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDIBreakpointHit;
@@ -113,7 +112,6 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
-import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
 import org.eclipse.ptp.debug.internal.core.PSetManager;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupParticipant;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceManager;
@@ -176,11 +174,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	private PBreakpointManager fBreakpointManager;
 
 	/**
-	 * The global variable manager for this target.
-	 */
-	private PGlobalVariableManager fGlobalVariableManager;
-	
-	/**
 	 * The executable binary file associated with this target.
 	 */
 	private IBinaryObject fBinaryFile;
@@ -227,7 +220,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		setModuleManager( new CModuleManager( this ) );
 		setGroupManager( new PSetManager( this ) );
 		setBreakpointManager( new PBreakpointManager( this ) );
-		setGlobalVariableManager( new PGlobalVariableManager( this ) );
 		initialize();
 		DebugPlugin.getDefault().getLaunchManager().addLaunchListener( this );
 		DebugPlugin.getDefault().getExpressionManager().addExpressionListener( this );
@@ -824,8 +816,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			return getBreakpointManager();
 		if ( adapter.equals( PSetManager.class ) )
 			return getGroupManager();
-		if ( adapter.equals( ICGlobalVariableManager.class ) )
-			return getGlobalVariableManager();
 		if ( adapter.equals( ICDISession.class ) )
 			return getCDISession();
 		return super.getAdapter( adapter );
@@ -982,8 +972,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener( this );
 		DebugPlugin.getDefault().getExpressionManager().removeExpressionListener( this );
 		DebugPlugin.getDefault().getLaunchManager().removeLaunchListener( this );
-		saveGlobalVariables();
-		disposeGlobalVariableManager();
 		disposeModuleManager();
 		disposeGroupManager();
 		disposeDisassembly();
@@ -1387,14 +1375,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		fGroupManager.dispose();
 	}
 
-	protected void saveGlobalVariables() {
-		fGlobalVariableManager.save();
-	}
-
-	protected void disposeGlobalVariableManager() {
-		fGlobalVariableManager.dispose();
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.core.model.IResumeWithoutSignal#canResumeWithoutSignal()
 	 */
@@ -1567,14 +1547,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	public void removePropertyChangeListener( IPropertyChangeListener listener ) {
 		if ( fPreferences != null )
 			fPreferences.removePropertyChangeListener( listener );
-	}
-
-	protected PGlobalVariableManager getGlobalVariableManager() {
-		return fGlobalVariableManager;
-	}
-
-	private void setGlobalVariableManager( PGlobalVariableManager globalVariableManager ) {
-		fGlobalVariableManager = globalVariableManager;
 	}
 
 	/* (non-Javadoc)
