@@ -2,10 +2,14 @@ package org.eclipse.ptp.debug.external.simulator;
 
 public class SimThread {
 
+	int curLine;
+	int breakLine;
 	SimStackFrame[] stackFrames;
 	int threadId;
 	
 	public SimThread(int id) {
+		curLine = 1;
+		breakLine = 0;
 		threadId = id;
 		int numStackFrames = 1;
 		
@@ -25,5 +29,20 @@ public class SimThread {
 	
 	public SimStackFrame[] getStackFrames() {
 		return stackFrames;
+	}
+	
+	public void incrementCurrentLine() {
+		curLine++;
+		if (curLine == breakLine) {
+			// Do Something
+		}
+	}
+	
+	public int getCurrentLine() {
+		return curLine;
+	}
+	
+	public void setBreakLine(int l) {
+		breakLine = l;
 	}
 }
