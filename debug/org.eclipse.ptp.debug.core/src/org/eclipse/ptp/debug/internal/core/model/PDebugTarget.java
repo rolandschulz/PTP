@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
+
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.core.IAddressFactory;
@@ -51,7 +52,6 @@ import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISharedLibrary;
-import org.eclipse.cdt.debug.core.cdi.model.ICDISignal;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
@@ -111,13 +111,11 @@ import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
-import org.eclipse.ptp.debug.core.model.IPFocus;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
 import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
 import org.eclipse.ptp.debug.internal.core.PRegisterManager;
 import org.eclipse.ptp.debug.internal.core.PSetManager;
-import org.eclipse.ptp.debug.internal.core.PSignalManager;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupParticipant;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceManager;
 
@@ -167,11 +165,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	 * The module manager for this target.
 	 */
 	private CModuleManager fModuleManager;
-
-	/**
-	 * The signal manager for this target.
-	 */
-	private PSignalManager fSignalManager;
 
 	/**
 	 * The set manager for this target.
@@ -238,7 +231,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		setThreadList( new ArrayList( 5 ) );
 		createDisassembly();
 		setModuleManager( new CModuleManager( this ) );
-		setSignalManager( new PSignalManager( this ) );
 		setGroupManager( new PSetManager( this ) );
 		setRegisterManager( new PRegisterManager( this ) );
 		setBreakpointManager( new PBreakpointManager( this ) );
@@ -842,8 +834,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			return this;
 		if ( adapter.equals( PBreakpointManager.class ) )
 			return getBreakpointManager();
-		if ( adapter.equals( PSignalManager.class ) )
-			return getSignalManager();
 		if ( adapter.equals( PSetManager.class ) )
 			return getGroupManager();
 		if ( adapter.equals( PRegisterManager.class ) )
@@ -908,9 +898,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 					}
 					if ( source instanceof ICDISharedLibrary ) {
 						handleSymbolsLoaded( (ICDISharedLibrary)source );
-					}
-					if ( source instanceof ICDISignal ) {
-						getSignalManager().signalChanged( (ICDISignal)source );
 					}
 				}
 				else if ( event instanceof ICDIRestartedEvent ) {
@@ -1012,7 +999,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		saveGlobalVariables();
 		disposeGlobalVariableManager();
 		disposeModuleManager();
-		disposeSignalManager();
 		disposeGroupManager();
 		saveRegisterGroups();
 		disposeRegisterManager();
@@ -1407,18 +1393,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		fModuleManager = null;
 	}
 
-	protected void setSignalManager( PSignalManager sm ) {
-		fSignalManager = sm;
-	}
-
-	protected PSignalManager getSignalManager() {
-		return fSignalManager;
-	}
-
-	protected void disposeSignalManager() {
-		fSignalManager.dispose();
-	}
-
 	protected void setGroupManager( PSetManager gm ) {
 		fGroupManager = gm;
 	}
@@ -1551,10 +1525,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	 * @see org.eclipse.cdt.debug.core.model.ICDebugTarget#getSignals()
 	 */
 	public ICSignal[] getSignals() throws DebugException {
-		PSignalManager sm = getSignalManager();
-		if ( sm != null ) {
-			return sm.getSignals();
-		}
 		return new ICSignal[0];
 	}
 
@@ -1562,10 +1532,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	 * @see org.eclipse.cdt.debug.core.model.ICDebugTarget#hasSignals()
 	 */
 	public boolean hasSignals() throws DebugException {
-		PSignalManager sm = getSignalManager();
-		if ( sm != null ) {
-			return (sm.getSignals().length > 0);
-		}
+		System.out.println("PDebugTarget.hasSignals()");
 		return false;
 	}
 
