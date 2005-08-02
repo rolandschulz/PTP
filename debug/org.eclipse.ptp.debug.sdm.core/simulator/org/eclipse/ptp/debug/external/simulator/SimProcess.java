@@ -6,20 +6,26 @@ import java.util.ArrayList;
 
 public class SimProcess extends Process {
 
+	final int RUNNING = 10;
+	final int SUSPENDED = 11;
+	final int TERMINATED = 12;
+	
+	int state;
+	
 	SimThread[] threads;
 	
-	boolean finished;
 	InputStream err;
 	InputStream in;
 	OutputStream out;
+	
 	String name;
-	Queue commands;
+	SimQueue commands;
 	
 	Thread procThread;
 	
-	public SimProcess(String nm, int numThreads, Queue cmds) {
+	public SimProcess(String nm, int numThreads, SimQueue cmds) {
 		super();
-		finished = false;
+		state = RUNNING;
 		name = nm;
 		commands = cmds;
 		
@@ -42,6 +48,12 @@ public class SimProcess extends Process {
 							String thread = (String) command.get(1);
 							String str = (String) command.get(2);
 							((SimInputStream) in).printString(str + " from process " + name + " & thread " + thread);
+							
+							threads[Integer.parseInt(thread) - 1].incrementCurrentLine();
+						} else	if (cmd.equals("break")) {
+							String thread = (String) command.get(1);
+							String str = (String) command.get(2);
+							((SimInputStream) in).printString(str + " from process " + name + " & thread " + thread);
 						} else if (cmd.equals("sleep")) {
 							String second = (String) command.get(1);
 							Thread.sleep(Integer.parseInt(second));
@@ -51,7 +63,7 @@ public class SimProcess extends Process {
 					} catch (InterruptedException e) {
 					}
 				}
-				finished = true;
+				state = TERMINATED;
 				((SimInputStream) in).destroy();
 			}
 		};
@@ -59,33 +71,22 @@ public class SimProcess extends Process {
 	}
 	
 	public int exitValue() {
-		// Auto-generated method stub
-		System.out.println("SimProcess.exitValue()");
-		if (!finished)
-			throw new IllegalThreadStateException();
-		else
+		if (state == TERMINATED)
 			return 0;
+		else
+			throw new IllegalThreadStateException();
 	}
 	
 	public int waitFor() throws InterruptedException {
-		// Auto-generated method stub
-		System.out.println("SimProcess.waitFor()");
-		
 		try {
-			//Thread.sleep(10000);
 			procThread.join();
-			//finished = true;
-			//((SimInputStream) in).destroy();
 		} catch (InterruptedException e) {
 		}
-		
 		return 0;
 	}
 
 	public void destroy() {
-		// Auto-generated method stub
-		System.out.println("SimProcess.destroy()");
-		finished = true;
+		state = TERMINATED;
 		((SimInputStream) in).destroy();
 	}
 

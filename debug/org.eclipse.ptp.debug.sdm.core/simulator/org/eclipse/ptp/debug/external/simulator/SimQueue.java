@@ -17,11 +17,11 @@ import java.util.List;
 /**
  * Simple thread-safe Queue implemetation.
  */
-public class Queue {
+public class SimQueue {
 
 	protected List list;
 
-	public Queue() {
+	public SimQueue() {
 		list = Collections.synchronizedList(new LinkedList());
 	}
 

@@ -22,12 +22,12 @@ public class DebugSimulator extends AbstractDebugger {
 	
 	private Process debuggerProcess = null;
 	Thread debuggerThread = null;
-	Queue debuggerCommands = null;
+	SimQueue debuggerCommands = null;
 	
 	protected void startDebugger(IPJob job) {
 		state = SUSPENDED;
 		
-		debuggerCommands = new Queue();
+		debuggerCommands = new SimQueue();
 		debuggerProcess = new SimProcess("Debugger", 1, debuggerCommands);
 		debuggerThread = new Thread() {
 			public void run() {
@@ -54,7 +54,7 @@ public class DebugSimulator extends AbstractDebugger {
 						command.add(1, "1");
 						command.add(2, "ProcessOutput");
 						for (int i = 0; i < pCommands.size(); i++) {
-							((Queue) pCommands.get(i)).addItem(command);
+							((SimQueue) pCommands.get(i)).addItem(command);
 						}
 						Thread.sleep(3000);
 					} catch (InterruptedException e) {
@@ -77,7 +77,7 @@ public class DebugSimulator extends AbstractDebugger {
 				}
 			}
 		};
-		dThread.start();
+		//dThread.start();
 		
 		
 		MProcess.resetGlobalCounter();
@@ -85,7 +85,7 @@ public class DebugSimulator extends AbstractDebugger {
 		pCommands = new ArrayList();
 		for (int i = 0; i < procs.length; i++) {
 			MProcess proc = new MProcess();
-			Queue q = new Queue();
+			SimQueue q = new SimQueue();
 			Process p = new SimProcess("proc" + i, 1, q);
 			proc.setDebugInfo(p); /* We store the process in the "debug info" */
 			proc.setPProcess(procs[i]);

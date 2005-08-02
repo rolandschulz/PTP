@@ -6,14 +6,14 @@ import java.io.InputStream;
 public class SimInputStream extends InputStream {
 
 	boolean finished;
-	Queue queue;
+	SimQueue queue;
 	
 	String str;
 	int strLen;
 	
 	public SimInputStream() {
 		super();
-		queue = new Queue();
+		queue = new SimQueue();
 		finished = false;
 		str = null;
 		strLen = -2;
@@ -44,14 +44,12 @@ public class SimInputStream extends InputStream {
 				if (finished) {
 					return -1;
 				}
-				Thread.sleep(1000);
 				str = (String) queue.removeItem();
 				if (str.equals("destroy")) {
 					return -1;
 				}
 				strLen = str.length();
 			} catch (InterruptedException e) {
-				//e.printStackTrace();
 			}
 		}
 			
