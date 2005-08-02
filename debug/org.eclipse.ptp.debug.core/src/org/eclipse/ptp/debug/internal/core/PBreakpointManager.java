@@ -49,8 +49,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IStorage;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
@@ -66,7 +64,6 @@ import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.internal.core.breakpoints.CBreakpoint;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupDirector;
 
 /**
  * The breakpoint manager manages all breakpoints set to the associated 
@@ -225,9 +222,6 @@ public class PBreakpointManager implements IBreakpointManagerListener, ICDIEvent
 				ISourceLocator sl = getSourceLocator();
 				if ( sl instanceof ICSourceLocator )
 					return ( ((ICSourceLocator)sl).findSourceElement( handle ) != null );
-				else if ( sl instanceof CSourceLookupDirector ) {
-					return true;//( ((CSourceLookupDirector)sl).getCompilationPath( handle ) != null || ((CSourceLookupDirector)sl).findSourceElements( handle ).length > 0 );
-				}
 			}
 			catch( CoreException e ) {
 				return false;
@@ -239,8 +233,6 @@ public class PBreakpointManager implements IBreakpointManagerListener, ICDIEvent
 				ISourceLocator sl = getSourceLocator();
 				if ( sl instanceof ICSourceLocator )
 					return ((ICSourceLocator)sl).contains( project );
-				else if ( sl instanceof CSourceLookupDirector )
-					return ((CSourceLookupDirector)sl).contains( project );
 				if ( project.equals( getProject() ) )
 					return true;
 				return CDebugUtils.isReferencedProject( getProject(), project );
@@ -651,26 +643,6 @@ public class PBreakpointManager implements IBreakpointManagerListener, ICDIEvent
 			ICDILocator location = cdiBreakpoint.getLocator();
 			if ( !isEmpty( location.getFile() ) ) {
 				ISourceLocator locator = getSourceLocator();
-				if ( locator instanceof ICSourceLocator || locator instanceof CSourceLookupDirector ) {
-					String sourceHandle = location.getFile();
-					IResource resource = getProject();
-					Object sourceElement = null;
-					if ( locator instanceof ICSourceLocator )
-						sourceElement = ((ICSourceLocator)locator).findSourceElement( location.getFile() );
-					else
-						sourceElement = ((CSourceLookupDirector)locator).getSourceElement( location.getFile() );
-					if ( sourceElement instanceof IFile || sourceElement instanceof IStorage ) {
-						sourceHandle = ( sourceElement instanceof IFile ) ? ((IFile)sourceElement).getLocation().toOSString() : ((IStorage)sourceElement).getFullPath().toOSString();
-						resource = ( sourceElement instanceof IFile ) ? (IResource)sourceElement : ResourcesPlugin.getWorkspace().getRoot();
-					}
-					breakpoint = createLineBreakpoint( sourceHandle, resource, cdiBreakpoint );
-//					else if ( !isEmpty( cdiBreakpoint.getLocation().getFunction() ) ) {
-//						breakpoint = createFunctionBreakpoint( cdiBreakpoint );
-//					}
-//					else if ( ! cdiBreakpoint.getLocation().getAddress().equals( BigInteger.ZERO ) ) {
-//						breakpoint = createAddressBreakpoint( cdiBreakpoint );
-//					}
-				}
 			}
 			else if ( !isEmpty( location.getFunction() ) ) {
 				breakpoint = createFunctionBreakpoint( cdiBreakpoint );
@@ -866,9 +838,6 @@ public class PBreakpointManager implements IBreakpointManagerListener, ICDIEvent
 		IPath path = null;
 		if ( Path.EMPTY.isValidPath( sourceHandle ) ) {
 			ISourceLocator sl = getSourceLocator();
-			if ( sl instanceof CSourceLookupDirector ) {
-				path = ((CSourceLookupDirector)sl).getCompilationPath( sourceHandle );
-			}
 			if ( path == null ) {
 				path = new Path( sourceHandle );
 			}
