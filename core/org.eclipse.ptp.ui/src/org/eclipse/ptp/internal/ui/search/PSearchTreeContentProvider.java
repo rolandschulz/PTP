@@ -27,7 +27,7 @@ import java.util.Set;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.ui.ParallelElementContentProvider;
+import org.eclipse.ptp.ui.old.ParallelElementContentProvider;
 import org.eclipse.swt.widgets.Display;
 
 /**

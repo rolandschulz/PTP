@@ -19,44 +19,60 @@
 package org.eclipse.ptp.ui.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.old.UIUtils;
+import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.part.ViewPart;
 
 /**
+ * @author clement chu
  *
  */
 public abstract class ParallelAction extends Action {
-    protected /*static*/ ViewPart viewPart = null;
-        
-    public ParallelAction(ViewPart view) {
-        this(view, false);
-    }
-    
-    public ParallelAction(ViewPart view, boolean isEnable) {
-        viewPart = view;
-        init(isEnable);
-    }
-    
-	public ParallelAction(ViewPart view, int style) {
-		super(null, style);
-		viewPart = view;
-		init(false);
+	protected AbstractParallelElementView view = null;
+	
+	public ParallelAction(String text, AbstractParallelElementView view) {
+		this(text, IAction.AS_PUSH_BUTTON, view);
 	}
-
-	public /*static*/ ViewPart getViewPart() {
-        return viewPart;
+	
+	public ParallelAction(String text, int style, AbstractParallelElementView view) {
+		super(text, style);
+		this.view = view;
+	    setToolTipText(text);
+	    setEnabled(false);
+	    setId(text);
+	}
+	
+	public AbstractParallelElementView getViewPart() {
+        return view;
     }
     
     public Shell getShell() {
-        return viewPart.getViewSite().getShell();
+        return view.getViewSite().getShell();
     }
     
-    protected IModelManager getLaunchManager() {
-        return PTPCorePlugin.getDefault().getModelManager();
+    public abstract void run(IElement[] elements);
+    
+    public void run() {
+    	ISelection selection = view.getSelection();
+    	if (selection != null && !selection.isEmpty() && selection instanceof IStructuredSelection) {
+        	Object[] objs = ((IStructuredSelection)selection).toArray();
+        	IElement[] elements = new IElement[objs.length];
+        	System.arraycopy(objs, 0, elements, 0, objs.length);
+        	run(elements);
+    	}
+    	else
+    		run(new IElement[0]);
     }
     
-    protected abstract void init(boolean isEnable);    
-    public abstract void run();    
+	protected boolean validation(IElement[] elements) {
+		if (elements == null || elements.length == 0) {
+			UIUtils.showErrorDialog("No selected elements", "Please select some elements first", null);
+			return false;
+		}
+		return true;
+	}
 }

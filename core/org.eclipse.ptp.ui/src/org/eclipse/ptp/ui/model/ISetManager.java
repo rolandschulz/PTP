@@ -16,34 +16,19 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.actions;
-
-import org.eclipse.jface.action.Action;
-import org.eclipse.ptp.ui.ParallelImages;
-import org.eclipse.ptp.ui.UIMessage;
-import org.eclipse.ptp.ui.views.AbstractParallelView;
-import org.eclipse.ui.part.ViewPart;
+package org.eclipse.ptp.ui.model;
 
 /**
+ * @author clement chu
+ *
  */
-public class ShowAllNodesAction extends ParallelAction {
-
-	public ShowAllNodesAction(ViewPart view) {
-		super(view, Action.AS_RADIO_BUTTON);
-	}
-
-	protected void init(boolean isEnable) {
-	    this.setText(UIMessage.getResourceString("ShowAllNodesAction.text"));
-	    this.setToolTipText(UIMessage.getResourceString("ShowAllNodesAction.tooltip"));
-	    this.setImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWALLNODES_ACTION_NORMAL));
-	    this.setDisabledImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWALLNODES_ACTION_DISABLE));
-	    this.setHoverImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWALLNODES_ACTION_HOVER));
-	    /*this.setEnabled(getLaunchManager().isMPIRuning());*/
-	    this.setEnabled(true);
-	}
-
-	public void run() {
-		((AbstractParallelView)getViewPart()).showAllNodes();
-	}
-
+public interface ISetManager extends IContainer {
+	public static final String SET_ROOT_ID = "Root";	
+	public IElementSet getSetRoot();
+	
+	public IElementSet[] getSetsWithElement(String id);
+	public IElementSet[] getSortedSets();
+	public IElementSet[] getSets();
+	public IElementSet getSet(String id);
+	public IElementSet getSet(int index);
 }

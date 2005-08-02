@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.ui.ParallelImages;
+import org.eclipse.ptp.ui.old.ParallelImages;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;

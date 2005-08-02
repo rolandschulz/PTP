@@ -7,6 +7,7 @@
 			name="%ParallelViewCategory.name"
 			id="org.parallel.ptp.ui.views">
 		</category>
+		<!--
 		<view
 			name="%ParallelControlView.name"
 			icon="icons/parallel_perspective.gif"
@@ -27,6 +28,14 @@
 			category="org.parallel.ptp.ui.views"
 			class="org.eclipse.ptp.ui.views.ParallelNodeStatusView"
 			id="org.eclipse.ptp.ui.views.parallelNodeStatusView">
+		</view>
+		//-->
+		<view
+			name="Machine"
+			icon="icons/parallel_perspective.gif"
+			category="org.parallel.ptp.ui.views"
+			class="org.eclipse.ptp.ui.views.ParallelMachineView"
+			id="org.eclipse.ptp.ui.views.parallelMachineView">
 		</view>
 	</extension>
 

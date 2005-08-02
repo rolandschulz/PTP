@@ -18,32 +18,32 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.actions;
 
-import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.ptp.ui.ParallelImages;
-import org.eclipse.ptp.ui.UIMessage;
-import org.eclipse.ptp.ui.views.AbstractParallelView;
-import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
 /**
+ * @author Clement chu
+ *
  */
-public class ShowMyAllocatedNodesAction extends ParallelAction {
-
-	public ShowMyAllocatedNodesAction(ViewPart view) {
-		super(view, Action.AS_RADIO_BUTTON);
+public class InternalSetAction extends ParallelAction {
+	private String set_id = "";
+	private SetAction action = null;
+	
+	public InternalSetAction(String set_id, AbstractParallelElementView view, SetAction action) {
+		this(set_id, view, IAction.AS_PUSH_BUTTON, action);
 	}
-
-	protected void init(boolean isEnable) {
-	    this.setText(UIMessage.getResourceString("ShowMyAllocatedNodesAction.text"));
-	    this.setToolTipText(UIMessage.getResourceString("ShowMyAllocatedNodesAction.tooltip"));
-	    this.setImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWMYALLOCNODES_ACTION_NORMAL));
-	    this.setDisabledImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWMYALLOCNODES_ACTION_DISABLE));
-	    this.setHoverImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWMYALLOCNODES_ACTION_HOVER));
-	    /*this.setEnabled(getLaunchManager().isMPIRuning());*/
-	    this.setEnabled(true);
+	
+	public InternalSetAction(String set_id, AbstractParallelElementView view, int style, SetAction action) {
+		super("To Set: " + set_id, style, view);
+		this.set_id = set_id;
+		this.action = action;
+	    setImageDescriptor(ParallelImages.ID_ICON_CREATESET_NORMAL);
+	    setDisabledImageDescriptor(ParallelImages.ID_ICON_CREATESET_DISABLE);
 	}
-
-	public void run() {
-		((AbstractParallelView)getViewPart()).showMyAllocatedNodes();
+	
+	public void run(IElement[] elements) {
+		action.run(elements, set_id);
 	}
-
 }

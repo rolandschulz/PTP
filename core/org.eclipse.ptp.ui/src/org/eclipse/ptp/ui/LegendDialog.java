@@ -19,7 +19,7 @@
 
 package org.eclipse.ptp.ui;
 
-import org.eclipse.ptp.ui.views.ParallelNodeStatusView;
+import org.eclipse.ptp.ui.views.old.ParallelNodeStatusView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.SelectionAdapter;
