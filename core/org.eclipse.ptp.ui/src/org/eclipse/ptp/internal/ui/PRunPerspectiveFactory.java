@@ -19,7 +19,8 @@
 package org.eclipse.ptp.internal.ui;
 
 import org.eclipse.debug.ui.IDebugUIConstants;
-import org.eclipse.ptp.ui.UIUtils;
+import org.eclipse.ptp.ui.old.UIUtils;
+import org.eclipse.ptp.ui.views.ParallelMachineView;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -35,9 +36,11 @@ public class PRunPerspectiveFactory implements IPerspectiveFactory {
  		String editorArea = layout.getEditorArea();
 		
 		IFolderLayout folder1= layout.createFolder("topLeft", IPageLayout.LEFT, (float)0.25, editorArea);
+		folder1.addView(ParallelMachineView.VIEW_ID);
+
 		//folder1.addView(UIUtils.ParallelProcessesView_ID);
-		folder1.addView(UIUtils.ParallelNodeStatusView_ID);
-		folder1.addView(UIUtils.ParallelJobsView_ID);
+		//folder1.addView(UIUtils.ParallelNodeStatusView_ID);
+		//folder1.addView(UIUtils.ParallelJobsView_ID);
 		//folder1.addView(IPageLayout.ID_RES_NAV);
 		folder1.addPlaceholder(IPageLayout.ID_BOOKMARKS);
 		

@@ -17,7 +17,7 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.ui;
+package org.eclipse.ptp.ui.old;
 
 import org.eclipse.ptp.ui.views.old.ParallelNodeStatusView;
 import org.eclipse.swt.SWT;

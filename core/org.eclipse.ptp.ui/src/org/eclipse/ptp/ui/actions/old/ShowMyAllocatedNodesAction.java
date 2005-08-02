@@ -16,34 +16,34 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.actions;
+package org.eclipse.ptp.ui.actions.old;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.ptp.ui.ParallelImages;
-import org.eclipse.ptp.ui.UIMessage;
-import org.eclipse.ptp.ui.views.AbstractParallelView;
+import org.eclipse.ptp.ui.old.ParallelImages;
+import org.eclipse.ptp.ui.old.UIMessage;
+import org.eclipse.ptp.ui.views.old.AbstractParallelView;
 import org.eclipse.ui.part.ViewPart;
 
 /**
  */
-public class ShowAllNodesAction extends ParallelAction {
+public class ShowMyAllocatedNodesAction extends ParallelAction {
 
-	public ShowAllNodesAction(ViewPart view) {
+	public ShowMyAllocatedNodesAction(ViewPart view) {
 		super(view, Action.AS_RADIO_BUTTON);
 	}
 
 	protected void init(boolean isEnable) {
-	    this.setText(UIMessage.getResourceString("ShowAllNodesAction.text"));
-	    this.setToolTipText(UIMessage.getResourceString("ShowAllNodesAction.tooltip"));
-	    this.setImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWALLNODES_ACTION_NORMAL));
-	    this.setDisabledImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWALLNODES_ACTION_DISABLE));
-	    this.setHoverImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWALLNODES_ACTION_HOVER));
+	    this.setText(UIMessage.getResourceString("ShowMyAllocatedNodesAction.text"));
+	    this.setToolTipText(UIMessage.getResourceString("ShowMyAllocatedNodesAction.tooltip"));
+	    this.setImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWMYALLOCNODES_ACTION_NORMAL));
+	    this.setDisabledImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWMYALLOCNODES_ACTION_DISABLE));
+	    this.setHoverImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWMYALLOCNODES_ACTION_HOVER));
 	    /*this.setEnabled(getLaunchManager().isMPIRuning());*/
 	    this.setEnabled(true);
 	}
 
 	public void run() {
-		((AbstractParallelView)getViewPart()).showAllNodes();
+		((AbstractParallelView)getViewPart()).showMyAllocatedNodes();
 	}
 
 }

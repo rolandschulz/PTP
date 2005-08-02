@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.views;
+package org.eclipse.ptp.ui.views.old;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.core.IPProcess;

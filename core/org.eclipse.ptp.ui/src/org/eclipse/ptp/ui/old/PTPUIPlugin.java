@@ -1,16 +1,14 @@
-package org.eclipse.ptp.ui;
+package org.eclipse.ptp.ui.old;
 
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.internal.WorkbenchWindow;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.plugin.*;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.osgi.framework.BundleContext;
+import java.util.*;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -23,9 +21,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
 	
-	private UIManager uiManager = null;
-	private MachineManager machineManager = null;
-
 	/**
 	 * The constructor.
 	 */
@@ -39,8 +34,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		uiManager = new UIManager();
-		machineManager = new MachineManager();
 	}
 
 	/**
@@ -50,13 +43,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		super.stop(context);
 		plugin = null;
 		resourceBundle = null;
-	}
-	
-	public UIManager getUIManager() {
-		return uiManager;
-	}
-	public MachineManager getMachineManager() {
-		return machineManager;
 	}
 
 	/**

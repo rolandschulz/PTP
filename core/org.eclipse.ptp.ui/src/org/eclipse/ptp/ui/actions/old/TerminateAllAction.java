@@ -16,13 +16,13 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.actions;
+package org.eclipse.ptp.ui.actions.old;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.ui.ParallelImages;
-import org.eclipse.ptp.ui.UIMessage;
-import org.eclipse.ptp.ui.views.ParallelJobsView;
+import org.eclipse.ptp.ui.old.ParallelImages;
+import org.eclipse.ptp.ui.old.UIMessage;
+import org.eclipse.ptp.ui.views.old.ParallelJobsView;
 import org.eclipse.ui.part.ViewPart;
 
 public class TerminateAllAction extends ParallelAction {

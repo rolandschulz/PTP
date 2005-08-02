@@ -16,34 +16,47 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.actions;
+package org.eclipse.ptp.ui.actions.old;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.ptp.ui.ParallelImages;
-import org.eclipse.ptp.ui.UIMessage;
-import org.eclipse.ptp.ui.views.AbstractParallelView;
+import org.eclipse.ptp.core.IModelManager;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.ViewPart;
 
 /**
-  */
-public class ShowMyUsedNodesAction extends ParallelAction {
-
-	public ShowMyUsedNodesAction(ViewPart view) {
-		super(view, Action.AS_RADIO_BUTTON);
+ *
+ */
+public abstract class ParallelAction extends Action {
+    protected /*static*/ ViewPart viewPart = null;
+        
+    public ParallelAction(ViewPart view) {
+        this(view, false);
+    }
+    
+    public ParallelAction(ViewPart view, boolean isEnable) {
+        viewPart = view;
+        init(isEnable);
+    }
+    
+	public ParallelAction(ViewPart view, int style) {
+		super(null, style);
+		viewPart = view;
+		init(false);
 	}
 
-	protected void init(boolean isEnable) {
-	    this.setText(UIMessage.getResourceString("ShowMyUsedNodesAction.text"));
-	    this.setToolTipText(UIMessage.getResourceString("ShowMyUsedNodesAction.tooltip"));
-	    this.setImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWMYUSEDNODES_ACTION_NORMAL));
-	    this.setDisabledImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWMYUSEDNODES_ACTION_DISABLE));
-	    this.setHoverImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWMYUSEDNODES_ACTION_HOVER));
-	    /*this.setEnabled(getLaunchManager().isMPIRuning());*/
-	    this.setEnabled(true);
-	}
-
-	public void run() {
-		((AbstractParallelView)getViewPart()).showMyUsedNodes();
-	}
-
+	public /*static*/ ViewPart getViewPart() {
+        return viewPart;
+    }
+    
+    public Shell getShell() {
+        return viewPart.getViewSite().getShell();
+    }
+    
+    protected IModelManager getLaunchManager() {
+        return PTPCorePlugin.getDefault().getModelManager();
+    }
+    
+    protected abstract void init(boolean isEnable);    
+    public abstract void run();    
 }

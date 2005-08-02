@@ -16,166 +16,20 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui;
+package org.eclipse.ptp.ui.old;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-
+import java.util.HashMap;
+import java.util.Iterator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 
-public class ParallelImages {	
-	public final static URL ICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/");
-	public final static URL TOOLICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/tool/");
-	public final static URL PROCESSICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/process/");
-	public final static URL NODEICONURL = PTPUIPlugin.getDefault().getBundle().getEntry("icons/node/");
-	
-    private static ImageRegistry imageRegistry = null;
-	
-	public static final String ICON_CREATEGROUP_DISABLE = "creategroup_disable.gif";
-	public static final String ICON_CREATEGROUP_NORMAL = "creategroup_normal.gif";
-	public static final String ICON_DELETEGROUP_DISABLE = "deletegroup_disable.gif";
-	public static final String ICON_DELETEGROUP_NORMAL = "deletegroup_normal.gif";
-	public static final String ICON_DELETEPROCESS_DISABLE = "deleteprocess_disable.gif";
-	public static final String ICON_DELETEPROCESS_NORMAL = "deleteprocess_normal.gif";
-	
-	public static final String ICON_MACHINE_DISABLE = "machine_disable.gif";
-	public static final String ICON_MACHINE_NORMAL = "machine_normal.gif";
-
-	//SHOW LEGEND ICON
-	public static final String ICON_SHOWLEGEND_ACTION_NORMAL =  "legend.gif";
-	public static final String ICON_SHOWLEGEND_ACTION_DISABLE = "legend.gif";
-	public static final String ICON_SHOWLEGEND_ACTION_HOVER = "legend.gif";	
-	
-	//NODE
-	public static final String IMG_NODE_USER_ALLOC_EXCL = "node_user_excl.gif";
-	public static final String IMG_NODE_USER_ALLOC_EXCL_SEL = "node_user_excl_sel.gif";
-	public static final String IMG_NODE_USER_ALLOC_SHARED = "node_user_shared.gif";
-	public static final String IMG_NODE_USER_ALLOC_SHARED_SEL = "node_user_shared_sel.gif";
-	public static final String IMG_NODE_OTHER_ALLOC_EXCL = "node_other_excl.gif";
-	public static final String IMG_NODE_OTHER_ALLOC_EXCL_SEL = "node_other_excl_sel.gif";
-	public static final String IMG_NODE_OTHER_ALLOC_SHARED = "node_other_shared.gif";
-	public static final String IMG_NODE_OTHER_ALLOC_SHARED_SEL = "node_other_shared_sel.gif";
-	public static final String IMG_NODE_DOWN = "node_down.gif";
-	public static final String IMG_NODE_DOWN_SEL = "node_down_sel.gif";
-	public static final String IMG_NODE_ERROR = "node_error.gif";
-	public static final String IMG_NODE_ERROR_SEL = "node_error_sel.gif";
-	public static final String IMG_NODE_EXITED = "node_exited.gif";
-	public static final String IMG_NODE_EXITED_SEL = "node_exited_sel.gif";
-	public static final String IMG_NODE_RUNNING = "node_running.gif";
-	public static final String IMG_NODE_RUNNING_SEL = "node_running_sel.gif";
-	public static final String IMG_NODE_UNKNOWN = "node_unknown.gif";
-	public static final String IMG_NODE_UNKNOWN_SEL = "node_unknown_sel.gif";
-	public static final String IMG_NODE_UP = "node_up.gif";
-	public static final String IMG_NODE_UP_SEL = "node_up_sel.gif";
-	
-	//PROCESS
-	public static final String IMG_PROC_ERROR = "proc_error.gif";
-	public static final String IMG_PROC_ERROR_SEL = "proc_error_sel.gif"; 
-	public static final String IMG_PROC_EXITED = "proc_exited.gif";
-	public static final String IMG_PROC_EXITED_SEL = "proc_exited_sel.gif";
-	public static final String IMG_PROC_EXITED_SIGNAL = "proc_exited_signal.gif";
-	public static final String IMG_PROC_EXITED_SIGNAL_SEL = "proc_exited_signal_sel.gif";
-	public static final String IMG_PROC_RUNNING = "proc_running.gif";
-	public static final String IMG_PROC_RUNNING_SEL = "proc_running_sel.gif";
-	public static final String IMG_PROC_STARTING = "proc_starting.gif";
-	public static final String IMG_PROC_STARTING_SEL = "proc_starting_sel.gif";
-	public static final String IMG_PROC_STOPPED = "proc_stopped.gif";
-	public static final String IMG_PROC_STOPPED_SEL = "proc_stopped_sel.gif";
-	
-	    
-	public static final ImageDescriptor ID_ICON_CREATESET_DISABLE = createImageDescriptor(TOOLICONURL, ICON_CREATEGROUP_DISABLE, ICON_CREATEGROUP_DISABLE);
-	public static final ImageDescriptor ID_ICON_CREATESET_NORMAL = createImageDescriptor(TOOLICONURL, ICON_CREATEGROUP_NORMAL, ICON_CREATEGROUP_NORMAL);
-	public static final ImageDescriptor ID_ICON_DELETESET_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DELETEGROUP_DISABLE, ICON_DELETEGROUP_DISABLE);
-	public static final ImageDescriptor ID_ICON_DELETESET_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DELETEGROUP_NORMAL, ICON_DELETEGROUP_NORMAL);
-	public static final ImageDescriptor ID_ICON_MACHINE_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DELETEPROCESS_DISABLE, ICON_DELETEPROCESS_DISABLE);
-	public static final ImageDescriptor ID_ICON_DELETEPROCESS_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DELETEPROCESS_NORMAL, ICON_DELETEPROCESS_NORMAL);
-
-	public static final ImageDescriptor ID_ICON_DELETEPROCESS_DISABLE = createImageDescriptor(TOOLICONURL, ICON_MACHINE_DISABLE, ICON_MACHINE_DISABLE);
-	public static final ImageDescriptor ID_ICON_MACHINE_NORMAL = createImageDescriptor(TOOLICONURL, ICON_MACHINE_NORMAL, ICON_MACHINE_NORMAL);
-
-	public static final ImageDescriptor ID_ICON_SHOWLEGEND_ACTION_NORMAL = createImageDescriptor(TOOLICONURL, ICON_SHOWLEGEND_ACTION_NORMAL, ICON_SHOWLEGEND_ACTION_NORMAL);
-	public static final ImageDescriptor ID_ICON_SHOWLEGEND_ACTION_DISABLE = createImageDescriptor(TOOLICONURL, ICON_SHOWLEGEND_ACTION_DISABLE, ICON_SHOWLEGEND_ACTION_DISABLE);
-	public static final ImageDescriptor ID_ICON_SHOWLEGEND_ACTION_HOVER = createImageDescriptor(TOOLICONURL, ICON_SHOWLEGEND_ACTION_HOVER, ICON_SHOWLEGEND_ACTION_HOVER);
-
-	public static final ImageDescriptor ID_IMG_NODE_USER_ALLOC_EXCL = createImageDescriptor(NODEICONURL, IMG_NODE_USER_ALLOC_EXCL, IMG_NODE_USER_ALLOC_EXCL);
-	public static final ImageDescriptor ID_IMG_NODE_USER_ALLOC_EXCL_SEL = createImageDescriptor(NODEICONURL, IMG_NODE_USER_ALLOC_EXCL_SEL, IMG_NODE_USER_ALLOC_EXCL_SEL);
-	public static final ImageDescriptor ID_IMG_NODE_USER_ALLOC_SHARED = createImageDescriptor(NODEICONURL, IMG_NODE_USER_ALLOC_SHARED, IMG_NODE_USER_ALLOC_SHARED);
-	public static final ImageDescriptor ID_IMG_NODE_USER_ALLOC_SHARED_SEL = createImageDescriptor(NODEICONURL, IMG_NODE_USER_ALLOC_SHARED_SEL, IMG_NODE_USER_ALLOC_SHARED_SEL);
-	public static final ImageDescriptor ID_IMG_NODE_OTHER_ALLOC_EXCL = createImageDescriptor(NODEICONURL, IMG_NODE_OTHER_ALLOC_EXCL, IMG_NODE_OTHER_ALLOC_EXCL);
-	public static final ImageDescriptor ID_IMG_NODE_OTHER_ALLOC_EXCL_SEL = createImageDescriptor(NODEICONURL, IMG_NODE_OTHER_ALLOC_EXCL_SEL, IMG_NODE_OTHER_ALLOC_EXCL_SEL);
-	public static final ImageDescriptor ID_IMG_NODE_OTHER_ALLOC_SHARED = createImageDescriptor(NODEICONURL, IMG_NODE_OTHER_ALLOC_SHARED, IMG_NODE_OTHER_ALLOC_SHARED);
-	public static final ImageDescriptor ID_IMG_NODE_OTHER_ALLOC_SHARED_SEL = createImageDescriptor(NODEICONURL, IMG_NODE_OTHER_ALLOC_SHARED_SEL, IMG_NODE_OTHER_ALLOC_SHARED_SEL);
-	public static final ImageDescriptor ID_IMG_NODE_DOWN = createImageDescriptor(NODEICONURL, IMG_NODE_DOWN, IMG_NODE_DOWN);
-	public static final ImageDescriptor ID_IMG_NODE_DOWN_SEL = createImageDescriptor(NODEICONURL, IMG_NODE_DOWN_SEL, IMG_NODE_DOWN_SEL);
-	public static final ImageDescriptor ID_IMG_NODE_ERROR = createImageDescriptor(NODEICONURL, IMG_NODE_ERROR, IMG_NODE_ERROR);
-	public static final ImageDescriptor ID_IMG_NODE_ERROR_SEL = createImageDescriptor(NODEICONURL, IMG_NODE_ERROR_SEL, IMG_NODE_ERROR_SEL);
-	public static final ImageDescriptor ID_IMG_NODE_EXITED = createImageDescriptor(NODEICONURL, IMG_NODE_EXITED, IMG_NODE_EXITED);
-	public static final ImageDescriptor ID_IMG_NODE_EXITED_SEL = createImageDescriptor(NODEICONURL, IMG_NODE_EXITED_SEL, IMG_NODE_EXITED_SEL);
-	public static final ImageDescriptor ID_IMG_NODE_RUNNING = createImageDescriptor(NODEICONURL, IMG_NODE_RUNNING, IMG_NODE_RUNNING);
-	public static final ImageDescriptor ID_IMG_NODE_RUNNING_SEL = createImageDescriptor(NODEICONURL, IMG_NODE_RUNNING_SEL, IMG_NODE_RUNNING_SEL);
-	public static final ImageDescriptor ID_IMG_NODE_UNKNOWN = createImageDescriptor(NODEICONURL, IMG_NODE_UNKNOWN, IMG_NODE_UNKNOWN);
-	public static final ImageDescriptor ID_IMG_NODE_UNKNOWN_SEL = createImageDescriptor(NODEICONURL, IMG_NODE_UNKNOWN_SEL, IMG_NODE_UNKNOWN_SEL);
-	public static final ImageDescriptor ID_IMG_NODE_UP = createImageDescriptor(NODEICONURL, IMG_NODE_UP, IMG_NODE_UP);
-	public static final ImageDescriptor ID_IMG_NODE_UP_SEL = createImageDescriptor(NODEICONURL, IMG_NODE_UP_SEL, IMG_NODE_UP_SEL);
-
-	public static final ImageDescriptor ID_IMG_PROC_ERROR = createImageDescriptor(PROCESSICONURL, IMG_PROC_ERROR, IMG_PROC_ERROR);
-	public static final ImageDescriptor ID_IMG_PROC_ERROR_SEL = createImageDescriptor(PROCESSICONURL, IMG_PROC_ERROR_SEL, IMG_PROC_ERROR_SEL);
-	public static final ImageDescriptor ID_IMG_PROC_EXITED = createImageDescriptor(PROCESSICONURL, IMG_PROC_EXITED, IMG_PROC_EXITED);
-	public static final ImageDescriptor ID_IMG_PROC_EXITED_SEL = createImageDescriptor(PROCESSICONURL, IMG_PROC_EXITED_SEL, IMG_PROC_EXITED_SEL);
-	public static final ImageDescriptor ID_IMG_PROC_EXITED_SIGNAL = createImageDescriptor(PROCESSICONURL, IMG_PROC_EXITED_SIGNAL, IMG_PROC_EXITED_SIGNAL);
-	public static final ImageDescriptor ID_IMG_PROC_EXITED_SIGNAL_SEL = createImageDescriptor(PROCESSICONURL, IMG_PROC_EXITED_SIGNAL_SEL, IMG_PROC_EXITED_SIGNAL_SEL);
-	public static final ImageDescriptor ID_IMG_PROC_RUNNING = createImageDescriptor(PROCESSICONURL, IMG_PROC_RUNNING, IMG_PROC_RUNNING);
-	public static final ImageDescriptor ID_IMG_PROC_RUNNING_SEL = createImageDescriptor(PROCESSICONURL, IMG_PROC_RUNNING_SEL, IMG_PROC_RUNNING_SEL);
-	public static final ImageDescriptor ID_IMG_PROC_STARTING = createImageDescriptor(PROCESSICONURL, IMG_PROC_STARTING, IMG_PROC_STARTING);
-	public static final ImageDescriptor ID_IMG_PROC_STARTING_SEL = createImageDescriptor(PROCESSICONURL, IMG_PROC_STARTING_SEL, IMG_PROC_STARTING_SEL);
-	public static final ImageDescriptor ID_IMG_PROC_STOPPED = createImageDescriptor(PROCESSICONURL, IMG_PROC_STOPPED, IMG_PROC_STOPPED);
-	public static final ImageDescriptor ID_IMG_PROC_STOPPED_SEL = createImageDescriptor(PROCESSICONURL, IMG_PROC_STOPPED_SEL, IMG_PROC_STOPPED_SEL);
-	
-	public static Image getImage(String key) {
-		return getImageRegistry().get(key);
-	}
-	public static ImageDescriptor getDescriptor(String key) {
-		return getImageRegistry().getDescriptor(key);
-	}
-	
-	private static ImageRegistry getImageRegistry() {
-		if (imageRegistry == null) {
-			imageRegistry = new ImageRegistry();
-		}
-		return imageRegistry;
-	}
-	
-	public static void addImage(String key, Image image) {
-		getImageRegistry().put(key, image);
-	}
-	public static void addImageDescriptor(String key, ImageDescriptor imageDescriptor) {
-		getImageRegistry().put(key, imageDescriptor);
-	}
-		
-	public static ImageDescriptor createImageDescriptor(URL iconURL, String key, String name) {
-		try {
-			ImageDescriptor imageDescriptor = ImageDescriptor.createFromURL(getIconURL(iconURL, name));
-			addImageDescriptor(key, imageDescriptor);
-			return imageDescriptor;
-		} catch (MalformedURLException e) {
-			return ImageDescriptor.getMissingImageDescriptor();
-		}
-	}
-	
-	private static URL getIconURL(URL iconURL, String name) throws MalformedURLException {
-		if (iconURL == null)
-			throw new MalformedURLException();
-			
-		return new URL(iconURL, name);
-	}	
-	
-	/*
-	
-	
+public class ParallelImages {
 	private static final String NAME_PREFIX = "org.eclipse.ptp.ui.";
 	private static final int NAME_PREFIX_LENGTH = NAME_PREFIX.length();
+    
 	private static URL iconBaseURL = null;
 	
 	static {
@@ -251,19 +105,23 @@ public class ParallelImages {
 	public static final String IMG_PROC_STOPPED = NAME_PREFIX + "proc_stopped.gif";
 	public static final String IMG_PROC_STOPPED_SEL = NAME_PREFIX + "proc_stopped_sel.gif";
 	
-		
-	//public static final String IMG_ABORT_ACTION_NORMAL = NAME_PREFIX + "icon_terminate_all.gif";
-	//public static final String IMG_ABORT_ACTION_DISABLE = NAME_PREFIX + "icon_terminate_all.gif";
-	//public static final String IMG_ABORT_ACTION_HOVER = NAME_PREFIX + "icon_terminate_all.gif";	
-	//public static final String IMG_EXIT_ACTION_NORMAL = NAME_PREFIX + "exit_normal.gif";
-	//public static final String IMG_EXIT_ACTION_DISABLE = NAME_PREFIX + "exit_disable.gif";
-	//public static final String IMG_EXIT_ACTION_HOVER = NAME_PREFIX + "exit_hover.gif";
-	//public static final String IMG_VIEWSTATUS_ACTION_NORMAL = NAME_PREFIX + "viewstatus_normal.gif";
-	//public static final String IMG_VIEWSTATUS_ACTION_DISABLE = NAME_PREFIX + "viewstatus_disable.gif";
-	//public static final String IMG_VIEWSTATUS_ACTION_HOVER = NAME_PREFIX + "viewstatus_hover.gif";
+	
+	
+	
+	/*
+	public static final String IMG_ABORT_ACTION_NORMAL = NAME_PREFIX + "icon_terminate_all.gif";
+	public static final String IMG_ABORT_ACTION_DISABLE = NAME_PREFIX + "icon_terminate_all.gif";
+	public static final String IMG_ABORT_ACTION_HOVER = NAME_PREFIX + "icon_terminate_all.gif";	
+	public static final String IMG_EXIT_ACTION_NORMAL = NAME_PREFIX + "exit_normal.gif";
+	public static final String IMG_EXIT_ACTION_DISABLE = NAME_PREFIX + "exit_disable.gif";
+	public static final String IMG_EXIT_ACTION_HOVER = NAME_PREFIX + "exit_hover.gif";
+	public static final String IMG_VIEWSTATUS_ACTION_NORMAL = NAME_PREFIX + "viewstatus_normal.gif";
+	public static final String IMG_VIEWSTATUS_ACTION_DISABLE = NAME_PREFIX + "viewstatus_disable.gif";
+	public static final String IMG_VIEWSTATUS_ACTION_HOVER = NAME_PREFIX + "viewstatus_hover.gif";
 
-	//public static final String IMG_NODE = NAME_PREFIX + "node.gif";
-	//public static final String IMG_PROCESS = NAME_PREFIX + "process.gif";
+	public static final String IMG_NODE = NAME_PREFIX + "node.gif";
+	public static final String IMG_PROCESS = NAME_PREFIX + "process.gif";
+	*/	
 	
 	public static final ImageDescriptor DESC_PARALLEL = createManaged(IMG_PARALLEL);
 	
@@ -329,19 +187,32 @@ public class ParallelImages {
 	public static final ImageDescriptor DESC_PROC_STOPPED = createManaged(IMG_PROC_STOPPED);
 	public static final ImageDescriptor DESC_PROC_STOPPED_SEL = createManaged(IMG_PROC_STOPPED_SEL);
 	
-	//public static final ImageDescriptor DESC_EXIT_ACTION_NORMAL = createManaged(IMG_EXIT_ACTION_NORMAL);
-	//public static final ImageDescriptor DESC_EXIT_ACTION_DISABLE = createManaged(IMG_EXIT_ACTION_DISABLE);
-	//public static final ImageDescriptor DESC_EXIT_ACTION_HOVER = createManaged(IMG_EXIT_ACTION_HOVER);
-	//public static final ImageDescriptor DESC_ABORT_ACTION_NORMAL = createManaged(IMG_ABORT_ACTION_NORMAL);
-	//public static final ImageDescriptor DESC_ABORT_ACTION_DISABLE = createManaged(IMG_ABORT_ACTION_DISABLE);
-	//public static final ImageDescriptor DESC_ABORT_ACTION_HOVER = createManaged(IMG_ABORT_ACTION_HOVER);
-	//public static final ImageDescriptor DESC_VIEWSTATUS_ACTION_NORMAL = createManaged(IMG_VIEWSTATUS_ACTION_NORMAL);
-	//public static final ImageDescriptor DESC_VIEWSTATUS_ACTION_DISABLE = createManaged(IMG_VIEWSTATUS_ACTION_DISABLE);
-	//public static final ImageDescriptor DESC_VIEWSTATUS_ACTION_HOVER = createManaged(IMG_VIEWSTATUS_ACTION_HOVER);
 	
-	//public static final ImageDescriptor DESC_IMG_NODE = createManaged(IMG_NODE);
-	//public static final ImageDescriptor DESC_IMG_PROCESS = createManaged(IMG_PROCESS);
+
 	
+	
+	
+	/*
+	public static final ImageDescriptor DESC_EXIT_ACTION_NORMAL = createManaged(IMG_EXIT_ACTION_NORMAL);
+	public static final ImageDescriptor DESC_EXIT_ACTION_DISABLE = createManaged(IMG_EXIT_ACTION_DISABLE);
+	public static final ImageDescriptor DESC_EXIT_ACTION_HOVER = createManaged(IMG_EXIT_ACTION_HOVER);
+	public static final ImageDescriptor DESC_ABORT_ACTION_NORMAL = createManaged(IMG_ABORT_ACTION_NORMAL);
+	public static final ImageDescriptor DESC_ABORT_ACTION_DISABLE = createManaged(IMG_ABORT_ACTION_DISABLE);
+	public static final ImageDescriptor DESC_ABORT_ACTION_HOVER = createManaged(IMG_ABORT_ACTION_HOVER);
+	public static final ImageDescriptor DESC_VIEWSTATUS_ACTION_NORMAL = createManaged(IMG_VIEWSTATUS_ACTION_NORMAL);
+	public static final ImageDescriptor DESC_VIEWSTATUS_ACTION_DISABLE = createManaged(IMG_VIEWSTATUS_ACTION_DISABLE);
+	public static final ImageDescriptor DESC_VIEWSTATUS_ACTION_HOVER = createManaged(IMG_VIEWSTATUS_ACTION_HOVER);
+	
+	public static final ImageDescriptor DESC_IMG_NODE = createManaged(IMG_NODE);
+	public static final ImageDescriptor DESC_IMG_PROCESS = createManaged(IMG_PROCESS);
+	*/
+	
+	/**
+	 * Returns the image managed under the given key in this registry.
+	 * 
+	 * @param key the image's key
+	 * @return the image managed under the given key
+	 */ 
 	public static Image getImage(String key) {
 		return getImageRegistry().get(key);
 	}
@@ -391,5 +262,4 @@ public class ParallelImages {
 			
 		return new URL(iconBaseURL, name);
 	}	
-	*/
 }

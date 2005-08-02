@@ -17,7 +17,7 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.ui.views;
+package org.eclipse.ptp.ui.views.old;
 
 import java.util.Arrays;
 import java.util.Timer;
@@ -42,13 +42,13 @@ import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IParallelModelListener;
 import org.eclipse.ptp.internal.core.PNode;
 import org.eclipse.ptp.internal.core.PProcess;
-import org.eclipse.ptp.ui.ParallelImages;
-import org.eclipse.ptp.ui.actions.ShowAllNodesAction;
-import org.eclipse.ptp.ui.actions.ShowLegendAction;
-import org.eclipse.ptp.ui.actions.ShowMyAllocatedNodesAction;
-import org.eclipse.ptp.ui.actions.ShowMyUsedNodesAction;
-import org.eclipse.ptp.ui.actions.ShowProcessesAction;
-import org.eclipse.ptp.ui.actions.TerminateAllAction;
+import org.eclipse.ptp.ui.actions.old.ShowAllNodesAction;
+import org.eclipse.ptp.ui.actions.old.ShowLegendAction;
+import org.eclipse.ptp.ui.actions.old.ShowMyAllocatedNodesAction;
+import org.eclipse.ptp.ui.actions.old.ShowMyUsedNodesAction;
+import org.eclipse.ptp.ui.actions.old.ShowProcessesAction;
+import org.eclipse.ptp.ui.actions.old.TerminateAllAction;
+import org.eclipse.ptp.ui.old.ParallelImages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.PaintEvent;

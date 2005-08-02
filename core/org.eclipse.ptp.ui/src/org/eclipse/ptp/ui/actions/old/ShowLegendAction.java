@@ -17,60 +17,47 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-/*
- * Created on Sep 23, 2004
- *
- */
-package org.eclipse.ptp.ui.actions;
+package org.eclipse.ptp.ui.actions.old;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ptp.ui.SearchDialog;
+import org.eclipse.ptp.ui.old.LegendDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-public class SearchAction implements IWorkbenchWindowActionDelegate {
+public class ShowLegendAction implements IWorkbenchWindowActionDelegate {
 	private IWorkbenchWindow window;
 
 	public void run(IAction action) {
-	    new SearchDialog(window.getShell()).open();	    
-	    
-	    /*
-		String input = sd.open();
-		if(input != null) {
-			int selection = sd.getSelection();
-			Integer intval;
-			try {
-				intval = new Integer(input);
-			} catch(NumberFormatException e) {
-				intval = null;
-			}
-
-			AbstractParallelView nodeView = (AbstractParallelView)window.getActivePage().findView(UIUtils.ParallelNodeStatusView_ID);
-			AbstractParallelView treeView = (AbstractParallelView)window.getActivePage().findView(UIUtils.ParallelProcessesView_ID);
-			
-			if(selection == SearchDialog.NODE) {
-			    if (nodeView != null)
-			        nodeView.searchForNode(intval.intValue());
-			    if (treeView != null)
-			        treeView.searchForNode(intval.intValue());
-			}
-			else if(selection == SearchDialog.PROCESS) {
-			    if (nodeView != null)
-			        nodeView.searchForProcess(intval.intValue());
-			    if (treeView != null)
-			        treeView.searchForProcess(intval.intValue());
-			}
-		}*/
+		new LegendDialog(window.getShell()).open();
 	}
-
 	public void selectionChanged(IAction action, ISelection selection) {
-	}
-	
+	}	
 	public void dispose() {
-	}
-	
+	}	
 	public void init(IWorkbenchWindow window) {
 		this.window = window;
 	}	
 }
+
+/*
+public class ShowLegendAction extends ParallelAction {
+	public ShowLegendAction(ViewPart view) {
+		super(view);
+	}
+
+	protected void init(boolean isEnable) {
+	    this.setText(UIMessage.getResourceString("ShowLegendAction.text"));
+	    this.setToolTipText(UIMessage.getResourceString("ShowLegendAction.tooltip"));
+	    this.setImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWLEGEND_ACTION_NORMAL));
+	    this.setDisabledImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWLEGEND_ACTION_DISABLE));
+	    this.setHoverImageDescriptor(ParallelImages.getDescriptor(ParallelImages.IMG_SHOWLEGEND_ACTION_HOVER));
+	    this.setEnabled(getLaunchManager().isMPIRuning());
+	}
+
+	public void run() {
+		LegendDialog ld = new LegendDialog(getShell());
+		ld.open();
+	}
+}
+*/

@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.views;
+package org.eclipse.ptp.ui.views.old;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -27,7 +27,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.debug.AbstractAttachDebugger;
 import org.eclipse.ptp.debug.CDTAttachDebuger;
 import org.eclipse.ptp.internal.core.ParallelModelAdapter;
-import org.eclipse.ptp.ui.UIUtils;
+import org.eclipse.ptp.ui.old.UIUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
