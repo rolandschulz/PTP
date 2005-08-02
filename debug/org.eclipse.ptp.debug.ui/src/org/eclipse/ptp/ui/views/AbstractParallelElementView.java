@@ -66,7 +66,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	protected int e_width = 16;
 	protected int e_height = 16;
 
-	// group
+	// Set
 	protected ISetManager setManager = null;
 	protected String cur_set_id = ISetManager.SET_ROOT_ID;
 	protected IElementSet cur_element_set = null;
@@ -118,25 +118,31 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		}
 	}
 	
-	//Set element info
-	protected abstract void initElementAttribute();
-	
 	public void createPartControl(Composite parent) {
 		initialKey(Platform.getOS());
 		createElementView(parent);
+	}
+	
+	protected void initialView() {
+		if (setManager.size() == 1)
+			initialElement();
+
+		selectSet(setManager.getSetRoot().getID());
+		update();
 	}
 
 	protected void changeTitle(final String title, final int size) {
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				setContentDescription(title + " [" + size + "]");
+				setContentDescription(" " + title + " [" + size + "]");
 			}
 		});
 	}
 
 	protected void createElementView(Composite parent) {
-		//parent.setLayout(new GridLayout(1, false));
-		parent.setLayout(new FillLayout());
+		GridLayout gd = new GridLayout(1, false);
+		gd.marginHeight = gd.marginWidth = 0;
+		parent.setLayout(gd);
 		parent.setLayoutData(new GridData(GridData.FILL_BOTH));
 		parent.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));		
 		
@@ -161,7 +167,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		sc.setContent(drawComp);
 
 		drawComp.addPaintListener(new PaintListener() {
-		public void paintControl(PaintEvent e) {
+			public void paintControl(PaintEvent e) {
 				if (setManager.size() > 0)
 					paintCanvas(e.gc);
 			}
@@ -737,24 +743,24 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		return new StructuredSelection(cur_element_set.getSelectedElements());
 	}
 
-	public String getCurrentGroupID() {
+	public String getCurrentSetID() {
 		return cur_set_id;
 	}
 
-	public void selectSet(String groupID) {
-		deSelectGroup();
-		this.cur_element_set = setManager.getSet(groupID);
+	public void selectSet(String setID) {
+		deSelectSet();
+		this.cur_element_set = setManager.getSet(setID);
 		this.cur_set_id = cur_element_set.getID();
 		this.cur_set_size = cur_element_set.size();
 		cur_element_set.setSelected(true);
 	}
 
-	public void deSelectGroup() {
+	public void deSelectSet() {
 		if (cur_element_set != null)
 			cur_element_set.setSelected(false);
 	}
 
-	public IElementSet getCurrentGroup() {
+	public IElementSet getCurrentSet() {
 		return cur_element_set;
 	}
 
@@ -778,6 +784,12 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 			}
 		});
 	}
+	//Set element info
+	protected abstract void initElementAttribute();	
+	//Set element to display 
+	protected abstract void initialElement();
+	//set update view details
+	public abstract void update();
 	
 	private void elementRedraw() {
 		if (!drawComp.isDisposed())

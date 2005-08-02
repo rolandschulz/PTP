@@ -20,58 +20,65 @@ package org.eclipse.ptp.ui.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.dialogs.IInputValidator;
-import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
-import org.eclipse.swt.SWT;
+
 /**
- * @author clement chu
+ * @author Clement chu
  *
  */
-public class CreateSetAction extends SetAction {
-	public static final String name = "Create";
+public class ChangeSetAction extends SetAction {
+	public static final String name = "Change";
     
-	public CreateSetAction(AbstractParallelElementView view) {
+	public ChangeSetAction(AbstractParallelElementView view) {
 		super(name, view);
 	}
 	
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
+    	String curSetID = view.getCurrentSetID();    	
+    	String rootSetID = view.getUIManger().getSetManager().getSetRoot().getID();
+    	addAction(dropDownMenuMgr, rootSetID, curSetID);
+
     	IElementSet[] sets = view.getUIManger().getSetManager().getSortedSets();
-    	for (int i=1; i<sets.length; i++) {
-    		IAction action = new InternalSetAction(sets[i].getID(), view, this);
-    		action.setEnabled(!view.getCurrentSetID().equals(sets[i].getID()));
-    		dropDownMenuMgr.add(action);
+    	if (sets.length > 1)
+    		dropDownMenuMgr.add(new Separator());
+    	for (int i=0; i<sets.length; i++) {
+    		if (sets[i].getID().equals(rootSetID))
+    			continue;
+    		
+    		addAction(dropDownMenuMgr, sets[i].getID(), curSetID);
     	}		
-	}	
+	}
 	
-	public void run(IElement[] elements) {
-		run(elements, null);
+	private void addAction(MenuManager dropDownMenuMgr, String setID, String curSetID) {
+		IAction action = new InternalSetAction(setID, view, IAction.AS_CHECK_BOX, this);
+		action.setChecked(curSetID.equals(setID));
+		action.setEnabled(true);
+		dropDownMenuMgr.add(action);
+	}
+	
+	public void run(IElement[] elements) {}
+	
+	public void run() {
+    	IElementSet[] sets = view.getUIManger().getSetManager().getSortedSets();
+    	for (int i=0; i<sets.length; i++) {
+    		if (view.getCurrentSetID().equals(sets[i].getID())) {
+    			if (i + 1 < sets.length)
+    				run(null, sets[i+1].getID());
+    			else
+    				run(null, sets[0].getID());
+    			
+    			break;
+    		}
+    	}
 	}
 	
 	public void run(IElement[] elements, String setID) {
-		if (validation(elements)) {
-			if (setID == null) {
-				IInputValidator inputValidator = new IInputValidator() {
-					public String isValid(String newText) {
-						if (CreateSetAction.this.view.getUIManger().getSetManager().contains(newText))
-							return "Entered set name (" + newText + ") is already used.";
-						return null;
-					}
-				};
-				InputDialog inputDialog = new InputDialog(getShell(), "Create a new set name", "Please enter the new set name.", "", inputValidator);
-				if (inputDialog.open() == SWT.CANCEL)
-					return;
-				
-				setID = view.getUIManger().createSet(elements, inputDialog.getValue());				
-			} else
-				view.getUIManger().addToSet(elements, setID);
-			
-			view.selectSet(setID);
-			view.getCurrentSet().setAllSelect(false);
-			view.update();
-			view.redraw();
-		}
+		view.selectSet(setID);
+		view.getCurrentSet().setAllSelect(false);
+		view.update();
+		view.redraw();
 	}
 }

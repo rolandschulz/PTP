@@ -18,34 +18,68 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.actions;
 
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
+import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.ptp.debug.ui.ImageUtil;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.views.AbstractParallelView;
+import org.eclipse.ptp.ui.views.AbstractParallelElementView;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
 /**
  * @author clement chu
  *
  */
-public class SetAction extends ParallelAction {
+public abstract class SetAction extends ParallelAction {
 	public static final String SET_ROOT = "Root";
 	public static final String name = "Set";
 	
-	public SetAction(String id, AbstractParallelView debugView) {
-		super(name + " " + id, IAction.AS_CHECK_BOX, debugView);
+    private IMenuCreator menuCreator = new IMenuCreator() {
+        private MenuManager dropDownMenuMgr = null;
+
+        private void createDropDownMenuMgr() {
+        	if (dropDownMenuMgr != null)
+        		dispose();
+        	
+        	dropDownMenuMgr = new MenuManager();
+        	createDropDownMenu(dropDownMenuMgr);
+        }
+        public Menu getMenu(Control parent) {
+            createDropDownMenuMgr();
+            return dropDownMenuMgr.createContextMenu(parent);
+        }
+        public Menu getMenu(Menu parent) {
+            createDropDownMenuMgr();
+            Menu menu = new Menu(parent);
+            IContributionItem[] items = dropDownMenuMgr.getItems();
+            for (int i = 0; i < items.length; i++) {
+                IContributionItem item = items[i];
+                IContributionItem newItem = item;
+                if (item instanceof ActionContributionItem) {
+                    newItem = new ActionContributionItem(((ActionContributionItem) item).getAction());
+                }
+                newItem.fill(menu, -1);
+            }
+            return menu;
+        }
+        public void dispose() {
+            if (dropDownMenuMgr != null) {
+                dropDownMenuMgr.dispose();
+                dropDownMenuMgr = null;
+            }
+        }
+    };
+	
+	public SetAction(String name, AbstractParallelElementView view) {
+		super(name, IAction.AS_DROP_DOWN_MENU, view);
+	    setImageDescriptor(ImageUtil.ID_ICON_CREATESET_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATESET_DISABLE);
 	    setEnabled(true);
-		setId(id);
+	    setMenuCreator(menuCreator);
 	}
 
-	public void run(IElement[] elements) {}
-	
-	public void run() {
-		if (debugView instanceof DebugParallelProcessView) {
-			DebugParallelProcessView view = (DebugParallelProcessView)debugView;
-			view.selectSet(getId());
-			//deselect all elements each time changed the group
-			view.getCurrentGroup().setAllSelect(false);
-			view.updateMenu(view.getViewSite().getActionBars().getMenuManager());
-			view.redraw();
-		}
-	}	
+	protected abstract void createDropDownMenu(MenuManager dropDownMenuMgr);	
+	protected abstract void run(IElement[] elements, String setID);
 }

@@ -22,29 +22,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.ptp.ui.model.IContainer;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 /**
  * @author clement chu
  *
  */
-public class ElementSet extends Container implements IElementSet {
-	private static int set_counter = 1;
-	
-	public ElementSet(boolean selected) {
-		this(set_counter++, selected);
-	}
-	public ElementSet(int num) {
-		this(String.valueOf(num), false);
-	}
-	public ElementSet(int num, boolean selected) {
-		this(String.valueOf(num), selected);
-	}
+public class ElementSet extends Container implements IElementSet {	
 	public ElementSet(String id) {
 		this(id, false);
 	}
 	public ElementSet(String id, boolean selected) {
-		super(id, selected);
+		super(id, selected, IContainer.ELEMENT_TYPE);
 	}
 	public IElement[] getSelectedElements() {
 		List selectedElements = new ArrayList();

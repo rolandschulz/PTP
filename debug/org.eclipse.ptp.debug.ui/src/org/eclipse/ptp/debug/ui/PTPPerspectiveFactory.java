@@ -19,7 +19,7 @@
 package org.eclipse.ptp.debug.ui;
 
 import org.eclipse.debug.ui.IDebugUIConstants;
-import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
+import org.eclipse.ptp.debug.ui.views.DebugParallelView;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -42,7 +42,7 @@ public class PTPPerspectiveFactory implements IPerspectiveFactory {
 		folder1.addView(IConsoleConstants.ID_CONSOLE_VIEW);
 
 		IFolderLayout folder2= layout.createFolder("topLeftUp", IPageLayout.TOP, (float)0.5, editorArea);
-		folder2.addView(DebugParallelProcessView.VIEW_ID);
+		folder2.addView(DebugParallelView.VIEW_ID);
 
 		IFolderLayout folder4= layout.createFolder("topRight", IPageLayout.RIGHT, (float)0.6, "topLeftUp");
 		folder4.addView(IDebugUIConstants.ID_BREAKPOINT_VIEW);
@@ -68,12 +68,12 @@ public class PTPPerspectiveFactory implements IPerspectiveFactory {
 		// views - standard workbench
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_PROBLEM_VIEW);
-		layout.addShowViewShortcut(DebugParallelProcessView.VIEW_ID);
+		layout.addShowViewShortcut(DebugParallelView.VIEW_ID);
 		//layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
 		layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
 
 		// link - things we should do
-		layout.addShowInPart(DebugParallelProcessView.VIEW_ID);
+		layout.addShowInPart(DebugParallelView.VIEW_ID);
 
 		//layout.addShowInPart(DebugMessageView.DebugMessageView_ID);
 		//layout.addShowInPart(IPageLayout.ID_RES_NAV);

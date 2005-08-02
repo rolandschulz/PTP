@@ -80,8 +80,9 @@ public class UIDebugManager {
 		
 		for (int i=0; i<elements.length; i++) {
 			//only register some unregistered elements
-			if (!elements[i].isRegistered())
-				target.setCurrentFocus(elements[i].getIDNum());
+			if (!elements[i].isRegistered()) {
+				//target.register(elements[i].getIDNum());
+			}
 		}
 	}
 	public void registerElements(IElement[] elements) {

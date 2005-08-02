@@ -23,6 +23,9 @@ package org.eclipse.ptp.ui.model;
  *
  */
 public interface IContainer extends IElement {
+	public static final int SET_TYPE = 1;
+	public static final int ELEMENT_TYPE = 2;
+	
 	public boolean contains(String id);
 	public String getElementID(int index);
 	public void add(IElement element);

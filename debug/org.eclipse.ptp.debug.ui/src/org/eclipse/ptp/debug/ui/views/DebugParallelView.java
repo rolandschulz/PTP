@@ -32,7 +32,7 @@ import org.eclipse.ptp.debug.ui.actions.StepOverAction;
 import org.eclipse.ptp.debug.ui.actions.StepReturnAction;
 import org.eclipse.ptp.debug.ui.actions.SuspendAction;
 import org.eclipse.ptp.debug.ui.actions.TerminateAction;
-import org.eclipse.ptp.debug.ui.actions.UnRegisterAction;
+import org.eclipse.ptp.debug.ui.actions.UnregisterAction;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -43,10 +43,10 @@ import org.eclipse.swt.graphics.Image;
  * @author clement chu
  * 
  */
-public class DebugParallelProcessView extends AbstractParallelSetView implements IDebugParallelModelListener {
-	public static final String VIEW_ID = "org.eclipse.ptp.debug.ui.views.debugParallelProcessView";
+public class DebugParallelView extends AbstractParallelSetView implements IDebugParallelModelListener {
+	public static final String VIEW_ID = "org.eclipse.ptp.debug.ui.views.debugParallelView";
 
-	private static DebugParallelProcessView instance = null;
+	private static DebugParallelView instance = null;
 	private UIDebugManager uiDebugManager = null;
 
 	// actions
@@ -78,7 +78,7 @@ public class DebugParallelProcessView extends AbstractParallelSetView implements
 	};
 
 
-	public DebugParallelProcessView() {
+	public DebugParallelView() {
 		uiDebugManager = UIPlugin.getDefault().getUIDebugManager();
 		//FIXME dummy
 		DebugManager.getInstance().addListener(this);		
@@ -96,13 +96,12 @@ public class DebugParallelProcessView extends AbstractParallelSetView implements
 	protected void initialElement() {
 		uiDebugManager.initialProcess();
 	}
-/*	              
-	public static DebugParallelProcessView getInstance() {
+
+	public static DebugParallelView getInstance() {
 		if (instance == null)
-			instance = new DebugParallelProcessView();
+			instance = new DebugParallelView();
 		return instance;
 	}
-*/
 	
 	protected boolean fillContextMenu(IMenuManager manager) {
 		manager.add(resumeAction);
@@ -124,7 +123,7 @@ public class DebugParallelProcessView extends AbstractParallelSetView implements
 		stepReturnAction = new StepReturnAction(this);
 		
 		registerAction = new RegisterAction(this);
-		unregisterAction = new UnRegisterAction(this);
+		unregisterAction = new UnregisterAction(this);
 
 		toolBarMgr.add(resumeAction);
 		toolBarMgr.add(suspendAction);

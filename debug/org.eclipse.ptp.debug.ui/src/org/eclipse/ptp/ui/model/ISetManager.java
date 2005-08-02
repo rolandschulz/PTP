@@ -23,7 +23,7 @@ package org.eclipse.ptp.ui.model;
  *
  */
 public interface ISetManager extends IContainer {
-	public static final String SET_ROOT_ID = "0";	
+	public static final String SET_ROOT_ID = "Root";	
 	public IElementSet getSetRoot();
 	
 	public IElementSet[] getSetsWithElement(String id);

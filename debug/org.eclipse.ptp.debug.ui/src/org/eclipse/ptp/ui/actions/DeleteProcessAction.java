@@ -22,11 +22,10 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.views.AbstractParallelView;
+import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
 /**
  * @author clement chu
@@ -35,33 +34,29 @@ import org.eclipse.ptp.ui.views.AbstractParallelView;
 public class DeleteProcessAction extends ParallelAction {
 	public static final String name = "Delete Process";
 	
-	public DeleteProcessAction(AbstractParallelView debugView) {
-		super(name, debugView);
+	public DeleteProcessAction(AbstractParallelElementView view) {
+		super(name, view);
 	    setImageDescriptor(ImageUtil.ID_ICON_DELETEPROCESS_NORMAL);
 	    setDisabledImageDescriptor(ImageUtil.ID_ICON_DELETEPROCESS_DISABLE);
 	}
 
 	public void run(IElement[] elements) {
 		if (validation(elements)) {
-			if (debugView instanceof DebugParallelProcessView) {
-				DebugParallelProcessView view = (DebugParallelProcessView)debugView;
-
-				IElementSet group = view.getCurrentGroup();
-				if (group.size() == elements.length) {
-					callDeleteGroupAction(view);
-				} else {
-					if (UIUtils.showQuestionDialog("Delete Confirmation", "Are you sure you want to delete (" + elements.length + ") processes in this set?"))	{			
-						view.getUIDebugManger().removeFromSet(elements, group.getID());
-						view.selectSet(group.getID());
-						view.updateTitle();
-						view.redraw();
-					}
+			IElementSet group = view.getCurrentSet();
+			if (group.size() == elements.length) {
+				callDeleteGroupAction();
+			} else {
+				if (UIUtils.showQuestionDialog("Delete Confirmation", "Are you sure you want to delete (" + elements.length + ") processes in this set?"))	{			
+					view.getUIManger().removeFromSet(elements, group.getID());
+					view.selectSet(group.getID());
+					view.updateTitle();
+					view.redraw();
 				}
 			}
 		}		
 	}
 	
-	private void callDeleteGroupAction(DebugParallelProcessView view) {
+	private void callDeleteGroupAction() {
 		IToolBarManager manager = view.getViewSite().getActionBars().getToolBarManager();
 		IContributionItem item = manager.find(DeleteSetAction.name);
 		if (item != null && item instanceof ActionContributionItem) {

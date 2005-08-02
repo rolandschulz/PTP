@@ -70,7 +70,7 @@ public abstract class AbstractParallelView extends ViewPart implements ISelectio
 		super.dispose();
 	}
 	
-	public UIManager getUIDebugManger() {
+	public UIManager getUIManger() {
 		return uiManager;
 	}
 	

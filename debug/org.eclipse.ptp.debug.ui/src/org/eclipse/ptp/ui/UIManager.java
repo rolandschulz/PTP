@@ -56,8 +56,8 @@ public class UIManager {
 	public void addToSet(IElement[] elements, String setID) {
 		addToSet(elements, setManager.getSet(setID));
 	}
-	public String createSet(IElement[] elements) {
-		IElementSet set = new ElementSet(true);
+	public String createSet(IElement[] elements, String setID) {
+		IElementSet set = new ElementSet(setID, true);
 		addToSet(elements, set);
 		setManager.add(set);
 		return set.getID();

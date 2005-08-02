@@ -24,7 +24,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.views.AbstractParallelView;
+import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -32,31 +32,32 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public abstract class ParallelAction extends Action {
-	protected AbstractParallelView debugView = null;
+	protected AbstractParallelElementView view = null;
 	
-	public ParallelAction(String text, AbstractParallelView debugView) {
-		this(text, IAction.AS_PUSH_BUTTON, debugView);
+	public ParallelAction(String text, AbstractParallelElementView view) {
+		this(text, IAction.AS_PUSH_BUTTON, view);
 	}
 	
-	public ParallelAction(String text, int style, AbstractParallelView debugView) {
+	public ParallelAction(String text, int style, AbstractParallelElementView view) {
 		super(text, style);
-		this.debugView = debugView;
+		this.view = view;
 	    setToolTipText(text);
 	    setEnabled(false);
+	    setId(text);
 	}
 	
-	public AbstractParallelView getViewPart() {
-        return debugView;
+	public AbstractParallelElementView getViewPart() {
+        return view;
     }
     
     public Shell getShell() {
-        return debugView.getViewSite().getShell();
+        return view.getViewSite().getShell();
     }
     
     public abstract void run(IElement[] elements);
     
     public void run() {
-    	ISelection selection = debugView.getSelection();
+    	ISelection selection = view.getSelection();
     	if (selection != null && !selection.isEmpty() && selection instanceof IStructuredSelection) {
         	Object[] objs = ((IStructuredSelection)selection).toArray();
         	IElement[] elements = new IElement[objs.length];
