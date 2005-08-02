@@ -10,5 +10,10 @@
  ***********************************************************************/ 
 package org.eclipse.ptp.debug.core.model; 
 
+
 public interface IPDebugProcessSet extends IPFocus {
+	public IPDebugProcess[] getProcesses();
+	public IPDebugProcess getProcess(int number);
+	public void addProcess(IPDebugProcess proc);
+	public void removeProcess(IPDebugProcess proc);
 }

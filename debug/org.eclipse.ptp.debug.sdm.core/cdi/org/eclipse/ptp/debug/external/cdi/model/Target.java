@@ -48,6 +48,7 @@ import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
 import org.eclipse.ptp.debug.external.cdi.RegisterManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
+import org.eclipse.ptp.debug.external.model.MProcessSet;
 import org.eclipse.ptp.debug.external.simulator.SimProcess;
 import org.eclipse.ptp.debug.external.simulator.SimThread;
 
@@ -58,50 +59,26 @@ public class Target extends SessionObject implements IPCDITarget {
 	private TargetConfiguration fConfiguration;
 	private DebugSession dSession;
 	
-	private HashMap allDebugGroups;
-	private IPCDIDebugProcessSet grpAllProcesses;
-	private IPCDIDebugFocus currentDebugFocus;
-	
 	Thread[] noThreads = new Thread[0];
 	Thread[] currentThreads;
 	int currentThreadId;
 	
-	public Target(Session s, DebugSession dS, IPJob job) {
+	public Target(Session s, DebugSession dS) {
 		super(s);
 		dSession = dS;
-		
-		allDebugGroups = new HashMap();
-		
-		grpAllProcesses = new DebugProcessGroup("allProcesses");
-		IPProcess[] pProcesses = job.getSortedProcesses();
-		for (int i = 0; i < pProcesses.length; i++) {
-			grpAllProcesses.addProcess(new DebugProcess(pProcesses[i]));
-		}
-		allDebugGroups.put(grpAllProcesses.getName(), grpAllProcesses);
-		
-		setCurrentFocus(grpAllProcesses.getProcess(0));
 		
 		fConfiguration = new TargetConfiguration(this);
 		currentThreads = noThreads;
 	}
 	
-	public IPCDIDebugProcessSet newProcessGroup(String name) {
-		//dSession.getDebugger().defSet()
-		DebugProcessGroup newGroup = new DebugProcessGroup(name);
-		allDebugGroups.put(newGroup.getName(), newGroup);
+	public IPCDIDebugProcessSet newProcessSet(String name, int[] procs) {
+		MProcessSet procSet = dSession.getDebugger().defSet(name, procs);
+		DebugProcessSet newGroup = new DebugProcessSet(procSet);
 		return newGroup;
 	}
 	
-	public void delProcessGroup(String name) {
-		allDebugGroups.remove(name);
-	}
-	
-	public void addProcess
-	public void removeProcess
-	
-	public void setCurrentFocus(IPCDIDebugFocus focus) {
-		System.out.println("Target.setCurrentFocus()");
-		currentDebugFocus = focus;
+	public void delProcessSet(String name) {
+		dSession.getDebugger().undefSet(name);
 	}
 	
 	public DebugSession getDebugSession() {

@@ -44,14 +44,14 @@ public class PSetManager {
 		fProcessGroups = new HashMap();
 	}
 
-	public void newProcessGroup(String name) {
+	public void newProcessGroup(String name, int[] procs) {
 		IPCDIDebugProcessSet grp;
-		grp = getDebugTarget().getCDITarget().newProcessGroup(name);
+		grp = getDebugTarget().getCDITarget().newProcessSet(name, procs);
 		fProcessGroups.put(name, grp);
 	}
 	
 	public void delProcessGroup(String name) {
-		getDebugTarget().getCDITarget().delProcessGroup(name);
+		getDebugTarget().getCDITarget().delProcessSet(name);
 		fProcessGroups.remove(name);
 	}
 	

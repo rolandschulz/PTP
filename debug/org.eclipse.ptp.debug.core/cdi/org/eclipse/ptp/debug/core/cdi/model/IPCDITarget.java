@@ -5,11 +5,10 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 
 public interface IPCDITarget extends ICDITarget {
-	public IPCDIDebugProcessSet newProcessGroup(String name);
-	public void delProcessGroup(String name);
 	
-	public void setCurrentFocus(IPCDIDebugFocus focus);
-
+	public IPCDIDebugProcessSet newProcessSet(String name, int[] procs);
+	public void delProcessSet(String name);
+	
 	public Process[] getProcesses();
 	public Process getProcess(int num);
 	

@@ -31,7 +31,7 @@ public class PTPDebugger implements IPCDIDebugger {
 
 			DebugSession debug = new DebugSession(job);
 
-			Session session = new Session(debug, job);
+			Session session = new Session(debug);
 			
 			Process debugger = session.getSessionProcess();
 			

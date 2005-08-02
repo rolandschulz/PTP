@@ -248,9 +248,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	}
 
 	public void register(int procNum) {
-		PDebugProcess pProc = new PDebugProcess(this, getCDITarget().setCurrentFocus(procNum));
-		currentFocus = pProc;
-		
 		if (fDebuggeeProcesses != null) {
 			for (int i = 0; i < fDebuggeeProcesses.length; i++) {
 				getLaunch().removeProcess(fDebuggeeProcesses[i]);
