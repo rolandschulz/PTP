@@ -18,15 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.actions;
 
-import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IContributionItem;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
+import org.eclipse.ptp.ui.UIManager;
 import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.views.AbstractParallelView;
+import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
 /**
  * @author clement chu
@@ -35,33 +32,28 @@ import org.eclipse.ptp.ui.views.AbstractParallelView;
 public class DeleteSetAction extends ParallelAction {
 	public static final String name = "Delete Set";
 	
-	public DeleteSetAction(AbstractParallelView debugView) {
-		super(name, debugView);
+	public DeleteSetAction(AbstractParallelElementView view) {
+		super(name, view);
 	    setImageDescriptor(ImageUtil.ID_ICON_DELETESET_NORMAL);
 	    setDisabledImageDescriptor(ImageUtil.ID_ICON_DELETESET_DISABLE);
-	    setId(name);
 	}
 
 	public void run(IElement[] elements) {}
 	public void run() {
-		if (debugView instanceof DebugParallelProcessView) {
-			DebugParallelProcessView view = (DebugParallelProcessView)debugView;
-
-			IElementSet set = view.getCurrentGroup();
-			if (set != null && set.size() > 0) {
-				 if (UIUtils.showQuestionDialog(name + " " + set.getID() + " Confirmation", "Are you sure you want to delete all elements in this set?")) {
-					IMenuManager manager = view.getViewSite().getActionBars().getMenuManager();
-					manager.remove(set.getID());
-					view.getUIDebugManger().removeSet(set.getID());
-									
-					IContributionItem[] items = manager.getItems();
-					if (items.length > 0) {
-						IContributionItem lastItem = items[items.length-1];				
-						if (lastItem != null && lastItem instanceof ActionContributionItem) {
-							((ActionContributionItem)lastItem).getAction().run();
-						}
-					}
-				 }
+		IElementSet set = view.getCurrentSet();
+		if (set != null && set.size() > 0) {
+			if (UIUtils.showQuestionDialog(name + " " + set.getID() + " Confirmation", "Are you sure you want to delete all elements in this set?")) {
+				UIManager uiManager = view.getUIManger();
+				uiManager.removeSet(set.getID());
+						
+				IElementSet[] sets = uiManager.getSetManager().getSortedSets();
+				if (sets.length > 0) {
+					IElementSet lastSet = sets[sets.length-1];
+					view.selectSet(lastSet.getID());
+					view.getCurrentSet().setAllSelect(false);
+					view.update();
+					view.redraw();
+				}
 			}
 		}		
 	}

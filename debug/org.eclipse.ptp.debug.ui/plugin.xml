@@ -19,11 +19,11 @@
 			id="org.eclipse.ptp.debug.ui.views">
 		</category>
 		<view
-			name="%DebugParallelProcessView.name"
+			name="%DebugParallelView.name"
 			icon="icons/ptp.gif"
 			category="org.eclipse.ptp.debug.ui.views"
-			class="org.eclipse.ptp.debug.ui.views.DebugParallelProcessView"
-			id="org.eclipse.ptp.debug.ui.views.debugParallelProcessView">
+			class="org.eclipse.ptp.debug.ui.views.DebugParallelView"
+			id="org.eclipse.ptp.debug.ui.views.debugParallelView">
 		</view>
 	</extension>
 	<!--

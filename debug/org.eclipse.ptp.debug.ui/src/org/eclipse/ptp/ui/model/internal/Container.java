@@ -31,9 +31,11 @@ import org.eclipse.ptp.ui.model.IElement;
 public abstract class Container extends Element implements IContainer {
 	protected Map elementMap = new HashMap();
 	protected IElement[] sortedArray = new IElement[0];
+	protected int store_element_type = ELEMENT_TYPE; 
 	
-	public Container(String id, boolean selected) {
+	public Container(String id, boolean selected, int cur_type) {
 		super(id, selected);
+		this.store_element_type = cur_type;
 	}
 	
 	public boolean contains(String id) {
@@ -56,7 +58,7 @@ public abstract class Container extends Element implements IContainer {
 	
 	public IElement[] getSorted() {
 		if (sortedArray.length != size())
-			refresh();
+			refresh(store_element_type);
 		
 		return sortedArray;		
 	}	
@@ -77,13 +79,13 @@ public abstract class Container extends Element implements IContainer {
 	public int size() {
 		return elementMap.size();
 	}
-	public void refresh() {
+	public void refresh(int type) {
 		IElement[] sortingElements = get();
-		sort(sortingElements);
+		sort(sortingElements, type);
 		sortedArray = sortingElements;
 	}
 	
-	private void quickSort(IElement element[], int low, int high) {
+	private void quickSortNum(IElement element[], int low, int high) {
 		int lo = low;
 		int hi = high;
 		int mid;
@@ -101,20 +103,47 @@ public abstract class Container extends Element implements IContainer {
 				}
 			}
 			if (low < hi)
-				quickSort(element, low, hi);
+				quickSortNum(element, low, hi);
 			if (lo < high)
-				quickSort(element, lo, high);
+				quickSortNum(element, lo, high);
 		}
 	}
 
-	private void swap(IElement element[], int i, int j) {
+	private void quickSortText(IElement[] element, int low, int high) {
+		int lo = low;
+		int hi = high;
+		String mid = "";
+		if (high > low) {
+			mid = element[(low + high) / 2].getID();
+			while (lo <= hi) {
+				while ((lo < high) && (element[lo].getID().compareTo(mid)) < 0)
+					++lo;
+				while ((hi > low) && (element[hi].getID().compareTo(mid)) > 0)
+					--hi;
+				if (lo <= hi) {
+					swap(element, lo, hi);
+					++lo;
+					--hi;
+				}
+			}
+			if (low < hi)
+				quickSortText(element, low, hi);
+			if (lo < high)
+				quickSortText(element, lo, high);
+		}
+	}	
+	private void swap(IElement[] element, int i, int j) {
 		IElement tempElement;
 		tempElement = element[i];
 		element[i] = element[j];
 		element[j] = tempElement;
 	}
 
-	protected void sort(IElement element[]) {
-		quickSort(element, 0, element.length - 1);
+	protected void sort(IElement[] element, int type) {
+		//set sort will ignore the root
+		if (type == SET_TYPE)
+			quickSortText(element, 0, element.length - 1);
+		else
+			quickSortNum(element, 0, element.length - 1);
 	}
 }

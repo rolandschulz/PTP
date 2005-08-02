@@ -21,21 +21,24 @@ package org.eclipse.ptp.debug.ui.actions;
 import org.eclipse.ptp.debug.ui.ImageUtil;
 import org.eclipse.ptp.debug.ui.views.DebugParallelView;
 import org.eclipse.ptp.ui.model.IElement;
-
 /**
  * @author clement chu
  *
  */
-public class TerminateAction extends DebugAction {
-	public static final String name = "Terminate";
-
-	public TerminateAction(DebugParallelView view) {
-		super(name, view);
-	    setImageDescriptor(ImageUtil.ID_ICON_TERMINATE_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_TERMINATE_DISABLE);
-	}
+public class UnregisterAction extends DebugAction {
+	public static final String name = "Unregister Selected Elements";
 	
-	public void run(IElement[] elements) {
-		// TODO Auto-generated method stub
+	public UnregisterAction(DebugParallelView view) {
+		super(name, view);
+	    setImageDescriptor(ImageUtil.ID_ICON_UNREGISTER_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_UNREGISTER_DISABLE);
+	    setEnabled(true);
 	}
+
+	public void run(IElement[] elements) {
+		if (validation(elements)) {
+			view.unregisterSelectedElements();
+			view.redraw();
+		}
+	}	
 }

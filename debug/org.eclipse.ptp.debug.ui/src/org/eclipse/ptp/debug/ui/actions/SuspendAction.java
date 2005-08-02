@@ -19,19 +19,18 @@
 package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.ui.actions.ParallelAction;
+import org.eclipse.ptp.debug.ui.views.DebugParallelView;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.views.AbstractParallelView;
 
 /**
  * @author clement chu
  *
  */
-public class SuspendAction extends ParallelAction {
+public class SuspendAction extends DebugAction {
 	public static final String name = "Suspend";
 
-	public SuspendAction(AbstractParallelView debugView) {
-		super(name, debugView);
+	public SuspendAction(DebugParallelView view) {
+		super(name, view);
 	    setImageDescriptor(ImageUtil.ID_ICON_SUSPEND_NORMAL);
 	    setDisabledImageDescriptor(ImageUtil.ID_ICON_SUSPEND_DISABLE);
 	}

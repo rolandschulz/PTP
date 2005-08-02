@@ -16,26 +16,34 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.actions;
+package org.eclipse.ptp.ui.actions;
 
+import org.eclipse.jface.action.IAction;
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.views.DebugParallelView;
 import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
 /**
- * @author clement chu
+ * @author Clement chu
  *
  */
-public class TerminateAction extends DebugAction {
-	public static final String name = "Terminate";
-
-	public TerminateAction(DebugParallelView view) {
-		super(name, view);
-	    setImageDescriptor(ImageUtil.ID_ICON_TERMINATE_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_TERMINATE_DISABLE);
+public class InternalSetAction extends ParallelAction {
+	private String set_id = "";
+	private SetAction action = null;
+	
+	public InternalSetAction(String set_id, AbstractParallelElementView view, SetAction action) {
+		this(set_id, view, IAction.AS_PUSH_BUTTON, action);
+	}
+	
+	public InternalSetAction(String set_id, AbstractParallelElementView view, int style, SetAction action) {
+		super("To Set: " + set_id, style, view);
+		this.set_id = set_id;
+		this.action = action;
+	    setImageDescriptor(ImageUtil.ID_ICON_CREATESET_NORMAL);
+	    setDisabledImageDescriptor(ImageUtil.ID_ICON_CREATESET_DISABLE);
 	}
 	
 	public void run(IElement[] elements) {
-		// TODO Auto-generated method stub
+		action.run(elements, set_id);
 	}
 }

@@ -18,19 +18,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
-import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.ptp.ui.actions.ChangeSetAction;
 import org.eclipse.ptp.ui.actions.CreateSetAction;
 import org.eclipse.ptp.ui.actions.DeleteProcessAction;
 import org.eclipse.ptp.ui.actions.DeleteSetAction;
 import org.eclipse.ptp.ui.actions.ParallelAction;
-import org.eclipse.ptp.ui.actions.SetAction;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.ISetManager;
 import org.eclipse.swt.SWT;
@@ -47,25 +44,22 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	protected ParallelAction createSetAction = null;
 	protected ParallelAction deleteSetAction = null;
 	protected ParallelAction deleteProcessAction = null;
+	protected ParallelAction changeSetAction = null;
 	
 	protected int DEFAULT_DEL_KEY = '\u007f';
 	protected int DEFAULT_BACK_KEY = '\u0008';
-	
-	//Set element to display 
-	protected abstract void initialElement();
-	
+		
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		createBuildInToolBarActions();
 		createBuildInMenuActions();
-		initialView();
 		createContextMenu();
+		initialView();
 	}	
 	
-	protected void initialView() {
-		if (setManager.size() == 1)
-			initialElement();
-
+	/*
+	 * old design
+	protected void createSetMenu() {
 		IMenuManager manager = getViewSite().getActionBars().getMenuManager();
 		IElementSet[] sets = setManager.getSortedSets();
 		for (int i = 1; i < sets.length; i++) {
@@ -73,9 +67,9 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 			sets[i].setSelected(false);
 			manager.add(action);
 		}
-		selectSet(setManager.getSetRoot().getID());
 		updateMenu(manager);
-	}	
+	}
+	*/
 	
 	protected void createBuildInToolBarActions() {		
 		IToolBarManager toolBarMgr = getViewSite().getActionBars().getToolBarManager();
@@ -86,10 +80,13 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		createSetAction = new CreateSetAction(this);
 		deleteSetAction = new DeleteSetAction(this);
 		deleteProcessAction = new DeleteProcessAction(this);
+		changeSetAction = new ChangeSetAction(this);
 
 		toolBarMgr.add(createSetAction);
 		toolBarMgr.add(deleteSetAction);
 		toolBarMgr.add(deleteProcessAction);
+		toolBarMgr.add(new Separator());
+		toolBarMgr.add(changeSetAction);
 	}
 	/**
 	 * @return true - need seperator, false - no seperator
@@ -100,11 +97,6 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		if (createMenuActions(menuMgr))
 			menuMgr.add(new Separator());
-		
-		//default Root menu
-		IAction action = new SetAction(ISetManager.SET_ROOT_ID, this);
-		action.setText(SetAction.SET_ROOT);
-		menuMgr.add(action);
 	}
 	protected abstract boolean createMenuActions(IMenuManager menuMgr);
 
@@ -128,43 +120,25 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		if (fillContextMenu(manager))
 			manager.add(new Separator());
 		
-		IElementSet[] sets = setManager.getSortedSets();
-		for (int i = 0; i < sets.length; i++) {
-			IAction action = new SetAction(sets[i].getID(), this);
-			if (i == 0)
-				action.setText(SetAction.SET_ROOT);
-
-			action.setChecked(sets[i].getID().equals(cur_set_id));
-			manager.add(action);
-		}
-
+		manager.add(new ChangeSetAction(this));
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}	
 	protected abstract boolean fillContextMenu(IMenuManager manager);
 	
-	 //Before this please make sure the group is set
-	public void updateMenu(IMenuManager manager) {
-		IElementSet[] groups = setManager.getSets();
-		for (int i = 0; i < groups.length; i++) {
-			IContributionItem item = manager.find(groups[i].getID());
-			if (item != null && item instanceof ActionContributionItem) {
-				IAction action = ((ActionContributionItem) item).getAction();
-				action.setChecked(groups[i].isSelected());
-				if (action.isChecked()) {
-					changeTitle(action.getText(), groups[i].size());
-				}
-			}
-		}
-		boolean deleteActionEnable = groups.length > 1 && !cur_set_id.equals(ISetManager.SET_ROOT_ID);
+	public void update() {
+		updateAction();
+		updateTitle();		
+	}
+	
+	protected void updateAction() {
+		IElementSet[] sets = setManager.getSets();
+		boolean deleteActionEnable = sets.length > 1 && !cur_set_id.equals(ISetManager.SET_ROOT_ID);
 		deleteSetAction.setEnabled(deleteActionEnable);
 		deleteProcessAction.setEnabled(deleteActionEnable);
 		createSetAction.setEnabled(cur_set_size > 0);
-		setActionEnable();
 	}
-	//set which action need to be enable or disenale
-	protected abstract void setActionEnable();	
-
+	
 	protected void keyDownEvent(int mx, int my, int keyCode) {
 		if (keyCode == DEFAULT_DEL_KEY || keyCode == DEFAULT_BACK_KEY) // delete key
 			removeProcess();

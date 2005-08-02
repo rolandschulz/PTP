@@ -35,7 +35,7 @@ public class SetManager extends Container implements ISetManager {
 	private List boundedElements = new ArrayList();
 		
 	public SetManager() {
-		super(SET_ROOT_ID, false);
+		super(SET_ROOT_ID, false, IContainer.SET_TYPE);
 		//create root 
 		add(new ElementSet(SET_ROOT_ID));
 	}

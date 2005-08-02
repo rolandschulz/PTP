@@ -19,30 +19,25 @@
 package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.views.DebugParallelProcessView;
+import org.eclipse.ptp.debug.ui.views.DebugParallelView;
 import org.eclipse.ptp.ui.UIUtils;
-import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.views.AbstractParallelView;
 /**
  * @author clement chu
  *
  */
-public class RegisterAction extends ParallelAction {
+public class RegisterAction extends DebugAction {
 	public static final String name = "Register Selected Elements";
 	private int NUM_PROCESS_WARNING = 10;
 	
-	public RegisterAction(AbstractParallelView debugView) {
-		super(name, debugView);
+	public RegisterAction(DebugParallelView view) {
+		super(name, view);
 	    setImageDescriptor(ImageUtil.ID_ICON_REGISTER_NORMAL);
 	    setDisabledImageDescriptor(ImageUtil.ID_ICON_REGISTER_DISABLE);
-	    setId(name);
 	    setEnabled(true);
 	}
 
 	public void run(IElement[] elements) {
-		AbstractParallelView pview = new DebugParallelProcessView();
-		/*
 		if (validation(elements)) {
 			if (elements.length > NUM_PROCESS_WARNING) {
 				if (!UIUtils.showQuestionDialog("Register Confirmation", "Are you sure you want to register (" + elements.length + ") processes?")) {
@@ -50,11 +45,9 @@ public class RegisterAction extends ParallelAction {
 				}
 			}
 			
-			if (debugView instanceof DebugParallelProcessView) {
-				DebugParallelProcessView view = (DebugParallelProcessView)debugView;
-				view.registerSelectedElements();
-				view.redraw();
-			}
-		}*/
+			DebugParallelView debugView = (DebugParallelView)view;
+			debugView.registerSelectedElements();
+			debugView.redraw();
+		}
 	}	
 }
