@@ -229,20 +229,6 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.IStackFrame#getRegisterGroups()
-	 */
-	public IRegisterGroup[] getRegisterGroups() throws DebugException {
-		return ((PDebugTarget)getDebugTarget()).getRegisterGroups( this );
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.IStackFrame#hasRegisterGroups()
-	 */
-	public boolean hasRegisterGroups() throws DebugException {
-		return ((PDebugTarget)getDebugTarget()).getRegisterGroups( this ).length > 0;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener#handleDebugEvents(org.eclipse.cdt.debug.core.cdi.event.ICDIEvent[])
 	 */
 	public void handleDebugEvents( ICDIEvent[] events ) {
@@ -906,5 +892,17 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 
 	private ICDIThread getCDIThread() {
 		return ((CThread)getThread()).getCDIThread();
+	}
+
+	public IRegisterGroup[] getRegisterGroups() throws DebugException {
+		// Auto-generated method stub
+		System.out.println("CStackFrame.getRegisterGroups");
+		return null;
+	}
+
+	public boolean hasRegisterGroups() throws DebugException {
+		// Auto-generated method stub
+		System.out.println("CStackFrame.hasRegisterGroups");
+		return false;
 	}
 }
