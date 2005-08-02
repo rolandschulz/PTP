@@ -17,51 +17,58 @@ public class DebugSimulator extends AbstractDebugger {
 	boolean finished = false;
 	Thread dThread = null;
 	
-	ArrayList pCommands = null;
-	Thread processesThread = null;
-	
 	private Process debuggerProcess = null;
-	Thread debuggerThread = null;
+	
 	SimQueue debuggerCommands = null;
+	SimQueue[] procCommands = null;
+	
+	private void initializeSimulatedProcessesCode(SimQueue dQ, SimQueue[] procs) {
+		ArrayList cmd, cmd2;
+		
+		cmd = new ArrayList();
+		cmd.add(0, "0");
+		cmd.add(1, "print");
+		cmd.add(2, "DebuggerOutput");
+		
+		for (int i = 0; i < 10; i++) {
+			dQ.addItem(cmd);
+		}
+		
+		cmd = new ArrayList();
+		cmd.add(0, "0");
+		cmd.add(1, "print");
+		cmd.add(2, "ProcessOutput");
+		
+		cmd2 = new ArrayList();
+		cmd2.add(0, "0");
+		cmd2.add(1, "break");
+		cmd2.add(2, "5");
+
+		for (int j = 0; j < procs.length; j++) {
+			procs[j].addItem(cmd2);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+		}
+	}
 	
 	protected void startDebugger(IPJob job) {
+		int numSlaves = job.getProcesses().length;
 		state = SUSPENDED;
 		
 		debuggerCommands = new SimQueue();
-		debuggerProcess = new SimProcess("Debugger", 1, debuggerCommands);
-		debuggerThread = new Thread() {
-			public void run() {
-				while (!finished) {
-					try {
-						ArrayList command = new ArrayList();
-						command.add(0, "print");
-						command.add(1, "1");
-						command.add(2, "DebuggerOutput");
-						debuggerCommands.addItem(command);
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-					}
-				}
-			}
-		};
-
-		processesThread = new Thread() {
-			public void run() {
-				while (!finished) {
-					try {
-						ArrayList command = new ArrayList();
-						command.add(0, "print");
-						command.add(1, "1");
-						command.add(2, "ProcessOutput");
-						for (int i = 0; i < pCommands.size(); i++) {
-							((SimQueue) pCommands.get(i)).addItem(command);
-						}
-						Thread.sleep(3000);
-					} catch (InterruptedException e) {
-					}
-				}
-			}
-		};
+		procCommands = new SimQueue[numSlaves];
+		for (int i = 0; i < numSlaves; i++) {
+			procCommands[i] = new SimQueue();
+		}
+		
+		initializeSimulatedProcessesCode(debuggerCommands, procCommands);
+		
+		debuggerProcess = new SimProcess("Debugger", 1, debuggerCommands, this, debugSession);
 		
 		dThread = new Thread() {
 			public void run() {
@@ -71,7 +78,7 @@ public class DebugSimulator extends AbstractDebugger {
 							state = SUSPENDED;
 							fireEvent(new EBreakpointHit(debugSession));
 						}
-						Thread.sleep(5000);
+						Thread.sleep(3000);
 					} catch (InterruptedException e) {
 					}
 				}
@@ -82,19 +89,13 @@ public class DebugSimulator extends AbstractDebugger {
 		
 		MProcess.resetGlobalCounter();
 		IPProcess[] procs = job.getProcesses();
-		pCommands = new ArrayList();
 		for (int i = 0; i < procs.length; i++) {
 			MProcess proc = new MProcess();
-			SimQueue q = new SimQueue();
-			Process p = new SimProcess("proc" + i, 1, q);
+			Process p = new SimProcess("proc" + i, 1, procCommands[i], this, debugSession);
 			proc.setDebugInfo(p); /* We store the process in the "debug info" */
 			proc.setPProcess(procs[i]);
-			pCommands.add(i, q);
 			allSet.addProcess(proc);
 		}
-		
-		debuggerThread.start();
-		processesThread.start();
 
 	}
 	
