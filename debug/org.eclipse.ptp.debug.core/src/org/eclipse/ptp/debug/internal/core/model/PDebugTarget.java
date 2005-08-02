@@ -217,6 +217,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	 * The address factory of this target.
 	 */
 	private IAddressFactory fAddressFactory;
+	
+	private int currentProcNum;
 
 	/**
 	 * Constructor for CDebugTarget.
@@ -259,11 +261,19 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		iprocesses[0] = DebugPlugin.newProcess(getLaunch(), process, "Launch Label - " + procNum);
 
 		setProcess( iprocesses );
+		currentProcNum = procNum;
 		refreshThreads();
 	}
 	
 	protected void initialize() {
-		register(0);
+		currentProcNum = 0;
+		
+		Process process = getCDITarget().getProcess(currentProcNum);
+		IProcess[] iprocesses = new IProcess[1];
+		iprocesses[0] = DebugPlugin.newProcess(getLaunch(), process, "Launch Label - " + currentProcNum);
+
+		setProcess( iprocesses );
+		
 		initializeSourceLookupPath();
 		ArrayList debugEvents = new ArrayList( 1 );
 		debugEvents.add( createCreateEvent() );
@@ -587,7 +597,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		ICDIThread[] cdiThreads = new ICDIThread[0];
 		ICDIThread currentCDIThread = null;
  		try {
- 			int procNum = 0;
+ 			int procNum = currentProcNum;
  			//if (currentFocus instanceof PDebugProcess) {
  			//	procNum = ((PDebugProcess) currentFocus).getProcessNumber();
  			//}
