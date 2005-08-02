@@ -26,15 +26,10 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.cdt.debug.core.sourcelookup.ICSourceLocation;
-import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.ListenerList;
 import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
 import org.eclipse.ptp.debug.internal.core.SessionManager;
 import org.eclipse.ptp.debug.internal.core.breakpoints.CBreakpoint;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupDirector;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.CommonSourceLookupDirector;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.SourceUtils;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -64,11 +59,6 @@ public class PTPDebugCorePlugin extends Plugin {
 	 */
 	private ListenerList fBreakpointListeners;
 	
-	/**
-	 * Dummy source lookup director needed to manage common source containers.
-	 */
-	private CommonSourceLookupDirector fCommonSourceLookupDirector;
-
 	private SessionManager fSessionManager = null;
 
 	/**
@@ -204,14 +194,6 @@ public class PTPDebugCorePlugin extends Plugin {
 		fSessionManager = sm;
 	}
 
-	public void saveCommonSourceLocations( ICSourceLocation[] locations ) {
-		PTPDebugCorePlugin.getDefault().getPluginPreferences().setValue( IPDebugConstants.PREF_SOURCE_LOCATIONS, SourceUtils.getCommonSourceLocationsMemento( locations ) );
-	}
-
-	public ICSourceLocation[] getCommonSourceLocations() {
-		return SourceUtils.getCommonSourceLocationsFromMemento( PTPDebugCorePlugin.getDefault().getPluginPreferences().getString( IPDebugConstants.PREF_SOURCE_LOCATIONS ) );
-	}
-
 	/**
 	 * Adds the given breakpoint listener to the debug model.
 	 * 
@@ -253,7 +235,6 @@ public class PTPDebugCorePlugin extends Plugin {
 	 */
 	public void start( BundleContext context ) throws Exception {
 		super.start( context );
-		initializeCommonSourceLookupDirector();
 		createBreakpointListenersList();
 		resetBreakpointsInstallCount();
 		setSessionManager( new SessionManager() );
@@ -266,39 +247,7 @@ public class PTPDebugCorePlugin extends Plugin {
 		setSessionManager( null );
 		disposeBreakpointListenersList();
 		resetBreakpointsInstallCount();
-		disposeCommonSourceLookupDirector();
 		super.stop( context );
 	}
 
-	private void initializeCommonSourceLookupDirector() {
-		if ( fCommonSourceLookupDirector == null ) {
-			fCommonSourceLookupDirector = new CommonSourceLookupDirector();
-			String newMemento = PTPDebugCorePlugin.getDefault().getPluginPreferences().getString( IPDebugInternalConstants.PREF_COMMON_SOURCE_CONTAINERS );
-			if ( newMemento.length() == 0 ) {
-				// Convert source locations to source containers
-				convertSourceLocations( fCommonSourceLookupDirector );
-			}
-			else {
-				try {
-					fCommonSourceLookupDirector.initializeFromMemento( newMemento );
-				}
-				catch( CoreException e ) {
-					log( e.getStatus() );
-				}
-			}
-		}
-	}
-
-	private void disposeCommonSourceLookupDirector() {
-		if ( fCommonSourceLookupDirector != null )
-			fCommonSourceLookupDirector.dispose();
-	}
-
-	public CSourceLookupDirector getCommonSourceLookupDirector() {
-		return fCommonSourceLookupDirector;
-	}
-
-	private void convertSourceLocations( CommonSourceLookupDirector director ) {
-		director.setSourceContainers( SourceUtils.convertSourceLocations( getCommonSourceLocations() ) );
-	}
 }
