@@ -114,7 +114,6 @@ import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
 import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
-import org.eclipse.ptp.debug.internal.core.PRegisterManager;
 import org.eclipse.ptp.debug.internal.core.PSetManager;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupParticipant;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceManager;
@@ -172,11 +171,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	private PSetManager fGroupManager;
 
 	/**
-	 * The register manager for this target.
-	 */
-	private PRegisterManager fRegisterManager;
-
-	/**
 	 * A breakpoint manager for this target.
 	 */
 	private PBreakpointManager fBreakpointManager;
@@ -232,7 +226,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		createDisassembly();
 		setModuleManager( new CModuleManager( this ) );
 		setGroupManager( new PSetManager( this ) );
-		setRegisterManager( new PRegisterManager( this ) );
 		setBreakpointManager( new PBreakpointManager( this ) );
 		setGlobalVariableManager( new PGlobalVariableManager( this ) );
 		initialize();
@@ -271,7 +264,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		debugEvents.add( createCreateEvent() );
 		initializeThreads( debugEvents );
 		initializeBreakpoints();
-		initializeRegisters();
 		initializeSourceManager();
 		initializeModuleManager();
 		getLaunch().addDebugTarget( this );
@@ -332,10 +324,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 				breakpointAdded0( bps[i] );
 			}
 		}
-	}
-
-	protected void initializeRegisters() {
-		getRegisterManager().initialize();
 	}
 
 	protected void initializeSourceManager() {
@@ -836,8 +824,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			return getBreakpointManager();
 		if ( adapter.equals( PSetManager.class ) )
 			return getGroupManager();
-		if ( adapter.equals( PRegisterManager.class ) )
-			return getRegisterManager();
 		if ( adapter.equals( ICGlobalVariableManager.class ) )
 			return getGlobalVariableManager();
 		if ( adapter.equals( ICDISession.class ) )
@@ -1000,8 +986,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		disposeGlobalVariableManager();
 		disposeModuleManager();
 		disposeGroupManager();
-		saveRegisterGroups();
-		disposeRegisterManager();
 		disposeDisassembly();
 		disposeSourceManager();
 		disposeSourceLookupPath();
@@ -1056,8 +1040,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		setState( CDebugElementState.SUSPENDED );
 		ICDISessionObject reason = event.getReason();
 		setCurrentStateInfo( reason );
-		// Reset the registers that have errors.
-		getRegisterManager().targetSuspended();
 		getBreakpointManager().skipBreakpoints( false );
 		List newThreads = refreshThreads();
 		if ( event.getSource() instanceof IPCDITarget ) {
@@ -1405,14 +1387,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		fGroupManager.dispose();
 	}
 
-	protected void saveRegisterGroups() {
-		fRegisterManager.save();
-	}
-
-	protected void disposeRegisterManager() {
-		fRegisterManager.dispose();
-	}
-
 	protected void saveGlobalVariables() {
 		fGlobalVariableManager.save();
 	}
@@ -1443,18 +1417,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			restoreOldState();
 			targetRequestFailed( e.getMessage(), e );
 		}
-	}
-
-	public PRegisterManager getRegisterManager() {
-		return fRegisterManager;
-	}
-
-	protected void setRegisterManager( PRegisterManager registerManager ) {
-		fRegisterManager = registerManager;
-	}
-
-	public IRegisterGroup[] getRegisterGroups( CStackFrame frame ) throws DebugException {
-		return getRegisterManager().getRegisterGroups( frame );
 	}
 
 	protected void disposeSourceManager() {
@@ -1733,41 +1695,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.ICDebugTarget#getRegisterDescriptors()
-	 */
-	public IRegisterDescriptor[] getRegisterDescriptors() throws DebugException {
-		return getRegisterManager().getAllRegisterDescriptors();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.ICDebugTarget#addUserDefinedRegisterGroup(java.lang.String, org.eclipse.cdt.debug.core.model.IRegisterDescriptor[])
-	 */
-	public void addRegisterGroup( String name, IRegisterDescriptor[] descriptors ) {
-		getRegisterManager().addRegisterGroup( name, descriptors );
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.ICDebugTarget#removeRegisterGroups(org.eclipse.debug.core.model.IRegisterGroup[])
-	 */
-	public void removeRegisterGroups( IRegisterGroup[] groups ) {
-		getRegisterManager().removeRegisterGroups( groups );
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.ICDebugTarget#modifyRegisterGroup(org.eclipse.cdt.debug.core.model.IPersistableRegisterGroup, org.eclipse.cdt.debug.core.model.IRegisterDescriptor[])
-	 */
-	public void modifyRegisterGroup( IPersistableRegisterGroup group, IRegisterDescriptor[] descriptors ) {
-		getRegisterManager().modifyRegisterGroup( group, descriptors );
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.ICDebugTarget#restoreDefaultRegisterGroups()
-	 */
-	public void restoreDefaultRegisterGroups() {
-		getRegisterManager().restoreDefaults();
-	}
-
 	protected void skipBreakpoints( boolean enabled ) {
 		getBreakpointManager().skipBreakpoints( enabled );
 	}
@@ -1788,5 +1715,35 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		// Auto-generated method stub
 		System.out.println("PDebugTarget.getProcessThreads()");
 		return null;
+	}
+
+	public IRegisterDescriptor[] getRegisterDescriptors() throws DebugException {
+		// Auto-generated method stub
+		System.out.println("PDebugTarget.getRegisterDescriptors");
+		return null;
+	}
+
+	public void addRegisterGroup(String name, IRegisterDescriptor[] descriptors) {
+		// Auto-generated method stub
+		System.out.println("PDebugTarget.addRegisterGroup");
+		
+	}
+
+	public void removeRegisterGroups(IRegisterGroup[] groups) {
+		// Auto-generated method stub
+		System.out.println("PDebugTarget.removeRegisterGroups");
+		
+	}
+
+	public void modifyRegisterGroup(IPersistableRegisterGroup group, IRegisterDescriptor[] descriptors) {
+		// Auto-generated method stub
+		System.out.println("PDebugTarget.modifyRegisterGroup");
+		
+	}
+
+	public void restoreDefaultRegisterGroups() {
+		// Auto-generated method stub
+		System.out.println("PDebugTarget.restoreDefaultRegisterGroups");
+		
 	}
 }
