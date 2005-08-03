@@ -20,13 +20,10 @@ import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
 public class Session implements ICDISession, ICDISessionObject {
-	
-	public final static Target[] EMPTY_TARGETS = {};
 	ProcessManager processManager;
 	EventManager eventManager;
 	BreakpointManager breakpointManager;
 	VariableManager variableManager;
-	RegisterManager registerManager;
 	
 	Properties props;
 	SessionConfiguration configuration;
@@ -38,6 +35,7 @@ public class Session implements ICDISession, ICDISessionObject {
 	public Session(DebugSession dSess, ILaunch launch, IBinaryObject binObj) {
 		props = new Properties();
 		configuration = new SessionConfiguration(this);
+		
 		dSession = dSess;
 		dLaunch = launch;
 		dBinObject = binObj;
@@ -46,11 +44,9 @@ public class Session implements ICDISession, ICDISessionObject {
 		eventManager = new EventManager(this);
 		breakpointManager = new BreakpointManager(this);
 		variableManager = new VariableManager(this);
-		registerManager = new RegisterManager(this);
 		
 		/* Initially we only create process/target 0 */
-		
-		addTargets(new int[] { 0, 1, 2 });
+		addTargets(new int[] { 0, 1 });
 	}
 
 	public void addTargets(int[] procNums) {
@@ -113,11 +109,6 @@ public class Session implements ICDISession, ICDISessionObject {
 	public VariableManager getVariableManager() {
 		System.out.println("Session.getVariableManager()");
 		return variableManager;
-	}
-
-	public RegisterManager getRegisterManager() {
-		System.out.println("Session.getRegisterManager()");
-		return registerManager;
 	}
 
 	public ICDIEventManager getEventManager() {

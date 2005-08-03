@@ -11,7 +11,6 @@
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import java.math.BigInteger;
-import java.util.HashMap;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
@@ -38,14 +37,10 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugFocus;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
-import org.eclipse.ptp.debug.external.cdi.RegisterManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
 import org.eclipse.ptp.debug.external.model.MProcessSet;
@@ -128,8 +123,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public ICDIRegisterGroup[] getRegisterGroups() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.getRegisterGroups()");
-		RegisterManager regMgr = ((Session)getSession()).getRegisterManager();
-		return regMgr.getRegisterGroups(this);
+		return null;
 	}
 
 	public boolean isTerminated() {
