@@ -24,6 +24,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.ui.MachineManager;
+
 /**
  * @author clement chu
  *
@@ -49,21 +52,21 @@ public class DebugManager {
 	
 	public void startSimulation() {
 		createProcess();
-		fireListener(IDebugParallelModelListener.STATUS_RUNNING);
+		fireListener(IPProcess.STARTING);
 		Runnable sim = new Runnable() {
 			private int counter = 0;
 			public void run() {
 				while (counter <= DebugManager.total) {
 					try {
-						Thread.sleep(getRandom(100) + 1);
+						Thread.sleep(getRandom(1000) + 1);
 					} catch (Exception e) {
 						System.out.println("Sleep err: " + e.getMessage());
 					}
 					int randomPnum = getRandom(processMap.size());
-					IPProcess p = getProcess(String.valueOf(randomPnum));
-					if (p != null && !p.getStatus().equals(IDebugParallelModelListener.STATUS_EXITED)) {
+					PProcess p = getProcess(String.valueOf(randomPnum));
+					if (p != null && !p.getStatus().equals(IPProcess.EXITED)) {
 						String status = getRandomStatus();
-						if (status.equals(IDebugParallelModelListener.STATUS_EXITED))
+						if (status.equals(IPProcess.EXITED))
 							counter++;
 						p.setStatus(status);
 						fireListener(status);
@@ -77,15 +80,15 @@ public class DebugManager {
 	public void fireListener(String status) {
 		for (Iterator i=listeners.iterator(); i.hasNext();) {
 			IDebugParallelModelListener listener = (IDebugParallelModelListener)i.next();
-			if (status.equals(IDebugParallelModelListener.STATUS_RUNNING))
+			if (status.equals(IPProcess.RUNNING))
 				listener.run();
-			else if (status.equals(IDebugParallelModelListener.STATUS_STARTING))
+			else if (status.equals(IPProcess.STARTING))
 				listener.start();
-			if (status.equals(IDebugParallelModelListener.STATUS_STOPPED))
+			if (status.equals(IPProcess.STOPPED))
 				listener.stop();
-			else if (status.equals(IDebugParallelModelListener.STATUS_SUSPENDED))
+			else if (status.equals(IPProcess.EXITED_SIGNALLED))
 				listener.suspend();
-			else if (status.equals(IDebugParallelModelListener.STATUS_EXITED))
+			else if (status.equals(IPProcess.EXITED))
 				listener.exit();
 			else 
 				listener.error();
@@ -102,13 +105,13 @@ public class DebugManager {
 	public void createProcess() {
 		for (int i=0; i<total; i++) {
 			PProcess p = new PProcess(String.valueOf(i));
-			p.setStatus(IDebugParallelModelListener.STATUS_STARTING);
+			p.setStatus(IPProcess.STARTING);
 			processMap.put(p.getID(), p);
 		}
 	}
 	
-	public IPProcess getProcess(String id) {
-		return (IPProcess)processMap.get(id);
+	public PProcess getProcess(String id) {
+		return (PProcess)processMap.get(id);
 	}
 	
 	public PProcess[] getProcesses() {
@@ -123,16 +126,18 @@ public class DebugManager {
 		int random = getRandom(5);
 		//NOTE: NO STARTING
 		switch(random) {
-			//case 1:
-			//	return IDebugParallelModelListener.STATUS_RUNNING;
-			case 3:
-				return IDebugParallelModelListener.STATUS_STOPPED;
-			case 4:
-				return IDebugParallelModelListener.STATUS_EXITED;
-			case 5:
-				return IDebugParallelModelListener.STATUS_SUSPENDED;
+			case MachineManager.PROC_EXITED:
+				return IPProcess.EXITED;
+			case MachineManager.PROC_EXITED_SIGNAL:
+				return IPProcess.EXITED_SIGNALLED;
+			case MachineManager.PROC_RUNNING:
+				return IPProcess.RUNNING;
+			case MachineManager.PROC_STOPPED:
+				return IPProcess.STOPPED;
+			//case MachineManager.PROC_STARTING:
+			//	return IPProcess.STARTING;
 			default:
-				return IDebugParallelModelListener.STATUS_ERROR;
+				return IPProcess.ERROR;
 		}
 	}
 	

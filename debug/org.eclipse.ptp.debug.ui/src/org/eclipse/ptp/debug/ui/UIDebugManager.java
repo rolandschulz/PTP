@@ -34,9 +34,8 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.debug.core.DebugManager;
 import org.eclipse.ptp.debug.core.PProcess;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
+import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.MachineManager;
-import org.eclipse.ptp.ui.PTPUIPlugin;
-import org.eclipse.ptp.ui.UIManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.ISetManager;
@@ -47,12 +46,11 @@ import org.eclipse.ptp.ui.model.internal.SetManager;
  * @author clement chu
  *
  */
-public class UIDebugManager {
-	public final static int PROC_SUSPEND = 16;
-	public final static int PROC_HIT = 17;
+public class UIDebugManager implements IManager {
+	public final static int PROC_SUSPEND = 6;
+	public final static int PROC_HIT = 7;
 
 	protected IModelManager modelManager = null;
-	protected UIManager uiManager = null;
 	private Map jobList = new HashMap();
 	
 	//FIXME dummy only
@@ -60,15 +58,18 @@ public class UIDebugManager {
 		
 	public UIDebugManager() {
 		modelManager = PTPCorePlugin.getDefault().getModelManager();
-		uiManager = PTPUIPlugin.getDefault().getUIManager();
 	}
 
-	public ISetManager getSetManager(String job_name) {
-		return (ISetManager)jobList.get(job_name);
+	public ISetManager getSetManager(String id) {
+		return (ISetManager)jobList.get(id);
 	}
 	
-	public String getNodeStatusText(String id) {
-		switch(getProcessStatus(id)) {
+	public int size() {
+		return jobList.size();
+	}
+	
+	public String getProcessStatusText(String job_id, String proc_id) {
+		switch(getProcessStatus(job_id, proc_id)) {
 		case MachineManager.PROC_STARTING:
 			return "Starting";
 		case MachineManager.PROC_RUNNING:
@@ -85,12 +86,12 @@ public class UIDebugManager {
 			return "Error";
 		}
 	}	
-	public int getProcessStatus(String id) {
+	public int getProcessStatus(String job_id, String proc_id) {
 		//FIXME dummy only 
 		if (dummy)
-			return MachineManager.PROC_STARTING;
-
-		IPProcess proc = findProcess(id);
+			return getDummyStatus(proc_id);
+		
+		IPProcess proc = findProcess(job_id, proc_id);
 		if (proc != null) {
 			String status = proc.getStatus();
 			if (status.equals(IPProcess.STARTING))
@@ -109,9 +110,35 @@ public class UIDebugManager {
 		return MachineManager.PROC_ERROR;
 	}
 	
+	//FIXME dummy only 
+	public int getDummyStatus(String id) {
+		String status = DebugManager.getInstance().getProcess(id).getStatus();
+		if (status.equals(IPProcess.STARTING))
+			return MachineManager.PROC_STARTING;
+		else if (status.equals(IPProcess.RUNNING))
+			return MachineManager.PROC_RUNNING;
+		else if (status.equals(IPProcess.EXITED))
+			return MachineManager.PROC_EXITED;
+		else if (status.equals(IPProcess.EXITED_SIGNALLED))
+			return MachineManager.PROC_EXITED_SIGNAL;
+		else if (status.equals(IPProcess.STOPPED))
+			return MachineManager.PROC_STOPPED;
+		else
+			return MachineManager.PROC_ERROR;
+	}
+	
 	//FIXME using id, or name
-	public IPProcess findProcess(String id) {
-		return modelManager.getUniverse().findProcessByName(id);
+	public IPProcess findProcess(String job_id, String id) {
+		//FIXME HARDCODE
+		return modelManager.getUniverse().findProcessByName("job" + job_id + "_process" + id);
+	}
+	//FIXME don't know whether it return machine or job
+	public String getName(String id) {
+		IPElement element = modelManager.getUniverse().findChild(id);
+		if (element == null)
+			return "";
+		
+		return element.getElementName();
 	}
 	
 	public void addJob(IPJob job) {
@@ -126,12 +153,12 @@ public class UIDebugManager {
 				set.add(new Element(pElements[i].getKeyString()));
 			}
 			setManager.add(set);
-			jobList.put(job.getElementName(), setManager);
+			jobList.put(job.getKeyString(), setManager);
 		}
 	}	
 	
 	//FIXME dummny only
-	private void dummyInitialProcess() {
+	private String dummyInitialProcess() {
 		PProcess[] processes = DebugManager.getInstance().getProcesses();
 		if (processes.length > 0) {
 			ISetManager setManager = new SetManager();
@@ -141,23 +168,27 @@ public class UIDebugManager {
 				group.add(new Element(processes[j].getID()));
 			}
 			jobList.put("dummy", setManager);
-		}		
+			return "dummy";
+		}
+		return "";
 	}
 	
-	public void initialJobs() {
+	public String initial() {
 		//FIXME dummy only
 		if (dummy) {
-			dummyInitialProcess();
-			return;
+			return dummyInitialProcess();
 		}
 		
+		String firstID = "";
 		IPJob[] jobs = modelManager.getUniverse().getSortedJobs();
 		if (jobs.length > 0) {
+			firstID = jobs[0].getKeyString();
 			for (int j=0; j<jobs.length; j++) {
-				if (!jobList.containsKey(jobs[j].getElementName()))
+				if (!jobList.containsKey(jobs[j].getKeyString()))
 					addJob(jobs[j]);
 			}
 		}
+		return firstID;
 	}	
 	
 	public void unregisterElements(ILaunch launch, PDebugTarget target, IElement[] elements) {
