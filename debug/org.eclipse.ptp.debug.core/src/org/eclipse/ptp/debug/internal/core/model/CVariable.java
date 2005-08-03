@@ -29,11 +29,9 @@ import org.eclipse.cdt.debug.core.model.CVariableFormat;
 import org.eclipse.cdt.debug.core.model.ICDebugElementStatus;
 import org.eclipse.cdt.debug.core.model.ICType;
 import org.eclipse.cdt.debug.core.model.ICValue;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
-import org.eclipse.ptp.debug.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 
@@ -720,11 +718,6 @@ public class CVariable extends AbstractCVariable implements ICDIEventListener {
 
 	protected boolean isBookkeepingEnabled() {
 		boolean result = false;
-		try {
-			result = getLaunch().getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ENABLE_VARIABLE_BOOKKEEPING, false );
-		}
-		catch( CoreException e ) {
-		}
 		return result;
 	}
 
