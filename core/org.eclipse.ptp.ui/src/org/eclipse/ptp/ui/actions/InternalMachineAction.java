@@ -28,22 +28,22 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
  *
  */
 public class InternalMachineAction extends ParallelAction {
-	private String machine_id = "";
+	private String machine_name = "";
 	private MachineAction action = null;
 	
-	public InternalMachineAction(String set_id, AbstractParallelElementView view, MachineAction action) {
-		this(set_id, view, IAction.AS_PUSH_BUTTON, action);
+	public InternalMachineAction(String machine_name, AbstractParallelElementView view, MachineAction action) {
+		this(machine_name, view, IAction.AS_PUSH_BUTTON, action);
 	}
 	
-	public InternalMachineAction(String machine_id, AbstractParallelElementView view, int style, MachineAction action) {
-		super("To Machine: " + machine_id, style, view);
-		this.machine_id = machine_id;
+	public InternalMachineAction(String machine_name, AbstractParallelElementView view, int style, MachineAction action) {
+		super("To: " + machine_name, style, view);
+		this.machine_name = machine_name;
 		this.action = action;
 	    setImageDescriptor(ParallelImages.ID_ICON_MACHINE_NORMAL);
 	    setDisabledImageDescriptor(ParallelImages.ID_ICON_MACHINE_DISABLE);
 	}
 	
 	public void run(IElement[] elements) {
-		action.run(elements, machine_id);
+		action.run(elements, machine_name);
 	}
 }

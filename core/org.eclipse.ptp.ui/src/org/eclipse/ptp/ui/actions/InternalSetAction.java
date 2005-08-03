@@ -36,7 +36,7 @@ public class InternalSetAction extends ParallelAction {
 	}
 	
 	public InternalSetAction(String set_id, AbstractParallelElementView view, int style, SetAction action) {
-		super("To Set: " + set_id, style, view);
+		super("To: " + set_id, style, view);
 		this.set_id = set_id;
 		this.action = action;
 	    setImageDescriptor(ParallelImages.ID_ICON_CREATESET_NORMAL);

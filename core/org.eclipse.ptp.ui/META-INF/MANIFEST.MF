@@ -20,4 +20,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.core,
  org.eclipse.ptp.launch
 Eclipse-AutoStart: true
-Export-Package: org.eclipse.ptp.ui
+Export-Package: org.eclipse.ptp.ui,
+ org.eclipse.ptp.ui.actions,
+ org.eclipse.ptp.ui.model,
+ org.eclipse.ptp.ui.model.internal,
+ org.eclipse.ptp.ui.preferences,
+ org.eclipse.ptp.ui.views

@@ -37,16 +37,17 @@ public class ChangeMachineAction extends MachineAction {
 	}
 	
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
-	    	String curMachineID = ((ParallelMachineView)view).getCurrentMachineID();	
-	    	IPMachine[] macs = view.getUIManger().getModelManager().getUniverse().getSortedMachines();
-	    	for (int i=0; i<macs.length; i++) {
-	    		addAction(dropDownMenuMgr, macs[i].getKeyString(), curMachineID);
-	    	}		
+    	String curMachineName = ((ParallelMachineView)view).getCurrentMachineName();	
+    	IPMachine[] macs = view.getUIManger().getModelManager().getUniverse().getSortedMachines();
+    	for (int i=0; i<macs.length; i++) {
+    		//FIXME id or name
+    		addAction(dropDownMenuMgr, macs[i].getElementName(), curMachineName);
+    	}		
 	}
 	
-	private void addAction(MenuManager dropDownMenuMgr, String machine_id, String curMachineID) {
-		IAction action = new InternalMachineAction(machine_id, view, IAction.AS_CHECK_BOX, this);
-		action.setChecked(curMachineID.equals(machine_id));
+	private void addAction(MenuManager dropDownMenuMgr, String machine_name, String curMachineName) {
+		IAction action = new InternalMachineAction(machine_name, view, IAction.AS_CHECK_BOX, this);
+		action.setChecked(curMachineName.equals(machine_name));
 		action.setEnabled(true);
 		dropDownMenuMgr.add(action);
 	}
@@ -56,22 +57,22 @@ public class ChangeMachineAction extends MachineAction {
 	public void run() {
 		IPMachine[] macs = view.getUIManger().getModelManager().getUniverse().getSortedMachines();
 	    	for (int i=0; i<macs.length; i++) {
-	    		if (((ParallelMachineView)view).getCurrentMachineID().equals(macs[i].getKeyString())) {
+//	    		FIXME id or name
+	    		if (((ParallelMachineView)view).getCurrentMachineName().equals(macs[i].getElementName())) {
 	    			if (i + 1 < macs.length)
-	    				run(null, macs[i+1].getKeyString());
+	    				run(null, macs[i+1].getElementName());
 	    			else
-	    				run(null, macs[0].getKeyString());
+	    				run(null, macs[0].getElementName());
 	    			
 	    			break;
 	    		}
 	    	}
 	}
 	
-	public void run(IElement[] elements, String machine_id) {
-		System.out.println("Machine: " + machine_id);
+	public void run(IElement[] elements, String machine_name) {
 		if (view instanceof ParallelMachineView) {
 			ParallelMachineView pmView = ((ParallelMachineView)view);
-			pmView.selectMachine(machine_id);			
+			pmView.selectMachine(machine_name);			
 			view.update();
 			view.refresh();
 		}
