@@ -23,19 +23,17 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
+
 /**
- * @author clement chu
+ * @author Clement chu
  *
  */
-public abstract class MachineAction extends ParallelAction {
-	public static final String name = "Machine";
-	
-    private IMenuCreator menuCreator = new IMenuCreator() {
+public abstract class GotoDropDownAction extends ParallelAction {
+    protected IMenuCreator menuCreator = new IMenuCreator() {
         private MenuManager dropDownMenuMgr = null;
 
         private void createDropDownMenuMgr() {
@@ -70,15 +68,14 @@ public abstract class MachineAction extends ParallelAction {
             }
         }
     };
-	
-	public MachineAction(String name, AbstractParallelElementView view) {
+    
+    public GotoDropDownAction(String name, AbstractParallelElementView view) {
 		super(name, IAction.AS_DROP_DOWN_MENU, view);
-	    setImageDescriptor(ParallelImages.ID_ICON_MACHINE_NORMAL);
-	    setDisabledImageDescriptor(ParallelImages.ID_ICON_MACHINE_DISABLE);
 	    setEnabled(true);
 	    setMenuCreator(menuCreator);
-	}
+    }
 
 	protected abstract void createDropDownMenu(MenuManager dropDownMenuMgr);	
 	protected abstract void run(IElement[] elements, String setID);
+	protected abstract void addAction(MenuManager dropDownMenuMgr, String name, String id, String curID);
 }

@@ -107,7 +107,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		}
 	};
 	
-	protected BoundedElementStore boundedElementStore = new BoundedElementStore();
+	protected SelectedAreaInfo selectedAreaInfo = new SelectedAreaInfo();
 	
 	public AbstractParallelElementView() {
 		initElementAttribute();
@@ -177,6 +177,10 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	}
 	
 	protected void drawingMouseHandleEvent(Event e) {
+		//Do nothing when there is no element set
+		if (cur_element_set == null)
+			return;
+		
 		final int mx = e.x;
 		final int my = e.y;
 		// System.out.println("drag:("+drag_x+":"+drag_y+"), mouse:("+mx+":"+my+"), view:("+view_width+":"+view_height+"), " + drawComp.getBounds());
@@ -242,18 +246,35 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 				selectionShell.setBackground(selectionShell.getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
 			}
 			//only select the bounded area
-			deselect(boundedElementStore.getBoundedElements());
+			deselect(selectedAreaInfo.getBoundedElements());
 			drawSelectedArea(drag_x, drag_y, mx, my);
-			IElement[] elements = selectElements(getSelectedRect(drag_x, drag_y, mx, my));
-			boundedElementStore.addBoundedElement(elements);
+			Rectangle rect = getSelectedRect(drag_x, drag_y, mx, my);
+			selectedAreaInfo.addBoundedElement(selectElements(rect));
+			redrawSelectedArea(rect);
 			elementRedraw();
 		}
 	}
+	//TODO LATER
+	protected void redrawSelectedArea(Rectangle rect) {
+		rect.x -= rect_dot_size * 2;
+		rect.y -= rect_dot_size * 2;
+		rect.width += rect_dot_size * 4;
+		rect.height += rect_dot_size * 4;
+		
+		Rectangle oldRect = selectedAreaInfo.getBoundedRect();		
+		if (rect.intersects(oldRect)) {
+			rect = oldRect;
+		}
+		
+		selectedAreaInfo.setBoundedRect(rect);
+		//elementRedraw(rect.x, rect.y, rect.width, rect.height, false);
+	}
+	
 	protected void mouseUpEvent(int mx, int my) {
 		disposeSelectionArea();
 
 		if (isDragging())
-			boundedElementStore.removeAllBoundedElements();
+			selectedAreaInfo.removeAllBoundedElements();
 		else
 			selectElement(mx, my);
 
@@ -753,7 +774,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 
 	public void deSelectSet() {
 		if (cur_element_set != null)
-			cur_element_set.setSelected(false);
+			cur_element_set.setAllSelect(false);
 	}
 
 	public IElementSet getCurrentSet() {
@@ -777,8 +798,10 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	public void refresh() {
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				adjustDrawingView();
-				elementRedraw();
+				if (!drawComp.isDisposed()) {
+					adjustDrawingView();
+					elementRedraw();
+				}
 			}
 		});
 	}
@@ -800,8 +823,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 			drawComp.redraw(x, y, width, height, reDrawChild);
 	}	
 	
-	private class BoundedElementStore {
+	private class SelectedAreaInfo {
 		private List tmpElements = new ArrayList();
+		private Rectangle boundedRect = new Rectangle(0, 0, 0, 0);
 		public void addBoundedElement(IElement[] elements) {
 			tmpElements.add(elements);
 		}
@@ -813,6 +837,12 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		}
 		public void removeAllBoundedElements() {
 			tmpElements.clear();
+		}
+		public void setBoundedRect(Rectangle rect) {
+			this.boundedRect = rect;
+		}
+		public Rectangle getBoundedRect() {
+			return boundedRect;
 		}
 	}
 	

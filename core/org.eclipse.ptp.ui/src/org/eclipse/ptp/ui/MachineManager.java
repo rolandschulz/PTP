@@ -25,6 +25,7 @@ import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.ISetManager;
@@ -35,7 +36,7 @@ import org.eclipse.ptp.ui.model.internal.SetManager;
  * @author clement chu
  *
  */
-public class MachineManager {
+public class MachineManager implements IManager {
 	public final static int NODE_USER_ALLOC_EXCL = 0;
 	public final static int NODE_USER_ALLOC_SHARED = 1;
 	public final static int NODE_OTHER_ALLOC_EXCL = 2;
@@ -47,12 +48,12 @@ public class MachineManager {
 	public final static int NODE_UNKNOWN = 8;
 	public final static int NODE_UP = 9;
 	
-	public final static int PROC_ERROR = 10;
-	public final static int PROC_EXITED = 11;
-	public final static int PROC_EXITED_SIGNAL = 12;
-	public final static int PROC_RUNNING = 13;
-	public final static int PROC_STARTING = 14;
-	public final static int PROC_STOPPED = 15;
+	public final static int PROC_ERROR = 0;
+	public final static int PROC_EXITED = 1;
+	public final static int PROC_EXITED_SIGNAL = 2;
+	public final static int PROC_RUNNING = 3;
+	public final static int PROC_STARTING = 4;
+	public final static int PROC_STOPPED = 5;
 	
 	protected IModelManager modelManager = null;
 	protected UIManager uiManager = null;
@@ -63,12 +64,15 @@ public class MachineManager {
 		uiManager = PTPUIPlugin.getDefault().getUIManager();
 	}
 		
-	public ISetManager getSetManager(String machine_name) {
-		return (ISetManager)machineList.get(machine_name);
+	public ISetManager getSetManager(String id) {
+		return (ISetManager)machineList.get(id);
+	}
+	public int size() {
+		return machineList.size();
 	}
 	
-	public String getNodeStatusText(String id) {
-		switch(getNodeStatus(id)) {
+	public String getNodeStatusText(String machine_id, String node_id) {
+		switch(getNodeStatus(machine_id, node_id)) {
 		case NODE_USER_ALLOC_EXCL:
 			return "User Alloc Excl";
 		case NODE_USER_ALLOC_SHARED:
@@ -90,8 +94,25 @@ public class MachineManager {
 		}
 	}
 	
-	public int getNodeStatus(String id) {
-		IPNode node = findNode(id);
+	public int getProcStatus(String p_state) {
+		if (p_state.equals(IPProcess.STARTING))
+			return PROC_STARTING;
+		else if (p_state.equals(IPProcess.RUNNING))
+			return PROC_RUNNING;
+		else if (p_state.equals(IPProcess.EXITED))
+			return PROC_EXITED;
+		else if (p_state.equals(IPProcess.EXITED_SIGNALLED))
+			return PROC_EXITED_SIGNAL;
+		else if (p_state.equals(IPProcess.STOPPED))
+			return PROC_STOPPED;
+		else if (p_state.equals(IPProcess.ERROR))
+			return PROC_ERROR;
+		else
+			return PROC_ERROR;
+	}
+	
+	public int getNodeStatus(String machine_id, String node_id) {
+		IPNode node = findNode(machine_id, node_id);
 		if (node != null) {
 			String nodeState = (String)node.getAttrib("state");
 			if (nodeState.equals("up")) {
@@ -120,8 +141,18 @@ public class MachineManager {
 	}
 
 	//FIXME using id, or name
-	public IPNode findNode(String id) {
-		return modelManager.getUniverse().findNodeByName(id);
+	public IPNode findNode(String machine_id, String node_id) {
+		//FIXME HARDCODE
+		return modelManager.getUniverse().findNodeByName("machine" + machine_id + "_node" + node_id);
+	}
+	
+	//FIXME don't know whether it return machine or job
+	public String getName(String id) {
+		IPElement element = modelManager.getUniverse().findChild(id);
+		if (element == null)
+			return "";
+		
+		return element.getElementName();
 	}
 	
 	public void addMachine(IPMachine mac) {
@@ -136,17 +167,20 @@ public class MachineManager {
 				set.add(new Element(pElements[i].getKeyString()));
 			}
 			setManager.add(set);
-			machineList.put(mac.getElementName(), setManager);
+			machineList.put(mac.getKeyString(), setManager);
 		}
 	}
 	
-	public void initialMachines() {
+	public String initial() {
+		String firstID = "";
 		IPMachine[] macs = modelManager.getUniverse().getSortedMachines();
 		if (macs.length > 0) {
+			firstID = macs[0].getKeyString();
 			for (int j=0; j<macs.length; j++) {
-				if (!machineList.containsKey(macs[j].getElementName()))
+				if (!machineList.containsKey(macs[j].getKeyString()))
 					addMachine(macs[j]);
 			}
 		}
+		return firstID;
 	}	
 }

@@ -16,19 +16,17 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.actions;
+package org.eclipse.ptp.ui;
 
-import org.eclipse.ptp.ui.ParallelImages;
-import org.eclipse.ptp.ui.views.AbstractParallelElementView;
+import org.eclipse.ptp.ui.model.ISetManager;
 
 /**
- * @author Clement chu
+ * @author clement chu
  *
  */
-public class InternalSetAction extends GotoAction {
-	public InternalSetAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
-		super(name, id, view, action);
-	    setImageDescriptor(ParallelImages.ID_ICON_CREATESET_NORMAL);
-	    setDisabledImageDescriptor(ParallelImages.ID_ICON_CREATESET_DISABLE);
-	}	
+public interface IManager {
+	public int size();
+	public String initial();
+	public ISetManager getSetManager(String id);
+	public String getName(String id);
 }

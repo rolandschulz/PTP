@@ -21,6 +21,7 @@ package org.eclipse.ptp.ui.actions;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 import org.eclipse.ptp.ui.views.ParallelMachineView;
@@ -29,25 +30,26 @@ import org.eclipse.ptp.ui.views.ParallelMachineView;
  * @author Clement chu
  *
  */
-public class ChangeMachineAction extends MachineAction {
+public class ChangeMachineAction extends GotoDropDownAction {
 	public static final String name = "Machine";
     
 	public ChangeMachineAction(AbstractParallelElementView view) {
 		super(name, view);
+	    setImageDescriptor(ParallelImages.ID_ICON_MACHINE_NORMAL);
+	    setDisabledImageDescriptor(ParallelImages.ID_ICON_MACHINE_DISABLE);
 	}
-	
+		
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
-    	String curMachineName = ((ParallelMachineView)view).getCurrentMachineName();	
-    	IPMachine[] macs = view.getUIManger().getModelManager().getUniverse().getSortedMachines();
-    	for (int i=0; i<macs.length; i++) {
-    		//FIXME id or name
-    		addAction(dropDownMenuMgr, macs[i].getElementName(), curMachineName);
-    	}		
+	    	String curMachineID = ((ParallelMachineView)view).getCurrentMachineID();	
+	    	IPMachine[] macs = view.getUIManger().getModelManager().getUniverse().getSortedMachines();
+	    	for (int i=0; i<macs.length; i++) {
+	    		addAction(dropDownMenuMgr, macs[i].getElementName(), macs[i].getKeyString(), curMachineID);
+	    	}		
 	}
 	
-	private void addAction(MenuManager dropDownMenuMgr, String machine_name, String curMachineName) {
-		IAction action = new InternalMachineAction(machine_name, view, IAction.AS_CHECK_BOX, this);
-		action.setChecked(curMachineName.equals(machine_name));
+	protected void addAction(MenuManager dropDownMenuMgr, String machine_name, String id, String curID) {
+		IAction action = new InternalMachineAction(machine_name, id, view, this);
+		action.setChecked(curID.equals(id));
 		action.setEnabled(true);
 		dropDownMenuMgr.add(action);
 	}
@@ -58,21 +60,21 @@ public class ChangeMachineAction extends MachineAction {
 		IPMachine[] macs = view.getUIManger().getModelManager().getUniverse().getSortedMachines();
 	    	for (int i=0; i<macs.length; i++) {
 //	    		FIXME id or name
-	    		if (((ParallelMachineView)view).getCurrentMachineName().equals(macs[i].getElementName())) {
+	    		if (((ParallelMachineView)view).getCurrentMachineID().equals(macs[i].getKeyString())) {
 	    			if (i + 1 < macs.length)
-	    				run(null, macs[i+1].getElementName());
+	    				run(null, macs[i+1].getKeyString());
 	    			else
-	    				run(null, macs[0].getElementName());
+	    				run(null, macs[0].getKeyString());
 	    			
 	    			break;
 	    		}
 	    	}
 	}
 	
-	public void run(IElement[] elements, String machine_name) {
+	public void run(IElement[] elements, String id) {
 		if (view instanceof ParallelMachineView) {
 			ParallelMachineView pmView = ((ParallelMachineView)view);
-			pmView.selectMachine(machine_name);			
+			pmView.selectMachine(id);			
 			view.update();
 			view.refresh();
 		}

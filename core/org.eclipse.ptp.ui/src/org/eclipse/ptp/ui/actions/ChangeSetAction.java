@@ -21,6 +21,7 @@ package org.eclipse.ptp.ui.actions;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.ISetManager;
@@ -30,16 +31,18 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
  * @author Clement chu
  *
  */
-public class ChangeSetAction extends SetAction {
+public class ChangeSetAction extends GotoDropDownAction {
 	public static final String name = "Change";
     
 	public ChangeSetAction(AbstractParallelElementView view) {
 		super(name, view);
+	    setImageDescriptor(ParallelImages.ID_ICON_CREATESET_NORMAL);
+	    setDisabledImageDescriptor(ParallelImages.ID_ICON_CREATESET_DISABLE);
 	}
 	
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
-	    	String curSetID = view.getCurrentSetID();    	
-	    	addAction(dropDownMenuMgr, ISetManager.SET_ROOT_ID, curSetID);
+	    	String curID = view.getCurrentSetID();    	
+	    	addAction(dropDownMenuMgr, ISetManager.SET_ROOT_ID, ISetManager.SET_ROOT_ID, curID);
 	
 		ISetManager setManager = view.getCurrentSetManager();
 		if (setManager == null)
@@ -52,13 +55,13 @@ public class ChangeSetAction extends SetAction {
 	    		if (sets[i].getID().equals(ISetManager.SET_ROOT_ID))
 	    			continue;
 	    		
-	    		addAction(dropDownMenuMgr, sets[i].getID(), curSetID);
+	    		addAction(dropDownMenuMgr, sets[i].getID(), sets[i].getID(), curID);
 	    	}		
 	}
 	
-	private void addAction(MenuManager dropDownMenuMgr, String setID, String curSetID) {
-		IAction action = new InternalSetAction(setID, view, IAction.AS_CHECK_BOX, this);
-		action.setChecked(curSetID.equals(setID));
+	protected void addAction(MenuManager dropDownMenuMgr, String e_name, String id, String curID) {
+		IAction action = new InternalSetAction(e_name, id, view, this);
+		action.setChecked(curID.equals(id));
 		action.setEnabled(true);
 		dropDownMenuMgr.add(action);
 	}
@@ -85,17 +88,16 @@ public class ChangeSetAction extends SetAction {
 	
 	public void run(IElement[] elements, IElementSet set) {
 		view.selectSet(set);
-		view.getCurrentSet().setAllSelect(false);
+		view.deSelectSet();
 		view.update();
 		view.refresh();
 	}
 	
-	public void run(IElement[] elements, String setID) {
+	public void run(IElement[] elements, String id) {
 		ISetManager setManager = view.getCurrentSetManager();
 		if (setManager == null)
 			return;
 		
-		run(elements, setManager.getSet(setID));
-
+		run(elements, setManager.getSet(id));
 	}
 }
