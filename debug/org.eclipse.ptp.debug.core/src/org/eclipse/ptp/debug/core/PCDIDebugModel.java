@@ -91,14 +91,14 @@ public class PCDIDebugModel {
 	 * @return a debug target
 	 * @throws DebugException
 	 */
-	public static IDebugTarget newDebugTarget( final ILaunch launch, final IProject project, final IPCDITarget cdiTarget, final String name, final IBinaryObject file, final boolean allowTerminate, final boolean allowDisconnect, final boolean stopInMain, final boolean resumeTarget ) throws DebugException {
+	public static IDebugTarget newDebugTarget( final ILaunch launch, final IProject project, final IPCDITarget cdiTarget, final String name, final IProcess debuggeeProcess, final IBinaryObject file, final boolean allowTerminate, final boolean allowDisconnect, final boolean stopInMain, final boolean resumeTarget ) throws DebugException {
 		final IDebugTarget[] target = new IDebugTarget[1];
 		IWorkspaceRunnable r = new IWorkspaceRunnable() {
 			public void run( IProgressMonitor m ) throws CoreException {
 				/* ptp.core and ptp.debug.core have IPTPLaunchConfigurationConstants */
 				/* Be careful of the class that you import */
 				boolean stop = launch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
-				target[0] = new PDebugTarget( launch, project, cdiTarget, name, file, allowTerminate, allowDisconnect );
+				target[0] = new PDebugTarget( launch, project, cdiTarget, name, debuggeeProcess, file, allowTerminate, allowDisconnect );
 				ICDITargetConfiguration config = cdiTarget.getConfiguration();
 				if ( config.supportsBreakpoints() && stop ) {
 					stopInMain( (PDebugTarget)target[0] );
@@ -116,26 +116,6 @@ public class PCDIDebugModel {
 			throw new DebugException( e.getStatus() );
 		}
 		return target[0];
-	}
-
-	/**
-	 * Creates and returns a debug target for the given CDI target, with the specified name, and associates it with the given process for console I/O. The debug
-	 * target is added to the given launch.
-	 * 
-	 * @param launch the launch the new debug target will be contained in
-	 * @param project the project to use to persist breakpoints.
-	 * @param cdiTarget the CDI target to create a debug target for
-	 * @param name the name to associate with this target, which will be returned from <code>IDebugTarget.getName</code>.
-	 * @param debuggeeProcess the process to associate with the debug target, which will be returned from <code>IDebugTarget.getProcess</code>
-	 * @param file the executable to debug.
-	 * @param allowTerminate allow terminate().
-	 * @param allowDisconnect allow disconnect().
-	 * @param resumeTarget resume target.
-	 * @return a debug target
-	 * @throws DebugException
-	 */
-	public static IDebugTarget newDebugTarget( ILaunch launch, IProject project, IPCDITarget cdiTarget, final String name, IBinaryObject file, boolean allowTerminate, boolean allowDisconnect, boolean resumeTarget ) throws DebugException {
-		return newDebugTarget( launch, project, cdiTarget, name, file, allowTerminate, allowDisconnect, false, resumeTarget );
 	}
 
 	/**

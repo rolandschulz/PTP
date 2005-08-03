@@ -18,20 +18,10 @@ public class PTPDebugger implements IPCDIDebugger {
 	}
 
 	public ICDISession createDebuggerSession(IPJob job, ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) {
-		return null;
-	}
-	
-	public ICDISession createDebuggerSession(IPJob job, ILaunch launch, File exe, IProgressMonitor monitor) {
-		
 		try {
-			/* Currently, we ignore the executable
-			File cwd = new File("/tmp/");
-			File prog = exe;
-			*/
-
 			DebugSession debug = new DebugSession(job);
 
-			Session session = new Session(debug);
+			Session session = new Session(debug, launch, exe);
 			
 			Process debugger = session.getSessionProcess();
 			
@@ -46,6 +36,15 @@ public class PTPDebugger implements IPCDIDebugger {
 			e.printStackTrace();
 		}		 
 		
+		return null;
+	}
+	
+	public ICDISession createDebuggerSession(IPJob job, ILaunch launch, File exe, IProgressMonitor monitor) {
+		/* Currently, we ignore the executable
+		File cwd = new File("/tmp/");
+		File prog = exe;
+		*/
+
 		return null;
 	}	
 }

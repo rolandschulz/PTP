@@ -15,7 +15,6 @@ public class DebugSimulator extends AbstractDebugger {
 	
 	int state = 0;
 	boolean finished = false;
-	Thread dThread = null;
 	
 	private Process debuggerProcess = null;
 	
@@ -30,7 +29,7 @@ public class DebugSimulator extends AbstractDebugger {
 		cmd.add(1, "print");
 		cmd.add(2, "DebuggerOutput");
 		
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 30; i++) {
 			dQ.addItem(cmd);
 		}
 		
@@ -46,6 +45,58 @@ public class DebugSimulator extends AbstractDebugger {
 
 		for (int j = 0; j < procs.length; j++) {
 			procs[j].addItem(cmd2);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
+			procs[j].addItem(cmd);
 			procs[j].addItem(cmd);
 			procs[j].addItem(cmd);
 			procs[j].addItem(cmd);
@@ -69,23 +120,6 @@ public class DebugSimulator extends AbstractDebugger {
 		initializeSimulatedProcessesCode(debuggerCommands, procCommands);
 		
 		debuggerProcess = new SimProcess("Debugger", 1, debuggerCommands, this, debugSession);
-		
-		dThread = new Thread() {
-			public void run() {
-				while (!finished) {
-					try {
-						if (state == RUNNING) {
-							state = SUSPENDED;
-							fireEvent(new EBreakpointHit(debugSession));
-						}
-						Thread.sleep(3000);
-					} catch (InterruptedException e) {
-					}
-				}
-			}
-		};
-		//dThread.start();
-		
 		
 		MProcess.resetGlobalCounter();
 		IPProcess[] procs = job.getProcesses();
