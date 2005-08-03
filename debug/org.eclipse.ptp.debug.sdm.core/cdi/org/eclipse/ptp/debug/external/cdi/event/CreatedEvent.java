@@ -29,7 +29,9 @@ public class CreatedEvent implements ICDICreatedEvent {
 	public CreatedEvent(Session s, EBreakpointCreated ev) {
 		session = s;
 		DebugSession dSession = ev.getDebugSession();
-		Target target = session.getTarget(dSession);
+		// FIXME 
+		//Target target = session.getTarget(dSession);
+		Target target = (Target) session.getTarget(0);
 		source = new PTPObject(target);
 	}
 

@@ -44,7 +44,9 @@ public class SuspendedEvent implements ICDISuspendedEvent {
 	public ICDIObject getSource() {
 		// Auto-generated method stub
 		System.out.println("SuspendedEvent.getSource()");
-		Target target = session.getTarget(event.getDebugSession()); 
+		// FIXME
+		//Target target = session.getTarget(event.getDebugSession());
+		Target target = (Target) session.getTarget(0);
 		// We can send the target as the Source.  CDI
 		// Will assume that all threads are supended for this.
 		// This is true for gdb when it suspend the inferior

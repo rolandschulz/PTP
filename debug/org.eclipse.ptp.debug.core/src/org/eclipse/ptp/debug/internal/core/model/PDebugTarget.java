@@ -114,7 +114,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	/**
 	 * Associated inferrior process, or <code>null</code> if not available.
 	 */
-	private IProcess[] fDebuggeeProcesses = null;
+	private IProcess fDebuggeeProcess = null;
 
 	/**
 	 * The underlying CDI target.
@@ -139,7 +139,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	/**
 	 * The set manager for this target.
 	 */
-	private PSetManager fGroupManager;
+	private PSetManager fSetManager;
 
 	/**
 	 * A breakpoint manager for this target.
@@ -176,12 +176,12 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	/**
 	 * Constructor for CDebugTarget.
 	 */
-	public PDebugTarget( ILaunch launch, IProject project, IPCDITarget cdiTarget, String name, IBinaryObject file, boolean allowsTerminate, boolean allowsDisconnect) {
+	public PDebugTarget( ILaunch launch, IProject project, IPCDITarget cdiTarget, String name, IProcess debuggeeProcess, IBinaryObject file, boolean allowsTerminate, boolean allowsDisconnect) {
 		super( null );
 		setLaunch( launch );
 		setDebugTarget( this );
 		setName( name );
-		//setProcess( debuggeeProcesses );
+		setProcess( debuggeeProcess );
 		setProject(project);
 		setExecFile( file );
 		setCDITarget( cdiTarget );
@@ -189,7 +189,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		initializePreferences();
 		setConfiguration( cdiTarget.getConfiguration() );
 		setThreadList( new ArrayList( 5 ) );
-		setGroupManager( new PSetManager( this ) );
+		setSetManager( new PSetManager( this ) );
 		setBreakpointManager( new PBreakpointManager( this ) );
 		initialize();
 		DebugPlugin.getDefault().getLaunchManager().addLaunchListener( this );
@@ -198,9 +198,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	}
 
 	public void register(int procNum) {
-		if (fDebuggeeProcesses != null) {
-			for (int i = 0; i < fDebuggeeProcesses.length; i++) {
-				getLaunch().removeProcess(fDebuggeeProcesses[i]);
+/*		if (fDebuggeeProcess != null) {
+			for (int i = 0; i < fDebuggeeProcess.length; i++) {
+				getLaunch().removeProcess(fDebuggeeProcess[i]);
 			}
 		}
 		
@@ -211,17 +211,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		setProcess( iprocesses );
 		currentProcNum = procNum;
 		refreshThreads();
-	}
+*/	}
 	
 	protected void initialize() {
-		currentProcNum = 0;
-		
-		Process process = getCDITarget().getProcess(currentProcNum);
-		IProcess[] iprocesses = new IProcess[1];
-		iprocesses[0] = DebugPlugin.newProcess(getLaunch(), process, "Launch Label - " + currentProcNum);
-
-		setProcess( iprocesses );
-		
 		ArrayList debugEvents = new ArrayList( 1 );
 		debugEvents.add( createCreateEvent() );
 		initializeThreads( debugEvents );
@@ -290,7 +282,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	 * @see org.eclipse.debug.core.model.IDebugTarget#getProcess()
 	 */
 	public IProcess getProcess() {
-		return fDebuggeeProcesses[0];
+		return fDebuggeeProcess;
 	}
 
 	/**
@@ -300,8 +292,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	 * or <code>null</code> if no process is associated with this debug target 
 	 * (for a core dump debugging).
 	 */
-	protected void setProcess( IProcess[] debuggeeProcesses ) {
-		fDebuggeeProcesses = debuggeeProcesses;
+	protected void setProcess( IProcess debuggeeProcess ) {
+		fDebuggeeProcess = debuggeeProcess;
 	}
 
 	/*
@@ -505,11 +497,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		ICDIThread[] cdiThreads = new ICDIThread[0];
 		ICDIThread currentCDIThread = null;
  		try {
- 			int procNum = currentProcNum;
- 			//if (currentFocus instanceof PDebugProcess) {
- 			//	procNum = ((PDebugProcess) currentFocus).getProcessNumber();
- 			//}
-			cdiThreads = getCDITarget().getThreads(procNum);
+			cdiThreads = getCDITarget().getThreads();
 			currentCDIThread = getCDITarget().getCurrentThread();
 		}
 		catch( CDIException e ) {
@@ -751,7 +739,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		if ( adapter.equals( PBreakpointManager.class ) )
 			return getBreakpointManager();
 		if ( adapter.equals( PSetManager.class ) )
-			return getGroupManager();
+			return getSetManager();
 		if ( adapter.equals( ICDISession.class ) )
 			return getCDISession();
 		return super.getAdapter( adapter );
@@ -899,7 +887,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener( this );
 		DebugPlugin.getDefault().getExpressionManager().removeExpressionListener( this );
 		DebugPlugin.getDefault().getLaunchManager().removeLaunchListener( this );
-		disposeGroupManager();
+		disposeSetManager();
 		disposeBreakpointManager();
 		removeAllExpressions();
 		disposePreferences();
@@ -1269,16 +1257,16 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return list;
 	}
 
-	protected void setGroupManager( PSetManager gm ) {
-		fGroupManager = gm;
+	protected void setSetManager( PSetManager gm ) {
+		fSetManager = gm;
 	}
 
-	protected PSetManager getGroupManager() {
-		return fGroupManager;
+	protected PSetManager getSetManager() {
+		return fSetManager;
 	}
 
-	protected void disposeGroupManager() {
-		fGroupManager.dispose();
+	protected void disposeSetManager() {
+		fSetManager.dispose();
 	}
 
 	/* (non-Javadoc)

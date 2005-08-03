@@ -63,12 +63,19 @@ public class Target extends SessionObject implements IPCDITarget {
 	Thread[] currentThreads;
 	int currentThreadId;
 	
-	public Target(Session s, DebugSession dS) {
+	int targetId;
+	
+	public Target(Session s, DebugSession dS, int tId) {
 		super(s);
 		dSession = dS;
+		targetId = tId;
 		
 		fConfiguration = new TargetConfiguration(this);
 		currentThreads = noThreads;
+	}
+	
+	public String getTargetId() {
+		return Integer.toString(targetId);
 	}
 	
 	public IPCDIDebugProcessSet newProcessSet(String name, int[] procs) {
@@ -98,7 +105,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	
 	public Process getProcess() {
 		System.out.println("Target.getProcess()");
-		return getProcess(0);
+		return getProcess(targetId);
 	}
 
 	public ICDITargetConfiguration getConfiguration() {
