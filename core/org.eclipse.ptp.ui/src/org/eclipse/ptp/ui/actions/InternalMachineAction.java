@@ -18,32 +18,17 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.actions;
 
-import org.eclipse.jface.action.IAction;
 import org.eclipse.ptp.ui.ParallelImages;
-import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
 /**
  * @author Clement chu
  *
  */
-public class InternalMachineAction extends ParallelAction {
-	private String machine_name = "";
-	private MachineAction action = null;
-	
-	public InternalMachineAction(String machine_name, AbstractParallelElementView view, MachineAction action) {
-		this(machine_name, view, IAction.AS_PUSH_BUTTON, action);
-	}
-	
-	public InternalMachineAction(String machine_name, AbstractParallelElementView view, int style, MachineAction action) {
-		super("To: " + machine_name, style, view);
-		this.machine_name = machine_name;
-		this.action = action;
+public class InternalMachineAction extends GotoAction {
+	public InternalMachineAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
+		super(name, id, view, action);
 	    setImageDescriptor(ParallelImages.ID_ICON_MACHINE_NORMAL);
 	    setDisabledImageDescriptor(ParallelImages.ID_ICON_MACHINE_DISABLE);
-	}
-	
-	public void run(IElement[] elements) {
-		action.run(elements, machine_name);
-	}
+	}	
 }

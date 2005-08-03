@@ -22,6 +22,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.ISetManager;
@@ -30,24 +31,31 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
  * @author clement chu
  *
  */
-public class CreateSetAction extends SetAction {
+public class CreateSetAction extends GotoDropDownAction {
 	public static final String name = "Create";
     
 	public CreateSetAction(AbstractParallelElementView view) {
 		super(name, view);
+	    setImageDescriptor(ParallelImages.ID_ICON_CREATESET_NORMAL);
+	    setDisabledImageDescriptor(ParallelImages.ID_ICON_CREATESET_DISABLE);
 	}
 	
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
+    		String curID = view.getCurrentSetID();
 		ISetManager setManager = view.getCurrentSetManager();
 		if (setManager == null)
 			return;
 
 		IElementSet[] sets = setManager.getSortedSets();
 	    	for (int i=1; i<sets.length; i++) {
-	    		IAction action = new InternalSetAction(sets[i].getID(), view, this);
-	    		action.setEnabled(!view.getCurrentSetID().equals(sets[i].getID()));
-	    		dropDownMenuMgr.add(action);
+	    		addAction(dropDownMenuMgr, sets[i].getID(), sets[i].getID(), curID);
 	    	}		
+	}
+	
+	protected void addAction(MenuManager dropDownMenuMgr, String e_name, String id, String curID) {
+		IAction action = new InternalSetAction(e_name, id, view, this);
+		action.setEnabled(!curID.equals(id));
+		dropDownMenuMgr.add(action);
 	}	
 	
 	public void run(IElement[] elements) {

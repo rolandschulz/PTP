@@ -18,17 +18,28 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.actions;
 
-import org.eclipse.ptp.ui.ParallelImages;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
 /**
  * @author Clement chu
  *
  */
-public class InternalSetAction extends GotoAction {
-	public InternalSetAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
-		super(name, id, view, action);
-	    setImageDescriptor(ParallelImages.ID_ICON_CREATESET_NORMAL);
-	    setDisabledImageDescriptor(ParallelImages.ID_ICON_CREATESET_DISABLE);
-	}	
+public abstract class GotoAction extends ParallelAction {
+	protected String id = "";
+	protected GotoDropDownAction action = null;
+	
+	public GotoAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
+		this(name, id, view, IAction.AS_CHECK_BOX, action);
+	}
+	public GotoAction(String name, String id, AbstractParallelElementView view, int style, GotoDropDownAction action) {
+		super("To: " + name, style, view);
+		this.id = id;
+		this.action = action;	
+	}
+	
+	public void run(IElement[] elements) {
+		action.run(elements, id);
+	}
 }
