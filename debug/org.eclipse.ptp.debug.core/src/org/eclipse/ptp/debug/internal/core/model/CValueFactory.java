@@ -31,10 +31,6 @@ public class CValueFactory {
 		return new CIndexedValue( parent, cdiValue, start, length );
 	}
 
-	static public CValue createGlobalValue( CVariable parent, ICDIValue cdiValue ) {
-		return new CGlobalValue( parent, cdiValue );
-	}
-
 	static public ICValue createValueWithError( CVariable parent, String message ) {
 		return new CValue( parent, message );
 	}
