@@ -22,7 +22,7 @@ package org.eclipse.ptp.debug.core;
  * @author clement chu
  *
  */
-public class PProcess implements IPProcess {
+public class PProcess {
 	private String id = "0";
 	private String status = "exit"; 
 	

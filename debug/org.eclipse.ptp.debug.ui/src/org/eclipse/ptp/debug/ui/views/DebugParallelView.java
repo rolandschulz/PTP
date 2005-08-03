@@ -23,8 +23,8 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.ptp.debug.core.DebugManager;
 import org.eclipse.ptp.debug.core.IDebugParallelModelListener;
-import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.actions.RegisterAction;
 import org.eclipse.ptp.debug.ui.actions.ResumeAction;
 import org.eclipse.ptp.debug.ui.actions.StepOverAction;
@@ -32,7 +32,6 @@ import org.eclipse.ptp.debug.ui.actions.StepReturnAction;
 import org.eclipse.ptp.debug.ui.actions.SuspendAction;
 import org.eclipse.ptp.debug.ui.actions.TerminateAction;
 import org.eclipse.ptp.debug.ui.actions.UnregisterAction;
-import org.eclipse.ptp.ui.MachineManager;
 import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
@@ -52,7 +51,7 @@ public class DebugParallelView extends AbstractParallelSetView implements IDebug
 	private UIDebugManager uiDebugManager = null;
 
 	//machine
-	protected String cur_job_name = "dummy";
+	protected String cur_job_id = "dummy";
 
 	// actions
 	protected ParallelAction resumeAction = null;
@@ -64,7 +63,7 @@ public class DebugParallelView extends AbstractParallelSetView implements IDebug
 	protected ParallelAction registerAction = null;
 	protected ParallelAction unregisterAction = null;
 
-	private Image[][] statusImages = {
+	private Image[][] procImages = {
 		{
 			ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR),
 			ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR_SEL) },
@@ -101,14 +100,18 @@ public class DebugParallelView extends AbstractParallelSetView implements IDebug
 	}
 	
 	protected void initialElement() {
-		uiDebugManager.initialJobs();
+		cur_job_id = uiDebugManager.initial();
 	}
 	protected void initialView() {
 		initialElement();
+		if (uiDebugManager.size() > 0) {
+			updateJob();
+			refresh();
+		}
 		update();
 	}
 	public ISetManager getCurrentSetManager() {
-		return uiDebugManager.getSetManager(cur_job_name);
+		return uiDebugManager.getSetManager(cur_job_id);
 	}
 
 	public static DebugParallelView getInstance() {
@@ -184,13 +187,13 @@ public class DebugParallelView extends AbstractParallelSetView implements IDebug
 			if (i < groups.length - 1)
 				buffer.append(",");
 		}
-		buffer.append("\nStatus: " + uiDebugManager.getProcessStatus(element.getID()));
+		buffer.append("\nStatus: " + uiDebugManager.getProcessStatusText(cur_job_id, element.getID()));
 		return buffer.toString();
 	}
 
 	protected Image getStatusIcon(IElement element) {
-		int status = uiDebugManager.getProcessStatus(element.getID()) - MachineManager.NODE_UP;
-		return statusImages[status][element.isSelected() ? 1 : 0];
+		int status = uiDebugManager.getProcessStatus(cur_job_id, element.getID());
+		return procImages[status][element.isSelected() ? 1 : 0];
 	}
 	
 	public void dispose() {
@@ -199,14 +202,14 @@ public class DebugParallelView extends AbstractParallelSetView implements IDebug
 		DebugManager.getInstance().removeListener(this);		
 	}
 
-	public String getCurrentMachineName() {
-		return cur_job_name;
+	public String getCurrentJobID() {
+		return cur_job_id;
 	}
-	public void selectMachine(String job_name) {
-		cur_job_name = job_name;
-		updateMachine();
+	public void selectMachine(String job_id) {
+		cur_job_id = job_id;
+		updateJob();
 	}
-	public void updateMachine() {
+	public void updateJob() {
 		ISetManager setManager = getCurrentSetManager();
 		if (setManager != null) {
 			selectSet(setManager.getSetRoot());
@@ -216,7 +219,7 @@ public class DebugParallelView extends AbstractParallelSetView implements IDebug
 	
 	public void updateTitle() {
 		if (cur_element_set != null) {
-			changeTitle(cur_job_name, cur_element_set.getID(), cur_set_size);
+			changeTitle(uiDebugManager.getName(cur_job_id), cur_element_set.getID(), cur_set_size);
 		}
 	}	
 	
@@ -252,16 +255,13 @@ public class DebugParallelView extends AbstractParallelSetView implements IDebug
 	/*
 	 * FIXME Should implemented IParallelModelListener
 	 */
-	public void run() {
-		initialView();
-		redraw();
-	}
-
 	public void start() {
 		initialView();
-		redraw();
+		refresh();
 	}
-
+	public void run() {
+		refresh();
+	}
 	public void stop() {
 		refresh();
 	}
