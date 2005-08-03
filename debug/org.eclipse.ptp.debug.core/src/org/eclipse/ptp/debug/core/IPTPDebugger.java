@@ -8,18 +8,13 @@
  ******************************************************************************/
 package org.eclipse.ptp.debug.core;
 
-import java.io.File;
-
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.cdt.debug.core.ICDIDebugger;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.ptp.core.IPJob;
 
-
-public interface IPCDIDebugger extends ICDIDebugger {
+public interface IPTPDebugger {
 	public ICDISession createDebuggerSession(IPJob job, ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException;
-	public ICDISession createDebuggerSession(IPJob job, ILaunch launch, File exe, IProgressMonitor monitor) throws CoreException;
 }

@@ -31,10 +31,6 @@ public class PTPDebugCorePreferenceInitializer extends AbstractPreferenceInitial
 	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
 	 */
 	public void initializeDefaultPreferences() {
-		PTPDebugCorePlugin.getDefault().getPluginPreferences().setDefault( IPDebugConstants.PREF_MAX_NUMBER_OF_INSTRUCTIONS, IPDebugConstants.DEF_NUMBER_OF_INSTRUCTIONS );
 		PTPDebugCorePlugin.getDefault().getPluginPreferences().setDefault( IPDebugConstants.PREF_DEFAULT_VARIABLE_FORMAT, ICDIFormat.NATURAL );
-		PTPDebugCorePlugin.getDefault().getPluginPreferences().setDefault( IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT, ICDIFormat.NATURAL );
-		PTPDebugCorePlugin.getDefault().getPluginPreferences().setDefault( IPDebugConstants.PREF_DEFAULT_REGISTER_FORMAT, ICDIFormat.NATURAL );
-		PTPDebugCorePlugin.getDefault().getPluginPreferences().setDefault( IPDebugConstants.PREF_INSTRUCTION_STEP_MODE_ON, false );
 	}
 }

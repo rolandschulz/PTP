@@ -50,13 +50,11 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
 import org.eclipse.cdt.debug.core.model.CDebugElementState;
 import org.eclipse.cdt.debug.core.model.ICAddressBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICDebugElement;
 import org.eclipse.cdt.debug.core.model.ICDebugElementStatus;
-import org.eclipse.cdt.debug.core.model.ICGlobalVariable;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICModule;
 import org.eclipse.cdt.debug.core.model.ICSignal;
@@ -80,7 +78,6 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.IExpressionListener;
-import org.eclipse.debug.core.IExpressionManager;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchListener;
 import org.eclipse.debug.core.model.IBreakpoint;
@@ -90,7 +87,6 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IRegisterGroup;
 import org.eclipse.debug.core.model.IThread;
-import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
@@ -102,7 +98,7 @@ import org.eclipse.ptp.debug.internal.core.PSetManager;
 /**
  * Debug target for C/C++ debug model.
  */
-public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEventListener, ILaunchListener, IExpressionListener {
+public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEventListener, ILaunchListener {
 
 	/**
 	 * Threads contained in this debug target. 
@@ -193,26 +189,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		setBreakpointManager( new PBreakpointManager( this ) );
 		initialize();
 		DebugPlugin.getDefault().getLaunchManager().addLaunchListener( this );
-		DebugPlugin.getDefault().getExpressionManager().addExpressionListener( this );
 		getCDISession().getEventManager().addEventListener( this );
 	}
 
-	public void register(int procNum) {
-/*		if (fDebuggeeProcess != null) {
-			for (int i = 0; i < fDebuggeeProcess.length; i++) {
-				getLaunch().removeProcess(fDebuggeeProcess[i]);
-			}
-		}
-		
-		Process process = getCDITarget().getProcess(procNum);
-		IProcess[] iprocesses = new IProcess[1];
-		iprocesses[0] = DebugPlugin.newProcess(getLaunch(), process, "Launch Label - " + procNum);
-
-		setProcess( iprocesses );
-		currentProcNum = procNum;
-		refreshThreads();
-*/	}
-	
 	protected void initialize() {
 		ArrayList debugEvents = new ArrayList( 1 );
 		debugEvents.add( createCreateEvent() );
@@ -885,11 +864,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		removeAllThreads();
 		getCDISession().getEventManager().removeEventListener( this );
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener( this );
-		DebugPlugin.getDefault().getExpressionManager().removeExpressionListener( this );
 		DebugPlugin.getDefault().getLaunchManager().removeLaunchListener( this );
 		disposeSetManager();
 		disposeBreakpointManager();
-		removeAllExpressions();
 		disposePreferences();
 	}
 
@@ -907,19 +884,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			debugEvents.add( thread.createTerminateEvent() );
 		}
 		fireEventSet( (DebugEvent[])debugEvents.toArray( new DebugEvent[debugEvents.size()] ) );
-	}
-
-	/**
-	 * Removes all expressions from this target.
-	 */
-	protected void removeAllExpressions() {
-		IExpressionManager em = DebugPlugin.getDefault().getExpressionManager();
-		IExpression[] expressions = em.getExpressions();
-		for( int i = 0; i < expressions.length; ++i ) {
-			if ( expressions[i] instanceof CExpression && expressions[i].getDebugTarget().equals( this ) ) {
-				em.removeExpression( expressions[i] );
-			}
-		}
 	}
 
 	/**
@@ -1147,27 +1111,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return getConfiguration().supportsExpressionEvaluation();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IExpressionListener#expressionAdded(org.eclipse.debug.core.model.IExpression)
-	 */
-	public void expressionAdded( IExpression expression ) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IExpressionListener#expressionChanged(org.eclipse.debug.core.model.IExpression)
-	 */
-	public void expressionChanged( IExpression expression ) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IExpressionListener#expressionRemoved(org.eclipse.debug.core.model.IExpression)
-	 */
-	public void expressionRemoved( IExpression expression ) {
-		if ( expression instanceof CExpression && expression.getDebugTarget().equals( this ) ) {
-			((CExpression)expression).dispose();
-		}
-	}
-
 	public void setInternalTemporaryBreakpoint( ICDILocation location ) throws DebugException {
 		try {
 			if (location instanceof ICDIFunctionLocation) {
@@ -1366,14 +1309,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.ISteppingModeTarget#isInstructionSteppingEnabled()
-	 */
-	public boolean isInstructionSteppingEnabled() {
-		return fPreferences.getBoolean( PREF_INSTRUCTION_STEPPING_MODE ) ||
-			   PTPDebugCorePlugin.getDefault().getPluginPreferences().getBoolean( IPDebugConstants.PREF_INSTRUCTION_STEP_MODE_ON );
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.core.model.ISteppingModeTarget#supportsInstructionStepping()
 	 */
 	public boolean supportsInstructionStepping() {
@@ -1441,37 +1376,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		}
 	}
 
-	public ICGlobalVariable createGlobalVariable( IGlobalVariableDescriptor info ) throws DebugException {
-		ICDIVariableDescriptor vo = null;
-		try {
-			vo = getCDITarget().getGlobalVariableDescriptors( info.getPath().lastSegment(), null, info.getName() );
-		}
-		catch( CDIException e ) {
-			throw new DebugException( new Status( IStatus.ERROR, PCDIDebugModel.getPluginIdentifier(), DebugException.TARGET_REQUEST_FAILED, (vo != null) ? vo.getName() + ": " + e.getMessage() : e.getMessage(), null ) ); //$NON-NLS-1$
-		}
-		return CVariableFactory.createGlobalVariable( this, info, vo );
-	}
-
 	protected void skipBreakpoints( boolean enabled ) {
 		getBreakpointManager().skipBreakpoints( enabled );
-	}
-
-	public boolean hasProcesses() throws DebugException {
-		// Auto-generated method stub
-		System.out.println("PDebugTarget.hasProcesses()");
-		return false;
-	}
-
-	public IProcess[] getProcesses() {
-		// Auto-generated method stub
-		System.out.println("PDebugTarget.getProcesses()");
-		return null;
-	}
-
-	public IThread[] getProcessThreads(IProcess process) throws DebugException {
-		// Auto-generated method stub
-		System.out.println("PDebugTarget.getProcessThreads()");
-		return null;
 	}
 
 	public IRegisterDescriptor[] getRegisterDescriptors() throws DebugException {
@@ -1526,5 +1432,11 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		// Auto-generated method stub
 		System.out.println("PDebugTarget.loadSymbolsForAllModules");
 		
+	}
+
+	public boolean isInstructionSteppingEnabled() {
+		// Auto-generated method stub
+		System.out.println("PDebugTarget.isInstructionSteppingEnabled");
+		return false;
 	}
 }

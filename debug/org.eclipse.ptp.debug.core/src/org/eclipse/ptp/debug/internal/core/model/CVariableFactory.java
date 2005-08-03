@@ -71,7 +71,4 @@ public class CVariableFactory {
 		return createGlobalVariableDescriptor( symbol.getName(), symbol.getFilename() );
 	}
 	
-	public static CGlobalVariable createGlobalVariable( PDebugElement parent, IGlobalVariableDescriptor descriptor, ICDIVariableDescriptor cdiVariableObject ) {
-		return new CGlobalVariable( parent, descriptor, cdiVariableObject );
-	}
 }

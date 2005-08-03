@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.debug.core.IPCDIDebugger;
+import org.eclipse.ptp.debug.core.IPTPDebugger;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 
@@ -42,10 +42,10 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 		return fElement;
 	}
 
-	public IPCDIDebugger createDebugger() throws CoreException {
+	public IPTPDebugger createDebugger() throws CoreException {
 		Object debugger = getConfigurationElement().createExecutableExtension("class"); //$NON-NLS-1$
-		if (debugger instanceof IPCDIDebugger) {
-			return (IPCDIDebugger)debugger;
+		if (debugger instanceof IPTPDebugger) {
+			return (IPTPDebugger)debugger;
 		}
 		throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), -1, InternalDebugCoreMessages.getString("DebugConfiguration.0"), null)); //$NON-NLS-1$
 	}

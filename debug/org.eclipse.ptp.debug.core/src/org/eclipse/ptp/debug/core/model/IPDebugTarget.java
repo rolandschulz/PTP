@@ -7,25 +7,4 @@ import org.eclipse.debug.core.model.IThread;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 
 public interface IPDebugTarget extends ICDebugTarget {
-	/**
-	 * The IPDebugTarget always has one process, this method checks
-	 * whether the debug target is a multi-process target or not.
-	 * 
-	 * @return
-	 * @throws DebugException
-	 */
-	public boolean hasProcesses() throws DebugException;
-	
-	/**
-	 * The method returns all processes in the debug target including
-	 * process 0. In a single-process target, it behaves the same like
-	 * IProcess getProcess() (except for the return type).
-	 * 
-	 * @return
-	 */
-	public IProcess[] getProcesses();
-	
-	public IThread[] getProcessThreads(IProcess process) throws DebugException;
-	
-	public void register(int procNum);
 }

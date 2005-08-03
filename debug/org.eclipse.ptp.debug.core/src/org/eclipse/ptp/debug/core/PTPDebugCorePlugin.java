@@ -195,24 +195,6 @@ public class PTPDebugCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Adds the given breakpoint listener to the debug model.
-	 * 
-	 * @param listener breakpoint listener
-	 */
-	public void addCBreakpointListener( ICBreakpointListener listener ) {
-		fBreakpointListeners.add( listener );
-	}
-
-	/**
-	 * Removes the given breakpoint listener from the debug model.
-	 * 
-	 * @param listener breakpoint listener
-	 */
-	public void removeCBreakpointListener( ICBreakpointListener listener ) {
-		fBreakpointListeners.remove( listener );
-	}
-
-	/**
 	 * Returns the list of breakpoint listeners registered with this plugin.
 	 *   
 	 * @return the list of breakpoint listeners registered with this plugin

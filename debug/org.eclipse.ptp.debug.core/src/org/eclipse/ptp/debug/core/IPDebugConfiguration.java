@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 public interface IPDebugConfiguration {
 	final static String CPU_NATIVE = "native"; //$NON-NLS-1$
 	
-	IPCDIDebugger createDebugger() throws CoreException;
+	IPTPDebugger createDebugger() throws CoreException;
 	String getName();
 	String getID();
 	String getPlatform();
