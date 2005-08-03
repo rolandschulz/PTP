@@ -777,6 +777,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	public void refresh() {
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
+				adjustDrawingView();
 				elementRedraw();
 			}
 		});
@@ -792,9 +793,12 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	public abstract ISetManager getCurrentSetManager();
 	
 	private void elementRedraw() {
-		if (!drawComp.isDisposed())
-			drawComp.redraw(0, sc.getOrigin().y, view_width, view_height, false);
+		elementRedraw(0, sc.getOrigin().y, view_width, view_height, false);
 	}
+	private void elementRedraw(int x, int y, int width, int height, boolean reDrawChild) {
+		if (!drawComp.isDisposed())
+			drawComp.redraw(x, y, width, height, reDrawChild);
+	}	
 	
 	private class BoundedElementStore {
 		private List tmpElements = new ArrayList();

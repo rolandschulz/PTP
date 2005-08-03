@@ -22,27 +22,25 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.ui.UIManager;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 /**
  * @author clement chu
  * The main plugin class to be used in the desktop.
  */
-public class UIPlugin extends AbstractUIPlugin {
+public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.ui";
 	//The shared instance.
-	private static UIPlugin plugin;
+	private static PTPDebugUIPlugin plugin;
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
 	
-	private UIManager uiManager = null;
 	private UIDebugManager uiDebugManager = null;
 	
 	/**
 	 * The constructor.
 	 */
-	public UIPlugin() {
+	public PTPDebugUIPlugin() {
 		super();
 		plugin = this;
 	}
@@ -60,13 +58,9 @@ public class UIPlugin extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		uiManager = new UIManager();
 		uiDebugManager = new UIDebugManager();
 	}
 	
-	public UIManager getUIManager() {
-		return uiManager;
-	}
 	public UIDebugManager getUIDebugManager() {
 		return uiDebugManager;
 	}
@@ -76,7 +70,6 @@ public class UIPlugin extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
-		uiManager.shutdown();
 		plugin = null;
 		resourceBundle = null;
 	}
@@ -84,7 +77,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	/**
 	 * Returns the shared instance.
 	 */
-	public static UIPlugin getDefault() {
+	public static PTPDebugUIPlugin getDefault() {
 		return plugin;
 	}
 
@@ -93,7 +86,7 @@ public class UIPlugin extends AbstractUIPlugin {
 	 * or 'key' if not found.
 	 */
 	public static String getResourceString(String key) {
-		ResourceBundle bundle = UIPlugin.getDefault().getResourceBundle();
+		ResourceBundle bundle = PTPDebugUIPlugin.getDefault().getResourceBundle();
 		try {
 			return (bundle != null) ? bundle.getString(key) : key;
 		} catch (MissingResourceException e) {

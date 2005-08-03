@@ -30,9 +30,9 @@ import org.eclipse.swt.graphics.Image;
  *
  */
 public class ImageUtil {
-	public final static URL ICONURL = UIPlugin.getDefault().getBundle().getEntry("icons/");
-	public final static URL TOOLICONURL = UIPlugin.getDefault().getBundle().getEntry("icons/tool/");
-	public final static URL PROCESSICONURL = UIPlugin.getDefault().getBundle().getEntry("icons/process/");
+	public final static URL ICONURL = PTPDebugUIPlugin.getDefault().getBundle().getEntry("icons/");
+	public final static URL TOOLICONURL = PTPDebugUIPlugin.getDefault().getBundle().getEntry("icons/tool/");
+	public final static URL PROCESSICONURL = PTPDebugUIPlugin.getDefault().getBundle().getEntry("icons/process/");
 	
     private static ImageRegistry imageRegistry = null;
     

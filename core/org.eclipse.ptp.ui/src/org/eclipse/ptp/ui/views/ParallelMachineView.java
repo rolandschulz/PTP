@@ -44,7 +44,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	protected ParallelAction changeMachineAction = null;
 	
 	//machine
-	protected String cur_machine_id = "0";
+	protected String cur_machine_name = "";
 
 	private Image[][] statusImages = {
 		{
@@ -97,7 +97,6 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			ParallelImages.getImage(ParallelImages.IMG_PROC_STOPPED_SEL) }
 	};
 
-
 	public ParallelMachineView() {
 		machineManager = PTPUIPlugin.getDefault().getMachineManager();
 	}
@@ -114,14 +113,12 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	protected void initialElement() {
 		machineManager.initialMachines();
 	}
-	
 	protected void initialView() {
 		initialElement();
 		update();
 	}
-	
 	public ISetManager getCurrentSetManager() {
-		return machineManager.getSetManager(cur_machine_id);
+		return machineManager.getSetManager(cur_machine_name);
 	}
 
 	public static ParallelMachineView getInstance() {
@@ -186,22 +183,25 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		super.dispose();
 	}
 
-	public String getCurrentMachineID() {
-		return cur_machine_id;
+	public String getCurrentMachineName() {
+		return cur_machine_name;
 	}
-	public void selectMachine(String machine_id) {
-		cur_machine_id = machine_id;
+	public void selectMachine(String machine_name) {
+		cur_machine_name = machine_name;
 		updateMachine();
 	}
 	public void updateMachine() {
 		ISetManager setManager = getCurrentSetManager();
-		if (setManager != null)
+		if (setManager != null) {			
 			selectSet(setManager.getSetRoot());
+			setManager.getSetRoot().setAllSelect(false);
+		}
 	}
 	
 	public void updateTitle() {
-		if (cur_element_set != null)
-			changeTitle("Machine " + cur_machine_id, cur_element_set.getID(), cur_set_size);
+		if (cur_element_set != null) {
+			changeTitle(cur_machine_name, cur_element_set.getID(), cur_set_size);
+		}
 	}
 		
 	/*

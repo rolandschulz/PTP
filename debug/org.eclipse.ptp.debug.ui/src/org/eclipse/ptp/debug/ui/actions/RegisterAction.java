@@ -20,8 +20,8 @@ package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.ptp.debug.ui.ImageUtil;
 import org.eclipse.ptp.debug.ui.views.DebugParallelView;
+import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.old.UIUtils;
 /**
  * @author clement chu
  *
@@ -44,10 +44,8 @@ public class RegisterAction extends DebugAction {
 					return;
 				}
 			}
-			
-			DebugParallelView debugView = (DebugParallelView)view;
-			debugView.registerSelectedElements();
-			debugView.redraw();
+			view.registerSelectedElements();
+			view.refresh();
 		}
 	}	
 }

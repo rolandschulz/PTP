@@ -38,7 +38,7 @@ public class UnregisterAction extends DebugAction {
 	public void run(IElement[] elements) {
 		if (validation(elements)) {
 			view.unregisterSelectedElements();
-			view.redraw();
+			view.refresh();
 		}
 	}	
 }

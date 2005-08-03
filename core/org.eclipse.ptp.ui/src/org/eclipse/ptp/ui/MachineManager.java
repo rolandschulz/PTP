@@ -47,17 +47,24 @@ public class MachineManager {
 	public final static int NODE_UNKNOWN = 8;
 	public final static int NODE_UP = 9;
 	
+	public final static int PROC_ERROR = 10;
+	public final static int PROC_EXITED = 11;
+	public final static int PROC_EXITED_SIGNAL = 12;
+	public final static int PROC_RUNNING = 13;
+	public final static int PROC_STARTING = 14;
+	public final static int PROC_STOPPED = 15;
+	
 	protected IModelManager modelManager = null;
 	protected UIManager uiManager = null;
-	private Map machines = new HashMap();
+	private Map machineList = new HashMap();
 
 	public MachineManager() {
 		modelManager = PTPCorePlugin.getDefault().getModelManager();
 		uiManager = PTPUIPlugin.getDefault().getUIManager();
 	}
 		
-	public ISetManager getSetManager(String machine_id) {
-		return (ISetManager)machines.get(machine_id);
+	public ISetManager getSetManager(String machine_name) {
+		return (ISetManager)machineList.get(machine_name);
 	}
 	
 	public String getNodeStatusText(String id) {
@@ -112,10 +119,11 @@ public class MachineManager {
 		return NODE_UNKNOWN;		
 	}
 
+	//FIXME using id, or name
 	public IPNode findNode(String id) {
 		return modelManager.getUniverse().findNodeByName(id);
 	}
-		
+	
 	public void addMachine(IPMachine mac) {
 		IPElement[] pElements = mac.getSortedNodes();
 		int total_element = pElements.length;
@@ -124,10 +132,11 @@ public class MachineManager {
 			setManager.clearAll();
 			IElementSet set = setManager.getSetRoot();
 			for (int i=0; i<total_element; i++) {
+				//FIXME using id, or name
 				set.add(new Element(pElements[i].getKeyString()));
 			}
 			setManager.add(set);
-			machines.put(mac.getKeyString(), setManager);
+			machineList.put(mac.getElementName(), setManager);
 		}
 	}
 	
@@ -135,7 +144,7 @@ public class MachineManager {
 		IPMachine[] macs = modelManager.getUniverse().getSortedMachines();
 		if (macs.length > 0) {
 			for (int j=0; j<macs.length; j++) {
-				if (!machines.containsKey(macs[j].getKeyString()))
+				if (!machineList.containsKey(macs[j].getElementName()))
 					addMachine(macs[j]);
 			}
 		}

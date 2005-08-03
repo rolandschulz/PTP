@@ -26,7 +26,6 @@ import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.ISetManager;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
-import org.eclipse.swt.SWT;
 /**
  * @author clement chu
  *
@@ -64,16 +63,19 @@ public class CreateSetAction extends SetAction {
 			if (setID == null) {
 				IInputValidator inputValidator = new IInputValidator() {
 					public String isValid(String newText) {
+						if (newText == null || newText.length() == 0)
+							return "This field cannot be empty.";
+						
 						if (setManager.contains(newText))
-							return "Entered set name (" + newText + ") is already used.";
+							return "Entered set name (" + newText + ") is already used.";						
+
 						return null;
 					}
 				};
 				InputDialog inputDialog = new InputDialog(getShell(), "Create a new set name", "Please enter the new set name.", "", inputValidator);
-				if (inputDialog.open() == SWT.CANCEL)
+				if (inputDialog.open() == InputDialog.CANCEL)
 					return;
-				
-				
+
 				setID = view.getUIManger().createSet(elements, inputDialog.getValue(), setManager);				
 			} else
 				view.getUIManger().addToSet(elements, setID, setManager);

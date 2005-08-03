@@ -47,7 +47,7 @@ public class DeleteSetAction extends ParallelAction {
 			if (setManager == null)
 				return;
 
-			if (UIUtils.showQuestionDialog(name + " " + set.getID() + " Confirmation", "Are you sure you want to delete all elements in this set?")) {
+			if (UIUtils.showQuestionDialog(name + " " + set.getID() + " Confirmation", "Are you sure you want to delete all elements from this set?")) {
 				UIManager uiManager = view.getUIManger();
 				uiManager.removeSet(set.getID(), setManager);
 						
