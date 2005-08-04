@@ -95,8 +95,6 @@ public class PCDIDebugModel {
 		final IDebugTarget[] target = new IDebugTarget[1];
 		IWorkspaceRunnable r = new IWorkspaceRunnable() {
 			public void run( IProgressMonitor m ) throws CoreException {
-				/* ptp.core and ptp.debug.core have IPTPLaunchConfigurationConstants */
-				/* Be careful of the class that you import */
 				boolean stop = launch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
 				target[0] = new PDebugTarget( launch, project, cdiTarget, name, debuggeeProcess, file, allowTerminate, allowDisconnect );
 				ICDITargetConfiguration config = cdiTarget.getConfiguration();

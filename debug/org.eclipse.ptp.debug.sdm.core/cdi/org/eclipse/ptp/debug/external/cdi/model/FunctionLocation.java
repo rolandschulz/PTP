@@ -11,7 +11,6 @@
 
 package org.eclipse.ptp.debug.external.cdi.model;
 
-
 import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
 import org.eclipse.ptp.debug.external.cdi.Location;
 

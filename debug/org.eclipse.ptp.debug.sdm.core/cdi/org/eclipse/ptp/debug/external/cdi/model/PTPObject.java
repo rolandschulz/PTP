@@ -13,8 +13,6 @@ package org.eclipse.ptp.debug.external.cdi.model;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 
-/**
- */
 public class PTPObject implements ICDIObject {
 	protected Target fTarget;
 	
@@ -22,9 +20,6 @@ public class PTPObject implements ICDIObject {
 		fTarget = t;
 	}
 	
-	/**
-	 * @see org.eclipse.cdt.debug.core.cdi.model.ICDIObject#getTarget()
-	 */
 	public ICDITarget getTarget() {
 		return fTarget;
 	}
