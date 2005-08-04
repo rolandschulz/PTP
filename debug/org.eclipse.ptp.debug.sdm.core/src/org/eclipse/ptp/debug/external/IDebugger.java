@@ -62,10 +62,18 @@ public interface IDebugger {
 	public void stepSet(String set);
 	public void stepSet(String set, int count);
 	public void stepOverSet(String set);
-	public void stepOverSet(String set,int count);
+	public void stepOverSet(String set, int count);
 	public void stepFinishSet(String set);
 	public void haltSet(String set);
 	public void goSet(String set);
+	public void step(int[] procs);
+	public void step(int[] procs, int count);
+	public void stepOver(int[] procs);
+	public void stepOver(int[] procs, int count);
+	public void stepFinish(int[] procs);
+	public void halt(int[] procs);
+	public void go(int[] procs);
+
 
 	
 	/* Actionpoints */
@@ -77,6 +85,10 @@ public interface IDebugger {
 	public void breakpointSet(String set, String loc, int count);
 	public void breakpointSet(String set, String loc, String cond);
 	public void watchpointSet(String set, String var);
+	public void breakpoint(int[] procs, String loc);
+	public void breakpoint(int[] procs, String loc, int count);
+	public void breakpoint(int[] procs, String loc, String cond);
+	public void watchpoint(int[] procs, String var);
 	public DebugActionpoint[] actions();
 	public DebugActionpoint[] actions(int[] ids);
 	public DebugActionpoint[] actions(String type);
