@@ -134,6 +134,10 @@ public class UIDebugManager implements IManager {
 	}
 	//FIXME don't know whether it return machine or job
 	public String getName(String id) {
+		//FIXME dummy only
+		if (dummy)
+			return "dummy";
+		
 		IPElement element = modelManager.getUniverse().findChild(id);
 		if (element == null)
 			return "";
