@@ -77,12 +77,10 @@ import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointManager;
-import org.eclipse.debug.core.IExpressionListener;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
-import org.eclipse.debug.core.model.IExpression;
 import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IRegisterGroup;
@@ -93,7 +91,6 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
-import org.eclipse.ptp.debug.internal.core.PSetManager;
 
 /**
  * Debug target for C/C++ debug model.
@@ -131,11 +128,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	 * The debug configuration of this session
 	 */
 	private ICDITargetConfiguration fConfig;
-
-	/**
-	 * The set manager for this target.
-	 */
-	private PSetManager fSetManager;
 
 	/**
 	 * A breakpoint manager for this target.
@@ -185,7 +177,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		initializePreferences();
 		setConfiguration( cdiTarget.getConfiguration() );
 		setThreadList( new ArrayList( 5 ) );
-		setSetManager( new PSetManager( this ) );
 		setBreakpointManager( new PBreakpointManager( this ) );
 		initialize();
 		DebugPlugin.getDefault().getLaunchManager().addLaunchListener( this );
@@ -717,8 +708,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			return this;
 		if ( adapter.equals( PBreakpointManager.class ) )
 			return getBreakpointManager();
-		if ( adapter.equals( PSetManager.class ) )
-			return getSetManager();
 		if ( adapter.equals( ICDISession.class ) )
 			return getCDISession();
 		return super.getAdapter( adapter );
@@ -865,7 +854,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		getCDISession().getEventManager().removeEventListener( this );
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener( this );
 		DebugPlugin.getDefault().getLaunchManager().removeLaunchListener( this );
-		disposeSetManager();
 		disposeBreakpointManager();
 		disposePreferences();
 	}
@@ -1198,18 +1186,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			}
 		}
 		return list;
-	}
-
-	protected void setSetManager( PSetManager gm ) {
-		fSetManager = gm;
-	}
-
-	protected PSetManager getSetManager() {
-		return fSetManager;
-	}
-
-	protected void disposeSetManager() {
-		fSetManager.dispose();
 	}
 
 	/* (non-Javadoc)
