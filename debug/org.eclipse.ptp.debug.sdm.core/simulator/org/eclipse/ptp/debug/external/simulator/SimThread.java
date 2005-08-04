@@ -15,12 +15,12 @@ public class SimThread {
 	int breakLine;
 	SimStackFrame[] stackFrames;
 	int threadId;
-	String processId;
+	int processId;
 	
 	DebugSimulator dSim;
 	DebugSession dSes;
 	
-	public SimThread(int id, String pId, DebugSimulator debugger, DebugSession dSession) {
+	public SimThread(int id, int pId, DebugSimulator debugger, DebugSession dSession) {
 		dSim = debugger;
 		dSes = dSession;
 		
@@ -63,7 +63,7 @@ public class SimThread {
 	public void checkBreakpoint() {
 		if (curLine == breakLine) {
 			state = SUSPENDED;
-			dSim.fireEvent(new EBreakpointHit(dSes));
+			dSim.fireEvent(new EBreakpointHit(processId, threadId));
 			// Do Something
 		}
 	}

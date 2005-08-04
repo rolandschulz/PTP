@@ -16,6 +16,8 @@ public class SimProcess extends Process {
 	InputStream in;
 	OutputStream out;
 	
+	
+	int id;
 	String name;
 	SimQueue commands;
 	
@@ -24,18 +26,19 @@ public class SimProcess extends Process {
 	DebugSimulator dSim;
 	DebugSession dSes;
 	
-	public SimProcess(String nm, int numThreads, SimQueue cmds, DebugSimulator debugger, DebugSession dSession) {
+	public SimProcess(String nm, int pId, int numThreads, SimQueue cmds, DebugSimulator debugger, DebugSession dSession) {
 		super();
 		dSim = debugger;
 		dSes = dSession;
 		
 		finished = false;
+		id = pId;
 		name = nm;
 		commands = cmds;
 		
 		threads = new SimThread[numThreads];
 		for (int i = 0; i < numThreads; i++) {
-			threads[i] = new SimThread(i, name, dSim, dSes);
+			threads[i] = new SimThread(i, id, dSim, dSes);
 		}
 		
 		err = null;
