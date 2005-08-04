@@ -99,11 +99,18 @@ public class ParallelJobView extends AbstractParallelSetView {
 	protected void initialView() {
 		initialElement();
 		if (jobManager.size() > 0) {
-			jobsList.removeAll();
-			IPJob[] jobs = jobManager.getJobs();
-			for (int i=0; i<jobs.length; i++) {
-				jobsList.add(jobs[i].getElementName());
-			}
+			getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					jobsList.removeAll();
+					IPJob[] jobs = jobManager.getJobs();
+					for (int i=0; i<jobs.length; i++) {
+						jobsList.add(jobs[i].getElementName());
+					}
+					//FIXME dummy only
+					jobsList.add("dummy");
+					jobsList.setSelection(0);
+				}
+			});
 			updateJob();
 			refresh();
 		}
@@ -131,7 +138,8 @@ public class ParallelJobView extends AbstractParallelSetView {
 		jobsList.setLayoutData(new GridData(GridData.FILL_BOTH));
 		jobsList.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				selectJob(jobsList.getItem(jobsList.getSelectionIndex()));
+				String jobName = jobsList.getItem(jobsList.getSelectionIndex());
+				selectJob(jobManager.findJob(jobName).getKeyString());
 				update();
 				refresh();
 			}			

@@ -86,9 +86,9 @@ public class UIDebugManager extends JobManager {
 		if (processes.length > 0) {
 			ISetManager setManager = new SetManager();
 			setManager.clearAll();
-			IElementSet group = setManager.getSetRoot();
+			IElementSet set = setManager.getSetRoot();
 			for (int j=0; j<processes.length; j++) {
-				group.add(new Element(processes[j].getID()));
+				set.add(new Element(processes[j].getID()));
 			}
 			jobList.put("dummy", setManager);
 			return "dummy";

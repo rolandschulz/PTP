@@ -72,21 +72,6 @@ public class DebugParallelView extends ParallelJobView implements IDebugParallel
 		return instance;
 	}	
 		
-	protected void initialElement() {
-		cur_job_id = jobManager.initial();
-	}
-	protected void initialView() {
-		initialElement();
-		if (jobManager.size() > 0) {
-			updateJob();
-			refresh();
-		}
-		update();
-	}
-	public ISetManager getCurrentSetManager() {
-		return jobManager.getSetManager(cur_job_id);
-	}
-	
 	protected boolean fillContextMenu(IMenuManager manager) {
 		manager.add(resumeAction);
 		manager.add(suspendAction);

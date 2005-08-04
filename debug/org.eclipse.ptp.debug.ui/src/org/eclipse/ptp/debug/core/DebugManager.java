@@ -32,7 +32,7 @@ import org.eclipse.ptp.ui.MachineManager;
  *
  */
 public class DebugManager {
-	private static final int total = 30000;
+	private static final int total = 5000;
 	private static DebugManager instance = null;
 	private List listeners = new ArrayList();
 	private Map processMap = new HashMap();
