@@ -86,7 +86,7 @@ public class DebugParallelView extends AbstractParallelSetView implements IDebug
 
 	public DebugParallelView() {
 		uiDebugManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
-		//FIXME dummy
+		//FIXME dummy only
 		DebugManager.getInstance().addListener(this);		
 	}
 	

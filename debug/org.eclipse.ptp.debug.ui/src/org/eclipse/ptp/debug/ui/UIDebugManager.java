@@ -161,7 +161,7 @@ public class UIDebugManager implements IManager {
 		}
 	}	
 	
-	//FIXME dummny only
+	//FIXME dummy only
 	private String dummyInitialProcess() {
 		PProcess[] processes = DebugManager.getInstance().getProcesses();
 		if (processes.length > 0) {
