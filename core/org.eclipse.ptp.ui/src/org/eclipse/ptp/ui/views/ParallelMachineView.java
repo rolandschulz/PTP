@@ -362,7 +362,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			return;
 		}
 			
-		int idx = BRtable.getSelectionIndex();
+		//int idx = BRtable.getSelectionIndex();
 		BLtable.removeAll();
 		BRtable.removeAll();
 		TableItem item;
