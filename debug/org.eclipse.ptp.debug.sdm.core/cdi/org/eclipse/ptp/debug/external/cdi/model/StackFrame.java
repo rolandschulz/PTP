@@ -22,10 +22,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.ptp.debug.external.cdi.Locator;
 import org.eclipse.ptp.debug.external.simulator.SimStackFrame;
 
-/**
- */
 public class StackFrame extends PTPObject implements ICDIStackFrame {
-
 	SimStackFrame frame;
 	Thread cthread;
 	int level;
@@ -46,9 +43,9 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 		BigInteger addr = BigInteger.ZERO;
 		if (frame != null) {
 			if (fLocator == null) {
-				String a = frame.getAddress();
-				if (a != null) {
-					// addr = MIFormat.getBigInteger(a);
+				String address = frame.getAddress();
+				if (address != null) {
+					addr = new BigInteger(address);
 				}
 				fLocator = new Locator(frame.getFile(), 
 					            frame.getFunction(),
@@ -61,15 +58,11 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 	}
 
 	public ICDIThread getThread() {
-		// Auto-generated method stub
-		System.out.println("StackFrame.getThread()");
-		return null;
+		return cthread;
 	}
 
 	public int getLevel() {
-		// Auto-generated method stub
-		System.out.println("StackFrame.getLevel()");
-		return 0;
+		return level;
 	}
 
 	public boolean equals(ICDIStackFrame stackframe) {
@@ -81,17 +74,11 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 	public void stepReturn() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("StackFrame.stepReturn()");
-		
 	}
 
 	public void stepReturn(ICDIValue value) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("StackFrame.stepReturn()");
-		
-	}
-	
-	public SimStackFrame getSimStackFrame() {
-		return frame;
 	}
 
 	public ICDILocalVariableDescriptor[] getLocalVariableDescriptors() throws CDIException {

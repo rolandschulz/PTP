@@ -23,24 +23,23 @@ import org.eclipse.ptp.debug.external.simulator.SimProcess;
 import org.eclipse.ptp.debug.external.simulator.SimStackFrame;
 
 public class Thread extends PTPObject implements ICDIThread {
-	
 	static ICDIStackFrame[] noStack = new ICDIStackFrame[0];
 	int id;
 	String name;
-	StackFrame currentFrame;
+	//StackFrame currentFrame;
 	List currentFrames;
 	int stackdepth = 0;
 	int procNumber;
 	
 	final public static int STACKFRAME_DEFAULT_DEPTH = 200;
 
-	public Thread(Target target, int pNumber, int threadId) {
-		this(target, pNumber, threadId, null);
+	public Thread(Target target, int threadId) {
+		this(target, threadId, null);
 	}
 
-	public Thread(Target target, int pNumber, int threadId, String threadName) {
+	public Thread(Target target, int threadId, String threadName) {
 		super(target);
-		procNumber = pNumber;
+		procNumber = target.getTargetId();
 		id = threadId;
 		name = threadName;
 	}
@@ -50,9 +49,6 @@ public class Thread extends PTPObject implements ICDIThread {
 	}
 
 	public ICDIStackFrame[] getStackFrames() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.getStackFrames()");
-		
 		// get the frames depth
 		int depth = getStackFrameCount();
 
@@ -60,7 +56,7 @@ public class Thread extends PTPObject implements ICDIThread {
 		if (currentFrames == null || currentFrames.size() < depth) {
 			currentFrames = new ArrayList();
 			Target target = (Target) getTarget();
-			SimProcess proc = (SimProcess) target.getDebugSession().getDebugger().getProcess(procNumber);
+			SimProcess proc = (SimProcess) target.getProcess();
 			SimStackFrame[] frames = proc.getThread(id).getStackFrames();
 			for (int i = 0; i < frames.length; i++) {
 				currentFrames.add(new StackFrame(this, frames[i], depth - frames[i].getLevel()));
@@ -71,9 +67,6 @@ public class Thread extends PTPObject implements ICDIThread {
 	}
 
 	public ICDIStackFrame[] getStackFrames(int fromIndex, int len) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.getStackFrames()");
-		
 		getStackFrames();
 		
 		List list = currentFrames.subList(fromIndex, len);
@@ -81,12 +74,9 @@ public class Thread extends PTPObject implements ICDIThread {
 	}
 
 	public int getStackFrameCount() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.getStackFrameCount()");
-		
 		if (stackdepth == 0) {
 			Target target = (Target) getTarget();
-			SimProcess proc = (SimProcess) target.getDebugSession().getDebugger().getProcess(procNumber);
+			SimProcess proc = (SimProcess) target.getProcess();
 			stackdepth = proc.getThread(id).getStackFrameCount();
 		}
 		return stackdepth;
@@ -101,19 +91,16 @@ public class Thread extends PTPObject implements ICDIThread {
 	public void resume() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.resume()");
-		
 	}
 
 	public void stepOver() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.stepOver()");
-		
 	}
 
 	public void stepInto() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.stepInto()");
-		
 	}
 	
 	public String toString() {
@@ -128,43 +115,36 @@ public class Thread extends PTPObject implements ICDIThread {
 	public void stepOverInstruction() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.stepOverInstruction()");
-		
 	}
 
 	public void stepIntoInstruction() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.stepIntoInstruction()");
-		
 	}
 
 	public void stepReturn() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.stepReturn()");
-		
 	}
 
 	public void runUntil(ICDILocation location) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.runUntil()");
-		
 	}
 
 	public void jump(ICDILocation location) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.jump()");
-		
 	}
 
 	public void signal() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.signal()");
-		
 	}
 
 	public void signal(ICDISignal signal) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.signal()");
-		
 	}
 
 	public boolean equals(ICDIThread thead) {
@@ -176,55 +156,46 @@ public class Thread extends PTPObject implements ICDIThread {
 	public void stepOver(int count) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.stepOver()");
-		
 	}
 
 	public void stepOverInstruction(int count) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.stepOverInstruction()");
-		
 	}
 
 	public void stepInto(int count) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.stepInto()");
-		
 	}
 
 	public void stepIntoInstruction(int count) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.stepIntoInstruction()");
-		
 	}
 
 	public void stepUntil(ICDILocation location) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.stepUntil()");
-		
 	}
 
 	public void resume(boolean passSignal) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.resume()");
-		
 	}
 
 	public void resume(ICDILocation location) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.resume()");
-		
 	}
 
 	public void resume(ICDISignal signal) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.resume()");
-		
 	}
 
 	public void suspend() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.suspend()");
-		
 	}
 
 	public boolean isSuspended() {

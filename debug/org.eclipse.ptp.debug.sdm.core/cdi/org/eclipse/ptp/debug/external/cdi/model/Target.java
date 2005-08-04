@@ -38,7 +38,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
-import org.eclipse.ptp.debug.external.DebugSession;
+import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
@@ -48,49 +48,31 @@ import org.eclipse.ptp.debug.external.simulator.SimThread;
 public class Target extends SessionObject implements IPCDITarget {
 	
 	private TargetConfiguration fConfiguration;
-	private DebugSession dSession;
+	private IDebugger fDebugger;
 	
-	Thread[] noThreads = new Thread[0];
 	Thread[] currentThreads;
 	int currentThreadId;
 	
-	int targetId;
+	int targetId; /* synonymous with the process number/id */
 	
-	public Target(Session s, DebugSession dS, int tId) {
+	public Target(Session s, IDebugger debugger, int tId) {
 		super(s);
-		dSession = dS;
+		fDebugger = debugger;
 		targetId = tId;
 		
 		fConfiguration = new TargetConfiguration(this);
-		currentThreads = noThreads;
+		currentThreads = new Thread[0];
 	}
 	
-	public String getTargetId() {
-		return Integer.toString(targetId);
-	}
-	
-	public DebugSession getDebugSession() {
-		System.out.println("Target.getDebugSession()");
-		return dSession;
-	}
-	
-	public Process[] getProcesses() {
-		System.out.println("Target.getProcesses()");
-		return dSession.getDebugger().getProcesses();
-	}
-
-	public Process getProcess(int num) {
-		System.out.println("Target.getProcess()");
-		return dSession.getDebugger().getProcess(num);
+	public int getTargetId() {
+		return targetId;
 	}
 	
 	public Process getProcess() {
-		System.out.println("Target.getProcess()");
-		return getProcess(targetId);
+		return fDebugger.getProcess(targetId);
 	}
 
 	public ICDITargetConfiguration getConfiguration() {
-		System.out.println("Target.getConfiguration()");
 		return fConfiguration;
 	}
 
@@ -121,7 +103,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void terminate() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.terminate()");
-		dSession.getDebugger().kill();
+		fDebugger.kill();
 	}
 
 	public boolean isDisconnected() {
@@ -133,13 +115,13 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void disconnect() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.disconnect()");
-		dSession.getDebugger().detach();
+		fDebugger.detach();
 	}
 
 	public void restart() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.restart()");
-		dSession.getDebugger().restart();
+		fDebugger.restart();
 	}
 
 	public void resume() throws CDIException {
@@ -151,49 +133,41 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void stepOver() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.stepOver()");
-		
 	}
 
 	public void stepInto() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.stepInto()");
-		
 	}
 
 	public void stepOverInstruction() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.stepOverInstruction()");
-		
 	}
 
 	public void stepIntoInstruction() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.stepIntoInstruction()");
-		
 	}
 
 	public void runUntil(ICDILocation location) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.runUntil()");
-		
 	}
 
 	public void jump(ICDILocation location) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.jump()");
-		
 	}
 
 	public void signal() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.signal()");
-		
 	}
 
 	public void signal(ICDISignal signal) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.signal()");
-		
 	}
 
 	public ICDIRuntimeOptions getRuntimeOptions() {
@@ -215,32 +189,20 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 	
 	public ICDIThread[] getThreads() throws CDIException {
-		return getThreads(0);
-	}
-	
-	public ICDIThread[] getThreads(int procNumber) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.getThreads(" + procNumber+ ")");
-		// FIXME Donny
-		//if (currentThreads.length == 0) {
+		SimThread[] threads = ((SimProcess) getProcess()).getThreads();
 			
-			SimThread[] threads = ((SimProcess) dSession.getDebugger().getProcess(procNumber)).getThreads();
+		currentThreads = new Thread[threads.length];
 			
-			currentThreads = new Thread[threads.length];
+		for (int i = 0; i < threads.length; i++) {
+			currentThreads[i] = new Thread(this, threads[i].getThreadId());
+		}
 			
-			for (int i = 0; i < threads.length; i++) {
-				currentThreads[i] = new Thread(this, procNumber, threads[i].getThreadId());
-			}
-			
-			currentThreadId = currentThreads[0].getId();
-		//}
+		currentThreadId = 0;
 		return currentThreads;
 	}
-
+	
 	public ICDIThread getCurrentThread() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.getCurrentThread()");
-		return null;
+		return currentThreads[currentThreadId];
 	}
 
 	public ICDIBreakpoint[] getBreakpoints() throws CDIException {
@@ -258,13 +220,11 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void deleteBreakpoints(ICDIBreakpoint[] breakpoints) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.deleteBreakpoints()");
-		
 	}
 
 	public void deleteAllBreakpoints() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.deleteAllBreakpoints()");
-		
 	}
 
 	public ICDIExceptionpoint setExceptionBreakpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch) throws CDIException {
@@ -276,55 +236,48 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void stepOver(int count) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.stepOver()");
-		
 	}
 
 	public void stepOverInstruction(int count) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.stepOverInstruction()");
-		
 	}
 
 	public void stepInto(int count) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.stepInto()");
-		
 	}
 
 	public void stepIntoInstruction(int count) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.stepIntoInstruction()");
-		
 	}
 
 	public void stepUntil(ICDILocation location) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.stepUntil()");
-		
 	}
 
 	public void resume(boolean passSignal) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.resume()");
-		dSession.getDebugger().go();
+		fDebugger.go();
 	}
 
 	public void resume(ICDILocation location) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.resume()");
-		
 	}
 
 	public void resume(ICDISignal signal) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.resume()");
-		
 	}
 
 	public void suspend() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.suspend()");
-		dSession.getDebugger().halt();
+		fDebugger.halt();
 	}
 
 	public boolean isSuspended() {
@@ -360,19 +313,16 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void destroyExpressions(ICDIExpression[] expressions) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.destroyExpressions()");
-		
 	}
 
 	public void destroyAllExpressions() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.destroyAllExpressions()");
-		
 	}
 
 	public void addSourcePaths(String[] srcPaths) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.addSourcePaths()");
-		
 	}
 
 	public String[] getSourcePaths() throws CDIException {
@@ -432,13 +382,11 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void removeBlocks(ICDIMemoryBlock[] memoryBlocks) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.removeBlocks()");
-		
 	}
 
 	public void removeAllBlocks() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.removeAllBlocks()");
-		
 	}
 
 	public ICDIMemoryBlock[] getMemoryBlocks() throws CDIException {
@@ -448,43 +396,31 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 
 	public ICDILineLocation createLineLocation(String file, int line) {
-		// Auto-generated method stub
-		System.out.println("Target.createLineLocation()");
 		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
 		return bMgr.createLineLocation(file, line);
 	}
 
 	public ICDIFunctionLocation createFunctionLocation(String file, String function) {
-		// Auto-generated method stub
-		System.out.println("Target.createFunctionLocation()");
 		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
 		return bMgr.createFunctionLocation(file, function);
 	}
 
 	public ICDIAddressLocation createAddressLocation(BigInteger address) {
-		// Auto-generated method stub
-		System.out.println("Target.createAddressLocation()");
 		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
 		return bMgr.createAddressLocation(address);
 	}
 
 	public ICDILineBreakpoint setLineBreakpoint(int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.setLineBreakpoint()");
 		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
 		return bMgr.setLineBreakpoint(this, type, location, condition, deferred);
 	}
 
 	public ICDIFunctionBreakpoint setFunctionBreakpoint(int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.setFunctionBreakpoint()");
 		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
 		return bMgr.setFunctionBreakpoint(this, type, location, condition, deferred);
 	}
 
 	public ICDIAddressBreakpoint setAddressBreakpoint(int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.setAddressBreakpoint()");
 		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
 		return bMgr.setAddressBreakpoint(this, type, location, condition, deferred);
 	}
@@ -492,7 +428,6 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void setSourcePaths(String[] srcPaths) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.setSourcePaths()");
-		
 	}
 
 }
