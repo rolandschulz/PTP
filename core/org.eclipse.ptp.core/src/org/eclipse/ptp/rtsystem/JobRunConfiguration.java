@@ -1,17 +1,19 @@
 package org.eclipse.ptp.rtsystem;
 
 public class JobRunConfiguration {
-	private String pathToExec;
-	private int numberOfProcesses;
-	private int numberOfProcessesPerNode;
-	private int firstNodeNumber;
+	protected String pathToExec;
+	protected int numberOfProcesses;
+	protected int numberOfProcessesPerNode;
+	protected int firstNodeNumber;
+	protected boolean isDebugJob = false;
 	
-	public JobRunConfiguration(String p, int np, int npp, int fn)
+	public JobRunConfiguration(String p, int np, int npp, int fn, boolean debug)
 	{
 		pathToExec = p;
 		numberOfProcesses = np;
 		numberOfProcessesPerNode = npp;
 		firstNodeNumber = fn;
+		isDebugJob = debug;
 	}
 	
 	public String getPathToExec()
@@ -40,5 +42,15 @@ public class JobRunConfiguration {
 		       "#procs:\t\t"+numberOfProcesses+"\n"+
 		       "#proc/node:\t"+numberOfProcessesPerNode+"\n"+
 		       "firstNode#:\t"+firstNodeNumber+"\n";
+	}
+	
+	public boolean isDebug()
+	{
+		return isDebugJob;
+	}
+	
+	public void setDebug()
+	{
+		isDebugJob = true;
 	}
 }
