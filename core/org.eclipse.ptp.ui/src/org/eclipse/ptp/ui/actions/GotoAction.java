@@ -34,7 +34,7 @@ public abstract class GotoAction extends ParallelAction {
 		this(name, id, view, IAction.AS_CHECK_BOX, action);
 	}
 	public GotoAction(String name, String id, AbstractParallelElementView view, int style, GotoDropDownAction action) {
-		super("To: " + name, style, view);
+		super(name, style, view);
 		this.id = id;
 		this.action = action;	
 	}

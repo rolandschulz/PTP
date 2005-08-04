@@ -53,7 +53,7 @@ public class CreateSetAction extends GotoDropDownAction {
 	}
 	
 	protected void addAction(MenuManager dropDownMenuMgr, String e_name, String id, String curID) {
-		IAction action = new InternalSetAction(e_name, id, view, this);
+		IAction action = new InternalSetAction("Add to set: " + e_name, id, view, this);
 		action.setEnabled(!curID.equals(id));
 		dropDownMenuMgr.add(action);
 	}	
