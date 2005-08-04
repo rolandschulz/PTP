@@ -118,13 +118,13 @@ public class DebugSimulator extends AbstractDebugger {
 		
 		initializeSimulatedProcessesCode(debuggerCommands, procCommands);
 		
-		debuggerProcess = new SimProcess("Debugger", 1, debuggerCommands, this, debugSession);
+		debuggerProcess = new SimProcess("Debugger", 99, 1, debuggerCommands, this, debugSession);
 		
 		MProcess.resetGlobalCounter();
 		IPProcess[] procs = job.getProcesses();
 		for (int i = 0; i < procs.length; i++) {
 			MProcess proc = new MProcess();
-			Process p = new SimProcess("proc" + i, 1, procCommands[i], this, debugSession);
+			Process p = new SimProcess("proc" + i, i, 1, procCommands[i], this, debugSession);
 			proc.setDebugInfo(p); /* We store the process in the "debug info" */
 			proc.setPProcess(procs[i]);
 			allSet.addProcess(proc);

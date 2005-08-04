@@ -4,7 +4,6 @@
  */
 package org.eclipse.ptp.debug.external.event;
 
-import org.eclipse.ptp.debug.external.DebugSession;
 
 /**
  * @author donny
@@ -12,14 +11,20 @@ import org.eclipse.ptp.debug.external.DebugSession;
  */
 public class DebugEvent {
 	String eventName = "";
-	DebugSession dSession;
+	int processId;
+	int threadId;
 	
-	public DebugEvent(String eName, DebugSession session) {
+	public DebugEvent(String eName, int pId, int tId) {
 		eventName = eName;
-		dSession = session;
+		processId = pId;
+		threadId = tId;
 	}
 	
-	public DebugSession getDebugSession() {
-		return dSession;
+	public int getProcessId() {
+		return processId;
+	}
+	
+	public int getThreadId() {
+		return threadId;
 	}
 }

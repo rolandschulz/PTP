@@ -22,17 +22,20 @@ import org.eclipse.ptp.debug.external.event.EInferiorCreated;
 /**
  */
 public class CreatedEvent implements ICDICreatedEvent {
-
 	Session session;
 	ICDIObject source;
 
 	public CreatedEvent(Session s, EBreakpointCreated ev) {
 		session = s;
+		int pId = ev.getProcessId();
+		int tId = ev.getThreadId();
 		DebugSession dSession = ev.getDebugSession();
 		// FIXME 
 		//Target target = session.getTarget(dSession);
 		Target target = (Target) session.getTarget(0);
 		source = new PTPObject(target);
+		
+		session.getTarget()
 	}
 
 	public CreatedEvent(Session s, EInferiorCreated ev) {
