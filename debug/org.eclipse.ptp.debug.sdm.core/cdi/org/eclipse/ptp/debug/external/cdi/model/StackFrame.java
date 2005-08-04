@@ -20,8 +20,6 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.ptp.debug.external.cdi.Locator;
-import org.eclipse.ptp.debug.external.cdi.Session;
-import org.eclipse.ptp.debug.external.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.simulator.SimStackFrame;
 
 /**
@@ -62,28 +60,6 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 		return new Locator("", "", 0, addr); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	public ICDILocalVariableDescriptor[] getLocalVariableDescriptors() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("StackFrame.getLocalVariableDescriptors()");
-		if (localDescs == null) {
-			Session session = (Session)getTarget().getSession();
-			VariableManager mgr = session.getVariableManager();
-			localDescs = mgr.getLocalVariableDescriptors(this);
-		}
-		return localDescs;
-	}
-
-	public ICDIArgumentDescriptor[] getArgumentDescriptors() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("StackFrame.getArgumentDescriptors()");
-		if (argDescs == null) {
-			Session session = (Session)getTarget().getSession();
-			VariableManager mgr = session.getVariableManager();
-			argDescs = mgr.getArgumentDescriptors(this);
-		}
-		return argDescs;
-	}
-
 	public ICDIThread getThread() {
 		// Auto-generated method stub
 		System.out.println("StackFrame.getThread()");
@@ -116,5 +92,17 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 	
 	public SimStackFrame getSimStackFrame() {
 		return frame;
+	}
+
+	public ICDILocalVariableDescriptor[] getLocalVariableDescriptors() throws CDIException {
+		// Auto-generated method stub
+		System.out.println("StackFrame.getLocalVariableDescriptors");
+		return null;
+	}
+
+	public ICDIArgumentDescriptor[] getArgumentDescriptors() throws CDIException {
+		// Auto-generated method stub
+		System.out.println("StackFrame.getArgumentDescriptors");
+		return null;
 	}
 }

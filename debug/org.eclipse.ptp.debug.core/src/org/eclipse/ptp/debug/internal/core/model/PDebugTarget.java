@@ -1166,29 +1166,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.IExecFileInfo#getGlobals()
-	 */
-	public IGlobalVariableDescriptor[] getGlobals() throws DebugException {
-		ArrayList list = new ArrayList();
-		IBinaryObject file = getBinaryFile();
-		if (file != null) {
-			list.addAll( getCFileGlobals( file ) );
-		}
-		return (IGlobalVariableDescriptor[])list.toArray( new IGlobalVariableDescriptor[list.size()] );
-	}
-
-	private List getCFileGlobals( IBinaryObject file ) throws DebugException {
-		ArrayList list = new ArrayList();
-		ISymbol[] symbols = file.getSymbols();
-		for( int i = 0; i < symbols.length; ++i ) {
-			if (symbols[i].getType() == ISymbol.VARIABLE) {
-				list.add( CVariableFactory.createGlobalVariableDescriptor( symbols[i] ) );
-			}
-		}
-		return list;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.core.model.IResumeWithoutSignal#canResumeWithoutSignal()
 	 */
 	public boolean canResumeWithoutSignal() {
@@ -1414,5 +1391,11 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		// Auto-generated method stub
 		System.out.println("PDebugTarget.isInstructionSteppingEnabled");
 		return false;
+	}
+
+	public IGlobalVariableDescriptor[] getGlobals() throws DebugException {
+		// Auto-generated method stub
+		System.out.println("PDebugTarget.getGlobals");
+		return null;
 	}
 }

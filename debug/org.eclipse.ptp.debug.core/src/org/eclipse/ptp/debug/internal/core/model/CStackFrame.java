@@ -109,55 +109,7 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 	 * @see org.eclipse.debug.core.model.IStackFrame#getVariables()
 	 */
 	public IVariable[] getVariables() throws DebugException {
-		ICGlobalVariable[] globals = getGlobals();
-		List vars = getVariables0();
-		List all = new ArrayList( globals.length + vars.size() );
-		all.addAll( Arrays.asList( globals ) );
-		all.addAll( vars );
-		return (IVariable[])all.toArray( new IVariable[all.size()] );
-	}
-
-	protected synchronized List getVariables0() throws DebugException {
-		CThread thread = (CThread)getThread();
-		if ( thread.isSuspended() ) {
-			if ( fVariables == null ) {			
-				List vars = getAllCDIVariableObjects();
-				fVariables = new ArrayList( vars.size() );
-				Iterator it = vars.iterator();
-				while( it.hasNext() ) {
-					fVariables.add( CVariableFactory.createVariable( this, (ICDIVariableDescriptor)it.next() ) );
-				}
-			}
-			else if ( refreshVariables() ) {
-				updateVariables();
-			}
-			setRefreshVariables( false );
-		}
-		return ( fVariables != null ) ? fVariables : Collections.EMPTY_LIST;
-	}
-
-	/**
-	 * Incrementally updates this stack frame's variables.
-	 */
-	protected void updateVariables() throws DebugException {
-		List locals = getAllCDIVariableObjects();
-		int index = 0;
-		while( index < fVariables.size() ) {
-			ICDIVariableDescriptor varObject = findVariable( locals, (CVariable)fVariables.get( index ) );
-			if ( varObject != null ) {
-				locals.remove( varObject );
-				index++;
-			}
-			else {
-				// remove variable
-				fVariables.remove( index );
-			}
-		}
-		// add any new locals
-		Iterator newOnes = locals.iterator();
-		while( newOnes.hasNext() ) {
-			fVariables.add( CVariableFactory.createVariable( this, (ICDIVariableDescriptor)newOnes.next() ) );
-		}
+		return new IVariable[0];		
 	}
 
 	/**
@@ -173,7 +125,7 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 	 * @see org.eclipse.debug.core.model.IStackFrame#hasVariables()
 	 */
 	public boolean hasVariables() throws DebugException {
-		return getVariables0().size() > 0;
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -473,7 +425,6 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 	protected void dispose() {
 		setDisposed( true );
 		getCDISession().getEventManager().removeEventListener( this );
-		disposeAllVariables();
 	}
 
 	/**
@@ -518,17 +469,6 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 		return tos != null && tos.equals( this );
 	}
 
-	protected void disposeAllVariables() {
-		if ( fVariables == null )
-			return;
-		Iterator it = fVariables.iterator();
-		while( it.hasNext() ) {
-			((CVariable)it.next()).dispose();
-		}
-		fVariables.clear();
-		fVariables = null;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.core.model.ICStackFrame#getAddress()
 	 */
@@ -563,30 +503,6 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 	 */
 	public int getFrameLineNumber() {
 		return getCDIStackFrame().getLocator().getLineNumber();
-	}
-
-	protected synchronized void preserve() {
-		preserveVariables();
-	}
-
-	private void preserveVariables() {
-		if ( fVariables == null )
-			return;
-		Iterator it = fVariables.iterator();
-		while( it.hasNext() ) {
-			AbstractCVariable av = (AbstractCVariable)it.next();
-			av.preserve();
-		}
-	}
-
-	protected ICDIVariableDescriptor findVariable( List list, CVariable var ) {
-		Iterator it = list.iterator();
-		while( it.hasNext() ) {
-			ICDIVariableDescriptor newVarObject = (ICDIVariableDescriptor)it.next();
-			if ( var.sameVariable( newVarObject ) )
-				return newVarObject;
-		}
-		return null;
 	}
 
 	/* (non-Javadoc)
