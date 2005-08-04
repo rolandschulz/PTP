@@ -121,6 +121,10 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	
 	public void createPartControl(Composite parent) {
 		initialKey(Platform.getOS());
+		createView(parent);
+	}
+	
+	protected void createView(Composite parent) {
 		createElementView(parent);
 	}
 	
@@ -131,15 +135,16 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 			}
 		});
 	}
-
-	protected void createElementView(Composite parent) {
+	
+	protected Composite createElementView(Composite parent) {
+		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout gd = new GridLayout(1, false);
 		gd.marginHeight = gd.marginWidth = 0;
-		parent.setLayout(gd);
-		parent.setLayoutData(new GridData(GridData.FILL_BOTH));
-		parent.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));		
-		
-		sc = new ScrolledComposite(parent, SWT.V_SCROLL);
+		composite.setLayout(gd);
+		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		composite.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+		sc = new ScrolledComposite(composite, SWT.V_SCROLL);
 		sc.setLayout(new FillLayout());
 		sc.setLayoutData(new GridData(GridData.FILL_BOTH));
 		sc.setMinSize(200, 200);
@@ -174,6 +179,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		drawComp.addListener(SWT.MouseDoubleClick, myDrawingMouseListener);
 		drawComp.addListener(SWT.KeyDown, myDrawingMouseListener);
 		drawComp.addListener(SWT.KeyUp, myDrawingMouseListener);
+		
+		return composite;
 	}
 	
 	protected void drawingMouseHandleEvent(Event e) {
@@ -295,6 +302,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		isDoubleClick = true;
 	}
 	protected void keyDownEvent(int mx, int my, int keyCode) {
+		hideToolTip();
 		if (keyCode == SWT.PAGE_UP)
 			scrollUp();
 		else if (keyCode == SWT.PAGE_DOWN)
@@ -491,7 +499,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		// reset the x to fit into screen size
 		new_x = (new_x < shell_rect.x) ? 0 : ((new_x + s_size.x) > shell_rect.width) ? (shell_rect.width - s_size.x - 10) : new_x;
 		int new_y = e_loc.y - s_size.y;
-		new_y = (new_y <= sc.getOrigin().y) ? (e_loc.y + e_height + e_spacing_y) : new_y;
+		new_y = (new_y <= sc.getOrigin().y) ? (e_loc.y + e_height + e_spacing_y + 5) : new_y - 5;
 
 		toolTipShell.setLocation(getViewActualLocation(drawComp, null, new_x, new_y));
 		toolTipShell.setVisible(true);

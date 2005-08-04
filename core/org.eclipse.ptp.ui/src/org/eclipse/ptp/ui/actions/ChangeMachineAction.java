@@ -40,11 +40,14 @@ public class ChangeMachineAction extends GotoDropDownAction {
 	}
 		
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
-	    	String curMachineID = ((ParallelMachineView)view).getCurrentMachineID();	
-	    	IPMachine[] macs = view.getUIManger().getModelManager().getUniverse().getSortedMachines();
-	    	for (int i=0; i<macs.length; i++) {
-	    		addAction(dropDownMenuMgr, macs[i].getElementName(), macs[i].getKeyString(), curMachineID);
-	    	}		
+		if (view instanceof ParallelMachineView) {
+			ParallelMachineView pmView = (ParallelMachineView)view;
+		    	String curMachineID = pmView.getCurrentMachineID();	
+		    	IPMachine[] macs = pmView.getMachineManager().getMachines();
+		    	for (int i=0; i<macs.length; i++) {
+		    		addAction(dropDownMenuMgr, macs[i].getElementName(), macs[i].getKeyString(), curMachineID);
+		    	}		
+		}
 	}
 	
 	protected void addAction(MenuManager dropDownMenuMgr, String machine_name, String id, String curID) {
@@ -57,17 +60,20 @@ public class ChangeMachineAction extends GotoDropDownAction {
 	public void run(IElement[] elements) {}
 	
 	public void run() {
-		IPMachine[] macs = view.getUIManger().getModelManager().getUniverse().getSortedMachines();
-	    	for (int i=0; i<macs.length; i++) {
-//	    		FIXME id or name
-	    		if (((ParallelMachineView)view).getCurrentMachineID().equals(macs[i].getKeyString())) {
-	    			if (i + 1 < macs.length)
-	    				run(null, macs[i+1].getKeyString());
-	    			else
-	    				run(null, macs[0].getKeyString());
-	    			
-	    			break;
-	    		}
+		if (view instanceof ParallelMachineView) {
+			ParallelMachineView pmView = ((ParallelMachineView)view);
+			IPMachine[] macs = pmView.getMachineManager().getMachines();
+			for (int i=0; i<macs.length; i++) {
+		    		//FIXME id or name
+		    		if (pmView.getCurrentMachineID().equals(macs[i].getKeyString())) {
+		    			if (i + 1 < macs.length)
+		    				run(null, macs[i+1].getKeyString());
+		    			else
+		    				run(null, macs[0].getKeyString());
+		    			
+		    			break;
+		    		}
+			}
 	    	}
 	}
 	
