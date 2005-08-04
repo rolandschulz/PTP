@@ -19,7 +19,7 @@
 
 package org.eclipse.ptp.ui;
 
-import org.eclipse.ptp.ui.views.old.ParallelNodeStatusView;
+import org.eclipse.ptp.ui.views.ParallelMachineView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -80,7 +80,6 @@ public class LegendDialog extends Dialog
 		FormData fd ;
 		GridData data = new GridData(GridData.FILL_BOTH);
 		top.setLayoutData(data);
-		CLabel text;
 
 		/* one horizontal box */
 		Composite c = new Composite(top, SWT.NONE);
@@ -88,7 +87,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		CLabel b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelNodeStatusView.statusImages[ParallelNodeStatusView.NODE_DOWN][ParallelNodeStatusView.NOT_SELECTED]);
+		b.setImage(ParallelMachineView.nodeImages[MachineManager.NODE_DOWN][0]);
 		CLabel l = new CLabel(c, SWT.LEFT);
 		l.setText("DOWN");
 		/* formdata stuff so they take up the right amount of space */
@@ -110,7 +109,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelNodeStatusView.statusImages[ParallelNodeStatusView.NODE_UP][ParallelNodeStatusView.NOT_SELECTED]);
+		b.setImage(ParallelMachineView.nodeImages[MachineManager.NODE_UP][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("UNALLOCATED");
 		/* formdata stuff so they take up the right amount of space */
@@ -132,7 +131,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelNodeStatusView.statusImages[ParallelNodeStatusView.NODE_USER_ALLOC_EXCL][ParallelNodeStatusView.NOT_SELECTED]);
+		b.setImage(ParallelMachineView.nodeImages[MachineManager.NODE_USER_ALLOC_EXCL][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("ALLOCATED TO YOU EXCLUSIVELY, BUT IDLE");
 		/* formdata stuff so they take up the right amount of space */
@@ -154,7 +153,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelNodeStatusView.statusImages[ParallelNodeStatusView.NODE_USER_ALLOC_SHARED][ParallelNodeStatusView.NOT_SELECTED]);
+		b.setImage(ParallelMachineView.nodeImages[MachineManager.NODE_USER_ALLOC_SHARED][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("ALLOCATED TO YOU SHARED, BUT IDLE");
 		/* formdata stuff so they take up the right amount of space */
@@ -176,7 +175,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelNodeStatusView.statusImages[ParallelNodeStatusView.NODE_OTHER_ALLOC_EXCL][ParallelNodeStatusView.NOT_SELECTED]);
+		b.setImage(ParallelMachineView.nodeImages[MachineManager.NODE_OTHER_ALLOC_EXCL][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("ALLOCATED TO SOMEONE ELSE EXCLUSIVELY");
 		/* formdata stuff so they take up the right amount of space */
@@ -198,7 +197,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelNodeStatusView.statusImages[ParallelNodeStatusView.NODE_OTHER_ALLOC_SHARED][ParallelNodeStatusView.NOT_SELECTED]);
+		b.setImage(ParallelMachineView.nodeImages[MachineManager.NODE_OTHER_ALLOC_SHARED][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("ALLOCATED TO SOMEONE ELSE SHARED");
 		/* formdata stuff so they take up the right amount of space */
@@ -220,7 +219,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelNodeStatusView.statusImages[ParallelNodeStatusView.NODE_RUNNING][ParallelNodeStatusView.NOT_SELECTED]);
+		b.setImage(ParallelMachineView.nodeImages[MachineManager.NODE_RUNNING][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("JOB RUNNING");
 		/* formdata stuff so they take up the right amount of space */
@@ -242,7 +241,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelNodeStatusView.statusImages[ParallelNodeStatusView.NODE_EXITED][ParallelNodeStatusView.NOT_SELECTED]);
+		b.setImage(ParallelMachineView.nodeImages[MachineManager.NODE_EXITED][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("JOB STOPPED");
 		/* formdata stuff so they take up the right amount of space */
@@ -264,7 +263,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelNodeStatusView.statusImages[ParallelNodeStatusView.NODE_ERROR][ParallelNodeStatusView.NOT_SELECTED]);
+		b.setImage(ParallelMachineView.nodeImages[MachineManager.NODE_ERROR][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("ERROR");
 		/* formdata stuff so they take up the right amount of space */
@@ -286,7 +285,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelNodeStatusView.statusImages[ParallelNodeStatusView.NODE_UNKNOWN][ParallelNodeStatusView.NOT_SELECTED]);
+		b.setImage(ParallelMachineView.nodeImages[MachineManager.NODE_UNKNOWN][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("UNKNOWN / UNDEFINED");
 		/* formdata stuff so they take up the right amount of space */
@@ -319,7 +318,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelNodeStatusView.statusImages[ParallelNodeStatusView.PROC_STARTING][ParallelNodeStatusView.NOT_SELECTED]);
+		b.setImage(ParallelMachineView.procImages[MachineManager.PROC_STARTING][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("STARTING");
 		/* formdata stuff so they take up the right amount of space */
@@ -342,7 +341,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelNodeStatusView.statusImages[ParallelNodeStatusView.PROC_RUNNING][ParallelNodeStatusView.NOT_SELECTED]);
+		b.setImage(ParallelMachineView.procImages[MachineManager.PROC_RUNNING][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("RUNNING");
 		/* formdata stuff so they take up the right amount of space */
@@ -365,7 +364,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelNodeStatusView.statusImages[ParallelNodeStatusView.PROC_EXITED][ParallelNodeStatusView.NOT_SELECTED]);
+		b.setImage(ParallelMachineView.procImages[MachineManager.PROC_EXITED][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("EXITED NORMALLY");
 		/* formdata stuff so they take up the right amount of space */
@@ -388,7 +387,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelNodeStatusView.statusImages[ParallelNodeStatusView.PROC_EXITED_SIGNAL][ParallelNodeStatusView.NOT_SELECTED]);
+		b.setImage(ParallelMachineView.procImages[MachineManager.PROC_EXITED_SIGNAL][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("EXITED WITH SIGNAL");
 		/* formdata stuff so they take up the right amount of space */
@@ -411,7 +410,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelNodeStatusView.statusImages[ParallelNodeStatusView.PROC_STOPPED][ParallelNodeStatusView.NOT_SELECTED]);
+		b.setImage(ParallelMachineView.procImages[MachineManager.PROC_STOPPED][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("STOPPED");
 		/* formdata stuff so they take up the right amount of space */
@@ -434,7 +433,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelNodeStatusView.statusImages[ParallelNodeStatusView.PROC_ERROR][ParallelNodeStatusView.NOT_SELECTED]);
+		b.setImage(ParallelMachineView.procImages[MachineManager.PROC_ERROR][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("ERROR");
 		/* formdata stuff so they take up the right amount of space */
