@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
-import org.eclipse.ptp.debug.external.event.EBreakpointHit;
 import org.eclipse.ptp.debug.external.model.MProcess;
 
 public class DebugSimulator extends AbstractDebugger {
@@ -312,6 +311,72 @@ public class DebugSimulator extends AbstractDebugger {
 	public void restart() {
 		// Auto-generated method stub
 		System.out.println("DebugSimulator2.restart()");
+		
+	}
+
+	public void step(int[] procs) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.step");
+		
+	}
+
+	public void step(int[] procs, int count) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.step");
+		
+	}
+
+	public void stepOver(int[] procs) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.stepOver");
+		
+	}
+
+	public void stepOver(int[] procs, int count) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.stepOver");
+		
+	}
+
+	public void stepFinish(int[] procs) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.stepFinish");
+		
+	}
+
+	public void halt(int[] procs) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.halt");
+		
+	}
+
+	public void go(int[] procs) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.go");
+		
+	}
+
+	public void breakpoint(int[] procs, String loc) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.breakpoint");
+		
+	}
+
+	public void breakpoint(int[] procs, String loc, int count) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.breakpoint");
+		
+	}
+
+	public void breakpoint(int[] procs, String loc, String cond) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.breakpoint");
+		
+	}
+
+	public void watchpoint(int[] procs, String var) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.watchpoint");
 		
 	}
 }
