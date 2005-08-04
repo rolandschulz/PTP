@@ -30,7 +30,6 @@ import org.eclipse.ptp.debug.external.model.MProcessSet;
 public class Session implements ICDISession, ICDISessionObject {
 	EventManager eventManager;
 	BreakpointManager breakpointManager;
-	VariableManager variableManager;
 	
 	Properties props;
 	SessionConfiguration configuration;
@@ -54,7 +53,6 @@ public class Session implements ICDISession, ICDISessionObject {
 		
 		eventManager = new EventManager(this);
 		breakpointManager = new BreakpointManager(this);
-		variableManager = new VariableManager(this);
 		
 		currentDebugTargetList = new Hashtable();
 		currentProcessSetList = new Hashtable();
@@ -64,10 +62,6 @@ public class Session implements ICDISession, ICDISessionObject {
 		addTarget(0);
 		addTarget(1);
 	}
-	
-	
-	
-	
 	
 	public IPCDIDebugProcessSet newProcessSet(String name, int[] procs) {
 		MProcessSet procSet = debugger.defSet(name, procs);
@@ -191,11 +185,6 @@ public class Session implements ICDISession, ICDISessionObject {
 		return breakpointManager;
 	}
 	
-	public VariableManager getVariableManager() {
-		System.out.println("Session.getVariableManager()");
-		return variableManager;
-	}
-
 	public ICDIEventManager getEventManager() {
 		System.out.println("Session.getEventManager()");
 		return eventManager;
