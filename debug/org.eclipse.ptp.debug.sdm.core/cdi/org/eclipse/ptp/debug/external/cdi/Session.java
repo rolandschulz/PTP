@@ -63,6 +63,14 @@ public class Session implements ICDISession, ICDISessionObject {
 		addTarget(1);
 	}
 	
+	public DebugSession getDebugSession() {
+		return dSession;
+	}
+	
+	public IDebugger getDebugger() {
+		return debugger;
+	}
+	
 	public IPCDIDebugProcessSet newProcessSet(String name, int[] procs) {
 		MProcessSet procSet = debugger.defSet(name, procs);
 		DebugProcessSet newSet = new DebugProcessSet(procSet);
@@ -99,12 +107,12 @@ public class Session implements ICDISession, ICDISessionObject {
 	
 
 	public void addTarget(int procNum) {
-		Target target = new Target(this, dSession, procNum);
+		Target target = new Target(this, debugger, procNum);
 		
 		debugger.addDebuggerObserver(eventManager);
 		debugger.fireEvent(new EInferiorCreated(dSession));
-		if (!currentDebugTargetList.containsKey(target.getTargetId())) {
-			currentDebugTargetList.put(target.getTargetId(), target);
+		if (!currentDebugTargetList.containsKey(Integer.toString(target.getTargetId()))) {
+			currentDebugTargetList.put(Integer.toString(target.getTargetId()), target);
 		}
 		
 		try {
