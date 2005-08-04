@@ -1,5 +1,7 @@
 package org.eclipse.ptp.debug.external.cdi;
 
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Properties;
 
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
@@ -16,11 +18,13 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.DebugSession;
+import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
+import org.eclipse.ptp.debug.external.event.EInferiorCreated;
 
 public class Session implements ICDISession, ICDISessionObject {
-	ProcessManager processManager;
 	EventManager eventManager;
 	BreakpointManager breakpointManager;
 	VariableManager variableManager;
@@ -31,6 +35,9 @@ public class Session implements ICDISession, ICDISessionObject {
 	DebugSession dSession;
 	ILaunch dLaunch;
 	IBinaryObject dBinObject;
+	IDebugger debugger;
+	
+	Hashtable currentDebugTargetList;
 	
 	public Session(DebugSession dSess, ILaunch launch, IBinaryObject binObj) {
 		props = new Properties();
@@ -39,56 +46,88 @@ public class Session implements ICDISession, ICDISessionObject {
 		dSession = dSess;
 		dLaunch = launch;
 		dBinObject = binObj;
+		debugger = dSession.getDebugger();
 		
-		processManager = new ProcessManager(this);
 		eventManager = new EventManager(this);
 		breakpointManager = new BreakpointManager(this);
 		variableManager = new VariableManager(this);
 		
+		currentDebugTargetList = new Hashtable();
+		
 		/* Initially we only create process/target 0 */
-		addTargets(new int[] { 0, 1 });
+		//addTargets(new int[] { 0, 1 });
+		addTarget(0);
+		addTarget(1);
 	}
 
-	public void addTargets(int[] procNums) {
-		Target[] targets = new Target[procNums.length];
-		for (int i = 0; i < procNums.length; i++) {
-			targets[i] = new Target(this, dSession, procNums[i]);
+	public void addTarget(int procNum) {
+		Target target = new Target(this, dSession, procNum);
+		
+		debugger.addDebuggerObserver(eventManager);
+		debugger.fireEvent(new EInferiorCreated(dSession));
+		if (!currentDebugTargetList.containsKey(target.getTargetId())) {
+			currentDebugTargetList.put(target.getTargetId(), target);
 		}
-		processManager.addTargets(targets);
 		
 		try {
 			boolean stopInMain = dLaunch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
 
-			for (int i = 0; i < targets.length; i++) {
-				Process process = targets[i].getProcess();
-				IProcess iprocess = null;
-				if (process != null) {
-					iprocess = DebugPlugin.newProcess(dLaunch, process, "Launch Label " + targets[i].getTargetId());
-				}
-
-				PCDIDebugModel.newDebugTarget(dLaunch, null, targets[i], "Proc " + targets[i].getTargetId(), iprocess, dBinObject, true, false, stopInMain, true);
+			Process process = target.getProcess();
+			IProcess iprocess = null;
+			if (process != null) {
+				iprocess = DebugPlugin.newProcess(dLaunch, process, "Launch Label " + target.getTargetId());
 			}
+
+			PCDIDebugModel.newDebugTarget(dLaunch, null, target, "Proc " + target.getTargetId(), iprocess, dBinObject, true, false, stopInMain, true);
 		} catch (DebugException e) {
 			e.printStackTrace();
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
-
-		
+	}
+	
+	public void addTargets(int[] procNums) {
+		for (int i = 0; i < procNums.length; i++) {
+			addTarget(procNums[i]);
+		}
 	}
 
-	public void removeTargets(int[] procNums) {
-		processManager.removeTargets(procNums);
+	public void removeTargets(int[] targets) {
+		for (int i = 0; i < targets.length; ++i) {
+			String targetId = Integer.toString(targets[i]);
+			Target target = (Target) currentDebugTargetList.remove(targetId);
+			
+			debugger.deleteDebuggerObserver(eventManager);
+		}
 	}
 
 	public ICDITarget getTarget(int i) {
-		return processManager.getCDITarget(i);
+		//return processManager.getCDITarget(i);
+		return (IPCDITarget) currentDebugTargetList.get(Integer.toString(i));
 	}
 	
 	public ICDITarget[] getTargets() {
-		return processManager.getCDITargets();
+		int size = currentDebugTargetList.size();
+		IPCDITarget[] targets = new IPCDITarget[size];
+		int index = 0;
+		
+	    Iterator it = currentDebugTargetList.keySet().iterator();
+	    while (it.hasNext()) {
+	       String targetId =  (String) it.next();
+	       IPCDITarget target = (IPCDITarget) currentDebugTargetList.get(targetId);
+	       targets[index++] = target;
+	    }
+	    return targets;
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
 	public void setAttribute(String key, String value) {
 		// Auto-generated method stub
 		System.out.println("Session.setAttribute()");
@@ -128,26 +167,16 @@ public class Session implements ICDISession, ICDISessionObject {
 		
 	}
 
-	public Process getSessionProcess(ICDITarget target) {
-		DebugSession dSession = ((Target)target).getDebugSession();
-		return dSession.getDebugger().getSessionProcess();
-	}
-
 	public Process getSessionProcess() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Session.getSessionProcess()");
 		
-		ICDITarget[] targets = getTargets();
-		if (targets != null && targets.length > 0) {
-			DebugSession dS = ((Target) targets[0]).getDebugSession();
-			return dS.getDebugger().getSessionProcess();
-		}
-		return null;
+		return debugger.getSessionProcess();
 	}
 
 	public ICDISession getSession() {
 		// Auto-generated method stub
 		System.out.println("Session.getSession()");
-		return null;
+		return this;
 	}
 }
