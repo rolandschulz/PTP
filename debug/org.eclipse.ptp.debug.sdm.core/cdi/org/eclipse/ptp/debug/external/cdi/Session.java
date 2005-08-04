@@ -18,11 +18,14 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.IDebugger;
+import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.event.EInferiorCreated;
+import org.eclipse.ptp.debug.external.model.MProcessSet;
 
 public class Session implements ICDISession, ICDISessionObject {
 	EventManager eventManager;
@@ -38,6 +41,7 @@ public class Session implements ICDISession, ICDISessionObject {
 	IDebugger debugger;
 	
 	Hashtable currentDebugTargetList;
+	Hashtable currentProcessSetList;
 	
 	public Session(DebugSession dSess, ILaunch launch, IBinaryObject binObj) {
 		props = new Properties();
@@ -53,12 +57,52 @@ public class Session implements ICDISession, ICDISessionObject {
 		variableManager = new VariableManager(this);
 		
 		currentDebugTargetList = new Hashtable();
+		currentProcessSetList = new Hashtable();
 		
 		/* Initially we only create process/target 0 */
 		//addTargets(new int[] { 0, 1 });
 		addTarget(0);
 		addTarget(1);
 	}
+	
+	
+	
+	
+	
+	public IPCDIDebugProcessSet newProcessSet(String name, int[] procs) {
+		MProcessSet procSet = debugger.defSet(name, procs);
+		DebugProcessSet newSet = new DebugProcessSet(procSet);
+		
+		if (!currentProcessSetList.containsKey(newSet.getName())) {
+			currentProcessSetList.put(newSet.getName(), newSet);
+		}
+		
+		return newSet;
+	}
+	
+	public void delProcessSet(String name) {
+		debugger.undefSet(name);
+		currentProcessSetList.remove(name);
+	}
+	
+	public IPCDIDebugProcessSet[] getProcessSets() {
+		int size = currentProcessSetList.size();
+		IPCDIDebugProcessSet[] pSets = new IPCDIDebugProcessSet[size];
+		int index = 0;
+		
+	    Iterator it = currentProcessSetList.keySet().iterator();
+	    while (it.hasNext()) {
+	       String procSetName =  (String) it.next();
+	       IPCDIDebugProcessSet procSet = (IPCDIDebugProcessSet) currentProcessSetList.get(procSetName);
+	       pSets[index++] = procSet;
+	    }
+	    return pSets;
+	}
+	
+	
+	
+	
+	
 
 	public void addTarget(int procNum) {
 		Target target = new Target(this, dSession, procNum);
@@ -92,17 +136,19 @@ public class Session implements ICDISession, ICDISessionObject {
 		}
 	}
 
+	public void removeTarget(int target) {
+		String targetId = Integer.toString(target);
+		Target t = (Target) currentDebugTargetList.remove(targetId);
+			
+		debugger.deleteDebuggerObserver(eventManager);
+	}
 	public void removeTargets(int[] targets) {
 		for (int i = 0; i < targets.length; ++i) {
-			String targetId = Integer.toString(targets[i]);
-			Target target = (Target) currentDebugTargetList.remove(targetId);
-			
-			debugger.deleteDebuggerObserver(eventManager);
+			removeTarget(targets[i]);
 		}
 	}
 
 	public ICDITarget getTarget(int i) {
-		//return processManager.getCDITarget(i);
 		return (IPCDITarget) currentDebugTargetList.get(Integer.toString(i));
 	}
 	
