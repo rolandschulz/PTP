@@ -214,7 +214,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 			break;
 		}
 	}
-	
+
 	protected void mouseHoverEvent(int mx, int my) {
 	}
 	
@@ -251,23 +251,25 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 			Rectangle rect = getSelectedRect(drag_x, drag_y, mx, my);
 			selectedAreaInfo.addBoundedElement(selectElements(rect));
 			redrawSelectedArea(rect);
-			elementRedraw();
 		}
 	}
 	//TODO LATER
 	protected void redrawSelectedArea(Rectangle rect) {
-		rect.x -= rect_dot_size * 2;
-		rect.y -= rect_dot_size * 2;
-		rect.width += rect_dot_size * 4;
-		rect.height += rect_dot_size * 4;
-		
-		Rectangle oldRect = selectedAreaInfo.getBoundedRect();		
-		if (rect.intersects(oldRect)) {
+		rect.x -= rect_dot_size * 2 + (e_width + e_spacing_x);
+		rect.y -= rect_dot_size * 2 + (e_height + e_spacing_y);
+		rect.width += rect_dot_size * 4 + (e_width + e_spacing_x) * 2;
+		rect.height += rect_dot_size * 4 + (e_height + e_spacing_y) * 2;
+
+		if (selectedAreaInfo.compare(rect)) {
+			//use old rect to redraw
+			Rectangle oldRect = selectedAreaInfo.getBoundedRect();;
+			selectedAreaInfo.setBoundedRect(rect);
 			rect = oldRect;
+		} else {
+			//use new rect to redaw
+			selectedAreaInfo.setBoundedRect(rect);			
 		}
-		
-		selectedAreaInfo.setBoundedRect(rect);
-		//elementRedraw(rect.x, rect.y, rect.width, rect.height, false);
+		elementRedraw(rect.x, rect.y, rect.width, rect.height, false);
 	}
 	
 	protected void mouseUpEvent(int mx, int my) {
@@ -837,12 +839,16 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		}
 		public void removeAllBoundedElements() {
 			tmpElements.clear();
+			boundedRect = new Rectangle(0, 0, 0, 0);
 		}
 		public void setBoundedRect(Rectangle rect) {
 			this.boundedRect = rect;
 		}
 		public Rectangle getBoundedRect() {
 			return boundedRect;
+		}
+		public boolean compare(Rectangle rect) {
+			return (boundedRect.width * boundedRect.height) > (rect.width * rect.height);
 		}
 	}
 	
