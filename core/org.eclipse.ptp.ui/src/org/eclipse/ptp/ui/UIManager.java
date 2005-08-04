@@ -41,7 +41,7 @@ public class UIManager {
 	
 	private void addToSet(IElement[] elements, IElementSet set) {
 		for (int i=0; i<elements.length; i++) {
-			set.add(elements[i].cloneElement());
+			set.add(elements[i]);
 		}
 	}
 	public void addToSet(IElement[] elements, String setID, ISetManager setManager) {
