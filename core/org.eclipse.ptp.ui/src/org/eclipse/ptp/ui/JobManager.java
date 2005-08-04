@@ -127,8 +127,6 @@ public class JobManager implements IManager {
 	}	
 		
 	public String initial() {
-		System.out.println("test 2");
-
 		String firstID = "";
 		IPJob[] jobs = getJobs();
 		if (jobs.length > 0) {
