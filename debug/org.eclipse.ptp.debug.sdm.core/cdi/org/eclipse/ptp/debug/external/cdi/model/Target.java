@@ -73,16 +73,6 @@ public class Target extends SessionObject implements IPCDITarget {
 		return Integer.toString(targetId);
 	}
 	
-	public IPCDIDebugProcessSet newProcessSet(String name, int[] procs) {
-		MProcessSet procSet = dSession.getDebugger().defSet(name, procs);
-		DebugProcessSet newGroup = new DebugProcessSet(procSet);
-		return newGroup;
-	}
-	
-	public void delProcessSet(String name) {
-		dSession.getDebugger().undefSet(name);
-	}
-	
 	public DebugSession getDebugSession() {
 		System.out.println("Target.getDebugSession()");
 		return dSession;

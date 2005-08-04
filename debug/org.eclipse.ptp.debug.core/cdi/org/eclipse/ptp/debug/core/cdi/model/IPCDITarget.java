@@ -6,9 +6,6 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 
 public interface IPCDITarget extends ICDITarget {
 	
-	public IPCDIDebugProcessSet newProcessSet(String name, int[] procs);
-	public void delProcessSet(String name);
-	
 	public Process[] getProcesses();
 	public Process getProcess(int num);
 	
