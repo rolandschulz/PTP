@@ -33,6 +33,7 @@ import org.eclipse.ptp.ui.model.ISetManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
@@ -197,29 +198,31 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		bright.setText("Process Info");
 
 		BLtable = new Table(bleft, SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		BLtable.setLayout(new FillLayout());
 		BLtable.setHeaderVisible(false);
 		BLtable.setLinesVisible(true);
 		TableColumn col1 = new TableColumn(BLtable, SWT.LEFT);
-		col1.setWidth(50);
+		col1.setWidth(65);
 		TableColumn col2 = new TableColumn(BLtable, SWT.LEFT);
-		col2.setWidth(80);
+		col2.setWidth(90);
 
 		BRtable = new Table(bright, SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		BRtable.setLayout(new FillLayout());
 		BRtable.setHeaderVisible(false);
 		BRtable.setLinesVisible(true);
 		col1 = new TableColumn(BRtable, SWT.LEFT);
 		col1.setWidth(25);
 		col2 = new TableColumn(BRtable, SWT.LEFT);
-		col2.setWidth(120);
+		col2.setWidth(130);
 
-		GridData gdtext = new GridData();
+		GridData gdtext = new GridData(GridData.FILL_BOTH);
 		gdtext.grabExcessVerticalSpace = true;
 		gdtext.grabExcessHorizontalSpace = true;
 		gdtext.horizontalAlignment = GridData.FILL;
 		gdtext.verticalAlignment = GridData.FILL;
 		bleft.setLayoutData(gdtext);
 
-		GridData gdlist = new GridData();
+		GridData gdlist = new GridData(GridData.FILL_BOTH);
 		gdlist.grabExcessVerticalSpace = true;
 		gdlist.grabExcessHorizontalSpace = true;
 		gdlist.horizontalAlignment = GridData.FILL;
@@ -279,26 +282,17 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	public void register(IElement element) {
 		element.setRegistered(true);
 		cur_selected_element_id = element.getID();
-		updateLowerTextRegions();
 	}
 	
 	public void unregister() {
 		IElement pE = cur_element_set.get(cur_selected_element_id);
-		if (pE != null)
+		if (pE != null) {
 			pE.setRegistered(false);
-
-		cur_selected_element_id = "";
-		updateLowerTextRegions();
-	}
-	
-	//overwrite to delselect the register
-	public void deSelectSet() {
-		if (cur_element_set != null) {
-			cur_element_set.setAllSelect(false);
-			unregister();
+			cur_selected_element_id = "";
+			clearLowerTextRegions();
 		}
 	}
-
+	
 	protected String getToolTipText(int element_num) {
 		ISetManager setManager = getCurrentSetManager();
 		if (setManager == null)
@@ -348,6 +342,18 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	public void updateTitle() {
 		if (cur_element_set != null) {
 			changeTitle(machineManager.getName(cur_machine_id), cur_element_set.getID(), cur_set_size);
+		}
+	}
+	public void deSelectSet() {
+		super.deSelectSet();
+		cur_selected_element_id = "";
+		clearLowerTextRegions();
+	}
+	protected void drawingRegisterElement(IElement element, GC g, int x_loc, int y_loc, int width, int height) {
+		super.drawingRegisterElement(element, g, x_loc, y_loc, width, height);
+		if (element.isRegistered()) {
+			cur_selected_element_id = element.getID();
+			updateLowerTextRegions();
 		}
 	}
 	

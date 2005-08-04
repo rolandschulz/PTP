@@ -254,22 +254,22 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 			redrawSelectedArea(rect);
 		}
 	}
-	//TODO LATER
+	//TODO NOT FINISHED
 	protected void redrawSelectedArea(Rectangle rect) {
-		rect.x -= rect_dot_size * 2 + (e_width + e_spacing_x);
-		rect.y -= rect_dot_size * 2 + (e_height + e_spacing_y);
-		rect.width += rect_dot_size * 4 + (e_width + e_spacing_x) * 2;
-		rect.height += rect_dot_size * 4 + (e_height + e_spacing_y) * 2;
+		Rectangle oldRect = selectedAreaInfo.getBoundedRect();
+		selectedAreaInfo.setBoundedRect(rect);
 
-		if (selectedAreaInfo.compare(rect)) {
-			//use old rect to redraw
-			Rectangle oldRect = selectedAreaInfo.getBoundedRect();;
-			selectedAreaInfo.setBoundedRect(rect);
-			rect = oldRect;
+		if (oldRect.intersects(rect)) {
+			//System.out.println(oldRect + " - " + rect);
+			if (selectedAreaInfo.compareArea(oldRect, rect)) {
+				//use old rect to redraw
+				rect = oldRect;
+			}
 		} else {
-			//use new rect to redaw
-			selectedAreaInfo.setBoundedRect(rect);			
+			oldRect = selectedAreaInfo.getBoundedArea(oldRect);
+			elementRedraw(oldRect.x, oldRect.y, oldRect.width, oldRect.height, false);			
 		}
+		rect = selectedAreaInfo.getBoundedArea(rect);
 		elementRedraw(rect.x, rect.y, rect.width, rect.height, false);
 	}
 	
@@ -571,12 +571,13 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		selectElements(element_num);
 	}
 
-	protected IElement[] selectElements(Rectangle rect) {
+	protected IElement[] selectElements(Rectangle boundedRect) {
 		//add the selection area size by 2 to prevent selection edge on element
-		rect.x += rect_dot_size * 2;
-		rect.y += rect_dot_size * 2;
-		rect.width -= rect_dot_size * 4;
-		rect.height -= rect_dot_size * 4;
+		Rectangle rect = new Rectangle(0, 0, 0, 0);
+		rect.x = boundedRect.x + rect_dot_size * 2;
+		rect.y = boundedRect.y + rect_dot_size * 2;
+		rect.width = boundedRect.width - rect_dot_size * 4;
+		rect.height = boundedRect.height -  rect_dot_size * 4;
 
 		Loc e_loc = findEstimateLocation(rect.x, rect.y);
 
@@ -622,6 +623,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 				}
 			}
 		}
+		
+		boundedRect.width = (total_col + 1) * (e_width + e_spacing_x);
+		boundedRect.height = (total_row + 1) * (e_height + e_spacing_y);
 		return (IElement[])selectedElements.toArray(new IElement[selectedElements.size()]);
 	}
 
@@ -727,15 +731,15 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		Image statusImage = getStatusIcon(element);
 		if (statusImage != null) {
 			g.drawImage(statusImage, x_loc, y_loc);
-			if (element.isRegistered())
-				drawingRegisterElement(g, x_loc, y_loc, e_width, e_height);
+			drawingRegisterElement(element, g, x_loc, y_loc, e_width, e_height);
 		}
 	}
 	protected abstract Image getStatusIcon(IElement element);
 
 	//allow change color in rectange 
-	protected void drawingRegisterElement(GC g, int x_loc, int y_loc, int width, int height) {
-		g.drawRectangle(x_loc, y_loc, width, height);
+	protected void drawingRegisterElement(IElement element, GC g, int x_loc, int y_loc, int width, int height) {
+		if (element.isRegistered())
+			g.drawRectangle(x_loc, y_loc, width, height);
 	}
 	
 	public void setSelection(ISelection selection) {
@@ -776,8 +780,10 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	}
 
 	public void deSelectSet() {
-		if (cur_element_set != null)
+		if (cur_element_set != null) {
+			cur_element_set.setSelected(false);
 			cur_element_set.setAllSelect(false);
+		}
 	}
 
 	public IElementSet getCurrentSet() {
@@ -848,8 +854,14 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		public Rectangle getBoundedRect() {
 			return boundedRect;
 		}
-		public boolean compare(Rectangle rect) {
-			return (boundedRect.width * boundedRect.height) > (rect.width * rect.height);
+		public Rectangle getBoundedArea(Rectangle orgRect) {
+			Rectangle rect = new Rectangle(orgRect.x, orgRect.y, orgRect.width, orgRect.height);
+			rect.x -= e_width + e_spacing_x;
+			rect.y -= e_height + e_spacing_y;
+			return rect;
+		}
+		public boolean compareArea(Rectangle rect1, Rectangle rect2) {
+			return (rect1.width * rect1.height) > (rect2.width * rect2.height);
 		}
 	}
 	

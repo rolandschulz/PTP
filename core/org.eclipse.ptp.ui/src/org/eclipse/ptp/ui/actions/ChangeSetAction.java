@@ -88,7 +88,6 @@ public class ChangeSetAction extends GotoDropDownAction {
 	
 	public void run(IElement[] elements, IElementSet set) {
 		view.selectSet(set);
-		view.deSelectSet();
 		view.update();
 		view.refresh();
 	}
