@@ -32,23 +32,20 @@ import org.eclipse.ptp.debug.ui.actions.StepReturnAction;
 import org.eclipse.ptp.debug.ui.actions.SuspendAction;
 import org.eclipse.ptp.debug.ui.actions.TerminateAction;
 import org.eclipse.ptp.debug.ui.actions.UnregisterAction;
-import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.ISetManager;
-import org.eclipse.ptp.ui.views.AbstractParallelSetView;
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.ptp.ui.views.ParallelJobView;
 
 /**
  * @author clement chu
  * 
  */
-public class DebugParallelView extends AbstractParallelSetView implements IDebugParallelModelListener {
+public class DebugParallelView extends ParallelJobView implements IDebugParallelModelListener {
 	public static final String VIEW_ID = "org.eclipse.ptp.debug.ui.views.debugParallelView";
 
 	private static DebugParallelView instance = null;
-	private UIDebugManager uiDebugManager = null;
 
 	//machine
 	protected String cur_job_id = "dummy";
@@ -63,61 +60,31 @@ public class DebugParallelView extends AbstractParallelSetView implements IDebug
 	protected ParallelAction registerAction = null;
 	protected ParallelAction unregisterAction = null;
 
-	private Image[][] procImages = {
-		{
-			ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR),
-			ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR_SEL) },
-		{
-			ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED),
-			ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SEL) },
-		{
-			ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL),
-			ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL_SEL) },
-		{
-			ParallelImages.getImage(ParallelImages.IMG_PROC_RUNNING),
-			ParallelImages.getImage(ParallelImages.IMG_PROC_RUNNING_SEL) },
-		{
-			ParallelImages.getImage(ParallelImages.IMG_PROC_STARTING),
-			ParallelImages.getImage(ParallelImages.IMG_PROC_STARTING_SEL) },
-		{
-			ParallelImages.getImage(ParallelImages.IMG_PROC_STOPPED),
-			ParallelImages.getImage(ParallelImages.IMG_PROC_STOPPED_SEL) }
-	};
-
 	public DebugParallelView() {
-		uiDebugManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
+		jobManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
 		//FIXME dummy only
-		DebugManager.getInstance().addListener(this);		
+		DebugManager.getInstance().addListener(this);
 	}
-	
-	protected void initElementAttribute() {
-		e_offset_x = 5;
-		e_spacing_x = 4;
-		e_offset_y = 5;
-		e_spacing_y = 4;
-		e_width = 16;
-		e_height = 16;
-	}
-	
+
+	public static DebugParallelView getDebugViewInstance() {
+		if (instance == null)
+			instance = new DebugParallelView();
+		return instance;
+	}	
+		
 	protected void initialElement() {
-		cur_job_id = uiDebugManager.initial();
+		cur_job_id = jobManager.initial();
 	}
 	protected void initialView() {
 		initialElement();
-		if (uiDebugManager.size() > 0) {
+		if (jobManager.size() > 0) {
 			updateJob();
 			refresh();
 		}
 		update();
 	}
 	public ISetManager getCurrentSetManager() {
-		return uiDebugManager.getSetManager(cur_job_id);
-	}
-
-	public static DebugParallelView getInstance() {
-		if (instance == null)
-			instance = new DebugParallelView();
-		return instance;
+		return jobManager.getSetManager(cur_job_id);
 	}
 	
 	protected boolean fillContextMenu(IMenuManager manager) {
@@ -154,13 +121,6 @@ public class DebugParallelView extends AbstractParallelSetView implements IDebug
 		toolBarMgr.add(unregisterAction);
 		return true;
 	}
-	protected boolean createMenuActions(IMenuManager menuMgr) {
-		return false;
-	}
-	
-	protected void setActionEnable() {
-		
-	}
 
 	protected void doubleClickAction(int element_num) {
 		IElement element = cur_element_set.get(element_num);
@@ -187,47 +147,21 @@ public class DebugParallelView extends AbstractParallelSetView implements IDebug
 			if (i < groups.length - 1)
 				buffer.append(",");
 		}
-		buffer.append("\nStatus: " + uiDebugManager.getProcessStatusText(cur_job_id, element.getID()));
+		buffer.append("\nStatus: " + jobManager.getProcessStatusText(cur_job_id, element.getID()));
 		return buffer.toString();
 	}
 
-	protected Image getStatusIcon(IElement element) {
-		int status = uiDebugManager.getProcessStatus(cur_job_id, element.getID());
-		return procImages[status][element.isSelected() ? 1 : 0];
-	}
-	
 	public void dispose() {
 		super.dispose();
 		//FIME dummy
 		DebugManager.getInstance().removeListener(this);		
 	}
-
-	public String getCurrentJobID() {
-		return cur_job_id;
-	}
-	public void selectMachine(String job_id) {
-		cur_job_id = job_id;
-		updateJob();
-	}
-	public void updateJob() {
-		ISetManager setManager = getCurrentSetManager();
-		if (setManager != null) {
-			selectSet(setManager.getSetRoot());
-			setManager.getSetRoot().setAllSelect(false);
-		}
-	}
-	
-	public void updateTitle() {
-		if (cur_element_set != null) {
-			changeTitle(uiDebugManager.getName(cur_job_id), cur_element_set.getID(), cur_set_size);
-		}
-	}	
 	
 	public void registerElement(IElement element) {
 		if (element.isRegistered())
-			uiDebugManager.unregisterElements(new IElement[] { element });
+			((UIDebugManager)jobManager).unregisterElements(new IElement[] { element });
 		else
-			uiDebugManager.registerElements(new IElement[] { element });
+			((UIDebugManager)jobManager).registerElements(new IElement[] { element });
 
 		element.setRegistered(!element.isRegistered());
 	}
@@ -238,7 +172,7 @@ public class DebugParallelView extends AbstractParallelSetView implements IDebug
 			for (int i = 0; i < elements.length; i++) {
 				elements[i].setRegistered(true);
 			}
-			uiDebugManager.registerElements(elements);
+			((UIDebugManager)jobManager).registerElements(elements);
 		}
 	}
 
@@ -248,7 +182,7 @@ public class DebugParallelView extends AbstractParallelSetView implements IDebug
 			for (int i = 0; i < elements.length; i++) {
 				elements[i].setRegistered(false);
 			}
-			uiDebugManager.unregisterElements(elements);
+			((UIDebugManager)jobManager).unregisterElements(elements);
 		}
 	}
 	
@@ -276,29 +210,5 @@ public class DebugParallelView extends AbstractParallelSetView implements IDebug
 
 	public void error() {
 		refresh();
-	}
-
-	public void abort() {
-	}
-
-	public void stopped() {
-	}
-
-	public void monitoringSystemChangeEvent(Object object) {
-	}
-
-	public void execStatusChangeEvent(Object object) {
-	}
-
-	public void sysStatusChangeEvent(Object object) {
-	}
-
-	public void processOutputEvent(Object object) {
-	}
-
-	public void errorEvent(Object object) {
-	}
-
-	public void updatedStatusEvent() {
 	}
 }

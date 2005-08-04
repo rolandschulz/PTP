@@ -18,23 +18,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.IPElement;
-import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.debug.core.DebugManager;
 import org.eclipse.ptp.debug.core.PProcess;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
-import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.JobManager;
 import org.eclipse.ptp.ui.MachineManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -46,68 +39,19 @@ import org.eclipse.ptp.ui.model.internal.SetManager;
  * @author clement chu
  *
  */
-public class UIDebugManager implements IManager {
+public class UIDebugManager extends JobManager {
 	public final static int PROC_SUSPEND = 6;
 	public final static int PROC_HIT = 7;
 
-	protected IModelManager modelManager = null;
-	private Map jobList = new HashMap();
-	
 	//FIXME dummy only
 	private boolean dummy = true;
 		
-	public UIDebugManager() {
-		modelManager = PTPCorePlugin.getDefault().getModelManager();
-	}
-
-	public ISetManager getSetManager(String id) {
-		return (ISetManager)jobList.get(id);
-	}
-	
-	public int size() {
-		return jobList.size();
-	}
-	
-	public String getProcessStatusText(String job_id, String proc_id) {
-		switch(getProcessStatus(job_id, proc_id)) {
-		case MachineManager.PROC_STARTING:
-			return "Starting";
-		case MachineManager.PROC_RUNNING:
-			return "Running";
-		case MachineManager.PROC_EXITED:
-			return "Exited";
-		case MachineManager.PROC_EXITED_SIGNAL:
-			return "Exited Signal";
-		case MachineManager.PROC_STOPPED:
-			return "Stopped";
-		case MachineManager.PROC_ERROR:
-			return "Error";
-		default:
-			return "Error";
-		}
-	}	
 	public int getProcessStatus(String job_id, String proc_id) {
 		//FIXME dummy only 
 		if (dummy)
 			return getDummyStatus(proc_id);
-		
-		IPProcess proc = findProcess(job_id, proc_id);
-		if (proc != null) {
-			String status = proc.getStatus();
-			if (status.equals(IPProcess.STARTING))
-				return MachineManager.PROC_STARTING;
-			else if (status.equals(IPProcess.RUNNING))
-				return MachineManager.PROC_RUNNING;
-			else if (status.equals(IPProcess.EXITED))
-				return MachineManager.PROC_EXITED;
-			else if (status.equals(IPProcess.EXITED_SIGNALLED))
-				return MachineManager.PROC_EXITED_SIGNAL;
-			else if (status.equals(IPProcess.STOPPED))
-				return MachineManager.PROC_STOPPED;
-			else if (status.equals(IPProcess.ERROR))
-				return MachineManager.PROC_ERROR;
-		}
-		return MachineManager.PROC_ERROR;
+
+		return super.getProcessStatus(job_id, proc_id);
 	}
 	
 	//FIXME dummy only 
@@ -127,39 +71,14 @@ public class UIDebugManager implements IManager {
 			return MachineManager.PROC_ERROR;
 	}
 	
-	//FIXME using id, or name
-	public IPProcess findProcess(String job_id, String id) {
-		//FIXME HARDCODE
-		return modelManager.getUniverse().findProcessByName("job" + job_id + "_process" + id);
-	}
 	//FIXME don't know whether it return machine or job
 	public String getName(String id) {
 		//FIXME dummy only
 		if (dummy)
 			return "dummy";
 		
-		IPElement element = modelManager.getUniverse().findChild(id);
-		if (element == null)
-			return "";
-		
-		return element.getElementName();
+		return super.getName(id);
 	}
-	
-	public void addJob(IPJob job) {
-		IPElement[] pElements = job.getSortedProcesses();
-		int total_element = pElements.length;
-		if (total_element > 0) {
-			ISetManager setManager = new SetManager();
-			setManager.clearAll();
-			IElementSet set = setManager.getSetRoot();
-			for (int i=0; i<total_element; i++) {
-				//FIXME using id, or name
-				set.add(new Element(pElements[i].getKeyString()));
-			}
-			setManager.add(set);
-			jobList.put(job.getKeyString(), setManager);
-		}
-	}	
 	
 	//FIXME dummy only
 	private String dummyInitialProcess() {
@@ -183,16 +102,7 @@ public class UIDebugManager implements IManager {
 			return dummyInitialProcess();
 		}
 		
-		String firstID = "";
-		IPJob[] jobs = modelManager.getUniverse().getSortedJobs();
-		if (jobs.length > 0) {
-			firstID = jobs[0].getKeyString();
-			for (int j=0; j<jobs.length; j++) {
-				if (!jobList.containsKey(jobs[j].getKeyString()))
-					addJob(jobs[j]);
-			}
-		}
-		return firstID;
+		return super.initial();
 	}	
 	
 	public void unregisterElements(ILaunch launch, PDebugTarget target, IElement[] elements) {
