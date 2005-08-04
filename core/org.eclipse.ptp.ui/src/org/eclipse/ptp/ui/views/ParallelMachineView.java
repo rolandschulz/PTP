@@ -159,7 +159,10 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	
 	protected void createElementView(Composite parent) {
 		super.createElementView(parent);
-
+		createLowerTextRegions(parent);
+	}
+	
+	protected void createLowerTextRegions(Composite parent) {
 		FormLayout layout = new FormLayout();
 		parent.setLayout(layout);
 
@@ -267,29 +270,34 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	protected void doubleClickAction(int element_num) {
 		IElement element = cur_element_set.get(element_num);
 		if (element != null) {
-			boolean isRegistered = element.isRegistered();
-			element.setRegistered(!isRegistered);
-
-			IElement pE = cur_element_set.get(cur_selected_element_id);
-			if (pE != null)
-				pE.setRegistered(false);
-
-			cur_selected_element_id = isRegistered?"":element.getID();
-			updateLowerTextRegions();
+			String tmp_selected_element_id = cur_selected_element_id;
+			unregister();
+			if (!element.getID().equals(tmp_selected_element_id))
+				register(element);
 		}
+	}
+	public void register(IElement element) {
+		element.setRegistered(true);
+		cur_selected_element_id = element.getID();
+		updateLowerTextRegions();
+	}
+	
+	public void unregister() {
+		IElement pE = cur_element_set.get(cur_selected_element_id);
+		if (pE != null)
+			pE.setRegistered(false);
+
+		cur_selected_element_id = "";
+		updateLowerTextRegions();
 	}
 	
 	//overwrite to delselect the register
 	public void deSelectSet() {
 		if (cur_element_set != null) {
-			cur_element_set.setSelected(false);
-
-			IElement pE = cur_element_set.get(cur_selected_element_id);
-			if (pE != null)
-				pE.setRegistered(false);			
+			cur_element_set.setAllSelect(false);
+			unregister();
 		}
 	}
-
 
 	protected String getToolTipText(int element_num) {
 		ISetManager setManager = getCurrentSetManager();
