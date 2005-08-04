@@ -37,7 +37,15 @@ public class CreatedEvent implements ICDICreatedEvent {
 
 	public CreatedEvent(Session s, EInferiorCreated ev) {
 		session = s;
-		source = null;
+		DebugSession dSession = ev.getDebugSession();
+		// FIXME 
+		//Target target = session.getTarget(dSession);
+		Target target = (Target) session.getTarget(0);
+		source = new PTPObject(target);
+
+		
+		//session = s;
+		//source = null;
 	}
 
 	public ICDIObject getSource() {
