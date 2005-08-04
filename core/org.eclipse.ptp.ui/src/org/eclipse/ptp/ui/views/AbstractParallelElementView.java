@@ -221,7 +221,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	protected void mouseDownEvent(int mx, int my) {
 		clearMouseSetting();
 		// unselected all elements only occurred when there is click no press ctrl button
-		deselect();		
+		deselect();
+		elementRedraw();
 	}
 	protected void mouseDragEvent(int mx, int my) {
 		// System.out.println("Draf("+mx+":"+my+")");
