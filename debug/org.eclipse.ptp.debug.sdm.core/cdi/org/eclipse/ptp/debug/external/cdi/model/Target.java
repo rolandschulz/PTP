@@ -37,18 +37,14 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
-import org.eclipse.ptp.debug.external.model.MProcessSet;
 import org.eclipse.ptp.debug.external.simulator.SimProcess;
 import org.eclipse.ptp.debug.external.simulator.SimThread;
 
-/**
- */
 public class Target extends SessionObject implements IPCDITarget {
 	
 	private TargetConfiguration fConfiguration;
