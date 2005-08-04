@@ -70,7 +70,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	protected Table BLtable = null;
 	protected Table BRtable = null;
 
-	private Image[][] nodeImages = {
+	public static Image[][] nodeImages = {
 		{
 			ParallelImages.getImage(ParallelImages.IMG_NODE_USER_ALLOC_EXCL),
 			ParallelImages.getImage(ParallelImages.IMG_NODE_USER_ALLOC_EXCL_SEL) },
@@ -103,7 +103,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			ParallelImages.getImage(ParallelImages.IMG_NODE_UP_SEL) }
 	};
 	
-	private Image[][] procImages = {
+	public static Image[][] procImages = {
 		{
 			ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR),
 			ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR_SEL) },
