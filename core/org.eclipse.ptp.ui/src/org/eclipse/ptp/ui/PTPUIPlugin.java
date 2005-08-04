@@ -25,6 +25,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	
 	private UIManager uiManager = null;
 	private MachineManager machineManager = null;
+	private JobManager jobManager = null;
 
 	/**
 	 * The constructor.
@@ -41,6 +42,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		super.start(context);
 		uiManager = new UIManager();
 		machineManager = new MachineManager();
+		jobManager = new JobManager();
 	}
 
 	/**
@@ -57,6 +59,9 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	}
 	public MachineManager getMachineManager() {
 		return machineManager;
+	}
+	public JobManager getJobManager() {
+		return jobManager;
 	}
 
 	/**

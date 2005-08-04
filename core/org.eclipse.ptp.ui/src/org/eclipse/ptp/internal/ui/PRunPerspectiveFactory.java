@@ -20,6 +20,7 @@ package org.eclipse.ptp.internal.ui;
 
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ptp.ui.old.UIUtils;
+import org.eclipse.ptp.ui.views.ParallelJobView;
 import org.eclipse.ptp.ui.views.ParallelMachineView;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.ui.IFolderLayout;
@@ -37,6 +38,7 @@ public class PRunPerspectiveFactory implements IPerspectiveFactory {
 		
 		IFolderLayout folder1= layout.createFolder("topLeft", IPageLayout.LEFT, (float)0.25, editorArea);
 		folder1.addView(ParallelMachineView.VIEW_ID);
+		folder1.addView(ParallelJobView.VIEW_ID);
 
 		//folder1.addView(UIUtils.ParallelProcessesView_ID);
 		//folder1.addView(UIUtils.ParallelNodeStatusView_ID);
@@ -65,14 +67,18 @@ public class PRunPerspectiveFactory implements IPerspectiveFactory {
 		// views - standard workbench
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_PROBLEM_VIEW);
-		layout.addShowViewShortcut(UIUtils.ParallelProcessesView_ID);
-		layout.addShowViewShortcut(UIUtils.ParallelNodeStatusView_ID);
+		layout.addShowViewShortcut(ParallelMachineView.VIEW_ID);
+		layout.addShowViewShortcut(ParallelJobView.VIEW_ID);
+		//layout.addShowViewShortcut(UIUtils.ParallelProcessesView_ID);
+		//layout.addShowViewShortcut(UIUtils.ParallelNodeStatusView_ID);
 		//layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
 		layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
 
 		// link - things we should do
-		layout.addShowInPart(UIUtils.ParallelProcessesView_ID);
-		layout.addShowInPart(UIUtils.ParallelNodeStatusView_ID);
+		layout.addShowInPart(ParallelMachineView.VIEW_ID);
+		layout.addShowInPart(ParallelJobView.VIEW_ID);
+		//layout.addShowInPart(UIUtils.ParallelProcessesView_ID);
+		//layout.addShowInPart(UIUtils.ParallelNodeStatusView_ID);
 		//layout.addShowInPart(IPageLayout.ID_RES_NAV);
 	}
 }

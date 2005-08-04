@@ -128,6 +128,10 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		machineManager = PTPUIPlugin.getDefault().getMachineManager();
 	}
 	
+	public MachineManager getMachineManager() {
+		return machineManager;
+	}
+	
 	protected void initElementAttribute() {
 		e_offset_x = 5;
 		e_spacing_x = 4;
@@ -158,9 +162,9 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		return instance;
 	}
 	
-	protected void createElementView(Composite parent) {
-		super.createElementView(parent);
-		createLowerTextRegions(parent);
+	protected void createView(Composite parent) {
+		Composite composite = createElementView(parent);
+		createLowerTextRegions(composite);
 	}
 	
 	protected void createLowerTextRegions(Composite parent) {
@@ -266,9 +270,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		return false;
 	}
 	
-	protected void setActionEnable() {
-		
-	}
+	protected void setActionEnable() {}
 
 	protected void doubleClickAction(int element_num) {
 		IElement element = cur_element_set.get(element_num);
@@ -319,10 +321,6 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	protected Image getStatusIcon(IElement element) {
 		int status = machineManager.getNodeStatus(cur_machine_id, element.getID());
 		return nodeImages[status][element.isSelected() ? 1 : 0];
-	}
-
-	public void dispose() {
-		super.dispose();
 	}
 
 	public String getCurrentMachineID() {

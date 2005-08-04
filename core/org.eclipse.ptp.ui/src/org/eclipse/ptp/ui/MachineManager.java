@@ -71,6 +71,10 @@ public class MachineManager implements IManager {
 		return machineList.size();
 	}
 	
+	public IPMachine[] getMachines() {
+		return modelManager.getUniverse().getSortedMachines();
+	}
+	
 	public String getNodeStatusText(String machine_id, String node_id) {
 		switch(getNodeStatus(machine_id, node_id)) {
 		case NODE_USER_ALLOC_EXCL:
@@ -173,7 +177,7 @@ public class MachineManager implements IManager {
 	
 	public String initial() {
 		String firstID = "";
-		IPMachine[] macs = modelManager.getUniverse().getSortedMachines();
+		IPMachine[] macs = getMachines();
 		if (macs.length > 0) {
 			firstID = macs[0].getKeyString();
 			for (int j=0; j<macs.length; j++) {
