@@ -352,16 +352,18 @@ public abstract class CBreakpoint extends Breakpoint implements ICBreakpoint, ID
 			DebugPlugin.getDefault().getBreakpointManager().fireBreakpointChanged( this );
 		}
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.debug.core.model.ICBreakpoint#getModule()
+	 */
 	public String getModule() throws CoreException {
-		// Auto-generated method stub
-		System.out.println("CBreakpoint.getModule");
-		return null;
+		return ensureMarker().getAttribute( MODULE, null );
 	}
 
-	public void setModule(String module) throws CoreException {
-		// Auto-generated method stub
-		System.out.println("CBreakpoint.setModule");
-		
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.debug.core.model.ICBreakpoint#setModule(java.lang.String)
+	 */
+	public void setModule( String module ) throws CoreException {
+		setAttribute( MODULE, module );
 	}
 }

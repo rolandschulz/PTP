@@ -10,14 +10,12 @@
  ***********************************************************************/
 package org.eclipse.ptp.debug.internal.core.breakpoints;
 
+import java.text.MessageFormat;
 import java.util.Map;
 
 import org.eclipse.cdt.debug.core.model.ICAddressBreakpoint;
-import org.eclipse.ptp.debug.internal.core.breakpoints.AbstractLineBreakpoint;
-import org.eclipse.ptp.debug.internal.core.breakpoints.BreakpointMessages;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import java.text.MessageFormat;
 
 /**
  * A breakpoint that suspend the execution when a particular address is reached.
@@ -52,18 +50,10 @@ public class CAddressBreakpoint extends AbstractLineBreakpoint implements ICAddr
 	 * @see org.eclipse.cdt.debug.internal.core.breakpoints.CBreakpoint#getMarkerMessage()
 	 */
 	protected String getMarkerMessage() throws CoreException {
-		StringBuffer sb = new StringBuffer( BreakpointMessages.getString( "CAddressBreakpoint.1" ) ); //$NON-NLS-1$
-		String name = ensureMarker().getResource().getName();
-		if ( name != null && name.length() > 0 ) {
-			sb.append( ' ' );
-			sb.append( name );
+		String fileName = ensureMarker().getResource().getName();
+		if ( fileName != null && fileName.length() > 0 ) {
+			fileName = ' ' + fileName + ' ';
 		}
-		try {
-			sb.append( MessageFormat.format( BreakpointMessages.getString( "CAddressBreakpoint.2" ), new String[] { getAddress() } ) ); //$NON-NLS-1$
-		}
-		catch( NumberFormatException e ) {
-		}
-		sb.append( getConditionText() );
-		return sb.toString();
+		return MessageFormat.format( BreakpointMessages.getString( "CAddressBreakpoint.0" ), new String[] { fileName, getAddress(), getConditionText() } ); //$NON-NLS-1$
 	}
 }

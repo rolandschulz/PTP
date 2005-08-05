@@ -14,7 +14,6 @@ import java.util.Map;
 
 import org.eclipse.cdt.debug.core.model.ICBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
-import org.eclipse.ptp.debug.internal.core.breakpoints.CBreakpoint;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
