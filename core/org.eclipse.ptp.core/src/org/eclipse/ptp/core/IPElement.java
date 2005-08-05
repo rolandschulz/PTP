@@ -34,6 +34,11 @@ public interface IPElement extends ISearchPageScoreComputer {
 	// public String NAME_TAG = "";
 
 	/**
+	 * Element tag for an error / undefined type
+	 */
+	public static final int P_TYPE_ERROR = -1;
+	
+	/**
 	 * Element tag for Universe Elements
 	 */
 	public static final int P_UNIVERSE = 10;
@@ -163,18 +168,18 @@ public interface IPElement extends ISearchPageScoreComputer {
 	public IPElement[] getSortedChildren();
 
 	/**
-	 * Returns the String key for this Element.
+	 * Returns an int version of the ID for this Element
 	 * 
-	 * @return The key for this Element
+	 * @return The ID for this Element
 	 */
-	public String getKeyString();
-
+	public int getID();
+	
 	/**
-	 * Returns an int version of the key for this Element
+	 * Returns a String version of the ID for this Element
 	 * 
-	 * @return The key for this Element
+	 * @return The ID for this Element as a String
 	 */
-	public int getKeyNumber();
+	public String getIDString();
 
 	/**
 	 * Returns the children of this Element as a Collection or null if there are

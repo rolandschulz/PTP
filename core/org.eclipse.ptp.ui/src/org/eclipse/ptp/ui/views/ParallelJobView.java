@@ -198,7 +198,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 					//new TableItem(jobInfoTable, 0).setText(new String[] { "Total procsses", String.valueOf(job.totalProcesses()) });
 					//new TableItem(jobInfoTable, 0).setText(new String[] { "Used nodes", String.valueOf(job.totalNodes()) });
 	
-					selectJob(job.getKeyString());
+					selectJob(job.getIDString());
 					update();
 					refresh();
 				}

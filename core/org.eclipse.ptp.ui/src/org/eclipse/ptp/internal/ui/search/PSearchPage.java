@@ -252,7 +252,7 @@ public class PSearchPage extends DialogPage implements ISearchPage, IPSearchCons
 		int searchFor = SEARCH_NODE;
 		int limitTo = LIMIT_NUMBER;
 		
-		String pattern = String.valueOf(element.getKeyNumber());		
+		String pattern = String.valueOf(element.getID());		
 		switch (element.getElementType()) {
 		    case IPElement.P_NODE:
 		        searchFor = SEARCH_NODE;

@@ -39,7 +39,7 @@ public class PMachine extends Parent implements IPMachine {
 		super(uni, name, key, P_MACHINE);
 		System.out.println("Name is " + name + ", key is " + key);
 		System.out.println("NAME_TAG = " + NAME_TAG + ", toString = "
-				+ this.toString() + ", key# = " + this.getKeyNumber());
+				+ this.toString() + ", key# = " + this.getID());
 	}
 
 	/*

@@ -18,34 +18,29 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
+import java.util.HashMap;
+
 import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.ptp.core.IDGenerator;
 import org.eclipse.ptp.core.IPElement;
-import org.eclipse.ptp.core.IPUniverse;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.internal.core.CoreUtils;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
-/**
- *
- */
-public abstract class PElement extends PlatformObject implements IPElement,
-		Comparable {
-	private IPElement fParent = null;
-
-	private String fName = null;
-
-	private String fKey = null;
-
-	private int fType;
+public abstract class PElement extends PlatformObject implements IPElement, Comparable {
+	protected HashMap attribs = null;
+	
+	protected int ID = -1;
 
 	private PElementInfo elementInfo = null;
 
 	protected PElement(IPElement parent, String name, String key, int type) {
-		fParent = parent;
-		fName = name;
-		fKey = key;
-		fType = type;
+		attribs = new HashMap();
+		ID = PTPCorePlugin.getDefault().getNewID();
+		attribs.put(AttributeConstants.ATTRIB_PARENT, parent);
+		attribs.put(AttributeConstants.ATTRIB_NAME, name);
+		attribs.put(AttributeConstants.ATTRIB_TYPE, new Integer(type));
+		System.out.println("NEW PElement - ID = "+ID);
 	}
 
 	protected PElementInfo getElementInfo() {
@@ -60,57 +55,55 @@ public abstract class PElement extends PlatformObject implements IPElement,
 
 	public String getElementName() {
 		// return NAME_TAG + getKey();
-		return fName;
+		return (String)attribs.get(AttributeConstants.ATTRIB_NAME);
 	}
 
-	public int getKeyNumber() {
-		try {
-			return Integer.parseInt(fKey);
-		} catch (NumberFormatException e) {
-			return -1;
-		}
+	public int getID() {
+		return ID;
 	}
-
-	public String getKeyString() {
-		return fKey;
+	
+	public String getIDString() {
+		return ""+ID+"";
 	}
 
 	/**
 	 * @param name
-	 *            The fName to set.
+	 *            The Name to set.
 	 */
 	public void setElementName(String name) {
-		fName = name;
+		attribs.put(AttributeConstants.ATTRIB_NAME, name);
 	}
 
 	/**
 	 * @return Returns the Parent.
 	 */
 	public IPElement getParent() {
-		return fParent;
+		return (IPElement)attribs.get(AttributeConstants.ATTRIB_PARENT);
 	}
 
 	/**
 	 * @param parent
-	 *            The fParent to set.
+	 *            The Parent to set.
 	 */
 	public void setParent(IPElement parent) {
-		fParent = parent;
+		attribs.put(AttributeConstants.ATTRIB_PARENT, parent);
 	}
 
 	/**
-	 * @return Returns the fType.
+	 * @return Returns the Type.
 	 */
 	public int getElementType() {
-		return fType;
+		Integer i = (Integer)attribs.get(AttributeConstants.ATTRIB_TYPE);
+		if(i == null) return P_TYPE_ERROR;
+		else return i.intValue();
 	}
 
 	/**
 	 * @param type
-	 *            The fType to set.
+	 *            The Type to set.
 	 */
 	public void setElementType(int type) {
-		fType = type;
+		attribs.put(AttributeConstants.ATTRIB_TYPE, new Integer(type));
 	}
 
 	public String toString() {
@@ -123,8 +116,8 @@ public abstract class PElement extends PlatformObject implements IPElement,
 
 	public int compareTo(Object obj) {
 		if (obj instanceof IPElement) {
-			int my_rank = getKeyNumber();
-			int his_rank = ((IPElement) obj).getKeyNumber();
+			int my_rank = getID();
+			int his_rank = ((IPElement) obj).getID();
 			if (my_rank < his_rank)
 				return -1;
 			if (my_rank == his_rank)

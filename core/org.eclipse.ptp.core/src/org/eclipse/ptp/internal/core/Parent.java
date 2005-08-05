@@ -101,11 +101,11 @@ public abstract class Parent extends PElement {
 		int hi = high;
 		int mid;
 		if (high > low) {
-			mid = element[(low + high) / 2].getKeyNumber();
+			mid = element[(low + high) / 2].getID();
 			while (lo <= hi) {
-				while ((lo < high) && (element[lo].getKeyNumber() < mid))
+				while ((lo < high) && (element[lo].getID() < mid))
 					++lo;
-				while ((hi > low) && (element[hi].getKeyNumber() > mid))
+				while ((hi > low) && (element[hi].getID() > mid))
 					--hi;
 				if (lo <= hi) {
 					swap(element, lo, hi);

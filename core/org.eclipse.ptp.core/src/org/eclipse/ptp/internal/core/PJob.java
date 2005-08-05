@@ -66,7 +66,7 @@ public class PJob extends Parent implements IPJob {
 	}
 
 	public String getJobNumber() {
-		int i = getKeyNumber();
+		int i = getID();
 		return "" + (i - BASE_OFFSET) + "";
 		/*
 		 * String s = getKey(); int i = -1; try { i = (new

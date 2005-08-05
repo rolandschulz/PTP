@@ -36,6 +36,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -150,6 +151,20 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		ortedFullText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		ortedFullText.addModifyListener(listener);
 		ortedFullText.setText(ortedPathText.getText()+" "+ortedArgsText.getText());
+		
+		/*
+		Group bGroup = new Group(aGroup, SWT.SHADOW_ETCHED_IN);
+		bGroup.setLayout(createGridLayout(1, true, 10, 10));
+		bGroup.setText("External Daemon, ORTEd, Start Method");
+	    	Button ortedStartButtonSystem = new Button(bGroup, SWT.RADIO);
+	    	ortedStartButtonSystem.setText("Start ORTEd with JNI/C/system() call");
+	    	Button ortedStartButtonForkExec = new Button(bGroup, SWT.RADIO);
+	    	ortedStartButtonForkExec.setText("Start ORTEd with JNI/C/fork()/exec() calls");
+	    	Button ortedStartButtonJava = new Button(bGroup, SWT.RADIO);
+	    	ortedStartButtonJava.setText("Start ORTEd with Java Runtime.getRuntime().exec(...)");
+	    	Button ortedStartButtonExternal = new Button(bGroup, SWT.RADIO);
+	    	ortedStartButtonExternal.setText("Do NOT start ORTEd (user must start it external to PTP)");
+	    	*/  
 	}
 
 	protected void defaultSetting() 

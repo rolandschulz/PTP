@@ -49,7 +49,7 @@ public class PNode extends Parent implements IPNode {
 	}
 
 	public String getNodeNumber() {
-		return "" + getKeyNumber() + "";
+		return "" + getID() + "";
 	}
 
 	public IPProcess[] getProcesses() {

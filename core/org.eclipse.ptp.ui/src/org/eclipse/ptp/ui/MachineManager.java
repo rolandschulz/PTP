@@ -168,10 +168,10 @@ public class MachineManager implements IManager {
 			IElementSet set = setManager.getSetRoot();
 			for (int i=0; i<total_element; i++) {
 				//FIXME using id, or name
-				set.add(new Element(pElements[i].getKeyString()));
+				set.add(new Element(pElements[i].getIDString()));
 			}
 			setManager.add(set);
-			machineList.put(mac.getKeyString(), setManager);
+			machineList.put(mac.getIDString(), setManager);
 		}
 	}
 	
@@ -179,9 +179,9 @@ public class MachineManager implements IManager {
 		String firstID = "";
 		IPMachine[] macs = getMachines();
 		if (macs.length > 0) {
-			firstID = macs[0].getKeyString();
+			firstID = macs[0].getIDString();
 			for (int j=0; j<macs.length; j++) {
-				if (!machineList.containsKey(macs[j].getKeyString()))
+				if (!machineList.containsKey(macs[j].getIDString()))
 					addMachine(macs[j]);
 			}
 		}
