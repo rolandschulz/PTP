@@ -85,4 +85,12 @@ public class ChangeMachineAction extends GotoDropDownAction {
 			view.refresh();
 		}
 	}
+	
+	private class InternalMachineAction extends GotoAction {
+		public InternalMachineAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
+			super(name, id, view, action);
+		    setImageDescriptor(ParallelImages.ID_ICON_MACHINE_NORMAL);
+		    setDisabledImageDescriptor(ParallelImages.ID_ICON_MACHINE_DISABLE);
+		}	
+	}	
 }

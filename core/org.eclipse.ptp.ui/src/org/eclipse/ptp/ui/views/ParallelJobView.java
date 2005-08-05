@@ -24,6 +24,8 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.ui.JobManager;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.ParallelImages;
+import org.eclipse.ptp.ui.actions.ChangeJobViewAction;
+import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.ISetManager;
@@ -54,7 +56,18 @@ public class ParallelJobView extends AbstractParallelSetView {
 	protected String cur_selected_element_id = "";
 	
 	//composite
-	protected List jobsList = null;
+	protected SashForm sashForm = null;
+	protected List jobsListComposite = null;
+	protected Composite elementViewComposite = null;
+	
+	//action
+	protected ParallelAction changeJobViewAction = null;
+	
+	//view flag
+	public static final String BOTH_VIEW = "0";
+	public static final String JOB_VIEW = "1";
+	public static final String PRO_VIEW = "2";
+	protected String current_view = BOTH_VIEW;
 	
 	public static Image[][] procImages = {
 		{
@@ -83,6 +96,27 @@ public class ParallelJobView extends AbstractParallelSetView {
 	public JobManager getJobManager() {
 		return jobManager;
 	}
+	public String getCurrentView() {
+		return current_view;
+	}
+	public void changeView(String view_flag) {
+		current_view = view_flag;
+		if (current_view.equals(ParallelJobView.JOB_VIEW)) {
+			jobsListComposite.setVisible(true);
+			elementViewComposite.setVisible(false);
+			sashForm.setWeights(new int[] { 1, 0 });
+		}
+		else if (current_view.equals(ParallelJobView.PRO_VIEW)) {
+			jobsListComposite.setVisible(false);
+			elementViewComposite.setVisible(true);
+			sashForm.setWeights(new int[] { 0, 1 });
+		}
+		else {
+			jobsListComposite.setVisible(true);
+			elementViewComposite.setVisible(true);
+			sashForm.setWeights(new int[] { 1, 3 });
+		}
+	}
 		
 	protected void initElementAttribute() {
 		e_offset_x = 5;
@@ -101,14 +135,14 @@ public class ParallelJobView extends AbstractParallelSetView {
 		if (jobManager.size() > 0) {
 			getDisplay().asyncExec(new Runnable() {
 				public void run() {
-					jobsList.removeAll();
+					jobsListComposite.removeAll();
 					IPJob[] jobs = jobManager.getJobs();
 					for (int i=0; i<jobs.length; i++) {
-						jobsList.add(jobs[i].getElementName());
+						jobsListComposite.add(jobs[i].getElementName());
 					}
 					//FIXME dummy only
-					jobsList.add("dummy");
-					jobsList.setSelection(0);
+					jobsListComposite.add("dummy");
+					jobsListComposite.setSelection(0);
 				}
 			});
 			updateJob();
@@ -130,30 +164,33 @@ public class ParallelJobView extends AbstractParallelSetView {
 		parent.setLayout(new FillLayout());
 		parent.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		SashForm sash = new SashForm(parent, SWT.HORIZONTAL);
-		sash.setLayout(new FillLayout());
-		sash.setLayoutData(new GridData(GridData.FILL_BOTH));
+		sashForm = new SashForm(parent, SWT.HORIZONTAL);
+		sashForm.setLayout(new FillLayout());
+		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		jobsList = new List(sash, SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
-		jobsList.setLayoutData(new GridData(GridData.FILL_BOTH));
-		jobsList.addSelectionListener(new SelectionAdapter() {
+		jobsListComposite = new List(sashForm, SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
+		jobsListComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		jobsListComposite.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				String jobName = jobsList.getItem(jobsList.getSelectionIndex());
+				String jobName = jobsListComposite.getItem(jobsListComposite.getSelectionIndex());
 				selectJob(jobManager.findJob(jobName).getKeyString());
 				update();
 				refresh();
 			}			
 		});
 		
-		createElementView(sash);
-		sash.setWeights(new int[] { 1, 3 });
+		elementViewComposite = createElementView(sashForm);
+		sashForm.setWeights(new int[] { 1, 3 });
 	}
 	
 	protected boolean fillContextMenu(IMenuManager manager) {
-		return false;
+		manager.add(new ChangeJobViewAction(this));
+		return true;
 	}
 	protected boolean createToolBarActions(IToolBarManager toolBarMgr) {
-		return false;
+		changeJobViewAction = new ChangeJobViewAction(this);
+		toolBarMgr.add(changeJobViewAction);
+		return true;
 	}
 	protected boolean createMenuActions(IMenuManager menuMgr) {
 		return false;

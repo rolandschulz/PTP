@@ -99,4 +99,12 @@ public class ChangeSetAction extends GotoDropDownAction {
 		
 		run(elements, setManager.getSet(id));
 	}
+
+	private class InternalSetAction extends GotoAction {
+		public InternalSetAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
+			super(name, id, view, action);
+		    setImageDescriptor(ParallelImages.ID_ICON_CREATESET_NORMAL);
+		    setDisabledImageDescriptor(ParallelImages.ID_ICON_CREATESET_DISABLE);
+		}	
+	}
 }
