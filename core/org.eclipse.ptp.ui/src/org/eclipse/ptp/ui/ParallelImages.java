@@ -44,6 +44,12 @@ public class ParallelImages {
 	public static final String ICON_MACHINE_NORMAL = "machine_normal.gif";
 	public static final String ICON_JOB_DISABLE = "job_disable.gif";
 	public static final String ICON_JOB_NORMAL = "job_normal.gif";
+	public static final String ICON_TERMINATE_ALL_DISABLE = "terminate_all_disable.gif";
+	public static final String ICON_TERMINATE_ALL_NORMAL = "terminate_all_normal.gif";
+	public static final String ICON_RUNMODE_DISABLE = "runmode_disable.gif";
+	public static final String ICON_RUNMODE_NORMAL = "runmode_normal.gif";
+	public static final String ICON_DEBUGMODE_DISABLE = "debugmode_disable.gif";
+	public static final String ICON_DEBUGMODE_NORMAL = "debugmode_normal.gif";
 
 	//SHOW LEGEND ICON
 	public static final String ICON_SHOWLEGEND_ACTION_NORMAL =  "legend.gif";
@@ -96,6 +102,12 @@ public class ParallelImages {
 	public static final ImageDescriptor ID_ICON_MACHINE_NORMAL = createImageDescriptor(TOOLICONURL, ICON_MACHINE_NORMAL, ICON_MACHINE_NORMAL);
 	public static final ImageDescriptor ID_ICON_JOB_DISABLE = createImageDescriptor(TOOLICONURL, ICON_JOB_DISABLE, ICON_JOB_DISABLE);
 	public static final ImageDescriptor ID_ICON_JOB_NORMAL = createImageDescriptor(TOOLICONURL, ICON_JOB_NORMAL, ICON_JOB_NORMAL);
+	public static final ImageDescriptor ID_ICON_TERMINATE_ALL_DISABLE = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_ALL_DISABLE, ICON_TERMINATE_ALL_DISABLE);
+	public static final ImageDescriptor ID_ICON_TERMINATE_ALL_NORMAL = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_ALL_NORMAL, ICON_TERMINATE_ALL_NORMAL);
+	public static final ImageDescriptor ID_ICON_RUNMODE_DISABLE = createImageDescriptor(TOOLICONURL, ICON_RUNMODE_DISABLE, ICON_RUNMODE_DISABLE);
+	public static final ImageDescriptor ID_ICON_RUNMODE_NORMAL = createImageDescriptor(TOOLICONURL, ICON_RUNMODE_NORMAL, ICON_RUNMODE_NORMAL);
+	public static final ImageDescriptor ID_ICON_DEBUGMODE_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DEBUGMODE_DISABLE, ICON_DEBUGMODE_DISABLE);
+	public static final ImageDescriptor ID_ICON_DEBUGMODE_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DEBUGMODE_NORMAL, ICON_DEBUGMODE_NORMAL);
 
 	public static final ImageDescriptor ID_ICON_SHOWLEGEND_ACTION_NORMAL = createImageDescriptor(TOOLICONURL, ICON_SHOWLEGEND_ACTION_NORMAL, ICON_SHOWLEGEND_ACTION_NORMAL);
 	public static final ImageDescriptor ID_ICON_SHOWLEGEND_ACTION_DISABLE = createImageDescriptor(TOOLICONURL, ICON_SHOWLEGEND_ACTION_DISABLE, ICON_SHOWLEGEND_ACTION_DISABLE);

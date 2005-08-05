@@ -24,8 +24,8 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.ui.JobManager;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.ParallelImages;
-import org.eclipse.ptp.ui.actions.ChangeJobViewAction;
 import org.eclipse.ptp.ui.actions.ParallelAction;
+import org.eclipse.ptp.ui.actions.TerminateAllAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.ISetManager;
@@ -63,7 +63,8 @@ public class ParallelJobView extends AbstractParallelSetView {
 	protected Composite elementViewComposite = null;
 	
 	//action
-	protected ParallelAction changeJobViewAction = null;
+	//protected ParallelAction changeJobViewAction = null;
+	protected ParallelAction terminateAllAction = null;
 	
 	//view flag
 	public static final String BOTH_VIEW = "0";
@@ -71,13 +72,10 @@ public class ParallelJobView extends AbstractParallelSetView {
 	public static final String PRO_VIEW = "2";
 	protected String current_view = BOTH_VIEW;
 	
-	public static Image[][] jobImages = {
-		{
-			ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR),
-			ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR_SEL) },
-		{
-			ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED),
-			ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SEL) }
+	public static Image[] jobImages = {
+		ParallelImages.getImage(ParallelImages.ICON_RUNMODE_NORMAL),
+		ParallelImages.getImage(ParallelImages.ICON_DEBUGMODE_NORMAL),
+		ParallelImages.getImage(ParallelImages.ICON_TERMINATE_ALL_NORMAL)
 	};
 	public static Image[][] procImages = {
 		{
@@ -150,7 +148,13 @@ public class ParallelJobView extends AbstractParallelSetView {
 					TableItem item = null;
 					for (int i=0; i<jobs.length; i++) {
 						item = new TableItem(jobTable, SWT.NULL);
-						item.setImage(jobImages[jobs[i].isDebug()?1:0][0]);
+						int jobImageIndex = 0;
+						if (jobs[i].isAllStop())
+							jobImageIndex = 2;
+						else if (jobs[i].isDebug())
+							jobImageIndex = 1;
+						
+						item.setImage(jobImages[jobImageIndex]);
 						item.setText(jobs[i].getElementName());
 					}
 					jobTable.setSelection(0);
@@ -206,12 +210,15 @@ public class ParallelJobView extends AbstractParallelSetView {
 	}
 	
 	protected boolean fillContextMenu(IMenuManager manager) {
-		manager.add(new ChangeJobViewAction(this));
+		//manager.add(new ChangeJobViewAction(this));
+		manager.add(new TerminateAllAction(this));
 		return true;
 	}
 	protected boolean createToolBarActions(IToolBarManager toolBarMgr) {
-		changeJobViewAction = new ChangeJobViewAction(this);
-		toolBarMgr.add(changeJobViewAction);
+		//changeJobViewAction = new ChangeJobViewAction(this);
+		//toolBarMgr.add(changeJobViewAction);
+		terminateAllAction = new TerminateAllAction(this);
+		toolBarMgr.add(terminateAllAction);
 		return true;
 	}
 	protected boolean createMenuActions(IMenuManager menuMgr) {

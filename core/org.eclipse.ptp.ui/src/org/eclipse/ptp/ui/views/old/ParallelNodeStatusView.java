@@ -341,7 +341,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 				else {
 					int index = -1;
 					if (el instanceof PProcess) {
-						index = ((PProcess) el).getKeyNumber();
+						index = ((PProcess) el).getID();
 					} else if (el instanceof PNode) {
 						index = IPNodeToSystemIndex((PNode) el);
 						// System.out.println("NodeRedraw - node = "+(PNode)el);
@@ -959,7 +959,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 			IPProcess procs[] = getSortedProcessList(somenode);
 
 			/* goto the first process */
-			selected_node_num = procs[0].getKeyNumber();
+			selected_node_num = procs[0].getID();
 			moveScrolledAreaToSelection();
 			refresh(false, null);
 			return;
@@ -1815,7 +1815,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 				mode = NODES;
 				filterNodes(true);
 			}
-			selected_node_num = element.getKeyNumber();
+			selected_node_num = element.getID();
 			moveScrolledAreaToSelection();
 			refresh(false, null);
 		} else if (element instanceof IPProcess) {
@@ -1826,7 +1826,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 				mode = PROCESSES;
 				filterNodes(false);
 			}
-			selected_node_num = element.getKeyNumber();
+			selected_node_num = element.getID();
 			moveScrolledAreaToSelection();
 			refresh(true, null);
 		}

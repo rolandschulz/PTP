@@ -332,11 +332,15 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		cur_selected_element_id = "";
 		clearLowerTextRegions();
 	}
+	protected void paintCanvas(GC g) {
+		super.paintCanvas(g);
+		updateLowerTextRegions();
+	}
+	
 	protected void drawingRegisterElement(IElement element, GC g, int x_loc, int y_loc, int width, int height) {
 		super.drawingRegisterElement(element, g, x_loc, y_loc, width, height);
 		if (element.isRegistered()) {
 			cur_selected_element_id = element.getID();
-			updateLowerTextRegions();
 		}
 	}
 	
