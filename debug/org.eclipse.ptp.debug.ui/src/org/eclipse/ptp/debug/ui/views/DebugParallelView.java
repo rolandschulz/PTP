@@ -82,7 +82,7 @@ public class DebugParallelView extends ParallelJobView implements IDebugParallel
 		manager.add(stepOverAction);
 		manager.add(stepReturnAction);
 		manager.add(new Separator());
-		return super.fillContextMenu(manager);
+		return true;
 	}
 	protected boolean createToolBarActions(IToolBarManager toolBarMgr) {
 		resumeAction = new ResumeAction(this);
@@ -107,7 +107,7 @@ public class DebugParallelView extends ParallelJobView implements IDebugParallel
 		toolBarMgr.add(registerAction);
 		toolBarMgr.add(unregisterAction);
 		toolBarMgr.add(new Separator());
-		return super.createToolBarActions(toolBarMgr);
+		return true;
 	}
 
 	protected void doubleClickAction(int element_num) {
