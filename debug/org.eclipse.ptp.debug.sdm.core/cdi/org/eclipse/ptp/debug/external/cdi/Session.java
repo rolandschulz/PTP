@@ -57,10 +57,12 @@ public class Session implements ICDISession, ICDISessionObject {
 		currentDebugTargetList = new Hashtable();
 		currentProcessSetList = new Hashtable();
 		
+		debugger.addDebuggerObserver(eventManager);
+		
 		/* Initially we only create process/target 0 */
 		//addTargets(new int[] { 0, 1 });
-		addTarget(0);
-		addTarget(1);
+		registerTarget(0);
+		registerTarget(1);
 	}
 	
 	public DebugSession getDebugSession() {
@@ -100,17 +102,12 @@ public class Session implements ICDISession, ICDISessionObject {
 	    }
 	    return pSets;
 	}
-	
-	
-	
-	
-	
 
-	public void addTarget(int procNum) {
+	public void registerTarget(int procNum) {
 		Target target = new Target(this, debugger, procNum);
 		
-		debugger.addDebuggerObserver(eventManager);
-		debugger.fireEvent(new EInferiorCreated(dSession));
+		debugger.fireEvent(new EInferiorCreated(procNum, 0));
+		
 		if (!currentDebugTargetList.containsKey(Integer.toString(target.getTargetId()))) {
 			currentDebugTargetList.put(Integer.toString(target.getTargetId()), target);
 		}
@@ -132,22 +129,24 @@ public class Session implements ICDISession, ICDISessionObject {
 		}
 	}
 	
-	public void addTargets(int[] procNums) {
+	public void registerTargets(int[] procNums) {
 		for (int i = 0; i < procNums.length; i++) {
-			addTarget(procNums[i]);
+			registerTarget(procNums[i]);
 		}
 	}
 
-	public void removeTarget(int target) {
+	public void unregisterTarget(int target) {
 		String targetId = Integer.toString(target);
 		Target t = (Target) currentDebugTargetList.remove(targetId);
-			
-		debugger.deleteDebuggerObserver(eventManager);
 	}
-	public void removeTargets(int[] targets) {
+	public void unregisterTargets(int[] targets) {
 		for (int i = 0; i < targets.length; ++i) {
-			removeTarget(targets[i]);
+			unregisterTarget(targets[i]);
 		}
+	}
+	
+	public boolean isRegistered(int i) {
+		return currentDebugTargetList.containsKey(Integer.toString(i));
 	}
 
 	public ICDITarget getTarget(int i) {
@@ -167,14 +166,6 @@ public class Session implements ICDISession, ICDISessionObject {
 	    }
 	    return targets;
 	}
-
-	
-	
-	
-	
-	
-	
-	
 	
 	public void setAttribute(String key, String value) {
 		// Auto-generated method stub
@@ -189,18 +180,14 @@ public class Session implements ICDISession, ICDISessionObject {
 	}
 
 	public BreakpointManager getBreakpointManager() {
-		System.out.println("Session.getBreakpointManager()");
 		return breakpointManager;
 	}
 	
 	public ICDIEventManager getEventManager() {
-		System.out.println("Session.getEventManager()");
 		return eventManager;
 	}
 
 	public ICDISessionConfiguration getConfiguration() {
-		// Auto-generated method stub
-		System.out.println("Session.getConfiguration()");
 		return configuration;
 	}
 
@@ -208,6 +195,7 @@ public class Session implements ICDISession, ICDISessionObject {
 		// Auto-generated method stub
 		System.out.println("Session.terminate()");
 		
+		debugger.deleteDebuggerObserver(eventManager);
 	}
 
 	public Process getSessionProcess() throws CDIException {
@@ -218,8 +206,6 @@ public class Session implements ICDISession, ICDISessionObject {
 	}
 
 	public ICDISession getSession() {
-		// Auto-generated method stub
-		System.out.println("Session.getSession()");
 		return this;
 	}
 }

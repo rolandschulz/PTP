@@ -188,6 +188,11 @@ public class Target extends SessionObject implements IPCDITarget {
 		return null;
 	}
 	
+	public ICDIThread getThread(int threadId) throws CDIException {
+		SimThread thread = ((SimProcess) getProcess()).getThread(threadId);
+		return new Thread(this, thread.getThreadId());
+	}
+	
 	public ICDIThread[] getThreads() throws CDIException {
 		SimThread[] threads = ((SimProcess) getProcess()).getThreads();
 			

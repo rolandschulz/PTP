@@ -10,12 +10,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
+import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.event.ICDICreatedEvent;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
-import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.cdi.Session;
-import org.eclipse.ptp.debug.external.cdi.model.PTPObject;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
+import org.eclipse.ptp.debug.external.event.DebugEvent;
 import org.eclipse.ptp.debug.external.event.EBreakpointCreated;
 import org.eclipse.ptp.debug.external.event.EInferiorCreated;
 
@@ -24,31 +24,38 @@ import org.eclipse.ptp.debug.external.event.EInferiorCreated;
 public class CreatedEvent implements ICDICreatedEvent {
 	Session session;
 	ICDIObject source;
+	DebugEvent event;
 
 	public CreatedEvent(Session s, EBreakpointCreated ev) {
 		session = s;
+		event = ev;
 		int pId = ev.getProcessId();
 		int tId = ev.getThreadId();
-		DebugSession dSession = ev.getDebugSession();
-		// FIXME 
-		//Target target = session.getTarget(dSession);
-		Target target = (Target) session.getTarget(0);
-		source = new PTPObject(target);
 		
-		session.getTarget()
+		if (!session.isRegistered(pId))
+			source = null;
+		else {
+			try {
+				source = ((Target) session.getTarget(pId)).getThread(tId);
+			} catch (CDIException e) {
+				source = null;
+			}
+		}
 	}
 
 	public CreatedEvent(Session s, EInferiorCreated ev) {
 		session = s;
-		DebugSession dSession = ev.getDebugSession();
-		// FIXME 
-		//Target target = session.getTarget(dSession);
-		Target target = (Target) session.getTarget(0);
-		source = new PTPObject(target);
-
+		int pId = ev.getProcessId();
+		int tId = ev.getThreadId();
 		
-		//session = s;
-		//source = null;
+		if (!session.isRegistered(pId))
+			source = null;
+		else
+			try {
+				source = ((Target) session.getTarget(pId)).getThread(tId);
+			} catch (CDIException e) {
+				source = null;
+			}
 	}
 
 	public ICDIObject getSource() {
