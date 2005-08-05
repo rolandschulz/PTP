@@ -23,16 +23,21 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.ui.actions.ChangeSetAction;
 import org.eclipse.ptp.ui.actions.CreateSetAction;
 import org.eclipse.ptp.ui.actions.DeleteProcessAction;
 import org.eclipse.ptp.ui.actions.DeleteSetAction;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.ISetManager;
+import org.eclipse.ptp.ui.old.PTPUIPlugin;
+import org.eclipse.ptp.ui.views.old.ProcessEditorInput;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.PartInitException;
 
 /**
  * @author Clement chu
@@ -134,5 +139,20 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		if (!cur_set_id.equals(ISetManager.SET_ROOT_ID)) {
 			deleteProcessAction.run(cur_element_set.getSelectedElements());
 		}
-	}	
+	}
+	
+    protected void openProcessViewer(final IPProcess element) {
+    	if (element == null)
+    		return;
+    	
+    	BusyIndicator.showWhile(getDisplay(), new Runnable() {
+            public void run() {
+                try {
+                    PTPUIPlugin.getActivePage().openEditor(new ProcessEditorInput(element), ParallelProcessViewer.VIEW_ID);
+                } catch (PartInitException e) {
+                    System.out.println("PartInitException err: " + e.getMessage());
+                }
+            }
+        });
+    }	
 }

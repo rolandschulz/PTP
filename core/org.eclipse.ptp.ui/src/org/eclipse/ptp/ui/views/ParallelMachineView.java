@@ -31,8 +31,8 @@ import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.ISetManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
@@ -196,9 +196,22 @@ public class ParallelMachineView extends AbstractParallelSetView {
 
 		Group bleft = new Group(bottom, SWT.BORDER);
 		bleft.setLayout(new FillLayout());
+		GridData gdtext = new GridData(GridData.FILL_BOTH);
+		gdtext.grabExcessVerticalSpace = true;
+		gdtext.grabExcessHorizontalSpace = true;
+		gdtext.horizontalAlignment = GridData.FILL;
+		gdtext.verticalAlignment = GridData.FILL;
+		bleft.setLayoutData(gdtext);
 		bleft.setText("Node Info");
+
 		Group bright = new Group(bottom, SWT.BORDER);
 		bright.setLayout(new FillLayout());
+		GridData gdlist = new GridData(GridData.FILL_BOTH);
+		gdlist.grabExcessVerticalSpace = true;
+		gdlist.grabExcessHorizontalSpace = true;
+		gdlist.horizontalAlignment = GridData.FILL;
+		gdlist.verticalAlignment = GridData.FILL;
+		bright.setLayoutData(gdlist);
 		bright.setText("Process Info");
 
 		BLtable = new Table(bleft, SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -206,9 +219,9 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		BLtable.setHeaderVisible(false);
 		BLtable.setLinesVisible(true);
 		TableColumn col1 = new TableColumn(BLtable, SWT.LEFT);
-		col1.setWidth(65);
+		col1.setWidth(55);
 		TableColumn col2 = new TableColumn(BLtable, SWT.LEFT);
-		col2.setWidth(90);
+		col2.setWidth(80);
 
 		BRtable = new Table(bright, SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		BRtable.setLayout(new FillLayout());
@@ -217,42 +230,19 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		col1 = new TableColumn(BRtable, SWT.LEFT);
 		col1.setWidth(25);
 		col2 = new TableColumn(BRtable, SWT.LEFT);
-		col2.setWidth(130);
-
-		GridData gdtext = new GridData(GridData.FILL_BOTH);
-		gdtext.grabExcessVerticalSpace = true;
-		gdtext.grabExcessHorizontalSpace = true;
-		gdtext.horizontalAlignment = GridData.FILL;
-		gdtext.verticalAlignment = GridData.FILL;
-		bleft.setLayoutData(gdtext);
-
-		GridData gdlist = new GridData(GridData.FILL_BOTH);
-		gdlist.grabExcessVerticalSpace = true;
-		gdlist.grabExcessHorizontalSpace = true;
-		gdlist.horizontalAlignment = GridData.FILL;
-		gdlist.verticalAlignment = GridData.FILL;
-		bright.setLayoutData(gdlist);
+		col2.setWidth(120);
 		
-		BRtable.addSelectionListener(new SelectionListener() {
-			/* single click - do nothing */
-			public void widgetSelected(SelectionEvent e) {
-			}
-
+		BRtable.addSelectionListener(new SelectionAdapter() {
 			/* double click - throw up an editor to look at the process */
 			public void widgetDefaultSelected(SelectionEvent e) {
-				int idx = BRtable.getSelectionIndex();
-
-				//if (mode == NODES) {
-					IPNode node = machineManager.findNode(cur_machine_id, cur_selected_element_id);
-					if (node != null) {
-						IPProcess[] procs = node.getSortedProcesses();
-						if (idx >= 0 && idx < procs.length) {
-							//launchProcessViewer(procs[idx]);
-						}
+				IPNode node = machineManager.findNode(cur_machine_id, cur_selected_element_id);
+				if (node != null) {
+					int idx = BRtable.getSelectionIndex();
+					IPProcess[] procs = node.getSortedProcesses();
+					if (idx >= 0 && idx < procs.length) {
+						openProcessViewer(procs[idx]);
 					}
-				//} else if (mode == PROCESSES) {
-				//	launchProcessViewer(processList[selected_node_num]);
-				//}
+				}
 			}
 		});
 	}
@@ -359,111 +349,29 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		BLtable.removeAll();
 		BRtable.removeAll();		
 	}
-	//Nathan's code
+
 	public void updateLowerTextRegions() {
-		if (cur_selected_element_id.length() == 0) {
-			clearLowerTextRegions();
+		clearLowerTextRegions();
+		if (cur_selected_element_id.length() == 0)
 			return;
-		}
 			
-		//int idx = BRtable.getSelectionIndex();
-		BLtable.removeAll();
-		BRtable.removeAll();
-		TableItem item;
+		IPNode node = machineManager.findNode(cur_machine_id, cur_selected_element_id);
+		new TableItem(BLtable, 0).setText(new String[] { "Node #", cur_selected_element_id });
+		new TableItem(BLtable, 0).setText(new String[] { "State", (String)node.getAttrib("state") });
+		new TableItem(BLtable, 0).setText(new String[] { "User", (String)node.getAttrib("user") });
+		new TableItem(BLtable, 0).setText(new String[] { "Group", (String)node.getAttrib("group") });
+		new TableItem(BLtable, 0).setText(new String[] { "Mode", (String)node.getAttrib("mode") });
 
-		//if (mode == NODES) {
-			item = new TableItem(BLtable, 0);
-			IPNode node = machineManager.findNode(cur_machine_id, cur_selected_element_id);
-			
-			item.setText(1, cur_selected_element_id);
-			item.setText(new String[] { "Node #", cur_selected_element_id });
-			item = new TableItem(BLtable, 0);
-			item.setText(new String[] { "State", (String)node.getAttrib("state") });
-			item = new TableItem(BLtable, 0);
-			item.setText(new String[] { "User", (String)node.getAttrib("user") });
-			item = new TableItem(BLtable, 0);
-			item.setText(new String[] { "Group", (String)node.getAttrib("group") });
-			item = new TableItem(BLtable, 0);
-			item.setText(new String[] { "Mode", (String)node.getAttrib("mode") });
-
-			if (node.hasChildren()) {
-				IPProcess procs[] = node.getSortedProcesses();
-				for (int i = 0; i < procs.length; i++) {
-					item = new TableItem(BRtable, 0);
-					int proc_state = machineManager.getProcStatus(procs[i].getStatus());
-					item.setImage(0, procImages[proc_state][0]);
-					item.setText(1, "Process " + procs[i].getProcessNumber() + ", Job " + procs[i].getJob().getJobNumber());
-				}
+		if (node.hasChildren()) {
+			IPProcess procs[] = node.getSortedProcesses();
+			TableItem item = null;
+			for (int i = 0; i < procs.length; i++) {
+				int proc_state = machineManager.getProcStatus(procs[i].getStatus());
+				item = new TableItem(BRtable, 0);
+				item.setImage(0, procImages[proc_state][0]);
+				item.setText(1, "Process " + procs[i].getProcessNumber() + ", Job " + procs[i].getJob().getJobNumber());
 			}
-		//}
-		/*
-		else if (mode == PROCESSES) {
-			item = new TableItem(BLtable, 0);
-			item.setText(new String[] { "Rank",
-					processList[selected_node_num].getProcessNumber() });
-			item = new TableItem(BLtable, 0);
-			item.setText(new String[] { "PID",
-					processList[selected_node_num].getPid() });
-
-			String procnum = processList[selected_node_num].getProcessNumber();
-			Integer procnumint = null;
-			try {
-				procnumint = new Integer(procnum);
-			} catch (NumberFormatException e) {
-				procnumint = null;
-			}
-			if (procnumint != null) {
-				int node_idx = findNodeFromProcess(procnumint.intValue());
-				if (node_idx >= 0 && node_idx < displayElements.length) {
-					item = new TableItem(BLtable, 0);
-					item.setText(new String[] {
-							"On node",
-							((IPNode) displayElements[node_idx])
-									.getNodeNumber() });
-				}
-			}
-
-			item = new TableItem(BLtable, 0);
-			item.setText(new String[] { "Status",
-					processList[selected_node_num].getStatus() });
-			if (processList[selected_node_num].getStatus().equals(
-					IPProcess.EXITED)) {
-				item = new TableItem(BLtable, 0);
-				item.setText(new String[] { "Exit code",
-						processList[selected_node_num].getExitCode() });
-			} else if (processList[selected_node_num].getStatus().equals(
-					IPProcess.EXITED_SIGNALLED)) {
-				item = new TableItem(BLtable, 0);
-				item.setText(new String[] { "Signal name",
-						processList[selected_node_num].getSignalName() });
-			}
-
-			item = new TableItem(BRtable, 0);
-
-			if (processList[selected_node_num].getStatus().equals(
-					IPProcess.STARTING))
-				item.setImage(0, statusImages[PROC_STARTING][NOT_SELECTED]);
-			else if (processList[selected_node_num].getStatus().equals(
-					IPProcess.RUNNING))
-				item.setImage(0, statusImages[PROC_RUNNING][NOT_SELECTED]);
-			else if (processList[selected_node_num].getStatus().equals(
-					IPProcess.EXITED))
-				item.setImage(0, statusImages[PROC_EXITED][NOT_SELECTED]);
-			else if (processList[selected_node_num].getStatus().equals(
-					IPProcess.EXITED_SIGNALLED))
-				item
-						.setImage(0,
-								statusImages[PROC_EXITED_SIGNAL][NOT_SELECTED]);
-			else if (processList[selected_node_num].getStatus().equals(
-					IPProcess.STOPPED))
-				item.setImage(0, statusImages[PROC_STOPPED][NOT_SELECTED]);
-			else if (processList[selected_node_num].getStatus().equals(
-					IPProcess.ERROR))
-				item.setImage(0, statusImages[PROC_ERROR][NOT_SELECTED]);
-			item.setText(1, "Process "
-					+ processList[selected_node_num].getProcessNumber());
 		}
-		*/
 	}	
 	
 	/*

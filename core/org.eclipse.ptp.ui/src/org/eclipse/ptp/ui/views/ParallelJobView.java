@@ -36,8 +36,13 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 
 /**
  * @author Clement chu
@@ -57,7 +62,9 @@ public class ParallelJobView extends AbstractParallelSetView {
 	
 	//composite
 	protected SashForm sashForm = null;
-	protected List jobsListComposite = null;
+	protected Composite jobComposite = null;
+	protected List jobList = null;
+	protected Table jobInfoTable = null;
 	protected Composite elementViewComposite = null;
 	
 	//action
@@ -102,17 +109,17 @@ public class ParallelJobView extends AbstractParallelSetView {
 	public void changeView(String view_flag) {
 		current_view = view_flag;
 		if (current_view.equals(ParallelJobView.JOB_VIEW)) {
-			jobsListComposite.setVisible(true);
+			jobComposite.setVisible(true);
 			elementViewComposite.setVisible(false);
 			sashForm.setWeights(new int[] { 1, 0 });
 		}
 		else if (current_view.equals(ParallelJobView.PRO_VIEW)) {
-			jobsListComposite.setVisible(false);
+			jobComposite.setVisible(false);
 			elementViewComposite.setVisible(true);
 			sashForm.setWeights(new int[] { 0, 1 });
 		}
 		else {
-			jobsListComposite.setVisible(true);
+			jobComposite.setVisible(true);
 			elementViewComposite.setVisible(true);
 			sashForm.setWeights(new int[] { 1, 3 });
 		}
@@ -135,14 +142,14 @@ public class ParallelJobView extends AbstractParallelSetView {
 		if (jobManager.size() > 0) {
 			getDisplay().asyncExec(new Runnable() {
 				public void run() {
-					jobsListComposite.removeAll();
+					jobList.removeAll();
 					IPJob[] jobs = jobManager.getJobs();
 					for (int i=0; i<jobs.length; i++) {
-						jobsListComposite.add(jobs[i].getElementName());
+						jobList.add(jobs[i].getElementName());
 					}
 					//FIXME dummy only
-					jobsListComposite.add("dummy");
-					jobsListComposite.setSelection(0);
+					jobList.add("dummy");
+					jobList.setSelection(0);
 				}
 			});
 			updateJob();
@@ -168,17 +175,50 @@ public class ParallelJobView extends AbstractParallelSetView {
 		sashForm.setLayout(new FillLayout());
 		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		jobsListComposite = new List(sashForm, SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
-		jobsListComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
-		jobsListComposite.addSelectionListener(new SelectionAdapter() {
+		jobComposite = new Composite(sashForm, SWT.NONE);
+		GridLayout gd = new GridLayout(1, false);
+		gd.marginHeight = gd.marginWidth = 0;
+		jobComposite.setLayout(gd);
+		jobComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		jobList = new List(jobComposite, SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
+		jobList.setLayoutData(new GridData(GridData.FILL_BOTH));
+		jobList.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				String jobName = jobsListComposite.getItem(jobsListComposite.getSelectionIndex());
-				selectJob(jobManager.findJob(jobName).getKeyString());
-				update();
-				refresh();
+				String jobName = jobList.getItem(jobList.getSelectionIndex());
+				IPJob job = jobManager.findJob(jobName);
+				
+				if (job != null) {
+					new TableItem(jobInfoTable, 0).setText(new String[] { "Job #", job.toString() });
+					new TableItem(jobInfoTable, 0).setText(new String[] { "Total procsses", String.valueOf(job.totalProcesses()) });
+					new TableItem(jobInfoTable, 0).setText(new String[] { "Used nodes", String.valueOf(job.totalNodes()) });
+	
+					selectJob(job.getKeyString());
+					update();
+					refresh();
+				}
 			}			
 		});
 		
+		Group jobGroup = new Group(jobComposite, SWT.BORDER);
+		jobGroup.setLayout(new FillLayout());
+		GridData gdtext = new GridData(GridData.FILL_BOTH);
+		gdtext.grabExcessVerticalSpace = true;
+		gdtext.grabExcessHorizontalSpace = true;
+		gdtext.horizontalAlignment = GridData.FILL;
+		gdtext.verticalAlignment = GridData.FILL;
+		jobGroup.setLayoutData(gdtext);
+		jobGroup.setText("Job Info");
+
+		jobInfoTable = new Table(jobGroup, SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		jobInfoTable.setLayout(new FillLayout());
+		jobInfoTable.setHeaderVisible(false);
+		jobInfoTable.setLinesVisible(true);
+		TableColumn col1 = new TableColumn(jobInfoTable, SWT.LEFT);
+		col1.setWidth(65);
+		TableColumn col2 = new TableColumn(jobInfoTable, SWT.LEFT);
+		col2.setWidth(90);	
+
 		elementViewComposite = createElementView(sashForm);
 		sashForm.setWeights(new int[] { 1, 3 });
 	}
@@ -200,6 +240,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 	protected void doubleClickAction(int element_num) {
 		IElement element = cur_element_set.get(element_num);
 		if (element != null) {
+			openProcessViewer(jobManager.findProcess(cur_job_id, element.getID()));
 		}
 	}
 	
@@ -315,5 +356,5 @@ public class ParallelJobView extends AbstractParallelSetView {
 	public void updatedStatusEvent() {
 		System.out.println("updatedStatusEvent");
 		refresh();
-	}		
+	}
 }
