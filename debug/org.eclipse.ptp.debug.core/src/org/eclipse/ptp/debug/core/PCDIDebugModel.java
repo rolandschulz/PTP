@@ -10,16 +10,10 @@
  ***********************************************************************/
 package org.eclipse.ptp.debug.core;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 
-import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IAddress;
-import org.eclipse.cdt.core.IBinaryParser;
-import org.eclipse.cdt.core.ICExtensionReference;
-import org.eclipse.cdt.core.IBinaryParser.IBinaryExecutable;
-import org.eclipse.cdt.core.IBinaryParser.IBinaryFile;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.debug.core.CDebugUtils;
 import org.eclipse.cdt.debug.core.cdi.ICDILocation;
@@ -29,7 +23,6 @@ import org.eclipse.cdt.debug.core.model.ICBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICWatchpoint;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -430,23 +423,6 @@ public class PCDIDebugModel {
 				throw new DebugException( new Status( IStatus.OK, e.getStatus().getPlugin(), e.getStatus().getCode(), e.getStatus().getMessage(), null ) );
 			}
 		}
-	}
-
-	private static IBinaryExecutable getBinary( IFile file ) throws CoreException {
-		IProject project = file.getProject();
-		ICExtensionReference[] binaryParsersExt = CCorePlugin.getDefault().getBinaryParserExtensions( project );
-		for( int i = 0; i < binaryParsersExt.length; i++ ) {
-			IBinaryParser parser = (IBinaryParser)binaryParsersExt[i].createExtension();
-			try {
-				IBinaryFile exe = parser.getBinary( file.getLocation() );
-				if ( exe instanceof IBinaryExecutable ) {
-					return (IBinaryExecutable)exe;
-				}
-			}
-			catch( IOException e ) {
-			}
-		}
-		throw new CoreException( new Status( IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), -1, DebugCoreMessages.getString( "CDIDebugModel.0" ), null ) ); //$NON-NLS-1$
 	}
 
 	private static boolean sameSourceHandle( String handle1, String handle2 ) {
