@@ -122,7 +122,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 		else {
 			jobTable.setVisible(true);
 			elementViewComposite.setVisible(true);
-			sashForm.setWeights(new int[] { 1, 3 });
+			sashForm.setWeights(new int[] { 1, 2 });
 		}
 	}
 		
@@ -206,12 +206,12 @@ public class ParallelJobView extends AbstractParallelSetView {
 		});
 
 		elementViewComposite = createElementView(sashForm);
-		sashForm.setWeights(new int[] { 1, 2 });
+		changeView(current_view);
+		//sashForm.setWeights(new int[] { 1, 2 });
 	}
 	
 	protected boolean fillContextMenu(IMenuManager manager) {
 		//manager.add(new ChangeJobViewAction(this));
-		manager.add(new TerminateAllAction(this));
 		return true;
 	}
 	protected boolean createToolBarActions(IToolBarManager toolBarMgr) {
@@ -284,11 +284,13 @@ public class ParallelJobView extends AbstractParallelSetView {
 		System.out.println("------------ run");		
 		initialView();
 		refresh();
+		terminateAllAction.setEnabled(true);
 	}
 
 	public void start() {
 		System.out.println("------------ start");
 		refresh();
+		terminateAllAction.setEnabled(false);
 	}
 
 	public void stopped() {
