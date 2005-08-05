@@ -41,7 +41,7 @@ public class CreateSetAction extends GotoDropDownAction {
 	}
 	
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
-    		String curID = view.getCurrentSetID();
+    	String curID = view.getCurrentSetID();
 		ISetManager setManager = view.getCurrentSetManager();
 		if (setManager == null)
 			return;
@@ -95,4 +95,12 @@ public class CreateSetAction extends GotoDropDownAction {
 			view.refresh();
 		}
 	}
+	
+	private class InternalSetAction extends GotoAction {
+		public InternalSetAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
+			super(name, id, view, action);
+		    setImageDescriptor(ParallelImages.ID_ICON_CREATESET_NORMAL);
+		    setDisabledImageDescriptor(ParallelImages.ID_ICON_CREATESET_DISABLE);
+		}	
+	}	
 }
