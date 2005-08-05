@@ -47,11 +47,8 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
-import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.launch.internal.ui.LaunchUtils;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
@@ -199,8 +196,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			exeFile = verifyBinary(project, exePath);
 		}
 		
-		getLaunchManager().run(launch, workDirectory, null, jrunconfig, monitor);
-		IPJob[] jobs = getLaunchManager().getUniverse().getJobs();
+		IPJob job = getLaunchManager().run(launch, workDirectory, null, jrunconfig, monitor);
 		
 		String[] commandLine = new String[] {"/bin/date"};
 		
@@ -209,17 +205,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				ICDISession dsession = null;
 				
-				dsession = (ICDISession) debugConfig.createDebugger().createDebuggerSession(jobs[0], launch, (File) null, monitor);
+				dsession = (ICDISession) debugConfig.createDebugger().createDebuggerSession(job, launch, exeFile, monitor);
 				
-				boolean stopInMain = launch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
-
-				IPCDITarget[] targets = (IPCDITarget[]) dsession.getTargets();
-				
-				/* Even though ICDISession supports multiple targets but it only creates one target */
-				
-				for (int i = 0; i < targets.length; i++) {
-					PCDIDebugModel.newDebugTarget(launch, null, targets[i], "Name", exeFile, true, false, stopInMain, true);
-				}
 			}
 			else if (mode.equals(ILaunchManager.RUN_MODE)) {
 				Process process = DebugPlugin.exec(commandLine, null);
