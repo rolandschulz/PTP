@@ -356,6 +356,9 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			return;
 			
 		IPNode node = machineManager.findNode(cur_machine_id, cur_selected_element_id);
+		if (node == null)
+			return;
+		
 		new TableItem(BLtable, SWT.NONE).setText(new String[] { "Node #", cur_selected_element_id });
 		new TableItem(BLtable, SWT.NONE).setText(new String[] { "State", (String)node.getAttrib("state") });
 		new TableItem(BLtable, SWT.NONE).setText(new String[] { "User", (String)node.getAttrib("user") });

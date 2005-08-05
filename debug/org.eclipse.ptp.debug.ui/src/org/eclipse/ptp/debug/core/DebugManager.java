@@ -52,7 +52,7 @@ public class DebugManager {
 	
 	public void startSimulation() {
 		createProcess();
-		fireListener(IPProcess.STARTING);
+		fireListener(IPProcess.RUNNING);
 		Runnable sim = new Runnable() {
 			private int counter = 0;
 			public void run() {
@@ -124,18 +124,18 @@ public class DebugManager {
 	
 	private String getRandomStatus() {
 		int random = getRandom(5);
-		//NOTE: NO STARTING
+		//NOTE: NO RUNNING
 		switch(random) {
 			case MachineManager.PROC_EXITED:
 				return IPProcess.EXITED;
 			case MachineManager.PROC_EXITED_SIGNAL:
 				return IPProcess.EXITED_SIGNALLED;
-			case MachineManager.PROC_RUNNING:
-				return IPProcess.RUNNING;
+			//case MachineManager.PROC_RUNNING:
+				//return IPProcess.RUNNING;
 			case MachineManager.PROC_STOPPED:
 				return IPProcess.STOPPED;
-			//case MachineManager.PROC_STARTING:
-			//	return IPProcess.STARTING;
+			case MachineManager.PROC_STARTING:
+				return IPProcess.STARTING;
 			default:
 				return IPProcess.ERROR;
 		}
