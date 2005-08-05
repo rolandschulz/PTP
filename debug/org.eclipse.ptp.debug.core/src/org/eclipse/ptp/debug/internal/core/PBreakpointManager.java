@@ -174,13 +174,6 @@ public class PBreakpointManager implements IBreakpointManagerListener, ICDIEvent
 		return getDebugTarget().getCDITarget();
 	}
 
-	protected ICSourceLocator getCSourceLocator() {
-		ISourceLocator locator = getDebugTarget().getLaunch().getSourceLocator();
-		if ( locator instanceof IAdaptable )
-			return (ICSourceLocator)((IAdaptable)locator).getAdapter( ICSourceLocator.class );
-		return null;
-	}
-
 	public void dispose() {
 		getDebugTarget().getCDISession().getEventManager().removeEventListener( this );
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointManagerListener( this );

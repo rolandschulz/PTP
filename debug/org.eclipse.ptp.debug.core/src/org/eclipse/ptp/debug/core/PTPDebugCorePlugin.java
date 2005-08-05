@@ -12,7 +12,6 @@ package org.eclipse.ptp.debug.core;
 
 import java.util.HashMap;
 
-import org.eclipse.cdt.debug.core.ICBreakpointListener;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
