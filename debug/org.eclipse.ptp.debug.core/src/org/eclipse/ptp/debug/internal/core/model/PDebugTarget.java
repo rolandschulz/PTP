@@ -723,6 +723,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			if ( source == null && event instanceof ICDIDestroyedEvent ) {
 				handleTerminatedEvent( (ICDIDestroyedEvent)event );
 			}
+			//FIXME Donny
+			else if (source == null)
+				return;
 			else if ( source.getTarget().equals( getCDITarget() ) ) {
 				if ( event instanceof ICDICreatedEvent ) {
 					if ( source instanceof ICDIThread ) {

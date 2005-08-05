@@ -20,7 +20,6 @@ import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIAddressBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
-import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.cdi.model.AddressBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.AddressLocation;
 import org.eclipse.ptp.debug.external.cdi.model.FunctionBreakpoint;
@@ -43,7 +42,7 @@ public class BreakpointManager extends Manager {
 		allowInterrupt = true;
 	}
 	
-	protected void update(org.eclipse.ptp.debug.external.cdi.model.Target target) throws CDIException {
+	protected void update(Target target) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("BreakpointManager.update()");
 	}
@@ -103,19 +102,10 @@ public class BreakpointManager extends Manager {
 		try {
 			setLocationBreakpoint(bkpt);
 			
-			//int procsNum = target.getProcesses().length;
-			
-			/* testing lots and lots of breakpoints */
-			//long start = System.currentTimeMillis();
-			//for (int j = 0; j < procsNum; j++)
-			//	dSession.getDebugger().fireEvent(new EBreakpointCreated(dSession));
-			//long end = System.currentTimeMillis();
-			//double totalseconds = (double)(end - start) / (double)1000;
-			//System.out.println("BreakpointManager.setLocationBreakpoint() takes " + totalseconds + " seconds");
-			/* testing lots and lots of breakpoints */
-			
 			// Fire a created Event.
-			sess.getDebugger().fireEvent(new EBreakpointCreated(sess.getDebugSession()));
+			int pId = target.getTargetId();
+			int tId = 0; /* thread id */
+			sess.getDebugger().fireEvent(new EBreakpointCreated(pId, tId));
 			
 		} catch (CDIException e) {
 		}

@@ -29,13 +29,6 @@ public class BreakpointHit extends SessionObject implements ICDIBreakpointHit {
 	 * @see org.eclipse.cdt.debug.core.cdi.ICDIBreakpointHit#getBreakpoint()
 	 */
 	public ICDIBreakpoint getBreakpoint() {
-		//int number = breakEvent.getNumber();
-		// Ask the breakpointManager for the breakpoint
-		//BreakpointManager mgr = ((Session)getSession()).getBreakpointManager();
-		// We need to return the same object as the breakpoint.
-		//Breakpoint point = mgr.getBreakpoint(breakEvent.getMISession(), number);
-		// FIXME: if point == null ?? Create a new breakpoint ??
-		//return point;
 		return null;
 	}
 
