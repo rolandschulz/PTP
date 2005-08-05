@@ -52,12 +52,6 @@ public class ImageUtil {
 	public static final String ICON_REGISTER_NORMAL = "register_normal.gif";
 	public static final String ICON_UNREGISTER_DISABLE = "unregister_disable.gif";
 	public static final String ICON_UNREGISTER_NORMAL = "unregister_normal.gif";
-	public static final String ICON_CREATEGROUP_DISABLE = "creategroup_disable.gif";
-	public static final String ICON_CREATEGROUP_NORMAL = "creategroup_normal.gif";
-	public static final String ICON_DELETEGROUP_DISABLE = "deletegroup_disable.gif";
-	public static final String ICON_DELETEGROUP_NORMAL = "deletegroup_normal.gif";
-	public static final String ICON_DELETEPROCESS_DISABLE = "deleteprocess_disable.gif";
-	public static final String ICON_DELETEPROCESS_NORMAL = "deleteprocess_normal.gif";
 	
 	public static final String IMG_PRO_ERROR_SEL = "error_sel.gif";
 	public static final String IMG_PRO_ERROR = "error.gif";
@@ -86,12 +80,6 @@ public class ImageUtil {
 	public static final ImageDescriptor ID_ICON_REGISTER_NORMAL = createImageDescriptor(TOOLICONURL, ICON_REGISTER_NORMAL, ICON_REGISTER_NORMAL);
 	public static final ImageDescriptor ID_ICON_UNREGISTER_DISABLE = createImageDescriptor(TOOLICONURL, ICON_UNREGISTER_DISABLE, ICON_UNREGISTER_DISABLE);
 	public static final ImageDescriptor ID_ICON_UNREGISTER_NORMAL = createImageDescriptor(TOOLICONURL, ICON_UNREGISTER_NORMAL, ICON_UNREGISTER_NORMAL);
-	public static final ImageDescriptor ID_ICON_CREATESET_DISABLE = createImageDescriptor(TOOLICONURL, ICON_CREATEGROUP_DISABLE, ICON_CREATEGROUP_DISABLE);
-	public static final ImageDescriptor ID_ICON_CREATESET_NORMAL = createImageDescriptor(TOOLICONURL, ICON_CREATEGROUP_NORMAL, ICON_CREATEGROUP_NORMAL);
-	public static final ImageDescriptor ID_ICON_DELETESET_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DELETEGROUP_DISABLE, ICON_DELETEGROUP_DISABLE);
-	public static final ImageDescriptor ID_ICON_DELETESET_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DELETEGROUP_NORMAL, ICON_DELETEGROUP_NORMAL);
-	public static final ImageDescriptor ID_ICON_DELETEPROCESS_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DELETEPROCESS_DISABLE, ICON_DELETEPROCESS_DISABLE);
-	public static final ImageDescriptor ID_ICON_DELETEPROCESS_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DELETEPROCESS_NORMAL, ICON_DELETEPROCESS_NORMAL);
 
 	public static final ImageDescriptor ID_IMG_PRO_ERROR_SEL = createImageDescriptor(PROCESSICONURL, IMG_PRO_ERROR_SEL, IMG_PRO_ERROR_SEL);
 	public static final ImageDescriptor ID_IMG_PRO_ERROR = createImageDescriptor(PROCESSICONURL, IMG_PRO_ERROR, IMG_PRO_ERROR);
