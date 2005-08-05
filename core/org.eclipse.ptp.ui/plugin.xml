@@ -31,14 +31,14 @@
 		</view>
 		//-->
 		<view
-			name="Machine"
+			name="Machines"
 			icon="icons/parallel_perspective.gif"
 			category="org.parallel.ptp.ui.views"
 			class="org.eclipse.ptp.ui.views.ParallelMachineView"
 			id="org.eclipse.ptp.ui.views.parallelMachineView">
 		</view>
 		<view
-			name="Job"
+			name="Jobs"
 			icon="icons/parallel_perspective.gif"
 			category="org.parallel.ptp.ui.views"
 			class="org.eclipse.ptp.ui.views.ParallelJobView"

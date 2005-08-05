@@ -147,7 +147,7 @@ public class MachineManager implements IManager {
 	//FIXME using id, or name
 	public IPNode findNode(String machine_id, String node_id) {
 		//FIXME HARDCODE
-		return modelManager.getUniverse().findNodeByName("machine" + machine_id + "_node" + node_id);
+		return modelManager.getUniverse().findNodeByName(getName(machine_id) + "_node" + node_id);
 	}
 	
 	//FIXME don't know whether it return machine or job
@@ -157,6 +157,15 @@ public class MachineManager implements IManager {
 			return "";
 		
 		return element.getElementName();
+		
+		/*
+		IPMachine[] macs = modelManager.getUniverse().getMachines();
+		for (int i=0; i<macs.length; i++) {
+			if (macs[i].getIDString().equals(id))
+				return macs[i].getElementName();
+		}
+		return "";
+		*/
 	}
 	
 	public void addMachine(IPMachine mac) {
@@ -181,6 +190,7 @@ public class MachineManager implements IManager {
 		if (macs.length > 0) {
 			firstID = macs[0].getIDString();
 			for (int j=0; j<macs.length; j++) {
+				System.out.println(macs[j]);
 				if (!machineList.containsKey(macs[j].getIDString()))
 					addMachine(macs[j]);
 			}
