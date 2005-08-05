@@ -45,7 +45,7 @@ public class ChangeMachineAction extends GotoDropDownAction {
 		    	String curMachineID = pmView.getCurrentMachineID();	
 		    	IPMachine[] macs = pmView.getMachineManager().getMachines();
 		    	for (int i=0; i<macs.length; i++) {
-		    		addAction(dropDownMenuMgr, macs[i].getElementName(), macs[i].getKeyString(), curMachineID);
+		    		addAction(dropDownMenuMgr, macs[i].getElementName(), macs[i].getIDString(), curMachineID);
 		    	}		
 		}
 	}
@@ -65,11 +65,11 @@ public class ChangeMachineAction extends GotoDropDownAction {
 			IPMachine[] macs = pmView.getMachineManager().getMachines();
 			for (int i=0; i<macs.length; i++) {
 		    		//FIXME id or name
-		    		if (pmView.getCurrentMachineID().equals(macs[i].getKeyString())) {
+		    		if (pmView.getCurrentMachineID().equals(macs[i].getIDString())) {
 		    			if (i + 1 < macs.length)
-		    				run(null, macs[i+1].getKeyString());
+		    				run(null, macs[i+1].getIDString());
 		    			else
-		    				run(null, macs[0].getKeyString());
+		    				run(null, macs[0].getIDString());
 		    			
 		    			break;
 		    		}

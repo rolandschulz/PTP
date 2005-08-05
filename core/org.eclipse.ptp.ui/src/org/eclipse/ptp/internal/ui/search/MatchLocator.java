@@ -195,7 +195,7 @@ public class MatchLocator implements IPSearchConstants {
 	private boolean matchPattern(String pattern, int limitTo, int mode, IPElement element) {
 	    switch (limitTo) {
 	        case LIMIT_NUMBER:
-	            return isMatch(pattern, element.getKeyString(), mode);
+	            return isMatch(pattern, element.getIDString(), mode);
 	         case LIMIT_PID:
 	             if (element instanceof IPProcess)
 	                 return isMatch(pattern, ((IPProcess)element).getPid(), mode);

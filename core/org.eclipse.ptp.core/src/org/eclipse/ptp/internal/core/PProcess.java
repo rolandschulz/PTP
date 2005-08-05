@@ -100,7 +100,7 @@ public class PProcess extends Parent implements IPProcess {
 	}
 
 	public String getProcessNumber() {
-		return "" + getKeyNumber() + "";
+		return "" + getID() + "";
 	}
 
 	public void setStatus(String status) {

@@ -40,6 +40,8 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 
 	// Resource bundle.
 	private ResourceBundle resourceBundle;
+	
+	private IDGenerator IDGen;
 
 	/**
 	 * The constructor.
@@ -53,6 +55,11 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
 		}
+		IDGen = new IDGenerator();
+	}
+	
+	public int getNewID() {
+		return IDGen.getNewID();
 	}
 
 	/**

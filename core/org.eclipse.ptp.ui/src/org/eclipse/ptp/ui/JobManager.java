@@ -119,10 +119,10 @@ public class JobManager implements IManager {
 			IElementSet set = setManager.getSetRoot();
 			for (int i=0; i<total_element; i++) {
 				//FIXME using id, or name
-				set.add(new Element(pElements[i].getKeyString()));
+				set.add(new Element(pElements[i].getIDString()));
 			}
 			setManager.add(set);
-			jobList.put(job.getKeyString(), setManager);
+			jobList.put(job.getIDString(), setManager);
 		}
 	}	
 		
@@ -130,9 +130,9 @@ public class JobManager implements IManager {
 		String firstID = "";
 		IPJob[] jobs = getJobs();
 		if (jobs.length > 0) {
-			firstID = jobs[0].getKeyString();
+			firstID = jobs[0].getIDString();
 			for (int j=0; j<jobs.length; j++) {
-				if (!jobList.containsKey(jobs[j].getKeyString()))
+				if (!jobList.containsKey(jobs[j].getIDString()))
 					addJob(jobs[j]);
 			}
 		}
