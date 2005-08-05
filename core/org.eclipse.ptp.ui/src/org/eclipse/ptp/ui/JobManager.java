@@ -95,8 +95,8 @@ public class JobManager implements IManager {
 	
 	//FIXME using id, or name
 	public IPProcess findProcess(String job_id, String id) {
-		//FIXME HARDCODE
-		return modelManager.getUniverse().findProcessByName("job" + job_id + "_process" + id);
+		IPJob job = findJob(getName(job_id));
+		return job.findProcess(id);
 	}
 	public IPJob findJob(String job_name) {
 		return modelManager.getUniverse().findJobByName(job_name);
@@ -108,6 +108,14 @@ public class JobManager implements IManager {
 			return "";
 		
 		return element.getElementName();
+		/*
+		IPJob[] jobs = modelManager.getUniverse().getJobs();
+		for (int i=0; i<jobs.length; i++) {
+			if (jobs[i].getIDString().equals(id))
+				return jobs[i].getElementName();
+		}
+		return "";
+		*/		
 	}
 	
 	public void addJob(IPJob job) {
