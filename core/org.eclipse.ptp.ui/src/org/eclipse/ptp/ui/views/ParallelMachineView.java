@@ -218,19 +218,14 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		BLtable.setLayout(new FillLayout());
 		BLtable.setHeaderVisible(false);
 		BLtable.setLinesVisible(true);
-		TableColumn col1 = new TableColumn(BLtable, SWT.LEFT);
-		col1.setWidth(55);
-		TableColumn col2 = new TableColumn(BLtable, SWT.LEFT);
-		col2.setWidth(80);
+		new TableColumn(BLtable, SWT.LEFT).setWidth(60);
+		new TableColumn(BLtable, SWT.LEFT).setWidth(80);
 
 		BRtable = new Table(bright, SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		BRtable.setLayout(new FillLayout());
 		BRtable.setHeaderVisible(false);
 		BRtable.setLinesVisible(true);
-		col1 = new TableColumn(BRtable, SWT.LEFT);
-		col1.setWidth(25);
-		col2 = new TableColumn(BRtable, SWT.LEFT);
-		col2.setWidth(120);
+		new TableColumn(BRtable, SWT.LEFT).setWidth(140);
 		
 		BRtable.addSelectionListener(new SelectionAdapter() {
 			/* double click - throw up an editor to look at the process */
@@ -359,20 +354,20 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		if (node == null)
 			return;
 		
-		new TableItem(BLtable, SWT.NONE).setText(new String[] { "Node #", cur_selected_element_id });
-		new TableItem(BLtable, SWT.NONE).setText(new String[] { "State", (String)node.getAttrib("state") });
-		new TableItem(BLtable, SWT.NONE).setText(new String[] { "User", (String)node.getAttrib("user") });
-		new TableItem(BLtable, SWT.NONE).setText(new String[] { "Group", (String)node.getAttrib("group") });
-		new TableItem(BLtable, SWT.NONE).setText(new String[] { "Mode", (String)node.getAttrib("mode") });
+		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Node #", cur_selected_element_id });
+		new TableItem(BLtable, SWT.NULL).setText(new String[] { "State", (String)node.getAttrib("state") });
+		new TableItem(BLtable, SWT.NULL).setText(new String[] { "User", (String)node.getAttrib("user") });
+		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Group", (String)node.getAttrib("group") });
+		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Mode", (String)node.getAttrib("mode") });
 
 		if (node.hasChildren()) {
 			IPProcess procs[] = node.getSortedProcesses();
 			TableItem item = null;
 			for (int i = 0; i < procs.length; i++) {
 				int proc_state = machineManager.getProcStatus(procs[i].getStatus());
-				item = new TableItem(BRtable, SWT.NONE);
-				item.setImage(0, procImages[proc_state][0]);
-				item.setText(1, "Process " + procs[i].getProcessNumber() + ", Job " + procs[i].getJob().getJobNumber());
+				item = new TableItem(BRtable, SWT.NULL);
+				item.setImage(procImages[proc_state][0]);
+				item.setText("Process " + procs[i].getProcessNumber() + ", Job " + procs[i].getJob().getJobNumber());
 			}
 		}
 	}	
