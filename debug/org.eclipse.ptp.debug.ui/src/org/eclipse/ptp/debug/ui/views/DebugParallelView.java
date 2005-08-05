@@ -173,28 +173,15 @@ public class DebugParallelView extends ParallelJobView implements IDebugParallel
 		}
 	}
 	
-	/*
-	 * FIXME Should implemented IParallelModelListener
-	 */
-	public void start() {
-		initialView();
-		refresh();
-	}
-	public void run() {
-		refresh();
-	}
 	public void stop() {
 		refresh();
 	}
-
 	public void suspend() {
 		refresh();
 	}
-
 	public void exit() {
 		refresh();
 	}
-
 	public void error() {
 		refresh();
 	}

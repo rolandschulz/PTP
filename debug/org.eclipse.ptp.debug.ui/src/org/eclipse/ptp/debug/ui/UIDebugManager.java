@@ -44,7 +44,7 @@ public class UIDebugManager extends JobManager {
 	public final static int PROC_HIT = 7;
 
 	//FIXME dummy only
-	public boolean dummy = true;
+	public boolean dummy = false;
 		
 	public int getProcessStatus(String job_id, String proc_id) {
 		//FIXME dummy only 
