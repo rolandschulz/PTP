@@ -63,7 +63,8 @@ public class DebugParallelView extends ParallelJobView implements IDebugParallel
 	public DebugParallelView() {
 		jobManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
 		//FIXME dummy only
-		DebugManager.getInstance().addListener(this);
+		if (((UIDebugManager)jobManager).dummy)
+			DebugManager.getInstance().addListener(this);
 	}
 
 	public static DebugParallelView getDebugViewInstance() {
@@ -140,8 +141,9 @@ public class DebugParallelView extends ParallelJobView implements IDebugParallel
 
 	public void dispose() {
 		super.dispose();
-		//FIME dummy
-		DebugManager.getInstance().removeListener(this);		
+		//FIXME dummy only
+		if (((UIDebugManager)jobManager).dummy)
+			DebugManager.getInstance().removeListener(this);		
 	}
 	
 	public void registerElement(IElement element) {

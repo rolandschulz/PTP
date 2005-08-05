@@ -149,9 +149,9 @@ public class ParallelJobView extends AbstractParallelSetView {
 					IPJob[] jobs = jobManager.getJobs();
 					TableItem item = null;
 					for (int i=0; i<jobs.length; i++) {
-						item = new TableItem(jobTable, SWT.NONE);
-						item.setImage(0, jobImages[jobs[i].isDebug()?1:0][0]);
-						item.setText(1, jobs[i].getElementName());
+						item = new TableItem(jobTable, SWT.NULL);
+						item.setImage(jobImages[jobs[i].isDebug()?1:0][0]);
+						item.setText(jobs[i].getElementName());
 					}
 					jobTable.setSelection(0);
 				}
@@ -172,26 +172,22 @@ public class ParallelJobView extends AbstractParallelSetView {
 	}
 	
 	protected void createView(Composite parent) {
-		parent.setLayout(new FillLayout());
+		parent.setLayout(new FillLayout(SWT.VERTICAL));
 		parent.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		sashForm = new SashForm(parent, SWT.HORIZONTAL);
-		sashForm.setLayout(new FillLayout());
+		sashForm.setLayout(new FillLayout(SWT.VERTICAL));
 		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
-		
-		jobTable = new Table(sashForm, SWT.FULL_SELECTION | SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
-		jobTable.setLayout(new FillLayout());
+				
+		jobTable = new Table(sashForm, SWT.BORDER | SWT.SINGLE);
 		jobTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 		jobTable.setHeaderVisible(false);
-		jobTable.setLinesVisible(false);
-		TableColumn col1 = new TableColumn(jobTable, SWT.LEFT);
-		col1.setWidth(25);
-		TableColumn col2 = new TableColumn(jobTable, SWT.LEFT);
-		col2.setWidth(90);	
+		TableColumn jobColumn = new TableColumn(jobTable, SWT.LEFT);
+		jobColumn.setWidth(100);
 
 		jobTable.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				String jobName = jobTable.getItem(jobTable.getSelectionIndex()).getText(1);
+				String jobName = jobTable.getSelection()[0].getText();
 				IPJob job = jobManager.findJob(jobName);
 				
 				if (job != null) {
@@ -202,11 +198,11 @@ public class ParallelJobView extends AbstractParallelSetView {
 					update();
 					refresh();
 				}
-			}			
+			}
 		});
 
 		elementViewComposite = createElementView(sashForm);
-		sashForm.setWeights(new int[] { 1, 3 });
+		sashForm.setWeights(new int[] { 1, 2 });
 	}
 	
 	protected boolean fillContextMenu(IMenuManager manager) {
