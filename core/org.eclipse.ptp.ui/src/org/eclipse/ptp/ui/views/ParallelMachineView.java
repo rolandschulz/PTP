@@ -356,89 +356,77 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			return;
 			
 		IPNode node = machineManager.findNode(cur_machine_id, cur_selected_element_id);
-		new TableItem(BLtable, 0).setText(new String[] { "Node #", cur_selected_element_id });
-		new TableItem(BLtable, 0).setText(new String[] { "State", (String)node.getAttrib("state") });
-		new TableItem(BLtable, 0).setText(new String[] { "User", (String)node.getAttrib("user") });
-		new TableItem(BLtable, 0).setText(new String[] { "Group", (String)node.getAttrib("group") });
-		new TableItem(BLtable, 0).setText(new String[] { "Mode", (String)node.getAttrib("mode") });
+		new TableItem(BLtable, SWT.NONE).setText(new String[] { "Node #", cur_selected_element_id });
+		new TableItem(BLtable, SWT.NONE).setText(new String[] { "State", (String)node.getAttrib("state") });
+		new TableItem(BLtable, SWT.NONE).setText(new String[] { "User", (String)node.getAttrib("user") });
+		new TableItem(BLtable, SWT.NONE).setText(new String[] { "Group", (String)node.getAttrib("group") });
+		new TableItem(BLtable, SWT.NONE).setText(new String[] { "Mode", (String)node.getAttrib("mode") });
 
 		if (node.hasChildren()) {
 			IPProcess procs[] = node.getSortedProcesses();
 			TableItem item = null;
 			for (int i = 0; i < procs.length; i++) {
 				int proc_state = machineManager.getProcStatus(procs[i].getStatus());
-				item = new TableItem(BRtable, 0);
+				item = new TableItem(BRtable, SWT.NONE);
 				item.setImage(0, procImages[proc_state][0]);
 				item.setText(1, "Process " + procs[i].getProcessNumber() + ", Job " + procs[i].getJob().getJobNumber());
 			}
 		}
 	}	
 	
-	/*
-	 * FIXME Should implemented IParallelModelListener
-	 */
 	public void run() {
-		System.out.println("monitoringSystemChangeEvent");		
-		refresh();
-	}
-
-	public void start() {
-		System.out.println("start");
+		System.out.println("------------ run");
 		initialView();
 		refresh();
 	}
 
-	public void stop() {
-		refresh();
-	}
-
-	public void suspend() {
-		refresh();
-	}
-
-	public void exit() {
-		refresh();
-	}
-
-	public void error() {
-		refresh();
-	}
-
-	public void abort() {
+	public void start() {
+		System.out.println("------------ start");
 		refresh();
 	}
 
 	public void stopped() {
+		System.out.println("------------ stop");
+		refresh();
+	}
+
+	public void exit() {
+		System.out.println("------------ exit");
+		refresh();
+	}
+
+	public void abort() {
+		System.out.println("------------ abort");
 		refresh();
 	}
 
 	public void monitoringSystemChangeEvent(Object object) {
-		System.out.println("monitoringSystemChangeEvent");
+		System.out.println("------------ monitoringSystemChangeEvent");
 		refresh();
 	}
 
 	public void execStatusChangeEvent(Object object) {
-		System.out.println("execStatusChangeEvent");
+		System.out.println("------------ execStatusChangeEvent");
 		refresh();
 	}
 
 	public void sysStatusChangeEvent(Object object) {
-		System.out.println("sysStatusChangeEvent");
+		System.out.println("------------ sysStatusChangeEvent");
 		refresh();
 	}
 
 	public void processOutputEvent(Object object) {
-		System.out.println("processOutputEvent");
+		System.out.println("------------ processOutputEvent");
 		refresh();
 	}
 
 	public void errorEvent(Object object) {
-		System.out.println("errorEvent");
+		System.out.println("------------ errorEvent");
 		refresh();
 	}
 
 	public void updatedStatusEvent() {
-		System.out.println("updatedStatusEvent");
+		System.out.println("------------ updatedStatusEvent");
 		refresh();
 	}
 }

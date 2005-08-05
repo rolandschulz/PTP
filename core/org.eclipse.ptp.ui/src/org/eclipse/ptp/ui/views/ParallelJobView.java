@@ -36,10 +36,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -62,9 +59,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 	
 	//composite
 	protected SashForm sashForm = null;
-	protected Composite jobComposite = null;
-	protected List jobList = null;
-	protected Table jobInfoTable = null;
+	protected Table jobTable = null;
 	protected Composite elementViewComposite = null;
 	
 	//action
@@ -76,6 +71,14 @@ public class ParallelJobView extends AbstractParallelSetView {
 	public static final String PRO_VIEW = "2";
 	protected String current_view = BOTH_VIEW;
 	
+	public static Image[][] jobImages = {
+		{
+			ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR),
+			ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR_SEL) },
+		{
+			ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED),
+			ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SEL) }
+	};
 	public static Image[][] procImages = {
 		{
 			ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR),
@@ -109,17 +112,17 @@ public class ParallelJobView extends AbstractParallelSetView {
 	public void changeView(String view_flag) {
 		current_view = view_flag;
 		if (current_view.equals(ParallelJobView.JOB_VIEW)) {
-			jobComposite.setVisible(true);
+			jobTable.setVisible(true);
 			elementViewComposite.setVisible(false);
 			sashForm.setWeights(new int[] { 1, 0 });
 		}
 		else if (current_view.equals(ParallelJobView.PRO_VIEW)) {
-			jobComposite.setVisible(false);
+			jobTable.setVisible(false);
 			elementViewComposite.setVisible(true);
 			sashForm.setWeights(new int[] { 0, 1 });
 		}
 		else {
-			jobComposite.setVisible(true);
+			jobTable.setVisible(true);
 			elementViewComposite.setVisible(true);
 			sashForm.setWeights(new int[] { 1, 3 });
 		}
@@ -142,14 +145,15 @@ public class ParallelJobView extends AbstractParallelSetView {
 		if (jobManager.size() > 0) {
 			getDisplay().asyncExec(new Runnable() {
 				public void run() {
-					jobList.removeAll();
+					jobTable.removeAll();
 					IPJob[] jobs = jobManager.getJobs();
+					TableItem item = null;
 					for (int i=0; i<jobs.length; i++) {
-						jobList.add(jobs[i].getElementName());
+						item = new TableItem(jobTable, SWT.NONE);
+						item.setImage(0, jobImages[jobs[i].isDebug()?1:0][0]);
+						item.setText(1, jobs[i].getElementName());
 					}
-					//FIXME dummy only
-					jobList.add("dummy");
-					jobList.setSelection(0);
+					jobTable.setSelection(0);
 				}
 			});
 			updateJob();
@@ -175,23 +179,24 @@ public class ParallelJobView extends AbstractParallelSetView {
 		sashForm.setLayout(new FillLayout());
 		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		jobComposite = new Composite(sashForm, SWT.NONE);
-		GridLayout gd = new GridLayout(1, false);
-		gd.marginHeight = gd.marginWidth = 0;
-		jobComposite.setLayout(gd);
-		jobComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		jobTable = new Table(sashForm, SWT.FULL_SELECTION | SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
+		jobTable.setLayout(new FillLayout());
+		jobTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+		jobTable.setHeaderVisible(false);
+		jobTable.setLinesVisible(false);
+		TableColumn col1 = new TableColumn(jobTable, SWT.LEFT);
+		col1.setWidth(25);
+		TableColumn col2 = new TableColumn(jobTable, SWT.LEFT);
+		col2.setWidth(90);	
 
-		jobList = new List(jobComposite, SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
-		jobList.setLayoutData(new GridData(GridData.FILL_BOTH));
-		jobList.addSelectionListener(new SelectionAdapter() {
+		jobTable.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				String jobName = jobList.getItem(jobList.getSelectionIndex());
+				String jobName = jobTable.getItem(jobTable.getSelectionIndex()).getText(1);
 				IPJob job = jobManager.findJob(jobName);
 				
 				if (job != null) {
-					new TableItem(jobInfoTable, 0).setText(new String[] { "Job #", job.toString() });
-					new TableItem(jobInfoTable, 0).setText(new String[] { "Total procsses", String.valueOf(job.totalProcesses()) });
-					new TableItem(jobInfoTable, 0).setText(new String[] { "Used nodes", String.valueOf(job.totalNodes()) });
+					//new TableItem(jobInfoTable, 0).setText(new String[] { "Total procsses", String.valueOf(job.totalProcesses()) });
+					//new TableItem(jobInfoTable, 0).setText(new String[] { "Used nodes", String.valueOf(job.totalNodes()) });
 	
 					selectJob(job.getKeyString());
 					update();
@@ -199,25 +204,6 @@ public class ParallelJobView extends AbstractParallelSetView {
 				}
 			}			
 		});
-		
-		Group jobGroup = new Group(jobComposite, SWT.BORDER);
-		jobGroup.setLayout(new FillLayout());
-		GridData gdtext = new GridData(GridData.FILL_BOTH);
-		gdtext.grabExcessVerticalSpace = true;
-		gdtext.grabExcessHorizontalSpace = true;
-		gdtext.horizontalAlignment = GridData.FILL;
-		gdtext.verticalAlignment = GridData.FILL;
-		jobGroup.setLayoutData(gdtext);
-		jobGroup.setText("Job Info");
-
-		jobInfoTable = new Table(jobGroup, SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		jobInfoTable.setLayout(new FillLayout());
-		jobInfoTable.setHeaderVisible(false);
-		jobInfoTable.setLinesVisible(true);
-		TableColumn col1 = new TableColumn(jobInfoTable, SWT.LEFT);
-		col1.setWidth(65);
-		TableColumn col2 = new TableColumn(jobInfoTable, SWT.LEFT);
-		col2.setWidth(90);	
 
 		elementViewComposite = createElementView(sashForm);
 		sashForm.setWeights(new int[] { 1, 3 });
@@ -290,71 +276,60 @@ public class ParallelJobView extends AbstractParallelSetView {
 			changeTitle(jobManager.getName(cur_job_id), cur_element_set.getID(), cur_set_size);
 		}
 	}	
-	/*
-	 * FIXME Should implemented IParallelModelListener
-	 */
-	public void run() {
-		System.out.println("monitoringSystemChangeEvent");		
-		refresh();
-	}
 
-	public void start() {
-		System.out.println("start");
+	public void run() {
+		System.out.println("------------ run");		
 		initialView();
 		refresh();
 	}
 
-	public void stop() {
-		refresh();
-	}
-
-	public void suspend() {
-		refresh();
-	}
-
-	public void exit() {
-		refresh();
-	}
-
-	public void error() {
-		refresh();
-	}
-
-	public void abort() {
+	public void start() {
+		System.out.println("------------ start");
 		refresh();
 	}
 
 	public void stopped() {
+		System.out.println("------------ stop");
+		refresh();
+	}
+
+	public void exit() {
+		System.out.println("------------ exit");
+		refresh();
+	}
+
+	public void abort() {
+		System.out.println("------------ abort");
 		refresh();
 	}
 
 	public void monitoringSystemChangeEvent(Object object) {
-		System.out.println("monitoringSystemChangeEvent");
+		System.out.println("------------ monitoringSystemChangeEvent");
 		refresh();
 	}
 
 	public void execStatusChangeEvent(Object object) {
-		System.out.println("execStatusChangeEvent");
+		System.out.println("------------ execStatusChangeEvent");
 		refresh();
 	}
 
 	public void sysStatusChangeEvent(Object object) {
-		System.out.println("sysStatusChangeEvent");
+		System.out.println("------------ sysStatusChangeEvent");
 		refresh();
 	}
 
 	public void processOutputEvent(Object object) {
-		System.out.println("processOutputEvent");
+		System.out.println("------------ processOutputEvent");
 		refresh();
 	}
 
 	public void errorEvent(Object object) {
-		System.out.println("errorEvent");
+		System.out.println("------------ errorEvent");
 		refresh();
 	}
 
 	public void updatedStatusEvent() {
-		System.out.println("updatedStatusEvent");
+		System.out.println("------------ updatedStatusEvent");
 		refresh();
 	}
 }
