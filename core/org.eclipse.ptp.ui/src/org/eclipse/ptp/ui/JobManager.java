@@ -96,6 +96,9 @@ public class JobManager implements IManager {
 	//FIXME using id, or name
 	public IPProcess findProcess(String job_id, String id) {
 		IPJob job = findJob(getName(job_id));
+		if (job == null)
+			return null;
+		
 		return job.findProcess(id);
 	}
 	public IPJob findJob(String job_name) {
@@ -115,7 +118,7 @@ public class JobManager implements IManager {
 				return jobs[i].getElementName();
 		}
 		return "";
-		*/		
+		*/
 	}
 	
 	public void addJob(IPJob job) {

@@ -136,12 +136,12 @@ public class ParallelJobView extends AbstractParallelSetView {
 	}
 	
 	protected void initialElement() {
-		cur_job_id = jobManager.initial();
+		selectJob(jobManager.initial());
 	}
 	protected void initialView() {
 		initialElement();
 		if (jobManager.size() > 0) {
-			getDisplay().asyncExec(new Runnable() {
+			getDisplay().syncExec(new Runnable() {
 				public void run() {
 					jobTable.removeAll();
 					IPJob[] jobs = jobManager.getJobs();
@@ -158,10 +158,9 @@ public class ParallelJobView extends AbstractParallelSetView {
 						item.setText(jobs[i].getElementName());
 					}
 					jobTable.setSelection(0);
+					refresh();
 				}
 			});
-			updateJob();
-			refresh();
 		}
 		update();
 	}

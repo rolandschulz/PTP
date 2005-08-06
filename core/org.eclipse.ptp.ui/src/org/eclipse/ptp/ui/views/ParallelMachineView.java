@@ -142,12 +142,11 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	}
 	
 	protected void initialElement() {
-		cur_machine_id = machineManager.initial();
+		selectMachine(machineManager.initial());
 	}
 	protected void initialView() {
 		initialElement();
 		if (machineManager.size() > 0) {
-			updateMachine();
 			refresh();
 		}
 		update();
