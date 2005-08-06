@@ -47,9 +47,6 @@ public class DebugParallelView extends ParallelJobView implements IDebugParallel
 
 	private static DebugParallelView instance = null;
 
-	//machine
-	protected String cur_job_id = "dummy";
-
 	// actions
 	protected ParallelAction resumeAction = null;
 	protected ParallelAction suspendAction = null;
