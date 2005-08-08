@@ -38,9 +38,17 @@ import org.eclipse.ptp.ui.model.internal.SetManager;
 public class JobManager implements IManager {
 	protected IModelManager modelManager = null;
 	protected Map jobList = new HashMap();
+	protected String cur_set_id = ISetManager.SET_ROOT_ID;
+	protected String cur_job_id = "";
 	
 	public JobManager() {
 		modelManager = PTPCorePlugin.getDefault().getModelManager();
+	}
+	
+	public void shutdown() {
+		jobList.clear();
+		jobList = null;
+		modelManager = null;
 	}
 
 	public ISetManager getSetManager(String id) {
@@ -53,6 +61,20 @@ public class JobManager implements IManager {
 	
 	public IPJob[] getJobs() {
 		return modelManager.getUniverse().getSortedJobs();
+	}
+	
+	public String getCurrentJobId() {
+		return cur_job_id;
+	}
+	public void setCurrentJobId(String job_id) {
+		cur_job_id = job_id;
+	}
+	
+	public String getCurrentSetId() {
+		return cur_set_id;
+	}
+	public void setCurrentSetId(String set_id) {
+		cur_set_id = set_id;
 	}
 	
 	public String getProcessStatusText(String job_id, String proc_id) {

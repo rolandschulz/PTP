@@ -47,7 +47,6 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public class ParallelJobView extends AbstractParallelSetView {
 	private static ParallelJobView instance = null;
-	protected JobManager jobManager = null;
 	
 	//job
 	protected String cur_job_id = "0";
@@ -97,10 +96,10 @@ public class ParallelJobView extends AbstractParallelSetView {
 	};
 	
 	public ParallelJobView() {
-		jobManager = PTPUIPlugin.getDefault().getJobManager();
+		manager = PTPUIPlugin.getDefault().getJobManager();
 	}
 	public JobManager getJobManager() {
-		return jobManager;
+		return (JobManager)manager;
 	}
 	public String getCurrentView() {
 		return current_view;
@@ -134,15 +133,15 @@ public class ParallelJobView extends AbstractParallelSetView {
 	}
 	
 	protected void initialElement() {
-		selectJob(jobManager.initial());
+		selectJob(manager.initial());
 	}
 	protected void initialView() {
 		initialElement();
-		if (jobManager.size() > 0) {
+		if (manager.size() > 0) {
 			getDisplay().syncExec(new Runnable() {
 				public void run() {
 					jobTable.removeAll();
-					IPJob[] jobs = jobManager.getJobs();
+					IPJob[] jobs = getJobManager().getJobs();
 					TableItem item = null;
 					for (int i=0; i<jobs.length; i++) {
 						item = new TableItem(jobTable, SWT.NULL);
@@ -163,7 +162,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 		update();
 	}
 	public ISetManager getCurrentSetManager() {
-		return jobManager.getSetManager(cur_job_id);
+		return manager.getSetManager(cur_job_id);
 	}
 
 	public static ParallelJobView getInstance() {
@@ -189,7 +188,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 		jobTable.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				String jobName = jobTable.getSelection()[0].getText();
-				IPJob job = jobManager.findJob(jobName);
+				IPJob job = getJobManager().findJob(jobName);
 				
 				if (job != null) {
 					//new TableItem(jobInfoTable, 0).setText(new String[] { "Total procsses", String.valueOf(job.totalProcesses()) });
@@ -226,7 +225,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 	protected void doubleClickAction(int element_num) {
 		IElement element = cur_element_set.get(element_num);
 		if (element != null) {
-			openProcessViewer(jobManager.findProcess(cur_job_id, element.getID()));
+			openProcessViewer(getJobManager().findProcess(cur_job_id, element.getID()));
 		}
 	}
 	
@@ -249,12 +248,12 @@ public class ParallelJobView extends AbstractParallelSetView {
 			if (i < groups.length - 1)
 				buffer.append(",");
 		}
-		buffer.append("\nStatus: " + jobManager.getProcessStatusText(cur_job_id, element.getID()));
+		buffer.append("\nStatus: " + getJobManager().getProcessStatusText(cur_job_id, element.getID()));
 		return buffer.toString();
 	}
 
 	protected Image getStatusIcon(IElement element) {
-		int status = jobManager.getProcessStatus(cur_job_id, element.getID());
+		int status = getJobManager().getProcessStatus(cur_job_id, element.getID());
 		return procImages[status][element.isSelected() ? 1 : 0];
 	}
 	
@@ -273,7 +272,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 	}
 	public void updateTitle() {
 		if (cur_element_set != null) {
-			changeTitle(jobManager.getName(cur_job_id), cur_element_set.getID(), cur_set_size);
+			changeTitle(manager.getName(cur_job_id), cur_element_set.getID(), cur_set_size);
 		}
 	}	
 

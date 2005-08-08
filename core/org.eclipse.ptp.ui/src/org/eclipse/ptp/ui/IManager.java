@@ -25,8 +25,12 @@ import org.eclipse.ptp.ui.model.ISetManager;
  *
  */
 public interface IManager {
+	public void shutdown();
 	public int size();
 	public String initial();
 	public ISetManager getSetManager(String id);
 	public String getName(String id);
+	
+	public String getCurrentSetId();
+	public void setCurrentSetId(String set_id);
 }
