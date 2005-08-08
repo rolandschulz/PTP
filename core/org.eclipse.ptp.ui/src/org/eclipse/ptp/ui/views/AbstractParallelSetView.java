@@ -123,7 +123,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	}
 	
 	protected void updateAction() {
-		boolean deleteActionEnable = cur_set_id.equals(ISetManager.SET_ROOT_ID);
+		boolean deleteActionEnable = manager.getCurrentSetId().equals(ISetManager.SET_ROOT_ID);
 		deleteSetAction.setEnabled(!deleteActionEnable);
 		deleteProcessAction.setEnabled(!deleteActionEnable);
 		createSetAction.setEnabled(cur_set_size > 0);
@@ -137,7 +137,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	}
 
 	public void removeProcess() {
-		if (!cur_set_id.equals(ISetManager.SET_ROOT_ID)) {
+		if (!manager.getCurrentSetId().equals(ISetManager.SET_ROOT_ID)) {
 			deleteProcessAction.run(cur_element_set.getSelectedElements());
 		}
 	}

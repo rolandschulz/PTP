@@ -56,14 +56,20 @@ public class MachineManager implements IManager {
 	public final static int PROC_STOPPED = 5;
 	
 	protected IModelManager modelManager = null;
-	protected UIManager uiManager = null;
 	private Map machineList = new HashMap();
+	protected String cur_set_id = ISetManager.SET_ROOT_ID;
+	protected String cur_machine_id = "";
 
 	public MachineManager() {
 		modelManager = PTPCorePlugin.getDefault().getModelManager();
-		uiManager = PTPUIPlugin.getDefault().getUIManager();
 	}
-		
+
+	public void shutdown() {
+		machineList.clear();
+		machineList = null;
+		modelManager = null;
+	}
+
 	public ISetManager getSetManager(String id) {
 		return (ISetManager)machineList.get(id);
 	}
@@ -74,6 +80,20 @@ public class MachineManager implements IManager {
 	public IPMachine[] getMachines() {
 		return modelManager.getUniverse().getSortedMachines();
 	}
+	
+	public String getCurrentMachineId() {
+		return cur_machine_id;
+	}
+	public void setCurrentJobId(String machine_id) {
+		cur_machine_id = machine_id;
+	}
+	
+	public String getCurrentSetId() {
+		return cur_set_id;
+	}
+	public void setCurrentSetId(String set_id) {
+		cur_set_id = set_id;
+	}	
 	
 	public String getNodeStatusText(String machine_id, String node_id) {
 		switch(getNodeStatus(machine_id, node_id)) {

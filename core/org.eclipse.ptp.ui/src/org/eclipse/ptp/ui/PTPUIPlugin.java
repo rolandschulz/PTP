@@ -50,6 +50,10 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
+		machineManager.shutdown();
+		jobManager.shutdown();
+		machineManager = null;
+		jobManager = null;
 		plugin = null;
 		resourceBundle = null;
 	}

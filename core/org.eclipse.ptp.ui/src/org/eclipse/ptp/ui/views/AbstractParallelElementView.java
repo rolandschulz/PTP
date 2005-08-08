@@ -25,6 +25,7 @@ import java.util.List;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.ISetManager;
@@ -68,7 +69,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 
 	// Set
 	//protected ISetManager setManager = null;
-	protected String cur_set_id = ISetManager.SET_ROOT_ID;
+	protected IManager manager = null;
 	protected IElementSet cur_element_set = null;
 	protected int cur_set_size = 0;
 	protected int fisrt_selected_element_id = -1;
@@ -837,15 +838,15 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	}
 
 	public String getCurrentSetID() {
-		return cur_set_id;
+		return manager.getCurrentSetId();
 	}
 
 	public void selectSet(IElementSet set) {
 		deSelectSet();
-		this.cur_element_set = set;
-		this.cur_set_id = cur_element_set.getID();
-		this.cur_set_size = cur_element_set.size();
+		cur_element_set = set;
+		cur_set_size = cur_element_set.size();
 		cur_element_set.setSelected(true);
+		manager.setCurrentSetId(cur_element_set.getID());
 	}
 
 	public void deSelectSet() {

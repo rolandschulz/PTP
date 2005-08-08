@@ -53,7 +53,6 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public class ParallelMachineView extends AbstractParallelSetView {
 	private static ParallelMachineView instance = null;
-	protected MachineManager machineManager = null;
 
 	// actions
 	protected ParallelAction changeMachineAction = null;
@@ -123,11 +122,11 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	};
 
 	public ParallelMachineView() {
-		machineManager = PTPUIPlugin.getDefault().getMachineManager();
+		manager = PTPUIPlugin.getDefault().getMachineManager();
 	}
 	
 	public MachineManager getMachineManager() {
-		return machineManager;
+		return (MachineManager)manager;
 	}
 	
 	protected void initElementAttribute() {
@@ -140,17 +139,17 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	}
 	
 	protected void initialElement() {
-		selectMachine(machineManager.initial());
+		selectMachine(manager.initial());
 	}
 	protected void initialView() {
 		initialElement();
-		if (machineManager.size() > 0) {
+		if (manager.size() > 0) {
 			refresh();
 		}
 		update();
 	}
 	public ISetManager getCurrentSetManager() {
-		return machineManager.getSetManager(cur_machine_id);
+		return getMachineManager().getSetManager(cur_machine_id);
 	}
 
 	public static ParallelMachineView getInstance() {
@@ -227,7 +226,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		BRtable.addSelectionListener(new SelectionAdapter() {
 			/* double click - throw up an editor to look at the process */
 			public void widgetDefaultSelected(SelectionEvent e) {
-				IPNode node = machineManager.findNode(cur_machine_id, cur_selected_element_id);
+				IPNode node = getMachineManager().findNode(cur_machine_id, cur_selected_element_id);
 				if (node != null) {
 					int idx = BRtable.getSelectionIndex();
 					IPProcess[] procs = node.getSortedProcesses();
@@ -296,12 +295,12 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			if (i < groups.length - 1)
 				buffer.append(",");
 		}
-		buffer.append("\nStatus: " + machineManager.getNodeStatusText(cur_machine_id, element.getID()));
+		buffer.append("\nStatus: " + getMachineManager().getNodeStatusText(cur_machine_id, element.getID()));
 		return buffer.toString();
 	}
 
 	protected Image getStatusIcon(IElement element) {
-		int status = machineManager.getNodeStatus(cur_machine_id, element.getID());
+		int status = getMachineManager().getNodeStatus(cur_machine_id, element.getID());
 		return nodeImages[status][element.isSelected() ? 1 : 0];
 	}
 
@@ -321,7 +320,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	
 	public void updateTitle() {
 		if (cur_element_set != null) {
-			changeTitle(machineManager.getName(cur_machine_id), cur_element_set.getID(), cur_set_size);
+			changeTitle(manager.getName(cur_machine_id), cur_element_set.getID(), cur_set_size);
 		}
 	}
 	public void deSelectSet() {
@@ -351,7 +350,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		if (cur_selected_element_id.length() == 0)
 			return;
 			
-		IPNode node = machineManager.findNode(cur_machine_id, cur_selected_element_id);
+		IPNode node = getMachineManager().findNode(cur_machine_id, cur_selected_element_id);
 		if (node == null)
 			return;
 		
@@ -365,7 +364,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			IPProcess procs[] = node.getSortedProcesses();
 			TableItem item = null;
 			for (int i = 0; i < procs.length; i++) {
-				int proc_state = machineManager.getProcStatus(procs[i].getStatus());
+				int proc_state = getMachineManager().getProcStatus(procs[i].getStatus());
 				item = new TableItem(BRtable, SWT.NULL);
 				item.setImage(procImages[proc_state][0]);
 				item.setText("Process " + procs[i].getProcessNumber() + ", Job " + procs[i].getJob().getJobNumber());
