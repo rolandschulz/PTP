@@ -44,4 +44,33 @@
 	</extension>
 	//-->
 
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerType="org.eclipse.ptp.debug.core.breakpointMarker"
+            super="org.eclipse.debug.core.breakpoint"
+            name="org.eclipse.ptp.debug.core.breakpoint">
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationImageProvider="org.eclipse.ptp.debug.internal.ui.BreakpointImageProvider"
+            colorPreferenceValue="217,255,226"
+            annotationType="org.eclipse.ptp.debug.core.breakpointMarker"
+            verticalRulerPreferenceValue="true"
+            colorPreferenceKey="ptpBreakpointColor"
+            highlightPreferenceKey="ptpBreakpointHighlight"
+            overviewRulerPreferenceValue="true"
+            highlightPreferenceValue="true"
+            presentationLayer="3"
+            icon="icons/bkpt.gif"
+            label="PTP Breakpoint"
+            textPreferenceValue="false"
+            textPreferenceKey="breakpointIndication"
+            verticalRulerPreferenceKey="breakpointIndicationVerticalRuler"
+            overviewRulerPreferenceKey="breakpointIndicationOverviewRuler">
+      </specification>	
+   </extension>
+
 </plugin>

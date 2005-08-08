@@ -14,6 +14,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.debug.core,
  org.eclipse.ptp.debug.core,
  org.eclipse.ptp.core,
- org.eclipse.ptp.ui
+ org.eclipse.ptp.ui,
+ org.eclipse.cdt.debug.ui
 Eclipse-AutoStart: true
 Bundle-Vendor: LANL
