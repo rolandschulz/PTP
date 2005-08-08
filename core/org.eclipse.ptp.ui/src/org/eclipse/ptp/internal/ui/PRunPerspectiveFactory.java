@@ -19,9 +19,7 @@
 package org.eclipse.ptp.internal.ui;
 
 import org.eclipse.debug.ui.IDebugUIConstants;
-import org.eclipse.ptp.ui.old.UIUtils;
-import org.eclipse.ptp.ui.views.ParallelJobView;
-import org.eclipse.ptp.ui.views.ParallelMachineView;
+import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -37,13 +35,9 @@ public class PRunPerspectiveFactory implements IPerspectiveFactory {
  		String editorArea = layout.getEditorArea();
 		
 		IFolderLayout folder1= layout.createFolder("topLeft", IPageLayout.LEFT, (float)0.25, editorArea);
-		folder1.addView(ParallelMachineView.VIEW_ID);
-		folder1.addView(ParallelJobView.VIEW_ID);
+		folder1.addView(IPTPUIConstants.VIEW_PARALLELMACHINE);
+		folder1.addView(IPTPUIConstants.VIEW_PARALLELJOB);
 
-		//folder1.addView(UIUtils.ParallelProcessesView_ID);
-		//folder1.addView(UIUtils.ParallelNodeStatusView_ID);
-		//folder1.addView(UIUtils.ParallelJobsView_ID);
-		//folder1.addView(IPageLayout.ID_RES_NAV);
 		folder1.addPlaceholder(IPageLayout.ID_BOOKMARKS);
 		
 		IFolderLayout folder2= layout.createFolder("bottom", IPageLayout.BOTTOM, (float)0.75, editorArea);
@@ -56,7 +50,7 @@ public class PRunPerspectiveFactory implements IPerspectiveFactory {
 
 		// set toolbar or menu icon
 		layout.addActionSet(IDebugUIConstants.LAUNCH_ACTION_SET);
-		layout.addActionSet(UIUtils.PTP_ACTION_SET);
+		layout.addActionSet(IPTPUIConstants.ACTION_SET);
 
 		// views - build console
 		layout.addShowViewShortcut(IConsoleConstants.ID_CONSOLE_VIEW);
@@ -67,18 +61,13 @@ public class PRunPerspectiveFactory implements IPerspectiveFactory {
 		// views - standard workbench
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_PROBLEM_VIEW);
-		layout.addShowViewShortcut(ParallelMachineView.VIEW_ID);
-		layout.addShowViewShortcut(ParallelJobView.VIEW_ID);
-		//layout.addShowViewShortcut(UIUtils.ParallelProcessesView_ID);
-		//layout.addShowViewShortcut(UIUtils.ParallelNodeStatusView_ID);
-		//layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
+		layout.addShowViewShortcut(IPTPUIConstants.VIEW_PARALLELMACHINE);
+		layout.addShowViewShortcut(IPTPUIConstants.VIEW_PARALLELJOB);
 		layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
 
 		// link - things we should do
-		layout.addShowInPart(ParallelMachineView.VIEW_ID);
-		layout.addShowInPart(ParallelJobView.VIEW_ID);
-		//layout.addShowInPart(UIUtils.ParallelProcessesView_ID);
-		//layout.addShowInPart(UIUtils.ParallelNodeStatusView_ID);
+		layout.addShowInPart(IPTPUIConstants.VIEW_PARALLELMACHINE);
+		layout.addShowInPart(IPTPUIConstants.VIEW_PARALLELJOB);
 		//layout.addShowInPart(IPageLayout.ID_RES_NAV);
 	}
 }

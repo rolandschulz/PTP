@@ -24,6 +24,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.actions.ChangeSetAction;
 import org.eclipse.ptp.ui.actions.CreateSetAction;
 import org.eclipse.ptp.ui.actions.DeleteProcessAction;
@@ -148,7 +149,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
     	BusyIndicator.showWhile(getDisplay(), new Runnable() {
             public void run() {
                 try {
-                    PTPUIPlugin.getActivePage().openEditor(new ProcessEditorInput(element), ParallelProcessViewer.VIEW_ID);
+                    PTPUIPlugin.getActivePage().openEditor(new ProcessEditorInput(element), IPTPUIConstants.VIEW_PARALLELProcess);
                 } catch (PartInitException e) {
                     System.out.println("PartInitException err: " + e.getMessage());
                 }

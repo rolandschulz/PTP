@@ -46,8 +46,6 @@ import org.eclipse.swt.widgets.TableItem;
  *
  */
 public class ParallelJobView extends AbstractParallelSetView {
-	public static final String VIEW_ID = "org.eclipse.ptp.ui.views.parallelJobView";
-
 	private static ParallelJobView instance = null;
 	protected JobManager jobManager = null;
 	

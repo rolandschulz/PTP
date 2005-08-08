@@ -54,6 +54,13 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		resourceBundle = null;
 	}
 	
+	public static String getUniqueIdentifier() {
+		if (getDefault() == null)
+			return PLUGIN_ID;
+
+		return getDefault().getBundle().getSymbolicName();
+	}	
+	
 	public UIManager getUIManager() {
 		return uiManager;
 	}

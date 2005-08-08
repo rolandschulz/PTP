@@ -52,9 +52,7 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 /**
  *  
  */
-public class ParallelProcessViewer extends AbstractTextEditor implements IProcessListener {
-    public static final String VIEW_ID = "org.eclipse.ptp.ui.views.parallelProcessViewer";
-	
+public class ParallelProcessView extends AbstractTextEditor implements IProcessListener {
     private final String EXITCODE_TEXT = "Exit code: ";
     private final String SIGNALNAME_TEXT = "Signal name: ";
     private Label rankLabel = null;
@@ -77,7 +75,7 @@ public class ParallelProcessViewer extends AbstractTextEditor implements IProces
         }
     };
 
-    public ParallelProcessViewer() {
+    public ParallelProcessView() {
 		super();
         setDocumentProvider(new StorageDocumentProvider());
         PTPCorePlugin.getDefault().getModelManager().addParallelLaunchListener(launchAdapter);
@@ -119,7 +117,7 @@ public class ParallelProcessViewer extends AbstractTextEditor implements IProces
         getSite().getShell().getDisplay().asyncExec(new Runnable() {
             public void run() {
                 if (toolkit != null) {
-                    getSite().getPage().closeEditor(ParallelProcessViewer.this, false);
+                    getSite().getPage().closeEditor(ParallelProcessView.this, false);
                 }
             }
         });
