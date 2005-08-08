@@ -265,30 +265,31 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 			}
 			//only select the bounded area
 			deselect(selectedAreaInfo.getBoundedElements());
-			Rectangle rect = getSelectedRect(drag_x, drag_y, mx, my);
+			SelectionInfo selectionInfo = getSelectedRect(drag_x, drag_y, mx, my);
 			autoScroll(mx, my);
-			drawSelectedArea(rect);
-			selectedAreaInfo.addBoundedElement(selectElements(rect));
-			redrawSelectedArea(rect);
+			drawSelectedArea(selectionInfo);
+			selectedAreaInfo.addBoundedElement(selectElements(selectionInfo.rect));
+			redrawSelectedArea(selectionInfo);
 		}
 	}
 	//TODO NOT FINISHED
-	protected void redrawSelectedArea(Rectangle rect) {
+	protected void redrawSelectedArea(SelectionInfo selectionInfo) {
 		Rectangle oldRect = selectedAreaInfo.getBoundedRect();
-		selectedAreaInfo.setBoundedRect(rect);
+		Rectangle newRect = selectionInfo.rect;
+		selectedAreaInfo.setBoundedRect(newRect);
 
-		if (oldRect.intersects(rect)) {
+		if (oldRect.intersects(newRect)) {
 			//System.out.println(oldRect + " - " + rect);
-			if (selectedAreaInfo.compareArea(oldRect, rect)) {
+			if (selectedAreaInfo.compareArea(oldRect, newRect)) {
 				//use old rect to redraw
-				rect = oldRect;
+				newRect = oldRect;
 			}
 		} else {
 			oldRect = selectedAreaInfo.getBoundedArea(oldRect);
 			elementRedraw(oldRect.x, oldRect.y, oldRect.width, oldRect.height, false);			
 		}
-		rect = selectedAreaInfo.getBoundedArea(rect);
-		elementRedraw(rect.x, rect.y, rect.width, rect.height, false);
+		newRect = selectedAreaInfo.getBoundedArea(newRect);
+		elementRedraw(newRect.x, newRect.y, newRect.width, newRect.height, false);
 	}
 	
 	protected void mouseUpEvent(int mx, int my) {
@@ -385,7 +386,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		}
 	}
 
-	private Rectangle getSelectedRect(int dx, int dy, int mx, int my) {
+	private SelectionInfo getSelectedRect(int dx, int dy, int mx, int my) {
 		int start_x = dx;
 		int start_y = dy;
 		int end_x = mx;
@@ -404,6 +405,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 
 
 		// switch dx and mx or dy and my
+		/*
 		int width = Math.abs(start_x - end_x);
 		int height = Math.abs(start_y - end_y);
 		if (drag_x > end_x) {
@@ -414,6 +416,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 			end_y = drag_y;
 			start_y = Math.abs(height - end_y);
 		}
+		*/
 		/*
 		int t_sx = start_x;
 		int t_sy = start_y;
@@ -430,18 +433,24 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		}		
 		System.out.println("start_x: " + start_x + ", start_y: " + start_y + ", end_x: " + end_x + ", end_y: " + end_y + ", width: " + width + ", height: " + height);
 		System.out.println("tmp__sx: " + t_sx + ", tmp__sy: " + t_sy + ", t__ex: " + t_ex + ", t__sy: " + t_ey + ", tmp_w: " + t_width + ", tmp__h: " + t_height);
+		 */
+		int direction = SelectionInfo.SE;
 		if (drag_x > end_x) {
 			start_x = end_x;
 			end_x = drag_x;
+			direction = SelectionInfo.SW;
 		}
 		if (drag_y > end_y) {
 			start_y = end_y;
 			end_y = drag_y;
+			if (direction == SelectionInfo.SW)
+				direction = SelectionInfo.NW;
+			else
+				direction = SelectionInfo.NE;
 		}
-		 */
 		
-		//return new Rectangle(start_x, start_y, (end_x - start_x), (end_y - start_y));
-		return new Rectangle(start_x, start_y, width, height);
+		return new SelectionInfo(start_x, start_y, end_x, end_y, direction);
+		//return new Rectangle(start_x, start_y, width, height);
 	}
 
 	private void autoScroll(int mx, int my) {
@@ -455,42 +464,51 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	}
 
 	private void drawSelectedArea(Rectangle rect, boolean hasTop, boolean hasBottom) {
-		int last_x = rect.width - rect_dot_disc;
-		int last_y = rect.height - rect_dot_disc;
-		int x = 0;
-		int y = 0;
-
-		Region region = new Region();
+		int last_x = ((rect.width / rect_dot_disc) - 1) * rect_dot_disc;
+		int last_y = ((rect.height / rect_dot_disc) - 1) * rect_dot_disc;
+		int start_x = 0;
+		int start_y = 0;
+		int end_x = last_x;
+		int end_y = last_y;
+		
 		Rectangle pixel = new Rectangle(0, 0, rect_dot_size, rect_dot_size);
-		for (y = 0; y < rect.height; y += rect_dot_disc) {
-			for (x = 0; x < rect.width; x += rect_dot_disc) {
-				if (fill_rect_dot || (y == 0 && hasTop) || (y >= last_y && hasBottom) || (x == 0 || x >= last_x)) {
+		Region region = new Region();
+
+		for (int y=start_y; y<=end_y; y+=rect_dot_disc) {
+			for (int x=start_x; x<=end_x; x+=rect_dot_disc) {
+				if (fill_rect_dot || (y == 0 && hasTop) || (y == end_y && hasBottom) || (x == 0 || x == end_x)) {
 					pixel.x = x;
 					pixel.y = y;
 					region.add(pixel);
 				}
 			}
 		}
-		//selectionShell.setBounds(rect.x, rect.y, rect.width + rect_dot_disc, rect.height + rect_dot_disc);
-		selectionShell.setLocation(rect.x, rect.y);
-		selectionShell.setBounds(rect.x, rect.y, x, y);		
 		selectionShell.setRegion(region);
+		selectionShell.setLocation(rect.x, rect.y);
+		selectionShell.setBounds(rect.x, rect.y, rect.width, rect.height);
 	}
 
-	private void drawSelectedArea(Rectangle rect) {
+	private void drawSelectedArea(SelectionInfo selectionInfo) {
 		boolean hasTop = true; // display the top of selectoin
 		boolean hasBottom = true; // display the bottom of selection
-		Rectangle newRect = new Rectangle(0, 0, 0, 0);
-		newRect.x = rect.x;
-		newRect.y = rect.y;
-		newRect.width = rect.width;
-		newRect.height = rect.height;
+		Rectangle newRect = selectionInfo.newRect();
 
-		Point start_pt = getViewActualLocation(drawComp, null, newRect.x, newRect.y);
 		Point end_pt = getViewActualLocation(drawComp, null, newRect.x + newRect.width, newRect.y + newRect.height);
+		Point start_pt = new Point(end_pt.x - newRect.width, end_pt.y - newRect.height);
 		int top_y = getDisplay().map(sc, null, 0, 0).y;
 		int bottom_y = getDisplay().map(sc, null, sc.getSize()).y;
 
+		switch (selectionInfo.direction) {
+		case SelectionInfo.SW:
+			break;
+		case SelectionInfo.NW:
+			break;
+		case SelectionInfo.NE:
+			break;
+		default:
+			break;
+		}
+		
 		if (start_pt.y < top_y) {
 			start_pt.y = top_y;
 			hasTop = false;
@@ -952,5 +970,35 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		public void setY(int y) {
 			this.y = y;
 		}
-	}	
+	}
+	private class SelectionInfo {
+		private static final int SE = 1;
+		private static final int SW = 2;
+		private static final int NW = 3;
+		private static final int NE = 4;
+		public int direction = SE;
+		public Rectangle rect = null;
+		public int start_x = 0;
+		public int start_y = 0;
+		public int end_x = 0;
+		public int end_y = 0;
+		public int width = 0;
+		public int height = 0;
+		public SelectionInfo(int start_x, int start_y, int end_x, int end_y, int direction) {
+			this.start_x = start_x;
+			this.start_y = start_y;
+			this.end_x = end_x;
+			this.end_y = end_y;
+			this.width = (end_x - start_x);
+			this.height = (end_y - start_y);
+			this.rect = new Rectangle(start_x, start_y, width, height);
+			this.direction = direction;
+		}
+		public int getDirection() {
+			return direction;
+		}
+		public Rectangle newRect() {
+			return new Rectangle(start_x, start_y, width, height);
+		}
+	}
 }
