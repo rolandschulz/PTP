@@ -19,7 +19,7 @@
 package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.views.DebugParallelView;
+import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
 import org.eclipse.ptp.ui.model.IElement;
 
 /**
@@ -29,7 +29,7 @@ import org.eclipse.ptp.ui.model.IElement;
 public class StepIntoAction extends StepAction {
 	public static final String name = "Step Into";
 
-	public StepIntoAction(DebugParallelView view) {
+	public StepIntoAction(ParallelDebugView view) {
 		super(name, view);
 	    setImageDescriptor(ImageUtil.ID_ICON_STEPINTO_NORMAL);
 	    setDisabledImageDescriptor(ImageUtil.ID_ICON_STEPINTO_DISABLE);

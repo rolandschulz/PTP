@@ -18,11 +18,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui;
 
+import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.DebugManager;
 import org.eclipse.ptp.debug.core.PProcess;
@@ -39,12 +42,21 @@ import org.eclipse.ptp.ui.model.internal.SetManager;
  * @author clement chu
  *
  */
-public class UIDebugManager extends JobManager {
+public class UIDebugManager extends JobManager implements IBreakpointListener {
 	public final static int PROC_SUSPEND = 6;
 	public final static int PROC_HIT = 7;
 
 	//FIXME dummy only
 	public boolean dummy = false;
+	
+	public UIDebugManager() {
+		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
+	}
+	
+	public void shutdown() {
+		super.shutdown();
+		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
+	}
 		
 	public int getProcessStatus(String job_id, String proc_id) {
 		//FIXME dummy only 
@@ -151,5 +163,22 @@ public class UIDebugManager extends JobManager {
 				return launches[i];
 		}
 		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No launch found", null));
+	}
+	
+	/*********************************************************************
+	 * Breakpoint
+	 *********************************************************************/
+	
+	public void breakpointAdded(IBreakpoint breakpoint) {
+		if (PTPDebugUIPlugin.getDefault().getCurrentPerspectiveID().equals(IPTPDebugUIConstants.PERSPECTIVE_DEBUG)) {
+			System.out.print("Current PTP Debug Perspevtive");
+			
+		}
+	}
+	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
+		
+	}
+	public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
+		
 	}
 }

@@ -22,6 +22,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 /**
@@ -52,7 +53,6 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		return getDefault().getBundle().getSymbolicName();
 	}
 	
-
 	/**
 	 * This method is called upon plug-in activation
 	 */
@@ -70,6 +70,8 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
+		uiDebugManager.shutdown();
+		uiDebugManager = null;
 		plugin = null;
 		resourceBundle = null;
 	}
@@ -116,5 +118,13 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.debug.ui", path);
+	}
+	
+	public static IWorkbenchWindow getActiveWorkbenchWindow() {
+		return getDefault().getWorkbench().getActiveWorkbenchWindow();
+	}
+	
+	public String getCurrentPerspectiveID() {
+		return getActiveWorkbenchWindow().getActivePage().getPerspective().getId();
 	}
 }

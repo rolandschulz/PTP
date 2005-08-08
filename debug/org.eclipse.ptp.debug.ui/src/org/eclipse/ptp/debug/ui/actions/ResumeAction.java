@@ -19,7 +19,7 @@
 package org.eclipse.ptp.debug.ui.actions;
 
 import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.views.DebugParallelView;
+import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
 import org.eclipse.ptp.ui.model.IElement;
 /**
  * @author clement chu
@@ -28,7 +28,7 @@ import org.eclipse.ptp.ui.model.IElement;
 public class ResumeAction extends DebugAction {
 	public static final String name = "Resume";
 
-	public ResumeAction(DebugParallelView view) {
+	public ResumeAction(ParallelDebugView view) {
 		super(name, view);
 	    setImageDescriptor(ImageUtil.ID_ICON_RESUME_NORMAL);
 	    setDisabledImageDescriptor(ImageUtil.ID_ICON_RESUME_DISABLE);
