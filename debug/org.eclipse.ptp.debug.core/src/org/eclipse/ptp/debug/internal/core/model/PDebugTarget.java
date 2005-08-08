@@ -11,7 +11,6 @@
 package org.eclipse.ptp.debug.internal.core.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -50,7 +49,6 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.model.CDebugElementState;
-import org.eclipse.cdt.debug.core.model.ICAddressBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICDebugElement;
 import org.eclipse.cdt.debug.core.model.ICDebugElementStatus;
@@ -63,10 +61,8 @@ import org.eclipse.cdt.debug.core.model.IExecFileInfo;
 import org.eclipse.cdt.debug.core.model.IGlobalVariableDescriptor;
 import org.eclipse.cdt.debug.core.model.IPersistableRegisterGroup;
 import org.eclipse.cdt.debug.core.model.IRegisterDescriptor;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Preferences;
@@ -75,7 +71,6 @@ import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchListener;
 import org.eclipse.debug.core.model.IBreakpoint;
@@ -84,7 +79,6 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IRegisterGroup;
 import org.eclipse.debug.core.model.IThread;
-import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
@@ -192,8 +186,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	}
 
 	private void initializeBreakpoints() {
-		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener( this );
-		setBreakpoints();
+		getBreakpointManager().initialize();
+		getBreakpointManager().setBreakpoints();
 	}
 
 	/**
@@ -223,27 +217,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		}
 		if ( suspendEvent != null ) {
 			debugEvents.add( suspendEvent );
-		}
-	}
-
-	/**
-	 * Installs all C/C++ breakpoints that currently exist in the breakpoint manager.
-	 */
-	public void setBreakpoints() {
-		IBreakpointManager manager = DebugPlugin.getDefault().getBreakpointManager();
-		IBreakpoint[] bps = manager.getBreakpoints( PCDIDebugModel.getPluginIdentifier() );
-		for( int i = 0; i < bps.length; i++ ) {
-			if ( bps[i] instanceof ICBreakpoint && getBreakpointManager().isTargetBreakpoint( (ICBreakpoint)bps[i] ) && !getBreakpointManager().isCDIRegistered( (ICBreakpoint)bps[i] ) ) {
-				if ( bps[i] instanceof ICAddressBreakpoint ) {
-					// disable address breakpoints to prevent the debugger to insert them prematurely
-					try {
-						bps[i].setEnabled( false );
-					}
-					catch( CoreException e ) {
-					}
-				}
-				breakpointAdded0( bps[i] );
-			}
 		}
 	}
 
@@ -308,7 +281,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	public boolean supportsBreakpoint( IBreakpoint breakpoint ) {
 		if ( !getConfiguration().supportsBreakpoints() )
 			return false;
-		return (breakpoint instanceof ICBreakpoint && getBreakpointManager().isCDIRegistered( (ICBreakpoint)breakpoint ));
+		return (breakpoint instanceof ICBreakpoint && getBreakpointManager().supportsBreakpoint( (ICBreakpoint)breakpoint ));
 	}
 
 	/* (non-Javadoc)
@@ -513,74 +486,18 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointAdded(org.eclipse.debug.core.model.IBreakpoint)
 	 */
 	public void breakpointAdded( IBreakpoint breakpoint ) {
-		if ( !(breakpoint instanceof ICBreakpoint) || !isAvailable() || !getBreakpointManager().isTargetBreakpoint( (ICBreakpoint)breakpoint ) )
-			return;
-		breakpointAdded0( breakpoint );
-	}
-
-	private void breakpointAdded0( IBreakpoint breakpoint ) {
-		if ( !isAvailable() )
-			return;
-		if ( breakpoint instanceof ICAddressBreakpoint && !getBreakpointManager().supportsAddressBreakpoint( (ICAddressBreakpoint)breakpoint ) )
-			return;
-		if ( getConfiguration().supportsBreakpoints() ) {
-			try {
-				getBreakpointManager().setBreakpoint( (ICBreakpoint)breakpoint );
-			}
-			catch( DebugException e ) {
-			}
-		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointRemoved(org.eclipse.debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
 	 */
 	public void breakpointRemoved( IBreakpoint breakpoint, IMarkerDelta delta ) {
-		if ( !(breakpoint instanceof ICBreakpoint) || !isAvailable() || !getBreakpointManager().isCDIRegistered( (ICBreakpoint)breakpoint ) )
-			return;
-		try {
-			getBreakpointManager().removeBreakpoint( (ICBreakpoint)breakpoint );
-		}
-		catch( DebugException e ) {
-		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointChanged(org.eclipse.debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
 	 */
 	public void breakpointChanged( IBreakpoint breakpoint, IMarkerDelta delta ) {
-		if ( !(breakpoint instanceof ICBreakpoint) || !isAvailable() )
-			return;
-		ICBreakpoint b = (ICBreakpoint)breakpoint;
-		boolean install = false;
-		try {
-			IPDebugTarget[] tfs = (IPDebugTarget[]) b.getTargetFilters();
-			install = Arrays.asList( tfs ).contains( this );
-		}
-		catch( CoreException e ) {
-		}
-		boolean registered = getBreakpointManager().isCDIRegistered( b );
-		if ( registered && !install ) {
-			try {
-				getBreakpointManager().removeBreakpoint( b );
-			}
-			catch( DebugException e ) {
-			}
-		}
-		if ( !registered && install ) {
-			try {
-				getBreakpointManager().setBreakpoint( b );
-			}
-			catch( DebugException e ) {
-			}
-		}
-//		if ( delta != null ) {
-			try {
-				getBreakpointManager().changeBreakpointProperties( b, delta );
-			}
-			catch( DebugException e ) {
-			}
-//		}
 	}
 
 	/**
@@ -854,7 +771,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		resetStatus();
 		removeAllThreads();
 		getCDISession().getEventManager().removeEventListener( this );
-		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener( this );
 		DebugPlugin.getDefault().getLaunchManager().removeLaunchListener( this );
 		disposeBreakpointManager();
 		disposePreferences();
@@ -973,16 +889,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	}
 
 	private void handleWatchpointScope( ICDIWatchpointScope ws ) {
-		ICBreakpoint watchpoint = getBreakpointManager().getBreakpoint( ws.getWatchpoint() );
-		if ( watchpoint != null ) {
-			try {
-				getBreakpointManager().removeBreakpoint( watchpoint );
-			}
-			catch( DebugException e ) {
-				PTPDebugCorePlugin.log( e );
-			}
-			fireSuspendEvent( DebugEvent.BREAKPOINT );
-		}
+		getBreakpointManager().watchpointOutOfScope( ws.getWatchpoint() );
+		fireSuspendEvent( DebugEvent.BREAKPOINT );
 	}
 
 	private void handleSuspendedBySignal( ICDISignalReceived signal ) {
@@ -1191,16 +1099,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		}
 	}
 
-	public IFile getCurrentBreakpointFile() {
-		Object info = getCurrentStateInfo();
-		if ( info instanceof ICDIBreakpointHit ) {
-			ICDIBreakpoint cdiBreakpoint = ((ICDIBreakpointHit)info).getBreakpoint();
-			if ( cdiBreakpoint != null )
-				return getBreakpointManager().getCDIBreakpointFile( cdiBreakpoint );
-		}
-		return null;
-	}
-
 	protected PBreakpointManager getBreakpointManager() {
 		return fBreakpointManager;
 	}
@@ -1247,13 +1145,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	 */
 	public IAddress getBreakpointAddress( ICLineBreakpoint breakpoint ) throws DebugException {
 		return (getBreakpointManager() != null) ? getBreakpointManager().getBreakpointAddress( breakpoint ) : getAddressFactory().getZero();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.IBreakpointTarget#isTargetBreakpoint(org.eclipse.cdt.debug.core.model.ICBreakpoint)
-	 */
-	public boolean isTargetBreakpoint( ICBreakpoint breakpoint ) {
-		return (getBreakpointManager() != null) ? getBreakpointManager().isTargetBreakpoint( breakpoint ) : false;
 	}
 
 	/* (non-Javadoc)
@@ -1335,69 +1226,58 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		getBreakpointManager().skipBreakpoints( enabled );
 	}
 
-	public IRegisterDescriptor[] getRegisterDescriptors() throws DebugException {
-		// Auto-generated method stub
-		System.out.println("PDebugTarget.getRegisterDescriptors");
-		return null;
-	}
-
-	public void addRegisterGroup(String name, IRegisterDescriptor[] descriptors) {
-		// Auto-generated method stub
-		System.out.println("PDebugTarget.addRegisterGroup");
-		
-	}
-
-	public void removeRegisterGroups(IRegisterGroup[] groups) {
-		// Auto-generated method stub
-		System.out.println("PDebugTarget.removeRegisterGroups");
-		
-	}
-
-	public void modifyRegisterGroup(IPersistableRegisterGroup group, IRegisterDescriptor[] descriptors) {
-		// Auto-generated method stub
-		System.out.println("PDebugTarget.modifyRegisterGroup");
-		
-	}
-
-	public void restoreDefaultRegisterGroups() {
-		// Auto-generated method stub
-		System.out.println("PDebugTarget.restoreDefaultRegisterGroups");
-		
-	}
-
 	public IDisassembly getDisassembly() throws DebugException {
-		// Auto-generated method stub
-		System.out.println("PDebugTarget.getDisassembly");
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public boolean hasModules() throws DebugException {
-		// Auto-generated method stub
-		System.out.println("PDebugTarget.hasModules");
+		// TODO Auto-generated method stub
 		return false;
 	}
 
 	public ICModule[] getModules() throws DebugException {
-		// Auto-generated method stub
-		System.out.println("PDebugTarget.getModules");
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public void loadSymbolsForAllModules() throws DebugException {
-		// Auto-generated method stub
-		System.out.println("PDebugTarget.loadSymbolsForAllModules");
+		// TODO Auto-generated method stub
 		
 	}
 
-	public boolean isInstructionSteppingEnabled() {
-		// Auto-generated method stub
-		System.out.println("PDebugTarget.isInstructionSteppingEnabled");
-		return false;
+	public IRegisterDescriptor[] getRegisterDescriptors() throws DebugException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void addRegisterGroup(String name, IRegisterDescriptor[] descriptors) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void removeRegisterGroups(IRegisterGroup[] groups) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void modifyRegisterGroup(IPersistableRegisterGroup group, IRegisterDescriptor[] descriptors) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void restoreDefaultRegisterGroups() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	public IGlobalVariableDescriptor[] getGlobals() throws DebugException {
-		// Auto-generated method stub
-		System.out.println("PDebugTarget.getGlobals");
+		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public boolean isInstructionSteppingEnabled() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

@@ -12,6 +12,7 @@ package org.eclipse.ptp.debug.core;
 
 import java.util.HashMap;
 
+import org.eclipse.cdt.debug.core.ICBreakpointListener;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -191,6 +192,24 @@ public class PTPDebugCorePlugin extends Plugin {
 		if ( fSessionManager != null )
 			fSessionManager.dispose();
 		fSessionManager = sm;
+	}
+
+	/**
+	 * Adds the given breakpoint listener to the debug model.
+	 * 
+	 * @param listener breakpoint listener
+	 */
+	public void addCBreakpointListener( ICBreakpointListener listener ) {
+		fBreakpointListeners.add( listener );
+	}
+
+	/**
+	 * Removes the given breakpoint listener from the debug model.
+	 * 
+	 * @param listener breakpoint listener
+	 */
+	public void removeCBreakpointListener( ICBreakpointListener listener ) {
+		fBreakpointListeners.remove( listener );
 	}
 
 	/**

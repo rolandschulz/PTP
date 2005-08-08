@@ -501,6 +501,11 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 		return getCDIStackFrame().getLocator().getLineNumber();
 	}
 
+	protected synchronized void preserve() {
+		//preserveVariables();
+		//preserveExpressions();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.core.model.IRestart#canRestart()
 	 */
