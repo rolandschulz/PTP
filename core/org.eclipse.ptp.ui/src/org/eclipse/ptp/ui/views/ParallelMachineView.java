@@ -52,8 +52,6 @@ import org.eclipse.swt.widgets.TableItem;
  * 
  */
 public class ParallelMachineView extends AbstractParallelSetView {
-	public static final String VIEW_ID = "org.eclipse.ptp.ui.views.parallelMachineView";
-
 	private static ParallelMachineView instance = null;
 	protected MachineManager machineManager = null;
 

@@ -7,29 +7,6 @@
 			name="%ParallelViewCategory.name"
 			id="org.parallel.ptp.ui.views">
 		</category>
-		<!--
-		<view
-			name="%ParallelControlView.name"
-			icon="icons/parallel_perspective.gif"
-			category="org.parallel.ptp.ui.views"
-			class="org.eclipse.ptp.ui.views.ParallelProcessesView"
-			id="org.eclipse.ptp.ui.views.parallelProcessesView">
-		</view>
-		<view
-			name="%ParallelJobsView.name"
-			icon="icons/parallel_perspective.gif"
-			category="org.parallel.ptp.ui.views"
-			class="org.eclipse.ptp.ui.views.ParallelJobsView"
-			id="org.eclipse.ptp.ui.views.parallelJobsView">
-		</view>
-		<view
-			name="%ParallelNodeView.name"
-			icon="icons/parallel_perspective.gif"
-			category="org.parallel.ptp.ui.views"
-			class="org.eclipse.ptp.ui.views.ParallelNodeStatusView"
-			id="org.eclipse.ptp.ui.views.parallelNodeStatusView">
-		</view>
-		//-->
 		<view
 			name="Machines"
 			icon="icons/parallel_perspective.gif"
@@ -53,8 +30,8 @@
 			icon="icons/parallel_perspective.gif"
             default="true"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"            
-			class="org.eclipse.ptp.ui.views.ParallelProcessViewer"
-			id="org.eclipse.ptp.ui.views.parallelProcessViewer">
+			class="org.eclipse.ptp.ui.views.ParallelProcessView"
+			id="org.eclipse.ptp.ui.views.parallelProcessView">
 		</editor>
 	</extension>
 	
@@ -64,7 +41,7 @@
 			icon="icons/parallel_perspective.gif"
 			class="org.eclipse.ptp.internal.ui.PRunPerspectiveFactory"
 			name="%perspective.name"
-			id="org.eclipse.ptp.ui.PRunPerspective"/>
+			id="org.eclipse.ptp.ui.PTPRunPerspective"/>
 	</extension>   
 
 <!-- create preference page //-->
@@ -95,13 +72,13 @@
       <actionSet
             label="%actionSets.name"
             visible="false"
-            id="org.eclipse.ptp.actionSets">
+            id="org.eclipse.ptp.ui.actionSets">
          <action
                label="%legendAction.name"
                icon="icons/legend.gif"
                class="org.eclipse.ptp.ui.actions.ShowLegendAction"
                tooltip="%legendAction.tooltip"
-               toolbarPath="org.eclipse.ptp.actionSets"
+               toolbarPath="org.eclipse.ptp.ui.actionSets"
                id="org.eclipse.ptp.ui.actions.showLegendAction">
          </action>
          <!--
