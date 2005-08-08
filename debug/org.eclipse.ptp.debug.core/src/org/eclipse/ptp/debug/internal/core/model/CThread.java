@@ -587,6 +587,7 @@ public class CThread extends PDebugElement implements ICThread, IRestart, IResum
 		while( it.hasNext() ) {
 			CStackFrame frame = (CStackFrame)(((IAdaptable)it.next()).getAdapter( CStackFrame.class ));
 			if ( frame != null ) {
+				frame.preserve();
 			}
 		}
 		setRefreshChildren( true );
