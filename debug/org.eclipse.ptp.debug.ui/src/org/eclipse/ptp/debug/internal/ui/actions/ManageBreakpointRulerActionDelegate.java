@@ -16,36 +16,35 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.actions;
+package org.eclipse.ptp.debug.internal.ui.actions;
 
-import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
-import org.eclipse.ptp.ui.UIUtils;
-import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.text.source.IVerticalRulerInfo;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.texteditor.AbstractRulerActionDelegate;
+import org.eclipse.ui.texteditor.ITextEditor;
+
 /**
  * @author clement chu
  *
  */
-public class RegisterAction extends DebugAction {
-	public static final String name = "Register Selected Elements";
-	private int NUM_PROCESS_WARNING = 10;
+public class ManageBreakpointRulerActionDelegate extends AbstractRulerActionDelegate {
+	private IEditorPart activeEditor;
+	private SetbreakpointRulerAction targetAction = null;
 	
-	public RegisterAction(ParallelDebugView view) {
-		super(name, view);
-	    setImageDescriptor(ImageUtil.ID_ICON_REGISTER_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_REGISTER_DISABLE);
-	    setEnabled(true);
+	public IAction createAction(ITextEditor editor, IVerticalRulerInfo rulerInfo) {
+		targetAction = new SetbreakpointRulerAction(editor, rulerInfo);
+		return targetAction;
 	}
 
-	public void run(IElement[] elements) {
-		if (validation(elements)) {
-			if (elements.length > NUM_PROCESS_WARNING) {
-				if (!UIUtils.showQuestionDialog("Register Confirmation", "Are you sure you want to register (" + elements.length + ") processes?")) {
-					return;
-				}
+	public void setActiveEditor(IAction callerAction, IEditorPart targetEditor) {
+		if (activeEditor != null) {
+			if (targetAction != null) {
+				targetAction.dispose();
+				targetAction = null;
 			}
-			view.registerSelectedElements();
-			view.refresh();
 		}
-	}	
+		activeEditor = targetEditor;
+		super.setActiveEditor(callerAction, targetEditor);
+	}		
 }

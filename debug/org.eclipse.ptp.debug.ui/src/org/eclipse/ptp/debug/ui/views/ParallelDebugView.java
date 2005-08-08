@@ -42,10 +42,8 @@ import org.eclipse.ptp.ui.views.ParallelJobView;
  * @author clement chu
  * 
  */
-public class DebugParallelView extends ParallelJobView implements IDebugParallelModelListener {
-	public static final String VIEW_ID = "org.eclipse.ptp.debug.ui.views.debugParallelView";
-
-	private static DebugParallelView instance = null;
+public class ParallelDebugView extends ParallelJobView implements IDebugParallelModelListener {
+	private static ParallelDebugView instance = null;
 
 	// actions
 	protected ParallelAction resumeAction = null;
@@ -57,16 +55,20 @@ public class DebugParallelView extends ParallelJobView implements IDebugParallel
 	protected ParallelAction registerAction = null;
 	protected ParallelAction unregisterAction = null;
 
-	public DebugParallelView() {
-		jobManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
+	public ParallelDebugView() {
+		manager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
 		//FIXME dummy only
-		if (((UIDebugManager)jobManager).dummy)
+		if (getDebugManager().dummy)
 			DebugManager.getInstance().addListener(this);
 	}
+	
+	public UIDebugManager getDebugManager() {
+		return (UIDebugManager)manager;
+	}
 
-	public static DebugParallelView getDebugViewInstance() {
+	public static ParallelDebugView getDebugViewInstance() {
 		if (instance == null)
-			instance = new DebugParallelView();
+			instance = new ParallelDebugView();
 		return instance;
 	}	
 		
@@ -132,22 +134,22 @@ public class DebugParallelView extends ParallelJobView implements IDebugParallel
 			if (i < groups.length - 1)
 				buffer.append(",");
 		}
-		buffer.append("\nStatus: " + jobManager.getProcessStatusText(cur_job_id, element.getID()));
+		buffer.append("\nStatus: " + getDebugManager().getProcessStatusText(cur_job_id, element.getID()));
 		return buffer.toString();
 	}
 
 	public void dispose() {
 		super.dispose();
 		//FIXME dummy only
-		if (((UIDebugManager)jobManager).dummy)
+		if (getDebugManager().dummy)
 			DebugManager.getInstance().removeListener(this);		
 	}
 	
 	public void registerElement(IElement element) {
 		if (element.isRegistered())
-			((UIDebugManager)jobManager).unregisterElements(new IElement[] { element });
+			getDebugManager().unregisterElements(new IElement[] { element });
 		else
-			((UIDebugManager)jobManager).registerElements(new IElement[] { element });
+			getDebugManager().registerElements(new IElement[] { element });
 
 		element.setRegistered(!element.isRegistered());
 	}
@@ -158,7 +160,7 @@ public class DebugParallelView extends ParallelJobView implements IDebugParallel
 			for (int i = 0; i < elements.length; i++) {
 				elements[i].setRegistered(true);
 			}
-			((UIDebugManager)jobManager).registerElements(elements);
+			getDebugManager().registerElements(elements);
 		}
 	}
 
@@ -168,7 +170,7 @@ public class DebugParallelView extends ParallelJobView implements IDebugParallel
 			for (int i = 0; i < elements.length; i++) {
 				elements[i].setRegistered(false);
 			}
-			((UIDebugManager)jobManager).unregisterElements(elements);
+			getDebugManager().unregisterElements(elements);
 		}
 	}
 	

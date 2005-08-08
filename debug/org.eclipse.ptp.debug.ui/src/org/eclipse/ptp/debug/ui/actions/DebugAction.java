@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.actions;
 
-import org.eclipse.ptp.debug.ui.views.DebugParallelView;
+import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 
 /**
@@ -26,9 +26,9 @@ import org.eclipse.ptp.ui.actions.ParallelAction;
  *
  */
 public abstract class DebugAction extends ParallelAction {
-	protected DebugParallelView view = null;
+	protected ParallelDebugView view = null;
 	
-	public DebugAction(String text, DebugParallelView view) {
+	public DebugAction(String text, ParallelDebugView view) {
 		super(text, view);
 		this.view = view;
 	}

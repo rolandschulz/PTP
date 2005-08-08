@@ -16,36 +16,21 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui.actions;
+package org.eclipse.ptp.debug.ui;
 
-import org.eclipse.ptp.debug.ui.ImageUtil;
-import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
-import org.eclipse.ptp.ui.UIUtils;
-import org.eclipse.ptp.ui.model.IElement;
 /**
- * @author clement chu
+ * @author Clement chu
  *
  */
-public class RegisterAction extends DebugAction {
-	public static final String name = "Register Selected Elements";
-	private int NUM_PROCESS_WARNING = 10;
+public interface IPTPDebugUIConstants {
+	public static final String PLUGIN_ID = PTPDebugUIPlugin.getUniqueIdentifier();
+	public static final String PREFIX = PLUGIN_ID + ".";
 	
-	public RegisterAction(ParallelDebugView view) {
-		super(name, view);
-	    setImageDescriptor(ImageUtil.ID_ICON_REGISTER_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_REGISTER_DISABLE);
-	    setEnabled(true);
-	}
+	public static final String PERSPECTIVE_DEBUG = PREFIX + "PTPPerspectiveFactory";
 
-	public void run(IElement[] elements) {
-		if (validation(elements)) {
-			if (elements.length > NUM_PROCESS_WARNING) {
-				if (!UIUtils.showQuestionDialog("Register Confirmation", "Are you sure you want to register (" + elements.length + ") processes?")) {
-					return;
-				}
-			}
-			view.registerSelectedElements();
-			view.refresh();
-		}
-	}	
+	public static final String VIEW_PARALLELDEBUG = PREFIX + "views.parallelDebugView";
+	
+	public static final String ACTION_BREAKPOINT_PROPERTIES = PREFIX + "breakpointProperties";
+	public static final String ACTION_ENABLE_DISABLE_BREAKPOINT = PREFIX + "enableDisableBreakpoint";
+	public static final String ACTION_SET_BREAKPOINT = PREFIX + "setBreakpoint";
 }
