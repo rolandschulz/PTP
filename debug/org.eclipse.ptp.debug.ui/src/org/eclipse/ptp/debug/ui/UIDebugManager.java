@@ -18,29 +18,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui;
 
-import java.util.HashMap;
-
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointListener;
-import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.DebugManager;
 import org.eclipse.ptp.debug.core.PProcess;
-import org.eclipse.ptp.debug.core.breakpoints.IPBreakpoint;
-import org.eclipse.ptp.debug.core.breakpoints.IPLineBreakpoint;
-import org.eclipse.ptp.debug.core.breakpoints.PLineBreakpoint;
+import org.eclipse.ptp.debug.core.breakpoints.PBreakpointManager;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
 import org.eclipse.ptp.ui.JobManager;
 import org.eclipse.ptp.ui.MachineManager;
@@ -57,19 +47,22 @@ import org.eclipse.ptp.ui.model.internal.SetManager;
 public class UIDebugManager extends JobManager implements IBreakpointListener {
 	public final static int PROC_SUSPEND = 6;
 	public final static int PROC_HIT = 7;
+	
+	private PBreakpointManager bptManager = null;
 
 	//FIXME dummy only
 	public boolean dummy = false;
 	
 	public UIDebugManager() {
-		getBreakpointManager().addBreakpointListener(this);
+		bptManager = PBreakpointManager.getDefault();
+		bptManager.getBreakpointManager().addBreakpointListener(this);
 	}
 	
 	public void shutdown() {
 		super.shutdown();
-		getBreakpointManager().removeBreakpointListener(this);
+		bptManager.getBreakpointManager().removeBreakpointListener(this);
 	}
-		
+
 	public int getProcessStatus(String job_id, String proc_id) {
 		//FIXME dummy only 
 		if (dummy)
@@ -176,90 +169,23 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		}
 		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No launch found", null));
 	}
-	
-	/*********************************************************************
+
+	/******
 	 * Breakpoint
-	 *********************************************************************/
-	
+	 * 
+	 ******/
 	public void breakpointAdded(IBreakpoint breakpoint) {
 		if (PTPDebugUIPlugin.getDefault().getCurrentPerspectiveID().equals(IPTPDebugUIConstants.PERSPECTIVE_DEBUG)) {
 			if (breakpoint instanceof ICLineBreakpoint) {
-				IBreakpointManager breakpointManager = getBreakpointManager();
 				try {
-					addBreakpoint((ICLineBreakpoint)breakpoint);
-					breakpointManager.removeBreakpoint(breakpoint, true);
+					bptManager.addRemoveBreakpoint((ICLineBreakpoint)breakpoint, getCurrentSetId(), getCurrentJobId());
+					bptManager.getBreakpointManager().removeBreakpoint(breakpoint, true);
 				} catch (CoreException e) {
 					System.out.println("Err: " + e.getMessage());
 				}
 			}
 		}
 	}
-	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
-		
-	}
-	public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
-		
-	}
-	
-	public IBreakpointManager getBreakpointManager() {
-		return DebugPlugin.getDefault().getBreakpointManager();
-	}
-	
-	//TODO should move this method to debug.core
-	public IBreakpoint createLineBreakpoint(String sourceHandle, IResource resource, int lineNumber, boolean enabled, boolean register, String set_id, String job_id) throws CoreException {
-		HashMap attributes = new HashMap(10);
-		attributes.put(IBreakpoint.ID, PTPDebugUIPlugin.getUniqueIdentifier());
-		attributes.put(IMarker.LINE_NUMBER, new Integer(lineNumber));
-		attributes.put(IBreakpoint.ENABLED, new Boolean(enabled));
-		attributes.put(IPBreakpoint.SOURCE_HANDLE, sourceHandle);
-		attributes.put(IPBreakpoint.SET_ID, set_id);
-		attributes.put(IPBreakpoint.JOB_ID, job_id);
-		return new PLineBreakpoint(resource, attributes, register);
-	}
-	//TODO ONLY workwith CBreakpoint
-	public void addBreakpoint(ICLineBreakpoint lineBkpt) throws CoreException {
-		int lineNumber = lineBkpt.getLineNumber();
-		boolean enabled = lineBkpt.isEnabled();
-		IProject project = lineBkpt.getMarker().getResource().getProject();
-		String sourceHandle = lineBkpt.getSourceHandle();
-		
-		addBreakpoint(sourceHandle, project, lineNumber, enabled, true, getCurrentSetId(), getCurrentJobId());
-	}
-	
-	public void addBreakpoint(String sourceHandle, IResource resource, int lineNumber, boolean enabled, boolean register, String set_id, String job_id) throws CoreException {
-		IBreakpoint breakpoint = isBreakpointExisted(sourceHandle, resource, lineNumber, set_id, job_id);
-		if (breakpoint != null) {
-			getBreakpointManager().removeBreakpoint(breakpoint, true);
-		} else
-			createLineBreakpoint(sourceHandle, resource, lineNumber, enabled, register, set_id, job_id);
-	}
-	public IBreakpoint isBreakpointExisted(String sourceHandle, IResource resource, int lineNumber, String set_id, String job_id) throws CoreException {
-		String modelId = PTPDebugUIPlugin.getUniqueIdentifier();
-		IBreakpointManager manager = DebugPlugin.getDefault().getBreakpointManager();
-		IBreakpoint[] breakpoints = manager.getBreakpoints(modelId);
-		for(int i=0; i<breakpoints.length; i++) {
-			if (!(breakpoints[i] instanceof IPLineBreakpoint)) {
-				continue;
-			}
-			IPLineBreakpoint breakpoint = (IPLineBreakpoint)breakpoints[i];
-			if (sameSourceHandle(sourceHandle, breakpoint.getSourceHandle())) {
-				if (breakpoint.getMarker().getResource().equals(resource)) {
-					if (breakpoint.getLineNumber() == lineNumber && breakpoint.getSetId().equals(set_id) && breakpoint.getJobId().equals(job_id)) {
-						return breakpoint;
-					}
-				}
-			}
-		}
-		return null;		
-	}
-	private static boolean sameSourceHandle(String handle1, String handle2) {
-		if (handle1 == null || handle2 == null)
-			return false;
-		IPath path1 = new Path(handle1);
-		IPath path2 = new Path(handle2);
-		if (path1.isValidPath(handle1) && path2.isValidPath(handle2)) {
-			return path1.equals(path2);
-		}
-		return handle1.equals(handle2);
-	}	
+	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {}
+	public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {}	
 }

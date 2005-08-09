@@ -29,10 +29,11 @@ import org.eclipse.swt.graphics.Image;
  * @author clement chu
  *
  */
-public class ImageUtil {
+public class PDebugImage {
 	public final static URL ICONURL = PTPDebugUIPlugin.getDefault().getBundle().getEntry("icons/");
 	public final static URL TOOLICONURL = PTPDebugUIPlugin.getDefault().getBundle().getEntry("icons/tool/");
 	public final static URL PROCESSICONURL = PTPDebugUIPlugin.getDefault().getBundle().getEntry("icons/process/");
+	public final static URL DEBUGICONURL = PTPDebugUIPlugin.getDefault().getBundle().getEntry("icons/debug/");
 	
     private static ImageRegistry imageRegistry = null;
     
@@ -63,6 +64,13 @@ public class ImageUtil {
 	public static final String IMG_PRO_STOPPED = "stopped.gif";
 	public static final String IMG_PRO_SUSPENDED_SEL = "suspended_sel.gif";
 	public static final String IMG_PRO_SUSPENDED = "suspended.gif";
+
+	public static final String IMG_DEBUG_BPT = "bpt.gif";
+	public static final String IMG_DEBUG_MULTISET = "multi_set.gif";
+	public static final String IMG_DEBUG_NOSET = "no_set.gif";
+	public static final String IMG_DEBUG_ERRORSET = "error_set.gif";
+	public static final String IMG_DEBUG_BPTENABLE = "bpt_enable.gif";
+	public static final String IMG_DEBUG_BPTDISABLE = "bpt_disable.gif";
 	
 	public static final ImageDescriptor ID_ICON_RESUME_DISABLE = createImageDescriptor(TOOLICONURL, ICON_RESUME_DISABLE, ICON_RESUME_DISABLE);
 	public static final ImageDescriptor ID_ICON_RESUME_NORMAL = createImageDescriptor(TOOLICONURL, ICON_RESUME_NORMAL, ICON_RESUME_NORMAL);
@@ -92,6 +100,13 @@ public class ImageUtil {
 	public static final ImageDescriptor ID_IMG_PRO_SUSPENDED_SEL = createImageDescriptor(PROCESSICONURL, IMG_PRO_SUSPENDED_SEL, IMG_PRO_SUSPENDED_SEL);
 	public static final ImageDescriptor ID_IMG_PRO_SUSPENDED = createImageDescriptor(PROCESSICONURL, IMG_PRO_SUSPENDED, IMG_PRO_SUSPENDED);
 	
+	public static final ImageDescriptor ID_IMG_DEBUG_BPT = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_BPT, IMG_DEBUG_BPT);
+	public static final ImageDescriptor ID_IMG_DEBUG_MULTISET = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_MULTISET, IMG_DEBUG_MULTISET);
+	public static final ImageDescriptor ID_IMG_DEBUG_NOSET = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_NOSET, IMG_DEBUG_NOSET);
+	public static final ImageDescriptor ID_IMG_DEBUG_ERRORSET = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_ERRORSET, IMG_DEBUG_ERRORSET);
+	public static final ImageDescriptor ID_IMG_DEBUG_BPTENABLE = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_BPTENABLE, IMG_DEBUG_BPTENABLE);
+	public static final ImageDescriptor ID_IMG_DEBUG_BPTDISABLE = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_BPTDISABLE, IMG_DEBUG_BPTDISABLE);
+
 	public static Image getImage(String key) {
 		return getImageRegistry().get(key);
 	}

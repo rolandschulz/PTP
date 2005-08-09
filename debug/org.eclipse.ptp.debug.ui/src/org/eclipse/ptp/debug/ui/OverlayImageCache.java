@@ -16,34 +16,41 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.breakpoints;
+package org.eclipse.ptp.debug.ui;
 
-import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * @author Clement chu
  *
  */
-public class PLineBreakpoint extends AbstractLineBreakpoint {
-	private static final String P_LINE_BREAKPOINT = "org.eclipse.ptp.debug.ui.pLineBreakpointMarker";
-	
-	public PLineBreakpoint(IResource resource, Map attributes, boolean add) throws CoreException {
-		super(resource, getMarkerType(), attributes, add);
-	}
+public class OverlayImageCache {
+	private Map cache = new HashMap();
 
-	public static String getMarkerType() {
-		return P_LINE_BREAKPOINT;
-	}
-
-	protected String getMarkerMessage() throws CoreException {
-		String fileName = ensureMarker().getResource().getName();
-		if (fileName != null && fileName.length() > 0) {
-			fileName = ' ' + fileName + ' ';
+	public Image getImageFor(OverlayImageDescriptor imageDescriptor) {
+		Image image = (Image)getCache().get(imageDescriptor);
+		if ( image == null ) {
+			image = imageDescriptor.createImage();
+			getCache().put(imageDescriptor, image);
 		}
-		return MessageFormat.format( BreakpointMessages.getString("PLineBreakpoint"), new Object[] { fileName, new Integer( getLineNumber() ), getConditionText() } );
+		return image;
+	}
+
+	public void disposeAll() {
+		for (Iterator it = getCache().values().iterator(); it.hasNext();) {
+			Image image = (Image)it.next();
+			image.dispose();
+		}
+		getCache().clear();
+	}
+
+	private Map getCache() {
+		return this.cache;
 	}
 }
+
+

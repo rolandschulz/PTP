@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.actions;
 
-import org.eclipse.ptp.debug.ui.ImageUtil;
+import org.eclipse.ptp.debug.ui.PDebugImage;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
 import org.eclipse.ptp.ui.model.IElement;
 /**
@@ -30,8 +30,8 @@ public class UnregisterAction extends DebugAction {
 	
 	public UnregisterAction(ParallelDebugView view) {
 		super(name, view);
-	    setImageDescriptor(ImageUtil.ID_ICON_UNREGISTER_NORMAL);
-	    setDisabledImageDescriptor(ImageUtil.ID_ICON_UNREGISTER_DISABLE);
+	    setImageDescriptor(PDebugImage.ID_ICON_UNREGISTER_NORMAL);
+	    setDisabledImageDescriptor(PDebugImage.ID_ICON_UNREGISTER_DISABLE);
 	    setEnabled(true);
 	}
 

@@ -45,9 +45,17 @@
 	//-->
 
    <extension
+         point="org.eclipse.debug.ui.debugModelPresentations">
+      <debugModelPresentation
+            class="org.eclipse.ptp.debug.ui.PDebugModelPresentation"
+            id="org.eclipse.ptp.debug.ui">
+      </debugModelPresentation>
+   </extension>
+
+   <extension
          point="org.eclipse.ui.editors.annotationTypes">
       <type
-            markerType="org.eclipse.ptp.debug.core.breakpointMarker"
+            markerType="org.eclipse.ptp.debug.ui.pBreakpointMarker"
             super="org.eclipse.debug.core.breakpoint"
             name="org.eclipse.ptp.debug.core.breakpoint">
       </type>
@@ -55,24 +63,79 @@
    <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
       <specification
-            annotationImageProvider="org.eclipse.ptp.debug.internal.ui.BreakpointImageProvider"
+            annotationImageProvider="org.eclipse.ptp.debug.ui.BreakpointImageProvider"
+            annotationType="org.eclipse.ptp.debug.core.breakpoint"
             colorPreferenceValue="217,255,226"
-            annotationType="org.eclipse.ptp.debug.core.breakpointMarker"
+            icon="icons/debug/bpt.gif">
+            <!--
             verticalRulerPreferenceValue="true"
             colorPreferenceKey="ptpBreakpointColor"
             highlightPreferenceKey="ptpBreakpointHighlight"
             overviewRulerPreferenceValue="true"
             highlightPreferenceValue="true"
             presentationLayer="3"
-            icon="icons/bkpt.gif"
             label="PTP Breakpoint"
             textPreferenceValue="false"
             textPreferenceKey="breakpointIndication"
             verticalRulerPreferenceKey="breakpointIndicationVerticalRuler"
             overviewRulerPreferenceKey="breakpointIndicationOverviewRuler">
+            //-->
       </specification>	
    </extension>
+   
+   <!-- breakpointMarker -->
+   <extension
+         id="pBreakpointMarker"
+         point="org.eclipse.core.resources.markers">
+     <super
+           type="org.eclipse.debug.core.breakpointMarker">
+     </super>
+   </extension>
+   <extension
+         id="commonPLineBreakpointMarker"
+         point="org.eclipse.core.resources.markers">
+     <super
+           type="org.eclipse.ptp.debug.ui.pBreakpointMarker">
+     </super>
+     <super
+           type="org.eclipse.debug.core.lineBreakpointMarker">
+     </super>
+     <persistent
+           value="true">
+     </persistent>
+     <attribute
+           name="org.eclipse.ptp.debug.core.threadId">
+     </attribute>
+     <attribute
+           name="org.eclipse.ptp.debug.core.sourceHandle">
+     </attribute>
+     <attribute
+           name="org.eclipse.ptp.debug.core.jobid">
+     </attribute>
+     <attribute
+           name="org.eclipse.ptp.debug.core.setid">
+     </attribute>
+   </extension>
+   <extension
+         id="pLineBreakpointMarker"
+         point="org.eclipse.core.resources.markers">
+     <super
+           type="org.eclipse.ptp.debug.ui.commonPLineBreakpointMarker">
+     </super>
+     <persistent
+           value="true">
+     </persistent>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.breakpoints">
+      <breakpoint
+            markerType="org.eclipse.ptp.debug.ui.pLineBreakpointMarker"
+            class="org.eclipse.ptp.debug.core.breakpoints.PLineBreakpoint"
+            id="pLineBreakpoint">
+      </breakpoint>
+   </extension>
 
+   <!--
    <extension
          point="org.eclipse.ui.popupMenus">
       <viewerContribution
@@ -104,5 +167,5 @@
          </action>
       </viewerContribution>
 	</extension>
-
+	//-->
 </plugin>

@@ -126,13 +126,6 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 	}
 	
 	protected abstract String getMarkerMessage() throws CoreException;
-	
-	protected IMarker ensureMarker() throws DebugException {
-		return super.ensureMarker();
-	}
-	protected void setAttribute(String attributeName, Object value) throws CoreException {
-		super.setAttribute(attributeName, value);
-	}
 	/*
 	public IPDebugTarget[] getTargetFilters() throws CoreException {
 		Set set = filteredThreadsByTarget.keySet();
@@ -178,6 +171,6 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 	}
 	
 	protected String getConditionText() throws CoreException {
-		return "Testing on PBreakpoint";
+		return " on Set " + getSetId();
 	}
 }
