@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
+
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.event.ICDICreatedEvent;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
@@ -23,44 +27,72 @@ import org.eclipse.ptp.debug.external.event.EInferiorCreated;
  */
 public class CreatedEvent implements ICDICreatedEvent {
 	Session session;
-	ICDIObject source;
+	ICDIObject[] sources;
 	DebugEvent event;
 
 	public CreatedEvent(Session s, EBreakpointCreated ev) {
 		session = s;
 		event = ev;
-		int pId = ev.getProcessId();
-		int tId = ev.getThreadId();
 		
-		if (!session.isRegistered(pId))
-			source = null;
-		else {
-			try {
-				source = ((Target) session.getTarget(pId)).getThread(tId);
-			} catch (CDIException e) {
-				source = null;
-			}
-		}
+		Hashtable table = ev.getSources();
+		ArrayList sourceList = new ArrayList();
+		
+	    Iterator it = table.keySet().iterator();
+	    while (it.hasNext()) {
+	       Integer targetId =  (Integer) it.next();
+	       int[] threads = (int[]) table.get(targetId);
+	       
+	       if (threads.length == 0) {
+	    		   ICDIObject src = session.getTarget(targetId.intValue());
+	    		   sourceList.add(src);
+	       }
+	       
+	       for (int i = 0; i < threads.length; i++) {
+	    	   try {
+	    		   ICDIObject src = ((Target) session.getTarget(targetId.intValue())).getThread(threads[i]);
+	    		   sourceList.add(src);
+	    	   } catch (CDIException e) {
+	    	   }
+	       }
+	    }
+	    sources = (ICDIObject[]) sourceList.toArray(new ICDIObject[0]);
 	}
 
 	public CreatedEvent(Session s, EInferiorCreated ev) {
 		session = s;
-		int pId = ev.getProcessId();
-		int tId = ev.getThreadId();
+		event = ev;
 		
-		if (!session.isRegistered(pId))
-			source = null;
-		else
-			try {
-				source = ((Target) session.getTarget(pId)).getThread(tId);
-			} catch (CDIException e) {
-				source = null;
-			}
+		Hashtable table = ev.getSources();
+		ArrayList sourceList = new ArrayList();
+		
+	    Iterator it = table.keySet().iterator();
+	    while (it.hasNext()) {
+	       Integer targetId =  (Integer) it.next();
+	       int[] threads = (int[]) table.get(targetId);
+	       
+	       if (threads.length == 0) {
+    		   ICDIObject src = session.getTarget(targetId.intValue());
+    		   sourceList.add(src);
+	       }
+       
+	       for (int i = 0; i < threads.length; i++) {
+	    	   try {
+	    		   ICDIObject src = ((Target) session.getTarget(targetId.intValue())).getThread(threads[i]);
+	    		   sourceList.add(src);
+	    	   } catch (CDIException e) {
+	    	   }
+	       }
+	    }
+	    sources = (ICDIObject[]) sourceList.toArray(new ICDIObject[0]);
 	}
 
 	public ICDIObject getSource() {
 		// Auto-generated method stub
 		System.out.println("CreatedEvent.getSource()");
-		return source;
+		return sources[0];
+	}
+	
+	public ICDIObject[] getSources() {
+		return sources;
 	}
 }

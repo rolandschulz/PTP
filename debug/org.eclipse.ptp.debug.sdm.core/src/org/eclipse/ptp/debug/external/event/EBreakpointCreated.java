@@ -1,9 +1,9 @@
 package org.eclipse.ptp.debug.external.event;
 
-
+import java.util.Hashtable;
 
 public class EBreakpointCreated extends DebugEvent {
-	public EBreakpointCreated(int pId, int tId) {
-		super("breakpointCreated", pId, tId);
+	public EBreakpointCreated(Hashtable s) {
+		super("breakpointCreated", s);
 	}
 }

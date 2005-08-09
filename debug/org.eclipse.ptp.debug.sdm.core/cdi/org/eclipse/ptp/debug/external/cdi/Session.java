@@ -18,13 +18,16 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.IDebugger;
+import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.event.EInferiorCreated;
+import org.eclipse.ptp.debug.external.model.MProcess;
 import org.eclipse.ptp.debug.external.model.MProcessSet;
 
 public class Session implements ICDISession, ICDISessionObject {
@@ -73,6 +76,10 @@ public class Session implements ICDISession, ICDISessionObject {
 		return debugger;
 	}
 	
+	public Process getProcess(int i) {
+		return (Process) debugger.getProcess(i).getDebugInfo();
+	}
+	
 	public IPCDIDebugProcessSet newProcessSet(String name, int[] procs) {
 		MProcessSet procSet = debugger.defSet(name, procs);
 		DebugProcessSet newSet = new DebugProcessSet(procSet);
@@ -104,13 +111,16 @@ public class Session implements ICDISession, ICDISessionObject {
 	}
 
 	public void registerTarget(int procNum) {
+		if (isRegistered(procNum))
+			return;
+		
 		Target target = new Target(this, debugger, procNum);
 		
-		debugger.fireEvent(new EInferiorCreated(procNum, 0));
+		Hashtable table = new Hashtable();
+		table.put(new Integer(procNum), new int[] { 0 });
+		debugger.fireEvent(new EInferiorCreated(table));
 		
-		if (!currentDebugTargetList.containsKey(Integer.toString(target.getTargetId()))) {
-			currentDebugTargetList.put(Integer.toString(target.getTargetId()), target);
-		}
+		currentDebugTargetList.put(Integer.toString(target.getTargetId()), target);
 		
 		try {
 			boolean stopInMain = dLaunch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
@@ -136,6 +146,9 @@ public class Session implements ICDISession, ICDISessionObject {
 	}
 
 	public void unregisterTarget(int target) {
+		if (!isRegistered(target))
+			return;
+		
 		String targetId = Integer.toString(target);
 		Target t = (Target) currentDebugTargetList.remove(targetId);
 	}
@@ -150,7 +163,12 @@ public class Session implements ICDISession, ICDISessionObject {
 	}
 
 	public ICDITarget getTarget(int i) {
-		return (IPCDITarget) currentDebugTargetList.get(Integer.toString(i));
+		if (isRegistered(i))
+			return (IPCDITarget) currentDebugTargetList.get(Integer.toString(i));
+		else {
+			return new Target(this, debugger, i);
+		}
+			
 	}
 	
 	public ICDITarget[] getTargets() {

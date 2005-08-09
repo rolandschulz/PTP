@@ -38,7 +38,7 @@ public class SimProcess extends Process {
 		
 		threads = new SimThread[numThreads];
 		for (int i = 0; i < numThreads; i++) {
-			threads[i] = new SimThread(i, id, dSim, dSes);
+			threads[i] = new SimThread(i, pId, dSim, dSes);
 		}
 		
 		err = null;

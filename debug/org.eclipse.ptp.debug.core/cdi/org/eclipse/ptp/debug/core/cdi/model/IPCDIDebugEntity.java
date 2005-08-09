@@ -1,5 +1,6 @@
 package org.eclipse.ptp.debug.core.cdi.model;
 
-public interface IPCDIDebugFocus {
+
+public interface IPCDIDebugEntity {
 	public String getName();
 }

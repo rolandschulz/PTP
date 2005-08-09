@@ -69,7 +69,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 	
 	public Process getProcess() {
-		return fDebugger.getProcess(targetId);
+		return ((Session) getSession()).getProcess(targetId);
 	}
 
 	public ICDITargetConfiguration getConfiguration() {
@@ -87,7 +87,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		System.out.println("Target.getGlobalVariableDescriptors()");
 		return null;
 	}
-
+	
 	public ICDIRegisterGroup[] getRegisterGroups() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.getRegisterGroups()");

@@ -1,5 +1,7 @@
 package org.eclipse.ptp.debug.external.simulator;
 
+import java.util.Hashtable;
+
 import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.event.EBreakpointHit;
 
@@ -63,7 +65,12 @@ public class SimThread {
 	public void checkBreakpoint() {
 		if (curLine == breakLine) {
 			state = SUSPENDED;
-			dSim.fireEvent(new EBreakpointHit(processId, threadId));
+			
+			Hashtable table = new Hashtable();
+			
+			Integer proc = new Integer(processId);
+			table.put(proc, new int[] {threadId});
+			dSim.fireEvent(new EBreakpointHit(table));
 			// Do Something
 		}
 	}
