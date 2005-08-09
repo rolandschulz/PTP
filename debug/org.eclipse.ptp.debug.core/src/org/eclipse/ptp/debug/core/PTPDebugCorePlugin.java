@@ -11,8 +11,10 @@
 package org.eclipse.ptp.debug.core;
 
 import java.util.HashMap;
+import java.util.Hashtable;
 
 import org.eclipse.cdt.debug.core.ICBreakpointListener;
+import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -26,6 +28,7 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.model.IBreakpoint;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.internal.core.ListenerList;
 import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
 import org.eclipse.ptp.debug.internal.core.SessionManager;
@@ -60,6 +63,8 @@ public class PTPDebugCorePlugin extends Plugin {
 	private ListenerList fBreakpointListeners;
 	
 	private SessionManager fSessionManager = null;
+	
+	private Hashtable fDebugSessions = null;
 
 	/**
 	 * The constructor.
@@ -229,12 +234,27 @@ public class PTPDebugCorePlugin extends Plugin {
 		fBreakpointListeners.removeAll();
 		fBreakpointListeners = null;
 	}
+	
+	
+	public void addDebugSession(IPJob job, ICDISession session) {
+		fDebugSessions.put(job, session);
+	}
+	
+	public ICDISession getDebugSession(IPJob job) {
+		return (ICDISession) fDebugSessions.get(job);
+	}
+	
+	public void removeDebugSession(IPJob job) {
+		fDebugSessions.remove(job);
+	}
 
+	
 	/* (non-Javadoc)
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
 	public void start( BundleContext context ) throws Exception {
 		super.start( context );
+		fDebugSessions = new Hashtable();
 		createBreakpointListenersList();
 		resetBreakpointsInstallCount();
 		setSessionManager( new SessionManager() );
@@ -247,6 +267,7 @@ public class PTPDebugCorePlugin extends Plugin {
 		setSessionManager( null );
 		disposeBreakpointListenersList();
 		resetBreakpointsInstallCount();
+		fDebugSessions.clear();
 		super.stop( context );
 	}
 
