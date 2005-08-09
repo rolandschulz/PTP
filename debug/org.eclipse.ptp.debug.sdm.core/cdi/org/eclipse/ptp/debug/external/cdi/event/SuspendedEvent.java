@@ -12,7 +12,6 @@ package org.eclipse.ptp.debug.external.cdi.event;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
@@ -39,24 +38,26 @@ public class SuspendedEvent implements ICDISuspendedEvent {
 		Hashtable table = ev.getSources();
 		ArrayList sourceList = new ArrayList();
 		
-	    Iterator it = table.keySet().iterator();
-	    while (it.hasNext()) {
-	       Integer targetId =  (Integer) it.next();
-	       int[] threads = (int[]) table.get(targetId);
-	       
-	       if (threads.length == 0) {
-    		   ICDIObject src = session.getTarget(targetId.intValue());
-    		   sourceList.add(src);
-	       }
-       
-	       for (int i = 0; i < threads.length; i++) {
-	    	   try {
-	    		   ICDIObject src = ((Target) session.getTarget(targetId.intValue())).getThread(threads[i]);
-	    		   sourceList.add(src);
-	    	   } catch (CDIException e) {
-	    	   }
-	       }
-	    }
+		int[] registeredTargets = session.getRegisteredTargetIds();
+		
+		for (int j = 0; j < registeredTargets.length; j++) {
+			Integer targetId = new Integer(registeredTargets[j]);
+			if (table.containsKey(targetId)) {
+		       int[] threads = (int[]) table.get(targetId);
+		       if (threads.length == 0) {
+		    		   ICDIObject src = session.getTarget(targetId.intValue());
+		    		   sourceList.add(src);
+		       }
+		       for (int i = 0; i < threads.length; i++) {
+		    	   try {
+		    		   ICDIObject src = ((Target) session.getTarget(targetId.intValue())).getThread(threads[i]);
+		    		   sourceList.add(src);
+		    	   } catch (CDIException e) {
+		    	   }
+		       }
+			}
+		}
+		
 	    sources = (ICDIObject[]) sourceList.toArray(new ICDIObject[0]);
 	}
 	
@@ -74,11 +75,14 @@ public class SuspendedEvent implements ICDISuspendedEvent {
 		System.out.println("SuspendedEvent.getSource()");
 		
 		Hashtable table = event.getSources();
-	    Iterator it = table.keySet().iterator();
-	    while (it.hasNext()) {
-	       Integer targetId =  (Integer) it.next();
-	       return session.getTarget(targetId.intValue());
-	    }
+		int[] registeredTargets = session.getRegisteredTargetIds();
+		
+		for (int j = 0; j < registeredTargets.length; j++) {
+			Integer targetId = new Integer(registeredTargets[j]);
+			if (table.containsKey(targetId)) {
+				return session.getTarget(targetId.intValue());
+			}
+		}
 		
 		//Target target = (Target) session.getTarget(0);
 		// We can send the target as the Source.  CDI

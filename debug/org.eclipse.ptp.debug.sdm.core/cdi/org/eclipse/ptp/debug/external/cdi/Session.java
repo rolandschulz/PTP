@@ -18,16 +18,13 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.IDebugger;
-import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.event.EInferiorCreated;
-import org.eclipse.ptp.debug.external.model.MProcess;
 import org.eclipse.ptp.debug.external.model.MProcessSet;
 
 public class Session implements ICDISession, ICDISessionObject {
@@ -81,12 +78,14 @@ public class Session implements ICDISession, ICDISessionObject {
 	}
 	
 	public IPCDIDebugProcessSet newProcessSet(String name, int[] procs) {
+		if (currentProcessSetList.containsKey(name)) {
+			return null;
+		}
+
 		MProcessSet procSet = debugger.defSet(name, procs);
 		DebugProcessSet newSet = new DebugProcessSet(procSet);
 		
-		if (!currentProcessSetList.containsKey(newSet.getName())) {
-			currentProcessSetList.put(newSet.getName(), newSet);
-		}
+		currentProcessSetList.put(newSet.getName(), newSet);
 		
 		return newSet;
 	}
@@ -109,18 +108,22 @@ public class Session implements ICDISession, ICDISessionObject {
 	    }
 	    return pSets;
 	}
+	
+	public IPCDIDebugProcessSet getProcessSet(String name) {
+		return (IPCDIDebugProcessSet) currentProcessSetList.get(name);
+	}
 
 	public void registerTarget(int procNum) {
 		if (isRegistered(procNum))
 			return;
 		
 		Target target = new Target(this, debugger, procNum);
+
+		currentDebugTargetList.put(Integer.toString(target.getTargetId()), target);
 		
 		Hashtable table = new Hashtable();
 		table.put(new Integer(procNum), new int[] { 0 });
 		debugger.fireEvent(new EInferiorCreated(table));
-		
-		currentDebugTargetList.put(Integer.toString(target.getTargetId()), target);
 		
 		try {
 			boolean stopInMain = dLaunch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
@@ -145,17 +148,34 @@ public class Session implements ICDISession, ICDISessionObject {
 		}
 	}
 
-	public void unregisterTarget(int target) {
-		if (!isRegistered(target))
+	public void unregisterTarget(int procNum) {
+		if (!isRegistered(procNum))
 			return;
 		
-		String targetId = Integer.toString(target);
-		Target t = (Target) currentDebugTargetList.remove(targetId);
+		// remove DebugTarget
+		// remove IProcess
+		
+		String targetId = Integer.toString(procNum);
+		currentDebugTargetList.remove(targetId);
 	}
+	
 	public void unregisterTargets(int[] targets) {
 		for (int i = 0; i < targets.length; ++i) {
 			unregisterTarget(targets[i]);
 		}
+	}
+	
+	public int[] getRegisteredTargetIds() {
+		int size = currentDebugTargetList.size();
+		int[] targetIds = new int[size];
+		int index = 0;
+		
+	    Iterator it = currentDebugTargetList.keySet().iterator();
+	    while (it.hasNext()) {
+	       String targetId =  (String) it.next();
+	       targetIds[index++] = Integer.parseInt(targetId);
+	    }
+	    return targetIds;
 	}
 	
 	public boolean isRegistered(int i) {
@@ -166,9 +186,8 @@ public class Session implements ICDISession, ICDISessionObject {
 		if (isRegistered(i))
 			return (IPCDITarget) currentDebugTargetList.get(Integer.toString(i));
 		else {
-			return new Target(this, debugger, i);
+			return null;
 		}
-			
 	}
 	
 	public ICDITarget[] getTargets() {
