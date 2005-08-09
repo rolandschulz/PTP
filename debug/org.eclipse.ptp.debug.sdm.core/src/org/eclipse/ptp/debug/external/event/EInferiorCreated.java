@@ -1,9 +1,9 @@
 package org.eclipse.ptp.debug.external.event;
 
-
+import java.util.Hashtable;
 
 public class EInferiorCreated extends DebugEvent {
-	public EInferiorCreated(int pId, int tId) {
-		super("inferiorCreated", pId, tId);
+	public EInferiorCreated(Hashtable s) {
+		super("inferiorCreated", s);
 	}
 }

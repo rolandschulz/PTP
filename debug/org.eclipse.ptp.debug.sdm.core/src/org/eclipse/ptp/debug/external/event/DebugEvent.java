@@ -4,6 +4,8 @@
  */
 package org.eclipse.ptp.debug.external.event;
 
+import java.util.Hashtable;
+
 
 /**
  * @author donny
@@ -11,20 +13,14 @@ package org.eclipse.ptp.debug.external.event;
  */
 public class DebugEvent {
 	String eventName = "";
-	int processId;
-	int threadId;
+	Hashtable eventSources;
 	
-	public DebugEvent(String eName, int pId, int tId) {
+	public DebugEvent(String eName, Hashtable eSources) {
 		eventName = eName;
-		processId = pId;
-		threadId = tId;
+		eventSources = eSources;
 	}
 	
-	public int getProcessId() {
-		return processId;
-	}
-	
-	public int getThreadId() {
-		return threadId;
+	public Hashtable getSources() {
+		return eventSources;
 	}
 }

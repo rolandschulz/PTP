@@ -11,6 +11,7 @@
 package org.eclipse.ptp.debug.external.cdi;
 
 import java.math.BigInteger;
+import java.util.Hashtable;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
@@ -105,7 +106,11 @@ public class BreakpointManager extends Manager {
 			// Fire a created Event.
 			int pId = target.getTargetId();
 			int tId = 0; /* thread id */
-			sess.getDebugger().fireEvent(new EBreakpointCreated(pId, tId));
+			
+			Hashtable table = new Hashtable();
+			table.put(new Integer(pId), new int[] { tId });
+			
+			sess.getDebugger().fireEvent(new EBreakpointCreated(table));
 			
 		} catch (CDIException e) {
 		}

@@ -22,7 +22,6 @@ public class MProcess {
 	private Object debugInfo;
 	private IPProcess pproc;
 	
-	private static int globalCounter = 0;
 	int id;
 	String name = "";
 
@@ -42,23 +41,9 @@ public class MProcess {
 		debugInfo = info;
 	}
 	
-	public MProcess() {
-		id = getUniqId();
+	public MProcess(int pId) {
+		id = pId;
 		name = "process" + Integer.toString(id);
-	}
-	
-	public static synchronized void resetGlobalCounter() {
-		globalCounter = 0;
-	}
-	
-	private static synchronized int getUniqId() {
-		int count = globalCounter;
-		// If we ever wrap around.
-		if (count < 0) {
-			count = globalCounter = 0;
-		}
-		globalCounter++;
-		return count;
 	}
 	
 	public int getId() {
