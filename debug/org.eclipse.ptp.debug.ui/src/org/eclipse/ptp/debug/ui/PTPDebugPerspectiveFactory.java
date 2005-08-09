@@ -28,7 +28,7 @@ import org.eclipse.ui.console.IConsoleConstants;
  * @author clement chu
  *
  */
-public class PTPPerspectiveFactory implements IPerspectiveFactory {	
+public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {	
 	/**
 	 * @see IPerspectiveFactory#createInitialLayout
 	 */	

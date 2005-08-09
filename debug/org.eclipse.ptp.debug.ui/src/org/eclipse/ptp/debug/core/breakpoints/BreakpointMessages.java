@@ -16,21 +16,25 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui;
+package org.eclipse.ptp.debug.core.breakpoints;
+
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 /**
  * @author Clement chu
  *
  */
-public interface IPTPDebugUIConstants {
-	public static final String PLUGIN_ID = PTPDebugUIPlugin.getUniqueIdentifier();
-	public static final String PREFIX = PLUGIN_ID + ".";
-	
-	public static final String PERSPECTIVE_DEBUG = PREFIX + "PTPDebugPerspective";
+public class BreakpointMessages {
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.debug.core.breakpoints.BreakpointMessages";
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
-	public static final String VIEW_PARALLELDEBUG = PREFIX + "views.parallelDebugView";
-	
-	public static final String ACTION_BREAKPOINT_PROPERTIES = PREFIX + "breakpointProperties";
-	public static final String ACTION_ENABLE_DISABLE_BREAKPOINT = PREFIX + "enableDisableBreakpoint";
-	public static final String ACTION_SET_BREAKPOINT = PREFIX + "setBreakpoint";
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch(MissingResourceException e) {
+			return '!' + key + '!';
+		}
+	}
 }
+

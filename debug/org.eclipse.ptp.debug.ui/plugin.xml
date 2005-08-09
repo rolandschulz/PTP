@@ -8,8 +8,8 @@
 		<perspective
 			name="Parallel Debug"
 			icon="icons/ptp.gif"
-			class="org.eclipse.ptp.debug.ui.PTPPerspectiveFactory"
-			id="org.eclipse.ptp.debug.ui.PTPPerspective"/>
+			class="org.eclipse.ptp.debug.ui.PTPDebugPerspectiveFactory"
+			id="org.eclipse.ptp.debug.ui.PTPDebugPerspective"/>
 	</extension>   
 
 	<extension

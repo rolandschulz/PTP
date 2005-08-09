@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.breakpoint;
+package org.eclipse.ptp.debug.core.breakpoints;
 
 import java.util.Map;
 
@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.model.Breakpoint;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 
@@ -36,7 +35,7 @@ import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
  * @author Clement chu
  *
  */
-public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint, IDebugEventSetListener {
+public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 	//private Map filteredThreadsByTarget;
 
 	public PBreakpoint() {
@@ -46,7 +45,6 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint, ID
 	public PBreakpoint(final IResource resource, final String markerType, final Map attributes, final boolean add) throws CoreException {
 		this();
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
-
 			public void run(IProgressMonitor monitor) throws CoreException {
 				// create the marker
 				setMarker(resource.createMarker(markerType));
@@ -89,7 +87,7 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint, ID
 		setAttribute(THREAD_ID, threadId);
 	}
 	public String getSourceHandle() throws CoreException {
-		return ensureMarker().getAttribute(SOURCE_HANDLE, null);
+		return ensureMarker().getAttribute(SOURCE_HANDLE, "");
 	}
 	public void setSourceHandle(String sourceHandle) throws CoreException {
 		setAttribute(SOURCE_HANDLE, sourceHandle);
@@ -99,6 +97,18 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint, ID
 	}
 	public void setModule(String module) throws CoreException {
 		setAttribute(MODULE, module);
+	}
+	public String getSetId() throws CoreException {
+		return ensureMarker().getAttribute(SET_ID, null);
+	}
+	public void setSetId(String id) throws CoreException {
+		setAttribute(SET_ID, id);
+	}
+	public String getJobId() throws CoreException {
+		return ensureMarker().getAttribute(JOB_ID, null);
+	}
+	public void setJobId(String id) throws CoreException {
+		setAttribute(JOB_ID, id);
 	}
 
 	protected void run(IWorkspaceRunnable wr) throws DebugException {
@@ -165,5 +175,9 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint, ID
 		if (markerExists()) {
 			DebugPlugin.getDefault().getBreakpointManager().fireBreakpointChanged(this);
 		}
-	}	
+	}
+	
+	protected String getConditionText() throws CoreException {
+		return "Testing on PBreakpoint";
+	}
 }
