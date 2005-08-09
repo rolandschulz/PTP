@@ -16,21 +16,40 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui;
+package org.eclipse.ptp.debug.core.breakpoints;
+
+import java.util.Map;
+
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 
 /**
  * @author Clement chu
  *
  */
-public interface IPTPDebugUIConstants {
-	public static final String PLUGIN_ID = PTPDebugUIPlugin.getUniqueIdentifier();
-	public static final String PREFIX = PLUGIN_ID + ".";
-	
-	public static final String PERSPECTIVE_DEBUG = PREFIX + "PTPDebugPerspective";
+public abstract class AbstractLineBreakpoint extends PBreakpoint implements IPLineBreakpoint {
+	public AbstractLineBreakpoint(IResource resource, String markerType, Map attributes, boolean add) throws CoreException {
+		super(resource, markerType, attributes, add);
+	}
 
-	public static final String VIEW_PARALLELDEBUG = PREFIX + "views.parallelDebugView";
-	
-	public static final String ACTION_BREAKPOINT_PROPERTIES = PREFIX + "breakpointProperties";
-	public static final String ACTION_ENABLE_DISABLE_BREAKPOINT = PREFIX + "enableDisableBreakpoint";
-	public static final String ACTION_SET_BREAKPOINT = PREFIX + "setBreakpoint";
+	public int getLineNumber() throws CoreException {
+		return ensureMarker().getAttribute(IMarker.LINE_NUMBER, -1);
+	}
+
+	public int getCharStart() throws CoreException {
+		return ensureMarker().getAttribute(IMarker.CHAR_START, -1);
+	}
+
+	public int getCharEnd() throws CoreException {
+		return ensureMarker().getAttribute(IMarker.CHAR_END, -1);
+	}
+
+	public String getFileName() throws CoreException {
+		String fileName = getSourceHandle();
+		IPath path = new Path(fileName);
+		return (path.isValidPath(fileName))?path.lastSegment():null;
+	}
 }

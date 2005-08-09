@@ -16,21 +16,34 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui;
+package org.eclipse.ptp.debug.core.breakpoints;
+
+import java.text.MessageFormat;
+import java.util.Map;
+
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 
 /**
  * @author Clement chu
  *
  */
-public interface IPTPDebugUIConstants {
-	public static final String PLUGIN_ID = PTPDebugUIPlugin.getUniqueIdentifier();
-	public static final String PREFIX = PLUGIN_ID + ".";
+public class PLineBreakpoint extends AbstractLineBreakpoint {
+	private static final String P_LINE_BREAKPOINT = "org.eclipse.ptp.debug.core.pLineBreakpointMarker";
 	
-	public static final String PERSPECTIVE_DEBUG = PREFIX + "PTPDebugPerspective";
+	public PLineBreakpoint(IResource resource, Map attributes, boolean add) throws CoreException {
+		super(resource, getMarkerType(), attributes, add);
+	}
 
-	public static final String VIEW_PARALLELDEBUG = PREFIX + "views.parallelDebugView";
-	
-	public static final String ACTION_BREAKPOINT_PROPERTIES = PREFIX + "breakpointProperties";
-	public static final String ACTION_ENABLE_DISABLE_BREAKPOINT = PREFIX + "enableDisableBreakpoint";
-	public static final String ACTION_SET_BREAKPOINT = PREFIX + "setBreakpoint";
+	public static String getMarkerType() {
+		return P_LINE_BREAKPOINT;
+	}
+
+	protected String getMarkerMessage() throws CoreException {
+		String fileName = ensureMarker().getResource().getName();
+		if ( fileName != null && fileName.length() > 0 ) {
+			fileName = ' ' + fileName + ' ';
+		}
+		return MessageFormat.format( BreakpointMessages.getString( "PLineBreakpoint" ), new Object[] { fileName, new Integer( getLineNumber() ), getConditionText() } );
+	}
 }
