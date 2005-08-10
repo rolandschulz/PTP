@@ -59,6 +59,12 @@
             category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
       </page>
       <page
+            name="%DebugpreferencePage.name"
+            class="org.eclipse.ptp.ui.preferences.DebugPreferencesPage"
+            id="org.eclipse.ptp.ui.preferences.debugPreferencesPage"
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
+      </page>
+      <page
             name="%OMPIpreferencePage.name"
             class="org.eclipse.ptp.ui.preferences.OMPIPreferencesPage"
             id="org.eclipse.ptp.ui.preferences.ompiPreferencesPage"
