@@ -12,6 +12,7 @@ package org.eclipse.ptp.debug.core;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Hashtable;
 
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
@@ -55,6 +56,9 @@ import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
  * specific to the CDI debug model.
  */
 public class PCDIDebugModel {
+	
+	private static Hashtable dTargets = new Hashtable();
+	private static Hashtable dProcesses = new Hashtable();
 
 	/**
 	 * Returns the identifier for the CDI debug model plug-in
@@ -63,6 +67,12 @@ public class PCDIDebugModel {
 	 */
 	public static String getPluginIdentifier() {
 		return PTPDebugCorePlugin.getUniqueIdentifier();
+	}
+	
+	public static void removeDebugTarget(ILaunch launch, int i) {
+		String name = "Proc " + i;
+		launch.removeDebugTarget((IDebugTarget) dTargets.get(name));
+		launch.removeProcess((IProcess) dProcesses.get(name));
 	}
 
 	/**
@@ -88,6 +98,10 @@ public class PCDIDebugModel {
 			public void run( IProgressMonitor m ) throws CoreException {
 				boolean stop = launch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
 				target[0] = new PDebugTarget( launch, project, cdiTarget, name, debuggeeProcess, file, allowTerminate, allowDisconnect );
+				
+				dTargets.put(name, target[0]);
+				dProcesses.put(name, debuggeeProcess);
+				
 				ICDITargetConfiguration config = cdiTarget.getConfiguration();
 				if ( config.supportsBreakpoints() && stop ) {
 					stopInMain( (PDebugTarget)target[0] );

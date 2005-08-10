@@ -43,7 +43,7 @@ public class DebugSimulator extends AbstractDebugger {
 		cmd2.add(2, "5");
 
 		for (int j = 0; j < procs.length; j++) {
-			procs[j].addItem(cmd2);
+			//procs[j].addItem(cmd2);
 			
 			procs[j].addItem(cmd);
 			procs[j].addItem(cmd);
@@ -121,7 +121,7 @@ public class DebugSimulator extends AbstractDebugger {
 		
 		debuggerProcess = new SimProcess("Debugger", 99, 1, debuggerCommands, this, debugSession);
 		
-		IPProcess[] procs = job.getProcesses();
+		IPProcess[] procs = job.getSortedProcesses();
 		for (int i = 0; i < procs.length; i++) {
 			MProcess proc = new MProcess(i);
 			Process p = new SimProcess("proc" + i, i, 1, procCommands[i], this, debugSession);
