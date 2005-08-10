@@ -41,18 +41,9 @@ public class CreatedEvent implements ICDICreatedEvent {
 		for (int j = 0; j < registeredTargets.length; j++) {
 			Integer targetId = new Integer(registeredTargets[j]);
 			if (table.containsKey(targetId)) {
-		       int[] threads = (int[]) table.get(targetId);
-		       if (threads.length == 0) {
-		    		   ICDIObject src = session.getTarget(targetId.intValue());
-		    		   sourceList.add(src);
-		       }
-		       for (int i = 0; i < threads.length; i++) {
-		    	   try {
-		    		   ICDIObject src = ((Target) session.getTarget(targetId.intValue())).getThread(threads[i]);
-		    		   sourceList.add(src);
-		    	   } catch (CDIException e) {
-		    	   }
-		       }
+				/* Put Target as the source rather than the Threads */
+	   		   ICDIObject src = session.getTarget(targetId.intValue());
+			   sourceList.add(src);
 			}
 		}
 		

@@ -60,10 +60,18 @@ public class Session implements IPCDISession, ICDISessionObject {
 		
 		debugger.addDebuggerObserver(eventManager);
 		
+		try {
+			Process debugger = getSessionProcess();
+			if (debugger != null) {
+				IProcess debuggerProcess = DebugPlugin.newProcess(launch, debugger, "Debugger");
+				launch.addProcess(debuggerProcess);
+			}
+		} catch (CDIException e) {
+			
+		}
+		
 		/* Initially we only create process/target 0 */
-		//addTargets(new int[] { 0, 1 });
 		registerTarget(0);
-		registerTarget(1);
 	}
 	
 	public DebugSession getDebugSession() {
@@ -153,8 +161,8 @@ public class Session implements IPCDISession, ICDISessionObject {
 		if (!isRegistered(procNum))
 			return;
 		
-		// remove DebugTarget
-		// remove IProcess
+		// Remove DebugTarget & IProcess;
+		PCDIDebugModel.removeDebugTarget(dLaunch, procNum);
 		
 		String targetId = Integer.toString(procNum);
 		currentDebugTargetList.remove(targetId);
