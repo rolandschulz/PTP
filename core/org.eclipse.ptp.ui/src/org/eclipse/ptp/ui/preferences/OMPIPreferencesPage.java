@@ -57,7 +57,7 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 
 	protected Button browseButton = null;
 
-	private String defaultOrtedArgs = "--debug-daemons --scope public --seed --persistent";
+	private String defaultOrtedArgs = "--scope public --seed --persistent";
 	private String ortedArgs = EMPTY_STRING;
 	private String ortedFile = EMPTY_STRING;
 
