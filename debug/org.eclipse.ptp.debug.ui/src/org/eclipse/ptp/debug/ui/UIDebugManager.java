@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.breakpoints.PBreakpointManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
@@ -57,7 +58,9 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			if (elements[i].isRegistered()) {
 				IPJob job = findJobById(getCurrentJobId());
 				ICDISession session = PTPDebugCorePlugin.getDefault().getDebugSession(job);
-				((IPCDISession)session).unregisterTarget(elements[i].getIDNum());
+				((IPCDISession)session).unregisterTarget(
+						findProcess(getCurrentJobId(), elements[i].getID()).getTaskId());
+				//System.out.println("Unregister: " + elements[i].getID());
 			}
 		}
 	}
@@ -68,7 +71,9 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			if (!elements[i].isRegistered()) {
 				IPJob job = findJobById(getCurrentJobId());
 				ICDISession session = PTPDebugCorePlugin.getDefault().getDebugSession(job);
-				((IPCDISession)session).registerTarget(elements[i].getIDNum());
+				((IPCDISession)session).registerTarget(
+						findProcess(getCurrentJobId(), elements[i].getID()).getTaskId());
+				//System.out.println("Register: " + elements[i].getID());
 			}
 		}
 	}
