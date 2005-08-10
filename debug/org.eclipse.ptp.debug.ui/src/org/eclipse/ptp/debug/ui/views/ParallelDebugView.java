@@ -130,7 +130,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugParallel
 			if (i < groups.length - 1)
 				buffer.append(",");
 		}
-		buffer.append("\nStatus: " + getDebugManager().getProcessStatusText(cur_job_id, element.getID()));
+		buffer.append("\nStatus: " + getDebugManager().getProcessStatusText(getCurrentJobID(), element.getID()));
 		return buffer.toString();
 	}
 

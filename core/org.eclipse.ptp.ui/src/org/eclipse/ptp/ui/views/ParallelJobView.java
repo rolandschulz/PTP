@@ -47,10 +47,7 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public class ParallelJobView extends AbstractParallelSetView {
 	private static ParallelJobView instance = null;
-	
-	//job
-	protected String cur_job_id = "0";
-	
+		
 	//selected element
 	protected String cur_selected_element_id = "";
 	
@@ -162,7 +159,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 		update();
 	}
 	public ISetManager getCurrentSetManager() {
-		return manager.getSetManager(cur_job_id);
+		return manager.getSetManager(getCurrentJobID());
 	}
 
 	public static ParallelJobView getInstance() {
@@ -225,7 +222,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 	protected void doubleClickAction(int element_num) {
 		IElement element = cur_element_set.get(element_num);
 		if (element != null) {
-			openProcessViewer(getJobManager().findProcess(cur_job_id, element.getID()));
+			openProcessViewer(getJobManager().findProcess(getCurrentJobID(), element.getID()));
 		}
 	}
 	
@@ -248,20 +245,20 @@ public class ParallelJobView extends AbstractParallelSetView {
 			if (i < groups.length - 1)
 				buffer.append(",");
 		}
-		buffer.append("\nStatus: " + getJobManager().getProcessStatusText(cur_job_id, element.getID()));
+		buffer.append("\nStatus: " + getJobManager().getProcessStatusText(getCurrentJobID(), element.getID()));
 		return buffer.toString();
 	}
 
 	protected Image getStatusIcon(IElement element) {
-		int status = getJobManager().getProcessStatus(cur_job_id, element.getID());
+		int status = getJobManager().getProcessStatus(getCurrentJobID(), element.getID());
 		return procImages[status][element.isSelected() ? 1 : 0];
 	}
 	
 	public String getCurrentJobID() {
-		return cur_job_id;
+		return getJobManager().getCurrentJobId();
 	}
 	public void selectJob(String job_id) {
-		cur_job_id = job_id;
+		getJobManager().setCurrentJobId(job_id);
 		updateJob();
 	}
 	public void updateJob() {
@@ -272,7 +269,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 	}
 	public void updateTitle() {
 		if (cur_element_set != null) {
-			changeTitle(manager.getName(cur_job_id), cur_element_set.getID(), cur_set_size);
+			changeTitle(manager.getName(getCurrentJobID()), cur_element_set.getID(), cur_set_size);
 		}
 	}	
 

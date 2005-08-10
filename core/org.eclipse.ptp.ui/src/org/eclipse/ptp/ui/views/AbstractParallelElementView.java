@@ -87,7 +87,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	//protected final int hide_time = 2000;
 
 	// mouse
-	protected boolean isDoubleClick = false;
 	protected int keyCode = SWT.None;
 	protected int last_event_type = SWT.NONE;
 
@@ -295,7 +294,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	
 	protected void mouseUpEvent(int mx, int my) {
 		disposeSelectionArea();
-
 		if (isDragging())
 			selectedAreaInfo.removeAllBoundedElements();
 		else
@@ -311,8 +309,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		int element_num = findElementNum(mx, my);
 		if (element_num > -1)
 			doubleClickAction(element_num);
-
-		isDoubleClick = true;
 	}
 	protected void keyDownEvent(int mx, int my, int keyCode) {
 		hideToolTip();
@@ -356,7 +352,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	}
 
 	protected void clearMouseSetting() {
-		isDoubleClick = false;
 		drag_x = -1;
 		drag_y = -1;
 	}

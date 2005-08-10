@@ -127,7 +127,20 @@ public class JobManager implements IManager {
 		return modelManager.getUniverse().findJobByName(job_name);
 	}
 	public IPJob findJobById(String job_id) {
-		return (IPJob)modelManager.getUniverse().findChild(job_id);
+		System.out.println("-- ID: " + job_id);
+		IPElement element = modelManager.getUniverse().findChild(job_id);
+		if (element == null)
+			return findJobById2(job_id);
+		return (IPJob)element;
+	}
+	private IPJob findJobById2(String job_id) {
+		IPJob[] jobs = modelManager.getUniverse().getJobs();
+		for (int i=0; i<jobs.length; i++) {
+			System.out.println("Job: " + jobs[i].getIDString() + ", " + job_id);
+			if (jobs[i].getIDString().equals(job_id))
+				return jobs[i];
+		}
+		return null;		
 	}
 	//FIXME don't know whether it return machine or job
 	public String getName(String id) {
@@ -136,14 +149,6 @@ public class JobManager implements IManager {
 			return "";
 		
 		return element.getElementName();
-		/*
-		IPJob[] jobs = modelManager.getUniverse().getJobs();
-		for (int i=0; i<jobs.length; i++) {
-			if (jobs[i].getIDString().equals(id))
-				return jobs[i].getElementName();
-		}
-		return "";
-		*/
 	}
 	
 	public void addJob(IPJob job) {
@@ -163,15 +168,14 @@ public class JobManager implements IManager {
 	}	
 		
 	public String initial() {
-		String firstID = "";
 		IPJob[] jobs = getJobs();
 		if (jobs.length > 0) {
-			firstID = jobs[0].getIDString();
+			cur_job_id = jobs[0].getIDString();
 			for (int j=0; j<jobs.length; j++) {
 				if (!jobList.containsKey(jobs[j].getIDString()))
 					addJob(jobs[j]);
 			}
 		}
-		return firstID;
+		return cur_job_id;
 	}	
 }
