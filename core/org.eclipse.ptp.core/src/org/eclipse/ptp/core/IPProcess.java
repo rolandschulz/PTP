@@ -39,6 +39,8 @@ public interface IPProcess extends IPElement {
 
 	public String getPid();
 
+	public int getTaskId();
+	
 	public String getStatus();
 
 	public String getExitCode();

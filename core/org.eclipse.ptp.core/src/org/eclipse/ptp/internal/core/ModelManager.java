@@ -265,7 +265,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			// System.out.println("process name = "+ne[j]);
 			
 			int pid = controlSystem.getProcessPID(ne[j]);
-			proc = new PProcess(job, ne[j], "" + j + "", "" + pid + "", "-1",
+			proc = new PProcess(job, ne[j], "" + j + "", "" + pid + "", j, "-1",
 					"", "");
 			job.addChild(proc);
 

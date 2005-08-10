@@ -36,6 +36,8 @@ public class PProcess extends Parent implements IPProcess {
 
 	private String pid = null;
 
+	private int taskId = -1;
+
 	private String status = null;
 
 	private String exitCode = null;
@@ -59,10 +61,11 @@ public class PProcess extends Parent implements IPProcess {
 	 */
 	protected IPNode node;
 
-	public PProcess(IPElement element, String name, String key, String pid,
+	public PProcess(IPElement element, String name, String key, String pid, int taskId,
 			String status, String exitCode, String signalName) {
 		super(element, name, key, P_PROCESS);
 		this.pid = pid;
+		this.taskId = taskId;
 		this.exitCode = exitCode;
 		setStatus(status);
 		IPJob job = getJob();
@@ -198,5 +201,9 @@ public class PProcess extends Parent implements IPProcess {
 
 	public IPNode getNode() {
 		return this.node;
+	}
+
+	public int getTaskId() {
+		return taskId;
 	}
 }
