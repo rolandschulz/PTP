@@ -8,7 +8,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -144,16 +143,14 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		return null;
 	}
 	
-    public void addPerspectiveListener(final IPerspectiveListener perspectiveListener) {
-        IWorkbenchWindow workBenchWindow = PTPUIPlugin.getActiveWorkbenchWindow();
-        if (workBenchWindow instanceof WorkbenchWindow) {
-            workBenchWindow.addPerspectiveListener(perspectiveListener);
-        }
-    }
-    public void removePerspectiveListener(final IPerspectiveListener perspectiveListener) {
-        IWorkbenchWindow workBenchWindow = PTPUIPlugin.getActiveWorkbenchWindow();
-        if (workBenchWindow instanceof WorkbenchWindow) {
-            workBenchWindow.removePerspectiveListener(perspectiveListener);
-        }
-    }	
+	public String getCurrentPerspectiveID() {
+		return getActiveWorkbenchWindow().getActivePage().getPerspective().getId();
+	}
+	
+	public void addPersepectiveListener(IPerspectiveListener listener) {
+		getActiveWorkbenchWindow().addPerspectiveListener(listener);
+	}
+	public void removePersepectiveListener(IPerspectiveListener listener) {
+		getActiveWorkbenchWindow().removePerspectiveListener(listener);
+	}	
 }
