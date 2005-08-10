@@ -18,6 +18,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.DebugSession;
@@ -27,7 +28,7 @@ import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.event.EInferiorCreated;
 import org.eclipse.ptp.debug.external.model.MProcessSet;
 
-public class Session implements ICDISession, ICDISessionObject {
+public class Session implements IPCDISession, ICDISessionObject {
 	EventManager eventManager;
 	BreakpointManager breakpointManager;
 	
