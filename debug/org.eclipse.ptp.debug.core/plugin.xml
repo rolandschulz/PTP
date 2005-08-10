@@ -9,7 +9,10 @@
 
    <runtime>
       <library name="ptpdebugcore.jar">
-      	<export name="*"/>
+         <export name="org.eclipse.ptp.debug.core.*"/>
+         <export name="org.eclipse.ptp.debug.core.cdi.*"/>
+         <export name="org.eclipse.ptp.debug.core.cdi.model.*"/>
+         <export name="org.eclipse.ptp.debug.core.model.*"/>
       </library>
    </runtime>
 
