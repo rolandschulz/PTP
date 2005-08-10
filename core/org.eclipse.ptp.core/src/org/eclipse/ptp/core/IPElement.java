@@ -64,6 +64,16 @@ public interface IPElement extends ISearchPageScoreComputer {
 	public static final int P_PROCESS = 14;
 
 	/**
+	 * Searches for an attribute on the Element given the key.  The resulting
+	 * attribute Object is returned.  The returned may be null if the attribute
+	 * was not found.
+	 * 
+	 * @param key String key of the attribute to look for
+	 * @return Object of the attribute or null if not found
+	 */
+	public Object getAttribute(String key);
+	
+	/**
 	 * Returns a name for this Element so it can be distinguished from other
 	 * Elements as well as printed out easily.
 	 * 
