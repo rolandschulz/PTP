@@ -9,7 +9,16 @@
 
    <runtime>
       <library name="ptpdebugexternal.jar">
-      	<export name="*"/>
+         <export name="org.eclipse.ptp.debug.external.*"/>
+         <export name="org.eclipse.ptp.debug.external.actionpoint.*"/>
+         <export name="org.eclipse.ptp.debug.external.cdi.*"/>
+         <export name="org.eclipse.ptp.debug.external.cdi.event.*"/>
+         <export name="org.eclipse.ptp.debug.external.cdi.model.*"/>
+         <export name="org.eclipse.ptp.debug.external.event.*"/>
+         <export name="org.eclipse.ptp.debug.external.model.*"/>
+         <export name="org.eclipse.ptp.debug.external.simulator.*"/>
+         <export name="org.eclipse.ptp.debug.external.utils.*"/>
+         <export name="org.eclipse.ptp.debug.external.variable.*"/>
       </library>
    </runtime>
 
