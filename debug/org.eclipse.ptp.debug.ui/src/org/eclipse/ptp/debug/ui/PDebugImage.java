@@ -65,12 +65,22 @@ public class PDebugImage {
 	public static final String IMG_PRO_SUSPENDED_SEL = "suspended_sel.gif";
 	public static final String IMG_PRO_SUSPENDED = "suspended.gif";
 
-	public static final String IMG_DEBUG_BPT = "bpt.gif";
-	public static final String IMG_DEBUG_MULTISET = "multi_set.gif";
-	public static final String IMG_DEBUG_NOSET = "no_set.gif";
-	public static final String IMG_DEBUG_ERRORSET = "error_set.gif";
-	public static final String IMG_DEBUG_BPTENABLE = "bpt_enable.gif";
-	public static final String IMG_DEBUG_BPTDISABLE = "bpt_disable.gif";
+	public static final String IMG_DEBUG_ONESET_EN = "one_set_enable.gif";
+	public static final String IMG_DEBUG_MULTISET_EN = "multi_set_enable.gif";
+	public static final String IMG_DEBUG_NOSET_EN = "no_set_enable.gif";
+	public static final String IMG_DEBUG_ONESET_DI = "one_set_disable.gif";
+	public static final String IMG_DEBUG_MULTISET_DI = "multi_set_disable.gif";
+	public static final String IMG_DEBUG_NOSET_DI = "no_set_disable.gif";
+
+	//TODO
+	public static final String IMG_DEBUG_OVER_BPT_COND_EN = "conditional_ovr.gif";
+	public static final String IMG_DEBUG_OVER_BPT_COND_DI = "conditional_ovr_disabled.gif";
+	public static final String IMG_DEBUG_OVER_BPT_INST_EN = "installed_ovr.gif";
+	public static final String IMG_DEBUG_OVER_BPT_INST_DI = "installed_ovr_disabled.gif";
+	public static final String IMG_DEBUG_OVER_BPT_ADDR_EN = "address_ovr.gif";
+	public static final String IMG_DEBUG_OVER_BPT_ADDR_DI = "address_ovr_disabled.gif";
+	public static final String IMG_DEBUG_OVER_BPT_FUNC_EN = "function_ovr.gif";
+	public static final String IMG_DEBUG_OVER_BPT_FUNC_DI = "function_ovr_disabled.gif";
 	
 	public static final ImageDescriptor ID_ICON_RESUME_DISABLE = createImageDescriptor(TOOLICONURL, ICON_RESUME_DISABLE, ICON_RESUME_DISABLE);
 	public static final ImageDescriptor ID_ICON_RESUME_NORMAL = createImageDescriptor(TOOLICONURL, ICON_RESUME_NORMAL, ICON_RESUME_NORMAL);
@@ -100,12 +110,21 @@ public class PDebugImage {
 	public static final ImageDescriptor ID_IMG_PRO_SUSPENDED_SEL = createImageDescriptor(PROCESSICONURL, IMG_PRO_SUSPENDED_SEL, IMG_PRO_SUSPENDED_SEL);
 	public static final ImageDescriptor ID_IMG_PRO_SUSPENDED = createImageDescriptor(PROCESSICONURL, IMG_PRO_SUSPENDED, IMG_PRO_SUSPENDED);
 	
-	public static final ImageDescriptor ID_IMG_DEBUG_BPT = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_BPT, IMG_DEBUG_BPT);
-	public static final ImageDescriptor ID_IMG_DEBUG_MULTISET = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_MULTISET, IMG_DEBUG_MULTISET);
-	public static final ImageDescriptor ID_IMG_DEBUG_NOSET = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_NOSET, IMG_DEBUG_NOSET);
-	public static final ImageDescriptor ID_IMG_DEBUG_ERRORSET = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_ERRORSET, IMG_DEBUG_ERRORSET);
-	public static final ImageDescriptor ID_IMG_DEBUG_BPTENABLE = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_BPTENABLE, IMG_DEBUG_BPTENABLE);
-	public static final ImageDescriptor ID_IMG_DEBUG_BPTDISABLE = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_BPTDISABLE, IMG_DEBUG_BPTDISABLE);
+	public static final ImageDescriptor ID_IMG_DEBUG_ONESET_EN = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_ONESET_EN, IMG_DEBUG_ONESET_EN);
+	public static final ImageDescriptor ID_IMG_DEBUG_MULTISET_EN = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_MULTISET_EN, IMG_DEBUG_MULTISET_EN);
+	public static final ImageDescriptor ID_IMG_DEBUG_NOSET_EN = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_NOSET_EN, IMG_DEBUG_NOSET_EN);
+	public static final ImageDescriptor ID_IMG_DEBUG_ONESET_DI = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_ONESET_DI, IMG_DEBUG_ONESET_DI);
+	public static final ImageDescriptor ID_IMG_DEBUG_MULTISET_DI = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_MULTISET_DI, IMG_DEBUG_MULTISET_DI);
+	public static final ImageDescriptor ID_IMG_DEBUG_NOSET_DI = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_NOSET_DI, IMG_DEBUG_NOSET_DI);
+
+	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_COND_EN = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_COND_EN, IMG_DEBUG_OVER_BPT_COND_EN);
+	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_COND_DI = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_COND_DI, IMG_DEBUG_OVER_BPT_COND_DI);
+	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_INST_EN = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_INST_EN, IMG_DEBUG_OVER_BPT_INST_EN);
+	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_INST_DI = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_INST_DI, IMG_DEBUG_OVER_BPT_INST_DI);
+	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_ADDR_EN = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_ADDR_EN, IMG_DEBUG_OVER_BPT_ADDR_EN);
+	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_ADDR_DI = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_ADDR_DI, IMG_DEBUG_OVER_BPT_ADDR_DI);
+	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_FUNC_EN = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_FUNC_EN, IMG_DEBUG_OVER_BPT_FUNC_EN);
+	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_FUNC_DI = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_FUNC_DI, IMG_DEBUG_OVER_BPT_FUNC_DI);
 
 	public static Image getImage(String key) {
 		return getImageRegistry().get(key);

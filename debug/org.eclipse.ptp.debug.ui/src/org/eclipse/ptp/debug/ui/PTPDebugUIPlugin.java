@@ -21,12 +21,10 @@ package org.eclipse.ptp.debug.ui;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
 /**
  * @author clement chu
  * The main plugin class to be used in the desktop.
@@ -71,9 +69,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	 * This method is called when the plug-in is stopped
 	 */
 	public void stop(BundleContext context) throws Exception {
-		super.stop(context);
 		uiDebugManager.shutdown();
 		uiDebugManager = null;
+		super.stop(context);
 		plugin = null;
 		resourceBundle = null;
 	}
@@ -128,13 +126,5 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	
 	public String getCurrentPerspectiveID() {
 		return getActiveWorkbenchWindow().getActivePage().getPerspective().getId();
-	}
-	
-	public void testing() {
-		try {
-			Platform.getBundle("org.eclipse.cdt.debug.ui").uninstall();
-		} catch (BundleException e) {
-			System.out.println("err: " + e.getMessage());
-		}
-	}
+	}	
 }

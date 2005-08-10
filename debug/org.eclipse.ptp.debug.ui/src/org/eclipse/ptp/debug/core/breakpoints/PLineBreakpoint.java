@@ -31,6 +31,9 @@ import org.eclipse.core.runtime.CoreException;
 public class PLineBreakpoint extends AbstractLineBreakpoint {
 	private static final String P_LINE_BREAKPOINT = "org.eclipse.ptp.debug.ui.pLineBreakpointMarker";
 	
+	public PLineBreakpoint() {
+	}
+	
 	public PLineBreakpoint(IResource resource, Map attributes, boolean add) throws CoreException {
 		super(resource, getMarkerType(), attributes, add);
 	}
@@ -44,6 +47,6 @@ public class PLineBreakpoint extends AbstractLineBreakpoint {
 		if (fileName != null && fileName.length() > 0) {
 			fileName = ' ' + fileName + ' ';
 		}
-		return MessageFormat.format( BreakpointMessages.getString("PLineBreakpoint"), new Object[] { fileName, new Integer( getLineNumber() ), getConditionText() } );
+		return MessageFormat.format( BreakpointMessages.getString("PLineBreakpoint"), new Object[] { getSetId(), fileName, new Integer( getLineNumber() ), getConditionText() } );
 	}
 }

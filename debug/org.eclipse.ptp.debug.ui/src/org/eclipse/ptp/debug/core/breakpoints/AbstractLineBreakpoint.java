@@ -31,6 +31,10 @@ import org.eclipse.core.runtime.Path;
  *
  */
 public abstract class AbstractLineBreakpoint extends PBreakpoint implements IPLineBreakpoint {
+	public AbstractLineBreakpoint() {
+		super();
+	}
+
 	public AbstractLineBreakpoint(IResource resource, String markerType, Map attributes, boolean add) throws CoreException {
 		super(resource, markerType, attributes, add);
 	}
@@ -46,6 +50,23 @@ public abstract class AbstractLineBreakpoint extends PBreakpoint implements IPLi
 	public int getCharEnd() throws CoreException {
 		return ensureMarker().getAttribute(IMarker.CHAR_END, -1);
 	}
+	
+	public String getAddress() throws CoreException {
+		return ensureMarker().getAttribute(IPLineBreakpoint.ADDRESS, "");
+	}
+	
+	public String getFunction() throws CoreException {
+		return ensureMarker().getAttribute(IPLineBreakpoint.FUNCTION, "");
+	}
+	
+	public void setAddress(String address) throws CoreException {
+		setAttribute(IPLineBreakpoint.ADDRESS, address);
+	}
+	
+	public void setFunction(String function) throws CoreException {
+		setAttribute(IPLineBreakpoint.FUNCTION, function);
+	}
+	
 
 	public String getFileName() throws CoreException {
 		String fileName = getSourceHandle();

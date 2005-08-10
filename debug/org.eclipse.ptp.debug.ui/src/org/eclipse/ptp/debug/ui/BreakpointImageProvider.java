@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.ui;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -39,17 +38,10 @@ public class BreakpointImageProvider implements IAnnotationImageProvider {
 		if (annotation instanceof MarkerAnnotation) {
 			MarkerAnnotation markerAnnotation = (MarkerAnnotation)annotation;
 			IMarker marker = markerAnnotation.getMarker();
-			//remove(marker);
 			if (marker != null && marker.exists())
 				return getPresentation().getImage(marker);
 		}
 		return null;
-	}
-	//FIXME  temporary created to remove all marker
-	private void remove(IMarker marker) {
-		try {
-			marker.delete();
-		} catch (CoreException e) {}
 	}
 	
 	public String getImageDescriptorId(Annotation annotation) {
