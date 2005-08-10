@@ -47,8 +47,8 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	}
 	
 	public void shutdown() {
-		super.shutdown();
 		bptManager.getBreakpointManager().removeBreakpointListener(this);
+		super.shutdown();
 	}
 
 	public void unregisterElements(IElement[] elements) {
@@ -75,7 +75,6 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	
 	/******
 	 * Breakpoint
-	 * 
 	 ******/
 	public void breakpointAdded(IBreakpoint breakpoint) {
 		if (PTPDebugUIPlugin.getDefault().getCurrentPerspectiveID().equals(IPTPDebugUIConstants.PERSPECTIVE_DEBUG)) {
@@ -91,4 +90,28 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	}
 	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {}
 	public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {}	
+	
+    		/*
+    		 * Cannot unregister the extension
+    		final String CDT_DEBUG_UI_ID = "org.eclipse.cdt.debug.ui";    		
+		Bundle bundle = Platform.getBundle(CDT_DEBUG_UI_ID);
+		if (bundle != null && bundle.getState() == Bundle.ACTIVE) {
+			//ExtensionRegistry reg = (ExtensionRegistry) Platform.getExtensionRegistry();
+			//reg.remove(bundle.getBundleId());
+			try {
+				Platform.getBundle(CDT_DEBUG_UI_ID).uninstall();
+				System.out.println("Remove: " + bundle.getState());
+			} catch (BundleException e) {
+				System.out.println("Err: " + e.getMessage());
+			}
+		} 
+		if (bundle != null && bundle.getState() == Bundle.UNINSTALLED) {
+			try {
+				Platform.getBundle(CDT_DEBUG_UI_ID).start();
+				System.out.println("Add: " + bundle.getState());
+			} catch (BundleException e) {
+				System.out.println("Err: " + e.getMessage());
+			}
+		}
+		*/
 }
