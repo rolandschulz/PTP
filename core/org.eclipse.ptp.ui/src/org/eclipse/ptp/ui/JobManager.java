@@ -127,7 +127,6 @@ public class JobManager implements IManager {
 		return modelManager.getUniverse().findJobByName(job_name);
 	}
 	public IPJob findJobById(String job_id) {
-		System.out.println("-- ID: " + job_id);
 		IPElement element = modelManager.getUniverse().findChild(job_id);
 		if (element == null)
 			return findJobById2(job_id);
@@ -136,7 +135,6 @@ public class JobManager implements IManager {
 	private IPJob findJobById2(String job_id) {
 		IPJob[] jobs = modelManager.getUniverse().getJobs();
 		for (int i=0; i<jobs.length; i++) {
-			System.out.println("Job: " + jobs[i].getIDString() + ", " + job_id);
 			if (jobs[i].getIDString().equals(job_id))
 				return jobs[i];
 		}
