@@ -68,7 +68,8 @@ public class OMPIControlSystem implements IControlSystem {
         } catch(UnsatisfiedLinkError e) {
         		String str = "Unable to load library 'libptp_ompi_jni.jnilib'.  Make sure "+
         				"the library exists and the VM arguments point to the directory where "+
-        				"it resides.";
+        				"it resides.  In the 'Run...' set the VM Args to something like "+
+        				"-Djava.library.path=[home directory]/[eclipse workspace]/org.eclipse.ptp.core/ompi";
         		System.err.println(str);
         		CoreUtils.showErrorDialog("Dynamic Library Load Failed", str, null);
         		failed_load = 1;
