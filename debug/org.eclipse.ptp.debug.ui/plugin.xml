@@ -90,6 +90,30 @@
      <super
            type="org.eclipse.debug.core.breakpointMarker">
      </super>
+     <persistent
+           value="true">
+     </persistent>
+     <attribute
+           name="org.eclipse.ptp.debug.core.condition">
+     </attribute>
+     <attribute
+           name="org.eclipse.ptp.debug.core.ignoreCount">
+     </attribute>
+     <attribute
+           name="org.eclipse.ptp.debug.core.threadId">
+     </attribute>
+     <attribute
+           name="org.eclipse.ptp.debug.core.installCount">
+     </attribute>
+     <attribute
+           name="org.eclipse.ptp.debug.core.sourceHandle">
+     </attribute>
+     <attribute
+           name="org.eclipse.ptp.debug.core.jobid">
+     </attribute>
+     <attribute
+           name="org.eclipse.ptp.debug.core.setid">
+     </attribute>
    </extension>
    <extension
          id="commonPLineBreakpointMarker"
@@ -103,18 +127,6 @@
      <persistent
            value="true">
      </persistent>
-     <attribute
-           name="org.eclipse.ptp.debug.core.threadId">
-     </attribute>
-     <attribute
-           name="org.eclipse.ptp.debug.core.sourceHandle">
-     </attribute>
-     <attribute
-           name="org.eclipse.ptp.debug.core.jobid">
-     </attribute>
-     <attribute
-           name="org.eclipse.ptp.debug.core.setid">
-     </attribute>
    </extension>
    <extension
          id="pLineBreakpointMarker"
@@ -125,13 +137,74 @@
      <persistent
            value="true">
      </persistent>
+     <attribute
+           name="org.eclipse.ptp.debug.core.function">
+     </attribute>
+     <attribute
+           name="org.eclipse.ptp.debug.core.address">
+     </attribute>
    </extension>
+   <extension
+         id="pAddressBreakpointMarker"
+         point="org.eclipse.core.resources.markers">
+     <super
+           type="org.eclipse.ptp.debug.ui.commonPLineBreakpointMarker">
+     </super>
+     <persistent
+           value="true">
+     </persistent>
+   </extension>
+   <extension
+         id="pFunctionBreakpointMarker"
+         point="org.eclipse.core.resources.markers">
+     <super
+           type="org.eclipse.ptp.debug.ui.commonPLineBreakpointMarker">
+     </super>
+     <persistent
+           value="true">
+     </persistent>
+   </extension>
+   <extension
+         id="pWatchpointBreakpointMarker"
+         point="org.eclipse.core.resources.markers">
+     <super
+           type="org.eclipse.ptp.debug.ui.pBreakpointMarker">
+     </super>
+     <persistent
+           value="true">
+     </persistent>
+     <attribute
+           name="org.eclipse.ptp.debug.core.expression">
+     </attribute>
+     <attribute
+           name="org.eclipse.ptp.debug.core.write">
+     </attribute>
+     <attribute
+           name="org.eclipse.ptp.debug.core.read">
+     </attribute>
+   </extension>
+
    <extension
          point="org.eclipse.debug.core.breakpoints">
       <breakpoint
             markerType="org.eclipse.ptp.debug.ui.pLineBreakpointMarker"
             class="org.eclipse.ptp.debug.core.breakpoints.PLineBreakpoint"
             id="pLineBreakpoint">
+      </breakpoint>
+      <breakpoint
+            markerType="org.eclipse.ptp.debug.ui.pAddressBreakpointMarker"
+            class="org.eclipse.ptp.debug.core.breakpoints.PAddressBreakpoint"
+            id="pAddressBreakpoint">
+      </breakpoint>
+      <breakpoint
+            markerType="org.eclipse.ptp.debug.ui.pFunctionBreakpointMarker"
+            class="org.eclipse.ptp.debug.core.breakpoints.PFunctionBreakpoint"
+            id="pFunctionBreakpoint">
+      </breakpoint>
+      <breakpoint
+            markerType="org.eclipse.ptp.debug.ui.pWatchBreakpointMarker"
+            class="org.eclipse.ptp.debug.core.breakpoints.PWatchBreakpoint"
+            id="pWatchBreakpoint">
       </breakpoint>
    </extension>
 

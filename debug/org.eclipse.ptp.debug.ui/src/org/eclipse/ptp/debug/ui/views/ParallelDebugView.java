@@ -163,6 +163,16 @@ public class ParallelDebugView extends ParallelJobView implements IDebugParallel
 		}
 	}
 	
+	public void run() {
+		System.out.println("------------ run");		
+		initialView();
+		refresh();
+	}
+
+	public void start() {
+		System.out.println("------------ start");
+		refresh();
+	}
 	public void stop() {
 		refresh();
 	}
