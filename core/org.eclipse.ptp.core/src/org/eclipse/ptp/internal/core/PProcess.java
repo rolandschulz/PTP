@@ -22,6 +22,7 @@ import java.io.File;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPNode;
@@ -35,8 +36,6 @@ public class PProcess extends Parent implements IPProcess {
 	protected String NAME_TAG = "process ";
 
 	private String pid = null;
-
-	private int taskId = -1;
 
 	private String status = null;
 
@@ -65,7 +64,7 @@ public class PProcess extends Parent implements IPProcess {
 			String status, String exitCode, String signalName) {
 		super(element, name, key, P_PROCESS);
 		this.pid = pid;
-		this.taskId = taskId;
+		attribs.put(AttributeConstants.ATTRIB_TASKID, new Integer(taskId));
 		this.exitCode = exitCode;
 		setStatus(status);
 		IPJob job = getJob();
@@ -204,6 +203,6 @@ public class PProcess extends Parent implements IPProcess {
 	}
 
 	public int getTaskId() {
-		return taskId;
+		return ((Integer) attribs.get(AttributeConstants.ATTRIB_TASKID)).intValue();
 	}
 }
