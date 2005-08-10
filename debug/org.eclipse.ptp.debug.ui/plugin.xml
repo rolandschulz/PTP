@@ -66,13 +66,13 @@
             annotationImageProvider="org.eclipse.ptp.debug.ui.BreakpointImageProvider"
             annotationType="org.eclipse.ptp.debug.core.breakpoint"
             colorPreferenceValue="217,255,226"
+            highlightPreferenceValue="true"
             icon="icons/debug/bpt.gif">
             <!--
             verticalRulerPreferenceValue="true"
             colorPreferenceKey="ptpBreakpointColor"
             highlightPreferenceKey="ptpBreakpointHighlight"
             overviewRulerPreferenceValue="true"
-            highlightPreferenceValue="true"
             presentationLayer="3"
             label="PTP Breakpoint"
             textPreferenceValue="false"
@@ -113,6 +113,9 @@
      </attribute>
      <attribute
            name="org.eclipse.ptp.debug.core.setid">
+     </attribute>
+     <attribute
+           name="org.eclipse.ptp.debug.core.existed">
      </attribute>
    </extension>
    <extension

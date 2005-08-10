@@ -26,12 +26,19 @@ import org.eclipse.debug.core.model.IBreakpoint;
  *
  */
 public interface IPBreakpoint extends IBreakpoint {
+	public static final String INSTALL_COUNT = "org.eclipse.ptp.debug.core.installCount";
+	public static final String CONDITION = "org.eclipse.ptp.debug.core.condition";
+	public static final String IGNORE_COUNT = "org.eclipse.ptp.debug.core.ignoreCount";
 	public static final String THREAD_ID = "org.eclipse.ptp.debug.core.threadId";
 	public static final String MODULE = "org.eclipse.ptp.debug.core.module";
 	public static final String SOURCE_HANDLE = "org.eclipse.ptp.debug.core.sourceHandle";
 	
+	public static final String EXISTED = "org.eclipse.ptp.debug.core.existed";
 	public static final String JOB_ID = "org.eclipse.ptp.debug.core.jobid";
 	public static final String SET_ID = "org.eclipse.ptp.debug.core.setid";
+
+	public boolean isExisted() throws CoreException;
+	public void setExisted(boolean existed) throws CoreException;
 
 	public String getSetId() throws CoreException;
 	public void setSetId(String id) throws CoreException;
@@ -39,11 +46,27 @@ public interface IPBreakpoint extends IBreakpoint {
 	public String getJobId() throws CoreException;
 	public void setJobId(String id) throws CoreException;
 
+	public boolean isInstalled() throws CoreException;
+	public boolean isConditional() throws CoreException;
+	
+	public String getCondition() throws CoreException;
+	public void setCondition(String condition) throws CoreException;
+	
+	public int getIgnoreCount() throws CoreException;
+	public void setIgnoreCount(int ignoreCount) throws CoreException;
+	
 	public String getThreadId() throws CoreException;
 	public void setThreadId(String threadId) throws CoreException;
 	
+	public String getModule() throws CoreException;
+	public void setModule(String module) throws CoreException;
+	
 	public String getSourceHandle() throws CoreException;
 	public void setSourceHandle(String sourceHandle) throws CoreException;
+	
+	public int incrementInstallCount() throws CoreException;
+	public int decrementInstallCount() throws CoreException;
+	public void resetInstallCount() throws CoreException;
 	
 	//public void setTargetFilter(IPDebugTarget target) throws CoreException;
 	//public void removeTargetFilter(IPDebugTarget target) throws CoreException;

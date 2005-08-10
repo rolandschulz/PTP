@@ -16,41 +16,11 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import org.eclipse.swt.graphics.Image;
+package org.eclipse.ptp.debug.core.breakpoints;
 
 /**
  * @author Clement chu
  *
  */
-public class OverlayImageCache {
-	private Map cache = new HashMap();
-
-	public Image getImageFor(OverlayImageDescriptor imageDescriptor) {
-		Image image = (Image)getCache().get(imageDescriptor);
-		if (image == null) {
-			image = imageDescriptor.createImage();
-			getCache().put(imageDescriptor, image);
-		}
-		return image;
-	}
-
-	public void disposeAll() {
-		for (Iterator it = getCache().values().iterator(); it.hasNext();) {
-			Image image = (Image)it.next();
-			image.dispose();
-		}
-		getCache().clear();
-	}
-
-	private Map getCache() {
-		return cache;
-	}
+public interface IPFunctionBreakpoint extends IPLineBreakpoint {
 }
-
-
