@@ -126,9 +126,12 @@ public class JobManager implements IManager {
 	public IPJob findJob(String job_name) {
 		return modelManager.getUniverse().findJobByName(job_name);
 	}
+	public IPJob findJobById(String job_id) {
+		return (IPJob)modelManager.getUniverse().findChild(job_id);
+	}
 	//FIXME don't know whether it return machine or job
 	public String getName(String id) {
-		IPElement element = modelManager.getUniverse().findChild(id);
+		IPElement element = findJobById(id);
 		if (element == null)
 			return "";
 		
