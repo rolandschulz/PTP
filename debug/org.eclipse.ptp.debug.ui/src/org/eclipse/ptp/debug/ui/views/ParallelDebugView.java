@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.ui.views;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.ptp.debug.core.DebugManager;
 import org.eclipse.ptp.debug.core.IDebugParallelModelListener;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.UIDebugManager;
@@ -57,9 +56,6 @@ public class ParallelDebugView extends ParallelJobView implements IDebugParallel
 
 	public ParallelDebugView() {
 		manager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
-		//FIXME dummy only
-		if (getDebugManager().dummy)
-			DebugManager.getInstance().addListener(this);
 	}
 	
 	public UIDebugManager getDebugManager() {
@@ -138,13 +134,6 @@ public class ParallelDebugView extends ParallelJobView implements IDebugParallel
 		return buffer.toString();
 	}
 
-	public void dispose() {
-		super.dispose();
-		//FIXME dummy only
-		if (getDebugManager().dummy)
-			DebugManager.getInstance().removeListener(this);		
-	}
-	
 	public void registerElement(IElement element) {
 		if (element.isRegistered())
 			getDebugManager().unregisterElements(new IElement[] { element });
