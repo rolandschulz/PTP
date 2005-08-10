@@ -84,7 +84,7 @@ public class MachineManager implements IManager {
 	public String getCurrentMachineId() {
 		return cur_machine_id;
 	}
-	public void setCurrentJobId(String machine_id) {
+	public void setCurrentMachineId(String machine_id) {
 		cur_machine_id = machine_id;
 	}
 	
@@ -170,22 +170,32 @@ public class MachineManager implements IManager {
 		return modelManager.getUniverse().findNodeByName(getName(machine_id) + "_node" + node_id);
 	}
 	
+	public IPMachine findMachine(String machine_name) {
+		return (IPMachine)modelManager.getUniverse().findMachineByName(machine_name);
+	}	
+	public IPMachine findMachineById(String machine_id) {
+		IPElement element = modelManager.getUniverse().findChild(machine_id);
+		if (element == null)
+			return findMachineById2(machine_id);
+		return (IPMachine)element;
+	}
+	
+	public IPMachine findMachineById2(String machine_id) {
+		IPMachine[] macs = modelManager.getUniverse().getMachines();
+		for (int i=0; i<macs.length; i++) {
+			if (macs[i].getIDString().equals(machine_id))
+				return macs[i];
+		}
+		return null;
+	}
+	
 	//FIXME don't know whether it return machine or job
 	public String getName(String id) {
-		IPElement element = modelManager.getUniverse().findChild(id);
+		IPElement element = findMachineById(id);
 		if (element == null)
 			return "";
 		
 		return element.getElementName();
-		
-		/*
-		IPMachine[] macs = modelManager.getUniverse().getMachines();
-		for (int i=0; i<macs.length; i++) {
-			if (macs[i].getIDString().equals(id))
-				return macs[i].getElementName();
-		}
-		return "";
-		*/
 	}
 	
 	public void addMachine(IPMachine mac) {
@@ -205,16 +215,15 @@ public class MachineManager implements IManager {
 	}
 	
 	public String initial() {
-		String firstID = "";
 		IPMachine[] macs = getMachines();
 		if (macs.length > 0) {
-			firstID = macs[0].getIDString();
+			cur_machine_id = macs[0].getIDString();
 			for (int j=0; j<macs.length; j++) {
 				System.out.println(macs[j]);
 				if (!machineList.containsKey(macs[j].getIDString()))
 					addMachine(macs[j]);
 			}
 		}
-		return firstID;
+		return cur_machine_id;
 	}	
 }
