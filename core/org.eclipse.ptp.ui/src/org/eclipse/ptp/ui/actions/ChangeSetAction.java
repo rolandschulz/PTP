@@ -24,7 +24,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.model.ISetManager;
+import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
 /**
@@ -42,9 +42,9 @@ public class ChangeSetAction extends GotoDropDownAction {
 	
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
 	    	String curID = view.getCurrentSetID();    	
-	    	addAction(dropDownMenuMgr, ISetManager.SET_ROOT_ID, ISetManager.SET_ROOT_ID, curID);
+	    	addAction(dropDownMenuMgr, IElementHandler.SET_ROOT_ID, IElementHandler.SET_ROOT_ID, curID);
 	
-		ISetManager setManager = view.getCurrentSetManager();
+		IElementHandler setManager = view.getCurrentSetManager();
 		if (setManager == null)
 			return;
 
@@ -52,7 +52,7 @@ public class ChangeSetAction extends GotoDropDownAction {
 	    	if (sets.length > 1)
 	    		dropDownMenuMgr.add(new Separator());
 	    	for (int i=0; i<sets.length; i++) {
-	    		if (sets[i].getID().equals(ISetManager.SET_ROOT_ID))
+	    		if (sets[i].getID().equals(IElementHandler.SET_ROOT_ID))
 	    			continue;
 	    		
 	    		addAction(dropDownMenuMgr, sets[i].getID(), sets[i].getID(), curID);
@@ -69,7 +69,7 @@ public class ChangeSetAction extends GotoDropDownAction {
 	public void run(IElement[] elements) {}
 	
 	public void run() {
-		ISetManager setManager = view.getCurrentSetManager();
+		IElementHandler setManager = view.getCurrentSetManager();
 		if (setManager == null)
 			return;
 		
@@ -93,7 +93,7 @@ public class ChangeSetAction extends GotoDropDownAction {
 	}
 	
 	public void run(IElement[] elements, String id) {
-		ISetManager setManager = view.getCurrentSetManager();
+		IElementHandler setManager = view.getCurrentSetManager();
 		if (setManager == null)
 			return;
 		

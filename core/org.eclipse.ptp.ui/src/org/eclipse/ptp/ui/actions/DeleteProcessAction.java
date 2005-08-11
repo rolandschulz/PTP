@@ -24,7 +24,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.model.ISetManager;
+import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.old.UIUtils;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
@@ -47,7 +47,7 @@ public class DeleteProcessAction extends ParallelAction {
 			if (set.size() == elements.length) {
 				callDeleteGroupAction();
 			} else {
-				ISetManager setManager = view.getCurrentSetManager();
+				IElementHandler setManager = view.getCurrentSetManager();
 				if (setManager == null)
 					return;
 

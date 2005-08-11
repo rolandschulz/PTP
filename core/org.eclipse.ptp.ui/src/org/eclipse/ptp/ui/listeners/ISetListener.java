@@ -16,19 +16,19 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.model;
+package org.eclipse.ptp.ui.listeners;
+
+import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.model.IElementSet;
 
 /**
  * @author clement chu
  *
  */
-public interface ISetManager extends IContainer {
-	public static final String SET_ROOT_ID = "Root";	
-	public IElementSet getSetRoot();
-	
-	public IElementSet[] getSetsWithElement(String id);
-	public IElementSet[] getSortedSets();
-	public IElementSet[] getSets();
-	public IElementSet getSet(String id);
-	public IElementSet getSet(int index);
+public interface ISetListener {
+	public void changeSetEvent(IElementSet currentSet, IElementSet preSet);
+	public void createSetEvent(IElementSet set, IElement[] elements);
+	public void deleteSetEvent(IElementSet set);
+	public void addElementsEvent(IElementSet set, IElement[] elements);
+	public void removeElementsEvent(IElementSet set, IElement[] elements);
 }

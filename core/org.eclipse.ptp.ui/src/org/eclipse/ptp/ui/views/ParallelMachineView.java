@@ -29,7 +29,7 @@ import org.eclipse.ptp.ui.actions.ChangeMachineAction;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.model.ISetManager;
+import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -145,8 +145,8 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		}
 		update();
 	}
-	public ISetManager getCurrentSetManager() {
-		return getMachineManager().getSetManager(getCurrentMachineID());
+	public IElementHandler getCurrentSetManager() {
+		return getMachineManager().getElementHandler(getCurrentMachineID());
 	}
 
 	public static ParallelMachineView getInstance() {
@@ -274,7 +274,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	}
 	
 	protected String getToolTipText(int element_num) {
-		ISetManager setManager = getCurrentSetManager();
+		IElementHandler setManager = getCurrentSetManager();
 		if (setManager == null)
 			return "Unknown element";
 
@@ -309,7 +309,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		updateMachine();
 	}
 	public void updateMachine() {
-		ISetManager setManager = getCurrentSetManager();
+		IElementHandler setManager = getCurrentSetManager();
 		if (setManager != null) {			
 			selectSet(setManager.getSetRoot());
 		}

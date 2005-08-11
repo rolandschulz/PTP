@@ -25,8 +25,9 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.ptp.core.IParallelModelListener;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.PTPUIPlugin;
-import org.eclipse.ptp.ui.UIManager;
+import org.eclipse.ptp.ui.UISetManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 /**
@@ -40,11 +41,11 @@ public abstract class AbstractParallelView extends ViewPart implements ISelectio
 	 * store debug event listener
 	 */
 	protected List listeners = new ArrayList(0);
-	protected UIManager uiManager = null;
+	protected UISetManager uiSetManager = null;
 	
 	public AbstractParallelView() {
-		uiManager = PTPUIPlugin.getDefault().getUIManager();
-		uiManager.getModelManager().addParallelLaunchListener(this);
+		uiSetManager = PTPUIPlugin.getDefault().getUIManager();
+		PTPCorePlugin.getDefault().getModelManager().addParallelLaunchListener(this);
 	}
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
@@ -63,12 +64,12 @@ public abstract class AbstractParallelView extends ViewPart implements ISelectio
 	 */
 	public void dispose() {
 		listeners.clear();
-		uiManager.getModelManager().removeParallelLaunchListener(this);
+		PTPCorePlugin.getDefault().getModelManager().removeParallelLaunchListener(this);
 		super.dispose();
 	}
 	
-	public UIManager getUIManger() {
-		return uiManager;
+	public UISetManager getUIManger() {
+		return uiSetManager;
 	}
 	
 	protected Display getDisplay() {

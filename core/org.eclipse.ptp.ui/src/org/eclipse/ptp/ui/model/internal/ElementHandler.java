@@ -25,14 +25,14 @@ import java.util.List;
 import org.eclipse.ptp.ui.model.IContainer;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.model.ISetManager;
+import org.eclipse.ptp.ui.model.IElementHandler;
 
 /**
  * @author clement chu
  *
  */
-public class SetManager extends Container implements ISetManager {
-	public SetManager() {
+public class ElementHandler extends Container implements IElementHandler {
+	public ElementHandler() {
 		super(SET_ROOT_ID, SET_ROOT_ID, false, IContainer.SET_TYPE);
 		//create root 
 		add(new ElementSet(SET_ROOT_ID, SET_ROOT_ID));

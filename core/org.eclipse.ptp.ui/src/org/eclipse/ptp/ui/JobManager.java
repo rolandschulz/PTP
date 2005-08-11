@@ -26,10 +26,10 @@ import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.model.ISetManager;
 import org.eclipse.ptp.ui.model.internal.Element;
-import org.eclipse.ptp.ui.model.internal.SetManager;
+import org.eclipse.ptp.ui.model.internal.ElementHandler;
 
 /**
  * @author Clement chu
@@ -38,7 +38,7 @@ import org.eclipse.ptp.ui.model.internal.SetManager;
 public class JobManager implements IManager {
 	protected IModelManager modelManager = null;
 	protected Map jobList = new HashMap();
-	protected String cur_set_id = ISetManager.SET_ROOT_ID;
+	protected String cur_set_id = IElementHandler.SET_ROOT_ID;
 	protected String cur_job_id = "";
 	
 	public JobManager() {
@@ -50,9 +50,16 @@ public class JobManager implements IManager {
 		jobList = null;
 		modelManager = null;
 	}
+	
+	public boolean isNoJob() {
+		return isNoJob(cur_job_id);
+	}
+	public boolean isNoJob(String jid) {
+		return (jid == null || jid.length() == 0);
+	}
 
-	public ISetManager getSetManager(String id) {
-		return (ISetManager)jobList.get(id);
+	public IElementHandler getElementHandler(String id) {
+		return (IElementHandler)jobList.get(id);
 	}
 	
 	public int size() {
@@ -67,7 +74,7 @@ public class JobManager implements IManager {
 		return cur_job_id;
 	}
 	public void setCurrentJobId(String job_id) {
-		cur_job_id = job_id;
+		jobChangedEvent(job_id, cur_job_id);
 	}
 	
 	public String getCurrentSetId() {
@@ -116,6 +123,12 @@ public class JobManager implements IManager {
 	}
 	
 	//FIXME using id, or name
+	public IPProcess findProcessbyName(String job_id, String process_id) {
+		//FIXME HARDCODE
+		return modelManager.getUniverse().findProcessByName(getName(job_id) + "_process" + process_id);
+	}
+	
+	//FIXME using id, or name
 	public IPProcess findProcess(String job_id, String id) {
 		IPJob job = findJob(getName(job_id));
 		if (job == null)
@@ -153,15 +166,15 @@ public class JobManager implements IManager {
 		IPProcess[] pElements = job.getSortedProcesses();
 		int total_element = pElements.length;
 		if (total_element > 0) {
-			ISetManager setManager = new SetManager();
-			setManager.clearAll();
-			IElementSet set = setManager.getSetRoot();
+			IElementHandler elementHandler = new ElementHandler();
+			elementHandler.clearAll();
+			IElementSet set = elementHandler.getSetRoot();
 			for (int i=0; i<total_element; i++) {
 				//FIXME using id, or name
 				set.add(new Element(pElements[i].getIDString(), pElements[i].getPid()));
 			}
-			setManager.add(set);
-			jobList.put(job.getIDString(), setManager);
+			elementHandler.add(set);
+			jobList.put(job.getIDString(), elementHandler);
 		}
 	}	
 		
@@ -175,5 +188,9 @@ public class JobManager implements IManager {
 			}
 		}
 		return cur_job_id;
-	}	
+	}
+	
+	public void jobChangedEvent(String cur_jid, String pre_jid) {
+		cur_job_id = cur_jid;
+	}
 }

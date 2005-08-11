@@ -19,15 +19,22 @@
 package org.eclipse.ptp.debug.ui;
 
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
+import org.eclipse.cdt.debug.core.cdi.event.ICDICreatedEvent;
+import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
+import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
+import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.debug.core.IPDebugListener;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.breakpoints.PBreakpointManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.ui.JobManager;
 import org.eclipse.ptp.ui.model.IElement;
 
@@ -35,7 +42,7 @@ import org.eclipse.ptp.ui.model.IElement;
  * @author clement chu
  *
  */
-public class UIDebugManager extends JobManager implements IBreakpointListener {
+public class UIDebugManager extends JobManager implements IBreakpointListener, ICDIEventListener, IPDebugListener {
 	public final static int PROC_SUSPEND = 6;
 	public final static int PROC_HIT = 7;
 	
@@ -44,21 +51,45 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 	public UIDebugManager() {
 		bptManager = PBreakpointManager.getDefault();
 		bptManager.getBreakpointManager().addBreakpointListener(this);
+		PTPDebugCorePlugin.getDefault().addDebugSessionListener(this);
 	}
 	
 	public void shutdown() {
 		bptManager.getBreakpointManager().removeBreakpointListener(this);
+		PTPDebugCorePlugin.getDefault().removeDebugSessionListener(this);
 		super.shutdown();
+	}
+	
+	public void jobChangedEvent(String cur_jid, String pre_jid) {
+		super.jobChangedEvent(cur_jid, pre_jid);
+		createEventListener(cur_jid);
+	}
+
+	public void createEventListener(String job_id) {
+		ICDISession session = getDebugSession(job_id);
+		if (session != null)
+			session.getEventManager().addEventListener(this);
+	}
+	
+	public void removeEventListener(String job_id) {
+		ICDISession session = getDebugSession(job_id);
+		if (session != null)
+			session.getEventManager().removeEventListener(this);		
+	}
+	
+	public ICDISession getDebugSession(String job_id) {
+		if (isNoJob(job_id))
+			return null;
+
+		IPJob job = findJobById(job_id);
+		return PTPDebugCorePlugin.getDefault().getDebugSession(job);
 	}
 
 	public void unregisterElements(IElement[] elements) {
 		for (int i=0; i<elements.length; i++) {
 			//only unregister some registered elements
 			if (elements[i].isRegistered()) {
-				IPJob job = findJobById(getCurrentJobId());
-				ICDISession session = PTPDebugCorePlugin.getDefault().getDebugSession(job);
-				((IPCDISession)session).unregisterTarget(
-						findProcess(getCurrentJobId(), elements[i].getID()).getTaskId());
+				((IPCDISession)getDebugSession(getCurrentJobId())).unregisterTarget(Integer.parseInt(elements[i].getName()));
 				//System.out.println("Unregister: " + elements[i].getID());
 			}
 		}
@@ -68,10 +99,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		for (int i=0; i<elements.length; i++) {
 			//only register some unregistered elements
 			if (!elements[i].isRegistered()) {
-				IPJob job = findJobById(getCurrentJobId());
-				ICDISession session = PTPDebugCorePlugin.getDefault().getDebugSession(job);
-				((IPCDISession)session).registerTarget(
-						findProcess(getCurrentJobId(), elements[i].getID()).getTaskId());
+				((IPCDISession)getDebugSession(getCurrentJobId())).registerTarget(Integer.parseInt(elements[i].getName()));
 				//System.out.println("Register: " + elements[i].getID());
 			}
 		}
@@ -118,4 +146,62 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 			}
 		}
 		*/
+	
+	/*****
+	 * Event
+	 *****/
+	public void handleDebugEvents(ICDIEvent[] events) {
+		for (int i=0; i<events.length; i++) {
+			IPCDIEvent event = (IPCDIEvent)events[i];
+			
+			int[] processes = event.getProcesses();			
+			String job_id = getCurrentJobId();
+			if (event instanceof ICDISuspendedEvent) {
+				for (int j=0; j<processes.length; j++) {
+					IPProcess process = findProcessbyName(job_id, String.valueOf(processes[j]));
+					System.out.println("---------------- process suspend: " + process.getID());
+				}
+			}
+			else if (event instanceof ICDICreatedEvent) {
+				for (int j=0; j<processes.length; j++) {
+					IPProcess process = findProcessbyName(job_id, String.valueOf(processes[j]));
+					System.out.println("---------------- process created: " + process.getID());
+				}
+			}
+			
+			/*
+			if (source != null && source.getTarget().equals(getDebugTarget().getCDITarget())) {
+				if (event instanceof ICDICreatedEvent) {
+					if (source instanceof ICDIBreakpoint)
+						handleBreakpointCreatedEvent((ICDIBreakpoint)source);
+				}
+				else if (event instanceof ICDIDestroyedEvent) {
+					if (source instanceof ICDIBreakpoint)
+						handleBreakpointDestroyedEvent((ICDIBreakpoint)source);
+				}
+				else if (event instanceof ICDIChangedEvent) {
+					if (source instanceof ICDIBreakpoint)
+						handleBreakpointChangedEvent((ICDIBreakpoint)source);
+				}
+			}
+			
+			if (event instanceof ICDIExitedEvent) {
+				Object obj = ((ICDIExitedEvent)event).getSource();
+				
+			}
+			else if (event instanceof ICDICreatedEvent) {
+				
+			}
+			else if (event instanceof ICDISuspendedEvent) {
+				
+			}
+			else {
+				
+			}
+			*/
+		}
+	}
+	
+	public void update(IPCDISession session) {
+	}
 }

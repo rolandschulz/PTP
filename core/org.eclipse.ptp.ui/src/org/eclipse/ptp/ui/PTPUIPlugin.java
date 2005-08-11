@@ -22,7 +22,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
 	
-	private UIManager uiManager = null;
+	private UISetManager uiManager = null;
 	private MachineManager machineManager = null;
 	private JobManager jobManager = null;
 
@@ -39,7 +39,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		uiManager = new UIManager();
+		uiManager = new UISetManager();
 		machineManager = new MachineManager();
 		jobManager = new JobManager();
 	}
@@ -64,7 +64,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		return getDefault().getBundle().getSymbolicName();
 	}	
 	
-	public UIManager getUIManager() {
+	public UISetManager getUIManager() {
 		return uiManager;
 	}
 	public MachineManager getMachineManager() {

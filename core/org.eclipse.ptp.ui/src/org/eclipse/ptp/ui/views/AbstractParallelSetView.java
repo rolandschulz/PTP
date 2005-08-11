@@ -30,7 +30,7 @@ import org.eclipse.ptp.ui.actions.CreateSetAction;
 import org.eclipse.ptp.ui.actions.DeleteProcessAction;
 import org.eclipse.ptp.ui.actions.DeleteSetAction;
 import org.eclipse.ptp.ui.actions.ParallelAction;
-import org.eclipse.ptp.ui.model.ISetManager;
+import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.old.PTPUIPlugin;
 import org.eclipse.ptp.ui.views.old.ProcessEditorInput;
 import org.eclipse.swt.SWT;
@@ -123,7 +123,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	}
 	
 	protected void updateAction() {
-		boolean deleteActionEnable = manager.getCurrentSetId().equals(ISetManager.SET_ROOT_ID);
+		boolean deleteActionEnable = manager.getCurrentSetId().equals(IElementHandler.SET_ROOT_ID);
 		deleteSetAction.setEnabled(!deleteActionEnable);
 		deleteProcessAction.setEnabled(!deleteActionEnable);
 		createSetAction.setEnabled(cur_set_size > 0);
@@ -137,7 +137,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	}
 
 	public void removeProcess() {
-		if (!manager.getCurrentSetId().equals(ISetManager.SET_ROOT_ID)) {
+		if (!manager.getCurrentSetId().equals(IElementHandler.SET_ROOT_ID)) {
 			deleteProcessAction.run(cur_element_set.getSelectedElements());
 		}
 	}

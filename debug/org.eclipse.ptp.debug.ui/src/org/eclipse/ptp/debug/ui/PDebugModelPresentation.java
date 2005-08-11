@@ -42,7 +42,7 @@ import org.eclipse.ptp.debug.core.breakpoints.IPAddressBreakpoint;
 import org.eclipse.ptp.debug.core.breakpoints.IPBreakpoint;
 import org.eclipse.ptp.debug.core.breakpoints.IPFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.breakpoints.IPLineBreakpoint;
-import org.eclipse.ptp.ui.model.ISetManager;
+import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
@@ -202,7 +202,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			return new Image(null, 1, 1);
 		
 		String descriptor = null;
-		ISetManager setManager = uiDebugManager.getSetManager(job_id);
+		IElementHandler setManager = uiDebugManager.getElementHandler(job_id);
 		if (setManager == null) //no job running
 			descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_ONESET_EN : PDebugImage.IMG_DEBUG_ONESET_DI;
 		else {//created job

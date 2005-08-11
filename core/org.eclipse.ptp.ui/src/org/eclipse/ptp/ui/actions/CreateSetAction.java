@@ -25,7 +25,7 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.model.ISetManager;
+import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 /**
  * @author clement chu
@@ -42,7 +42,7 @@ public class CreateSetAction extends GotoDropDownAction {
 	
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
     	String curID = view.getCurrentSetID();
-		ISetManager setManager = view.getCurrentSetManager();
+		IElementHandler setManager = view.getCurrentSetManager();
 		if (setManager == null)
 			return;
 
@@ -64,7 +64,7 @@ public class CreateSetAction extends GotoDropDownAction {
 	
 	public void run(IElement[] elements, String setID) {
 		if (validation(elements)) {
-			final ISetManager setManager = view.getCurrentSetManager();
+			final IElementHandler setManager = view.getCurrentSetManager();
 			if (setManager == null)
 				return;
 			

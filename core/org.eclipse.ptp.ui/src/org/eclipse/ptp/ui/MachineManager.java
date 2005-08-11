@@ -28,9 +28,9 @@ import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.model.ISetManager;
+import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.internal.Element;
-import org.eclipse.ptp.ui.model.internal.SetManager;
+import org.eclipse.ptp.ui.model.internal.ElementHandler;
 
 /**
  * @author clement chu
@@ -57,7 +57,7 @@ public class MachineManager implements IManager {
 	
 	protected IModelManager modelManager = null;
 	private Map machineList = new HashMap();
-	protected String cur_set_id = ISetManager.SET_ROOT_ID;
+	protected String cur_set_id = IElementHandler.SET_ROOT_ID;
 	protected String cur_machine_id = "";
 
 	public MachineManager() {
@@ -70,8 +70,15 @@ public class MachineManager implements IManager {
 		modelManager = null;
 	}
 
-	public ISetManager getSetManager(String id) {
-		return (ISetManager)machineList.get(id);
+	public boolean isNoMachine() {
+		return isNoMachine(cur_machine_id);
+	}
+	public boolean isNoMachine(String machid) {
+		return (machid == null || machid.length() == 0);
+	}
+
+	public IElementHandler getElementHandler(String id) {
+		return (IElementHandler)machineList.get(id);
 	}
 	public int size() {
 		return machineList.size();
@@ -202,15 +209,15 @@ public class MachineManager implements IManager {
 		IPElement[] pElements = mac.getSortedNodes();
 		int total_element = pElements.length;
 		if (total_element > 0) {
-			ISetManager setManager = new SetManager();
-			setManager.clearAll();
-			IElementSet set = setManager.getSetRoot();
+			IElementHandler elementHandler = new ElementHandler();
+			elementHandler.clearAll();
+			IElementSet set = elementHandler.getSetRoot();
 			for (int i=0; i<total_element; i++) {
 				//FIXME using id, or name
 				set.add(new Element(pElements[i].getIDString(), pElements[i].getElementName()));
 			}
-			setManager.add(set);
-			machineList.put(mac.getIDString(), setManager);
+			elementHandler.add(set);
+			machineList.put(mac.getIDString(), elementHandler);
 		}
 	}
 	
