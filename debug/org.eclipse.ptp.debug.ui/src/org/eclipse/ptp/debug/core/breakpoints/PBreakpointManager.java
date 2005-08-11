@@ -59,23 +59,19 @@ public class PBreakpointManager {
 	}
 	
 	public IBreakpoint addRemoveBreakpoint(String sourceHandle, IResource resource, int lineNumber, boolean enabled, boolean register, String set_id, String job_id) throws CoreException {
-		IPLineBreakpoint breakpoint = isBreakpointCreated(sourceHandle, resource, lineNumber, set_id, job_id);
+		IPLineBreakpoint breakpoint = isPBreakpointExisted(sourceHandle, resource, lineNumber);
 		if (breakpoint == null)
 			return createLineBreakpoint(sourceHandle, resource, lineNumber, enabled, register, set_id, job_id);
 
-		IPBreakpoint matchBpt = isPBreakpointExisted(breakpoint);
-		if (matchBpt != null) {
-			matchBpt.setExisted(false);
-		}		
 		getBreakpointManager().removeBreakpoint(breakpoint, true);
 		return null;
 	}
-	public IPLineBreakpoint isBreakpointCreated(String sourceHandle, IResource resource, int lineNumber, String set_id, String job_id) throws CoreException {
+	public IPLineBreakpoint isPBreakpointExisted(String sourceHandle, IResource resource, int lineNumber, String set_id, String job_id) throws CoreException {
 		IBreakpoint[] breakpoints = getPBreakpoints();
 		for(int i=0; i<breakpoints.length; i++) {
-			if (!(breakpoints[i] instanceof IPLineBreakpoint)) {
+			if (!(breakpoints[i] instanceof IPLineBreakpoint))
 				continue;
-			}
+
 			IPLineBreakpoint breakpoint = (IPLineBreakpoint)breakpoints[i];
 			if (sameSourceHandle(sourceHandle, breakpoint.getSourceHandle())) {
 				if (breakpoint.getMarker().getResource().equals(resource)) {
@@ -107,14 +103,6 @@ public class PBreakpointManager {
 		attributes.put(IPBreakpoint.SET_ID, set_id);
 		attributes.put(IPBreakpoint.JOB_ID, job_id);
 		
-		IPBreakpoint bpt = isPBreakpointExisted(sourceHandle, resource, lineNumber);
-		if (bpt == null) {
-			attributes.put(IPBreakpoint.EXISTED, new Boolean(false));
-		} else {
-			bpt.setExisted(true);
-			attributes.put(IPBreakpoint.EXISTED, new Boolean(true));
-		}
-		
 		return new PLineBreakpoint(resource, attributes, register);
 	}
 	
@@ -130,12 +118,12 @@ public class PBreakpointManager {
 		return isPBreakpointExisted(sourceHandle, resource, lineNumber);
 	}
 
-	public IPBreakpoint isPBreakpointExisted(String sourceHandle, IResource resource, int lineNumber) throws CoreException {
+	public IPLineBreakpoint isPBreakpointExisted(String sourceHandle, IResource resource, int lineNumber) throws CoreException {
 		IBreakpoint[] breakpoints = getPBreakpoints();
 		for(int i=0; i<breakpoints.length; i++) {
-			if (!(breakpoints[i] instanceof IPLineBreakpoint)) {
+			if (!(breakpoints[i] instanceof IPLineBreakpoint))
 				continue;
-			}
+
 			IPLineBreakpoint breakpoint = (IPLineBreakpoint)breakpoints[i];
 			if (sameSourceHandle(sourceHandle, breakpoint.getSourceHandle())) {
 				if (breakpoint.getMarker().getResource().equals(resource)) {

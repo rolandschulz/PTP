@@ -128,12 +128,6 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 	public void setJobId(String id) throws CoreException {
 		setAttribute(JOB_ID, id);
 	}
-	public boolean isExisted() throws CoreException {
-		return ensureMarker().getAttribute(EXISTED, false);
-	}
-	public void setExisted(boolean existed) throws CoreException {
-		setAttribute(EXISTED, existed);
-	}
 
 	protected void run(IWorkspaceRunnable wr) throws DebugException {
 		try {
