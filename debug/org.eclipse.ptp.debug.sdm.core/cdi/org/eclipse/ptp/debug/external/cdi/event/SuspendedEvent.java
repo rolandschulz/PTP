@@ -17,6 +17,7 @@ import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.external.cdi.BreakpointHit;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
@@ -26,7 +27,7 @@ import org.eclipse.ptp.debug.external.event.EBreakpointHit;
 /**
  *
  */
-public class SuspendedEvent implements ICDISuspendedEvent {
+public class SuspendedEvent implements ICDISuspendedEvent, IPCDIEvent {
 	Session session;	
 	ICDIObject[] sources;
 	DebugEvent event;
@@ -92,5 +93,24 @@ public class SuspendedEvent implements ICDISuspendedEvent {
 		//return target;
 		
 		return null;
+	}
+	
+	public ICDIObject[] getSources() {
+		// Auto-generated method stub
+		System.out.println("SuspendedEvent.getSources()");
+	
+		ArrayList sourceList = new ArrayList();
+		
+		Hashtable table = event.getSources();
+		int[] registeredTargets = session.getRegisteredTargetIds();
+		
+		for (int j = 0; j < registeredTargets.length; j++) {
+			Integer targetId = new Integer(registeredTargets[j]);
+			if (table.containsKey(targetId)) {
+				sourceList.add(session.getTarget(targetId.intValue()));
+			}
+		}
+		
+		return (ICDIObject[]) sourceList.toArray(new ICDIObject[0]);
 	}
 }
