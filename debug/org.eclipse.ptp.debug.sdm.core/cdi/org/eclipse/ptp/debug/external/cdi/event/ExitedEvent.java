@@ -29,6 +29,7 @@ public class ExitedEvent implements ICDIExitedEvent, IPCDIEvent {
 	Session session;
 	ICDIObject[] sources;
 	DebugEvent event;
+	int[] processes;
 
 	public ExitedEvent(Session s, EExit ev) {
 		session = s;
@@ -36,6 +37,7 @@ public class ExitedEvent implements ICDIExitedEvent, IPCDIEvent {
 		
 		Hashtable table = ev.getSources();
 		ArrayList sourceList = new ArrayList();
+		processes = ev.getProcesses();
 		
 		int[] registeredTargets = session.getRegisteredTargetIds();
 		
@@ -74,5 +76,9 @@ public class ExitedEvent implements ICDIExitedEvent, IPCDIEvent {
 	
 	public ICDIObject[] getSources() {
 		return sources;
+	}
+	
+	public int[] getProcesses() {
+		return processes;
 	}
 }

@@ -70,7 +70,7 @@ public class SimThread {
 			
 			Integer proc = new Integer(processId);
 			table.put(proc, new int[] {threadId});
-			dSim.fireEvent(new EBreakpointHit(table));
+			dSim.fireEvent(new EBreakpointHit(table, new int[] {processId}));
 			// Do Something
 		}
 	}
