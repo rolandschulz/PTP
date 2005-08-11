@@ -29,12 +29,14 @@ import org.eclipse.ptp.ui.model.IElementSet;
  * @author clement chu
  *
  */
-public class ElementSet extends Container implements IElementSet {	
-	public ElementSet(String id) {
-		this(id, false);
+public class ElementSet extends Container implements IElementSet {
+	private List matchSets = new ArrayList(0);
+	
+	public ElementSet(String id, String name) {
+		this(id, name, false);
 	}
-	public ElementSet(String id, boolean selected) {
-		super(id, selected, IContainer.ELEMENT_TYPE);
+	public ElementSet(String id, String name, boolean selected) {
+		super(id, name, selected, IContainer.ELEMENT_TYPE);
 	}
 	public IElement[] getSelectedElements() {
 		List selectedElements = new ArrayList();
@@ -80,5 +82,19 @@ public class ElementSet extends Container implements IElementSet {
 	}
 	public IElement getElement(int index) {
 		return get(index);
+	}
+	public void addMatchSet(String setId) {
+		if (!matchSets.contains(setId))
+			matchSets.add(setId);
+	}
+	public void removeMatchSet(String setId) {
+		if (matchSets.contains(setId))
+			matchSets.remove(setId);
+	}
+	public String[] getMatchSets() {
+		return (String[])matchSets.toArray(new String[matchSets.size()]);
+	}
+	public boolean containOtherSets() {
+		return (matchSets.size()>0);
 	}
 }

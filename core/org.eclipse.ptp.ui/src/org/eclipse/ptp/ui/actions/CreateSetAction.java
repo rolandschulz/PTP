@@ -84,7 +84,8 @@ public class CreateSetAction extends GotoDropDownAction {
 				if (inputDialog.open() == InputDialog.CANCEL)
 					return;
 
-				setID = view.getUIManger().createSet(elements, inputDialog.getValue(), setManager);				
+				String name = inputDialog.getValue();
+				setID = view.getUIManger().createSet(elements, name, name, setManager);				
 			} else
 				view.getUIManger().addToSet(elements, setID, setManager);
 			

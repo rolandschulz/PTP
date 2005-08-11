@@ -33,13 +33,13 @@ import org.eclipse.ptp.ui.model.ISetManager;
  */
 public class SetManager extends Container implements ISetManager {
 	public SetManager() {
-		super(SET_ROOT_ID, false, IContainer.SET_TYPE);
+		super(SET_ROOT_ID, SET_ROOT_ID, false, IContainer.SET_TYPE);
 		//create root 
-		add(new ElementSet(SET_ROOT_ID));
+		add(new ElementSet(SET_ROOT_ID, SET_ROOT_ID));
 	}
 	public IElementSet getSetRoot() {
 		if (size() == 0)
-			add(new ElementSet(SET_ROOT_ID));
+			add(new ElementSet(SET_ROOT_ID, SET_ROOT_ID));
 		
 		return (IElementSet)get(SET_ROOT_ID);
 	}

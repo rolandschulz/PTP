@@ -150,7 +150,7 @@ public class JobManager implements IManager {
 	}
 	
 	public void addJob(IPJob job) {
-		IPElement[] pElements = job.getSortedProcesses();
+		IPProcess[] pElements = job.getSortedProcesses();
 		int total_element = pElements.length;
 		if (total_element > 0) {
 			ISetManager setManager = new SetManager();
@@ -158,7 +158,7 @@ public class JobManager implements IManager {
 			IElementSet set = setManager.getSetRoot();
 			for (int i=0; i<total_element; i++) {
 				//FIXME using id, or name
-				set.add(new Element(pElements[i].getIDString()));
+				set.add(new Element(pElements[i].getIDString(), pElements[i].getPid()));
 			}
 			setManager.add(set);
 			jobList.put(job.getIDString(), setManager);
