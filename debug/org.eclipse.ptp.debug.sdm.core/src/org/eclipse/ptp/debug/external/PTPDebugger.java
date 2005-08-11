@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.IPTPDebugger;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.external.cdi.Session;
 
 public class PTPDebugger implements IPTPDebugger {
@@ -14,7 +15,10 @@ public class PTPDebugger implements IPTPDebugger {
 			DebugSession debug = new DebugSession(job);
 
 			Session session = new Session(debug, launch, exe);
-						
+			
+			/* Make the Debug Session accessible by others through the PTPDebugCorePlugin */
+			PTPDebugCorePlugin.getDefault().addDebugSession(job, session);
+			
 			return session;
 			
 		} catch (Exception e) {

@@ -12,6 +12,7 @@ package org.eclipse.ptp.debug.core;
 
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Observer;
 
 import org.eclipse.cdt.debug.core.ICBreakpointListener;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
@@ -29,6 +30,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.internal.core.ListenerList;
 import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
 import org.eclipse.ptp.debug.internal.core.SessionManager;
@@ -65,6 +67,8 @@ public class PTPDebugCorePlugin extends Plugin {
 	private SessionManager fSessionManager = null;
 	
 	private Hashtable fDebugSessions = null;
+	
+	private ListenerList fDebugSessionListeners;
 
 	/**
 	 * The constructor.
@@ -234,10 +238,32 @@ public class PTPDebugCorePlugin extends Plugin {
 		fBreakpointListeners.removeAll();
 		fBreakpointListeners = null;
 	}
-	
+
+	/* Debug Session Listeners */
+
+	public void addDebugSessionListener( Observer listener ) {
+		fDebugSessionListeners.add( listener );
+	}
+
+	public void removeDebugSessionListener( Observer listener ) {
+		fDebugSessionListeners.remove( listener );
+	}
+
+	private void createDebugSessionListenersList() {
+		fDebugSessionListeners = new ListenerList( 1 );
+	}
+
+	private void disposeDebugSessionListenersList() {
+		fDebugSessionListeners.removeAll();
+		fDebugSessionListeners = null;
+	}
 	
 	public void addDebugSession(IPJob job, ICDISession session) {
 		fDebugSessions.put(job, session);
+		
+		Object[] listeners = fDebugSessionListeners.getListeners();
+		for( int i = 0; i < listeners.length; ++i )
+			((IPDebugListener)listeners[i]).update((IPCDISession) session);
 	}
 	
 	public ICDISession getDebugSession(IPJob job) {
@@ -256,6 +282,7 @@ public class PTPDebugCorePlugin extends Plugin {
 		super.start( context );
 		fDebugSessions = new Hashtable();
 		createBreakpointListenersList();
+		createDebugSessionListenersList();
 		resetBreakpointsInstallCount();
 		setSessionManager( new SessionManager() );
 	}
@@ -265,6 +292,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	 */
 	public void stop( BundleContext context ) throws Exception {
 		setSessionManager( null );
+		disposeDebugSessionListenersList();
 		disposeBreakpointListenersList();
 		resetBreakpointsInstallCount();
 		fDebugSessions.clear();
