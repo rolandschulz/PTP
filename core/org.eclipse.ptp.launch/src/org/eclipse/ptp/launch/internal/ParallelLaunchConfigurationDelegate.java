@@ -211,9 +211,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				ICDISession dsession = null;
 				
 				dsession = (ICDISession) debugConfig.createDebugger().createDebuggerSession(job, launch, exeFile, monitor);
-				
-				/* Make the Debug Session accessible by others through the PTPDebugCorePlugin */
-				PTPDebugCorePlugin.getDefault().addDebugSession(job, dsession);
 			}
 			else if (mode.equals(ILaunchManager.RUN_MODE)) {
 				Process process = DebugPlugin.exec(commandLine, null);
