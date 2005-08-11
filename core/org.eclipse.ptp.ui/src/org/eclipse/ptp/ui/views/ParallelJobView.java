@@ -28,7 +28,7 @@ import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.actions.TerminateAllAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.model.ISetManager;
+import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -158,8 +158,8 @@ public class ParallelJobView extends AbstractParallelSetView {
 		}
 		update();
 	}
-	public ISetManager getCurrentSetManager() {
-		return manager.getSetManager(getCurrentJobID());
+	public IElementHandler getCurrentSetManager() {
+		return manager.getElementHandler(getCurrentJobID());
 	}
 
 	public static ParallelJobView getInstance() {
@@ -188,9 +188,6 @@ public class ParallelJobView extends AbstractParallelSetView {
 				IPJob job = getJobManager().findJob(jobName);
 				
 				if (job != null) {
-					//new TableItem(jobInfoTable, 0).setText(new String[] { "Total procsses", String.valueOf(job.totalProcesses()) });
-					//new TableItem(jobInfoTable, 0).setText(new String[] { "Used nodes", String.valueOf(job.totalNodes()) });
-	
 					selectJob(job.getIDString());
 					update();
 					refresh();
@@ -227,7 +224,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 	}
 	
 	protected String getToolTipText(int element_num) {
-		ISetManager setManager = getCurrentSetManager();
+		IElementHandler setManager = getCurrentSetManager();
 		if (setManager == null)
 			return "Unknown element";
 
@@ -262,7 +259,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 		updateJob();
 	}
 	public void updateJob() {
-		ISetManager setManager = getCurrentSetManager();
+		IElementHandler setManager = getCurrentSetManager();
 		if (setManager != null) {			
 			selectSet(setManager.getSetRoot());
 		}

@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui;
 
-import org.eclipse.ptp.ui.model.ISetManager;
+import org.eclipse.ptp.ui.model.IElementHandler;
 
 /**
  * @author clement chu
@@ -28,7 +28,7 @@ public interface IManager {
 	public void shutdown();
 	public int size();
 	public String initial();
-	public ISetManager getSetManager(String id);
+	public IElementHandler getElementHandler(String id);
 	public String getName(String id);
 	
 	public String getCurrentSetId();

@@ -26,9 +26,10 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.UISetManager;
 import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.model.ISetManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.PaintEvent;
@@ -835,8 +836,13 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	public String getCurrentSetID() {
 		return manager.getCurrentSetId();
 	}
+	
+	public void fireChangeEvent(IElementSet cur_set, IElementSet pre_set) {
+		uiSetManager.fireEvent(UISetManager.CHANGE_SET_TYPE, null, cur_set, pre_set);
+	}
 
 	public void selectSet(IElementSet set) {
+		fireChangeEvent(set, cur_element_set);
 		deSelectSet();
 		cur_element_set = set;
 		cur_set_size = cur_element_set.size();
@@ -887,7 +893,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	//set update view details
 	public abstract void update();
 	
-	public abstract ISetManager getCurrentSetManager();
+	public abstract IElementHandler getCurrentSetManager();
 	
 	private void elementRedraw() {
 		elementRedraw(0, sc.getOrigin().y, view_width, view_height, false);

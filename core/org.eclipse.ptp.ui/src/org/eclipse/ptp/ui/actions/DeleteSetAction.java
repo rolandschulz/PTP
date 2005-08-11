@@ -19,10 +19,10 @@
 package org.eclipse.ptp.ui.actions;
 
 import org.eclipse.ptp.ui.ParallelImages;
-import org.eclipse.ptp.ui.UIManager;
+import org.eclipse.ptp.ui.UISetManager;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.model.ISetManager;
+import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.old.UIUtils;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
 
@@ -43,12 +43,12 @@ public class DeleteSetAction extends ParallelAction {
 	public void run() {
 		IElementSet set = view.getCurrentSet();
 		if (set != null && set.size() > 0) {
-			ISetManager setManager = view.getCurrentSetManager();
+			IElementHandler setManager = view.getCurrentSetManager();
 			if (setManager == null)
 				return;
 
 			if (UIUtils.showQuestionDialog(name + " " + set.getID() + " Confirmation", "Are you sure you want to delete all elements from this set?")) {
-				UIManager uiManager = view.getUIManger();
+				UISetManager uiManager = view.getUIManger();
 				uiManager.removeSet(set.getID(), setManager);
 						
 				IElementSet[] sets = setManager.getSortedSets();
