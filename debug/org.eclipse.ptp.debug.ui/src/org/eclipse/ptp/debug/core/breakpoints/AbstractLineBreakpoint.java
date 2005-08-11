@@ -67,7 +67,6 @@ public abstract class AbstractLineBreakpoint extends PBreakpoint implements IPLi
 		setAttribute(IPLineBreakpoint.FUNCTION, function);
 	}
 	
-
 	public String getFileName() throws CoreException {
 		String fileName = getSourceHandle();
 		IPath path = new Path(fileName);

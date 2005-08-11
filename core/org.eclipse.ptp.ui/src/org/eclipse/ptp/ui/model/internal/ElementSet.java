@@ -97,4 +97,7 @@ public class ElementSet extends Container implements IElementSet {
 	public boolean containOtherSets() {
 		return (matchSets.size()>0);
 	}
+	public boolean isContainSets(String set_id) {
+		return matchSets.contains(set_id);
+	}
 }

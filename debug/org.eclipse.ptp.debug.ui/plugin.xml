@@ -91,7 +91,7 @@
            type="org.eclipse.debug.core.breakpointMarker">
      </super>
      <persistent
-           value="true">
+           value="false">
      </persistent>
      <attribute
            name="org.eclipse.ptp.debug.core.condition">
@@ -114,9 +114,6 @@
      <attribute
            name="org.eclipse.ptp.debug.core.setid">
      </attribute>
-     <attribute
-           name="org.eclipse.ptp.debug.core.existed">
-     </attribute>
    </extension>
    <extension
          id="commonPLineBreakpointMarker"
@@ -128,7 +125,7 @@
            type="org.eclipse.debug.core.lineBreakpointMarker">
      </super>
      <persistent
-           value="true">
+           value="false">
      </persistent>
    </extension>
    <extension
@@ -138,7 +135,7 @@
            type="org.eclipse.ptp.debug.ui.commonPLineBreakpointMarker">
      </super>
      <persistent
-           value="true">
+           value="false">
      </persistent>
      <attribute
            name="org.eclipse.ptp.debug.core.function">
@@ -154,7 +151,7 @@
            type="org.eclipse.ptp.debug.ui.commonPLineBreakpointMarker">
      </super>
      <persistent
-           value="true">
+           value="false">
      </persistent>
    </extension>
    <extension
@@ -164,7 +161,7 @@
            type="org.eclipse.ptp.debug.ui.commonPLineBreakpointMarker">
      </super>
      <persistent
-           value="true">
+           value="false">
      </persistent>
    </extension>
    <extension
@@ -174,7 +171,7 @@
            type="org.eclipse.ptp.debug.ui.pBreakpointMarker">
      </super>
      <persistent
-           value="true">
+           value="false">
      </persistent>
      <attribute
            name="org.eclipse.ptp.debug.core.expression">

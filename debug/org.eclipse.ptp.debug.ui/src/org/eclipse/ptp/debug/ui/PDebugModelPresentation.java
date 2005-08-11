@@ -42,6 +42,7 @@ import org.eclipse.ptp.debug.core.breakpoints.IPAddressBreakpoint;
 import org.eclipse.ptp.debug.core.breakpoints.IPBreakpoint;
 import org.eclipse.ptp.debug.core.breakpoints.IPFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.breakpoints.IPLineBreakpoint;
+import org.eclipse.ptp.ui.model.ISetManager;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
@@ -55,6 +56,7 @@ import org.eclipse.ui.part.FileEditorInput;
  */
 public class PDebugModelPresentation extends LabelProvider implements IDebugModelPresentation {
 	private static PDebugModelPresentation instance = null;
+	public final static String DISPLAY_FULL_PATHS = "DISPLAY_FULL_PATHS";
 	
 	protected UIDebugManager uiDebugManager = null;
 	protected Map attributes = new HashMap(3);
@@ -192,16 +194,31 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	}
 	
 	protected Image getLineBreakpointImage(IPLineBreakpoint breakpoint) throws CoreException {
-		String descriptor = null;
+		String job_id = breakpoint.getJobId();
+		String cur_job_id = uiDebugManager.getCurrentJobId();
+
+		// Display nothing if the breakpoint is not in current job
+		if (cur_job_id != null && !cur_job_id.equals(job_id))
+			return new Image(null, 1, 1);
 		
-		String cur_set_id = uiDebugManager.getCurrentSetId();
-		if (breakpoint.isExisted()) {
-			descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_MULTISET_EN : PDebugImage.IMG_DEBUG_MULTISET_DI;
-		} else {
-			if (breakpoint.getSetId().equals(cur_set_id))
+		String descriptor = null;
+		ISetManager setManager = uiDebugManager.getSetManager(job_id);
+		if (setManager == null) //no job running
+			descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_ONESET_EN : PDebugImage.IMG_DEBUG_ONESET_DI;
+		else {//created job
+			String cur_set_id = uiDebugManager.getCurrentSetId();
+			String bpt_set_id = breakpoint.getSetId();
+			boolean hasOthersSet = setManager.getSet(bpt_set_id).isContainSets(cur_set_id);
+			
+			if (bpt_set_id.equals(cur_set_id)) {
 				descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_ONESET_EN : PDebugImage.IMG_DEBUG_ONESET_DI;
-			else
-				descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_NOSET_EN : PDebugImage.IMG_DEBUG_NOSET_DI;
+			}
+			else {
+				if (hasOthersSet)
+					descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_MULTISET_EN : PDebugImage.IMG_DEBUG_MULTISET_DI;
+				else
+					descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_NOSET_EN : PDebugImage.IMG_DEBUG_NOSET_DI;
+			}
 		}
 		return getImageCache().getImageFor(new OverlayImageDescriptor(PDebugImage.getImage(descriptor), computeBreakpointOverlays(breakpoint)));
 	}
@@ -262,12 +279,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	}
 
 	protected boolean isShowQualifiedNames() {
-		return true;
-		/*
 		Boolean showQualified = (Boolean)getAttributes().get(DISPLAY_FULL_PATHS);
 		showQualified = showQualified == null ? Boolean.FALSE : showQualified;
 		return showQualified.booleanValue();
-		*/
 	}
 
 	private Map getAttributes() {
@@ -319,8 +333,10 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		return label;
 	}
 	protected StringBuffer appendStatus(IPBreakpoint breakpoint, StringBuffer label) throws CoreException {
+		String job_id = breakpoint.getJobId();
+		String jobName = job_id.length()==0?"N/A":uiDebugManager.getName(job_id);
 		label.append(" ");
-		label.append("<Job: " + breakpoint.getJobId() + " - Set: " + breakpoint.getSetId() + ">");
+		label.append("<Job: " + jobName + " - Set: " + breakpoint.getSetId() + ">");
 		return label;
 	}
 

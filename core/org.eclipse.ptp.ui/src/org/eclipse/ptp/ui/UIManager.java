@@ -73,7 +73,7 @@ public class UIManager {
 	}
 	public void updateMatchElementSets(IElementSet targetSet, ISetManager setManager) {
 		IElementSet[] sets = setManager.getSortedSets();
-		for (int i=1; i<sets.length; i++) {
+		for (int i=0; i<sets.length; i++) {
 			if (sets[i].getID().equals(targetSet.getID()))
 				continue;
 			

@@ -33,12 +33,8 @@ public interface IPBreakpoint extends IBreakpoint {
 	public static final String MODULE = "org.eclipse.ptp.debug.core.module";
 	public static final String SOURCE_HANDLE = "org.eclipse.ptp.debug.core.sourceHandle";
 	
-	public static final String EXISTED = "org.eclipse.ptp.debug.core.existed";
 	public static final String JOB_ID = "org.eclipse.ptp.debug.core.jobid";
 	public static final String SET_ID = "org.eclipse.ptp.debug.core.setid";
-
-	public boolean isExisted() throws CoreException;
-	public void setExisted(boolean existed) throws CoreException;
 
 	public String getSetId() throws CoreException;
 	public void setSetId(String id) throws CoreException;
