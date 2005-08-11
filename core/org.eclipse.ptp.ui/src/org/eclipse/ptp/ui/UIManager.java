@@ -45,15 +45,23 @@ public class UIManager {
 		}
 	}
 	public void addToSet(IElement[] elements, String setID, ISetManager setManager) {
-		addToSet(elements, setManager.getSet(setID));
+		IElementSet set = setManager.getSet(setID);
+		addToSet(elements, set);
+		updateMatchElementSets(set, setManager);
 	}
-	public String createSet(IElement[] elements, String setID, ISetManager setManager) {
-		IElementSet set = new ElementSet(setID, true);
+	public String createSet(IElement[] elements, String setID, String setName, ISetManager setManager) {
+		IElementSet set = new ElementSet(setID, setName, true);
 		addToSet(elements, set);
 		setManager.add(set);
+		updateMatchElementSets(set, setManager);
 		return set.getID();
 	}
 	public void removeSet(String setID, ISetManager setManager) {
+		IElementSet set = setManager.getSet(setID);
+		String[] sets = set.getMatchSets();
+		for (int i=0; i<sets.length; i++) {
+			setManager.getSet(sets[i]).removeMatchSet(setID);
+		}
 		setManager.remove(setID);
 	}
 	public void removeFromSet(IElement[] elements, String setID, ISetManager setManager) {
@@ -61,5 +69,22 @@ public class UIManager {
 		for (int i=0; i<elements.length; i++) {
 			set.remove(elements[i]);
 		}
-	}	
+		updateMatchElementSets(set, setManager);
+	}
+	public void updateMatchElementSets(IElementSet targetSet, ISetManager setManager) {
+		IElementSet[] sets = setManager.getSortedSets();
+		for (int i=1; i<sets.length; i++) {
+			if (sets[i].getID().equals(targetSet.getID()))
+				continue;
+			
+			IElement[] elements = sets[i].getElements();
+			for (int j=0; j<elements.length; j++) {
+				if (targetSet.contains(elements[j].getID())) {
+					targetSet.addMatchSet(sets[i].getID());
+					sets[i].addMatchSet(targetSet.getID());
+					break;
+				}
+			}
+		}
+	}
 }

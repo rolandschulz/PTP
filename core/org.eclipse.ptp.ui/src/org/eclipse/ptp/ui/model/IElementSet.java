@@ -23,6 +23,11 @@ package org.eclipse.ptp.ui.model;
  *
  */
 public interface IElementSet extends IContainer {
+	public void addMatchSet(String setId);
+	public void removeMatchSet(String setId);
+	public String[] getMatchSets();
+	public boolean containOtherSets();
+	
 	public IElement[] getSelectedElements();
 	public void removeAllSelected();
 	public void select(int index);

@@ -207,7 +207,7 @@ public class MachineManager implements IManager {
 			IElementSet set = setManager.getSetRoot();
 			for (int i=0; i<total_element; i++) {
 				//FIXME using id, or name
-				set.add(new Element(pElements[i].getIDString()));
+				set.add(new Element(pElements[i].getIDString(), pElements[i].getElementName()));
 			}
 			setManager.add(set);
 			machineList.put(mac.getIDString(), setManager);
