@@ -241,11 +241,11 @@ public class PTPDebugCorePlugin extends Plugin {
 
 	/* Debug Session Listeners */
 
-	public void addDebugSessionListener( Observer listener ) {
+	public void addDebugSessionListener( IPDebugListener listener ) {
 		fDebugSessionListeners.add( listener );
 	}
 
-	public void removeDebugSessionListener( Observer listener ) {
+	public void removeDebugSessionListener( IPDebugListener listener ) {
 		fDebugSessionListeners.remove( listener );
 	}
 
