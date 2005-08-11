@@ -41,7 +41,8 @@ public class VariableManager extends Manager {
 	}
 	
 	public ICDIArgumentDescriptor[] getArgumentDescriptors(StackFrame frame) throws CDIException {
-		List argObjects = new ArrayList();
+		return null;
+/*		List argObjects = new ArrayList();
 		SimStackFrame sFrame = frame.getSimStackFrame();
 		Target target = (Target)frame.getTarget();
 		int level = frame.getLevel();
@@ -54,10 +55,11 @@ public class VariableManager extends Manager {
 			}
 		}
 		return (ICDIArgumentDescriptor[]) argObjects.toArray(new ICDIArgumentDescriptor[0]);
-	}
+*/	}
 	
 	public ICDILocalVariableDescriptor[] getLocalVariableDescriptors(StackFrame frame) throws CDIException {
-		List argObjects = new ArrayList();
+		return null;
+/*		List argObjects = new ArrayList();
 		SimStackFrame sFrame = frame.getSimStackFrame();
 		Target target = (Target)frame.getTarget();
 		int level = frame.getLevel();
@@ -70,7 +72,7 @@ public class VariableManager extends Manager {
 			}
 		}
 		return (ICDILocalVariableDescriptor[]) argObjects.toArray(new ICDILocalVariableDescriptor[0]);
-	}
+*/	}
 	
 	public Variable createVariable(VariableDescriptor varDesc) throws CDIException {
 		if (varDesc instanceof ArgumentDescriptor) {
