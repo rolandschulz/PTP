@@ -31,6 +31,7 @@ public class SuspendedEvent implements ICDISuspendedEvent, IPCDIEvent {
 	Session session;	
 	ICDIObject[] sources;
 	DebugEvent event;
+	int[] processes;
 
 	public SuspendedEvent(Session s, EBreakpointHit ev) {
 		session = s;
@@ -38,6 +39,7 @@ public class SuspendedEvent implements ICDISuspendedEvent, IPCDIEvent {
 		
 		Hashtable table = ev.getSources();
 		ArrayList sourceList = new ArrayList();
+		processes = ev.getProcesses();
 		
 		int[] registeredTargets = session.getRegisteredTargetIds();
 		
@@ -112,5 +114,9 @@ public class SuspendedEvent implements ICDISuspendedEvent, IPCDIEvent {
 		}
 		
 		return (ICDIObject[]) sourceList.toArray(new ICDIObject[0]);
+	}
+	
+	public int[] getProcesses() {
+		return processes;
 	}
 }

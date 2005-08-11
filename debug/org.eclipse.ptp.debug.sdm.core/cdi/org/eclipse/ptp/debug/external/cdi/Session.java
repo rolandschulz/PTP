@@ -134,7 +134,7 @@ public class Session implements IPCDISession, ICDISessionObject {
 		
 		Hashtable table = new Hashtable();
 		table.put(new Integer(procNum), new int[] { 0 });
-		debugger.fireEvent(new EInferiorCreated(table));
+		debugger.fireEvent(new EInferiorCreated(table, new int[] { procNum}));
 		
 		try {
 			boolean stopInMain = dLaunch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );

@@ -14,13 +14,19 @@ import java.util.Hashtable;
 public class DebugEvent {
 	String eventName = "";
 	Hashtable eventSources;
+	int[] eventProcesses;
 	
-	public DebugEvent(String eName, Hashtable eSources) {
+	public DebugEvent(String eName, Hashtable eSources, int[] eProcesses) {
 		eventName = eName;
 		eventSources = eSources;
+		eventProcesses = eProcesses;
 	}
 	
 	public Hashtable getSources() {
 		return eventSources;
+	}
+	
+	public int[] getProcesses() {
+		return eventProcesses;
 	}
 }

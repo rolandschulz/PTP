@@ -110,7 +110,7 @@ public class BreakpointManager extends Manager {
 			Hashtable table = new Hashtable();
 			table.put(new Integer(pId), new int[] { tId });
 			
-			sess.getDebugger().fireEvent(new EBreakpointCreated(table));
+			sess.getDebugger().fireEvent(new EBreakpointCreated(table, new int[] { pId }));
 			
 		} catch (CDIException e) {
 		}
