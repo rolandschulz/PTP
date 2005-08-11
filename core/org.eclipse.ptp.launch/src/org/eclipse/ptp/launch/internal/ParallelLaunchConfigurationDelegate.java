@@ -174,7 +174,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				
 		monitor.beginTask(MessageFormat.format("{0}...", new String[]{configuration.getName()}), 10);
 		
-		LaunchUtils.switchPerspectiveTo(LaunchUtils.PPerspectiveFactory_ID);    		
+		// Switch the perspective
+		//LaunchUtils.switchPerspectiveTo(LaunchUtils.PPerspectiveFactory_ID);    		
 		monitor.worked(1);
 
 		//check for cancellation
@@ -185,7 +186,11 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		
 		// done the verification phase
 		String projectName = verifyProject(configuration).getName();
-		JobRunConfiguration jrunconfig = getJobRunConfiguration(configuration); 
+		JobRunConfiguration jrunconfig = getJobRunConfiguration(configuration);
+		if (mode.equals(ILaunchManager.DEBUG_MODE))
+			jrunconfig.setDebug();
+		
+		
 		//String[] args = verifyArgument(configuration);
 		File workDirectory = vertifyWorkDirectory(configuration);
 
