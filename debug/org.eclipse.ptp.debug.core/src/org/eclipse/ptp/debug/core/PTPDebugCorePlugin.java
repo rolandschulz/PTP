@@ -67,6 +67,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	private SessionManager fSessionManager = null;
 	
 	private Hashtable fDebugSessions = null;
+	private Hashtable fDebugJobs = null;
 	
 	private ListenerList fDebugSessionListeners;
 
@@ -258,8 +259,10 @@ public class PTPDebugCorePlugin extends Plugin {
 		fDebugSessionListeners = null;
 	}
 	
+	
 	public void addDebugSession(IPJob job, ICDISession session) {
 		fDebugSessions.put(job, session);
+		fDebugJobs.put(session, job);
 		
 		Object[] listeners = fDebugSessionListeners.getListeners();
 		for( int i = 0; i < listeners.length; ++i )
@@ -268,6 +271,10 @@ public class PTPDebugCorePlugin extends Plugin {
 	
 	public ICDISession getDebugSession(IPJob job) {
 		return (ICDISession) fDebugSessions.get(job);
+	}
+	
+	public IPJob getDebugJob(ICDISession session) {
+		return (IPJob) fDebugJobs.get(session);
 	}
 	
 	public void removeDebugSession(IPJob job) {
