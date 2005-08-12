@@ -30,33 +30,37 @@ import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.debug.core.IPDebugListener;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.breakpoints.PBreakpointManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.ui.JobManager;
+import org.eclipse.ptp.ui.PTPUIPlugin;
+import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.model.IElementSet;
 
 /**
  * @author clement chu
  *
  */
-public class UIDebugManager extends JobManager implements IBreakpointListener, ICDIEventListener, IPDebugListener {
+public class UIDebugManager extends JobManager implements ISetListener, IBreakpointListener, ICDIEventListener {
 	public final static int PROC_SUSPEND = 6;
 	public final static int PROC_HIT = 7;
 	
 	private PBreakpointManager bptManager = null;
 
 	public UIDebugManager() {
+		PTPUIPlugin.getDefault().getUIManager().addSetListener(this);
 		bptManager = PBreakpointManager.getDefault();
 		bptManager.getBreakpointManager().addBreakpointListener(this);
-		PTPDebugCorePlugin.getDefault().addDebugSessionListener(this);
+		//PTPDebugCorePlugin.getDefault().addDebugSessionListener(this);
 	}
 	
 	public void shutdown() {
+		PTPUIPlugin.getDefault().getUIManager().removeSetListener(this);
 		bptManager.getBreakpointManager().removeBreakpointListener(this);
-		PTPDebugCorePlugin.getDefault().removeDebugSessionListener(this);
+		//PTPDebugCorePlugin.getDefault().removeDebugSessionListener(this);
 		super.shutdown();
 	}
 	
@@ -203,5 +207,32 @@ public class UIDebugManager extends JobManager implements IBreakpointListener, I
 	}
 	
 	public void update(IPCDISession session) {
+	}
+	
+	/*****
+	 * Element Set
+	 *****/
+	public void updateBreakpointMarker() {
+		IBreakpoint[] breakpoints = bptManager.getPBreakpoints();
+		for (int i=1; i<breakpoints.length; i++) {
+			try {
+				breakpoints[i].setEnabled(true);
+			} catch (CoreException e) {}
+		}
+	}
+	public void changeSetEvent(IElementSet currentSet, IElementSet preSet) {
+		
+	}
+	public void createSetEvent(IElementSet set, IElement[] elements) {
+		
+	}
+	public void deleteSetEvent(IElementSet set) {
+		
+	}
+	public void addElementsEvent(IElementSet set, IElement[] elements) {
+		
+	}
+	public void removeElementsEvent(IElementSet set, IElement[] elements) {
+		
 	}
 }
