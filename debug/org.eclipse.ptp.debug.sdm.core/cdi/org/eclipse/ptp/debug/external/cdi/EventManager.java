@@ -25,8 +25,8 @@ import org.eclipse.ptp.debug.external.cdi.event.SuspendedEvent;
 import org.eclipse.ptp.debug.external.event.DebugEvent;
 import org.eclipse.ptp.debug.external.event.EBreakpointCreated;
 import org.eclipse.ptp.debug.external.event.EBreakpointHit;
-import org.eclipse.ptp.debug.external.event.EExit;
-import org.eclipse.ptp.debug.external.event.EInferiorCreated;
+import org.eclipse.ptp.debug.external.event.EDebuggerExit;
+import org.eclipse.ptp.debug.external.event.ETargetRegistered;
 
 /**
  */
@@ -83,18 +83,18 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 		
 		List cdiList = new ArrayList(1);
 		
-		if (event instanceof EExit) {
+		if (event instanceof EDebuggerExit) {
 			System.out.println("Exit Event Received");
-			cdiList.add(new ExitedEvent(session, (EExit) event));
+			cdiList.add(new ExitedEvent(session, (EDebuggerExit) event));
 		} else if (event instanceof EBreakpointCreated) {
 			System.out.println("BreakpointCreated Event Received");
 			cdiList.add(new CreatedEvent(session, (EBreakpointCreated) event));
 		} else if (event instanceof EBreakpointHit) {
 			System.out.println("BreakpointHit Event Received");
 			cdiList.add(new SuspendedEvent(session, (EBreakpointHit) event));
-		} else if (event instanceof EInferiorCreated) {
+		} else if (event instanceof ETargetRegistered) {
 			System.out.println("InferiorCreated Event Received");
-			cdiList.add(new CreatedEvent(session, (EInferiorCreated) event));
+			cdiList.add(new CreatedEvent(session, (ETargetRegistered) event));
 		} else {
 			System.out.println("Unknown Event");
 		}

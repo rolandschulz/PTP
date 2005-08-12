@@ -21,7 +21,7 @@ import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.event.DebugEvent;
 import org.eclipse.ptp.debug.external.event.EBreakpointCreated;
-import org.eclipse.ptp.debug.external.event.EInferiorCreated;
+import org.eclipse.ptp.debug.external.event.ETargetRegistered;
 
 /**
  */
@@ -53,7 +53,7 @@ public class CreatedEvent implements ICDICreatedEvent, IPCDIEvent {
 	    sources = (ICDIObject[]) sourceList.toArray(new ICDIObject[0]);
 	}
 
-	public CreatedEvent(Session s, EInferiorCreated ev) {
+	public CreatedEvent(Session s, ETargetRegistered ev) {
 		session = s;
 		event = ev;
 		

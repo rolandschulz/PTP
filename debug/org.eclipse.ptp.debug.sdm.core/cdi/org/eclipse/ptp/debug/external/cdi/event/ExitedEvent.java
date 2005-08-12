@@ -21,7 +21,7 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.event.DebugEvent;
-import org.eclipse.ptp.debug.external.event.EExit;
+import org.eclipse.ptp.debug.external.event.EDebuggerExit;
 
 /**
  */
@@ -31,7 +31,7 @@ public class ExitedEvent implements ICDIExitedEvent, IPCDIEvent {
 	DebugEvent event;
 	int[] processes;
 
-	public ExitedEvent(Session s, EExit ev) {
+	public ExitedEvent(Session s, EDebuggerExit ev) {
 		session = s;
 		event = ev;
 		
