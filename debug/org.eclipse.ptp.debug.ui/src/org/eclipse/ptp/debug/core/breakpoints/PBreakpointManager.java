@@ -101,6 +101,7 @@ public class PBreakpointManager {
 		attributes.put(IBreakpoint.ENABLED, new Boolean(enabled));
 		attributes.put(IPBreakpoint.SOURCE_HANDLE, sourceHandle);
 		attributes.put(IPBreakpoint.SET_ID, set_id);
+		attributes.put(IPBreakpoint.CUR_SET_ID, set_id);
 		attributes.put(IPBreakpoint.JOB_ID, job_id);
 		
 		return new PLineBreakpoint(resource, attributes, register);

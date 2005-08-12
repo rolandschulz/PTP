@@ -31,6 +31,7 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.breakpoints.IPBreakpoint;
 import org.eclipse.ptp.debug.core.breakpoints.PBreakpointManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
@@ -38,6 +39,7 @@ import org.eclipse.ptp.ui.JobManager;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 
 /**
@@ -66,6 +68,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	
 	public void jobChangedEvent(String cur_jid, String pre_jid) {
 		super.jobChangedEvent(cur_jid, pre_jid);
+		updateBreakpointMarker(IElementHandler.SET_ROOT_ID);
 		createEventListener(cur_jid);
 	}
 
@@ -126,7 +129,35 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	}
 	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {}
 	public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {}	
-	
+
+	/*****
+	 * Element Set
+	 *****/
+	public void updateBreakpointMarker(String cur_sid) {
+		IBreakpoint[] breakpoints = bptManager.getPBreakpoints();
+		for (int i=0; i<breakpoints.length; i++) {
+			if (!(breakpoints[i] instanceof IPBreakpoint))
+				continue;
+			
+			IPBreakpoint breakpoint = (IPBreakpoint)breakpoints[i];
+			try {
+				if (isNoJob(breakpoint.getJobId())) 
+					breakpoint.setJobId(getCurrentJobId());
+
+				breakpoint.setCurSetId(cur_sid);
+			} catch (CoreException e) {
+				System.out.println("Err: " + e.getMessage());
+			}
+		}
+	}
+	public void changeSetEvent(IElementSet currentSet, IElementSet preSet) {
+		updateBreakpointMarker(currentSet.getID());
+	}
+	public void createSetEvent(IElementSet set, IElement[] elements) {}
+	public void deleteSetEvent(IElementSet set) {}
+	public void addElementsEvent(IElementSet set, IElement[] elements) {}
+	public void removeElementsEvent(IElementSet set, IElement[] elements) {}
+
     		/*
     		 * Cannot unregister the extension
     		final String CDT_DEBUG_UI_ID = "org.eclipse.cdt.debug.ui";    		
@@ -207,32 +238,5 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	}
 	
 	public void update(IPCDISession session) {
-	}
-	
-	/*****
-	 * Element Set
-	 *****/
-	public void updateBreakpointMarker() {
-		IBreakpoint[] breakpoints = bptManager.getPBreakpoints();
-		for (int i=1; i<breakpoints.length; i++) {
-			try {
-				breakpoints[i].setEnabled(true);
-			} catch (CoreException e) {}
-		}
-	}
-	public void changeSetEvent(IElementSet currentSet, IElementSet preSet) {
-		
-	}
-	public void createSetEvent(IElementSet set, IElement[] elements) {
-		
-	}
-	public void deleteSetEvent(IElementSet set) {
-		
-	}
-	public void addElementsEvent(IElementSet set, IElement[] elements) {
-		
-	}
-	public void removeElementsEvent(IElementSet set, IElement[] elements) {
-		
 	}
 }

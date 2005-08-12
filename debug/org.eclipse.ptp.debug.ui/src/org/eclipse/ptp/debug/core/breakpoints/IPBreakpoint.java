@@ -35,6 +35,10 @@ public interface IPBreakpoint extends IBreakpoint {
 	
 	public static final String JOB_ID = "org.eclipse.ptp.debug.core.jobid";
 	public static final String SET_ID = "org.eclipse.ptp.debug.core.setid";
+	public static final String CUR_SET_ID = "org.eclipse.ptp.debug.core.cursetid";
+
+	public String getCurSetId() throws CoreException;
+	public void setCurSetId(String id) throws CoreException;
 
 	public String getSetId() throws CoreException;
 	public void setSetId(String id) throws CoreException;

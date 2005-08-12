@@ -128,6 +128,12 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 	public void setJobId(String id) throws CoreException {
 		setAttribute(JOB_ID, id);
 	}
+	public String getCurSetId() throws CoreException {
+		return ensureMarker().getAttribute(CUR_SET_ID, null);
+	}
+	public void setCurSetId(String id) throws CoreException {
+		setAttribute(CUR_SET_ID, id);
+	}
 
 	protected void run(IWorkspaceRunnable wr) throws DebugException {
 		try {
