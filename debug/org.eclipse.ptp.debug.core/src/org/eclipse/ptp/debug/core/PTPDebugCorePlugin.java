@@ -288,6 +288,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	public void start( BundleContext context ) throws Exception {
 		super.start( context );
 		fDebugSessions = new Hashtable();
+		fDebugJobs = new Hashtable();
 		createBreakpointListenersList();
 		createDebugSessionListenersList();
 		resetBreakpointsInstallCount();
@@ -302,6 +303,7 @@ public class PTPDebugCorePlugin extends Plugin {
 		disposeDebugSessionListenersList();
 		disposeBreakpointListenersList();
 		resetBreakpointsInstallCount();
+		fDebugJobs.clear();
 		fDebugSessions.clear();
 		super.stop( context );
 	}

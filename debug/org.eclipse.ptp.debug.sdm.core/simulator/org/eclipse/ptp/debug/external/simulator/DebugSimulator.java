@@ -43,7 +43,7 @@ public class DebugSimulator extends AbstractDebugger {
 		cmd2.add(2, "5");
 
 		for (int j = 0; j < procs.length; j++) {
-			//procs[j].addItem(cmd2);
+			procs[j].addItem(cmd2);
 			
 			procs[j].addItem(cmd);
 			procs[j].addItem(cmd);
