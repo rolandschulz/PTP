@@ -19,6 +19,7 @@ import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.cdi.model.type.IncompleteType;
+import org.eclipse.ptp.debug.external.cdi.model.type.IntType;
 
 /**
  */
@@ -69,16 +70,24 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 	
 	public String getTypeName() throws CDIException {
 		System.out.println("VariableDescriptor.getTypeName()");
-		return "typeName";
+		// FIXME Donny
+		return "int";
 	}
 	
 	public String getQualifiedName() throws CDIException {
 		System.out.println("VariableDescriptor.getQualifiedName()");
-		return "qualifiedName";
+		return fName;
 	}
 	
 	public ICDIType getType() throws CDIException {
 		System.out.println("VariableDescriptor.getQualifiedName()");
+		String typeName = getTypeName();
+		Target target = (Target) getTarget();
+		
+		if (typeName.equals("int")) {
+			return new IntType(target, typeName);
+		}
+		
 		return new IncompleteType((Target) getTarget(), getTypeName());
 	}
 	
@@ -101,7 +110,43 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 	
 	public boolean equals(ICDIVariableDescriptor varDesc) {
 		System.out.println("VariableDescriptor.equals()");
-		return false;
+		if (varDesc instanceof VariableDescriptor) {
+			VariableDescriptor desc = (VariableDescriptor) varDesc;
+			if (desc.getName().equals(getName())) {
+				// Check the threads
+				ICDIThread varThread = null;
+				ICDIThread ourThread = null;
+				try {
+					varThread = desc.getThread();
+					ourThread = getThread();
+				} catch (CDIException e) {
+					// ignore
+				}
+				if ((ourThread == null && varThread == null) ||
+						(varThread != null && ourThread != null && varThread.equals(ourThread))) {
+					// check the stackFrames
+					ICDIStackFrame varFrame = null;
+					ICDIStackFrame ourFrame = null;
+					try {
+						varFrame = desc.getStackFrame();
+						ourFrame = getStackFrame();
+					} catch (CDIException e) {
+						// ignore
+					}
+					if (ourFrame == null && varFrame == null) {
+						return true;
+					} else if (varFrame != null && ourFrame != null && varFrame.equals(ourFrame)) {
+						if (desc.getStackDepth() == getStackDepth()) {
+							if (desc.getPosition() == getPosition()) {
+								return true;
+							}
+						}
+					}
+				}
+				return false;
+			}
+		}
+		return super.equals(varDesc);
 	}
 	
 	/* (non-Javadoc)
