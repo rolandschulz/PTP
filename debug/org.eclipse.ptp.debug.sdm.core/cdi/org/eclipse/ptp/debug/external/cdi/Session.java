@@ -25,7 +25,7 @@ import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
-import org.eclipse.ptp.debug.external.event.EInferiorCreated;
+import org.eclipse.ptp.debug.external.event.ETargetRegistered;
 import org.eclipse.ptp.debug.external.model.MProcessSet;
 
 public class Session implements IPCDISession, ICDISessionObject {
@@ -134,7 +134,7 @@ public class Session implements IPCDISession, ICDISessionObject {
 		
 		Hashtable table = new Hashtable();
 		table.put(new Integer(procNum), new int[] { 0 });
-		debugger.fireEvent(new EInferiorCreated(table, new int[] { procNum}));
+		debugger.fireEvent(new ETargetRegistered(table, new int[] { procNum}));
 		
 		try {
 			boolean stopInMain = dLaunch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
