@@ -16,13 +16,14 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui;
+package org.eclipse.ptp.debug.internal.ui;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.swt.graphics.Image;
 
 /**

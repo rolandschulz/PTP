@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui;
+package org.eclipse.ptp.debug.internal.ui;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.debug.ui.DebugUITools;

@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui;
+package org.eclipse.ptp.debug.internal.ui;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +42,8 @@ import org.eclipse.ptp.debug.core.breakpoints.IPAddressBreakpoint;
 import org.eclipse.ptp.debug.core.breakpoints.IPBreakpoint;
 import org.eclipse.ptp.debug.core.breakpoints.IPFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.breakpoints.IPLineBreakpoint;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorDescriptor;
@@ -198,7 +200,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		String cur_job_id = uiDebugManager.getCurrentJobId();
 
 		// Display nothing if the breakpoint is not in current job
-		if (cur_job_id != null && !cur_job_id.equals(job_id))
+		if (cur_job_id == null || !cur_job_id.equals(job_id))
 			return new Image(null, 1, 1);
 		
 		String descriptor = null;
