@@ -13,7 +13,9 @@ package org.eclipse.ptp.debug.external.cdi.model;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
+import org.eclipse.cdt.debug.core.cdi.model.type.ICDIIntType;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
+import org.eclipse.ptp.debug.external.cdi.model.type.IntValue;
 import org.eclipse.ptp.debug.external.simulator.SimVariable;
 
 /**
@@ -33,6 +35,10 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		fVar = sVar;
 	}
 	
+	public SimVariable getSimVariable() {
+		return fVar;
+	}
+	
 	public void setValue(ICDIValue value) throws CDIException {
 		System.out.println("Variable.setValue()");
 	}
@@ -45,7 +51,11 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		System.out.println("Variable.getValue()");
 		if (value == null) {
 			ICDIType t = getType();
-			value = new Value(this);
+			if (t instanceof ICDIIntType) {
+				value = new IntValue(this);
+			} else {
+				value = new Value(this);
+			}
 		}
 		return value;
 	}
@@ -61,7 +71,11 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 	
 	public boolean equals(ICDIVariable var) {
 		System.out.println("Variable.equals()");
-		return false;
+		if (var instanceof Variable) {
+			Variable variable = (Variable) var;
+			return fVar.getName().equals(variable.getSimVariable().getName());
+		}
+		return super.equals(var);
 	}
 
 	public void dispose() throws CDIException {

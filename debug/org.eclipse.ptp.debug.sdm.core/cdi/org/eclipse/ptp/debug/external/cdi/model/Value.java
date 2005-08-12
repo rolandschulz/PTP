@@ -14,6 +14,7 @@ import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
+import org.eclipse.ptp.debug.external.simulator.SimVariable;
 
 /**
  */
@@ -41,7 +42,12 @@ public class Value extends PTPObject implements ICDIValue {
 	public String getValueString() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Value.getValueString()");
-		return null;
+
+		String result = "";
+		SimVariable sVar = variable.getSimVariable();
+		result = sVar.getValue();
+		
+		return result;
 	}
 
 	public int getChildrenNumber() throws CDIException {

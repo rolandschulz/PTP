@@ -15,6 +15,8 @@ import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.cdt.core.IAddress;
@@ -26,6 +28,7 @@ import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
 import org.eclipse.cdt.debug.core.model.ICGlobalVariable;
 import org.eclipse.cdt.debug.core.model.ICStackFrame;
 import org.eclipse.cdt.debug.core.model.IJumpToAddress;
@@ -105,7 +108,65 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 	 * @see org.eclipse.debug.core.model.IStackFrame#getVariables()
 	 */
 	public IVariable[] getVariables() throws DebugException {
-		return new IVariable[0];		
+		ICGlobalVariable[] globals = getGlobals();
+		List vars = getVariables0();
+		List all = new ArrayList( globals.length + vars.size() );
+		all.addAll( Arrays.asList( globals ) );
+		all.addAll( vars );
+		return (IVariable[])all.toArray( new IVariable[all.size()] );
+	}
+	
+	protected synchronized List getVariables0() throws DebugException {
+		CThread thread = (CThread)getThread();
+		if ( thread.isSuspended() ) {
+			if ( fVariables == null ) {			
+				List vars = getAllCDIVariableObjects();
+				fVariables = new ArrayList( vars.size() );
+				Iterator it = vars.iterator();
+				while( it.hasNext() ) {
+					fVariables.add( CVariableFactory.createVariable( this, (ICDIVariableDescriptor)it.next() ) );
+				}
+			}
+			else if ( refreshVariables() ) {
+				updateVariables();
+			}
+			setRefreshVariables( false );
+		}
+		return ( fVariables != null ) ? fVariables : Collections.EMPTY_LIST;
+	}
+	
+	/**
+	 * Incrementally updates this stack frame's variables.
+	 */
+	protected void updateVariables() throws DebugException {
+		List locals = getAllCDIVariableObjects();
+		int index = 0;
+		while( index < fVariables.size() ) {
+			ICDIVariableDescriptor varObject = findVariable( locals, (CVariable)fVariables.get( index ) );
+			if ( varObject != null ) {
+				locals.remove( varObject );
+				index++;
+			}
+			else {
+				// remove variable
+				fVariables.remove( index );
+			}
+		}
+		// add any new locals
+		Iterator newOnes = locals.iterator();
+		while( newOnes.hasNext() ) {
+			fVariables.add( CVariableFactory.createVariable( this, (ICDIVariableDescriptor)newOnes.next() ) );
+		}
+	}
+	
+	protected ICDIVariableDescriptor findVariable( List list, CVariable var ) {
+		Iterator it = list.iterator();
+		while( it.hasNext() ) {
+			ICDIVariableDescriptor newVarObject = (ICDIVariableDescriptor)it.next();
+			if ( var.sameVariable( newVarObject ) )
+				return newVarObject;
+		}
+		return null;
 	}
 
 	/**
@@ -121,7 +182,7 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 	 * @see org.eclipse.debug.core.model.IStackFrame#hasVariables()
 	 */
 	public boolean hasVariables() throws DebugException {
-		return false;
+		return getVariables0().size() > 0;
 	}
 
 	/* (non-Javadoc)
@@ -421,6 +482,18 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 	protected void dispose() {
 		setDisposed( true );
 		getCDISession().getEventManager().removeEventListener( this );
+		disposeAllVariables();
+	}
+
+	protected void disposeAllVariables() {
+		if ( fVariables == null )
+			return;
+		Iterator it = fVariables.iterator();
+		while( it.hasNext() ) {
+			((CVariable)it.next()).dispose();
+		}
+		fVariables.clear();
+		fVariables = null;
 	}
 
 	/**
@@ -502,8 +575,18 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 	}
 
 	protected synchronized void preserve() {
-		//preserveVariables();
+		preserveVariables();
 		//preserveExpressions();
+	}
+	
+	private void preserveVariables() {
+		if ( fVariables == null )
+			return;
+		Iterator it = fVariables.iterator();
+		while( it.hasNext() ) {
+			AbstractCVariable av = (AbstractCVariable)it.next();
+			av.preserve();
+		}
 	}
 
 	/* (non-Javadoc)

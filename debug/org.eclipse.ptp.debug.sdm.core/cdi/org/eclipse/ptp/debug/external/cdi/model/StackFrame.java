@@ -20,6 +20,8 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.ptp.debug.external.cdi.Locator;
+import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.simulator.SimStackFrame;
 
 public class StackFrame extends PTPObject implements ICDIStackFrame {
@@ -37,6 +39,10 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 		level = l;
 	}
 
+	public SimStackFrame getSimStackFrame() {
+		return frame;
+	}
+	
 	public ICDILocator getLocator() {
 		// Auto-generated method stub
 		System.out.println("StackFrame.getLocator()");
@@ -68,7 +74,22 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 	public boolean equals(ICDIStackFrame stackframe) {
 		// Auto-generated method stub
 		System.out.println("StackFrame.equals()");
-		return false;
+		if (stackframe instanceof StackFrame) {
+			StackFrame stack = (StackFrame)stackframe;
+			boolean equal =  cthread != null &&
+				cthread.equals(stack.getThread()) &&
+				getLevel() == stack.getLevel();
+			if (equal) {
+				ICDILocator otherLocator = stack.getLocator();
+				ICDILocator myLocator = getLocator();
+				if (Locator.equalString(myLocator.getFile(), otherLocator.getFile())) {
+					if (Locator.equalString(myLocator.getFunction(), otherLocator.getFunction())) {
+						return true;
+					}
+				}
+			}
+		}
+		return super.equals(stackframe);
 	}
 
 	public void stepReturn() throws CDIException {
@@ -84,12 +105,22 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 	public ICDILocalVariableDescriptor[] getLocalVariableDescriptors() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("StackFrame.getLocalVariableDescriptors");
-		return null;
+        if (localDescs == null) {
+                Session session = (Session) getTarget().getSession();
+                VariableManager mgr = session.getVariableManager();
+                localDescs = mgr.getLocalVariableDescriptors(this);
+        }
+        return localDescs;
 	}
 
 	public ICDIArgumentDescriptor[] getArgumentDescriptors() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("StackFrame.getArgumentDescriptors");
-		return null;
+        if (argDescs == null) {
+                Session session = (Session)getTarget().getSession();
+                VariableManager mgr = session.getVariableManager();
+                argDescs = mgr.getArgumentDescriptors(this);
+        }
+        return argDescs;
 	}
 }

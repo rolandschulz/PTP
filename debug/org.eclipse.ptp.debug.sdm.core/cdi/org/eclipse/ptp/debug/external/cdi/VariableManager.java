@@ -41,8 +41,7 @@ public class VariableManager extends Manager {
 	}
 	
 	public ICDIArgumentDescriptor[] getArgumentDescriptors(StackFrame frame) throws CDIException {
-		return null;
-/*		List argObjects = new ArrayList();
+		List argObjects = new ArrayList();
 		SimStackFrame sFrame = frame.getSimStackFrame();
 		Target target = (Target)frame.getTarget();
 		int level = frame.getLevel();
@@ -55,11 +54,10 @@ public class VariableManager extends Manager {
 			}
 		}
 		return (ICDIArgumentDescriptor[]) argObjects.toArray(new ICDIArgumentDescriptor[0]);
-*/	}
+	}
 	
 	public ICDILocalVariableDescriptor[] getLocalVariableDescriptors(StackFrame frame) throws CDIException {
-		return null;
-/*		List argObjects = new ArrayList();
+		List argObjects = new ArrayList();
 		SimStackFrame sFrame = frame.getSimStackFrame();
 		Target target = (Target)frame.getTarget();
 		int level = frame.getLevel();
@@ -72,7 +70,7 @@ public class VariableManager extends Manager {
 			}
 		}
 		return (ICDILocalVariableDescriptor[]) argObjects.toArray(new ICDILocalVariableDescriptor[0]);
-*/	}
+	}
 	
 	public Variable createVariable(VariableDescriptor varDesc) throws CDIException {
 		if (varDesc instanceof ArgumentDescriptor) {
@@ -85,12 +83,24 @@ public class VariableManager extends Manager {
 	
 	public LocalVariable createLocalVariable(LocalVariableDescriptor varDesc) throws CDIException {
 		System.out.println("VariableManager.createLocalVariable()");
-		return new LocalVariable(varDesc, null);
+		StackFrame frame = (StackFrame) varDesc.getStackFrame();
+		SimVariable[] vars = frame.getSimStackFrame().getLocalVars();
+		for (int i = 0; i < vars.length; i++) {
+			if (varDesc.getName().equals(vars[i].getName()))
+				return new LocalVariable(varDesc, vars[i]);
+		}
+		throw new CDIException(CDIResources.getString("cdi.VariableManager.Unknown_variable_object")); //$NON-NLS-1$
 	}
 	
 	public Argument createArgument(ArgumentDescriptor argDesc) throws CDIException {
 		System.out.println("VariableManager.createArgument()");
-		return new Argument(argDesc, null);
+		StackFrame frame = (StackFrame) argDesc.getStackFrame();
+		SimVariable[] vars = frame.getSimStackFrame().getArgs();
+		for (int i = 0; i < vars.length; i++) {
+			if (argDesc.getName().equals(vars[i].getName()))
+				return new Argument(argDesc, vars[i]);
+		}
+		throw new CDIException(CDIResources.getString("cdi.VariableManager.Unknown_variable_object")); //$NON-NLS-1$
 	}
 
 }
