@@ -47,7 +47,7 @@
    <extension
          point="org.eclipse.debug.ui.debugModelPresentations">
       <debugModelPresentation
-            class="org.eclipse.ptp.debug.ui.PDebugModelPresentation"
+            class="org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation"
             id="org.eclipse.ptp.debug.ui">
       </debugModelPresentation>
    </extension>
@@ -63,23 +63,11 @@
    <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
       <specification
-            annotationImageProvider="org.eclipse.ptp.debug.ui.BreakpointImageProvider"
+            annotationImageProvider="org.eclipse.ptp.debug.internal.ui.BreakpointImageProvider"
             annotationType="org.eclipse.ptp.debug.core.breakpoint"
             colorPreferenceValue="217,255,226"
             highlightPreferenceValue="true"
             icon="icons/debug/bpt.gif">
-            <!--
-            verticalRulerPreferenceValue="true"
-            colorPreferenceKey="ptpBreakpointColor"
-            highlightPreferenceKey="ptpBreakpointHighlight"
-            overviewRulerPreferenceValue="true"
-            presentationLayer="3"
-            label="PTP Breakpoint"
-            textPreferenceValue="false"
-            textPreferenceKey="breakpointIndication"
-            verticalRulerPreferenceKey="breakpointIndicationVerticalRuler"
-            overviewRulerPreferenceKey="breakpointIndicationOverviewRuler">
-            //-->
       </specification>	
    </extension>
    
@@ -113,6 +101,9 @@
      </attribute>
      <attribute
            name="org.eclipse.ptp.debug.core.setid">
+     </attribute>
+     <attribute
+           name="org.eclipse.ptp.debug.core.cursetid">
      </attribute>
    </extension>
    <extension
