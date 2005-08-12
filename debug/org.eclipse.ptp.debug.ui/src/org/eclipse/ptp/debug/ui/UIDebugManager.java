@@ -30,6 +30,7 @@ import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.debug.core.IPDebugListener;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.breakpoints.IPBreakpoint;
 import org.eclipse.ptp.debug.core.breakpoints.PBreakpointManager;
@@ -46,7 +47,7 @@ import org.eclipse.ptp.ui.model.IElementSet;
  * @author clement chu
  *
  */
-public class UIDebugManager extends JobManager implements ISetListener, IBreakpointListener, ICDIEventListener {
+public class UIDebugManager extends JobManager implements ISetListener, IBreakpointListener, ICDIEventListener, IPDebugListener {
 	public final static int PROC_SUSPEND = 6;
 	public final static int PROC_HIT = 7;
 	
@@ -56,13 +57,13 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		PTPUIPlugin.getDefault().getUIManager().addSetListener(this);
 		bptManager = PBreakpointManager.getDefault();
 		bptManager.getBreakpointManager().addBreakpointListener(this);
-		//PTPDebugCorePlugin.getDefault().addDebugSessionListener(this);
+		PTPDebugCorePlugin.getDefault().addDebugSessionListener(this);
 	}
 	
 	public void shutdown() {
 		PTPUIPlugin.getDefault().getUIManager().removeSetListener(this);
 		bptManager.getBreakpointManager().removeBreakpointListener(this);
-		//PTPDebugCorePlugin.getDefault().removeDebugSessionListener(this);
+		PTPDebugCorePlugin.getDefault().removeDebugSessionListener(this);
 		super.shutdown();
 	}
 	
@@ -74,8 +75,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 
 	public void createEventListener(String job_id) {
 		ICDISession session = getDebugSession(job_id);
-		if (session != null)
+		if (session != null) {
 			session.getEventManager().addEventListener(this);
+			System.out.println("+++++++++ Create session event");
+		}
 	}
 	
 	public void removeEventListener(String job_id) {
@@ -237,6 +240,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}
 	}
 	
+	//ONLY for detectt the debug sesssion is created
 	public void update(IPCDISession session) {
+		createEventListener(getCurrentJobId());
 	}
 }
