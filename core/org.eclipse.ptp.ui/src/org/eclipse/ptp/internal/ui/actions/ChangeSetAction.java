@@ -16,12 +16,14 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.actions;
+package org.eclipse.ptp.internal.ui.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.ptp.ui.ParallelImages;
+import org.eclipse.ptp.ui.actions.GotoAction;
+import org.eclipse.ptp.ui.actions.GotoDropDownAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.IElementHandler;

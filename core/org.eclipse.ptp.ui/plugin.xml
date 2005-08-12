@@ -82,7 +82,7 @@
          <action
                label="%legendAction.name"
                icon="icons/legend.gif"
-               class="org.eclipse.ptp.ui.actions.ShowLegendAction"
+               class="org.eclipse.ptp.internal.ui.actions.ShowLegendAction"
                tooltip="%legendAction.tooltip"
                toolbarPath="org.eclipse.ptp.ui.actionSets"
                id="org.eclipse.ptp.ui.actions.showLegendAction">

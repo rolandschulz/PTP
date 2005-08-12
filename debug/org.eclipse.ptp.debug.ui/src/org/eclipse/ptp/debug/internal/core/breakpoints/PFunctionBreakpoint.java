@@ -16,34 +16,36 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.actions;
+package org.eclipse.ptp.debug.internal.core.breakpoints;
 
-import org.eclipse.ptp.ui.ParallelImages;
-import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.views.AbstractParallelElementView;
-import org.eclipse.ptp.ui.views.ParallelJobView;
+import java.text.MessageFormat;
+import java.util.Map;
+
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.debug.core.breakpoints.IPFunctionBreakpoint;
 
 /**
  * @author Clement chu
  *
  */
-public class TerminateAllAction extends ParallelAction {
-	public static final String name = "Terminate All";
-	
-	public TerminateAllAction(AbstractParallelElementView view) {
-		super(name, view);
-	    setImageDescriptor(ParallelImages.ID_ICON_TERMINATE_ALL_NORMAL);
-	    setDisabledImageDescriptor(ParallelImages.ID_ICON_TERMINATE_ALL_DISABLE);
+public class PFunctionBreakpoint extends AbstractLineBreakpoint implements IPFunctionBreakpoint {
+	private static final String P_FUNCTION_BREAKPOINT = "org.eclipse.ptp.debug.ui.pFunctionBreakpointMarker";
+
+	public PFunctionBreakpoint() {
 	}
-	
-	public void run(IElement[] elements) {}
-	
-	public void run() {
-		if (view instanceof ParallelJobView) {
-			ParallelJobView jView = (ParallelJobView)view;
-			//TODO terminate all process in this job
-			//String job_id = jView.getCurrentJobID();
-			jView.getJobManager();
+	public PFunctionBreakpoint(IResource resource, Map attributes, boolean add) throws CoreException {
+		super(resource, getMarkerType(), attributes, add);
+	}
+
+	public static String getMarkerType() {
+		return P_FUNCTION_BREAKPOINT;
+	}
+	protected String getMarkerMessage() throws CoreException {
+		String fileName = ensureMarker().getResource().getName();
+		if (fileName != null && fileName.length() > 0) {
+			fileName = ' ' + fileName + ' ';
 		}
+		return MessageFormat.format(BreakpointMessages.getString("PFunctinBreakpoint"), new String[] { getSetId(), fileName, getFunction(), getConditionText() });
 	}
 }

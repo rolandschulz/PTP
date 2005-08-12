@@ -25,7 +25,11 @@ import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
 import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.core.resources.IMarkerDelta;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
@@ -36,7 +40,7 @@ import org.eclipse.ptp.debug.core.breakpoints.IPBreakpoint;
 import org.eclipse.ptp.debug.core.breakpoints.PBreakpointManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.ui.JobManager;
+import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
@@ -77,7 +81,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		ICDISession session = getDebugSession(job_id);
 		if (session != null) {
 			session.getEventManager().addEventListener(this);
-			System.out.println("+++++++++ Create session event");
 		}
 	}
 	
@@ -136,21 +139,27 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	/*****
 	 * Element Set
 	 *****/
-	public void updateBreakpointMarker(String cur_sid) {
+	public void updateBreakpointMarker(final String cur_sid) {
 		IBreakpoint[] breakpoints = bptManager.getPBreakpoints();
 		for (int i=0; i<breakpoints.length; i++) {
 			if (!(breakpoints[i] instanceof IPBreakpoint))
 				continue;
-			
-			IPBreakpoint breakpoint = (IPBreakpoint)breakpoints[i];
-			try {
-				if (isNoJob(breakpoint.getJobId())) 
-					breakpoint.setJobId(getCurrentJobId());
 
-				breakpoint.setCurSetId(cur_sid);
+			final IPBreakpoint breakpoint = (IPBreakpoint)breakpoints[i];
+			IWorkspace workspace= ResourcesPlugin.getWorkspace();
+			IWorkspaceRunnable runnable= new IWorkspaceRunnable() {
+				public void run(IProgressMonitor monitor) throws CoreException {
+					if (isNoJob(breakpoint.getJobId())) 
+						breakpoint.setJobId(getCurrentJobId());
+
+					breakpoint.setCurSetId(cur_sid);
+				}
+			};
+			try {
+				workspace.run(runnable, null);
 			} catch (CoreException e) {
 				System.out.println("Err: " + e.getMessage());
-			}
+			}				
 		}
 	}
 	public void changeSetEvent(IElementSet currentSet, IElementSet preSet) {

@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.breakpoints;
+package org.eclipse.ptp.debug.internal.core.breakpoints;
 
 import java.text.MessageFormat;
 import java.util.Map;
@@ -47,6 +47,6 @@ public class PLineBreakpoint extends AbstractLineBreakpoint {
 		if (fileName != null && fileName.length() > 0) {
 			fileName = ' ' + fileName + ' ';
 		}
-		return MessageFormat.format( BreakpointMessages.getString("PLineBreakpoint"), new Object[] { getSetId(), fileName, new Integer( getLineNumber() ), getConditionText() } );
+		return MessageFormat.format(BreakpointMessages.getString("PLineBreakpoint"), new Object[] { getSetId(), fileName, new Integer( getLineNumber() ), getConditionText() });
 	}
 }

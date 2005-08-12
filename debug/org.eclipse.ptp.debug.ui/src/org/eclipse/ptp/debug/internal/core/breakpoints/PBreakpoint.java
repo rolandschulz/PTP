@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.breakpoints;
+package org.eclipse.ptp.debug.internal.core.breakpoints;
 
 import java.text.MessageFormat;
 import java.util.Map;
@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.Breakpoint;
+import org.eclipse.ptp.debug.core.breakpoints.IPBreakpoint;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 
 /**
@@ -77,7 +78,6 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 	}
 	
 	public String getModelIdentifier() {
-		//TODO change PTPDebugModel
 		return PTPDebugUIPlugin.getUniqueIdentifier();
 	}
 	
@@ -117,19 +117,19 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 		setAttribute(MODULE, module);
 	}
 	public String getSetId() throws CoreException {
-		return ensureMarker().getAttribute(SET_ID, null);
+		return ensureMarker().getAttribute(SET_ID, "");
 	}
 	public void setSetId(String id) throws CoreException {
 		setAttribute(SET_ID, id);
 	}
 	public String getJobId() throws CoreException {
-		return ensureMarker().getAttribute(JOB_ID, null);
+		return ensureMarker().getAttribute(JOB_ID, "");
 	}
 	public void setJobId(String id) throws CoreException {
 		setAttribute(JOB_ID, id);
 	}
 	public String getCurSetId() throws CoreException {
-		return ensureMarker().getAttribute(CUR_SET_ID, null);
+		return ensureMarker().getAttribute(CUR_SET_ID, "");
 	}
 	public void setCurSetId(String id) throws CoreException {
 		setAttribute(CUR_SET_ID, id);

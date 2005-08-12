@@ -208,7 +208,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		if (setManager == null) //no job running
 			descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_ONESET_EN : PDebugImage.IMG_DEBUG_ONESET_DI;
 		else {//created job
-			String cur_set_id = breakpoint.getCurSetId();
+			String cur_set_id = uiDebugManager.getCurrentSetId();
 			String bpt_set_id = breakpoint.getSetId();
 			
 			if (bpt_set_id.equals(cur_set_id)) {

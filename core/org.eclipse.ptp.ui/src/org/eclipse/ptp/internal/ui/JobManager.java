@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui;
+package org.eclipse.ptp.internal.ui;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +26,7 @@ import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.internal.Element;

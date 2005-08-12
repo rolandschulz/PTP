@@ -66,6 +66,7 @@ public class PDebugImage {
 	public static final String IMG_PRO_SUSPENDED_SEL = "suspended_sel.gif";
 	public static final String IMG_PRO_SUSPENDED = "suspended.gif";
 
+	public static final String IMG_DEBUG_PTPBPTSET = "ptp_bpt_set.gif";
 	public static final String IMG_DEBUG_ONESET_EN = "one_set_enable.gif";
 	public static final String IMG_DEBUG_MULTISET_EN = "multi_set_enable.gif";
 	public static final String IMG_DEBUG_NOSET_EN = "no_set_enable.gif";
@@ -73,7 +74,6 @@ public class PDebugImage {
 	public static final String IMG_DEBUG_MULTISET_DI = "multi_set_disable.gif";
 	public static final String IMG_DEBUG_NOSET_DI = "no_set_disable.gif";
 
-	//TODO
 	public static final String IMG_DEBUG_OVER_BPT_COND_EN = "conditional_ovr.gif";
 	public static final String IMG_DEBUG_OVER_BPT_COND_DI = "conditional_ovr_disabled.gif";
 	public static final String IMG_DEBUG_OVER_BPT_INST_EN = "installed_ovr.gif";
@@ -111,6 +111,7 @@ public class PDebugImage {
 	public static final ImageDescriptor ID_IMG_PRO_SUSPENDED_SEL = createImageDescriptor(PROCESSICONURL, IMG_PRO_SUSPENDED_SEL, IMG_PRO_SUSPENDED_SEL);
 	public static final ImageDescriptor ID_IMG_PRO_SUSPENDED = createImageDescriptor(PROCESSICONURL, IMG_PRO_SUSPENDED, IMG_PRO_SUSPENDED);
 	
+	public static final ImageDescriptor ID_IMG_DEBUG_PTPBPTSET = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_PTPBPTSET, IMG_DEBUG_PTPBPTSET);
 	public static final ImageDescriptor ID_IMG_DEBUG_ONESET_EN = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_ONESET_EN, IMG_DEBUG_ONESET_EN);
 	public static final ImageDescriptor ID_IMG_DEBUG_MULTISET_EN = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_MULTISET_EN, IMG_DEBUG_MULTISET_EN);
 	public static final ImageDescriptor ID_IMG_DEBUG_NOSET_EN = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_NOSET_EN, IMG_DEBUG_NOSET_EN);

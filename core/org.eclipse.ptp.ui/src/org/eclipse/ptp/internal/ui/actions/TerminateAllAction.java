@@ -16,50 +16,35 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.actions;
+package org.eclipse.ptp.internal.ui.actions;
 
 import org.eclipse.ptp.ui.ParallelImages;
-import org.eclipse.ptp.ui.UISetManager;
+import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.model.IElementHandler;
-import org.eclipse.ptp.ui.old.UIUtils;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
+import org.eclipse.ptp.ui.views.ParallelJobView;
 
 /**
- * @author clement chu
+ * @author Clement chu
  *
  */
-public class DeleteSetAction extends ParallelAction {
-	public static final String name = "Delete Set";
+public class TerminateAllAction extends ParallelAction {
+	public static final String name = "Terminate All";
 	
-	public DeleteSetAction(AbstractParallelElementView view) {
+	public TerminateAllAction(AbstractParallelElementView view) {
 		super(name, view);
-	    setImageDescriptor(ParallelImages.ID_ICON_DELETESET_NORMAL);
-	    setDisabledImageDescriptor(ParallelImages.ID_ICON_DELETESET_DISABLE);
+	    setImageDescriptor(ParallelImages.ID_ICON_TERMINATE_ALL_NORMAL);
+	    setDisabledImageDescriptor(ParallelImages.ID_ICON_TERMINATE_ALL_DISABLE);
 	}
-
+	
 	public void run(IElement[] elements) {}
+	
 	public void run() {
-		IElementSet set = view.getCurrentSet();
-		if (set != null && set.size() > 0) {
-			IElementHandler setManager = view.getCurrentSetManager();
-			if (setManager == null)
-				return;
-
-			if (UIUtils.showQuestionDialog(name + " " + set.getID() + " Confirmation", "Are you sure you want to delete all elements from this set?")) {
-				UISetManager uiManager = view.getUIManger();
-				uiManager.removeSet(set.getID(), setManager);
-						
-				IElementSet[] sets = setManager.getSortedSets();
-				if (sets.length > 0) {
-					IElementSet lastSet = sets[sets.length-1];
-					view.selectSet(setManager.getSet(lastSet.getID()));
-					view.getCurrentSet().setAllSelect(false);
-					view.update();
-					view.refresh();
-				}
-			}
-		}		
+		if (view instanceof ParallelJobView) {
+			ParallelJobView jView = (ParallelJobView)view;
+			//TODO terminate all process in this job
+			//String job_id = jView.getCurrentJobID();
+			jView.getJobManager();
+		}
 	}
 }

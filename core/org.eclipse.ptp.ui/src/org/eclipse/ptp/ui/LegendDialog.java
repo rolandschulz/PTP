@@ -19,6 +19,7 @@
 
 package org.eclipse.ptp.ui;
 
+import org.eclipse.ptp.internal.ui.MachineManager;
 import org.eclipse.ptp.ui.views.ParallelMachineView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
