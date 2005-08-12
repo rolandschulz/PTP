@@ -4,6 +4,9 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.internal.ui.JobManager;
+import org.eclipse.ptp.internal.ui.MachineManager;
+import org.eclipse.ptp.internal.ui.UISetManager;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;

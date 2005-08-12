@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.breakpoints;
+package org.eclipse.ptp.debug.internal.core.breakpoints;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -26,7 +26,7 @@ import java.util.ResourceBundle;
  *
  */
 public class BreakpointMessages {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.debug.core.breakpoints.BreakpointMessages";
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.debug.internal.core.breakpoints.BreakpointMessages";
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
 	public static String getString(String key) {

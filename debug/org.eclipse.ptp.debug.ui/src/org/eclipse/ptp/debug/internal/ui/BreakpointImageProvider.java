@@ -45,10 +45,12 @@ public class BreakpointImageProvider implements IAnnotationImageProvider {
 	}
 	
 	public String getImageDescriptorId(Annotation annotation) {
+		System.out.println("Hello annotation: " + annotation);
 		return null;
 	}
 	
 	public ImageDescriptor getImageDescriptor(String imageDescritporId) {
+		System.out.println("Hello: " + imageDescritporId);
 		return null;
 	}
 	

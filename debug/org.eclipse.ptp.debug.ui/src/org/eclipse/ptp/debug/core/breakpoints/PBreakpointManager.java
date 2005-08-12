@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.model.IBreakpoint;
+import org.eclipse.ptp.debug.internal.core.breakpoints.PLineBreakpoint;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 
 /**
