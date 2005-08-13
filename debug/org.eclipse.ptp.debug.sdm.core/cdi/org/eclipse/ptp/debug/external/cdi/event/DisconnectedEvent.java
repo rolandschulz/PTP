@@ -11,15 +11,14 @@
 package org.eclipse.ptp.debug.external.cdi.event;
 
 import org.eclipse.cdt.debug.core.cdi.event.ICDIDisconnectedEvent;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
+import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.event.ETargetUnregistered;
 
 /**
  */
-public class DisconnectedEvent implements ICDIDisconnectedEvent {
+public class DisconnectedEvent extends AbstractEvent implements ICDIDisconnectedEvent {
 
-	public ICDIObject getSource() {
-		// Auto-generated method stub
-		System.out.println("DisconnectedEvent.getSource()");
-		return null;
+	public DisconnectedEvent(Session s, ETargetUnregistered ev) {
+		super(s, ev);
 	}
 }

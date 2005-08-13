@@ -11,21 +11,20 @@
 package org.eclipse.ptp.debug.external.cdi.event;
 
 import org.eclipse.cdt.debug.core.cdi.event.ICDIResumedEvent;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
+import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.event.EInferiorResumed;
 
 /**
  */
-public class ResumedEvent implements ICDIResumedEvent {
-
+public class ResumedEvent extends AbstractEvent implements ICDIResumedEvent {
+	
+	public ResumedEvent(Session s, EInferiorResumed ev) {
+		super(s, ev);
+	}
+	
 	public int getType() {
 		// Auto-generated method stub
 		System.out.println("ResumedEvent.getType()");
 		return 0;
-	}
-
-	public ICDIObject getSource() {
-		// Auto-generated method stub
-		System.out.println("ResumedEvent.getSource()");
-		return null;
 	}
 }

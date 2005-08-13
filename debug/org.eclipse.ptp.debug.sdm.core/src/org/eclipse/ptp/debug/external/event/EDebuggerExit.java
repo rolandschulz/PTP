@@ -1,9 +1,9 @@
 package org.eclipse.ptp.debug.external.event;
 
-import java.util.Hashtable;
+import java.util.BitSet;
 
 public class EDebuggerExit extends DebugEvent {
-	public EDebuggerExit(Hashtable s, int[] p) {
-		super("debuggerExit", s, p);
+	public EDebuggerExit(BitSet s) {
+		super("debuggerExit", s);
 	}
 }

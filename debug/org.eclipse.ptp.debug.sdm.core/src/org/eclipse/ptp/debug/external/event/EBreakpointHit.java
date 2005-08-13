@@ -1,9 +1,9 @@
 package org.eclipse.ptp.debug.external.event;
 
-import java.util.Hashtable;
+import java.util.BitSet;
 
 public class EBreakpointHit extends DebugEvent {
-	public EBreakpointHit(Hashtable s, int[] p) {
-		super("breakpointHit", s, p);
+	public EBreakpointHit(BitSet s) {
+		super("breakpointHit", s);
 	}
 }

@@ -1,9 +1,9 @@
 package org.eclipse.ptp.debug.external.event;
 
-import java.util.Hashtable;
+import java.util.BitSet;
 
 public class EError extends DebugEvent {
-	public EError(Hashtable s, int[] p) {
-		super("inferiorExit", s, p);
+	public EError(BitSet s) {
+		super("error", s);
 	}
 }

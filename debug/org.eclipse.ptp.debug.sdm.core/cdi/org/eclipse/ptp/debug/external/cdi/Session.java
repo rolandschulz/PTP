@@ -1,5 +1,6 @@
 package org.eclipse.ptp.debug.external.cdi;
 
+import java.util.BitSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Properties;
@@ -74,6 +75,7 @@ public class Session implements IPCDISession, ICDISessionObject {
 		
 		/* Initially we only create process/target 0 */
 		registerTarget(0);
+		registerTarget(1);
 	}
 	
 	public DebugSession getDebugSession() {
@@ -132,9 +134,9 @@ public class Session implements IPCDISession, ICDISessionObject {
 
 		currentDebugTargetList.put(Integer.toString(target.getTargetId()), target);
 		
-		Hashtable table = new Hashtable();
-		table.put(new Integer(procNum), new int[] { 0 });
-		debugger.fireEvent(new ETargetRegistered(table, new int[] { procNum}));
+		BitSet bitSet = new BitSet();
+		bitSet.set(procNum);
+		debugger.fireEvent(new ETargetRegistered(bitSet));
 		
 		try {
 			boolean stopInMain = dLaunch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
