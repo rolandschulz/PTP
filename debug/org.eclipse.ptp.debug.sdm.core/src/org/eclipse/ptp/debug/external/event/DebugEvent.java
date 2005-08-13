@@ -4,7 +4,7 @@
  */
 package org.eclipse.ptp.debug.external.event;
 
-import java.util.Hashtable;
+import java.util.BitSet;
 
 
 /**
@@ -13,20 +13,14 @@ import java.util.Hashtable;
  */
 public class DebugEvent {
 	String eventName = "";
-	Hashtable eventSources;
-	int[] eventProcesses;
+	BitSet eventSources;
 	
-	public DebugEvent(String eName, Hashtable eSources, int[] eProcesses) {
+	public DebugEvent(String eName, BitSet eSources) {
 		eventName = eName;
 		eventSources = eSources;
-		eventProcesses = eProcesses;
 	}
 	
-	public Hashtable getSources() {
+	public BitSet getSources() {
 		return eventSources;
-	}
-	
-	public int[] getProcesses() {
-		return eventProcesses;
 	}
 }

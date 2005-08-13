@@ -1,9 +1,9 @@
 package org.eclipse.ptp.debug.external.event;
 
-import java.util.Hashtable;
+import java.util.BitSet;
 
 public class EInferiorResumed extends DebugEvent {
-	public EInferiorResumed(Hashtable s, int[] p) {
-		super("inferiorExit", s, p);
+	public EInferiorResumed(BitSet s) {
+		super("inferiorResumed", s);
 	}
 }

@@ -1,9 +1,9 @@
 package org.eclipse.ptp.debug.external.event;
 
-import java.util.Hashtable;
+import java.util.BitSet;
 
 public class ETargetUnregistered extends DebugEvent {
-	public ETargetUnregistered(Hashtable s, int[] p) {
-		super("targetUnregistered", s, p);
+	public ETargetUnregistered(BitSet s) {
+		super("targetUnregistered", s);
 	}
 }
