@@ -1,7 +1,14 @@
-/*
- * (c) Copyright IBM Corp. 2000, 2005.
- * All Rights Reserved.
- */
+/*******************************************************************************
+ * Copyright (c) 2005 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *     QNX Software System
+ *******************************************************************************/
 package org.eclipse.cdt.internal.ui.editor;
 
 
@@ -709,9 +716,9 @@ public class CEditor extends TextEditor implements ISelectionChangedListener, IS
         action.setActionDefinitionId(ICEditorActionDefinitionIds.OPEN_DEF);
         setAction("OpenDefinition", action); //$NON-NLS-1$
         
-		action = new OpenTypeHierarchyAction(this);
-		action.setActionDefinitionId(ICEditorActionDefinitionIds.OPEN_TYPE_HIERARCHY);
-		setAction("OpenTypeHierarchy", action); //$NON-NLS-1$
+//		action = new OpenTypeHierarchyAction(this);
+//		action.setActionDefinitionId(ICEditorActionDefinitionIds.OPEN_TYPE_HIERARCHY);
+//		setAction("OpenTypeHierarchy", action); //$NON-NLS-1$
 
 		fShowInCViewAction = new ShowInCViewAction(this);
 		action = fShowInCViewAction;
