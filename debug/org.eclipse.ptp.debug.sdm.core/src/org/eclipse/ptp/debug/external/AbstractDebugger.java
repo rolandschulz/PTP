@@ -23,26 +23,14 @@
 package org.eclipse.ptp.debug.external;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.debug.external.actionpoint.ABreakpoint;
-import org.eclipse.ptp.debug.external.actionpoint.AWatchpoint;
-import org.eclipse.ptp.debug.external.actionpoint.DebugActionpoint;
 import org.eclipse.ptp.debug.external.event.DebugEvent;
 import org.eclipse.ptp.debug.external.model.MProcess;
 import org.eclipse.ptp.debug.external.model.MProcessSet;
 import org.eclipse.ptp.debug.external.utils.Queue;
-import org.eclipse.ptp.debug.external.variable.DebugVariable;
-import org.eclipse.ptp.debug.external.variable.VMode;
-import org.eclipse.ptp.debug.external.variable.VStartModel;
-import org.eclipse.ptp.debug.external.variable.VStopModel;
-
-
-
 
 /**
  * @author donny
@@ -56,7 +44,6 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 	protected ArrayList actionpointList = null;
 	protected Queue eventQueue = null;
 	protected EventThread eventThread = null;
-	protected HashMap stateVariables = null;
 
 	protected ArrayList userDefinedProcessSetList = null;
 	protected MProcessSet allSet = null;
@@ -71,16 +58,12 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 		eventQueue = new Queue();
 		eventThread = new EventThread(this);
 		eventThread.start();
-		stateVariables = new HashMap();
 
 		userDefinedProcessSetList = new ArrayList();
 		allSet = new MProcessSet("all");
 		currentFocus = allSet;
 
 		// Initialize state variables
-		stateVariables.put("MODE", new VMode());
-		stateVariables.put("START_MODEL", new VStartModel());
-		stateVariables.put("STOP_MODEL", new VStopModel());
 		startDebugger(job);
 	}
 	
@@ -106,40 +89,6 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 			}
 		} catch (InterruptedException e) {
 		}		
-	}
-	
-	public final void unsetAll() {
-		Iterator keys = stateVariables.keySet().iterator();
-		while (keys.hasNext()) {
-			Object currentKey = keys.next();
-			DebugVariable dVar = (DebugVariable) stateVariables.get(currentKey);
-			dVar.setValue(dVar.getDefaultValue());
-		}
-	}
-
-	public final DebugVariable[] set() {
-		ArrayList dVars = new ArrayList();
-		Iterator keys = stateVariables.keySet().iterator();
-		while (keys.hasNext()) {
-			Object currentKey = keys.next();
-			DebugVariable dVar = (DebugVariable) stateVariables.get(currentKey);
-			dVars.add(dVar);
-		}
-		return (DebugVariable[]) dVars.toArray();
-	}
-	
-	public final void unset(String varName) {
-		DebugVariable dVar = (DebugVariable) stateVariables.get(varName);
-		dVar.setValue(dVar.getDefaultValue());
-	}
-	
-	public final DebugVariable set(String varName) {
-		return (DebugVariable) stateVariables.get(varName);
-	}
-	
-	public final void set(String varName, String varValue) {
-		DebugVariable dVar = (DebugVariable) stateVariables.get(varName);
-		dVar.setValue(varValue);
 	}
 	
 	public final void breakpointSet(String set, String loc) {
@@ -168,55 +117,6 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 		focus(set);
 		watchpoint(var);
 		currentFocus = savedFocus;
-	}
-
-	public final DebugActionpoint[] actions() {
-		ArrayList daList = new ArrayList();
-		int size = actionpointList.size();
-		for (int i = 0; i < size; i++) {
-			DebugActionpoint da = (DebugActionpoint) actionpointList.get(i);
-			if (!da.isDeleted())
-				daList.add(da);
-		}
-		return (DebugActionpoint[]) daList.toArray();
-	}
-
-	public final DebugActionpoint[] actions(int[] ids) {
-		/* Internally the array for actionpoints starts at 0 but
-		 * actionpoint id starts at 1
-		 */
-		ArrayList daList = new ArrayList();
-		int size = actionpointList.size();
-		int argSize = ids.length;
-		
-		for (int i = 0; i < argSize; i++) {
-			int id = ids[i] - 1; // See the note above
-			if (id >= size)
-				continue;
-			DebugActionpoint da = (DebugActionpoint) actionpointList.get(id);
-			if (!da.isDeleted())
-				daList.add(da);
-		}
-		return (DebugActionpoint[]) daList.toArray();
-	}
-	
-	public final DebugActionpoint[] actions(String type) {
-		ArrayList daList = new ArrayList();
-		int size = actionpointList.size();
-		for (int i = 0; i < size; i++) {
-			DebugActionpoint da = (DebugActionpoint) actionpointList.get(i);
-			if (type.equals("DISABLED") && da.isDisabled())
-				daList.add(da);
-			else if (type.equals("ENABLED") && da.isEnabled())
-				daList.add(da);
-			else if (type.equals("WATCH") && (da instanceof AWatchpoint))
-				if (!da.isDeleted())
-					daList.add(da);
-			else if (type.equals("BREAK") && (da instanceof ABreakpoint))
-				if (!da.isDeleted())
-					daList.add(da);
-		}
-		return (DebugActionpoint[]) daList.toArray();
 	}
 
 	public final void goSet(String set) {

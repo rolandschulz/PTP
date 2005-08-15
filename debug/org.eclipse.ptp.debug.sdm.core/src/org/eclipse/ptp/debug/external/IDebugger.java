@@ -26,12 +26,10 @@ package org.eclipse.ptp.debug.external;
 import java.util.Observer;
 
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.debug.external.actionpoint.DebugActionpoint;
 import org.eclipse.ptp.debug.external.event.DebugEvent;
 import org.eclipse.ptp.debug.external.model.MProcess;
 import org.eclipse.ptp.debug.external.model.MProcessSet;
 import org.eclipse.ptp.debug.external.utils.Queue;
-import org.eclipse.ptp.debug.external.variable.DebugVariable;
 
 
 
@@ -43,11 +41,6 @@ public interface IDebugger {
 	public void initialize(IPJob job);
 	
 	/* General Debugger Interface */
-	public DebugVariable[] set();
-	public DebugVariable set(String name);
-	public void set(String name, String value);
-	public void unset(String name);
-	public void unsetAll();
 
 	/* Process/Thread Sets */
 	public void focus(String name);
@@ -107,9 +100,6 @@ public interface IDebugger {
 	public void breakpoint(int[] procs, String loc, int count);
 	public void breakpoint(int[] procs, String loc, String cond);
 	public void watchpoint(int[] procs, String var);
-	public DebugActionpoint[] actions();
-	public DebugActionpoint[] actions(int[] ids);
-	public DebugActionpoint[] actions(String type);
 	public abstract void delete(int[] ids);
 	public abstract void delete(String type);
 	public abstract void disable(int[] ids);
