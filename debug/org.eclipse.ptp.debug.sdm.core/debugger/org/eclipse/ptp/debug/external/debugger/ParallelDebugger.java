@@ -1,0 +1,287 @@
+/*******************************************************************************
+ * Copyright (c) 2005 The Regents of the University of California. 
+ * This material was produced under U.S. Government contract W-7405-ENG-36 
+ * for Los Alamos National Laboratory, which is operated by the University 
+ * of California for the U.S. Department of Energy. The U.S. Government has 
+ * rights to use, reproduce, and distribute this software. NEITHER THE 
+ * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR 
+ * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified 
+ * to produce derivative works, such modified software should be clearly marked, 
+ * so as not to confuse it with the version available from LANL.
+ * 
+ * Additionally, this program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * LA-CC 04-115
+ *******************************************************************************/
+
+package org.eclipse.ptp.debug.external.debugger;
+
+import java.util.ArrayList;
+
+import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.debug.external.AbstractDebugger;
+import org.eclipse.ptp.debug.external.model.MProcess;
+
+public class ParallelDebugger extends AbstractDebugger {
+
+	final int RUNNING = 10;
+	final int SUSPENDED = 11;
+	
+	int state = 0;
+	boolean finished = false;
+	
+	private Process debuggerProcess = null;
+	
+	
+	protected void startDebugger(IPJob job) {
+	}
+	
+	protected void stopDebugger() {
+	}
+
+	public Process getSessionProcess() {
+		return debuggerProcess;
+	}
+
+	public MProcess[] getProcesses() {
+		int listSize = allSet.getSize();
+		MProcess[] procs = new MProcess[listSize];
+		for (int i = 0; i < listSize; i++) {
+			procs[i] = allSet.getProcess(i);
+		}
+		return procs;
+	}
+
+	public MProcess getProcess(int num) {
+		return (allSet.getProcess(num));
+	}
+	
+	public MProcess getProcess() {
+		return getProcess(0);
+	}
+	
+	public void go() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.go()");
+		state = RUNNING;
+	}
+
+	public void kill() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.kill()");
+		int listSize = allSet.getSize();
+		//long start = System.currentTimeMillis();
+		
+		for (int i = 0; i < listSize; i++) {
+			//System.out.println("terminating: " + allSet.getProcess(i).getName());
+			((Process) allSet.getProcess(i).getDebugInfo()).destroy();
+		}
+
+		//long end = System.currentTimeMillis();
+		
+		//double totalseconds = (double)(end - start) / (double)1000;
+		//System.out.println("DebugSimulator.terminate() takes " + totalseconds + " seconds");
+	}
+
+	public void halt() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.halt()");
+		state = SUSPENDED;
+	}
+	
+	public void load(String prg) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.load()");
+		
+	}
+
+	public void load(String prg, int numProcs) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.load()");
+		
+	}
+
+	public void run(String[] args) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.run()");
+		
+	}
+
+	public void run() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.run()");
+		
+	}
+
+	public void detach() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.detach()");
+		
+	}
+
+	public void step() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.step()");
+		
+	}
+
+	public void step(int count) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.step()");
+		
+	}
+
+	public void stepOver() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.stepOver()");
+		
+	}
+
+	public void stepOver(int count) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.stepOver()");
+		
+	}
+
+	public void stepFinish() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.stepFinish()");
+		
+	}
+
+	public void breakpoint(String loc) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.breakpoint()");
+		
+	}
+
+	public void breakpoint(String loc, int count) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.breakpoint()");
+		
+	}
+
+	public void breakpoint(String loc, String cond) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.breakpoint()");
+		
+	}
+
+	public void watchpoint(String var) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.watchpoint()");
+		
+	}
+
+	public void delete(int[] ids) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.delete()");
+		
+	}
+
+	public void delete(String type) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.delete()");
+		
+	}
+
+	public void disable(int[] ids) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.disable()");
+		
+	}
+
+	public void disable(String type) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.disable()");
+		
+	}
+
+	public void enable(int[] ids) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.enable()");
+		
+	}
+
+	public void enable(String type) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.enable()");
+		
+	}
+
+	public void restart() {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator2.restart()");
+		
+	}
+
+	public void step(int[] procs) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.step");
+		
+	}
+
+	public void step(int[] procs, int count) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.step");
+		
+	}
+
+	public void stepOver(int[] procs) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.stepOver");
+		
+	}
+
+	public void stepOver(int[] procs, int count) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.stepOver");
+		
+	}
+
+	public void stepFinish(int[] procs) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.stepFinish");
+		
+	}
+
+	public void halt(int[] procs) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.halt");
+		
+	}
+
+	public void go(int[] procs) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.go");
+		
+	}
+
+	public void breakpoint(int[] procs, String loc) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.breakpoint");
+		
+	}
+
+	public void breakpoint(int[] procs, String loc, int count) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.breakpoint");
+		
+	}
+
+	public void breakpoint(int[] procs, String loc, String cond) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.breakpoint");
+		
+	}
+
+	public void watchpoint(int[] procs, String var) {
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.watchpoint");
+		
+	}
+}
