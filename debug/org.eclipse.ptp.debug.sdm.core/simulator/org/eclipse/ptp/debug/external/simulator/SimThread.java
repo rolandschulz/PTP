@@ -20,7 +20,6 @@ package org.eclipse.ptp.debug.external.simulator;
 
 import java.util.BitSet;
 
-import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.event.EBreakpointHit;
 
 public class SimThread {
@@ -38,11 +37,9 @@ public class SimThread {
 	int processId;
 	
 	DebugSimulator dSim;
-	DebugSession dSes;
 	
-	public SimThread(int id, int pId, DebugSimulator debugger, DebugSession dSession) {
+	public SimThread(int id, int pId, DebugSimulator debugger) {
 		dSim = debugger;
-		dSes = dSession;
 		
 		state = RUNNING;
 		curLine = 1;

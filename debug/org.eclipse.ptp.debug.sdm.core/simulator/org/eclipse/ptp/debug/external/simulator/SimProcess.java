@@ -22,8 +22,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
-import org.eclipse.ptp.debug.external.DebugSession;
-
 public class SimProcess extends Process {
 	
 	boolean finished;
@@ -42,12 +40,10 @@ public class SimProcess extends Process {
 	Thread procThread;
 	
 	DebugSimulator dSim;
-	DebugSession dSes;
 	
-	public SimProcess(String nm, int pId, int numThreads, SimQueue cmds, DebugSimulator debugger, DebugSession dSession) {
+	public SimProcess(String nm, int pId, int numThreads, SimQueue cmds, DebugSimulator debugger) {
 		super();
 		dSim = debugger;
-		dSes = dSession;
 		
 		finished = false;
 		id = pId;
@@ -56,7 +52,7 @@ public class SimProcess extends Process {
 		
 		threads = new SimThread[numThreads];
 		for (int i = 0; i < numThreads; i++) {
-			threads[i] = new SimThread(i, pId, dSim, dSes);
+			threads[i] = new SimThread(i, pId, dSim);
 		}
 		
 		err = null;

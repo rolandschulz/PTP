@@ -40,7 +40,7 @@ import org.eclipse.ptp.debug.external.variable.DebugVariable;
  *
  */
 public interface IDebugger {
-	public void initialize(DebugSession dS, IPJob job);
+	public void initialize(IPJob job);
 	
 	/* General Debugger Interface */
 	public DebugVariable[] set();
