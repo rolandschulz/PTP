@@ -81,10 +81,10 @@ public class FortranCorePlugin extends CCorePlugin {
 
 	public static final String BUILDER_MODEL_ID = PLUGIN_ID + ".CBuildModel"; //$NON-NLS-1$
 	public static final String BINARY_PARSER_SIMPLE_ID = "BinaryParser"; //$NON-NLS-1$
-	public final static String BINARY_PARSER_UNIQ_ID = PLUGIN_ID + "." + BINARY_PARSER_SIMPLE_ID; //$NON-NLS-1$
+	public final static String BINARY_PARSER_UNIQ_ID = CCorePlugin.PLUGIN_ID + "." + BINARY_PARSER_SIMPLE_ID; //$NON-NLS-1$
 	public final static String PREF_BINARY_PARSER = "binaryparser"; //$NON-NLS-1$
 	public final static String DEFAULT_BINARY_PARSER_SIMPLE_ID = "ELF"; //$NON-NLS-1$
-	public final static String DEFAULT_BINARY_PARSER_UNIQ_ID = PLUGIN_ID + "." + DEFAULT_BINARY_PARSER_SIMPLE_ID; //$NON-NLS-1$
+	public final static String DEFAULT_BINARY_PARSER_UNIQ_ID = CCorePlugin.PLUGIN_ID + "." + DEFAULT_BINARY_PARSER_SIMPLE_ID; //$NON-NLS-1$
 	public final static String PREF_USE_STRUCTURAL_PARSE_MODE = "useStructualParseMode"; //$NON-NLS-1$
 	
 	public static final String INDEXER_SIMPLE_ID = "CIndexer"; //$NON-NLS-1$
