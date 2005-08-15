@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.ui.views;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.internal.ui.actions.RegisterAction;
 import org.eclipse.ptp.debug.internal.ui.actions.ResumeAction;
@@ -122,6 +123,15 @@ public class ParallelDebugView extends ParallelJobView {
 		
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("ID: " + element.getID());
+		
+		IPProcess proc = getUIDebugManager().findProcess(getCurrentJobID(), element.getID());
+		if (proc != null) {
+			buffer.append("\n");
+			buffer.append("Tast ID: " + proc.getTaskId());
+			buffer.append("\n");
+			buffer.append("Tast ID: " + proc.getPid());
+		}
+
 		IElementSet[] groups = setManager.getSetsWithElement(element.getID());
 		if (groups.length > 1)
 			buffer.append("\nGroup: ");
@@ -130,11 +140,11 @@ public class ParallelDebugView extends ParallelJobView {
 			if (i < groups.length - 1)
 				buffer.append(",");
 		}
-		buffer.append("\nStatus: " + getUIDebugManager().getProcessStatusText(getCurrentJobID(), element.getID()));
+		buffer.append("\nStatus: " + getUIDebugManager().getProcessStatusText(proc));
 		return buffer.toString();
 	}
 
-	public void registerElement(IElement element) {
+	public void registerElement(IElement element) {		
 		if (element.isRegistered())
 			getUIDebugManager().unregisterElements(new IElement[] { element });
 		else
@@ -146,20 +156,20 @@ public class ParallelDebugView extends ParallelJobView {
 	public void registerSelectedElements() {
 		if (cur_element_set != null) {
 			IElement[] elements = cur_element_set.getSelectedElements();
+			getUIDebugManager().registerElements(elements);
 			for (int i = 0; i < elements.length; i++) {
 				elements[i].setRegistered(true);
 			}
-			getUIDebugManager().registerElements(elements);
 		}
 	}
 
 	public void unregisterSelectedElements() {
 		if (cur_element_set != null) {
 			IElement[] elements = cur_element_set.getSelectedElements();
+			getUIDebugManager().unregisterElements(elements);
 			for (int i = 0; i < elements.length; i++) {
 				elements[i].setRegistered(false);
 			}
-			getUIDebugManager().unregisterElements(elements);
 		}
 	}
 	

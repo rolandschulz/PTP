@@ -90,7 +90,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	}
 
 	public void unregisterElements(IElement[] elements) {
-		for (int i=0; i<elements.length; i++) {
+		for (int i=0; i<elements.length; i++) {			
 			//only unregister some registered elements
 			if (elements[i].isRegistered()) {
 				((IPCDISession)getDebugSession(getCurrentJobId())).unregisterTarget(Integer.parseInt(elements[i].getName()));

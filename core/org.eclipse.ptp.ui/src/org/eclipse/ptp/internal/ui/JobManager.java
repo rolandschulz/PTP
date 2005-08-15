@@ -86,7 +86,10 @@ public class JobManager implements IManager {
 	}
 	
 	public String getProcessStatusText(String job_id, String proc_id) {
-		switch(getProcessStatus(job_id, proc_id)) {
+		return getProcessStatusText(findProcess(job_id, proc_id));
+	}
+	public String getProcessStatusText(IPProcess proc) {
+		switch (getProcessStatus(proc)) {
 		case MachineManager.PROC_STARTING:
 			return "Starting";
 		case MachineManager.PROC_RUNNING:
@@ -102,9 +105,11 @@ public class JobManager implements IManager {
 		default:
 			return "Error";
 		}
-	}	
+	}
 	public int getProcessStatus(String job_id, String proc_id) {
-		IPProcess proc = findProcess(job_id, proc_id);
+		return getProcessStatus(findProcess(job_id, proc_id));
+	}
+	public int getProcessStatus(IPProcess proc) {
 		if (proc != null) {
 			String status = proc.getStatus();
 			if (status.equals(IPProcess.STARTING))
@@ -172,7 +177,7 @@ public class JobManager implements IManager {
 			IElementSet set = elementHandler.getSetRoot();
 			for (int i=0; i<total_element; i++) {
 				//FIXME using id, or name
-				set.add(new Element(pElements[i].getIDString(), pElements[i].getPid()));
+				set.add(new Element(pElements[i].getIDString(), String.valueOf(pElements[i].getTaskId())));
 			}
 			elementHandler.add(set);
 			jobList.put(job.getIDString(), elementHandler);
