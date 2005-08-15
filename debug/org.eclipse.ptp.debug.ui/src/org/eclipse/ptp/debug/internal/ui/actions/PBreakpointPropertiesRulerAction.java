@@ -18,12 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
-import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.jface.text.source.IVerticalRulerInfo;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.dialogs.PropertyDialogAction;
@@ -36,7 +36,7 @@ public class PBreakpointPropertiesRulerAction extends AbstractBreakpointRulerAct
 	public PBreakpointPropertiesRulerAction(IWorkbenchPart part, IVerticalRulerInfo info) {
 		setInfo(info);
 		setTargetPart(part);
-		setText("Breakpoint Properties Ruler Action");
+		setText(ActionMessages.getString("PBreakpointPropertiesRulerAction.Breakpoint_Properties"));
 		setId(IPTPDebugUIConstants.ACTION_BREAKPOINT_PROPERTIES);
 	}
 	
@@ -60,8 +60,7 @@ public class PBreakpointPropertiesRulerAction extends AbstractBreakpointRulerAct
 	
 	public void update() {
 		setBreakpoint(determineBreakpoint());
-		//TODO replace IBreakpoint with IPBreakpoint
-		if (getBreakpoint() == null || (getBreakpoint() instanceof IBreakpoint)) {
+		if (getBreakpoint() == null || !(getBreakpoint() instanceof IPBreakpoint)) {
 			setBreakpoint(null);
 			setEnabled(false);
 			return;

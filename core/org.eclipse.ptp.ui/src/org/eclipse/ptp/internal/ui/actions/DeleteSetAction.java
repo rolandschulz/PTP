@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui.actions;
 
+import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.UISetManager;
-import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;

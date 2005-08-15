@@ -18,18 +18,18 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.internal.ui.MachineManager;
+import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.ChangeMachineAction;
+import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
-import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.IElementHandler;
+import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -119,6 +119,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	};
 
 	public ParallelMachineView() {
+		instance = this;
 		manager = PTPUIPlugin.getDefault().getMachineManager();
 	}
 	
@@ -149,7 +150,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		return getMachineManager().getElementHandler(getCurrentMachineID());
 	}
 
-	public static ParallelMachineView getInstance() {
+	public static ParallelMachineView getMachineViewInstance() {
 		if (instance == null)
 			instance = new ParallelMachineView();
 		return instance;
@@ -234,18 +235,10 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			}
 		});
 	}
-	
-	protected boolean fillContextMenu(IMenuManager manager) {
-		manager.add(new ChangeMachineAction(this));
-		return true;
-	}
-	protected boolean createToolBarActions(IToolBarManager toolBarMgr) {
+	protected void createToolBarActions(IToolBarManager toolBarMgr) {
 		changeMachineAction = new ChangeMachineAction(this);
-		toolBarMgr.add(changeMachineAction);
-		return true;
-	}
-	protected boolean createMenuActions(IMenuManager menuMgr) {
-		return false;
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUINAVIGATORGROUP, changeMachineAction);
+		super.buildInToolBarActions(toolBarMgr);
 	}
 	
 	protected void setActionEnable() {}

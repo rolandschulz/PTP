@@ -8,21 +8,21 @@
 			id="org.parallel.ptp.ui.views">
 		</category>
 		<view
-			name="Machines"
+			name="%ParallelMachinesView.name"
 			icon="icons/parallel_perspective.gif"
 			category="org.parallel.ptp.ui.views"
 			class="org.eclipse.ptp.ui.views.ParallelMachineView"
 			id="org.eclipse.ptp.ui.views.parallelMachineView">
 		</view>
 		<view
-			name="Jobs"
+			name="%ParallelJobsView.name"
 			icon="icons/parallel_perspective.gif"
 			category="org.parallel.ptp.ui.views"
 			class="org.eclipse.ptp.ui.views.ParallelJobView"
 			id="org.eclipse.ptp.ui.views.parallelJobView">
 		</view>
 	</extension>
-
+	
 	<extension
 		point="org.eclipse.ui.editors">
 		<editor

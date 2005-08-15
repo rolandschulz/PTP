@@ -18,17 +18,17 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.internal.ui.JobManager;
+import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.TerminateAllAction;
+import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
-import org.eclipse.ptp.ui.ParallelImages;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.IElementHandler;
+import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -93,6 +93,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 	};
 	
 	public ParallelJobView() {
+		instance = this;
 		manager = PTPUIPlugin.getDefault().getJobManager();
 	}
 	public JobManager getJobManager() {
@@ -162,7 +163,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 		return manager.getElementHandler(getCurrentJobID());
 	}
 
-	public static ParallelJobView getInstance() {
+	public static ParallelJobView getJobViewInstance() {
 		if (instance == null)
 			instance = new ParallelJobView();
 		return instance;
@@ -200,20 +201,11 @@ public class ParallelJobView extends AbstractParallelSetView {
 		//sashForm.setWeights(new int[] { 1, 2 });
 	}
 	
-	protected boolean fillContextMenu(IMenuManager manager) {
-		//manager.add(new ChangeJobViewAction(this));
-		return true;
-	}
-	protected boolean createToolBarActions(IToolBarManager toolBarMgr) {
-		//changeJobViewAction = new ChangeJobViewAction(this);
-		//toolBarMgr.add(changeJobViewAction);
+	protected void createToolBarActions(IToolBarManager toolBarMgr) {
 		terminateAllAction = new TerminateAllAction(this);
-		toolBarMgr.add(terminateAllAction);
-		return true;
-	}
-	protected boolean createMenuActions(IMenuManager menuMgr) {
-		return false;
-	}
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAllAction);
+		super.buildInToolBarActions(toolBarMgr);
+	}	
 	protected void setActionEnable() {}
 	
 	protected void doubleClickAction(int element_num) {
@@ -257,6 +249,16 @@ public class ParallelJobView extends AbstractParallelSetView {
 	public void selectJob(String job_id) {
 		getJobManager().setCurrentJobId(job_id);
 		updateJob();
+	}
+	public void changeJob(String job_id) {
+		String jobName = manager.getName(job_id);
+		TableItem[] items = jobTable.getItems();
+		for (int i=0; i<items.length; i++) {
+			if (items[i].getText().equals(jobName)) {
+				jobTable.setSelection(i);
+				break;
+			}
+		}
 	}
 	public void updateJob() {
 		IElementHandler setManager = getCurrentSetManager();

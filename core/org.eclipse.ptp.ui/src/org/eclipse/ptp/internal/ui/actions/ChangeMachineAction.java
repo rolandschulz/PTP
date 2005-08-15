@@ -21,7 +21,7 @@ package org.eclipse.ptp.internal.ui.actions;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.ui.ParallelImages;
+import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.actions.GotoAction;
 import org.eclipse.ptp.ui.actions.GotoDropDownAction;
 import org.eclipse.ptp.ui.model.IElement;
@@ -40,7 +40,7 @@ public class ChangeMachineAction extends GotoDropDownAction {
 	    setImageDescriptor(ParallelImages.ID_ICON_MACHINE_NORMAL);
 	    setDisabledImageDescriptor(ParallelImages.ID_ICON_MACHINE_DISABLE);
 	}
-		
+	
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
 		if (view instanceof ParallelMachineView) {
 			ParallelMachineView pmView = (ParallelMachineView)view;
@@ -53,7 +53,7 @@ public class ChangeMachineAction extends GotoDropDownAction {
 	}
 	
 	protected void addAction(MenuManager dropDownMenuMgr, String machine_name, String id, String curID) {
-		IAction action = new InternalMachineAction(machine_name, id, view, this);
+		IAction action = new InternalMachineAction(machine_name, id, getViewPart(), this);
 		action.setChecked(curID.equals(id));
 		action.setEnabled(true);
 		dropDownMenuMgr.add(action);
@@ -76,15 +76,15 @@ public class ChangeMachineAction extends GotoDropDownAction {
 		    			break;
 		    		}
 			}
-	    	}
+	    }
 	}
 	
 	public void run(IElement[] elements, String id) {
 		if (view instanceof ParallelMachineView) {
 			ParallelMachineView pmView = ((ParallelMachineView)view);
 			pmView.selectMachine(id);			
-			view.update();
-			view.refresh();
+			pmView.update();
+			pmView.refresh();
 		}
 	}
 	
@@ -93,6 +93,6 @@ public class ChangeMachineAction extends GotoDropDownAction {
 			super(name, id, view, action);
 		    setImageDescriptor(ParallelImages.ID_ICON_MACHINE_NORMAL);
 		    setDisabledImageDescriptor(ParallelImages.ID_ICON_MACHINE_DISABLE);
-		}	
-	}	
+		}		
+	}
 }

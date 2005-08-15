@@ -840,7 +840,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	public void fireChangeEvent(IElementSet cur_set, IElementSet pre_set) {
 		uiSetManager.fireEvent(UISetManager.CHANGE_SET_TYPE, null, cur_set, pre_set);
 	}
-
+	
 	public void selectSet(IElementSet set) {
 		fireChangeEvent(set, cur_element_set);
 		deSelectSet();

@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.internal.ui.actions;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.text.source.IVerticalRulerInfo;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ui.IWorkbenchPart;
@@ -32,7 +33,7 @@ public class EnableDisableBreakpointRulerAction extends AbstractBreakpointRulerA
 	public EnableDisableBreakpointRulerAction(IWorkbenchPart part, IVerticalRulerInfo info) {
 		setInfo(info);
 		setTargetPart(part);
-		setText("Enable PTP Breakpoint");
+		setText(ActionMessages.getString("EnableDisableBreakpointRulerAction.Enable_Breakpoint_1"));
 		setId(IPTPDebugUIConstants.ACTION_ENABLE_DISABLE_BREAKPOINT);
 	}
 	
@@ -41,7 +42,7 @@ public class EnableDisableBreakpointRulerAction extends AbstractBreakpointRulerA
 			try {
 				getBreakpoint().setEnabled(!getBreakpoint().isEnabled());
 			} catch (CoreException e) {
-				System.out.println("Set PTP Breakpoint err: " + e.getMessage());
+				ErrorDialog.openError(getTargetPart().getSite().getShell(), ActionMessages.getString("EnableDisableBreakpointRulerAction.Enabling_disabling_breakpoints_1"), ActionMessages.getString( "EnableDisableBreakpointRulerAction.Exceptions_occurred_enabling_or_disabling_breakpoint_1" ), e.getStatus());
 			}
 		}
 	}
@@ -55,7 +56,7 @@ public class EnableDisableBreakpointRulerAction extends AbstractBreakpointRulerA
 		setEnabled(true);
 		try {
 			boolean enabled = getBreakpoint().isEnabled();
-			setText(enabled?"Disbale PTP Breakpoint":"Enable PTP Breakpoint");
+			setText(enabled?ActionMessages.getString("EnableDisableBreakpointRulerAction.Disable_Breakpoint_1"):ActionMessages.getString("EnableDisableBreakpointRulerAction.Enable_Breakpoint_1"));
 		} catch (CoreException e) {
 			DebugPlugin.log(e);
 		}

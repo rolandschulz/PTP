@@ -21,10 +21,15 @@ package org.eclipse.ptp.debug.ui;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
 /**
  * @author clement chu
  * The main plugin class to be used in the desktop.
@@ -59,12 +64,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		uiDebugManager = new UIDebugManager();
+		//refreshPluginActions();
 	}
 	
-	public UIDebugManager getUIDebugManager() {
-		return uiDebugManager;
-	}
-
 	/**
 	 * This method is called when the plug-in is stopped
 	 */
@@ -81,6 +83,10 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	 */
 	public static PTPDebugUIPlugin getDefault() {
 		return plugin;
+	}
+
+	public UIDebugManager getUIDebugManager() {
+		return uiDebugManager;
 	}
 
 	/**
@@ -120,11 +126,31 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		return AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.ptp.debug.ui", path);
 	}
 	
+	public static Shell getActiveWorkbenchShell() {
+		IWorkbenchWindow window = getActiveWorkbenchWindow();
+		if ( window != null ) {
+			return window.getShell();
+		}
+		return null;
+	}
+	
 	public static IWorkbenchWindow getActiveWorkbenchWindow() {
 		return getDefault().getWorkbench().getActiveWorkbenchWindow();
 	}
 	
-	public String getCurrentPerspectiveID() {
+	public static String getCurrentPerspectiveID() {
 		return getActiveWorkbenchWindow().getActivePage().getPerspective().getId();
-	}	
+	}
+	public static boolean isPTPDebugPerspective() {
+		return getCurrentPerspectiveID().equals(IPTPDebugUIConstants.PERSPECTIVE_DEBUG);		
+	}
+	
+	/***** LOG *****/
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
+	}
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPDebugUIConstants.INTERNAL_ERROR, "Internal Error", e));
+	}
+	
 }

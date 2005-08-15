@@ -27,7 +27,7 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.ui.AbstractBreakpointOrganizerDelegate;
 import org.eclipse.debug.ui.BreakpointTypeCategory;
 import org.eclipse.debug.ui.IBreakpointTypeCategory;
-import org.eclipse.ptp.debug.core.breakpoints.IPBreakpoint;
+import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 
 /**
@@ -46,24 +46,24 @@ public class PBreakpointSetOrganizer extends AbstractBreakpointOrganizerDelegate
             return new IAdaptable[]{ category };
         }
         
-    		IPBreakpoint pBpt = (IPBreakpoint)breakpoint;
-    		try {
-    			String sid = pBpt.getSetId();    			
-    			if (sid.length() > 0) {
-    				IAdaptable[] categories = (IAdaptable[]) types.get(sid);
-        	    		if (category == null) {
-        	    			categories = new IAdaptable[]{ new BreakpointTypeCategory(sid, PDebugImage.ID_IMG_DEBUG_PTPBPTSET) };
-        	    			types.put(sid, category);
-        	    		}
-        	    		return categories;
-    			}
-    		} catch (CoreException e) {
-    			return null;
-    		}
-	    	return null;
+		IPBreakpoint pBpt = (IPBreakpoint)breakpoint;
+		try {
+			String sid = pBpt.getSetId();    			
+			if (sid.length() > 0) {
+				IAdaptable[] categories = (IAdaptable[])types.get(sid);
+    	    		if (category == null) {
+    	    			categories = new IAdaptable[]{ new BreakpointTypeCategory(sid, PDebugImage.ID_IMG_DEBUG_PTPBPTSET) };
+    	    			types.put(sid, category);
+    	    		}
+    	    		return categories;
+			}
+		} catch (CoreException e) {
+			return null;
+		}
+    	return null;
     }
     
     public void dispose() {
-    		types.clear();
+    	types.clear();
     }
 }

@@ -21,27 +21,27 @@ package org.eclipse.ptp.debug.ui.views;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.ptp.debug.core.IDebugParallelModelListener;
+import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
+import org.eclipse.ptp.debug.internal.ui.actions.RegisterAction;
+import org.eclipse.ptp.debug.internal.ui.actions.ResumeAction;
+import org.eclipse.ptp.debug.internal.ui.actions.StepOverAction;
+import org.eclipse.ptp.debug.internal.ui.actions.StepReturnAction;
+import org.eclipse.ptp.debug.internal.ui.actions.SuspendAction;
+import org.eclipse.ptp.debug.internal.ui.actions.TerminateAction;
+import org.eclipse.ptp.debug.internal.ui.actions.UnregisterAction;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.ptp.debug.ui.UIDebugManager;
-import org.eclipse.ptp.debug.ui.actions.RegisterAction;
-import org.eclipse.ptp.debug.ui.actions.ResumeAction;
-import org.eclipse.ptp.debug.ui.actions.StepOverAction;
-import org.eclipse.ptp.debug.ui.actions.StepReturnAction;
-import org.eclipse.ptp.debug.ui.actions.SuspendAction;
-import org.eclipse.ptp.debug.ui.actions.TerminateAction;
-import org.eclipse.ptp.debug.ui.actions.UnregisterAction;
+import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.IElementHandler;
+import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.views.ParallelJobView;
 
 /**
  * @author clement chu
  * 
  */
-public class ParallelDebugView extends ParallelJobView implements IDebugParallelModelListener {
+public class ParallelDebugView extends ParallelJobView {
 	private static ParallelDebugView instance = null;
 
 	// actions
@@ -55,6 +55,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugParallel
 	protected ParallelAction unregisterAction = null;
 
 	public ParallelDebugView() {
+		instance = this;
 		manager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
 	}
 	
@@ -68,18 +69,17 @@ public class ParallelDebugView extends ParallelJobView implements IDebugParallel
 		return instance;
 	}	
 		
-	protected boolean fillContextMenu(IMenuManager manager) {
-		manager.add(resumeAction);
-		manager.add(suspendAction);
-		manager.add(terminateAction);
-		manager.add(new Separator());
-		manager.add(stepIntoAction);
-		manager.add(stepOverAction);
-		manager.add(stepReturnAction);
-		manager.add(new Separator());
-		return true;
+	protected void fillContextMenu(IMenuManager manager) {
+		super.fillContextMenu(manager);
+		manager.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, resumeAction);
+		manager.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, suspendAction);
+		manager.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAction);
+		manager.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, new Separator());
+		manager.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, stepIntoAction);
+		manager.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, stepOverAction);
+		manager.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, stepReturnAction);
 	}
-	protected boolean createToolBarActions(IToolBarManager toolBarMgr) {
+	protected void createToolBarActions(IToolBarManager toolBarMgr) {
 		resumeAction = new ResumeAction(this);
 		suspendAction = new SuspendAction(this);
 		terminateAction = new TerminateAction(this);
@@ -91,18 +91,18 @@ public class ParallelDebugView extends ParallelJobView implements IDebugParallel
 		registerAction = new RegisterAction(this);
 		unregisterAction = new UnregisterAction(this);
 
-		toolBarMgr.add(resumeAction);
-		toolBarMgr.add(suspendAction);
-		toolBarMgr.add(terminateAction);
-		toolBarMgr.add(new Separator());
-		toolBarMgr.add(stepIntoAction);
-		toolBarMgr.add(stepOverAction);
-		toolBarMgr.add(stepReturnAction);
-		toolBarMgr.add(new Separator());
-		toolBarMgr.add(registerAction);
-		toolBarMgr.add(unregisterAction);
-		toolBarMgr.add(new Separator());
-		return true;
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, resumeAction);
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, suspendAction);
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAction);
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, new Separator());
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, stepIntoAction);
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, stepOverAction);
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, stepReturnAction);
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, new Separator());
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, registerAction);
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, unregisterAction);
+		
+		super.buildInToolBarActions(toolBarMgr);
 	}
 
 	protected void doubleClickAction(int element_num) {
