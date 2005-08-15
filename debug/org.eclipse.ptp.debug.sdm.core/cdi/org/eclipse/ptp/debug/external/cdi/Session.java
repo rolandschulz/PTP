@@ -40,7 +40,6 @@ import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
-import org.eclipse.ptp.debug.external.DebugSession;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
@@ -55,7 +54,6 @@ public class Session implements IPCDISession, ICDISessionObject {
 	Properties props;
 	SessionConfiguration configuration;
 	
-	DebugSession dSession;
 	ILaunch dLaunch;
 	IBinaryObject dBinObject;
 	IDebugger debugger;
@@ -63,14 +61,13 @@ public class Session implements IPCDISession, ICDISessionObject {
 	Hashtable currentDebugTargetList;
 	Hashtable currentProcessSetList;
 	
-	public Session(DebugSession dSess, ILaunch launch, IBinaryObject binObj) {
+	public Session(IDebugger iDebugger, ILaunch launch, IBinaryObject binObj) {
 		props = new Properties();
 		configuration = new SessionConfiguration(this);
 		
-		dSession = dSess;
 		dLaunch = launch;
 		dBinObject = binObj;
-		debugger = dSession.getDebugger();
+		debugger = iDebugger;
 		
 		eventManager = new EventManager(this);
 		breakpointManager = new BreakpointManager(this);
@@ -94,10 +91,6 @@ public class Session implements IPCDISession, ICDISessionObject {
 		/* Initially we only create process/target 0 */
 		registerTarget(0);
 		registerTarget(1);
-	}
-	
-	public DebugSession getDebugSession() {
-		return dSession;
 	}
 	
 	public IDebugger getDebugger() {

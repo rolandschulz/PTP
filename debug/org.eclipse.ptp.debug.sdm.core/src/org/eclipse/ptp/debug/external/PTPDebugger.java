@@ -26,13 +26,16 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.IPTPDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.simulator.DebugSimulator;
 
 public class PTPDebugger implements IPTPDebugger {
 	public ICDISession createDebuggerSession(IPJob job, ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) {
 		try {
-			DebugSession debug = new DebugSession(job);
+			
+			IDebugger debugger = new DebugSimulator();
+			debugger.initialize(job);
 
-			Session session = new Session(debug, launch, exe);
+			Session session = new Session(debugger, launch, exe);
 			
 			/* Make the Debug Session accessible by others through the PTPDebugCorePlugin */
 			PTPDebugCorePlugin.getDefault().addDebugSession(job, session);

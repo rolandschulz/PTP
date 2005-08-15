@@ -62,13 +62,11 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 	protected MProcessSet allSet = null;
 	protected MProcessSet currentFocus = null;
 	
-	protected DebugSession debugSession = null;
-	
 	protected boolean isExitingFlag = false; /* Checked by the eventThread */
 
 	protected abstract void startDebugger(IPJob job);
 	
-	public void initialize(DebugSession dS, IPJob job) {
+	public void initialize(IPJob job) {
 		actionpointList = new ArrayList();
 		eventQueue = new Queue();
 		eventThread = new EventThread(this);
@@ -79,8 +77,6 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 		allSet = new MProcessSet("all");
 		currentFocus = allSet;
 
-		debugSession = dS;
-		
 		// Initialize state variables
 		stateVariables.put("MODE", new VMode());
 		stateVariables.put("START_MODEL", new VStartModel());
