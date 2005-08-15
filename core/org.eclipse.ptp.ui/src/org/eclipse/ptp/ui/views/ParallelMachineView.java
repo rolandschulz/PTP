@@ -276,7 +276,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			return "Unknown element";
 
 		IPNode node = getMachineManager().findNode(getCurrentMachineID(), element.getID());
-		if (node != null)
+		if (node == null)
 			return "Unknown node";
 
 		StringBuffer buffer = new StringBuffer();

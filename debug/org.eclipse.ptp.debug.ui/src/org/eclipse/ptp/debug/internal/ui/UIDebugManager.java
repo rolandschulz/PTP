@@ -89,22 +89,44 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		return PTPDebugCorePlugin.getDefault().getDebugSession(job);
 	}
 
+	public void registerProcess(IPCDISession session, int task_id, boolean isRegister) {
+		if (isRegister)
+			session.registerTarget(task_id);
+		else
+			session.unregisterTarget(task_id);
+	}
+	
 	public void unregisterElements(IElement[] elements) {
+		IPJob job = findJobById(getCurrentJobId());
+		if (job == null || job.isAllStop())
+			return;
+		
+		IPCDISession session = (IPCDISession)getDebugSession(getCurrentJobId());
+		IElementHandler elementHandler = getElementHandler(getCurrentJobId());
 		for (int i=0; i<elements.length; i++) {			
 			//only unregister some registered elements
 			if (elements[i].isRegistered()) {
-				((IPCDISession)getDebugSession(getCurrentJobId())).unregisterTarget(Integer.parseInt(elements[i].getName()));
-				//System.out.println("Unregister: " + elements[i].getID());
+				if (elementHandler.containsRegisterElement(elements[i])) {
+					registerProcess(session, Integer.parseInt(elements[i].getName()), false);
+					elementHandler.removeRegisterElement(elements[i]);
+				}
 			}
 		}
 	}
-	
 	public void registerElements(IElement[] elements) {
+		IPJob job = findJobById(getCurrentJobId());
+		if (job == null || job.isAllStop())
+			return;
+
+		IPCDISession session = (IPCDISession)getDebugSession(getCurrentJobId());
+		IElementHandler elementHandler = getElementHandler(getCurrentJobId());
 		for (int i=0; i<elements.length; i++) {
 			//only register some unregistered elements
 			if (!elements[i].isRegistered()) {
-				((IPCDISession)getDebugSession(getCurrentJobId())).registerTarget(Integer.parseInt(elements[i].getName()));
-				//System.out.println("Register: " + elements[i].getID());
+				if (!elementHandler.containsRegisterElement(elements[i])) {
+					registerProcess(session, Integer.parseInt(elements[i].getName()), true);
+					elementHandler.addRegisterElement(elements[i]);
+				}
 			}
 		}
 	}
@@ -136,8 +158,20 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			PTPDebugUIPlugin.log(e);
 		}				
 	}
-	public void changeSetEvent(IElementSet currentSet, IElementSet preSet) {
-		updateBreakpointMarker(currentSet.getID());
+	public void changeSetEvent(IElementSet curSet, IElementSet preSet) {
+		updateBreakpointMarker(curSet.getID());
+
+		IPCDISession session = (IPCDISession)getDebugSession(getCurrentJobId());
+		IElementHandler elementHandler = getElementHandler(getCurrentJobId());
+		IElement[] registerElements = elementHandler.getRegisteredElements();
+		for (int i=0; i<registerElements.length; i++) {
+			if (curSet.contains(registerElements[i].getID())) {
+				if (!preSet.contains(registerElements[i].getID()))
+					registerProcess(session, Integer.parseInt(registerElements[i].getName()), true);
+			} 
+			else
+				registerProcess(session, Integer.parseInt(registerElements[i].getName()), false);
+		}
 	}
 	//Delete the set that will delete the all related breakpoint
 	public void deleteSetEvent(IElementSet set) {

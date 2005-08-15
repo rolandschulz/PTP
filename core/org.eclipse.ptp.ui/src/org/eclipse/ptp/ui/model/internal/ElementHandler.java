@@ -32,6 +32,8 @@ import org.eclipse.ptp.ui.model.IElementHandler;
  *
  */
 public class ElementHandler extends Container implements IElementHandler {
+	protected List registerElements = new ArrayList();
+
 	public ElementHandler() {
 		super(SET_ROOT_ID, SET_ROOT_ID, false, IContainer.SET_TYPE);
 		//create root 
@@ -74,5 +76,18 @@ public class ElementHandler extends Container implements IElementHandler {
 				aList.add(sets[i]);
 		}
 		return (IElementSet[])aList.toArray(new IElementSet[aList.size()]);
+	}
+
+	public boolean containsRegisterElement(IElement element) {
+		return registerElements.contains(element);
+	}
+	public void addRegisterElement(IElement element) {
+		registerElements.add(element);
+	}
+	public void removeRegisterElement(IElement element) {
+		registerElements.remove(element);
+	}
+	public IElement[] getRegisteredElements() {
+		return (IElement[])registerElements.toArray(new IElement[registerElements.size()]);
 	}
 }

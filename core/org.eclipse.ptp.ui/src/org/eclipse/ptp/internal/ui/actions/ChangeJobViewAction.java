@@ -50,7 +50,7 @@ public class ChangeJobViewAction extends GotoDropDownAction {
 	}
 	
 	protected void addAction(MenuManager dropDownMenuMgr, String view_name, String id, String curID) {
-		IAction action = new InternalJobAction(view_name, id, view, this);
+		IAction action = new InternalJobAction(view_name, id, getViewPart(), this);
 		action.setChecked(curID.equals(id));
 		action.setEnabled(true);
 		dropDownMenuMgr.add(action);

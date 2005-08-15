@@ -122,7 +122,7 @@ public class ParallelDebugView extends ParallelJobView {
 			return "Unknown element";
 
 		IPProcess proc = getUIDebugManager().findProcess(getCurrentJobID(), element.getID());
-		if (proc != null)
+		if (proc == null)
 			return "Unknow process";
 
 		StringBuffer buffer = new StringBuffer();

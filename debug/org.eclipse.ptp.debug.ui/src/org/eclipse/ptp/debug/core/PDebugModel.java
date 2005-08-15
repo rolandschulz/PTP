@@ -192,7 +192,7 @@ public class PDebugModel {
 		IWorkspaceRunnable runnable= new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				final IBreakpoint[] breakpoints = getPBreakpoints();
-				new Job("Remove breakpoint") {
+				new Job("Update breakpoint") {
 					protected IStatus run(IProgressMonitor pmonitor) {
 						try {				
 							for (int i=0; i<breakpoints.length; i++) {
