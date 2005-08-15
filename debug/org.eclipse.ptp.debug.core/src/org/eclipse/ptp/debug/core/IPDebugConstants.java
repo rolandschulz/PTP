@@ -27,4 +27,8 @@ public interface IPDebugConstants {
 	 */
 	public static final String PREF_DEFAULT_VARIABLE_FORMAT = PLUGIN_ID + "pDebug.default_variable_format"; //$NON-NLS-1$
 
+	/**
+	 * The identifier of the common source locations list
+	 */
+	public static final String PREF_SOURCE_LOCATIONS = PLUGIN_ID + "pDebug.Source.source_locations"; //$NON-NLS-1$
 }

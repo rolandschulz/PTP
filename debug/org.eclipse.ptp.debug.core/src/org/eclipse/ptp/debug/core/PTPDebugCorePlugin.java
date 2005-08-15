@@ -12,10 +12,10 @@ package org.eclipse.ptp.debug.core;
 
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Observer;
 
 import org.eclipse.cdt.debug.core.ICBreakpointListener;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
+import org.eclipse.cdt.debug.core.sourcelookup.ICSourceLocation;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -31,10 +31,14 @@ import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.ListenerList;
 import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
 import org.eclipse.ptp.debug.internal.core.SessionManager;
 import org.eclipse.ptp.debug.internal.core.breakpoints.CBreakpoint;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupDirector;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.CommonSourceLookupDirector;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.SourceUtils;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -63,7 +67,12 @@ public class PTPDebugCorePlugin extends Plugin {
 	 * Breakpoint listener list.
 	 */
 	private ListenerList fBreakpointListeners;
-	
+
+	/**
+	 * Dummy source lookup director needed to manage common source containers.
+	 */
+	private CommonSourceLookupDirector fCommonSourceLookupDirector;
+
 	private SessionManager fSessionManager = null;
 	
 	private Hashtable fDebugSessions = null;
@@ -287,6 +296,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	 */
 	public void start( BundleContext context ) throws Exception {
 		super.start( context );
+		initializeCommonSourceLookupDirector();
 		fDebugSessions = new Hashtable();
 		fDebugJobs = new Hashtable();
 		createBreakpointListenersList();
@@ -305,7 +315,43 @@ public class PTPDebugCorePlugin extends Plugin {
 		resetBreakpointsInstallCount();
 		fDebugJobs.clear();
 		fDebugSessions.clear();
+		disposeCommonSourceLookupDirector();
 		super.stop( context );
 	}
+	
+	private void initializeCommonSourceLookupDirector() {
+		if ( fCommonSourceLookupDirector == null ) {
+			fCommonSourceLookupDirector = new CommonSourceLookupDirector();
+			String newMemento = PTPDebugCorePlugin.getDefault().getPluginPreferences().getString( IPDebugInternalConstants.PREF_COMMON_SOURCE_CONTAINERS );
+			if ( newMemento.length() == 0 ) {
+				// Convert source locations to source containers
+				convertSourceLocations( fCommonSourceLookupDirector );
+			}
+			else {
+				try {
+					fCommonSourceLookupDirector.initializeFromMemento( newMemento );
+				}
+				catch( CoreException e ) {
+					log( e.getStatus() );
+				}
+			}
+		}
+	}
 
+	private void disposeCommonSourceLookupDirector() {
+		if ( fCommonSourceLookupDirector != null )
+			fCommonSourceLookupDirector.dispose();
+	}
+
+	public CSourceLookupDirector getCommonSourceLookupDirector() {
+		return fCommonSourceLookupDirector;
+	}
+	
+	private void convertSourceLocations( CommonSourceLookupDirector director ) {
+		director.setSourceContainers( SourceUtils.convertSourceLocations( getCommonSourceLocations() ) );
+	}
+	
+	public ICSourceLocation[] getCommonSourceLocations() {
+		return SourceUtils.getCommonSourceLocationsFromMemento( PTPDebugCorePlugin.getDefault().getPluginPreferences().getString( IPDebugConstants.PREF_SOURCE_LOCATIONS ) );
+	}
 }

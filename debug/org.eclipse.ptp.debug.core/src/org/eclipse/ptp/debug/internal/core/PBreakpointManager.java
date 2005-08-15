@@ -71,6 +71,7 @@ import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.internal.core.breakpoints.CBreakpoint;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupDirector;
 
 public class PBreakpointManager implements IBreakpointsListener, IBreakpointManagerListener, ICDIEventListener, IAdaptable {
 
@@ -881,10 +882,9 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 				ISourceLocator sl = getSourceLocator();
 				if ( sl instanceof ICSourceLocator )
 					return ( ((ICSourceLocator)sl).findSourceElement( handle ) != null );
-				// Donny
-				//else if ( sl instanceof CSourceLookupDirector ) {
-				//	return ( ((CSourceLookupDirector)sl).contains( breakpoint ) );
-				//}
+				else if ( sl instanceof CSourceLookupDirector ) {
+					return ( ((CSourceLookupDirector)sl).contains( breakpoint ) );
+				}
 			}
 			catch( CoreException e ) {
 				return false;
@@ -896,9 +896,8 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 				ISourceLocator sl = getSourceLocator();
 				if ( sl instanceof ICSourceLocator )
 					return ((ICSourceLocator)sl).contains( project );
-				// Donny
-				//else if ( sl instanceof CSourceLookupDirector )
-				//	return ((CSourceLookupDirector)sl).contains( project );
+				else if ( sl instanceof CSourceLookupDirector )
+					return ((CSourceLookupDirector)sl).contains( project );
 				if ( project.equals( getProject() ) )
 					return true;
 				return CDebugUtils.isReferencedProject( getProject(), project );
@@ -968,10 +967,9 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 		IPath path = null;
 		if ( Path.EMPTY.isValidPath( sourceHandle ) ) {
 			ISourceLocator sl = getSourceLocator();
-			// Donny
-			//if ( sl instanceof CSourceLookupDirector ) {
-			//	path = ((CSourceLookupDirector)sl).getCompilationPath( sourceHandle );
-			//}
+			if ( sl instanceof CSourceLookupDirector ) {
+				path = ((CSourceLookupDirector)sl).getCompilationPath( sourceHandle );
+			}
 			if ( path == null ) {
 				path = new Path( sourceHandle );
 			}
@@ -994,13 +992,12 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 	protected Object getSourceElement( String file ) {
 		Object sourceElement = null;
 		ISourceLocator locator = getSourceLocator();
-		// Donny
-		//if ( locator instanceof ICSourceLocator || locator instanceof CSourceLookupDirector ) {
-		//	if ( locator instanceof ICSourceLocator )
-		//		sourceElement = ((ICSourceLocator)locator).findSourceElement( file );
-		//	else
-		//		sourceElement = ((CSourceLookupDirector)locator).getSourceElement( file );
-		//}
+		if ( locator instanceof ICSourceLocator || locator instanceof CSourceLookupDirector ) {
+			if ( locator instanceof ICSourceLocator )
+				sourceElement = ((ICSourceLocator)locator).findSourceElement( file );
+			else
+				sourceElement = ((CSourceLookupDirector)locator).getSourceElement( file );
+		}
 		return sourceElement;
 	}
 
