@@ -31,11 +31,9 @@ package org.eclipse.ptp.debug.external.cdi.model;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.ptp.debug.external.actionpoint.DebugActionpoint;
 
 public class Breakpoint extends PTPObject implements ICDIBreakpoint {
 	ICDICondition condition;
-	DebugActionpoint debugActionpoint;
 	
 	int type;
 	boolean enable;
@@ -45,18 +43,6 @@ public class Breakpoint extends PTPObject implements ICDIBreakpoint {
 		type = kind;
 		condition = cond;
 		enable = true;
-	}
-
-	public DebugActionpoint getDebugActionpoints() {
-		return debugActionpoint;
-	}
-
-	public void setDebugActionpoints(DebugActionpoint newDebugActionpoint) {
-		debugActionpoint = newDebugActionpoint;
-	}
-
-	public boolean isDeferred() {
-		return (debugActionpoint == null);
 	}
 
 	/**
