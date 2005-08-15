@@ -43,4 +43,22 @@ public interface IPTPUIConstants {
     public static final String IUISETGROUP = "setgroup";
     public static final String IUICHANGESETGROUP = "changesetgroup";
     public static final String IUIEMPTYGROUP = "emptygroup";
+    
+	public final static int NODE_USER_ALLOC_EXCL = 0;
+	public final static int NODE_USER_ALLOC_SHARED = 1;
+	public final static int NODE_OTHER_ALLOC_EXCL = 2;
+	public final static int NODE_OTHER_ALLOC_SHARED = 3;
+	public final static int NODE_DOWN = 4;
+	public final static int NODE_ERROR = 5;
+	public final static int NODE_EXITED = 6;
+	public final static int NODE_RUNNING = 7;
+	public final static int NODE_UNKNOWN = 8;
+	public final static int NODE_UP = 9;
+	
+	public final static int PROC_ERROR = 0;
+	public final static int PROC_EXITED = 1;
+	public final static int PROC_EXITED_SIGNAL = 2;
+	public final static int PROC_RUNNING = 3;
+	public final static int PROC_STARTING = 4;
+	public final static int PROC_STOPPED = 5;
 }

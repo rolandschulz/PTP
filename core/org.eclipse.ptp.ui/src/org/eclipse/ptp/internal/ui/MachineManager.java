@@ -21,15 +21,14 @@ package org.eclipse.ptp.internal.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.ui.IManager;
-import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.model.IElementHandler;
+import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.internal.Element;
 import org.eclipse.ptp.ui.model.internal.ElementHandler;
 
@@ -37,28 +36,8 @@ import org.eclipse.ptp.ui.model.internal.ElementHandler;
  * @author clement chu
  *
  */
-public class MachineManager implements IManager {
-	public final static int NODE_USER_ALLOC_EXCL = 0;
-	public final static int NODE_USER_ALLOC_SHARED = 1;
-	public final static int NODE_OTHER_ALLOC_EXCL = 2;
-	public final static int NODE_OTHER_ALLOC_SHARED = 3;
-	public final static int NODE_DOWN = 4;
-	public final static int NODE_ERROR = 5;
-	public final static int NODE_EXITED = 6;
-	public final static int NODE_RUNNING = 7;
-	public final static int NODE_UNKNOWN = 8;
-	public final static int NODE_UP = 9;
-	
-	public final static int PROC_ERROR = 0;
-	public final static int PROC_EXITED = 1;
-	public final static int PROC_EXITED_SIGNAL = 2;
-	public final static int PROC_RUNNING = 3;
-	public final static int PROC_STARTING = 4;
-	public final static int PROC_STOPPED = 5;
-	
-	protected IModelManager modelManager = null;
+public class MachineManager extends AbstractUIManager {	
 	private Map machineList = new HashMap();
-	protected String cur_set_id = IElementHandler.SET_ROOT_ID;
 	protected String cur_machine_id = "";
 
 	public MachineManager() {
@@ -105,21 +84,21 @@ public class MachineManager implements IManager {
 	
 	public String getNodeStatusText(IPNode node) {
 		switch(getNodeStatus(node)) {
-		case NODE_USER_ALLOC_EXCL:
+		case IPTPUIConstants.NODE_USER_ALLOC_EXCL:
 			return "User Alloc Excl";
-		case NODE_USER_ALLOC_SHARED:
+		case IPTPUIConstants.NODE_USER_ALLOC_SHARED:
 			return "User Alloc Shared";
-		case NODE_OTHER_ALLOC_EXCL:
+		case IPTPUIConstants.NODE_OTHER_ALLOC_EXCL:
 			return "Other Alloc Excl";
-		case NODE_OTHER_ALLOC_SHARED:
+		case IPTPUIConstants.NODE_OTHER_ALLOC_SHARED:
 			return "Other Alloc Shared";
-		case NODE_UP:
+		case IPTPUIConstants.NODE_UP:
 			return "Up";
-		case NODE_DOWN:
+		case IPTPUIConstants.NODE_DOWN:
 			return "Down";
-		case NODE_ERROR:
+		case IPTPUIConstants.NODE_ERROR:
 			return "Error";
-		case NODE_UNKNOWN:
+		case IPTPUIConstants.NODE_UNKNOWN:
 			return "Unknown";
 		default:
 			return "Unknown";
@@ -130,19 +109,19 @@ public class MachineManager implements IManager {
 	}	
 	public int getProcStatus(String p_state) {
 		if (p_state.equals(IPProcess.STARTING))
-			return PROC_STARTING;
+			return IPTPUIConstants.PROC_STARTING;
 		else if (p_state.equals(IPProcess.RUNNING))
-			return PROC_RUNNING;
+			return IPTPUIConstants.PROC_RUNNING;
 		else if (p_state.equals(IPProcess.EXITED))
-			return PROC_EXITED;
+			return IPTPUIConstants.PROC_EXITED;
 		else if (p_state.equals(IPProcess.EXITED_SIGNALLED))
-			return PROC_EXITED_SIGNAL;
+			return IPTPUIConstants.PROC_EXITED_SIGNAL;
 		else if (p_state.equals(IPProcess.STOPPED))
-			return PROC_STOPPED;
+			return IPTPUIConstants.PROC_STOPPED;
 		else if (p_state.equals(IPProcess.ERROR))
-			return PROC_ERROR;
+			return IPTPUIConstants.PROC_ERROR;
 		else
-			return PROC_ERROR;
+			return IPTPUIConstants.PROC_ERROR;
 	}	
 	public int getNodeStatus(IPNode node) {
 		if (node != null) {
@@ -151,25 +130,25 @@ public class MachineManager implements IManager {
 				if (node.getAttrib("user").equals(System.getProperty("user.name"))) {
 					String mode = (String) node.getAttrib("mode");
 					if (mode.equals("0100"))
-						return NODE_USER_ALLOC_EXCL;
+						return IPTPUIConstants.NODE_USER_ALLOC_EXCL;
 					else if (mode.equals("0110") || mode.equals("0111") || mode.equals("0101"))
-						return NODE_USER_ALLOC_SHARED;
+						return IPTPUIConstants.NODE_USER_ALLOC_SHARED;
 				}
 				else if (!node.getAttrib("user").equals("")) {
 					String mode = (String) node.getAttrib("mode");
 					if (mode.equals("0100"))
-						return NODE_OTHER_ALLOC_EXCL;
+						return IPTPUIConstants.NODE_OTHER_ALLOC_EXCL;
 					else if (mode.equals("0110") || mode.equals("0111") || mode.equals("0101"))
-						return NODE_OTHER_ALLOC_SHARED;
+						return IPTPUIConstants.NODE_OTHER_ALLOC_SHARED;
 				}
-				return NODE_UP;
+				return IPTPUIConstants.NODE_UP;
 			}
 			else if (nodeState.equals("down"))
-				return NODE_DOWN;
+				return IPTPUIConstants.NODE_DOWN;
 			else if (nodeState.equals("error"))
-				return NODE_ERROR;
+				return IPTPUIConstants.NODE_ERROR;
 		}
-		return NODE_UNKNOWN;		
+		return IPTPUIConstants.NODE_UNKNOWN;		
 	}
 	public int getNodeStatus(String machine_id, String node_id) {
 		return getNodeStatus(findNode(machine_id, node_id));

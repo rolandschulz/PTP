@@ -21,12 +21,11 @@ package org.eclipse.ptp.internal.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.internal.Element;
@@ -36,10 +35,8 @@ import org.eclipse.ptp.ui.model.internal.ElementHandler;
  * @author Clement chu
  *
  */
-public class JobManager implements IManager {
-	protected IModelManager modelManager = null;
+public class JobManager extends AbstractUIManager {
 	protected Map jobList = new HashMap();
-	protected String cur_set_id = IElementHandler.SET_ROOT_ID;
 	protected String cur_job_id = "";
 	
 	public JobManager() {
@@ -90,17 +87,17 @@ public class JobManager implements IManager {
 	}
 	public String getProcessStatusText(IPProcess proc) {
 		switch (getProcessStatus(proc)) {
-		case MachineManager.PROC_STARTING:
+		case IPTPUIConstants.PROC_STARTING:
 			return "Starting";
-		case MachineManager.PROC_RUNNING:
+		case IPTPUIConstants.PROC_RUNNING:
 			return "Running";
-		case MachineManager.PROC_EXITED:
+		case IPTPUIConstants.PROC_EXITED:
 			return "Exited";
-		case MachineManager.PROC_EXITED_SIGNAL:
+		case IPTPUIConstants.PROC_EXITED_SIGNAL:
 			return "Exited Signal";
-		case MachineManager.PROC_STOPPED:
+		case IPTPUIConstants.PROC_STOPPED:
 			return "Stopped";
-		case MachineManager.PROC_ERROR:
+		case IPTPUIConstants.PROC_ERROR:
 			return "Error";
 		default:
 			return "Error";
@@ -113,19 +110,19 @@ public class JobManager implements IManager {
 		if (proc != null) {
 			String status = proc.getStatus();
 			if (status.equals(IPProcess.STARTING))
-				return MachineManager.PROC_STARTING;
+				return IPTPUIConstants.PROC_STARTING;
 			else if (status.equals(IPProcess.RUNNING))
-				return MachineManager.PROC_RUNNING;
+				return IPTPUIConstants.PROC_RUNNING;
 			else if (status.equals(IPProcess.EXITED))
-				return MachineManager.PROC_EXITED;
+				return IPTPUIConstants.PROC_EXITED;
 			else if (status.equals(IPProcess.EXITED_SIGNALLED))
-				return MachineManager.PROC_EXITED_SIGNAL;
+				return IPTPUIConstants.PROC_EXITED_SIGNAL;
 			else if (status.equals(IPProcess.STOPPED))
-				return MachineManager.PROC_STOPPED;
+				return IPTPUIConstants.PROC_STOPPED;
 			else if (status.equals(IPProcess.ERROR))
-				return MachineManager.PROC_ERROR;
+				return IPTPUIConstants.PROC_ERROR;
 		}
-		return MachineManager.PROC_ERROR;
+		return IPTPUIConstants.PROC_ERROR;
 	}
 	
 	//FIXME using id, or name

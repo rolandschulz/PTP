@@ -16,24 +16,17 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.model;
+package org.eclipse.ptp.internal.ui;
+
+import org.eclipse.ptp.core.IModelManager;
+import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.model.IElementHandler;
 
 /**
- * @author clement chu
+ * @author Clement chu
  *
  */
-public interface IElementHandler extends IContainer {
-	public static final String SET_ROOT_ID = "Root";	
-	public IElementSet getSetRoot();
-	
-	public IElementSet[] getSetsWithElement(String id);
-	public IElementSet[] getSortedSets();
-	public IElementSet[] getSets();
-	public IElementSet getSet(String id);
-	public IElementSet getSet(int index);
-	
-	public boolean containsRegisterElement(IElement element);
-	public void addRegisterElement(IElement element);
-	public void removeRegisterElement(IElement element);
-	public IElement[] getRegisteredElements();
+public abstract class AbstractUIManager implements IManager {
+	protected IModelManager modelManager = null;
+	protected String cur_set_id = IElementHandler.SET_ROOT_ID;
 }
