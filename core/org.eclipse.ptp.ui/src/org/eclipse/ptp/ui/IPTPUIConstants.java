@@ -37,4 +37,10 @@ public interface IPTPUIConstants {
 	
     public static final String ACTION_SET = PREFIX + "actionSets";
     public static final String ACTION_SHOW_LEGEND = PREFIX + "actions.showLegendAction";
+    
+    public static final String IUINAVIGATORGROUP = "navigatorgroup";
+    public static final String IUIACTIONGROUP = "actiongroup";
+    public static final String IUISETGROUP = "setgroup";
+    public static final String IUICHANGESETGROUP = "changesetgroup";
+    public static final String IUIEMPTYGROUP = "emptygroup";
 }

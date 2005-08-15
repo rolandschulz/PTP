@@ -2,47 +2,31 @@
 <?eclipse version="3.0"?>
 <plugin>
     
-<!-- create perspective //-->
-	<extension
-		point="org.eclipse.ui.perspectives">
-		<perspective
-			name="Parallel Debug"
-			icon="icons/ptp.gif"
-			class="org.eclipse.ptp.debug.internal.ui.PTPDebugPerspectiveFactory"
-			id="org.eclipse.ptp.debug.ui.PTPDebugPerspective"/>
-	</extension>   
+   <!-- perspective //-->
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            name="%ParallelDebugPerspective.name"
+            icon="icons/ptp.gif"
+            class="org.eclipse.ptp.debug.internal.ui.PTPDebugPerspectiveFactory"
+            id="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
+      </perspective>
+   </extension>   
 
-	<extension
-		point="org.eclipse.ui.views">
-		<category
-			name="Parallel Debug"
-			id="org.eclipse.ptp.debug.ui.views">
-		</category>
-		<view
-			name="%DebugParallelView.name"
-			icon="icons/ptp.gif"
-			category="org.eclipse.ptp.debug.ui.views"
-			class="org.eclipse.ptp.debug.ui.views.ParallelDebugView"
-			id="org.eclipse.ptp.debug.ui.views.parallelDebugView">
-		</view>
-	</extension>
-	<!--
-	<extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            label="%ActionSets.name"
-            visible="true"
-            id="rg.eclipse.ptp.debug.ui..actionSets">
-         <action
-               label="%legendAction.name"
-               icon="icons/legend.gif"
-               class="org.eclipse.ptp.ui.actions.ShowLegendAction"
-               tooltip="%legendAction.tooltip"
-               toolbarPath="org.eclipse.ptp.debug.ui.actionSets"
-               id="org.eclipse.ptp.ui.actions.showLegendAction">
-         </action>
-	</extension>
-	//-->
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="%ParallelDebugViewCategory.name"
+            id="org.eclipse.ptp.debug.ui.views">
+      </category>
+      <view
+            name="%ParallelDebugView.name"
+            icon="icons/ptp.gif"
+            category="org.eclipse.ptp.debug.ui.views"
+            class="org.eclipse.ptp.debug.ui.views.ParallelDebugView"
+            id="org.eclipse.ptp.debug.ui.views.parallelDebugView">
+      </view>
+   </extension>
 
    <extension
          point="org.eclipse.debug.ui.debugModelPresentations">
@@ -204,12 +188,19 @@
    </extension>
 
    <extension
+         point="org.eclipse.debug.ui.breakpointOrganizers">
+      <breakpointOrganizer
+            othersLabel="%PBreakpointSet.others"
+            label="%PBreakpointSet.label"
+            icon="icons/debug/ptp_bpt_set.gif"
+            class="org.eclipse.ptp.debug.internal.ui.views.breakpoints.PBreakpointSetOrganizer"
+            id="org.eclipse.ptp.debug.ui.pBreakpointSetOrganizer">
+      </breakpointOrganizer>
+   </extension>
+   
+   <!--
+   <extension
          point="org.eclipse.ui.viewActions">
-      <viewContribution
-            targetID="org.eclipse.debug.ui.BreakpointView"
-            id="org.eclipse.ptp.debug.ui.breakpointView.toolbar">
-      </viewContribution>
-      <!--
       <viewContribution
             targetID="org.eclipse.debug.ui.BreakpointView"
             id="org.eclipse.ptp.debug.ui.breakpointView.menu">
@@ -223,18 +214,8 @@
                id="org.eclipse.ptp.debug.internal.ui.actions.ShowFullPathsAction">
          </action>
       </viewContribution>
-      //-->
    </extension>
-
-    <extension
-          point="org.eclipse.debug.ui.breakpointOrganizers">
-          <breakpointOrganizer
-                othersLabel="%PBreakpointSet.others"
-                label="%PBreakpointSet.label"
-                icon="icons/debug/ptp_bpt_set.gif"
-                class="org.eclipse.ptp.debug.internal.ui.views.breakpoints.PBreakpointSetOrganizer"
-                id="org.eclipse.ptp.debug.ui.pBreakpointSetOrganizer"/>
-   </extension>
+   //-->
 
    <!--
    <extension
@@ -251,38 +232,117 @@
             class="org.eclipse.ptp.debug.internal.ui.propertypages.PBreakpointFilteringPage"
             name="%FilteringBreakpointPage.label"
             id="org.eclipse.ptp.debug.ui.propertypages.breakpoint.filtering"/>
-   </extension>
+   </extension>    
    //-->
 
+   <extension point="org.eclipse.core.runtime.adapters">
+      <factory 
+            class="org.eclipse.ptp.debug.internal.ui.actions.RetargettableActionAdapterFactory" 
+            adaptableType="org.eclipse.cdt.internal.ui.editor.CEditor">
+         <adapter
+               type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
+         </adapter>
+         <adapter
+               type="org.eclipse.debug.ui.actions.IRunToLineTarget">
+         </adapter>
+         <adapter
+               type="org.eclipse.debug.ui.actions.IResumeAtLineTarget">
+          </adapter>
+      </factory>
+      <factory
+            class="org.eclipse.ptp.debug.internal.ui.actions.RetargettableActionAdapterFactory"
+            adaptableType="org.eclipse.ui.views.contentoutline.ContentOutline">
+         <adapter
+               type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
+         </adapter>
+      </factory>
+      <factory
+            class="org.eclipse.ptp.debug.internal.ui.PBreakpointWorkbenchAdapterFactory"
+            adaptableType="org.eclipse.ptp.debug.core.model.IPBreakpoint">
+         <adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
+      </factory>
+   </extension>
+   
+   <!--
+   <extension
+         point="org.eclipse.ui.editorActions">
+      <editorContribution
+            targetID="org.eclipse.cdt.ui.editor.CEditor"
+            id="org.eclipse.ptp.debug.ui.CEditor.BreakpointRulerActions">
+         <action
+            label="%ToggleBreakpoint.label"
+            class="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
+            actionID="RulerDoubleClick"
+            id="org.eclipse.ptp.debug.ui.CEditor.ManageBreakpointRulerAction">
+         </action>
+      </editorContribution>
+   </extension>
+   //-->
+   
    <extension
          point="org.eclipse.ui.popupMenus">
       <viewerContribution
             targetID="#CEditorRulerContext"
-            id="org.eclipse.cdt.debug.ui.CEditorRulerActions">
-         <menu
+            id="org.eclipse.ptp.debug.ui.CEditorRulerActions">
+        <menu
          	label="%EditorRulerAction.label"
          	path="debug"
          	id="org.eclipse.ptp.debug.ui.popupmenu.submenu">
-         	<separator name="ptpseparator"></separator>
-         </menu>
+            <groupMarker
+                name="ptpGroup">
+            </groupMarker>
+        </menu>
+        <action
+            label="%PBreakpointProperties.label"
+            class="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesRulerActionDelegate"
+            menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup"
+            id="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesRulerActionDelegate">
+        </action>
+        <action
+            label="%EnableDisableBreakpoint.label"
+            class="org.eclipse.ptp.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
+            menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup"
+            id="org.eclipse.ptp.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate">
+        </action>
+        <action
+            label="%ToggleBreakpoint.label"
+            class="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
+            menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpGroup"
+            id="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate">
+        </action>
+      </viewerContribution>
+      <viewerContribution
+            targetID="org.eclipse.debug.ui.BreakpointView"
+            id="org.eclipse.ptp.debug.ui.breakpointview.popupMenu">
          <action
-               label="BreakpointProperties Label"
-               class="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesRulerActionDelegate"
-               menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpseparator"
-               id="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesRulerActionDelegate">
-         </action>
-         <action
-               label="Enable/Disable Breakpoint"
-               class="org.eclipse.ptp.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate"
-               menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpseparator"
-               id="org.eclipse.ptp.debug.internal.ui.actions.EnableDisableBreakpointRulerActionDelegate">
-         </action>
-         <action
-               label="Add Breakpoint Set"
-               class="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate"
-               menubarPath="org.eclipse.ptp.debug.ui.popupmenu.submenu/ptpseparator"
-               id="org.eclipse.ptp.debug.internal.ui.actions.ManageBreakpointRulerActionDelegate">
+               label="%GotoSet.label"
+               icon="icons/debug/ptp_bpt_set.gif"
+               class="org.eclipse.ptp.debug.internal.ui.actions.GotoSet"
+               menubarPath="navigationGroup"
+               enablesFor="1+"
+               id="org.eclipse.ptp.debug.internal.ui.actions.GotoSet">
          </action>
       </viewerContribution>
-	</extension>
+      <objectContribution
+            objectClass="org.eclipse.ptp.debug.core.model.IPBreakpoint"
+            id="org.eclipse.ptp.debug.ui.PBreakpointActions">
+         <action
+               label="%BreakpointPropertiesAction.label"
+               class="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesAction"
+               menubarPath="additions"
+               enablesFor="1"
+               id="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesAction">
+         </action>
+      </objectContribution>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            adaptable="true"
+            objectClass="org.eclipse.ptp.debug.core.model.IPBreakpoint"
+            class="org.eclipse.ptp.debug.internal.ui.propertypages.PBreakpointPropertyPage"
+            name="%CommonBreakpointPage.label"
+            id="org.eclipse.ptp.debug.ui.propertypages.breakpoint.common"/>
+   </extension>   
 </plugin>

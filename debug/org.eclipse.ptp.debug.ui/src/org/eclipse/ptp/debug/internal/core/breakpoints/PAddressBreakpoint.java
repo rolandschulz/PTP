@@ -24,7 +24,7 @@ import java.util.Map;
 import org.eclipse.cdt.debug.internal.core.breakpoints.BreakpointMessages;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.debug.core.breakpoints.IPAddressBreakpoint;
+import org.eclipse.ptp.debug.core.model.IPAddressBreakpoint;
 
 /**
  * @author Clement chu

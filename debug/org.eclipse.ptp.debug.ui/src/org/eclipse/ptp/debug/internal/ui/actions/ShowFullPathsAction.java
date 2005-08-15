@@ -48,7 +48,7 @@ public class ShowFullPathsAction extends ViewFilterAction {
 		if (view != null) {
 			IDebugModelPresentation pres = view.getPresentation(PTPDebugUIPlugin.getUniqueIdentifier());
 			if ( pres != null ) {
-				pres.setAttribute(PDebugModelPresentation.DISPLAY_FULL_PATHS, (getValue() ? Boolean.TRUE : Boolean.FALSE));
+				pres.setAttribute(PDebugModelPresentation.DISPLAY_FULL_PATHS, (getValue()?Boolean.TRUE:Boolean.FALSE));
 				BusyIndicator.showWhile(viewer.getControl().getDisplay(), new Runnable() {
 					public void run() {
 						viewer.refresh();

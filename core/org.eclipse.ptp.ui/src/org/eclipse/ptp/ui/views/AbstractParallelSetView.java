@@ -56,49 +56,55 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
-		createBuildInToolBarActions();
-		createBuildInMenuActions();
+		IToolBarManager toolBarMgr = getViewSite().getActionBars().getToolBarManager();
+		createToolBarGroups(toolBarMgr);
+		createToolBarActions(toolBarMgr);
+		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+		createMenuGroups(menuMgr);
+		createMenuActions(menuMgr);
 		createContextMenu();
 		initialView();
+		if (menuMgr.getItems().length == 1)
+			menuMgr.removeAll();
 	}
 	
-	protected void createBuildInToolBarActions() {		
-		IToolBarManager toolBarMgr = getViewSite().getActionBars().getToolBarManager();
-		if (createToolBarActions(toolBarMgr))
-			toolBarMgr.add(new Separator());
-
-		//default actions
+	protected void createToolBarGroups(IToolBarManager toolBarMgr) {	
+		toolBarMgr.add(new Separator(IPTPUIConstants.IUINAVIGATORGROUP));
+		toolBarMgr.add(new Separator(IPTPUIConstants.IUIACTIONGROUP));
+		toolBarMgr.add(new Separator(IPTPUIConstants.IUISETGROUP));
+		toolBarMgr.add(new Separator(IPTPUIConstants.IUISETGROUP));
+		toolBarMgr.add(new Separator(IPTPUIConstants.IUICHANGESETGROUP));
+		toolBarMgr.add(new Separator(IPTPUIConstants.IUIEMPTYGROUP));
+	}
+	protected void buildInToolBarActions(IToolBarManager toolBarMgr) {
 		createSetAction = new CreateSetAction(this);
 		deleteSetAction = new DeleteSetAction(this);
 		deleteProcessAction = new DeleteProcessAction(this);
 		changeSetAction = new ChangeSetAction(this);
-
-		toolBarMgr.add(createSetAction);
-		toolBarMgr.add(deleteSetAction);
-		toolBarMgr.add(deleteProcessAction);
-		toolBarMgr.add(new Separator());
-		toolBarMgr.add(changeSetAction);
+		
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUISETGROUP, createSetAction);
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUISETGROUP, deleteSetAction);
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUISETGROUP, deleteProcessAction);
+		toolBarMgr.appendToGroup(IPTPUIConstants.IUICHANGESETGROUP, changeSetAction);
 	}
-	/**
-	 * @return true - need seperator, false - no seperator
-	 */
-	protected abstract boolean createToolBarActions(IToolBarManager toolBarMgr);
 	
-	protected void createBuildInMenuActions() {
-		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-		if (createMenuActions(menuMgr))
-			menuMgr.add(new Separator());
+	protected void createToolBarActions(IToolBarManager toolBarMgr) {
+		buildInToolBarActions(toolBarMgr);
 	}
-	protected abstract boolean createMenuActions(IMenuManager menuMgr);
+	
+	protected void createMenuGroups(IMenuManager menuMgr) {
+		menuMgr.add(new Separator(IPTPUIConstants.IUIEMPTYGROUP));
+	}
+	protected void createMenuActions(IMenuManager menuMgr) {}
 
 	protected void createContextMenu() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		MenuManager menuMgr = new MenuManager("#popupmenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
 				//if right click occur, eclipse will ignore the key up event, so clear keyCode when popup occur.
 				keyCode = SWT.NONE;
-				fillBuildInContextMenu(manager);
+				fillContextMenu(manager);
 			}
 		});
 		Menu menu = menuMgr.createContextMenu(drawComp);
@@ -107,15 +113,14 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		getSite().registerContextMenu(menuMgr, this);
 	}
 
-	protected void fillBuildInContextMenu(IMenuManager manager) {
-		if (fillContextMenu(manager))
-			manager.add(new Separator());
-		
+	protected void fillContextMenu(IMenuManager manager) {
+		manager.add(new Separator(IPTPUIConstants.IUIACTIONGROUP));
+		manager.add(new Separator(IPTPUIConstants.IUIEMPTYGROUP));
+		manager.add(new Separator(IPTPUIConstants.IUICHANGESETGROUP));
 		manager.add(new ChangeSetAction(this));
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}	
-	protected abstract boolean fillContextMenu(IMenuManager manager);
 	
 	public void update() {
 		updateAction();

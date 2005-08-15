@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.internal.ui.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.source.IVerticalRulerInfo;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.AbstractRulerActionDelegate;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -30,10 +31,10 @@ import org.eclipse.ui.texteditor.ITextEditor;
  */
 public class ManageBreakpointRulerActionDelegate extends AbstractRulerActionDelegate {
 	private IEditorPart activeEditor;
-	private SetbreakpointRulerAction targetAction = null;
+	private ToggleBreakpointRulerAction targetAction = null;
 	
 	public IAction createAction(ITextEditor editor, IVerticalRulerInfo rulerInfo) {
-		targetAction = new SetbreakpointRulerAction(editor, rulerInfo);
+		targetAction = new ToggleBreakpointRulerAction(editor, rulerInfo);
 		return targetAction;
 	}
 
@@ -46,5 +47,9 @@ public class ManageBreakpointRulerActionDelegate extends AbstractRulerActionDele
 		}
 		activeEditor = targetEditor;
 		super.setActiveEditor(callerAction, targetEditor);
-	}		
+	}
+	
+	public void mouseDoubleClick(MouseEvent e) {
+		targetAction.run();
+	}
 }

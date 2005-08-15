@@ -28,7 +28,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
  *
  */
 public class PBreakpointPropertiesRulerActionDelegate extends AbstractRulerActionDelegate {
-	
 	protected IAction createAction(ITextEditor editor, IVerticalRulerInfo rulerInfo) {
 		return new PBreakpointPropertiesRulerAction(editor, rulerInfo);
 	}

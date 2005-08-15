@@ -51,13 +51,13 @@ public abstract class AbstractParallelView extends ViewPart implements ISelectio
      * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
      */
     public void addSelectionChangedListener(ISelectionChangedListener listener) {
-    		listeners.add(listener);
+    	listeners.add(listener);
     }
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
      */
     public void removeSelectionChangedListener(ISelectionChangedListener listener) {
-    		listeners.remove(listener);
+    	listeners.remove(listener);
     }	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPart#dispose()

@@ -38,12 +38,11 @@ import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IValueDetailListener;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.ptp.debug.core.breakpoints.IPAddressBreakpoint;
-import org.eclipse.ptp.debug.core.breakpoints.IPBreakpoint;
-import org.eclipse.ptp.debug.core.breakpoints.IPFunctionBreakpoint;
-import org.eclipse.ptp.debug.core.breakpoints.IPLineBreakpoint;
+import org.eclipse.ptp.debug.core.model.IPAddressBreakpoint;
+import org.eclipse.ptp.debug.core.model.IPBreakpoint;
+import org.eclipse.ptp.debug.core.model.IPFunctionBreakpoint;
+import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
-import org.eclipse.ptp.debug.ui.UIDebugManager;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorDescriptor;
@@ -80,10 +79,8 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			IEditorDescriptor descriptor = registry.getDefaultEditor(input.getName());
 			if (descriptor != null)
 				return descriptor.getId();
-			/*
-			 * FIXME
-			id = (descriptor != null) ? descriptor.getId() : CUIPlugin.EDITOR_ID;
-			*/
+			//TODO return CEditor id hardcode
+			return (descriptor != null)?descriptor.getId():"org.eclipse.cdt.ui..editor.CEditor";
 		}
 		return null;
 	}
@@ -191,6 +188,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 				return getLineBreakpointImage((IPLineBreakpoint)breakpoint);
 			//TODO implement WatchBreakpoint
 		} catch(CoreException e) {
+			PTPDebugUIPlugin.log(e);
 		}
 		return null;
 	}
@@ -200,14 +198,14 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		String cur_job_id = uiDebugManager.getCurrentJobId();
 
 		// Display nothing if the breakpoint is not in current job
-		if (cur_job_id == null || !cur_job_id.equals(job_id))
+		if (job_id == null || !cur_job_id.equals(job_id))
 			return new Image(null, 1, 1);
 		
 		String descriptor = null;
 		IElementHandler setManager = uiDebugManager.getElementHandler(job_id);
 		if (setManager == null) //no job running
 			descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_ONESET_EN : PDebugImage.IMG_DEBUG_ONESET_DI;
-		else {//created job
+		else { //created job
 			String cur_set_id = uiDebugManager.getCurrentSetId();
 			String bpt_set_id = breakpoint.getSetId();
 			
@@ -270,11 +268,10 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			}
 		}
 		catch (DebugException e) {
-			return "Cannot find base text err: " + e.getMessage();
+			PTPDebugUIPlugin.log(e);
 		}
 		catch (CoreException e) {
-			//TODO should log it
-			System.out.println("GetBaseText Err: " + e.getMessage());
+			PTPDebugUIPlugin.log(e);
 		}
 		return null;
 	}
@@ -335,7 +332,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	}
 	protected StringBuffer appendStatus(IPBreakpoint breakpoint, StringBuffer label) throws CoreException {
 		String job_id = breakpoint.getJobId();
-		String jobName = job_id.length()==0?"N/A":uiDebugManager.getName(job_id);
+		String jobName = uiDebugManager.isNoJob(job_id)?"N/A":uiDebugManager.getName(job_id);
 		label.append(" ");
 		label.append("<Job: " + jobName + " - Set: " + breakpoint.getSetId() + ">");
 		return label;
@@ -357,8 +354,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 				overlays[OverlayImageDescriptor.TOP_RIGHT] = (breakpoint.isEnabled()) ? PDebugImage.ID_IMG_DEBUG_OVER_BPT_FUNC_EN : PDebugImage.ID_IMG_DEBUG_OVER_BPT_FUNC_DI;
 			}
 		} catch(CoreException e) {
-			//TODO log it
-			System.out.println("computerBreakpointOverlays err: " + e.getMessage());
+			PTPDebugUIPlugin.log(e);
 		}
 		return overlays;
 	}

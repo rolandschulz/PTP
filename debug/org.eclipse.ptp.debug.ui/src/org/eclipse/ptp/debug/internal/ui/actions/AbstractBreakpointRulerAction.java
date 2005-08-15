@@ -50,12 +50,12 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 
 	protected IBreakpoint determineBreakpoint() {
 		//TODO need to change back PTPDebugUIPlugin to PTPDebugCorePlugin
-		IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints( PTPDebugUIPlugin.getUniqueIdentifier() );
-		for( int i = 0; i < breakpoints.length; i++ ) {
+		IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(PTPDebugUIPlugin.getUniqueIdentifier());
+		for(int i = 0; i < breakpoints.length; i++) {
 			IBreakpoint breakpoint = breakpoints[i];
-			if ( breakpoint instanceof ILineBreakpoint ) {
+			if (breakpoint instanceof ILineBreakpoint) {
 				ILineBreakpoint lineBreakpoint = (ILineBreakpoint)breakpoint;
-				if ( breakpointAtRulerLine( lineBreakpoint ) ) {
+				if (breakpointAtRulerLine(lineBreakpoint)) {
 					return lineBreakpoint;
 				}
 			}
@@ -87,7 +87,7 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 	}
 
 	protected boolean breakpointAtRulerLine(ILineBreakpoint pBreakpoint) {
-		int lineNumber = getBreakpointLine( pBreakpoint );
+		int lineNumber = getBreakpointLine(pBreakpoint);
 		int rulerLine = getInfo().getLineOfLastMouseButtonActivity();
 		return (rulerLine == lineNumber);
 	}
