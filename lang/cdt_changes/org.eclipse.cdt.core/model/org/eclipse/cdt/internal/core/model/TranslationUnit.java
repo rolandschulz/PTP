@@ -1,9 +1,15 @@
-package org.eclipse.cdt.internal.core.model;
+/*******************************************************************************
+ * Copyright (c) 2000, 2005 QNX Software Systems and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     QNX Software Systems - Initial API and implementation
+ *******************************************************************************/
 
-/*
- * (c) Copyright IBM Corp. 2000, 2001.
- * All Rights Reserved.
- */
+package org.eclipse.cdt.internal.core.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -584,13 +590,12 @@ public class TranslationUnit extends Openable implements ITranslationUnit {
 				// newElements);
 				modelBuilder = new CModelBuilder(this, newElements);
 			// JO -- END
-			boolean quickParseMode = !(CCorePlugin.getDefault()
-					.useStructuralParseMode());
+			boolean quickParseMode = ! (CCorePlugin.getDefault().useStructuralParseMode());
 			modelBuilder.parse(quickParseMode);
 		} catch (Exception e) {
 			// use the debug log for this exception.
-			Util.debugLog("Exception in CModelBuilder", IDebugLogConstants.MODEL); //$NON-NLS-1$
-		}
+			Util.debugLog( "Exception in CModelBuilder", IDebugLogConstants.MODEL);  //$NON-NLS-1$
+		}							
 	}
 	
 	public IProblemRequestor getProblemRequestor() {

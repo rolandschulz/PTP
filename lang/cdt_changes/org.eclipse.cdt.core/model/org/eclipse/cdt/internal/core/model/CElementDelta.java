@@ -1,9 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2000, 2004 QNX Software Systems and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     QNX Software Systems - Initial API and implementation
+ *******************************************************************************/
+
 package org.eclipse.cdt.internal.core.model;
 
-/*
- * (c) Copyright IBM Corp. 2000, 2001.
- * All Rights Reserved.
- */
 import java.util.ArrayList;
 
 import org.eclipse.cdt.core.model.ICElement;
@@ -696,6 +703,12 @@ public class CElementDelta implements ICElementDelta {
 			if (prev)
 				buffer.append(" | "); //$NON-NLS-1$
 			buffer.append("PATHENTRY REORDER"); //$NON-NLS-1$
+			prev = true;
+		}
+		if ((changeFlags & ICElementDelta.F_CONTENT_TYPE) != 0) {
+			if (prev)
+				buffer.append(" | "); //$NON-NLS-1$
+			buffer.append("CONTENT_TYPE"); //$NON-NLS-1$
 			prev = true;
 		}
 
