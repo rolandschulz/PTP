@@ -26,262 +26,60 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.model.MProcess;
 
-public class ParallelDebugger extends AbstractDebugger {
+public class ParallelDebugger extends AbstractDebugger throws DebugException {
 
-	final int RUNNING = 10;
-	final int SUSPENDED = 11;
-	
-	int state = 0;
-	boolean finished = false;
-	
-	private Process debuggerProcess = null;
-	
-	
 	protected void startDebugger(IPJob job) {
 	}
 	
 	protected void stopDebugger() {
 	}
-
-	public Process getSessionProcess() {
-		return debuggerProcess;
-	}
-
-	public MProcess[] getProcesses() {
-		int listSize = allSet.getSize();
-		MProcess[] procs = new MProcess[listSize];
-		for (int i = 0; i < listSize; i++) {
-			procs[i] = allSet.getProcess(i);
-		}
-		return procs;
-	}
-
-	public MProcess getProcess(int num) {
-		return (allSet.getProcess(num));
-	}
 	
-	public MProcess getProcess() {
-		return getProcess(0);
-	}
-	
-	public void go() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.go()");
-		state = RUNNING;
-	}
-
-	public void kill() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.kill()");
-		int listSize = allSet.getSize();
-		//long start = System.currentTimeMillis();
-		
-		for (int i = 0; i < listSize; i++) {
-			//System.out.println("terminating: " + allSet.getProcess(i).getName());
-			((Process) allSet.getProcess(i).getDebugInfo()).destroy();
-		}
-
-		//long end = System.currentTimeMillis();
-		
-		//double totalseconds = (double)(end - start) / (double)1000;
-		//System.out.println("DebugSimulator.terminate() takes " + totalseconds + " seconds");
-	}
-
-	public void halt() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.halt()");
-		state = SUSPENDED;
-	}
-	
-	public void load(String prg) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.load()");
-		
-	}
-
-	public void load(String prg, int numProcs) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.load()");
-		
-	}
-
 	public void run(String[] args) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.run()");
-		
 	}
 
-	public void run() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.run()");
-		
+	public void go(ProcessSet p) {
 	}
 
-	public void detach() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.detach()");
-		
+	public void kill(ProcessSet p) {
 	}
 
-	public void step() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.step()");
-		
+	public void halt(ProcessSet p) {
+	}
+	
+	public void stepInto(ProcessSet p, int count) {
 	}
 
-	public void step(int count) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.step()");
-		
+	public void stepOver(ProcessSet p, int count) {
 	}
 
-	public void stepOver() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.stepOver()");
-		
+	public void stepFinish(ProcessSet p, int count) {
 	}
 
-	public void stepOver(int count) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.stepOver()");
-		
+	public BreakPoint setLineBreakpoint(ProcessSet p, String file, int line) {
 	}
 
-	public void stepFinish() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.stepFinish()");
-		
+	public BreakPoint setFunctionBreakpoint(ProcessSet p, String file, String func) {
 	}
 
-	public void breakpoint(String loc) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.breakpoint()");
+	public void deleteBreakpoint(BreakPoint bp) {
+	}
+	
+	public StackFrame[] listStackFrames(ProcessSet p) {
+	}
+	
+	public StackFrame moveStackFrame(ProcessSet p, int count, boolean down) {
 		
 	}
-
-	public void breakpoint(String loc, int count) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.breakpoint()");
+	
+	public Expression evaluateExpression(ProcessSet p, String expr) {
 		
 	}
-
-	public void breakpoint(String loc, String cond) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.breakpoint()");
+	
+	public Variable[] listVariables(ProcessSet p, StackFrame f) {
 		
 	}
-
-	public void watchpoint(String var) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.watchpoint()");
-		
-	}
-
-	public void delete(int[] ids) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.delete()");
-		
-	}
-
-	public void delete(String type) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.delete()");
-		
-	}
-
-	public void disable(int[] ids) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.disable()");
-		
-	}
-
-	public void disable(String type) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.disable()");
-		
-	}
-
-	public void enable(int[] ids) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.enable()");
-		
-	}
-
-	public void enable(String type) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.enable()");
-		
-	}
-
-	public void restart() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.restart()");
-		
-	}
-
-	public void step(int[] procs) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.step");
-		
-	}
-
-	public void step(int[] procs, int count) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.step");
-		
-	}
-
-	public void stepOver(int[] procs) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.stepOver");
-		
-	}
-
-	public void stepOver(int[] procs, int count) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.stepOver");
-		
-	}
-
-	public void stepFinish(int[] procs) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.stepFinish");
-		
-	}
-
-	public void halt(int[] procs) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.halt");
-		
-	}
-
-	public void go(int[] procs) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.go");
-		
-	}
-
-	public void breakpoint(int[] procs, String loc) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.breakpoint");
-		
-	}
-
-	public void breakpoint(int[] procs, String loc, int count) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.breakpoint");
-		
-	}
-
-	public void breakpoint(int[] procs, String loc, String cond) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.breakpoint");
-		
-	}
-
-	public void watchpoint(int[] procs, String var) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.watchpoint");
+	
+	public Variable[] listGlobalVariables(ProcessSet p) {
 		
 	}
 }
