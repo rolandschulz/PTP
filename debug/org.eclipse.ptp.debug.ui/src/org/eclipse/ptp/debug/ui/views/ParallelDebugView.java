@@ -120,17 +120,15 @@ public class ParallelDebugView extends ParallelJobView {
 		IElement element = cur_element_set.get(element_num);
 		if (element == null)
 			return "Unknown element";
-		
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("ID: " + element.getID());
-		
+
 		IPProcess proc = getUIDebugManager().findProcess(getCurrentJobID(), element.getID());
-		if (proc != null) {
-			buffer.append("\n");
-			buffer.append("Tast ID: " + proc.getTaskId());
-			buffer.append("\n");
-			buffer.append("Tast ID: " + proc.getPid());
-		}
+		if (proc != null)
+			return "Unknow process";
+
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("Tast ID: " + proc.getTaskId());
+		buffer.append("\n");
+		buffer.append("Process ID: " + proc.getPid());
 
 		IElementSet[] groups = setManager.getSetsWithElement(element.getID());
 		if (groups.length > 1)
@@ -140,7 +138,7 @@ public class ParallelDebugView extends ParallelJobView {
 			if (i < groups.length - 1)
 				buffer.append(",");
 		}
-		buffer.append("\nStatus: " + getUIDebugManager().getProcessStatusText(proc));
+		//buffer.append("\nStatus: " + getUIDebugManager().getProcessStatusText(proc));
 		return buffer.toString();
 	}
 
