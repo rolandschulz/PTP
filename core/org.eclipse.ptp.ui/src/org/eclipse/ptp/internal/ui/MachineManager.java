@@ -103,8 +103,8 @@ public class MachineManager implements IManager {
 		cur_set_id = set_id;
 	}	
 	
-	public String getNodeStatusText(String machine_id, String node_id) {
-		switch(getNodeStatus(machine_id, node_id)) {
+	public String getNodeStatusText(IPNode node) {
+		switch(getNodeStatus(node)) {
 		case NODE_USER_ALLOC_EXCL:
 			return "User Alloc Excl";
 		case NODE_USER_ALLOC_SHARED:
@@ -125,7 +125,9 @@ public class MachineManager implements IManager {
 			return "Unknown";
 		}
 	}
-	
+	public String getNodeStatusText(String job_id, String proc_id) {
+		return getNodeStatusText(findNode(job_id, proc_id));
+	}	
 	public int getProcStatus(String p_state) {
 		if (p_state.equals(IPProcess.STARTING))
 			return PROC_STARTING;
@@ -141,10 +143,8 @@ public class MachineManager implements IManager {
 			return PROC_ERROR;
 		else
 			return PROC_ERROR;
-	}
-	
-	public int getNodeStatus(String machine_id, String node_id) {
-		IPNode node = findNode(machine_id, node_id);
+	}	
+	public int getNodeStatus(IPNode node) {
 		if (node != null) {
 			String nodeState = (String)node.getAttrib("state");
 			if (nodeState.equals("up")) {
@@ -170,6 +170,9 @@ public class MachineManager implements IManager {
 				return NODE_ERROR;
 		}
 		return NODE_UNKNOWN;		
+	}
+	public int getNodeStatus(String machine_id, String node_id) {
+		return getNodeStatus(findNode(machine_id, node_id));
 	}
 
 	//FIXME using id, or name

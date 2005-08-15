@@ -20,6 +20,7 @@ package org.eclipse.ptp.ui.views;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.TerminateAllAction;
@@ -223,9 +224,16 @@ public class ParallelJobView extends AbstractParallelSetView {
 		IElement element = cur_element_set.get(element_num);
 		if (element == null)
 			return "Unknown element";
+
+		IPProcess proc = getJobManager().findProcess(getCurrentJobID(), element.getID());
+		if (proc == null)
+			return "Unknown process";
 		
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("ID: " + element.getID());
+		buffer.append("Tast ID: " + proc.getTaskId());
+		buffer.append("\n");
+		buffer.append("Process ID: " + proc.getPid());
+
 		IElementSet[] groups = setManager.getSetsWithElement(element.getID());
 		if (groups.length > 1)
 			buffer.append("\nGroup: ");
@@ -234,7 +242,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 			if (i < groups.length - 1)
 				buffer.append(",");
 		}
-		buffer.append("\nStatus: " + getJobManager().getProcessStatusText(getCurrentJobID(), element.getID()));
+		//buffer.append("\nStatus: " + getJobManager().getProcessStatusText(proc));
 		return buffer.toString();
 	}
 
