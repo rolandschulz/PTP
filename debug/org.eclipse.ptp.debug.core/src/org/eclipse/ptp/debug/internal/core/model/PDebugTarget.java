@@ -10,11 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.core.IAddressFactory;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
@@ -61,10 +63,18 @@ import org.eclipse.cdt.debug.core.model.IExecFileInfo;
 import org.eclipse.cdt.debug.core.model.IGlobalVariableDescriptor;
 import org.eclipse.cdt.debug.core.model.IPersistableRegisterGroup;
 import org.eclipse.cdt.debug.core.model.IRegisterDescriptor;
+import org.eclipse.cdt.debug.core.sourcelookup.ICSourceLocator;
+import org.eclipse.cdt.debug.core.sourcelookup.ISourceLookupChangeListener;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
@@ -78,17 +88,26 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IRegisterGroup;
+import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.debug.core.model.IThread;
+import org.eclipse.debug.core.sourcelookup.ISourceContainer;
+import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
+import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
+import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
+import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
+import org.eclipse.ptp.debug.core.sourcelookup.CDirectorySourceContainer;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupParticipant;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceManager;
 
 /**
  * Debug target for C/C++ debug model.
  */
-public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEventListener, ILaunchListener {
+public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEventListener, ILaunchListener, ISourceLookupChangeListener {
 
 	/**
 	 * Threads contained in this debug target. 
@@ -177,10 +196,12 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	}
 
 	protected void initialize() {
+		initializeSourceLookupPath();
 		ArrayList debugEvents = new ArrayList( 1 );
 		debugEvents.add( createCreateEvent() );
 		initializeThreads( debugEvents );
 		initializeBreakpoints();
+		initializeSourceManager();
 		getLaunch().addDebugTarget( this );
 		fireEventSet( (DebugEvent[])debugEvents.toArray( new DebugEvent[debugEvents.size()] ) );
 	}
@@ -217,6 +238,34 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		}
 		if ( suspendEvent != null ) {
 			debugEvents.add( suspendEvent );
+		}
+	}
+	
+	protected void initializeSourceManager() {
+		ISourceLocator locator = getLaunch().getSourceLocator();
+		if ( locator instanceof IAdaptable ) {
+			ICSourceLocator clocator = (ICSourceLocator)((IAdaptable)locator).getAdapter( ICSourceLocator.class );
+			if ( clocator instanceof IAdaptable ) {
+				CSourceManager sm = (CSourceManager)((IAdaptable)clocator).getAdapter( CSourceManager.class );
+				if ( sm != null )
+					sm.setDebugTarget( this );
+			}
+			IResourceChangeListener listener = (IResourceChangeListener)((IAdaptable)locator).getAdapter( IResourceChangeListener.class );
+			if ( listener != null )
+				CCorePlugin.getWorkspace().addResourceChangeListener( listener );
+		}
+	}
+
+	protected void initializeSourceLookupPath() {
+		ISourceLocator locator = getLaunch().getSourceLocator();
+		if ( locator instanceof ISourceLookupDirector ) {
+			ISourceLookupParticipant[] participants = ((ISourceLookupDirector)locator).getParticipants();
+			for ( int i = 0; i < participants.length; ++i ) {
+				if ( participants[i] instanceof CSourceLookupParticipant ) {
+					((CSourceLookupParticipant)participants[i]).addSourceLookupChangeListener( this );
+				}
+			}
+			setSourceLookupPath( ((ISourceLookupDirector)locator).getSourceContainers() );
 		}
 	}
 
@@ -772,6 +821,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		removeAllThreads();
 		getCDISession().getEventManager().removeEventListener( this );
 		DebugPlugin.getDefault().getLaunchManager().removeLaunchListener( this );
+		disposeSourceManager();
+		disposeSourceLookupPath();
 		disposeBreakpointManager();
 		disposePreferences();
 	}
@@ -1036,6 +1087,10 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return null;
 	}
 
+	protected ISourceLocator getSourceLocator() {
+		return getLaunch().getSourceLocator();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.core.model.IExecFileInfo#isLittleEndian()
 	 */
@@ -1099,6 +1154,27 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		}
 	}
 
+	protected void disposeSourceManager() {
+		ISourceLocator locator = getSourceLocator();
+		if ( locator instanceof IAdaptable ) {
+			IResourceChangeListener listener = (IResourceChangeListener)((IAdaptable)locator).getAdapter( IResourceChangeListener.class );
+			if ( listener != null )
+				CCorePlugin.getWorkspace().removeResourceChangeListener( listener );
+		}
+	}
+
+	protected void disposeSourceLookupPath() {
+		ISourceLocator locator = getLaunch().getSourceLocator();
+		if ( locator instanceof ISourceLookupDirector ) {
+			ISourceLookupParticipant[] participants = ((ISourceLookupDirector)locator).getParticipants();
+			for ( int i = 0; i < participants.length; ++i ) {
+				if ( participants[i] instanceof CSourceLookupParticipant ) {
+					((CSourceLookupParticipant)participants[i]).removeSourceLookupChangeListener( this );
+				}
+			}
+		}
+	}
+	
 	protected PBreakpointManager getBreakpointManager() {
 		return fBreakpointManager;
 	}
@@ -1279,5 +1355,50 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	public boolean isInstructionSteppingEnabled() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public void sourceContainersChanged( ISourceLookupDirector director ) {
+		setSourceLookupPath( director.getSourceContainers() );
+	}
+
+	private void setSourceLookupPath( ISourceContainer[] containers ) {
+		ArrayList list = new ArrayList( containers.length );
+		getSourceLookupPath( list, containers );
+		try {
+			getCDITarget().setSourcePaths( (String[])list.toArray( new String[list.size()] ) );
+		}
+		catch( CDIException e ) {
+			PTPDebugCorePlugin.log( e );
+		}
+	}
+
+	private void getSourceLookupPath( List list, ISourceContainer[] containers ) {
+		for ( int i = 0; i < containers.length; ++i ) {
+			if ( containers[i] instanceof ProjectSourceContainer ) {
+				IProject project = ((ProjectSourceContainer)containers[i]).getProject();
+				if ( project != null && project.exists() )
+					list.add( project.getLocation().toPortableString() );
+			}
+			if ( containers[i] instanceof FolderSourceContainer ) {
+				IContainer container = ((FolderSourceContainer)containers[i]).getContainer();
+				if ( container != null && container.exists() )
+					list.add( container.getLocation().toPortableString() );
+			}
+			if ( containers[i] instanceof CDirectorySourceContainer ) {
+				File dir = ((CDirectorySourceContainer)containers[i]).getDirectory();
+				if ( dir != null && dir.exists() ) {
+					IPath path = new Path( dir.getAbsolutePath() );
+					list.add( path.toPortableString() );
+				}
+			}
+			if ( containers[i].isComposite() ) {
+				try {
+					getSourceLookupPath( list, containers[i].getSourceContainers() );
+				}
+				catch( CoreException e ) {
+					PTPDebugCorePlugin.log( e.getStatus() );
+				}
+			}
+		}
 	}
 }

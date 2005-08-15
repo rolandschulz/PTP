@@ -28,4 +28,36 @@
    
    <extension-point id="PTPDebugger" name="Parallel Tools Core Debugger Extension" schema="schema/PTPDebugger.exsd"/>
 
+   <extension
+         point="org.eclipse.debug.core.sourcePathComputers">
+      <sourcePathComputer
+            class="org.eclipse.ptp.debug.internal.core.sourcelookup.CSourcePathComputerDelegate"
+            id="org.eclipse.ptp.debug.core.sourcePathComputer"/>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.sourceLocators">
+      <sourceLocator
+            class="org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupDirector"
+            name="C/C++ Source Locator"
+            id="org.eclipse.ptp.debug.core.sourceLocator"/>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.sourceContainerTypes">
+      <sourceContainerType
+            class="org.eclipse.ptp.debug.internal.core.sourcelookup.MappingSourceContainerType"
+            description="%containerDescription.mapping"
+            id="org.eclipse.ptp.debug.core.containerType.mapping"
+            name="%containerName.mapping"/>
+      <sourceContainerType
+            class="org.eclipse.ptp.debug.internal.core.sourcelookup.MapEntrySourceContainerType"
+            description="%containerDescription.mapEntry"
+            id="org.eclipse.ptp.debug.core.containerType.mapEntry"
+            name="%containerName.mapEntry"/>
+      <sourceContainerType
+            class="org.eclipse.ptp.debug.internal.core.sourcelookup.CDirectorySourceContainerType"
+            description="%containerDescription.directory"
+            id="org.eclipse.ptp.debug.core.containerType.directory"
+            name="%containerName.directory"/>
+   </extension>
+
 </plugin>
