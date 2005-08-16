@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi;
 
-import java.util.BitSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Properties;
@@ -43,6 +42,7 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
+import org.eclipse.ptp.debug.external.utils.BitList;
 
 public class Session implements IPCDISession, ICDISessionObject {
 	EventManager eventManager;
@@ -143,10 +143,10 @@ public class Session implements IPCDISession, ICDISessionObject {
 
 		currentDebugTargetList.put(Integer.toString(target.getTargetId()), target);
 		
-		BitSet bitSet = new BitSet();
-		bitSet.set(procNum);
+		BitList bitList = new BitList();
+		bitList.set(procNum);
 		//debugger.fireEvent(new ETargetRegistered(bitSet));
-		debugger.fireEvent(new TargetRegisteredEvent(this, bitSet));
+		debugger.fireEvent(new TargetRegisteredEvent(this, bitList));
 		
 		try {
 			boolean stopInMain = dLaunch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );

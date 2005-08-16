@@ -28,16 +28,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
-import java.util.BitSet;
-
 import org.eclipse.cdt.debug.core.cdi.event.ICDICreatedEvent;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.external.utils.BitList;
 
 /**
  */
 public class InferiorCreatedEvent extends AbstractEvent implements ICDICreatedEvent {
 
-	public InferiorCreatedEvent(IPCDISession s, BitSet sources) {
+	public InferiorCreatedEvent(IPCDISession s, BitList sources) {
 		super(s, sources);
 	}
 }

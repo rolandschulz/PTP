@@ -28,20 +28,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
-import java.util.BitSet;
-
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.external.cdi.BreakpointHit;
 import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.utils.BitList;
 
 /**
  *
  */
 public class BreakpointHitEvent extends AbstractEvent implements ICDISuspendedEvent {
 
-	public BreakpointHitEvent(IPCDISession s, BitSet sources) {
+	public BreakpointHitEvent(IPCDISession s, BitList sources) {
 		super(s, sources);
 	}
 	

@@ -28,16 +28,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
-import java.util.BitSet;
-
 import org.eclipse.cdt.debug.core.cdi.event.ICDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.external.utils.BitList;
 
 /**
  */
 public class InferiorResumedEvent extends AbstractEvent implements ICDIResumedEvent {
 	
-	public InferiorResumedEvent(IPCDISession s, BitSet sources) {
+	public InferiorResumedEvent(IPCDISession s, BitList sources) {
 		super(s, sources);
 	}
 	

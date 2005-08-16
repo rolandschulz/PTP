@@ -28,19 +28,18 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
-import java.util.BitSet;
-
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.utils.BitList;
 
 /**
  *
  */
 public class ErrorEvent extends AbstractEvent implements ICDISuspendedEvent {
 
-	public ErrorEvent(IPCDISession s, BitSet sources) {
+	public ErrorEvent(IPCDISession s, BitList sources) {
 		super(s, sources);
 	}
 	

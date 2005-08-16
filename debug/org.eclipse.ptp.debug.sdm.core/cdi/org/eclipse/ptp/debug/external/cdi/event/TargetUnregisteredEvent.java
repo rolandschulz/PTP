@@ -28,16 +28,15 @@
 ***********************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
-import java.util.BitSet;
-
 import org.eclipse.cdt.debug.core.cdi.event.ICDIDisconnectedEvent;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.external.utils.BitList;
 
 /**
  */
 public class TargetUnregisteredEvent extends AbstractEvent implements ICDIDisconnectedEvent {
 
-	public TargetUnregisteredEvent(IPCDISession s, BitSet sources) {
+	public TargetUnregisteredEvent(IPCDISession s, BitList sources) {
 		super(s, sources);
 	}
 }
