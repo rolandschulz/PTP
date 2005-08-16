@@ -18,22 +18,32 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model;
 
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
-import org.eclipse.ptp.debug.external.model.MProcess;
 
 public class DebugProcess implements IPCDIDebugProcess {
 	
-	private MProcess mProcess;
+	private IPProcess pProcess;
+	private Process process;
 
-	public DebugProcess(MProcess p) {
-		mProcess = p;
+	public DebugProcess(IPProcess pP, Process p) {
+		pProcess = pP;
+		process = p;
 	}
 	
-	public MProcess getMProcess() {
-		return mProcess;
+	public IPProcess getPProcess() {
+		return pProcess;
 	}
 	
 	public String getName() {
-		return mProcess.getName();
+		return pProcess.getElementName();
+	}
+
+	public void setProcess(Process p) {
+		process = p;
+	}
+
+	public Process getProcess() {
+		return process;
 	}
 }

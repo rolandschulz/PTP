@@ -27,9 +27,10 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
+import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.event.DebugEvent;
-import org.eclipse.ptp.debug.external.model.MProcess;
-import org.eclipse.ptp.debug.external.model.MProcessSet;
 import org.eclipse.ptp.debug.external.utils.Queue;
 
 /**
@@ -46,8 +47,8 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 	protected EventThread eventThread = null;
 
 	protected ArrayList userDefinedProcessSetList = null;
-	protected MProcessSet allSet = null;
-	protected MProcessSet currentFocus = null;
+	protected IPCDIDebugProcessSet allSet = null;
+	protected IPCDIDebugProcessSet currentFocus = null;
 	
 	protected boolean isExitingFlag = false; /* Checked by the eventThread */
 
@@ -60,7 +61,7 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 		eventThread.start();
 
 		userDefinedProcessSetList = new ArrayList();
-		allSet = new MProcessSet("all");
+		allSet = new DebugProcessSet("all");
 		currentFocus = allSet;
 
 		// Initialize state variables
@@ -92,83 +93,83 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 	}
 	
 	public final void breakpointSet(String set, String loc) {
-		MProcessSet savedFocus = currentFocus;
+		IPCDIDebugProcessSet savedFocus = currentFocus;
 		focus(set);
 		breakpoint(loc);
 		currentFocus = savedFocus;
 	}
 	
 	public final void breakpointSet(String set, String loc, int count) {
-		MProcessSet savedFocus = currentFocus;
+		IPCDIDebugProcessSet savedFocus = currentFocus;
 		focus(set);
 		breakpoint(loc, count);
 		currentFocus = savedFocus;
 	}
 	
 	public final void breakpointSet(String set, String loc, String cond) {
-		MProcessSet savedFocus = currentFocus;
+		IPCDIDebugProcessSet savedFocus = currentFocus;
 		focus(set);
 		breakpoint(loc, cond);
 		currentFocus = savedFocus;
 	}
 	
 	public final void watchpointSet(String set, String var) {
-		MProcessSet savedFocus = currentFocus;
+		IPCDIDebugProcessSet savedFocus = currentFocus;
 		focus(set);
 		watchpoint(var);
 		currentFocus = savedFocus;
 	}
 
 	public final void goSet(String set) {
-		MProcessSet savedFocus = currentFocus;
+		IPCDIDebugProcessSet savedFocus = currentFocus;
 		focus(set);
 		go();
 		currentFocus = savedFocus;
 	}
 
 	public final void haltSet(String set) {
-		MProcessSet savedFocus = currentFocus;
+		IPCDIDebugProcessSet savedFocus = currentFocus;
 		focus(set);
 		halt();
 		currentFocus = savedFocus;
 	}
 
 	public final void stepFinishSet(String set) {
-		MProcessSet savedFocus = currentFocus;
+		IPCDIDebugProcessSet savedFocus = currentFocus;
 		focus(set);
 		stepFinish();
 		currentFocus = savedFocus;
 	}
 
 	public final void stepSet(String set) {
-		MProcessSet savedFocus = currentFocus;
+		IPCDIDebugProcessSet savedFocus = currentFocus;
 		focus(set);
 		step();
 		currentFocus = savedFocus;
 	}
 
 	public final void stepSet(String set, int count) {
-		MProcessSet savedFocus = currentFocus;
+		IPCDIDebugProcessSet savedFocus = currentFocus;
 		focus(set);
 		step(count);
 		currentFocus = savedFocus;
 	}
 
 	public final void stepOverSet(String set) {
-		MProcessSet savedFocus = currentFocus;
+		IPCDIDebugProcessSet savedFocus = currentFocus;
 		focus(set);
 		stepOver();
 		currentFocus = savedFocus;
 	}
 
 	public final void stepOverSet(String set, int count) {
-		MProcessSet savedFocus = currentFocus;
+		IPCDIDebugProcessSet savedFocus = currentFocus;
 		focus(set);
 		stepOver(count);
 		currentFocus = savedFocus;
 	}
 	
-	public final MProcessSet defSet(String name, int[] procs) {
+	public final IPCDIDebugProcessSet defSet(String name, int[] procs) {
 		int size = userDefinedProcessSetList.size();
 		
 		if (name.equals("all"))
@@ -176,13 +177,13 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 		
 		/* to avoid duplicates */
 		for (int i = 0; i < size; i++) {
-			MProcessSet set = (MProcessSet) userDefinedProcessSetList.get(i);
+			IPCDIDebugProcessSet set = (IPCDIDebugProcessSet) userDefinedProcessSetList.get(i);
 			if (set.getName().equals(name)) {
 				return set;
 			}
 		}
 		
-		MProcessSet procSet = new MProcessSet(name);
+		IPCDIDebugProcessSet procSet = new DebugProcessSet(name);
 		size = allSet.getSize();
 		int procsLength = procs.length;
 		for (int i = 0; i < procsLength; i++) {
@@ -197,9 +198,9 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 	public final void undefSet(String name) {
 		int size = userDefinedProcessSetList.size();
 		for (int i = 0; i < size; i++) {
-			MProcessSet set = (MProcessSet) userDefinedProcessSetList.get(i);
+			IPCDIDebugProcessSet set = (IPCDIDebugProcessSet) userDefinedProcessSetList.get(i);
 			if (set.getName().equals(name)) {
-				set.clear();
+				//set.clear();
 				userDefinedProcessSetList.remove(set);
 				break;
 			}
@@ -209,22 +210,22 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 	public final void undefSetAll() {
 		int size = userDefinedProcessSetList.size();
 		for (int i = 0; i < size; i++) {
-			MProcessSet set = (MProcessSet) userDefinedProcessSetList.get(i);
-			set.clear();
+			IPCDIDebugProcessSet set = (IPCDIDebugProcessSet) userDefinedProcessSetList.get(i);
+			//set.clear();
 			userDefinedProcessSetList.remove(set);
 		}
 	}
 	
-	public final MProcess[] viewSet(String name) {
-		MProcess[] retValue = null;
+	public final IPCDIDebugProcess[] viewSet(String name) {
+		IPCDIDebugProcess[] retValue = null;
 		if (name.equals("all"))
-			retValue = allSet.getProcessList();
+			retValue = allSet.getProcesses();
 		else {
 			int size = userDefinedProcessSetList.size();
 			for (int i = 0; i < size; i++) {
-				MProcessSet set = (MProcessSet) userDefinedProcessSetList.get(i);
+				IPCDIDebugProcessSet set = (IPCDIDebugProcessSet) userDefinedProcessSetList.get(i);
 				if (set.getName().equals(name)) {
-					retValue = set.getProcessList();
+					retValue = set.getProcesses();
 					break;
 				}
 			}
@@ -239,7 +240,7 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 		else {
 			int size = userDefinedProcessSetList.size();
 			for (int i = 0; i < size; i++) {
-				MProcessSet set = (MProcessSet) userDefinedProcessSetList.get(i);
+				IPCDIDebugProcessSet set = (IPCDIDebugProcessSet) userDefinedProcessSetList.get(i);
 				if (set.getName().equals(name)) {
 					currentFocus = set;
 					break;
