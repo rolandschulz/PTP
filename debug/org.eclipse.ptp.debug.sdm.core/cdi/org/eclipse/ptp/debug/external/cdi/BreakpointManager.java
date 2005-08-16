@@ -29,7 +29,6 @@
 package org.eclipse.ptp.debug.external.cdi;
 
 import java.math.BigInteger;
-import java.util.BitSet;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
@@ -48,6 +47,7 @@ import org.eclipse.ptp.debug.external.cdi.model.LineBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.cdi.model.LocationBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
+import org.eclipse.ptp.debug.external.utils.BitList;
 
 /**
  * Breakpoint Manager for the CDI interface.
@@ -125,11 +125,11 @@ public class BreakpointManager extends Manager {
 			int pId = target.getTargetId();
 			int tId = 0; /* thread id */
 			
-			BitSet bitSet = new BitSet();
-			bitSet.set(pId);
+			BitList bitList = new BitList();
+			bitList.set(pId);
 			
 			//sess.getDebugger().fireEvent(new EBreakpointCreated(bitSet));
-			sess.getDebugger().fireEvent(new BreakpointCreatedEvent(sess, bitSet));
+			sess.getDebugger().fireEvent(new BreakpointCreatedEvent(sess, bitList));
 			
 		} catch (CDIException e) {
 		}

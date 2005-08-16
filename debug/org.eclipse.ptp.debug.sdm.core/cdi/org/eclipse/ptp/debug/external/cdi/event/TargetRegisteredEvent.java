@@ -28,16 +28,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
-import java.util.BitSet;
-
 import org.eclipse.cdt.debug.core.cdi.event.ICDICreatedEvent;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.external.utils.BitList;
 
 /**
  */
 public class TargetRegisteredEvent extends AbstractEvent implements ICDICreatedEvent {
 
-	public TargetRegisteredEvent(IPCDISession s, BitSet sources) {
+	public TargetRegisteredEvent(IPCDISession s, BitList sources) {
 		super(s, sources);
 	}
 }
