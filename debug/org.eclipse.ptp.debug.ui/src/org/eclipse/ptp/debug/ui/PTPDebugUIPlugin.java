@@ -151,6 +151,5 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	}
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPDebugUIConstants.INTERNAL_ERROR, "Internal Error", e));
-	}
-	
+	}	
 }
