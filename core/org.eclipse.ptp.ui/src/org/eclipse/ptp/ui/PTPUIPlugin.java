@@ -3,6 +3,8 @@ package org.eclipse.ptp.ui;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.internal.ui.MachineManager;
@@ -155,5 +157,13 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	}
 	public void removePersepectiveListener(IPerspectiveListener listener) {
 		getActiveWorkbenchWindow().removePerspectiveListener(listener);
+	}
+	
+	/***** LOG *****/
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
+	}
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e));
 	}	
 }
