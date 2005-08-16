@@ -31,6 +31,8 @@ package org.eclipse.ptp.debug.external.cdi.event;
 import java.util.ArrayList;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
+import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.external.cdi.Session;
@@ -83,5 +85,9 @@ public abstract class AbstractEvent implements IPCDIEvent {
 			return null;
 		else
 			return iCDIObjects[0];
+	}
+	
+	public IPJob getDebugJob() {
+		return PTPDebugCorePlugin.getDefault().getDebugJob(session);
 	}
 }
