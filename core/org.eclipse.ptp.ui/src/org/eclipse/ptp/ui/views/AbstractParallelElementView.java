@@ -893,7 +893,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	//set update view details
 	public abstract void update();
 	
-	public abstract IElementHandler getCurrentSetManager();
+	public abstract IElementHandler getCurrentElementHandler();
 	
 	private void elementRedraw() {
 		elementRedraw(0, sc.getOrigin().y, view_width, view_height, false);

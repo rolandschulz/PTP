@@ -33,9 +33,13 @@ public abstract class Container extends Element implements IContainer {
 	protected IElement[] sortedArray = new IElement[0];
 	protected int store_element_type = ELEMENT_TYPE; 
 	
-	public Container(String id, String name, boolean selected, int cur_type) {
-		super(id, name, selected);
+	public Container(IElement parent, String id, String name, boolean selected, int cur_type) {
+		super(parent, id, name, selected);
 		this.store_element_type = cur_type;
+	}
+	
+	public IElement getParent() {
+		return parent;
 	}
 	
 	public boolean contains(String id) {

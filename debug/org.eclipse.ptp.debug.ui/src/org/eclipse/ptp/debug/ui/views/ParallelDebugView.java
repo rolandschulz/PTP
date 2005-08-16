@@ -113,7 +113,7 @@ public class ParallelDebugView extends ParallelJobView {
 	}
 
 	protected String getToolTipText(int element_num) {
-		IElementHandler setManager = getCurrentSetManager();
+		IElementHandler setManager = getCurrentElementHandler();
 		if (setManager == null)
 			return "Unknown element";
 

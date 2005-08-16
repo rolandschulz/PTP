@@ -26,6 +26,7 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.IPTPUIConstants;
+import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.internal.Element;
@@ -47,13 +48,19 @@ public class JobManager extends AbstractUIManager {
 		jobList.clear();
 		jobList = null;
 		modelManager = null;
+		super.shutdown();
 	}
 	
-	public boolean isNoJob() {
-		return isNoJob(cur_job_id);
-	}
 	public boolean isNoJob(String jid) {
 		return (jid == null || jid.length() == 0);
+	}
+	
+	public boolean isJobStop(String job_id) {
+		if (isNoJob(job_id))
+			return true;
+		
+		IPJob job = findJobById(job_id);
+		return (job == null || job.isAllStop());
 	}
 
 	public IElementHandler getElementHandler(String id) {
@@ -125,38 +132,28 @@ public class JobManager extends AbstractUIManager {
 		return IPTPUIConstants.PROC_ERROR;
 	}
 	
-	//FIXME using id, or name
-	public IPProcess findProcessbyName(String job_id, String process_id) {
-		//FIXME HARDCODE
-		return modelManager.getUniverse().findProcessByName(getName(job_id) + "_process" + process_id);
-	}
-	
-	//FIXME using id, or name
 	public IPProcess findProcess(String job_id, String id) {
-		IPJob job = findJob(getName(job_id));
+		IPJob job = findJobById(job_id);
 		if (job == null)
 			return null;
 		
 		return job.findProcess(id);
 	}
 	public IPJob findJob(String job_name) {
-		return modelManager.getUniverse().findJobByName(job_name);
+		IPElement element = modelManager.getUniverse().findJobByName(job_name);
+		if (element instanceof IPJob)
+			return (IPJob)element;
+		
+		return null;
 	}
 	public IPJob findJobById(String job_id) {
 		IPElement element = modelManager.getUniverse().findChild(job_id);
-		if (element == null)
-			return findJobById2(job_id);
-		return (IPJob)element;
+		if (element instanceof IPJob)
+			return (IPJob)element;
+		
+		return null;
 	}
-	private IPJob findJobById2(String job_id) {
-		IPJob[] jobs = modelManager.getUniverse().getJobs();
-		for (int i=0; i<jobs.length; i++) {
-			if (jobs[i].getIDString().equals(job_id))
-				return jobs[i];
-		}
-		return null;		
-	}
-	//FIXME don't know whether it return machine or job
+
 	public String getName(String id) {
 		IPElement element = findJobById(id);
 		if (element == null)
@@ -173,8 +170,7 @@ public class JobManager extends AbstractUIManager {
 			elementHandler.clearAll();
 			IElementSet set = elementHandler.getSetRoot();
 			for (int i=0; i<total_element; i++) {
-				//FIXME using id, or name
-				set.add(new Element(pElements[i].getIDString(), String.valueOf(pElements[i].getTaskId())));
+				set.add(new Element(set, pElements[i].getIDString(), String.valueOf(pElements[i].getTaskId())));
 			}
 			elementHandler.add(set);
 			jobList.put(job.getIDString(), elementHandler);
@@ -196,4 +192,13 @@ public class JobManager extends AbstractUIManager {
 	public void jobChangedEvent(String cur_jid, String pre_jid) {
 		cur_job_id = cur_jid;
 	}
+	
+	/*****
+	 * Element Set
+	 *****/
+	public void changeSetEvent(IElementSet curSet, IElementSet preSet) {}
+	public void deleteSetEvent(IElementSet set) {}
+	public void createSetEvent(IElementSet set, IElement[] elements) {}
+	public void addElementsEvent(IElementSet set, IElement[] elements) {}
+	public void removeElementsEvent(IElementSet set, IElement[] elements) {}	
 }

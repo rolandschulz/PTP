@@ -32,12 +32,13 @@ import org.eclipse.ptp.ui.model.IElementSet;
 public class ElementSet extends Container implements IElementSet {
 	private List matchSets = new ArrayList(0);
 	
-	public ElementSet(String id, String name) {
-		this(id, name, false);
+	public ElementSet(IElement parent, String id, String name) {
+		this(parent, id, name, false);
 	}
-	public ElementSet(String id, String name, boolean selected) {
-		super(id, name, selected, IContainer.ELEMENT_TYPE);
+	public ElementSet(IElement parent, String id, String name, boolean selected) {
+		super(parent, id, name, selected, IContainer.ELEMENT_TYPE);
 	}
+	
 	public IElement[] getSelectedElements() {
 		List selectedElements = new ArrayList();
 		for (Iterator i=elementMap.values().iterator(); i.hasNext();) {

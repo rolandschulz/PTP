@@ -32,8 +32,10 @@ public interface IElementHandler extends IContainer {
 	public IElementSet getSet(String id);
 	public IElementSet getSet(int index);
 	
-	public boolean containsRegisterElement(IElement element);
-	public void addRegisterElement(IElement element);
-	public void removeRegisterElement(IElement element);
-	public IElement[] getRegisteredElements();
+	public boolean containsRegisterElement(String eid);
+	public void addRegisterElement(String eid);
+	public void removeRegisterElement(String eid);
+	public String[] getRegisteredElementsID();
+	public void removeAllRegisterElements();
+	public int totalRegisterElements();
 }

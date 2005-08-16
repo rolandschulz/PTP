@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.breakpoints;
+package org.eclipse.ptp.debug.internal.core.breakpoints.moved;
 
 import java.text.MessageFormat;
 import java.util.Map;
@@ -30,7 +30,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.Breakpoint;
-import org.eclipse.ptp.debug.core.model.IPBreakpoint;
+import org.eclipse.ptp.debug.core.model.moved.IPBreakpoint;
+import org.eclipse.ptp.debug.internal.core.breakpoints.old.BreakpointMessages;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 
 /**

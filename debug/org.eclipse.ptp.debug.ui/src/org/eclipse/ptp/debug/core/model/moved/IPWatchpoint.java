@@ -1,4 +1,4 @@
-package org.eclipse.ptp.debug.core.model;
+package org.eclipse.ptp.debug.core.model.moved;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.ILineBreakpoint;

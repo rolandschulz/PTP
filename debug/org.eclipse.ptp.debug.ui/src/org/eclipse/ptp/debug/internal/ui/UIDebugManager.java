@@ -19,10 +19,8 @@
 package org.eclipse.ptp.debug.internal.ui;
 
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
-import org.eclipse.cdt.debug.core.cdi.event.ICDICreatedEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
-import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.CoreException;
@@ -30,16 +28,15 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.IPDebugListener;
 import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
+import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
+import org.eclipse.ptp.debug.external.cdi.event.TargetUnregisteredEvent;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.internal.ui.JobManager;
-import org.eclipse.ptp.ui.PTPUIPlugin;
-import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -48,15 +45,13 @@ import org.eclipse.ptp.ui.model.IElementSet;
  * @author clement chu
  *
  */
-public class UIDebugManager extends JobManager implements ISetListener, IBreakpointListener, ICDIEventListener, IPDebugListener {
+public class UIDebugManager extends JobManager implements IBreakpointListener, ICDIEventListener, IPDebugListener {
 	public UIDebugManager() {
-		PTPUIPlugin.getDefault().getUIManager().addSetListener(this);
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
 		PTPDebugCorePlugin.getDefault().addDebugSessionListener(this);
 	}
 	
 	public void shutdown() {
-		PTPUIPlugin.getDefault().getUIManager().removeSetListener(this);
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
 		PTPDebugCorePlugin.getDefault().removeDebugSessionListener(this);
 		super.shutdown();
@@ -89,7 +84,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		return PTPDebugCorePlugin.getDefault().getDebugSession(job);
 	}
 
-	public void registerProcess(IPCDISession session, int task_id, boolean isRegister) {
+	public void registerProcess(IPCDISession session, int task_id, boolean isRegister, boolean isChanged) {
 		if (isRegister)
 			session.registerTarget(task_id);
 		else
@@ -97,36 +92,26 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	}
 	
 	public void unregisterElements(IElement[] elements) {
-		IPJob job = findJobById(getCurrentJobId());
-		if (job == null || job.isAllStop())
+		if (isJobStop(getCurrentJobId()))
 			return;
 		
 		IPCDISession session = (IPCDISession)getDebugSession(getCurrentJobId());
-		IElementHandler elementHandler = getElementHandler(getCurrentJobId());
 		for (int i=0; i<elements.length; i++) {			
 			//only unregister some registered elements
 			if (elements[i].isRegistered()) {
-				if (elementHandler.containsRegisterElement(elements[i])) {
-					registerProcess(session, Integer.parseInt(elements[i].getName()), false);
-					elementHandler.removeRegisterElement(elements[i]);
-				}
+				//registerProcess(session, Integer.parseInt(elements[i].getName()), false, true);
 			}
 		}
 	}
 	public void registerElements(IElement[] elements) {
-		IPJob job = findJobById(getCurrentJobId());
-		if (job == null || job.isAllStop())
+		if (isJobStop(getCurrentJobId()))
 			return;
 
 		IPCDISession session = (IPCDISession)getDebugSession(getCurrentJobId());
-		IElementHandler elementHandler = getElementHandler(getCurrentJobId());
 		for (int i=0; i<elements.length; i++) {
 			//only register some unregistered elements
 			if (!elements[i].isRegistered()) {
-				if (!elementHandler.containsRegisterElement(elements[i])) {
-					registerProcess(session, Integer.parseInt(elements[i].getName()), true);
-					elementHandler.addRegisterElement(elements[i]);
-				}
+				//registerProcess(session, Integer.parseInt(elements[i].getName()), true, true);
 			}
 		}
 	}
@@ -163,14 +148,18 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 
 		IPCDISession session = (IPCDISession)getDebugSession(getCurrentJobId());
 		IElementHandler elementHandler = getElementHandler(getCurrentJobId());
-		IElement[] registerElements = elementHandler.getRegisteredElements();
-		for (int i=0; i<registerElements.length; i++) {
-			if (curSet.contains(registerElements[i].getID())) {
-				if (!preSet.contains(registerElements[i].getID()))
-					registerProcess(session, Integer.parseInt(registerElements[i].getName()), true);
+		if (elementHandler == null)
+			return;
+		String[] registerElementsID = elementHandler.getRegisteredElementsID();
+		for (int i=0; i<registerElementsID.length; i++) {
+			if (curSet.contains(registerElementsID[i])) {
+				if (!preSet.contains(registerElementsID[i])) {
+					//registerProcess(session, Integer.parseInt(registerElements[i].getName()), true, false);
+				}
 			} 
-			else
-				registerProcess(session, Integer.parseInt(registerElements[i].getName()), false);
+			else {
+				//registerProcess(session, Integer.parseInt(registerElements[i].getName()), false, false);
+			}
 		}
 	}
 	//Delete the set that will delete the all related breakpoint
@@ -181,9 +170,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			PTPDebugUIPlugin.log(e);
 		}
 	}
-	public void createSetEvent(IElementSet set, IElement[] elements) {}
-	public void addElementsEvent(IElementSet set, IElement[] elements) {}
-	public void removeElementsEvent(IElementSet set, IElement[] elements) {}
 
     	/*
     	 * Cannot unregister the extension
@@ -215,7 +201,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	public void handleDebugEvents(ICDIEvent[] events) {
 		for (int i=0; i<events.length; i++) {
 			IPCDIEvent event = (IPCDIEvent)events[i];
-			
+			/*
 			int[] processes = event.getProcesses();			
 			String job_id = getCurrentJobId();
 			if (event instanceof ICDISuspendedEvent) {
@@ -230,6 +216,26 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					System.out.println("---------------- process created: " + process.getID());
 				}
 			}
+			*/
+			if (event instanceof TargetRegisteredEvent) {
+				TargetRegisteredEvent targetRegisteredEvent = (TargetRegisteredEvent)event;
+				String job_id = targetRegisteredEvent.getDebugJob().getIDString();
+				IElementHandler elementHandler = getElementHandler(job_id);
+				int[] processes = event.getProcesses();
+				for (int j=0; j<processes.length; j++) {
+					//elementHandler.addRegisterElement();
+				}
+			}
+			else if (event instanceof TargetUnregisteredEvent) {
+				TargetRegisteredEvent targetRegisteredEvent = (TargetRegisteredEvent)event;
+				String job_id = targetRegisteredEvent.getDebugJob().getIDString();
+				IElementHandler elementHandler = getElementHandler(job_id);
+				int[] processes = event.getProcesses();
+				for (int j=0; j<processes.length; j++) {
+					//elementHandler.removeRegisterElement();
+				}
+			}
+			firePaintListener();
 		}
 	}
 	

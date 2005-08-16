@@ -16,18 +16,11 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.model;
+package org.eclipse.ptp.debug.core.model.moved;
 
 /**
  * @author Clement chu
  *
  */
-public class PBreakpointManager {
-	private static PBreakpointManager instance = null;
-	
-	public static PBreakpointManager getDefault() {
-		if (instance == null)
-			instance =  new PBreakpointManager();
-		return instance;
-	}
+public interface IPFunctionBreakpoint extends IPLineBreakpoint {
 }

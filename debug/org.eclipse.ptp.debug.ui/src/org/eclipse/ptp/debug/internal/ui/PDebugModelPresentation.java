@@ -18,20 +18,38 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.cdt.debug.core.cdi.ICDIBreakpointHit;
+import org.eclipse.cdt.debug.core.cdi.ICDIExitInfo;
+import org.eclipse.cdt.debug.core.cdi.ICDISharedLibraryEvent;
+import org.eclipse.cdt.debug.core.cdi.ICDISignalExitInfo;
+import org.eclipse.cdt.debug.core.cdi.ICDISignalReceived;
+import org.eclipse.cdt.debug.core.cdi.ICDIWatchpointScope;
+import org.eclipse.cdt.debug.core.cdi.ICDIWatchpointTrigger;
+import org.eclipse.cdt.debug.core.cdi.model.ICDISignal;
+import org.eclipse.cdt.debug.core.model.CDebugElementState;
+import org.eclipse.cdt.debug.core.model.ICDebugElement;
+import org.eclipse.cdt.debug.core.model.ICDebugElementStatus;
+import org.eclipse.cdt.debug.core.model.ICStackFrame;
+import org.eclipse.cdt.debug.core.model.IEnableDisableTarget;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.core.model.IDisconnect;
+import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.debug.core.model.ITerminate;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.ui.IDebugModelPresentation;
@@ -40,6 +58,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.ptp.debug.core.model.IPAddressBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
+import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.IPFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
@@ -227,20 +246,20 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		if (bt == null)
 			return null;
 		StringBuffer baseText = new StringBuffer(bt);
-		/*
-		if (element instanceof IPDebugElementStatus && !((IPDebugElementStatus)element).isOK()) {
-			baseText.append(getFormattedString(" <{0}>", ((IPDebugElementStatus)element).getMessage()));
+		//FIXME used ICDebugElementStatus - cdt
+		if (element instanceof ICDebugElementStatus && !((ICDebugElementStatus)element).isOK()) {
+			baseText.append(getFormattedString(" <{0}>", ((ICDebugElementStatus)element).getMessage()));
 		}
 		if (element instanceof IAdaptable) {
+			//FIXME used IEnableDisableTarget - cdt
 			IEnableDisableTarget target = (IEnableDisableTarget)((IAdaptable)element).getAdapter(IEnableDisableTarget.class);
 			if (target != null) {
 				if (!target.isEnabled()) {
 					baseText.append(' ');
-					baseText.append(PDebugUIMessages.getString("PTPDebugModelPresentation.25"));
+					baseText.append(PDebugUIMessages.getString("PTPDebugModelPresentation.disabled1"));
 				}
 			}
 		}
-		*/
 		return baseText.toString();
 	}
 
@@ -248,7 +267,35 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		boolean showQualified = isShowQualifiedNames();
 		StringBuffer label = new StringBuffer();
 		try {
-			//TODO element can be IValue, IDebugTarget etc.
+			/*
+			if (element instanceof ICModule) {
+				label.append(getModuleText((ICModule)element, showQualified));
+				return label.toString();
+			}
+			if (element instanceof ICSignal) {
+				label.append(getSignalText((ICSignal)element));
+				return label.toString();
+			}
+			if (element instanceof IRegisterGroup) {
+				label.append(((IRegisterGroup)element).getName());
+				return label.toString();
+			}
+			if (element instanceof IWatchExpression) {
+				return getWatchExpressionText((IWatchExpression)element);
+			}
+			if (element instanceof IVariable) {
+				label.append(getVariableText((IVariable)element));
+				return label.toString();
+			}
+			if (element instanceof IValue) {
+				label.append(getValueText((IValue)element));
+				return label.toString();
+			}
+			*/
+			if (element instanceof IStackFrame) {
+				label.append(getStackFrameText((IStackFrame)element, showQualified));
+				return label.toString();
+			}
 			if (element instanceof IMarker) {
 				IBreakpoint breakpoint = getBreakpoint((IMarker)element);
 				if (breakpoint != null) {
@@ -263,6 +310,21 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 				label.append(getTargetText((IDebugTarget)element, showQualified));
 			else if ( element instanceof IThread )
 				label.append(getThreadText((IThread)element, showQualified));
+			if ( label.length() > 0 ) {
+				return label.toString();
+			}
+			if (element instanceof ITerminate)  {
+				if (((ITerminate)element).isTerminated()) {
+					label.insert(0, PDebugUIMessages.getString("PTPDebugModelPresentation.terminated1"));
+					return label.toString();
+				}
+			}
+			if (element instanceof IDisconnect) {
+				if (((IDisconnect)element).isDisconnected()) {
+					label.insert(0, PDebugUIMessages.getString("PTPDebugModelPresentation.disconnected1"));
+					return label.toString();
+				}
+			}
 			if ( label.length() > 0 ) {
 				return label.toString();
 			}
@@ -326,7 +388,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		int lineNumber = breakpoint.getLineNumber();
 		if (lineNumber > 0) {
 			label.append(" ");
-			label.append("[Line: " + lineNumber + "]");
+			label.append(MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.line1"), new String[] { Integer.toString(lineNumber) }));
 		}
 		return label;
 	}
@@ -334,7 +396,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		String job_id = breakpoint.getJobId();
 		String jobName = uiDebugManager.isNoJob(job_id)?"N/A":uiDebugManager.getName(job_id);
 		label.append(" ");
-		label.append("<Job: " + jobName + " - Set: " + breakpoint.getSetId() + ">");
+		label.append(MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.details1"), new String[] { jobName, breakpoint.getSetId() }));
 		return label;
 	}
 
@@ -360,10 +422,114 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	}
 
 	protected String getTargetText(IDebugTarget target, boolean qualified) throws DebugException {
-		return "TO DO LATER";
+		IPDebugTarget t = (IPDebugTarget)target.getAdapter(IPDebugTarget.class);
+		if (t != null) {
+			if (!t.isPostMortem()) {
+				//FIXME used CDebugElementState
+				CDebugElementState state = t.getState();
+				if (state.equals(CDebugElementState.EXITED)) {
+					Object info = t.getCurrentStateInfo();
+					String label = PDebugUIMessages.getString("PTPDebugModelPresentation.target1");
+					String reason = "";
+					if (info != null && info instanceof ICDISignalExitInfo) {
+						ICDISignalExitInfo sigInfo = (ICDISignalExitInfo)info;
+						reason = ' ' + MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.target2"), new String[]{ sigInfo.getName(), sigInfo.getDescription() });
+					}
+					else if (info != null && info instanceof ICDIExitInfo ) {
+						reason = ' ' + MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.target3"), new Integer[] { new Integer( ((ICDIExitInfo)info).getCode() ) });
+					}
+					return MessageFormat.format(label, new String[] { target.getName(), reason } );
+				}
+				else if (state.equals(CDebugElementState.SUSPENDED)) {
+					return MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.target4"), new String[] { target.getName() });
+				}
+			}
+		}
+		return target.getName();
 	}
 	protected String getThreadText(IThread thread, boolean qualified) throws DebugException {
-		return "TO DO LATER";
+		IPDebugTarget target = (IPDebugTarget)thread.getDebugTarget().getAdapter(IPDebugTarget.class);
+		if (target.isPostMortem()) {
+			return getFormattedString(PDebugUIMessages.getString("PTPDebugModelPresentation.thread"), thread.getName());
+		}
+		if (thread.isTerminated()) {
+			return getFormattedString(PDebugUIMessages.getString("PTPDebugModelPresentation.thread2"), thread.getName());
+		}
+		if (thread.isStepping()) {
+			return getFormattedString(PDebugUIMessages.getString("PTPDebugModelPresentation.thread3"), thread.getName());
+		}
+		if (!thread.isSuspended()) {
+			return getFormattedString(PDebugUIMessages.getString("PTPDebugModelPresentation.thread4"), thread.getName());
+		}
+		if (thread.isSuspended()) {
+			String reason = "";
+			//FIXME used ICDebugElement
+			ICDebugElement element = (ICDebugElement)thread.getAdapter(ICDebugElement.class);
+			if (element != null) {
+				Object info = element.getCurrentStateInfo();
+				if (info != null && info instanceof ICDISignalReceived) {
+					ICDISignal signal = ((ICDISignalReceived)info).getSignal();
+					reason = MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.thread5"), new String[]{ signal.getName(), signal.getDescription() });
+				}
+				else if (info != null && info instanceof ICDIWatchpointTrigger) {
+					reason = MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.thread6"), new String[]{ ((ICDIWatchpointTrigger)info).getOldValue(), ((ICDIWatchpointTrigger)info).getNewValue() });
+				}
+				else if (info != null && info instanceof ICDIWatchpointScope) {
+					reason = PDebugUIMessages.getString("PTPDebugModelPresentation.thread7");
+				}
+				else if (info != null && info instanceof ICDIBreakpointHit) {
+					reason = PDebugUIMessages.getString("PTPDebugModelPresentation.thread8");
+				}
+				else if (info != null && info instanceof ICDISharedLibraryEvent) {
+					reason = PDebugUIMessages.getString("PTPDebugModelPresentation.thread9");
+				}
+			}
+			return MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.thread10"), new String[] { thread.getName(), reason } );
+		}
+		return MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.thread11"), new String[] { thread.getName() } );
+	}
+	
+	protected String getStackFrameText(IStackFrame f, boolean qualified) throws DebugException {
+		//FIXME used ICStackFrame - cdt
+		if (f instanceof ICStackFrame) {
+			ICStackFrame frame = (ICStackFrame)f;
+			StringBuffer label = new StringBuffer();
+			label.append(frame.getLevel());
+			label.append(' ');
+			String function = frame.getFunction();
+			if (function != null) {
+				function = function.trim();
+				if (function.length() > 0) {
+					label.append(function);
+					label.append("() ");
+					if (frame.getFile() != null) {
+						IPath path = new Path(frame.getFile());
+						if (!path.isEmpty()) {
+							label.append(PDebugUIMessages.getString("PTPDebugModelPresentation.frame1"));
+							label.append(' ');
+							label.append((qualified?path.toOSString():path.lastSegment()));
+							label.append(':');
+							if (frame.getFrameLineNumber() != 0)
+								label.append(frame.getFrameLineNumber());
+						}
+					}
+				}
+			}
+			if (isEmpty(function))
+				label.append(PDebugUIMessages.getString("PTPDebugModelPresentation.frame2"));
+			return label.toString();
+		}
+		//FIXME Dunno what is IDummyStacjFrame for
+		//return (f.getAdapter(IDummyStackFrame.class) != null)?getDummyStackFrameLabel(f):f.getName();
+		return f.getName();
+	}	
+	
+	public static String getFormattedString(String key, String arg) {
+		return getFormattedString(key, new String[]{ arg });
+	}
+
+	public static String getFormattedString(String string, String[] args) {
+		return MessageFormat.format(string, args);
 	}
 	
 	public void dispose() {

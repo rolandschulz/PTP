@@ -44,7 +44,7 @@ public class DeleteSetAction extends ParallelAction {
 	public void run() {
 		IElementSet set = view.getCurrentSet();
 		if (set != null && set.size() > 0) {
-			IElementHandler setManager = view.getCurrentSetManager();
+			IElementHandler setManager = view.getCurrentElementHandler();
 			if (setManager == null)
 				return;
 
