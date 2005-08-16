@@ -26,9 +26,9 @@ package org.eclipse.ptp.debug.external;
 import java.util.Observer;
 
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.event.DebugEvent;
-import org.eclipse.ptp.debug.external.model.MProcess;
-import org.eclipse.ptp.debug.external.model.MProcessSet;
 import org.eclipse.ptp.debug.external.utils.Queue;
 
 
@@ -44,10 +44,10 @@ public interface IDebugger {
 
 	/* Process/Thread Sets */
 	public void focus(String name);
-	public MProcessSet defSet(String name, int[] procs);
+	public IPCDIDebugProcessSet defSet(String name, int[] procs);
 	public void undefSet(String name);
 	public void undefSetAll();
-	public MProcess[] viewSet(String name);
+	public IPCDIDebugProcess[] viewSet(String name);
 	
 	/* Debugger Initialization/Termination */
 	public abstract void load(String prg);
@@ -120,9 +120,9 @@ public interface IDebugger {
 	
 	/* Methods that are required to interface with Eclipse Debug/CDI Model */
 	public abstract Process getSessionProcess();
-	public abstract MProcess getProcess(int number);
-	public abstract MProcess getProcess();
-	public abstract MProcess[] getProcesses();
+	public abstract IPCDIDebugProcess getProcess(int number);
+	public abstract IPCDIDebugProcess getProcess();
+	public abstract IPCDIDebugProcess[] getProcesses();
 	public abstract void restart();
 
 }

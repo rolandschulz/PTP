@@ -23,4 +23,5 @@ public interface IPCDIDebugProcessSet extends IPCDIDebugEntity {
 	public IPCDIDebugProcess getProcess(int number);
 	public void addProcess(IPCDIDebugProcess proc);
 	public void removeProcess(IPCDIDebugProcess proc);
+	public int getSize();
 }

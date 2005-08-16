@@ -22,8 +22,9 @@ import java.util.ArrayList;
 
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
-import org.eclipse.ptp.debug.external.model.MProcess;
+import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
 
 public class DebugSimulator extends AbstractDebugger {
 
@@ -141,10 +142,8 @@ public class DebugSimulator extends AbstractDebugger {
 		
 		IPProcess[] procs = job.getSortedProcesses();
 		for (int i = 0; i < procs.length; i++) {
-			MProcess proc = new MProcess(i);
 			Process p = new SimProcess("proc" + i, i, 1, procCommands[i], this);
-			proc.setDebugInfo(p); /* We store the process in the "debug info" */
-			proc.setPProcess(procs[i]);
+			IPCDIDebugProcess proc = new DebugProcess(procs[i], p);
 			allSet.addProcess(proc);
 		}
 
@@ -160,20 +159,15 @@ public class DebugSimulator extends AbstractDebugger {
 		return debuggerProcess;
 	}
 
-	public MProcess[] getProcesses() {
-		int listSize = allSet.getSize();
-		MProcess[] procs = new MProcess[listSize];
-		for (int i = 0; i < listSize; i++) {
-			procs[i] = allSet.getProcess(i);
-		}
-		return procs;
+	public IPCDIDebugProcess[] getProcesses() {
+		return allSet.getProcesses();
 	}
 
-	public MProcess getProcess(int num) {
+	public IPCDIDebugProcess getProcess(int num) {
 		return (allSet.getProcess(num));
 	}
 	
-	public MProcess getProcess() {
+	public IPCDIDebugProcess getProcess() {
 		return getProcess(0);
 	}
 	
@@ -191,7 +185,7 @@ public class DebugSimulator extends AbstractDebugger {
 		
 		for (int i = 0; i < listSize; i++) {
 			//System.out.println("terminating: " + allSet.getProcess(i).getName());
-			((Process) allSet.getProcess(i).getDebugInfo()).destroy();
+			allSet.getProcess(i).getProcess().destroy();
 		}
 
 		//long end = System.currentTimeMillis();

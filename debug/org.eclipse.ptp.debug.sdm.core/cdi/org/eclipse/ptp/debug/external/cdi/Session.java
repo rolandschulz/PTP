@@ -41,10 +41,8 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.IDebugger;
-import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.event.ETargetRegistered;
-import org.eclipse.ptp.debug.external.model.MProcessSet;
 
 public class Session implements IPCDISession, ICDISessionObject {
 	EventManager eventManager;
@@ -98,7 +96,7 @@ public class Session implements IPCDISession, ICDISessionObject {
 	}
 	
 	public Process getProcess(int i) {
-		return (Process) debugger.getProcess(i).getDebugInfo();
+		return debugger.getProcess(i).getProcess();
 	}
 	
 	public IPCDIDebugProcessSet newProcessSet(String name, int[] procs) {
@@ -106,8 +104,7 @@ public class Session implements IPCDISession, ICDISessionObject {
 			return null;
 		}
 
-		MProcessSet procSet = debugger.defSet(name, procs);
-		DebugProcessSet newSet = new DebugProcessSet(procSet);
+		IPCDIDebugProcessSet newSet = debugger.defSet(name, procs);
 		
 		currentProcessSetList.put(newSet.getName(), newSet);
 		
