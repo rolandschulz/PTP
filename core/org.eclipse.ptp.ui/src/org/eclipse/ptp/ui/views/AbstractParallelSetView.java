@@ -29,10 +29,9 @@ import org.eclipse.ptp.internal.ui.actions.CreateSetAction;
 import org.eclipse.ptp.internal.ui.actions.DeleteProcessAction;
 import org.eclipse.ptp.internal.ui.actions.DeleteSetAction;
 import org.eclipse.ptp.ui.IPTPUIConstants;
+import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElementHandler;
-import org.eclipse.ptp.ui.old.PTPUIPlugin;
-import org.eclipse.ptp.ui.views.old.ProcessEditorInput;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Composite;
@@ -60,12 +59,9 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		createToolBarGroups(toolBarMgr);
 		createToolBarActions(toolBarMgr);
 		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-		createMenuGroups(menuMgr);
 		createMenuActions(menuMgr);
 		createContextMenu();
 		initialView();
-		if (menuMgr.getItems().length == 1)
-			menuMgr.removeAll();
 	}
 	
 	protected void createToolBarGroups(IToolBarManager toolBarMgr) {	
@@ -92,9 +88,6 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		buildInToolBarActions(toolBarMgr);
 	}
 	
-	protected void createMenuGroups(IMenuManager menuMgr) {
-		menuMgr.add(new Separator(IPTPUIConstants.IUIEMPTYGROUP));
-	}
 	protected void createMenuActions(IMenuManager menuMgr) {}
 
 	protected void createContextMenu() {
@@ -156,7 +149,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
                 try {
                     PTPUIPlugin.getActivePage().openEditor(new ProcessEditorInput(element), IPTPUIConstants.VIEW_PARALLELProcess);
                 } catch (PartInitException e) {
-                    System.out.println("PartInitException err: " + e.getMessage());
+                    PTPUIPlugin.log(e);
                 }
             }
         });
