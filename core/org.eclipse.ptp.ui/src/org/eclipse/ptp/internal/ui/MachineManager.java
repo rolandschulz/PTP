@@ -27,6 +27,7 @@ import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.IPTPUIConstants;
+import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.internal.Element;
@@ -48,6 +49,7 @@ public class MachineManager extends AbstractUIManager {
 		machineList.clear();
 		machineList = null;
 		modelManager = null;
+		super.shutdown();
 	}
 
 	public boolean isNoMachine() {
@@ -154,10 +156,12 @@ public class MachineManager extends AbstractUIManager {
 		return getNodeStatus(findNode(machine_id, node_id));
 	}
 
-	//FIXME using id, or name
 	public IPNode findNode(String machine_id, String node_id) {
-		//FIXME HARDCODE
-		return modelManager.getUniverse().findNodeByName(getName(machine_id) + "_node" + node_id);
+		IPMachine machine = findMachineById(machine_id);
+		if (machine == null)
+			return null;
+		
+		return machine.findNode(node_id);
 	}
 	
 	public IPMachine findMachine(String machine_name) {
@@ -165,21 +169,12 @@ public class MachineManager extends AbstractUIManager {
 	}	
 	public IPMachine findMachineById(String machine_id) {
 		IPElement element = modelManager.getUniverse().findChild(machine_id);
-		if (element == null)
-			return findMachineById2(machine_id);
-		return (IPMachine)element;
-	}
-	
-	public IPMachine findMachineById2(String machine_id) {
-		IPMachine[] macs = modelManager.getUniverse().getMachines();
-		for (int i=0; i<macs.length; i++) {
-			if (macs[i].getIDString().equals(machine_id))
-				return macs[i];
-		}
+		if (element instanceof IPMachine)
+			return (IPMachine)element;
+		
 		return null;
 	}
 	
-	//FIXME don't know whether it return machine or job
 	public String getName(String id) {
 		IPElement element = findMachineById(id);
 		if (element == null)
@@ -196,8 +191,7 @@ public class MachineManager extends AbstractUIManager {
 			elementHandler.clearAll();
 			IElementSet set = elementHandler.getSetRoot();
 			for (int i=0; i<total_element; i++) {
-				//FIXME using id, or name
-				set.add(new Element(pElements[i].getIDString(), pElements[i].getElementName()));
+				set.add(new Element(set, pElements[i].getIDString(), pElements[i].getElementName()));
 			}
 			elementHandler.add(set);
 			machineList.put(mac.getIDString(), elementHandler);
@@ -215,5 +209,14 @@ public class MachineManager extends AbstractUIManager {
 			}
 		}
 		return cur_machine_id;
-	}	
+	}
+	
+	/*****
+	 * Element Set
+	 *****/
+	public void changeSetEvent(IElementSet curSet, IElementSet preSet) {}
+	public void deleteSetEvent(IElementSet set) {}
+	public void createSetEvent(IElementSet set, IElement[] elements) {}
+	public void addElementsEvent(IElementSet set, IElement[] elements) {}
+	public void removeElementsEvent(IElementSet set, IElement[] elements) {}	
 }

@@ -16,11 +16,25 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.model;
+package org.eclipse.ptp.debug.internal.core.breakpoints.moved;
+
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 /**
  * @author Clement chu
  *
  */
-public interface IPAddressBreakpoint extends IPLineBreakpoint {
+public class BreakpointMessages {
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.debug.internal.core.breakpoints.BreakpointMessages";
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch(MissingResourceException e) {
+			return '!' + key + '!';
+		}
+	}
 }
+

@@ -146,7 +146,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		}
 		update();
 	}
-	public IElementHandler getCurrentSetManager() {
+	public IElementHandler getCurrentElementHandler() {
 		return getMachineManager().getElementHandler(getCurrentMachineID());
 	}
 
@@ -246,28 +246,33 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	protected void doubleClickAction(int element_num) {
 		IElement element = cur_element_set.get(element_num);
 		if (element != null) {
-			String tmp_selected_element_id = cur_selected_element_id;
+			boolean isElementRegistered = element.isRegistered(); 
+			
 			unregister();
-			if (!element.getID().equals(tmp_selected_element_id))
+			if (!isElementRegistered) {
 				register(element);
+				getCurrentElementHandler().addRegisterElement(element.getID());
+			}
 		}
 	}
 	public void register(IElement element) {
 		element.setRegistered(true);
-		cur_selected_element_id = element.getID();
 	}
 	
 	public void unregister() {
-		IElement pE = cur_element_set.get(cur_selected_element_id);
-		if (pE != null) {
-			pE.setRegistered(false);
-			cur_selected_element_id = "";
-			clearLowerTextRegions();
+		IElementHandler elementHandler = getCurrentElementHandler();
+		IElementSet rootSet = elementHandler.getSetRoot();
+		String[] registerElements = elementHandler.getRegisteredElementsID();
+		for (int i=0; i<registerElements.length; i++) {
+			IElement pE = rootSet.get(registerElements[i]);
+			if (pE != null)
+				pE.setRegistered(false);
 		}
+		elementHandler.removeAllRegisterElements();
 	}
 	
 	protected String getToolTipText(int element_num) {
-		IElementHandler setManager = getCurrentSetManager();
+		IElementHandler setManager = getCurrentElementHandler();
 		if (setManager == null)
 			return "Unknown element";
 
@@ -309,7 +314,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		updateMachine();
 	}
 	public void updateMachine() {
-		IElementHandler setManager = getCurrentSetManager();
+		IElementHandler setManager = getCurrentElementHandler();
 		if (setManager != null) {			
 			selectSet(setManager.getSetRoot());
 		}
@@ -323,30 +328,31 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	public void deSelectSet() {
 		super.deSelectSet();
 		cur_selected_element_id = "";
-		clearLowerTextRegions();
 	}
 	protected void paintCanvas(GC g) {
 		super.paintCanvas(g);
 		updateLowerTextRegions();
 	}
 	
-	protected void drawingRegisterElement(IElement element, GC g, int x_loc, int y_loc, int width, int height) {
-		super.drawingRegisterElement(element, g, x_loc, y_loc, width, height);
-		if (element.isRegistered()) {
-			cur_selected_element_id = element.getID();
-		}
-	}
-	
 	public void clearLowerTextRegions() {
 		BLtable.removeAll();
 		BRtable.removeAll();		
 	}
-
+	
 	public void updateLowerTextRegions() {
 		clearLowerTextRegions();
-		if (cur_selected_element_id.length() == 0)
+		cur_selected_element_id = "";
+
+		IElementHandler elementHandler = getCurrentElementHandler();
+		if (elementHandler == null || elementHandler.totalRegisterElements() == 0)
 			return;
-			
+		
+		String firstRegisteredElementID = elementHandler.getRegisteredElementsID()[0];
+		if (!cur_element_set.contains(firstRegisteredElementID))
+			return;
+		
+		cur_selected_element_id = firstRegisteredElementID; 
+		
 		IPNode node = getMachineManager().findNode(getCurrentMachineID(), cur_selected_element_id);
 		if (node == null)
 			return;

@@ -16,11 +16,27 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.model;
+package org.eclipse.ptp.debug.internal.ui;
+
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 /**
  * @author Clement chu
  *
  */
-public interface IPFunctionBreakpoint extends IPLineBreakpoint {
+public class PDebugUIMessages {
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.debug.internal.ui.PDebugUIMessages";
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+
+	private PDebugUIMessages() {
+	}
+
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch(MissingResourceException e) {
+			return '!' + key + '!';
+		}
+	}
 }

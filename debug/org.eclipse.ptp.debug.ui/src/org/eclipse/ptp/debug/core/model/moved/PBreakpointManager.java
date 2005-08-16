@@ -16,25 +16,18 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui;
-
-import org.eclipse.ptp.ui.listeners.IPaintListener;
-import org.eclipse.ptp.ui.model.IElementHandler;
+package org.eclipse.ptp.debug.core.model.moved;
 
 /**
- * @author clement chu
+ * @author Clement chu
  *
  */
-public interface IManager {
-	public void shutdown();
-	public int size();
-	public String initial();
-	public IElementHandler getElementHandler(String id);
-	public String getName(String id);
+public class PBreakpointManager {
+	private static PBreakpointManager instance = null;
 	
-	public String getCurrentSetId();
-	public void setCurrentSetId(String set_id);
-	
-	public void addPaintListener(IPaintListener pListener);
-	public void removePaintListener(IPaintListener pListener);
+	public static PBreakpointManager getDefault() {
+		if (instance == null)
+			instance =  new PBreakpointManager();
+		return instance;
+	}
 }

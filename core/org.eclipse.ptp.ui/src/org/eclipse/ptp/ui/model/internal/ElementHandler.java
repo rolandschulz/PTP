@@ -35,13 +35,13 @@ public class ElementHandler extends Container implements IElementHandler {
 	protected List registerElements = new ArrayList();
 
 	public ElementHandler() {
-		super(SET_ROOT_ID, SET_ROOT_ID, false, IContainer.SET_TYPE);
+		super(null, SET_ROOT_ID, SET_ROOT_ID, false, IContainer.SET_TYPE);
 		//create root 
-		add(new ElementSet(SET_ROOT_ID, SET_ROOT_ID));
+		add(new ElementSet(this, SET_ROOT_ID, SET_ROOT_ID));
 	}
 	public IElementSet getSetRoot() {
 		if (size() == 0)
-			add(new ElementSet(SET_ROOT_ID, SET_ROOT_ID));
+			add(new ElementSet(this, SET_ROOT_ID, SET_ROOT_ID));
 		
 		return (IElementSet)get(SET_ROOT_ID);
 	}
@@ -78,16 +78,24 @@ public class ElementHandler extends Container implements IElementHandler {
 		return (IElementSet[])aList.toArray(new IElementSet[aList.size()]);
 	}
 
-	public boolean containsRegisterElement(IElement element) {
-		return registerElements.contains(element);
+	public boolean containsRegisterElement(String eid) {
+		return registerElements.contains(eid);
 	}
-	public void addRegisterElement(IElement element) {
-		registerElements.add(element);
+	public void addRegisterElement(String eid) {
+		if (!containsRegisterElement(eid))
+			registerElements.add(eid);
 	}
-	public void removeRegisterElement(IElement element) {
-		registerElements.remove(element);
+	public void removeRegisterElement(String eid) {
+		if (containsRegisterElement(eid))
+			registerElements.remove(eid);
 	}
-	public IElement[] getRegisteredElements() {
-		return (IElement[])registerElements.toArray(new IElement[registerElements.size()]);
+	public String[] getRegisteredElementsID() {
+		return (String[])registerElements.toArray(new String[registerElements.size()]);
+	}
+	public void removeAllRegisterElements() {
+		registerElements.clear();
+	}
+	public int totalRegisterElements() {
+		return registerElements.size();
 	}
 }

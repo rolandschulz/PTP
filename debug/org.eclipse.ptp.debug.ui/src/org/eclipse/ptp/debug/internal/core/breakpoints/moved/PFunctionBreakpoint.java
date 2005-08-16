@@ -16,37 +16,38 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.breakpoints;
+package org.eclipse.ptp.debug.internal.core.breakpoints.moved;
 
 import java.text.MessageFormat;
 import java.util.Map;
 
-import org.eclipse.cdt.debug.internal.core.breakpoints.BreakpointMessages;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.debug.core.model.IPAddressBreakpoint;
+import org.eclipse.ptp.debug.core.model.moved.IPFunctionBreakpoint;
+import org.eclipse.ptp.debug.internal.core.breakpoints.AbstractLineBreakpoint;
+import org.eclipse.ptp.debug.internal.core.breakpoints.BreakpointMessages;
 
 /**
  * @author Clement chu
  *
  */
-public class PAddressBreakpoint extends AbstractLineBreakpoint implements IPAddressBreakpoint {
-	private static final String P_ADDRESS_BREAKPOINT = "org.eclipse.ptp.debug.ui.pAddressBreakpointMarker";
+public class PFunctionBreakpoint extends AbstractLineBreakpoint implements IPFunctionBreakpoint {
+	private static final String P_FUNCTION_BREAKPOINT = "org.eclipse.ptp.debug.ui.pFunctionBreakpointMarker";
 
-	public PAddressBreakpoint() {
+	public PFunctionBreakpoint() {
 	}
-	public PAddressBreakpoint(IResource resource, Map attributes, boolean add) throws CoreException {
+	public PFunctionBreakpoint(IResource resource, Map attributes, boolean add) throws CoreException {
 		super(resource, getMarkerType(), attributes, add);
 	}
 
 	public static String getMarkerType() {
-		return P_ADDRESS_BREAKPOINT;
+		return P_FUNCTION_BREAKPOINT;
 	}
 	protected String getMarkerMessage() throws CoreException {
 		String fileName = ensureMarker().getResource().getName();
 		if (fileName != null && fileName.length() > 0) {
 			fileName = ' ' + fileName + ' ';
 		}
-		return MessageFormat.format(BreakpointMessages.getString("PAddressBreakpoint"), new String[] { getSetId(), fileName, getAddress(), getConditionText() });
+		return MessageFormat.format(BreakpointMessages.getString("PFunctinBreakpoint"), new String[] { getSetId(), fileName, getFunction(), getConditionText() });
 	}
 }

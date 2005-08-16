@@ -23,6 +23,7 @@ package org.eclipse.ptp.ui.model;
  *
  */
 public interface IElement {
+	public IElement getParent();
 	public String getName();
 	public int getIDNum();
 	public String getID();

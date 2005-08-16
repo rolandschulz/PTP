@@ -160,7 +160,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 		}
 		update();
 	}
-	public IElementHandler getCurrentSetManager() {
+	public IElementHandler getCurrentElementHandler() {
 		return manager.getElementHandler(getCurrentJobID());
 	}
 
@@ -217,7 +217,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 	}
 	
 	protected String getToolTipText(int element_num) {
-		IElementHandler setManager = getCurrentSetManager();
+		IElementHandler setManager = getCurrentElementHandler();
 		if (setManager == null)
 			return "Unknown element";
 
@@ -269,7 +269,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 		}
 	}
 	public void updateJob() {
-		IElementHandler setManager = getCurrentSetManager();
+		IElementHandler setManager = getCurrentElementHandler();
 		if (setManager != null) {			
 			selectSet(setManager.getSetRoot());
 		}

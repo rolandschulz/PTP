@@ -16,37 +16,12 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.breakpoints;
-
-import java.text.MessageFormat;
-import java.util.Map;
-
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
+package org.eclipse.ptp.ui.listeners;
 
 /**
  * @author Clement chu
  *
  */
-public class PLineBreakpoint extends AbstractLineBreakpoint {
-	private static final String P_LINE_BREAKPOINT = "org.eclipse.ptp.debug.ui.pLineBreakpointMarker";
-	
-	public PLineBreakpoint() {
-	}
-	
-	public PLineBreakpoint(IResource resource, Map attributes, boolean add) throws CoreException {
-		super(resource, getMarkerType(), attributes, add);
-	}
-
-	public static String getMarkerType() {
-		return P_LINE_BREAKPOINT;
-	}
-
-	protected String getMarkerMessage() throws CoreException {
-		String fileName = ensureMarker().getResource().getName();
-		if (fileName != null && fileName.length() > 0) {
-			fileName = ' ' + fileName + ' ';
-		}
-		return MessageFormat.format(BreakpointMessages.getString("PLineBreakpoint"), new Object[] { getSetId(), fileName, new Integer( getLineNumber() ), getConditionText() });
-	}
+public interface IPaintListener {
+	public void redraw();
 }

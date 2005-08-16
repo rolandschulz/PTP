@@ -44,7 +44,7 @@ public class CreateSetAction extends GotoDropDownAction {
 	
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
     	String curID = view.getCurrentSetID();
-		IElementHandler setManager = view.getCurrentSetManager();
+		IElementHandler setManager = view.getCurrentElementHandler();
 		if (setManager == null)
 			return;
 
@@ -66,7 +66,7 @@ public class CreateSetAction extends GotoDropDownAction {
 	
 	public void run(IElement[] elements, String setID) {
 		if (validation(elements)) {
-			final IElementHandler setManager = view.getCurrentSetManager();
+			final IElementHandler setManager = view.getCurrentElementHandler();
 			if (setManager == null)
 				return;
 			

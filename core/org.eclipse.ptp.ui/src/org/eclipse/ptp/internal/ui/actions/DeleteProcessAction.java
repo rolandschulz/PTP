@@ -48,7 +48,7 @@ public class DeleteProcessAction extends ParallelAction {
 			if (set.size() == elements.length) {
 				callDeleteGroupAction();
 			} else {
-				IElementHandler setManager = view.getCurrentSetManager();
+				IElementHandler setManager = view.getCurrentElementHandler();
 				if (setManager == null)
 					return;
 

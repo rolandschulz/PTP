@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core;
+package org.eclipse.ptp.debug.core.moved;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,9 +36,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.ptp.debug.core.model.IPBreakpoint;
-import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
-import org.eclipse.ptp.debug.internal.core.breakpoints.PLineBreakpoint;
+import org.eclipse.ptp.debug.core.model.moved.IPBreakpoint;
+import org.eclipse.ptp.debug.core.model.moved.IPLineBreakpoint;
+import org.eclipse.ptp.debug.internal.core.breakpoints.moved.PLineBreakpoint;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 
 /**

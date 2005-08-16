@@ -50,7 +50,7 @@ public class GotoSet implements IViewActionDelegate {
 					String jid = breakpoint.getJobId();
 					String sid = breakpoint.getSetId();
 					view.changeJob(jid);
-					IElementHandler elementHandler = view.getCurrentSetManager();
+					IElementHandler elementHandler = view.getCurrentElementHandler();
 					if (elementHandler != null) {
 						view.selectSet(elementHandler.getSet(sid));
 					}

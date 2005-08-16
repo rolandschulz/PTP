@@ -32,14 +32,14 @@
          point="org.eclipse.debug.ui.debugModelPresentations">
       <debugModelPresentation
             class="org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation"
-            id="org.eclipse.ptp.debug.ui">
+            id="org.eclipse.ptp.debug.core">
       </debugModelPresentation>
    </extension>
 
    <extension
          point="org.eclipse.ui.editors.annotationTypes">
       <type
-            markerType="org.eclipse.ptp.debug.ui.pBreakpointMarker"
+            markerType="org.eclipse.ptp.debug.core.pBreakpointMarker"
             super="org.eclipse.debug.core.breakpoint"
             name="org.eclipse.ptp.debug.core.breakpoint">
       </type>
@@ -56,6 +56,7 @@
    </extension>
    
    <!-- breakpointMarker -->
+   <!--
    <extension
          id="pBreakpointMarker"
          point="org.eclipse.core.resources.markers">
@@ -186,7 +187,8 @@
             id="pWatchBreakpoint">
       </breakpoint>
    </extension>
-
+   //-->
+   
    <extension
          point="org.eclipse.debug.ui.breakpointOrganizers">
       <breakpointOrganizer

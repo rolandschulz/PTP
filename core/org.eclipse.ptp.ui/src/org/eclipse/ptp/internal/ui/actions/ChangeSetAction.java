@@ -46,7 +46,7 @@ public class ChangeSetAction extends GotoDropDownAction {
 	    String curID = view.getCurrentSetID();    	
 	    addAction(dropDownMenuMgr, IElementHandler.SET_ROOT_ID, IElementHandler.SET_ROOT_ID, curID);
 	
-		IElementHandler setManager = view.getCurrentSetManager();
+		IElementHandler setManager = view.getCurrentElementHandler();
 		if (setManager == null)
 			return;
 
@@ -71,7 +71,7 @@ public class ChangeSetAction extends GotoDropDownAction {
 	public void run(IElement[] elements) {}
 	
 	public void run() {
-		IElementHandler setManager = view.getCurrentSetManager();
+		IElementHandler setManager = view.getCurrentElementHandler();
 		if (setManager == null)
 			return;
 		
@@ -95,7 +95,7 @@ public class ChangeSetAction extends GotoDropDownAction {
 	}
 	
 	public void run(IElement[] elements, String id) {
-		IElementHandler setManager = view.getCurrentSetManager();
+		IElementHandler setManager = view.getCurrentElementHandler();
 		if (setManager == null)
 			return;
 		
