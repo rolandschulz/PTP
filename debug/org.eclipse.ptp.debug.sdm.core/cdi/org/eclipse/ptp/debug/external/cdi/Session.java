@@ -41,8 +41,8 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.IDebugger;
+import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
-import org.eclipse.ptp.debug.external.event.ETargetRegistered;
 
 public class Session implements IPCDISession, ICDISessionObject {
 	EventManager eventManager;
@@ -66,6 +66,7 @@ public class Session implements IPCDISession, ICDISessionObject {
 		dLaunch = launch;
 		dBinObject = binObj;
 		debugger = iDebugger;
+		debugger.setSession(this);
 		
 		eventManager = new EventManager(this);
 		breakpointManager = new BreakpointManager(this);
@@ -144,7 +145,8 @@ public class Session implements IPCDISession, ICDISessionObject {
 		
 		BitSet bitSet = new BitSet();
 		bitSet.set(procNum);
-		debugger.fireEvent(new ETargetRegistered(bitSet));
+		//debugger.fireEvent(new ETargetRegistered(bitSet));
+		debugger.fireEvent(new TargetRegisteredEvent(this, bitSet));
 		
 		try {
 			boolean stopInMain = dLaunch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );

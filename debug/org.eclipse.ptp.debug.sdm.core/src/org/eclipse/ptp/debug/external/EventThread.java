@@ -29,7 +29,7 @@
 
 package org.eclipse.ptp.debug.external;
 
-import org.eclipse.ptp.debug.external.event.DebugEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.external.utils.Queue;
 
 /**
@@ -47,11 +47,11 @@ public class EventThread extends Thread {
 	public void run() {
 		// Signal by the session of time to die.
 		while (dbg.isExiting() != true) {
-			DebugEvent event = null;
+			IPCDIEvent event = null;
 			Queue eventQueue = dbg.getEventQueue();
 			// removeItem() will block until an item is available.
 			try {
-				event = (DebugEvent) eventQueue.removeItem();
+				event = (IPCDIEvent) eventQueue.removeItem();
 			} catch (InterruptedException e) {
 				//e.printStackTrace();
 			}

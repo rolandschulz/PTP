@@ -32,22 +32,20 @@ import java.util.ArrayList;
 import java.util.BitSet;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.external.cdi.Session;
-import org.eclipse.ptp.debug.external.event.DebugEvent;
 
 /**
  */
 public abstract class AbstractEvent implements IPCDIEvent {
-	Session session;	
+	IPCDISession session;	
 	BitSet sources;
-	DebugEvent event;
 	ICDIObject[] iCDIObjects;
 
-	public AbstractEvent(Session s, DebugEvent ev) {
+	public AbstractEvent(IPCDISession s, BitSet srcs) {
 		session = s;
-		event = ev;
-		sources = ev.getSources();
+		sources = srcs;
 		
 		ArrayList sourceList = new ArrayList();
 		
@@ -55,7 +53,7 @@ public abstract class AbstractEvent implements IPCDIEvent {
 		
 		for (int j = 0; j < registeredTargets.length; j++) {
 			if (sources.get(registeredTargets[j])) {
-				ICDIObject src = session.getTarget(registeredTargets[j]);
+				ICDIObject src = ((Session) session).getTarget(registeredTargets[j]);
 				sourceList.add(src);
 			}
 			

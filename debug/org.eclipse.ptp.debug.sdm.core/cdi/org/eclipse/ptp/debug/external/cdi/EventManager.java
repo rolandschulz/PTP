@@ -37,14 +37,7 @@ import java.util.Observer;
 import org.eclipse.cdt.debug.core.cdi.ICDIEventManager;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
-import org.eclipse.ptp.debug.external.cdi.event.CreatedEvent;
-import org.eclipse.ptp.debug.external.cdi.event.ExitedEvent;
-import org.eclipse.ptp.debug.external.cdi.event.SuspendedEvent;
-import org.eclipse.ptp.debug.external.event.DebugEvent;
-import org.eclipse.ptp.debug.external.event.EBreakpointCreated;
-import org.eclipse.ptp.debug.external.event.EBreakpointHit;
-import org.eclipse.ptp.debug.external.event.EDebuggerExit;
-import org.eclipse.ptp.debug.external.event.ETargetRegistered;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 
 /**
  */
@@ -96,12 +89,14 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	public void update(Observable obs, Object ev) {
 		System.out.println("EventManager.update()");
 		
-		DebugEvent event = (DebugEvent) ev;
+		IPCDIEvent event = (IPCDIEvent) ev;
 		Session session = (Session)getSession();
 		
 		List cdiList = new ArrayList(1);
 		
-		if (event instanceof EDebuggerExit) {
+		cdiList.add(event);
+		
+/*		if (event instanceof EDebuggerExit) {
 			System.out.println("Exit Event Received");
 			cdiList.add(new ExitedEvent(session, (EDebuggerExit) event));
 		} else if (event instanceof EBreakpointCreated) {
@@ -116,7 +111,7 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 		} else {
 			System.out.println("Unknown Event");
 		}
-		
+*/		
 		// Fire the event;
 		ICDIEvent[] cdiEvents = (ICDIEvent[])cdiList.toArray(new ICDIEvent[0]);
 		fireEvents(cdiEvents);
