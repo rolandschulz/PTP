@@ -24,9 +24,14 @@ import java.util.ArrayList;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
-import org.eclipse.ptp.debug.external.model.MProcess;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
+import org.eclipse.cdt.debug.core.cdi.CDIException;
 
-public class ParallelDebugger extends AbstractDebugger throws DebugException {
+public class ParallelDebugger extends AbstractDebugger {
 
 	protected void startDebugger(IPJob job) {
 	}
@@ -34,52 +39,50 @@ public class ParallelDebugger extends AbstractDebugger throws DebugException {
 	protected void stopDebugger() {
 	}
 	
-	public void run(String[] args) {
+	public void go(IPCDIDebugProcessSet procs) throws CDIException {
 	}
 
-	public void go(ProcessSet p) {
+	public void kill(IPCDIDebugProcessSet procs) throws CDIException {
 	}
 
-	public void kill(ProcessSet p) {
-	}
-
-	public void halt(ProcessSet p) {
+	public void halt(IPCDIDebugProcessSet procs) throws CDIException {
 	}
 	
-	public void stepInto(ProcessSet p, int count) {
+	public void stepInto(IPCDIDebugProcessSet procs, int count) throws CDIException {
 	}
 
-	public void stepOver(ProcessSet p, int count) {
+	public void stepOver(IPCDIDebugProcessSet procs, int count) throws CDIException {
 	}
 
-	public void stepFinish(ProcessSet p, int count) {
+	public void stepFinish(IPCDIDebugProcessSet procs, int count) throws CDIException {
 	}
 
-	public BreakPoint setLineBreakpoint(ProcessSet p, String file, int line) {
+	public void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDIBreakpoint bpt) throws CDIException {
 	}
 
-	public BreakPoint setFunctionBreakpoint(ProcessSet p, String file, String func) {
+	public void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIBreakpoint bpt) throws CDIException {
 	}
 
-	public void deleteBreakpoint(BreakPoint bp) {
+	public void deleteBreakpoints(ICDIBreakpoint[] bp) throws CDIException {
 	}
 	
-	public StackFrame[] listStackFrames(ProcessSet p) {
+	public ICDIStackFrame[] listStackFrames(IPCDIDebugProcessSet procs) throws CDIException {
+		return null;
 	}
 	
-	public StackFrame moveStackFrame(ProcessSet p, int count, boolean down) {
+	public void setCurrentStackFrame(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException {
 		
 	}
 	
-	public Expression evaluateExpression(ProcessSet p, String expr) {
-		
+	public ICDIExpression evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws CDIException {
+		return null;
 	}
 	
-	public Variable[] listVariables(ProcessSet p, StackFrame f) {
-		
+	public ICDIVariable[] listVariables(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException {
+		return null;
 	}
 	
-	public Variable[] listGlobalVariables(ProcessSet p) {
-		
+	public ICDIVariable[] listGlobalVariables(IPCDIDebugProcessSet procs) throws CDIException {
+		return null;
 	}
 }
