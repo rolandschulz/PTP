@@ -26,9 +26,10 @@ package org.eclipse.ptp.debug.external;
 import java.util.Observer;
 
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
-import org.eclipse.ptp.debug.external.event.DebugEvent;
 import org.eclipse.ptp.debug.external.utils.Queue;
 
 
@@ -112,14 +113,16 @@ public interface IDebugger {
 	/* Events */
 	public void addDebuggerObserver(Observer obs);
 	public void deleteDebuggerObserver(Observer obs);
-	public void fireEvents(DebugEvent[] events);
-	public void fireEvent(DebugEvent event);
+	public void fireEvents(IPCDIEvent[] events);
+	public void fireEvent(IPCDIEvent event);
 	public void notifyObservers(Object arg);
 	public Queue getEventQueue();
 	public boolean isExiting();
 	
 	/* Methods that are required to interface with Eclipse Debug/CDI Model */
 	public abstract Process getSessionProcess();
+	public IPCDISession getSession();
+	public void setSession(IPCDISession session);
 	public abstract IPCDIDebugProcess getProcess(int number);
 	public abstract IPCDIDebugProcess getProcess();
 	public abstract IPCDIDebugProcess[] getProcesses();

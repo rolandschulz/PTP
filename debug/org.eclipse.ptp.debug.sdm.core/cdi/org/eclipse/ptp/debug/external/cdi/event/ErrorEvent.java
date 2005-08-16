@@ -28,20 +28,28 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
-import org.eclipse.cdt.debug.core.cdi.event.ICDICreatedEvent;
+import java.util.BitSet;
+
+import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
+import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.external.cdi.Session;
-import org.eclipse.ptp.debug.external.event.EBreakpointCreated;
-import org.eclipse.ptp.debug.external.event.ETargetRegistered;
 
 /**
+ *
  */
-public class CreatedEvent extends AbstractEvent implements ICDICreatedEvent {
+public class ErrorEvent extends AbstractEvent implements ICDISuspendedEvent {
 
-	public CreatedEvent(Session s, EBreakpointCreated ev) {
-		super(s, ev);
+	public ErrorEvent(IPCDISession s, BitSet sources) {
+		super(s, sources);
 	}
-
-	public CreatedEvent(Session s, ETargetRegistered ev) {
-		super(s, ev);
+	
+	public ICDISessionObject getReason() {
+		// Auto-generated method stub
+		System.out.println("SuspendedEvent.getReason()");
+/*		if (event instanceof EBreakpointHit) {
+			return new BreakpointHit(session, (EBreakpointHit)event);
+		}
+*/		return (Session) session;
 	}
 }

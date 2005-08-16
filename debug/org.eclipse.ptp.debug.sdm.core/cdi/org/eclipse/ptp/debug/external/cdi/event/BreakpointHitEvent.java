@@ -28,21 +28,30 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
-import org.eclipse.cdt.debug.core.cdi.event.ICDIResumedEvent;
+import java.util.BitSet;
+
+import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
+import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.external.cdi.BreakpointHit;
 import org.eclipse.ptp.debug.external.cdi.Session;
-import org.eclipse.ptp.debug.external.event.EInferiorResumed;
 
 /**
+ *
  */
-public class ResumedEvent extends AbstractEvent implements ICDIResumedEvent {
-	
-	public ResumedEvent(Session s, EInferiorResumed ev) {
-		super(s, ev);
+public class BreakpointHitEvent extends AbstractEvent implements ICDISuspendedEvent {
+
+	public BreakpointHitEvent(IPCDISession s, BitSet sources) {
+		super(s, sources);
 	}
 	
-	public int getType() {
+	public ICDISessionObject getReason() {
 		// Auto-generated method stub
-		System.out.println("ResumedEvent.getType()");
-		return 0;
+		System.out.println("SuspendedEvent.getReason()");
+/*		if (event instanceof EBreakpointHit) {
+			return new BreakpointHit(session, (EBreakpointHit)event);
+		}
+*/		return new BreakpointHit((Session) session, this);
+		//return session;
 	}
 }

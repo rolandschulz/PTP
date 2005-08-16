@@ -20,7 +20,7 @@ package org.eclipse.ptp.debug.external.simulator;
 
 import java.util.BitSet;
 
-import org.eclipse.ptp.debug.external.event.EBreakpointHit;
+import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 
 public class SimThread {
 
@@ -82,7 +82,8 @@ public class SimThread {
 			state = SUSPENDED;
 			BitSet bitSet = new BitSet();
 			bitSet.set(processId);
-			dSim.fireEvent(new EBreakpointHit(bitSet));
+			//dSim.fireEvent(new EBreakpointHit(bitSet));
+			dSim.fireEvent(new BreakpointHitEvent(dSim.getSession(), bitSet));
 			// Do Something
 		}
 	}

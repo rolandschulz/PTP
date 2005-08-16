@@ -27,10 +27,11 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
-import org.eclipse.ptp.debug.external.event.DebugEvent;
 import org.eclipse.ptp.debug.external.utils.Queue;
 
 /**
@@ -50,16 +51,26 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 	protected IPCDIDebugProcessSet allSet = null;
 	protected IPCDIDebugProcessSet currentFocus = null;
 	
+	protected IPCDISession session = null;
+	
 	protected boolean isExitingFlag = false; /* Checked by the eventThread */
 
 	protected abstract void startDebugger(IPJob job);
+	
+	public IPCDISession getSession() {
+		return session;
+	}
+	
+	public void setSession(IPCDISession s) {
+		session = s;
+	}
 	
 	public void initialize(IPJob job) {
 		actionpointList = new ArrayList();
 		eventQueue = new Queue();
 		eventThread = new EventThread(this);
 		eventThread.start();
-
+		
 		userDefinedProcessSetList = new ArrayList();
 		allSet = new DebugProcessSet("all");
 		currentFocus = allSet;
@@ -258,7 +269,7 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 		this.deleteObserver(obs);
 	}
 	
-	public final void fireEvents(DebugEvent[] events) {
+	public final void fireEvents(IPCDIEvent[] events) {
 		if (events != null && events.length > 0) {
 			for (int i = 0; i < events.length; i++) {
 				fireEvent(events[i]);
@@ -266,7 +277,7 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 		}
 	}
 
-	public final void fireEvent(DebugEvent event) {
+	public final void fireEvent(IPCDIEvent event) {
 		if (event != null) {
 			eventQueue.addItem(event);
 		}

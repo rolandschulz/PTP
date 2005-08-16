@@ -30,15 +30,15 @@ package org.eclipse.ptp.debug.external.cdi;
 
 import org.eclipse.cdt.debug.core.cdi.ICDIBreakpointHit;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.ptp.debug.external.event.EBreakpointHit;
+import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 
 /**
  */
 public class BreakpointHit extends SessionObject implements ICDIBreakpointHit {
 
-	EBreakpointHit breakEvent;
+	BreakpointHitEvent breakEvent;
 
-	public BreakpointHit(Session session, EBreakpointHit e) {
+	public BreakpointHit(Session session, BreakpointHitEvent e) {
 		super(session);
 		breakEvent = e;
 	}

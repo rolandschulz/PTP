@@ -34,7 +34,7 @@ public class PTPDebugger implements IPTPDebugger {
 			
 			IDebugger debugger = new DebugSimulator();
 			debugger.initialize(job);
-
+			
 			Session session = new Session(debugger, launch, exe);
 			
 			/* Make the Debug Session accessible by others through the PTPDebugCorePlugin */
