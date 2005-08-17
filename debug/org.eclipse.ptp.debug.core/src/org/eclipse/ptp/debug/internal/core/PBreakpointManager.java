@@ -67,6 +67,7 @@ import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICThread;
 import org.eclipse.cdt.debug.core.model.ICWatchpoint;
 import org.eclipse.cdt.debug.core.sourcelookup.ICSourceLocator;
+import org.eclipse.cdt.debug.internal.core.breakpoints.CBreakpoint;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IProject;
@@ -87,7 +88,6 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
-import org.eclipse.ptp.debug.internal.core.breakpoints.CBreakpoint;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupDirector;
 

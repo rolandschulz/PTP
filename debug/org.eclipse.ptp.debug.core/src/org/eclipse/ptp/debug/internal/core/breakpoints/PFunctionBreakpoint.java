@@ -18,23 +18,34 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.breakpoints;
 
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.text.MessageFormat;
+import java.util.Map;
+
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ptp.debug.core.model.IPFunctionBreakpoint;
 
 /**
  * @author Clement chu
  *
  */
-public class BreakpointMessages {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.debug.internal.core.breakpoints.BreakpointMessages";
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+public class PFunctionBreakpoint extends AbstractLineBreakpoint implements IPFunctionBreakpoint {
+	private static final String P_FUNCTION_BREAKPOINT = "org.eclipse.ptp.debug.core.pFunctionBreakpointMarker";
 
-	public static String getString(String key) {
-		try {
-			return RESOURCE_BUNDLE.getString(key);
-		} catch(MissingResourceException e) {
-			return '!' + key + '!';
+	public PFunctionBreakpoint() {
+	}
+	public PFunctionBreakpoint(IResource resource, Map attributes, boolean add) throws CoreException {
+		super(resource, getMarkerType(), attributes, add);
+	}
+
+	public static String getMarkerType() {
+		return P_FUNCTION_BREAKPOINT;
+	}
+	protected String getMarkerMessage() throws CoreException {
+		String fileName = ensureMarker().getResource().getName();
+		if (fileName != null && fileName.length() > 0) {
+			fileName = ' ' + fileName + ' ';
 		}
+		return MessageFormat.format(BreakpointMessages.getString("PFunctinBreakpoint"), new String[] { getSetId(), fileName, getFunction(), getConditionText() });
 	}
 }
-

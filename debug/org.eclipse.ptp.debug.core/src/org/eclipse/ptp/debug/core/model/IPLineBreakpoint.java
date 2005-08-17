@@ -16,25 +16,24 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.breakpoints;
+package org.eclipse.ptp.debug.core.model;
 
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.model.ILineBreakpoint;
 
 /**
- * @author Clement chu
+ * @author Clement
  *
  */
-public class BreakpointMessages {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.debug.internal.core.breakpoints.BreakpointMessages";
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+public interface IPLineBreakpoint extends IPBreakpoint, ILineBreakpoint {
+	public static final String FUNCTION = "org.eclipse.ptp.debug.core.function";	
+	public static final String ADDRESS = "org.eclipse.ptp.debug.core.address";	
 
-	public static String getString(String key) {
-		try {
-			return RESOURCE_BUNDLE.getString(key);
-		} catch(MissingResourceException e) {
-			return '!' + key + '!';
-		}
-	}
+	public String getAddress() throws CoreException;
+	public void setAddress( String address ) throws CoreException;
+	
+	public String getFunction() throws CoreException;
+	public void setFunction( String function ) throws CoreException;
+	
+	public String getFileName() throws CoreException;
 }
-
