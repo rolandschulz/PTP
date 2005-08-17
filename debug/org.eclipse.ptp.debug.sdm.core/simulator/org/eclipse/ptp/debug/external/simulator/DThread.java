@@ -18,10 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.simulator;
 
-import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
-import org.eclipse.ptp.debug.external.utils.BitList;
 
-public class SimThread {
+public class DThread {
 
 	final int RUNNING = 10;
 	final int SUSPENDED = 11;
@@ -31,14 +29,14 @@ public class SimThread {
 	
 	int curLine;
 	int breakLine;
-	SimStackFrame[] stackFrames;
+	DStackFrame[] stackFrames;
 	int threadId;
 	int processId;
 	
-	DebugSimulator dSim;
+	DebugSimulator dD;
 	
-	public SimThread(int id, int pId, DebugSimulator debugger) {
-		dSim = debugger;
+	public DThread(int id, int pId, DebugSimulator debugger) {
+		dD = debugger;
 		
 		state = RUNNING;
 		curLine = 1;
@@ -47,9 +45,9 @@ public class SimThread {
 		processId = pId;
 		int numStackFrames = 1;
 		
-		stackFrames = new SimStackFrame[numStackFrames];
+		stackFrames = new DStackFrame[numStackFrames];
 		for (int i = 0; i < numStackFrames; i++) {
-			stackFrames[i] = new SimStackFrame(i, "123456", "main", "main.c", 6);
+			stackFrames[i] = new DStackFrame(i, "123456", "main", "main.c", 6);
 		}
 	}
 	
@@ -61,11 +59,11 @@ public class SimThread {
 		return stackFrames.length;
 	}
 	
-	public SimStackFrame[] getStackFrames() {
+	public DStackFrame[] getStackFrames() {
 		return stackFrames;
 	}
 
-	public void runCommand(SimInputStream in, String cmd, String arg) {
+	public void runCommand(DInputStream in, String cmd, String arg) {
 		if (cmd.equals("print")) {
 			checkBreakpoint();
 			in.printString(arg + " from process " + processId + " & thread " + threadId);
@@ -79,10 +77,10 @@ public class SimThread {
 	public void checkBreakpoint() {
 		if (curLine == breakLine) {
 			state = SUSPENDED;
-			BitList bitList = new BitList();
-			bitList.set(processId);
-			//dSim.fireEvent(new EBreakpointHit(bitSet));
-			dSim.fireEvent(new BreakpointHitEvent(dSim.getSession(), bitList));
+			//BitList bitList = new BitList();
+			//bitList.set(processId);
+			//dD.fireEvent(new EBreakpointHit(bitSet));
+			//dD.fireEvent(new BreakpointHitEvent(dD.getSession(), bitList));
 			// Do Something
 		}
 	}

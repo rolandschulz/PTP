@@ -32,7 +32,6 @@ import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
-import org.eclipse.ptp.debug.external.simulator.SimVariable;
 
 /**
  */
@@ -62,8 +61,7 @@ public class Value extends PTPObject implements ICDIValue {
 		System.out.println("Value.getValueString()");
 
 		String result = "";
-		SimVariable sVar = variable.getSimVariable();
-		result = sVar.getValue();
+		result = variable.fValue;
 		
 		return result;
 	}

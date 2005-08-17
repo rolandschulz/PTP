@@ -32,18 +32,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgumentDescriptor;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariableDescriptor;
+import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.model.Argument;
 import org.eclipse.ptp.debug.external.cdi.model.ArgumentDescriptor;
+import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.LocalVariable;
 import org.eclipse.ptp.debug.external.cdi.model.LocalVariableDescriptor;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
+import org.eclipse.ptp.debug.external.cdi.model.Thread;
 import org.eclipse.ptp.debug.external.cdi.model.Variable;
 import org.eclipse.ptp.debug.external.cdi.model.VariableDescriptor;
-import org.eclipse.ptp.debug.external.simulator.SimStackFrame;
-import org.eclipse.ptp.debug.external.simulator.SimVariable;
 
 /**
  */
@@ -60,14 +63,19 @@ public class VariableManager extends Manager {
 	
 	public ICDIArgumentDescriptor[] getArgumentDescriptors(StackFrame frame) throws CDIException {
 		List argObjects = new ArrayList();
-		SimStackFrame sFrame = frame.getSimStackFrame();
 		Target target = (Target)frame.getTarget();
-		int level = frame.getLevel();
-		SimVariable[] args = sFrame.getArgs();
-
+		Session session = (Session) target.getSession();
+		IDebugger debugger = session.getDebugger();
+		DebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+		ICDIArgument[] args = debugger.listArguments(newSet, frame);
 		if (args != null) {
 			for (int i = 0; i < args.length; i++) {
-				ArgumentDescriptor arg = new ArgumentDescriptor(target, null, frame, args[i].getName(), null, args.length - i, level);
+				Thread thread = (Thread) ((VariableDescriptor) args[0]).getThread();
+				String name = args[0].getName();
+				String fName = args[0].getQualifiedName();
+				int pos = ((VariableDescriptor) args[0]).getPosition();
+				int depth = ((VariableDescriptor) args[0]).getStackDepth();
+				ArgumentDescriptor arg = new ArgumentDescriptor(target, thread, frame, name, fName, pos, depth);
 				argObjects.add(arg);
 			}
 		}
@@ -76,14 +84,19 @@ public class VariableManager extends Manager {
 	
 	public ICDILocalVariableDescriptor[] getLocalVariableDescriptors(StackFrame frame) throws CDIException {
 		List argObjects = new ArrayList();
-		SimStackFrame sFrame = frame.getSimStackFrame();
 		Target target = (Target)frame.getTarget();
-		int level = frame.getLevel();
-		SimVariable[] args = sFrame.getLocalVars();
-
+		Session session = (Session) target.getSession();
+		IDebugger debugger = session.getDebugger();
+		DebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+		ICDILocalVariable[] args = debugger.listLocalVariables(newSet, frame);
 		if (args != null) {
 			for (int i = 0; i < args.length; i++) {
-				LocalVariableDescriptor arg = new LocalVariableDescriptor(target, null, frame, args[i].getName(), null, args.length - i, level);
+				Thread thread = (Thread) ((VariableDescriptor) args[0]).getThread();
+				String name = args[0].getName();
+				String fName = args[0].getQualifiedName();
+				int pos = ((VariableDescriptor) args[0]).getPosition();
+				int depth = ((VariableDescriptor) args[0]).getStackDepth();
+				LocalVariableDescriptor arg = new ArgumentDescriptor(target, thread, frame, name, fName, pos, depth);
 				argObjects.add(arg);
 			}
 		}
@@ -102,10 +115,14 @@ public class VariableManager extends Manager {
 	public LocalVariable createLocalVariable(LocalVariableDescriptor varDesc) throws CDIException {
 		System.out.println("VariableManager.createLocalVariable()");
 		StackFrame frame = (StackFrame) varDesc.getStackFrame();
-		SimVariable[] vars = frame.getSimStackFrame().getLocalVars();
+		Target target = (Target)frame.getTarget();
+		Session session = (Session) target.getSession();
+		IDebugger debugger = session.getDebugger();
+		DebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+		ICDILocalVariable[] vars = debugger.listLocalVariables(newSet, frame);
 		for (int i = 0; i < vars.length; i++) {
 			if (varDesc.getName().equals(vars[i].getName()))
-				return new LocalVariable(varDesc, vars[i]);
+				return new LocalVariable(varDesc, vars[i].getValue().getValueString());
 		}
 		throw new CDIException(CDIResources.getString("cdi.VariableManager.Unknown_variable_object")); //$NON-NLS-1$
 	}
@@ -113,10 +130,14 @@ public class VariableManager extends Manager {
 	public Argument createArgument(ArgumentDescriptor argDesc) throws CDIException {
 		System.out.println("VariableManager.createArgument()");
 		StackFrame frame = (StackFrame) argDesc.getStackFrame();
-		SimVariable[] vars = frame.getSimStackFrame().getArgs();
+		Target target = (Target)frame.getTarget();
+		Session session = (Session) target.getSession();
+		IDebugger debugger = session.getDebugger();
+		DebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+		ICDIArgument[] vars = debugger.listArguments(newSet, frame);
 		for (int i = 0; i < vars.length; i++) {
 			if (argDesc.getName().equals(vars[i].getName()))
-				return new Argument(argDesc, vars[i]);
+				return new Argument(argDesc, vars[i].getValue().getValueString());
 		}
 		throw new CDIException(CDIResources.getString("cdi.VariableManager.Unknown_variable_object")); //$NON-NLS-1$
 	}

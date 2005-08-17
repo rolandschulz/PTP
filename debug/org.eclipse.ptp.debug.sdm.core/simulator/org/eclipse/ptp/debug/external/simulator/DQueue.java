@@ -33,13 +33,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Simple thread-safe Queue implemetation.
+ * Dple thread-safe Queue implemetation.
  */
-public class SimQueue {
+public class DQueue {
 
 	protected List list;
 
-	public SimQueue() {
+	public DQueue() {
 		list = Collections.synchronizedList(new LinkedList());
 	}
 

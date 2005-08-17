@@ -90,28 +90,11 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 		System.out.println("EventManager.update()");
 		
 		IPCDIEvent event = (IPCDIEvent) ev;
-		Session session = (Session)getSession();
 		
 		List cdiList = new ArrayList(1);
 		
 		cdiList.add(event);
 		
-/*		if (event instanceof EDebuggerExit) {
-			System.out.println("Exit Event Received");
-			cdiList.add(new ExitedEvent(session, (EDebuggerExit) event));
-		} else if (event instanceof EBreakpointCreated) {
-			System.out.println("BreakpointCreated Event Received");
-			cdiList.add(new CreatedEvent(session, (EBreakpointCreated) event));
-		} else if (event instanceof EBreakpointHit) {
-			System.out.println("BreakpointHit Event Received");
-			cdiList.add(new SuspendedEvent(session, (EBreakpointHit) event));
-		} else if (event instanceof ETargetRegistered) {
-			System.out.println("InferiorCreated Event Received");
-			cdiList.add(new CreatedEvent(session, (ETargetRegistered) event));
-		} else {
-			System.out.println("Unknown Event");
-		}
-*/		
 		// Fire the event;
 		ICDIEvent[] cdiEvents = (ICDIEvent[])cdiList.toArray(new ICDIEvent[0]);
 		fireEvents(cdiEvents);

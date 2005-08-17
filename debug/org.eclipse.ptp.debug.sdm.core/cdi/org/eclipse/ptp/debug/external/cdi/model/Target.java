@@ -55,13 +55,12 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
-import org.eclipse.ptp.debug.external.simulator.SimProcess;
-import org.eclipse.ptp.debug.external.simulator.SimThread;
 
 public class Target extends SessionObject implements IPCDITarget {
 	
@@ -72,14 +71,20 @@ public class Target extends SessionObject implements IPCDITarget {
 	int currentThreadId;
 	
 	int targetId; /* synonymous with the process number/id */
+	IPCDIDebugProcess debugProcess;
 	
 	public Target(Session s, IDebugger debugger, int tId) {
 		super(s);
 		fDebugger = debugger;
 		targetId = tId;
+		debugProcess = debugger.getProcess(targetId);
 		
 		fConfiguration = new TargetConfiguration(this);
 		currentThreads = new Thread[0];
+	}
+	
+	public IPCDIDebugProcess getDebugProcess() {
+		return debugProcess;
 	}
 	
 	public int getTargetId() {
@@ -121,7 +126,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void terminate() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.terminate()");
-		fDebugger.kill();
+		fDebugger.kill(null);
 	}
 
 	public boolean isDisconnected() {
@@ -133,7 +138,8 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void disconnect() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.disconnect()");
-		fDebugger.detach();
+		//fDebugger.detach(null);
+		fDebugger.kill(null);
 	}
 
 	public void restart() throws CDIException {
@@ -214,14 +220,10 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 	
 	public ICDIThread[] getThreads() throws CDIException {
-		SimThread[] threads = ((SimProcess) getProcess()).getThreads();
-			
-		currentThreads = new Thread[threads.length];
-			
-		for (int i = 0; i < threads.length; i++) {
-			currentThreads[i] = new Thread(this, threads[i].getThreadId());
-		}
-			
+		/* Currently the debug external interface doesn't support thread
+		 */
+		currentThreads = new Thread[1];
+		currentThreads[0] = new Thread(this, 0);
 		currentThreadId = 0;
 		return currentThreads;
 	}
@@ -286,7 +288,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void resume(boolean passSignal) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.resume()");
-		fDebugger.go();
+		fDebugger.go(null);
 	}
 
 	public void resume(ICDILocation location) throws CDIException {
@@ -302,7 +304,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void suspend() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.suspend()");
-		fDebugger.halt();
+		fDebugger.halt(null);
 	}
 
 	public boolean isSuspended() {

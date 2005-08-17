@@ -20,11 +20,29 @@
 
 import java.util.ArrayList;
 
+import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
+import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
+import org.eclipse.ptp.debug.external.cdi.model.Argument;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
+import org.eclipse.ptp.debug.external.cdi.model.LocalVariable;
+import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
+import org.eclipse.ptp.debug.external.cdi.model.Target;
+import org.eclipse.ptp.debug.external.cdi.model.Thread;
+import org.eclipse.ptp.rtsystem.simulation.SimProcess;
+import org.eclipse.ptp.rtsystem.simulation.SimStackFrame;
+import org.eclipse.ptp.rtsystem.simulation.SimThread;
+import org.eclipse.ptp.rtsystem.simulation.SimVariable;
 
 public class DebugSimulator extends AbstractDebugger {
 
@@ -36,11 +54,10 @@ public class DebugSimulator extends AbstractDebugger {
 	
 	private Process debuggerProcess = null;
 	
-	SimQueue debuggerCommands = null;
-	SimQueue[] procCommands = null;
+	DQueue debuggerCommands = null;
 	
-	private void initializeSimulatedProcessesCode(SimQueue dQ, SimQueue[] procs) {
-		ArrayList cmd, cmd2;
+	private void initializeSimulatedProcessesCode(DQueue dQ) {
+		ArrayList cmd;
 		
 		cmd = new ArrayList();
 		cmd.add(0, "0");
@@ -50,103 +67,13 @@ public class DebugSimulator extends AbstractDebugger {
 		for (int i = 0; i < 30; i++) {
 			dQ.addItem(cmd);
 		}
-		
-		cmd = new ArrayList();
-		cmd.add(0, "0");
-		cmd.add(1, "print");
-		cmd.add(2, "ProcessOutput");
-		
-		cmd2 = new ArrayList();
-		cmd2.add(0, "0");
-		cmd2.add(1, "break");
-		cmd2.add(2, "5");
-
-		for (int j = 0; j < procs.length; j++) {
-			procs[j].addItem(cmd2);
-			
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-			procs[j].addItem(cmd);
-		}
 	}
 	
 	protected void startDebugger(IPJob job) {
-		int numSlaves = job.getProcesses().length;
 		state = SUSPENDED;
-		
-		debuggerCommands = new SimQueue();
-		procCommands = new SimQueue[numSlaves];
-		for (int i = 0; i < numSlaves; i++) {
-			procCommands[i] = new SimQueue();
-		}
-		
-		initializeSimulatedProcessesCode(debuggerCommands, procCommands);
-		
-		debuggerProcess = new SimProcess("Debugger", 99, 1, debuggerCommands, this);
-		
-		IPProcess[] procs = job.getSortedProcesses();
-		for (int i = 0; i < procs.length; i++) {
-			Process p = new SimProcess("proc" + i, i, 1, procCommands[i], this);
-			IPCDIDebugProcess proc = new DebugProcess(procs[i], p);
-			allSet.addProcess(proc);
-		}
-
+		debuggerCommands = new DQueue();
+		initializeSimulatedProcessesCode(debuggerCommands);
+		debuggerProcess = new DProcess("Debugger", -1, 1, debuggerCommands, this);
 	}
 	
 	protected void stopDebugger() {
@@ -155,240 +82,173 @@ public class DebugSimulator extends AbstractDebugger {
 		finished = true;
 	}
 
-	public Process getSessionProcess() {
+	public Process getDebuggerProcess() {
 		return debuggerProcess;
 	}
 
-	public IPCDIDebugProcess[] getProcesses() {
-		return allSet.getProcesses();
+	public ICDIStackFrame[] listStackFrames(IPCDIDebugProcessSet procs) throws CDIException {
+		ArrayList list = new ArrayList();
+		IPCDIDebugProcess[] procList = procs.getProcesses();
+		for (int i = 0; i < procList.length; i++) {
+			//ICDITarget target = procList[i].getTarget();
+			int taskId = ((DebugProcess) procList[i]).getPProcess().getTaskId();
+			ICDITarget target = getSession().getTarget(taskId);
+			SimThread simThread = ((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0);
+			ICDIThread thread = new Thread((Target) target, simThread.getThreadId());
+			SimStackFrame[] simFrames = simThread.getStackFrames();
+			for (int j = 0; j < simFrames.length; j++) {
+				int level = simFrames[j].getLevel();
+				String file = simFrames[j].getFile();
+				String func = simFrames[j].getFunction();
+				int line = simFrames[j].getLine();
+				String addr = simFrames[j].getAddress();
+				StackFrame frame = new StackFrame((Thread) thread, level, file, func, line, addr);
+				list.add(frame);
+			}
+		}
+		return (ICDIStackFrame[]) list.toArray();
 	}
 
-	public IPCDIDebugProcess getProcess(int num) {
-		return (allSet.getProcess(num));
+	public void setCurrentStackFrame(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException {
+		// TODO Auto-generated method stub
+		
 	}
-	
-	public IPCDIDebugProcess getProcess() {
-		return getProcess(0);
+
+	public ICDIExpression evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws CDIException {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
-	public void go() {
+
+	public ICDIArgument[] listArguments(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException {
+		ArrayList list = new ArrayList();
+		IPCDIDebugProcess[] procList = procs.getProcesses();
+		for (int i = 0; i < procList.length; i++) {
+			//ICDITarget target = procList[i].getTarget();
+			int taskId = ((DebugProcess) procList[i]).getPProcess().getTaskId();
+			ICDITarget target = getSession().getTarget(taskId);
+			SimThread simThread = ((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0);
+			ICDIThread thread = new Thread((Target) target, simThread.getThreadId());
+			SimStackFrame[] simFrames = simThread.getStackFrames();
+			for (int j = 0; j < simFrames.length; j++) {
+				int level = simFrames[j].getLevel();
+				String file = simFrames[j].getFile();
+				String func = simFrames[j].getFunction();
+				int line = simFrames[j].getLine();
+				String addr = simFrames[j].getAddress();
+				StackFrame newFrame = new StackFrame((Thread) thread, level, file, func, line, addr);
+				if (newFrame.equals(frame)) {
+					SimVariable[] args = simFrames[j].getArgs();
+					for (int k = 0; k < args.length; k++) {
+						String aName = args[k].getName();
+						String aVal = args[k].getValue();
+						Argument arg = new Argument((Target) target, (Thread) thread, 
+								(StackFrame) frame, aName, aName,
+								args.length - k, frame.getLevel(), aVal);
+						list.add(arg);
+					}
+				}
+			}
+		}
+		return (ICDIArgument[]) list.toArray();
+	}
+
+	public ICDILocalVariable[] listLocalVariables(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException {
+		ArrayList list = new ArrayList();
+		IPCDIDebugProcess[] procList = procs.getProcesses();
+		for (int i = 0; i < procList.length; i++) {
+			//ICDITarget target = procList[i].getTarget();
+			int taskId = ((DebugProcess) procList[i]).getPProcess().getTaskId();
+			ICDITarget target = getSession().getTarget(taskId);
+			SimThread simThread = ((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0);
+			ICDIThread thread = new Thread((Target) target, simThread.getThreadId());
+			SimStackFrame[] simFrames = simThread.getStackFrames();
+			for (int j = 0; j < simFrames.length; j++) {
+				int level = simFrames[j].getLevel();
+				String file = simFrames[j].getFile();
+				String func = simFrames[j].getFunction();
+				int line = simFrames[j].getLine();
+				String addr = simFrames[j].getAddress();
+				StackFrame newFrame = new StackFrame((Thread) thread, level, file, func, line, addr);
+				if (newFrame.equals(frame)) {
+					SimVariable[] args = simFrames[j].getLocalVars();
+					for (int k = 0; k < args.length; k++) {
+						String aName = args[k].getName();
+						String aVal = args[k].getValue();
+						LocalVariable arg = new LocalVariable((Target) target, (Thread) thread, 
+								(StackFrame) frame, aName, aName,
+								args.length - k, frame.getLevel(), aVal);
+						list.add(arg);
+					}
+				}
+			}
+		}
+		return (ICDILocalVariable[]) list.toArray();
+	}
+
+	public ICDIGlobalVariable[] listGlobalVariables(IPCDIDebugProcessSet procs) throws CDIException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void stepInto(IPCDIDebugProcessSet procs, int count) throws CDIException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void stepOver(IPCDIDebugProcessSet procs, int count) throws CDIException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void stepFinish(IPCDIDebugProcessSet procs, int count) throws CDIException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void go(IPCDIDebugProcessSet procs) throws CDIException {
+		// Currently we apply this method globally for all procs
 		// Auto-generated method stub
 		System.out.println("DebugSimulator.go()");
 		state = RUNNING;
 	}
 
-	public void kill() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.kill()");
-		int listSize = allSet.getSize();
-		//long start = System.currentTimeMillis();
-		
-		for (int i = 0; i < listSize; i++) {
-			//System.out.println("terminating: " + allSet.getProcess(i).getName());
-			allSet.getProcess(i).getProcess().destroy();
-		}
-
-		//long end = System.currentTimeMillis();
-		
-		//double totalseconds = (double)(end - start) / (double)1000;
-		//System.out.println("DebugSimulator.terminate() takes " + totalseconds + " seconds");
-	}
-
-	public void halt() {
+	public void halt(IPCDIDebugProcessSet procs) throws CDIException {
+		// Currently we apply this method globally for all procs
 		// Auto-generated method stub
 		System.out.println("DebugSimulator.halt()");
 		state = SUSPENDED;
 	}
-	
-	public void load(String prg) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.load()");
+
+	public void kill(IPCDIDebugProcessSet procs) throws CDIException {
+		// Currently we apply this method globally for all procs
+		IPCDIDebugProcess[] list = getProcesses();
+		for (int i = 0; i < list.length; i++) {
+			list[i].getProcess().destroy();
+		}
+	}
+
+	public void run(String[] args) throws CDIException {
+		// TODO Auto-generated method stub
 		
 	}
 
-	public void load(String prg, int numProcs) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.load()");
+	public void restart() throws CDIException {
+		// TODO Auto-generated method stub
 		
 	}
 
-	public void run(String[] args) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.run()");
+	public void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDIBreakpoint bpt) throws CDIException {
+		// TODO Auto-generated method stub
 		
 	}
 
-	public void run() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.run()");
+	public void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIBreakpoint bpt) throws CDIException {
+		// TODO Auto-generated method stub
 		
 	}
 
-	public void detach() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.detach()");
-		
-	}
-
-	public void step() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.step()");
-		
-	}
-
-	public void step(int count) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.step()");
-		
-	}
-
-	public void stepOver() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.stepOver()");
-		
-	}
-
-	public void stepOver(int count) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.stepOver()");
-		
-	}
-
-	public void stepFinish() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.stepFinish()");
-		
-	}
-
-	public void breakpoint(String loc) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.breakpoint()");
-		
-	}
-
-	public void breakpoint(String loc, int count) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.breakpoint()");
-		
-	}
-
-	public void breakpoint(String loc, String cond) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.breakpoint()");
-		
-	}
-
-	public void watchpoint(String var) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.watchpoint()");
-		
-	}
-
-	public void delete(int[] ids) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.delete()");
-		
-	}
-
-	public void delete(String type) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.delete()");
-		
-	}
-
-	public void disable(int[] ids) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.disable()");
-		
-	}
-
-	public void disable(String type) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.disable()");
-		
-	}
-
-	public void enable(int[] ids) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.enable()");
-		
-	}
-
-	public void enable(String type) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.enable()");
-		
-	}
-
-	public void restart() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator2.restart()");
-		
-	}
-
-	public void step(int[] procs) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.step");
-		
-	}
-
-	public void step(int[] procs, int count) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.step");
-		
-	}
-
-	public void stepOver(int[] procs) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.stepOver");
-		
-	}
-
-	public void stepOver(int[] procs, int count) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.stepOver");
-		
-	}
-
-	public void stepFinish(int[] procs) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.stepFinish");
-		
-	}
-
-	public void halt(int[] procs) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.halt");
-		
-	}
-
-	public void go(int[] procs) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.go");
-		
-	}
-
-	public void breakpoint(int[] procs, String loc) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.breakpoint");
-		
-	}
-
-	public void breakpoint(int[] procs, String loc, int count) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.breakpoint");
-		
-	}
-
-	public void breakpoint(int[] procs, String loc, String cond) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.breakpoint");
-		
-	}
-
-	public void watchpoint(int[] procs, String var) {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.watchpoint");
+	public void deleteBreakpoints(ICDIBreakpoint[] bp) throws CDIException {
+		// TODO Auto-generated method stub
 		
 	}
 }

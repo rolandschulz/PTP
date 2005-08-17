@@ -40,41 +40,39 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.ptp.debug.external.cdi.Locator;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
-import org.eclipse.ptp.debug.external.simulator.SimStackFrame;
 
 public class StackFrame extends PTPObject implements ICDIStackFrame {
-	SimStackFrame frame;
 	Thread cthread;
-	int level;
+	int sLevel;
+	String sFile;
+	String sFunction;
+	int sLine;
+	String sAddress;
 	ICDIArgumentDescriptor[] argDescs;
 	ICDILocalVariableDescriptor[] localDescs;
 	Locator fLocator;
 
-	public StackFrame(Thread thread, SimStackFrame f, int l) {
+	public StackFrame(Thread thread, int level, String file, String function, int line, String address) {
 		super((Target)thread.getTarget());
 		cthread = thread;
-		frame = f;
-		level = l;
+		sLevel = level;
+		sFile = file;
+		sFunction = function;
+		sLine = line;
+		sAddress = address;
 	}
 
-	public SimStackFrame getSimStackFrame() {
-		return frame;
-	}
-	
 	public ICDILocator getLocator() {
 		// Auto-generated method stub
 		System.out.println("StackFrame.getLocator()");
 		BigInteger addr = BigInteger.ZERO;
-		if (frame != null) {
+		if (sFile != null && sFunction != null) {
 			if (fLocator == null) {
-				String address = frame.getAddress();
+				String address = sAddress;
 				if (address != null) {
 					addr = new BigInteger(address);
 				}
-				fLocator = new Locator(frame.getFile(), 
-					            frame.getFunction(),
-					            frame.getLine(),  
-								addr);
+				fLocator = new Locator(sFile, sFunction, sLine, addr);
 			}
 			return fLocator;
 		}
@@ -86,7 +84,7 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 	}
 
 	public int getLevel() {
-		return level;
+		return sLevel;
 	}
 
 	public boolean equals(ICDIStackFrame stackframe) {

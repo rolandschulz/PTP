@@ -41,6 +41,7 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
+import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.utils.BitList;
 
@@ -105,7 +106,10 @@ public class Session implements IPCDISession, ICDISessionObject {
 			return null;
 		}
 
-		IPCDIDebugProcessSet newSet = debugger.defSet(name, procs);
+		IPCDIDebugProcessSet newSet = new DebugProcessSet(name);
+		for (int i = 0; i < procs.length; i++) {
+			newSet.addProcess(debugger.getProcess(procs[i]));
+		}
 		
 		currentProcessSetList.put(newSet.getName(), newSet);
 		
@@ -113,7 +117,6 @@ public class Session implements IPCDISession, ICDISessionObject {
 	}
 	
 	public void delProcessSet(String name) {
-		debugger.undefSet(name);
 		currentProcessSetList.remove(name);
 	}
 	
@@ -205,7 +208,7 @@ public class Session implements IPCDISession, ICDISessionObject {
 		return currentDebugTargetList.containsKey(Integer.toString(i));
 	}
 
-	public ICDITarget getTarget(int i) {
+	public IPCDITarget getTarget(int i) {
 		if (isRegistered(i))
 			return (IPCDITarget) currentDebugTargetList.get(Integer.toString(i));
 		else {
@@ -266,7 +269,7 @@ public class Session implements IPCDISession, ICDISessionObject {
 		// Auto-generated method stub
 		System.out.println("Session.getSessionProcess()");
 		
-		return debugger.getSessionProcess();
+		return debugger.getDebuggerProcess();
 	}
 
 	public ICDISession getSession() {

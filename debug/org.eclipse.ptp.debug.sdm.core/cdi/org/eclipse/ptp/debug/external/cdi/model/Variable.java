@@ -34,27 +34,23 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIIntType;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
 import org.eclipse.ptp.debug.external.cdi.model.type.IntValue;
-import org.eclipse.ptp.debug.external.simulator.SimVariable;
 
 /**
  */
 public abstract class Variable extends VariableDescriptor implements ICDIVariable {
 	
-	SimVariable fVar;
 	Value value;
 	
-	public Variable(VariableDescriptor obj, SimVariable sVar) {
+	String fValue;
+	
+	public Variable(VariableDescriptor obj, String val) {
 		super(obj);
-		fVar = sVar;
+		fValue = val;
 	}
 
-	public Variable(Target target, Thread thread, StackFrame frame, String n, String q, int pos, int depth, SimVariable sVar) {
+	public Variable(Target target, Thread thread, StackFrame frame, String n, String q, int pos, int depth, String val) {
 		super(target, thread, frame, n, q, pos, depth);
-		fVar = sVar;
-	}
-	
-	public SimVariable getSimVariable() {
-		return fVar;
+		fValue = val;
 	}
 	
 	public void setValue(ICDIValue value) throws CDIException {
@@ -91,7 +87,7 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		System.out.println("Variable.equals()");
 		if (var instanceof Variable) {
 			Variable variable = (Variable) var;
-			return fVar.getName().equals(variable.getSimVariable().getName());
+			return fName.equals(variable.fName);
 		}
 		return super.equals(var);
 	}

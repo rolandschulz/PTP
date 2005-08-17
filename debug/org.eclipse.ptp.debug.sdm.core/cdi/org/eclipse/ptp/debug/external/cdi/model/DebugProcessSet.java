@@ -33,6 +33,20 @@ public class DebugProcessSet implements IPCDIDebugProcessSet {
 		setName = name;
 	}
 	
+	public DebugProcessSet(String name, IPCDIDebugProcess[] procs) {
+		processList = new ArrayList();
+		setName = name;
+		for (int i = 0; i < procs.length; i++) {
+			addProcess(procs[i]);
+		}
+	}
+	
+	public DebugProcessSet(String name, IPCDIDebugProcess proc) {
+		processList = new ArrayList();
+		setName = name;
+		addProcess(proc);
+	}
+	
 	public IPCDIDebugProcess[] getProcesses() {
 		return (IPCDIDebugProcess[]) processList.toArray();
 	}
