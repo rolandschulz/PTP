@@ -27,7 +27,6 @@ import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.IPTPUIConstants;
-import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.internal.Element;
@@ -210,13 +209,4 @@ public class MachineManager extends AbstractUIManager {
 		}
 		return cur_machine_id;
 	}
-	
-	/*****
-	 * Element Set
-	 *****/
-	public void changeSetEvent(IElementSet curSet, IElementSet preSet) {}
-	public void deleteSetEvent(IElementSet set) {}
-	public void createSetEvent(IElementSet set, IElement[] elements) {}
-	public void addElementsEvent(IElementSet set, IElement[] elements) {}
-	public void removeElementsEvent(IElementSet set, IElement[] elements) {}	
 }
