@@ -117,93 +117,33 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	public void refreshMonitoringSystem(int ID)
 	{
 		if(ID == MonitoringSystemChoices.SIMULATED_ID) {
-			execSimulatedMS();
+			universe = new PUniverse();
+			/* load up the control and monitoring systems for the simulation */
+			monitoringSystem = new SimulationMonitoringSystem();
+			controlSystem = new SimulationControlSystem();
+			monitoringSystem.startup();
+			controlSystem.startup();
+			setupMS();
 			fireEvent(null, EVENT_MONITORING_SYSTEM_CHANGE);
 		}
 		else if(ID == MonitoringSystemChoices.ORTE) {
-			execORTEMS();
+			universe = new PUniverse();
+			/* load up the control and monitoring systems for OMPI */
+			monitoringSystem = new OMPIMonitoringSystem();
+			controlSystem = new OMPIControlSystem();
+			monitoringSystem.startup();
+			controlSystem.startup();
+			setupMS();
 			fireEvent(null, EVENT_MONITORING_SYSTEM_CHANGE);
 		}
 		else {
 			CoreUtils.showErrorDialog("Monitoring System Error", "Invalid monitoring system selected.  Set using the PTP preferences page.", null);
 		}
 	}
-
-	/* test out the dummy (simulation) RTM (runtime model) */
-	public void execSimulatedMS()
+	
+	/* setup the monitoring system */
+	public void setupMS() 
 	{
-		System.out.println("Launch Manager: Testing function");
-
-		universe = new PUniverse();
-		
-		/* load up the control and monitoring systems for the simulation */
-		monitoringSystem = new SimulationMonitoringSystem();
-		controlSystem = new SimulationControlSystem();
-		monitoringSystem.startup();
-		controlSystem.startup();
-		
-		String[] ne = monitoringSystem.getMachines();
-		for (int i = 0; i < ne.length; i++) {
-			PMachine mac;
-
-			System.out.println("MACHINE: " + ne[i]);
-
-			mac = new PMachine(universe, ne[i], ne[i].substring(new String(
-					"machine").length()));
-
-			universe.addChild(mac);
-
-			String[] ne2 = monitoringSystem.getNodes(ne[i]);
-			for (int j = 0; j < ne2.length; j++) {
-				PNode node;
-				node = new PNode(mac, ne2[j], "" + j + "");
-				node.setAttrib("user", monitoringSystem.getNodeAttribute(ne2[j],
-						"user"));
-				node.setAttrib("group", monitoringSystem.getNodeAttribute(ne2[j],
-						"group"));
-				node.setAttrib("state", monitoringSystem.getNodeAttribute(ne2[j],
-						"state"));
-				node.setAttrib("mode", monitoringSystem.getNodeAttribute(ne2[j],
-						"mode"));
-
-				mac.addChild(node);
-			}
-		}
-		ne = controlSystem.getJobs();
-		if(ne != null) {
-			for (int i = 0; i < ne.length; i++) {
-				PJob job;
-
-				System.out.println("JOB: " + ne[i]);
-
-				int x = 0;
-				try {
-					x = (new Integer(ne[i].substring(3))).intValue();
-				} catch (NumberFormatException e) {
-				}
-				job = new PJob(universe, ne[i], "" + (PJob.BASE_OFFSET + x) + "");
-				universe.addChild(job);
-				getProcsForNewJob(ne[i], job);
-			}
-		}
-
-		monitoringSystem.addRuntimeListener(this);
-		controlSystem.addRuntimeListener(this);
-	}
-
-	/* test out the OMPI (Open MPI) RTM (runtime model) */
-	public void execORTEMS() 
-	{
-		System.out.println("Model Manager - testing function: OMPI RTM");
-
-		universe = new PUniverse();
-
-		/* load up the control and monitoring systems for OMPI */
-		monitoringSystem = new OMPIMonitoringSystem();
-		controlSystem = new OMPIControlSystem();
-		monitoringSystem.startup();
-		controlSystem.startup();
-		
 		String[] ne = monitoringSystem.getMachines();
 		for (int i = 0; i < ne.length; i++) {
 			PMachine mac;
