@@ -42,6 +42,10 @@ import org.eclipse.cdt.debug.core.model.ICBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICWatchpoint;
+import org.eclipse.cdt.debug.internal.core.breakpoints.CAddressBreakpoint;
+import org.eclipse.cdt.debug.internal.core.breakpoints.CFunctionBreakpoint;
+import org.eclipse.cdt.debug.internal.core.breakpoints.CLineBreakpoint;
+import org.eclipse.cdt.debug.internal.core.breakpoints.CWatchpoint;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -63,10 +67,6 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
-import org.eclipse.ptp.debug.internal.core.breakpoints.CAddressBreakpoint;
-import org.eclipse.ptp.debug.internal.core.breakpoints.CFunctionBreakpoint;
-import org.eclipse.ptp.debug.internal.core.breakpoints.CLineBreakpoint;
-import org.eclipse.ptp.debug.internal.core.breakpoints.CWatchpoint;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
 
 /**

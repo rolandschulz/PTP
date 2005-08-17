@@ -26,7 +26,7 @@
  * Contributors: 
  * QNX Software Systems - Initial API and implementation
 ***********************************************************************/
-package org.eclipse.ptp.debug.internal.core.breakpoints;
+package org.eclipse.ptp.debug.internal.core.breakpoints.old;
 
 import java.text.MessageFormat;
 import java.util.Arrays;

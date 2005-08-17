@@ -26,32 +26,32 @@
  * Contributors: 
  * QNX Software Systems - Initial API and implementation
  ***********************************************************************/
-package org.eclipse.ptp.debug.internal.core.breakpoints;
+package org.eclipse.ptp.debug.internal.core.breakpoints.old;
 
 import java.text.MessageFormat;
 import java.util.Map;
 
-import org.eclipse.cdt.debug.core.model.ICAddressBreakpoint;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 /**
- * A breakpoint that suspend the execution when a particular address is reached.
+ * A breakpoint that suspends the execution when a particular line of code is
+ * reached.
  */
-public class CAddressBreakpoint extends AbstractLineBreakpoint implements ICAddressBreakpoint {
+public class CLineBreakpoint extends AbstractLineBreakpoint {
 
-	private static final String C_ADDRESS_BREAKPOINT = "org.eclipse.ptp.debug.core.cAddressBreakpointMarker"; //$NON-NLS-1$
+	private static final String C_LINE_BREAKPOINT = "org.eclipse.ptp.debug.core.cLineBreakpointMarker"; //$NON-NLS-1$
 
 	/**
-	 * Constructor for CAddressBreakpoint.
+	 * Constructor for CLineBreakpoint.
 	 */
-	public CAddressBreakpoint() {
+	public CLineBreakpoint() {
 	}
 
 	/**
-	 * Constructor for CAddressBreakpoint.
+	 * Constructor for CLineBreakpoint.
 	 */
-	public CAddressBreakpoint( IResource resource, Map attributes, boolean add ) throws CoreException {
+	public CLineBreakpoint( IResource resource, Map attributes, boolean add ) throws CoreException {
 		super( resource, getMarkerType(), attributes, add );
 	}
 
@@ -59,12 +59,10 @@ public class CAddressBreakpoint extends AbstractLineBreakpoint implements ICAddr
 	 * Returns the type of marker associated with this type of breakpoints
 	 */
 	public static String getMarkerType() {
-		return C_ADDRESS_BREAKPOINT;
+		return C_LINE_BREAKPOINT;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/*(non-Javadoc)
 	 * @see org.eclipse.cdt.debug.internal.core.breakpoints.CBreakpoint#getMarkerMessage()
 	 */
 	protected String getMarkerMessage() throws CoreException {
@@ -72,6 +70,6 @@ public class CAddressBreakpoint extends AbstractLineBreakpoint implements ICAddr
 		if ( fileName != null && fileName.length() > 0 ) {
 			fileName = ' ' + fileName + ' ';
 		}
-		return MessageFormat.format( BreakpointMessages.getString( "CAddressBreakpoint.0" ), new String[] { fileName, getAddress(), getConditionText() } ); //$NON-NLS-1$
+		return MessageFormat.format( BreakpointMessages.getString( "CLineBreakpoint.0" ), new Object[] { fileName, new Integer( getLineNumber() ), getConditionText() } ); //$NON-NLS-1$
 	}
 }
