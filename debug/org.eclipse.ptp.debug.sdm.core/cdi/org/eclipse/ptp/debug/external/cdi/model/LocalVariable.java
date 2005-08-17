@@ -30,7 +30,6 @@
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
-import org.eclipse.ptp.debug.external.simulator.SimVariable;
 
 /**
  * LocalVariable
@@ -41,23 +40,23 @@ public class LocalVariable extends Variable implements ICDILocalVariable {
 	 * @param obj
 	 * @param v
 	 */
-	public LocalVariable(LocalVariableDescriptor obj, SimVariable v) {
-		super(obj, v);
+	public LocalVariable(LocalVariableDescriptor obj, String val) {
+		super(obj, val);
 	}
 
 	/**
 	 */
 	public LocalVariable(Target target, Thread thread, StackFrame frame, String n, String q,
-			int pos, int depth, SimVariable v) {
-		super(target, thread, frame, n, q, pos, depth, v);
+			int pos, int depth, String val) {
+		super(target, thread, frame, n, q, pos, depth, val);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.mi.core.cdi.model.Variable#createVariable(org.eclipse.cdt.debug.mi.core.cdi.model.Target, java.lang.String, java.lang.String, org.eclipse.cdt.debug.core.cdi.model.ICDIThread, org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame, int, int, org.eclipse.cdt.debug.mi.core.output.MIVar)
 	 */
 	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name,
-			String fullName, int pos, int depth, SimVariable miVar) {
-		return new LocalVariable(target, thread, frame, name, fullName, pos, depth, miVar);
+			String fullName, int pos, int depth, String varVal) {
+		return new LocalVariable(target, thread, frame, name, fullName, pos, depth, varVal);
 	}
 
 }

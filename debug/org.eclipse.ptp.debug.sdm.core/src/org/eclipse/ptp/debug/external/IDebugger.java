@@ -22,9 +22,15 @@
  */
 package org.eclipse.ptp.debug.external;
 
-
 import java.util.Observer;
 
+import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
@@ -32,83 +38,48 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.utils.Queue;
 
-
-
 /**
  * @author donny
  *
  */
 public interface IDebugger {
-	public void initialize(IPJob job);
-	
-	/* General Debugger Interface */
 
-	/* Process/Thread Sets */
-	public void focus(String name);
-	public IPCDIDebugProcessSet defSet(String name, int[] procs);
-	public void undefSet(String name);
-	public void undefSetAll();
-	public IPCDIDebugProcess[] viewSet(String name);
-	
 	/* Debugger Initialization/Termination */
-	public abstract void load(String prg);
-	public abstract void load(String prg, int numProcs);
-	public abstract void run(String[] args);
-	public abstract void run();
-	public abstract void detach();
-	public abstract void kill();
-	public void exit();
+	public void initialize(IPJob job);
+	/* The debugger must implement startDebugger()
+	 * This method will be called by initialize()
+	 * protected abstract void startDebugger(IPJob job);
+	 */
+	public void exit() throws CDIException;
+	/* The debugger must implement stopDebugger()
+	 * This method will be called by exit()
+	 * protected abstract void stopDebugger();
+	 */
 	
 	/* Program Information */
+	public abstract ICDIStackFrame[] listStackFrames(IPCDIDebugProcessSet procs) throws CDIException;
+	public abstract void setCurrentStackFrame(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException;
 	
 	/* Data Display and Manipulation */
+	public abstract ICDIExpression evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws CDIException;
+	public abstract ICDIArgument[] listArguments(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException;
+	public abstract ICDILocalVariable[] listLocalVariables(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException;
+	public abstract ICDIGlobalVariable[] listGlobalVariables(IPCDIDebugProcessSet procs) throws CDIException;
 	
 	/* Execution Control */
-	public abstract void step();
-	public abstract void step(int count);
-	public abstract void stepOver();
-	public abstract void stepOver(int count);
-	public abstract void stepFinish();
-	public abstract void halt();
-	public abstract void go();
-	public void stepSet(String set);
-	public void stepSet(String set, int count);
-	public void stepOverSet(String set);
-	public void stepOverSet(String set, int count);
-	public void stepFinishSet(String set);
-	public void haltSet(String set);
-	public void goSet(String set);
-	public void step(int[] procs);
-	public void step(int[] procs, int count);
-	public void stepOver(int[] procs);
-	public void stepOver(int[] procs, int count);
-	public void stepFinish(int[] procs);
-	public void halt(int[] procs);
-	public void go(int[] procs);
-
-
+	public abstract void stepInto(IPCDIDebugProcessSet procs, int count) throws CDIException;
+	public abstract void stepOver(IPCDIDebugProcessSet procs, int count) throws CDIException;
+	public abstract void stepFinish(IPCDIDebugProcessSet procs, int count) throws CDIException;
+	public abstract void go(IPCDIDebugProcessSet procs) throws CDIException;
+	public abstract void halt(IPCDIDebugProcessSet procs) throws CDIException;
+	public abstract void kill(IPCDIDebugProcessSet procs) throws CDIException;
+	public abstract void run(String[] args) throws CDIException;
+	public abstract void restart() throws CDIException;
 	
-	/* Actionpoints */
-	public abstract void breakpoint(String loc);
-	public abstract void breakpoint(String loc, int count);
-	public abstract void breakpoint(String loc, String cond);
-	public abstract void watchpoint(String var);
-	public void breakpointSet(String set, String loc);
-	public void breakpointSet(String set, String loc, int count);
-	public void breakpointSet(String set, String loc, String cond);
-	public void watchpointSet(String set, String var);
-	public void breakpoint(int[] procs, String loc);
-	public void breakpoint(int[] procs, String loc, int count);
-	public void breakpoint(int[] procs, String loc, String cond);
-	public void watchpoint(int[] procs, String var);
-	public abstract void delete(int[] ids);
-	public abstract void delete(String type);
-	public abstract void disable(int[] ids);
-	public abstract void disable(String type);
-	public abstract void enable(int[] ids);
-	public abstract void enable(String type);
-	
-	/* The methods below will not be found in the HPDF Spec */
+	/* Breakpoints */
+	public abstract void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDIBreakpoint bpt) throws CDIException;
+	public abstract void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIBreakpoint bpt) throws CDIException;
+	public abstract void deleteBreakpoints(ICDIBreakpoint[] bp) throws CDIException;
 	
 	/* Events */
 	public void addDebuggerObserver(Observer obs);
@@ -117,16 +88,14 @@ public interface IDebugger {
 	public void fireEvent(IPCDIEvent event);
 	public void notifyObservers(Object arg);
 	public Queue getEventQueue();
-	public boolean isExiting();
 	
-	/* Methods that are required to interface with Eclipse Debug/CDI Model */
-	public abstract Process getSessionProcess();
+	/* Miscellaneous */
 	public IPCDISession getSession();
 	public void setSession(IPCDISession session);
-	public abstract IPCDIDebugProcess getProcess(int number);
-	public abstract IPCDIDebugProcess getProcess();
-	public abstract IPCDIDebugProcess[] getProcesses();
-	public abstract void restart();
+	public boolean isExiting();
+	public IPCDIDebugProcess getProcess(int number);
+	public IPCDIDebugProcess getProcess();
+	public IPCDIDebugProcess[] getProcesses();
+	public abstract Process getDebuggerProcess();
 
 }
-

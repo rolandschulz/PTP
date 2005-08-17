@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.core.cdi;
 
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 
 public interface IPCDISession extends ICDISession {
 	
@@ -28,5 +29,7 @@ public interface IPCDISession extends ICDISession {
 	public void unregisterTargets(int[] targets);
 	public int[] getRegisteredTargetIds();
 	public boolean isRegistered(int i);
+	
+	public IPCDITarget getTarget(int i);
 
 }

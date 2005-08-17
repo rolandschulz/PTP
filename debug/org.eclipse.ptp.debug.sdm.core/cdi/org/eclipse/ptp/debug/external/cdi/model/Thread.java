@@ -37,8 +37,8 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDISignal;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorageDescriptor;
-import org.eclipse.ptp.debug.external.simulator.SimProcess;
-import org.eclipse.ptp.debug.external.simulator.SimStackFrame;
+import org.eclipse.ptp.debug.external.IDebugger;
+import org.eclipse.ptp.debug.external.cdi.Session;
 
 public class Thread extends PTPObject implements ICDIThread {
 	static ICDIStackFrame[] noStack = new ICDIStackFrame[0];
@@ -73,12 +73,17 @@ public class Thread extends PTPObject implements ICDIThread {
 		// refresh if we have nothing or if we have just a subset get everything.
 		if (currentFrames == null || currentFrames.size() < depth) {
 			currentFrames = new ArrayList();
+			
 			Target target = (Target) getTarget();
-			SimProcess proc = (SimProcess) target.getProcess();
-			SimStackFrame[] frames = proc.getThread(id).getStackFrames();
+			Session session = (Session) target.getSession();
+			IDebugger debugger = session.getDebugger();
+			DebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+			ICDIStackFrame[] frames = debugger.listStackFrames(newSet);
+			
 			for (int i = 0; i < frames.length; i++) {
-				currentFrames.add(new StackFrame(this, frames[i], depth - frames[i].getLevel()));
+				currentFrames.add(frames[i]);
 			}
+			
 			//target.setCurrentThread(currentThread, false);
 		}
 		return (ICDIStackFrame[]) currentFrames.toArray(noStack);
@@ -86,7 +91,6 @@ public class Thread extends PTPObject implements ICDIThread {
 
 	public ICDIStackFrame[] getStackFrames(int fromIndex, int len) throws CDIException {
 		getStackFrames();
-		
 		List list = currentFrames.subList(fromIndex, len);
 		return (ICDIStackFrame[]) list.toArray(noStack);
 	}
@@ -94,8 +98,11 @@ public class Thread extends PTPObject implements ICDIThread {
 	public int getStackFrameCount() throws CDIException {
 		if (stackdepth == 0) {
 			Target target = (Target) getTarget();
-			SimProcess proc = (SimProcess) target.getProcess();
-			stackdepth = proc.getThread(id).getStackFrameCount();
+			Session session = (Session) target.getSession();
+			IDebugger debugger = session.getDebugger();
+			DebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+			ICDIStackFrame[] frames = debugger.listStackFrames(newSet);
+			stackdepth = frames.length;
 		}
 		return stackdepth;
 	}

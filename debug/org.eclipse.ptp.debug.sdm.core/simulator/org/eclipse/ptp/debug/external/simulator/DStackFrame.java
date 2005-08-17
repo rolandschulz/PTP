@@ -18,61 +18,62 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.simulator;
 
-import java.io.IOException;
-import java.io.InputStream;
+public class DStackFrame {
 
-public class SimInputStream extends InputStream {
-
-	boolean finished;
-	SimQueue queue;
+	int level;
+	String addr;
+	String func = ""; //$NON-NLS-1$
+	String file = ""; //$NON-NLS-1$
+	int line;
 	
-	String str;
-	int strLen;
+	DVariable[] args;
+	DVariable[] local;
 	
-	public SimInputStream() {
-		super();
-		queue = new SimQueue();
-		finished = false;
-		str = null;
-		strLen = -2;
-	}
-	
-	public void printString(String s) {
-		queue.addItem(s);
-	}
-	
-	public void destroy() {
-		finished = true;
-		queue.addItem("destroy");
-	}
-	
-	public int read() throws IOException {
-		if (strLen == 0) {
-			strLen--;
-			return '\n';
+	public DStackFrame(int l, String iAddr, String iFunc, String iFile, int iLine) {
+		level = l;
+		addr = iAddr;
+		func = iFunc;
+		file = iFile;
+		line = iLine;
+		
+		args = new DVariable[2];
+		for (int i = 0; i < args.length; i++) {
+			args[i] = new DVariable("arg" + i, "rType", "" + 1000 + i);
 		}
 		
-		if (strLen == -1) {
-			strLen--;
-			return -1;
+		local = new DVariable[2];
+		for (int i = 0; i < local.length; i++) {
+			local[i] = new DVariable("local" + i, "rType", "" + 2000 + i);
 		}
-			
-		if (strLen == -2) {
-			try {
-				if (finished) {
-					return -1;
-				}
-				str = (String) queue.removeItem();
-				if (str.equals("destroy")) {
-					return -1;
-				}
-				strLen = str.length();
-			} catch (InterruptedException e) {
-			}
-		}
-			
-		int chr = str.charAt(str.length() - strLen);
-		strLen--;
-		return chr;
+
 	}
+	
+	public int getLevel() {
+		return level;
+	}
+	
+	public String getFile() {
+		return file;
+	}
+
+	public String getFunction() {
+		return func;
+	}
+
+	public int getLine() {
+		return line;
+	}
+	
+	public String getAddress() {
+		return addr;
+	}
+	
+	public DVariable[] getArgs() {
+		return args;
+	}
+	
+	public DVariable[] getLocalVars() {
+		return local;
+	}
+
 }

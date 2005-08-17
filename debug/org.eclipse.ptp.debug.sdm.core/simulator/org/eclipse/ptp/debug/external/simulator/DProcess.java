@@ -22,11 +22,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
-public class SimProcess extends Process {
+public class DProcess extends Process {
 	
 	boolean finished;
 	
-	SimThread[] threads;
+	DThread[] threads;
 	
 	InputStream err;
 	InputStream in;
@@ -35,29 +35,29 @@ public class SimProcess extends Process {
 	
 	int id;
 	String name;
-	SimQueue commands;
+	DQueue commands;
 	
 	Thread procThread;
 	
-	DebugSimulator dSim;
+	DebugSimulator dD;
 	
-	public SimProcess(String nm, int pId, int numThreads, SimQueue cmds, DebugSimulator debugger) {
+	public DProcess(String nm, int pId, int numThreads, DQueue cmds, DebugSimulator debugger) {
 		super();
-		dSim = debugger;
+		dD = debugger;
 		
 		finished = false;
 		id = pId;
 		name = nm;
 		commands = cmds;
 		
-		threads = new SimThread[numThreads];
+		threads = new DThread[numThreads];
 		for (int i = 0; i < numThreads; i++) {
-			threads[i] = new SimThread(i, pId, dSim);
+			threads[i] = new DThread(i, pId, dD);
 		}
 		
 		err = null;
-		in = new SimInputStream();
-		out = new SimOutputStream();
+		in = new DInputStream();
+		out = new DOutputStream();
 		
 		procThread = new Thread() {
 			public void run() {
@@ -70,7 +70,7 @@ public class SimProcess extends Process {
 						String arg = (String) command.get(2);
 						
 						if (!destination.equals("-1")) {
-							threads[Integer.parseInt(destination)].runCommand((SimInputStream) in, cmd, arg);
+							threads[Integer.parseInt(destination)].runCommand((DInputStream) in, cmd, arg);
 						} else {
 							if (cmd.equals("sleep")) {
 								Thread.sleep(Integer.parseInt(arg));
@@ -83,7 +83,7 @@ public class SimProcess extends Process {
 					}
 				}
 				finished = true;
-				((SimInputStream) in).destroy();
+				((DInputStream) in).destroy();
 			}
 		};
 		procThread.start();
@@ -106,7 +106,7 @@ public class SimProcess extends Process {
 
 	public void destroy() {
 		finished = true;
-		((SimInputStream) in).destroy();
+		((DInputStream) in).destroy();
 	}
 	
 	public InputStream getErrorStream() {
@@ -121,11 +121,11 @@ public class SimProcess extends Process {
 		return out;
 	}
 
-	public SimThread getThread(int tId) {
+	public DThread getThread(int tId) {
 		return threads[tId];
 	}
 	
-	public SimThread[] getThreads() {
+	public DThread[] getThreads() {
 		return threads;
 	}
 	

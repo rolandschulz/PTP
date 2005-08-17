@@ -116,15 +116,13 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 
 	public int getPosition() {
 		System.out.println("VariableDescriptor.getPosition()");
-		return 0;
+		return position;
 	}
 	
 	public int getStackDepth() {
 		System.out.println("VariableDescriptor.getStackDepth()");
-		return 0;
+		return stackdepth;
 	}
-	
-
 	
 	public boolean equals(ICDIVariableDescriptor varDesc) {
 		System.out.println("VariableDescriptor.equals()");

@@ -27,11 +27,11 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
-import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
+import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
 import org.eclipse.ptp.debug.external.utils.Queue;
 
 /**
@@ -39,42 +39,28 @@ import org.eclipse.ptp.debug.external.utils.Queue;
  *
  */
 public abstract class AbstractDebugger extends Observable implements IDebugger {
-	/* We use an array to store the actionpoints, the
-	 * index of the array (plus 1) corresponds to the id of the actionpoint
-	 * Note: actionpoint id starts at 1, array index starts at 0
-	 */
-	protected ArrayList actionpointList = null;
 	protected Queue eventQueue = null;
 	protected EventThread eventThread = null;
 
 	protected ArrayList userDefinedProcessSetList = null;
-	protected IPCDIDebugProcessSet allSet = null;
-	protected IPCDIDebugProcessSet currentFocus = null;
 	
 	protected IPCDISession session = null;
+	
+	IPProcess[] procs;
 	
 	protected boolean isExitingFlag = false; /* Checked by the eventThread */
 
 	protected abstract void startDebugger(IPJob job);
 	
-	public IPCDISession getSession() {
-		return session;
-	}
-	
-	public void setSession(IPCDISession s) {
-		session = s;
-	}
-	
-	public void initialize(IPJob job) {
-		actionpointList = new ArrayList();
+	public final void initialize(IPJob job) {
 		eventQueue = new Queue();
 		eventThread = new EventThread(this);
 		eventThread.start();
 		
 		userDefinedProcessSetList = new ArrayList();
-		allSet = new DebugProcessSet("all");
-		currentFocus = allSet;
-
+		
+		procs = job.getSortedProcesses();
+		
 		// Initialize state variables
 		startDebugger(job);
 	}
@@ -102,163 +88,13 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 		} catch (InterruptedException e) {
 		}		
 	}
-	
-	public final void breakpointSet(String set, String loc) {
-		IPCDIDebugProcessSet savedFocus = currentFocus;
-		focus(set);
-		breakpoint(loc);
-		currentFocus = savedFocus;
-	}
-	
-	public final void breakpointSet(String set, String loc, int count) {
-		IPCDIDebugProcessSet savedFocus = currentFocus;
-		focus(set);
-		breakpoint(loc, count);
-		currentFocus = savedFocus;
-	}
-	
-	public final void breakpointSet(String set, String loc, String cond) {
-		IPCDIDebugProcessSet savedFocus = currentFocus;
-		focus(set);
-		breakpoint(loc, cond);
-		currentFocus = savedFocus;
-	}
-	
-	public final void watchpointSet(String set, String var) {
-		IPCDIDebugProcessSet savedFocus = currentFocus;
-		focus(set);
-		watchpoint(var);
-		currentFocus = savedFocus;
-	}
 
-	public final void goSet(String set) {
-		IPCDIDebugProcessSet savedFocus = currentFocus;
-		focus(set);
-		go();
-		currentFocus = savedFocus;
-	}
-
-	public final void haltSet(String set) {
-		IPCDIDebugProcessSet savedFocus = currentFocus;
-		focus(set);
-		halt();
-		currentFocus = savedFocus;
-	}
-
-	public final void stepFinishSet(String set) {
-		IPCDIDebugProcessSet savedFocus = currentFocus;
-		focus(set);
-		stepFinish();
-		currentFocus = savedFocus;
-	}
-
-	public final void stepSet(String set) {
-		IPCDIDebugProcessSet savedFocus = currentFocus;
-		focus(set);
-		step();
-		currentFocus = savedFocus;
-	}
-
-	public final void stepSet(String set, int count) {
-		IPCDIDebugProcessSet savedFocus = currentFocus;
-		focus(set);
-		step(count);
-		currentFocus = savedFocus;
-	}
-
-	public final void stepOverSet(String set) {
-		IPCDIDebugProcessSet savedFocus = currentFocus;
-		focus(set);
-		stepOver();
-		currentFocus = savedFocus;
-	}
-
-	public final void stepOverSet(String set, int count) {
-		IPCDIDebugProcessSet savedFocus = currentFocus;
-		focus(set);
-		stepOver(count);
-		currentFocus = savedFocus;
+	public final IPCDISession getSession() {
+		return session;
 	}
 	
-	public final IPCDIDebugProcessSet defSet(String name, int[] procs) {
-		int size = userDefinedProcessSetList.size();
-		
-		if (name.equals("all"))
-			return allSet;
-		
-		/* to avoid duplicates */
-		for (int i = 0; i < size; i++) {
-			IPCDIDebugProcessSet set = (IPCDIDebugProcessSet) userDefinedProcessSetList.get(i);
-			if (set.getName().equals(name)) {
-				return set;
-			}
-		}
-		
-		IPCDIDebugProcessSet procSet = new DebugProcessSet(name);
-		size = allSet.getSize();
-		int procsLength = procs.length;
-		for (int i = 0; i < procsLength; i++) {
-			if (procs[i] >= size)
-				continue;
-			procSet.addProcess(allSet.getProcess(procs[i]));
-		}
-		userDefinedProcessSetList.add(procSet);
-		return procSet;
-	}
-	
-	public final void undefSet(String name) {
-		int size = userDefinedProcessSetList.size();
-		for (int i = 0; i < size; i++) {
-			IPCDIDebugProcessSet set = (IPCDIDebugProcessSet) userDefinedProcessSetList.get(i);
-			if (set.getName().equals(name)) {
-				//set.clear();
-				userDefinedProcessSetList.remove(set);
-				break;
-			}
-		}
-	}
-	
-	public final void undefSetAll() {
-		int size = userDefinedProcessSetList.size();
-		for (int i = 0; i < size; i++) {
-			IPCDIDebugProcessSet set = (IPCDIDebugProcessSet) userDefinedProcessSetList.get(i);
-			//set.clear();
-			userDefinedProcessSetList.remove(set);
-		}
-	}
-	
-	public final IPCDIDebugProcess[] viewSet(String name) {
-		IPCDIDebugProcess[] retValue = null;
-		if (name.equals("all"))
-			retValue = allSet.getProcesses();
-		else {
-			int size = userDefinedProcessSetList.size();
-			for (int i = 0; i < size; i++) {
-				IPCDIDebugProcessSet set = (IPCDIDebugProcessSet) userDefinedProcessSetList.get(i);
-				if (set.getName().equals(name)) {
-					retValue = set.getProcesses();
-					break;
-				}
-			}
-		}
-			
-		return retValue;
-	}
-	
-	public final void focus(String name) {
-		if (name.equals("all"))
-			currentFocus = allSet;
-		else {
-			int size = userDefinedProcessSetList.size();
-			for (int i = 0; i < size; i++) {
-				IPCDIDebugProcessSet set = (IPCDIDebugProcessSet) userDefinedProcessSetList.get(i);
-				if (set.getName().equals(name)) {
-					currentFocus = set;
-					break;
-				}
-			}
-		}
-			
+	public final void setSession(IPCDISession s) {
+		session = s;
 	}
 
 	public final void addDebuggerObserver(Observer obs) {
@@ -295,5 +131,24 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 	public final boolean isExiting() {
 		return isExitingFlag;
 	}
-
+	
+	public final IPCDIDebugProcess getProcess(int number) {
+		IPCDIDebugProcess proc = new DebugProcess(procs[number], (Process) procs[number]);
+		return proc;
+	}
+	
+	public final IPCDIDebugProcess getProcess() {
+		return getProcess(0);
+	}
+	
+	public final IPCDIDebugProcess[] getProcesses() {
+		IPCDIDebugProcess[] list = new IPCDIDebugProcess[procs.length];
+		
+		for (int i = 0; i < procs.length; i++) {
+			IPCDIDebugProcess proc = new DebugProcess(procs[i], (Process) procs[i]);
+			list[i] = proc;
+		}
+		
+		return list;
+	}
 }

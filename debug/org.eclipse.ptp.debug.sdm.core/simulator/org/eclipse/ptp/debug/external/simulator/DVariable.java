@@ -18,13 +18,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.simulator;
 
-public class SimVariable {
+public class DVariable {
 
 	String vName;
 	String vType;
 	String vValue;
 	
-	public SimVariable(String name, String type, String value) {
+	public DVariable(String name, String type, String value) {
 		vName = name;
 		vType = type;
 		vValue = value;

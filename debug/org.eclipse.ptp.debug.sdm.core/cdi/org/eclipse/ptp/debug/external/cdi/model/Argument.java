@@ -29,26 +29,25 @@
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
-import org.eclipse.ptp.debug.external.simulator.SimVariable;
 
 /**
  */
 public class Argument extends Variable implements ICDIArgument {
 
 	public Argument(Target target, Thread thread, StackFrame frame,
-			String n, String q, int pos, int depth, SimVariable v) {
-		super(target, thread, frame, n, q, pos, depth, v);
+			String n, String q, int pos, int depth, String val) {
+		super(target, thread, frame, n, q, pos, depth, val);
 	}
 
-	public Argument(ArgumentDescriptor obj, SimVariable var) {
-		super(obj, var);
+	public Argument(ArgumentDescriptor obj, String val) {
+		super(obj, val);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.mi.core.cdi.model.Variable#createVariable(org.eclipse.cdt.debug.mi.core.cdi.model.Target, org.eclipse.cdt.debug.core.cdi.model.ICDIThread, org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame, java.lang.String, java.lang.String, int, int, org.eclipse.cdt.debug.mi.core.output.MIVar)
 	 */
-	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, SimVariable miVar) {
-		return new Argument(target, thread, frame, name, fullName, pos, depth, miVar);
+	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, String varVal) {
+		return new Argument(target, thread, frame, name, fullName, pos, depth, varVal);
 	}
 
 }

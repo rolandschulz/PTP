@@ -123,7 +123,6 @@ public class BreakpointManager extends Manager {
 			
 			// Fire a created Event.
 			int pId = target.getTargetId();
-			int tId = 0; /* thread id */
 			
 			BitList bitList = new BitList();
 			bitList.set(pId);
