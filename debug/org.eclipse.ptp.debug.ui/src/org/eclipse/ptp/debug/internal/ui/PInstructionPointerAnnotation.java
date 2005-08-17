@@ -16,31 +16,36 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui;
+package org.eclipse.ptp.debug.internal.ui;
+
+import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 
 /**
  * @author Clement chu
  *
  */
-public interface IPTPDebugUIConstants {
-	public static final String PLUGIN_ID = PTPDebugUIPlugin.getUniqueIdentifier();
-	public static final String PREFIX = PLUGIN_ID + ".";
+public class PInstructionPointerAnnotation extends Annotation {
+	private IStackFrame fStackFrame;
 	
-	public static final String PERSPECTIVE_DEBUG = PREFIX + "PTPDebugPerspective";
+	public PInstructionPointerAnnotation(IStackFrame stackFrame, boolean isTopFrame) {
+		super(isTopFrame?IPTPDebugUIConstants.ANN_INSTR_POINTER_CURRENT:IPTPDebugUIConstants.ANN_INSTR_POINTER_SECONDARY, false, "asdadasdasdasd");
+		fStackFrame = stackFrame;
+	}
+	
+	public boolean equals(Object other) {
+		if (other instanceof PInstructionPointerAnnotation) {
+			return getStackFrame().equals(((PInstructionPointerAnnotation)other).getStackFrame());			
+		}
+		return false;
+	}
+	
+	public int hashCode() {
+		return getStackFrame().hashCode();
+	}
 
-	public static final String VIEW_PARALLELDEBUG = PREFIX + "views.parallelDebugView";
-	
-	public static final String ACTION_BREAKPOINT_PROPERTIES = PREFIX + "breakpointProperties";
-	public static final String ACTION_ENABLE_DISABLE_BREAKPOINT = PREFIX + "enableDisableBreakpoint";
-	public static final String ACTION_SET_BREAKPOINT = PREFIX + "toggleBreakpointRulerAction";
-	
-	public static final String PEF_SHOW_FULL_PATHS = PREFIX + "show_full_paths";
-	
-	public static final int INTERNAL_ERROR = 150;
-	public static final int STATUS_CODE_QUESTION = 10000;
-	public static final int STATUS_CODE_INFO = 10001;
-	public static final int STATUS_CODE_ERROR = 10002;
-	
-	public static final String ANN_INSTR_POINTER_CURRENT = PREFIX + "currentIP";
-	public static final String ANN_INSTR_POINTER_SECONDARY = PREFIX + "secondaryIP";
+	private IStackFrame getStackFrame() {
+		return fStackFrame;
+	}
 }

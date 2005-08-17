@@ -16,31 +16,49 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.ui;
+package org.eclipse.ptp.debug.internal.ui;
+
+import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * @author Clement chu
  *
  */
-public interface IPTPDebugUIConstants {
-	public static final String PLUGIN_ID = PTPDebugUIPlugin.getUniqueIdentifier();
-	public static final String PREFIX = PLUGIN_ID + ".";
+public class PInstructionPointerContext {
+	private ITextEditor fTextEditor;
 	
-	public static final String PERSPECTIVE_DEBUG = PREFIX + "PTPDebugPerspective";
+	private PInstructionPointerAnnotation fAnnotation;
 
-	public static final String VIEW_PARALLELDEBUG = PREFIX + "views.parallelDebugView";
+	public PInstructionPointerContext(ITextEditor textEditor, PInstructionPointerAnnotation annotation) {
+		setTextEditor(textEditor);
+		setAnnotation(annotation);
+	}
 	
-	public static final String ACTION_BREAKPOINT_PROPERTIES = PREFIX + "breakpointProperties";
-	public static final String ACTION_ENABLE_DISABLE_BREAKPOINT = PREFIX + "enableDisableBreakpoint";
-	public static final String ACTION_SET_BREAKPOINT = PREFIX + "toggleBreakpointRulerAction";
+	public boolean equals(Object other) {
+		if (other instanceof PInstructionPointerContext) {
+			PInstructionPointerContext otherContext = (PInstructionPointerContext) other;
+			return getAnnotation().equals(otherContext.getAnnotation());
+		}
+		return false;
+	}
 	
-	public static final String PEF_SHOW_FULL_PATHS = PREFIX + "show_full_paths";
-	
-	public static final int INTERNAL_ERROR = 150;
-	public static final int STATUS_CODE_QUESTION = 10000;
-	public static final int STATUS_CODE_INFO = 10001;
-	public static final int STATUS_CODE_ERROR = 10002;
-	
-	public static final String ANN_INSTR_POINTER_CURRENT = PREFIX + "currentIP";
-	public static final String ANN_INSTR_POINTER_SECONDARY = PREFIX + "secondaryIP";
+	public int hashCode() {
+		return getAnnotation().hashCode();
+	}
+
+	private void setTextEditor(ITextEditor textEditor) {
+		fTextEditor = textEditor;
+	}
+
+	public ITextEditor getTextEditor() {
+		return fTextEditor;
+	}
+
+	private void setAnnotation(PInstructionPointerAnnotation annotation) {
+		fAnnotation = annotation;
+	}
+
+	public PInstructionPointerAnnotation getAnnotation() {
+		return fAnnotation;
+	}
 }
