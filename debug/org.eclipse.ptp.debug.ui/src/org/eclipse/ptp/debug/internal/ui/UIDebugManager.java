@@ -37,6 +37,8 @@ import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetUnregisteredEvent;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.internal.ui.JobManager;
+import org.eclipse.ptp.ui.PTPUIPlugin;
+import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -45,13 +47,15 @@ import org.eclipse.ptp.ui.model.IElementSet;
  * @author clement chu
  *
  */
-public class UIDebugManager extends JobManager implements IBreakpointListener, ICDIEventListener, IPDebugListener {
+public class UIDebugManager extends JobManager implements ISetListener, IBreakpointListener, ICDIEventListener, IPDebugListener {
 	public UIDebugManager() {
+		PTPUIPlugin.getDefault().getUIManager().addSetListener(this);
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
 		PTPDebugCorePlugin.getDefault().addDebugSessionListener(this);
 	}
 	
 	public void shutdown() {
+		PTPUIPlugin.getDefault().getUIManager().removeSetListener(this);
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
 		PTPDebugCorePlugin.getDefault().removeDebugSessionListener(this);
 		super.shutdown();
@@ -170,6 +174,9 @@ public class UIDebugManager extends JobManager implements IBreakpointListener, I
 			PTPDebugUIPlugin.log(e);
 		}
 	}
+	public void createSetEvent(IElementSet set, IElement[] elements) {}
+	public void addElementsEvent(IElementSet set, IElement[] elements) {}
+	public void removeElementsEvent(IElementSet set, IElement[] elements) {}	
 
     	/*
     	 * Cannot unregister the extension
@@ -224,6 +231,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener, I
 				int[] processes = event.getProcesses();
 				for (int j=0; j<processes.length; j++) {
 					//elementHandler.addRegisterElement();
+					//elementHandler.getSetRoot().get().setRegistered(true);
 				}
 			}
 			else if (event instanceof TargetUnregisteredEvent) {
@@ -233,6 +241,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener, I
 				int[] processes = event.getProcesses();
 				for (int j=0; j<processes.length; j++) {
 					//elementHandler.removeRegisterElement();
+					//elementHandler.getSetRoot().get().setRegistered(false);
 				}
 			}
 			firePaintListener();

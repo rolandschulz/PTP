@@ -25,7 +25,6 @@ import org.eclipse.cdt.debug.internal.core.breakpoints.BreakpointMessages;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.debug.core.model.moved.IPAddressBreakpoint;
-import org.eclipse.ptp.debug.internal.core.breakpoints.AbstractLineBreakpoint;
 
 /**
  * @author Clement chu

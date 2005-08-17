@@ -43,16 +43,54 @@
             super="org.eclipse.debug.core.breakpoint"
             name="org.eclipse.ptp.debug.core.breakpoint">
       </type>
+      <type
+            markerType="org.eclipse.ptp.debug.ui.currentIP"
+            name="org.eclipse.ptp.debug.ui.currentIP">
+      </type>
+      <type
+            markerType="org.eclipse.ptp.debug.ui.secondaryIP"
+            name="org.eclipse.ptp.debug.ui.secondaryIP">
+      </type>      
    </extension>
    <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
       <specification
             annotationImageProvider="org.eclipse.ptp.debug.internal.ui.BreakpointImageProvider"
             annotationType="org.eclipse.ptp.debug.core.breakpoint"
-            colorPreferenceValue="217,255,226"
-            highlightPreferenceValue="true"
+            label="%PBreakpointAnnotation.label"
+            presentationLayer="4"
             icon="icons/debug/bpt.gif">
-      </specification>	
+      </specification>
+      <specification
+            colorPreferenceValue="100,100,100"
+            annotationType="org.eclipse.ptp.debug.ui.currentIP"
+            icon="icons/ptp.gif"
+            verticalRulerPreferenceValue="true"
+            colorPreferenceKey="currentIPColor"
+            overviewRulerPreferenceValue="true"
+            highlightPreferenceKey="currentIPHighlight"
+            presentationLayer="6"
+            highlightPreferenceValue="true"
+            textPreferenceValue="false"
+            textPreferenceKey="currentIPIndication"
+            verticalRulerPreferenceKey="currentIPVerticalRuler"
+            overviewRulerPreferenceKey="currentIPOverviewRuler">
+      </specification>
+      <specification
+            colorPreferenceValue="200,200,100"
+            annotationType="org.eclipse.ptp.debug.ui.secondaryIP"
+            icon="icons/debug/ptp_bpt_set.gif"
+            verticalRulerPreferenceValue="true"
+            colorPreferenceKey="currentIPColor"
+            overviewRulerPreferenceValue="true"
+            highlightPreferenceKey="currentIPHighlight"
+            presentationLayer="6"
+            highlightPreferenceValue="true"
+            textPreferenceValue="false"
+            textPreferenceKey="currentIPIndication"
+            verticalRulerPreferenceKey="currentIPVerticalRuler"
+            overviewRulerPreferenceKey="currentIPOverviewRuler">
+      </specification>
    </extension>
    
    <!-- breakpointMarker -->

@@ -147,8 +147,6 @@ public class ParallelDebugView extends ParallelJobView {
 			getUIDebugManager().unregisterElements(new IElement[] { element });
 		else
 			getUIDebugManager().registerElements(new IElement[] { element });
-
-		element.setRegistered(!element.isRegistered());
 	}
 
 	public void registerSelectedElements() {

@@ -20,9 +20,12 @@ Require-Bundle: org.eclipse.jface.text,
  org.eclipse.ptp.debug.external,
  org.eclipse.ptp.core,
  org.eclipse.ptp.ui,
+ org.eclipse.cdt.debug.mi.core,
+ org.eclipse.cdt.debug.mi.ui,
  org.eclipse.cdt.debug.core,
  org.eclipse.cdt.debug.ui,
  org.eclipse.cdt.ui,
+ org.eclipse.jdt.debug,
  org.eclipse.jdt.debug.ui,
  org.eclipse.jdt.ui
 Eclipse-AutoStart: true

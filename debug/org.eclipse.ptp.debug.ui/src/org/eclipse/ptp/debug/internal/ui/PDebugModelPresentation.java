@@ -19,7 +19,10 @@
 package org.eclipse.ptp.debug.internal.ui;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.cdt.debug.core.cdi.ICDIBreakpointHit;
@@ -52,9 +55,15 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.ITerminate;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
+import org.eclipse.debug.ui.IDebugEditorPresentation;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IValueDetailListener;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.ptp.debug.core.model.IPAddressBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
@@ -66,24 +75,29 @@ import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * @author Clement chu
  *
  */
-public class PDebugModelPresentation extends LabelProvider implements IDebugModelPresentation {
+public class PDebugModelPresentation extends LabelProvider implements IDebugModelPresentation, IDebugEditorPresentation {
 	private static PDebugModelPresentation instance = null;
 	public final static String DISPLAY_FULL_PATHS = "DISPLAY_FULL_PATHS";
 	
 	protected UIDebugManager uiDebugManager = null;
 	protected Map attributes = new HashMap(3);
 	private OverlayImageCache imageCache = new OverlayImageCache();
+	protected Map fDebugTargetMap = null;
 	
 	public PDebugModelPresentation() {
 		uiDebugManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
+		fDebugTargetMap = new HashMap();
 	}
 	
 	public static PDebugModelPresentation getDefault() {
@@ -151,6 +165,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 
 	public void computeDetail(IValue value, IValueDetailListener listener) {
 		// TODO 
+		//listener.detailComputed(value, );
 		System.out.println("PDebugModelPresentation - ComputeDetails");
 	}
 
@@ -223,19 +238,19 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		String descriptor = null;
 		IElementHandler setManager = uiDebugManager.getElementHandler(job_id);
 		if (setManager == null) //no job running
-			descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_ONESET_EN : PDebugImage.IMG_DEBUG_ONESET_DI;
+			descriptor = breakpoint.isEnabled()?PDebugImage.IMG_DEBUG_ONESET_EN:PDebugImage.IMG_DEBUG_ONESET_DI;
 		else { //created job
 			String cur_set_id = uiDebugManager.getCurrentSetId();
 			String bpt_set_id = breakpoint.getSetId();
 			
 			if (bpt_set_id.equals(cur_set_id)) {
-				descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_ONESET_EN : PDebugImage.IMG_DEBUG_ONESET_DI;
+				descriptor = breakpoint.isEnabled()?PDebugImage.IMG_DEBUG_ONESET_EN:PDebugImage.IMG_DEBUG_ONESET_DI;
 			}
 			else {
 				if (setManager.getSet(bpt_set_id).isContainSets(cur_set_id))
-					descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_MULTISET_EN : PDebugImage.IMG_DEBUG_MULTISET_DI;
+					descriptor = breakpoint.isEnabled()?PDebugImage.IMG_DEBUG_MULTISET_EN:PDebugImage.IMG_DEBUG_MULTISET_DI;
 				else
-					descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_NOSET_EN : PDebugImage.IMG_DEBUG_NOSET_DI;
+					descriptor = breakpoint.isEnabled()?PDebugImage.IMG_DEBUG_NOSET_EN:PDebugImage.IMG_DEBUG_NOSET_DI;
 			}
 		}
 		return getImageCache().getImageFor(new OverlayImageDescriptor(PDebugImage.getImage(descriptor), computeBreakpointOverlays(breakpoint)));
@@ -536,5 +551,116 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		getImageCache().disposeAll();
 		attributes.clear();
 		super.dispose();
+	}
+	
+	private ITextEditor getTextEditor(IEditorPart editorPart) {
+		ITextEditor textEditor = null;
+		if (editorPart instanceof ITextEditor)				
+			textEditor = (ITextEditor)editorPart;
+		else
+			textEditor = (ITextEditor) editorPart.getAdapter(ITextEditor.class);
+
+		return textEditor;	
+	}
+	
+	public boolean addAnnotations(IEditorPart editorPart, IStackFrame stackFrame) {
+		ITextEditor textEditor = getTextEditor(editorPart);
+		if (textEditor == null)
+			return false;
+		
+		IDocumentProvider docProvider = textEditor.getDocumentProvider();
+		IEditorInput editorInput = textEditor.getEditorInput();
+        IAnnotationModel annModel = docProvider.getAnnotationModel(editorInput);
+        if (annModel == null)
+            return false;
+
+        IThread thread = stackFrame.getThread();
+		IStackFrame tos = null;
+		try {
+			tos = thread.getTopStackFrame();
+		} catch (DebugException de) {
+		}
+
+		PInstructionPointerAnnotation instPtrAnnotation = new PInstructionPointerAnnotation(stackFrame, tos == null || stackFrame.equals(tos));
+		instPtrAnnotation.setText("FUCK YOU DAMN SHIT!!!");
+
+		Position position = null;
+		int charStart = -1;
+		int length = -1; 
+		try {
+			charStart = stackFrame.getCharStart();
+			length = stackFrame.getCharEnd() - charStart;
+		} catch (DebugException de) {
+		}
+		if (charStart < 0) {
+			IDocument doc = docProvider.getDocument(editorInput);
+			if (doc == null)
+				return false;
+
+			try {
+				int lineNumber = stackFrame.getLineNumber() - 1;
+				IRegion region = doc.getLineInformation(lineNumber);
+				charStart = region.getOffset();
+				length = region.getLength();
+			} catch (BadLocationException ble) {
+				return false;
+			} catch (DebugException de) {
+				return false;
+			}
+		}
+		if (charStart < 0)
+			return false;
+
+		position = new Position(charStart, length);
+		annModel.removeAnnotation(instPtrAnnotation);
+		annModel.addAnnotation(instPtrAnnotation, position);	
+		
+		// Retrieve the list of instruction pointer contexts
+		IDebugTarget debugTarget = stackFrame.getDebugTarget();
+		Map threadMap = (Map) fDebugTargetMap.get(debugTarget);
+		if (threadMap == null) {
+			threadMap = new HashMap();	
+			fDebugTargetMap.put(debugTarget, threadMap);		
+		}
+		List contextList = (List) threadMap.get(thread);
+		if (contextList == null) {
+			contextList = new ArrayList();
+			threadMap.put(thread, contextList);
+		}
+		
+		PInstructionPointerContext context = new PInstructionPointerContext(textEditor, instPtrAnnotation);
+		contextList.remove(context);
+		contextList.add(context);
+		return true;
+	}
+	public void removeAnnotations(IEditorPart editorPart, IThread thread) {
+		IDebugTarget debugTarget = thread.getDebugTarget();
+		Map threadMap = (Map) fDebugTargetMap.get(debugTarget);
+		if (threadMap == null) {
+			return;
+		}
+		
+		removeAnnotations(thread, threadMap);
+	}
+	private void removeAnnotations(IThread thread, Map threadMap) {
+		List contextList = (List) threadMap.get(thread);
+		if (contextList != null) {
+			Iterator contextIterator = contextList.iterator();
+			while (contextIterator.hasNext()) {
+				PInstructionPointerContext context = (PInstructionPointerContext) contextIterator.next();
+				removeAnnotation(context.getTextEditor(), context.getAnnotation());
+			}
+		}
+		
+		threadMap.remove(thread);						
+	}
+	private void removeAnnotation(ITextEditor textEditor, PInstructionPointerAnnotation annotation) {
+		IDocumentProvider docProvider = textEditor.getDocumentProvider();
+		if (docProvider != null) {
+			IAnnotationModel annotationModel = docProvider.getAnnotationModel(textEditor.getEditorInput());
+			if (annotationModel != null) {
+				annotationModel.removeAnnotation(annotation);
+			}
+		}
 	}	
 }

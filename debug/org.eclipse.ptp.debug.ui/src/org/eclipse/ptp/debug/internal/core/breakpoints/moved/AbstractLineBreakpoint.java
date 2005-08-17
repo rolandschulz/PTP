@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.debug.core.model.moved.IPLineBreakpoint;
-import org.eclipse.ptp.debug.internal.core.breakpoints.PBreakpoint;
 
 /**
  * @author Clement chu
