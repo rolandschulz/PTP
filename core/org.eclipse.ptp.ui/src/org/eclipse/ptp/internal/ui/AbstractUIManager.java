@@ -24,26 +24,21 @@ import java.util.List;
 
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.ui.IManager;
-import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.listeners.IPaintListener;
-import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
 
 /**
  * @author Clement chu
  *
  */
-public abstract class AbstractUIManager implements IManager, ISetListener {
+public abstract class AbstractUIManager implements IManager {
 	protected IModelManager modelManager = null;
 	protected String cur_set_id = IElementHandler.SET_ROOT_ID;
 	protected List pListeners = new ArrayList(0);
 	
-	public AbstractUIManager() {
-		PTPUIPlugin.getDefault().getUIManager().addSetListener(this);
-	}
-	
 	public void shutdown() {
-		PTPUIPlugin.getDefault().getUIManager().removeSetListener(this);
+		pListeners.clear();
+		pListeners = null;
 	}
 	
 	public void addPaintListener(IPaintListener pListener) {

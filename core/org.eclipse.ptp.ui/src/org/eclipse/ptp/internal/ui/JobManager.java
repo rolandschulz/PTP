@@ -26,7 +26,6 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.IPTPUIConstants;
-import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.internal.Element;
@@ -192,13 +191,4 @@ public class JobManager extends AbstractUIManager {
 	public void jobChangedEvent(String cur_jid, String pre_jid) {
 		cur_job_id = cur_jid;
 	}
-	
-	/*****
-	 * Element Set
-	 *****/
-	public void changeSetEvent(IElementSet curSet, IElementSet preSet) {}
-	public void deleteSetEvent(IElementSet set) {}
-	public void createSetEvent(IElementSet set, IElement[] elements) {}
-	public void addElementsEvent(IElementSet set, IElement[] elements) {}
-	public void removeElementsEvent(IElementSet set, IElement[] elements) {}	
 }
