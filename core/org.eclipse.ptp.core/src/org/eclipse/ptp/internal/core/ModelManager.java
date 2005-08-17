@@ -57,6 +57,7 @@ import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.NamedEntity;
 import org.eclipse.ptp.rtsystem.ompi.OMPIControlSystem;
 import org.eclipse.ptp.rtsystem.ompi.OMPIMonitoringSystem;
+import org.eclipse.ptp.rtsystem.simulation.SimProcess;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -261,12 +262,16 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			System.out.println("getProcsForNewJob:" + nejob + " - #procs = "
 					+ ne.length);
 		for (int j = 0; ne != null && j < ne.length; j++) {
-			PProcess proc;
+			IPProcess proc;
 			// System.out.println("process name = "+ne[j]);
 			
 			int pid = controlSystem.getProcessPID(ne[j]);
-			proc = new PProcess(job, ne[j], "" + j + "", "" + pid + "", j, "-1",
-					"", "");
+			
+			if (controlSystem instanceof SimulationControlSystem)
+				proc = new SimProcess(job, ne[j], "" + j + "", "" + pid + "", j, "-1", "", "");
+			else
+				proc = new PProcess(job, ne[j], "" + j + "", "" + pid + "", j, "-1", "", "");
+			
 			job.addChild(proc);
 
 			String pname = proc.getElementName();

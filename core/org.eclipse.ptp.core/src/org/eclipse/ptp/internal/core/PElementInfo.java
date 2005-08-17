@@ -30,15 +30,15 @@ import org.eclipse.ptp.core.IPElement;
 public class PElementInfo {
 	private Map fChildren = null;
 
-	protected PElement element;
+	protected IPElement element;
 
-	public PElementInfo(PElement element) {
+	public PElementInfo(IPElement element) {
 		this.element = element;
 		// Array list starts with size = 0
 		fChildren = new HashMap(0);
 	}
 
-	public PElement getElement() {
+	public IPElement getElement() {
 		return element;
 	}
 
