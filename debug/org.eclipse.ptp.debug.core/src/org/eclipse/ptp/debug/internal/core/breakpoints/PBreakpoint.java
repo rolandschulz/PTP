@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.cdt.debug.core.model.ICDebugTarget;
+import org.eclipse.cdt.debug.core.model.ICThread;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRunnable;
@@ -45,10 +47,10 @@ import org.eclipse.ptp.debug.core.model.IPDebugTarget;
  *
  */
 public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
-	private Map filteredThreadsByTarget;
+	private Map fFilteredThreadsByTarget;
 
 	public PBreakpoint() {
-		filteredThreadsByTarget = new HashMap(10);
+		fFilteredThreadsByTarget = new HashMap(10);
 	}
 	
 	public PBreakpoint(final IResource resource, final String markerType, final Map attributes, final boolean add) throws CoreException {
@@ -179,42 +181,6 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 		return ((getCondition() != null && getCondition().trim().length() > 0) || getIgnoreCount() > 0);
 	}
 
-	public IPDebugTarget[] getTargetFilters() throws CoreException {
-		Set set = filteredThreadsByTarget.keySet();
-		return (IPDebugTarget[])set.toArray(new IPDebugTarget[set.size()]);
-	}
-	public IThread[] getThreadFilters(IPDebugTarget target) throws CoreException {
-		Set set = (Set)filteredThreadsByTarget.get(target);
-		return (set != null)?(IThread[])set.toArray(new IThread[set.size()]):null;
-	}
-	public void removeTargetFilter(IPDebugTarget target) throws CoreException {
-		if (filteredThreadsByTarget.containsKey(target)) {
-			filteredThreadsByTarget.remove(target);
-		}
-	}
-	public void removeThreadFilters(IThread[] threads) throws CoreException {
-		if (threads != null && threads.length > 0) {
-			IDebugTarget target = threads[0].getDebugTarget();
-			if (filteredThreadsByTarget.containsKey(target)) {
-				Set set = (Set)filteredThreadsByTarget.get(target);
-				if (set != null) {
-					set.removeAll(Arrays.asList(threads));
-					if (set.isEmpty()) {
-						filteredThreadsByTarget.remove(target);
-					}
-				}
-			}
-		}
-	}
-	public void setTargetFilter(IPDebugTarget target) throws CoreException {
-		filteredThreadsByTarget.put(target, null);
-	}
-	public void setThreadFilters(IThread[] threads) throws CoreException {
-		if (threads != null && threads.length > 0) {
-			filteredThreadsByTarget.put(threads[0].getDebugTarget(), new HashSet(Arrays.asList(threads)));
-		}
-	}
-	
 	public void fireChanged() {
 		if (markerExists()) {
 			DebugPlugin.getDefault().getBreakpointManager().fireBreakpointChanged(this);
@@ -232,5 +198,64 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 			sb.append( MessageFormat.format(BreakpointMessages.getString("PBreakpoint.2"), new String[] { condition }));
 		}
 		return sb.toString();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.debug.core.model.ICBreakpoint#getTargetFilters()
+	 */
+	public ICDebugTarget[] getTargetFilters() throws CoreException {
+		Set set = fFilteredThreadsByTarget.keySet();
+		return (ICDebugTarget[])set.toArray( new ICDebugTarget[set.size()] );
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.debug.core.model.ICBreakpoint#getThreadFilters(org.eclipse.cdt.debug.core.model.ICDebugTarget)
+	 */
+	public ICThread[] getThreadFilters( ICDebugTarget target ) throws CoreException {
+		Set set = (Set)fFilteredThreadsByTarget.get( target );
+		return ( set != null ) ? (ICThread[])set.toArray( new ICThread[set.size()] ) : null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.debug.core.model.ICBreakpoint#removeTargetFilter(org.eclipse.cdt.debug.core.model.ICDebugTarget)
+	 */
+	public void removeTargetFilter( ICDebugTarget target ) throws CoreException {
+		if ( fFilteredThreadsByTarget.containsKey( target ) ) {
+			fFilteredThreadsByTarget.remove( target );
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.debug.core.model.ICBreakpoint#removeThreadFilters(org.eclipse.cdt.debug.core.model.ICThread[])
+	 */
+	public void removeThreadFilters( ICThread[] threads ) throws CoreException {
+		if ( threads != null && threads.length > 0 ) {
+			IDebugTarget target = threads[0].getDebugTarget();
+			if ( fFilteredThreadsByTarget.containsKey( target ) ) {
+				Set set = (Set)fFilteredThreadsByTarget.get( target );
+				if ( set != null ) {
+					set.removeAll( Arrays.asList( threads ) );
+					if ( set.isEmpty() ) {
+						fFilteredThreadsByTarget.remove( target );
+					}
+				}
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.debug.core.model.ICBreakpoint#setTargetFilter(org.eclipse.cdt.debug.core.model.ICDebugTarget)
+	 */
+	public void setTargetFilter( ICDebugTarget target ) throws CoreException {
+		fFilteredThreadsByTarget.put( target, null );
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.debug.core.model.ICBreakpoint#setThreadFilters(org.eclipse.cdt.debug.core.model.ICThread[])
+	 */
+	public void setThreadFilters( ICThread[] threads ) throws CoreException {
+		if ( threads != null && threads.length > 0 ) {
+			fFilteredThreadsByTarget.put( threads[0].getDebugTarget(), new HashSet( Arrays.asList( threads ) ) );
+		}
 	}
 }

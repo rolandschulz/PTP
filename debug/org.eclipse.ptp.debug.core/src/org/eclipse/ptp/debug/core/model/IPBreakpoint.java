@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.model;
 
+import org.eclipse.cdt.debug.core.model.ICDebugTarget;
+import org.eclipse.cdt.debug.core.model.ICThread;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.IBreakpoint;
 
@@ -68,10 +70,10 @@ public interface IPBreakpoint extends IBreakpoint {
 	public int decrementInstallCount() throws CoreException;
 	public void resetInstallCount() throws CoreException;
 	
-	//public void setTargetFilter(IPDebugTarget target) throws CoreException;
-	//public void removeTargetFilter(IPDebugTarget target) throws CoreException;
-	//public void setThreadFilters(IPThread[] threads) throws CoreException;\
-	//public void removeThreadFilters(IPThread[] threads) throws CoreException;
-	//public ICThread[] getThreadFilters(IPDebugTarget target) throws CoreException;
-	//public IPDebugTarget[] getTargetFilters() throws CoreException; 
+	public void setTargetFilter(ICDebugTarget target) throws CoreException;
+	public void removeTargetFilter(ICDebugTarget target) throws CoreException;
+	public void setThreadFilters(ICThread[] threads) throws CoreException;
+	public void removeThreadFilters(ICThread[] threads) throws CoreException;
+	public ICThread[] getThreadFilters(ICDebugTarget target) throws CoreException;
+	public ICDebugTarget[] getTargetFilters() throws CoreException; 
 }
