@@ -70,11 +70,11 @@ public class VariableManager extends Manager {
 		ICDIArgument[] args = debugger.listArguments(newSet, frame);
 		if (args != null) {
 			for (int i = 0; i < args.length; i++) {
-				Thread thread = (Thread) ((VariableDescriptor) args[0]).getThread();
-				String name = args[0].getName();
-				String fName = args[0].getQualifiedName();
-				int pos = ((VariableDescriptor) args[0]).getPosition();
-				int depth = ((VariableDescriptor) args[0]).getStackDepth();
+				Thread thread = (Thread) ((VariableDescriptor) args[i]).getThread();
+				String name = args[i].getName();
+				String fName = args[i].getQualifiedName();
+				int pos = ((VariableDescriptor) args[i]).getPosition();
+				int depth = ((VariableDescriptor) args[i]).getStackDepth();
 				ArgumentDescriptor arg = new ArgumentDescriptor(target, thread, frame, name, fName, pos, depth);
 				argObjects.add(arg);
 			}
@@ -91,12 +91,12 @@ public class VariableManager extends Manager {
 		ICDILocalVariable[] args = debugger.listLocalVariables(newSet, frame);
 		if (args != null) {
 			for (int i = 0; i < args.length; i++) {
-				Thread thread = (Thread) ((VariableDescriptor) args[0]).getThread();
-				String name = args[0].getName();
-				String fName = args[0].getQualifiedName();
-				int pos = ((VariableDescriptor) args[0]).getPosition();
-				int depth = ((VariableDescriptor) args[0]).getStackDepth();
-				LocalVariableDescriptor arg = new ArgumentDescriptor(target, thread, frame, name, fName, pos, depth);
+				Thread thread = (Thread) ((VariableDescriptor) args[i]).getThread();
+				String name = args[i].getName();
+				String fName = args[i].getQualifiedName();
+				int pos = ((VariableDescriptor) args[i]).getPosition();
+				int depth = ((VariableDescriptor) args[i]).getStackDepth();
+				LocalVariableDescriptor arg = new LocalVariableDescriptor(target, thread, frame, name, fName, pos, depth);
 				argObjects.add(arg);
 			}
 		}

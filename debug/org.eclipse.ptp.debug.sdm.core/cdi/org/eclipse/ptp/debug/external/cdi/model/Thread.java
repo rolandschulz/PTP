@@ -172,10 +172,14 @@ public class Thread extends PTPObject implements ICDIThread {
 		System.out.println("Thread.signal()");
 	}
 
-	public boolean equals(ICDIThread thead) {
+	public boolean equals(ICDIThread thread) {
 		// Auto-generated method stub
 		System.out.println("Thread.equals()");
-		return false;
+		if (thread instanceof Thread) {
+			Thread cthread = (Thread) thread;
+			return id == cthread.getId();
+		}
+		return super.equals(thread);
 	}
 
 	public void stepOver(int count) throws CDIException {

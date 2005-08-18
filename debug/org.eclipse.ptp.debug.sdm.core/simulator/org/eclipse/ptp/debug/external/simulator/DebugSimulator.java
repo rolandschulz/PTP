@@ -23,6 +23,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
@@ -37,6 +38,7 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
+import org.eclipse.ptp.debug.external.cdi.Locator;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.Argument;
@@ -153,7 +155,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 				int line = simFrames[j].getLine();
 				String addr = simFrames[j].getAddress();
 				StackFrame newFrame = new StackFrame((Thread) thread, level, file, func, line, addr);
-				if (newFrame.equals(frame)) {
+				if (newFrame.getLocator().equals(frame.getLocator())) {
 					SimVariable[] args = simFrames[j].getArgs();
 					for (int k = 0; k < args.length; k++) {
 						String aName = args[k].getName();
@@ -186,7 +188,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 				int line = simFrames[j].getLine();
 				String addr = simFrames[j].getAddress();
 				StackFrame newFrame = new StackFrame((Thread) thread, level, file, func, line, addr);
-				if (newFrame.equals(frame)) {
+				if (newFrame.getLocator().equals(frame.getLocator())) {
 					SimVariable[] args = simFrames[j].getLocalVars();
 					for (int k = 0; k < args.length; k++) {
 						String aName = args[k].getName();
