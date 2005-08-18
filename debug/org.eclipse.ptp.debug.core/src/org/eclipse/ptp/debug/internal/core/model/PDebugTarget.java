@@ -69,7 +69,6 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.model.CDebugElementState;
-import org.eclipse.cdt.debug.core.model.ICBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICDebugElement;
 import org.eclipse.cdt.debug.core.model.ICDebugElementStatus;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
@@ -115,7 +114,9 @@ import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
+import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.core.sourcelookup.CDirectorySourceContainer;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
@@ -348,7 +349,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	public boolean supportsBreakpoint( IBreakpoint breakpoint ) {
 		if ( !getConfiguration().supportsBreakpoints() )
 			return false;
-		return (breakpoint instanceof ICBreakpoint && getBreakpointManager().supportsBreakpoint( (ICBreakpoint)breakpoint ));
+		return (breakpoint instanceof IPBreakpoint && getBreakpointManager().supportsBreakpoint( (IPBreakpoint)breakpoint ));
 	}
 
 	/* (non-Javadoc)
@@ -958,9 +959,10 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	}
 
 	private void handleWatchpointScope( ICDIWatchpointScope ws ) {
-		getBreakpointManager().watchpointOutOfScope( ws.getWatchpoint() );
+		// DONNY
+/*		getBreakpointManager().watchpointOutOfScope( ws.getWatchpoint() );
 		fireSuspendEvent( DebugEvent.BREAKPOINT );
-	}
+*/	}
 
 	private void handleSuspendedBySignal( ICDISignalReceived signal ) {
 		fireSuspendEvent( DebugEvent.UNSPECIFIED );
@@ -1234,10 +1236,15 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return false;
 	}
 
+	public IAddress getBreakpointAddress( ICLineBreakpoint breakpoint ) throws DebugException {
+		System.out.println("PDebugTarget.getBreakpointAddress()");
+		return null;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.core.model.IBreakpointTarget#getBreakpointAddress(org.eclipse.cdt.debug.core.model.ICLineBreakpoint)
 	 */
-	public IAddress getBreakpointAddress( ICLineBreakpoint breakpoint ) throws DebugException {
+	public IAddress getBreakpointAddress( IPLineBreakpoint breakpoint ) throws DebugException {
 		return (getBreakpointManager() != null) ? getBreakpointManager().getBreakpointAddress( breakpoint ) : getAddressFactory().getZero();
 	}
 

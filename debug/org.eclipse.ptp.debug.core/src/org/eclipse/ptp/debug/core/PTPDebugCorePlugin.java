@@ -34,7 +34,6 @@ import java.util.Hashtable;
 import org.eclipse.cdt.debug.core.ICBreakpointListener;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.cdt.debug.core.sourcelookup.ICSourceLocation;
-import org.eclipse.cdt.debug.internal.core.breakpoints.CBreakpoint;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -54,6 +53,7 @@ import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.ListenerList;
 import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
 import org.eclipse.ptp.debug.internal.core.SessionManager;
+import org.eclipse.ptp.debug.internal.core.breakpoints.PBreakpoint;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CommonSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.SourceUtils;
@@ -210,9 +210,9 @@ public class PTPDebugCorePlugin extends Plugin {
 		IBreakpointManager bm = DebugPlugin.getDefault().getBreakpointManager();
 		IBreakpoint[] breakpoints = bm.getBreakpoints( getUniqueIdentifier() );
 		for( int i = 0; i < breakpoints.length; ++i ) {
-			if ( breakpoints[i] instanceof CBreakpoint ) {
+			if ( breakpoints[i] instanceof PBreakpoint ) {
 				try {
-					((CBreakpoint)breakpoints[i]).resetInstallCount();
+					((PBreakpoint)breakpoints[i]).resetInstallCount();
 				}
 				catch( CoreException e ) {
 					log( e.getStatus() );

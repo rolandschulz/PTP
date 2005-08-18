@@ -31,7 +31,6 @@ package org.eclipse.ptp.debug.internal.core.sourcelookup;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
-import org.eclipse.cdt.debug.core.model.ICBreakpoint;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -45,6 +44,7 @@ import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
 import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.WorkspaceSourceContainer;
+import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.sourcelookup.CDirectorySourceContainer;
 import org.eclipse.ptp.debug.core.sourcelookup.MappingSourceContainer;
  
@@ -77,7 +77,7 @@ public class CSourceLookupDirector extends AbstractSourceLookupDirector {
 		return fSupportedTypes.contains( type.getId() );
 	}
 
-	public boolean contains( ICBreakpoint breakpoint ) {
+	public boolean contains( IPBreakpoint breakpoint ) {
 		try {
 			String handle = breakpoint.getSourceHandle();
 			ISourceContainer[] containers = getSourceContainers();
