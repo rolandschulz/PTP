@@ -20,7 +20,6 @@ package org.eclipse.ptp.debug.internal.ui;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
@@ -34,7 +33,6 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 	public PInstructionPointerAnnotation(IMarker marker, IStackFrame stackFrame) {
 		super(marker);
 		fStackFrame = stackFrame;
-		setMessage(getMessageFromStack());
 	}
 	
 	public void setMessage(String message) {
@@ -57,13 +55,5 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 
 	private IStackFrame getStackFrame() {
 		return fStackFrame;
-	}
-	
-	private String getMessageFromStack() {
-		try {
-			return fStackFrame.getName();
-		} catch (DebugException e) {
-			return "";
-		}
 	}
 }
