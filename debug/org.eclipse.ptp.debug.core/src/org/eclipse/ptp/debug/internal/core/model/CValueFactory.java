@@ -28,7 +28,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
-import org.eclipse.cdt.debug.core.CDebugCorePlugin;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIArrayValue;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIFloatingPointValue;
@@ -40,6 +39,7 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 
 /**
  * The value factory for variable and expressions.
@@ -69,7 +69,7 @@ public class CValueFactory {
 		}
 
 		public String getModelIdentifier() {
-			return CDebugCorePlugin.getUniqueIdentifier();
+			return PTPDebugCorePlugin.getUniqueIdentifier();
 		}
 
 		public IDebugTarget getDebugTarget() {
@@ -113,10 +113,10 @@ public class CValueFactory {
 		return new CIndexedValue( parent, cdiValue, start, length );
 	}
 
-/*	static public CValue createGlobalValue( CVariable parent, ICDIValue cdiValue ) {
+	static public CValue createGlobalValue( CVariable parent, ICDIValue cdiValue ) {
 		return new CGlobalValue( parent, cdiValue );
 	}
-*/
+
 	static public ICValue createValueWithError( CVariable parent, String message ) {
 		return new CValue( parent, message );
 	}
