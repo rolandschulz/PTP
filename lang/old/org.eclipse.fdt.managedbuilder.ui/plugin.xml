@@ -890,10 +890,10 @@
 		  </option>
           <inputType
               sourceContentType="org.eclipse.fdt.core.fortranSource"
-		      sources="f90"
-              dependencyContentType="org.eclipse.cdt.core.fortranHeader"
-              dependencyExtensions="h"
-              dependencyCalculator="org.eclipse.cdt.managedbuilder.makegen.internal.DefaultNoDependencyCalculator"
+		      sources="f,f90,f95,f03"
+              dependencyContentType="org.eclipse.cdt.core.fortranSource"
+              dependencyExtensions="f,f90,f95,f03"
+              dependencyCalculator="org.eclipse.fdt.managedbuilder.core/org.eclipse.fdt.managedbuilder.core.makegen.DefaultFortranDependencyCalculator"
               id="fdt.managedbuild.tool.gnu.fortran.compiler.input">
           </inputType>
           <outputType
