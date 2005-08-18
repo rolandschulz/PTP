@@ -19,10 +19,7 @@
 package org.eclipse.ptp.debug.internal.ui;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.cdt.debug.core.cdi.ICDIBreakpointHit;
@@ -59,11 +56,6 @@ import org.eclipse.debug.ui.IDebugEditorPresentation;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IValueDetailListener;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.Position;
-import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.ptp.debug.core.model.IPAddressBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
@@ -79,8 +71,6 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
-import org.eclipse.ui.texteditor.IDocumentProvider;
-import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * @author Clement chu
@@ -409,9 +399,11 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	}
 	protected StringBuffer appendStatus(IPBreakpoint breakpoint, StringBuffer label) throws CoreException {
 		String job_id = breakpoint.getJobId();
-		String jobName = uiDebugManager.isNoJob(job_id)?"N/A":uiDebugManager.getName(job_id);
+		String jobName = uiDebugManager.isNoJob(job_id)?"":"Job: " + uiDebugManager.getName(job_id) + " - ";
 		label.append(" ");
-		label.append(MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.details1"), new String[] { jobName, breakpoint.getSetId() }));
+		label.append("<" + jobName);
+		label.append(breakpoint.getSetId() + ">");
+		//label.append(MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.details1"), new String[] { jobName, breakpoint.getSetId() }));
 		return label;
 	}
 
@@ -549,6 +541,8 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	
 	public void dispose() {
 		getImageCache().disposeAll();
+		annotationManager.shutdown();
+		annotationManager = null;
 		attributes.clear();
 		super.dispose();
 	}

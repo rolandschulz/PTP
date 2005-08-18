@@ -28,6 +28,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.IPDebugListener;
 import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -90,9 +91,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 
 	public void registerProcess(IPCDISession session, int task_id, boolean isRegister, boolean isChanged) {
 		if (isRegister)
-			session.registerTarget(task_id);
+			session.registerTarget(task_id, isChanged);
 		else
-			session.unregisterTarget(task_id);
+			session.unregisterTarget(task_id, isChanged);
 	}
 	
 	public void unregisterElements(IElement[] elements) {
@@ -103,7 +104,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		for (int i=0; i<elements.length; i++) {			
 			//only unregister some registered elements
 			if (elements[i].isRegistered()) {
-				//registerProcess(session, Integer.parseInt(elements[i].getName()), false, true);
+				registerProcess(session, Integer.parseInt(elements[i].getName()), false, true);
 			}
 		}
 	}
@@ -115,7 +116,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		for (int i=0; i<elements.length; i++) {
 			//only register some unregistered elements
 			if (!elements[i].isRegistered()) {
-				//registerProcess(session, Integer.parseInt(elements[i].getName()), true, true);
+				registerProcess(session, Integer.parseInt(elements[i].getName()), true, true);
 			}
 		}
 	}
@@ -154,15 +155,18 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IElementHandler elementHandler = getElementHandler(getCurrentJobId());
 		if (elementHandler == null)
 			return;
+
 		String[] registerElementsID = elementHandler.getRegisteredElementsID();
 		for (int i=0; i<registerElementsID.length; i++) {
 			if (curSet.contains(registerElementsID[i])) {
 				if (!preSet.contains(registerElementsID[i])) {
-					//registerProcess(session, Integer.parseInt(registerElements[i].getName()), true, false);
+					String taskID = elementHandler.getSetRoot().get(registerElementsID[i]).getName();
+					registerProcess(session, Integer.parseInt(taskID), true, false);
 				}
 			} 
 			else {
-				//registerProcess(session, Integer.parseInt(registerElements[i].getName()), false, false);
+				String taskID = elementHandler.getSetRoot().get(registerElementsID[i]).getName();
+				registerProcess(session, Integer.parseInt(taskID), false, false);
 			}
 		}
 	}
@@ -230,8 +234,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				IElementHandler elementHandler = getElementHandler(job_id);
 				int[] processes = event.getProcesses();
 				for (int j=0; j<processes.length; j++) {
-					//elementHandler.addRegisterElement();
-					//elementHandler.getSetRoot().get().setRegistered(true);
+					IPProcess proc = findJobById(job_id).findProcessByTaskId(processes[i]);
+					elementHandler.addRegisterElement(proc.getIDString());
+					elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(true);
 				}
 			}
 			else if (event instanceof TargetUnregisteredEvent) {
@@ -240,8 +245,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				IElementHandler elementHandler = getElementHandler(job_id);
 				int[] processes = event.getProcesses();
 				for (int j=0; j<processes.length; j++) {
-					//elementHandler.removeRegisterElement();
-					//elementHandler.getSetRoot().get().setRegistered(false);
+					IPProcess proc = findJobById(job_id).findProcessByTaskId(processes[i]);
+					elementHandler.removeRegisterElement(proc.getIDString());
+					elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(false);
 				}
 			}
 			firePaintListener();

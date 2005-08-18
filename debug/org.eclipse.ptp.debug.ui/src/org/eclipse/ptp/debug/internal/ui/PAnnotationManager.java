@@ -61,6 +61,11 @@ public class PAnnotationManager {
 			instance = new PAnnotationManager();
 		return instance;
 	}
+	
+	public void shutdown() {
+		removeAllAnnotations();
+		fDebugTargetMap = null;
+	}
 		
 	private ITextEditor getTextEditor(IEditorPart editorPart) {
 		if (editorPart instanceof ITextEditor)				
@@ -81,14 +86,9 @@ public class PAnnotationManager {
 			return null;
 		}
 	}
-	public IMarker createMarker(IResource resource, IThread thread, IStackFrame stackFrame) {
+	public IMarker createMarker(IResource resource, IThread thread, IStackFrame stackFrame) throws CoreException {
 		IStackFrame topStack = getTopStackFrame(thread);
-		boolean isTopFrame = (topStack == null || stackFrame.equals(topStack));
-		try {
-			return resource.createMarker(isTopFrame?IPTPDebugUIConstants.ANN_INSTR_POINTER_CURRENT:IPTPDebugUIConstants.ANN_INSTR_POINTER_SECONDARY);
-		} catch (CoreException e) {
-			return null;
-		}
+		return resource.createMarker((topStack == null || stackFrame.equals(topStack))?IPTPDebugUIConstants.ANN_INSTR_POINTER_CURRENT:IPTPDebugUIConstants.ANN_INSTR_POINTER_SECONDARY);
 	}
 	public Position createPosition(IStackFrame stackFrame, IDocument doc) {
 		if (doc == null)
@@ -119,6 +119,7 @@ public class PAnnotationManager {
 		return new Position(charStart, length);
 	}
 	
+	//FIXME Need to redo it
 	public boolean addAnnotations(IEditorPart editorPart, IStackFrame stackFrame) {
 		ITextEditor textEditor = getTextEditor(editorPart);
 		if (textEditor == null)
@@ -132,21 +133,22 @@ public class PAnnotationManager {
 			return false;
 		
         IThread thread = stackFrame.getThread();
-        IMarker marker = createMarker(resource, thread, stackFrame);
-        if (marker == null)
-        	return false;
         
         IAnnotationModel annModel = docProvider.getAnnotationModel(editorInput);
         if (annModel == null)
-            return false;
+        		return false;
 
         Position position = createPosition(stackFrame, docProvider.getDocument(editorInput));
         if (position == null)
-        	return false;
+        		return false;
         
-		Annotation instPtrAnnotation = createAnnotation(annModel, position, marker, stackFrame);
+		Annotation instPtrAnnotation = null; 
+		try {	
+			instPtrAnnotation = createAnnotation(annModel, position, resource, thread, stackFrame);
+		} catch (CoreException e) {
+			return false;
+		}
 		
-		annModel.removeAnnotation(instPtrAnnotation);
 		annModel.addAnnotation(instPtrAnnotation, position);
 		
 		IDebugTarget debugTarget = stackFrame.getDebugTarget();
@@ -167,24 +169,48 @@ public class PAnnotationManager {
 		return true;
 	}
 	
-	private Annotation createAnnotation(IAnnotationModel annModel, Position position, IMarker marker, IStackFrame stackFrame) {
+	private Annotation createAnnotation(IAnnotationModel annModel, Position position, IResource resource, IThread thread, IStackFrame stackFrame) throws CoreException {
+		boolean appendMsg = false;
+		PInstructionPointerAnnotation ptrAnnotation = null;
 		for (Iterator i=annModel.getAnnotationIterator(); i.hasNext();) {
 			Annotation annotation = (Annotation)i.next();
-			if (annModel.getPosition(annotation).equals(position))
-				return annotation;
+			if (annotation instanceof PInstructionPointerAnnotation) {
+				if (annModel.getPosition(annotation).equals(position)) {
+					ptrAnnotation = (PInstructionPointerAnnotation)annotation;
+					annModel.removeAnnotation(annotation);
+					appendMsg = true;
+					break;
+				}
+			}
 		}
-		return new PInstructionPointerAnnotation(marker, stackFrame);
+		
+		if (ptrAnnotation == null) {
+			IMarker marker = createMarker(resource, thread, stackFrame);
+			ptrAnnotation = new PInstructionPointerAnnotation(marker, stackFrame);
+		}
+		createStackFrameMessage(ptrAnnotation.getMarker(), stackFrame, appendMsg);
+		return ptrAnnotation;
+	}
+	
+	public void createStackFrameMessage(IMarker marker, IStackFrame stackFrame, boolean append) throws CoreException {
+		//msg is task id
+		String msg = stackFrame.getThread().getName();
+		if (append) {
+			String markerMsg = marker.getAttribute(IMarker.MESSAGE, "");
+			msg = markerMsg + "," + msg; 
+		}
+		marker.setAttribute(IMarker.MESSAGE, msg);
 	}
 	
 	public void removeAnnotations(IEditorPart editorPart, IThread thread) {
 		IDebugTarget debugTarget = thread.getDebugTarget();
-		Map threadMap = (Map) fDebugTargetMap.get(debugTarget);
+		Map threadMap = (Map)fDebugTargetMap.get(debugTarget);
 		if (threadMap != null) {
 			removeAnnotations(thread, threadMap);
 		}
 	}
 	private void removeAnnotations(IThread thread, Map threadMap) {
-		List contextList = (List) threadMap.get(thread);
+		List contextList = (List)threadMap.get(thread);
 		if (contextList != null) {
 			Iterator contextIterator = contextList.iterator();
 			while (contextIterator.hasNext()) {
@@ -202,5 +228,25 @@ public class PAnnotationManager {
 				annotationModel.removeAnnotation(annotation);
 			}
 		}
-	}	
+	}
+	
+	public void removeAllAnnotations() {
+		for (Iterator i=fDebugTargetMap.values().iterator(); i.hasNext();) {
+			Map threadMap = (Map)i.next();
+			if (threadMap != null) {
+				for (Iterator j=threadMap.values().iterator(); j.hasNext();) {
+					List contextList = (List)j.next();
+					if (contextList != null) {
+						Iterator contextIterator = contextList.iterator();
+						while (contextIterator.hasNext()) {
+							PInstructionPointerContext context = (PInstructionPointerContext) contextIterator.next();
+							removeAnnotation(context.getTextEditor(), context.getAnnotation());
+						}
+					}
+				}
+				threadMap.clear();
+			}
+		}
+		fDebugTargetMap.clear();
+	}
 }
