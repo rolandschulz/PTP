@@ -62,4 +62,11 @@ public interface IPTPLaunchConfigurationConstants {
 	public static final String DEF_PROCESSES_PER_NODE = "1";
 
 	public static final String DEF_FIRST_NODE_NUMBER = "0";
+	
+	/**
+	 * Launch configuration attribute key. The value is a global variables'
+	 * memento.
+	 */
+	public static final String ATTR_DEBUGGER_GLOBAL_VARIABLES = PTP_LAUNCH_ID + ".GLOBAL_VARIABLES"; //$NON-NLS-1$
+
 }

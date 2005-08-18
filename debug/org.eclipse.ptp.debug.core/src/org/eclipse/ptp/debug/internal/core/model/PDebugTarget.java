@@ -38,7 +38,9 @@ import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.core.IAddressFactory;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
+import org.eclipse.cdt.core.IBinaryParser.ISymbol;
 import org.eclipse.cdt.debug.core.CDebugUtils;
+import org.eclipse.cdt.debug.core.ICGlobalVariableManager;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDIBreakpointHit;
@@ -68,9 +70,11 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
 import org.eclipse.cdt.debug.core.model.CDebugElementState;
 import org.eclipse.cdt.debug.core.model.ICDebugElement;
 import org.eclipse.cdt.debug.core.model.ICDebugElementStatus;
+import org.eclipse.cdt.debug.core.model.ICGlobalVariable;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICModule;
 import org.eclipse.cdt.debug.core.model.ICSignal;
@@ -112,6 +116,7 @@ import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
 import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
+import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
@@ -120,6 +125,7 @@ import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.core.sourcelookup.CDirectorySourceContainer;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
+import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupParticipant;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceManager;
 
@@ -164,7 +170,12 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	 * A breakpoint manager for this target.
 	 */
 	private PBreakpointManager fBreakpointManager;
-
+	
+	/**
+	 * The global variable manager for this target.
+	 */
+	private PGlobalVariableManager fGlobalVariableManager;
+	
 	/**
 	 * The executable binary file associated with this target.
 	 */
@@ -209,6 +220,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		setConfiguration( cdiTarget.getConfiguration() );
 		setThreadList( new ArrayList( 5 ) );
 		setBreakpointManager( new PBreakpointManager( this ) );
+		setGlobalVariableManager( new PGlobalVariableManager( this ) );
 		initialize();
 		DebugPlugin.getDefault().getLaunchManager().addLaunchListener( this );
 		getCDISession().getEventManager().addEventListener( this );
@@ -692,6 +704,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			return this;
 		if ( adapter.equals( PBreakpointManager.class ) )
 			return getBreakpointManager();
+		if ( adapter.equals( ICGlobalVariableManager.class ) )
+			return getGlobalVariableManager();
 		if ( adapter.equals( ICDISession.class ) )
 			return getCDISession();
 		return super.getAdapter( adapter );
@@ -840,6 +854,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		removeAllThreads();
 		getCDISession().getEventManager().removeEventListener( this );
 		DebugPlugin.getDefault().getLaunchManager().removeLaunchListener( this );
+		saveGlobalVariables();
+		disposeGlobalVariableManager();
 		disposeSourceManager();
 		disposeSourceLookupPath();
 		disposeBreakpointManager();
@@ -1150,6 +1166,14 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return fProject;
 	}
 	
+	protected void saveGlobalVariables() {
+		fGlobalVariableManager.save();
+	}
+
+	protected void disposeGlobalVariableManager() {
+		fGlobalVariableManager.dispose();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.core.model.IResumeWithoutSignal#canResumeWithoutSignal()
 	 */
@@ -1286,6 +1310,14 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		if ( fPreferences != null )
 			fPreferences.removePropertyChangeListener( listener );
 	}
+	
+	protected PGlobalVariableManager getGlobalVariableManager() {
+		return fGlobalVariableManager;
+	}
+
+	private void setGlobalVariableManager( PGlobalVariableManager globalVariableManager ) {
+		fGlobalVariableManager = globalVariableManager;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.core.model.ICDebugTarget#isPostMortem()
@@ -1332,6 +1364,17 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return null;
 	}
 
+	public ICGlobalVariable createGlobalVariable( IGlobalVariableDescriptor info ) throws DebugException {
+		ICDIVariableDescriptor vo = null;
+		try {
+			vo = getCDITarget().getGlobalVariableDescriptors( info.getPath().lastSegment(), null, info.getName() );
+		}
+		catch( CDIException e ) {
+			throw new DebugException( new Status( IStatus.ERROR, PCDIDebugModel.getPluginIdentifier(), DebugException.TARGET_REQUEST_FAILED, (vo != null) ? vo.getName() + ": " + e.getMessage() : e.getMessage(), null ) ); //$NON-NLS-1$
+		}
+		return CVariableFactory.createGlobalVariable( this, info, vo );
+	}
+
 	public boolean hasModules() throws DebugException {
 		// TODO Auto-generated method stub
 		return false;
@@ -1373,8 +1416,23 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	}
 
 	public IGlobalVariableDescriptor[] getGlobals() throws DebugException {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList list = new ArrayList();
+		IBinaryObject file = getBinaryFile();
+		if (file != null) {
+			list.addAll( getCFileGlobals( file ) );
+		}
+		return (IGlobalVariableDescriptor[])list.toArray( new IGlobalVariableDescriptor[list.size()] );
+	}
+
+	private List getCFileGlobals( IBinaryObject file ) throws DebugException {
+		ArrayList list = new ArrayList();
+		ISymbol[] symbols = file.getSymbols();
+		for( int i = 0; i < symbols.length; ++i ) {
+			if (symbols[i].getType() == ISymbol.VARIABLE) {
+				list.add( CVariableFactory.createGlobalVariableDescriptor( symbols[i] ) );
+			}
+		}
+		return list;
 	}
 
 	public boolean isInstructionSteppingEnabled() {

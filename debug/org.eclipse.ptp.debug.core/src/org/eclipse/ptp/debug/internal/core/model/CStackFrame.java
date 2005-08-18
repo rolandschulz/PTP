@@ -66,6 +66,7 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
 
 /**
  * Proxy to a stack frame on the target.
@@ -658,6 +659,10 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 	}
 
 	private ICGlobalVariable[] getGlobals() {
+		PGlobalVariableManager gvm = ((PDebugTarget)getDebugTarget()).getGlobalVariableManager();
+		if ( gvm != null ) {
+			return gvm.getGlobals();
+		}
 		return new ICGlobalVariable[0];
 	}
 

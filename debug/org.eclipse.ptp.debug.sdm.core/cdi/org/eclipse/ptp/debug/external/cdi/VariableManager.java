@@ -34,12 +34,15 @@ import java.util.List;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgumentDescriptor;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariableDescriptor;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.model.Argument;
 import org.eclipse.ptp.debug.external.cdi.model.ArgumentDescriptor;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
+import org.eclipse.ptp.debug.external.cdi.model.GlobalVariable;
+import org.eclipse.ptp.debug.external.cdi.model.GlobalVariableDescriptor;
 import org.eclipse.ptp.debug.external.cdi.model.LocalVariable;
 import org.eclipse.ptp.debug.external.cdi.model.LocalVariableDescriptor;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
@@ -61,6 +64,27 @@ public class VariableManager extends Manager {
 		System.out.println("VariableManager.update()");
 	}
 	
+	public GlobalVariableDescriptor getGlobalVariableDescriptor(Target target, String filename, String function, String name) throws CDIException {
+		if (filename == null) {
+			filename = new String();
+		}
+		if (function == null) {
+			function = new String();
+		}
+		if (name == null) {
+			name = new String();
+		}
+		StringBuffer buffer = new StringBuffer();
+		if (filename.length() > 0) {
+			buffer.append('\'').append(filename).append('\'').append("::"); //$NON-NLS-1$
+		}
+		if (function.length() > 0) {
+			buffer.append(function).append("::"); //$NON-NLS-1$
+		}
+		buffer.append(name);
+		return new GlobalVariableDescriptor(target, null, null, buffer.toString(), null, 0, 0);
+	}
+
 	public ICDIArgumentDescriptor[] getArgumentDescriptors(StackFrame frame) throws CDIException {
 		List argObjects = new ArrayList();
 		Target target = (Target)frame.getTarget();
@@ -108,6 +132,8 @@ public class VariableManager extends Manager {
 			return createArgument((ArgumentDescriptor)varDesc);
 		} else if (varDesc instanceof LocalVariableDescriptor) {
 			return createLocalVariable((LocalVariableDescriptor)varDesc);
+		} else if (varDesc instanceof GlobalVariableDescriptor) {
+			return createGlobalVariable((GlobalVariableDescriptor)varDesc);
 		}
 		throw new CDIException(CDIResources.getString("cdi.VariableManager.Unknown_variable_object")); //$NON-NLS-1$			
 	}
@@ -127,6 +153,21 @@ public class VariableManager extends Manager {
 		throw new CDIException(CDIResources.getString("cdi.VariableManager.Unknown_variable_object")); //$NON-NLS-1$
 	}
 	
+	public GlobalVariable createGlobalVariable(GlobalVariableDescriptor varDesc) throws CDIException {
+		System.out.println("VariableManager.createGlobalVariable()");
+		StackFrame frame = (StackFrame) varDesc.getStackFrame();
+		Target target = (Target)frame.getTarget();
+		Session session = (Session) target.getSession();
+		IDebugger debugger = session.getDebugger();
+		DebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+		ICDIGlobalVariable[] vars = debugger.listGlobalVariables(newSet);
+		for (int i = 0; i < vars.length; i++) {
+			if (varDesc.getName().equals(vars[i].getName()))
+				return new GlobalVariable(varDesc, vars[i].getValue().getValueString());
+		}
+		throw new CDIException(CDIResources.getString("cdi.VariableManager.Unknown_variable_object")); //$NON-NLS-1$
+	}
+
 	public Argument createArgument(ArgumentDescriptor argDesc) throws CDIException {
 		System.out.println("VariableManager.createArgument()");
 		StackFrame frame = (StackFrame) argDesc.getStackFrame();

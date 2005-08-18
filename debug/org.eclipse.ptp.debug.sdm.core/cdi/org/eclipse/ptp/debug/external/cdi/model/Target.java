@@ -61,6 +61,7 @@ import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
+import org.eclipse.ptp.debug.external.cdi.VariableManager;
 
 public class Target extends SessionObject implements IPCDITarget {
 	
@@ -108,7 +109,8 @@ public class Target extends SessionObject implements IPCDITarget {
 	public ICDIVariableDescriptor getGlobalVariableDescriptors(String filename, String function, String name) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.getGlobalVariableDescriptors()");
-		return null;
+		VariableManager varMgr = ((Session)getSession()).getVariableManager();
+		return varMgr.getGlobalVariableDescriptor(this, filename, function, name);
 	}
 	
 	public ICDIRegisterGroup[] getRegisterGroups() throws CDIException {
