@@ -24,19 +24,87 @@ import java.util.ArrayList;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
+import org.eclipse.ptp.debug.external.utils.Queue;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 
 public class ParallelDebugger extends AbstractDebugger {
-
+	
+	public class DebugEventThread extends Thread {
+		AbstractDebugger dbg;
+		
+		public DebugEventThread(AbstractDebugger d) {
+			super("IDebugger Event Thread"); //$NON-NLS-1$
+			dbg = d;
+		}
+		
+		public void run() {
+			// Signal by the session of time to die.
+			while (dbg.isExiting() != true) {
+				IPCDIEvent event = null;
+				int ev;
+				// Wait for event from external debugger
+				// DbgWaitEvent();
+				
+				// Convert to IPCDIEvent
+				/*
+				switch (ev) {
+				case DBGEVENT_BPHIT:
+					break;
+					
+				case DBGEVENT_STEPCOMPLETED:
+					break
+				
+				case DBGEVENT_EXIT:
+				}
+				*/
+				Queue eventQueue = dbg.getEventQueue();
+				// removeItem() will block until an item is available.
+				eventQueue.addItem(event);
+			}
+			System.out.println("EventThread exits");
+		}
+	}
+	
+	private DebugEventThread eventThread;
+	private long cmdTimeout = 1000; // FIXME
+	
 	protected void startDebugger(IPJob job) {
+		eventThread = new DebugEventThread(this);
 	}
 	
 	protected void stopDebugger() {
+		// Kill the event Thread ... if it is not us.
+		if (!eventThread.equals(Thread.currentThread())) {			
+			// Kill the event Thread.
+			try {
+				if (eventThread.isAlive()) {
+					eventThread.interrupt();
+					eventThread.join(cmdTimeout);
+				}
+			} catch (InterruptedException e) {
+			}		
+		}
+	}
+	
+	public Process getDebuggerProcess() {
+		return null;
+	}
+	
+	public void restart() throws CDIException {
+		
+	}
+	
+	public void run(String[] args) throws CDIException {
+		
 	}
 	
 	public void go(IPCDIDebugProcessSet procs) throws CDIException {
@@ -78,11 +146,15 @@ public class ParallelDebugger extends AbstractDebugger {
 		return null;
 	}
 	
-	public ICDIVariable[] listVariables(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException {
+	public ICDILocalVariable[] listLocalVariables(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException {
 		return null;
 	}
 	
-	public ICDIVariable[] listGlobalVariables(IPCDIDebugProcessSet procs) throws CDIException {
+	public ICDIGlobalVariable[] listGlobalVariables(IPCDIDebugProcessSet procs) throws CDIException {
+		return null;
+	}
+	
+	public ICDIArgument[] listArguments(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException {
 		return null;
 	}
 }
