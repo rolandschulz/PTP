@@ -113,7 +113,7 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		
 		threads = new SimThread[numThreads];
 		for (int i = 0; i < numThreads; i++) {
-			threads[i] = new SimThread(i, Integer.parseInt(pid));
+			threads[i] = new SimThread(i, taskId);
 		}
 		
 		err = null;
@@ -139,7 +139,7 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 								break;
 							}
 						}
-						Thread.sleep(3000);
+						Thread.sleep(2000);
 					} catch (InterruptedException e) {
 					}
 				}
@@ -150,7 +150,7 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		procThread.start();
 		
 	}
-
+	
 	private void setOutputStore() {
 		Preferences preferences = PTPCorePlugin.getDefault()
 				.getPluginPreferences();
@@ -492,7 +492,7 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 	}
 	
 	private void initCommands(SimQueue cmds) {
-		ArrayList cmd, cmd2;
+		ArrayList cmd, cmd2, cmd3, cmd4;
 
 		cmd = new ArrayList();
 		cmd.add(0, "0");
@@ -503,11 +503,17 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		cmd2.add(0, "0");
 		cmd2.add(1, "break");
 		cmd2.add(2, "5");
+		
+		cmd3 = new ArrayList();
+		cmd3.add(0, "-1");
+		cmd3.add(1, "exitProcess");
+		cmd3.add(2, "");
 
-		cmds.addItem(cmd2);
+		//cmds.addItem(cmd2);
 		for (int j = 0; j < 30; j++) {
 			cmds.addItem(cmd);
 		}
+		cmds.addItem(cmd3);
 	}
 	
 	public int exitValue() {

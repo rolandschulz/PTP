@@ -38,9 +38,11 @@ import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIAddressBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointCreatedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.AddressBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.AddressLocation;
+import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.FunctionBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.FunctionLocation;
 import org.eclipse.ptp.debug.external.cdi.model.LineBreakpoint;
@@ -116,7 +118,7 @@ public class BreakpointManager extends Manager {
 		System.out.println("BreakpointManager.setNewLocationBreakpoint()");
 		
 		Target target = (Target)bkpt.getTarget();
-		Session sess = (Session) target.getSession();
+		Session session = (Session) target.getSession();
 		
 		try {
 			setLocationBreakpoint(bkpt);
@@ -128,7 +130,14 @@ public class BreakpointManager extends Manager {
 			bitList.set(pId);
 			
 			//sess.getDebugger().fireEvent(new EBreakpointCreated(bitSet));
-			sess.getDebugger().fireEvent(new BreakpointCreatedEvent(sess, bitList));
+			session.getDebugger().fireEvent(new BreakpointCreatedEvent(session, bitList));
+			IPCDIDebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+			if (bkpt instanceof LineBreakpoint) {
+				session.getDebugger().setLineBreakpoint(newSet, (ICDILineBreakpoint) bkpt);
+			} else if (bkpt instanceof FunctionBreakpoint) {
+				session.getDebugger().setFunctionBreakpoint(newSet, (ICDIFunctionBreakpoint) bkpt);
+			}
+			
 			
 		} catch (CDIException e) {
 		}

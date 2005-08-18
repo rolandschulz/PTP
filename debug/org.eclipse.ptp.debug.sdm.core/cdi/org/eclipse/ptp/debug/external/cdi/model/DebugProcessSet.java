@@ -48,7 +48,7 @@ public class DebugProcessSet implements IPCDIDebugProcessSet {
 	}
 	
 	public IPCDIDebugProcess[] getProcesses() {
-		return (IPCDIDebugProcess[]) processList.toArray();
+		return (IPCDIDebugProcess[]) processList.toArray(new IPCDIDebugProcess[0]);
 	}
 	
 	public IPCDIDebugProcess getProcess(int number) {

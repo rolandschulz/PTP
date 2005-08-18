@@ -19,12 +19,16 @@
  package org.eclipse.ptp.debug.external.simulator;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
@@ -33,18 +37,23 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
+import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
+import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.Argument;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
+import org.eclipse.ptp.debug.external.cdi.model.FunctionBreakpoint;
+import org.eclipse.ptp.debug.external.cdi.model.LineBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.LocalVariable;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
+import org.eclipse.ptp.debug.external.utils.BitList;
 import org.eclipse.ptp.rtsystem.simulation.SimProcess;
 import org.eclipse.ptp.rtsystem.simulation.SimStackFrame;
 import org.eclipse.ptp.rtsystem.simulation.SimThread;
 import org.eclipse.ptp.rtsystem.simulation.SimVariable;
 
-public class DebugSimulator extends AbstractDebugger {
+public class DebugSimulator extends AbstractDebugger implements Observer {
 
 	final int RUNNING = 10;
 	final int SUSPENDED = 11;
@@ -57,15 +66,21 @@ public class DebugSimulator extends AbstractDebugger {
 	DQueue debuggerCommands = null;
 	
 	private void initializeSimulatedProcessesCode(DQueue dQ) {
-		ArrayList cmd;
+		ArrayList cmd, cmd2;
 		
 		cmd = new ArrayList();
 		cmd.add(0, "0");
 		cmd.add(1, "print");
 		cmd.add(2, "DebuggerOutput");
 		
+		cmd2 = new ArrayList();
+		cmd2.add(0, "-1");
+		cmd2.add(1, "sleep");
+		cmd2.add(2, "10000");
+
+		dQ.addItem(cmd);
 		for (int i = 0; i < 30; i++) {
-			dQ.addItem(cmd);
+			dQ.addItem(cmd2);
 		}
 	}
 	
@@ -74,6 +89,8 @@ public class DebugSimulator extends AbstractDebugger {
 		debuggerCommands = new DQueue();
 		initializeSimulatedProcessesCode(debuggerCommands);
 		debuggerProcess = new DProcess("Debugger", -1, 1, debuggerCommands, this);
+		
+		
 	}
 	
 	protected void stopDebugger() {
@@ -106,7 +123,7 @@ public class DebugSimulator extends AbstractDebugger {
 				list.add(frame);
 			}
 		}
-		return (ICDIStackFrame[]) list.toArray();
+		return (ICDIStackFrame[]) list.toArray(new ICDIStackFrame[0]);
 	}
 
 	public void setCurrentStackFrame(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException {
@@ -149,7 +166,7 @@ public class DebugSimulator extends AbstractDebugger {
 				}
 			}
 		}
-		return (ICDIArgument[]) list.toArray();
+		return (ICDIArgument[]) list.toArray(new ICDIArgument[0]);
 	}
 
 	public ICDILocalVariable[] listLocalVariables(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException {
@@ -182,7 +199,7 @@ public class DebugSimulator extends AbstractDebugger {
 				}
 			}
 		}
-		return (ICDILocalVariable[]) list.toArray();
+		return (ICDILocalVariable[]) list.toArray(new ICDILocalVariable[0]);
 	}
 
 	public ICDIGlobalVariable[] listGlobalVariables(IPCDIDebugProcessSet procs) throws CDIException {
@@ -210,6 +227,14 @@ public class DebugSimulator extends AbstractDebugger {
 		// Auto-generated method stub
 		System.out.println("DebugSimulator.go()");
 		state = RUNNING;
+		
+		if (procs == null)
+			return;
+		
+		IPCDIDebugProcess[] procList = procs.getProcesses();
+		for (int i = 0; i < procList.length; i++) {
+			((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0).resume();
+		}
 	}
 
 	public void halt(IPCDIDebugProcessSet procs) throws CDIException {
@@ -237,18 +262,44 @@ public class DebugSimulator extends AbstractDebugger {
 		
 	}
 
-	public void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDIBreakpoint bpt) throws CDIException {
-		// TODO Auto-generated method stub
+	public void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDILineBreakpoint bpt) throws CDIException {
+		System.out.println("DebugSimulator.setLineBreakpoint() : " +
+				((LineBreakpoint) bpt).getLineNumber());
+		int line = ((LineBreakpoint) bpt).getLineNumber();
 		
+		IPCDIDebugProcess[] procList = procs.getProcesses();
+		for (int i = 0; i < procList.length; i++) {
+			((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0).addObserver(this);
+			((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0).addBreakpoint(line);
+		}
+
+		//((SimProcess) ((DebugProcess) getProcess(0)).getPProcess()).getThread(0).addBreakpoint(line);
+
 	}
 
-	public void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIBreakpoint bpt) throws CDIException {
-		// TODO Auto-generated method stub
-		
+	public void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIFunctionBreakpoint bpt) throws CDIException {
+		System.out.println("DebugSimulator.setFunctionBreakpoint() : " +
+				((FunctionBreakpoint) bpt).getFunction());
 	}
 
 	public void deleteBreakpoints(ICDIBreakpoint[] bp) throws CDIException {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void update(Observable o, Object arg) {
+		ArrayList list = (ArrayList) arg;
+		int procId = ((Integer) list.get(0)).intValue();
+		String event = (String) list.get(1);
+		
+		BitList bitList = new BitList();
+		bitList.set(procId);
+		
+		if (event.equals("BREAKPOINTHIT"))
+			fireEvent(new BreakpointHitEvent(getSession(), bitList));
+		else if (event.equals("RESUMED"))
+			fireEvent(new InferiorResumedEvent(getSession(), bitList));
+			
+		// Do Something
 	}
 }
