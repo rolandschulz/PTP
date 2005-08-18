@@ -34,6 +34,8 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
@@ -41,6 +43,7 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
+import org.eclipse.ptp.debug.external.cdi.event.TargetUnregisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.utils.BitList;
@@ -56,11 +59,12 @@ public class Session implements IPCDISession, ICDISessionObject {
 	ILaunch dLaunch;
 	IBinaryObject dBinObject;
 	IDebugger debugger;
+	IPJob dJob;
 	
 	Hashtable currentDebugTargetList;
 	Hashtable currentProcessSetList;
 	
-	public Session(IDebugger iDebugger, ILaunch launch, IBinaryObject binObj) {
+	public Session(IPJob job, IDebugger iDebugger, ILaunch launch, IBinaryObject binObj) {
 		props = new Properties();
 		configuration = new SessionConfiguration(this);
 		
@@ -68,6 +72,7 @@ public class Session implements IPCDISession, ICDISessionObject {
 		dBinObject = binObj;
 		debugger = iDebugger;
 		debugger.setSession(this);
+		dJob = job;
 		
 		eventManager = new EventManager(this);
 		breakpointManager = new BreakpointManager(this);
@@ -89,8 +94,8 @@ public class Session implements IPCDISession, ICDISessionObject {
 		}
 		
 		/* Initially we only create process/target 0 */
-		registerTarget(0);
-		registerTarget(1);
+		registerTarget(0, true);
+		registerTarget(1, true);
 	}
 	
 	public IDebugger getDebugger() {
@@ -138,7 +143,7 @@ public class Session implements IPCDISession, ICDISessionObject {
 		return (IPCDIDebugProcessSet) currentProcessSetList.get(name);
 	}
 
-	public void registerTarget(int procNum) {
+	public void registerTarget(int procNum, boolean sendEvent) {
 		if (isRegistered(procNum))
 			return;
 		
@@ -146,10 +151,13 @@ public class Session implements IPCDISession, ICDISessionObject {
 
 		currentDebugTargetList.put(Integer.toString(target.getTargetId()), target);
 		
-		BitList bitList = new BitList();
-		bitList.set(procNum);
-		//debugger.fireEvent(new ETargetRegistered(bitSet));
-		debugger.fireEvent(new TargetRegisteredEvent(this, bitList));
+		if (sendEvent) {
+			BitList bitList = new BitList();
+			bitList.set(procNum);
+			debugger.fireEvent(new TargetRegisteredEvent(this, bitList));
+			dJob.findProcessByTaskId(procNum).
+				setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(true));
+		}
 		
 		try {
 			boolean stopInMain = dLaunch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
@@ -168,13 +176,24 @@ public class Session implements IPCDISession, ICDISessionObject {
 		}
 	}
 	
-	public void registerTargets(int[] procNums) {
+	public void registerTargets(int[] procNums, boolean sendEvent) {
+		BitList bitList = new BitList();
+		
 		for (int i = 0; i < procNums.length; i++) {
-			registerTarget(procNums[i]);
+			registerTarget(procNums[i], false);
+			bitList.set(procNums[i]);
+			
+			if (sendEvent)
+				dJob.findProcessByTaskId(procNums[i]).
+					setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(true));
+		}
+		
+		if (sendEvent) {
+			debugger.fireEvent(new TargetRegisteredEvent(this, bitList));
 		}
 	}
 
-	public void unregisterTarget(int procNum) {
+	public void unregisterTarget(int procNum, boolean sendEvent) {
 		if (!isRegistered(procNum))
 			return;
 		
@@ -183,11 +202,30 @@ public class Session implements IPCDISession, ICDISessionObject {
 		
 		String targetId = Integer.toString(procNum);
 		currentDebugTargetList.remove(targetId);
+
+		if (sendEvent) {
+			BitList bitList = new BitList();
+			bitList.set(procNum);
+			debugger.fireEvent(new TargetUnregisteredEvent(this, bitList));
+			dJob.findProcessByTaskId(procNum).
+				setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
+		}
 	}
 	
-	public void unregisterTargets(int[] targets) {
-		for (int i = 0; i < targets.length; ++i) {
-			unregisterTarget(targets[i]);
+	public void unregisterTargets(int[] procNums, boolean sendEvent) {
+		BitList bitList = new BitList();
+		
+		for (int i = 0; i < procNums.length; i++) {
+			unregisterTarget(procNums[i], false);
+			bitList.set(procNums[i]);
+			
+			if (sendEvent)
+				dJob.findProcessByTaskId(procNums[i]).
+					setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
+		}
+		
+		if (sendEvent) {
+			debugger.fireEvent(new TargetRegisteredEvent(this, bitList));
 		}
 	}
 	
