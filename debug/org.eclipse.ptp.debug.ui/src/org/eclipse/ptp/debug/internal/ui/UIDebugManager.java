@@ -232,20 +232,23 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				TargetRegisteredEvent targetRegisteredEvent = (TargetRegisteredEvent)event;
 				String job_id = targetRegisteredEvent.getDebugJob().getIDString();
 				IElementHandler elementHandler = getElementHandler(job_id);
+				IPJob job = findJobById(job_id);
 				int[] processes = event.getProcesses();
 				for (int j=0; j<processes.length; j++) {
-					IPProcess proc = findJobById(job_id).findProcessByTaskId(processes[i]);
+					System.out.println("--- proc task id: " + processes[i]);
+					IPProcess proc = job.findProcessByTaskId(processes[i]);
 					elementHandler.addRegisterElement(proc.getIDString());
 					elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(true);
 				}
 			}
 			else if (event instanceof TargetUnregisteredEvent) {
-				TargetRegisteredEvent targetRegisteredEvent = (TargetRegisteredEvent)event;
-				String job_id = targetRegisteredEvent.getDebugJob().getIDString();
+				TargetUnregisteredEvent targetUnregisteredEvent = (TargetUnregisteredEvent)event;
+				String job_id = targetUnregisteredEvent.getDebugJob().getIDString();
 				IElementHandler elementHandler = getElementHandler(job_id);
+				IPJob job = findJobById(job_id);
 				int[] processes = event.getProcesses();
 				for (int j=0; j<processes.length; j++) {
-					IPProcess proc = findJobById(job_id).findProcessByTaskId(processes[i]);
+					IPProcess proc = job.findProcessByTaskId(processes[i]);
 					elementHandler.removeRegisterElement(proc.getIDString());
 					elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(false);
 				}
