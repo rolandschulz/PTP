@@ -18,8 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.rtsystem.simulation;
 
+import java.util.ArrayList;
+import java.util.Observable;
 
-public class SimThread {
+
+public class SimThread extends Observable {
 
 	final int RUNNING = 10;
 	final int SUSPENDED = 11;
@@ -28,7 +31,7 @@ public class SimThread {
 	int state;
 	
 	int curLine;
-	int breakLine;
+	ArrayList breakLines;
 	SimStackFrame[] stackFrames;
 	int threadId;
 	int processId;
@@ -36,7 +39,7 @@ public class SimThread {
 	public SimThread(int tid, int pId) {
 		state = RUNNING;
 		curLine = 1;
-		breakLine = 0;
+		breakLines = new ArrayList();
 		threadId = tid;
 		processId = pId;
 		int numStackFrames = 1;
@@ -60,24 +63,59 @@ public class SimThread {
 	}
 
 	public void runCommand(SimInputStream in, String cmd, String arg) {
+		if (state == SUSPENDED)
+			return;
+		
 		if (cmd.equals("print")) {
 			checkBreakpoint();
-			in.printString(arg + " from process (pid) " + processId + " & thread #" + threadId);
+			in.printString(curLine + " : " + arg + " from process (pid) " + processId + " & thread #" + threadId);
 			curLine++;
-		} else	if (cmd.equals("break")) {
+/*		} else	if (cmd.equals("break")) {
 			breakLine = Integer.parseInt(arg);
-		}
+*/		}
 	}
 	
+	public void addBreakpoint(int line) {
+		breakLines.add(new Integer(line));
+	}
 	
 	public void checkBreakpoint() {
-		if (curLine == breakLine) {
-			state = SUSPENDED;
-			//BitList bitList = new BitList();
-			//bitList.set(processId);
-			//dSim.fireEvent(new EBreakpointHit(bitSet));
-			//dSim.fireEvent(new BreakpointHitEvent(dSim.getSession(), bitList));
-			// Do Something
+		Integer[] bps = (Integer []) breakLines.toArray(new Integer[0]);
+		for (int i = 0; i < bps.length; i++) {
+			if (curLine == bps[i].intValue()) {
+				state = SUSPENDED;
+				System.out.println("Process: " + processId + " Thread: " + 
+						threadId + " SUSPENDED at line " + curLine);
+				
+				setChanged();
+				ArrayList list = new ArrayList();
+				list.add(0, new Integer(processId));
+				list.add(1, new String("BREAKPOINTHIT"));
+				
+				for (int j = 0; j < stackFrames.length; j++) {
+					stackFrames[j].setLine(curLine);
+				}
+				
+				notifyObservers(list);
+				//BitList bitList = new BitList();
+				//bitList.set(processId);
+				//dSim.fireEvent(new EBreakpointHit(bitSet));
+				//dSim.fireEvent(new BreakpointHitEvent(dSim.getSession(), bitList));
+				// Do Something
+				return;
+			}
 		}
+
+	}
+	
+	public void resume() {
+		state = RUNNING;
+		
+		setChanged();
+		ArrayList list = new ArrayList();
+		list.add(0, new Integer(processId));
+		list.add(1, new String("RESUMED"));
+		
+		notifyObservers(list);
 	}
 }

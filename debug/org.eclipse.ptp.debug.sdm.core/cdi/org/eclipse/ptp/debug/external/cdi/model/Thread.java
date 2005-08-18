@@ -115,7 +115,7 @@ public class Thread extends PTPObject implements ICDIThread {
 
 	public void resume() throws CDIException {
 		// Auto-generated method stub
-		System.out.println("Thread.resume()");
+		System.out.println("Thread.resume1()");
 	}
 
 	public void stepOver() throws CDIException {
@@ -205,17 +205,23 @@ public class Thread extends PTPObject implements ICDIThread {
 
 	public void resume(boolean passSignal) throws CDIException {
 		// Auto-generated method stub
-		System.out.println("Thread.resume()");
+		System.out.println("Thread.resume2()");
+		
+		Target target = (Target) getTarget();
+		Session session = (Session) target.getSession();
+		IDebugger debugger = session.getDebugger();
+		DebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+		debugger.go(newSet);
 	}
 
 	public void resume(ICDILocation location) throws CDIException {
 		// Auto-generated method stub
-		System.out.println("Thread.resume()");
+		System.out.println("Thread.resume3()");
 	}
 
 	public void resume(ICDISignal signal) throws CDIException {
 		// Auto-generated method stub
-		System.out.println("Thread.resume()");
+		System.out.println("Thread.resume4()");
 	}
 
 	public void suspend() throws CDIException {

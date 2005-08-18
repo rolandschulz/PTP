@@ -28,7 +28,9 @@ import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.ptp.core.IPJob;
@@ -77,8 +79,8 @@ public interface IDebugger {
 	public abstract void restart() throws CDIException;
 	
 	/* Breakpoints */
-	public abstract void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDIBreakpoint bpt) throws CDIException;
-	public abstract void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIBreakpoint bpt) throws CDIException;
+	public abstract void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDILineBreakpoint bpt) throws CDIException;
+	public abstract void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIFunctionBreakpoint bpt) throws CDIException;
 	public abstract void deleteBreakpoints(ICDIBreakpoint[] bp) throws CDIException;
 	
 	/* Events */

@@ -75,5 +75,9 @@ public class SimStackFrame {
 	public SimVariable[] getLocalVars() {
 		return local;
 	}
+	
+	public void setLine(int l) {
+		line = l;
+	}
 
 }
