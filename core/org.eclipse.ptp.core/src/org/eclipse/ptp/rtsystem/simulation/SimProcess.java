@@ -542,4 +542,8 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 	public int getThreadCount() {
 		return threads.length;
 	}
+
+	public void setAttribute(String key, Object o) {
+		attribs.put(key, o);
+	}
 }

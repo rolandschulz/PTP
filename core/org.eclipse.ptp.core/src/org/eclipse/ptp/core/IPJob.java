@@ -137,4 +137,6 @@ public interface IPJob extends IPElement {
 	 * @return The Universe that this Job resides within
 	 */
 	public IPUniverse getUniverse();
+	
+	public IPProcess findProcessByTaskId(int taskId);
 }

@@ -73,6 +73,8 @@ public interface IPElement extends ISearchPageScoreComputer {
 	 */
 	public Object getAttribute(String key);
 	
+	public void setAttribute(String key, Object o);
+	
 	/**
 	 * Returns a name for this Element so it can be distinguished from other
 	 * Elements as well as printed out easily.
