@@ -23,4 +23,5 @@ public interface AttributeConstants {
 	public static final String ATTRIB_NAME = "ATTRIB_NAME";
 	public static final String ATTRIB_TYPE = "ATTRIB_TYPE";
 	public static final String ATTRIB_TASKID = "ATTRIB_TASKID";
+	public static final String ATTRIB_ISREGISTERED = "ATTRIB_ISREGISTERED";
 }
