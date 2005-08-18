@@ -56,6 +56,10 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 	public Object getAttribute(String key) {
 		return attribs.get(key);
 	}
+
+	public void setAttribute(String key, Object o) {
+		attribs.put(key, o);
+	}
 	
 	public String getElementName() {
 		// return NAME_TAG + getKey();

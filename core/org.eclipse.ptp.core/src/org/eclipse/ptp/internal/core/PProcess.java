@@ -65,6 +65,7 @@ public class PProcess extends Parent implements IPProcess {
 		super(element, name, key, P_PROCESS);
 		this.pid = pid;
 		attribs.put(AttributeConstants.ATTRIB_TASKID, new Integer(taskId));
+		attribs.put(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
 		this.exitCode = exitCode;
 		setStatus(status);
 		IPJob job = getJob();

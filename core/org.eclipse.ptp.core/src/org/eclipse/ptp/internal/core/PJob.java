@@ -33,11 +33,13 @@ import org.eclipse.ptp.core.IPUniverse;
 public class PJob extends Parent implements IPJob {
 	protected String NAME_TAG = "root ";
 	protected boolean isDebugJob = false;
+	private ArrayList taskIdMap;
 
 	final public static int BASE_OFFSET = 10000;
 
 	public PJob(IPUniverse uni, String name, String key) {
 		super(uni, name, key, P_JOB);
+		taskIdMap = new ArrayList();
 	}
 	
 	public boolean isDebug() {
@@ -154,5 +156,21 @@ public class PJob extends Parent implements IPJob {
 				return (IPUniverse) current;
 		} while ((current = current.getParent()) != null);
 		return null;
+	}
+	
+	public void addChild(IPElement member) {
+		super.addChild(member);
+		if (member instanceof PProcess) {
+			PProcess p = (PProcess) member;
+			taskIdMap.add(p.getTaskId(), p.getProcessNumber());
+		}
+	}
+
+	public synchronized IPProcess findProcessByTaskId(int taskId) {
+		String procNumber = (String) taskIdMap.get(taskId);
+		if (procNumber == null)
+			return null;
+		else
+			return findProcess(procNumber);
 	}
 }
