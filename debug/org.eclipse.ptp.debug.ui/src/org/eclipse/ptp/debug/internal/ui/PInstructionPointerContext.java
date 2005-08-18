@@ -29,7 +29,7 @@ public class PInstructionPointerContext {
 	private ITextEditor fTextEditor;
 	private Annotation fAnnotation;
 
-	public PInstructionPointerContext(ITextEditor textEditor, Annotation annotation) {
+	public 3(ITextEditor textEditor, Annotation annotation) {
 		setTextEditor(textEditor);
 		setAnnotation(annotation);
 	}

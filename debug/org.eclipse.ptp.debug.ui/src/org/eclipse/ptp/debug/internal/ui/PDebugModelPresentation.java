@@ -56,6 +56,7 @@ import org.eclipse.debug.ui.IDebugEditorPresentation;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IValueDetailListener;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.ptp.debug.core.model.IPAddressBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
@@ -193,6 +194,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	}
 	
 	private Image getBaseImage(Object element) {
+		if (element instanceof Annotation) {
+			System.out.println("------ Annotation: " + ((Annotation)element).getType());
+		}
 		//TODO element can be DebugTarget, Thread
 		if (element instanceof IMarker) {
 			IBreakpoint bp = getBreakpoint((IMarker)element);

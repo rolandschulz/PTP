@@ -44,12 +44,20 @@
             name="org.eclipse.ptp.debug.core.breakpoint">
       </type>
       <type
-            markerType="org.eclipse.ptp.debug.ui.currentIP"
-            name="org.eclipse.ptp.debug.ui.currentIP">
+            markerType="org.eclipse.ptp.debug.ui.regCurrentIP"
+            name="org.eclipse.ptp.debug.ui.regCurrentIP">
       </type>
       <type
-            markerType="org.eclipse.ptp.debug.ui.secondaryIP"
-            name="org.eclipse.ptp.debug.ui.secondaryIP">
+            markerType="org.eclipse.ptp.debug.ui.regSecondaryIP"
+            name="org.eclipse.ptp.debug.ui.regSecondaryIP">
+      </type>      
+      <type
+            markerType="org.eclipse.ptp.debug.ui.currentSetIP"
+            name="org.eclipse.ptp.debug.ui.currentSetIP">
+      </type>      
+      <type
+            markerType="org.eclipse.ptp.debug.ui.setIP"
+            name="org.eclipse.ptp.debug.ui.setIP">
       </type>      
    </extension>
    <extension
@@ -62,36 +70,64 @@
             icon="icons/debug/bpt.gif">
       </specification>
       <specification
-            annotationType="org.eclipse.ptp.debug.ui.currentIP"
-            icon="icons/debug/ptp_bpt_set.gif"
-            label="ehheheh current ip"
+            annotationType="org.eclipse.ptp.debug.ui.regCurrentIP"
+            icon="icons/debug/reg_cur_ip.gif"
             presentationLayer="6"
             colorPreferenceKey="ptpCurrentIPColor"
             colorPreferenceValue="100,100,100"
             highlightPreferenceValue="true"
-            highlightPreferenceKey="ptpCurrentIPHighlight"
+            highlightPreferenceKey="ptpRegCurrentIPHighlight"
             textPreferenceValue="false"
-            textPreferenceKey="ptpCurrentIPIndication"
+            textPreferenceKey="ptpRegCurrentIPIndication"
             verticalRulerPreferenceValue="true"
-            verticalRulerPreferenceKey="ptpCurrentIPVerticalRuler"
+            verticalRulerPreferenceKey="ptpRegCurrentIPVerticalRuler"
             overviewRulerPreferenceValue="true"
-            overviewRulerPreferenceKey="ptpCucurrentIPOverviewRuler">
+            overviewRulerPreferenceKey="ptpRegCucurrentIPOverviewRuler">
       </specification>
       <specification
-            annotationType="org.eclipse.ptp.debug.ui.secondaryIP"
-            icon="icons/debug/bpt.gif"
-            label="nononono secondary ip"
+            annotationType="org.eclipse.ptp.debug.ui.regSecondaryIP"
+            icon="icons/debug/reg_sec_ip.gif"
             presentationLayer="6"
             colorPreferenceValue="200,200,100"
             colorPreferenceKey="ptpSecondaryIPColor"
             highlightPreferenceValue="true"
-            highlightPreferenceKey="ptpSecondaryIPHighlight"
+            highlightPreferenceKey="ptpRegSecondaryIPHighlight"
             textPreferenceValue="false"
-            textPreferenceKey="ptpSecondaryIPIndication"
+            textPreferenceKey="ptpRegSecondaryIPIndication"
             verticalRulerPreferenceValue="true"
-            verticalRulerPreferenceKey="ptpSecondaryIPVerticalRuler"
+            verticalRulerPreferenceKey="ptpRegSecondaryIPVerticalRuler"
             overviewRulerPreferenceValue="true"
-            overviewRulerPreferenceKey="ptpSecondaryIPOverviewRuler">
+            overviewRulerPreferenceKey="ptpRegSecondaryIPOverviewRuler">
+      </specification>
+      <specification
+            annotationType="org.eclipse.ptp.debug.ui.currentSetIP"
+            icon="icons/debug/cur_set_ip.gif"
+            presentationLayer="5"
+            colorPreferenceValue="200,200,100"
+            colorPreferenceKey="ptpSecondaryIPColor"
+            highlightPreferenceValue="true"
+            highlightPreferenceKey="ptpCurrentSetIPHighlight"
+            textPreferenceValue="false"
+            textPreferenceKey="ptpCurrentSetIPIndication"
+            verticalRulerPreferenceValue="true"
+            verticalRulerPreferenceKey="ptpCurrentSetIPVerticalRuler"
+            overviewRulerPreferenceValue="true"
+            overviewRulerPreferenceKey="ptpCurrentSetIPOverviewRuler">
+      </specification>
+      <specification
+            annotationType="org.eclipse.ptp.debug.ui.setIP"
+            icon="icons/debug/set_ip.gif"
+            presentationLayer="5"
+            colorPreferenceValue="200,200,100"
+            colorPreferenceKey="ptpSecondaryIPColor"
+            highlightPreferenceValue="true"
+            highlightPreferenceKey="ptpSetIPHighlight"
+            textPreferenceValue="false"
+            textPreferenceKey="ptpSetIPIndication"
+            verticalRulerPreferenceValue="true"
+            verticalRulerPreferenceKey="ptpSetIPVerticalRuler"
+            overviewRulerPreferenceValue="true"
+            overviewRulerPreferenceKey="ptpSetIPOverviewRuler">
       </specification>
    </extension>
    

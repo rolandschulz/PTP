@@ -24,9 +24,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IStackFrame;
@@ -38,9 +43,15 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -67,56 +78,12 @@ public class PAnnotationManager {
 		fDebugTargetMap = null;
 	}
 		
-	private ITextEditor getTextEditor(IEditorPart editorPart) {
-		if (editorPart instanceof ITextEditor)				
-			return (ITextEditor)editorPart;
-
-		return (ITextEditor) editorPart.getAdapter(ITextEditor.class);
-	}
-	public IResource getResource(IEditorInput editorInput) {
-		if (editorInput instanceof IFileEditorInput)
-			return ((IFileEditorInput)editorInput).getFile();
-
-		return null;
-	}
 	public IStackFrame getTopStackFrame(IThread thread) {
 		try {
 			return thread.getTopStackFrame();
 		} catch (DebugException de) {
 			return null;
 		}
-	}
-	public IMarker createMarker(IResource resource, IThread thread, IStackFrame stackFrame) throws CoreException {
-		IStackFrame topStack = getTopStackFrame(thread);
-		return resource.createMarker((topStack == null || stackFrame.equals(topStack))?IPTPDebugUIConstants.ANN_INSTR_POINTER_CURRENT:IPTPDebugUIConstants.ANN_INSTR_POINTER_SECONDARY);
-	}
-	public Position createPosition(IStackFrame stackFrame, IDocument doc) {
-		if (doc == null)
-			return null;
-		
-		int charStart = -1;
-		int length = -1; 
-		try {
-			charStart = stackFrame.getCharStart();
-			length = stackFrame.getCharEnd() - charStart;
-		} catch (DebugException de) {}
-
-		if (charStart < 0) {
-			try {
-				int lineNumber = stackFrame.getLineNumber() - 1;
-				IRegion region = doc.getLineInformation(lineNumber);
-				charStart = region.getOffset();
-				length = region.getLength();
-			} catch (BadLocationException ble) {
-				return null;
-			} catch (DebugException de) {
-				return null;
-			}
-		}
-		if (charStart < 0)
-			return null;
-
-		return new Position(charStart, length);
 	}
 	
 	//FIXME Need to redo it
@@ -169,23 +136,131 @@ public class PAnnotationManager {
 		return true;
 	}
 	
-	private Annotation createAnnotation(IAnnotationModel annModel, Position position, IResource resource, IThread thread, IStackFrame stackFrame) throws CoreException {
-		boolean appendMsg = false;
+	public IEditorPart openEditor(final IWorkbenchPage page, final IEditorInput input, final String id) {
+		final IEditorPart[] editor = new IEditorPart[] {null};
+		Runnable r = new Runnable() {
+			public void run() {
+				try {
+					editor[0] = page.openEditor(input, id, false);
+				} catch (PartInitException e) {
+					PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot open editor", e);
+				}					
+			}
+		}; 
+		BusyIndicator.showWhile(PTPDebugUIPlugin.getDisplay(), r);
+		return editor[0];
+	}	
+	
+	//FIXME hard the CEditor id
+	public IEditorPart openEditor(IFile file) {
+		String fileExt = file.getFileExtension();
+		if (!fileExt.equals("c") && !fileExt.equals("cpp"))
+			return null;
+		
+		String id = "org.eclipse.cdt.ui.editor.CEditor";
+		IWorkbenchPage page = PTPDebugUIPlugin.getActiveWorkbenchWindow().getActivePage();
+		IEditorPart editor = page.getActiveEditor();
+		if (editor != null) {
+			IEditorInput editorInput = editor.getEditorInput();
+			if (editorInput instanceof IFileEditorInput)
+				if (((IFileEditorInput)editorInput).getFile().equals(file)) {
+					page.bringToTop(editor);
+					return editor;
+				}
+		}
+		
+		if (editor == null) {
+			IEditorReference[] refs = page.getEditorReferences();
+			for (int i = 0; i < refs.length; i++) {
+				IEditorPart refEditor = refs[i].getEditor(false);
+				IEditorInput editorInput = refEditor.getEditorInput();
+				if (editorInput instanceof IFileEditorInput) {
+					if (((IFileEditorInput)editorInput).getFile().equals(file)) {
+						editor = refEditor;
+						page.bringToTop(editor);
+						return editor;
+					}
+				}
+			}
+		}
+		return openEditor(page, new FileEditorInput(file), id);
+	}
+	public IFile findFile(String fullPathFileName) {
+		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		return workspaceRoot.getFile(new Path(fullPathFileName));
+	}
+	public ITextEditor getTextEditor(IEditorPart editorPart) {
+		if (editorPart instanceof ITextEditor)				
+			return (ITextEditor)editorPart;
+
+		return (ITextEditor) editorPart.getAdapter(ITextEditor.class);
+	}
+	public IFile getResource(IEditorInput editorInput) {
+		if (editorInput instanceof IFileEditorInput)
+			return ((IFileEditorInput)editorInput).getFile();
+
+		return null;
+	}
+	public Position createPosition(int lineNumber, IDocument doc) {
+		if (doc == null)
+			return null;
+		
+		try {
+			IRegion region = doc.getLineInformation(lineNumber);
+			int charStart = region.getOffset();
+			int length = region.getLength();
+			if (charStart < 0)
+				return null;
+
+			return new Position(charStart, length);
+		} catch (BadLocationException ble) {
+			return null;
+		}
+	}
+	public IMarker createMarker(IResource resource, String type) throws CoreException {
+		return resource.createMarker(type);
+	}
+	public void addAnnotation(String fullPathFileName, int lineNumber, int[] taskId) throws CoreException {
+		IFile file = findFile(fullPathFileName);
+		if (file == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		
+		IEditorPart editor = openEditor(file);
+		if (editor == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		
+		addAnnotation(editor, file, lineNumber, taskId);
+	}
+	
+	public void addAnnotation(IEditorPart editor, IFile file, int lineNumber, int[] taskId) throws CoreException {
+		ITextEditor textEditor = getTextEditor(editor);
+		IDocumentProvider docProvider = textEditor.getDocumentProvider();
+		IAnnotationModel annotationModel = docProvider.getAnnotationModel(editor.getEditorInput());
+		if (annotationModel == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		
+		Position position = createPosition(lineNumber, docProvider.getDocument(editor.getEditorInput()));
+		if (position == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		
+		
+	}
+	
+	public Annotation createAnnotation(IAnnotationModel annotationModel, Position position, IFile file, int lineNumber, String type) {
 		PInstructionPointerAnnotation ptrAnnotation = null;
-		for (Iterator i=annModel.getAnnotationIterator(); i.hasNext();) {
+		for (Iterator i=annotationModel.getAnnotationIterator(); i.hasNext();) {
 			Annotation annotation = (Annotation)i.next();
 			if (annotation instanceof PInstructionPointerAnnotation) {
-				if (annModel.getPosition(annotation).equals(position)) {
+				if (annotationModel.getPosition(annotation).equals(position)) {
 					ptrAnnotation = (PInstructionPointerAnnotation)annotation;
-					annModel.removeAnnotation(annotation);
-					appendMsg = true;
+					annotationModel.removeAnnotation(annotation);
 					break;
 				}
 			}
 		}
 		
 		if (ptrAnnotation == null) {
-			IMarker marker = createMarker(resource, thread, stackFrame);
+			IMarker marker = createMarker(file, type);
 			ptrAnnotation = new PInstructionPointerAnnotation(marker, stackFrame);
 		}
 		createStackFrameMessage(ptrAnnotation.getMarker(), stackFrame, appendMsg);

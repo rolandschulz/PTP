@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui;
 
+import java.util.BitSet;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 /**
@@ -28,11 +29,10 @@ import org.eclipse.ui.texteditor.MarkerAnnotation;
  *
  */
 public class PInstructionPointerAnnotation extends MarkerAnnotation {
-	private IStackFrame fStackFrame;
-
-	public PInstructionPointerAnnotation(IMarker marker, IStackFrame stackFrame) {
+	private BitSet tBitSet = null;
+	
+	public PInstructionPointerAnnotation(IMarker marker) {
 		super(marker);
-		fStackFrame = stackFrame;
 	}
 	
 	public void setMessage(String message) {
@@ -40,20 +40,29 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 			getMarker().setAttribute(IMarker.MESSAGE, message);
 		} catch (CoreException e) {}
 		setText(message);
+	}	
+	public String getMessage() {
+		return getText();
 	}
 	
-	public boolean equals(Object other) {
-		if (other instanceof PInstructionPointerAnnotation) {
-			return getStackFrame().equals(((PInstructionPointerAnnotation)other).getStackFrame());			
+	public void setTasks(BitSet tBitSet) {
+		this.tBitSet = tBitSet;
+	}
+	public int[] getTasks() {
+		return convertArray(tBitSet);		
+	}
+	public int[] convertArray(BitSet bitSet) {
+		int[] intArray = new int[bitSet.cardinality()];
+		for(int i=bitSet.nextSetBit(0), j=0; i>=0; i=bitSet.nextSetBit(i+1), j++) {
+			intArray[j] = i;
 		}
-		return false;
+		return intArray;		
 	}
-	
-	public int hashCode() {
-		return getStackFrame().hashCode();
+	public boolean contains(BitSet bitSet) {
+		return tBitSet.intersects(bitSet);
 	}
-
-	private IStackFrame getStackFrame() {
-		return fStackFrame;
+	public int[] containTasks(BitSet bitSet) {
+		bitSet.and(tBitSet);
+		return convertArray(bitSet);		
 	}
 }
