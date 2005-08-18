@@ -66,6 +66,11 @@ cp -vp org.eclipse.cdt.make.ui/plugin.properties ../org.eclipse.cdt.make.ui/plug
 cp -vp org.eclipse.cdt.make.ui/plugin.xml ../org.eclipse.cdt.make.ui/plugin.xml
 
 
+# org.eclipse.cdt.managedbuilder.core
+
+cp -vp org.eclipse.cdt.managedbuilder.core/src/org/eclipse/cdt/managedbuilder/makegen/gnu/GnuMakefileGenerator.java ../org.eclipse.cdt.managedbuilder.core/src/org/eclipse/cdt/managedbuilder/makegen/gnu/GnuMakefileGenerator.java
+
+
 # org.eclipse.cdt.managedbuilder.gnu.ui
 
 cp -vp org.eclipse.cdt.managedbuilder.gnu.ui/plugin.xml ../org.eclipse.cdt.managedbuilder.gnu.ui/plugin.xml
