@@ -93,11 +93,11 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	protected UIDebugManager uiDebugManager = null;
 	protected Map attributes = new HashMap(3);
 	private OverlayImageCache imageCache = new OverlayImageCache();
-	protected Map fDebugTargetMap = null;
+	protected PAnnotationManager annotationManager = null;
 	
 	public PDebugModelPresentation() {
 		uiDebugManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
-		fDebugTargetMap = new HashMap();
+		annotationManager = PAnnotationManager.getDefault();
 	}
 	
 	public static PDebugModelPresentation getDefault() {
@@ -553,114 +553,11 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		super.dispose();
 	}
 	
-	private ITextEditor getTextEditor(IEditorPart editorPart) {
-		ITextEditor textEditor = null;
-		if (editorPart instanceof ITextEditor)				
-			textEditor = (ITextEditor)editorPart;
-		else
-			textEditor = (ITextEditor) editorPart.getAdapter(ITextEditor.class);
-
-		return textEditor;	
+	public boolean addAnnotations(IEditorPart editorPart, IStackFrame stackFrame) {
+		return annotationManager.addAnnotations(editorPart, stackFrame);
 	}
 	
-	public boolean addAnnotations(IEditorPart editorPart, IStackFrame stackFrame) {
-		ITextEditor textEditor = getTextEditor(editorPart);
-		if (textEditor == null)
-			return false;
-		
-		IDocumentProvider docProvider = textEditor.getDocumentProvider();
-		IEditorInput editorInput = textEditor.getEditorInput();
-        IAnnotationModel annModel = docProvider.getAnnotationModel(editorInput);
-        if (annModel == null)
-            return false;
-
-        IThread thread = stackFrame.getThread();
-		IStackFrame tos = null;
-		try {
-			tos = thread.getTopStackFrame();
-		} catch (DebugException de) {
-		}
-
-		PInstructionPointerAnnotation instPtrAnnotation = new PInstructionPointerAnnotation(stackFrame, tos == null || stackFrame.equals(tos));
-		instPtrAnnotation.setText("FUCK YOU DAMN SHIT!!!");
-
-		Position position = null;
-		int charStart = -1;
-		int length = -1; 
-		try {
-			charStart = stackFrame.getCharStart();
-			length = stackFrame.getCharEnd() - charStart;
-		} catch (DebugException de) {
-		}
-		if (charStart < 0) {
-			IDocument doc = docProvider.getDocument(editorInput);
-			if (doc == null)
-				return false;
-
-			try {
-				int lineNumber = stackFrame.getLineNumber() - 1;
-				IRegion region = doc.getLineInformation(lineNumber);
-				charStart = region.getOffset();
-				length = region.getLength();
-			} catch (BadLocationException ble) {
-				return false;
-			} catch (DebugException de) {
-				return false;
-			}
-		}
-		if (charStart < 0)
-			return false;
-
-		position = new Position(charStart, length);
-		annModel.removeAnnotation(instPtrAnnotation);
-		annModel.addAnnotation(instPtrAnnotation, position);	
-		
-		// Retrieve the list of instruction pointer contexts
-		IDebugTarget debugTarget = stackFrame.getDebugTarget();
-		Map threadMap = (Map) fDebugTargetMap.get(debugTarget);
-		if (threadMap == null) {
-			threadMap = new HashMap();	
-			fDebugTargetMap.put(debugTarget, threadMap);		
-		}
-		List contextList = (List) threadMap.get(thread);
-		if (contextList == null) {
-			contextList = new ArrayList();
-			threadMap.put(thread, contextList);
-		}
-		
-		PInstructionPointerContext context = new PInstructionPointerContext(textEditor, instPtrAnnotation);
-		contextList.remove(context);
-		contextList.add(context);
-		return true;
-	}
 	public void removeAnnotations(IEditorPart editorPart, IThread thread) {
-		IDebugTarget debugTarget = thread.getDebugTarget();
-		Map threadMap = (Map) fDebugTargetMap.get(debugTarget);
-		if (threadMap == null) {
-			return;
-		}
-		
-		removeAnnotations(thread, threadMap);
+		annotationManager.removeAnnotations(editorPart, thread);
 	}
-	private void removeAnnotations(IThread thread, Map threadMap) {
-		List contextList = (List) threadMap.get(thread);
-		if (contextList != null) {
-			Iterator contextIterator = contextList.iterator();
-			while (contextIterator.hasNext()) {
-				PInstructionPointerContext context = (PInstructionPointerContext) contextIterator.next();
-				removeAnnotation(context.getTextEditor(), context.getAnnotation());
-			}
-		}
-		
-		threadMap.remove(thread);						
-	}
-	private void removeAnnotation(ITextEditor textEditor, PInstructionPointerAnnotation annotation) {
-		IDocumentProvider docProvider = textEditor.getDocumentProvider();
-		if (docProvider != null) {
-			IAnnotationModel annotationModel = docProvider.getAnnotationModel(textEditor.getEditorInput());
-			if (annotationModel != null) {
-				annotationModel.removeAnnotation(annotation);
-			}
-		}
-	}	
 }

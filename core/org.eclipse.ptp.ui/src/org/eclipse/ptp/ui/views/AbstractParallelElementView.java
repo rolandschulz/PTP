@@ -59,6 +59,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	//Composite
 	protected ScrolledComposite sc = null;
 	protected Composite drawComp = null;
+	//protected Image fBuffer = null;
 
 	// default element info
 	protected int e_offset_x = 5;
@@ -766,6 +767,35 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 		//System.out.println(view_width + ":" + new_height);
 	}
 
+	/*
+	 * FIXME not completed yet -- implement size for drawing
+	private void doubleBufferPaint(GC dest) {
+		Point size= drawComp.getSize();
+		if (size.x <= 0 || size.y <= 0)
+			return;
+
+		if (fBuffer != null) {
+			Rectangle r = fBuffer.getBounds();
+			if (r.width != size.x || r.height != size.y) {
+				fBuffer.dispose();
+				fBuffer= null;
+			}
+		}
+		if (fBuffer == null)
+			fBuffer= new Image(drawComp.getDisplay(), size.x, size.y);
+
+		GC gc= new GC(fBuffer);
+		try {
+			gc.setBackground(drawComp.getBackground());
+			gc.fillRectangle(0, 0, size.x, size.y);
+			paintCanvas(gc);
+		} finally {
+			gc.dispose();
+		}
+		dest.drawImage(fBuffer, 0, 0);
+	}
+	*/
+	
 	/**
 	 * Print visible area ONLY Find out process numbers of beginning and ending
 	 */

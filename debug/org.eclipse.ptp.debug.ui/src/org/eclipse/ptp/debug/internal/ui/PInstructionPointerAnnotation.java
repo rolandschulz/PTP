@@ -18,20 +18,30 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui;
 
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
-import org.eclipse.jface.text.source.Annotation;
-import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
+import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 /**
  * @author Clement chu
  *
  */
-public class PInstructionPointerAnnotation extends Annotation {
+public class PInstructionPointerAnnotation extends MarkerAnnotation {
 	private IStackFrame fStackFrame;
-	
-	public PInstructionPointerAnnotation(IStackFrame stackFrame, boolean isTopFrame) {
-		super(isTopFrame?IPTPDebugUIConstants.ANN_INSTR_POINTER_CURRENT:IPTPDebugUIConstants.ANN_INSTR_POINTER_SECONDARY, false, "asdadasdasdasd");
+
+	public PInstructionPointerAnnotation(IMarker marker, IStackFrame stackFrame) {
+		super(marker);
 		fStackFrame = stackFrame;
+		setMessage(getMessageFromStack());
+	}
+	
+	public void setMessage(String message) {
+		try {
+			getMarker().setAttribute(IMarker.MESSAGE, message);
+		} catch (CoreException e) {}
+		setText(message);
 	}
 	
 	public boolean equals(Object other) {
@@ -47,5 +57,13 @@ public class PInstructionPointerAnnotation extends Annotation {
 
 	private IStackFrame getStackFrame() {
 		return fStackFrame;
+	}
+	
+	private String getMessageFromStack() {
+		try {
+			return fStackFrame.getName();
+		} catch (DebugException e) {
+			return "";
+		}
 	}
 }

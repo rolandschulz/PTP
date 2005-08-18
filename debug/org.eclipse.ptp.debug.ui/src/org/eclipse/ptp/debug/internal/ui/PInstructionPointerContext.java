@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui;
 
+import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
@@ -26,17 +27,16 @@ import org.eclipse.ui.texteditor.ITextEditor;
  */
 public class PInstructionPointerContext {
 	private ITextEditor fTextEditor;
-	
-	private PInstructionPointerAnnotation fAnnotation;
+	private Annotation fAnnotation;
 
-	public PInstructionPointerContext(ITextEditor textEditor, PInstructionPointerAnnotation annotation) {
+	public PInstructionPointerContext(ITextEditor textEditor, Annotation annotation) {
 		setTextEditor(textEditor);
 		setAnnotation(annotation);
 	}
 	
 	public boolean equals(Object other) {
 		if (other instanceof PInstructionPointerContext) {
-			PInstructionPointerContext otherContext = (PInstructionPointerContext) other;
+			PInstructionPointerContext otherContext = (PInstructionPointerContext)other;
 			return getAnnotation().equals(otherContext.getAnnotation());
 		}
 		return false;
@@ -54,11 +54,11 @@ public class PInstructionPointerContext {
 		return fTextEditor;
 	}
 
-	private void setAnnotation(PInstructionPointerAnnotation annotation) {
+	private void setAnnotation(Annotation annotation) {
 		fAnnotation = annotation;
 	}
 
-	public PInstructionPointerAnnotation getAnnotation() {
+	public Annotation getAnnotation() {
 		return fAnnotation;
 	}
 }
