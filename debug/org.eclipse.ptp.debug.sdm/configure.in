@@ -1,0 +1,109 @@
+dnl
+dnl Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
+dnl
+dnl This program is free software; you can redistribute it and/or modify
+dnl it under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation; either version 2 of the License, or
+dnl (at your option) any later version.
+dnl
+dnl This program is distributed in the hope that it will be useful,
+dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with this program; if not, write to the Free Software
+dnl Foundation, Inc., 59 Temple Place - Suite 330,
+dnl Boston, MA 02111-1307, USA.
+dnl
+
+AC_PREREQ(2.50)
+
+AC_INIT(org.eclipse.ptp.debug.sdm, 1.0)
+AC_CONFIG_HEADER(config.h)
+AC_CANONICAL_BUILD
+
+CFLAGS="$CFLAGS -Wall"
+
+dnl
+dnl Check for programs.
+dnl
+
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+
+dnl
+dnl Check for libraries.
+dnl
+
+AC_CHECK_LIB(nsl, gethostbyname)
+AC_CHECK_LIB(socket, socket)
+AC_SEARCH_LIBS(openpty, [util],
+	[AC_DEFINE(HAVE_OPENPTY, 1, [System has openpty() function.])])dnl
+
+dnl AIF libraries
+dnl AC_TEST_PACKAGE_NEW(aif,[#include <aif.h>],-laif,,[/usr/local $(TOP)/../libaif],LIBAIF)
+dnl if test "$with_aif" = "no"; then
+dnl 	INCLUDE_aif='$(srcdir)/src/aif'
+dnl 	LIB_aif='$(srcdir)/src/aif'
+dnl 	# note: copy of libaif in guard src tree is old, and should not
+dnl 	# be used anymore.
+dnl 	AC_MSG_ERROR([You must have libaif to compile sdm.])
+dnl fi
+
+dnl Check for libmigdb
+AC_TEST_PACKAGE_NEW(libmigdb,[#include "mi_gdb.h"],-lmigdb,,[/usr/local $(TOP)/../libmigdb/src],LIBMIGDB)
+
+dnl Check for posix4
+AC_CHECK_LIB(posix4, clock_gettime)
+if test "$ac_cv_lib_posix4_clock_gettime" = yes; then
+	AC_DEFINE(POSIX, 1, [Enable POSIX support in Guard.])
+	LIBS="$LIBS -lposix4"
+fi
+
+dnl
+dnl Check for header files.
+dnl
+
+AC_HEADER_STDC
+AC_CHECK_HEADERS(strings.h sys/time.h unistd.h)
+
+dnl
+dnl Check for typedefs, structures, and compiler characteristics.
+dnl
+
+AC_HEADER_TIME
+AC_STRUCT_TM
+
+dnl
+dnl Check for library functions.
+dnl
+
+AC_FUNC_MEMCMP
+AC_TYPE_SIGNAL
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS(gethostname select strdup strstr strtoul sigset sighold sigrelse)
+
+dnl Open MPI
+AC_PATH_PROG(OMPI_INFO, ompi_info, no)
+if test "$ac_cv_path_OMPI_INFO" != no; then
+	AC_PATH_PROG(MPIRUN, mpirun, no)
+	if test "$ac_cv_path_MPIRUN" != no ; then
+		AC_DEFINE(OMPI,1,[Enable Open MPI support in Guard.])
+		AC_DEFINE_UNQUOTED(MPIRUN, "$ac_cv_path_MPIRUN", [Location of mpirun command.])
+	fi
+fi
+
+dnl Use local aif if necessary (obsolete)
+if test "$with_aif" = "no"; then
+	AC_CONFIG_SUBDIRS(src/aif)
+fi
+
+AC_CONFIG_FILES(src/client/Makefile)
+AC_CONFIG_FILES(src/server/Makefile)
+AC_CONFIG_FILES(src/utils/Makefile)
+AC_CONFIG_FILES(jni/Makefile)
+AC_CONFIG_SUBDIRS(bitvector)
+AC_OUTPUT

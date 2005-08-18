@@ -1,0 +1,74 @@
+#
+
+srcdir =	@srcdir@
+VPATH =		@srcdir@
+prefix =	@prefix@
+exec_prefix =	@exec_prefix@
+bindir =	@bindir@
+build =		@build@
+distname =	guard
+
+INSTALL =	$${srcdir}/install-sh -c
+CHMOD =		chmod
+TAR =		@TAR@
+GZIP =		gzip
+BASENAME =	basename
+REMOVE =	rm -f
+
+SHELL =		/bin/sh
+
+ALL_DIRS =	bitvector jni src/client src/server src/utils
+DEP_DIRS =	src/client src/server src/utils
+
+all: depend
+	for dir in $(ALL_DIRS); do \
+		(cd $$dir; \
+		if test -f Makefile ; then \
+			make ; \
+		fi) \
+	done
+
+depend:
+	for dir in $(DEP_DIRS); do \
+		(cd $$dir; \
+		if test -f Makefile ; then \
+			make depend ; \
+		fi) \
+	done
+	> depend
+
+install: all
+	for dir in $(ALL_DIRS); do \
+		(cd $$dir; \
+		if test -f Makefile ; then \
+			make install ; \
+		fi) \
+	done
+
+clean:
+	for dir in $(ALL_DIRS); do \
+		(cd $$dir; \
+		if test -f Makefile ; then \
+			make clean ; \
+		fi) \
+	done
+	for dir in testsuite doc; do \
+		(cd $$dir; make clean) \
+	done
+	$(REMOVE) a.out core *.o .gdb_history
+	$(REMOVE) config.log config.status config.cache depend
+
+distclean:
+	for dir in $(ALL_DIRS); do \
+		(cd $$dir; \
+		if test -f Makefile ; then \
+			make distclean ; \
+		fi) \
+	done
+	for dir in testsuite doc; do \
+		(cd $$dir; make distclean) \
+	done
+	$(REMOVE) config.cache config.h config.log config.status depend aclocal.m4
+	$(REMOVE) Makefile Makefile.bak .gdb_history
+	$(REMOVE) -r autom4te-2.53.cache
+

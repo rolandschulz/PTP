@@ -1,0 +1,80 @@
+#ifndef RCSID
+#define RCSID(msg) \
+static /**/const char *const rcsid[] = { (const char *)rcsid, "\100(#)" msg }
+#endif
+
+
+/* Define if you don't have `vprintf' but do have `_doprnt.' */
+#undef HAVE_DOPRNT
+
+/* Define if you have the `gethostname' function. */
+#undef HAVE_GETHOSTNAME
+
+/* Define if you have the `nsl' library (-lnsl). */
+#undef HAVE_LIBNSL
+
+/* Define if you have the `posix4' library (-lposix4). */
+#undef HAVE_LIBPOSIX4
+
+/* Define if you have the `socket' library (-lsocket). */
+#undef HAVE_LIBSOCKET
+
+/* System has openpty() function. */
+#undef HAVE_OPENPTY
+
+/* Define if you have the `select' function. */
+#undef HAVE_SELECT
+
+/* Define if you have the `strdup' function. */
+#undef HAVE_STRDUP
+
+/* Define if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define if you have the `strstr' function. */
+#undef HAVE_STRSTR
+
+/* Define if you have the `strtoul' function. */
+#undef HAVE_STRTOUL
+
+/* Define if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
+
+/* Define if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define if you have the `vprintf' function. */
+#undef HAVE_VPRINTF
+
+/* Define if you have sigset. */
+#undef HAVE_SIGSET
+
+/* Define if you have sigrelse. */
+#undef HAVE_SIGRELSE
+
+/* Define if you have sighold. */
+#undef HAVE_SIGHOLD
+
+/* Define if you have the aif package. */
+#undef LIBAIF
+
+/* Define if you have the libmigdb package. */
+#undef LIBMIGDB
+
+/* Enable Open MPI in Guard. */
+#undef OMPI
+
+/* Enable POSIX support in Guard. */
+#undef POSIX
+
+/* Define as the return type of signal handlers (`int' or `void'). */
+#undef RETSIGTYPE
+
+/* Define if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define if you can safely include both <sys/time.h> and <time.h>. */
+#undef TIME_WITH_SYS_TIME
+
+/* Define if your <sys/time.h> declares `struct tm'. */
+#undef TM_IN_SYS_TIME
