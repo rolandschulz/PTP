@@ -21,10 +21,14 @@ package org.eclipse.ptp.debug.ui;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -128,11 +132,19 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	
 	public static Shell getActiveWorkbenchShell() {
 		IWorkbenchWindow window = getActiveWorkbenchWindow();
-		if ( window != null ) {
+		if (window != null) {
 			return window.getShell();
 		}
 		return null;
 	}
+	
+	public static Display getDisplay() {
+		Display display= Display.getCurrent();
+		if (display == null) {
+			display= Display.getDefault();
+		}
+		return display;		
+	}	
 	
 	public static IWorkbenchWindow getActiveWorkbenchWindow() {
 		return getDefault().getWorkbench().getActiveWorkbenchWindow();
@@ -151,5 +163,26 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	}
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPDebugUIConstants.INTERNAL_ERROR, "Internal Error", e));
-	}	
+	}
+	
+	public static void errorDialog(Shell shell, String title, String message, Throwable t) {
+		IStatus status;
+		if (t instanceof CoreException) {
+			status= ((CoreException)t).getStatus();
+			if (status != null && message.equals(status.getMessage())) {
+				message= null;
+			}
+		} else {
+			status= new Status(IStatus.ERROR, getUniqueIdentifier(), IDebugUIConstants.INTERNAL_ERROR, "Error within Debug UI: ", t); //$NON-NLS-1$
+			log(status);	
+		}
+		ErrorDialog.openError(shell, title, message, status);
+	}
+	public static void errorDialog(Shell shell, String title, String message, IStatus s) {
+		if (s != null && message.equals(s.getMessage()))
+			message= null;
+
+		ErrorDialog.openError(shell, title, message, s);
+	}
+	
 }
