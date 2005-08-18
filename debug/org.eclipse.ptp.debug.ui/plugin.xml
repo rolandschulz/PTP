@@ -62,34 +62,36 @@
             icon="icons/debug/bpt.gif">
       </specification>
       <specification
-            colorPreferenceValue="100,100,100"
             annotationType="org.eclipse.ptp.debug.ui.currentIP"
-            icon="icons/ptp.gif"
-            verticalRulerPreferenceValue="true"
-            colorPreferenceKey="currentIPColor"
-            overviewRulerPreferenceValue="true"
-            highlightPreferenceKey="currentIPHighlight"
+            icon="icons/debug/ptp_bpt_set.gif"
+            label="ehheheh current ip"
             presentationLayer="6"
+            colorPreferenceKey="ptpCurrentIPColor"
+            colorPreferenceValue="100,100,100"
             highlightPreferenceValue="true"
+            highlightPreferenceKey="ptpCurrentIPHighlight"
             textPreferenceValue="false"
-            textPreferenceKey="currentIPIndication"
-            verticalRulerPreferenceKey="currentIPVerticalRuler"
-            overviewRulerPreferenceKey="currentIPOverviewRuler">
+            textPreferenceKey="ptpCurrentIPIndication"
+            verticalRulerPreferenceValue="true"
+            verticalRulerPreferenceKey="ptpCurrentIPVerticalRuler"
+            overviewRulerPreferenceValue="true"
+            overviewRulerPreferenceKey="ptpCucurrentIPOverviewRuler">
       </specification>
       <specification
-            colorPreferenceValue="200,200,100"
             annotationType="org.eclipse.ptp.debug.ui.secondaryIP"
-            icon="icons/debug/ptp_bpt_set.gif"
-            verticalRulerPreferenceValue="true"
-            colorPreferenceKey="currentIPColor"
-            overviewRulerPreferenceValue="true"
-            highlightPreferenceKey="currentIPHighlight"
+            icon="icons/debug/bpt.gif"
+            label="nononono secondary ip"
             presentationLayer="6"
+            colorPreferenceValue="200,200,100"
+            colorPreferenceKey="ptpSecondaryIPColor"
             highlightPreferenceValue="true"
+            highlightPreferenceKey="ptpSecondaryIPHighlight"
             textPreferenceValue="false"
-            textPreferenceKey="currentIPIndication"
-            verticalRulerPreferenceKey="currentIPVerticalRuler"
-            overviewRulerPreferenceKey="currentIPOverviewRuler">
+            textPreferenceKey="ptpSecondaryIPIndication"
+            verticalRulerPreferenceValue="true"
+            verticalRulerPreferenceKey="ptpSecondaryIPVerticalRuler"
+            overviewRulerPreferenceValue="true"
+            overviewRulerPreferenceKey="ptpSecondaryIPOverviewRuler">
       </specification>
    </extension>
    
