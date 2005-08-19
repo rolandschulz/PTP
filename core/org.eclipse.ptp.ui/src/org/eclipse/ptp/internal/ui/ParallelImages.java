@@ -40,8 +40,8 @@ public class ParallelImages {
 	public static final String ICON_CREATESET_NORMAL = "createset_normal.gif";
 	public static final String ICON_DELETESET_DISABLE = "deleteset_disable.gif";
 	public static final String ICON_DELETESET_NORMAL = "deleteset_normal.gif";
-	public static final String ICON_DELETEPROCESS_DISABLE = "deleteprocess_disable.gif";
-	public static final String ICON_DELETEPROCESS_NORMAL = "deleteprocess_normal.gif";
+	public static final String ICON_DELETEELEMENT_DISABLE = "deleteelement_disable.gif";
+	public static final String ICON_DELETEELEMENT_NORMAL = "deleteelement_normal.gif";
 	
 	public static final String ICON_MACHINE_DISABLE = "machine_disable.gif";
 	public static final String ICON_MACHINE_NORMAL = "machine_normal.gif";
@@ -101,8 +101,8 @@ public class ParallelImages {
 	public static final ImageDescriptor ID_ICON_CREATESET_NORMAL = createImageDescriptor(TOOLICONURL, ICON_CREATESET_NORMAL, ICON_CREATESET_NORMAL);
 	public static final ImageDescriptor ID_ICON_DELETESET_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DELETESET_DISABLE, ICON_DELETESET_DISABLE);
 	public static final ImageDescriptor ID_ICON_DELETESET_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DELETESET_NORMAL, ICON_DELETESET_NORMAL);
-	public static final ImageDescriptor ID_ICON_DELETEPROCESS_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DELETEPROCESS_DISABLE, ICON_DELETEPROCESS_DISABLE);
-	public static final ImageDescriptor ID_ICON_DELETEPROCESS_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DELETEPROCESS_NORMAL, ICON_DELETEPROCESS_NORMAL);
+	public static final ImageDescriptor ID_ICON_DELETEELEMENT_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DELETEELEMENT_DISABLE, ICON_DELETEELEMENT_DISABLE);
+	public static final ImageDescriptor ID_ICON_DELETEELEMENT_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DELETEELEMENT_NORMAL, ICON_DELETEELEMENT_NORMAL);
 	public static final ImageDescriptor ID_ICON_MACHINE_DISABLE = createImageDescriptor(TOOLICONURL, ICON_MACHINE_DISABLE, ICON_MACHINE_DISABLE);
 	public static final ImageDescriptor ID_ICON_MACHINE_NORMAL = createImageDescriptor(TOOLICONURL, ICON_MACHINE_NORMAL, ICON_MACHINE_NORMAL);
 	public static final ImageDescriptor ID_ICON_JOB_DISABLE = createImageDescriptor(TOOLICONURL, ICON_JOB_DISABLE, ICON_JOB_DISABLE);
