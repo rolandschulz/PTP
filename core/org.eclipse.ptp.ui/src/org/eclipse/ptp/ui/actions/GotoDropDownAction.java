@@ -71,7 +71,6 @@ public abstract class GotoDropDownAction extends ParallelAction {
     
     public GotoDropDownAction(String name, AbstractParallelElementView view) {
 		super(name, IAction.AS_DROP_DOWN_MENU, view);
-	    setEnabled(true);
 	    setMenuCreator(menuCreator);
     }
 

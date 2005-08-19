@@ -320,6 +320,11 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		}
 	}
 	
+	protected void updateAction() {
+		super.updateAction();
+		changeMachineAction.setEnabled(getMachineManager().getMachines().length > 0);
+	}
+	
 	public void updateTitle() {
 		if (cur_element_set != null) {
 			changeTitle(manager.getName(getCurrentMachineID()), cur_element_set.getID(), cur_set_size);
