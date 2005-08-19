@@ -149,7 +149,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}				
 	}
 	public void changeSetEvent(IElementSet curSet, IElementSet preSet) {
-		System.out.println("curset: "+ curSet + ", preSet: " + preSet);
 		updateBreakpointMarker(curSet.getID());
 
 		IPCDISession session = (IPCDISession)getDebugSession(getCurrentJobId());
