@@ -18,10 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -41,7 +41,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
-import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
+import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -151,7 +151,7 @@ public class PAnnotationManager {
 			return null;
 		
 		try {
-			IRegion region = doc.getLineInformation(lineNumber);
+			IRegion region = doc.getLineInformation(lineNumber - 1);
 			int charStart = region.getOffset();
 			int length = region.getLength();
 			if (charStart < 0)
@@ -166,21 +166,9 @@ public class PAnnotationManager {
 		return resource.createMarker(type);
 	}
 	
-	public int hardcode(IStackFrame stackFrame) {
-		try {
-			String name = stackFrame.getThread().getName();
-			name = name.split("-")[0];
-			return Integer.parseInt(name.trim());
-		} catch(DebugException e) {
-			return -1;
-		}
-	}
-	public BitSet getTaskId(IStackFrame stackFrame) {
-		IDebugTarget debugTarget = stackFrame.getDebugTarget();
-		if (debugTarget instanceof PDebugTarget) {
-			//FIXME WAITING FOR DONNY'S FUNCTION TO GET TASK ID
-			//((PDebugTarget)debugTarget)
-			int taskId = hardcode(stackFrame);
+	public BitSet getTaskId(IDebugTarget debugTarget) {
+		if (debugTarget instanceof IPDebugTarget) {
+			int taskId = ((IPDebugTarget)debugTarget).getTargetId();
 			if (taskId == -1)
 				return null;
 			
@@ -189,6 +177,13 @@ public class PAnnotationManager {
 			return bitSet;
 		}
 		return null;
+	}
+	
+	public BitSet getTaskId(IThread thread) {
+		return getTaskId(thread.getDebugTarget());
+	}
+	public BitSet getTaskId(IStackFrame stackFrame) {
+		return getTaskId(stackFrame.getDebugTarget());
 	}
 	
 	//called by debug view
@@ -216,6 +211,7 @@ public class PAnnotationManager {
 		String set_id = uiDebugManager.getCurrentSetId();
 		IElementHandler handler = uiDebugManager.getElementHandler(job_id);
 		IElementSet set = handler.getSet(set_id);
+		taskId.cardinality();
 		for(int i=taskId.nextSetBit(0); i>=0; i=taskId.nextSetBit(i+1)) {
 			if (set.contains(String.valueOf(i)))
 				return true;
@@ -252,63 +248,104 @@ public class PAnnotationManager {
 		if (position == null)
 			throw new CoreException(Status.CANCEL_STATUS);
 		
-		PInstructionPointerAnnotation annotation = findAnnotation(annotationModel, position, file, lineNumber, type);
+		PInstructionPointerAnnotation annotation = findAnnotation(annotationModel, position, file, lineNumber);
 		if (annotation == null) {
 			IMarker marker = createMarker(file, type);
 			annotation = new PInstructionPointerAnnotation(marker);
 		}
+		else 
+			annotationModel.removeAnnotation(annotation);
+
 		annotation.addTasks(taskId);
 		annotation.setMessage();
+		annotationModel.addAnnotation(annotation, position);
 	}
 	
-	public PInstructionPointerAnnotation findAnnotation(IAnnotationModel annotationModel, Position position, IFile file, int lineNumber, String type) {
+	public PInstructionPointerAnnotation findAnnotation(IAnnotationModel annotationModel, Position position, IFile file, int lineNumber) {
 		for (Iterator i=annotationModel.getAnnotationIterator(); i.hasNext();) {
 			Annotation annotation = (Annotation)i.next();
 			if (annotation instanceof PInstructionPointerAnnotation) {
 				if (annotationModel.getPosition(annotation).equals(position)) {
-					annotationModel.removeAnnotation(annotation);
+					if (annotation.getType().equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT) || annotation.getType().equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_SECONDARY))
+						continue;
+					
 					return (PInstructionPointerAnnotation)annotation;
 				}
 			}
 		}
 		return null;
 	}
-	
-	public void createStackFrameMessage(IMarker marker, IStackFrame stackFrame, boolean append) throws CoreException {
-		//msg is task id
-		String msg = stackFrame.getThread().getName();
-		if (append) {
-			String markerMsg = marker.getAttribute(IMarker.MESSAGE, "");
-			msg = markerMsg + "," + msg; 
-		}
-		marker.setAttribute(IMarker.MESSAGE, msg);
+
+	//called by debug view
+	public void removeAnnotation(IEditorPart editorPart, IThread thread) throws CoreException {
+		ITextEditor textEditor = getTextEditor(editorPart);
+		if (textEditor == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		
+		IFile file = getFile(textEditor.getEditorInput());
+		if (file == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		
+		BitSet taskId = getTaskId(thread);
+		if (taskId == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		
+		
 	}
 	
-	public void removeAnnotations(IEditorPart editorPart, IThread thread) {
-		IDebugTarget debugTarget = thread.getDebugTarget();
-		Map threadMap = (Map)fDebugTargetMap.get(debugTarget);
-		if (threadMap != null) {
-			removeAnnotations(thread, threadMap);
-		}
+	//called by event
+	public void removeAnnotation(String fullPathFileName, BitSet taskId) throws CoreException {
+		IFile file = findFile(fullPathFileName);
+		if (file == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		
+		IEditorPart editorPart = openEditor(file);
+		if (editorPart == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		
+		ITextEditor textEditor = getTextEditor(editorPart);
+		if (textEditor == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		
 	}
-	private void removeAnnotations(IThread thread, Map threadMap) {
-		List contextList = (List)threadMap.get(thread);
-		if (contextList != null) {
-			Iterator contextIterator = contextList.iterator();
-			while (contextIterator.hasNext()) {
-				PInstructionPointerContext context = (PInstructionPointerContext) contextIterator.next();
-				removeAnnotation(context.getTextEditor(), context.getAnnotation());
-			}
-		}
-		threadMap.remove(thread);						
-	}
-	private void removeAnnotation(ITextEditor textEditor, Annotation annotation) {
+	
+	public void removeAnnotation(ITextEditor textEditor, IFile file, BitSet taskId) throws CoreException {
 		IDocumentProvider docProvider = textEditor.getDocumentProvider();
-		if (docProvider != null) {
-			IAnnotationModel annotationModel = docProvider.getAnnotationModel(textEditor.getEditorInput());
-			if (annotationModel != null) {
+		IAnnotationModel annotationModel = docProvider.getAnnotationModel(textEditor.getEditorInput());
+		if (annotationModel == null)
+			throw new CoreException(Status.CANCEL_STATUS);
+		
+		for (Iterator i=findAnnotationIterator(annotationModel); i.hasNext();) {
+			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation)i.next();
+			annotation.removeTasks(taskId);
+			Position position = annotationModel.getPosition(annotation);
+			
+			if (annotation.isEmpty()) {
+				removeMarkerAnnotation(annotationModel, annotation);
+			} else {
 				annotationModel.removeAnnotation(annotation);
+				annotation.setMessage();
+				annotationModel.addAnnotation(annotation, position);
 			}
 		}
 	}
+	
+	public void removeMarkerAnnotation(IAnnotationModel annotationModel, PInstructionPointerAnnotation annotation) {
+		try {
+			annotation.getMarker().delete();
+		} catch (CoreException e) {}
+		annotationModel.removeAnnotation(annotation);
+	}
+	
+	public Iterator findAnnotationIterator(IAnnotationModel annotationModel) {
+		List annotations = new ArrayList();
+		for (Iterator i=annotationModel.getAnnotationIterator(); i.hasNext();) {
+			Annotation annotation = (Annotation)i.next();
+			if (annotation instanceof PInstructionPointerAnnotation) {
+				annotations.add(annotation);
+			}
+		}
+		return annotations.iterator();
+	}
+	
 }

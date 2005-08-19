@@ -548,10 +548,20 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	}
 	
 	public boolean addAnnotations(IEditorPart editorPart, IStackFrame stackFrame) {
-		return PAnnotationManager.getDefault().addAnnotation(editorPart, stackFrame);
+		try {
+			PAnnotationManager.getDefault().addAnnotation(editorPart, stackFrame);
+			return true;
+		} catch (CoreException e) {
+			PTPDebugUIPlugin.log(e);
+			return false;
+		}
 	}
 	
 	public void removeAnnotations(IEditorPart editorPart, IThread thread) {
-		PAnnotationManager.getDefault().removeAnnotation(editorPart, thread);
+		try{
+			PAnnotationManager.getDefault().removeAnnotation(editorPart, thread);
+		} catch (CoreException e) {
+			PTPDebugUIPlugin.log(e);
+		}
 	}
 }

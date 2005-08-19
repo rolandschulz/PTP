@@ -72,6 +72,10 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 	public void removeTasks(BitSet bitSet) {
 		tBitSet.andNot(bitSet);
 	}
+	public boolean isEmpty() {
+		return (tBitSet.cardinality() == 0);
+	}
+	
 	public boolean contains(BitSet bitSet) {
 		return tBitSet.intersects(bitSet);
 	}
