@@ -34,6 +34,8 @@ public class ParallelImages {
 	
     private static ImageRegistry imageRegistry = null;
 	
+	public static final String ICON_CHANGESET_DISABLE = "changeset_disable.gif";
+	public static final String ICON_CHANGESET_NORMAL = "changeset_normal.gif";
 	public static final String ICON_CREATESET_DISABLE = "createset_disable.gif";
 	public static final String ICON_CREATESET_NORMAL = "createset_normal.gif";
 	public static final String ICON_DELETESET_DISABLE = "deleteset_disable.gif";
@@ -93,6 +95,8 @@ public class ParallelImages {
 	public static final String IMG_PROC_STOPPED = "proc_stopped.gif";
 	public static final String IMG_PROC_STOPPED_SEL = "proc_stopped_sel.gif";
 	
+	public static final ImageDescriptor ID_ICON_CHANGESET_DISABLE = createImageDescriptor(TOOLICONURL, ICON_CHANGESET_DISABLE, ICON_CHANGESET_DISABLE);
+	public static final ImageDescriptor ID_ICON_CHANGESET_NORMAL = createImageDescriptor(TOOLICONURL, ICON_CHANGESET_NORMAL, ICON_CHANGESET_NORMAL);
 	public static final ImageDescriptor ID_ICON_CREATESET_DISABLE = createImageDescriptor(TOOLICONURL, ICON_CREATESET_DISABLE, ICON_CREATESET_DISABLE);
 	public static final ImageDescriptor ID_ICON_CREATESET_NORMAL = createImageDescriptor(TOOLICONURL, ICON_CREATESET_NORMAL, ICON_CREATESET_NORMAL);
 	public static final ImageDescriptor ID_ICON_DELETESET_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DELETESET_DISABLE, ICON_DELETESET_DISABLE);
