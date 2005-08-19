@@ -34,7 +34,7 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
  *
  */
 public class CreateSetAction extends GotoDropDownAction {
-	public static final String name = "Create";
+	public static final String name = "Create Set";
     
 	public CreateSetAction(AbstractParallelElementView view) {
 		super(name, view);
