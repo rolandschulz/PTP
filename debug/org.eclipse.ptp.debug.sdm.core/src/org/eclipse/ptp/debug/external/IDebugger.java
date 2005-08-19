@@ -26,12 +26,12 @@ import java.util.Observer;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
@@ -63,7 +63,7 @@ public interface IDebugger {
 	public abstract void setCurrentStackFrame(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException;
 	
 	/* Data Display and Manipulation */
-	public abstract ICDIExpression evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws PCDIException;
+	public abstract String evaluateExpression(IPCDIDebugProcessSet procs, ICDIVariable var) throws PCDIException;
 	public abstract ICDIArgument[] listArguments(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException;
 	public abstract ICDILocalVariable[] listLocalVariables(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException;
 	public abstract ICDIGlobalVariable[] listGlobalVariables(IPCDIDebugProcessSet procs) throws PCDIException;
