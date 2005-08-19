@@ -34,7 +34,7 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
  *
  */
 public class ChangeSetAction extends GotoDropDownAction {
-	public static final String name = "Change";
+	public static final String name = "Change Set";
     
 	public ChangeSetAction(AbstractParallelElementView view) {
 		super(name, view);
