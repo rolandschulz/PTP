@@ -212,6 +212,7 @@ public class PAnnotationManager {
 		IElementHandler handler = uiDebugManager.getElementHandler(job_id);
 		IElementSet set = handler.getSet(set_id);
 		taskId.cardinality();
+		//FIXME should be improved this checking method
 		for(int i=taskId.nextSetBit(0); i>=0; i=taskId.nextSetBit(i+1)) {
 			if (set.contains(String.valueOf(i)))
 				return true;
@@ -248,28 +249,33 @@ public class PAnnotationManager {
 		if (position == null)
 			throw new CoreException(Status.CANCEL_STATUS);
 		
-		PInstructionPointerAnnotation annotation = findAnnotation(annotationModel, position, file, lineNumber);
+		PInstructionPointerAnnotation annotation = findAnnotation(annotationModel, position, taskId);
 		if (annotation == null) {
 			IMarker marker = createMarker(file, type);
 			annotation = new PInstructionPointerAnnotation(marker);
 		}
-		else 
+		else {
 			annotationModel.removeAnnotation(annotation);
+		}
 
 		annotation.addTasks(taskId);
 		annotation.setMessage();
 		annotationModel.addAnnotation(annotation, position);
 	}
 	
-	public PInstructionPointerAnnotation findAnnotation(IAnnotationModel annotationModel, Position position, IFile file, int lineNumber) {
+	public PInstructionPointerAnnotation findAnnotation(IAnnotationModel annotationModel, Position position, BitSet taskId) {
 		for (Iterator i=annotationModel.getAnnotationIterator(); i.hasNext();) {
 			Annotation annotation = (Annotation)i.next();
 			if (annotation instanceof PInstructionPointerAnnotation) {
 				if (annotationModel.getPosition(annotation).equals(position)) {
-					if (annotation.getType().equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT) || annotation.getType().equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_SECONDARY))
+					PInstructionPointerAnnotation pAnnotation = (PInstructionPointerAnnotation)annotation;
+					if (pAnnotation.getType().equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT) || pAnnotation.getType().equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_SECONDARY)) {
+						if (pAnnotation.contains(taskId))
+							return pAnnotation;
+						
 						continue;
-					
-					return (PInstructionPointerAnnotation)annotation;
+					}					
+					return pAnnotation;
 				}
 			}
 		}
@@ -290,7 +296,7 @@ public class PAnnotationManager {
 		if (taskId == null)
 			throw new CoreException(Status.CANCEL_STATUS);
 		
-		
+		removeAnnotation(textEditor, file, taskId);
 	}
 	
 	//called by event
@@ -306,7 +312,8 @@ public class PAnnotationManager {
 		ITextEditor textEditor = getTextEditor(editorPart);
 		if (textEditor == null)
 			throw new CoreException(Status.CANCEL_STATUS);
-		
+	
+		removeAnnotation(textEditor, file, taskId);
 	}
 	
 	public void removeAnnotation(ITextEditor textEditor, IFile file, BitSet taskId) throws CoreException {
