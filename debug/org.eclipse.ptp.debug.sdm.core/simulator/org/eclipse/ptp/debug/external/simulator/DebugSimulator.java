@@ -23,10 +23,8 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
@@ -34,11 +32,12 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
-import org.eclipse.ptp.debug.external.cdi.Locator;
+import org.eclipse.ptp.debug.external.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.Argument;
@@ -105,7 +104,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		return debuggerProcess;
 	}
 
-	public ICDIStackFrame[] listStackFrames(IPCDIDebugProcessSet procs) throws CDIException {
+	public ICDIStackFrame[] listStackFrames(IPCDIDebugProcessSet procs) throws PCDIException {
 		ArrayList list = new ArrayList();
 		IPCDIDebugProcess[] procList = procs.getProcesses();
 		for (int i = 0; i < procList.length; i++) {
@@ -128,17 +127,26 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		return (ICDIStackFrame[]) list.toArray(new ICDIStackFrame[0]);
 	}
 
-	public void setCurrentStackFrame(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException {
+	public void setCurrentStackFrame(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public ICDIExpression evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws CDIException {
-		// TODO Auto-generated method stub
-		return null;
+	public String evaluateExpression(IPCDIDebugProcessSet procs, ICDIVariable var) throws PCDIException {
+		String retVal = null;
+		IPCDIDebugProcess[] procList = procs.getProcesses();
+		for (int i = 0; i < procList.length; i++) {
+			try {
+				String qName = var.getQualifiedName();
+				retVal = "1" + qName;
+			} catch (CDIException e) {
+				throw new PCDIException(e.toString());
+			}
+		}
+		return retVal;
 	}
 
-	public ICDIArgument[] listArguments(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException {
+	public ICDIArgument[] listArguments(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException {
 		ArrayList list = new ArrayList();
 		IPCDIDebugProcess[] procList = procs.getProcesses();
 		for (int i = 0; i < procList.length; i++) {
@@ -162,7 +170,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 						String aVal = args[k].getValue();
 						Argument arg = new Argument((Target) target, (Thread) thread, 
 								(StackFrame) frame, aName, aName,
-								args.length - k, frame.getLevel(), aVal);
+								args.length - k, frame.getLevel(), null);
 						list.add(arg);
 					}
 				}
@@ -171,7 +179,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		return (ICDIArgument[]) list.toArray(new ICDIArgument[0]);
 	}
 
-	public ICDILocalVariable[] listLocalVariables(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException {
+	public ICDILocalVariable[] listLocalVariables(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException {
 		ArrayList list = new ArrayList();
 		IPCDIDebugProcess[] procList = procs.getProcesses();
 		for (int i = 0; i < procList.length; i++) {
@@ -195,7 +203,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 						String aVal = args[k].getValue();
 						LocalVariable arg = new LocalVariable((Target) target, (Thread) thread, 
 								(StackFrame) frame, aName, aName,
-								args.length - k, frame.getLevel(), aVal);
+								args.length - k, frame.getLevel(), null);
 						list.add(arg);
 					}
 				}
@@ -204,27 +212,27 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		return (ICDILocalVariable[]) list.toArray(new ICDILocalVariable[0]);
 	}
 
-	public ICDIGlobalVariable[] listGlobalVariables(IPCDIDebugProcessSet procs) throws CDIException {
+	public ICDIGlobalVariable[] listGlobalVariables(IPCDIDebugProcessSet procs) throws PCDIException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public void stepInto(IPCDIDebugProcessSet procs, int count) throws CDIException {
+	public void stepInto(IPCDIDebugProcessSet procs, int count) throws PCDIException {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void stepOver(IPCDIDebugProcessSet procs, int count) throws CDIException {
+	public void stepOver(IPCDIDebugProcessSet procs, int count) throws PCDIException {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void stepFinish(IPCDIDebugProcessSet procs, int count) throws CDIException {
+	public void stepFinish(IPCDIDebugProcessSet procs, int count) throws PCDIException {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void go(IPCDIDebugProcessSet procs) throws CDIException {
+	public void go(IPCDIDebugProcessSet procs) throws PCDIException {
 		// Currently we apply this method globally for all procs
 		// Auto-generated method stub
 		System.out.println("DebugSimulator.go()");
@@ -239,14 +247,14 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		}
 	}
 
-	public void halt(IPCDIDebugProcessSet procs) throws CDIException {
+	public void halt(IPCDIDebugProcessSet procs) throws PCDIException {
 		// Currently we apply this method globally for all procs
 		// Auto-generated method stub
 		System.out.println("DebugSimulator.halt()");
 		state = SUSPENDED;
 	}
 
-	public void kill(IPCDIDebugProcessSet procs) throws CDIException {
+	public void kill(IPCDIDebugProcessSet procs) throws PCDIException {
 		// Currently we apply this method globally for all procs
 		IPCDIDebugProcess[] list = getProcesses();
 		for (int i = 0; i < list.length; i++) {
@@ -254,17 +262,17 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		}
 	}
 
-	public void run(String[] args) throws CDIException {
+	public void run(String[] args) throws PCDIException {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void restart() throws CDIException {
+	public void restart() throws PCDIException {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDILineBreakpoint bpt) throws CDIException {
+	public void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDILineBreakpoint bpt) throws PCDIException {
 		System.out.println("DebugSimulator.setLineBreakpoint() : " +
 				((LineBreakpoint) bpt).getLineNumber());
 		int line = ((LineBreakpoint) bpt).getLineNumber();
@@ -279,12 +287,12 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 
 	}
 
-	public void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIFunctionBreakpoint bpt) throws CDIException {
+	public void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIFunctionBreakpoint bpt) throws PCDIException {
 		System.out.println("DebugSimulator.setFunctionBreakpoint() : " +
 				((FunctionBreakpoint) bpt).getFunction());
 	}
 
-	public void deleteBreakpoints(ICDIBreakpoint[] bp) throws CDIException {
+	public void deleteBreakpoints(ICDIBreakpoint[] bp) throws PCDIException {
 		// TODO Auto-generated method stub
 		
 	}
