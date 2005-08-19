@@ -166,7 +166,6 @@ public class JobManager extends AbstractUIManager {
 		int total_element = pElements.length;
 		if (total_element > 0) {
 			IElementHandler elementHandler = new ElementHandler();
-			elementHandler.clearAll();
 			IElementSet set = elementHandler.getSetRoot();
 			for (int i=0; i<total_element; i++) {
 				set.add(new Element(set, pElements[i].getIDString(), String.valueOf(pElements[i].getTaskId())));
@@ -184,6 +183,7 @@ public class JobManager extends AbstractUIManager {
 				if (!jobList.containsKey(jobs[j].getIDString()))
 					addJob(jobs[j]);
 			}
+			setCurrentSetId(IElementHandler.SET_ROOT_ID);
 		}
 		return cur_job_id;
 	}

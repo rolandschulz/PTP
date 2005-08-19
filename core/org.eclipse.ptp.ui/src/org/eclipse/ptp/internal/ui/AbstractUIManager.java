@@ -33,7 +33,7 @@ import org.eclipse.ptp.ui.model.IElementHandler;
  */
 public abstract class AbstractUIManager implements IManager {
 	protected IModelManager modelManager = null;
-	protected String cur_set_id = IElementHandler.SET_ROOT_ID;
+	protected String cur_set_id = "";
 	protected List pListeners = new ArrayList(0);
 	
 	public void shutdown() {
