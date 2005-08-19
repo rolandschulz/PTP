@@ -111,6 +111,14 @@ public class ParallelDebugView extends ParallelJobView {
 		if (element != null)
 			registerElement(element);
 	}
+	
+	protected void updateAction() {
+		super.updateAction();
+		
+		boolean isJobStopped = getUIDebugManager().isJobStop(getCurrentJobID());
+		registerAction.setEnabled(!isJobStopped);
+		unregisterAction.setEnabled(!isJobStopped);
+	}	
 
 	protected String getToolTipText(int element_num) {
 		IElementHandler setManager = getCurrentElementHandler();

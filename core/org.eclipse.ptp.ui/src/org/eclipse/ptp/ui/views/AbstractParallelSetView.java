@@ -121,10 +121,13 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	}
 	
 	protected void updateAction() {
-		boolean deleteActionEnable = manager.getCurrentSetId().equals(IElementHandler.SET_ROOT_ID);
+		boolean deleteActionEnable = (manager.getCurrentSetId().length() == 0 || manager.getCurrentSetId().equals(IElementHandler.SET_ROOT_ID));
 		deleteSetAction.setEnabled(!deleteActionEnable);
 		deleteProcessAction.setEnabled(!deleteActionEnable);
 		createSetAction.setEnabled(cur_set_size > 0);
+		
+		IElementHandler elementHandler = getCurrentElementHandler();
+		changeSetAction.setEnabled(!(elementHandler == null || elementHandler.size() == 0));
 	}
 	
 	protected void keyDownEvent(int mx, int my, int keyCode) {

@@ -32,7 +32,6 @@ public class UnregisterAction extends DebugAction {
 		super(name, view);
 	    setImageDescriptor(PDebugImage.ID_ICON_UNREGISTER_NORMAL);
 	    setDisabledImageDescriptor(PDebugImage.ID_ICON_UNREGISTER_DISABLE);
-	    setEnabled(true);
 	}
 
 	public void run(IElement[] elements) {

@@ -34,7 +34,6 @@ public class RegisterAction extends DebugAction {
 		super(name, view);
 	    setImageDescriptor(PDebugImage.ID_ICON_REGISTER_NORMAL);
 	    setDisabledImageDescriptor(PDebugImage.ID_ICON_REGISTER_DISABLE);
-	    setEnabled(true);
 	}
 
 	public void run(IElement[] elements) {
