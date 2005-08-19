@@ -201,13 +201,14 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	 */
 	private IAddressFactory fAddressFactory;
 	
-	private int currentProcNum;
+	private int procTaskId;
 
 	/**
 	 * Constructor for CDebugTarget.
 	 */
 	public PDebugTarget( ILaunch launch, IProject project, IPCDITarget cdiTarget, String name, IProcess debuggeeProcess, IBinaryObject file, boolean allowsTerminate, boolean allowsDisconnect) {
 		super( null );
+		procTaskId = cdiTarget.getTargetId();
 		setLaunch( launch );
 		setDebugTarget( this );
 		setName( name );
@@ -224,6 +225,10 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		initialize();
 		DebugPlugin.getDefault().getLaunchManager().addLaunchListener( this );
 		getCDISession().getEventManager().addEventListener( this );
+	}
+	
+	public int getTargetId() {
+		return procTaskId;
 	}
 
 	protected void initialize() {
