@@ -42,8 +42,8 @@ public class PDebugImage {
 	public static final String ICON_RESUME_NORMAL = "resume_normal.gif";
 	public static final String ICON_SUSPEND_DISABLE = "suspend_disable.gif";
 	public static final String ICON_SUSPEND_NORMAL = "suspend_normal.gif";
-	public static final String ICON_TERMINATE_DISABLE = "terminate_disable.gif";
-	public static final String ICON_TERMINATE_NORMAL = "terminate_normal.gif";
+	public static final String ICON_TERMINATEALL_DISABLE = "terminate_all_disable.gif";
+	public static final String ICON_TERMINATEALL_NORMAL = "terminate_all_normal.gif";
 	public static final String ICON_STEPINTO_DISABLE = "stepinto_disable.gif";
 	public static final String ICON_STEPINTO_NORMAL = "stepinto_normal.gif";
 	public static final String ICON_STEPOVER_DISABLE = "stepover_disable.gif";
@@ -87,8 +87,8 @@ public class PDebugImage {
 	public static final ImageDescriptor ID_ICON_RESUME_NORMAL = createImageDescriptor(TOOLICONURL, ICON_RESUME_NORMAL, ICON_RESUME_NORMAL);
 	public static final ImageDescriptor ID_ICON_SUSPEND_DISABLE = createImageDescriptor(TOOLICONURL, ICON_SUSPEND_DISABLE, ICON_SUSPEND_DISABLE);
 	public static final ImageDescriptor ID_ICON_SUSPEND_NORMAL = createImageDescriptor(TOOLICONURL, ICON_SUSPEND_NORMAL, ICON_SUSPEND_NORMAL);
-	public static final ImageDescriptor ID_ICON_TERMINATE_DISABLE = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_DISABLE, ICON_TERMINATE_DISABLE);
-	public static final ImageDescriptor ID_ICON_TERMINATE_NORMAL = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_NORMAL, ICON_TERMINATE_NORMAL);
+	public static final ImageDescriptor ID_ICON_TERMINATEALL_DISABLE = createImageDescriptor(TOOLICONURL, ICON_TERMINATEALL_DISABLE, ICON_TERMINATEALL_DISABLE);
+	public static final ImageDescriptor ID_ICON_TERMINATEALL_NORMAL = createImageDescriptor(TOOLICONURL, ICON_TERMINATEALL_NORMAL, ICON_TERMINATEALL_NORMAL);
 	public static final ImageDescriptor ID_ICON_STEPINTO_DISABLE = createImageDescriptor(TOOLICONURL, ICON_STEPINTO_DISABLE, ICON_STEPINTO_DISABLE);
 	public static final ImageDescriptor ID_ICON_STEPINTO_NORMAL = createImageDescriptor(TOOLICONURL, ICON_STEPINTO_NORMAL, ICON_STEPINTO_NORMAL);
 	public static final ImageDescriptor ID_ICON_STEPOVER_DISABLE = createImageDescriptor(TOOLICONURL, ICON_STEPOVER_DISABLE, ICON_STEPOVER_DISABLE);
