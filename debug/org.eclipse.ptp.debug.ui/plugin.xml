@@ -66,8 +66,7 @@
             annotationImageProvider="org.eclipse.ptp.debug.internal.ui.BreakpointImageProvider"
             annotationType="org.eclipse.ptp.debug.core.breakpoint"
             label="%PBreakpointAnnotation.label"
-            presentationLayer="4"
-            icon="icons/debug/bpt.gif">
+            presentationLayer="4">
       </specification>
       <specification
             annotationType="org.eclipse.ptp.debug.ui.regCurrentIP"
