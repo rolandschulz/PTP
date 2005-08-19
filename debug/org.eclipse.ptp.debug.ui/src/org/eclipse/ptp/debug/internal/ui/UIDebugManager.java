@@ -222,7 +222,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				IPJob job = findJobById(job_id);
 				int[] processes = event.getProcesses();
 				for (int j=0; j<processes.length; j++) {
-					System.out.println("--- proc task id: " + processes[i]);
 					IPProcess proc = job.findProcessByTaskId(processes[i]);
 					elementHandler.addRegisterElement(proc.getIDString());
 					elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(true);

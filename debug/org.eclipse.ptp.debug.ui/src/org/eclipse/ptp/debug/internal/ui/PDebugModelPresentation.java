@@ -230,19 +230,19 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		String descriptor = null;
 		IElementHandler setManager = uiDebugManager.getElementHandler(job_id);
 		if (setManager == null) //no job running
-			descriptor = breakpoint.isEnabled()?PDebugImage.IMG_DEBUG_ONESET_EN:PDebugImage.IMG_DEBUG_ONESET_DI;
+			descriptor = breakpoint.isEnabled()?PDebugImage.IMG_DEBUG_BPTCURSET_EN:PDebugImage.IMG_DEBUG_BPTCURSET_DI;
 		else { //created job
 			String cur_set_id = uiDebugManager.getCurrentSetId();
 			String bpt_set_id = breakpoint.getSetId();
 			
 			if (bpt_set_id.equals(cur_set_id)) {
-				descriptor = breakpoint.isEnabled()?PDebugImage.IMG_DEBUG_ONESET_EN:PDebugImage.IMG_DEBUG_ONESET_DI;
+				descriptor = breakpoint.isEnabled()?PDebugImage.IMG_DEBUG_BPTCURSET_EN:PDebugImage.IMG_DEBUG_BPTCURSET_DI;
 			}
 			else {
 				if (setManager.getSet(bpt_set_id).isContainSets(cur_set_id))
-					descriptor = breakpoint.isEnabled()?PDebugImage.IMG_DEBUG_MULTISET_EN:PDebugImage.IMG_DEBUG_MULTISET_DI;
+					descriptor = breakpoint.isEnabled()?PDebugImage.IMG_DEBUG_BPTMULTISET_EN:PDebugImage.IMG_DEBUG_BPTMULTISET_DI;
 				else
-					descriptor = breakpoint.isEnabled()?PDebugImage.IMG_DEBUG_NOSET_EN:PDebugImage.IMG_DEBUG_NOSET_DI;
+					descriptor = breakpoint.isEnabled()?PDebugImage.IMG_DEBUG_BPTNOSET_EN:PDebugImage.IMG_DEBUG_BPTNOSET_DI;
 			}
 		}
 		return getImageCache().getImageFor(new OverlayImageDescriptor(PDebugImage.getImage(descriptor), computeBreakpointOverlays(breakpoint)));
