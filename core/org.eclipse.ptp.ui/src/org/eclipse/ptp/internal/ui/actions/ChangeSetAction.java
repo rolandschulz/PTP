@@ -44,21 +44,23 @@ public class ChangeSetAction extends GotoDropDownAction {
 	
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
 	    String curID = view.getCurrentSetID();    	
+	    if (curID == null || curID.length() == 0)
+	    		return;
+	    
 	    addAction(dropDownMenuMgr, IElementHandler.SET_ROOT_ID, IElementHandler.SET_ROOT_ID, curID);
-	
 		IElementHandler setManager = view.getCurrentElementHandler();
 		if (setManager == null)
 			return;
 
 		IElementSet[] sets = setManager.getSortedSets();
-    	if (sets.length > 1)
-    		dropDownMenuMgr.add(new Separator());
-    	for (int i=0; i<sets.length; i++) {
-    		if (sets[i].getID().equals(IElementHandler.SET_ROOT_ID))
-    			continue;
-    		
-    		addAction(dropDownMenuMgr, sets[i].getID(), sets[i].getID(), curID);
-    	}		
+	    	if (sets.length > 1)
+	    		dropDownMenuMgr.add(new Separator());
+	    	for (int i=0; i<sets.length; i++) {
+	    		if (sets[i].getID().equals(IElementHandler.SET_ROOT_ID))
+	    			continue;
+	    		
+	    		addAction(dropDownMenuMgr, sets[i].getID(), sets[i].getID(), curID);
+	    	}		
 	}
 	
 	protected void addAction(MenuManager dropDownMenuMgr, String e_name, String id, String curID) {

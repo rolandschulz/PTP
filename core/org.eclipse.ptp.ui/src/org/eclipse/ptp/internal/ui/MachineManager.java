@@ -187,7 +187,6 @@ public class MachineManager extends AbstractUIManager {
 		int total_element = pElements.length;
 		if (total_element > 0) {
 			IElementHandler elementHandler = new ElementHandler();
-			elementHandler.clearAll();
 			IElementSet set = elementHandler.getSetRoot();
 			for (int i=0; i<total_element; i++) {
 				set.add(new Element(set, pElements[i].getIDString(), pElements[i].getElementName()));
@@ -206,6 +205,7 @@ public class MachineManager extends AbstractUIManager {
 				if (!machineList.containsKey(macs[j].getIDString()))
 					addMachine(macs[j]);
 			}
+			setCurrentSetId(IElementHandler.SET_ROOT_ID);
 		}
 		return cur_machine_id;
 	}
