@@ -403,8 +403,10 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		String job_id = breakpoint.getJobId();
 		String jobName = uiDebugManager.isNoJob(job_id)?"":"Job: " + uiDebugManager.getName(job_id) + " - ";
 		label.append(" ");
-		label.append("<" + jobName);
-		label.append(breakpoint.getSetId() + ">");
+		label.append("{"); 
+		label.append(jobName);
+		label.append(breakpoint.getSetId());
+		label.append("}");
 		//label.append(MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.details1"), new String[] { jobName, breakpoint.getSetId() }));
 		return label;
 	}
