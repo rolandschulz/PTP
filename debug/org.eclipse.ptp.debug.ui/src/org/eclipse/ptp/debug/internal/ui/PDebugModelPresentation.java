@@ -84,11 +84,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	protected UIDebugManager uiDebugManager = null;
 	protected Map attributes = new HashMap(3);
 	private OverlayImageCache imageCache = new OverlayImageCache();
-	protected PAnnotationManager annotationManager = null;
 	
 	public PDebugModelPresentation() {
 		uiDebugManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
-		annotationManager = PAnnotationManager.getDefault();
 	}
 	
 	public static PDebugModelPresentation getDefault() {
@@ -545,17 +543,15 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	
 	public void dispose() {
 		getImageCache().disposeAll();
-		annotationManager.shutdown();
-		annotationManager = null;
 		attributes.clear();
 		super.dispose();
 	}
 	
 	public boolean addAnnotations(IEditorPart editorPart, IStackFrame stackFrame) {
-		return annotationManager.addAnnotations(editorPart, stackFrame);
+		return PAnnotationManager.getDefault().addAnnotation(editorPart, stackFrame);
 	}
 	
 	public void removeAnnotations(IEditorPart editorPart, IThread thread) {
-		annotationManager.removeAnnotations(editorPart, thread);
+		PAnnotationManager.getDefault().removeAnnotation(editorPart, thread);
 	}
 }

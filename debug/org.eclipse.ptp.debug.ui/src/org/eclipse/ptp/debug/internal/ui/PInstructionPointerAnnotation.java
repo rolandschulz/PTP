@@ -40,7 +40,18 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 			getMarker().setAttribute(IMarker.MESSAGE, message);
 		} catch (CoreException e) {}
 		setText(message);
-	}	
+	}
+	public void setMessage() {
+		String msg = "Suspended on process: ";
+		int[] tasks = getTasks();
+		for (int i=0; i<tasks.length; i++) {
+			msg += tasks[i];
+			if (i < tasks.length - 1)
+				msg += ", ";
+		}
+		setMessage(msg);
+	}
+	
 	public String getMessage() {
 		return getText();
 	}
@@ -51,12 +62,15 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 	public int[] getTasks() {
 		return convertArray(tBitSet);		
 	}
-	public int[] convertArray(BitSet bitSet) {
-		int[] intArray = new int[bitSet.cardinality()];
-		for(int i=bitSet.nextSetBit(0), j=0; i>=0; i=bitSet.nextSetBit(i+1), j++) {
-			intArray[j] = i;
-		}
-		return intArray;		
+	
+	public void addTasks(BitSet bitSet) {
+		if (tBitSet == null)
+			tBitSet = new BitSet();
+
+		tBitSet.or(bitSet);
+	}
+	public void removeTasks(BitSet bitSet) {
+		tBitSet.andNot(bitSet);
 	}
 	public boolean contains(BitSet bitSet) {
 		return tBitSet.intersects(bitSet);
@@ -64,5 +78,12 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 	public int[] containTasks(BitSet bitSet) {
 		bitSet.and(tBitSet);
 		return convertArray(bitSet);		
+	}
+	public int[] convertArray(BitSet bitSet) {
+		int[] intArray = new int[bitSet.cardinality()];
+		for(int i=bitSet.nextSetBit(0), j=0; i>=0; i=bitSet.nextSetBit(i+1), j++) {
+			intArray[j] = i;
+		}
+		return intArray;		
 	}
 }
