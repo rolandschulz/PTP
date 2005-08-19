@@ -24,7 +24,6 @@ package org.eclipse.ptp.debug.external;
 
 import java.util.Observer;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
@@ -38,6 +37,7 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
+import org.eclipse.ptp.debug.external.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.utils.Queue;
 
 /**
@@ -52,36 +52,36 @@ public interface IDebugger {
 	 * This method will be called by initialize()
 	 * protected abstract void startDebugger(IPJob job);
 	 */
-	public void exit() throws CDIException;
+	public void exit() throws PCDIException;
 	/* The debugger must implement stopDebugger()
 	 * This method will be called by exit()
 	 * protected abstract void stopDebugger();
 	 */
 	
 	/* Program Information */
-	public abstract ICDIStackFrame[] listStackFrames(IPCDIDebugProcessSet procs) throws CDIException;
-	public abstract void setCurrentStackFrame(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException;
+	public abstract ICDIStackFrame[] listStackFrames(IPCDIDebugProcessSet procs) throws PCDIException;
+	public abstract void setCurrentStackFrame(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException;
 	
 	/* Data Display and Manipulation */
-	public abstract ICDIExpression evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws CDIException;
-	public abstract ICDIArgument[] listArguments(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException;
-	public abstract ICDILocalVariable[] listLocalVariables(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException;
-	public abstract ICDIGlobalVariable[] listGlobalVariables(IPCDIDebugProcessSet procs) throws CDIException;
+	public abstract ICDIExpression evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws PCDIException;
+	public abstract ICDIArgument[] listArguments(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException;
+	public abstract ICDILocalVariable[] listLocalVariables(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException;
+	public abstract ICDIGlobalVariable[] listGlobalVariables(IPCDIDebugProcessSet procs) throws PCDIException;
 	
 	/* Execution Control */
-	public abstract void stepInto(IPCDIDebugProcessSet procs, int count) throws CDIException;
-	public abstract void stepOver(IPCDIDebugProcessSet procs, int count) throws CDIException;
-	public abstract void stepFinish(IPCDIDebugProcessSet procs, int count) throws CDIException;
-	public abstract void go(IPCDIDebugProcessSet procs) throws CDIException;
-	public abstract void halt(IPCDIDebugProcessSet procs) throws CDIException;
-	public abstract void kill(IPCDIDebugProcessSet procs) throws CDIException;
-	public abstract void run(String[] args) throws CDIException;
-	public abstract void restart() throws CDIException;
+	public abstract void stepInto(IPCDIDebugProcessSet procs, int count) throws PCDIException;
+	public abstract void stepOver(IPCDIDebugProcessSet procs, int count) throws PCDIException;
+	public abstract void stepFinish(IPCDIDebugProcessSet procs, int count) throws PCDIException;
+	public abstract void go(IPCDIDebugProcessSet procs) throws PCDIException;
+	public abstract void halt(IPCDIDebugProcessSet procs) throws PCDIException;
+	public abstract void kill(IPCDIDebugProcessSet procs) throws PCDIException;
+	public abstract void run(String[] args) throws PCDIException;
+	public abstract void restart() throws PCDIException;
 	
 	/* Breakpoints */
-	public abstract void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDILineBreakpoint bpt) throws CDIException;
-	public abstract void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIFunctionBreakpoint bpt) throws CDIException;
-	public abstract void deleteBreakpoints(ICDIBreakpoint[] bp) throws CDIException;
+	public abstract void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDILineBreakpoint bpt) throws PCDIException;
+	public abstract void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIFunctionBreakpoint bpt) throws PCDIException;
+	public abstract void deleteBreakpoints(ICDIBreakpoint[] bp) throws PCDIException;
 	
 	/* Events */
 	public void addDebuggerObserver(Observer obs);

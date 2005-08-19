@@ -24,17 +24,19 @@ import java.util.ArrayList;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
+import org.eclipse.ptp.debug.external.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.utils.Queue;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 
 public class ParallelDebugger extends AbstractDebugger {
 	
@@ -52,7 +54,7 @@ public class ParallelDebugger extends AbstractDebugger {
 				IPCDIEvent event = null;
 				int ev;
 				// Wait for event from external debugger
-				// DbgWaitEvent();
+				// DbgProgress(callback);
 				
 				// Convert to IPCDIEvent
 				/*
@@ -77,6 +79,8 @@ public class ParallelDebugger extends AbstractDebugger {
 	private DebugEventThread eventThread;
 	private long cmdTimeout = 1000; // FIXME
 	
+	public native int DbgGo(int[] procs);
+	
 	protected void startDebugger(IPJob job) {
 		eventThread = new DebugEventThread(this);
 	}
@@ -99,62 +103,86 @@ public class ParallelDebugger extends AbstractDebugger {
 		return null;
 	}
 	
-	public void restart() throws CDIException {
+	public void restart() throws PCDIException {
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "restart");
+	}
+	
+	public void run(String[] args) throws PCDIException {
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "run");		
+	}
+	
+	public void go(IPCDIDebugProcessSet procs) throws PCDIException {
+		int rc = DbgGo(procs.toBitArray());
+		if (rc != 0)
+			throw new PCDIException(toPCDIException(rc), "go");
+	}
+
+	public void kill(IPCDIDebugProcessSet procs) throws PCDIException {
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "kill");
+	}
+
+	public void halt(IPCDIDebugProcessSet procs) throws PCDIException {
+	}
+	
+	public void stepInto(IPCDIDebugProcessSet procs, int count) throws PCDIException {
+	}
+
+	public void stepOver(IPCDIDebugProcessSet procs, int count) throws PCDIException {
+	}
+
+	public void stepFinish(IPCDIDebugProcessSet procs, int count) throws PCDIException {
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "stepFinish");
+	}
+
+	public void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDILineBreakpoint bpt) throws PCDIException {
+	}
+
+	public void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIFunctionBreakpoint bpt) throws PCDIException {
+	}
+
+	public void deleteBreakpoints(ICDIBreakpoint[] bp) throws PCDIException {
+	}
+	
+	/**
+	 * list stack frames for first process in procs
+	 * TODO: extend to support multiple processes
+	 */
+	public ICDIStackFrame[] listStackFrames(IPCDIDebugProcessSet procs) throws PCDIException {
+		return null;
+	}
+	
+	public void setCurrentStackFrame(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException {
 		
 	}
-	
-	public void run(String[] args) throws CDIException {
-		
-	}
-	
-	public void go(IPCDIDebugProcessSet procs) throws CDIException {
-	}
-
-	public void kill(IPCDIDebugProcessSet procs) throws CDIException {
-	}
-
-	public void halt(IPCDIDebugProcessSet procs) throws CDIException {
-	}
-	
-	public void stepInto(IPCDIDebugProcessSet procs, int count) throws CDIException {
-	}
-
-	public void stepOver(IPCDIDebugProcessSet procs, int count) throws CDIException {
-	}
-
-	public void stepFinish(IPCDIDebugProcessSet procs, int count) throws CDIException {
-	}
-
-	public void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDIBreakpoint bpt) throws CDIException {
-	}
-
-	public void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIBreakpoint bpt) throws CDIException {
-	}
-
-	public void deleteBreakpoints(ICDIBreakpoint[] bp) throws CDIException {
-	}
-	
-	public ICDIStackFrame[] listStackFrames(IPCDIDebugProcessSet procs) throws CDIException {
+	/**
+	 * evaluate expression for first process in procs
+	 * TODO: extend to support multiple processes
+	 */
+	public ICDIExpression evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws PCDIException {
 		return null;
 	}
 	
-	public void setCurrentStackFrame(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException {
-		
-	}
-	
-	public ICDIExpression evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws CDIException {
+	/**
+	 * list local variables for first process in procs
+	 * TODO: extend to support multiple processes
+	 */
+	public ICDILocalVariable[] listLocalVariables(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException {
 		return null;
 	}
 	
-	public ICDILocalVariable[] listLocalVariables(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException {
+	/**
+	 * list global variables for first process in procs
+	 * TODO: extend to support multiple processes
+	 */
+	public ICDIGlobalVariable[] listGlobalVariables(IPCDIDebugProcessSet procs) throws PCDIException {
 		return null;
 	}
 	
-	public ICDIGlobalVariable[] listGlobalVariables(IPCDIDebugProcessSet procs) throws CDIException {
-		return null;
-	}
-	
-	public ICDIArgument[] listArguments(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws CDIException {
+	/**
+	 * list arguments for first process in procs
+	 * TODO: extend to support multiple processes
+	 */
+	public ICDIArgument[] listArguments(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException {
 		return null;
 	}
 }
