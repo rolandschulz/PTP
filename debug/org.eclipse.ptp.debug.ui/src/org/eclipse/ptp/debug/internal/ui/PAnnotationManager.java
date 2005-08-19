@@ -211,8 +211,8 @@ public class PAnnotationManager {
 		String set_id = uiDebugManager.getCurrentSetId();
 		IElementHandler handler = uiDebugManager.getElementHandler(job_id);
 		IElementSet set = handler.getSet(set_id);
-		taskId.cardinality();
 		//FIXME should be improved this checking method
+		taskId.cardinality();
 		for(int i=taskId.nextSetBit(0); i>=0; i=taskId.nextSetBit(i+1)) {
 			if (set.contains(String.valueOf(i)))
 				return true;

@@ -149,6 +149,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}				
 	}
 	public void changeSetEvent(IElementSet curSet, IElementSet preSet) {
+		System.out.println("curset: "+ curSet + ", preSet: " + preSet);
 		updateBreakpointMarker(curSet.getID());
 
 		IPCDISession session = (IPCDISession)getDebugSession(getCurrentJobId());
@@ -156,6 +157,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		if (elementHandler == null)
 			return;
 
+		if (preSet == null)
+			return;
+		
 		String[] registerElementsID = elementHandler.getRegisteredElementsID();
 		for (int i=0; i<registerElementsID.length; i++) {
 			if (curSet.contains(registerElementsID[i])) {
@@ -212,22 +216,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	public void handleDebugEvents(ICDIEvent[] events) {
 		for (int i=0; i<events.length; i++) {
 			IPCDIEvent event = (IPCDIEvent)events[i];
-			/*
-			int[] processes = event.getProcesses();			
-			String job_id = getCurrentJobId();
-			if (event instanceof ICDISuspendedEvent) {
-				for (int j=0; j<processes.length; j++) {
-					IPProcess process = findProcessbyName(job_id, String.valueOf(processes[j]));
-					System.out.println("---------------- process suspend: " + process.getID());
-				}
-			}
-			else if (event instanceof ICDICreatedEvent) {
-				for (int j=0; j<processes.length; j++) {
-					IPProcess process = findProcessbyName(job_id, String.valueOf(processes[j]));
-					System.out.println("---------------- process created: " + process.getID());
-				}
-			}
-			*/
 			if (event instanceof TargetRegisteredEvent) {
 				TargetRegisteredEvent targetRegisteredEvent = (TargetRegisteredEvent)event;
 				String job_id = targetRegisteredEvent.getDebugJob().getIDString();
