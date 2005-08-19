@@ -7,7 +7,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             name="%ParallelDebugPerspective.name"
-            icon="icons/ptp.gif"
+            icon="icons/ptpdebug.gif"
             class="org.eclipse.ptp.debug.internal.ui.PTPDebugPerspectiveFactory"
             id="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
       </perspective>
@@ -21,7 +21,7 @@
       </category>
       <view
             name="%ParallelDebugView.name"
-            icon="icons/ptp.gif"
+            icon="icons/ptpdebug.gif"
             category="org.eclipse.ptp.debug.ui.views"
             class="org.eclipse.ptp.debug.ui.views.ParallelDebugView"
             id="org.eclipse.ptp.debug.ui.views.parallelDebugView">

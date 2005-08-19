@@ -38,8 +38,8 @@ public class ChangeSetAction extends GotoDropDownAction {
     
 	public ChangeSetAction(AbstractParallelElementView view) {
 		super(name, view);
-	    setImageDescriptor(ParallelImages.ID_ICON_CREATESET_NORMAL);
-	    setDisabledImageDescriptor(ParallelImages.ID_ICON_CREATESET_DISABLE);
+	    setImageDescriptor(ParallelImages.ID_ICON_CHANGESET_NORMAL);
+	    setDisabledImageDescriptor(ParallelImages.ID_ICON_CHANGESET_DISABLE);
 	}
 	
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
@@ -105,8 +105,6 @@ public class ChangeSetAction extends GotoDropDownAction {
 	private class InternalSetAction extends GotoAction {
 		public InternalSetAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
 			super(name, id, view, action);
-		    setImageDescriptor(ParallelImages.ID_ICON_CREATESET_NORMAL);
-		    setDisabledImageDescriptor(ParallelImages.ID_ICON_CREATESET_DISABLE);
 		}	
 	}
 }
