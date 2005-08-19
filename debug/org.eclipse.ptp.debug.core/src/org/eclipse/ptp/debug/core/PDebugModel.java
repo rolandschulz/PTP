@@ -199,8 +199,10 @@ public class PDebugModel {
 									continue;
 					
 								IPBreakpoint breakpoint = (IPBreakpoint)breakpoints[i];
-								if (breakpoint.getJobId().length() == 0)
+								if (breakpoint.getJobId().length() == 0) {
+									breakpoint.setSetId(set_id);
 									breakpoint.setJobId(job_id);
+								}
 					
 								breakpoint.setCurSetId(set_id);
 							}
