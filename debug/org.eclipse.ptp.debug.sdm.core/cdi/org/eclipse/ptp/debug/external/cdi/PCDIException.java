@@ -31,6 +31,11 @@ public class PCDIException extends CDIException {
 	public static final int INVALID_PROCESS_SET = 102;
 
 	private int status;
+
+	public PCDIException(String desc) {
+		super(desc);
+		this.status = NOT_IMPLEMENTED;
+	}
 	
 	public PCDIException(int status, String desc) {
 		super(desc);
