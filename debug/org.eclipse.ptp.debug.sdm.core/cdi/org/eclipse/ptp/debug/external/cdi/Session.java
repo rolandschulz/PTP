@@ -39,20 +39,19 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetUnregisteredEvent;
-import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
-import org.eclipse.ptp.debug.external.utils.BitList;
 
 public class Session implements IPCDISession, ICDISessionObject {
 	EventManager eventManager;
 	BreakpointManager breakpointManager;
 	ExpressionManager expressionManager;
 	VariableManager variableManager;
+	ModelManager modelManager;
 	
 	Properties props;
 	SessionConfiguration configuration;
@@ -63,7 +62,6 @@ public class Session implements IPCDISession, ICDISessionObject {
 	IPJob dJob;
 	
 	Hashtable currentDebugTargetList;
-	Hashtable currentProcessSetList;
 	
 	public Session(IPJob job, IDebugger iDebugger, ILaunch launch, IBinaryObject binObj) {
 		props = new Properties();
@@ -79,9 +77,9 @@ public class Session implements IPCDISession, ICDISessionObject {
 		breakpointManager = new BreakpointManager(this);
 		expressionManager = new ExpressionManager(this);
 		variableManager = new VariableManager(this);
+		modelManager = new ModelManager(this);
 		
 		currentDebugTargetList = new Hashtable();
-		currentProcessSetList = new Hashtable();
 		
 		debugger.addDebuggerObserver(eventManager);
 		
@@ -107,43 +105,6 @@ public class Session implements IPCDISession, ICDISessionObject {
 		return debugger.getProcess(i).getProcess();
 	}
 	
-	public IPCDIDebugProcessSet newProcessSet(String name, int[] procs) {
-		if (currentProcessSetList.containsKey(name)) {
-			return null;
-		}
-
-		IPCDIDebugProcessSet newSet = new DebugProcessSet(name);
-		for (int i = 0; i < procs.length; i++) {
-			newSet.addProcess(debugger.getProcess(procs[i]));
-		}
-		
-		currentProcessSetList.put(newSet.getName(), newSet);
-		
-		return newSet;
-	}
-	
-	public void delProcessSet(String name) {
-		currentProcessSetList.remove(name);
-	}
-	
-	public IPCDIDebugProcessSet[] getProcessSets() {
-		int size = currentProcessSetList.size();
-		IPCDIDebugProcessSet[] pSets = new IPCDIDebugProcessSet[size];
-		int index = 0;
-		
-	    Iterator it = currentProcessSetList.keySet().iterator();
-	    while (it.hasNext()) {
-	       String procSetName =  (String) it.next();
-	       IPCDIDebugProcessSet procSet = (IPCDIDebugProcessSet) currentProcessSetList.get(procSetName);
-	       pSets[index++] = procSet;
-	    }
-	    return pSets;
-	}
-	
-	public IPCDIDebugProcessSet getProcessSet(String name) {
-		return (IPCDIDebugProcessSet) currentProcessSetList.get(name);
-	}
-
 	public void registerTarget(int procNum, boolean sendEvent) {
 		if (isRegistered(procNum))
 			return;
@@ -292,7 +253,11 @@ public class Session implements IPCDISession, ICDISessionObject {
 	public ICDIEventManager getEventManager() {
 		return eventManager;
 	}
-	
+
+	public ModelManager getModelManager() {
+		return modelManager;
+	}
+
 	public ExpressionManager getExpressionManager() {
 		return expressionManager;
 	}

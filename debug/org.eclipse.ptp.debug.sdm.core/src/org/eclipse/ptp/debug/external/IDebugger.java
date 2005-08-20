@@ -37,8 +37,8 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
+import org.eclipse.ptp.debug.core.utils.Queue;
 import org.eclipse.ptp.debug.external.cdi.PCDIException;
-import org.eclipse.ptp.debug.external.utils.Queue;
 
 /**
  * @author donny

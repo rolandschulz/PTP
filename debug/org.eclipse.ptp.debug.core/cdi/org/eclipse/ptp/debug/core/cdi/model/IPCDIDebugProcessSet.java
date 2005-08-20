@@ -21,7 +21,14 @@ package org.eclipse.ptp.debug.core.cdi.model;
 public interface IPCDIDebugProcessSet extends IPCDIDebugEntity {
 	public IPCDIDebugProcess[] getProcesses();
 	public IPCDIDebugProcess getProcess(int number);
-	public void addProcess(IPCDIDebugProcess proc);
-	public void removeProcess(IPCDIDebugProcess proc);
+	/* We do not maintain the IPCDIDebugProcess list in
+	 * the set, so the arguments to addProcess() and removeProcess()
+	 * are not IPCDIDebugProcess (but integers)
+	 */
+	public void addProcess(int proc);
+	public void addProcess(int[] proc);
+	public void removeProcess(int proc);
+	public void removeProcess(int[] proc);
 	public int getSize();
+	public int[] toIntArray();
 }

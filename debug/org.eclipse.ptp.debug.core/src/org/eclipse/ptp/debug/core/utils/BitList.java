@@ -17,7 +17,7 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.debug.external.utils;
+package org.eclipse.ptp.debug.core.utils;
 
 import java.util.BitSet;
 
@@ -36,9 +36,19 @@ public class BitList {
 	public void clear(int index) {
 		bitSet.clear(index);
 	}
-	
+
+	public void clear(int[] indexs) {
+		for (int i = 0; i < indexs.length; i++)
+			bitSet.clear(indexs[i]);
+	}
+
 	public void set(int index) {
 		bitSet.set(index);
+	}
+
+	public void set(int[] indexs) {
+		for (int i = 0; i < indexs.length; i++)
+			bitSet.set(indexs[i]);
 	}
 	
 	public boolean get(int index) {
@@ -47,5 +57,13 @@ public class BitList {
 	
 	public int nextSetBit(int index) {
 		return bitSet.nextSetBit(index);
+	}
+	
+	public int[] toArray() {
+		int[] retValue = new int[bitSet.cardinality()];
+		for(int i = bitSet.nextSetBit(0), j = 0; i >= 0; i = bitSet.nextSetBit(i+1), j++) {
+			retValue[j] = i;
+		}
+		return retValue;
 	}
 }

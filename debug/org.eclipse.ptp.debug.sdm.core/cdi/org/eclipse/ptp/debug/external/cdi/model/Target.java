@@ -80,7 +80,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		super(s);
 		fDebugger = debugger;
 		targetId = tId;
-		debugProcess = debugger.getProcess(targetId);
+		debugProcess = s.getModelManager().getProcess(targetId);
 		
 		fConfiguration = new TargetConfiguration(this);
 		currentThreads = new Thread[0];
@@ -109,7 +109,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		Target target = (Target) frame.getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+		DebugProcessSet newSet = new DebugProcessSet(session, "", target.getTargetId());
 
 		return createExpression(expressionText).getValue(frame).getValueString();
 	}

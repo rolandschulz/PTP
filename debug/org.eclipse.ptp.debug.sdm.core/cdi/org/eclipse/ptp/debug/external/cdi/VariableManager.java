@@ -90,7 +90,7 @@ public class VariableManager extends Manager {
 		Target target = (Target)frame.getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+		DebugProcessSet newSet = new DebugProcessSet(session, "", target.getTargetId());
 		ICDIArgument[] args = debugger.listArguments(newSet, frame);
 		if (args != null) {
 			for (int i = 0; i < args.length; i++) {
@@ -111,7 +111,7 @@ public class VariableManager extends Manager {
 		Target target = (Target)frame.getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+		DebugProcessSet newSet = new DebugProcessSet(session, "", target.getTargetId());
 		ICDILocalVariable[] args = debugger.listLocalVariables(newSet, frame);
 		if (args != null) {
 			for (int i = 0; i < args.length; i++) {
@@ -144,7 +144,7 @@ public class VariableManager extends Manager {
 		Target target = (Target)frame.getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+		DebugProcessSet newSet = new DebugProcessSet(session, "", target.getTargetId());
 		ICDILocalVariable[] vars = debugger.listLocalVariables(newSet, frame);
 		for (int i = 0; i < vars.length; i++) {
 			if (varDesc.getName().equals(vars[i].getName()))
@@ -159,7 +159,7 @@ public class VariableManager extends Manager {
 		Target target = (Target)frame.getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+		DebugProcessSet newSet = new DebugProcessSet(session, "", target.getTargetId());
 		ICDIGlobalVariable[] vars = debugger.listGlobalVariables(newSet);
 		for (int i = 0; i < vars.length; i++) {
 			if (varDesc.getName().equals(vars[i].getName()))
@@ -174,7 +174,7 @@ public class VariableManager extends Manager {
 		Target target = (Target)frame.getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+		DebugProcessSet newSet = new DebugProcessSet(session, "", target.getTargetId());
 		ICDIArgument[] vars = debugger.listArguments(newSet, frame);
 		for (int i = 0; i < vars.length; i++) {
 			if (argDesc.getName().equals(vars[i].getName()))
