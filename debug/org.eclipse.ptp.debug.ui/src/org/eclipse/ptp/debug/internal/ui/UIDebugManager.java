@@ -18,12 +18,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui;
 
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Iterator;
+import java.util.List;
+
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.core.resources.IMarkerDelta;
+import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
@@ -37,6 +48,7 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetUnregisteredEvent;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.listeners.IRegListener;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.listeners.ISetListener;
@@ -49,17 +61,35 @@ import org.eclipse.ptp.ui.model.IElementSet;
  *
  */
 public class UIDebugManager extends JobManager implements ISetListener, IBreakpointListener, ICDIEventListener, IPDebugListener {
+	public final static String BITSET_KEY = "bitset";
+	private final static int REG_TYPE = 1;
+	private final static int UNREG_TYPE = 2;
+	
+	private List regListeners = new ArrayList();
+	private PAnnotationManager annotationMgr = null;
+	
 	public UIDebugManager() {
 		PTPUIPlugin.getDefault().getUIManager().addSetListener(this);
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
 		PTPDebugCorePlugin.getDefault().addDebugSessionListener(this);
+		annotationMgr = new PAnnotationManager(this);
 	}
 	
 	public void shutdown() {
 		PTPUIPlugin.getDefault().getUIManager().removeSetListener(this);
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
 		PTPDebugCorePlugin.getDefault().removeDebugSessionListener(this);
+		regListeners.clear();
+		annotationMgr.shutdown();
 		super.shutdown();
+	}
+	
+	public boolean isDebugging(String job_id) {
+		if (isNoJob(job_id))
+			return false;
+		
+		IPJob job = findJobById(job_id);
+		return (job != null && !job.isAllStop() && job.isDebug());
 	}
 	
 	public void jobChangedEvent(String cur_jid, String pre_jid) {
@@ -68,19 +98,37 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		createEventListener(cur_jid);
 	}
 
+	public void addRegListener(IRegListener listener) {
+		if (!regListeners.contains(listener))
+			regListeners.add(listener);
+	}
+	public void removeRegListener(IRegListener listener) {
+		if (regListeners.contains(listener))
+			regListeners.remove(listener);
+	}
+	public void fireRegListener(int type, BitSet tasks) {
+		for (Iterator i=regListeners.iterator(); i.hasNext();) {
+			switch (type) {
+			case REG_TYPE:
+				((IRegListener)i.next()).register(tasks);
+				break;
+			case UNREG_TYPE:
+				((IRegListener)i.next()).unregister(tasks);
+			}
+		}
+	}
+
 	public void createEventListener(String job_id) {
 		ICDISession session = getDebugSession(job_id);
 		if (session != null) {
 			session.getEventManager().addEventListener(this);
 		}
 	}
-	
 	public void removeEventListener(String job_id) {
 		ICDISession session = getDebugSession(job_id);
 		if (session != null)
 			session.getEventManager().removeEventListener(this);		
-	}
-	
+	}	
 	public ICDISession getDebugSession(String job_id) {
 		if (isNoJob(job_id))
 			return null;
@@ -89,11 +137,14 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		return PTPDebugCorePlugin.getDefault().getDebugSession(job);
 	}
 
-	public void registerProcess(IPCDISession session, int task_id, boolean isRegister, boolean isChanged) {
-		if (isRegister)
-			session.registerTarget(task_id, isChanged);
-		else
-			session.unregisterTarget(task_id, isChanged);
+	public int convertToInt(String id) {
+		return Integer.parseInt(id);
+	}
+	public void registerProcess(IPCDISession session, int task_id, boolean isChanged) {
+		session.registerTarget(task_id, isChanged);
+	}
+	public void unregisterProcess(IPCDISession session, int task_id, boolean isChanged) {
+		session.unregisterTarget(task_id, isChanged);
 	}
 	
 	public void unregisterElements(IElement[] elements) {
@@ -101,24 +152,37 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			return;
 		
 		IPCDISession session = (IPCDISession)getDebugSession(getCurrentJobId());
+		if (session == null)
+			return;		
+		BitSet tasks = new BitSet();
 		for (int i=0; i<elements.length; i++) {			
 			//only unregister some registered elements
 			if (elements[i].isRegistered()) {
-				registerProcess(session, Integer.parseInt(elements[i].getName()), false, true);
+				int taskId = convertToInt(elements[i].getName());
+				unregisterProcess(session, taskId, true);
+				tasks.set(taskId);
 			}
 		}
+		fireRegListener(UNREG_TYPE, tasks);
 	}
 	public void registerElements(IElement[] elements) {
 		if (isJobStop(getCurrentJobId()))
 			return;
 
 		IPCDISession session = (IPCDISession)getDebugSession(getCurrentJobId());
+		if (session == null)
+			return;
+
+		BitSet tasks = new BitSet();
 		for (int i=0; i<elements.length; i++) {
 			//only register some unregistered elements
 			if (!elements[i].isRegistered()) {
-				registerProcess(session, Integer.parseInt(elements[i].getName()), true, true);
+				int taskId = convertToInt(elements[i].getName());
+				registerProcess(session, taskId, true);
+				tasks.set(taskId);
 			}
 		}
+		fireRegListener(REG_TYPE, tasks);
 	}
 	
 	/******
@@ -148,29 +212,49 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			PTPDebugUIPlugin.log(e);
 		}				
 	}
-	public void changeSetEvent(IElementSet curSet, IElementSet preSet) {
+	public void changeSetEvent(final IElementSet curSet, final IElementSet preSet) {
 		updateBreakpointMarker(curSet.getID());
 
-		IPCDISession session = (IPCDISession)getDebugSession(getCurrentJobId());
-		IElementHandler elementHandler = getElementHandler(getCurrentJobId());
+		final IElementHandler elementHandler = getElementHandler(getCurrentJobId());
 		if (elementHandler == null)
 			return;
-
-		if (preSet == null)
-			return;
 		
-		String[] registerElementsID = elementHandler.getRegisteredElementsID();
-		for (int i=0; i<registerElementsID.length; i++) {
-			if (curSet.contains(registerElementsID[i])) {
-				if (!preSet.contains(registerElementsID[i])) {
-					String taskID = elementHandler.getSetRoot().get(registerElementsID[i]).getName();
-					registerProcess(session, Integer.parseInt(taskID), true, false);
-				}
-			} 
-			else {
-				String taskID = elementHandler.getSetRoot().get(registerElementsID[i]).getName();
-				registerProcess(session, Integer.parseInt(taskID), false, false);
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException {
+				new Job("Updating") {
+					protected IStatus run(IProgressMonitor pmonitor) {
+						IPCDISession session = (IPCDISession)getDebugSession(getCurrentJobId());
+						String[] registerElementsID = elementHandler.getRegisteredElementsID();
+						for (int i=0; i<registerElementsID.length; i++) {
+							if (curSet.contains(registerElementsID[i])) {
+								if (!preSet.contains(registerElementsID[i])) {
+									int taskID = convertToInt(elementHandler.getSetRoot().get(registerElementsID[i]).getName());				
+									registerProcess(session, taskID, false);
+									BitSet tasks = new BitSet();
+									tasks.set(taskID);
+									fireRegListener(UNREG_TYPE, tasks);
+								}
+							} 
+							else {
+								int taskID = convertToInt(elementHandler.getSetRoot().get(registerElementsID[i]).getName());				
+								unregisterProcess(session, taskID, false);
+								BitSet tasks = new BitSet();
+								tasks.set(taskID);
+								fireRegListener(UNREG_TYPE, tasks);
+								
+							}
+						}
+						//update annotation
+						return Status.OK_STATUS;
+					}
+				}.schedule();
 			}
+		};
+		try {
+			ResourcesPlugin.getWorkspace().run(runnable, null, 0, null);
+			annotationMgr.updateAnnotation(curSet, preSet);
+		} catch (CoreException e) {
+			PTPDebugUIPlugin.log(e);
 		}
 	}
 	//Delete the set that will delete the all related breakpoint
@@ -180,10 +264,31 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 		}
+		set.setData(BITSET_KEY, null);		
 	}
-	public void createSetEvent(IElementSet set, IElement[] elements) {}
-	public void addElementsEvent(IElementSet set, IElement[] elements) {}
-	public void removeElementsEvent(IElementSet set, IElement[] elements) {}	
+	public void createSetEvent(IElementSet set, IElement[] elements) {
+		BitSet tasks = new BitSet();
+		for (int i=0; i<elements.length; i++) {
+			tasks.set(convertToInt(elements[i].getName()));
+		}
+		set.setData(BITSET_KEY, tasks);
+	}
+	public void addElementsEvent(IElementSet set, IElement[] elements) {
+		BitSet tasks = (BitSet)set.getData(BITSET_KEY);
+		BitSet addTasks = new BitSet();
+		for (int i=0; i<elements.length; i++) {
+			tasks.set(convertToInt(elements[i].getName()));
+		}
+		tasks.or(addTasks);
+	}
+	public void removeElementsEvent(IElementSet set, IElement[] elements) {
+		BitSet tasks = (BitSet)set.getData(BITSET_KEY);
+		BitSet addTasks = new BitSet();
+		for (int i=0; i<elements.length; i++) {
+			tasks.set(convertToInt(elements[i].getName()));
+		}
+		tasks.andNot(addTasks);
+	}
 
     	/*
     	 * Cannot unregister the extension
@@ -199,14 +304,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				System.out.println("Err: " + e.getMessage());
 			}
 		} 
-		if (bundle != null && bundle.getState() == Bundle.UNINSTALLED) {
-			try {
-				Platform.getBundle(CDT_DEBUG_UI_ID).start();
-				System.out.println("Add: " + bundle.getState());
-			} catch (BundleException e) {
-				System.out.println("Err: " + e.getMessage());
-			}
-		}
 		*/
 	
 	/*****
@@ -225,6 +322,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					IPProcess proc = job.findProcessByTaskId(processes[i]);
 					elementHandler.addRegisterElement(proc.getIDString());
 					elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(true);
+					//fireRegListener(true, event. )
 				}
 			}
 			else if (event instanceof TargetUnregisteredEvent) {
@@ -237,13 +335,14 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					IPProcess proc = job.findProcessByTaskId(processes[i]);
 					elementHandler.removeRegisterElement(proc.getIDString());
 					elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(false);
+					//fireRegListener(false, event. )
 				}
 			}
 			firePaintListener();
 		}
 	}
 	
-	//ONLY for detectt the debug sesssion is created
+	//ONLY for detect the debug sesssion is created
 	public void update(IPCDISession session) {
 		createEventListener(getCurrentJobId());
 	}

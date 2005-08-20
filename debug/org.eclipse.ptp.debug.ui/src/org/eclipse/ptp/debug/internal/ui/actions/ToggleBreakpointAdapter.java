@@ -33,6 +33,7 @@ import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
@@ -85,7 +86,9 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 								DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);
 							}
 							else {
-								PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, uiDebugManager.getCurrentSetId(), uiDebugManager.getCurrentJobId());
+								String sid = uiDebugManager.getCurrentSetId();
+								sid = (sid == null || sid.length() == 0)?IElementHandler.SET_ROOT_ID:sid;
+								PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, uiDebugManager.getCurrentJobId());
 							}
 							return;
 						}
