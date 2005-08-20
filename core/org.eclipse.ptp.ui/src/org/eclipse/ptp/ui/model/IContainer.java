@@ -38,4 +38,7 @@ public interface IContainer extends IElement {
 	public IElement[] getSorted();
 	public IElement get(String id);
 	public IElement get(int index);
+	
+	public void setData(String key, Object data);
+	public Object getData(String key);
 }

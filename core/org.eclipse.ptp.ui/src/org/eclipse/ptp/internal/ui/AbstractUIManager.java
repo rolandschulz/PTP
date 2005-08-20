@@ -25,7 +25,6 @@ import java.util.List;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.listeners.IPaintListener;
-import org.eclipse.ptp.ui.model.IElementHandler;
 
 /**
  * @author Clement chu
@@ -53,7 +52,7 @@ public abstract class AbstractUIManager implements IManager {
 
 	protected void firePaintListener() {
 		for (Iterator i=pListeners.iterator(); i.hasNext();) {
-			((IPaintListener)i.next()).redraw();
+			((IPaintListener)i.next()).repaint();
 		}
 	}
 }

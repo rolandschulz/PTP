@@ -24,21 +24,27 @@ import java.util.List;
 
 import org.eclipse.ptp.ui.model.IContainer;
 import org.eclipse.ptp.ui.model.IElement;
+import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 /**
  * @author clement chu
  *
  */
-public class ElementSet extends Container implements IElementSet {
-	private List matchSets = new ArrayList(0);
+public class ElementSet extends Container implements IElementSet {	
+	//only store the set id;
+	private final String MATCHSET_KEY = "matchset";
 	
 	public ElementSet(IElement parent, String id, String name) {
 		this(parent, id, name, false);
 	}
 	public ElementSet(IElement parent, String id, String name, boolean selected) {
 		super(parent, id, name, selected, IContainer.ELEMENT_TYPE);
+		setData(MATCHSET_KEY, new ArrayList());
 	}
 	
+	public boolean isRootSet() {
+		return (id.equals(IElementHandler.SET_ROOT_ID));
+	}
 	public IElement[] getSelectedElements() {
 		List selectedElements = new ArrayList();
 		for (Iterator i=elementMap.values().iterator(); i.hasNext();) {
@@ -85,20 +91,29 @@ public class ElementSet extends Container implements IElementSet {
 		return get(index);
 	}
 	public void addMatchSet(String setId) {
-		if (!matchSets.contains(setId))
-			matchSets.add(setId);
+		List setList = getMatchSetList();
+		if (!setList.contains(setId))
+			setList.add(setId);
 	}
 	public void removeMatchSet(String setId) {
-		if (matchSets.contains(setId))
-			matchSets.remove(setId);
+		List setList = getMatchSetList();
+		if (setList.contains(setId))
+			setList.remove(setId);
 	}
 	public String[] getMatchSets() {
-		return (String[])matchSets.toArray(new String[matchSets.size()]);
+		List setList = getMatchSetList();
+		return (String[])setList.toArray(new String[setList.size()]);
 	}
 	public boolean containOtherSets() {
-		return (matchSets.size()>0);
+		List setList = getMatchSetList();
+		return (setList.size()>0);
 	}
 	public boolean isContainSets(String set_id) {
-		return matchSets.contains(set_id);
+		List setList = getMatchSetList();
+		return setList.contains(set_id);
+	}
+	
+	private List getMatchSetList() {
+		return (List)getData(MATCHSET_KEY);
 	}
 }

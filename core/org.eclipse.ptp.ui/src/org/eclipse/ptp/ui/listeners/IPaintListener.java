@@ -23,5 +23,5 @@ package org.eclipse.ptp.ui.listeners;
  *
  */
 public interface IPaintListener {
-	public void redraw();
+	public void repaint();
 }

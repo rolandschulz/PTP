@@ -29,6 +29,7 @@ import org.eclipse.ptp.ui.model.IElement;
  *
  */
 public abstract class Container extends Element implements IContainer {
+	protected Map dataMap = new HashMap();
 	protected Map elementMap = new HashMap();
 	protected IElement[] sortedArray = new IElement[0];
 	protected int store_element_type = ELEMENT_TYPE; 
@@ -36,6 +37,13 @@ public abstract class Container extends Element implements IContainer {
 	public Container(IElement parent, String id, String name, boolean selected, int cur_type) {
 		super(parent, id, name, selected);
 		this.store_element_type = cur_type;
+	}
+	
+	public void setData(String key, Object data) {
+		dataMap.put(key, data);
+	}
+	public Object getData(String key) {
+		return dataMap.get(key);
 	}
 	
 	public IElement getParent() {
