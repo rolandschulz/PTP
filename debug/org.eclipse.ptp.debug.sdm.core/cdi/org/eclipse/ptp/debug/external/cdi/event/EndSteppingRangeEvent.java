@@ -26,33 +26,31 @@
  * Contributors:
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.debug.core;
+package org.eclipse.ptp.debug.external.cdi.event;
+
+import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
+import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.external.cdi.EndSteppingRange;
+import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.utils.BitList;
 
 /**
- * Constant definitions for C/C++ debug plug-in.
+ *
  */
-public interface IPDebugConstants {
+public class EndSteppingRangeEvent extends AbstractEvent implements ICDISuspendedEvent {
 
-	/**
-	 * C/C++ debug plug-in identifier (value
-	 * <code>"org.eclipse.ptp.debug.core"</code>).
-	 */
-	public static final String PLUGIN_ID = PTPDebugCorePlugin.getUniqueIdentifier();
-
-	/**
-	 * The identifier of the default variable format to use in the variables
-	 * view
-	 */
-	public static final String PREF_DEFAULT_VARIABLE_FORMAT = PLUGIN_ID + "pDebug.default_variable_format"; //$NON-NLS-1$
+	public EndSteppingRangeEvent(IPCDISession s, BitList sources) {
+		super(s, sources);
+	}
 	
-	/**
-	 * The identifier of the default expression format to use in the expressions
-	 * views
-	 */
-	public static final String PREF_DEFAULT_EXPRESSION_FORMAT = PLUGIN_ID + "pDebug.default_expression_format"; //$NON-NLS-1$
-
-	/**
-	 * The identifier of the common source locations list
-	 */
-	public static final String PREF_SOURCE_LOCATIONS = PLUGIN_ID + "pDebug.Source.source_locations"; //$NON-NLS-1$
+	public ICDISessionObject getReason() {
+		// Auto-generated method stub
+		System.out.println("SuspendedEvent.getReason()");
+/*		if (event instanceof EBreakpointHit) {
+			return new BreakpointHit(session, (EBreakpointHit)event);
+		}
+*/		return new EndSteppingRange((Session) session, this);
+		//return session;
+	}
 }

@@ -51,6 +51,7 @@ import org.eclipse.ptp.debug.external.utils.BitList;
 public class Session implements IPCDISession, ICDISessionObject {
 	EventManager eventManager;
 	BreakpointManager breakpointManager;
+	ExpressionManager expressionManager;
 	VariableManager variableManager;
 	
 	Properties props;
@@ -76,6 +77,7 @@ public class Session implements IPCDISession, ICDISessionObject {
 		
 		eventManager = new EventManager(this);
 		breakpointManager = new BreakpointManager(this);
+		expressionManager = new ExpressionManager(this);
 		variableManager = new VariableManager(this);
 		
 		currentDebugTargetList = new Hashtable();
@@ -290,6 +292,10 @@ public class Session implements IPCDISession, ICDISessionObject {
 	
 	public ICDIEventManager getEventManager() {
 		return eventManager;
+	}
+	
+	public ExpressionManager getExpressionManager() {
+		return expressionManager;
 	}
 
 	public ICDISessionConfiguration getConfiguration() {

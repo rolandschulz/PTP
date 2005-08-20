@@ -32,6 +32,8 @@ import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
+import org.eclipse.ptp.debug.external.IDebugger;
+import org.eclipse.ptp.debug.external.cdi.Session;
 
 /**
  */
@@ -60,10 +62,13 @@ public class Value extends PTPObject implements ICDIValue {
 		// Auto-generated method stub
 		System.out.println("Value.getValueString()");
 
-		String result = "";
-		result = variable.fValue;
-		
-		return result;
+		Target target = (Target) variable.getTarget();
+		Session session = (Session) target.getSession();
+		IDebugger debugger = session.getDebugger();
+		DebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+		String valString = debugger.evaluateExpression(newSet, variable);
+
+		return valString;
 	}
 
 	public int getChildrenNumber() throws CDIException {

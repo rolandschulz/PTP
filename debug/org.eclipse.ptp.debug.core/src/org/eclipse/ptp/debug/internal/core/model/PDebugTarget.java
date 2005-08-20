@@ -102,10 +102,13 @@ import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.IExpressionListener;
+import org.eclipse.debug.core.IExpressionManager;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.core.model.IExpression;
 import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IRegisterGroup;
@@ -132,7 +135,7 @@ import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceManager;
 /**
  * Debug target for C/C++ debug model.
  */
-public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEventListener, ILaunchListener, ISourceLookupChangeListener {
+public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEventListener, ILaunchListener, IExpressionListener, ISourceLookupChangeListener {
 
 	/**
 	 * Threads contained in this debug target. 
@@ -224,6 +227,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		setGlobalVariableManager( new PGlobalVariableManager( this ) );
 		initialize();
 		DebugPlugin.getDefault().getLaunchManager().addLaunchListener( this );
+		DebugPlugin.getDefault().getExpressionManager().addExpressionListener( this );
 		getCDISession().getEventManager().addEventListener( this );
 	}
 	
@@ -858,12 +862,14 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		resetStatus();
 		removeAllThreads();
 		getCDISession().getEventManager().removeEventListener( this );
+		DebugPlugin.getDefault().getExpressionManager().removeExpressionListener( this );
 		DebugPlugin.getDefault().getLaunchManager().removeLaunchListener( this );
 		saveGlobalVariables();
 		disposeGlobalVariableManager();
 		disposeSourceManager();
 		disposeSourceLookupPath();
 		disposeBreakpointManager();
+		removeAllExpressions();
 		disposePreferences();
 	}
 
@@ -881,6 +887,19 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			debugEvents.add( thread.createTerminateEvent() );
 		}
 		fireEventSet( (DebugEvent[])debugEvents.toArray( new DebugEvent[debugEvents.size()] ) );
+	}
+
+	/**
+	 * Removes all expressions from this target.
+	 */
+	protected void removeAllExpressions() {
+		IExpressionManager em = DebugPlugin.getDefault().getExpressionManager();
+		IExpression[] expressions = em.getExpressions();
+		for( int i = 0; i < expressions.length; ++i ) {
+			if ( expressions[i] instanceof CExpression && expressions[i].getDebugTarget().equals( this ) ) {
+				em.removeExpression( expressions[i] );
+			}
+		}
 	}
 
 	/**
@@ -1099,6 +1118,27 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 
 	protected boolean supportsExpressionEvaluation() {
 		return getConfiguration().supportsExpressionEvaluation();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.IExpressionListener#expressionAdded(org.eclipse.debug.core.model.IExpression)
+	 */
+	public void expressionAdded( IExpression expression ) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.IExpressionListener#expressionChanged(org.eclipse.debug.core.model.IExpression)
+	 */
+	public void expressionChanged( IExpression expression ) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.IExpressionListener#expressionRemoved(org.eclipse.debug.core.model.IExpression)
+	 */
+	public void expressionRemoved( IExpression expression ) {
+		if ( expression instanceof CExpression && expression.getDebugTarget().equals( this ) ) {
+			((CExpression)expression).dispose();
+		}
 	}
 
 	public void setInternalTemporaryBreakpoint( ICDILocation location ) throws DebugException {

@@ -44,6 +44,7 @@ import org.eclipse.cdt.debug.core.cdi.ICDILocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
@@ -512,6 +513,7 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 		setDisposed( true );
 		getCDISession().getEventManager().removeEventListener( this );
 		disposeAllVariables();
+		disposeExpressions();
 	}
 
 	protected void disposeAllVariables() {
@@ -523,6 +525,17 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 		}
 		fVariables.clear();
 		fVariables = null;
+	}
+	
+	protected void disposeExpressions() {
+		if ( fExpressions != null ) {
+			Iterator it = fExpressions.iterator();
+			while( it.hasNext() ) {
+				((CExpression)it.next()).dispose();
+			}
+			fExpressions.clear();
+		}
+		fExpressions = null;
 	}
 
 	/**
@@ -605,7 +618,7 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 
 	protected synchronized void preserve() {
 		preserveVariables();
-		//preserveExpressions();
+		preserveExpressions();
 	}
 	
 	private void preserveVariables() {
@@ -615,6 +628,16 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 		while( it.hasNext() ) {
 			AbstractCVariable av = (AbstractCVariable)it.next();
 			av.preserve();
+		}
+	}
+	
+	private void preserveExpressions() {
+		if ( fExpressions == null )
+			return;
+		Iterator it = fExpressions.iterator();
+		while( it.hasNext() ) {
+			CExpression exp = (CExpression)it.next();
+			exp.preserve();
 		}
 	}
 
@@ -706,6 +729,32 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 		catch( CDIException e ) {
 			targetRequestFailed( e.getMessage(), null );
 		}
+	}
+	
+	private synchronized CExpression getExpression( String expressionText ) throws DebugException {
+		if ( isDisposed() ) {
+			return null;
+		}
+		if ( fExpressions == null ) {
+			fExpressions = new ArrayList( 5 );
+		}
+		CExpression expression = null;
+		Iterator it = fExpressions.iterator();
+		while( it.hasNext() ) {
+			expression = (CExpression)it.next();
+			if ( expression.getExpressionText().compareTo( expressionText ) == 0 ) {
+				return expression;
+			}
+		}
+		try {
+			ICDIExpression cdiExpression = ((PDebugTarget)getDebugTarget()).getCDITarget().createExpression( expressionText );
+			expression = new CExpression( this, cdiExpression, null );
+			fExpressions.add( expression );
+		}
+		catch( CDIException e ) {
+			targetRequestFailed( e.getMessage(), null );
+		}
+		return expression;
 	}
 
 	protected boolean isDisposed() {
@@ -864,9 +913,15 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 		return false;
 	}
 
-	public IValue evaluateExpression(String expression) throws DebugException {
+	public IValue evaluateExpression(String expressionText) throws DebugException {
 		// Auto-generated method stub
 		System.out.println("CStackFrame.evaluateExpression");
+		if ( !isDisposed() ) {
+			CExpression expression = getExpression( expressionText );
+			if ( expression != null ) {
+				return expression.getValue( this );
+			}
+		}
 		return null;
 	}
 }
