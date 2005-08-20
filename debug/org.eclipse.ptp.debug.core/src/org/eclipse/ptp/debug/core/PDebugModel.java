@@ -166,7 +166,7 @@ public class PDebugModel {
 	}
 	
 	public static void deletePBreakpointBySet(final String set_id) throws CoreException {
-		IWorkspaceRunnable runnable= new IWorkspaceRunnable() {
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				final IBreakpoint[] breakpoints = findPBreakpointsBySet(set_id);
 				if (breakpoints.length > 0) {
@@ -188,7 +188,7 @@ public class PDebugModel {
 	}
 	
 	public static void updatePBreakpoints(final String job_id, final String set_id) throws CoreException {
-		IWorkspaceRunnable runnable= new IWorkspaceRunnable() {
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				new Job("Update breakpoint") {
 					protected IStatus run(IProgressMonitor pmonitor) {
