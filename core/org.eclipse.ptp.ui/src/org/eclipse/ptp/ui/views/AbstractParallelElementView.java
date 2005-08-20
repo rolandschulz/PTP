@@ -556,9 +556,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		Point s_size = toolTipShell.getSize();
 
 		int new_x = e_loc.x - (s_size.x / 2);
-		Rectangle shell_rect = Display.getCurrent().getBounds();
-		// reset the x to fit into screen size
-		new_x = (new_x < shell_rect.x) ? 0 : ((new_x + s_size.x) > shell_rect.width) ? (shell_rect.width - s_size.x - 10) : new_x;
+		Rectangle shell_rect = sc.getBounds();
+		// reset the x to fit into screen size, assume scrollbar is 10 width
+		new_x = (new_x < shell_rect.x)?0:((new_x + s_size.x) > (shell_rect.width - 10))?(shell_rect.width - s_size.x - 10):new_x;
 		int new_y = e_loc.y - s_size.y;
 		new_y = (new_y <= sc.getOrigin().y) ? (e_loc.y + e_height + e_spacing_y + 5) : new_y - 5;
 
