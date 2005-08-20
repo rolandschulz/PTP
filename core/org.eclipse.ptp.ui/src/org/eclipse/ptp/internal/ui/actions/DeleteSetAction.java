@@ -37,7 +37,6 @@ public class DeleteSetAction extends ParallelAction {
 	public DeleteSetAction(AbstractParallelElementView view) {
 		super(name, view);
 	    setImageDescriptor(ParallelImages.ID_ICON_DELETESET_NORMAL);
-	    setDisabledImageDescriptor(ParallelImages.ID_ICON_DELETESET_DISABLE);
 	}
 
 	public void run(IElement[] elements) {}
