@@ -18,8 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
-
 public interface IPCDIDebugProcess extends IPCDIDebugEntity {
 	public void setProcess(Process p);
 	public Process getProcess();

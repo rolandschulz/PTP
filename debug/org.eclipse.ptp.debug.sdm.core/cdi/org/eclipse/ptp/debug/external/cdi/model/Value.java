@@ -65,8 +65,8 @@ public class Value extends PTPObject implements ICDIValue {
 		Target target = (Target) variable.getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet(session, "", target.getTargetId());
-		String valString = debugger.evaluateExpression(newSet, variable.getName());
+		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
+		String valString = debugger.evaluateExpression(newSet, variable);
 
 		return valString;
 	}

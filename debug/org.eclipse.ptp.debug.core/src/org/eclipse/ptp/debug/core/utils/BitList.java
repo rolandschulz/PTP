@@ -66,4 +66,10 @@ public class BitList {
 		}
 		return retValue;
 	}
+	
+	public BitList copy() {
+		BitList retVal = new BitList();
+		retVal.bitSet = (BitSet) bitSet.clone();
+		return retVal;
+	}
 }

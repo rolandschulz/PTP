@@ -109,7 +109,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		Target target = (Target) frame.getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet(session, "", target.getTargetId());
+		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
 
 		return createExpression(expressionText).getValue(frame).getValueString();
 	}

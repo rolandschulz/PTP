@@ -29,20 +29,27 @@
 package org.eclipse.ptp.debug.external.cdi.event;
 
 import org.eclipse.cdt.debug.core.cdi.event.ICDIResumedEvent;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.utils.BitList;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 
 /**
  */
 public class InferiorResumedEvent extends AbstractEvent implements ICDIResumedEvent {
 	
-	public InferiorResumedEvent(IPCDISession s, BitList sources) {
+	public InferiorResumedEvent(IPCDISession s, IPCDIDebugProcessSet sources) {
 		super(s, sources);
 	}
 	
 	public int getType() {
 		// Auto-generated method stub
-		System.out.println("ResumedEvent.getType()");
+		System.out.println("InferiorResumedEvent.getType()");
 		return 0;
+	}
+
+	public ICDIObject getSource() {
+		// Auto-generated method stub
+		System.out.println("InferiorResumedEvent.getSource()");
+		return null;
 	}
 }

@@ -16,21 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.cdi.event;
+package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
-
-/**
- * 
- * A base interface for all CDI events.
- * 
- * @since Jul 18, 2002
- */
-public interface IPCDIEvent {
-	public IPCDIDebugProcessSet getAllProcesses();
-	public IPCDIDebugProcessSet getAllUnregisteredProcesses();
-	public IPCDIDebugProcessSet getAllRegisteredProcesses();
-	public IPJob getDebugJob();
+public interface IPCDIDebugProcessSetNamed extends IPCDIDebugProcessSet {
 }
-

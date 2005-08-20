@@ -30,8 +30,9 @@ package org.eclipse.ptp.debug.external.cdi.event;
 
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.utils.BitList;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.BreakpointHit;
 import org.eclipse.ptp.debug.external.cdi.Session;
 
@@ -40,7 +41,7 @@ import org.eclipse.ptp.debug.external.cdi.Session;
  */
 public class BreakpointHitEvent extends AbstractEvent implements ICDISuspendedEvent {
 
-	public BreakpointHitEvent(IPCDISession s, BitList sources) {
+	public BreakpointHitEvent(IPCDISession s, IPCDIDebugProcessSet sources) {
 		super(s, sources);
 	}
 	
@@ -52,5 +53,11 @@ public class BreakpointHitEvent extends AbstractEvent implements ICDISuspendedEv
 		}
 */		return new BreakpointHit((Session) session, this);
 		//return session;
+	}
+
+	public ICDIObject getSource() {
+		// Auto-generated method stub
+		System.out.println("BreakpointHitEvent.getSource()");
+		return null;
 	}
 }

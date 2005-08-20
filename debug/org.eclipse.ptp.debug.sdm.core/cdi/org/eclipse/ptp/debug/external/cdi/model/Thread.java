@@ -93,7 +93,7 @@ public class Thread extends PTPObject implements ICDIThread {
 			Target target = (Target) getTarget();
 			Session session = (Session) target.getSession();
 			IDebugger debugger = session.getDebugger();
-			DebugProcessSet newSet = new DebugProcessSet(session, "", target.getTargetId());
+			DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
 			ICDIStackFrame[] frames = debugger.listStackFrames(newSet);
 			
 			for (int i = 0; i < frames.length; i++) {
@@ -130,7 +130,7 @@ public class Thread extends PTPObject implements ICDIThread {
 			Target target = (Target) getTarget();
 			Session session = (Session) target.getSession();
 			IDebugger debugger = session.getDebugger();
-			DebugProcessSet newSet = new DebugProcessSet(session, "", target.getTargetId());
+			DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
 			ICDIStackFrame[] frames = debugger.listStackFrames(newSet);
 			stackdepth = frames.length;
 		}
@@ -244,7 +244,7 @@ public class Thread extends PTPObject implements ICDIThread {
 		Target target = (Target) getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet(session, "", target.getTargetId());
+		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
 		debugger.go(newSet);
 	}
 

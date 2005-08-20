@@ -26,32 +26,34 @@ import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
 
 public class DebugProcessSet extends SessionObject implements IPCDIDebugProcessSet {
-	
-	private String setName;
-	private BitList processList = null;
+	static private int tempId = 0;
+	final private String PREFIX = "TempSet_";
+	protected String setName;
+	protected BitList processList = null;
 
-	public DebugProcessSet(IPCDISession s, String name) {
-		super((Session) s);
-		processList = new BitList();
-		setName = name;
+	public DebugProcessSet(DebugProcessSet set) {
+		super((Session) set.getSession());
+		processList = set.toBitList().copy();
+		setName = PREFIX + tempId++;
 	}
 	
-	public DebugProcessSet(IPCDISession s, String name, int[] procs) {
+	public DebugProcessSet(IPCDISession s) {
 		super((Session) s);
 		processList = new BitList();
-		setName = name;
-		for (int i = 0; i < procs.length; i++) {
-			addProcess(procs[i]);
-		}
+		setName = PREFIX + tempId++;
+	}
+
+	public DebugProcessSet(IPCDISession s, int proc) {
+		this(s, new int[] {proc});
 	}
 	
-	public DebugProcessSet(IPCDISession s, String name, int proc) {
+	public DebugProcessSet(IPCDISession s, int[] procs) {
 		super((Session) s);
 		processList = new BitList();
-		setName = name;
-		addProcess(proc);
+		processList.set(procs);
+		setName = PREFIX + tempId++;
 	}
-	
+
 	public IPCDIDebugProcess[] getProcesses() {
 		int[] list = toIntArray();
 		IPCDIDebugProcess[] retVal = new IPCDIDebugProcess[list.length];
@@ -60,9 +62,25 @@ public class DebugProcessSet extends SessionObject implements IPCDIDebugProcessS
 		}
 		return retVal;
 	}
-	
+
 	public IPCDIDebugProcess getProcess(int number) {
 		return ((Session) getSession()).getModelManager().getProcess(number);
+	}
+
+	public int getSize() {
+		return processList.cardinality();
+	}
+
+	public int[] toIntArray() {
+		return processList.toArray();
+	}
+
+	public String getName() {
+		return setName;
+	}
+
+	public BitList toBitList() {
+		return processList;
 	}
 	
 	public void addProcess(int proc) {
@@ -79,17 +97,5 @@ public class DebugProcessSet extends SessionObject implements IPCDIDebugProcessS
 
 	public void removeProcess(int[] proc) {
 		processList.clear(proc);
-	}
-	
-	public String getName() {
-		return setName;
-	}
-	
-	public int getSize() {
-		return processList.cardinality();
-	}
-	
-	public int[] toIntArray() {
-		return processList.toArray();
 	}
 }

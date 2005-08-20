@@ -32,7 +32,6 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
@@ -44,13 +43,13 @@ import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.Argument;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
+import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.FunctionBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.LineBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.LocalVariable;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
-import org.eclipse.ptp.debug.external.cdi.model.Value;
 import org.eclipse.ptp.rtsystem.simulation.SimProcess;
 import org.eclipse.ptp.rtsystem.simulation.SimStackFrame;
 import org.eclipse.ptp.rtsystem.simulation.SimThread;
@@ -134,7 +133,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		
 	}
 
-	public String evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws PCDIException {
+	public String evaluateExpression(IPCDIDebugProcessSet procs, ICDIVariable var) throws PCDIException {
 		String retVal = null;
 		IPCDIDebugProcess[] procList = procs.getProcesses();
 		for (int i = 0; i < procList.length; i++) {
@@ -149,15 +148,25 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 				for (int k = 0; k < args.length; k++) {
 					String aName = args[k].getName();
 					String aVal = args[k].getValue();
-					if (aName.equals(expr))
-						return aVal;
+					try {
+						String qName = var.getQualifiedName();
+						if (aName.equals(qName))
+							return aVal;
+					} catch (CDIException e) {
+						throw new PCDIException(e.toString());
+					}
 				}
 				SimVariable[] local = simFrames[j].getLocalVars();
 				for (int k = 0; k < local.length; k++) {
 					String aName = local[k].getName();
 					String aVal = local[k].getValue();
-					if (aName.equals(expr))
-						return aVal;
+					try {
+						String qName = var.getQualifiedName();
+						if (aName.equals(qName))
+							return aVal;
+					} catch (CDIException e) {
+						throw new PCDIException(e.toString());
+					}
 				}
 			}
 		}
@@ -320,13 +329,10 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		int procId = ((Integer) list.get(0)).intValue();
 		String event = (String) list.get(1);
 		
-		BitList bitList = new BitList();
-		bitList.set(procId);
-		
 		if (event.equals("BREAKPOINTHIT"))
-			fireEvent(new BreakpointHitEvent(getSession(), bitList));
+			fireEvent(new BreakpointHitEvent(getSession(), new DebugProcessSet(session, procId)));
 		else if (event.equals("RESUMED"))
-			fireEvent(new InferiorResumedEvent(getSession(), bitList));
+			fireEvent(new InferiorResumedEvent(getSession(), new DebugProcessSet(session, procId)));
 			
 		// Do Something
 	}
