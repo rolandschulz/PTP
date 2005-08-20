@@ -53,10 +53,32 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 	public void setMessage() {
 		String msg = "Suspended on process: ";
 		int[] tasks = getTasks();
-		for (int i=0; i<tasks.length; i++) {
-			msg += tasks[i];
-			if (i < tasks.length - 1)
-				msg += ", ";
+		if (tasks.length == 0) {
+			setMessage("");
+			return;
+		}
+		int preTask = tasks[0];
+		if (tasks.length == 1) {
+			setMessage(msg + preTask);
+			return;
+		}
+		boolean isContinue = false;
+		for (int i=1; i<tasks.length; i++) {
+			if (preTask == (tasks[i] - 1)) {
+				if (!isContinue) {
+					if (i == 1)
+						msg += preTask;
+					msg += "-";
+				}
+				if (i == (tasks.length - 1))
+					msg += tasks[i];
+
+				isContinue = true;
+			} else {
+				isContinue = false;
+				msg += preTask + "," + tasks[i];
+			}
+			preTask = tasks[i];
 		}
 		setMessage(msg);
 	}
