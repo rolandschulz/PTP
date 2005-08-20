@@ -190,9 +190,9 @@ public class PDebugModel {
 	public static void updatePBreakpoints(final String job_id, final String set_id) throws CoreException {
 		IWorkspaceRunnable runnable= new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
-				final IBreakpoint[] breakpoints = getPBreakpoints();
 				new Job("Update breakpoint") {
 					protected IStatus run(IProgressMonitor pmonitor) {
+						IBreakpoint[] breakpoints = getPBreakpoints();
 						try {				
 							for (int i=0; i<breakpoints.length; i++) {
 								if (!(breakpoints[i] instanceof IPBreakpoint))
@@ -209,7 +209,7 @@ public class PDebugModel {
 							return Status.OK_STATUS;
 						} catch (CoreException e) {
 							PTPDebugCorePlugin.log(e);
-						}
+						}						
 						return Status.CANCEL_STATUS;
 					}
 				}.schedule();
