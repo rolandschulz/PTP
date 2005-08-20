@@ -27,10 +27,14 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IStackFrame;
@@ -39,11 +43,11 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
-import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.listeners.IRegListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -61,17 +65,25 @@ import org.eclipse.ui.texteditor.ITextEditor;
  * @author Clement chu
  *
  */
-public class PAnnotationManager {
+public class PAnnotationManager implements IRegListener {
 	private static PAnnotationManager instance = null;
 	protected UIDebugManager uiDebugManager = null;
+	private List annotationList = new ArrayList();
 	
-	public PAnnotationManager() {
-		uiDebugManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
+	public PAnnotationManager(UIDebugManager uiDebugManager) {
+		this.uiDebugManager = uiDebugManager;
+		uiDebugManager.addRegListener(this);
 	}
 	public static PAnnotationManager getDefault() {
 		if (instance == null)
-			instance = new PAnnotationManager();
+			instance = new PAnnotationManager(PTPDebugUIPlugin.getDefault().getUIDebugManager());
 		return instance;
+	}
+	
+	public void shutdown() {
+		uiDebugManager.removeRegListener(this);
+		annotationList.clear();
+		annotationList = null;
 	}
 	
 	public IStackFrame getTopStackFrame(IThread thread) {
@@ -209,15 +221,20 @@ public class PAnnotationManager {
 	public boolean containsCurrentSet(BitSet taskId) {
 		String job_id = uiDebugManager.getCurrentJobId();
 		String set_id = uiDebugManager.getCurrentSetId();
+		if (set_id.equals(IElementHandler.SET_ROOT_ID))
+			return true;
+		
 		IElementHandler handler = uiDebugManager.getElementHandler(job_id);
 		IElementSet set = handler.getSet(set_id);
-		//FIXME should be improved this checking method
+		BitSet tasks = (BitSet)set.getData(UIDebugManager.BITSET_KEY);
+		return (tasks != null && tasks.intersects(taskId));
+		/*
 		taskId.cardinality();
 		for(int i=taskId.nextSetBit(0); i>=0; i=taskId.nextSetBit(i+1)) {
 			if (set.contains(String.valueOf(i)))
 				return true;
 		}
-		return false;
+		*/
 	}
 	
 	//called by event
@@ -249,34 +266,28 @@ public class PAnnotationManager {
 		if (position == null)
 			throw new CoreException(Status.CANCEL_STATUS);
 		
-		PInstructionPointerAnnotation annotation = findAnnotation(annotationModel, position, taskId);
+		PInstructionPointerAnnotation annotation = findAnnotation(annotationModel, position, type);
 		if (annotation == null) {
 			IMarker marker = createMarker(file, type);
-			annotation = new PInstructionPointerAnnotation(marker);
-		}
-		else {
-			annotationModel.removeAnnotation(annotation);
+			annotation = new PInstructionPointerAnnotation(marker, position);
+			annotationList.add(annotation);
+			annotationModel.addAnnotation(annotation, position);
 		}
 
 		annotation.addTasks(taskId);
 		annotation.setMessage();
-		annotationModel.addAnnotation(annotation, position);
 	}
 	
-	public PInstructionPointerAnnotation findAnnotation(IAnnotationModel annotationModel, Position position, BitSet taskId) {
-		for (Iterator i=annotationModel.getAnnotationIterator(); i.hasNext();) {
-			Annotation annotation = (Annotation)i.next();
-			if (annotation instanceof PInstructionPointerAnnotation) {
-				if (annotationModel.getPosition(annotation).equals(position)) {
-					PInstructionPointerAnnotation pAnnotation = (PInstructionPointerAnnotation)annotation;
-					if (pAnnotation.getType().equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT) || pAnnotation.getType().equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_SECONDARY)) {
-						if (pAnnotation.contains(taskId))
-							return pAnnotation;
-						
-						continue;
-					}					
-					return pAnnotation;
-				}
+	public PInstructionPointerAnnotation findAnnotation(IAnnotationModel annotationModel, Position position, String type) {
+		for (Iterator i=annotationList.iterator(); i.hasNext();) {
+			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation)i.next();
+			if (annotationModel.getPosition(annotation).equals(position)) {
+				String annotationType = annotation.getType();
+				if (annotationType.equals(IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT) || annotationType.equals(IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT))
+					return (PInstructionPointerAnnotation)annotation;
+				
+				if (annotationType.equals(type))
+					return (PInstructionPointerAnnotation)annotation;
 			}
 		}
 		return null;
@@ -322,37 +333,160 @@ public class PAnnotationManager {
 		if (annotationModel == null)
 			throw new CoreException(Status.CANCEL_STATUS);
 		
-		for (Iterator i=findAnnotationIterator(annotationModel); i.hasNext();) {
-			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation)i.next();
+		for (int i=0; i<annotationList.size(); i++) {
+			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation)annotationList.get(i);
 			annotation.removeTasks(taskId);
-			Position position = annotationModel.getPosition(annotation);
-			
 			if (annotation.isEmpty()) {
-				removeMarkerAnnotation(annotationModel, annotation);
+				removeMarkerAnnotation(annotation);
 			} else {
-				annotationModel.removeAnnotation(annotation);
 				annotation.setMessage();
-				annotationModel.addAnnotation(annotation, position);
 			}
 		}
 	}
 	
-	public void removeMarkerAnnotation(IAnnotationModel annotationModel, PInstructionPointerAnnotation annotation) {
+	public void removeMarkerAnnotation(PInstructionPointerAnnotation annotation) {
 		try {
 			annotation.getMarker().delete();
 		} catch (CoreException e) {}
-		annotationModel.removeAnnotation(annotation);
+		annotationList.remove(annotation);
 	}
 	
-	public Iterator findAnnotationIterator(IAnnotationModel annotationModel) {
+	public Iterator findAnnotationIterator(String type) {
 		List annotations = new ArrayList();
-		for (Iterator i=annotationModel.getAnnotationIterator(); i.hasNext();) {
-			Annotation annotation = (Annotation)i.next();
-			if (annotation instanceof PInstructionPointerAnnotation) {
+		for (Iterator i=annotationList.iterator(); i.hasNext();) {
+			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation)i.next();
+			if (annotation.getType().equals(type)) {
 				annotations.add(annotation);
 			}
 		}
 		return annotations.iterator();
 	}
+	public Position findAnnotationPosition(BitSet bitSet) {
+		if (bitSet.isEmpty())
+			return null;
+		
+		for (Iterator i=annotationList.iterator(); i.hasNext();) {
+			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation)i.next();
+			if (annotation.contains(bitSet))
+				return annotation.getPosition();
+		}
+		return null;
+	}
+
+	public PInstructionPointerAnnotation findAnnotation(BitSet bitSet) {
+		if (bitSet.isEmpty())
+			return null;
+		
+		for (Iterator i=annotationList.iterator(); i.hasNext();) {
+			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation)i.next();
+			if (annotation.contains(bitSet))
+				return annotation;
+		}
+		return null;
+	}	
 	
+	public PInstructionPointerAnnotation findUnregAnnotation(Position position) {
+		if (position == null)
+			return null;
+		
+		for (Iterator i=annotationList.iterator(); i.hasNext();) {
+			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation)i.next();
+			String annotationType = annotation.getType();
+			if (annotationType.equals(IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT) || annotationType.equals(IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT))
+				if (annotation.getPosition().equals(position))
+					return annotation;
+		}
+		return null;
+	}
+	
+	public void changeAnnotationType(PInstructionPointerAnnotation annotation, String type) {
+		if (annotation.getType().equals(type)) {
+			annotation.setType(type);
+		}
+	}
+
+	//change set
+	//TODO make sure marker is changed icon if tpye is changed
+	public void updateAnnotation(final IElementSet currentSet, final IElementSet preSet) throws CoreException {
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException {
+				new Job("Update Annotation") {
+					protected IStatus run(IProgressMonitor pmonitor) {
+						boolean isRoot = currentSet.isRootSet();
+						BitSet tasks = (BitSet)currentSet.getData(UIDebugManager.BITSET_KEY);
+						
+						for (Iterator i=annotationList.iterator(); i.hasNext();) {
+							PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation)i.next();
+							String annotationType = annotation.getType();
+							if (annotationType.equals(IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT) || annotationType.equals(IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT)) {
+								if (isRoot)
+									changeAnnotationType(annotation, IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT);
+								else
+									changeAnnotationType(annotation, annotation.contains(tasks)?IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT:IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
+							}
+						}
+						return Status.OK_STATUS;
+					}
+				}.schedule();
+			}
+		};
+		ResourcesPlugin.getWorkspace().run(runnable, null, 0, null);		
+	}
+
+	/*****
+	 * Register listener
+	 *****/
+	public void register(final BitSet tasks) {
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException {
+				new Job("Update Annotation") {
+					protected IStatus run(IProgressMonitor pmonitor) {
+						PInstructionPointerAnnotation regAnnotation = findAnnotation(tasks);
+						if (regAnnotation != null) {
+							PInstructionPointerAnnotation unregAnnotation = findUnregAnnotation(regAnnotation.getPosition());
+							if (unregAnnotation != null) {
+								unregAnnotation.removeTasks(tasks);
+								unregAnnotation.setMessage();
+							}
+						}
+						return Status.OK_STATUS;
+					}
+				}.schedule();
+			}
+		};
+		try {
+			ResourcesPlugin.getWorkspace().run(runnable, null, 0, null);
+		} catch (CoreException e) {
+			PTPDebugUIPlugin.log(e);
+		}
+	}
+	public void unregister(final BitSet tasks) {
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException {
+				new Job("Update Annotation") {
+					protected IStatus run(IProgressMonitor pmonitor) {
+						PInstructionPointerAnnotation regAnnotation = findAnnotation(tasks);
+						if (regAnnotation != null) {
+							PInstructionPointerAnnotation unregAnnotation = findUnregAnnotation(regAnnotation.getPosition());
+							if (unregAnnotation != null) {
+								unregAnnotation.addTasks(tasks);
+								unregAnnotation.setMessage();
+							}
+							//remove task id manually
+							regAnnotation.removeTasks(tasks);
+							regAnnotation.setMessage();
+							if (regAnnotation.isEmpty())
+								removeMarkerAnnotation(regAnnotation);
+						}
+						return Status.OK_STATUS;
+					}
+				}.schedule();
+			}
+		};
+		try {
+			ResourcesPlugin.getWorkspace().run(runnable, null, 0, null);
+		} catch (CoreException e) {
+			PTPDebugUIPlugin.log(e);
+		}
+	}
 }

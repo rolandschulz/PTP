@@ -22,6 +22,7 @@ import java.util.BitSet;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.Position;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 /**
@@ -29,10 +30,18 @@ import org.eclipse.ui.texteditor.MarkerAnnotation;
  *
  */
 public class PInstructionPointerAnnotation extends MarkerAnnotation {
-	private BitSet tBitSet = null;
+	private BitSet tasks = null;
+	private Position position = null;
 	
-	public PInstructionPointerAnnotation(IMarker marker) {
+	public PInstructionPointerAnnotation(IMarker marker, Position position) {
 		super(marker);
+		this.position = position;
+	}
+	public void setPosition(Position position) {
+		this.position = position;
+	}
+	public Position getPosition() {
+		return position;
 	}
 	
 	public void setMessage(String message) {
@@ -56,31 +65,31 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 		return getText();
 	}
 	
-	public void setTasks(BitSet tBitSet) {
-		this.tBitSet = tBitSet;
+	public void setTasks(BitSet tasks) {
+		this.tasks = tasks;
 	}
 	public int[] getTasks() {
-		return convertArray(tBitSet);		
+		return convertArray(tasks);		
 	}
 	
 	public void addTasks(BitSet bitSet) {
-		if (tBitSet == null)
-			tBitSet = new BitSet();
+		if (tasks == null)
+			tasks = new BitSet();
 
-		tBitSet.or(bitSet);
+		tasks.or(bitSet);
 	}
 	public void removeTasks(BitSet bitSet) {
-		tBitSet.andNot(bitSet);
+		tasks.andNot(bitSet);
 	}
 	public boolean isEmpty() {
-		return (tBitSet.cardinality() == 0);
+		return (tasks.cardinality() == 0);
 	}
 	
 	public boolean contains(BitSet bitSet) {
-		return tBitSet.intersects(bitSet);
+		return tasks.intersects(bitSet);
 	}
 	public int[] containTasks(BitSet bitSet) {
-		bitSet.and(tBitSet);
+		bitSet.and(tasks);
 		return convertArray(bitSet);		
 	}
 	public int[] convertArray(BitSet bitSet) {

@@ -115,9 +115,9 @@ public class ParallelDebugView extends ParallelJobView {
 	protected void updateAction() {
 		super.updateAction();
 		
-		boolean isJobStopped = getUIDebugManager().isJobStop(getCurrentJobID());
-		registerAction.setEnabled(!isJobStopped);
-		unregisterAction.setEnabled(!isJobStopped);
+		boolean isDebugging = getUIDebugManager().isDebugging(getCurrentJobID());
+		registerAction.setEnabled(isDebugging);
+		unregisterAction.setEnabled(isDebugging);
 	}	
 
 	protected String getToolTipText(int element_num) {
@@ -150,7 +150,7 @@ public class ParallelDebugView extends ParallelJobView {
 		return buffer.toString();
 	}
 
-	public void registerElement(IElement element) {		
+	public void registerElement(IElement element) {
 		if (element.isRegistered())
 			getUIDebugManager().unregisterElements(new IElement[] { element });
 		else
@@ -161,9 +161,6 @@ public class ParallelDebugView extends ParallelJobView {
 		if (cur_element_set != null) {
 			IElement[] elements = cur_element_set.getSelectedElements();
 			getUIDebugManager().registerElements(elements);
-			for (int i = 0; i < elements.length; i++) {
-				elements[i].setRegistered(true);
-			}
 		}
 	}
 
@@ -171,9 +168,6 @@ public class ParallelDebugView extends ParallelJobView {
 		if (cur_element_set != null) {
 			IElement[] elements = cur_element_set.getSelectedElements();
 			getUIDebugManager().unregisterElements(elements);
-			for (int i = 0; i < elements.length; i++) {
-				elements[i].setRegistered(false);
-			}
 		}
 	}
 	
