@@ -19,15 +19,12 @@
 
 package org.eclipse.ptp.debug.external.debugger;
 
-import java.util.ArrayList;
-
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.cdi.PCDIException;
-import org.eclipse.ptp.debug.external.utils.Queue;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
+import org.eclipse.ptp.debug.core.utils.Queue;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
@@ -35,8 +32,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
+
 
 public class ParallelDebugger extends AbstractDebugger {
 	
@@ -112,9 +108,9 @@ public class ParallelDebugger extends AbstractDebugger {
 	}
 	
 	public void go(IPCDIDebugProcessSet procs) throws PCDIException {
-		int rc = DbgGo(procs.toBitArray());
-		if (rc != 0)
-			throw new PCDIException(toPCDIException(rc), "go");
+		//int rc = DbgGo(procs.toBitArray());
+		//if (rc != 0)
+		//	throw new PCDIException(toPCDIException(rc), "go");
 	}
 
 	public void kill(IPCDIDebugProcessSet procs) throws PCDIException {
@@ -158,7 +154,7 @@ public class ParallelDebugger extends AbstractDebugger {
 	 * evaluate expression for first process in procs
 	 * TODO: extend to support multiple processes
 	 */
-	public ICDIExpression evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws PCDIException {
+	public String evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws PCDIException {
 		return null;
 	}
 	
