@@ -28,6 +28,7 @@
  ***********************************************************************/ 
 package org.eclipse.ptp.debug.internal.core; 
 
+import org.eclipse.cdt.debug.core.ICDebugConstants;
 import org.eclipse.cdt.debug.core.cdi.ICDIFormat;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
@@ -50,5 +51,7 @@ public class PTPDebugCorePreferenceInitializer extends AbstractPreferenceInitial
 	 */
 	public void initializeDefaultPreferences() {
 		PTPDebugCorePlugin.getDefault().getPluginPreferences().setDefault( IPDebugConstants.PREF_DEFAULT_VARIABLE_FORMAT, ICDIFormat.NATURAL );
+		PTPDebugCorePlugin.getDefault().getPluginPreferences().setDefault( IPDebugConstants.PREF_DEFAULT_EXPRESSION_FORMAT, ICDIFormat.NATURAL );
+
 	}
 }

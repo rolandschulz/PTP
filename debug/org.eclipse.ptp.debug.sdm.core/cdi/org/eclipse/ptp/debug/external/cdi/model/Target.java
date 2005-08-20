@@ -59,6 +59,7 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
+import org.eclipse.ptp.debug.external.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
@@ -100,10 +101,16 @@ public class Target extends SessionObject implements IPCDITarget {
 		return fConfiguration;
 	}
 
-	public String evaluateExpressionToString(ICDIStackFrame context, String expressionText) throws CDIException {
+	public String evaluateExpressionToString(ICDIStackFrame frame, String expressionText) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.evaluateExpressionToString()");
-		return null;
+		
+		Target target = (Target) frame.getTarget();
+		Session session = (Session) target.getSession();
+		IDebugger debugger = session.getDebugger();
+		DebugProcessSet newSet = new DebugProcessSet("", target.getDebugProcess());
+
+		return createExpression(expressionText).getValue(frame).getValueString();
 	}
 
 	public ICDIVariableDescriptor getGlobalVariableDescriptors(String filename, String function, String name) throws CDIException {
@@ -330,23 +337,29 @@ public class Target extends SessionObject implements IPCDITarget {
 	public ICDIExpression createExpression(String code) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.createExpression()");
-		return null;
+		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
+		return expMgr.createExpression(this, code);
 	}
 
 	public ICDIExpression[] getExpressions() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.getExpressions()");
-		return null;
+		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
+		return expMgr.getExpressions(this);
 	}
 
 	public void destroyExpressions(ICDIExpression[] expressions) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.destroyExpressions()");
+		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
+		expMgr.destroyExpressions(this, expressions);
 	}
 
 	public void destroyAllExpressions() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.destroyAllExpressions()");
+		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
+		expMgr.destroyAllExpressions(this);
 	}
 
 	public void addSourcePaths(String[] srcPaths) throws CDIException {

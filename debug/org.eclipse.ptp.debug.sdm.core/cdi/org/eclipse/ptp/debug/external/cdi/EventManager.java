@@ -99,4 +99,87 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 		ICDIEvent[] cdiEvents = (ICDIEvent[])cdiList.toArray(new ICDIEvent[0]);
 		fireEvents(cdiEvents);
 	}
-}
+
+	// FIXME DONNY
+	/**
+	 * When suspended arrives, reset managers and target.
+	 * Alse the variable and the memory needs to be updated and events
+	 * fired for changes.
+	 */
+/*	boolean processSuspendedEvent(MIStoppedEvent stopped) {
+		Session session = (Session)getSession();
+		MISession miSession = stopped.getMISession();
+		Target currentTarget = session.getTarget(miSession);
+		currentTarget.setSupended(true);
+
+		// Bailout early if we do not want to process any events.
+		if (!isAllowingProcessingEvents()) {
+			return false;
+		}
+
+
+		if (processSharedLibEvent(stopped)) {
+			// Event was consumed by the shared lib processing bailout
+			return false;
+		}
+
+		if (processBreakpointHitEvent(stopped)) {
+			// Event was consumed, i.e. it was not the right exception.
+			return false;
+		}
+
+		int threadId = threadId = stopped.getThreadId();
+		currentTarget.updateState(threadId);
+		try {
+			Thread cthread = (Thread)currentTarget.getCurrentThread();
+			if (cthread != null) {
+				cthread.getCurrentStackFrame();
+			} else {
+				return true;
+			}
+		} catch (CDIException e1) {
+			//e1.printStackTrace();
+			return true;
+		}
+
+		// Update the managers.
+		// For the Variable/Expression Managers call only the updateManager.
+		VariableManager varMgr = session.getVariableManager();
+		ExpressionManager expMgr  = session.getExpressionManager();		
+		RegisterManager regMgr = session.getRegisterManager();
+		MemoryManager memMgr = session.getMemoryManager();
+		BreakpointManager bpMgr = session.getBreakpointManager();
+		SignalManager sigMgr = session.getSignalManager();
+		SourceManager srcMgr = session.getSourceManager();
+		SharedLibraryManager libMgr = session.getSharedLibraryManager();
+		try {
+			if (varMgr.isAutoUpdate()) {
+				varMgr.update(currentTarget);
+			}
+			if (expMgr.isAutoUpdate()) { 
+				expMgr.update(currentTarget);
+			}
+			if (regMgr.isAutoUpdate()) {
+				regMgr.update(currentTarget);
+			}
+			if (memMgr.isAutoUpdate()) {
+				memMgr.update(currentTarget);
+			}
+			if (bpMgr.isAutoUpdate()) {
+				bpMgr.update(currentTarget);
+			}
+			if (sigMgr.isAutoUpdate()) {
+				sigMgr.update(currentTarget);
+			}
+			if (libMgr.isAutoUpdate()) {
+				libMgr.update(currentTarget);
+			}
+			if (srcMgr.isAutoUpdate()) {
+				srcMgr.update(currentTarget);
+			}
+		} catch (CDIException e) {
+			//System.out.println(e);
+		}
+		return true;
+	}
+*/}

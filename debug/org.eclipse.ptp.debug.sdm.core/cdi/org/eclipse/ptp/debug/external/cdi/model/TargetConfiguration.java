@@ -116,7 +116,7 @@ public class TargetConfiguration extends PTPObject implements ICDITargetConfigur
 	public boolean supportsExpressionEvaluation() {
 		// Auto-generated method stub
 		System.out.println("TargetConfiguration.supportsExpressionEvaluation()");
-		return false;
+		return true;
 	}
 
 }

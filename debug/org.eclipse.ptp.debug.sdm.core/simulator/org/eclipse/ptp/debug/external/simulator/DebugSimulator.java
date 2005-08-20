@@ -136,11 +136,37 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		String retVal = null;
 		IPCDIDebugProcess[] procList = procs.getProcesses();
 		for (int i = 0; i < procList.length; i++) {
-			try {
-				String qName = var.getQualifiedName();
-				retVal = "1" + qName;
-			} catch (CDIException e) {
-				throw new PCDIException(e.toString());
+			//ICDITarget target = procList[i].getTarget();
+			int taskId = ((DebugProcess) procList[i]).getPProcess().getTaskId();
+			ICDITarget target = getSession().getTarget(taskId);
+			SimThread simThread = ((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0);
+			ICDIThread thread = new Thread((Target) target, simThread.getThreadId());
+			SimStackFrame[] simFrames = simThread.getStackFrames();
+			for (int j = 0; j < simFrames.length; j++) {
+				SimVariable[] args = simFrames[j].getArgs();
+				for (int k = 0; k < args.length; k++) {
+					String aName = args[k].getName();
+					String aVal = args[k].getValue();
+					try {
+						String qName = var.getQualifiedName();
+						if (aName.equals(qName))
+							return aVal;
+					} catch (CDIException e) {
+						throw new PCDIException(e.toString());
+					}
+				}
+				SimVariable[] local = simFrames[j].getLocalVars();
+				for (int k = 0; k < local.length; k++) {
+					String aName = local[k].getName();
+					String aVal = local[k].getValue();
+					try {
+						String qName = var.getQualifiedName();
+						if (aName.equals(qName))
+							return aVal;
+					} catch (CDIException e) {
+						throw new PCDIException(e.toString());
+					}
+				}
 			}
 		}
 		return retVal;
