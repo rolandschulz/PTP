@@ -28,66 +28,61 @@
 ***********************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
-import java.util.ArrayList;
-
-import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 
 /**
  */
 public abstract class AbstractEvent implements IPCDIEvent {
 	IPCDISession session;	
-	BitList sources;
-	ICDIObject[] iCDIObjects;
+	IPCDIDebugProcessSet sources;
 
-	public AbstractEvent(IPCDISession s, BitList srcs) {
+	public AbstractEvent(IPCDISession s, IPCDIDebugProcessSet srcs) {
 		session = s;
 		sources = srcs;
-		
-		ArrayList sourceList = new ArrayList();
-		
-		int[] registeredTargets = session.getRegisteredTargetIds();
-		
-		for (int j = 0; j < registeredTargets.length; j++) {
-			if (sources.get(registeredTargets[j])) {
-				ICDIObject src = ((Session) session).getTarget(registeredTargets[j]);
-				sourceList.add(src);
-			}
-			
-		}
-		
-	    iCDIObjects = (ICDIObject[]) sourceList.toArray(new ICDIObject[0]);
-	}
-	
-	public BitList getBitList() {
-		return sources;
-	}
-	
-	public int[] getProcesses() {
-		int[] retValue = new int[sources.cardinality()];
-		for(int i = sources.nextSetBit(0), j = 0; i >= 0; i = sources.nextSetBit(i+1), j++) {
-			retValue[j] = i;
-		}
-		return retValue;
-	}
-	
-	public ICDIObject[] getSources() {
-		return iCDIObjects;
-	}
-	
-	public ICDIObject getSource() {
-		if (iCDIObjects == null || iCDIObjects.length == 0)
-			return null;
-		else
-			return iCDIObjects[0];
 	}
 	
 	public IPJob getDebugJob() {
 		return PTPDebugCorePlugin.getDefault().getDebugJob(session);
+	}
+
+	public IPCDIDebugProcessSet getAllProcesses() {
+		return sources;
+	}
+
+	public IPCDIDebugProcessSet getAllUnregisteredProcesses() {
+		IPCDIDebugProcessSet retVal = new DebugProcessSet((DebugProcessSet) sources);
+		
+		int[] registeredTargets = session.getRegisteredTargetIds();
+		BitList bitList = retVal.toBitList();
+		
+		for (int i = 0; i < registeredTargets.length; i++) {
+			if (bitList.get(registeredTargets[i])) {
+				retVal.removeProcess(registeredTargets[i]);
+			}
+		}
+		
+		return retVal;
+	}
+
+	public IPCDIDebugProcessSet getAllRegisteredProcesses() {
+		IPCDIDebugProcessSet retVal = new DebugProcessSet((Session) session);
+		
+		int[] registeredTargets = session.getRegisteredTargetIds();
+		BitList bitList = sources.toBitList();
+		
+		for (int i = 0; i < registeredTargets.length; i++) {
+			if (bitList.get(registeredTargets[i])) {
+				retVal.addProcess(registeredTargets[i]);
+			}
+		}
+		
+		return retVal;
 	}
 }

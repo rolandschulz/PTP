@@ -30,20 +30,27 @@ package org.eclipse.ptp.debug.external.cdi.event;
 
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIExitedEvent;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.utils.BitList;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 
 /**
  */
 public class DebuggerExitEvent extends AbstractEvent implements ICDIExitedEvent {
 
-	public DebuggerExitEvent(IPCDISession s, BitList sources) {
+	public DebuggerExitEvent(IPCDISession s, IPCDIDebugProcessSet sources) {
 		super(s, sources);
 	}
 	
 	public ICDISessionObject getReason() {
 		// Auto-generated method stub
 		System.out.println("ExitedEvent.getReason()");
+		return null;
+	}
+
+	public ICDIObject getSource() {
+		// Auto-generated method stub
+		System.out.println("DebuggerExitEvent.getSource()");
 		return null;
 	}
 }

@@ -18,9 +18,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
+import org.eclipse.ptp.debug.core.utils.BitList;
+
 public interface IPCDIDebugProcessSet extends IPCDIDebugEntity {
 	public IPCDIDebugProcess[] getProcesses();
 	public IPCDIDebugProcess getProcess(int number);
+	public int getSize();
+	public int[] toIntArray();
+	public BitList toBitList();
 	/* We do not maintain the IPCDIDebugProcess list in
 	 * the set, so the arguments to addProcess() and removeProcess()
 	 * are not IPCDIDebugProcess (but integers)
@@ -29,6 +34,4 @@ public interface IPCDIDebugProcessSet extends IPCDIDebugEntity {
 	public void addProcess(int[] proc);
 	public void removeProcess(int proc);
 	public void removeProcess(int[] proc);
-	public int getSize();
-	public int[] toIntArray();
 }
