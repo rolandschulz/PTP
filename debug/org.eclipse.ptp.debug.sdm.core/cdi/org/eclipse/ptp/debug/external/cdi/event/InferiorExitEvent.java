@@ -31,7 +31,7 @@ package org.eclipse.ptp.debug.external.cdi.event;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIExitedEvent;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.external.utils.BitList;
+import org.eclipse.ptp.debug.core.utils.BitList;
 
 /**
  */

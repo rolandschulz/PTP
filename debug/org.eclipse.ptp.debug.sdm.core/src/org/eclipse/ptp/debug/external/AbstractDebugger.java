@@ -31,8 +31,8 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
+import org.eclipse.ptp.debug.core.utils.Queue;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
-import org.eclipse.ptp.debug.external.utils.Queue;
 
 /**
  * @author donny
@@ -133,7 +133,7 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 	}
 	
 	public final IPCDIDebugProcess getProcess(int number) {
-		IPCDIDebugProcess proc = new DebugProcess(procs[number], (Process) procs[number]);
+		IPCDIDebugProcess proc = new DebugProcess(session, procs[number], (Process) procs[number]);
 		return proc;
 	}
 	
@@ -145,7 +145,7 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 		IPCDIDebugProcess[] list = new IPCDIDebugProcess[procs.length];
 		
 		for (int i = 0; i < procs.length; i++) {
-			IPCDIDebugProcess proc = new DebugProcess(procs[i], (Process) procs[i]);
+			IPCDIDebugProcess proc = new DebugProcess(session, procs[i], (Process) procs[i]);
 			list[i] = proc;
 		}
 		

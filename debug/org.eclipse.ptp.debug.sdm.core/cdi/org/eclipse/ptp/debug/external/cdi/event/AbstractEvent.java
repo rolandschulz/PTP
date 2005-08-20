@@ -35,8 +35,8 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
+import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.cdi.Session;
-import org.eclipse.ptp.debug.external.utils.BitList;
 
 /**
  */

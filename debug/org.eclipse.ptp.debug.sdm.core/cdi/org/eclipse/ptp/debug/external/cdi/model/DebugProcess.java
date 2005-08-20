@@ -19,14 +19,18 @@
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
+import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.cdi.SessionObject;
 
-public class DebugProcess implements IPCDIDebugProcess {
+public class DebugProcess extends SessionObject implements IPCDIDebugProcess {
 	
 	private IPProcess pProcess;
 	private Process process;
 
-	public DebugProcess(IPProcess pP, Process p) {
+	public DebugProcess(IPCDISession s, IPProcess pP, Process p) {
+		super((Session) s);
 		pProcess = pP;
 		process = p;
 	}

@@ -18,51 +18,67 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model;
 
-import java.util.ArrayList;
-
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
+import org.eclipse.ptp.debug.core.utils.BitList;
+import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.cdi.SessionObject;
 
-public class DebugProcessSet implements IPCDIDebugProcessSet {
+public class DebugProcessSet extends SessionObject implements IPCDIDebugProcessSet {
 	
 	private String setName;
-	private ArrayList processList = null;
+	private BitList processList = null;
 
-	public DebugProcessSet(String name) {
-		processList = new ArrayList();
+	public DebugProcessSet(IPCDISession s, String name) {
+		super((Session) s);
+		processList = new BitList();
 		setName = name;
 	}
 	
-	public DebugProcessSet(String name, IPCDIDebugProcess[] procs) {
-		processList = new ArrayList();
+	public DebugProcessSet(IPCDISession s, String name, int[] procs) {
+		super((Session) s);
+		processList = new BitList();
 		setName = name;
 		for (int i = 0; i < procs.length; i++) {
 			addProcess(procs[i]);
 		}
 	}
 	
-	public DebugProcessSet(String name, IPCDIDebugProcess proc) {
-		processList = new ArrayList();
+	public DebugProcessSet(IPCDISession s, String name, int proc) {
+		super((Session) s);
+		processList = new BitList();
 		setName = name;
 		addProcess(proc);
 	}
 	
 	public IPCDIDebugProcess[] getProcesses() {
-		return (IPCDIDebugProcess[]) processList.toArray(new IPCDIDebugProcess[0]);
+		int[] list = toIntArray();
+		IPCDIDebugProcess[] retVal = new IPCDIDebugProcess[list.length];
+		for (int i = 0; i < list.length; i++) {
+			retVal[i] = getProcess(list[i]);
+		}
+		return retVal;
 	}
 	
 	public IPCDIDebugProcess getProcess(int number) {
-		return (IPCDIDebugProcess) processList.get(number);
+		return ((Session) getSession()).getModelManager().getProcess(number);
 	}
 	
-	public void addProcess(IPCDIDebugProcess proc) {
-		if (!processList.contains(proc))
-			processList.add(proc);
+	public void addProcess(int proc) {
+		processList.set(proc);
 	}
 	
-	public void removeProcess(IPCDIDebugProcess proc) {
-		if (processList.contains(proc))
-			processList.remove(proc);
+	public void addProcess(int[] proc) {
+		processList.set(proc);
+	}
+	
+	public void removeProcess(int proc) {
+		processList.clear(proc);
+	}
+
+	public void removeProcess(int[] proc) {
+		processList.clear(proc);
 	}
 	
 	public String getName() {
@@ -70,6 +86,10 @@ public class DebugProcessSet implements IPCDIDebugProcessSet {
 	}
 	
 	public int getSize() {
-		return processList.size();
+		return processList.cardinality();
+	}
+	
+	public int[] toIntArray() {
+		return processList.toArray();
 	}
 }

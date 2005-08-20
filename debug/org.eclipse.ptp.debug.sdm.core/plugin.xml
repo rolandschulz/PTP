@@ -19,6 +19,7 @@
          <export name="org.eclipse.ptp.debug.external.simulator.*"/>
          <export name="org.eclipse.ptp.debug.external.utils.*"/>
          <export name="org.eclipse.ptp.debug.external.variable.*"/>
+         <export name="org.eclipse.ptp.debug.external.cdi.model.type.*"/>
       </library>
    </runtime>
 

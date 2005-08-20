@@ -14,6 +14,8 @@
          <export name="org.eclipse.ptp.debug.core.cdi.model.*"/>
          <export name="org.eclipse.ptp.debug.core.model.*"/>
          <export name="org.eclipse.ptp.debug.core.cdi.event.*"/>
+         <export name="org.eclipse.ptp.debug.core.utils.*"/>
+         <export name="org.eclipse.ptp.debug.core.sourcelookup.*"/>
       </library>
    </runtime>
 

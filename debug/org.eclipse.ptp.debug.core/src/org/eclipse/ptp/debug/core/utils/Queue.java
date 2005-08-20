@@ -26,7 +26,7 @@
  * Contributors:
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.utils;
+package org.eclipse.ptp.debug.core.utils;
  
 import java.util.Collections;
 import java.util.LinkedList;
