@@ -97,7 +97,6 @@ public class Session implements IPCDISession, ICDISessionObject {
 		
 		/* Initially we only create process/target 0 */
 		registerTarget(0, true);
-		registerTarget(1, true);
 	}
 	
 	public IDebugger getDebugger() {
