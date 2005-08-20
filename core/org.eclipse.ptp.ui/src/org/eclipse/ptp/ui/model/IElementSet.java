@@ -29,6 +29,7 @@ public interface IElementSet extends IContainer {
 	public boolean containOtherSets();
 	public boolean isContainSets(String set_id);
 	
+	public boolean isRootSet();
 	public IElement[] getSelectedElements();
 	public void removeAllSelected();
 	public void select(int index);

@@ -32,10 +32,14 @@ import org.eclipse.ptp.ui.model.IElementHandler;
  *
  */
 public class ElementHandler extends Container implements IElementHandler {
-	protected List registerElements = new ArrayList();
+	//only store the register set id;
+	private final String REGISTERED_KEY = "registeredset";
 
 	public ElementHandler() {
 		super(null, SET_ROOT_ID, SET_ROOT_ID, false, IContainer.SET_TYPE);
+		//store registered list
+		setData(REGISTERED_KEY, new ArrayList());
+		
 		//create root 
 		add(new ElementSet(this, SET_ROOT_ID, SET_ROOT_ID));
 	}
@@ -79,23 +83,33 @@ public class ElementHandler extends Container implements IElementHandler {
 	}
 
 	public boolean containsRegisterElement(String eid) {
-		return registerElements.contains(eid);
+		List setList = getRegisteredSetList();
+		return setList.contains(eid);
 	}
 	public void addRegisterElement(String eid) {
-		if (!containsRegisterElement(eid))
-			registerElements.add(eid);
+		List setList = getRegisteredSetList();
+		if (!setList.contains(eid))
+			setList.add(eid);
 	}
 	public void removeRegisterElement(String eid) {
-		if (containsRegisterElement(eid))
-			registerElements.remove(eid);
+		List setList = getRegisteredSetList();
+		if (setList.contains(eid))
+			setList.remove(eid);
 	}
 	public String[] getRegisteredElementsID() {
-		return (String[])registerElements.toArray(new String[registerElements.size()]);
+		List setList = getRegisteredSetList();
+		return (String[])setList.toArray(new String[setList.size()]);
 	}
 	public void removeAllRegisterElements() {
-		registerElements.clear();
+		List setList = getRegisteredSetList();
+		setList.clear();
 	}
 	public int totalRegisterElements() {
-		return registerElements.size();
+		List setList = getRegisteredSetList();
+		return setList.size();
 	}
+	
+	private List getRegisteredSetList() {
+		return (List)getData(REGISTERED_KEY);
+	}	
 }

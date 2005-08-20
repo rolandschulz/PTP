@@ -27,6 +27,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.internal.ui.UISetManager;
 import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.listeners.IPaintListener;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -55,7 +56,7 @@ import org.eclipse.swt.widgets.Shell;
  * @author clement chu
  *
  */
-public abstract class AbstractParallelElementView extends AbstractParallelView {
+public abstract class AbstractParallelElementView extends AbstractParallelView implements IPaintListener {
 	//Composite
 	protected ScrolledComposite sc = null;
 	protected Composite drawComp = null;
@@ -125,6 +126,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	public void createPartControl(Composite parent) {
 		initialKey(Platform.getOS());
 		createView(parent);
+		manager.addPaintListener(this);
 	}
 	
 	protected void createView(Composite parent) {
@@ -850,6 +852,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	}
 	
 	public void dispose() {
+		manager.removePaintListener(this);
 		super.dispose();
 	}
 	public void setFocus() {
@@ -931,7 +934,14 @@ public abstract class AbstractParallelElementView extends AbstractParallelView {
 	private void elementRedraw(int x, int y, int width, int height, boolean reDrawChild) {
 		if (!drawComp.isDisposed())
 			drawComp.redraw(x, y, width, height, reDrawChild);
-	}	
+	}
+	
+	/**
+	 * Paint Listener 
+	 */
+	public void repaint() {
+		refresh();
+	}
 	
 	private class SelectedAreaInfo {
 		private List tmpElements = new ArrayList();
