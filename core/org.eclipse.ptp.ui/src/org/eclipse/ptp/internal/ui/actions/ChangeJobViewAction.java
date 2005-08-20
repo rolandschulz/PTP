@@ -37,7 +37,6 @@ public class ChangeJobViewAction extends GotoDropDownAction {
 	public ChangeJobViewAction(AbstractParallelElementView view) {
 		super(name, view);
 	    setImageDescriptor(ParallelImages.ID_ICON_JOB_NORMAL);
-	    setDisabledImageDescriptor(ParallelImages.ID_ICON_JOB_DISABLE);
 	}
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
 		if (view instanceof ParallelJobView) {
@@ -82,7 +81,6 @@ public class ChangeJobViewAction extends GotoDropDownAction {
 		public InternalJobAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
 			super(name, id, view, action);
 		    setImageDescriptor(ParallelImages.ID_ICON_JOB_NORMAL);
-		    setDisabledImageDescriptor(ParallelImages.ID_ICON_JOB_DISABLE);
 		}	
 	}
 }

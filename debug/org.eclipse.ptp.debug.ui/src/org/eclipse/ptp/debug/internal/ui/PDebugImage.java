@@ -50,9 +50,7 @@ public class PDebugImage {
 	public static final String ICON_STEPOVER_NORMAL = "stepover_normal.gif";
 	public static final String ICON_STEPRETURN_DISABLE = "stepreturn_disable.gif";
 	public static final String ICON_STEPRETURN_NORMAL = "stepreturn_normal.gif";
-	public static final String ICON_REGISTER_DISABLE = "register_disable.gif";
 	public static final String ICON_REGISTER_NORMAL = "register_normal.gif";
-	public static final String ICON_UNREGISTER_DISABLE = "unregister_disable.gif";
 	public static final String ICON_UNREGISTER_NORMAL = "unregister_normal.gif";
 	
 	public static final String IMG_PRO_ERROR_SEL = "error_sel.gif";
@@ -95,9 +93,7 @@ public class PDebugImage {
 	public static final ImageDescriptor ID_ICON_STEPOVER_NORMAL = createImageDescriptor(TOOLICONURL, ICON_STEPOVER_NORMAL, ICON_STEPOVER_NORMAL);
 	public static final ImageDescriptor ID_ICON_STEPRETURN_DISABLE = createImageDescriptor(TOOLICONURL, ICON_STEPRETURN_DISABLE, ICON_STEPRETURN_DISABLE);
 	public static final ImageDescriptor ID_ICON_STEPRETURN_NORMAL = createImageDescriptor(TOOLICONURL, ICON_STEPRETURN_NORMAL, ICON_STEPRETURN_NORMAL);
-	public static final ImageDescriptor ID_ICON_REGISTER_DISABLE = createImageDescriptor(TOOLICONURL, ICON_REGISTER_DISABLE, ICON_REGISTER_DISABLE);
 	public static final ImageDescriptor ID_ICON_REGISTER_NORMAL = createImageDescriptor(TOOLICONURL, ICON_REGISTER_NORMAL, ICON_REGISTER_NORMAL);
-	public static final ImageDescriptor ID_ICON_UNREGISTER_DISABLE = createImageDescriptor(TOOLICONURL, ICON_UNREGISTER_DISABLE, ICON_UNREGISTER_DISABLE);
 	public static final ImageDescriptor ID_ICON_UNREGISTER_NORMAL = createImageDescriptor(TOOLICONURL, ICON_UNREGISTER_NORMAL, ICON_UNREGISTER_NORMAL);
 
 	public static final ImageDescriptor ID_IMG_PRO_ERROR_SEL = createImageDescriptor(PROCESSICONURL, IMG_PRO_ERROR_SEL, IMG_PRO_ERROR_SEL);

@@ -39,7 +39,6 @@ public class CreateSetAction extends GotoDropDownAction {
 	public CreateSetAction(AbstractParallelElementView view) {
 		super(name, view);
 	    setImageDescriptor(ParallelImages.ID_ICON_CREATESET_NORMAL);
-	    setDisabledImageDescriptor(ParallelImages.ID_ICON_CREATESET_DISABLE);
 	}
 	
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
@@ -103,7 +102,6 @@ public class CreateSetAction extends GotoDropDownAction {
 		public InternalSetAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
 			super(name, id, view, action);
 		    setImageDescriptor(ParallelImages.ID_ICON_CREATESET_NORMAL);
-		    setDisabledImageDescriptor(ParallelImages.ID_ICON_CREATESET_DISABLE);
 		}	
 	}	
 }

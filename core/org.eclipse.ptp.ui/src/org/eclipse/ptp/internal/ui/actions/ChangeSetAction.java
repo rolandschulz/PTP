@@ -39,7 +39,6 @@ public class ChangeSetAction extends GotoDropDownAction {
 	public ChangeSetAction(AbstractParallelElementView view) {
 		super(name, view);
 	    setImageDescriptor(ParallelImages.ID_ICON_CHANGESET_NORMAL);
-	    setDisabledImageDescriptor(ParallelImages.ID_ICON_CHANGESET_DISABLE);
 	}
 	
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {

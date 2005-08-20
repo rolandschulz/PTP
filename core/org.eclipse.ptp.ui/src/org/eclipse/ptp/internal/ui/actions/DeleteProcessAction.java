@@ -39,7 +39,6 @@ public class DeleteProcessAction extends ParallelAction {
 	public DeleteProcessAction(AbstractParallelElementView view) {
 		super(name, view);
 	    setImageDescriptor(ParallelImages.ID_ICON_DELETEELEMENT_NORMAL);
-	    setDisabledImageDescriptor(ParallelImages.ID_ICON_DELETEELEMENT_DISABLE);
 	}
 
 	public void run(IElement[] elements) {

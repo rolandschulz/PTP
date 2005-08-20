@@ -33,7 +33,6 @@ public class RegisterAction extends DebugAction {
 	public RegisterAction(ParallelDebugView view) {
 		super(name, view);
 	    setImageDescriptor(PDebugImage.ID_ICON_REGISTER_NORMAL);
-	    setDisabledImageDescriptor(PDebugImage.ID_ICON_REGISTER_DISABLE);
 	}
 
 	public void run(IElement[] elements) {

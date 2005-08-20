@@ -38,7 +38,6 @@ public class ChangeMachineAction extends GotoDropDownAction {
 	public ChangeMachineAction(AbstractParallelElementView view) {
 		super(name, view);
 	    setImageDescriptor(ParallelImages.ID_ICON_MACHINE_NORMAL);
-	    setDisabledImageDescriptor(ParallelImages.ID_ICON_MACHINE_DISABLE);
 	}
 	
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
@@ -92,7 +91,6 @@ public class ChangeMachineAction extends GotoDropDownAction {
 		public InternalMachineAction(String name, String id, AbstractParallelElementView view, GotoDropDownAction action) {
 			super(name, id, view, action);
 		    setImageDescriptor(ParallelImages.ID_ICON_MACHINE_NORMAL);
-		    setDisabledImageDescriptor(ParallelImages.ID_ICON_MACHINE_DISABLE);
 		}		
 	}
 }

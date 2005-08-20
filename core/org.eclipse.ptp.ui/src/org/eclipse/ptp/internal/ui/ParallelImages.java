@@ -34,30 +34,20 @@ public class ParallelImages {
 	
     private static ImageRegistry imageRegistry = null;
 	
-	public static final String ICON_CHANGESET_DISABLE = "changeset_disable.gif";
 	public static final String ICON_CHANGESET_NORMAL = "changeset_normal.gif";
-	public static final String ICON_CREATESET_DISABLE = "createset_disable.gif";
 	public static final String ICON_CREATESET_NORMAL = "createset_normal.gif";
-	public static final String ICON_DELETESET_DISABLE = "deleteset_disable.gif";
 	public static final String ICON_DELETESET_NORMAL = "deleteset_normal.gif";
-	public static final String ICON_DELETEELEMENT_DISABLE = "deleteelement_disable.gif";
 	public static final String ICON_DELETEELEMENT_NORMAL = "deleteelement_normal.gif";
 	
-	public static final String ICON_MACHINE_DISABLE = "machine_disable.gif";
 	public static final String ICON_MACHINE_NORMAL = "machine_normal.gif";
-	public static final String ICON_JOB_DISABLE = "job_disable.gif";
 	public static final String ICON_JOB_NORMAL = "job_normal.gif";
 	public static final String ICON_TERMINATE_ALL_DISABLE = "terminate_all_disable.gif";
 	public static final String ICON_TERMINATE_ALL_NORMAL = "terminate_all_normal.gif";
-	public static final String ICON_RUNMODE_DISABLE = "runmode_disable.gif";
 	public static final String ICON_RUNMODE_NORMAL = "runmode_normal.gif";
-	public static final String ICON_DEBUGMODE_DISABLE = "debugmode_disable.gif";
 	public static final String ICON_DEBUGMODE_NORMAL = "debugmode_normal.gif";
 
 	//SHOW LEGEND ICON
 	public static final String ICON_SHOWLEGEND_ACTION_NORMAL =  "legend.gif";
-	public static final String ICON_SHOWLEGEND_ACTION_DISABLE = "legend.gif";
-	public static final String ICON_SHOWLEGEND_ACTION_HOVER = "legend.gif";	
 	
 	//NODE
 	public static final String IMG_NODE_USER_ALLOC_EXCL = "node_user_excl.gif";
@@ -95,28 +85,18 @@ public class ParallelImages {
 	public static final String IMG_PROC_STOPPED = "proc_stopped.gif";
 	public static final String IMG_PROC_STOPPED_SEL = "proc_stopped_sel.gif";
 	
-	public static final ImageDescriptor ID_ICON_CHANGESET_DISABLE = createImageDescriptor(TOOLICONURL, ICON_CHANGESET_DISABLE, ICON_CHANGESET_DISABLE);
 	public static final ImageDescriptor ID_ICON_CHANGESET_NORMAL = createImageDescriptor(TOOLICONURL, ICON_CHANGESET_NORMAL, ICON_CHANGESET_NORMAL);
-	public static final ImageDescriptor ID_ICON_CREATESET_DISABLE = createImageDescriptor(TOOLICONURL, ICON_CREATESET_DISABLE, ICON_CREATESET_DISABLE);
 	public static final ImageDescriptor ID_ICON_CREATESET_NORMAL = createImageDescriptor(TOOLICONURL, ICON_CREATESET_NORMAL, ICON_CREATESET_NORMAL);
-	public static final ImageDescriptor ID_ICON_DELETESET_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DELETESET_DISABLE, ICON_DELETESET_DISABLE);
 	public static final ImageDescriptor ID_ICON_DELETESET_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DELETESET_NORMAL, ICON_DELETESET_NORMAL);
-	public static final ImageDescriptor ID_ICON_DELETEELEMENT_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DELETEELEMENT_DISABLE, ICON_DELETEELEMENT_DISABLE);
 	public static final ImageDescriptor ID_ICON_DELETEELEMENT_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DELETEELEMENT_NORMAL, ICON_DELETEELEMENT_NORMAL);
-	public static final ImageDescriptor ID_ICON_MACHINE_DISABLE = createImageDescriptor(TOOLICONURL, ICON_MACHINE_DISABLE, ICON_MACHINE_DISABLE);
 	public static final ImageDescriptor ID_ICON_MACHINE_NORMAL = createImageDescriptor(TOOLICONURL, ICON_MACHINE_NORMAL, ICON_MACHINE_NORMAL);
-	public static final ImageDescriptor ID_ICON_JOB_DISABLE = createImageDescriptor(TOOLICONURL, ICON_JOB_DISABLE, ICON_JOB_DISABLE);
 	public static final ImageDescriptor ID_ICON_JOB_NORMAL = createImageDescriptor(TOOLICONURL, ICON_JOB_NORMAL, ICON_JOB_NORMAL);
 	public static final ImageDescriptor ID_ICON_TERMINATE_ALL_DISABLE = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_ALL_DISABLE, ICON_TERMINATE_ALL_DISABLE);
 	public static final ImageDescriptor ID_ICON_TERMINATE_ALL_NORMAL = createImageDescriptor(TOOLICONURL, ICON_TERMINATE_ALL_NORMAL, ICON_TERMINATE_ALL_NORMAL);
-	public static final ImageDescriptor ID_ICON_RUNMODE_DISABLE = createImageDescriptor(TOOLICONURL, ICON_RUNMODE_DISABLE, ICON_RUNMODE_DISABLE);
 	public static final ImageDescriptor ID_ICON_RUNMODE_NORMAL = createImageDescriptor(TOOLICONURL, ICON_RUNMODE_NORMAL, ICON_RUNMODE_NORMAL);
-	public static final ImageDescriptor ID_ICON_DEBUGMODE_DISABLE = createImageDescriptor(TOOLICONURL, ICON_DEBUGMODE_DISABLE, ICON_DEBUGMODE_DISABLE);
 	public static final ImageDescriptor ID_ICON_DEBUGMODE_NORMAL = createImageDescriptor(TOOLICONURL, ICON_DEBUGMODE_NORMAL, ICON_DEBUGMODE_NORMAL);
 
 	public static final ImageDescriptor ID_ICON_SHOWLEGEND_ACTION_NORMAL = createImageDescriptor(TOOLICONURL, ICON_SHOWLEGEND_ACTION_NORMAL, ICON_SHOWLEGEND_ACTION_NORMAL);
-	public static final ImageDescriptor ID_ICON_SHOWLEGEND_ACTION_DISABLE = createImageDescriptor(TOOLICONURL, ICON_SHOWLEGEND_ACTION_DISABLE, ICON_SHOWLEGEND_ACTION_DISABLE);
-	public static final ImageDescriptor ID_ICON_SHOWLEGEND_ACTION_HOVER = createImageDescriptor(TOOLICONURL, ICON_SHOWLEGEND_ACTION_HOVER, ICON_SHOWLEGEND_ACTION_HOVER);
 
 	public static final ImageDescriptor ID_IMG_NODE_USER_ALLOC_EXCL = createImageDescriptor(NODEICONURL, IMG_NODE_USER_ALLOC_EXCL, IMG_NODE_USER_ALLOC_EXCL);
 	public static final ImageDescriptor ID_IMG_NODE_USER_ALLOC_EXCL_SEL = createImageDescriptor(NODEICONURL, IMG_NODE_USER_ALLOC_EXCL_SEL, IMG_NODE_USER_ALLOC_EXCL_SEL);
