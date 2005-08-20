@@ -71,6 +71,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	
 	Thread[] currentThreads;
 	int currentThreadId;
+	boolean suspended = true;
 	
 	int targetId; /* synonymous with the process number/id */
 	IPCDIDebugProcess debugProcess;
@@ -228,12 +229,25 @@ public class Target extends SessionObject implements IPCDITarget {
 		return currentThreads[threadId];
 	}
 	
+	/**
+	 * Called when stopping because of breakpoints etc ..
+	 */
+	public void updateState() {
+		// get the new Threads.
+		
+		for (int i = 0; i < currentThreads.length; i++) {
+			currentThreads[i].clearState();
+		}
+	}
+	
 	public ICDIThread[] getThreads() throws CDIException {
 		/* Currently the debug external interface doesn't support thread
 		 */
-		currentThreads = new Thread[1];
-		currentThreads[0] = new Thread(this, 0);
-		currentThreadId = 0;
+		if (currentThreads.length == 0) {
+			currentThreads = new Thread[1];
+			currentThreads[0] = new Thread(this, 0);
+			currentThreadId = 0;
+		}
 		return currentThreads;
 	}
 	
@@ -332,6 +346,11 @@ public class Target extends SessionObject implements IPCDITarget {
 		// Auto-generated method stub
 		System.out.println("Target.getTarget()");
 		return this;
+	}
+	
+	public synchronized void setSuspended(boolean state) {
+		suspended = state;
+		notifyAll();
 	}
 
 	public ICDIExpression createExpression(String code) throws CDIException {

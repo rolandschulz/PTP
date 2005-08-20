@@ -44,7 +44,7 @@ public class Thread extends PTPObject implements ICDIThread {
 	static ICDIStackFrame[] noStack = new ICDIStackFrame[0];
 	int id;
 	String name;
-	//StackFrame currentFrame;
+	StackFrame currentFrame;
 	List currentFrames;
 	int stackdepth = 0;
 	int procNumber;
@@ -65,6 +65,22 @@ public class Thread extends PTPObject implements ICDIThread {
 	public int getId() {
 		return id;
 	}
+	
+	public void clearState() {
+		stackdepth = 0;
+		currentFrame = null;
+		currentFrames = null;
+	}
+	
+	public StackFrame getCurrentStackFrame() throws CDIException {
+		if (currentFrame == null) {
+			ICDIStackFrame[] frames = getStackFrames(0, 0);
+			if (frames.length > 0) {
+				currentFrame = (StackFrame)frames[0];
+			}
+		}
+		return currentFrame;
+	}
 
 	public ICDIStackFrame[] getStackFrames() throws CDIException {
 		// get the frames depth
@@ -84,6 +100,20 @@ public class Thread extends PTPObject implements ICDIThread {
 				currentFrames.add(frames[i]);
 			}
 			
+			// assign the currentFrame if it was not done yet.
+			if (currentFrame == null) {
+				for (int i = 0; i < currentFrames.size(); i++) {
+					ICDIStackFrame stack = (ICDIStackFrame) currentFrames.get(i);
+					
+					/* For a thread with 1 stack, the level of the stack is 0, however
+					 * the depth is 1
+					 */
+					if (stack.getLevel() + 1 == depth) {
+						currentFrame = (StackFrame)stack;
+					}
+				}
+			}
+
 			//target.setCurrentThread(currentThread, false);
 		}
 		return (ICDIStackFrame[]) currentFrames.toArray(noStack);

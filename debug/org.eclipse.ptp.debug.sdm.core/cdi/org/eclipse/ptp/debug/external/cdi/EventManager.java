@@ -34,10 +34,15 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIEventManager;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
+import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
+import org.eclipse.ptp.debug.external.cdi.event.AbstractEvent;
+import org.eclipse.ptp.debug.external.cdi.model.Target;
+import org.eclipse.ptp.debug.external.cdi.model.Thread;
 
 /**
  */
@@ -95,91 +100,64 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 		
 		cdiList.add(event);
 		
+		if (event instanceof ICDISuspendedEvent) {
+			processSuspendedEvent(event);
+		}
+		
 		// Fire the event;
 		ICDIEvent[] cdiEvents = (ICDIEvent[])cdiList.toArray(new ICDIEvent[0]);
 		fireEvents(cdiEvents);
 	}
 
-	// FIXME DONNY
 	/**
 	 * When suspended arrives, reset managers and target.
 	 * Alse the variable and the memory needs to be updated and events
 	 * fired for changes.
 	 */
-/*	boolean processSuspendedEvent(MIStoppedEvent stopped) {
-		Session session = (Session)getSession();
-		MISession miSession = stopped.getMISession();
-		Target currentTarget = session.getTarget(miSession);
-		currentTarget.setSupended(true);
+	boolean processSuspendedEvent(IPCDIEvent event) {
+		Session session = (Session) getSession();
+		
+		int[] procs = ((AbstractEvent) event).getProcesses();
+		
+		for (int i = 0; i < procs.length; i++) {
+			Target currentTarget = (Target) session.getTarget(procs[i]);
+			currentTarget.setSuspended(true);
 
-		// Bailout early if we do not want to process any events.
-		if (!isAllowingProcessingEvents()) {
-			return false;
-		}
-
-
-		if (processSharedLibEvent(stopped)) {
-			// Event was consumed by the shared lib processing bailout
-			return false;
-		}
-
-		if (processBreakpointHitEvent(stopped)) {
-			// Event was consumed, i.e. it was not the right exception.
-			return false;
-		}
-
-		int threadId = threadId = stopped.getThreadId();
-		currentTarget.updateState(threadId);
-		try {
-			Thread cthread = (Thread)currentTarget.getCurrentThread();
-			if (cthread != null) {
-				cthread.getCurrentStackFrame();
-			} else {
+			//int threadId = threadId = stopped.getThreadId();
+			//currentTarget.updateState(threadId);
+			currentTarget.updateState();
+			
+			try {
+				Thread cthread = (Thread) currentTarget.getCurrentThread();
+				if (cthread != null) {
+					cthread.getCurrentStackFrame();
+				} else {
+					return true;
+				}
+			} catch (CDIException e1) {
+				//e1.printStackTrace();
 				return true;
 			}
-		} catch (CDIException e1) {
-			//e1.printStackTrace();
-			return true;
 		}
 
 		// Update the managers.
 		// For the Variable/Expression Managers call only the updateManager.
 		VariableManager varMgr = session.getVariableManager();
 		ExpressionManager expMgr  = session.getExpressionManager();		
-		RegisterManager regMgr = session.getRegisterManager();
-		MemoryManager memMgr = session.getMemoryManager();
 		BreakpointManager bpMgr = session.getBreakpointManager();
-		SignalManager sigMgr = session.getSignalManager();
-		SourceManager srcMgr = session.getSourceManager();
-		SharedLibraryManager libMgr = session.getSharedLibraryManager();
 		try {
 			if (varMgr.isAutoUpdate()) {
-				varMgr.update(currentTarget);
+				varMgr.update(null);
 			}
 			if (expMgr.isAutoUpdate()) { 
-				expMgr.update(currentTarget);
-			}
-			if (regMgr.isAutoUpdate()) {
-				regMgr.update(currentTarget);
-			}
-			if (memMgr.isAutoUpdate()) {
-				memMgr.update(currentTarget);
+				expMgr.update(null);
 			}
 			if (bpMgr.isAutoUpdate()) {
-				bpMgr.update(currentTarget);
-			}
-			if (sigMgr.isAutoUpdate()) {
-				sigMgr.update(currentTarget);
-			}
-			if (libMgr.isAutoUpdate()) {
-				libMgr.update(currentTarget);
-			}
-			if (srcMgr.isAutoUpdate()) {
-				srcMgr.update(currentTarget);
+				bpMgr.update(null);
 			}
 		} catch (CDIException e) {
 			//System.out.println(e);
 		}
 		return true;
 	}
-*/}
+}
