@@ -82,8 +82,7 @@ public class PCDIDebugModel {
 		return PTPDebugCorePlugin.getUniqueIdentifier();
 	}
 	
-	public static void removeDebugTarget(ILaunch launch, int i) {
-		String name = "Proc " + i;
+	public static void removeDebugTarget(ILaunch launch, String name) {
 		launch.removeDebugTarget((IDebugTarget) dTargets.get(name));
 		launch.removeProcess((IProcess) dProcesses.get(name));
 	}

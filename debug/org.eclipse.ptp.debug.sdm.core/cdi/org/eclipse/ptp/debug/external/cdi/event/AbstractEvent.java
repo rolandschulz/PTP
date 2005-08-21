@@ -101,10 +101,6 @@ public abstract class AbstractEvent implements IPCDIEvent {
 					break;
 				}
 			}
-			
-			if (src == null) {
-				src = session.getTarget(); /* We go with TargetZero */
-			}
 		}
 		return src;
 	}

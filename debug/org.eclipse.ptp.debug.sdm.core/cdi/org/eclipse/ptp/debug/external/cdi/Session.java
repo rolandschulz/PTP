@@ -40,7 +40,6 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
-import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetUnregisteredEvent;
@@ -62,7 +61,6 @@ public class Session implements IPCDISession, ICDISessionObject {
 	IDebugger debugger;
 	IPJob dJob;
 	
-	Target targetZero; /* For compatibility we maintain the Target for Process 0 */
 	Hashtable currentDebugTargetList;
 	
 	public Session(IPJob job, IDebugger iDebugger, ILaunch launch, IBinaryObject binObj) {
@@ -97,7 +95,6 @@ public class Session implements IPCDISession, ICDISessionObject {
 		
 		/* Initially we only create process/target 0 */
 		registerTarget(0, true);
-		targetZero = (Target) getTarget(0);
 	}
 	
 	public IDebugger getDebugger() {
@@ -161,7 +158,7 @@ public class Session implements IPCDISession, ICDISessionObject {
 			return;
 		
 		// Remove DebugTarget & IProcess;
-		PCDIDebugModel.removeDebugTarget(dLaunch, procNum);
+		PCDIDebugModel.removeDebugTarget(dLaunch, "Process " + procNum);
 		
 		String targetId = Integer.toString(procNum);
 		currentDebugTargetList.remove(targetId);
@@ -205,10 +202,6 @@ public class Session implements IPCDISession, ICDISessionObject {
 	
 	public boolean isRegistered(int i) {
 		return currentDebugTargetList.containsKey(Integer.toString(i));
-	}
-
-	public IPCDITarget getTarget() {
-		return targetZero; /* For compatibility reason */
 	}
 	
 	public IPCDITarget getTarget(int i) {

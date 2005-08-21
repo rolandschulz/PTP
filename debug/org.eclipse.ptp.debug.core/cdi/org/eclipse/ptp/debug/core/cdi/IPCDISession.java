@@ -29,6 +29,5 @@ public interface IPCDISession extends ICDISession {
 	public void unregisterTargets(int[] targets, boolean sendEvent);
 	public int[] getRegisteredTargetIds();
 	public boolean isRegistered(int i);
-	public IPCDITarget getTarget();
 	public IPCDITarget getTarget(int i);
 }
