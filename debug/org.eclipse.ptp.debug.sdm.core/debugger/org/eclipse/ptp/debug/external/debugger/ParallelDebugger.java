@@ -32,6 +32,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 
 
 public class ParallelDebugger extends AbstractDebugger {
@@ -154,7 +155,7 @@ public class ParallelDebugger extends AbstractDebugger {
 	 * evaluate expression for first process in procs
 	 * TODO: extend to support multiple processes
 	 */
-	public String evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws PCDIException {
+	public String evaluateExpression(IPCDIDebugProcessSet procs, ICDIVariable var) throws PCDIException {
 		return null;
 	}
 	
