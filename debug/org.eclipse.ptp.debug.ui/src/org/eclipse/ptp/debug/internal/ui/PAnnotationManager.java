@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.internal.ui;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -45,6 +44,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
+import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.listeners.IRegListener;
@@ -178,24 +178,24 @@ public class PAnnotationManager implements IRegListener {
 		return resource.createMarker(type);
 	}
 	
-	public BitSet getTaskId(IDebugTarget debugTarget) {
+	public BitList getTasks(IDebugTarget debugTarget) {
 		if (debugTarget instanceof IPDebugTarget) {
 			int taskId = ((IPDebugTarget)debugTarget).getTargetId();
 			if (taskId == -1)
 				return null;
 			
-			BitSet bitSet = new BitSet();
-			bitSet.set(taskId);
-			return bitSet;
+			BitList tasks = new BitList();
+			tasks.set(taskId);
+			return tasks;
 		}
 		return null;
 	}
 	
-	public BitSet getTaskId(IThread thread) {
-		return getTaskId(thread.getDebugTarget());
+	public BitList getTasks(IThread thread) {
+		return getTasks(thread.getDebugTarget());
 	}
-	public BitSet getTaskId(IStackFrame stackFrame) {
-		return getTaskId(stackFrame.getDebugTarget());
+	public BitList getTasks(IStackFrame stackFrame) {
+		return getTasks(stackFrame.getDebugTarget());
 	}
 	
 	//called by debug view
@@ -208,17 +208,17 @@ public class PAnnotationManager implements IRegListener {
 		if (file == null)
 			throw new CoreException(Status.CANCEL_STATUS);
 		
-		BitSet taskId = getTaskId(stackFrame);
-		if (taskId == null)
+		BitList tasks = getTasks(stackFrame);
+		if (tasks == null)
 			throw new CoreException(Status.CANCEL_STATUS);
 		
 		IStackFrame tos = getTopStackFrame(stackFrame.getThread());
 		String type = (tos == null || stackFrame.equals(tos))?IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT: IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_SECONDARY;
 
-		addAnnotation(textEditor, file, stackFrame.getLineNumber(), taskId, type);
+		addAnnotation(textEditor, file, stackFrame.getLineNumber(), tasks, type);
 	}
 	
-	public boolean containsCurrentSet(BitSet taskId) {
+	public boolean containsCurrentSet(BitList aTasks) {
 		String job_id = uiDebugManager.getCurrentJobId();
 		String set_id = uiDebugManager.getCurrentSetId();
 		if (set_id.equals(IElementHandler.SET_ROOT_ID))
@@ -226,8 +226,8 @@ public class PAnnotationManager implements IRegListener {
 		
 		IElementHandler handler = uiDebugManager.getElementHandler(job_id);
 		IElementSet set = handler.getSet(set_id);
-		BitSet tasks = (BitSet)set.getData(UIDebugManager.BITSET_KEY);
-		return (tasks != null && tasks.intersects(taskId));
+		BitList tasks = (BitList)set.getData(UIDebugManager.BITSET_KEY);
+		return (tasks != null && tasks.intersects(aTasks));
 		/*
 		taskId.cardinality();
 		for(int i=taskId.nextSetBit(0); i>=0; i=taskId.nextSetBit(i+1)) {
@@ -238,7 +238,7 @@ public class PAnnotationManager implements IRegListener {
 	}
 	
 	//called by event
-	public void addAnnotation(String fullPathFileName, int lineNumber, BitSet taskId) throws CoreException {
+	public void addAnnotation(String fullPathFileName, int lineNumber, BitList tasks) throws CoreException {
 		IFile file = findFile(fullPathFileName);
 		if (file == null)
 			throw new CoreException(Status.CANCEL_STATUS);
@@ -251,12 +251,12 @@ public class PAnnotationManager implements IRegListener {
 		if (textEditor == null)
 			throw new CoreException(Status.CANCEL_STATUS);
 		
-		String type = (containsCurrentSet(taskId))?IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT:IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT;		
+		String type = (containsCurrentSet(tasks))?IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT:IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT;		
 
-		addAnnotation(textEditor, file, lineNumber, taskId, type);
+		addAnnotation(textEditor, file, lineNumber, tasks, type);
 	}
 	
-	public void addAnnotation(ITextEditor textEditor, IFile file, int lineNumber, BitSet taskId, String type) throws CoreException {
+	public void addAnnotation(ITextEditor textEditor, IFile file, int lineNumber, BitList tasks, String type) throws CoreException {
 		IDocumentProvider docProvider = textEditor.getDocumentProvider();
 		IAnnotationModel annotationModel = docProvider.getAnnotationModel(textEditor.getEditorInput());
 		if (annotationModel == null)
@@ -274,7 +274,7 @@ public class PAnnotationManager implements IRegListener {
 			annotationModel.addAnnotation(annotation, position);
 		}
 
-		annotation.addTasks(taskId);
+		annotation.addTasks(tasks);
 		annotation.setMessage();
 	}
 	
@@ -303,15 +303,15 @@ public class PAnnotationManager implements IRegListener {
 		if (file == null)
 			throw new CoreException(Status.CANCEL_STATUS);
 		
-		BitSet taskId = getTaskId(thread);
-		if (taskId == null)
+		BitList tasks = getTasks(thread);
+		if (tasks == null)
 			throw new CoreException(Status.CANCEL_STATUS);
 		
-		removeAnnotation(textEditor, file, taskId);
+		removeAnnotation(textEditor, file, tasks);
 	}
 	
 	//called by event
-	public void removeAnnotation(String fullPathFileName, BitSet taskId) throws CoreException {
+	public void removeAnnotation(String fullPathFileName, BitList tasks) throws CoreException {
 		IFile file = findFile(fullPathFileName);
 		if (file == null)
 			throw new CoreException(Status.CANCEL_STATUS);
@@ -324,10 +324,10 @@ public class PAnnotationManager implements IRegListener {
 		if (textEditor == null)
 			throw new CoreException(Status.CANCEL_STATUS);
 	
-		removeAnnotation(textEditor, file, taskId);
+		removeAnnotation(textEditor, file, tasks);
 	}
 	
-	public void removeAnnotation(ITextEditor textEditor, IFile file, BitSet taskId) throws CoreException {
+	public void removeAnnotation(ITextEditor textEditor, IFile file, BitList tasks) throws CoreException {
 		IDocumentProvider docProvider = textEditor.getDocumentProvider();
 		IAnnotationModel annotationModel = docProvider.getAnnotationModel(textEditor.getEditorInput());
 		if (annotationModel == null)
@@ -335,7 +335,7 @@ public class PAnnotationManager implements IRegListener {
 		
 		for (int i=0; i<annotationList.size(); i++) {
 			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation)annotationList.get(i);
-			annotation.removeTasks(taskId);
+			annotation.removeTasks(tasks);
 			if (annotation.isEmpty()) {
 				removeMarkerAnnotation(annotation);
 			} else {
@@ -361,25 +361,25 @@ public class PAnnotationManager implements IRegListener {
 		}
 		return annotations.iterator();
 	}
-	public Position findAnnotationPosition(BitSet bitSet) {
-		if (bitSet.isEmpty())
+	public Position findAnnotationPosition(BitList tasks) {
+		if (tasks.isEmpty())
 			return null;
 		
 		for (Iterator i=annotationList.iterator(); i.hasNext();) {
 			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation)i.next();
-			if (annotation.contains(bitSet))
+			if (annotation.contains(tasks))
 				return annotation.getPosition();
 		}
 		return null;
 	}
 
-	public PInstructionPointerAnnotation findAnnotation(BitSet bitSet) {
-		if (bitSet.isEmpty())
+	public PInstructionPointerAnnotation findAnnotation(BitList tasks) {
+		if (tasks.isEmpty())
 			return null;
 		
 		for (Iterator i=annotationList.iterator(); i.hasNext();) {
 			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation)i.next();
-			if (annotation.contains(bitSet))
+			if (annotation.contains(tasks))
 				return annotation;
 		}
 		return null;
@@ -413,8 +413,7 @@ public class PAnnotationManager implements IRegListener {
 				new Job("Update Annotation") {
 					protected IStatus run(IProgressMonitor pmonitor) {
 						boolean isRoot = currentSet.isRootSet();
-						BitSet tasks = (BitSet)currentSet.getData(UIDebugManager.BITSET_KEY);
-						
+						BitList tasks = (BitList)currentSet.getData(UIDebugManager.BITSET_KEY);					
 						for (Iterator i=annotationList.iterator(); i.hasNext();) {
 							PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation)i.next();
 							String annotationType = annotation.getType();
@@ -436,7 +435,7 @@ public class PAnnotationManager implements IRegListener {
 	/*****
 	 * Register listener
 	 *****/
-	public void register(final BitSet tasks) {
+	public void register(final BitList tasks) {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				new Job("Update Annotation") {
@@ -460,7 +459,7 @@ public class PAnnotationManager implements IRegListener {
 			PTPDebugUIPlugin.log(e);
 		}
 	}
-	public void unregister(final BitSet tasks) {
+	public void unregister(final BitList tasks) {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				new Job("Update Annotation") {
