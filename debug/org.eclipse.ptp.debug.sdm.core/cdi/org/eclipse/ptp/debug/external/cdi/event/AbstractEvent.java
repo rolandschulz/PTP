@@ -28,6 +28,7 @@
 ***********************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
+import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
@@ -42,6 +43,7 @@ import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 public abstract class AbstractEvent implements IPCDIEvent {
 	IPCDISession session;	
 	IPCDIDebugProcessSet sources;
+	ICDIObject src; /* For compatibility with CDI/CDT */
 
 	public AbstractEvent(IPCDISession s, IPCDIDebugProcessSet srcs) {
 		session = s;
@@ -84,5 +86,26 @@ public abstract class AbstractEvent implements IPCDIEvent {
 		}
 		
 		return retVal;
+	}
+	
+	public ICDIObject getSource() {
+		// Auto-generated method stub
+		System.out.println("AbstractEvent.getSource()");
+		if (src == null) {
+			int[] registeredTargets = session.getRegisteredTargetIds();
+			BitList bitList = sources.toBitList();
+			
+			for (int i = 0; i < registeredTargets.length; i++) {
+				if (bitList.get(registeredTargets[i])) {
+					src = session.getTarget(registeredTargets[i]);
+					break;
+				}
+			}
+			
+			if (src == null) {
+				src = session.getTarget(); /* We go with TargetZero */
+			}
+		}
+		return src;
 	}
 }

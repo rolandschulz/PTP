@@ -30,7 +30,6 @@ package org.eclipse.ptp.debug.external.cdi.event;
 
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.BreakpointHit;
@@ -55,9 +54,4 @@ public class BreakpointHitEvent extends AbstractEvent implements ICDISuspendedEv
 		//return session;
 	}
 
-	public ICDIObject getSource() {
-		// Auto-generated method stub
-		System.out.println("BreakpointHitEvent.getSource()");
-		return null;
-	}
 }
