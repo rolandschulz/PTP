@@ -18,11 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui;
 
-import java.util.BitSet;
-
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.Position;
+import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 /**
@@ -30,7 +29,7 @@ import org.eclipse.ui.texteditor.MarkerAnnotation;
  *
  */
 public class PInstructionPointerAnnotation extends MarkerAnnotation {
-	private BitSet tasks = null;
+	private BitList tasks = null;
 	private Position position = null;
 	
 	public PInstructionPointerAnnotation(IMarker marker, Position position) {
@@ -87,34 +86,34 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 		return getText();
 	}
 	
-	public void setTasks(BitSet tasks) {
+	public void setTasks(BitList tasks) {
 		this.tasks = tasks;
 	}
 	public int[] getTasks() {
 		return convertArray(tasks);		
 	}
 	
-	public void addTasks(BitSet bitSet) {
+	public void addTasks(BitList aTasks) {
 		if (tasks == null)
-			tasks = new BitSet();
+			tasks = new BitList();
 
-		tasks.or(bitSet);
+		tasks.or(aTasks);
 	}
-	public void removeTasks(BitSet bitSet) {
-		tasks.andNot(bitSet);
+	public void removeTasks(BitList aTasks) {
+		tasks.andNot(aTasks);
 	}
 	public boolean isEmpty() {
 		return (tasks.cardinality() == 0);
 	}
 	
-	public boolean contains(BitSet bitSet) {
-		return tasks.intersects(bitSet);
+	public boolean contains(BitList aTasks) {
+		return tasks.intersects(aTasks);
 	}
-	public int[] containTasks(BitSet bitSet) {
-		bitSet.and(tasks);
-		return convertArray(bitSet);		
+	public int[] containTasks(BitList aTasks) {
+		aTasks.and(tasks);
+		return convertArray(aTasks);		
 	}
-	public int[] convertArray(BitSet bitSet) {
+	public int[] convertArray(BitList bitSet) {
 		int[] intArray = new int[bitSet.cardinality()];
 		for(int i=bitSet.nextSetBit(0), j=0; i>=0; i=bitSet.nextSetBit(i+1), j++) {
 			intArray[j] = i;

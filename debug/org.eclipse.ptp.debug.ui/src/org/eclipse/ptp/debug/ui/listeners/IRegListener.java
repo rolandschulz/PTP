@@ -18,13 +18,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.listeners;
 
-import java.util.BitSet;
+import org.eclipse.ptp.debug.core.utils.BitList;
 
 /**
  * @author Clement chu
  *
  */
 public interface IRegListener {
-	public void register(BitSet tasks);
-	public void unregister(BitSet tasks);
+	public void register(BitList tasks);
+	public void unregister(BitList tasks);
 }

@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.internal.ui;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -45,6 +44,7 @@ import org.eclipse.ptp.debug.core.PDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
+import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetUnregisteredEvent;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
@@ -106,7 +106,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		if (regListeners.contains(listener))
 			regListeners.remove(listener);
 	}
-	public void fireRegListener(int type, BitSet tasks) {
+	public void fireRegListener(int type, BitList tasks) {
 		for (Iterator i=regListeners.iterator(); i.hasNext();) {
 			switch (type) {
 			case REG_TYPE:
@@ -154,16 +154,13 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession)getDebugSession(getCurrentJobId());
 		if (session == null)
 			return;		
-		BitSet tasks = new BitSet();
 		for (int i=0; i<elements.length; i++) {			
 			//only unregister some registered elements
 			if (elements[i].isRegistered()) {
 				int taskId = convertToInt(elements[i].getName());
 				unregisterProcess(session, taskId, true);
-				tasks.set(taskId);
 			}
 		}
-		fireRegListener(UNREG_TYPE, tasks);
 	}
 	public void registerElements(IElement[] elements) {
 		if (isJobStop(getCurrentJobId()))
@@ -173,16 +170,13 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		if (session == null)
 			return;
 
-		BitSet tasks = new BitSet();
 		for (int i=0; i<elements.length; i++) {
 			//only register some unregistered elements
 			if (!elements[i].isRegistered()) {
 				int taskId = convertToInt(elements[i].getName());
 				registerProcess(session, taskId, true);
-				tasks.set(taskId);
 			}
 		}
-		fireRegListener(REG_TYPE, tasks);
 	}
 	
 	/******
@@ -230,7 +224,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 								if (!preSet.contains(registerElementsID[i])) {
 									int taskID = convertToInt(elementHandler.getSetRoot().get(registerElementsID[i]).getName());				
 									registerProcess(session, taskID, false);
-									BitSet tasks = new BitSet();
+									BitList tasks = new BitList();
 									tasks.set(taskID);
 									fireRegListener(UNREG_TYPE, tasks);
 								}
@@ -238,7 +232,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 							else {
 								int taskID = convertToInt(elementHandler.getSetRoot().get(registerElementsID[i]).getName());				
 								unregisterProcess(session, taskID, false);
-								BitSet tasks = new BitSet();
+								BitList tasks = new BitList();
 								tasks.set(taskID);
 								fireRegListener(UNREG_TYPE, tasks);
 								
@@ -267,23 +261,23 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		set.setData(BITSET_KEY, null);		
 	}
 	public void createSetEvent(IElementSet set, IElement[] elements) {
-		BitSet tasks = new BitSet();
+		BitList tasks = new BitList();
 		for (int i=0; i<elements.length; i++) {
 			tasks.set(convertToInt(elements[i].getName()));
 		}
 		set.setData(BITSET_KEY, tasks);
 	}
 	public void addElementsEvent(IElementSet set, IElement[] elements) {
-		BitSet tasks = (BitSet)set.getData(BITSET_KEY);
-		BitSet addTasks = new BitSet();
+		BitList tasks = (BitList)set.getData(BITSET_KEY);
+		BitList addTasks = new BitList();
 		for (int i=0; i<elements.length; i++) {
 			tasks.set(convertToInt(elements[i].getName()));
 		}
 		tasks.or(addTasks);
 	}
 	public void removeElementsEvent(IElementSet set, IElement[] elements) {
-		BitSet tasks = (BitSet)set.getData(BITSET_KEY);
-		BitSet addTasks = new BitSet();
+		BitList tasks = (BitList)set.getData(BITSET_KEY);
+		BitList addTasks = new BitList();
 		for (int i=0; i<elements.length; i++) {
 			tasks.set(convertToInt(elements[i].getName()));
 		}
@@ -309,34 +303,54 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	/*****
 	 * Event
 	 *****/
-	public void handleDebugEvents(ICDIEvent[] events) {
+	public void handleDebugEvents(final ICDIEvent[] events) {
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException {
+				new Job("Update Events") {
+					protected IStatus run(IProgressMonitor pmonitor) {
+						handleDebugEvents(events, pmonitor);
+						return Status.OK_STATUS;
+					}
+				}.schedule();
+			}
+		};
+		try {
+			ResourcesPlugin.getWorkspace().run(runnable, null, 0, null);
+		} catch (CoreException e) {
+			PTPDebugUIPlugin.log(e);
+		}
+	}
+	
+	private void handleDebugEvents(ICDIEvent[] events, IProgressMonitor monitor) {
 		for (int i=0; i<events.length; i++) {
 			IPCDIEvent event = (IPCDIEvent)events[i];
 			if (event instanceof TargetRegisteredEvent) {
-				TargetRegisteredEvent targetRegisteredEvent = (TargetRegisteredEvent)event;
-				String job_id = targetRegisteredEvent.getDebugJob().getIDString();
-				IElementHandler elementHandler = getElementHandler(job_id);
-				IPJob job = findJobById(job_id);
-				int[] processes = event.getProcesses();
+				IPJob job = event.getDebugJob();
+				if (job == null)
+					continue;
+				
+				IElementHandler elementHandler = getElementHandler(job.getIDString());
+				int[] processes = event.getAllProcesses().toIntArray();
 				for (int j=0; j<processes.length; j++) {
 					IPProcess proc = job.findProcessByTaskId(processes[i]);
 					elementHandler.addRegisterElement(proc.getIDString());
 					elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(true);
-					//fireRegListener(true, event. )
 				}
+				fireRegListener(REG_TYPE, event.getAllProcesses().toBitList());
 			}
 			else if (event instanceof TargetUnregisteredEvent) {
-				TargetUnregisteredEvent targetUnregisteredEvent = (TargetUnregisteredEvent)event;
-				String job_id = targetUnregisteredEvent.getDebugJob().getIDString();
-				IElementHandler elementHandler = getElementHandler(job_id);
-				IPJob job = findJobById(job_id);
-				int[] processes = event.getProcesses();
+				IPJob job = event.getDebugJob();
+				if (job == null)
+					continue;
+				
+				IElementHandler elementHandler = getElementHandler(job.getIDString());
+				int[] processes = event.getAllProcesses().toIntArray();
 				for (int j=0; j<processes.length; j++) {
 					IPProcess proc = job.findProcessByTaskId(processes[i]);
 					elementHandler.removeRegisterElement(proc.getIDString());
 					elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(false);
-					//fireRegListener(false, event. )
 				}
+				fireRegListener(UNREG_TYPE, event.getAllProcesses().toBitList());
 			}
 			firePaintListener();
 		}
