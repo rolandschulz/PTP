@@ -31,6 +31,11 @@ import org.eclipse.ptp.debug.internal.ui.actions.SuspendAction;
 import org.eclipse.ptp.debug.internal.ui.actions.TerminateAction;
 import org.eclipse.ptp.debug.internal.ui.actions.UnregisterAction;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.events.IDebugActionEvent;
+import org.eclipse.ptp.debug.ui.events.IResumedDebugEvent;
+import org.eclipse.ptp.debug.ui.events.ISuspendedDebugEvent;
+import org.eclipse.ptp.debug.ui.events.ITerminatedDebugEvent;
+import org.eclipse.ptp.debug.ui.listeners.IDebugActionUpdateListener;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
@@ -42,7 +47,7 @@ import org.eclipse.ptp.ui.views.ParallelJobView;
  * @author clement chu
  * 
  */
-public class ParallelDebugView extends ParallelJobView {
+public class ParallelDebugView extends ParallelJobView implements IDebugActionUpdateListener {
 	private static ParallelDebugView instance = null;
 
 	// actions
@@ -58,6 +63,12 @@ public class ParallelDebugView extends ParallelJobView {
 	public ParallelDebugView() {
 		instance = this;
 		manager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
+		getUIDebugManager().addDebugEventListener(this);
+	}
+	
+	public void dispose() {
+		getUIDebugManager().removeDebugEventListener(this);
+		super.dispose();
 	}
 	
 	public UIDebugManager getUIDebugManager() {
@@ -192,5 +203,22 @@ public class ParallelDebugView extends ParallelJobView {
 	}
 	public void error() {
 		refresh();
+	}
+	
+	/****
+	 * Debug Action Event
+	 ****/
+	public void handleDebugActionEvent(IDebugActionEvent event) {
+		if (event instanceof IResumedDebugEvent) {
+			suspendAction.setEnabled(true);
+			terminateAction.setEnabled(true);
+		} else if (event instanceof ISuspendedDebugEvent) {
+			resumeAction.setEnabled(true);
+			stepIntoAction.setEnabled(true);
+			stepOverAction.setEnabled(true);
+			stepReturnAction.setEnabled(true);
+		} else if (event instanceof ITerminatedDebugEvent) {
+			
+		}
 	}
 }

@@ -56,27 +56,27 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 			setMessage("");
 			return;
 		}
+		
 		int preTask = tasks[0];
-		if (tasks.length == 1) {
-			setMessage(msg + preTask);
-			return;
-		}
+		msg += preTask;
 		boolean isContinue = false;
 		for (int i=1; i<tasks.length; i++) {
 			if (preTask == (tasks[i] - 1)) {
-				if (!isContinue) {
-					if (i == 1)
-						msg += preTask;
-					msg += "-";
-				}
-				if (i == (tasks.length - 1))
-					msg += tasks[i];
-
+				preTask = tasks[i];
 				isContinue = true;
-			} else {
-				isContinue = false;
-				msg += preTask + "," + tasks[i];
+
+				if (i == (tasks.length - 1)) {
+					msg += "-" + tasks[i];
+					break;
+				}
+				continue;
 			}
+
+			if (isContinue)
+				msg += "-" + preTask;
+
+			msg += "," + tasks[i];
+			isContinue = false;
 			preTask = tasks[i];
 		}
 		setMessage(msg);

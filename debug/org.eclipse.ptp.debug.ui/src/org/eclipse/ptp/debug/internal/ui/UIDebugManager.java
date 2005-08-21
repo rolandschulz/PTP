@@ -48,6 +48,8 @@ import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetUnregisteredEvent;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.ui.events.IDebugActionEvent;
+import org.eclipse.ptp.debug.ui.listeners.IDebugActionUpdateListener;
 import org.eclipse.ptp.debug.ui.listeners.IRegListener;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.ui.PTPUIPlugin;
@@ -66,6 +68,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	private final static int UNREG_TYPE = 2;
 	
 	private List regListeners = new ArrayList();
+	private List debugEventListeners = new ArrayList();
 	private PAnnotationManager annotationMgr = null;
 	
 	public UIDebugManager() {
@@ -98,6 +101,19 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		createEventListener(cur_jid);
 	}
 
+	public void addDebugEventListener(IDebugActionUpdateListener listener) {
+		if (!debugEventListeners.contains(listener))
+			debugEventListeners.add(listener);
+	}
+	public void removeDebugEventListener(IDebugActionUpdateListener listener) {
+		if (debugEventListeners.contains(listener))
+			debugEventListeners.remove(listener);
+	}
+	public void fireDebugEvent(IDebugActionEvent event) {
+		for (Iterator i=regListeners.iterator(); i.hasNext();) {
+			((IDebugActionUpdateListener)i.next()).handleDebugActionEvent(event);
+		}
+	}
 	public void addRegListener(IRegListener listener) {
 		if (!regListeners.contains(listener))
 			regListeners.add(listener);
