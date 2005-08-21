@@ -72,4 +72,24 @@ public class BitList {
 		retVal.bitSet = (BitSet) bitSet.clone();
 		return retVal;
 	}
+	
+	public void and(BitList s) {
+		bitSet.and(s.bitSet);
+	}
+	
+	public void andNot(BitList s) {
+		bitSet.andNot(s.bitSet);
+	}
+	
+	public boolean intersects(BitList s) {
+		return bitSet.intersects(s.bitSet);
+	}
+	
+	public boolean isEmpty() {
+		return bitSet.isEmpty();
+	}
+	
+	public void or(BitList s) {
+		bitSet.or(s.bitSet);
+	}
 }
