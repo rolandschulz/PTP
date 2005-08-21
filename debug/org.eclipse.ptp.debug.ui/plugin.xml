@@ -14,6 +14,22 @@
    </extension>   
 
    <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            name="%PDebugPreferencePage.name"
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
+            class="org.eclipse.ptp.debug.internal.ui.preferences.PDebugPreferencePage"
+            id="org.eclipse.ptp.debug.ui.PDebugPreferencePage">
+      </page>
+      <page
+            name="%PDebuggerPage.name"
+            category="org.eclipse.ptp.debug.ui.PDebugPreferencePage"
+            class="org.eclipse.ptp.debug.internal.ui.preferences.PDebuggerPage"
+            id="org.eclipse.ptp.debug.ui.PDebuggerPage">
+      </page>
+   </extension>   
+
+   <extension
          point="org.eclipse.ui.views">
       <category
             name="%ParallelDebugViewCategory.name"
@@ -35,7 +51,12 @@
             id="org.eclipse.ptp.debug.core">
       </debugModelPresentation>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.ptp.debug.internal.ui.PDebugUIPreferenceInitializer"/>
+   </extension>
 
+   <!-- annotation //-->
    <extension
          point="org.eclipse.ui.editors.annotationTypes">
       <type
@@ -129,141 +150,8 @@
             overviewRulerPreferenceKey="ptpSetIPOverviewRuler">
       </specification>
    </extension>
-   
-   <!-- breakpointMarker -->
-   <!--
-   <extension
-         id="pBreakpointMarker"
-         point="org.eclipse.core.resources.markers">
-     <super
-           type="org.eclipse.debug.core.breakpointMarker">
-     </super>
-     <persistent
-           value="false">
-     </persistent>
-     <attribute
-           name="org.eclipse.ptp.debug.core.condition">
-     </attribute>
-     <attribute
-           name="org.eclipse.ptp.debug.core.ignoreCount">
-     </attribute>
-     <attribute
-           name="org.eclipse.ptp.debug.core.threadId">
-     </attribute>
-     <attribute
-           name="org.eclipse.ptp.debug.core.installCount">
-     </attribute>
-     <attribute
-           name="org.eclipse.ptp.debug.core.sourceHandle">
-     </attribute>
-     <attribute
-           name="org.eclipse.ptp.debug.core.jobid">
-     </attribute>
-     <attribute
-           name="org.eclipse.ptp.debug.core.setid">
-     </attribute>
-     <attribute
-           name="org.eclipse.ptp.debug.core.cursetid">
-     </attribute>
-   </extension>
-   <extension
-         id="commonPLineBreakpointMarker"
-         point="org.eclipse.core.resources.markers">
-     <super
-           type="org.eclipse.ptp.debug.ui.pBreakpointMarker">
-     </super>
-     <super
-           type="org.eclipse.debug.core.lineBreakpointMarker">
-     </super>
-     <persistent
-           value="false">
-     </persistent>
-   </extension>
-   <extension
-         id="pLineBreakpointMarker"
-         point="org.eclipse.core.resources.markers">
-     <super
-           type="org.eclipse.ptp.debug.ui.commonPLineBreakpointMarker">
-     </super>
-     <persistent
-           value="false">
-     </persistent>
-     <attribute
-           name="org.eclipse.ptp.debug.core.function">
-     </attribute>
-     <attribute
-           name="org.eclipse.ptp.debug.core.address">
-     </attribute>
-   </extension>
-   <extension
-         id="pAddressBreakpointMarker"
-         point="org.eclipse.core.resources.markers">
-     <super
-           type="org.eclipse.ptp.debug.ui.commonPLineBreakpointMarker">
-     </super>
-     <persistent
-           value="false">
-     </persistent>
-   </extension>
-   <extension
-         id="pFunctionBreakpointMarker"
-         point="org.eclipse.core.resources.markers">
-     <super
-           type="org.eclipse.ptp.debug.ui.commonPLineBreakpointMarker">
-     </super>
-     <persistent
-           value="false">
-     </persistent>
-   </extension>
-   <extension
-         id="pWatchpointBreakpointMarker"
-         point="org.eclipse.core.resources.markers">
-     <super
-           type="org.eclipse.ptp.debug.ui.pBreakpointMarker">
-     </super>
-     <persistent
-           value="false">
-     </persistent>
-     <attribute
-           name="org.eclipse.ptp.debug.core.expression">
-     </attribute>
-     <attribute
-           name="org.eclipse.ptp.debug.core.write">
-     </attribute>
-     <attribute
-           name="org.eclipse.ptp.debug.core.read">
-     </attribute>
-   </extension>
-
-   <extension
-         point="org.eclipse.debug.core.breakpoints">
-      <breakpoint
-            markerType="org.eclipse.ptp.debug.ui.pLineBreakpointMarker"
-            class="org.eclipse.ptp.debug.internal.core.breakpoints.PLineBreakpoint"
-            name="%PLineBreakpoint.name"
-            id="pLineBreakpoint">
-      </breakpoint>
-      <breakpoint
-            markerType="org.eclipse.ptp.debug.ui.pAddressBreakpointMarker"
-            class="org.eclipse.ptp.debug.internal.core.breakpoints.PAddressBreakpoint"
-            name="%PAddressBreakpoint.name"
-            id="pAddressBreakpoint">
-      </breakpoint>
-      <breakpoint
-            markerType="org.eclipse.ptp.debug.ui.pFunctionBreakpointMarker"
-            class="org.eclipse.ptp.debug.internal.core.breakpoints.PFunctionBreakpoint"
-            name="%PFunctionBreakpoint.name"
-            id="pFunctionBreakpoint">
-      </breakpoint>
-      <breakpoint
-            markerType="org.eclipse.ptp.debug.ui.pWatchBreakpointMarker"
-            class="org.eclipse.ptp.debug.internal.core.breakpoints.PWatchBreakpoint"
-            name="%PWatchBreakpoint.name"
-            id="pWatchBreakpoint">
-      </breakpoint>
-   </extension>
-   //-->
-   
+   <!-- annotation //-->
+      
    <extension
          point="org.eclipse.debug.ui.breakpointOrganizers">
       <breakpointOrganizer
@@ -294,24 +182,6 @@
    </extension>
    //-->
 
-   <!--
-   <extension
-         point="org.eclipse.ui.propertyPages">
-      <page
-            adaptable="true"
-            objectClass="org.eclipse.ptp.debug.core.model.IPBreakpoint"
-            class="org.eclipse.ptp.debug.internal.ui.propertypages.PBreakpointPropertyPage"
-            name="%CommonBreakpointPage.label"
-            id="org.eclipse.ptp.debug.ui.propertypages.breakpoint.common"/>
-      <page
-            adaptable="true"
-            objectClass="org.eclipse.ptp.debug.core.model.IPBreakpoint"
-            class="org.eclipse.ptp.debug.internal.ui.propertypages.PBreakpointFilteringPage"
-            name="%FilteringBreakpointPage.label"
-            id="org.eclipse.ptp.debug.ui.propertypages.breakpoint.filtering"/>
-   </extension>    
-   //-->
-
    <extension point="org.eclipse.core.runtime.adapters">
       <factory 
             class="org.eclipse.ptp.debug.internal.ui.actions.RetargettableActionAdapterFactory" 
@@ -339,7 +209,6 @@
          <adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
       </factory>
    </extension>
-   
    <!--
    <extension
          point="org.eclipse.ui.editorActions">
@@ -355,7 +224,6 @@
       </editorContribution>
    </extension>
    //-->
-   
    <extension
          point="org.eclipse.ui.popupMenus">
       <viewerContribution
@@ -421,5 +289,14 @@
             class="org.eclipse.ptp.debug.internal.ui.propertypages.PBreakpointPropertyPage"
             name="%CommonBreakpointPage.label"
             id="org.eclipse.ptp.debug.ui.propertypages.breakpoint.common"/>
-   </extension>   
+      <!--
+      <page
+            adaptable="true"
+            objectClass="org.eclipse.ptp.debug.core.model.IPBreakpoint"
+            class="org.eclipse.ptp.debug.internal.ui.propertypages.PBreakpointFilteringPage"
+            name="%FilteringBreakpointPage.label"
+            id="org.eclipse.ptp.debug.ui.propertypages.breakpoint.filtering"/>
+       //-->
+   </extension>    
+
 </plugin>

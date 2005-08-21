@@ -18,15 +18,22 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
+import org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -157,6 +164,10 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		return getCurrentPerspectiveID().equals(IPTPDebugUIConstants.PERSPECTIVE_DEBUG);		
 	}
 	
+	public static PDebugModelPresentation getDebugModelPresentation() {
+		return PDebugModelPresentation.getDefault();
+	}
+	
 	/***** LOG *****/
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
@@ -184,5 +195,20 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 
 		ErrorDialog.openError(shell, title, message, s);
 	}
+
 	
+	/**
+	 * TODO moved to debug core later
+	 */
+	public Map getDebuggersMap() {
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(getUniqueIdentifier(), "PDebugger");
+		IConfigurationElement[] infos = extensionPoint.getConfigurationElements();
+		Map debuggerMap = new HashMap(infos.length);
+		for( int i = 0; i < infos.length; i++ ) {
+			IConfigurationElement configurationElement = infos[i];
+			PDebugConfiguration configType = new PDebugConfiguration(configurationElement);
+			debuggerMap.put(configType.getID(), configType);
+		}
+		return debuggerMap;
+	}	
 }

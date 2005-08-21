@@ -56,7 +56,6 @@ import org.eclipse.debug.ui.IDebugEditorPresentation;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IValueDetailListener;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.ptp.debug.core.model.IPAddressBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
@@ -101,7 +100,8 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 			IEditorDescriptor descriptor = registry.getDefaultEditor(input.getName());
 			if (descriptor != null)
 				return descriptor.getId();
-			//TODO return CEditor id hardcode
+			
+			//TODO return CEditor id hardcode, CUIPlugin.EDITOR_ID
 			return (descriptor != null)?descriptor.getId():"org.eclipse.cdt.ui..editor.CEditor";
 		}
 		return null;
@@ -154,7 +154,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 
 	public void computeDetail(IValue value, IValueDetailListener listener) {
 		// TODO 
-		//listener.detailComputed(value, );
+		//PValueDetailProvider.getDefault().computeDetail(value, listener);
 		System.out.println("PDebugModelPresentation - ComputeDetails");
 	}
 
@@ -192,9 +192,6 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	}
 	
 	private Image getBaseImage(Object element) {
-		if (element instanceof Annotation) {
-			System.out.println("------ Annotation: " + ((Annotation)element).getType());
-		}
 		//TODO element can be DebugTarget, Thread
 		if (element instanceof IMarker) {
 			IBreakpoint bp = getBreakpoint((IMarker)element);
@@ -347,7 +344,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 
 	protected boolean isShowQualifiedNames() {
 		Boolean showQualified = (Boolean)getAttributes().get(DISPLAY_FULL_PATHS);
-		showQualified = showQualified == null ? Boolean.FALSE : showQualified;
+		showQualified = (showQualified == null)?Boolean.FALSE:showQualified;
 		return showQualified.booleanValue();
 	}
 
@@ -386,7 +383,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		if (!isEmpty( handle)) {
 			IPath path = new Path(handle);
 			if (path.isValidPath(handle)) {
-				label.append(qualified ? path.toOSString() : path.lastSegment());
+				label.append(qualified?path.toOSString():path.lastSegment());
 			}
 		}
 		return label;
