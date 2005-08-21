@@ -34,8 +34,6 @@ public interface IPTPDebugUIConstants {
 	public static final String ACTION_ENABLE_DISABLE_BREAKPOINT = PREFIX + "enableDisableBreakpoint";
 	public static final String ACTION_SET_BREAKPOINT = PREFIX + "toggleBreakpointRulerAction";
 	
-	public static final String PEF_SHOW_FULL_PATHS = PREFIX + "show_full_paths";
-	
 	public static final int INTERNAL_ERROR = 150;
 	public static final int STATUS_CODE_QUESTION = 10000;
 	public static final int STATUS_CODE_INFO = 10001;
