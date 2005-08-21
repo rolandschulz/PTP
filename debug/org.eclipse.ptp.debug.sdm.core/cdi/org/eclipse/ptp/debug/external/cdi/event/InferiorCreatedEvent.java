@@ -29,7 +29,6 @@
 package org.eclipse.ptp.debug.external.cdi.event;
 
 import org.eclipse.cdt.debug.core.cdi.event.ICDICreatedEvent;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 
@@ -41,9 +40,4 @@ public class InferiorCreatedEvent extends AbstractEvent implements ICDICreatedEv
 		super(s, sources);
 	}
 
-	public ICDIObject getSource() {
-		// Auto-generated method stub
-		System.out.println("InferiorCreatedEvent.getSource()");
-		return null;
-	}
 }

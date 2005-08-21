@@ -131,7 +131,7 @@ public class Session implements IPCDISession, ICDISessionObject {
 				iprocess = DebugPlugin.newProcess(dLaunch, process, "Launch Label " + target.getTargetId());
 			}
 
-			PCDIDebugModel.newDebugTarget(dLaunch, null, target, "Proc " + target.getTargetId(), iprocess, dBinObject, true, false, stopInMain, true);
+			PCDIDebugModel.newDebugTarget(dLaunch, null, target, "Process " + target.getTargetId(), iprocess, dBinObject, true, false, stopInMain, true);
 		} catch (DebugException e) {
 			e.printStackTrace();
 		} catch (CoreException e) {
