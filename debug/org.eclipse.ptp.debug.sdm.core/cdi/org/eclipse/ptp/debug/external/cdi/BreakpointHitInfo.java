@@ -34,20 +34,22 @@ import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 
 /**
  */
-public class BreakpointHit extends SessionObject implements ICDIBreakpointHit {
+public class BreakpointHitInfo extends SessionObject implements ICDIBreakpointHit {
 
 	BreakpointHitEvent breakEvent;
+	ICDIBreakpoint breakPoint;
 
-	public BreakpointHit(Session session, BreakpointHitEvent e) {
+	public BreakpointHitInfo(Session session, BreakpointHitEvent e, ICDIBreakpoint bp) {
 		super(session);
 		breakEvent = e;
+		breakPoint = bp;
 	}
 
 	/**
 	 * @see org.eclipse.cdt.debug.core.cdi.ICDIBreakpointHit#getBreakpoint()
 	 */
 	public ICDIBreakpoint getBreakpoint() {
-		return null;
+		return breakPoint;
 	}
 
 }

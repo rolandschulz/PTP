@@ -92,6 +92,10 @@ public class SimThread extends Observable {
 				list.add(0, new Integer(processId));
 				list.add(1, new String("BREAKPOINTHIT"));
 				
+				/* Additional info */
+				list.add(2, new String("main.c"));
+				list.add(3, new Integer(curLine));
+				
 				for (int j = 0; j < stackFrames.length; j++) {
 					stackFrames[j].setLine(curLine);
 				}

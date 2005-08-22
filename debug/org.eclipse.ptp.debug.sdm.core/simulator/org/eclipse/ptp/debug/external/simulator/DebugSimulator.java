@@ -36,7 +36,6 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
-import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
@@ -46,6 +45,7 @@ import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.FunctionBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.LineBreakpoint;
+import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.cdi.model.LocalVariable;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
@@ -329,9 +329,14 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		int procId = ((Integer) list.get(0)).intValue();
 		String event = (String) list.get(1);
 		
-		if (event.equals("BREAKPOINTHIT"))
-			fireEvent(new BreakpointHitEvent(getSession(), new DebugProcessSet(session, procId)));
-		else if (event.equals("RESUMED"))
+		if (event.equals("BREAKPOINTHIT")) {
+			String file = (String) list.get(2);
+			int line = ((Integer) list.get(3)).intValue();
+			
+			LineLocation loc = new LineLocation(file, line);
+			LineBreakpoint bpt = new LineBreakpoint(null, 0, loc, null);
+			fireEvent(new BreakpointHitEvent(getSession(), new DebugProcessSet(session, procId), bpt));
+		} else if (event.equals("RESUMED"))
 			fireEvent(new InferiorResumedEvent(getSession(), new DebugProcessSet(session, procId)));
 			
 		// Do Something

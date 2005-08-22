@@ -28,13 +28,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
-import org.eclipse.cdt.debug.core.cdi.event.ICDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 
 /**
  */
-public class InferiorResumedEvent extends AbstractEvent implements ICDIResumedEvent {
+public class InferiorResumedEvent extends AbstractEvent implements IPCDIResumedEvent {
 	
 	public InferiorResumedEvent(IPCDISession s, IPCDIDebugProcessSet sources) {
 		super(s, sources);
