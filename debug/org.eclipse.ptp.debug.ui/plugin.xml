@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-   <extension-point id="PDebuggerPage" name="%PDebuggerPage"/>
-    
-   <!-- perspective //-->
-   <extension
-         point="org.eclipse.ui.perspectives">
-      <perspective
-            name="%ParallelDebugPerspective.name"
-            icon="icons/ptpdebug.gif"
-            class="org.eclipse.ptp.debug.internal.ui.PTPDebugPerspectiveFactory"
-            id="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
-      </perspective>
-   </extension>   
 
+   <extension-point id="PDebuggerPage" name="%PDebuggerPage.name"/>
+
+   <!-- preferences //-->
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.ptp.debug.internal.ui.PDebugUIPreferenceInitializer"/>
+   </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
@@ -28,6 +23,17 @@
             class="org.eclipse.ptp.debug.internal.ui.preferences.PDebuggerPage"
             id="org.eclipse.ptp.debug.ui.PDebuggerPage">
       </page>
+   </extension>   
+
+   <!-- perspective //-->
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            name="%ParallelDebugPerspective.name"
+            icon="icons/ptpdebug.gif"
+            class="org.eclipse.ptp.debug.internal.ui.PTPDebugPerspectiveFactory"
+            id="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
+      </perspective>
    </extension>   
 
    <extension
@@ -51,10 +57,6 @@
             class="org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation"
             id="org.eclipse.ptp.debug.core">
       </debugModelPresentation>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.ptp.debug.internal.ui.PDebugUIPreferenceInitializer"/>
    </extension>
 
    <!-- annotation //-->
