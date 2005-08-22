@@ -34,6 +34,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
@@ -332,12 +333,14 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		if (event.equals("BREAKPOINTHIT")) {
 			String file = (String) list.get(2);
 			int line = ((Integer) list.get(3)).intValue();
-			
 			LineLocation loc = new LineLocation(file, line);
 			LineBreakpoint bpt = new LineBreakpoint(null, 0, loc, null);
+			procs[procId].setStatus(IPProcess.STOPPED);
 			fireEvent(new BreakpointHitEvent(getSession(), new DebugProcessSet(session, procId), bpt));
-		} else if (event.equals("RESUMED"))
+		} else if (event.equals("RESUMED")) {
+			procs[procId].setStatus(IPProcess.RUNNING);
 			fireEvent(new InferiorResumedEvent(getSession(), new DebugProcessSet(session, procId)));
+		}
 			
 		// Do Something
 	}

@@ -46,7 +46,7 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 	
 	protected IPCDISession session = null;
 	
-	IPProcess[] procs;
+	protected IPProcess[] procs;
 	
 	protected boolean isExitingFlag = false; /* Checked by the eventThread */
 
