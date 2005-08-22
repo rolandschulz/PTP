@@ -30,9 +30,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
 import org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.swt.widgets.Display;
@@ -54,6 +54,8 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	
 	private UIDebugManager uiDebugManager = null;
 	
+	protected Map fDebuggerPageMap;
+
 	/**
 	 * The constructor.
 	 */
@@ -196,19 +198,26 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		ErrorDialog.openError(shell, title, message, s);
 	}
 
-	
-	/**
-	 * TODO moved to debug core later
-	 */
-	public Map getDebuggersMap() {
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(getUniqueIdentifier(), "PDebugger");
-		IConfigurationElement[] infos = extensionPoint.getConfigurationElements();
-		Map debuggerMap = new HashMap(infos.length);
-		for( int i = 0; i < infos.length; i++ ) {
-			IConfigurationElement configurationElement = infos[i];
-			PDebugConfiguration configType = new PDebugConfiguration(configurationElement);
-			debuggerMap.put(configType.getID(), configType);
+	public ILaunchConfigurationTab getDebuggerPage( String debuggerID ) throws CoreException {
+		if ( fDebuggerPageMap == null ) {
+			initializeDebuggerPageMap();
 		}
-		return debuggerMap;
-	}	
+		IConfigurationElement configElement = (IConfigurationElement)fDebuggerPageMap.get( debuggerID );
+		ILaunchConfigurationTab tab = null;
+		if ( configElement != null ) {
+			tab = (ILaunchConfigurationTab)configElement.createExecutableExtension( "class" ); //$NON-NLS-1$
+		}
+		return tab;
+	}
+
+	protected void initializeDebuggerPageMap() {
+		fDebuggerPageMap = new HashMap( 10 );
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint( PLUGIN_ID, "CDebuggerPage" ); //$NON-NLS-1$
+		IConfigurationElement[] infos = extensionPoint.getConfigurationElements();
+		for( int i = 0; i < infos.length; i++ ) {
+			String id = infos[i].getAttribute( "debuggerID" ); //$NON-NLS-1$
+			fDebuggerPageMap.put( id, infos[i] );
+		}
+	}
+
 }
