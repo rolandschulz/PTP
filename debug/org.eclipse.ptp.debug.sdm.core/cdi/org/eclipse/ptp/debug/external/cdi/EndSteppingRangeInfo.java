@@ -15,11 +15,11 @@ import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
 
 /**
  */
-public class EndSteppingRange extends SessionObject implements ICDIEndSteppingRange  {
+public class EndSteppingRangeInfo extends SessionObject implements ICDIEndSteppingRange  {
 
 	EndSteppingRangeEvent event;
 
-	public EndSteppingRange(Session session, EndSteppingRangeEvent e) {
+	public EndSteppingRangeInfo(Session session, EndSteppingRangeEvent e) {
 		super(session);
 		event = e;
 	}

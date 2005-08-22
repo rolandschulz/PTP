@@ -29,29 +29,23 @@
 package org.eclipse.ptp.debug.external.cdi.event;
 
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
-import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
-import org.eclipse.ptp.debug.external.cdi.EndSteppingRange;
+import org.eclipse.ptp.debug.external.cdi.EndSteppingRangeInfo;
 import org.eclipse.ptp.debug.external.cdi.Session;
 
 /**
  *
  */
-public class EndSteppingRangeEvent extends AbstractEvent implements ICDISuspendedEvent {
+public class EndSteppingRangeEvent extends AbstractEvent implements IPCDISuspendedEvent {
 
 	public EndSteppingRangeEvent(IPCDISession s, IPCDIDebugProcessSet sources) {
 		super(s, sources);
 	}
 	
 	public ICDISessionObject getReason() {
-		// Auto-generated method stub
-		System.out.println("SuspendedEvent.getReason()");
-/*		if (event instanceof EBreakpointHit) {
-			return new BreakpointHit(session, (EBreakpointHit)event);
-		}
-*/		return new EndSteppingRange((Session) session, this);
-		//return session;
+		return new EndSteppingRangeInfo((Session) session, this);
 	}
 
 }

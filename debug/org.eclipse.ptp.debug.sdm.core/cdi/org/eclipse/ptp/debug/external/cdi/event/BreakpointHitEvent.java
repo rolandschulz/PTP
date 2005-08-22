@@ -29,29 +29,27 @@
 package org.eclipse.ptp.debug.external.cdi.event;
 
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
-import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
-import org.eclipse.ptp.debug.external.cdi.BreakpointHit;
+import org.eclipse.ptp.debug.external.cdi.BreakpointHitInfo;
 import org.eclipse.ptp.debug.external.cdi.Session;
 
 /**
  *
  */
-public class BreakpointHitEvent extends AbstractEvent implements ICDISuspendedEvent {
+public class BreakpointHitEvent extends AbstractEvent implements IPCDISuspendedEvent {
+	
+	ICDIBreakpoint breakpoint;
 
-	public BreakpointHitEvent(IPCDISession s, IPCDIDebugProcessSet sources) {
+	public BreakpointHitEvent(IPCDISession s, IPCDIDebugProcessSet sources, ICDIBreakpoint bp) {
 		super(s, sources);
+		breakpoint = bp;
 	}
 	
 	public ICDISessionObject getReason() {
-		// Auto-generated method stub
-		System.out.println("SuspendedEvent.getReason()");
-/*		if (event instanceof EBreakpointHit) {
-			return new BreakpointHit(session, (EBreakpointHit)event);
-		}
-*/		return new BreakpointHit((Session) session, this);
-		//return session;
+		return new BreakpointHitInfo((Session) session, this, breakpoint);
 	}
 
 }

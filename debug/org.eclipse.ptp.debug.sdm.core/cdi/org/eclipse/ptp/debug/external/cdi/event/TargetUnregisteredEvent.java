@@ -28,13 +28,13 @@
 ***********************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
-import org.eclipse.cdt.debug.core.cdi.event.ICDIDisconnectedEvent;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIDisconnectedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 
 /**
  */
-public class TargetUnregisteredEvent extends AbstractEvent implements ICDIDisconnectedEvent {
+public class TargetUnregisteredEvent extends AbstractEvent implements IPCDIDisconnectedEvent {
 
 	public TargetUnregisteredEvent(IPCDISession s, IPCDIDebugProcessSet sources) {
 		super(s, sources);

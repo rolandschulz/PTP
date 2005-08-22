@@ -16,28 +16,10 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
-package org.eclipse.ptp.debug.external.cdi.event;
+package org.eclipse.ptp.debug.core.cdi.event;
 
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDICreatedEvent;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
+import org.eclipse.cdt.debug.core.cdi.event.ICDICreatedEvent;
 
-/**
- */
-public class InferiorCreatedEvent extends AbstractEvent implements IPCDICreatedEvent {
-
-	public InferiorCreatedEvent(IPCDISession s, IPCDIDebugProcessSet sources) {
-		super(s, sources);
-	}
-
+public interface IPCDICreatedEvent extends IPCDIEvent, ICDICreatedEvent {
 }
+

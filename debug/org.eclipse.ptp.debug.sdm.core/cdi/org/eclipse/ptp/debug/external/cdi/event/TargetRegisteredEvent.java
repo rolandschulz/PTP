@@ -28,13 +28,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
-import org.eclipse.cdt.debug.core.cdi.event.ICDICreatedEvent;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDICreatedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 
 /**
  */
-public class TargetRegisteredEvent extends AbstractEvent implements ICDICreatedEvent {
+public class TargetRegisteredEvent extends AbstractEvent implements IPCDICreatedEvent {
 
 	public TargetRegisteredEvent(IPCDISession s, IPCDIDebugProcessSet sources) {
 		super(s, sources);
