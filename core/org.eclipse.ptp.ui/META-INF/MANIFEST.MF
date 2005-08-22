@@ -17,8 +17,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.forms,
  org.eclipse.ui.editors,
  org.eclipse.ui.workbench.texteditor,
- org.eclipse.ptp.core,
- org.eclipse.ptp.launch
+ org.eclipse.ptp.core
 Eclipse-AutoStart: true
 Export-Package: org.eclipse.ptp.internal.ui,
  org.eclipse.ptp.ui,
