@@ -108,7 +108,7 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		dynamicComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
         numberOfProcessField = new IntegerFieldEditor("numberOfProcess", CoreMessages.getResourceString("ParallelTab.Number_Of_Processes"), dynamicComp);
-        numberOfProcessField.setValidRange(0, 5000);
+        numberOfProcessField.setValidRange(0, 100000);
         numberOfProcessField.setPropertyChangeListener(listener);
 
         //pRadio = new Button(parallelComp, SWT.RADIO);

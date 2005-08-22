@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
@@ -98,4 +99,13 @@ public abstract class PLaunchConfigurationTab extends AbstractLaunchConfiguratio
         gd.horizontalSpan = space;
         return gd;
     }    
+
+    protected String getPlatform(ILaunchConfiguration config) {
+		String platform = Platform.getOS();
+		try {
+			return config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PLATFORM, platform);
+		} catch (CoreException e) {
+			return platform;
+		}
+	}
 }
