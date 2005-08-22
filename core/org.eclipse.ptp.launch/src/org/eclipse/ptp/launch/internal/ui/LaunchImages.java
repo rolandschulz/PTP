@@ -45,10 +45,12 @@ public class LaunchImages {
 	public static final String IMG_PARALLEL_TAB = NAME_PREFIX + "parallel_tab.gif";
 	public static final String IMG_ARGUMENT_TAB = NAME_PREFIX + "arguments_tab.gif";
 	public static final String IMG_MAIN_TAB = NAME_PREFIX + "main_tab.gif";
+	public static final String IMG_DEBUGGER_TAB = NAME_PREFIX + "debugger_tab.gif";
 	
 	public static final ImageDescriptor DESC_PARALLEL_TAB = createManaged(IMG_PARALLEL_TAB);
 	public static final ImageDescriptor DESC_ARGUMENT_TAB = createManaged(IMG_ARGUMENT_TAB);
 	public static final ImageDescriptor DESC_MAIN_TAB = createManaged(IMG_MAIN_TAB);	
+	public static final ImageDescriptor DESC_DEBUGGER_TAB = createManaged(IMG_DEBUGGER_TAB);	
 	/**
 	 * Returns the image managed under the given key in this registry.
 	 * 

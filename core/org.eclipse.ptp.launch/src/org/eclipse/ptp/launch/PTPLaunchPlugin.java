@@ -1,9 +1,13 @@
 package org.eclipse.ptp.launch;
 
+import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.*;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.osgi.framework.BundleContext;
 import java.util.*;
@@ -109,6 +113,54 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 		return null;
 	}	
 	
+	/**
+	 * Logs the specified status with this plug-in's log.
+	 * 
+	 * @param status
+	 *            status to log
+	 */
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
+	}
+	/**
+	 * Logs an internal error with the specified message.
+	 * 
+	 * @param message
+	 *            the error message to log
+	 */
+	public static void logErrorMessage(String message) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, message, null));
+	}
+
+	/**
+	 * Logs an internal error with the specified throwable
+	 * 
+	 * @param e
+	 *            the exception to be logged
+	 */
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), e)); //$NON-NLS-1$
+	}
+
+	
+	public static void errorDialog(String message, IStatus status) {
+		log(status);
+		Shell shell = getActiveWorkbenchShell();
+		if (shell != null) {
+			ErrorDialog.openError(shell, LaunchMessages.getResourceString("LaunchUIPlugin.Error"), message, status); //$NON-NLS-1$
+		}
+	}
+
+	public static void errorDialog(String message, Throwable t) {
+		log(t);
+		Shell shell = getActiveWorkbenchShell();
+		if (shell != null) {
+			IStatus status = new Status(IStatus.ERROR, getUniqueIdentifier(), 1, t.getMessage(), null); //$NON-NLS-1$	
+			ErrorDialog.openError(shell, LaunchMessages.getResourceString("LaunchUIPlugin.Error"), message, status); //$NON-NLS-1$
+		}
+	}
+
+
 	/**
 	 * Returns the active workbench shell or <code>null</code> if none
 	 * 
