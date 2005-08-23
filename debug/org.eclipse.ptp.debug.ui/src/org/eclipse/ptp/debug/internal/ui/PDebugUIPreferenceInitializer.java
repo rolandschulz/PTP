@@ -19,9 +19,6 @@
 package org.eclipse.ptp.debug.internal.ui;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.debug.internal.ui.preferences.PDebugPreferencePage;
-import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 
 /**
  * @author Clement chu
@@ -32,7 +29,6 @@ public class PDebugUIPreferenceInitializer extends AbstractPreferenceInitializer
 		super();
 	}
 	public void initializeDefaultPreferences() {
-		IPreferenceStore pstore = PTPDebugUIPlugin.getDefault().getPreferenceStore();
-		PDebugPreferencePage.initDefaults(pstore);
+		//IPreferenceStore pstore = PTPDebugUIPlugin.getDefault().getPreferenceStore();
 	}
 }
