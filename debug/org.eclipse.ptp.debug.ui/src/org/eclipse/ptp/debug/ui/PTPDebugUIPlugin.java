@@ -198,6 +198,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		ErrorDialog.openError(shell, title, message, s);
 	}
 
+	//TODO These methods should be in debug core
 	public ILaunchConfigurationTab getDebuggerPage( String debuggerID ) throws CoreException {
 		if ( fDebuggerPageMap == null ) {
 			initializeDebuggerPageMap();
