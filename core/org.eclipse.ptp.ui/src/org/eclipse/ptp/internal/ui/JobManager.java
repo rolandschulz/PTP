@@ -18,7 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.ptp.core.IPElement;
@@ -26,6 +29,7 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.IPTPUIConstants;
+import org.eclipse.ptp.ui.listeners.IJobChangeListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.internal.Element;
@@ -38,6 +42,7 @@ import org.eclipse.ptp.ui.model.internal.ElementHandler;
 public class JobManager extends AbstractUIManager {
 	protected Map jobList = new HashMap();
 	protected String cur_job_id = "";
+	protected List jobChangeListeners = new ArrayList();
 	
 	public JobManager() {
 		modelManager = PTPCorePlugin.getDefault().getModelManager();
@@ -47,7 +52,23 @@ public class JobManager extends AbstractUIManager {
 		jobList.clear();
 		jobList = null;
 		modelManager = null;
+		jobChangeListeners.clear();
+		jobChangeListeners = null;
 		super.shutdown();
+	}
+	
+	public void addJobChangeListener(IJobChangeListener listener) {
+		if (!jobChangeListeners.contains(listener))
+			jobChangeListeners.add(listener);
+	}
+	public void removeJobChangeListener(IJobChangeListener listener) {
+		if (jobChangeListeners.contains(listener))
+			jobChangeListeners.remove(listener);
+	}
+	public void fireJobChangeEvent(String cur_jid, String pre_jid) {
+		for (Iterator i=jobChangeListeners.iterator(); i.hasNext();) {
+			((IJobChangeListener)i.next()).changeJobEvent(cur_jid, pre_jid);
+		}
 	}
 	
 	public boolean isNoJob(String jid) {
@@ -78,7 +99,8 @@ public class JobManager extends AbstractUIManager {
 		return cur_job_id;
 	}
 	public void setCurrentJobId(String job_id) {
-		jobChangedEvent(job_id, cur_job_id);
+		fireJobChangeEvent(job_id, cur_job_id);
+		cur_job_id = job_id;
 	}
 	
 	public String getCurrentSetId() {
@@ -186,9 +208,5 @@ public class JobManager extends AbstractUIManager {
 			setCurrentSetId(IElementHandler.SET_ROOT_ID);
 		}
 		return cur_job_id;
-	}
-	
-	public void jobChangedEvent(String cur_jid, String pre_jid) {
-		cur_job_id = cur_jid;
 	}
 }
