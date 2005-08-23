@@ -69,11 +69,6 @@ public class PDebugPreferencePage extends AbstractDebugPerferencePage {
 		fPathsButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.default2"));
 	}
 	
-	protected void setValues() {
-		IPreferenceStore store = getPreferenceStore();
-		fPathsButton.setSelection(store.getBoolean(IPDebugPreferenceConstants.PREF_SHOW_FULL_PATHS));
-	}
-	
 	public boolean performOk() {
 		storeValues();
 		if (changed) {
@@ -85,22 +80,24 @@ public class PDebugPreferencePage extends AbstractDebugPerferencePage {
 		return true;
 	}
 	
-	public static void initDefaults(IPreferenceStore store) {
-		store.setDefault(IPDebugPreferenceConstants.PREF_SHOW_FULL_PATHS, false);
+	protected void setValues() {
+		fPathsButton.setSelection(false);
 	}
-	
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
 		store.setValue(IPDebugPreferenceConstants.PREF_SHOW_FULL_PATHS, fPathsButton.getSelection());
 		PTPDebugUIPlugin.getDefault().getPluginPreferences().setValue(IPDebugPreferenceConstants.PREF_SHOW_FULL_PATHS, fPathsButton.getSelection());
 		IDebugModelPresentation pres = PTPDebugUIPlugin.getDebugModelPresentation();
-		if (pres != null)
+		if (pres != null) {
 			pres.setAttribute(PDebugModelPresentation.DISPLAY_FULL_PATHS, fPathsButton.getSelection()?Boolean.TRUE:Boolean.FALSE);
+		}
 		//DebugUIPlugin.getDefault().getPluginPreferences()
 	}
 	
     public void propertyChange(PropertyChangeEvent event) {
     	if (event.getProperty().equals(IPDebugPreferenceConstants.PREF_SHOW_FULL_PATHS))
     		changed = true;
+    	else
+    		changed = false;
     }	
 }

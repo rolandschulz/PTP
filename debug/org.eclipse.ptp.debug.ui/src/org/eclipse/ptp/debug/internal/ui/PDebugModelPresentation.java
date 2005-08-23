@@ -86,6 +86,9 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	
 	public PDebugModelPresentation() {
 		uiDebugManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
+		//make sure using the one created by start up
+		if (instance == null)
+			instance = this;
 	}
 	
 	public static PDebugModelPresentation getDefault() {

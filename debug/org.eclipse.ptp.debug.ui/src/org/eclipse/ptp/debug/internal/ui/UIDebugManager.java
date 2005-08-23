@@ -22,9 +22,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IWorkspaceRunnable;
@@ -45,6 +48,8 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.utils.BitList;
+import org.eclipse.ptp.debug.external.cdi.BreakpointHitInfo;
+import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetUnregisteredEvent;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
@@ -95,12 +100,12 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		return (job != null && !job.isAllStop() && job.isDebug());
 	}
 	
-	public void jobChangedEvent(String cur_jid, String pre_jid) {
-		super.jobChangedEvent(cur_jid, pre_jid);
+	public void setCurrentJobId(String job_id) {
+		createEventListener(job_id);
 		updateBreakpointMarker(IElementHandler.SET_ROOT_ID);
-		createEventListener(cur_jid);
+		super.setCurrentJobId(job_id);
 	}
-
+	
 	public void addDebugEventListener(IDebugActionUpdateListener listener) {
 		if (!debugEventListeners.contains(listener))
 			debugEventListeners.add(listener);
@@ -340,7 +345,29 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	private void handleDebugEvents(ICDIEvent[] events, IProgressMonitor monitor) {
 		for (int i=0; i<events.length; i++) {
 			IPCDIEvent event = (IPCDIEvent)events[i];
-			if (event instanceof TargetRegisteredEvent) {
+			
+			System.out.println("=================================: " + event);
+			if (event instanceof BreakpointHitEvent) {
+				IPJob job = event.getDebugJob();
+				if (job == null)
+					continue;
+				
+				BreakpointHitEvent bptHitEvent = (BreakpointHitEvent)event;
+				ICDIBreakpoint bpt = ((BreakpointHitInfo)bptHitEvent.getReason()).getBreakpoint();
+				if (bpt instanceof ICDILineBreakpoint) {
+					ICDILocator locator = ((ICDILineBreakpoint)bpt).getLocator();
+					int lineNumber = locator.getLineNumber();
+					//String fileName = locator.getFile();
+					//String fileName = "TestC/testC.c";
+					String fileName = "D:/eclipse3.1/runtime-EclipseApplication/TestC/testC.c";
+					try {						
+						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllProcesses().toBitList());
+					} catch (CoreException e) {
+						PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
+					}
+				}
+			}
+			else if (event instanceof TargetRegisteredEvent) {
 				IPJob job = event.getDebugJob();
 				if (job == null)
 					continue;

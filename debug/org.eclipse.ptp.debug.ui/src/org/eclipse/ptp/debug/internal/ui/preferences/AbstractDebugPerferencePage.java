@@ -82,7 +82,7 @@ public abstract class AbstractDebugPerferencePage extends PreferencePage impleme
 		IViewPart part = page.findView(viewID);
 		if (part != null) {
 			IDebugView adapter = (IDebugView)part.getAdapter(IDebugView.class);
-			if (adapter != null) {
+			if (adapter != null) {				
 				Viewer viewer = adapter.getViewer();
 				if (viewer instanceof StructuredViewer) {
 					((StructuredViewer)viewer).refresh();

@@ -103,7 +103,7 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 		tasks.andNot(aTasks);
 	}
 	public boolean isEmpty() {
-		return (tasks.cardinality() == 0);
+		return tasks.isEmpty();
 	}
 	
 	public boolean contains(BitList aTasks) {
@@ -119,5 +119,17 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 			intArray[j] = i;
 		}
 		return intArray;		
+	}
+	
+	public boolean deleteMarker() {
+		IMarker marker = getMarker();
+		if (marker.exists()) {
+			try {
+				marker.delete();
+			} catch (CoreException e) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
