@@ -37,6 +37,7 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.debug.core.IPLaunch;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
@@ -63,15 +64,15 @@ public class Session implements IPCDISession, ICDISessionObject {
 	
 	Hashtable currentDebugTargetList;
 	
-	public Session(IPJob job, IDebugger iDebugger, ILaunch launch, IBinaryObject binObj) {
+	public Session(IDebugger iDebugger, IPLaunch launch, IBinaryObject binObj) {
 		props = new Properties();
 		configuration = new SessionConfiguration(this);
 		
-		dLaunch = launch;
+		dLaunch = (ILaunch) launch;
 		dBinObject = binObj;
 		debugger = iDebugger;
 		debugger.setSession(this);
-		dJob = job;
+		dJob = launch.getPJob();
 		
 		eventManager = new EventManager(this);
 		breakpointManager = new BreakpointManager(this);
@@ -86,8 +87,8 @@ public class Session implements IPCDISession, ICDISessionObject {
 		try {
 			Process debugger = getSessionProcess();
 			if (debugger != null) {
-				IProcess debuggerProcess = DebugPlugin.newProcess(launch, debugger, "Debugger");
-				launch.addProcess(debuggerProcess);
+				IProcess debuggerProcess = DebugPlugin.newProcess(dLaunch, debugger, "Debugger");
+				dLaunch.addProcess(debuggerProcess);
 			}
 		} catch (CDIException e) {
 			

@@ -287,7 +287,9 @@ public class PTPDebugCorePlugin extends Plugin {
 	}
 	
 	
-	public void addDebugSession(IPJob job, ICDISession session) {
+	public void addDebugLaunch(IPLaunch launch) {
+		IPJob job = launch.getPJob();
+		IPCDISession session = launch.getPSession().getPCDISession();
 		fDebugSessions.put(job, session);
 		fDebugJobs.put(session, job);
 		

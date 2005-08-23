@@ -34,7 +34,6 @@
       <import plugin="org.eclipse.ptp.core"/>
       <import plugin="org.eclipse.search"/>
       <import plugin="org.eclipse.debug.ui"/>
-      <import plugin="org.eclipse.ptp.debug.ui"/>
    </requires>
 
    <extension

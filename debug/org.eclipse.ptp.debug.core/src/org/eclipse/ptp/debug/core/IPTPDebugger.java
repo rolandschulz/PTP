@@ -27,12 +27,10 @@
 package org.eclipse.ptp.debug.core;
 
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.debug.core.ILaunch;
-import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 
 public interface IPTPDebugger {
-	public ICDISession createDebuggerSession(IPJob job, ILaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException;
+	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException;
 }
