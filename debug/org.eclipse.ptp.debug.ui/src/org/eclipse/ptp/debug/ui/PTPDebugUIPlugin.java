@@ -212,7 +212,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 
 	protected void initializeDebuggerPageMap() {
 		fDebuggerPageMap = new HashMap( 10 );
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint( PLUGIN_ID, "CDebuggerPage" ); //$NON-NLS-1$
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint( PLUGIN_ID, "PDebuggerPage" ); //$NON-NLS-1$
 		IConfigurationElement[] infos = extensionPoint.getConfigurationElements();
 		for( int i = 0; i < infos.length; i++ ) {
 			String id = infos[i].getAttribute( "debuggerID" ); //$NON-NLS-1$
