@@ -33,6 +33,8 @@
       <import plugin="org.eclipse.debug.core"/>
       <import plugin="org.eclipse.ptp.core"/>
       <import plugin="org.eclipse.search"/>
+      <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="org.eclipse.ptp.debug.ui"/>
    </requires>
 
    <extension
@@ -45,6 +47,14 @@
             class="org.eclipse.ptp.debug.external.PTPDebugger"
             id="org.eclipse.ptp.debug.external.PTPDebugger">
       </debugger>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.debug.ui.PDebuggerPage">
+      <debugPage
+            class="org.eclipse.ptp.debug.external.ui.ExternalDebuggerPage"
+            debuggerID="org.eclipse.ptp.debug.external.PTPDebugger"
+            id="org.eclipse.ptp.debug.external.ui.ExternalDebuggerPage">
+      </debugPage>
    </extension>
 
 </plugin>
