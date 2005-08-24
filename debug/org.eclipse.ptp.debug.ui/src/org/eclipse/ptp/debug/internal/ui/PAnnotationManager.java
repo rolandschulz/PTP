@@ -458,7 +458,6 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	}
 
 	//change set
-	//FIXME Not tested method, make sure marker is changed icon if tpye is changed
 	public void updateAnnotation(final IElementSet currentSet, final IElementSet preSet) throws CoreException {
 		String job_id = uiDebugManager.getCurrentJobId();
 		final AnnotationGroup annotationGroup = getAnnotationGroup(job_id);

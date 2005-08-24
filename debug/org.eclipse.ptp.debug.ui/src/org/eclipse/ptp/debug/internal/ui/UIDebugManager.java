@@ -388,8 +388,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					ICDILocator locator = ((ICDILineBreakpoint)bpt).getLocator();
 					int lineNumber = locator.getLineNumber();
 					//String fileName = locator.getFile();
-					//String fileName = "TestC/testC.c";
-					String fileName = "D:/eclipse3.1/runtime-EclipseApplication/TestC/testC.c";
+					String fileName = "TestC/testC.c";
+					//String fileName = "D:/eclipse3.1/runtime-EclipseApplication/TestC/testC.c";
 					try {						
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllProcesses().toBitList());
 					} catch (CoreException e) {
