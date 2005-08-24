@@ -22,6 +22,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.internal.ui.actions.RegisterAction;
 import org.eclipse.ptp.debug.internal.ui.actions.ResumeAction;
@@ -183,13 +184,15 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	}
 	
 	public void run() {
-		System.out.println("------------ run");		
+		System.out.println("------------ debug run");		
 		initialView();
 		refresh();
+		suspendAction.setEnabled(true);
+		terminateAction.setEnabled(true);
 	}
 
 	public void start() {
-		System.out.println("------------ start");
+		System.out.println("------------ debug start");
 		refresh();
 	}
 	public void stop() {
@@ -209,16 +212,43 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	 * Debug Action Event
 	 ****/
 	public void handleDebugActionEvent(IDebugActionEvent event) {
-		if (event instanceof IResumedDebugEvent) {
-			suspendAction.setEnabled(true);
-			terminateAction.setEnabled(true);
-		} else if (event instanceof ISuspendedDebugEvent) {
-			resumeAction.setEnabled(true);
-			stepIntoAction.setEnabled(true);
-			stepOverAction.setEnabled(true);
-			stepReturnAction.setEnabled(true);
+		String job_id = event.getJobId();
+		//only take action with current job
+		if (!job_id.equals(getCurrentJobID()))
+			return;
+		
+		BitList tasks = (BitList)event.getSource();
+		IElementSet set = getCurrentSet();
+		BitList setTasks = (BitList)set.getData(UIDebugManager.BITSET_KEY);
+		if (event instanceof ISuspendedDebugEvent || event instanceof IResumedDebugEvent) {
+			boolean isEnabled = false;
+			if (set.isRootSet()) {
+				isEnabled = !tasks.isEmpty();
+				//disable suspendAction if all tasks same as root size
+				suspendAction.setEnabled(!(set.size()==tasks.cardinality()));
+			}
+			else {
+				isEnabled = setTasks.intersects(tasks);
+				//take action if some suspended tasks in current set
+				if (isEnabled) {
+					//disable suspendAction if all tasks same as set tasks
+					tasks.and(setTasks);
+					suspendAction.setEnabled(!(tasks.cardinality()==setTasks.cardinality()));
+				}
+			}			
+			resumeAction.setEnabled(isEnabled);
+			stepIntoAction.setEnabled(isEnabled);
+			stepOverAction.setEnabled(isEnabled);
+			stepReturnAction.setEnabled(isEnabled);
 		} else if (event instanceof ITerminatedDebugEvent) {
-			
+			boolean isEnabled = false;
+			if (set.isRootSet())
+				isEnabled = !(set.size()==tasks.cardinality());
+			else {
+				tasks.and(setTasks);
+				isEnabled = !(tasks.cardinality()==setTasks.cardinality());
+			}
+			terminateAction.setEnabled(isEnabled);
 		}
 	}
 }

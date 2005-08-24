@@ -22,5 +22,6 @@ package org.eclipse.ptp.debug.ui.events;
  *
  */
 public interface IDebugActionEvent {
+	public String getJobId();
 	public Object getSource();
 }

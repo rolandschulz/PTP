@@ -50,6 +50,7 @@ import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.listeners.IRegListener;
+import org.eclipse.ptp.ui.listeners.IJobChangeListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -68,7 +69,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
  * @author Clement chu
  *
  */
-public class PAnnotationManager implements IRegListener {
+public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	private static PAnnotationManager instance = null;
 	protected UIDebugManager uiDebugManager = null;
 	private Map annotationMap = new HashMap();
@@ -76,6 +77,7 @@ public class PAnnotationManager implements IRegListener {
 	public PAnnotationManager(UIDebugManager uiDebugManager) {
 		this.uiDebugManager = uiDebugManager;
 		uiDebugManager.addRegListener(this);
+		uiDebugManager.addJobChangeListener(this);
 	}
 	public static PAnnotationManager getDefault() {
 		if (instance == null)
@@ -85,6 +87,7 @@ public class PAnnotationManager implements IRegListener {
 	
 	public void shutdown() {
 		uiDebugManager.removeRegListener(this);
+		uiDebugManager.removeJobChangeListener(this);
 		clearAllAnnotations();
 		annotationMap = null;
 	}
@@ -554,6 +557,21 @@ public class PAnnotationManager implements IRegListener {
 			ResourcesPlugin.getWorkspace().run(runnable, null, 0, null);
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
+		}
+	}
+	/*****
+	 * Job Change Listener
+	 */
+	public void changeJobEvent(String cur_job_id, String pre_job_id) {
+		if (pre_job_id != null) {
+			AnnotationGroup preAnnotationGroup = getAnnotationGroup(pre_job_id);
+			if (preAnnotationGroup != null)
+				preAnnotationGroup.removeAllMarkers();
+		}
+		if (cur_job_id != null) {
+			AnnotationGroup curAnnotationGroup = getAnnotationGroup(cur_job_id);
+			if (curAnnotationGroup != null)
+				curAnnotationGroup.retrieveAllMarkers();
 		}
 	}
 }

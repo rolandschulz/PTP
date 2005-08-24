@@ -25,10 +25,17 @@ package org.eclipse.ptp.debug.ui.events;
  */
 public abstract class DebugActionEvent implements IDebugActionEvent {
 	private Object source = null;
-	public DebugActionEvent(Object source) {
+	private String job_id = "";
+	
+	public DebugActionEvent(String job_id, Object source) {
+		this.job_id = job_id;
 		this.source = source;
 	}
 	
+	public String getJobId() {
+		return job_id;
+	}
+		
 	public Object getSource() {
 		return source;
 	}
