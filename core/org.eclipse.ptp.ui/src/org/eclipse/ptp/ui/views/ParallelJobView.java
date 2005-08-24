@@ -281,60 +281,60 @@ public class ParallelJobView extends AbstractParallelSetView {
 	}	
 
 	public void run() {
-		System.out.println("------------ run");		
+		System.out.println("------------ job run");		
 		initialView();
 		refresh();
 		terminateAllAction.setEnabled(true);
 	}
 
 	public void start() {
-		System.out.println("------------ start");
+		System.out.println("------------ job start");
 		refresh();
 		terminateAllAction.setEnabled(false);
 	}
 
 	public void stopped() {
-		System.out.println("------------ stop");
+		System.out.println("------------ job stop");
 		refresh();
 	}
 
 	public void exit() {
-		System.out.println("------------ exit");
+		System.out.println("------------ job exit");
 		refresh();
 	}
 
 	public void abort() {
-		System.out.println("------------ abort");
+		System.out.println("------------ job abort");
 		refresh();
 	}
 
 	public void monitoringSystemChangeEvent(Object object) {
-		System.out.println("------------ monitoringSystemChangeEvent");
+		System.out.println("------------ job monitoringSystemChangeEvent");
 		refresh();
 	}
 
 	public void execStatusChangeEvent(Object object) {
-		System.out.println("------------ execStatusChangeEvent");
+		System.out.println("------------ job execStatusChangeEvent");
 		refresh();
 	}
 
 	public void sysStatusChangeEvent(Object object) {
-		System.out.println("------------ sysStatusChangeEvent");
+		System.out.println("------------ job sysStatusChangeEvent");
 		refresh();
 	}
 
 	public void processOutputEvent(Object object) {
-		System.out.println("------------ processOutputEvent");
+		System.out.println("------------ job processOutputEvent");
 		refresh();
 	}
 
 	public void errorEvent(Object object) {
-		System.out.println("------------ errorEvent");
+		System.out.println("------------ job errorEvent");
 		refresh();
 	}
 
 	public void updatedStatusEvent() {
-		System.out.println("------------ updatedStatusEvent");
+		System.out.println("------------ job updatedStatusEvent");
 		refresh();
 	}
 }
