@@ -381,58 +381,58 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	}	
 	
 	public void run() {
-		System.out.println("------------ run");
+		System.out.println("------------ machine run");
 		initialView();
 		refresh();
 	}
 
 	public void start() {
-		System.out.println("------------ start");
+		System.out.println("------------ machine start");
 		refresh();
 	}
 
 	public void stopped() {
-		System.out.println("------------ stop");
+		System.out.println("------------ machine stop");
 		refresh();
 	}
 
 	public void exit() {
-		System.out.println("------------ exit");
+		System.out.println("------------ machine exit");
 		refresh();
 	}
 
 	public void abort() {
-		System.out.println("------------ abort");
+		System.out.println("------------ machine abort");
 		refresh();
 	}
 
 	public void monitoringSystemChangeEvent(Object object) {
-		System.out.println("------------ monitoringSystemChangeEvent");
+		System.out.println("------------ machine monitoringSystemChangeEvent");
 		refresh();
 	}
 
 	public void execStatusChangeEvent(Object object) {
-		System.out.println("------------ execStatusChangeEvent");
+		System.out.println("------------ machine execStatusChangeEvent");
 		refresh();
 	}
 
 	public void sysStatusChangeEvent(Object object) {
-		System.out.println("------------ sysStatusChangeEvent");
+		System.out.println("------------ machine sysStatusChangeEvent");
 		refresh();
 	}
 
 	public void processOutputEvent(Object object) {
-		System.out.println("------------ processOutputEvent");
+		System.out.println("------------ machine processOutputEvent");
 		refresh();
 	}
 
 	public void errorEvent(Object object) {
-		System.out.println("------------ errorEvent");
+		System.out.println("------------ machine errorEvent");
 		refresh();
 	}
 
 	public void updatedStatusEvent() {
-		System.out.println("------------ updatedStatusEvent");
+		System.out.println("------------ machine updatedStatusEvent");
 		refresh();
 	}
 }
