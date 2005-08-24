@@ -124,14 +124,6 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 			registerElement(element);
 	}
 	
-	protected void updateAction() {
-		super.updateAction();
-		
-		boolean isDebugging = getUIDebugManager().isDebugging(getCurrentJobID());
-		registerAction.setEnabled(isDebugging);
-		unregisterAction.setEnabled(isDebugging);
-	}	
-
 	protected String getToolTipText(int element_num) {
 		IElementHandler setManager = getCurrentElementHandler();
 		if (setManager == null)
@@ -207,6 +199,64 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	public void error() {
 		refresh();
 	}
+
+	//Update button
+	protected void updateAction() {
+		super.updateAction();
+		
+		boolean isDebugging = getUIDebugManager().isDebugging(getCurrentJobID());
+		registerAction.setEnabled(isDebugging);
+		unregisterAction.setEnabled(isDebugging);
+		
+		IElementHandler elementHandler = getCurrentElementHandler();
+		if (elementHandler != null) {
+			IElementSet set = getCurrentSet();
+			updateSuspendResumeButton((BitList)elementHandler.getData(UIDebugManager.SUSPENDED_PROC_KEY), set);
+			updateTerminateButton((BitList)elementHandler.getData(UIDebugManager.TERMINATED_PROC_KEY), set);
+		}
+	}
+	
+	public void updateSuspendResumeButton(BitList tasks, IElementSet set) {
+		if (set == null || tasks == null)
+			return;
+		
+		BitList refTasks = tasks.copy();
+		boolean isEnabled = false;
+		if (set.isRootSet()) {
+			isEnabled = !refTasks.isEmpty();
+			//disable suspendAction if all tasks same as root size
+			suspendAction.setEnabled(!(set.size()==refTasks.cardinality()));
+		}
+		else {
+			BitList setTasks = (BitList)set.getData(UIDebugManager.BITSET_KEY);
+			isEnabled = setTasks.intersects(refTasks);
+			//take action if some suspended tasks in current set
+			if (isEnabled) {
+				//disable suspendAction if all tasks same as set tasks
+				refTasks.and(setTasks);
+				suspendAction.setEnabled(!(refTasks.cardinality()==setTasks.cardinality()));
+			}
+		}			
+		resumeAction.setEnabled(isEnabled);
+		stepIntoAction.setEnabled(isEnabled);
+		stepOverAction.setEnabled(isEnabled);
+		stepReturnAction.setEnabled(isEnabled);
+	}
+	public void updateTerminateButton(BitList tasks, IElementSet set) {
+		if (set == null || tasks == null)
+			return;
+
+		BitList refTasks = tasks.copy();
+		boolean isEnabled = false;
+		if (set.isRootSet())
+			isEnabled = !(set.size()==refTasks.cardinality());
+		else {
+			BitList setTasks = (BitList)set.getData(UIDebugManager.BITSET_KEY);
+			refTasks.and(setTasks);
+			isEnabled = !(refTasks.cardinality()==setTasks.cardinality());
+		}
+		terminateAction.setEnabled(isEnabled);		
+	}
 	
 	/****
 	 * Debug Action Event
@@ -219,36 +269,10 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		
 		BitList tasks = (BitList)event.getSource();
 		IElementSet set = getCurrentSet();
-		BitList setTasks = (BitList)set.getData(UIDebugManager.BITSET_KEY);
 		if (event instanceof ISuspendedDebugEvent || event instanceof IResumedDebugEvent) {
-			boolean isEnabled = false;
-			if (set.isRootSet()) {
-				isEnabled = !tasks.isEmpty();
-				//disable suspendAction if all tasks same as root size
-				suspendAction.setEnabled(!(set.size()==tasks.cardinality()));
-			}
-			else {
-				isEnabled = setTasks.intersects(tasks);
-				//take action if some suspended tasks in current set
-				if (isEnabled) {
-					//disable suspendAction if all tasks same as set tasks
-					tasks.and(setTasks);
-					suspendAction.setEnabled(!(tasks.cardinality()==setTasks.cardinality()));
-				}
-			}			
-			resumeAction.setEnabled(isEnabled);
-			stepIntoAction.setEnabled(isEnabled);
-			stepOverAction.setEnabled(isEnabled);
-			stepReturnAction.setEnabled(isEnabled);
+			updateSuspendResumeButton(tasks, set);
 		} else if (event instanceof ITerminatedDebugEvent) {
-			boolean isEnabled = false;
-			if (set.isRootSet())
-				isEnabled = !(set.size()==tasks.cardinality());
-			else {
-				tasks.and(setTasks);
-				isEnabled = !(tasks.cardinality()==setTasks.cardinality());
-			}
-			terminateAction.setEnabled(isEnabled);
+			updateTerminateButton(tasks, set);
 		}
 	}
 }

@@ -356,7 +356,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		for (int i=0; i<events.length; i++) {
 			IPCDIEvent event = (IPCDIEvent)events[i];
 			
-			System.out.println("=================================: " + event);
 			//all events must be running under a job
 			IPJob job = event.getDebugJob();
 			if (job == null)
@@ -420,7 +419,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		BitList suspendedTasks = (BitList)elementHandler.getData(SUSPENDED_PROC_KEY);
 		if (suspendedTasks == null) {
 			suspendedTasks = new BitList();
-			elementHandler.setData(SUSPENDED_PROC_KEY, suspendedTasks.copy());
+			elementHandler.setData(SUSPENDED_PROC_KEY, suspendedTasks);
 		}		
 		suspendedTasks.or(tasks);
 		fireDebugEvent(new SuspendedDebugEvent(job.getIDString(), suspendedTasks));
@@ -430,7 +429,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		BitList suspendedTasks = (BitList)elementHandler.getData(SUSPENDED_PROC_KEY);
 		if (suspendedTasks == null) {
 			suspendedTasks = new BitList();
-			elementHandler.setData(SUSPENDED_PROC_KEY, suspendedTasks.copy());
+			elementHandler.setData(SUSPENDED_PROC_KEY, suspendedTasks);
 		}		
 		suspendedTasks.andNot(tasks);
 		fireDebugEvent(new ResumedDebugEvent(job.getIDString(), suspendedTasks));
@@ -443,7 +442,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			elementHandler.setData(TERMINATED_PROC_KEY, terminatedTasks);
 		}		
 		terminatedTasks.or(tasks);
-		fireDebugEvent(new TerminatedDebugEvent(job.getIDString(), terminatedTasks.copy()));
+		fireDebugEvent(new TerminatedDebugEvent(job.getIDString(), terminatedTasks));
 	}
 	
 	//ONLY for detect the debug sesssion is created
