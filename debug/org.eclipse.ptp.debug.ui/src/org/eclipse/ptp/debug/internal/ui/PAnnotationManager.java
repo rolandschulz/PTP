@@ -452,7 +452,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	}
 	
 	public void changeAnnotationType(PInstructionPointerAnnotation annotation, String type) {
-		if (annotation.getType().equals(type)) {
+		if (!annotation.getType().equals(type)) {
 			annotation.setType(type);
 		}
 	}
@@ -469,13 +469,12 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				new Job("Update Annotation") {
 					protected IStatus run(IProgressMonitor pmonitor) {
-						boolean isRoot = currentSet.isRootSet();
 						BitList tasks = (BitList)currentSet.getData(UIDebugManager.BITSET_KEY);					
 						for (Iterator i=annotationGroup.getAnnotationIterator(); i.hasNext();) {
 							PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation)i.next();
 							String annotationType = annotation.getType();
 							if (annotationType.equals(IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT) || annotationType.equals(IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT)) {
-								if (isRoot)
+								if (currentSet.isRootSet())
 									changeAnnotationType(annotation, IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT);
 								else
 									changeAnnotationType(annotation, annotation.contains(tasks)?IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT:IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
