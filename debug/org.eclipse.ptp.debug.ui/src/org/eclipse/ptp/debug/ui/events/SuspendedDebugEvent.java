@@ -24,7 +24,7 @@ package org.eclipse.ptp.debug.ui.events;
  *
  */
 public class SuspendedDebugEvent extends DebugActionEvent implements IResumedDebugEvent {
-	public SuspendedDebugEvent(Object source) {
-		super(source);
+	public SuspendedDebugEvent(String job_id, Object source) {
+		super(job_id, source);
 	}
 }

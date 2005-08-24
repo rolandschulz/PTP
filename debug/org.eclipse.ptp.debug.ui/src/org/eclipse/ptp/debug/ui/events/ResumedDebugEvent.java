@@ -24,7 +24,7 @@ package org.eclipse.ptp.debug.ui.events;
  *
  */
 public class ResumedDebugEvent extends DebugActionEvent implements IResumedDebugEvent { 
-	public ResumedDebugEvent(Object source) {
-		super(source);
+	public ResumedDebugEvent(String job_id, Object source) {
+		super(job_id, source);
 	}
 }

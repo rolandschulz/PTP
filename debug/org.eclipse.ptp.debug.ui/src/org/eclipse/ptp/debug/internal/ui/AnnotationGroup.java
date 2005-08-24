@@ -79,7 +79,6 @@ public class AnnotationGroup {
 			//}
 		}
 	}
-	
 	public IMarker createMarker(IResource resource, String type) throws CoreException {
 		return resource.createMarker(type);
 	}
