@@ -110,6 +110,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		return (job != null && !job.isAllStop() && job.isDebug());
 	}
 	
+	//change job
 	public void setCurrentJobId(String job_id) {
 		createEventListener(job_id);
 		updateBreakpointMarker(IElementHandler.SET_ROOT_ID);
@@ -269,7 +270,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 								
 							}
 						}
-						//update annotation
 						return Status.OK_STATUS;
 					}
 				}.schedule();
@@ -420,7 +420,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		if (suspendedTasks == null) {
 			suspendedTasks = new BitList();
 			elementHandler.setData(SUSPENDED_PROC_KEY, suspendedTasks);
-		}		
+		}
+		//add tasks
 		suspendedTasks.or(tasks);
 		fireDebugEvent(new SuspendedDebugEvent(job.getIDString(), suspendedTasks));
 	}
@@ -430,7 +431,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		if (suspendedTasks == null) {
 			suspendedTasks = new BitList();
 			elementHandler.setData(SUSPENDED_PROC_KEY, suspendedTasks);
-		}		
+		}
+		//remove tasks
 		suspendedTasks.andNot(tasks);
 		fireDebugEvent(new ResumedDebugEvent(job.getIDString(), suspendedTasks));
 	}
@@ -440,7 +442,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		if (terminatedTasks == null) {
 			terminatedTasks = new BitList();
 			elementHandler.setData(TERMINATED_PROC_KEY, terminatedTasks);
-		}		
+		}
+		//only add tasks
 		terminatedTasks.or(tasks);
 		fireDebugEvent(new TerminatedDebugEvent(job.getIDString(), terminatedTasks));
 	}
