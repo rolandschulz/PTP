@@ -20,14 +20,11 @@ Require-Bundle: org.eclipse.jface.text,
  org.eclipse.ptp.debug.external,
  org.eclipse.ptp.core,
  org.eclipse.ptp.ui,
- org.eclipse.jdt.debug,
- org.eclipse.jdt.debug.ui,
- org.eclipse.jdt.ui,
+ org.eclipse.cdt.debug.ui,
  org.eclipse.cdt.debug.core
 Eclipse-AutoStart: true
 Bundle-Vendor: LANL
 Export-Package: org.eclipse.ptp.debug.core,
- org.eclipse.ptp.debug.internal.core.breakpoints,
  org.eclipse.ptp.debug.internal.ui,
  org.eclipse.ptp.debug.internal.ui.actions,
  org.eclipse.ptp.debug.ui,

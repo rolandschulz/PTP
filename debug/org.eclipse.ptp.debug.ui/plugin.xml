@@ -36,6 +36,7 @@
       </perspective>
    </extension>   
 
+   <!-- view //-->
    <extension
          point="org.eclipse.ui.views">
       <category
@@ -49,6 +50,13 @@
             class="org.eclipse.ptp.debug.ui.views.ParallelDebugView"
             id="org.eclipse.ptp.debug.ui.views.parallelDebugView">
       </view>
+      <view
+            name="%ArrayView.name"
+            icon="icons/tool/ptparrayview.gif"
+            category="org.eclipse.debug.ui"
+            class="org.eclipse.ptp.debug.internal.ui.views.array.ArrayView"
+            id="org.eclipse.ptp.debug.ui.views.ArrayView">
+      </view>      
    </extension>
 
    <extension

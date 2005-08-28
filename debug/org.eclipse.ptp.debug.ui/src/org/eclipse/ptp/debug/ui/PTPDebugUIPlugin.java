@@ -51,9 +51,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	private static PTPDebugUIPlugin plugin;
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
-	
 	private UIDebugManager uiDebugManager = null;
-	
 	protected Map fDebuggerPageMap;
 
 	/**
@@ -198,26 +196,25 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		ErrorDialog.openError(shell, title, message, s);
 	}
 
-	//TODO These methods should be in debug core
-	public ILaunchConfigurationTab getDebuggerPage( String debuggerID ) throws CoreException {
-		if ( fDebuggerPageMap == null ) {
+	public ILaunchConfigurationTab getDebuggerPage(String debuggerID) throws CoreException {
+		if (fDebuggerPageMap == null) {
 			initializeDebuggerPageMap();
 		}
-		IConfigurationElement configElement = (IConfigurationElement)fDebuggerPageMap.get( debuggerID );
+		IConfigurationElement configElement = (IConfigurationElement)fDebuggerPageMap.get(debuggerID);
 		ILaunchConfigurationTab tab = null;
-		if ( configElement != null ) {
-			tab = (ILaunchConfigurationTab)configElement.createExecutableExtension( "class" ); //$NON-NLS-1$
+		if (configElement != null) {
+			tab = (ILaunchConfigurationTab)configElement.createExecutableExtension("class");
 		}
 		return tab;
 	}
 
 	protected void initializeDebuggerPageMap() {
-		fDebuggerPageMap = new HashMap( 10 );
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint( PLUGIN_ID, "PDebuggerPage" ); //$NON-NLS-1$
+		fDebuggerPageMap = new HashMap(10);
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(PLUGIN_ID, "PDebuggerPage");
 		IConfigurationElement[] infos = extensionPoint.getConfigurationElements();
-		for( int i = 0; i < infos.length; i++ ) {
-			String id = infos[i].getAttribute( "debuggerID" ); //$NON-NLS-1$
-			fDebuggerPageMap.put( id, infos[i] );
+		for(int i = 0; i < infos.length; i++) {
+			String id = infos[i].getAttribute("debuggerID");
+			fDebuggerPageMap.put(id, infos[i]);
 		}
 	}
 
