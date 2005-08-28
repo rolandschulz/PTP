@@ -29,6 +29,7 @@ public interface IPTPDebugUIConstants {
 	public static final String PERSPECTIVE_DEBUG = PREFIX + "PTPDebugPerspective";
 
 	public static final String VIEW_PARALLELDEBUG = PREFIX + "views.parallelDebugView";
+	public static final String VIEW_ARRAY = PREFIX + "views.ArrayView";
 	
 	public static final String ACTION_BREAKPOINT_PROPERTIES = PREFIX + "breakpointProperties";
 	public static final String ACTION_ENABLE_DISABLE_BREAKPOINT = PREFIX + "enableDisableBreakpoint";
