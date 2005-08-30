@@ -57,6 +57,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
     private final String SIGNALNAME_TEXT = "Signal name: ";
     private Label rankLabel = null;
     private Label nodeLabel = null;
+    private Label jobLabel = null;
     private Label totalLabel = null;
     private Label pidLabel = null;
     private Label statusLabel = null;
@@ -152,17 +153,20 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
         rankLabel = toolkit.createLabel(detailsContainer, null);
         rankLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         
-        totalLabel = toolkit.createLabel(detailsContainer, null);
-        totalLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        pidLabel = toolkit.createLabel(detailsContainer, null);
+        pidLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));    
         
         nodeLabel = toolkit.createLabel(detailsContainer, null);
         nodeLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         
-        pidLabel = toolkit.createLabel(detailsContainer, null);
-        pidLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));        
+        jobLabel = toolkit.createLabel(detailsContainer, null);
+        jobLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        
+        totalLabel = toolkit.createLabel(detailsContainer, null);
+        totalLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         debugButton = toolkit.createButton(detailsContainer, "Debug", SWT.NONE);
-        debugButton.setLayoutData(spanGridData(-1, 2));
+        debugButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         debugButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
                 doRun();
@@ -209,6 +213,7 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
             rankLabel.setText("Rank: " + process.getProcessNumber());
             totalLabel.setText("Total: " + process.getParent().size());
             nodeLabel.setText("Node: " + ((IPNode) process.getNode()).getNodeNumber());
+            jobLabel.setText("Job: "+ process.getJob().getJobNumber());
             pidLabel.setText("PID: " + process.getPid());
             statusLabel.setText("Status: " + process.getStatus());
             if (process.getExitCode() != null)

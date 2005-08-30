@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
@@ -37,9 +38,10 @@ public class PJob extends Parent implements IPJob {
 
 	final public static int BASE_OFFSET = 10000;
 
-	public PJob(IPUniverse uni, String name, String key) {
+	public PJob(IPUniverse uni, String name, String key, int jobNumber) {
 		super(uni, name, key, P_JOB);
 		taskIdMap = new ArrayList();
+		attribs.put(AttributeConstants.ATTRIB_JOBID, new Integer(jobNumber));
 	}
 	
 	public boolean isDebug() {
@@ -68,8 +70,12 @@ public class PJob extends Parent implements IPJob {
 	}
 
 	public String getJobNumber() {
+		return ""+((Integer) attribs.get(AttributeConstants.ATTRIB_JOBID)).intValue()+"";
+		/*
 		int i = getID();
+		System.out.println("get job number - ID = "+i+", offset = "+BASE_OFFSET);
 		return "" + (i - BASE_OFFSET) + "";
+		*/
 		/*
 		 * String s = getKey(); int i = -1; try { i = (new
 		 * Integer(s)).intValue(); } catch(NumberFormatException e) { } if(i !=

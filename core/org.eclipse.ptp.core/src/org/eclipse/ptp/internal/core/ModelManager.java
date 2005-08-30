@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
@@ -158,14 +159,18 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			String[] ne2 = monitoringSystem.getNodes(ne[i]);
 			for (int j = 0; j < ne2.length; j++) {
 				PNode node;
-				node = new PNode(mac, ne2[j], "" + j + "");
-				node.setAttrib("user", monitoringSystem.getNodeAttribute(ne2[j],
+				node = new PNode(mac, ne2[j], "" + j + "", j);
+				node.setAttrib(AttributeConstants.ATTRIB_NODE_USER, 
+						monitoringSystem.getNodeAttribute(ne2[j],
 						"user"));
-				node.setAttrib("group", monitoringSystem.getNodeAttribute(ne2[j],
+				node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP, 
+						monitoringSystem.getNodeAttribute(ne2[j],
 						"group"));
-				node.setAttrib("state", monitoringSystem.getNodeAttribute(ne2[j],
+				node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, 
+						monitoringSystem.getNodeAttribute(ne2[j],
 						"state"));
-				node.setAttrib("mode", monitoringSystem.getNodeAttribute(ne2[j],
+				node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE, 
+						monitoringSystem.getNodeAttribute(ne2[j],
 						"mode"));
 
 				mac.addChild(node);
@@ -183,7 +188,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					x = (new Integer(ne[i].substring(3))).intValue();
 				} catch (NumberFormatException e) {
 				}
-				job = new PJob(universe, ne[i], "" + (PJob.BASE_OFFSET + x) + "");
+				job = new PJob(universe, ne[i], "" + (PJob.BASE_OFFSET + x) + "", x);
 				universe.addChild(job);
 				getProcsForNewJob(ne[i], job);
 			}
@@ -322,7 +327,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			x = (new Integer(ne.substring(3))).intValue();
 		} catch (NumberFormatException e) {
 		}
-		pjob = new PJob(universe, ne, "" + (PJob.BASE_OFFSET + x) + "");
+		pjob = new PJob(universe, ne, "" + (PJob.BASE_OFFSET + x) + "", x);
 
 		universe.addChild(pjob);
 		getProcsForNewJob(ne, pjob);
@@ -355,8 +360,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	};
 
 	public void shutdown() {
-		PTPCorePlugin.getDefault().removePerspectiveListener(
-				perspectiveListener);
+		PTPCorePlugin.getDefault().removePerspectiveListener(perspectiveListener);
 		perspectiveListener = null;
 		listeners.clear();
 		listeners = null;
@@ -506,7 +510,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				x = (new Integer(nejob.substring(3))).intValue();
 			} catch (NumberFormatException e) {
 			}
-			job = new PJob(universe, nejob, "" + (PJob.BASE_OFFSET + x) + "");
+			job = new PJob(universe, nejob, "" + (PJob.BASE_OFFSET + x) + "", x);
 			if(jobRunConfig.isDebug()) job.setDebug();
 
 		//	myjob = job;

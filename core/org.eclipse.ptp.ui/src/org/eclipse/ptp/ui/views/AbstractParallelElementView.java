@@ -485,7 +485,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		}
 		selectionShell.setRegion(region);
 		selectionShell.setLocation(rect.x, rect.y);
-		selectionShell.setBounds(rect.x, rect.y, rect.width, rect.height);
+		selectionShell.setBounds(rect.x, rect.y, rect.width, rect.height);		
 	}
 
 	private void drawSelectedArea(SelectionInfo selectionInfo) {
