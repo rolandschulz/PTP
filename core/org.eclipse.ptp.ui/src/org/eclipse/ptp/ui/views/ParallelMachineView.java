@@ -19,6 +19,7 @@
 package org.eclipse.ptp.ui.views;
 
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.internal.ui.MachineManager;
@@ -213,13 +214,13 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		BLtable.setHeaderVisible(false);
 		BLtable.setLinesVisible(true);
 		new TableColumn(BLtable, SWT.LEFT).setWidth(60);
-		new TableColumn(BLtable, SWT.LEFT).setWidth(80);
+		new TableColumn(BLtable, SWT.LEFT).setWidth(200);
 
 		BRtable = new Table(bright, SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		BRtable.setLayout(new FillLayout());
 		BRtable.setHeaderVisible(false);
 		BRtable.setLinesVisible(true);
-		new TableColumn(BRtable, SWT.LEFT).setWidth(140);
+		new TableColumn(BRtable, SWT.LEFT).setWidth(300);
 		
 		BRtable.addSelectionListener(new SelectionAdapter() {
 			/* double click - throw up an editor to look at the process */
@@ -285,7 +286,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			return "Unknown node";
 
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("Node ID: " + node.getID());
+		buffer.append("Node ID: " + node.getNodeNumber());
 		buffer.append("\n");
 		buffer.append("Node name: " + node.getElementName());
 
@@ -359,17 +360,22 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		cur_selected_element_id = firstRegisteredElementID; 
 		
 		IPNode node = getMachineManager().findNode(getCurrentMachineID(), cur_selected_element_id);
-		if (node == null)
+		if (node == null) {
 			return;
+		}
 		
-		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Node #", cur_selected_element_id });
-		new TableItem(BLtable, SWT.NULL).setText(new String[] { "State", (String)node.getAttrib("state") });
-		new TableItem(BLtable, SWT.NULL).setText(new String[] { "User", (String)node.getAttrib("user") });
-		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Group", (String)node.getAttrib("group") });
-		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Mode", (String)node.getAttrib("mode") });
+		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Node #", node.getNodeNumber() });
+		new TableItem(BLtable, SWT.NULL).setText(new String[] { "State", 
+				(String)node.getAttrib(AttributeConstants.ATTRIB_NODE_STATE) });
+		new TableItem(BLtable, SWT.NULL).setText(new String[] { "User", 
+				(String)node.getAttrib(AttributeConstants.ATTRIB_NODE_USER) });
+		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Group", 
+				(String)node.getAttrib(AttributeConstants.ATTRIB_NODE_GROUP) });
+		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Mode", 
+				(String)node.getAttrib(AttributeConstants.ATTRIB_NODE_MODE) });
 
-		if (node.hasChildren()) {
-			IPProcess procs[] = node.getSortedProcesses();
+		IPProcess procs[] = node.getSortedProcesses();
+		if (procs != null) {
 			TableItem item = null;
 			for (int i = 0; i < procs.length; i++) {
 				int proc_state = getMachineManager().getProcStatus(procs[i].getStatus());

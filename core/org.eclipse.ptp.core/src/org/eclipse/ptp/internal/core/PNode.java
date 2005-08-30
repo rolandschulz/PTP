@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPNode;
@@ -34,9 +35,10 @@ public class PNode extends Parent implements IPNode {
 
 	protected Map attribs = null;
 
-	public PNode(IPElement element, String name, String key) {
+	public PNode(IPElement element, String name, String key, int nodeNumber) {
 		super(element, name, key, P_NODE);
 		attribs = new HashMap(0);
+		this.setAttrib(AttributeConstants.ATTRIB_NODE_NUMBER, new String(""+nodeNumber+""));
 	}
 
 	public IPMachine getMachine() {
@@ -49,7 +51,7 @@ public class PNode extends Parent implements IPNode {
 	}
 
 	public String getNodeNumber() {
-		return "" + getID() + "";
+		return (String)getAttrib(AttributeConstants.ATTRIB_NODE_NUMBER);
 	}
 
 	public IPProcess[] getProcesses() {

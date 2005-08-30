@@ -25,7 +25,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.Vector;
 
+import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -42,25 +44,16 @@ public class SimulationControlSystem implements IControlSystem {
 
 	protected List listeners = new ArrayList(2);
 
-	protected String spawned_app_state = null;
-
-	protected int spawned_num_procs = 0;
-
-	protected int spawned_procs_per_node = 0;
-
-	protected int spawned_first_node = 0;
-
-	protected String spawned_app_signal = new String("");
-
-	protected String spawned_app_exit_code = new String("");
-
 	protected Thread runningAppEventsThread = null;
 
 	protected Thread runningAppFinishThread = null;
 
 	protected HashMap processMap;
+	
+	protected Vector simJobs = null;
 
 	public SimulationControlSystem() {
+		simJobs = new Vector();
 	}
 	
 	public void startup() {
@@ -69,6 +62,7 @@ public class SimulationControlSystem implements IControlSystem {
 	
 	/* returns the new job name that it started - unique */
 	public String run(JobRunConfiguration jobRunConfig) {
+		/*
 		if (spawned_app_state != null
 				&& (spawned_app_state.equals(IPProcess.STARTING) || spawned_app_state
 						.equals(IPProcess.RUNNING))) {
@@ -76,21 +70,26 @@ public class SimulationControlSystem implements IControlSystem {
 					.println("Another job already running, unable to start a new one.");
 			return null;
 		}
+		*/
 
 		numJobs++;
 		final String s = new String("job" + numJobs);
+		
+		SimJobState ss = new SimJobState();
+		ss.jobname = s;
+		ss.spawned_num_procs = ss.spawned_procs_per_node = ss.spawned_first_node = 0;
 
-		spawned_num_procs = spawned_procs_per_node = spawned_first_node = 0;
+		ss.spawned_num_procs = jobRunConfig.getNumberOfProcesses();
+		ss.spawned_procs_per_node = jobRunConfig.getNumberOfProcessesPerNode();
+		ss.spawned_first_node = jobRunConfig.getFirstNodeNumber();
 
-		this.spawned_num_procs = jobRunConfig.getNumberOfProcesses();
-		this.spawned_procs_per_node = jobRunConfig.getNumberOfProcessesPerNode();
-		this.spawned_first_node = jobRunConfig.getFirstNodeNumber();
+		processMap.put(s, new Integer(ss.spawned_num_procs));
 
-		processMap.put(s, new Integer(spawned_num_procs));
-
-		spawned_app_state = IPProcess.RUNNING;
-		spawned_app_exit_code = new String("");
-		spawned_app_signal = new String("");
+		ss.spawned_app_state = IPProcess.RUNNING;
+		ss.spawned_app_exit_code = new String("");
+		ss.spawned_app_signal = new String("");
+		
+		simJobs.addElement(ss);
 
 		/* UNCOMMENT THIS IF YOU WANT THE JOB YOU SPAWN TO PRINT RANDOM TEXT OUTPUT 
 		 * AND RANDOMLY EXIT AFTER 30SECS OR SO
@@ -151,10 +150,19 @@ public class SimulationControlSystem implements IControlSystem {
 	}
 
 	public void terminateJob(IPJob jobName) {
-		spawned_app_state = IPProcess.EXITED_SIGNALLED;
-		spawned_app_signal = new String("SIGTERM");
-		String s = new String("job" + numJobs);
-		processMap.remove(s);
+		String tname = (String)jobName.getAttribute(AttributeConstants.ATTRIB_NAME);
+		for(int i=0; i<simJobs.size(); i++) {
+			SimJobState ss = (SimJobState)simJobs.elementAt(i);
+			/* found */
+			if(ss.jobname.equals(tname)) {
+				/* only do these if we really want to DELETE the job, not just set its state at terminated */
+				//simJobs.remove(i);
+				//processMap.remove(tname);
+				ss.spawned_app_state = IPProcess.EXITED_SIGNALLED;
+				ss.spawned_app_signal = new String("SIGTERM");
+				return;
+			}
+		}
 	}
 	
 	public String[] getJobs() {
@@ -173,9 +181,12 @@ public class SimulationControlSystem implements IControlSystem {
 
 	/* get the processes pertaining to a certain job */
 	public String[] getProcesses(String jobName) {
+		System.out.println("getProcesses("+jobName+")");
 		/* find this machineName in the map - if it's there */
-		if (!processMap.containsKey(jobName))
+		if (!processMap.containsKey(jobName)) {
+			System.out.println("getProcesses - null - can't find this job!");
 			return null;
+		}
 
 		int n = ((Integer) (processMap.get(jobName))).intValue();
 
@@ -198,20 +209,20 @@ public class SimulationControlSystem implements IControlSystem {
 	public String getProcessNodeName(String procName) {
 		// System.out.println("getProcessNodeName("+procName+")");
 		String job = procName.substring(0, procName.indexOf("process") - 1);
-		// System.out.println("job = "+job);
-		// String job = procName.substring(0, 4);
-		/* ok this is coming from the fake job */
-		if (job.equals("job" + numJobs)) {
-			String s = procName.substring(procName.indexOf("process") + 7,
-					procName.length());
-			// System.out.println("proc # = "+s);
-			int procNum = -1;
-			try {
-				procNum = (new Integer(s)).intValue();
-			} catch (NumberFormatException e) {
-			}
-			if (procNum != -1) {
-				return "machine0_node" + spawned_first_node + (procNum / spawned_procs_per_node);
+
+		for(int i=0; i<simJobs.size(); i++) {
+			SimJobState ss = (SimJobState)simJobs.elementAt(i);
+			if(ss.jobname.equals(job)) {
+				String s = procName.substring(procName.indexOf("process") + 7,
+						procName.length());
+				int procNum = -1;
+				try {
+					procNum = (new Integer(s)).intValue();
+				} catch(NumberFormatException e) {
+				}
+				if(procNum != -1) {
+					return "machine0_node" + (ss.spawned_first_node + (procNum / ss.spawned_procs_per_node));
+				}
 			}
 		}
 
@@ -220,28 +231,34 @@ public class SimulationControlSystem implements IControlSystem {
 
 	public String getProcessStatus(String procName) {
 		String job = procName.substring(0, 4);
-		if (job.equals("job" + numJobs)) {
-			// System.out.println("PROCSTATE = "+spawned_app_state);
-			return spawned_app_state;
+		for(int i=0; i<simJobs.size(); i++) {
+			SimJobState ss = (SimJobState)simJobs.elementAt(i);
+			if(ss.jobname.equals(job))
+				return ss.spawned_app_state;
 		}
+
 		return "-1";
 	}
 
 	public String getProcessExitCode(String procName) {
 		String job = procName.substring(0, 4);
-		if (job.equals("job" + numJobs)) {
-			// System.out.println("PROCSTATE = "+spawned_app_state);
-			return spawned_app_exit_code;
+		for(int i=0; i<simJobs.size(); i++) {
+			SimJobState ss = (SimJobState)simJobs.elementAt(i);
+			if(ss.jobname.equals(job))
+				return ss.spawned_app_exit_code;
 		}
+
 		return "-1";
 	}
 
 	public String getProcessSignal(String procName) {
 		String job = procName.substring(0, 4);
-		if (job.equals("job" + numJobs)) {
-			// System.out.println("PROCSTATE = "+spawned_app_state);
-			return spawned_app_signal;
+		for(int i=0; i<simJobs.size(); i++) {
+			SimJobState ss = (SimJobState)simJobs.elementAt(i);
+			if(ss.jobname.equals(job))
+				return ss.spawned_app_signal;
 		}
+
 		return "-1";
 	}
 	

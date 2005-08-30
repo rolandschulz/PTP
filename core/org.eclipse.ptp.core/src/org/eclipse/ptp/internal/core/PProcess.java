@@ -103,7 +103,7 @@ public class PProcess extends Parent implements IPProcess {
 	}
 
 	public String getProcessNumber() {
-		return "" + getID() + "";
+		return ""+getTaskId()+"";
 	}
 
 	public void setStatus(String status) {

@@ -19,9 +19,17 @@
 package org.eclipse.ptp.core;
 
 public interface AttributeConstants {
+	public static final String ATTRIB_JOBID = "ATTRIB_JOBID";
+	
 	public static final String ATTRIB_PARENT = "ATTRIB_PARENT";
 	public static final String ATTRIB_NAME = "ATTRIB_NAME";
 	public static final String ATTRIB_TYPE = "ATTRIB_TYPE";
 	public static final String ATTRIB_TASKID = "ATTRIB_TASKID";
 	public static final String ATTRIB_ISREGISTERED = "ATTRIB_ISREGISTERED";
+	
+	public static final String ATTRIB_NODE_NUMBER = "ATTRIB_NODE_NUMBER";
+	public static final String ATTRIB_NODE_STATE = "ATTRIB_NODE_STATE";
+	public static final String ATTRIB_NODE_GROUP = "ATTRIB_NODE_GROUP";
+	public static final String ATTRIB_NODE_USER = "ATTRIB_NODE_USER";
+	public static final String ATTRIB_NODE_MODE = "ATTRIB_NODE_MODE";
 }

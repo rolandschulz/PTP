@@ -230,7 +230,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 			return "Unknown process";
 		
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("Tast ID: " + proc.getTaskId());
+		buffer.append("Task ID: " + proc.getTaskId());
 		buffer.append("\n");
 		buffer.append("Process ID: " + proc.getPid());
 

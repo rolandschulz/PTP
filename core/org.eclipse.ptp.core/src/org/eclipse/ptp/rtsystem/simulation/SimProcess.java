@@ -181,7 +181,7 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 	}
 
 	public String getProcessNumber() {
-		return "" + getID() + "";
+		return "" + getTaskId() + "";
 	}
 
 	public void setStatus(String status) {
