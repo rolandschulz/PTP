@@ -216,7 +216,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				IPCDISession dSession = null;
 				dSession = debugConfig.createDebugger().createDebuggerSession(pLaunch, exeFile, monitor);
 				
-				IPSession pSession = (IPSession) new PSession(dSession);
+				IPSession pSession = (IPSession) new PSession(dSession, pLaunch);
 				pLaunch.setPSession(pSession);
 				
 				/* Make the Debug Session accessible by others through the PTPDebugCorePlugin */
