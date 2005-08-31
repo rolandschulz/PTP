@@ -26,68 +26,55 @@
  * Contributors:
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.cdi.model;
+package org.eclipse.ptp.debug.external.cdi.breakpoints;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 
-public class Breakpoint extends PTPObject implements ICDIBreakpoint {
+public class Breakpoint implements ICDIBreakpoint {
 	ICDICondition condition;
 	
 	int type;
 	boolean enable;
 
-	public Breakpoint(Target target, int kind, ICDICondition cond) {
-		super(target);
+	public Breakpoint(int kind, ICDICondition cond) {
 		type = kind;
 		condition = cond;
 		enable = true;
 	}
 
-	/**
-	 * @see org.eclipse.cdt.debug.core.cdi.ICDIBreakpoint#getCondition()
-	 */
 	public ICDICondition getCondition() throws CDIException {
-		System.out.println("Breakpoint.getCondition()");
 		if (condition == null) {
 			return null;
 		}
 		return condition;
 	}
 
-	/**
-	 * @see org.eclipse.cdt.debug.core.cdi.ICDIBreakpoint#isEnabled()
-	 */
 	public boolean isEnabled() throws CDIException {
 		return enable;
 	}
 
-	/**
-	 * @see org.eclipse.cdt.debug.core.cdi.ICDIBreakpoint#isHardware()
-	 */
 	public boolean isHardware() {
 		return (type == ICDIBreakpoint.HARDWARE);
 	}
 
-	/**
-	 * @see org.eclipse.cdt.debug.core.cdi.ICDIBreakpoint#isTemporary()
-	 */
 	public boolean isTemporary() {
 		return (type == ICDIBreakpoint.TEMPORARY);
 	}
 
-	/**
-	 * @see org.eclipse.cdt.debug.core.cdi.ICDIBreakpoint#setCondition(ICDICondition)
-	 */
 	public void setCondition(ICDICondition newCondition) throws CDIException {
 		System.out.println("Breakpoint.setCondition()");
 	}
 
-	/**
-	 * @see org.eclipse.cdt.debug.core.cdi.ICDIBreakpoint#setEnabled(boolean)
-	 */
 	public void setEnabled(boolean on) throws CDIException {
 		System.out.println("Breakpoint.setEnabled()");
+	}
+
+	public ICDITarget getTarget() {
+		// In the PTP Model, Breakpoint is not associated with Target
+		System.out.println("Breakpoint.getTarget()");
+		return null;
 	}
 }

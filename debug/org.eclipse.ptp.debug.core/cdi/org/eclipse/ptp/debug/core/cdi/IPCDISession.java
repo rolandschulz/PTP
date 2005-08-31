@@ -18,7 +18,18 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi;
 
+import java.math.BigInteger;
+
+import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
+import org.eclipse.cdt.debug.core.cdi.ICDICondition;
+import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
+import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIAddressBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 
 public interface IPCDISession extends ICDISession {
@@ -30,4 +41,24 @@ public interface IPCDISession extends ICDISession {
 	public int[] getRegisteredTargetIds();
 	public boolean isRegistered(int i);
 	public IPCDITarget getTarget(int i);
+	
+	/* Breakpoint */
+	public ICDILineBreakpoint setLineBreakpoint(int type,
+			ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException;
+	public ICDIFunctionBreakpoint setFunctionBreakpoint(int type,
+			ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException;
+	public ICDIAddressBreakpoint setAddressBreakpoint(int type,
+			ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException;
+	
+	public ICDILineBreakpoint setLineBreakpoint(IPCDIDebugProcessSet bSet, int type,
+			ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException;
+	public ICDIFunctionBreakpoint setFunctionBreakpoint(IPCDIDebugProcessSet bSet, int type,
+			ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException;
+	public ICDIAddressBreakpoint setAddressBreakpoint(IPCDIDebugProcessSet bSet, int type,
+			ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException;
+
+	/* Location */
+	public ICDILineLocation createLineLocation(String file, int line);
+	public ICDIFunctionLocation createFunctionLocation(String file, String function);
+	public ICDIAddressLocation createAddressLocation(BigInteger address);
 }

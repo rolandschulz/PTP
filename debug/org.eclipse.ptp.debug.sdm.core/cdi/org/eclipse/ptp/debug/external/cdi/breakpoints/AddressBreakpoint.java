@@ -27,7 +27,7 @@
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.debug.external.cdi.model;
+package org.eclipse.ptp.debug.external.cdi.breakpoints;
 
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDILocation;
@@ -36,9 +36,9 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIAddressBreakpoint;
 public class AddressBreakpoint extends LocationBreakpoint implements
 		ICDIAddressBreakpoint {
 
-	public AddressBreakpoint(Target target, int kind, ICDILocation loc,
+	public AddressBreakpoint(int kind, ICDILocation loc,
 			ICDICondition cond) {
-		super(target, kind, loc, cond);
+		super(kind, loc, cond);
 	}
 
 }

@@ -39,15 +39,15 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIAddressBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
+import org.eclipse.ptp.debug.external.cdi.breakpoints.AddressBreakpoint;
+import org.eclipse.ptp.debug.external.cdi.breakpoints.FunctionBreakpoint;
+import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
+import org.eclipse.ptp.debug.external.cdi.breakpoints.LocationBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointCreatedEvent;
-import org.eclipse.ptp.debug.external.cdi.model.AddressBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.AddressLocation;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
-import org.eclipse.ptp.debug.external.cdi.model.FunctionBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.FunctionLocation;
-import org.eclipse.ptp.debug.external.cdi.model.LineBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
-import org.eclipse.ptp.debug.external.cdi.model.LocationBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
 /**
@@ -63,7 +63,6 @@ public class BreakpointManager extends Manager {
 	}
 	
 	protected void update(Target target) throws CDIException {
-		// Auto-generated method stub
 		System.out.println("BreakpointManager.update()");
 	}
 	
@@ -79,63 +78,38 @@ public class BreakpointManager extends Manager {
 		return new AddressLocation(address);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpointManagement#setLineBreakpoint(int, org.eclipse.cdt.debug.core.cdi.ICDILineLocation, org.eclipse.cdt.debug.core.cdi.ICDICondition, boolean)
-	 */
-	public ICDILineBreakpoint setLineBreakpoint(Target target, int type, ICDILineLocation location,
+	public ICDILineBreakpoint setLineBreakpoint(IPCDIDebugProcessSet bSet, int type, ICDILineLocation location,
 			ICDICondition condition, boolean deferred) throws CDIException {		
-		LineBreakpoint bkpt = new LineBreakpoint(target, type, location, condition);
-		setNewLocationBreakpoint(bkpt, deferred);
+		LineBreakpoint bkpt = new LineBreakpoint(type, location, condition);
+		setNewLocationBreakpoint(bSet, bkpt, deferred);
 		return bkpt;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpointManagement#setFunctionBreakpoint(int, org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation, org.eclipse.cdt.debug.core.cdi.ICDICondition, boolean)
-	 */
-	public ICDIFunctionBreakpoint setFunctionBreakpoint(Target target, int type, ICDIFunctionLocation location,
+	public ICDIFunctionBreakpoint setFunctionBreakpoint(IPCDIDebugProcessSet bSet, int type, ICDIFunctionLocation location,
 			ICDICondition condition, boolean deferred) throws CDIException {		
-		FunctionBreakpoint bkpt = new FunctionBreakpoint(target, type, location, condition);
-		setNewLocationBreakpoint(bkpt, deferred);
+		FunctionBreakpoint bkpt = new FunctionBreakpoint(type, location, condition);
+		setNewLocationBreakpoint(bSet, bkpt, deferred);
 		return bkpt;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpointManagement#setAddressBreakpoint(int, org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation, org.eclipse.cdt.debug.core.cdi.ICDICondition, boolean)
-	 */
-	public ICDIAddressBreakpoint setAddressBreakpoint(Target target, int type, ICDIAddressLocation location,
+	public ICDIAddressBreakpoint setAddressBreakpoint(IPCDIDebugProcessSet bSet, int type, ICDIAddressLocation location,
 			ICDICondition condition, boolean deferred) throws CDIException {		
-		AddressBreakpoint bkpt = new AddressBreakpoint(target, type, location, condition);
-		setNewLocationBreakpoint(bkpt, deferred);
+		AddressBreakpoint bkpt = new AddressBreakpoint(type, location, condition);
+		setNewLocationBreakpoint(bSet, bkpt, deferred);
 		return bkpt;
 	}
 	
-	public void setLocationBreakpoint (LocationBreakpoint bkpt) throws CDIException {
-		System.out.println("BreakpointManager.setLocationBreakpoint()");
-	}
-	
-	public void setNewLocationBreakpoint(LocationBreakpoint bkpt, boolean deferred) throws CDIException {
-		System.out.println("BreakpointManager.setNewLocationBreakpoint()");
-		
-		Target target = (Target)bkpt.getTarget();
-		Session session = (Session) target.getSession();
+	public void setNewLocationBreakpoint(IPCDIDebugProcessSet bSet, LocationBreakpoint bkpt, boolean deferred) throws CDIException {
+		Session session = (Session) ((DebugProcessSet) bSet).getSession();
 		
 		try {
-			setLocationBreakpoint(bkpt);
-			
-			// Fire a created Event.
-			int pId = target.getTargetId();
-			
-			IPCDIDebugProcessSet newSet = new DebugProcessSet(session, pId);
-			//sess.getDebugger().fireEvent(new EBreakpointCreated(bitSet));
-			session.getDebugger().fireEvent(new BreakpointCreatedEvent(session, newSet));
+			session.getDebugger().fireEvent(new BreakpointCreatedEvent(session, bSet));
 			
 			if (bkpt instanceof LineBreakpoint) {
-				session.getDebugger().setLineBreakpoint(newSet, (ICDILineBreakpoint) bkpt);
+				session.getDebugger().setLineBreakpoint(bSet, (ICDILineBreakpoint) bkpt);
 			} else if (bkpt instanceof FunctionBreakpoint) {
-				session.getDebugger().setFunctionBreakpoint(newSet, (ICDIFunctionBreakpoint) bkpt);
+				session.getDebugger().setFunctionBreakpoint(bSet, (ICDIFunctionBreakpoint) bkpt);
 			}
-			
-			
 		} catch (CDIException e) {
 		}
 	}

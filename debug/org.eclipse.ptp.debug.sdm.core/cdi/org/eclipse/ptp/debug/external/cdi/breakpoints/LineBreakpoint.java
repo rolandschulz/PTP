@@ -27,7 +27,7 @@
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.debug.external.cdi.model;
+package org.eclipse.ptp.debug.external.cdi.breakpoints;
 
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
@@ -35,8 +35,8 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 
 public class LineBreakpoint extends LocationBreakpoint implements ICDILineBreakpoint {
 
-	public LineBreakpoint(Target target, int kind, ICDILineLocation loc, ICDICondition cond) {
-		super(target, kind, loc, cond);
+	public LineBreakpoint(int kind, ICDILineLocation loc, ICDICondition cond) {
+		super(kind, loc, cond);
 	}
 
 }

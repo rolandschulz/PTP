@@ -74,7 +74,9 @@ import org.eclipse.debug.core.IBreakpointsListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ISourceLocator;
+import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
@@ -572,8 +574,12 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 				public void run() {
 					try {
 						if ( breakpoint instanceof IPLineBreakpoint ) {
-							target.setLineBreakpoint( ICDIBreakpoint.REGULAR,
-								(ICDILineLocation)location, condition, true );
+							((IPCDISession) target.getSession()).setLineBreakpoint(
+									ICDIBreakpoint.REGULAR,
+									(ICDILineLocation)location, condition, true);
+							
+							//target.setLineBreakpoint( ICDIBreakpoint.REGULAR,
+							//	(ICDILineLocation)location, condition, true );
 							// DONNY
 /*						} else if ( breakpoint instanceof ICFunctionBreakpoint ) {
 							target.setFunctionBreakpoint( ICDIBreakpoint.REGULAR,
@@ -611,14 +617,15 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 	}
 */
 	private void setLineBreakpoint( IPLineBreakpoint breakpoint ) throws CDIException, CoreException {
-		boolean enabled = breakpoint.isEnabled();
+/*		boolean enabled = breakpoint.isEnabled();
 		ICDITarget cdiTarget = getCDITarget();
 		String handle = breakpoint.getSourceHandle();
 		IPath path = convertPath( handle );
-		ICDILineLocation location = cdiTarget.createLineLocation( path.lastSegment()/*path.toPortableString()*/, breakpoint.getLineNumber() );
+		
+		ICDILineLocation location = ((IPCDISession) cdiTarget.getSession()).createLineLocation( path.lastSegment()path.toPortableString(), breakpoint.getLineNumber() );
 		ICDICondition condition = createCondition( breakpoint );
 		setLocationBreakpointOnTarget( breakpoint, cdiTarget, location, condition, enabled );
-	}
+*/	}
 
 	// DONNY
 /*	private void setWatchpointOnTarget( final ICWatchpoint watchpoint, final ICDITarget target, final int accessType, final String expression, final ICDICondition condition, final boolean enabled ) {

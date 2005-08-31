@@ -39,13 +39,13 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.cdi.PCDIException;
+import org.eclipse.ptp.debug.external.cdi.breakpoints.FunctionBreakpoint;
+import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.Argument;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
-import org.eclipse.ptp.debug.external.cdi.model.FunctionBreakpoint;
-import org.eclipse.ptp.debug.external.cdi.model.LineBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.cdi.model.LocalVariable;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
@@ -92,6 +92,8 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		debuggerCommands = new DQueue();
 		initializeSimulatedProcessesCode(debuggerCommands);
 		debuggerProcess = new DProcess("Debugger", -1, 1, debuggerCommands, this);
+		
+		
 		
 		
 	}
@@ -334,7 +336,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 			String file = (String) list.get(2);
 			int line = ((Integer) list.get(3)).intValue();
 			LineLocation loc = new LineLocation(file, line);
-			LineBreakpoint bpt = new LineBreakpoint(null, ICDIBreakpoint.REGULAR, loc, null);
+			LineBreakpoint bpt = new LineBreakpoint(ICDIBreakpoint.REGULAR, loc, null);
 			procs[procId].setStatus(IPProcess.STOPPED);
 			fireEvent(new BreakpointHitEvent(getSession(), new DebugProcessSet(session, procId), bpt));
 		} else if (event.equals("RESUMED")) {

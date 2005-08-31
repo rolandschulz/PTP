@@ -116,7 +116,8 @@ public class PCDIDebugModel {
 				
 				ICDITargetConfiguration config = cdiTarget.getConfiguration();
 				if ( config.supportsBreakpoints() && stop ) {
-					stopInMain( (PDebugTarget)target[0] );
+					// FIXME DONNY
+					//stopInMain( (PDebugTarget)target[0] );
 				}
 				if ( config.supportsResume() && resumeTarget ) {
 					target[0].resume();
