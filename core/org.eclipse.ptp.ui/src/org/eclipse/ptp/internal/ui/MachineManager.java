@@ -21,6 +21,7 @@ package org.eclipse.ptp.internal.ui;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
@@ -126,17 +127,17 @@ public class MachineManager extends AbstractUIManager {
 	}	
 	public int getNodeStatus(IPNode node) {
 		if (node != null) {
-			String nodeState = (String)node.getAttrib("state");
+			String nodeState = (String)node.getAttrib(AttributeConstants.ATTRIB_NODE_STATE);
 			if (nodeState.equals("up")) {
-				if (node.getAttrib("user").equals(System.getProperty("user.name"))) {
-					String mode = (String) node.getAttrib("mode");
+				if (node.getAttrib(AttributeConstants.ATTRIB_NODE_USER).equals(System.getProperty("user.name"))) {
+					String mode = (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_MODE);
 					if (mode.equals("0100"))
 						return IPTPUIConstants.NODE_USER_ALLOC_EXCL;
 					else if (mode.equals("0110") || mode.equals("0111") || mode.equals("0101"))
 						return IPTPUIConstants.NODE_USER_ALLOC_SHARED;
 				}
-				else if (!node.getAttrib("user").equals("")) {
-					String mode = (String) node.getAttrib("mode");
+				else if (!node.getAttrib(AttributeConstants.ATTRIB_NODE_USER).equals("")) {
+					String mode = (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_MODE);
 					if (mode.equals("0100"))
 						return IPTPUIConstants.NODE_OTHER_ALLOC_EXCL;
 					else if (mode.equals("0110") || mode.equals("0111") || mode.equals("0101"))
