@@ -168,7 +168,7 @@ public class PJob extends Parent implements IPJob {
 		super.addChild(member);
 		if (member instanceof IPProcess) {
 			IPProcess p = (IPProcess) member;
-			taskIdMap.add(p.getTaskId(), p.getProcessNumber());
+			taskIdMap.add(p.getTaskId(), "" + p.getID() + "");
 		}
 	}
 
