@@ -16,36 +16,14 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.ui.views.array;
+package org.eclipse.ptp.debug.internal.ui.views;
 
-import org.eclipse.cdt.debug.core.model.ICType;
-import org.eclipse.cdt.debug.core.model.ICVariable;
-import org.eclipse.debug.core.DebugException;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.ptp.debug.internal.ui.actions.AddVariableAction;
-import org.eclipse.ptp.debug.internal.ui.views.PTabFolder;
-import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
+import org.eclipse.ui.part.ViewPart;
 
 /**
  * @author Clement chu
  *
  */
-public class ArrayView extends PTabFolder {
-	protected void configureToolBar(IToolBarManager toolBarMgr) {
-		toolBarMgr.appendToGroup(IPTPDebugUIConstants.IUITABVARIABLEGROUP, new AddVariableAction(this));
-	}
-	
-	public void createTabItem(String tabName, Object selection) {
-		ArrayTabItem item = new ArrayTabItem(this, tabName);
-		if (selection instanceof ICVariable) {
-			try {
-				ICType type = ((ICVariable)selection).getType();
-				type.getArrayDimensions();
-			} catch (DebugException e) {
-				
-			}
-		}
-		item.setControl();
-		item.displayTab();
-	}
+public abstract class PDebugView extends ViewPart {
+
 }

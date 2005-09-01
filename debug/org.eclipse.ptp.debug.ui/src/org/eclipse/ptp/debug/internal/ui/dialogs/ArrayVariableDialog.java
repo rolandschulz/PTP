@@ -16,36 +16,47 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.ui.views.array;
+package org.eclipse.ptp.debug.internal.ui.dialogs;
 
-import org.eclipse.cdt.debug.core.model.ICType;
 import org.eclipse.cdt.debug.core.model.ICVariable;
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.ptp.debug.internal.ui.actions.AddVariableAction;
-import org.eclipse.ptp.debug.internal.ui.views.PTabFolder;
-import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
+import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author Clement chu
  *
  */
-public class ArrayView extends PTabFolder {
-	protected void configureToolBar(IToolBarManager toolBarMgr) {
-		toolBarMgr.appendToGroup(IPTPDebugUIConstants.IUITABVARIABLEGROUP, new AddVariableAction(this));
+public class ArrayVariableDialog extends VariableDialog {
+	
+	public ArrayVariableDialog(Shell parent, IStackFrame frame) {
+		super(parent, frame);
 	}
 	
-	public void createTabItem(String tabName, Object selection) {
-		ArrayTabItem item = new ArrayTabItem(this, tabName);
-		if (selection instanceof ICVariable) {
-			try {
-				ICType type = ((ICVariable)selection).getType();
-				type.getArrayDimensions();
-			} catch (DebugException e) {
-				
+	protected ViewerFilter getViewFilter() {
+		return new ArrayFilter();
+	}
+	
+	private class ArrayFilter extends ViewerFilter {
+		public boolean select(Viewer viewer, Object parentElement, Object element) {
+			if (element instanceof IVariable) {
+				try {
+					return isArray((IVariable)element);
+				} catch (DebugException e) {
+					return false;
+				}
 			}
+			return false;
 		}
-		item.setControl();
-		item.displayTab();
+		
+		private boolean isArray(IVariable variable) throws DebugException {
+			if (variable instanceof ICVariable) {
+				return ((ICVariable)variable).getType().isArray();
+			}
+			return false;
+		}
 	}
 }

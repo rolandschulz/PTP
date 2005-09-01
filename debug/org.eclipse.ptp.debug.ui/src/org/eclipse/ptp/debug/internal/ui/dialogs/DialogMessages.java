@@ -16,36 +16,26 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.ui.views.array;
+package org.eclipse.ptp.debug.internal.ui.dialogs;
 
-import org.eclipse.cdt.debug.core.model.ICType;
-import org.eclipse.cdt.debug.core.model.ICVariable;
-import org.eclipse.debug.core.DebugException;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.ptp.debug.internal.ui.actions.AddVariableAction;
-import org.eclipse.ptp.debug.internal.ui.views.PTabFolder;
-import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 /**
  * @author Clement chu
  *
  */
-public class ArrayView extends PTabFolder {
-	protected void configureToolBar(IToolBarManager toolBarMgr) {
-		toolBarMgr.appendToGroup(IPTPDebugUIConstants.IUITABVARIABLEGROUP, new AddVariableAction(this));
-	}
-	
-	public void createTabItem(String tabName, Object selection) {
-		ArrayTabItem item = new ArrayTabItem(this, tabName);
-		if (selection instanceof ICVariable) {
-			try {
-				ICType type = ((ICVariable)selection).getType();
-				type.getArrayDimensions();
-			} catch (DebugException e) {
-				
-			}
+public class DialogMessages {
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.debug.internal.ui.dialogs.DialogMessages";
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+
+	private DialogMessages() {}
+
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch(MissingResourceException e) {
+			return '!' + key + '!';
 		}
-		item.setControl();
-		item.displayTab();
 	}
 }
