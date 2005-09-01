@@ -11,7 +11,6 @@ public class PLaunch extends Launch implements IPLaunch {
 	
 	public PLaunch(ILaunchConfiguration launchConfiguration, String mode, ISourceLocator locator) {
 		super(launchConfiguration, mode, locator);
-		// TODO Auto-generated constructor stub
 	}
 
 	public IPJob getPJob() {

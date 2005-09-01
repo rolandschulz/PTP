@@ -5,7 +5,6 @@ import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILocation;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -13,7 +12,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.IBreakpointsListener;
-import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
@@ -30,7 +28,8 @@ public class PSession implements IPSession, IBreakpointsListener {
 
 		pCDISession = session;
 		pLaunch = launch;
-		setBreakpoints();
+		
+		initializeBreakpoints();
 	}
 
 	public IPCDISession getPCDISession() {
@@ -50,16 +49,14 @@ public class PSession implements IPSession, IBreakpointsListener {
 	public void breakpointsRemoved(IBreakpoint[] breakpoints, IMarkerDelta[] deltas) {
 		// Auto-generated method stub
 		System.out.println("PSession.breakpointsRemoved()");
-		
 	}
 
 	public void breakpointsChanged(IBreakpoint[] breakpoints, IMarkerDelta[] deltas) {
 		// Auto-generated method stub
 		System.out.println("PSession.breakpointsChanged()");
-		
 	}
 	
-	public void setBreakpoints() {
+	private void initializeBreakpoints() {
 		IBreakpointManager manager = DebugPlugin.getDefault().getBreakpointManager();
 		IBreakpoint[] bps = manager.getBreakpoints( PCDIDebugModel.getPluginIdentifier() );
 		for( int i = 0; i < bps.length; i++ ) {
@@ -73,15 +70,13 @@ public class PSession implements IPSession, IBreakpointsListener {
 		try {
 			if ( breakpoint instanceof IPLineBreakpoint )
 				setLineBreakpoint( (IPLineBreakpoint)breakpoint );
-			// DONNY
-/*			else if ( breakpoint instanceof ICFunctionBreakpoint )
+/*			else if ( breakpoint instanceof IPFunctionBreakpoint )
 				setFunctionBreakpoint( (ICFunctionBreakpoint)breakpoint );
-			else if ( breakpoint instanceof ICAddressBreakpoint )
+			else if ( breakpoint instanceof IPAddressBreakpoint )
 				setAddressBreakpoint( (ICAddressBreakpoint)breakpoint );
-			else if ( breakpoint instanceof ICWatchpoint )
+			else if ( breakpoint instanceof IPWatchpoint )
 				setWatchpoint( (ICWatchpoint)breakpoint );
-*/
-		}
+*/		}
 		catch( CoreException e ) {
 		}
 		catch( NumberFormatException e ) {
@@ -95,28 +90,24 @@ public class PSession implements IPSession, IBreakpointsListener {
 		String handle = breakpoint.getSourceHandle();
 		IPath path = convertPath( handle );
 		
-		ICDILineLocation location = ((IPCDISession) getPCDISession()).createLineLocation( path.lastSegment()/*path.toPortableString()*/, breakpoint.getLineNumber() );
-		ICDICondition condition = null; //((IPCDISession) getPCDISession()).createCondition( breakpoint.getIgnoreCount(), breakpoint.getCondition(), getThreadNames( breakpoint ) );
-		setLocationBreakpointOnTarget( breakpoint, location, condition, enabled );
+		ICDILineLocation location = pCDISession.createLineLocation( path.lastSegment(), breakpoint.getLineNumber() );
+		ICDICondition condition = null;
+		
+		setLocationBreakpointOnSession( breakpoint, location, condition, enabled );
 	}
 	
-	private void setLocationBreakpointOnTarget( final IPBreakpoint breakpoint, final ICDILocation location, final ICDICondition condition, final boolean enabled ) {
+	private void setLocationBreakpointOnSession( final IPBreakpoint breakpoint, final ICDILocation location, final ICDICondition condition, final boolean enabled ) {
 		DebugPlugin.getDefault().asyncExec( new Runnable() {				
 			public void run() {
 				try {
 					if ( breakpoint instanceof IPLineBreakpoint ) {
-						((IPCDISession) getPCDISession()).setLineBreakpoint(
-								ICDIBreakpoint.REGULAR,
+						pCDISession.setLineBreakpoint(ICDIBreakpoint.REGULAR,
 								(ICDILineLocation)location, condition, true);
-							
-						//target.setLineBreakpoint( ICDIBreakpoint.REGULAR,
-						//	(ICDILineLocation)location, condition, true );
-						// DONNY
 /*					} else if ( breakpoint instanceof ICFunctionBreakpoint ) {
 						target.setFunctionBreakpoint( ICDIBreakpoint.REGULAR,
 								(ICDIFunctionLocation)location, condition, true );								
 					} else if ( breakpoint instanceof ICAddressBreakpoint ) {
-							target.setAddressBreakpoint( ICDIBreakpoint.REGULAR,
+						target.setAddressBreakpoint( ICDIBreakpoint.REGULAR,
 								(ICDIAddressLocation)location, condition, true );
 */					}
 				}

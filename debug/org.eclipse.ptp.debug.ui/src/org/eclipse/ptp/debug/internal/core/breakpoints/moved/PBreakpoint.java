@@ -31,7 +31,6 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.Breakpoint;
 import org.eclipse.ptp.debug.core.model.moved.IPBreakpoint;
-import org.eclipse.ptp.debug.internal.core.breakpoints.old.BreakpointMessages;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 
 /**

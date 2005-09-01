@@ -43,7 +43,7 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.IPDebugListener;
-import org.eclipse.ptp.debug.core.PDebugModel;
+import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
@@ -233,7 +233,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	 *****/
 	public void updateBreakpointMarker(final String cur_sid) {
 		try {
-			PDebugModel.updatePBreakpoints(getCurrentJobId(), cur_sid);
+			PCDIDebugModel.updatePBreakpoints(getCurrentJobId(), cur_sid);
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 		}				
@@ -285,7 +285,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	//Delete the set that will delete the all related breakpoint
 	public void deleteSetEvent(IElementSet set) {
 		try {
-			PDebugModel.deletePBreakpointBySet(set.getID());
+			PCDIDebugModel.deletePBreakpointBySet(set.getID());
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 		}
@@ -389,6 +389,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					int lineNumber = locator.getLineNumber();
 					//String fileName = locator.getFile();
 					String fileName = "TestC/testC.c";
+					//fileName = "HelloWorld/main.c";
 					//String fileName = "D:/eclipse3.1/runtime-EclipseApplication/TestC/testC.c";
 					try {						
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllProcesses().toBitList());
