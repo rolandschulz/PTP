@@ -62,5 +62,8 @@ public interface IPTPUIConstants {
 	public final static int PROC_STARTING = 4;
 	public final static int PROC_STOPPED = 5;
 	
-	public static final int INTERNAL_ERROR = 150;	
+	public static final int INTERNAL_ERROR = 150;
+	public static final int STATUS_CODE_QUESTION = 10000;
+	public static final int STATUS_CODE_INFO = 10001;
+	public static final int STATUS_CODE_ERROR = 10002;
 }
