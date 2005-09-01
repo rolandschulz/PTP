@@ -33,12 +33,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.cdi.ICDIBreakpointHit;
 import org.eclipse.cdt.debug.core.cdi.ICDIEndSteppingRange;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.cdt.debug.core.cdi.ICDISignalReceived;
-import org.eclipse.cdt.debug.core.cdi.ICDIWatchpointTrigger;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIChangedEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIDestroyedEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIDisconnectedEvent;
@@ -352,11 +351,12 @@ public class CThread extends PDebugElement implements ICThread, IRestart, IResum
 		List list = new ArrayList( 1 );
 		if ( isSuspended() ) {
 			IBreakpoint bkpt = null;
-			if ( getCurrentStateInfo() instanceof ICDIBreakpointHit )
+			// FIXME Donny
+/*			if ( getCurrentStateInfo() instanceof ICDIBreakpointHit )
 				bkpt = ((PDebugTarget)getDebugTarget()).getBreakpointManager().getBreakpoint( ((ICDIBreakpointHit)getCurrentStateInfo()).getBreakpoint() );
 			else if ( getCurrentStateInfo() instanceof ICDIWatchpointTrigger )
 				bkpt = ((PDebugTarget)getDebugTarget()).getBreakpointManager().getBreakpoint( ((ICDIWatchpointTrigger)getCurrentStateInfo()).getWatchpoint() );
-			if ( bkpt != null )
+*/			if ( bkpt != null )
 				list.add( bkpt );
 		}
 		return (IBreakpoint[])list.toArray( new IBreakpoint[list.size()] );

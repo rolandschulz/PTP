@@ -124,10 +124,8 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
-import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.core.sourcelookup.CDirectorySourceContainer;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
-import org.eclipse.ptp.debug.internal.core.PBreakpointManager;
 import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupParticipant;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceManager;
@@ -169,11 +167,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	 */
 	private ICDITargetConfiguration fConfig;
 
-	/**
-	 * A breakpoint manager for this target.
-	 */
-	private PBreakpointManager fBreakpointManager;
-	
 	/**
 	 * The global variable manager for this target.
 	 */
@@ -223,7 +216,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		initializePreferences();
 		setConfiguration( cdiTarget.getConfiguration() );
 		setThreadList( new ArrayList( 5 ) );
-		setBreakpointManager( new PBreakpointManager( this ) );
 		setGlobalVariableManager( new PGlobalVariableManager( this ) );
 		initialize();
 		DebugPlugin.getDefault().getLaunchManager().addLaunchListener( this );
@@ -240,15 +232,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		ArrayList debugEvents = new ArrayList( 1 );
 		debugEvents.add( createCreateEvent() );
 		initializeThreads( debugEvents );
-		initializeBreakpoints();
 		initializeSourceManager();
 		getLaunch().addDebugTarget( this );
 		fireEventSet( (DebugEvent[])debugEvents.toArray( new DebugEvent[debugEvents.size()] ) );
-	}
-
-	private void initializeBreakpoints() {
-		getBreakpointManager().initialize();
-		getBreakpointManager().setBreakpoints();
 	}
 
 	/**
@@ -370,7 +356,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	public boolean supportsBreakpoint( IBreakpoint breakpoint ) {
 		if ( !getConfiguration().supportsBreakpoints() )
 			return false;
-		return (breakpoint instanceof IPBreakpoint && getBreakpointManager().supportsBreakpoint( (IPBreakpoint)breakpoint ));
+		//return (breakpoint instanceof IPBreakpoint && getBreakpointManager().supportsBreakpoint( (IPBreakpoint)breakpoint ));
+		return (breakpoint instanceof IPBreakpoint);
 	}
 
 	/* (non-Javadoc)
@@ -711,8 +698,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			return this;
 		if ( adapter.equals( IExecFileInfo.class ) )
 			return this;
-		if ( adapter.equals( PBreakpointManager.class ) )
-			return getBreakpointManager();
 		if ( adapter.equals( ICGlobalVariableManager.class ) )
 			return getGlobalVariableManager();
 		if ( adapter.equals( ICDISession.class ) )
@@ -868,7 +853,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		disposeGlobalVariableManager();
 		disposeSourceManager();
 		disposeSourceLookupPath();
-		disposeBreakpointManager();
 		removeAllExpressions();
 		disposePreferences();
 	}
@@ -919,7 +903,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		setState( CDebugElementState.SUSPENDED );
 		ICDISessionObject reason = event.getReason();
 		setCurrentStateInfo( reason );
-		getBreakpointManager().skipBreakpoints( false );
+		skipBreakpoints( false );
 		List newThreads = refreshThreads();
 		if ( event.getSource() instanceof IPCDITarget ) {
 			suspendThreads( event );
@@ -1264,19 +1248,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		}
 	}
 	
-	protected PBreakpointManager getBreakpointManager() {
-		return fBreakpointManager;
-	}
-
-	protected void setBreakpointManager( PBreakpointManager manager ) {
-		fBreakpointManager = manager;
-	}
-
-	protected void disposeBreakpointManager() {
-		if ( getBreakpointManager() != null )
-			getBreakpointManager().dispose();
-	}
-
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -1308,13 +1279,6 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	public IAddress getBreakpointAddress( ICLineBreakpoint breakpoint ) throws DebugException {
 		System.out.println("PDebugTarget.getBreakpointAddress()");
 		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.IBreakpointTarget#getBreakpointAddress(org.eclipse.cdt.debug.core.model.ICLineBreakpoint)
-	 */
-	public IAddress getBreakpointAddress( IPLineBreakpoint breakpoint ) throws DebugException {
-		return (getBreakpointManager() != null) ? getBreakpointManager().getBreakpointAddress( breakpoint ) : getAddressFactory().getZero();
 	}
 
 	/* (non-Javadoc)
@@ -1401,7 +1365,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	}
 
 	protected void skipBreakpoints( boolean enabled ) {
-		getBreakpointManager().skipBreakpoints( enabled );
+		// FIXME Donny
+		// We do not have skipBreakpoints support for each individual target
+		//getBreakpointManager().skipBreakpoints( enabled );
 	}
 
 	public IDisassembly getDisassembly() throws DebugException {
