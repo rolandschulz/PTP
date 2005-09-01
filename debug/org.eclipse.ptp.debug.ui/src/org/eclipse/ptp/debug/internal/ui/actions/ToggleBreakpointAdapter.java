@@ -31,8 +31,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
-import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -134,7 +134,7 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 		else {
 			errorMessage = ActionMessages.getString("RunToLineAdapter.Operation_is_not_supported_1");
 		}
-		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPDebugUIConstants.INTERNAL_ERROR, errorMessage, null));
+		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, errorMessage, null));
 	}
 
 	public boolean canToggleLineBreakpoints(IWorkbenchPart part, ISelection selection) {
