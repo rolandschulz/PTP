@@ -74,7 +74,6 @@ import org.eclipse.debug.core.IBreakpointsListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ISourceLocator;
-import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
@@ -427,7 +426,6 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 			}
 			catch( CoreException e ) {
 			}
-			getBreakpointNotifier().breakpointInstalled( getDebugTarget(), breakpoint );
 			changeBreakpointProperties( breakpoint, cdiBreakpoint );
 		}
 	}
@@ -488,7 +486,6 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 			}
 			catch( CDIException e ) {
 			}
-			getBreakpointNotifier().breakpointChanged( getDebugTarget(), breakpoint, map );
 		}
 	}
 
@@ -506,7 +503,6 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 				catch( CoreException e ) {
 				}
 			}
-			getBreakpointNotifier().breakpointsRemoved( getDebugTarget(), new IBreakpoint[] { breakpoint } );
 		}
 	}
 
@@ -537,7 +533,6 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 				} 
 			}
 		} );			
-		getBreakpointNotifier().breakpointsRemoved( getDebugTarget(), breakpoints );
 	}
 
 	private void setBreakpoint( IPBreakpoint breakpoint ) {
@@ -1040,10 +1035,6 @@ public class PBreakpointManager implements IBreakpointsListener, IBreakpointMana
 
 	private boolean isTargetAvailable() {
 		return getDebugTarget().getCDITarget().getConfiguration().supportsBreakpoints() && getDebugTarget().isAvailable();
-	}
-
-	private PBreakpointNotifier getBreakpointNotifier() {
-		return PBreakpointNotifier.getInstance();
 	}
 
 	private boolean isFilteredByTarget( IPBreakpoint breakpoint, IPDebugTarget target ) {

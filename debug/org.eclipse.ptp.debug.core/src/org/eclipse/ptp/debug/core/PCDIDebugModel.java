@@ -280,36 +280,34 @@ public class PCDIDebugModel {
 	}
 	
 	public static void updatePBreakpoints(final String job_id, final String set_id) throws CoreException {
-		IWorkspaceRunnable runnable= new IWorkspaceRunnable() {
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
-				final IBreakpoint[] breakpoints = getPBreakpoints();
 				new Job("Update breakpoint") {
 					protected IStatus run(IProgressMonitor pmonitor) {
+						IBreakpoint[] breakpoints = getPBreakpoints();
 						try {				
 							for (int i=0; i<breakpoints.length; i++) {
 								if (!(breakpoints[i] instanceof IPBreakpoint))
 									continue;
 					
 								IPBreakpoint breakpoint = (IPBreakpoint)breakpoints[i];
-								if (breakpoint.getJobId().length() == 0)
+								if (breakpoint.getJobId().length() == 0) {
+									breakpoint.setSetId(set_id);
 									breakpoint.setJobId(job_id);
+								}
 					
 								breakpoint.setCurSetId(set_id);
 							}
 							return Status.OK_STATUS;
 						} catch (CoreException e) {
 							PTPDebugCorePlugin.log(e);
-						}
+						}						
 						return Status.CANCEL_STATUS;
 					}
 				}.schedule();
 			}
 		};
 		ResourcesPlugin.getWorkspace().run(runnable, null, 0, null);
-	}	
-	
-	
-	
-	
+	}
 	
 }

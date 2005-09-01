@@ -28,7 +28,7 @@ import org.eclipse.debug.ui.actions.IToggleBreakpointsTarget;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ptp.debug.core.PDebugModel;
+import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
@@ -81,14 +81,14 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 						}
 						else {
 							String sourceHandle = getSourceHandle(input);
-							IPLineBreakpoint breakpoint = PDebugModel.lineBreakpointExists(sourceHandle, resource, lineNumber);
+							IPLineBreakpoint breakpoint = PCDIDebugModel.lineBreakpointExists(sourceHandle, resource, lineNumber);
 							if (breakpoint != null) {
 								DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);
 							}
 							else {
 								String sid = uiDebugManager.getCurrentSetId();
 								sid = (sid == null || sid.length() == 0)?IElementHandler.SET_ROOT_ID:sid;
-								PDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, uiDebugManager.getCurrentJobId());
+								PCDIDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, uiDebugManager.getCurrentJobId());
 							}
 							return;
 						}
