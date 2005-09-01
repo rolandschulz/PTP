@@ -34,14 +34,12 @@ public interface IPTPDebugUIConstants {
 	public static final String ACTION_BREAKPOINT_PROPERTIES = PREFIX + "breakpointProperties";
 	public static final String ACTION_ENABLE_DISABLE_BREAKPOINT = PREFIX + "enableDisableBreakpoint";
 	public static final String ACTION_SET_BREAKPOINT = PREFIX + "toggleBreakpointRulerAction";
-	
-	public static final int INTERNAL_ERROR = 150;
-	public static final int STATUS_CODE_QUESTION = 10000;
-	public static final int STATUS_CODE_INFO = 10001;
-	public static final int STATUS_CODE_ERROR = 10002;
-	
+		
 	public static final String REG_ANN_INSTR_POINTER_CURRENT = PREFIX + "regCurrentIP";
 	public static final String REG_ANN_INSTR_POINTER_SECONDARY = PREFIX + "regSecondaryIP";
 	public static final String CURSET_ANN_INSTR_POINTER_CURRENT = PREFIX + "currentSetIP";
 	public static final String SET_ANN_INSTR_POINTER_CURRENT = PREFIX + "setIP";
+	
+    public static final String IUITABEMPTYGROUP = "emptygroup";
+    public static final String IUITABVARIABLEGROUP = "variablegroup";	
 }

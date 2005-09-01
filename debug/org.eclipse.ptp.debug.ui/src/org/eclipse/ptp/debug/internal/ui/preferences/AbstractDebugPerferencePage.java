@@ -62,7 +62,7 @@ public abstract class AbstractDebugPerferencePage extends PreferencePage impleme
 	}
 	
 	protected void refreshViews(final String[] views_id) {
-		BusyIndicator.showWhile( getShell().getDisplay(), new Runnable() {
+		BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
 			public void run() {
 				IWorkbenchWindow[] windows = PTPDebugUIPlugin.getDefault().getWorkbench().getWorkbenchWindows();
 				IWorkbenchPage page = null;

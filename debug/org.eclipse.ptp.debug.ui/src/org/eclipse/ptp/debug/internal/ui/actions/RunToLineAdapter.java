@@ -33,8 +33,8 @@ import org.eclipse.debug.ui.actions.IRunToLineTarget;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
@@ -117,7 +117,7 @@ public class RunToLineAdapter implements IRunToLineTarget {
 		else {
 			errorMessage = ActionMessages.getString("RunToLineAdapter.Operation_is_not_supported_1");
 		}
-		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPDebugUIConstants.INTERNAL_ERROR, errorMessage, null));
+		throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, errorMessage, null));
 	}
 
 	public boolean canRunToLine(IWorkbenchPart part, ISelection selection, ISuspendResume target) {
@@ -185,8 +185,8 @@ public class RunToLineAdapter implements IRunToLineTarget {
 	}
 
 	protected void failed(Throwable e) {
-		MultiStatus ms = new MultiStatus(PTPDebugUIPlugin.getUniqueIdentifier(), IPTPDebugUIConstants.STATUS_CODE_ERROR, ActionMessages.getString("ResumeAtLineAdapter.4"), null);
-		ms.add(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPDebugUIConstants.STATUS_CODE_ERROR, e.getMessage(), e));
+		MultiStatus ms = new MultiStatus(PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.STATUS_CODE_ERROR, ActionMessages.getString("ResumeAtLineAdapter.4"), null);
+		ms.add(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IPTPUIConstants.STATUS_CODE_ERROR, e.getMessage(), e));
 		IStatusHandler handler = DebugPlugin.getDefault().getStatusHandler(ms);
 		if (handler != null) {
 			try {

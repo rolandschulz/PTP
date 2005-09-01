@@ -38,6 +38,8 @@ public class PDebugImage {
 	
     private static ImageRegistry imageRegistry = null;
     
+	public static final String ICON_ADD_VAR_NORMAL = "add_variable_normal.gif";
+	
 	public static final String ICON_RESUME_DISABLE = "resume_disable.gif";
 	public static final String ICON_RESUME_NORMAL = "resume_normal.gif";
 	public static final String ICON_SUSPEND_DISABLE = "suspend_disable.gif";
@@ -81,6 +83,8 @@ public class PDebugImage {
 	public static final String IMG_DEBUG_OVER_BPT_FUNC_EN = "function_ovr.gif";
 	public static final String IMG_DEBUG_OVER_BPT_FUNC_DI = "function_ovr_disabled.gif";
 	
+	public static final ImageDescriptor ID_ICON_ADD_VAR_NORMAL = createImageDescriptor(TOOLICONURL, ICON_ADD_VAR_NORMAL, ICON_ADD_VAR_NORMAL);
+
 	public static final ImageDescriptor ID_ICON_RESUME_DISABLE = createImageDescriptor(TOOLICONURL, ICON_RESUME_DISABLE, ICON_RESUME_DISABLE);
 	public static final ImageDescriptor ID_ICON_RESUME_NORMAL = createImageDescriptor(TOOLICONURL, ICON_RESUME_NORMAL, ICON_RESUME_NORMAL);
 	public static final ImageDescriptor ID_ICON_SUSPEND_DISABLE = createImageDescriptor(TOOLICONURL, ICON_SUSPEND_DISABLE, ICON_SUSPEND_DISABLE);

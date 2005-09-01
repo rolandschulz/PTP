@@ -44,8 +44,9 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 
 		IFolderLayout folder4= layout.createFolder("topRight", IPageLayout.RIGHT, (float)0.6, "topLeftUp");
 		folder4.addView(IDebugUIConstants.ID_BREAKPOINT_VIEW);
-		folder4.addView(IDebugUIConstants.ID_EXPRESSION_VIEW);
 		folder4.addView(IDebugUIConstants.ID_VARIABLE_VIEW);
+		folder4.addView(IPTPDebugUIConstants.VIEW_ARRAY);
+		folder4.addView(IDebugUIConstants.ID_EXPRESSION_VIEW);
 
 		IFolderLayout folder3= layout.createFolder("topLeftDown", IPageLayout.BOTTOM, (float)0.6, "topLeftUp");
 		folder3.addView(IDebugUIConstants.ID_DEBUG_VIEW);
@@ -56,21 +57,22 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 		// set toolbar or menu icon
 		layout.addActionSet(IDebugUIConstants.LAUNCH_ACTION_SET);
 
-		// views - build console
+		// views - short cut
 		layout.addShowViewShortcut(IConsoleConstants.ID_CONSOLE_VIEW);
-		
-		// views - searching
 		layout.addShowViewShortcut(NewSearchUI.SEARCH_VIEW_ID);
-		
-		// views - standard workbench
+		layout.addShowViewShortcut(IPTPDebugUIConstants.VIEW_PARALLELDEBUG);
+		layout.addShowViewShortcut(IPTPDebugUIConstants.VIEW_ARRAY);
+		layout.addShowViewShortcut(IDebugUIConstants.ID_BREAKPOINT_VIEW);
+		layout.addShowViewShortcut(IDebugUIConstants.ID_VARIABLE_VIEW);
+		layout.addShowViewShortcut(IDebugUIConstants.ID_DEBUG_VIEW);
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_PROBLEM_VIEW);
-		layout.addShowViewShortcut(IPTPDebugUIConstants.VIEW_PARALLELDEBUG);
 		//layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
 		layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
 
 		// link - things we should do
 		layout.addShowInPart(IPTPDebugUIConstants.VIEW_PARALLELDEBUG);
+		layout.addShowInPart(IPTPDebugUIConstants.VIEW_ARRAY);
 		//layout.addShowInPart(IPageLayout.ID_RES_NAV);
 	}
 }
