@@ -75,11 +75,11 @@ public class Target extends SessionObject implements IPCDITarget {
 	int targetId; /* synonymous with the process number/id */
 	IPCDIDebugProcess debugProcess;
 	
-	public Target(Session s, IDebugger debugger, int tId) {
-		super(s);
+	public Target(Session session, IDebugger debugger, int tId) {
+		super(session);
 		fDebugger = debugger;
 		targetId = tId;
-		debugProcess = s.getModelManager().getProcess(targetId);
+		debugProcess = session.getModelManager().getProcess(targetId);
 		
 		fConfiguration = new TargetConfiguration(this);
 		currentThreads = new Thread[0];
@@ -325,8 +325,6 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 
 	public ICDIExpression createExpression(String code) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.createExpression()");
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
 		return expMgr.createExpression(this, code);
 	}
@@ -432,6 +430,10 @@ public class Target extends SessionObject implements IPCDITarget {
 		System.out.println("Target.setSourcePaths()");
 	}
 
+	
+	
+	/* Unused methods, see org.eclipse.ptp.debug.external.cdi.Session */
+	
 	public ICDILineLocation createLineLocation(String file, int line) {
 		// Auto-generated method stub
 		System.out.println("Target.createLineLocation()");
