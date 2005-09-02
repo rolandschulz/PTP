@@ -43,23 +43,23 @@ public class LocalVariable extends Variable implements ICDILocalVariable {
 	 * @param obj
 	 * @param v
 	 */
-	public LocalVariable(LocalVariableDescriptor obj, String val) {
-		super(obj, val);
+	public LocalVariable(LocalVariableDescriptor obj) {
+		super(obj);
 	}
 
 	/**
 	 */
-	public LocalVariable(Target target, Thread thread, StackFrame frame, String n, String q,
-			int pos, int depth, String val) {
-		super(target, thread, frame, n, q, pos, depth, val);
+	public LocalVariable(Target target, Thread thread, StackFrame frame, String name, String fullName,
+			int pos, int depth) {
+		super(target, thread, frame, name, fullName, pos, depth);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.mi.core.cdi.model.Variable#createVariable(org.eclipse.cdt.debug.mi.core.cdi.model.Target, java.lang.String, java.lang.String, org.eclipse.cdt.debug.core.cdi.model.ICDIThread, org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame, int, int, org.eclipse.cdt.debug.mi.core.output.MIVar)
 	 */
 	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name,
-			String fullName, int pos, int depth, String varVal) {
-		return new LocalVariable(target, thread, frame, name, fullName, pos, depth, varVal);
+			String fullName, int pos, int depth) {
+		return new LocalVariable(target, thread, frame, name, fullName, pos, depth);
 	}
 
 }

@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
@@ -32,7 +31,6 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
@@ -119,40 +117,52 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		
 	}
 
-	public String evaluateExpression(IPCDIDebugProcessSet procs, ICDIVariable var) throws PCDIException {
+	public String evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws PCDIException {
 		String retVal = null;
 		IPCDIDebugProcess[] procList = procs.getProcesses();
 		for (int i = 0; i < procList.length; i++) {
-			//ICDITarget target = procList[i].getTarget();
-			int taskId = ((DebugProcess) procList[i]).getPProcess().getTaskId();
-			ICDITarget target = getSession().getTarget(taskId);
 			SimThread simThread = ((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0);
-			ICDIThread thread = new Thread((Target) target, simThread.getThreadId());
 			SimStackFrame[] simFrames = simThread.getStackFrames();
 			for (int j = 0; j < simFrames.length; j++) {
 				SimVariable[] args = simFrames[j].getArgs();
 				for (int k = 0; k < args.length; k++) {
 					String aName = args[k].getName();
 					String aVal = args[k].getValue();
-					try {
-						String qName = var.getQualifiedName();
-						if (aName.equals(qName))
-							return aVal;
-					} catch (CDIException e) {
-						throw new PCDIException(e.toString());
-					}
+					if (aName.equals(expr))
+						return aVal;
 				}
 				SimVariable[] local = simFrames[j].getLocalVars();
 				for (int k = 0; k < local.length; k++) {
 					String aName = local[k].getName();
 					String aVal = local[k].getValue();
-					try {
-						String qName = var.getQualifiedName();
-						if (aName.equals(qName))
-							return aVal;
-					} catch (CDIException e) {
-						throw new PCDIException(e.toString());
-					}
+					if (aName.equals(expr))
+						return aVal;
+				}
+			}
+		}
+		return retVal;
+	}
+	
+	public String getVariableType(IPCDIDebugProcessSet procs, String varName) throws PCDIException {
+		String retVal = null;
+		IPCDIDebugProcess[] procList = procs.getProcesses();
+		for (int i = 0; i < procList.length; i++) {
+			SimThread simThread = ((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0);
+			SimStackFrame[] simFrames = simThread.getStackFrames();
+			for (int j = 0; j < simFrames.length; j++) {
+				SimVariable[] args = simFrames[j].getArgs();
+				for (int k = 0; k < args.length; k++) {
+					String aName = args[k].getName();
+					String aType = args[k].getType();
+					if (aName.equals(varName))
+						return aType;
+				}
+				SimVariable[] local = simFrames[j].getLocalVars();
+				for (int k = 0; k < local.length; k++) {
+					String aName = local[k].getName();
+					String aType = local[k].getType();
+					if (aName.equals(varName))
+						return aType;
 				}
 			}
 		}
@@ -180,10 +190,9 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 					SimVariable[] args = simFrames[j].getArgs();
 					for (int k = 0; k < args.length; k++) {
 						String aName = args[k].getName();
-						String aVal = args[k].getValue();
 						Argument arg = new Argument((Target) target, (Thread) thread, 
 								(StackFrame) frame, aName, aName,
-								args.length - k, frame.getLevel(), null);
+								args.length - k, frame.getLevel());
 						list.add(arg);
 					}
 				}
@@ -213,10 +222,9 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 					SimVariable[] args = simFrames[j].getLocalVars();
 					for (int k = 0; k < args.length; k++) {
 						String aName = args[k].getName();
-						String aVal = args[k].getValue();
 						LocalVariable arg = new LocalVariable((Target) target, (Thread) thread, 
 								(StackFrame) frame, aName, aName,
-								args.length - k, frame.getLevel(), null);
+								args.length - k, frame.getLevel());
 						list.add(arg);
 					}
 				}
@@ -331,4 +339,5 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 			
 		// Do Something
 	}
+
 }

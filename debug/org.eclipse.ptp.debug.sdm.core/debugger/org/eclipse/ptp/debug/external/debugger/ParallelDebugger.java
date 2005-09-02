@@ -19,21 +19,20 @@
 
 package org.eclipse.ptp.debug.external.debugger;
 
+import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.debug.external.AbstractDebugger;
-import org.eclipse.ptp.debug.external.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.utils.Queue;
+import org.eclipse.ptp.debug.external.AbstractDebugger;
+import org.eclipse.ptp.debug.external.cdi.PCDIException;
 import org.eclipse.ptp.internal.core.CoreUtils;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 
 
 public class ParallelDebugger extends AbstractDebugger {
@@ -172,11 +171,20 @@ public class ParallelDebugger extends AbstractDebugger {
 	public void setCurrentStackFrame(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException {
 		
 	}
+	
 	/**
 	 * evaluate expression for first process in procs
 	 * TODO: extend to support multiple processes
 	 */
-	public String evaluateExpression(IPCDIDebugProcessSet procs, ICDIVariable var) throws PCDIException {
+	public String evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws PCDIException {
+		return null;
+	}
+	
+	/**
+	 * get variable type for first process in procs
+	 * TODO: extend to support multiple processes
+	 */
+	public String getVariableType(IPCDIDebugProcessSet procs, String varName) throws PCDIException {
 		return null;
 	}
 	

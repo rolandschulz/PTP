@@ -45,16 +45,12 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 	
 	Value value;
 	
-	String fValue;
-	
-	public Variable(VariableDescriptor obj, String val) {
+	public Variable(VariableDescriptor obj) {
 		super(obj);
-		fValue = val;
 	}
 
-	public Variable(Target target, Thread thread, StackFrame frame, String n, String q, int pos, int depth, String val) {
-		super(target, thread, frame, n, q, pos, depth);
-		fValue = val;
+	public Variable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth) {
+		super(target, thread, frame, name, fullName, pos, depth);
 	}
 	
 	public void setValue(ICDIValue value) throws CDIException {

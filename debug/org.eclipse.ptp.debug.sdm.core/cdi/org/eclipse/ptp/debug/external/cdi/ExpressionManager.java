@@ -92,7 +92,7 @@ public class ExpressionManager extends Manager {
 		// target.setCurrentThread(frame.getThread(), false);
 		// ((Thread)frame.getThread()).setCurrentStackFrame(frame, false);
 
-		Variable variable = new LocalVariable(target, null, frame, code, null, 0, 0, null);
+		Variable variable = new LocalVariable(target, null, frame, code, null, 0, 0);
 		return variable;
 	}
 }
