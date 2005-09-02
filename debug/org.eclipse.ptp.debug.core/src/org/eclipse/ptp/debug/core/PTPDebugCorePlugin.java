@@ -53,7 +53,7 @@ import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.ListenerList;
 import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
 import org.eclipse.ptp.debug.internal.core.SessionManager;
-import org.eclipse.ptp.debug.internal.core.breakpoints.PBreakpoint;
+import org.eclipse.ptp.debug.internal.core.breakpoint.PBreakpoint;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CommonSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.SourceUtils;

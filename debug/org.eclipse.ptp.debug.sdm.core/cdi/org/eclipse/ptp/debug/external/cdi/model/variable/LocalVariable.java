@@ -27,26 +27,39 @@
  * QNX Software Systems - Initial API and implementation
  ***********************************************************************/
 
-package org.eclipse.ptp.debug.external.cdi.model;
+package org.eclipse.ptp.debug.external.cdi.model.variable;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariableDescriptor;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
+import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
+import org.eclipse.ptp.debug.external.cdi.model.Target;
+import org.eclipse.ptp.debug.external.cdi.model.Thread;
 
 /**
- * LocalVariableDescriptor
+ * LocalVariable
  */
-public class LocalVariableDescriptor extends VariableDescriptor implements
-		ICDILocalVariableDescriptor {
+public class LocalVariable extends Variable implements ICDILocalVariable {
 
 	/**
-	 * @param target
-	 * @param n
-	 * @param fn
-	 * @param stack
-	 * @param pos
-	 * @param depth
+	 * @param obj
+	 * @param v
 	 */
-	public LocalVariableDescriptor(Target target, Thread thread, StackFrame frame, String n, String fn, int pos, int depth) {
-		super(target, thread, frame, n, fn, pos, depth);
+	public LocalVariable(LocalVariableDescriptor obj, String val) {
+		super(obj, val);
+	}
+
+	/**
+	 */
+	public LocalVariable(Target target, Thread thread, StackFrame frame, String n, String q,
+			int pos, int depth, String val) {
+		super(target, thread, frame, n, q, pos, depth, val);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.debug.mi.core.cdi.model.Variable#createVariable(org.eclipse.cdt.debug.mi.core.cdi.model.Target, java.lang.String, java.lang.String, org.eclipse.cdt.debug.core.cdi.model.ICDIThread, org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame, int, int, org.eclipse.cdt.debug.mi.core.output.MIVar)
+	 */
+	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name,
+			String fullName, int pos, int depth, String varVal) {
+		return new LocalVariable(target, thread, frame, name, fullName, pos, depth, varVal);
 	}
 
 }

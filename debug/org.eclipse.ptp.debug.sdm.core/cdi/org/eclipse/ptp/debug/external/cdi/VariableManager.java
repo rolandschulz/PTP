@@ -38,18 +38,18 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariableDescriptor;
 import org.eclipse.ptp.debug.external.IDebugger;
-import org.eclipse.ptp.debug.external.cdi.model.Argument;
-import org.eclipse.ptp.debug.external.cdi.model.ArgumentDescriptor;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
-import org.eclipse.ptp.debug.external.cdi.model.GlobalVariable;
-import org.eclipse.ptp.debug.external.cdi.model.GlobalVariableDescriptor;
-import org.eclipse.ptp.debug.external.cdi.model.LocalVariable;
-import org.eclipse.ptp.debug.external.cdi.model.LocalVariableDescriptor;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
-import org.eclipse.ptp.debug.external.cdi.model.Variable;
-import org.eclipse.ptp.debug.external.cdi.model.VariableDescriptor;
+import org.eclipse.ptp.debug.external.cdi.model.variable.Argument;
+import org.eclipse.ptp.debug.external.cdi.model.variable.ArgumentDescriptor;
+import org.eclipse.ptp.debug.external.cdi.model.variable.GlobalVariable;
+import org.eclipse.ptp.debug.external.cdi.model.variable.GlobalVariableDescriptor;
+import org.eclipse.ptp.debug.external.cdi.model.variable.LocalVariable;
+import org.eclipse.ptp.debug.external.cdi.model.variable.LocalVariableDescriptor;
+import org.eclipse.ptp.debug.external.cdi.model.variable.Variable;
+import org.eclipse.ptp.debug.external.cdi.model.variable.VariableDescriptor;
 
 /**
  */

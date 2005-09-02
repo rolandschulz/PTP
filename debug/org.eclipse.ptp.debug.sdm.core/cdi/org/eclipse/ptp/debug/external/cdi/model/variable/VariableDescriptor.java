@@ -26,7 +26,7 @@
  * Contributors:
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.cdi.model;
+package org.eclipse.ptp.debug.external.cdi.model.variable;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
@@ -36,6 +36,10 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
+import org.eclipse.ptp.debug.external.cdi.model.PTPObject;
+import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
+import org.eclipse.ptp.debug.external.cdi.model.Target;
+import org.eclipse.ptp.debug.external.cdi.model.Thread;
 import org.eclipse.ptp.debug.external.cdi.model.type.IncompleteType;
 import org.eclipse.ptp.debug.external.cdi.model.type.IntType;
 

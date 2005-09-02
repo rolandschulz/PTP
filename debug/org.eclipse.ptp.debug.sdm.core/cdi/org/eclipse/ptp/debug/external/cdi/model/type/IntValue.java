@@ -30,7 +30,7 @@
 package org.eclipse.ptp.debug.external.cdi.model.type;
 
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIIntValue;
-import org.eclipse.ptp.debug.external.cdi.model.Variable;
+import org.eclipse.ptp.debug.external.cdi.model.variable.Variable;
 
 /**
  */

@@ -104,7 +104,6 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 				dLaunch.addProcess(debuggerProcess);
 			}
 		} catch (CDIException e) {
-			
 		}
 		
 		/* Initially we only create process/target 0 */
@@ -124,7 +123,6 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 			return;
 		
 		Target target = new Target(this, debugger, procNum);
-
 		currentDebugTargetList.put(Integer.toString(target.getTargetId()), target);
 		
 		if (sendEvent) {
@@ -241,14 +239,10 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	}
 	
 	public void setAttribute(String key, String value) {
-		// Auto-generated method stub
-		System.out.println("Session.setAttribute()");
 		props.setProperty(key, value);
 	}
 
 	public String getAttribute(String key) {
-		// Auto-generated method stub
-		System.out.println("Session.getAttribute()");
 		return props.getProperty(key);
 	}
 
@@ -277,16 +271,11 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	}
 
 	public void terminate() throws CDIException {
-		// Auto-generated method stub
 		System.out.println("Session.terminate()");
-		
 		debugger.deleteDebuggerObserver(eventManager);
 	}
 
 	public Process getSessionProcess() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Session.getSessionProcess()");
-		
 		return debugger.getDebuggerProcess();
 	}
 

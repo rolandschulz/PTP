@@ -19,10 +19,10 @@ import java.util.Map;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
 import org.eclipse.ptp.debug.external.cdi.model.Expression;
-import org.eclipse.ptp.debug.external.cdi.model.LocalVariable;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
-import org.eclipse.ptp.debug.external.cdi.model.Variable;
+import org.eclipse.ptp.debug.external.cdi.model.variable.LocalVariable;
+import org.eclipse.ptp.debug.external.cdi.model.variable.Variable;
 
 /**
  */

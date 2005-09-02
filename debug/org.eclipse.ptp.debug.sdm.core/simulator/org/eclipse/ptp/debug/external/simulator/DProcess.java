@@ -20,18 +20,14 @@ package org.eclipse.ptp.debug.external.simulator;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 
 public class DProcess extends Process {
 	
 	boolean finished;
 	
-	DThread[] threads;
-	
 	InputStream err;
 	InputStream in;
 	OutputStream out;
-	
 	
 	int id;
 	String name;
@@ -50,11 +46,6 @@ public class DProcess extends Process {
 		name = nm;
 		commands = cmds;
 		
-		threads = new DThread[numThreads];
-		for (int i = 0; i < numThreads; i++) {
-			threads[i] = new DThread(i, pId, dD);
-		}
-		
 		err = null;
 		in = new DInputStream();
 		out = new DOutputStream();
@@ -63,22 +54,15 @@ public class DProcess extends Process {
 			public void run() {
 				while (true) {
 					try {
-						ArrayList command = (ArrayList) commands.removeItem();
+						String output = (String) commands.removeItem();
 						
-						String destination = (String) command.get(0);
-						String cmd = (String) command.get(1);
-						String arg = (String) command.get(2);
+						((DInputStream) in).printString(output);
 						
-						if (!destination.equals("-1")) {
-							threads[Integer.parseInt(destination)].runCommand((DInputStream) in, cmd, arg);
-						} else {
-							if (cmd.equals("sleep")) {
-								Thread.sleep(Integer.parseInt(arg));
-							} else if (cmd.equals("exitProcess")) {
-								break;
-							}
+						if (output.equals("exit")) {
+							break;
 						}
-						Thread.sleep(3000);
+						
+						//Thread.sleep(3000);
 					} catch (InterruptedException e) {
 					}
 				}
@@ -121,15 +105,4 @@ public class DProcess extends Process {
 		return out;
 	}
 
-	public DThread getThread(int tId) {
-		return threads[tId];
-	}
-	
-	public DThread[] getThreads() {
-		return threads;
-	}
-	
-	public int getThreadCount() {
-		return threads.length;
-	}
 }

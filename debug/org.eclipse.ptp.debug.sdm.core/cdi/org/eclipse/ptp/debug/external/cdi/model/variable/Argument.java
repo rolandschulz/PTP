@@ -26,9 +26,12 @@
  * Contributors:
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.cdi.model;
+package org.eclipse.ptp.debug.external.cdi.model.variable;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
+import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
+import org.eclipse.ptp.debug.external.cdi.model.Target;
+import org.eclipse.ptp.debug.external.cdi.model.Thread;
 
 /**
  */

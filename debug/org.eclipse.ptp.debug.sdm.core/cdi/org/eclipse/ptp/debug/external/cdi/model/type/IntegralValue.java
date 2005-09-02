@@ -33,8 +33,7 @@ import java.math.BigInteger;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIIntegralValue;
-import org.eclipse.ptp.debug.external.cdi.model.Value;
-import org.eclipse.ptp.debug.external.cdi.model.Variable;
+import org.eclipse.ptp.debug.external.cdi.model.variable.Variable;
 
 /**
  */

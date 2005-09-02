@@ -16,64 +16,37 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.simulator;
+package org.eclipse.ptp.debug.internal.core.breakpoint;
 
-public class DStackFrame {
+import java.text.MessageFormat;
+import java.util.Map;
 
-	int level;
-	String addr;
-	String func = ""; //$NON-NLS-1$
-	String file = ""; //$NON-NLS-1$
-	int line;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+
+/**
+ * @author Clement chu
+ *
+ */
+public class PLineBreakpoint extends AbstractLineBreakpoint {
+	private static final String P_LINE_BREAKPOINT = "org.eclipse.ptp.debug.core.pLineBreakpointMarker";
 	
-	DVariable[] args;
-	DVariable[] local;
+	public PLineBreakpoint() {
+	}
 	
-	public DStackFrame(int l, String iAddr, String iFunc, String iFile, int iLine) {
-		level = l;
-		addr = iAddr;
-		func = iFunc;
-		file = iFile;
-		line = iLine;
-		
-		args = new DVariable[2];
-		for (int i = 0; i < args.length; i++) {
-			args[i] = new DVariable("arg" + i, "rType", "" + 1000 + i);
+	public PLineBreakpoint(IResource resource, Map attributes, boolean add) throws CoreException {
+		super(resource, getMarkerType(), attributes, add);
+	}
+
+	public static String getMarkerType() {
+		return P_LINE_BREAKPOINT;
+	}
+
+	protected String getMarkerMessage() throws CoreException {
+		String fileName = ensureMarker().getResource().getName();
+		if (fileName != null && fileName.length() > 0) {
+			fileName = ' ' + fileName + ' ';
 		}
-		
-		local = new DVariable[2];
-		for (int i = 0; i < local.length; i++) {
-			local[i] = new DVariable("local" + i, "rType", "" + 2000 + i);
-		}
-
+		return MessageFormat.format(BreakpointMessages.getString("PLineBreakpoint"), new Object[] { getSetId(), fileName, new Integer( getLineNumber() ), getConditionText() });
 	}
-	
-	public int getLevel() {
-		return level;
-	}
-	
-	public String getFile() {
-		return file;
-	}
-
-	public String getFunction() {
-		return func;
-	}
-
-	public int getLine() {
-		return line;
-	}
-	
-	public String getAddress() {
-		return addr;
-	}
-	
-	public DVariable[] getArgs() {
-		return args;
-	}
-	
-	public DVariable[] getLocalVars() {
-		return local;
-	}
-
 }
