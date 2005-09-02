@@ -3,12 +3,19 @@ package org.eclipse.ptp.rtsystem.ompi;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
 
 public class OMPIMonitoringSystem implements IMonitoringSystem {
 
 	protected List listeners = new ArrayList(2);
+	
+	private OMPIJNIBroker jniBroker = null;
+
+	public OMPIMonitoringSystem(OMPIJNIBroker jniBroker) {
+		this.jniBroker = jniBroker;
+	}
 
 	public void addRuntimeListener(IRuntimeListener listener) {
 		listeners.add(listener);
@@ -69,13 +76,13 @@ public class OMPIMonitoringSystem implements IMonitoringSystem {
 				+ attrib + ") called");
 		String s = null;
 
-		if (attrib.equals("state")) {
+		if (attrib.equals(AttributeConstants.ATTRIB_NODE_STATE)) {
 			s = "down";
-		} else if (attrib.equals("mode")) {
+		} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_MODE)) {
 			s = "0100";
-		} else if (attrib.equals("user")) {
+		} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_USER)) {
 			s = "root";
-		} else if (attrib.equals("group")) {
+		} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_GROUP)) {
 			s = "root";
 		}
 		return s;

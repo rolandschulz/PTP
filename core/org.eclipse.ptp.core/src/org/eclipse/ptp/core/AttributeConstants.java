@@ -19,6 +19,17 @@
 package org.eclipse.ptp.core;
 
 public interface AttributeConstants {
+	
+	/* WARNING WARNING WARNING
+	 * 
+	 * If you change any of the string values in here you must change where they are used in the C 
+	 * code used by JNI (OMPI for example) as well.  We have no good way to define constants that
+	 * both Java and C can use - so these values (such as "ATTRIB_PROCESS_PID") exist identically
+	 * in the JNI code.  If you change it here, it must change there as well.
+	 * 
+	 * WARNING WARNING WARNING
+	 */
+	
 	public static final String ATTRIB_JOBID = "ATTRIB_JOBID";
 	
 	public static final String ATTRIB_PARENT = "ATTRIB_PARENT";
@@ -27,9 +38,17 @@ public interface AttributeConstants {
 	public static final String ATTRIB_TASKID = "ATTRIB_TASKID";
 	public static final String ATTRIB_ISREGISTERED = "ATTRIB_ISREGISTERED";
 	
+	/* node attributes */
 	public static final String ATTRIB_NODE_NUMBER = "ATTRIB_NODE_NUMBER";
 	public static final String ATTRIB_NODE_STATE = "ATTRIB_NODE_STATE";
 	public static final String ATTRIB_NODE_GROUP = "ATTRIB_NODE_GROUP";
 	public static final String ATTRIB_NODE_USER = "ATTRIB_NODE_USER";
 	public static final String ATTRIB_NODE_MODE = "ATTRIB_NODE_MODE";
+
+	/* process attributes */
+	public static final String ATTRIB_PROCESS_PID = "ATTRIB_PROCESS_PID";
+	public static final String ATTRIB_PROCESS_EXIT_CODE = "ATTRIB_PROCESS_EXIT_CODE";
+	public static final String ATTRIB_PROCESS_STATUS = "ATTRIB_PROCESS_STATUS";
+	public static final String ATTRIB_PROCESS_SIGNAL = "ATTRIB_PROCESS_SIGNAL";
+	public static final String ATTRIB_PROCESS_NODE_NAME = "ATTRIB_PROCESS_NODE_NAME";
 }

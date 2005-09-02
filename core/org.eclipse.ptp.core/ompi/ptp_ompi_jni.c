@@ -40,12 +40,12 @@ opal_mutex_t eclipse_orte_lock;
  **********************************************************************/
 
 JNIEXPORT jstring JNICALL
-Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIGetError(JNIEnv *env, jobject obj)
+Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIGetError(JNIEnv *env, jobject obj)
 {
     	return (*env)->NewStringUTF(env, error_msg);
 }
 
-JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIStartDaemon(JNIEnv *env, jobject obj, jstring jompi_bin_path, jstring jorted_path, jstring jorted_bin, jobjectArray array)
+JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIStartDaemon(JNIEnv *env, jobject obj, jstring jompi_bin_path, jstring jorted_path, jstring jorted_bin, jobjectArray array)
 {
     	char *orted_path, *orted_bin, *ompi_bin_path;
 	char **orted_args;
@@ -153,7 +153,7 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
  * returns -1 if there was some error of any kind - call OMPIGetError()
  *            to get the error string
  */
-JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIInit(JNIEnv *env, jobject obj)
+JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIInit(JNIEnv *env, jobject obj)
 {
     	int rc, id;
 
@@ -198,7 +198,7 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPI
 }
 
 JNIEXPORT void JNICALL 
-Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIFinalize(JNIEnv *env, jobject obj) 
+Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIFinalize(JNIEnv *env, jobject obj) 
 {
     	printf("JNI (C) OMPI: OMPIFinalize()\n");
 	fflush(stdout);
@@ -211,7 +211,7 @@ Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIFinalize(JNIEnv *env, j
 }
 
 JNIEXPORT void JNICALL 
-Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIProgress(JNIEnv *env, jobject obj) 
+Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIProgress(JNIEnv *env, jobject obj) 
 {
     	printf("JNI (C) OMPI: OMPIProgress() starting . . .\n");
 	fflush(stdout);
@@ -234,7 +234,7 @@ Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIProgress(JNIEnv *env, j
 }
 
 JNIEXPORT void JNICALL 
-Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPITerminateJob(JNIEnv *env, jobject obj, jint jjobid)
+Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPITerminateJob(JNIEnv *env, jobject obj, jint jjobid)
 {
     	int jobid;
 
@@ -257,7 +257,7 @@ Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPITerminateJob(JNIEnv *en
  *   integer represents the OMPI JobID of the created parallel job
  */
 JNIEXPORT jint JNICALL 
-Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIRun(JNIEnv *env, jobject obj, jobjectArray array)
+Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIRun(JNIEnv *env, jobject obj, jobjectArray array)
 {
 	printf("JNI (C) OMPI: OMPIRun() starting . . .\n");
 	fflush(stdout);
@@ -301,7 +301,7 @@ Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIRun(JNIEnv *env, jobjec
 }
 
 JNIEXPORT void JNICALL 
-Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIShutdown(JNIEnv *env, jobject obj)
+Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIShutdown(JNIEnv *env, jobject obj)
 {
     	int ret;
 
@@ -310,6 +310,80 @@ Java_org_eclipse_ptp_rtsystem_ompi_OMPIControlSystem_OMPIShutdown(JNIEnv *env, j
     	ptp_ompi_sendcmd(ORTE_DAEMON_EXIT_CMD);
 }
 
+/* PROCESS/JOB MONITORING */
+JNIEXPORT jobjectArray JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIGetJobs (JNIEnv *env, jobject obj)
+{
+}
+
+JNIEXPORT jobjectArray JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIGetProcesses (JNIEnv *env, jobject obj, jstring jjobName)
+{
+	char *jobName;
+
+	jobName = (char *)(*env)->GetStringUTFChars(env, jjobName, NULL);
+
+	(*env)->ReleaseStringUTFChars(env, jjobName, jobName);
+}
+
+JNIEXPORT jstring JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIGetProcessesAttribute (JNIEnv *env, jobject obj, jstring jprocName, jstring jattrib)
+{
+	char *procName, *attrib;
+	char value[256];
+
+	procName = (char *)(*env)->GetStringUTFChars(env, jprocName, NULL);
+	attrib = (char *)(*env)->GetStringUTFChars(env, jattrib, NULL);
+
+	(*env)->ReleaseStringUTFChars(env, jprocName, procName);
+	(*env)->ReleaseStringUTFChars(env, jattrib, attrib);
+
+	if(!strcmp(attrib, "ATTRIB_NODE_STATE")) {
+	    snprintf(value, 256, "down");
+	} else if(!strcmp(attrib, "ATTRIB_NODE_MODE")) {
+	    snprintf(value, 256, "0100");
+	} else if(!strcmp(attrib, "ATTRIB_NODE_USER")) {
+	    snprintf(value, 256, "root");
+	} else if(!strcmp(attrib, "ATTRIB_NODE_GROUP")) {
+	    snprintf(value, 256, "root");
+	} else {
+	    return NULL;
+	}
+
+	return ((*env)->NewStringUTF(env, value));
+}
+
+/* NODE/MACHINE MONITORING */
+JNIEXPORT jstring JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIGetMachines (JNIEnv *env, jobject obj)
+{
+}
+
+JNIEXPORT jobjectArray JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIGetNodes (JNIEnv *env, jobject obj, jstring jmachineName)
+{
+	char *machineName;
+
+	machineName = (char *)(*env)->GetStringUTFChars(env, jmachineName, NULL);
+
+	(*env)->ReleaseStringUTFChars(env, jmachineName, machineName);
+}
+
+JNIEXPORT jstring JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIGetNodeMachineName (JNIEnv *env, jobject obj, jstring jnodeName)
+{
+	char *nodeName;
+
+	nodeName = (char *)(*env)->GetStringUTFChars(env, jnodeName, NULL);
+
+	(*env)->ReleaseStringUTFChars(env, jnodeName, nodeName);
+}
+
+JNIEXPORT jstring JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIGetNodeAttribute (JNIEnv *env, jobject obj, jstring jnodeName, jstring jattrib)
+{ 
+	char *nodeName, *attrib;
+
+	nodeName = (char *)(*env)->GetStringUTFChars(env, jnodeName, NULL);
+	attrib = (char *)(*env)->GetStringUTFChars(env, jattrib, NULL);
+
+	(*env)->ReleaseStringUTFChars(env, jnodeName, nodeName);
+	(*env)->ReleaseStringUTFChars(env, jattrib, attrib);
+}
+  
 /**********************************************************************
  * THE FUNCTIONS THAT DO THE ACTUAL WORK
  *********************************************************************/

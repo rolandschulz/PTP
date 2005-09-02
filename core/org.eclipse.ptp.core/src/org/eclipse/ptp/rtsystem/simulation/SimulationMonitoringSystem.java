@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
@@ -205,13 +206,13 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 
 	public String getNodeAttribute(String nodeName, String attrib) {
 		String s = null;
-		if (attrib.equals("state")) {
+		if (attrib.equals(AttributeConstants.ATTRIB_NODE_STATE)) {
 			s = (String) nodeStateMap.get(nodeName);
-		} else if (attrib.equals("mode")) {
+		} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_MODE)) {
 			s = (String) nodeModeMap.get(nodeName);
-		} else if (attrib.equals("user")) {
+		} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_USER)) {
 			s = (String) nodeUserMap.get(nodeName);
-		} else if (attrib.equals("group")) {
+		} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_GROUP)) {
 			s = (String) nodeGroupMap.get(nodeName);
 		}
 		return s;

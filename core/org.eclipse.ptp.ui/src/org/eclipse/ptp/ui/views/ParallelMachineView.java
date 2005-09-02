@@ -122,6 +122,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	public ParallelMachineView() {
 		instance = this;
 		manager = PTPUIPlugin.getDefault().getMachineManager();
+		System.out.println("MachineView started");
 	}
 	
 	public MachineManager getMachineManager() {

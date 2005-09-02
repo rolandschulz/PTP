@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -46,38 +47,17 @@ public class OMPIControlSystem implements IControlSystem {
 	private Vector knownJobs = null;
 	
 	protected List listeners = new ArrayList(2);
+	
+	private OMPIJNIBroker jniBroker = null;
 
-	public OMPIControlSystem() {
-		System.out.println("JAVA OMPI: constructor called");
+	public OMPIControlSystem(OMPIJNIBroker jniBroker) {
+		this.jniBroker = jniBroker;
 	}
 	
-	public native String OMPIGetError();
-	public native int OMPIInit();
-	public native int OMPIStartDaemon(String ompi_bin_path, String orted_path, String orted_bin, String[] args);
-	public native void OMPIShutdown();
-	public native void OMPIFinalize();
-	public native void OMPIProgress();
-	public native int OMPIRun(String[] args);
-	public native void OMPITerminateJob(int jobID);
-	
-	private static int failed_load = 0;
-	
-	static {
-        try { 
-        		System.loadLibrary("ptp_ompi_jni");
-        } catch(UnsatisfiedLinkError e) {
-        		String str = "Unable to load library 'ptp_ompi_jni'.  Make sure "+
-        				"the library exists and the VM arguments point to the directory where "+
-        				"it resides.  In the 'Run...' set the VM Args to something like "+
-        				"-Djava.library.path=[home directory]/[eclipse workspace]/org.eclipse.ptp.core/ompi";
-        		System.err.println(str);
-        		CoreUtils.showErrorDialog("Dynamic Library Load Failed", str, null);
-        		failed_load = 1;
-        }
-    }
+	private boolean failed_init = false;
 	
 	public void startup() {
-		if(failed_load == 1) {
+		if(!jniBroker.libraryLoaded()) {
 			System.err.println("Unable to startup OMPI Control System because of a failed "+
 					"library load.");
 			return;
@@ -110,17 +90,17 @@ public class OMPIControlSystem implements IControlSystem {
 			System.out.println("["+x+"] = "+split_path[x]);
 		
 		/* start the daemon using JNI */
-		OMPIStartDaemon(ompi_bin_path, orted_path, split_path[split_path.length - 1], split_args);
+		jniBroker.OMPIStartDaemon(ompi_bin_path, orted_path, split_path[split_path.length - 1], split_args);
 		
 		/* start the daemon using Java */
 		//OMPIStartORTEd(orted_full);
 		
-		int rc = OMPIInit();
+		int rc = jniBroker.OMPIInit();
 		System.out.println("OMPI Init() return code = "+rc);
 		if(rc != 0) {
-			String error_msg = OMPIGetError();
+			String error_msg = jniBroker.OMPIGetError();
 			CoreUtils.showErrorDialog("OMPI Runtime Initialization Error", error_msg, null);
-			failed_load = 1;
+			failed_init = true;
 			return;
 		}
 
@@ -141,19 +121,19 @@ public class OMPIControlSystem implements IControlSystem {
 				"are correct.";
 			System.err.println(err);
 			CoreUtils.showErrorDialog("Failed to Spawn ORTED", err, null);
-			failed_load = 1;
+			failed_init = true;
 		}
 	}
     
 	public void startProgressMaker() {
-		if(failed_load == 1) {
+		if(!jniBroker.libraryLoaded()) {
 			System.err.println("Unable to startup OMPI Control System because of a failed "+
 					"library load.");
 			return;
 		}
 		Thread progressThread = new Thread("PTP RTE OMPI Progress Thread") {
 			public void run() {
-				OMPIProgress();
+				jniBroker.OMPIProgress();
 			}
 		};
 		progressThread.start();
@@ -173,10 +153,10 @@ public class OMPIControlSystem implements IControlSystem {
 		args[5] = ""+jobRunConfig.getNumberOfProcessesPerNode()+"";
 		args[6] = "firstNodeNumber";
 		args[7] = ""+jobRunConfig.getFirstNodeNumber()+"";
-		jobID = OMPIRun(args);
+		jobID = jniBroker.OMPIRun(args);
 		if(jobID == -1) {
 			/* error occurred */
-			String error_msg = OMPIGetError();
+			String error_msg = jniBroker.OMPIGetError();
 			CoreUtils.showErrorDialog("OMPI Parallel Run/Spawn Error", error_msg, null);
 			return null;
 		}
@@ -203,7 +183,7 @@ public class OMPIControlSystem implements IControlSystem {
 		}
 		if(jobID >= 0) {
 			System.out.println("JAVA OMPI: abortJob() with name "+job.toString()+" and ID "+jobID);
-			OMPITerminateJob(jobID);
+			jniBroker.OMPITerminateJob(jobID);
 		}
 		else {
 			System.err.println("ERROR: Tried to abort a null job.");
@@ -234,45 +214,25 @@ public class OMPIControlSystem implements IControlSystem {
 		ne[0] = new String("job0_process0");
 		return ne;
 	}
-
-	public String getProcessNodeName(String procName) {
-		System.out.println("JAVA OMPI: getProcessNodeName(" + procName
-				+ ") called");
-
-		/* check if procName is a valid process name */
-
-		return "machine0_node0";
-	}
-
-	public String getProcessStatus(String procName) {
-		System.out.println("JAVA OMPI: getProcessStatus(" + procName
-				+ ") called");
-
-		/* check is procName is a valid process name */
-
-		return "-1";
-	}
-
-	public String getProcessExitCode(String procName) {
-		System.out.println("JAVA OMPI: getProcessExitCode(" + procName
-				+ ") called");
-
-		/* check if procName is a valid process name */
-
-		return "-1";
-	}
-
-	public String getProcessSignal(String procName) {
-		System.out.println("JAVA OMPI: getProcessSignal(" + procName
-				+ ") called");
-
-		/* check is procName is a valid process name */
-
-		return "-1";
-	}
 	
-	public int getProcessPID(String procName) {
-		return ((int)(Math.random() * 10000)) + 1000;
+	public String getProcessAttribute(String procName, String attrib)
+	{
+		System.out.println("JAVA OMPI: getProcessAttribute(" + procName + ", "
+				+ attrib + ") called");
+		String s = null;
+
+		if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_PID)) {
+			s = ""+((int)(Math.random() * 10000)) + 1000+"";
+		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_EXIT_CODE)) {
+			s = "-1";
+		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_SIGNAL)) {
+			s = "-1";
+		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_STATUS)) {
+			s = "-1";
+		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_NODE_NAME)) {
+			s = "machine0_node0";
+		}
+		return s;
 	}
 
 	public void addRuntimeListener(IRuntimeListener listener) {
@@ -310,7 +270,7 @@ public class OMPIControlSystem implements IControlSystem {
 	}
 
 	public void shutdown() {
-		if(failed_load == 1) {
+		if(!jniBroker.libraryLoaded()) {
 			System.err.println("Unable to startup OMPI Control System because of a failed "+
 					"library load.");
 			return;
@@ -318,10 +278,10 @@ public class OMPIControlSystem implements IControlSystem {
 		System.out.println("JAVA OMPI: shutdown() called");
 		
 		/* shutdown/kill the ORTE daemon */
-		OMPIShutdown();
+		jniBroker.OMPIShutdown();
 		
 		/* finalize the registry - yes, it's odd it is in this order */
-		OMPIFinalize();
+		jniBroker.OMPIFinalize();
 		
 		/*
 		if(orted_process != null) {

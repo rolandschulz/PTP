@@ -34,16 +34,8 @@ public interface IControlSystem {
 	public String[] getJobs();
 
 	public String[] getProcesses(String jobName);
-
-	public String getProcessNodeName(String procName);
 	
-	public String getProcessStatus(String procName);
-
-	public String getProcessExitCode(String procName);
-
-	public String getProcessSignal(String procName);
-	
-	public int getProcessPID(String procName);
+	public String getProcessAttribute(String procName, String attrib);
 
 	/* event stuff */
 	public void addRuntimeListener(IRuntimeListener listener);
