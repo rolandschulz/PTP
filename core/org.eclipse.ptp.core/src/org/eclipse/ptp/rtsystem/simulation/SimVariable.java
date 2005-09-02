@@ -37,4 +37,8 @@ public class SimVariable {
 	public String getValue() {
 		return vValue;
 	}
+	
+	public String getType() {
+		return vType;
+	}
 }

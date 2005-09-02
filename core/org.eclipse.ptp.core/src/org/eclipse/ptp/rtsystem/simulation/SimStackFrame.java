@@ -38,12 +38,12 @@ public class SimStackFrame {
 		
 		args = new SimVariable[2];
 		for (int i = 0; i < args.length; i++) {
-			args[i] = new SimVariable("arg" + i, "rType", "" + 1000 + i);
+			args[i] = new SimVariable("arg" + i, "int", "" + 1000 + i);
 		}
 		
 		local = new SimVariable[2];
 		for (int i = 0; i < local.length; i++) {
-			local[i] = new SimVariable("local" + i, "rType", "" + 2000 + i);
+			local[i] = new SimVariable("local" + i, "int", "" + 2000 + i);
 		}
 
 	}

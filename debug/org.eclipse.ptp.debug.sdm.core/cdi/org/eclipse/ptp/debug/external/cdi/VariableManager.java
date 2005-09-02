@@ -148,7 +148,7 @@ public class VariableManager extends Manager {
 		ICDILocalVariable[] vars = debugger.listLocalVariables(newSet, frame);
 		for (int i = 0; i < vars.length; i++) {
 			if (varDesc.getName().equals(vars[i].getName()))
-				return new LocalVariable(varDesc, vars[i].getValue().getValueString());
+				return new LocalVariable(varDesc);
 		}
 		throw new CDIException(CDIResources.getString("cdi.VariableManager.Unknown_variable_object")); //$NON-NLS-1$
 	}
@@ -163,7 +163,7 @@ public class VariableManager extends Manager {
 		ICDIGlobalVariable[] vars = debugger.listGlobalVariables(newSet);
 		for (int i = 0; i < vars.length; i++) {
 			if (varDesc.getName().equals(vars[i].getName()))
-				return new GlobalVariable(varDesc, vars[i].getValue().getValueString());
+				return new GlobalVariable(varDesc);
 		}
 		throw new CDIException(CDIResources.getString("cdi.VariableManager.Unknown_variable_object")); //$NON-NLS-1$
 	}
@@ -178,7 +178,7 @@ public class VariableManager extends Manager {
 		ICDIArgument[] vars = debugger.listArguments(newSet, frame);
 		for (int i = 0; i < vars.length; i++) {
 			if (argDesc.getName().equals(vars[i].getName()))
-				return new Argument(argDesc, vars[i].getValue().getValueString());
+				return new Argument(argDesc);
 		}
 		throw new CDIException(CDIResources.getString("cdi.VariableManager.Unknown_variable_object")); //$NON-NLS-1$
 	}

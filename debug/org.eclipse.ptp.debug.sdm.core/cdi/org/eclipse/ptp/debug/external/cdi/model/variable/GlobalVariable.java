@@ -26,8 +26,8 @@ public class GlobalVariable extends Variable implements ICDIGlobalVariable {
 	 * @param obj
 	 * @param v
 	 */
-	public GlobalVariable(VariableDescriptor obj, String val) {
-		super(obj, val);
+	public GlobalVariable(VariableDescriptor obj) {
+		super(obj);
 	}
 
 	/**
@@ -40,14 +40,14 @@ public class GlobalVariable extends Variable implements ICDIGlobalVariable {
 	 * @param depth
 	 * @param v
 	 */
-	public GlobalVariable(Target target, Thread thread, StackFrame frame, String n, String q, int pos, int depth, String v) {
-		super(target, thread, frame, n, q, pos, depth, v);
+	public GlobalVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth) {
+		super(target, thread, frame, name, fullName, pos, depth);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.debug.mi.core.cdi.model.Variable#createVariable(org.eclipse.cdt.debug.mi.core.cdi.model.Target, java.lang.String, java.lang.String, org.eclipse.cdt.debug.core.cdi.model.ICDIThread, org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame, int, int, org.eclipse.cdt.debug.mi.core.output.MIVar)
 	 */
-	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, String miVar) {
-		return new GlobalVariable(target, thread, frame, name, fullName, pos, depth, miVar);
+	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth) {
+		return new GlobalVariable(target, thread, frame, name, fullName, pos, depth);
 	}
 }

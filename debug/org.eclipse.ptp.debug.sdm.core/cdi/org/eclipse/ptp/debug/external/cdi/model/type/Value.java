@@ -70,9 +70,7 @@ public class Value extends PTPObject implements ICDIValue {
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
 		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
-		String valString = debugger.evaluateExpression(newSet, variable);
-
-		return valString;
+		return debugger.evaluateExpression(newSet, variable.getName());
 	}
 
 	public int getChildrenNumber() throws CDIException {
