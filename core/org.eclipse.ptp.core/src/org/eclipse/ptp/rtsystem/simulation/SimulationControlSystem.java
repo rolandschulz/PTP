@@ -206,7 +206,7 @@ public class SimulationControlSystem implements IControlSystem {
 	 * assumes a certain number of jobs with a set number of processes in each
 	 * job
 	 */
-	public String getProcessNodeName(String procName) {
+	private String getProcessNodeName(String procName) {
 		// System.out.println("getProcessNodeName("+procName+")");
 		String job = procName.substring(0, procName.indexOf("process") - 1);
 
@@ -229,7 +229,7 @@ public class SimulationControlSystem implements IControlSystem {
 		return "";
 	}
 
-	public String getProcessStatus(String procName) {
+	private String getProcessStatus(String procName) {
 		String job = procName.substring(0, 4);
 		for(int i=0; i<simJobs.size(); i++) {
 			SimJobState ss = (SimJobState)simJobs.elementAt(i);
@@ -240,7 +240,7 @@ public class SimulationControlSystem implements IControlSystem {
 		return "-1";
 	}
 
-	public String getProcessExitCode(String procName) {
+	private String getProcessExitCode(String procName) {
 		String job = procName.substring(0, 4);
 		for(int i=0; i<simJobs.size(); i++) {
 			SimJobState ss = (SimJobState)simJobs.elementAt(i);
@@ -251,7 +251,7 @@ public class SimulationControlSystem implements IControlSystem {
 		return "-1";
 	}
 
-	public String getProcessSignal(String procName) {
+	private String getProcessSignal(String procName) {
 		String job = procName.substring(0, 4);
 		for(int i=0; i<simJobs.size(); i++) {
 			SimJobState ss = (SimJobState)simJobs.elementAt(i);
@@ -262,8 +262,24 @@ public class SimulationControlSystem implements IControlSystem {
 		return "-1";
 	}
 	
-	public int getProcessPID(String procName) {
-		return ((int)(Math.random() * 10000)) + 1000;
+	public String getProcessAttribute(String procName, String attrib)
+	{
+		System.out.println("JAVA OMPI: getProcessAttribute(" + procName + ", "
+				+ attrib + ") called");
+		String s = null;
+
+		if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_PID)) {
+			s = ""+((int)(Math.random() * 10000)) + 1000+"";
+		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_EXIT_CODE)) {
+			s = getProcessExitCode(procName);
+		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_SIGNAL)) {
+			s = getProcessSignal(procName);
+		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_STATUS)) {
+			s = getProcessStatus(procName);
+		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_NODE_NAME)) {
+			s = getProcessNodeName(procName);
+		}
+		return s;
 	}
 
 	public void addRuntimeListener(IRuntimeListener listener) {

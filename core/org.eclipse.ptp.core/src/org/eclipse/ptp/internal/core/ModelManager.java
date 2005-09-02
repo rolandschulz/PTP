@@ -57,6 +57,7 @@ import org.eclipse.ptp.rtsystem.IRuntimeListener;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.NamedEntity;
 import org.eclipse.ptp.rtsystem.ompi.OMPIControlSystem;
+import org.eclipse.ptp.rtsystem.ompi.OMPIJNIBroker;
 import org.eclipse.ptp.rtsystem.ompi.OMPIMonitoringSystem;
 import org.eclipse.ptp.rtsystem.simulation.SimProcess;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
@@ -130,8 +131,9 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		else if(ID == MonitoringSystemChoices.ORTE) {
 			universe = new PUniverse();
 			/* load up the control and monitoring systems for OMPI */
-			monitoringSystem = new OMPIMonitoringSystem();
-			controlSystem = new OMPIControlSystem();
+			OMPIJNIBroker jnibroker = new OMPIJNIBroker();
+			monitoringSystem = new OMPIMonitoringSystem(jnibroker);
+			controlSystem = new OMPIControlSystem(jnibroker);
 			monitoringSystem.startup();
 			controlSystem.startup();
 			setupMS();
@@ -159,19 +161,20 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			String[] ne2 = monitoringSystem.getNodes(ne[i]);
 			for (int j = 0; j < ne2.length; j++) {
 				PNode node;
+				System.out.println("\tNODE: "+j);
 				node = new PNode(mac, ne2[j], "" + j + "", j);
 				node.setAttrib(AttributeConstants.ATTRIB_NODE_USER, 
 						monitoringSystem.getNodeAttribute(ne2[j],
-						"user"));
+						AttributeConstants.ATTRIB_NODE_USER));
 				node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP, 
 						monitoringSystem.getNodeAttribute(ne2[j],
-						"group"));
+						AttributeConstants.ATTRIB_NODE_GROUP));
 				node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, 
 						monitoringSystem.getNodeAttribute(ne2[j],
-						"state"));
+						AttributeConstants.ATTRIB_NODE_STATE));
 				node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE, 
 						monitoringSystem.getNodeAttribute(ne2[j],
-						"mode"));
+						AttributeConstants.ATTRIB_NODE_MODE));
 
 				mac.addChild(node);
 			}
@@ -210,7 +213,12 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			IPProcess proc;
 			// System.out.println("process name = "+ne[j]);
 			
-			int pid = controlSystem.getProcessPID(ne[j]);
+			String pids = controlSystem.getProcessAttribute(ne[j], AttributeConstants.ATTRIB_PROCESS_PID);
+			int pid = -1;
+			try {
+				pid = (Integer.valueOf(pids)).intValue();
+			} catch(Exception e) {
+			}
 			
 			if (controlSystem instanceof SimulationControlSystem)
 				proc = new SimProcess(job, ne[j], "" + j + "", "" + pid + "", j, "-1", "", "");
@@ -220,7 +228,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			job.addChild(proc);
 
 			String pname = proc.getElementName();
-			String nname = controlSystem.getProcessNodeName(pname);
+			String nname = controlSystem.getProcessAttribute(pname, AttributeConstants.ATTRIB_PROCESS_NODE_NAME);
 			String mname = monitoringSystem.getNodeMachineName(nname);
 			// System.out.println("Process "+pname+" running on node:");
 			// System.out.println("\t"+nname);
@@ -239,7 +247,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					proc.setNode(node);
 				}
 			}
-			String status = controlSystem.getProcessStatus(ne[j]);
+			String status = controlSystem.getProcessAttribute(ne[j], AttributeConstants.ATTRIB_PROCESS_STATUS);
 			proc.setStatus(status);
 		}
 	}
@@ -252,12 +260,12 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			if (procs != null) {
 				for (int i = 0; i < procs.length; i++) {
 					String procName = procs[i].getElementName();
-					String status = controlSystem.getProcessStatus(procName);
+					String status = controlSystem.getProcessAttribute(procName, AttributeConstants.ATTRIB_PROCESS_STATUS);
 					// System.out.println("Status = "+status+" on process -
 					// "+procName);
 					procs[i].setStatus(status);
-					String signal = controlSystem.getProcessSignal(procName);
-					String exitCode = controlSystem.getProcessExitCode(procName);
+					String signal = controlSystem.getProcessAttribute(procName, AttributeConstants.ATTRIB_PROCESS_SIGNAL);
+					String exitCode = controlSystem.getProcessAttribute(procName, AttributeConstants.ATTRIB_PROCESS_EXIT_CODE);
 					if (!signal.equals(""))
 						procs[i].setSignalName(signal);
 					if (!exitCode.equals(""))
