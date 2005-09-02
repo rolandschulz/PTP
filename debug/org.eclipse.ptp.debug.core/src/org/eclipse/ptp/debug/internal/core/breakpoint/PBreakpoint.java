@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.breakpoints;
+package org.eclipse.ptp.debug.internal.core.breakpoint;
 
 import java.text.MessageFormat;
 import java.util.Arrays;

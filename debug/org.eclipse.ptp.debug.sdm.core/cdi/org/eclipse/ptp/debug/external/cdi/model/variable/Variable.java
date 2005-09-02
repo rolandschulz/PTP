@@ -26,66 +26,77 @@
  * Contributors:
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.cdi.model;
+package org.eclipse.ptp.debug.external.cdi.model.variable;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
+import org.eclipse.cdt.debug.core.cdi.model.type.ICDIIntType;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
-import org.eclipse.ptp.debug.external.IDebugger;
-import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
+import org.eclipse.ptp.debug.external.cdi.model.Target;
+import org.eclipse.ptp.debug.external.cdi.model.Thread;
+import org.eclipse.ptp.debug.external.cdi.model.type.IntValue;
+import org.eclipse.ptp.debug.external.cdi.model.type.Value;
 
 /**
  */
-public class Value extends PTPObject implements ICDIValue {
-
-	protected Variable variable;
-
-	public Value(Variable v) {
-		super((Target)v.getTarget());
-		variable = v;
+public abstract class Variable extends VariableDescriptor implements ICDIVariable {
+	
+	Value value;
+	
+	String fValue;
+	
+	public Variable(VariableDescriptor obj, String val) {
+		super(obj);
+		fValue = val;
 	}
 
-	public String getTypeName() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Value.getTypeName()");
-		return variable.getTypeName();
+	public Variable(Target target, Thread thread, StackFrame frame, String n, String q, int pos, int depth, String val) {
+		super(target, thread, frame, n, q, pos, depth);
+		fValue = val;
 	}
-
-	public ICDIType getType() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Value.getType()");
-		return variable.getType();
+	
+	public void setValue(ICDIValue value) throws CDIException {
+		System.out.println("Variable.setValue()");
 	}
-
-	public String getValueString() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Value.getValueString()");
-
-		Target target = (Target) variable.getTarget();
-		Session session = (Session) target.getSession();
-		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
-		String valString = debugger.evaluateExpression(newSet, variable);
-
-		return valString;
+	
+	public void setValue(String expression) throws CDIException {
+		System.out.println("Variable.setValue()");
 	}
-
-	public int getChildrenNumber() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Value.getChildrenNumber()");
-		return 0;
+	
+	public ICDIValue getValue() throws CDIException {
+		System.out.println("Variable.getValue()");
+		if (value == null) {
+			ICDIType t = getType();
+			if (t instanceof ICDIIntType) {
+				value = new IntValue(this);
+			} else {
+				value = new Value(this);
+			}
+		}
+		return value;
 	}
-
-	public boolean hasChildren() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Value.hasChildren()");
+	
+	public boolean isEditable() throws CDIException {
+		System.out.println("Variable.isEditable()");
 		return false;
 	}
+	
+	public void setFormat(int format) throws CDIException {
+		System.out.println("Variable.setFormat()");
+	}
+	
+	public boolean equals(ICDIVariable var) {
+		System.out.println("Variable.equals()");
+		if (var instanceof Variable) {
+			Variable variable = (Variable) var;
+			return fName.equals(variable.fName);
+		}
+		return super.equals(var);
+	}
 
-	public ICDIVariable[] getVariables() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Value.getVariables()");
-		return null;
+	public void dispose() throws CDIException {
+		System.out.println("Variable.dispose()");
 	}
 }

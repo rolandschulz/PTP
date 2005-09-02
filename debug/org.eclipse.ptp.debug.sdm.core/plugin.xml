@@ -10,16 +10,15 @@
    <runtime>
       <library name="ptpdebugexternal.jar">
          <export name="org.eclipse.ptp.debug.external.*"/>
-         <export name="org.eclipse.ptp.debug.external.actionpoint.*"/>
          <export name="org.eclipse.ptp.debug.external.cdi.*"/>
+         <export name="org.eclipse.ptp.debug.external.cdi.breakpoints.*"/>
          <export name="org.eclipse.ptp.debug.external.cdi.event.*"/>
          <export name="org.eclipse.ptp.debug.external.cdi.model.*"/>
-         <export name="org.eclipse.ptp.debug.external.event.*"/>
-         <export name="org.eclipse.ptp.debug.external.model.*"/>
-         <export name="org.eclipse.ptp.debug.external.simulator.*"/>
-         <export name="org.eclipse.ptp.debug.external.utils.*"/>
-         <export name="org.eclipse.ptp.debug.external.variable.*"/>
          <export name="org.eclipse.ptp.debug.external.cdi.model.type.*"/>
+         <export name="org.eclipse.ptp.debug.external.cdi.model.variable.*"/>
+         <export name="org.eclipse.ptp.debug.external.debugger.*"/>
+         <export name="org.eclipse.ptp.debug.external.simulator.*"/>
+         <export name="org.eclipse.ptp.debug.external.ui.*"/>
       </library>
    </runtime>
 

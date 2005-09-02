@@ -61,7 +61,7 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
-import org.eclipse.ptp.debug.internal.core.breakpoints.PLineBreakpoint;
+import org.eclipse.ptp.debug.internal.core.breakpoint.PLineBreakpoint;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
 
 /**

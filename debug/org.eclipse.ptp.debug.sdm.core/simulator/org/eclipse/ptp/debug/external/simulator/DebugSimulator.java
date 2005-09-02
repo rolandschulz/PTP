@@ -43,14 +43,14 @@ import org.eclipse.ptp.debug.external.cdi.breakpoints.FunctionBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
-import org.eclipse.ptp.debug.external.cdi.model.Argument;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
-import org.eclipse.ptp.debug.external.cdi.model.LocalVariable;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
+import org.eclipse.ptp.debug.external.cdi.model.variable.Argument;
+import org.eclipse.ptp.debug.external.cdi.model.variable.LocalVariable;
 import org.eclipse.ptp.rtsystem.simulation.SimProcess;
 import org.eclipse.ptp.rtsystem.simulation.SimStackFrame;
 import org.eclipse.ptp.rtsystem.simulation.SimThread;
@@ -66,36 +66,19 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 	
 	private Process debuggerProcess = null;
 	
-	DQueue debuggerCommands = null;
+	DQueue debuggerOutput = null;
 	
 	private void initializeSimulatedProcessesCode(DQueue dQ) {
-		ArrayList cmd, cmd2;
-		
-		cmd = new ArrayList();
-		cmd.add(0, "0");
-		cmd.add(1, "print");
-		cmd.add(2, "DebuggerOutput");
-		
-		cmd2 = new ArrayList();
-		cmd2.add(0, "-1");
-		cmd2.add(1, "sleep");
-		cmd2.add(2, "10000");
-
-		dQ.addItem(cmd);
-		for (int i = 0; i < 30; i++) {
-			dQ.addItem(cmd2);
-		}
+		dQ.addItem("DEBUG SIMULATOR");
+		dQ.addItem("Look at this console window for output from the Debug Simulator");
+		dQ.addItem("  ");
 	}
 	
 	protected void startDebugger(IPJob job) {
 		state = SUSPENDED;
-		debuggerCommands = new DQueue();
-		initializeSimulatedProcessesCode(debuggerCommands);
-		debuggerProcess = new DProcess("Debugger", -1, 1, debuggerCommands, this);
-		
-		
-		
-		
+		debuggerOutput = new DQueue();
+		initializeSimulatedProcessesCode(debuggerOutput);
+		debuggerProcess = new DProcess("Debugger", -1, 1, debuggerOutput, this);
 	}
 	
 	protected void stopDebugger() {
@@ -339,9 +322,11 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 			LineBreakpoint bpt = new LineBreakpoint(ICDIBreakpoint.REGULAR, loc, null);
 			procs[procId].setStatus(IPProcess.STOPPED);
 			fireEvent(new BreakpointHitEvent(getSession(), new DebugProcessSet(session, procId), bpt));
+			debuggerOutput.addItem("BreakpointHit Event for " + procId);
 		} else if (event.equals("RESUMED")) {
 			procs[procId].setStatus(IPProcess.RUNNING);
 			fireEvent(new InferiorResumedEvent(getSession(), new DebugProcessSet(session, procId)));
+			debuggerOutput.addItem("InferiorResumed Event for " + procId);
 		}
 			
 		// Do Something

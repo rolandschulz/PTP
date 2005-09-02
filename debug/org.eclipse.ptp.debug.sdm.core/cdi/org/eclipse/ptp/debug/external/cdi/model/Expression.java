@@ -18,6 +18,7 @@ import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
 import org.eclipse.ptp.debug.external.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.model.type.IntType;
+import org.eclipse.ptp.debug.external.cdi.model.variable.Variable;
 
 /**
  */
