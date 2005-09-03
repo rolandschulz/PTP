@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.dialogs;
 
-import org.eclipse.cdt.debug.core.model.ICVariable;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IVariable;
@@ -31,6 +30,7 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public class ArrayVariableDialog extends VariableDialog {
+	private static String ARRAY_TAG = "[";
 	
 	public ArrayVariableDialog(Shell parent, IStackFrame frame) {
 		super(parent, frame);
@@ -53,10 +53,7 @@ public class ArrayVariableDialog extends VariableDialog {
 		}
 		
 		private boolean isArray(IVariable variable) throws DebugException {
-			if (variable instanceof ICVariable) {
-				return ((ICVariable)variable).getType().isArray();
-			}
-			return false;
+			return (variable.getReferenceTypeName().indexOf(ARRAY_TAG)>-1);
 		}
 	}
 }

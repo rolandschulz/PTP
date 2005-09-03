@@ -41,6 +41,7 @@ public abstract class PTabItem {
 	protected CTabItem tabItem = null;
 	protected PageBook fPageBook = null;
 	protected TextViewer fTextViewer = null;
+	protected boolean displayError = false;
 	
 	public PTabItem(CTabFolder folder) {
 		this(folder, "");
@@ -48,11 +49,15 @@ public abstract class PTabItem {
 	public PTabItem(CTabFolder folder, String tabName) {
 		tabItem = new CTabItem(folder, SWT.CLOSE);
 		tabItem.setText(tabName);
+		tabItem.setToolTipText(tabName);
 		tabItem.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent event) {
 				dispose();
 			}
 		});
+	}
+	public CTabItem getTabItem() {
+		return tabItem;
 	}
 	public void setControl() {
 	    tabItem.setControl(createControl(tabItem.getParent()));		
@@ -79,9 +84,11 @@ public abstract class PTabItem {
 		}
 	}
 	public void displayError(DebugException e) {
+		displayError = true;
 		StyledText styleText = fTextViewer.getTextWidget();
 		if (styleText != null)
 			styleText.setText("Error: " + e.getMessage());
+
 		fPageBook.showPage(fTextViewer.getControl());
 		clearContext();
 	}

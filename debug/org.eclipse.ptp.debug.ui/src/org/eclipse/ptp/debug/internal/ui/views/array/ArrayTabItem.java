@@ -21,10 +21,17 @@ package org.eclipse.ptp.debug.internal.ui.views.array;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IValue;
+import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.ptp.debug.internal.ui.views.PTabItem;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -46,43 +53,90 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public class ArrayTabItem extends PTabItem {
 	private final int MAX_CHECKED = 2;
+	private final int TABLE_COL_INDEX = 0;
+	private final int TABLE_ROW_INDEX = 1;
 	private SashForm sashForm = null;
 	private Table colTable = null;
 	private Table rowTable = null;
 	private ScrolledComposite tableSC = null;
+	private ScrolledComposite comboSC = null;
 	private List selectedButtons = new ArrayList(2);
 	private Combo[] comboBoxes = new Combo[0];
-	private int[] array = new int[0];
+	private IVariable variable = null;
 
 	public ArrayTabItem(ArrayView view, String tabText) {
 		super(view.getTabFolder(), tabText);
+		setControl();
 	}
 	
-	public void setArray(int[] array) {
-		this.array = array;
+	public void init(final IVariable variable) {
+		this.variable = variable;
+		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+			public void run() {
+				try {
+					List varList = new ArrayList();
+					setVariables(varList, variable.getValue());
+					setupComboBoxes((Integer[])varList.toArray(new Integer[varList.size()]));
+				} catch (DebugException e) {
+					displayError(e);
+				}
+			}
+		});
+	}
+	
+	public void setVariables(List varList, IValue value) throws DebugException {		
+		if (value.hasVariables()) {
+			IVariable[] vars = value.getVariables();
+			varList.add(new Integer(vars.length));
+			setVariables(varList, vars[0].getValue());
+		}
 	}
 	
 	protected void dispose() {
-		disposeTable();
-		selectedButtons.clear();
+		clearContext();
+		variable = null;
+		comboBoxes = new Combo[0];
 	}
 	protected void clearContext() {
-		if (!colTable.isDisposed())
-			colTable.removeAll();
+		disposeTable(true);
+		selectedButtons.clear();
 	}
 
 	public void displayTab() {
-		fPageBook.showPage(sashForm);
+		if (displayError == false)		
+			fPageBook.showPage(sashForm);
 	}
 	
 	public void createTabPage(Composite parent) {
 		sashForm = new SashForm(parent, SWT.HORIZONTAL);
 		sashForm.setLayout(new FillLayout(SWT.VERTICAL));
 		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
-		
 		createComboBoxes(sashForm);
 		createTableComposite(sashForm);
 		sashForm.setWeights(new int[] { 2,5 });
+	}
+	public void createComboBoxes(Composite parent) {
+		comboSC = new ScrolledComposite(parent, SWT.V_SCROLL);
+		Composite comboComp = new Composite(comboSC, SWT.NONE);
+		comboComp.setLayout(new GridLayout(2, false));
+		comboComp.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
+		comboSC.setContent(comboComp);
+		comboSC.setExpandVertical(true);
+	    comboSC.setExpandHorizontal(true);
+	}
+	protected void createTableComposite(Composite parent) {
+		tableSC = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+		Composite tableComp = new Composite(tableSC, SWT.NONE);
+		GridLayout layout = new GridLayout(2, false);
+		layout.verticalSpacing = 0;
+		layout.horizontalSpacing = 0;
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		tableComp.setLayout(layout);
+		tableComp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		tableSC.setContent(tableComp);
+		tableSC.setExpandVertical(true);
+	    tableSC.setExpandHorizontal(true);
 	}
 	protected void createRowTable(Composite parent) {
 		TableLayout tableLayout = new TableLayout();
@@ -109,30 +163,20 @@ public class ArrayTabItem extends PTabItem {
 		colTable.setHeaderVisible(true);
 		colTable.setLinesVisible(true);		
 	}
-	protected void createTableComposite(Composite parent) {
-		tableSC = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
-		Composite tableComp = new Composite(tableSC, SWT.NONE);
-		GridLayout layout = new GridLayout(2, false);
-		layout.verticalSpacing = 0;
-		layout.horizontalSpacing = 0;
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		tableComp.setLayout(layout);
-		tableComp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		tableSC.setContent(tableComp);
-		tableSC.setExpandVertical(true);
-	    tableSC.setExpandHorizontal(true);
-	}
-	public void disposeTable() {
+	public void disposeTable(boolean resetAll) {
 		if (colTable != null && !colTable.isDisposed()) {
 			colTable.removeAll();
-			colTable.dispose();
-			colTable = null;
+			if (resetAll) {
+				colTable.dispose();
+				colTable = null;
+			}
 		}
 		if (rowTable != null && !rowTable.isDisposed()) {
-			rowTable.removeAll();
-			rowTable.dispose();
-			rowTable = null;
+			if (resetAll) {
+				rowTable.removeAll();
+				rowTable.dispose();
+				rowTable = null;
+			}
 		}
 	}
 	public void createTable(int row, int col) {
@@ -142,35 +186,64 @@ public class ArrayTabItem extends PTabItem {
 		fillColumnHeaders(col);
 	}
 	
-	public void freshTable() {
-		disposeTable();
-		if (!selectedButtons.isEmpty())
-			createTable(getRow(), getColumn());			
+	public void updateTable(final boolean resetAll) {
+		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+			public void run() {
+				disposeTable(resetAll);
+				if (!selectedButtons.isEmpty()) {
+					int rowIndex = getRowIndex();
+					int colIndex = getColumnIndex();
+					int row = rowIndex==-1?1:comboBoxes[rowIndex].getItemCount();
+					int col = colIndex==-1?1:comboBoxes[colIndex].getItemCount();
+					if (resetAll)
+						createTable(row, col);
 
-		tableSC.setMinSize(tableSC.getContent().computeSize(SWT.DEFAULT, SWT.DEFAULT));
+					try {
+						for (int i=0; i<row; i++) {
+							TableItem item = new TableItem(colTable, SWT.NONE);
+							for (int j=0; j<col; j++) {
+								item.setText(j, getValueString(rowIndex, i, colIndex, j));
+							}
+						}
+					} catch (DebugException e) {
+						displayError(e);
+					}
+				}
+				if (resetAll)
+					tableSC.setMinSize(tableSC.getContent().computeSize(SWT.DEFAULT, SWT.DEFAULT));
+			}
+		});
 	}
-	public int getRow() {
-		if (selectedButtons.size() > 1) {
-			Button button = (Button)selectedButtons.get(1);
-			return comboBoxes[((Integer)button.getData()).intValue()].getItemCount();
-		}
-		return 1;
+	public int getRowIndex() {
+		return getIndex(TABLE_ROW_INDEX);
 	}
-	public int getColumn() {
-		if (selectedButtons.size() > 0) {
-			Button button = (Button)selectedButtons.get(0);
-			return comboBoxes[((Integer)button.getData()).intValue()].getItemCount();
+	public int getColumnIndex() {
+		return getIndex(TABLE_COL_INDEX);
+	}
+	public int getIndex(int index) {
+		if (selectedButtons.size() > index) {
+			Button button = (Button)selectedButtons.get(index);
+			return ((Integer)button.getData()).intValue();
 		}
-		return 1;
+		return -1;
 	}
 	
-	public void fillTable(int row, int col) {
-		for (int i=0; i<row; i++) {
-			TableItem item = new TableItem(colTable, SWT.NONE);
-			for (int j=0; j<col; j++) {
-				item.setText(j, "(" + i + "," + j + ")");
+	public String getValueString(int rowIndex, int row, int colIndex, int col) throws DebugException {
+		IVariable var = variable;
+		for (int i=0; i<comboBoxes.length; i++) {
+			IVariable[] vars = var.getValue().getVariables();
+			if (vars.length == 0)
+				throw new DebugException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No Value found", null));
+			
+			if (i == rowIndex)
+				var = vars[row];
+			else if (i == colIndex)
+				var = vars[col];
+			else {
+				var = vars[comboBoxes[i].getSelectionIndex()];
 			}
 		}
+		return var.getValue().getValueString();
 	}
 	public void fillRowHeaders(int row) {
 		TableItem item = null;
@@ -190,20 +263,14 @@ public class ArrayTabItem extends PTabItem {
 		}
 	}
 	
-	public void createComboBoxes(Composite parent) {
-		ScrolledComposite sc = new ScrolledComposite(parent, SWT.V_SCROLL);
-		Composite comboComp = new Composite(sc, SWT.NONE);
-		comboComp.setLayout(new GridLayout(2, false));
-		comboComp.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
-		sc.setContent(comboComp);
-		sc.setExpandVertical(true);
-	    sc.setExpandHorizontal(true);
-
+	public void setupComboBoxes(Integer[] vars) {
+		selectedButtons.clear();
+		Composite comboComp = (Composite)comboSC.getContent();
 	    Button button = null;
-	    comboBoxes = new Combo[array.length];
-	    for (int i=0; i<array.length; i++) {
-	    	int total = array[i];
+	    comboBoxes = new Combo[vars.length];
+	    for (int i=0; i<vars.length; i++) {
 	    	button = new Button(comboComp, SWT.CHECK);
+	    	int total = vars[i].intValue();
 	    	button.setText((i+1) + ":");
 	    	button.setData(new Integer(i));
 	    	button.addSelectionListener(new SelectionAdapter() {
@@ -221,12 +288,12 @@ public class ArrayTabItem extends PTabItem {
 		    }
 		    comboBoxes[i].addSelectionListener(new SelectionAdapter() {
 		    	public void widgetSelected(SelectionEvent e) {
-
+		    		updateTable(false);
 		    	}
 		    });
 		    comboBoxes[i].select(0);
 	    }
-	    sc.setMinSize(comboComp.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+	    comboSC.setMinSize(comboComp.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 	
 	protected void checkSelected(Button button) {
@@ -242,6 +309,6 @@ public class ArrayTabItem extends PTabItem {
 			}
 			selectedButtons.add(button);
 		}
-		freshTable();
+		updateTable(true);
 	}
 }

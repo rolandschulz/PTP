@@ -18,9 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.views.array;
 
-import org.eclipse.cdt.debug.core.model.ICType;
-import org.eclipse.cdt.debug.core.model.ICVariable;
-import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.debug.internal.ui.actions.AddVariableAction;
 import org.eclipse.ptp.debug.internal.ui.views.PTabFolder;
@@ -36,16 +34,11 @@ public class ArrayView extends PTabFolder {
 	}
 	
 	public void createTabItem(String tabName, Object selection) {
-		ArrayTabItem item = new ArrayTabItem(this, tabName);
-		if (selection instanceof ICVariable) {
-			try {
-				ICType type = ((ICVariable)selection).getType();
-				type.getArrayDimensions();
-			} catch (DebugException e) {
-				
-			}
+		if (selection instanceof IVariable) {
+			ArrayTabItem item = new ArrayTabItem(this, tabName);
+			item.init((IVariable)selection);
+			item.displayTab();
+ 			folder.setSelection(item.getTabItem());
 		}
-		item.setControl();
-		item.displayTab();
 	}
 }
