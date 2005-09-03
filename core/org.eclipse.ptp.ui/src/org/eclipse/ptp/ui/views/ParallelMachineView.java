@@ -32,14 +32,12 @@ import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -61,9 +59,18 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	//selected element
 	protected String cur_selected_element_id = "";
 	
-	//table
+	//composite
+	protected SashForm sashForm = null;
+	protected Composite elementViewComposite = null;
+	protected Composite infoComposite = null;
 	protected Table BLtable = null;
 	protected Table BRtable = null;
+	
+	//view flag
+	public static final String BOTH_VIEW = "0";
+	public static final String MACHINE_VIEW = "1";
+	public static final String INFO_VIEW = "2";
+	protected String current_view = BOTH_VIEW;	
 
 	public static Image[][] nodeImages = {
 		{
@@ -122,11 +129,29 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	public ParallelMachineView() {
 		instance = this;
 		manager = PTPUIPlugin.getDefault().getMachineManager();
-		System.out.println("MachineView started");
 	}
 	
 	public MachineManager getMachineManager() {
 		return (MachineManager)manager;
+	}
+	
+	public void changeView(String view_flag) {
+		current_view = view_flag;
+		if (current_view.equals(ParallelMachineView.MACHINE_VIEW)) {
+			elementViewComposite.setVisible(true);
+			infoComposite.setVisible(false);
+			sashForm.setWeights(new int[] { 1, 0 });
+		}
+		else if (current_view.equals(ParallelMachineView.INFO_VIEW)) {
+			elementViewComposite.setVisible(false);
+			infoComposite.setVisible(true);
+			sashForm.setWeights(new int[] { 0, 1 });
+		}
+		else {
+			elementViewComposite.setVisible(true);
+			infoComposite.setVisible(true);
+			sashForm.setWeights(new int[] { 3, 1 });
+		}
 	}
 	
 	protected void initElementAttribute() {
@@ -159,38 +184,28 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	}
 	
 	protected void createView(Composite parent) {
-		Composite composite = createElementView(parent);
-		createLowerTextRegions(composite);
+		parent.setLayout(new FillLayout(SWT.VERTICAL));
+		parent.setLayoutData(new GridData(GridData.FILL_BOTH));
+		
+		sashForm = new SashForm(parent, SWT.VERTICAL);
+		sashForm.setLayout(new FillLayout(SWT.HORIZONTAL));
+		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		elementViewComposite = createElementView(sashForm);
+		infoComposite = createLowerTextRegions(sashForm);
+		changeView(current_view);
 	}
 	
-	protected void createLowerTextRegions(Composite parent) {
-		FormLayout layout = new FormLayout();
-		parent.setLayout(layout);
-
-		/* setup the form layout for the top 'node area' box */
-		FormData compositeData = new FormData();
-		compositeData.top = new FormAttachment(0);
-		compositeData.left = new FormAttachment(0);
-		compositeData.right = new FormAttachment(100);
-		compositeData.bottom = new FormAttachment(65);
-		sc.setLayoutData(compositeData);
-
-		/* setup the form data for the text area */
-		FormData bottomData = new FormData();
-		bottomData.left = new FormAttachment(0);
-		bottomData.right = new FormAttachment(100);
-		bottomData.bottom = new FormAttachment(100);
-		bottomData.top = new FormAttachment(sc, 20);
-
-		Composite bottomOut = new Composite(parent, SWT.BORDER);
-		bottomOut.setLayout(new FillLayout());
-		bottomOut.setLayoutData(bottomData);
+	protected Composite createLowerTextRegions(Composite parent) {
+		Composite composite = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout(2, true);
+		layout.verticalSpacing = 0;
+		layout.horizontalSpacing = 0;
+		composite.setLayout(layout);
+		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		/* inner bottom composite - this one uses a grid layout */
-		Composite bottom = new Composite(bottomOut, SWT.NONE);
-		bottom.setLayout(new GridLayout(2, true));
-
-		Group bleft = new Group(bottom, SWT.BORDER);
+		Group bleft = new Group(composite, SWT.BORDER);
 		bleft.setLayout(new FillLayout());
 		GridData gdtext = new GridData(GridData.FILL_BOTH);
 		gdtext.grabExcessVerticalSpace = true;
@@ -200,7 +215,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		bleft.setLayoutData(gdtext);
 		bleft.setText("Node Info");
 
-		Group bright = new Group(bottom, SWT.BORDER);
+		Group bright = new Group(composite, SWT.BORDER);
 		bright.setLayout(new FillLayout());
 		GridData gdlist = new GridData(GridData.FILL_BOTH);
 		gdlist.grabExcessVerticalSpace = true;
@@ -236,6 +251,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 				}
 			}
 		});
+		return composite;
 	}
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
 		changeMachineAction = new ChangeMachineAction(this);

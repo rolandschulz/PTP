@@ -199,7 +199,6 @@ public class ParallelJobView extends AbstractParallelSetView {
 
 		elementViewComposite = createElementView(sashForm);
 		changeView(current_view);
-		//sashForm.setWeights(new int[] { 1, 2 });
 	}
 	
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
