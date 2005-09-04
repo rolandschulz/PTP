@@ -2180,11 +2180,11 @@ public class GnuMakefileGenerator implements IManagedBuilderMakefileGenerator {
 		// No duplicates in a makefile.  If we already have this rule, return
 		if (getRuleList().contains(buildRule)) {
 			//  TODO:  Should we assert that this is a pattern rule?
-			return;
+// CER - always calculate per file dependencies			return;
 		}
 		else {
 			getRuleList().add(buildRule);
-		}
+// CER don't end rule yet		}
 		
 		// Echo starting message
 		buffer.append(buildRule + NEWLINE);
@@ -2285,7 +2285,8 @@ public class GnuMakefileGenerator implements IManagedBuilderMakefileGenerator {
 		buffer.append(TAB + AT + ECHO + WHITESPACE + SINGLE_QUOTE + MESSAGE_FINISH_FILE + WHITESPACE + IN_MACRO + SINGLE_QUOTE + NEWLINE);
 		buffer.append(TAB + AT + ECHO + WHITESPACE + SINGLE_QUOTE + WHITESPACE + SINGLE_QUOTE + NEWLINE + NEWLINE);
 
-
+		} // CER - always calculate per file dependencies
+		
 		//  Add separate dependency lines per file if necessary
 		boolean addedDepLines = false; 
 		if (depGen != null && depGen.getCalculatorType() != IManagedDependencyGenerator.TYPE_COMMAND) { 
@@ -2512,7 +2513,8 @@ public class GnuMakefileGenerator implements IManagedBuilderMakefileGenerator {
 			IResource[] res = depGen.findDependencies(resource, project);
 			for (int i=0; i<res.length; i++) {
 				IPath dep = res[i].getProjectRelativePath();
-				deps.add(dep);
+				IPath src = dep.removeFirstSegments(dep.segmentCount() - 1);
+				deps.add(src);
 			}
 			break;
 			
