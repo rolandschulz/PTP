@@ -18,20 +18,28 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.views.array;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.TableLayout;
+import org.eclipse.jface.window.Window;
+import org.eclipse.ptp.debug.internal.ui.dialogs.RangeDialog;
 import org.eclipse.ptp.debug.internal.ui.views.PTabItem;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -63,6 +71,12 @@ public class ArrayTabItem extends PTabItem {
 	private List selectedButtons = new ArrayList(2);
 	private Combo[] comboBoxes = new Combo[0];
 	private IVariable variable = null;
+	private int startRow = 0;
+	private int startCol = 0;
+	private int endRow = 0;
+	private int endCol = 0;
+	private int totalRow = 0;
+	private int totalCol = 0;
 
 	public ArrayTabItem(ArrayView view, String tabText) {
 		super(view.getTabFolder(), tabText);
@@ -71,17 +85,29 @@ public class ArrayTabItem extends PTabItem {
 	
 	public void init(final IVariable variable) {
 		this.variable = variable;
-		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-			public void run() {
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor pmonitor) throws CoreException {
+				if (pmonitor == null)
+					pmonitor = new NullProgressMonitor();
+				
+				pmonitor.beginTask(MessageFormat.format("{0}", new String[]{ ArrayMessages.getString("ArrayTabItem.initVariable")}), 10);
 				try {
 					List varList = new ArrayList();
 					setVariables(varList, variable.getValue());
-					setupComboBoxes((Integer[])varList.toArray(new Integer[varList.size()]));
+					pmonitor.worked(3);
+					setupComboBoxes((Integer[])varList.toArray(new Integer[varList.size()]), pmonitor);
 				} catch (DebugException e) {
 					displayError(e);
+				} finally {
+					pmonitor.done();
 				}
 			}
-		});
+		};
+		try {
+			ResourcesPlugin.getWorkspace().run(runnable, null);
+		} catch(CoreException e) {
+			displayError(e);
+		}
 	}
 	
 	public void setVariables(List varList, IValue value) throws DebugException {		
@@ -113,7 +139,7 @@ public class ArrayTabItem extends PTabItem {
 		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
 		createComboBoxes(sashForm);
 		createTableComposite(sashForm);
-		sashForm.setWeights(new int[] { 2,5 });
+		sashForm.setWeights(new int[] { 2,7 });
 	}
 	public void createComboBoxes(Composite parent) {
 		comboSC = new ScrolledComposite(parent, SWT.V_SCROLL);
@@ -179,40 +205,70 @@ public class ArrayTabItem extends PTabItem {
 			}
 		}
 	}
-	public void createTable(int row, int col) {
+	public void createTable(int sRow, int eRow, int sCol, int eCol) {
 		createRowTable((Composite)tableSC.getContent());
 		createColumnTable((Composite)tableSC.getContent());
-		fillRowHeaders(row);
-		fillColumnHeaders(col);
+		fillRowHeaders(sRow, eRow);
+		fillColumnHeaders(sCol, eCol);
 	}
 	
-	public void updateTable(final boolean resetAll) {
-		BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-			public void run() {
-				disposeTable(resetAll);
-				if (!selectedButtons.isEmpty()) {
-					int rowIndex = getRowIndex();
-					int colIndex = getColumnIndex();
-					int row = rowIndex==-1?1:comboBoxes[rowIndex].getItemCount();
-					int col = colIndex==-1?1:comboBoxes[colIndex].getItemCount();
-					if (resetAll)
-						createTable(row, col);
-
-					try {
-						for (int i=0; i<row; i++) {
-							TableItem item = new TableItem(colTable, SWT.NONE);
-							for (int j=0; j<col; j++) {
-								item.setText(j, getValueString(rowIndex, i, colIndex, j));
+	public void updateTable(boolean resetAll) {
+		disposeTable(resetAll);
+		if (selectedButtons.isEmpty())
+			return;
+		
+		int rowIndex = getRowIndex();
+		int colIndex = getColumnIndex();
+		totalRow = rowIndex==-1?1:comboBoxes[rowIndex].getItemCount();
+		totalCol = colIndex==-1?1:comboBoxes[colIndex].getItemCount();
+		if (resetAll) {
+			RangeDialog rangeDialog = new RangeDialog(tableSC.getShell(), totalRow, totalCol);
+			if (rangeDialog.open(rowIndex>-1, colIndex>-1, startRow, endRow, startCol, endCol) == Window.CANCEL)
+				return;
+			
+			startRow = rangeDialog.getFromRow();
+			endRow = rangeDialog.getToRow();
+			startCol = rangeDialog.getFromCol();
+			endCol = rangeDialog.getToCol();
+			createTable(startRow, endRow, startCol, endCol);
+			tableSC.setMinSize(tableSC.getContent().computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		}
+		updateTableContent(rowIndex, colIndex);
+	}
+	private void updateTableContent(final int rowIndex, final int colIndex) {
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor pmonitor) throws CoreException {
+				if (pmonitor == null)
+					pmonitor = new NullProgressMonitor();
+				
+				pmonitor.beginTask(MessageFormat.format("{0}", new String[]{ ArrayMessages.getString("ArrayTabItem.updateTable")}), (endRow - startRow) * (endCol - startCol));
+				try {
+					for (int i=startRow; i<endRow; i++) {
+						TableItem item = new TableItem(colTable, SWT.NONE);
+						int colPos = 0;
+						for (int j=startCol; j<endCol; j++) {
+							if (pmonitor.isCanceled()) {
+								disposeTable(true);
+								return;
 							}
+							item.setText(colPos++, getValueString(rowIndex, i, colIndex, j));
+							pmonitor.worked(1);
 						}
-					} catch (DebugException e) {
-						displayError(e);
 					}
+				} catch (DebugException e) {
+					displayError(e);
+					return;
+				} finally {
+					pmonitor.subTask(ArrayMessages.getString("ArrayTabItem.done"));
+					pmonitor.done();
 				}
-				if (resetAll)
-					tableSC.setMinSize(tableSC.getContent().computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
-		});
+		};
+		try {
+			ResourcesPlugin.getWorkspace().run(runnable, null);
+		} catch(CoreException e) {
+			displayError(e);
+		}
 	}
 	public int getRowIndex() {
 		return getIndex(TABLE_ROW_INDEX);
@@ -239,31 +295,32 @@ public class ArrayTabItem extends PTabItem {
 				var = vars[row];
 			else if (i == colIndex)
 				var = vars[col];
-			else {
+			else
 				var = vars[comboBoxes[i].getSelectionIndex()];
-			}
 		}
 		return var.getValue().getValueString();
 	}
-	public void fillRowHeaders(int row) {
+	public void fillRowHeaders(int sRow, int eRow) {
 		TableItem item = null;
-		for (int i=0; i<row; i++) {
+		for (int i=sRow; i<eRow; i++) {
 			item = new TableItem(rowTable, SWT.NONE);
 			item.setText(""+i);
 		}
-		rowTable.getColumn(0).setWidth(getTextSize(rowTable, ""+row).x - 3);
+		rowTable.getColumn(0).setWidth(getTextSize(rowTable, ""+eRow).x - 2);
 	}
-	public void fillColumnHeaders(int col) {
-		TableColumn[] columns = new TableColumn[col];
+	public void fillColumnHeaders(int sCol, int eCol) {
 		TableColumn column = null;
-		for (int i=0; i<columns.length; i++) {
+		for (int i=sCol; i<eCol; i++) {
 			column = new TableColumn(colTable, SWT.CENTER);
 			column.setText(""+i);
 			column.setWidth(30);
 		}
 	}
 	
-	public void setupComboBoxes(Integer[] vars) {
+	public void setupComboBoxes(Integer[] vars, IProgressMonitor monitor) {
+		monitor.subTask(ArrayMessages.getString("ArrayTabItem.initCombobox"));
+		SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, vars.length);
+		
 		selectedButtons.clear();
 		Composite comboComp = (Composite)comboSC.getContent();
 	    Button button = null;
@@ -283,16 +340,23 @@ public class ArrayTabItem extends PTabItem {
 		    });
 	    	comboBoxes[i] = new Combo(comboComp, SWT.READ_ONLY);
 	    	comboBoxes[i].setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
+
+	    	monitor.subTask(ArrayMessages.getString("ArrayTabItem.creatingCombobox"));
+			SubProgressMonitor subTotalMonitor = new SubProgressMonitor(subMonitor, total);
 		    for (int j=0; j<total; j++) {
 		    	comboBoxes[i].add(""+j);
+		    	subTotalMonitor.worked(1);
 		    }
+		    subTotalMonitor.done();
 		    comboBoxes[i].addSelectionListener(new SelectionAdapter() {
 		    	public void widgetSelected(SelectionEvent e) {
 		    		updateTable(false);
 		    	}
 		    });
 		    comboBoxes[i].select(0);
+		    subMonitor.worked(1);
 	    }
+	    subMonitor.done();
 	    comboSC.setMinSize(comboComp.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 	
@@ -310,5 +374,5 @@ public class ArrayTabItem extends PTabItem {
 			selectedButtons.add(button);
 		}
 		updateTable(true);
-	}
+	}	
 }

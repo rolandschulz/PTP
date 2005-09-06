@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.views;
 
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.swt.SWT;
@@ -83,7 +82,7 @@ public abstract class PTabItem {
 			styleText.setEnabled(false);
 		}
 	}
-	public void displayError(DebugException e) {
+	public void displayError(Exception e) {
 		displayError = true;
 		StyledText styleText = fTextViewer.getTextWidget();
 		if (styleText != null)
