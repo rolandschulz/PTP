@@ -27,4 +27,5 @@ void		procset_free(procset *);
 void		procset_add_proc(procset *, int);
 void		procset_remove_proc(procset *, int);
 int		procset_test(procset *, int);
+char *	procset_to_str(procset *);
 #endif /*PROCSET_H_*/

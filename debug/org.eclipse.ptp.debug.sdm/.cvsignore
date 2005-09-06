@@ -4,3 +4,8 @@
 autom4te.cache
 *.o
 *.Po
+Makefile
+libtool
+stamp-h1
+*.la
+config.h

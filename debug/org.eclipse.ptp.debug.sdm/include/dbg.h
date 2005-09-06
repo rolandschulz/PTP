@@ -5,6 +5,8 @@
 #include "breakpoint.h"
 #include "stackframe.h"
 
+#define DBGRES_OK	0
+#define DBGRES_ERR	-1
 /*
  * Process set operations
  */
