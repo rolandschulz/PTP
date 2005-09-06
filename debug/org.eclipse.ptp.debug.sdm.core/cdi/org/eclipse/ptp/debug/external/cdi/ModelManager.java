@@ -32,15 +32,17 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.ptp.debug.core.cdi.IPCDIModelManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSetNamed;
+import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSetNamed;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
 /**
  */
-public class ModelManager extends Manager {
+public class ModelManager extends Manager implements IPCDIModelManager {
 	
 	private Hashtable currentProcessSetList;
 	private Hashtable processListCache;
@@ -70,6 +72,14 @@ public class ModelManager extends Manager {
 			return (IPCDIDebugProcessSetNamed) currentProcessSetList.get(name);
 		IPCDIDebugProcessSetNamed newSet = new DebugProcessSetNamed((IPCDISession) getSession(), name);
 		newSet.addProcess(procs);
+		currentProcessSetList.put(newSet.getName(), newSet);
+		return newSet;
+	}
+
+	public IPCDIDebugProcessSetNamed newProcessSet(String name, BitList list) {
+		if (currentProcessSetList.containsKey(name))
+			return (IPCDIDebugProcessSetNamed) currentProcessSetList.get(name);
+		IPCDIDebugProcessSetNamed newSet = new DebugProcessSetNamed((IPCDISession) getSession(), name, list);
 		currentProcessSetList.put(newSet.getName(), newSet);
 		return newSet;
 	}

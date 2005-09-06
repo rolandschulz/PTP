@@ -43,6 +43,12 @@ public class DebugProcessSet extends SessionObject implements IPCDIDebugProcessS
 		setName = PREFIX + tempId++;
 	}
 
+	public DebugProcessSet(IPCDISession s, BitList list) {
+		super((Session) s);
+		processList = list;
+		setName = PREFIX + tempId++;
+	}
+
 	public DebugProcessSet(IPCDISession s, int proc) {
 		this(s, new int[] {proc});
 	}
