@@ -36,6 +36,7 @@ import org.eclipse.cdt.debug.core.cdi.ICDILocation;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISignal;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorage;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorageDescriptor;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.Session;
@@ -267,5 +268,11 @@ public class Thread extends PTPObject implements ICDIThread {
 		// Auto-generated method stub
 		System.out.println("Thread.isSuspended()");
 		return false;
+	}
+
+	public ICDIThreadStorage createThreadStorage(ICDIThreadStorageDescriptor varDesc) throws CDIException {
+		// Auto-generated method stub
+		System.out.println("Thread.createThreadStorage()");
+		return null;
 	}
 }

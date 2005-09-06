@@ -1,37 +1,29 @@
-/*******************************************************************************
- * Copyright (c) 2002, 2004 QNX Software Systems and others.
+/**********************************************************************
+ * Copyright (c) 2004 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
+ * are made available under the terms of the Common Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * http://www.eclipse.org/legal/cpl-v10.html
  *
  * Contributors:
  * QNX Software Systems - Initial API and implementation
- *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.model;
+ ***********************************************************************/ 
+package org.eclipse.ptp.debug.internal.core.model; 
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
-import org.eclipse.cdt.debug.core.cdi.event.ICDIResumedEvent;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgumentDescriptor;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariableDescriptor;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIArrayValue;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
-import org.eclipse.cdt.debug.core.model.ICGlobalVariable;
 import org.eclipse.cdt.debug.core.model.ICType;
 import org.eclipse.cdt.debug.core.model.ICValue;
-import org.eclipse.cdt.debug.core.model.IGlobalVariableDescriptor;
 import org.eclipse.debug.core.DebugException;
+ 
 
-/**
- * Represents a global variable.
- */
-public class CGlobalVariable extends CVariable implements ICGlobalVariable {
+public class CLocalVariable extends CVariable {
 
 	private class InternalVariable implements IInternalVariable {
 		
@@ -104,7 +96,7 @@ public class CGlobalVariable extends CVariable implements ICGlobalVariable {
 		private synchronized ICDIVariable getCDIVariable() throws DebugException {
 			if ( fCDIVariable == null ) {
 				try {
-					fCDIVariable = getCDITarget().createGlobalVariable( (ICDIGlobalVariableDescriptor)getCDIVariableObject() );
+					fCDIVariable = ((CStackFrame)getStackFrame()).getCDIStackFrame().createLocalVariable( (ICDILocalVariableDescriptor)getCDIVariableObject() );
 				}
 				catch( CDIException e ) {
 					requestFailed( e.getMessage(), null );
@@ -310,63 +302,18 @@ public class CGlobalVariable extends CVariable implements ICGlobalVariable {
 		}
 	}
 
-	private IGlobalVariableDescriptor fDescriptor;
-
-	/**
-	 * Constructor for CGlobalVariable.
+	/** 
+	 * Constructor for CLocalVariable. 
 	 */
-	protected CGlobalVariable( PDebugElement parent, IGlobalVariableDescriptor descriptor, ICDIVariableDescriptor cdiVariableObject ) {
+	public CLocalVariable( PDebugElement parent, ICDIVariableDescriptor cdiVariableObject, String errorMessage ) {
+		super( parent, cdiVariableObject, errorMessage );
+	}
+
+	/** 
+	 * Constructor for CLocalVariable. 
+	 */
+	public CLocalVariable( PDebugElement parent, ICDIVariableDescriptor cdiVariableObject ) {
 		super( parent, cdiVariableObject );
-		fDescriptor = descriptor;
-	}
-
-	/**
-	 * Constructor for CGlobalVariable.
-	 */
-	protected CGlobalVariable( PDebugElement parent, IGlobalVariableDescriptor descriptor, ICDIVariableDescriptor cdiVariableObject, String message ) {
-		super( parent, cdiVariableObject, message );
-		fDescriptor = descriptor;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.ICVariable#canEnableDisable()
-	 */
-	public boolean canEnableDisable() {
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener#handleDebugEvents(org.eclipse.cdt.debug.core.cdi.event.ICDIEvent[])
-	 */
-	public void handleDebugEvents( ICDIEvent[] events ) {
-		for( int i = 0; i < events.length; i++ ) {
-			ICDIEvent event = events[i];
-			if ( event instanceof ICDIResumedEvent ) {
-				ICDIObject source = event.getSource();
-				if ( source != null ) {
-					ICDITarget cdiTarget = source.getTarget();
-					if (  getCDITarget().equals( cdiTarget ) ) {
-						setChanged( false );
-					}
-				}
-			}
-		}
-		super.handleDebugEvents( events );
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.model.ICGlobalVariable#getDescriptor()
-	 */
-	public IGlobalVariableDescriptor getDescriptor() {
-		return fDescriptor;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.internal.core.model.AbstractCVariable#dispose()
-	 */
-	public void dispose() {
-		internalDispose( true );
-		setDisposed( true );
 	}
 
 	protected void createOriginal( ICDIVariableDescriptor vo ) {
