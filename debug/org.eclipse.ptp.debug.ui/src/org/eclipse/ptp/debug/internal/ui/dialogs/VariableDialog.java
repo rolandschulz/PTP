@@ -57,14 +57,13 @@ public abstract class VariableDialog extends Dialog {
 		this.frame = frame;
 	}
 	
-	public void okPressed() {
-		super.okPressed();
-	}
+    protected void configureShell(Shell shell) {
+    	super.configureShell(shell);
+        shell.setText(DialogMessages.getString("VariableDialog.name"));
+    }
 	
 	protected Control createDialogArea(Composite parent) {
         final Composite composite = (Composite)super.createDialogArea(parent);
-        composite.getShell().setText(DialogMessages.getString("VariableDialog.shell.name"));
-
 	    Composite result = new Composite(composite, SWT.NONE);
 	    GridLayout layout = new GridLayout(1, false);
 	    layout.marginHeight = 0;
@@ -99,27 +98,17 @@ public abstract class VariableDialog extends Dialog {
 
         listViewer.addSelectionChangedListener(new ISelectionChangedListener() {
             public void selectionChanged(SelectionChangedEvent event) {
-            	ISelection selection = event.getSelection();
-                getOkButton().setEnabled(!selection.isEmpty());
-                if (selection instanceof IStructuredSelection) {
-                	if (selection.isEmpty())
-                		selectedVariable = null;
-                	else {
-                    	Object obj = ((IStructuredSelection)selection).getFirstElement();
-                    	if (obj instanceof IVariable)
-                    		selectedVariable = (IVariable)obj;
-                    	else
-                    		selectedVariable = null;
-                	}
-                }
+                getOkButton().setEnabled(!event.getSelection().isEmpty());
             }
         });
 
         listViewer.addDoubleClickListener(new IDoubleClickListener() {
             public void doubleClick(DoubleClickEvent event) {
-                okPressed();
+            	buttonPressed(IDialogConstants.OK_ID);
             }
         });
+        
+        applyDialogFont(composite);
 		return composite;
 	}
 	public void createButtonsForButtonBar(Composite parent) {
@@ -136,9 +125,23 @@ public abstract class VariableDialog extends Dialog {
     	return selectedVariable;
     }
     
+    protected void buttonPressed(int buttonId) {
+    	selectedVariable = null;
+    	if (buttonId == IDialogConstants.OK_ID) {
+        	ISelection selection = listViewer.getSelection();
+        	if (!selection.isEmpty()) {
+        		if (selection instanceof IStructuredSelection) {
+                	Object obj = ((IStructuredSelection)selection).getFirstElement();
+                	if (obj instanceof IVariable)
+                		selectedVariable = (IVariable)obj;
+            	}
+            }
+        }        
+        super.buttonPressed(buttonId);
+    }    
+    
 	private class ContentProvider implements IStructuredContentProvider {
 	    public ContentProvider() {}
-
 	    public void dispose() {}
 	    public Object[] getElements(Object inputElement) {
 	        if (inputElement instanceof Object[])
