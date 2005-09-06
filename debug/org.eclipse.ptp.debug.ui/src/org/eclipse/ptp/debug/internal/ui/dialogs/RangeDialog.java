@@ -78,11 +78,6 @@ public class RangeDialog extends Dialog {
             toRow = rowToField.getIntValue();
         	fromCol = colFromField.getIntValue();
             toCol = colToField.getIntValue();
-        } else {
-            fromRow = 0;
-            toRow = maxRow;
-            fromCol = 0;
-            toCol = maxCol;
         }        
         super.buttonPressed(buttonId);
     }
@@ -127,13 +122,13 @@ public class RangeDialog extends Dialog {
     
     public int open(boolean showRow, boolean showCol, int fromRow, int toRow, int fromCol, int toCol) {
     	this.fromRow = fromRow;
-    	this.toRow = (toRow==0?maxRow:toRow);
+    	this.toRow = toRow==0?maxRow:toRow;
     	this.fromCol = fromCol;
     	this.toCol = (toCol==0?maxCol:toCol);
     	return open(showRow, showCol);
     }
 
-    public int open(boolean showRow, boolean showCol) {
+    private int open(boolean showRow, boolean showCol) {
     	create();
     	rowGroup.setEnabled(showRow);
     	rowFromField.setEnabled(showRow, rowGroup);

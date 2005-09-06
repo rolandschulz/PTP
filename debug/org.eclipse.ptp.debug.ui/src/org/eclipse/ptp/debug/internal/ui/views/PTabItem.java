@@ -18,6 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.views;
 
+import java.lang.reflect.InvocationTargetException;
+
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.swt.SWT;
@@ -36,7 +41,7 @@ import org.eclipse.ui.part.PageBook;
  * @author Clement chu
  *
  */
-public abstract class PTabItem {
+public abstract class PTabItem implements IRunnableContext {
 	protected CTabItem tabItem = null;
 	protected PageBook fPageBook = null;
 	protected TextViewer fTextViewer = null;
@@ -97,5 +102,9 @@ public abstract class PTabItem {
 	
 	public Point getTextSize(Composite composite, String text) {
 		return new GC(composite).textExtent(text);
+	}
+	
+	public void run(boolean fork, boolean cancelable, IRunnableWithProgress runnable) throws InvocationTargetException, InterruptedException {
+		new ProgressMonitorDialog(fPageBook.getShell()).run(fork, cancelable, runnable);
 	}	
 }
