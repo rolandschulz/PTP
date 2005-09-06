@@ -298,8 +298,8 @@ public class PTPDebugCorePlugin extends Plugin {
 			((IPDebugListener)listeners[i]).update((IPCDISession) session);
 	}
 	
-	public ICDISession getDebugSession(IPJob job) {
-		return (ICDISession) fDebugSessions.get(job);
+	public IPCDISession getDebugSession(IPJob job) {
+		return (IPCDISession) fDebugSessions.get(job);
 	}
 	
 	public IPJob getDebugJob(ICDISession session) {

@@ -41,6 +41,7 @@ public interface IPCDISession extends ICDISession {
 	public int[] getRegisteredTargetIds();
 	public boolean isRegistered(int i);
 	public IPCDITarget getTarget(int i);
+	public IPCDIModelManager getModelManager();
 	
 	/* Breakpoint */
 	public ICDILineBreakpoint setLineBreakpoint(int type,

@@ -51,6 +51,7 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.IPLaunch;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
+import org.eclipse.ptp.debug.core.cdi.IPCDIModelManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
@@ -65,7 +66,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	BreakpointManager breakpointManager;
 	ExpressionManager expressionManager;
 	VariableManager variableManager;
-	ModelManager modelManager;
+	IPCDIModelManager modelManager;
 	
 	Properties props;
 	SessionConfiguration configuration;
@@ -258,7 +259,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 		return eventManager;
 	}
 
-	public ModelManager getModelManager() {
+	public IPCDIModelManager getModelManager() {
 		return modelManager;
 	}
 
