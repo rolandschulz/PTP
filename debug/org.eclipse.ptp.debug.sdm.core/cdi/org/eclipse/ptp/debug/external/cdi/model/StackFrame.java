@@ -32,7 +32,9 @@ import java.math.BigInteger;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgumentDescriptor;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
@@ -40,6 +42,8 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.ptp.debug.external.cdi.Locator;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
+import org.eclipse.ptp.debug.external.cdi.model.variable.ArgumentDescriptor;
+import org.eclipse.ptp.debug.external.cdi.model.variable.LocalVariableDescriptor;
 
 public class StackFrame extends PTPObject implements ICDIStackFrame {
 	Thread cthread;
@@ -138,5 +142,29 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
                 argDescs = mgr.getArgumentDescriptors(this);
         }
         return argDescs;
+	}
+
+	public ICDIArgument createArgument(ICDIArgumentDescriptor varDesc) throws CDIException {
+		// Auto-generated method stub
+		System.out.println("StackFrame.createArgument()");
+		if (varDesc instanceof ArgumentDescriptor) {
+			Session session = (Session)getTarget().getSession();
+			VariableManager mgr = session.getVariableManager();
+			return mgr.createArgument((ArgumentDescriptor)varDesc);
+		}
+		return null;
+	}
+
+	public ICDILocalVariable createLocalVariable(ICDILocalVariableDescriptor varDesc) throws CDIException {
+		// Auto-generated method stub
+		System.out.println("StackFrame.createLocalVariable()");
+		if (varDesc instanceof ArgumentDescriptor) {
+			return createArgument((ICDIArgumentDescriptor)varDesc);
+		} else if (varDesc instanceof LocalVariableDescriptor) {
+			Session session = (Session)getTarget().getSession();
+			VariableManager mgr = session.getVariableManager();
+			return mgr.createLocalVariable((LocalVariableDescriptor)varDesc);			
+		}
+		return null;
 	}
 }

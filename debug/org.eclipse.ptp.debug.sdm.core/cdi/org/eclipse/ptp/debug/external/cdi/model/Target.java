@@ -41,10 +41,14 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIExceptionpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIInstruction;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIMemoryBlock;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIMixedInstruction;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIRegister;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIRegisterDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRegisterGroup;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRuntimeOptions;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISharedLibrary;
@@ -53,7 +57,6 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
@@ -62,6 +65,7 @@ import org.eclipse.ptp.debug.external.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
+import org.eclipse.ptp.debug.external.cdi.model.variable.GlobalVariableDescriptor;
 
 public class Target extends SessionObject implements IPCDITarget {
 	
@@ -113,7 +117,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		return createExpression(expressionText).getValue(frame).getValueString();
 	}
 
-	public ICDIVariableDescriptor getGlobalVariableDescriptors(String filename, String function, String name) throws CDIException {
+	public ICDIGlobalVariableDescriptor getGlobalVariableDescriptors(String filename, String function, String name) throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.getGlobalVariableDescriptors()");
 		VariableManager varMgr = ((Session)getSession()).getVariableManager();
@@ -498,6 +502,22 @@ public class Target extends SessionObject implements IPCDITarget {
 		// Auto-generated method stub
 		System.out.println("Target.deleteAllBreakpoints()");
 		
+	}
+
+	public ICDIGlobalVariable createGlobalVariable(ICDIGlobalVariableDescriptor varDesc) throws CDIException {
+		// Auto-generated method stub
+		System.out.println("Target.createGlobalVariable()");
+		if (varDesc instanceof GlobalVariableDescriptor) {
+			VariableManager varMgr = ((Session)getSession()).getVariableManager();
+			return varMgr.createGlobalVariable((GlobalVariableDescriptor)varDesc);
+		}
+		return null;
+	}
+
+	public ICDIRegister createRegister(ICDIRegisterDescriptor varDesc) throws CDIException {
+		// Auto-generated method stub
+		System.out.println("Target.createRegister()");
+		return null;
 	}
 
 }
