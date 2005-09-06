@@ -1,0 +1,6 @@
+.libs
+.deps
+.dirstamp
+autom4te.cache
+*.o
+*.Po
