@@ -37,3 +37,9 @@ procset_test(procset *p, int proc)
 {
 	return BITVECTOR_GET(p->ps_procs, proc);
 }
+
+char *
+procset_to_str(procset *p)
+{
+	return ""; // TODO
+}

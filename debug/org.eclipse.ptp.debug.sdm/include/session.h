@@ -6,7 +6,7 @@
  * rights to use, reproduce, and distribute this software. NEITHER THE
  * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR
  * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified
- * to produce derivative works, such modified software should be clearly
+ * to produce derivative works, such modified software should be clearly  
  * marked, so as not to confuse it with the version available from LANL.
  *
  * Additionally, this program and the accompanying materials
@@ -16,34 +16,15 @@
  *
  * LA-CC 04-115
  ******************************************************************************/
+#ifndef _SESSION_H_
+#define _SESSION_H_
 
-#include <mpi.h>
+#include "proxy.h"
 
-extern void client(int);
-extern void server(int, int);
+struct session {
+	proxy_funcs proxy;
+};
+typedef struct proxy_funcs	proxy_funcs;
 
-MPI_Comm mcast_comm;
-
-int
-main(int argc, char *argv[])
-{
-	int rank;
-	int size;
-	
-	MPI_Init(&argc, &argv);
-	
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	
-	/* Create multicast communicator */
-	
-	if (rank == size-1) {
-		client(rank);
-	} else {
-		server(size - 1, rank);
-	}
-	
-	MPI_Finalize();
-	
-	return 0;
-}
+int		proxy_send_request(char *, char *);
+#endif /* _SESSION_H_*/

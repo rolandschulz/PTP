@@ -14,7 +14,9 @@
 
 @SET_MAKE@
 
-SOURCES = $(sdm_SOURCES)
+
+
+SOURCES = $(libptp_dbg_jni_la_SOURCES) $(sdm_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -38,10 +40,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
 bin_PROGRAMS = sdm$(EXEEXT)
-DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
-	config.guess config.sub depcomp install-sh ltmain.sh missing
+DIST_COMMON = README $(am__configure_deps) $(include_HEADERS) \
+	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/config.h.in $(top_srcdir)/configure AUTHORS COPYING \
+	ChangeLog INSTALL NEWS compile config.guess config.sub depcomp \
+	install-sh ltmain.sh missing
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -53,11 +56,27 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)"
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
+	"$(DESTDIR)$(includedir)"
+libLTLIBRARIES_INSTALL = $(INSTALL)
+LTLIBRARIES = $(lib_LTLIBRARIES)
+libptp_dbg_jni_la_LIBADD =
+am__dirstamp = $(am__leading_dot)dirstamp
+am_libptp_dbg_jni_la_OBJECTS = jni/libptp_dbg_jni_la-dbg_jni.lo
+libptp_dbg_jni_la_OBJECTS = $(am_libptp_dbg_jni_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_sdm_OBJECTS = client.$(OBJEXT) client_interface.$(OBJEXT) \
-	startup.$(OBJEXT) server.$(OBJEXT) procset.$(OBJEXT)
+am_sdm_OBJECTS = src/client/sdm-client.$(OBJEXT) \
+	src/client/sdm-client_interface.$(OBJEXT) \
+	src/client/sdm-startup.$(OBJEXT) \
+	src/server/sdm-server.$(OBJEXT) \
+	src/utils/sdm-procset.$(OBJEXT)
 sdm_OBJECTS = $(am_sdm_OBJECTS)
 sdm_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
@@ -71,8 +90,10 @@ LTCOMPILE = $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link --tag=CC $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(sdm_SOURCES)
-DIST_SOURCES = $(sdm_SOURCES)
+SOURCES = $(libptp_dbg_jni_la_SOURCES) $(sdm_SOURCES)
+DIST_SOURCES = $(libptp_dbg_jni_la_SOURCES) $(sdm_SOURCES)
+includeHEADERS_INSTALL = $(INSTALL_HEADER)
+HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -140,9 +161,6 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
-SDM_MAJOR_VERSION = @SDM_MAJOR_VERSION@
-SDM_MICRO_VERSION = @SDM_MICRO_VERSION@
-SDM_MINOR_VERSION = @SDM_MINOR_VERSION@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -192,6 +210,12 @@ subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 sdm_SOURCES = src/client/client.c src/client/client_interface.c src/client/startup.c src/server/server.c src/utils/procset.c
+sdm_CFLAGS = -I./include -I./bitvector $(AM_CFLAGS)
+include_HEADERS = include/breakpoint.h include/dbg.h include/location.h include/procset.h include/stackframe.h
+lib_LTLIBRARIES = libptp_dbg_jni.la
+libptp_dbg_jni_la_SOURCES = jni/dbg_jni.c
+libptp_dbg_jni_la_LDFLAGS = -shrext .jnilib -single_module -framework JavaVM
+libptp_dbg_jni_la_CFLAGS = -I/System/Library/Frameworks/JavaVM.framework/Headers $(AM_CFLAGS)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -247,6 +271,43 @@ $(srcdir)/config.h.in:  $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
+install-libLTLIBRARIES: $(lib_LTLIBRARIES)
+	@$(NORMAL_INSTALL)
+	test -z "$(libdir)" || $(mkdir_p) "$(DESTDIR)$(libdir)"
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    f=$(am__strip_dir) \
+	    echo " $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(libdir)/$$f'"; \
+	    $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(libdir)/$$f"; \
+	  else :; fi; \
+	done
+
+uninstall-libLTLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@set -x; list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  p=$(am__strip_dir) \
+	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$p'"; \
+	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$p"; \
+	done
+
+clean-libLTLIBRARIES:
+	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+jni/$(am__dirstamp):
+	@$(mkdir_p) jni
+	@: > jni/$(am__dirstamp)
+jni/$(DEPDIR)/$(am__dirstamp):
+	@$(mkdir_p) jni/$(DEPDIR)
+	@: > jni/$(DEPDIR)/$(am__dirstamp)
+jni/libptp_dbg_jni_la-dbg_jni.lo: jni/$(am__dirstamp) \
+	jni/$(DEPDIR)/$(am__dirstamp)
+libptp_dbg_jni.la: $(libptp_dbg_jni_la_OBJECTS) $(libptp_dbg_jni_la_DEPENDENCIES) 
+	$(LINK) -rpath $(libdir) $(libptp_dbg_jni_la_LDFLAGS) $(libptp_dbg_jni_la_OBJECTS) $(libptp_dbg_jni_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
@@ -275,122 +336,186 @@ clean-binPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
+src/client/$(am__dirstamp):
+	@$(mkdir_p) src/client
+	@: > src/client/$(am__dirstamp)
+src/client/$(DEPDIR)/$(am__dirstamp):
+	@$(mkdir_p) src/client/$(DEPDIR)
+	@: > src/client/$(DEPDIR)/$(am__dirstamp)
+src/client/sdm-client.$(OBJEXT): src/client/$(am__dirstamp) \
+	src/client/$(DEPDIR)/$(am__dirstamp)
+src/client/sdm-client_interface.$(OBJEXT): src/client/$(am__dirstamp) \
+	src/client/$(DEPDIR)/$(am__dirstamp)
+src/client/sdm-startup.$(OBJEXT): src/client/$(am__dirstamp) \
+	src/client/$(DEPDIR)/$(am__dirstamp)
+src/server/$(am__dirstamp):
+	@$(mkdir_p) src/server
+	@: > src/server/$(am__dirstamp)
+src/server/$(DEPDIR)/$(am__dirstamp):
+	@$(mkdir_p) src/server/$(DEPDIR)
+	@: > src/server/$(DEPDIR)/$(am__dirstamp)
+src/server/sdm-server.$(OBJEXT): src/server/$(am__dirstamp) \
+	src/server/$(DEPDIR)/$(am__dirstamp)
+src/utils/$(am__dirstamp):
+	@$(mkdir_p) src/utils
+	@: > src/utils/$(am__dirstamp)
+src/utils/$(DEPDIR)/$(am__dirstamp):
+	@$(mkdir_p) src/utils/$(DEPDIR)
+	@: > src/utils/$(DEPDIR)/$(am__dirstamp)
+src/utils/sdm-procset.$(OBJEXT): src/utils/$(am__dirstamp) \
+	src/utils/$(DEPDIR)/$(am__dirstamp)
 sdm$(EXEEXT): $(sdm_OBJECTS) $(sdm_DEPENDENCIES) 
 	@rm -f sdm$(EXEEXT)
 	$(LINK) $(sdm_LDFLAGS) $(sdm_OBJECTS) $(sdm_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f jni/libptp_dbg_jni_la-dbg_jni.$(OBJEXT)
+	-rm -f jni/libptp_dbg_jni_la-dbg_jni.lo
+	-rm -f src/client/sdm-client.$(OBJEXT)
+	-rm -f src/client/sdm-client_interface.$(OBJEXT)
+	-rm -f src/client/sdm-startup.$(OBJEXT)
+	-rm -f src/server/sdm-server.$(OBJEXT)
+	-rm -f src/utils/sdm-procset.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client_interface.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/procset.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/startup.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@jni/$(DEPDIR)/libptp_dbg_jni_la-dbg_jni.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/client/$(DEPDIR)/sdm-client.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/client/$(DEPDIR)/sdm-client_interface.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/client/$(DEPDIR)/sdm-startup.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/server/$(DEPDIR)/sdm-server.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/sdm-procset.Po@am__quote@
 
 .c.o:
-@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`; \
+@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$$depbase.Tpo" -c -o $@ $<; \
+@am__fastdepCC_TRUE@	then mv -f "$$depbase.Tpo" "$$depbase.Po"; else rm -f "$$depbase.Tpo"; exit 1; fi
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c $<
+@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ $<
 
 .c.obj:
-@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ `$(CYGPATH_W) '$<'`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`; \
+@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$$depbase.Tpo" -c -o $@ `$(CYGPATH_W) '$<'`; \
+@am__fastdepCC_TRUE@	then mv -f "$$depbase.Tpo" "$$depbase.Po"; else rm -f "$$depbase.Tpo"; exit 1; fi
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.lo:
-@am__fastdepCC_TRUE@	if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Plo"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`; \
+@am__fastdepCC_TRUE@	if $(LTCOMPILE) -MT $@ -MD -MP -MF "$$depbase.Tpo" -c -o $@ $<; \
+@am__fastdepCC_TRUE@	then mv -f "$$depbase.Tpo" "$$depbase.Plo"; else rm -f "$$depbase.Tpo"; exit 1; fi
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
-client.o: src/client/client.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT client.o -MD -MP -MF "$(DEPDIR)/client.Tpo" -c -o client.o `test -f 'src/client/client.c' || echo '$(srcdir)/'`src/client/client.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/client.Tpo" "$(DEPDIR)/client.Po"; else rm -f "$(DEPDIR)/client.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/client/client.c' object='client.o' libtool=no @AMDEPBACKSLASH@
+jni/libptp_dbg_jni_la-dbg_jni.lo: jni/dbg_jni.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libptp_dbg_jni_la_CFLAGS) $(CFLAGS) -MT jni/libptp_dbg_jni_la-dbg_jni.lo -MD -MP -MF "jni/$(DEPDIR)/libptp_dbg_jni_la-dbg_jni.Tpo" -c -o jni/libptp_dbg_jni_la-dbg_jni.lo `test -f 'jni/dbg_jni.c' || echo '$(srcdir)/'`jni/dbg_jni.c; \
+@am__fastdepCC_TRUE@	then mv -f "jni/$(DEPDIR)/libptp_dbg_jni_la-dbg_jni.Tpo" "jni/$(DEPDIR)/libptp_dbg_jni_la-dbg_jni.Plo"; else rm -f "jni/$(DEPDIR)/libptp_dbg_jni_la-dbg_jni.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='jni/dbg_jni.c' object='jni/libptp_dbg_jni_la-dbg_jni.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o client.o `test -f 'src/client/client.c' || echo '$(srcdir)/'`src/client/client.c
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libptp_dbg_jni_la_CFLAGS) $(CFLAGS) -c -o jni/libptp_dbg_jni_la-dbg_jni.lo `test -f 'jni/dbg_jni.c' || echo '$(srcdir)/'`jni/dbg_jni.c
 
-client.obj: src/client/client.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT client.obj -MD -MP -MF "$(DEPDIR)/client.Tpo" -c -o client.obj `if test -f 'src/client/client.c'; then $(CYGPATH_W) 'src/client/client.c'; else $(CYGPATH_W) '$(srcdir)/src/client/client.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/client.Tpo" "$(DEPDIR)/client.Po"; else rm -f "$(DEPDIR)/client.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/client/client.c' object='client.obj' libtool=no @AMDEPBACKSLASH@
+src/client/sdm-client.o: src/client/client.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/client/sdm-client.o -MD -MP -MF "src/client/$(DEPDIR)/sdm-client.Tpo" -c -o src/client/sdm-client.o `test -f 'src/client/client.c' || echo '$(srcdir)/'`src/client/client.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/client/$(DEPDIR)/sdm-client.Tpo" "src/client/$(DEPDIR)/sdm-client.Po"; else rm -f "src/client/$(DEPDIR)/sdm-client.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/client/client.c' object='src/client/sdm-client.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o client.obj `if test -f 'src/client/client.c'; then $(CYGPATH_W) 'src/client/client.c'; else $(CYGPATH_W) '$(srcdir)/src/client/client.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/client/sdm-client.o `test -f 'src/client/client.c' || echo '$(srcdir)/'`src/client/client.c
 
-client_interface.o: src/client/client_interface.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT client_interface.o -MD -MP -MF "$(DEPDIR)/client_interface.Tpo" -c -o client_interface.o `test -f 'src/client/client_interface.c' || echo '$(srcdir)/'`src/client/client_interface.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/client_interface.Tpo" "$(DEPDIR)/client_interface.Po"; else rm -f "$(DEPDIR)/client_interface.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/client/client_interface.c' object='client_interface.o' libtool=no @AMDEPBACKSLASH@
+src/client/sdm-client.obj: src/client/client.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/client/sdm-client.obj -MD -MP -MF "src/client/$(DEPDIR)/sdm-client.Tpo" -c -o src/client/sdm-client.obj `if test -f 'src/client/client.c'; then $(CYGPATH_W) 'src/client/client.c'; else $(CYGPATH_W) '$(srcdir)/src/client/client.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/client/$(DEPDIR)/sdm-client.Tpo" "src/client/$(DEPDIR)/sdm-client.Po"; else rm -f "src/client/$(DEPDIR)/sdm-client.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/client/client.c' object='src/client/sdm-client.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o client_interface.o `test -f 'src/client/client_interface.c' || echo '$(srcdir)/'`src/client/client_interface.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/client/sdm-client.obj `if test -f 'src/client/client.c'; then $(CYGPATH_W) 'src/client/client.c'; else $(CYGPATH_W) '$(srcdir)/src/client/client.c'; fi`
 
-client_interface.obj: src/client/client_interface.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT client_interface.obj -MD -MP -MF "$(DEPDIR)/client_interface.Tpo" -c -o client_interface.obj `if test -f 'src/client/client_interface.c'; then $(CYGPATH_W) 'src/client/client_interface.c'; else $(CYGPATH_W) '$(srcdir)/src/client/client_interface.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/client_interface.Tpo" "$(DEPDIR)/client_interface.Po"; else rm -f "$(DEPDIR)/client_interface.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/client/client_interface.c' object='client_interface.obj' libtool=no @AMDEPBACKSLASH@
+src/client/sdm-client_interface.o: src/client/client_interface.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/client/sdm-client_interface.o -MD -MP -MF "src/client/$(DEPDIR)/sdm-client_interface.Tpo" -c -o src/client/sdm-client_interface.o `test -f 'src/client/client_interface.c' || echo '$(srcdir)/'`src/client/client_interface.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/client/$(DEPDIR)/sdm-client_interface.Tpo" "src/client/$(DEPDIR)/sdm-client_interface.Po"; else rm -f "src/client/$(DEPDIR)/sdm-client_interface.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/client/client_interface.c' object='src/client/sdm-client_interface.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o client_interface.obj `if test -f 'src/client/client_interface.c'; then $(CYGPATH_W) 'src/client/client_interface.c'; else $(CYGPATH_W) '$(srcdir)/src/client/client_interface.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/client/sdm-client_interface.o `test -f 'src/client/client_interface.c' || echo '$(srcdir)/'`src/client/client_interface.c
 
-startup.o: src/client/startup.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT startup.o -MD -MP -MF "$(DEPDIR)/startup.Tpo" -c -o startup.o `test -f 'src/client/startup.c' || echo '$(srcdir)/'`src/client/startup.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/startup.Tpo" "$(DEPDIR)/startup.Po"; else rm -f "$(DEPDIR)/startup.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/client/startup.c' object='startup.o' libtool=no @AMDEPBACKSLASH@
+src/client/sdm-client_interface.obj: src/client/client_interface.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/client/sdm-client_interface.obj -MD -MP -MF "src/client/$(DEPDIR)/sdm-client_interface.Tpo" -c -o src/client/sdm-client_interface.obj `if test -f 'src/client/client_interface.c'; then $(CYGPATH_W) 'src/client/client_interface.c'; else $(CYGPATH_W) '$(srcdir)/src/client/client_interface.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/client/$(DEPDIR)/sdm-client_interface.Tpo" "src/client/$(DEPDIR)/sdm-client_interface.Po"; else rm -f "src/client/$(DEPDIR)/sdm-client_interface.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/client/client_interface.c' object='src/client/sdm-client_interface.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o startup.o `test -f 'src/client/startup.c' || echo '$(srcdir)/'`src/client/startup.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/client/sdm-client_interface.obj `if test -f 'src/client/client_interface.c'; then $(CYGPATH_W) 'src/client/client_interface.c'; else $(CYGPATH_W) '$(srcdir)/src/client/client_interface.c'; fi`
 
-startup.obj: src/client/startup.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT startup.obj -MD -MP -MF "$(DEPDIR)/startup.Tpo" -c -o startup.obj `if test -f 'src/client/startup.c'; then $(CYGPATH_W) 'src/client/startup.c'; else $(CYGPATH_W) '$(srcdir)/src/client/startup.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/startup.Tpo" "$(DEPDIR)/startup.Po"; else rm -f "$(DEPDIR)/startup.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/client/startup.c' object='startup.obj' libtool=no @AMDEPBACKSLASH@
+src/client/sdm-startup.o: src/client/startup.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/client/sdm-startup.o -MD -MP -MF "src/client/$(DEPDIR)/sdm-startup.Tpo" -c -o src/client/sdm-startup.o `test -f 'src/client/startup.c' || echo '$(srcdir)/'`src/client/startup.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/client/$(DEPDIR)/sdm-startup.Tpo" "src/client/$(DEPDIR)/sdm-startup.Po"; else rm -f "src/client/$(DEPDIR)/sdm-startup.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/client/startup.c' object='src/client/sdm-startup.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o startup.obj `if test -f 'src/client/startup.c'; then $(CYGPATH_W) 'src/client/startup.c'; else $(CYGPATH_W) '$(srcdir)/src/client/startup.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/client/sdm-startup.o `test -f 'src/client/startup.c' || echo '$(srcdir)/'`src/client/startup.c
 
-server.o: src/server/server.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT server.o -MD -MP -MF "$(DEPDIR)/server.Tpo" -c -o server.o `test -f 'src/server/server.c' || echo '$(srcdir)/'`src/server/server.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/server.Tpo" "$(DEPDIR)/server.Po"; else rm -f "$(DEPDIR)/server.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/server/server.c' object='server.o' libtool=no @AMDEPBACKSLASH@
+src/client/sdm-startup.obj: src/client/startup.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/client/sdm-startup.obj -MD -MP -MF "src/client/$(DEPDIR)/sdm-startup.Tpo" -c -o src/client/sdm-startup.obj `if test -f 'src/client/startup.c'; then $(CYGPATH_W) 'src/client/startup.c'; else $(CYGPATH_W) '$(srcdir)/src/client/startup.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/client/$(DEPDIR)/sdm-startup.Tpo" "src/client/$(DEPDIR)/sdm-startup.Po"; else rm -f "src/client/$(DEPDIR)/sdm-startup.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/client/startup.c' object='src/client/sdm-startup.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o server.o `test -f 'src/server/server.c' || echo '$(srcdir)/'`src/server/server.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/client/sdm-startup.obj `if test -f 'src/client/startup.c'; then $(CYGPATH_W) 'src/client/startup.c'; else $(CYGPATH_W) '$(srcdir)/src/client/startup.c'; fi`
 
-server.obj: src/server/server.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT server.obj -MD -MP -MF "$(DEPDIR)/server.Tpo" -c -o server.obj `if test -f 'src/server/server.c'; then $(CYGPATH_W) 'src/server/server.c'; else $(CYGPATH_W) '$(srcdir)/src/server/server.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/server.Tpo" "$(DEPDIR)/server.Po"; else rm -f "$(DEPDIR)/server.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/server/server.c' object='server.obj' libtool=no @AMDEPBACKSLASH@
+src/server/sdm-server.o: src/server/server.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/server/sdm-server.o -MD -MP -MF "src/server/$(DEPDIR)/sdm-server.Tpo" -c -o src/server/sdm-server.o `test -f 'src/server/server.c' || echo '$(srcdir)/'`src/server/server.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/server/$(DEPDIR)/sdm-server.Tpo" "src/server/$(DEPDIR)/sdm-server.Po"; else rm -f "src/server/$(DEPDIR)/sdm-server.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/server/server.c' object='src/server/sdm-server.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o server.obj `if test -f 'src/server/server.c'; then $(CYGPATH_W) 'src/server/server.c'; else $(CYGPATH_W) '$(srcdir)/src/server/server.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/server/sdm-server.o `test -f 'src/server/server.c' || echo '$(srcdir)/'`src/server/server.c
 
-procset.o: src/utils/procset.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT procset.o -MD -MP -MF "$(DEPDIR)/procset.Tpo" -c -o procset.o `test -f 'src/utils/procset.c' || echo '$(srcdir)/'`src/utils/procset.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/procset.Tpo" "$(DEPDIR)/procset.Po"; else rm -f "$(DEPDIR)/procset.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/procset.c' object='procset.o' libtool=no @AMDEPBACKSLASH@
+src/server/sdm-server.obj: src/server/server.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/server/sdm-server.obj -MD -MP -MF "src/server/$(DEPDIR)/sdm-server.Tpo" -c -o src/server/sdm-server.obj `if test -f 'src/server/server.c'; then $(CYGPATH_W) 'src/server/server.c'; else $(CYGPATH_W) '$(srcdir)/src/server/server.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/server/$(DEPDIR)/sdm-server.Tpo" "src/server/$(DEPDIR)/sdm-server.Po"; else rm -f "src/server/$(DEPDIR)/sdm-server.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/server/server.c' object='src/server/sdm-server.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o procset.o `test -f 'src/utils/procset.c' || echo '$(srcdir)/'`src/utils/procset.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/server/sdm-server.obj `if test -f 'src/server/server.c'; then $(CYGPATH_W) 'src/server/server.c'; else $(CYGPATH_W) '$(srcdir)/src/server/server.c'; fi`
 
-procset.obj: src/utils/procset.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT procset.obj -MD -MP -MF "$(DEPDIR)/procset.Tpo" -c -o procset.obj `if test -f 'src/utils/procset.c'; then $(CYGPATH_W) 'src/utils/procset.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/procset.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/procset.Tpo" "$(DEPDIR)/procset.Po"; else rm -f "$(DEPDIR)/procset.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/procset.c' object='procset.obj' libtool=no @AMDEPBACKSLASH@
+src/utils/sdm-procset.o: src/utils/procset.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/utils/sdm-procset.o -MD -MP -MF "src/utils/$(DEPDIR)/sdm-procset.Tpo" -c -o src/utils/sdm-procset.o `test -f 'src/utils/procset.c' || echo '$(srcdir)/'`src/utils/procset.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/sdm-procset.Tpo" "src/utils/$(DEPDIR)/sdm-procset.Po"; else rm -f "src/utils/$(DEPDIR)/sdm-procset.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/procset.c' object='src/utils/sdm-procset.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o procset.obj `if test -f 'src/utils/procset.c'; then $(CYGPATH_W) 'src/utils/procset.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/procset.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/utils/sdm-procset.o `test -f 'src/utils/procset.c' || echo '$(srcdir)/'`src/utils/procset.c
+
+src/utils/sdm-procset.obj: src/utils/procset.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/utils/sdm-procset.obj -MD -MP -MF "src/utils/$(DEPDIR)/sdm-procset.Tpo" -c -o src/utils/sdm-procset.obj `if test -f 'src/utils/procset.c'; then $(CYGPATH_W) 'src/utils/procset.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/procset.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/sdm-procset.Tpo" "src/utils/$(DEPDIR)/sdm-procset.Po"; else rm -f "src/utils/$(DEPDIR)/sdm-procset.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/procset.c' object='src/utils/sdm-procset.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -c -o src/utils/sdm-procset.obj `if test -f 'src/utils/procset.c'; then $(CYGPATH_W) 'src/utils/procset.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/procset.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
+	-rm -rf jni/.libs jni/_libs
 
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
+install-includeHEADERS: $(include_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(includedir)" || $(mkdir_p) "$(DESTDIR)$(includedir)"
+	@list='$(include_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(includeHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(includedir)/$$f'"; \
+	  $(includeHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(includedir)/$$f"; \
+	done
+
+uninstall-includeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(include_HEADERS)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(includedir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(includedir)/$$f"; \
+	done
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -443,6 +568,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
+	$(mkdir_p) $(distdir)/include
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -568,9 +694,11 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-am
-all-am: Makefile $(PROGRAMS) config.h
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS) config.h
+install-binPROGRAMS: install-libLTLIBRARIES
+
 installdirs:
-	for dir in "$(DESTDIR)$(bindir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -593,17 +721,26 @@ clean-generic:
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
+	-rm -f src/server/$(DEPDIR)/$(am__dirstamp)
+	-rm -f jni/$(DEPDIR)/$(am__dirstamp)
+	-rm -f src/server/$(am__dirstamp)
+	-rm -f jni/$(am__dirstamp)
+	-rm -f src/utils/$(DEPDIR)/$(am__dirstamp)
+	-rm -f src/client/$(am__dirstamp)
+	-rm -f src/client/$(DEPDIR)/$(am__dirstamp)
+	-rm -f src/utils/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
+	clean-libtool mostlyclean-am
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf ./$(DEPDIR)
+	-rm -rf jni/$(DEPDIR) src/client/$(DEPDIR) src/server/$(DEPDIR) src/utils/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-libtool distclean-tags
@@ -618,9 +755,9 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-includeHEADERS
 
-install-exec-am: install-binPROGRAMS
+install-exec-am: install-binPROGRAMS install-libLTLIBRARIES
 
 install-info: install-info-am
 
@@ -631,7 +768,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf ./$(DEPDIR)
+	-rm -rf jni/$(DEPDIR) src/client/$(DEPDIR) src/server/$(DEPDIR) src/utils/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -648,22 +785,26 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-info-am
+uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
+	uninstall-info-am uninstall-libLTLIBRARIES
 
 .PHONY: CTAGS GTAGS all all-am am--refresh check check-am clean \
-	clean-binPROGRAMS clean-generic clean-libtool ctags dist \
-	dist-all dist-bzip2 dist-gzip dist-shar dist-tarZ dist-zip \
-	distcheck distclean distclean-compile distclean-generic \
-	distclean-hdr distclean-libtool distclean-tags distcleancheck \
-	distdir distuninstallcheck dvi dvi-am html html-am info \
-	info-am install install-am install-binPROGRAMS install-data \
-	install-data-am install-exec install-exec-am install-info \
-	install-info-am install-man install-strip installcheck \
+	clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
+	clean-libtool ctags dist dist-all dist-bzip2 dist-gzip \
+	dist-shar dist-tarZ dist-zip distcheck distclean \
+	distclean-compile distclean-generic distclean-hdr \
+	distclean-libtool distclean-tags distcleancheck distdir \
+	distuninstallcheck dvi dvi-am html html-am info info-am \
+	install install-am install-binPROGRAMS install-data \
+	install-data-am install-exec install-exec-am \
+	install-includeHEADERS install-info install-info-am \
+	install-libLTLIBRARIES install-man install-strip installcheck \
 	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-info-am
+	uninstall-includeHEADERS uninstall-info-am \
+	uninstall-libLTLIBRARIES
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
