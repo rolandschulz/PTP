@@ -53,6 +53,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -156,7 +157,7 @@ public class ArrayTabItem extends PTabItem {
 	public void createComboBoxes(Composite parent) {
 		comboSC = new ScrolledComposite(parent, SWT.V_SCROLL);
 		Composite comboComp = new Composite(comboSC, SWT.NONE);
-		comboComp.setLayout(new GridLayout(2, false));
+		comboComp.setLayout(new GridLayout(3, false));
 		comboComp.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
 		comboSC.setContent(comboComp);
 		comboSC.setExpandVertical(true);
@@ -267,6 +268,7 @@ public class ArrayTabItem extends PTabItem {
 			disposeTable();
 			return;
 		}
+		
 		updateTableContent(getRowIndex(), getColumnIndex());
 	}
 	private void updateTableContent(final int rowIndex, final int colIndex) {
@@ -368,14 +370,24 @@ public class ArrayTabItem extends PTabItem {
 		
 		selectedButtons.clear();
 		Composite comboComp = (Composite)comboSC.getContent();
-	    Button button = null;
+		new Label(comboComp, SWT.READ_ONLY).setText(ArrayMessages.getString("ArrayTabItem.colHead"));
+		new Label(comboComp, SWT.READ_ONLY).setText(ArrayMessages.getString("ArrayTabItem.rowHead"));
+		Button showTableButton = new Button(comboComp, SWT.ARROW | SWT.RIGHT);
+		showTableButton.setToolTipText(ArrayMessages.getString("ArrayTabItem.showTable"));
+		showTableButton.addSelectionListener(new SelectionAdapter() {
+	    	public void widgetSelected(SelectionEvent e) {
+	    	}
+	    });
+
+		Button rowButton = null;
+		Button colButton = null;
 	    comboBoxes = new Combo[vars.length];
 	    for (int i=0; i<vars.length; i++) {
-	    	button = new Button(comboComp, SWT.CHECK);
 	    	int total = vars[i].intValue();
-	    	button.setText((i+1) + ":");
-	    	button.setData(new Integer(i));
-	    	button.addSelectionListener(new SelectionAdapter() {
+	    	rowButton = new Button(comboComp, SWT.CHECK);
+	    	rowButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
+	    	rowButton.setData(new Integer(i));
+	    	rowButton.addSelectionListener(new SelectionAdapter() {
 		    	public void widgetSelected(SelectionEvent e) {
 		    		Object obj = e.getSource();
 		    		if (obj instanceof Button) {
@@ -383,6 +395,18 @@ public class ArrayTabItem extends PTabItem {
 		    		}
 		    	}
 		    });
+	    	colButton = new Button(comboComp, SWT.CHECK);
+	    	colButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
+	    	colButton.setData(new Integer(i));
+	    	colButton.addSelectionListener(new SelectionAdapter() {
+		    	public void widgetSelected(SelectionEvent e) {
+		    		Object obj = e.getSource();
+		    		if (obj instanceof Button) {
+		    			checkSelected((Button)obj);
+		    		}
+		    	}
+		    });
+	    	
 	    	comboBoxes[i] = new Combo(comboComp, SWT.READ_ONLY);
 	    	comboBoxes[i].setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
 
