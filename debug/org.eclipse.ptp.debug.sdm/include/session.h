@@ -16,15 +16,15 @@
  *
  * LA-CC 04-115
  ******************************************************************************/
+ 
 #ifndef _SESSION_H_
 #define _SESSION_H_
 
-#include "proxy.h"
-
 struct session {
-	proxy_funcs proxy;
+	struct proxy *	sess_proxy;
+	void *			sess_proxy_data;
 };
-typedef struct proxy_funcs	proxy_funcs;
+typedef struct session	session;
 
 int		proxy_send_request(char *, char *);
 #endif /* _SESSION_H_*/

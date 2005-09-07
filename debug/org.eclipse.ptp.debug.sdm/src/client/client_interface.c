@@ -21,6 +21,8 @@
 #include <string.h>
 
 #include "dbg.h"
+#include "session.h"
+#include "proxy.h"
 
 /*
  * Process set operations
@@ -35,9 +37,19 @@ void DbgRemoveProcFromSet(procset *set, int pid);
 /*
  * Session initialization
  */
-session * 
-DbgInit(void)
+int
+DbgInit(char *proxy, void *data, session **s)
 {
+	*s = malloc(sizeof(session));
+	if (find_proxy(proxy, &(*s)->sess_proxy) < 0) {
+		free(*s);
+		return -1;
+	}
+	(*s)->sess_proxy_data = data;
+	if ((*s)->sess_proxy->funcs->init(data) < 0) {
+		free(*s);
+		return -1;
+	}
 	return 0;
 }
 
@@ -47,19 +59,19 @@ DbgInit(void)
 int 
 DbgSetLineBreakpoint(session *s, procset *set, char *file, int line, breakpoint *bp)
 {
-	return s->proxy.setlinebreakpoint(s, set, file, line, bp);
+	return s->sess_proxy->funcs->setlinebreakpoint(s, set, file, line, bp);
 }
 
 int 
 DbgSetFuncBreakpoint(session *s, procset *set, char *file, char *func, breakpoint *bp)
 {
-	return s->proxy.setfuncbreakpoint(s, set, file, func, bp);
+	return s->sess_proxy->funcs->setfuncbreakpoint(s, set, file, func, bp);
 }
 
 int 
 DbgDeleteBreakpoints(session *s, procset *set, breakpoint *bp)
 {
-	return s->proxy.deletebreakpoints(s, set, bp);
+	return s->sess_proxy->funcs->deletebreakpoints(s, set, bp);
 }
 
 /*
@@ -68,13 +80,13 @@ DbgDeleteBreakpoints(session *s, procset *set, breakpoint *bp)
 int 
 DbgGo(session *s, procset *set)
 {
-	return s->proxy.go(s, set);
+	return s->sess_proxy->funcs->go(s, set);
 }
 
 int 
 DbgStep(session *s, procset *set, int count, int type)
 {
-	return s->proxy.step(s, set, count, type);
+	return s->sess_proxy->funcs->step(s, set, count, type);
 }
 
 /*
@@ -83,13 +95,13 @@ DbgStep(session *s, procset *set, int count, int type)
 int 
 DbgListStackframes(session *s, int proc, stackframelist *frame)
 {
-	return s->proxy.liststackframes(s, proc, frame);
+	return s->sess_proxy->funcs->liststackframes(s, proc, frame);
 }
 
 int 
 DbgSetCurrentStackframe(session *s, int proc, int count, int dir, stackframe *frame)
 {
-	return s->proxy.setcurrentstackframe(s, proc, count, dir, frame);
+	return s->sess_proxy->funcs->setcurrentstackframe(s, proc, count, dir, frame);
 }
 
 /*
@@ -98,25 +110,25 @@ DbgSetCurrentStackframe(session *s, int proc, int count, int dir, stackframe *fr
 int 
 DbgEvaluateExpression(session *s, int proc, char *exp)
 {
-	return s->proxy.evaluateexpression(s, proc, exp);
+	return s->sess_proxy->funcs->evaluateexpression(s, proc, exp);
 }
 
 int 
 DbgListLocalVariables(session *s, int proc, stackframe *frame)
 {
-	return s->proxy.listlocalvariables(s, proc, frame);
+	return s->sess_proxy->funcs->listlocalvariables(s, proc, frame);
 }
 
 int 
 DbgListArguments(session *s, int proc, stackframe *frame)
 {
-	return s->proxy.listarguments(s, proc, frame);
+	return s->sess_proxy->funcs->listarguments(s, proc, frame);
 }
 
 int 
 DbgListGlobalVariables(session *s, int proc)
 {
-	return s->proxy.listglobalvariables(s, proc);
+	return s->sess_proxy->funcs->listglobalvariables(s, proc);
 }
 
 /*
@@ -125,5 +137,5 @@ DbgListGlobalVariables(session *s, int proc)
 int
 DbgProgress(session *s)
 {
-	return s->proxy.progress(s);
+	return s->sess_proxy->funcs->progress(s);
 }
