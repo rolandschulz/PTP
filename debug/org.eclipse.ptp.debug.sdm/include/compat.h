@@ -17,21 +17,12 @@
  * LA-CC 04-115
  ******************************************************************************/
  
-#ifndef STACKFRAME_H_
-#define STACKFRAME_H_
+#ifndef _COMPAT_H_
+#define _COMPAT_H_
 
-#include "location.h"
+#define SOCKET          int
+#define CLOSE_SOCKET(s) (void)close(s)
+#define INVALID_SOCKET  -1
+#define SOCKET_ERROR    -1
 
-struct stackframe {
-	int		frame_level;
-	location	frame_location;
-};
-typedef struct stackframe stackframe;
-
-struct stackframelist {
-	stackframe				frame;
-	struct stackframelist *	next;
-};
-typedef struct stackframelist stackframelist;
-
-#endif /*STACKFRAME_H_*/
+#endif /* _COMPAT_H_*/

@@ -23,8 +23,27 @@
  
  #include "proxy.h"
 
+proxy proxies[] = {
+	{"tcp", proxy_tcp_funcs},
+	{NULL, NULL}
+};
+
+int
+find_proxy(char *name, proxy **pp)
+{
+	proxy *p;
+	
+	for (p = proxies; p->name != NULL; p++) {
+		if (strcmp(p->name, name) == 0) {
+			*pp = p;
+			return 0;
+		}
+	}
+	return -1;
+}
+
 int 
-proxy_init_not_imp(void)
+proxy_init_not_imp(void *data)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
