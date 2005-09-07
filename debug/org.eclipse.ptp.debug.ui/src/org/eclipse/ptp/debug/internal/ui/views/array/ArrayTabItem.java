@@ -232,6 +232,7 @@ public class ArrayTabItem extends PTabItem {
 			startCol = rangeDialog.getFromCol();
 			endCol = rangeDialog.getToCol();
 			createTable(startRow, endRow, startCol, endCol, rowIndex>-1);
+			tableSC.setMinSize(tableSC.getContent().computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			updateTable();
 		}
 	}
@@ -246,6 +247,7 @@ public class ArrayTabItem extends PTabItem {
 			rowTable.dispose();
 			rowTable = null;
 		}
+		tableSC.setMinSize(tableSC.getContent().computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		startRow = 0;
 		startCol = 0;
 		endRow = 0;
