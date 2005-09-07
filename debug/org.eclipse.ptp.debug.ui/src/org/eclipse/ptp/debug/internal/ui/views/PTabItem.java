@@ -26,7 +26,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
@@ -46,12 +45,14 @@ public abstract class PTabItem implements IRunnableContext {
 	protected PageBook fPageBook = null;
 	protected TextViewer fTextViewer = null;
 	protected boolean displayError = false;
+	protected PTabFolder view = null;
 	
-	public PTabItem(CTabFolder folder) {
-		this(folder, "");
+	public PTabItem(PTabFolder view) {
+		this(view, "");
 	}
-	public PTabItem(CTabFolder folder, String tabName) {
-		tabItem = new CTabItem(folder, SWT.CLOSE);
+	public PTabItem(PTabFolder view, String tabName) {
+		this.view = view;
+		tabItem = new CTabItem(view.getTabFolder(), SWT.CLOSE);
 		tabItem.setText(tabName);
 		tabItem.setToolTipText(tabName);
 		tabItem.addDisposeListener(new DisposeListener() {

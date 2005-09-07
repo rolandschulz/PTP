@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public class ArrayVariableDialog extends VariableDialog {
-	private static String ARRAY_TAG = "[";
+	private static final String ARRAY_TAG = "[";
 	
 	public ArrayVariableDialog(Shell parent, IStackFrame frame) {
 		super(parent, frame);

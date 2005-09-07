@@ -36,6 +36,7 @@ import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.debug.internal.ui.dialogs.RangeDialog;
+import org.eclipse.ptp.debug.internal.ui.views.PTabFolder;
 import org.eclipse.ptp.debug.internal.ui.views.PTabItem;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.swt.SWT;
@@ -43,6 +44,7 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -50,6 +52,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -75,11 +81,9 @@ public class ArrayTabItem extends PTabItem {
 	private int startCol = 0;
 	private int endRow = 0;
 	private int endCol = 0;
-	private int totalRow = 0;
-	private int totalCol = 0;
 
-	public ArrayTabItem(ArrayView view, String tabText) {
-		super(view.getTabFolder(), tabText);
+	public ArrayTabItem(PTabFolder view, String tabText) {
+		super(view, tabText);
 		setControl();
 	}
 	
@@ -147,7 +151,7 @@ public class ArrayTabItem extends PTabItem {
 		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
 		createComboBoxes(sashForm);
 		createTableComposite(sashForm);
-		sashForm.setWeights(new int[] { 2,7 });
+		//sashForm.setWeights(new int[] { 2,7 });
 	}
 	public void createComboBoxes(Composite parent) {
 		comboSC = new ScrolledComposite(parent, SWT.V_SCROLL);
@@ -173,9 +177,6 @@ public class ArrayTabItem extends PTabItem {
 	    tableSC.setExpandHorizontal(true);
 	}
 	protected void createRowTable(Composite parent) {
-		if (rowTable != null)
-			return;
-		
 		TableLayout tableLayout = new TableLayout();
 		tableLayout.addColumnData(new ColumnWeightData(1));
 		rowTable = new Table(parent, SWT.SINGLE | SWT.READ_ONLY | SWT.NONE);
@@ -194,13 +195,45 @@ public class ArrayTabItem extends PTabItem {
 		rowColumn.setResizable(false);
 	}
 	protected void createColumnTable(Composite parent) {
-		if (colTable != null)
-			return;
-
 		colTable = new Table(parent, SWT.SINGLE | SWT.FULL_SELECTION);
 		colTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 		colTable.setHeaderVisible(true);
-		colTable.setLinesVisible(true);		
+		colTable.setLinesVisible(true);
+		colTable.addListener(SWT.MouseDoubleClick, new Listener() {
+			public void handleEvent(Event event) {
+				if (event.type == SWT.MouseDoubleClick)
+					resetRangeAction();
+			}
+		});
+		colTable.setMenu(createPopupMenu());
+	}
+	protected Menu createPopupMenu() {
+		Menu menu = new Menu(colTable);
+		MenuItem mItem = new MenuItem(menu, SWT.PUSH);
+		mItem.setText(ArrayMessages.getString("ArrayTabItem.resetRange"));
+		mItem.addSelectionListener(new SelectionAdapter() {
+	    	public void widgetSelected(SelectionEvent e) {
+	    		resetRangeAction();
+	    	}
+	    });
+		return menu;
+	}
+	
+	protected void resetRangeAction() {
+		int colIndex = getColumnIndex();
+		int rowIndex = getRowIndex();
+		int totalCol = (colIndex>-1)?comboBoxes[colIndex].getItemCount():1;
+		int totalRow = (rowIndex>-1)?comboBoxes[rowIndex].getItemCount():1;
+		RangeDialog rangeDialog = new RangeDialog(tableSC.getShell(), totalRow, totalCol);
+		if (rangeDialog.open(rowIndex>-1, colIndex>-1, startRow, endRow, startCol, endCol) == Window.OK) {
+			disposeTable();
+			startRow = rangeDialog.getFromRow();
+			endRow = rangeDialog.getToRow();
+			startCol = rangeDialog.getFromCol();
+			endCol = rangeDialog.getToCol();
+			createTable(startRow, endRow, startCol, endCol, rowIndex>-1);
+			updateTable();
+		}
 	}
 	public void disposeTable() {
 		if (colTable != null && !colTable.isDisposed()) {
@@ -212,20 +245,18 @@ public class ArrayTabItem extends PTabItem {
 			rowTable.removeAll();
 			rowTable.dispose();
 			rowTable = null;
-			//reset size only row header is changed
-			tableSC.setMinSize(tableSC.getContent().computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		}
 		startRow = 0;
 		startCol = 0;
 		endRow = 0;
 		endCol = 0;
-		totalRow = 0;
-		totalCol = 0;
 	}
-	public void createTable(int sRow, int eRow, int sCol, int eCol) {
-		createRowTable((Composite)tableSC.getContent());
+	public void createTable(int sRow, int eRow, int sCol, int eCol, boolean showRowHeade) {
+		if (showRowHeade) {
+			createRowTable((Composite)tableSC.getContent());
+			fillRowHeaders(sRow, eRow);
+		}
 		createColumnTable((Composite)tableSC.getContent());
-		fillRowHeaders(sRow, eRow);
 		fillColumnHeaders(sCol, eCol);
 	}
 	
@@ -288,6 +319,13 @@ public class ArrayTabItem extends PTabItem {
 			return ((Integer)button.getData()).intValue();
 		}
 		return -1;
+	}
+	private boolean isFirstButton(Button button) {
+		if (selectedButtons.size() > TABLE_COL_INDEX) {
+			Button checkedButton = (Button)selectedButtons.get(TABLE_COL_INDEX);
+			return (checkedButton.equals(button));
+		}
+		return false;
 	}
 	public String getValueString(int rowIndex, int row, int colIndex, int col) throws DebugException {
 		IVariable var = variable;
@@ -364,14 +402,14 @@ public class ArrayTabItem extends PTabItem {
 		    subMonitor.worked(1);
 	    }
 	    subMonitor.done();
-	    comboSC.setMinSize(comboComp.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+	    Point pt = comboComp.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+	    comboSC.setMinSize(pt);
+	    sashForm.setWeights(new int [] { (pt.x + 20), view.getTabFolder().getClientArea().width });
 	}
 	
 	protected void checkSelected(Button button) {
-		if (!settingTableInfo(button)) {
-			button.setSelection(!button.getSelection());
+		if (!settingTableInfo(button))
 			return;
-		}
 
 		comboBoxes[((Integer)button.getData()).intValue()].setEnabled(!button.getSelection());
 		if (selectedButtons.contains(button)) {
@@ -389,33 +427,43 @@ public class ArrayTabItem extends PTabItem {
 	}
 	
 	private boolean settingTableInfo(Button button) {
-		if (!button.getSelection() && selectedButtons.size() == 1)
+		boolean checked = button.getSelection();
+		button.setSelection(!checked);//make it original
+		if (!checked && selectedButtons.size() == 1) {//unchecked all buttons
+			button.setSelection(checked);
 			return true;
+		}
+		
+		int tmpStartCol = startCol;
+		int tmpEndCol = endCol;
 		
 		int colIndex = getColumnIndex();
 		int rowIndex = getRowIndex();
-		if (colIndex == -1 && rowIndex == -1)
+		if (colIndex == -1 && rowIndex == -1)//first start up
 			colIndex = ((Integer)button.getData()).intValue();
-		else if (rowIndex == -1)
-			rowIndex = ((Integer)button.getData()).intValue();
-		else if (!button.getSelection())
+		else if (!checked) {//now have 2 checked buttons, unchecked one of them
+			colIndex = isFirstButton(button)?rowIndex:colIndex;
 			rowIndex = -1;
+			tmpStartCol = tmpEndCol = 0;
+		}
+		else if (rowIndex == -1 || selectedButtons.size() == MAX_CHECKED) //now have 1 checked button OR now have 2 checked button, check other button
+			rowIndex = ((Integer)button.getData()).intValue();
 			
-		totalRow = (rowIndex>-1)?comboBoxes[rowIndex].getItemCount():1;
-		totalCol = (colIndex>-1)?comboBoxes[colIndex].getItemCount():1;
-		startRow = 0;
-		endRow = totalRow;
+		int totalCol = (colIndex>-1)?comboBoxes[colIndex].getItemCount():1;
+		int totalRow = (rowIndex>-1)?comboBoxes[rowIndex].getItemCount():1;
 		RangeDialog rangeDialog = new RangeDialog(tableSC.getShell(), totalRow, totalCol);
-		if (rangeDialog.open(rowIndex>-1, colIndex>-1, startRow, endRow, startCol, endCol) == Window.CANCEL)
+		if (rangeDialog.open(rowIndex>-1, colIndex>-1, 0, totalRow, tmpStartCol, tmpEndCol) == Window.CANCEL) {
 			return false;
+		}
 		
 		disposeTable();
 		startRow = rangeDialog.getFromRow();
 		endRow = rangeDialog.getToRow();
 		startCol = rangeDialog.getFromCol();
 		endCol = rangeDialog.getToCol();
-		createTable(startRow, endRow, startCol, endCol);
+		createTable(startRow, endRow, startCol, endCol, rowIndex>-1);
 		tableSC.setMinSize(tableSC.getContent().computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		button.setSelection(checked);
 		return true;
 	}
 }
