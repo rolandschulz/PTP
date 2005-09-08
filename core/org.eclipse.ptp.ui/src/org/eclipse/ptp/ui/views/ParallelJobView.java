@@ -44,61 +44,35 @@ import org.eclipse.swt.widgets.TableItem;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public class ParallelJobView extends AbstractParallelSetView {
 	private static ParallelJobView instance = null;
-		
-	//selected element
+	// selected element
 	protected String cur_selected_element_id = "";
-	
-	//composite
+	// composite
 	protected SashForm sashForm = null;
 	protected Table jobTable = null;
 	protected Composite elementViewComposite = null;
-	
-	//action
-	//protected ParallelAction changeJobViewAction = null;
+	// action
+	// protected ParallelAction changeJobViewAction = null;
 	protected ParallelAction terminateAllAction = null;
-	
-	//view flag
+	// view flag
 	public static final String BOTH_VIEW = "0";
 	public static final String JOB_VIEW = "1";
 	public static final String PRO_VIEW = "2";
 	protected String current_view = BOTH_VIEW;
-	
-	public static Image[] jobImages = {
-		ParallelImages.getImage(ParallelImages.ICON_RUNMODE_NORMAL),
-		ParallelImages.getImage(ParallelImages.ICON_DEBUGMODE_NORMAL),
-		ParallelImages.getImage(ParallelImages.ICON_TERMINATE_ALL_NORMAL)
-	};
-	public static Image[][] procImages = {
-		{
-			ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR),
-			ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR_SEL) },
-		{
-			ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED),
-			ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SEL) },
-		{
-			ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL),
-			ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL_SEL) },
-		{
-			ParallelImages.getImage(ParallelImages.IMG_PROC_RUNNING),
-			ParallelImages.getImage(ParallelImages.IMG_PROC_RUNNING_SEL) },
-		{
-			ParallelImages.getImage(ParallelImages.IMG_PROC_STARTING),
-			ParallelImages.getImage(ParallelImages.IMG_PROC_STARTING_SEL) },
-		{
-			ParallelImages.getImage(ParallelImages.IMG_PROC_STOPPED),
-			ParallelImages.getImage(ParallelImages.IMG_PROC_STOPPED_SEL) }
-	};
-	
+	public static Image[] jobImages = { ParallelImages.getImage(ParallelImages.ICON_RUNMODE_NORMAL), ParallelImages.getImage(ParallelImages.ICON_DEBUGMODE_NORMAL), ParallelImages.getImage(ParallelImages.ICON_TERMINATE_ALL_NORMAL) };
+	public static Image[][] procImages = { { ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR), ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR_SEL) }, { ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED), ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SEL) },
+			{ ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL), ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL_SEL) }, { ParallelImages.getImage(ParallelImages.IMG_PROC_RUNNING), ParallelImages.getImage(ParallelImages.IMG_PROC_RUNNING_SEL) },
+			{ ParallelImages.getImage(ParallelImages.IMG_PROC_STARTING), ParallelImages.getImage(ParallelImages.IMG_PROC_STARTING_SEL) }, { ParallelImages.getImage(ParallelImages.IMG_PROC_STOPPED), ParallelImages.getImage(ParallelImages.IMG_PROC_STOPPED_SEL) } };
+
 	public ParallelJobView() {
 		instance = this;
 		manager = PTPUIPlugin.getDefault().getJobManager();
 	}
 	public JobManager getJobManager() {
-		return (JobManager)manager;
+		return (JobManager) manager;
 	}
 	public String getCurrentView() {
 		return current_view;
@@ -109,19 +83,16 @@ public class ParallelJobView extends AbstractParallelSetView {
 			jobTable.setVisible(true);
 			elementViewComposite.setVisible(false);
 			sashForm.setWeights(new int[] { 1, 0 });
-		}
-		else if (current_view.equals(ParallelJobView.PRO_VIEW)) {
+		} else if (current_view.equals(ParallelJobView.PRO_VIEW)) {
 			jobTable.setVisible(false);
 			elementViewComposite.setVisible(true);
 			sashForm.setWeights(new int[] { 0, 1 });
-		}
-		else {
+		} else {
 			jobTable.setVisible(true);
 			elementViewComposite.setVisible(true);
 			sashForm.setWeights(new int[] { 1, 2 });
 		}
 	}
-		
 	protected void initElementAttribute() {
 		e_offset_x = 5;
 		e_spacing_x = 4;
@@ -130,7 +101,6 @@ public class ParallelJobView extends AbstractParallelSetView {
 		e_width = 16;
 		e_height = 16;
 	}
-	
 	protected void initialElement() {
 		selectJob(manager.initial());
 	}
@@ -142,14 +112,13 @@ public class ParallelJobView extends AbstractParallelSetView {
 					jobTable.removeAll();
 					IPJob[] jobs = getJobManager().getJobs();
 					TableItem item = null;
-					for (int i=0; i<jobs.length; i++) {
+					for (int i = 0; i < jobs.length; i++) {
 						item = new TableItem(jobTable, SWT.NULL);
 						int jobImageIndex = 0;
 						if (jobs[i].isAllStop())
 							jobImageIndex = 2;
 						else if (jobs[i].isDebug())
 							jobImageIndex = 1;
-						
 						item.setImage(jobImages[jobImageIndex]);
 						item.setText(jobs[i].getElementName());
 					}
@@ -163,32 +132,26 @@ public class ParallelJobView extends AbstractParallelSetView {
 	public IElementHandler getCurrentElementHandler() {
 		return manager.getElementHandler(getCurrentJobID());
 	}
-
 	public static ParallelJobView getJobViewInstance() {
 		if (instance == null)
 			instance = new ParallelJobView();
 		return instance;
 	}
-	
 	protected void createView(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.VERTICAL));
 		parent.setLayoutData(new GridData(GridData.FILL_BOTH));
-		
 		sashForm = new SashForm(parent, SWT.HORIZONTAL);
 		sashForm.setLayout(new FillLayout(SWT.VERTICAL));
 		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
-				
 		jobTable = new Table(sashForm, SWT.BORDER | SWT.SINGLE);
 		jobTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 		jobTable.setHeaderVisible(false);
 		TableColumn jobColumn = new TableColumn(jobTable, SWT.LEFT);
 		jobColumn.setWidth(100);
-
 		jobTable.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				String jobName = jobTable.getSelection()[0].getText();
 				IPJob job = getJobManager().findJob(jobName);
-				
 				if (job != null) {
 					selectJob(job.getIDString());
 					update();
@@ -196,43 +159,35 @@ public class ParallelJobView extends AbstractParallelSetView {
 				}
 			}
 		});
-
 		elementViewComposite = createElementView(sashForm);
 		changeView(current_view);
 	}
-	
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
 		terminateAllAction = new TerminateAllAction(this);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAllAction);
 		super.buildInToolBarActions(toolBarMgr);
-	}	
+	}
 	protected void setActionEnable() {}
-	
 	protected void doubleClickAction(int element_num) {
 		IElement element = cur_element_set.get(element_num);
 		if (element != null) {
 			openProcessViewer(getJobManager().findProcess(getCurrentJobID(), element.getID()));
 		}
 	}
-	
 	protected String getToolTipText(int element_num) {
 		IElementHandler setManager = getCurrentElementHandler();
 		if (setManager == null)
 			return "Unknown element";
-
 		IElement element = cur_element_set.get(element_num);
 		if (element == null)
 			return "Unknown element";
-
 		IPProcess proc = getJobManager().findProcess(getCurrentJobID(), element.getID());
 		if (proc == null)
 			return "Unknown process";
-		
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("Task ID: " + proc.getTaskId());
 		buffer.append("\n");
 		buffer.append("Process ID: " + proc.getPid());
-
 		IElementSet[] groups = setManager.getSetsWithElement(element.getID());
 		if (groups.length > 1)
 			buffer.append("\nGroup: ");
@@ -241,15 +196,13 @@ public class ParallelJobView extends AbstractParallelSetView {
 			if (i < groups.length - 1)
 				buffer.append(",");
 		}
-		//buffer.append("\nStatus: " + getJobManager().getProcessStatusText(proc));
+		// buffer.append("\nStatus: " + getJobManager().getProcessStatusText(proc));
 		return buffer.toString();
 	}
-
 	protected Image getStatusIcon(IElement element) {
 		int status = getJobManager().getProcessStatus(getCurrentJobID(), element.getID());
 		return procImages[status][element.isSelected() ? 1 : 0];
 	}
-	
 	public String getCurrentJobID() {
 		return getJobManager().getCurrentJobId();
 	}
@@ -260,7 +213,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 	public void changeJob(String job_id) {
 		String jobName = manager.getName(job_id);
 		TableItem[] items = jobTable.getItems();
-		for (int i=0; i<items.length; i++) {
+		for (int i = 0; i < items.length; i++) {
 			if (items[i].getText().equals(jobName)) {
 				jobTable.setSelection(i);
 				break;
@@ -269,7 +222,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 	}
 	public void updateJob() {
 		IElementHandler setManager = getCurrentElementHandler();
-		if (setManager != null) {			
+		if (setManager != null) {
 			selectSet(setManager.getSetRoot());
 		}
 	}
@@ -277,61 +230,50 @@ public class ParallelJobView extends AbstractParallelSetView {
 		if (cur_element_set != null) {
 			changeTitle(manager.getName(getCurrentJobID()), cur_element_set.getID(), cur_set_size);
 		}
-	}	
-
+	}
 	public void run() {
-		System.out.println("------------ job run");		
+		System.out.println("------------ job run");
 		initialView();
 		refresh();
 		terminateAllAction.setEnabled(true);
 	}
-
 	public void start() {
 		System.out.println("------------ job start");
 		refresh();
 		terminateAllAction.setEnabled(false);
 	}
-
 	public void stopped() {
 		System.out.println("------------ job stop");
 		refresh();
 	}
-
 	public void exit() {
 		System.out.println("------------ job exit");
 		refresh();
 	}
-
 	public void abort() {
 		System.out.println("------------ job abort");
 		refresh();
 	}
-
 	public void monitoringSystemChangeEvent(Object object) {
 		System.out.println("------------ job monitoringSystemChangeEvent");
 		refresh();
 	}
-
 	public void execStatusChangeEvent(Object object) {
 		System.out.println("------------ job execStatusChangeEvent");
 		refresh();
 	}
-
 	public void sysStatusChangeEvent(Object object) {
 		System.out.println("------------ job sysStatusChangeEvent");
 		refresh();
 	}
-
 	public void processOutputEvent(Object object) {
 		System.out.println("------------ job processOutputEvent");
 		refresh();
 	}
-
 	public void errorEvent(Object object) {
 		System.out.println("------------ job errorEvent");
 		refresh();
 	}
-
 	public void updatedStatusEvent() {
 		System.out.println("------------ job updatedStatusEvent");
 		refresh();

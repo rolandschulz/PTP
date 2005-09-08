@@ -27,6 +27,8 @@ import java.util.Map;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.IProcessEvent;
+import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.listeners.IJobChangeListener;
@@ -39,7 +41,7 @@ import org.eclipse.ptp.ui.model.internal.ElementHandler;
  * @author Clement chu
  *
  */
-public class JobManager extends AbstractUIManager {
+public class JobManager extends AbstractUIManager implements IProcessListener {
 	protected Map jobList = new HashMap();
 	protected String cur_job_id = "";
 	protected List jobChangeListeners = new ArrayList();
@@ -184,13 +186,14 @@ public class JobManager extends AbstractUIManager {
 	}
 	
 	public void addJob(IPJob job) {
-		IPProcess[] pElements = job.getSortedProcesses();
-		int total_element = pElements.length;
+		IPProcess[] pProcesses = job.getSortedProcesses();
+		int total_element = pProcesses.length;
 		if (total_element > 0) {
 			IElementHandler elementHandler = new ElementHandler();
 			IElementSet set = elementHandler.getSetRoot();
 			for (int i=0; i<total_element; i++) {
-				set.add(new Element(set, pElements[i].getIDString(), String.valueOf(pElements[i].getTaskId())));
+				pProcesses[i].addProcessListener(this);
+				set.add(new Element(set, pProcesses[i].getIDString(), String.valueOf(pProcesses[i].getTaskId())));
 			}
 			elementHandler.add(set);
 			jobList.put(job.getIDString(), elementHandler);
@@ -208,5 +211,26 @@ public class JobManager extends AbstractUIManager {
 			setCurrentSetId(IElementHandler.SET_ROOT_ID);
 		}
 		return cur_job_id;
+	}
+	
+	/**
+	 * IProcessListener
+	 */
+	public void processEvent(IProcessEvent event) {
+		//only redraw if the current set contain the process
+		if (isCurrentSetContainProcess(event.getProcessID())) {
+			if (event.getType() != IProcessEvent.ADD_OUTPUT_TYPE)
+				firePaintListener();
+		}
+	}
+	public boolean isCurrentSetContainProcess(String processID) {
+		IElementHandler elementHandler = getElementHandler(getCurrentJobId());
+		if (elementHandler == null)
+			return false;
+		IElementSet set = elementHandler.getSet(getCurrentSetId());
+		if (set == null)
+			return false;
+		
+		return set.contains(processID);
 	}
 }

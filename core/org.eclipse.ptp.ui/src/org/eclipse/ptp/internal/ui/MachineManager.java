@@ -20,8 +20,9 @@ package org.eclipse.ptp.internal.ui;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.ptp.core.INodeEvent;
+import org.eclipse.ptp.core.INodeListener;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
@@ -35,57 +36,50 @@ import org.eclipse.ptp.ui.model.internal.ElementHandler;
 
 /**
  * @author clement chu
- *
+ * 
  */
-public class MachineManager extends AbstractUIManager {	
+public class MachineManager extends AbstractUIManager implements INodeListener {
 	private Map machineList = new HashMap();
 	protected String cur_machine_id = "";
 
 	public MachineManager() {
 		modelManager = PTPCorePlugin.getDefault().getModelManager();
 	}
-
 	public void shutdown() {
 		machineList.clear();
 		machineList = null;
 		modelManager = null;
 		super.shutdown();
 	}
-
 	public boolean isNoMachine() {
 		return isNoMachine(cur_machine_id);
 	}
 	public boolean isNoMachine(String machid) {
 		return (machid == null || machid.length() == 0);
 	}
-
 	public IElementHandler getElementHandler(String id) {
-		return (IElementHandler)machineList.get(id);
+		return (IElementHandler) machineList.get(id);
 	}
 	public int size() {
 		return machineList.size();
 	}
-	
 	public IPMachine[] getMachines() {
 		return modelManager.getUniverse().getSortedMachines();
 	}
-	
 	public String getCurrentMachineId() {
 		return cur_machine_id;
 	}
 	public void setCurrentMachineId(String machine_id) {
 		cur_machine_id = machine_id;
 	}
-	
 	public String getCurrentSetId() {
 		return cur_set_id;
 	}
 	public void setCurrentSetId(String set_id) {
 		cur_set_id = set_id;
-	}	
-	
+	}
 	public String getNodeStatusText(IPNode node) {
-		switch(getNodeStatus(node)) {
+		switch (getNodeStatus(node)) {
 		case IPTPUIConstants.NODE_USER_ALLOC_EXCL:
 			return "User Alloc Excl";
 		case IPTPUIConstants.NODE_USER_ALLOC_SHARED:
@@ -108,7 +102,7 @@ public class MachineManager extends AbstractUIManager {
 	}
 	public String getNodeStatusText(String job_id, String proc_id) {
 		return getNodeStatusText(findNode(job_id, proc_id));
-	}	
+	}
 	public int getProcStatus(String p_state) {
 		if (p_state.equals(IPProcess.STARTING))
 			return IPTPUIConstants.PROC_STARTING;
@@ -124,22 +118,20 @@ public class MachineManager extends AbstractUIManager {
 			return IPTPUIConstants.PROC_ERROR;
 		else
 			return IPTPUIConstants.PROC_ERROR;
-	}	
+	}
 	public int getNodeStatus(IPNode node) {
 		if (node != null) {
-			String nodeState = (String)node.getAttrib(AttributeConstants.ATTRIB_NODE_STATE);
+			String nodeState = (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_STATE);
 			if (nodeState.equals("up")) {
 				if (node.size() > 0)
-					return (node.isAllStop()?IPTPUIConstants.NODE_EXITED:IPTPUIConstants.NODE_RUNNING);
-
+					return (node.isAllStop() ? IPTPUIConstants.NODE_EXITED : IPTPUIConstants.NODE_RUNNING);
 				if (node.getAttrib(AttributeConstants.ATTRIB_NODE_USER).equals(System.getProperty("user.name"))) {
 					String mode = (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_MODE);
 					if (mode.equals("0100"))
 						return IPTPUIConstants.NODE_USER_ALLOC_EXCL;
 					else if (mode.equals("0110") || mode.equals("0111") || mode.equals("0101"))
 						return IPTPUIConstants.NODE_USER_ALLOC_SHARED;
-				}
-				else if (!node.getAttrib(AttributeConstants.ATTRIB_NODE_USER).equals("")) {
+				} else if (!node.getAttrib(AttributeConstants.ATTRIB_NODE_USER).equals("")) {
 					String mode = (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_MODE);
 					if (mode.equals("0100"))
 						return IPTPUIConstants.NODE_OTHER_ALLOC_EXCL;
@@ -147,70 +139,80 @@ public class MachineManager extends AbstractUIManager {
 						return IPTPUIConstants.NODE_OTHER_ALLOC_SHARED;
 				}
 				return IPTPUIConstants.NODE_UP;
-			}
-			else if (nodeState.equals("down"))
+			} else if (nodeState.equals("down"))
 				return IPTPUIConstants.NODE_DOWN;
 			else if (nodeState.equals("error"))
 				return IPTPUIConstants.NODE_ERROR;
 		}
-		return IPTPUIConstants.NODE_UNKNOWN;		
+		return IPTPUIConstants.NODE_UNKNOWN;
 	}
 	public int getNodeStatus(String machine_id, String node_id) {
 		return getNodeStatus(findNode(machine_id, node_id));
 	}
-
 	public IPNode findNode(String machine_id, String node_id) {
 		IPMachine machine = findMachineById(machine_id);
 		if (machine == null)
 			return null;
-		
 		return machine.findNode(node_id);
 	}
-	
 	public IPMachine findMachine(String machine_name) {
-		return (IPMachine)modelManager.getUniverse().findMachineByName(machine_name);
-	}	
+		return (IPMachine) modelManager.getUniverse().findMachineByName(machine_name);
+	}
 	public IPMachine findMachineById(String machine_id) {
 		IPElement element = modelManager.getUniverse().findChild(machine_id);
 		if (element instanceof IPMachine)
-			return (IPMachine)element;
-		
+			return (IPMachine) element;
 		return null;
 	}
-	
 	public String getName(String id) {
 		IPElement element = findMachineById(id);
 		if (element == null)
 			return "";
-		
 		return element.getElementName();
 	}
-	
 	public void addMachine(IPMachine mac) {
-		IPElement[] pElements = mac.getSortedNodes();
-		int total_element = pElements.length;
+		IPNode[] pNodes = mac.getSortedNodes();
+		int total_element = pNodes.length;
 		if (total_element > 0) {
 			IElementHandler elementHandler = new ElementHandler();
 			IElementSet set = elementHandler.getSetRoot();
-			for (int i=0; i<total_element; i++) {
-				set.add(new Element(set, pElements[i].getIDString(), pElements[i].getElementName()));
+			for (int i = 0; i < total_element; i++) {
+				pNodes[i].addNodeListener(this);
+				set.add(new Element(set, pNodes[i].getIDString(), pNodes[i].getElementName()));
 			}
 			elementHandler.add(set);
 			machineList.put(mac.getIDString(), elementHandler);
 		}
 	}
-	
 	public String initial() {
 		IPMachine[] macs = getMachines();
 		if (macs.length > 0) {
 			cur_machine_id = macs[0].getIDString();
-			for (int j=0; j<macs.length; j++) {
-				System.out.println(macs[j] + ", " + macs[j].getID());
+			for (int j = 0; j < macs.length; j++) {
+				System.out.println("testing -- " + macs[j] + ", " + macs[j].getID());
 				if (!machineList.containsKey(macs[j].getIDString()))
 					addMachine(macs[j]);
 			}
 			setCurrentSetId(IElementHandler.SET_ROOT_ID);
 		}
 		return cur_machine_id;
+	}
+	/**
+	 * INodeListener
+	 */
+	public void nodeEvent(INodeEvent event) {
+		// only redraw if the current set contain the node
+		if (isCurrentSetContainNode(event.getNodeID())) {
+			firePaintListener();
+		}
+	}
+	public boolean isCurrentSetContainNode(String nodeID) {
+		IElementHandler elementHandler = getElementHandler(getCurrentMachineId());
+		if (elementHandler == null)
+			return false;
+		IElementSet set = elementHandler.getSet(getCurrentSetId());
+		if (set == null)
+			return false;
+		return set.contains(nodeID);
 	}
 }

@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.IProcessEvent;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.debug.AbstractAttachDebugger;
@@ -83,7 +84,7 @@ public class ParallelProcessViewer extends AbstractTextEditor implements IProces
 
     public void dispose() {
         PTPCorePlugin.getDefault().getModelManager().removeParallelLaunchListener(launchAdapter);
-        getProcess().removerProcessListener();
+        getProcess().removerProcessListener(this);
         myForm.dispose();
         toolkit.dispose();
         super.dispose();
@@ -233,6 +234,7 @@ public class ParallelProcessViewer extends AbstractTextEditor implements IProces
         enableButton(process);
     }
 
+    /*
     public void addOutput(final String output) {
         getSite().getShell().getDisplay().asyncExec(new Runnable() {
             public void run() {
@@ -240,7 +242,6 @@ public class ParallelProcessViewer extends AbstractTextEditor implements IProces
             }
         });
     }
-
     public void changeStatus(final String status) {
         getSite().getShell().getDisplay().asyncExec(new Runnable() {
             public void run() {
@@ -249,7 +250,6 @@ public class ParallelProcessViewer extends AbstractTextEditor implements IProces
             }
         });
     }
-
     public void changeSignalName(final String content) {
         getSite().getShell().getDisplay().asyncExec(new Runnable() {
             public void run() {
@@ -257,7 +257,6 @@ public class ParallelProcessViewer extends AbstractTextEditor implements IProces
             }
         });
     }
-
     public void changeExitCode(final String content) {
         getSite().getShell().getDisplay().asyncExec(new Runnable() {
             public void run() {
@@ -265,7 +264,28 @@ public class ParallelProcessViewer extends AbstractTextEditor implements IProces
             }
         });
     }
-    
+    */
+	public void processEvent(final IProcessEvent event) {
+		getSite().getShell().getDisplay().asyncExec(new Runnable() {
+			public void run() {
+				switch (event.getType()) {
+				case IProcessEvent.STATUS_CHANGE_TYPE:
+					statusLabel.setText("Status: " + event.getInput());
+					enableButton(getProcess());
+					break;
+				case IProcessEvent.STATUS_EXIT_TYPE:
+					dynamicLabel.setText(EXITCODE_TEXT + event.getInput());
+					break;
+				case IProcessEvent.STATUS_SIGNALNAME_TYPE:
+					dynamicLabel.setText(SIGNALNAME_TEXT + event.getInput());
+					break;
+				case IProcessEvent.ADD_OUTPUT_TYPE:
+					outputText.append(event.getInput());
+					break;			
+				}
+			}
+		});
+	}    
     public void enableButton(IPProcess process) {
         boolean isEnable = !(process == null || process.isAllStop());
         debugButton.setEnabled(isEnable);
