@@ -191,7 +191,7 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 			IElementHandler elementHandler = new ElementHandler();
 			IElementSet set = elementHandler.getSetRoot();
 			for (int i=0; i<total_element; i++) {
-				pProcesses[i].addProcessListener(this);
+				addProcessListener(pProcesses[i], job);
 				set.add(new Element(set, pProcesses[i].getIDString(), String.valueOf(pProcesses[i].getTaskId())));
 			}
 			elementHandler.add(set);
@@ -213,9 +213,13 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		return cur_job_id;
 	}
 	
-	/**
-	 * IProcessListener
-	 */
+	/*******************************************************************************************************************************************************************************************************************************************************************************************************
+	 * Process Listener
+	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	public void addProcessListener(IPProcess process, IPJob currentJob) {
+		if (!currentJob.isDebug())
+			process.addProcessListener(this);
+	}
 	public void processEvent(IProcessEvent event) {
 		//only redraw if the current set contain the process
 		if (isJobStop(event.getJobId()))

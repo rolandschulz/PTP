@@ -319,6 +319,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	}
 	private void handleDebugEvents(ICDIEvent[] events, IProgressMonitor monitor) {
 		for (int i = 0; i < events.length; i++) {
+			Object condition = null;
 			IPCDIEvent event = (IPCDIEvent) events[i];
 			System.out.println("===================== event: " + event);
 			// all events must be running under a job
@@ -367,10 +368,11 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				fireResumeEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof InferiorExitedEvent) {
 				fireTerminatedEvent(job, event.getAllProcesses().toBitList());
+				condition = job.isAllStop()?new Boolean(true):null;
 			} else if (event instanceof ErrorEvent) {
 				fireTerminatedEvent(job, event.getAllProcesses().toBitList());
 			}
-			firePaintListener(null);
+			firePaintListener(condition);
 		}
 	}
 	public void fireSuspendEvent(IPJob job, BitList tasks) {
