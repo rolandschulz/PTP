@@ -17,10 +17,27 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.core;
-
 /**
- * 
+ * @author Clement chu
+ *
  */
-public interface IProcessListener {
-	public void processEvent(IProcessEvent event);
+public class NodeEvent implements INodeEvent {
+	private int type = -1;
+	private String input = null;
+	private String nodeID = null;
+	
+	public NodeEvent(int type, String input, String nodeID) {
+		this.type = type;
+		this.input = input;
+		this.nodeID = nodeID;
+	}
+	public String getInput() {
+		return input;
+	}
+	public int getType() {
+		return type;
+	}
+	public String getNodeID() {
+		return nodeID;
+	}
 }

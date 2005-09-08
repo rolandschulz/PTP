@@ -27,6 +27,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.ptp.core.IParallelModelListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.internal.ui.UISetManager;
+import org.eclipse.ptp.rtsystem.IRuntimeListener;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;

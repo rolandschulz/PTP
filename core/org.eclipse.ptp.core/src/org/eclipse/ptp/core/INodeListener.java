@@ -17,10 +17,10 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.core;
-
 /**
- * 
+ * @author Clement chu
+ *
  */
-public interface IProcessListener {
-	public void processEvent(IProcessEvent event);
+public interface INodeListener {
+	public void nodeEvent(INodeEvent event);
 }

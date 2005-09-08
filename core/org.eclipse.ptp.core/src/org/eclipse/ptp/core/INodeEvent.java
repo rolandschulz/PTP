@@ -17,10 +17,14 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.core;
-
 /**
- * 
+ * @author Clement chu
+ *
  */
-public interface IProcessListener {
-	public void processEvent(IProcessEvent event);
+public interface INodeEvent {
+	public final static int STATUS_UPDATE_TYPE = 0;
+	
+	public String getInput();
+	public int getType();
+	public String getNodeID();	
 }

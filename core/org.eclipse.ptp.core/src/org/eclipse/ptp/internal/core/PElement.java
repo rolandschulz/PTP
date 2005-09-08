@@ -40,7 +40,6 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 		attribs.put(AttributeConstants.ATTRIB_PARENT, parent);
 		attribs.put(AttributeConstants.ATTRIB_NAME, name);
 		attribs.put(AttributeConstants.ATTRIB_TYPE, new Integer(type));
-		System.out.println("NEW PElement - ID = "+ID);
 	}
 
 	protected PElementInfo getElementInfo() {

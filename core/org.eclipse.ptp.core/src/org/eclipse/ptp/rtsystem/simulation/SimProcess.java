@@ -24,18 +24,22 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.ptp.core.INodeEvent;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.IProcessEvent;
 import org.eclipse.ptp.core.IProcessListener;
+import org.eclipse.ptp.core.NodeEvent;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.ProcessEvent;
 import org.eclipse.ptp.internal.core.CoreUtils;
 import org.eclipse.ptp.internal.core.OutputTextFile;
 import org.eclipse.ptp.internal.core.PElement;
@@ -43,83 +47,57 @@ import org.eclipse.ptp.internal.core.PElementInfo;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
 
 public class SimProcess extends Process implements IPProcess, IPElement, Comparable {
-
 	InputStream err;
 	InputStream in;
 	OutputStream out;
 	SimThread[] threads;
 	SimQueue commands;
-	
 	protected HashMap attribs = null;
-	
 	protected int ID = -1;
-
 	private PElementInfo elementInfo = null;
-
 	protected String NAME_TAG = "process ";
-
 	private String pid = null;
-
 	private String status = null;
-
 	private String exitCode = null;
-
 	private String signalName = null;
-
 	private boolean isTerminated = false;
-
 	// private List outputList = new ArrayList();
 	private OutputTextFile outputFile = null;
-
 	protected String outputDirPath = null;
-
 	protected int storeLine = 0;
-
-	private IProcessListener listener = null;
-
+	private List listeners = new ArrayList();
 	/*
-	 * the node that this process is running on, or was scheduled on / will be,
-	 * etc
+	 * the node that this process is running on, or was scheduled on / will be, etc
 	 */
 	protected IPNode node;
-	
 	Thread procThread;
 
-	public SimProcess(IPElement element, String name, String key, String pid, int taskId,
-			String status, String exitCode, String signalName) {
-		
+	public SimProcess(IPElement element, String name, String key, String pid, int taskId, String status, String exitCode, String signalName) {
 		attribs = new HashMap();
 		ID = PTPCorePlugin.getDefault().getNewID();
 		attribs.put(AttributeConstants.ATTRIB_PARENT, element);
 		attribs.put(AttributeConstants.ATTRIB_NAME, name);
 		attribs.put(AttributeConstants.ATTRIB_TYPE, new Integer(P_PROCESS));
-		System.out.println("NEW PElement - ID = "+ID);
-
+		System.out.println("NEW PElement - ID = " + ID);
 		this.pid = pid;
 		attribs.put(AttributeConstants.ATTRIB_TASKID, new Integer(taskId));
 		this.exitCode = exitCode;
 		setStatus(status);
-		IPJob job = getJob();
 		setOutputStore();
 		outputFile = new OutputTextFile(name, outputDirPath, storeLine);
-
 		final int numThreads = 1;
 		SimQueue cmds = null;
-		
 		if (cmds == null) {
 			commands = new SimQueue();
 			initCommands(commands);
 		}
-		
 		threads = new SimThread[numThreads];
 		for (int i = 0; i < numThreads; i++) {
 			threads[i] = new SimThread(this, i, taskId);
 		}
-		
 		err = null;
 		in = new SimInputStream();
 		out = new SimOutputStream();
-		
 		procThread = new Thread() {
 			public void run() {
 				outerWhile: while (true) {
@@ -130,13 +108,10 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 								continue outerWhile;
 							}
 						}
-						
 						ArrayList command = (ArrayList) commands.removeItem();
-						
 						String destination = (String) command.get(0);
 						String cmd = (String) command.get(1);
 						String arg = (String) command.get(2);
-						
 						if (!destination.equals("-1")) {
 							threads[Integer.parseInt(destination)].runCommand((SimInputStream) in, cmd, arg);
 						} else {
@@ -154,34 +129,23 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 				for (int i = 0; i < numThreads; i++) {
 					threads[i].terminate();
 				}
-				
 				((SimInputStream) in).destroy();
 			}
 		};
 		procThread.start();
-		
 	}
-	
 	private void setOutputStore() {
-		Preferences preferences = PTPCorePlugin.getDefault()
-				.getPluginPreferences();
-		outputDirPath = preferences
-				.getString(PreferenceConstants.OUTPUT_DIR);
+		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
+		outputDirPath = preferences.getString(PreferenceConstants.OUTPUT_DIR);
 		storeLine = preferences.getInt(PreferenceConstants.STORE_LINE);
 		if (outputDirPath == null || outputDirPath.length() == 0)
-			outputDirPath = ResourcesPlugin.getWorkspace().getRoot()
-					.getLocation().append(
-							PreferenceConstants.DEF_OUTPUT_DIR_NAME)
-					.toOSString();
-
+			outputDirPath = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(PreferenceConstants.DEF_OUTPUT_DIR_NAME).toOSString();
 		if (storeLine == 0)
 			storeLine = PreferenceConstants.DEF_STORE_LINE;
-
 		File outputDirectory = new File(outputDirPath);
 		if (!outputDirectory.exists())
 			outputDirectory.mkdir();
 	}
-
 	public IPJob getJob() {
 		IPElement current = this;
 		do {
@@ -190,150 +154,130 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		} while ((current = current.getParent()) != null);
 		return null;
 	}
-
 	public String getProcessNumber() {
 		return "" + getTaskId() + "";
 	}
-
+	private void fireEvent(IProcessEvent event) {
+		for (Iterator i=listeners.iterator(); i.hasNext();) {
+			IProcessListener listener = (IProcessListener)i.next();
+			listener.processEvent(event);
+		}
+	}
 	public void setStatus(String status) {
 		this.status = status == null ? "unknown" : status;
-		if (listener != null && status != null)
-			listener.changeStatus(status);
+		if (status != null) {
+			fireEvent(new ProcessEvent(IProcessEvent.STATUS_CHANGE_TYPE, status, getIDString()));
+			if (node != null)
+				node.fireEvent(new NodeEvent(INodeEvent.STATUS_UPDATE_TYPE, null, node.getIDString()));
+		}
 	}
-
 	public void setExitCode(String exitCode) {
 		this.exitCode = exitCode;
-		if (listener != null && exitCode != null)
-			listener.changeExitCode(exitCode);
+		if (exitCode != null) {
+			fireEvent(new ProcessEvent(IProcessEvent.STATUS_EXIT_TYPE, exitCode, getIDString()));
+			node.fireEvent(new NodeEvent(INodeEvent.STATUS_UPDATE_TYPE, null, node.getIDString()));
+		}
 	}
-
 	public void setSignalName(String signalName) {
 		this.signalName = signalName;
-		if (listener != null && signalName != null)
-			listener.changeSignalName(signalName);
+		if (signalName != null)
+			fireEvent(new ProcessEvent(IProcessEvent.STATUS_SIGNALNAME_TYPE, signalName, getIDString()));
 	}
-
 	public void setPid(String pid) {
 		this.pid = pid;
 	}
-
 	public String getPid() {
 		return pid;
 	}
-
 	public String getExitCode() {
 		return exitCode;
 	}
-
 	public String getSignalName() {
 		return signalName;
 	}
-
 	public String getStatus() {
 		return status;
 	}
-
 	public boolean isTerminated() {
 		return isTerminated;
 	}
-
 	public void removeProcess() {
 		((IPNode) getParent()).removeChild(this);
 	}
-
 	public void setTerminated(boolean isTerminated) {
 		this.isTerminated = isTerminated;
 	}
-
 	public void addOutput(String output) {
 		// outputList.add(output);
 		// outputList.add("random output from process: " + (counter++));
 		outputFile.write(output + "\n");
-		if (listener != null)
-			listener.addOutput(output + "\n");
+		fireEvent(new ProcessEvent(IProcessEvent.ADD_OUTPUT_TYPE, output + "\n", getIDString()));
 	}
-
 	public String getContents() {
 		// String[] array = new String[outputList.size()];
 		// return (String[]) outputList.toArray( array );
 		return outputFile.getContents();
 	}
-
 	public String[] getOutputs() {
 		// String[] array = new String[outputList.size()];
 		// return (String[]) outputList.toArray( array );
 		return null;
 	}
-
 	public void clearOutput() {
 		outputFile.delete();
 		// outputList.clear();
 	}
-
 	public void addProcessListener(IProcessListener listener) {
-		this.listener = listener;
+		if (!listeners.contains(listener))
+			listeners.add(listener);
 	}
-
-	public void removerProcessListener() {
-		listener = null;
+	public void removerProcessListener(IProcessListener listener) {
+		if (listeners.contains(listener))
+			listeners.remove(listener);
 	}
-
 	public boolean isAllStop() {
 		return getStatus().startsWith(EXITED);
 	}
-
 	public void setNode(IPNode node) {
 		this.node = node;
 		if (node != null)
 			node.addChild(this);
 	}
-
 	public IPNode getNode() {
 		return this.node;
 	}
-
 	public int getTaskId() {
 		return ((Integer) attribs.get(AttributeConstants.ATTRIB_TASKID)).intValue();
 	}
-	
 	public void addChild(IPElement member) {
 		getElementInfo().addChild(member);
 	}
-
 	public void removeChild(IPElement member) {
 		getElementInfo().removeChild(member);
 	}
-
 	public IPElement findChild(String key) {
 		return getElementInfo().findChild(key);
 	}
-
 	public void removeChildren() {
 		getElementInfo().removeChildren();
 	}
-
 	public Collection getCollection() {
 		PElementInfo info = getElementInfo();
 		if (info != null)
 			return info.getCollection();
-
 		return null;
 	}
-
 	public IPElement[] getChildren() {
 		PElementInfo info = getElementInfo();
 		if (info != null)
 			return info.getChildren();
-
 		return new IPElement[] {};
 	}
-
 	public IPElement[] getSortedChildren() {
 		IPElement[] elements = getChildren();
 		sort(elements);
 		return elements;
 	}
-
 	public List getChildrenOfType(int type) {
 		IPElement[] children = getChildren();
 		int size = children.length;
@@ -346,11 +290,9 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		}
 		return list;
 	}
-
 	public boolean hasChildren() {
 		return getElementInfo().hasChildren();
 	}
-
 	private void quickSort(IPElement element[], int low, int high) {
 		int lo = low;
 		int hi = high;
@@ -374,45 +316,36 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 				quickSort(element, lo, high);
 		}
 	}
-
 	private void swap(IPElement element[], int i, int j) {
 		IPElement tempElement;
 		tempElement = element[i];
 		element[i] = element[j];
 		element[j] = tempElement;
 	}
-
 	public void sort(IPElement element[]) {
 		quickSort(element, 0, element.length - 1);
 	}
-	
 	protected PElementInfo getElementInfo() {
 		if (elementInfo == null)
 			elementInfo = new PElementInfo(this);
 		return elementInfo;
 	}
-
 	/*
 	 * public String getKey() { return fKey; }
 	 */
-
 	public Object getAttribute(String key) {
 		return attribs.get(key);
 	}
-	
 	public String getElementName() {
 		// return NAME_TAG + getKey();
-		return (String)attribs.get(AttributeConstants.ATTRIB_NAME);
+		return (String) attribs.get(AttributeConstants.ATTRIB_NAME);
 	}
-
 	public int getID() {
 		return ID;
 	}
-	
 	public String getIDString() {
-		return ""+ID+"";
+		return "" + ID + "";
 	}
-
 	/**
 	 * @param name
 	 *            The Name to set.
@@ -420,14 +353,12 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 	public void setElementName(String name) {
 		attribs.put(AttributeConstants.ATTRIB_NAME, name);
 	}
-
 	/**
 	 * @return Returns the Parent.
 	 */
 	public IPElement getParent() {
-		return (IPElement)attribs.get(AttributeConstants.ATTRIB_PARENT);
+		return (IPElement) attribs.get(AttributeConstants.ATTRIB_PARENT);
 	}
-
 	/**
 	 * @param parent
 	 *            The Parent to set.
@@ -435,16 +366,16 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 	public void setParent(IPElement parent) {
 		attribs.put(AttributeConstants.ATTRIB_PARENT, parent);
 	}
-
 	/**
 	 * @return Returns the Type.
 	 */
 	public int getElementType() {
-		Integer i = (Integer)attribs.get(AttributeConstants.ATTRIB_TYPE);
-		if(i == null) return P_TYPE_ERROR;
-		else return i.intValue();
+		Integer i = (Integer) attribs.get(AttributeConstants.ATTRIB_TYPE);
+		if (i == null)
+			return P_TYPE_ERROR;
+		else
+			return i.intValue();
 	}
-
 	/**
 	 * @param type
 	 *            The Type to set.
@@ -452,15 +383,12 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 	public void setElementType(int type) {
 		attribs.put(AttributeConstants.ATTRIB_TYPE, new Integer(type));
 	}
-
 	public String toString() {
 		return getElementName();
 	}
-
 	public int size() {
 		return getElementInfo().size();
 	}
-
 	public int compareTo(Object obj) {
 		if (obj instanceof IPElement) {
 			int my_rank = getID();
@@ -474,66 +402,51 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		}
 		return 0;
 	}
-
 	public int computeScore(String pageId, Object element) {
 		if (!CoreUtils.PTP_SEARCHPAGE_ID.equals(pageId))
 			return ISearchPageScoreComputer.UNKNOWN;
-
 		if (element instanceof IPElement)
 			return 90;
-
 		return ISearchPageScoreComputer.LOWEST;
 	}
-	
 	public InputStream getErrorStream() {
 		return err;
 	}
-
 	public InputStream getInputStream() {
 		return in;
 	}
-
 	public OutputStream getOutputStream() {
 		return out;
 	}
-	
 	public void destroy() {
 		setTerminated(true);
 		((SimInputStream) in).destroy();
 	}
-	
 	private void initCommands(SimQueue cmds) {
 		ArrayList cmd, cmd2, cmd3, cmd4;
-
 		cmd = new ArrayList();
 		cmd.add(0, "0");
 		cmd.add(1, "print");
 		cmd.add(2, "ProcessOutput");
-		
-/*		cmd2 = new ArrayList();
-		cmd2.add(0, "0");
-		cmd2.add(1, "break");
-		cmd2.add(2, "5");
-*/		
+		/*
+		 * cmd2 = new ArrayList(); cmd2.add(0, "0"); cmd2.add(1, "break"); cmd2.add(2, "5");
+		 */
 		cmd3 = new ArrayList();
 		cmd3.add(0, "-1");
 		cmd3.add(1, "exitProcess");
 		cmd3.add(2, "");
-
-		//cmds.addItem(cmd2);
+		// cmds.addItem(cmd2);
 		for (int j = 0; j < 10; j++) {
 			cmds.addItem(cmd);
 		}
 		cmds.addItem(cmd3);
 	}
-	
 	public int exitValue() {
 		if (isTerminated)
 			return 0;
 		else
 			throw new IllegalThreadStateException();
 	}
-	
 	public int waitFor() throws InterruptedException {
 		try {
 			procThread.join();
@@ -541,19 +454,15 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		}
 		return 0;
 	}
-	
 	public SimThread getThread(int tId) {
 		return threads[tId];
 	}
-	
 	public SimThread[] getThreads() {
 		return threads;
 	}
-	
 	public int getThreadCount() {
 		return threads.length;
 	}
-
 	public void setAttribute(String key, Object o) {
 		attribs.put(key, o);
 	}

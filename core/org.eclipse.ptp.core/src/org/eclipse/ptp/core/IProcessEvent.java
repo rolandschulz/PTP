@@ -17,10 +17,17 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.core;
-
 /**
- * 
+ * @author Clement chu
+ *
  */
-public interface IProcessListener {
-	public void processEvent(IProcessEvent event);
+public interface IProcessEvent {
+	public final static int STATUS_CHANGE_TYPE = 0;
+	public final static int STATUS_EXIT_TYPE = 1;
+	public final static int STATUS_SIGNALNAME_TYPE = 2;
+	public final static int ADD_OUTPUT_TYPE = 3;
+	
+	public String getInput();
+	public int getType();
+	public String getProcessID();
 }
