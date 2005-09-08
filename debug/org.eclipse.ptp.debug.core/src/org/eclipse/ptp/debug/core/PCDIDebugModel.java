@@ -216,6 +216,7 @@ public class PCDIDebugModel {
 		return DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(PTPDebugCorePlugin.getUniqueIdentifier());
 	}
 	
+	/*
 	public static IPBreakpoint isPBreakpointExisted(IPLineBreakpoint breakpoint) throws CoreException {
 		int lineNumber = breakpoint.getLineNumber();
 		IResource resource = breakpoint.getMarker().getResource();
@@ -223,7 +224,6 @@ public class PCDIDebugModel {
 		
 		return lineBreakpointExists(sourceHandle, resource, lineNumber);
 	}
-
 	public static IPLineBreakpoint lineBreakpointExists(String sourceHandle, IResource resource, int lineNumber) throws CoreException {
 		IBreakpoint[] breakpoints = getPBreakpoints();
 		for(int i=0; i<breakpoints.length; i++) {
@@ -241,7 +241,7 @@ public class PCDIDebugModel {
 		}
 		return null;
 	}
-	
+	*/
 	public static IBreakpoint[] findPBreakpointsBySet(String set_id) throws CoreException {
 		List bptList = new ArrayList();
 		IBreakpoint[] breakpoints = getPBreakpoints();
@@ -276,7 +276,7 @@ public class PCDIDebugModel {
 				}
 			}
 		};
-		ResourcesPlugin.getWorkspace().run(runnable, null, 0, null);
+		ResourcesPlugin.getWorkspace().run(runnable, null);
 	}
 	
 	public static void updatePBreakpoints(final String job_id, final String set_id) throws CoreException {
@@ -307,7 +307,7 @@ public class PCDIDebugModel {
 				}.schedule();
 			}
 		};
-		ResourcesPlugin.getWorkspace().run(runnable, null, 0, null);
+		ResourcesPlugin.getWorkspace().run(runnable, null);
 	}
 	
 }
