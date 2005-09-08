@@ -233,10 +233,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				 */
 				if (getLaunchManager().getControlSystem() instanceof SimulationControlSystem) {
 					IPProcess[] procs = job.getSortedProcesses();
-					for (int i = 0; i < procs.length; i++) {
-						Process process = ((Process) procs[i]);
-						DebugPlugin.newProcess(launch, process, "Launch Label " + i);
-					}
+					Process process = ((Process) procs[0]);
+					DebugPlugin.newProcess(launch, process, "Launch Label " + 0);
 				} else {
 					Process process = DebugPlugin.exec(commandLine, null);
 					DebugPlugin.newProcess(launch, process, "Launch Label");
