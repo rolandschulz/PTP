@@ -129,6 +129,9 @@ public class MachineManager extends AbstractUIManager {
 		if (node != null) {
 			String nodeState = (String)node.getAttrib(AttributeConstants.ATTRIB_NODE_STATE);
 			if (nodeState.equals("up")) {
+				if (!node.isAllStop())
+					return IPTPUIConstants.NODE_RUNNING;
+				
 				if (node.getAttrib(AttributeConstants.ATTRIB_NODE_USER).equals(System.getProperty("user.name"))) {
 					String mode = (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_MODE);
 					if (mode.equals("0100"))
