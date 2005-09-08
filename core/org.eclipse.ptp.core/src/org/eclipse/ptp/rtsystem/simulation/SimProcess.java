@@ -113,7 +113,7 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		
 		threads = new SimThread[numThreads];
 		for (int i = 0; i < numThreads; i++) {
-			threads[i] = new SimThread(i, taskId);
+			threads[i] = new SimThread(this, i, taskId);
 		}
 		
 		err = null;

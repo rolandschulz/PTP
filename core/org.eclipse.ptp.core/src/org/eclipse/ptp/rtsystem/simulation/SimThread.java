@@ -21,6 +21,8 @@ package org.eclipse.ptp.rtsystem.simulation;
 import java.util.ArrayList;
 import java.util.Observable;
 
+import org.eclipse.ptp.core.IPProcess;
+
 
 public class SimThread extends Observable {
 
@@ -35,10 +37,12 @@ public class SimThread extends Observable {
 	SimStackFrame[] stackFrames;
 	int threadId;
 	int processId;
+	SimProcess simProcess;
 	
-	public SimThread(int tid, int pId) {
+	public SimThread(SimProcess proc, int tid, int pId) {
 		state = RUNNING;
 		curLine = 1;
+		simProcess = proc;
 		breakLines = new ArrayList();
 		threadId = tid;
 		processId = pId;
@@ -81,6 +85,8 @@ public class SimThread extends Observable {
 		for (int i = 0; i < bps.length; i++) {
 			if (curLine == bps[i].intValue()) {
 				state = SUSPENDED;
+				simProcess.setStatus(IPProcess.STOPPED);
+
 				System.out.println("Process: " + processId + " Thread: " + 
 						threadId + " SUSPENDED at line " + curLine);
 				
@@ -111,6 +117,7 @@ public class SimThread extends Observable {
 	
 	public void terminate() {
 		state = TERMINATED;
+		simProcess.setStatus(IPProcess.EXITED);
 		setChanged();
 		ArrayList list = new ArrayList();
 		list.add(0, new Integer(processId));
@@ -120,6 +127,7 @@ public class SimThread extends Observable {
 	
 	public void resume() {
 		state = RUNNING;
+		simProcess.setStatus(IPProcess.RUNNING);
 		setChanged();
 		ArrayList list = new ArrayList();
 		list.add(0, new Integer(processId));

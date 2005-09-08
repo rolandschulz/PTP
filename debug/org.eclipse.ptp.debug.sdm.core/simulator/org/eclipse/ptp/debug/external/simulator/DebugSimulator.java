@@ -333,15 +333,12 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 			int line = ((Integer) list.get(3)).intValue();
 			LineLocation loc = new LineLocation(file, line);
 			LineBreakpoint bpt = new LineBreakpoint(ICDIBreakpoint.REGULAR, loc, null);
-			procs[procId].setStatus(IPProcess.STOPPED);
 			fireEvent(new BreakpointHitEvent(getSession(), new DebugProcessSet(session, procId), bpt));
 			debuggerOutput.addItem("BreakpointHit Event for " + procId);
 		} else if (event.equals("RESUMED")) {
-			procs[procId].setStatus(IPProcess.RUNNING);
 			fireEvent(new InferiorResumedEvent(getSession(), new DebugProcessSet(session, procId)));
 			debuggerOutput.addItem("InferiorResumed Event for " + procId);
 		} else if (event.equals("TERMINATED")) {
-			procs[procId].setStatus(IPProcess.EXITED);
 			fireEvent(new InferiorExitedEvent(getSession(), new DebugProcessSet(session, procId)));
 			debuggerOutput.addItem("InferiorExited Event for " + procId);
 		}
