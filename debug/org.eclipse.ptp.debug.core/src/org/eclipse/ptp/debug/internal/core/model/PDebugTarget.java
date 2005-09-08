@@ -121,6 +121,7 @@ import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
@@ -711,6 +712,11 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	public void handleDebugEvents( ICDIEvent[] events ) {
 		for( int i = 0; i < events.length; i++ ) {
 			ICDIEvent event = events[i];
+			
+			/* Check to see if this event is applicable for the process */
+			if (!((IPCDIEvent) event).isForProcess(procTaskId))
+				return;
+			
 			ICDIObject source = event.getSource();
 			if ( source == null && event instanceof ICDIDestroyedEvent ) {
 				handleTerminatedEvent( (ICDIDestroyedEvent)event );
