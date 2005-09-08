@@ -104,4 +104,8 @@ public abstract class AbstractEvent implements IPCDIEvent {
 		}
 		return src;
 	}
+	
+	public boolean isForProcess(int procNumber) {
+		return sources.toBitList().get(procNumber);
+	}
 }

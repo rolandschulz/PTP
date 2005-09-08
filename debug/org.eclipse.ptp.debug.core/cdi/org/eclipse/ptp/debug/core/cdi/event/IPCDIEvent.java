@@ -32,5 +32,6 @@ public interface IPCDIEvent {
 	public IPCDIDebugProcessSet getAllUnregisteredProcesses();
 	public IPCDIDebugProcessSet getAllRegisteredProcesses();
 	public IPJob getDebugJob();
+	public boolean isForProcess(int procNumber);
 }
 

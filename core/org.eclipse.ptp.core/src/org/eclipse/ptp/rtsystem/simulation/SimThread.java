@@ -63,9 +63,6 @@ public class SimThread extends Observable {
 	}
 
 	public void runCommand(SimInputStream in, String cmd, String arg) {
-		if (state == SUSPENDED)
-			return;
-		
 		if (cmd.equals("print")) {
 			checkBreakpoint();
 			in.printString(curLine + " : " + arg + " from process (pid) " + processId + " & thread #" + threadId);

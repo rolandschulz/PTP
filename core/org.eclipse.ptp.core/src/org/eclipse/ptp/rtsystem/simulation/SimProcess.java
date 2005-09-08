@@ -122,8 +122,15 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		
 		procThread = new Thread() {
 			public void run() {
-				while (true) {
+				outerWhile: while (true) {
 					try {
+						for (int i = 0; i < numThreads; i++) {
+							if (threads[i].state == threads[i].SUSPENDED) {
+								Thread.sleep(2000);
+								continue outerWhile;
+							}
+						}
+						
 						ArrayList command = (ArrayList) commands.removeItem();
 						
 						String destination = (String) command.get(0);
