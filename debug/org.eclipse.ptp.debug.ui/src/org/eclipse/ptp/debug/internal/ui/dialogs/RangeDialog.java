@@ -53,12 +53,12 @@ public class RangeDialog extends Dialog {
 	private int fromCol = 0;
 	private int toCol = 0;
 	
-    public RangeDialog(Shell parentShell, int maxRow, int maxCol) {
+    public RangeDialog(Shell parentShell, int maxCol, int maxRow) {
         super(parentShell);
-        this.maxRow = maxRow;
         this.maxCol = maxCol;
-        this.toRow = maxRow;
         this.toCol = maxCol;
+        this.maxRow = maxRow;
+        this.toRow = maxRow;
     }
     public int getFromRow() {
     	return fromRow;
@@ -120,26 +120,26 @@ public class RangeDialog extends Dialog {
         return composite;
     }
     
-    public int open(boolean showRow, boolean showCol, int fromRow, int toRow, int fromCol, int toCol) {
-    	this.fromRow = fromRow;
-    	this.toRow = toRow==0?maxRow:toRow;
+    public int open(boolean showCol, boolean showRow, int fromCol, int toCol, int fromRow, int toRow) {
     	this.fromCol = fromCol;
     	this.toCol = (toCol==0?maxCol:toCol);
-    	return open(showRow, showCol);
+    	this.fromRow = fromRow;
+    	this.toRow = toRow==0?maxRow:toRow;
+    	return open(showCol, showRow);
     }
 
-    private int open(boolean showRow, boolean showCol) {
+    private int open(boolean showCol, boolean showRow) {
     	create();
-    	rowGroup.setEnabled(showRow);
-    	rowFromField.setEnabled(showRow, rowGroup);
-    	rowToField.setEnabled(showRow, rowGroup);
     	colGroup.setEnabled(showCol);
        	colFromField.setEnabled(showCol, colGroup);
        	colToField.setEnabled(showCol, colGroup);
-       	rowFromField.setStringValue(""+fromRow);
-       	rowToField.setStringValue(""+toRow);
+    	rowGroup.setEnabled(showRow);
+    	rowFromField.setEnabled(showRow, rowGroup);
+    	rowToField.setEnabled(showRow, rowGroup);
        	colFromField.setStringValue(""+fromCol);
        	colToField.setStringValue(""+toCol);
+       	rowFromField.setStringValue(""+fromRow);
+       	rowToField.setStringValue(""+toRow);
     	return open();
     }
     

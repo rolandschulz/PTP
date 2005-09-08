@@ -179,12 +179,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	public static void errorDialog(Shell shell, String title, String message, Throwable t) {
 		IStatus status;
 		if (t instanceof CoreException) {
-			status= ((CoreException)t).getStatus();
-			if (status != null && message.equals(status.getMessage())) {
-				message = null;
-			}
+			status = ((CoreException)t).getStatus();
 		} else {
-			status= new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Error within Debug UI: ", t); //$NON-NLS-1$
+			status = new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Error within Debug UI: ", t);
 			log(status);	
 		}
 		errorDialog(shell, title, message, status);
