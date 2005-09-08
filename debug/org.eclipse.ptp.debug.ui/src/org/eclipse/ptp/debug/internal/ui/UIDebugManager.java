@@ -387,12 +387,14 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				if (bpt instanceof ICDILineBreakpoint) {
 					ICDILocator locator = ((ICDILineBreakpoint)bpt).getLocator();
 					int lineNumber = locator.getLineNumber();
+					System.out.println("Locator: " + locator.getFile());
 					//String fileName = locator.getFile();
+					//FIXME: Hardcode the filename
 					String fileName = "TestC/testC.c";
 					//fileName = "HelloWorld/main.c";
 					//String fileName = "D:/eclipse3.1/runtime-EclipseApplication/TestC/testC.c";
 					try {						
-						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllProcesses().toBitList());
+						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses().toBitList());
 					} catch (CoreException e) {
 						PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
 					}
