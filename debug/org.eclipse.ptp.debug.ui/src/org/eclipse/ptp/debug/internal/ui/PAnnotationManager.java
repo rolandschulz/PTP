@@ -258,6 +258,9 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		
 	//called by event
 	public void addAnnotation(String job_id, String fullPathFileName, int lineNumber, BitList tasks) throws CoreException {
+		if (tasks.isEmpty())
+			return;
+		
 		IFile file = findFile(fullPathFileName);
 		if (file == null)
 			throw new CoreException(Status.CANCEL_STATUS);
@@ -363,6 +366,9 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	
 	//called by event
 	public void removeAnnotation(String job_id, String fullPathFileName, BitList tasks) throws CoreException {
+		if (tasks.isEmpty())
+			return;
+
 		IFile file = findFile(fullPathFileName);
 		if (file == null)
 			throw new CoreException(Status.CANCEL_STATUS);
