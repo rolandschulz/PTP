@@ -1,6 +1,8 @@
 package org.eclipse.ptp.rtsystem.simulation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -166,13 +168,22 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 	public String[] getMachines() {
 		int i = 0;
 		Set set = nodeMap.keySet();
-		String[] ne = new String[set.size()];
-		Iterator it = set.iterator();
+		Object[] arset = set.toArray();
+		Arrays.sort(arset);
+		
+		String[] ne = new String[arset.length];
+		//Iterator it = set.iterator();
 
+		for(i=0; i<arset.length; i++) {
+			ne[i] = new String((String)arset[i]);
+		}
+		
+		/*
 		while (it.hasNext()) {
 			String key = (String) it.next();
 			ne[i++] = new String(key);
 		}
+		*/
 
 		return ne;
 	}
