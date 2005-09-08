@@ -129,9 +129,6 @@ public class MachineManager extends AbstractUIManager {
 		if (node != null) {
 			String nodeState = (String)node.getAttrib(AttributeConstants.ATTRIB_NODE_STATE);
 			if (nodeState.equals("up")) {
-				if (!node.isAllStop())
-					return IPTPUIConstants.NODE_RUNNING;
-				
 				if (node.getAttrib(AttributeConstants.ATTRIB_NODE_USER).equals(System.getProperty("user.name"))) {
 					String mode = (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_MODE);
 					if (mode.equals("0100"))
@@ -146,7 +143,10 @@ public class MachineManager extends AbstractUIManager {
 					else if (mode.equals("0110") || mode.equals("0111") || mode.equals("0101"))
 						return IPTPUIConstants.NODE_OTHER_ALLOC_SHARED;
 				}
-				return IPTPUIConstants.NODE_UP;
+				if (node.size() == 0)
+					return IPTPUIConstants.NODE_UP;
+					
+				return (node.isAllStop()?IPTPUIConstants.NODE_EXITED:IPTPUIConstants.NODE_RUNNING);
 			}
 			else if (nodeState.equals("down"))
 				return IPTPUIConstants.NODE_DOWN;
