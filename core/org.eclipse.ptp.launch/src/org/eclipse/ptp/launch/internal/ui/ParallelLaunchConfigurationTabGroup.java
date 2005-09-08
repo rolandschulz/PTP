@@ -37,7 +37,7 @@ public class ParallelLaunchConfigurationTabGroup extends AbstractLaunchConfigura
                 new PArgumentTab(),
                 new ParallelTab(),
                 //new CEnvironmentTab(), 
-                new PDebuggerTab(false), 
+                //new PDebuggerTab(false), 
                 //new CSourceLookupTab(), 
                 new PCommonTab() };
         setTabs(tabs);
