@@ -320,6 +320,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	private void handleDebugEvents(ICDIEvent[] events, IProgressMonitor monitor) {
 		for (int i = 0; i < events.length; i++) {
 			IPCDIEvent event = (IPCDIEvent) events[i];
+			System.out.println("===================== event: " + event);
 			// all events must be running under a job
 			IPJob job = event.getDebugJob();
 			if (job == null)
