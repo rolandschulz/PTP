@@ -103,7 +103,7 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		setOutputStore();
 		outputFile = new OutputTextFile(name, outputDirPath, storeLine);
 
-		int numThreads = 1;
+		final int numThreads = 1;
 		SimQueue cmds = null;
 		
 		if (cmds == null) {
@@ -144,6 +144,10 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 					}
 				}
 				isTerminated = true;
+				for (int i = 0; i < numThreads; i++) {
+					threads[i].terminate();
+				}
+				
 				((SimInputStream) in).destroy();
 			}
 		};
@@ -499,21 +503,21 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		cmd.add(1, "print");
 		cmd.add(2, "ProcessOutput");
 		
-		cmd2 = new ArrayList();
+/*		cmd2 = new ArrayList();
 		cmd2.add(0, "0");
 		cmd2.add(1, "break");
 		cmd2.add(2, "5");
-		
+*/		
 		cmd3 = new ArrayList();
 		cmd3.add(0, "-1");
 		cmd3.add(1, "exitProcess");
 		cmd3.add(2, "");
 
 		//cmds.addItem(cmd2);
-		for (int j = 0; j < 90; j++) {
+		for (int j = 0; j < 10; j++) {
 			cmds.addItem(cmd);
 		}
-		//cmds.addItem(cmd3);
+		cmds.addItem(cmd3);
 	}
 	
 	public int exitValue() {

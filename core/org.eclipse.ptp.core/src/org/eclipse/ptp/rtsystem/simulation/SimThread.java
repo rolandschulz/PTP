@@ -112,14 +112,21 @@ public class SimThread extends Observable {
 
 	}
 	
+	public void terminate() {
+		state = TERMINATED;
+		setChanged();
+		ArrayList list = new ArrayList();
+		list.add(0, new Integer(processId));
+		list.add(1, new String("TERMINATED"));
+		notifyObservers(list);
+	}
+	
 	public void resume() {
 		state = RUNNING;
-		
 		setChanged();
 		ArrayList list = new ArrayList();
 		list.add(0, new Integer(processId));
 		list.add(1, new String("RESUMED"));
-		
 		notifyObservers(list);
 	}
 }
