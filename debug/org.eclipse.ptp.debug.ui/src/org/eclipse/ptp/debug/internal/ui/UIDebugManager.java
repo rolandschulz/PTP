@@ -255,7 +255,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			}
 		};
 		try {
-			ResourcesPlugin.getWorkspace().run(runnable, null, 0, null);
+			ResourcesPlugin.getWorkspace().run(runnable, null);
 			annotationMgr.updateAnnotation(curSet, preSet);
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
@@ -269,6 +269,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			PTPDebugUIPlugin.log(e);
 		}
 		set.setData(BITSET_KEY, null);
+		IPCDISession session = (IPCDISession) getDebugSession(getCurrentJobId());
+		if (session == null) {
+			session.getModelManager().delProcessSet(set.getID());
+		}
 	}
 	public void createSetEvent(IElementSet set, IElement[] elements) {
 		BitList tasks = new BitList();
@@ -276,6 +280,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			tasks.set(convertToInt(elements[i].getName()));
 		}
 		set.setData(BITSET_KEY, tasks);
+		IPCDISession session = (IPCDISession) getDebugSession(getCurrentJobId());
+		if (session == null) {
+			session.getModelManager().newProcessSet(set.getID(), tasks);
+		}
 	}
 	public void addElementsEvent(IElementSet set, IElement[] elements) {
 		BitList tasks = (BitList) set.getData(BITSET_KEY);
@@ -284,6 +292,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			tasks.set(convertToInt(elements[i].getName()));
 		}
 		tasks.or(addTasks);
+		//FIXME how to add more process in the created set
 	}
 	public void removeElementsEvent(IElementSet set, IElement[] elements) {
 		BitList tasks = (BitList) set.getData(BITSET_KEY);
@@ -292,6 +301,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			tasks.set(convertToInt(elements[i].getName()));
 		}
 		tasks.andNot(addTasks);
+		//FIXME how to delete more process in the created set
 	}
 	/*
 	 * Cannot unregister the extension final String CDT_DEBUG_UI_ID = "org.eclipse.cdt.debug.ui"; Bundle bundle = Platform.getBundle(CDT_DEBUG_UI_ID); if (bundle != null && bundle.getState() == Bundle.ACTIVE) { //ExtensionRegistry reg = (ExtensionRegistry) Platform.getExtensionRegistry();
@@ -312,7 +322,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			}
 		};
 		try {
-			ResourcesPlugin.getWorkspace().run(runnable, null, 0, null);
+			ResourcesPlugin.getWorkspace().run(runnable, null);
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 		}
