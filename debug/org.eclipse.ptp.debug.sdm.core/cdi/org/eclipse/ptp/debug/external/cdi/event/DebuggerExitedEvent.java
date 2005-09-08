@@ -35,9 +35,9 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 
 /**
  */
-public class InferiorExitEvent extends AbstractEvent implements IPCDIExitedEvent {
+public class DebuggerExitedEvent extends AbstractEvent implements IPCDIExitedEvent {
 
-	public InferiorExitEvent(IPCDISession s, IPCDIDebugProcessSet sources) {
+	public DebuggerExitedEvent(IPCDISession s, IPCDIDebugProcessSet sources) {
 		super(s, sources);
 	}
 	

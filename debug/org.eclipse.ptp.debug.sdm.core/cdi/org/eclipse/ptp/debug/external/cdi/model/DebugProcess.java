@@ -50,4 +50,8 @@ public class DebugProcess extends SessionObject implements IPCDIDebugProcess {
 	public Process getProcess() {
 		return process;
 	}
+	
+	public boolean isTerminated() {
+		return pProcess.isTerminated();
+	}
 }

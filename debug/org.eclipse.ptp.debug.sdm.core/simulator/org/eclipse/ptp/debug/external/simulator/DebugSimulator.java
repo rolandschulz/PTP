@@ -40,6 +40,7 @@ import org.eclipse.ptp.debug.external.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.FunctionBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
+import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
@@ -77,6 +78,10 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		debuggerOutput = new DQueue();
 		initializeSimulatedProcessesCode(debuggerOutput);
 		debuggerProcess = new DProcess("Debugger", -1, 1, debuggerOutput, this);
+		
+		for (int i = 0; i < procs.length; i++) {
+			((SimProcess) procs[i]).getThread(0).addObserver(this);
+		}
 	}
 	
 	protected void stopDebugger() {
@@ -300,7 +305,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		
 		IPCDIDebugProcess[] procList = procs.getProcesses();
 		for (int i = 0; i < procList.length; i++) {
-			((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0).addObserver(this);
+			//((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0).addObserver(this);
 			((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0).addBreakpoint(line);
 		}
 
@@ -335,6 +340,10 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 			procs[procId].setStatus(IPProcess.RUNNING);
 			fireEvent(new InferiorResumedEvent(getSession(), new DebugProcessSet(session, procId)));
 			debuggerOutput.addItem("InferiorResumed Event for " + procId);
+		} else if (event.equals("TERMINATED")) {
+			procs[procId].setStatus(IPProcess.EXITED);
+			fireEvent(new InferiorExitedEvent(getSession(), new DebugProcessSet(session, procId)));
+			debuggerOutput.addItem("InferiorExited Event for " + procId);
 		}
 			
 		// Do Something

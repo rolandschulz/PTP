@@ -52,7 +52,7 @@ import org.eclipse.ptp.debug.external.cdi.BreakpointHitInfo;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
 import org.eclipse.ptp.debug.external.cdi.event.ErrorEvent;
-import org.eclipse.ptp.debug.external.cdi.event.InferiorExitEvent;
+import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetUnregisteredEvent;
@@ -405,7 +405,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			else if (event instanceof InferiorResumedEvent) {
 				fireResumeEvent(job, event.getAllProcesses().toBitList());
 			}
-			else if (event instanceof InferiorExitEvent) {
+			else if (event instanceof InferiorExitedEvent) {
 				fireTerminatedEvent(job, event.getAllProcesses().toBitList());
 			}
 			else if (event instanceof ErrorEvent) {

@@ -109,10 +109,10 @@ public class Target extends SessionObject implements IPCDITarget {
 		// Auto-generated method stub
 		System.out.println("Target.evaluateExpressionToString()");
 		
-		Target target = (Target) frame.getTarget();
-		Session session = (Session) target.getSession();
-		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
+		// Target target = (Target) frame.getTarget();
+		// Session session = (Session) target.getSession();
+		// IDebugger debugger = session.getDebugger();
+		// DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
 
 		return createExpression(expressionText).getValue(frame).getValueString();
 	}
@@ -133,7 +133,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public boolean isTerminated() {
 		// Auto-generated method stub
 		System.out.println("Target.isTerminated()");
-		return false;
+		return getDebugProcess().isTerminated();
 	}
 
 	public void terminate() throws CDIException {
