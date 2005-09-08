@@ -23,7 +23,8 @@ package org.eclipse.ptp.core;
  */
 public interface INodeEvent {
 	public final static int STATUS_UPDATE_TYPE = 0;
-	
+
+	public String getMachineID();
 	public String getInput();
 	public int getType();
 	public String getNodeID();	

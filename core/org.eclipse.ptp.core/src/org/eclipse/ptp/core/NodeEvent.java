@@ -25,11 +25,16 @@ public class NodeEvent implements INodeEvent {
 	private int type = -1;
 	private String input = null;
 	private String nodeID = null;
+	private String mid = null;
 	
-	public NodeEvent(int type, String input, String nodeID) {
+	public NodeEvent(String mid, String nodeID, int type, String input) {
+		this.mid = mid;
+		this.nodeID = nodeID;
 		this.type = type;
 		this.input = input;
-		this.nodeID = nodeID;
+	}
+	public String getMachineID() {
+		return mid;
 	}
 	public String getInput() {
 		return input;
