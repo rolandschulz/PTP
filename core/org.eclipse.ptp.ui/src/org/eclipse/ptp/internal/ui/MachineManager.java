@@ -202,7 +202,7 @@ public class MachineManager extends AbstractUIManager {
 		if (macs.length > 0) {
 			cur_machine_id = macs[0].getIDString();
 			for (int j=0; j<macs.length; j++) {
-				System.out.println(macs[j]);
+				System.out.println(macs[j] + ", " + macs[j].getID());
 				if (!machineList.containsKey(macs[j].getIDString()))
 					addMachine(macs[j]);
 			}
