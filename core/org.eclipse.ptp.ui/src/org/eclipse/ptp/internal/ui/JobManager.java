@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
@@ -203,7 +202,8 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	public String initial() {
 		IPJob[] jobs = getJobs();
 		if (jobs.length > 0) {
-			cur_job_id = jobs[0].getIDString();
+			//focus on last job
+			cur_job_id = jobs[jobs.length-1].getIDString();
 			for (int j=0; j<jobs.length; j++) {
 				if (!jobList.containsKey(jobs[j].getIDString()))
 					addJob(jobs[j]);
@@ -218,12 +218,18 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	 */
 	public void processEvent(IProcessEvent event) {
 		//only redraw if the current set contain the process
-		if (isCurrentSetContainProcess(event.getProcessID())) {
-			if (event.getType() != IProcessEvent.ADD_OUTPUT_TYPE)
-				firePaintListener();
+		if (isJobStop(event.getJobId()))
+			firePaintListener(new Boolean(true));
+		else {
+			if (isCurrentSetContainProcess(event.getJobId(), event.getProcessID())) {
+				if (event.getType() != IProcessEvent.ADD_OUTPUT_TYPE)
+					firePaintListener(null);
+			}
 		}
 	}
-	public boolean isCurrentSetContainProcess(String processID) {
+	public boolean isCurrentSetContainProcess(String jid, String processID) {
+		if (!getCurrentJobId().equals(jid))
+			return false;
 		IElementHandler elementHandler = getElementHandler(getCurrentJobId());
 		if (elementHandler == null)
 			return false;

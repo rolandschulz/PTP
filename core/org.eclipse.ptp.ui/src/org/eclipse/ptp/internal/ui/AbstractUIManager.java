@@ -50,9 +50,9 @@ public abstract class AbstractUIManager implements IManager {
 			pListeners.remove(pListener);
 	}
 
-	protected void firePaintListener() {
+	protected void firePaintListener(Object condition) {
 		for (Iterator i=pListeners.iterator(); i.hasNext();) {
-			((IPaintListener)i.next()).repaint();
+			((IPaintListener)i.next()).repaint(condition);
 		}
 	}
 }

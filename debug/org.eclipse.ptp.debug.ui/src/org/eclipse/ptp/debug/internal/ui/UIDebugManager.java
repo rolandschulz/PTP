@@ -370,7 +370,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			} else if (event instanceof ErrorEvent) {
 				fireTerminatedEvent(job, event.getAllProcesses().toBitList());
 			}
-			firePaintListener();
+			firePaintListener(null);
 		}
 	}
 	public void fireSuspendEvent(IPJob job, BitList tasks) {

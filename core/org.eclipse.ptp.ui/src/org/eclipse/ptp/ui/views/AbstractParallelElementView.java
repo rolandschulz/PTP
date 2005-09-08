@@ -759,7 +759,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	/**
 	 * Paint Listener
 	 */
-	public void repaint() {
+	public void repaint(Object condition) {
 		refresh();
 	}
 

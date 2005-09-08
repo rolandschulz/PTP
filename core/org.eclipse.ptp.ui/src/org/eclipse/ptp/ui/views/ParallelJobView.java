@@ -109,25 +109,30 @@ public class ParallelJobView extends AbstractParallelSetView {
 		if (manager.size() > 0) {
 			getDisplay().syncExec(new Runnable() {
 				public void run() {
-					jobTable.removeAll();
 					IPJob[] jobs = getJobManager().getJobs();
-					TableItem item = null;
-					for (int i = 0; i < jobs.length; i++) {
-						item = new TableItem(jobTable, SWT.NULL);
-						int jobImageIndex = 0;
-						if (jobs[i].isAllStop())
-							jobImageIndex = 2;
-						else if (jobs[i].isDebug())
-							jobImageIndex = 1;
-						item.setImage(jobImages[jobImageIndex]);
-						item.setText(jobs[i].getElementName());
+					for (int i=jobTable.getItemCount(); i < jobs.length; i++) {
+						setJobItem(new TableItem(jobTable, SWT.NULL), jobs[i]);
 					}
-					jobTable.setSelection(0);
-					refresh();
+					jobTable.setSelection(jobs.length-1);
 				}
 			});
 		}
 		update();
+	}
+	private void setJobItem(TableItem item, IPJob job) {
+		int jobImageIndex = 0;
+		if (job.isAllStop())
+			jobImageIndex = 2;
+		else if (job.isDebug())
+			jobImageIndex = 1;
+		item.setImage(jobImages[jobImageIndex]);
+		item.setText(job.getElementName());
+	}
+	public void updateJobTable() {
+		IPJob[] jobs = getJobManager().getJobs();
+		for (int i=0; i < jobs.length; i++) {
+			setJobItem(jobTable.getItem(i), jobs[i]);
+		}
 	}
 	public IElementHandler getCurrentElementHandler() {
 		return manager.getElementHandler(getCurrentJobID());
@@ -230,6 +235,16 @@ public class ParallelJobView extends AbstractParallelSetView {
 		if (cur_element_set != null) {
 			changeTitle(manager.getName(getCurrentJobID()), cur_element_set.getID(), cur_set_size);
 		}
+	}
+	public void repaint(Object condition) {
+		if (condition != null) {
+			getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					updateJobTable();
+				}
+			});
+		}
+		refresh();
 	}
 	public void run() {
 		System.out.println("------------ job run");
