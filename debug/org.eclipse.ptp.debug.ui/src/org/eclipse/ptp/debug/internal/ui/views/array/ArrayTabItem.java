@@ -67,21 +67,21 @@ import org.eclipse.ui.PlatformUI;
  *
  */
 public class ArrayTabItem extends PTabItem {
-	private final int MAX_CHECKED = 2;
-	private final int TABLE_COL_INDEX = 0;
-	private final int TABLE_ROW_INDEX = 1;
+	private final int COL_TYPE = 0;
+	private final int ROW_TYPE = 1;
 	private SashForm sashForm = null;
 	private Table colTable = null;
 	private Table rowTable = null;
 	private ScrolledComposite tableSC = null;
 	private ScrolledComposite comboSC = null;
-	private List selectedButtons = new ArrayList(2);
 	private Combo[] comboBoxes = new Combo[0];
 	private IVariable variable = null;
 	private int startRow = 0;
 	private int startCol = 0;
 	private int endRow = 0;
 	private int endCol = 0;
+	private Button selectedRowButton = null;
+	private Button selectedColButton = null;
 
 	public ArrayTabItem(PTabFolder view, String tabText) {
 		super(view, tabText);
@@ -138,7 +138,8 @@ public class ArrayTabItem extends PTabItem {
 	}
 	protected void clearContext() {
 		disposeTable();
-		selectedButtons.clear();
+		selectedRowButton = null;
+		selectedColButton = null;
 	}
 
 	public void displayTab() {
@@ -177,28 +178,24 @@ public class ArrayTabItem extends PTabItem {
 		tableSC.setExpandVertical(true);
 	    tableSC.setExpandHorizontal(true);
 	}
-	protected void createRowTable(Composite parent) {
+	protected void createRowTable(Composite parent, boolean showColHeader) {
 		TableLayout tableLayout = new TableLayout();
 		tableLayout.addColumnData(new ColumnWeightData(1));
 		rowTable = new Table(parent, SWT.SINGLE | SWT.READ_ONLY | SWT.NONE);
 		rowTable.setLayout(tableLayout);
 		rowTable.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
-		rowTable.setHeaderVisible(true);
+		rowTable.setHeaderVisible(showColHeader);
+		rowTable.setEnabled(false);
 		rowTable.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-		rowTable.addSelectionListener(new SelectionAdapter() {
-	    	public void widgetSelected(SelectionEvent e) {
-	    		colTable.setSelection(rowTable.getSelectionIndex());
-	    	}
-	    });
 		
 		TableColumn rowColumn = new TableColumn(rowTable, SWT.RIGHT);
 		rowColumn.setMoveable(false);
 		rowColumn.setResizable(false);
 	}
-	protected void createColumnTable(Composite parent) {
+	protected void createColumnTable(Composite parent, boolean showColHeader) {
 		colTable = new Table(parent, SWT.SINGLE | SWT.FULL_SELECTION);
 		colTable.setLayoutData(new GridData(GridData.FILL_BOTH));
-		colTable.setHeaderVisible(true);
+		colTable.setHeaderVisible(showColHeader);
 		colTable.setLinesVisible(true);
 		colTable.addListener(SWT.MouseDoubleClick, new Listener() {
 			public void handleEvent(Event event) {
@@ -220,23 +217,10 @@ public class ArrayTabItem extends PTabItem {
 		return menu;
 	}
 	
-	protected void resetRangeAction() {
-		int colIndex = getColumnIndex();
-		int rowIndex = getRowIndex();
-		int totalCol = (colIndex>-1)?comboBoxes[colIndex].getItemCount():1;
-		int totalRow = (rowIndex>-1)?comboBoxes[rowIndex].getItemCount():1;
-		RangeDialog rangeDialog = new RangeDialog(tableSC.getShell(), totalRow, totalCol);
-		if (rangeDialog.open(rowIndex>-1, colIndex>-1, startRow, endRow, startCol, endCol) == Window.OK) {
-			disposeTable();
-			startRow = rangeDialog.getFromRow();
-			endRow = rangeDialog.getToRow();
-			startCol = rangeDialog.getFromCol();
-			endCol = rangeDialog.getToCol();
-			createTable(startRow, endRow, startCol, endCol, rowIndex>-1);
-			tableSC.setMinSize(tableSC.getContent().computeSize(SWT.DEFAULT, SWT.DEFAULT));
-			updateTable();
-		}
+	public boolean isTableDisposed() {
+		return ((colTable == null || colTable.isDisposed()) && (rowTable == null || rowTable.isDisposed()));
 	}
+	
 	public void disposeTable() {
 		if (colTable != null && !colTable.isDisposed()) {
 			colTable.removeAll();
@@ -248,35 +232,40 @@ public class ArrayTabItem extends PTabItem {
 			rowTable.dispose();
 			rowTable = null;
 		}
-		tableSC.setMinSize(tableSC.getContent().computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		startRow = 0;
-		startCol = 0;
-		endRow = 0;
-		endCol = 0;
+		if (tableSC != null && !tableSC.isDisposed())
+			tableSC.setMinSize(tableSC.getContent().computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
-	public void createTable(int sRow, int eRow, int sCol, int eCol, boolean showRowHeade) {
-		if (showRowHeade) {
-			createRowTable((Composite)tableSC.getContent());
-			fillRowHeaders(sRow, eRow);
+	public void createTable(int sRow, int eRow, int sCol, int eCol, boolean showColHeader, boolean showRowHeader, IProgressMonitor monitor) {
+		if (showRowHeader) {
+			createRowTable((Composite)tableSC.getContent(), showColHeader);//no row header if there is no column header
+			fillRowHeaders(sRow, eRow, monitor);
 		}
-		createColumnTable((Composite)tableSC.getContent());
-		fillColumnHeaders(sCol, eCol);
+		createColumnTable((Composite)tableSC.getContent(), showColHeader);
+		if (showColHeader)
+			fillColumnHeaders(sCol, eCol, monitor);
+		tableSC.setMinSize(tableSC.getContent().computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 	
 	public void updateTable() {
-		if (selectedButtons.isEmpty()) {
-			disposeTable();
+		updateTable(getIndex(selectedColButton), getIndex(selectedRowButton));
+	}
+	public void updateTable(int colIndex, int rowIndex) {
+		if (colIndex == -1 && rowIndex == -1) {
+			PTPDebugUIPlugin.errorDialog(fPageBook.getShell(), ArrayMessages.getString("ArrayTabItem.noIndexErrTitle"), ArrayMessages.getString("ArrayTabItem.noIndexErrMsg"), new Exception());
 			return;
 		}
-		
-		updateTableContent(getRowIndex(), getColumnIndex());
+		updateTableContent(colIndex, rowIndex);
 	}
-	private void updateTableContent(final int rowIndex, final int colIndex) {
+	private void updateTableContent(final int colIndex, final int rowIndex) {
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				if (monitor == null)
 					monitor = new NullProgressMonitor();
 				
+				if (isTableDisposed())
+					createTable(startRow, endRow, startCol, endCol, colIndex>-1, rowIndex>-1, monitor);
+				
+				colTable.removeAll();				
 				monitor.beginTask(MessageFormat.format("{0}", new String[]{ ArrayMessages.getString("ArrayTabItem.updateTable")}), (endRow - startRow) * (endCol - startCol));
 				try {
 					for (int i=startRow; i<endRow; i++) {
@@ -311,26 +300,6 @@ public class ArrayTabItem extends PTabItem {
 			displayError(e1);
 		}
 	}
-	public int getRowIndex() {
-		return getIndex(TABLE_ROW_INDEX);
-	}
-	public int getColumnIndex() {
-		return getIndex(TABLE_COL_INDEX);
-	}
-	private int getIndex(int index) {
-		if (selectedButtons.size() > index) {
-			Button button = (Button)selectedButtons.get(index);
-			return ((Integer)button.getData()).intValue();
-		}
-		return -1;
-	}
-	private boolean isFirstButton(Button button) {
-		if (selectedButtons.size() > TABLE_COL_INDEX) {
-			Button checkedButton = (Button)selectedButtons.get(TABLE_COL_INDEX);
-			return (checkedButton.equals(button));
-		}
-		return false;
-	}
 	public String getValueString(int rowIndex, int row, int colIndex, int col) throws DebugException {
 		IVariable var = variable;
 		for (int i=0; i<comboBoxes.length; i++) {
@@ -347,28 +316,37 @@ public class ArrayTabItem extends PTabItem {
 		}
 		return var.getValue().getValueString();
 	}
-	public void fillRowHeaders(int sRow, int eRow) {
+	public void fillRowHeaders(int sRow, int eRow, IProgressMonitor monitor) {
+		IProgressMonitor subMonitor = monitor;
+		subMonitor.beginTask(ArrayMessages.getString("ArrayTabItem.initRow"), (eRow - sRow));
 		TableItem item = null;
 		for (int i=sRow; i<eRow; i++) {
 			item = new TableItem(rowTable, SWT.NONE);
 			item.setText(""+i);
+			subMonitor.worked(1);
 		}
 		rowTable.getColumn(0).setWidth(getTextSize(rowTable, ""+eRow).x - 2);
+		subMonitor.done();
 	}
-	public void fillColumnHeaders(int sCol, int eCol) {
+	public void fillColumnHeaders(int sCol, int eCol, IProgressMonitor monitor) {
+		IProgressMonitor subMonitor = monitor;
+		subMonitor.beginTask(ArrayMessages.getString("ArrayTabItem.initCol"), (eCol - sCol));
 		TableColumn column = null;
 		for (int i=sCol; i<eCol; i++) {
 			column = new TableColumn(colTable, SWT.CENTER);
 			column.setText(""+i);
 			column.setWidth(30);
+			column.setMoveable(false);
+			column.setResizable(true);
+			subMonitor.worked(1);
 		}
+		subMonitor.done();
 	}
 	
 	public void setupComboBoxes(Integer[] vars, IProgressMonitor monitor) {
 		IProgressMonitor subMonitor = monitor;
 		subMonitor.beginTask(ArrayMessages.getString("ArrayTabItem.initCombobox"), vars.length);
 		
-		selectedButtons.clear();
 		Composite comboComp = (Composite)comboSC.getContent();
 		new Label(comboComp, SWT.READ_ONLY).setText(ArrayMessages.getString("ArrayTabItem.colHead"));
 		new Label(comboComp, SWT.READ_ONLY).setText(ArrayMessages.getString("ArrayTabItem.rowHead"));
@@ -376,6 +354,7 @@ public class ArrayTabItem extends PTabItem {
 		showTableButton.setToolTipText(ArrayMessages.getString("ArrayTabItem.showTable"));
 		showTableButton.addSelectionListener(new SelectionAdapter() {
 	    	public void widgetSelected(SelectionEvent e) {
+	    		updateTable();
 	    	}
 	    });
 
@@ -384,26 +363,20 @@ public class ArrayTabItem extends PTabItem {
 	    comboBoxes = new Combo[vars.length];
 	    for (int i=0; i<vars.length; i++) {
 	    	int total = vars[i].intValue();
-	    	rowButton = new Button(comboComp, SWT.CHECK);
-	    	rowButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
-	    	rowButton.setData(new Integer(i));
-	    	rowButton.addSelectionListener(new SelectionAdapter() {
-		    	public void widgetSelected(SelectionEvent e) {
-		    		Object obj = e.getSource();
-		    		if (obj instanceof Button) {
-		    			checkSelected((Button)obj);
-		    		}
-		    	}
-		    });
 	    	colButton = new Button(comboComp, SWT.CHECK);
 	    	colButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
 	    	colButton.setData(new Integer(i));
 	    	colButton.addSelectionListener(new SelectionAdapter() {
 		    	public void widgetSelected(SelectionEvent e) {
-		    		Object obj = e.getSource();
-		    		if (obj instanceof Button) {
-		    			checkSelected((Button)obj);
-		    		}
+		    		setColButton((Button)e.getSource());
+		    	}
+		    });
+	    	rowButton = new Button(comboComp, SWT.CHECK);
+	    	rowButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
+	    	rowButton.setData(new Integer(i));
+	    	rowButton.addSelectionListener(new SelectionAdapter() {
+		    	public void widgetSelected(SelectionEvent e) {
+		    		setRowButton((Button)e.getSource());
 		    	}
 		    });
 	    	
@@ -417,79 +390,131 @@ public class ArrayTabItem extends PTabItem {
 		    	subTotalMonitor.worked(1);
 		    }
 		    subTotalMonitor.done();
+		    comboBoxes[i].select(0);
 		    comboBoxes[i].addSelectionListener(new SelectionAdapter() {
 		    	public void widgetSelected(SelectionEvent e) {
-		    		if (colTable != null && !colTable.isDisposed())
-		    			colTable.removeAll();
 		    		updateTable();
 		    	}
 		    });
-		    comboBoxes[i].select(0);
 		    subMonitor.worked(1);
 	    }
 	    subMonitor.done();
 	    Point pt = comboComp.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 	    comboSC.setMinSize(pt);
-	    sashForm.setWeights(new int [] { (pt.x + 20), view.getTabFolder().getClientArea().width });
+	    sashForm.setWeights(new int [] { (pt.x + 30), view.getTabFolder().getClientArea().width });
 	}
-	
-	protected void checkSelected(Button button) {
-		if (!settingTableInfo(button))
-			return;
-
-		comboBoxes[((Integer)button.getData()).intValue()].setEnabled(!button.getSelection());
-		if (selectedButtons.contains(button)) {
-			selectedButtons.remove(button);
-		} 
-		else {
-			if (MAX_CHECKED == selectedButtons.size()) {
-				Button selectedButton = (Button)selectedButtons.remove(MAX_CHECKED - 1);
-				selectedButton.setSelection(false);
-				comboBoxes[((Integer)selectedButton.getData()).intValue()].setEnabled(true);
+	private void setEnableComboBox(Button button, boolean isEnable) {
+		int index = getIndex(button);
+		if (index > -1) 
+			comboBoxes[index].setEnabled(isEnable);
+	}
+	private void unCheckedButton(int type) {
+		checkedButton(type, null);
+		switch(type) {
+		case COL_TYPE:
+			startCol = 0;
+			endCol = 1;
+			break;
+		case ROW_TYPE:
+			startRow = 0;
+			endRow = 1;
+			break;
+		}
+	}
+	private void checkedButton(int type, Button button) {
+		switch(type) {
+		case COL_TYPE:
+			if (selectedColButton != null) {
+				selectedColButton.setSelection(false);
+				setEnableComboBox(selectedColButton, true);
 			}
-			selectedButtons.add(button);
+			selectedColButton = button;
+			break;
+		case ROW_TYPE:
+			if (selectedRowButton != null) {
+				selectedRowButton.setSelection(false);
+				setEnableComboBox(selectedRowButton, true);
+			}
+			selectedRowButton = button;
+			break;
 		}
-		updateTable();
+		setEnableComboBox(button, false);
 	}
-	
-	private boolean settingTableInfo(Button button) {
-		boolean checked = button.getSelection();
-		button.setSelection(!checked);//make it original
-		if (!checked && selectedButtons.size() == 1) {//unchecked all buttons
-			button.setSelection(checked);
-			return true;
-		}
+	private boolean openRangeDialog(int colIndex, int rowIndex, int type) {
+		int totalCol = (colIndex>-1)?comboBoxes[colIndex].getItemCount():1;
+		int totalRow = (rowIndex>-1)?comboBoxes[rowIndex].getItemCount():1;
 		
 		int tmpStartCol = startCol;
 		int tmpEndCol = endCol;
-		
-		int colIndex = getColumnIndex();
-		int rowIndex = getRowIndex();
-		if (colIndex == -1 && rowIndex == -1)//first start up
-			colIndex = ((Integer)button.getData()).intValue();
-		else if (!checked) {//now have 2 checked buttons, unchecked one of them
-			colIndex = isFirstButton(button)?rowIndex:colIndex;
-			rowIndex = -1;
-			tmpStartCol = tmpEndCol = 0;
+		int tmpStartRow = startRow;
+		int tmpEndRow = endRow;
+		switch(type) {
+		case COL_TYPE:
+			tmpStartCol = 0;
+			tmpEndCol = totalCol;
+			break;
+		case ROW_TYPE:
+			tmpStartRow = 0;
+			tmpEndRow = totalRow;
+			break;
 		}
-		else if (rowIndex == -1 || selectedButtons.size() == MAX_CHECKED) //now have 1 checked button OR now have 2 checked button, check other button
-			rowIndex = ((Integer)button.getData()).intValue();
-			
-		int totalCol = (colIndex>-1)?comboBoxes[colIndex].getItemCount():1;
-		int totalRow = (rowIndex>-1)?comboBoxes[rowIndex].getItemCount():1;
-		RangeDialog rangeDialog = new RangeDialog(tableSC.getShell(), totalRow, totalCol);
-		if (rangeDialog.open(rowIndex>-1, colIndex>-1, 0, totalRow, tmpStartCol, tmpEndCol) == Window.CANCEL) {
-			return false;
+		RangeDialog rangeDialog = new RangeDialog(tableSC.getShell(), totalCol, totalRow);
+		if (rangeDialog.open(colIndex>-1, rowIndex>-1, tmpStartCol, tmpEndCol,  tmpStartRow, tmpEndRow) == Window.OK) {
+			startCol = rangeDialog.getFromCol();
+			endCol = rangeDialog.getToCol();
+			startRow = rangeDialog.getFromRow();
+			endRow = rangeDialog.getToRow();
+			return true;
 		}
-		
-		disposeTable();
-		startRow = rangeDialog.getFromRow();
-		endRow = rangeDialog.getToRow();
-		startCol = rangeDialog.getFromCol();
-		endCol = rangeDialog.getToCol();
-		createTable(startRow, endRow, startCol, endCol, rowIndex>-1);
-		tableSC.setMinSize(tableSC.getContent().computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		button.setSelection(checked);
-		return true;
+		return false;
+	}
+	private void setRowButton(Button button) {
+		boolean checked = button.getSelection();
+		int colIndex = getIndex(selectedColButton);
+		int rowIndex = getIndex(button);
+		if (!checked) {
+			unCheckedButton(ROW_TYPE);
+			disposeTable();
+			return;
+		}
+		button.setSelection(!checked);
+		if (openRangeDialog(colIndex, rowIndex, ROW_TYPE)) {
+			if (colIndex == rowIndex)
+				unCheckedButton(COL_TYPE);
+			checkedButton(ROW_TYPE, button);
+			button.setSelection(checked);
+			disposeTable();
+		}
+	}
+	private void setColButton(Button button) {
+		boolean checked = button.getSelection();
+		int colIndex = getIndex(button);
+		int rowIndex = getIndex(selectedRowButton);
+		if (!checked) {
+			unCheckedButton(COL_TYPE);
+			disposeTable();
+			return;
+		}
+		button.setSelection(!checked);
+		if (openRangeDialog(colIndex, rowIndex, COL_TYPE)) {
+			if (colIndex == rowIndex)
+				unCheckedButton(ROW_TYPE);
+			checkedButton(COL_TYPE, button);
+			button.setSelection(checked);
+			disposeTable();
+		}
+	}	
+	private int getIndex(Button button) {
+		if (button == null)
+			return -1;
+		return ((Integer)button.getData()).intValue();
+	}
+	protected void resetRangeAction() {
+		int colIndex = getIndex(selectedColButton);
+		int rowIndex = getIndex(selectedRowButton);
+		if (openRangeDialog(colIndex, rowIndex, -1)) {
+			disposeTable();
+			updateTable(colIndex, rowIndex);
+		}
 	}
 }
