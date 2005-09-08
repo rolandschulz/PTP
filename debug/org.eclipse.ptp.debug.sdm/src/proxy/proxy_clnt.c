@@ -24,110 +24,96 @@
  #include "proxy.h"
 
 proxy proxies[] = {
-	{"tcp", proxy_tcp_funcs},
+	{"tcp", proxy_tcp_clnt_funcs, NULL},
 	{NULL, NULL}
 };
 
-int
-find_proxy(char *name, proxy **pp)
-{
-	proxy *p;
-	
-	for (p = proxies; p->name != NULL; p++) {
-		if (strcmp(p->name, name) == 0) {
-			*pp = p;
-			return 0;
-		}
-	}
-	return -1;
-}
-
 int 
-proxy_init_not_imp(void *data)
+proxy_clnt_init_not_imp(void *data)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_setlinebreakpoint_not_imp(session *s, procset *p, char *file, int l, breakpoint *bp)
+proxy_clnt_setlinebreakpoint_not_imp(session *s, procset *p, char *file, int l, breakpoint *bp)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_setfuncbreakpoint_not_imp(session *s, procset *p, char *file, char *func, breakpoint *bp)
+proxy_clnt_setfuncbreakpoint_not_imp(session *s, procset *p, char *file, char *func, breakpoint *bp)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_deletebreakpoints_not_imp(session *s, procset *p, breakpoint *bp)
+proxy_clnt_deletebreakpoints_not_imp(session *s, procset *p, breakpoint *bp)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int
-proxy_go_not_imp(session *s, procset *p)
+proxy_clnt_go_not_imp(session *s, procset *p)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_step_not_imp(session *s, procset *p, int count, int type)
+proxy_clnt_step_not_imp(session *s, procset *p, int count, int type)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_liststackframes_not_imp(session *s, int p, stackframelist *list)
+proxy_clnt_liststackframes_not_imp(session *s, int p, stackframelist *list)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_setcurrentstackframe_not_imp(session *s, int p, int count, int type, stackframe *frame)
+proxy_clnt_setcurrentstackframe_not_imp(session *s, int p, int count, int type, stackframe *frame)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_evaluateexpression_not_imp(session *s, int p, char *)
+proxy_clnt_evaluateexpression_not_imp(session *s, int p, char *)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_listlocalvariables_not_imp(session *s, int p, stackframe *frame)
+proxy_clnt_listlocalvariables_not_imp(session *s, int p, stackframe *frame)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_listarguments_not_imp(session *s, int p, stackframe *frame)
+proxy_clnt_listarguments_not_imp(session *s, int p, stackframe *frame)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_listglobalvariables_not_imp(session *s, int p)
+proxy_clnt_listglobalvariables_not_imp(session *s, int p)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_progress(session *s)
+proxy_clnt_progress(session *s)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
