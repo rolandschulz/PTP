@@ -27,27 +27,30 @@
 #include "proxy.h"
 #include "breakpoint.h"
 
-extern int proxy_tcp_setlinebreak(sessions *, procset *, char *, int , breakpoint *);
+static int proxy_tcp_clnt_init(void *);
+static int proxy_tcp_clnt_setlinebreak(sessions *, procset *, char *, int , breakpoint *);
+static int proxy_tcp_clnt_quit(void);
 
-proxy_funcs proxy_tcp_funcs =
+proxy_clnt_funcs proxy_tcp_clnt_funcs =
 {
-	proxy_tcp_init,
-	proxy_tcp_setlinebreakpoint,
-	proxy_setfuncbreakpoint_not_imp,
-	proxy_deletebreakpoints_not_imp,
-	proxy_go_not_imp,
-	proxy_step_not_imp,
-	proxy_liststackframes_not_imp,
-	proxy_setcurrentstackframe_not_imp,
-	proxy_evaluateexpression_not_imp,
-	proxy_listlocalvariables_not_imp,
-	proxy_listarguments_not_imp,
-	proxy_listglobalvariables_not_imp,
-	proxy_progress_not_imp,
+	proxy_tcp_clnt_init,
+	proxy_tcp_clnt_setlinebreakpoint,
+	proxy_clnt_setfuncbreakpoint_not_imp,
+	proxy_clnt_deletebreakpoints_not_imp,
+	proxy_clnt_go_not_imp,
+	proxy_clnt_step_not_imp,
+	proxy_clnt_liststackframes_not_imp,
+	proxy_clnt_setcurrentstackframe_not_imp,
+	proxy_clnt_evaluateexpression_not_imp,
+	proxy_clnt_listlocalvariables_not_imp,
+	proxy_clnt_listarguments_not_imp,
+	proxy_clnt_listglobalvariables_not_imp,
+	proxy_tcp_clnt_quit,
+	proxy_clnt_progress_not_imp,
 };
 
 static int
-proxy_client_connect(char *host, int port, proxy_conn **cp)
+proxy_tcp_client_connect(char *host, int port, proxy_conn **cp)
 {
 	SOCKET                  sd;
 	struct hostent *        hp;
@@ -92,19 +95,22 @@ proxy_client_connect(char *host, int port, proxy_conn **cp)
 }
 
 static int
-proxy_send_request(char *request, char *reply)
+proxy_tcp_send_request(char *request, char *reply)
 {
 }
-
+	
+/*
+ * CLIENT FUNCTIONS
+ */
 static int
-proxy_tcp_init(void *data)
+proxy_tcp_clnt_init(void *data)
 {
 	proxy_tcp_conn *conn = (proxy_tcp_conn *)data;
 	
 }
 
 static int
-proxy_tcp_setlinebreakpoint(sessions *s, procset *set, char *file, int line, breakpoint *bp)
+proxy_tcp_clnt_setlinebreakpoint(sessions *s, procset *set, char *file, int line, breakpoint *bp)
 {
 	int			status;
 	char *		request;
@@ -120,6 +126,47 @@ proxy_tcp_setlinebreakpoint(sessions *s, procset *set, char *file, int line, bre
 	if ( proxy_send_request(request, &result, &status, NULL) < 0 )
 	{
 	        fprintf(stderr,"DbgSetLineBP failed\n");
+	        free(request);
+	        return DBGRES_ERR;
+	}
+	
+	free(request);
+	
+	if ( status != DBGRES_OK ) {
+	        free(result);
+	        return status;
+	}
+	
+	s = result;
+	
+	s = getword(s,par);
+	status = atoi(par);
+	
+	if (status != DBGEV_BPSET) {
+		if (status == DBGEV_ERROR) {
+			s = getword(s,par);
+			s = skipspace(s);
+			DbgSetErr(atoi(par), s);
+		}
+		free(result);
+		return status;
+	}
+}
+
+
+static int
+proxy_tcp_clnt_quit(void)
+{
+	int			status;
+	char *		request;
+	char *		result;
+	char *		s;
+	char			par[1024];
+	
+	asprintf(&request, "QUIT\n");
+	
+	if ( proxy_send_request(request, &result, &status, NULL) < 0 )
+	{
 	        free(request);
 	        return DBGRES_ERR;
 	}
