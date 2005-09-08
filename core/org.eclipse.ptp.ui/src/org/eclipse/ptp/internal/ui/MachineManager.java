@@ -202,11 +202,13 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 	 */
 	public void nodeEvent(INodeEvent event) {
 		// only redraw if the current set contain the node
-		if (isCurrentSetContainNode(event.getNodeID())) {
-			firePaintListener();
+		if (isCurrentSetContainNode(event.getMachineID(), event.getNodeID())) {
+			firePaintListener(null);
 		}
 	}
-	public boolean isCurrentSetContainNode(String nodeID) {
+	public boolean isCurrentSetContainNode(String mid, String nodeID) {
+		if (!getCurrentMachineId().equals(mid))
+			return false;
 		IElementHandler elementHandler = getElementHandler(getCurrentMachineId());
 		if (elementHandler == null)
 			return false;

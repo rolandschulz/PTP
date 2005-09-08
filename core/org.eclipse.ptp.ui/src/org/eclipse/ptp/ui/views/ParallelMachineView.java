@@ -405,7 +405,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	
 	public void run() {
 		System.out.println("------------ machine run");
-		//initialView();
+		initialView();
 		refresh();
 	}
 
