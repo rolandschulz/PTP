@@ -25,11 +25,16 @@ public class ProcessEvent implements IProcessEvent {
 	private int type = -1;
 	private String input = null;
 	private String procID = null;
+	private String jid = null;
 	
-	public ProcessEvent(int type, String input, String procID) {
+	public ProcessEvent(String jid, String procID, int type, String input) {
+		this.jid = jid;
+		this.procID = procID;
 		this.type = type;
 		this.input = input;
-		this.procID = procID;
+	}
+	public String getJobId() {
+		return jid;
 	}
 	public String getInput() {
 		return input;

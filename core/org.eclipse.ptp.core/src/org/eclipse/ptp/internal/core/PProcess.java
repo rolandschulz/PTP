@@ -90,19 +90,23 @@ public class PProcess extends Parent implements IPProcess {
 	public void setStatus(String status) {
 		this.status = status == null ? "unknown" : status;
 		if (status != null) {
-			fireEvent(new ProcessEvent(IProcessEvent.STATUS_CHANGE_TYPE, status, getIDString()));
-			node.fireEvent(new NodeEvent(INodeEvent.STATUS_UPDATE_TYPE, null, node.getIDString()));
+			fireEvent(new ProcessEvent(getJob().getIDString(), getIDString(), IProcessEvent.STATUS_CHANGE_TYPE, status));
+			if (node != null && status.equals(IPProcess.EXITED))
+				node.fireEvent(new NodeEvent(node.getMachine().getIDString(), node.getIDString(), INodeEvent.STATUS_UPDATE_TYPE, null));
 		}
 	}
 	public void setExitCode(String exitCode) {
 		this.exitCode = exitCode;
-		if (exitCode != null)
-			fireEvent(new ProcessEvent(IProcessEvent.STATUS_EXIT_TYPE, exitCode, getIDString()));
+		if (exitCode != null) {
+			fireEvent(new ProcessEvent(getJob().getIDString(), getIDString(), IProcessEvent.STATUS_EXIT_TYPE, exitCode));
+			if (node != null)
+				node.fireEvent(new NodeEvent(node.getMachine().getIDString(), node.getIDString(), INodeEvent.STATUS_UPDATE_TYPE, null));
+		}
 	}
 	public void setSignalName(String signalName) {
 		this.signalName = signalName;
 		if (signalName != null)
-			fireEvent(new ProcessEvent(IProcessEvent.STATUS_SIGNALNAME_TYPE, signalName, getIDString()));
+			fireEvent(new ProcessEvent(getJob().getIDString(), getIDString(), IProcessEvent.STATUS_SIGNALNAME_TYPE, signalName));
 	}
 	public void setPid(String pid) {
 		this.pid = pid;
@@ -132,7 +136,7 @@ public class PProcess extends Parent implements IPProcess {
 		// outputList.add(output);
 		// outputList.add("random output from process: " + (counter++));
 		outputFile.write(output + "\n");
-		fireEvent(new ProcessEvent(IProcessEvent.ADD_OUTPUT_TYPE, output + "\n", getIDString()));
+		fireEvent(new ProcessEvent(getJob().getIDString(), getIDString(), IProcessEvent.ADD_OUTPUT_TYPE, output + "\n"));
 	}
 	public String getContents() {
 		// String[] array = new String[outputList.size()];

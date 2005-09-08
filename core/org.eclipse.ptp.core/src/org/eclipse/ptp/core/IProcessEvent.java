@@ -27,6 +27,7 @@ public interface IProcessEvent {
 	public final static int STATUS_SIGNALNAME_TYPE = 2;
 	public final static int ADD_OUTPUT_TYPE = 3;
 	
+	public String getJobId();
 	public String getInput();
 	public int getType();
 	public String getProcessID();
