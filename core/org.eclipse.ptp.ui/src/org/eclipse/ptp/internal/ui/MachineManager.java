@@ -121,7 +121,10 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 	}
 	public int getNodeStatus(IPNode node) {
 		if (node != null) {
-			String nodeState = (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_STATE);
+			String nodeState = (String)node.getAttrib(AttributeConstants.ATTRIB_NODE_STATE);
+			if(nodeState == null) {
+				System.out.println("***** NODE STATE NULL!  MAJOR ERROR!");
+			}
 			if (nodeState.equals("up")) {
 				if (node.size() > 0)
 					return (node.isAllStop() ? IPTPUIConstants.NODE_EXITED : IPTPUIConstants.NODE_RUNNING);

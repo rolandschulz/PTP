@@ -45,6 +45,7 @@ public class ChangeMachineAction extends GotoDropDownAction {
 			ParallelMachineView pmView = (ParallelMachineView)view;
 		    	String curMachineID = pmView.getCurrentMachineID();	
 		    	IPMachine[] macs = pmView.getMachineManager().getMachines();
+
 		    	for (int i=0; i<macs.length; i++) {
 		    		addAction(dropDownMenuMgr, macs[i].getElementName(), macs[i].getIDString(), curMachineID);
 		    	}		
