@@ -22,6 +22,7 @@
  */
  
  #include <stdio.h>
+ #include <string.h>
  
  #include "session.h"
  #include "proxy.h"
