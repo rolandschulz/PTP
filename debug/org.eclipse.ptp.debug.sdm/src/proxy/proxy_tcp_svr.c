@@ -23,9 +23,13 @@
  * certainly be running in different processes.
  */
 
+#include <stdio.h>
+#include <string.h>
+
 #include "compat.h"
+#include "session.h"
 #include "proxy.h"
-#include "breakpoint.h"
+#include "proxy_tcp.h"
 
 static int proxy_tcp_svr_dispatch(int);
 
@@ -35,7 +39,7 @@ proxy_svr_funcs proxy_tcp_svr_funcs =
 };
 
 struct proxy_tcp_svr_func {
-	char *cmd, 
+	char *cmd;
 	int (*func)(char *, char **);
 };
 
@@ -62,32 +66,37 @@ proxy_tcp_svr_func proxy_tcp_svr_func_tab[] =
 };
 
 static int
-proxy_tcp_svr_dispatch(int *fd)
+proxy_tcp_svr_dispatch(SOCKET fd)
 {
 	int					i;
+	int					n;
 	int					res;
+	char *				command;
 	char *				response;
+	char *				cmd;
 	proxy_tcp_svr_func * sf;
 	
-	n = tcp_read(fd, &result);
+	n = proxy_tcp_recv(fd, &command);
 	if (n <= 0)
 		return -1;
 	
-	tail = getword(result, command);
+	cmd = getword(&command);
 	
 	response = NULL;
 
-	for (i = 0; i < sizeof(proxy_tcp_srv_func_tab) / sizeof(proxy_tcp_svr_func); i++) {
-		sf = &proxy_tcp_srv_func_tab[i];
-		if (sf->cmd != NULL && strcmp(command, sf->cmd) == 0)
-			response = sf->func(tail, &response);
+	for (i = 0; i < sizeof(proxy_tcp_svr_func_tab) / sizeof(proxy_tcp_svr_func); i++) {
+		sf = &proxy_tcp_svr_func_tab[i];
+		if (sf->cmd != NULL && strcmp(cmd, sf->cmd) == 0)
+			res = sf->func(command, &response);
 	}
 	
-	free(result);
+	free(command);
+	free(cmd);
 	
 	if (res == 0) {
-		if (tcp_send(fd, response) < 0 ) {
-			fprintf(stderr, "dbgsrv dbgsrv_soc soc_sendreply failed\n");
+		if (proxy_tcp_send(fd, response, strlen(response)) < 0 ) {
+			free(response);
+			return -1;
 		}
 		free(response);
 	}
@@ -98,27 +107,18 @@ proxy_tcp_svr_dispatch(int *fd)
 static int 
 proxy_tcp_svr_setlinebreakpoint(char *args, char **response)
 {
-	int             len;
-	dbgevent_t *    e;
-	char            par[1024];
-	char *          file;
-	int             line;
-	char *          st_event;
+	char *		file;
+	char *		line_str;
+	int			line;
 	
-	args = getword(args, par);
-	file = StrSocEventDup(par);
+	file = getword(&args);
+	line_str = getword(&args);
+	line = atoi(line_str);
+	free(line_str);
 	
-	args = getword(args, par);
-	line = atoi(par);
-	
-	e = DbgClntSetLineBreak(file, line);
+	asprintf(response, "0 setting line breakpoint %s %d\n", file, line);
 	
 	free(file);
-	
-	st_event = EventToSocProto(e);
-	len = strlen(st_event) + 16;
-	asprintf(*response, len-1, "%s\n", st_event);
-	free(st_event);
 	
 	return 0;
 }
@@ -126,17 +126,6 @@ proxy_tcp_svr_setlinebreakpoint(char *args, char **response)
 static int 
 proxy_tcp_svr_quit(char *args, char **response)
 {       
-        int             len;
-        char *          st_event;
-        
-        st_event = EventToSocProto(DbgClntQuit());
-        
-        len = strlen(st_event) + 16;
-        asprintf(*response, len-1, "%s\n",st_event);
-
-        free(st_event);
-        
-        Shutdown++;
-        
-        return 0;
+	asprintf(response, "0 quitting\n");
+	return 0;
 }  

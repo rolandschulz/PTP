@@ -24,8 +24,8 @@
  */
 
 #include "compat.h"
+#include "session.h"
 #include "proxy.h"
-#include "breakpoint.h"
 
 static int proxy_tcp_clnt_init(void *);
 static int proxy_tcp_clnt_setlinebreak(sessions *, procset *, char *, int , breakpoint *);
@@ -48,56 +48,6 @@ proxy_clnt_funcs proxy_tcp_clnt_funcs =
 	proxy_tcp_clnt_quit,
 	proxy_clnt_progress_not_imp,
 };
-
-static int
-proxy_tcp_client_connect(char *host, int port, proxy_conn **cp)
-{
-	SOCKET                  sd;
-	struct hostent *        hp;
-	long int                haddr;
-	struct sockaddr_in      scket;
-	        
-	*cp = (proxy_conn *) malloc(sizeof(proxy_conn));
-	
-	hp = gethostbyname(host);
-	        
-	if (hp == (struct hostent *)NULL) {
-		fprintf(stderr, "could not find host \"%s\"\n", chost);
-		return -1;
-	}
-	
-	haddr = ((hp->h_addr[0] & 0xff) << 24) |
-			((hp->h_addr[1] & 0xff) << 16) |
-			((hp->h_addr[2] & 0xff) <<  8) |
-			((hp->h_addr[3] & 0xff) <<  0);
-	
-	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
-	{
-		perror("socket");
-		return -1;
-	}
-	
-	memset (&scket,0,sizeof(scket));
-	scket.sin_family = PF_INET;
-	scket.sin_port = htons((u_short) port);
-	scket.sin_addr.s_addr = htonl(haddr);
-	
-	if ( connect(sd, (struct sockaddr *) &scket, sizeof(scket)) == SOCKET_ERROR )
-	{
-		perror("connect");
-		CLOSE_SOCKET(sd);
-		return -1;
-	}
-	
-	cp->cl_fd = sd;
-	
-	return cp;
-}
-
-static int
-proxy_tcp_send_request(char *request, char *reply)
-{
-}
 	
 /*
  * CLIENT FUNCTIONS
