@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.ptp.core.ControlSystemChoices;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
@@ -92,10 +93,39 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		int MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
 		String MSChoice = MonitoringSystemChoices.getMSNameByID(MSChoiceID);
-		
-		System.out.println("Your Monitoring System Choice: '"+MSChoice+"'");
+		int CSChoiceID = preferences.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
+		String CSChoice = ControlSystemChoices.getCSNameByID(CSChoiceID);
 
-		refreshMonitoringSystem(MSChoiceID);
+		System.out.println("Your Control System Choice: '"+CSChoice+"'");
+		System.out.println("Your Monitoring System Choice: '"+MSChoice+"'");
+		
+		if(ControlSystemChoices.getCSArrayIndexByID(CSChoiceID) == -1 ||
+		   MonitoringSystemChoices.getMSArrayIndexByID(MSChoiceID) == -1)
+		{
+			Preferences p = PTPCorePlugin.getDefault().getPluginPreferences();
+
+			int MSI = MonitoringSystemChoices.getMSIDByName("Simulated");
+			int CSI = ControlSystemChoices.getCSIDByName("Simulated");
+				
+			p.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSI);
+			p.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSI);
+
+			PTPCorePlugin.getDefault().savePluginPreferences();
+
+			CoreUtils.showErrorDialog("Default Runtime System Set",
+				"No existing / invalid control or monitoring system detected.  "+
+				"Default systems set to simulation.  Set using the PTP preferences page.", null);
+			
+			MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
+			MSChoice = MonitoringSystemChoices.getMSNameByID(MSChoiceID);
+			CSChoiceID = preferences.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
+			CSChoice = ControlSystemChoices.getCSNameByID(CSChoiceID);
+
+			System.out.println("Your Control System Choice: '"+CSChoice+"'");
+			System.out.println("Your Monitoring System Choice: '"+MSChoice+"'");
+		}
+
+		refreshMonitoringSystem(CSChoiceID, MSChoiceID);
 	}
 	
 	public IControlSystem getControlSystem() {
@@ -106,9 +136,9 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		return monitoringSystem;
 	}
 	
-	public void refreshMonitoringSystem(int ID)
+	public void refreshMonitoringSystem(int controlSystemID, int monitoringSystemID)
 	{
-		if(ID == MonitoringSystemChoices.SIMULATED_ID) {
+		if(monitoringSystemID == MonitoringSystemChoices.SIMULATED_ID && controlSystemID == ControlSystemChoices.SIMULATED_ID) {
 			universe = new PUniverse();
 			/* load up the control and monitoring systems for the simulation */
 			monitoringSystem = new SimulationMonitoringSystem();
@@ -118,7 +148,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			setupMS();
 			fireEvent(null, EVENT_MONITORING_SYSTEM_CHANGE);
 		}
-		else if(ID == MonitoringSystemChoices.ORTE) {
+		else if(monitoringSystemID == MonitoringSystemChoices.ORTE && controlSystemID == ControlSystemChoices.ORTE) {
 			universe = new PUniverse();
 			/* load up the control and monitoring systems for OMPI */
 			OMPIJNIBroker jnibroker = new OMPIJNIBroker();
@@ -130,7 +160,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			fireEvent(null, EVENT_MONITORING_SYSTEM_CHANGE);
 		}
 		else {
-			CoreUtils.showErrorDialog("Monitoring System Error", "Invalid monitoring system selected.  Set using the PTP preferences page.", null);
+			CoreUtils.showErrorDialog("Runtime System Error", "Invalid monitoring/control system selected.  Set using the PTP preferences page.", null);
 		}
 	}
 	

@@ -19,17 +19,17 @@
 
 package org.eclipse.ptp.core;
 
-public class MonitoringSystemChoices {
+public class ControlSystemChoices {
 	
-	/* HOWTO ADD A NEW MS:
-	 * 1: Add an ID number for the new MS - static public final int . . . 
-	 * 2: Add a String name for this MS and put it in the MSChoices[] array
-	 * 3: Add the ID variable from step #1 to the MSIDs[] array IN THE SAME
+	/* HOWTO ADD A NEW CS:
+	 * 1: Add an ID number for the new CS - static public final int . . . 
+	 * 2: Add a String name for this CS and put it in the CSChoices[] array
+	 * 3: Add the ID variable from step #1 to the CSIDs[] array IN THE SAME
 	 *    INDEX PLACE as in step #2
 	 * 4: Marvel
 	 */
 	
-	/* ID numbers for each of the MSs */
+	/* ID numbers for each of the CSs */
 	static public final int SIMULATED_ID = 100;
 	static public final int ORTE = 101;
 	static public final int LAMPI = 102;
@@ -37,88 +37,84 @@ public class MonitoringSystemChoices {
 	static public final int MPICH1 = 104;
 	static public final int MPICH2 = 105;
 	
-	static private String[] MSChoices = new String[] {
+	static private String[] CSChoices = new String[] {
 			"Simulated", 
 			"Open Runtime Environment (ORTE)",
-			/*
 			"Los Alamos MPI (LAMPI)",
 			"LAM-MPI",
 			"MPICH 1.x",
-			"MPICH 2.x (MPD)"
-			*/ 
+			"MPICH 2.x (MPD)" 
 	};
 	
-	static private int[] MSIDs = new int[] {
+	static private int[] CSIDs = new int[] {
 			SIMULATED_ID,
 			ORTE,
-			/*
 			LAMPI,
 			LAMMPI,
 			MPICH1,
 			MPICH2
-			*/
 	};
 	
-	public static String[] getMSStrings()
+	public static String[] getCSStrings()
 	{
-		return MSChoices;
+		return CSChoices;
 	}
 
 	/* returns -1 if not found */
-	public static int getMSArrayIndexByName(String MSname)
+	public static int getCSArrayIndexByName(String CSname)
 	{
 		int i;
 		
 		/* find the index number by the name */
-		for(i=0; i<MSChoices.length; i++) {
-			if(MSname.equals(MSChoices[i])) return i;
+		for(i=0; i<CSChoices.length; i++) {
+			if(CSname.equals(CSChoices[i])) return i;
 		}
 		
 		return -1;
 	}
 	
-	public static int getMSArrayIndexByID(int ID)
+	public static int getCSArrayIndexByID(int ID)
 	{
 		int i;
 		
-		for(i=0; i<MSIDs.length; i++) {
-			if(ID == MSIDs[i]) return i;
+		for(i=0; i<CSIDs.length; i++) {
+			if(ID == CSIDs[i]) return i;
 		}
 		
 		return -1;
 	}
 	
-	public static int getMSIDByName(String MSname)
+	public static int getCSIDByName(String CSname)
 	{
 		int idx;
 		
-		idx = getMSArrayIndexByName(MSname);
+		idx = getCSArrayIndexByName(CSname);
 		if(idx < 0) return idx;
 		
-		return MSIDs[idx];
+		return CSIDs[idx];
 	}
 	
-	public static int getMSIDByIndex(int idx)
+	public static int getCSIDByIndex(int idx)
 	{
 
-		if(idx < 0 || idx >= MSIDs.length) return -1;
-		return MSIDs[idx];
+		if(idx < 0 || idx >= CSIDs.length) return -1;
+		return CSIDs[idx];
 	}
 	
-	public static String getMSNameByID(int ID)
+	public static String getCSNameByID(int ID)
 	{
 		int i;
 		
-		for(i=0; i<MSIDs.length; i++) {
-			if(ID == MSIDs[i]) return MSChoices[i];
+		for(i=0; i<CSIDs.length; i++) {
+			if(ID == CSIDs[i]) return CSChoices[i];
 		}
 		
-		return "<UNDEFINED MS>";
+		return "<UNDEFINED CS>";
 	}
 	
-	public static String getMSNameByIndex(int idx)
+	public static String getCSNameByIndex(int idx)
 	{
-		if(idx < 0 || idx >= MSChoices.length) return "<UNDEFINED MS>";
-		return MSChoices[idx];
+		if(idx < 0 || idx >= CSChoices.length) return "<UNDEFINED CS>";
+		return CSChoices[idx];
 	}
 }

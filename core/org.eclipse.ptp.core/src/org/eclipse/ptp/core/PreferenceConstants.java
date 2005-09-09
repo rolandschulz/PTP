@@ -21,6 +21,8 @@ package org.eclipse.ptp.core;
 public interface PreferenceConstants {
 	public static final String MONITORING_SYSTEM_SELECTION = "MONITORING_SYSTEM_SELECTION";
 	
+	public static final String CONTROL_SYSTEM_SELECTION = "CONTROL_SYSTEM_SELECTION";
+	
 	public static final String OUTPUT_DIR = "OUTPUT_DIR";
 
 	public static final String STORE_LINE = "STORE_LINE";

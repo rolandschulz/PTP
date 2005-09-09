@@ -27,6 +27,7 @@ import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.ptp.core.ControlSystemChoices;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -61,7 +62,9 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 
 	protected IntegerFieldEditor storeLineField = null;
 
-	protected Combo combo = null;
+	protected Combo comboCS = null;
+	
+	protected Combo comboMS = null;
 
 	private String outputDIR = EMPTY_STRING;
 	
@@ -71,7 +74,11 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 	
 	private int MSChoiceID = -1;
 	
+	private int CSChoiceID = -1;
+	
 	private int lastMSChoiceID = -1;
+	
+	private int lastCSChoiceID = -1;
 
 	public PTPPreferencesPage() 
 	{
@@ -108,7 +115,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		composite.setLayout(createGridLayout(1, true, 0, 0));
 		composite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 
-		createChooseMSContents(composite);
+		createChooseRSContents(composite);
 		//createMPICTRLContents(composite);
 		createOutputContents(composite);
 
@@ -150,21 +157,30 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		storeLineField.setEmptyStringAllowed(false);
 	}
 	
-	private void createChooseMSContents(Composite parent) 
+	private void createChooseRSContents(Composite parent) 
 	{
 		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		aGroup.setText(CoreMessages.getResourceString("PTPPreferencesPage.group_ms"));
+		aGroup.setText(CoreMessages.getResourceString("PTPPreferencesPage.group_rs"));
 		
-		combo = new Combo(aGroup, SWT.READ_ONLY);
-		combo.setItems(MonitoringSystemChoices.getMSStrings());
-		combo.addSelectionListener(listener);
+		new Label(aGroup, SWT.NONE).setText(CoreMessages.
+				getResourceString("PTPPreferencesPage.group_cs"));
+		comboCS = new Combo(aGroup, SWT.READ_ONLY);
+		comboCS.setItems(ControlSystemChoices.getCSStrings());
+		comboCS.addSelectionListener(listener);
+			
+		new Label(aGroup, SWT.NONE).setText(CoreMessages.
+			getResourceString("PTPPreferencesPage.group_ms"));
+		comboMS = new Combo(aGroup, SWT.READ_ONLY);
+		comboMS.setItems(MonitoringSystemChoices.getMSStrings());
+		comboMS.addSelectionListener(listener);
 	}
 
 	protected void defaultSetting() 
 	{
-		combo.select(MonitoringSystemChoices.getMSArrayIndexByID(MSChoiceID));
+		comboMS.select(MonitoringSystemChoices.getMSArrayIndexByID(MSChoiceID));
+		comboCS.select(ControlSystemChoices.getCSArrayIndexByID(CSChoiceID));
 		outputDirText.setText(outputDIR);
 		storeLineField.setStringValue(String.valueOf(storeLine));
 	}
@@ -190,8 +206,11 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		storeLine = preferences.getInt(PreferenceConstants.STORE_LINE);
 		storeLineField.setStringValue(String.valueOf(storeLine));
 		MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
-		combo.select(MonitoringSystemChoices.getMSArrayIndexByID(MSChoiceID));
+		comboMS.select(MonitoringSystemChoices.getMSArrayIndexByID(MSChoiceID));
 		lastMSChoiceID = MSChoiceID;
+		CSChoiceID = preferences.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
+		comboCS.select(ControlSystemChoices.getCSArrayIndexByID(CSChoiceID));
+		lastCSChoiceID = CSChoiceID;
 	}
 
 	/* do stuff on init() of preferences, if anything */
@@ -212,7 +231,8 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 
 	private void store() 
 	{
-		MSChoiceID = MonitoringSystemChoices.getMSIDByIndex(combo.getSelectionIndex());
+		MSChoiceID = MonitoringSystemChoices.getMSIDByIndex(comboMS.getSelectionIndex());
+		CSChoiceID = ControlSystemChoices.getCSIDByIndex(comboCS.getSelectionIndex());
 		outputDIR = outputDirText.getText();
 		storeLine = storeLineField.getIntValue();
 	}
@@ -223,20 +243,22 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 
 		preferences.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSChoiceID);
+		preferences.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSChoiceID);
 		preferences.setValue(PreferenceConstants.OUTPUT_DIR, outputDIR);
 		preferences.setValue(PreferenceConstants.STORE_LINE, storeLine);
 
 		PTPCorePlugin.getDefault().savePluginPreferences();
 
 		IModelManager manager = PTPCorePlugin.getDefault().getModelManager();
-		if (manager.isParallelPerspectiveOpen() && lastMSChoiceID != MSChoiceID) {
-			manager.refreshMonitoringSystem(MSChoiceID);
+		if (manager.isParallelPerspectiveOpen() && (lastMSChoiceID != MSChoiceID || lastCSChoiceID != CSChoiceID)) {
+			manager.refreshMonitoringSystem(CSChoiceID, MSChoiceID);
 		}
 
 		File outputDirPath = new File(outputDIR);
 		if (!outputDirPath.exists())
 			outputDirPath.mkdir();
 		
+		lastCSChoiceID = CSChoiceID;
 		lastMSChoiceID = MSChoiceID;
 
 		return true;
@@ -258,9 +280,13 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 			outputDirText.setText(selectedDirPath);
 	}
 	
+	/**
+	 * Returns true if the selected monitoring system is a valid selection.  We allow
+	 * the system to display MS choices which are not yet complete or enabled yet.
+	 */
 	protected boolean isValidMSSetting() 
 	{
-		int intchoice = combo.getSelectionIndex();
+		int intchoice = comboMS.getSelectionIndex();
 		if(intchoice > 1) {
 			setErrorMessage("Sorry, that monitoring system choice is not yet implemented.");
 			setValid(false);
@@ -274,7 +300,50 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		
 		return true;
 	}
-
+	
+	/**
+	 * Returns true if the selected control system is a valid selection.  We allow
+	 * the system to display CS choices which are not yet complete or enabled yet.
+	 */
+	protected boolean isValidCSSetting() 
+	{
+		int intchoice = comboCS.getSelectionIndex();
+		if(intchoice > 1) {
+			setErrorMessage("Sorry, that control system choice is not yet implemented.");
+			setValid(false);
+			return false;
+		}
+		else if(intchoice < 0) {
+			setErrorMessage("Select a control system.");
+			setValid(false);
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Checks that the selected control and monitoring systems are able to work together.
+	 * Returns true if they are a valid pair, else false.
+	 */
+	protected boolean isValidRSSetting()
+	{
+		int CS = comboCS.getSelectionIndex();
+		int MS = comboMS.getSelectionIndex();
+		int CSID = ControlSystemChoices.getCSIDByIndex(CS);
+		int MSID = MonitoringSystemChoices.getMSIDByIndex(MS);
+		
+		if(CSID == ControlSystemChoices.SIMULATED_ID && MSID == MonitoringSystemChoices.SIMULATED_ID)
+			return true;
+		if(CSID == ControlSystemChoices.ORTE && MSID == MonitoringSystemChoices.ORTE)
+			return true;
+		
+		setErrorMessage("Sorry, that combination of control and monitoring systems it not valid.");
+		setValid(false);
+		
+		return false;
+	}
+	
 	protected boolean isValidOutputSetting() 
 	{
 		String name = getFieldContent(outputDirText.getText());
@@ -310,7 +379,13 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		setErrorMessage(null);
 		setMessage(null);
 
+		if (!isValidCSSetting())
+			return;
+		
 		if (!isValidMSSetting())
+			return;
+		
+		if (!isValidRSSetting())
 			return;
 		
 		if (!isValidOutputSetting())
