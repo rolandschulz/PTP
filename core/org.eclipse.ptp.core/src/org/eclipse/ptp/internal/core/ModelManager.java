@@ -19,43 +19,35 @@
 package org.eclipse.ptp.internal.core;
 
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IModelManager;
+import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.IPMachine;
-import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IParallelModelListener;
 import org.eclipse.ptp.core.MonitoringSystemChoices;
-import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.internal.core.CoreUtils;
-import org.eclipse.ptp.internal.core.CoreMessages;
+import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
-import org.eclipse.ptp.rtsystem.NamedEntity;
 import org.eclipse.ptp.rtsystem.ompi.OMPIControlSystem;
 import org.eclipse.ptp.rtsystem.ompi.OMPIJNIBroker;
 import org.eclipse.ptp.rtsystem.ompi.OMPIMonitoringSystem;
@@ -63,10 +55,8 @@ import org.eclipse.ptp.rtsystem.simulation.SimProcess;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
 import org.eclipse.ui.IPerspectiveDescriptor;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IPerspectiveListener;
-import org.eclipse.ui.progress.IProgressService;
+import org.eclipse.ui.IWorkbenchPage;
 
 public class ModelManager implements IModelManager, IRuntimeListener {
 	protected List listeners = new ArrayList(2);
@@ -183,9 +173,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		if(ne != null) {
 			for (int i = 0; i < ne.length; i++) {
 				PJob job;
-
 				System.out.println("JOB: " + ne[i]);
-
 				int x = 0;
 				try {
 					x = (new Integer(ne[i].substring(3))).intValue();
@@ -193,7 +181,12 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				}
 				job = new PJob(universe, ne[i], "" + (PJob.BASE_OFFSET + x) + "", x);
 				universe.addChild(job);
-				getProcsForNewJob(ne[i], job);
+				try {
+					getProcsForNewJob(ne[i], job, null);
+				} catch (InterruptedException e) {
+					universe.removeChild(job);
+					break;
+				}
 			}
 		}
 
@@ -204,12 +197,21 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	/* given a Job, this contacts the monitoring system and populates the runtime 
 	 * model with the processes that correspond to that Job
 	 */
-	private void getProcsForNewJob(String nejob, IPJob job) {
+	private void getProcsForNewJob(String nejob, IPJob job, IProgressMonitor monitor) throws InterruptedException {
 		String[] ne = controlSystem.getProcesses(nejob);
 		if (ne != null)
-			System.out.println("getProcsForNewJob:" + nejob + " - #procs = "
-					+ ne.length);
+			System.out.println("getProcsForNewJob:" + nejob + " - #procs = " + ne.length);
+		
+		if (monitor == null)
+			monitor = new NullProgressMonitor();
+		
+		monitor.beginTask("Initialing the process...", ne.length);
 		for (int j = 0; ne != null && j < ne.length; j++) {
+			if (monitor.isCanceled()) {
+				job.removeAllProcesses();
+				throw new InterruptedException("Cancelled by user");
+			}
+			
 			IPProcess proc;
 			// System.out.println("process name = "+ne[j]);
 			
@@ -249,7 +251,9 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			}
 			String status = controlSystem.getProcessAttribute(ne[j], AttributeConstants.ATTRIB_PROCESS_STATUS);
 			proc.setStatus(status);
+			monitor.worked(1);
 		}
+		monitor.done();
 	}
 
 	private void refreshJobStatus(String nejob) {
@@ -338,8 +342,12 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		pjob = new PJob(universe, ne, "" + (PJob.BASE_OFFSET + x) + "", x);
 
 		universe.addChild(pjob);
-		getProcsForNewJob(ne, pjob);
-
+		try {
+			getProcsForNewJob(ne, pjob, null);
+		} catch (InterruptedException e) {
+			universe.removeChild(job);
+			return;
+		}
 		fireEvent(job, EVENT_UPDATED_STATUS);
 	}
 
@@ -474,9 +482,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 	//protected IPJob myjob = null;
 
-	public IPJob run(final ILaunch launch, File workingDirectory,
-			String[] envp, final JobRunConfiguration jobRunConfig, IProgressMonitor monitor)
-			throws CoreException {
+	public IPJob run(final ILaunch launch, File workingDirectory, String[] envp, final JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException {
 		/*
 		 * PORT IProgressMonitor subMonitor = new SubProgressMonitor(monitor,
 		 * 5); subMonitor.beginTask("Executing job", 10);
@@ -509,6 +515,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		}
 		*/
 
+		monitor.subTask("Creating the job...");
 		String nejob = controlSystem.run(jobRunConfig);
 		if (nejob != null) {
 			PJob job;
@@ -523,12 +530,15 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 		//	myjob = job;
 			universe.addChild(job);
-			getProcsForNewJob(nejob, job);
+			try {
+				getProcsForNewJob(nejob, job, monitor);
+			} catch (InterruptedException e) {
+				universe.removeChild(job);
+				throw new CoreException(Status.CANCEL_STATUS);
+			}
 			fireState(STATE_RUN);
-			
 			return job;
 		}
-		
 		return null;
 	}
 
