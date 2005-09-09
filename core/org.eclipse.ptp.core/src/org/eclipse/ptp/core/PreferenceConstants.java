@@ -34,4 +34,8 @@ public interface PreferenceConstants {
 	public static final String ORTE_ORTED_PATH = "ORTE_ORTED_PATH";
 	
 	public static final String ORTE_ORTED_ARGS = "ORTE_ORTED_ARGS";
+	
+	public static final String SIMULATION_MACHINE_NODE_PREFIX = "SIMULATION_MACHINE_NODE_";
+	
+	public static final String SIMULATION_NUM_MACHINES = "SIMULATION_NUM_MACHINES";
 }
