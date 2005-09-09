@@ -19,7 +19,6 @@
 package org.eclipse.ptp.core;
 
 import java.io.File;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
@@ -31,55 +30,30 @@ import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 public interface IModelManager {
 	public static final int STATE_ERROR = -1;
-
 	public static final int STATE_RUN = 1;
-
 	public static final int STATE_EXIT = 3;
-
 	public static final int STATE_ABORT = 2;
-
 	public static final int STATE_START = 0;
-
 	public static final int STATE_STOPPED = 4;
-
 	public static final int EVENT_PROCESS_OUTPUT = 1;
-
 	public static final int EVENT_EXEC_STATUS_CHANGE = 2;
-
 	public static final int EVENT_SYS_STATUS_CHANGE = 3;
-
 	public static final int EVENT_ERROR = 4;
-
 	public static final int EVENT_UPDATED_STATUS = 5;
-
 	public static final int EVENT_ALL_PROCESSES_STOPPED = 6;
-	
 	public static final int EVENT_MONITORING_SYSTEM_CHANGE = 7;
-	
+
 	public IControlSystem getControlSystem();
-	
 	public IMonitoringSystem getMonitoringSystem();
-
 	public boolean isParallelPerspectiveOpen();
-	
 	public void refreshMonitoringSystem(int ID);
-
 	public void shutdown();
-
 	public IPUniverse getUniverse();
-
 	public void addParallelLaunchListener(IParallelModelListener listener);
-
 	public void removeParallelLaunchListener(IParallelModelListener listener);
-
 	public int getCurrentState();
-
 	public void abortJob(String jobName) throws CoreException;
-
-	public IPJob run(ILaunch launch, File workingDirectory, String[] envp,
-			JobRunConfiguration jobRunConfig, IProgressMonitor pm) throws CoreException;
-
+	public IPJob run(ILaunch launch, File workingDirectory, String[] envp, JobRunConfiguration jobRunConfig, IProgressMonitor pm) throws CoreException;
 	public void setPTPConfiguration(ILaunchConfiguration config);
-
 	public ILaunchConfiguration getPTPConfiguration();
 }
