@@ -16,26 +16,21 @@
  * 
  * LA-CC 04-115
  ******************************************************************************/
-
-/*
- * Miscellaneous proxy functions.
- */
  
- #include <stdio.h>
- 
- #include "session.h"
- #include "proxy.h"
+#ifndef _PROXY_TCP_H_
+#define _PROXY_TCP_H_
 
-int
-find_proxy(char *name, proxy **pp)
-{
-	proxy *p;
-	
-	for (p = proxies; p->name != NULL; p++) {
-		if (strcmp(p->name, name) == 0) {
-			*pp = p;
-			return 0;
-		}
-	}
-	return -1;
-}
+struct proxy_tcp_conn {
+	char *	host;
+	int		port;
+	SOCKET	sock;
+};
+typedef struct proxy_tcp_conn	proxy_tcp_conn;
+
+extern int		proxy_tcp_client_connect(char *, int, proxy_tcp_conn **);
+extern int		proxy_tcp_recv(SOCKET, char **);
+extern int		proxy_tcp_send(SOCKET, char *, int);
+extern void		skipspace(char *);
+extern char *	getword(char **);
+
+#endif /* _PROXY_TCP_H_*/

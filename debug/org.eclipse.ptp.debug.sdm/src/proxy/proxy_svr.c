@@ -21,9 +21,12 @@
  * Miscellaneous proxy functions.
  */
  
+ #include "session.h"
  #include "proxy.h"
 
+extern proxy_svr_funcs proxy_tcp_svr_funcs;
+
 proxy proxies[] = {
-	{"tcp", NULL, proxy_tcp_svr_funcs},
-	{NULL, NULL}
+	{"tcp", NULL, &proxy_tcp_svr_funcs},
+	{NULL, NULL, NULL}
 };

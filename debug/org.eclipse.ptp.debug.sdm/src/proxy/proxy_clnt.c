@@ -21,6 +21,7 @@
  * Miscellaneous proxy functions.
  */
  
+ #include "session.h"
  #include "proxy.h"
 
 proxy proxies[] = {
