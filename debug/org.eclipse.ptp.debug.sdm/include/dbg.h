@@ -20,10 +20,13 @@
 #ifndef DBG_H_
 #define DBG_H_
 
+#include <stdarg.h>
+
 #include "session.h"
 #include "procset.h"
 #include "breakpoint.h"
 #include "stackframe.h"
+#include "dbg_event.h"
 
 #define DBGRES_OK	0
 #define DBGRES_ERR	-1
@@ -40,7 +43,7 @@ void DbgRemoveProcFromSet(procset *set, int pid);
 /*
  * Session initialization
  */
-int DbgInit(char *, void *, session **);
+int DbgInit(session **, char *, char *, ...);
 
 /*
  * Breakpoint operations
@@ -72,6 +75,6 @@ int DbgListGlobalVariables(session *s, int proc);
 /*
  * Event Handling
  */
-int DbgProgress(session *);
+int DbgProgress(session *, void (*)(dbg_event*));
 
 #endif /*DBG_H_*/

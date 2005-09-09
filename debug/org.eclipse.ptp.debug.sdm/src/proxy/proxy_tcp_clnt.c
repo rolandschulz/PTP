@@ -22,14 +22,24 @@
  * client debugger, since they may be running on different hosts, and will
  * certainly be running in different processes.
  */
+ 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/select.h>
+
+#include <string.h>
+#include <errno.h>
+#include <stdio.h>
 
 #include "compat.h"
 #include "session.h"
 #include "proxy.h"
+#include "proxy_tcp.h"
 
-static int proxy_tcp_clnt_init(void *);
-static int proxy_tcp_clnt_setlinebreak(sessions *, procset *, char *, int , breakpoint *);
-static int proxy_tcp_clnt_quit(void);
+static int proxy_tcp_clnt_init(void **, char *, ...);
+static int proxy_tcp_clnt_setlinebreakpoint(void *, procset *, char *, int , breakpoint *);
+static int proxy_tcp_clnt_quit(void *);
+static int proxy_tcp_clnt_progress(void *, void (*)(dbg_event *));
 
 proxy_clnt_funcs proxy_tcp_clnt_funcs =
 {
@@ -46,36 +56,53 @@ proxy_clnt_funcs proxy_tcp_clnt_funcs =
 	proxy_clnt_listarguments_not_imp,
 	proxy_clnt_listglobalvariables_not_imp,
 	proxy_tcp_clnt_quit,
-	proxy_clnt_progress_not_imp,
+	proxy_tcp_clnt_progress,
 };
 	
 /*
  * CLIENT FUNCTIONS
  */
 static int
-proxy_tcp_clnt_init(void *data)
+proxy_tcp_clnt_init(void **data, char *attr, ...)
 {
-	proxy_tcp_conn *conn = (proxy_tcp_conn *)data;
+	va_list	ap;
+	proxy_tcp_conn *conn = malloc(sizeof(proxy_tcp_conn));
 	
+	va_start(ap, attr);
+	
+	while (attr != NULL) {
+		if (strcmp(attr, "host") == 0)
+			conn->host = strdup(va_arg(ap, char *));
+		else if (strcmp(attr, "port") == 0)
+			conn->port = va_arg(ap, int);
+			
+		attr = va_arg(ap, char *);
+	}
+	
+	va_end(ap);
+	
+	conn->sock = INVALID_SOCKET;
+	
+	*data = (void *)conn;
+	
+	return 0;
 }
 
 static int
-proxy_tcp_clnt_setlinebreakpoint(sessions *s, procset *set, char *file, int line, breakpoint *bp)
+proxy_tcp_clnt_setlinebreakpoint(void *data, procset *set, char *file, int line, breakpoint *bp)
 {
-	int			status;
-	char *		request;
-	char *		result;
-	char *		s;
-	char			par[1024];
-	
+	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
+	int				status;
+	char *			request;
+	char *			result;
+
 	if ( file == NULL )
 		file = "<null>";
 	        
 	asprintf(&request, "SETLINEBREAK %s %s %d\n", procset_to_str(set), file, line);
 	
-	if ( proxy_send_request(request, &result, &status, NULL) < 0 )
+	if ( proxy_tcp_send_request(conn->sock, request, &result, &status, NULL) < 0 )
 	{
-	        fprintf(stderr,"DbgSetLineBP failed\n");
 	        free(request);
 	        return DBGRES_ERR;
 	}
@@ -105,17 +132,17 @@ proxy_tcp_clnt_setlinebreakpoint(sessions *s, procset *set, char *file, int line
 
 
 static int
-proxy_tcp_clnt_quit(void)
+proxy_tcp_clnt_quit(void *data)
 {
-	int			status;
-	char *		request;
-	char *		result;
-	char *		s;
-	char			par[1024];
+	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
+	int				status;
+	char *			request;
+	char *			result;
+	char *			s;
 	
 	asprintf(&request, "QUIT\n");
 	
-	if ( proxy_send_request(request, &result, &status, NULL) < 0 )
+	if ( proxy_tcp_send_request(conn->sock, request, &result, &status, NULL) < 0 )
 	{
 	        free(request);
 	        return DBGRES_ERR;
@@ -142,4 +169,59 @@ proxy_tcp_clnt_quit(void)
 		free(result);
 		return status;
 	}
+}
+
+static int 
+proxy_tcp_clnt_progress(void * data, void (*event_callback)(dbg_event *))
+{
+	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
+	fd_set			fds;
+	int				res;
+	char *			result;
+	dbg_event *		ev;
+	struct timeval	tv;
+
+	FD_ZERO(&fds);
+	FD_SET(conn->sock, &fds);
+	tv = TCPTIMEOUT;
+	
+	for ( ;; ) {
+		res = select(conn->sock+1, &fds, NULL, NULL, &tv);
+	
+		switch (res) {
+		case INVALID_SOCKET:
+			if ( errno == EINTR )
+				continue;
+		
+			perror("select");
+			return -1;
+		
+		case 0:
+			return 0;
+		
+		default:
+			if ( !FD_ISSET(conn->sock, &fds) )
+			{
+				fprintf(stderr, "select on bad socket\n");
+				return -1;
+			}
+			break;
+		}
+	
+		break;
+	}
+	
+	res = proxy_tcp_recv(conn->sock, &result);
+	if (res <= 0) {
+		return -1;
+	}
+	
+	if (proxy_tcp_result_to_event(result, &ev) < 0) {
+		fprintf(stderr, "bad response");
+		return -1;
+	}
+	
+	event_callback(ev);
+	
+	return 0;
 }

@@ -38,18 +38,26 @@ void DbgRemoveProcFromSet(procset *set, int pid);
  * Session initialization
  */
 int
-DbgInit(char *proxy, void *data, session **s)
+DbgInit(session **s, char *proxy, char *attr, ...)
 {
+	va_list	ap;
+	void *	data;
+	int		res;
+	
 	*s = malloc(sizeof(session));
 	if (find_proxy(proxy, &(*s)->sess_proxy) < 0) {
 		free(*s);
 		return -1;
 	}
-	(*s)->sess_proxy_data = data;
-	if ((*s)->sess_proxy->clnt_funcs->init(data) < 0) {
+	va_start(ap, attr);
+	res = (*s)->sess_proxy->clnt_funcs->init(&data, attr, ap);
+	va_end(ap);
+	
+	if (res < 0) {
 		free(*s);
 		return -1;
 	}
+	(*s)->sess_proxy_data = data;
 	return 0;
 }
 
@@ -59,19 +67,19 @@ DbgInit(char *proxy, void *data, session **s)
 int 
 DbgSetLineBreakpoint(session *s, procset *set, char *file, int line, breakpoint *bp)
 {
-	return s->sess_proxy->clnt_funcs->setlinebreakpoint(s, set, file, line, bp);
+	return s->sess_proxy->clnt_funcs->setlinebreakpoint(s->sess_proxy_data, set, file, line, bp);
 }
 
 int 
 DbgSetFuncBreakpoint(session *s, procset *set, char *file, char *func, breakpoint *bp)
 {
-	return s->sess_proxy->clnt_funcs->setfuncbreakpoint(s, set, file, func, bp);
+	return s->sess_proxy->clnt_funcs->setfuncbreakpoint(s->sess_proxy_data, set, file, func, bp);
 }
 
 int 
 DbgDeleteBreakpoints(session *s, procset *set, breakpoint *bp)
 {
-	return s->sess_proxy->clnt_funcs->deletebreakpoints(s, set, bp);
+	return s->sess_proxy->clnt_funcs->deletebreakpoints(s->sess_proxy_data, set, bp);
 }
 
 /*
@@ -80,13 +88,13 @@ DbgDeleteBreakpoints(session *s, procset *set, breakpoint *bp)
 int 
 DbgGo(session *s, procset *set)
 {
-	return s->sess_proxy->clnt_funcs->go(s, set);
+	return s->sess_proxy->clnt_funcs->go(s->sess_proxy_data, set);
 }
 
 int 
 DbgStep(session *s, procset *set, int count, int type)
 {
-	return s->sess_proxy->clnt_funcs->step(s, set, count, type);
+	return s->sess_proxy->clnt_funcs->step(s->sess_proxy_data, set, count, type);
 }
 
 /*
@@ -95,13 +103,13 @@ DbgStep(session *s, procset *set, int count, int type)
 int 
 DbgListStackframes(session *s, int proc, stackframelist *frame)
 {
-	return s->sess_proxy->clnt_funcs->liststackframes(s, proc, frame);
+	return s->sess_proxy->clnt_funcs->liststackframes(s->sess_proxy_data, proc, frame);
 }
 
 int 
 DbgSetCurrentStackframe(session *s, int proc, int count, int dir, stackframe *frame)
 {
-	return s->sess_proxy->clnt_funcs->setcurrentstackframe(s, proc, count, dir, frame);
+	return s->sess_proxy->clnt_funcs->setcurrentstackframe(s->sess_proxy_data, proc, count, dir, frame);
 }
 
 /*
@@ -110,32 +118,32 @@ DbgSetCurrentStackframe(session *s, int proc, int count, int dir, stackframe *fr
 int 
 DbgEvaluateExpression(session *s, int proc, char *exp)
 {
-	return s->sess_proxy->clnt_funcs->evaluateexpression(s, proc, exp);
+	return s->sess_proxy->clnt_funcs->evaluateexpression(s->sess_proxy_data, proc, exp);
 }
 
 int 
 DbgListLocalVariables(session *s, int proc, stackframe *frame)
 {
-	return s->sess_proxy->clnt_funcs->listlocalvariables(s, proc, frame);
+	return s->sess_proxy->clnt_funcs->listlocalvariables(s->sess_proxy_data, proc, frame);
 }
 
 int 
 DbgListArguments(session *s, int proc, stackframe *frame)
 {
-	return s->sess_proxy->clnt_funcs->listarguments(s, proc, frame);
+	return s->sess_proxy->clnt_funcs->listarguments(s->sess_proxy_data, proc, frame);
 }
 
 int 
 DbgListGlobalVariables(session *s, int proc)
 {
-	return s->sess_proxy->clnt_funcs->listglobalvariables(s, proc);
+	return s->sess_proxy->clnt_funcs->listglobalvariables(s->sess_proxy_data, proc);
 }
 
 /*
  * Event handling
  */
 int
-DbgProgress(session *s)
+DbgProgress(session *s, void (*event_callback)(dbg_event *))
 {
-	return s->sess_proxy->clnt_funcs->progress(s);
+	return s->sess_proxy->clnt_funcs->progress(s->sess_proxy_data, event_callback);
 }

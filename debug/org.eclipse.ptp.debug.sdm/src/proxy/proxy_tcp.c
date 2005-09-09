@@ -30,6 +30,8 @@
 #include "proxy.h"
 #include "proxy_tcp.h"
 
+struct timeval TCPTIMEOUT = { 25, 0 };
+
 int
 proxy_tcp_client_connect(char *host, int port, proxy_tcp_conn **cp)
 {
@@ -78,23 +80,62 @@ proxy_tcp_client_connect(char *host, int port, proxy_tcp_conn **cp)
 }
 
 int
-proxy_tcp_send(SOCKET fd, char *ptr, int nbytes)
+proxy_tcp_result_to_event(char *result, dbg_event **ev)
 {
-	int nleft, nwritten;
+	dbg_event *e;
 	
-	nleft = nbytes;
-	while ( nleft > 0 ) {
-		nwritten = send(fd, ptr, nleft, 0);
-		if (nwritten <= 0) {
-			return nwritten;
-		}
-	
-		nleft -= nwritten;
-		ptr += nwritten;
-	}
-	return nbytes - nleft;
+	e = (dbg_event *)malloc(sizeof(dbg_event));
+	*ev = e;
+	return 0;
 }
 
+
+static int
+tcp_send(SOCKET fd, char *buf, int len)
+{
+	int		n;
+
+	while ( len > 0 ) {
+		n = send(fd, buf, len, 0);
+		if (n <= 0) {
+			return -1;
+		}
+	
+		len -= n;
+		buf += n;
+	}
+	
+	return 0;
+}
+
+/*
+ * Send a message to a remote peer. proxy_tcp_send() will always send a complete message.
+ * If the send fails for any reason, an error is returned.
+ */
+int
+proxy_tcp_send(SOCKET fd, char *message, int len)
+{
+	char *	buf;
+	
+	/*
+	 * Send message length first
+	 */
+	asprintf(buf, "%d ", nbytes);
+	
+	if (tcp_send(fd, buf, strlen(buf)) < 0)
+		return -1;
+		
+	/* 
+	 * Now send message
+	 */
+	 
+	return tcp_send(fd, message, len);
+}
+
+/*
+ * Receive a message from a remote peer. proxy_tcp_recv() will always return a complete message.
+ * If the receive fails for any reason, an error is returned.
+ */
 int
 proxy_tcp_recv(SOCKET fd, char **result)
 {
@@ -132,6 +173,11 @@ proxy_tcp_recv(SOCKET fd, char **result)
 	*result = pbuf;
 	
 	return count;
+}
+
+int
+proxy_tcp_send_request(SOCKET sock, char *request, char **result, int status, struct timeval *timeout)
+{
 }
 
 void
