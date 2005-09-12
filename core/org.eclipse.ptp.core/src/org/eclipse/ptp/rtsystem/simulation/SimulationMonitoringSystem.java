@@ -27,8 +27,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.ptp.core.ControlSystemChoices;
+import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.internal.core.CoreUtils;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
@@ -45,25 +50,40 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 
 	protected HashMap nodeStateMap;
 
-	/* define the number of machines here */
-	final static int numMachines = 4;
-
-
-	/*
-	 * define how many nodes each machine has - the array length must equal
-	 * numMachines
-	 */
-	final static int[] numNodes = { 256, 256, 256, 512 };
-
+	protected int numMachines = 1;
+	protected int[] numNodes;
 	
 	public SimulationMonitoringSystem() {
-		
+		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
+		int prefNumMachines = preferences.getInt(PreferenceConstants.SIMULATION_NUM_MACHINES);
+		System.out.println("User selected "+prefNumMachines+" simulated machines.");
+		if(prefNumMachines < 1) {
+			int i = 1;
+			preferences.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, i);
+
+			PTPCorePlugin.getDefault().savePluginPreferences();
+
+			CoreUtils.showErrorDialog("Default Simulation Num Machines Set",
+				"No existing / invalid number of machines to to simulate detected.  Default "+
+				"number of machines set to 1.  Set using the PTP preferences -> simulation page", null);
+			numNodes = new int[1];
+			numNodes[0] = 256;
+		}
+		else {
+			numNodes = new int[prefNumMachines];
+			for(int i=0; i<prefNumMachines; i++) {
+				int nn = preferences.getInt(PreferenceConstants.SIMULATION_MACHINE_NODE_PREFIX + ""+(i+1)+"");
+				System.out.println("SimPreferences: Machine "+(i+1)+" = "+nn+" nodes");
+				numNodes[i] = nn;
+			}
+		}
+		numMachines = prefNumMachines;
 	}
 	
 	public void startup() {
 		nodeMap = new HashMap();
 		for (int i = 0; i < numMachines; i++) {
-			String s = new String("machine" + i);
+			String s = new String("machine" + (i+1));
 			nodeMap.put(s, new Integer(numNodes[i]));
 		}
 		
@@ -78,7 +98,7 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 
 		/* machine 3 has a bunch of nodes w/ different states */
 		for (int i = 0; i < numNodes[3]; i++) {
-			String s = new String("machine3_node" + i);
+			String s = new String("machine4_node" + i);
 			int r = ((int) (Math.random() * 100));
 			if (r < 10)
 				nodeStateMap.put(s, new String("error"));
@@ -101,7 +121,7 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 		String cmode = new String(((int) (Math.random() * 2)) == 0 ? "0111"
 				: "0100");
 		for (int i = 0; i < numNodes[3]; i++) {
-			String s = new String("machine3_node" + i);
+			String s = new String("machine4_node" + i);
 			if (i >= nstart && i <= (nstart + nlen)) {
 				nodeUserMap.put(s, new String(System.getProperty("user.name")));
 				nodeGroupMap.put(s, new String("ptp"));
@@ -119,11 +139,10 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 				nodeGroupMap.put(s, new String(""));
 				nodeModeMap.put(s, new String("0111"));
 			}
-
 		}
 
 		for (int i = 0; i < numNodes[0]; i++) {
-			String s = new String("machine0_node" + i);
+			String s = new String("machine1_node" + i);
 			nodeStateMap.put(s, new String("up"));
 			nodeUserMap.put(s, new String(System.getProperty("user.name")));
 			nodeGroupMap.put(s, new String("ptp"));
@@ -131,7 +150,7 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 		}
 
 		for (int i = 0; i < numNodes[1]; i++) {
-			String s = new String("machine1_node" + i);
+			String s = new String("machine2_node" + i);
 			nodeStateMap.put(s, new String("up"));
 			if (i < 32) {
 				nodeUserMap.put(s, new String(System.getProperty("user.name")));
@@ -156,14 +175,24 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 		 * setup machine[2]'s hardware - a machine w/ a bunch of nodes w/
 		 * different state
 		 */
-		for (int i = 0; i < numNodes[3]; i++) {
-			String s = new String("machine2_node" + i);
+		for (int i = 0; i < numNodes[2]; i++) {
+			String s = new String("machine3_node" + i);
 			int r = ((int) (Math.random() * 100));
 			if (r < 3) {
 				nodeStateMap.put(s, new String("error"));
 			} else if (r < 6)
 				nodeStateMap.put(s, new String("down"));
 			else {
+				nodeStateMap.put(s, new String("up"));
+				nodeUserMap.put(s, new String(System.getProperty("user.name")));
+				nodeGroupMap.put(s, new String("ptp"));
+				nodeModeMap.put(s, new String("0100"));
+			}
+		}
+		
+		for(int i=4; i< numMachines; i++) {
+			for(int j=0; j<numNodes[i]; j++) {
+				String s = new String("machine"+(i+1)+"_node"+j);
 				nodeStateMap.put(s, new String("up"));
 				nodeUserMap.put(s, new String(System.getProperty("user.name")));
 				nodeGroupMap.put(s, new String("ptp"));

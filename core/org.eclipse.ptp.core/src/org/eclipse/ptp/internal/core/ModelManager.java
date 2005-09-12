@@ -181,7 +181,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			String[] ne2 = monitoringSystem.getNodes(ne[i]);
 			for (int j = 0; j < ne2.length; j++) {
 				PNode node;
-				System.out.println("\tNODE: "+j);
 				node = new PNode(mac, ne2[j], "" + j + "", j);
 				node.setAttrib(AttributeConstants.ATTRIB_NODE_USER, 
 						monitoringSystem.getNodeAttribute(ne2[j],
