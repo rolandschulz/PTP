@@ -99,7 +99,6 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 				} catch (NumberFormatException e) {
 				}
 				nodes[mac] = val;
-				nodeText.setSize(nodeText.computeSize(128, SWT.DEFAULT));
 			}
 			updatePreferencePage();
 		}
@@ -141,7 +140,7 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 		
 		Group bGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		bGroup.setLayout(createGridLayout(1, true, 10, 10));
-		bGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
+		bGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL, 2));
 		bGroup.setText(CoreMessages.getResourceString("SimulationPreferencesPage.group_machines"));
 		
 		new Label(bGroup, SWT.NONE).setText("Select a machine:");
@@ -151,13 +150,13 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 		
 		nodeLabel = new Label(bGroup, SWT.NONE);
 		nodeLabel.setText("Number of nodes for machine #1:");
+		nodeLabel.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		
 		nodeText = new Text(bGroup, SWT.BORDER | SWT.SINGLE);
-		nodeText.setSize(nodeText.computeSize(128, SWT.DEFAULT));
+		nodeText.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		/* only integers allowed */
 		nodeText.addVerifyListener(new VerifyListener() {
 			public void verifyText(VerifyEvent e) {
-				nodeText.setSize(nodeText.computeSize(128, SWT.DEFAULT));
 				String text = e.text;
 				char[] chars = new char[text.length()];
 				text.getChars(0, chars.length, chars, 0);
@@ -173,7 +172,6 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 		
 		mcombo.select(0);
 		//setupMachineRegion();
-		nodeText.setSize(nodeText.computeSize(128, SWT.DEFAULT));
 	}
 	
 	protected void setupMachineRegion()
@@ -219,12 +217,10 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 		//nodeLabel.pack();
 		if(nodes != null)
 			nodeText.setText(""+nodes[sel]+"");
-		nodeText.setSize(nodeText.computeSize(128, SWT.DEFAULT));
 	}
 
 	protected void defaultSetting() 
 	{
-		nodeText.setSize(nodeText.computeSize(128, SWT.DEFAULT));
 	}
 	
 	private void loadSaved()
@@ -240,13 +236,10 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 		for(int i=1; i<=numMachines; i++) {
 			/* look for a #nodes for each machine */
 			int nnodes = preferences.getInt(PreferenceConstants.SIMULATION_MACHINE_NODE_PREFIX + ""+i+"");
-			System.out.println("Machine "+i+" - #nodes = "+nnodes);
 			if(nnodes < 1) nnodes = 1;
 			nodes[i-1] = nnodes;
 		}
-		nodeText.setSize(nodeText.computeSize(128, SWT.DEFAULT));
 		nodeText.setText(""+nodes[0]+"");
-		nodeText.setSize(nodeText.computeSize(128, SWT.DEFAULT));
 	}
 
 	public void init(IWorkbench workbench) 
