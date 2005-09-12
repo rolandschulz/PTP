@@ -35,6 +35,8 @@ import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.internal.core.CoreMessages;
+import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
+import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
@@ -270,7 +272,18 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 		}
 		
 		PTPCorePlugin.getDefault().savePluginPreferences();
-
+		
+		IModelManager manager = PTPCorePlugin.getDefault().getModelManager();
+		System.out.println("PPopen?: "+manager.isParallelPerspectiveOpen());
+		if (manager.isParallelPerspectiveOpen() &&
+			manager.getMonitoringSystem() instanceof SimulationMonitoringSystem &&
+			manager.getControlSystem() instanceof SimulationControlSystem)
+		{
+			System.out.println("refreshin!");
+			manager.refreshRuntimeSystems(ControlSystemChoices.getCSIDByName("Simulated"),
+					MonitoringSystemChoices.getMSIDByName("Simulated"));
+		}
+		
 		return true;
 	}
 	
