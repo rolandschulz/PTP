@@ -229,18 +229,21 @@ public class DefaultFortranDependencyCalculator implements IManagedDependencyGen
 		File file = resource.getLocation().toFile();
 		try {
 			if (!isFortranFile(tool, resource)) return new IResource[0];
+			
+			// add dependency on self
+			dependencies.add(resource);
 	
 			//  Get the names of the modules USE'd by the source file
 			String[] usedNames = findUsedModuleNames(file);
-			if (usedNames.length == 0) return new IResource[0];
-			
-			//  Search the project files for a Fortran source that creates the module.  If we find one, then compiling this
-			//  source file is dependent upon first compiling the found source file.
-			IResource[] resources = project.members();	
-			IResource[] modRes = FindModulesInResources(project, tool, resource, resources, config.getName(), usedNames);
-			if (modRes != null) {
-				for (int i=0; i<modRes.length; i++) {
-					dependencies.add(modRes[i]);
+			if (usedNames.length != 0) {
+				//  Search the project files for a Fortran source that creates the module.  If we find one, then compiling this
+				//  source file is dependent upon first compiling the found source file.
+				IResource[] resources = project.members();	
+				IResource[] modRes = FindModulesInResources(project, tool, resource, resources, config.getName(), usedNames);
+				if (modRes != null) {
+					for (int i=0; i<modRes.length; i++) {
+						dependencies.add(modRes[i]);
+					}
 				}
 			}
 		}
