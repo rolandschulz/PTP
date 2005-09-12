@@ -221,7 +221,7 @@ public class SimulationControlSystem implements IControlSystem {
 				} catch(NumberFormatException e) {
 				}
 				if(procNum != -1) {
-					return "machine0_node" + (ss.spawned_first_node + (procNum / ss.spawned_procs_per_node));
+					return "machine1_node" + (ss.spawned_first_node + (procNum / ss.spawned_procs_per_node));
 				}
 			}
 		}
