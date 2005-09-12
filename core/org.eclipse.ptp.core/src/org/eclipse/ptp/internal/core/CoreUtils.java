@@ -39,7 +39,7 @@ import org.eclipse.ui.WorkbenchException;
 public class CoreUtils {
 	public static final String ParallelProcessesView_ID = "org.eclipse.ptp.ui.views.parallelProcessesView";
 
-	public static final String PPerspectiveFactory_ID = "org.eclipse.ptp.ui.PRunPerspective";
+	public static final String PPerspectiveFactory_ID = "org.eclipse.ptp.ui.PTPRunPerspective";
 
 	public static final String ParallelProcessViewer_ID = "org.eclipse.ptp.ui.views.parallelProcessViewer";
 

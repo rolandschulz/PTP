@@ -170,15 +170,15 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		String[] ne = monitoringSystem.getMachines();
 		for (int i = 0; i < ne.length; i++) {
 			PMachine mac;
-
-			System.out.println("MACHINE: " + ne[i]);
-
 			mac = new PMachine(universe, ne[i], ne[i].substring(new String(
 					"machine").length()));
 
 			universe.addChild(mac);
 
 			String[] ne2 = monitoringSystem.getNodes(ne[i]);
+
+			System.out.println("MACHINE: " + ne[i]+" - #nodes = "+ne2.length);
+
 			for (int j = 0; j < ne2.length; j++) {
 				PNode node;
 				node = new PNode(mac, ne2[j], "" + j + "", j);
@@ -381,26 +381,27 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	}
 
 	private IPerspectiveListener perspectiveListener = new IPerspectiveListener() {
+		/*
 		public void perspectiveOpened(IWorkbenchPage page,
 				IPerspectiveDescriptor perspective) {
 			if (perspective.getId().equals(CoreUtils.PPerspectiveFactory_ID)) {
 				isPerspectiveOpen = true;
 			}
-		}
+		}*/
 
 		public void perspectiveActivated(IWorkbenchPage page,
 				IPerspectiveDescriptor perspective) {
-			System.out.println("Active: " + perspective.getId());
+			System.out.println("PERSPECTIVE: Active: " + perspective.getId());
 			if (perspective.getId().equals(CoreUtils.PPerspectiveFactory_ID)) {
 				isPerspectiveOpen = true;
-				System.out.println("Active: " + perspective.getId());
+				System.out.println("MYPERSPECTIVE: Active: " + perspective.getId());
 			}
 		}
 
 		public void perspectiveChanged(IWorkbenchPage page,
 				IPerspectiveDescriptor perspective, String changeId) {
-			// if (perspective.getId().equals(CoreUtils.PPerspectiveFactory_ID))
-			// System.out.println("Changed: " + perspective.getId());
+			if (perspective.getId().equals(CoreUtils.PPerspectiveFactory_ID))
+				System.out.println("PERSPECTIVE: Changed: " + perspective.getId());
 		}
 	};
 
