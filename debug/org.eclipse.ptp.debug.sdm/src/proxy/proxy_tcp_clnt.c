@@ -92,42 +92,22 @@ static int
 proxy_tcp_clnt_setlinebreakpoint(void *data, procset *set, char *file, int line, breakpoint *bp)
 {
 	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-	int				status;
 	char *			request;
-	char *			result;
 
 	if ( file == NULL )
 		file = "<null>";
 	        
 	asprintf(&request, "SETLINEBREAK %s %s %d\n", procset_to_str(set), file, line);
 	
-	if ( proxy_tcp_send_request(conn->sock, request, &result, &status, NULL) < 0 )
+	if ( proxy_tcp_send(conn->sock, request, strlen(request)) < 0 )
 	{
 	        free(request);
-	        return DBGRES_ERR;
+	        return -1;
 	}
 	
 	free(request);
 	
-	if ( status != DBGRES_OK ) {
-	        free(result);
-	        return status;
-	}
-	
-	s = result;
-	
-	s = getword(s,par);
-	status = atoi(par);
-	
-	if (status != DBGEV_BPSET) {
-		if (status == DBGEV_ERROR) {
-			s = getword(s,par);
-			s = skipspace(s);
-			DbgSetErr(atoi(par), s);
-		}
-		free(result);
-		return status;
-	}
+	return 0;
 }
 
 
@@ -135,44 +115,23 @@ static int
 proxy_tcp_clnt_quit(void *data)
 {
 	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-	int				status;
 	char *			request;
-	char *			result;
-	char *			s;
 	
 	asprintf(&request, "QUIT\n");
 	
-	if ( proxy_tcp_send_request(conn->sock, request, &result, &status, NULL) < 0 )
+	if ( proxy_tcp_send(conn->sock, request, strlen(request)) < 0 )
 	{
 	        free(request);
-	        return DBGRES_ERR;
+	        return -1;
 	}
 	
 	free(request);
 	
-	if ( status != DBGRES_OK ) {
-	        free(result);
-	        return status;
-	}
-	
-	s = result;
-	
-	s = getword(s,par);
-	status = atoi(par);
-	
-	if (status != DBGEV_BPSET) {
-		if (status == DBGEV_ERROR) {
-			s = getword(s,par);
-			s = skipspace(s);
-			DbgSetErr(atoi(par), s);
-		}
-		free(result);
-		return status;
-	}
+	return 0;
 }
 
 static int 
-proxy_tcp_clnt_progress(void * data, void (*event_callback)(dbg_event *))
+proxy_tcp_clnt_progress(void *data, void (*event_callback)(dbg_event *))
 {
 	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
 	fd_set			fds;
@@ -211,15 +170,18 @@ proxy_tcp_clnt_progress(void * data, void (*event_callback)(dbg_event *))
 		break;
 	}
 	
-	res = proxy_tcp_recv(conn->sock, &result);
+	res = proxy_tcp_recv(conn, &result);
 	if (res <= 0) {
-		return -1;
+		return res;
 	}
 	
 	if (proxy_tcp_result_to_event(result, &ev) < 0) {
 		fprintf(stderr, "bad response");
+		free(result);
 		return -1;
 	}
+	
+	free(result);
 	
 	event_callback(ev);
 	

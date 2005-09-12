@@ -75,6 +75,11 @@ proxy_tcp_client_connect(char *host, int port, proxy_tcp_conn **cp)
 	(*cp)->sock = sd;
 	(*cp)->host = strdup(host);
 	(*cp)->port = port;
+			
+	(*cp)->buf_size = BUFSIZ;
+	(*cp)->buf = (char *)malloc((*cp)->buf_size);
+	(*cp)->buf_pos = 0;
+	(*cp)->total_read = 0;
 	
 	return 0;
 }
@@ -113,71 +118,104 @@ tcp_send(SOCKET fd, char *buf, int len)
  * If the send fails for any reason, an error is returned.
  */
 int
-proxy_tcp_send(SOCKET fd, char *message, int len)
+proxy_tcp_send(proxy_tcp_conn *conn, char *message, int len)
 {
 	char *	buf;
 	
 	/*
 	 * Send message length first
 	 */
-	asprintf(buf, "%d ", nbytes);
+	asprintf(&buf, "%d ", len);
 	
-	if (tcp_send(fd, buf, strlen(buf)) < 0)
+	if (tcp_send(conn->sock, buf, strlen(buf)) < 0) {
+		free(buf);
 		return -1;
+	}
+	
+	free(buf);
 		
 	/* 
 	 * Now send message
 	 */
 	 
-	return tcp_send(fd, message, len);
+	return tcp_send(conn->sock, message, len);
 }
 
-/*
- * Receive a message from a remote peer. proxy_tcp_recv() will always return a complete message.
- * If the receive fails for any reason, an error is returned.
+/**
+ * Receive a buffer from a remote peer and assemble the buffer into a message. proxy_tcp_recv() may
+ * need to be called repeatedly to assemble the message. Once the message is available, it is
+ * returned to the caller.
+ * 
+ * @return 
+ * 	-1:	error
+ * 	 0: read complete, no result available yet
+ * 	>0: result available, length returned
  */
 int
-proxy_tcp_recv(SOCKET fd, char **result)
+proxy_tcp_recv(proxy_tcp_conn *conn, char **result)
 {
-	int		size;
-	int		count;
-	char *	pbuf;
-	char		ch;
+	char *	end;
 	int		n;
 	
-	size = BUFSIZ;
-	count = 0;
+	if (conn->total_read == conn->buf_size) {
+		conn->buf_size += BUFSIZ;
+		conn->buf = (char *)realloc(conn->buf, conn->buf_size);
+	}
 	
-	pbuf = (char *) malloc(size);
+	n = recv(conn->sock, &conn->buf[conn->buf_pos], conn->buf_size - conn->total_read, 0);
 	
-	do {
-		n = recv(fd, &ch, 1, 0);
+	if (n < 0) {
+		return -1;
+	}
 	
-		if (n <= 0  ||  ch == '\n') {
-			break;
+	/*
+	 * Check for length
+	 */
+	if (conn->msg_len == 0) {
+		conn->msg_len = strtol(conn->buf, &end, 10);
+		
+		/*
+		 * check if we've received the length
+		 */
+		if (conn->msg_len > 0) {
+			/*
+			 * We've received something
+			 */
+			if (*end != ' ') {
+				/*
+				 * Not a length though
+				 */
+				conn->msg_len = 0;
+				conn->buf_pos += n;
+				conn->total_read += n;
+				return 0;
+			}
+			
+			conn->msg = end + 1;
 		}
+	}
 	
-		pbuf[count] = ch;
-		count++;
+	/*
+	 * Ok, we have the length. Now make sure that we have either
+	 * the entire buffer, or need to read more..
+	 */
+	 
+	if (n - (conn->msg - conn->buf + 1) >= conn->msg_len) {
+		*result = (char *)malloc(conn->msg_len + 1);
+		memcpy(*result, conn->msg, conn->msg_len);
+		(*result)[conn->msg_len] = '\0';
+		conn->total_read = 0;
+		conn->buf_pos = 0;
+		return conn->msg_len;
+	}
 	
-		if (count >= size-1) {
-			size = 2*size;
-			*result = (char *) malloc(size);
-			memcpy(*result,pbuf,count);
-			free(pbuf);
-			pbuf = *result;
-		}
-	} while (1);
+	/*
+	 * Need more...
+	 */
+	conn->buf_pos += n;
+	conn->total_read += n;
 	
-	pbuf[count] = '\0';
-	*result = pbuf;
-	
-	return count;
-}
-
-int
-proxy_tcp_send_request(SOCKET sock, char *request, char **result, int status, struct timeval *timeout)
-{
+	return 0;
 }
 
 void
