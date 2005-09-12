@@ -59,7 +59,10 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 		System.out.println("User selected "+prefNumMachines+" simulated machines.");
 		if(prefNumMachines < 1) {
 			int i = 1;
-			preferences.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, i);
+			preferences.setValue(PreferenceConstants.SIMULATION_NUM_MACHINES, i);
+			i = 256;
+			preferences.setValue(PreferenceConstants.SIMULATION_MACHINE_NODE_PREFIX + "1", i);
+			prefNumMachines = 1;
 
 			PTPCorePlugin.getDefault().savePluginPreferences();
 
@@ -97,96 +100,107 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 		nodeStateMap = new HashMap();
 
 		/* machine 3 has a bunch of nodes w/ different states */
-		for (int i = 0; i < numNodes[3]; i++) {
-			String s = new String("machine4_node" + i);
-			int r = ((int) (Math.random() * 100));
-			if (r < 10)
-				nodeStateMap.put(s, new String("error"));
-			else if (r < 30)
-				nodeStateMap.put(s, new String("down"));
-			else {
-				nodeStateMap.put(s, new String("up"));
+		if(numMachines >= 4) {
+			for (int i = 0; i < numNodes[3]; i++) {
+				String s = new String("machine4_node" + i);
+				int r = ((int) (Math.random() * 100));
+				if (r < 10)
+					nodeStateMap.put(s, new String("error"));
+				else if (r < 30)
+					nodeStateMap.put(s, new String("down"));
+				else {
+					nodeStateMap.put(s, new String("up"));
+				}
 			}
-		}
-		int nstart = ((int) (Math.random() * 50));
-		int nlen = ((int) (Math.random() * 40 + 10));
-		String nmode = new String(((int) (Math.random() * 2)) == 0 ? "0111"
-				: "0100");
-		int gstart = ((int) (Math.random() * 50 + (nstart + nlen)));
-		int glen = ((int) (Math.random() * 100 + 40));
-		String gmode = new String(((int) (Math.random() * 2)) == 0 ? "0111"
-				: "0100");
-		int cstart = ((int) (Math.random() * 50 + (nstart + nlen + gstart + glen)));
-		int clen = ((int) (Math.random() * 75 + 25));
-		String cmode = new String(((int) (Math.random() * 2)) == 0 ? "0111"
-				: "0100");
-		for (int i = 0; i < numNodes[3]; i++) {
-			String s = new String("machine4_node" + i);
-			if (i >= nstart && i <= (nstart + nlen)) {
-				nodeUserMap.put(s, new String(System.getProperty("user.name")));
-				nodeGroupMap.put(s, new String("ptp"));
-				nodeModeMap.put(s, nmode);
-			} else if (i >= gstart && i <= (gstart + glen)) {
-				nodeUserMap.put(s, new String("gwatson"));
-				nodeGroupMap.put(s, new String("ptp"));
-				nodeModeMap.put(s, gmode);
-			} else if (i >= cstart && i <= (cstart + clen)) {
-				nodeUserMap.put(s, new String("crasmussen"));
-				nodeGroupMap.put(s, new String("ptp"));
-				nodeModeMap.put(s, cmode);
-			} else {
-				nodeUserMap.put(s, new String(""));
-				nodeGroupMap.put(s, new String(""));
-				nodeModeMap.put(s, new String("0111"));
-			}
-		}
-
-		for (int i = 0; i < numNodes[0]; i++) {
-			String s = new String("machine1_node" + i);
-			nodeStateMap.put(s, new String("up"));
-			nodeUserMap.put(s, new String(System.getProperty("user.name")));
-			nodeGroupMap.put(s, new String("ptp"));
-			nodeModeMap.put(s, new String("0100"));
-		}
-
-		for (int i = 0; i < numNodes[1]; i++) {
-			String s = new String("machine2_node" + i);
-			nodeStateMap.put(s, new String("up"));
-			if (i < 32) {
-				nodeUserMap.put(s, new String(System.getProperty("user.name")));
-				nodeGroupMap.put(s, new String("ptp"));
-				nodeModeMap.put(s, new String("0100"));
-			} else if (i < 64) {
-				nodeUserMap.put(s, new String(""));
-				nodeGroupMap.put(s, new String(""));
-				nodeModeMap.put(s, new String("0111"));
-			} else if (i < 128) {
-				nodeUserMap.put(s, new String("wjones"));
-				nodeGroupMap.put(s, new String("parl"));
-				nodeModeMap.put(s, new String("0100"));
-			} else {
-				nodeUserMap.put(s, new String("jsmith"));
-				nodeGroupMap.put(s, new String("awhere"));
-				nodeModeMap.put(s, new String("0111"));
+			int nstart = ((int) (Math.random() * 50));
+			int nlen = ((int) (Math.random() * 40 + 10));
+			String nmode = new String(((int) (Math.random() * 2)) == 0 ? "0111"
+					: "0100");
+			int gstart = ((int) (Math.random() * 50 + (nstart + nlen)));
+			int glen = ((int) (Math.random() * 100 + 40));
+			String gmode = new String(((int) (Math.random() * 2)) == 0 ? "0111"
+					: "0100");
+			int cstart = ((int) (Math.random() * 50 + (nstart + nlen + gstart + glen)));
+			int clen = ((int) (Math.random() * 75 + 25));
+			String cmode = new String(((int) (Math.random() * 2)) == 0 ? "0111"
+					: "0100");
+			for (int i = 0; i < numNodes[3]; i++) {
+				String s = new String("machine4_node" + i);
+				if (i >= nstart && i <= (nstart + nlen)) {
+					nodeUserMap.put(s, new String(System
+							.getProperty("user.name")));
+					nodeGroupMap.put(s, new String("ptp"));
+					nodeModeMap.put(s, nmode);
+				} else if (i >= gstart && i <= (gstart + glen)) {
+					nodeUserMap.put(s, new String("gwatson"));
+					nodeGroupMap.put(s, new String("ptp"));
+					nodeModeMap.put(s, gmode);
+				} else if (i >= cstart && i <= (cstart + clen)) {
+					nodeUserMap.put(s, new String("crasmussen"));
+					nodeGroupMap.put(s, new String("ptp"));
+					nodeModeMap.put(s, cmode);
+				} else {
+					nodeUserMap.put(s, new String(""));
+					nodeGroupMap.put(s, new String(""));
+					nodeModeMap.put(s, new String("0111"));
+				}
 			}
 		}
 
-		/*
-		 * setup machine[2]'s hardware - a machine w/ a bunch of nodes w/
-		 * different state
-		 */
-		for (int i = 0; i < numNodes[2]; i++) {
-			String s = new String("machine3_node" + i);
-			int r = ((int) (Math.random() * 100));
-			if (r < 3) {
-				nodeStateMap.put(s, new String("error"));
-			} else if (r < 6)
-				nodeStateMap.put(s, new String("down"));
-			else {
+		if(numMachines >= 1) {
+			for (int i = 0; i < numNodes[0]; i++) {
+				String s = new String("machine1_node" + i);
 				nodeStateMap.put(s, new String("up"));
 				nodeUserMap.put(s, new String(System.getProperty("user.name")));
 				nodeGroupMap.put(s, new String("ptp"));
 				nodeModeMap.put(s, new String("0100"));
+			}
+		}
+
+		if (numMachines >= 2) {
+			for (int i = 0; i < numNodes[1]; i++) {
+				String s = new String("machine2_node" + i);
+				nodeStateMap.put(s, new String("up"));
+				if (i < 32) {
+					nodeUserMap.put(s, new String(System
+							.getProperty("user.name")));
+					nodeGroupMap.put(s, new String("ptp"));
+					nodeModeMap.put(s, new String("0100"));
+				} else if (i < 64) {
+					nodeUserMap.put(s, new String(""));
+					nodeGroupMap.put(s, new String(""));
+					nodeModeMap.put(s, new String("0111"));
+				} else if (i < 128) {
+					nodeUserMap.put(s, new String("wjones"));
+					nodeGroupMap.put(s, new String("parl"));
+					nodeModeMap.put(s, new String("0100"));
+				} else {
+					nodeUserMap.put(s, new String("jsmith"));
+					nodeGroupMap.put(s, new String("awhere"));
+					nodeModeMap.put(s, new String("0111"));
+				}
+			}
+		}
+
+		if (numMachines >= 3) {
+			/*
+			 * setup machine[2]'s hardware - a machine w/ a bunch of nodes w/
+			 * different state
+			 */
+			for (int i = 0; i < numNodes[2]; i++) {
+				String s = new String("machine3_node" + i);
+				int r = ((int) (Math.random() * 100));
+				if (r < 3) {
+					nodeStateMap.put(s, new String("error"));
+				} else if (r < 6)
+					nodeStateMap.put(s, new String("down"));
+				else {
+					nodeStateMap.put(s, new String("up"));
+					nodeUserMap.put(s, new String(System
+							.getProperty("user.name")));
+					nodeGroupMap.put(s, new String("ptp"));
+					nodeModeMap.put(s, new String("0100"));
+				}
 			}
 		}
 		

@@ -251,7 +251,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 
 		IModelManager manager = PTPCorePlugin.getDefault().getModelManager();
 		if (manager.isParallelPerspectiveOpen() && (lastMSChoiceID != MSChoiceID || lastCSChoiceID != CSChoiceID)) {
-			manager.refreshMonitoringSystem(CSChoiceID, MSChoiceID);
+			manager.refreshRuntimeSystems(CSChoiceID, MSChoiceID);
 		}
 
 		File outputDirPath = new File(outputDIR);

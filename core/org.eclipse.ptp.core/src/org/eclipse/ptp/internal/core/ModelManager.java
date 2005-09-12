@@ -125,7 +125,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			System.out.println("Your Monitoring System Choice: '"+MSChoice+"'");
 		}
 
-		refreshMonitoringSystem(CSChoiceID, MSChoiceID);
+		refreshRuntimeSystems(CSChoiceID, MSChoiceID);
 	}
 	
 	public IControlSystem getControlSystem() {
@@ -136,7 +136,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		return monitoringSystem;
 	}
 	
-	public void refreshMonitoringSystem(int controlSystemID, int monitoringSystemID)
+	public void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID)
 	{
 		if(monitoringSystemID == MonitoringSystemChoices.SIMULATED_ID && controlSystemID == ControlSystemChoices.SIMULATED_ID) {
 			universe = new PUniverse();
