@@ -188,6 +188,12 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 		}
 	}
 	public String initial() {
+		if(machineList != null) {
+			machineList.clear();
+			machineList = null;
+		}
+		machineList = new HashMap();
+		
 		IPMachine[] macs = getMachines();
 		if (macs.length > 0) {
 			cur_machine_id = macs[0].getIDString();
