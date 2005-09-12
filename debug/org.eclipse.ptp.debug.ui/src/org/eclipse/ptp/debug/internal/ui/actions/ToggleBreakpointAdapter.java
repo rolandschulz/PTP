@@ -82,6 +82,7 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 						else {
 							String sid = uiDebugManager.getCurrentSetId();
 							String jid = uiDebugManager.getCurrentJobId();
+							String jobName = uiDebugManager.getName(jid);
 							sid = (sid == null || sid.length() == 0)?IElementHandler.SET_ROOT_ID:sid;
 							String sourceHandle = getSourceHandle(input);
 							IPLineBreakpoint breakpoint = PCDIDebugModel.lineBreakpointExists(sourceHandle, resource, lineNumber, sid, jid);
@@ -89,7 +90,7 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 								DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);
 							}
 							else {
-								PCDIDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, jid);
+								PCDIDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, jid, jobName);
 							}
 							return;
 						}

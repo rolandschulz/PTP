@@ -35,10 +35,13 @@ public interface IPBreakpoint extends IBreakpoint {
 	public static final String MODULE = "org.eclipse.ptp.debug.core.module";
 	public static final String SOURCE_HANDLE = "org.eclipse.ptp.debug.core.sourceHandle";
 	
-	public static final String JOB_ID = "org.eclipse.ptp.debug.core.jobid";
 	public static final String SET_ID = "org.eclipse.ptp.debug.core.setid";
 	public static final String CUR_SET_ID = "org.eclipse.ptp.debug.core.cursetid";
+	public static final String JOB_ID = "org.eclipse.ptp.debug.core.jobid";
+	public static final String JOB_NAME = "org.eclipse.ptp.debug.core.jobname";
 
+	public void updateMarkerMessage() throws CoreException;
+	
 	public String getCurSetId() throws CoreException;
 	public void setCurSetId(String id) throws CoreException;
 
@@ -48,6 +51,9 @@ public interface IPBreakpoint extends IBreakpoint {
 	public String getJobId() throws CoreException;
 	public void setJobId(String id) throws CoreException;
 
+	public String getJobNmae() throws CoreException;
+	public void setJobName(String name) throws CoreException;
+	
 	public boolean isInstalled() throws CoreException;
 	public boolean isConditional() throws CoreException;
 	
