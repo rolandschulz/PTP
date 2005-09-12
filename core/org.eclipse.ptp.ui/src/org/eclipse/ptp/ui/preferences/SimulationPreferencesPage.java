@@ -274,12 +274,10 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 		PTPCorePlugin.getDefault().savePluginPreferences();
 		
 		IModelManager manager = PTPCorePlugin.getDefault().getModelManager();
-		System.out.println("PPopen?: "+manager.isParallelPerspectiveOpen());
 		if (manager.isParallelPerspectiveOpen() &&
 			manager.getMonitoringSystem() instanceof SimulationMonitoringSystem &&
 			manager.getControlSystem() instanceof SimulationControlSystem)
 		{
-			System.out.println("refreshin!");
 			manager.refreshRuntimeSystems(ControlSystemChoices.getCSIDByName("Simulated"),
 					MonitoringSystemChoices.getMSIDByName("Simulated"));
 		}

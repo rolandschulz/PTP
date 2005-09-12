@@ -432,6 +432,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 
 	public void monitoringSystemChangeEvent(Object object) {
 		System.out.println("------------ machine monitoringSystemChangeEvent");
+		initialView();
 		refresh();
 	}
 
