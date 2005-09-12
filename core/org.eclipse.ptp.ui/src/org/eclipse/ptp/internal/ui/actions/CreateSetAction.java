@@ -86,9 +86,9 @@ public class CreateSetAction extends GotoDropDownAction {
 					return;
 
 				String name = inputDialog.getValue();
-				setID = view.getUIManger().createSet(elements, name, name, setManager);				
+				setID = view.getUIManager().createSet(elements, name, name, setManager);				
 			} else
-				view.getUIManger().addToSet(elements, setID, setManager);
+				view.getUIManager().addToSet(elements, setID, setManager);
 			
 			view.selectSet(setManager.getSet(setID));
 			//Need to deselect all elements manually

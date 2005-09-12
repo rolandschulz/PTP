@@ -21,6 +21,7 @@ package org.eclipse.ptp.internal.ui.actions;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.internal.ui.MachineManager;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.actions.GotoAction;
 import org.eclipse.ptp.ui.actions.GotoDropDownAction;
@@ -44,7 +45,7 @@ public class ChangeMachineAction extends GotoDropDownAction {
 		if (view instanceof ParallelMachineView) {
 			ParallelMachineView pmView = (ParallelMachineView)view;
 		    	String curMachineID = pmView.getCurrentMachineID();	
-		    	IPMachine[] macs = pmView.getMachineManager().getMachines();
+		    	IPMachine[] macs = ((MachineManager)pmView.getUIManager()).getMachines();
 
 		    	for (int i=0; i<macs.length; i++) {
 		    		addAction(dropDownMenuMgr, macs[i].getElementName(), macs[i].getIDString(), curMachineID);
@@ -64,9 +65,8 @@ public class ChangeMachineAction extends GotoDropDownAction {
 	public void run() {
 		if (view instanceof ParallelMachineView) {
 			ParallelMachineView pmView = ((ParallelMachineView)view);
-			IPMachine[] macs = pmView.getMachineManager().getMachines();
+			IPMachine[] macs = ((MachineManager)pmView.getUIManager()).getMachines();
 			for (int i=0; i<macs.length; i++) {
-		    		//FIXME id or name
 		    		if (pmView.getCurrentMachineID().equals(macs[i].getIDString())) {
 		    			if (i + 1 < macs.length)
 		    				run(null, macs[i+1].getIDString());

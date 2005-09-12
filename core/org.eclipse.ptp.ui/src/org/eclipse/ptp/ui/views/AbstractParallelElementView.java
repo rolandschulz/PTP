@@ -24,7 +24,6 @@ import java.util.List;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.ptp.internal.ui.UISetManager;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.listeners.IPaintListener;
 import org.eclipse.ptp.ui.model.IElement;
@@ -700,7 +699,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		return manager.getCurrentSetId();
 	}
 	public void fireChangeEvent(IElementSet cur_set, IElementSet pre_set) {
-		uiSetManager.fireEvent(UISetManager.CHANGE_SET_TYPE, null, cur_set, pre_set);
+		manager.fireEvent(IManager.CHANGE_SET_TYPE, null, cur_set, pre_set);
 	}
 	public void selectSet(IElementSet set) {
 		fireChangeEvent(set, cur_element_set);
@@ -863,4 +862,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			return new Rectangle(start_x, start_y, width, height);
 		}
 	}
+	
+	public abstract IManager getUIManager();
 }

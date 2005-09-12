@@ -41,10 +41,9 @@ public class TerminateAllAction extends ParallelAction {
 	
 	public void run() {
 		if (view instanceof ParallelJobView) {
-			ParallelJobView jView = (ParallelJobView)view;
+			//ParallelJobView jView = (ParallelJobView)view;
 			//TODO terminate all process in this job
 			//String job_id = jView.getCurrentJobID();
-			jView.getJobManager();
 		}
 	}
 }

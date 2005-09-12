@@ -24,6 +24,7 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.TerminateAllAction;
+import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.actions.ParallelAction;
@@ -71,9 +72,10 @@ public class ParallelJobView extends AbstractParallelSetView {
 		instance = this;
 		manager = PTPUIPlugin.getDefault().getJobManager();
 	}
-	public JobManager getJobManager() {
-		return (JobManager) manager;
+	public IManager getUIManager() {
+		return manager;
 	}
+	
 	public String getCurrentView() {
 		return current_view;
 	}
@@ -109,7 +111,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 		if (manager.size() > 0) {
 			getDisplay().syncExec(new Runnable() {
 				public void run() {
-					IPJob[] jobs = getJobManager().getJobs();
+					IPJob[] jobs = ((JobManager)manager).getJobs();
 					for (int i=jobTable.getItemCount(); i < jobs.length; i++) {
 						setJobItem(new TableItem(jobTable, SWT.NULL), jobs[i]);
 					}
@@ -129,7 +131,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 		item.setText(job.getElementName());
 	}
 	public void updateJobTable() {
-		IPJob[] jobs = getJobManager().getJobs();
+		IPJob[] jobs = ((JobManager)manager).getJobs();
 		for (int i=0; i < jobs.length; i++) {
 			setJobItem(jobTable.getItem(i), jobs[i]);
 		}
@@ -156,7 +158,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 		jobTable.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				String jobName = jobTable.getSelection()[0].getText();
-				IPJob job = getJobManager().findJob(jobName);
+				IPJob job = ((JobManager)manager).findJob(jobName);
 				if (job != null) {
 					selectJob(job.getIDString());
 					update();
@@ -176,7 +178,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 	protected void doubleClickAction(int element_num) {
 		IElement element = cur_element_set.get(element_num);
 		if (element != null) {
-			openProcessViewer(getJobManager().findProcess(getCurrentJobID(), element.getID()));
+			openProcessViewer(((JobManager)manager).findProcess(getCurrentJobID(), element.getID()));
 		}
 	}
 	protected String getToolTipText(int element_num) {
@@ -186,7 +188,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 		IElement element = cur_element_set.get(element_num);
 		if (element == null)
 			return "Unknown element";
-		IPProcess proc = getJobManager().findProcess(getCurrentJobID(), element.getID());
+		IPProcess proc = ((JobManager)manager).findProcess(getCurrentJobID(), element.getID());
 		if (proc == null)
 			return "Unknown process";
 		StringBuffer buffer = new StringBuffer();
@@ -205,14 +207,14 @@ public class ParallelJobView extends AbstractParallelSetView {
 		return buffer.toString();
 	}
 	protected Image getStatusIcon(IElement element) {
-		int status = getJobManager().getProcessStatus(getCurrentJobID(), element.getID());
+		int status = ((JobManager)manager).getProcessStatus(getCurrentJobID(), element.getID());
 		return procImages[status][element.isSelected() ? 1 : 0];
 	}
 	public String getCurrentJobID() {
-		return getJobManager().getCurrentJobId();
+		return ((JobManager)manager).getCurrentJobId();
 	}
 	public void selectJob(String job_id) {
-		getJobManager().setCurrentJobId(job_id);
+		((JobManager)manager).setCurrentJobId(job_id);
 		updateJob();
 	}
 	public void changeJob(String job_id) {

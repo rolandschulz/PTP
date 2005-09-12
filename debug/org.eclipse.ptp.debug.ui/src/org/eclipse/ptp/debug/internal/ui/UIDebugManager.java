@@ -63,7 +63,6 @@ import org.eclipse.ptp.debug.ui.events.TerminatedDebugEvent;
 import org.eclipse.ptp.debug.ui.listeners.IDebugActionUpdateListener;
 import org.eclipse.ptp.debug.ui.listeners.IRegListener;
 import org.eclipse.ptp.internal.ui.JobManager;
-import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -84,13 +83,13 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	private PAnnotationManager annotationMgr = null;
 
 	public UIDebugManager() {
-		PTPUIPlugin.getDefault().getUIManager().addSetListener(this);
+		addSetListener(this);
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
 		PTPDebugCorePlugin.getDefault().addDebugSessionListener(this);
 		annotationMgr = new PAnnotationManager(this);
 	}
 	public void shutdown() {
-		PTPUIPlugin.getDefault().getUIManager().removeSetListener(this);
+		removeSetListener(this);
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
 		PTPDebugCorePlugin.getDefault().removeDebugSessionListener(this);
 		regListeners.clear();

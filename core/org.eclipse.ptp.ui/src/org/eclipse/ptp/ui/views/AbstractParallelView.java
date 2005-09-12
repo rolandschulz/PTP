@@ -20,15 +20,11 @@ package org.eclipse.ptp.ui.views;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.ptp.core.IParallelModelListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.internal.ui.UISetManager;
-import org.eclipse.ptp.rtsystem.IRuntimeListener;
-import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 /**
@@ -42,10 +38,8 @@ public abstract class AbstractParallelView extends ViewPart implements ISelectio
 	 * store debug event listener
 	 */
 	protected List listeners = new ArrayList(0);
-	protected UISetManager uiSetManager = null;
 	
 	public AbstractParallelView() {
-		uiSetManager = PTPUIPlugin.getDefault().getUIManager();
 		PTPCorePlugin.getDefault().getModelManager().addParallelLaunchListener(this);
 	}
     /* (non-Javadoc)
@@ -67,10 +61,6 @@ public abstract class AbstractParallelView extends ViewPart implements ISelectio
 		listeners.clear();
 		PTPCorePlugin.getDefault().getModelManager().removeParallelLaunchListener(this);
 		super.dispose();
-	}
-	
-	public UISetManager getUIManger() {
-		return uiSetManager;
 	}
 	
 	protected Display getDisplay() {

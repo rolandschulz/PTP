@@ -25,6 +25,7 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.internal.ui.MachineManager;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.ChangeMachineAction;
+import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.actions.ParallelAction;
@@ -131,8 +132,8 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		manager = PTPUIPlugin.getDefault().getMachineManager();
 	}
 	
-	public MachineManager getMachineManager() {
-		return (MachineManager)manager;
+	public IManager getUIManager() {
+		return manager;
 	}
 	
 	public void changeView(String view_flag) {
@@ -174,7 +175,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		update();
 	}
 	public IElementHandler getCurrentElementHandler() {
-		return getMachineManager().getElementHandler(getCurrentMachineID());
+		return manager.getElementHandler(getCurrentMachineID());
 	}
 
 	public static ParallelMachineView getMachineViewInstance() {
@@ -241,7 +242,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		BRtable.addSelectionListener(new SelectionAdapter() {
 			/* double click - throw up an editor to look at the process */
 			public void widgetDefaultSelected(SelectionEvent e) {
-				IPNode node = getMachineManager().findNode(getCurrentMachineID(), cur_selected_element_id);
+				IPNode node = ((MachineManager)manager).findNode(getCurrentMachineID(), cur_selected_element_id);
 				if (node != null) {
 					int idx = BRtable.getSelectionIndex();
 					IPProcess[] procs = node.getSortedProcesses();
@@ -298,7 +299,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		if (element == null)
 			return "Unknown element";
 
-		IPNode node = getMachineManager().findNode(getCurrentMachineID(), element.getID());
+		IPNode node = ((MachineManager)manager).findNode(getCurrentMachineID(), element.getID());
 		if (node == null)
 			return "Unknown node";
 
@@ -320,15 +321,15 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	}
 
 	protected Image getStatusIcon(IElement element) {
-		int status = getMachineManager().getNodeStatus(getCurrentMachineID(), element.getID());
+		int status = ((MachineManager)manager).getNodeStatus(getCurrentMachineID(), element.getID());
 		return nodeImages[status][element.isSelected() ? 1 : 0];
 	}
 
 	public String getCurrentMachineID() {
-		return getMachineManager().getCurrentMachineId();
+		return ((MachineManager)manager).getCurrentMachineId();
 	}
 	public void selectMachine(String machine_id) {
-		getMachineManager().setCurrentMachineId(machine_id);
+		((MachineManager)manager).setCurrentMachineId(machine_id);
 		updateMachine();
 	}
 	public void updateMachine() {
@@ -340,7 +341,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	
 	protected void updateAction() {
 		super.updateAction();
-		changeMachineAction.setEnabled(getMachineManager().getMachines().length > 0);
+		changeMachineAction.setEnabled(((MachineManager)manager).getMachines().length > 0);
 	}
 	
 	public void updateTitle() {
@@ -376,7 +377,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		
 		cur_selected_element_id = firstRegisteredElementID; 
 		
-		IPNode node = getMachineManager().findNode(getCurrentMachineID(), cur_selected_element_id);
+		IPNode node = ((MachineManager)manager).findNode(getCurrentMachineID(), cur_selected_element_id);
 		if (node == null) {
 			return;
 		}
@@ -395,7 +396,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		if (procs != null) {
 			TableItem item = null;
 			for (int i = 0; i < procs.length; i++) {
-				int proc_state = getMachineManager().getProcStatus(procs[i].getStatus());
+				int proc_state = ((MachineManager)manager).getProcStatus(procs[i].getStatus());
 				item = new TableItem(BRtable, SWT.NULL);
 				item.setImage(procImages[proc_state][0]);
 				item.setText("Process " + procs[i].getProcessNumber() + ", Job " + procs[i].getJob().getJobNumber());
