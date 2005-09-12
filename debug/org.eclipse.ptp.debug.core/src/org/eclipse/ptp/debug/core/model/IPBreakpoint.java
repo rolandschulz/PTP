@@ -51,7 +51,7 @@ public interface IPBreakpoint extends IBreakpoint {
 	public String getJobId() throws CoreException;
 	public void setJobId(String id) throws CoreException;
 
-	public String getJobNmae() throws CoreException;
+	public String getJobName() throws CoreException;
 	public void setJobName(String name) throws CoreException;
 	
 	public boolean isInstalled() throws CoreException;
