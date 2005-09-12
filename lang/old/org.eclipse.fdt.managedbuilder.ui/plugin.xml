@@ -1136,7 +1136,7 @@
          <configuration
                name="%ConfigName.Dbg"
                cleanCommand="rm -rf"
-			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"               
+			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.fdt.core.GFortranErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"               
                id="fdt.managedbuild.config.gnu.fortran.macosx.exe.debug">
                <toolChain
                      archList="all"
@@ -1201,7 +1201,7 @@
          <configuration
                name="%ConfigName.Rel"
                cleanCommand="rm -rf"               
-			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"                              
+			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.fdt.core.GFortranErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"                              
                id="fdt.managedbuild.config.gnu.fortran.macosx.exe.release">
                <toolChain
                      archList="all"
@@ -1273,7 +1273,7 @@
          <configuration
                name="%ConfigName.Dbg"
                cleanCommand="rm -rf"
-			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.XLFErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"               
+			   errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.fdt.core.XLFErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser"               
                id="fdt.managedbuild.config.xlf.fortran.macosx.exe.debug">
                <toolChain
                      archList="all"
