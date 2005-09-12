@@ -19,13 +19,22 @@
 package org.eclipse.ptp.ui;
 
 import org.eclipse.ptp.ui.listeners.IPaintListener;
+import org.eclipse.ptp.ui.listeners.ISetListener;
+import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
+import org.eclipse.ptp.ui.model.IElementSet;
 
 /**
  * @author clement chu
  *
  */
 public interface IManager {
+	public static final int CREATE_SET_TYPE = 0;
+	public static final int DELETE_SET_TYPE = 1;
+	public static final int CHANGE_SET_TYPE = 2;
+	public static final int ADD_ELEMENT_TYPE = 3;
+	public static final int REMOVE_ELEMENT_TYPE = 4;	
+	
 	public void shutdown();
 	public int size();
 	public String initial();
@@ -37,4 +46,14 @@ public interface IManager {
 	
 	public void addPaintListener(IPaintListener pListener);
 	public void removePaintListener(IPaintListener pListener);
+	
+	public void addSetListener(ISetListener setListener);
+	public void removeSetListener(ISetListener setListener);
+	public void fireEvent(int eventType, IElement[] elements, IElementSet cur_set, IElementSet pre_set);
+	public void addToSet(IElement[] elements, IElementSet set);
+	public void addToSet(IElement[] elements, String setID, IElementHandler elementHandler);
+	public String createSet(IElement[] elements, String setID, String setName, IElementHandler elementHandler);
+	public void removeSet(String setID, IElementHandler elementHandler);
+	public void removeFromSet(IElement[] elements, String setID, IElementHandler elementHandler);
+	public void updateMatchElementSets(IElementSet targetSet, IElementHandler elementHandler);
 }

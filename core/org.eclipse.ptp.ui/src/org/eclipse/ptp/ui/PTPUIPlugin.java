@@ -21,13 +21,11 @@ package org.eclipse.ptp.ui;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.internal.ui.MachineManager;
-import org.eclipse.ptp.internal.ui.UISetManager;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -46,7 +44,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
 	
-	private UISetManager uiManager = null;
 	private MachineManager machineManager = null;
 	private JobManager jobManager = null;
 
@@ -63,7 +60,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		uiManager = new UISetManager();
 		machineManager = new MachineManager();
 		jobManager = new JobManager();
 	}
@@ -88,9 +84,6 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		return getDefault().getBundle().getSymbolicName();
 	}	
 	
-	public UISetManager getUIManager() {
-		return uiManager;
-	}
 	public MachineManager getMachineManager() {
 		return machineManager;
 	}

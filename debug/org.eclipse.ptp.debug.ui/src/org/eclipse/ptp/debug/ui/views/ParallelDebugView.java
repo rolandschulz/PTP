@@ -37,6 +37,7 @@ import org.eclipse.ptp.debug.ui.events.IResumedDebugEvent;
 import org.eclipse.ptp.debug.ui.events.ISuspendedDebugEvent;
 import org.eclipse.ptp.debug.ui.events.ITerminatedDebugEvent;
 import org.eclipse.ptp.debug.ui.listeners.IDebugActionUpdateListener;
+import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
@@ -64,16 +65,15 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	public ParallelDebugView() {
 		instance = this;
 		manager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
-		getUIDebugManager().addDebugEventListener(this);
+		((UIDebugManager)manager).addDebugEventListener(this);
 	}
 	
 	public void dispose() {
-		getUIDebugManager().removeDebugEventListener(this);
+		((UIDebugManager)manager).removeDebugEventListener(this);
 		super.dispose();
 	}
-	
-	public UIDebugManager getUIDebugManager() {
-		return (UIDebugManager)manager;
+	public IManager getUIManager() {
+		return manager;
 	}
 
 	public static ParallelDebugView getDebugViewInstance() {
@@ -133,7 +133,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		if (element == null)
 			return "Unknown element";
 
-		IPProcess proc = getUIDebugManager().findProcess(getCurrentJobID(), element.getID());
+		IPProcess proc = ((UIDebugManager)manager).findProcess(getCurrentJobID(), element.getID());
 		if (proc == null)
 			return "Unknow process";
 
@@ -156,22 +156,22 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 
 	public void registerElement(IElement element) {
 		if (element.isRegistered())
-			getUIDebugManager().unregisterElements(new IElement[] { element });
+			((UIDebugManager)manager).unregisterElements(new IElement[] { element });
 		else
-			getUIDebugManager().registerElements(new IElement[] { element });
+			((UIDebugManager)manager).registerElements(new IElement[] { element });
 	}
 
 	public void registerSelectedElements() {
 		if (cur_element_set != null) {
 			IElement[] elements = cur_element_set.getSelectedElements();
-			getUIDebugManager().registerElements(elements);
+			((UIDebugManager)manager).registerElements(elements);
 		}
 	}
 
 	public void unregisterSelectedElements() {
 		if (cur_element_set != null) {
 			IElement[] elements = cur_element_set.getSelectedElements();
-			getUIDebugManager().unregisterElements(elements);
+			((UIDebugManager)manager).unregisterElements(elements);
 		}
 	}
 	
@@ -204,7 +204,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	protected void updateAction() {
 		super.updateAction();
 		
-		boolean isDebugging = getUIDebugManager().isDebugging(getCurrentJobID());
+		boolean isDebugging = ((UIDebugManager)manager).isDebugging(getCurrentJobID());
 		registerAction.setEnabled(isDebugging);
 		unregisterAction.setEnabled(isDebugging);
 		

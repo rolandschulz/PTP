@@ -52,7 +52,7 @@ public class DeleteProcessAction extends ParallelAction {
 					return;
 
 				if (UIUtils.showQuestionDialog("Delete Confirmation", "Are you sure you want to delete (" + elements.length + ") element from this set?"))	{			
-					view.getUIManger().removeFromSet(elements, set.getID(), setManager);
+					view.getUIManager().removeFromSet(elements, set.getID(), setManager);
 					view.selectSet(setManager.getSet(set.getID()));
 					view.updateTitle();
 					view.refresh();
