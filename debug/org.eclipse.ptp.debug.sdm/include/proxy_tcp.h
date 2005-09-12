@@ -24,6 +24,12 @@ struct proxy_tcp_conn {
 	char *	host;
 	int		port;
 	SOCKET	sock;
+	char *	buf;
+	int		buf_size;
+	int		buf_pos;
+	int		total_read;
+	char *	msg;
+	int		msg_len;
 };
 typedef struct proxy_tcp_conn	proxy_tcp_conn;
 
@@ -31,8 +37,8 @@ extern struct timeval TCPTIMEOUT;
 
 extern int		proxy_tcp_client_connect(char *, int, proxy_tcp_conn **);
 extern int		proxy_tcp_result_to_event(char *, dbg_event **);
-extern int		proxy_tcp_recv(SOCKET, char **);
-extern int		proxy_tcp_send(SOCKET, char *, int);
+extern int		proxy_tcp_recv(proxy_tcp_conn *, char **);
+extern int		proxy_tcp_send(proxy_tcp_conn *, char *, int);
 extern void		skipspace(char *);
 extern char *	getword(char **);
 
