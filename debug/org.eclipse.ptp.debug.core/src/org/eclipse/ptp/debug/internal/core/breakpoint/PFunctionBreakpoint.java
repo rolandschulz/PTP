@@ -46,6 +46,12 @@ public class PFunctionBreakpoint extends AbstractLineBreakpoint implements IPFun
 		if (fileName != null && fileName.length() > 0) {
 			fileName = ' ' + fileName + ' ';
 		}
-		return MessageFormat.format(BreakpointMessages.getString("PFunctinBreakpoint"), new String[] { getSetId(), fileName, getFunction(), getConditionText() });
+
+		String jobInfo = "";
+		String jobName = getJobName();
+		if (jobName.length() > 0)
+			jobInfo = "Job " + jobName + " - ";
+		
+		return jobInfo + MessageFormat.format(BreakpointMessages.getString("PFunctinBreakpoint"), new String[] { getSetId(), fileName, getFunction(), getConditionText() });
 	}
 }
