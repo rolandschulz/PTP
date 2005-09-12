@@ -135,6 +135,12 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 	public void setJobId(String id) throws CoreException {
 		setAttribute(JOB_ID, id);
 	}
+	public String getJobNmae() throws CoreException {
+		return ensureMarker().getAttribute(JOB_NAME, "");
+	}
+	public void setJobName(String name) throws CoreException {
+		setAttribute(JOB_NAME, name);
+	}
 	public String getCurSetId() throws CoreException {
 		return ensureMarker().getAttribute(CUR_SET_ID, "");
 	}
@@ -155,6 +161,9 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 		}
 	}
 	
+	public void updateMarkerMessage() throws CoreException {
+		setAttribute(IMarker.MESSAGE, getMarkerMessage());
+	}
 	protected abstract String getMarkerMessage() throws CoreException;
 	
 	public synchronized void resetInstallCount() throws CoreException {

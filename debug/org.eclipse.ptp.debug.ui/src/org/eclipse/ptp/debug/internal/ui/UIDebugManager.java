@@ -215,7 +215,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public void updateBreakpointMarker(final String cur_sid) {
 		try {
-			PCDIDebugModel.updatePBreakpoints(getCurrentJobId(), cur_sid);
+			PCDIDebugModel.updatePBreakpoints(getCurrentJobId(), cur_sid, getName(getCurrentJobId()));
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 		}
@@ -263,7 +263,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	// Delete the set that will delete the all related breakpoint
 	public void deleteSetEvent(IElementSet set) {
 		try {
-			PCDIDebugModel.deletePBreakpointBySet(set.getID());
+			PCDIDebugModel.deletePBreakpointBySet(getCurrentJobId(), set.getID());
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 		}
