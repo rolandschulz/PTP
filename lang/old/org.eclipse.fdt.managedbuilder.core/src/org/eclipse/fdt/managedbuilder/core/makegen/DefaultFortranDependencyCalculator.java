@@ -13,21 +13,24 @@ package org.eclipse.fdt.managedbuilder.core.makegen;
 import java.io.*;
 import java.lang.String;
 import java.util.ArrayList;
+import java.util.Collection;
 
+import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.IManagedOutputNameProvider;
-import org.eclipse.cdt.managedbuilder.core.IManagedProject;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ITool;
 import org.eclipse.cdt.managedbuilder.makegen.IManagedDependencyGenerator;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-// import org.eclipse.fdt.core.FortranLanguage;
+import org.eclipse.fdt.core.FortranLanguage;
+
 // import org.eclipse.fdt.internal.core.f95parser.FortranProcessor;
 // import org.eclipse.fdt.internal.core.f95parser.ILexer;
 // import org.eclipse.fdt.internal.core.f95parser.Terminal;
@@ -36,7 +39,6 @@ import org.eclipse.core.runtime.Path;
 
 /**
  *  This class implements the Dependency Manager and Output Name Provider interfaces
- *  for a very "quick & dirty" ifort tool-chain on Win32
  */
 public class DefaultFortranDependencyCalculator implements IManagedDependencyGenerator,
 														   IManagedOutputNameProvider
@@ -84,6 +86,19 @@ public class DefaultFortranDependencyCalculator implements IManagedDependencyGen
 							st.pushBack();
 						}
 					}
+					/**
+					 * This should be moved to separate include file list
+					 */
+					/*
+					else if (st.sval.equalsIgnoreCase("include")) {
+						token = st.nextToken();
+						if (st.ttype == '\'' || st.ttype == '"') {
+							names.add(st.sval);
+						} else {
+							st.pushBack();
+						}
+					}
+					*/
 				}
 			}
 		}
@@ -149,13 +164,13 @@ public class DefaultFortranDependencyCalculator implements IManagedDependencyGen
 	/*
 	 * Returns true if the resource is a Fortran source file
 	 */
-	private boolean isFortranFile(ITool tool, IResource resource) {
-		// TODO:  Get the file extensions from the tool's primary input type
-		String ext = resource.getFileExtension();
-		if (ext != null) {
-			if (ext.equalsIgnoreCase("f")) return true;
-			if (ext.equalsIgnoreCase("for")) return true;
-			if (ext.equalsIgnoreCase("f90")) return true;
+	private boolean isFortranFile(IProject project, File file, Collection fortranContentTypes) {
+		try {
+			IContentType ct = CCorePlugin.getContentType(project, file.getCanonicalPath());
+			if (ct != null) {
+				return fortranContentTypes.contains(ct.toString());
+			}
+		} catch (Exception e) {
 		}
 		return false;
 	}
@@ -164,14 +179,14 @@ public class DefaultFortranDependencyCalculator implements IManagedDependencyGen
 	 * Given a set of the module names used by a source file, and a set of resources to search, determine
 	 * if any of the source files implements the module names.
 	 */
-	private IResource[] FindModulesInResources(IProject project, ITool tool, IResource resource, IResource[] resourcesToSearch, 
+	private IResource[] FindModulesInResources(IProject project, Collection contentTypes, IResource resource, IResource[] resourcesToSearch, 
 							String topBuildDir, String[] usedNames) {
 		ArrayList modRes = new ArrayList();
 		for (int ir = 0; ir < resourcesToSearch.length; ir++) {
 			if (resourcesToSearch[ir].equals(resource)) continue;
 			if (resourcesToSearch[ir].getType() == IResource.FILE) {
 				File projectFile = resourcesToSearch[ir].getLocation().toFile();
-				if (!isFortranFile(tool, resourcesToSearch[ir])) continue;
+				if (!isFortranFile(project, projectFile, contentTypes)) continue;
 				String[] modules = findModuleNames(projectFile);
 				if (modules != null) {
 					for (int iu = 0; iu < usedNames.length; iu++) {
@@ -184,7 +199,6 @@ public class DefaultFortranDependencyCalculator implements IManagedDependencyGen
 								//  TODO: Support the /module:path option and use that in determining the path of the module file 
 								IPath modName = Path.fromOSString(topBuildDir + Path.SEPARATOR + modules[im] + "." + MODULE_EXTENSION);
 								modRes.add(project.getFile(modName));
-// adding .o dependency so this not needed								modRes.add(resourcesToSearch[ir]);
 								foundDependency = true;
 								break;
 							}
@@ -194,7 +208,7 @@ public class DefaultFortranDependencyCalculator implements IManagedDependencyGen
 				}
 			} else if (resourcesToSearch[ir].getType() == IResource.FOLDER) {
 				try {
-					IResource[] modFound = FindModulesInResources(project, tool, resource, ((IFolder)resourcesToSearch[ir]).members(), 
+					IResource[] modFound = FindModulesInResources(project, contentTypes, resource, ((IFolder)resourcesToSearch[ir]).members(), 
 							topBuildDir, usedNames);
 					if (modFound != null) {
 						for (int i=0; i<modFound.length; i++) {
@@ -212,23 +226,18 @@ public class DefaultFortranDependencyCalculator implements IManagedDependencyGen
 	 */
 	public IResource[] findDependencies(IResource resource, IProject project) {
 		ArrayList dependencies = new ArrayList();
+		Collection fortranContentTypes = new FortranLanguage().getRegisteredContentTypeIds();
 
 		//  TODO:  This method should be passed the ITool and the relative path of the top build directory
 		//         For now we'll figure this out from the project.
 		IManagedBuildInfo mngInfo = ManagedBuildManager.getBuildInfo(project);
 		IConfiguration config = mngInfo.getDefaultConfiguration();
-		ITool tool = null;
-		ITool[] tools = config.getTools();
-		for (int i=0; i<tools.length; i++) {
-			if (tools[i].getName().equals("GNU Fortran Compiler")) {
-				tool = tools[i];
-				break;
-			}
-		}
-		
+
 		File file = resource.getLocation().toFile();
 		try {
-			if (!isFortranFile(tool, resource)) return new IResource[0];
+			if (!isFortranFile(project, file, fortranContentTypes)) {
+				return new IResource[0];
+			}
 			
 			// add dependency on self
 			dependencies.add(resource);
@@ -239,7 +248,7 @@ public class DefaultFortranDependencyCalculator implements IManagedDependencyGen
 				//  Search the project files for a Fortran source that creates the module.  If we find one, then compiling this
 				//  source file is dependent upon first compiling the found source file.
 				IResource[] resources = project.members();	
-				IResource[] modRes = FindModulesInResources(project, tool, resource, resources, config.getName(), usedNames);
+				IResource[] modRes = FindModulesInResources(project, fortranContentTypes, resource, resources, config.getName(), usedNames);
 				if (modRes != null) {
 					for (int i=0; i<modRes.length; i++) {
 						dependencies.add(modRes[i]);
