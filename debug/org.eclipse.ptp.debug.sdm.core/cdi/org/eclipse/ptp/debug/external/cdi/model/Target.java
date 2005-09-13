@@ -139,7 +139,8 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void terminate() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Target.terminate()");
-		fDebugger.kill(null);
+		DebugProcessSet newSet = new DebugProcessSet((Session) getSession(), getTargetId());
+		fDebugger.kill(newSet);
 	}
 
 	public boolean isDisconnected() {
@@ -152,7 +153,8 @@ public class Target extends SessionObject implements IPCDITarget {
 		// Auto-generated method stub
 		System.out.println("Target.disconnect()");
 		//fDebugger.detach(null);
-		fDebugger.kill(null);
+		DebugProcessSet newSet = new DebugProcessSet((Session) getSession(), getTargetId());
+		fDebugger.kill(newSet);
 	}
 
 	public void restart() throws CDIException {
