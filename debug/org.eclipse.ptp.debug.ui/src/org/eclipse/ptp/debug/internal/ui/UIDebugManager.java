@@ -375,11 +375,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				fireSuspendEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof InferiorResumedEvent) {
 				fireResumeEvent(job, event.getAllProcesses().toBitList());
-			} else if (event instanceof InferiorExitedEvent) {
+			} else if (event instanceof InferiorExitedEvent || event instanceof ErrorEvent) {
 				fireTerminatedEvent(job, event.getAllProcesses().toBitList());
 				condition = job.isAllStop()?new Boolean(true):null;
-			} else if (event instanceof ErrorEvent) {
-				fireTerminatedEvent(job, event.getAllProcesses().toBitList());
 			}
 			firePaintListener(condition);
 		}
@@ -393,29 +391,29 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}
 		// add tasks
 		suspendedTasks.or(tasks);
-		fireDebugEvent(new SuspendedDebugEvent(job.getIDString(), suspendedTasks));
+		fireDebugEvent(new SuspendedDebugEvent(job.getIDString(), suspendedTasks, (BitList)elementHandler.getData(TERMINATED_PROC_KEY)));
 	}
 	public void fireResumeEvent(IPJob job, BitList tasks) {
 		IElementHandler elementHandler = getElementHandler(job.getIDString());
-		BitList suspendedTasks = (BitList) elementHandler.getData(SUSPENDED_PROC_KEY);
+		BitList suspendedTasks = (BitList)elementHandler.getData(SUSPENDED_PROC_KEY);
 		if (suspendedTasks == null) {
 			suspendedTasks = new BitList();
 			elementHandler.setData(SUSPENDED_PROC_KEY, suspendedTasks);
 		}
 		// remove tasks
 		suspendedTasks.andNot(tasks);
-		fireDebugEvent(new ResumedDebugEvent(job.getIDString(), suspendedTasks));
+		fireDebugEvent(new ResumedDebugEvent(job.getIDString(), suspendedTasks, (BitList)elementHandler.getData(TERMINATED_PROC_KEY)));
 	}
 	public void fireTerminatedEvent(IPJob job, BitList tasks) {
 		IElementHandler elementHandler = getElementHandler(job.getIDString());
-		BitList terminatedTasks = (BitList) elementHandler.getData(TERMINATED_PROC_KEY);
+		BitList terminatedTasks = (BitList)elementHandler.getData(TERMINATED_PROC_KEY);
 		if (terminatedTasks == null) {
 			terminatedTasks = new BitList();
 			elementHandler.setData(TERMINATED_PROC_KEY, terminatedTasks);
 		}
 		// only add tasks
 		terminatedTasks.or(tasks);
-		fireDebugEvent(new TerminatedDebugEvent(job.getIDString(), terminatedTasks));
+		fireDebugEvent(new TerminatedDebugEvent(job.getIDString(), terminatedTasks, (BitList)elementHandler.getData(SUSPENDED_PROC_KEY)));
 	}
 	// ONLY for detect the debug sesssion is created
 	public void update(IPCDISession session) {

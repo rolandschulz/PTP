@@ -26,10 +26,12 @@ package org.eclipse.ptp.debug.ui.events;
 public abstract class DebugActionEvent implements IDebugActionEvent {
 	private Object source = null;
 	private String job_id = "";
+	private Object target = null;
 	
-	public DebugActionEvent(String job_id, Object source) {
+	public DebugActionEvent(String job_id, Object source, Object target) {
 		this.job_id = job_id;
 		this.source = source;
+		this.target = target;
 	}
 	
 	public String getJobId() {
@@ -38,5 +40,9 @@ public abstract class DebugActionEvent implements IDebugActionEvent {
 		
 	public Object getSource() {
 		return source;
+	}
+	
+	public Object getTarget() {
+		return target;
 	}
 }

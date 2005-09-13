@@ -211,51 +211,82 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		IElementHandler elementHandler = getCurrentElementHandler();
 		if (elementHandler != null) {
 			IElementSet set = getCurrentSet();
-			updateSuspendResumeButton((BitList)elementHandler.getData(UIDebugManager.SUSPENDED_PROC_KEY), set);
-			updateTerminateButton((BitList)elementHandler.getData(UIDebugManager.TERMINATED_PROC_KEY), set);
+			BitList suspendedTaskList = (BitList)elementHandler.getData(UIDebugManager.SUSPENDED_PROC_KEY);
+			BitList terminatedTaskList = (BitList)elementHandler.getData(UIDebugManager.TERMINATED_PROC_KEY);
+			updateSuspendResumeButton(suspendedTaskList, set, terminatedTaskList);
+			updateTerminateButton(terminatedTaskList, set, suspendedTaskList);
 		}
 	}
 	
-	public void updateSuspendResumeButton(BitList tasks, IElementSet set) {
+	public void updateSuspendResumeButton(BitList tasks, IElementSet set, BitList targetTasks) {
 		if (set == null || tasks == null)
 			return;
 		
-		BitList refTasks = tasks.copy();
 		boolean isEnabled = false;
 		if (set.isRootSet()) {
-			isEnabled = !refTasks.isEmpty();
-			//disable suspendAction if all tasks same as root size
-			suspendAction.setEnabled(!(set.size()==refTasks.cardinality()));
+			isEnabled = !tasks.isEmpty();//tasks != 0: some processes suspended
+			suspendAction.setEnabled(set.size()!=tasks.cardinality()); //disable suspend Action if all tasks same as root size
 		}
 		else {
 			BitList setTasks = (BitList)set.getData(UIDebugManager.BITSET_KEY);
-			isEnabled = setTasks.intersects(refTasks);
-			//take action if some suspended tasks in current set
-			if (isEnabled) {
-				//disable suspendAction if all tasks same as set tasks
-				refTasks.and(setTasks);
-				suspendAction.setEnabled(!(refTasks.cardinality()==setTasks.cardinality()));
-			}
-		}			
+			//this set contains some suspended processes
+			isEnabled = setTasks.intersects(tasks);
+			
+			BitList refTasks = tasks.copy();
+			refTasks.and(setTasks);
+			//the size is not equal: there is some processes running
+			suspendAction.setEnabled(set.size()!=refTasks.cardinality()); 			
+		}
+		setEnableResumeButtonGroup(isEnabled);
+	}
+	//has suspend = resume enable
+	//has running = suspend enable
+	private void setEnableResumeButtonGroup(boolean isEnabled) {
 		resumeAction.setEnabled(isEnabled);
 		stepIntoAction.setEnabled(isEnabled);
 		stepOverAction.setEnabled(isEnabled);
 		stepReturnAction.setEnabled(isEnabled);
 	}
-	public void updateTerminateButton(BitList tasks, IElementSet set) {
+	public void updateTerminateButton(BitList tasks, IElementSet set, BitList targetTasks) {
 		if (set == null || tasks == null)
 			return;
 
-		BitList refTasks = tasks.copy();
 		boolean isEnabled = false;
-		if (set.isRootSet())
-			isEnabled = !(set.size()==refTasks.cardinality());
+		if (set.isRootSet()) {
+			isEnabled = !(set.size()==tasks.cardinality());//size equals: all processes are terminated
+			if (isEnabled) {//not all processes terminated
+				if (targetTasks == null || targetTasks.isEmpty()) {//no suspended process
+					setEnableResumeButtonGroup(false);
+					suspendAction.setEnabled(true);
+				}
+				else {//running process: total terminated + total suspended != set size
+					boolean isRunning = (set.size()!=(tasks.cardinality() + targetTasks.cardinality())); 
+					setEnableResumeButtonGroup(!isRunning);
+					suspendAction.setEnabled(isRunning);
+				}
+			} 
+			else {//all process terminated
+				setEnableResumeButtonGroup(false);
+				suspendAction.setEnabled(false);
+			}
+		}
 		else {
+			BitList refTasks = tasks.copy();
 			BitList setTasks = (BitList)set.getData(UIDebugManager.BITSET_KEY);
 			refTasks.and(setTasks);
-			isEnabled = !(refTasks.cardinality()==setTasks.cardinality());
+			isEnabled = !(setTasks.cardinality()==refTasks.cardinality());
+			boolean isEnabledOther = isEnabled;
+			if (isEnabledOther) {
+				if (targetTasks != null) {
+					BitList tarRefTasks = targetTasks.copy();
+					tarRefTasks.and(setTasks);
+					isEnabledOther = (setTasks.cardinality()==tarRefTasks.cardinality());
+					setEnableResumeButtonGroup(!isEnabledOther);
+				}
+			} else 
+				setEnableResumeButtonGroup(isEnabledOther);
 		}
-		terminateAction.setEnabled(isEnabled);		
+		terminateAction.setEnabled(isEnabled);
 	}
 	
 	/****
@@ -263,16 +294,18 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	 ****/
 	public void handleDebugActionEvent(IDebugActionEvent event) {
 		String job_id = event.getJobId();
-		//only take action with current job
-		if (!job_id.equals(getCurrentJobID()))
+		// only take action with current job
+		if (!job_id.equals(getCurrentJobID())) {
 			return;
+		}
 		
 		BitList tasks = (BitList)event.getSource();
+		BitList targetTasks = (BitList)event.getTarget();
 		IElementSet set = getCurrentSet();
 		if (event instanceof ISuspendedDebugEvent || event instanceof IResumedDebugEvent) {
-			updateSuspendResumeButton(tasks, set);
+			updateSuspendResumeButton(tasks, set, targetTasks);
 		} else if (event instanceof ITerminatedDebugEvent) {
-			updateTerminateButton(tasks, set);
+			updateTerminateButton(tasks, set, targetTasks);
 		}
 	}
 }
