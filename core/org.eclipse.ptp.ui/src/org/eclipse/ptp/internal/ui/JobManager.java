@@ -200,17 +200,18 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	}	
 		
 	public String initial() {
+		String last_job_id = "";
 		IPJob[] jobs = getJobs();
 		if (jobs.length > 0) {
 			//focus on last job
-			cur_job_id = jobs[jobs.length-1].getIDString();
+			last_job_id = jobs[jobs.length-1].getIDString();
 			for (int j=0; j<jobs.length; j++) {
 				if (!jobList.containsKey(jobs[j].getIDString()))
 					addJob(jobs[j]);
 			}
 			setCurrentSetId(IElementHandler.SET_ROOT_ID);
 		}
-		return cur_job_id;
+		return last_job_id;
 	}
 	
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************

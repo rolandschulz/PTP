@@ -22,19 +22,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public class AnnotationGroup {
 	List annotationList = new ArrayList();
-	
+
 	public boolean contains(Annotation annotation) {
 		return annotationList.contains(annotation);
 	}
@@ -53,7 +54,6 @@ public class AnnotationGroup {
 		removeAllMarkers();
 		annotationList.clear();
 	}
-	
 	public Iterator getAnnotationIterator() {
 		return annotationList.iterator();
 	}
@@ -61,22 +61,24 @@ public class AnnotationGroup {
 		return annotationList.isEmpty();
 	}
 	public void removeAllMarkers() {
-		for (Iterator i=annotationList.iterator(); i.hasNext();) {
-			((PInstructionPointerAnnotation)i.next()).deleteMarker();
+		for (Iterator i = annotationList.iterator(); i.hasNext();) {
+			((PInstructionPointerAnnotation) i.next()).deleteMarker();
 		}
 	}
-	//FIXME Not tested method
 	public void retrieveAllMarkers() {
-		for (Iterator i=annotationList.iterator(); i.hasNext();) {
-			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation)i.next();
-			IMarker marker = annotation.getMarker();
-			//if (marker != null) {
-				try {
-					createMarker(marker.getResource(), annotation.getType());
-				} catch (CoreException e) {
-					System.out.println("--------AnnotationGroup err: " + e.getMessage());
-				}
-			//}
+		for (Iterator i = annotationList.iterator(); i.hasNext();) {
+			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation) i.next();
+			try {
+				String type = annotation.getType();
+				if (type.equals(IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT))
+					type = IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT;
+				
+				annotation.setMarker(createMarker(annotation.getMarker().getResource(), type));
+				annotation.getAnnotationModel().addAnnotation(annotation, annotation.getPosition());
+				annotation.setMessage(!type.equals(IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT));
+			} catch (CoreException e) {
+				PTPDebugUIPlugin.log(e);
+			}
 		}
 	}
 	public IMarker createMarker(IResource resource, String type) throws CoreException {
