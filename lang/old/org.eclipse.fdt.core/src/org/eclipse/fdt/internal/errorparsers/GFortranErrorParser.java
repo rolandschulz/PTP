@@ -20,6 +20,9 @@ import org.eclipse.core.runtime.Path;
 
 public class GFortranErrorParser implements IErrorParser {
 	
+	String fileName = null;
+	int lineNumber = -1;
+	
 	public boolean processLine(String line, ErrorParserManager eoParser) {
 		return processLine(line, eoParser, IMarkerGenerator.SEVERITY_ERROR_RESOURCE);
 	}
@@ -27,30 +30,12 @@ public class GFortranErrorParser implements IErrorParser {
 	public boolean processLine(String line, ErrorParserManager eoParser, int inheritedSeverity) {
 		// Known patterns.
 		// (a)
-		// filename:lineno: description
-		//
-		// (b)
-		// filename:lineno:column: description
-		//
-		// (c)
 		//  In file filename:lineno
 		//
 		// use standard_types
 		//                  1
 		//
 		// Fatal Error: Can't open module file 'standard_types.mod' for reading at (1): No such file or directory
-		//
-		// (d)
-		// In file included from hello.c:3:
-		// c.h:2:15: missing ')' in macro parameter list
-		//
-		// (e)
-		// h.c: In function `main':
-		// h.c:41: `foo' undeclared (first use in this function)
-		// h.c:41: (Each undeclared identifier is reported only once
-		// h.c:41: for each function it appears in.)
-		// h.c:41: parse error before `char'
-		// h.c:75: `p' undeclared (first use in this function)
 
 		int firstColon = line.indexOf(':');
 
@@ -71,151 +56,35 @@ public class GFortranErrorParser implements IErrorParser {
 		}
 
 		if (firstColon != -1) {
+			
 			try {
-				int secondColon = -1;
-				int	num  = -1;
-
-				String lineNumber = line.substring(firstColon + 1);
-				try {
-					num = Integer.parseInt(lineNumber);
-				} catch (NumberFormatException e) {
-					// Failed.
-				}
-				
+			
 				/*
-				 *	In file included from hello.c:3:
-				 *	 c.h:2:15: missing ')' in macro parameter list
-				 *
-				 * We reconstruct the multiline gcc errors to multiple errors:
-				 *    c.h:2:15: missing ')' in macro parameter list
-				 *    hello.c:3:  in inclusion c.h:2:15
-				 *     
+				 *	In file filename:lineno
 				 */
-				if (line.startsWith("In file ")) { //$NON-NLS-1$
-					// We want the last error in the chain, so continue.
-					String fileName = line.substring(8, firstColon);
-					eoParser.appendToScratchBuffer(line);
-					return false;
-				}
-
-
-
-				if (secondColon != -1) {
-					int col = -1;
-
-					String fileName = line.substring(0, firstColon);
-					String varName = null;
-					String desc = line.substring(secondColon + 1).trim();
-					/* Then check for the column  */
-					int thirdColon= line.indexOf(':', secondColon + 1);
-					if (thirdColon != -1) {
-						String columnNumber = line.substring(secondColon + 1, thirdColon);
-						try {
-							col = Integer.parseInt(columnNumber);
-						} catch (NumberFormatException e) {
-						}
-					}
-					if (col != -1) {
-						desc = line.substring(thirdColon + 1).trim();
-					}
-
-					// gnu c: filename:no: (Each undeclared identifier is reported
-					// only once. filename:no: for each function it appears in.)
-					if (desc.startsWith ("(Each undeclared")) { //$NON-NLS-1$
-						// Do nothing.
+				if (line.startsWith("In file ")) {
+					fileName = line.substring(8, firstColon);
+					String lineno = line.substring(firstColon + 1);
+					try {
+						lineNumber = Integer.parseInt(lineno);
+					} catch (NumberFormatException e) {
+						lineNumber = -1;
+						fileName = null;
 						return false;
 					}
-					if (desc.endsWith(")")) { //$NON-NLS-1$
-						String previous = eoParser.getPreviousLine();
-						// It if is a "(Each undeclared ..." ignore this.
-						// we already have the error.
-						if (previous.indexOf("(Each undeclared") >= 0 ) { //$NON-NLS-1$
-							// Do nothing.
-							return false;
-						}
-					}
+				}
 
-					/* See if we can get a var name
-					 * Look for:
-					 * `foo' undeclared
-					 * `foo' defined but not used
-					 * conflicting types for `foo'
-					 * previous declaration of `foo'
-					 * parse error before `foo'
-					 *
-					 */ 
-					 int s;
-					 if((s = desc.indexOf("\' undeclared")) != -1) { //$NON-NLS-1$
-					 	int p = desc.indexOf("`"); //$NON-NLS-1$
-					 	if (p != -1) {
-					 		varName = desc.substring(p+1, s);
-					 		//System.out.println("undex varName "+ varName);
-					 	}
-					 } else if((s = desc.indexOf("\' defined but not used")) != -1) { //$NON-NLS-1$
-					 	int p = desc.indexOf("`"); //$NON-NLS-1$
-					 	if (p != -1) {
-					 		varName = desc.substring(p+1, s);
-					 		//System.out.println("unused varName "+ varName);
-					 	}
-					 } else if((s = desc.indexOf("conflicting types for `")) != -1) { //$NON-NLS-1$
-					 	int p = desc.indexOf("\'", s); //$NON-NLS-1$
-					 	if (p != -1) {
-					 		varName = desc.substring(desc.indexOf("`") + 1, p); //$NON-NLS-1$
-					 		//System.out.println("confl varName "+ varName);
-					 	}
-					 } else if((s = desc.indexOf("previous declaration of `")) != -1) { //$NON-NLS-1$
-					 	int p = desc.indexOf("\'", s); //$NON-NLS-1$
-					 	if (p != -1) {
-					 		varName = desc.substring(desc.indexOf("`") + 1, p); //$NON-NLS-1$
-					 		//System.out.println("prev varName "+ varName);
-					 	}
-					 } else if ((s = desc.indexOf("parse error before ")) != -1) { //$NON-NLS-1$
-						int p = desc.indexOf("\'", s); //$NON-NLS-1$
-						if (p != -1) {
-							varName = desc.substring(desc.indexOf("`") + 1, p); //$NON-NLS-1$
-							//System.out.println("prev varName "+ varName);
-						}
-					 }
-
-					/*
-					 *	In file included from b.h:2,
-					 *					 from a.h:3,
-					 *					 from hello.c:3:
-					 *	 c.h:2:15: missing ')' in macro parameter list
-					 *
-					 * We reconstruct the multiline gcc errors to multiple errors:
-					 *    c.h:2:15: missing ')' in macro parameter list
-					 *    b.h:2:  in inclusion c.h:3:15
-					 *    a.h:3:  in inclusion b.h:2
-					 *    hello.c:3:  in inclusion a.h:3
-					 *     
-					 */
-					if (eoParser.getScratchBuffer().startsWith("In file included from ")) { //$NON-NLS-1$
-						if (line.startsWith("from ")) { //$NON-NLS-1$
-							// We want the last error in the chain, so continue.
-							eoParser.appendToScratchBuffer(line);
-							return false;
-						}
-						String buffer = eoParser.getScratchBuffer();
-						eoParser.clearScratchBuffer();
-						int from = -1;
-						String inclusionError = fileName + ":" + num; //$NON-NLS-1$
-						while ((from = buffer.indexOf("from ")) != -1) { //$NON-NLS-1$
-							int coma = buffer.indexOf(',', from);
-							String buf;
-							if (coma != -1) {
-								buf = buffer.substring(from + 5, coma) + ':';
-								buffer = buffer.substring(coma);
-							} else {
-								buf = buffer.substring(from + 5);
-								buffer = ""; //$NON-NLS-1$
-							}
-							String t = buf;
-							buf += " in inclusion " + inclusionError; //$NON-NLS-1$
-							inclusionError = t;
-							// Call the parsing process again.
-							processLine(buf, eoParser, extractSeverity(desc, inheritedSeverity));
-						}
+				/*
+				 *	(a) Error: desc
+				 *  (b) Fatal Error: desc
+				 */
+				else if (line.startsWith("Error:") || line.startsWith("Fatal Error:")) {
+					String varName = null;
+					String desc = line.substring(firstColon + 1).trim();
+					int severity = extractSeverity("Error", inheritedSeverity);
+					
+					if (fileName == null || lineNumber == -1) {
+						return false;
 					}
 
 					// The pattern is to generall we have to guard:
@@ -255,34 +124,38 @@ public class GFortranErrorParser implements IErrorParser {
 						}
 					}
 
-					int severity = extractSeverity(desc, inheritedSeverity);
-					if (desc.startsWith("warning") || desc.startsWith("Warning")) { //$NON-NLS-1$ //$NON-NLS-2$
-						// Remove the warning.
-						String d = desc.substring("warning".length()).trim(); //$NON-NLS-1$
-						if (d.startsWith(":")) { //$NON-NLS-1$
-							d = d.substring(1).trim();
-						}
-
-						if (d.length() != 0) {
-							desc = d;
-						}
-					}
-					
 					// Display the fileName.
 					if (file == null) {
 						desc = desc +"[" + fileName + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 					}
 
-					eoParser.generateMarker(file, num, desc, severity, varName);
-				} else {
-					if (line.startsWith("In file included from ")) { //$NON-NLS-1$
-						eoParser.appendToScratchBuffer(line);
-					} else if (line.startsWith("from ")) { //$NON-NLS-1$
-						eoParser.appendToScratchBuffer(line);
-					}
+					// Look for variable name
+					int p = desc.indexOf("Symbol \'");
+				 	if (p != -1) {
+				 		varName = desc.substring(p+8);
+				 		p = varName.indexOf("'");
+				 		if (p != -1) {
+				 			varName = varName.substring(0, p);
+				 		} else {
+				 			varName = null;
+				 		}
+				 	}
+				 	
+				 	// Remove at (error number)
+				 	p = desc.indexOf("at (");
+				 	if (p != -1) {
+				 		String tail = desc.substring(p+4);
+				 		int q = tail.indexOf(")");
+				 		if (q != -1) {
+				 			desc = desc.substring(0, p) + tail.substring(q+1);
+				 		}
+				 	}
+
+					eoParser.generateMarker(file, lineNumber, desc, severity, varName);
+					lineNumber = -1;
+					fileName = null;
 				}
 			} catch (StringIndexOutOfBoundsException e) {
-			} catch (NumberFormatException e) {
 			}
 		}
 		return false;
