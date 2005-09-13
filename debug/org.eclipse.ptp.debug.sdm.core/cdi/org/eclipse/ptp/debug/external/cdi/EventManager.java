@@ -117,7 +117,7 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	boolean processSuspendedEvent(IPCDIEvent event) {
 		Session session = (Session) getSession();
 		
-		int[] procs = ((AbstractEvent) event).getAllProcesses().toIntArray();
+		int[] procs = ((AbstractEvent) event).getAllRegisteredProcesses().toIntArray();
 		
 		for (int i = 0; i < procs.length; i++) {
 			Target currentTarget = (Target) session.getTarget(procs[i]);

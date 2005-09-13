@@ -22,4 +22,5 @@ public interface IPCDIDebugProcess extends IPCDIDebugEntity {
 	public void setProcess(Process p);
 	public Process getProcess();
 	public boolean isTerminated();
+	public boolean isSuspended();
 }

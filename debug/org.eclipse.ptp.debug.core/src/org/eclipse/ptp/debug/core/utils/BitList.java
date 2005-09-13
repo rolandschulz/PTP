@@ -41,6 +41,10 @@ public class BitList {
 		for (int i = 0; i < indexs.length; i++)
 			bitSet.clear(indexs[i]);
 	}
+	
+	public void set(int fromIndex, int toIndex) {
+		bitSet.set(fromIndex, toIndex);
+	}
 
 	public void set(int index) {
 		bitSet.set(index);

@@ -15,6 +15,7 @@ import org.eclipse.debug.core.IBreakpointsListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupDirector;
@@ -101,7 +102,8 @@ public class PSession implements IPSession, IBreakpointsListener {
 			public void run() {
 				try {
 					if ( breakpoint instanceof IPLineBreakpoint ) {
-						pCDISession.setLineBreakpoint(ICDIBreakpoint.REGULAR,
+						IPCDIDebugProcessSet set = pCDISession.getModelManager().getProcessSet(breakpoint.getCurSetId());
+						pCDISession.setLineBreakpoint(set, ICDIBreakpoint.REGULAR,
 								(ICDILineLocation)location, condition, true);
 /*					} else if ( breakpoint instanceof ICFunctionBreakpoint ) {
 						target.setFunctionBreakpoint( ICDIBreakpoint.REGULAR,
@@ -110,8 +112,8 @@ public class PSession implements IPSession, IBreakpointsListener {
 						target.setAddressBreakpoint( ICDIBreakpoint.REGULAR,
 								(ICDIAddressLocation)location, condition, true );
 */					}
-				}
-				catch( CDIException e ) {
+				} catch( CDIException e ) {
+				} catch( CoreException e ) {
 				} 
 			}
 		} );

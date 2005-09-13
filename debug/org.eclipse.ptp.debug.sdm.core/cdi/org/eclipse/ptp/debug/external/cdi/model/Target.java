@@ -313,7 +313,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	public boolean isSuspended() {
 		// Auto-generated method stub
 		System.out.println("Target.isSuspended()");
-		return false;
+		return getDebugProcess().isSuspended();
 	}
 
 	public ICDISignal[] getSignals() throws CDIException {
