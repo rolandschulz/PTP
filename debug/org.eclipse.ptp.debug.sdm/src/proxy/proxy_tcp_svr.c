@@ -286,13 +286,15 @@ proxy_tcp_svr_dispatch(void *data)
 static int 
 proxy_tcp_svr_setlinebreakpoint(char **args, char **response)
 {
+	char *		procs;
 	char *		file;
 	int			line;
 	
-	file = args[1];
-	line = atoi(args[2]);
+	procs = args[1];
+	file = args[2];
+	line = atoi(args[3]);
 	
-	asprintf(response, "0 setting line breakpoint %s %d", file, line);
+	asprintf(response, "0 setting line breakpoint %s %s %d", procs, file, line);
 	
 	return 0;
 }

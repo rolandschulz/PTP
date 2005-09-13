@@ -20,7 +20,6 @@
 #include <stdio.h>
 
 #include "dbg.h"
-#include "session.h"
 #include "proxy.h"
 #include "proxy_tcp.h"
 
@@ -45,14 +44,19 @@ main(int argc, char *argv[])
 {
 	int		i;
 	session *s;
+	procset *p;
 	
 	if (DbgInit(&s, "tcp", "host", "localhost", "port", PROXY_TCP_PORT, NULL) < 0) {
 		fprintf(stderr, "DbgInit failed\n");
 		exit(1);
 	}
 	
+	DbgCreateProcSet(100, &p);
+	for (i = 0; i < 10; i++)
+		DbgAddProcToSet(p, i * 3 + 1);
+	
 	for (i = 0; i < 10; i++) {
-		DbgSetLineBreakpoint(s, NULL, "test.c", 23, NULL);
+		DbgSetLineBreakpoint(s, p, "test.c", 23, NULL);
 	
 		wait_for_event(s);
 	}

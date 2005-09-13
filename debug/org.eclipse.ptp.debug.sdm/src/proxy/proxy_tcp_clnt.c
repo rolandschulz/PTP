@@ -150,11 +150,20 @@ proxy_tcp_clnt_setlinebreakpoint(void *data, procset *set, char *file, int line,
 {
 	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
 	char *			request;
+	char *			esc_file;
+	char *			procs;
 
+	procs = procset_to_str(set);
+	
 	if ( file == NULL )
-		file = "<null>";
+		asprintf(&esc_file, "<null>");
+	else
+		asprintf(&esc_file, "\"%s\"", file);
 	        
-	asprintf(&request, "SETLINEBREAK %s %s %d", procset_to_str(set), file, line);
+	asprintf(&request, "SETLINEBREAK %s %s %d", procs, esc_file, line);
+	
+	free(procs);
+	free(esc_file);
 	
 	if ( proxy_tcp_send_msg(conn, request, strlen(request)) < 0 )
 	{
