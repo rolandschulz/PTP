@@ -40,6 +40,7 @@ import org.eclipse.ptp.debug.external.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.FunctionBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
+import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
@@ -249,8 +250,18 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 	}
 
 	public void stepOver(IPCDIDebugProcessSet procs, int count) throws PCDIException {
-		// TODO Auto-generated method stub
+		// Currently we apply this method globally for all procs
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.stepOver()");
+		state = RUNNING;
 		
+		if (procs == null)
+			return;
+		
+		IPCDIDebugProcess[] procList = procs.getProcesses();
+		for (int i = 0; i < procList.length; i++) {
+			((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0).stepOver(count);
+		}
 	}
 
 	public void stepFinish(IPCDIDebugProcessSet procs, int count) throws PCDIException {
@@ -335,6 +346,14 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 			LineBreakpoint bpt = new LineBreakpoint(ICDIBreakpoint.REGULAR, loc, null);
 			fireEvent(new BreakpointHitEvent(getSession(), new DebugProcessSet(session, procId), bpt));
 			debuggerOutput.addItem("BreakpointHit Event for " + procId);
+		} else if (event.equals("ENDSTEPPINGRANGE")) {
+			//String file = (String) list.get(2);
+			//int line = ((Integer) list.get(3)).intValue();
+			//LineLocation loc = new LineLocation(file, line);
+			//LineBreakpoint bpt = new LineBreakpoint(ICDIBreakpoint.REGULAR, loc, null);
+			fireEvent(new EndSteppingRangeEvent(getSession(), new DebugProcessSet(session, procId)));
+			//fireEvent(new BreakpointHitEvent(getSession(), new DebugProcessSet(session, procId), bpt));
+			debuggerOutput.addItem("EndSteppingRange Event for " + procId);
 		} else if (event.equals("RESUMED")) {
 			fireEvent(new InferiorResumedEvent(getSession(), new DebugProcessSet(session, procId)));
 			debuggerOutput.addItem("InferiorResumed Event for " + procId);
