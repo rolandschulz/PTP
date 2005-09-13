@@ -115,11 +115,14 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 	public void stepReturn() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("StackFrame.stepReturn()");
+		
+		// FIXME Donny, correct way to do this?
+		((Thread) getThread()).stepReturn();
 	}
 
 	public void stepReturn(ICDIValue value) throws CDIException {
 		// Auto-generated method stub
-		System.out.println("StackFrame.stepReturn()");
+		System.out.println("StackFrame.stepReturn(" + value + ")");
 	}
 
 	public ICDILocalVariableDescriptor[] getLocalVariableDescriptors() throws CDIException {

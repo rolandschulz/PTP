@@ -245,8 +245,18 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 	}
 
 	public void stepInto(IPCDIDebugProcessSet procs, int count) throws PCDIException {
-		// TODO Auto-generated method stub
+		// Currently we apply this method globally for all procs
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.stepOver()");
+		state = RUNNING;
 		
+		if (procs == null)
+			return;
+		
+		IPCDIDebugProcess[] procList = procs.getProcesses();
+		for (int i = 0; i < procList.length; i++) {
+			((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0).stepInto(count);
+		}
 	}
 
 	public void stepOver(IPCDIDebugProcessSet procs, int count) throws PCDIException {
@@ -265,8 +275,18 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 	}
 
 	public void stepFinish(IPCDIDebugProcessSet procs, int count) throws PCDIException {
-		// TODO Auto-generated method stub
+		// Currently we apply this method globally for all procs
+		// Auto-generated method stub
+		System.out.println("DebugSimulator.stepOver()");
+		state = RUNNING;
 		
+		if (procs == null)
+			return;
+		
+		IPCDIDebugProcess[] procList = procs.getProcesses();
+		for (int i = 0; i < procList.length; i++) {
+			((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0).stepFinish(count);
+		}
 	}
 
 	public void go(IPCDIDebugProcessSet procs) throws PCDIException {

@@ -19,6 +19,8 @@
 package org.eclipse.ptp.rtsystem.simulation;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Observable;
 
 import org.eclipse.ptp.core.IPProcess;
@@ -31,33 +33,36 @@ public class SimThread extends Observable {
 	final int TERMINATED = 12;
 	
 	boolean isStepping;
-	int stepCount;
-	
 	int state;
+	int currentNumStackFrames;
+	SimStackFrame currentStackFrame;
 	
 	int curLine;
 	ArrayList breakLines;
-	SimStackFrame[] stackFrames;
+	ArrayList stackFrameList;
 	int threadId;
 	int processId;
 	SimProcess simProcess;
 	
 	public SimThread(SimProcess proc, int tid, int pId) {
 		isStepping = false;
-		stepCount = 0;
-		
 		state = RUNNING;
 		curLine = 1;
 		simProcess = proc;
 		breakLines = new ArrayList();
 		threadId = tid;
 		processId = pId;
-		int numStackFrames = 1;
 		
-		stackFrames = new SimStackFrame[numStackFrames];
+		int numStackFrames = 3;
+		
+		stackFrameList = new ArrayList();
 		for (int i = 0; i < numStackFrames; i++) {
-			stackFrames[i] = new SimStackFrame(i, "123456", "main", "main.c", 6);
+			SimStackFrame sF = new SimStackFrame(i + 1, "123456", "main", "main.c", 0);
+			stackFrameList.add(sF);
 		}
+		
+		currentNumStackFrames = 1;
+		currentStackFrame = (SimStackFrame) stackFrameList.get(currentNumStackFrames - 1);
 	}
 	
 	public int getThreadId() {
@@ -65,11 +70,16 @@ public class SimThread extends Observable {
 	}
 	
 	public int getStackFrameCount() {
-		return stackFrames.length;
+		return currentNumStackFrames;
 	}
 	
 	public SimStackFrame[] getStackFrames() {
-		return stackFrames;
+		List list = stackFrameList.subList(0, currentNumStackFrames);
+		ArrayList newList = new ArrayList(list);
+		
+		if (currentNumStackFrames > 1)
+			Collections.reverse(newList);
+		return (SimStackFrame[]) newList.toArray(new SimStackFrame[0]);
 	}
 	
 	public void runCommand(SimInputStream in, String cmd, String arg) {
@@ -87,10 +97,7 @@ public class SimThread extends Observable {
 	}
 	
 	public void checkStepping() {
-		if (stepCount > 0)
-			stepCount--;
-		
-		if (isStepping && stepCount == 0) {
+		if (isStepping) {
 			state = SUSPENDED;
 			simProcess.setStatus(IPProcess.STOPPED);
 			setChanged();
@@ -100,9 +107,7 @@ public class SimThread extends Observable {
 			/* Additional info */
 			list.add(2, new String("main.c"));
 			list.add(3, new Integer(curLine));
-			for (int j = 0; j < stackFrames.length; j++) {
-				stackFrames[j].setLine(curLine);
-			}
+			currentStackFrame.setLine(curLine);
 			notifyObservers(list);
 			return;
 		}
@@ -121,9 +126,7 @@ public class SimThread extends Observable {
 				/* Additional info */
 				list.add(2, new String("main.c"));
 				list.add(3, new Integer(curLine));
-				for (int j = 0; j < stackFrames.length; j++) {
-					stackFrames[j].setLine(curLine);
-				}
+				currentStackFrame.setLine(curLine);
 				notifyObservers(list);
 				return;
 			}
@@ -152,8 +155,8 @@ public class SimThread extends Observable {
 	}
 	
 	public void stepOver(int count) {
+		/* currently, we ignore count */
 		isStepping = true;
-		stepCount = count;
 		state = RUNNING;
 		simProcess.setStatus(IPProcess.RUNNING);
 		setChanged();
@@ -162,4 +165,35 @@ public class SimThread extends Observable {
 		list.add(1, new String("RESUMED"));
 		notifyObservers(list);
 	}
+	
+	public void stepInto(int count) {
+		/* currently, we ignore count */
+		currentNumStackFrames++;
+		currentStackFrame = (SimStackFrame) stackFrameList.get(currentNumStackFrames - 1);
+		
+		isStepping = true;
+		state = RUNNING;
+		simProcess.setStatus(IPProcess.RUNNING);
+		setChanged();
+		ArrayList list = new ArrayList();
+		list.add(0, new Integer(processId));
+		list.add(1, new String("RESUMED"));
+		notifyObservers(list);
+	}
+	
+	public void stepFinish(int count) {
+		/* currently, we ignore count */
+		currentNumStackFrames--;
+		currentStackFrame = (SimStackFrame) stackFrameList.get(currentNumStackFrames - 1);
+		
+		isStepping = true;
+		state = RUNNING;
+		simProcess.setStatus(IPProcess.RUNNING);
+		setChanged();
+		ArrayList list = new ArrayList();
+		list.add(0, new Integer(processId));
+		list.add(1, new String("RESUMED"));
+		notifyObservers(list);
+	}
+
 }

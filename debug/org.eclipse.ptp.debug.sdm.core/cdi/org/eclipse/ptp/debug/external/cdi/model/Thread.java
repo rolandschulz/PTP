@@ -154,8 +154,7 @@ public class Thread extends PTPObject implements ICDIThread {
 	}
 
 	public void stepInto() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.stepInto()");
+		stepInto(1);
 	}
 	
 	public String toString() {
@@ -180,6 +179,12 @@ public class Thread extends PTPObject implements ICDIThread {
 	public void stepReturn() throws CDIException {
 		// Auto-generated method stub
 		System.out.println("Thread.stepReturn()");
+		
+		Target target = (Target) getTarget();
+		Session session = (Session) target.getSession();
+		IDebugger debugger = session.getDebugger();
+		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
+		debugger.stepFinish(newSet, 0);
 	}
 
 	public void runUntil(ICDILocation location) throws CDIException {
@@ -230,7 +235,13 @@ public class Thread extends PTPObject implements ICDIThread {
 
 	public void stepInto(int count) throws CDIException {
 		// Auto-generated method stub
-		System.out.println("Thread.stepInto()");
+		System.out.println("Thread.stepInto(" + count + ")");
+		
+		Target target = (Target) getTarget();
+		Session session = (Session) target.getSession();
+		IDebugger debugger = session.getDebugger();
+		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
+		debugger.stepInto(newSet, count);
 	}
 
 	public void stepIntoInstruction(int count) throws CDIException {
