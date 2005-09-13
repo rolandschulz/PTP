@@ -71,7 +71,7 @@
 /*
  * Process set operations
  */
-void DbgCreateProcSet(procset *set);
+void DbgCreateProcSet(int nprocs, procset **set);
 void DbgDestroyProcSet(procset *set);
 void DbgRemoveFromSet(procset *dst, procset *src);
 void DbgAddToSet(procset *dst, procset *src);

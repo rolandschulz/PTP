@@ -36,6 +36,7 @@
 
 struct procset {
 	char *			ps_name;
+	int				ps_nprocs;
 	BITVECTOR_TYPE	ps_procs;
 };
 typedef struct procset procset;

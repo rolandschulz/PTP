@@ -23,15 +23,32 @@
 #include "dbg.h"
 #include "session.h"
 #include "proxy.h"
+#include "procset.h"
 
 /*
  * Process set operations
  */
-void DbgCreateProcSet(procset *set);
-void DbgDestroyProcSet(procset *set);
+void 
+DbgCreateProcSet(int nprocs, procset **set)
+{
+	*set = procset_new(nprocs);
+}
+
+void 
+DbgDestroyProcSet(procset *set)
+{
+	procset_free(set);
+}
+
 void DbgRemoveFromSet(procset *dst, procset *src);
 void DbgAddToSet(procset *dst, procset *src);
-void DbgAddProcToSet(procset *set, int pid);
+
+void
+DbgAddProcToSet(procset *set, int pid)
+{
+	procset_add_proc(set, pid);
+}
+
 void DbgRemoveProcFromSet(procset *set, int pid);
 
 /*
