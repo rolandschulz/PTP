@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.internal.ui;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
@@ -29,12 +30,19 @@ import org.eclipse.ui.texteditor.MarkerAnnotation;
  *
  */
 public class PInstructionPointerAnnotation extends MarkerAnnotation {
+	private IAnnotationModel annotationModel = null;
 	private BitList tasks = null;
 	private Position position = null;
+	private IMarker marker = null;
 	
-	public PInstructionPointerAnnotation(IMarker marker, Position position) {
+	public PInstructionPointerAnnotation(IMarker marker, Position position, IAnnotationModel annotationModel) {
 		super(marker);
+		this.marker = marker;
 		this.position = position;
+		this.annotationModel = annotationModel;
+	}
+	public IAnnotationModel getAnnotationModel() {
+		return annotationModel;
 	}
 	public void setPosition(Position position) {
 		this.position = position;
@@ -42,21 +50,26 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 	public Position getPosition() {
 		return position;
 	}
-	
+	public void setMarker(IMarker marker) {
+		this.marker = marker;
+	}
+	public IMarker getMarker() {
+		return marker;
+	}	
 	public void setMessage(String message) {
 		try {
 			getMarker().setAttribute(IMarker.MESSAGE, message);
 		} catch (CoreException e) {}
 		setText(message);
 	}
-	public void setMessage() {
-		String msg = "Suspended on process: ";
+	public void setMessage(boolean isRegister) {
 		int[] tasks = getTasks();
 		if (tasks.length == 0) {
 			setMessage("");
+			deleteMarker();
 			return;
 		}
-		
+		String msg = "Suspended on "+(isRegister?"registered":"unregistered")+" "+(tasks.length==1?"process":"processes")+": ";		
 		int preTask = tasks[0];
 		msg += preTask;
 		boolean isContinue = false;
@@ -92,7 +105,6 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 	public int[] getTasks() {
 		return convertArray(tasks);		
 	}
-	
 	public void addTasks(BitList aTasks) {
 		if (tasks == null)
 			tasks = new BitList();

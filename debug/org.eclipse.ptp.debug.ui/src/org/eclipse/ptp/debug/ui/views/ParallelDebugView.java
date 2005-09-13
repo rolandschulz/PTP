@@ -51,7 +51,6 @@ import org.eclipse.ptp.ui.views.ParallelJobView;
  */
 public class ParallelDebugView extends ParallelJobView implements IDebugActionUpdateListener {
 	private static ParallelDebugView instance = null;
-
 	// actions
 	protected ParallelAction resumeAction = null;
 	protected ParallelAction suspendAction = null;
@@ -65,23 +64,20 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	public ParallelDebugView() {
 		instance = this;
 		manager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
-		((UIDebugManager)manager).addDebugEventListener(this);
+		((UIDebugManager) manager).addDebugEventListener(this);
 	}
-	
 	public void dispose() {
-		((UIDebugManager)manager).removeDebugEventListener(this);
+		((UIDebugManager) manager).removeDebugEventListener(this);
 		super.dispose();
 	}
 	public IManager getUIManager() {
 		return manager;
 	}
-
 	public static ParallelDebugView getDebugViewInstance() {
 		if (instance == null)
 			instance = new ParallelDebugView();
 		return instance;
-	}	
-		
+	}
 	protected void fillContextMenu(IMenuManager manager) {
 		super.fillContextMenu(manager);
 		manager.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, resumeAction);
@@ -96,14 +92,11 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		resumeAction = new ResumeAction(this);
 		suspendAction = new SuspendAction(this);
 		terminateAction = new TerminateAction(this);
-
 		stepIntoAction = new StepReturnAction(this);
 		stepOverAction = new StepOverAction(this);
 		stepReturnAction = new StepReturnAction(this);
-		
 		registerAction = new RegisterAction(this);
 		unregisterAction = new UnregisterAction(this);
-
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, resumeAction);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, suspendAction);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAction);
@@ -114,34 +107,27 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, new Separator());
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, registerAction);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, unregisterAction);
-		
 		super.buildInToolBarActions(toolBarMgr);
 	}
-
 	protected void doubleClickAction(int element_num) {
 		IElement element = cur_element_set.get(element_num);
 		if (element != null)
 			registerElement(element);
 	}
-	
 	protected String getToolTipText(int element_num) {
 		IElementHandler setManager = getCurrentElementHandler();
 		if (setManager == null)
 			return "Unknown element";
-
 		IElement element = cur_element_set.get(element_num);
 		if (element == null)
 			return "Unknown element";
-
-		IPProcess proc = ((UIDebugManager)manager).findProcess(getCurrentJobID(), element.getID());
+		IPProcess proc = ((UIDebugManager) manager).findProcess(getCurrentJobID(), element.getID());
 		if (proc == null)
 			return "Unknow process";
-
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("Tast ID: " + proc.getTaskId());
 		buffer.append("\n");
 		buffer.append("Process ID: " + proc.getPid());
-
 		IElementSet[] groups = setManager.getSetsWithElement(element.getID());
 		if (groups.length > 1)
 			buffer.append("\nGroup: ");
@@ -150,39 +136,34 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 			if (i < groups.length - 1)
 				buffer.append(",");
 		}
-		//buffer.append("\nStatus: " + getUIDebugManager().getProcessStatusText(proc));
+		// buffer.append("\nStatus: " + getUIDebugManager().getProcessStatusText(proc));
 		return buffer.toString();
 	}
-
 	public void registerElement(IElement element) {
 		if (element.isRegistered())
-			((UIDebugManager)manager).unregisterElements(new IElement[] { element });
+			((UIDebugManager) manager).unregisterElements(new IElement[] { element });
 		else
-			((UIDebugManager)manager).registerElements(new IElement[] { element });
+			((UIDebugManager) manager).registerElements(new IElement[] { element });
 	}
-
 	public void registerSelectedElements() {
 		if (cur_element_set != null) {
 			IElement[] elements = cur_element_set.getSelectedElements();
-			((UIDebugManager)manager).registerElements(elements);
+			((UIDebugManager) manager).registerElements(elements);
 		}
 	}
-
 	public void unregisterSelectedElements() {
 		if (cur_element_set != null) {
 			IElement[] elements = cur_element_set.getSelectedElements();
-			((UIDebugManager)manager).unregisterElements(elements);
+			((UIDebugManager) manager).unregisterElements(elements);
 		}
 	}
-	
 	public void run() {
-		System.out.println("------------ debug run");		
+		System.out.println("------------ debug run");
 		initialView();
 		refresh();
 		suspendAction.setEnabled(true);
 		terminateAction.setEnabled(true);
 	}
-
 	public void start() {
 		System.out.println("------------ debug start");
 		refresh();
@@ -199,48 +180,41 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	public void error() {
 		refresh();
 	}
-
-	//Update button
+	// Update button
 	protected void updateAction() {
 		super.updateAction();
-		
-		boolean isDebugging = ((UIDebugManager)manager).isDebugging(getCurrentJobID());
+		boolean isDebugging = ((UIDebugManager) manager).isDebugging(getCurrentJobID());
 		registerAction.setEnabled(isDebugging);
 		unregisterAction.setEnabled(isDebugging);
-		
 		IElementHandler elementHandler = getCurrentElementHandler();
 		if (elementHandler != null) {
 			IElementSet set = getCurrentSet();
-			BitList suspendedTaskList = (BitList)elementHandler.getData(UIDebugManager.SUSPENDED_PROC_KEY);
-			BitList terminatedTaskList = (BitList)elementHandler.getData(UIDebugManager.TERMINATED_PROC_KEY);
+			BitList suspendedTaskList = (BitList) elementHandler.getData(UIDebugManager.SUSPENDED_PROC_KEY);
+			BitList terminatedTaskList = (BitList) elementHandler.getData(UIDebugManager.TERMINATED_PROC_KEY);
 			updateSuspendResumeButton(suspendedTaskList, set, terminatedTaskList);
 			updateTerminateButton(terminatedTaskList, set, suspendedTaskList);
 		}
 	}
-	
 	public void updateSuspendResumeButton(BitList tasks, IElementSet set, BitList targetTasks) {
 		if (set == null || tasks == null)
 			return;
-		
 		boolean isEnabled = false;
 		if (set.isRootSet()) {
-			isEnabled = !tasks.isEmpty();//tasks != 0: some processes suspended
-			suspendAction.setEnabled(set.size()!=tasks.cardinality()); //disable suspend Action if all tasks same as root size
-		}
-		else {
-			BitList setTasks = (BitList)set.getData(UIDebugManager.BITSET_KEY);
-			//this set contains some suspended processes
+			isEnabled = !tasks.isEmpty();// tasks != 0: some processes suspended
+			suspendAction.setEnabled(set.size() != tasks.cardinality()); // disable suspend Action if all tasks same as root size
+		} else {
+			BitList setTasks = (BitList) set.getData(UIDebugManager.BITSET_KEY);
+			// this set contains some suspended processes
 			isEnabled = setTasks.intersects(tasks);
-			
 			BitList refTasks = tasks.copy();
 			refTasks.and(setTasks);
-			//the size is not equal: there is some processes running
-			suspendAction.setEnabled(set.size()!=refTasks.cardinality()); 			
+			// the size is not equal: there is some processes running
+			suspendAction.setEnabled(set.size() != refTasks.cardinality());
 		}
 		setEnableResumeButtonGroup(isEnabled);
 	}
-	//has suspend = resume enable
-	//has running = suspend enable
+	// has suspend = resume enable
+	// has running = suspend enable
 	private void setEnableResumeButtonGroup(boolean isEnabled) {
 		resumeAction.setEnabled(isEnabled);
 		stepIntoAction.setEnabled(isEnabled);
@@ -250,59 +224,51 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	public void updateTerminateButton(BitList tasks, IElementSet set, BitList targetTasks) {
 		if (set == null || tasks == null)
 			return;
-
 		int setSize = set.size();
 		int totalTerminatedSize = tasks.cardinality();
-		int totalSuspendedSize = (targetTasks==null||targetTasks.isEmpty()?0:targetTasks.cardinality());
-		//size equals: all processes are terminated
-		boolean isEnabled = (setSize!=totalTerminatedSize);
-		
+		int totalSuspendedSize = (targetTasks == null || targetTasks.isEmpty() ? 0 : targetTasks.cardinality());
+		// size equals: all processes are terminated
+		boolean isEnabled = (setSize != totalTerminatedSize);
 		if (!set.isRootSet()) {
-			BitList setTasks = (BitList)set.getData(UIDebugManager.BITSET_KEY);
+			BitList setTasks = (BitList) set.getData(UIDebugManager.BITSET_KEY);
 			setSize = setTasks.cardinality();
 			BitList refTasks = tasks.copy();
 			refTasks.and(setTasks);
-			//size equals: the set contains all terminated processes
+			// size equals: the set contains all terminated processes
 			totalTerminatedSize = refTasks.cardinality();
-			isEnabled = (setSize!=totalTerminatedSize);
-			
+			isEnabled = (setSize != totalTerminatedSize);
 			if (isEnabled) {
 				BitList tarRefTasks = targetTasks.copy();
 				tarRefTasks.and(setTasks);
 				totalSuspendedSize = tarRefTasks.cardinality();
-			}			
+			}
 		}
 		terminateAction.setEnabled(isEnabled);
-		
-		if (isEnabled) {//not all processes terminated
-			if (totalSuspendedSize == 0) {//no suspended process
+		if (isEnabled) {// not all processes terminated
+			if (totalSuspendedSize == 0) {// no suspended process
 				setEnableResumeButtonGroup(false);
 				suspendAction.setEnabled(true);
-			}
-			else {//running process: total terminated + total suspended != set size
-				boolean isRunning = (setSize!=(totalTerminatedSize + totalSuspendedSize)); 
+			} else {// running process: total terminated + total suspended != set size
+				boolean isRunning = (setSize != (totalTerminatedSize + totalSuspendedSize));
 				setEnableResumeButtonGroup(!isRunning);
 				suspendAction.setEnabled(isRunning);
 			}
-		} 
-		else {//all process terminated
+		} else {// all process terminated
 			setEnableResumeButtonGroup(false);
 			suspendAction.setEnabled(false);
 		}
 	}
-	
-	/****
+	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * Debug Action Event
-	 ****/
+	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public void handleDebugActionEvent(IDebugActionEvent event) {
 		String job_id = event.getJobId();
 		// only take action with current job
 		if (!job_id.equals(getCurrentJobID())) {
 			return;
 		}
-		
-		BitList tasks = (BitList)event.getSource();
-		BitList targetTasks = (BitList)event.getTarget();
+		BitList tasks = (BitList) event.getSource();
+		BitList targetTasks = (BitList) event.getTarget();
 		IElementSet set = getCurrentSet();
 		if (event instanceof ISuspendedDebugEvent || event instanceof IResumedDebugEvent)
 			updateSuspendResumeButton(tasks, set, targetTasks);
