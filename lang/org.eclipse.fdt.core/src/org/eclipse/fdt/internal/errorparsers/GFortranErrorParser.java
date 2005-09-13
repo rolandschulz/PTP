@@ -75,18 +75,30 @@ public class GFortranErrorParser implements IErrorParser {
 				int secondColon = -1;
 				int	num  = -1;
 
-				while ((secondColon = line.indexOf(':', firstColon + 1)) != -1) {
-					String lineNumber = line.substring(firstColon + 1, secondColon);
-					try {
-						num = Integer.parseInt(lineNumber);
-					} catch (NumberFormatException e) {
-						// Failed.
-					}
-					if (num != -1) {
-						break; // Find possible match.
-					}
-					firstColon = secondColon;
+				String lineNumber = line.substring(firstColon + 1);
+				try {
+					num = Integer.parseInt(lineNumber);
+				} catch (NumberFormatException e) {
+					// Failed.
 				}
+				
+				/*
+				 *	In file included from hello.c:3:
+				 *	 c.h:2:15: missing ')' in macro parameter list
+				 *
+				 * We reconstruct the multiline gcc errors to multiple errors:
+				 *    c.h:2:15: missing ')' in macro parameter list
+				 *    hello.c:3:  in inclusion c.h:2:15
+				 *     
+				 */
+				if (line.startsWith("In file ")) { //$NON-NLS-1$
+					// We want the last error in the chain, so continue.
+					String fileName = line.substring(8, firstColon);
+					eoParser.appendToScratchBuffer(line);
+					return false;
+				}
+
+
 
 				if (secondColon != -1) {
 					int col = -1;
@@ -164,21 +176,6 @@ public class GFortranErrorParser implements IErrorParser {
 							//System.out.println("prev varName "+ varName);
 						}
 					 }
-
-					/*
-					 *	In file included from hello.c:3:
-					 *	 c.h:2:15: missing ')' in macro parameter list
-					 *
-					 * We reconstruct the multiline gcc errors to multiple errors:
-					 *    c.h:2:15: missing ')' in macro parameter list
-					 *    hello.c:3:  in inclusion c.h:2:15
-					 *     
-					 */
-					if (line.startsWith("In file included from ")) { //$NON-NLS-1$
-						// We want the last error in the chain, so continue.
-						eoParser.appendToScratchBuffer(line);
-						return false;
-					}
 
 					/*
 					 *	In file included from b.h:2,
