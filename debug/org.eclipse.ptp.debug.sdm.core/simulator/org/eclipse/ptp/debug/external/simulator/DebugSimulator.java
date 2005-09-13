@@ -313,8 +313,9 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 
 	public void kill(IPCDIDebugProcessSet procs) throws PCDIException {
 		// Currently we apply this method globally for all procs
-		IPCDIDebugProcess[] list = getProcesses();
+		IPCDIDebugProcess[] list = procs.getProcesses();
 		for (int i = 0; i < list.length; i++) {
+			((DebugProcess) list[i]).getPProcess().setTerminated(true);
 			list[i].getProcess().destroy();
 		}
 	}

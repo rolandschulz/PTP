@@ -71,6 +71,8 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 	 */
 	protected IPNode node;
 	Thread procThread;
+	
+	final int numThreads = 1;
 
 	public SimProcess(IPElement element, String name, String key, String pid, int taskId, String status, String exitCode, String signalName) {
 		attribs = new HashMap();
@@ -85,7 +87,6 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		setStatus(status);
 		setOutputStore();
 		outputFile = new OutputTextFile(name, outputDirPath, storeLine);
-		final int numThreads = 1;
 		SimQueue cmds = null;
 		if (cmds == null) {
 			commands = new SimQueue();
@@ -102,6 +103,9 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 			public void run() {
 				outerWhile: while (true) {
 					try {
+						if (isTerminated)
+							break;
+						
 						for (int i = 0; i < numThreads; i++) {
 							if (threads[i].state == threads[i].SUSPENDED) {
 								Thread.sleep(2000);
@@ -125,7 +129,7 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 					} catch (InterruptedException e) {
 					}
 				}
-				isTerminated = true;
+				// isTerminated = true;
 				for (int i = 0; i < numThreads; i++) {
 					threads[i].terminate();
 				}
