@@ -25,10 +25,13 @@ import org.eclipse.ptp.core.IPProcess;
 
 
 public class SimThread extends Observable {
-
+	
 	final int RUNNING = 10;
 	final int SUSPENDED = 11;
 	final int TERMINATED = 12;
+	
+	boolean isStepping;
+	int stepCount;
 	
 	int state;
 	
@@ -40,6 +43,9 @@ public class SimThread extends Observable {
 	SimProcess simProcess;
 	
 	public SimThread(SimProcess proc, int tid, int pId) {
+		isStepping = false;
+		stepCount = 0;
+		
 		state = RUNNING;
 		curLine = 1;
 		simProcess = proc;
@@ -65,19 +71,41 @@ public class SimThread extends Observable {
 	public SimStackFrame[] getStackFrames() {
 		return stackFrames;
 	}
-
+	
 	public void runCommand(SimInputStream in, String cmd, String arg) {
 		if (cmd.equals("print")) {
-			checkBreakpoint();
-			in.printString(curLine + " : " + arg + " from process (pid) " + processId + " & thread #" + threadId);
+			in.printString(curLine + " : " + arg + " from process with task id: " + processId + " & thread #" + threadId);
 			curLine++;
-/*		} else	if (cmd.equals("break")) {
-			breakLine = Integer.parseInt(arg);
-*/		}
+		}
+		checkStepping();
+		checkBreakpoint();
+
 	}
 	
 	public void addBreakpoint(int line) {
 		breakLines.add(new Integer(line));
+	}
+	
+	public void checkStepping() {
+		if (stepCount > 0)
+			stepCount--;
+		
+		if (isStepping && stepCount == 0) {
+			state = SUSPENDED;
+			simProcess.setStatus(IPProcess.STOPPED);
+			setChanged();
+			ArrayList list = new ArrayList();
+			list.add(0, new Integer(processId));
+			list.add(1, new String("ENDSTEPPINGRANGE"));
+			/* Additional info */
+			list.add(2, new String("main.c"));
+			list.add(3, new Integer(curLine));
+			for (int j = 0; j < stackFrames.length; j++) {
+				stackFrames[j].setLine(curLine);
+			}
+			notifyObservers(list);
+			return;
+		}
 	}
 	
 	public void checkBreakpoint() {
@@ -86,33 +114,20 @@ public class SimThread extends Observable {
 			if (curLine == bps[i].intValue()) {
 				state = SUSPENDED;
 				simProcess.setStatus(IPProcess.STOPPED);
-
-				System.out.println("Process: " + processId + " Thread: " + 
-						threadId + " SUSPENDED at line " + curLine);
-				
 				setChanged();
 				ArrayList list = new ArrayList();
 				list.add(0, new Integer(processId));
 				list.add(1, new String("BREAKPOINTHIT"));
-				
 				/* Additional info */
 				list.add(2, new String("main.c"));
 				list.add(3, new Integer(curLine));
-				
 				for (int j = 0; j < stackFrames.length; j++) {
 					stackFrames[j].setLine(curLine);
 				}
-				
 				notifyObservers(list);
-				//BitList bitList = new BitList();
-				//bitList.set(processId);
-				//dSim.fireEvent(new EBreakpointHit(bitSet));
-				//dSim.fireEvent(new BreakpointHitEvent(dSim.getSession(), bitList));
-				// Do Something
 				return;
 			}
 		}
-
 	}
 	
 	public void terminate() {
@@ -126,6 +141,19 @@ public class SimThread extends Observable {
 	}
 	
 	public void resume() {
+		isStepping = false;
+		state = RUNNING;
+		simProcess.setStatus(IPProcess.RUNNING);
+		setChanged();
+		ArrayList list = new ArrayList();
+		list.add(0, new Integer(processId));
+		list.add(1, new String("RESUMED"));
+		notifyObservers(list);
+	}
+	
+	public void stepOver(int count) {
+		isStepping = true;
+		stepCount = count;
 		state = RUNNING;
 		simProcess.setStatus(IPProcess.RUNNING);
 		setChanged();

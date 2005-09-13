@@ -146,12 +146,11 @@ public class Thread extends PTPObject implements ICDIThread {
 
 	public void resume() throws CDIException {
 		// Auto-generated method stub
-		System.out.println("Thread.resume1()");
+		System.out.println("Thread.resume()");
 	}
 
 	public void stepOver() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.stepOver()");
+		stepOver(1);
 	}
 
 	public void stepInto() throws CDIException {
@@ -215,7 +214,13 @@ public class Thread extends PTPObject implements ICDIThread {
 
 	public void stepOver(int count) throws CDIException {
 		// Auto-generated method stub
-		System.out.println("Thread.stepOver()");
+		System.out.println("Thread.stepOver(" + count + ")");
+		
+		Target target = (Target) getTarget();
+		Session session = (Session) target.getSession();
+		IDebugger debugger = session.getDebugger();
+		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
+		debugger.stepOver(newSet, count);
 	}
 
 	public void stepOverInstruction(int count) throws CDIException {
@@ -240,7 +245,7 @@ public class Thread extends PTPObject implements ICDIThread {
 
 	public void resume(boolean passSignal) throws CDIException {
 		// Auto-generated method stub
-		System.out.println("Thread.resume2()");
+		System.out.println("Thread.resume(" + passSignal + ")");
 		
 		Target target = (Target) getTarget();
 		Session session = (Session) target.getSession();

@@ -168,8 +168,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 
 	public void stepOver() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.stepOver()");
+		stepOver(1);
 	}
 
 	public void stepInto() throws CDIException {
@@ -260,7 +259,9 @@ public class Target extends SessionObject implements IPCDITarget {
 
 	public void stepOver(int count) throws CDIException {
 		// Auto-generated method stub
-		System.out.println("Target.stepOver()");
+		System.out.println("Thread.stepOver(" + count + ")");
+		DebugProcessSet newSet = new DebugProcessSet((Session) getSession(), getTargetId());
+		fDebugger.stepOver(newSet, count);
 	}
 
 	public void stepOverInstruction(int count) throws CDIException {
@@ -285,8 +286,9 @@ public class Target extends SessionObject implements IPCDITarget {
 
 	public void resume(boolean passSignal) throws CDIException {
 		// Auto-generated method stub
-		System.out.println("Target.resume()");
-		fDebugger.go(null);
+		System.out.println("Target.resume(" + passSignal + ")");
+		DebugProcessSet newSet = new DebugProcessSet((Session) getSession(), getTargetId());
+		fDebugger.go(newSet);
 	}
 
 	public void resume(ICDILocation location) throws CDIException {
