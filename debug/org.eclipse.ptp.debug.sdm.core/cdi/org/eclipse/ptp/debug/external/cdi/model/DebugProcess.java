@@ -54,4 +54,9 @@ public class DebugProcess extends SessionObject implements IPCDIDebugProcess {
 	public boolean isTerminated() {
 		return pProcess.isTerminated();
 	}
+	
+	public boolean isSuspended() {
+		String status = pProcess.getStatus();
+		return (status.equals(IPProcess.STOPPED));
+	}
 }

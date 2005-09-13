@@ -283,7 +283,7 @@ public class Thread extends PTPObject implements ICDIThread {
 	public boolean isSuspended() {
 		// Auto-generated method stub
 		System.out.println("Thread.isSuspended()");
-		return false;
+		return getTarget().isSuspended();
 	}
 
 	public ICDIThreadStorage createThreadStorage(ICDIThreadStorageDescriptor varDesc) throws CDIException {

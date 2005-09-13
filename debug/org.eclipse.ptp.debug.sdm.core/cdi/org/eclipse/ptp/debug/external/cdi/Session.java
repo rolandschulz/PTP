@@ -55,6 +55,7 @@ import org.eclipse.ptp.debug.core.cdi.IPCDIModelManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetUnregisteredEvent;
@@ -94,6 +95,11 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 		variableManager = new VariableManager(this);
 		modelManager = new ModelManager(this);
 		
+		/* Set the root process set */
+		BitList root = new BitList();
+		root.set(0, dJob.size());
+		modelManager.newProcessSet("Root", root);
+		
 		currentDebugTargetList = new Hashtable();
 		
 		debugger.addDebuggerObserver(eventManager);
@@ -108,7 +114,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 		}
 		
 		/* Initially we only create process/target 0 */
-		registerTarget(0, true);
+		registerTarget(0, true, true);
 	}
 	
 	public IDebugger getDebugger() {
@@ -118,8 +124,12 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	public Process getProcess(int i) {
 		return debugger.getProcess(i).getProcess();
 	}
-	
+
 	public void registerTarget(int procNum, boolean sendEvent) {
+		registerTarget(procNum, sendEvent, false);
+	}
+	
+	public void registerTarget(int procNum, boolean sendEvent, boolean resumeTarget) {
 		if (isRegistered(procNum))
 			return;
 		
@@ -141,7 +151,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 				iprocess = DebugPlugin.newProcess(dLaunch, process, "Launch Label " + target.getTargetId());
 			}
 
-			PCDIDebugModel.newDebugTarget(dLaunch, null, target, "Process " + target.getTargetId(), iprocess, dBinObject, true, false, stopInMain, true);
+			PCDIDebugModel.newDebugTarget(dLaunch, null, target, "Process " + target.getTargetId(), iprocess, dBinObject, true, false, stopInMain, resumeTarget);
 		} catch (DebugException e) {
 			e.printStackTrace();
 		} catch (CoreException e) {
