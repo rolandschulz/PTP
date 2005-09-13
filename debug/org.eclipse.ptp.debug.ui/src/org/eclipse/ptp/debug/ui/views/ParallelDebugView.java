@@ -251,42 +251,44 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		if (set == null || tasks == null)
 			return;
 
-		boolean isEnabled = false;
-		if (set.isRootSet()) {
-			isEnabled = !(set.size()==tasks.cardinality());//size equals: all processes are terminated
-			if (isEnabled) {//not all processes terminated
-				if (targetTasks == null || targetTasks.isEmpty()) {//no suspended process
-					setEnableResumeButtonGroup(false);
-					suspendAction.setEnabled(true);
-				}
-				else {//running process: total terminated + total suspended != set size
-					boolean isRunning = (set.size()!=(tasks.cardinality() + targetTasks.cardinality())); 
-					setEnableResumeButtonGroup(!isRunning);
-					suspendAction.setEnabled(isRunning);
-				}
-			} 
-			else {//all process terminated
-				setEnableResumeButtonGroup(false);
-				suspendAction.setEnabled(false);
-			}
-		}
-		else {
-			BitList refTasks = tasks.copy();
+		int setSize = set.size();
+		int totalTerminatedSize = tasks.cardinality();
+		int totalSuspendedSize = (targetTasks==null||targetTasks.isEmpty()?0:targetTasks.cardinality());
+		//size equals: all processes are terminated
+		boolean isEnabled = (setSize!=totalTerminatedSize);
+		
+		if (!set.isRootSet()) {
 			BitList setTasks = (BitList)set.getData(UIDebugManager.BITSET_KEY);
+			setSize = setTasks.cardinality();
+			BitList refTasks = tasks.copy();
 			refTasks.and(setTasks);
-			isEnabled = !(setTasks.cardinality()==refTasks.cardinality());
-			boolean isEnabledOther = isEnabled;
-			if (isEnabledOther) {
-				if (targetTasks != null) {
-					BitList tarRefTasks = targetTasks.copy();
-					tarRefTasks.and(setTasks);
-					isEnabledOther = (setTasks.cardinality()==tarRefTasks.cardinality());
-					setEnableResumeButtonGroup(!isEnabledOther);
-				}
-			} else 
-				setEnableResumeButtonGroup(isEnabledOther);
+			//size equals: the set contains all terminated processes
+			totalTerminatedSize = refTasks.cardinality();
+			isEnabled = (setSize!=totalTerminatedSize);
+			
+			if (isEnabled) {
+				BitList tarRefTasks = targetTasks.copy();
+				tarRefTasks.and(setTasks);
+				totalSuspendedSize = tarRefTasks.cardinality();
+			}			
 		}
 		terminateAction.setEnabled(isEnabled);
+		
+		if (isEnabled) {//not all processes terminated
+			if (totalSuspendedSize == 0) {//no suspended process
+				setEnableResumeButtonGroup(false);
+				suspendAction.setEnabled(true);
+			}
+			else {//running process: total terminated + total suspended != set size
+				boolean isRunning = (setSize!=(totalTerminatedSize + totalSuspendedSize)); 
+				setEnableResumeButtonGroup(!isRunning);
+				suspendAction.setEnabled(isRunning);
+			}
+		} 
+		else {//all process terminated
+			setEnableResumeButtonGroup(false);
+			suspendAction.setEnabled(false);
+		}
 	}
 	
 	/****
@@ -302,10 +304,9 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		BitList tasks = (BitList)event.getSource();
 		BitList targetTasks = (BitList)event.getTarget();
 		IElementSet set = getCurrentSet();
-		if (event instanceof ISuspendedDebugEvent || event instanceof IResumedDebugEvent) {
+		if (event instanceof ISuspendedDebugEvent || event instanceof IResumedDebugEvent)
 			updateSuspendResumeButton(tasks, set, targetTasks);
-		} else if (event instanceof ITerminatedDebugEvent) {
+		else if (event instanceof ITerminatedDebugEvent)
 			updateTerminateButton(tasks, set, targetTasks);
-		}
 	}
 }

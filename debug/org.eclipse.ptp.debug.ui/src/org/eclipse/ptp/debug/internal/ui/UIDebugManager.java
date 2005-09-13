@@ -96,6 +96,18 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		annotationMgr.shutdown();
 		super.shutdown();
 	}
+	
+	public String initial() {
+		String new_job_id = super.initial();
+		IElementHandler elementHandler = getElementHandler(new_job_id);
+		if (elementHandler != null) {
+			if ((BitList)elementHandler.getData(TERMINATED_PROC_KEY) == null)
+				elementHandler.setData(TERMINATED_PROC_KEY, new BitList());
+			if ((BitList)elementHandler.getData(SUSPENDED_PROC_KEY) == null)
+				elementHandler.setData(SUSPENDED_PROC_KEY, new BitList());
+		}
+		return new_job_id;
+	}
 	public boolean isDebugging(String job_id) {
 		if (isNoJob(job_id))
 			return false;
@@ -385,10 +397,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	public void fireSuspendEvent(IPJob job, BitList tasks) {
 		IElementHandler elementHandler = getElementHandler(job.getIDString());
 		BitList suspendedTasks = (BitList) elementHandler.getData(SUSPENDED_PROC_KEY);
-		if (suspendedTasks == null) {
-			suspendedTasks = new BitList();
-			elementHandler.setData(SUSPENDED_PROC_KEY, suspendedTasks);
-		}
 		// add tasks
 		suspendedTasks.or(tasks);
 		fireDebugEvent(new SuspendedDebugEvent(job.getIDString(), suspendedTasks, (BitList)elementHandler.getData(TERMINATED_PROC_KEY)));
@@ -396,10 +404,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	public void fireResumeEvent(IPJob job, BitList tasks) {
 		IElementHandler elementHandler = getElementHandler(job.getIDString());
 		BitList suspendedTasks = (BitList)elementHandler.getData(SUSPENDED_PROC_KEY);
-		if (suspendedTasks == null) {
-			suspendedTasks = new BitList();
-			elementHandler.setData(SUSPENDED_PROC_KEY, suspendedTasks);
-		}
 		// remove tasks
 		suspendedTasks.andNot(tasks);
 		fireDebugEvent(new ResumedDebugEvent(job.getIDString(), suspendedTasks, (BitList)elementHandler.getData(TERMINATED_PROC_KEY)));
@@ -407,10 +411,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	public void fireTerminatedEvent(IPJob job, BitList tasks) {
 		IElementHandler elementHandler = getElementHandler(job.getIDString());
 		BitList terminatedTasks = (BitList)elementHandler.getData(TERMINATED_PROC_KEY);
-		if (terminatedTasks == null) {
-			terminatedTasks = new BitList();
-			elementHandler.setData(TERMINATED_PROC_KEY, terminatedTasks);
-		}
 		// only add tasks
 		terminatedTasks.or(tasks);
 		fireDebugEvent(new TerminatedDebugEvent(job.getIDString(), terminatedTasks, (BitList)elementHandler.getData(SUSPENDED_PROC_KEY)));
