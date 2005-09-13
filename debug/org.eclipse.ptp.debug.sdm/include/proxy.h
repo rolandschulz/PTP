@@ -27,15 +27,8 @@
 #include "stackframe.h"
 #include "dbg_event.h"
 
-struct proxy {
-	char *					name;
-	struct proxy_clnt_funcs *	clnt_funcs;
-	struct proxy_svr_funcs *	svr_funcs;
-};
-typedef struct proxy	proxy;
-
 struct proxy_clnt_funcs {
-	int (*init)(void **, char *, ...);
+	int (*init)(void **, char *, va_list);
 	int (*setlinebreakpoint)(void *, struct procset *, char *, int, struct breakpoint *);
 	int (*setfuncbreakpoint)(void *, struct procset *, char *, char *, struct breakpoint *);
 	int (*deletebreakpoints)(void *, struct procset *, struct breakpoint *);
@@ -53,15 +46,25 @@ struct proxy_clnt_funcs {
 typedef struct proxy_clnt_funcs	proxy_clnt_funcs;
 
 struct proxy_svr_funcs {
-	int (*dispatch)(int);
+	int (*create)(void **, void (*)(void));
+	int (*progress)(void *);
+	void (*dispatch)(void *);
+	void (*finish)(void *);
 };
 typedef struct proxy_svr_funcs	proxy_svr_funcs;
+
+struct proxy {
+	char *					name;
+	struct proxy_clnt_funcs *	clnt_funcs;
+	struct proxy_svr_funcs *	svr_funcs;
+};
+typedef struct proxy	proxy;
 
 extern proxy 	proxies[];
 
 extern int find_proxy(char *, proxy **);
 
-extern int proxy_clnt_init_not_imp(void **, char *, ...);
+extern int proxy_clnt_init_not_imp(void **, char *, va_list);
 extern int proxy_clnt_setlinebreakpoint_not_imp(void *, struct procset *, char *, int, struct breakpoint *);
 extern int proxy_clnt_setfuncbreakpoint_not_imp(void *, struct procset *, char *, char *, struct breakpoint *);
 extern int proxy_clnt_deletebreakpoints_not_imp(void *, struct procset *, struct breakpoint *);

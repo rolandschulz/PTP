@@ -139,6 +139,11 @@ DbgListGlobalVariables(session *s, int proc)
 	return s->sess_proxy->clnt_funcs->listglobalvariables(s->sess_proxy_data, proc);
 }
 
+int 
+DbgQuit(session *s)
+{
+	return s->sess_proxy->clnt_funcs->quit(s->sess_proxy_data);
+}
 /*
  * Event handling
  */
@@ -146,4 +151,12 @@ int
 DbgProgress(session *s, void (*event_callback)(dbg_event *))
 {
 	return s->sess_proxy->clnt_funcs->progress(s->sess_proxy_data, event_callback);
+}
+
+/*
+ * Error handling
+ */
+void
+DbgSetError(int errnum, char *msg)
+{
 }
