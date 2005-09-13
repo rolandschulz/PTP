@@ -16,40 +16,50 @@
  * 
  * LA-CC 04-115
  ******************************************************************************/
- 
-#ifndef _PROXY_TCP_H_
-#define _PROXY_TCP_H_
 
-#include "compat.h"
+#include <stdio.h>
 
-#define PROXY_TCP_PORT	12345
-#define MAX_MSG_LEN_SIZE	10
+#include "dbg.h"
+#include "session.h"
+#include "proxy.h"
+#include "proxy_tcp.h"
 
-struct proxy_tcp_conn {
-	char *	host;
-	int		port;
-	SOCKET	sock;
-	SOCKET	svr_sock;
-	char *	buf;
-	char		msg_len_buf[11];
-	int		buf_size;
-	int		buf_pos;
-	int		total_read;
-	char *	msg;
-	int		msg_len;
-};
-typedef struct proxy_tcp_conn	proxy_tcp_conn;
+int called_back;
 
-extern struct timeval TCPTIMEOUT;
-extern proxy_clnt_funcs proxy_tcp_clnt_funcs;
-extern proxy_svr_funcs proxy_tcp_svr_funcs;
+void
+event_callback(dbg_event *e)
+{
+	printf("got callback\n");
+	called_back++;
+}
 
-extern void		proxy_tcp_create_conn(proxy_tcp_conn **);
-extern void		proxy_tcp_destroy_conn(proxy_tcp_conn *);
-extern int		proxy_tcp_result_to_event(char *, dbg_event **);
-extern int		proxy_tcp_recv_msg(proxy_tcp_conn *, char **);
-extern int		proxy_tcp_send_msg(proxy_tcp_conn *, char *, int);
-extern void		skipspace(char *);
-extern char *	getword(char **);
+void
+wait_for_event(session *s)
+{
+	for (called_back = 0; !called_back; )
+		DbgProgress(s, event_callback);
+}
 
-#endif /* _PROXY_TCP_H_*/
+int
+main(int argc, char *argv[])
+{
+	int		i;
+	session *s;
+	
+	if (DbgInit(&s, "tcp", "host", "localhost", "port", PROXY_TCP_PORT, NULL) < 0) {
+		fprintf(stderr, "DbgInit failed\n");
+		exit(1);
+	}
+	
+	for (i = 0; i < 10; i++) {
+		DbgSetLineBreakpoint(s, NULL, "test.c", 23, NULL);
+	
+		wait_for_event(s);
+	}
+	
+	DbgQuit(s);
+	
+	wait_for_event(s);
+	
+	exit(0);
+}

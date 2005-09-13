@@ -28,8 +28,46 @@
 #include "stackframe.h"
 #include "dbg_event.h"
 
-#define DBGRES_OK	0
-#define DBGRES_ERR	-1
+#define DBGRES_OK			0
+#define DBGRES_ERR			-1
+
+#define DBGERR_NOTIMP			-2
+#define DBGERR_PROTO			-3
+#define DBGERR_DEBUGGER		-4
+#define DBGERR_SERVER			-5
+#define DBGERR_CALLBACK		-6
+#define DBGERR_INPROGRESS		-7
+#define DBGERR_CBCREATE		-8
+#define DBGERR_NOSERVER		-9
+#define DBGERR_RPC			-10
+#define DBGERR_NOLINE			-11
+#define DBGERR_NOFUNC			-12
+#define DBGERR_NOFILE			-13
+#define DBGERR_NOBP			-14
+#define DBGERR_NOSYM			-15
+#define DBGERR_NOMEM			-16
+#define DBGERR_CANTRUN		-17
+#define DBGERR_INVOKE			-18
+#define DBGERR_ISRUNNING		-19
+#define DBGERR_NOTRUN			-20
+#define DBGERR_FIRSTFRAME		-21
+#define DBGERR_LASTFRAME		-22
+#define DBGERR_BADBPARG		-23
+#define DBGERR_REGEX			-24
+#define DBGERR_NOSTACK		-25
+#define DBGERR_OUTOFRANGE		-26
+#define DBGERR_NOFILEDIR		-27
+#define DBGERR_NOSYMS			-28
+#define DBGERR_TEMP			-29
+#define DBGERR_PIPE			-30
+#define DBGERR_FORK			-31
+#define DBGERR_SELECT			-32
+#define DBGERR_NOTEXEC		-33
+#define DBGERR_CHDIR			-34
+#define DBGERR_SOURCE			-35
+#define DBGERR_SETVAR			-36
+#define DBGERR_UNKNOWN		-99
+
 /*
  * Process set operations
  */
@@ -41,9 +79,10 @@ void DbgAddProcToSet(procset *set, int pid);
 void DbgRemoveProcFromSet(procset *set, int pid);
 
 /*
- * Session initialization
+ * Session control
  */
 int DbgInit(session **, char *, char *, ...);
+int DbgQuit(session *);
 
 /*
  * Breakpoint operations
@@ -76,5 +115,10 @@ int DbgListGlobalVariables(session *s, int proc);
  * Event Handling
  */
 int DbgProgress(session *, void (*)(dbg_event*));
+
+/*
+ * Error Handling
+ */
+void DbgSetError(int, char *);
 
 #endif /*DBG_H_*/

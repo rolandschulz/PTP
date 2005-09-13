@@ -20,17 +20,21 @@
 /*
  * Miscellaneous proxy functions.
  */
-  
- #include "session.h"
- #include "proxy.h"
+ 
+#include <stdio.h>
 
+#include "session.h"
+#include "proxy.h"
+#include "proxy_tcp.h"
+#include "dbg.h"
+ 
 proxy proxies[] = {
-	{"tcp", proxy_tcp_clnt_funcs, NULL},
-	{NULL, NULL}
+	{"tcp", &proxy_tcp_clnt_funcs, NULL},
+	{NULL, NULL, NULL}
 };
 
 int 
-proxy_clnt_init_not_imp(void **data, char *attr, ...)
+proxy_clnt_init_not_imp(void **data, char *attr, va_list ap)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
@@ -86,7 +90,7 @@ proxy_clnt_setcurrentstackframe_not_imp(void *data, int p, int count, int type, 
 }
 
 int 
-proxy_clnt_evaluateexpression_not_imp(void *data, int p, char *)
+proxy_clnt_evaluateexpression_not_imp(void *data, int p, char *expr)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;

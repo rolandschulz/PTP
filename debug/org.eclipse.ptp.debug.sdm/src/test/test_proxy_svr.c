@@ -16,40 +16,42 @@
  * 
  * LA-CC 04-115
  ******************************************************************************/
- 
-#ifndef _PROXY_TCP_H_
-#define _PROXY_TCP_H_
 
-#include "compat.h"
+#include <stdio.h>
 
-#define PROXY_TCP_PORT	12345
-#define MAX_MSG_LEN_SIZE	10
+#include "session.h"
+#include "proxy.h"
+#include "proxy_tcp.h"
 
-struct proxy_tcp_conn {
-	char *	host;
-	int		port;
-	SOCKET	sock;
-	SOCKET	svr_sock;
-	char *	buf;
-	char		msg_len_buf[11];
-	int		buf_size;
-	int		buf_pos;
-	int		total_read;
-	char *	msg;
-	int		msg_len;
-};
-typedef struct proxy_tcp_conn	proxy_tcp_conn;
+int shutdown;
 
-extern struct timeval TCPTIMEOUT;
-extern proxy_clnt_funcs proxy_tcp_clnt_funcs;
-extern proxy_svr_funcs proxy_tcp_svr_funcs;
+void
+shutdown_server(void)
+{
+	shutdown++;
+}
 
-extern void		proxy_tcp_create_conn(proxy_tcp_conn **);
-extern void		proxy_tcp_destroy_conn(proxy_tcp_conn *);
-extern int		proxy_tcp_result_to_event(char *, dbg_event **);
-extern int		proxy_tcp_recv_msg(proxy_tcp_conn *, char **);
-extern int		proxy_tcp_send_msg(proxy_tcp_conn *, char *, int);
-extern void		skipspace(char *);
-extern char *	getword(char **);
-
-#endif /* _PROXY_TCP_H_*/
+int
+main(int argc, char *argv[])
+{
+	int stat;
+	void *conn;
+	
+	shutdown = 0;
+	
+	if (proxy_tcp_svr_funcs.create(&conn, shutdown_server) < 0) {
+		fprintf(stderr, "proxy_tcp_svr_create failed\n");
+		exit(1);
+	}
+	
+	while (!shutdown && (stat = proxy_tcp_svr_funcs.progress(conn)) >= 0)
+		if (stat) proxy_tcp_svr_funcs.dispatch(conn);
+		
+	if (!shutdown && stat < 0)
+		fprintf(stderr, "progress failed\n");
+	
+	proxy_tcp_svr_funcs.finish(conn);
+	
+	printf("proxy server shutting down\n");
+	exit(0);
+}

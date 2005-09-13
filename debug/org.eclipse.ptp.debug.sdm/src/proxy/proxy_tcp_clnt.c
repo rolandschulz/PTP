@@ -26,17 +26,20 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/select.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "compat.h"
 #include "session.h"
 #include "proxy.h"
 #include "proxy_tcp.h"
 
-static int proxy_tcp_clnt_init(void **, char *, ...);
+static int proxy_tcp_clnt_init(void **, char *, va_list);
 static int proxy_tcp_clnt_setlinebreakpoint(void *, procset *, char *, int , breakpoint *);
 static int proxy_tcp_clnt_quit(void *);
 static int proxy_tcp_clnt_progress(void *, void (*)(dbg_event *));
@@ -58,30 +61,84 @@ proxy_clnt_funcs proxy_tcp_clnt_funcs =
 	proxy_tcp_clnt_quit,
 	proxy_tcp_clnt_progress,
 };
+
+
+/**
+ * Connect to a remote proxy.
+ * 
+ * @return conn structure that can be used for subsequent proxy requests.
+ */
+int
+proxy_tcp_client_connect(char *host, int port, proxy_tcp_conn **cp)
+{
+	SOCKET				sd;
+	struct hostent *		hp;
+	long int				haddr;
+	struct sockaddr_in	scket;
+	proxy_tcp_conn *		conn;
+	        
+	hp = gethostbyname(host);
+	        
+	if (hp == (struct hostent *)NULL) {
+		fprintf(stderr, "could not find host \"%s\"\n", host);
+		return -1;
+	}
 	
+	haddr = ((hp->h_addr[0] & 0xff) << 24) |
+			((hp->h_addr[1] & 0xff) << 16) |
+			((hp->h_addr[2] & 0xff) <<  8) |
+			((hp->h_addr[3] & 0xff) <<  0);
+	
+	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
+	{
+		perror("socket");
+		return -1;
+	}
+	
+	memset (&scket,0,sizeof(scket));
+	scket.sin_family = PF_INET;
+	scket.sin_port = htons((u_short) port);
+	scket.sin_addr.s_addr = htonl(haddr);
+	
+	if ( connect(sd, (struct sockaddr *) &scket, sizeof(scket)) == SOCKET_ERROR )
+	{
+		perror("connect");
+		CLOSE_SOCKET(sd);
+		return -1;
+	}
+	
+	proxy_tcp_create_conn(&conn);
+	
+	conn->sock = sd;
+	conn->host = strdup(host);
+	conn->port = port;
+
+	*cp = conn;
+	
+	return 0;
+}
+
 /*
  * CLIENT FUNCTIONS
  */
 static int
-proxy_tcp_clnt_init(void **data, char *attr, ...)
+proxy_tcp_clnt_init(void **data, char *attr, va_list ap)
 {
-	va_list	ap;
-	proxy_tcp_conn *conn = malloc(sizeof(proxy_tcp_conn));
-	
-	va_start(ap, attr);
+	int					port;
+	char *				host;
+	proxy_tcp_conn *		conn;
 	
 	while (attr != NULL) {
 		if (strcmp(attr, "host") == 0)
-			conn->host = strdup(va_arg(ap, char *));
+			host = strdup(va_arg(ap, char *));
 		else if (strcmp(attr, "port") == 0)
-			conn->port = va_arg(ap, int);
+			port = va_arg(ap, int);
 			
 		attr = va_arg(ap, char *);
 	}
 	
-	va_end(ap);
-	
-	conn->sock = INVALID_SOCKET;
+	if (proxy_tcp_client_connect(host, port, &conn) < 0)
+		return -1;
 	
 	*data = (void *)conn;
 	
@@ -97,9 +154,9 @@ proxy_tcp_clnt_setlinebreakpoint(void *data, procset *set, char *file, int line,
 	if ( file == NULL )
 		file = "<null>";
 	        
-	asprintf(&request, "SETLINEBREAK %s %s %d\n", procset_to_str(set), file, line);
+	asprintf(&request, "SETLINEBREAK %s %s %d", procset_to_str(set), file, line);
 	
-	if ( proxy_tcp_send(conn->sock, request, strlen(request)) < 0 )
+	if ( proxy_tcp_send_msg(conn, request, strlen(request)) < 0 )
 	{
 	        free(request);
 	        return -1;
@@ -117,9 +174,9 @@ proxy_tcp_clnt_quit(void *data)
 	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
 	char *			request;
 	
-	asprintf(&request, "QUIT\n");
+	asprintf(&request, "QUIT");
 	
-	if ( proxy_tcp_send(conn->sock, request, strlen(request)) < 0 )
+	if ( proxy_tcp_send_msg(conn, request, strlen(request)) < 0 )
 	{
 	        free(request);
 	        return -1;
@@ -170,7 +227,7 @@ proxy_tcp_clnt_progress(void *data, void (*event_callback)(dbg_event *))
 		break;
 	}
 	
-	res = proxy_tcp_recv(conn, &result);
+	res = proxy_tcp_recv_msg(conn, &result);
 	if (res <= 0) {
 		return res;
 	}

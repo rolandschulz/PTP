@@ -20,9 +20,13 @@
 #ifndef _COMPAT_H_
 #define _COMPAT_H_
 
-#define SOCKET          int
-#define CLOSE_SOCKET(s) (void)close(s)
-#define INVALID_SOCKET  -1
-#define SOCKET_ERROR    -1
+#ifndef MAX
+#define MAX(a, b)		((a) < (b) ? (b) : (a))
+#endif /* MAX */
+
+#define SOCKET			int
+#define CLOSE_SOCKET(s)	(void)close(s)
+#define INVALID_SOCKET	-1
+#define SOCKET_ERROR		-1
 
 #endif /* _COMPAT_H_*/
