@@ -105,4 +105,6 @@ public interface IPUniverse extends IPElement {
 	 * @return The Process object if found, else null
 	 */
 	public IPProcess findProcessByName(String pname);
+	
+	public void deleteJob(IPJob job);
 }

@@ -172,4 +172,18 @@ public class PUniverse extends Parent implements IPUniverse {
 		}
 		return null;
 	}
+	
+	public void deleteJob(IPJob job) {
+		for (Iterator i=job.getCollection().iterator(); i.hasNext();) {
+			IPProcess process = (IPProcess)i.next();
+			if (process == null)
+				continue;
+			IPNode node = process.getNode();
+			if (node == null)
+				continue;
+			node.removeChild(process);
+		}
+		job.removeAllProcesses();
+		removeChild(job);
+	}
 }
