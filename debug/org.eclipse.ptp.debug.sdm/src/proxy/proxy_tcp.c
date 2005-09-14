@@ -134,7 +134,7 @@ proxy_tcp_send_msg(proxy_tcp_conn *conn, char *message, int len)
 	/*
 	 * Send message length first
 	 */
-	asprintf(&buf, "0x%08x ", len & 0xffffffff);
+	asprintf(&buf, "%08x ", len & 0xffffffff);
 	
 	if (tcp_send(conn, buf, strlen(buf)) < 0) {
 		free(buf);

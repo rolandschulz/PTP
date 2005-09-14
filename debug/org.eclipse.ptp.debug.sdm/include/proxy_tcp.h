@@ -23,7 +23,7 @@
 #include "compat.h"
 
 #define PROXY_TCP_PORT	12345
-#define MAX_MSG_LEN_SIZE	10
+#define MAX_MSG_LEN_SIZE	8
 
 struct proxy_tcp_conn {
 	char *	host;
