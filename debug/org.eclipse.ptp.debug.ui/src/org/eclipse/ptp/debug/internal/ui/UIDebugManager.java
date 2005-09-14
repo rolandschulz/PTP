@@ -277,14 +277,12 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 									registerProcess(session, taskID, false);
 									BitList tasks = new BitList();
 									tasks.set(taskID);
-									fireRegListener(REG_TYPE, tasks);
 								}
 							} else {
 								int taskID = convertToInt(elementHandler.getSetRoot().get(registerElementsID[i]).getName());
 								unregisterProcess(session, taskID, false);
 								BitList tasks = new BitList();
 								tasks.set(taskID);
-								fireRegListener(UNREG_TYPE, tasks);
 							}
 						}
 						return Status.OK_STATUS;
