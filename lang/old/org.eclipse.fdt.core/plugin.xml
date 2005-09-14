@@ -91,7 +91,7 @@
          point="org.eclipse.cdt.core.CFileTypeAssociation">
       <association
             type="org.eclipse.fdt.core.fileType.fortran_source"
-            pattern="*.f,*.f77,*.f90,*.f95">
+            pattern="*.f,*.for,*.f77,*.f90,*.f95">
       </association>
       <association
             type="org.eclipse.fdt.core.fileType.fortran_header"
@@ -106,6 +106,10 @@
       <fileTypes
             type="text"
             extension="f">
+      </fileTypes>
+      <fileTypes
+            type="text"
+            extension="for">
       </fileTypes>
       <fileTypes
             type="text"
@@ -142,14 +146,18 @@
    <extension point="org.eclipse.core.runtime.contentTypes"> 
       <file-association 
        content-type="org.eclipse.fdt.core.fortranSource"
-       file-extensions="f,f77,f90,f95"/>
+       file-extensions="f,for,f77,f90,f95"/>
    </extension> 
 
    <extension point="org.eclipse.core.runtime.contentTypes"> 
       <file-association 
        content-type="org.eclipse.fdt.core.fortranHeader"
        file-extensions="fh"/>
-   </extension> 
+   </extension>
+   
+   <extension point="org.eclipse.cdt.core.AdditionalLanguages">
+       <language class="org.eclipse.fdt.core.FortranLanguage"/>
+   </extension>
 
 <!-- =================================================================================== -->
 <!-- Initialize the preference for the Core Plugin                                       -->
