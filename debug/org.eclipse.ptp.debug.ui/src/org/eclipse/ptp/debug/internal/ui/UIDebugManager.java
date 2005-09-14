@@ -368,7 +368,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			PTPDebugUIPlugin.log(e);
 		}
 	}
-	private void handleDebugEvents(ICDIEvent[] events, IProgressMonitor monitor) {
+	private synchronized void handleDebugEvents(ICDIEvent[] events, IProgressMonitor monitor) {
 		for (int i = 0; i < events.length; i++) {
 			Object condition = null;
 			IPCDIEvent event = (IPCDIEvent) events[i];

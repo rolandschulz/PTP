@@ -264,17 +264,23 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		putAnnotationGroup(job_id, annotationGroup);
 	}
 	public boolean containsCurrentSet(BitList aTasks) {
-		String job_id = uiDebugManager.getCurrentJobId();
 		String set_id = uiDebugManager.getCurrentSetId();
 		if (set_id.equals(IElementHandler.SET_ROOT_ID))
 			return true;
-		IElementHandler handler = uiDebugManager.getElementHandler(job_id);
+		IElementHandler handler = uiDebugManager.getElementHandler(uiDebugManager.getCurrentJobId());
 		IElementSet set = handler.getSet(set_id);
 		BitList tasks = (BitList) set.getData(UIDebugManager.BITSET_KEY);
 		return (tasks != null && tasks.intersects(aTasks));
 	}
+	private void printBitList(BitList tasks) {
+		System.out.print("++++++++++++++++ tasks: " + tasks.cardinality() + ": ");
+		for(int i=tasks.nextSetBit(0), j=0; i>=0; i=tasks.nextSetBit(i+1), j++) {
+			System.out.print("[" + i + "], ");
+		}
+		System.out.println();
+	}
 	// generic
-	public void addAnnotation(AnnotationGroup annotationGroup, ITextEditor textEditor, IFile file, int lineNumber, BitList tasks, String type) throws CoreException {
+	public synchronized void addAnnotation(AnnotationGroup annotationGroup, ITextEditor textEditor, IFile file, int lineNumber, BitList tasks, String type) throws CoreException {
 		IDocumentProvider docProvider = textEditor.getDocumentProvider();
 		IAnnotationModel annotationModel = docProvider.getAnnotationModel(textEditor.getEditorInput());
 		if (annotationModel == null)
@@ -351,7 +357,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		}
 	}
 	// generic
-	public void removeAnnotation(AnnotationGroup annotationGroup, ITextEditor textEditor, IFile file, BitList tasks, boolean isRegister) throws CoreException {
+	public synchronized void removeAnnotation(AnnotationGroup annotationGroup, ITextEditor textEditor, IFile file, BitList tasks, boolean isRegister) throws CoreException {
 		IDocumentProvider docProvider = textEditor.getDocumentProvider();
 		IAnnotationModel annotationModel = docProvider.getAnnotationModel(textEditor.getEditorInput());
 		if (annotationModel == null)
