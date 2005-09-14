@@ -213,7 +213,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				try {
 					getProcsForNewJob(ne[i], job, null);
 				} catch (InterruptedException e) {
-					universe.removeChild(job);
+					universe.deleteJob(job);
 					break;
 				}
 			}
@@ -237,7 +237,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		monitor.beginTask("Initialing the process...", ne.length);
 		for (int j = 0; ne != null && j < ne.length; j++) {
 			if (monitor.isCanceled()) {
-				job.removeAllProcesses();
 				throw new InterruptedException("Cancelled by user");
 			}
 			
@@ -374,7 +373,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		try {
 			getProcsForNewJob(ne, pjob, null);
 		} catch (InterruptedException e) {
-			universe.removeChild(job);
+			universe.deleteJob(job);
 			return;
 		}
 		fireEvent(job, EVENT_UPDATED_STATUS);
@@ -430,8 +429,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			switch (state) {
 			case STATE_START:
 				listener.start();
-				System.out
-						.println("++++++++++++ Started ++++++++++++++");
+				System.out.println("++++++++++++ Started ++++++++++++++");
 				break;
 			case STATE_RUN:
 				listener.run();
@@ -563,7 +561,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			try {
 				getProcsForNewJob(nejob, job, monitor);
 			} catch (InterruptedException e) {
-				universe.removeChild(job);
+				universe.deleteJob(job);
 				throw new CoreException(Status.CANCEL_STATUS);
 			}
 			fireState(STATE_RUN);
