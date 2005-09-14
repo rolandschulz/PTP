@@ -27,12 +27,12 @@
 
 #define MAX_PROC_SET	100
 
-#define BITVECTOR_TYPE	bitvector *
-#define BITVECTOR_CREATE	bitvector_create
-#define BITVECTOR_FREE	bitvector_free
-#define BITVECTOR_SET		bitvector_set
-#define BITVECTOR_UNSET	bitvector_unset
-#define BITVECTOR_GET		bitvector_get
+#define BITVECTOR_TYPE			bitvector *
+#define BITVECTOR_CREATE(size)	bitvector_create(size)
+#define BITVECTOR_FREE(v)			bitvector_free(v)
+#define BITVECTOR_SET(v, bit)		bitvector_set((v), (bit))
+#define BITVECTOR_UNSET(v, bit)	bitvector_unset((v), (bit))
+#define BITVECTOR_GET(v, bit)		bitvector_get((v), (bit))
 
 struct procset {
 	char *			ps_name;
@@ -41,10 +41,11 @@ struct procset {
 };
 typedef struct procset procset;
 
-procset *procset_new(int);
-void		procset_free(procset *);
-void		procset_add_proc(procset *, int);
-void		procset_remove_proc(procset *, int);
-int		procset_test(procset *, int);
-char *	procset_to_str(procset *);
+procset *	procset_new(int);
+void			procset_free(procset *);
+void			procset_add_proc(procset *, int);
+void			procset_remove_proc(procset *, int);
+int			procset_test(procset *, int);
+char *		procset_to_str(procset *);
+procset *	str_to_procset(char *);
 #endif /*PROCSET_H_*/
