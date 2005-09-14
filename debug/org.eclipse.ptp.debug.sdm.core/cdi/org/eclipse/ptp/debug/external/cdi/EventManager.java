@@ -59,8 +59,7 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	 */
 	public void addEventListener(ICDIEventListener listener) {
 		System.out.println("EventManager.addEventListener()");
-		if (!list.contains(listener))
-			list.add(listener);
+		list.add(listener);
 	}
 
 	/**
@@ -68,8 +67,7 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	 */
 	public void removeEventListener(ICDIEventListener listener) {
 		System.out.println("EventManager.removeEventListener()");
-		if (list.contains(listener))
-			list.remove(listener);
+		list.remove(listener);
 	}
 
 	public void removeEventListeners() {
