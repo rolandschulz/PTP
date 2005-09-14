@@ -34,7 +34,7 @@ import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
  * 
  */
 public class AnnotationGroup {
-	List annotationList = new ArrayList();
+	private List annotationList = new ArrayList();
 
 	public boolean contains(Annotation annotation) {
 		return annotationList.contains(annotation);
@@ -53,6 +53,9 @@ public class AnnotationGroup {
 	public void removeAnnotations() {
 		removeAllMarkers();
 		annotationList.clear();
+	}
+	public int size() {
+		return annotationList.size();
 	}
 	public Iterator getAnnotationIterator() {
 		return annotationList.iterator();
