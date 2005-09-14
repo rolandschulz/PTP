@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.internal.ui;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
@@ -106,6 +107,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			if ((BitList)elementHandler.getData(SUSPENDED_PROC_KEY) == null)
 				elementHandler.setData(SUSPENDED_PROC_KEY, new BitList());
 		}
+		createEventListener(new_job_id);
 		return new_job_id;
 	}
 	public boolean isDebugging(String job_id) {
@@ -116,7 +118,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	}
 	// change job
 	public void setCurrentJobId(String job_id) {
-		createEventListener(job_id);
 		super.setCurrentJobId(job_id);
 		updateBreakpointMarker(IElementHandler.SET_ROOT_ID);
 	}
@@ -141,7 +142,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		if (regListeners.contains(listener))
 			regListeners.remove(listener);
 	}
-	public void fireRegListener(int type, BitList tasks) {
+	public synchronized void fireRegListener(int type, BitList tasks) {
 		for (Iterator i = regListeners.iterator(); i.hasNext();) {
 			switch (type) {
 			case REG_TYPE:
@@ -385,7 +386,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					elementHandler.addRegisterElement(proc.getIDString());
 					elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(true);
 				}
-				fireRegListener(REG_TYPE, event.getAllProcesses().toBitList());
+				fireRegListener(REG_TYPE, event.getAllRegisteredProcesses().toBitList());
 			} else if (event instanceof TargetUnregisteredEvent) {
 				IElementHandler elementHandler = getElementHandler(job.getIDString());
 				int[] processes = event.getAllProcesses().toIntArray();
@@ -394,7 +395,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					elementHandler.removeRegisterElement(proc.getIDString());
 					elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(false);
 				}
-				fireRegListener(UNREG_TYPE, event.getAllProcesses().toBitList());
+				fireRegListener(UNREG_TYPE, event.getAllUnregisteredProcesses().toBitList());
 			} else if (event instanceof BreakpointHitEvent) {
 				BreakpointHitEvent bptHitEvent = (BreakpointHitEvent) event;
 				ICDIBreakpoint bpt = ((BreakpointHitInfo) bptHitEvent.getReason()).getBreakpoint();
@@ -407,7 +408,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					// fileName = "HelloWorld/main.c";
 					// String fileName = "D:/eclipse3.1/runtime-EclipseApplication/TestC/testC.c";
 					try {
-						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses().toBitList());
+						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses().toBitList(), false);
+						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses().toBitList(), true);
 					} catch (CoreException e) {
 						PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
 					}
@@ -420,6 +422,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			} else if (event instanceof InferiorExitedEvent || event instanceof ErrorEvent) {
 				fireTerminatedEvent(job, event.getAllProcesses().toBitList());
 				condition = job.isAllStop()?new Boolean(true):null;
+			} else if (event instanceof BreakpointHitEvent) {
+				//do nothing in breakpoint hit event
+				continue;
 			}
 			firePaintListener(condition);
 		}
