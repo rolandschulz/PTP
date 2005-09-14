@@ -22,6 +22,8 @@ package org.eclipse.ptp.rtsystem.simulation;
 public class SimJobState {
 	public String jobname = null;
 	
+	public String machine_name = null;
+	
 	public String spawned_app_state = null;
 
 	public int spawned_num_procs = 0;

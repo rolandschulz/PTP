@@ -428,7 +428,7 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		((SimInputStream) in).destroy();
 	}
 	private void initCommands(SimQueue cmds) {
-		ArrayList cmd, cmd2, cmd3, cmd4;
+		ArrayList cmd, /*cmd2,*/ cmd3/*, cmd4*/;
 		cmd = new ArrayList();
 		cmd.add(0, "0");
 		cmd.add(1, "print");

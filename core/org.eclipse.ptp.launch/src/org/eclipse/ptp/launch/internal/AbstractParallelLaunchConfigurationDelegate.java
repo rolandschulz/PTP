@@ -122,8 +122,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	protected JobRunConfiguration getJobRunConfiguration(ILaunchConfiguration configuration) throws CoreException
 	{
 		IFile programFile = getProgramFile(configuration);
-		String path, nprocs_str, nprocpnode_str, firstnode_str;
+		String path, nprocs_str, nprocpnode_str, firstnode_str, machineName;
 		
+		machineName = getMachineName(configuration);
 		path = programFile.getLocation().toString();
 		nprocs_str = getNumberOfProcesses(configuration);
 		nprocpnode_str = getNumberOfProcessesPerNode(configuration);
@@ -140,7 +141,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		catch(NumberFormatException e) {	}
 		
 		JobRunConfiguration jrc = new JobRunConfiguration(
-			programFile.getLocation().toString(), nprocs, nprocpnode, firstnode, false);
+			programFile.getLocation().toString(), machineName, nprocs, nprocpnode, firstnode, false);
 		
 		return jrc;
 	}
@@ -195,6 +196,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 	protected static String getProgramName(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, (String)null);
+	}
+	protected static String getMachineName(ILaunchConfiguration configuration) throws CoreException {
+		return configuration.getAttribute(IPTPLaunchConfigurationConstants.MACHINE_NAME, (String)null);
 	}
 	protected static String getNumberOfProcesses(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.NUMBER_OF_PROCESSES, (String)null);
