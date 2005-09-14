@@ -21,14 +21,16 @@ package org.eclipse.ptp.rtsystem;
 
 public class JobRunConfiguration {
 	protected String pathToExec;
+	protected String machineName;
 	protected int numberOfProcesses;
 	protected int numberOfProcessesPerNode;
 	protected int firstNodeNumber;
 	protected boolean isDebugJob = false;
 	
-	public JobRunConfiguration(String p, int np, int npp, int fn, boolean debug)
+	public JobRunConfiguration(String p, String mn, int np, int npp, int fn, boolean debug)
 	{
 		pathToExec = p;
+		machineName = mn;
 		numberOfProcesses = np;
 		numberOfProcessesPerNode = npp;
 		firstNodeNumber = fn;
@@ -38,6 +40,11 @@ public class JobRunConfiguration {
 	public String getPathToExec()
 	{
 		return pathToExec;
+	}
+	
+	public String getMachineName()
+	{
+		return machineName;
 	}
 	
 	public int getNumberOfProcesses()
@@ -55,14 +62,6 @@ public class JobRunConfiguration {
 		return firstNodeNumber;
 	}
 	
-	public String toString()
-	{
-		return "path:\t\t"+pathToExec+"\n"+
-		       "#procs:\t\t"+numberOfProcesses+"\n"+
-		       "#proc/node:\t"+numberOfProcessesPerNode+"\n"+
-		       "firstNode#:\t"+firstNodeNumber+"\n";
-	}
-	
 	public boolean isDebug()
 	{
 		return isDebugJob;
@@ -71,5 +70,15 @@ public class JobRunConfiguration {
 	public void setDebug()
 	{
 		isDebugJob = true;
+	}
+	
+	public String toString()
+	{
+		return "path:\t\t"+pathToExec+"\n"+
+		       "machineName:\t"+machineName+"\n"+
+		       "#procs:\t\t"+numberOfProcesses+"\n"+
+		       "#proc/node:\t"+numberOfProcessesPerNode+"\n"+
+		       "firstNode#:\t"+firstNodeNumber+"\n"+
+		       "isDebug?\t\t"+isDebugJob+"\n";
 	}
 }

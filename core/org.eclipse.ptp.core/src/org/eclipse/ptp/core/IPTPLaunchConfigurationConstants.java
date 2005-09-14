@@ -39,6 +39,8 @@ public interface IPTPLaunchConfigurationConstants {
 	public static final String ATTR_PROGRAM_NAME = PTP_LAUNCH_ID + ".PROGRAM_NAME"; //$NON-NLS-1$
 
 	public static final String ATTR_APPLICATION_NAME = PTP_LAUNCH_ID + ".APPLICATION_NAME";
+	
+	public static final String MACHINE_NAME = PTP_LAUNCH_ID + ".MACHINE_NAME";
 
 	public static final String ATTR_STOP_IN_MAIN = PTP_LAUNCH_ID + ".STOP_IN_MAIN";
 

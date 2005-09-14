@@ -23,16 +23,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.rtsystem.IControlSystem;
-import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.RuntimeEvent;
@@ -79,6 +76,7 @@ public class SimulationControlSystem implements IControlSystem {
 		ss.jobname = s;
 		ss.spawned_num_procs = ss.spawned_procs_per_node = ss.spawned_first_node = 0;
 
+		ss.machine_name = jobRunConfig.getMachineName();
 		ss.spawned_num_procs = jobRunConfig.getNumberOfProcesses();
 		ss.spawned_procs_per_node = jobRunConfig.getNumberOfProcessesPerNode();
 		ss.spawned_first_node = jobRunConfig.getFirstNodeNumber();
@@ -221,7 +219,7 @@ public class SimulationControlSystem implements IControlSystem {
 				} catch(NumberFormatException e) {
 				}
 				if(procNum != -1) {
-					return "machine1_node" + (ss.spawned_first_node + (procNum / ss.spawned_procs_per_node));
+					return ss.machine_name + "_node" + (ss.spawned_first_node + (procNum / ss.spawned_procs_per_node));
 				}
 			}
 		}
