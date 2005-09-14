@@ -117,8 +117,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	// change job
 	public void setCurrentJobId(String job_id) {
 		createEventListener(job_id);
-		updateBreakpointMarker(IElementHandler.SET_ROOT_ID);
 		super.setCurrentJobId(job_id);
+		updateBreakpointMarker(IElementHandler.SET_ROOT_ID);
 	}
 	public void addDebugEventListener(IDebugActionUpdateListener listener) {
 		if (!debugEventListeners.contains(listener))
@@ -232,16 +232,42 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			PTPDebugUIPlugin.log(e);
 		}
 	}
-	public void changeSetEvent(final IElementSet curSet, final IElementSet preSet) {
-		updateBreakpointMarker(curSet.getID());
-		final IElementHandler elementHandler = getElementHandler(getCurrentJobId());
+	public void removeAllRegisterElements(final String job_id) throws CoreException {
+		final IElementHandler elementHandler = getElementHandler(job_id);
 		if (elementHandler == null)
-			return;
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "Update register/unregister error", null));
+		
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
-				new Job("Updating") {
+				new Job("Removing registered processes") {
 					protected IStatus run(IProgressMonitor pmonitor) {
-						IPCDISession session = (IPCDISession) getDebugSession(getCurrentJobId());
+						IPCDISession session = (IPCDISession) getDebugSession(job_id);
+						if (session == null)
+							return Status.CANCEL_STATUS;
+						String[] registerElementsID = elementHandler.getRegisteredElementsID();
+						for (int i = 0; i < registerElementsID.length; i++) {
+							int taskID = convertToInt(elementHandler.getSetRoot().get(registerElementsID[i]).getName());
+							unregisterProcess(session, taskID, false);
+						}
+						return Status.OK_STATUS;
+					}
+				}.schedule();
+			}
+		};
+		ResourcesPlugin.getWorkspace().run(runnable, null);		
+	}
+	public void updateRegisterUnRegisterElements(final IElementSet curSet, final IElementSet preSet, final String job_id) throws CoreException {
+		final IElementHandler elementHandler = getElementHandler(job_id);
+		if (elementHandler == null)
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "Update register/unregister error", null));
+
+		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException {
+				new Job("Updating registered/unregistered processes") {
+					protected IStatus run(IProgressMonitor pmonitor) {
+						IPCDISession session = (IPCDISession) getDebugSession(job_id);
+						if (session == null)
+							return Status.CANCEL_STATUS;
 						String[] registerElementsID = elementHandler.getRegisteredElementsID();
 						for (int i = 0; i < registerElementsID.length; i++) {
 							if (curSet.contains(registerElementsID[i])) {
@@ -250,7 +276,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 									registerProcess(session, taskID, false);
 									BitList tasks = new BitList();
 									tasks.set(taskID);
-									fireRegListener(UNREG_TYPE, tasks);
+									fireRegListener(REG_TYPE, tasks);
 								}
 							} else {
 								int taskID = convertToInt(elementHandler.getSetRoot().get(registerElementsID[i]).getName());
@@ -265,8 +291,12 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				}.schedule();
 			}
 		};
+		ResourcesPlugin.getWorkspace().run(runnable, null);
+	}
+	public void changeSetEvent(IElementSet curSet, IElementSet preSet) {
+		updateBreakpointMarker(curSet.getID());
 		try {
-			ResourcesPlugin.getWorkspace().run(runnable, null);
+			updateRegisterUnRegisterElements(curSet, preSet, getCurrentJobId());
 			annotationMgr.updateAnnotation(curSet, preSet);
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
