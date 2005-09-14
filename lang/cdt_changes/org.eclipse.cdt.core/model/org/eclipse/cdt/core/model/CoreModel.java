@@ -239,7 +239,8 @@ public class CoreModel implements ICoreModel {
 				return true;
 			} else if (CCorePlugin.CONTENT_TYPE_ASMSOURCE.equals(id)) {
 				return true;
-			} else if (AdditionalLanguagesExtension.getInstance().someAdditionalLanguageMatchesSourceContentType(id)) { //JO
+//			} else if (AdditionalLanguagesExtension.getInstance().someAdditionalLanguageMatchesSourceContentType(id)) { //JO
+			} else if (id.equals("org.eclipse.fdt.core.fortranSource")) {  // Can't load extension pt, WARNING hack attack (CER)
 				return true;
 			}
 		}
@@ -275,7 +276,8 @@ public class CoreModel implements ICoreModel {
 				return true;
 			} else if (CCorePlugin.CONTENT_TYPE_ASMSOURCE.equals(id)) {
 				return true;
-			} else if (AdditionalLanguagesExtension.getInstance().someAdditionalLanguageMatchesSourceContentType(id)) { //JO
+//			} else if (AdditionalLanguagesExtension.getInstance().someAdditionalLanguageMatchesSourceContentType(id)) { //JO
+			} else if (id.equals("org.eclipse.fdt.core.fortranSource")) { // Can't get AdditionalLanguages extension pt to work, WARNING hack attack (CER)
 				return true;
 			}
 		}
