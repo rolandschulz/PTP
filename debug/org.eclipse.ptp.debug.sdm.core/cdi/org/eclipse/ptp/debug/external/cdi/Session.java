@@ -366,4 +366,47 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 		return bMgr.createAddressLocation(address);
 	}
 
+	/* Execution */
+	
+	public void stepOver(String setName) {
+		stepOver(setName, 1);
+	}
+
+	public void stepOver(String setName, int count) {
+		// Auto-generated method stub
+		System.out.println("Session.stepOver()");
+		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
+		try {
+			debugger.stepOver(set, count);
+		} catch (PCDIException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void stepInto(String setName) {
+		stepInto(setName, 1);
+	}
+
+	public void stepInto(String setName, int count) {
+		// Auto-generated method stub
+		System.out.println("Session.stepInto()");
+		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
+		try {
+			debugger.stepInto(set, count);
+		} catch (PCDIException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void stepFinish(String setName) {
+		// Auto-generated method stub
+		System.out.println("Session.stepFinish()");
+		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
+		try {
+			debugger.stepFinish(set, 0);
+		} catch (PCDIException e) {
+			e.printStackTrace();
+		}
+	}
+
 }
