@@ -441,7 +441,7 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		cmd3.add(1, "exitProcess");
 		cmd3.add(2, "");
 		// cmds.addItem(cmd2);
-		for (int j = 0; j < 10; j++) {
+		for (int j = 0; j < 20; j++) {
 			cmds.addItem(cmd);
 		}
 		cmds.addItem(cmd3);

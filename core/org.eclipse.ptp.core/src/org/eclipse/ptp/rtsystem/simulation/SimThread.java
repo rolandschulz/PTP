@@ -53,7 +53,7 @@ public class SimThread extends Observable {
 		threadId = tid;
 		processId = pId;
 		
-		int numStackFrames = 3;
+		int numStackFrames = 5;
 		
 		stackFrameList = new ArrayList();
 		for (int i = 0; i < numStackFrames; i++) {
