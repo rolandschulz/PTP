@@ -22,6 +22,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "compat.h"
 #include "procset.h"
 
 procset *
@@ -42,6 +43,66 @@ procset_free(procset *p)
 {
 	BITVECTOR_FREE(p->ps_procs);
 	free(p);
+}
+
+procset *	
+procset_copy(procset *p)
+{
+	procset *np = procset_new(p->ps_nprocs);
+	
+	BITVECTOR_COPY(np->ps_procs, p->ps_procs);
+	
+	return np;
+}
+
+int	
+procset_isempty(procset *p)
+{
+	return BITVECTOR_ISEMPTY(p->ps_procs);
+}
+
+procset *	
+procset_and(procset *p1, procset *p2)
+{
+	procset *np = procset_new(MAX(p1->ps_nprocs, p2->ps_nprocs));
+	
+	BITVECTOR_AND(np->ps_procs, p1->ps_procs, p2->ps_procs);
+	
+	return np;
+}
+
+void
+procset_andeq(procset *p1, procset *p2)
+{
+	/*
+	 * Silently fail if sets are different sizes
+	 * */
+	if (p1->ps_nprocs != p2->ps_nprocs)
+		return;
+	
+	BITVECTOR_ANDEQ(p1->ps_procs, p2->ps_procs);
+}
+
+procset *	
+procset_or(procset *p1, procset *p2)
+{
+	procset *np = procset_new(MAX(p1->ps_nprocs, p2->ps_nprocs));
+	
+	BITVECTOR_OR(np->ps_procs, p1->ps_procs, p2->ps_procs);
+	
+	return np;
+}
+
+void
+procset_oreq(procset *p1, procset *p2)
+{
+	/*
+	 * Silently fail if sets are different sizes
+	 * */
+	if (p1->ps_nprocs != p2->ps_nprocs)
+		return;
+	
+	BITVECTOR_OREQ(p1->ps_procs, p2->ps_procs);
 }
 
 /**
