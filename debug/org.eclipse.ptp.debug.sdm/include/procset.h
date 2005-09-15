@@ -33,6 +33,12 @@
 #define BITVECTOR_SET(v, bit)		bitvector_set((v), (bit))
 #define BITVECTOR_UNSET(v, bit)	bitvector_unset((v), (bit))
 #define BITVECTOR_GET(v, bit)		bitvector_get((v), (bit))
+#define BITVECTOR_COPY(v1, v2)	bitvector_copy((v1), (v2))
+#define BITVECTOR_ISEMPTY(v)		bitvector_isempty(v)
+#define BITVECTOR_ANDEQ(v1, v2)	bitvector_andeq((v1), (v2))
+#define BITVECTOR_OREQ(v1, v2)	bitvector_oreq((v1), (v2))
+#define BITVECTOR_AND(v1, v2, v3)	bitvector_and((v1), (v2), (v3))
+#define BITVECTOR_OR(v1, v2, v3)	bitvector_or((v1), (v2), (v3))
 
 struct procset {
 	char *			ps_name;
@@ -43,9 +49,15 @@ typedef struct procset procset;
 
 procset *	procset_new(int);
 void			procset_free(procset *);
+procset *	procset_copy(procset *);
+int			procset_isempty(procset *);
 void			procset_add_proc(procset *, int);
 void			procset_remove_proc(procset *, int);
 int			procset_test(procset *, int);
+procset *	procset_and(procset *, procset *);
+void			procset_andeq(procset *, procset *);
+procset *	procset_or(procset *, procset *);
+void			procset_oreq(procset *, procset *);
 char *		procset_to_str(procset *);
 procset *	str_to_procset(char *);
 #endif /*PROCSET_H_*/
