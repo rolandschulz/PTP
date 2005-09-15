@@ -62,4 +62,11 @@ public interface IPCDISession extends ICDISession {
 	public ICDILineLocation createLineLocation(String file, int line);
 	public ICDIFunctionLocation createFunctionLocation(String file, String function);
 	public ICDIAddressLocation createAddressLocation(BigInteger address);
+	
+	/* Execution */
+	public void stepOver(String setName);
+	public void stepOver(String setName, int count);
+	public void stepInto(String setName);
+	public void stepInto(String setName, int count);
+	public void stepFinish(String setName);
 }
