@@ -226,9 +226,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * Element Set
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	public void updateBreakpointMarker(final String cur_sid) {
+	public void updateBreakpointMarker(String cur_sid) {
 		try {
-			PCDIDebugModel.updatePBreakpoints(getCurrentJobId(), cur_sid, getName(getCurrentJobId()));
+			PCDIDebugModel.updatePBreakpoints(cur_sid);
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 		}
@@ -293,6 +293,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		ResourcesPlugin.getWorkspace().run(runnable, null);
 	}
 	public void changeSetEvent(IElementSet curSet, IElementSet preSet) {
+		if (curSet == null)
+			return;
+		
 		updateBreakpointMarker(curSet.getID());
 		try {
 			updateRegisterUnRegisterElements(curSet, preSet, getCurrentJobId());

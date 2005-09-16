@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.debug.core.CDebugUtils;
 import org.eclipse.cdt.debug.core.cdi.ICDILocation;
@@ -169,8 +168,9 @@ public class PCDIDebugModel {
 		return null;
 	}
 	*/
-	public static IPLineBreakpoint lineBreakpointExists(String sourceHandle, IResource resource, int lineNumber, String set_id, String job_id) throws CoreException {
+	public static IPLineBreakpoint[] lineBreakpointsExists(String sourceHandle, IResource resource, int lineNumber) throws CoreException {
 		IBreakpoint[] breakpoints = getPBreakpoints();
+		List foundBreakpoints = new ArrayList(0);
 		for(int i=0; i<breakpoints.length; i++) {
 			if (!(breakpoints[i] instanceof IPLineBreakpoint))
 				continue;
@@ -178,14 +178,24 @@ public class PCDIDebugModel {
 			IPLineBreakpoint breakpoint = (IPLineBreakpoint)breakpoints[i];
 			if (sameSourceHandle(sourceHandle, breakpoint.getSourceHandle())) {
 				if (breakpoint.getMarker().getResource().equals(resource)) {
-					if (breakpoint.getLineNumber() == lineNumber && breakpoint.getSetId().equals(set_id) && breakpoint.getJobId().equals(job_id)) {
-						return breakpoint;
+					if (breakpoint.getLineNumber() == lineNumber) {
+						foundBreakpoints.add(breakpoint);
 					}
 				}
 			}
 		}
-		return null;		
+		return (IPLineBreakpoint[])foundBreakpoints.toArray(new IPLineBreakpoint[foundBreakpoints.size()]);		
 	}
+	//remove global breapoint or the breakpoint same as job id given
+	public static IPLineBreakpoint lineBreakpointExists(IPLineBreakpoint[] breakpoints, String job_id) throws CoreException {
+		for (int i=0; i<breakpoints.length; i++) {
+			String bpt_job_id = breakpoints[i].getJobId();
+			if (bpt_job_id.equals(IPBreakpoint.GLOBAL) || bpt_job_id.equals(job_id))
+				return breakpoints[i];
+		}
+		return null;
+	}
+	
 	public static boolean sameSourceHandle(String handle1, String handle2) {
 		if (handle1 == null || handle2 == null)
 			return false;
@@ -257,7 +267,20 @@ public class PCDIDebugModel {
 		}
 		return (IBreakpoint[])bptList.toArray(new IBreakpoint[bptList.size()]);
 	}
-	
+	public static IBreakpoint[] findPBreakpointsByJob(String job_id) throws CoreException {
+		List bptList = new ArrayList();
+		IBreakpoint[] breakpoints = getPBreakpoints();
+		for(int i=0; i<breakpoints.length; i++) {
+			if (!(breakpoints[i] instanceof IPLineBreakpoint))
+				continue;
+
+			IPLineBreakpoint breakpoint = (IPLineBreakpoint)breakpoints[i];
+			if (breakpoint.getJobId().equals(job_id)) {
+				bptList.add(breakpoint);
+			}
+		}
+		return (IBreakpoint[])bptList.toArray(new IBreakpoint[bptList.size()]);
+	}
 	public static void deletePBreakpointBySet(final String job_id, final String set_id) throws CoreException {
 		IWorkspaceRunnable runnable= new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
@@ -279,8 +302,28 @@ public class PCDIDebugModel {
 		};
 		ResourcesPlugin.getWorkspace().run(runnable, null);
 	}
-	
-	public static void updatePBreakpoints(final String job_id, final String set_id, final String job_name) throws CoreException {
+	public static void deletePBreakpointBySet(final String job_id) throws CoreException {
+		IWorkspaceRunnable runnable= new IWorkspaceRunnable() {
+			public void run(IProgressMonitor monitor) throws CoreException {
+				final IBreakpoint[] breakpoints = findPBreakpointsByJob(job_id);
+				if (breakpoints.length > 0) {
+					new Job("Remove breakpoint") {
+						protected IStatus run(IProgressMonitor pmonitor) {
+							try {
+								DebugPlugin.getDefault().getBreakpointManager().removeBreakpoints(breakpoints, true);					
+	                            return Status.OK_STATUS;
+	                        } catch (CoreException e) {
+	                            PTPDebugCorePlugin.log(e);
+	                        }
+	                        return Status.CANCEL_STATUS;
+						}
+					}.schedule();
+				}
+			}
+		};
+		ResourcesPlugin.getWorkspace().run(runnable, null);
+	}	
+	public static void updatePBreakpoints(final String set_id) throws CoreException {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				new Job("Update breakpoint") {
@@ -292,12 +335,6 @@ public class PCDIDebugModel {
 									continue;
 					
 								IPBreakpoint breakpoint = (IPBreakpoint)breakpoints[i];
-								if (breakpoint.getJobId().length() == 0) {
-									breakpoint.setJobId(job_id);
-									breakpoint.setSetId(set_id);
-									breakpoint.setJobName(job_name);
-									breakpoint.updateMarkerMessage();
-								}
 								breakpoint.setCurSetId(set_id);
 							}
 							return Status.OK_STATUS;

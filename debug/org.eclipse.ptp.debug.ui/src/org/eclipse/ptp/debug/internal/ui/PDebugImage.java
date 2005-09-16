@@ -74,6 +74,8 @@ public class PDebugImage {
 	public static final String IMG_DEBUG_BPTMULTISET_DI = "bpt_multi_set_disable.gif";
 	public static final String IMG_DEBUG_BPTNOSET_DI = "bpt_no_set_disable.gif";
 
+	public static final String IMG_DEBUG_OVER_BPT_GLOB_EN = "global_ovr.gif";
+	public static final String IMG_DEBUG_OVER_BPT_GLOB_DI = "global_ovr_disabled.gif";
 	public static final String IMG_DEBUG_OVER_BPT_COND_EN = "conditional_ovr.gif";
 	public static final String IMG_DEBUG_OVER_BPT_COND_DI = "conditional_ovr_disabled.gif";
 	public static final String IMG_DEBUG_OVER_BPT_INST_EN = "installed_ovr.gif";
@@ -119,6 +121,8 @@ public class PDebugImage {
 	public static final ImageDescriptor ID_IMG_DEBUG_BPTMULTISET_DI = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_BPTMULTISET_DI, IMG_DEBUG_BPTMULTISET_DI);
 	public static final ImageDescriptor ID_IMG_DEBUG_BPTNOSET_DI = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_BPTNOSET_DI, IMG_DEBUG_BPTNOSET_DI);
 
+	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_GLOB_EN = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_GLOB_EN, IMG_DEBUG_OVER_BPT_GLOB_EN);
+	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_GLOB_DI = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_GLOB_DI, IMG_DEBUG_OVER_BPT_GLOB_DI);
 	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_COND_EN = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_COND_EN, IMG_DEBUG_OVER_BPT_COND_EN);
 	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_COND_DI = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_COND_DI, IMG_DEBUG_OVER_BPT_COND_DI);
 	public static final ImageDescriptor ID_IMG_DEBUG_OVER_BPT_INST_EN = createImageDescriptor(DEBUGICONURL, IMG_DEBUG_OVER_BPT_INST_EN, IMG_DEBUG_OVER_BPT_INST_EN);

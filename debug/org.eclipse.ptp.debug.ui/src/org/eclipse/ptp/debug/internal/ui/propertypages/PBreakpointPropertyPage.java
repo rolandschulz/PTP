@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.internal.ui.propertypages;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -54,7 +53,7 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
 
 /**
  * @author clement chu
- *
+ * 
  */
 public class PBreakpointPropertyPage extends FieldEditorPreferencePage implements IWorkbenchPropertyPage {
 	class BreakpointIntegerFieldEditor extends IntegerFieldEditor {
@@ -86,14 +85,12 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 					if (getErrorMessage().equals(message)) {
 						super.clearErrorMessage();
 					}
-				}
-				else {
+				} else {
 					super.clearErrorMessage();
 				}
 			}
 		}
 	}
-
 	class BreakpointStringFieldEditor extends StringFieldEditor {
 		public BreakpointStringFieldEditor(String name, String labelText, Composite parent) {
 			super(name, labelText, parent);
@@ -122,14 +119,12 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 					if (getErrorMessage().equals(message)) {
 						super.clearErrorMessage();
 					}
-				}
-				else {
+				} else {
 					super.clearErrorMessage();
 				}
 			}
 		}
 	}
-
 	class LabelFieldEditor extends FieldEditor {
 		private Label titleLabel;
 		private Label valueLabel;
@@ -142,11 +137,9 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 			this.title = title;
 			this.createControl(parent);
 		}
-
 		protected void adjustForNumColumns(int numColumns) {
-			((GridData)basicComposite.getLayoutData()).horizontalSpan = numColumns;
+			((GridData) basicComposite.getLayoutData()).horizontalSpan = numColumns;
 		}
-
 		protected void doFillIntoGrid(Composite parent, int numColumns) {
 			basicComposite = new Composite(parent, SWT.NULL);
 			GridLayout layout = new GridLayout();
@@ -168,11 +161,9 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 			gd = new GridData();
 			valueLabel.setLayoutData(gd);
 		}
-
 		public int getNumberOfControls() {
 			return 1;
 		}
-
 		protected void doLoad() {}
 		protected void doLoadDefault() {}
 		protected void doStore() {}
@@ -183,9 +174,8 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 	private Text ignoreCountTextControl;
 	private BreakpointIntegerFieldEditor ignoreCount;
 	private IAdaptable element;
-
 	private PBreakpointPreferenceStore pBreakpointPreferenceStore;
-	private UIDebugManager uiDebugManager = null;	
+	private UIDebugManager uiDebugManager = null;
 
 	public PBreakpointPropertyPage() {
 		super(GRID);
@@ -193,13 +183,12 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 		uiDebugManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
 		pBreakpointPreferenceStore = new PBreakpointPreferenceStore();
 	}
-
 	protected void createFieldEditors() {
 		IPBreakpoint breakpoint = getBreakpoint();
-		createTypeSpecificLabelFieldEditors(breakpoint);
-		createEnabledField(getFieldEditorParent());
-		IPreferenceStore store = getPreferenceStore();
 		try {
+			createTypeSpecificLabelFieldEditors(breakpoint);
+			createEnabledField(getFieldEditorParent());
+			IPreferenceStore store = getPreferenceStore();
 			String condition = breakpoint.getCondition();
 			if (condition == null) {
 				condition = "";
@@ -208,105 +197,70 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 			createConditionEditor(getFieldEditorParent());
 			store.setValue(PBreakpointPreferenceStore.ENABLED, breakpoint.isEnabled());
 			int ignoreCount = breakpoint.getIgnoreCount();
-			store.setValue(PBreakpointPreferenceStore.IGNORE_COUNT, (ignoreCount >= 0)?ignoreCount:0);
+			store.setValue(PBreakpointPreferenceStore.IGNORE_COUNT, (ignoreCount >= 0) ? ignoreCount : 0);
 			createIgnoreCountEditor(getFieldEditorParent());
-		} catch(CoreException ce) {
-			PTPDebugUIPlugin.log(ce);
+		} catch (CoreException ce) {
+			PTPDebugUIPlugin.errorDialog(getShell(), "Breakpoint Property Page", "", ce);
 		}
 	}
-
-	private void createTypeSpecificLabelFieldEditors(IPBreakpoint breakpoint) {
+	private void createTypeSpecificLabelFieldEditors(IPBreakpoint breakpoint) throws CoreException {
 		if (breakpoint instanceof IPFunctionBreakpoint) {
-			IPFunctionBreakpoint funcBpt = (IPFunctionBreakpoint)breakpoint;
+			IPFunctionBreakpoint funcBpt = (IPFunctionBreakpoint) breakpoint;
 			addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.18"), PropertyPageMessages.getString("PBreakpointPropertyPage.3")));
-			String function = PropertyPageMessages.getString("PBreakpointPropertyPage.1");
-			try {
-				function = funcBpt.getFunction();
-			} catch(CoreException e) {
-			}
+			String function = funcBpt.getFunction();
 			if (function != null) {
 				addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.2"), function));
 			}
-		}
-		else if (breakpoint instanceof IPAddressBreakpoint) {
-			IPAddressBreakpoint addrBpt = (IPAddressBreakpoint)breakpoint;
+		} else if (breakpoint instanceof IPAddressBreakpoint) {
+			IPAddressBreakpoint addrBpt = (IPAddressBreakpoint) breakpoint;
 			addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.18"), PropertyPageMessages.getString("PBreakpointPropertyPage.6")));
-			String address = PropertyPageMessages.getString("PBreakpointPropertyPage.4");
-			try {
-				address = addrBpt.getAddress();
-			} catch(CoreException e) {
-			}
+			String address = addrBpt.getAddress();
 			if (address != null) {
 				addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.5"), address));
 			}
-		}
-		else if (breakpoint instanceof IPWatchpoint) {
-			IPWatchpoint watchpoint = (IPWatchpoint)breakpoint;
+		} else if (breakpoint instanceof IPWatchpoint) {
+			IPWatchpoint watchpoint = (IPWatchpoint) breakpoint;
 			String type = "";
-			String expression = "";
-			try {
-				if (watchpoint.isReadType() && !watchpoint.isWriteType())
-					type = PropertyPageMessages.getString("PBreakpointPropertyPage.11");
-				else if ( !watchpoint.isReadType() && watchpoint.isWriteType() )
-					type = PropertyPageMessages.getString("PBreakpointPropertyPage.12");
-				else
-					type = PropertyPageMessages.getString("PBreakpointPropertyPage.13");
-				expression = watchpoint.getExpression();
-			} catch(CoreException ce) {
-				PTPDebugUIPlugin.log(ce);
-			}
+			if (watchpoint.isReadType() && !watchpoint.isWriteType())
+				type = PropertyPageMessages.getString("PBreakpointPropertyPage.11");
+			else if (!watchpoint.isReadType() && watchpoint.isWriteType())
+				type = PropertyPageMessages.getString("PBreakpointPropertyPage.12");
+			else
+				type = PropertyPageMessages.getString("PBreakpointPropertyPage.13");
+
+			String expression = watchpoint.getExpression();
 			addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.18"), type));
 			String projectName = breakpoint.getMarker().getResource().getLocation().toOSString();
-			if ( projectName != null ) {
+			if (projectName != null) {
 				addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.10"), projectName));
 			}
 			addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.14"), expression));
-		}
-		else if (breakpoint instanceof ILineBreakpoint) {
+		} else if (breakpoint instanceof ILineBreakpoint) {
 			addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.18"), PropertyPageMessages.getString("PBreakpointPropertyPage.8")));
-			String fileName = null;
-			try {
-				fileName = breakpoint.getSourceHandle();
-			} catch(CoreException e) {
-			}
+			String fileName = breakpoint.getSourceHandle();
 			if (fileName != null) {
 				addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.7"), fileName));
 			}
-			ILineBreakpoint lineBpt = (ILineBreakpoint)breakpoint;
-			int lineNumber = 0;
-			try {
-				lineNumber = lineBpt.getLineNumber();
-			} catch (CoreException ce) {
-				PTPDebugUIPlugin.log(ce);
-			}
+			ILineBreakpoint lineBpt = (ILineBreakpoint) breakpoint;
+			int lineNumber = lineBpt.getLineNumber();
 			if (lineNumber > 0) {
 				addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.9"), String.valueOf(lineNumber)));
 			}
 		}
-		
-		//Set
-		String job_id = null;
-		try {
-			job_id = breakpoint.getJobId();
-		} catch(CoreException e) {
-		}
-		
-		String jobName = uiDebugManager.isNoJob(job_id)?"N/A":uiDebugManager.getName(job_id);
+		// Set
+		String job_id = breakpoint.getJobId();
+		String jobName = breakpoint.getJobName();
 		addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.20"), jobName));
-		
-		String set_id = null;
-		try {
-			set_id = breakpoint.getSetId();
-		} catch(CoreException e) {
-		}
+		String set_id = breakpoint.getSetId();
 		addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.21"), set_id));
-		if (!uiDebugManager.isNoJob(job_id)) {
+		//show total number of processes
+		if (!job_id.equals(IPBreakpoint.GLOBAL)) {
 			IElementHandler setManager = uiDebugManager.getElementHandler(job_id);
 			IElementSet elementSet = setManager.getSet(set_id);
 			addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.22"), String.valueOf(elementSet.size())));
 			String[] setNames = elementSet.getMatchSets();
 			StringBuffer buffer = new StringBuffer();
-			for (int i=0; i<setNames.length; i++) {
+			for (int i = 0; i < setNames.length; i++) {
 				buffer.append(setNames[i]);
 				if (i < setNames.length - 1)
 					buffer.append(",");
@@ -315,79 +269,66 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 				addField(createLabelEditor(getFieldEditorParent(), PropertyPageMessages.getString("PBreakpointPropertyPage.23"), buffer.toString()));
 		}
 	}
-
 	protected void createEnabledField(Composite parent) {
 		enabled = new BooleanFieldEditor(PBreakpointPreferenceStore.ENABLED, PropertyPageMessages.getString("PBreakpointPropertyPage.19"), parent);
 		addField(enabled);
 	}
-
 	protected void createConditionEditor(Composite parent) {
 		condition = new BreakpointStringFieldEditor(PBreakpointPreferenceStore.CONDITION, PropertyPageMessages.getString("PBreakpointPropertyPage.15"), parent);
 		condition.setEmptyStringAllowed(true);
 		condition.setErrorMessage(PropertyPageMessages.getString("PBreakpointPropertyPage.16"));
 		addField(condition);
 	}
-
 	protected void createIgnoreCountEditor(Composite parent) {
 		ignoreCount = new BreakpointIntegerFieldEditor(PBreakpointPreferenceStore.IGNORE_COUNT, PropertyPageMessages.getString("PBreakpointPropertyPage.17"), parent);
 		ignoreCount.setValidRange(0, Integer.MAX_VALUE);
 		ignoreCountTextControl = ignoreCount.getTextControl(parent);
 		try {
 			ignoreCountTextControl.setEnabled(getBreakpoint().getIgnoreCount() >= 0);
-		}
-		catch(CoreException ce) {
+		} catch (CoreException ce) {
 			PTPDebugUIPlugin.log(ce);
 		}
 		addField(ignoreCount);
 	}
-
 	protected FieldEditor createLabelEditor(Composite parent, String title, String value) {
 		return new LabelFieldEditor(parent, title, value);
 	}
-
 	protected IPBreakpoint getBreakpoint() {
 		IAdaptable element = getElement();
-		return (element instanceof IPBreakpoint)?(IPBreakpoint)element:null;
+		return (element instanceof IPBreakpoint) ? (IPBreakpoint) element : null;
 	}
-
 	public IAdaptable getElement() {
 		return element;
 	}
-
 	public void setElement(IAdaptable element) {
 		this.element = element;
 	}
-
 	public IPreferenceStore getPreferenceStore() {
 		return pBreakpointPreferenceStore;
 	}
-
 	public boolean performOk() {
 		final List changedProperties = new ArrayList(5);
 		getPreferenceStore().addPropertyChangeListener(new IPropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent event) {
 				changedProperties.add(event.getProperty());
 			}
-		} );
+		});
 		boolean result = super.performOk();
 		setBreakpointProperties(changedProperties);
 		return result;
 	}
-
 	protected void setBreakpointProperties(final List changedProperties) {
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				IPBreakpoint breakpoint = getBreakpoint();
 				Iterator changed = changedProperties.iterator();
-				while(changed.hasNext()) {
-					String property = (String)changed.next();
+				while (changed.hasNext()) {
+					String property = (String) changed.next();
 					if (property.equals(PBreakpointPreferenceStore.ENABLED)) {
 						breakpoint.setEnabled(getPreferenceStore().getBoolean(PBreakpointPreferenceStore.ENABLED));
-					}
-					else if (property.equals(PBreakpointPreferenceStore.IGNORE_COUNT)) {
-						breakpoint.setIgnoreCount( getPreferenceStore().getInt(PBreakpointPreferenceStore.IGNORE_COUNT));
-					}
-					else if (property.equals(PBreakpointPreferenceStore.CONDITION)) {
+					} else if (property.equals(PBreakpointPreferenceStore.IGNORE_COUNT)) {
+						breakpoint.setIgnoreCount(getPreferenceStore().getInt(PBreakpointPreferenceStore.IGNORE_COUNT));
+					} else if (property.equals(PBreakpointPreferenceStore.CONDITION)) {
 						breakpoint.setCondition(getPreferenceStore().getString(PBreakpointPreferenceStore.CONDITION));
 					}
 				}
@@ -395,8 +336,7 @@ public class PBreakpointPropertyPage extends FieldEditorPreferencePage implement
 		};
 		try {
 			ResourcesPlugin.getWorkspace().run(wr, null);
-		}
-		catch(CoreException ce) {
+		} catch (CoreException ce) {
 			PTPDebugUIPlugin.log(ce);
 		}
 	}

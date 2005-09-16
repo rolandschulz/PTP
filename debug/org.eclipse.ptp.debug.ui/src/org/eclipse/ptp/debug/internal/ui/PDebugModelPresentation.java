@@ -224,7 +224,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		String cur_job_id = uiDebugManager.getCurrentJobId();
 
 		// Display nothing if the breakpoint is not in current job
-		if (job_id == null || !cur_job_id.equals(job_id))
+		if (!job_id.equals(IPBreakpoint.GLOBAL) && !job_id.equals(cur_job_id))
 			return new Image(null, 1, 1);
 		
 		String descriptor = null;
@@ -378,7 +378,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		StringBuffer label = new StringBuffer();
 		appendSourceName(breakpoint, label, qualified);
 		appendLineNumber(breakpoint, label);
-		appendStatus(breakpoint, label);
+		appendBreakpointStatus(breakpoint, label);
 		return label.toString();
 	}
 	protected StringBuffer appendSourceName(IPBreakpoint breakpoint, StringBuffer label, boolean qualified) throws CoreException {
@@ -399,12 +399,13 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		}
 		return label;
 	}
-	protected StringBuffer appendStatus(IPBreakpoint breakpoint, StringBuffer label) throws CoreException {
-		String job_id = breakpoint.getJobId();
-		String jobName = uiDebugManager.isNoJob(job_id)?"":"Job: " + uiDebugManager.getName(job_id) + " - ";
+	protected StringBuffer appendBreakpointStatus(IPBreakpoint breakpoint, StringBuffer label) throws CoreException {
+		String jobName = breakpoint.getJobName();
+		if (!jobName.equals(IPBreakpoint.GLOBAL))
+			jobName = "Job: " + jobName; 
 		label.append(" ");
 		label.append("{"); 
-		label.append(jobName);
+		label.append(jobName + " - ");
 		label.append(breakpoint.getSetId());
 		label.append("}");
 		//label.append(MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.details1"), new String[] { jobName, breakpoint.getSetId() }));
@@ -414,8 +415,11 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	private ImageDescriptor[] computeBreakpointOverlays(IPBreakpoint breakpoint) {
 		ImageDescriptor[] overlays = new ImageDescriptor[]{ null, null, null, null };
 		try {
+			if (breakpoint.isGlobal()) {
+				overlays[OverlayImageDescriptor.TOP_LEFT] = (breakpoint.isEnabled()) ? PDebugImage.ID_IMG_DEBUG_OVER_BPT_GLOB_EN : PDebugImage.ID_IMG_DEBUG_OVER_BPT_GLOB_DI;
+			}
 			if (breakpoint.isConditional()) {
-				overlays[OverlayImageDescriptor.TOP_LEFT] = (breakpoint.isEnabled()) ? PDebugImage.ID_IMG_DEBUG_OVER_BPT_COND_EN : PDebugImage.ID_IMG_DEBUG_OVER_BPT_COND_DI;
+				overlays[OverlayImageDescriptor.BOTTOM_LEFT] = (breakpoint.isEnabled()) ? PDebugImage.ID_IMG_DEBUG_OVER_BPT_COND_EN : PDebugImage.ID_IMG_DEBUG_OVER_BPT_COND_DI;
 			}
 			if (breakpoint.isInstalled()) {
 				overlays[OverlayImageDescriptor.BOTTOM_LEFT] = (breakpoint.isEnabled()) ? PDebugImage.ID_IMG_DEBUG_OVER_BPT_INST_EN : PDebugImage.ID_IMG_DEBUG_OVER_BPT_INST_DI;
@@ -424,7 +428,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 				overlays[OverlayImageDescriptor.TOP_RIGHT] = (breakpoint.isEnabled()) ? PDebugImage.ID_IMG_DEBUG_OVER_BPT_ADDR_EN : PDebugImage.ID_IMG_DEBUG_OVER_BPT_ADDR_DI;
 			}
 			if (breakpoint instanceof IPFunctionBreakpoint) {
-				overlays[OverlayImageDescriptor.TOP_RIGHT] = (breakpoint.isEnabled()) ? PDebugImage.ID_IMG_DEBUG_OVER_BPT_FUNC_EN : PDebugImage.ID_IMG_DEBUG_OVER_BPT_FUNC_DI;
+				overlays[OverlayImageDescriptor.BOTTOM_RIGHT] = (breakpoint.isEnabled()) ? PDebugImage.ID_IMG_DEBUG_OVER_BPT_FUNC_EN : PDebugImage.ID_IMG_DEBUG_OVER_BPT_FUNC_DI;
 			}
 		} catch(CoreException e) {
 			PTPDebugUIPlugin.log(e);

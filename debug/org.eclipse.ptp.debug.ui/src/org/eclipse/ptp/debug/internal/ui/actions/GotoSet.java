@@ -48,11 +48,13 @@ public class GotoSet implements IViewActionDelegate {
 			if (view != null) {
 				try {				
 					String jid = breakpoint.getJobId();
-					String sid = breakpoint.getSetId();
+					if (jid.equals(IPBreakpoint.GLOBAL))
+						jid = "";
+					
 					view.changeJob(jid);
 					IElementHandler elementHandler = view.getCurrentElementHandler();
 					if (elementHandler != null) {
-						view.selectSet(elementHandler.getSet(sid));
+						view.selectSet(elementHandler.getSet(breakpoint.getSetId()));
 					}
 					view.update();
 					view.refresh();
@@ -77,7 +79,7 @@ public class GotoSet implements IViewActionDelegate {
 	public void selectionChanged(IAction action, ISelection selection) {
 		if (selection instanceof IStructuredSelection) {
 			this.selection = (IStructuredSelection)selection;
-			action.setEnabled(this.selection.size()==1 && getPBreakpoint() != null);
+			action.setEnabled(this.selection.size()==1 && getPBreakpoint()!=null);
 		}
 	}
 }
