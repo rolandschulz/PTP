@@ -38,17 +38,16 @@ import org.eclipse.ptp.ui.model.internal.ElementHandler;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public class JobManager extends AbstractUIManager implements IProcessListener {
 	protected Map jobList = new HashMap();
-	protected String cur_job_id = "";
+	protected String cur_job_id = EMPTY_ID;
 	protected List jobChangeListeners = new ArrayList();
-	
+
 	public JobManager() {
 		modelManager = PTPCorePlugin.getDefault().getModelManager();
 	}
-	
 	public void shutdown() {
 		jobList.clear();
 		jobList = null;
@@ -57,7 +56,6 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		jobChangeListeners = null;
 		super.shutdown();
 	}
-	
 	public void addJobChangeListener(IJobChangeListener listener) {
 		if (!jobChangeListeners.contains(listener))
 			jobChangeListeners.add(listener);
@@ -67,35 +65,28 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 			jobChangeListeners.remove(listener);
 	}
 	public void fireJobChangeEvent(String cur_jid, String pre_jid) {
-		for (Iterator i=jobChangeListeners.iterator(); i.hasNext();) {
-			((IJobChangeListener)i.next()).changeJobEvent(cur_jid, pre_jid);
+		for (Iterator i = jobChangeListeners.iterator(); i.hasNext();) {
+			((IJobChangeListener) i.next()).changeJobEvent(cur_jid, pre_jid);
 		}
 	}
-	
 	public boolean isNoJob(String jid) {
 		return (jid == null || jid.length() == 0);
 	}
-	
 	public boolean isJobStop(String job_id) {
 		if (isNoJob(job_id))
 			return true;
-		
 		IPJob job = findJobById(job_id);
 		return (job == null || job.isAllStop());
 	}
-
 	public IElementHandler getElementHandler(String id) {
-		return (IElementHandler)jobList.get(id);
+		return (IElementHandler) jobList.get(id);
 	}
-	
 	public int size() {
 		return jobList.size();
 	}
-	
 	public IPJob[] getJobs() {
 		return modelManager.getUniverse().getSortedJobs();
 	}
-	
 	public String getCurrentJobId() {
 		return cur_job_id;
 	}
@@ -103,14 +94,12 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		fireJobChangeEvent(job_id, cur_job_id);
 		cur_job_id = job_id;
 	}
-	
 	public String getCurrentSetId() {
 		return cur_set_id;
 	}
 	public void setCurrentSetId(String set_id) {
 		cur_set_id = set_id;
 	}
-	
 	public String getProcessStatusText(String job_id, String proc_id) {
 		return getProcessStatusText(findProcess(job_id, proc_id));
 	}
@@ -153,59 +142,51 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		}
 		return IPTPUIConstants.PROC_ERROR;
 	}
-	
 	public IPProcess findProcess(String job_id, String id) {
 		IPJob job = findJobById(job_id);
 		if (job == null)
 			return null;
-		
 		return job.findProcess(id);
 	}
 	public IPJob findJob(String job_name) {
 		IPElement element = modelManager.getUniverse().findJobByName(job_name);
 		if (element instanceof IPJob)
-			return (IPJob)element;
-		
+			return (IPJob) element;
 		return null;
 	}
 	public IPJob findJobById(String job_id) {
 		IPElement element = modelManager.getUniverse().findChild(job_id);
 		if (element instanceof IPJob)
-			return (IPJob)element;
-		
+			return (IPJob) element;
 		return null;
 	}
-
 	public String getName(String id) {
 		IPElement element = findJobById(id);
 		if (element == null)
 			return "";
-		
 		return element.getElementName();
 	}
-	
 	public void addJob(IPJob job) {
 		IPProcess[] pProcesses = job.getSortedProcesses();
 		int total_element = pProcesses.length;
 		if (total_element > 0) {
 			IElementHandler elementHandler = new ElementHandler();
 			IElementSet set = elementHandler.getSetRoot();
-			for (int i=0; i<total_element; i++) {
+			for (int i = 0; i < total_element; i++) {
 				addProcessListener(pProcesses[i], job);
 				set.add(new Element(set, pProcesses[i].getIDString(), String.valueOf(pProcesses[i].getTaskId())));
 			}
 			elementHandler.add(set);
 			jobList.put(job.getIDString(), elementHandler);
 		}
-	}	
-		
+	}
 	public String initial() {
-		String last_job_id = "";
+		String last_job_id = EMPTY_ID;
 		IPJob[] jobs = getJobs();
 		if (jobs.length > 0) {
-			//focus on last job
-			last_job_id = jobs[jobs.length-1].getIDString();
-			for (int j=0; j<jobs.length; j++) {
+			// focus on last job
+			last_job_id = jobs[jobs.length - 1].getIDString();
+			for (int j = 0; j < jobs.length; j++) {
 				if (!jobList.containsKey(jobs[j].getIDString()))
 					addJob(jobs[j]);
 			}
@@ -213,7 +194,6 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		}
 		return last_job_id;
 	}
-	
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * Process Listener
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
@@ -222,7 +202,7 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 			process.addProcessListener(this);
 	}
 	public void processEvent(IProcessEvent event) {
-		//only redraw if the current set contain the process
+		// only redraw if the current set contain the process
 		if (isJobStop(event.getJobId()))
 			firePaintListener(new Boolean(true));
 		else {
@@ -241,7 +221,6 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		IElementSet set = elementHandler.getSet(getCurrentSetId());
 		if (set == null)
 			return false;
-		
 		return set.contains(processID);
 	}
 }

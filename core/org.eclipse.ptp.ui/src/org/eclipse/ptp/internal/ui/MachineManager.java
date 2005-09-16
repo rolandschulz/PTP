@@ -40,7 +40,7 @@ import org.eclipse.ptp.ui.model.internal.ElementHandler;
  */
 public class MachineManager extends AbstractUIManager implements INodeListener {
 	private Map machineList = new HashMap();
-	protected String cur_machine_id = "";
+	protected String cur_machine_id = EMPTY_ID;
 
 	public MachineManager() {
 		modelManager = PTPCorePlugin.getDefault().getModelManager();

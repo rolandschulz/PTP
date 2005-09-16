@@ -44,7 +44,7 @@ public class ChangeMachineAction extends GotoDropDownAction {
 	protected void createDropDownMenu(MenuManager dropDownMenuMgr) {
 		if (view instanceof ParallelMachineView) {
 			ParallelMachineView pmView = (ParallelMachineView)view;
-		    	String curMachineID = pmView.getCurrentMachineID();	
+		    	String curMachineID = pmView.getCurrentID();	
 		    	IPMachine[] macs = ((MachineManager)pmView.getUIManager()).getMachines();
 
 		    	for (int i=0; i<macs.length; i++) {
@@ -67,7 +67,7 @@ public class ChangeMachineAction extends GotoDropDownAction {
 			ParallelMachineView pmView = ((ParallelMachineView)view);
 			IPMachine[] macs = ((MachineManager)pmView.getUIManager()).getMachines();
 			for (int i=0; i<macs.length; i++) {
-		    		if (pmView.getCurrentMachineID().equals(macs[i].getIDString())) {
+		    		if (pmView.getCurrentID().equals(macs[i].getIDString())) {
 		    			if (i + 1 < macs.length)
 		    				run(null, macs[i+1].getIDString());
 		    			else
