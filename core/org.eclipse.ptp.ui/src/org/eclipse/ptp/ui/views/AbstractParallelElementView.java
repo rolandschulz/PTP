@@ -95,6 +95,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	// key
 	protected int DEFAULT_CTRL_KEY = SWT.CTRL;
 	protected int A_KEY = '\u0061';
+	//title
+	protected final String EMPTY_TITLE = " "; 
 	protected Listener myDrawingMouseListener = new Listener() {
 		public void handleEvent(Event e) {
 			drawingMouseHandleEvent(e);
@@ -113,15 +115,25 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	public void createPartControl(Composite parent) {
 		initialKey(Platform.getOS());
 		createView(parent);
+		setContentDescription(EMPTY_TITLE);
 		manager.addPaintListener(this);
 	}
 	protected void createView(Composite parent) {
 		createElementView(parent);
 	}
-	protected void changeTitle(final String title, final String setName, final int size) {
+	public IManager getUIManager() {
+		return manager;
+	}
+	public IElementHandler getCurrentElementHandler() {
+		return manager.getElementHandler(getCurrentID());
+	}	
+	protected void changeTitle(String title, String setName, int size) {
+		changeTitle(" " + title + " - " + setName + " [" + size + "]");
+	}
+	protected void changeTitle(final String message) {
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				setContentDescription(" " + title + " - " + setName + " [" + size + "]");
+				setContentDescription(message);
 			}
 		});
 	}
@@ -705,9 +717,11 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		fireChangeEvent(set, cur_element_set);
 		deSelectSet();
 		cur_element_set = set;
-		cur_set_size = cur_element_set.size();
-		cur_element_set.setSelected(true);
-		manager.setCurrentSetId(cur_element_set.getID());
+		if (cur_element_set != null) {
+			cur_set_size = cur_element_set.size();
+			cur_element_set.setSelected(true);
+			manager.setCurrentSetId(cur_element_set.getID());
+		}
 	}
 	public void deSelectSet() {
 		if (cur_element_set != null) {
@@ -717,10 +731,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	}
 	public IElementSet getCurrentSet() {
 		return cur_element_set;
-	}
-	public void updateTitle() {
-		if (cur_element_set != null)
-			changeTitle("", cur_element_set.getID(), cur_set_size);
 	}
 	public void redraw() {
 		getDisplay().asyncExec(new Runnable() {
@@ -747,7 +757,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	protected abstract void initialElement();
 	// set update view details
 	public abstract void update();
-	public abstract IElementHandler getCurrentElementHandler();
+	public abstract void updateTitle();
+	public abstract String getCurrentID();
 	private void elementRedraw() {
 		elementRedraw(0, sc.getOrigin().y, view_width, view_height, false);
 	}
@@ -862,6 +873,4 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			return new Rectangle(start_x, start_y, width, height);
 		}
 	}
-	
-	public abstract IManager getUIManager();
 }

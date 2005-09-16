@@ -28,6 +28,7 @@ import org.eclipse.ptp.internal.ui.actions.ChangeSetAction;
 import org.eclipse.ptp.internal.ui.actions.CreateSetAction;
 import org.eclipse.ptp.internal.ui.actions.DeleteProcessAction;
 import org.eclipse.ptp.internal.ui.actions.DeleteSetAction;
+import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.actions.ParallelAction;
@@ -41,18 +42,19 @@ import org.eclipse.ui.PartInitException;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public abstract class AbstractParallelSetView extends AbstractParallelElementView {
+	// selected element
+	protected String cur_selected_element_id = IManager.EMPTY_ID;
 	// default actions
 	protected ParallelAction createSetAction = null;
 	protected ParallelAction deleteSetAction = null;
 	protected ParallelAction deleteProcessAction = null;
 	protected ParallelAction changeSetAction = null;
-	
 	protected int DEFAULT_DEL_KEY = '\u007f';
 	protected int DEFAULT_BACK_KEY = '\u0008';
-		
+
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		IToolBarManager toolBarMgr = getViewSite().getActionBars().getToolBarManager();
@@ -63,8 +65,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		createContextMenu();
 		initialView();
 	}
-	
-	protected void createToolBarGroups(IToolBarManager toolBarMgr) {	
+	protected void createToolBarGroups(IToolBarManager toolBarMgr) {
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUINAVIGATORGROUP));
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUIACTIONGROUP));
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUISETGROUP));
@@ -77,25 +78,21 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		deleteSetAction = new DeleteSetAction(this);
 		deleteProcessAction = new DeleteProcessAction(this);
 		changeSetAction = new ChangeSetAction(this);
-		
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUISETGROUP, createSetAction);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUISETGROUP, deleteSetAction);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUISETGROUP, deleteProcessAction);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUICHANGESETGROUP, changeSetAction);
 	}
-	
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
 		buildInToolBarActions(toolBarMgr);
 	}
-	
 	protected void createMenuActions(IMenuManager menuMgr) {}
-
 	protected void createContextMenu() {
 		MenuManager menuMgr = new MenuManager("#popupmenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
-				//if right click occur, eclipse will ignore the key up event, so clear keyCode when popup occur.
+				// if right click occur, eclipse will ignore the key up event, so clear keyCode when popup occur.
 				keyCode = SWT.NONE;
 				fillContextMenu(manager);
 			}
@@ -105,7 +102,6 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		// Be sure to register it so that other plug-ins can add actions.
 		getSite().registerContextMenu(menuMgr, this);
 	}
-
 	protected void fillContextMenu(IMenuManager manager) {
 		manager.add(new Separator(IPTPUIConstants.IUIACTIONGROUP));
 		manager.add(new Separator(IPTPUIConstants.IUIEMPTYGROUP));
@@ -113,48 +109,47 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		manager.add(new ChangeSetAction(this));
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-	}	
-	
+	}
 	public void update() {
 		updateAction();
-		updateTitle();		
+		updateTitle();
 	}
-	
+	public void updateTitle() {
+		if (cur_element_set != null)
+			changeTitle(manager.getName(getCurrentID()), cur_element_set.getID(), cur_set_size);
+		else
+			changeTitle(EMPTY_TITLE);
+	}
 	protected void updateAction() {
 		boolean deleteActionEnable = (manager.getCurrentSetId().length() == 0 || manager.getCurrentSetId().equals(IElementHandler.SET_ROOT_ID));
 		deleteSetAction.setEnabled(!deleteActionEnable);
 		deleteProcessAction.setEnabled(!deleteActionEnable);
 		createSetAction.setEnabled(cur_set_size > 0);
-		
 		IElementHandler elementHandler = getCurrentElementHandler();
 		changeSetAction.setEnabled(!(elementHandler == null || elementHandler.size() == 0));
 	}
-	
 	protected void keyDownEvent(int mx, int my, int keyCode) {
 		if (keyCode == DEFAULT_DEL_KEY || keyCode == DEFAULT_BACK_KEY) // delete key
 			removeProcess();
 		else
 			super.keyDownEvent(mx, my, keyCode);
 	}
-
 	public void removeProcess() {
 		if (!manager.getCurrentSetId().equals(IElementHandler.SET_ROOT_ID)) {
 			deleteProcessAction.run(cur_element_set.getSelectedElements());
 		}
 	}
-	
-    protected void openProcessViewer(final IPProcess element) {
-    	if (element == null)
-    		return;
-    	
-    	BusyIndicator.showWhile(getDisplay(), new Runnable() {
-            public void run() {
-                try {
-                    PTPUIPlugin.getActivePage().openEditor(new ProcessEditorInput(element), IPTPUIConstants.VIEW_PARALLELProcess);
-                } catch (PartInitException e) {
-                    PTPUIPlugin.log(e);
-                }
-            }
-        });
-    }	
+	protected void openProcessViewer(final IPProcess element) {
+		if (element == null)
+			return;
+		BusyIndicator.showWhile(getDisplay(), new Runnable() {
+			public void run() {
+				try {
+					PTPUIPlugin.getActivePage().openEditor(new ProcessEditorInput(element), IPTPUIConstants.VIEW_PARALLELProcess);
+				} catch (PartInitException e) {
+					PTPUIPlugin.log(e);
+				}
+			}
+		});
+	}
 }

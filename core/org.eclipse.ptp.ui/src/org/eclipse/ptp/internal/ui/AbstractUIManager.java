@@ -36,7 +36,7 @@ import org.eclipse.ptp.ui.model.internal.ElementSet;
  */
 public abstract class AbstractUIManager implements IManager {
 	protected IModelManager modelManager = null;
-	protected String cur_set_id = "";
+	protected String cur_set_id = EMPTY_ID;
 	protected List pListeners = new ArrayList(0);
 	protected List setListeners = new ArrayList(0);
 	
