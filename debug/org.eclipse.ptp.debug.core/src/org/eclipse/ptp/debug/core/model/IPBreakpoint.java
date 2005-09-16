@@ -28,6 +28,8 @@ import org.eclipse.debug.core.model.IBreakpoint;
  *
  */
 public interface IPBreakpoint extends IBreakpoint {
+	public static final String GLOBAL = "Global";
+	
 	public static final String INSTALL_COUNT = "org.eclipse.ptp.debug.core.installCount";
 	public static final String CONDITION = "org.eclipse.ptp.debug.core.condition";
 	public static final String IGNORE_COUNT = "org.eclipse.ptp.debug.core.ignoreCount";
@@ -41,6 +43,8 @@ public interface IPBreakpoint extends IBreakpoint {
 	public static final String JOB_NAME = "org.eclipse.ptp.debug.core.jobname";
 
 	public void updateMarkerMessage() throws CoreException;
+	
+	public boolean isGlobal() throws CoreException;
 	
 	public String getCurSetId() throws CoreException;
 	public void setCurSetId(String id) throws CoreException;

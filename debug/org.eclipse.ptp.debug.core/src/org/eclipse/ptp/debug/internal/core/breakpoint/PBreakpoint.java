@@ -129,6 +129,9 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 	public void setSetId(String id) throws CoreException {
 		setAttribute(SET_ID, id);
 	}
+	public boolean isGlobal() throws CoreException {
+		return (getJobId().equals(IPBreakpoint.GLOBAL));
+	}
 	public String getJobId() throws CoreException {
 		return ensureMarker().getAttribute(JOB_ID, "");
 	}
@@ -136,7 +139,10 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 		setAttribute(JOB_ID, id);
 	}
 	public String getJobName() throws CoreException {
-		return ensureMarker().getAttribute(JOB_NAME, "");
+		String name = ensureMarker().getAttribute(JOB_NAME, "");
+		if (name.equals(IPBreakpoint.GLOBAL))
+			return name + " ";
+		return "Job: " + name + " ";
 	}
 	public void setJobName(String name) throws CoreException {
 		setAttribute(JOB_NAME, name);

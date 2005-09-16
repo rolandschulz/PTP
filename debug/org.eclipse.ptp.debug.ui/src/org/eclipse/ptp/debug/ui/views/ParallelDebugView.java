@@ -37,7 +37,6 @@ import org.eclipse.ptp.debug.ui.events.IResumedDebugEvent;
 import org.eclipse.ptp.debug.ui.events.ISuspendedDebugEvent;
 import org.eclipse.ptp.debug.ui.events.ITerminatedDebugEvent;
 import org.eclipse.ptp.debug.ui.listeners.IDebugActionUpdateListener;
-import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
@@ -69,9 +68,6 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	public void dispose() {
 		((UIDebugManager) manager).removeDebugEventListener(this);
 		super.dispose();
-	}
-	public IManager getUIManager() {
-		return manager;
 	}
 	public static ParallelDebugView getDebugViewInstance() {
 		if (instance == null)
@@ -110,18 +106,20 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		super.buildInToolBarActions(toolBarMgr);
 	}
 	protected void doubleClickAction(int element_num) {
-		IElement element = cur_element_set.get(element_num);
-		if (element != null)
-			registerElement(element);
+		if (cur_element_set != null) {
+			IElement element = cur_element_set.get(element_num);
+			if (element != null)
+				registerElement(element);
+		}
 	}
 	protected String getToolTipText(int element_num) {
 		IElementHandler setManager = getCurrentElementHandler();
-		if (setManager == null)
+		if (setManager == null || cur_element_set == null)
 			return "Unknown element";
 		IElement element = cur_element_set.get(element_num);
 		if (element == null)
 			return "Unknown element";
-		IPProcess proc = ((UIDebugManager) manager).findProcess(getCurrentJobID(), element.getID());
+		IPProcess proc = ((UIDebugManager) manager).findProcess(getCurrentID(), element.getID());
 		if (proc == null)
 			return "Unknow process";
 		StringBuffer buffer = new StringBuffer();
@@ -168,22 +166,10 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		System.out.println("------------ debug start");
 		refresh();
 	}
-	public void stop() {
-		refresh();
-	}
-	public void suspend() {
-		refresh();
-	}
-	public void exit() {
-		refresh();
-	}
-	public void error() {
-		refresh();
-	}
 	// Update button
 	protected void updateAction() {
 		super.updateAction();
-		boolean isDebugging = ((UIDebugManager) manager).isDebugging(getCurrentJobID());
+		boolean isDebugging = ((UIDebugManager) manager).isDebugging(getCurrentID());
 		registerAction.setEnabled(isDebugging);
 		unregisterAction.setEnabled(isDebugging);
 		IElementHandler elementHandler = getCurrentElementHandler();
@@ -264,7 +250,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	public void handleDebugActionEvent(IDebugActionEvent event) {
 		String job_id = event.getJobId();
 		// only take action with current job
-		if (!job_id.equals(getCurrentJobID())) {
+		if (!job_id.equals(getCurrentID())) {
 			return;
 		}
 		BitList tasks = (BitList) event.getSource();

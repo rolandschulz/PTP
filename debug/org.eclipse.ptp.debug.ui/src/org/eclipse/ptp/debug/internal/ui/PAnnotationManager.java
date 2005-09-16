@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -50,6 +49,7 @@ import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.listeners.IRegListener;
+import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.listeners.IJobChangeListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -574,7 +574,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	 * Job Change Listener
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public synchronized void changeJobEvent(String cur_job_id, String pre_job_id) {
-		if (pre_job_id != null) {
+		if (pre_job_id != null && !pre_job_id.equals(IManager.EMPTY_ID)) {
 			try {
 				uiDebugManager.removeAllRegisterElements(pre_job_id);
 			} catch (CoreException e) {

@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.internal.ui;
 
 import java.util.Arrays;
-
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -28,71 +27,62 @@ import org.eclipse.swt.graphics.Point;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public class OverlayImageDescriptor extends CompositeImageDescriptor {
 	private static final int DEFAULT_WIDTH = 16;
 	private static final int DEFAULT_HEIGHT = 16;
-
 	public static final int TOP_LEFT = 0;
 	public static final int TOP_RIGHT = 1;
 	public static final int BOTTOM_LEFT = 2;
 	public static final int BOTTOM_RIGHT = 3;
-
 	// the base image
 	private Image base;
-
 	// the overlay images
 	private ImageDescriptor[] overlays;
-
 	// the size
 	private Point size;
 
 	public OverlayImageDescriptor(Image base, ImageDescriptor[] overlays) {
 		this(base, overlays, new Point(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 	}
-
 	public OverlayImageDescriptor(Image base, ImageDescriptor[] overlays, Point size) {
 		setBase(base);
 		setOverlays(overlays);
 		setSize(size);
 	}
-
 	protected void drawOverlays(ImageDescriptor[] overlays) {
 		Point size = getSize();
-
-		for (int i=0; i<overlays.length; i++) {
+		for (int i = 0; i < overlays.length; i++) {
 			ImageDescriptor overlay = overlays[i];
 			if (overlay == null)
 				continue;
 			ImageData overlayData = overlay.getImageData();
-			//Use the missing descriptor if it is not there.
+			// Use the missing descriptor if it is not there.
 			if (overlayData == null)
 				overlayData = ImageDescriptor.getMissingImageDescriptor().getImageData();
 			switch (i) {
-				case TOP_LEFT:
-					drawImage(overlayData, 0, 0);
-					break;
-				case TOP_RIGHT:
-					drawImage(overlayData, size.x - overlayData.width, 0);
-					break;
-				case BOTTOM_LEFT:
-					drawImage(overlayData, 0, size.y - overlayData.height);
-					break;
-				case BOTTOM_RIGHT:
-					drawImage(overlayData, size.x - overlayData.width, size.y - overlayData.height);
-					break;
+			case TOP_LEFT:
+				drawImage(overlayData, 0, 0);
+				break;
+			case TOP_RIGHT:
+				drawImage(overlayData, size.x - overlayData.width, 0);
+				break;
+			case BOTTOM_LEFT:
+				drawImage(overlayData, 0, size.y - overlayData.height);
+				break;
+			case BOTTOM_RIGHT:
+				drawImage(overlayData, size.x - overlayData.width, size.y - overlayData.height);
+				break;
 			}
 		}
 	}
-
-	public boolean equals( Object o ) {
-		if ( !(o instanceof OverlayImageDescriptor) )
+	public boolean equals(Object o) {
+		if (!(o instanceof OverlayImageDescriptor))
 			return false;
-		OverlayImageDescriptor other = (OverlayImageDescriptor)o;
-		return getBase().equals( other.getBase() ) && Arrays.equals( getOverlays(), other.getOverlays() );
+		OverlayImageDescriptor other = (OverlayImageDescriptor) o;
+		return getBase().equals(other.getBase()) && Arrays.equals(getOverlays(), other.getOverlays());
 	}
-
 	public int hashCode() {
 		int code = getBase().hashCode();
 		for (int i = 0; i < getOverlays().length; i++) {
@@ -101,32 +91,25 @@ public class OverlayImageDescriptor extends CompositeImageDescriptor {
 		}
 		return code;
 	}
-
 	protected void drawCompositeImage(int width, int height) {
 		drawImage(getBase().getImageData(), 0, 0);
 		drawOverlays(getOverlays());
 	}
-
 	protected Point getSize() {
 		return size;
 	}
-
 	private Image getBase() {
 		return base;
 	}
-
 	private void setBase(Image base) {
 		this.base = base;
 	}
-
 	private ImageDescriptor[] getOverlays() {
 		return this.overlays;
 	}
-
 	private void setOverlays(ImageDescriptor[] overlays) {
 		this.overlays = overlays;
 	}
-
 	private void setSize(Point size) {
 		this.size = size;
 	}
