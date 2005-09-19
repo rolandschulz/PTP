@@ -99,6 +99,7 @@ public class OMPIJNIBroker {
         				"it resides.  In the 'Run...' set the VM Args to something like "+
         				"-Djava.library.path=[home directory]/[eclipse workspace]/org.eclipse.ptp.core/ompi";
         		System.err.println(str);
+        		System.out.println(e);
         		CoreUtils.showErrorDialog("Dynamic Library Load Failed", str, null);
         		successful_load = false;
         }
