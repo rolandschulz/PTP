@@ -181,13 +181,13 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		if (isJobStop(getCurrentJobId()))
 			return;
 		IPCDISession session = (IPCDISession) getDebugSession(getCurrentJobId());
-		if (session == null)
-			return;
-		for (int i = 0; i < elements.length; i++) {
-			// only unregister some registered elements
-			if (elements[i].isRegistered()) {
-				int taskId = convertToInt(elements[i].getName());
-				unregisterProcess(session, taskId, true);
+		if (session != null) {
+			for (int i = 0; i < elements.length; i++) {
+				// only unregister some registered elements
+				if (elements[i].isRegistered()) {
+					int taskId = convertToInt(elements[i].getName());
+					unregisterProcess(session, taskId, true);
+				}
 			}
 		}
 	}
@@ -195,13 +195,13 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		if (isJobStop(getCurrentJobId()))
 			return;
 		IPCDISession session = (IPCDISession) getDebugSession(getCurrentJobId());
-		if (session == null)
-			return;
-		for (int i = 0; i < elements.length; i++) {
-			// only register some unregistered elements
-			if (!elements[i].isRegistered()) {
-				int taskId = convertToInt(elements[i].getName());
-				registerProcess(session, taskId, true);
+		if (session != null) {
+			for (int i = 0; i < elements.length; i++) {
+				// only register some unregistered elements
+				if (!elements[i].isRegistered()) {
+					int taskId = convertToInt(elements[i].getName());
+					registerProcess(session, taskId, true);
+				}
 			}
 		}
 	}
@@ -308,7 +308,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}
 		set.setData(BITSET_KEY, null);
 		IPCDISession session = (IPCDISession) getDebugSession(getCurrentJobId());
-		if (session == null) {
+		if (session != null) {
 			session.getModelManager().delProcessSet(set.getID());
 		}
 	}
@@ -319,8 +319,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}
 		set.setData(BITSET_KEY, tasks);
 		IPCDISession session = (IPCDISession) getDebugSession(getCurrentJobId());
-		if (session == null) {
-			System.out.println("-----------SET ID: " + set.getID());
+		if (session != null) {
 			session.getModelManager().newProcessSet(set.getID(), tasks);
 		}
 	}
@@ -415,6 +414,13 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			} else if (event instanceof EndSteppingRangeEvent) {
 				fireSuspendEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof InferiorResumedEvent) {
+				/*
+				try {
+					InferiorResumedEvent resumeEvent = (InferiorResumedEvent) event;
+				} catch (CoreException e) {
+					PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
+				}
+				*/
 				fireResumeEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof InferiorExitedEvent || event instanceof ErrorEvent) {
 				fireTerminatedEvent(job, event.getAllProcesses().toBitList());
@@ -461,6 +467,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			return;
+		session.resume(set_id);
 	}
 	public void suspend() {
 		suspend(getCurrentJobId(), getCurrentSetId());
@@ -477,6 +484,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			return;
+		session.terminate(set_id);
 	}
 	public void stepInto() {
 		stepInto(getCurrentJobId(), getCurrentSetId());
@@ -485,6 +493,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			return;
+		session.stepInto(set_id);
 	}
 	public void stepOver() {
 		stepOver(getCurrentJobId(), getCurrentSetId());
@@ -493,6 +502,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			return;
+		session.stepOver(set_id);
 	}
 	public void stepReturn() {
 		stepReturn(getCurrentJobId(), getCurrentSetId());
@@ -501,5 +511,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			return;
+		session.stepFinish(set_id);
 	}
 }
