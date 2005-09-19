@@ -172,8 +172,8 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 		});
 		nodeText.addModifyListener(listener);
 		
+		setupMachineRegion();
 		mcombo.select(0);
-		//setupMachineRegion();
 	}
 	
 	protected void setupMachineRegion()
