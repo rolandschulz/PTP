@@ -14,38 +14,36 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "procset.h"
+extern int	svr_dispatch(char *, char **);
 
-int
+/*
+ * Receive and process a command from the client. Return the reponse to the client.
+ * 
+ * @return	0 for normal command dispatch
+ * 			1 for server shutdown
+ * 			-1 for other errors
+ */
+static int
 do_commands(int client_task_id, int my_task_id)
 {
-	int			count;
+	int			len;
 	int			ret = 0;
 	char *		cmd_buf;
 	char *		reply_buf;
 	MPI_Status	stat;
 
-	printf("[%d] waiting for client\n", my_task_id);
-
 	MPI_Probe(client_task_id, 0, MPI_COMM_WORLD, &stat);
-	MPI_Get_count(&stat, MPI_CHAR, &count);
+	MPI_Get_count(&stat, MPI_CHAR, &len);
 	
-	printf("[%d] message size %d available\n", my_task_id, count);
+	cmd_buf = (char *)malloc(len + 1);
+	MPI_Recv(cmd_buf, len, MPI_CHAR, client_task_id, 0, MPI_COMM_WORLD, &stat);
+	cmd_buf[len] = '\0';
+
+printf("[%d] server received msg <%s>\n", my_task_id, cmd_buf);
 	
-	cmd_buf = (char *)malloc(count);
-	
-	MPI_Recv(cmd_buf, count, MPI_CHAR, client_task_id, 0, MPI_COMM_WORLD, &stat);
-	
-	printf("[%d] received message \"%s\"\n", my_task_id, cmd_buf);
-	
-	if (strcmp(cmd_buf, "exit") == 0)
-		ret = 1;
+	ret = svr_dispatch(cmd_buf, &reply_buf);
 	
 	free(cmd_buf);
-	
-	printf("[%d] sendind reply\n", my_task_id);
-	
-	asprintf(&reply_buf, "ok");
 	
 	MPI_Send(reply_buf, strlen(reply_buf), MPI_CHAR, client_task_id, 0, MPI_COMM_WORLD);
 	
@@ -54,6 +52,29 @@ do_commands(int client_task_id, int my_task_id)
 	return ret;
 }
 
+/*
+ * Debug server implementation
+ * 
+ * NOTE: currently the debug server does not support multiple simulutaneous command execution. That is, it
+ * will only process one command at at time, and will not accept another command until a reply
+ * has been sent. The client may send multiple commands, but it is the underlying transport
+ * that is providing the command buffering. 
+ * 
+ * This approach should be sufficient for all debugging tasks if we assume that the debugger operates
+ * in one of two states: ACCEPTING_COMMANDS and PROCESSING_COMMAND and will only accept additional commands
+ * when it is in the ACCEPTING_COMMANDS state. E.g.
+ * 
+ * Command		Debugger State		GDB State
+ * 
+ * --SLB-->		ACCEPTING_COMMANDS	SUSPENDED
+ * 				PROCESSING_COMMAND	SUSPENDED
+ * <--OK---		ACCEPTING_COMMANDS	SUSPENDED
+ * 
+ * --GOP-->		ACCEPTING_COMMANDS	SUSPENDED
+ * 				PROCESSING_COMMAND	RUNNING
+ * 				PROCESSING_COMMAND	SUSPENDED
+ * <--OK---		ACCEPTING_COMMANDS	SUSPENDED
+ */
 void
 server(int client_task_id, int my_task_id)
 {
