@@ -82,13 +82,14 @@ public class ParallelDebugger extends AbstractDebugger {
 
 	static {
         try { 
-        		System.loadLibrary("libdbgjni");
+        		System.loadLibrary("ptp_dbg_jni");
         } catch(UnsatisfiedLinkError e) {
-        		String str = "Unable to load library 'libdbgjni'.  Make sure "+
+        		String str = "Unable to load library 'ptp_dbg_jni'.  Make sure "+
         				"the library exists and the VM arguments point to the directory where "+
         				"it resides.  In the 'Run...' set the VM Args to something like "+
         				"-Djava.library.path=[home directory]/[eclipse workspace]/org.eclipse.ptp.core/ompi";
         		System.err.println(str);
+        		System.err.println(e.getMessage());
         		CoreUtils.showErrorDialog("Dynamic Library Load Failed", str, null);
         		failed_load = 1;
         }
@@ -99,7 +100,7 @@ public class ParallelDebugger extends AbstractDebugger {
 			System.err.println("Unable to startup debugger because of a failed library load.");
 			return;
 		}
-		eventThread = new DebugEventThread(this);
+		//eventThread = new DebugEventThread(this);
 	}
 	
 	protected void stopDebugger() {
@@ -129,9 +130,9 @@ public class ParallelDebugger extends AbstractDebugger {
 	}
 	
 	public void go(IPCDIDebugProcessSet procs) throws PCDIException {
-		//int rc = DbgGo(procs.toBitArray());
-		//if (rc != 0)
-		//	throw new PCDIException(toPCDIException(rc), "go");
+		int rc = DbgGo(null);
+		if (rc != 0)
+			throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "go");
 	}
 
 	public void kill(IPCDIDebugProcessSet procs) throws PCDIException {
