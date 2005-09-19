@@ -69,6 +69,11 @@ public class PSession implements IPSession, IBreakpointsListener {
 	
 	private void setBreakpoint( IPBreakpoint breakpoint ) {
 		try {
+			if (!breakpoint.getJobId().equals(pLaunch.getPJob().getIDString()) &&
+				!breakpoint.getJobId().equals("Global")) {
+				return;
+			}
+			
 			if ( breakpoint instanceof IPLineBreakpoint )
 				setLineBreakpoint( (IPLineBreakpoint)breakpoint );
 /*			else if ( breakpoint instanceof IPFunctionBreakpoint )
