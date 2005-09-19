@@ -35,6 +35,9 @@ main(int argc, char *argv[])
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	
+	// MPI_Comm_create_errhandler(handle_fatal_errors, &err_handler);
+	// MPI_Comm_set_errhandler(MPI_COMM_WORLD, err_handler);
+	
 	/* Create multicast communicator */
 	
 	if (rank == size-1) {
