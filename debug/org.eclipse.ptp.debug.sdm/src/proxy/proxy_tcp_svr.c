@@ -33,15 +33,20 @@
 #include <unistd.h>
 
 #include "compat.h"
+#include "dbg.h"
+#include "dbg_client.h"
 #include "args.h"
 #include "session.h"
 #include "proxy.h"
 #include "proxy_tcp.h"
+#include "procset.h"
 
-static int proxy_tcp_svr_create(void **, void (*)(void));
-static int proxy_tcp_svr_progress(void *);
-static void proxy_tcp_svr_dispatch(void *);
-static void proxy_tcp_svr_finish(void *);
+static int	proxy_tcp_svr_create(void **, void (*)(void));
+static int	proxy_tcp_svr_progress(void *);
+static void	proxy_tcp_svr_finish(void *);
+
+static int	proxy_tcp_svr_dispatch(int, void *);
+static int	proxy_tcp_svr_accept(int, void *);
 
 proxy_svr_funcs proxy_tcp_svr_funcs =
 {
@@ -59,23 +64,33 @@ struct proxy_tcp_svr_func {
 typedef struct proxy_tcp_svr_func	proxy_tcp_svr_func;
 
 static int proxy_tcp_svr_setlinebreakpoint(char **, char **);
+static int proxy_tcp_svr_setfuncbreakpoint(char **, char **);
+static int proxy_tcp_svr_deletebreakpoints(char **, char **);
+static int proxy_tcp_svr_go(char **, char **);
+static int proxy_tcp_svr_step(char **, char **);
+static int proxy_tcp_svr_liststackframes(char **, char **);
+static int proxy_tcp_svr_setcurrentstackframe(char **, char **);
+static int proxy_tcp_svr_evaluateexpression(char **, char **);
+static int proxy_tcp_svr_listlocalvariables(char **, char **);
+static int proxy_tcp_svr_listarguments(char **, char **);
+static int proxy_tcp_svr_listglobalvariables(char **, char **);
 static int proxy_tcp_svr_quit(char **, char **);
 
 static proxy_tcp_svr_func proxy_tcp_svr_func_tab[] =
 {
-	{"SETLINEBREAK",	proxy_tcp_svr_setlinebreakpoint},
-	{NULL,			NULL},
-	{NULL,			NULL},
-	{NULL,			NULL},
-	{NULL,			NULL},
-	{NULL,			NULL},
-	{NULL,			NULL},
-	{NULL,			NULL},
-	{NULL,			NULL},
-	{NULL,			NULL},
-	{NULL,			NULL},
-	{"QUIT",			proxy_tcp_svr_quit},
-	{NULL,			NULL},
+	{"SLB",	proxy_tcp_svr_setlinebreakpoint},
+	{"SFB",	proxy_tcp_svr_setfuncbreakpoint},
+	{"DBS",	proxy_tcp_svr_deletebreakpoints},
+	{"GOP",	proxy_tcp_svr_go},
+	{"STP",	proxy_tcp_svr_step},
+	{"LSF",	proxy_tcp_svr_liststackframes},
+	{"SCS",	proxy_tcp_svr_setcurrentstackframe},
+	{"EEX",	proxy_tcp_svr_evaluateexpression},
+	{"LLV",	proxy_tcp_svr_listlocalvariables},
+	{"LAR",	proxy_tcp_svr_listarguments},
+	{"LGV",	proxy_tcp_svr_listglobalvariables},
+	{"QUI",	proxy_tcp_svr_quit},
+	{NULL,	NULL},
 };
 
 static int proxy_tcp_svr_shutdown;
@@ -134,12 +149,51 @@ proxy_tcp_svr_create(void **data, void (*shutdown)(void))
 	conn->port = (int) ntohs(sname.sin_port);
 	*data = (void *)conn;
 	
+	DbgClntRegisterFileHandler(sd, READ_FILE_HANDLER, proxy_tcp_svr_accept, (void *)conn);
+	
 	proxy_tcp_svr_shutdown = 0;
 	proxy_tcp_svr_shutdown_callback = shutdown;
 	
 	return 0;
 }
 
+/**
+ * Accept a new proxy connection. Register dispatch routine.
+ */
+static int
+proxy_tcp_svr_accept(int fd, void *data)
+{
+	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
+	socklen_t		fromlen;
+	SOCKET			ns;
+	struct sockaddr	addr;
+	
+	fromlen = sizeof(addr);
+	ns = accept(fd, &addr, &fromlen);
+	if (ns < 0) {
+		perror("accept");
+		return 0;
+	}
+	
+	/*
+	 * Only allow one connection at a time.
+	 */
+	if (conn->sock != INVALID_SOCKET) {
+		CLOSE_SOCKET(ns); // reject
+		return 0;
+	}
+	
+	conn->sock = ns;
+	
+	DbgClntRegisterFileHandler(ns, READ_FILE_HANDLER, proxy_tcp_svr_dispatch, (void *)conn);
+	
+	return 0;
+	
+}
+
+/**
+ * Cleanup prior to server exit.
+ */
 static void 
 proxy_tcp_svr_finish(void *data)
 {
@@ -149,92 +203,28 @@ proxy_tcp_svr_finish(void *data)
 
 /**
  * Check for incoming messages or connection attempts.
- * 
- * @return
- * 	-1:	error
- * 	 0: no action
- * 	 1: message ready for dispatch
  */
 static int
 proxy_tcp_svr_progress(void *data)
 {
 	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-	fd_set			fds;
-	int				res;
-	int				nfds = 0;
-	socklen_t		fromlen;
-	SOCKET			ns;
-	struct sockaddr	addr;
-	struct timeval	tv;
 
 	if (proxy_tcp_svr_shutdown) {
 		if (conn->sock != INVALID_SOCKET) {
+			DbgClntUnregisterFileHandler(conn->sock);
 			CLOSE_SOCKET(conn->sock);
 			conn->sock = INVALID_SOCKET;
 		}
 		if (conn->svr_sock != INVALID_SOCKET) {
+			DbgClntUnregisterFileHandler(conn->svr_sock);
 			CLOSE_SOCKET(conn->svr_sock);
 			conn->svr_sock = INVALID_SOCKET;
 		}
 		proxy_tcp_svr_shutdown_callback();
 		return 0;
 	}
-		
-	FD_ZERO(&fds);
-	if (conn->sock != INVALID_SOCKET) {
-		FD_SET(conn->sock, &fds);
-		nfds = conn->sock;
-	}
 	
-	FD_SET(conn->svr_sock, &fds);
-	tv = TCPTIMEOUT;
-	
-	for ( ;; ) {
-		res = select(MAX(nfds, conn->svr_sock)+1, &fds, NULL, NULL, &tv);
-	
-		switch (res) {
-		case INVALID_SOCKET:
-			if ( errno == EINTR )
-				continue;
-		
-			perror("select");
-			return -1;
-		
-		case 0:
-			return 0;
-		
-		default:
-			break;
-		}
-	
-		break;
-	}
-	
-	if (conn->sock != INVALID_SOCKET && FD_ISSET(conn->sock, &fds))
-		return 1;
-		
-	if (FD_ISSET(conn->svr_sock, &fds)) {
-		fromlen = sizeof(addr);
-		ns = accept(conn->svr_sock, &addr, &fromlen);
-		if (ns < 0) {
-			perror("accept");
-			return 0;
-		}
-		
-		/*
-		 * Only allow one connection at a time.
-		 */
-		if (conn->sock != INVALID_SOCKET) {
-			CLOSE_SOCKET(ns); // reject
-			return 0;
-		}
-		
-		conn->sock = ns;
-		return 0;
-	}
-		
-	fprintf(stderr, "select on bad socket\n");
-	return -1;
+	return DbgClntProgress();
 }
 
 /*
@@ -244,8 +234,8 @@ proxy_tcp_svr_progress(void *data)
  * assume the client has gone away. Errors from server commands are just reported back to the
  * client.
  */
-static void
-proxy_tcp_svr_dispatch(void *data)
+static int
+proxy_tcp_svr_dispatch(int fd, void *data)
 {
 	int					i;
 	int					n;
@@ -258,7 +248,7 @@ proxy_tcp_svr_dispatch(void *data)
 	
 	n = proxy_tcp_recv_msg(conn, &msg);
 	if (n <= 0)
-		return;
+		return n;
 	
 	args = Str2Args(msg);
 	
@@ -267,7 +257,7 @@ proxy_tcp_svr_dispatch(void *data)
 	for (i = 0; i < sizeof(proxy_tcp_svr_func_tab) / sizeof(proxy_tcp_svr_func); i++) {
 		sf = &proxy_tcp_svr_func_tab[i];
 		if (sf->cmd != NULL && strcmp(args[0], sf->cmd) == 0) {
-			res = sf->func(args, &response);
+			res = sf->func(args, NULL);
 			break;
 		}
 	}
@@ -275,34 +265,113 @@ proxy_tcp_svr_dispatch(void *data)
 	FreeArgs(args);
 	free(msg);
 	
-	if (res != 0) {
-		asprintf(&response, "-1 some nasty error ocurred");
-	}
-	
+	if (res != DBGRES_OK)
+		asprintf(&response, "%d %d \"%s\"", res, DbgClntGetError(), DbgClntGetErrorStr());
+	else
+		asprintf(&response, "%d", res);
+			
 	(void)proxy_tcp_send_msg(conn, response, strlen(response));
+	
 	free(response);
+	
+	return 0;
 }
 
+/*
+ * SERVER FUNCTIONS
+ */
 static int 
 proxy_tcp_svr_setlinebreakpoint(char **args, char **response)
 {
-	char *		procs;
+	int			res;
 	char *		file;
 	int			line;
+	procset *	procs;
 	
-	procs = args[1];
 	file = args[2];
 	line = atoi(args[3]);
 	
-	asprintf(response, "0 setting line breakpoint %s %s %d", procs, file, line);
+	procs = str_to_procset(args[1]);
+	if (procs == NULL) {
+		DbgClntSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
 	
-	return 0;
+	res = DbgClntSetLineBreakpoint(procs, file, line);
+	
+	procset_free(procs);
+	
+	return res;
 }
 
 static int 
+proxy_tcp_svr_setfuncbreakpoint(char **args, char **response)
+{
+	return DBGRES_OK;
+}
+
+static int 
+proxy_tcp_svr_deletebreakpoints(char **args, char **response)
+{
+	return DBGRES_OK;
+}
+
+static int 
+proxy_tcp_svr_go(char **args, char **response)
+{
+	return DBGRES_OK;
+}
+
+static int 
+proxy_tcp_svr_step(char **args, char **response)
+{
+	return DBGRES_OK;
+}
+
+static int 
+proxy_tcp_svr_liststackframes(char **args, char **response)
+{
+	return DBGRES_OK;
+}
+
+static int 
+proxy_tcp_svr_setcurrentstackframe(char **args, char **response)
+{
+	return DBGRES_OK;
+}
+
+static int 
+proxy_tcp_svr_evaluateexpression(char **args, char **response)
+{
+	return DBGRES_OK;
+}
+
+static int 
+proxy_tcp_svr_listlocalvariables(char **args, char **response)
+{
+	return DBGRES_OK;
+}
+
+static int 
+proxy_tcp_svr_listarguments(char **args, char **response)
+{
+	return DBGRES_OK;
+}
+
+static int 
+proxy_tcp_svr_listglobalvariables(char **args, char **response)
+{
+	return DBGRES_OK;
+}
+
+static int
 proxy_tcp_svr_quit(char **args, char **response)
 {
-	asprintf(response, "0 quitting");
+	int	res;
+	
+	res = DbgClntQuit();
+	
 	proxy_tcp_svr_shutdown++;
-	return 0;
+	
+	return res;
 }
