@@ -33,84 +33,242 @@
 #include <mpi.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
+#include "dbg.h"
+#include "dbg_client.h"
 #include "procset.h"
+#include "list.h"
+
+/*
+ * A request represents an asynchronous send/receive transaction between the client
+ * and all servers. completed() is called once all replys have been received.
+ */
+struct active_request {
+	procset *		procs;
+	void				(*completed)(procset *);
+	//Hash *			replys;
+};
+typedef struct active_request	active_request;
+
+static procset *		sending_procs;
+static procset *		receiving_procs;
+static List *		active_requests;
+static char **		cmd_bufs;
+static MPI_Request *	cmd_requests;
+int *			pids;
+MPI_Status *		stats;
 
 int num_servers;
 int my_task_id;
-char *cmd_buf;
-char **reply_bufs;
-MPI_Request *cmd_requests;
-MPI_Request *reply_requests;
-MPI_Status *msg_stats;
 
-void
-send_cmd(char *str)
+/*
+ * Send a command to the servers specified in procset. 
+ * 
+ * It is permissible to have multiple outstanding commands, provided
+ * the processes each command applies to are disjoint sets.
+ */
+int
+send_command(procset *procs, char *str, void (*completed_callback)(procset *))
 {
-	int i;
-	int res;
-	strcpy(cmd_buf, str);
-#if 1
-	printf("[%d] sending message \"%s\"\n", my_task_id, cmd_buf);
-	res = MPI_Startall(num_servers, cmd_requests);
-	printf("[%d] send waitall (res = %d)\n", my_task_id, res);
-	res = MPI_Waitall(num_servers, cmd_requests, msg_stats);
-	printf("[%d] end waitall (res = %d)\n", my_task_id, res);
-#else
-	for (i = 0; i < num_servers; i++) {
-		printf("[%d] sending message \"%s\" to [%d]\n", my_task_id, cmd_buf, i);
-		MPI_Send(cmd_buf, CMD_BUF_SIZE, MPI_CHAR, i, 0, MPI_COMM_WORLD);
+	int				pid;
+	int				cmd_len;
+	procset *		p;
+	active_request *	r;
+	
+	/*
+	 * Check if any processes already have active requests
+	 */
+	p = procset_and(sending_procs, procs);
+	procset_andeq(p, receiving_procs);
+	if (!procset_isempty(p)) {
+		DbgClntSetError(DBGERR_INPROGRESS, NULL);
+		return -1;
 	}
-#endif
+	
+	procset_free(p);
+	/*
+	 * Update sending processes
+	 */	
+	procset_oreq(sending_procs, procs);
+
+	/*
+	 * Create a new request and add it too the active list
+	 */
+	r = (active_request *)malloc(sizeof(active_request));
+	r->procs = procset_copy(procs);
+	r->completed = completed_callback;
+	//r->replys = NewHash(procset_size(procs));
+	
+	AddToList(active_requests, (void *)r);
+
+	/*
+	 * Now post commands to the servers
+	 */
+	for (pid = 0; pid < num_servers; pid++) {
+		if (procset_test(procs, pid)) {
+			/*
+			 * MPI spec does not allow read access to a send buffer while send is in progress
+			 * so we must make a copy for each send.
+			 */
+			cmd_bufs[pid] = strdup(str);
+			cmd_len = strlen(str);
+			
+			printf("[%d] sending message \"%s\" to [%d]\n", my_task_id, cmd_bufs[pid], pid);
+			MPI_Isend(cmd_bufs[pid], cmd_len, MPI_CHAR, pid, 0, MPI_COMM_WORLD, &cmd_requests[pid]); // TODO: handle fatal errors
+		}
+	}
+
+	return 0;
+}
+
+/*
+ * Check for any replies from servers. If any are received, and these complete a send request,
+ * then processes the reply.
+ */
+void
+progress_commands(void)
+{
+	int				i;
+	int				count;
+	int				avail;
+	int				recv_pid;
+	int 				completed;
+	char *			reply_buf;
+	active_request *	r;
+	MPI_Status		stat;
+
+	/*
+	 * Check for completed sends
+	 */
+	printf("sending procs is %s\n", procset_to_str(sending_procs));
+	count = procset_size(sending_procs);
+	if (count > 0) {
+printf("count = %d\n", count);
+		if (MPI_Testsome(count, cmd_requests, &completed, pids, stats) != MPI_SUCCESS) {
+			printf("error in testsome\n");
+			exit(1);
+		}
+		
+		printf("completed = %d\n", completed);
+		
+		for (i = 0; i < completed; i++) {
+			printf("send to %d complete\n", pids[i]);
+			procset_remove_proc(sending_procs, pids[i]);
+			procset_add_proc(receiving_procs, pids[i]);
+			free(cmd_bufs[i]);
+		}
+	}
+		
+	/*
+	 * Check for replys
+	 */
+	count = procset_size(receiving_procs);
+	if (count > 0) {
+		MPI_Iprobe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &avail, &stat);
+	
+		if (avail == 0)
+			return;
+		
+		/*
+		 * A message is available, so receive it
+		 */
+		MPI_Get_count(&stat, MPI_CHAR, &count);
+		
+		reply_buf = (char *)malloc(count + 1);
+		recv_pid = stat.MPI_SOURCE;
+		
+		MPI_Recv(reply_buf, count, MPI_CHAR, recv_pid, 0, MPI_COMM_WORLD, &stat);
+		
+		reply_buf[count] = '\0';
+			
+		printf("[%d] got reply from [%d] \"%s\"\n", my_task_id, recv_pid, reply_buf);
+		
+		free(reply_buf);
+		
+		/*
+		 * remove from active and receiving procsets
+		 */
+		procset_remove_proc(receiving_procs, recv_pid);
+		
+		/*
+		 * Check if any sends/recvs are complete. Call notify function for completed sends.
+		 */
+		SetList(active_requests);
+	
+		while ((r = (active_request *)GetListElement(active_requests)) != NULL) {
+			if (procset_test(r->procs, recv_pid)) {
+				procset_remove_proc(r->procs, recv_pid);
+				if (procset_isempty(r->procs)) {
+					RemoveFromList(active_requests, (void *)r);
+					r->completed(r->procs);
+					procset_free(r->procs);
+					free(r);
+				}
+			}
+		}
+	}
+}
+
+#define TEST
+
+#ifdef TEST
+int completed;
+
+void 
+send_complete(procset *p)
+{
+	printf("send completed\n");
+	completed++;
 }
 
 void
-wait_reply(void)
+wait_for_server(void)
 {
-	int i;
-
-#if 0	
-	printf("[%d] reply startall\n", my_task_id);
-	MPI_Startall(num_servers, reply_requests);
-	printf("[%d] reply waitall\n", my_task_id);
-	MPI_Waitall(num_servers, reply_requests, msg_stats);
-	for (i = 0; i < num_servers; i++)
-		printf("[%d] got reply from [%d] \"%s\"\n", my_task_id, i, reply_bufs[i]);
-#else
-	for (i = 0; i < num_servers; i++) {
-		MPI_Status stat;
-		MPI_Recv(reply_bufs[0], REPLY_BUF_SIZE, MPI_CHAR, i, 0, MPI_COMM_WORLD, &stat);		
-		printf("[%d] got reply from [%d] \"%s\"\n", my_task_id, i, reply_bufs[0]);
+	completed = 0;
+	
+	while (!completed) {
+		progress_commands();
+		usleep(10000);
 	}
-#endif
 }
+#endif
 
 void 
 client(int task_id)
 {
-	int i;
-	
+#ifdef TEST
+	int	i;
+	procset *p;
+#endif
+
 	num_servers = my_task_id = task_id;
 	
 	printf("client starting on [%d]\n", task_id);
 	
-	cmd_buf = malloc(CMD_BUF_SIZE);
-	reply_bufs = malloc(num_servers);
+	cmd_bufs = (char **)malloc(sizeof(char *) * num_servers);
 	cmd_requests = (MPI_Request *) malloc(sizeof(MPI_Request) * num_servers);
-	reply_requests = (MPI_Request *) malloc(sizeof(MPI_Request) * num_servers);
-	msg_stats = (MPI_Status *) malloc(sizeof(MPI_Status) * num_servers);
+	pids = (int *)malloc(sizeof(int) * num_servers);
+	stats = (MPI_Status *)malloc(sizeof(MPI_Status) * num_servers);
+
+	for (i = 0; i < num_servers; i++)
+		cmd_requests[i] = MPI_REQUEST_NULL;
+
+	sending_procs = procset_new(num_servers);
+	receiving_procs = procset_new(num_servers);
+	active_requests = NewList();
 	
-	for (i = 0; i < task_id; i++) {
-		MPI_Send_init(cmd_buf, CMD_BUF_SIZE, MPI_CHAR, i, 0, MPI_COMM_WORLD, &cmd_requests[i]);
-		reply_bufs[i] = malloc(REPLY_BUF_SIZE);
-		MPI_Recv_init(reply_bufs[i], REPLY_BUF_SIZE, MPI_CHAR, i, 0, MPI_COMM_WORLD, &reply_requests[i]);
-	}
+#ifdef TEST
+	p = procset_new(num_servers);
+	for (i = 0; i < num_servers; i++)
+		procset_add_proc(p, i);
 	
-	send_cmd("message 1");
-	wait_reply();
-	send_cmd("message 2");
-	wait_reply();
-	send_cmd("message 3");
-	wait_reply();
-	send_cmd("exit");
-	wait_reply();
+	printf("client sending command...\n");
+	
+	send_command(p, "hello", send_complete);
+	
+	printf("client waiting for replies\n");
+	
+	wait_for_server();
+#endif
 }
