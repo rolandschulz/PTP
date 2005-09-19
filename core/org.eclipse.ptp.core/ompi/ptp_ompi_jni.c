@@ -33,7 +33,7 @@
 #include "mca/base/base.h"
 #include "mca/errmgr/errmgr.h"
 #include "mca/rml/rml.h"
-#include "mca/pls/base/base.h"
+//#include "mca/pls/base/base.h"
 
 #include "event/event.h"
 
@@ -101,7 +101,7 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIStar
 		  jorted_bin, NULL);
 		len = (*env)->GetArrayLength(env, array);
 
-		user_path = (char*)malloc(2048 * sizeof(char));
+		//user_path = (char*)malloc(2048 * sizeof(char));
 		user_path_new_tmp = (char*)malloc((2048+strlen(ompi_bin_path+2))*sizeof(char));
 		user_path_new = (char*)malloc((2048+strlen(ompi_bin_path+2))*sizeof(char));
 		user_path = getenv("PATH");
@@ -112,21 +112,27 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIStar
 		user_path = getenv("PATH");
 		printf("New user's PATH (temporarily) after prepending "
 		  "OMPI bin: %s\n", user_path);
+		printf("sup dog!?\n"); fflush(stdout);
+		//free(user_path);
+		//printf("after free1.\n"); fflush(stdout);
 		free(user_path_new_tmp);
+		printf("after free1.\n"); fflush(stdout);
 		free(user_path_new);
-		free(user_path);
+		printf("after frees.\n"); fflush(stdout);
 
 		/* we need 'len + 2' args for len args, 1 for NULL
 		 * termination, and 1 preface for the program name
 		 * (argv[0] essentially) */
 		orted_args = (char **)malloc((len+2) * sizeof(char*));
 		orted_args[0] = strdup(orted_bin);
+		printf("woot args time!\n"); fflush(stdout);
 		for(i=1; i<len+1; i++) {
 		    jstring astr;
 		    char *bstr;
 
 		    astr = (*env)->GetObjectArrayElement(env, array, i - 1);
 		    bstr = (char *)(*env)->GetStringUTFChars(env, astr, NULL);
+		    printf("bstr[%d] = %s\n", i, bstr); fflush(stdout);
 
 		    /* copy the original string from the Java array over
 		     * into a C array element */
@@ -185,7 +191,7 @@ JNIEXPORT jint JNICALL Java_org_eclipse_ptp_rtsystem_ompi_OMPIJNIBroker_OMPIInit
 	putenv("OMPI_MCA_orte_univ_exist=1");
 	
 	/* setup the runtime environment */
-	rc = orte_init();
+	rc = orte_init(true);
 	if(rc == ORTE_ERR_UNREACH) {
 	    /* unreachable orted */
 	    char foo[256];
