@@ -28,12 +28,13 @@
 #define MAX_PROC_SET	100
 
 #define BITVECTOR_TYPE			bitvector *
+#define BITVECTOR_NUMBITS(v)		((v)->size)
 #define BITVECTOR_CREATE(size)	bitvector_create(size)
 #define BITVECTOR_FREE(v)			bitvector_free(v)
 #define BITVECTOR_SET(v, bit)		bitvector_set((v), (bit))
 #define BITVECTOR_UNSET(v, bit)	bitvector_unset((v), (bit))
-#define BITVECTOR_GET(v, bit)		bitvector_get((v), (bit))
-#define BITVECTOR_COPY(v1, v2)	bitvector_copy((v1), (v2))
+#define BITVECTOR_GET(v, bit)		(bitvector_get((v), (bit))>0)
+#define BITVECTOR_COPY(v1, v2)	bitvector_copy((v2), (v1))
 #define BITVECTOR_ISEMPTY(v)		bitvector_isempty(v)
 #define BITVECTOR_ANDEQ(v1, v2)	bitvector_andeq((v1), (v2))
 #define BITVECTOR_OREQ(v1, v2)	bitvector_oreq((v1), (v2))
@@ -60,4 +61,5 @@ procset *	procset_or(procset *, procset *);
 void			procset_oreq(procset *, procset *);
 char *		procset_to_str(procset *);
 procset *	str_to_procset(char *);
+int			procset_size(procset *);
 #endif /*PROCSET_H_*/
