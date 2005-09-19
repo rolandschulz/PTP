@@ -44,8 +44,10 @@ main(int argc, char *argv[])
 		exit(1);
 	}
 	
-	while (!shutdown && (stat = proxy_tcp_svr_funcs.progress(conn)) >= 0)
-		if (stat) proxy_tcp_svr_funcs.dispatch(conn);
+	while (!shutdown) {
+		if ((stat = proxy_tcp_svr_funcs.progress(conn)) < 0)
+			break;
+	}
 		
 	if (!shutdown && stat < 0)
 		fprintf(stderr, "progress failed\n");
