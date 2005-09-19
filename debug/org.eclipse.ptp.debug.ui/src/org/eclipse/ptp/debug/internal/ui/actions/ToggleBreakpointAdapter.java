@@ -53,9 +53,6 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 		uiDebugManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
 	}
 	
-	private boolean isGlobal(String jid) {
-		return (jid == null || jid.length() == 0);
-	}
 	public void toggleLineBreakpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
 		if (!PTPDebugUIPlugin.isPTPDebugPerspective())
 			return;
@@ -86,7 +83,7 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 						else {
 							String jid = uiDebugManager.getCurrentJobId();
 							String jobName = "";
-							if (isGlobal(jid)) {
+							if (uiDebugManager.isNoJob(jid)) {
 								jid = IPBreakpoint.GLOBAL;
 								jobName = IPBreakpoint.GLOBAL;
 							}
