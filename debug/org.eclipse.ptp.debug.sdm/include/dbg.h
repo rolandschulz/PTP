@@ -17,8 +17,8 @@
  * LA-CC 04-115
  ******************************************************************************/
  
-#ifndef DBG_H_
-#define DBG_H_
+#ifndef _DBG_H_
+#define _DBG_H_
 
 #include <stdarg.h>
 
@@ -66,6 +66,7 @@
 #define DBGERR_CHDIR			-34
 #define DBGERR_SOURCE			-35
 #define DBGERR_SETVAR			-36
+#define DBGERR_PROCSET		-37
 #define DBGERR_UNKNOWN		-99
 
 /*
@@ -119,6 +120,8 @@ int DbgProgress(session *, void (*)(dbg_event*));
 /*
  * Error Handling
  */
-void DbgSetError(int, char *);
+void		DbgSetError(int, char *);
+int		DbgGetError(void);
+char *	DbgGetErrorStr(void);
 
-#endif /*DBG_H_*/
+#endif /* _DBG_H_ */
