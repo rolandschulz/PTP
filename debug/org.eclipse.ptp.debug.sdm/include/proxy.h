@@ -48,7 +48,7 @@ typedef struct proxy_clnt_funcs	proxy_clnt_funcs;
 struct proxy_svr_funcs {
 	int (*create)(void **, void (*)(void));
 	int (*progress)(void *);
-	void (*dispatch)(void *);
+	int (*dispatch)(int, void *);
 	void (*finish)(void *);
 };
 typedef struct proxy_svr_funcs	proxy_svr_funcs;
