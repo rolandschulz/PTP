@@ -266,7 +266,7 @@ proxy_tcp_svr_dispatch(int fd, void *data)
 	free(msg);
 	
 	if (res != DBGRES_OK)
-		asprintf(&response, "%d %d \"%s\"", res, DbgClntGetError(), DbgClntGetErrorStr());
+		asprintf(&response, "%d %d \"%s\"", res, DbgGetError(), DbgGetErrorStr());
 	else
 		asprintf(&response, "%d", res);
 			
@@ -293,7 +293,7 @@ proxy_tcp_svr_setlinebreakpoint(char **args, char **response)
 	
 	procs = str_to_procset(args[1]);
 	if (procs == NULL) {
-		DbgClntSetError(DBGERR_PROCSET, NULL);
+		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
 	}
 	
