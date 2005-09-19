@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.internal.ui;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
@@ -97,14 +96,13 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		annotationMgr.shutdown();
 		super.shutdown();
 	}
-	
 	public String initial() {
 		String new_job_id = super.initial();
 		IElementHandler elementHandler = getElementHandler(new_job_id);
 		if (elementHandler != null) {
-			if ((BitList)elementHandler.getData(TERMINATED_PROC_KEY) == null)
+			if ((BitList) elementHandler.getData(TERMINATED_PROC_KEY) == null)
 				elementHandler.setData(TERMINATED_PROC_KEY, new BitList());
-			if ((BitList)elementHandler.getData(SUSPENDED_PROC_KEY) == null)
+			if ((BitList) elementHandler.getData(SUSPENDED_PROC_KEY) == null)
 				elementHandler.setData(SUSPENDED_PROC_KEY, new BitList());
 		}
 		createEventListener(new_job_id);
@@ -237,7 +235,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		final IElementHandler elementHandler = getElementHandler(job_id);
 		if (elementHandler == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "Update register/unregister error", null));
-		
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				new Job("Removing registered processes") {
@@ -255,13 +252,12 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				}.schedule();
 			}
 		};
-		ResourcesPlugin.getWorkspace().run(runnable, null);		
+		ResourcesPlugin.getWorkspace().run(runnable, null);
 	}
 	public void updateRegisterUnRegisterElements(final IElementSet curSet, final IElementSet preSet, final String job_id) throws CoreException {
 		final IElementHandler elementHandler = getElementHandler(job_id);
 		if (elementHandler == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "Update register/unregister error", null));
-
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				new Job("Updating registered/unregistered processes") {
@@ -295,7 +291,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	public void changeSetEvent(IElementSet curSet, IElementSet preSet) {
 		if (curSet == null)
 			return;
-		
 		updateBreakpointMarker(curSet.getID());
 		try {
 			updateRegisterUnRegisterElements(curSet, preSet, getCurrentJobId());
@@ -325,6 +320,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		set.setData(BITSET_KEY, tasks);
 		IPCDISession session = (IPCDISession) getDebugSession(getCurrentJobId());
 		if (session == null) {
+			System.out.println("-----------SET ID: " + set.getID());
 			session.getModelManager().newProcessSet(set.getID(), tasks);
 		}
 	}
@@ -335,7 +331,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			tasks.set(convertToInt(elements[i].getName()));
 		}
 		tasks.or(addTasks);
-		//FIXME how to add more process in the created set
+		// FIXME how to add more process in the created set
 	}
 	public void removeElementsEvent(IElementSet set, IElement[] elements) {
 		BitList tasks = (BitList) set.getData(BITSET_KEY);
@@ -344,7 +340,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			tasks.set(convertToInt(elements[i].getName()));
 		}
 		tasks.andNot(addTasks);
-		//FIXME how to delete more process in the created set
+		// FIXME how to delete more process in the created set
 	}
 	/*
 	 * Cannot unregister the extension final String CDT_DEBUG_UI_ID = "org.eclipse.cdt.debug.ui"; Bundle bundle = Platform.getBundle(CDT_DEBUG_UI_ID); if (bundle != null && bundle.getState() == Bundle.ACTIVE) { //ExtensionRegistry reg = (ExtensionRegistry) Platform.getExtensionRegistry();
@@ -422,9 +418,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				fireResumeEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof InferiorExitedEvent || event instanceof ErrorEvent) {
 				fireTerminatedEvent(job, event.getAllProcesses().toBitList());
-				condition = job.isAllStop()?new Boolean(true):null;
+				condition = job.isAllStop() ? new Boolean(true) : null;
 			} else if (event instanceof BreakpointHitEvent) {
-				//do nothing in breakpoint hit event
+				// do nothing in breakpoint hit event
 				continue;
 			}
 			firePaintListener(condition);
@@ -435,24 +431,75 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		BitList suspendedTasks = (BitList) elementHandler.getData(SUSPENDED_PROC_KEY);
 		// add tasks
 		suspendedTasks.or(tasks);
-		fireDebugEvent(new SuspendedDebugEvent(job.getIDString(), suspendedTasks, (BitList)elementHandler.getData(TERMINATED_PROC_KEY)));
+		fireDebugEvent(new SuspendedDebugEvent(job.getIDString(), suspendedTasks, (BitList) elementHandler.getData(TERMINATED_PROC_KEY)));
 	}
 	public void fireResumeEvent(IPJob job, BitList tasks) {
 		IElementHandler elementHandler = getElementHandler(job.getIDString());
-		BitList suspendedTasks = (BitList)elementHandler.getData(SUSPENDED_PROC_KEY);
+		BitList suspendedTasks = (BitList) elementHandler.getData(SUSPENDED_PROC_KEY);
 		// remove tasks
 		suspendedTasks.andNot(tasks);
-		fireDebugEvent(new ResumedDebugEvent(job.getIDString(), suspendedTasks, (BitList)elementHandler.getData(TERMINATED_PROC_KEY)));
+		fireDebugEvent(new ResumedDebugEvent(job.getIDString(), suspendedTasks, (BitList) elementHandler.getData(TERMINATED_PROC_KEY)));
 	}
 	public void fireTerminatedEvent(IPJob job, BitList tasks) {
 		IElementHandler elementHandler = getElementHandler(job.getIDString());
-		BitList terminatedTasks = (BitList)elementHandler.getData(TERMINATED_PROC_KEY);
+		BitList terminatedTasks = (BitList) elementHandler.getData(TERMINATED_PROC_KEY);
 		// only add tasks
 		terminatedTasks.or(tasks);
-		fireDebugEvent(new TerminatedDebugEvent(job.getIDString(), terminatedTasks, (BitList)elementHandler.getData(SUSPENDED_PROC_KEY)));
+		fireDebugEvent(new TerminatedDebugEvent(job.getIDString(), terminatedTasks, (BitList) elementHandler.getData(SUSPENDED_PROC_KEY)));
 	}
 	// ONLY for detect the debug sesssion is created
 	public void update(IPCDISession session) {
 		createEventListener(getCurrentJobId());
+	}
+	/*******************************************************************************************************************************************************************************************************************************************************************************************************
+	 * debug actions
+	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	public void resume() {
+		resume(getCurrentJobId(), getCurrentSetId());
+	}
+	public void resume(String job_id, String set_id) {
+		IPCDISession session = (IPCDISession) getDebugSession(job_id);
+		if (session == null)
+			return;
+	}
+	public void suspend() {
+		suspend(getCurrentJobId(), getCurrentSetId());
+	}
+	public void suspend(String job_id, String set_id) {
+		IPCDISession session = (IPCDISession) getDebugSession(job_id);
+		if (session == null)
+			return;
+	}
+	public void terminate() {
+		terminate(getCurrentJobId(), getCurrentSetId());
+	}
+	public void terminate(String job_id, String set_id) {
+		IPCDISession session = (IPCDISession) getDebugSession(job_id);
+		if (session == null)
+			return;
+	}
+	public void stepInto() {
+		stepInto(getCurrentJobId(), getCurrentSetId());
+	}
+	public void stepInto(String job_id, String set_id) {
+		IPCDISession session = (IPCDISession) getDebugSession(job_id);
+		if (session == null)
+			return;
+	}
+	public void stepOver() {
+		stepOver(getCurrentJobId(), getCurrentSetId());
+	}
+	public void stepOver(String job_id, String set_id) {
+		IPCDISession session = (IPCDISession) getDebugSession(job_id);
+		if (session == null)
+			return;
+	}
+	public void stepReturn() {
+		stepReturn(getCurrentJobId(), getCurrentSetId());
+	}
+	public void stepReturn(String job_id, String set_id) {
+		IPCDISession session = (IPCDISession) getDebugSession(job_id);
+		if (session == null)
+			return;
 	}
 }

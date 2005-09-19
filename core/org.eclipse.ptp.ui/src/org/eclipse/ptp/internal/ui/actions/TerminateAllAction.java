@@ -18,11 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui.actions;
 
+import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.views.AbstractParallelElementView;
-import org.eclipse.ptp.ui.views.ParallelJobView;
 
 /**
  * @author Clement chu
@@ -40,10 +41,9 @@ public class TerminateAllAction extends ParallelAction {
 	public void run(IElement[] elements) {}
 	
 	public void run() {
-		if (view instanceof ParallelJobView) {
-			//ParallelJobView jView = (ParallelJobView)view;
-			//TODO terminate all process in this job
-			//String job_id = jView.getCurrentJobID();
+		IManager manager = view.getUIManager();
+		if (manager instanceof JobManager) {
+			((JobManager)manager).terminate();
 		}
 	}
 }

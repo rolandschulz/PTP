@@ -717,6 +717,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		fireChangeEvent(set, cur_element_set);
 		deSelectSet();
 		cur_element_set = set;
+		cur_set_size = 0;
 		if (cur_element_set != null) {
 			cur_set_size = cur_element_set.size();
 			cur_element_set.setSelected(true);

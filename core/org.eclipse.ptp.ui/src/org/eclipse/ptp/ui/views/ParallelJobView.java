@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
@@ -109,11 +110,12 @@ public class ParallelJobView extends AbstractParallelSetView {
 			getDisplay().syncExec(new Runnable() {
 				public void run() {
 					jobTableViewer.refresh(true);
-					jobTableViewer.setCheckedElements(new IPJob[]{ ((JobManager) manager).findJobById(getCurrentID()) });
+					changeJob(((JobManager) manager).findJobById(getCurrentID()));
 				}
 			});
 		}
-		update();
+		else
+			update();
 	}
 	public static ParallelJobView getJobViewInstance() {
 		if (instance == null)
@@ -130,8 +132,10 @@ public class ParallelJobView extends AbstractParallelSetView {
 		jobTableViewer.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
 		jobTableViewer.setLabelProvider(new LabelProvider() {
 			public String getText(Object element) {
-				if (element instanceof IPJob)
+				if (element instanceof IPJob) {
+					
 					return ((IPJob) element).getElementName();
+				}
 				return "";
 			}
 			public Image getImage(Object element) {
@@ -214,6 +218,13 @@ public class ParallelJobView extends AbstractParallelSetView {
 		((JobManager) manager).setCurrentJobId(job_id);
 		updateJob();
 	}
+	public IPJob getCheckedJob() {
+		String job_id = getCurrentID();
+		if (!((JobManager) manager).isNoJob(job_id))
+			return ((JobManager) manager).findJobById(job_id);
+
+		return null;
+	}
 	public void changeJob(String job_id) {
 		changeJob(((JobManager) manager).findJobById(job_id));
 	}
@@ -224,6 +235,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 				public void run() {
 					jobTableViewer.setAllChecked(false);
 					jobTableViewer.setChecked(job, true);
+					jobTableViewer.setSelection(new StructuredSelection(job));
 				}
 			});
 		}
@@ -231,6 +243,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 			getDisplay().syncExec(new Runnable() {
 				public void run() {
 					jobTableViewer.setAllChecked(false);
+					jobTableViewer.setSelection(new StructuredSelection());
 				}
 			});
 		}
@@ -241,12 +254,27 @@ public class ParallelJobView extends AbstractParallelSetView {
 		IElementHandler setManager = getCurrentElementHandler();
 		selectSet(setManager==null?null:setManager.getSetRoot());
 	}
+	protected void updateAction() {
+		super.updateAction();
+		if (terminateAllAction != null) {
+			Object[] checkedElements = jobTableViewer.getCheckedElements();
+			if (checkedElements.length == 0) {
+				terminateAllAction.setEnabled(false);
+			}
+			else {
+				IPJob job = (IPJob)checkedElements[0];
+				terminateAllAction.setEnabled(!job.isAllStop());
+			}
+		}
+	}	
 	public void repaint(Object condition) {
 		if (condition != null) {
 			getDisplay().asyncExec(new Runnable() {
 				public void run() {
-					if (!jobTableViewer.getTable().isDisposed())
+					if (!jobTableViewer.getTable().isDisposed()) {
 						jobTableViewer.refresh(true);
+						update();
+					}
 				}
 			});
 		}
