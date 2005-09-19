@@ -123,7 +123,8 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 		if (node != null) {
 			String nodeState = (String)node.getAttrib(AttributeConstants.ATTRIB_NODE_STATE);
 			if(nodeState == null) {
-				System.out.println("***** NODE STATE NULL!  MAJOR ERROR!");
+				System.out.println("null node state!");
+				return IPTPUIConstants.NODE_UNKNOWN;
 			}
 			if (nodeState.equals("up")) {
 				if (node.size() > 0)
