@@ -69,4 +69,6 @@ public interface IPCDISession extends ICDISession {
 	public void stepInto(String setName);
 	public void stepInto(String setName, int count);
 	public void stepFinish(String setName);
+	public void resume(String setName);
+	public void terminate(String setName);
 }
