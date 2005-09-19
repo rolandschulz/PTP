@@ -25,9 +25,6 @@
 #include "proxy.h"
 #include "procset.h"
 
-static int 		dbg_errno = DBGRES_OK;
-static char *	dbg_errstr = NULL;
-
 /*
  * Process set operations
  */
@@ -172,33 +169,4 @@ int
 DbgProgress(session *s, void (*event_callback)(dbg_event *))
 {
 	return s->sess_proxy->clnt_funcs->progress(s->sess_proxy_data, event_callback);
-}
-
-/*
- * Error handling
- */
-void
-DbgSetError(int errnum, char *msg)
-{
-	dbg_errno = errnum;
-	
-	if (dbg_errstr != NULL) {
-		free(dbg_errstr);
-		dbg_errstr = NULL;
-	}
-	
-	if (msg != NULL)
-		dbg_errstr = strdup(msg);
-}
-
-int
-DbgGetError(void)
-{
-	return dbg_errno;
-}
-
-char *
-DbgGetErrorStr(void)
-{
-	return dbg_errstr;
 }

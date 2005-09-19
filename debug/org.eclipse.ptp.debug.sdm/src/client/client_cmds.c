@@ -56,8 +56,6 @@ struct dbg_event_handler {
 };
 typedef struct dbg_event_handler	dbg_event_handler;
 
-static int 			dbg_errno = DBGRES_OK;
-static char *		dbg_errstr = NULL;
 static List *		dbg_event_handlers = NULL;
 static struct timeval	TIMEOUT = { 25, 0 };
 
@@ -349,36 +347,4 @@ DbgClntUnregisterFileHandler(int fd)
 			free(h);
 		}
 	}
-}
-
-/*
- * Error handling
- */
-void
-DbgClntSetError(int errnum, char *msg)
-{
-	dbg_errno = errnum;
-	
-	if (dbg_errstr != NULL) {
-		free(dbg_errstr);
-		dbg_errstr = NULL;
-	}
-	
-	if (msg != NULL)
-		dbg_errstr = strdup(msg);
-}
-
-int
-DbgClntGetError(void)
-{
-	return dbg_errno;
-}
-
-char *
-DbgClntGetErrorStr(void)
-{
-	if (dbg_errstr == NULL)
-		return "";
-		
-	return dbg_errstr;
 }
