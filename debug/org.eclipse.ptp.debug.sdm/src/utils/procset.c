@@ -180,6 +180,9 @@ procset_to_str(procset *p)
 		}
 	}
 	
+	if (!nonzero)
+		*s++ = '0';
+	
 	*s = '\0';
 	
 	return str;
@@ -232,4 +235,18 @@ str_to_procset(char *str)
 	}
 	
 	return p;
+}
+
+/**
+ * Number of processes in the set (as opposed to the total size of the set)
+ */
+int
+procset_size(procset *p)
+{
+	int	i;
+	int	size = 0;
+	
+	for (i = 0; i < p->ps_nprocs; i++)
+		size += BITVECTOR_GET(p->ps_procs, i);
+	return size;
 }
