@@ -54,10 +54,10 @@ typedef struct active_request	active_request;
 static procset *		sending_procs;
 static procset *		receiving_procs;
 static List *		active_requests;
-static char **		cmd_bufs;
-static MPI_Request *	cmd_requests;
-int *			pids;
-MPI_Status *		stats;
+static char **		send_bufs;
+static MPI_Request *	send_requests;
+int *				pids;
+MPI_Status *			stats;
 
 int num_servers;
 int my_task_id;
@@ -82,7 +82,7 @@ send_command(procset *procs, char *str, void (*completed_callback)(procset *))
 	p = procset_and(sending_procs, procs);
 	procset_andeq(p, receiving_procs);
 	if (!procset_isempty(p)) {
-		DbgClntSetError(DBGERR_INPROGRESS, NULL);
+		DbgSetError(DBGERR_INPROGRESS, NULL);
 		return -1;
 	}
 	
@@ -111,11 +111,10 @@ send_command(procset *procs, char *str, void (*completed_callback)(procset *))
 			 * MPI spec does not allow read access to a send buffer while send is in progress
 			 * so we must make a copy for each send.
 			 */
-			cmd_bufs[pid] = strdup(str);
+			send_bufs[pid] = strdup(str);
 			cmd_len = strlen(str);
 			
-			printf("[%d] sending message \"%s\" to [%d]\n", my_task_id, cmd_bufs[pid], pid);
-			MPI_Isend(cmd_bufs[pid], cmd_len, MPI_CHAR, pid, 0, MPI_COMM_WORLD, &cmd_requests[pid]); // TODO: handle fatal errors
+			MPI_Isend(send_bufs[pid], cmd_len, MPI_CHAR, pid, 0, MPI_COMM_WORLD, &send_requests[pid]); // TODO: handle fatal errors
 		}
 	}
 
@@ -141,22 +140,17 @@ progress_commands(void)
 	/*
 	 * Check for completed sends
 	 */
-	printf("sending procs is %s\n", procset_to_str(sending_procs));
 	count = procset_size(sending_procs);
 	if (count > 0) {
-printf("count = %d\n", count);
-		if (MPI_Testsome(count, cmd_requests, &completed, pids, stats) != MPI_SUCCESS) {
+		if (MPI_Testsome(num_servers, send_requests, &completed, pids, stats) != MPI_SUCCESS) {
 			printf("error in testsome\n");
 			exit(1);
 		}
 		
-		printf("completed = %d\n", completed);
-		
 		for (i = 0; i < completed; i++) {
-			printf("send to %d complete\n", pids[i]);
 			procset_remove_proc(sending_procs, pids[i]);
 			procset_add_proc(receiving_procs, pids[i]);
-			free(cmd_bufs[i]);
+			free(send_bufs[pids[i]]);
 		}
 	}
 		
@@ -179,11 +173,9 @@ printf("count = %d\n", count);
 		recv_pid = stat.MPI_SOURCE;
 		
 		MPI_Recv(reply_buf, count, MPI_CHAR, recv_pid, 0, MPI_COMM_WORLD, &stat);
-		
 		reply_buf[count] = '\0';
+printf("got reply <%s> from [%d]\n", reply_buf, recv_pid);		
 			
-		printf("[%d] got reply from [%d] \"%s\"\n", my_task_id, recv_pid, reply_buf);
-		
 		free(reply_buf);
 		
 		/*
@@ -237,22 +229,20 @@ wait_for_server(void)
 void 
 client(int task_id)
 {
-#ifdef TEST
 	int	i;
+#ifdef TEST
 	procset *p;
 #endif
 
 	num_servers = my_task_id = task_id;
 	
-	printf("client starting on [%d]\n", task_id);
-	
-	cmd_bufs = (char **)malloc(sizeof(char *) * num_servers);
-	cmd_requests = (MPI_Request *) malloc(sizeof(MPI_Request) * num_servers);
+	send_bufs = (char **)malloc(sizeof(char *) * num_servers);
+	send_requests = (MPI_Request *) malloc(sizeof(MPI_Request) * num_servers);
 	pids = (int *)malloc(sizeof(int) * num_servers);
 	stats = (MPI_Status *)malloc(sizeof(MPI_Status) * num_servers);
 
 	for (i = 0; i < num_servers; i++)
-		cmd_requests[i] = MPI_REQUEST_NULL;
+		send_requests[i] = MPI_REQUEST_NULL;
 
 	sending_procs = procset_new(num_servers);
 	receiving_procs = procset_new(num_servers);
@@ -263,12 +253,12 @@ client(int task_id)
 	for (i = 0; i < num_servers; i++)
 		procset_add_proc(p, i);
 	
-	printf("client sending command...\n");
-	
 	send_command(p, "hello", send_complete);
-	
-	printf("client waiting for replies\n");
-	
 	wait_for_server();
+	send_command(p, "SLB", send_complete);
+	wait_for_server();
+	send_command(p, "QUI", send_complete);
+	wait_for_server();
+	
 #endif
 }
