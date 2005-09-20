@@ -74,6 +74,10 @@ printf("[%d] server received msg <%s>\n", my_task_id, cmd_buf);
  * 				PROCESSING_COMMAND	RUNNING
  * 				PROCESSING_COMMAND	SUSPENDED
  * <--OK---		ACCEPTING_COMMANDS	SUSPENDED
+ * 
+ * The exception to this is the INT command which can be sent at any time. This works by sending
+ * with a special MPI tag used of OOB communication. It will be implemented later...
+ * 
  */
 void
 server(int client_task_id, int my_task_id)
