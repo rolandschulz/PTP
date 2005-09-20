@@ -1,0 +1,104 @@
+
+Libaif
+
+Greg Watson
+
+David Abramson
+
+Brian May
+
+Donny Kurniawan
+
+   Copyright © 2001 GuardSoft Pty. Ltd.
+     _________________________________________________________________
+
+   Table of Contents
+
+   1. [1]Quick Start
+
+        [2]Installing libaif
+        [3]Installing patched GDB
+
+Chapter 1. Quick Start
+
+   Table of Contents
+
+   [4]Installing libaif
+   [5]Installing patched GDB
+
+   This chapter describes how to start using libaif in the minimum amount
+   of time.
+
+Installing libaif
+
+     * Download and extract the source code:
+
+$ tar -xzf libaif-1.0.0.tar.gz
+
+     * Compile and install libaif by changing to the directory, and using
+       configure and make, followed by make install (as root).
+       For example:
+
+$ cd libaif-1.0.0
+$ configure
+
+...
+
+$ make
+
+...
+
+$ make install
+
+...
+
+Installing patched GDB
+
+     * AIF  is  currently  supported  in  versions  5.0  and  5.2 of GDB.
+       Download  the  source  code for the version of GDB that suits your
+       system.
+     * Extract  source  code,  and apply the patch from libaif, using the
+       supplied patch script applypatch.
+       For example:
+
+$ cd /tmp
+$ tar -xzf gdb_5.0.tar.gz
+$ cd $(libaif)/patches
+$ ./applypatch -install-all /tmp/gdb-5.0
+patching file gdb-5.0/gdb/aif-valprint.c
+patching file gdb-5.0/gdb/c-valprint.c
+patching file gdb-5.0/gdb/printcmd.c
+patching file gdb-5.0/gdb/typeprint.c
+patching file gdb-5.0/gdb/valprint.c
+patching file gdb-5.0/gdb/Makefile.in
+patching file gdb-5.0/gdb/libaif.mk
+
+     * Compile  and  install  GDB by changing to the directory, and using
+       configure and make, followed by make install (as root).
+
+Note
+       You  should  use  the  --with-aif=dir  (or  --with-aif-lib=dir and
+       --with-aif-include=dir)  options  in  order  to allow configure to
+       locate the libaif library and include files.
+       Example:
+
+$ cd /tmp/gdb-5.0
+$ ./configure --with-aif=$(libaif-insdir) alpha-redhat-linux
+
+...
+
+$ make
+
+...
+
+$ make install
+
+...
+
+References
+
+   1. file://localhost/tmp/xmlto.9iXGp0/libaif.proc#id2812815
+   2. file://localhost/tmp/xmlto.9iXGp0/libaif.proc#id2798796
+   3. file://localhost/tmp/xmlto.9iXGp0/libaif.proc#id2751035
+   4. file://localhost/tmp/xmlto.9iXGp0/libaif.proc#id2798796
+   5. file://localhost/tmp/xmlto.9iXGp0/libaif.proc#id2751035

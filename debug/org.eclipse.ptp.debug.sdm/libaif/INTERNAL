@@ -1,0 +1,111 @@
+Internal documentation for the aif library.
+
+AIF stands for "architecture-independent form".  Any data structure in any
+language should be convertable to an AIF.  The AIF may be safely shipped from
+machine to machine and converted back to an equivalent data structure.
+
+An AIF is a struct with fields for the format-descriptor string (fds) and the
+data (with explicit length).  The fds uses characters to indicate the type.
+All bytes are represented in the data by two hex characters, representing upper
+nibble then lower nibble.  The characters and formats have changed over time.
+This is the currently operative list:
+
+b: boolean
+	- the data size is the same as the size of a native integer
+	- the data for a true value is -1 and 0 for a false value
+
+c: character  
+	- uses 1 byte of data
+	- characters are always unsigned
+
+i: integer: i(s|u)N
+	- s means signed; u means unsigned
+	- N is a single digit specifying the number of bytes of data
+
+f: floating: fN
+	- N is a single digit specifying the number of bytes of data
+
+^: pointer: ^T
+	- T is a format string representing the target (possibly of > form)
+	- The first byte in the data is a marker, with value:
+		0 to indicate a null value
+		1 to indicate a normal value.  The target is found in the 
+		  subsequent bytes
+		2 to indicate a normal value that will be referred to later.  
+		  The next byte gives a name to this value.  Subsequent 
+		  bytes represent the value of the target
+		3 to indicate that the value is circular.  The next byte gives 
+		  the name by which this value is known
+		4 to indicate an invalid pointer value
+
+%: named component: %name/T
+	- where T is a format string representing the component
+	- uses 0 bytes of data
+
+>: reference to named component: >name/
+	- used in circular linked types to make representation finite
+	- uses 0 bytes of data
+
+[: array: [R]T
+	- R is a range indicating low and high bounds
+	- T is a format string representing the base type (can be an array)
+	- itself uses 0 bytes of data, but the components may use data
+
+{: struct: {ID|N1=F1,N2=F2,...;;;}
+	- ID is the identifier for the struct, it is optional
+	- Nn is the name of the field
+	- Fn is a format string representing the field
+	- struct and class share the same format string since conceptually
+	  they are the same (except for the default member access specifiers)
+
+{: class: {ID|N1=F1,...; N2=F2,...; N3=F3,...; N4=F4,...}
+	- ID is the identifier for the class, it is optional
+	- Nn is the name of the field
+	- Fn is a format string representing the field
+	- The class format string is divided into four sections 
+	  (separated by a ;) :
+	  The first section is used to store public data (eg: N1)
+	  The second section is used to store protected data (eg: N2)
+	  The third section is used to store private data (eg: N3)
+	  The fourth section is used to store hidden data (eg: N3)
+
+(: union: (ID|N1=F1,N2=F2,...)
+	- ID is the identifier for the union, it is optional
+	- Nn is the name of the field
+	- Fn is a format string representing the field
+
+<: enumeration: <ID|S1=V1,S2=V2,...>is4
+	- ID is the identifier for the enum, it is optional
+	- consists of name/val pairs Sn=Vn where Sn is the name of the 
+	  enumerated value and Vn is the value of the enumeration. Values 
+	  are integers whose type is is4 (signed integer with 4 bytes)
+
+r: range: rL..UT
+	- a range from L to U, where L and U are integer types specified by T
+
+&: function: &A1,A2,.../T
+	- a function that returns type T and that has arguments of type 
+	  A1, A2, ... Data consists of a null-terminated string containing 
+	  the name of the function
+
+s: string: s
+	- the first 2 bytes of the data indicate the length (more significant 
+	  byte first) of the string in bytes.  These bytes follow immediately
+
+v: void: vN
+	- N is the number of bytes of data
+
+z: ZPL region: zNT
+	- a ZPL region of rank N. Type T is the type of the data describing
+	  the bounds of each rank and must be an integer type. The data 
+	  consists of pairs of integers describing the lower and upper
+	  bounds of each rank respectively
+
+?: invalid: ?n? 
+	- n is an integer code (currently only 0)
+	- 0 bytes of data
+
+The construction routines allow a client to build most reasonable AIFs, but in
+building data-circular AIFs requires using lower-level access.  For arrays, it
+is necessary to generate the data portion of the array using low-level
+mechanisms before using our constructors to make the final AIF.

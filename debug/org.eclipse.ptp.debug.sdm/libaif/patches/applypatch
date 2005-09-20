@@ -1,0 +1,115 @@
+#!/bin/sh
+#
+# Apply patches to GDB.
+#
+# Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+
+COMMENT="# Support for AIF"
+INSAIF=no
+
+while [ $# -ne 0 ]
+do
+	case $1 in
+	-install-aif | --install-aif)
+		INSAIF=yes
+		;;
+
+	-install-all | --install-all)
+		INSAIF=yes
+		;;
+	*)
+		INSDIR=$1
+		SRCDIR=$1/gdb
+		;;
+	esac
+
+	shift
+done
+
+if [ $INSAIF = no -o "x$INSDIR" = x ]; then
+	echo usage: $0 '--install-aif|--install-all' gdb-dir
+	exit 1
+fi
+
+if [ ! -d $INSDIR -a ! -d $SRCDIR ]; then
+	echo $0: could not find gdb source
+	exit 1
+fi
+
+if [ ! -f $SRCDIR/Makefile.in ]; then
+	echo $0: could not find Makefile.in
+	exit 1
+fi
+
+VERSION=""
+
+if [ -f $SRCDIR/version.in ]; then
+	VERSION=`cat $SRCDIR/version.in`
+else
+	VERSION=`grep '^VERSION' $SRCDIR/Makefile.in | sed -e 's/VERSION = //'`
+fi
+
+if [ "x$VERSION" = x ]; then
+	echo $0: could not find version of new gdb
+	exit 1
+fi
+
+if grep "$COMMENT" $SRCDIR/Makefile.in > /dev/null ; then
+	echo $0: warning - gdb-$VERSION has already been patched
+	exit 0
+fi
+
+rhv=`expr "$VERSION" : 'Red Hat Linux (\([^)]*\))'`
+
+if [ "x$rhv" != x ]; then
+	VERSION="rh$rhv"
+fi
+
+case $VERSION in
+5.0)
+	sed -e "/^CLEANFILES =/a\\
+$COMMENT\\
+INCLUDE_aif = @INCLUDE_aif@\\
+LIB_aif = @LIB_aif@\\
+-include libaif.mk\\
+" < $SRCDIR/Makefile.in > $SRCDIR/Makefile.in.x
+	mv $SRCDIR/Makefile.in.x $SRCDIR/Makefile.in
+
+	(cd $INSDIR/..; patch -p0) < gdb-$VERSION.patch
+	;;
+
+5.2|rh5.2.1-4|2002-08-11-cvs)
+	sed -e "/^DISTSTUFF = \$(YYFILES)/a\\
+$COMMENT\\
+INCLUDE_aif = @INCLUDE_aif@\\
+LIB_aif = @LIB_aif@\\
+-include libaif.mk\\
+" < $SRCDIR/Makefile.in > $SRCDIR/Makefile.in.x
+	mv $SRCDIR/Makefile.in.x $SRCDIR/Makefile.in
+
+	(cd $INSDIR/..; patch -p0) < gdb-$VERSION.patch
+	;;
+
+*)
+	echo $0: version $VERSION not supported
+	exit 1
+	;;
+esac
+
+exit 0

@@ -1,0 +1,49 @@
+srcdir =	@srcdir@
+VPATH =		@srcdir@
+prefix =	@prefix@
+exec_prefix =	@exec_prefix@
+bindir =	@bindir@
+libdir =	@libdir@
+
+CC =		@CC@
+CPPFLAGS =	@CPPFLAGS@
+CFLAGS =	@CFLAGS@
+LDFLAGS =	@LDFLAGS@
+DEFS =		@DEFS@
+INSTALL =	@INSTALL@
+INSTALL_PROGRAM =	@INSTALL_PROGRAM@
+INSTALL_DATA =	@INSTALL_DATA@
+RANLIB =	@RANLIB@
+AR =		ar
+RPCGEN =	rpcgen
+REMOVE =	rm -f
+XMLTO =		@XMLTO@
+
+TOP =		$(srcdir)/../..
+COMPAT =	$(srcdir)/../compat
+DBGSRV =	$(srcdir)/../dbgsrv
+GC =		$(srcdir)/../gc
+UTIL =		$(srcdir)/../util
+LIBS =	
+INSPROGS =	
+
+SHELL =		/bin/sh
+
+all: html.stamp libaif.ps libaif.txt
+
+clean:
+	rm -f libaif.ps *.html html.stamp
+
+distclean: clean
+	rm -rf Makefile Makefile.bak
+
+html.stamp: libaif.xml
+	$(XMLTO) html libaif.xml
+
+libaif.ps: libaif.xml
+	$(XMLTO) ps libaif.xml
+
+libaif.txt: libaif.xml
+	$(XMLTO) txt libaif.xml
+
+# DO NOT REMOVE THIS LINE

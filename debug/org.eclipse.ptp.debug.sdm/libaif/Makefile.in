@@ -1,0 +1,133 @@
+#
+# Master AIF Makefile
+#
+# Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+
+srcdir =	@srcdir@
+VPATH =		@srcdir@
+prefix =	@prefix@
+exec_prefix =	@exec_prefix@
+bindir =	@bindir@
+libdir =	@libdir@
+includedir =	@includedir@
+distname =	libaif
+
+CC =		@CC@
+CPPFLAGS =	@CPPFLAGS@
+CFLAGS =	@CFLAGS@
+LDFLAGS =	@LDFLAGS@
+LIBS =		@LIBS@
+DEFS =		@DEFS@
+INSTALL =	@INSTALL@
+INSTALL_PROGRAM =	@INSTALL_PROGRAM@
+INSTALL_DATA =	@INSTALL_DATA@
+RANLIB =	@RANLIB@
+AR =		ar
+REMOVE =	rm -f
+
+TOP =		$(srcdir)
+ALL_CFLAGS =	$(CPPFLAGS) $(DEFS) -I$(srcdir) $(CFLAGS)
+SRCS =		aif.c calc.c fds.c array.c conv.c cmp.c print.c error.c io.c \
+		struct.c util.c aif.x
+OBJS =		aif.o calc.o fds.o array.o conv.o cmp.o print.o error.o io.o \
+		struct.o util.o aif_xdr.o
+INSLIBS =	libaif.a
+
+SHELL =		/bin/sh
+.SUFFIXES:
+.SUFFIXES: .c .o
+.c.o:
+	$(CC) -c $(ALL_CFLAGS) $<
+
+all:	libaif.a testaif
+
+depend:
+	cp Makefile Makefile.bak
+	sed -n '1,/^# DO NOT REMOVE THIS LINE/p' < Makefile > makedep
+	$(CC) -MM $(ALL_CFLAGS) $(SRCS) >> makedep
+	mv makedep Makefile
+
+clean:
+	for dir in doc; do \
+		(cd $$dir; make clean) \
+	done
+	$(REMOVE) a.out core *.o *.a testaif aif_xdr.c
+
+distclean: clean
+	for dir in doc; do \
+		(cd $$dir; make distclean) \
+	done
+	$(REMOVE) Makefile Makefile.bak
+	$(REMOVE) config.h config.log config.status config.cache
+
+docs:
+	(cd doc; make all)
+
+install-dirs:
+	$(srcdir)/mkinstalldirs $(bindir) $(libdir) $(includedir)
+
+install-libs:
+	for i in $(INSLIBS); do \
+		$(REMOVE) $(libdir)/$$i; \
+		$(INSTALL_DATA) $$i $(libdir)/$$i; \
+		$(RANLIB) $(libdir)/$$i; \
+	done
+
+install-include:
+	$(INSTALL_DATA) aif.h $(includedir)/aif.h
+	$(INSTALL_DATA) fds.h $(includedir)/fds.h
+
+install: all install-dirs install-libs install-include
+
+libaif.a:	$(OBJS)
+	$(REMOVE) libaif.a
+	$(AR) r libaif.a $(OBJS)
+	$(RANLIB) libaif.a
+	
+testaif:	testaif.o libaif.a
+	$(CC) $(CFLAGS) -o testaif testaif.o libaif.a
+
+RPCGEN =        /usr/bin/rpcgen
+aif_xdr.c: aif.x
+	$(RPCGEN) -c $(RPCGENFLAGS) -o $@ aif.x
+
+CHMOD =		chmod
+TAR =		tar
+GZIP =		gzip
+BASENAME =	basename
+REMOVE =	rm -f
+dist:	distclean
+	if test ! -d dist ; then \
+		mkdir dist; \
+	fi
+	cd $(srcdir) && dir=`pwd` && dir=`$(BASENAME) $$dir` && cd ..;\
+	$(CHMOD) -R a+rX,g-w,o-w $$dir;\
+	$(TAR) -cf- -X$$dir/exclude $$dir |\
+	(cd $$dir/dist; $(TAR) -xf - );\
+	cd $$dir/dist;\
+	version=`grep LIBAIF_VERSION ../version.h | sed 's/.*"\([^"]*\)"/\1/'`;\
+	distfile="$(distname)-$$version";\
+	mv $$dir $$distfile;\
+	$(TAR) -cf- $$distfile | $(GZIP) -9c > $$distfile.tar.gz;\
+	rm -fr $$distfile;\
+	if test $$? != 0; then\
+		exit 1;\
+	fi
+
+# DO NOT REMOVE THIS LINE
