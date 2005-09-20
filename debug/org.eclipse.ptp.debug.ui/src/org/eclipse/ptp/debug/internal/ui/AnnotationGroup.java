@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.internal.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import org.eclipse.core.resources.IMarker;
@@ -34,7 +35,7 @@ import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
  * 
  */
 public class AnnotationGroup {
-	private List annotationList = new ArrayList();
+	private List annotationList = Collections.synchronizedList(new ArrayList());
 
 	public boolean contains(Annotation annotation) {
 		return annotationList.contains(annotation);
