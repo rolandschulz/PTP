@@ -29,6 +29,7 @@
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 
 public class TargetConfiguration extends PTPObject implements ICDITargetConfiguration {
 	public TargetConfiguration(Target target) {
@@ -36,86 +37,72 @@ public class TargetConfiguration extends PTPObject implements ICDITargetConfigur
 	}
 
 	public boolean supportsTerminate() {
-		// Auto-generated method stub
-		System.out.println("TargetConfiguration.supportsTerminate()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return true;
 	}
 
 	public boolean supportsDisconnect() {
-		// Auto-generated method stub
-		System.out.println("TargetConfiguration.supportsDisconnect()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public boolean supportsSuspend() {
-		// Auto-generated method stub
-		System.out.println("TargetConfiguration.supportsSuspend()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return true;
 	}
 
 	public boolean supportsResume() {
-		// Auto-generated method stub
-		System.out.println("TargetConfiguration.supportsResume()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return true;
 	}
 
 	public boolean supportsRestart() {
-		// Auto-generated method stub
-		System.out.println("TargetConfiguration.supportsRestart()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public boolean supportsStepping() {
-		// Auto-generated method stub
-		System.out.println("TargetConfiguration.supportsStepping()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return true;
 	}
 
 	public boolean supportsInstructionStepping() {
-		// Auto-generated method stub
-		System.out.println("TargetConfiguration.supportsInstructionStepping()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public boolean supportsBreakpoints() {
-		// Auto-generated method stub
-		System.out.println("TargetConfiguration.supportsBreakpoints()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return true;
 	}
 
 	public boolean supportsRegisters() {
-		// Auto-generated method stub
-		System.out.println("TargetConfiguration.supportsRegisters()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public boolean supportsRegisterModification() {
-		// Auto-generated method stub
-		System.out.println("TargetConfiguration.supportsRegisterModification()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public boolean supportsSharedLibrary() {
-		// Auto-generated method stub
-		System.out.println("TargetConfiguration.supportsSharedLibrary()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public boolean supportsMemoryRetrieval() {
-		// Auto-generated method stub
-		System.out.println("TargetConfiguration.supportsMemoryRetrieval()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public boolean supportsMemoryModification() {
-		// Auto-generated method stub
-		System.out.println("TargetConfiguration.supportsMemoryModification()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public boolean supportsExpressionEvaluation() {
-		// Auto-generated method stub
-		System.out.println("TargetConfiguration.supportsExpressionEvaluation()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return true;
 	}
 

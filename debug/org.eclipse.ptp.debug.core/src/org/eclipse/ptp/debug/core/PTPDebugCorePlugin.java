@@ -30,6 +30,12 @@ package org.eclipse.ptp.debug.core;
 
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import org.eclipse.cdt.debug.core.ICBreakpointListener;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
@@ -80,6 +86,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	private static PTPDebugCorePlugin plugin;
 
 	private HashMap fDebugConfigurations;
+	private static Logger logger;
 
 	/**
 	 * Breakpoint listener list.
@@ -374,4 +381,32 @@ public class PTPDebugCorePlugin extends Plugin {
 	public ICSourceLocation[] getCommonSourceLocations() {
 		return SourceUtils.getCommonSourceLocationsFromMemento( PTPDebugCorePlugin.getDefault().getPluginPreferences().getString( IPDebugConstants.PREF_SOURCE_LOCATIONS ) );
 	}
+	
+	public Logger getLogger() {
+		if (logger == null) {
+			logger = Logger.getLogger(getClass().getName());
+			Handler[] handlers = logger.getHandlers();
+			for ( int index = 0; index < handlers.length; index++ ) {
+				logger.removeHandler(handlers[index]);
+			}
+			Handler console = new ConsoleHandler();
+			console.setFormatter(new Formatter() {
+				public String format(LogRecord record) {
+					String out = record.getLevel()  + " : "
+						+ record.getSourceClassName()  + "."
+						+ record.getSourceMethodName();
+					if (!record.getMessage().equals(""))
+						out = out + " : " + record.getMessage();
+					out += "\n";
+					return out;
+				}});
+			
+			console.setLevel(Level.FINER);
+			logger.addHandler(console);
+			logger.setLevel(Level.FINER);
+		}
+		
+		return logger;
+	}
+
 }
