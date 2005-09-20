@@ -21,24 +21,23 @@
 #define _BREAKPOINT_H_
 
 #include "location.h"
+#include "list.h"
 
 struct breakpoint {
-	int			bp_id;
-	int			bp_ignore;
-	int			bp_special;
-	int			bp_deleted;
-	char *		bp_type;
-	location		bp_loc;
-	int			bp_hits;
-	char *		bp_stmt;
-	char **		bp_commands;
+	int			id;
+	int			ignore;
+	int			special;
+	int			deleted;
+	char *		type;
+	location		loc;
+	int			hits;
 };
 typedef struct breakpoint breakpoint;
 
-struct breakpointlist {
-	breakpoint		bp;
-	struct breakpointlist *	next;
-};
-typedef struct breakpointlist breakpointlist;
-
+extern breakpoint *	NewBreakpoint(int);
+extern void			FreeBreakpoint(breakpoint *);
+extern breakpoint *	CopyBreakpoint(breakpoint *);
+extern void			AddBreakpoint(List *, breakpoint *);
+extern void			RemoveBreakpoint(List *, int);
+extern breakpoint *	FindBreakpoint(List *, int);
 #endif /* _BREAKPOINT_H_*/
