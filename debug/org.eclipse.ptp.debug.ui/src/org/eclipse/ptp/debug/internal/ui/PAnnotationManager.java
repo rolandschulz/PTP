@@ -241,8 +241,10 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 		if (annotationGroup == null)
 			annotationGroup = new AnnotationGroup();		
-		addAnnotation(annotationGroup, textEditor, file, stackFrame.getLineNumber(), tasks, type);
-		putAnnotationGroup(job_id, annotationGroup);
+		synchronized (tasks) {
+			addAnnotation(annotationGroup, textEditor, file, stackFrame.getLineNumber(), tasks, type);
+			putAnnotationGroup(job_id, annotationGroup);
+		}
 	}
 	// called by event
 	public void addAnnotation(String job_id, String fullPathFileName, int lineNumber, BitList tasks, boolean isRegister) throws CoreException {
@@ -262,8 +264,10 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 		if (annotationGroup == null)
 			annotationGroup = new AnnotationGroup();
-		addAnnotation(annotationGroup, textEditor, file, lineNumber, tasks, type);
-		putAnnotationGroup(job_id, annotationGroup);
+		synchronized (tasks) {
+			addAnnotation(annotationGroup, textEditor, file, lineNumber, tasks, type);
+			putAnnotationGroup(job_id, annotationGroup);
+		}
 	}
 	public boolean containsCurrentSet(BitList aTasks) {
 		String set_id = uiDebugManager.getCurrentSetId();
@@ -335,9 +339,11 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		String job_id = uiDebugManager.getCurrentJobId();
 		AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 		if (annotationGroup != null) {
-			removeAnnotation(annotationGroup, textEditor, file, tasks);
-			if (annotationGroup.isEmpty())
-				removeAnnotationGroup(job_id);
+			synchronized (tasks) {
+				removeAnnotation(annotationGroup, textEditor, file, tasks);
+				if (annotationGroup.isEmpty())
+					removeAnnotationGroup(job_id);
+			}
 		}
 	}
 	// called by event
@@ -355,9 +361,11 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			throw new CoreException(Status.CANCEL_STATUS);
 		AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 		if (annotationGroup != null) {
-			removeAnnotation(annotationGroup, textEditor, file, tasks);
-			if (annotationGroup.isEmpty())
-				removeAnnotationGroup(job_id);
+			synchronized (tasks) {
+				removeAnnotation(annotationGroup, textEditor, file, tasks);
+				if (annotationGroup.isEmpty())
+					removeAnnotationGroup(job_id);
+			}
 		}
 	}
 	// generic
