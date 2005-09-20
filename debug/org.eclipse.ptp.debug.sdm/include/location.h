@@ -22,10 +22,10 @@
 
 struct location
 {
-	char *	loc_file;
-	char *	loc_func;
-	char *	loc_addr;
-	int		loc_line;
+	char *	file;
+	char *	func;
+	char *	addr;
+	int		line;
 };
 typedef struct location location;
 
