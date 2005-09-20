@@ -29,18 +29,20 @@
 
 struct dbg_backend_funcs {
 	int (*init)(int *, int *, dbg_event **);
+	int (*read)(int);
 	int (*setlinebreakpoint)(char *, int, dbg_event **);
 	int (*setfuncbreakpoint)(char *, char *, dbg_event **);
-	int (*deletebreakpoints)(int);
-	int (*go)(char *, int, dbg_event **);
-	int (*step)(int, int, char *, int, dbg_event **);
-	int (*liststackframes)(void *, int, dbg_event **);
-	int (*setcurrentstackframe)(int, int, dbg_event **);
+	int (*deletebreakpoints)(int, dbg_event **);
+	int (*go)(dbg_event **);
+	int (*step)(int, int, dbg_event **);
+	int (*liststackframes)(dbg_event **);
+	int (*setcurrentstackframe)(int, dbg_event **);
 	int (*evaluateexpression)(char *, dbg_event **);
+	int (*gettype)(char *, dbg_event **);
 	int (*listlocalvariables)(dbg_event **);
 	int (*listarguments)(dbg_event **);
 	int (*listglobalvariables)(dbg_event **);
-	int (*quit)(void *, dbg_event **);
+	int (*quit)(dbg_event **);
 	int (*progress)(void *, void (*)(dbg_event *));
 };
 typedef struct dbg_backend_funcs	dbg_backend_funcs;
