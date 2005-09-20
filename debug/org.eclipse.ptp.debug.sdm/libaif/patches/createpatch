@@ -1,0 +1,112 @@
+#!/bin/sh -e
+#
+# Create gdb patch files.
+#
+# Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+#
+
+FILES_50="aif-valprint.c c-valprint.c printcmd.c typeprint.c valprint.c libaif.mk configure.in aclocal.m4 configure"
+
+FILES_52="aif-valprint.c c-valprint.c printcmd.c typeprint.c valprint.c libaif.mk configure.in configure config.in"
+
+FILES_20020811CVS="aif-valprint.c c-valprint.c printcmd.c typeprint.c valprint.c libaif.mk configure.in configure config.in"
+
+if  [ $# -ne 1 ]; then
+	echo usage: $0 new-gdb-dir
+	exit 1
+fi
+
+NEWINSDIR=$1
+NEWSRCDIR=$1/gdb
+ORGINSDIR=$1-old
+ORGSRCDIR=$1-old/gdb
+
+if [ ! -d $NEWINSDIR -a ! -d $NEWSRCDIR ]; then
+	echo $0: could not find new gdb source
+	exit 1
+fi
+
+if [ ! -d $ORGINSDIR -a ! -d $ORGSRCDIR ]; then
+	echo $0: could not find original gdb source
+	exit 1
+fi
+
+if [ ! -f $NEWSRCDIR/Makefile.in -o ! -f $ORGSRCDIR/Makefile.in ]; then
+	echo $0: could not find Makefile.in
+	exit 1
+fi
+
+VERSION=""
+
+if [ -f $NEWSRCDIR/version.in ]; then
+	VERSION=`cat $NEWSRCDIR/version.in`
+else
+	VERSION=`grep '^VERSION' $NEWSRCDIR/Makefile.in | sed -e 's/VERSION = //'`
+fi
+
+if [ "x$VERSION" = x ]; then
+	echo $0: could not find version of new gdb
+	exit 1
+fi
+
+ORGVERSION=""
+
+if [ -f $ORGSRCDIR/version.in ]; then
+	ORGVERSION=`cat $ORGSRCDIR/version.in`
+else
+	ORGVERSION=`grep '^VERSION' $ORGSRCDIR/Makefile.in | sed -e 's/VERSION = //'`
+fi
+
+if [ "x$ORGVERSION" = x ]; then
+	echo $0: could not find version of original gdb
+	exit 1
+fi
+
+if [ $ORGVERSION != $VERSION ]; then
+	echo $0: original and new versions do not match
+	exit 1
+fi
+
+df=`echo $VERSION | sed -e 's/-//g' -e 's/\.//g' | tr 'a-z' 'A-Z'`
+FILES=`eval echo '$'"FILES_$df"`
+
+NEWDIR=`basename $NEWINSDIR`
+PARENT=`dirname $NEWINSDIR`
+ORGDIR=$NEWDIR-old
+
+case $VERSION in
+5.[02]|2002-08-11-cvs)
+	rm -f gdb-$VERSION.patch
+	for i in $FILES
+	do
+		ORG=$ORGDIR/gdb/$i
+		NEW=$NEWDIR/gdb/$i
+		if [ ! -f $ORGSRCDIR/$i ]; then ORG=/dev/null; fi
+		if [ ! -f $NEWSRCDIR/$i ]; then NEW=/dev/null; fi
+		(cd $PARENT; diff -uN $ORG $NEW || true) >> gdb-$VERSION.patch
+	done
+	;;
+
+*)
+	echo $0: version $VERSION of gdb not supported
+	exit 1
+	;;
+esac
+
+exit 0

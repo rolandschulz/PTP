@@ -1,0 +1,168 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+          "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<book><title>Libaif</title>
+  <bookinfo>
+    <authorgroup>
+      <author>
+	<firstname>Greg</firstname>
+	<surname>Watson</surname>
+      </author>
+      <author>
+	<firstname>David</firstname>
+	<surname>Abramson</surname>
+      </author>
+      <author>
+	<firstname>Brian</firstname>
+	<surname>May</surname>
+      </author>
+      <author>
+	<firstname>Donny</firstname>
+	<surname>Kurniawan</surname>
+      </author>
+    </authorgroup>
+    <copyright>
+      <year>2001</year>
+      <holder>GuardSoft Pty. Ltd.</holder>
+    </copyright>
+    <affiliation>
+      <orgname>Monash University</orgname>
+      <address>Clayton, Victoria, Melbourne</address>
+    </affiliation>
+  </bookinfo>
+
+<!-- ====================================================================== -->
+<chapter><title>Quick Start</title>
+<para>
+This chapter describes how to start using <emphasis>libaif</emphasis>
+in the minimum amount of time.
+</para>
+
+<section><title>Installing <emphasis>libaif</emphasis></title>
+
+<para>
+<itemizedlist>
+  <listitem>
+    <para>Download and extract the source code:</para>
+<para>
+<screen>
+
+$ tar -xzf libaif-1.0.0.tar.gz
+
+</screen>
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>Compile and install <emphasis>libaif</emphasis> by
+    changing to the
+    directory, and using <userinput>configure</userinput> and
+    <userinput>make</userinput>, followed by
+    <userinput>make install</userinput> (as root).</para>
+
+    <para>For example:
+<screen>
+
+$ cd libaif-1.0.0
+$ configure
+
+...
+
+$ make
+
+...
+
+$ make install
+
+...
+
+</screen></para>
+  </listitem>
+</itemizedlist>
+</para>
+
+</section>
+
+<!-- ...................................................................... -->
+
+<section><title>Installing patched <emphasis>GDB</emphasis></title>
+
+<para>
+<itemizedlist>
+  <listitem>
+    <para>AIF is currently supported in versions 5.0 and 5.2 of <emphasis>GDB</emphasis>. 
+    Download the source code for the version of <emphasis>GDB</emphasis> that suits your system.
+    </para>
+  </listitem>
+  <listitem>
+    <para>Extract source code, and apply the patch from
+    <emphasis>libaif</emphasis>, using
+    the supplied patch script <userinput>applypatch</userinput>.</para>
+
+    <para> For example:
+<screen>
+
+$ cd /tmp
+$ tar -xzf gdb_5.0.tar.gz 
+$ cd $(libaif)/patches
+$ ./applypatch -install-all /tmp/gdb-5.0
+patching file gdb-5.0/gdb/aif-valprint.c
+patching file gdb-5.0/gdb/c-valprint.c
+patching file gdb-5.0/gdb/printcmd.c
+patching file gdb-5.0/gdb/typeprint.c
+patching file gdb-5.0/gdb/valprint.c
+patching file gdb-5.0/gdb/Makefile.in
+patching file gdb-5.0/gdb/libaif.mk
+
+</screen>
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>Compile and install <emphasis>GDB</emphasis> by
+    changing to the
+    directory, and using <userinput>configure</userinput> and
+    <userinput>make</userinput>, followed by
+    <userinput>make install</userinput> (as root).
+    </para>
+
+    <note><para>You should use the
+      <userinput>--with-aif=<replaceable>dir</replaceable></userinput> (or 
+      <userinput>--with-aif-lib=<replaceable>dir</replaceable></userinput> and
+      <userinput>--with-aif-include=<replaceable>dir</replaceable></userinput>)
+      options in order to allow <userinput>configure</userinput> to locate the
+      libaif library and include files.
+    </para></note>
+
+    <para> Example:
+<screen>
+
+$ cd /tmp/gdb-5.0
+$ ./configure --with-aif=$(libaif-insdir) alpha-redhat-linux
+
+...
+
+$ make
+
+...
+
+$ make install
+
+...
+
+</screen>
+</para>
+  </listitem>
+
+</itemizedlist>
+</para>
+
+</section>
+
+<!-- ...................................................................... -->
+
+</chapter>
+
+<!-- ====================================================================== -->
+
+</book>

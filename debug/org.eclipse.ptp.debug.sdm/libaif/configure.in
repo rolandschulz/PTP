@@ -1,0 +1,76 @@
+dnl
+dnl Copyright (c) 1996-2001 by Guardsoft Pty Ltd.
+dnl
+dnl This program is free software; you can redistribute it and/or modify
+dnl it under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation; either version 2 of the License, or
+dnl (at your option) any later version.
+dnl
+dnl This program is distributed in the hope that it will be useful,
+dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with this program; if not, write to the Free Software
+dnl Foundation, Inc., 59 Temple Place - Suite 330,
+dnl Boston, MA 02111-1307, USA.
+dnl
+
+AC_PREREQ(2.50)
+
+AC_INIT(aif.c)
+AC_CONFIG_HEADER(config.h)
+
+CFLAGS="$CFLAGS -Wall"
+
+dnl Checks for programs.
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+
+dnl Checks for libraries.
+
+dnl Check endianness
+AC_C_BIGENDIAN
+
+dnl See if compiler supports "long long" type.
+
+AC_CHECK_SIZEOF(long long)
+if test $ac_cv_sizeof_long_long -ne 0; then
+	AC_DEFINE(CC_HAS_LONG_LONG,1,[define if system has long long type.])
+fi
+
+dnl See if compiler supports "long double" type.
+
+AC_CHECK_SIZEOF(long double)
+if test $ac_cv_sizeof_long_double -ne 0; then
+	dnl See if "long double" is longer than "double".
+
+	AC_CHECK_SIZEOF(double)
+	if test $ac_cv_sizeof_long_double -gt $ac_cv_sizeof_double; then
+		AC_DEFINE(HAVE_LONG_DOUBLE,1,[define if system has long double type.])
+	fi
+fi
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(strings.h sys/time.h unistd.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_TIME
+AC_STRUCT_TM
+
+dnl Checks for library functions.
+AC_FUNC_MEMCMP
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS(strdup)
+
+AC_PATH_PROG(XMLTO, xmlto)
+if test -z "$ac_cv_path_XMLTO"; then
+	AC_MSG_WARN([You must have XMLTO to compile the XML documentation for libaif.])
+	XMLTO=":"
+fi
+
+AC_OUTPUT(Makefile doc/Makefile)
