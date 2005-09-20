@@ -23,6 +23,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
@@ -30,6 +33,7 @@ import org.eclipse.ptp.core.IProcessEvent;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.IPTPUIConstants;
+import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.listeners.IJobChangeListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -41,7 +45,7 @@ import org.eclipse.ptp.ui.model.internal.ElementHandler;
  * 
  */
 public class JobManager extends AbstractUIManager implements IProcessListener {
-	protected Map jobList = new HashMap();
+	protected Map jobList = null;
 	protected String cur_job_id = EMPTY_ID;
 	protected List jobChangeListeners = new ArrayList();
 
@@ -49,8 +53,7 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		modelManager = PTPCorePlugin.getDefault().getModelManager();
 	}
 	public void shutdown() {
-		jobList.clear();
-		jobList = null;
+		clear();
 		modelManager = null;
 		jobChangeListeners.clear();
 		jobChangeListeners = null;
@@ -83,6 +86,10 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	}
 	public int size() {
 		return jobList.size();
+	}
+	public void clear() {
+		jobList.clear();
+		jobList = null;
 	}
 	public IPJob[] getJobs() {
 		return modelManager.getUniverse().getSortedJobs();
@@ -181,6 +188,9 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		}
 	}
 	public String initial() {
+		if (jobList == null)
+			jobList = new HashMap();
+
 		String last_job_id = EMPTY_ID;
 		IPJob[] jobs = getJobs();
 		if (jobs.length > 0) {
@@ -230,6 +240,10 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		terminate(getCurrentJobId());
 	}
 	public void terminate(String job_id) {
-		
+		try {
+			modelManager.abortJob(getName(job_id));
+		} catch (CoreException e) {
+			ErrorDialog.openError(PTPUIPlugin.getActiveWorkbenchShell(), "Terminate Job Error", "Cannot terminate the job.", e.getStatus());
+		}
 	}
 }

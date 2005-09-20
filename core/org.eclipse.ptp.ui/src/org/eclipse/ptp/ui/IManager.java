@@ -38,6 +38,7 @@ public interface IManager {
 	
 	public void shutdown();
 	public int size();
+	public void clear();
 	public String initial();
 	public IElementHandler getElementHandler(String id);
 	public String getName(String id);
