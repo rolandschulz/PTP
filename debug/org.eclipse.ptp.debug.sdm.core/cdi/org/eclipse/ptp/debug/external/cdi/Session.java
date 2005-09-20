@@ -121,6 +121,10 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 		return debugger;
 	}
 	
+	public IPJob getJob() {
+		return dJob;
+	}
+	
 	public Process getProcess(int i) {
 		return debugger.getProcess(i).getProcess();
 	}

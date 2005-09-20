@@ -29,6 +29,7 @@ import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIAddressBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 
@@ -42,6 +43,7 @@ public interface IPCDISession extends ICDISession {
 	public boolean isRegistered(int i);
 	public IPCDITarget getTarget(int i);
 	public IPCDIModelManager getModelManager();
+	public IPJob getJob();
 	
 	/* Breakpoint */
 	public ICDILineBreakpoint setLineBreakpoint(int type,

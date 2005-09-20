@@ -39,6 +39,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.Locator;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
@@ -67,8 +68,7 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 	}
 
 	public ICDILocator getLocator() {
-		// Auto-generated method stub
-		System.out.println("StackFrame.getLocator()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		BigInteger addr = BigInteger.ZERO;
 		if (sFile != null && sFunction != null) {
 			if (fLocator == null) {
@@ -92,8 +92,7 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 	}
 
 	public boolean equals(ICDIStackFrame stackframe) {
-		// Auto-generated method stub
-		System.out.println("StackFrame.equals()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (stackframe instanceof StackFrame) {
 			StackFrame stack = (StackFrame)stackframe;
 			boolean equal =  cthread != null &&
@@ -113,21 +112,18 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 	}
 
 	public void stepReturn() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("StackFrame.stepReturn()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		
 		// FIXME Donny, correct way to do this?
 		((Thread) getThread()).stepReturn();
 	}
 
 	public void stepReturn(ICDIValue value) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("StackFrame.stepReturn(" + value + ")");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public ICDILocalVariableDescriptor[] getLocalVariableDescriptors() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("StackFrame.getLocalVariableDescriptors");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
         if (localDescs == null) {
                 Session session = (Session) getTarget().getSession();
                 VariableManager mgr = session.getVariableManager();
@@ -137,8 +133,7 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 	}
 
 	public ICDIArgumentDescriptor[] getArgumentDescriptors() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("StackFrame.getArgumentDescriptors");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
         if (argDescs == null) {
                 Session session = (Session)getTarget().getSession();
                 VariableManager mgr = session.getVariableManager();
@@ -148,8 +143,7 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 	}
 
 	public ICDIArgument createArgument(ICDIArgumentDescriptor varDesc) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("StackFrame.createArgument()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (varDesc instanceof ArgumentDescriptor) {
 			Session session = (Session)getTarget().getSession();
 			VariableManager mgr = session.getVariableManager();
@@ -159,8 +153,7 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 	}
 
 	public ICDILocalVariable createLocalVariable(ICDILocalVariableDescriptor varDesc) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("StackFrame.createLocalVariable()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (varDesc instanceof ArgumentDescriptor) {
 			return createArgument((ICDIArgumentDescriptor)varDesc);
 		} else if (varDesc instanceof LocalVariableDescriptor) {
