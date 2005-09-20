@@ -20,8 +20,32 @@
 #ifndef _DBG_EVENT_H_
 #define _DBG_EVENT_H_
 
+#include <aif.h>
+
+#include "breakpoint.h"
+#include "list.h"
+
+#define DBGEV_OK		0
+#define DBGEV_BPHIT	1
+#define DBGEV_SIGNAL	2
+#define DBGEV_EXIT	3
+#define DBGEV_STEP	4
+#define DBGEV_BPSET	5
+#define DBGEV_FRAMES	7
+#define DBGEV_DATA	8
+#define DBGEV_TYPE	9
+#define DBGEV_VARS	9
+#define DBGEV_INIT	10
+
 struct dbg_event {
+	int			event;
+	breakpoint *	bp;
+	List *		list;
+	char *		type_desc;
+	AIF *		data;
 };
 typedef struct dbg_event dbg_event;
 
+extern dbg_event *	NewEvent(int);
+extern void			FreeEvent(dbg_event *);
 #endif /* _DBG_EVENT_H_ */
