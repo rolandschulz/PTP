@@ -1,0 +1,6 @@
+testaif
+config.status
+Makefile
+aif_xdr.c
+config.h
+*.a
