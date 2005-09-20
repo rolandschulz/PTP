@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui.actions;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.ui.IManager;
@@ -43,7 +45,11 @@ public class TerminateAllAction extends ParallelAction {
 	public void run() {
 		IManager manager = view.getUIManager();
 		if (manager instanceof JobManager) {
-			((JobManager)manager).terminate();
+			try {
+				((JobManager)manager).terminateAll();
+			} catch (CoreException e) {
+				ErrorDialog.openError(getShell(), "Terminate Job Error", "Cannot terminate the job.", e.getStatus());
+			}
 		}
 	}
 }

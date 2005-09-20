@@ -18,8 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.model.IElement;
@@ -42,7 +44,11 @@ public class TerminateAction extends DebugAction {
 	public void run() {
 		IManager manager = view.getUIManager();
 		if (manager instanceof UIDebugManager) {
-			((UIDebugManager)manager).terminate();
+			try {
+				((UIDebugManager)manager).terminate();
+			} catch (CoreException e) {
+				PTPDebugUIPlugin.errorDialog(getShell(), "Error", e.getStatus());				
+			}
 		}
 	}
 }
