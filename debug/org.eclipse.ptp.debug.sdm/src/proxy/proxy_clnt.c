@@ -97,6 +97,13 @@ proxy_clnt_evaluateexpression_not_imp(void *data, int p, char *expr)
 }
 
 int 
+proxy_clnt_gettype_not_imp(void *data, int p, char *expr)
+{
+	DbgSetError(DBGERR_NOTIMP, NULL);
+	return -1;
+}
+
+int 
 proxy_clnt_listlocalvariables_not_imp(void *data, int p)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);

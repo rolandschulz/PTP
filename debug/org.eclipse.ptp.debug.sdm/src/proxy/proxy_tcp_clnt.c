@@ -55,6 +55,7 @@ proxy_clnt_funcs proxy_tcp_clnt_funcs =
 	proxy_clnt_liststackframes_not_imp,
 	proxy_clnt_setcurrentstackframe_not_imp,
 	proxy_clnt_evaluateexpression_not_imp,
+	proxy_clnt_gettype_not_imp,
 	proxy_clnt_listlocalvariables_not_imp,
 	proxy_clnt_listarguments_not_imp,
 	proxy_clnt_listglobalvariables_not_imp,
