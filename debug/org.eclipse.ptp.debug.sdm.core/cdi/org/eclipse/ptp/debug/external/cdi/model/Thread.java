@@ -39,6 +39,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorage;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorageDescriptor;
 import org.eclipse.ptp.debug.external.IDebugger;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.Session;
 
 public class Thread extends PTPObject implements ICDIThread {
@@ -139,14 +140,12 @@ public class Thread extends PTPObject implements ICDIThread {
 	}
 
 	public ICDIThreadStorageDescriptor[] getThreadStorageDescriptors() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.getThreadStorageDescriptors()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public void resume() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.resume()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void stepOver() throws CDIException {
@@ -167,19 +166,15 @@ public class Thread extends PTPObject implements ICDIThread {
 	}
 
 	public void stepOverInstruction() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.stepOverInstruction()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void stepIntoInstruction() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.stepIntoInstruction()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void stepReturn() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.stepReturn()");
-		
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		Target target = (Target) getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
@@ -188,28 +183,23 @@ public class Thread extends PTPObject implements ICDIThread {
 	}
 
 	public void runUntil(ICDILocation location) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.runUntil()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void jump(ICDILocation location) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.jump()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void signal() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.signal()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void signal(ICDISignal signal) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.signal()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public boolean equals(ICDIThread thread) {
-		// Auto-generated method stub
-		System.out.println("Thread.equals()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (thread instanceof Thread) {
 			Thread cthread = (Thread) thread;
 			return id == cthread.getId();
@@ -218,9 +208,7 @@ public class Thread extends PTPObject implements ICDIThread {
 	}
 
 	public void stepOver(int count) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.stepOver(" + count + ")");
-		
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		Target target = (Target) getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
@@ -229,14 +217,11 @@ public class Thread extends PTPObject implements ICDIThread {
 	}
 
 	public void stepOverInstruction(int count) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.stepOverInstruction()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void stepInto(int count) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.stepInto(" + count + ")");
-		
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		Target target = (Target) getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
@@ -245,19 +230,15 @@ public class Thread extends PTPObject implements ICDIThread {
 	}
 
 	public void stepIntoInstruction(int count) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.stepIntoInstruction()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void stepUntil(ICDILocation location) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.stepUntil()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void resume(boolean passSignal) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.resume(" + passSignal + ")");
-		
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		Target target = (Target) getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
@@ -266,29 +247,24 @@ public class Thread extends PTPObject implements ICDIThread {
 	}
 
 	public void resume(ICDILocation location) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.resume3()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void resume(ICDISignal signal) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.resume4()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void suspend() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.suspend()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public boolean isSuspended() {
-		// Auto-generated method stub
-		System.out.println("Thread.isSuspended()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return getTarget().isSuspended();
 	}
 
 	public ICDIThreadStorage createThreadStorage(ICDIThreadStorageDescriptor varDesc) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.createThreadStorage()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 }

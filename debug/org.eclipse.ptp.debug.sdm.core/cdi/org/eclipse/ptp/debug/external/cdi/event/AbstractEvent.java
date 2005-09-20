@@ -35,6 +35,7 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.utils.BitList;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 
@@ -89,8 +90,7 @@ public abstract class AbstractEvent implements IPCDIEvent {
 	}
 	
 	public ICDIObject getSource() {
-		// Auto-generated method stub
-		System.out.println("AbstractEvent.getSource()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (src == null) {
 			int[] registeredTargets = session.getRegisteredTargetIds();
 			BitList bitList = sources.toBitList();

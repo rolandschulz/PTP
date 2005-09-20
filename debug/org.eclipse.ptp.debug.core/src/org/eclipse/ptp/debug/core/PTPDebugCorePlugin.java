@@ -87,6 +87,7 @@ public class PTPDebugCorePlugin extends Plugin {
 
 	private HashMap fDebugConfigurations;
 	private static Logger logger;
+	private Level loggingLevel = Level.FINE;
 
 	/**
 	 * Breakpoint listener list.
@@ -401,9 +402,9 @@ public class PTPDebugCorePlugin extends Plugin {
 					return out;
 				}});
 			
-			console.setLevel(Level.FINER);
+			console.setLevel(loggingLevel);
 			logger.addHandler(console);
-			logger.setLevel(Level.FINER);
+			logger.setLevel(loggingLevel);
 		}
 		
 		return logger;
