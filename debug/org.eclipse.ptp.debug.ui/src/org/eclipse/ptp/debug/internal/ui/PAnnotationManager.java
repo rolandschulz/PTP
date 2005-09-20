@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.internal.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -72,7 +73,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	private static PAnnotationManager instance = null;
 	protected UIDebugManager uiDebugManager = null;
-	private Map annotationMap = new HashMap();
+	private Map annotationMap = Collections.synchronizedMap(new HashMap());
 
 	public PAnnotationManager(UIDebugManager uiDebugManager) {
 		this.uiDebugManager = uiDebugManager;
