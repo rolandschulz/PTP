@@ -173,9 +173,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	public int convertToInt(String id) {
 		return Integer.parseInt(id);
 	}
-	/***
-	 * Register / Unregister 
-	 ****/
+	/*******************************************************************************************************************************************************************************************************************************************************************************************************
+	 * Register / Unregister
+	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public void registerProcess(IPCDISession session, int task_id, boolean isChanged) {
 		session.registerTarget(task_id, isChanged);
 	}
@@ -186,11 +186,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPJob job = findJobById(getCurrentJobId());
 		if (job == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No job found", null));
-
 		IPCDISession session = (IPCDISession) getDebugSession(job);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		
 		for (int i = 0; i < elements.length; i++) {
 			// only unregister some registered elements
 			if (elements[i].isRegistered()) {
@@ -204,11 +202,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPJob job = findJobById(getCurrentJobId());
 		if (job == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No job found", null));
-
 		IPCDISession session = (IPCDISession) getDebugSession(job);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-
 		for (int i = 0; i < elements.length; i++) {
 			// only register some unregistered elements
 			if (!elements[i].isRegistered()) {
@@ -423,19 +419,19 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				}
 				fireSuspendEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof EndSteppingRangeEvent) {
-				//System.out.println("-------------------- end stepping  ------------------------");
-				//annotationMgr.printBitList(event.getAllProcesses().toBitList());
+				// System.out.println("-------------------- end stepping ------------------------");
+				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
 				fireSuspendEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof InferiorResumedEvent) {
-				//FIXME hardcode the filename
+				// FIXME hardcode the filename
 				String fileName = "TestC/main.c";
 				try {
 					annotationMgr.removeAnnotation(job.getIDString(), fileName, event.getAllProcesses().toBitList());
 				} catch (CoreException e) {
 					PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
 				}
-				//System.out.println("-------------------- resume ------------------------");
-				//annotationMgr.printBitList(event.getAllProcesses().toBitList());
+				// System.out.println("-------------------- resume ------------------------");
+				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
 				fireResumeEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof InferiorExitedEvent || event instanceof ErrorEvent) {
 				String fileName = "TestC/main.c";
@@ -444,8 +440,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				} catch (CoreException e) {
 					PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
 				}
-				//System.out.println("-------------------- terminate ------------------------");
-				//annotationMgr.printBitList(event.getAllProcesses().toBitList());
+				// System.out.println("-------------------- terminate ------------------------");
+				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
 				fireTerminatedEvent(job, event.getAllProcesses().toBitList());
 				condition = job.isAllStop() ? new Boolean(true) : null;
 			} else if (event instanceof BreakpointHitEvent) {
@@ -502,7 +498,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		//TODO: no suspend method in session
+		// TODO: no suspend method in session
 	}
 	public void terminate() throws CoreException {
 		terminate(getCurrentJobId(), getCurrentSetId());
