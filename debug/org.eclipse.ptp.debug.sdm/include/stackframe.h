@@ -23,15 +23,11 @@
 #include "location.h"
 
 struct stackframe {
-	int		frame_level;
-	location	frame_location;
+	int		level;
+	location	loc;
 };
 typedef struct stackframe stackframe;
 
-struct stackframelist {
-	stackframe				frame;
-	struct stackframelist *	next;
-};
-typedef struct stackframelist stackframelist;
-
+extern stackframe *	NewStackframe(int);
+extern void			FreeStackframe(stackframe *);
 #endif /*STACKFRAME_H_*/
