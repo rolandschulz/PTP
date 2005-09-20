@@ -38,7 +38,6 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.PCDIException;
-import org.eclipse.ptp.debug.external.cdi.breakpoints.FunctionBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
@@ -284,13 +283,8 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 	}
 
 	public void go(IPCDIDebugProcessSet procs) throws PCDIException {
-		// Currently we apply this method globally for all procs
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		state = RUNNING;
-		
-		if (procs == null)
-			return;
-		
 		IPCDIDebugProcess[] procList = procs.getProcesses();
 		for (int i = 0; i < procList.length; i++) {
 			((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0).resume();
@@ -298,13 +292,15 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 	}
 
 	public void halt(IPCDIDebugProcessSet procs) throws PCDIException {
-		// Currently we apply this method globally for all procs
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		state = SUSPENDED;
+		IPCDIDebugProcess[] list = procs.getProcesses();
+		for (int i = 0; i < list.length; i++) {
+			((DebugProcess) list[i]).getPProcess().setStatus(IPProcess.STOPPED);
+		}
 	}
 
 	public void kill(IPCDIDebugProcessSet procs) throws PCDIException {
-		// Currently we apply this method globally for all procs
 		IPCDIDebugProcess[] list = procs.getProcesses();
 		for (int i = 0; i < list.length; i++) {
 			((DebugProcess) list[i]).getPProcess().setTerminated(true);
@@ -358,12 +354,10 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 			fireEvent(new BreakpointHitEvent(getSession(), new DebugProcessSet(session, procId), bpt));
 			debuggerOutput.addItem("BreakpointHit Event for " + procId);
 		} else if (event.equals("ENDSTEPPINGRANGE")) {
-			//String file = (String) list.get(2);
-			//int line = ((Integer) list.get(3)).intValue();
-			//LineLocation loc = new LineLocation(file, line);
-			//LineBreakpoint bpt = new LineBreakpoint(ICDIBreakpoint.REGULAR, loc, null);
-			fireEvent(new EndSteppingRangeEvent(getSession(), new DebugProcessSet(session, procId)));
-			//fireEvent(new BreakpointHitEvent(getSession(), new DebugProcessSet(session, procId), bpt));
+			String file = (String) list.get(2);
+			int line = ((Integer) list.get(3)).intValue();
+			LineLocation loc = new LineLocation(file, line);
+			fireEvent(new EndSteppingRangeEvent(getSession(), new DebugProcessSet(session, procId), loc));
 			debuggerOutput.addItem("EndSteppingRange Event for " + procId);
 		} else if (event.equals("RESUMED")) {
 			fireEvent(new InferiorResumedEvent(getSession(), new DebugProcessSet(session, procId)));

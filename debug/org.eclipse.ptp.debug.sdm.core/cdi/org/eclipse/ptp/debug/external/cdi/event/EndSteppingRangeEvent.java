@@ -28,6 +28,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
+import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
+import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
@@ -40,12 +42,15 @@ import org.eclipse.ptp.debug.external.cdi.Session;
  */
 public class EndSteppingRangeEvent extends AbstractEvent implements IPCDISuspendedEvent {
 
-	public EndSteppingRangeEvent(IPCDISession s, IPCDIDebugProcessSet sources) {
+	ICDILineLocation lineLoc;
+	
+	public EndSteppingRangeEvent(IPCDISession s, IPCDIDebugProcessSet sources, ICDILineLocation loc) {
 		super(s, sources);
+		lineLoc = loc;
 	}
 	
 	public ICDISessionObject getReason() {
-		return new EndSteppingRangeInfo((Session) session, this);
+		return new EndSteppingRangeInfo((Session) session, this, lineLoc);
 	}
 
 }

@@ -423,6 +423,17 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 			e.printStackTrace();
 		}
 	}
+	
+	public void suspend(String setName) {
+		// Auto-generated method stub
+		System.out.println("Session.resume()");
+		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
+		try {
+			debugger.halt(set);
+		} catch (PCDIException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void terminate(String setName) {
 		// Auto-generated method stub
