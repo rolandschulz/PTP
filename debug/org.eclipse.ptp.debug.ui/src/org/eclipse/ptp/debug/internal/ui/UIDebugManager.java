@@ -441,6 +441,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	}
 	public void fireResumeEvent(IPJob job, BitList tasks) {
 		IElementHandler elementHandler = getElementHandler(job.getIDString());
+		System.out.println("-------------------- resume tasks: " + tasks.cardinality());
 		BitList suspendedTasks = (BitList) elementHandler.getData(SUSPENDED_PROC_KEY);
 		// remove tasks
 		suspendedTasks.andNot(tasks);
@@ -448,6 +449,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	}
 	public void fireTerminatedEvent(IPJob job, BitList tasks) {
 		IElementHandler elementHandler = getElementHandler(job.getIDString());
+		System.out.println("-------------------- terminate tasks: " + tasks.cardinality());
 		BitList terminatedTasks = (BitList) elementHandler.getData(TERMINATED_PROC_KEY);
 		// only add tasks
 		terminatedTasks.or(tasks);

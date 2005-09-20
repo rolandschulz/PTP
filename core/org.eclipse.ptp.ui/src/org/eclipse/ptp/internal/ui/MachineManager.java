@@ -39,15 +39,14 @@ import org.eclipse.ptp.ui.model.internal.ElementHandler;
  * 
  */
 public class MachineManager extends AbstractUIManager implements INodeListener {
-	private Map machineList = new HashMap();
+	private Map machineList = null;
 	protected String cur_machine_id = EMPTY_ID;
 
 	public MachineManager() {
 		modelManager = PTPCorePlugin.getDefault().getModelManager();
 	}
 	public void shutdown() {
-		machineList.clear();
-		machineList = null;
+		clear();
 		modelManager = null;
 		super.shutdown();
 	}
@@ -62,6 +61,10 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 	}
 	public int size() {
 		return machineList.size();
+	}
+	public void clear() {
+		machineList.clear();
+		machineList = null;
 	}
 	public IPMachine[] getMachines() {
 		return modelManager.getUniverse().getSortedMachines();
@@ -189,12 +192,9 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 		}
 	}
 	public String initial() {
-		if(machineList != null) {
-			machineList.clear();
-			machineList = null;
-		}
-		machineList = new HashMap();
-		
+		if (machineList == null)
+			machineList = new HashMap();
+
 		IPMachine[] macs = getMachines();
 		if (macs.length > 0) {
 			cur_machine_id = macs[0].getIDString();

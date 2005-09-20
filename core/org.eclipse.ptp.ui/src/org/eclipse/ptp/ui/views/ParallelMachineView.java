@@ -303,8 +303,6 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	}
 	public void run() {
 		System.out.println("------------ machine run");
-		// when the job is started, the node in the machine will not add more, so it doesn't need this method
-		// initialView();
 		refresh();
 	}
 	public void start() {
@@ -325,6 +323,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	}
 	public void monitoringSystemChangeEvent(Object object) {
 		System.out.println("------------ machine monitoringSystemChangeEvent");
+		manager.clear();
 		initialView();
 		refresh();
 	}
