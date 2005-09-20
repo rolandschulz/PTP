@@ -36,6 +36,7 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.FunctionBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
@@ -86,8 +87,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 	}
 	
 	protected void stopDebugger() {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.stopDebugger()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		finished = true;
 	}
 
@@ -245,8 +245,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 	}
 
 	public void stepInto(IPCDIDebugProcessSet procs, int count) throws PCDIException {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.stepOver()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		state = RUNNING;
 		
 		if (procs == null)
@@ -259,8 +258,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 	}
 
 	public void stepOver(IPCDIDebugProcessSet procs, int count) throws PCDIException {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.stepOver()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		state = RUNNING;
 		
 		if (procs == null)
@@ -273,8 +271,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 	}
 
 	public void stepFinish(IPCDIDebugProcessSet procs, int count) throws PCDIException {
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.stepOver()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		state = RUNNING;
 		
 		if (procs == null)
@@ -288,8 +285,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 
 	public void go(IPCDIDebugProcessSet procs) throws PCDIException {
 		// Currently we apply this method globally for all procs
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.go()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		state = RUNNING;
 		
 		if (procs == null)
@@ -303,8 +299,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 
 	public void halt(IPCDIDebugProcessSet procs) throws PCDIException {
 		// Currently we apply this method globally for all procs
-		// Auto-generated method stub
-		System.out.println("DebugSimulator.halt()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		state = SUSPENDED;
 	}
 
@@ -328,8 +323,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 	}
 
 	public void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDILineBreakpoint bpt) throws PCDIException {
-		System.out.println("DebugSimulator.setLineBreakpoint() : " +
-				((LineBreakpoint) bpt).getLineNumber());
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		int line = ((LineBreakpoint) bpt).getLineNumber();
 		
 		IPCDIDebugProcess[] procList = procs.getProcesses();
@@ -343,8 +337,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 	}
 
 	public void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIFunctionBreakpoint bpt) throws PCDIException {
-		System.out.println("DebugSimulator.setFunctionBreakpoint() : " +
-				((FunctionBreakpoint) bpt).getFunction());
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void deleteBreakpoints(ICDIBreakpoint[] bp) throws PCDIException {

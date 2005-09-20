@@ -40,6 +40,7 @@ import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
 import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.event.AbstractEvent;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
@@ -58,7 +59,7 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	 * @see org.eclipse.cdt.debug.core.cdi.ICDIEventManager#addEventListener(ICDIEventListener)
 	 */
 	public void addEventListener(ICDIEventListener listener) {
-		System.out.println("EventManager.addEventListener()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (!list.contains(listener))
 			list.add(listener);
 	}
@@ -67,13 +68,13 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	 * @see org.eclipse.cdt.debug.core.cdi.ICDIEventManager#removeEventListener(ICDIEventListener)
 	 */
 	public void removeEventListener(ICDIEventListener listener) {
-		System.out.println("EventManager.removeEventListener()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (list.contains(listener))
 			list.remove(listener);
 	}
 
 	public void removeEventListeners() {
-		System.out.println("EventManager.removeEventListeners()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		list.clear();
 	}
 
@@ -94,8 +95,7 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	 * and fire the corresponding CDI event.
 	 */
 	public void update(Observable obs, Object ev) {
-		System.out.println("EventManager.update()");
-		
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		IPCDIEvent event = (IPCDIEvent) ev;
 		
 		List cdiList = new ArrayList(1);

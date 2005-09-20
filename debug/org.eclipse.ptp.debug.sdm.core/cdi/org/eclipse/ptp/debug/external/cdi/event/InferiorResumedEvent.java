@@ -31,6 +31,7 @@ package org.eclipse.ptp.debug.external.cdi.event;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 
 /**
  */
@@ -41,8 +42,7 @@ public class InferiorResumedEvent extends AbstractEvent implements IPCDIResumedE
 	}
 	
 	public int getType() {
-		// Auto-generated method stub
-		System.out.println("InferiorResumedEvent.getType()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return 0;
 	}
 

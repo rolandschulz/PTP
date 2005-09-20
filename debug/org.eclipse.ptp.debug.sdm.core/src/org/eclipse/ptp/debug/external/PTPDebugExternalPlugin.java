@@ -42,6 +42,7 @@ public class PTPDebugExternalPlugin extends AbstractUIPlugin {
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
 	private static Logger logger;
+	private Level loggingLevel = Level.FINE;
 	
 	/**
 	 * The constructor.
@@ -145,9 +146,9 @@ public class PTPDebugExternalPlugin extends AbstractUIPlugin {
 					return out;
 				}});
 			
-			console.setLevel(Level.FINER);
+			console.setLevel(loggingLevel);
 			logger.addHandler(console);
-			logger.setLevel(Level.FINER);
+			logger.setLevel(loggingLevel);
 		}
 		
 		return logger;

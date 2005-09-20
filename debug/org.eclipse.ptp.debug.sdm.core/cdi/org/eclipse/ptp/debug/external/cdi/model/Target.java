@@ -61,6 +61,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.IDebugger;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
@@ -106,9 +107,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 
 	public String evaluateExpressionToString(ICDIStackFrame frame, String expressionText) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.evaluateExpressionToString()");
-		
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		// Target target = (Target) frame.getTarget();
 		// Session session = (Session) target.getSession();
 		// IDebugger debugger = session.getDebugger();
@@ -118,54 +117,46 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 
 	public ICDIGlobalVariableDescriptor getGlobalVariableDescriptors(String filename, String function, String name) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.getGlobalVariableDescriptors()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		VariableManager varMgr = ((Session)getSession()).getVariableManager();
 		return varMgr.getGlobalVariableDescriptor(this, filename, function, name);
 	}
 	
 	public ICDIRegisterGroup[] getRegisterGroups() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.getRegisterGroups()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public boolean isTerminated() {
-		// Auto-generated method stub
-		System.out.println("Target.isTerminated()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return getDebugProcess().isTerminated();
 	}
 
 	public void terminate() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.terminate()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		DebugProcessSet newSet = new DebugProcessSet((Session) getSession(), getTargetId());
 		fDebugger.kill(newSet);
 	}
 
 	public boolean isDisconnected() {
-		// Auto-generated method stub
-		System.out.println("Target.isDisconnected()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public void disconnect() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.disconnect()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		//fDebugger.detach(null);
 		DebugProcessSet newSet = new DebugProcessSet((Session) getSession(), getTargetId());
 		fDebugger.kill(newSet);
 	}
 
 	public void restart() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.restart()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		fDebugger.restart();
 	}
 
 	public void resume() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.resume()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		resume(false);
 	}
 
@@ -178,50 +169,41 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 
 	public void stepOverInstruction() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.stepOverInstruction()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void stepIntoInstruction() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.stepIntoInstruction()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void runUntil(ICDILocation location) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.runUntil()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void jump(ICDILocation location) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.jump()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void signal() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.signal()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void signal(ICDISignal signal) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.signal()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public ICDIRuntimeOptions getRuntimeOptions() {
-		// Auto-generated method stub
-		System.out.println("Target.getRuntimeOptions()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDICondition createCondition(int ignoreCount, String expression) {
-		// Auto-generated method stub
-		System.out.println("Target.createCondition()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDICondition createCondition(int ignoreCount, String expression, String[] threadIds) {
-		// Auto-generated method stub
-		System.out.println("Target.createCondition()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 	
@@ -259,74 +241,62 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 
 	public void stepOver(int count) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Thread.stepOver(" + count + ")");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		DebugProcessSet newSet = new DebugProcessSet((Session) getSession(), getTargetId());
 		fDebugger.stepOver(newSet, count);
 	}
 
 	public void stepOverInstruction(int count) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.stepOverInstruction()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void stepInto(int count) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.stepInto(" + count + ")");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		DebugProcessSet newSet = new DebugProcessSet((Session) getSession(), getTargetId());
 		fDebugger.stepInto(newSet, count);
 	}
 
 	public void stepIntoInstruction(int count) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.stepIntoInstruction()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void stepUntil(ICDILocation location) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.stepUntil()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		DebugProcessSet newSet = new DebugProcessSet((Session) getSession(), getTargetId());
 		fDebugger.stepFinish(newSet, 0);
 	}
 
 	public void resume(boolean passSignal) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.resume(" + passSignal + ")");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		DebugProcessSet newSet = new DebugProcessSet((Session) getSession(), getTargetId());
 		fDebugger.go(newSet);
 	}
 
 	public void resume(ICDILocation location) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.resume()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void resume(ICDISignal signal) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.resume()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void suspend() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.suspend()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		fDebugger.halt(null);
 	}
 
 	public boolean isSuspended() {
-		// Auto-generated method stub
-		System.out.println("Target.isSuspended()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return getDebugProcess().isSuspended();
 	}
 
 	public ICDISignal[] getSignals() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.getSignals()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDITarget getTarget() {
-		// Auto-generated method stub
-		System.out.println("Target.getTarget()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return this;
 	}
 	
@@ -341,104 +311,87 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 
 	public ICDIExpression[] getExpressions() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.getExpressions()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
 		return expMgr.getExpressions(this);
 	}
 
 	public void destroyExpressions(ICDIExpression[] expressions) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.destroyExpressions()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
 		expMgr.destroyExpressions(this, expressions);
 	}
 
 	public void destroyAllExpressions() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.destroyAllExpressions()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
 		expMgr.destroyAllExpressions(this);
 	}
 
 	public void addSourcePaths(String[] srcPaths) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.addSourcePaths()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public String[] getSourcePaths() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.getSourcePaths()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDIInstruction[] getInstructions(BigInteger startAddress, BigInteger endAddress) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.getInstructions()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDIInstruction[] getInstructions(String filename, int linenum) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.getInstructions()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDIInstruction[] getInstructions(String filename, int linenum, int lines) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.getInstructions()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDIMixedInstruction[] getMixedInstructions(BigInteger startAddress, BigInteger endAddress) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.getMixedInstructions()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDIMixedInstruction[] getMixedInstructions(String filename, int linenum) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.getMixedInstructions()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDIMixedInstruction[] getMixedInstructions(String filename, int linenum, int lines) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.getMixedInstructions()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDISharedLibrary[] getSharedLibraries() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.getSharedLibraries()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDIMemoryBlock createMemoryBlock(String address, int units, int wordSize) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.createMemoryBlock()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public void removeBlocks(ICDIMemoryBlock[] memoryBlocks) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.removeBlocks()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void removeAllBlocks() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.removeAllBlocks()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public ICDIMemoryBlock[] getMemoryBlocks() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.getMemoryBlocks()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public void setSourcePaths(String[] srcPaths) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.setSourcePaths()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	
@@ -446,74 +399,60 @@ public class Target extends SessionObject implements IPCDITarget {
 	/* Unused methods, see org.eclipse.ptp.debug.external.cdi.Session */
 	
 	public ICDILineLocation createLineLocation(String file, int line) {
-		// Auto-generated method stub
-		System.out.println("Target.createLineLocation()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDIFunctionLocation createFunctionLocation(String file, String function) {
-		// Auto-generated method stub
-		System.out.println("Target.createFunctionLocation()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDIAddressLocation createAddressLocation(BigInteger address) {
-		// Auto-generated method stub
-		System.out.println("Target.createAddressLocation()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDILineBreakpoint setLineBreakpoint(int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.setLineBreakpoint()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDIFunctionBreakpoint setFunctionBreakpoint(int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.setFunctionBreakpoint()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDIAddressBreakpoint setAddressBreakpoint(int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.setAddressBreakpoint()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDIWatchpoint setWatchpoint(int type, int watchType, String expression, ICDICondition condition) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.setWatchpoint()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDIExceptionpoint setExceptionBreakpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.setExceptionBreakpoint()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDIBreakpoint[] getBreakpoints() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.getBreakpoints()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public void deleteBreakpoints(ICDIBreakpoint[] breakpoints) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.deleteBreakpoints()");
-		
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void deleteAllBreakpoints() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.deleteAllBreakpoints()");
-		
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public ICDIGlobalVariable createGlobalVariable(ICDIGlobalVariableDescriptor varDesc) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.createGlobalVariable()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (varDesc instanceof GlobalVariableDescriptor) {
 			VariableManager varMgr = ((Session)getSession()).getVariableManager();
 			return varMgr.createGlobalVariable((GlobalVariableDescriptor)varDesc);
@@ -522,8 +461,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 
 	public ICDIRegister createRegister(ICDIRegisterDescriptor varDesc) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Target.createRegister()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
