@@ -188,7 +188,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 			updateTerminateButton(terminatedTaskList, set, suspendedTaskList);
 		}
 	}
-	public synchronized void updateSuspendResumeButton(BitList tasks, IElementSet set, BitList targetTasks) {
+	public void updateSuspendResumeButton(BitList tasks, IElementSet set, BitList targetTasks) {
 		if (set == null || tasks == null)
 			return;
 		boolean isEnabled = false;
@@ -214,7 +214,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		stepOverAction.setEnabled(isEnabled);
 		stepReturnAction.setEnabled(isEnabled);
 	}
-	public synchronized void updateTerminateButton(BitList tasks, IElementSet set, BitList targetTasks) {
+	public void updateTerminateButton(BitList tasks, IElementSet set, BitList targetTasks) {
 		if (set == null || tasks == null)
 			return;
 		int setSize = set.size();
@@ -254,7 +254,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * Debug Action Event
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	public synchronized void handleDebugActionEvent(IDebugActionEvent event) {
+	public void handleDebugActionEvent(IDebugActionEvent event) {
 		String job_id = event.getJobId();
 		// only take action with current job
 		if (!job_id.equals(getCurrentID())) {
