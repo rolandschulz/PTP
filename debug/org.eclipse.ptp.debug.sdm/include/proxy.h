@@ -38,6 +38,7 @@ struct proxy_clnt_funcs {
 	int (*liststackframes)(void *, int);
 	int (*setcurrentstackframe)(void *, int, int);
 	int (*evaluateexpression)(void *, int, char *);
+	int (*gettype)(void *, int, char *);
 	int (*listlocalvariables)(void *, int);
 	int (*listarguments)(void *, int);
 	int (*listglobalvariables)(void *, int);
@@ -74,6 +75,7 @@ extern int proxy_clnt_step_not_imp(void *, struct procset *, int, int);
 extern int proxy_clnt_liststackframes_not_imp(void *, int);
 extern int proxy_clnt_setcurrentstackframe_not_imp(void*, int, int);
 extern int proxy_clnt_evaluateexpression_not_imp(void *, int, char *);
+extern int proxy_clnt_gettype_not_imp(void *, int, char *);
 extern int proxy_clnt_listlocalvariables_not_imp(void *, int);
 extern int proxy_clnt_listarguments_not_imp(void *, int);
 extern int proxy_clnt_listglobalvariables_not_imp(void *, int);
