@@ -35,6 +35,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
 import org.eclipse.ptp.debug.external.IDebugger;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
@@ -88,12 +89,12 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 	}
 	
 	public String getName() {
-		System.out.println("VariableDescriptor.getName()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return fName;
 	}
 	
 	public String getTypeName() throws CDIException {
-		System.out.println("VariableDescriptor.getTypeName()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		// FIXME Donny
 		
 		Target target = (Target) getTarget();
@@ -104,12 +105,12 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 	}
 	
 	public String getQualifiedName() throws CDIException {
-		System.out.println("VariableDescriptor.getQualifiedName()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return fName;
 	}
 	
 	public ICDIType getType() throws CDIException {
-		System.out.println("VariableDescriptor.getQualifiedName()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		String typeName = getTypeName();
 		Target target = (Target) getTarget();
 		
@@ -121,22 +122,22 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 	}
 	
 	public int sizeof() throws CDIException {
-		System.out.println("VariableDescriptor.sizeof()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return 0;
 	}
 
 	public int getPosition() {
-		System.out.println("VariableDescriptor.getPosition()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return position;
 	}
 	
 	public int getStackDepth() {
-		System.out.println("VariableDescriptor.getStackDepth()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return stackdepth;
 	}
 	
 	public boolean equals(ICDIVariableDescriptor varDesc) {
-		System.out.println("VariableDescriptor.equals()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (varDesc instanceof VariableDescriptor) {
 			VariableDescriptor desc = (VariableDescriptor) varDesc;
 			if (desc.getName().equals(getName())) {
@@ -180,7 +181,7 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 	 * @see org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor#getVariableDescriptorAsArray(org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor, int, int)
 	 */
 	public ICDIVariableDescriptor getVariableDescriptorAsArray(int start, int length) throws CDIException {
-		System.out.println("VariableDescriptor.getVariableDescriptorAsArray()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		Session session = (Session)getTarget().getSession();
 		VariableManager mgr = session.getVariableManager();
 		//return mgr.getVariableDescriptorAsArray(this, start, length);
@@ -191,7 +192,7 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 	 * @see org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor#getVariableDescriptorAsType(org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor, java.lang.String)
 	 */
 	public ICDIVariableDescriptor getVariableDescriptorAsType(String type) throws CDIException {
-		System.out.println("VariableDescriptor.getVariableDescriptorAsType()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		Session session = (Session)getTarget().getSession();
 		VariableManager mgr = session.getVariableManager();
 		//return mgr.getVariableDescriptorAsType(this, type);
@@ -202,7 +203,7 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 	 * @see org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor#createVariable()
 	 */
 	public ICDIVariable createVariable() throws CDIException {
-		System.out.println("VariableDescriptor.createVariable()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		Session session = (Session)getTarget().getSession();
 		VariableManager mgr = session.getVariableManager();
 		return mgr.createVariable(this);

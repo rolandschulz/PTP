@@ -36,6 +36,7 @@ import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 
 /**
@@ -86,7 +87,7 @@ public class SessionManager implements IDebugEventSetListener {
 			if ( targets[i].getAdapter( IPCDITarget.class ) != null && session.equals( ((IPCDITarget)targets[i].getAdapter( IPCDITarget.class )).getSession() ) && !targets[i].isTerminated() && !targets[i].isDisconnected() )
 				terminate = false;
 		}
-		if ( terminate ) {
+		if ( terminate && ((IPCDISession) session).getJob().isAllStop()) {
 			try {
 				session.terminate();
 			}
