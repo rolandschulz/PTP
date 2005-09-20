@@ -27,6 +27,7 @@
 #include "breakpoint.h"
 #include "stackframe.h"
 #include "dbg_event.h"
+#include "list.h"
 
 #define DBGRES_OK			0
 #define DBGRES_ERR			-1
@@ -88,9 +89,9 @@ int DbgQuit(session *);
 /*
  * Breakpoint operations
  */
-int DbgSetLineBreakpoint(session *s, procset *set, char *file, int line, breakpoint *bp);
-int DbgSetFuncBreakpoint(session *s, procset *set, char *file, char *func, breakpoint *bp);
-int DbgDeleteBreakpoint(session *s, procset *set, breakpoint *bp);
+int DbgSetLineBreakpoint(session *s, procset *set, char *file, int line);
+int DbgSetFuncBreakpoint(session *s, procset *set, char *file, char *func);
+int DbgDeleteBreakpoint(session *s, procset *set, int bpid);
 
 /*
  * Process control operations
@@ -101,15 +102,15 @@ int DbgStep(session *s, procset *set, int count, int type);
 /*
  * Stack frame operations
  */
-int DbgListStackFrames(session *s, int proc, stackframelist *frame);
-int DbgSetCurrentStackFrame(session *s, int proc, int count, int dir, stackframe *frame);
+int DbgListStackFrames(session *s, int proc);
+int DbgSetCurrentStackFrame(session *s, int proc, int level);
 
 /*
  * Expression/variable operations
  */
 int DbgEvaluateExpression(session *s, int proc, char *exp);
-int DbgListLocalVariables(session *s, int proc, stackframe *frame);
-int DbgListArguments(session *s, int proc, stackframe *frame);
+int DbgListLocalVariables(session *s, int proc);
+int DbgListArguments(session *s, int proc);
 int DbgListGlobalVariables(session *s, int proc);
 
 /*

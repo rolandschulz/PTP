@@ -57,7 +57,7 @@ main(int argc, char *argv[])
 	DbgAddProcToSet(p, 99);
 	
 	for (i = 0; i < 10; i++) {
-		DbgSetLineBreakpoint(s, p, "test.c", 23, NULL);
+		DbgSetLineBreakpoint(s, p, "test.c", 23);
 	
 		wait_for_event(s);
 	}

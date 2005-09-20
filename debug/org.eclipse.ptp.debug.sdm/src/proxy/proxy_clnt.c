@@ -41,21 +41,21 @@ proxy_clnt_init_not_imp(void **data, char *attr, va_list ap)
 }
 
 int 
-proxy_clnt_setlinebreakpoint_not_imp(void *data, procset *p, char *file, int l, breakpoint *bp)
+proxy_clnt_setlinebreakpoint_not_imp(void *data, procset *p, char *file, int line)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_clnt_setfuncbreakpoint_not_imp(void *data, procset *p, char *file, char *func, breakpoint *bp)
+proxy_clnt_setfuncbreakpoint_not_imp(void *data, procset *p, char *file, char *func)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_clnt_deletebreakpoints_not_imp(void *data, procset *p, breakpoint *bp)
+proxy_clnt_deletebreakpoint_not_imp(void *data, procset *p, int bpid)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
@@ -76,14 +76,14 @@ proxy_clnt_step_not_imp(void *data, procset *p, int count, int type)
 }
 
 int 
-proxy_clnt_liststackframes_not_imp(void *data, int p, stackframelist *list)
+proxy_clnt_liststackframes_not_imp(void *data, int p)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_clnt_setcurrentstackframe_not_imp(void *data, int p, int count, int type, stackframe *frame)
+proxy_clnt_setcurrentstackframe_not_imp(void *data, int p, int level)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
@@ -97,14 +97,14 @@ proxy_clnt_evaluateexpression_not_imp(void *data, int p, char *expr)
 }
 
 int 
-proxy_clnt_listlocalvariables_not_imp(void *data, int p, stackframe *frame)
+proxy_clnt_listlocalvariables_not_imp(void *data, int p)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_clnt_listarguments_not_imp(void *data, int p, stackframe *frame)
+proxy_clnt_listarguments_not_imp(void *data, int p)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;

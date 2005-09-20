@@ -40,7 +40,7 @@
 #include "proxy_tcp.h"
 
 static int proxy_tcp_clnt_init(void **, char *, va_list);
-static int proxy_tcp_clnt_setlinebreakpoint(void *, procset *, char *, int , breakpoint *);
+static int proxy_tcp_clnt_setlinebreakpoint(void *, procset *, char *, int);
 static int proxy_tcp_clnt_quit(void *);
 static int proxy_tcp_clnt_progress(void *, void (*)(dbg_event *));
 
@@ -49,7 +49,7 @@ proxy_clnt_funcs proxy_tcp_clnt_funcs =
 	proxy_tcp_clnt_init,
 	proxy_tcp_clnt_setlinebreakpoint,
 	proxy_clnt_setfuncbreakpoint_not_imp,
-	proxy_clnt_deletebreakpoints_not_imp,
+	proxy_clnt_deletebreakpoint_not_imp,
 	proxy_clnt_go_not_imp,
 	proxy_clnt_step_not_imp,
 	proxy_clnt_liststackframes_not_imp,
@@ -146,7 +146,7 @@ proxy_tcp_clnt_init(void **data, char *attr, va_list ap)
 }
 
 static int
-proxy_tcp_clnt_setlinebreakpoint(void *data, procset *set, char *file, int line, breakpoint *bp)
+proxy_tcp_clnt_setlinebreakpoint(void *data, procset *set, char *file, int line)
 {
 	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
 	char *			request;

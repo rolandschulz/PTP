@@ -26,19 +26,20 @@
 #include "breakpoint.h"
 #include "stackframe.h"
 #include "dbg_event.h"
+#include "list.h"
 
 struct proxy_clnt_funcs {
 	int (*init)(void **, char *, va_list);
-	int (*setlinebreakpoint)(void *, struct procset *, char *, int, struct breakpoint *);
-	int (*setfuncbreakpoint)(void *, struct procset *, char *, char *, struct breakpoint *);
-	int (*deletebreakpoints)(void *, struct procset *, struct breakpoint *);
+	int (*setlinebreakpoint)(void *, struct procset *, char *, int);
+	int (*setfuncbreakpoint)(void *, struct procset *, char *, char *);
+	int (*deletebreakpoint)(void *, struct procset *, int);
 	int (*go)(void *, struct procset *);
 	int (*step)(void *, struct procset *, int, int);
-	int (*liststackframes)(void *, int, struct stackframelist *);
-	int (*setcurrentstackframe)(void *, int, int, int, struct stackframe *);
+	int (*liststackframes)(void *, int);
+	int (*setcurrentstackframe)(void *, int, int);
 	int (*evaluateexpression)(void *, int, char *);
-	int (*listlocalvariables)(void *, int, struct stackframe *);
-	int (*listarguments)(void *, int, struct stackframe*);
+	int (*listlocalvariables)(void *, int);
+	int (*listarguments)(void *, int);
 	int (*listglobalvariables)(void *, int);
 	int (*quit)(void *);
 	int (*progress)(void *, void (*)(dbg_event *));
@@ -65,16 +66,16 @@ extern proxy 	proxies[];
 extern int find_proxy(char *, proxy **);
 
 extern int proxy_clnt_init_not_imp(void **, char *, va_list);
-extern int proxy_clnt_setlinebreakpoint_not_imp(void *, struct procset *, char *, int, struct breakpoint *);
-extern int proxy_clnt_setfuncbreakpoint_not_imp(void *, struct procset *, char *, char *, struct breakpoint *);
-extern int proxy_clnt_deletebreakpoints_not_imp(void *, struct procset *, struct breakpoint *);
+extern int proxy_clnt_setlinebreakpoint_not_imp(void *, struct procset *, char *, int);
+extern int proxy_clnt_setfuncbreakpoint_not_imp(void *, struct procset *, char *, char *);
+extern int proxy_clnt_deletebreakpoint_not_imp(void *, struct procset *, int);
 extern int proxy_clnt_go_not_imp(void *, struct procset *);
 extern int proxy_clnt_step_not_imp(void *, struct procset *, int, int);
-extern int proxy_clnt_liststackframes_not_imp(void *, int, struct stackframelist *);
-extern int proxy_clnt_setcurrentstackframe_not_imp(void*, int, int, int, struct stackframe *);
+extern int proxy_clnt_liststackframes_not_imp(void *, int);
+extern int proxy_clnt_setcurrentstackframe_not_imp(void*, int, int);
 extern int proxy_clnt_evaluateexpression_not_imp(void *, int, char *);
-extern int proxy_clnt_listlocalvariables_not_imp(void *, int, struct stackframe *);
-extern int proxy_clnt_listarguments_not_imp(void *, int, struct stackframe*);
+extern int proxy_clnt_listlocalvariables_not_imp(void *, int);
+extern int proxy_clnt_listarguments_not_imp(void *, int);
 extern int proxy_clnt_listglobalvariables_not_imp(void *, int);
 extern int proxy_clnt_quit_not_imp(void *);
 extern int proxy_clnt_progress_not_imp(void *, void (*)(dbg_event *));
