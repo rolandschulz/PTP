@@ -423,7 +423,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				}
 				fireSuspendEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof EndSteppingRangeEvent) {
-				fireResumeEvent(job, event.getAllProcesses().toBitList());
+				//System.out.println("-------------------- end stepping  ------------------------");
+				//annotationMgr.printBitList(event.getAllProcesses().toBitList());
+				fireSuspendEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof InferiorResumedEvent) {
 				//FIXME hardcode the filename
 				String fileName = "TestC/main.c";
@@ -469,10 +471,13 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	}
 	public void fireTerminatedEvent(IPJob job, BitList tasks) {
 		IElementHandler elementHandler = getElementHandler(job.getIDString());
+		BitList suspendedTasks = (BitList) elementHandler.getData(SUSPENDED_PROC_KEY);
+		// remove tasks
+		suspendedTasks.andNot(tasks);
 		BitList terminatedTasks = (BitList) elementHandler.getData(TERMINATED_PROC_KEY);
 		// only add tasks
 		terminatedTasks.or(tasks);
-		fireDebugEvent(new TerminatedDebugEvent(job.getIDString(), terminatedTasks, (BitList) elementHandler.getData(SUSPENDED_PROC_KEY)));
+		fireDebugEvent(new TerminatedDebugEvent(job.getIDString(), terminatedTasks, suspendedTasks));
 	}
 	// ONLY for detect the debug sesssion is created
 	public void update(IPCDISession session) {
