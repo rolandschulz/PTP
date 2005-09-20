@@ -22,6 +22,12 @@ import org.eclipse.ui.plugin.*;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.osgi.framework.BundleContext;
 import java.util.*;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -35,6 +41,7 @@ public class PTPDebugExternalPlugin extends AbstractUIPlugin {
 	private static PTPDebugExternalPlugin plugin;
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
+	private static Logger logger;
 	
 	/**
 	 * The constructor.
@@ -119,4 +126,31 @@ public class PTPDebugExternalPlugin extends AbstractUIPlugin {
 		return getDefault().getBundle().getSymbolicName();
 	}
 
+	public Logger getLogger() {
+		if (logger == null) {
+			logger = Logger.getLogger(getClass().getName());
+			Handler[] handlers = logger.getHandlers();
+			for ( int index = 0; index < handlers.length; index++ ) {
+				logger.removeHandler(handlers[index]);
+			}
+			Handler console = new ConsoleHandler();
+			console.setFormatter(new Formatter() {
+				public String format(LogRecord record) {
+					String out = record.getLevel()  + " : "
+						+ record.getSourceClassName()  + "."
+						+ record.getSourceMethodName();
+					if (!record.getMessage().equals(""))
+						out = out + " : " + record.getMessage();
+					out += "\n";
+					return out;
+				}});
+			
+			console.setLevel(Level.FINER);
+			logger.addHandler(console);
+			logger.setLevel(Level.FINER);
+		}
+		
+		return logger;
+	}
+	
 }
