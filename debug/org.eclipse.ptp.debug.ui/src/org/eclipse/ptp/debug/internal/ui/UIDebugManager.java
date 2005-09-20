@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.internal.ui;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
@@ -48,6 +49,7 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.cdi.BreakpointHitInfo;
+import org.eclipse.ptp.debug.external.cdi.EndSteppingRangeInfo;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
 import org.eclipse.ptp.debug.external.cdi.event.ErrorEvent;
@@ -419,6 +421,19 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				}
 				fireSuspendEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof EndSteppingRangeEvent) {
+				EndSteppingRangeEvent endStepEvent = (EndSteppingRangeEvent) event;
+				ICDILineLocation lineLocation = ((EndSteppingRangeInfo)endStepEvent.getReason()).getLineLocation();
+				if (lineLocation != null) {
+					int lineNumber = lineLocation.getLineNumber();
+					// FIXME: Hardcode the filename
+					String fileName = "TestC/" + lineLocation.getFile();
+					try {
+						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses().toBitList(), false);
+						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses().toBitList(), true);
+					} catch (CoreException e) {
+						PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
+					}
+				}
 				// System.out.println("-------------------- end stepping ------------------------");
 				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
 				fireSuspendEvent(job, event.getAllProcesses().toBitList());
@@ -498,7 +513,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		// TODO: no suspend method in session
+		session.suspend(set_id);
 	}
 	public void terminate() throws CoreException {
 		terminate(getCurrentJobId(), getCurrentSetId());
