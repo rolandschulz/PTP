@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
@@ -33,7 +32,6 @@ import org.eclipse.ptp.core.IProcessEvent;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.IPTPUIConstants;
-import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.listeners.IJobChangeListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -150,7 +148,9 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		return IPTPUIConstants.PROC_ERROR;
 	}
 	public IPProcess findProcess(String job_id, String id) {
-		IPJob job = findJobById(job_id);
+		return findProcess(findJobById(job_id), id);
+	}
+	public IPProcess findProcess(IPJob job, String id) {
 		if (job == null)
 			return null;
 		return job.findProcess(id);
@@ -236,14 +236,10 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * terminate action
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	public void terminate() {
-		terminate(getCurrentJobId());
+	public void terminateAll() throws CoreException {
+		terminateAll(getCurrentJobId());
 	}
-	public void terminate(String job_id) {
-		try {
-			modelManager.abortJob(getName(job_id));
-		} catch (CoreException e) {
-			ErrorDialog.openError(PTPUIPlugin.getActiveWorkbenchShell(), "Terminate Job Error", "Cannot terminate the job.", e.getStatus());
-		}
+	public void terminateAll(String job_id) throws CoreException {
+		modelManager.abortJob(getName(job_id));
 	}
 }

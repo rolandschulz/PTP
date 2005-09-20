@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.views;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -26,6 +27,7 @@ import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.internal.ui.actions.RegisterAction;
 import org.eclipse.ptp.debug.internal.ui.actions.ResumeAction;
+import org.eclipse.ptp.debug.internal.ui.actions.StepIntoAction;
 import org.eclipse.ptp.debug.internal.ui.actions.StepOverAction;
 import org.eclipse.ptp.debug.internal.ui.actions.StepReturnAction;
 import org.eclipse.ptp.debug.internal.ui.actions.SuspendAction;
@@ -88,7 +90,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		resumeAction = new ResumeAction(this);
 		suspendAction = new SuspendAction(this);
 		terminateAction = new TerminateAction(this);
-		stepIntoAction = new StepReturnAction(this);
+		stepIntoAction = new StepIntoAction(this);
 		stepOverAction = new StepOverAction(this);
 		stepReturnAction = new StepReturnAction(this);
 		registerAction = new RegisterAction(this);
@@ -108,8 +110,13 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	protected void doubleClickAction(int element_num) {
 		if (cur_element_set != null) {
 			IElement element = cur_element_set.get(element_num);
-			if (element != null)
-				registerElement(element);
+			if (element != null) {
+				try {
+					registerElement(element);
+				} catch (CoreException e) {
+					PTPDebugUIPlugin.errorDialog(getViewSite().getShell(), "Error", e.getStatus());
+				}
+			}
 		}
 	}
 	protected String getToolTipText(int element_num) {
@@ -137,19 +144,19 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		// buffer.append("\nStatus: " + getUIDebugManager().getProcessStatusText(proc));
 		return buffer.toString();
 	}
-	public void registerElement(IElement element) {
+	public void registerElement(IElement element) throws CoreException {
 		if (element.isRegistered())
 			((UIDebugManager) manager).unregisterElements(new IElement[] { element });
 		else
 			((UIDebugManager) manager).registerElements(new IElement[] { element });
 	}
-	public void registerSelectedElements() {
+	public void registerSelectedElements() throws CoreException {
 		if (cur_element_set != null) {
 			IElement[] elements = cur_element_set.getSelectedElements();
 			((UIDebugManager) manager).registerElements(elements);
 		}
 	}
-	public void unregisterSelectedElements() {
+	public void unregisterSelectedElements() throws CoreException {
 		if (cur_element_set != null) {
 			IElement[] elements = cur_element_set.getSelectedElements();
 			((UIDebugManager) manager).unregisterElements(elements);
@@ -181,7 +188,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 			updateTerminateButton(terminatedTaskList, set, suspendedTaskList);
 		}
 	}
-	public void updateSuspendResumeButton(BitList tasks, IElementSet set, BitList targetTasks) {
+	public synchronized void updateSuspendResumeButton(BitList tasks, IElementSet set, BitList targetTasks) {
 		if (set == null || tasks == null)
 			return;
 		boolean isEnabled = false;
@@ -207,7 +214,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		stepOverAction.setEnabled(isEnabled);
 		stepReturnAction.setEnabled(isEnabled);
 	}
-	public void updateTerminateButton(BitList tasks, IElementSet set, BitList targetTasks) {
+	public synchronized void updateTerminateButton(BitList tasks, IElementSet set, BitList targetTasks) {
 		if (set == null || tasks == null)
 			return;
 		int setSize = set.size();
@@ -247,7 +254,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * Debug Action Event
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	public void handleDebugActionEvent(IDebugActionEvent event) {
+	public synchronized void handleDebugActionEvent(IDebugActionEvent event) {
 		String job_id = event.getJobId();
 		// only take action with current job
 		if (!job_id.equals(getCurrentID())) {

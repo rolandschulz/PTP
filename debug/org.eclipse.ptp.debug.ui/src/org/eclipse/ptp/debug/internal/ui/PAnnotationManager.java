@@ -274,7 +274,8 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		BitList tasks = (BitList) set.getData(UIDebugManager.BITSET_KEY);
 		return (tasks != null && tasks.intersects(aTasks));
 	}
-	private void printBitList(BitList tasks) {
+	//FIXME temp testing method
+	public void printBitList(BitList tasks) {
 		System.out.print("++++++++++++++++ tasks: " + tasks.cardinality() + ": ");
 		for(int i=tasks.nextSetBit(0), j=0; i>=0; i=tasks.nextSetBit(i+1), j++) {
 			System.out.print("[" + i + "], ");

@@ -18,7 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.debug.internal.ui.PDebugImage;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.views.ParallelDebugView;
 import org.eclipse.ptp.ui.model.IElement;
 /**
@@ -35,8 +37,12 @@ public class UnregisterAction extends DebugAction {
 
 	public void run(IElement[] elements) {
 		if (validation(elements)) {
-			view.unregisterSelectedElements();
-			view.refresh();
+			try {
+				view.unregisterSelectedElements();
+				view.refresh();
+			} catch (CoreException e) {
+				PTPDebugUIPlugin.errorDialog(getShell(), "Error", e.getStatus());				
+			}
 		}
 	}	
 }
