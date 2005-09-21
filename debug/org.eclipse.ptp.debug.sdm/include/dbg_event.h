@@ -23,6 +23,7 @@
 #include <aif.h>
 
 #include "breakpoint.h"
+#include "procset.h"
 #include "list.h"
 
 #define DBGEV_OK		0
@@ -34,15 +35,20 @@
 #define DBGEV_FRAMES	7
 #define DBGEV_DATA	8
 #define DBGEV_TYPE	9
-#define DBGEV_VARS	9
-#define DBGEV_INIT	10
+#define DBGEV_VARS	10
+#define DBGEV_INIT	11
 
 struct dbg_event {
 	int			event;
+	procset *	procs;
 	breakpoint *	bp;
 	List *		list;
 	char *		type_desc;
 	AIF *		data;
+	char *		sig_name;
+	char *		sig_meaning;
+	int			thread_id;
+	int			exit_status;
 };
 typedef struct dbg_event dbg_event;
 

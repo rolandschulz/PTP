@@ -38,7 +38,6 @@ void
 FreeEvent(dbg_event *e) {
 	switch (e->event) {
 	case DBGEV_OK:
-	case DBGEV_SIGNAL:
 	case DBGEV_EXIT:
 	case DBGEV_STEP:
 	case DBGEV_INIT:
@@ -64,7 +63,14 @@ FreeEvent(dbg_event *e) {
 	case DBGEV_VARS:
 		DestroyList(e->list, free);
 		break;
-	}		
+		
+	case DBGEV_SIGNAL:
+		free(e->sig_name);
+		free(e->sig_meaning);
+	}
+	
+	if (e->procs != NULL)
+		procset_free(e->procs);
 
 	free(e);
 }
