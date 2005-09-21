@@ -20,11 +20,24 @@
 **
 */
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#include <string.h>
+#include <errno.h>
+#include <fcntl.h>
+
+#include <mi_gdb.h>
+#include <aif.h>
+
 #include "dbg.h"
 #include "dbg_event.h"
 #include "backend.h"
+#include "list.h"
 
-extern int	Shutdown;
+static mi_h *		MIHandle;
+static stackframe *	CurrentStackframe;
+static List *		Breakpoints;
 
 static int	GDBMIBuildAIFVar(char *, char *, char *, dbg_event **);
 static int	SetAndCheckBreak(char *, dbg_event **);
@@ -34,14 +47,15 @@ static int	GDBMIRead(int);
 static int	GDBMISetLineBreakpoint(char *, int, dbg_event **);
 static int	GDBMISetFuncBreakpoint(char *, char *, dbg_event **);
 static int	GDBMIDeleteBreakpoints(int, dbg_event **);
-static int	GDBMIGo(char *, int, dbg_event **);
-static int	GDBMIStep(int, int, char *, int, dbg_event **);
+static int	GDBMIGo(dbg_event **);
+static int	GDBMIStep(int, int, dbg_event **);
 static int	GDBMIListStackframes(dbg_event **);
-static int	GDBMISetCurrentStackframe(int, int, dbg_event **);
+static int	GDBMISetCurrentStackframe(int, dbg_event **);
 static int	GDBMIEvaluateExpression(char *, dbg_event **);
-static int	GDBMIGetLocalVariables(char *, dbg_event **);
-static int	GDBMIGetArguments(char *, dbg_event **);
-static int	GDBMIGetGlobalVariables(char *, dbg_event **);
+static int	GDBMIGetType(char *, dbg_event **);
+static int	GDBMIGetLocalVariables(dbg_event **);
+static int	GDBMIGetArguments(dbg_event **);
+static int	GDBMIGetGlobalVariables(dbg_event **);
 static int	GDBMIQuit(dbg_event **);
 
 dbg_backend_funcs	GDBMIBackend =
@@ -56,6 +70,7 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIListStackframes,
 	GDBMISetCurrentStackframe,
 	GDBMIEvaluateExpression,
+	GDBMIGetType,
 	GDBMIGetLocalVariables,
 	GDBMIGetArguments,
 	GDBMIGetGlobalVariables,
@@ -63,42 +78,50 @@ dbg_backend_funcs	GDBMIBackend =
 };
 
 /*
+ * Wait for terminated children
+ */
+void
+Reap(int sig)
+{
+	int	status;
+	wait(&status);
+}
+
+#ifdef notdef
+/*
 ** Look up current frame.
 */
 static int
 SetCurrFrame(void)
 {
-	dbgframe_t *	f;
+	stackframe *	s;
 	mi_frames *	frame;
 
 	if ( (frame = gmi_stack_info_frame(MIHandle)) == NULL )
 		return -1;
 
-	f = (dbgframe_t *)Alloc(sizeof(dbgframe_t));
-	f->frame_next = (dbgframe_t *)NULL;
-	f->frame_loc.loc_addr = NULL;
-	f->frame_loc.loc_func = NULL;
-	f->frame_loc.loc_file = NULL;
+	s = NewStackframe(frame->level);
 
-	f->frame_level = frame->level;
 	if ( frame->addr != 0 )
-		asprintf(&f->frame_loc.loc_addr, "0x%x", frame->addr);
+		asprintf(&s->location.addr, "0x%x", frame->addr);
 	if ( frame->func != NULL )
-		f->frame_loc.loc_func = strdup(frame->func);
+		s->location.func = strdup(frame->func);
 	if ( frame->file != NULL )
-		f->frame_loc.loc_file = strdup(frame->file);
-	f->frame_loc.loc_line = frame->line;
+		s->location.file = strdup(frame->file);
+	s->location.line = frame->line;
 
 	mi_free_frames(frame);
 
-	if ( CurrFrame != NULL )
-		FreeFrame(CurrFrame);
+	if ( CurrentStackframe != NULL )
+		FreeStackframe(CurrentStackframe);
 
-	CurrFrame = f;
+	CurrentStackframe = s;
 
 	return 0;
 }
+#endif
 
+#ifdef notdef
 static void
 SetAsync(char *host, int prog)
 {
@@ -132,45 +155,6 @@ AsyncBreakpointHit(void *arg)
 	e->ev_bp = DupBP(CurrBP);
 
 	return e;
-}
-
-char *
-LookupLine(char *file, int line)
-{
-	size_t	len;
-	char *	lp;
-	char *	ret;
-	FILE *	fp;
-
-	if ( file == NULL )
-		return NULL;
-
-	if ( (fp = fopen(file, "r")) == NULL )
-		return NULL;
-
-	while ( line-- > 0 )
-		lp = fgetln(fp, &len);
-
-	if ( lp == NULL )
-	{
-		fclose(fp);
-		return NULL;
-	}
-		
-	/*
-	** Remove newline if it exists.
-	*/
-	if ( lp[len-1] == '\n' )
-		len--;
-
-	ret = (char *)Alloc(sizeof(char *) * len + 1);	
-
-	memcpy(ret, lp, len);
-	ret[len] = '\0';
-
-	fclose(fp);
-
-	return ret;
 }
 
 dbgevent_t *
@@ -228,22 +212,20 @@ AsyncExit(void *arg)
 
 	return e;
 }
+#endif
 
 /*
-** AsyncCB is called by mi_get_response() when an async response is
+** AsyncCallback is called by mi_get_response() when an async response is
 ** detected. It can't issue any gdb commands or there's a potential
 ** for deadlock. If commands need to be issues (e.g. to obtain
 ** current stack frame, they must be called from the main select
 ** loop using the AsyncCheck() mechanism. 
 */
 static void
-AsyncCB(mi_output *mio, void *data)
+AsyncCallback(mi_output *mio, void *data)
 {
 	mi_stop *	stop;
 
-	if ( Status == DBGSTAT_INITIALISING)
-		return;
-	
 	stop = mi_get_stopped(mio->c);
 
 	if ( !stop )
@@ -252,24 +234,24 @@ AsyncCB(mi_output *mio, void *data)
 	switch ( stop->reason )
 	{
 	case sr_bkpt_hit:
-		AsyncCheck(AsyncBreakpointHit, (void *)stop->bkptno, AsyncHost, AsyncProg);
+		//AsyncCheck(AsyncBreakpointHit, (void *)stop->bkptno, AsyncHost, AsyncProg);
 		break;
 
 	case sr_end_stepping_range:
-		AsyncCheck(AsyncStep, NULL, AsyncHost, AsyncProg);
+		//AsyncCheck(AsyncStep, NULL, AsyncHost, AsyncProg);
 		break;
 
 	case sr_exited_signalled:
 	case sr_signal_received:
-		AsyncCheck(AsyncSignal, (void *)strdup(stop->signal_name), AsyncHost, AsyncProg);
+		//AsyncCheck(AsyncSignal, (void *)strdup(stop->signal_name), AsyncHost, AsyncProg);
 		break;
 
 	case sr_exited:
-		AsyncCheck(AsyncExit, (void *)stop->exit_code, AsyncHost, AsyncProg);
+		//AsyncCheck(AsyncExit, (void *)stop->exit_code, AsyncHost, AsyncProg);
 		break;
 
 	case sr_exited_normally:
-		AsyncCheck(AsyncExit, 0, AsyncHost, AsyncProg);
+		//AsyncCheck(AsyncExit, 0, AsyncHost, AsyncProg);
 		break;
 
 	default:
@@ -277,9 +259,8 @@ AsyncCB(mi_output *mio, void *data)
 	}
 
 	mi_free_stop(stop);	
-
-	Status = DBGSTAT_STOPPED;
 }
+
 
 /*
  * Initialize GDB
@@ -287,8 +268,7 @@ AsyncCB(mi_output *mio, void *data)
 static int
 GDBMIInit(int *rd, int *tty, dbg_event **ev)
 {
-	dbgevent_t *	e;
-	mi_pty *	pty;
+	mi_pty *		pty;
 
 	MIHandle = mi_connect_local();
 
@@ -298,7 +278,7 @@ GDBMIInit(int *rd, int *tty, dbg_event **ev)
 		return DBGRES_ERR;
 	}
 
-	mi_set_async_cb(MIHandle, AsyncCB, NULL);
+	mi_set_async_cb(MIHandle, AsyncCallback, NULL);
 
 #ifdef DEBUG
 	mi_set_to_gdb_cb(MIHandle, ToGDBCB, NULL);
@@ -318,14 +298,14 @@ GDBMIInit(int *rd, int *tty, dbg_event **ev)
 	*rd = MIHandle->from_gdb[0];
 
 	signal(SIGCHLD, Reap);
-	signal(SIGTERM, GDBMIFinish);
-	signal(SIGHUP, GDBMIFinish);
-	signal(SIGINT, GDBMIFinish);
-	signal(SIGPIPE, GDBMIFinish);
+	signal(SIGTERM, SIG_IGN);
+	signal(SIGHUP, SIG_IGN);
+	signal(SIGINT, SIG_IGN);
+	signal(SIGPIPE, SIG_IGN);
 
-	BP = NewList();
-
-	Status = DBGSTAT_INITIALISING;
+	Breakpoints = NewList();
+	
+	*ev = NewEvent(DBGEV_INIT);
 
 	return DBGRES_OK;
 }
@@ -403,38 +383,36 @@ SetAndCheckBreak(char *where, dbg_event **ev)
 
 	bp = NewBreakpoint(bpt->number);
 
-	bp->bp_ignore = bpt->ignore;
+	bp->ignore = bpt->ignore;
 
 	switch ( bpt->type ) {
 	case t_unknown:
-		bp->bp_type = strdup("unknown");
+		bp->type = strdup("unknown");
 		break;
 
 	case t_breakpoint:
-		bp->bp_type = strdup("breakpoint");
+		bp->type = strdup("breakpoint");
 		break;
 
 	case t_hw:
-		bp->bp_type = strdup("hw");
+		bp->type = strdup("hw");
 		break;
 	}
 
-	bp->bp_hits = bpt->times;
+	bp->hits = bpt->times;
 
 	if ( bpt->file != NULL )
-		bp->bp_loc.loc_file = strdup(bpt->file);
+		bp->loc.file = strdup(bpt->file);
 	if ( bpt->func != NULL )
-		bp->bp_loc.loc_func = strdup(bpt->func);
+		bp->loc.func = strdup(bpt->func);
 	if ( bpt->addr != 0 )
-		asprintf(&bp->bp_loc.loc_addr, "0x%x", bpt->addr);
-	bp->bp_loc.loc_line = bpt->line;
-
-	bp->bp_stmt = LookupLine(bpt->file, bpt->line);
+		asprintf(&bp->loc.addr, "0x%x", bpt->addr);
+	bp->loc.line = bpt->line;
 
 	/*
 	** Link a copy of the breakpoint onto BP.
 	*/
-	AddToList(Breakpoints, (void *)bp);
+	AddBreakpoint(Breakpoints, bp);
 
 	/*
 	** Now create a fake event and make it
@@ -442,7 +420,7 @@ SetAndCheckBreak(char *where, dbg_event **ev)
 	*/
 
 	e = NewEvent(DBGEV_BPSET);
-	e->ev_bp = DupBP(bp);
+	e->bp = bp;
 	*ev = e;
 	
 	mi_free_bkpt(bpt);
@@ -454,14 +432,14 @@ SetAndCheckBreak(char *where, dbg_event **ev)
 ** Delete a breakpoint.
 */
 static int
-GDBMIDeleteBreakpoints(int bid, dbg_event **ev)
+GDBMIDeleteBreakpoints(int bpid, dbg_event **ev)
 {
-	if ( !gmi_break_delete(MIHandle, bid) ) {
+	if ( !gmi_break_delete(MIHandle, bpid) ) {
 		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
 		return DBGRES_ERR;
 	}
 
-	RemoveBP(BP, bid);
+	RemoveBreakpoint(Breakpoints, bpid);
 
 	*ev = NewEvent(DBGEV_OK);
 
@@ -472,12 +450,12 @@ GDBMIDeleteBreakpoints(int bid, dbg_event **ev)
 ** Start/continue executing program. 
 */
 static int
-GDBMIGo(char *host, int prog, dbg_event **ev)
+GDBMIGo(dbg_event **ev)
 {
 	if ( !gmi_exec_continue(MIHandle) )
 	{
-		EVENT_ERROR(e, DBGERR_DEBUGGER, (char *)mi_get_error_str());
-		return e;
+		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		return DBGRES_ERR;
 	}
 
 	/*
@@ -494,10 +472,9 @@ GDBMIGo(char *host, int prog, dbg_event **ev)
 ** function calls.
 */
 static int
-GDBMIStep(int count, int in, char *host, int prog, dbg_event **ev)
+GDBMIStep(int count, int in, dbg_event **ev)
 {
 	int		res;
-	dbgevent_t *	e;
 
 	if ( !in )
 		res = gmi_exec_next_cnt(MIHandle, count);
@@ -523,38 +500,15 @@ GDBMIStep(int count, int in, char *host, int prog, dbg_event **ev)
 ** Move up or down count stack frames.
 */
 static int
-GDBMISetCurrentStackframe(int count, int up, dbg_event **ev)
+GDBMISetCurrentStackframe(int level, dbg_event **ev)
 {
-	int		level;
-	dbgevent_t *	e;
-
-	if ( up )
-	{
-		level = CurrFrameLevel - count;
-
-		if ( level < 0 )
-			level = 0;
-	}
-	else
-	{
-		level = CurrFrameLevel + count;
-
-		if ( level > LastFrameLevel )
-			level = LastFrameLevel;
-	}
-
-	if 
-	( 
-		!gmi_stack_select_frame(MIHandle, level) 
-		||
-		SetCurrFrame() < 0
-	)
+	if (!gmi_stack_select_frame(MIHandle, level))
 	{
 		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
 		return DBGRES_ERR;
 	}
 
-	//*ev = NewEvent(STACKFRAME);
+	*ev = NewEvent(DBGEV_OK);
 	return DBGRES_OK;
 }
 
@@ -565,15 +519,36 @@ static int
 GDBMIListStackframes(dbg_event **ev)
 {
 	dbg_event *	e;
+	List *		flist;
+	stackframe *	s;
+	mi_frames *	frames;
 
-	if ( CurrFrame == NULL )
+	if ( (frames = gmi_stack_list_frames(MIHandle)) == NULL )
 	{
-		DbgSetError(DBGERR_NOSTACK, "");
+		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
 		return DBGRES_ERR;
 	}
+	
+	flist = NewList();
+	
+	for (; frames != NULL; frames = frames->next) {
+		s = NewStackframe(frames->level);
 
-	e = NewEvent(DBGEV_FRAME);
-	e->ev_frame = DupFrame(CurrFrame);	
+		if ( frames->addr != 0 )
+			asprintf(&s->loc.addr, "0x%x", frames->addr);
+		if ( frames->func != NULL )
+			s->loc.func = strdup(frames->func);
+		if ( frames->file != NULL )
+			s->loc.file = strdup(frames->file);
+		s->loc.line = frames->line;
+		
+		AddToList(flist, (void *)s);
+	}
+
+	mi_free_frames(frames);
+	
+	e = NewEvent(DBGEV_FRAMES);
+	e->list = flist;	
 	*ev = e;
 	
 	return DBGRES_OK;
@@ -647,34 +622,14 @@ gmi_dump_binary_value(mi_h *h, char *exp, char *file)
 static int
 GDBMIEvaluateExpression(char *exp, dbg_event **ev)
 {
-#ifndef GDB_WITH_AIF
 	char *		type;
-	char		tmp[18];
-#else /* GDB_WITH_AIF */
-	mi_aif *	aif;
-#endif /* GDB_WITH_AIF */
+	char			tmp[18];
 	dbg_event *	e;
 
-#ifdef GDB_WITH_AIF
-	aif = gmi_aif_evaluate_expression(MIHandle, exp);
-
-	if ( aif == NULL )
-	{
-		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
+	if (GDBMIGetType(exp, &e) != DBGRES_OK)
 		return DBGRES_ERR;
-	}
-
-	e = NewEvent(DBGEV_DATA);
-	e->ev_data = AsciiToAIF(aif->fds, aif->data);
-
-	mi_free_aif(aif);
-#else /* GDB_WITH_AIF */
-	e = DbgGDBMIGetType(exp);
-
-	if ( e->ev_event != DBGEV_TYPE )
-		return e;
 			
-	type = strdup(e->ev_type);
+	type = strdup(e->type_desc);
 
 	FreeEvent(e);
 
@@ -692,11 +647,10 @@ GDBMIEvaluateExpression(char *exp, dbg_event **ev)
 		return DBGRES_ERR;
 	}
 
-	e = GDBMIBuildAIFVar(exp, type, tmp);
+	GDBMIBuildAIFVar(exp, type, tmp, &e);
 
 	(void)free(type);
 	(void)unlink(tmp);
-#endif /* GDB_WITH_AIF */
 
 	*ev = e;
 	
@@ -747,8 +701,8 @@ str_init(void)
 {
 	str_ptr s;
 
-	s = (str_ptr)Alloc(sizeof(struct str_type));
-	s->buf = (char *)Alloc(STRSIZE);
+	s = (str_ptr)malloc(sizeof(struct str_type));
+	s->buf = (char *)malloc(STRSIZE);
 	s->blen = STRSIZE;
 	s->slen = 0;
 	*(s->buf) = '\0';
@@ -772,7 +726,7 @@ str_add(str_ptr s1, char *s2, ...)
 	if (s1->slen + l2 >= s1->blen)
 	{
 		s1->blen += MAX(STRSIZE, l2);
-		s1->buf = (char *) Resize (s1->buf, s1->blen);
+		s1->buf = (char *) realloc (s1->buf, s1->blen);
 	}
 
 	memcpy(&(s1->buf[s1->slen]), buf, l2);
@@ -806,8 +760,8 @@ str_dup(char *s1)
 int
 SimpleTypeToFDS(char *type, str_ptr fds)
 {
-	char *			p;
-	char *			last = &type[strlen(type) - 1];
+	char *				p;
+	char *				last = &type[strlen(type) - 1];
 	struct simple_type *	s;
 
 	if ( strcmp(type, "<text variable, no debug info>") == 0 )
@@ -858,33 +812,31 @@ SimpleTypeToFDS(char *type, str_ptr fds)
 	return 0;
 }
 
-dbgevent_t *
-ConvertType(mi_gvar *gvar, str_ptr fds)
+static int
+ConvertType(mi_gvar *gvar, str_ptr fds, dbg_event **ev)
 {
-	dbgevent_t *	e;
+	dbg_event *	e;
 
 	if ( gvar->numchild == 0 )
 	{
 		if ( !gmi_var_info_type(MIHandle, gvar) )
 		{
-			EVENT_ERROR(e, DBGERR_DEBUGGER, (char *)mi_get_error_str());
-			return e;
+			DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
+			return DBGRES_ERR;
 		}
 
 		if ( SimpleTypeToFDS(gvar->type, fds) < 0 )
 		{
-			EVENT_ERROR(e, DBGERR_NOSYMS, "");
-			return e;
+			DbgSetError(DBGERR_NOSYMS, "");
+			return DBGRES_ERR;
 		}
-
 	}
 	else
 	{
-
 		if ( !gmi_var_list_children(MIHandle, gvar) )
 		{
-			EVENT_ERROR(e, DBGERR_DEBUGGER, (char *)mi_get_error_str());
-			return e;
+			DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
+			return DBGRES_ERR;
 		}
 
 		switch ( gvar->type[strlen(gvar->type) - 1] )
@@ -895,8 +847,10 @@ ConvertType(mi_gvar *gvar, str_ptr fds)
 			/*
 			** Just look at first child to determine type
 			*/
-			if ( (e = ConvertType(gvar->child, fds)) != NULL )
-				return e;
+			if ( ConvertType(gvar->child, fds, &e) != DBGRES_OK ) {
+				*ev = e;
+				return DBGRES_ERR;
+			}
 
 			break;
 #if 0
@@ -906,86 +860,67 @@ ConvertType(mi_gvar *gvar, str_ptr fds)
 			gvar = gvar->child;
 			for ( i = 0 ; i < num ; i++ )
 			{
-				if ( (e = ConvertType(gvar, fds)) != NULL )
-					return e;
+				if ( ConvertType(gvar, fds, &e) != DBGRES_OK ) {
+					*ev = e;
+					return DBGRES_ERR;
+				}
 				gvar = gvar->next;
 			}
 			add_to_str(fds, ";;;}");
 			break;
 #endif
 		default:
-			EVENT_ERROR(e, DBGERR_DEBUGGER, "type not supported (yet)");
-			return e;
-			break;
+			DbgSetError(DBGERR_DEBUGGER, "type not supported (yet)");
+			return DBGRES_ERR;
 		}
 		
 	}
 
-	return NULL;
+	return DBGRES_OK;
 }
 
-#ifdef notyet
 /*
 ** Find type of variable.
 */
-dbgevent_t *
-DbgGDBMIGetType(char *var)
+static int
+GDBMIGetType(char *var, dbg_event **ev)
 {
-	dbgevent_t *	e;
-#ifdef GDB_WITH_AIF
-	char *		type;
-#else /* GDB_WITH_AIF */
+	dbg_event *	e;
 	mi_gvar *	gvar;
 	str_ptr		fds;
-#endif /* GDB_WITH_AIF */
 
-	DPRINT(fprintf(stderr, "*** DbgGetType(%s)\n", var));
-
-#ifdef GDB_WITH_AIF
-	type = gmi_aif_type(MIHandle);
-
-	if ( type == NULL )
-	{
-		EVENT_ERROR(e, DBGERR_DEBUGGER, (char *)mi_get_error_str());
-		return e;
-	}
-
-	e = NewEvent(DBGEV_TYPE);
-	e->ev_type = type;
-#else /* GDB_WITH_AIF */
 	gvar = gmi_var_create(MIHandle, -1, var);
 
 	if ( gvar == NULL )
 	{
-		EVENT_ERROR(e, DBGERR_NOSYM, var);
-		return e;
+		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		return DBGRES_ERR;
 	}
 
 	fds = str_init();
 
-	if ( (e = ConvertType(gvar, fds)) != NULL )
-		return e;
+	if ( ConvertType(gvar, fds, &e) != DBGRES_OK ) {
+		*ev = e;
+		return DBGRES_ERR;
+	}
 
 	e = NewEvent(DBGEV_TYPE);
-	e->ev_type = strdup(fds->buf);
+	e->type_desc = strdup(fds->buf);
 
 	str_free(fds);
 
 	mi_free_gvar(gvar);
-#endif /* GDB_WITH_AIF */
 
-	return e;
+	return DBGRES_OK;
 }
-#endif
 
 /*
 ** List local variables.
 */
 static int
-GDBMIGetLocalVariables(char *file, dbg_event **ev)
+GDBMIGetLocalVariables(dbg_event **ev)
 {
-	dbgevent_t *	e;
-	dbgvars_t *	v;
+	dbg_event *	e;
 	mi_results *	c;
 	mi_results *	res;
 
@@ -998,7 +933,7 @@ GDBMIGetLocalVariables(char *file, dbg_event **ev)
 	}
 
 	e = NewEvent(DBGEV_VARS);
-	e->ev_vars = (dbgvars_t *)NULL;
+	e->list = NewList();
 
 	c = res;
 
@@ -1006,10 +941,7 @@ GDBMIGetLocalVariables(char *file, dbg_event **ev)
 	{
 		if ( c->type == t_const && strcmp(c->var, "name") == 0 ) 
 		{
-			v = (dbgvars_t *)Alloc(sizeof(dbgvars_t));
-			v->var_name = strdup(c->v.cstr);
-			v->var_next = e->ev_vars;
-			e->ev_vars = v;
+			AddToList(e->list, strdup(c->var));
 		}
 		c = c->next;
 	}
@@ -1025,7 +957,7 @@ GDBMIGetLocalVariables(char *file, dbg_event **ev)
 ** List arguments.
 */
 static int
-GDBMIGetArguments(char *file, dbg_event **ev)
+GDBMIGetArguments(dbg_event **ev)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return DBGRES_ERR;
@@ -1035,7 +967,7 @@ GDBMIGetArguments(char *file, dbg_event **ev)
 ** List global variables.
 */
 static int
-GDBMIGetGlobalVariables(char *file, dbg_event **ev)
+GDBMIGetGlobalVariables(dbg_event **ev)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return DBGRES_ERR;
@@ -1113,13 +1045,13 @@ char tohex[] =	{'0', '1', '2', '3', '4', '5', '6', '7',
 static int
 GDBMIBuildAIFVar(char *var, char *type, char *file, dbg_event **ev)
 {
-	int		n;
-	int		fd;
+	int			n;
+	int			fd;
 	AIF *		aif;
 	char *		data;
 	char *		ap;
 	char *		bp;
-	char		buf[BUFSIZ];
+	char			buf[BUFSIZ];
 	struct stat	sb;
 	dbg_event *	e;
 
@@ -1134,7 +1066,7 @@ GDBMIBuildAIFVar(char *var, char *type, char *file, dbg_event **ev)
 		/*
 		** Data is function name
 		*/
-		ap = data = Alloc(strlen(var) * 2 + 1);
+		ap = data = malloc(strlen(var) * 2 + 1);
 
 		for ( bp = var ; *bp != '\0' ; bp++ )
 		{
@@ -1152,7 +1084,7 @@ GDBMIBuildAIFVar(char *var, char *type, char *file, dbg_event **ev)
 			return DBGRES_ERR;
 		}
 
-		ap = data = Alloc(sb.st_size * 2 + 1);
+		ap = data = malloc(sb.st_size * 2 + 1);
 
 		while ((n = read(fd, buf, BUFSIZ)) > 0)
 		{
@@ -1177,7 +1109,7 @@ GDBMIBuildAIFVar(char *var, char *type, char *file, dbg_event **ev)
 	}
 
 	e = NewEvent(DBGEV_DATA);
-	e->ev_data = aif;
+	e->data = aif;
 	*ev = e;
 	
 	return DBGRES_OK;
