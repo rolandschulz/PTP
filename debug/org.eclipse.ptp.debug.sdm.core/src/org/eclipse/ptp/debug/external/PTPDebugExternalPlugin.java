@@ -36,7 +36,7 @@ public class PTPDebugExternalPlugin extends AbstractUIPlugin {
 	/**
 	 * The plug-in identifier (value <code>"org.eclipse.ptp.debug.external.ui"</code>).
 	 */
-	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.external.ui" ; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "org.eclipse.ptp.debug.external" ; //$NON-NLS-1$
 	//The shared instance.
 	private static PTPDebugExternalPlugin plugin;
 	//Resource bundle.
