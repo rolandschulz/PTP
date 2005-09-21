@@ -246,16 +246,17 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		if (name == null) {
 			setErrorMessage(CoreMessages
 					.getResourceString("OMPIPreferencesPage.Incorrect_ORTEd_file"));
-			setValid(false);
-			return false;
+			//setValid(false);
+			//return false;
 		}
-
-		File path = new File(name);
-		if (!path.exists() || !path.isFile()) {
-			setErrorMessage(CoreMessages
+		else {
+			File path = new File(name);
+			if (!path.exists() || !path.isFile()) {
+				setErrorMessage(CoreMessages
 					.getResourceString("OMPIPreferencesPage.Incorrect_ORTEd_file"));
-			setValid(false);
-			return false;
+				//setValid(false);
+				//return false;
+			}
 		}
 
 		return true;
