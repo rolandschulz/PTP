@@ -504,7 +504,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		controlSystem.terminateJob(j);
 		System.out
 				.println("***** NEED TO REFRESH JOB STATUS HERE in abortJob() of ModelManager ONCE WE KNOW THE JOBID!");
-		// refreshJobStatus(nejob);
+		refreshJobStatus(jobName);
 		fireState(STATE_ABORT);
 	}
 
