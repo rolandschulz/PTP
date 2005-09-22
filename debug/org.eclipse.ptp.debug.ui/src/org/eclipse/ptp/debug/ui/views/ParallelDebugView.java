@@ -166,8 +166,6 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		System.out.println("------------ debug run");
 		initialView();
 		refresh();
-		suspendAction.setEnabled(true);
-		terminateAction.setEnabled(true);
 	}
 	public void start() {
 		System.out.println("------------ debug start");
@@ -179,13 +177,17 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		boolean isDebugging = ((UIDebugManager) manager).isDebugging(getCurrentID());
 		registerAction.setEnabled(isDebugging);
 		unregisterAction.setEnabled(isDebugging);
-		IElementHandler elementHandler = getCurrentElementHandler();
-		if (elementHandler != null) {
-			IElementSet set = getCurrentSet();
-			BitList suspendedTaskList = (BitList) elementHandler.getData(UIDebugManager.SUSPENDED_PROC_KEY);
-			BitList terminatedTaskList = (BitList) elementHandler.getData(UIDebugManager.TERMINATED_PROC_KEY);
-			updateSuspendResumeButton(suspendedTaskList, set, terminatedTaskList);
-			updateTerminateButton(terminatedTaskList, set, suspendedTaskList);
+		suspendAction.setEnabled(isDebugging);
+		terminateAction.setEnabled(isDebugging);
+		if (isDebugging) {
+			IElementHandler elementHandler = getCurrentElementHandler();
+			if (elementHandler != null) {
+				IElementSet set = getCurrentSet();
+				BitList suspendedTaskList = (BitList) elementHandler.getData(UIDebugManager.SUSPENDED_PROC_KEY);
+				BitList terminatedTaskList = (BitList) elementHandler.getData(UIDebugManager.TERMINATED_PROC_KEY);
+				updateSuspendResumeButton(suspendedTaskList, set, terminatedTaskList);
+				updateTerminateButton(terminatedTaskList, set, suspendedTaskList);
+			}
 		}
 	}
 	public void updateSuspendResumeButton(BitList tasks, IElementSet set, BitList targetTasks) {
