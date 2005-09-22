@@ -20,9 +20,13 @@
 #ifndef _COMPAT_H_
 #define _COMPAT_H_
 
+#include <sys/types.h>
+
 #ifndef MAX
 #define MAX(a, b)		((a) < (b) ? (b) : (a))
 #endif /* MAX */
+
+#define BITSPERBYTE	NBBY
 
 #define SOCKET			int
 #define CLOSE_SOCKET(s)	(void)close(s)
