@@ -26,26 +26,27 @@
 #include "compat.h"
 #include "args.h"
 #include "dbg.h"
+#include "dbg_event.h"
 
 struct svr_cmd {
 	char *cmd_name;
-	int (*cmd_func)(char **, char **);
+	int (*cmd_func)(char **, dbg_event **);
 };
 
 typedef struct svr_cmd	svr_cmd;
 
-static int svr_setlinebreakpoint(char **, char **);
-static int svr_setfuncbreakpoint(char **, char **);
-static int svr_deletebreakpoints(char **, char **);
-static int svr_go(char **, char **);
-static int svr_step(char **, char **);
-static int svr_liststackframes(char **, char **);
-static int svr_setcurrentstackframe(char **, char **);
-static int svr_evaluateexpression(char **, char **);
-static int svr_listlocalvariables(char **, char **);
-static int svr_listarguments(char **, char **);
-static int svr_listglobalvariables(char **, char **);
-static int svr_quit(char **, char **);
+static int svr_setlinebreakpoint(char **, dbg_event **);
+static int svr_setfuncbreakpoint(char **, dbg_event **);
+static int svr_deletebreakpoints(char **, dbg_event **);
+static int svr_go(char **, dbg_event **);
+static int svr_step(char **, dbg_event **);
+static int svr_liststackframes(char **, dbg_event **);
+static int svr_setcurrentstackframe(char **, dbg_event **);
+static int svr_evaluateexpression(char **, dbg_event **);
+static int svr_listlocalvariables(char **, dbg_event **);
+static int svr_listarguments(char **, dbg_event **);
+static int svr_listglobalvariables(char **, dbg_event **);
+static int svr_quit(char **, dbg_event **);
 
 static svr_cmd svr_cmd_tab[] =
 {
@@ -71,15 +72,15 @@ svr_dispatch(char *cmd, char **resp)
 	int			i;
 	int			res;
 	char **		args;
-	char *		result = NULL;
 	svr_cmd *	sc;
+	dbg_event *	e;
 	
 	args = Str2Args(cmd);
 	
 	for (i = 0; i < sizeof(svr_cmd_tab) / sizeof(svr_cmd); i++) {
 		sc = &svr_cmd_tab[i];
 		if (strcmp(args[0], sc->cmd_name) == 0) {
-			res = sc->cmd_func(args, &result);
+			res = sc->cmd_func(args, &e);
 			break;
 		}
 	}
@@ -91,89 +92,106 @@ svr_dispatch(char *cmd, char **resp)
 	
 	FreeArgs(args);
 	
-	if (res != DBGRES_OK)
-		asprintf(resp, "%d %d \"%s\"", res, DbgGetError(), DbgGetErrorStr());
-	else {
-		if (result != NULL) {
-			asprintf(resp, "%d %s", res, result);
-			free(result);
-		}
-		else
-			asprintf(resp, "%d", res);
+	if (res != DBGRES_OK) {
+		e = NewEvent(DBGEV_ERROR);
+		e->error_code = DbgGetError();
+		e->error_msg = strdup(DbgGetErrorStr());
 	}
+	
+	if (proxy_tcp_event_to_str(e, resp) < 0)
+		*resp = strdup("ERROR");
+
+printf("response will be <%s>\n", *resp);
+	
+	FreeEvent(e);
 			
 	return svr_shutdown;
 }
 
 static int 
-svr_setlinebreakpoint(char **args, char **resp)
+svr_setlinebreakpoint(char **args, dbg_event **ev)
+{
+	dbg_event *	e;
+	int i = rand() % 5;
+	
+	if (i == 0) {
+		e = NewEvent(DBGEV_ERROR);
+		e->error_code = i;
+		e->error_msg = strdup("test error");
+	}
+	else
+		e = NewEvent(DBGEV_OK);
+		
+	*ev = e;
+	return DBGRES_OK;
+}
+
+static int 
+svr_setfuncbreakpoint(char **args, dbg_event **ev)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_setfuncbreakpoint(char **args, char **resp)
+svr_deletebreakpoints(char **args, dbg_event **ev)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_deletebreakpoints(char **args, char **resp)
+svr_go(char **args, dbg_event **ev)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_go(char **args, char **resp)
+svr_step(char **args, dbg_event **ev)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_step(char **args, char **resp)
+svr_liststackframes(char **args, dbg_event **ev)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_liststackframes(char **args, char **resp)
+svr_setcurrentstackframe(char **args, dbg_event **ev)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_setcurrentstackframe(char **args, char **resp)
+svr_evaluateexpression(char **args, dbg_event **ev)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_evaluateexpression(char **args, char **resp)
+svr_listlocalvariables(char **args, dbg_event **ev)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_listlocalvariables(char **args, char **resp)
+svr_listarguments(char **args, dbg_event **ev)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_listarguments(char **args, char **resp)
+svr_listglobalvariables(char **args, dbg_event **ev)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_listglobalvariables(char **args, char **resp)
+svr_quit(char **args, dbg_event **ev)
 {
-	return DBGRES_OK;
-}
-
-static int 
-svr_quit(char **args, char **resp)
-{
+	dbg_event *	e = NewEvent(DBGEV_OK);
+	*ev = e;
+	
 	svr_shutdown++;
 	return DBGRES_OK;
 }
