@@ -52,7 +52,7 @@ struct dbg_event_handler {
 	/*
 	 * HANDLER_EVENT
 	 */
-	 void 	(*event_handler)(dbg_event *);
+	 void 	(*event_handler)(dbg_event *, void *);
 };
 typedef struct dbg_event_handler	dbg_event_handler;
 
@@ -284,19 +284,20 @@ DbgClntProgress(void)
 }
 
 void
-DbgClntRegisterEventHandler(void (*event_callback)(dbg_event *))
+DbgClntRegisterEventHandler(void (*event_callback)(dbg_event *, void *), void *data)
 {
 	dbg_event_handler *	h;
 	
 	h = new_dbg_event_handler(HANDLER_EVENT, NULL);
 	h->event_handler = event_callback;
+	h->data = data;
 }
 
 /**
  * Unregister file descriptor handler
  */
 void
-DbgClntUnregisterEventHandler(void (*event_callback)(dbg_event *))
+DbgClntUnregisterEventHandler(void (*event_callback)(dbg_event *, void *))
 {
 	dbg_event_handler *	h;
 
