@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "hash.h"
+
 extern int	svr_dispatch(char *, char **);
 
 /*
@@ -28,6 +30,7 @@ do_commands(int client_task_id, int my_task_id)
 {
 	int			len;
 	int			ret = 0;
+	unsigned int	hdr[2];
 	char *		cmd_buf;
 	char *		reply_buf;
 	MPI_Status	stat;
@@ -45,6 +48,12 @@ printf("[%d] server received msg <%s>\n", my_task_id, cmd_buf);
 	
 	free(cmd_buf);
 	
+	len = strlen(reply_buf);
+
+	hdr[0] = HashCompute(reply_buf, len);
+	hdr[1] = len;
+	
+	MPI_Send(hdr, 2, MPI_UNSIGNED, client_task_id, 0, MPI_COMM_WORLD);
 	MPI_Send(reply_buf, strlen(reply_buf), MPI_CHAR, client_task_id, 0, MPI_COMM_WORLD);
 	
 	free(reply_buf);
@@ -94,6 +103,7 @@ server(int client_task_id, int my_task_id)
 	//initalize_low();
 	
 	//signal = start_inferior(&args, &status);
+	srand(my_task_id);
 	
 	while (!exit) {
 		exit = do_commands(client_task_id, my_task_id);
