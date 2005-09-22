@@ -149,7 +149,7 @@ procset_to_str(procset *p)
 	unsigned char	byte;
 	
 	if (p == NULL)
-		return strdup("<null>");
+		return strdup("0:0");
 		
 	/*
 	 * Find out how many bytes needed (rounded up)
@@ -161,7 +161,7 @@ procset_to_str(procset *p)
 	/*
 	 * Start with actual number of processes (silently truncate to 32 bits)
 	 */
-	n = sprintf(str, "%x", p->ps_nprocs & 0xffff);
+	n = sprintf(str, "%X", p->ps_nprocs & 0xffffffff);
 	
 	s = str + n;
 	
@@ -212,7 +212,7 @@ str_to_procset(char *str)
 		nprocs += digittoint(*str);
 	}
 	
-	if (*str != ':')
+	if (*str != ':' || nprocs == 0)
 		return NULL;
 		
 	p = procset_new(nprocs);
