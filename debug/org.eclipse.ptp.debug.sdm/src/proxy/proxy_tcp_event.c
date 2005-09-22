@@ -34,7 +34,6 @@ proxy_tcp_data_to_str(char *data, int len, char **result)
 	int		n;
 	char		ch;
 	char *	res;
-	char *	s;
 	
 	if (data == NULL) {
 		*result = strdup("0:0");
@@ -46,9 +45,9 @@ proxy_tcp_data_to_str(char *data, int len, char **result)
 	/*
 	 * Convert length (silently truncate to 32 bits)
 	 */
-	n = sprintf(res, "%x:", len & 0xffff);
+	n = sprintf(res, "%X:", len & 0xffffffff);
 	
-	s = res + n;
+	res += n;
 	
 	/*
 	 * Add rest of data 
@@ -156,7 +155,7 @@ proxy_tcp_list_to_str(List *lst, int (*el_to_str)(void *, char **), char **resul
 
 	*result = res = (char *)malloc(9 + len + 1);
 	
-	sprintf(res, "%x ", count & 0xffff);
+	sprintf(res, "%X ", count & 0xffff);
 	
 	for (i = 0; i < count; i++) {
 		if (i > 0)
@@ -218,6 +217,11 @@ proxy_tcp_event_to_str(dbg_event *e, char **result)
  		asprintf(result, "%d %s", e->event, pstr);
 		break;
 
+	case DBGEV_ERROR:
+		proxy_tcp_cstring_to_str(e->error_msg, &str);
+ 		asprintf(result, "%d %d %s", e->event, e->error_code, str);
+		break;
+	
 	case DBGEV_BPHIT:
 	case DBGEV_BPSET:
 		proxy_tcp_breakpoint_to_str(e->bp, &str);
@@ -264,7 +268,7 @@ proxy_tcp_event_to_str(dbg_event *e, char **result)
 		asprintf(result, "%d %s %s", e->event, pstr, str);
 		free(str);
 		break;
-
+		
 	default:
 		free(pstr);
 		return -1;
@@ -366,6 +370,14 @@ proxy_tcp_str_to_data(char *str, char **data, int *len)
 }
 
 static int
+proxy_tcp_str_to_cstring(char *str, char **cstring)
+{
+	int	len;
+	
+	return proxy_tcp_str_to_data(str, cstring, &len);
+}
+
+static int
 proxy_tcp_str_to_aif(char **args, AIF **res)
 {
 	int		fmt_len;
@@ -408,6 +420,12 @@ proxy_tcp_str_to_event(char *str, dbg_event **ev)
 		e = NewEvent(DBGEV_OK);
 		break;
 	
+	case DBGEV_ERROR:
+		e = NewEvent(DBGEV_ERROR);
+		e->error_code = atoi(args[1]);
+		proxy_tcp_str_to_cstring(args[2], &e->error_msg);
+		break;
+		
 	case DBGEV_BPHIT:
 	case DBGEV_BPSET:
 		e = NewEvent(DBGEV_BPHIT);
@@ -416,8 +434,8 @@ proxy_tcp_str_to_event(char *str, dbg_event **ev)
 	
 	case DBGEV_SIGNAL:
 		e = NewEvent(DBGEV_SIGNAL);
-		e->sig_name = strdup(args[1]);
-		e->sig_meaning = strdup(args[2]);
+		proxy_tcp_str_to_cstring(args[1], &e->sig_name);
+		proxy_tcp_str_to_cstring(args[2], &e->sig_meaning);
 		e->thread_id = atoi(args[3]);
 		break;
 	
@@ -443,7 +461,7 @@ proxy_tcp_str_to_event(char *str, dbg_event **ev)
 
 	case DBGEV_TYPE:
 		e = NewEvent(DBGEV_TYPE);
-		e->type_desc = strdup(args[1]);
+		proxy_tcp_str_to_cstring(args[1], &e->type_desc);
 		break;
 
 	case DBGEV_DATA:
