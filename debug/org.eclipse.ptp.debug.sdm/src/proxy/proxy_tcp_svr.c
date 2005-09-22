@@ -96,6 +96,21 @@ static proxy_tcp_svr_func proxy_tcp_svr_func_tab[] =
 static int proxy_tcp_svr_shutdown;
 static void (*proxy_tcp_svr_shutdown_callback)(void);
 
+/*
+ * Called when an event is received in response to a client debug command.
+ * Sends the event to the proxy peer.
+ */
+static void
+proxy_tcp_svr_event_callback(dbg_event *ev, void *data)
+{
+	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
+	char *			str;
+	
+	(void)proxy_tcp_event_to_str(ev, &str);
+	(void)proxy_tcp_send_msg(conn, str, strlen(str));
+	free(str);
+}
+
 /**
  * Create server socket and bind address to it. 
  * 
@@ -150,6 +165,7 @@ proxy_tcp_svr_create(void **data, void (*shutdown)(void))
 	*data = (void *)conn;
 	
 	DbgClntRegisterFileHandler(sd, READ_FILE_HANDLER, proxy_tcp_svr_accept, (void *)conn);
+	DbgClntRegisterEventHandler(proxy_tcp_svr_event_callback, (void *)conn);
 	
 	proxy_tcp_svr_shutdown = 0;
 	proxy_tcp_svr_shutdown_callback = shutdown;
@@ -270,7 +286,7 @@ proxy_tcp_svr_dispatch(int fd, void *data)
 	else
 		asprintf(&response, "%d", res);
 			
-	(void)proxy_tcp_send_msg(conn, response, strlen(response));
+
 	
 	free(response);
 	
