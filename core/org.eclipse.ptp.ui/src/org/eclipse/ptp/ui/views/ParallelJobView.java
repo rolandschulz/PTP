@@ -22,8 +22,12 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.IPJob;
@@ -110,7 +114,8 @@ public class ParallelJobView extends AbstractParallelSetView {
 			getDisplay().syncExec(new Runnable() {
 				public void run() {
 					jobTableViewer.refresh(true);
-					changeJob(((JobManager) manager).findJobById(getCurrentID()));
+					IPJob job = ((JobManager) manager).findJobById(getCurrentID());
+					jobTableViewer.setSelection(new StructuredSelection(job));
 				}
 			});
 		}
@@ -128,7 +133,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 		sashForm = new SashForm(parent, SWT.HORIZONTAL);
 		sashForm.setLayout(new FillLayout(SWT.VERTICAL));
 		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
-		jobTableViewer = CheckboxTableViewer.newCheckList(sashForm, SWT.BORDER);
+		jobTableViewer = CheckboxTableViewer.newCheckList(sashForm, SWT.SINGLE | SWT.BORDER);
 		jobTableViewer.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
 		jobTableViewer.setLabelProvider(new LabelProvider() {
 			public String getText(Object element) {
@@ -162,7 +167,40 @@ public class ParallelJobView extends AbstractParallelSetView {
 		jobTableViewer.setInput(manager);
 		jobTableViewer.addCheckStateListener(new ICheckStateListener() {
 			public void checkStateChanged(CheckStateChangedEvent event) {
-				changeJob((event.getChecked()?(IPJob) event.getElement():null));
+				jobTableViewer.setAllChecked(false);
+				if (event.getChecked()) {
+					jobTableViewer.setChecked(event.getElement(), true);
+					changeJob((IPJob) event.getElement());
+				}
+				else {
+					changeJob((IPJob)null);
+				}
+			}
+		});
+		jobTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(SelectionChangedEvent event) {
+				jobTableViewer.getTable().deselectAll();
+				ISelection selection = event.getSelection();
+				if (selection.isEmpty()) {
+					changeJob((IPJob)null);
+				}
+				else {
+					if (selection instanceof IStructuredSelection) {
+						Object selectedElement = ((IStructuredSelection)selection).getFirstElement();						
+						if (selectedElement instanceof IPJob) {							
+							IPJob job = (IPJob)selectedElement;							
+							boolean isSelected = jobTableViewer.getChecked(job);
+							jobTableViewer.setAllChecked(false);
+							if (!isSelected) {
+								jobTableViewer.setChecked(job, true);
+								changeJob(job);
+							}
+							else {
+								changeJob((IPJob)null);								
+							}
+						}
+					}
+				}
 			}
 		});
 		elementViewComposite = createElementView(sashForm);
@@ -230,23 +268,6 @@ public class ParallelJobView extends AbstractParallelSetView {
 	}
 	protected void changeJob(final IPJob job) {
 		selectJob((job==null?IManager.EMPTY_ID:job.getIDString()));
-		if (job != null) {
-			getDisplay().syncExec(new Runnable() {
-				public void run() {
-					jobTableViewer.setAllChecked(false);
-					jobTableViewer.setChecked(job, true);
-					jobTableViewer.setSelection(new StructuredSelection(job));
-				}
-			});
-		}
-		else {
-			getDisplay().syncExec(new Runnable() {
-				public void run() {
-					jobTableViewer.setAllChecked(false);
-					jobTableViewer.setSelection(new StructuredSelection());
-				}
-			});
-		}
 		update();
 		refresh();
 	}
