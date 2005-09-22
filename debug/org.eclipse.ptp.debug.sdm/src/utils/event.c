@@ -27,9 +27,9 @@ dbg_event *
 NewEvent(int event) {
 	dbg_event *	e = (dbg_event *)malloc(sizeof(dbg_event));
 	
+	memset((void *)e, 0, sizeof(dbg_event));
+	 
 	e->event = event;
-	
-	// TODO: zero out data structures
 	
 	return e;
 }
