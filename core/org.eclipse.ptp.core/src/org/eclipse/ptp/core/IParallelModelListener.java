@@ -22,8 +22,6 @@ package org.eclipse.ptp.core;
  *
  */
 public interface IParallelModelListener {
-	public void run();
-
 	public void abort();
 
 	public void exit();
@@ -43,4 +41,6 @@ public interface IParallelModelListener {
 	public void errorEvent(Object object);
 
 	public void updatedStatusEvent();
+
+	public void run(String arg);
 }

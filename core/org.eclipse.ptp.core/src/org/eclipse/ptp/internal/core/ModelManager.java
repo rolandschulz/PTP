@@ -329,7 +329,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		IPJob job = universe.findJobByName(ne);
 
 		fireEvent(job, EVENT_ALL_PROCESSES_STOPPED);
-		fireState(STATE_STOPPED);
+		fireState(STATE_STOPPED, null);
 		clearUsedMemory();
 
 		/*
@@ -421,7 +421,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		listeners.remove(listener);
 	}
 
-	protected synchronized void fireState(int state) {
+	protected synchronized void fireState(int state, String arg) {
 		setCurrentState(state);
 		Iterator i = listeners.iterator();
 		while (i.hasNext()) {
@@ -432,7 +432,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				System.out.println("++++++++++++ Started ++++++++++++++");
 				break;
 			case STATE_RUN:
-				listener.run();
+				listener.run(arg);
 				break;
 			case STATE_EXIT:
 				System.out.println("++++++++++++ Exit ++++++++++++++");
@@ -505,7 +505,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		System.out
 				.println("***** NEED TO REFRESH JOB STATUS HERE in abortJob() of ModelManager ONCE WE KNOW THE JOBID!");
 		refreshJobStatus(jobName);
-		fireState(STATE_ABORT);
+		fireState(STATE_ABORT, null);
 	}
 
 	//protected IPJob myjob = null;
@@ -564,7 +564,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				universe.deleteJob(job);
 				throw new CoreException(Status.CANCEL_STATUS);
 			}
-			fireState(STATE_RUN);
+			fireState(STATE_RUN, nejob);
 			return job;
 		}
 		return null;

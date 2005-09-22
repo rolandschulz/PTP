@@ -24,7 +24,7 @@ import org.eclipse.ptp.core.IParallelModelListener;
  *
  */
 public abstract class ParallelModelAdapter implements IParallelModelListener {
-	public void run() {
+	public void run(String arg) {
 	}
 
 	public void abort() {
