@@ -39,6 +39,7 @@
 #include "dbg_client.h"
 #include "procset.h"
 #include "list.h"
+#include "hash.h"
 
 /*
  * A request represents an asynchronous send/receive transaction between the client
@@ -46,8 +47,8 @@
  */
 struct active_request {
 	procset *		procs;
-	void				(*completed)(procset *);
-	//Hash *			replys;
+	void				(*completed)(Hash *);
+	Hash *			events;
 };
 typedef struct active_request	active_request;
 
@@ -69,7 +70,7 @@ int my_task_id;
  * the processes each command applies to are disjoint sets.
  */
 int
-send_command(procset *procs, char *str, void (*completed_callback)(procset *))
+send_command(procset *procs, char *str, void (*completed_callback)(Hash *))
 {
 	int				pid;
 	int				cmd_len;
@@ -98,7 +99,7 @@ send_command(procset *procs, char *str, void (*completed_callback)(procset *))
 	r = (active_request *)malloc(sizeof(active_request));
 	r->procs = procset_copy(procs);
 	r->completed = completed_callback;
-	//r->replys = NewHash(procset_size(procs));
+	r->events = HashCreate(procset_size(procs)); // TODO: Check this is a sensible size
 	
 	AddToList(active_requests, (void *)r);
 
@@ -129,13 +130,15 @@ void
 progress_commands(void)
 {
 	int				i;
-	int				count;
 	int				avail;
 	int				recv_pid;
 	int 				completed;
 	char *			reply_buf;
+	unsigned int		count;
+	unsigned int		hdr[2];
 	active_request *	r;
 	MPI_Status		stat;
+	dbg_event *		e;
 
 	/*
 	 * Check for completed sends
@@ -166,39 +169,69 @@ progress_commands(void)
 		
 		/*
 		 * A message is available, so receive it
+		 * 
+		 * A message is split into two parts: a header comprising two
+		 * unsigned integers (a hash value and a length); a body which 
+		 * is the dbg_event structure converted to a string.
+		 * 
+		 * The hash is computed by each server and is used to quickly
+		 * coalesce events.
+		 * 
+		 * The length is the length of the event string.
+		 * 
 		 */
-		MPI_Get_count(&stat, MPI_CHAR, &count);
+		//MPI_Get_count(&stat, MPI_CHAR, &count);
 		
+		recv_pid = stat.MPI_SOURCE;		
+		
+		MPI_Recv(hdr, 2, MPI_UNSIGNED, recv_pid, 0, MPI_COMM_WORLD, &stat);
+
+printf("got header <0x%0x,%d> from [%d]\n", hdr[0], hdr[1], recv_pid);	
+	
+		count = hdr[1];
 		reply_buf = (char *)malloc(count + 1);
-		recv_pid = stat.MPI_SOURCE;
 		
 		MPI_Recv(reply_buf, count, MPI_CHAR, recv_pid, 0, MPI_COMM_WORLD, &stat);
 		reply_buf[count] = '\0';
 printf("got reply <%s> from [%d]\n", reply_buf, recv_pid);		
-			
-		free(reply_buf);
 		
 		/*
-		 * remove from active and receiving procsets
+		 * Find request for this proc
 		 */
-		procset_remove_proc(receiving_procs, recv_pid);
-		
-		/*
-		 * Check if any sends/recvs are complete. Call notify function for completed sends.
-		 */
-		SetList(active_requests);
-	
-		while ((r = (active_request *)GetListElement(active_requests)) != NULL) {
+		for (SetList(active_requests); (r = (active_request *)GetListElement(active_requests)) != NULL; ) {
 			if (procset_test(r->procs, recv_pid)) {
+				/*
+				 * Save event if it is new, otherwise just add this process to the event
+				 */
+				if ((e = HashSearch(r->events, hdr[0])) == NULL) {
+					proxy_tcp_str_to_event(reply_buf, &e);
+					e->procs = procset_new(num_servers);
+					HashInsert(r->events, hdr[0], (void *)e);
+				}
+				
+				procset_add_proc(e->procs, recv_pid);
+								
+				/*
+				 * Call notify function if all receives have been completed
+				 */
 				procset_remove_proc(r->procs, recv_pid);
 				if (procset_isempty(r->procs)) {
 					RemoveFromList(active_requests, (void *)r);
-					r->completed(r->procs);
+					r->completed(r->events);
 					procset_free(r->procs);
 					free(r);
 				}
 			}
+			
+			break;
 		}
+		
+		free(reply_buf);
+		
+		/*
+		 * remove from receiving procsets
+		 */
+		procset_remove_proc(receiving_procs, recv_pid);
 	}
 }
 
@@ -208,8 +241,16 @@ printf("got reply <%s> from [%d]\n", reply_buf, recv_pid);
 int completed;
 
 void 
-send_complete(procset *p)
+send_complete(Hash *h)
 {
+	HashEntry *	he;
+	dbg_event *	e;
+	
+	for (HashSet(h); (he = HashGet(h)) != NULL; ) {
+		e = (dbg_event *)he->h_data;
+		printf("hash[0x%0x] = <%d,%s>\n", he->h_hval, e->event, procset_to_str(e->procs));
+	}
+	
 	printf("send completed\n");
 	completed++;
 }
