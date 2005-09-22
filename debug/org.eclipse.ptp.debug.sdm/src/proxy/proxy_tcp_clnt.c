@@ -242,7 +242,7 @@ proxy_tcp_clnt_progress(void *data, void (*event_callback)(dbg_event *))
 		return res;
 	}
 	
-	if (proxy_tcp_result_to_event(result, &ev) < 0) {
+	if (proxy_tcp_str_to_event(result, &ev) < 0) {
 		fprintf(stderr, "bad response");
 		free(result);
 		return -1;
