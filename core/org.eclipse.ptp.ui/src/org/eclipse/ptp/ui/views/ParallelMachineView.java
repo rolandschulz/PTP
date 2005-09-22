@@ -20,8 +20,11 @@ package org.eclipse.ptp.ui.views;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.internal.ui.MachineManager;
 import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ptp.internal.ui.actions.ChangeMachineAction;
@@ -246,6 +249,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		return ((MachineManager) manager).getCurrentMachineId();
 	}
 	public void selectMachine(String machine_id) {
+		System.out.println("selectMachine("+machine_id+")");
 		((MachineManager) manager).setCurrentMachineId(machine_id);
 		updateMachine();
 	}
@@ -301,8 +305,18 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			}
 		}
 	}
-	public void run() {
-		System.out.println("------------ machine run");
+	public void run(String arg) {
+		System.out.println("------------ machine run - job "+arg);
+		refresh();
+		IPJob j = PTPCorePlugin.getDefault().getModelManager().getUniverse().findJobByName(arg);
+		if(j != null) {
+			IPMachine[] m = j.getMachines();
+			if(m.length > 0) {
+				System.out.println("MACHINE = "+m[0]);
+				selectMachine(m[0].getIDString());
+			}
+		}
+		update();
 		refresh();
 	}
 	public void start() {

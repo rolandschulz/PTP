@@ -301,7 +301,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 		}
 		refresh();
 	}
-	public void run() {
+	public void run(String arg) {
 		System.out.println("------------ job run");
 		initialView();
 		refresh();
