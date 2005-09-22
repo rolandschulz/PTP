@@ -28,28 +28,29 @@
 #include "dbg_event.h"
 
 struct dbg_backend_funcs {
-	int (*init)(int *, int *, dbg_event **);
+	int (*init)(void (*)(dbg_event *, void *), void *);
 	int (*read)(int);
-	int (*setlinebreakpoint)(char *, int, dbg_event **);
-	int (*setfuncbreakpoint)(char *, char *, dbg_event **);
-	int (*deletebreakpoints)(int, dbg_event **);
-	int (*go)(dbg_event **);
-	int (*step)(int, int, dbg_event **);
-	int (*liststackframes)(dbg_event **);
-	int (*setcurrentstackframe)(int, dbg_event **);
-	int (*evaluateexpression)(char *, dbg_event **);
-	int (*gettype)(char *, dbg_event **);
-	int (*listlocalvariables)(dbg_event **);
-	int (*listarguments)(dbg_event **);
-	int (*listglobalvariables)(dbg_event **);
-	int (*quit)(dbg_event **);
-	int (*progress)(void *, void (*)(dbg_event *));
+	int (*progress)(void);
+	int (*start_session)(void);
+	int (*setlinebreakpoint)(char *, int);
+	int (*setfuncbreakpoint)(char *, char *);
+	int (*deletebreakpoints)(int);
+	int (*go)(void);
+	int (*step)(int, int);
+	int (*liststackframes)(void);
+	int (*setcurrentstackframe)(int);
+	int (*evaluateexpression)(char *);
+	int (*gettype)(char *);
+	int (*listlocalvariables)(void);
+	int (*listarguments)(void);
+	int (*listglobalvariables)(void);
+	int (*quit)(void);
 };
 typedef struct dbg_backend_funcs	dbg_backend_funcs;
 
 struct dbg_backend {
-	char *						dbg_name;
-	struct dbg_backend_funcs *	dbg_funcs;
+	char *						db_name;
+	struct dbg_backend_funcs *	db_funcs;
 };
 typedef struct dbg_backend	dbg_backend;
 
