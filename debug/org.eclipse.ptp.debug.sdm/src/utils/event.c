@@ -45,28 +45,36 @@ FreeEvent(dbg_event *e) {
 		
 	case DBGEV_BPSET:
 	case DBGEV_BPHIT:
-		FreeBreakpoint(e->bp);
+		if (e->bp != NULL)
+			FreeBreakpoint(e->bp);
 		break;
 		
 	case DBGEV_FRAMES:
-		DestroyList(e->list, FreeStackframe);
+		if (e->list != NULL)
+			DestroyList(e->list, FreeStackframe);
 		break;
 		
 	case DBGEV_DATA:
-		AIFFree(e->data);
+		if (e->data != NULL)
+			AIFFree(e->data);
 		break;
 		
 	case DBGEV_TYPE:
-		free(e->type_desc);
+		if (e->type_desc != NULL)
+			free(e->type_desc);
 		break;
 		
 	case DBGEV_VARS:
-		DestroyList(e->list, free);
+		if (e->list != NULL)
+			DestroyList(e->list, free);
 		break;
 		
 	case DBGEV_SIGNAL:
-		free(e->sig_name);
-		free(e->sig_meaning);
+		if (e->list != NULL) {
+			free(e->sig_name);
+			free(e->sig_meaning);
+		}
+		break;
 	}
 	
 	if (e->procs != NULL)
