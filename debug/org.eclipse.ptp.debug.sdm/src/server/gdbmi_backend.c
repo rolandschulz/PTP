@@ -99,7 +99,7 @@ void
 SaveEvent(dbg_event *e)
 {
 	if (LastEvent != NULL)
-		FreeEvent(e);
+		FreeEvent(LastEvent);
 		
 	LastEvent = e;
 }
@@ -283,14 +283,22 @@ AsyncCallback(mi_output *mio, void *data)
 	case sr_exited_signalled:
 	case sr_signal_received:
 		//AsyncCheck(AsyncSignal, (void *)strdup(stop->signal_name), AsyncHost, AsyncProg);
+		e = NewEvent(DBGEV_SIGNAL);
+		e->sig_name = strdup(stop->signal_name);
+		e->sig_meaning = strdup(stop->signal_meaning);
+		e->thread_id = stop->thread_id;
 		break;
 
 	case sr_exited:
 		//AsyncCheck(AsyncExit, (void *)stop->exit_code, AsyncHost, AsyncProg);
+		e = NewEvent(DBGEV_EXIT);
+		e->exit_status = stop->exit_code;
 		break;
 
 	case sr_exited_normally:
 		//AsyncCheck(AsyncExit, 0, AsyncHost, AsyncProg);
+		e = NewEvent(DBGEV_EXIT);
+		e->exit_status = 0;
 		break;
 
 	default:
@@ -794,7 +802,6 @@ GDBMIEvaluateExpression(char *exp)
 	if (res == DBGRES_OK) {
 		e = NewEvent(DBGEV_DATA);
 		e->data = a;
-	
 		SaveEvent(e);
 	}
 
