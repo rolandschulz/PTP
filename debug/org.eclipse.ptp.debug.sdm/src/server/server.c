@@ -15,8 +15,33 @@
 #include <string.h>
 
 #include "hash.h"
+#include "backend.h"
 
-extern int	svr_dispatch(char *, char **);
+extern int	svr_init(dbg_backend *, void (*)(dbg_event *, void *), void *);
+extern int	svr_dispatch(dbg_backend *, char *);
+extern int	svr_progress(dbg_backend *);
+
+static void
+event_callback(dbg_event *e, void *data)
+{
+	int		task_id = *((int *)data);
+	int		len;
+	char *	reply_buf;
+	unsigned int	hdr[2];
+		
+	if (proxy_tcp_event_to_str(e, &reply_buf) < 0)
+		reply_buf = strdup("ERROR");
+	
+	len = strlen(reply_buf);
+
+	hdr[0] = HashCompute(reply_buf, len);
+	hdr[1] = len;
+	
+	MPI_Send(hdr, 2, MPI_UNSIGNED, task_id, 0, MPI_COMM_WORLD);
+	MPI_Send(reply_buf, strlen(reply_buf), MPI_CHAR, task_id, 0, MPI_COMM_WORLD);
+	
+	free(reply_buf);
+}
 
 /*
  * Receive and process a command from the client. Return the reponse to the client.
@@ -26,37 +51,28 @@ extern int	svr_dispatch(char *, char **);
  * 			-1 for other errors
  */
 static int
-do_commands(int client_task_id, int my_task_id)
+do_commands(dbg_backend *dbgr, int client_task_id, int my_task_id)
 {
 	int			len;
+	int			flag;
 	int			ret = 0;
-	unsigned int	hdr[2];
 	char *		cmd_buf;
-	char *		reply_buf;
 	MPI_Status	stat;
 
-	MPI_Probe(client_task_id, 0, MPI_COMM_WORLD, &stat);
+	MPI_Iprobe(client_task_id, 0, MPI_COMM_WORLD, &flag, &stat);
+	
+	if (flag == 0)
+		return 0;
+		
 	MPI_Get_count(&stat, MPI_CHAR, &len);
 	
 	cmd_buf = (char *)malloc(len + 1);
 	MPI_Recv(cmd_buf, len, MPI_CHAR, client_task_id, 0, MPI_COMM_WORLD, &stat);
 	cmd_buf[len] = '\0';
 
-printf("[%d] server received msg <%s>\n", my_task_id, cmd_buf);
-	
-	ret = svr_dispatch(cmd_buf, &reply_buf);
+	ret = svr_dispatch(dbgr, cmd_buf);
 	
 	free(cmd_buf);
-	
-	len = strlen(reply_buf);
-
-	hdr[0] = HashCompute(reply_buf, len);
-	hdr[1] = len;
-	
-	MPI_Send(hdr, 2, MPI_UNSIGNED, client_task_id, 0, MPI_COMM_WORLD);
-	MPI_Send(reply_buf, strlen(reply_buf), MPI_CHAR, client_task_id, 0, MPI_COMM_WORLD);
-	
-	free(reply_buf);
 	
 	return ret;
 }
@@ -89,7 +105,7 @@ printf("[%d] server received msg <%s>\n", my_task_id, cmd_buf);
  * 
  */
 void
-server(int client_task_id, int my_task_id)
+server(int client_task_id, int my_task_id, dbg_backend *dbgr)
 {
 	int exit = 0;
 	//int signal;
@@ -105,7 +121,10 @@ server(int client_task_id, int my_task_id)
 	//signal = start_inferior(&args, &status);
 	srand(my_task_id);
 	
+	svr_init(dbgr, event_callback, (void *)&client_task_id);
+	
 	while (!exit) {
-		exit = do_commands(client_task_id, my_task_id);
+		exit = do_commands(dbgr, client_task_id, my_task_id);
+		svr_progress(dbgr);
 	}
 }

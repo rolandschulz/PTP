@@ -28,7 +28,7 @@ find_dbg_backend(char *name, dbg_backend **dp)
 	
 	for (i = 0; i < sizeof(dbg_backends) / sizeof(dbg_backend); i++) {
 		d = &dbg_backends[i];
-		if (strcmp(name, d->dbg_name) == 0) {
+		if (strcmp(name, d->db_name) == 0) {
 			*dp = d;
 			return 0;
 		}

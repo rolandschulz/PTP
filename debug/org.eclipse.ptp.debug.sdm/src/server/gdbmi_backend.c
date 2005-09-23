@@ -35,33 +35,41 @@
 #include "backend.h"
 #include "list.h"
 
+static struct timeval	SELECT_TIMEOUT = { 25, 0 };
 static mi_h *		MIHandle;
 static stackframe *	CurrentStackframe;
 static List *		Breakpoints;
+static dbg_event *	LastEvent;
+static void			(*EventCallback)(dbg_event *, void *);
+static void *		EventCallbackData;
 
-static int	GDBMIBuildAIFVar(char *, char *, char *, dbg_event **);
-static int	SetAndCheckBreak(char *, dbg_event **);
+static int	GDBMIBuildAIFVar(char *, char *, char *, AIF **);
+static int	SetAndCheckBreak(char *);
 
-static int	GDBMIInit(int *, int *, dbg_event **);
+static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIRead(int);
-static int	GDBMISetLineBreakpoint(char *, int, dbg_event **);
-static int	GDBMISetFuncBreakpoint(char *, char *, dbg_event **);
-static int	GDBMIDeleteBreakpoints(int, dbg_event **);
-static int	GDBMIGo(dbg_event **);
-static int	GDBMIStep(int, int, dbg_event **);
-static int	GDBMIListStackframes(dbg_event **);
-static int	GDBMISetCurrentStackframe(int, dbg_event **);
-static int	GDBMIEvaluateExpression(char *, dbg_event **);
-static int	GDBMIGetType(char *, dbg_event **);
-static int	GDBMIGetLocalVariables(dbg_event **);
-static int	GDBMIGetArguments(dbg_event **);
-static int	GDBMIGetGlobalVariables(dbg_event **);
-static int	GDBMIQuit(dbg_event **);
+static int	GDBMIProgress(void);
+static int	GDBMIStartSession(void);
+static int	GDBMISetLineBreakpoint(char *, int);
+static int	GDBMISetFuncBreakpoint(char *, char *);
+static int	GDBMIDeleteBreakpoints(int);
+static int	GDBMIGo(void);
+static int	GDBMIStep(int, int);
+static int	GDBMIListStackframes(void);
+static int	GDBMISetCurrentStackframe(int);
+static int	GDBMIEvaluateExpression(char *);
+static int	GDBMIGetType(char *);
+static int	GDBMIGetLocalVariables(void);
+static int	GDBMIGetArguments(void);
+static int	GDBMIGetGlobalVariables(void);
+static int	GDBMIQuit(void);
 
 dbg_backend_funcs	GDBMIBackend =
 {
 	GDBMIInit,
 	GDBMIRead,
+	GDBMIProgress,
+	GDBMIStartSession,
 	GDBMISetLineBreakpoint,
 	GDBMISetFuncBreakpoint,
 	GDBMIDeleteBreakpoints,
@@ -76,6 +84,15 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIGetGlobalVariables,
 	GDBMIQuit
 };
+
+void
+SaveEvent(dbg_event *e)
+{
+	if (LastEvent != NULL)
+		FreeEvent(e);
+		
+	LastEvent = e;
+}
 
 /*
  * Wait for terminated children
@@ -266,10 +283,21 @@ AsyncCallback(mi_output *mio, void *data)
  * Initialize GDB
  */
 static int
-GDBMIInit(int *rd, int *tty, dbg_event **ev)
+GDBMIInit(void (*event_callback)(dbg_event *, void *), void *data)
 {
-	mi_pty *		pty;
+	EventCallback = event_callback;
+	EventCallbackData = data;
+	MIHandle = NULL;
+	LastEvent = NULL;
+	return DBGEV_OK;
+}
 
+/*
+ * Start GDB session
+ */	
+static int
+GDBMIStartSession(void)
+{
 	MIHandle = mi_connect_local();
 
 	if ( !MIHandle )
@@ -285,18 +313,6 @@ GDBMIInit(int *rd, int *tty, dbg_event **ev)
 	mi_set_from_gdb_cb(MIHandle, FromGDBCB, NULL);
 #endif /* DEBUG */
 
-	pty = gmi_look_for_free_pty();
-
-	if ( !pty || !gmi_target_terminal(MIHandle, pty->slave) )
-	{
-		fprintf(stderr, "Could not select target terminal\n");
-		*tty = -1;
-	}
-	else
-		*tty = pty->master;
-
-	*rd = MIHandle->from_gdb[0];
-
 	signal(SIGCHLD, Reap);
 	signal(SIGTERM, SIG_IGN);
 	signal(SIGHUP, SIG_IGN);
@@ -305,7 +321,52 @@ GDBMIInit(int *rd, int *tty, dbg_event **ev)
 
 	Breakpoints = NewList();
 	
-	*ev = NewEvent(DBGEV_INIT);
+	SaveEvent(NewEvent(DBGEV_INIT));
+
+	return DBGRES_OK;
+}
+
+
+static int	
+GDBMIProgress(void)
+{
+	fd_set			fds;
+	int				res;
+	struct timeval	tv;
+
+	if (!MIHandle)
+		return DBGRES_ERR;
+		
+	FD_ZERO(&fds);
+	FD_SET(MIHandle->from_gdb[0], &fds);
+	tv = SELECT_TIMEOUT;
+	
+	for ( ;; ) {
+		res = select(MIHandle->from_gdb[0]+1, &fds, NULL, NULL, &tv);
+	
+		switch (res) {
+		case INVALID_SOCKET:
+			if ( errno == EINTR )
+				continue;
+		
+			perror("select");
+			return -1;
+		
+		case 0:
+			return DBGRES_OK;
+		
+		default:
+			break;
+		}
+	
+		break;
+	}
+	
+	while ( (res = mi_get_response(MIHandle)) <= 0 )
+	{
+		if (res < 0)
+			return DBGRES_ERR;
+	}
 
 	return DBGRES_OK;
 }
@@ -332,7 +393,7 @@ GDBMIRead(int rd)
 ** Set breakpoint at specified line.
 */
 static int
-GDBMISetLineBreakpoint(char *file, int line, dbg_event **ev)
+GDBMISetLineBreakpoint(char *file, int line)
 {
 	char *where;
 
@@ -341,14 +402,14 @@ GDBMISetLineBreakpoint(char *file, int line, dbg_event **ev)
 	else
 		asprintf(&where, "%s:%d", file, line);
 
-	return SetAndCheckBreak(where, ev);
+	return SetAndCheckBreak(where);
 }
 
 /*
 ** Set breakpoint at start of specified function.
 */
 static int
-GDBMISetFuncBreakpoint(char *file, char *func, dbg_event **ev)
+GDBMISetFuncBreakpoint(char *file, char *func)
 {
 	char *where;
 
@@ -357,7 +418,7 @@ GDBMISetFuncBreakpoint(char *file, char *func, dbg_event **ev)
 	else
 		asprintf(&where, "%s:%s", file, func);
 
-	return SetAndCheckBreak(where, ev);
+	return SetAndCheckBreak(where);
 }
 
 /*
@@ -366,7 +427,7 @@ GDBMISetFuncBreakpoint(char *file, char *func, dbg_event **ev)
 ** id in bid. Adds to breakpoint list if necessary.
 */
 static int
-SetAndCheckBreak(char *where, dbg_event **ev)
+SetAndCheckBreak(char *where)
 {
 	breakpoint *	bp;
 	dbg_event *	e;
@@ -421,7 +482,7 @@ SetAndCheckBreak(char *where, dbg_event **ev)
 
 	e = NewEvent(DBGEV_BPSET);
 	e->bp = bp;
-	*ev = e;
+	SaveEvent(e);
 	
 	mi_free_bkpt(bpt);
 
@@ -432,7 +493,7 @@ SetAndCheckBreak(char *where, dbg_event **ev)
 ** Delete a breakpoint.
 */
 static int
-GDBMIDeleteBreakpoints(int bpid, dbg_event **ev)
+GDBMIDeleteBreakpoints(int bpid)
 {
 	if ( !gmi_break_delete(MIHandle, bpid) ) {
 		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
@@ -441,7 +502,7 @@ GDBMIDeleteBreakpoints(int bpid, dbg_event **ev)
 
 	RemoveBreakpoint(Breakpoints, bpid);
 
-	*ev = NewEvent(DBGEV_OK);
+	SaveEvent(NewEvent(DBGEV_OK));
 
 	return DBGRES_OK;
 }
@@ -450,7 +511,7 @@ GDBMIDeleteBreakpoints(int bpid, dbg_event **ev)
 ** Start/continue executing program. 
 */
 static int
-GDBMIGo(dbg_event **ev)
+GDBMIGo(void)
 {
 	if ( !gmi_exec_continue(MIHandle) )
 	{
@@ -458,12 +519,6 @@ GDBMIGo(dbg_event **ev)
 		return DBGRES_ERR;
 	}
 
-	/*
-	 * Wait for event...
-	 */
-	 
-	//*ev = NewEvent(DBGEV_WHATEVER);
-	
 	return DBGRES_OK;
 }
 
@@ -472,7 +527,7 @@ GDBMIGo(dbg_event **ev)
 ** function calls.
 */
 static int
-GDBMIStep(int count, int in, dbg_event **ev)
+GDBMIStep(int count, int in)
 {
 	int		res;
 
@@ -487,12 +542,6 @@ GDBMIStep(int count, int in, dbg_event **ev)
 		return DBGRES_ERR;
 	}
 
-	/*
-	 * Wait for event...
-	 */
-	 
-	//*ev = NewEvent(DBGEV_WHATEVER);
-	
 	return DBGRES_OK;
 }
 
@@ -500,7 +549,7 @@ GDBMIStep(int count, int in, dbg_event **ev)
 ** Move up or down count stack frames.
 */
 static int
-GDBMISetCurrentStackframe(int level, dbg_event **ev)
+GDBMISetCurrentStackframe(int level)
 {
 	if (!gmi_stack_select_frame(MIHandle, level))
 	{
@@ -508,7 +557,8 @@ GDBMISetCurrentStackframe(int level, dbg_event **ev)
 		return DBGRES_ERR;
 	}
 
-	*ev = NewEvent(DBGEV_OK);
+	SaveEvent(NewEvent(DBGEV_OK));
+	
 	return DBGRES_OK;
 }
 
@@ -516,7 +566,7 @@ GDBMISetCurrentStackframe(int level, dbg_event **ev)
 ** List current stack frames.
 */
 static int
-GDBMIListStackframes(dbg_event **ev)
+GDBMIListStackframes(void)
 {
 	dbg_event *	e;
 	List *		flist;
@@ -549,7 +599,7 @@ GDBMIListStackframes(dbg_event **ev)
 	
 	e = NewEvent(DBGEV_FRAMES);
 	e->list = flist;	
-	*ev = e;
+	SaveEvent(e);
 	
 	return DBGRES_OK;
 }
@@ -620,18 +670,18 @@ gmi_dump_binary_value(mi_h *h, char *exp, char *file)
 ** Evaluate the expression exp.
 */
 static int
-GDBMIEvaluateExpression(char *exp, dbg_event **ev)
+GDBMIEvaluateExpression(char *exp)
 {
+	int			res;
 	char *		type;
 	char			tmp[18];
+	AIF *		a;
 	dbg_event *	e;
 
-	if (GDBMIGetType(exp, &e) != DBGRES_OK)
+	if (GDBMIGetType(exp) != DBGRES_OK)
 		return DBGRES_ERR;
 			
-	type = strdup(e->type_desc);
-
-	FreeEvent(e);
+	type = strdup(LastEvent->type_desc);
 
 	strcpy(tmp, "/tmp/guard.XXXXXX");
 
@@ -647,14 +697,19 @@ GDBMIEvaluateExpression(char *exp, dbg_event **ev)
 		return DBGRES_ERR;
 	}
 
-	GDBMIBuildAIFVar(exp, type, tmp, &e);
+	res = GDBMIBuildAIFVar(exp, type, tmp, &a);
+	
+	if (res == DBGRES_OK) {
+		e = NewEvent(DBGEV_DATA);
+		e->data = a;
+	
+		SaveEvent(e);
+	}
 
 	(void)free(type);
 	(void)unlink(tmp);
-
-	*ev = e;
 	
-	return DBGRES_OK;
+	return res;
 }
 
 struct str_type
@@ -813,10 +868,8 @@ SimpleTypeToFDS(char *type, str_ptr fds)
 }
 
 static int
-ConvertType(mi_gvar *gvar, str_ptr fds, dbg_event **ev)
+ConvertType(mi_gvar *gvar, str_ptr fds)
 {
-	dbg_event *	e;
-
 	if ( gvar->numchild == 0 )
 	{
 		if ( !gmi_var_info_type(MIHandle, gvar) )
@@ -847,8 +900,7 @@ ConvertType(mi_gvar *gvar, str_ptr fds, dbg_event **ev)
 			/*
 			** Just look at first child to determine type
 			*/
-			if ( ConvertType(gvar->child, fds, &e) != DBGRES_OK ) {
-				*ev = e;
+			if ( ConvertType(gvar->child, fds) != DBGRES_OK ) {
 				return DBGRES_ERR;
 			}
 
@@ -860,8 +912,7 @@ ConvertType(mi_gvar *gvar, str_ptr fds, dbg_event **ev)
 			gvar = gvar->child;
 			for ( i = 0 ; i < num ; i++ )
 			{
-				if ( ConvertType(gvar, fds, &e) != DBGRES_OK ) {
-					*ev = e;
+				if ( ConvertType(gvar, fds) != DBGRES_OK ) {
 					return DBGRES_ERR;
 				}
 				gvar = gvar->next;
@@ -883,7 +934,7 @@ ConvertType(mi_gvar *gvar, str_ptr fds, dbg_event **ev)
 ** Find type of variable.
 */
 static int
-GDBMIGetType(char *var, dbg_event **ev)
+GDBMIGetType(char *var)
 {
 	dbg_event *	e;
 	mi_gvar *	gvar;
@@ -899,14 +950,14 @@ GDBMIGetType(char *var, dbg_event **ev)
 
 	fds = str_init();
 
-	if ( ConvertType(gvar, fds, &e) != DBGRES_OK ) {
-		*ev = e;
+	if ( ConvertType(gvar, fds) != DBGRES_OK ) {
 		return DBGRES_ERR;
 	}
 
 	e = NewEvent(DBGEV_TYPE);
 	e->type_desc = strdup(fds->buf);
-
+	SaveEvent(e);
+	
 	str_free(fds);
 
 	mi_free_gvar(gvar);
@@ -918,7 +969,7 @@ GDBMIGetType(char *var, dbg_event **ev)
 ** List local variables.
 */
 static int
-GDBMIGetLocalVariables(dbg_event **ev)
+GDBMIGetLocalVariables(void)
 {
 	dbg_event *	e;
 	mi_results *	c;
@@ -948,7 +999,7 @@ GDBMIGetLocalVariables(dbg_event **ev)
 
 	mi_free_results(res);
 
-	*ev = e;
+	SaveEvent(e);
 	
 	return DBGRES_OK;
 }
@@ -957,7 +1008,7 @@ GDBMIGetLocalVariables(dbg_event **ev)
 ** List arguments.
 */
 static int
-GDBMIGetArguments(dbg_event **ev)
+GDBMIGetArguments(void)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return DBGRES_ERR;
@@ -967,7 +1018,7 @@ GDBMIGetArguments(dbg_event **ev)
 ** List global variables.
 */
 static int
-GDBMIGetGlobalVariables(dbg_event **ev)
+GDBMIGetGlobalVariables(void)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return DBGRES_ERR;
@@ -977,7 +1028,7 @@ GDBMIGetGlobalVariables(dbg_event **ev)
 ** Quit debugger.
 */
 static int
-GDBMIQuit(dbg_event **ev)
+GDBMIQuit(void)
 {
 	gmi_gdb_exit(MIHandle);
 
@@ -1043,17 +1094,15 @@ char tohex[] =	{'0', '1', '2', '3', '4', '5', '6', '7',
 		 '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
 static int
-GDBMIBuildAIFVar(char *var, char *type, char *file, dbg_event **ev)
+GDBMIBuildAIFVar(char *var, char *type, char *file, AIF **aif)
 {
 	int			n;
 	int			fd;
-	AIF *		aif;
 	char *		data;
 	char *		ap;
 	char *		bp;
 	char			buf[BUFSIZ];
 	struct stat	sb;
-	dbg_event *	e;
 
 	if ( stat(file, &sb) < 0 )
 	{
@@ -1102,15 +1151,11 @@ GDBMIBuildAIFVar(char *var, char *type, char *file, dbg_event **ev)
 		(void)close(fd);
 	}
 
-	if ( (aif = AsciiToAIF(type, data)) == NULL )
+	if ( (*aif = AsciiToAIF(type, data)) == NULL )
 	{
 		DbgSetError(DBGERR_DEBUGGER, AIFErrorStr());
 		return DBGRES_ERR;
 	}
-
-	e = NewEvent(DBGEV_DATA);
-	e->data = aif;
-	*ev = e;
 	
 	return DBGRES_OK;
 }

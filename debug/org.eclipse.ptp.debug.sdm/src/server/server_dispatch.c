@@ -27,29 +27,32 @@
 #include "args.h"
 #include "dbg.h"
 #include "dbg_event.h"
+#include "backend.h"
 
 struct svr_cmd {
 	char *cmd_name;
-	int (*cmd_func)(char **, dbg_event **);
+	int (*cmd_func)(dbg_backend *, char **);
 };
 
 typedef struct svr_cmd	svr_cmd;
 
-static int svr_setlinebreakpoint(char **, dbg_event **);
-static int svr_setfuncbreakpoint(char **, dbg_event **);
-static int svr_deletebreakpoints(char **, dbg_event **);
-static int svr_go(char **, dbg_event **);
-static int svr_step(char **, dbg_event **);
-static int svr_liststackframes(char **, dbg_event **);
-static int svr_setcurrentstackframe(char **, dbg_event **);
-static int svr_evaluateexpression(char **, dbg_event **);
-static int svr_listlocalvariables(char **, dbg_event **);
-static int svr_listarguments(char **, dbg_event **);
-static int svr_listglobalvariables(char **, dbg_event **);
-static int svr_quit(char **, dbg_event **);
+static int svr_start_session(dbg_backend *, char **);
+static int svr_setlinebreakpoint(dbg_backend *, char **);
+static int svr_setfuncbreakpoint(dbg_backend *, char **);
+static int svr_deletebreakpoints(dbg_backend *, char **);
+static int svr_go(dbg_backend *, char **);
+static int svr_step(dbg_backend *, char **);
+static int svr_liststackframes(dbg_backend *, char **);
+static int svr_setcurrentstackframe(dbg_backend *, char **);
+static int svr_evaluateexpression(dbg_backend *, char **);
+static int svr_listlocalvariables(dbg_backend *, char **);
+static int svr_listarguments(dbg_backend *, char **);
+static int svr_listglobalvariables(dbg_backend *, char **);
+static int svr_quit(dbg_backend *, char **);
 
 static svr_cmd svr_cmd_tab[] =
 {
+	{"STS",	svr_start_session},
 	{"SLB",	svr_setlinebreakpoint},
 	{"SFB",	svr_setfuncbreakpoint},
 	{"DBS",	svr_deletebreakpoints},
@@ -64,133 +67,150 @@ static svr_cmd svr_cmd_tab[] =
 	{"QUI",	svr_quit},
 };
 
-static int	svr_shutdown = 0;
+static int			svr_shutdown = 0;
+static int			svr_res;
+static dbg_event *	svr_event;
+static void			(*svr_event_callback)(dbg_event *, void *);
+static void *		svr_data;
 
 int
-svr_dispatch(char *cmd, char **resp)
+svr_init(dbg_backend *db, void (*cb)(dbg_event *, void *), void *data)
+{
+	svr_event_callback = cb;
+	svr_data = data;
+	return db->db_funcs->init(cb, data);
+}
+
+int
+svr_dispatch(dbg_backend *db, char *cmd)
 {
 	int			i;
-	int			res;
 	char **		args;
 	svr_cmd *	sc;
-	dbg_event *	e;
 	
 	args = Str2Args(cmd);
 	
 	for (i = 0; i < sizeof(svr_cmd_tab) / sizeof(svr_cmd); i++) {
 		sc = &svr_cmd_tab[i];
 		if (strcmp(args[0], sc->cmd_name) == 0) {
-			res = sc->cmd_func(args, &e);
+			svr_res = sc->cmd_func(db, args);
 			break;
 		}
 	}
 	
+	FreeArgs(args);
+	
 	if (i == sizeof(svr_cmd_tab) / sizeof(svr_cmd)) {
-		res = DBGRES_ERR;
+		svr_res = DBGRES_ERR;
 		DbgSetError(DBGERR_PROTO, "Unknown command");
 	}
 	
-	FreeArgs(args);
-	
-	if (res != DBGRES_OK) {
-		e = NewEvent(DBGEV_ERROR);
-		e->error_code = DbgGetError();
-		e->error_msg = strdup(DbgGetErrorStr());
-	}
-	
-	if (proxy_tcp_event_to_str(e, resp) < 0)
-		*resp = strdup("ERROR");
-
-printf("response will be <%s>\n", *resp);
-	
-	FreeEvent(e);
-			
 	return svr_shutdown;
 }
 
-static int 
-svr_setlinebreakpoint(char **args, dbg_event **ev)
+int
+svr_progress(dbg_backend *db)
 {
 	dbg_event *	e;
+	
+	if (svr_res != DBGRES_OK) {
+		e = NewEvent(DBGEV_ERROR);
+		e->error_code = DbgGetError();
+		e->error_msg = strdup(DbgGetErrorStr());
+		svr_event_callback(e, svr_data);
+		FreeEvent(e);
+		return DBGRES_ERR;
+	}
+	
+	return db->db_funcs->progress();
+}
+
+static int 
+svr_start_session(dbg_backend *db, char **args)
+{
+	return db->db_funcs->start_session();
+}
+
+static int 
+svr_setlinebreakpoint(dbg_backend *db, char **args)
+{
 	int i = rand() % 5;
 	
 	if (i == 0) {
-		e = NewEvent(DBGEV_ERROR);
-		e->error_code = i;
-		e->error_msg = strdup("test error");
+		svr_event = NewEvent(DBGEV_ERROR);
+		svr_event->error_code = i;
+		svr_event->error_msg = strdup("test error");
 	}
 	else
-		e = NewEvent(DBGEV_OK);
+		svr_event = NewEvent(DBGEV_OK);
 		
-	*ev = e;
 	return DBGRES_OK;
 }
 
 static int 
-svr_setfuncbreakpoint(char **args, dbg_event **ev)
+svr_setfuncbreakpoint(dbg_backend *db, char **args)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_deletebreakpoints(char **args, dbg_event **ev)
+svr_deletebreakpoints(dbg_backend *db, char **args)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_go(char **args, dbg_event **ev)
+svr_go(dbg_backend *db, char **args)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_step(char **args, dbg_event **ev)
+svr_step(dbg_backend *db, char **args)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_liststackframes(char **args, dbg_event **ev)
+svr_liststackframes(dbg_backend *db, char **args)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_setcurrentstackframe(char **args, dbg_event **ev)
+svr_setcurrentstackframe(dbg_backend *db, char **args)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_evaluateexpression(char **args, dbg_event **ev)
+svr_evaluateexpression(dbg_backend *db, char **args)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_listlocalvariables(char **args, dbg_event **ev)
+svr_listlocalvariables(dbg_backend *db, char **args)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_listarguments(char **args, dbg_event **ev)
+svr_listarguments(dbg_backend *db, char **args)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_listglobalvariables(char **args, dbg_event **ev)
+svr_listglobalvariables(dbg_backend *db, char **args)
 {
 	return DBGRES_OK;
 }
 
 static int 
-svr_quit(char **args, dbg_event **ev)
+svr_quit(dbg_backend *db, char **args)
 {
-	dbg_event *	e = NewEvent(DBGEV_OK);
-	*ev = e;
+	svr_event = NewEvent(DBGEV_OK);
 	
 	svr_shutdown++;
 	return DBGRES_OK;
