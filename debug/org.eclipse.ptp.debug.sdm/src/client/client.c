@@ -266,6 +266,15 @@ send_complete(Hash *h)
 		case DBGEV_STEP:
 			printf("step completed\n");
 			break;
+		case DBGEV_SIGNAL:
+			printf("received signal %s\n", e->sig_name);
+			break;
+		case DBGEV_EXIT:
+			printf("exited with status %d\n", e->exit_status);
+			break;
+		case DBGEV_DATA:
+			printf("data is "); AIFPrint(stdout, 0, e->data); printf("\n");
+			break;
 		case DBGEV_FRAMES:
 			printf("got frames:\n");
 			for (SetList(e->list); (f = (stackframe *)GetListElement(e->list)) != NULL; ) {
@@ -278,7 +287,6 @@ send_complete(Hash *h)
 		}
 	}
 	
-	printf("send completed\n");
 	completed++;
 }
 
@@ -299,7 +307,7 @@ client(int task_id)
 {
 	int	i;
 #ifdef TEST
-	procset *p;
+	procset *p, *p1;
 #endif
 
 	num_servers = my_task_id = task_id;
@@ -320,6 +328,9 @@ client(int task_id)
 	p = procset_new(num_servers);
 	for (i = 0; i < num_servers; i++)
 		procset_add_proc(p, i);
+		
+	p1 = procset_new(num_servers);
+	procset_add_proc(p1, 0);
 
 	send_command(p, "INI yyy", send_complete);
 	wait_for_server();	
@@ -327,9 +338,9 @@ client(int task_id)
 	wait_for_server();
 	send_command(p, "SLB yyy.c 6", send_complete);
 	wait_for_server();
-	send_command(p, "SLB xxx.c 23", send_complete);
+	send_command(p, "SLB xxx.c 99", send_complete);
 	wait_for_server();
-	send_command(p, "SLB xxx.c 6", send_complete);
+	send_command(p, "SLB xxx.c 14", send_complete);
 	wait_for_server();
 	send_command(p, "GOP", send_complete);
 	wait_for_server();
@@ -339,7 +350,21 @@ client(int task_id)
 	wait_for_server();
 	send_command(p, "STP 1 0", send_complete);
 	wait_for_server();
+	send_command(p1, "STP 1 0", send_complete);
+	wait_for_server();
+	send_command(p, "EEX a", send_complete);
+	wait_for_server();
 	send_command(p, "LSF 1", send_complete);
+	wait_for_server();
+	send_command(p, "SFB xxx.c b", send_complete);
+	wait_for_server();
+	send_command(p, "GOP", send_complete);
+	wait_for_server();
+	send_command(p, "LSF 1", send_complete);
+	wait_for_server();
+	send_command(p, "LSF 0", send_complete);
+	wait_for_server();
+	send_command(p, "GOP", send_complete);
 	wait_for_server();
 	send_command(p, "QUI", send_complete);
 	wait_for_server();
