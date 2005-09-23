@@ -27,7 +27,6 @@ import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -42,9 +41,6 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 	private Map machineList = null;
 	protected String cur_machine_id = EMPTY_ID;
 
-	public MachineManager() {
-		modelManager = PTPCorePlugin.getDefault().getModelManager();
-	}
 	public void shutdown() {
 		clear();
 		modelManager = null;

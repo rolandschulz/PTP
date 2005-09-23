@@ -23,14 +23,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IProcessEvent;
 import org.eclipse.ptp.core.IProcessListener;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.listeners.IJobChangeListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -47,9 +45,6 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	protected String cur_job_id = EMPTY_ID;
 	protected List jobChangeListeners = new ArrayList();
 
-	public JobManager() {
-		modelManager = PTPCorePlugin.getDefault().getModelManager();
-	}
 	public void shutdown() {
 		clear();
 		modelManager = null;
@@ -155,18 +150,6 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 			return null;
 		return job.findProcess(id);
 	}
-	public IPJob findJob(String job_name) {
-		IPElement element = modelManager.getUniverse().findJobByName(job_name);
-		if (element instanceof IPJob)
-			return (IPJob) element;
-		return null;
-	}
-	public IPJob findJobById(String job_id) {
-		IPElement element = modelManager.getUniverse().findChild(job_id);
-		if (element instanceof IPJob)
-			return (IPJob) element;
-		return null;
-	}
 	public String getName(String id) {
 		IPElement element = findJobById(id);
 		if (element == null)
@@ -208,8 +191,7 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	 * Process Listener
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public void addProcessListener(IPProcess process, IPJob currentJob) {
-		if (!currentJob.isDebug())
-			process.addProcessListener(this);
+		process.addProcessListener(this);
 	}
 	public void processEvent(IProcessEvent event) {
 		// only redraw if the current set contain the process

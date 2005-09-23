@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.eclipse.ptp.core.IModelManager;
+import org.eclipse.ptp.core.IPElement;
+import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.listeners.IPaintListener;
 import org.eclipse.ptp.ui.listeners.ISetListener;
@@ -39,6 +42,10 @@ public abstract class AbstractUIManager implements IManager {
 	protected String cur_set_id = EMPTY_ID;
 	protected List pListeners = new ArrayList(0);
 	protected List setListeners = new ArrayList(0);
+	
+	public AbstractUIManager() {
+		modelManager = PTPCorePlugin.getDefault().getModelManager();
+	}
 	
 	public void shutdown() {
 		pListeners.clear();
@@ -144,5 +151,15 @@ public abstract class AbstractUIManager implements IManager {
 				}
 			}
 		}
+	}
+	
+	public IPJob findJob(String job_name) {
+		return modelManager.getUniverse().findJobByName(job_name);
+	}
+	public IPJob findJobById(String job_id) {
+		IPElement element = modelManager.getUniverse().findChild(job_id);
+		if (element instanceof IPJob)
+			return (IPJob) element;
+		return null;
 	}	
 }
