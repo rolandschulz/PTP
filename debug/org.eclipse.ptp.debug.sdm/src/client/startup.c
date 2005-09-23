@@ -85,6 +85,12 @@ main(int argc, char *argv[])
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	
+	if (size < 2) {
+		error_msg(rank, "Debugger requires at least 2 processes\n");
+		MPI_Finalize();
+		return 1;
+	}
+	
 	// MPI_Comm_create_errhandler(handle_fatal_errors, &err_handler);
 	// MPI_Comm_set_errhandler(MPI_COMM_WORLD, err_handler);
 	
