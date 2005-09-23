@@ -202,10 +202,11 @@ proxy_tcp_aif_to_str(AIF *a, char **result)
 int
 proxy_tcp_event_to_str(dbg_event *e, char **result)
 {
+	int		res = 0;
 	char *	str;
 	char *	str2;
 	char *	pstr;
-	
+
 	if (e == NULL)
 		return -1;
 	
@@ -270,13 +271,13 @@ proxy_tcp_event_to_str(dbg_event *e, char **result)
 		break;
 		
 	default:
-		free(pstr);
-		return -1;
+		res = -1;
+		break;
 	}
 
 	free(pstr);
 	
-	return 0;
+	return res;
 }
 
 static int
@@ -382,7 +383,7 @@ proxy_tcp_str_to_stackframes(char **args, List **lst)
 
 	*lst = NewList();
 	
-	for (i = 0, pos = 1; i < count; i++, pos += 4) {
+	for (i = 0, pos = 1; i < count; i++, pos += 5) {
 		if (proxy_tcp_str_to_int(args[pos], &level) < 0) {
 			DestroyList(*lst, FreeStackframe);
 			return -1;
