@@ -31,13 +31,13 @@ struct dbg_backend_funcs {
 	int (*init)(void (*)(dbg_event *, void *), void *);
 	int (*read)(int);
 	int (*progress)(void);
-	int (*start_session)(void);
+	int (*start_session)(char *, char *);
 	int (*setlinebreakpoint)(char *, int);
 	int (*setfuncbreakpoint)(char *, char *);
 	int (*deletebreakpoints)(int);
 	int (*go)(void);
 	int (*step)(int, int);
-	int (*liststackframes)(void);
+	int (*liststackframes)(int);
 	int (*setcurrentstackframe)(int);
 	int (*evaluateexpression)(char *);
 	int (*gettype)(char *);
