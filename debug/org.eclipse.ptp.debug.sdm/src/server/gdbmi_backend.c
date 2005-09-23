@@ -35,13 +35,15 @@
 #include "backend.h"
 #include "list.h"
 
-static struct timeval	SELECT_TIMEOUT = { 25, 0 };
+//#define DEBUG
+static struct timeval	SELECT_TIMEOUT = { 0, 1000 };
 static mi_h *		MIHandle;
-static stackframe *	CurrentStackframe;
 static List *		Breakpoints;
 static dbg_event *	LastEvent;
 static void			(*EventCallback)(dbg_event *, void *);
 static void *		EventCallbackData;
+static int			ServerExit;
+static int			Started;
 
 static int	GDBMIBuildAIFVar(char *, char *, char *, AIF **);
 static int	SetAndCheckBreak(char *);
@@ -49,13 +51,13 @@ static int	SetAndCheckBreak(char *);
 static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIRead(int);
 static int	GDBMIProgress(void);
-static int	GDBMIStartSession(void);
+static int	GDBMIStartSession(char *, char*);
 static int	GDBMISetLineBreakpoint(char *, int);
 static int	GDBMISetFuncBreakpoint(char *, char *);
 static int	GDBMIDeleteBreakpoints(int);
 static int	GDBMIGo(void);
 static int	GDBMIStep(int, int);
-static int	GDBMIListStackframes(void);
+static int	GDBMIListStackframes(int);
 static int	GDBMISetCurrentStackframe(int);
 static int	GDBMIEvaluateExpression(char *);
 static int	GDBMIGetType(char *);
@@ -85,6 +87,14 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIQuit
 };
 
+char *
+GetLastErrorStr(void)
+{
+	if (mi_error == MI_FROM_GDB && mi_error_from_gdb != NULL)
+ 		return mi_error_from_gdb;
+	return (char *)mi_get_error_str();
+}
+	
 void
 SaveEvent(dbg_event *e)
 {
@@ -101,6 +111,7 @@ void
 Reap(int sig)
 {
 	int	status;
+	printf("waiting on child...\n");
 	wait(&status);
 }
 
@@ -157,7 +168,7 @@ AsyncBreakpointHit(void *arg)
 
 	if ( SetCurrFrame() < 0 )
 	{
-		EVENT_ERROR(e, DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		EVENT_ERROR(e, DBGERR_DEBUGGER, GetLastErrorStr());
 		return e;
 	}
 
@@ -181,7 +192,7 @@ AsyncStep(void *arg)
 
 	if ( SetCurrFrame() < 0 )
 	{
-		EVENT_ERROR(e, DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		EVENT_ERROR(e, DBGERR_DEBUGGER, GetLastErrorStr());
 		return e;
 	}
 
@@ -202,7 +213,7 @@ AsyncSignal(void *arg)
 	if ( SetCurrFrame() < 0 )
 	{
 		Free(sig);
-		EVENT_ERROR(e, DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		EVENT_ERROR(e, DBGERR_DEBUGGER, GetLastErrorStr());
 		return e;
 	}
 
@@ -242,6 +253,8 @@ static void
 AsyncCallback(mi_output *mio, void *data)
 {
 	mi_stop *	stop;
+	dbg_event *	e;
+	breakpoint *	bp;
 
 	stop = mi_get_stopped(mio->c);
 
@@ -252,10 +265,19 @@ AsyncCallback(mi_output *mio, void *data)
 	{
 	case sr_bkpt_hit:
 		//AsyncCheck(AsyncBreakpointHit, (void *)stop->bkptno, AsyncHost, AsyncProg);
+		if ((bp = FindBreakpoint(Breakpoints, stop->bkptno)) == NULL)
+		{
+			DbgSetError(DBGERR_DEBUGGER, "bad breakpoint");
+			return;
+		}
+	
+		e = NewEvent(DBGEV_BPHIT);
+		e->bp = CopyBreakpoint(bp);
 		break;
 
 	case sr_end_stepping_range:
 		//AsyncCheck(AsyncStep, NULL, AsyncHost, AsyncProg);
+		e = NewEvent(DBGEV_STEP);
 		break;
 
 	case sr_exited_signalled:
@@ -275,7 +297,12 @@ AsyncCallback(mi_output *mio, void *data)
 		break;
 	}
 
-	mi_free_stop(stop);	
+	mi_free_stop(stop);
+	
+	if (EventCallback != NULL)
+		EventCallback(e, EventCallbackData);
+		
+	FreeEvent(e);
 }
 
 
@@ -289,30 +316,8 @@ GDBMIInit(void (*event_callback)(dbg_event *, void *), void *data)
 	EventCallbackData = data;
 	MIHandle = NULL;
 	LastEvent = NULL;
-	return DBGEV_OK;
-}
-
-/*
- * Start GDB session
- */	
-static int
-GDBMIStartSession(void)
-{
-	MIHandle = mi_connect_local();
-
-	if ( !MIHandle )
-	{
-		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
-		return DBGRES_ERR;
-	}
-
-	mi_set_async_cb(MIHandle, AsyncCallback, NULL);
-
-#ifdef DEBUG
-	mi_set_to_gdb_cb(MIHandle, ToGDBCB, NULL);
-	mi_set_from_gdb_cb(MIHandle, FromGDBCB, NULL);
-#endif /* DEBUG */
-
+	ServerExit = 0;
+		
 	signal(SIGCHLD, Reap);
 	signal(SIGTERM, SIG_IGN);
 	signal(SIGHUP, SIG_IGN);
@@ -321,26 +326,98 @@ GDBMIStartSession(void)
 
 	Breakpoints = NewList();
 	
-	SaveEvent(NewEvent(DBGEV_INIT));
+	return DBGEV_OK;
+}
+
+#ifdef DEBUG
+void
+to_gdb_cb(const char *str, void *data)
+{
+	printf(">>> %s\n", str);
+}
+void
+from_gdb_cb(const char *str, void *data)
+{
+	printf("<<< %s\n", str);
+}
+#endif /* DEBUG */
+
+/*
+ * Start GDB session
+ */	
+static int
+GDBMIStartSession(char *prog, char *args)
+{
+	if (MIHandle != NULL) {
+		DbgSetError(DBGERR_SESSION, NULL);
+		return DBGRES_ERR;
+	}
+	
+	if ((MIHandle = mi_connect_local()) == NULL) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		return DBGRES_ERR;
+	}
+
+	mi_set_async_cb(MIHandle, AsyncCallback, NULL);
+
+#ifdef DEBUG
+	mi_set_to_gdb_cb(MIHandle, to_gdb_cb, NULL);
+	mi_set_from_gdb_cb(MIHandle, from_gdb_cb, NULL);
+#endif /* DEBUG */
+
+	if ( !gmi_set_exec(MIHandle, prog, args) )
+	{
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		gmi_gdb_exit(MIHandle);
+		MIHandle = NULL;
+		return DBGRES_ERR;
+	}
+	
+	Started = 0;
+	SaveEvent(NewEvent(DBGEV_OK));
 
 	return DBGRES_OK;
 }
 
-
+/*
+ * Progress gdb commands.
+ * 
+ * @return	-1	error/server shutdown
+ * 			0	completed operation
+ */
 static int	
 GDBMIProgress(void)
 {
 	fd_set			fds;
-	int				res;
+	int				res = 0;
 	struct timeval	tv;
 
-	if (!MIHandle)
-		return DBGRES_ERR;
+	if (MIHandle == NULL)
+		return 0;
+	
+	/*
+	 * Check for existing events
+	 */
+	if (LastEvent != NULL) {
+		if (EventCallback != NULL)
+			EventCallback(LastEvent, EventCallbackData);
 		
+		if (ServerExit && LastEvent->event == DBGEV_OK) {
+			mi_disconnect(MIHandle);
+			MIHandle = NULL;
+			res = -1;
+		}
+			
+		FreeEvent(LastEvent);
+		LastEvent = NULL;
+		
+		return res;
+	}
+	
 	FD_ZERO(&fds);
 	FD_SET(MIHandle->from_gdb[0], &fds);
 	tv = SELECT_TIMEOUT;
-	
+
 	for ( ;; ) {
 		res = select(MIHandle->from_gdb[0]+1, &fds, NULL, NULL, &tv);
 	
@@ -353,7 +430,7 @@ GDBMIProgress(void)
 			return -1;
 		
 		case 0:
-			return DBGRES_OK;
+			return 0;
 		
 		default:
 			break;
@@ -362,13 +439,10 @@ GDBMIProgress(void)
 		break;
 	}
 	
-	while ( (res = mi_get_response(MIHandle)) <= 0 )
-	{
-		if (res < 0)
-			return DBGRES_ERR;
-	}
+	if ( mi_get_response(MIHandle) < 0 )
+			return -1;
 
-	return DBGRES_OK;
+	return 0;
 }
 
 /*
@@ -435,10 +509,13 @@ SetAndCheckBreak(char *where)
 
 	bpt = gmi_break_insert_full(MIHandle, 0, 0, NULL, -1, -1, where);
 
-	(void)free(where);
-
+	free(where);
+	
 	if ( bpt == NULL ) {
-		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		if (mi_error == MI_OK)
+			DbgSetError(DBGERR_DEBUGGER, "Attempt to set breakpoint failed");
+		else
+			DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
 	}
 
@@ -481,7 +558,7 @@ SetAndCheckBreak(char *where)
 	*/
 
 	e = NewEvent(DBGEV_BPSET);
-	e->bp = bp;
+	e->bp = CopyBreakpoint(bp);
 	SaveEvent(e);
 	
 	mi_free_bkpt(bpt);
@@ -496,7 +573,7 @@ static int
 GDBMIDeleteBreakpoints(int bpid)
 {
 	if ( !gmi_break_delete(MIHandle, bpid) ) {
-		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
 	}
 
@@ -513,9 +590,18 @@ GDBMIDeleteBreakpoints(int bpid)
 static int
 GDBMIGo(void)
 {
-	if ( !gmi_exec_continue(MIHandle) )
+	int res;
+	
+	if (Started)
+		res = gmi_exec_continue(MIHandle);
+	else {
+		res = gmi_exec_run(MIHandle);
+		Started = 1;
+	}
+		
+	if ( !res )
 	{
-		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
 	}
 
@@ -538,7 +624,7 @@ GDBMIStep(int count, int in)
 
 	if ( !res )
 	{
-		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
 	}
 
@@ -553,7 +639,7 @@ GDBMISetCurrentStackframe(int level)
 {
 	if (!gmi_stack_select_frame(MIHandle, level))
 	{
-		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
 	}
 
@@ -563,34 +649,40 @@ GDBMISetCurrentStackframe(int level)
 }
 
 /*
-** List current stack frames.
+** List current or all stack frames.
 */
 static int
-GDBMIListStackframes(void)
+GDBMIListStackframes(int current)
 {
 	dbg_event *	e;
 	List *		flist;
 	stackframe *	s;
+	mi_frames *	f;
 	mi_frames *	frames;
-
-	if ( (frames = gmi_stack_list_frames(MIHandle)) == NULL )
+	
+	if (current)
+		frames = gmi_stack_info_frame(MIHandle);
+	else
+		frames = gmi_stack_list_frames(MIHandle);
+		
+	if ( frames == NULL )
 	{
-		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
 	}
 	
 	flist = NewList();
 	
-	for (; frames != NULL; frames = frames->next) {
-		s = NewStackframe(frames->level);
+	for (f = frames; f != NULL; f = f->next) {
+		s = NewStackframe(f->level);
 
-		if ( frames->addr != 0 )
-			asprintf(&s->loc.addr, "0x%x", frames->addr);
-		if ( frames->func != NULL )
-			s->loc.func = strdup(frames->func);
-		if ( frames->file != NULL )
-			s->loc.file = strdup(frames->file);
-		s->loc.line = frames->line;
+		if ( f->addr != 0 )
+			asprintf(&s->loc.addr, "0x%x", f->addr);
+		if ( f->func != NULL )
+			s->loc.func = strdup(f->func);
+		if ( f->file != NULL )
+			s->loc.file = strdup(f->file);
+		s->loc.line = f->line;
 		
 		AddToList(flist, (void *)s);
 	}
@@ -693,7 +785,7 @@ GDBMIEvaluateExpression(char *exp)
 
 	if ( !gmi_dump_binary_value(MIHandle, exp, tmp) )
 	{
-		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
 	}
 
@@ -874,7 +966,7 @@ ConvertType(mi_gvar *gvar, str_ptr fds)
 	{
 		if ( !gmi_var_info_type(MIHandle, gvar) )
 		{
-			DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
+			DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 			return DBGRES_ERR;
 		}
 
@@ -888,7 +980,7 @@ ConvertType(mi_gvar *gvar, str_ptr fds)
 	{
 		if ( !gmi_var_list_children(MIHandle, gvar) )
 		{
-			DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
+			DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 			return DBGRES_ERR;
 		}
 
@@ -944,7 +1036,7 @@ GDBMIGetType(char *var)
 
 	if ( gvar == NULL )
 	{
-		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
 	}
 
@@ -979,7 +1071,7 @@ GDBMIGetLocalVariables(void)
 
 	if ( res == NULL )
 	{
-		DbgSetError(DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
 	}
 
@@ -1031,7 +1123,8 @@ static int
 GDBMIQuit(void)
 {
 	gmi_gdb_exit(MIHandle);
-
+	SaveEvent(NewEvent(DBGEV_OK));
+	ServerExit++;
 	return DBGRES_OK;
 }
 
@@ -1047,20 +1140,20 @@ DbgGDBMIInvoke(char *host, int cb, char *proto, char *prog, char *args, char **e
 
 	if ( !gmi_set_exec(MIHandle, prog, args) )
 	{
-		EVENT_ERROR(e, DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		EVENT_ERROR(e, DBGERR_DEBUGGER, GetLastErrorStr());
 		return e;
 	}
 
 	bpt = gmi_break_insert_full(MIHandle, 0, 0, NULL, -1, -1, "main");
 
 	if ( bpt == NULL ) {
-		EVENT_ERROR(e, DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		EVENT_ERROR(e, DBGERR_DEBUGGER, GetLastErrorStr());
 		return e;
 	}
 
 	if ( !gmi_exec_run(MIHandle) )
 	{
-		EVENT_ERROR(e, DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		EVENT_ERROR(e, DBGERR_DEBUGGER, GetLastErrorStr());
 		return e;
 	}
 
@@ -1075,7 +1168,7 @@ DbgGDBMIInvoke(char *host, int cb, char *proto, char *prog, char *args, char **e
 	
 	if ( !sr || SetCurrFrame() < 0 )
 	{
-		EVENT_ERROR(e, DBGERR_DEBUGGER, (char *)mi_get_error_str());
+		EVENT_ERROR(e, DBGERR_DEBUGGER, GetLastErrorStr());
 		return e;
 	}
 
