@@ -154,7 +154,7 @@ public class ParallelJobsView extends AbstractParallelView implements SelectionL
 		//updateButton();
 	}
 
-	public void run() {
+	public void run(String arg) {
 		System.out.println("ParallelProcessesView - run");
 		//updateButton();
 		//resetEntireList();

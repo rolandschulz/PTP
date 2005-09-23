@@ -497,7 +497,7 @@ public class ParallelNodeStatusView extends AbstractParallelView implements
 		getInitialStatus();
 	}
 
-	public void run() {
+	public void run(String arg) {
 		System.out.println("ParallelNodeStatusView - run");
 		getInitialStatus();
 		// removerAllProcessViewer();

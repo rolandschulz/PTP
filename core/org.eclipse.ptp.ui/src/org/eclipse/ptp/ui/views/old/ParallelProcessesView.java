@@ -141,7 +141,7 @@ public class ParallelProcessesView extends AbstractParallelView {
 		updateButton();
 	}
 
-	public void run() {
+	public void run(String arg) {
 		System.out.println("ParallelProcessesView - run");
 		updateButton();
 		refreshAll(ASYN_STYLE, true);
