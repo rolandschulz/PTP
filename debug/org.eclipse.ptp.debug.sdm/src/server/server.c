@@ -107,7 +107,6 @@ do_commands(dbg_backend *dbgr, int client_task_id, int my_task_id)
 void
 server(int client_task_id, int my_task_id, dbg_backend *dbgr)
 {
-	int exit = 0;
 	//int signal;
 	//char status;
 	//char **args;
@@ -123,8 +122,9 @@ server(int client_task_id, int my_task_id, dbg_backend *dbgr)
 	
 	svr_init(dbgr, event_callback, (void *)&client_task_id);
 	
-	while (!exit) {
-		exit = do_commands(dbgr, client_task_id, my_task_id);
-		svr_progress(dbgr);
+	for (;;) {
+		do_commands(dbgr, client_task_id, my_task_id);
+		if (svr_progress(dbgr) < 0)
+			break;
 	}
 }
