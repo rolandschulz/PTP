@@ -167,7 +167,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	public ICDISession getDebugSession(String job_id) {
 		if (isNoJob(job_id))
 			return null;
-		return PTPDebugCorePlugin.getDefault().getDebugSession(findJobById(job_id));
+		IPJob job = findJobById(job_id);
+		if (job == null)
+			return null;
+		return PTPDebugCorePlugin.getDefault().getDebugSession(job);
 	}
 	public ICDISession getDebugSession(IPJob job) {
 		return PTPDebugCorePlugin.getDefault().getDebugSession(job);

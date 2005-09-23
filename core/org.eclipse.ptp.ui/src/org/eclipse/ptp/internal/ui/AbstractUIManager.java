@@ -161,5 +161,8 @@ public abstract class AbstractUIManager implements IManager {
 		if (element instanceof IPJob)
 			return (IPJob) element;
 		return null;
-	}	
+	}
+	public void removeJob(IPJob job) {
+		modelManager.getUniverse().deleteJob(job);
+	}
 }
