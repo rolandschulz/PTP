@@ -52,7 +52,7 @@ static int svr_quit(dbg_backend *, char **);
 
 static svr_cmd svr_cmd_tab[] =
 {
-	{"STS",	svr_start_session},
+	{"INI",	svr_start_session},
 	{"SLB",	svr_setlinebreakpoint},
 	{"SFB",	svr_setfuncbreakpoint},
 	{"DBS",	svr_deletebreakpoints},
@@ -119,7 +119,8 @@ svr_progress(dbg_backend *db)
 		e->error_msg = strdup(DbgGetErrorStr());
 		svr_event_callback(e, svr_data);
 		FreeEvent(e);
-		return DBGRES_ERR;
+		svr_res = DBGRES_OK;
+		return 0;
 	}
 	
 	return db->db_funcs->progress();
@@ -128,90 +129,84 @@ svr_progress(dbg_backend *db)
 static int 
 svr_start_session(dbg_backend *db, char **args)
 {
-	return db->db_funcs->start_session();
+	return db->db_funcs->start_session(args[1], args[2]);
 }
 
 static int 
 svr_setlinebreakpoint(dbg_backend *db, char **args)
 {
-	int i = rand() % 5;
-	
-	if (i == 0) {
-		svr_event = NewEvent(DBGEV_ERROR);
-		svr_event->error_code = i;
-		svr_event->error_msg = strdup("test error");
-	}
-	else
-		svr_event = NewEvent(DBGEV_OK);
-		
-	return DBGRES_OK;
+	return db->db_funcs->setlinebreakpoint(args[1], atoi(args[2]));
 }
 
 static int 
 svr_setfuncbreakpoint(dbg_backend *db, char **args)
 {
-	return DBGRES_OK;
+	DbgSetError(DBGERR_NOTIMP, "Command not implemented");
+	return DBGRES_ERR;
 }
 
 static int 
 svr_deletebreakpoints(dbg_backend *db, char **args)
 {
-	return DBGRES_OK;
+	DbgSetError(DBGERR_NOTIMP, "Command not implemented");
+	return DBGRES_ERR;
 }
 
 static int 
 svr_go(dbg_backend *db, char **args)
 {
-	return DBGRES_OK;
+	return db->db_funcs->go();
 }
 
 static int 
 svr_step(dbg_backend *db, char **args)
 {
-	return DBGRES_OK;
+	return db->db_funcs->step(atoi(args[1]), atoi(args[2]));
 }
 
 static int 
 svr_liststackframes(dbg_backend *db, char **args)
 {
-	return DBGRES_OK;
+	return db->db_funcs->liststackframes(atoi(args[1]));
 }
 
 static int 
 svr_setcurrentstackframe(dbg_backend *db, char **args)
 {
-	return DBGRES_OK;
+	DbgSetError(DBGERR_NOTIMP, "Command not implemented");
+	return DBGRES_ERR;
 }
 
 static int 
 svr_evaluateexpression(dbg_backend *db, char **args)
 {
-	return DBGRES_OK;
+	DbgSetError(DBGERR_NOTIMP, "Command not implemented");
+	return DBGRES_ERR;
 }
 
 static int 
 svr_listlocalvariables(dbg_backend *db, char **args)
 {
-	return DBGRES_OK;
+	DbgSetError(DBGERR_NOTIMP, "Command not implemented");
+	return DBGRES_ERR;
 }
 
 static int 
 svr_listarguments(dbg_backend *db, char **args)
 {
-	return DBGRES_OK;
+	DbgSetError(DBGERR_NOTIMP, "Command not implemented");
+	return DBGRES_ERR;
 }
 
 static int 
 svr_listglobalvariables(dbg_backend *db, char **args)
 {
-	return DBGRES_OK;
+	DbgSetError(DBGERR_NOTIMP, "Command not implemented");
+	return DBGRES_ERR;
 }
 
 static int 
 svr_quit(dbg_backend *db, char **args)
 {
-	svr_event = NewEvent(DBGEV_OK);
-	
-	svr_shutdown++;
-	return DBGRES_OK;
+	return db->db_funcs->quit();
 }
