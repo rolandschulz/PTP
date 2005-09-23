@@ -141,8 +141,7 @@ svr_setlinebreakpoint(dbg_backend *db, char **args)
 static int 
 svr_setfuncbreakpoint(dbg_backend *db, char **args)
 {
-	DbgSetError(DBGERR_NOTIMP, "Command not implemented");
-	return DBGRES_ERR;
+	return db->db_funcs->setfuncbreakpoint(args[1], args[2]);
 }
 
 static int 
@@ -180,8 +179,7 @@ svr_setcurrentstackframe(dbg_backend *db, char **args)
 static int 
 svr_evaluateexpression(dbg_backend *db, char **args)
 {
-	DbgSetError(DBGERR_NOTIMP, "Command not implemented");
-	return DBGRES_ERR;
+	return db->db_funcs->evaluateexpression(args[1]);
 }
 
 static int 
