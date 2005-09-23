@@ -23,7 +23,8 @@
 #include "stackframe.h"
 
 stackframe *	
-NewStackframe(int level) {
+NewStackframe(int level)
+{
 	stackframe *	sf = (stackframe *)malloc(sizeof(stackframe));
 	
 	sf->level = level;
@@ -35,14 +36,20 @@ NewStackframe(int level) {
 	return sf;
 }
 
+void
+FreeLocation(location *loc) 
+{
+	if (loc->file != NULL)
+		free(loc->file);
+	if (loc->func != NULL)
+		free(loc->func);
+	if (loc->addr != NULL)
+		free(loc->addr);
+}
+
 void	
-FreeStackframe(stackframe *sf) {
-	if (sf->loc.file != NULL)
-		free(sf->loc.file);
-	if (sf->loc.func != NULL)
-		free(sf->loc.func);
-	if (sf->loc.addr != NULL)
-		free(sf->loc.addr);
-		
+FreeStackframe(stackframe *sf)
+{
+	FreeLocation(&sf->loc);	
 	free(sf);
 }
