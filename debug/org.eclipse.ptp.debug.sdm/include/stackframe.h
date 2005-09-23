@@ -29,5 +29,6 @@ struct stackframe {
 typedef struct stackframe stackframe;
 
 extern stackframe *	NewStackframe(int);
+extern void			FreeLocation(location *);
 extern void			FreeStackframe(stackframe *);
 #endif /*STACKFRAME_H_*/
