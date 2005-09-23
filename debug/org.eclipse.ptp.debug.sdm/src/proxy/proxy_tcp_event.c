@@ -148,7 +148,7 @@ proxy_tcp_list_to_str(List *lst, int (*el_to_str)(void *, char **), char **resul
 	/*
 	 * Convert strings.
 	 */
-	for (i = 0, SetList(lst); (el = GetListElement(lst)) != NULL; i++) {
+	for (len = 0, i = 0, SetList(lst); (el = GetListElement(lst)) != NULL; i++) {
 		el_to_str(el, &strs[i]);
 		len += strlen(strs[i]) + 1;
 	}
@@ -219,7 +219,7 @@ proxy_tcp_event_to_str(dbg_event *e, char **result)
 
 	case DBGEV_ERROR:
 		proxy_tcp_cstring_to_str(e->error_msg, &str);
- 		asprintf(result, "%d %d %s", e->event, e->error_code, str);
+ 		asprintf(result, "%d %s %d %s", e->event, pstr, e->error_code, str);
 		break;
 	
 	case DBGEV_BPHIT:
@@ -280,89 +280,31 @@ proxy_tcp_event_to_str(dbg_event *e, char **result)
 }
 
 static int
-proxy_tcp_str_to_location(char **args, location *loc)
-{
-	loc->file = strdup(args[0]);
-	loc->func = strdup(args[1]);
-	loc->addr = strdup(args[2]);
-	loc->line = atoi(args[3]);
-	
-	return 0;
-}
-
-static int
-proxy_tcp_str_to_breakpoint(char **args, breakpoint **bp)
-{
-	struct breakpoint *	b = NewBreakpoint(atoi(args[0]));
-	
-	b->ignore = atoi(args[1]);
-	b->special = atoi(args[2]);
-	b->deleted = atoi(args[3]);
-	b->type = strdup(args[4]);
-	proxy_tcp_str_to_location(&args[5], &b->loc);
-	b->hits = atoi(args[9]);
-	
-	*bp = b;
-	
-	return 0;
-}
-
-static int
-proxy_tcp_str_to_stackframes(char **args, List **lst)
-{
-	int			i;
-	int			pos;
-	int			count = atoi(args[0]);
-	stackframe *	sf;
-	
-	*lst = NewList();
-	
-	for (i = 0, pos = 1; i < count; i++, pos += 4) {
-		sf = NewStackframe(atoi(args[pos]));
-		proxy_tcp_str_to_location(&args[pos+1], &sf->loc);
-		AddToList(*lst, (void *)sf);
-	}
-	
-	return 0;
-}
-
-static int
-proxy_tcp_str_to_vars(char **args, List **lst)
-{
-	int	i;
-	int	count = atoi(args[0]);
-	
-	*lst = NewList();
-	
-	for (i = 0; i < count; i++) {
-		AddToList(*lst, (void *)strdup(args[i+1]));
-	}
-	
-	return 0;
-}
-
-static int
 proxy_tcp_str_to_data(char *str, char **data, int *len)
 {
 	int		data_len;
 	char		ch;
 	char *	p;
 	
+	if (str == NULL)
+		return -1;
+		
 	for (data_len = 0; *str != ':' && *str != '\0' && isxdigit(*str); str++) {
 		data_len <<= 4;
 		data_len += digittoint(*str);
 	}
 	
-	if (*str != ':')
+	if (*str++ != ':')
 		return -1;
-	
+
 	*len = data_len;
 	*data = p = (char *)malloc(sizeof(char) * data_len);
 	
-	for (; data_len >= 0; data_len--) {
+	for (; data_len > 0; data_len--) {
 		ch = digittoint(*str++);
 		ch <<= 4;
 		ch |= digittoint(*str++);
+
 		*p++ = ch;
 	}
 		
@@ -377,6 +319,106 @@ proxy_tcp_str_to_cstring(char *str, char **cstring)
 	return proxy_tcp_str_to_data(str, cstring, &len);
 }
 
+
+static int
+proxy_tcp_str_to_int(char *str, int *val)
+{
+	if (str == NULL)
+		return -1;
+	
+	*val = atoi(str);
+	
+	return 0;
+}
+
+static int
+proxy_tcp_str_to_location(char **args, location *loc)
+{
+	if (proxy_tcp_str_to_cstring(args[0], &loc->file) < 0 ||
+		proxy_tcp_str_to_cstring(args[1], &loc->func) < 0 ||
+		proxy_tcp_str_to_cstring(args[2], &loc->addr) < 0 ||
+		proxy_tcp_str_to_int(args[3], &loc->line) < 0) {
+		FreeLocation(loc);
+		return -1;
+	}
+	
+	return 0;
+}
+
+static int
+proxy_tcp_str_to_breakpoint(char **args, breakpoint **bp)
+{
+	int			id;
+	breakpoint *	b;
+	
+	if (proxy_tcp_str_to_int(args[0], &id) < 0)
+		return -1;
+		
+	b = NewBreakpoint(id);
+	
+	if (proxy_tcp_str_to_int(args[1], &b->ignore) < 0 ||
+		proxy_tcp_str_to_int(args[2], &b->special) < 0 ||
+		proxy_tcp_str_to_int(args[3], &b->deleted) < 0 ||
+		proxy_tcp_str_to_cstring(args[4], &b->type) < 0 ||
+		proxy_tcp_str_to_location(&args[5], &b->loc) < 0 ||
+		proxy_tcp_str_to_int(args[9], &b->hits) < 0) {
+		FreeBreakpoint(b);
+		return -1;
+	}
+	
+	*bp = b;
+	
+	return 0;
+}
+
+static int
+proxy_tcp_str_to_stackframes(char **args, List **lst)
+{
+	int			i;
+	int			pos;
+	int			level;
+	int			count = atoi(args[0]);
+	stackframe *	sf;
+
+	*lst = NewList();
+	
+	for (i = 0, pos = 1; i < count; i++, pos += 4) {
+		if (proxy_tcp_str_to_int(args[pos], &level) < 0) {
+			DestroyList(*lst, FreeStackframe);
+			return -1;
+		}
+		sf = NewStackframe(level);
+		if (proxy_tcp_str_to_location(&args[pos+1], &sf->loc) < 0) {
+			FreeStackframe(sf);
+			DestroyList(*lst, FreeStackframe);
+			return -1;			
+		}
+		AddToList(*lst, (void *)sf);
+	}
+	
+	return 0;
+}
+
+static int
+proxy_tcp_str_to_vars(char **args, List **lst)
+{
+	int		i;
+	int		count = atoi(args[0]);
+	char *	str;
+	
+	*lst = NewList();
+	
+	for (i = 0; i < count; i++) {
+		if (proxy_tcp_str_to_cstring(args[i+1], &str) < 0) {
+			DestroyList(*lst, free);
+			return -1;
+		}
+		AddToList(*lst, (void *)str);
+	}
+	
+	return 0;
+}
+
 static int
 proxy_tcp_str_to_aif(char **args, AIF **res)
 {
@@ -386,8 +428,9 @@ proxy_tcp_str_to_aif(char **args, AIF **res)
 	char *	fmt;
 	char *	data;
 	
-	proxy_tcp_str_to_data(args[0], &fmt, &fmt_len);
-	proxy_tcp_str_to_data(args[1], &data, &data_len);
+	if (proxy_tcp_str_to_data(args[0], &fmt, &fmt_len) < 0 ||
+		proxy_tcp_str_to_data(args[1], &data, &data_len))
+		return -1;
 	
 	a = NewAIF(0, 0);
 	AIF_FORMAT(a) = fmt;
@@ -403,16 +446,19 @@ int
 proxy_tcp_str_to_event(char *str, dbg_event **ev)
 {
 	int			event;
-	dbg_event *	e;
+	dbg_event *	e = NULL;
 	char **		args;
+	procset *	procs = NULL;
 		
-	if (str == NULL)
+	if (str == NULL || (args = Str2Args(str)) == NULL)
 		return -1;
 
-	if ((args = Str2Args(str)) == NULL)
+	if (proxy_tcp_str_to_int(args[0], &event) < 0 || args[1] == NULL) {
+		FreeArgs(args);
 		return -1;
-
-	event = atoi(args[0]);
+	}
+		
+	procs = str_to_procset(args[1]);
 
 	switch (event)
 	{
@@ -422,61 +468,86 @@ proxy_tcp_str_to_event(char *str, dbg_event **ev)
 	
 	case DBGEV_ERROR:
 		e = NewEvent(DBGEV_ERROR);
-		e->error_code = atoi(args[1]);
-		proxy_tcp_str_to_cstring(args[2], &e->error_msg);
+		if (proxy_tcp_str_to_int(args[2], &e->error_code) < 0 ||
+			proxy_tcp_str_to_cstring(args[3], &e->error_msg) < 0)
+			goto error_out;
 		break;
 		
 	case DBGEV_BPHIT:
-	case DBGEV_BPSET:
 		e = NewEvent(DBGEV_BPHIT);
-		proxy_tcp_str_to_breakpoint(&args[1], &e->bp);
+		if (proxy_tcp_str_to_breakpoint(&args[2], &e->bp) < 0)
+			goto error_out;
+		break;
+	
+	case DBGEV_BPSET:
+		e = NewEvent(DBGEV_BPSET);
+		if (proxy_tcp_str_to_breakpoint(&args[2], &e->bp) < 0)
+			goto error_out;
 		break;
 	
 	case DBGEV_SIGNAL:
 		e = NewEvent(DBGEV_SIGNAL);
-		proxy_tcp_str_to_cstring(args[1], &e->sig_name);
-		proxy_tcp_str_to_cstring(args[2], &e->sig_meaning);
-		e->thread_id = atoi(args[3]);
+		if (proxy_tcp_str_to_cstring(args[2], &e->sig_name) < 0 ||
+			proxy_tcp_str_to_cstring(args[3], &e->sig_meaning) < 0 ||
+			proxy_tcp_str_to_int(args[4], &e->thread_id) < 0)
+			goto error_out;
 		break;
 	
 	case DBGEV_EXIT:
 		e = NewEvent(DBGEV_EXIT);
-		e->exit_status = atoi(args[1]);
+		if (proxy_tcp_str_to_int(args[2], &e->exit_status) < 0)
+			goto error_out;
 		break;
 	
 	case DBGEV_STEP:
 		e = NewEvent(DBGEV_STEP);
-		e->thread_id = atoi(args[1]);
+		if (proxy_tcp_str_to_int(args[2], &e->thread_id) < 0)
+			goto error_out;
 		break;
 	
 	case DBGEV_FRAMES:
 		e = NewEvent(DBGEV_FRAMES);
-		proxy_tcp_str_to_stackframes(&args[1], &e->list);
+		if (proxy_tcp_str_to_stackframes(&args[2], &e->list) < 0)
+			goto error_out;
 		break;
 
 	case DBGEV_VARS:
 		e = NewEvent(DBGEV_VARS);
-		proxy_tcp_str_to_vars(&args[1], &e->list);
+		if (proxy_tcp_str_to_vars(&args[2], &e->list) < 0)
+			goto error_out;
 		break;
 
 	case DBGEV_TYPE:
 		e = NewEvent(DBGEV_TYPE);
-		proxy_tcp_str_to_cstring(args[1], &e->type_desc);
+		if (proxy_tcp_str_to_cstring(args[2], &e->type_desc) < 0)
+			goto error_out;
 		break;
 
 	case DBGEV_DATA:
 		e = NewEvent(DBGEV_DATA);
-		proxy_tcp_str_to_aif(&args[1], &e->data);
+		if (proxy_tcp_str_to_aif(&args[2], &e->data) < 0)
+			goto error_out;
 		break;
 
 	default:
-		FreeArgs(args);
-		return -1;
+		goto error_out;
 	}
 	
+	e->procs = procs;
 	*ev = e;
 	
 	FreeArgs(args);
 	
 	return 0;
+	
+error_out:
+	FreeArgs(args);
+	
+	if (procs != NULL)
+		procset_free(procs);
+	
+	if (e != NULL)
+		FreeEvent(e);
+		
+	return -1;
 }
