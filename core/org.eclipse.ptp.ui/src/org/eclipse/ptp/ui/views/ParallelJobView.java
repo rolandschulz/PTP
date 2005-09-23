@@ -263,8 +263,17 @@ public class ParallelJobView extends AbstractParallelSetView {
 
 		return null;
 	}
-	public void changeJob(String job_id) {
-		changeJob(((JobManager) manager).findJobById(job_id));
+	public void changeJob(final String job_id) {
+		getDisplay().syncExec(new Runnable() {
+			public void run() {
+				IPJob job = ((JobManager) manager).findJobById(job_id);
+				jobTableViewer.setAllChecked(false);
+				if (job != null)
+					jobTableViewer.setChecked(job, true);
+
+				changeJob(job);
+			}
+		});
 	}
 	protected void changeJob(final IPJob job) {
 		selectJob((job==null?IManager.EMPTY_ID:job.getIDString()));
@@ -284,7 +293,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 			}
 			else {
 				IPJob job = (IPJob)checkedElements[0];
-				terminateAllAction.setEnabled(!job.isAllStop());
+				terminateAllAction.setEnabled(!(job.isDebug() || job.isAllStop()));
 			}
 		}
 	}	
@@ -305,12 +314,10 @@ public class ParallelJobView extends AbstractParallelSetView {
 		System.out.println("------------ job run");
 		initialView();
 		refresh();
-		terminateAllAction.setEnabled(true);
 	}
 	public void start() {
 		System.out.println("------------ job start");
 		refresh();
-		terminateAllAction.setEnabled(false);
 	}
 	public void stopped() {
 		System.out.println("------------ job stop");

@@ -279,7 +279,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 						String[] registerElementsID = elementHandler.getRegisteredElementsID();
 						for (int i = 0; i < registerElementsID.length; i++) {
 							if (curSet.contains(registerElementsID[i])) {
-								if (!preSet.contains(registerElementsID[i])) {
+								if (preSet != null && !preSet.contains(registerElementsID[i])) {
 									int taskID = convertToInt(elementHandler.getSetRoot().get(registerElementsID[i]).getName());
 									registerProcess(session, taskID, false);
 									BitList tasks = new BitList();
