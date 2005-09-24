@@ -39,12 +39,13 @@ typedef struct svr_cmd	svr_cmd;
 static int svr_start_session(dbg_backend *, char **);
 static int svr_setlinebreakpoint(dbg_backend *, char **);
 static int svr_setfuncbreakpoint(dbg_backend *, char **);
-static int svr_deletebreakpoints(dbg_backend *, char **);
+static int svr_deletebreakpoint(dbg_backend *, char **);
 static int svr_go(dbg_backend *, char **);
 static int svr_step(dbg_backend *, char **);
 static int svr_liststackframes(dbg_backend *, char **);
 static int svr_setcurrentstackframe(dbg_backend *, char **);
 static int svr_evaluateexpression(dbg_backend *, char **);
+static int svr_gettype(dbg_backend *, char **);
 static int svr_listlocalvariables(dbg_backend *, char **);
 static int svr_listarguments(dbg_backend *, char **);
 static int svr_listglobalvariables(dbg_backend *, char **);
@@ -55,12 +56,13 @@ static svr_cmd svr_cmd_tab[] =
 	{"INI",	svr_start_session},
 	{"SLB",	svr_setlinebreakpoint},
 	{"SFB",	svr_setfuncbreakpoint},
-	{"DBS",	svr_deletebreakpoints},
+	{"DBP",	svr_deletebreakpoint},
 	{"GOP",	svr_go},
 	{"STP",	svr_step},
 	{"LSF",	svr_liststackframes},
 	{"SCS",	svr_setcurrentstackframe},
 	{"EEX",	svr_evaluateexpression},
+	{"TYP",	svr_gettype},
 	{"LLV",	svr_listlocalvariables},
 	{"LAR",	svr_listarguments},
 	{"LGV",	svr_listglobalvariables},
@@ -69,7 +71,6 @@ static svr_cmd svr_cmd_tab[] =
 
 static int			svr_shutdown = 0;
 static int			svr_res;
-static dbg_event *	svr_event;
 static void			(*svr_event_callback)(dbg_event *, void *);
 static void *		svr_data;
 
@@ -145,7 +146,7 @@ svr_setfuncbreakpoint(dbg_backend *db, char **args)
 }
 
 static int 
-svr_deletebreakpoints(dbg_backend *db, char **args)
+svr_deletebreakpoint(dbg_backend *db, char **args)
 {
 	DbgSetError(DBGERR_NOTIMP, "Command not implemented");
 	return DBGRES_ERR;
@@ -180,6 +181,12 @@ static int
 svr_evaluateexpression(dbg_backend *db, char **args)
 {
 	return db->db_funcs->evaluateexpression(args[1]);
+}
+
+static int 
+svr_gettype(dbg_backend *db, char **args)
+{
+	return db->db_funcs->gettype(args[1]);
 }
 
 static int 
