@@ -77,33 +77,53 @@ Str2Args(char *s)
 			if ( isspace((int)*s) && !squote && !dquote && !bsquote )
 				break;
 
-			if ( bsquote )
-			{
-				bsquote = 0;
-			}
-			else if ( *s == '\\' )
-			{
-				bsquote = 1;
-			}
-			else if ( squote )
-			{
-				if ( *s == '\'' )
+			switch (*s) {
+			case '\\':
+				if (bsquote) {
+					*arg++ = *s;
+					bsquote = 0;
+				} else
+					bsquote = 1;
+				break;
+			
+			
+			case '\'':
+				if (squote)
 					squote = 0;
-			}
-			else if ( dquote )
-			{
-				if ( *s == '"' )
-					dquote = 0;
-			}
-			else
-			{
-				if ( *s == '\'' )
+				else
 					squote = 1;
-				else if ( *s == '"' )
+				break;
+			
+			case '"':
+				if (dquote)
+					dquote = 0;
+				else
 					dquote = 1;
-			}
+				break;
 
-			*arg++ = *s;
+			default:
+				if (bsquote)
+				{
+					bsquote = 0;
+					
+					switch (*s) {
+					case 'n':
+						*arg++ = '\n';
+						break;
+					case 't':
+						*arg++ = '\t';
+						break;
+					default:
+						*arg++ = *s;
+						break;
+					}
+					
+					break;
+				}
+				
+				*arg++ = *s;
+				break;
+			}
 
 			s++;
 		}
