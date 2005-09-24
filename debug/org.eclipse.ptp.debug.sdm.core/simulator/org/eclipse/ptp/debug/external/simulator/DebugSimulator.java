@@ -32,7 +32,6 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
@@ -296,7 +295,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		state = SUSPENDED;
 		IPCDIDebugProcess[] list = procs.getProcesses();
 		for (int i = 0; i < list.length; i++) {
-			((DebugProcess) list[i]).getPProcess().setStatus(IPProcess.STOPPED);
+			((SimProcess) ((DebugProcess) list[i]).getPProcess()).getThread(0).suspend();
 		}
 	}
 
@@ -365,6 +364,12 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		} else if (event.equals("TERMINATED")) {
 			fireEvent(new InferiorExitedEvent(getSession(), new DebugProcessSet(session, procId)));
 			debuggerOutput.addItem("InferiorExited Event for " + procId);
+		} else if (event.equals("SUSPENDED")) {
+			String file = (String) list.get(2);
+			int line = ((Integer) list.get(3)).intValue();
+			LineLocation loc = new LineLocation(file, line);
+			fireEvent(new EndSteppingRangeEvent(getSession(), new DebugProcessSet(session, procId), loc));
+			debuggerOutput.addItem("EndSteppingRange Event for " + procId);
 		}
 			
 		// Do Something

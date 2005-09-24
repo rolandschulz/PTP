@@ -426,7 +426,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	
 	public void suspend(String setName) {
 		// Auto-generated method stub
-		System.out.println("Session.resume()");
+		System.out.println("Session.suspend()");
 		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
 		try {
 			debugger.halt(set);
@@ -437,7 +437,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 
 	public void terminate(String setName) {
 		// Auto-generated method stub
-		System.out.println("Session.resume()");
+		System.out.println("Session.terminate()");
 		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
 		try {
 			debugger.kill(set);
