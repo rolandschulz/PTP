@@ -26,6 +26,7 @@
 #include "compat.h"
 #include "dbg.h"
 #include "dbg_client.h"
+#include "client_srv.h"
 #include "procset.h"
 #include "list.h"
 
@@ -57,7 +58,8 @@ struct dbg_event_handler {
 typedef struct dbg_event_handler	dbg_event_handler;
 
 static List *		dbg_event_handlers = NULL;
-static struct timeval	TIMEOUT = { 25, 0 };
+static procset *		dbg_procs = NULL;
+static struct timeval	TIMEOUT = { 0, 1000 };
 
 /**
  * Create an event handler structure and add it to the list of handlers
@@ -94,21 +96,47 @@ destroy_dbg_event_handler(dbg_event_handler *h)
  * call all registered event handlers.
  */
 static void
-dbg_clnt_cmd_completed(procset *p)
+dbg_clnt_cmd_completed(dbg_event *e, void *data)
 {
-	/*
-	dbg_event *e = resp_to_event(res);
-	
+	dbg_event_handler *	h;
+
 	SetList(dbg_event_handlers);
 	
 	while ((h = (dbg_event_handler *)GetListElement(dbg_event_handlers)) != NULL) {
 		if (h->htype == HANDLER_EVENT) {
-			h->event_handler(e);
+			h->event_handler(e, data);
 		}
 	}
+}
+
+void
+DbgClntInit(int num_svrs)
+{
+	/*
+	 * Initialize client/server interface
+	 */
+	ClntInit(num_svrs);
 	
-	free_event(e);
-	*/
+	/*
+	 * Create a procset containing all processes
+	 */
+	dbg_procs = procset_new(num_svrs);
+	procset_invert(dbg_procs);
+}
+
+int 
+DbgClntStartSession(char *prog, char *args)
+{
+	int		res;
+	char *	cmd;
+	
+	if (args == NULL)
+		args = "";
+		
+	asprintf(&cmd, "INI \"%s\" \"%s\"", prog, args);
+	res = ClntSendCommand(dbg_procs, cmd, NULL);
+	free(cmd);
+	return res;
 }
 
 /*
@@ -117,22 +145,37 @@ dbg_clnt_cmd_completed(procset *p)
 int 
 DbgClntSetLineBreakpoint(procset *set, char *file, int line)
 {
+	int		res;
 	char *	cmd;
 	
 	asprintf(&cmd, "SLB \"%s\" %d", file, line);
-	return send_command(set, cmd, dbg_clnt_cmd_completed);
+	res = ClntSendCommand(set, cmd, NULL);
+	free(cmd);
+	return res;
 }
 
 int 
 DbgClntSetFuncBreakpoint(procset *set, char *file, char *func)
 {
-	return DBGRES_OK;
+	int		res;
+	char *	cmd;
+	
+	asprintf(&cmd, "SFB \"%s\" \"%s\"", file, func);
+	res = ClntSendCommand(set, cmd, NULL);
+	free(cmd);
+	return res;
 }
 
 int 
-DbgClntDeleteBreakpoints(procset *set)
+DbgClntDeleteBreakpoint(procset *set, int bpid)
 {
-	return DBGRES_OK;
+	int		res;
+	char *	cmd;
+	
+	asprintf(&cmd, "DBP %d", bpid);
+	res = ClntSendCommand(set, cmd, NULL);
+	free(cmd);
+	return res;
 }
 
 /*
@@ -141,61 +184,97 @@ DbgClntDeleteBreakpoints(procset *set)
 int 
 DbgClntGo(procset *set)
 {
-	return DBGRES_OK;
+	return ClntSendCommand(set, "GOP", NULL);
 }
 
 int 
 DbgClntStep(procset *set, int count, int type)
 {
-	return DBGRES_OK;
+	int		res;
+	char *	cmd;
+	
+	asprintf(&cmd, "STP %d %d", count, type);
+	res = ClntSendCommand(set, cmd, NULL);
+	free(cmd);
+	return res;
 }
 
 /*
  * Stack frame operations
  */
 int 
-DbgClntListStackframes(int proc)
+DbgClntListStackframes(procset *set, int current)
 {
-	return DBGRES_OK;
+	int		res;
+	char *	cmd;
+	
+	asprintf(&cmd, "LSF %d", current);
+	res = ClntSendCommand(set, cmd, NULL);
+	free(cmd);
+	return res;
 }
 
 int 
-DbgClntSetCurrentStackframe(int proc, int count, int dir)
+DbgClntSetCurrentStackframe(procset *set, int level)
 {
-	return DBGRES_OK;
+	int		res;
+	char *	cmd;
+	
+	asprintf(&cmd, "SCS %d", level);
+	res = ClntSendCommand(set, cmd, NULL);
+	free(cmd);
+	return res;
 }
 
 /*
  * Expression/variable operations
  */
 int 
-DbgClntEvaluateExpression(int proc)
+DbgClntEvaluateExpression(procset *set, char *expr)
 {
-	return DBGRES_OK;
+	int		res;
+	char *	cmd;
+	
+	asprintf(&cmd, "EEX \"%s\"", expr);
+	res = ClntSendCommand(set, cmd, NULL);
+	free(cmd);
+	return res;
 }
 
 int 
-DbgClntListLocalVariables(int proc)
+DbgClntGetType(procset *set, char *expr)
 {
-	return DBGRES_OK;
+	int		res;
+	char *	cmd;
+	
+	asprintf(&cmd, "TYP \"%s\"", expr);
+	res = ClntSendCommand(set, cmd, NULL);
+	free(cmd);
+	return res;
 }
 
 int 
-DbgClntListArguments(int proc)
+DbgClntListLocalVariables(procset *set)
 {
-	return DBGRES_OK;
+	return ClntSendCommand(set, "LLV", NULL);
 }
 
 int 
-DbgClntListGlobalVariables(int proc)
+DbgClntListArguments(procset *set)
 {
-	return DBGRES_OK;
+	return ClntSendCommand(set, "LAR", NULL);
+}
+
+int 
+DbgClntListGlobalVariables(procset *set)
+{
+	return ClntSendCommand(set, "LGV", NULL);
 }
 
 int 
 DbgClntQuit(void)
 {
-	return DBGRES_OK;
+	return ClntSendCommand(dbg_procs, "QUI", NULL);
 }
 
 /*
@@ -255,8 +334,10 @@ DbgClntProgress(void)
 			return -1;
 		
 		case 0:
-			return 0;
-		
+			/*
+			 * Timeout. Drop through...
+			 */
+			 		
 		default:
 			break;
 		}
@@ -270,15 +351,16 @@ DbgClntProgress(void)
 		if (h->htype == HANDLER_FILE
 			&& ((h->file_type & READ_FILE_HANDLER && FD_ISSET(h->fd, &rfds))
 				|| (h->file_type & WRITE_FILE_HANDLER && FD_ISSET(h->fd, &wfds))
-				|| (h->file_type & EXCEPT_FILE_HANDLER && FD_ISSET(h->fd, &efds))))
-			h->file_handler(h->fd, h->data);
+				|| (h->file_type & EXCEPT_FILE_HANDLER && FD_ISSET(h->fd, &efds)))
+			&& h->file_handler(h->fd, h->data) < 0)
+			return -1;
 	}
 	
 	/*************************************
 	 * Second: Check for any server events
 	 */
 	 
-	progress_commands();
+	ClntProgressCmds();
 	
 	return 0;
 }
@@ -287,7 +369,13 @@ void
 DbgClntRegisterEventHandler(void (*event_callback)(dbg_event *, void *), void *data)
 {
 	dbg_event_handler *	h;
+	static int			registered = 0;
 	
+	if (registered == 0) {
+		ClntRegisterCallback(dbg_clnt_cmd_completed);
+		registered++;
+	}
+
 	h = new_dbg_event_handler(HANDLER_EVENT, NULL);
 	h->event_handler = event_callback;
 	h->data = data;
