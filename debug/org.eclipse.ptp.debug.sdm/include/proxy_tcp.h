@@ -27,17 +27,18 @@
 #define MAX_MSG_LEN_SIZE	8
 
 struct proxy_tcp_conn {
-	char *	host;
-	int		port;
-	SOCKET	sock;
-	SOCKET	svr_sock;
-	char *	buf;
-	char		msg_len_buf[11];
-	int		buf_size;
-	int		buf_pos;
-	int		total_read;
-	char *	msg;
-	int		msg_len;
+	char *					host;
+	int						port;
+	SOCKET					sock;
+	SOCKET					svr_sock;
+	char *					buf;
+	char						msg_len_buf[11];
+	int						buf_size;
+	int						buf_pos;
+	int						total_read;
+	char *					msg;
+	int						msg_len;
+	proxy_svr_helper_funcs *	helper;
 };
 typedef struct proxy_tcp_conn	proxy_tcp_conn;
 

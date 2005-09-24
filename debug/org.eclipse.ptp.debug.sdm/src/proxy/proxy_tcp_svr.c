@@ -41,9 +41,9 @@
 #include "proxy_tcp.h"
 #include "procset.h"
 
-static int	proxy_tcp_svr_create(void **, void (*)(void));
-static int	proxy_tcp_svr_progress(void *);
-static void	proxy_tcp_svr_finish(void *);
+static int	proxy_tcp_svr_create(proxy_svr_helper_funcs *, void **);
+static int	proxy_tcp_svr_progress(proxy_svr_helper_funcs *, void *);
+static void	proxy_tcp_svr_finish(proxy_svr_helper_funcs *, void *);
 
 static int	proxy_tcp_svr_dispatch(int, void *);
 static int	proxy_tcp_svr_accept(int, void *);
@@ -52,29 +52,29 @@ proxy_svr_funcs proxy_tcp_svr_funcs =
 {
 	proxy_tcp_svr_create,
 	proxy_tcp_svr_progress,
-	proxy_tcp_svr_dispatch,
 	proxy_tcp_svr_finish,
 };
 
 struct proxy_tcp_svr_func {
 	char *cmd;
-	int (*func)(char **, char **);
+	int (*func)(proxy_svr_helper_funcs *, char **, char **);
 };
 
 typedef struct proxy_tcp_svr_func	proxy_tcp_svr_func;
 
-static int proxy_tcp_svr_setlinebreakpoint(char **, char **);
-static int proxy_tcp_svr_setfuncbreakpoint(char **, char **);
-static int proxy_tcp_svr_deletebreakpoints(char **, char **);
-static int proxy_tcp_svr_go(char **, char **);
-static int proxy_tcp_svr_step(char **, char **);
-static int proxy_tcp_svr_liststackframes(char **, char **);
-static int proxy_tcp_svr_setcurrentstackframe(char **, char **);
-static int proxy_tcp_svr_evaluateexpression(char **, char **);
-static int proxy_tcp_svr_listlocalvariables(char **, char **);
-static int proxy_tcp_svr_listarguments(char **, char **);
-static int proxy_tcp_svr_listglobalvariables(char **, char **);
-static int proxy_tcp_svr_quit(char **, char **);
+static int proxy_tcp_svr_setlinebreakpoint(proxy_svr_helper_funcs *, char **, char **);
+static int proxy_tcp_svr_setfuncbreakpoint(proxy_svr_helper_funcs *, char **, char **);
+static int proxy_tcp_svr_deletebreakpoints(proxy_svr_helper_funcs *, char **, char **);
+static int proxy_tcp_svr_go(proxy_svr_helper_funcs *, char **, char **);
+static int proxy_tcp_svr_step(proxy_svr_helper_funcs *, char **, char **);
+static int proxy_tcp_svr_liststackframes(proxy_svr_helper_funcs *, char **, char **);
+static int proxy_tcp_svr_setcurrentstackframe(proxy_svr_helper_funcs *, char **, char **);
+static int proxy_tcp_svr_evaluateexpression(proxy_svr_helper_funcs *, char **, char **);
+static int proxy_tcp_svr_gettype(proxy_svr_helper_funcs *, char **, char **);
+static int proxy_tcp_svr_listlocalvariables(proxy_svr_helper_funcs *, char **, char **);
+static int proxy_tcp_svr_listarguments(proxy_svr_helper_funcs *, char **, char **);
+static int proxy_tcp_svr_listglobalvariables(proxy_svr_helper_funcs *, char **, char **);
+static int proxy_tcp_svr_quit(proxy_svr_helper_funcs *, char **, char **);
 
 static proxy_tcp_svr_func proxy_tcp_svr_func_tab[] =
 {
@@ -86,6 +86,7 @@ static proxy_tcp_svr_func proxy_tcp_svr_func_tab[] =
 	{"LSF",	proxy_tcp_svr_liststackframes},
 	{"SCS",	proxy_tcp_svr_setcurrentstackframe},
 	{"EEX",	proxy_tcp_svr_evaluateexpression},
+	{"TYP",	proxy_tcp_svr_gettype},
 	{"LLV",	proxy_tcp_svr_listlocalvariables},
 	{"LAR",	proxy_tcp_svr_listarguments},
 	{"LGV",	proxy_tcp_svr_listglobalvariables},
@@ -94,7 +95,6 @@ static proxy_tcp_svr_func proxy_tcp_svr_func_tab[] =
 };
 
 static int proxy_tcp_svr_shutdown;
-static void (*proxy_tcp_svr_shutdown_callback)(void);
 
 /*
  * Called when an event is received in response to a client debug command.
@@ -117,7 +117,7 @@ proxy_tcp_svr_event_callback(dbg_event *ev, void *data)
  * @return conn structure containing server socket and port
  */
 static int 
-proxy_tcp_svr_create(void **data, void (*shutdown)(void))
+proxy_tcp_svr_create(proxy_svr_helper_funcs *helper, void **data)
 {
 	socklen_t			slen;
 	SOCKET				sd;
@@ -162,13 +162,11 @@ proxy_tcp_svr_create(void **data, void (*shutdown)(void))
 	
 	conn->svr_sock = sd;
 	conn->port = (int) ntohs(sname.sin_port);
+	conn->helper = helper;
 	*data = (void *)conn;
 	
-	DbgClntRegisterFileHandler(sd, READ_FILE_HANDLER, proxy_tcp_svr_accept, (void *)conn);
-	DbgClntRegisterEventHandler(proxy_tcp_svr_event_callback, (void *)conn);
-	
-	proxy_tcp_svr_shutdown = 0;
-	proxy_tcp_svr_shutdown_callback = shutdown;
+	helper->regreadfile(sd, proxy_tcp_svr_accept, (void *)conn);
+	helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
 	
 	return 0;
 }
@@ -201,7 +199,7 @@ proxy_tcp_svr_accept(int fd, void *data)
 	
 	conn->sock = ns;
 	
-	DbgClntRegisterFileHandler(ns, READ_FILE_HANDLER, proxy_tcp_svr_dispatch, (void *)conn);
+	conn->helper->regreadfile(ns, proxy_tcp_svr_dispatch, (void *)conn);
 	
 	return 0;
 	
@@ -211,7 +209,7 @@ proxy_tcp_svr_accept(int fd, void *data)
  * Cleanup prior to server exit.
  */
 static void 
-proxy_tcp_svr_finish(void *data)
+proxy_tcp_svr_finish(proxy_svr_helper_funcs *helper, void *data)
 {
 	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
 	proxy_tcp_destroy_conn(conn);
@@ -221,26 +219,25 @@ proxy_tcp_svr_finish(void *data)
  * Check for incoming messages or connection attempts.
  */
 static int
-proxy_tcp_svr_progress(void *data)
+proxy_tcp_svr_progress(proxy_svr_helper_funcs *helper, void *data)
 {
 	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
 
 	if (proxy_tcp_svr_shutdown) {
 		if (conn->sock != INVALID_SOCKET) {
-			DbgClntUnregisterFileHandler(conn->sock);
+			helper->unregreadfile(conn->sock);
 			CLOSE_SOCKET(conn->sock);
 			conn->sock = INVALID_SOCKET;
 		}
 		if (conn->svr_sock != INVALID_SOCKET) {
-			DbgClntUnregisterFileHandler(conn->svr_sock);
+			helper->unregreadfile(conn->svr_sock);
 			CLOSE_SOCKET(conn->svr_sock);
 			conn->svr_sock = INVALID_SOCKET;
 		}
-		proxy_tcp_svr_shutdown_callback();
-		return 0;
+		helper->shutdown();
 	}
 	
-	return DbgClntProgress();
+	return helper->progress();
 }
 
 /*
@@ -273,7 +270,7 @@ proxy_tcp_svr_dispatch(int fd, void *data)
 	for (i = 0; i < sizeof(proxy_tcp_svr_func_tab) / sizeof(proxy_tcp_svr_func); i++) {
 		sf = &proxy_tcp_svr_func_tab[i];
 		if (sf->cmd != NULL && strcmp(args[0], sf->cmd) == 0) {
-			res = sf->func(args, NULL);
+			res = sf->func(conn->helper, args, NULL);
 			break;
 		}
 	}
@@ -286,8 +283,6 @@ proxy_tcp_svr_dispatch(int fd, void *data)
 	else
 		asprintf(&response, "%d", res);
 			
-
-	
 	free(response);
 	
 	return 0;
@@ -297,7 +292,7 @@ proxy_tcp_svr_dispatch(int fd, void *data)
  * SERVER FUNCTIONS
  */
 static int 
-proxy_tcp_svr_setlinebreakpoint(char **args, char **response)
+proxy_tcp_svr_setlinebreakpoint(proxy_svr_helper_funcs *helper, char **args, char **response)
 {
 	int			res;
 	char *		file;
@@ -313,7 +308,7 @@ proxy_tcp_svr_setlinebreakpoint(char **args, char **response)
 		return DBGRES_ERR;
 	}
 	
-	res = DbgClntSetLineBreakpoint(procs, file, line);
+	res = helper->setlinebreakpoint(procs, file, line);
 	
 	procset_free(procs);
 	
@@ -321,71 +316,77 @@ proxy_tcp_svr_setlinebreakpoint(char **args, char **response)
 }
 
 static int 
-proxy_tcp_svr_setfuncbreakpoint(char **args, char **response)
+proxy_tcp_svr_setfuncbreakpoint(proxy_svr_helper_funcs *helper, char **args, char **response)
 {
 	return DBGRES_OK;
 }
 
 static int 
-proxy_tcp_svr_deletebreakpoints(char **args, char **response)
+proxy_tcp_svr_deletebreakpoints(proxy_svr_helper_funcs *helper, char **args, char **response)
 {
 	return DBGRES_OK;
 }
 
 static int 
-proxy_tcp_svr_go(char **args, char **response)
+proxy_tcp_svr_go(proxy_svr_helper_funcs *helper, char **args, char **response)
 {
 	return DBGRES_OK;
 }
 
 static int 
-proxy_tcp_svr_step(char **args, char **response)
+proxy_tcp_svr_step(proxy_svr_helper_funcs *helper, char **args, char **response)
 {
 	return DBGRES_OK;
 }
 
 static int 
-proxy_tcp_svr_liststackframes(char **args, char **response)
+proxy_tcp_svr_liststackframes(proxy_svr_helper_funcs *helper, char **args, char **response)
 {
 	return DBGRES_OK;
 }
 
 static int 
-proxy_tcp_svr_setcurrentstackframe(char **args, char **response)
+proxy_tcp_svr_setcurrentstackframe(proxy_svr_helper_funcs *helper, char **args, char **response)
 {
 	return DBGRES_OK;
 }
 
 static int 
-proxy_tcp_svr_evaluateexpression(char **args, char **response)
+proxy_tcp_svr_evaluateexpression(proxy_svr_helper_funcs *helper, char **args, char **response)
 {
 	return DBGRES_OK;
 }
 
 static int 
-proxy_tcp_svr_listlocalvariables(char **args, char **response)
+proxy_tcp_svr_gettype(proxy_svr_helper_funcs *helper, char **args, char **response)
 {
 	return DBGRES_OK;
 }
 
 static int 
-proxy_tcp_svr_listarguments(char **args, char **response)
+proxy_tcp_svr_listlocalvariables(proxy_svr_helper_funcs *helper, char **args, char **response)
 {
 	return DBGRES_OK;
 }
 
 static int 
-proxy_tcp_svr_listglobalvariables(char **args, char **response)
+proxy_tcp_svr_listarguments(proxy_svr_helper_funcs *helper, char **args, char **response)
+{
+	return DBGRES_OK;
+}
+
+static int 
+proxy_tcp_svr_listglobalvariables(proxy_svr_helper_funcs *helper, char **args, char **response)
 {
 	return DBGRES_OK;
 }
 
 static int
-proxy_tcp_svr_quit(char **args, char **response)
+proxy_tcp_svr_quit(proxy_svr_helper_funcs *helper, char **args, char **response)
 {
 	int	res;
 	
-	res = DbgClntQuit();
+	res = helper->quit();
 	
 	proxy_tcp_svr_shutdown++;
 	
