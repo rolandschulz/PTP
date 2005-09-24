@@ -40,6 +40,8 @@
 #define BITVECTOR_OREQ(v1, v2)	bitvector_oreq((v1), (v2))
 #define BITVECTOR_AND(v1, v2, v3)	bitvector_and((v1), (v2), (v3))
 #define BITVECTOR_OR(v1, v2, v3)	bitvector_or((v1), (v2), (v3))
+#define BITVECTOR_INVERT(v1)		bitvector_invert((v1))
+#define BITVECTOR_CLEAR(v1)		bitvector_clear((v1))
 
 struct procset {
 	char *			ps_name;
@@ -59,6 +61,7 @@ procset *	procset_and(procset *, procset *);
 void			procset_andeq(procset *, procset *);
 procset *	procset_or(procset *, procset *);
 void			procset_oreq(procset *, procset *);
+void			procset_invert(procset *);
 char *		procset_to_str(procset *);
 procset *	str_to_procset(char *);
 int			procset_size(procset *);
