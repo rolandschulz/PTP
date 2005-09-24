@@ -30,7 +30,6 @@
  * task ids.
  */
 
-#include <mpi.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -39,255 +38,61 @@
 #include "dbg_client.h"
 #include "procset.h"
 #include "list.h"
-#include "hash.h"
-
-/*
- * A request represents an asynchronous send/receive transaction between the client
- * and all servers. completed() is called once all replys have been received.
- */
-struct active_request {
-	procset *		procs;
-	void				(*completed)(Hash *);
-	Hash *			events;
-};
-typedef struct active_request	active_request;
-
-static procset *		sending_procs;
-static procset *		receiving_procs;
-static List *		active_requests;
-static char **		send_bufs;
-static MPI_Request *	send_requests;
-int *				pids;
-MPI_Status *			stats;
-
-int num_servers;
-int my_task_id;
-
-/*
- * Send a command to the servers specified in procset. 
- * 
- * It is permissible to have multiple outstanding commands, provided
- * the processes each command applies to are disjoint sets.
- */
-int
-send_command(procset *procs, char *str, void (*completed_callback)(Hash *))
-{
-	int				pid;
-	int				cmd_len;
-	procset *		p;
-	active_request *	r;
-	
-	/*
-	 * Check if any processes already have active requests
-	 */
-	p = procset_and(sending_procs, procs);
-	procset_andeq(p, receiving_procs);
-	if (!procset_isempty(p)) {
-		DbgSetError(DBGERR_INPROGRESS, NULL);
-		return -1;
-	}
-	
-	procset_free(p);
-	/*
-	 * Update sending processes
-	 */	
-	procset_oreq(sending_procs, procs);
-
-	/*
-	 * Create a new request and add it too the active list
-	 */
-	r = (active_request *)malloc(sizeof(active_request));
-	r->procs = procset_copy(procs);
-	r->completed = completed_callback;
-	r->events = HashCreate(procset_size(procs)); // TODO: Check this is a sensible size
-	
-	AddToList(active_requests, (void *)r);
-
-	/*
-	 * Now post commands to the servers
-	 */
-	for (pid = 0; pid < num_servers; pid++) {
-		if (procset_test(procs, pid)) {
-			/*
-			 * MPI spec does not allow read access to a send buffer while send is in progress
-			 * so we must make a copy for each send.
-			 */
-			send_bufs[pid] = strdup(str);
-			cmd_len = strlen(str);
-printf("client sending <%s> to %d\n", send_bufs[pid], pid);
-			MPI_Isend(send_bufs[pid], cmd_len, MPI_CHAR, pid, 0, MPI_COMM_WORLD, &send_requests[pid]); // TODO: handle fatal errors
-		}
-	}
-
-	return 0;
-}
-
-/*
- * Check for any replies from servers. If any are received, and these complete a send request,
- * then processes the reply.
- */
-void
-progress_commands(void)
-{
-	int				i;
-	int				avail;
-	int				recv_pid;
-	int 				completed;
-	char *			reply_buf;
-	unsigned int		count;
-	unsigned int		hdr[2];
-	active_request *	r;
-	MPI_Status		stat;
-	dbg_event *		e;
-
-	/*
-	 * Check for completed sends
-	 */
-	count = procset_size(sending_procs);
-	if (count > 0) {
-		if (MPI_Testsome(num_servers, send_requests, &completed, pids, stats) != MPI_SUCCESS) {
-			printf("error in testsome\n");
-			exit(1);
-		}
-		
-		for (i = 0; i < completed; i++) {
-			procset_remove_proc(sending_procs, pids[i]);
-			procset_add_proc(receiving_procs, pids[i]);
-			free(send_bufs[pids[i]]);
-		}
-	}
-		
-	/*
-	 * Check for replys
-	 */
-	count = procset_size(receiving_procs);
-	if (count > 0) {
-		MPI_Iprobe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &avail, &stat);
-	
-		if (avail == 0)
-			return;
-		
-		/*
-		 * A message is available, so receive it
-		 * 
-		 * A message is split into two parts: a header comprising two
-		 * unsigned integers (a hash value and a length); a body which 
-		 * is the dbg_event structure converted to a string.
-		 * 
-		 * The hash is computed by each server and is used to quickly
-		 * coalesce events.
-		 * 
-		 * The length is the length of the event string.
-		 * 
-		 */
-		//MPI_Get_count(&stat, MPI_CHAR, &count);
-		
-		recv_pid = stat.MPI_SOURCE;		
-		
-		MPI_Recv(hdr, 2, MPI_UNSIGNED, recv_pid, 0, MPI_COMM_WORLD, &stat);
-	
-		count = hdr[1];
-		reply_buf = (char *)malloc(count + 1);
-		
-		MPI_Recv(reply_buf, count, MPI_CHAR, recv_pid, 0, MPI_COMM_WORLD, &stat);
-		reply_buf[count] = '\0';
-		
-		/*
-		 * Find request for this proc
-		 */
-		for (SetList(active_requests); (r = (active_request *)GetListElement(active_requests)) != NULL; ) {
-			if (procset_test(r->procs, recv_pid)) {
-				/*
-				 * Save event if it is new, otherwise just add this process to the event
-				 */
-				if ((e = HashSearch(r->events, hdr[0])) == NULL) {
-					if (proxy_tcp_str_to_event(reply_buf, &e) < 0) {
-						fprintf(stderr, "Bad protocol: conversion to event failed!\n");
-					} else {
-						e->procs = procset_new(num_servers);
-						HashInsert(r->events, hdr[0], (void *)e);
-					}
-				}
-				
-				if (e != NULL)
-					procset_add_proc(e->procs, recv_pid);
-								
-				/*
-				 * Call notify function if all receives have been completed
-				 */
-				procset_remove_proc(r->procs, recv_pid);
-				if (procset_isempty(r->procs)) {
-					RemoveFromList(active_requests, (void *)r);
-					r->completed(r->events);
-					procset_free(r->procs);
-					free(r);
-				}
-			}
-			
-			break;
-		}
-		
-		free(reply_buf);
-		
-		/*
-		 * remove from receiving procsets
-		 */
-		procset_remove_proc(receiving_procs, recv_pid);
-	}
-}
+#include "proxy.h"
+#include "proxy_tcp.h"
 
 #define TEST
 
 #ifdef TEST
-int completed;
+static int completed;
 
 void 
-send_complete(Hash *h)
+process_event(dbg_event *e, void *data)
 {
-	HashEntry *	he;
-	dbg_event *	e;
 	stackframe *	f;
 	
-	for (HashSet(h); (he = HashGet(h)) != NULL; ) {
-		e = (dbg_event *)he->h_data;
-		switch (e->event) {
-		case DBGEV_ERROR:
-			printf("error: %s\n", e->error_msg);
-			break;
-		case DBGEV_OK:
-			printf("command ok\n");
-			break;
-		case DBGEV_BPHIT:
-			printf("hit breakpoint at line %d\n", e->bp->loc.line);
-			break;
-		case DBGEV_BPSET:
-			printf("breakpoint set\n");
-			break;
-		case DBGEV_STEP:
-			printf("step completed\n");
-			break;
-		case DBGEV_SIGNAL:
-			printf("received signal %s\n", e->sig_name);
-			break;
-		case DBGEV_EXIT:
-			printf("exited with status %d\n", e->exit_status);
-			break;
-		case DBGEV_DATA:
-			printf("data is "); AIFPrint(stdout, 0, e->data); printf("\n");
-			break;
-		case DBGEV_FRAMES:
-			printf("got frames:\n");
-			for (SetList(e->list); (f = (stackframe *)GetListElement(e->list)) != NULL; ) {
-				printf(" #%d %s() at %s:%d\n", f->level, f->loc.func, f->loc.file, f->loc.line);
-			}
-			break;
-		default:
-			printf("got event %d\n", e->event);
-			break;
-		}
-	}
-	
 	completed++;
+	
+	if (e == NULL) {
+		printf("got null event!\n");
+		return;
+	}
+		
+	switch (e->event) {
+	case DBGEV_ERROR:
+		printf("error: %s\n", e->error_msg);
+		break;
+	case DBGEV_OK:
+		printf("command ok\n");
+		break;
+	case DBGEV_BPHIT:
+		printf("hit breakpoint at line %d\n", e->bp->loc.line);
+		break;
+	case DBGEV_BPSET:
+		printf("breakpoint set\n");
+		break;
+	case DBGEV_STEP:
+		printf("step completed\n");
+		break;
+	case DBGEV_SIGNAL:
+		printf("received signal %s\n", e->sig_name);
+		break;
+	case DBGEV_EXIT:
+		printf("exited with status %d\n", e->exit_status);
+		break;
+	case DBGEV_DATA:
+		printf("data is "); AIFPrint(stdout, 0, e->data); printf("\n");
+		break;
+	case DBGEV_FRAMES:
+		printf("got frames:\n");
+		for (SetList(e->list); (f = (stackframe *)GetListElement(e->list)) != NULL; ) {
+			printf(" #%d %s() at %s:%d\n", f->level, f->loc.func, f->loc.file, f->loc.line);
+		}
+		break;
+	default:
+		printf("got event %d\n", e->event);
+		break;
+	}
 }
 
 void
@@ -296,77 +101,127 @@ wait_for_server(void)
 	completed = 0;
 	
 	while (!completed) {
-		progress_commands();
+		DbgClntProgress();
 		usleep(1000);
 	}
 }
 #endif
 
-void 
-client(int task_id)
+void
+reg_read_file_handler(int fd, int (*handler)(int, void *), void *data)
 {
-	int	i;
-#ifdef TEST
-	procset *p, *p1;
+	DbgClntRegisterFileHandler(fd, READ_FILE_HANDLER, handler, data);
+}
+
+static int shutdown = 0;
+
+void
+shutdown_server(void)
+{
+	shutdown++;
+}
+
+proxy_svr_helper_funcs helper_funcs = {
+	shutdown_server,
+	reg_read_file_handler,
+	DbgClntUnregisterFileHandler,
+	DbgClntRegisterEventHandler,
+	DbgClntProgress,
+	DbgClntSetLineBreakpoint,
+	DbgClntSetFuncBreakpoint,
+	DbgClntDeleteBreakpoint,
+	DbgClntGo,
+	DbgClntStep,
+	DbgClntListStackframes,
+	DbgClntSetCurrentStackframe,
+	DbgClntEvaluateExpression,
+	DbgClntGetType,
+	DbgClntListLocalVariables,
+	DbgClntListArguments,
+	DbgClntListGlobalVariables
+};
+
+void 
+client(int num_servers, int task_id, proxy *p)
+{
+	int		i;
+#ifndef TEST
+	int		stat;
+	void *	pc;
+#else
+	procset *p1, *p2;
 #endif
 
-	num_servers = my_task_id = task_id;
+	DbgClntInit(num_servers);
 	
-	send_bufs = (char **)malloc(sizeof(char *) * num_servers);
-	send_requests = (MPI_Request *) malloc(sizeof(MPI_Request) * num_servers);
-	pids = (int *)malloc(sizeof(int) * num_servers);
-	stats = (MPI_Status *)malloc(sizeof(MPI_Status) * num_servers);
-
-	for (i = 0; i < num_servers; i++)
-		send_requests[i] = MPI_REQUEST_NULL;
-
-	sending_procs = procset_new(num_servers);
-	receiving_procs = procset_new(num_servers);
-	active_requests = NewList();
+#ifndef TEST
 	
-#ifdef TEST
-	p = procset_new(num_servers);
-	for (i = 0; i < num_servers; i++)
-		procset_add_proc(p, i);
+	proxy_svr_init(p, &helper_funcs);
+	
+	if (proxy_svr_create(p, &pc) < 0) {
+		fprintf(stderr, "proxy_svr_create failed\n");
+		return;
+	}
+	
+	while (!shutdown) {
+		if ((stat = proxy_svr_progress(p, pc)) < 0)
+			break;
+	}
 		
-	p1 = procset_new(num_servers);
-	procset_add_proc(p1, 0);
+	if (!shutdown && stat < 0)
+		fprintf(stderr, "progress failed\n");
+	
+	proxy_svr_finish(p, pc);
+	
+#else
 
-	send_command(p, "INI yyy", send_complete);
+	p1 = procset_new(num_servers);
+	for (i = 0; i < num_servers; i++)
+		procset_add_proc(p1, i);
+		
+	p2 = procset_new(num_servers);
+	procset_add_proc(p2, 0);
+
+	DbgClntRegisterEventHandler(process_event, NULL);
+
+	
+	DbgClntStartSession("yyy", NULL);
+
 	wait_for_server();	
-	send_command(p, "INI xxx", send_complete);
+	DbgClntStartSession("xxx", NULL);
 	wait_for_server();
-	send_command(p, "SLB yyy.c 6", send_complete);
+	DbgClntSetLineBreakpoint(p1, "yyy.c", 6);
 	wait_for_server();
-	send_command(p, "SLB xxx.c 99", send_complete);
+	DbgClntSetLineBreakpoint(p1, "xxx.c", 99);
 	wait_for_server();
-	send_command(p, "SLB xxx.c 14", send_complete);
+	DbgClntSetLineBreakpoint(p1, "xxx.c", 14);
 	wait_for_server();
-	send_command(p, "GOP", send_complete);
+	DbgClntGo(p1);
 	wait_for_server();
-	send_command(p, "LSF 0", send_complete);
+	DbgClntListStackframes(p1, 0);
 	wait_for_server();
-	send_command(p, "STP 1 0", send_complete);
+	DbgClntStep(p1, 1, 0);
 	wait_for_server();
-	send_command(p, "STP 1 0", send_complete);
+	DbgClntStep(p1, 1, 0);
 	wait_for_server();
-	send_command(p1, "STP 1 0", send_complete);
+	DbgClntStep(p2, 1, 0);
 	wait_for_server();
-	send_command(p, "EEX a", send_complete);
+	DbgClntEvaluateExpression(p1, "a");
 	wait_for_server();
-	send_command(p, "LSF 1", send_complete);
+	DbgClntListStackframes(p1, 1);
 	wait_for_server();
-	send_command(p, "SFB xxx.c b", send_complete);
+	DbgClntSetFuncBreakpoint(p1, "xxx.c", "b");
 	wait_for_server();
-	send_command(p, "GOP", send_complete);
+	DbgClntGo(p1);
 	wait_for_server();
-	send_command(p, "LSF 1", send_complete);
+	DbgClntListStackframes(p1, 1);
 	wait_for_server();
-	send_command(p, "LSF 0", send_complete);
+	DbgClntListStackframes(p1, 0);
 	wait_for_server();
-	send_command(p, "GOP", send_complete);
+	DbgClntGo(p1);
 	wait_for_server();
-	send_command(p, "QUI", send_complete);
+	
+	DbgClntQuit();
 	wait_for_server();
 	
 #endif
