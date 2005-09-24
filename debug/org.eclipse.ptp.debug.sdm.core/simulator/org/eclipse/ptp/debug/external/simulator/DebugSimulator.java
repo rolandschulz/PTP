@@ -32,6 +32,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
@@ -286,7 +287,10 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		state = RUNNING;
 		IPCDIDebugProcess[] procList = procs.getProcesses();
 		for (int i = 0; i < procList.length; i++) {
-			((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0).resume();
+			SimProcess p = ((SimProcess) ((DebugProcess) procList[i]).getPProcess());
+			if (p.getStatus().equals(IPProcess.EXITED))
+				continue;
+			p.getThread(0).resume();
 		}
 	}
 
@@ -295,7 +299,10 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		state = SUSPENDED;
 		IPCDIDebugProcess[] list = procs.getProcesses();
 		for (int i = 0; i < list.length; i++) {
-			((SimProcess) ((DebugProcess) list[i]).getPProcess()).getThread(0).suspend();
+			SimProcess p = ((SimProcess) ((DebugProcess) list[i]).getPProcess());
+			if (p.getStatus().equals(IPProcess.EXITED))
+				continue;
+			p.getThread(0).suspend();
 		}
 	}
 
