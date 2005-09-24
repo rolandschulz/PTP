@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui;
 
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.ui.listeners.IPaintListener;
 import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
@@ -46,9 +47,7 @@ public interface IManager {
 	public String getCurrentSetId();
 	public void setCurrentSetId(String set_id);
 	
-	public void addPaintListener(IPaintListener pListener);
-	public void removePaintListener(IPaintListener pListener);
-	
+	//set listener
 	public void addSetListener(ISetListener setListener);
 	public void removeSetListener(ISetListener setListener);
 	public void fireEvent(int eventType, IElement[] elements, IElementSet cur_set, IElementSet pre_set);
@@ -58,4 +57,17 @@ public interface IManager {
 	public void removeSet(String setID, IElementHandler elementHandler);
 	public void removeFromSet(IElement[] elements, String setID, IElementHandler elementHandler);
 	public void updateMatchElementSets(IElementSet targetSet, IElementHandler elementHandler);
+	
+	//paint listener
+	public void addPaintListener(IPaintListener pListener);
+	public void removePaintListener(IPaintListener pListener);
+	public void firePaintListener(Object condition);
+	//job
+	public boolean isNoJob(String jid);
+	public boolean isJobStop(String job_id);
+	public IPJob findJob(String job_name);
+	public IPJob findJobById(String job_id);
+	public void removeJob(IPJob job);
+	public void removeAllStoppedJobs();
+	public boolean hasStoppedJob();	
 }

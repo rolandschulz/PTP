@@ -18,20 +18,26 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.listeners.IPaintListener;
 import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.internal.ElementSet;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * @author Clement chu
@@ -62,7 +68,7 @@ public abstract class AbstractUIManager implements IManager {
 			pListeners.remove(pListener);
 	}
 
-	protected void firePaintListener(Object condition) {
+	public void firePaintListener(Object condition) {
 		for (Iterator i=pListeners.iterator(); i.hasNext();) {
 			((IPaintListener)i.next()).repaint(condition);
 		}
@@ -153,6 +159,15 @@ public abstract class AbstractUIManager implements IManager {
 		}
 	}
 	
+	public boolean isNoJob(String jid) {
+		return (jid == null || jid.length() == 0);
+	}
+	public boolean isJobStop(String job_id) {
+		if (isNoJob(job_id))
+			return true;
+		IPJob job = findJobById(job_id);
+		return (job == null || job.isAllStop());
+	}	
 	public IPJob findJob(String job_name) {
 		return modelManager.getUniverse().findJobByName(job_name);
 	}
@@ -164,5 +179,45 @@ public abstract class AbstractUIManager implements IManager {
 	}
 	public void removeJob(IPJob job) {
 		modelManager.getUniverse().deleteJob(job);
+	}
+	public void removeAllStoppedJobs() {
+		IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			public void run(IProgressMonitor pmonitor) throws InvocationTargetException {
+				if (pmonitor == null)
+					pmonitor = new NullProgressMonitor();
+				
+				try {
+					IPJob[] jobs = modelManager.getUniverse().getJobs();
+					pmonitor.beginTask("Removing stopped jobs...", jobs.length);
+					for (int i=0; i<jobs.length; i++) {
+						if (pmonitor.isCanceled())
+							throw new InvocationTargetException(new Exception("Cancelled by user"));
+						
+						if (jobs[i].isAllStop())
+							removeJob(jobs[i]);
+						
+						pmonitor.worked(1);
+					}
+				} finally {
+					pmonitor.done();
+					firePaintListener(new Boolean(true));
+				}
+			}
+		};
+		try {
+			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
+		} catch(InterruptedException e) {
+			PTPUIPlugin.log(e);
+		} catch (InvocationTargetException e1) {
+			PTPUIPlugin.log(e1);
+		}		
+	}
+	public boolean hasStoppedJob() {
+		IPJob[] jobs = modelManager.getUniverse().getJobs();
+		for (int i=0; i<jobs.length; i++) {
+			if (jobs[i].isAllStop())
+				return true;
+		}
+		return false;
 	}
 }
