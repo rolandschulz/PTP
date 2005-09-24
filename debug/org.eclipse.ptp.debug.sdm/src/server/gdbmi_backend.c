@@ -54,7 +54,7 @@ static int	GDBMIProgress(void);
 static int	GDBMIStartSession(char *, char*);
 static int	GDBMISetLineBreakpoint(char *, int);
 static int	GDBMISetFuncBreakpoint(char *, char *);
-static int	GDBMIDeleteBreakpoints(int);
+static int	GDBMIDeleteBreakpoint(int);
 static int	GDBMIGo(void);
 static int	GDBMIStep(int, int);
 static int	GDBMIListStackframes(int);
@@ -74,7 +74,7 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIStartSession,
 	GDBMISetLineBreakpoint,
 	GDBMISetFuncBreakpoint,
-	GDBMIDeleteBreakpoints,
+	GDBMIDeleteBreakpoint,
 	GDBMIGo,
 	GDBMIStep,
 	GDBMIListStackframes,
@@ -578,7 +578,7 @@ SetAndCheckBreak(char *where)
 ** Delete a breakpoint.
 */
 static int
-GDBMIDeleteBreakpoints(int bpid)
+GDBMIDeleteBreakpoint(int bpid)
 {
 	if ( !gmi_break_delete(MIHandle, bpid) ) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
@@ -617,15 +617,15 @@ GDBMIGo(void)
 }
 
 /*
-** Execute count statements. If in == 0, do not enter
+** Execute count statements. If type == 0, do not enter
 ** function calls.
 */
 static int
-GDBMIStep(int count, int in)
+GDBMIStep(int count, int type)
 {
 	int		res;
 
-	if ( !in )
+	if ( type == 0 )
 		res = gmi_exec_next_cnt(MIHandle, count);
 	else
 		res = gmi_exec_step_cnt(MIHandle, count);
