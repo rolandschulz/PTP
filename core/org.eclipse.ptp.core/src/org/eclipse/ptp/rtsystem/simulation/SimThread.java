@@ -95,7 +95,7 @@ public class SimThread extends Observable {
 	public void addBreakpoint(int line) {
 		breakLines.add(new Integer(line));
 	}
-	
+
 	public void checkStepping() {
 		if (isStepping) {
 			state = SUSPENDED;
@@ -131,6 +131,20 @@ public class SimThread extends Observable {
 				return;
 			}
 		}
+	}
+	
+	public void suspend() {
+		state = SUSPENDED;
+		simProcess.setStatus(IPProcess.STOPPED);
+		setChanged();
+		ArrayList list = new ArrayList();
+		list.add(0, new Integer(processId));
+		list.add(1, new String("SUSPENDED"));
+		/* Additional info */
+		list.add(2, new String("main.c"));
+		list.add(3, new Integer(curLine));
+		currentStackFrame.setLine(curLine);
+		notifyObservers(list);
 	}
 	
 	public void terminate() {
