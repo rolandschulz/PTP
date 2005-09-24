@@ -32,6 +32,8 @@
 /*
  * Session control
  */
+void DbgClntInit(int);
+int DbgClntStartSession(char *, char *);
 int DbgClntQuit(void);
 
 /*
@@ -39,7 +41,7 @@ int DbgClntQuit(void);
  */
 int DbgClntSetLineBreakpoint(procset *set, char *file, int line);
 int DbgClntSetFuncBreakpoint(procset *set, char *file, char *func);
-int DbgClntDeleteBreakpoint(procset *set);
+int DbgClntDeleteBreakpoint(procset *set, int);
 
 /*
  * Process control operations
@@ -50,16 +52,17 @@ int DbgClntStep(procset *set, int count, int type);
 /*
  * Stack frame operations
  */
-int DbgClntListStackFrames(int proc);
-int DbgClntSetCurrentStackFrame(int proc, int count, int dir);
+int DbgClntListStackframes(procset *set, int);
+int DbgClntSetCurrentStackframe(procset *set, int level);
 
 /*
  * Expression/variable operations
  */
-int DbgClntEvaluateExpression(int proc);
-int DbgClntListLocalVariables(int proc);
-int DbgClntListArguments(int proc);
-int DbgClntListGlobalVariables(int proc);
+int DbgClntEvaluateExpression(procset *set, char *);
+int DbgClntGetType(procset *set, char *);
+int DbgClntListLocalVariables(procset *set);
+int DbgClntListArguments(procset *set);
+int DbgClntListGlobalVariables(procset *set);
 
 /*
  * Event Handling
@@ -67,7 +70,7 @@ int DbgClntListGlobalVariables(int proc);
 int DbgClntProgress(void);
 void DbgClntRegisterFileHandler(int, int, int (*)(int, void *), void *);
 void DbgClntUnregisterFileHandler(int);
-
+void DbgClntRegisterEventHandler(void (*)(dbg_event *, void *), void *);
 /*
  * Error Handling
  */

@@ -76,49 +76,49 @@ proxy_clnt_step_not_imp(void *data, procset *p, int count, int type)
 }
 
 int 
-proxy_clnt_liststackframes_not_imp(void *data, int p)
+proxy_clnt_liststackframes_not_imp(void *data, procset *p, int current)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_clnt_setcurrentstackframe_not_imp(void *data, int p, int level)
+proxy_clnt_setcurrentstackframe_not_imp(void *data, procset *p, int level)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_clnt_evaluateexpression_not_imp(void *data, int p, char *expr)
+proxy_clnt_evaluateexpression_not_imp(void *data, procset *p, char *expr)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_clnt_gettype_not_imp(void *data, int p, char *expr)
+proxy_clnt_gettype_not_imp(void *data, procset *p, char *expr)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_clnt_listlocalvariables_not_imp(void *data, int p)
+proxy_clnt_listlocalvariables_not_imp(void *data, procset *p)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_clnt_listarguments_not_imp(void *data, int p)
+proxy_clnt_listarguments_not_imp(void *data, procset *p)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
 }
 
 int 
-proxy_clnt_listglobalvariables_not_imp(void *data, int p)
+proxy_clnt_listglobalvariables_not_imp(void *data, procset *p)
 {
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return -1;
