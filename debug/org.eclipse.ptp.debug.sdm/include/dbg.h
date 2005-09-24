@@ -65,16 +65,17 @@ int DbgStep(session *s, procset *set, int count, int type);
 /*
  * Stack frame operations
  */
-int DbgListStackFrames(session *s, int proc);
-int DbgSetCurrentStackFrame(session *s, int proc, int level);
+int DbgListStackFrames(session *s, procset *set, int current);
+int DbgSetCurrentStackFrame(session *s, procset *set, int level);
 
 /*
  * Expression/variable operations
  */
-int DbgEvaluateExpression(session *s, int proc, char *exp);
-int DbgListLocalVariables(session *s, int proc);
-int DbgListArguments(session *s, int proc);
-int DbgListGlobalVariables(session *s, int proc);
+int DbgEvaluateExpression(session *s, procset *set, char *exp);
+int DbgGetType(session *s, procset *set, char *exp);
+int DbgListLocalVariables(session *s, procset *set);
+int DbgListArguments(session *s, procset *set);
+int DbgListGlobalVariables(session *s, procset *set);
 
 /*
  * Event Handling

@@ -94,7 +94,7 @@ DbgSetFuncBreakpoint(session *s, procset *set, char *file, char *func)
 }
 
 int 
-DbgDeleteBreakpoints(session *s, procset *set, int bpid)
+DbgDeleteBreakpoint(session *s, procset *set, int bpid)
 {
 	return s->sess_proxy->clnt_funcs->deletebreakpoint(s->sess_proxy_data, set, bpid);
 }
@@ -118,42 +118,48 @@ DbgStep(session *s, procset *set, int count, int type)
  * Stack frame operations
  */
 int 
-DbgListStackframes(session *s, int proc)
+DbgListStackframes(session *s, procset *set, int current)
 {
-	return s->sess_proxy->clnt_funcs->liststackframes(s->sess_proxy_data, proc);
+	return s->sess_proxy->clnt_funcs->liststackframes(s->sess_proxy_data, set, current);
 }
 
 int 
-DbgSetCurrentStackframe(session *s, int proc, int level)
+DbgSetCurrentStackframe(session *s, procset *set, int level)
 {
-	return s->sess_proxy->clnt_funcs->setcurrentstackframe(s->sess_proxy_data, proc, level);
+	return s->sess_proxy->clnt_funcs->setcurrentstackframe(s->sess_proxy_data, set, level);
 }
 
 /*
  * Expression/variable operations
  */
 int 
-DbgEvaluateExpression(session *s, int proc, char *exp)
+DbgEvaluateExpression(session *s, procset *set, char *exp)
 {
-	return s->sess_proxy->clnt_funcs->evaluateexpression(s->sess_proxy_data, proc, exp);
+	return s->sess_proxy->clnt_funcs->evaluateexpression(s->sess_proxy_data, set, exp);
 }
 
 int 
-DbgListLocalVariables(session *s, int proc)
+DbgGetType(session *s, procset *set, char *exp)
 {
-	return s->sess_proxy->clnt_funcs->listlocalvariables(s->sess_proxy_data, proc);
+	return s->sess_proxy->clnt_funcs->gettype(s->sess_proxy_data, set, exp);
 }
 
 int 
-DbgListArguments(session *s, int proc)
+DbgListLocalVariables(session *s, procset *set)
 {
-	return s->sess_proxy->clnt_funcs->listarguments(s->sess_proxy_data, proc);
+	return s->sess_proxy->clnt_funcs->listlocalvariables(s->sess_proxy_data, set);
 }
 
 int 
-DbgListGlobalVariables(session *s, int proc)
+DbgListArguments(session *s, procset *set)
 {
-	return s->sess_proxy->clnt_funcs->listglobalvariables(s->sess_proxy_data, proc);
+	return s->sess_proxy->clnt_funcs->listarguments(s->sess_proxy_data, set);
+}
+
+int 
+DbgListGlobalVariables(session *s, procset *set)
+{
+	return s->sess_proxy->clnt_funcs->listglobalvariables(s->sess_proxy_data, set);
 }
 
 int 
