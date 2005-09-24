@@ -49,6 +49,7 @@ proxy_tcp_create_conn(proxy_tcp_conn **conn)
 	c->buf = (char *)malloc(c->buf_size);
 	c->buf_pos = 0;
 	c->total_read = 0;
+	c->helper = NULL;
 	
 	*conn = c;
 }

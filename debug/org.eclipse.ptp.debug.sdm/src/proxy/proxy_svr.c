@@ -24,9 +24,40 @@
  #include "session.h"
  #include "proxy.h"
 
-extern proxy_svr_funcs proxy_tcp_svr_funcs;
+extern proxy_svr_funcs 	proxy_tcp_svr_funcs;
 
 proxy proxies[] = {
 	{"tcp", NULL, &proxy_tcp_svr_funcs},
 	{NULL, NULL, NULL}
 };
+
+void
+proxy_svr_init(proxy *p, proxy_svr_helper_funcs *funcs)
+{
+	p->svr_helper_funcs = funcs;
+}
+
+int
+proxy_svr_create(proxy *p, void **data)
+{
+	if (p != NULL)
+		return p->svr_funcs->create(p->svr_helper_funcs, data);
+		
+	return -1;
+}
+
+int
+proxy_svr_progress(proxy *p, void *data)
+{
+	if (p != NULL)
+		return p->svr_funcs->progress(p->svr_helper_funcs, data);
+		
+	return -1;
+}
+
+void
+proxy_svr_finish(proxy *p, void *data)
+{
+	if (p != NULL)
+		p->svr_funcs->finish(p->svr_helper_funcs, data);
+}
