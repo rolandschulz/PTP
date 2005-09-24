@@ -105,24 +105,54 @@ procset_oreq(procset *p1, procset *p2)
 	BITVECTOR_OREQ(p1->ps_procs, p2->ps_procs);
 }
 
+/*
+ * Bitvector always rounds up the number of bits to the nearest
+ * chunk size. We need to reset the top most bits or they
+ * will be incorrectly tested by isempty().
+ */
+static void
+_invert_helper(int nb, BITVECTOR_TYPE bv)
+{
+	int	b;
+	
+	for (b = nb; b < BV_BITSIZE(bv); b++)
+		BITVECTOR_UNSET(bv, b);
+}
+
+void		
+procset_invert(procset *p)
+{
+	BITVECTOR_INVERT(p->ps_procs);
+	_invert_helper(p->ps_nprocs, p->ps_procs);
+}
+	
 /**
  * Add a process to the set. Processes are numbered from 0.
  */
 void		
 procset_add_proc(procset *p, int proc)
 {
+	if (proc < 0 || proc >= p->ps_nprocs)
+		return;
+		
 	BITVECTOR_SET(p->ps_procs, proc);
 }
 
 void		
 procset_remove_proc(procset *p, int proc)
 {
+	if (proc < 0 || proc >= p->ps_nprocs)
+		return;
+		
 	BITVECTOR_UNSET(p->ps_procs, proc);
 }
 
 int		
 procset_test(procset *p, int proc)
 {
+	if (proc < 0 || proc >= p->ps_nprocs)
+		return 0;
+		
 	return BITVECTOR_GET(p->ps_procs, proc);
 }
 
@@ -169,7 +199,7 @@ procset_to_str(procset *p)
 	
 	for (pbit = (bytes << 3) - 1; pbit > 0; ) {
 		for (byte = 0, bit = 3; bit >= 0; bit--, pbit--) {
-			if (pbit <= p->ps_nprocs && BITVECTOR_GET(p->ps_procs, pbit)) {
+			if (pbit < p->ps_nprocs && BITVECTOR_GET(p->ps_procs, pbit)) {
 				byte |= (1 << bit);
 				nonzero = 1;
 			}
