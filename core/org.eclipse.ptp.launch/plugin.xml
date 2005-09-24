@@ -42,7 +42,7 @@
             modes="run, debug"
             id="org.eclipse.ptp.ptpShortcut">
          <perspective
-               id="org.eclipse.ptp.ui.PRunPerspective">
+               id="org.eclipse.ptp.ui.PTPRunPerspective">
          </perspective>
          <perspective
                id="org.eclipse.debug.ui.DebugPerspective">

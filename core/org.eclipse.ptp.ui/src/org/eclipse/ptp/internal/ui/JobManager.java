@@ -65,15 +65,6 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 			((IJobChangeListener) i.next()).changeJobEvent(cur_jid, pre_jid);
 		}
 	}
-	public boolean isNoJob(String jid) {
-		return (jid == null || jid.length() == 0);
-	}
-	public boolean isJobStop(String job_id) {
-		if (isNoJob(job_id))
-			return true;
-		IPJob job = findJobById(job_id);
-		return (job == null || job.isAllStop());
-	}
 	public IElementHandler getElementHandler(String id) {
 		return (IElementHandler) jobList.get(id);
 	}

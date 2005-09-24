@@ -18,7 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -30,6 +34,7 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.internal.ui.ParallelImages;
+import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
 import org.eclipse.ptp.internal.ui.actions.TerminateAllAction;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
@@ -40,19 +45,14 @@ import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
@@ -164,95 +164,37 @@ public class ParallelJobView extends AbstractParallelSetView {
 			public void mouseDown(MouseEvent e) {
 				Point point = new Point(e.x, e.y);
 				TableItem item = jobTableViewer.getTable().getItem(point);
-				jobPopupMenu.getDefaultItem().setData(null);
 				if (item == null) {
 					jobTableViewer.getTable().deselectAll();
-					changeJob((IPJob)null);
-				}
-				else {
-					IPJob job = ((JobManager) manager).findJob(item.getText());
+					changeJob((IPJob) null);
+				} else {
+					IPJob job = manager.findJob(item.getText());
 					changeJob(job);
-					if (job != null && e.button == 3) {//right click
-						jobPopupMenu.getDefaultItem().setData(job);
-					}
 				}
 			}
 		});
-		jobPopupMenu = new Menu(jobTableViewer.getTable());
-		MenuItem menuItem = new MenuItem(jobPopupMenu, SWT.PUSH);
-		menuItem.addSelectionListener(new SelectionAdapter() {
-	    	public void widgetSelected(SelectionEvent e) {
-	    		MenuItem mItem = (MenuItem)e.getSource();
-    			Object data = mItem.getData();
-    			if (data instanceof IPJob) {
-    	    		((JobManager) manager).removeJob((IPJob)data);
-    	    		changeJob((IPJob)null);
-    	    		mItem.setData(null);
-    	    		jobTableViewer.refresh();
-    			}
-	    	}
-	    });	
-		jobPopupMenu.addMenuListener(new MenuAdapter() {
-			public void menuShown(MenuEvent e) {
-				Menu menu = (Menu)e.getSource();
-				MenuItem menuItem = menu.getDefaultItem();
-				Object data = menuItem.getData();
-				if (data == null) {
-					menuItem.setText("");
-					menu.setVisible(false);
-				} else if (data instanceof IPJob) {
-					menuItem.setText("Remove " + ((IPJob)data).getElementName());
-					menuItem.setEnabled(((IPJob)data).isAllStop());
-				}
-			}
-		});
-		jobTableViewer.getTable().setMenu(jobPopupMenu);
-		jobPopupMenu.setDefaultItem(menuItem);
-		jobPopupMenu.setVisible(false);
-		/*
-		jobTableViewer.addCheckStateListener(new ICheckStateListener() {
-			public void checkStateChanged(CheckStateChangedEvent event) {
-				jobTableViewer.setAllChecked(false);
-				if (event.getChecked()) {
-					jobTableViewer.setChecked(event.getElement(), true);
-					changeJob((IPJob) event.getElement());
-				}
-				else {
-					changeJob((IPJob)null);
-				}
-			}
-		});
-		jobTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
-				jobTableViewer.getTable().deselectAll();
-				ISelection selection = event.getSelection();
-				if (selection.isEmpty()) {
-					changeJob((IPJob)null);
-				}
-				else {
-					if (selection instanceof IStructuredSelection) {
-						Object selectedElement = ((IStructuredSelection)selection).getFirstElement();						
-						if (selectedElement instanceof IPJob) {							
-							IPJob job = (IPJob)selectedElement;							
-							boolean isSelected = jobTableViewer.getChecked(job);
-							jobTableViewer.setAllChecked(false);
-							if (!isSelected) {
-								jobTableViewer.setChecked(job, true);
-								changeJob(job);
-							}
-							else {
-								changeJob((IPJob)null);								
-							}
-						}
-					}
-				}
-			}
-		});
-		*/
+		createJobContextMenu();
 		elementViewComposite = createElementView(sashForm);
 		changeView(current_view);
-	}	
-	
+	}
+	protected void createJobContextMenu() {
+		MenuManager menuMgr = new MenuManager("#jobpopupmenu");
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(IMenuManager manager) {
+				manager.add(new Separator(IPTPUIConstants.IUIACTIONGROUP));
+				manager.add(new Separator(IPTPUIConstants.IUIEMPTYGROUP));
+				fillJobContextMenu(manager);
+			}
+		});
+		Menu menu = menuMgr.createContextMenu(jobTableViewer.getTable());
+		jobTableViewer.getTable().setMenu(menu);
+	}
+	protected void fillJobContextMenu(IMenuManager menuManager) {
+		ParallelAction removeAllTerminatedAction = new RemoveAllTerminatedAction(this);
+		removeAllTerminatedAction.setEnabled(manager.hasStoppedJob());
+		menuManager.add(removeAllTerminatedAction);
+	}
 	protected void createToolBarActions(IToolBarManager toolBarMgr) {
 		terminateAllAction = new TerminateAllAction(this);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, terminateAllAction);
@@ -305,36 +247,27 @@ public class ParallelJobView extends AbstractParallelSetView {
 	}
 	public IPJob getCheckedJob() {
 		String job_id = getCurrentID();
-		if (!((JobManager) manager).isNoJob(job_id))
-			return ((JobManager) manager).findJobById(job_id);
-
+		if (!manager.isNoJob(job_id))
+			return manager.findJobById(job_id);
 		return null;
 	}
 	public void changeJob(final String job_id) {
 		getDisplay().syncExec(new Runnable() {
 			public void run() {
-				IPJob job = ((JobManager) manager).findJobById(job_id);
+				IPJob job = manager.findJobById(job_id);
 				changeJob(job);
-				jobTableViewer.setSelection(job==null?new StructuredSelection():new StructuredSelection(job));
-				/*
-				IPJob job = ((JobManager) manager).findJobById(job_id);
-				jobTableViewer.setAllChecked(false);
-				if (job != null)
-					jobTableViewer.setChecked(job, true);
-
-				changeJob(job);
-				*/
+				jobTableViewer.setSelection(job == null ? new StructuredSelection() : new StructuredSelection(job));
 			}
 		});
 	}
 	protected void changeJob(final IPJob job) {
-		selectJob((job==null?IManager.EMPTY_ID:job.getIDString()));
+		selectJob((job == null ? IManager.EMPTY_ID : job.getIDString()));
 		update();
 		refresh();
 	}
 	public void updateJob() {
 		IElementHandler setManager = getCurrentElementHandler();
-		selectSet(setManager==null?null:setManager.getSetRoot());
+		selectSet(setManager == null ? null : setManager.getSetRoot());
 	}
 	protected void updateAction() {
 		super.updateAction();
@@ -342,23 +275,12 @@ public class ParallelJobView extends AbstractParallelSetView {
 			ISelection selection = jobTableViewer.getSelection();
 			if (selection.isEmpty()) {
 				terminateAllAction.setEnabled(false);
-			}
-			else {
-				IPJob job = (IPJob)((IStructuredSelection)selection).getFirstElement();
+			} else {
+				IPJob job = (IPJob) ((IStructuredSelection) selection).getFirstElement();
 				terminateAllAction.setEnabled(!(job.isDebug() || job.isAllStop()));
 			}
-			/*
-			Object[] checkedElements = jobTableViewer.getCheckedElements();
-			if (checkedElements.length == 0) {
-				terminateAllAction.setEnabled(false);
-			}
-			else {
-				IPJob job = (IPJob)checkedElements[0];
-				terminateAllAction.setEnabled(!(job.isDebug() || job.isAllStop()));
-			}
-			*/
 		}
-	}	
+	}
 	public void repaint(Object condition) {
 		if (condition != null) {
 			getDisplay().asyncExec(new Runnable() {
@@ -378,8 +300,8 @@ public class ParallelJobView extends AbstractParallelSetView {
 		getDisplay().syncExec(new Runnable() {
 			public void run() {
 				jobTableViewer.refresh(true);
-				IPJob job = ((JobManager) manager).findJob(arg);
-				jobTableViewer.setSelection(job==null?new StructuredSelection():new StructuredSelection(job));
+				IPJob job = manager.findJob(arg);
+				jobTableViewer.setSelection(job == null ? new StructuredSelection() : new StructuredSelection(job));
 				changeJob(job);
 			}
 		});
