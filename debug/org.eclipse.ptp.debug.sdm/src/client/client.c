@@ -41,92 +41,35 @@
 #include "proxy.h"
 #include "proxy_tcp.h"
 
-#define TEST
+static int num_servers;
 
-#ifdef TEST
-static int completed;
-
-void 
-process_event(dbg_event *e, void *data)
-{
-	stackframe *	f;
-	
-	completed++;
-	
-	if (e == NULL) {
-		printf("got null event!\n");
-		return;
-	}
-		
-	switch (e->event) {
-	case DBGEV_ERROR:
-		printf("error: %s\n", e->error_msg);
-		break;
-	case DBGEV_OK:
-		printf("command ok\n");
-		break;
-	case DBGEV_BPHIT:
-		printf("hit breakpoint at line %d\n", e->bp->loc.line);
-		break;
-	case DBGEV_BPSET:
-		printf("breakpoint set\n");
-		break;
-	case DBGEV_STEP:
-		printf("step completed\n");
-		break;
-	case DBGEV_SIGNAL:
-		printf("received signal %s\n", e->sig_name);
-		break;
-	case DBGEV_EXIT:
-		printf("exited with status %d\n", e->exit_status);
-		break;
-	case DBGEV_DATA:
-		printf("data is "); AIFPrint(stdout, 0, e->data); printf("\n");
-		break;
-	case DBGEV_FRAMES:
-		printf("got frames:\n");
-		for (SetList(e->list); (f = (stackframe *)GetListElement(e->list)) != NULL; ) {
-			printf(" #%d %s() at %s:%d\n", f->level, f->loc.func, f->loc.file, f->loc.line);
-		}
-		break;
-	default:
-		printf("got event %d\n", e->event);
-		break;
-	}
-}
-
-void
-wait_for_server(void)
-{
-	completed = 0;
-	
-	while (!completed) {
-		DbgClntProgress();
-		usleep(1000);
-	}
-}
-#endif
-
-void
+/*
+ * Called by proxy to register a file descriptor
+ */
+static void
 reg_read_file_handler(int fd, int (*handler)(int, void *), void *data)
 {
 	DbgClntRegisterFileHandler(fd, READ_FILE_HANDLER, handler, data);
 }
 
-static int shutdown = 0;
-
-void
-shutdown_server(void)
+/*
+ * Called by proxy when a new connection
+ * is establised.
+ */
+static int
+new_connection(void)
 {
-	shutdown++;
+	return 0;
 }
 
 proxy_svr_helper_funcs helper_funcs = {
-	shutdown_server,
+	new_connection,
+	DbgClntIsShutdown,
 	reg_read_file_handler,
 	DbgClntUnregisterFileHandler,
 	DbgClntRegisterEventHandler,
 	DbgClntProgress,
+	DbgClntStartSession,
 	DbgClntSetLineBreakpoint,
 	DbgClntSetFuncBreakpoint,
 	DbgClntDeleteBreakpoint,
@@ -138,91 +81,32 @@ proxy_svr_helper_funcs helper_funcs = {
 	DbgClntGetType,
 	DbgClntListLocalVariables,
 	DbgClntListArguments,
-	DbgClntListGlobalVariables
+	DbgClntListGlobalVariables,
+	DbgClntQuit
 };
 
 void 
-client(int num_servers, int task_id, proxy *p)
+client(int svr_num, int task_id, proxy *p)
 {
-	int		i;
-#ifndef TEST
-	int		stat;
 	void *	pc;
-#else
-	procset *p1, *p2;
-#endif
 
-	DbgClntInit(num_servers);
+	num_servers = svr_num;
 	
-#ifndef TEST
+	DbgClntInit(svr_num);
 	
 	proxy_svr_init(p, &helper_funcs);
 	
 	if (proxy_svr_create(p, &pc) < 0) {
 		fprintf(stderr, "proxy_svr_create failed\n");
+		DbgClntQuit(); //TODO fixme!
+		DbgClntProgress();
 		return;
 	}
 	
-	while (!shutdown) {
-		if ((stat = proxy_svr_progress(p, pc)) < 0)
+	for (;;) {
+		if (proxy_svr_progress(p, pc) < 0)
 			break;
 	}
 		
-	if (!shutdown && stat < 0)
-		fprintf(stderr, "progress failed\n");
-	
 	proxy_svr_finish(p, pc);
-	
-#else
-
-	p1 = procset_new(num_servers);
-	for (i = 0; i < num_servers; i++)
-		procset_add_proc(p1, i);
-		
-	p2 = procset_new(num_servers);
-	procset_add_proc(p2, 0);
-
-	DbgClntRegisterEventHandler(process_event, NULL);
-
-	
-	DbgClntStartSession("yyy", NULL);
-
-	wait_for_server();	
-	DbgClntStartSession("xxx", NULL);
-	wait_for_server();
-	DbgClntSetLineBreakpoint(p1, "yyy.c", 6);
-	wait_for_server();
-	DbgClntSetLineBreakpoint(p1, "xxx.c", 99);
-	wait_for_server();
-	DbgClntSetLineBreakpoint(p1, "xxx.c", 14);
-	wait_for_server();
-	DbgClntGo(p1);
-	wait_for_server();
-	DbgClntListStackframes(p1, 0);
-	wait_for_server();
-	DbgClntStep(p1, 1, 0);
-	wait_for_server();
-	DbgClntStep(p1, 1, 0);
-	wait_for_server();
-	DbgClntStep(p2, 1, 0);
-	wait_for_server();
-	DbgClntEvaluateExpression(p1, "a");
-	wait_for_server();
-	DbgClntListStackframes(p1, 1);
-	wait_for_server();
-	DbgClntSetFuncBreakpoint(p1, "xxx.c", "b");
-	wait_for_server();
-	DbgClntGo(p1);
-	wait_for_server();
-	DbgClntListStackframes(p1, 1);
-	wait_for_server();
-	DbgClntListStackframes(p1, 0);
-	wait_for_server();
-	DbgClntGo(p1);
-	wait_for_server();
-	
-	DbgClntQuit();
-	wait_for_server();
-	
-#endif
 }
