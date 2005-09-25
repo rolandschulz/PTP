@@ -49,6 +49,7 @@ procset *	procset_new(int);
 void			procset_free(procset *);
 procset *	procset_copy(procset *);
 int			procset_isempty(procset *);
+void			procset_clear(procset *);
 void			procset_add_proc(procset *, int);
 void			procset_remove_proc(procset *, int);
 int			procset_test(procset *, int);
