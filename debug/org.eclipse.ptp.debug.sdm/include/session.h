@@ -21,10 +21,10 @@
 #define _SESSION_H_
 
 struct session {
+	struct procset *	sess_procs;
 	struct proxy *	sess_proxy;
 	void *			sess_proxy_data;
 };
 typedef struct session	session;
 
-int		proxy_send_request(char *, char *);
 #endif /* _SESSION_H_*/
