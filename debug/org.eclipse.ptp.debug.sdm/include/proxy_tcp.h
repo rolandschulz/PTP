@@ -38,6 +38,8 @@ struct proxy_tcp_conn {
 	int						total_read;
 	char *					msg;
 	int						msg_len;
+	void						(*event_handler)(dbg_event *, void *);
+	void *					event_data;
 	proxy_svr_helper_funcs *	helper;
 };
 typedef struct proxy_tcp_conn	proxy_tcp_conn;
@@ -49,7 +51,8 @@ extern proxy_svr_funcs proxy_tcp_svr_funcs;
 extern void		proxy_tcp_create_conn(proxy_tcp_conn **);
 extern void		proxy_tcp_destroy_conn(proxy_tcp_conn *);
 extern int		proxy_tcp_result_to_event(char *, dbg_event **);
-extern int		proxy_tcp_recv_msg(proxy_tcp_conn *, char **);
+extern int		proxy_tcp_recv_msgs(proxy_tcp_conn *);
+extern int		proxy_tcp_get_msg(proxy_tcp_conn *, char **);
 extern int		proxy_tcp_send_msg(proxy_tcp_conn *, char *, int);
 extern int		proxy_tcp_str_to_event(char *, dbg_event **);
 extern int		proxy_tcp_event_to_str(dbg_event *, char **);
