@@ -29,6 +29,7 @@
 
 struct proxy_clnt_funcs {
 	int (*init)(void **, char *, va_list);
+	int (*connect)(void *);
 	void (*regeventhandler)(void *, void (*)(dbg_event *, void *), void *);
 	int (*startsession)(void *, char *, char *);
 	int (*setlinebreakpoint)(void *, struct procset *, char *, int);
@@ -50,6 +51,7 @@ typedef struct proxy_clnt_funcs	proxy_clnt_funcs;
 
 struct proxy_svr_helper_funcs {
 	int (*newconn)(void);
+	int (*numservers)(void);
 	int (*shutdown_completed)(void);
 	void (*regreadfile)(int, int (*)(int, void *), void *); 
 	void (*unregreadfile)(int); 

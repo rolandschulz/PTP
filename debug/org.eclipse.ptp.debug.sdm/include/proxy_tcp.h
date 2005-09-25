@@ -29,6 +29,7 @@
 struct proxy_tcp_conn {
 	char *					host;
 	int						port;
+	int						connected;
 	SOCKET					sock;
 	SOCKET					svr_sock;
 	char *					buf;

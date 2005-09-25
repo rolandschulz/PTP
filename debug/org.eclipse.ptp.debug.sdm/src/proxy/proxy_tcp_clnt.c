@@ -43,6 +43,7 @@
 struct timeval	SELECT_TIMEOUT = {0, 1000};
 
 static int proxy_tcp_clnt_init(void **, char *, va_list);
+static int proxy_tcp_clnt_connect(void *);
 static void proxy_tcp_clnt_regeventhandler(void *, void (*)(dbg_event *, void *), void *);
 static int proxy_tcp_clnt_startsession(void *, char *, char *);
 static int proxy_tcp_clnt_setlinebreakpoint(void *, procset *, char *, int);
@@ -63,6 +64,7 @@ static int proxy_tcp_clnt_progress(void *);
 proxy_clnt_funcs proxy_tcp_clnt_funcs =
 {
 	proxy_tcp_clnt_init,
+	proxy_tcp_clnt_connect,
 	proxy_tcp_clnt_regeventhandler,
 	proxy_tcp_clnt_startsession,
 	proxy_tcp_clnt_setlinebreakpoint,
@@ -81,68 +83,15 @@ proxy_clnt_funcs proxy_tcp_clnt_funcs =
 	proxy_tcp_clnt_progress,
 };
 
-
-/**
- * Connect to a remote proxy.
- * 
- * @return conn structure that can be used for subsequent proxy requests.
- */
-static int
-proxy_tcp_client_connect(char *host, int port, proxy_tcp_conn **cp)
-{
-	SOCKET				sd;
-	struct hostent *		hp;
-	long int				haddr;
-	struct sockaddr_in	scket;
-	proxy_tcp_conn *		conn;
-	        
-	hp = gethostbyname(host);
-	        
-	if (hp == (struct hostent *)NULL) {
-		fprintf(stderr, "could not find host \"%s\"\n", host);
-		return -1;
-	}
-	
-	haddr = ((hp->h_addr[0] & 0xff) << 24) |
-			((hp->h_addr[1] & 0xff) << 16) |
-			((hp->h_addr[2] & 0xff) <<  8) |
-			((hp->h_addr[3] & 0xff) <<  0);
-	
-	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
-	{
-		perror("socket");
-		return -1;
-	}
-	
-	memset (&scket,0,sizeof(scket));
-	scket.sin_family = PF_INET;
-	scket.sin_port = htons((u_short) port);
-	scket.sin_addr.s_addr = htonl(haddr);
-	
-	if ( connect(sd, (struct sockaddr *) &scket, sizeof(scket)) == SOCKET_ERROR )
-	{
-		perror("connect");
-		CLOSE_SOCKET(sd);
-		return -1;
-	}
-	
-	proxy_tcp_create_conn(&conn);
-	
-	conn->sock = sd;
-	conn->host = strdup(host);
-	conn->port = port;
-
-	*cp = conn;
-	
-	return 0;
-}
-
 static int
 proxy_tcp_clnt_send_cmd(proxy_tcp_conn *conn, char *fmt, ...)
 {
 	va_list	ap;
 	char *	request;
 	
+	if (!conn->connected)
+		return -1;
+		
 	va_start(ap, fmt);
 	vasprintf(&request, fmt, ap);
 	va_end(ap);
@@ -184,11 +133,66 @@ proxy_tcp_clnt_init(void **data, char *attr, va_list ap)
 			
 		attr = va_arg(ap, char *);
 	}
+
+	proxy_tcp_create_conn(&conn);
 	
-	if (proxy_tcp_client_connect(host, port, &conn) < 0)
-		return -1;
-	
+	conn->host = strdup(host);
+	conn->port = port;
+
 	*data = (void *)conn;
+	
+	return 0;
+}
+
+/**
+ * Connect to a remote proxy.
+ */
+static int
+proxy_tcp_clnt_connect(void *data)
+{
+	SOCKET				sd;
+	struct hostent *		hp;
+	long int				haddr;
+	struct sockaddr_in	scket;
+	proxy_tcp_conn *		conn = (proxy_tcp_conn *)data;
+		        
+	if (conn->host == NULL) {
+		fprintf(stderr, "no host specified\n");
+		return -1;
+	}
+	
+	hp = gethostbyname(conn->host);
+	        
+	if (hp == (struct hostent *)NULL) {
+		fprintf(stderr, "could not find host \"%s\"\n", conn->host);
+		return -1;
+	}
+	
+	haddr = ((hp->h_addr[0] & 0xff) << 24) |
+			((hp->h_addr[1] & 0xff) << 16) |
+			((hp->h_addr[2] & 0xff) <<  8) |
+			((hp->h_addr[3] & 0xff) <<  0);
+	
+	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
+	{
+		perror("socket");
+		return -1;
+	}
+	
+	memset (&scket,0,sizeof(scket));
+	scket.sin_family = PF_INET;
+	scket.sin_port = htons((u_short) conn->port);
+	scket.sin_addr.s_addr = htonl(haddr);
+	
+	if ( connect(sd, (struct sockaddr *) &scket, sizeof(scket)) == SOCKET_ERROR )
+	{
+		perror("connect");
+		CLOSE_SOCKET(sd);
+		return -1;
+	}
+
+	conn->sock = sd;
+	conn->connected++;
 	
 	return 0;
 }
@@ -477,7 +481,8 @@ proxy_tcp_clnt_progress(void *data)
 	
 	free(result);
 	
-	conn->event_handler(ev, conn->event_data);
+	if (conn->event_handler)
+		conn->event_handler(ev, conn->event_data);
 	
 	return 0;
 }

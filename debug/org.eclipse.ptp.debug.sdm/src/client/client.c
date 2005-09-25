@@ -62,8 +62,15 @@ new_connection(void)
 	return 0;
 }
 
+static int
+server_count(void)
+{
+	return num_servers;
+}
+
 proxy_svr_helper_funcs helper_funcs = {
 	new_connection,
+	server_count,
 	DbgClntIsShutdown,
 	reg_read_file_handler,
 	DbgClntUnregisterFileHandler,

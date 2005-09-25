@@ -26,30 +26,19 @@
 #include "procset.h"
 
 /*
- * Process set operations
+ * Intercept INIT events to obtain number of procs
  */
-void 
-DbgCreateProcSet(int nprocs, procset **set)
+static void
+session_event_handler(dbg_event *e, void *data)
 {
-	*set = procset_new(nprocs);
+	session *	s = (session *)data;
+	
+	if (e->event == DBGEV_INIT) {
+		s->sess_procs = e->num_servers;
+	}
+	
+	s->sess_event_handler(e, s->sess_event_data);
 }
-
-void 
-DbgDestroyProcSet(procset *set)
-{
-	procset_free(set);
-}
-
-void DbgRemoveFromSet(procset *dst, procset *src);
-void DbgAddToSet(procset *dst, procset *src);
-
-void
-DbgAddProcToSet(procset *set, int pid)
-{
-	procset_add_proc(set, pid);
-}
-
-void DbgRemoveProcFromSet(procset *set, int pid);
 
 /*
  * Session initialization
@@ -82,10 +71,18 @@ DbgInit(session **s, char *proxy, char *attr, ...)
 	return 0;
 }
 
+int
+DbgConnect(session *s)
+{
+	return s->sess_proxy->clnt_funcs->connect(s->sess_proxy_data);
+}
+
 void
 DbgRegisterEventHandler(session *s, void (*event_handler)(dbg_event *, void *), void *data)
 {
-	return s->sess_proxy->clnt_funcs->regeventhandler(s->sess_proxy_data, event_handler, data);
+	s->sess_event_handler = event_handler;
+	s->sess_event_data = data;
+	return s->sess_proxy->clnt_funcs->regeventhandler(s->sess_proxy_data, session_event_handler, (void *)s);
 }
 
 int
