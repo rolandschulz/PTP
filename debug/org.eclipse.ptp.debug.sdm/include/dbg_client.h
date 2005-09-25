@@ -35,6 +35,7 @@
 void DbgClntInit(int);
 int DbgClntStartSession(char *, char *);
 int DbgClntQuit(void);
+int DbgClntIsShutdown(void);
 
 /*
  * Breakpoint operations
