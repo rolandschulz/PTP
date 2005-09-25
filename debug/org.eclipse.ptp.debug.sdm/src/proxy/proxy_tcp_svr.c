@@ -192,6 +192,7 @@ proxy_tcp_svr_accept(int fd, void *data)
 	socklen_t		fromlen;
 	SOCKET			ns;
 	struct sockaddr	addr;
+	dbg_event *		e;
 	
 	fromlen = sizeof(addr);
 	ns = accept(fd, &addr, &fromlen);
@@ -216,6 +217,10 @@ proxy_tcp_svr_accept(int fd, void *data)
 	conn->sock = ns;
 	
 	conn->helper->regreadfile(ns, proxy_tcp_svr_recv_msgs, (void *)conn);
+	
+	e = NewEvent(DBGEV_INIT);
+	e->num_servers = conn->helper->numservers();
+	proxy_tcp_svr_event_callback(e, data);
 	
 	return 0;
 	

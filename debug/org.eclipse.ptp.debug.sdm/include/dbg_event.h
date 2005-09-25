@@ -44,6 +44,11 @@ struct dbg_event {
 	procset *	procs;
 	
 	/*
+	 * DBGEV_INIT
+	 */
+	int num_servers;
+	
+	/*
 	 * DBGEV_BPHIT, DBGEV_BPSET
 	 */
 	breakpoint *	bp;

@@ -20,10 +20,14 @@
 #ifndef _SESSION_H_
 #define _SESSION_H_
 
+#include "dbg_event.h"
+
 struct session {
-	struct procset *	sess_procs;
+	int				sess_procs;
 	struct proxy *	sess_proxy;
 	void *			sess_proxy_data;
+	void				(*sess_event_handler)(dbg_event *, void *);
+	void *			sess_event_data;
 };
 typedef struct session	session;
 

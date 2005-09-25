@@ -34,19 +34,10 @@
 #define DBGRES_ERR			-1
 
 /*
- * Process set operations
- */
-void DbgCreateProcSet(int nprocs, procset **set);
-void DbgDestroyProcSet(procset *set);
-void DbgRemoveFromSet(procset *dst, procset *src);
-void DbgAddToSet(procset *dst, procset *src);
-void DbgAddProcToSet(procset *set, int pid);
-void DbgRemoveProcFromSet(procset *set, int pid);
-
-/*
  * Session control
  */
 int DbgInit(session **, char *, char *, ...);
+int	DbgConnect(session *);
 void DbgRegisterEventHandler(session *, void (*)(dbg_event *, void *), void *);
 int DbgStartSession(session *, char *, char *);
 int DbgQuit(session *);

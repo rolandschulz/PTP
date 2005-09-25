@@ -38,9 +38,13 @@ event_callback(dbg_event *e, void *data)
 		return;
 	}
 	
-	s = procset_to_set(e->procs);
-	printf("%s -> ", s);
-	free(s);
+	if (e->procs != NULL) {
+		s = procset_to_set(e->procs);
+		printf("%s ", s);
+		free(s);
+	}
+		
+	printf("-> ");
 	
 	switch (e->event) {
 	case DBGEV_ERROR:
@@ -48,6 +52,9 @@ event_callback(dbg_event *e, void *data)
 		break;
 	case DBGEV_OK:
 		printf("command ok\n");
+		break;
+	case DBGEV_INIT:
+		printf("debugger initilized\n");
 		break;
 	case DBGEV_BPHIT:
 		printf("hit breakpoint at line %d\n", e->bp->loc.line);
@@ -78,10 +85,14 @@ event_callback(dbg_event *e, void *data)
 		break;
 	}
 
-	procset_invert(e->procs);
-	procset_andeq(procs_outstanding, e->procs);
-	if (procset_isempty(procs_outstanding))
-		completed++;
+	if (e->procs != NULL) {
+		procset_invert(e->procs);
+		procset_andeq(procs_outstanding, e->procs);
+		if (!procset_isempty(procs_outstanding))
+			return;
+	}
+	
+	completed++;
 }
 
 void
@@ -91,20 +102,18 @@ wait_for_event(session *s, procset *p)
 	
 	if (p != NULL)
 		procs_outstanding = procset_copy(p);
-	else
-		procs_outstanding = procset_copy(s->sess_procs); 
 		
 	while (!completed) {
 		DbgProgress(s);
 	}
-		
-	procset_free(procs_outstanding);
+	
+	if (p != NULL)	
+		procset_free(procs_outstanding);
 }
 
 int
 main(int argc, char *argv[])
 {
-	int		i;
 	session *s;
 	procset *p1;
 	procset *p2;
@@ -115,20 +124,20 @@ main(int argc, char *argv[])
 	}
 	
 	DbgRegisterEventHandler(s, event_callback, NULL);
-	
-	s->sess_procs = procset_new(4); //TODO this should happen automatically!!!!
-	
-	DbgCreateProcSet(4, &p1);
-	for (i = 0; i < 4; i++)
-		DbgAddProcToSet(p1, i);
-	DbgCreateProcSet(4, &p2);
-	DbgAddProcToSet(p2, 0);
+
+	DbgConnect(s);
+	wait_for_event(s, NULL);
+
+	p1 = procset_new(s->sess_procs);
+	procset_invert(p1);
+	p2 = procset_new(s->sess_procs);
+	procset_add_proc(p2, 0);
 	
 	DbgStartSession(s, "yyy", NULL);
-	wait_for_event(s, NULL);
+	wait_for_event(s, p1);
 		
 	DbgStartSession(s, "xxx", NULL);
-	wait_for_event(s, NULL);
+	wait_for_event(s, p1);
 
 	DbgSetLineBreakpoint(s, p1, "yyy.c", 6);
 	wait_for_event(s, p1);
@@ -176,7 +185,7 @@ main(int argc, char *argv[])
 	wait_for_event(s, p1);
 
 	DbgQuit(s);
-	wait_for_event(s, NULL);
+	wait_for_event(s, p1);
 
 	exit(0);
 }

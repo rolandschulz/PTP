@@ -218,6 +218,10 @@ proxy_tcp_event_to_str(dbg_event *e, char **result)
  		asprintf(result, "%d %s", e->event, pstr);
 		break;
 
+	case DBGEV_INIT:
+ 		asprintf(result, "%d %s %d", e->event, pstr, e->num_servers);
+		break;
+	
 	case DBGEV_ERROR:
 		proxy_tcp_cstring_to_str(e->error_msg, &str);
  		asprintf(result, "%d %s %d %s", e->event, pstr, e->error_code, str);
@@ -467,6 +471,12 @@ proxy_tcp_str_to_event(char *str, dbg_event **ev)
 		e = NewEvent(DBGEV_OK);
 		break;
 	
+	case DBGEV_INIT:
+		e = NewEvent(DBGEV_INIT);
+		if (proxy_tcp_str_to_int(args[2], &e->num_servers) < 0)
+			goto error_out;
+		break;
+
 	case DBGEV_ERROR:
 		e = NewEvent(DBGEV_ERROR);
 		if (proxy_tcp_str_to_int(args[2], &e->error_code) < 0 ||

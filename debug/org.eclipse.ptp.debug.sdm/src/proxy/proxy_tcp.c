@@ -45,6 +45,7 @@ proxy_tcp_create_conn(proxy_tcp_conn **conn)
 	c->sock = INVALID_SOCKET;
 	c->host = NULL;
 	c->port = 0;
+	c->connected = 0;
 	c->buf_size = BUFSIZ;
 	c->buf = (char *)malloc(c->buf_size);
 	c->buf_pos = 0;
