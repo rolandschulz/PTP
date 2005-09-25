@@ -47,6 +47,8 @@ void DbgRemoveProcFromSet(procset *set, int pid);
  * Session control
  */
 int DbgInit(session **, char *, char *, ...);
+void DbgRegisterEventHandler(session *, void (*)(dbg_event *, void *), void *);
+int DbgStartSession(session *, char *, char *);
 int DbgQuit(session *);
 
 /*
@@ -65,8 +67,8 @@ int DbgStep(session *s, procset *set, int count, int type);
 /*
  * Stack frame operations
  */
-int DbgListStackFrames(session *s, procset *set, int current);
-int DbgSetCurrentStackFrame(session *s, procset *set, int level);
+int DbgListStackframes(session *s, procset *set, int current);
+int DbgSetCurrentStackframe(session *s, procset *set, int level);
 
 /*
  * Expression/variable operations
@@ -80,7 +82,7 @@ int DbgListGlobalVariables(session *s, procset *set);
 /*
  * Event Handling
  */
-int DbgProgress(session *, void (*)(dbg_event*));
+int DbgProgress(session *);
 
 /*
  * Error Handling
