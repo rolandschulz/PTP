@@ -87,6 +87,12 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIQuit
 };
 
+#define CHECK_SESSION() \
+	if (MIHandle == NULL) { \
+		DbgSetError(DBGERR_NOSESSION, NULL); \
+		return DBGRES_ERR; \
+	}
+	
 char *
 GetLastErrorStr(void)
 {
@@ -149,99 +155,6 @@ SetCurrFrame(void)
 }
 #endif
 
-#ifdef notdef
-static void
-SetAsync(char *host, int prog)
-{
-	if ( AsyncHost != NULL )
-		Free(AsyncHost);
-	
-	AsyncHost = strdup(host);
-	AsyncProg = prog;
-}
-
-dbgevent_t *
-AsyncBreakpointHit(void *arg)
-{
-	dbgevent_t *	e;
-	int 		bkpt = (int)arg;
-
-	if ( SetCurrFrame() < 0 )
-	{
-		EVENT_ERROR(e, DBGERR_DEBUGGER, GetLastErrorStr());
-		return e;
-	}
-
-
-	if ( (CurrBP = FindBPByID(BP, bkpt)) == NULL )
-	{
-		EVENT_ERROR(e, DBGERR_DEBUGGER, "bad breakpoint");
-		return e;
-	}
-
-	e = NewEvent(DBGEV_BPHIT);
-	e->ev_bp = DupBP(CurrBP);
-
-	return e;
-}
-
-dbgevent_t *
-AsyncStep(void *arg)
-{
-	dbgevent_t *	e;
-
-	if ( SetCurrFrame() < 0 )
-	{
-		EVENT_ERROR(e, DBGERR_DEBUGGER, GetLastErrorStr());
-		return e;
-	}
-
-	e = NewEvent(DBGEV_STEP);
-	e->ev_step_lno = CurrFrame->frame_loc.loc_line;
-	e->ev_step_frame = DupFrame(CurrFrame);
-	e->ev_step_line = LookupLine(CurrFrame->frame_loc.loc_file, CurrFrame->frame_loc.loc_line);
-
-	return e;
-}
-
-dbgevent_t *
-AsyncSignal(void *arg)
-{
-	dbgevent_t *	e;
-	char *		sig = (char *)arg;
-
-	if ( SetCurrFrame() < 0 )
-	{
-		Free(sig);
-		EVENT_ERROR(e, DBGERR_DEBUGGER, GetLastErrorStr());
-		return e;
-	}
-
-	e = NewEvent(DBGEV_SIGNAL);
-	e->ev_sig_type = sig;
-	e->ev_sig_frame = DupFrame(CurrFrame);
-	e->ev_sig_line = LookupLine(CurrFrame->frame_loc.loc_file, CurrFrame->frame_loc.loc_line);
-
-	return e;
-}
-
-dbgevent_t *
-AsyncExit(void *arg)
-{
-	dbgevent_t *	e;
-	int		exit_code = (int)arg;
-
-	e = NewEvent(DBGEV_EXIT);
-	e->ev_exit = exit_code;
-
-	if ( CurrFrame != NULL )
-		FreeFrame(CurrFrame);
-	CurrFrame = NULL;
-
-	return e;
-}
-#endif
-
 /*
 ** AsyncCallback is called by mi_get_response() when an async response is
 ** detected. It can't issue any gdb commands or there's a potential
@@ -264,7 +177,6 @@ AsyncCallback(mi_output *mio, void *data)
 	switch ( stop->reason )
 	{
 	case sr_bkpt_hit:
-		//AsyncCheck(AsyncBreakpointHit, (void *)stop->bkptno, AsyncHost, AsyncProg);
 		if ((bp = FindBreakpoint(Breakpoints, stop->bkptno)) == NULL)
 		{
 			DbgSetError(DBGERR_DEBUGGER, "bad breakpoint");
@@ -276,13 +188,11 @@ AsyncCallback(mi_output *mio, void *data)
 		break;
 
 	case sr_end_stepping_range:
-		//AsyncCheck(AsyncStep, NULL, AsyncHost, AsyncProg);
 		e = NewEvent(DBGEV_STEP);
 		break;
 
 	case sr_exited_signalled:
 	case sr_signal_received:
-		//AsyncCheck(AsyncSignal, (void *)strdup(stop->signal_name), AsyncHost, AsyncProg);
 		e = NewEvent(DBGEV_SIGNAL);
 		e->sig_name = strdup(stop->signal_name);
 		e->sig_meaning = strdup(stop->signal_meaning);
@@ -290,13 +200,11 @@ AsyncCallback(mi_output *mio, void *data)
 		break;
 
 	case sr_exited:
-		//AsyncCheck(AsyncExit, (void *)stop->exit_code, AsyncHost, AsyncProg);
 		e = NewEvent(DBGEV_EXIT);
 		e->exit_status = stop->exit_code;
 		break;
 
 	case sr_exited_normally:
-		//AsyncCheck(AsyncExit, 0, AsyncHost, AsyncProg);
 		e = NewEvent(DBGEV_EXIT);
 		e->exit_status = 0;
 		break;
@@ -390,7 +298,7 @@ GDBMIStartSession(char *prog, char *args)
 /*
  * Progress gdb commands.
  * 
- * @return	-1	error/server shutdown
+ * @return	-1	server shutdown
  * 			0	completed operation
  */
 static int	
@@ -400,9 +308,6 @@ GDBMIProgress(void)
 	int				res = 0;
 	struct timeval	tv;
 
-	if (MIHandle == NULL)
-		return 0;
-	
 	/*
 	 * Check for existing events
 	 */
@@ -411,8 +316,10 @@ GDBMIProgress(void)
 			EventCallback(LastEvent, EventCallbackData);
 		
 		if (ServerExit && LastEvent->event == DBGEV_OK) {
-			mi_disconnect(MIHandle);
-			MIHandle = NULL;
+			if (MIHandle != NULL) {
+				mi_disconnect(MIHandle);
+				MIHandle = NULL;
+			}
 			res = -1;
 		}
 			
@@ -421,6 +328,9 @@ GDBMIProgress(void)
 		
 		return res;
 	}
+	
+	if (MIHandle == NULL)
+		return 0;
 	
 	FD_ZERO(&fds);
 	FD_SET(MIHandle->from_gdb[0], &fds);
@@ -434,8 +344,11 @@ GDBMIProgress(void)
 			if ( errno == EINTR )
 				continue;
 		
-			perror("select");
-			return -1;
+			mi_disconnect(MIHandle);
+			MIHandle = NULL;
+		
+			DbgSetError(DBGERR_SELECT, strerror(errno));
+			return 0;
 		
 		case 0:
 			return 0;
@@ -447,8 +360,11 @@ GDBMIProgress(void)
 		break;
 	}
 	
-	if ( mi_get_response(MIHandle) < 0 )
-			return -1;
+	if ( mi_get_response(MIHandle) < 0 ) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		mi_disconnect(MIHandle);
+		MIHandle = NULL;
+	}
 
 	return 0;
 }
@@ -479,6 +395,8 @@ GDBMISetLineBreakpoint(char *file, int line)
 {
 	char *where;
 
+	CHECK_SESSION()
+
 	if ( file == NULL || *file == '\0' )
 		asprintf(&where, "%d", line);
 	else
@@ -494,6 +412,8 @@ static int
 GDBMISetFuncBreakpoint(char *file, char *func)
 {
 	char *where;
+
+	CHECK_SESSION()
 
 	if ( file == NULL || *file == '\0' )
 		asprintf(&where, "%s", func);
@@ -580,6 +500,8 @@ SetAndCheckBreak(char *where)
 static int
 GDBMIDeleteBreakpoint(int bpid)
 {
+	CHECK_SESSION()
+
 	if ( !gmi_break_delete(MIHandle, bpid) ) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
@@ -600,6 +522,8 @@ GDBMIGo(void)
 {
 	int res;
 	
+	CHECK_SESSION()
+
 	if (Started)
 		res = gmi_exec_continue(MIHandle);
 	else {
@@ -625,6 +549,8 @@ GDBMIStep(int count, int type)
 {
 	int		res;
 
+	CHECK_SESSION()
+
 	if ( type == 0 )
 		res = gmi_exec_next_cnt(MIHandle, count);
 	else
@@ -645,6 +571,8 @@ GDBMIStep(int count, int type)
 static int
 GDBMISetCurrentStackframe(int level)
 {
+	CHECK_SESSION()
+
 	if (!gmi_stack_select_frame(MIHandle, level))
 	{
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
@@ -668,6 +596,8 @@ GDBMIListStackframes(int current)
 	mi_frames *	f;
 	mi_frames *	frames;
 	
+	CHECK_SESSION()
+
 	if (current)
 		frames = gmi_stack_info_frame(MIHandle);
 	else
@@ -1039,6 +969,8 @@ GDBMIGetType(char *var)
 	mi_gvar *	gvar;
 	str_ptr		fds;
 
+	CHECK_SESSION()
+
 	gvar = gmi_var_create(MIHandle, -1, var);
 
 	if ( gvar == NULL )
@@ -1073,6 +1005,8 @@ GDBMIGetLocalVariables(void)
 	dbg_event *	e;
 	mi_results *	c;
 	mi_results *	res;
+
+	CHECK_SESSION()
 
 	res = gmi_stack_list_locals(MIHandle, 0);
 
@@ -1109,6 +1043,8 @@ GDBMIGetLocalVariables(void)
 static int
 GDBMIGetArguments(void)
 {
+	CHECK_SESSION()
+
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return DBGRES_ERR;
 }
@@ -1119,6 +1055,8 @@ GDBMIGetArguments(void)
 static int
 GDBMIGetGlobalVariables(void)
 {
+	CHECK_SESSION()
+
 	DbgSetError(DBGERR_NOTIMP, NULL);
 	return DBGRES_ERR;
 }
@@ -1129,9 +1067,12 @@ GDBMIGetGlobalVariables(void)
 static int
 GDBMIQuit(void)
 {
-	gmi_gdb_exit(MIHandle);
+	if (MIHandle != NULL)
+		gmi_gdb_exit(MIHandle);
+		
 	SaveEvent(NewEvent(DBGEV_OK));
 	ServerExit++;
+	
 	return DBGRES_OK;
 }
 
