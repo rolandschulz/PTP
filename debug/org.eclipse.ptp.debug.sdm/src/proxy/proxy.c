@@ -21,11 +21,11 @@
  * Miscellaneous proxy functions.
  */
  
- #include <stdio.h>
- #include <string.h>
+#include <stdio.h>
+#include <string.h>
  
- #include "session.h"
- #include "proxy.h"
+#include "session.h"
+#include "proxy.h"
 
 int
 find_proxy(char *name, proxy **pp)
