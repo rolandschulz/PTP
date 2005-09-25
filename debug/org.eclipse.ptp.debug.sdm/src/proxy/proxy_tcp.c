@@ -49,6 +49,7 @@ proxy_tcp_create_conn(proxy_tcp_conn **conn)
 	c->buf = (char *)malloc(c->buf_size);
 	c->buf_pos = 0;
 	c->total_read = 0;
+	c->msg_len = 0;
 	c->helper = NULL;
 	
 	*conn = c;
@@ -84,7 +85,6 @@ tcp_recv(proxy_tcp_conn *conn)
 	}
 	
 	n = recv(conn->sock, &conn->buf[conn->buf_pos], conn->buf_size - conn->total_read, 0);
-	
 	if (n <= 0) {
 		if (n < 0)
 			perror("recv");
@@ -113,11 +113,11 @@ tcp_send(proxy_tcp_conn *conn, char *buf, int len)
 			conn->sock = INVALID_SOCKET;			
 			return -1;
 		}
-printf("send %s\n", buf);
+
 		len -= n;
 		buf += n;
 	}
-	
+
 	return 0;
 }
 
@@ -155,7 +155,7 @@ static int
 proxy_tcp_get_msg_len(proxy_tcp_conn *conn)
 {
 	char *	end;
-	
+
 	/*
 	 * If we haven't read enough then return for more...
 	 */
@@ -181,17 +181,15 @@ proxy_tcp_copy_msg(proxy_tcp_conn *conn, char **result)
 	int	n = conn->msg_len;
 	
 	*result = (char *)malloc(conn->msg_len + 1);
-	memcpy(*result, &conn->buf[MAX_MSG_LEN_SIZE+1], conn->msg_len);
+	memcpy(*result, &conn->buf[MAX_MSG_LEN_SIZE + 1], conn->msg_len);
 	(*result)[conn->msg_len] = '\0';
 	
 	/*
 	 * Move rest of buffer down if necessary
 	 */
-	if (conn->total_read > conn->msg_len + MAX_MSG_LEN_SIZE+1) {
-printf("adjusting total_read from %d ", conn->total_read);
+	if (conn->total_read > conn->msg_len + MAX_MSG_LEN_SIZE + 1) {
 		conn->total_read -= conn->msg_len + MAX_MSG_LEN_SIZE + 1;
-printf("to %d\n", conn->total_read);
-		memcpy(conn->buf, &conn->buf[conn->msg_len + MAX_MSG_LEN_SIZE+1], conn->total_read);
+		memmove(conn->buf, &conn->buf[conn->msg_len + MAX_MSG_LEN_SIZE + 1], conn->total_read);
 	} else {
 		conn->buf_pos = 0;
 		conn->total_read = 0;
@@ -214,27 +212,36 @@ proxy_tcp_get_msg_body(proxy_tcp_conn *conn, char **result)
 	return proxy_tcp_copy_msg(conn, result);
 }
 
-/**
- * Receive a buffer from a remote peer and assemble the buffer into a message. proxy_tcp_recv_msg() may
- * need to be called repeatedly to assemble the message. Once the message is available, it is
- * returned to the caller.
+/*
+ * Receive a buffer from a remote peer. It is possible that this buffer may contain a partial
+ * message or a number of completed messages.
  * 
- * @return 
- * 	-1:	error
- * 	 0: read complete, no result available yet
- * 	>0: result available, length returned
  */
 int
-proxy_tcp_recv_msg(proxy_tcp_conn *conn, char **result)
+proxy_tcp_recv_msgs(proxy_tcp_conn *conn)
 {
-	int		n;
-	
 	/*
 	 * Get whatever is available
 	 */
 	if (tcp_recv(conn) < 0)
 		return -1;
 		
+	return 0;
+}
+
+/*
+ * Get the first available message from the buffer. Repeated calls will get subsequent
+ * messages from the buffer.
+ * 
+ * @return	0	no messages available
+ * 			>0	message available, length returned
+ * 			-1	error
+ */
+int
+proxy_tcp_get_msg(proxy_tcp_conn *conn, char **result)
+{
+	int	n;
+	
 	if (conn->msg_len == 0 && (n = proxy_tcp_get_msg_len(conn)) <= 0)
 		return n;
 		
