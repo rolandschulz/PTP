@@ -34,6 +34,10 @@
 #define HANDLER_SIGNAL	2
 #define HANDLER_EVENT		3
 
+#define SHUTDOWN_CANCELLED	0
+#define SHUTDOWN_STARTED		1
+#define SHUTDOWN_COMPLETED	2
+
 struct dbg_event_handler {
 	int		htype;
 	void *	data;
@@ -57,6 +61,7 @@ struct dbg_event_handler {
 };
 typedef struct dbg_event_handler	dbg_event_handler;
 
+static int			dbg_shutdown;
 static List *		dbg_event_handlers = NULL;
 static procset *		dbg_procs = NULL;
 static struct timeval	TIMEOUT = { 0, 1000 };
@@ -104,9 +109,23 @@ dbg_clnt_cmd_completed(dbg_event *e, void *data)
 	
 	while ((h = (dbg_event_handler *)GetListElement(dbg_event_handlers)) != NULL) {
 		if (h->htype == HANDLER_EVENT) {
-			h->event_handler(e, data);
+			h->event_handler(e, h->data);
 		}
 	}
+	
+	/*
+	 * The next event received after a quit command
+	 * must be the server shutting down.
+	 */
+	if (dbg_shutdown == SHUTDOWN_STARTED)
+		dbg_shutdown = SHUTDOWN_COMPLETED;
+}
+
+static void
+fix_null(char **str)
+{
+	if (*str == NULL)
+		*str = "";
 }
 
 void
@@ -122,6 +141,17 @@ DbgClntInit(int num_svrs)
 	 */
 	dbg_procs = procset_new(num_svrs);
 	procset_invert(dbg_procs);
+	
+	/*
+	 * Reset shutdown flag
+	 */
+	dbg_shutdown = SHUTDOWN_CANCELLED;
+}
+
+int
+DbgClntIsShutdown(void)
+{
+	return dbg_shutdown == SHUTDOWN_COMPLETED;
 }
 
 int 
@@ -130,8 +160,8 @@ DbgClntStartSession(char *prog, char *args)
 	int		res;
 	char *	cmd;
 	
-	if (args == NULL)
-		args = "";
+	fix_null(&prog);
+	fix_null(&args);
 		
 	asprintf(&cmd, "INI \"%s\" \"%s\"", prog, args);
 	res = ClntSendCommand(dbg_procs, cmd, NULL);
@@ -147,6 +177,8 @@ DbgClntSetLineBreakpoint(procset *set, char *file, int line)
 {
 	int		res;
 	char *	cmd;
+
+	fix_null(&file);
 	
 	asprintf(&cmd, "SLB \"%s\" %d", file, line);
 	res = ClntSendCommand(set, cmd, NULL);
@@ -159,6 +191,9 @@ DbgClntSetFuncBreakpoint(procset *set, char *file, char *func)
 {
 	int		res;
 	char *	cmd;
+
+	fix_null(&file);
+	fix_null(&func);
 	
 	asprintf(&cmd, "SFB \"%s\" \"%s\"", file, func);
 	res = ClntSendCommand(set, cmd, NULL);
@@ -235,6 +270,8 @@ DbgClntEvaluateExpression(procset *set, char *expr)
 	int		res;
 	char *	cmd;
 	
+	fix_null(&expr);
+	
 	asprintf(&cmd, "EEX \"%s\"", expr);
 	res = ClntSendCommand(set, cmd, NULL);
 	free(cmd);
@@ -246,6 +283,8 @@ DbgClntGetType(procset *set, char *expr)
 {
 	int		res;
 	char *	cmd;
+	
+	fix_null(&expr);
 	
 	asprintf(&cmd, "TYP \"%s\"", expr);
 	res = ClntSendCommand(set, cmd, NULL);
@@ -274,6 +313,8 @@ DbgClntListGlobalVariables(procset *set)
 int 
 DbgClntQuit(void)
 {
+	dbg_shutdown = SHUTDOWN_STARTED;
+	
 	return ClntSendCommand(dbg_procs, "QUI", NULL);
 }
 
@@ -335,25 +376,25 @@ DbgClntProgress(void)
 		
 		case 0:
 			/*
-			 * Timeout. Drop through...
+			 * Timeout.
 			 */
+			 break;
 			 		
 		default:
-			break;
+			SetList(dbg_event_handlers);
+			
+			while ((h = (dbg_event_handler *)GetListElement(dbg_event_handlers)) != NULL) {
+				if (h->htype == HANDLER_FILE
+					&& ((h->file_type & READ_FILE_HANDLER && FD_ISSET(h->fd, &rfds))
+						|| (h->file_type & WRITE_FILE_HANDLER && FD_ISSET(h->fd, &wfds))
+						|| (h->file_type & EXCEPT_FILE_HANDLER && FD_ISSET(h->fd, &efds)))
+					&& h->file_handler(h->fd, h->data) < 0)
+					return -1;
+			}
+			
 		}
 	
 		break;
-	}
-	
-	SetList(dbg_event_handlers);
-	
-	while ((h = (dbg_event_handler *)GetListElement(dbg_event_handlers)) != NULL) {
-		if (h->htype == HANDLER_FILE
-			&& ((h->file_type & READ_FILE_HANDLER && FD_ISSET(h->fd, &rfds))
-				|| (h->file_type & WRITE_FILE_HANDLER && FD_ISSET(h->fd, &wfds))
-				|| (h->file_type & EXCEPT_FILE_HANDLER && FD_ISSET(h->fd, &efds)))
-			&& h->file_handler(h->fd, h->data) < 0)
-			return -1;
 	}
 	
 	/*************************************
