@@ -267,6 +267,71 @@ str_to_procset(char *str)
 	return p;
 }
 
+int
+emit_range(char ** str, char sep, int lower, int upper)
+{
+	int			n;
+	
+	if (lower < 0 || upper < lower)
+		return 0;
+		
+	if (sep)
+		*(*str)++ = sep;
+		
+	if (lower != upper) {
+		n = sprintf(*str, "%d-%d", lower, upper);
+	} else {
+		n = sprintf(*str, "%d", lower);
+	}
+	
+	*str += n;
+	
+	return 1;
+}
+
+/*
+ * Convert procset to set notation of the form
+ * 
+ * 	{0-2,4,5-100}
+ */
+char *
+procset_to_set(procset *p)
+{
+	int			proc;
+	int			lower;
+	int			upper;
+	char			sep = 0;
+	char *		str;
+	char *		s;
+	
+	if (p == NULL)
+		return strdup("{}");
+		
+	str = s = (char *)malloc(p->ps_nprocs * 2 + 3);
+
+	*s++ = '{';
+	
+	for (proc = 0, lower = -1, upper = -1; proc < p->ps_nprocs; proc++) {	
+		if (procset_test(p, proc)) {
+			if (lower < 0)
+				lower = proc;
+			
+			upper = proc;
+		} else {
+			if (emit_range(&s, sep, lower, upper))
+				sep = ',';
+			lower = proc + 1;
+		}
+	}
+	
+	emit_range(&s, sep, lower, upper);
+	
+	*s++ = '}';
+	*s = '\0';
+	
+	return str;
+}
+
 /**
  * Number of processes in the set (as opposed to the total size of the set)
  */
