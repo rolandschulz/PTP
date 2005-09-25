@@ -36,7 +36,7 @@ static char * dbg_error_tab[] =
 	"Must register callback first",
 	"Callback in progress",
 	"No server to register callback",
-	"Could not create callback",
+	"Must start session first",
 	"Session already established",
 	"No line %s in file ",
 	"Function \"%s\" not defined",
