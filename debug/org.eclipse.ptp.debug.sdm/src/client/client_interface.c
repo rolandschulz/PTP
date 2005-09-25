@@ -62,10 +62,12 @@ DbgInit(session **s, char *proxy, char *attr, ...)
 	int		res;
 	
 	*s = malloc(sizeof(session));
+	
 	if (find_proxy(proxy, &(*s)->sess_proxy) < 0) {
 		free(*s);
 		return -1;
 	}
+	
 	va_start(ap, attr);
 	res = (*s)->sess_proxy->clnt_funcs->init(&data, attr, ap);
 	va_end(ap);
@@ -74,8 +76,22 @@ DbgInit(session **s, char *proxy, char *attr, ...)
 		free(*s);
 		return -1;
 	}
+	
 	(*s)->sess_proxy_data = data;
+	
 	return 0;
+}
+
+void
+DbgRegisterEventHandler(session *s, void (*event_handler)(dbg_event *, void *), void *data)
+{
+	return s->sess_proxy->clnt_funcs->regeventhandler(s->sess_proxy_data, event_handler, data);
+}
+
+int
+DbgStartSession(session *s, char *prog, char *args)
+{
+	return s->sess_proxy->clnt_funcs->startsession(s->sess_proxy_data, prog, args);
 }
 
 /*
@@ -172,7 +188,7 @@ DbgQuit(session *s)
  * Event handling
  */
 int
-DbgProgress(session *s, void (*event_callback)(dbg_event *))
+DbgProgress(session *s)
 {
-	return s->sess_proxy->clnt_funcs->progress(s->sess_proxy_data, event_callback);
+	return s->sess_proxy->clnt_funcs->progress(s->sess_proxy_data);
 }

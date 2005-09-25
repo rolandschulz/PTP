@@ -29,6 +29,8 @@
 
 struct proxy_clnt_funcs {
 	int (*init)(void **, char *, va_list);
+	void (*regeventhandler)(void *, void (*)(dbg_event *, void *), void *);
+	int (*startsession)(void *, char *, char *);
 	int (*setlinebreakpoint)(void *, struct procset *, char *, int);
 	int (*setfuncbreakpoint)(void *, struct procset *, char *, char *);
 	int (*deletebreakpoint)(void *, struct procset *, int);
@@ -42,16 +44,18 @@ struct proxy_clnt_funcs {
 	int (*listarguments)(void *, struct procset *);
 	int (*listglobalvariables)(void *, struct procset *);
 	int (*quit)(void *);
-	int (*progress)(void *, void (*)(dbg_event *));
+	int (*progress)(void *);
 };
 typedef struct proxy_clnt_funcs	proxy_clnt_funcs;
 
 struct proxy_svr_helper_funcs {
-	void (*shutdown)(void);
+	int (*newconn)(void);
+	int (*shutdown_completed)(void);
 	void (*regreadfile)(int, int (*)(int, void *), void *); 
 	void (*unregreadfile)(int); 
 	void (*regeventhandler)(void (*)(dbg_event *, void *), void *);
 	int (*progress)(void);
+	int (*startsession)(char *, char *);
 	int (*setlinebreakpoint)(struct procset *, char *, int);
 	int (*setfuncbreakpoint)(struct procset *, char *, char *);
 	int (*deletebreakpoint)(struct procset *, int);
