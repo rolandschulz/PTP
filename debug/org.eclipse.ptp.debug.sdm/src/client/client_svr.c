@@ -121,7 +121,7 @@ ClntSendCommand(procset *procs, char *str, void *data)
 	int				cmd_len;
 	procset *		p;
 	active_request *	r;
-printf("sending command %s\n", str);	
+
 	/*
 	 * Check if any processes already have active requests
 	 */
