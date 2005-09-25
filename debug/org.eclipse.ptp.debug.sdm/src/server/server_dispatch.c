@@ -69,7 +69,6 @@ static svr_cmd svr_cmd_tab[] =
 	{"QUI",	svr_quit},
 };
 
-static int			svr_shutdown = 0;
 static int			svr_res;
 static void			(*svr_event_callback)(dbg_event *, void *);
 static void *		svr_data;
@@ -106,7 +105,7 @@ svr_dispatch(dbg_backend *db, char *cmd)
 		DbgSetError(DBGERR_PROTO, "Unknown command");
 	}
 	
-	return svr_shutdown;
+	return 0;
 }
 
 int
