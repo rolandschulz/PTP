@@ -61,6 +61,13 @@ procset_isempty(procset *p)
 	return BITVECTOR_ISEMPTY(p->ps_procs);
 }
 
+
+void	
+procset_clear(procset *p)
+{
+	return BITVECTOR_CLEAR(p->ps_procs);
+}
+
 procset *	
 procset_and(procset *p1, procset *p2)
 {
