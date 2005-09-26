@@ -214,7 +214,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		resumeAction.setEnabled(isEnabled);
 		stepIntoAction.setEnabled(isEnabled);
 		stepOverAction.setEnabled(isEnabled);
-		stepReturnAction.setEnabled(isEnabled);
+		//stepReturnAction.setEnabled(isEnabled);
 	}
 	public void updateTerminateButton(BitList tasks, IElementSet set, BitList targetTasks) {
 		if (set == null || tasks == null)
