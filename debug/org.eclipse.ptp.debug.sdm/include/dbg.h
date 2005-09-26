@@ -29,6 +29,7 @@
 #include "dbg_error.h"
 #include "dbg_event.h"
 #include "list.h"
+#include "proxy.h"
 
 #define DBGRES_OK			0
 #define DBGRES_ERR			-1

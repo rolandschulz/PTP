@@ -19,11 +19,25 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <errno.h>
 
 #include "dbg.h"
 #include "session.h"
 #include "proxy.h"
 #include "procset.h"
+#include "handler.h"
+
+static struct timeval	TIMEOUT = { 0, 1000 };
+
+static void session_event_handler(dbg_event *, void *);
+
+static proxy_clnt_helper_funcs helper_funcs = {
+	RegisterFileHandler,
+	UnregisterFileHandler,
+	session_event_handler,
+	NULL
+};
 
 /*
  * Intercept INIT events to obtain number of procs
@@ -33,11 +47,12 @@ session_event_handler(dbg_event *e, void *data)
 {
 	session *	s = (session *)data;
 	
-	if (e->event == DBGEV_INIT) {
+	if (e != NULL && e->event == DBGEV_INIT) {
 		s->sess_procs = e->num_servers;
 	}
 	
-	s->sess_event_handler(e, s->sess_event_data);
+	if (s->sess_event_handler != NULL)
+		s->sess_event_handler(e, s->sess_event_data);
 }
 
 /*
@@ -57,8 +72,11 @@ DbgInit(session **s, char *proxy, char *attr, ...)
 		return -1;
 	}
 	
+	helper_funcs.eventdata = (void *)(*s);
+	(*s)->sess_proxy->clnt_helper_funcs = &helper_funcs;
+	
 	va_start(ap, attr);
-	res = (*s)->sess_proxy->clnt_funcs->init(&data, attr, ap);
+	res = (*s)->sess_proxy->clnt_funcs->init(&helper_funcs, &data, attr, ap);
 	va_end(ap);
 	
 	if (res < 0) {
@@ -67,6 +85,7 @@ DbgInit(session **s, char *proxy, char *attr, ...)
 	}
 	
 	(*s)->sess_proxy_data = data;
+	(*s)->sess_event_handler = NULL;
 	
 	return 0;
 }
@@ -74,21 +93,13 @@ DbgInit(session **s, char *proxy, char *attr, ...)
 int
 DbgConnect(session *s)
 {
-	return s->sess_proxy->clnt_funcs->connect(s->sess_proxy_data);
+	return s->sess_proxy->clnt_funcs->connect(s->sess_proxy, s->sess_proxy_data);
 }
 
 int
 DbgAccept(session *s)
 {
 	return s->sess_proxy->clnt_funcs->accept(s->sess_proxy_data);
-}
-
-void
-DbgRegisterEventHandler(session *s, void (*event_handler)(dbg_event *, void *), void *data)
-{
-	s->sess_event_handler = event_handler;
-	s->sess_event_data = data;
-	return s->sess_proxy->clnt_funcs->regeventhandler(s->sess_proxy_data, session_event_handler, (void *)s);
 }
 
 int
@@ -193,5 +204,116 @@ DbgQuit(session *s)
 int
 DbgProgress(session *s)
 {
+	fd_set			rfds;
+	fd_set			wfds;
+	fd_set			efds;
+	int				res;
+	int				nfds = 0;
+	struct timeval	tv;
+	handler *		h;
+
+	/*
+	 * Set up fd sets
+	 */
+	FD_ZERO(&rfds);
+	FD_ZERO(&wfds);
+	FD_ZERO(&efds);
+	
+	for (SetHandler(); (h = GetHandler()) != NULL; ) {
+		if (h->htype == HANDLER_FILE) {
+			if (h->file_type & READ_FILE_HANDLER)
+				FD_SET(h->fd, &rfds);
+			if (h->file_type & WRITE_FILE_HANDLER)
+				FD_SET(h->fd, &wfds);
+			if (h->file_type & EXCEPT_FILE_HANDLER)
+				FD_SET(h->fd, &efds);
+			if (h->fd > nfds)
+				nfds = h->fd;
+		}
+	}
+	
+	tv = TIMEOUT;
+	
+	for ( ;; ) {
+		res = select(nfds+1, &rfds, &wfds, &efds, &tv);
+	
+		switch (res) {
+		case INVALID_SOCKET:
+			if ( errno == EINTR )
+				continue;
+		
+			perror("select");
+			return -1;
+		
+		case 0:
+			/*
+			 * Timeout.
+			 */
+			 break;
+			 		
+		default:
+			for (SetHandler(); (h = GetHandler()) != NULL; ) {
+				if (h->htype == HANDLER_FILE
+					&& ((h->file_type & READ_FILE_HANDLER && FD_ISSET(h->fd, &rfds))
+						|| (h->file_type & WRITE_FILE_HANDLER && FD_ISSET(h->fd, &wfds))
+						|| (h->file_type & EXCEPT_FILE_HANDLER && FD_ISSET(h->fd, &efds)))
+					&& h->file_handler(h->fd, h->data) < 0)
+					return -1;
+			}
+			
+		}
+	
+		break;
+	}
+
 	return s->sess_proxy->clnt_funcs->progress(s->sess_proxy_data);
+}
+
+void
+DbgRegisterEventHandler(session *s, void (*event_callback)(dbg_event *, void *), void *data)
+{
+	s->sess_event_handler = event_callback;
+	s->sess_event_data = data;
+	RegisterEventHandler(session_event_handler, (void *)s);
+	//s->sess_proxy->clnt_funcs->regeventhandler(s->sess_proxy_data, session_event_handler, (void *)s);
+}
+
+/**
+ * Unregister file descriptor handler
+ */
+void
+DbgUnregisterEventHandler(session *s, void (*event_callback)(dbg_event *, void *))
+{
+	s->sess_event_handler = NULL;
+	UnregisterEventHandler(session_event_handler);
+}
+
+/**
+ * Register a handler for file descriptor events.
+ */
+void
+DbgRegisterReadFileHandler(session *s, int fd, int (*file_handler)(int, void *), void *data)
+{
+	RegisterFileHandler(fd, READ_FILE_HANDLER, file_handler, data);
+}
+
+void
+DbgRegisterWriteFileHandler(session *s, int fd, int (*file_handler)(int, void *), void *data)
+{
+	RegisterFileHandler(fd, WRITE_FILE_HANDLER, file_handler, data);
+}
+
+void
+DbgRegisterExceptFileHandler(session *s, int fd, int (*file_handler)(int, void *), void *data)
+{
+	RegisterFileHandler(fd, EXCEPT_FILE_HANDLER, file_handler, data);
+}
+
+/**
+ * Unregister file descriptor handler
+ */
+void
+DbgUnregisterFileHandler(session *s, int fd)
+{
+	UnregisterFileHandler(fd);
 }
