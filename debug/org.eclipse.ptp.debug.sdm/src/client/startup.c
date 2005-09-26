@@ -24,17 +24,19 @@
 
 #include "backend.h"
 #include "proxy.h"
+#include "proxy_tcp.h"
 
 #define DEFAULT_BACKEND	"gdb-mi"
 #define DEFAULT_PROXY		"tcp"
 
-extern void client(int, int, proxy *);
+extern void client(int, int, proxy *, char *, int);
 extern void server(int, int, dbg_backend *);
 
 static struct option longopts[] = {
 	{"debugger",	required_argument,	NULL,	'b'},
 	{"proxy",	required_argument,	NULL, 	'P'}, 
 	{"port",		required_argument,	NULL, 	'p'}, 
+	{"host",		required_argument,	NULL, 	'h'}, 
 	{NULL,		0,					NULL,	0}
 };
 
@@ -55,7 +57,9 @@ error_msg(int rank, char *fmt, ...)
  * Main entry point for MPI parallel debugger.
  * 
  * @arg	-b debugger	select backend debugger
- * @arg	-p port		port number to listen on
+ * @arg	-p port		port number to listen on/connect to
+ * @arg	-h host		host to connect to
+ * @arg	-P proxy		type of proxy connection to use
  */
 int
 main(int argc, char *argv[])
@@ -63,13 +67,14 @@ main(int argc, char *argv[])
 	int 				rank;
 	int 				size;
 	int				ch;
-	int				port;
+	int				port = PROXY_TCP_PORT;
+	char *			host = NULL;
 	char *			debugger_str = DEFAULT_BACKEND;
 	char *			proxy_str = DEFAULT_PROXY;
 	proxy *			p;
 	dbg_backend *	d;
 	
-	while ((ch = getopt_long(argc, argv, "b:P:p:", longopts, NULL)) != -1)
+	while ((ch = getopt_long(argc, argv, "b:P:p:h:", longopts, NULL)) != -1)
 	switch (ch) {
 	case 'b':
 		debugger_str = optarg;
@@ -80,8 +85,11 @@ main(int argc, char *argv[])
 	case 'p':
 		port = atoi(optarg);
 		break;
+	case 'h':
+		host = optarg;
+		break;
 	default:
-		fprintf(stderr, "sdm [--debugger=value] [--proxy=proxy] [--port=list-port]\n");
+		fprintf(stderr, "sdm [--debugger=value] [--proxy=proxy] [--host=host_name] [--port=list-port]\n");
 		exit(1);
 	}
 	
@@ -117,7 +125,7 @@ main(int argc, char *argv[])
 	}
 	
 	if (rank == size-1) {
-		client(size - 1, rank, p);
+		client(size - 1, rank, p, host, port);
 	} else {
 		server(size - 1, rank, d);
 	}

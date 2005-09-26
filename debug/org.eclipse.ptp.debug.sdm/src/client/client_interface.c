@@ -77,6 +77,12 @@ DbgConnect(session *s)
 	return s->sess_proxy->clnt_funcs->connect(s->sess_proxy_data);
 }
 
+int
+DbgAccept(session *s)
+{
+	return s->sess_proxy->clnt_funcs->accept(s->sess_proxy_data);
+}
+
 void
 DbgRegisterEventHandler(session *s, void (*event_handler)(dbg_event *, void *), void *data)
 {

@@ -125,7 +125,12 @@ main(int argc, char *argv[])
 	
 	DbgRegisterEventHandler(s, event_callback, NULL);
 
+#ifdef TEST_ACCEPT
+	DbgAccept(s);
+#else 
 	DbgConnect(s);
+#endif
+
 	wait_for_event(s, NULL);
 
 	p1 = procset_new(s->sess_procs);

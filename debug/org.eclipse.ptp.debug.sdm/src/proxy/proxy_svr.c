@@ -38,10 +38,19 @@ proxy_svr_init(proxy *p, proxy_svr_helper_funcs *funcs)
 }
 
 int
-proxy_svr_create(proxy *p, void **data)
+proxy_svr_create(proxy *p, int port, void **data)
 {
 	if (p != NULL)
-		return p->svr_funcs->create(p->svr_helper_funcs, data);
+		return p->svr_funcs->create(p->svr_helper_funcs, port, data);
+		
+	return -1;
+}
+
+int
+proxy_svr_connect(proxy *p, char *host, int port, void **data)
+{
+	if (p != NULL)
+		return p->svr_funcs->connect(p->svr_helper_funcs, host, port, data);
 		
 	return -1;
 }
