@@ -461,7 +461,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				// System.out.println("-------------------- terminate ------------------------");
 				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
 				fireTerminatedEvent(job, event.getAllProcesses().toBitList());
-				condition = job.isAllStop() ? new Boolean(true) : null;
+				if (job.isAllStop()) {
+					condition = new Boolean(true);
+					annotationMgr.removeAnnotationGroup(job.getIDString());
+				}
 			} else if (event instanceof BreakpointHitEvent) {
 				// do nothing in breakpoint hit event
 				continue;
@@ -553,5 +556,14 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
 		session.stepFinish(set_id);
+	}
+	
+	public void removeJob(IPJob job) {
+		super.removeJob(job);
+		try {
+			PCDIDebugModel.deletePBreakpointBySet(job.getIDString());
+		} catch (CoreException e) {
+			PTPDebugUIPlugin.log(e);
+		}
 	}
 }
