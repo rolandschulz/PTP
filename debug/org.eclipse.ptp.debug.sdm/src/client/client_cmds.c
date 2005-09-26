@@ -28,73 +28,18 @@
 #include "dbg_client.h"
 #include "client_srv.h"
 #include "procset.h"
+#include "handler.h"
 #include "list.h"
-
-#define HANDLER_FILE		1
-#define HANDLER_SIGNAL	2
-#define HANDLER_EVENT		3
 
 #define SHUTDOWN_CANCELLED	0
 #define SHUTDOWN_STARTED		1
 #define SHUTDOWN_COMPLETED	2
 
-struct dbg_event_handler {
-	int		htype;
-	void *	data;
-		
-	/*
-	 * HANDLER_FILE
-	 */
-	int		file_type;
-	int		fd;
-	int		(*file_handler)(int, void *);
-	
-	/*
-	 * HANDLER_SIGNAL
-	 */
-	int		signal;
-
-	/*
-	 * HANDLER_EVENT
-	 */
-	 void 	(*event_handler)(dbg_event *, void *);
-};
-typedef struct dbg_event_handler	dbg_event_handler;
-
 static int			dbg_shutdown;
-static List *		dbg_event_handlers = NULL;
 static procset *		dbg_procs = NULL;
+static proxy *		dbg_proxy;
+static void *		dbg_proxy_data;
 static struct timeval	TIMEOUT = { 0, 1000 };
-
-/**
- * Create an event handler structure and add it to the list of handlers
- */
-static dbg_event_handler *
-new_dbg_event_handler(int type, void *data)
-{
-	dbg_event_handler *	h;
-	
-	if (dbg_event_handlers == NULL)
-		dbg_event_handlers = NewList();
-		
-	h = (dbg_event_handler *)malloc(sizeof(dbg_event_handler));
-	h->htype = type;
-	h->data = data;
-	
-	AddToList(dbg_event_handlers, (void *)h);
-	
-	return h;
-}
-
-/**
- * Remove handler from list and dispose of memory
- */
-static void
-destroy_dbg_event_handler(dbg_event_handler *h)
-{
-	RemoveFromList(dbg_event_handlers, (void *)h);
-	free(h);
-}
 
 /**
  * A send command is completed. Process the result and 
@@ -103,11 +48,9 @@ destroy_dbg_event_handler(dbg_event_handler *h)
 static void
 dbg_clnt_cmd_completed(dbg_event *e, void *data)
 {
-	dbg_event_handler *	h;
+	handler *	h;
 
-	SetList(dbg_event_handlers);
-	
-	while ((h = (dbg_event_handler *)GetListElement(dbg_event_handlers)) != NULL) {
+	for (SetHandler(); (h = GetHandler()) != NULL; ) {
 		if (h->htype == HANDLER_EVENT) {
 			h->event_handler(e, h->data);
 		}
@@ -129,7 +72,7 @@ fix_null(char **str)
 }
 
 void
-DbgClntInit(int num_svrs)
+DbgClntInit(int num_svrs, proxy *p, proxy_svr_helper_funcs *funcs)
 {
 	/*
 	 * Initialize client/server interface
@@ -146,6 +89,30 @@ DbgClntInit(int num_svrs)
 	 * Reset shutdown flag
 	 */
 	dbg_shutdown = SHUTDOWN_CANCELLED;
+	
+	/*
+	 * Save proxy
+	 */
+	dbg_proxy = p;
+	
+	proxy_svr_init(p, funcs);
+}
+
+int
+DbgClntCreateSession(char *host, int port)
+{
+	if (proxy_svr_create(dbg_proxy, port, &dbg_proxy_data) < 0) {
+		fprintf(stderr, "proxy_svr_create failed\n");
+		return -1;
+	}
+	
+	return 0;
+}
+
+void
+DbgClntFinish(void)
+{
+	proxy_svr_finish(dbg_proxy, dbg_proxy_data);
 }
 
 int
@@ -324,17 +291,14 @@ DbgClntQuit(void)
 int
 DbgClntProgress(void)
 {
-	fd_set				rfds;
-	fd_set				wfds;
-	fd_set				efds;
-	int					res;
-	int					nfds = 0;
-	struct timeval		tv;
-	dbg_event_handler *	h;
+	fd_set			rfds;
+	fd_set			wfds;
+	fd_set			efds;
+	int				res;
+	int				nfds = 0;
+	struct timeval	tv;
+	handler *		h;
 
-	if (dbg_event_handlers == NULL || EmptyList(dbg_event_handlers))
-		return 0;
-	
 	/***********************************
 	 * First: Check for any file events
 	 */
@@ -346,9 +310,7 @@ DbgClntProgress(void)
 	FD_ZERO(&wfds);
 	FD_ZERO(&efds);
 	
-	SetList(dbg_event_handlers);
-	
-	while ((h = (dbg_event_handler *)GetListElement(dbg_event_handlers)) != NULL) {
+	for (SetHandler(); (h = GetHandler()) != NULL; ) {
 		if (h->htype == HANDLER_FILE) {
 			if (h->file_type & READ_FILE_HANDLER)
 				FD_SET(h->fd, &rfds);
@@ -381,9 +343,7 @@ DbgClntProgress(void)
 			 break;
 			 		
 		default:
-			SetList(dbg_event_handlers);
-			
-			while ((h = (dbg_event_handler *)GetListElement(dbg_event_handlers)) != NULL) {
+			for (SetHandler(); (h = GetHandler()) != NULL; ) {
 				if (h->htype == HANDLER_FILE
 					&& ((h->file_type & READ_FILE_HANDLER && FD_ISSET(h->fd, &rfds))
 						|| (h->file_type & WRITE_FILE_HANDLER && FD_ISSET(h->fd, &wfds))
@@ -403,23 +363,24 @@ DbgClntProgress(void)
 	 
 	ClntProgressCmds();
 	
-	return 0;
+	/**************************************
+	 * Third: Check for proxy events
+	 */
+	 
+	return proxy_svr_progress(dbg_proxy, dbg_proxy_data);
 }
 
 void
 DbgClntRegisterEventHandler(void (*event_callback)(dbg_event *, void *), void *data)
 {
-	dbg_event_handler *	h;
-	static int			registered = 0;
+	static int	registered = 0;
 	
 	if (registered == 0) {
 		ClntRegisterCallback(dbg_clnt_cmd_completed);
 		registered++;
 	}
 
-	h = new_dbg_event_handler(HANDLER_EVENT, NULL);
-	h->event_handler = event_callback;
-	h->data = data;
+	RegisterEventHandler(event_callback, data);
 }
 
 /**
@@ -428,17 +389,7 @@ DbgClntRegisterEventHandler(void (*event_callback)(dbg_event *, void *), void *d
 void
 DbgClntUnregisterEventHandler(void (*event_callback)(dbg_event *, void *))
 {
-	dbg_event_handler *	h;
-
-	if (dbg_event_handlers == NULL || EmptyList(dbg_event_handlers))
-		return;
-		
-	SetList(dbg_event_handlers);
-	
-	while ((h = (dbg_event_handler *)GetListElement(dbg_event_handlers)) != NULL) {
-		if (h->htype == HANDLER_EVENT && h->event_handler == event_callback)
-			destroy_dbg_event_handler(h);
-	}
+	UnregisterEventHandler(event_callback);
 }
 
 /**
@@ -447,14 +398,21 @@ DbgClntUnregisterEventHandler(void (*event_callback)(dbg_event *, void *))
  * TODO: Should the handler return a value?
  */
 void
-DbgClntRegisterFileHandler(int fd, int type, int (*handler)(int, void *), void *data)
+DbgClntRegisterReadFileHandler(int fd, int (*file_handler)(int, void *), void *data)
 {
-	dbg_event_handler *	h;
-	
-	h = new_dbg_event_handler(HANDLER_FILE, data);
-	h->file_type = type;
-	h->fd = fd;
-	h->file_handler = handler;
+	RegisterFileHandler(fd, READ_FILE_HANDLER, file_handler, data);
+}
+
+void
+DbgClntRegisterWriteFileHandler(int fd, int (*file_handler)(int, void *), void *data)
+{
+	RegisterFileHandler(fd, WRITE_FILE_HANDLER, file_handler, data);
+}
+
+void
+DbgClntRegisterExceptFileHandler(int fd, int (*file_handler)(int, void *), void *data)
+{
+	RegisterFileHandler(fd, EXCEPT_FILE_HANDLER, file_handler, data);
 }
 
 /**
@@ -463,18 +421,5 @@ DbgClntRegisterFileHandler(int fd, int type, int (*handler)(int, void *), void *
 void
 DbgClntUnregisterFileHandler(int fd)
 {
-	dbg_event_handler *	h;
-
-	if (dbg_event_handlers == NULL || EmptyList(dbg_event_handlers))
-		return;
-		
-	SetList(dbg_event_handlers);
-	
-	while ((h = (dbg_event_handler *)GetListElement(dbg_event_handlers)) != NULL) {
-		if (h->htype == HANDLER_FILE && h->fd == fd)
-		{
-			RemoveFromList(dbg_event_handlers, (void *)h);
-			free(h);
-		}
-	}
+	UnregisterFileHandler(fd);
 }
