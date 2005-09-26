@@ -41,7 +41,8 @@
 #include "proxy_tcp.h"
 #include "procset.h"
 
-static int	proxy_tcp_svr_create(proxy_svr_helper_funcs *, void **);
+static int	proxy_tcp_svr_create(proxy_svr_helper_funcs *, int, void **);
+static int	proxy_tcp_svr_connect(proxy_svr_helper_funcs *, char *, int, void **);
 static int	proxy_tcp_svr_progress(proxy_svr_helper_funcs *, void *);
 static void	proxy_tcp_svr_finish(proxy_svr_helper_funcs *, void *);
 
@@ -52,6 +53,7 @@ static int	proxy_tcp_svr_dispatch(proxy_tcp_conn *, char *);
 proxy_svr_funcs proxy_tcp_svr_funcs =
 {
 	proxy_tcp_svr_create,
+	proxy_tcp_svr_connect,
 	proxy_tcp_svr_progress,
 	proxy_tcp_svr_finish,
 };
@@ -128,7 +130,7 @@ printf("SVR reply <%s>\n", str);
  * @return conn structure containing server socket and port
  */
 static int 
-proxy_tcp_svr_create(proxy_svr_helper_funcs *helper, void **data)
+proxy_tcp_svr_create(proxy_svr_helper_funcs *helper, int port, void **data)
 {
 	socklen_t			slen;
 	SOCKET				sd;
@@ -143,7 +145,7 @@ proxy_tcp_svr_create(proxy_svr_helper_funcs *helper, void **data)
 	
 	memset (&sname, 0, sizeof(sname));
 	sname.sin_family = PF_INET;
-	sname.sin_port = htons(PROXY_TCP_PORT);
+	sname.sin_port = htons(port);
 	sname.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	if (bind(sd,(struct sockaddr *) &sname, sizeof(sname)) == SOCKET_ERROR )
@@ -183,6 +185,72 @@ proxy_tcp_svr_create(proxy_svr_helper_funcs *helper, void **data)
 }
 
 /**
+ * Connect to a remote proxy.
+ */
+static int
+proxy_tcp_svr_connect(proxy_svr_helper_funcs *helper, char *host, int port, void **data)
+{
+	SOCKET				sd;
+	struct hostent *		hp;
+	long int				haddr;
+	struct sockaddr_in	scket;
+	dbg_event *			e;
+	proxy_tcp_conn *		conn = (proxy_tcp_conn *)data;
+		        
+	if (host == NULL) {
+		fprintf(stderr, "no host specified\n");
+		return -1;
+	}
+	
+	hp = gethostbyname(host);
+	        
+	if (hp == (struct hostent *)NULL) {
+		fprintf(stderr, "could not find host \"%s\"\n", host);
+		return -1;
+	}
+	
+	haddr = ((hp->h_addr[0] & 0xff) << 24) |
+			((hp->h_addr[1] & 0xff) << 16) |
+			((hp->h_addr[2] & 0xff) <<  8) |
+			((hp->h_addr[3] & 0xff) <<  0);
+	
+	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
+	{
+		perror("socket");
+		return -1;
+	}
+	
+	memset (&scket,0,sizeof(scket));
+	scket.sin_family = PF_INET;
+	scket.sin_port = htons((u_short) port);
+	scket.sin_addr.s_addr = htonl(haddr);
+	
+	if ( connect(sd, (struct sockaddr *) &scket, sizeof(scket)) == SOCKET_ERROR )
+	{
+		perror("connect");
+		CLOSE_SOCKET(sd);
+		return -1;
+	}
+
+	proxy_tcp_create_conn(&conn);
+	
+	conn->sess_sock = sd;
+	conn->host = strdup(host);
+	conn->port = port;
+	conn->helper = helper;
+	*data = (void *)conn;
+	
+	helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
+	helper->regreadfile(sd, proxy_tcp_svr_recv_msgs, (void *)conn);
+	
+	e = NewEvent(DBGEV_INIT);
+	e->num_servers = conn->helper->numservers();
+	proxy_tcp_svr_event_callback(e, data);
+	
+	return 0;
+}
+
+/**
  * Accept a new proxy connection. Register dispatch routine.
  */
 static int
@@ -204,7 +272,7 @@ proxy_tcp_svr_accept(int fd, void *data)
 	/*
 	 * Only allow one connection at a time.
 	 */
-	if (conn->sock != INVALID_SOCKET) {
+	if (conn->sess_sock != INVALID_SOCKET) {
 		CLOSE_SOCKET(ns); // reject
 		return 0;
 	}
@@ -214,7 +282,7 @@ proxy_tcp_svr_accept(int fd, void *data)
 		return 0;
 	}
 	
-	conn->sock = ns;
+	conn->sess_sock = ns;
 	
 	conn->helper->regreadfile(ns, proxy_tcp_svr_recv_msgs, (void *)conn);
 	
@@ -234,10 +302,10 @@ proxy_tcp_svr_finish(proxy_svr_helper_funcs *helper, void *data)
 {
 	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
 	
-	if (conn->sock != INVALID_SOCKET) {
-		helper->unregreadfile(conn->sock);
-		CLOSE_SOCKET(conn->sock);
-		conn->sock = INVALID_SOCKET;
+	if (conn->sess_sock != INVALID_SOCKET) {
+		helper->unregreadfile(conn->sess_sock);
+		CLOSE_SOCKET(conn->sess_sock);
+		conn->sess_sock = INVALID_SOCKET;
 	}
 	
 	if (conn->svr_sock != INVALID_SOCKET) {

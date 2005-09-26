@@ -44,7 +44,9 @@ struct timeval	SELECT_TIMEOUT = {0, 1000};
 
 static int proxy_tcp_clnt_init(void **, char *, va_list);
 static int proxy_tcp_clnt_connect(void *);
+static int proxy_tcp_clnt_accept(void *);
 static void proxy_tcp_clnt_regeventhandler(void *, void (*)(dbg_event *, void *), void *);
+static int proxy_tcp_clnt_progress(void *);
 static int proxy_tcp_clnt_startsession(void *, char *, char *);
 static int proxy_tcp_clnt_setlinebreakpoint(void *, procset *, char *, int);
 static int proxy_tcp_clnt_setfuncbreakpoint(void *, procset *, char *, char *);
@@ -59,13 +61,14 @@ static int proxy_tcp_clnt_listlocalvariables(void *, procset *);
 static int proxy_tcp_clnt_listarguments(void *, procset *);
 static int proxy_tcp_clnt_listglobalvariables(void *, procset *);
 static int proxy_tcp_clnt_quit(void *);
-static int proxy_tcp_clnt_progress(void *);
 
 proxy_clnt_funcs proxy_tcp_clnt_funcs =
 {
 	proxy_tcp_clnt_init,
 	proxy_tcp_clnt_connect,
+	proxy_tcp_clnt_accept,
 	proxy_tcp_clnt_regeventhandler,
+	proxy_tcp_clnt_progress,
 	proxy_tcp_clnt_startsession,
 	proxy_tcp_clnt_setlinebreakpoint,
 	proxy_tcp_clnt_setfuncbreakpoint,
@@ -80,7 +83,6 @@ proxy_clnt_funcs proxy_tcp_clnt_funcs =
 	proxy_tcp_clnt_listarguments,
 	proxy_tcp_clnt_listglobalvariables,
 	proxy_tcp_clnt_quit,
-	proxy_tcp_clnt_progress,
 };
 
 static int
@@ -191,10 +193,83 @@ proxy_tcp_clnt_connect(void *data)
 		return -1;
 	}
 
-	conn->sock = sd;
+	conn->sess_sock = sd;
 	conn->connected++;
 	
 	return 0;
+}
+
+static int 
+proxy_tcp_clnt_accept(void *data)
+{
+	socklen_t			slen;
+	SOCKET				sd;
+	struct sockaddr_in	sname;
+	proxy_tcp_conn *		conn = (proxy_tcp_conn *)data;
+	
+	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
+	{
+		fprintf(stderr, "socket error");
+		return -1;
+	}
+	
+	memset (&sname, 0, sizeof(sname));
+	sname.sin_family = PF_INET;
+	sname.sin_port = htons(conn->port);
+	sname.sin_addr.s_addr = htonl(INADDR_ANY);
+	
+	if (bind(sd,(struct sockaddr *) &sname, sizeof(sname)) == SOCKET_ERROR )
+	{
+		fprintf(stderr, "bind error\n");
+		CLOSE_SOCKET(sd);
+		return -1;
+	}
+	
+	slen = sizeof(sname);
+	
+	if ( getsockname(sd, (struct sockaddr *)&sname, &slen) == SOCKET_ERROR )
+	{
+		fprintf(stderr, "getsockname error\n");
+		CLOSE_SOCKET(sd);
+		return -1;
+	}
+	
+	if ( listen(sd, 5) == SOCKET_ERROR )
+	{
+		fprintf(stderr, "listen error\n");
+		CLOSE_SOCKET(sd);
+		return -1;
+	}
+	
+	return 0;
+}
+
+static int
+proxy_tcp_clnt_complete_accept(int fd, void *data)
+{
+	SOCKET				ns;
+	socklen_t			fromlen;
+	struct sockaddr		addr;
+	proxy_tcp_conn *		conn = (proxy_tcp_conn *)data;\
+	dbg_event *			e;
+	
+	fromlen = sizeof(addr);
+	ns = accept(fd, &addr, &fromlen);
+	if (ns < 0) {
+		perror("accept");
+		return 0;
+	}
+	
+	conn->sess_sock = ns;
+	
+	//conn->helper->regreadfile(ns, proxy_tcp_svr_recv_msgs, (void *)conn);
+	
+	e = NewEvent(DBGEV_INIT);
+	e->num_servers = conn->helper->numservers();
+	//proxy_tcp_svr_event_callback(e, data);
+	
+	return 0;
+	
 }
 
 static void
@@ -204,6 +279,67 @@ proxy_tcp_clnt_regeventhandler(void *data, void (*event_handler)(dbg_event *, vo
 	
 	conn->event_handler = event_handler;
 	conn->event_data = event_data;
+}
+
+static int 
+proxy_tcp_clnt_progress(void *data)
+{
+	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
+	fd_set			fds;
+	int				res;
+	char *			result;
+	dbg_event *		ev;
+	struct timeval	tv;
+
+	FD_ZERO(&fds);
+	FD_SET(conn->sess_sock, &fds);
+	tv = SELECT_TIMEOUT;
+	
+	for ( ;; ) {
+		res = select(conn->sess_sock+1, &fds, NULL, NULL, &tv);
+	
+		switch (res) {
+		case INVALID_SOCKET:
+			if ( errno == EINTR )
+				continue;
+		
+			perror("select");
+			return -1;
+		
+		case 0:
+			break;
+		
+		default:
+			if ( !FD_ISSET(conn->sess_sock, &fds) )
+			{
+				fprintf(stderr, "select on bad socket\n");
+				return -1;
+			}
+			
+			if (proxy_tcp_recv_msgs(conn) < 0)
+				return -1;
+				
+			break;
+		}
+	
+		break;
+	}
+	
+	if ((res = proxy_tcp_get_msg(conn, &result)) <= 0)
+		return res;
+	
+	if (proxy_tcp_str_to_event(result, &ev) < 0) {
+		fprintf(stderr, "bad response");
+		free(result);
+		return -1;
+	}
+	
+	free(result);
+	
+	if (conn->event_handler)
+		conn->event_handler(ev, conn->event_data);
+	
+	return 0;
 }
 
 static int
@@ -424,65 +560,4 @@ proxy_tcp_clnt_quit(void *data)
 	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
 	
 	return proxy_tcp_clnt_send_cmd(conn, "QUI");
-}
-
-static int 
-proxy_tcp_clnt_progress(void *data)
-{
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-	fd_set			fds;
-	int				res;
-	char *			result;
-	dbg_event *		ev;
-	struct timeval	tv;
-
-	FD_ZERO(&fds);
-	FD_SET(conn->sock, &fds);
-	tv = SELECT_TIMEOUT;
-	
-	for ( ;; ) {
-		res = select(conn->sock+1, &fds, NULL, NULL, &tv);
-	
-		switch (res) {
-		case INVALID_SOCKET:
-			if ( errno == EINTR )
-				continue;
-		
-			perror("select");
-			return -1;
-		
-		case 0:
-			break;
-		
-		default:
-			if ( !FD_ISSET(conn->sock, &fds) )
-			{
-				fprintf(stderr, "select on bad socket\n");
-				return -1;
-			}
-			
-			if (proxy_tcp_recv_msgs(conn) < 0)
-				return -1;
-				
-			break;
-		}
-	
-		break;
-	}
-	
-	if ((res = proxy_tcp_get_msg(conn, &result)) <= 0)
-		return res;
-	
-	if (proxy_tcp_str_to_event(result, &ev) < 0) {
-		fprintf(stderr, "bad response");
-		free(result);
-		return -1;
-	}
-	
-	free(result);
-	
-	if (conn->event_handler)
-		conn->event_handler(ev, conn->event_data);
-	
-	return 0;
 }

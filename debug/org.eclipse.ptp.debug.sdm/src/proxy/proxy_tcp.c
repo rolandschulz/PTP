@@ -42,7 +42,7 @@ proxy_tcp_create_conn(proxy_tcp_conn **conn)
 	
 	c = (proxy_tcp_conn *) malloc(sizeof(proxy_tcp_conn));
 		
-	c->sock = INVALID_SOCKET;
+	c->sess_sock = INVALID_SOCKET;
 	c->host = NULL;
 	c->port = 0;
 	c->connected = 0;
@@ -85,12 +85,12 @@ tcp_recv(proxy_tcp_conn *conn)
 		conn->buf = (char *)realloc(conn->buf, conn->buf_size);
 	}
 	
-	n = recv(conn->sock, &conn->buf[conn->buf_pos], conn->buf_size - conn->total_read, 0);
+	n = recv(conn->sess_sock, &conn->buf[conn->buf_pos], conn->buf_size - conn->total_read, 0);
 	if (n <= 0) {
 		if (n < 0)
 			perror("recv");
-		CLOSE_SOCKET(conn->sock);
-		conn->sock = INVALID_SOCKET;
+		CLOSE_SOCKET(conn->sess_sock);
+		conn->sess_sock = INVALID_SOCKET;
 		return -1;
 	}
 	
@@ -106,12 +106,12 @@ tcp_send(proxy_tcp_conn *conn, char *buf, int len)
 	int		n;
 
 	while ( len > 0 ) {
-		n = send(conn->sock, buf, len, 0);
+		n = send(conn->sess_sock, buf, len, 0);
 		if (n <= 0) {
 			if (n < 0)
 				perror("recv");
-			CLOSE_SOCKET(conn->sock);
-			conn->sock = INVALID_SOCKET;			
+			CLOSE_SOCKET(conn->sess_sock);
+			conn->sess_sock = INVALID_SOCKET;			
 			return -1;
 		}
 

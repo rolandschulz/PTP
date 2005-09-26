@@ -93,7 +93,7 @@ proxy_svr_helper_funcs helper_funcs = {
 };
 
 void 
-client(int svr_num, int task_id, proxy *p)
+client(int svr_num, int task_id, proxy *p, char *host, int port)
 {
 	void *	pc;
 
@@ -103,11 +103,26 @@ client(int svr_num, int task_id, proxy *p)
 	
 	proxy_svr_init(p, &helper_funcs);
 	
-	if (proxy_svr_create(p, &pc) < 0) {
-		fprintf(stderr, "proxy_svr_create failed\n");
-		DbgClntQuit(); //TODO fixme!
-		DbgClntProgress();
-		return;
+	if (host != NULL) {
+		/*
+		 * Try to connect to host:port
+		 */
+		if (proxy_svr_connect(p, host, port, &pc) < 0) {
+			fprintf(stderr, "proxy_svr_connect failed\n");
+			DbgClntQuit(); //TODO fixme!
+			DbgClntProgress();
+			return;
+		}
+	} else {
+		/*
+		 * Listen for incoming connections
+		 */
+		if (proxy_svr_create(p, port, &pc) < 0) {
+			fprintf(stderr, "proxy_svr_create failed\n");
+			DbgClntQuit(); //TODO fixme!
+			DbgClntProgress();
+			return;
+		}
 	}
 	
 	for (;;) {

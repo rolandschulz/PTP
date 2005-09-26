@@ -28,9 +28,18 @@
 #include "dbg_event.h"
 
 struct proxy_clnt_funcs {
+	/*
+	 * Service functions
+	 */
 	int (*init)(void **, char *, va_list);
 	int (*connect)(void *);
+	int (*accept)(void *);
 	void (*regeventhandler)(void *, void (*)(dbg_event *, void *), void *);
+	int (*progress)(void *);
+	
+	/*
+	 * Protocol functions
+	 */
 	int (*startsession)(void *, char *, char *);
 	int (*setlinebreakpoint)(void *, struct procset *, char *, int);
 	int (*setfuncbreakpoint)(void *, struct procset *, char *, char *);
@@ -45,11 +54,13 @@ struct proxy_clnt_funcs {
 	int (*listarguments)(void *, struct procset *);
 	int (*listglobalvariables)(void *, struct procset *);
 	int (*quit)(void *);
-	int (*progress)(void *);
 };
 typedef struct proxy_clnt_funcs	proxy_clnt_funcs;
 
 struct proxy_svr_helper_funcs {
+	/*
+	 * Service functions
+	 */
 	int (*newconn)(void);
 	int (*numservers)(void);
 	int (*shutdown_completed)(void);
@@ -57,6 +68,10 @@ struct proxy_svr_helper_funcs {
 	void (*unregreadfile)(int); 
 	void (*regeventhandler)(void (*)(dbg_event *, void *), void *);
 	int (*progress)(void);
+	
+	/*
+	 * Protocol functions
+	 */
 	int (*startsession)(char *, char *);
 	int (*setlinebreakpoint)(struct procset *, char *, int);
 	int (*setfuncbreakpoint)(struct procset *, char *, char *);
@@ -75,7 +90,8 @@ struct proxy_svr_helper_funcs {
 typedef struct proxy_svr_helper_funcs	proxy_svr_helper_funcs;
 
 struct proxy_svr_funcs {
-	int (*create)(struct proxy_svr_helper_funcs *, void **);
+	int (*create)(struct proxy_svr_helper_funcs *, int, void **);
+	int (*connect)(struct proxy_svr_helper_funcs *, char *, int, void **);
 	int (*progress)(struct proxy_svr_helper_funcs *, void *);
 	void (*finish)(struct proxy_svr_helper_funcs *, void *);
 };
@@ -93,7 +109,8 @@ extern proxy 	proxies[];
 
 extern int	find_proxy(char *, proxy **);
 extern void	proxy_svr_init(proxy *, proxy_svr_helper_funcs *);
-extern int	proxy_svr_create(proxy *, void **);
+extern int	proxy_svr_create(proxy *, int, void **);
+extern int	proxy_svr_connect(proxy *, char *, int, void **);
 extern int	proxy_svr_progress(proxy *, void *);
 extern void	proxy_svr_finish(proxy *, void *);
 
