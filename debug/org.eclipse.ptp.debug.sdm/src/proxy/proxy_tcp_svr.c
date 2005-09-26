@@ -244,7 +244,7 @@ proxy_tcp_svr_connect(proxy_svr_helper_funcs *helper, char *host, int port, void
 	helper->regreadfile(sd, proxy_tcp_svr_recv_msgs, (void *)conn);
 	
 	e = NewEvent(DBGEV_INIT);
-	e->num_servers = conn->helper->numservers();
+	e->num_servers = ((proxy_svr_helper_funcs *)conn->helper)->numservers();
 	proxy_tcp_svr_event_callback(e, data);
 	
 	return 0;
@@ -277,17 +277,17 @@ proxy_tcp_svr_accept(int fd, void *data)
 		return 0;
 	}
 	
-	if (conn->helper->newconn() < 0) {
+	if (((proxy_svr_helper_funcs *)conn->helper)->newconn() < 0) {
 		CLOSE_SOCKET(ns); // reject
 		return 0;
 	}
 	
 	conn->sess_sock = ns;
 	
-	conn->helper->regreadfile(ns, proxy_tcp_svr_recv_msgs, (void *)conn);
+	((proxy_svr_helper_funcs *)conn->helper)->regreadfile(ns, proxy_tcp_svr_recv_msgs, (void *)conn);
 	
 	e = NewEvent(DBGEV_INIT);
-	e->num_servers = conn->helper->numservers();
+	e->num_servers = ((proxy_svr_helper_funcs *)conn->helper)->numservers();
 	proxy_tcp_svr_event_callback(e, data);
 	
 	return 0;
