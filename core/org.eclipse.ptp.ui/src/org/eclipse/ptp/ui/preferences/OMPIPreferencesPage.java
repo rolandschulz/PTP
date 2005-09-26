@@ -215,6 +215,8 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		preferences.setValue(PreferenceConstants.ORTE_ORTED_ARGS, ortedArgs);
 
 		PTPCorePlugin.getDefault().savePluginPreferences();
+		
+		System.out.println("Saved!");
 
 		return true;
 	}
@@ -270,6 +272,7 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		if (!isValidORTEdSetting())
 			return;
 
+		performOk();
 		setValid(true);
 	}
 
