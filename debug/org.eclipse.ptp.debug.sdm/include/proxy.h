@@ -27,12 +27,22 @@
 #include "stackframe.h"
 #include "dbg_event.h"
 
+struct proxy;
+
+struct proxy_clnt_helper_funcs {
+	void (*regfile)(int, int, int (*)(int, void *), void *); 
+	void (*unregfile)(int); 
+	void (*eventhandler)(dbg_event *, void *);
+	void *eventdata;
+};
+typedef struct proxy_clnt_helper_funcs	proxy_clnt_helper_funcs;
+
 struct proxy_clnt_funcs {
 	/*
 	 * Service functions
 	 */
-	int (*init)(void **, char *, va_list);
-	int (*connect)(void *);
+	int (*init)(struct proxy_clnt_helper_funcs *, void **, char *, va_list);
+	int (*connect)(struct proxy *, void *);
 	int (*accept)(void *);
 	void (*regeventhandler)(void *, void (*)(dbg_event *, void *), void *);
 	int (*progress)(void *);
@@ -67,8 +77,7 @@ struct proxy_svr_helper_funcs {
 	void (*regreadfile)(int, int (*)(int, void *), void *); 
 	void (*unregreadfile)(int); 
 	void (*regeventhandler)(void (*)(dbg_event *, void *), void *);
-	int (*progress)(void);
-	
+
 	/*
 	 * Protocol functions
 	 */
@@ -100,6 +109,7 @@ typedef struct proxy_svr_funcs	proxy_svr_funcs;
 struct proxy {
 	char *							name;
 	struct proxy_clnt_funcs *			clnt_funcs;
+	struct proxy_clnt_helper_funcs *	clnt_helper_funcs;
 	struct proxy_svr_funcs *			svr_funcs;
 	struct proxy_svr_helper_funcs *	svr_helper_funcs;
 };
