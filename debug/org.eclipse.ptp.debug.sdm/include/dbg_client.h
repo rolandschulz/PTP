@@ -29,7 +29,7 @@
 /*
  * Session control
  */
-void DbgClntInit(int, proxy *, proxy_svr_helper_funcs *);
+int DbgClntInit(int, char *, proxy_svr_helper_funcs *);
 int DbgClntCreateSession(char *, int);
 int DbgClntStartSession(char *, char *);
 int DbgClntQuit(void);
