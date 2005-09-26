@@ -44,15 +44,6 @@
 static int num_servers;
 
 /*
- * Called by proxy to register a file descriptor
- */
-static void
-reg_read_file_handler(int fd, int (*handler)(int, void *), void *data)
-{
-	DbgClntRegisterFileHandler(fd, READ_FILE_HANDLER, handler, data);
-}
-
-/*
  * Called by proxy when a new connection
  * is establised.
  */
@@ -68,14 +59,13 @@ server_count(void)
 	return num_servers;
 }
 
-proxy_svr_helper_funcs helper_funcs = {
+static proxy_svr_helper_funcs helper_funcs = {
 	new_connection,
 	server_count,
 	DbgClntIsShutdown,
-	reg_read_file_handler,
+	DbgClntRegisterReadFileHandler,
 	DbgClntUnregisterFileHandler,
 	DbgClntRegisterEventHandler,
-	DbgClntProgress,
 	DbgClntStartSession,
 	DbgClntSetLineBreakpoint,
 	DbgClntSetFuncBreakpoint,
@@ -95,40 +85,20 @@ proxy_svr_helper_funcs helper_funcs = {
 void 
 client(int svr_num, int task_id, proxy *p, char *host, int port)
 {
-	void *	pc;
-
 	num_servers = svr_num;
 	
-	DbgClntInit(svr_num);
+	DbgClntInit(svr_num, p, &helper_funcs);
 	
-	proxy_svr_init(p, &helper_funcs);
-	
-	if (host != NULL) {
-		/*
-		 * Try to connect to host:port
-		 */
-		if (proxy_svr_connect(p, host, port, &pc) < 0) {
-			fprintf(stderr, "proxy_svr_connect failed\n");
-			DbgClntQuit(); //TODO fixme!
-			DbgClntProgress();
-			return;
-		}
-	} else {
-		/*
-		 * Listen for incoming connections
-		 */
-		if (proxy_svr_create(p, port, &pc) < 0) {
-			fprintf(stderr, "proxy_svr_create failed\n");
-			DbgClntQuit(); //TODO fixme!
-			DbgClntProgress();
-			return;
-		}
+	if (DbgClntCreateSession(host, port) < 0) {
+		DbgClntQuit(); //TODO fixme!
+		DbgClntProgress();
+		return;
 	}
 	
 	for (;;) {
-		if (proxy_svr_progress(p, pc) < 0)
+		if (DbgClntProgress() < 0)
 			break;
 	}
-		
-	proxy_svr_finish(p, pc);
+	
+	DbgClntFinish();	
 }
