@@ -83,13 +83,12 @@ static proxy_svr_helper_funcs helper_funcs = {
 };
 
 void 
-client(int svr_num, int task_id, proxy *p, char *host, int port)
+client(int svr_num, int task_id, char *proxy, char *host, int port)
 {
 	num_servers = svr_num;
 	
-	DbgClntInit(svr_num, p, &helper_funcs);
-	
-	if (DbgClntCreateSession(host, port) < 0) {
+	if (DbgClntInit(svr_num, proxy, &helper_funcs) < 0 ||
+			DbgClntCreateSession(host, port) < 0) {
 		DbgClntQuit(); //TODO fixme!
 		DbgClntProgress();
 		return;
