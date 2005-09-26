@@ -27,8 +27,8 @@
 extern proxy_svr_funcs 	proxy_tcp_svr_funcs;
 
 proxy proxies[] = {
-	{"tcp", NULL, &proxy_tcp_svr_funcs},
-	{NULL, NULL, NULL}
+	{"tcp", NULL, NULL,  &proxy_tcp_svr_funcs, NULL},
+	{NULL, NULL, NULL, NULL, NULL}
 };
 
 void
