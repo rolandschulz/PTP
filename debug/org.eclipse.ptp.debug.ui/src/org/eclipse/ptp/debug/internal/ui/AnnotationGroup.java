@@ -64,6 +64,9 @@ public class AnnotationGroup {
 	public boolean isEmpty() {
 		return annotationList.isEmpty();
 	}
+	public void clear() {
+		annotationList.clear();
+	}
 	public void removeAllMarkers() {
 		for (Iterator i = annotationList.iterator(); i.hasNext();) {
 			((PInstructionPointerAnnotation) i.next()).deleteMarker();
