@@ -29,7 +29,7 @@
 #define DEFAULT_BACKEND	"gdb-mi"
 #define DEFAULT_PROXY		"tcp"
 
-extern void client(int, int, proxy *, char *, int);
+extern void client(int, int, char *, char *, int);
 extern void server(int, int, dbg_backend *);
 
 static struct option longopts[] = {
@@ -125,7 +125,7 @@ main(int argc, char *argv[])
 	}
 	
 	if (rank == size-1) {
-		client(size - 1, rank, p, host, port);
+		client(size - 1, rank, proxy_str, host, port);
 	} else {
 		server(size - 1, rank, d);
 	}
