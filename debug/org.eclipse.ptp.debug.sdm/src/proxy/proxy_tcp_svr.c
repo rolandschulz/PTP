@@ -333,8 +333,6 @@ proxy_tcp_svr_progress(proxy_svr_helper_funcs *helper, void *data)
 		proxy_tcp_svr_dispatch(conn, msg);
 		free(msg);
 	}
-			
-	helper->progress();
 	
 	if (proxy_tcp_svr_shutdown && helper->shutdown_completed())
 		return -1;
