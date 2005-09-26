@@ -74,6 +74,11 @@ int DbgListGlobalVariables(session *s, procset *set);
  * Event Handling
  */
 int DbgProgress(session *);
+void DbgRegisterReadFileHandler(session *s, int, int (*)(int, void *), void *);
+void DbgRegisterWriteFileHandler(session *s, int, int (*)(int, void *), void *);
+void DbgRegisterExceptFileHandler(session *s, int, int (*)(int, void *), void *);
+void DbgUnregisterFileHandler(session *s, int);
+void DbgRegisterEventHandler(session *s, void (*)(dbg_event *, void *), void *);
 
 /*
  * Error Handling
