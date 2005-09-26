@@ -71,8 +71,8 @@ fix_null(char **str)
 		*str = "";
 }
 
-void
-DbgClntInit(int num_svrs, proxy *p, proxy_svr_helper_funcs *funcs)
+int
+DbgClntInit(int num_svrs, char *proxy, proxy_svr_helper_funcs *funcs)
 {
 	/*
 	 * Initialize client/server interface
@@ -91,11 +91,15 @@ DbgClntInit(int num_svrs, proxy *p, proxy_svr_helper_funcs *funcs)
 	dbg_shutdown = SHUTDOWN_CANCELLED;
 	
 	/*
-	 * Save proxy
+	 * Initialize proxy
 	 */
-	dbg_proxy = p;
+	if (find_proxy(proxy, &dbg_proxy) < 0) {
+		return -1;
+	}
 	
-	proxy_svr_init(p, funcs);
+	proxy_svr_init(dbg_proxy, funcs);
+	
+	return 0;
 }
 
 int
