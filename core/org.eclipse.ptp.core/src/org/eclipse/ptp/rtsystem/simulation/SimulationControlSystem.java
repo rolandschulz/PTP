@@ -149,6 +149,15 @@ public class SimulationControlSystem implements IControlSystem {
 
 	public void terminateJob(IPJob jobName) {
 		String tname = (String)jobName.getAttribute(AttributeConstants.ATTRIB_NAME);
+		
+		IPProcess[] ps = jobName.getProcesses();
+		for(int i=0; i<ps.length; i++) {
+			ps[i].setTerminated(true);
+			if(ps[i] instanceof SimProcess) {
+				((java.lang.Process)ps[i]).destroy();
+			}
+		}
+		
 		for(int i=0; i<simJobs.size(); i++) {
 			SimJobState ss = (SimJobState)simJobs.elementAt(i);
 			/* found */
@@ -161,6 +170,7 @@ public class SimulationControlSystem implements IControlSystem {
 				return;
 			}
 		}
+
 	}
 	
 	public String[] getJobs() {
