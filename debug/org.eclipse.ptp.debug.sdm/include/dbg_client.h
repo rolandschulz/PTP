@@ -24,18 +24,17 @@
 #include "breakpoint.h"
 #include "stackframe.h"
 #include "dbg_event.h"
-
-#define READ_FILE_HANDLER		1
-#define WRITE_FILE_HANDLER	2
-#define EXCEPT_FILE_HANDLER	4
+#include "proxy.h"
 
 /*
  * Session control
  */
-void DbgClntInit(int);
+void DbgClntInit(int, proxy *, proxy_svr_helper_funcs *);
+int DbgClntCreateSession(char *, int);
 int DbgClntStartSession(char *, char *);
 int DbgClntQuit(void);
 int DbgClntIsShutdown(void);
+void DbgClntFinish(void);
 
 /*
  * Breakpoint operations
@@ -69,9 +68,12 @@ int DbgClntListGlobalVariables(procset *set);
  * Event Handling
  */
 int DbgClntProgress(void);
-void DbgClntRegisterFileHandler(int, int, int (*)(int, void *), void *);
+void DbgClntRegisterReadFileHandler(int, int (*)(int, void *), void *);
+void DbgClntRegisterWriteFileHandler(int, int (*)(int, void *), void *);
+void DbgClntRegisterExceptFileHandler(int, int (*)(int, void *), void *);
 void DbgClntUnregisterFileHandler(int);
 void DbgClntRegisterEventHandler(void (*)(dbg_event *, void *), void *);
+
 /*
  * Error Handling
  */
