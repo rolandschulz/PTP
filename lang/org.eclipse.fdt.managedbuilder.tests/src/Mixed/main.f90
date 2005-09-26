@@ -1,5 +1,5 @@
 program main
-  extern C_INT
+  external C_INT
   integer :: i
   call C_INT(i)
   print *, "C_INT = ", i
