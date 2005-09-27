@@ -26,7 +26,15 @@
 #define MAX(a, b)		((a) < (b) ? (b) : (a))
 #endif /* MAX */
 
-#define BITSPERBYTE	NBBY
+#ifdef __APPLE__
+#define BITSPERBYTE     NBBY
+#elif __linux__
+#include <limits.h>
+#define BITSPERBYTE     CHAR_BIT
+extern int digittoint(int);
+#else
+#error "Need to define BITSPERBYTE for your operating system"
+#endif
 
 #define SOCKET			int
 #define CLOSE_SOCKET(s)	(void)close(s)
