@@ -113,14 +113,14 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	public AnnotationGroup getAnnotationGroup(String job_id) {
 		return (AnnotationGroup) annotationMap.get(job_id);
 	}
-	public IStackFrame getTopStackFrame(IThread thread) {
+	protected IStackFrame getTopStackFrame(IThread thread) {
 		try {
 			return thread.getTopStackFrame();
 		} catch (DebugException de) {
 			return null;
 		}
 	}
-	public IEditorPart openEditor(final IWorkbenchPage page, final IEditorInput input, final String id) {
+	protected IEditorPart openEditor(final IWorkbenchPage page, final IEditorInput input, final String id) {
 		final IEditorPart[] editor = new IEditorPart[] { null };
 		Runnable r = new Runnable() {
 			public void run() {
@@ -134,7 +134,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		BusyIndicator.showWhile(Display.getDefault(), r);
 		return editor[0];
 	}
-	public IEditorPart openEditor(final IFile file) {
+	protected IEditorPart getEditorPart(final IFile file) {
 		String fileExt = file.getFileExtension();
 		// FIXME hard the extension
 		if (!fileExt.equals("c") && !fileExt.equals("cpp"))
@@ -146,14 +146,15 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 				final String id = "org.eclipse.cdt.ui.editor.CEditor";
 				IWorkbenchPage page = PTPDebugUIPlugin.getActiveWorkbenchWindow().getActivePage();
 				IEditorPart editorPart = page.getActiveEditor();
-				if (editor != null) {
+				if (editorPart != null) {
 					IEditorInput editorInput = editorPart.getEditorInput();
-					if (editorInput instanceof IFileEditorInput)
+					if (editorInput instanceof IFileEditorInput) {
 						if (((IFileEditorInput) editorInput).getFile().equals(file)) {
 							page.bringToTop(editorPart);
 							editor[0] = editorPart;
 							return;
 						}
+					}
 				}
 				if (editor == null) {
 					IEditorReference[] refs = page.getEditorReferences();
@@ -178,24 +179,24 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		});
 		return editor[0];
 	}
-	public IFile findFile(String fileName) {
+	protected IFile findFile(String fileName) {
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IPath path = new Path(fileName);
 		if (path.isAbsolute())
 			return workspaceRoot.getFileForLocation(path);
 		return workspaceRoot.getFile(path);
 	}
-	public ITextEditor getTextEditor(IEditorPart editorPart) {
+	protected ITextEditor getTextEditor(IEditorPart editorPart) {
 		if (editorPart instanceof ITextEditor)
 			return (ITextEditor) editorPart;
 		return (ITextEditor) editorPart.getAdapter(ITextEditor.class);
 	}
-	public IFile getFile(IEditorInput editorInput) {
+	protected IFile getFile(IEditorInput editorInput) {
 		if (editorInput instanceof IFileEditorInput)
 			return ((IFileEditorInput) editorInput).getFile();
 		return null;
 	}
-	public Position createPosition(int lineNumber, IDocument doc) {
+	protected Position createPosition(int lineNumber, IDocument doc) {
 		if (doc == null)
 			return null;
 		try {
@@ -258,7 +259,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		IFile file = findFile(fullPathFileName);
 		if (file == null)
 			throw new CoreException(Status.CANCEL_STATUS);
-		IEditorPart editorPart = openEditor(file);
+		IEditorPart editorPart = getEditorPart(file);
 		if (editorPart == null)
 			throw new CoreException(Status.CANCEL_STATUS);
 		ITextEditor textEditor = getTextEditor(editorPart);
@@ -358,7 +359,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		IFile file = findFile(fullPathFileName);
 		if (file == null)
 			throw new CoreException(Status.CANCEL_STATUS);
-		IEditorPart editorPart = openEditor(file);
+		IEditorPart editorPart = getEditorPart(file);
 		if (editorPart == null)
 			throw new CoreException(Status.CANCEL_STATUS);
 		ITextEditor textEditor = getTextEditor(editorPart);

@@ -19,9 +19,11 @@
 
 package org.eclipse.ptp.ui;
 
+import java.io.IOException;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.internal.ui.JobManager;
@@ -145,7 +147,14 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 			return w.getActivePage();
 		}
 		return null;
-	}	
+	}
+    public String getPluginPath() {
+        try {
+            return Platform.resolve(Platform.getBundle(PLUGIN_ID).getEntry("/")).getPath();
+        } catch (IOException e) {
+        	return null;
+        }
+    }	
 	
 	/**
 	 * Returns the active workbench shell or <code>null</code> if none

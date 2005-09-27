@@ -18,44 +18,34 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.preferences;
 
-import java.io.File;
-
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.debug.internal.ui.SWTUtil;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.preference.FieldEditor;
-import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.ControlSystemChoices;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.MonitoringSystemChoices;
-import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.internal.core.CoreMessages;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
@@ -120,10 +110,39 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 		composite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 
 		createMyContents(composite);
+		createSimulationProject(composite);
 
 		loadSaved();
 		defaultSetting();
 		return composite;
+	}
+	
+	private void createSimulationProject(Composite parent) {
+		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
+		aGroup.setLayout(createGridLayout(3, false, 10, 10));
+		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
+		aGroup.setText(CoreMessages.getResourceString("SimulationPreferencesPage.group_simulation"));
+		
+		new Label(aGroup, SWT.NONE).setText(CoreMessages.getResourceString("SimulationPreferencesPage.createSimulationProject_combo"));
+		final Combo projectCombo = new Combo(aGroup, SWT.READ_ONLY);
+		//FIXME hard code for c project 
+		projectCombo.add("C");
+		
+		Button createSimulationButton = new Button(aGroup, SWT.PUSH);
+		createSimulationButton.setText(CoreMessages.getResourceString("SimulationPreferencesPage.createSimulationProject_button"));
+		createSimulationButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if (projectCombo.getSelectionIndex() > -1) {
+					//FIXME Should be changed to call plugin configuration
+					SimulationProjectCreation simulationProject = new ManagedCProjectCreation(SIMULATION_PROJECT_NAME, SIMULATION_FILE_NAME);
+					try {
+						simulationProject.createSimulatorProject();
+					} catch (CoreException e) {
+						ErrorDialog.openError(getShell(), "Error found", "Cannot create project", e.getStatus());					
+					}
+				}
+			}
+		});
 	}
 
 	private void createMyContents(Composite parent)

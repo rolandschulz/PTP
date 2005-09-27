@@ -23,7 +23,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPElement;
@@ -41,39 +45,47 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public abstract class AbstractUIManager implements IManager {
 	protected IModelManager modelManager = null;
 	protected String cur_set_id = EMPTY_ID;
 	protected List pListeners = new ArrayList(0);
 	protected List setListeners = new ArrayList(0);
-	
+
 	public AbstractUIManager() {
 		modelManager = PTPCorePlugin.getDefault().getModelManager();
 	}
-	
+
+	protected abstract class SafeNotifier implements ISafeRunnable {
+		public void handleException(Throwable ex) {
+			IStatus status = new Status(IStatus.ERROR, PTPUIPlugin.PLUGIN_ID, IStatus.OK, "UIManager failed to notify an UIListener", ex);
+			PTPUIPlugin.log(status);
+		}
+	}
+
 	public void shutdown() {
 		pListeners.clear();
 		pListeners = null;
 	}
-	
 	public void addPaintListener(IPaintListener pListener) {
 		if (!pListeners.contains(pListener))
 			pListeners.add(pListener);
 	}
-	
 	public void removePaintListener(IPaintListener pListener) {
 		if (pListeners.contains(pListener))
 			pListeners.remove(pListener);
 	}
-
-	public void firePaintListener(Object condition) {
-		for (Iterator i=pListeners.iterator(); i.hasNext();) {
-			((IPaintListener)i.next()).repaint(condition);
+	public void firePaintListener(final Object condition) {
+		for (Iterator i = pListeners.iterator(); i.hasNext();) {
+			final IPaintListener pListener = (IPaintListener) i.next();
+			Platform.run(new SafeNotifier() {
+				public void run() {
+					pListener.repaint(condition);
+				}
+			});
 		}
 	}
-	
 	public void addSetListener(ISetListener setListener) {
 		if (!setListeners.contains(setListener))
 			setListeners.add(setListener);
@@ -82,32 +94,34 @@ public abstract class AbstractUIManager implements IManager {
 		if (setListeners.contains(setListener))
 			setListeners.remove(setListener);
 	}
-	
-	public void fireEvent(int eventType, IElement[] elements, IElementSet cur_set, IElementSet pre_set) {
-		for (Iterator i=setListeners.iterator(); i.hasNext();) {
-			ISetListener setListener = (ISetListener)i.next();
-			switch (eventType) {
-			case CREATE_SET_TYPE:
-				setListener.createSetEvent(cur_set, elements);
-				break;
-			case DELETE_SET_TYPE:
-				setListener.deleteSetEvent(cur_set);
-				break;
-			case CHANGE_SET_TYPE:
-				setListener.changeSetEvent(cur_set, pre_set);
-				break;
-			case ADD_ELEMENT_TYPE:
-				setListener.addElementsEvent(cur_set, elements);
-				break;
-			case REMOVE_ELEMENT_TYPE:
-				setListener.removeElementsEvent(cur_set, elements);
-				break;
-			}
+	public void fireEvent(final int eventType, final IElement[] elements, final IElementSet cur_set, final IElementSet pre_set) {
+		for (Iterator i = setListeners.iterator(); i.hasNext();) {
+			final ISetListener setListener = (ISetListener) i.next();
+			Platform.run(new SafeNotifier() {
+				public void run() {
+					switch (eventType) {
+					case CREATE_SET_TYPE:
+						setListener.createSetEvent(cur_set, elements);
+						break;
+					case DELETE_SET_TYPE:
+						setListener.deleteSetEvent(cur_set);
+						break;
+					case CHANGE_SET_TYPE:
+						setListener.changeSetEvent(cur_set, pre_set);
+						break;
+					case ADD_ELEMENT_TYPE:
+						setListener.addElementsEvent(cur_set, elements);
+						break;
+					case REMOVE_ELEMENT_TYPE:
+						setListener.removeElementsEvent(cur_set, elements);
+						break;
+					}
+				}
+			});
 		}
 	}
-	
 	public void addToSet(IElement[] elements, IElementSet set) {
-		for (int i=0; i<elements.length; i++) {
+		for (int i = 0; i < elements.length; i++) {
 			set.add(elements[i]);
 		}
 	}
@@ -128,7 +142,7 @@ public abstract class AbstractUIManager implements IManager {
 	public void removeSet(String setID, IElementHandler elementHandler) {
 		IElementSet set = elementHandler.getSet(setID);
 		String[] sets = set.getMatchSets();
-		for (int i=0; i<sets.length; i++) {
+		for (int i = 0; i < sets.length; i++) {
 			elementHandler.getSet(sets[i]).removeMatchSet(setID);
 		}
 		elementHandler.remove(setID);
@@ -136,7 +150,7 @@ public abstract class AbstractUIManager implements IManager {
 	}
 	public void removeFromSet(IElement[] elements, String setID, IElementHandler elementHandler) {
 		IElementSet set = elementHandler.getSet(setID);
-		for (int i=0; i<elements.length; i++) {
+		for (int i = 0; i < elements.length; i++) {
 			set.remove(elements[i]);
 		}
 		updateMatchElementSets(set, elementHandler);
@@ -144,12 +158,11 @@ public abstract class AbstractUIManager implements IManager {
 	}
 	public void updateMatchElementSets(IElementSet targetSet, IElementHandler elementHandler) {
 		IElementSet[] sets = elementHandler.getSortedSets();
-		for (int i=0; i<sets.length; i++) {
+		for (int i = 0; i < sets.length; i++) {
 			if (sets[i].getID().equals(targetSet.getID()))
 				continue;
-			
 			IElement[] elements = sets[i].getElements();
-			for (int j=0; j<elements.length; j++) {
+			for (int j = 0; j < elements.length; j++) {
 				if (targetSet.contains(elements[j].getID())) {
 					targetSet.addMatchSet(sets[i].getID());
 					sets[i].addMatchSet(targetSet.getID());
@@ -158,7 +171,6 @@ public abstract class AbstractUIManager implements IManager {
 			}
 		}
 	}
-	
 	public boolean isNoJob(String jid) {
 		return (jid == null || jid.length() == 0);
 	}
@@ -167,7 +179,7 @@ public abstract class AbstractUIManager implements IManager {
 			return true;
 		IPJob job = findJobById(job_id);
 		return (job == null || job.isAllStop());
-	}	
+	}
 	public IPJob findJob(String job_name) {
 		return modelManager.getUniverse().findJobByName(job_name);
 	}
@@ -185,17 +197,14 @@ public abstract class AbstractUIManager implements IManager {
 			public void run(IProgressMonitor pmonitor) throws InvocationTargetException {
 				if (pmonitor == null)
 					pmonitor = new NullProgressMonitor();
-				
 				try {
 					IPJob[] jobs = modelManager.getUniverse().getJobs();
 					pmonitor.beginTask("Removing stopped jobs...", jobs.length);
-					for (int i=0; i<jobs.length; i++) {
+					for (int i = 0; i < jobs.length; i++) {
 						if (pmonitor.isCanceled())
 							throw new InvocationTargetException(new Exception("Cancelled by user"));
-						
 						if (jobs[i].isAllStop())
 							removeJob(jobs[i]);
-						
 						pmonitor.worked(1);
 					}
 				} finally {
@@ -206,15 +215,15 @@ public abstract class AbstractUIManager implements IManager {
 		};
 		try {
 			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
-		} catch(InterruptedException e) {
+		} catch (InterruptedException e) {
 			PTPUIPlugin.log(e);
 		} catch (InvocationTargetException e1) {
 			PTPUIPlugin.log(e1);
-		}		
+		}
 	}
 	public boolean hasStoppedJob() {
 		IPJob[] jobs = modelManager.getUniverse().getJobs();
-		for (int i=0; i<jobs.length; i++) {
+		for (int i = 0; i < jobs.length; i++) {
 			if (jobs[i].isAllStop())
 				return true;
 		}
