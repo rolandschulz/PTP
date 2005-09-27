@@ -76,7 +76,7 @@ DbgInit(session **s, char *proxy, char *attr, ...)
 	(*s)->sess_proxy->clnt_helper_funcs = &helper_funcs;
 	
 	va_start(ap, attr);
-	res = (*s)->sess_proxy->clnt_funcs->init(&helper_funcs, &data, attr, ap);
+	res = proxy_clnt_init((*s)->sess_proxy, &helper_funcs, &data, attr, ap);
 	va_end(ap);
 	
 	if (res < 0) {
@@ -93,7 +93,7 @@ DbgInit(session **s, char *proxy, char *attr, ...)
 int
 DbgConnect(session *s)
 {
-	return s->sess_proxy->clnt_funcs->connect(s->sess_proxy, s->sess_proxy_data);
+	return proxy_clnt_connect(s->sess_proxy, s->sess_proxy_data);
 }
 
 int
@@ -105,7 +105,7 @@ DbgAccept(session *s)
 int
 DbgStartSession(session *s, char *prog, char *args)
 {
-	return s->sess_proxy->clnt_funcs->startsession(s->sess_proxy_data, prog, args);
+	return proxy_clnt_startsession(s->sess_proxy, s->sess_proxy_data, prog, args);
 }
 
 /*
@@ -114,19 +114,19 @@ DbgStartSession(session *s, char *prog, char *args)
 int 
 DbgSetLineBreakpoint(session *s, procset *set, char *file, int line)
 {
-	return s->sess_proxy->clnt_funcs->setlinebreakpoint(s->sess_proxy_data, set, file, line);
+	return proxy_clnt_setlinebreakpoint(s->sess_proxy, s->sess_proxy_data, set, file, line);
 }
 
 int 
 DbgSetFuncBreakpoint(session *s, procset *set, char *file, char *func)
 {
-	return s->sess_proxy->clnt_funcs->setfuncbreakpoint(s->sess_proxy_data, set, file, func);
+	return proxy_clnt_setfuncbreakpoint(s->sess_proxy, s->sess_proxy_data, set, file, func);
 }
 
 int 
 DbgDeleteBreakpoint(session *s, procset *set, int bpid)
 {
-	return s->sess_proxy->clnt_funcs->deletebreakpoint(s->sess_proxy_data, set, bpid);
+	return proxy_clnt_deletebreakpoint(s->sess_proxy, s->sess_proxy_data, set, bpid);
 }
 
 /*
@@ -135,13 +135,13 @@ DbgDeleteBreakpoint(session *s, procset *set, int bpid)
 int 
 DbgGo(session *s, procset *set)
 {
-	return s->sess_proxy->clnt_funcs->go(s->sess_proxy_data, set);
+	return proxy_clnt_go(s->sess_proxy, s->sess_proxy_data, set);
 }
 
 int 
 DbgStep(session *s, procset *set, int count, int type)
 {
-	return s->sess_proxy->clnt_funcs->step(s->sess_proxy_data, set, count, type);
+	return proxy_clnt_step(s->sess_proxy, s->sess_proxy_data, set, count, type);
 }
 
 /*
@@ -150,13 +150,13 @@ DbgStep(session *s, procset *set, int count, int type)
 int 
 DbgListStackframes(session *s, procset *set, int current)
 {
-	return s->sess_proxy->clnt_funcs->liststackframes(s->sess_proxy_data, set, current);
+	return proxy_clnt_liststackframes(s->sess_proxy, s->sess_proxy_data, set, current);
 }
 
 int 
 DbgSetCurrentStackframe(session *s, procset *set, int level)
 {
-	return s->sess_proxy->clnt_funcs->setcurrentstackframe(s->sess_proxy_data, set, level);
+	return proxy_clnt_setcurrentstackframe(s->sess_proxy, s->sess_proxy_data, set, level);
 }
 
 /*
@@ -165,37 +165,37 @@ DbgSetCurrentStackframe(session *s, procset *set, int level)
 int 
 DbgEvaluateExpression(session *s, procset *set, char *exp)
 {
-	return s->sess_proxy->clnt_funcs->evaluateexpression(s->sess_proxy_data, set, exp);
+	return proxy_clnt_evaluateexpression(s->sess_proxy, s->sess_proxy_data, set, exp);
 }
 
 int 
 DbgGetType(session *s, procset *set, char *exp)
 {
-	return s->sess_proxy->clnt_funcs->gettype(s->sess_proxy_data, set, exp);
+	return proxy_clnt_gettype(s->sess_proxy, s->sess_proxy_data, set, exp);
 }
 
 int 
 DbgListLocalVariables(session *s, procset *set)
 {
-	return s->sess_proxy->clnt_funcs->listlocalvariables(s->sess_proxy_data, set);
+	return proxy_clnt_listlocalvariables(s->sess_proxy, s->sess_proxy_data, set);
 }
 
 int 
 DbgListArguments(session *s, procset *set)
 {
-	return s->sess_proxy->clnt_funcs->listarguments(s->sess_proxy_data, set);
+	return proxy_clnt_listarguments(s->sess_proxy, s->sess_proxy_data, set);
 }
 
 int 
 DbgListGlobalVariables(session *s, procset *set)
 {
-	return s->sess_proxy->clnt_funcs->listglobalvariables(s->sess_proxy_data, set);
+	return proxy_clnt_listglobalvariables(s->sess_proxy, s->sess_proxy_data, set);
 }
 
 int 
 DbgQuit(session *s)
 {
-	return s->sess_proxy->clnt_funcs->quit(s->sess_proxy_data);
+	return proxy_clnt_quit(s->sess_proxy, s->sess_proxy_data);
 }
 
 /*
@@ -257,8 +257,10 @@ DbgProgress(session *s)
 					&& ((h->file_type & READ_FILE_HANDLER && FD_ISSET(h->fd, &rfds))
 						|| (h->file_type & WRITE_FILE_HANDLER && FD_ISSET(h->fd, &wfds))
 						|| (h->file_type & EXCEPT_FILE_HANDLER && FD_ISSET(h->fd, &efds)))
-					&& h->file_handler(h->fd, h->data) < 0)
-					return -1;
+					&& h->file_handler(h->fd, h->data) < 0) {
+						printf("warning: unregistering file handler for %d\n", h->fd);
+						DbgUnregisterFileHandler(s, h->fd);
+					}
 			}
 			
 		}
@@ -266,7 +268,7 @@ DbgProgress(session *s)
 		break;
 	}
 
-	return s->sess_proxy->clnt_funcs->progress(s->sess_proxy_data);
+	return proxy_clnt_progress(s->sess_proxy, s->sess_proxy_data);
 }
 
 void
