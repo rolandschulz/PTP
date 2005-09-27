@@ -97,7 +97,7 @@ DbgClntInit(int num_svrs, char *proxy, proxy_svr_helper_funcs *funcs)
 		return -1;
 	}
 	
-	proxy_svr_init(dbg_proxy, funcs);
+	proxy_svr_init(dbg_proxy, funcs, &dbg_proxy_data);
 	
 	return 0;
 }
@@ -105,7 +105,7 @@ DbgClntInit(int num_svrs, char *proxy, proxy_svr_helper_funcs *funcs)
 int
 DbgClntCreateSession(char *host, int port)
 {
-	if (proxy_svr_create(dbg_proxy, port, &dbg_proxy_data) < 0) {
+	if (proxy_svr_create(dbg_proxy, port, dbg_proxy_data) < 0) {
 		fprintf(stderr, "proxy_svr_create failed\n");
 		return -1;
 	}
