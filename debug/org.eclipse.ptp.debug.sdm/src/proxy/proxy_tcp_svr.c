@@ -41,10 +41,11 @@
 #include "proxy_tcp.h"
 #include "procset.h"
 
-static int	proxy_tcp_svr_create(proxy_svr_helper_funcs *, int, void **);
-static int	proxy_tcp_svr_connect(proxy_svr_helper_funcs *, char *, int, void **);
-static int	proxy_tcp_svr_progress(proxy_svr_helper_funcs *, void *);
-static void	proxy_tcp_svr_finish(proxy_svr_helper_funcs *, void *);
+static void	proxy_tcp_svr_init(proxy_svr_helper_funcs *, void **);
+static int	proxy_tcp_svr_create(int, void *);
+static int	proxy_tcp_svr_connect(char *, int, void *);
+static int	proxy_tcp_svr_progress(void *);
+static void	proxy_tcp_svr_finish(void *);
 
 static int	proxy_tcp_svr_recv_msgs(int, void *);
 static int	proxy_tcp_svr_accept(int, void *);
@@ -52,6 +53,7 @@ static int	proxy_tcp_svr_dispatch(proxy_tcp_conn *, char *);
 
 proxy_svr_funcs proxy_tcp_svr_funcs =
 {
+	proxy_tcp_svr_init,
 	proxy_tcp_svr_create,
 	proxy_tcp_svr_connect,
 	proxy_tcp_svr_progress,
@@ -124,18 +126,29 @@ printf("SVR reply <%s>\n", str);
 	free(str);
 }
 
+static void
+proxy_tcp_svr_init(proxy_svr_helper_funcs *helper, void **data)
+{
+	proxy_tcp_conn		*conn;
+
+	proxy_tcp_create_conn(&conn);
+	conn->helper = helper;
+	*data = (void *)conn;
+}
+
 /**
  * Create server socket and bind address to it. 
  * 
  * @return conn structure containing server socket and port
  */
 static int 
-proxy_tcp_svr_create(proxy_svr_helper_funcs *helper, int port, void **data)
+proxy_tcp_svr_create(int port, void *data)
 {
-	socklen_t			slen;
-	SOCKET				sd;
-	struct sockaddr_in	sname;
-	proxy_tcp_conn		*conn;
+	socklen_t				slen;
+	SOCKET					sd;
+	struct sockaddr_in		sname;
+	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
+	proxy_svr_helper_funcs *	helper = (proxy_svr_helper_funcs *)conn->helper;
 	
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
@@ -171,15 +184,13 @@ proxy_tcp_svr_create(proxy_svr_helper_funcs *helper, int port, void **data)
 		return -1;
 	}
 	
-	proxy_tcp_create_conn(&conn);
-	
 	conn->svr_sock = sd;
 	conn->port = (int) ntohs(sname.sin_port);
-	conn->helper = helper;
-	*data = (void *)conn;
 	
-	helper->regreadfile(sd, proxy_tcp_svr_accept, (void *)conn);
-	helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
+	if (helper != NULL) {
+		helper->regreadfile(sd, proxy_tcp_svr_accept, (void *)conn);
+		helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
+	}
 	
 	return 0;
 }
@@ -188,14 +199,15 @@ proxy_tcp_svr_create(proxy_svr_helper_funcs *helper, int port, void **data)
  * Connect to a remote proxy.
  */
 static int
-proxy_tcp_svr_connect(proxy_svr_helper_funcs *helper, char *host, int port, void **data)
+proxy_tcp_svr_connect(char *host, int port, void *data)
 {
-	SOCKET				sd;
-	struct hostent *		hp;
-	long int				haddr;
-	struct sockaddr_in	scket;
-	dbg_event *			e;
-	proxy_tcp_conn *		conn = (proxy_tcp_conn *)data;
+	SOCKET					sd;
+	struct hostent *			hp;
+	long int					haddr;
+	struct sockaddr_in		scket;
+	dbg_event *				e;
+	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
+	proxy_svr_helper_funcs *	helper = (proxy_svr_helper_funcs *)conn->helper;
 		        
 	if (host == NULL) {
 		fprintf(stderr, "no host specified\n");
@@ -232,20 +244,18 @@ proxy_tcp_svr_connect(proxy_svr_helper_funcs *helper, char *host, int port, void
 		return -1;
 	}
 
-	proxy_tcp_create_conn(&conn);
-	
 	conn->sess_sock = sd;
 	conn->host = strdup(host);
 	conn->port = port;
-	conn->helper = helper;
-	*data = (void *)conn;
 	
-	helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
-	helper->regreadfile(sd, proxy_tcp_svr_recv_msgs, (void *)conn);
-	
-	e = NewEvent(DBGEV_INIT);
-	e->num_servers = ((proxy_svr_helper_funcs *)conn->helper)->numservers();
-	proxy_tcp_svr_event_callback(e, data);
+	if (helper != NULL) {
+		helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
+		helper->regreadfile(sd, proxy_tcp_svr_recv_msgs, (void *)conn);
+		
+		e = NewEvent(DBGEV_INIT);
+		e->num_servers = ((proxy_svr_helper_funcs *)conn->helper)->numservers();
+		proxy_tcp_svr_event_callback(e, data);
+	}
 	
 	return 0;
 }
@@ -256,11 +266,12 @@ proxy_tcp_svr_connect(proxy_svr_helper_funcs *helper, char *host, int port, void
 static int
 proxy_tcp_svr_accept(int fd, void *data)
 {
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-	socklen_t		fromlen;
-	SOCKET			ns;
-	struct sockaddr	addr;
-	dbg_event *		e;
+	socklen_t				fromlen;
+	SOCKET					ns;
+	struct sockaddr			addr;
+	dbg_event *				e;
+	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
+	proxy_svr_helper_funcs *	helper = (proxy_svr_helper_funcs *)conn->helper;
 	
 	fromlen = sizeof(addr);
 	ns = accept(fd, &addr, &fromlen);
@@ -284,11 +295,13 @@ proxy_tcp_svr_accept(int fd, void *data)
 	
 	conn->sess_sock = ns;
 	
-	((proxy_svr_helper_funcs *)conn->helper)->regreadfile(ns, proxy_tcp_svr_recv_msgs, (void *)conn);
-	
-	e = NewEvent(DBGEV_INIT);
-	e->num_servers = ((proxy_svr_helper_funcs *)conn->helper)->numservers();
-	proxy_tcp_svr_event_callback(e, data);
+	if (helper != NULL) {
+		helper->regreadfile(ns, proxy_tcp_svr_recv_msgs, (void *)conn);
+		
+		e = NewEvent(DBGEV_INIT);
+		e->num_servers = helper->numservers();
+		proxy_tcp_svr_event_callback(e, data);
+	}
 	
 	return 0;
 	
@@ -298,18 +311,21 @@ proxy_tcp_svr_accept(int fd, void *data)
  * Cleanup prior to server exit.
  */
 static void 
-proxy_tcp_svr_finish(proxy_svr_helper_funcs *helper, void *data)
+proxy_tcp_svr_finish(void *data)
 {
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
+	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
+	proxy_svr_helper_funcs *	helper = (proxy_svr_helper_funcs *)conn->helper;
 	
 	if (conn->sess_sock != INVALID_SOCKET) {
-		helper->unregreadfile(conn->sess_sock);
+		if (helper != NULL)
+			helper->unregreadfile(conn->sess_sock);
 		CLOSE_SOCKET(conn->sess_sock);
 		conn->sess_sock = INVALID_SOCKET;
 	}
 	
 	if (conn->svr_sock != INVALID_SOCKET) {
-		helper->unregreadfile(conn->svr_sock);
+		if (helper != NULL)
+			helper->unregreadfile(conn->svr_sock);
 		CLOSE_SOCKET(conn->svr_sock);
 		conn->svr_sock = INVALID_SOCKET;
 	}
@@ -324,18 +340,23 @@ proxy_tcp_svr_finish(proxy_svr_helper_funcs *helper, void *data)
  * 			-1	server shutdown
  */
 static int
-proxy_tcp_svr_progress(proxy_svr_helper_funcs *helper, void *data)
+proxy_tcp_svr_progress(void *data)
 {
-	char *			msg;
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
+	char *					msg;
+	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
+	proxy_svr_helper_funcs *	helper = (proxy_svr_helper_funcs *)conn->helper;
 
 	if (proxy_tcp_get_msg(conn, &msg) > 0) {
 		proxy_tcp_svr_dispatch(conn, msg);
 		free(msg);
 	}
 	
-	if (proxy_tcp_svr_shutdown && helper->shutdown_completed())
-		return -1;
+	if (proxy_tcp_svr_shutdown) {
+		if (helper != NULL)
+			 return helper->shutdown_completed() ? -1 : 0;
+		else
+			return -1;
+	}
 		
 	return 0;
 }
