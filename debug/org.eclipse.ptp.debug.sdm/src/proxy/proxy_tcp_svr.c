@@ -31,6 +31,7 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #include "compat.h"
 #include "dbg.h"
@@ -663,3 +664,4 @@ proxy_tcp_svr_quit(proxy_svr_helper_funcs *helper, char **args, char **response)
 	
 	return res;
 }
+

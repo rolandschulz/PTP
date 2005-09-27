@@ -18,6 +18,7 @@
  ******************************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "dbg.h"
 #include "proxy.h"
@@ -248,3 +249,4 @@ main(int argc, char *argv[])
 
 	exit(0);
 }
+

@@ -16,6 +16,8 @@
 
 #include "hash.h"
 #include "backend.h"
+#include "proxy.h"
+#include "proxy_tcp.h"
 
 extern int	svr_init(dbg_backend *, void (*)(dbg_event *, void *), void *);
 extern int	svr_dispatch(dbg_backend *, char *);
@@ -128,3 +130,4 @@ server(int client_task_id, int my_task_id, dbg_backend *dbgr)
 			break;
 	}
 }
+

@@ -17,6 +17,10 @@
  * LA-CC 04-115
  ******************************************************************************/
 
+#ifdef __gnu_linux__
+#define _GNU_SOURCE
+#endif /* __gnu_linux__ */
+
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
