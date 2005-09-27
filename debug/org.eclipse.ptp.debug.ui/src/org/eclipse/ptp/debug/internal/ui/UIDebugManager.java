@@ -35,6 +35,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
@@ -42,6 +43,7 @@ import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.debug.core.IPDebugListener;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -129,9 +131,14 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		if (debugEventListeners.contains(listener))
 			debugEventListeners.remove(listener);
 	}
-	public void fireDebugEvent(IDebugActionEvent event) {
+	public void fireDebugEvent(final IDebugActionEvent event) {
 		for (Iterator i = debugEventListeners.iterator(); i.hasNext();) {
-			((IDebugActionUpdateListener) i.next()).handleDebugActionEvent(event);
+			final IDebugActionUpdateListener dListener = (IDebugActionUpdateListener) i.next();
+			Platform.run(new SafeNotifier() {
+				public void run() {
+					dListener.handleDebugActionEvent(event);
+				}
+			});
 		}
 	}
 	public void addRegListener(IRegListener listener) {
@@ -142,15 +149,20 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		if (regListeners.contains(listener))
 			regListeners.remove(listener);
 	}
-	public synchronized void fireRegListener(int type, BitList tasks) {
+	public synchronized void fireRegListener(final int type, final BitList tasks) {
 		for (Iterator i = regListeners.iterator(); i.hasNext();) {
-			switch (type) {
-			case REG_TYPE:
-				((IRegListener) i.next()).register(tasks);
-				break;
-			case UNREG_TYPE:
-				((IRegListener) i.next()).unregister(tasks);
-			}
+			final IRegListener rListener = (IRegListener) i.next();
+			Platform.run(new SafeNotifier() {
+				public void run() {
+					switch (type) {
+					case REG_TYPE:
+						rListener.register(tasks);
+						break;
+					case UNREG_TYPE:
+						rListener.unregister(tasks);
+					}
+				}
+			});
 		}
 	}
 	public void createEventListener(String job_id) {
@@ -344,7 +356,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			tasks.set(convertToInt(elements[i].getName()));
 		}
 		tasks.or(addTasks);
-		// FIXME how to add more process in the created set
 	}
 	public void removeElementsEvent(IElementSet set, IElement[] elements) {
 		BitList tasks = (BitList) set.getData(BITSET_KEY);
@@ -413,8 +424,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					ICDILocator locator = ((ICDILineBreakpoint) bpt).getLocator();
 					int lineNumber = locator.getLineNumber();
 					// FIXME: Hardcode the filename
-					String fileName = "TestC/" + locator.getFile();
-					// String fileName = "D:/eclipse3.1/runtime-EclipseApplication/TestC/main.c";
+					String fileName = PreferenceConstants.SIMULATION_PROJECT_NAME + "/" + PreferenceConstants.SIMULATION_FILE_NAME + ".c";
 					try {
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses().toBitList(), false);
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses().toBitList(), true);
@@ -429,7 +439,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				if (lineLocation != null) {
 					int lineNumber = lineLocation.getLineNumber();
 					// FIXME: Hardcode the filename
-					String fileName = "TestC/" + lineLocation.getFile();
+					String fileName = PreferenceConstants.SIMULATION_PROJECT_NAME + "/" + PreferenceConstants.SIMULATION_FILE_NAME + ".c";
 					try {
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses().toBitList(), false);
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses().toBitList(), true);
@@ -442,7 +452,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				fireSuspendEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof InferiorResumedEvent) {
 				// FIXME hardcode the filename
-				String fileName = "TestC/main.c";
+				String fileName = PreferenceConstants.SIMULATION_PROJECT_NAME + "/" + PreferenceConstants.SIMULATION_FILE_NAME + ".c";
 				try {
 					annotationMgr.removeAnnotation(job.getIDString(), fileName, event.getAllProcesses().toBitList());
 				} catch (CoreException e) {
@@ -452,7 +462,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
 				fireResumeEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof InferiorExitedEvent || event instanceof ErrorEvent) {
-				String fileName = "TestC/main.c";
+				// FIXME hardcode the filename
+				String fileName = PreferenceConstants.SIMULATION_PROJECT_NAME + "/" + PreferenceConstants.SIMULATION_FILE_NAME + ".c";
 				try {
 					annotationMgr.removeAnnotation(job.getIDString(), fileName, event.getAllProcesses().toBitList());
 				} catch (CoreException e) {
