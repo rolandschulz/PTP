@@ -102,7 +102,7 @@ svr_dispatch(dbg_backend *db, char *cmd)
 	
 	if (i == sizeof(svr_cmd_tab) / sizeof(svr_cmd)) {
 		svr_res = DBGRES_ERR;
-		DbgSetError(DBGERR_PROTO, "Unknown command");
+		DbgSetError(DBGERR_DEBUGGER, "Unknown command");
 	}
 	
 	return 0;
