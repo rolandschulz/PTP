@@ -20,8 +20,13 @@
 **
 */
 
+#ifdef __gnu_linux__
+#define _GNU_SOURCE
+#endif /* __gnu_linux__ */
+
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 
 #include <string.h>
 #include <errno.h>
@@ -472,7 +477,7 @@ SetAndCheckBreak(char *where)
 	if ( bpt->func != NULL )
 		bp->loc.func = strdup(bpt->func);
 	if ( bpt->addr != 0 )
-		asprintf(&bp->loc.addr, "0x%x", bpt->addr);
+		asprintf(&bp->loc.addr, "0x%p", bpt->addr);
 	bp->loc.line = bpt->line;
 
 	/*
@@ -615,7 +620,7 @@ GDBMIListStackframes(int current)
 		s = NewStackframe(f->level);
 
 		if ( f->addr != 0 )
-			asprintf(&s->loc.addr, "0x%x", f->addr);
+			asprintf(&s->loc.addr, "0x%p", f->addr);
 		if ( f->func != NULL )
 			s->loc.func = strdup(f->func);
 		if ( f->file != NULL )

@@ -23,6 +23,10 @@
  * certainly be running in different processes.
  */
  
+#ifdef __gnu_linux__
+#define _GNU_SOURCE
+#endif
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/select.h>

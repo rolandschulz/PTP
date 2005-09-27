@@ -17,6 +17,10 @@
  * LA-CC 04-115
  ******************************************************************************/
 
+#ifdef __gnu_linux__
+#define _GNU_SOURCE
+#endif
+
 #include <sys/types.h>
 #include <sys/socket.h>
      
@@ -24,6 +28,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <signal.h>
+#include <stdlib.h>
 
 #include "compat.h"
 #include "session.h"
