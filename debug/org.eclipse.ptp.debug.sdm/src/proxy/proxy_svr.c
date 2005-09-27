@@ -32,25 +32,28 @@ proxy proxies[] = {
 };
 
 void
-proxy_svr_init(proxy *p, proxy_svr_helper_funcs *funcs)
+proxy_svr_init(proxy *p, proxy_svr_helper_funcs *funcs, void **data)
 {
+	if (p != NULL)
+		p->svr_funcs->init(funcs, data);
+
 	p->svr_helper_funcs = funcs;
 }
 
 int
-proxy_svr_create(proxy *p, int port, void **data)
+proxy_svr_create(proxy *p, int port, void *data)
 {
 	if (p != NULL)
-		return p->svr_funcs->create(p->svr_helper_funcs, port, data);
+		return p->svr_funcs->create(port, data);
 		
 	return -1;
 }
 
 int
-proxy_svr_connect(proxy *p, char *host, int port, void **data)
+proxy_svr_connect(proxy *p, char *host, int port, void *data)
 {
 	if (p != NULL)
-		return p->svr_funcs->connect(p->svr_helper_funcs, host, port, data);
+		return p->svr_funcs->connect(host, port, data);
 		
 	return -1;
 }
@@ -59,7 +62,7 @@ int
 proxy_svr_progress(proxy *p, void *data)
 {
 	if (p != NULL)
-		return p->svr_funcs->progress(p->svr_helper_funcs, data);
+		return p->svr_funcs->progress(data);
 		
 	return -1;
 }
@@ -68,5 +71,5 @@ void
 proxy_svr_finish(proxy *p, void *data)
 {
 	if (p != NULL)
-		p->svr_funcs->finish(p->svr_helper_funcs, data);
+		p->svr_funcs->finish(data);
 }
