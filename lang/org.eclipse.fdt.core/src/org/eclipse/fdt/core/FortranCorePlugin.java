@@ -27,7 +27,6 @@ import org.eclipse.cdt.core.ICDescriptorManager;
 import org.eclipse.cdt.core.IProcessList;
 import org.eclipse.cdt.core.IErrorParser;
 import org.eclipse.cdt.core.dom.CDOM;
-import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.model.ICoreModel;
 import org.eclipse.cdt.core.model.IWorkingCopy;
 import org.eclipse.cdt.core.parser.IScannerInfoProvider;
@@ -69,6 +68,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.core.runtime.content.IContentTypeMatcher;
+import org.eclipse.fdt.core.model.FortranCoreModel;
 import org.osgi.framework.BundleContext;
 
 public class FortranCorePlugin extends CCorePlugin {
@@ -142,7 +142,7 @@ public class FortranCorePlugin extends CCorePlugin {
 
 	private CDescriptorManager fDescriptorManager = new CDescriptorManager();
 
-	private CoreModel fCoreModel;
+	private FortranCoreModel fCoreModel;
 
 	private PathEntryVariableManager fPathEntryVariableManager;
 
@@ -273,7 +273,7 @@ public class FortranCorePlugin extends CCorePlugin {
 		fDescriptorManager.startup();
 
 		// Fired up the model.
-		fCoreModel = CoreModel.getDefault();
+		fCoreModel = FortranCoreModel.getDefault();
 		fCoreModel.startup();
 
 		//Fired up the indexer
