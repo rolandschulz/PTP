@@ -43,9 +43,6 @@ dnl 	# be used anymore.
 dnl 	AC_MSG_ERROR([You must have libaif to compile sdm.])
 dnl fi
 
-dnl Check for libmigdb
-AC_TEST_PACKAGE_NEW(libmigdb,[#include "mi_gdb.h"],-lmigdb,,[/usr/local $(TOP)/../libmigdb/src],LIBMIGDB)
-
 dnl Check for posix4
 AC_CHECK_LIB(posix4, clock_gettime)
 if test "$ac_cv_lib_posix4_clock_gettime" = yes; then
@@ -87,5 +84,5 @@ if test "$ac_cv_path_OMPI_INFO" != no; then
 fi
 
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_SUBDIRS([bitvector])
+AC_CONFIG_SUBDIRS([bitvector libaif])
 AC_OUTPUT
