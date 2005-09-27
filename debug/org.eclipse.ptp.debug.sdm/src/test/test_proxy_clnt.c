@@ -138,58 +138,112 @@ main(int argc, char *argv[])
 	p2 = procset_new(s->sess_procs);
 	procset_add_proc(p2, 0);
 	
-	DbgStartSession(s, "yyy", NULL);
+	if (DbgStartSession(s, "yyy", NULL) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 		
-	DbgStartSession(s, "xxx", NULL);
+	if (DbgStartSession(s, "xxx", NULL) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 
-	DbgSetLineBreakpoint(s, p1, "yyy.c", 6);
+	if (DbgSetLineBreakpoint(s, p1, "yyy.c", 6) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 	
-	DbgSetLineBreakpoint(s, p1, "xxx.c", 99);
+	if (DbgSetLineBreakpoint(s, p1, "xxx.c", 99) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 	
-	DbgSetLineBreakpoint(s, p1, "xxx.c", 14);
+	if (DbgSetLineBreakpoint(s, p1, "xxx.c", 14) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 	
-	DbgGo(s, p1);
+	if (DbgGo(s, p1) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 	
-	DbgListStackframes(s, p1, 0);
+	if (DbgListStackframes(s, p1, 0) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 	
-	DbgStep(s, p1, 1, 0);
+	if (DbgStep(s, p1, 1, 0) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 	
-	DbgStep(s, p1, 1, 0);
+	if (DbgStep(s, p1, 1, 0) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 	
-	DbgStep(s, p2, 1, 0);
+	if (DbgStep(s, p2, 1, 0) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p2);
 	
-	DbgEvaluateExpression(s, p1, "a");
+	if (DbgEvaluateExpression(s, p1, "a") < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 	
-	DbgListStackframes(s, p1, 1);
+	if (DbgListStackframes(s, p1, 1) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 	
-	DbgSetFuncBreakpoint(s, p1, "xxx.c", "b");
+	if (DbgSetFuncBreakpoint(s, p1, "xxx.c", "b") < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 	
-	DbgGo(s, p1);
+	if (DbgGo(s, p1) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 	
-	DbgListStackframes(s, p1, 1);
+	if (DbgListStackframes(s, p1, 1) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 	
-	DbgListStackframes(s, p1, 0);
+	if (DbgListStackframes(s, p1, 0) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 	
-	DbgGo(s, p1);
+	if (DbgGo(s, p1) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 
-	DbgQuit(s);
+	if (DbgQuit(s) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 	wait_for_event(s, p1);
 
 	exit(0);
