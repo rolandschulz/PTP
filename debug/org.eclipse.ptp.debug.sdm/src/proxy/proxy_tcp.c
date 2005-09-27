@@ -53,6 +53,8 @@ proxy_tcp_create_conn(proxy_tcp_conn **conn)
 	c->msg_len = 0;
 	c->helper = NULL;
 	
+	signal(SIGPIPE, SIG_IGN);
+	
 	*conn = c;
 }
 
@@ -90,7 +92,7 @@ tcp_recv(proxy_tcp_conn *conn)
 		if (n < 0)
 			perror("recv");
 		CLOSE_SOCKET(conn->sess_sock);
-		conn->sess_sock = INVALID_SOCKET;
+		conn->connected = 0;
 		return -1;
 	}
 	
@@ -109,9 +111,9 @@ tcp_send(proxy_tcp_conn *conn, char *buf, int len)
 		n = send(conn->sess_sock, buf, len, 0);
 		if (n <= 0) {
 			if (n < 0)
-				perror("recv");
+				perror("send");
 			CLOSE_SOCKET(conn->sess_sock);
-			conn->sess_sock = INVALID_SOCKET;			
+			conn->connected = 0;			
 			return -1;
 		}
 
