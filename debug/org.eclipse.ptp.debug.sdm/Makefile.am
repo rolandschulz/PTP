@@ -60,5 +60,6 @@ libutils_a_SOURCES =		src/utils/procset.c \
 						src/utils/stackframe.c \
 						src/utils/event.c \
 						src/utils/hash.c \
-						src/utils/handler.c
+						src/utils/handler.c \
+						src/utils/compat.c
 libutils_a_CFLAGS =		-I./include -I./bitvector -I./libaif $(AM_CFLAGS) -g 
