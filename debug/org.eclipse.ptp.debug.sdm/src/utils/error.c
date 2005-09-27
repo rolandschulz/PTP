@@ -30,9 +30,9 @@ static char * dbg_error_tab[] =
 {
 	"NO_ERROR",
 	"Protocol not implemented",
-	"No such protocol \"%s\"",
+	"Proxy connection unexpectedly terminated",
+	"Bad message received by proxy",
 	"Debugger error: %s",
-	"No server for this process",
 	"Must register callback first",
 	"Callback in progress",
 	"No server to register callback",
