@@ -19,6 +19,4 @@ do
 	(cd $dir; autogen $dir)
 done
 
-./configure
-
 exit 0
