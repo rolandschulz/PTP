@@ -29,111 +29,159 @@
 #include "dbg.h"
  
 proxy proxies[] = {
-	{"tcp", &proxy_tcp_clnt_funcs, NULL},
-	{NULL, NULL, NULL}
+	{"tcp", &proxy_tcp_clnt_funcs, NULL, NULL, NULL},
+	{NULL, NULL, NULL, NULL, NULL}
 };
 
 int 
-proxy_clnt_init_not_imp(void **data, char *attr, va_list ap)
+proxy_clnt_init(proxy *p, proxy_clnt_helper_funcs *funcs, void **data, char *attr, va_list ap)
 {
-	DbgSetError(DBGERR_NOTIMP, NULL);
+	if (p != NULL)
+		return p->clnt_funcs->init(funcs, data, attr, ap);
+		
 	return -1;
 }
 
 int 
-proxy_clnt_setlinebreakpoint_not_imp(void *data, procset *p, char *file, int line)
+proxy_clnt_connect(proxy *p, void *data)
 {
-	DbgSetError(DBGERR_NOTIMP, NULL);
-	return -1;
-}
-
-int 
-proxy_clnt_setfuncbreakpoint_not_imp(void *data, procset *p, char *file, char *func)
-{
-	DbgSetError(DBGERR_NOTIMP, NULL);
-	return -1;
-}
-
-int 
-proxy_clnt_deletebreakpoint_not_imp(void *data, procset *p, int bpid)
-{
-	DbgSetError(DBGERR_NOTIMP, NULL);
+	if (p != NULL)
+		return p->clnt_funcs->connect(data);
+		
 	return -1;
 }
 
 int
-proxy_clnt_go_not_imp(void *data, procset *p)
+proxy_clnt_progress(proxy *p, void *data)
 {
-	DbgSetError(DBGERR_NOTIMP, NULL);
+	if (p != NULL)
+		return p->clnt_funcs->progress(data);
+		
+	return -1;
+}
+
+int
+proxy_clnt_startsession(proxy *p, void *data, char *prog, char *args)
+{
+	if (p != NULL)
+		return p->clnt_funcs->startsession(data, prog, args);
+		
 	return -1;
 }
 
 int 
-proxy_clnt_step_not_imp(void *data, procset *p, int count, int type)
+proxy_clnt_setlinebreakpoint(proxy *p, void *data, procset *set, char *file, int line)
 {
-	DbgSetError(DBGERR_NOTIMP, NULL);
+	if (p != NULL)
+		return p->clnt_funcs->setlinebreakpoint(data, set, file, line);
+		
 	return -1;
 }
 
 int 
-proxy_clnt_liststackframes_not_imp(void *data, procset *p, int current)
+proxy_clnt_setfuncbreakpoint(proxy *p, void *data, procset *set, char *file, char *func)
 {
-	DbgSetError(DBGERR_NOTIMP, NULL);
+	if (p != NULL)
+		return p->clnt_funcs->setfuncbreakpoint(data, set, file, func);
+		
 	return -1;
 }
 
 int 
-proxy_clnt_setcurrentstackframe_not_imp(void *data, procset *p, int level)
+proxy_clnt_deletebreakpoint(proxy *p, void *data, procset *set, int bpid)
 {
-	DbgSetError(DBGERR_NOTIMP, NULL);
+	if (p != NULL)
+		return p->clnt_funcs->deletebreakpoint(data, set, bpid);
+		
+	return -1;
+}
+
+int
+proxy_clnt_go(proxy *p, void *data, procset *set)
+{
+	if (p != NULL)
+		return p->clnt_funcs->go(data, set);
+		
 	return -1;
 }
 
 int 
-proxy_clnt_evaluateexpression_not_imp(void *data, procset *p, char *expr)
+proxy_clnt_step(proxy *p, void *data, procset *set, int count, int type)
 {
-	DbgSetError(DBGERR_NOTIMP, NULL);
+	if (p != NULL)
+		return p->clnt_funcs->step(data, set, count, type);
+		
 	return -1;
 }
 
 int 
-proxy_clnt_gettype_not_imp(void *data, procset *p, char *expr)
+proxy_clnt_liststackframes(proxy *p, void *data, procset *set, int current)
 {
-	DbgSetError(DBGERR_NOTIMP, NULL);
+	if (p != NULL)
+		return p->clnt_funcs->liststackframes(data, set, current);
+		
 	return -1;
 }
 
 int 
-proxy_clnt_listlocalvariables_not_imp(void *data, procset *p)
+proxy_clnt_setcurrentstackframe(proxy *p, void *data, procset *set, int level)
 {
-	DbgSetError(DBGERR_NOTIMP, NULL);
+	if (p != NULL)
+		return p->clnt_funcs->setcurrentstackframe(data, set, level);
+		
 	return -1;
 }
 
 int 
-proxy_clnt_listarguments_not_imp(void *data, procset *p)
+proxy_clnt_evaluateexpression(proxy *p, void *data, procset *set, char *expr)
 {
-	DbgSetError(DBGERR_NOTIMP, NULL);
+	if (p != NULL)
+		return p->clnt_funcs->evaluateexpression(data, set, expr);
+		
 	return -1;
 }
 
 int 
-proxy_clnt_listglobalvariables_not_imp(void *data, procset *p)
+proxy_clnt_gettype(proxy *p, void *data, procset *set, char *expr)
 {
-	DbgSetError(DBGERR_NOTIMP, NULL);
+	if (p != NULL)
+		return p->clnt_funcs->gettype(data, set, expr);
+		
 	return -1;
 }
 
 int 
-proxy_clnt_quit_not_imp(void *data)
+proxy_clnt_listlocalvariables(proxy *p, void *data, procset *set)
 {
-	DbgSetError(DBGERR_NOTIMP, NULL);
+	if (p != NULL)
+		return p->clnt_funcs->listlocalvariables(data, set);
+		
 	return -1;
 }
 
 int 
-proxy_clnt_progress_not_imp(void *data, void (*cb)(dbg_event *))
+proxy_clnt_listarguments(proxy *p, void *data, procset *set)
 {
-	DbgSetError(DBGERR_NOTIMP, NULL);
+	if (p != NULL)
+		return p->clnt_funcs->listarguments(data, set);
+		
+	return -1;
+}
+
+int 
+proxy_clnt_listglobalvariables(proxy *p, void *data, procset *set)
+{
+	if (p != NULL)
+		return p->clnt_funcs->listglobalvariables(data, set);
+		
+	return -1;
+}
+
+int 
+proxy_clnt_quit(proxy *p, void *data)
+{
+	if (p != NULL)
+		return p->clnt_funcs->quit(data);
+		
 	return -1;
 }
