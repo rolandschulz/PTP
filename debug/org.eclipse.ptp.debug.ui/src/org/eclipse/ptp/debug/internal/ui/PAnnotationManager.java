@@ -333,12 +333,6 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	}
 	// called by debug view
 	public void removeAnnotation(IEditorPart editorPart, IThread thread) throws CoreException {
-		ITextEditor textEditor = getTextEditor(editorPart);
-		if (textEditor == null)
-			throw new CoreException(Status.CANCEL_STATUS);
-		IFile file = getFile(textEditor.getEditorInput());
-		if (file == null)
-			throw new CoreException(Status.CANCEL_STATUS);
 		BitList tasks = getTasks(thread);
 		if (tasks == null)
 			throw new CoreException(Status.CANCEL_STATUS);
@@ -346,40 +340,27 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 		if (annotationGroup != null) {
 			synchronized (tasks) {
-				removeAnnotation(annotationGroup, textEditor, file, tasks);
+				removeAnnotation(annotationGroup, tasks);
 				if (annotationGroup.isEmpty())
 					removeAnnotationGroup(job_id);
 			}
 		}
 	}
 	// called by event
-	public void removeAnnotation(String job_id, String fullPathFileName, BitList tasks) throws CoreException {
+	public void removeAnnotation(String job_id, BitList tasks) throws CoreException {
 		if (tasks.isEmpty())
 			return;
-		IFile file = findFile(fullPathFileName);
-		if (file == null)
-			throw new CoreException(Status.CANCEL_STATUS);
-		IEditorPart editorPart = getEditorPart(file);
-		if (editorPart == null)
-			throw new CoreException(Status.CANCEL_STATUS);
-		ITextEditor textEditor = getTextEditor(editorPart);
-		if (textEditor == null)
-			throw new CoreException(Status.CANCEL_STATUS);
 		AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 		if (annotationGroup != null) {
 			synchronized (tasks) {
-				removeAnnotation(annotationGroup, textEditor, file, tasks);
+				removeAnnotation(annotationGroup, tasks);
 				if (annotationGroup.isEmpty())
 					removeAnnotationGroup(job_id);
 			}
 		}
 	}
 	// generic
-	public synchronized void removeAnnotation(AnnotationGroup annotationGroup, ITextEditor textEditor, IFile file, BitList tasks) throws CoreException {
-		IDocumentProvider docProvider = textEditor.getDocumentProvider();
-		IAnnotationModel annotationModel = docProvider.getAnnotationModel(textEditor.getEditorInput());
-		if (annotationModel == null)
-			throw new CoreException(Status.CANCEL_STATUS);
+	public synchronized void removeAnnotation(AnnotationGroup annotationGroup, BitList tasks) throws CoreException {
 		List removedList = new ArrayList(0);
 		for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
 			PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation) i.next();
