@@ -54,7 +54,6 @@ static int	GDBMIBuildAIFVar(char *, char *, char *, AIF **);
 static int	SetAndCheckBreak(char *);
 
 static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
-static int	GDBMIRead(int);
 static int	GDBMIProgress(void);
 static int	GDBMIStartSession(char *, char *, char*);
 static int	GDBMISetLineBreakpoint(char *, int);
@@ -74,7 +73,6 @@ static int	GDBMIQuit(void);
 dbg_backend_funcs	GDBMIBackend =
 {
 	GDBMIInit,
-	GDBMIRead,
 	GDBMIProgress,
 	GDBMIStartSession,
 	GDBMISetLineBreakpoint,
@@ -105,7 +103,13 @@ GetLastErrorStr(void)
  		return mi_error_from_gdb;
 	return (char *)mi_get_error_str();
 }
-	
+
+void
+ResetError(void)
+{
+	mi_error=MI_OK;
+}
+
 void
 SaveEvent(dbg_event *e)
 {
@@ -125,40 +129,6 @@ Reap(int sig)
 	printf("waiting on child...\n");
 	wait(&status);
 }
-
-#ifdef notdef
-/*
-** Look up current frame.
-*/
-static int
-SetCurrFrame(void)
-{
-	stackframe *	s;
-	mi_frames *	frame;
-
-	if ( (frame = gmi_stack_info_frame(MIHandle)) == NULL )
-		return -1;
-
-	s = NewStackframe(frame->level);
-
-	if ( frame->addr != 0 )
-		asprintf(&s->location.addr, "0x%x", frame->addr);
-	if ( frame->func != NULL )
-		s->location.func = strdup(frame->func);
-	if ( frame->file != NULL )
-		s->location.file = strdup(frame->file);
-	s->location.line = frame->line;
-
-	mi_free_frames(frame);
-
-	if ( CurrentStackframe != NULL )
-		FreeStackframe(CurrentStackframe);
-
-	CurrentStackframe = s;
-
-	return 0;
-}
-#endif
 
 /*
 ** AsyncCallback is called by mi_get_response() when an async response is
@@ -296,6 +266,8 @@ GDBMIStartSession(char *gdb_path, char *prog, char *args)
 	
 	mi_set_gdb_exe(gdb_path);
 	
+	ResetError();
+	
 	if ((MIHandle = mi_connect_local()) == NULL) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
@@ -308,6 +280,7 @@ GDBMIStartSession(char *gdb_path, char *prog, char *args)
 	mi_set_from_gdb_cb(MIHandle, from_gdb_cb, NULL);
 #endif /* DEBUG */
 
+	ResetError();
 	if ( !gmi_set_exec(MIHandle, prog, args) )
 	{
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
@@ -387,6 +360,7 @@ GDBMIProgress(void)
 		break;
 	}
 	
+	ResetError();
 	if ( mi_get_response(MIHandle) < 0 ) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		mi_disconnect(MIHandle);
@@ -394,24 +368,6 @@ GDBMIProgress(void)
 	}
 
 	return 0;
-}
-
-/*
- * Read response from gdb. Keep reading until a prompt is
- * received (mi_get_response() returns 1).
- */
-static int
-GDBMIRead(int rd)
-{
-	int res;
-
-	while ( (res = mi_get_response(MIHandle)) <= 0 )
-	{
-		if (res < 0)
-			return 0;
-	}
-
-	return 1;
 }
 
 /*
@@ -461,6 +417,8 @@ SetAndCheckBreak(char *where)
 	breakpoint *	bp;
 	dbg_event *	e;
 	mi_bkpt *	bpt;
+
+	ResetError();
 
 	bpt = gmi_break_insert_full(MIHandle, 0, 0, NULL, -1, -1, where);
 
@@ -529,6 +487,8 @@ GDBMIDeleteBreakpoint(int bpid)
 {
 	CHECK_SESSION()
 
+	ResetError();
+
 	if ( !gmi_break_delete(MIHandle, bpid) ) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
@@ -550,6 +510,8 @@ GDBMIGo(void)
 	int res;
 	
 	CHECK_SESSION()
+
+	ResetError();
 
 	if (Started)
 		res = gmi_exec_continue(MIHandle);
@@ -578,6 +540,8 @@ GDBMIStep(int count, int type)
 
 	CHECK_SESSION()
 
+	ResetError();
+
 	if ( type == 0 )
 		res = gmi_exec_next_cnt(MIHandle, count);
 	else
@@ -599,6 +563,8 @@ static int
 GDBMISetCurrentStackframe(int level)
 {
 	CHECK_SESSION()
+
+	ResetError();
 
 	if (!gmi_stack_select_frame(MIHandle, level))
 	{
@@ -624,6 +590,8 @@ GDBMIListStackframes(int current)
 	mi_frames *	frames;
 	
 	CHECK_SESSION()
+
+	ResetError();
 
 	if (current)
 		frames = gmi_stack_info_frame(MIHandle);
@@ -747,6 +715,8 @@ GDBMIEvaluateExpression(char *exp)
 		DbgSetError(DBGERR_DEBUGGER, (char *)strerror(errno));
 		return DBGRES_ERR;
 	}
+
+	ResetError();
 
 	if ( !gmi_dump_binary_value(MIHandle, exp, tmp) )
 	{
@@ -926,6 +896,8 @@ SimpleTypeToFDS(char *type, str_ptr fds)
 static int
 ConvertType(mi_gvar *gvar, str_ptr fds)
 {
+	ResetError();
+
 	if ( gvar->numchild == 0 )
 	{
 		if ( !gmi_var_info_type(MIHandle, gvar) )
@@ -998,6 +970,8 @@ GDBMIGetType(char *var)
 
 	CHECK_SESSION()
 
+	ResetError();
+
 	gvar = gmi_var_create(MIHandle, -1, var);
 
 	if ( gvar == NULL )
@@ -1034,6 +1008,8 @@ GDBMIGetLocalVariables(void)
 	mi_results *	res;
 
 	CHECK_SESSION()
+
+	ResetError();
 
 	res = gmi_stack_list_locals(MIHandle, 0);
 
@@ -1103,63 +1079,8 @@ GDBMIQuit(void)
 	return DBGRES_OK;
 }
 
-#ifdef notyet
-dbgevent_t *
-DbgGDBMIInvoke(char *host, int cb, char *proto, char *prog, char *args, char **env, int arch)
-{
-	dbgevent_t *	e;
-	mi_bkpt *	bpt;
-	mi_stop *	sr;
-
-	DPRINT(fprintf(stderr, "*** DbgInvoke\n"));
-
-	if ( !gmi_set_exec(MIHandle, prog, args) )
-	{
-		EVENT_ERROR(e, DBGERR_DEBUGGER, GetLastErrorStr());
-		return e;
-	}
-
-	bpt = gmi_break_insert_full(MIHandle, 0, 0, NULL, -1, -1, "main");
-
-	if ( bpt == NULL ) {
-		EVENT_ERROR(e, DBGERR_DEBUGGER, GetLastErrorStr());
-		return e;
-	}
-
-	if ( !gmi_exec_run(MIHandle) )
-	{
-		EVENT_ERROR(e, DBGERR_DEBUGGER, GetLastErrorStr());
-		return e;
-	}
-
-	/*
-	** Wait until we hit the breakpoint at main().
-	*/
-
-	while ( !mi_get_response(MIHandle) )
-		usleep(1000);
-
-	sr = mi_res_stop(MIHandle);
-	
-	if ( !sr || SetCurrFrame() < 0 )
-	{
-		EVENT_ERROR(e, DBGERR_DEBUGGER, GetLastErrorStr());
-		return e;
-	}
-
-	if ( DbgProg != NULL ) 
-		Free(DbgProg);
-
-	DbgProg = strdup(prog);
-
-	Status = DBGSTAT_STOPPED;
-
-	return NewEvent(DBGEV_OK);
-}
-#endif
-
 char tohex[] =	{'0', '1', '2', '3', '4', '5', '6', '7', 
-		 '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+				 '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
 static int
 GDBMIBuildAIFVar(char *var, char *type, char *file, AIF **aif)
