@@ -60,6 +60,7 @@ static int proxy_tcp_clnt_setfuncbreakpoint(void *, procset *, char *, char *);
 static int proxy_tcp_clnt_deletebreakpoint(void *, procset *, int);
 static int proxy_tcp_clnt_go(void *, procset *);
 static int proxy_tcp_clnt_step(void *, procset *, int, int);
+static int proxy_tcp_clnt_terminate(void *, procset *);
 static int proxy_tcp_clnt_liststackframes(void *, procset *, int);
 static int proxy_tcp_clnt_setcurrentstackframe(void *, procset *, int);
 static int proxy_tcp_clnt_evaluateexpression(void *, procset *, char *);
@@ -81,6 +82,7 @@ proxy_clnt_funcs proxy_tcp_clnt_funcs =
 	proxy_tcp_clnt_deletebreakpoint,
 	proxy_tcp_clnt_go,
 	proxy_tcp_clnt_step,
+	proxy_tcp_clnt_terminate,
 	proxy_tcp_clnt_liststackframes,
 	proxy_tcp_clnt_setcurrentstackframe,
 	proxy_tcp_clnt_evaluateexpression,
@@ -425,6 +427,22 @@ proxy_tcp_clnt_step(void *data, procset *set, int count, int type)
 	procs = procset_to_str(set);
 	        
 	res = proxy_tcp_clnt_send_cmd(conn, "STP %s %d %d", procs, count, type);
+	
+	free(procs);
+		
+	return res;
+}
+
+static int
+proxy_tcp_clnt_terminate(void *data, procset *set)
+{
+	int				res;
+	char *			procs;
+	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
+
+	procs = procset_to_str(set);
+	        
+	res = proxy_tcp_clnt_send_cmd(conn, "HLT %s", procs);
 	
 	free(procs);
 		

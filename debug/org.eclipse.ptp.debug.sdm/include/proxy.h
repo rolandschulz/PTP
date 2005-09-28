@@ -55,6 +55,7 @@ struct proxy_clnt_funcs {
 	int (*deletebreakpoint)(void *, struct procset *, int);
 	int (*go)(void *, struct procset *);
 	int (*step)(void *, struct procset *, int, int);
+	int (*terminate)(void *, struct procset *);
 	int (*liststackframes)(void *, struct procset *, int);
 	int (*setcurrentstackframe)(void *, struct procset *, int);
 	int (*evaluateexpression)(void *, struct procset *, char *);
@@ -86,6 +87,7 @@ struct proxy_svr_helper_funcs {
 	int (*deletebreakpoint)(struct procset *, int);
 	int (*go)(struct procset *);
 	int (*step)(struct procset *, int, int);
+	int (*terminate)(struct procset *);
 	int (*liststackframes)(struct procset *, int);
 	int (*setcurrentstackframe)(struct procset *, int);
 	int (*evaluateexpression)(struct procset *, char *);
@@ -135,6 +137,7 @@ extern int proxy_clnt_setfuncbreakpoint(proxy *, void *, struct procset *, char 
 extern int proxy_clnt_deletebreakpoint(proxy *, void *, struct procset *, int);
 extern int proxy_clnt_go(proxy *, void *, struct procset *);
 extern int proxy_clnt_step(proxy *, void *, struct procset *, int, int);
+extern int proxy_clnt_terminate(proxy *, void *, struct procset *);
 extern int proxy_clnt_liststackframes(proxy *, void *, struct procset *, int);
 extern int proxy_clnt_setcurrentstackframe(proxy *, void*, struct procset *, int);
 extern int proxy_clnt_evaluateexpression(proxy *, void *, struct procset *, char *);

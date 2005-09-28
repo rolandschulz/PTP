@@ -36,6 +36,7 @@ struct dbg_backend_funcs {
 	int (*deletebreakpoints)(int);
 	int (*go)(void);
 	int (*step)(int, int);
+	int (*terminate)(void);
 	int (*liststackframes)(int);
 	int (*setcurrentstackframe)(int);
 	int (*evaluateexpression)(char *);

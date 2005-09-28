@@ -48,6 +48,7 @@ int DbgClntDeleteBreakpoint(procset *set, int);
  */
 int DbgClntGo(procset *set);
 int DbgClntStep(procset *set, int count, int type);
+int DbgClntTerminate(procset *set);
 
 /*
  * Stack frame operations

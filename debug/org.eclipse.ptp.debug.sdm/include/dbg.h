@@ -56,6 +56,7 @@ int DbgDeleteBreakpoint(session *s, procset *set, int bpid);
  */
 int DbgGo(session *s, procset *set);
 int DbgStep(session *s, procset *set, int count, int type);
+int DbgTerminate(session *s, procset *set);
 
 /*
  * Stack frame operations

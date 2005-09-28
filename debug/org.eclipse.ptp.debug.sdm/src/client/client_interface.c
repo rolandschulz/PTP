@@ -144,6 +144,12 @@ DbgStep(session *s, procset *set, int count, int type)
 	return proxy_clnt_step(s->sess_proxy, s->sess_proxy_data, set, count, type);
 }
 
+int 
+DbgTerminate(session *s, procset *set)
+{
+	return proxy_clnt_terminate(s->sess_proxy, s->sess_proxy_data, set);
+}
+
 /*
  * Stack frame operations
  */

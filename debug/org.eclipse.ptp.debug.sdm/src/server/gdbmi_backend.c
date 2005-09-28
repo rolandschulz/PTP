@@ -61,6 +61,7 @@ static int	GDBMISetFuncBreakpoint(char *, char *);
 static int	GDBMIDeleteBreakpoint(int);
 static int	GDBMIGo(void);
 static int	GDBMIStep(int, int);
+static int	GDBMITerminate(void);
 static int	GDBMIListStackframes(int);
 static int	GDBMISetCurrentStackframe(int);
 static int	GDBMIEvaluateExpression(char *);
@@ -80,6 +81,7 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIDeleteBreakpoint,
 	GDBMIGo,
 	GDBMIStep,
+	GDBMITerminate,
 	GDBMIListStackframes,
 	GDBMISetCurrentStackframe,
 	GDBMIEvaluateExpression,
@@ -281,7 +283,8 @@ GDBMIStartSession(char *gdb_path, char *prog, char *args)
 #endif /* DEBUG */
 
 	ResetError();
-	if ( !gmi_set_exec(MIHandle, prog, args) )
+	if ( !gmi_set_exec(MIHandle, prog, args) ||
+		!gmi_gdb_set(MIHandle, "confirm", "off") )
 	{
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		gmi_gdb_exit(MIHandle);
@@ -553,6 +556,25 @@ GDBMIStep(int count, int type)
 		return DBGRES_ERR;
 	}
 
+	return DBGRES_OK;
+}
+
+/*
+** Terminate program execution.
+*/
+static int
+GDBMITerminate(void)
+{
+	CHECK_SESSION()
+
+	ResetError();
+	
+	if (!gmi_exec_kill(MIHandle))
+	{
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		return DBGRES_ERR;
+	}
+	
 	return DBGRES_OK;
 }
 

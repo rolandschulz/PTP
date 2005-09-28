@@ -75,6 +75,7 @@ static int proxy_tcp_svr_setfuncbreakpoint(proxy_svr_helper_funcs *, char **, ch
 static int proxy_tcp_svr_deletebreakpoint(proxy_svr_helper_funcs *, char **, char **);
 static int proxy_tcp_svr_go(proxy_svr_helper_funcs *, char **, char **);
 static int proxy_tcp_svr_step(proxy_svr_helper_funcs *, char **, char **);
+static int proxy_tcp_svr_terminate(proxy_svr_helper_funcs *, char **, char **);
 static int proxy_tcp_svr_liststackframes(proxy_svr_helper_funcs *, char **, char **);
 static int proxy_tcp_svr_setcurrentstackframe(proxy_svr_helper_funcs *, char **, char **);
 static int proxy_tcp_svr_evaluateexpression(proxy_svr_helper_funcs *, char **, char **);
@@ -92,6 +93,7 @@ static proxy_tcp_svr_func proxy_tcp_svr_func_tab[] =
 	{"DBS",	proxy_tcp_svr_deletebreakpoint},
 	{"GOP",	proxy_tcp_svr_go},
 	{"STP",	proxy_tcp_svr_step},
+	{"HLT",	proxy_tcp_svr_terminate},
 	{"LSF",	proxy_tcp_svr_liststackframes},
 	{"SCS",	proxy_tcp_svr_setcurrentstackframe},
 	{"EEX",	proxy_tcp_svr_evaluateexpression},
@@ -513,7 +515,27 @@ proxy_tcp_svr_step(proxy_svr_helper_funcs *helper, char **args, char **response)
 	
 	procset_free(procs);
 	
-	return res;}
+	return res;
+}
+
+static int 
+proxy_tcp_svr_terminate(proxy_svr_helper_funcs *helper, char **args, char **response)
+{
+	int			res;
+	procset *	procs;
+	
+	procs = str_to_procset(args[1]);
+	if (procs == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	res = helper->terminate(procs);
+	
+	procset_free(procs);
+	
+	return res;
+}
 
 static int 
 proxy_tcp_svr_liststackframes(proxy_svr_helper_funcs *helper, char **args, char **response)
