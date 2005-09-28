@@ -29,33 +29,30 @@
 			type="org.eclipse.ptp.launch.parallelLaunch"
 			class="org.eclipse.ptp.launch.internal.ui.ParallelLaunchConfigurationTabGroup"
 			id="org.eclipse.ptp.launch.parallelLaunchConfigurationTabGroup">
+			<launchMode
+               perspective="org.eclipse.ptp.debug.ui.PTPDebugPerspective"
+               description="%ParallelLaunch.debug"
+               mode="debug">
+	        </launchMode>
+    	    <launchMode
+               perspective="org.eclipse.ptp.ui.PTPRunPerspective"
+               description="%ParallelLaunch.run"
+               mode="run">
+         	</launchMode>
 		</launchConfigurationTabGroup>
 	</extension>
 
 <!-- PDT Shortcut //-->	
    <extension
-         point="org.eclipse.debug.ui.launchShortcuts">
-      <shortcut
+		point="org.eclipse.debug.ui.launchShortcuts">
+		<shortcut
             label="%PTPShortcut.label"
 			icon="icons/parallel_run.gif"
             class="org.eclipse.ptp.launch.internal.PTPLaunchShortcut"
             modes="run, debug"
             id="org.eclipse.ptp.ptpShortcut">
-         <perspective
-               id="org.eclipse.ptp.ui.PTPRunPerspective">
-         </perspective>
-         <perspective
-               id="org.eclipse.debug.ui.DebugPerspective">
-         </perspective>
-         <perspective
-               id="org.eclipse.ui.resourcePerspective">
-         </perspective>
-         <perspective
-               id="org.eclipse.jdt.ui.JavaPerspective">
-         </perspective>                  
-         <perspective
-               id="org.eclipse.cdt.ui.CPerspective">
-         </perspective>                  
-      </shortcut>
+			<perspective id="org.eclipse.ptp.ui.PTPRunPerspective"/>
+			<perspective id="org.eclipse.ptp.debug.ui.PTPDebugPerspective"/>
+		</shortcut>
    </extension>	
 </plugin>
