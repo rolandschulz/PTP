@@ -24,8 +24,6 @@
 #include	<config.h>
 #endif /* HAVE_CONFIG_H */
 
-RCSID("$Id$");
-
 #include	<stdio.h>
 #ifndef WIN32
 #include	<unistd.h>

@@ -24,8 +24,6 @@
 #include	<config.h>
 #endif /* HAVE_CONFIG_H */
 
-RCSID("$Id$");
-
 #include	<stdio.h>
 
 #ifdef STDC_HEADERS
