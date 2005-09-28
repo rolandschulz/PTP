@@ -25,23 +25,14 @@ test_proxy_clnt_CFLAGS =	-I./include -I./bitvector -I./libaif $(AM_CFLAGS) -g
 test_proxy_clnt_LDFLAGS = -g
 test_proxy_clnt_LDADD =	libdbgproxy.a libutils.a bitvector/.libs/libbitvector.a libaif/libaif.a
 
-test_proxy_svr_SOURCES =	src/test/test_proxy_svr.c \
-						src/proxy/proxy.c \
-						src/proxy/proxy_svr.c \
-						src/proxy/proxy_tcp_svr.c \
-						src/proxy/proxy_tcp.c \
-						src/client/client_cmds.c
-test_proxy_svr_CFLAGS =	-I./include -I./bitvector -I./libaif $(AM_CFLAGS) -g
-test_proxy_svr_LDFLAGS = -g
-test_proxy_svr_LDADD =	libutils.a bitvector/.libs/libbitvector.a
-
 include_HEADERS =		include/breakpoint.h include/dbg.h include/location.h include/procset.h include/stackframe.h
 
-lib_LTLIBRARIES =		libptp_dbg_jni.la
-
-libptp_dbg_jni_la_SOURCES = jni/dbg_jni.c
-libptp_dbg_jni_la_LDFLAGS = -shrext .jnilib -single_module -framework JavaVM
-libptp_dbg_jni_la_CFLAGS = -I/System/Library/Frameworks/JavaVM.framework/Headers $(AM_CFLAGS)
+lib_LTLIBRARIES =
+if PTPDBGJNI
+	lib_LTLIBRARIES += libptp_dbg_jni.la
+	libptp_dbg_jni_la_SOURCES = jni/dbg_jni.c
+	libptp_dbg_jni_la_CFLAGS = $(AM_CFLAGS)
+endif
 
 lib_LIBRARIES =			libdbgproxy.a libutils.a
 
