@@ -24,8 +24,6 @@
 #include	<config.h>
 #endif /* HAVE_CONFIG_H */
 
-RCSID("$Id: struct.c,v 1.10 2002/07/22 22:29:47 greg Exp $");
-
 #include	<stdio.h>
 #ifndef WIN32
 #include	<unistd.h>

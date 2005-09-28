@@ -24,8 +24,6 @@
 #include	<config.h>
 #endif /* HAVE_CONFIG_H */
 
-RCSID("$Id: print.c,v 1.25 2005/05/22 15:40:57 jarrah Exp $");
-
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>

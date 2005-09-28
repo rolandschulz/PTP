@@ -33,8 +33,6 @@
 #include	<config.h>
 #endif /* HAVE_CONFIG_H */
 
-RCSID("$Id: calc.c,v 1.40 2005/05/24 23:58:45 jarrah Exp $");
-
 #include	<stdio.h>
 #include	<string.h>
 

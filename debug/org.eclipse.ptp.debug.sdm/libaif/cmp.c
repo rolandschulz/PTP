@@ -24,8 +24,6 @@
 #include	<config.h>
 #endif /* HAVE_CONFIG_H */
 
-RCSID("$Id: cmp.c,v 1.48 2005/05/24 23:58:48 jarrah Exp $");
-
 #include	<stdio.h>
 #include	<string.h>
 #include	<math.h>

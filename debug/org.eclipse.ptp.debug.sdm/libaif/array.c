@@ -24,8 +24,6 @@
 #include	<config.h>
 #endif /* HAVE_CONFIG_H */
 
-RCSID("$Id: array.c,v 1.34 2003/03/14 16:07:09 jarrah Exp $");
-
 #include	<stdio.h>
 #include	<memory.h>
 #include	<string.h>

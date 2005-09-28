@@ -4,3 +4,4 @@ Makefile
 aif_xdr.c
 config.h
 *.a
+autom4te.cache

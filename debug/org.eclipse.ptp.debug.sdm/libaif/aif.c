@@ -24,8 +24,6 @@
 #include	<config.h>
 #endif /* HAVE_CONFIG_H */
 
-RCSID("$Id: aif.c,v 1.26 2003/10/05 15:01:56 jarrah Exp $");
-
 #include	<stdio.h>
 
 #ifdef STDC_HEADERS

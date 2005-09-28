@@ -25,8 +25,6 @@
 #include	<config.h>
 #endif /* HAVE_CONFIG_H */
 
-RCSID("$Id: conv.c,v 1.54 2005/05/24 23:58:48 jarrah Exp $");
-
 #include	<assert.h>
 #include	<ctype.h>
 #include	<stdio.h>

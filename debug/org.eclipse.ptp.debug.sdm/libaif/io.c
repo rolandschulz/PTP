@@ -24,8 +24,6 @@
 #include	<config.h>
 #endif /* HAVE_CONFIG_H */
 
-RCSID("$Id: io.c,v 1.13 2002/07/22 22:29:47 greg Exp $");
-
 #include	<assert.h>
 #include	<stdio.h>
 #include	<errno.h>
