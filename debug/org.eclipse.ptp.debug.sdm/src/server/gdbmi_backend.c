@@ -374,7 +374,7 @@ GDBMIProgress(void)
 			mi_disconnect(MIHandle);
 			MIHandle = NULL;
 		
-			DbgSetError(DBGERR_SELECT, strerror(errno));
+			DbgSetError(DBGERR_SYSTEM, strerror(errno));
 			return 0;
 		
 		case 0:

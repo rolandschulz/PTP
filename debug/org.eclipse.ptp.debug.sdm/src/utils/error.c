@@ -59,7 +59,7 @@ static char * dbg_error_tab[] =
 	"Could not create temporary file",
 	"pipe: %s",
 	"fork: %s",
-	"select: %s",
+	"system error: %s",
 	"%s: not in executable format",
 	"%s",
 	"Source file is more recent than executable",
