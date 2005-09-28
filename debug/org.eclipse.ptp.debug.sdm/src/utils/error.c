@@ -33,7 +33,7 @@ static char * dbg_error_tab[] =
 	"Proxy connection unexpectedly terminated",
 	"Bad message received by proxy",
 	"Debugger error: %s",
-	"Must register callback first",
+	"Backend debugger executable \"%s\" not found",
 	"Callback in progress",
 	"No server to register callback",
 	"Must start session first",

@@ -56,7 +56,7 @@ static int	SetAndCheckBreak(char *);
 static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIRead(int);
 static int	GDBMIProgress(void);
-static int	GDBMIStartSession(char *, char*);
+static int	GDBMIStartSession(char *, char *, char*);
 static int	GDBMISetLineBreakpoint(char *, int);
 static int	GDBMISetFuncBreakpoint(char *, char *);
 static int	GDBMIDeleteBreakpoint(int);
@@ -247,7 +247,7 @@ GDBMIInit(void (*event_callback)(dbg_event *, void *), void *data)
 
 	Breakpoints = NewList();
 	
-	return DBGEV_OK;
+	return DBGRES_OK;
 }
 
 #ifdef DEBUG
@@ -267,12 +267,34 @@ from_gdb_cb(const char *str, void *data)
  * Start GDB session
  */	
 static int
-GDBMIStartSession(char *prog, char *args)
+GDBMIStartSession(char *gdb_path, char *prog, char *args)
 {
+	char *		p;
+	struct stat	st;
+	
 	if (MIHandle != NULL) {
 		DbgSetError(DBGERR_SESSION, NULL);
 		return DBGRES_ERR;
 	}
+
+	/*
+	 * see if we can find the gdb executable
+	 */
+	if (*gdb_path == '/') {
+	 	if (stat(gdb_path, &st) < 0 || !S_ISREG(st.st_mode)) {
+	 		DbgSetError(DBGERR_NOBACKEND, gdb_path);
+	 		return DBGRES_ERR;
+	 	}
+	} else {
+		p = mi_search_in_path(gdb_path);
+		if (p == NULL) {
+	 		DbgSetError(DBGERR_NOBACKEND, gdb_path);
+	 		return DBGRES_ERR;
+	 	}
+	 	gdb_path = p;
+	}
+	
+	mi_set_gdb_exe(gdb_path);
 	
 	if ((MIHandle = mi_connect_local()) == NULL) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());

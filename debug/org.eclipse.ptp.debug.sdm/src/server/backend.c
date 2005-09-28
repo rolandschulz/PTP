@@ -17,7 +17,7 @@
 extern dbg_backend_funcs	GDBMIBackend;
 
 dbg_backend	dbg_backends[] = {
-	{"gdb-mi", &GDBMIBackend},
+	{"gdb-mi", &GDBMIBackend, "gdb"},
 };
 
 int
@@ -35,4 +35,10 @@ find_dbg_backend(char *name, dbg_backend **dp)
 	}
 
 	return -1;
+}
+
+void
+backend_set_path(dbg_backend *d, char *path)
+{
+	d->db_exe_path = path;
 }

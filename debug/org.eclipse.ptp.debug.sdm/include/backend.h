@@ -31,7 +31,7 @@ struct dbg_backend_funcs {
 	int (*init)(void (*)(dbg_event *, void *), void *);
 	int (*read)(int);
 	int (*progress)(void);
-	int (*start_session)(char *, char *);
+	int (*start_session)(char *, char *, char *);
 	int (*setlinebreakpoint)(char *, int);
 	int (*setfuncbreakpoint)(char *, char *);
 	int (*deletebreakpoints)(int);
@@ -51,11 +51,13 @@ typedef struct dbg_backend_funcs	dbg_backend_funcs;
 struct dbg_backend {
 	char *						db_name;
 	struct dbg_backend_funcs *	db_funcs;
+	char *						db_exe_path;
 };
 typedef struct dbg_backend	dbg_backend;
 
 extern dbg_backend 	dbg_backends[];
 
-extern int find_dbg_backend(char *, dbg_backend **);
+extern int	find_dbg_backend(char *, dbg_backend **);
+extern void	backend_set_path(dbg_backend *, char *);
 
 #endif /* _BACKEND_H_*/
