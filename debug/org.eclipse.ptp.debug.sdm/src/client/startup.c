@@ -33,11 +33,12 @@ extern void client(int, int, char *, char *, int);
 extern void server(int, int, dbg_backend *);
 
 static struct option longopts[] = {
-	{"debugger",	required_argument,	NULL,	'b'},
-	{"proxy",	required_argument,	NULL, 	'P'}, 
-	{"port",		required_argument,	NULL, 	'p'}, 
-	{"host",		required_argument,	NULL, 	'h'}, 
-	{NULL,		0,					NULL,	0}
+	{"debugger",			required_argument,	NULL,	'b'},
+	{"debugger_path",	required_argument,	NULL, 	'e'}, 
+	{"proxy",			required_argument,	NULL, 	'P'}, 
+	{"port",				required_argument,	NULL, 	'p'}, 
+	{"host",				required_argument,	NULL, 	'h'}, 
+	{NULL,				0,					NULL,	0}
 };
 
 void
@@ -57,6 +58,7 @@ error_msg(int rank, char *fmt, ...)
  * Main entry point for MPI parallel debugger.
  * 
  * @arg	-b debugger	select backend debugger
+ * @arg	-e path		set backend debugger path
  * @arg	-p port		port number to listen on/connect to
  * @arg	-h host		host to connect to
  * @arg	-P proxy		type of proxy connection to use
@@ -71,13 +73,22 @@ main(int argc, char *argv[])
 	char *			host = NULL;
 	char *			debugger_str = DEFAULT_BACKEND;
 	char *			proxy_str = DEFAULT_PROXY;
+	char *			path = NULL;
 	proxy *			p;
 	dbg_backend *	d;
+
+	MPI_Init(&argc, &argv);
 	
-	while ((ch = getopt_long(argc, argv, "b:P:p:h:", longopts, NULL)) != -1)
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	
+	while ((ch = getopt_long(argc, argv, "b:e:P:p:h:", longopts, NULL)) != -1)
 	switch (ch) {
 	case 'b':
 		debugger_str = optarg;
+		break;
+	case 'e':
+		path = optarg;
 		break;
 	case 'P':
 		proxy_str = optarg;
@@ -89,17 +100,14 @@ main(int argc, char *argv[])
 		host = optarg;
 		break;
 	default:
-		fprintf(stderr, "sdm [--debugger=value] [--proxy=proxy] [--host=host_name] [--port=list-port]\n");
+		error_msg(rank, "sdm [--debugger=value] [--debugger_path=path]\n");
+		error_msg(rank, "    [--proxy=proxy]\n");
+		error_msg(rank, "    [--host=host_name] [--port=list-port]\n");
 		exit(1);
 	}
 	
 	argc -= optind;
 	argv += optind;
-	
-	MPI_Init(&argc, &argv);
-	
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	
 	if (size < 2) {
 		error_msg(rank, "Debugger requires at least 2 processes\n");
@@ -110,13 +118,14 @@ main(int argc, char *argv[])
 	// MPI_Comm_create_errhandler(handle_fatal_errors, &err_handler);
 	// MPI_Comm_set_errhandler(MPI_COMM_WORLD, err_handler);
 	
-	/* Create multicast communicator */
-	
 	if (find_dbg_backend(debugger_str, &d) < 0) {
 		error_msg(rank, "No such backend: \"%s\"\n", debugger_str);
 		MPI_Finalize();
 		return 1;
 	}
+	
+	if (path != NULL)
+		backend_set_path(d, path);
 	
 	if (find_proxy(proxy_str, &p) < 0) {
 		error_msg(rank, "No such proxy: \"%s\"\n", proxy_str);
