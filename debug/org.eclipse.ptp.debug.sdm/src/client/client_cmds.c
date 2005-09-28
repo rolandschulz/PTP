@@ -207,6 +207,12 @@ DbgClntStep(procset *set, int count, int type)
 	return res;
 }
 
+int 
+DbgClntTerminate(procset *set)
+{
+	return ClntSendCommand(set, "HLT", NULL);
+}
+
 /*
  * Stack frame operations
  */

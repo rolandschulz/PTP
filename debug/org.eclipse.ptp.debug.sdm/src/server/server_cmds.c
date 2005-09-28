@@ -42,6 +42,7 @@ static int svr_setfuncbreakpoint(dbg_backend *, char **);
 static int svr_deletebreakpoint(dbg_backend *, char **);
 static int svr_go(dbg_backend *, char **);
 static int svr_step(dbg_backend *, char **);
+static int svr_terminate(dbg_backend *, char **);
 static int svr_liststackframes(dbg_backend *, char **);
 static int svr_setcurrentstackframe(dbg_backend *, char **);
 static int svr_evaluateexpression(dbg_backend *, char **);
@@ -59,6 +60,7 @@ static svr_cmd svr_cmd_tab[] =
 	{"DBP",	svr_deletebreakpoint},
 	{"GOP",	svr_go},
 	{"STP",	svr_step},
+	{"HLT",	svr_terminate},
 	{"LSF",	svr_liststackframes},
 	{"SCS",	svr_setcurrentstackframe},
 	{"EEX",	svr_evaluateexpression},
@@ -161,6 +163,12 @@ static int
 svr_step(dbg_backend *db, char **args)
 {
 	return db->db_funcs->step(atoi(args[1]), atoi(args[2]));
+}
+
+static int 
+svr_terminate(dbg_backend *db, char **args)
+{
+	return db->db_funcs->terminate();
 }
 
 static int 

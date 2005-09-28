@@ -123,6 +123,15 @@ proxy_clnt_step(proxy *p, void *data, procset *set, int count, int type)
 	return -1;
 }
 
+int
+proxy_clnt_terminate(proxy *p, void *data, procset *set)
+{
+	if (p != NULL)
+		return p->clnt_funcs->terminate(data, set);
+		
+	return -1;
+}
+
 int 
 proxy_clnt_liststackframes(proxy *p, void *data, procset *set, int current)
 {

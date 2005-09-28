@@ -73,6 +73,7 @@ static proxy_svr_helper_funcs helper_funcs = {
 	DbgClntDeleteBreakpoint,
 	DbgClntGo,
 	DbgClntStep,
+	DbgClntTerminate,
 	DbgClntListStackframes,
 	DbgClntSetCurrentStackframe,
 	DbgClntEvaluateExpression,
