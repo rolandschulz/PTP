@@ -56,6 +56,8 @@ dnl
 
 AC_HEADER_STDC
 AC_CHECK_HEADERS(strings.h sys/time.h unistd.h)
+AC_CHECK_HEADERS(jni.h)
+AM_CONDITIONAL(PTPDBGJNI, [test "$ac_cv_header_jni_h" = yes])
 
 dnl
 dnl Check for typedefs, structures, and compiler characteristics.
