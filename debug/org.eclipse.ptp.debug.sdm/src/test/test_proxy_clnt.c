@@ -114,7 +114,10 @@ wait_for_event(session *s, procset *p)
 		procs_outstanding = procset_copy(p);
 		
 	while (!completed) {
-		DbgProgress(s);
+		if (DbgProgress(s) < 0) {
+			fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+			exit(1);
+		}
 	}
 	
 	if (p != NULL)	

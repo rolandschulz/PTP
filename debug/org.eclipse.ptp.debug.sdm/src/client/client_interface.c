@@ -242,8 +242,8 @@ DbgProgress(session *s)
 			if ( errno == EINTR )
 				continue;
 		
-			perror("select");
-			return -1;
+			DbgSetError(DBGERR_SYSTEM, strerror(errno));
+			return DBGRES_ERR;
 		
 		case 0:
 			/*
@@ -258,8 +258,8 @@ DbgProgress(session *s)
 						|| (h->file_type & WRITE_FILE_HANDLER && FD_ISSET(h->fd, &wfds))
 						|| (h->file_type & EXCEPT_FILE_HANDLER && FD_ISSET(h->fd, &efds)))
 					&& h->file_handler(h->fd, h->data) < 0) {
-						printf("warning: unregistering file handler for %d\n", h->fd);
-						DbgUnregisterFileHandler(s, h->fd);
+						printf("warning: file handler for %d returns bad\n", h->fd);
+						res = -1;
 					}
 			}
 			
@@ -268,6 +268,9 @@ DbgProgress(session *s)
 		break;
 	}
 
+	if (res < 0)
+		return DBGRES_ERR;
+		
 	return proxy_clnt_progress(s->sess_proxy, s->sess_proxy_data);
 }
 

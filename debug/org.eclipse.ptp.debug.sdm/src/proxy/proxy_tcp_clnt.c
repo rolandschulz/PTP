@@ -121,9 +121,15 @@ printf("tcp_clnt_send_cmd: <%s>\n", request);
 static int
 proxy_tcp_clnt_recv_msgs(int fd, void *data)
 {
-	proxy_tcp_conn *		conn = (proxy_tcp_conn *)data;
+	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
+	proxy_clnt_helper_funcs *	helper = (proxy_clnt_helper_funcs *)conn->helper;
 	
-	return proxy_tcp_recv_msgs(conn);
+	if (proxy_tcp_recv_msgs(conn) < 0) {
+		helper->unregfile(conn->sess_sock);
+		return -1;
+	}
+	
+	return 0;
 }
 
 static void
@@ -320,18 +326,17 @@ proxy_tcp_clnt_progress(void *data)
 		return 0;
 		
 	if (res < 0) {
-		ev = NewEvent(DBGEV_ERROR);
-		ev->error_code = DBGERR_PROXY_TERM;
-		ev->error_msg = strdup("");
-	} else {
-		if (proxy_tcp_str_to_event(result, &ev) < 0) {
-			ev = NewEvent(DBGEV_ERROR);
-			ev->error_code = DBGERR_PROXY_PROTO;
-			ev->error_msg = strdup("");
-		}
-		
-		free(result);
+		DbgSetError(DBGERR_PROXY_TERM, NULL);
+		return -1;
 	}
+	
+	if (proxy_tcp_str_to_event(result, &ev) < 0) {
+		ev = NewEvent(DBGEV_ERROR);
+		ev->error_code = DBGERR_PROXY_PROTO;
+		ev->error_msg = strdup("");
+	}
+	
+	free(result);
 	
 	helper->eventhandler(ev, helper->eventdata);
 	

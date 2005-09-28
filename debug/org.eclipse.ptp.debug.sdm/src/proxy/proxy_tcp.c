@@ -30,11 +30,13 @@
 #include <ctype.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include "compat.h"
 #include "session.h"
 #include "proxy.h"
 #include "proxy_tcp.h"
+#include "dbg_error.h"
 
 struct timeval TCPTIMEOUT = { 25, 0 };
 
@@ -96,7 +98,10 @@ tcp_recv(proxy_tcp_conn *conn)
 	n = recv(conn->sess_sock, &conn->buf[conn->buf_pos], conn->buf_size - conn->total_read, 0);
 	if (n <= 0) {
 		if (n < 0)
-			perror("recv");
+			DbgSetError(DBGERR_SYSTEM, strerror(errno));
+		else
+			DbgSetError(DBGERR_PROXY_TERM, NULL);
+		
 		CLOSE_SOCKET(conn->sess_sock);
 		conn->connected = 0;
 		return -1;
@@ -177,7 +182,7 @@ proxy_tcp_get_msg_len(proxy_tcp_conn *conn)
 	 * check if we've received the length
 	 */
 	if (conn->msg_len == 0 || (conn->msg_len > 0 && *end != ' ')) {
-		fprintf(stderr, "badly formatted message structure\n");
+		DbgSetError(DBGERR_PROXY_PROTO, NULL);
 		return -1;
 	}
 
