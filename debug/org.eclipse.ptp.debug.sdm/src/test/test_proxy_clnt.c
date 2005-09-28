@@ -26,6 +26,7 @@
 #include "procset.h"
 
 int 			completed;
+int			fatal;
 procset *	procs_outstanding;
 
 void
@@ -50,6 +51,13 @@ event_callback(dbg_event *e, void *data)
 	switch (e->event) {
 	case DBGEV_ERROR:
 		printf("error: %s\n", e->error_msg);
+		switch (e->error_code) {
+		case DBGERR_NOBACKEND:
+			fatal++;
+			break;
+		default:
+			break;
+		}
 		break;
 	case DBGEV_OK:
 		printf("command ok\n");
@@ -96,10 +104,11 @@ event_callback(dbg_event *e, void *data)
 	completed++;
 }
 
-void
+int
 wait_for_event(session *s, procset *p)
 {
 	completed = 0;
+	fatal = 0;
 	
 	if (p != NULL)
 		procs_outstanding = procset_copy(p);
@@ -110,16 +119,36 @@ wait_for_event(session *s, procset *p)
 	
 	if (p != NULL)	
 		procset_free(procs_outstanding);
+		
+	/*
+	 * Check a fatal error hasn't ocurred
+	 */
+	return fatal ? -1 : 0;
+}
+
+/*
+ * Tell server to quit
+ */
+void
+cleanup_and_exit(session *s, procset *p)
+{
+	DbgQuit(s);
+	wait_for_event(s, p);
+	exit(0);
 }
 
 int
 main(int argc, char *argv[])
 {
-	session *s;
-	procset *p1;
-	procset *p2;
+	session *	s;
+	procset *	p1;
+	procset *	p2;
+	char *		host = "localhost";
 	
-	if (DbgInit(&s, "tcp", "host", "localhost", "port", PROXY_TCP_PORT, NULL) < 0) {
+	if (argc > 1)
+		host = argv[1];
+		
+	if (DbgInit(&s, "tcp", "host", host, "port", PROXY_TCP_PORT, NULL) < 0) {
 		fprintf(stderr, "DbgInit failed\n");
 		exit(1);
 	}
@@ -143,7 +172,9 @@ main(int argc, char *argv[])
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
-	wait_for_event(s, p1);
+	if (wait_for_event(s, p1) < 0) {
+		cleanup_and_exit(s, p1);
+	}
 		
 	if (DbgStartSession(s, "xxx", NULL) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
