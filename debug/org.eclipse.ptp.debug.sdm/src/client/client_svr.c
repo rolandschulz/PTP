@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <math.h>
 
 #include "dbg.h"
 #include "dbg_client.h"
@@ -144,7 +145,7 @@ ClntSendCommand(procset *procs, char *str, void *data)
 	r = (active_request *)malloc(sizeof(active_request));
 	r->procs = procset_copy(procs);
 	r->data = data;
-	r->events = HashCreate(procset_size(procs)); // TODO: Check this is a sensible size
+	r->events = HashCreate(log2l(procset_size(procs))); // TODO: Check this is a sensible size
 	
 	AddToList(active_requests, (void *)r);
 
