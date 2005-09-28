@@ -141,42 +141,11 @@ cleanup_and_exit(session *s, procset *p)
 }
 
 int
-main(int argc, char *argv[])
+do_test(session *s, char *exe)
 {
-	session *	s;
 	procset *	p1;
 	procset *	p2;
-	char *		exe;
-	char *		host = "localhost";
 	
-	if (argc < 2) {
-		fprintf(stderr, "usage: test_proxy_clnt exe [host]\n");
-		return 1;
-	}
-	
-	exe = argv[1];
-	
-	if (argc > 2)
-		host = argv[2];
-		
-	if (DbgInit(&s, "tcp", "host", host, "port", PROXY_TCP_PORT, NULL) < 0) {
-		fprintf(stderr, "DbgInit failed\n");
-		exit(1);
-	}
-	
-	DbgRegisterEventHandler(s, event_callback, NULL);
-
-#ifdef TEST_ACCEPT
-	DbgAccept(s);
-#else 
-	if (DbgConnect(s) < 0) {
-		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
-		return 1;
-	}
-#endif
-
-	wait_for_event(s, NULL);
-
 	p1 = procset_new(s->sess_procs);
 	procset_invert(p1);
 	p2 = procset_new(s->sess_procs);

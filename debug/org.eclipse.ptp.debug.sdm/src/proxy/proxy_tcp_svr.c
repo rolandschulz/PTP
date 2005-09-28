@@ -154,8 +154,8 @@ proxy_tcp_svr_create(int port, void *data)
 	
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
-		fprintf(stderr, "socket error");
-		return -1;
+		DbgSetError(DBGERR_SYSTEM, strerror(errno));
+		return DBGRES_ERR;
 	}
 	
 	memset (&sname, 0, sizeof(sname));
@@ -165,36 +165,34 @@ proxy_tcp_svr_create(int port, void *data)
 	
 	if (bind(sd,(struct sockaddr *) &sname, sizeof(sname)) == SOCKET_ERROR )
 	{
-		fprintf(stderr, "bind error\n");
+		DbgSetError(DBGERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
-		return -1;
+		return DBGRES_ERR;
 	}
 	
 	slen = sizeof(sname);
 	
 	if ( getsockname(sd, (struct sockaddr *)&sname, &slen) == SOCKET_ERROR )
 	{
-		fprintf(stderr, "getsockname error\n");
+		DbgSetError(DBGERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
-		return -1;
+		return DBGRES_ERR;
 	}
 	
 	if ( listen(sd, 5) == SOCKET_ERROR )
 	{
-		fprintf(stderr, "listen error\n");
+		DbgSetError(DBGERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
-		return -1;
+		return DBGRES_ERR;
 	}
 	
 	conn->svr_sock = sd;
 	conn->port = (int) ntohs(sname.sin_port);
 	
-	if (helper != NULL) {
-		helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_svr_accept, (void *)conn);
-		helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
-	}
+	helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_svr_accept, (void *)conn);
+	helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
 	
-	return 0;
+	return DBGRES_OK;
 }
 
 /**
@@ -212,15 +210,15 @@ proxy_tcp_svr_connect(char *host, int port, void *data)
 	proxy_svr_helper_funcs *	helper = (proxy_svr_helper_funcs *)conn->helper;
 		        
 	if (host == NULL) {
-		fprintf(stderr, "no host specified\n");
-		return -1;
+		DbgSetError(DBGERR_DEBUGGER, "no host specified");
+		return DBGRES_ERR;
 	}
 	
 	hp = gethostbyname(host);
 	        
 	if (hp == (struct hostent *)NULL) {
-		fprintf(stderr, "could not find host \"%s\"\n", host);
-		return -1;
+		DbgSetError(DBGERR_DEBUGGER, "could not find host");
+		return DBGRES_ERR;
 	}
 	
 	haddr = ((hp->h_addr[0] & 0xff) << 24) |
@@ -230,8 +228,8 @@ proxy_tcp_svr_connect(char *host, int port, void *data)
 	
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
-		perror("socket");
-		return -1;
+		DbgSetError(DBGERR_SYSTEM, strerror(errno));
+		return DBGRES_ERR;
 	}
 	
 	memset (&scket,0,sizeof(scket));
@@ -241,25 +239,23 @@ proxy_tcp_svr_connect(char *host, int port, void *data)
 	
 	if ( connect(sd, (struct sockaddr *) &scket, sizeof(scket)) == SOCKET_ERROR )
 	{
-		perror("connect");
+		DbgSetError(DBGERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
-		return -1;
+		return DBGRES_ERR;
 	}
 
 	conn->sess_sock = sd;
 	conn->host = strdup(host);
 	conn->port = port;
 	
-	if (helper != NULL) {
-		helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
-		helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_svr_recv_msgs, (void *)conn);
-		
-		e = NewEvent(DBGEV_INIT);
-		e->num_servers = ((proxy_svr_helper_funcs *)conn->helper)->numservers();
-		proxy_tcp_svr_event_callback(e, data);
-	}
+	helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
+	helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_svr_recv_msgs, (void *)conn);
 	
-	return 0;
+	e = NewEvent(DBGEV_INIT);
+	e->num_servers = helper->numservers();
+	proxy_tcp_svr_event_callback(e, data);
+	
+	return DBGRES_OK;
 }
 
 /**
@@ -278,34 +274,33 @@ proxy_tcp_svr_accept(int fd, void *data)
 	fromlen = sizeof(addr);
 	ns = accept(fd, &addr, &fromlen);
 	if (ns < 0) {
-		perror("accept");
-		return 0;
+		DbgSetError(DBGERR_SYSTEM, strerror(errno));
+		return DBGRES_ERR;
 	}
 	
 	/*
 	 * Only allow one connection at a time.
 	 */
-	if (conn->sess_sock != INVALID_SOCKET) {
+	if (conn->connected) {
 		CLOSE_SOCKET(ns); // reject
-		return 0;
+		return DBGRES_OK;
 	}
 	
 	if (helper->newconn() < 0) {
 		CLOSE_SOCKET(ns); // reject
-		return 0;
+		return DBGRES_OK;
 	}
 	
 	conn->sess_sock = ns;
+	conn->connected++;
 	
-	if (helper != NULL) {
-		helper->regfile(ns, READ_FILE_HANDLER, proxy_tcp_svr_recv_msgs, (void *)conn);
-		
-		e = NewEvent(DBGEV_INIT);
-		e->num_servers = helper->numservers();
-		proxy_tcp_svr_event_callback(e, data);
-	}
+	helper->regfile(ns, READ_FILE_HANDLER, proxy_tcp_svr_recv_msgs, (void *)conn);
 	
-	return 0;
+	e = NewEvent(DBGEV_INIT);
+	e->num_servers = helper->numservers();
+	proxy_tcp_svr_event_callback(e, data);
+	
+	return DBGRES_OK;
 }
 
 /**
@@ -354,12 +349,12 @@ proxy_tcp_svr_progress(void *data)
 	
 	if (proxy_tcp_svr_shutdown) {
 		if (helper != NULL)
-			 return helper->shutdown_completed() ? -1 : 0;
+			 return helper->shutdown_completed() ? DBGRES_ERR : DBGRES_OK;
 		else
-			return -1;
+			return DBGRES_ERR;
 	}
 		
-	return 0;
+	return DBGRES_OK;
 }
 
 /*

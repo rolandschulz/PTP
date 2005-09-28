@@ -102,7 +102,7 @@ main(int argc, char *argv[])
 	default:
 		error_msg(rank, "sdm [--debugger=value] [--debugger_path=path]\n");
 		error_msg(rank, "    [--proxy=proxy]\n");
-		error_msg(rank, "    [--host=host_name] [--port=list-port]\n");
+		error_msg(rank, "    [--host=host_name] [--port=port]\n");
 		exit(1);
 	}
 	

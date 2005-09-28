@@ -17,60 +17,45 @@
  * LA-CC 04-115
  ******************************************************************************/
 
-/*
- * Miscellaneous proxy functions.
- */
- 
- #include "session.h"
- #include "proxy.h"
- #include "dbg.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-extern proxy_svr_funcs 	proxy_tcp_svr_funcs;
+#include "dbg.h"
+#include "proxy.h"
+#include "proxy_tcp.h"
+#include "procset.h"
 
-proxy proxies[] = {
-	{"tcp", NULL, NULL,  &proxy_tcp_svr_funcs, NULL},
-	{NULL, NULL, NULL, NULL, NULL}
-};
-
-void
-proxy_svr_init(proxy *p, proxy_svr_helper_funcs *funcs, void **data)
-{
-	if (p != NULL)
-		p->svr_funcs->init(funcs, data);
-
-	p->svr_helper_funcs = funcs;
-}
+extern int	do_test(session *, char *);
+extern void	event_callback(dbg_event *, void *);
+extern int	wait_for_event(session *, procset *);
 
 int
-proxy_svr_create(proxy *p, int port, void *data)
+main(int argc, char *argv[])
 {
-	if (p != NULL)
-		return p->svr_funcs->create(port, data);
-		
-	return DBGRES_ERR;
+	session *	s;
+	char *		exe;
+	
+	if (argc < 2) {
+		fprintf(stderr, "usage: test_proxy_clnt exe\n");
+		return 1;
+	}
+	
+	exe = argv[1];
+	
+	if (DbgInit(&s, "tcp", "port", PROXY_TCP_PORT, NULL) < 0) {
+		fprintf(stderr, "DbgInit failed\n");
+		exit(1);
+	}
+	
+	DbgRegisterEventHandler(s, event_callback, NULL);
+
+	if (DbgCreate(s) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
+
+	wait_for_event(s, NULL);
+
+	return do_test(s, exe);
 }
 
-int
-proxy_svr_connect(proxy *p, char *host, int port, void *data)
-{
-	if (p != NULL)
-		return p->svr_funcs->connect(host, port, data);
-		
-	return DBGRES_ERR;
-}
-
-int
-proxy_svr_progress(proxy *p, void *data)
-{
-	if (p != NULL)
-		return p->svr_funcs->progress(data);
-		
-	return DBGRES_ERR;
-}
-
-void
-proxy_svr_finish(proxy *p, void *data)
-{
-	if (p != NULL)
-		p->svr_funcs->finish(data);
-}

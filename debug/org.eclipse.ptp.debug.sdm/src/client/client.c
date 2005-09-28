@@ -88,15 +88,16 @@ client(int svr_num, int task_id, char *proxy, char *host, int port)
 {
 	num_servers = svr_num;
 	
-	if (DbgClntInit(svr_num, proxy, &helper_funcs) < 0 ||
-			DbgClntCreateSession(host, port) < 0) {
+	if (DbgClntInit(svr_num, proxy, &helper_funcs) != DBGRES_OK ||
+			DbgClntCreateSession(host, port) != DBGRES_OK) {
+		fprintf(stderr, "%s\n", DbgGetErrorStr());
 		DbgClntQuit(); //TODO fixme!
 		DbgClntProgress();
 		return;
 	}
 	
 	for (;;) {
-		if (DbgClntProgress() < 0)
+		if (DbgClntProgress() != DBGRES_OK)
 			break;
 	}
 	

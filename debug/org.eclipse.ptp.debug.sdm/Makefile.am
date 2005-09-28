@@ -1,6 +1,6 @@
 SUBDIRS = bitvector libmigdb libaif
 
-bin_PROGRAMS =			sdm test_proxy_clnt
+bin_PROGRAMS =			sdm test_proxy test_proxy_rev
 
 sdm_SOURCES =			src/client/startup.c\
 						src/client/client.c \
@@ -16,14 +16,17 @@ sdm_SOURCES =			src/client/startup.c\
 sdm_CFLAGS =				-I./include -I./bitvector -I./libmigdb/src -I./libaif $(AM_CFLAGS)
 sdm_LDADD =				libdbgproxy.a libutils.a bitvector/.libs/libbitvector.a libmigdb/src/libmigdb.a libaif/libaif.a
 
-test_proxy_clnt_SOURCES =	src/test/test_proxy_clnt.c \
-						src/proxy/proxy.c \
-						src/proxy/proxy_clnt.c \
-						src/proxy/proxy_tcp_clnt.c \
-						src/proxy/proxy_tcp.c
-test_proxy_clnt_CFLAGS =	-I./include -I./bitvector -I./libaif $(AM_CFLAGS) -g
-test_proxy_clnt_LDFLAGS = -g
-test_proxy_clnt_LDADD =	libdbgproxy.a libutils.a bitvector/.libs/libbitvector.a libaif/libaif.a
+test_proxy_SOURCES =		src/test/test_proxy.c \
+						src/test/test_proxy_clnt.c
+test_proxy_CFLAGS =		-I./include -I./bitvector -I./libaif $(AM_CFLAGS) -g
+test_proxy_LDFLAGS = 		-g
+test_proxy_LDADD =		libdbgproxy.a libutils.a bitvector/.libs/libbitvector.a libaif/libaif.a
+
+test_proxy_rev_SOURCES =	src/test/test_proxy_rev.c \
+						src/test/test_proxy_clnt.c
+test_proxy_rev_CFLAGS =	-I./include -I./bitvector -I./libaif $(AM_CFLAGS) -g
+test_proxy_rev_LDFLAGS = 	-g
+test_proxy_rev_LDADD =	libdbgproxy.a libutils.a bitvector/.libs/libbitvector.a libaif/libaif.a
 
 include_HEADERS =		include/breakpoint.h include/dbg.h include/location.h include/procset.h include/stackframe.h
 
@@ -38,6 +41,7 @@ lib_LIBRARIES =			libdbgproxy.a libutils.a
 
 libdbgproxy_a_SOURCES =	src/client/client_interface.c \
 						src/proxy/proxy.c \
+						src/proxy/proxy_clnt.c \
 						src/proxy/proxy_tcp.c \
 						src/proxy/proxy_tcp_clnt.c \
 						src/proxy/proxy_tcp_event.c

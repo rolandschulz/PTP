@@ -44,6 +44,7 @@
 #include "proxy.h"
 #include "proxy_tcp.h"
 #include "handler.h"
+#include "dbg.h"
 #include "dbg_error.h"
 
 struct timeval	SELECT_TIMEOUT = {0, 1000};
@@ -98,7 +99,7 @@ proxy_tcp_clnt_send_cmd(proxy_tcp_conn *conn, char *fmt, ...)
 	proxy_clnt_helper_funcs *	helper = (proxy_clnt_helper_funcs *)conn->helper;
 	
 	if (!conn->connected)
-		return -1;
+		return DBGRES_ERR;
 		
 	va_start(ap, fmt);
 	vasprintf(&request, fmt, ap);
@@ -110,12 +111,12 @@ printf("tcp_clnt_send_cmd: <%s>\n", request);
 			DbgSetError(DBGERR_PROXY_TERM, NULL);
 			helper->unregfile(conn->sess_sock);
 			free(request);
-			return -1;
+			return DBGRES_ERR;
 	}
 	
 	free(request);
 	
-	return 0;
+	return DBGRES_OK;
 }
 
 static int
@@ -126,10 +127,10 @@ proxy_tcp_clnt_recv_msgs(int fd, void *data)
 	
 	if (proxy_tcp_recv_msgs(conn) < 0) {
 		helper->unregfile(conn->sess_sock);
-		return -1;
+		return DBGRES_ERR;
 	}
 	
-	return 0;
+	return DBGRES_OK;
 }
 
 static void
@@ -166,7 +167,7 @@ proxy_tcp_clnt_init(proxy_clnt_helper_funcs *helper, void **data, char *attr, va
 
 	*data = (void *)conn;
 	
-	return 0;
+	return DBGRES_OK;
 }
 
 /**
@@ -184,14 +185,14 @@ proxy_tcp_clnt_connect(void *data)
 		        
 	if (conn->host == NULL) {
 		DbgSetError(DBGERR_DEBUGGER, "no host specified");
-		return -1;
+		return DBGRES_ERR;
 	}
 	
 	hp = gethostbyname(conn->host);
 	        
 	if (hp == (struct hostent *)NULL) {
 		DbgSetError(DBGERR_DEBUGGER, "could not find host");
-		return -1;
+		return DBGRES_ERR;
 	}
 	
 	haddr = ((hp->h_addr[0] & 0xff) << 24) |
@@ -202,7 +203,7 @@ proxy_tcp_clnt_connect(void *data)
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
 		DbgSetError(DBGERR_SYSTEM, strerror(errno));
-		return -1;
+		return DBGRES_ERR;
 	}
 	
 	memset (&scket,0,sizeof(scket));
@@ -214,16 +215,15 @@ proxy_tcp_clnt_connect(void *data)
 	{
 		DbgSetError(DBGERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
-		return -1;
+		return DBGRES_ERR;
 	}
 
 	conn->sess_sock = sd;
 	conn->connected++;
 	
 	helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_clnt_recv_msgs, (void *)conn);
-	//helper->regeventhandler(proxy_tcp_clnt_event_callback, (void *)conn);
 	
-	return 0;
+	return DBGRES_OK;
 }
 
 static int 
@@ -238,7 +238,7 @@ proxy_tcp_clnt_create(void *data)
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
 		DbgSetError(DBGERR_SYSTEM, strerror(errno));
-		return -1;
+		return DBGRES_ERR;
 	}
 	
 	memset (&sname, 0, sizeof(sname));
@@ -250,7 +250,7 @@ proxy_tcp_clnt_create(void *data)
 	{
 		DbgSetError(DBGERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
-		return -1;
+		return DBGRES_ERR;
 	}
 	
 	slen = sizeof(sname);
@@ -259,23 +259,22 @@ proxy_tcp_clnt_create(void *data)
 	{
 		DbgSetError(DBGERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
-		return -1;
+		return DBGRES_ERR;
 	}
 	
 	if ( listen(sd, 5) == SOCKET_ERROR )
 	{
 		DbgSetError(DBGERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
-		return -1;
+		return DBGRES_ERR;
 	}
 	
 	conn->svr_sock = sd;
 	conn->port = (int) ntohs(sname.sin_port);
 	
-	if (helper != NULL)
-		helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_clnt_accept, (void *)conn);
+	helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_clnt_accept, (void *)conn);
 	
-	return 0;
+	return DBGRES_OK;
 }
 
 static int
@@ -290,26 +289,24 @@ proxy_tcp_clnt_accept(int fd, void *data)
 	fromlen = sizeof(addr);
 	ns = accept(fd, &addr, &fromlen);
 	if (ns < 0) {
-		perror("accept");
-		return 0;
+		DbgSetError(DBGERR_SYSTEM, strerror(errno));
+		return DBGRES_ERR;
 	}
-	
-	conn->sess_sock = ns;
 	
 	/*
 	 * Only allow one connection at a time.
 	 */
 	if (conn->sess_sock != INVALID_SOCKET) {
 		CLOSE_SOCKET(ns); // reject
-		return 0;
+		return DBGRES_OK;
 	}
 	
 	conn->sess_sock = ns;
+	conn->connected++;
+
+	helper->regfile(ns, READ_FILE_HANDLER, proxy_tcp_clnt_recv_msgs, (void *)conn);
 	
-	if (helper != NULL)
-		helper->regfile(ns, READ_FILE_HANDLER, proxy_tcp_clnt_recv_msgs, (void *)conn);
-	
-	return 0;
+	return DBGRES_OK;
 	
 }
 
@@ -322,13 +319,8 @@ proxy_tcp_clnt_progress(void *data)
 	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
 	proxy_clnt_helper_funcs *	helper = (proxy_clnt_helper_funcs *)conn->helper;
 
-	if ((res = proxy_tcp_get_msg(conn, &result)) == 0)
-		return 0;
-		
-	if (res < 0) {
-		DbgSetError(DBGERR_PROXY_TERM, NULL);
-		return -1;
-	}
+	if ((res = proxy_tcp_get_msg(conn, &result)) <= 0)
+		return res;
 	
 	if (proxy_tcp_str_to_event(result, &ev) < 0) {
 		ev = NewEvent(DBGEV_ERROR);
@@ -340,7 +332,7 @@ proxy_tcp_clnt_progress(void *data)
 	
 	helper->eventhandler(ev, helper->eventdata);
 	
-	return 0;
+	return DBGRES_OK;
 }
 
 static int
