@@ -50,7 +50,7 @@
 #define DBGERR_TEMP			28
 #define DBGERR_PIPE			29
 #define DBGERR_FORK			30
-#define DBGERR_SELECT			31
+#define DBGERR_SYSTEM			31
 #define DBGERR_NOTEXEC		32
 #define DBGERR_CHDIR			33
 #define DBGERR_SOURCE			34

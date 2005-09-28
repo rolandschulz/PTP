@@ -143,9 +143,17 @@ main(int argc, char *argv[])
 	session *	s;
 	procset *	p1;
 	procset *	p2;
+	char *		exe;
 	char *		host = "localhost";
 	
-	if (argc > 1)
+	if (argc < 2) {
+		fprintf(stderr, "usage: test_proxy_clnt exe [host]\n");
+		return 1;
+	}
+	
+	exe = argv[1];
+	
+	if (argc > 2)
 		host = argv[1];
 		
 	if (DbgInit(&s, "tcp", "host", host, "port", PROXY_TCP_PORT, NULL) < 0) {
@@ -158,7 +166,10 @@ main(int argc, char *argv[])
 #ifdef TEST_ACCEPT
 	DbgAccept(s);
 #else 
-	DbgConnect(s);
+	if (DbgConnect(s) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
 #endif
 
 	wait_for_event(s, NULL);
@@ -176,7 +187,7 @@ main(int argc, char *argv[])
 		cleanup_and_exit(s, p1);
 	}
 		
-	if (DbgStartSession(s, "xxx", NULL) < 0) {
+	if (DbgStartSession(s, exe, NULL) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}

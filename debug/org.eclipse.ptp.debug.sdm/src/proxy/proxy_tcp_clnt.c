@@ -177,14 +177,14 @@ proxy_tcp_clnt_connect(void *data)
 	proxy_clnt_helper_funcs *	helper = (proxy_clnt_helper_funcs *)conn->helper;
 		        
 	if (conn->host == NULL) {
-		fprintf(stderr, "no host specified\n");
+		DbgSetError(DBGERR_DEBUGGER, "no host specified");
 		return -1;
 	}
 	
 	hp = gethostbyname(conn->host);
 	        
 	if (hp == (struct hostent *)NULL) {
-		fprintf(stderr, "could not find host \"%s\"\n", conn->host);
+		DbgSetError(DBGERR_DEBUGGER, "could not find host");
 		return -1;
 	}
 	
@@ -195,7 +195,7 @@ proxy_tcp_clnt_connect(void *data)
 	
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
-		perror("socket");
+		DbgSetError(DBGERR_SYSTEM, strerror(errno));
 		return -1;
 	}
 	
@@ -206,7 +206,7 @@ proxy_tcp_clnt_connect(void *data)
 	
 	if ( connect(sd, (struct sockaddr *) &scket, sizeof(scket)) == SOCKET_ERROR )
 	{
-		perror("connect");
+		DbgSetError(DBGERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
 		return -1;
 	}
@@ -231,7 +231,7 @@ proxy_tcp_clnt_create(void *data)
 	
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
-		fprintf(stderr, "socket error");
+		DbgSetError(DBGERR_SYSTEM, strerror(errno));
 		return -1;
 	}
 	
@@ -242,7 +242,7 @@ proxy_tcp_clnt_create(void *data)
 	
 	if (bind(sd,(struct sockaddr *) &sname, sizeof(sname)) == SOCKET_ERROR )
 	{
-		fprintf(stderr, "bind error\n");
+		DbgSetError(DBGERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
 		return -1;
 	}
@@ -251,14 +251,14 @@ proxy_tcp_clnt_create(void *data)
 	
 	if ( getsockname(sd, (struct sockaddr *)&sname, &slen) == SOCKET_ERROR )
 	{
-		fprintf(stderr, "getsockname error\n");
+		DbgSetError(DBGERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
 		return -1;
 	}
 	
 	if ( listen(sd, 5) == SOCKET_ERROR )
 	{
-		fprintf(stderr, "listen error\n");
+		DbgSetError(DBGERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
 		return -1;
 	}
