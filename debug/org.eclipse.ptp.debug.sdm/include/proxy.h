@@ -43,7 +43,7 @@ struct proxy_clnt_funcs {
 	 */
 	int (*init)(struct proxy_clnt_helper_funcs *, void **, char *, va_list);
 	int (*connect)(void *);
-	int (*accept)(void *);
+	int (*create)(void *);
 	int (*progress)(void *);
 	
 	/*
@@ -73,8 +73,8 @@ struct proxy_svr_helper_funcs {
 	int (*newconn)(void);
 	int (*numservers)(void);
 	int (*shutdown_completed)(void);
-	void (*regreadfile)(int, int (*)(int, void *), void *); 
-	void (*unregreadfile)(int); 
+	void (*regfile)(int, int, int (*)(int, void *), void *); 
+	void (*unregfile)(int); 
 	void (*regeventhandler)(void (*)(dbg_event *, void *), void *);
 
 	/*
@@ -127,6 +127,7 @@ extern void	proxy_svr_finish(proxy *, void *);
 
 extern int proxy_clnt_init(proxy *, proxy_clnt_helper_funcs *, void **, char *, va_list);
 extern int proxy_clnt_connect(proxy *, void *);
+extern int proxy_clnt_create(proxy *, void *);
 extern int proxy_clnt_progress(proxy *, void *);
 extern int proxy_clnt_startsession(proxy *, void *, char *, char *);
 extern int proxy_clnt_setlinebreakpoint(proxy *, void *, struct procset *, char *, int);

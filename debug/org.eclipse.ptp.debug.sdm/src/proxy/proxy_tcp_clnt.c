@@ -50,7 +50,8 @@ struct timeval	SELECT_TIMEOUT = {0, 1000};
 
 static int proxy_tcp_clnt_init(proxy_clnt_helper_funcs *, void **, char *, va_list);
 static int proxy_tcp_clnt_connect(void *);
-static int proxy_tcp_clnt_accept(void *);
+static int proxy_tcp_clnt_create(void *);
+static int proxy_tcp_clnt_accept(int, void *);
 static int proxy_tcp_clnt_progress(void *);
 static int proxy_tcp_clnt_startsession(void *, char *, char *);
 static int proxy_tcp_clnt_setlinebreakpoint(void *, procset *, char *, int);
@@ -71,7 +72,7 @@ proxy_clnt_funcs proxy_tcp_clnt_funcs =
 {
 	proxy_tcp_clnt_init,
 	proxy_tcp_clnt_connect,
-	proxy_tcp_clnt_accept,
+	proxy_tcp_clnt_create,
 	proxy_tcp_clnt_progress,
 	proxy_tcp_clnt_startsession,
 	proxy_tcp_clnt_setlinebreakpoint,
@@ -220,12 +221,13 @@ proxy_tcp_clnt_connect(void *data)
 }
 
 static int 
-proxy_tcp_clnt_accept(void *data)
+proxy_tcp_clnt_create(void *data)
 {
-	socklen_t			slen;
-	SOCKET				sd;
-	struct sockaddr_in	sname;
-	proxy_tcp_conn *		conn = (proxy_tcp_conn *)data;
+	socklen_t				slen;
+	SOCKET					sd;
+	struct sockaddr_in		sname;
+	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
+	proxy_clnt_helper_funcs *	helper = (proxy_clnt_helper_funcs *)conn->helper;
 	
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
@@ -261,17 +263,23 @@ proxy_tcp_clnt_accept(void *data)
 		return -1;
 	}
 	
+	conn->svr_sock = sd;
+	conn->port = (int) ntohs(sname.sin_port);
+	
+	if (helper != NULL)
+		helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_clnt_accept, (void *)conn);
+	
 	return 0;
 }
 
 static int
-proxy_tcp_clnt_complete_accept(int fd, void *data)
+proxy_tcp_clnt_accept(int fd, void *data)
 {
-	SOCKET				ns;
-	socklen_t			fromlen;
-	struct sockaddr		addr;
-	proxy_tcp_conn *		conn = (proxy_tcp_conn *)data;
-	dbg_event *			e;
+	SOCKET					ns;
+	socklen_t				fromlen;
+	struct sockaddr			addr;
+	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
+	proxy_clnt_helper_funcs *	helper = (proxy_clnt_helper_funcs *)conn->helper;
 	
 	fromlen = sizeof(addr);
 	ns = accept(fd, &addr, &fromlen);
@@ -282,11 +290,18 @@ proxy_tcp_clnt_complete_accept(int fd, void *data)
 	
 	conn->sess_sock = ns;
 	
-	//conn->helper->regreadfile(ns, proxy_tcp_svr_recv_msgs, (void *)conn);
+	/*
+	 * Only allow one connection at a time.
+	 */
+	if (conn->sess_sock != INVALID_SOCKET) {
+		CLOSE_SOCKET(ns); // reject
+		return 0;
+	}
 	
-	//e = NewEvent(DBGEV_INIT);
-	//e->num_servers = conn->helper->numservers();
-	//proxy_tcp_svr_event_callback(e, data);
+	conn->sess_sock = ns;
+	
+	if (helper != NULL)
+		helper->regfile(ns, READ_FILE_HANDLER, proxy_tcp_clnt_recv_msgs, (void *)conn);
 	
 	return 0;
 	

@@ -40,6 +40,7 @@
 #include "list.h"
 #include "proxy.h"
 #include "proxy_tcp.h"
+#include "handler.h"
 
 static int num_servers;
 
@@ -63,8 +64,8 @@ static proxy_svr_helper_funcs helper_funcs = {
 	new_connection,
 	server_count,
 	DbgClntIsShutdown,
-	DbgClntRegisterReadFileHandler,
-	DbgClntUnregisterFileHandler,
+	RegisterFileHandler,
+	UnregisterFileHandler,
 	DbgClntRegisterEventHandler,
 	DbgClntStartSession,
 	DbgClntSetLineBreakpoint,

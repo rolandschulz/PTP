@@ -41,6 +41,7 @@
 #include "proxy.h"
 #include "proxy_tcp.h"
 #include "procset.h"
+#include "handler.h"
 
 static void	proxy_tcp_svr_init(proxy_svr_helper_funcs *, void **);
 static int	proxy_tcp_svr_create(int, void *);
@@ -189,7 +190,7 @@ proxy_tcp_svr_create(int port, void *data)
 	conn->port = (int) ntohs(sname.sin_port);
 	
 	if (helper != NULL) {
-		helper->regreadfile(sd, proxy_tcp_svr_accept, (void *)conn);
+		helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_svr_accept, (void *)conn);
 		helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
 	}
 	
@@ -251,7 +252,7 @@ proxy_tcp_svr_connect(char *host, int port, void *data)
 	
 	if (helper != NULL) {
 		helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
-		helper->regreadfile(sd, proxy_tcp_svr_recv_msgs, (void *)conn);
+		helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_svr_recv_msgs, (void *)conn);
 		
 		e = NewEvent(DBGEV_INIT);
 		e->num_servers = ((proxy_svr_helper_funcs *)conn->helper)->numservers();
@@ -289,7 +290,7 @@ proxy_tcp_svr_accept(int fd, void *data)
 		return 0;
 	}
 	
-	if (((proxy_svr_helper_funcs *)conn->helper)->newconn() < 0) {
+	if (helper->newconn() < 0) {
 		CLOSE_SOCKET(ns); // reject
 		return 0;
 	}
@@ -297,7 +298,7 @@ proxy_tcp_svr_accept(int fd, void *data)
 	conn->sess_sock = ns;
 	
 	if (helper != NULL) {
-		helper->regreadfile(ns, proxy_tcp_svr_recv_msgs, (void *)conn);
+		helper->regfile(ns, READ_FILE_HANDLER, proxy_tcp_svr_recv_msgs, (void *)conn);
 		
 		e = NewEvent(DBGEV_INIT);
 		e->num_servers = helper->numservers();
@@ -305,7 +306,6 @@ proxy_tcp_svr_accept(int fd, void *data)
 	}
 	
 	return 0;
-	
 }
 
 /**
@@ -319,14 +319,14 @@ proxy_tcp_svr_finish(void *data)
 	
 	if (conn->sess_sock != INVALID_SOCKET) {
 		if (helper != NULL)
-			helper->unregreadfile(conn->sess_sock);
+			helper->unregfile(conn->sess_sock);
 		CLOSE_SOCKET(conn->sess_sock);
 		conn->sess_sock = INVALID_SOCKET;
 	}
 	
 	if (conn->svr_sock != INVALID_SOCKET) {
 		if (helper != NULL)
-			helper->unregreadfile(conn->svr_sock);
+			helper->unregfile(conn->svr_sock);
 		CLOSE_SOCKET(conn->svr_sock);
 		conn->svr_sock = INVALID_SOCKET;
 	}

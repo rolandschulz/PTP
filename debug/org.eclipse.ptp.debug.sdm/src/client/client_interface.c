@@ -97,9 +97,9 @@ DbgConnect(session *s)
 }
 
 int
-DbgAccept(session *s)
+DbgCreate(session *s)
 {
-	return s->sess_proxy->clnt_funcs->accept(s->sess_proxy_data);
+	return proxy_clnt_create(s->sess_proxy, s->sess_proxy_data);
 }
 
 int
