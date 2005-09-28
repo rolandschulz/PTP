@@ -451,10 +451,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
 				fireSuspendEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof InferiorResumedEvent) {
-				// FIXME hardcode the filename
-				String fileName = PreferenceConstants.SIMULATION_PROJECT_NAME + "/" + PreferenceConstants.SIMULATION_FILE_NAME + ".c";
 				try {
-					annotationMgr.removeAnnotation(job.getIDString(), fileName, event.getAllProcesses().toBitList());
+					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses().toBitList());
 				} catch (CoreException e) {
 					PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
 				}
@@ -462,10 +460,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
 				fireResumeEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof InferiorExitedEvent || event instanceof ErrorEvent) {
-				// FIXME hardcode the filename
-				String fileName = PreferenceConstants.SIMULATION_PROJECT_NAME + "/" + PreferenceConstants.SIMULATION_FILE_NAME + ".c";
 				try {
-					annotationMgr.removeAnnotation(job.getIDString(), fileName, event.getAllProcesses().toBitList());
+					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses().toBitList());
 				} catch (CoreException e) {
 					PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
 				}
