@@ -33,7 +33,7 @@ struct dbg_backend_funcs {
 	int (*start_session)(char *, char *, char *);
 	int (*setlinebreakpoint)(char *, int);
 	int (*setfuncbreakpoint)(char *, char *);
-	int (*deletebreakpoints)(int);
+	int (*deletebreakpoint)(int);
 	int (*go)(void);
 	int (*step)(int, int);
 	int (*terminate)(void);

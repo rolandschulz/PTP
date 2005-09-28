@@ -149,8 +149,7 @@ svr_setfuncbreakpoint(dbg_backend *db, char **args)
 static int 
 svr_deletebreakpoint(dbg_backend *db, char **args)
 {
-	DbgSetError(DBGERR_NOTIMP, "Command not implemented");
-	return DBGRES_ERR;
+	return db->db_funcs->deletebreakpoint(atoi(args[1]));
 }
 
 static int 
@@ -180,8 +179,7 @@ svr_liststackframes(dbg_backend *db, char **args)
 static int 
 svr_setcurrentstackframe(dbg_backend *db, char **args)
 {
-	DbgSetError(DBGERR_NOTIMP, "Command not implemented");
-	return DBGRES_ERR;
+	return db->db_funcs->setcurrentstackframe(atoi(args[1]));
 }
 
 static int 
@@ -199,22 +197,19 @@ svr_gettype(dbg_backend *db, char **args)
 static int 
 svr_listlocalvariables(dbg_backend *db, char **args)
 {
-	DbgSetError(DBGERR_NOTIMP, "Command not implemented");
-	return DBGRES_ERR;
+	return db->db_funcs->listlocalvariables();
 }
 
 static int 
 svr_listarguments(dbg_backend *db, char **args)
 {
-	DbgSetError(DBGERR_NOTIMP, "Command not implemented");
-	return DBGRES_ERR;
+	return db->db_funcs->listarguments();
 }
 
 static int 
 svr_listglobalvariables(dbg_backend *db, char **args)
 {
-	DbgSetError(DBGERR_NOTIMP, "Command not implemented");
-	return DBGRES_ERR;
+	return db->db_funcs->listglobalvariables();
 }
 
 static int 
