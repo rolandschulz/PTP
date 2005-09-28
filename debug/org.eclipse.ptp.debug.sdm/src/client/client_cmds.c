@@ -98,23 +98,21 @@ DbgClntInit(int num_svrs, char *proxy, proxy_svr_helper_funcs *funcs)
 	 * Initialize proxy
 	 */
 	if (find_proxy(proxy, &dbg_proxy) < 0) {
-		return -1;
+		return DBGRES_ERR;
 	}
 	
 	proxy_svr_init(dbg_proxy, funcs, &dbg_proxy_data);
 	
-	return 0;
+	return DBGRES_OK;
 }
 
 int
 DbgClntCreateSession(char *host, int port)
 {
-	if (proxy_svr_create(dbg_proxy, port, dbg_proxy_data) < 0) {
-		fprintf(stderr, "proxy_svr_create failed\n");
-		return -1;
-	}
+	if (host != NULL)
+		return proxy_svr_connect(dbg_proxy, host, port, dbg_proxy_data);
 	
-	return 0;
+	return proxy_svr_create(dbg_proxy, port, dbg_proxy_data);
 }
 
 void
@@ -341,8 +339,8 @@ DbgClntProgress(void)
 			if ( errno == EINTR )
 				continue;
 		
-			perror("select");
-			return -1;
+			DbgSetError(DBGERR_SYSTEM, strerror(errno));
+			return DBGRES_ERR;
 		
 		case 0:
 			/*
@@ -357,7 +355,7 @@ DbgClntProgress(void)
 						|| (h->file_type & WRITE_FILE_HANDLER && FD_ISSET(h->fd, &wfds))
 						|| (h->file_type & EXCEPT_FILE_HANDLER && FD_ISSET(h->fd, &efds)))
 					&& h->file_handler(h->fd, h->data) < 0)
-					return -1;
+					return DBGRES_ERR;
 			}
 			
 		}
