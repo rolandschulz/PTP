@@ -154,7 +154,7 @@ main(int argc, char *argv[])
 	exe = argv[1];
 	
 	if (argc > 2)
-		host = argv[1];
+		host = argv[2];
 		
 	if (DbgInit(&s, "tcp", "host", host, "port", PROXY_TCP_PORT, NULL) < 0) {
 		fprintf(stderr, "DbgInit failed\n");
