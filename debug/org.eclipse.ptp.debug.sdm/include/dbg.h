@@ -39,6 +39,7 @@
  */
 int DbgInit(session **, char *, char *, ...);
 int	DbgConnect(session *);
+int	DbgCreate(session *);
 void DbgRegisterEventHandler(session *, void (*)(dbg_event *, void *), void *);
 int DbgStartSession(session *, char *, char *);
 int DbgQuit(session *);

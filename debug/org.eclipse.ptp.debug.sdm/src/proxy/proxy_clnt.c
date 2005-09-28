@@ -51,6 +51,15 @@ proxy_clnt_connect(proxy *p, void *data)
 	return -1;
 }
 
+int 
+proxy_clnt_create(proxy *p, void *data)
+{
+	if (p != NULL)
+		return p->clnt_funcs->create(data);
+		
+	return -1;
+}
+
 int
 proxy_clnt_progress(proxy *p, void *data)
 {
