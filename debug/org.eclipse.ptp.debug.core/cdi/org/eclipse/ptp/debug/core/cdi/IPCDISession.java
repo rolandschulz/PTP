@@ -44,6 +44,7 @@ public interface IPCDISession extends ICDISession {
 	public IPCDITarget getTarget(int i);
 	public IPCDIModelManager getModelManager();
 	public IPJob getJob();
+	public String getProjectName();
 	
 	/* Breakpoint */
 	public ICDILineBreakpoint setLineBreakpoint(int type,

@@ -44,7 +44,6 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPJob;
@@ -72,7 +71,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	Properties props;
 	SessionConfiguration configuration;
 	
-	ILaunch dLaunch;
+	IPLaunch dLaunch;
 	IBinaryObject dBinObject;
 	IDebugger debugger;
 	IPJob dJob;
@@ -83,7 +82,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 		props = new Properties();
 		configuration = new SessionConfiguration(this);
 		
-		dLaunch = (ILaunch) launch;
+		dLaunch = launch;
 		dBinObject = binObj;
 		debugger = iDebugger;
 		debugger.setSession(this);
@@ -115,6 +114,10 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 		
 		/* Initially we only create process/target 0 */
 		registerTarget(0, true, true);
+	}
+	
+	public String getProjectName() {
+		return dLaunch.getProjectName();
 	}
 	
 	public IDebugger getDebugger() {
