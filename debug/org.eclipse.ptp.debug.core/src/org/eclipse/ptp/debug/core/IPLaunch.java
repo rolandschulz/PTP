@@ -9,4 +9,7 @@ public interface IPLaunch extends ILaunch {
 	
 	public IPSession getPSession();
 	public void setPSession(IPSession session);
+	
+	public String getProjectName();
+	public void setProjectName(String name);
 }

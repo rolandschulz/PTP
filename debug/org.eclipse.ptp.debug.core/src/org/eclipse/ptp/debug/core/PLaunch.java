@@ -15,6 +15,7 @@ import org.eclipse.ptp.core.IPJob;
 public class PLaunch extends Launch implements IPLaunch {
 	private IPJob pJob;
 	private IPSession pSession;
+	private String projectName;
 	private Comparator targetComparator;
 	private Comparator processComparator;
 	
@@ -70,5 +71,13 @@ public class PLaunch extends Launch implements IPLaunch {
 		List list = super.getProcesses0();
 		Collections.sort(list, processComparator);
 		return list;
+	}
+
+	public String getProjectName() {
+		return projectName;
+	}
+
+	public void setProjectName(String name) {
+		projectName = name;
 	}	
 }

@@ -193,6 +193,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			IPJob job = getLaunchManager().run(launch, workDirectory, null, jrunconfig, new SubProgressMonitor(monitor, 5));
 			PLaunch pLaunch = (PLaunch) launch;
 			pLaunch.setPJob(job);
+			pLaunch.setProjectName(project.getElementName());
 			String[] commandLine = new String[] { "/bin/date" };
 			try {
 				if (mode.equals(ILaunchManager.DEBUG_MODE)) {
