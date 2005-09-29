@@ -1,0 +1,123 @@
+% Refactoring Support: Source Printing and Program Editing
+
+Aside from the usual front end components (parser and symbol tables), a
+refactoring tool requires
+\begin{itemize}
+\item a means of manipulating the parse tree, i.e., moving nodes around,
+deleting them, and inserting new ones; and
+\item a means of outputting ``revised'' source code after a parse tree has
+been manipulated.
+\end{itemize}
+
+We will look at the means of outputting source code first, discussing
+the \texttt{Presentation} and \texttt{SourcePrinter} classes.
+We will then discuss the \texttt{ProgramEditor}, which allows you to
+manipulate the parse tree and \texttt{Presentation}.
+
+\section{The \texttt{Presentation} and the \texttt{Program}}
+
+While the parse tree for a program stores all of the ``important'' tokens
+(identifiers, parentheses, etc.), other things---comments, line continuations,
+and C preprocessor directives---are not in the Fortran grammar.  However,
+when the source printer produces source code from a parse tree, it needs to
+include these as well.
+
+We refer to these things (comments, line continuations, C preprocessor
+directives, Fortran INCLUDE statements, and anything else that does not
+end up in a parse tree) as \textit{non-tree tokens}, and we represent them
+by the class \texttt{NonTreeToken}.  A \texttt{Presentation} is essentially
+a list of all the non-tree tokens that appeared in a parse.
+
+A \texttt{Presentation} can be created from a parse by calling the
+\texttt{getNonTreeTokens} method on the lexer and passing the resulting
+\texttt{List<NonTreeToken>} to the \texttt{Presentation} constructor.
+
+A \texttt{Program} is just parse tree paired with a symbol table and a
+\texttt{Presentation}.
+
+\section{Presentation Blocks}
+
+Since \texttt{Token}s in the parse tree and \texttt{NonTreeToken}s in
+a program's \texttt{Presentation} have a lot in common, we will refer to
+them collectively as ``presentation blocks.''  Not surprisingly, they
+share a common superclass (interface, rather): \texttt{IPresentationBlock}.
+JavaDoc removed, it looks like this:
+
+\begin{verbatim}
+public interface IPresentationBlock
+{
+    public abstract String getFilename();
+    public abstract void setFilename(String value);
+
+    public abstract int getStartLine();
+    public abstract void setStartLine(int value);
+
+    public abstract int getStartCol();
+    public abstract void setStartCol(int value);
+
+    public abstract int getEndLine();
+    public abstract void setEndLine(int value);
+
+    public abstract int getEndCol();
+    public abstract void setEndCol(int value);
+
+    public abstract int getOffset();
+    public abstract void setOffset(int value);
+
+    public abstract int getLength();
+    public abstract void setLength(int value);
+
+    public abstract String getText();
+    public abstract void setText(String value);
+}
+\end{verbatim}
+
+Intuitively, then, all presentation blocks know what file they originated from,
+where they were in the file (both in terms of line/column and offset/length),
+and exactly what their text looked like.  (This is important since capitalization
+does not matter in Fortran.)
+
+Most importantly, this means that reproduce the source code of a program verbatim
+from a parse tree and a \texttt{Presentation}.  (The only difference will be the
+use of spaces vs. tabs to make sure tokens appear in the correct column on a line.)
+All comments and formatting will be retained.
+
+\section{The \texttt{SourcePrinter}}
+
+The job of the source printer (class \texttt{SourcePrinter}) is to take a
+a parse tree and corresponding \texttt{Presentation}
+and produce source code from it.
+
+Since every \texttt{Token} in the parse tree and every \texttt{NonTreeToken}
+in the \texttt{Presentation} knows what line and column it should appear on,
+this is easy.
+
+\section{The \texttt{ProgramEditor}}
+
+Essentially, a refactoring needs to change the parse tree for a program.  It
+may change existing nodes, move them around, remove them altogether, or insert
+new nodes.
+
+As described above, though, source code is produced by looking at the line/column
+offsets of the \texttt{Token}s in the parse tree and interleaving comments and
+other non-tree tokens from a program's \texttt{Presentation}.
+
+When we add, move, change, or delete a subtree of the parse tree, then,
+we must do three things:
+\begin{itemize}
+\item adjust the positions of the \texttt{Token}s in that subtree,
+\item adjust the positions of the related \texttt{NonTreeToken}s
+(e.g., the comments describing a method and C preprocessor directives in its
+definition)
+\item adjust the positions of all of the presentation blocks that appear after
+the modified subtree.  For example, if you change an token's text from
+``Hello'' to ``Goodbye,'' every presentation block after that one will have
+its offset incremented by 2, and every presentation block to the right of
+that token on the same line will also have its starting column number incremented
+by 2.
+\end{itemize}
+
+The (static) methods in \texttt{ProgramEditor} are used to add, move, modify,
+and delete subtrees.
+
+This class will be described more as it stabilizes.

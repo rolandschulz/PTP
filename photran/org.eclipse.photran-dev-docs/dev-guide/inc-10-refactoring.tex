@@ -1,0 +1,153 @@
+% Refactoring: Preconditions and Implementation
+
+From an implementation standpoint, a refactoring consists of
+\begin{itemize}
+\item a set of \textit{initial preconditions},
+\item input from the user,
+\item a set of \textit{final preconditions}, and
+\item a program manipulation.
+\end{itemize}
+
+As an example, consider the easiest of all refactorings: Rename.
+\begin{itemize}
+\item \textbf{Initial preconditions:}
+    \begin{itemize}
+    \item The token to rename should be an identifier.
+    \item The identifier must correspond to an entry in the symbol table.
+    \item If Rename is limited to certain entities, say, variables and subprograms,
+          the symbol table entry should indicate that the identifier corresponds
+          to a variable or subprogram.
+    \end{itemize}
+\item \textbf{User input:}
+    \begin{itemize}
+    \item New name for the variable or subprogram
+    \end{itemize}
+\item \textbf{Final preconditions:}
+    \begin{itemize}
+    \item The new name must be a valid identifier.
+    \item The new name must be different from the old name.
+    \item The new name must not already exist in its namespace.
+    \item For every reference to the old name, a change to the new name should uniquely
+          identify the same variable or function.  For example, if you are renaming a
+          global variable from \texttt{a} to \texttt{b}, but a local variable \texttt{b}
+          will end up shadowing the global variable and cause one of its references to
+          ``go wrong,'' then the rename cannot continue.
+    \end{itemize}
+\item \textbf{Program manipulation:}
+    \begin{itemize}
+    \item Locate the declaration of the entity being renamed, and locate all
+          references in all files in the workspace, and change the token text
+          to the new name.
+    \end{itemize}
+\end{itemize}
+
+The distinction between initial and final preconditions, then, is that
+initial preconditions must be satisfied before the user is asked for input,
+while final preconditions depend on the user's input.  If a refactoring does
+not require user input, it will have no final preconditions.
+
+\section{Running a Refactoring}
+
+Running a refactoring looks something like this.\footnote{The
+\texttt{if (!...) throw ...} is an obvious code smell that makes it look like
+the various methods in \texttt{RenameRefactoring} should be throwing exceptions
+rather than returning booleans.  The current structure makes more sense in
+``real'' code, where the user is being assaulted with dialog boxes and other
+things happen between each of the steps.}
+
+\begin{verbatim}
+        RenameRefactoring r = new RenameRefactoring(getProgram(), targetToken);
+        if (!r.checkInitialPreconditions()) throw new Error(r.getErrorMessage());
+        r.setNewName("Whatever");
+        if (!r.checkFinalPreconditions()) throw new Error(r.getErrorMessage());
+        if (!r.perform()) throw new Error(r.getErrorMessage());
+\end{verbatim}
+
+In other words, you
+\begin{itemize}
+\item check the initial preconditions,
+\item get input from the user,
+\item check the final preconditions, and
+\item finally perform the refactoring.
+\end{itemize}
+At any point, if a step has failed, you can call \texttt{r.getErrorMessage()}
+to get an explanation suitable for displaying to the user.
+
+\section{The \texttt{FortranRefactoring} Class}
+
+All Fortran refactorings must be subclasses of \texttt{FortranRefactoring}.
+\texttt{FortranRefactoring} (or its superclass) provides
+\begin{itemize}
+\item an instance variable \texttt{error}, the contents of which will be
+      returned
+      when the user calls \texttt{getErrorMessage()}.  If the refactoring fails,
+      before returning false, be sure to set this so the user knows why.
+\item Two \texttt{List}s of \texttt{Precondition}s:
+      \texttt{initialPreconditions}
+      and \texttt{finalPreconditions}.  Add preconditions to the former in the
+      constructor and the latter after input has been received from the user.
+\item Two fields, \texttt{initialPreconditionsCheckedAndPassed} and
+      \texttt{finalPreconditionsCheckedAndPassed}.  For example, you will want
+      to assert that the initial preconditions have been checked and passed
+      before checking the final preconditions.
+\end{itemize}
+
+\section{Preconditions}
+
+Refactoring preconditions are stored in the package
+\texttt{org.eclipse.photran.internal.core.refactoring.preconditions}.
+They are all derived from the class \texttt{AbstractPrecondition}.
+
+A precondition (i.e., a class derived from \texttt{AbstractPrecondition})
+has:
+\begin{itemize}
+\item a \texttt{List} of prerequisite preconditions, and
+\item a method for checking this precondition.
+\end{itemize}
+
+To check a precondition, call its \texttt{check} method.  After this method
+has been called once, it ``remembers'' whether it succeeded or failed, so
+future calls to \texttt{check} will just return the stored result rather than
+performing the entire check again.\footnote{It is very possible that a
+precondition will be checked manually, and then it will be checked again
+because it is a prerequisite for another precondition.  This resolves any
+inefficiences that might result because of this.}
+
+To implement how a precondition is checked, override the abstract method
+\texttt{checkThisPrecondition} method.  If any other preconditions need
+to be checked before this one, add them to the \texttt{prereqPreconditions}
+list in the constructor.  If the code in \texttt{checkThisPrecondition} is
+called, they have all been satisfied.
+
+The fields \texttt{parseTree}, \texttt{presentation}, and \texttt{symbolTable}
+will be populated when the constructor is called.  You will almost definitely
+need to use these in your implementation of \texttt{checkThisPrecondition}.
+
+\section{Implementing a Refactoring}
+
+\begin{itemize}
+
+\item If you need any preconditions that don't exist yet, implement them
+      as described above.
+
+\item Create a subclass of \texttt{FortranRefactoring}.
+
+\item In the constructor, call \texttt{super} and add preconditions
+      to the \texttt{initialPreconditions} field.
+
+\item Implement any methods to store input from the user.  At the beginning
+      of these methods, you will probably want to assert
+      \texttt{initialPreconditionsCheckedAndPassed}.
+
+\item Implement \texttt{perform}.  You will want to assert that all user
+      input is in place as well as asserting
+      \texttt{finalPreconditionsCheckedAndPassed}.  Use the
+      \texttt{ProgramEditor} to modify the parse tree and presentation.
+      If your changes might possibly affect the program's symbol table,
+      call the (inherited) \texttt{rebuildSymbolTable} method after all
+      transformations have been completed.
+
+\end{itemize}
+
+TODO-Jeff: Figure out and document how to integrate a refactoring into the
+(CDT) UI.

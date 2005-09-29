@@ -1,0 +1,103 @@
+% Symbol Tables
+
+All of the symbol table routines are stored in the ``parser'' folder under the
+Core plug-in.
+
+After you have parsed a file, you can create a symbol table for it by calling
+\texttt{FortranProcessor\#createSymbolTableFromParseTree}.  This, in turn calls
+the static method \texttt{SymbolTable\#createSymbolTableFor}, which is intended
+to be the sole entrypoint for symbol table building.
+
+\section{Contents of a Symbol Table}
+
+The classes representing symbol table entries are stored in the
+\texttt{org.eclipse.photran.internal.core.f95parser.symboltable.entries}
+package.  Currently, the following are allowed.
+\begin{itemize}
+\item Main Programs
+\item Modules
+\item Functions
+\item Subroutines
+\item Derived Types
+\item Block Data
+\item Namelists
+\item Common Blocks
+\item Interfaces
+\item Externals
+\item Intrinsics
+\item Variables
+\end{itemize}
+
+\texttt{FortranProcessor\#createSymbolTableFromParseTree} returns a
+\texttt{SymbolTable}, which represents the global symbol table for
+the program that was parsed.
+
+A \texttt{SymbolTable} is essentially just a collection of
+\texttt{SymbolTableEntry} objects.  Each \texttt{SymbolTableEntry} has
+a child symbol table.  For \texttt{FunctionEntry} objects, this child
+table contains all of the parameters, the return variable, and any
+local variables declared inside the function.  For \texttt{VariableEntry}
+objects, which represent local variables, the child table will always
+be empty (it is there only for uniformity).
+
+Symbol tables also keep track of whether an ``implicit'' rule applies,
+what external modules are being used (via USE statements), etc.
+
+To see what's in a symbol table, just use the \texttt{toString} method.
+Child tables will be indented in the output.
+
+The symbol table-related classes are JavaDoc'd, so additional information
+is available there.
+
+\section{\texttt{SymbolTableVisitor}s}
+
+You can also create a Visitor for a program's symbol table hierarchy
+by subclassing \texttt{SymbolTableVisitor}, which has a visit method
+for each type of \texttt{SymbolTableEntry}.
+
+\section{The Module Database}
+
+Similar to \textit{import} statements in Java, Fortran programs can USE a
+module defined in a different Fortran file.  Unfortunately, there is no
+easy way to tell where this module might be defined.  The user simply specifies
+a list of ``module paths'' which are searched for Fortran source files.
+Each Fortran source file must be checked to see if it contains a module
+with the given name.
+
+In Photran, the list of modules paths is stored in a workspace preference,
+although we plan to convert this to a project property.
+
+The class \texttt{ModuleLoader} is responsible for locating modules in this
+way.  The \texttt{ModuleDB} caches the symbol tables for files on the module
+path so they don't all have to be reparsed every time a module is searched for.
+Neither of these is complete yet, but they will be soon.
+
+\section{How Symbol Tables are Built}
+
+A quick look at \texttt{FortranProcessor\#createSymbolTableFromParseTree}
+explains how symbol tables are built:
+\begin{verbatim}
+    public static SymbolTable createSymbolTableFor(ParseTreeNode parseTree) throws Exception
+    {
+        SymbolTable tbl = (new DeclarationCollector(parseTree)).getSymbolTable();
+        Intrinsics.fill(tbl);
+        return (new ReferenceCollector(tbl, parseTree)).getSymbolTable();
+    }
+\end{verbatim}
+
+\begin{itemize}
+
+\item A Visitor is run over the parse tree to collect declarations of
+programs, modules, functions, subroutines, block data, derived types,
+namelists, etc.---anything that can be stored in the symbol table.
+
+\item The names of all Fortran 95 intrinsic functions and subroutines
+are inserted into the table.
+
+\item Now that declarations have been inserted, the parse tree is scanned
+for references (i.e., uses of a function, variable, namelist, etc.).
+If implicit variables have been allowed, the \texttt{ReferenceCollector} will
+detect those (since they are used but not declared) and insert them into the
+symbol table.
+
+\end{itemize}

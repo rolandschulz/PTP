@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin
+   id="org.eclipse.photran.ui"
+   name="Photran UI Plug-in"
+   version="3.0.0"
+   provider-name="University of Illinois at Urbana-Champaign and Los Alamos National Laboratory"
+   class="org.eclipse.photran.ui.FortranUIPlugin">
+
+   <runtime>
+      <library name="fdtui.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.ui.views"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
+      <import plugin="org.eclipse.photran.core"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.cdt.ui"/>
+   </requires>
+   
+<!-- ===========================================================================   -->
+<!-- Extension point: org.eclipse.cdt.ui.textHovers                                -->
+<!-- Extension Implementation: must implement org.eclipse.jface.text.ITextHover    -->
+<!-- Purpose: Provide a perspective specific text hovering for FortranEditor files -->
+<!-- ===========================================================================   -->
+   <extension-point id="textHovers" name="%textHoversName"/>
+
+   <!--extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            class="org.eclipse.cdt.internal.ui.CElementAdapterFactory"
+            adaptableType="org.eclipse.cdt.core.model.ICElement">
+         <adapter
+               type="org.eclipse.core.resources.IResource">
+         </adapter>
+         <adapter
+               type="org.eclipse.core.resources.IProject">
+         </adapter>
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
+         </adapter>
+         <adapter
+               type="org.eclipse.ui.views.properties.IPropertySource">
+         </adapter>
+      </factory>
+   </extension-->
+
+<!-- Define the document provider and participant for the FortranEditor -->
+   <!--extension
+         id="org.eclipse.photran.ui.FortranDocumentSetupParticipant"
+         name="%FortranDocumentSetupParticipant"
+         point="org.eclipse.core.filebuffers.documentSetup">
+      <participant
+            class="org.eclipse.photran.internal.ui.editor.FortranDocumentSetupParticipant"
+            contentTypeId="org.eclipse.photran.core.fortranSource">
+      </participant>
+      <participant
+            class="org.eclipse.photran.internal.ui.editor.FortranDocumentSetupParticipant"
+            contentTypeId="org.eclipse.photran.core.fortranHeader">
+      </participant>
+   </extension>
+   <extension
+         id="org.eclipse.photran.ui.FortranDocumentFactory"
+         name="%FortranDocumentFactory"
+         point="org.eclipse.core.filebuffers.documentCreation">
+      <factory
+            class="org.eclipse.cdt.internal.ui.editor.CDocumentFactory"
+            contentTypeId="org.eclipse.photran.core.fortranSource">
+      </factory>
+      <factory
+            class="org.eclipse.cdt.internal.ui.editor.CDocumentFactory"
+            contentTypeId="org.eclipse.photran.core.fortranHeader">
+      </factory>
+   </extension-->
+   <extension
+         point="org.eclipse.ui.editors"
+         id="org.eclipse.photran.ui.FortranEditor">
+      <editor
+            default="true"
+            name="Fortran Editor"
+            extensions="f,f77,f90,f95"
+            icon="icons/full/obj16/f_file_obj.gif"
+            class="org.eclipse.photran.internal.ui.editor.FortranFreeFormEditor"
+            contributorClass="org.eclipse.photran.internal.ui.editor.FortranEditorActionContributor"
+            symbolicFontName="org.eclipse.cdt.ui.editors.textfont"
+            id="org.eclipse.photran.ui.editor.FortranEditor">
+      </editor>
+      <editor
+            default="true"
+            name="Fortran Fixed Form Editor"
+            extensions="ff"
+            icon="icons/full/obj16/f_file_obj.gif"
+            class="org.eclipse.photran.internal.ui.editor.FortranFixedFormEditor"
+            contributorClass="org.eclipse.photran.internal.ui.editor.FortranEditorActionContributor"
+            symbolicFontName="org.eclipse.cdt.ui.editors.textfont"
+            id="org.eclipse.photran.ui.editor.FortranFixedFormEditor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editorActions">
+      <editorContribution
+            targetID="org.eclipse.photran.ui.editor.FortranEditor"
+            id="org.eclipse.ui.texteditor.ruler.actions">
+         <action
+               label="%Dummy.label"
+               helpContextId="org.eclipse.ui.bookmark_action_context"
+               class="org.eclipse.ui.texteditor.BookmarkRulerAction"
+               actionID="RulerDoubleClick"
+               id="org.eclipse.ui.texteditor.BookmarkRulerAction">
+         </action>
+      </editorContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSetPartAssociations">
+      <actionSetPartAssociation
+            targetID="org.eclipse.cdt.ui.SearchActionSet">
+         <!--part
+               id="org.eclipse.photran.ui.FortranView">
+         </part-->
+         <part
+               id="org.eclipse.photran.ui.editor.FortranEditor">
+         </part>
+         <!--part
+               id="org.eclipse.search.SearchResultView">
+         </part-->
+      </actionSetPartAssociation>
+      <actionSetPartAssociation
+            targetID="org.eclipse.ui.edit.text.actionSet.annotationNavigation">
+         <part
+               id="org.eclipse.photran.ui.editor.FortranEditor">
+         </part>
+      </actionSetPartAssociation>      
+   </extension>
+
+   <!-- This extension point allows preferences to be loaded. Without it, color highlighting
+        in the editor won't work.
+     -->
+   <!-- NC: This is no longer needed, use the  protected void initializeDefaultPluginPreferences()
+   in FortranUIPlugin to set it -->  
+   <!--extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.photran.ui.FortranUIPreferenceInitializer"/>
+   </extension-->
+   
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            name="Fortran Parser"
+            class="org.eclipse.photran.internal.ui.preferences.FortranParserPreferencePage"
+            id="org.eclipse.photran.ui.preferences.FortranParserPreferencePage">
+      </page>
+      <page
+            name="Module Paths"
+            category="org.eclipse.photran.ui.preferences.FortranParserPreferencePage"
+            class="org.eclipse.photran.internal.ui.preferences.FortranModulePathsPreferencePage"
+            id="org.eclipse.photran.ui.preferences.FortranModulePathsPreferencePage">
+      </page>
+      <page
+            name="Fortran Editor"
+            class="org.eclipse.photran.internal.ui.preferences.FortranFreeFormSpacePreferencePage"
+            id="org.eclipse.photran.internal.ui.preferences.FortranFreeFormSpacePreferencePage">
+      </page>
+      <page
+            name="Colors"
+            category="org.eclipse.photran.internal.ui.preferences.FortranFreeFormSpacePreferencePage"
+            class="org.eclipse.photran.internal.ui.preferences.ColorPreferencePage"
+            id="org.eclipse.photran.internal.ui.preferences.ColorPreferencePage">
+      </page>
+   </extension>
+   
+   <!-- cheahcf to provide key binding to block comments-->
+
+   <extension
+   		 point="org.eclipse.ui.bindings">
+   	 <key
+            sequence="Ctrl+/"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         	contextId="org.eclipse.photran.ui.FEditorScope"
+   			commandId = "org.eclipse.cdt.ui.edit.text.c.add.block.comment"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="Source Editting"
+            description="Source Editting"
+            id="org.eclipse.photran.ui.category.source">
+      </category>
+            <command
+            categoryId="org.eclipse.photran.ui.category.source"
+            description="Remove block comments in Photran"
+            id="org.eclipse.cdt.ui.edit.text.c.add.block.comment"
+            name="Photran Block Comment">
+     	 	</command>
+   </extension>
+   
+   <extension
+   		 point="org.eclipse.ui.contexts">
+   	   <context
+            name="Fortran Editor"
+            parentId="org.eclipse.ui.textEditorScope"
+            description="Editting Fortran Editor"
+            id="org.eclipse.photran.ui.FEditorScope">
+       </context>
+   </extension>
+   
+</plugin>

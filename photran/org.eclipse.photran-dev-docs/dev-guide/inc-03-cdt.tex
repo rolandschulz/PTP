@@ -1,0 +1,191 @@
+% CDT Integration
+
+Previous versions of Photran were developed by hacking the CDT: essentially,
+we made the user interface say ``Fortran'' instead of ``C/C++,'' we replaced the
+model builder (which creates the Outline view, among other things) with one
+that ran a Fortran parser, we changed the list of file extensions, and we
+modified the syntax highlighting code to recognize Fortran comments and
+keywords.
+
+Starting with Photran 3.0, we are taking a fundamentally different approach:
+\begin{itemize}
+\item We rename the C/C++ Perspective to the Make Perspective.  We replace
+the four project types (C Standard Make Project, C++ Standard Make Project,
+C Managed Make Project, and C++ Managed Make Project) with two generic
+project types (Standard Make Project and Managed Make Project).  We also
+change the launcher's menu item to read ``Run Local Application'' rather
+than ``Run Local C Application.''  These are all superficial changes
+(i.e., changes to labels and icons, not to the underlying code).  The
+Make project types use the natures formerly used for C projects.
+\item We add an extension point to the CDT which allows it to recognize
+other languages besides C and C++.
+\end{itemize}
+
+\section{Integrating with the CDT: The \texttt{AdditionalLanguages}
+            Extension Point}
+
+The org.eclipse.photran.xyzsamplelang project is a simple example of how
+to integrate a new language into the CDT.  Its README is included in an
+appendix.
+
+Essentially, the process of integrating a new language into the CDT works
+as follows:
+\begin{itemize}
+
+\item Create a new plug-in with an editor.  (Obviously, you will eventually
+want to customize the editor for your language.)
+
+\item For each filename extension supported by your editor (i.e., each
+filename extension for files in your language), declare a (text) content type.
+\begin{verbatim}
+   <extension point="org.eclipse.core.runtime.contentTypes">
+      <content-type id="xyzSource" name="XYZ Language Source File"
+            base-type="org.eclipse.core.runtime.text"
+            priority="high"/>
+      <file-association
+            content-type="xyzSource"
+            file-extensions="xyz"/>
+   </extension>
+\end{verbatim}
+
+\item Specify org.eclipse.cdt.core as a dependency of your plug-in, and
+declare in your \texttt{plugin.xml} that you are extending the
+org.eclipse.cdt.core.AdditionalLanguages extension point.
+\begin{verbatim}
+   <extension point="org.eclipse.cdt.core.AdditionalLanguages">
+      <language class="addl_langs.XYZLanguage"/>
+   </extension>
+\end{verbatim}
+You must provide the fully-qualified name of a class
+(\texttt{addl\_langs.XYZLanguage}, in this case which implements the
+\texttt{org.eclipse.cdt.core.addl\_langs.IAdditionalLanguage} interface.
+
+\item Fill in the definition of that class.  See the JavaDoc in
+\texttt{IAdditionalLanguage} for more information.
+\begin{itemize}
+\item \texttt{getName} just returns the name of the language
+(Fortran, XYZ Sample Language, etc.)
+\item \texttt{getRegisteredContentTypeIds} returns a list of all of
+the content types you declared above.  The content type names must
+be fully qualified, i.e., the name of the plug-in followed by the name
+of the content type, e.g., \texttt{XyzLanguagePlugIn.xyzSource}
+or \texttt{org.eclipse.photran.core.fortranSource}.
+\item \texttt{createModelBuilder} returns a model builder for your
+language.  Look at the \texttt{ToyModelBuilder} in the XYZ Sample Language
+project for a (trivial) example of how a model builder works, and
+see the JavaDoc for \texttt{IModelBuilder} for a more complete description.
+In essence,
+\begin{itemize}
+\item It must implement \texttt{IModelBuilder}.
+\item Its constructor takes a \texttt{TranslationUnit}, i.e., the file
+for which a model needs to be created.
+\item The \texttt{parse} method return a Map taking
+\texttt{ICElement}s to \texttt{CElementInfo}s, which contains all of the
+elements that should appear in the Outline for the translation unit
+specified in the constructor.  Use can either reuse the various implementations
+of \texttt{ICElement} in the CDT (\texttt{Macro, Namespace,
+FunctionDeclaration,} etc.), or you can create your own (with their own
+icons) by implementing \texttt{IAdditionalLanguageElement}.
+\end{itemize}
+\end{itemize}
+
+\item In the constructor for your editor, use the CDT UI plug-in's document
+provider rather than your own, i.e.,
+\begin{verbatim}
+setDocumentProvider(CUIPlugin.getDefault().getDocumentProvider());
+\end{verbatim}
+
+\item Since you don't have your own document provider anymore, set up
+your partitioner by overriding
+\begin{verbatim}
+protected void doSetInput(IEditorInput input)
+\end{verbatim}
+and setting it up there.
+
+\item Reuse the Outline page provided by CDT by copying the following
+field and methods from \texttt{FortranEditor} into
+your editor (notice that we are passing \texttt{null} into the
+constructor for \texttt{CEditorOutlinePage}; this doesn't seem to hurt
+anything):
+\begin{verbatim}
+    protected CContentOutlinePage fOutlinePage;
+
+    public Object getAdapter(Class required) { ... }
+
+    public CContentOutlinePage getOutlinePage() { ... }
+
+    public static void setOutlinePageInput(CContentOutlinePage page,
+            IEditorInput input) { ... }
+\end{verbatim}
+
+\item If you want your editor to jump to the correct location when something
+is selected in the Outline view, it needs to implement
+\texttt{ISelectionChangedListener}.  (If you don't require this, remove
+the line ``\texttt{fOutlinePage.addSelectionChangedListener(this);}''
+from the code copied above.)  We implemented \texttt{ISelectionChangedListener}
+by copying the following methods verbatim from \texttt{CEditor}:
+\begin{verbatim}
+    public void selectionChanged(SelectionChangedEvent event) { ... }
+
+    private boolean isActivePart() { ... }
+
+    public void setSelection(ISourceRange element, boolean moveCursor) { ... }
+\end{verbatim}
+
+\item If you want to be able to set breakpoints in your editor, add this
+line to the constructor for your editor class:
+\begin{verbatim}
+    // JO: This gives you a "Toggle Breakpoint" action (and others)
+    // when you right-click the Fortran editor's ruler
+    setRulerContextMenuId("#CEditorRulerContext"); //$NON-NLS-1$
+\end{verbatim}
+
+\item If you want the CDT's Refactor menu to appear in your editor, add this
+line to the constructor for your editor class:
+\begin{verbatim}
+    // JO: This will put the Refactor menu in the editor's
+    // context menu, among other things
+    setEditorContextMenuId("#CEditorContext"); //$NON-NLS-1$
+\end{verbatim}
+
+\end{itemize}
+
+\section{Photran-CDT Integration}
+
+Photran is integrated into the CDT in the same way described above.
+\begin{itemize}
+
+\item The Photran Core plug-in
+defines a class \texttt{FortranLanguage}, which implements
+\texttt{IAdditionalLanguage}, and hooks it into the (new)
+\texttt{AdditionalLanguages} extension point in the CDT core.
+
+\item Photran's Core plugin.xml defines a content type
+\texttt{org.eclipse.photran.core.fortranSource}; \texttt{FortranLanguage}
+notifies the CDT that we want it to treat this content type as a valid
+source language.
+
+\item We provide a \texttt{FortranModelBuilder}, which
+runs our Fortran parser over a source file to create a CDT-compatible
+model.
+
+\begin{itemize}
+
+\item Rather than using the CDT's model elements, we provide our own
+model elements, which are all subclasses of \texttt{FortranElement}.
+(\texttt{FortranElement} implements \texttt{IAdditionalLanguageElement}.)
+
+\item The icons corresponding to \texttt{FortranElement}s
+are stored in the org.eclipse.photran.modelicons plug-in.\footnote{
+The Photran UI plug-in would be the logical place to store these icons.
+However, the UI already has the Core as a dependency.  The icon requests
+come from the \texttt{FortranElement}s in the Core, so if they had to be
+retrieved from the UI, we would introduce a circular dependency.  So we put
+them in their own plug-in.}
+
+\end{itemize}
+
+\item The Core plug-in also contributes several error parsers,
+which are described in the next section.
+
+\end{itemize}

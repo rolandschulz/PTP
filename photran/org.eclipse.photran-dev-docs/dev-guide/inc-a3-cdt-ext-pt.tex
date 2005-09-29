@@ -1,0 +1,85 @@
+% Overview of Implementation of the CDT AdditionalLanguages Extension Point
+
+The following, from an e-mail to the CDT copied to photran-dev, is an
+alternative description of how we modified the CDT to include this
+extension point.
+
+\begin{verbatim}
+1. Add an AdditionalLanguages extension point to the Core's plugin.xml and AdditionalLanguages.exsd to the Core's schema folder
+
+   Extend via <language class="my.plugin.XyzLanguage">
+   where XyzLanguage implements IAdditionalLanguage (see below)
+
+2. Add a package org.eclipse.cdt.core.addl_langs containing:
+
+   IAdditionalLanguage
+        public interface IAdditionalLanguage {
+          public String getName();
+          public boolean matchesSourceContentType(String contentTypeID);
+          public Collection/*<String>*/ getRegistedContentTypeIds();
+          public IModelBuilder createModelBuilder(TranslationUnit tu,
+              Map newElements);
+        }
+
+   AdditionalLanguagesExtension.java
+        Singleton; provides access to the extension point
+        Methods:
+            public Iterator/*<IAdditionalLanguage>*/ iterator()
+            public void processAdditionalLanguages(
+                IAdditionalLanguageCallback callback)
+            public boolean someAdditionalLanguageMatchesContentType(
+                String contentTypeID)
+            public IAdditionalLanguage getLanguageForContentType(
+                String contentTypeID)
+
+   AdditionalLanguagesIterator.java -- see iterator() above
+        Implements Iterable/*<IAdditionalLanguage>*/
+
+   IAdditionalLanguageCallback -- see processAdditionalLanguages() above
+        Allows you to perform some arbitrary action on each contributed
+            IAdditionalLanguage
+
+   IModelBuilder
+        Each extension language provides a model builder this way
+        Single method:
+            public abstract Map parse(boolean quickParseMode)
+                throws Exception;
+
+   IAdditionalLanguageElement (extends ICElement)
+        Allows you to extend the ICElement hierarchy
+        Methods:
+            public abstract Object getBaseImageDescriptor();
+            - The return type should really be ImageDescriptor,
+              but I don't want to make the Core depend on JFace
+
+3. Change content type checking to use extension point...
+   i.   CoreModel#getRegistedContentTypeIds
+   ii.  CCorePlugin#getContentType
+   iii. TranslationUnit#isSourceUnit
+   iv.  CoreModel#isValidSourceUnitName
+   v.   CoreModel#isValidTranslationUnitName
+
+   The change each of these is just a line or two -- usually a call to
+   AdditionalLanguagesExtension#someAdditionalLanguageMatchesContentType
+
+4. Make CModelBuilder implement IModelBuilder (no substantive change)
+
+5. Change the beginning of TranslationUnit#parse(Map):
+        IModelBuilder modelBuilder;
+        IAdditionalLanguage lang = AdditionalLanguagesExtension
+            .getInstance()
+            .getLanguageForSourceContentType(fContentTypeID);
+        if (lang != null)
+            modelBuilder = lang.createModelBuilder(this, newElements);
+        else
+            modelBuilder = new CModelBuilder(this, newElements);
+
+6. Make CElementInfo public (rather than default)
+
+7. Make CElementInfo#setIsStructureKnown public (rather than protected)
+
+8. Add this to the top of CElementImageProvider#getBaseImageDescriptor:
+   if (celement instanceof IAdditionalLanguageElement)
+     return (ImageDescriptor)
+       ((IAdditionalLanguageElement)celement).getBaseImageDescriptor();
+\end{verbatim}

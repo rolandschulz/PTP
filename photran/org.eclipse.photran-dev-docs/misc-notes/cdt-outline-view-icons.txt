@@ -1,0 +1,18 @@
+How do icons make their way into the CDT Outline view?
+
+The Outline view basically displays one translation unit's (file's) part
+of the CModel (ICElement hierarchy).  The icons displayed are based on
+the types of the individual ICElements in the hierarchy (see
+ICElement.getElementType()).
+
+CContentOutlinePage creates a DecoratingCLabelProvider around a
+StandardCElementLabelProvider, which inherits from an
+AppearanceAwareLabelProvider, which inherits from CUILabelProvider,
+which uses a CElementImageProvider to load icons from the resource bundle
+for the UI plugin by creating URLs to the individual icons.
+
+See CElementImageProvider#getImageLabel, which calls
+getCImageDescriptor, which calls getBaseImageDescriptor, which is where
+there lies a giant case statement lies, which returns the ImageDescriptor.
+
+--JO 6/28/05

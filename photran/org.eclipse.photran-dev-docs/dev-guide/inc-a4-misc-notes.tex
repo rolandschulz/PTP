@@ -1,0 +1,57 @@
+% Miscellaneous Parser and Language Processing Notes
+
+\section{Notes on the (almost-)LALR(1) Grammar}
+
+The current grammar is based on an Eli grammar that has been worked on
+for several years.  All of the lexer work is totally original, and we fixed
+several bugs in the Eli grammar, but for the most part the grammar in
+\texttt{Fortran95.bnf} is the work of other people.  We have invested
+several months of work in it---but that does not compare to the years of
+work invested by the previous authors of that grammar.
+
+More information on the Eli grammar is available at
+http://members.aol.com/wclodius/eli\_f95\_parser.html
+
+\section{Why not an abstract syntax tree?}
+
+We started by building an AST for Fortran by hand.  For a compiler, this
+wouldn't be a big deal.  The purpose of an AST is provide a tree that only
+contains ``useful'' information from the parse, so superfluous tokens like
+parentheses never end up in an AST.  For a refactoring tool, though,
+it is important to remember every token in the parse, because you need to
+reproduce code that looks similar to the user's original code.  Fortran
+has a number of cases where there are several different ways to specify the
+same thing.  For example, you can end a program with ``end,'' ``end program,''
+or ``end program'' followed by the name of the program.  Other cases, with
+several optional tokens in the middle of statements, are trickier.  So,
+long story short, after a couple of months, we had about 600 AST classes and
+were nowhere near finished.
+
+So we needed a different alternative.
+
+One would be to have the parser generator generate the AST stuff for us.
+However, aside from the fact that it would require lots of tedious annotations
+in the grammar, we would still be in a place of having several hundred AST
+classes and a Visitor with several hundred methods.
+
+Instead, we\footnote{Actually, ``I'' is more correct... Spiros was leaving
+for Google, Brian was indifferent, and I think Dr. Johnson still would
+have preferred an AST... so now you know where to put the blame...} decided
+to use a good old-fashioned parse tree.
+
+Here's why.
+
+First, it made the ``superfluous token'' problem go away.
+Since each node just had a \texttt{List} of child nodes (either tokens or
+other parse tree nodes), we did not have to do anything extra to accommodate
+all of the variations of a statement.  All the tokens were there when we
+needed them (e.g., for prettyprinting), and they could be ignored when we
+didn't need them.
+
+Second, it gave us two possible Visitors, as described above.  More
+importantly, unlike visiting an AST, these Visitors could just do a ``dumb''
+recursive traversal of the tree, totally ignorant of the underlying grammar.
+This also made parse tree searches and grammar modifications easier.
+
+There are probably other reasons as well which I can try to remember if
+someone is still not convinced that this was a good idea.

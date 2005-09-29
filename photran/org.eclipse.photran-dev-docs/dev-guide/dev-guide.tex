@@ -1,0 +1,79 @@
+%\documentclass[10pt,letterpaper,twocolumn]{article}
+\documentclass[10pt,letterpaper]{report}
+
+%\usepackage{anysize}
+%\marginsize{1in}{1in}{1in}{1in}
+\usepackage{fullpage}
+
+\usepackage{graphicx}
+
+\hyphenpenalty=5000
+\tolerance=1000
+
+% Skip a line between paragraphs, and don't indent them
+\setlength{\parskip}{10pt}  % 10 pt = space between paragraphs
+\setlength{\parindent}{0pt} % 0 pt  = indentation
+
+\begin{document}
+
+\title{Photran 3.0 Developer's Guide}
+\author{
+\input{authors}
+}
+\date{}
+
+\maketitle
+
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Introduction}
+\input{inc-01-intro}
+
+\chapter{Plug-in Decomposition}
+\input{inc-02-plugins}
+
+\chapter{CDT Integration}
+\input{inc-03-cdt}
+
+\chapter{The Photran Core Plug-in}
+\input{inc-04-core}
+
+\chapter{The Photran UI Plug-in}
+\input{inc-05-ui}
+
+\chapter{The Photran Lexers and Parser}
+\input{inc-06-parser}
+
+\chapter{Parse Tree Analysis: Visitors and Searching}
+\input{inc-07-analysis}
+
+\chapter{Symbol Tables}
+\input{inc-08-symtbls}
+
+\chapter{Refactoring Support: Source Printing and Program Editing}
+\input{inc-09-refac-suppt}
+
+\chapter{Refactoring: Preconditions and Implementation}
+\input{inc-10-refactoring}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+
+\chapter{Getting the Photran 3.0 Sources from CVS}
+\vspace{0.5em}
+\input{inc-a1-cvs}
+
+\chapter{XYZ Language Plug-in README}
+\input{inc-a2-xyz}
+
+\chapter{Overview of Implementation of the CDT \texttt{AdditionalLanguages}
+         Extension Point}
+\input{inc-a3-cdt-ext-pt}
+
+\chapter{Miscellaneous Parser and Language Processing Notes}
+\input{inc-a4-misc-notes}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
