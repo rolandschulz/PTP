@@ -31,6 +31,7 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
+import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.core.utils.Queue;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
 
@@ -38,7 +39,7 @@ import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
  * @author donny
  *
  */
-public abstract class AbstractDebugger extends Observable implements IDebugger {
+public abstract class AbstractDebugger extends Observable implements IDebugger, IDebuggerEvent {
 	protected Queue eventQueue = null;
 	protected EventThread eventThread = null;
 
@@ -150,5 +151,21 @@ public abstract class AbstractDebugger extends Observable implements IDebugger {
 		}
 		
 		return list;
+	}
+	
+	public void handleDebugEvent(int eventType, BitList procs, String[] args) {
+		IPCDIEvent event = null;
+		
+		if (eventType == IDBGEV_BPHIT) {
+			event = handleBreakpointHitEvent(procs, args);
+		} else if (eventType == IDBGEV_ENDSTEPPING) {
+			event = handleEndSteppingEvent(procs, args);
+		} else if (eventType == IDBGEV_PROCESSRESUMED) {
+			event = handleProcessResumedEvent(procs, args);
+		} else if (eventType == IDBGEV_PROCESSTERMINATED) {
+			event = handleProcessTerminatedEvent(procs, args);
+		}
+		
+		fireEvent(event);
 	}
 }

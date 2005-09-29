@@ -29,6 +29,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
+import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.core.utils.Queue;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.cdi.PCDIException;
@@ -210,6 +211,30 @@ public class ParallelDebugger extends AbstractDebugger {
 	 * TODO: extend to support multiple processes
 	 */
 	public ICDIArgument[] listArguments(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException {
+		return null;
+	}
+
+	public IPCDIEvent handleBreakpointHitEvent(BitList procs, String[] args) {
+		// Auto-generated method stub
+		System.out.println("ParallelDebugger.handleBreakpointHitEvent()");
+		return null;
+	}
+
+	public IPCDIEvent handleEndSteppingEvent(BitList procs, String[] args) {
+		// Auto-generated method stub
+		System.out.println("ParallelDebugger.handleEndSteppingEvent()");
+		return null;
+	}
+
+	public IPCDIEvent handleProcessResumedEvent(BitList procs, String[] args) {
+		// Auto-generated method stub
+		System.out.println("ParallelDebugger.handleProcessResumedEvent()");
+		return null;
+	}
+
+	public IPCDIEvent handleProcessTerminatedEvent(BitList procs, String[] args) {
+		// Auto-generated method stub
+		System.out.println("ParallelDebugger.handleProcessTerminatedEvent()");
 		return null;
 	}
 }
