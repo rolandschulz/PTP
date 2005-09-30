@@ -48,6 +48,8 @@ ORTEShutdown(void)
 	return 0;
 }
 
+/* this is the event progress bit.  we'll have to figure out how to hook
+ * this in correctly */
 int
 ORTEProgress(void)
 {
@@ -58,6 +60,10 @@ ORTEProgress(void)
 	return 0;
 }
 
+/* terminate a job, given a jobid
+ * EVENT RETURN:
+ *   type = TERMINATE_JOB
+ *   data = "success" ?
 int
 ORTETerminateJob(int jobid)
 {
@@ -69,6 +75,11 @@ ORTETerminateJob(int jobid)
 	return 0;
 }
 
+/* spawn a job with the given executable path and # of procs.
+ * EVENT RETURN:
+ *   type = RUN
+ *   data = "jobid" (example: "848")
+ */
 int
 ORTERun(char *exec_path, int num_procs)
 {
@@ -174,6 +185,8 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 	}
 }
 
+/* this is an internal function we'll call from within this, consider
+ * it 'private' */
 static int 
 ptp_ompi_sendcmd(orte_daemon_cmd_flag_t usercmd)
 {
@@ -205,7 +218,10 @@ ptp_ompi_sendcmd(orte_daemon_cmd_flag_t usercmd)
 /* JOB RELATED FUNCTIONS */
 
 /* get a dump of all the jobs known in the universe, this will return
- * an event with a list of jobIDs */
+ * an event with a list of jobIDs
+ * EVENT RETURN:
+ *   type = GET_JOBS
+ *   data = [99,195,4555] <-- job IDs */
 int
 OMPIGetJobs()
 {
@@ -213,7 +229,11 @@ OMPIGetJobs()
 
 /* given a jobid (valid from OMPIGetJobs()) we request a list of the process
  * IDs associated with that job.  this will return an event with a list of
- * processIDs */
+ * processIDs 
+ * EVENT RETURN:
+ *   type = GET_PROCESSES
+ *   data = [85,86,87,88] <-- those are process IDs
+ */
 int 
 OMPIGetProcesses(int jobid)
 {
@@ -224,7 +244,11 @@ OMPIGetProcesses(int jobid)
  * elsewhere but an example might be ATTRIB_PROCESS_STATE, ATTRIB_PROCESS_NODE
  * which would be the state of the process (starting, running, terminated,
  * exited, etc) and the nodeID of the node the process is running on, 
- * respectively */
+ * respectively 
+ * EVENT RETURN:
+ *   type = GET_NODE_ATTRIBUTE
+ *   data = "key=value" (example "state=running", "node=54" <-- 54 = node ID, not necessary node number)
+ */
 int
 OMPIGetProcessAttribute(int procid, string attrib)
 {
@@ -233,14 +257,22 @@ OMPIGetProcessAttribute(int procid, string attrib)
 /* MONITORING RELATED FUNCTIONS */
 
 /* generates an event which returns a list of all the machineIDs know to
- * the universe. */
+ * the universe.
+ * EVENT RETURN:
+ *   type = GET_MACHINES
+ *   data = [2,3,4,5] <--- those are machine IDs
+ */
 int
 OMPIGetMachines()
 {
 }
 
 /* given a machine ID, this generates an event which contains a list of
- * all the nodeIDs associated with the given machineID */
+ * all the nodeIDs associated with the given machineID
+ * EVENT RETURN:
+ *   type = GET_NODES
+ *   data = [10,11,12,13,14,15] <-- those are node IDs
+ */
 int
 OMPIGetNodes(int machineid)
 {
@@ -249,7 +281,11 @@ OMPIGetNodes(int machineid)
 /* given a nodeid and an attribute key this generates an event with
  * the attribute's value.  sample attributes might be ATTRIB_NODE_STATE
  * or ATTRIB_NODE_OS which might return up, down, booting, or error and
- * linux, solaris, windows, osx, etc respectively. */
+ * linux, solaris, windows, osx, etc respectively
+ * EVENT RETURN:
+ *   type = GET_NODE_ATTRIBUTE
+ *   data = "key=value" (example "state=down", "user=ndebard")
+ */
 int
 OMPIGetNodeAttribute(int nodeid, string attrib)
 {
@@ -261,7 +297,11 @@ OMPIGetNodeAttribute(int nodeid, string attrib)
  * and getNodes(some_machine_id).  once the model is populated, we should
  * have a relationship between the two but this MAY be helpful ... really
  * it depends on whether we want helper functions at this level or up at
- * the Java level - probably in my opinion we want them at the Java level */
+ * the Java level - probably in my opinion we want them at the Java level 
+ * EVENT RETURN:
+ *   type = GET_NODE_MACHINE_ID
+ *   data = "nodeid=machineid" (example node 1000 owned by machine 4 -> "1000=4")
+ */ 
 int
 OMPIGetNodeMachineID(int nodeid)
 {
