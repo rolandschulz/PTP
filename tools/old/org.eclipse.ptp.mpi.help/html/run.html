@@ -1,0 +1,86 @@
+<html>
+<head>
+<title>
+Running PTP MPI Tools Plug-in
+</title>
+<body>
+<h1> Running the PTP MPI Tools Plug-in</h1>
+
+
+
+<h3>Now set up to run the PTP MPI plug-ins</h3>
+<ol>
+<li>Create a project (e.g a Managed Make C project) , and within the project, create a C file that includes MPI code. A sample is <a href="testMPI.c">testMPI.c</a> 
+
+<p>Note: A sample C++ file with MPI calls 
+is <a href="helloMPI_cpp_style.cpp">helloMPI_cpp_style.cpp</a>.
+<br>A sample C++ file with MPI calls in ordinary C style 
+is <a href="helloMPI_c_style.cpp">helloMPI_c_style.cpp</a>.
+
+
+</ul>
+<p>&nbsp;
+
+<li>Open the MPI Artifacts view
+- or, the view will be opened automatically when analysis is complete.
+<p>Window > Show View > Other... > PTP MPI Views > MPI Artifact View
+
+<p><img src="images/showView.gif">
+<p>&nbsp;
+
+<li>Select the source file to analyse, to find the MPI artifacts.
+<p>Click the MPI button 
+<img src="images/mpi.gif" border=1> in the tool bar.
+<p><img src="images/mpiButtons.gif" >
+<li>The MPI Artifact View is opened, if it was not present.
+It is 
+populated with MPI artifacts found.
+<p><img src="images/mpiView.gif">
+<p>&nbsp;
+<li>Double click on any marker in the MPI Artifact View
+to navigate the editor to that line in the source file.
+<p>&nbsp;
+<li>Hover over the MPI Artifact identified in the source file
+(by blue squiggles) to see additional information about that
+function call, for example. 
+<br><img src="images/hover.gif" border=1>
+<li>Rows in the MPI Artifact View can be sorted by any of the columns.
+Click on the column heading to sort.
+<li>Click the "Clear MPI Artifacts Markers" button 
+<img src="images/nompi.gif" border=1> in the tool bar to remove all
+the markers.
+<li>You can run the analysis on another file and its markers
+will be added to the view.
+<li>You can run the analysis on more than one file (multiple selection)
+or a container (folder or project), to analyse more than one file at a time.
+Click on a project or a folder, then click the
+MPI button 
+<img src="images/mpi.gif" border=1> 
+ to run it on all C source files in that folder.
+<p>
+<li><b>Content Assist</b><br>
+Type an incomplete MPI function name e.g. "MPI_Ini"
+and hit Ctrl-Space. The information that is shown
+is populated with CDT completions including argument
+types, but in addition, the PTP-MPI tools also provide
+specific information about actual MPI constant values, etc.
+where appropriate, and a yellow popup with additional 
+textual descriptive information about the function.
+<br><img src="images/contentAssist.gif" border=1>
+<p>
+<li><b>Content sensitive help</b><br>
+Also, if F1 is pressed when the cursor is within
+a function name, a help view appears which shows additional information.
+
+<br><img src="images/helpContSensHitF1.gif" border=1>
+<p>Help View appears:
+<br><img src="images/helpContSens.gif" border=1>
+<p>Click on the function name to see more information:
+<br><img src="images/helpContSensHitF1click.gif" border=1>
+
+</ol>
+<p>&nbsp;
+<p>That's all folks.
+<p>&nbsp;<p>&nbsp;<p>&nbsp;
+</body>
+</html>

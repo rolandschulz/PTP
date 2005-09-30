@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+
+
+<plugin
+   id="org.eclipse.ptp.mpi.help"
+   name="PTP MPI Help Plug-in"
+   version="0.1.5"
+   provider-name="IBM Research"
+   class="org.eclipse.ptp.mpi.help.HelpPlugin">
+
+   <runtime>
+      <library name="help.jar"/>
+   </runtime>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.help"/>
+   </requires>
+   <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="toc.xml"
+            primary="true"/>
+      <index path="org.eclipse.ptp.mpi.help.index1"/>
+   </extension>
+
+</plugin>

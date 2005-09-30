@@ -1,0 +1,56 @@
+<html>
+<head>
+<title>
+Setup for MPI Tools Plug-in
+</title>
+<body>
+<h1> Setup for PTP MPI Tools Plug-in</h1>
+
+<h2>Running the PTP MPI Tools plug-in</h2>
+<p>Launch Eclipse with the PTP MPI Tools feature (org.eclipse.ptp.mpi)
+which includes two plug-ins:
+<ul><li>
+<b>org.eclipse.ptp.mpi.core </b>
+and 
+<li><b>org.eclipse.ptp.mpi.help</b>
+</ul>
+<p>The CDT (or FDT) plug-ins are also required.
+<ol>
+<li>Create a CDT project (e.g. Managed Make C Project)
+<li>Create a source file e.g. test.c with MPI artifacts 
+(see <a href="testMPI.c">testMPI.c</a>).
+
+<li>Set up the include paths etc:
+<br>Project Properties, C/C++ Build, Configuration Settings,
+Tool Settings tab, Directories
+<br>--> Add include path for mpi header files etc. - path to the 'include' dir
+<br><img src="images/include.gif">
+<p>
+Project Properties, C/C++ Build, Configuration Settings,
+Tool Settings tab, GCC C Linker, Libraries
+<ol>
+<li>Under "Libraries (-l)"  add the symbol "mpi"  
+<li> Under "Library search path (-L)" add the path to the 'lib' dir in MPI dir.
+<br><img src="images/lib.gif">
+</ol>
+<p>
+<li>Make sure the Indexer is turned on
+<br>Project Properties, C/C++ Indexer, select "Full C/C++ Indexer (declarations and cross references)"
+<br>And also the same in Window, Prefs, C/C++, Indexer (this seems to be the
+default setting for new projects)
+<p>
+<li>Tell the plug-in where to find the MPI header file
+<p>Window, Preferences, MPI
+<br>Add path to MPI include paths (again) - this tells it what symbols to look
+for in the MPI Artifact view.
+<br><img src="images/includeMPI.gif">
+</ol>
+
+<p>Now set up to <a href="run.html">run the MPI plug-in</a>
+
+
+
+<p>&nbsp;
+<p>&nbsp;<p>&nbsp;<p>&nbsp;
+</body>
+</html>

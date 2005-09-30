@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin
+   id="org.eclipse.ptp.mpi.core"
+   name="PTP MPI Tools Plug-in"
+   version="0.1.5"
+   provider-name="IBM Research"
+   class="org.eclipse.ptp.mpi.core.MpiPlugin">
+
+   <runtime>
+      <library name="ptpmpi.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.cdt.ui"/>
+      <import plugin="org.eclipse.search"/>
+      <import plugin="org.eclipse.help"/>
+      <import plugin="org.eclipse.cdt.doc.user"/>
+   </requires>
+   
+    <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="MPI Artifacts Action Set"
+            visible="true"
+            id="org.eclipse.ptp.mpi.core.ui.actionSet">
+         <menu
+               label="&amp;MPI Artifacts"
+               id="mpiMenu">
+            <separator
+                  name="mpiGroup">
+            </separator>
+         </menu>
+         <action
+               label="Clear MPI Artifact Markers"
+               icon="icons/nompi.gif"
+               class="org.eclipse.ptp.mpi.core.actions.RemoveMarkerAction"
+               tooltip="Clear MPI Artifacts Markers"
+               menubarPath="mpiMenu/mpiGroup"
+               toolbarPath="mpiToolbarGroup"
+               id="org.eclipse.ptp.mpi.core.ui.actions.RemoveMarkerAction">
+            <selection
+                  class="org.eclipse.core.resources.IProject">
+            </selection>
+         </action>
+         <action
+               label="Run MPI Analysis"
+               icon="icons/mpi.gif"
+               class="org.eclipse.ptp.mpi.core.actions.RunAnalyseBase"
+               tooltip="Run MPI Analysis on selected file, folder, or project to find MPI Artifacts"
+               menubarPath="mpiMenu/mpiGroup"
+               toolbarPath="mpiToolbarGroup"
+               id="org.eclipse.ptp.mpi.core.ui.actions.RunAnalyseAction">
+         </action>
+        </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="PTP MPI Views"
+            id="org.eclipse.ptp.mpi">
+      </category>
+      <view
+            name="MPI Artifact View"
+            icon="icons/mpi.gif"
+            category="org.eclipse.ptp.mpi"
+            class="org.eclipse.ptp.mpi.core.views.MPITableView"
+            id="org.eclipse.ptp.mpi.core.views.MPITableView">
+      </view>
+
+   </extension>
+   <!--  MPI markers -->
+   <extension point="org.eclipse.core.resources.markers"
+		id="mpiMarker"
+        name="MPI Artifact Marker">
+      <super type="org.eclipse.core.resources.textmarker"/>
+      <attribute name="fileName"/>
+      <attribute name="theLineNo"/>
+      <attribute name="theNewLineNo"/>
+      <attribute name="columnNo"/>
+      <attribute name="name"/>
+      <attribute name="description"/>
+      <attribute name="constructType"/>
+      <attribute name="uniqueID"/>
+   </extension>
+   <!-- this changes the marker image in the editor marker bar  -->
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerType="org.eclipse.ptp.mpi.core.mpiMarker"
+            name="org.eclipse.ptp.mpi.core.mpiMarkerAnnotation">
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="org.eclipse.ptp.mpi.core.mpiMarkerAnnotation"
+            icon="icons/mpi.gif" 
+            
+            presentationLayer="3"
+            label="MPI Annotation Marker"
+            
+            textPreferenceKey="mpiIndication"
+            textPreferenceValue="true"
+            highlightPreferenceKey="artifactHighlighting"
+            highlightPreferenceValue="false"
+            colorPreferenceKey="artifactIndicationColor"
+            colorPreferenceValue="0,128,192"
+            verticalRulerPreferenceKey="artifactIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="true"
+			showInNextPrevDropdownToolbarActionKey="showPortingInNextPrevDropdownToolbarAction"
+            showInNextPrevDropdownToolbarAction="false"
+            overviewRulerPreferenceKey="artifactIndicationInOverviewRuler"
+            overviewRulerPreferenceValue="true"
+            
+            includeOnPreferencePage="true"
+            isGoToPreviousNavigationTargetKey="isPortingGoToPreviousNavigationTarget"
+
+            isGoToNextNavigationTargetKey="isPortingRecordGoToNextNavigationTarget"
+            >
+      </specification>  
+   </extension>
+  
+   
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.eclipse.ptp.mpi.core.prefs.MPIPreferencePage"
+            id="org.eclipse.ptp.mpi.core.prefpage"
+            name="MPI"/>
+   </extension>
+   <extension
+         point="org.eclipse.cdt.ui.CHelpProvider">
+      <provider
+            class="org.eclipse.ptp.mpi.core.help.CHelpProviderImpl"
+            id="org.eclipse.ptp.mpi.core.help.CHelpInfoProvider"/>
+   </extension>
+</plugin>

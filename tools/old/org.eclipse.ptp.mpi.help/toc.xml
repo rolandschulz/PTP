@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="PTP MPI Tools" topic="html/toc.html">
+
+      <topic label="Setup for PTP MPI tools"  href="html/setup.html"/> 
+      <topic label="Running PTP MPI tools"  href="html/run.html"/> 
+   
+</toc>
