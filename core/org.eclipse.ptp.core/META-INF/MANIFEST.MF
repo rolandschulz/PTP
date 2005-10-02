@@ -8,6 +8,8 @@ Bundle-Activator: org.eclipse.ptp.core.PTPCorePlugin
 Bundle-Vendor: LANL
 Bundle-Localization: plugin
 Export-Package: org.eclipse.ptp.core,
+ org.eclipse.ptp.core.proxy,
+ org.eclipse.ptp.core.proxy.event,
  org.eclipse.ptp.debug,
  org.eclipse.ptp.internal.core,
  org.eclipse.ptp.rtsystem,
