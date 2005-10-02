@@ -1,7 +1,6 @@
 package org.eclipse.ptp.core.proxy;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
@@ -21,13 +20,16 @@ public abstract class AbstractProxyClient {
 	private Socket				sessSock;
 	private OutputStreamWriter	sessOut;
 	private InputStreamReader		sessIn;
+	private boolean				connected;
 	private boolean				exitThread;
 	private Thread				eventThread;
+	private Thread				acceptThread;
 	protected List				listeners = new ArrayList(2);
 
 	public AbstractProxyClient(String host, int port) {
 		this.sessHost = host;
 		this.sessPort = port;
+		this.connected = false;
 	}
 	
 	private String encodeLength(int val) {
@@ -67,12 +69,23 @@ public abstract class AbstractProxyClient {
 	
 	public void sessionCreate() throws IOException {
 		sessSvrSock = new ServerSocket(sessPort);
+		acceptThread = new Thread("Proxy Client Accept Thread") {
+			public void run() {
+				try {
+					sessSock = sessSvrSock.accept();
+					sessOut = new OutputStreamWriter(sessSock.getOutputStream());
+					sessIn = new InputStreamReader(sessSock.getInputStream());
+					connected = true;
+					startEventThread();
+				} catch (IOException e) {
+				}
+				System.out.println("accept thread exiting...");
+			}
+		};
+		acceptThread.start();
 	}
 
-	public void sessionAccept() throws IOException {
-		sessSock = sessSvrSock.accept();
-		sessOut = new OutputStreamWriter(sessSock.getOutputStream());
-		sessIn = new InputStreamReader(sessSock.getInputStream());
+	private void startEventThread() throws IOException {
 		eventThread = new Thread("Proxy Client Event Thread") {
 			public void run() {
 				try {
@@ -81,9 +94,8 @@ public abstract class AbstractProxyClient {
 						sessionProgress();
 					}
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
+				System.out.println("event thread exiting...");
 			}
 		};
 		eventThread.start();
@@ -102,12 +114,27 @@ public abstract class AbstractProxyClient {
 	public void sessionProgress() throws IOException {
 		char[] len_bytes = new char[9];
 		
-		sessIn.read(len_bytes, 0, 9);
+		int n = sessIn.read(len_bytes, 0, 9);
+		if (n < 0) {
+			sessIn.close();
+			sessOut.close();
+			exitThread = true;
+			return;
+		}
+		
 		String len_str = new String(len_bytes, 0, 8);
 		int len = Integer.parseInt(len_str, 16);
 		
 		char[] event_bytes = new char[len];
-		sessIn.read(event_bytes, 0, len);
+
+		n = sessIn.read(event_bytes, 0, len);
+		if (n < 0) {
+			sessIn.close();
+			sessOut.close();
+			exitThread = true;
+			return;
+		}
+
 		String event_str = new String(event_bytes);
 		
 		IProxyEvent e = convertEvent(event_str);
