@@ -1,41 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
-<plugin
-   id="org.eclipse.ptp.debug.external"
-   name="PTP Debug External Plug-in"
-   version="1.0.0"
-   provider-name=""
-   class="org.eclipse.ptp.debug.external.PTPDebugExternalPlugin">
+<plugin>
 
-   <runtime>
-      <library name="ptpdebugexternal.jar">
-         <export name="org.eclipse.ptp.debug.external.*"/>
-         <export name="org.eclipse.ptp.debug.external.cdi.*"/>
-         <export name="org.eclipse.ptp.debug.external.cdi.breakpoints.*"/>
-         <export name="org.eclipse.ptp.debug.external.cdi.event.*"/>
-         <export name="org.eclipse.ptp.debug.external.cdi.model.*"/>
-         <export name="org.eclipse.ptp.debug.external.cdi.model.type.*"/>
-         <export name="org.eclipse.ptp.debug.external.cdi.model.variable.*"/>
-         <export name="org.eclipse.ptp.debug.external.debugger.*"/>
-         <export name="org.eclipse.ptp.debug.external.simulator.*"/>
-         <export name="org.eclipse.ptp.debug.external.ui.*"/>
-      </library>
-   </runtime>
-
-   <requires>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.cdt.debug.core"/>
-      <import plugin="org.eclipse.cdt.core"/>
-      <import plugin="org.eclipse.ptp.debug.core"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.debug.core"/>
-      <import plugin="org.eclipse.ptp.core"/>
-      <import plugin="org.eclipse.search"/>
-      <import plugin="org.eclipse.debug.ui"/>
-   </requires>
-
-   <extension
+     <extension
          point="org.eclipse.ptp.debug.core.PTPDebugger">
       <debugger
             platform="*"
