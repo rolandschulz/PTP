@@ -26,18 +26,20 @@
 #include "procset.h"
 #include "list.h"
 
-#define DBGEV_OK		0
-#define DBGEV_ERROR	1
-#define DBGEV_BPHIT	2
-#define DBGEV_SIGNAL	3
-#define DBGEV_EXIT	4
-#define DBGEV_STEP	5
-#define DBGEV_BPSET	6
-#define DBGEV_FRAMES	7
-#define DBGEV_DATA	8
-#define DBGEV_TYPE	9
-#define DBGEV_VARS	10
-#define DBGEV_INIT	11
+#define DBGEV_OK			0
+#define DBGEV_ERROR		1
+
+#define DBG_EV_OFFSET		100
+#define DBGEV_BPHIT		DBG_EV_OFFSET + 0
+#define DBGEV_SIGNAL		DBG_EV_OFFSET + 1
+#define DBGEV_EXIT		DBG_EV_OFFSET + 2
+#define DBGEV_STEP		DBG_EV_OFFSET + 3
+#define DBGEV_BPSET		DBG_EV_OFFSET + 4
+#define DBGEV_FRAMES		DBG_EV_OFFSET + 5
+#define DBGEV_DATA		DBG_EV_OFFSET + 6
+#define DBGEV_TYPE		DBG_EV_OFFSET + 7
+#define DBGEV_VARS		DBG_EV_OFFSET + 8
+#define DBGEV_INIT		DBG_EV_OFFSET + 9
 
 struct dbg_event {
 	int			event;
