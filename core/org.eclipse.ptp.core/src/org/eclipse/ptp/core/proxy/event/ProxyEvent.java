@@ -10,7 +10,7 @@ public class ProxyEvent {
 		
 		int type = Integer.parseInt(args[0]);
 		
-		FastBitSet set = new FastBitSet(args[1]);
+		FastBitSet set = decodeBitSet(args[1]);
 		
 		switch (type) {
 		case IProxyEvent.EVENT_OK:
@@ -42,5 +42,11 @@ public class ProxyEvent {
 		}
 		
 		return new String(strBytes);
+	}
+	
+	public static FastBitSet decodeBitSet(String str) {
+		String[] parts = str.split(":");
+		int len = Integer.parseInt(parts[0], 16); // Skip trailing NULL
+		return new FastBitSet(len, parts[1]);
 	}
 }

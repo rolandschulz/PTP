@@ -19,7 +19,8 @@ public class FastBitSet {
 		}
 	}
 	
-	public FastBitSet(String str) {
+	public FastBitSet(int nbits, String str) {
+		this.init(nbits);
 		this.fromString(str);
 	}
 	
@@ -35,6 +36,27 @@ public class FastBitSet {
 	
 	public int size() {
 		return this.nBits;
+	}
+	
+	private int countBits(byte b) {
+		int n = 0;
+		
+		while (b != 0) {
+			n++;
+			b &= (b-1);
+		}
+		
+		return n;
+	}
+	
+	public int cardinality() {
+		int n = 0;
+		
+		for (int i = 0; i < this.nBytes; i++) {
+			n += countBits(this.bits[i]);
+		}
+		
+		return n;
 	}
 	
 	public void clear(int index) throws IndexOutOfBoundsException {
@@ -64,22 +86,22 @@ public class FastBitSet {
 	}
 	
 	public void set(int from, int to) {
-		if (from >= this.nBits || from < 0 || to >= this.nBits || to < 0 || from > to)
+		if (from >= this.nBits || from < 0 || to > this.nBits || from >= to)
 			throw new IndexOutOfBoundsException();
 		
 		int p1 = bytePos(from);
-		int p2 = bytePos(to);
+		int p2 = bytePos(to-1);
 		int b1 = bitInByte(from);
-		int b2 = bitInByte(to);
+		int b2 = bitInByte(to-1);
 		
 		byte hiMask =  (byte) (0xff >> (7 - b2));
 		byte lowMask = (byte) (0xff << b1);
 		
-		for (int p = p1; p <= p2; p++)
+		for (int p = p1+1; p < p2; p++)
 			this.bits[p] = (byte) 0xff;
 		
-		this.bits[p1] &= lowMask;
-		this.bits[p2] &= hiMask;
+		this.bits[p1] |= lowMask;
+		this.bits[p2] |= hiMask;
 	}
 	
 	public boolean get(int index) throws IndexOutOfBoundsException {
@@ -91,20 +113,41 @@ public class FastBitSet {
 		return (this.bits[b] & mask) == mask;
 	}
 	
-/*
- * TODO	
 	public int nextSetBit(int index) {
-		return bitSet.nextSetBit(index);
+		if (index < 0)
+			throw new IndexOutOfBoundsException();
+
+		if (index >= this.nBits)
+			return -1;
+		
+		int i = index;
+		int start = bitInByte(index);
+		
+		for (int p = bytePos(index); p < this.nBytes; p++) {
+			byte val = this.bits[p];
+			if (val != 0) {
+				for (int b = start; b < 8; b++, i++) {
+					byte mask = (byte) (1 << b);
+					if ((val & mask) == mask)
+						return i;
+				}
+			} else
+				i += 8;
+			
+			start = 0;
+		}
+		
+		return -1;
 	}
 	
 	public int[] toArray() {
-		int[] retValue = new int[bitSet.cardinality()];
-		for(int i = bitSet.nextSetBit(0), j = 0; i >= 0; i = bitSet.nextSetBit(i+1), j++) {
+		int[] retValue = new int[this.cardinality()];
+		for(int i = this.nextSetBit(0), j = 0; i >= 0; i = this.nextSetBit(i+1), j++) {
 			retValue[j] = i;
 		}
 		return retValue;
 	}
-*/
+
 	public FastBitSet copy() {
 		return new FastBitSet(this.nBits, this.bits);
 	}
@@ -164,15 +207,11 @@ public class FastBitSet {
 		}
 	}
 	
-	public void fromString(String str) {
-		String[] strs = str.split(":");
-		
-		this.init(Integer.parseInt(strs[0], 16));
-		
+	private void fromString(String str) {
 		if (this.nBytes == 0)
 			return;
 		
-		byte[] strBits = strs[1].getBytes();
+		byte[] strBits = str.getBytes();
 		
 		int last = strBits.length - this.nBytes * 2;
 		if (last < 0)
@@ -194,14 +233,12 @@ public class FastBitSet {
 	}
 	
 	public String toString() {
-		String res;
+		String res = "";
 		boolean nonzero = false;
 		
 		if (this.nBits == 0) {
-			res = "0:00";
+			res = "0";
 		} else {
-			res = Integer.toHexString(this.nBits) + ":";
-			
 			for (int i = this.nBytes-1 ; i >= 0; i--) {
 				nonzero |= this.bits[i] != 0;
 				if (nonzero) {

@@ -6,6 +6,7 @@ import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.ptp.core.proxy.FastBitSet;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
+import org.eclipse.ptp.core.proxy.event.ProxyEvent;
 import org.eclipse.ptp.debug.external.cdi.Condition;
 import org.eclipse.ptp.debug.external.cdi.Location;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.AddressBreakpoint;
@@ -20,7 +21,7 @@ public class ProxyDebugEvent {
 		
 		int type = Integer.parseInt(args[0]);
 		
-		FastBitSet set = new FastBitSet(args[1]);
+		FastBitSet set = ProxyEvent.decodeBitSet(args[1]);
 		
 		switch (type) {
 		case IProxyEvent.EVENT_DBG_BPHIT:
