@@ -70,17 +70,14 @@ public class IconCanvas extends Canvas {
 	*/
 
 	protected int max_e_row = -1;
-	
 	protected int current_top_row = -1;
-	protected int lastPaintTopIndex = -1;
-	protected int clientAreaHeight = 0;			// the client area height. Needed to calculate content width for new visible lines during Resize callback
-	protected int clientAreaWidth = 0;			// the client area width. Needed during Resize callback to determine if line wrap needs to be recalculated
-	
-	protected Point selection = null;
 	
 	protected boolean mouseDown = false;
 	protected boolean mouseDoubleClick = false;	// true=a double click ocurred. Don't do mouse swipe selection.
 	protected boolean doubleClickEnabled = true;	// see getDoubleClickEnabled
+	protected boolean continueSelection = false;
+	protected boolean specialSelection = false;
+	protected Point selection = null;
 	protected Point doubleClickSelection;			// selection after last mouse double click
 	
 	protected int autoScrollDirection = SWT.NULL;	// the direction of autoscrolling (up, down, right, left)
@@ -297,7 +294,7 @@ public class IconCanvas extends Canvas {
 		setKeyBinding(SWT.BS, ST.DELETE_PREVIOUS);
 		setKeyBinding(SWT.DEL, ST.DELETE_NEXT);
 	}
-	public void invokeAction(int action) {
+	public void invokeAction(int action, Event event) {
 		checkWidget();
 		updateCaretDirection = true;
 		switch (action) {
@@ -348,30 +345,30 @@ public class IconCanvas extends Canvas {
 			case ST.SELECT_LINE_START:
 				System.out.println("++++ select line start");
 				//doLineStart();
-				doSelection(ST.COLUMN_PREVIOUS);
+				//doSelection(ST.COLUMN_PREVIOUS);
 				break;
 			case ST.SELECT_LINE_END:
 				System.out.println("++++ select line end");
 				//doLineEnd();
-				doSelection(ST.COLUMN_NEXT);
+				//doSelection(ST.COLUMN_NEXT);
 				break;
 			case ST.SELECT_COLUMN_PREVIOUS:
 				System.out.println("++++ select column previous");
 				//doSelectionCursorPrevious();
-				doSelection(ST.COLUMN_PREVIOUS);
+				//doSelection(ST.COLUMN_PREVIOUS);
 				break;
 			case ST.SELECT_COLUMN_NEXT:
 				System.out.println("++++ select column next");
 				//doSelectionCursorNext();
-				doSelection(ST.COLUMN_NEXT);
+				//doSelection(ST.COLUMN_NEXT);
 				break;
 			case ST.SELECT_PAGE_UP:
 				System.out.println("++++ select page up");
-				//doSelectionPageUp(getRowCountWhole());
+				doSelectionPageUp(getMaxClientRow(), event.x);
 				break;
 			case ST.SELECT_PAGE_DOWN:
 				System.out.println("++++ select page down");
-				//doSelectionPageDown(getRowCountWhole());
+				doSelectionPageDown(getMaxClientRow(), event.x);
 				break;
 			// Modification			
 			case ST.CUT:
@@ -475,7 +472,7 @@ public class IconCanvas extends Canvas {
 			}
 		}
 		if (action != SWT.NULL) {
-			invokeAction(action);		
+			invokeAction(action, event);		
 		}
 	}
 
@@ -623,22 +620,26 @@ public class IconCanvas extends Canvas {
 		}
 		return -1;
 	}
+	protected int getSelectedIndex() {
+		if (selection != null) {
+			int col = getSelectedCol(selection.x);
+			if (col > -1) {
+				int row = getSelectedRow(selection.y);
+				if (row > -1) {
+					return row * getMaxCol() + col;
+				}
+			}
+		}
+		return -1;
+	}
+	
 	protected void doSelection(int direction) {
 		int redrawStart = -1;
 		int redrawEnd = -1;
-		
-		
+
 		if (direction == -1) {
-			if (selection != null) {
-				int col = getSelectedCol(selection.x);
-				if (col > -1) {
-					int row = getSelectedRow(selection.y);
-					if (row > -1) {
-						int foundIndex = row * getMaxCol() + col;
-						System.out.println("----index: " + foundIndex);
-					}
-				}
-			}
+			int selectedIndex = getSelectedIndex();
+			System.out.println("---- index: " + selectedIndex);
 		}
 		/*
 		if (selectionAnchor == -1) {
@@ -737,6 +738,10 @@ public class IconCanvas extends Canvas {
 	}
 	
 	protected void resetInfo() {
+		mouseDown = false;
+		mouseDoubleClick = false;
+		continueSelection = false;
+		specialSelection = false;
 		selection = null;
 		doubleClickSelection = null;
 		max_e_row = -1;
@@ -757,7 +762,7 @@ public class IconCanvas extends Canvas {
 		}
 	}
 	protected void handleKeyUp(Event event) {
-		doubleClickSelection = null;
+		resetInfo();
 	}
 	protected void handleMouseDown(Event event) {
 		mouseDown = true;
@@ -765,17 +770,21 @@ public class IconCanvas extends Canvas {
 		if ((event.button != 1) || (IS_CARBON && (event.stateMask & SWT.MOD4) != 0)) {
 			return;	
 		}
-		boolean select = (event.stateMask & (SWT.MOD2 | SWT.MOD1)) != 0;	
+		specialSelection = (event.stateMask & SWT.MOD1)!=0;
+		continueSelection = (event.stateMask & SWT.MOD2)!=0;
+		
+		if (continueSelection && specialSelection) {
+			continueSelection = false;
+			specialSelection = false;
+		}
+		
 		event.y -= e_offset_y;
 		event.x -= e_offset_x;
-		selection = select?new Point(event.x, event.y):null;
+		selection = new Point(event.x, event.y);
 		doSelection(-1);
 	}
 	protected void handleMouseUp(Event event) {
-		mouseDown = false;
-		mouseDoubleClick = false;
-		event.y -= e_offset_y;
-		event.x -= e_offset_x;
+		resetInfo();
 		endAutoScroll();
 	}
 	protected void handleMouseDoubleClick(Event event) {
