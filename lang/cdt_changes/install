@@ -13,6 +13,7 @@
 
 cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/core/model/CoreModel.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/core/model/CoreModel.java
 cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/core/model/ICoreModel.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/core/model/ICoreModel.java
+cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/core/model/ITranslationUnit.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/core/model/ITranslationUnit.java
 cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/ArchiveContainerInfo.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/ArchiveContainerInfo.java
 cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/Binary.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/Binary.java
 cp -vp org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/BinaryContainerInfo.java ../org.eclipse.cdt.core/model/org/eclipse/cdt/internal/core/model/BinaryContainerInfo.java
@@ -90,6 +91,7 @@ cp -vp org.eclipse.cdt.ui/icons/dtool16/newmsrcfldr_wiz.gif ../org.eclipse.cdt.u
 cp -vp org.eclipse.cdt.ui/icons/etool16/newmprj_wiz.gif ../org.eclipse.cdt.ui/icons/etool16/newmprj_wiz.gif
 cp -vp org.eclipse.cdt.ui/icons/etool16/newmsrcfldr_wiz.gif ../org.eclipse.cdt.ui/icons/etool16/newmsrcfldr_wiz.gif
 cp -vp org.eclipse.cdt.ui/icons/etool16/newsrcfile_wiz.gif ../org.eclipse.cdt.ui/icons/etool16/newsrcfile_wiz.gif
+cp -vp org.eclipse.cdt.ui/icons/obj16/f_file_obj.gif ../org.eclipse.cdt.ui/icons/obj16/f_file_obj.gif
 cp -vp org.eclipse.cdt.ui/icons/ovr16/m_ovr.gif ../org.eclipse.cdt.ui/icons/ovr16/m_ovr.gif
 cp -vp org.eclipse.cdt.ui/icons/view16/m_pers.gif ../org.eclipse.cdt.ui/icons/view16/m_pers.gif
 cp -vp org.eclipse.cdt.ui/icons/view16/mmprojects.gif ../org.eclipse.cdt.ui/icons/view16/mmprojects.gif
