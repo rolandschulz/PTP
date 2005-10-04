@@ -3,7 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Parallel Tools Platform UI Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.ui; singleton:=true
 Bundle-Version: 1.0.0
-Bundle-ClassPath: ptp_ui.jar
 Bundle-Activator: org.eclipse.ptp.ui.PTPUIPlugin
 Bundle-Vendor: LANL
 Bundle-Localization: plugin

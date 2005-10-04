@@ -25,8 +25,7 @@ Require-Bundle: org.eclipse.jface.text,
  org.eclipse.cdt.debug.core
 Eclipse-AutoStart: true
 Bundle-Vendor: LANL
-Export-Package: org.eclipse.ptp.debug.core,
- org.eclipse.ptp.debug.internal.ui,
- org.eclipse.ptp.debug.internal.ui.actions,
- org.eclipse.ptp.debug.ui,
+Export-Package: org.eclipse.ptp.debug.ui,
+ org.eclipse.ptp.debug.ui.events,
+ org.eclipse.ptp.debug.ui.listeners,
  org.eclipse.ptp.debug.ui.views
