@@ -627,6 +627,14 @@ public class FortranTranslationUnit extends Openable implements ITranslationUnit
 				|| CCorePlugin.CONTENT_TYPE_CHEADER.equals(fContentTypeID)
 				);
 	}
+	
+	/**
+	 * True if the code is Fortran (this is only temporary until AdditionalLanguages extension pt works (CER)
+	 * @return
+	 */
+	public boolean isFortranLanguage() {
+		return fContentTypeID.equals("org.eclipse.fdt.core.fortranSource");
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.cdt.core.model.ITranslationUnit#isCXXLanguage()
