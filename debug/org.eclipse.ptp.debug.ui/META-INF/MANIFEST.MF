@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Parallel Debug UI Plug-in
+Bundle-Name: PTP Debug UI Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.debug.ui; singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Activator: org.eclipse.ptp.debug.ui.PTPDebugUIPlugin
@@ -24,7 +24,7 @@ Require-Bundle: org.eclipse.jface.text,
  org.eclipse.cdt.debug.ui,
  org.eclipse.cdt.debug.core
 Eclipse-AutoStart: true
-Bundle-Vendor: LANL
+Bundle-Vendor: Eclipse.org
 Export-Package: org.eclipse.ptp.debug.ui,
  org.eclipse.ptp.debug.ui.events,
  org.eclipse.ptp.debug.ui.listeners,

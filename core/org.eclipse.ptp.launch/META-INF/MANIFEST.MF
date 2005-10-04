@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Parallel Tools Platform Launch Plug-in
+Bundle-Name: PTP Launch Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.launch; singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Activator: org.eclipse.ptp.launch.PTPLaunchPlugin
-Bundle-Vendor: LANL
+Bundle-Vendor: Eclipse.org
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
