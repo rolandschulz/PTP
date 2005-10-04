@@ -89,10 +89,30 @@ public class FastBitSet {
 		if (from >= this.nBits || from < 0 || to > this.nBits || from >= to)
 			throw new IndexOutOfBoundsException();
 		
+		int last = to - 1; 
+		
+		/*
+		 * Deal with single bit case
+		 */
+		if (from == last) {
+			this.set(from);
+			return;
+		}
+		
 		int p1 = bytePos(from);
-		int p2 = bytePos(to-1);
+		int p2 = bytePos(last);
 		int b1 = bitInByte(from);
-		int b2 = bitInByte(to-1);
+		int b2 = bitInByte(last);
+		
+		/*
+		 * Need to do something special if 'from' and 'to' refer
+		 * to a single byte
+		 */
+		if (p1 == p2) {
+			byte mask = (byte) (0xff >> (7 - b2));
+			this.bits[p1] = (byte) (mask << b1);
+			return;
+		}
 		
 		byte hiMask =  (byte) (0xff >> (7 - b2));
 		byte lowMask = (byte) (0xff << b1);

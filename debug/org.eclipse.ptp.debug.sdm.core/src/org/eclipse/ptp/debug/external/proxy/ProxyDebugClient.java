@@ -13,59 +13,59 @@ public class ProxyDebugClient extends AbstractProxyClient {
 	}
 
 	public void debugStartSession(String prog, String args) throws IOException {
-		SendCommand("INI " + "\""+ prog + "\" \"" + args + "\"");
+		sendCommand("INI", "\""+ prog + "\" \"" + args + "\"");
 	}
 	
 	public void debugSetLineBreakpoint(FastBitSet procs, String file, int line) throws IOException {
-		SendCommand("SLB " + procs.toString() + " \"" + file + "\" " + line);
+		sendCommand("SLB", procs, "\"" + file + "\" " + line);
 	}
 	
 	public void debugSetFuncBreakpoint(FastBitSet procs, String file, String func) throws IOException {
-		SendCommand("SFB " + procs.toString() + " \"" + file + "\" \"" + func + "\"");
+		sendCommand("SFB", procs, "\"" + file + "\" \"" + func + "\"");
 	}
 	
 	public void debugDeleteBreakpoint(FastBitSet procs, int bpid) throws IOException {
-		SendCommand("DBP " + procs.toString() + " " + bpid);
+		sendCommand("DBP", procs, Integer.toString(bpid));
 	}
 	
 	public void debugGo(FastBitSet procs) throws IOException {
-		SendCommand("GOP " + procs.toString());
+		sendCommand("GOP", procs);
 	}
 	
 	public void debugStep(FastBitSet procs, int count, int type) throws IOException {
-		SendCommand("STP " + procs.toString() + " " + count + " " + type);
+		sendCommand("STP", procs, count + " " + type);
 	}
 	
 	public void debugTerminate(FastBitSet procs) throws IOException {
-		SendCommand("HLT " + procs.toString());
+		sendCommand("HLT", procs);
 	}
 	
 	public void debugListStackframes(FastBitSet procs, int current) throws IOException {
-		SendCommand("LSF " + procs.toString() + " " + current);
+		sendCommand("LSF", procs, Integer.toString(current));
 	}
 
 	public void debugSetCurrentStackframe(FastBitSet procs, int level) throws IOException {
-		SendCommand("SCS " + procs.toString() + " " + level);
+		sendCommand("SCS", procs, Integer.toString(level));
 	}
 
 	public void debugEvaluateExpression(FastBitSet procs, String expr) throws IOException {
-		SendCommand("EEX " + procs.toString() + " \""+ expr + "\"");
+		sendCommand("EEX", procs, "\""+ expr + "\"");
 	}
 
 	public void debugGetType(FastBitSet procs, String expr) throws IOException {
-		SendCommand("TYP " + procs.toString() + " \""+ expr + "\"");
+		sendCommand("TYP", procs, "\""+ expr + "\"");
 	}
 
 	public void debugListLocalVariables(FastBitSet procs) throws IOException {
-		SendCommand("LLV " + procs.toString());
+		sendCommand("LLV", procs);
 	}
 
 	public void debugListArguments(FastBitSet procs) throws IOException {
-		SendCommand("LAR " + procs.toString());
+		sendCommand("LAR", procs);
 	}
 
 	public void debugListGlobalVariables(FastBitSet procs) throws IOException {
-		SendCommand("LGV " + procs.toString());
+		sendCommand("LGV", procs);
 	}
 
 	public IProxyEvent convertEvent(String str) {
