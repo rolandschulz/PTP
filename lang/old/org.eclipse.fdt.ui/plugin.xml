@@ -98,6 +98,7 @@
             contributorClass="org.eclipse.fdt.internal.ui.editor.FortranEditorActionContributor"
             symbolicFontName="org.eclipse.cdt.ui.editors.textfont"
             id="org.eclipse.fdt.ui.editor.FortranEditor">
+            <contentTypeBinding contentTypeId="org.eclipse.fdt.core.fortranSource"/>
       </editor>
    </extension>
    <extension
