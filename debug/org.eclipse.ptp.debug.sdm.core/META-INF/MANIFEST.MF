@@ -27,3 +27,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.search,
  org.eclipse.debug.ui
 Eclipse-AutoStart: true
+Bundle-Vendor: Eclipse.org
