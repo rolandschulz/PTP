@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PTP Debug Core Plug-in
+Bundle-SymbolicName: org.eclipse.ptp.debug.core; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.ptp.debug.core.PTPDebugCorePlugin
+Bundle-Localization: plugin
+Export-Package: org.eclipse.ptp.debug.core,
+ org.eclipse.ptp.debug.core.cdi,
+ org.eclipse.ptp.debug.core.cdi.event,
+ org.eclipse.ptp.debug.core.cdi.model,
+ org.eclipse.ptp.debug.core.model,
+ org.eclipse.ptp.debug.core.sourcelookup,
+ org.eclipse.ptp.debug.core.utils
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.debug.core,
+ org.eclipse.cdt.core,
+ org.eclipse.cdt.debug.core,
+ org.eclipse.ptp.core
+Eclipse-AutoStart: true

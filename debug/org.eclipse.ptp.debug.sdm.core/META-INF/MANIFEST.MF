@@ -3,7 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: PTP Debug External Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.debug.external; singleton:=true
 Bundle-Version: 1.0.0
-Bundle-ClassPath: ptpdebugexternal.jar
 Bundle-Activator: org.eclipse.ptp.debug.external.PTPDebugExternalPlugin
 Bundle-Localization: plugin
 Export-Package: org.eclipse.ptp.debug.external,
