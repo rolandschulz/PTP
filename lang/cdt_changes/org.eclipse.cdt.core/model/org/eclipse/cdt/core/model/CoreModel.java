@@ -207,6 +207,7 @@ public class CoreModel implements ICoreModel {
 		contentTypes.add(CCorePlugin.CONTENT_TYPE_CSOURCE);
 		contentTypes.add(CCorePlugin.CONTENT_TYPE_CXXHEADER);
 		contentTypes.add(CCorePlugin.CONTENT_TYPE_CXXSOURCE);
+		contentTypes.add("org.eclipse.fdt.core.fortranSource");
 		AdditionalLanguagesExtension.getInstance().processAdditionalLanguages(
 				new IAdditionalLanguageCallback()
 				{
@@ -239,7 +240,8 @@ public class CoreModel implements ICoreModel {
 				return true;
 			} else if (CCorePlugin.CONTENT_TYPE_ASMSOURCE.equals(id)) {
 				return true;
-//			} else if (AdditionalLanguagesExtension.getInstance().someAdditionalLanguageMatchesSourceContentType(id)) { //JO
+			} else if (AdditionalLanguagesExtension.getInstance().someAdditionalLanguageMatchesSourceContentType(id)) { //JO
+				return true;
 			} else if (id.equals("org.eclipse.fdt.core.fortranSource")) {  // Can't load extension pt, WARNING hack attack (CER)
 				return true;
 			}
@@ -276,7 +278,8 @@ public class CoreModel implements ICoreModel {
 				return true;
 			} else if (CCorePlugin.CONTENT_TYPE_ASMSOURCE.equals(id)) {
 				return true;
-//			} else if (AdditionalLanguagesExtension.getInstance().someAdditionalLanguageMatchesSourceContentType(id)) { //JO
+			} else if (AdditionalLanguagesExtension.getInstance().someAdditionalLanguageMatchesSourceContentType(id)) { //JO
+				return true;
 			} else if (id.equals("org.eclipse.fdt.core.fortranSource")) { // Can't get AdditionalLanguages extension pt to work, WARNING hack attack (CER)
 				return true;
 			}
