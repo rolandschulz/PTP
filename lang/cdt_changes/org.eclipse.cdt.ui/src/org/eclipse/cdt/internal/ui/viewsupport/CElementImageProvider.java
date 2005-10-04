@@ -308,6 +308,8 @@ public class CElementImageProvider {
 				} else if (unit.isSourceUnit()) {
 					if (unit.isASMLanguage()) {
 						return CPluginImages.DESC_OBJS_TUNIT_ASM;
+					} else if (unit.isFortranLanguage()) { // CER - temporary hack
+						return CPluginImages.DESC_OBJS_TUNIT_FORTRAN;
 					}
 				}
 				return CPluginImages.DESC_OBJS_TUNIT;
