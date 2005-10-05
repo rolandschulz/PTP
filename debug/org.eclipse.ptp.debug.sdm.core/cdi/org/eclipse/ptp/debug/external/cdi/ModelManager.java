@@ -32,11 +32,11 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDIModelManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSetNamed;
-import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSetNamed;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 

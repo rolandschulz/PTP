@@ -1,8 +1,8 @@
 package org.eclipse.ptp.debug.core.cdi;
 
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSetNamed;
-import org.eclipse.ptp.debug.core.utils.BitList;
 
 public interface IPCDIModelManager {
 	public void delProcessSet(String setName);

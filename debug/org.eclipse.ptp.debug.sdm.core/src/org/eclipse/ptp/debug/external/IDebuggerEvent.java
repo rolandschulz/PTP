@@ -22,8 +22,8 @@
  */
 package org.eclipse.ptp.debug.external;
 
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.core.utils.BitList;
 
 
 /**
