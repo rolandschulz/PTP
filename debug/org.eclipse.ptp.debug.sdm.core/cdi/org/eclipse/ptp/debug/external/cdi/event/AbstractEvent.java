@@ -30,11 +30,11 @@ package org.eclipse.ptp.debug.external.cdi.event;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
-import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;

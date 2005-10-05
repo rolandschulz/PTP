@@ -33,10 +33,10 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
-import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
@@ -357,7 +357,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		String event = (String) list.get(1);
 		
 		String[] args = null;
-		BitList procs = new BitList();
+		BitList procs = new BitList(this.procs.length);
 		procs.set(procId);
 		
 		if (event.equals("BREAKPOINTHIT")) {

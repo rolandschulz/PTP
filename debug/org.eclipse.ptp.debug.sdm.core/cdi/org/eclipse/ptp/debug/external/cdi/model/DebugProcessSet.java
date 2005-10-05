@@ -18,10 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model;
 
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
-import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
 
@@ -39,7 +39,7 @@ public class DebugProcessSet extends SessionObject implements IPCDIDebugProcessS
 	
 	public DebugProcessSet(IPCDISession s) {
 		super((Session) s);
-		processList = new BitList();
+		processList = new BitList(s.getTotalProcesses());
 		setName = PREFIX + tempId++;
 	}
 
@@ -55,7 +55,7 @@ public class DebugProcessSet extends SessionObject implements IPCDIDebugProcessS
 	
 	public DebugProcessSet(IPCDISession s, int[] procs) {
 		super((Session) s);
-		processList = new BitList();
+		processList = new BitList(s.getTotalProcesses());
 		processList.set(procs);
 		setName = PREFIX + tempId++;
 	}

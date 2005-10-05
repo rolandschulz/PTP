@@ -28,10 +28,10 @@ import java.util.Observer;
 
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
-import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.core.utils.Queue;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
 

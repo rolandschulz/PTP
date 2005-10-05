@@ -1,8 +1,8 @@
 package org.eclipse.ptp.debug.external.cdi.model;
 
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSetNamed;
-import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.cdi.Session;
 
 public class DebugProcessSetNamed extends DebugProcessSet implements IPCDIDebugProcessSetNamed {

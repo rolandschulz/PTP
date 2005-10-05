@@ -48,13 +48,13 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPLaunch;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.cdi.IPCDIModelManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
-import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetUnregisteredEvent;
@@ -95,7 +95,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 		modelManager = new ModelManager(this);
 		
 		/* Set the root process set */
-		BitList root = new BitList();
+		BitList root = new BitList(dJob.size());
 		root.set(0, dJob.size());
 		modelManager.newProcessSet("Root", root);
 		
@@ -447,5 +447,9 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 		} catch (PCDIException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public int getTotalProcesses() {
+		return dJob.size();
 	}
 }

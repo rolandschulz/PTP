@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.ptp.debug.core.utils.BitList;
+import org.eclipse.ptp.core.util.BitList;
 
 public interface IPCDIDebugProcessSet extends IPCDIDebugEntity {
 	public IPCDIDebugProcess[] getProcesses();
