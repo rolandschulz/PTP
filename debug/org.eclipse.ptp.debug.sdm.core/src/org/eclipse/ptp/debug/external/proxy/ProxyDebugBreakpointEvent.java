@@ -7,14 +7,20 @@ import org.eclipse.ptp.core.util.BitList;
 
 public class ProxyDebugBreakpointEvent extends AbstractProxyEvent implements IProxyEvent {
 	private ICDIBreakpoint	bpt;
+	private int				bpId;
 	
-	public ProxyDebugBreakpointEvent(BitList set, int type, ICDIBreakpoint bpt) {
+	public ProxyDebugBreakpointEvent(BitList set, int type, int id, ICDIBreakpoint bpt) {
 		super(type, set);
+		this.bpId = id;
 		this.bpt = bpt;
 	}
 	
 	public ICDIBreakpoint getBreakpoint() {
 		return this.bpt;
+	}
+	
+	public int getBreakpointId() {
+		return this.bpId;
 	}
 	
 	public String toString() {

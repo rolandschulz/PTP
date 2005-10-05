@@ -16,12 +16,12 @@ public class ProxyDebugClient extends AbstractProxyClient {
 		sendCommand("INI", "\""+ prog + "\" \"" + args + "\"");
 	}
 	
-	public void debugSetLineBreakpoint(BitList procs, String file, int line) throws IOException {
-		sendCommand("SLB", procs, "\"" + file + "\" " + line);
+	public void debugSetLineBreakpoint(BitList procs, int bpid, String file, int line) throws IOException {
+		sendCommand("SLB", procs, bpid + " \"" + file + "\" " + line);
 	}
 	
-	public void debugSetFuncBreakpoint(BitList procs, String file, String func) throws IOException {
-		sendCommand("SFB", procs, "\"" + file + "\" \"" + func + "\"");
+	public void debugSetFuncBreakpoint(BitList procs, int bpid, String file, String func) throws IOException {
+		sendCommand("SFB", procs, bpid + " \"" + file + "\" \"" + func + "\"");
 	}
 	
 	public void debugDeleteBreakpoint(BitList procs, int bpid) throws IOException {
