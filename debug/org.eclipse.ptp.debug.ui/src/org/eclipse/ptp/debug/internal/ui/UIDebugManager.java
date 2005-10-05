@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.internal.ui;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
@@ -44,12 +45,12 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPDebugListener;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.external.cdi.BreakpointHitInfo;
 import org.eclipse.ptp.debug.external.cdi.EndSteppingRangeInfo;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
@@ -105,9 +106,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IElementHandler elementHandler = getElementHandler(new_job_id);
 		if (elementHandler != null) {
 			if ((BitList) elementHandler.getData(TERMINATED_PROC_KEY) == null)
-				elementHandler.setData(TERMINATED_PROC_KEY, new BitList());
+				elementHandler.setData(TERMINATED_PROC_KEY, new BitList(elementHandler.getSetRoot().size()));
 			if ((BitList) elementHandler.getData(SUSPENDED_PROC_KEY) == null)
-				elementHandler.setData(SUSPENDED_PROC_KEY, new BitList());
+				elementHandler.setData(SUSPENDED_PROC_KEY, new BitList(elementHandler.getSetRoot().size()));
 		}
 		createEventListener(new_job_id);
 		return new_job_id;
@@ -297,14 +298,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 								if (preSet != null && !preSet.contains(registerElementsID[i])) {
 									int taskID = convertToInt(elementHandler.getSetRoot().get(registerElementsID[i]).getName());
 									registerProcess(session, taskID, false);
-									BitList tasks = new BitList();
-									tasks.set(taskID);
 								}
 							} else {
 								int taskID = convertToInt(elementHandler.getSetRoot().get(registerElementsID[i]).getName());
 								unregisterProcess(session, taskID, false);
-								BitList tasks = new BitList();
-								tasks.set(taskID);
 							}
 						}
 						return Status.OK_STATUS;
@@ -339,7 +336,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}
 	}
 	public void createSetEvent(IElementSet set, IElement[] elements) {
-		BitList tasks = new BitList();
+		//FIXME do it later
+		BitList tasks = new BitList(((IElementHandler)set.getParent()).getSetRoot().size());
 		for (int i = 0; i < elements.length; i++) {
 			tasks.set(convertToInt(elements[i].getName()));
 		}
@@ -351,19 +349,21 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	}
 	public void addElementsEvent(IElementSet set, IElement[] elements) {
 		BitList tasks = (BitList) set.getData(BITSET_KEY);
-		BitList addTasks = new BitList();
+		//FIXME do it later 
+		//BitList addTasks = new BitList();
 		for (int i = 0; i < elements.length; i++) {
 			tasks.set(convertToInt(elements[i].getName()));
 		}
-		tasks.or(addTasks);
+		//tasks.or(addTasks);
 	}
 	public void removeElementsEvent(IElementSet set, IElement[] elements) {
 		BitList tasks = (BitList) set.getData(BITSET_KEY);
-		BitList addTasks = new BitList();
+		//FIXME do it later 
+		//BitList addTasks = new BitList();
 		for (int i = 0; i < elements.length; i++) {
 			tasks.set(convertToInt(elements[i].getName()));
 		}
-		tasks.andNot(addTasks);
+		//tasks.andNot(addTasks);
 		// FIXME how to delete more process in the created set
 	}
 	/*

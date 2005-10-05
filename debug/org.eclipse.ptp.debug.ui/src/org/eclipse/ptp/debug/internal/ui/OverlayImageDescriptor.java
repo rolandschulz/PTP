@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.internal.ui;
 
 import java.util.Arrays;
+
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;

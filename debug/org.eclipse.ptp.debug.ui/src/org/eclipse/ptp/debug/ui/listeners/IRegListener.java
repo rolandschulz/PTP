@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.ui.listeners;
 
-import org.eclipse.ptp.debug.core.utils.BitList;
+import org.eclipse.ptp.core.util.BitList;
 
 /**
  * @author Clement chu
