@@ -621,6 +621,7 @@ public class TranslationUnit extends Openable implements ITranslationUnit {
 				|| CCorePlugin.CONTENT_TYPE_CXXSOURCE.equals(fContentTypeID)
 				|| CCorePlugin.CONTENT_TYPE_ASMSOURCE.equals(fContentTypeID)
 				|| AdditionalLanguagesExtension.getInstance().someAdditionalLanguageMatchesSourceContentType(fContentTypeID) //JO
+				|| fContentTypeID.equals("org.eclipse.fdt.core.fortranSource")
 				);
 	}
 
@@ -632,6 +633,14 @@ public class TranslationUnit extends Openable implements ITranslationUnit {
 				CCorePlugin.CONTENT_TYPE_CSOURCE.equals(fContentTypeID)
 				|| CCorePlugin.CONTENT_TYPE_CHEADER.equals(fContentTypeID)
 				);
+	}
+
+	/**
+	 * True if the code is Fortran (this is only temporary until AdditionalLanguages extension pt works (CER)
+	 * @return
+	 */
+	public boolean isFortranLanguage() {
+		return fContentTypeID.equals("org.eclipse.fdt.core.fortranSource");
 	}
 
 	/* (non-Javadoc)
