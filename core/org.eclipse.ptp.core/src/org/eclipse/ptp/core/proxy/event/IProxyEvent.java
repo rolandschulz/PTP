@@ -1,6 +1,6 @@
 package org.eclipse.ptp.core.proxy.event;
 
-import org.eclipse.ptp.core.proxy.FastBitSet;
+import org.eclipse.ptp.core.util.BitList;
 
 public interface IProxyEvent {
 	public static final int EVENT_OK = 0;
@@ -19,5 +19,5 @@ public interface IProxyEvent {
 	public static final int EVENT_DBG_INIT = DBG_EVENT_OFFSET + 9;
 
 	public int getEventID();
-	public FastBitSet getBitSet();
+	public BitList getBitSet();
 }

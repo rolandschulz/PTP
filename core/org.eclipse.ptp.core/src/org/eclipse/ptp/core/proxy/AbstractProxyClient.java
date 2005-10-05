@@ -12,6 +12,7 @@ import java.util.List;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
+import org.eclipse.ptp.core.util.BitList;
 
 public abstract class AbstractProxyClient {
 	private String				sessHost;
@@ -46,7 +47,7 @@ public abstract class AbstractProxyClient {
 		return String.valueOf(res);
 	}
 	
-	private String encodeBitSet(FastBitSet set) {
+	private String encodeBitSet(BitList set) {
 		String lenStr = Integer.toHexString(set.size());
 		return lenStr + ":" + set.toString();
 	}
@@ -64,12 +65,12 @@ public abstract class AbstractProxyClient {
 		this.sendCommand(cmd + " " + args);
 	}
 	
-	protected void sendCommand(String cmd, FastBitSet set) throws IOException {
+	protected void sendCommand(String cmd, BitList set) throws IOException {
 		String setStr = encodeBitSet(set);
 		this.sendCommand(cmd, setStr);
 	}
 	
-	protected void sendCommand(String cmd, FastBitSet set, String args) throws IOException {
+	protected void sendCommand(String cmd, BitList set, String args) throws IOException {
 		String setStr = encodeBitSet(set);
 		this.sendCommand(cmd, setStr + " " + args);
 	}

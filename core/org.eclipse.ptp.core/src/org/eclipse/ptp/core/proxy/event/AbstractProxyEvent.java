@@ -1,17 +1,17 @@
 package org.eclipse.ptp.core.proxy.event;
 
-import org.eclipse.ptp.core.proxy.FastBitSet;
+import org.eclipse.ptp.core.util.BitList;
 
 public abstract class AbstractProxyEvent implements IProxyEvent {
 	private int			eventID;
-	private FastBitSet	bitSet;
+	private BitList	bitSet;
 	
 	public AbstractProxyEvent(int id) {
 		eventID = id;
 		bitSet = null;
 	}
 	
-	public AbstractProxyEvent(int id, FastBitSet set) {
+	public AbstractProxyEvent(int id, BitList set) {
 		eventID = id;
 		bitSet = set;
 	}
@@ -20,7 +20,7 @@ public abstract class AbstractProxyEvent implements IProxyEvent {
 		return eventID;
 	}
 	
-	public FastBitSet getBitSet() {
+	public BitList getBitSet() {
 		return bitSet;
 	}
 }
