@@ -27,8 +27,9 @@ public class ProxyDebugEvent {
 		case IProxyEvent.EVENT_DBG_BPHIT:
 		case IProxyEvent.EVENT_DBG_BPSET:
 			Location loc = toLocation(decodeString(args[7]), decodeString(args[8]), decodeString(args[9]), args[10]);
-			ICDIBreakpoint bpt = toBreakpoint(args[2], args[3], args[4], args[5], decodeString(args[6]), loc);
-			evt = new ProxyDebugBreakpointEvent(set, type, bpt);
+			ICDIBreakpoint bpt = toBreakpoint(args[3], args[4], args[5], decodeString(args[6]), loc);
+			int idVal = Integer.parseInt(args[2]);
+			evt = new ProxyDebugBreakpointEvent(set, type, idVal, bpt);
 			break;
 			
 		case IProxyEvent.EVENT_DBG_SIGNAL:
@@ -98,11 +99,10 @@ public class ProxyDebugEvent {
 		return new String(strBytes);
 	}
 	
-	public static ICDIBreakpoint toBreakpoint(String id, String ignore, String spec, String del, String type, Location loc) {
+	public static ICDIBreakpoint toBreakpoint(String ignore, String spec, String del, String type, Location loc) {
 		ICDIBreakpoint bpt;
 		int typeVal;
 		
-		int idVal = Integer.parseInt(id);
 		int ignoreVal = Integer.parseInt(ignore);
 		ICDICondition cond = new Condition(ignoreVal, null, null);
 		
