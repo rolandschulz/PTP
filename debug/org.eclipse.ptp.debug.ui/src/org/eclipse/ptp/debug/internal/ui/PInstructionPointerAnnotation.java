@@ -22,7 +22,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.IAnnotationModel;
-import org.eclipse.ptp.debug.core.utils.BitList;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 /**
@@ -106,8 +106,10 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 		return convertArray(tasks);		
 	}
 	public void addTasks(BitList aTasks) {
-		if (tasks == null)
-			tasks = new BitList();
+		if (tasks == null) {
+			//FIXME fix it later
+			//tasks = new BitList();
+		}
 
 		tasks.or(aTasks);
 	}

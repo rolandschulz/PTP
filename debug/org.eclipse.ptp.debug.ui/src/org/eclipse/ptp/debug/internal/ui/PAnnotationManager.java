@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -45,8 +46,8 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
-import org.eclipse.ptp.debug.core.utils.BitList;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.listeners.IRegListener;
@@ -215,7 +216,9 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			int taskId = ((IPDebugTarget) debugTarget).getTargetId();
 			if (taskId == -1)
 				return null;
-			BitList tasks = new BitList();
+			
+			//FIXME it later
+			BitList tasks = new BitList(100);
 			tasks.set(taskId);
 			return tasks;
 		}
