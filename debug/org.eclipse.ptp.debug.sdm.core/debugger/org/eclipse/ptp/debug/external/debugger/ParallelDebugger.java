@@ -19,6 +19,12 @@
 
 package org.eclipse.ptp.debug.external.debugger;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.ListIterator;
+
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
@@ -26,96 +32,114 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
+import org.eclipse.debug.core.model.IThread;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.proxy.event.IProxyEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
+import org.eclipse.ptp.core.proxy.event.ProxyErrorEvent;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
-import org.eclipse.ptp.debug.core.utils.Queue;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.cdi.PCDIException;
-import org.eclipse.ptp.internal.core.CoreUtils;
+import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
+import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
+import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
+import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
+import org.eclipse.ptp.debug.external.proxy.ProxyDebugBreakpointEvent;
+import org.eclipse.ptp.debug.external.proxy.ProxyDebugClient;
+import org.eclipse.ptp.debug.external.proxy.ProxyDebugInitEvent;
 
 
-public class ParallelDebugger extends AbstractDebugger {
-	
-	public class DebugEventThread extends Thread {
-		AbstractDebugger dbg;
+public class ParallelDebugger extends AbstractDebugger implements IProxyEventListener {
+	private class BreakpointMapping {
+		private ICDIBreakpoint		bpObject;
+		private BitList				bpSet;
+		private int					bpId;
 		
-		public DebugEventThread(AbstractDebugger d) {
-			super("IDebugger Event Thread"); //$NON-NLS-1$
-			dbg = d;
+		public BreakpointMapping(int bpid, BitList set, ICDIBreakpoint bpt) {
+			this.bpId = bpid;
+			this.bpSet = set;
+			this.bpObject = bpt;
 		}
 		
-		public void run() {
-			// Signal by the session of time to die.
-			while (dbg.isExiting() != true) {
-				IPCDIEvent event = null;
-				int ev;
-				// Wait for event from external debugger
-				// DbgProgress(callback);
-				
-				// Convert to IPCDIEvent
-				/*
-				switch (ev) {
-				case DBGEVENT_BPHIT:
-					break;
-					
-				case DBGEVENT_STEPCOMPLETED:
-					break
-				
-				case DBGEVENT_EXIT:
-				}
-				*/
-				Queue eventQueue = dbg.getEventQueue();
-				// removeItem() will block until an item is available.
-				eventQueue.addItem(event);
+		public int getBreakpointId() {
+			return this.bpId;
+		}
+	
+		public BitList getBreakpointProcs() {
+			return this.bpSet;
+		}
+		
+		public ICDIBreakpoint getBreakpoint() {
+			return this.bpObject;
+		}	
+		
+		public void updateProcs(BitList set) {
+			if (this.bpSet != null) {
+				this.bpSet.or(set);
+			} else {
+				this.bpSet = set;
 			}
-			System.out.println("EventThread exits");
 		}
 	}
 	
-	private DebugEventThread eventThread;
-	private long cmdTimeout = 1000; // FIXME
+	private ProxyDebugClient	proxy;
+	private int				numServers;
+	private IProxyEvent		lastEvent;
+	private ICDIBreakpoint	currBP;
+	private HashMap			bpMap = new HashMap();
+	private ArrayList		bpArray = new ArrayList();
+	private int				bpId = 0;
 	
-	public native int DbgGo(int[] procs);
+	/*
+	 * Wait for any event
+	 */
+	private synchronized void waitForEvent() {
+		try {
+			wait();
+		} catch (InterruptedException e) {
+		}
+	}
 	
-	private static int failed_load = 0;
+	/*
+	 * Wait until 'type' events have been received from all processes in 'procs'
+	 */
+	private synchronized void waitForEvents(int type, BitList procs) throws PCDIException {
+		BitList remain = procs.copy();
+		
+		try {
+			while (!remain.isEmpty()) {
+				wait();
 
-	static {
-        try { 
-        		System.loadLibrary("ptp_dbg_jni");
-        } catch(UnsatisfiedLinkError e) {
-        		String str = "Unable to load library 'ptp_dbg_jni'.  Make sure "+
-        				"the library exists and the VM arguments point to the directory where "+
-        				"it resides.  In the 'Run...' set the VM Args to something like "+
-        				"-Djava.library.path=[home directory]/[eclipse workspace]/org.eclipse.ptp.core/ompi";
-        		System.err.println(str);
-        		System.err.println(e.getMessage());
-        		CoreUtils.showErrorDialog("Dynamic Library Load Failed", str, null);
-        		failed_load = 1;
-        }
-    }
+				if (this.lastEvent instanceof ProxyErrorEvent)
+					throw new PCDIException(((ProxyErrorEvent)this.lastEvent).getErrorMessage());
+				
+				if (this.lastEvent.getEventID() == type)
+					remain.andNot(this.lastEvent.getBitSet());
+			}
+		} catch (InterruptedException e) {
+		}
+	}
 
 	protected void startDebugger(IPJob job) {
-		if(failed_load == 1) {
-			System.err.println("Unable to startup debugger because of a failed library load.");
+		proxy = new ProxyDebugClient("localhost", 12345);
+		proxy.addEventListener(this);
+		try {
+			proxy.sessionCreate();
+		} catch (IOException e) {
 			return;
 		}
-		//eventThread = new DebugEventThread(this);
+		waitForEvent();
 	}
 	
 	protected void stopDebugger() {
-		// Kill the event Thread ... if it is not us.
-		if (!eventThread.equals(Thread.currentThread())) {			
-			// Kill the event Thread.
-			try {
-				if (eventThread.isAlive()) {
-					eventThread.interrupt();
-					eventThread.join(cmdTimeout);
-				}
-			} catch (InterruptedException e) {
-			}		
+		try {
+			proxy.sessionFinish();
+		} catch (IOException e) {
+			return;
 		}
+		waitForEvent();
 	}
 	
 	public Process getDebuggerProcess() {
@@ -131,9 +155,11 @@ public class ParallelDebugger extends AbstractDebugger {
 	}
 	
 	public void go(IPCDIDebugProcessSet procs) throws PCDIException {
-		int rc = DbgGo(null);
-		if (rc != 0)
-			throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "go");
+		try {
+			proxy.debugGo(procs.toBitList());
+		} catch (IOException e) {
+			// TODO deal with IOException (maybe should be dealt with in ProxyClient?)
+		}
 	}
 
 	public void kill(IPCDIDebugProcessSet procs) throws PCDIException {
@@ -141,12 +167,21 @@ public class ParallelDebugger extends AbstractDebugger {
 	}
 
 	public void halt(IPCDIDebugProcessSet procs) throws PCDIException {
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "halt");
 	}
 	
 	public void stepInto(IPCDIDebugProcessSet procs, int count) throws PCDIException {
+		try {
+			proxy.debugStep(procs.toBitList(), count, 0);
+		} catch (IOException e) {
+		}
 	}
 
 	public void stepOver(IPCDIDebugProcessSet procs, int count) throws PCDIException {
+		try {
+			proxy.debugStep(procs.toBitList(), count, 1);
+		} catch (IOException e) {
+		}
 	}
 
 	public void stepFinish(IPCDIDebugProcessSet procs, int count) throws PCDIException {
@@ -154,12 +189,53 @@ public class ParallelDebugger extends AbstractDebugger {
 	}
 
 	public void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDILineBreakpoint bpt) throws PCDIException {
+		try {
+			proxy.debugSetLineBreakpoint(procs.toBitList(), newBreakpointId(), bpt.getLocator().getFile(), bpt.getLocator().getLineNumber());
+		} catch (IOException e1) {
+			return;
+		}
+		
+		this.currBP = bpt;
+		
+		waitForEvents(IProxyEvent.EVENT_DBG_BPSET, procs.toBitList());
 	}
 
 	public void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIFunctionBreakpoint bpt) throws PCDIException {
+		try {
+			proxy.debugSetFuncBreakpoint(procs.toBitList(), newBreakpointId(), bpt.getLocator().getFile(), bpt.getLocator().getFunction());
+		} catch (IOException e1) {
+			return;
+		}
+
+		this.currBP = bpt;
+		
+		waitForEvents(IProxyEvent.EVENT_DBG_BPSET, procs.toBitList());
 	}
 
+	private void deleteBreakpoint(BitList procs, int bpid)  throws PCDIException {
+		try {
+			proxy.debugDeleteBreakpoint(procs, bpid);
+		} catch (IOException e1) {
+			return;
+		}
+
+		waitForEvents(IProxyEvent.EVENT_OK, procs);
+	}
+	
+	private void deleteBreakpoint(ICDIBreakpoint bp)  throws PCDIException {
+		BreakpointMapping bpm = findBreakpointInfo(bp);
+		
+		if (bpm != null) {
+			deleteBreakpoint(bpm.getBreakpointProcs(), bpm.getBreakpointId());				
+		}
+	}
+	
 	public void deleteBreakpoints(ICDIBreakpoint[] bp) throws PCDIException {
+		if (bp != null) {
+			for (int i = 0; i < bp.length; i++) {
+				deleteBreakpoint(bp[i]);
+			}
+		}
 	}
 	
 	/**
@@ -167,11 +243,16 @@ public class ParallelDebugger extends AbstractDebugger {
 	 * TODO: extend to support multiple processes
 	 */
 	public ICDIStackFrame[] listStackFrames(IPCDIDebugProcessSet procs) throws PCDIException {
-		return null;
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listStackFrames");
 	}
 	
 	public void setCurrentStackFrame(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException {
+		try {
+			proxy.debugSetCurrentStackframe(procs.toBitList(), frame.getLevel());
+		} catch (IOException e) {
+		}
 		
+		waitForEvents(IProxyEvent.EVENT_OK, procs.toBitList());
 	}
 	
 	/**
@@ -179,7 +260,7 @@ public class ParallelDebugger extends AbstractDebugger {
 	 * TODO: extend to support multiple processes
 	 */
 	public String evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws PCDIException {
-		return null;
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "evaluateExpression");
 	}
 	
 	/**
@@ -187,7 +268,7 @@ public class ParallelDebugger extends AbstractDebugger {
 	 * TODO: extend to support multiple processes
 	 */
 	public String getVariableType(IPCDIDebugProcessSet procs, String varName) throws PCDIException {
-		return null;
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "getVariableType");
 	}
 	
 	/**
@@ -195,7 +276,7 @@ public class ParallelDebugger extends AbstractDebugger {
 	 * TODO: extend to support multiple processes
 	 */
 	public ICDILocalVariable[] listLocalVariables(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException {
-		return null;
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listLocalVariables");
 	}
 	
 	/**
@@ -203,7 +284,7 @@ public class ParallelDebugger extends AbstractDebugger {
 	 * TODO: extend to support multiple processes
 	 */
 	public ICDIGlobalVariable[] listGlobalVariables(IPCDIDebugProcessSet procs) throws PCDIException {
-		return null;
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listGlobalVariables");
 	}
 	
 	/**
@@ -211,13 +292,16 @@ public class ParallelDebugger extends AbstractDebugger {
 	 * TODO: extend to support multiple processes
 	 */
 	public ICDIArgument[] listArguments(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException {
-		return null;
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listGlobalVariables");
 	}
 
 	public IPCDIEvent handleBreakpointHitEvent(BitList procs, String[] args) {
-		// Auto-generated method stub
-		System.out.println("ParallelDebugger.handleBreakpointHitEvent()");
-		return null;
+		String file = args[0];
+		int line = Integer.parseInt(args[1]);
+		LineLocation loc = new LineLocation(file, line);
+		LineBreakpoint bpt = new LineBreakpoint(ICDIBreakpoint.REGULAR, loc, null);
+		IPCDIEvent ev = new BreakpointHitEvent(getSession(), new DebugProcessSet(session, procs), bpt);
+		return ev;
 	}
 
 	public IPCDIEvent handleEndSteppingEvent(BitList procs, String[] args) {
@@ -236,5 +320,87 @@ public class ParallelDebugger extends AbstractDebugger {
 		// Auto-generated method stub
 		System.out.println("ParallelDebugger.handleProcessTerminatedEvent()");
 		return null;
+	}
+
+	public void fireEvent(IProxyEvent e) {
+		System.out.println("got event: " + e.toString());
+		switch (e.getEventID()) {
+		case IProxyEvent.EVENT_DBG_INIT:
+			numServers = ((ProxyDebugInitEvent)e).getNumServers();
+			System.out.println("num servers = " + numServers);
+			break;
+			
+		case IProxyEvent.EVENT_DBG_BPHIT:
+			/*
+			 * Retrieve the breakpoint object.
+			 */
+			BreakpointMapping bp = findBreakpointInfo(((ProxyDebugBreakpointEvent)e).getBreakpointId());
+			if (bp != null) {
+				IPCDIEvent ev = new BreakpointHitEvent(getSession(), new DebugProcessSet(session, e.getBitSet()), bp.bpObject);
+				super.fireEvent(ev);
+			}
+			break;
+			
+		case IProxyEvent.EVENT_DBG_STEP:
+			handleDebugEvent(IDBGEV_ENDSTEPPING, e.getBitSet(), null);
+			break;	
+			
+		case IProxyEvent.EVENT_DBG_BPSET:
+			if (this.currBP != null) {
+				updateBreakpointInfo(((ProxyDebugBreakpointEvent)e).getBreakpointId(), e.getBitSet(), this.currBP);
+			}
+			break;
+		}
+		
+		this.lastEvent = e;
+		notify();
+	}
+	
+	/*
+	 * Keep two data structures:
+	 * 
+	 * 1. A HashMap that is indexed by the actual breakpoint object that contains lists of
+	 * breakpoint id/procset tuples associated with the object. This is used to delete a breakpoint 
+	 * based on a breakpoint object. See the deleteBreakpoint() method.
+	 * 
+	 * 2. An ArrayList that is indexed by breakpoint id that contains the breakpoint 
+	 * object/procset combination associated with the breakpoint id. This is used to look up the breakpoint
+	 * object when a BPHIT event arrives.
+	 * 
+	 * ASSUMPTIONS: There is a one-to-one mapping between breakpoint id and breakpoint object. This is
+	 * achieved by generating a new breakpoint id every time a breakpoint is set.
+	 * 
+	 */
+	private void updateBreakpointInfo(int bpid, BitList bpset, ICDIBreakpoint bpt) {
+		/*
+		 * First update bpMap
+		 */
+		BreakpointMapping bp = (BreakpointMapping) bpMap.get(bpt);
+		
+		if (bp == null) {
+			bp = new BreakpointMapping(bpid, bpset, bpt);
+			bpMap.put(bpt, bp);
+		} else
+			bp.updateProcs(bpset);
+		
+		/*
+		 * Next update bpArray
+		 */
+		if (bpArray.get(bpid) == null) {
+			bpArray.add(bpid, bp);
+		}
+	}
+	
+	private BreakpointMapping findBreakpointInfo(int bpid) {
+		return (BreakpointMapping)bpArray.get(bpid);
+	}
+
+	
+	private BreakpointMapping findBreakpointInfo(ICDIBreakpoint bpt) {
+		return (BreakpointMapping)bpMap.get(bpt);
+	}
+
+	private int newBreakpointId() {
+		return this.bpId++;
 	}
 }
