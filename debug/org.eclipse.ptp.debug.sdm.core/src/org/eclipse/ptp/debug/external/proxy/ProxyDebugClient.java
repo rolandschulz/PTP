@@ -3,8 +3,8 @@ package org.eclipse.ptp.debug.external.proxy;
 import java.io.IOException;
 
 import org.eclipse.ptp.core.proxy.AbstractProxyClient;
-import org.eclipse.ptp.core.proxy.FastBitSet;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
+import org.eclipse.ptp.core.util.BitList;
 
 public class ProxyDebugClient extends AbstractProxyClient {
 
@@ -16,55 +16,55 @@ public class ProxyDebugClient extends AbstractProxyClient {
 		sendCommand("INI", "\""+ prog + "\" \"" + args + "\"");
 	}
 	
-	public void debugSetLineBreakpoint(FastBitSet procs, String file, int line) throws IOException {
+	public void debugSetLineBreakpoint(BitList procs, String file, int line) throws IOException {
 		sendCommand("SLB", procs, "\"" + file + "\" " + line);
 	}
 	
-	public void debugSetFuncBreakpoint(FastBitSet procs, String file, String func) throws IOException {
+	public void debugSetFuncBreakpoint(BitList procs, String file, String func) throws IOException {
 		sendCommand("SFB", procs, "\"" + file + "\" \"" + func + "\"");
 	}
 	
-	public void debugDeleteBreakpoint(FastBitSet procs, int bpid) throws IOException {
+	public void debugDeleteBreakpoint(BitList procs, int bpid) throws IOException {
 		sendCommand("DBP", procs, Integer.toString(bpid));
 	}
 	
-	public void debugGo(FastBitSet procs) throws IOException {
+	public void debugGo(BitList procs) throws IOException {
 		sendCommand("GOP", procs);
 	}
 	
-	public void debugStep(FastBitSet procs, int count, int type) throws IOException {
+	public void debugStep(BitList procs, int count, int type) throws IOException {
 		sendCommand("STP", procs, count + " " + type);
 	}
 	
-	public void debugTerminate(FastBitSet procs) throws IOException {
+	public void debugTerminate(BitList procs) throws IOException {
 		sendCommand("HLT", procs);
 	}
 	
-	public void debugListStackframes(FastBitSet procs, int current) throws IOException {
+	public void debugListStackframes(BitList procs, int current) throws IOException {
 		sendCommand("LSF", procs, Integer.toString(current));
 	}
 
-	public void debugSetCurrentStackframe(FastBitSet procs, int level) throws IOException {
+	public void debugSetCurrentStackframe(BitList procs, int level) throws IOException {
 		sendCommand("SCS", procs, Integer.toString(level));
 	}
 
-	public void debugEvaluateExpression(FastBitSet procs, String expr) throws IOException {
+	public void debugEvaluateExpression(BitList procs, String expr) throws IOException {
 		sendCommand("EEX", procs, "\""+ expr + "\"");
 	}
 
-	public void debugGetType(FastBitSet procs, String expr) throws IOException {
+	public void debugGetType(BitList procs, String expr) throws IOException {
 		sendCommand("TYP", procs, "\""+ expr + "\"");
 	}
 
-	public void debugListLocalVariables(FastBitSet procs) throws IOException {
+	public void debugListLocalVariables(BitList procs) throws IOException {
 		sendCommand("LLV", procs);
 	}
 
-	public void debugListArguments(FastBitSet procs) throws IOException {
+	public void debugListArguments(BitList procs) throws IOException {
 		sendCommand("LAR", procs);
 	}
 
-	public void debugListGlobalVariables(FastBitSet procs) throws IOException {
+	public void debugListGlobalVariables(BitList procs) throws IOException {
 		sendCommand("LGV", procs);
 	}
 

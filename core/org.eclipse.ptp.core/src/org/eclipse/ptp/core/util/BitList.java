@@ -1,6 +1,6 @@
-package org.eclipse.ptp.core.proxy;
+package org.eclipse.ptp.core.util;
 
-public class FastBitSet {
+public class BitList {
 	private byte[]	bits;
 	private int		nBits;
 	private int		nBytes;
@@ -19,16 +19,16 @@ public class FastBitSet {
 		}
 	}
 	
-	public FastBitSet(int nbits, String str) {
+	public BitList(int nbits, String str) {
 		this.init(nbits);
 		this.fromString(str);
 	}
 	
-	public FastBitSet(int nbits) {
+	public BitList(int nbits) {
 		this.init(nbits);
 	}
 	
-	private FastBitSet(int nbits, byte[] bits) {
+	private BitList(int nbits, byte[] bits) {
 		this.init(nbits);
 		for (int i = 0; i < this.nBytes; i++)
 			this.bits[i] = bits[i];
@@ -168,8 +168,8 @@ public class FastBitSet {
 		return retValue;
 	}
 
-	public FastBitSet copy() {
-		return new FastBitSet(this.nBits, this.bits);
+	public BitList copy() {
+		return new BitList(this.nBits, this.bits);
 	}
 	
 	public Object clone() {
@@ -179,7 +179,7 @@ public class FastBitSet {
 	/*
 	 * If sets are different lengths, we assume missing bits are zero
 	 */
-	public void and(FastBitSet s) {
+	public void and(BitList s) {
 		for (int i = 0; i < this.nBytes; i++) {
 			if (i >= s.nBytes)
 				this.bits[i] = 0;
@@ -188,14 +188,14 @@ public class FastBitSet {
 		}
 	}
 	
-	public void andNot(FastBitSet s) {
+	public void andNot(BitList s) {
 		for (int i = 0; i < this.nBytes; i++) {
 			if (i < s.nBytes)
 				this.bits[i] &= ~s.bits[i];
 		}
 	}
 	
-	public boolean intersects(FastBitSet s) {
+	public boolean intersects(BitList s) {
 		for (int i = 0; i < this.nBytes; i++) {
 			if (i >= s.nBytes)
 				break;
@@ -218,7 +218,7 @@ public class FastBitSet {
 		return res;
 	}
 	
-	public void or(FastBitSet s) {
+	public void or(BitList s) {
 		for (int i = 0; i < this.nBytes; i++) {
 			if (i >= s.nBytes)
 				break;

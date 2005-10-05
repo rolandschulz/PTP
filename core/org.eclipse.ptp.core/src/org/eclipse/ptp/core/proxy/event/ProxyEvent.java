@@ -1,6 +1,6 @@
 package org.eclipse.ptp.core.proxy.event;
 
-import org.eclipse.ptp.core.proxy.FastBitSet;
+import org.eclipse.ptp.core.util.BitList;
 
 public class ProxyEvent {
 	
@@ -10,7 +10,7 @@ public class ProxyEvent {
 		
 		int type = Integer.parseInt(args[0]);
 		
-		FastBitSet set = decodeBitSet(args[1]);
+		BitList set = decodeBitSet(args[1]);
 		
 		switch (type) {
 		case IProxyEvent.EVENT_OK:
@@ -44,9 +44,9 @@ public class ProxyEvent {
 		return new String(strBytes);
 	}
 	
-	public static FastBitSet decodeBitSet(String str) {
+	public static BitList decodeBitSet(String str) {
 		String[] parts = str.split(":");
 		int len = Integer.parseInt(parts[0], 16); // Skip trailing NULL
-		return new FastBitSet(len, parts[1]);
+		return new BitList(len, parts[1]);
 	}
 }

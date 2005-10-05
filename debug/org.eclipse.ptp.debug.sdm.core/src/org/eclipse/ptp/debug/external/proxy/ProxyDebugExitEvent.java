@@ -1,13 +1,13 @@
 package org.eclipse.ptp.debug.external.proxy;
 
-import org.eclipse.ptp.core.proxy.FastBitSet;
 import org.eclipse.ptp.core.proxy.event.AbstractProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
+import org.eclipse.ptp.core.util.BitList;
 
 public class ProxyDebugExitEvent extends AbstractProxyEvent implements IProxyEvent {
 	private int		exitStatus;
 	
-	public ProxyDebugExitEvent(FastBitSet set, int code) {
+	public ProxyDebugExitEvent(BitList set, int code) {
 		super(EVENT_DBG_EXIT, set);
 		this.exitStatus = code;
 	}

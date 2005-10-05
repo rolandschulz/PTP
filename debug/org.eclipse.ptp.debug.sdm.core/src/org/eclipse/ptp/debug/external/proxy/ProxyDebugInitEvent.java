@@ -1,13 +1,13 @@
 package org.eclipse.ptp.debug.external.proxy;
 
-import org.eclipse.ptp.core.proxy.FastBitSet;
 import org.eclipse.ptp.core.proxy.event.AbstractProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
+import org.eclipse.ptp.core.util.BitList;
 
 public class ProxyDebugInitEvent extends AbstractProxyEvent implements IProxyEvent {
 	private int		num_servers;
 	
-	public ProxyDebugInitEvent(FastBitSet set, int num) {
+	public ProxyDebugInitEvent(BitList set, int num) {
 		super(EVENT_DBG_INIT, set);
 		this.num_servers = num;
 	}

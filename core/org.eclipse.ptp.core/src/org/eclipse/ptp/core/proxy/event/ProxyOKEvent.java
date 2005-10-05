@@ -1,10 +1,10 @@
 package org.eclipse.ptp.core.proxy.event;
 
-import org.eclipse.ptp.core.proxy.FastBitSet;
+import org.eclipse.ptp.core.util.BitList;
 
 public class ProxyOKEvent extends AbstractProxyEvent implements IProxyEvent {
 	
-	public ProxyOKEvent(FastBitSet set) {
+	public ProxyOKEvent(BitList set) {
 		super(EVENT_OK, set);
 	}
 	
