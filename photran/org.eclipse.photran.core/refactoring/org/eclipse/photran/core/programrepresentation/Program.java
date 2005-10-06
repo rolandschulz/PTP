@@ -1,5 +1,7 @@
 package org.eclipse.photran.core.programrepresentation;
 
+import java.util.Iterator;
+
 import org.eclipse.photran.internal.core.f95parser.ParseTreeNode;
 import org.eclipse.photran.internal.core.f95parser.symboltable.SymbolTable;
 

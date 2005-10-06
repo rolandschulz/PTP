@@ -1,5 +1,7 @@
 package org.eclipse.photran.core.programrepresentation;
 
+import java.util.Iterator;
+
 import org.eclipse.photran.internal.core.f95parser.ParseTreeNode;
 
 /**
@@ -28,5 +30,10 @@ public abstract class ParseTreePres
     public Presentation getPresentation()
     {
         return presentation;
+    }
+    
+    public Iterator iterator()
+    {
+        return new ParseTreePresIterator(this);
     }
 }

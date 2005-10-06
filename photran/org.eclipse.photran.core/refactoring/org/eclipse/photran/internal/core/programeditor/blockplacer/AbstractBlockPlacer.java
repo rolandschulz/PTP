@@ -195,12 +195,12 @@ public abstract class AbstractBlockPlacer
                 + " to format it?)");
         
         subTreeToFormat.visitUsing(new GenericParseTreeVisitor()
+        {
+            public void visitToken(Token token)
             {
-                public void visitToken(Token token)
-                {
-                    applyRules(program, subTreeToFormat, presRangeToFormat, token);
-                }
-            });
+                applyRules(program, subTreeToFormat, presRangeToFormat, token);
+            }
+        });
         
         Iterator/*<NonTreeToken>*/ it = program.getPresentation().getNonTreeTokens(presRangeToFormat).iterator();
         while (it.hasNext())

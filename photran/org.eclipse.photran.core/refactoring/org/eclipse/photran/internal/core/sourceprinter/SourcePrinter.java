@@ -2,16 +2,9 @@ package org.eclipse.photran.internal.core.sourceprinter;
 
 import java.io.PrintStream;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.photran.core.programrepresentation.ParseTreePres;
-import org.eclipse.photran.core.programrepresentation.Presentation;
-import org.eclipse.photran.internal.core.f95parser.GenericParseTreeVisitor;
 import org.eclipse.photran.internal.core.f95parser.IPresentationBlock;
-import org.eclipse.photran.internal.core.f95parser.NonTreeToken;
-import org.eclipse.photran.internal.core.f95parser.ParseTreeNode;
-import org.eclipse.photran.internal.core.f95parser.Token;
 
 /**
  * A <code>SourcePrinter</code> takes
@@ -28,18 +21,14 @@ import org.eclipse.photran.internal.core.f95parser.Token;
  */
 public class SourcePrinter
 {
-    private ParseTreeNode parseTree;
-
-    private Presentation presentation;
+    private ParseTreePres parseTreePres;
 
     private int curRow;
-
     private int curCol;
 
-    public SourcePrinter(ParseTreePres program)
+    public SourcePrinter(ParseTreePres parseTreePres)
     {
-        this.parseTree = program.getParseTree();
-        this.presentation = program.getPresentation();
+        this.parseTreePres = parseTreePres;
     }
 
     /**
@@ -50,12 +39,10 @@ public class SourcePrinter
      */
     public void printOn(PrintStream printStream)
     {
-        List/* <PresentationBlock> */blocks = mergePresBlocksWithTokensFromParseTree();
-
         curRow = 1;
         curCol = 1;
 
-        Iterator it = blocks.iterator();
+        Iterator it = this.parseTreePres.iterator();
         while (it.hasNext())
             printBlock((IPresentationBlock)it.next(), printStream);
     }
@@ -143,101 +130,5 @@ public class SourcePrinter
     private void printNewLine(PrintStream printStream)
     {
         printStream.print(System.getProperty("line.separator"));
-    }
-
-    /**
-     * Merges the tokens in the parse tree with the blocks in the <code>Presentation</code>
-     * object, sorting them by line/column so that they are in order for printing.
-     * 
-     * @return
-     */
-    private List/* <IPresentationBlock> */mergePresBlocksWithTokensFromParseTree()
-    {
-        List/* <IPresentationBlock> */mergedList = new LinkedList();
-
-        if (parseTree != null)
-            parseTree.visitUsing(new MergingVisitor(mergedList));
-        else if (presentation != null) mergedList = presentation.getNonTreeTokens();
-
-        return mergedList;
-    }
-
-    /**
-     * Iterates through a parse tree, merging its tokens with the presentation blocks contained in
-     * this <code>SourcePrinter</code>.
-     * 
-     * @author joverbey
-     */
-    private class MergingVisitor extends GenericParseTreeVisitor
-    {
-        private List/* <IPresentationBlock> */mergedList;
-
-        private Iterator it = presentation.iterator();
-
-        private IPresentationBlock nextBlock;
-
-        /*
-         * We must remember which node was the root, because after we've finished visiting the
-         * entire tree, there may be comments or other presentation blocks left over at the end of
-         * the file. We print these after we're done visiting the root, since that indicates that
-         * all tokens (from the parse tree) have been displayed.
-         */
-        private ParseTreeNode root = null;
-
-        public MergingVisitor(List/* <PresentationBlock> */mergedList)
-        {
-            super();
-            this.mergedList = mergedList;
-            getNextBlock();
-        }
-
-        private void getNextBlock()
-        {
-            nextBlock = it.hasNext() ? (NonTreeToken)it.next() : null;
-        }
-
-        public void visitToken(Token token)
-        {
-            while (nextBlock != null && isLessThan(nextBlock, token))
-            {
-                mergedList.add(nextBlock);
-                nextBlock = it.hasNext() ? (NonTreeToken)it.next() : null;
-            }
-
-            mergedList.add(token);
-        }
-
-        public void preparingToVisitChildrenOf(ParseTreeNode node)
-        {
-            if (root == null) root = node;
-        }
-
-        public void doneVisitingChildrenOf(ParseTreeNode node)
-        {
-            if (root == node) addAnyRemainingPresBlocksToList();
-        }
-
-        private void addAnyRemainingPresBlocksToList()
-        {
-            while (nextBlock != null)
-            {
-                mergedList.add(nextBlock);
-                nextBlock = it.hasNext() ? (NonTreeToken)it.next() : null;
-            }
-        }
-
-        private boolean isLessThan(IPresentationBlock a, IPresentationBlock b)
-        {
-            if (a.getStartLine() < b.getStartLine())
-                return true;
-            else if (a.getStartLine() > b.getStartLine())
-                return false;
-            else if (a.getStartCol() < b.getStartCol())
-                return true;
-            else if (a.getStartCol() > b.getStartCol())
-                return false;
-            else
-                return false; // equal
-        }
     }
 }
