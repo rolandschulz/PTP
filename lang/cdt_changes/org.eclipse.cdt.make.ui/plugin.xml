@@ -43,7 +43,7 @@
             %WizardNewCMakeProject.description
          </description>
       </wizard>
-      <wizard
+      <!--wizard
             name="%WizardConvertMakeProject.name"
             icon="icons/etool16/newmngm_app.gif"
             category="org.eclipse.cdt.ui.newCWizards"
@@ -56,7 +56,7 @@
          <selection
                class="org.eclipse.core.resources.IProject">
          </selection>
-      </wizard>
+      </wizard-->
 <!-- For C++ Wizards -->
       <!--wizard
             name="%WizardNewCCMakeProject.name"
