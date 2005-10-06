@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.internal.ui;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.eclipse.cdt.debug.core.cdi.ICDIBreakpointHit;
 import org.eclipse.cdt.debug.core.cdi.ICDIExitInfo;
 import org.eclipse.cdt.debug.core.cdi.ICDISharedLibraryEvent;

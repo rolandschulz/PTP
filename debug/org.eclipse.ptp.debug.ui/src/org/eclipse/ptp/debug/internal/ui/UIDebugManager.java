@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.internal.ui;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
@@ -335,9 +334,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			session.getModelManager().delProcessSet(set.getID());
 		}
 	}
+	
 	public void createSetEvent(IElementSet set, IElement[] elements) {
-		//FIXME do it later
-		BitList tasks = new BitList(((IElementHandler)set.getParent()).getSetRoot().size());
+		BitList tasks = new BitList(set.getElementHandler().getSetRoot().size());
 		for (int i = 0; i < elements.length; i++) {
 			tasks.set(convertToInt(elements[i].getName()));
 		}
@@ -349,22 +348,15 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	}
 	public void addElementsEvent(IElementSet set, IElement[] elements) {
 		BitList tasks = (BitList) set.getData(BITSET_KEY);
-		//FIXME do it later 
-		//BitList addTasks = new BitList();
 		for (int i = 0; i < elements.length; i++) {
 			tasks.set(convertToInt(elements[i].getName()));
 		}
-		//tasks.or(addTasks);
 	}
 	public void removeElementsEvent(IElementSet set, IElement[] elements) {
 		BitList tasks = (BitList) set.getData(BITSET_KEY);
-		//FIXME do it later 
-		//BitList addTasks = new BitList();
 		for (int i = 0; i < elements.length; i++) {
-			tasks.set(convertToInt(elements[i].getName()));
+			tasks.clear(convertToInt(elements[i].getName()));
 		}
-		//tasks.andNot(addTasks);
-		// FIXME how to delete more process in the created set
 	}
 	/*
 	 * Cannot unregister the extension final String CDT_DEBUG_UI_ID = "org.eclipse.cdt.debug.ui"; Bundle bundle = Platform.getBundle(CDT_DEBUG_UI_ID); if (bundle != null && bundle.getState() == Bundle.ACTIVE) { //ExtensionRegistry reg = (ExtensionRegistry) Platform.getExtensionRegistry();
@@ -479,28 +471,35 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			firePaintListener(condition);
 		}
 	}
+	private BitList addTasks(BitList curTasks, BitList newTasks) {
+		if (curTasks.size() < newTasks.size()) {
+			newTasks.or(curTasks);
+			return newTasks.copy();
+		} 
+		curTasks.or(newTasks);
+		return curTasks; 
+	}
+	private void removeTasks(BitList curTasks, BitList newTasks) {
+		curTasks.andNot(newTasks);
+	}
 	public void fireSuspendEvent(IPJob job, BitList tasks) {
 		IElementHandler elementHandler = getElementHandler(job.getIDString());
 		BitList suspendedTasks = (BitList) elementHandler.getData(SUSPENDED_PROC_KEY);
-		// add tasks
-		suspendedTasks.or(tasks);
+		suspendedTasks = addTasks(suspendedTasks, tasks);
 		fireDebugEvent(new SuspendedDebugEvent(job.getIDString(), suspendedTasks, (BitList) elementHandler.getData(TERMINATED_PROC_KEY)));
 	}
 	public void fireResumeEvent(IPJob job, BitList tasks) {
 		IElementHandler elementHandler = getElementHandler(job.getIDString());
 		BitList suspendedTasks = (BitList) elementHandler.getData(SUSPENDED_PROC_KEY);
-		// remove tasks
-		suspendedTasks.andNot(tasks);
+		removeTasks(suspendedTasks, tasks);
 		fireDebugEvent(new ResumedDebugEvent(job.getIDString(), suspendedTasks, (BitList) elementHandler.getData(TERMINATED_PROC_KEY)));
 	}
 	public void fireTerminatedEvent(IPJob job, BitList tasks) {
 		IElementHandler elementHandler = getElementHandler(job.getIDString());
 		BitList suspendedTasks = (BitList) elementHandler.getData(SUSPENDED_PROC_KEY);
-		// remove tasks
-		suspendedTasks.andNot(tasks);
+		removeTasks(suspendedTasks, tasks);
 		BitList terminatedTasks = (BitList) elementHandler.getData(TERMINATED_PROC_KEY);
-		// only add tasks
-		terminatedTasks.or(tasks);
+		terminatedTasks = addTasks(terminatedTasks, tasks);
 		fireDebugEvent(new TerminatedDebugEvent(job.getIDString(), terminatedTasks, suspendedTasks));
 	}
 	// ONLY for detect the debug sesssion is created
