@@ -27,14 +27,14 @@ import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 /**
  * @author Clement chu
- *
+ * 
  */
 public class PInstructionPointerAnnotation extends MarkerAnnotation {
 	private IAnnotationModel annotationModel = null;
 	private BitList tasks = null;
 	private Position position = null;
 	private IMarker marker = null;
-	
+
 	public PInstructionPointerAnnotation(IMarker marker, Position position, IAnnotationModel annotationModel) {
 		super(marker);
 		this.marker = marker;
@@ -55,11 +55,12 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 	}
 	public IMarker getMarker() {
 		return marker;
-	}	
+	}
 	public void setMessage(String message) {
 		try {
 			getMarker().setAttribute(IMarker.MESSAGE, message);
-		} catch (CoreException e) {}
+		} catch (CoreException e) {
+		}
 		setText(message);
 	}
 	public void setMessage(boolean isRegister) {
@@ -69,49 +70,46 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 			deleteMarker();
 			return;
 		}
-		String msg = "Suspended on "+(isRegister?"registered":"unregistered")+" "+(tasks.length==1?"process":"processes")+": ";		
+		String msg = "Suspended on " + (isRegister ? "registered" : "unregistered") + " " + (tasks.length == 1 ? "process" : "processes") + ": ";
 		int preTask = tasks[0];
 		msg += preTask;
 		boolean isContinue = false;
-		for (int i=1; i<tasks.length; i++) {
+		for (int i = 1; i < tasks.length; i++) {
 			if (preTask == (tasks[i] - 1)) {
 				preTask = tasks[i];
 				isContinue = true;
-
 				if (i == (tasks.length - 1)) {
 					msg += "-" + tasks[i];
 					break;
 				}
 				continue;
 			}
-
 			if (isContinue)
 				msg += "-" + preTask;
-
 			msg += "," + tasks[i];
 			isContinue = false;
 			preTask = tasks[i];
 		}
 		setMessage(msg);
 	}
-	
 	public String getMessage() {
 		return getText();
 	}
-	
 	public void setTasks(BitList tasks) {
 		this.tasks = tasks;
 	}
 	public int[] getTasks() {
-		return convertArray(tasks);		
+		return tasks.toArray();
 	}
 	public void addTasks(BitList aTasks) {
 		if (tasks == null) {
-			//FIXME fix it later
-			//tasks = new BitList();
+			tasks = aTasks.copy();
 		}
-
-		tasks.or(aTasks);
+		if (tasks.size() < aTasks.size()) {
+			aTasks.or(tasks);
+			tasks = aTasks.copy();
+		} else
+			tasks.or(aTasks);
 	}
 	public void removeTasks(BitList aTasks) {
 		tasks.andNot(aTasks);
@@ -119,22 +117,13 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 	public boolean isEmpty() {
 		return tasks.isEmpty();
 	}
-	
 	public boolean contains(BitList aTasks) {
 		return tasks.intersects(aTasks);
 	}
 	public int[] containTasks(BitList aTasks) {
 		aTasks.and(tasks);
-		return convertArray(aTasks);		
+		return aTasks.toArray();
 	}
-	public int[] convertArray(BitList bitSet) {
-		int[] intArray = new int[bitSet.cardinality()];
-		for(int i=bitSet.nextSetBit(0), j=0; i>=0; i=bitSet.nextSetBit(i+1), j++) {
-			intArray[j] = i;
-		}
-		return intArray;		
-	}
-	
 	public boolean deleteMarker() {
 		IMarker marker = getMarker();
 		if (marker.exists()) {

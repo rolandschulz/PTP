@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.internal.ui.views;
 
 import java.lang.reflect.InvocationTargetException;
-
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;

@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.internal.ui;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import org.eclipse.swt.graphics.Image;
 
 /**

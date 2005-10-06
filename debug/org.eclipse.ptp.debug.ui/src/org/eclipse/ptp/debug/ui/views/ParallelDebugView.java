@@ -240,14 +240,9 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		}
 		terminateAction.setEnabled(isEnabled);
 		if (isEnabled) {// not all processes terminated
-			if (totalSuspendedSize == 0) {// no suspended process
-				setEnableResumeButtonGroup(false);
-				suspendAction.setEnabled(true);
-			} else {// running process: total terminated + total suspended != set size
-				boolean isRunning = (setSize != (totalTerminatedSize + totalSuspendedSize));
-				setEnableResumeButtonGroup(!isRunning);
-				suspendAction.setEnabled(isRunning);
-			}
+			setEnableResumeButtonGroup(totalSuspendedSize>0);
+			// no suspended process or running process: total terminated + total suspended != set size
+			suspendAction.setEnabled(totalSuspendedSize == 0 || (setSize != (totalTerminatedSize + totalSuspendedSize)));
 		} else {// all process terminated
 			setEnableResumeButtonGroup(false);
 			suspendAction.setEnabled(false);
