@@ -110,7 +110,7 @@ public class BitList {
 		 */
 		if (p1 == p2) {
 			byte mask = (byte) (0xff >> (7 - b2));
-			this.bits[p1] = (byte) (mask << b1);
+			this.bits[p1] = (byte) (mask & (0xff << b1));
 			return;
 		}
 		
