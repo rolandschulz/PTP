@@ -26,10 +26,8 @@ public class ProxyDebugEvent {
 		switch (type) {
 		case IProxyEvent.EVENT_DBG_BPHIT:
 		case IProxyEvent.EVENT_DBG_BPSET:
-			Location loc = toLocation(decodeString(args[7]), decodeString(args[8]), decodeString(args[9]), args[10]);
-			ICDIBreakpoint bpt = toBreakpoint(args[3], args[4], args[5], decodeString(args[6]), loc);
 			int idVal = Integer.parseInt(args[2]);
-			evt = new ProxyDebugBreakpointEvent(set, type, idVal, bpt);
+			evt = new ProxyDebugBreakpointEvent(set, type, idVal);
 			break;
 			
 		case IProxyEvent.EVENT_DBG_SIGNAL:
