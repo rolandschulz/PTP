@@ -41,6 +41,9 @@ public class ElementSet extends Container implements IElementSet {
 		super(parent, id, name, selected, IContainer.ELEMENT_TYPE);
 		setData(MATCHSET_KEY, new ArrayList());
 	}
+	public IElementHandler getElementHandler() {
+		return (IElementHandler)parent;
+	}
 	
 	public boolean isRootSet() {
 		return (id.equals(IElementHandler.SET_ROOT_ID));

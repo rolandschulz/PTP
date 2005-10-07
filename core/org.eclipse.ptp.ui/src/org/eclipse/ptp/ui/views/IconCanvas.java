@@ -91,6 +91,7 @@ public class IconCanvas extends Canvas {
 	
 	protected int autoScrollDirection = SWT.NULL;	// the direction of autoscrolling (up, down, right, left)
 	protected int verticalScrollOffset = 0;
+	protected int scrolling_y = 0;
 	protected BitSet input = null;
 	
 	protected Color background = null;
@@ -456,8 +457,8 @@ public class IconCanvas extends Canvas {
 		if (verticalBar != null) {
 			verticalBar.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event event) {
-					setVerticalScrollOffset(getVerticalBar().getSelection(), false);
-					redraw();
+					setVerticalScrollOffset(getVerticalBar().getSelection(), true);
+					System.out.println("scrolling");
 				}
 			});
 		}
@@ -555,7 +556,7 @@ public class IconCanvas extends Canvas {
 			
 			current_top_row += scrollRows;
 			// scroll one page down or to the bottom
-			int scrollOffset = verticalScrollOffset + scrollRows * getVerticalIncrement();
+			int scrollOffset = Math.min(verticalScrollOffset + scrollRows * getVerticalIncrement(), (getMaxRow()-getMaxClientRow())* getElementHeight());
 			if (scrollOffset > verticalScrollOffset) {		
 				setVerticalScrollOffset(scrollOffset, true);
 			}
@@ -570,8 +571,8 @@ public class IconCanvas extends Canvas {
 			verticalBar.setSelection(pixelOffset);
 		}
 		Rectangle clientArea = getClientArea();
-		scroll(0, 0, 0, pixelOffset - verticalScrollOffset, clientArea.width, clientArea.height, true);
-
+		scroll(0, 0, 0, pixelOffset - verticalScrollOffset, clientArea.width, clientArea.height, adjustScrollBar);
+		
 		verticalScrollOffset = pixelOffset;
 		calculateTopIndex();
 		return true;
@@ -654,16 +655,10 @@ public class IconCanvas extends Canvas {
 		return direction;
 	}
 	protected void doMouseSelection(int mouse_x, int mouse_y) {
-		if (autoScrollDirection == SWT.DOWN) {
-			if (movingSelectionStart.y - verticalScrollOffset < getMaxClientRow() * getElementHeight())
-				movingSelectionStart.y += verticalScrollOffset;
-		}
-		
 		Rectangle clientArea = getClientArea();
 		int end_x = Math.min(getMaxCol()*getElementWidth(), Math.max(0+sel_size, mouse_x));
 		int end_y = Math.min(clientArea.height-e_spacing_y-sel_size, Math.max(0+sel_size, mouse_y));
 		
-		System.out.println(end_x + ":"+ end_y);
 		int direction = calculateMovingSelection(end_x, end_y);
 		int s_x = movingSelectionStart.x;
 		int e_x = end_x;
@@ -692,8 +687,7 @@ public class IconCanvas extends Canvas {
 		int row_start = getSelectedRow(s_y, true);
 		int row_end = Math.min(getSelectedRow(e_y-e_offset_y, true)+1, getMaxRow());
 
-		//if (autoScrollDirection == SWT.NULL)
-			selectedElements.clear();
+		selectedElements.clear();
 		
 		int total = getTotalElements();
 		for (int row_count=row_start; row_count<row_end; row_count++) {
@@ -705,7 +699,11 @@ public class IconCanvas extends Canvas {
 			}
 		}
 		System.out.println("---size: " + selectedElements.cardinality());
-
+		
+		//if (autoScrollDirection != SWT.NULL) {
+			//return;
+		//}
+		
 		if (movingSelectionEnd != null) {
 			if (calculateMovingSelection(movingSelectionEnd.x, movingSelectionEnd.y) != direction) {
 				movingSelectionEnd = new Point(end_x, end_y);
@@ -802,7 +800,7 @@ public class IconCanvas extends Canvas {
 				}
 			}			
 		}
-		if (selectedElements.cardinality() > 0) {
+		if (movingSelectionStart != null && movingSelectionEnd != null) {
 			drawSelection(newGC);
 		}
 		gc.drawImage(imageBuffer, render_x, render_y);
@@ -810,12 +808,27 @@ public class IconCanvas extends Canvas {
 		imageBuffer.dispose();
 		clearMargin(gc, getBackground());
 	}
-	
+	private int tmp_y = 0;
 	private void drawSelection(GC gc) {
 		gc.setForeground(sel_color);
 		gc.setLineWidth(sel_size);
+		int last_page_scroll_offset = (getMaxRow()-getMaxClientRow())* getElementHeight();
 		int start_x = movingSelectionStart.x;
 		int start_y = movingSelectionStart.y;
+		boolean drawTop = true;
+		boolean drawBottom = true;
+		if (autoScrollDirection == SWT.DOWN) {
+			if (tmp_y - verticalScrollOffset < 0) {
+				tmp_y -= getElementHeight();
+				start_y = tmp_y;
+			}
+			System.out.println("***: " + tmp_y + ", "+verticalScrollOffset);
+			drawBottom = (last_page_scroll_offset == verticalScrollOffset);
+		}
+		else if (autoScrollDirection == SWT.NULL) {
+			tmp_y = start_y + verticalScrollOffset;
+		}
+
 		int end_x = 0;
 		int end_y = 0;
 		switch (calculateMovingSelection(movingSelectionEnd.x, movingSelectionEnd.y)) {
@@ -832,9 +845,11 @@ public class IconCanvas extends Canvas {
 			start_y -= sel_gap;
 			end_x = start_x;
 			end_y = start_y;
-			while (end_x > movingSelectionStart.x) {
-				gc.drawLine(end_x-sel_length, start_y, end_x, start_y);
-				end_x -= (sel_length*sel_gap);
+			if (drawBottom) {
+				while (end_x > movingSelectionStart.x) {
+					gc.drawLine(end_x-sel_length, start_y, end_x, start_y);
+					end_x -= (sel_length*sel_gap);
+				}
 			}
 			while (end_y > movingSelectionStart.y) {
 				gc.drawLine(start_x, end_y-sel_length, start_x, end_y);
@@ -998,7 +1013,7 @@ public class IconCanvas extends Canvas {
 		else
 			doMouseSelection(event.x, event.y);
 		
-		System.out.println(movingSelectionStart);
+		System.out.println(" " + movingSelectionStart + ", " + selection);		
 	}	
 	protected void handlePaint(Event event) {
 		Rectangle clientArea = getClientArea();
@@ -1014,6 +1029,7 @@ public class IconCanvas extends Canvas {
 		int col_end = getMaxCol();
 		int row_start = 0;
 		int row_end = getMaxClientRow();
+
 		if (autoScrollDirection == SWT.NULL && movingSelectionStart != null && movingSelectionEnd != null) {
 			int s_x = movingSelectionStart.x;
 			int e_x = event.x;
@@ -1044,9 +1060,11 @@ public class IconCanvas extends Canvas {
 			renderHeight = s_y + e_y + event.height;
 		}
 		else {
-			row_start = Math.max(0, getSelectedRow(0 - e_offset_y, true));
+			//row_start = Math.max(0, getSelectedRow(0 - e_offset_y, true));
+			row_start = Math.max(0, getCurrentTopRow());
 			row_end = Math.min(row_end + row_start + 1, getMaxRow()); 
 		}
+		//System.out.println("performPaint: " + col_start + "," + col_end + " - " + row_start + "," + row_end);
 		performPaint(event.gc, col_start, col_end, row_start, row_end, 0, 0, renderWidth, renderHeight);
 	}	
 	protected void handleResize(Event event) {
@@ -1058,15 +1076,6 @@ public class IconCanvas extends Canvas {
 	/****************************
 	 * testing only
 	 **************/
-	public TestObject createTestObject() {
-		return new TestObject();
-	}
-	
-	private class TestObject {
-		public int getSize() {
-			return 10000;
-		}
-	}
 	public static void main(String[] args) {
         final Display display = new Display();
         final Shell shell = new Shell(display);
@@ -1075,7 +1084,7 @@ public class IconCanvas extends Canvas {
         shell.setLocation(0, 0);
         IconCanvas test = new IconCanvas(shell, SWT.NONE);
         BitSet testInput = new BitSet();
-        testInput.set(0, 1000);
+		testInput.set(0,10000);
         test.setInput(testInput);
         
         shell.open();

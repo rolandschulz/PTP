@@ -40,4 +40,6 @@ public interface IElementSet extends IContainer {
 	public IElement[] getElements();
 	public IElement getElement(String id);
 	public IElement getElement(int index);
+	
+	public IElementHandler getElementHandler();
 }
