@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.fdt.managedbuilder.core
-Bundle-Version: 3.0.0
+Bundle-Version: 1.0.0
 Bundle-Activator: org.eclipse.fdt.managedbuilder.core.ManagedBuilderCorePlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.cdt.core,
+ org.eclipse.fdt.core,
  org.eclipse.core.runtime,
  org.eclipse.cdt.managedbuilder.core,
- org.eclipse.core.resources,
- org.eclipse.fdt.core
+ org.eclipse.core.resources
 Eclipse-AutoStart: true
