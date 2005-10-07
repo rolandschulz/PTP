@@ -11,7 +11,6 @@ import org.eclipse.ptp.debug.external.cdi.Condition;
 import org.eclipse.ptp.debug.external.cdi.Location;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.AddressBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.FunctionBreakpoint;
-import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 
 public class ProxyDebugEvent {
 	
@@ -47,12 +46,11 @@ public class ProxyDebugEvent {
 			
 		case IProxyEvent.EVENT_DBG_FRAMES:
 			int numFrames = Integer.parseInt(args[2]);
-			StackFrame[] frames = new StackFrame[numFrames];
+			ProxyDebugStackframe[] frames = new ProxyDebugStackframe[numFrames];
 			for (int i = 0; i < numFrames; i++) {
 				int frameLevel = Integer.parseInt(args[5*i+3]);
 				int line = Integer.parseInt(args[5*i+7]);
-				//TODO StackFrame requires a thread
-				frames[i] = null;//new StackFrame(null, frameLevel, decodeString(args[5*i+4]), decodeString(args[5*i+5]), line, args[5*i+6]);
+				frames[i] = new ProxyDebugStackframe(frameLevel, decodeString(args[5*i+4]), decodeString(args[5*i+5]), line, decodeString(args[5*i+6]));
 			}
 			evt = new ProxyDebugStackframeEvent(set, frames);
 			break;
@@ -95,6 +93,21 @@ public class ProxyDebugEvent {
 		}
 		
 		return new String(strBytes);
+	}
+		
+	public static BigInteger decodeAddr(String str) {
+		String[] parts = str.split(":");
+		int len = Integer.parseInt(parts[0], 16) - 1; // Skip trailing NULL
+		byte[] strBytes = new byte[len];
+		
+		for (int i = 0, p = 0; i < len; i++, p += 2) {
+			byte c = (byte) ((Character.digit(parts[1].charAt(p), 16) & 0xf) << 4);
+			c |= (byte) ((Character.digit(parts[1].charAt(p+1), 16) & 0xf));
+			strBytes[i] = c;
+		}
+		
+		BigInteger a = new BigInteger(strBytes);
+		return a;
 	}
 	
 	public static ICDIBreakpoint toBreakpoint(String ignore, String spec, String del, String type, Location loc) {
