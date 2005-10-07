@@ -90,7 +90,7 @@ static proxy_tcp_svr_func proxy_tcp_svr_func_tab[] =
 	{"INI",	proxy_tcp_svr_startsession},
 	{"SLB",	proxy_tcp_svr_setlinebreakpoint},
 	{"SFB",	proxy_tcp_svr_setfuncbreakpoint},
-	{"DBS",	proxy_tcp_svr_deletebreakpoint},
+	{"DBP",	proxy_tcp_svr_deletebreakpoint},
 	{"GOP",	proxy_tcp_svr_go},
 	{"STP",	proxy_tcp_svr_step},
 	{"HLT",	proxy_tcp_svr_terminate},
@@ -435,7 +435,7 @@ proxy_tcp_svr_setlinebreakpoint(proxy_svr_helper_funcs *helper, char **args, cha
 		return DBGRES_ERR;
 	}
 	
-	res = helper->setlinebreakpoint(procs, args[2], atoi(args[3]));
+	res = helper->setlinebreakpoint(procs, atoi(args[2]), args[3], atoi(args[4]));
 	
 	procset_free(procs);
 	
@@ -454,7 +454,7 @@ proxy_tcp_svr_setfuncbreakpoint(proxy_svr_helper_funcs *helper, char **args, cha
 		return DBGRES_ERR;
 	}
 	
-	res = helper->setfuncbreakpoint(procs, args[2], args[3]);
+	res = helper->setfuncbreakpoint(procs, atoi(args[2]), args[3], args[4]);
 	
 	procset_free(procs);
 	

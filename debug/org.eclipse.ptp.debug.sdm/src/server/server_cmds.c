@@ -137,13 +137,13 @@ svr_start_session(dbg_backend *db, char **args)
 static int 
 svr_setlinebreakpoint(dbg_backend *db, char **args)
 {
-	return db->db_funcs->setlinebreakpoint(args[1], atoi(args[2]));
+	return db->db_funcs->setlinebreakpoint(atoi(args[1]), args[2], atoi(args[3]));
 }
 
 static int 
 svr_setfuncbreakpoint(dbg_backend *db, char **args)
 {
-	return db->db_funcs->setfuncbreakpoint(args[1], args[2]);
+	return db->db_funcs->setfuncbreakpoint(atoi(args[1]), args[2], args[3]);
 }
 
 static int 

@@ -55,8 +55,8 @@ static int proxy_tcp_clnt_create(void *);
 static int proxy_tcp_clnt_accept(int, void *);
 static int proxy_tcp_clnt_progress(void *);
 static int proxy_tcp_clnt_startsession(void *, char *, char *);
-static int proxy_tcp_clnt_setlinebreakpoint(void *, procset *, char *, int);
-static int proxy_tcp_clnt_setfuncbreakpoint(void *, procset *, char *, char *);
+static int proxy_tcp_clnt_setlinebreakpoint(void *, procset *, int, char *, int);
+static int proxy_tcp_clnt_setfuncbreakpoint(void *, procset *, int, char *, char *);
 static int proxy_tcp_clnt_deletebreakpoint(void *, procset *, int);
 static int proxy_tcp_clnt_go(void *, procset *);
 static int proxy_tcp_clnt_step(void *, procset *, int, int);
@@ -349,7 +349,7 @@ proxy_tcp_clnt_startsession(void *data, char *prog, char *args)
 }
 
 static int
-proxy_tcp_clnt_setlinebreakpoint(void *data, procset *set, char *file, int line)
+proxy_tcp_clnt_setlinebreakpoint(void *data, procset *set, int bpid, char *file, int line)
 {
 	int				res;
 	char *			procs;
@@ -359,7 +359,7 @@ proxy_tcp_clnt_setlinebreakpoint(void *data, procset *set, char *file, int line)
 	
 	fix_null(&file);
 	        
-	res = proxy_tcp_clnt_send_cmd(conn, "SLB %s \"%s\" %d", procs, file, line);
+	res = proxy_tcp_clnt_send_cmd(conn, "SLB %s %d \"%s\" %d", procs, bpid, file, line);
 	
 	free(procs);
 		
@@ -367,7 +367,7 @@ proxy_tcp_clnt_setlinebreakpoint(void *data, procset *set, char *file, int line)
 }
 
 static int 
-proxy_tcp_clnt_setfuncbreakpoint(void *data, procset *set, char *file, char *func)
+proxy_tcp_clnt_setfuncbreakpoint(void *data, procset *set, int bpid, char *file, char *func)
 {
 	int				res;
 	char *			procs;
@@ -378,7 +378,7 @@ proxy_tcp_clnt_setfuncbreakpoint(void *data, procset *set, char *file, char *fun
 	fix_null(&file);
 	fix_null(&func);
 		        
-	res = proxy_tcp_clnt_send_cmd(conn, "SFB %s \"%s\" \"%s\"", procs, file, func);
+	res = proxy_tcp_clnt_send_cmd(conn, "SFB %s %d \"%s\" \"%s\"", procs, bpid, file, func);
 	
 	free(procs);
 		

@@ -39,8 +39,8 @@ void DbgClntFinish(void);
 /*
  * Breakpoint operations
  */
-int DbgClntSetLineBreakpoint(procset *set, char *file, int line);
-int DbgClntSetFuncBreakpoint(procset *set, char *file, char *func);
+int DbgClntSetLineBreakpoint(procset *set, int bpid, char *file, int line);
+int DbgClntSetFuncBreakpoint(procset *set, int bpid, char *file, char *func);
 int DbgClntDeleteBreakpoint(procset *set, int);
 
 /*
