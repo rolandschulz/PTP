@@ -50,8 +50,8 @@ struct proxy_clnt_funcs {
 	 * Protocol functions
 	 */
 	int (*startsession)(void *, char *, char *);
-	int (*setlinebreakpoint)(void *, struct procset *, char *, int);
-	int (*setfuncbreakpoint)(void *, struct procset *, char *, char *);
+	int (*setlinebreakpoint)(void *, struct procset *, int, char *, int);
+	int (*setfuncbreakpoint)(void *, struct procset *, int, char *, char *);
 	int (*deletebreakpoint)(void *, struct procset *, int);
 	int (*go)(void *, struct procset *);
 	int (*step)(void *, struct procset *, int, int);
@@ -82,8 +82,8 @@ struct proxy_svr_helper_funcs {
 	 * Protocol functions
 	 */
 	int (*startsession)(char *, char *);
-	int (*setlinebreakpoint)(struct procset *, char *, int);
-	int (*setfuncbreakpoint)(struct procset *, char *, char *);
+	int (*setlinebreakpoint)(struct procset *, int, char *, int);
+	int (*setfuncbreakpoint)(struct procset *, int, char *, char *);
 	int (*deletebreakpoint)(struct procset *, int);
 	int (*go)(struct procset *);
 	int (*step)(struct procset *, int, int);
@@ -132,8 +132,8 @@ extern int proxy_clnt_connect(proxy *, void *);
 extern int proxy_clnt_create(proxy *, void *);
 extern int proxy_clnt_progress(proxy *, void *);
 extern int proxy_clnt_startsession(proxy *, void *, char *, char *);
-extern int proxy_clnt_setlinebreakpoint(proxy *, void *, struct procset *, char *, int);
-extern int proxy_clnt_setfuncbreakpoint(proxy *, void *, struct procset *, char *, char *);
+extern int proxy_clnt_setlinebreakpoint(proxy *, void *, struct procset *, int, char *, int);
+extern int proxy_clnt_setfuncbreakpoint(proxy *, void *, struct procset *, int, char *, char *);
 extern int proxy_clnt_deletebreakpoint(proxy *, void *, struct procset *, int);
 extern int proxy_clnt_go(proxy *, void *, struct procset *);
 extern int proxy_clnt_step(proxy *, void *, struct procset *, int, int);

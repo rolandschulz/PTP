@@ -66,7 +66,7 @@ event_callback(dbg_event *e, void *data)
 		printf("debugger initilized\n");
 		break;
 	case DBGEV_BPHIT:
-		printf("hit breakpoint at line %d\n", e->bp->loc.line);
+		printf("hit breakpoint %d\n", e->bpid);
 		break;
 	case DBGEV_BPSET:
 		printf("breakpoint set\n");
@@ -145,6 +145,7 @@ do_test(session *s, char *exe)
 {
 	procset *	p1;
 	procset *	p2;
+	int			bpid = 54;
 	
 	p1 = procset_new(s->sess_procs);
 	procset_invert(p1);
@@ -165,19 +166,19 @@ do_test(session *s, char *exe)
 	}
 	wait_for_event(s, p1);
 
-	if (DbgSetLineBreakpoint(s, p1, "yyy.c", 6) < 0) {
+	if (DbgSetLineBreakpoint(s, p1, bpid++, "yyy.c", 6) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
 	wait_for_event(s, p1);
 	
-	if (DbgSetLineBreakpoint(s, p1, "xxx.c", 99) < 0) {
+	if (DbgSetLineBreakpoint(s, p1, bpid++, "xxx.c", 99) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
 	wait_for_event(s, p1);
 	
-	if (DbgSetLineBreakpoint(s, p1, "xxx.c", 14) < 0) {
+	if (DbgSetLineBreakpoint(s, p1, bpid, "xxx.c", 14) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
@@ -225,7 +226,13 @@ do_test(session *s, char *exe)
 	}
 	wait_for_event(s, p1);
 	
-	if (DbgSetFuncBreakpoint(s, p1, "xxx.c", "b") < 0) {
+	if (DbgDeleteBreakpoint(s, p1, bpid++) < 0) {
+		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
+		return 1;
+	}
+	wait_for_event(s, p1);
+		
+	if (DbgSetFuncBreakpoint(s, p1, bpid++, "xxx.c", "b") < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}

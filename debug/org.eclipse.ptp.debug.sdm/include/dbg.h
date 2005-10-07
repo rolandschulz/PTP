@@ -47,8 +47,8 @@ int DbgQuit(session *);
 /*
  * Breakpoint operations
  */
-int DbgSetLineBreakpoint(session *s, procset *set, char *file, int line);
-int DbgSetFuncBreakpoint(session *s, procset *set, char *file, char *func);
+int DbgSetLineBreakpoint(session *s, procset *set, int bpid, char *file, int line);
+int DbgSetFuncBreakpoint(session *s, procset *set, int bpid, char *file, char *func);
 int DbgDeleteBreakpoint(session *s, procset *set, int bpid);
 
 /*

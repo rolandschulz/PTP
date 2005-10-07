@@ -41,23 +41,35 @@
 #include "list.h"
 
 //#define DEBUG
+
+struct bpentry {
+	int local;
+	int remote;
+};
+
+struct bpmap {
+	int				nels; // number of elements currently in map
+	int				size; // total size of map
+	struct bpentry *	maps;
+};
+
 static struct timeval	SELECT_TIMEOUT = { 0, 1000 };
 static mi_h *		MIHandle;
-static List *		Breakpoints;
 static dbg_event *	LastEvent;
 static void			(*EventCallback)(dbg_event *, void *);
 static void *		EventCallbackData;
 static int			ServerExit;
 static int			Started;
+static struct bpmap	BPMap = { 0, 0, NULL };
 
 static int	GDBMIBuildAIFVar(char *, char *, char *, AIF **);
-static int	SetAndCheckBreak(char *);
+static int	SetAndCheckBreak(int, char *);
 
 static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIProgress(void);
 static int	GDBMIStartSession(char *, char *, char*);
-static int	GDBMISetLineBreakpoint(char *, int);
-static int	GDBMISetFuncBreakpoint(char *, char *);
+static int	GDBMISetLineBreakpoint(int, char *, int);
+static int	GDBMISetFuncBreakpoint(int, char *, char *);
 static int	GDBMIDeleteBreakpoint(int);
 static int	GDBMIGo(void);
 static int	GDBMIStep(int, int);
@@ -121,6 +133,92 @@ SaveEvent(dbg_event *e)
 	LastEvent = e;
 }
 
+void
+AddBPMap(int local, int remote)
+{
+	int				i;
+	struct bpentry *	map;
+	
+	if (BPMap.size == 0) {
+		BPMap.maps = (struct bpentry *)malloc(sizeof(struct bpentry) * 100);
+		BPMap.size = 100;
+		
+		for (i = 0; i < BPMap.size; i++) {
+			map = &BPMap.maps[i];
+			map->remote = map->local = -1;
+		}
+	}
+	
+	if (BPMap.nels == BPMap.size) {
+		i = BPMap.size;
+		BPMap.size *= 2;
+		BPMap.maps = (struct bpentry *)realloc(BPMap.maps, sizeof(struct bpentry) * BPMap.size);
+		
+		for (; i < BPMap.size; i++) {
+			map = &BPMap.maps[i];
+			map->remote = map->local = -1;
+		}
+	}
+	
+	for (i = 0; i < BPMap.size; i++) {
+		map = &BPMap.maps[i];
+		if (map->remote == -1) {
+			map->remote = remote;
+			map->local = local;
+			BPMap.nels++;
+		}
+	}
+}
+
+void
+RemoveBPMap(int remote)
+{
+	int				i;
+	struct bpentry *	map;
+	
+	for (i = 0; i < BPMap.nels; i++) {
+		map = &BPMap.maps[i];
+		if (map->remote == remote) {
+			map->remote = -1;
+			map->local = -1;
+			BPMap.nels--;
+			return;
+		}
+	}		
+}
+
+int
+LocalToRemoteBP(int local) 
+{
+	int				i;
+	struct bpentry *	map;
+	
+	for (i = 0; i < BPMap.nels; i++) {
+		map = &BPMap.maps[i];
+		if (map->local == local) {
+			return map->remote;
+		}
+	}
+
+	return -1;
+}
+
+int
+RemoteToLocalBP(int remote) 
+{
+	int				i;
+	struct bpentry *	map;
+	
+	for (i = 0; i < BPMap.nels; i++) {
+		map = &BPMap.maps[i];
+		if (map->remote == remote) {
+			return map->local;
+		}
+	}
+
+	return -1;
+}
+
 /*
  * Wait for terminated children
  */
@@ -144,7 +242,6 @@ AsyncCallback(mi_output *mio, void *data)
 {
 	mi_stop *	stop;
 	dbg_event *	e;
-	breakpoint *	bp;
 
 	stop = mi_get_stopped(mio->c);
 
@@ -154,14 +251,8 @@ AsyncCallback(mi_output *mio, void *data)
 	switch ( stop->reason )
 	{
 	case sr_bkpt_hit:
-		if ((bp = FindBreakpoint(Breakpoints, stop->bkptno)) == NULL)
-		{
-			DbgSetError(DBGERR_DEBUGGER, "bad breakpoint");
-			return;
-		}
-	
 		e = NewEvent(DBGEV_BPHIT);
-		e->bp = CopyBreakpoint(bp);
+		e->bpid = LocalToRemoteBP(stop->bkptno);
 		break;
 
 	case sr_end_stepping_range:
@@ -217,8 +308,6 @@ GDBMIInit(void (*event_callback)(dbg_event *, void *), void *data)
 	signal(SIGINT, SIG_IGN);
 	signal(SIGPIPE, SIG_IGN);
 
-	Breakpoints = NewList();
-	
 	return DBGRES_OK;
 }
 
@@ -377,7 +466,7 @@ GDBMIProgress(void)
 ** Set breakpoint at specified line.
 */
 static int
-GDBMISetLineBreakpoint(char *file, int line)
+GDBMISetLineBreakpoint(int bpid, char *file, int line)
 {
 	char *where;
 
@@ -388,14 +477,14 @@ GDBMISetLineBreakpoint(char *file, int line)
 	else
 		asprintf(&where, "%s:%d", file, line);
 
-	return SetAndCheckBreak(where);
+	return SetAndCheckBreak(bpid, where);
 }
 
 /*
 ** Set breakpoint at start of specified function.
 */
 static int
-GDBMISetFuncBreakpoint(char *file, char *func)
+GDBMISetFuncBreakpoint(int bpid, char *file, char *func)
 {
 	char *where;
 
@@ -406,7 +495,7 @@ GDBMISetFuncBreakpoint(char *file, char *func)
 	else
 		asprintf(&where, "%s:%s", file, func);
 
-	return SetAndCheckBreak(where);
+	return SetAndCheckBreak(bpid, where);
 }
 
 /*
@@ -415,9 +504,8 @@ GDBMISetFuncBreakpoint(char *file, char *func)
 ** id in bid. Adds to breakpoint list if necessary.
 */
 static int
-SetAndCheckBreak(char *where)
+SetAndCheckBreak(int bpid, char *where)
 {
-	breakpoint *	bp;
 	dbg_event *	e;
 	mi_bkpt *	bpt;
 
@@ -435,46 +523,10 @@ SetAndCheckBreak(char *where)
 		return DBGRES_ERR;
 	}
 
-	bp = NewBreakpoint(bpt->number);
-
-	bp->ignore = bpt->ignore;
-
-	switch ( bpt->type ) {
-	case t_unknown:
-		bp->type = strdup("unknown");
-		break;
-
-	case t_breakpoint:
-		bp->type = strdup("breakpoint");
-		break;
-
-	case t_hw:
-		bp->type = strdup("hw");
-		break;
-	}
-
-	bp->hits = bpt->times;
-
-	if ( bpt->file != NULL )
-		bp->loc.file = strdup(bpt->file);
-	if ( bpt->func != NULL )
-		bp->loc.func = strdup(bpt->func);
-	if ( bpt->addr != 0 )
-		asprintf(&bp->loc.addr, "0x%p", bpt->addr);
-	bp->loc.line = bpt->line;
-
-	/*
-	** Link a copy of the breakpoint onto BP.
-	*/
-	AddBreakpoint(Breakpoints, bp);
-
-	/*
-	** Now create a fake event and make it
-	** look like a BPSET.
-	*/
-
+	AddBPMap(bpt->number, bpid);
+	
 	e = NewEvent(DBGEV_BPSET);
-	e->bp = CopyBreakpoint(bp);
+	e->bpid = bpid;
 	SaveEvent(e);
 	
 	mi_free_bkpt(bpt);
@@ -488,16 +540,26 @@ SetAndCheckBreak(char *where)
 static int
 GDBMIDeleteBreakpoint(int bpid)
 {
+	int		lbpid;
+	char *	bpstr;
+	
 	CHECK_SESSION()
 
 	ResetError();
 
-	if ( !gmi_break_delete(MIHandle, bpid) ) {
+	if ((lbpid = RemoteToLocalBP(bpid)) < 0) {
+		asprintf(&bpstr, "%d", bpid);
+		DbgSetError(DBGERR_NOBP, bpstr);
+		free(bpstr);
+		return DBGRES_ERR;
+	}
+	
+	if ( !gmi_break_delete(MIHandle, lbpid) ) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
 	}
 
-	RemoveBreakpoint(Breakpoints, bpid);
+	RemoveBPMap(bpid);
 
 	SaveEvent(NewEvent(DBGEV_OK));
 

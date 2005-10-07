@@ -112,15 +112,15 @@ DbgStartSession(session *s, char *prog, char *args)
  * Breakpoint operations
  */
 int 
-DbgSetLineBreakpoint(session *s, procset *set, char *file, int line)
+DbgSetLineBreakpoint(session *s, procset *set, int bpid, char *file, int line)
 {
-	return proxy_clnt_setlinebreakpoint(s->sess_proxy, s->sess_proxy_data, set, file, line);
+	return proxy_clnt_setlinebreakpoint(s->sess_proxy, s->sess_proxy_data, set, bpid, file, line);
 }
 
 int 
-DbgSetFuncBreakpoint(session *s, procset *set, char *file, char *func)
+DbgSetFuncBreakpoint(session *s, procset *set, int bpid, char *file, char *func)
 {
-	return proxy_clnt_setfuncbreakpoint(s->sess_proxy, s->sess_proxy_data, set, file, func);
+	return proxy_clnt_setfuncbreakpoint(s->sess_proxy, s->sess_proxy_data, set, bpid, file, func);
 }
 
 int 

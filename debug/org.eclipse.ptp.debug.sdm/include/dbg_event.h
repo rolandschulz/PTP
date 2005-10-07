@@ -48,12 +48,12 @@ struct dbg_event {
 	/*
 	 * DBGEV_INIT
 	 */
-	int num_servers;
+	int			num_servers;
 	
 	/*
 	 * DBGEV_BPHIT, DBGEV_BPSET
 	 */
-	breakpoint *	bp;
+	int			bpid;
 	
 	/*
 	 * DBGEV_FRAMES, DBGEV_VARS

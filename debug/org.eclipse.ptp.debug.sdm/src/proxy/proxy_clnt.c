@@ -79,19 +79,19 @@ proxy_clnt_startsession(proxy *p, void *data, char *prog, char *args)
 }
 
 int 
-proxy_clnt_setlinebreakpoint(proxy *p, void *data, procset *set, char *file, int line)
+proxy_clnt_setlinebreakpoint(proxy *p, void *data, procset *set, int bpid, char *file, int line)
 {
 	if (p != NULL)
-		return p->clnt_funcs->setlinebreakpoint(data, set, file, line);
+		return p->clnt_funcs->setlinebreakpoint(data, set, bpid, file, line);
 		
 	return -1;
 }
 
 int 
-proxy_clnt_setfuncbreakpoint(proxy *p, void *data, procset *set, char *file, char *func)
+proxy_clnt_setfuncbreakpoint(proxy *p, void *data, procset *set, int bpid, char *file, char *func)
 {
 	if (p != NULL)
-		return p->clnt_funcs->setfuncbreakpoint(data, set, file, func);
+		return p->clnt_funcs->setfuncbreakpoint(data, set, bpid, file, func);
 		
 	return -1;
 }

@@ -41,12 +41,8 @@ FreeEvent(dbg_event *e) {
 	case DBGEV_EXIT:
 	case DBGEV_STEP:
 	case DBGEV_INIT:
-		break;
-		
 	case DBGEV_BPSET:
 	case DBGEV_BPHIT:
-		if (e->bp != NULL)
-			FreeBreakpoint(e->bp);
 		break;
 		
 	case DBGEV_FRAMES:

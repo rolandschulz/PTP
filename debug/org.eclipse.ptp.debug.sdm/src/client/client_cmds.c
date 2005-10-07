@@ -146,21 +146,21 @@ DbgClntStartSession(char *prog, char *args)
  * Breakpoint operations
  */
 int 
-DbgClntSetLineBreakpoint(procset *set, char *file, int line)
+DbgClntSetLineBreakpoint(procset *set, int bpid, char *file, int line)
 {
 	int		res;
 	char *	cmd;
 
 	fix_null(&file);
 	
-	asprintf(&cmd, "SLB \"%s\" %d", file, line);
+	asprintf(&cmd, "SLB %d \"%s\" %d", bpid, file, line);
 	res = ClntSendCommand(set, cmd, NULL);
 	free(cmd);
 	return res;
 }
 
 int 
-DbgClntSetFuncBreakpoint(procset *set, char *file, char *func)
+DbgClntSetFuncBreakpoint(procset *set, int bpid, char *file, char *func)
 {
 	int		res;
 	char *	cmd;
@@ -168,7 +168,7 @@ DbgClntSetFuncBreakpoint(procset *set, char *file, char *func)
 	fix_null(&file);
 	fix_null(&func);
 	
-	asprintf(&cmd, "SFB \"%s\" \"%s\"", file, func);
+	asprintf(&cmd, "SFB %d \"%s\" \"%s\"", bpid, file, func);
 	res = ClntSendCommand(set, cmd, NULL);
 	free(cmd);
 	return res;

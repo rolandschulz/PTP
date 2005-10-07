@@ -229,9 +229,7 @@ proxy_tcp_event_to_str(dbg_event *e, char **result)
 	
 	case DBGEV_BPHIT:
 	case DBGEV_BPSET:
-		proxy_tcp_breakpoint_to_str(e->bp, &str);
-		asprintf(result, "%d %s %s", e->event, pstr, str);
-		free(str);
+		asprintf(result, "%d %s %d", e->event, pstr, e->bpid);
 		break;
 
 	case DBGEV_SIGNAL:
@@ -486,13 +484,13 @@ proxy_tcp_str_to_event(char *str, dbg_event **ev)
 		
 	case DBGEV_BPHIT:
 		e = NewEvent(DBGEV_BPHIT);
-		if (proxy_tcp_str_to_breakpoint(&args[2], &e->bp) < 0)
+		if (proxy_tcp_str_to_int(args[2], &e->bpid) < 0)
 			goto error_out;
 		break;
 	
 	case DBGEV_BPSET:
 		e = NewEvent(DBGEV_BPSET);
-		if (proxy_tcp_str_to_breakpoint(&args[2], &e->bp) < 0)
+		if (proxy_tcp_str_to_int(args[2], &e->bpid) < 0)
 			goto error_out;
 		break;
 	
