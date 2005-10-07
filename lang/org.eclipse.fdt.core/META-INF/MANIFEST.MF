@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.eclipse.fdt.core; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-ClassPath: fdtcore.jar,
+ fdtparser.jar
+Bundle-Activator: org.eclipse.fdt.core.FortranCorePlugin
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
+Export-Package: org.eclipse.fdt.core,
+ org.eclipse.fdt.core.model,
+ org.eclipse.fdt.core.parser,
+ org.eclipse.fdt.internal.core,
+ org.eclipse.fdt.internal.core.model,
+ org.eclipse.fdt.internal.core.parser,
+ org.eclipse.fdt.internal.core.parser.token,
+ org.eclipse.fdt.internal.errorparsers
+Require-Bundle: org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.cdt.core
+Eclipse-AutoStart: true

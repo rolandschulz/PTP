@@ -1,26 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
-<plugin
-   id="org.eclipse.fdt.core"
-   name="%pluginName"
-   version="3.0.0"
-   provider-name="%providerName"
-   class="org.eclipse.fdt.core.FortranCorePlugin">
+<plugin>
 
-   <runtime>
-      <library name="fdtcore.jar">
-         <export name="*"/>
-      </library>
-      <library name="fdtparser.jar">
-         <export name="*"/>
-      </library>
-   </runtime>
-   <requires>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.cdt.core"/>
-   </requires>
-
+    
 <!-- =================================================================================== -->
 <!-- Extension Point: FortranFileType and FortranFileTypeAssociation                     -->
 <!--                  for translation unit ident                                         -->
