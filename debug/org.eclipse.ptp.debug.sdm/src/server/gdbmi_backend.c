@@ -694,7 +694,7 @@ GDBMIListStackframes(int current)
 		s = NewStackframe(f->level);
 
 		if ( f->addr != 0 )
-			asprintf(&s->loc.addr, "0x%p", f->addr);
+			asprintf(&s->loc.addr, "%p", f->addr);
 		if ( f->func != NULL )
 			s->loc.func = strdup(f->func);
 		if ( f->file != NULL )
