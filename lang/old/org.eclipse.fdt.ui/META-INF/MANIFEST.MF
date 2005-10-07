@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.eclipse.fdt.ui; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-ClassPath: fdtui.jar
+Bundle-Activator: org.eclipse.fdt.ui.FortranUIPlugin
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
+Export-Package: org.eclipse.fdt.internal.ui.editor,
+ org.eclipse.fdt.internal.ui.preferences,
+ org.eclipse.fdt.internal.ui.text,
+ org.eclipse.fdt.internal.ui.text.util,
+ org.eclipse.fdt.ui
+Require-Bundle: org.eclipse.ui.ide,
+ org.eclipse.ui.views,
+ org.eclipse.jface.text,
+ org.eclipse.ui.workbench.texteditor,
+ org.eclipse.ui.editors,
+ org.eclipse.ui,
+ org.eclipse.core.resources,
+ org.eclipse.cdt.core,
+ org.eclipse.fdt.core,
+ org.eclipse.cdt.ui,
+ org.eclipse.core.filebuffers,
+ org.eclipse.core.runtime
+Eclipse-AutoStart: true
