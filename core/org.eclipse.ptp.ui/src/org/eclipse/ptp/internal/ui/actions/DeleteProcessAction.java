@@ -34,7 +34,7 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
  *
  */
 public class DeleteProcessAction extends ParallelAction {
-	public static final String name = "Delete Element";
+	public static final String name = "Remove Elements";
 	
 	public DeleteProcessAction(AbstractParallelElementView view) {
 		super(name, view);
@@ -51,7 +51,7 @@ public class DeleteProcessAction extends ParallelAction {
 				if (setManager == null)
 					return;
 
-				if (UIUtils.showQuestionDialog("Delete Confirmation", "Are you sure you want to delete (" + elements.length + ") element from this set?"))	{			
+				if (UIUtils.showQuestionDialog("Remove Confirmation", "Are you sure you want to remove (" + elements.length + ") elements from this set?"))	{			
 					view.getUIManager().removeFromSet(elements, set.getID(), setManager);
 					view.selectSet(setManager.getSet(set.getID()));
 					view.updateTitle();
