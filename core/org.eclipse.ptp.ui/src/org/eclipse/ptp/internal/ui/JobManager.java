@@ -72,8 +72,10 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		return jobList.size();
 	}
 	public void clear() {
-		jobList.clear();
-		jobList = null;
+		if (jobList != null) {
+			jobList.clear();
+			jobList = null;
+		}
 	}
 	public IPJob[] getJobs() {
 		return modelManager.getUniverse().getSortedJobs();
