@@ -580,11 +580,6 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public synchronized void changeJobEvent(String cur_job_id, String pre_job_id) {
 		if (pre_job_id != null && !pre_job_id.equals(IManager.EMPTY_ID)) {
-			try {
-				uiDebugManager.removeAllRegisterElements(pre_job_id);
-			} catch (CoreException e) {
-				PTPDebugUIPlugin.log(e);
-			}
 			AnnotationGroup preAnnotationGroup = getAnnotationGroup(pre_job_id);
 			if (preAnnotationGroup != null) {
 				preAnnotationGroup.removeAllMarkers();
