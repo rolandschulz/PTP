@@ -61,9 +61,12 @@ static void *		EventCallbackData;
 static int			ServerExit;
 static int			Started;
 static struct bpmap	BPMap = { 0, 0, NULL };
+static int			(*AsyncFunc)(void *) = NULL;
+static void *		AsyncFuncData;
 
 static int	GDBMIBuildAIFVar(char *, char *, char *, AIF **);
 static int	SetAndCheckBreak(int, char *);
+static int	GetStackframes(int, List **);
 
 static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIProgress(void);
@@ -110,7 +113,12 @@ dbg_backend_funcs	GDBMIBackend =
 		return DBGRES_ERR; \
 	}
 	
-char *
+#define ERROR_TO_EVENT(e) \
+	e = NewEvent(DBGEV_ERROR); \
+	e->error_code = DbgGetError(); \
+	e->error_msg = strdup(DbgGetErrorStr())
+
+static char *
 GetLastErrorStr(void)
 {
 	if (mi_error == MI_FROM_GDB && mi_error_from_gdb != NULL)
@@ -118,13 +126,13 @@ GetLastErrorStr(void)
 	return (char *)mi_get_error_str();
 }
 
-void
+static void
 ResetError(void)
 {
 	mi_error=MI_OK;
 }
 
-void
+static void
 SaveEvent(dbg_event *e)
 {
 	if (LastEvent != NULL)
@@ -133,7 +141,7 @@ SaveEvent(dbg_event *e)
 	LastEvent = e;
 }
 
-void
+static void
 AddBPMap(int local, int remote)
 {
 	int				i;
@@ -170,7 +178,7 @@ AddBPMap(int local, int remote)
 	}
 }
 
-void
+static void
 RemoveBPMap(int remote)
 {
 	int				i;
@@ -187,7 +195,7 @@ RemoveBPMap(int remote)
 	}		
 }
 
-int
+static int
 LocalToRemoteBP(int local) 
 {
 	int				i;
@@ -203,7 +211,7 @@ LocalToRemoteBP(int local)
 	return -1;
 }
 
-int
+static int
 RemoteToLocalBP(int remote) 
 {
 	int				i;
@@ -222,7 +230,7 @@ RemoteToLocalBP(int remote)
 /*
  * Wait for terminated children
  */
-void
+static void
 Reap(int sig)
 {
 	int	status;
@@ -230,24 +238,13 @@ Reap(int sig)
 	wait(&status);
 }
 
-/*
-** AsyncCallback is called by mi_get_response() when an async response is
-** detected. It can't issue any gdb commands or there's a potential
-** for deadlock. If commands need to be issues (e.g. to obtain
-** current stack frame, they must be called from the main select
-** loop using the AsyncCheck() mechanism. 
-*/
-static void
-AsyncCallback(mi_output *mio, void *data)
+static int
+AsyncStop(void *data)
 {
-	mi_stop *	stop;
+	List *		frames;
 	dbg_event *	e;
-
-	stop = mi_get_stopped(mio->c);
-
-	if ( !stop )
-		return;
-
+	mi_stop *	stop = (	mi_stop *)data;
+	
 	switch ( stop->reason )
 	{
 	case sr_bkpt_hit:
@@ -256,7 +253,17 @@ AsyncCallback(mi_output *mio, void *data)
 		break;
 
 	case sr_end_stepping_range:
-		e = NewEvent(DBGEV_STEP);
+		if (GetStackframes(1, &frames) != DBGRES_OK) {
+			ERROR_TO_EVENT(e);
+		} else if (EmptyList(frames)) {
+			DbgSetError(DBGERR_DEBUGGER, "Could not get current stack frame");
+			ERROR_TO_EVENT(e);
+		} else {
+			SetList(frames);
+			e = NewEvent(DBGEV_STEP);
+			//e->frame = (stackframe *)GetListElement(frames);
+			DestroyList(frames, NULL);
+		}
 		break;
 
 	case sr_exited_signalled:
@@ -278,15 +285,39 @@ AsyncCallback(mi_output *mio, void *data)
 		break;
 
 	default:
-		break;
+		DbgSetError(DBGERR_DEBUGGER, "Unknown reason for stopping");
+		return DBGRES_ERR;
 	}
 
 	mi_free_stop(stop);
-	
+
 	if (EventCallback != NULL)
 		EventCallback(e, EventCallbackData);
 		
 	FreeEvent(e);
+	
+	return DBGRES_OK;
+}
+
+/*
+** AsyncCallback is called by mi_get_response() when an async response is
+** detected. It can't issue any gdb commands or there's a potential
+** for deadlock. If commands need to be issues (e.g. to obtain
+** current stack frame, they must be called from the main select
+** loop using the AsyncFunc() mechanism. 
+*/
+static void
+AsyncCallback(mi_output *mio, void *data)
+{
+	mi_stop *	stop;
+
+	stop = mi_get_stopped(mio->c);
+
+	if ( !stop )
+		return;
+
+	AsyncFunc = AsyncStop;
+	AsyncFuncData = (void *)stop;
 }
 
 
@@ -390,6 +421,8 @@ GDBMIStartSession(char *gdb_path, char *prog, char *args)
 /*
  * Progress gdb commands.
  * 
+ * TODO: Deal with errors
+ * 
  * @return	-1	server shutdown
  * 			0	completed operation
  */
@@ -453,10 +486,20 @@ GDBMIProgress(void)
 	}
 	
 	ResetError();
-	if ( mi_get_response(MIHandle) < 0 ) {
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-		mi_disconnect(MIHandle);
-		MIHandle = NULL;
+	while ( (res = mi_get_response(MIHandle)) <= 0 ) {
+		if ( res < 0 ) {
+			DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+			mi_disconnect(MIHandle);
+			MIHandle = NULL;
+		}
+	}
+	
+	/*
+	 * Do any extra async functions. We can call gdbmi safely here
+	 */
+	if (AsyncFunc != NULL) {
+		AsyncFunc(AsyncFuncData);
+		AsyncFunc = NULL;
 	}
 
 	return 0;
@@ -661,22 +704,13 @@ GDBMISetCurrentStackframe(int level)
 	return DBGRES_OK;
 }
 
-/*
-** List current or all stack frames.
-*/
 static int
-GDBMIListStackframes(int current)
+GetStackframes(int current, List **flist)
 {
-	dbg_event *	e;
-	List *		flist;
-	stackframe *	s;
-	mi_frames *	f;
 	mi_frames *	frames;
-	
-	CHECK_SESSION()
-
-	ResetError();
-
+	mi_frames *	f;
+	stackframe *	s;
+		
 	if (current)
 		frames = gmi_stack_info_frame(MIHandle);
 	else
@@ -684,12 +718,12 @@ GDBMIListStackframes(int current)
 		
 	if ( frames == NULL )
 	{
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		DbgSetError(DBGERR_DEBUGGER, "Failed to get stack frames from backend");
 		return DBGRES_ERR;
 	}
 	
-	flist = NewList();
-	
+	*flist = NewList();
+
 	for (f = frames; f != NULL; f = f->next) {
 		s = NewStackframe(f->level);
 
@@ -701,13 +735,32 @@ GDBMIListStackframes(int current)
 			s->loc.file = strdup(f->file);
 		s->loc.line = f->line;
 		
-		AddToList(flist, (void *)s);
+		AddToList(*flist, (void *)s);
 	}
 
 	mi_free_frames(frames);
 	
+	return DBGRES_OK;
+}
+
+/*
+** List current or all stack frames.
+*/
+static int
+GDBMIListStackframes(int current)
+{
+	dbg_event *	e;
+	List *		frames;
+	
+	CHECK_SESSION()
+
+	ResetError();
+
+	if (GetStackframes(current, &frames) != DBGRES_OK)
+		return DBGRES_ERR;
+	
 	e = NewEvent(DBGEV_FRAMES);
-	e->list = flist;	
+	e->list = frames;	
 	SaveEvent(e);
 	
 	return DBGRES_OK;
