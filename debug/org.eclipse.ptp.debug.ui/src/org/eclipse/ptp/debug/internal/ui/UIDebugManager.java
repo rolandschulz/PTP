@@ -133,10 +133,15 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		return isRunning(findJobById(job_id));
 	}
 	// change job
-	public void setCurrentJobId(String job_id) {
-		super.setCurrentJobId(job_id);
+	public void fireJobChangeEvent(String cur_jid, String pre_jid) {
 		updateBreakpointMarker(IElementHandler.SET_ROOT_ID);
-	}
+		try {
+			removeAllRegisterElements(pre_jid);
+		} catch (CoreException e) {
+			PTPDebugUIPlugin.log(e);
+		}
+		super.fireJobChangeEvent(cur_jid, pre_jid);
+	}	
 	public void addDebugEventListener(IDebugActionUpdateListener listener) {
 		if (!debugEventListeners.contains(listener))
 			debugEventListeners.add(listener);
@@ -308,7 +313,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 						String[] registerElementsID = elementHandler.getRegisteredElementsID();
 						for (int i = 0; i < registerElementsID.length; i++) {
 							if (curSet.contains(registerElementsID[i])) {
-								if (preSet != null && !preSet.contains(registerElementsID[i])) {
+								if (curSet.isRootSet() || (preSet != null && !preSet.contains(registerElementsID[i]))) {
 									int taskID = convertToInt(elementHandler.getSetRoot().get(registerElementsID[i]).getName());
 									registerProcess(session, taskID, false);
 								}
@@ -348,7 +353,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			session.getModelManager().delProcessSet(set.getID());
 		}
 	}
-	
 	public void createSetEvent(IElementSet set, IElement[] elements) {
 		BitList tasks = new BitList(set.getElementHandler().getSetRoot().size());
 		for (int i = 0; i < elements.length; i++) {
@@ -441,7 +445,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				fireSuspendEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof EndSteppingRangeEvent) {
 				EndSteppingRangeEvent endStepEvent = (EndSteppingRangeEvent) event;
-				ICDILineLocation lineLocation = ((EndSteppingRangeInfo)endStepEvent.getReason()).getLineLocation();
+				ICDILineLocation lineLocation = ((EndSteppingRangeInfo) endStepEvent.getReason()).getLineLocation();
 				if (lineLocation != null) {
 					int lineNumber = lineLocation.getLineNumber();
 					// FIXME: Hardcode the filename
@@ -489,9 +493,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		if (curTasks.size() < newTasks.size()) {
 			newTasks.or(curTasks);
 			return newTasks.copy();
-		} 
+		}
 		curTasks.or(newTasks);
-		return curTasks; 
+		return curTasks;
 	}
 	private void removeTasks(BitList curTasks, BitList newTasks) {
 		curTasks.andNot(newTasks);
@@ -551,8 +555,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			if (session == null)
 				throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
 			session.terminate(set_id);
-		} 
-		else {
+		} else {
 			super.terminateAll(job_id);
 		}
 	}
@@ -583,7 +586,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
 		session.stepFinish(set_id);
 	}
-	
 	public void removeJob(IPJob job) {
 		super.removeJob(job);
 		try {
