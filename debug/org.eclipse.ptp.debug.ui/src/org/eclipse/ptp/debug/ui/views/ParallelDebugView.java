@@ -259,7 +259,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	public void handleDebugActionEvent(IDebugActionEvent event) {
 		String job_id = event.getJobId();
 		// only take action with current job
-		if (!job_id.equals(getCurrentID()) && !((UIDebugManager) manager).isDebugMode(job_id)) {
+		if (!job_id.equals(getCurrentID()) || !((UIDebugManager) manager).isDebugMode(job_id)) {
 			return;
 		}
 		BitList tasks = (BitList) event.getSource();

@@ -278,6 +278,10 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		synchronized (tasks) {
 			addAnnotation(annotationGroup, textEditor, file, lineNumber, tasks, type);
 			putAnnotationGroup(job_id, annotationGroup);
+			//remove marker if it is not in current job
+			if (!uiDebugManager.getCurrentJobId().equals(job_id)) {
+				annotationGroup.removeAllMarkers();
+			}
 		}
 	}
 	public boolean containsCurrentSet(BitList aTasks) {
