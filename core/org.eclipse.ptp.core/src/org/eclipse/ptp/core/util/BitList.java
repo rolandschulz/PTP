@@ -266,6 +266,8 @@ public class BitList {
 					res += Integer.toHexString(this.bits[i] & 0xf);
 				}
 			}
+			if (!nonzero)
+				res = "0";
 		}
 		
 		return res;
