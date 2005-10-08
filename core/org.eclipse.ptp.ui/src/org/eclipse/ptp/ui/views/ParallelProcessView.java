@@ -18,24 +18,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IProcessEvent;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.debug.AbstractAttachDebugger;
-import org.eclipse.ptp.debug.CDTAttachDebuger;
 import org.eclipse.ptp.internal.core.ParallelModelAdapter;
-import org.eclipse.ptp.ui.old.UIUtils;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -63,7 +55,6 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 	private Label pidLabel = null;
 	private Label statusLabel = null;
 	private Label dynamicLabel = null;
-	private Button debugButton = null;
 	private Text outputText = null;
 	private FormToolkit toolkit = null;
 	private ScrolledForm myForm = null;
@@ -135,22 +126,15 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		Composite detailsContainer = createClientContainer(detailsSection, toolkit, 3, true, 2, 2);
 		rankLabel = toolkit.createLabel(detailsContainer, null);
 		rankLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		pidLabel = toolkit.createLabel(detailsContainer, null);
-		pidLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		nodeLabel = toolkit.createLabel(detailsContainer, null);
 		nodeLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		jobLabel = toolkit.createLabel(detailsContainer, null);
-		jobLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		totalLabel = toolkit.createLabel(detailsContainer, null);
 		totalLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		debugButton = toolkit.createButton(detailsContainer, "Debug", SWT.NONE);
-		debugButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		debugButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				doRun();
-			}
-		});
-		Composite statusContainer = createClientContainer(detailsContainer, toolkit, 2, true, 0, 0);
+		pidLabel = toolkit.createLabel(detailsContainer, null);
+		pidLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		jobLabel = toolkit.createLabel(detailsContainer, null);
+		jobLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		Composite statusContainer = createClientContainer(detailsContainer, toolkit, 3, true, 0, 0);
 		statusContainer.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 3));
 		statusLabel = toolkit.createLabel(statusContainer, null);
 		statusLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -202,7 +186,6 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 			statusLabel.setText("Status: N/A");
 			outputText.setText("N/A");
 		}
-		enableButton(process);
 	}
 	
 	public void processEvent(final IProcessEvent event) {
@@ -211,7 +194,6 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 				switch (event.getType()) {
 				case IProcessEvent.STATUS_CHANGE_TYPE:
 					statusLabel.setText("Status: " + event.getInput());
-					enableButton(getProcess());
 					break;
 				case IProcessEvent.STATUS_EXIT_TYPE:
 					dynamicLabel.setText(EXITCODE_TEXT + event.getInput());
@@ -225,10 +207,6 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 				}
 			}
 		});
-	}
-	public void enableButton(IPProcess process) {
-		boolean isEnable = !(process == null || process.isAllStop());
-		debugButton.setEnabled(isEnable);
 	}
 	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
 		GridLayout gridLayout = new GridLayout();
@@ -253,21 +231,6 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		gd.horizontalSpan = colSpan;
 		label.setLayoutData(gd);
 		label.setFont(comp.getFont());
-	}
-	protected void doRun() {
-		BusyIndicator.showWhile(getSite().getShell().getDisplay(), new Runnable() {
-			public void run() {
-				IPProcess process = getProcess();
-				AbstractAttachDebugger debugger = new CDTAttachDebuger(process.getPid(), process.getElementName());
-				try {
-					debugger.attachDebugger(PTPCorePlugin.getDefault().getModelManager().getPTPConfiguration());
-					debugButton.setEnabled(false);
-				} catch (CoreException e) {
-					String msg = e.getMessage() + "\n" + "Process not debuggable.";
-					UIUtils.showErrorDialog("Error Debugging Process", msg, null);
-				}
-			}
-		});
 	}
 	protected void updateStatusField(String category) {
 		if (category == null)
