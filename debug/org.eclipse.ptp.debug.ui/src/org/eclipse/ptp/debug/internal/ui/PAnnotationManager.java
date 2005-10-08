@@ -103,6 +103,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	public void removeAnnotationGroup(String job_id) {
 		if (!annotationMap.containsKey(job_id))
 			return;
+		
 		AnnotationGroup annotationGroup = (AnnotationGroup)annotationMap.remove(job_id);
 		if (annotationGroup != null) {
 			annotationGroup.removeAllMarkers();

@@ -112,11 +112,25 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		createEventListener(new_job_id);
 		return new_job_id;
 	}
-	public boolean isDebugging(String job_id) {
+	public boolean isDebugMode(String job_id) {
 		if (isNoJob(job_id))
 			return false;
-		IPJob job = findJobById(job_id);
-		return (job != null && !job.isAllStop() && job.isDebug());
+		return isDebugMode(findJobById(job_id));
+	}
+	public boolean isDebugMode(IPJob job) {
+		if (job == null)
+			return false;
+		return job.isDebug();
+	}
+	public boolean isRunning(IPJob job) {
+		if (job == null)
+			return false;
+		return (job != null && !job.isAllStop());
+	}
+	public boolean isRunning(String job_id) {
+		if (isNoJob(job_id))
+			return false;
+		return isRunning(findJobById(job_id));
 	}
 	// change job
 	public void setCurrentJobId(String job_id) {
@@ -531,10 +545,16 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		terminate(getCurrentJobId(), getCurrentSetId());
 	}
 	public void terminate(String job_id, String set_id) throws CoreException {
-		IPCDISession session = (IPCDISession) getDebugSession(job_id);
-		if (session == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		session.terminate(set_id);
+		IPJob job = findJobById(job_id);
+		if (isDebugMode(job)) {
+			IPCDISession session = (IPCDISession) getDebugSession(job);
+			if (session == null)
+				throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
+			session.terminate(set_id);
+		} 
+		else {
+			super.terminateAll(job_id);
+		}
 	}
 	public void stepInto() throws CoreException {
 		stepInto(getCurrentJobId(), getCurrentSetId());

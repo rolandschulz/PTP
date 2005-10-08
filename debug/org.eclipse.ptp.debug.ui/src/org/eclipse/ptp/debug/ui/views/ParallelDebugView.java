@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
@@ -174,12 +175,14 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	// Update button
 	protected void updateAction() {
 		super.updateAction();
-		boolean isDebugging = ((UIDebugManager) manager).isDebugging(getCurrentID());
-		registerAction.setEnabled(isDebugging);
-		unregisterAction.setEnabled(isDebugging);
-		suspendAction.setEnabled(isDebugging);
-		terminateAction.setEnabled(isDebugging);
-		if (isDebugging) {
+		IPJob job = ((UIDebugManager) manager).findJobById(getCurrentID());
+		boolean isDebugMode = ((UIDebugManager) manager).isDebugMode(job);
+		boolean isRunning = ((UIDebugManager) manager).isRunning(job);
+		registerAction.setEnabled(isRunning && isDebugMode);
+		unregisterAction.setEnabled(isRunning && isDebugMode);
+		suspendAction.setEnabled(isRunning && isDebugMode);
+		terminateAction.setEnabled(isRunning);
+		if (isRunning && isDebugMode) {
 			IElementHandler elementHandler = getCurrentElementHandler();
 			if (elementHandler != null) {
 				IElementSet set = getCurrentSet();
@@ -189,6 +192,8 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 				updateTerminateButton(terminatedTaskList, set, suspendedTaskList);
 			}
 		}
+		else
+			setEnableResumeButtonGroup(false);
 	}
 	public void updateSuspendResumeButton(BitList tasks, IElementSet set, BitList targetTasks) {
 		if (set == null || tasks == null)
@@ -254,7 +259,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	public void handleDebugActionEvent(IDebugActionEvent event) {
 		String job_id = event.getJobId();
 		// only take action with current job
-		if (!job_id.equals(getCurrentID())) {
+		if (!job_id.equals(getCurrentID()) && !((UIDebugManager) manager).isDebugMode(job_id)) {
 			return;
 		}
 		BitList tasks = (BitList) event.getSource();
