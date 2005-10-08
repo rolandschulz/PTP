@@ -59,8 +59,10 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 		return machineList.size();
 	}
 	public void clear() {
-		machineList.clear();
-		machineList = null;
+		if (machineList != null) {
+			machineList.clear();
+			machineList = null;
+		}
 	}
 	public IPMachine[] getMachines() {
 		return modelManager.getUniverse().getSortedMachines();
