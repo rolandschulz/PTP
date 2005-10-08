@@ -127,11 +127,8 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		machineCombo.select(0);
 		machineCombo.addSelectionListener(listener);
 
-		numberOfProcessField = new IntegerFieldEditor("numberOfProcess",
-				CoreMessages
-						.getResourceString("ParallelTab.Number_Of_Processes"),
-				parallelComp);
-		numberOfProcessField.setValidRange(0, 100000);
+		numberOfProcessField = new IntegerFieldEditor("numberOfProcess",CoreMessages.getResourceString("ParallelTab.Number_Of_Processes"), parallelComp);
+		numberOfProcessField.setValidRange(1, 100000);
 		numberOfProcessField.setPropertyChangeListener(listener);
 
 		// pRadio = new Button(parallelComp, SWT.RADIO);
