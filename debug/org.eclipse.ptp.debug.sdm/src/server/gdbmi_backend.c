@@ -261,7 +261,7 @@ AsyncStop(void *data)
 		} else {
 			SetList(frames);
 			e = NewEvent(DBGEV_STEP);
-			//e->frame = (stackframe *)GetListElement(frames);
+			e->frame = (stackframe *)GetListElement(frames);
 			DestroyList(frames, NULL);
 		}
 		break;

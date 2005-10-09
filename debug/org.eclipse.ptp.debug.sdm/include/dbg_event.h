@@ -23,6 +23,7 @@
 #include <aif.h>
 
 #include "breakpoint.h"
+#include "stackframe.h"
 #include "procset.h"
 #include "list.h"
 
@@ -87,6 +88,11 @@ struct dbg_event {
 	 */
 	int			error_code;
 	char *		error_msg;
+	
+	/*
+	 * DBGEV_STEP
+	 */
+	stackframe *	frame;
 };
 typedef struct dbg_event dbg_event;
 

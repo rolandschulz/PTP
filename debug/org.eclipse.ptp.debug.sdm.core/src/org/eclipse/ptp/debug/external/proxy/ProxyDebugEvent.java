@@ -59,8 +59,10 @@ public class ProxyDebugEvent {
 			break;
 			
 		case IProxyEvent.EVENT_DBG_STEP:
-			int stepTid = Integer.parseInt(args[2]);
-			evt = new ProxyDebugStepEvent(set, stepTid);
+			int stepLevel = Integer.parseInt(args[2]);
+			int stepLine = Integer.parseInt(args[6]);
+			ProxyDebugStackframe frame = new ProxyDebugStackframe(stepLevel, decodeString(args[3]), decodeString(args[4]), stepLine, decodeString(args[5]));
+			evt = new ProxyDebugStepEvent(set, frame);
 			break;
 			
 		case IProxyEvent.EVENT_DBG_FRAMES:

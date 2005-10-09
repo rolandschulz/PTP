@@ -24,18 +24,18 @@ import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.util.BitList;
 
 public class ProxyDebugStepEvent extends AbstractProxyEvent implements IProxyEvent {
-	private int		threadID;
+	private ProxyDebugStackframe		frame;
 	
-	public ProxyDebugStepEvent(BitList set, int tid) {
+	public ProxyDebugStepEvent(BitList set, ProxyDebugStackframe frame) {
 		super(EVENT_DBG_STEP, set);
-		this.threadID = tid;
+		this.frame = frame;
 	}
 	
-	public int getThreadID() {
-		return this.threadID;
+	public ProxyDebugStackframe getFrame() {
+		return this.frame;
 	}
 	
 	public String toString() {
-		return "EVENT_DBG_STEP " + this.getBitSet().toString() + " " + this.threadID;
+		return "EVENT_DBG_STEP " + this.getBitSet().toString() + " " + this.frame.toString();
 	}
 }
