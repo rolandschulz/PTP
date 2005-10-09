@@ -181,7 +181,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			JobRunConfiguration jrunconfig = getJobRunConfiguration(configuration);
 			if (mode.equals(ILaunchManager.DEBUG_MODE))
 				jrunconfig.setDebug();
-			// String[] args = verifyArgument(configuration);
+			String[] args = verifyArgument(configuration);
 			File workDirectory = vertifyWorkDirectory(configuration);
 			/* Assuming we have parsed the configuration */
 			IPath exePath = verifyProgramPath(configuration);
@@ -191,10 +191,15 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			}
 			
 			IPJob job = getLaunchManager().run(launch, workDirectory, null, jrunconfig, new SubProgressMonitor(monitor, 5));
+			job.setAttribute("app", exePath);
+			job.setAttribute("dir", workDirectory);
+			job.setAttribute("args", args);
+			
 			PLaunch pLaunch = (PLaunch) launch;
 			pLaunch.setPJob(job);
 			pLaunch.setProjectName(project.getElementName());
 			String[] commandLine = new String[] { "/bin/date" };
+			
 			try {
 				if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 					IPDebugConfiguration debugConfig = getDebugConfig(configuration);
