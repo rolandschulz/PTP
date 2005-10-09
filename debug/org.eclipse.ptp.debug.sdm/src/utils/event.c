@@ -39,12 +39,16 @@ FreeEvent(dbg_event *e) {
 	switch (e->event) {
 	case DBGEV_OK:
 	case DBGEV_EXIT:
-	case DBGEV_STEP:
 	case DBGEV_INIT:
 	case DBGEV_BPSET:
 	case DBGEV_BPHIT:
 		break;
 		
+	case DBGEV_STEP:
+		if (e->frame != NULL)
+			FreeStackframe(e->frame);
+		break;
+			
 	case DBGEV_FRAMES:
 		if (e->list != NULL)
 			DestroyList(e->list, FreeStackframe);

@@ -53,4 +53,17 @@ public class ProxyDebugStackframe {
 	public String getAddr() {
 		return this.addr;
 	}
+	
+	public String toString() {
+		String res = getLevel() + " file=\"" + getFile() + "\"";
+		
+		if (getFunc().compareTo("") != 0)
+			res += " func=" + getFunc();
+		if (getLine() != 0)
+			res += " line=" + getLine();
+		if (getAddr().compareTo("") != 0)
+			res += " addr=" + getAddr();	
+		
+		return res;
+	}
 }

@@ -245,7 +245,8 @@ proxy_tcp_event_to_str(dbg_event *e, char **result)
 		break;
 
 	case DBGEV_STEP:
-		asprintf(result, "%d %s %d", e->event, pstr, e->thread_id);
+		proxy_tcp_stackframe_to_str(e->frame, &str);
+		asprintf(result, "%d %s %s", e->event, pstr, str);
 		break;
 
 	case DBGEV_FRAMES:
@@ -375,26 +376,39 @@ proxy_tcp_str_to_breakpoint(char **args, breakpoint **bp)
 }
 
 static int
+proxy_tcp_str_to_stackframe(char **args, stackframe **frame)
+{
+	int			level;
+	stackframe *	sf;
+	
+	if (proxy_tcp_str_to_int(args[0], &level) < 0) {
+		return -1;
+	}
+	sf = NewStackframe(level);
+	if (proxy_tcp_str_to_location(&args[1], &sf->loc) < 0) {
+		FreeStackframe(sf);
+		return -1;			
+	}
+	
+	*frame = sf;
+	
+	return 0;
+}
+
+static int
 proxy_tcp_str_to_stackframes(char **args, List **lst)
 {
 	int			i;
 	int			pos;
-	int			level;
 	int			count = atoi(args[0]);
 	stackframe *	sf;
 
 	*lst = NewList();
 	
 	for (i = 0, pos = 1; i < count; i++, pos += 5) {
-		if (proxy_tcp_str_to_int(args[pos], &level) < 0) {
+		if (proxy_tcp_str_to_stackframe(&args[pos], &sf) < 0) {
 			DestroyList(*lst, FreeStackframe);
 			return -1;
-		}
-		sf = NewStackframe(level);
-		if (proxy_tcp_str_to_location(&args[pos+1], &sf->loc) < 0) {
-			FreeStackframe(sf);
-			DestroyList(*lst, FreeStackframe);
-			return -1;			
 		}
 		AddToList(*lst, (void *)sf);
 	}
@@ -510,7 +524,7 @@ proxy_tcp_str_to_event(char *str, dbg_event **ev)
 	
 	case DBGEV_STEP:
 		e = NewEvent(DBGEV_STEP);
-		if (proxy_tcp_str_to_int(args[2], &e->thread_id) < 0)
+		if (proxy_tcp_str_to_stackframe(&args[2], &e->frame) < 0)
 			goto error_out;
 		break;
 	
