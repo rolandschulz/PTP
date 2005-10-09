@@ -19,11 +19,10 @@
 
 package org.eclipse.ptp.debug.external.debugger;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.ListIterator;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
@@ -32,23 +31,26 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.ProxyErrorEvent;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.cdi.PCDIException;
-import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
+import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.proxy.ProxyDebugBreakpointEvent;
 import org.eclipse.ptp.debug.external.proxy.ProxyDebugClient;
 import org.eclipse.ptp.debug.external.proxy.ProxyDebugInitEvent;
+import org.eclipse.ptp.debug.external.proxy.ProxyDebugStepEvent;
 
 
 public class ParallelDebugger extends AbstractDebugger implements IProxyEventListener {
@@ -86,7 +88,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 	
 	private ProxyDebugClient	proxy;
 	private int				numServers;
-	private IProxyEvent		lastEvent;
+	private Queue			events = new Queue();
 	private ICDIBreakpoint	currBP;
 	private HashMap			bpMap = new HashMap();
 	private ArrayList		bpArray = new ArrayList();
@@ -105,32 +107,48 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 	/*
 	 * Wait until 'type' events have been received from all processes in 'procs'
 	 */
-	private synchronized void waitForEvents(int type, BitList procs) throws PCDIException {
+	private synchronized void waitForEvents(BitList procs) throws PCDIException {
 		BitList remain = procs.copy();
 		
 		try {
 			while (!remain.isEmpty()) {
 				wait();
 
-				if (this.lastEvent instanceof ProxyErrorEvent)
-					throw new PCDIException(((ProxyErrorEvent)this.lastEvent).getErrorMessage());
-				
-				if (this.lastEvent.getEventID() == type)
-					remain.andNot(this.lastEvent.getBitSet());
+				while (!this.events.isEmpty()) {
+					IProxyEvent e = (IProxyEvent)this.events.removeItem();
+					remain.andNot(e.getBitSet());
+				}
 			}
 		} catch (InterruptedException e) {
 		}
 	}
 
+	private String join(String[] strs, String delim) {
+		StringBuffer buf = new StringBuffer();
+		for (int i = 0; i < strs.length; i++) {
+			if (i > 0)
+				buf.append(delim);
+			buf.append(strs[i]);
+		}
+		return buf.toString();
+	}
+	
 	protected void startDebugger(IPJob job) {
 		proxy = new ProxyDebugClient("localhost", 12345);
 		proxy.addEventListener(this);
 		try {
 			proxy.sessionCreate();
+			waitForEvent();
+			
+			IPath app = (IPath) job.getAttribute("app");
+			//File dir = (File) job.getAttribute("dir");
+			String[] args = (String[]) job.getAttribute("args");
+			
+			proxy.debugStartSession(app.toString(), join(args, " "));
+			waitForEvent();
 		} catch (IOException e) {
 			return;
 		}
-		waitForEvent();
 	}
 	
 	protected void stopDebugger() {
@@ -197,7 +215,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 		
 		this.currBP = bpt;
 		
-		waitForEvents(IProxyEvent.EVENT_DBG_BPSET, procs.toBitList());
+		waitForEvents(procs.toBitList());
 	}
 
 	public void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIFunctionBreakpoint bpt) throws PCDIException {
@@ -209,7 +227,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 
 		this.currBP = bpt;
 		
-		waitForEvents(IProxyEvent.EVENT_DBG_BPSET, procs.toBitList());
+		waitForEvents(procs.toBitList());
 	}
 
 	private void deleteBreakpoint(BitList procs, int bpid)  throws PCDIException {
@@ -219,7 +237,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 			return;
 		}
 
-		waitForEvents(IProxyEvent.EVENT_OK, procs);
+		waitForEvents(procs);
 	}
 	
 	private void deleteBreakpoint(ICDIBreakpoint bp)  throws PCDIException {
@@ -252,7 +270,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 		} catch (IOException e) {
 		}
 		
-		waitForEvents(IProxyEvent.EVENT_OK, procs.toBitList());
+		waitForEvents(procs.toBitList());
 	}
 	
 	/**
@@ -296,12 +314,8 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 	}
 
 	public IPCDIEvent handleBreakpointHitEvent(BitList procs, String[] args) {
-		String file = args[0];
-		int line = Integer.parseInt(args[1]);
-		LineLocation loc = new LineLocation(file, line);
-		LineBreakpoint bpt = new LineBreakpoint(ICDIBreakpoint.REGULAR, loc, null);
-		IPCDIEvent ev = new BreakpointHitEvent(getSession(), new DebugProcessSet(session, procs), bpt);
-		return ev;
+		// Handled by direct call to super.fireEvent();
+		return null;
 	}
 
 	public IPCDIEvent handleEndSteppingEvent(BitList procs, String[] args) {
@@ -342,7 +356,10 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 			break;
 			
 		case IProxyEvent.EVENT_DBG_STEP:
-			handleDebugEvent(IDBGEV_ENDSTEPPING, e.getBitSet(), null);
+			ProxyDebugStepEvent stepEvent = (ProxyDebugStepEvent)e;
+			LineLocation loc = new LineLocation(stepEvent.getFrame().getFile(), stepEvent.getFrame().getLine());
+			IPCDIEvent ev = new EndSteppingRangeEvent(getSession(), new DebugProcessSet(session, e.getBitSet()), loc);
+			super.fireEvent(ev);
 			break;	
 			
 		case IProxyEvent.EVENT_DBG_BPSET:
@@ -352,7 +369,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 			break;
 		}
 		
-		this.lastEvent = e;
+		this.events.addItem(e);
 		notify();
 	}
 	
