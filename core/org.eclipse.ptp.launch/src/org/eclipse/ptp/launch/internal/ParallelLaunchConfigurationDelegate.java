@@ -191,8 +191,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			}
 			
 			IPJob job = getLaunchManager().run(launch, workDirectory, null, jrunconfig, new SubProgressMonitor(monitor, 5));
-			job.setAttribute("app", exePath);
-			job.setAttribute("dir", workDirectory);
+			job.setAttribute("app", exePath.lastSegment());
+			job.setAttribute("dir", workDirectory.getAbsolutePath());
 			job.setAttribute("args", args);
 			
 			PLaunch pLaunch = (PLaunch) launch;
