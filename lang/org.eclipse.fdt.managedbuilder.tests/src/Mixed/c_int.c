@@ -14,3 +14,8 @@ void c_int_(int* i)
 {
   *i = 3;
 }
+
+void c_int__(int* i)
+{
+  *i = 3;
+}
