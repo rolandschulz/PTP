@@ -17,28 +17,52 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.debug.external.proxy;
+package org.eclipse.ptp.core.util;
 
-import org.eclipse.ptp.core.proxy.event.IProxyEvent;
-import org.eclipse.ptp.core.proxy.event.AbstractProxyEvent;
-import org.eclipse.ptp.core.util.BitList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-public class ProxyDebugBreakpointEvent extends AbstractProxyEvent implements IProxyEvent {
-	private int				bpId;
-	
-	public ProxyDebugBreakpointEvent(BitList set, int type, int id) {
-		super(type, set);
-		this.bpId = id;
+public class Queue {
+	protected List list;
+
+	public Queue() {
+		list = Collections.synchronizedList(new LinkedList());
+	}
+
+	public Object removeItem() throws InterruptedException {
+		synchronized (list) {
+			while (list.isEmpty()) {
+				list.wait();
+			}
+
+			return list.remove(0);
+		}
+	}
+
+	public void addItem(Object item) {
+		synchronized (list) {
+			list.add(item);
+			list.notifyAll();
+		}
 	}
 	
-	public int getBreakpointId() {
-		return this.bpId;
+	public Object[] clearItems() {
+		Object[] array;
+		synchronized (list) {
+			array = list.toArray();
+			list.clear();
+		}
+		return array;
 	}
-	
-	public String toString() {
-		if (this.getEventID() == EVENT_DBG_BPHIT)
-			return "EVENT_DBG_BPHIT " + this.getBitSet().toString();
-		else
-			return "EVENT_DBG_BPSET " + this.getBitSet().toString();
+
+	public boolean isEmpty() {
+		boolean empty;
+		synchronized (list) {
+			empty = list.isEmpty();
+		}
+		return empty;
 	}
 }
+	
+

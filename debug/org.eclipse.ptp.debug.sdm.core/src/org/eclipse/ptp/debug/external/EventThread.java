@@ -30,7 +30,7 @@
 package org.eclipse.ptp.debug.external;
 
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.core.utils.Queue;
+import org.eclipse.ptp.core.util.Queue;
 
 /**
  * Event Thread blocks on the event Queue, wakes up
