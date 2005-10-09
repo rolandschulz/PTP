@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.fdt.managedbuilder.ui; singleton:=true
 Bundle-Version: 1.0.0
-Bundle-ClassPath: fortranmgdbuildui.jar
+Bundle-ClassPath: fdtmngbuildui.jar
 Bundle-Activator: org.eclipse.fdt.managedbuilder.internal.ui.ManagedBuilderUIPlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
