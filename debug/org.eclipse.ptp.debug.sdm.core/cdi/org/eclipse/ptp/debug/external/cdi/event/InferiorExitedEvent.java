@@ -42,8 +42,6 @@ public class InferiorExitedEvent extends AbstractEvent implements IPCDIExitedEve
 	}
 	
 	public ICDISessionObject getReason() {
-		// Auto-generated method stub
-		System.out.println("ExitedEvent.getReason()");
 		return null;
 	}
 

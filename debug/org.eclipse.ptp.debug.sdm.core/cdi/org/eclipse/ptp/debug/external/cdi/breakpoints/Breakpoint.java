@@ -32,6 +32,7 @@ import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 
 public class Breakpoint implements ICDIBreakpoint {
 	ICDICondition condition;
@@ -65,16 +66,15 @@ public class Breakpoint implements ICDIBreakpoint {
 	}
 
 	public void setCondition(ICDICondition newCondition) throws CDIException {
-		System.out.println("Breakpoint.setCondition()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void setEnabled(boolean on) throws CDIException {
-		System.out.println("Breakpoint.setEnabled()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public ICDITarget getTarget() {
-		// In the PTP Model, Breakpoint is not associated with Target
-		System.out.println("Breakpoint.getTarget()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 }

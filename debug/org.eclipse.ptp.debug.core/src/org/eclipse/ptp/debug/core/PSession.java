@@ -38,8 +38,7 @@ public class PSession implements IPSession, IBreakpointsListener {
 	}
 
 	public void breakpointsAdded(IBreakpoint[] breakpoints) {
-		// Auto-generated method stub
-		System.out.println("PSession.breakpointsAdded()");
+		PTPDebugCorePlugin.getDefault().getLogger().finer("");
 		for ( int i = 0; i < breakpoints.length; ++i ) {
 			if ( breakpoints[i] instanceof IPBreakpoint ) {
 				setBreakpoint((IPBreakpoint) breakpoints[i]);
@@ -48,13 +47,11 @@ public class PSession implements IPSession, IBreakpointsListener {
 	}
 
 	public void breakpointsRemoved(IBreakpoint[] breakpoints, IMarkerDelta[] deltas) {
-		// Auto-generated method stub
-		System.out.println("PSession.breakpointsRemoved()");
+		PTPDebugCorePlugin.getDefault().getLogger().finer("");
 	}
 
 	public void breakpointsChanged(IBreakpoint[] breakpoints, IMarkerDelta[] deltas) {
-		// Auto-generated method stub
-		System.out.println("PSession.breakpointsChanged()");
+		PTPDebugCorePlugin.getDefault().getLogger().finer("");
 	}
 	
 	private void initializeBreakpoints() {

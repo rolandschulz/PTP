@@ -1278,12 +1278,12 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	 * @see org.eclipse.cdt.debug.core.model.ICDebugTarget#hasSignals()
 	 */
 	public boolean hasSignals() throws DebugException {
-		System.out.println("PDebugTarget.hasSignals()");
+		PTPDebugCorePlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public IAddress getBreakpointAddress( ICLineBreakpoint breakpoint ) throws DebugException {
-		System.out.println("PDebugTarget.getBreakpointAddress()");
+		PTPDebugCorePlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 

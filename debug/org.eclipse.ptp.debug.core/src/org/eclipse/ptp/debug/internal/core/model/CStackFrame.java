@@ -67,6 +67,7 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
 
 /**
@@ -211,7 +212,7 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 	 * @see org.eclipse.debug.core.model.IStackFrame#getLineNumber()
 	 */
 	public int getLineNumber() throws DebugException {
-		System.out.println("CStackFrame.getLineNumber()");
+		PTPDebugCorePlugin.getDefault().getLogger().finer("");
 		if ( isSuspended() ) {
 			ISourceLocator locator = ((PDebugTarget)getDebugTarget()).getSourceLocator();
 			if ( locator != null && locator instanceof IAdaptable && ((IAdaptable)locator).getAdapter( ICSourceLocator.class ) != null )
@@ -902,20 +903,17 @@ public class CStackFrame extends PDebugElement implements ICStackFrame, IRestart
 	}
 
 	public IRegisterGroup[] getRegisterGroups() throws DebugException {
-		// Auto-generated method stub
-		System.out.println("CStackFrame.getRegisterGroups");
+		PTPDebugCorePlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public boolean hasRegisterGroups() throws DebugException {
-		// Auto-generated method stub
-		System.out.println("CStackFrame.hasRegisterGroups");
+		PTPDebugCorePlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public IValue evaluateExpression(String expressionText) throws DebugException {
-		// Auto-generated method stub
-		System.out.println("CStackFrame.evaluateExpression");
+		PTPDebugCorePlugin.getDefault().getLogger().finer("");
 		if ( !isDisposed() ) {
 			CExpression expression = getExpression( expressionText );
 			if ( expression != null ) {

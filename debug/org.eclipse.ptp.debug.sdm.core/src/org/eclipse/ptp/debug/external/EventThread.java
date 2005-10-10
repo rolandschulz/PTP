@@ -64,6 +64,5 @@ public class EventThread extends Thread {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("EventThread exits");
 	}
 }

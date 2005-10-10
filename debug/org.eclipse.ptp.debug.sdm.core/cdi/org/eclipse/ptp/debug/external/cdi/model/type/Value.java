@@ -33,6 +33,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
 import org.eclipse.ptp.debug.external.IDebugger;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.PTPObject;
@@ -51,20 +52,17 @@ public class Value extends PTPObject implements ICDIValue {
 	}
 
 	public String getTypeName() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Value.getTypeName()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return variable.getTypeName();
 	}
 
 	public ICDIType getType() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Value.getType()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return variable.getType();
 	}
 
 	public String getValueString() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Value.getValueString()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 
 		Target target = (Target) variable.getTarget();
 		Session session = (Session) target.getSession();
@@ -74,20 +72,17 @@ public class Value extends PTPObject implements ICDIValue {
 	}
 
 	public int getChildrenNumber() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Value.getChildrenNumber()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return 0;
 	}
 
 	public boolean hasChildren() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Value.hasChildren()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public ICDIVariable[] getVariables() throws CDIException {
-		// Auto-generated method stub
-		System.out.println("Value.getVariables()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 }

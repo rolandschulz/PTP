@@ -39,6 +39,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIAddressBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.AddressBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.FunctionBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
@@ -63,7 +64,7 @@ public class BreakpointManager extends Manager {
 	}
 	
 	protected void update(Target target) throws CDIException {
-		System.out.println("BreakpointManager.update()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 	
 	public LineLocation createLineLocation(String file, int line) {
