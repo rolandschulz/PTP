@@ -56,6 +56,7 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.IDebugger;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetUnregisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
@@ -289,7 +290,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	}
 
 	public void terminate() throws CDIException {
-		System.out.println("Session.terminate()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		debugger.deleteDebuggerObserver(eventManager);
 	}
 
@@ -304,26 +305,26 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	/* Breakpoint Management */
 	
 	public ICDIWatchpoint setWatchpoint(int type, int watchType, String expression, ICDICondition condition) throws CDIException {
-		System.out.println("Session.setWatchpoint()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDIExceptionpoint setExceptionBreakpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch) throws CDIException {
-		System.out.println("Session.setExceptionBreakpoint()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public ICDIBreakpoint[] getBreakpoints() throws CDIException {
-		System.out.println("Session.getBreakpoints()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public void deleteBreakpoints(ICDIBreakpoint[] breakpoints) throws CDIException {
-		System.out.println("Session.deleteBreakpoints()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 
 	public void deleteAllBreakpoints() throws CDIException {
-		System.out.println("Session.deleteAllBreakpoints()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 	
 	public ICDILineBreakpoint setLineBreakpoint(int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException {
@@ -380,8 +381,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	}
 
 	public void stepOver(String setName, int count) {
-		// Auto-generated method stub
-		System.out.println("Session.stepOver()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
 		try {
 			debugger.stepOver(set, count);
@@ -395,8 +395,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	}
 
 	public void stepInto(String setName, int count) {
-		// Auto-generated method stub
-		System.out.println("Session.stepInto()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
 		try {
 			debugger.stepInto(set, count);
@@ -406,8 +405,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	}
 
 	public void stepFinish(String setName) {
-		// Auto-generated method stub
-		System.out.println("Session.stepFinish()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
 		try {
 			debugger.stepFinish(set, 0);
@@ -417,8 +415,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	}
 	
 	public void resume(String setName) {
-		// Auto-generated method stub
-		System.out.println("Session.resume()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
 		try {
 			debugger.go(set);
@@ -428,8 +425,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	}
 	
 	public void suspend(String setName) {
-		// Auto-generated method stub
-		System.out.println("Session.suspend()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
 		try {
 			debugger.halt(set);
@@ -439,8 +435,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	}
 
 	public void terminate(String setName) {
-		// Auto-generated method stub
-		System.out.println("Session.terminate()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
 		try {
 			debugger.kill(set);

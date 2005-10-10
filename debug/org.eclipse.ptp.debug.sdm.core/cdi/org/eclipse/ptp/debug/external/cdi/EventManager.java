@@ -158,7 +158,6 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 				bpMgr.update(null);
 			}
 		} catch (CDIException e) {
-			//System.out.println(e);
 		}
 		return true;
 	}

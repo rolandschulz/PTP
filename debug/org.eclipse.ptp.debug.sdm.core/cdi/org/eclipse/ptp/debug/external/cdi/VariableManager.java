@@ -38,6 +38,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariableDescriptor;
 import org.eclipse.ptp.debug.external.IDebugger;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
@@ -60,9 +61,7 @@ public class VariableManager extends Manager {
 	}
 
 	protected void update(Target target) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("VariableManager.update()");
-	}
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");	}
 	
 	public GlobalVariableDescriptor getGlobalVariableDescriptor(Target target, String filename, String function, String name) throws CDIException {
 		if (filename == null) {
@@ -139,7 +138,7 @@ public class VariableManager extends Manager {
 	}
 	
 	public LocalVariable createLocalVariable(LocalVariableDescriptor varDesc) throws CDIException {
-		System.out.println("VariableManager.createLocalVariable()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		StackFrame frame = (StackFrame) varDesc.getStackFrame();
 		Target target = (Target)frame.getTarget();
 		Session session = (Session) target.getSession();
@@ -154,7 +153,7 @@ public class VariableManager extends Manager {
 	}
 	
 	public GlobalVariable createGlobalVariable(GlobalVariableDescriptor varDesc) throws CDIException {
-		System.out.println("VariableManager.createGlobalVariable()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		StackFrame frame = (StackFrame) varDesc.getStackFrame();
 		Target target = (Target)frame.getTarget();
 		Session session = (Session) target.getSession();
@@ -169,7 +168,7 @@ public class VariableManager extends Manager {
 	}
 
 	public Argument createArgument(ArgumentDescriptor argDesc) throws CDIException {
-		System.out.println("VariableManager.createArgument()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		StackFrame frame = (StackFrame) argDesc.getStackFrame();
 		Target target = (Target)frame.getTarget();
 		Session session = (Session) target.getSession();

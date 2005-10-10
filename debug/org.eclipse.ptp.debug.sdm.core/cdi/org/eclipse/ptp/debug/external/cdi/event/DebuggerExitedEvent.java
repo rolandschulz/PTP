@@ -32,6 +32,7 @@ import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 
 /**
  */
@@ -42,8 +43,7 @@ public class DebuggerExitedEvent extends AbstractEvent implements IPCDIExitedEve
 	}
 	
 	public ICDISessionObject getReason() {
-		// Auto-generated method stub
-		System.out.println("ExitedEvent.getReason()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 

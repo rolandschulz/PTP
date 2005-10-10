@@ -37,6 +37,7 @@ import org.eclipse.ptp.debug.core.cdi.IPCDIModelManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSetNamed;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSetNamed;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
@@ -54,9 +55,7 @@ public class ModelManager extends Manager implements IPCDIModelManager {
 	}
 
 	protected void update(Target target) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("ModelManager.update()");
-	}
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");	}
 	
 	public IPCDIDebugProcess getProcess(int proc) {
 		IPCDIDebugProcess p = (IPCDIDebugProcess) processListCache.get(new Integer(proc));

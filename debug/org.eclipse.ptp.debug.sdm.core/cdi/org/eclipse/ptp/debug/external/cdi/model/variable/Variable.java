@@ -33,6 +33,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIIntType;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
@@ -54,15 +55,15 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 	}
 	
 	public void setValue(ICDIValue value) throws CDIException {
-		System.out.println("Variable.setValue()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 	
 	public void setValue(String expression) throws CDIException {
-		System.out.println("Variable.setValue()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 	
 	public ICDIValue getValue() throws CDIException {
-		System.out.println("Variable.getValue()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (value == null) {
 			ICDIType t = getType();
 			if (t instanceof ICDIIntType) {
@@ -75,16 +76,16 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 	}
 	
 	public boolean isEditable() throws CDIException {
-		System.out.println("Variable.isEditable()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 	
 	public void setFormat(int format) throws CDIException {
-		System.out.println("Variable.setFormat()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 	
 	public boolean equals(ICDIVariable var) {
-		System.out.println("Variable.equals()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (var instanceof Variable) {
 			Variable variable = (Variable) var;
 			return fName.equals(variable.fName);
@@ -93,6 +94,6 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 	}
 
 	public void dispose() throws CDIException {
-		System.out.println("Variable.dispose()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 }

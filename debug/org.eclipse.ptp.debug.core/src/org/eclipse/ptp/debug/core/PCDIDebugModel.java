@@ -134,7 +134,7 @@ public class PCDIDebugModel {
 	}
 
 	protected static void stopInMain( PDebugTarget target ) throws DebugException {
-		System.out.println("PCDIDebugModel.stopInMain()");
+		PTPDebugCorePlugin.getDefault().getLogger().finer("");
 		ICDILocation location = target.getCDITarget().createFunctionLocation( "", "main" ); //$NON-NLS-1$ //$NON-NLS-2$
 		try {
 			target.setInternalTemporaryBreakpoint( location );

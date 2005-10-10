@@ -15,6 +15,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.model.type.IntType;
@@ -81,7 +82,7 @@ public class Expression extends PTPObject implements ICDIExpression {
 	 * @see org.eclipse.cdt.debug.core.cdi.model.ICDIExpression#dispose()
 	 */
 	public void dispose() throws CDIException {
-		System.out.println("Expression.dispose()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		Session session = (Session)getTarget().getSession();
 		ExpressionManager mgr = session.getExpressionManager();
 		mgr.destroyExpressions((Target)getTarget(), new Expression[] {this});

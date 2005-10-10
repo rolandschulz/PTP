@@ -11,6 +11,7 @@
 package org.eclipse.ptp.debug.external.cdi;
 
 import org.eclipse.cdt.debug.core.cdi.ICDIErrorInfo;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.event.ErrorEvent;
 
 /**
@@ -25,14 +26,12 @@ public class ErrorInfo extends SessionObject implements ICDIErrorInfo  {
 	}
 
 	public String getMessage() {
-		// Auto-generated method stub
-		System.out.println("ErrorInfo.getMessage()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 
 	public String getDetailMessage() {
-		// Auto-generated method stub
-		System.out.println("ErrorInfo.getDetailMessage()");
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
 

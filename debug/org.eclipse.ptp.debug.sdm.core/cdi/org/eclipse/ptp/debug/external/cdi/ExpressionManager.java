@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
+import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.model.Expression;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
@@ -37,10 +38,7 @@ public class ExpressionManager extends Manager {
 	}
 
 	protected void update(Target target) throws CDIException {
-		// Auto-generated method stub
-		System.out.println("ExpressionManager.update");
-		
-	}
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");	}
 	
 	synchronized List getExpressionList(Target target) {
 		List expList = (List)expMap.get(target);
