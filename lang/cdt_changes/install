@@ -50,6 +50,14 @@ cp -vp org.eclipse.cdt.core/schema/AdditionalLanguages.exsd ../org.eclipse.cdt.c
 cp -vp org.eclipse.cdt.debug.core/src/org/eclipse/cdt/debug/internal/core/sourcelookup/InternalSourceLookupMessages.properties  ../org.eclipse.cdt.debug.core/src/org/eclipse/cdt/debug/internal/core/sourcelookup/InternalSourceLookupMessages.properties
 
 
+# org.eclipse.cdt.debug.mi.core
+
+cp -vp org.eclipse.cdt.debug.mi.core/mi/org/eclipse/cdt/debug/mi/core/output/MIArg.java  ../org.eclipse.cdt.debug.mi.core/mi/org/eclipse/cdt/debug/mi/core/output/MIArg.java
+cp -vp org.eclipse.cdt.debug.mi.core/mi/org/eclipse/cdt/debug/mi/core/output/MIParser.java  ../org.eclipse.cdt.debug.mi.core/mi/org/eclipse/cdt/debug/mi/core/output/MIParser.java
+cp -vp org.eclipse.cdt.debug.mi.core/mi/org/eclipse/cdt/debug/mi/core/output/MIStackListLocalsInfo.java  ../org.eclipse.cdt.debug.mi.core/mi/org/eclipse/cdt/debug/mi/core/output/MIStackListLocalsInfo.java
+cp -vp org.eclipse.cdt.debug.mi.core/mi/org/eclipse/cdt/debug/mi/core/output/MITuple.java  ../org.eclipse.cdt.debug.mi.core/mi/org/eclipse/cdt/debug/mi/core/output/MITuple.java
+
+
 # org.eclipse.cdt.launch
 
 cp -vp org.eclipse.cdt.launch/src/org/eclipse/cdt/launch/internal/ui/LaunchMessages.properties ../org.eclipse.cdt.launch/src/org/eclipse/cdt/launch/internal/ui/LaunchMessages.properties
