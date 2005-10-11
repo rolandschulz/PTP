@@ -1019,7 +1019,7 @@ public abstract class AbstractIconCanvas extends Canvas {
 				}
 			}
 		}
-		if (movingSelectionStart != null) {
+		if (movingSelectionStart != null && movingSelectionEnd != null) {
 			drawSelection(newGC);
 		}
 		if (DOUBLE_BUFFER) {
