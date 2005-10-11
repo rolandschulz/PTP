@@ -31,4 +31,9 @@ public interface IPDebugPreferenceConstants {
 	public static final String PREF_PTP_DEBUGGER = IPTPDebugUIConstants.PLUGIN_ID + ".pDebug.debuggers";
 	public static final String PREF_PTP_DEBUG_COMM_TIMEOUT = IPTPDebugUIConstants.PLUGIN_ID + ".pDebug.timeout";
 	public static final String PREF_PTP_DEBUG_EVENT_TIME = IPTPDebugUIConstants.PLUGIN_ID + ".pDebug.eventTime";
+
+	public static final String PREF_PTP_DEBUG_REGISTER_PROC_0 = IPTPDebugUIConstants.PLUGIN_ID + ".pDebug.regPro0";
+	
+	public static final int DEFAULT_DEBUG_TIMEOUT = 1000;
+	public static final int DEFAULT_DEBUG_EVENTTIME = 1000;
 }

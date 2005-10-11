@@ -51,6 +51,7 @@ public abstract class AbstractDebugPerferencePage extends PreferencePage impleme
 	
 	public AbstractDebugPerferencePage() {
 		super();
+		setPreferenceStore(PTPDebugUIPlugin.getDefault().getPreferenceStore());
 	}
 	
 	public void init(IWorkbench workbench) {
