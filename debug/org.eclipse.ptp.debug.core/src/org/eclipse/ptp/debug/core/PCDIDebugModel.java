@@ -56,6 +56,7 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
@@ -107,16 +108,15 @@ public class PCDIDebugModel {
 		final IDebugTarget[] target = new IDebugTarget[1];
 		IWorkspaceRunnable r = new IWorkspaceRunnable() {
 			public void run( IProgressMonitor m ) throws CoreException {
-				boolean stop = launch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
 				target[0] = new PDebugTarget( launch, project, cdiTarget, name, debuggeeProcess, file, allowTerminate, allowDisconnect );
 				
 				dTargets.put(name, target[0]);
 				dProcesses.put(name, debuggeeProcess);
 				
 				ICDITargetConfiguration config = cdiTarget.getConfiguration();
-				if ( config.supportsBreakpoints() && stop ) {
+				if ( config.supportsBreakpoints() && stopInMain ) {
 					// FIXME DONNY
-					//stopInMain( (PDebugTarget)target[0] );
+					stopInMain( (PDebugTarget)target[0] );
 				}
 				if ( config.supportsResume() && resumeTarget ) {
 					target[0].resume();
@@ -135,7 +135,8 @@ public class PCDIDebugModel {
 
 	protected static void stopInMain( PDebugTarget target ) throws DebugException {
 		PTPDebugCorePlugin.getDefault().getLogger().finer("");
-		ICDILocation location = target.getCDITarget().createFunctionLocation( "", "main" ); //$NON-NLS-1$ //$NON-NLS-2$
+		ICDILocation location = ((IPCDISession) target.getCDISession()).createFunctionLocation( "", "main" ); //$NON-NLS-1$ //$NON-NLS-2$
+		//ICDILocation location = target.getCDITarget().createFunctionLocation( "", "main" ); //$NON-NLS-1$ //$NON-NLS-2$
 		try {
 			target.setInternalTemporaryBreakpoint( location );
 		}
