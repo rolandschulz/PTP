@@ -23,7 +23,6 @@ import java.util.List;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -53,7 +52,7 @@ public class ElementIconCanvas extends AbstractIconCanvas {
 	}
 	public void setElementSet(IElementSet e_set) {
 		this.cur_element_set = e_set;
-		BusyIndicator.showWhile(getDisplay(), new Runnable() {
+		getDisplay().syncExec(new Runnable() {
 			public void run() {
 				setTotal(cur_element_set == null ? 0 : cur_element_set.size());
 			}

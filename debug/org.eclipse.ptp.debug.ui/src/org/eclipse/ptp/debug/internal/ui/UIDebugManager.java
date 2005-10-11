@@ -100,10 +100,18 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		annotationMgr.shutdown();
 		super.shutdown();
 	}
+	private void defaultRegister(IElementHandler elementHandler) {
+		IElement element = elementHandler.getSetRoot().get(0);
+		if (element != null) {
+			elementHandler.addRegisterElement(element.getID());
+			element.setRegistered(true);
+		}
+	}
 	public String initial() {
 		String new_job_id = super.initial();
 		IElementHandler elementHandler = getElementHandler(new_job_id);
 		if (elementHandler != null) {
+			defaultRegister(elementHandler);
 			if ((BitList) elementHandler.getData(TERMINATED_PROC_KEY) == null)
 				elementHandler.setData(TERMINATED_PROC_KEY, new BitList(elementHandler.getSetRoot().size()));
 			if ((BitList) elementHandler.getData(SUSPENDED_PROC_KEY) == null)
@@ -279,7 +287,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	public void removeAllRegisterElements(final String job_id) throws CoreException {
 		final IElementHandler elementHandler = getElementHandler(job_id);
 		if (elementHandler == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "Update register/unregister error", null));
+			return;
+		
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				new Job("Removing registered processes") {
@@ -302,7 +311,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	public void updateRegisterUnRegisterElements(final IElementSet curSet, final IElementSet preSet, final String job_id) throws CoreException {
 		final IElementHandler elementHandler = getElementHandler(job_id);
 		if (elementHandler == null)
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "Update register/unregister error", null));
+			return;
+		
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				new Job("Updating registered/unregistered processes") {
