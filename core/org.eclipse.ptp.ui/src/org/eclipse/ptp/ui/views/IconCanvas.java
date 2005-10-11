@@ -18,11 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
-import java.io.File;
-import java.net.URL;
 import java.util.BitSet;
 import java.util.Hashtable;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.accessibility.Accessible;
@@ -37,7 +34,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -52,7 +48,7 @@ import org.eclipse.swt.widgets.Shell;
  * @author Clement chu
  * 
  */
-public class IconCanvas extends Canvas {
+public abstract class IconCanvas extends Canvas {
 	public final static int SE = 1;
 	public final static int SW = 2;
 	public final static int NW = 3;
@@ -86,18 +82,21 @@ public class IconCanvas extends Canvas {
 	protected Point movingSelectionStart = null;
 	protected Point movingSelectionEnd = null;
 	protected int actualScrollStart_y = 0;
-	protected int autoScrollDirection = SWT.NULL; // the direction of autoscrolling (up, down, right, left)
+	protected int autoScrollDirection = SWT.NULL;
 	protected int verticalScrollOffset = 0;
-	protected BitSet input = null;//FIXME
 	protected Cursor defaultCursor = null;
 	protected Color background = null;
 	protected Color foreground = null;
+	//input
+	protected int total_elements = 0;
 	final static boolean IS_CARBON, IS_GTK, IS_MOTIF;
+	final static boolean DOUBLE_BUFFER;
 	static {
 		String platform = SWT.getPlatform();
 		IS_CARBON = "carbon".equals(platform);
 		IS_GTK = "gtk".equals(platform);
 		IS_MOTIF = "motif".equals(platform);
+		DOUBLE_BUFFER = !IS_CARBON;
 	}
 
 	public IconCanvas(Composite parent, int style) {
@@ -111,18 +110,19 @@ public class IconCanvas extends Canvas {
 		initializeAccessible();
 		sel_color = display.getSystemColor(SWT.COLOR_BLUE);
 	}
-	public void setInput(BitSet input) {
+	public void setTotal(int total) {
 		checkWidget();
-		if (input == null) {
+		if (total <= 0) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
-		this.input = input;
+		this.total_elements = total;
 		resetInfo();
 		calculateVerticalScrollBar();
 	}
-	public BitSet getInput() {
-		return input;
+	public int getTotalElements() {
+		return total_elements;
 	}
+	
 	public void setSelectionSize(int size) {
 		this.sel_size = size;
 	}
@@ -155,9 +155,6 @@ public class IconCanvas extends Canvas {
 		foreground = color;
 		super.setForeground(getForeground());
 		redraw();
-	}
-	public int getTotalElements() {
-		return input == null ? 0 : input.cardinality();
 	}
 	protected int getElementHeight() {
 		return (e_spacing_y + e_height);
@@ -342,7 +339,7 @@ public class IconCanvas extends Canvas {
 		case ST.SELECT_COLUMN_NEXT:
 			System.out.println("++++ select element next");
 			doNext(true);
-			break;			
+			break;
 		case ST.SELECT_LINE_START:
 			System.out.println("++++ select element start");
 			doLineStart(true);
@@ -502,8 +499,7 @@ public class IconCanvas extends Canvas {
 		} else {
 			if (movingSelectionStart == null) {
 				movingSelectionStart = new Point(selection.x, selection.y);
-			}
-			else {
+			} else {
 				doMouseSelection(movingSelectionStart.x, movingSelectionStart.y, x_loc, y_loc, false);
 			}
 			endAutoScroll();
@@ -542,35 +538,33 @@ public class IconCanvas extends Canvas {
 		}
 	}
 	protected void doSelectionPageUp(int distance) {
-		int index = selection==null?-1:findSelectedIndexByLocation(selection.x, (actualScrollStart_y-verticalScrollOffset), false);
+		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > 0) {
 			int max_col = getMaxCol();
-			int max_row = getMaxClientRow()-1;
+			int max_row = getMaxClientRow() - 1;
 			int total_in_page = max_col * max_row;
 			int start_index = Math.max(0, (index - total_in_page));
-			
 			actualScrollStart_y -= max_row * getElementHeight();
-			if (actualScrollStart_y-verticalScrollOffset < 0) {
+			if (actualScrollStart_y - verticalScrollOffset < 0) {
 				doPageUp(max_row);
 			}
-			selection.y = Math.max(0, actualScrollStart_y-verticalScrollOffset);
+			selection.y = Math.max(0, actualScrollStart_y - verticalScrollOffset);
 			selectElements(start_index, index);
 			redraw(start_index, index);
 		}
 	}
 	protected void doSelectionPageDown(int distance) {
-		int index = selection==null?-1:findSelectedIndexByLocation(selection.x, (actualScrollStart_y-verticalScrollOffset), false);
+		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > -1) {
 			int max_col = getMaxCol();
-			int max_row = getMaxClientRow()-1;
+			int max_row = getMaxClientRow() - 1;
 			int total_in_page = max_col * max_row;
 			int end_index = Math.min(getTotalElements(), (index + total_in_page));
-			
 			actualScrollStart_y += max_row * getElementHeight();
-			if (actualScrollStart_y-verticalScrollOffset > (max_row+1) * getElementHeight()) {
+			if (actualScrollStart_y - verticalScrollOffset > (max_row + 1) * getElementHeight()) {
 				doPageDown(max_row);
 			}
-			selection.y = Math.max(0, actualScrollStart_y-verticalScrollOffset);
+			selection.y = Math.max(0, actualScrollStart_y - verticalScrollOffset);
 			selectElements(index, end_index);
 			redraw(index, end_index);
 		}
@@ -589,10 +583,8 @@ public class IconCanvas extends Canvas {
 			doMouseSelection(movingSelectionStart.x, movingSelectionStart.y, x_loc, y_loc, true);
 		}
 	}
-	//TODO
-	protected void doDelete() {
-		
-	}
+	// TODO
+	protected void doDelete() {}
 	protected void doPageUp(int rows) {
 		if (current_top_row >= 0 && verticalScrollOffset > 0) {
 			int scrollRows = Math.max(1, Math.min(current_top_row, rows));
@@ -620,7 +612,7 @@ public class IconCanvas extends Canvas {
 		}
 	}
 	protected void doUp(boolean isSelect) {
-		int index = selection==null?-1:findSelectedIndexByLocation(selection.x, (actualScrollStart_y-verticalScrollOffset), false);
+		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > 0) {
 			int max_col = getMaxCol();
 			if ((index - max_col) > -1) {
@@ -628,122 +620,110 @@ public class IconCanvas extends Canvas {
 				if (selection.y < getVerticalIncrement()) {
 					doPageUp(1);
 				}
-				selection.y = actualScrollStart_y-verticalScrollOffset;
+				selection.y = actualScrollStart_y - verticalScrollOffset;
 				if (!isSelect)
 					clearSelection(index);
-				
-				if (!isSelected(index-max_col))
-					selectElement(index-max_col);
+				if (!isSelected(index - max_col))
+					selectElement(index - max_col);
 				else
 					clearSelection(index);
-				
 				redraw(index, index - max_col);
 			}
 		}
 	}
 	protected void doDown(boolean isSelect) {
-		int index = selection==null?-1:findSelectedIndexByLocation(selection.x, (actualScrollStart_y-verticalScrollOffset), false);
+		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > -1) {
 			int max_col = getMaxCol();
 			if ((index + max_col) < getTotalElements()) {
 				actualScrollStart_y += getElementHeight();
-				if (selection.y + getVerticalIncrement() > getMaxClientRow()*getElementHeight()) {
+				if (selection.y + getVerticalIncrement() > getMaxClientRow() * getElementHeight()) {
 					doPageDown(1);
 				}
-				selection.y = actualScrollStart_y-verticalScrollOffset;
+				selection.y = actualScrollStart_y - verticalScrollOffset;
 				if (!isSelect)
 					clearSelection(index);
-				
-				if (!isSelected(index+max_col))
-					selectElement(index+max_col);
+				if (!isSelected(index + max_col))
+					selectElement(index + max_col);
 				else
 					clearSelection(index);
-
 				redraw(index, index + max_col);
 			}
 		}
 	}
 	protected void doPrevious(boolean isSelect) {
-		int index = selection==null?-1:findSelectedIndexByLocation(selection.x, (actualScrollStart_y-verticalScrollOffset), false);
+		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > 0) {
 			selection.x -= getElementWidth();
 			if (selection.x < e_offset_x) {
 				actualScrollStart_y -= getElementHeight();
-				if (actualScrollStart_y-verticalScrollOffset < getVerticalIncrement()) {
+				if (actualScrollStart_y - verticalScrollOffset < getVerticalIncrement()) {
 					doPageUp(1);
 				}
-				selection.x = getMaxCol() * getElementWidth(); 
-				selection.y = actualScrollStart_y-verticalScrollOffset;
+				selection.x = getMaxCol() * getElementWidth();
+				selection.y = actualScrollStart_y - verticalScrollOffset;
 			}
 			if (!isSelect)
 				clearSelection(index);
-			
-			if (!isSelected(index-1))
-				selectElement(index-1);
+			if (!isSelected(index - 1))
+				selectElement(index - 1);
 			else
 				clearSelection(index);
-
-			redraw(index-1, index);
+			redraw(index - 1, index);
 		}
 	}
 	protected void doNext(boolean isSelect) {
-		int index = selection==null?-1:findSelectedIndexByLocation(selection.x, (actualScrollStart_y-verticalScrollOffset), false);
+		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > -1 && index < getTotalElements() - 1) {
 			selection.x += getElementWidth();
 			if (selection.x > (getMaxCol() * getElementWidth())) {
 				actualScrollStart_y += getElementHeight();
-				if (selection.y + getVerticalIncrement() > getMaxClientRow()*getElementHeight()) {
+				if (selection.y + getVerticalIncrement() > getMaxClientRow() * getElementHeight()) {
 					doPageDown(1);
 				}
 				selection.x = getElementWidth();
-				selection.y = actualScrollStart_y-verticalScrollOffset;
+				selection.y = actualScrollStart_y - verticalScrollOffset;
 			}
 			if (!isSelect)
 				clearSelection(index);
-			
-			if (!isSelected(index+1))
-				selectElement(index+1);
+			if (!isSelected(index + 1))
+				selectElement(index + 1);
 			else
 				clearSelection(index);
-
-			redraw(index, index+1);
+			redraw(index, index + 1);
 		}
 	}
 	protected void doLineStart(boolean isSelect) {
-		int index = selection==null?-1:findSelectedIndexByLocation(selection.x, (actualScrollStart_y-verticalScrollOffset), false);
+		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > -1) {
-			int start_index = findSelectedIndexByLocation(getElementWidth(), (actualScrollStart_y-verticalScrollOffset), false);
+			int start_index = findSelectedIndexByLocation(getElementWidth(), (actualScrollStart_y - verticalScrollOffset), false);
 			if (start_index > -1) {
 				selection.x = getElementWidth();
 				if (!isSelect) {
 					selectedElements.clear(index);
 					selectElement(start_index);
-				}
-				else
+				} else
 					selectElements(start_index, index);
 				redraw(start_index, index);
 			}
 		}
 	}
 	protected void doLineEnd(boolean isSelect) {
-		int index = selection==null?-1:findSelectedIndexByLocation(selection.x, (actualScrollStart_y-verticalScrollOffset), false);
+		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > -1) {
 			if (!isSelect)
 				selectedElements.clear(index);
-
 			int total = getTotalElements() - 1;
 			if (index > total - getMaxCol()) {
 				int end_counter = total - index;
 				selection.x = (end_counter + 1) * getElementWidth();
-				
 				if (!isSelect)
-					selectElement(index+end_counter);
+					selectElement(index + end_counter);
 				else
-					selectElements(index, index+end_counter);
-				redraw(index, index+end_counter);
-			}
-			else {
-				int end_index = findSelectedIndexByLocation(getMaxClientRow() * getElementWidth(), (actualScrollStart_y-verticalScrollOffset), false);
+					selectElements(index, index + end_counter);
+				redraw(index, index + end_counter);
+			} else {
+				int end_index = findSelectedIndexByLocation(getMaxClientRow() * getElementWidth(), (actualScrollStart_y - verticalScrollOffset), false);
 				if (end_index > -1) {
 					selection.x = getMaxClientRow() * getElementWidth();
 					if (!isSelect)
@@ -751,8 +731,7 @@ public class IconCanvas extends Canvas {
 					else
 						selectElements(index, end_index);
 					redraw(index, end_index);
-				}
-				else {
+				} else {
 					redraw(index, index);
 				}
 			}
@@ -798,6 +777,7 @@ public class IconCanvas extends Canvas {
 			}
 		}
 	}
+	// FIXME it is not enough accurate to find out the location
 	protected int getSelectedCol(int x_loc, boolean isApproximate) {
 		int col = Math.min(x_loc / getElementWidth(), getMaxCol() - 1);
 		if (isApproximate)
@@ -835,11 +815,11 @@ public class IconCanvas extends Canvas {
 	}
 	protected Point findSection(int index) {
 		int max_col = getMaxCol();
-		int col = (int)Math.floor(index % max_col);
-		int row = (int)Math.floor(index / max_col);
+		int col = (int) Math.floor(index % max_col);
+		int row = (int) Math.floor(index / max_col);
 		return new Point(col, row);
 	}
-	protected Point findLocation(int index) {		
+	protected Point findLocation(int index) {
 		Point section = findSection(index);
 		int x_loc = (section.x * getElementWidth() + e_offset_x);
 		int y_loc = (section.y * getElementHeight() + e_offset_y) - verticalScrollOffset;
@@ -906,7 +886,6 @@ public class IconCanvas extends Canvas {
 		int col_end = Math.min(getSelectedCol(e_x - e_offset_x, true) + 1, getMaxCol());
 		int row_start = getSelectedRow(s_y, true);
 		int row_end = Math.min(getSelectedRow(e_y - e_offset_y, true) + 1, getMaxRow());
-
 		tempSelectedElements.clear();
 		tempSelectedElements.or(selectElements(col_start, col_end, row_start, row_end));
 		if (movingSelectionEnd != null) {
@@ -979,47 +958,40 @@ public class IconCanvas extends Canvas {
 	}
 	protected void redraw(int start_index, int end_index) {
 		int max_col = getMaxCol();
-		int start_row = (int)Math.floor(start_index / max_col);
+		int start_row = (int) Math.floor(start_index / max_col);
 		int start_y_loc = (start_row * getElementHeight() + e_offset_y) - verticalScrollOffset;
-		int end_row = (int)Math.floor(end_index / max_col);
+		int end_row = (int) Math.floor(end_index / max_col);
 		int end_y_loc = (end_row * getElementHeight() + e_offset_y) - verticalScrollOffset;
-		
-		int diff = Math.abs(end_row - start_row)+1;
+		int diff = Math.abs(end_row - start_row) + 1;
 		redraw(0, Math.min(start_y_loc, end_y_loc), (max_col * getElementWidth() + e_offset_x), diff * getElementHeight(), false);
 	}
 	protected void selectElement(Point start_pt, Point end_pt) {
-		int start_index = start_pt==null?-1:findSelectedIndexByLocation(start_pt.x, start_pt.y, false);
-		int end_index = end_pt==null?-1:findSelectedIndexByLocation(end_pt.x, end_pt.y, false);
-
+		int start_index = start_pt == null ? -1 : findSelectedIndexByLocation(start_pt.x, start_pt.y, false);
+		int end_index = end_pt == null ? -1 : findSelectedIndexByLocation(end_pt.x, end_pt.y, false);
 		int start_count = start_index + 1;
 		int end_count = end_index;
 		if (start_index > end_index) {
 			if (end_index == -1)
 				return;
-			
 			start_count = end_index;
 			end_count = start_index - 1;
-		}
-		else if (start_index < end_index) {
+		} else if (start_index < end_index) {
 			if (start_index == -1) {
 				start_count = end_count;
 			}
-		}
-		else {
+		} else {
 			if (start_index > -1)
 				selectElement(start_index);
 			return;
 		}
-		
-		for (int index=start_count; index<end_count+1; index++) {
+		for (int index = start_count; index < end_count + 1; index++) {
 			selectElement(index);
 		}
 	}
 	protected void selectElement(int index) {
 		if (isSelected(index)) {
 			selectedElements.clear(index);
-		}
-		else {
+		} else {
 			selectedElements.set(index);
 		}
 	}
@@ -1033,31 +1005,24 @@ public class IconCanvas extends Canvas {
 		selectElements(from_index, to_index, false);
 	}
 	protected void selectElements(int from_index, int to_index, boolean checkStatus) {
-		for (int index=from_index; index<to_index+1; index++) {
+		for (int index = from_index; index < to_index + 1; index++) {
 			if (checkStatus)
 				selectElement(index);
 			else
 				selectedElements.set(index);
 		}
 	}
-//FIXME
-	private Image image = null;
 
-	private Image getImage() {
-		if (image == null) {
-			try {
-				URL url = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_user_excl.gif").toURL();
-				image = ImageDescriptor.createFromURL(url).createImage();
-			} catch (Exception e) {
-				System.out.println("+++++ err: " + e.getMessage());
-			}
-		}
-		return image;
-	}
 	protected void performPaint(GC gc, int col_start, int col_end, int row_start, int row_end, int render_x, int render_y, int renderWidth, int renderHeight) {
-		Image imageBuffer = new Image(getDisplay(), renderWidth, renderHeight);
-		GC newGC = new GC(imageBuffer, SWT.LEFT_TO_RIGHT);
-		newGC.setBackground(getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+		Image imageBuffer = null;
+		GC newGC = null;
+		if (DOUBLE_BUFFER) {
+			imageBuffer = new Image(getDisplay(), renderWidth, renderHeight);
+			newGC = new GC(imageBuffer, SWT.LEFT_TO_RIGHT);
+			newGC.setBackground(getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+		} else {
+			newGC = gc;
+		}
 		int total = getTotalElements();
 		for (int row_count = row_start; row_count < row_end; row_count++) {
 			for (int col_count = col_start; col_count < col_end; col_count++) {
@@ -1065,21 +1030,26 @@ public class IconCanvas extends Canvas {
 				if (index < total) {
 					int x_loc = e_offset_x + ((col_count) * getElementWidth());
 					int y_loc = e_offset_y + ((row_count) * getElementHeight()) - verticalScrollOffset;
-					if (selectedElements.get(index) || tempSelectedElements.get(index)) {
-						newGC.fillRectangle(x_loc, y_loc, e_width, e_height);
-					} else {
-						newGC.drawImage(getImage(), x_loc, y_loc);
-					}
+					drawImage(newGC, index, x_loc, y_loc, (selectedElements.get(index) || tempSelectedElements.get(index)));
 				}
 			}
 		}
 		if (movingSelectionStart != null && movingSelectionEnd != null) {
 			drawSelection(newGC);
 		}
-		gc.drawImage(imageBuffer, render_x, render_y);
-		newGC.dispose();
-		imageBuffer.dispose();
+		if (DOUBLE_BUFFER) {
+			gc.drawImage(imageBuffer, render_x, render_y);
+			newGC.dispose();
+			imageBuffer.dispose();
+		}
 		clearMargin(gc, getBackground());
+	}
+	protected void drawImage(GC gc, int index, int x_loc, int y_loc, boolean isSelected) {
+		Image statusImage = getStatusIcon(index);
+		if (statusImage != null) {
+			gc.drawImage(statusImage, x_loc, y_loc);
+			drawRectangle(index, gc, x_loc, y_loc, e_width, e_height);
+		}
 	}
 	private void drawSelection(GC gc) {
 		gc.setForeground(sel_color);
@@ -1197,7 +1167,7 @@ public class IconCanvas extends Canvas {
 	protected GC getGC(int style) {
 		return new GC(this, style);
 	}
-	public void setCursor (Cursor cursor) {
+	public void setCursor(Cursor cursor) {
 		if (cursor == null) {
 			super.setCursor(defaultCursor);
 		} else {
@@ -1210,8 +1180,7 @@ public class IconCanvas extends Canvas {
 			Display display = getDisplay();
 			setCursor(new Cursor(display, SWT.CURSOR_HAND));
 			showToolTip(index, event.x, event.y, display);
-		}
-		else {
+		} else {
 			setCursor(null);
 			hideToolTip();
 		}
@@ -1225,16 +1194,16 @@ public class IconCanvas extends Canvas {
 		movingSelectionEnd = null;
 		max_e_row = -1;
 		max_e_col = -1;
-		setCursor(null);		
+		setCursor(null);
 	}
 	protected void handleDispose(Event event) {
 		removeListener(SWT.Dispose, listener);
 		event.type = SWT.None;
 		resetInfo();
 		keyActionMap = null;
-		input = null;
 		defaultCursor.dispose();
 		defaultCursor = null;
+		total_elements = 0;
 	}
 	protected void handleKeyDown(Event event) {
 		if (event.doit == true) {
@@ -1258,17 +1227,14 @@ public class IconCanvas extends Canvas {
 		}
 		if (isShift || isCtrl) {
 			selectedElements.or(tempSelectedElements);
-		}
-		else {
+		} else {
 			selectedElements.clear();
 			tempSelectedElements.clear();
 			selection = null;
 		}
-
 		int start_x = Math.min(getMaxCol() * getElementWidth(), Math.max(0 + sel_size, event.x));
 		int start_y = Math.min(getClientArea().height, Math.max(0 + sel_size, event.y));
-
-		selectElement(isShift?(selection!=null?new Point(selection.x, actualScrollStart_y-verticalScrollOffset):null):null, new Point(start_x, start_y));
+		selectElement(isShift ? (selection != null ? new Point(selection.x, actualScrollStart_y - verticalScrollOffset) : null) : null, new Point(start_x, start_y));
 		selection = new Point(start_x, start_y);
 		actualScrollStart_y = selection.y + verticalScrollOffset;
 		redraw();
@@ -1277,7 +1243,7 @@ public class IconCanvas extends Canvas {
 		if (movingSelectionStart != null) {
 			redraw();
 		}
-		resetInfo();		
+		resetInfo();
 		endAutoScroll();
 	}
 	protected void handleMouseDoubleClick(Event event) {
@@ -1292,7 +1258,6 @@ public class IconCanvas extends Canvas {
 	protected void handleMouseMove(Event event) {
 		if (autoScrollDirection == SWT.NULL)
 			doMouseMoving(event);
-		
 		if (!mouseDown || mouseDoubleClick)
 			return;
 		if ((event.stateMask & SWT.BUTTON1) == 0) {
@@ -1319,8 +1284,7 @@ public class IconCanvas extends Canvas {
 			if (movingSelectionStart != null)
 				start_pt = getStartedPoint(movingSelectionStart.x, movingSelectionStart.y);
 			else
-				start_pt = getStartedPoint(event.x+event.width, event.y+event.height);
-			
+				start_pt = getStartedPoint(event.x + event.width, event.y + event.height);
 			Point end_pt = getFinishedPoint(event.x, event.y);
 			int s_x = start_pt.x;
 			int e_x = end_pt.x;
@@ -1352,11 +1316,11 @@ public class IconCanvas extends Canvas {
 			row_start = Math.max(0, getCurrentTopRow());
 			row_end = Math.min(row_end + row_start + 1, getMaxRow());
 		}
-		//System.out.println("performPaint: " + col_start + "," + col_end + " - " + row_start + "," + row_end);
+		// System.out.println("performPaint: " + col_start + "," + col_end + " - " + row_start + "," + row_end);
 		performPaint(event.gc, col_start, col_end, row_start, row_end, 0, 0, renderWidth, renderHeight);
 	}
 	protected void handleResize(Event event) {
-		int index = selection==null?-1:findSelectedIndexByLocation(selection.x, (actualScrollStart_y-verticalScrollOffset), false);
+		int index = selection == null ? -1 : findSelectedIndexByLocation(selection.x, (actualScrollStart_y - verticalScrollOffset), false);
 		if (index > -1) {
 			selectedElements.clear(index);
 			selection = null;
@@ -1369,7 +1333,6 @@ public class IconCanvas extends Canvas {
 	protected void handleFocusOut(Event event) {
 		hideToolTip();
 	}
-	
 	protected void showToolTip(int index, int mx, int my, Display display) {
 		if (index == -1) {
 			hideToolTip();
@@ -1393,15 +1356,13 @@ public class IconCanvas extends Canvas {
 		Point location = findLocation(index);
 		Point t_size = toolTipShell.getSize();
 		Rectangle clientArea = getClientArea();
-		
-		final int gap_x = 5;		
+		final int gap_x = 5;
 		int display_x = location.x + getElementWidth() + gap_x;
 		int display_y = location.y + getElementHeight();
-		
 		if (display_x + t_size.x > clientArea.width - e_offset_x) {
 			display_x = location.x - t_size.x - gap_x;
 		}
-		if (display_y  > clientArea.height - e_offset_y) {
+		if (display_y > clientArea.height - e_offset_y) {
 			display_y = location.y - t_size.y;
 		}
 		toolTipShell.setLocation(getViewActualLocation(this, null, display_x, display_y));
@@ -1415,9 +1376,6 @@ public class IconCanvas extends Canvas {
 			toolTipShell = null;
 		}
 	}
-	protected String getToolTipText(int index) {
-		return " Seleced index: "+ index; 
-	}
 	protected Point getViewActualLocation(Control from, Control to, int mx, int my) {
 		Point mappedpt = getDisplay().map(from, to, 0, 0);
 		Point newpt = new Point(mx, my);
@@ -1425,23 +1383,9 @@ public class IconCanvas extends Canvas {
 		newpt.y += mappedpt.y;
 		return newpt;
 	}
-	/*******************************************************************************************************************************************************************************************************************************************************************************************************
-	 * testing only
-	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	public static void main(String[] args) {
-		final Display display = new Display();
-		final Shell shell = new Shell(display);
-		shell.setLayout(new FillLayout());
-		shell.setSize(400, 400);
-		shell.setLocation(0, 0);
-		IconCanvas test = new IconCanvas(shell, SWT.NONE);
-		BitSet testInput = new BitSet();
-		testInput.set(0, 100000);
-		test.setInput(testInput);
-		shell.open();
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch())
-				display.sleep();
-		}
-	}
+	
+	//abstract function
+	protected abstract String getToolTipText(int index);
+	protected abstract Image getStatusIcon(int index);
+	protected abstract void drawRectangle(int index, GC gc, int x_loc, int y_loc, int width, int height);
 }
