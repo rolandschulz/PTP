@@ -65,6 +65,7 @@ public class PDebuggerPage extends AbstractDebugPerferencePage {
 		createCommunicationSetting(composite);
 		createSpacer(composite, 1);
 		createEventSetting(composite);
+		defaultSetting();
 		setValues();
 		return composite;
 	}
@@ -98,23 +99,31 @@ public class PDebuggerPage extends AbstractDebugPerferencePage {
 		}
 		return -1;
 	}
-
+	
+	protected void defaultSetting() {
+		IPreferenceStore store = getPreferenceStore();
+		store.setDefault(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, IPDebugPreferenceConstants.DEFAULT_DEBUG_TIMEOUT);
+		store.setDefault(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME, IPDebugPreferenceConstants.DEFAULT_DEBUG_EVENTTIME);
+	}
+	public void performDefaults() { 
+		IPreferenceStore store = getPreferenceStore();
+		timeoutField.setStringValue(""+store.getDefaultInt(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT));
+		eventTimeField.setStringValue(""+store.getDefaultInt(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME));
+		super.performDefaults();
+	}
+	
 	protected void setValues() {
 		IPreferenceStore store = getPreferenceStore();
 		simulatorCombo.select(getSelectedDebugger(store.getString(IPDebugPreferenceConstants.PREF_PTP_DEBUGGER)));
-		timeoutField.setStringValue(store.getString(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT));
-		eventTimeField.setStringValue(store.getString(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME));
+		timeoutField.setStringValue(""+store.getInt(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT));
+		eventTimeField.setStringValue(""+store.getInt(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME));
 	}	
-	
-	public static void initDefaults(IPreferenceStore store) {
-		store.setDefault(IPDebugPreferenceConstants.PREF_SHOW_FULL_PATHS, false);
-	}
-	
+		
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
 		store.setValue(IPDebugPreferenceConstants.PREF_PTP_DEBUGGER, simulatorCombo.getText());
-		store.setValue(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, timeoutField.getStringValue());
-		store.setValue(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME, eventTimeField.getStringValue());
+		store.setValue(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, timeoutField.getIntValue());
+		store.setValue(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME, eventTimeField.getIntValue());
 	}
 	
     public void propertyChange(PropertyChangeEvent event) {

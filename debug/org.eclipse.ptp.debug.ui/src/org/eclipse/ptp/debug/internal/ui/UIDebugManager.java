@@ -59,6 +59,7 @@ import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetUnregisteredEvent;
+import org.eclipse.ptp.debug.internal.ui.preferences.IPDebugPreferenceConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.events.IDebugActionEvent;
 import org.eclipse.ptp.debug.ui.events.ResumedDebugEvent;
@@ -101,10 +102,13 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		super.shutdown();
 	}
 	private void defaultRegister(IElementHandler elementHandler) {
-		IElement element = elementHandler.getSetRoot().get(0);
-		if (element != null) {
-			elementHandler.addRegisterElement(element.getID());
-			element.setRegistered(true);
+		//register process 0 if the preference is checked
+		if (PTPDebugUIPlugin.getDefault().getPreferenceStore().getBoolean(IPDebugPreferenceConstants.PREF_PTP_DEBUG_REGISTER_PROC_0)) {
+			IElement element = elementHandler.getSetRoot().get(0);
+			if (element != null) {
+				elementHandler.addRegisterElement(element.getID());
+				element.setRegistered(true);
+			}
 		}
 	}
 	public String initial() {
