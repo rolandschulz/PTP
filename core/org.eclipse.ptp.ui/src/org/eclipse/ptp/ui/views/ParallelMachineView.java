@@ -37,7 +37,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -67,15 +66,6 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	public static final String MACHINE_VIEW = "1";
 	public static final String INFO_VIEW = "2";
 	protected String current_view = BOTH_VIEW;
-	public static Image[][] nodeImages = { { ParallelImages.getImage(ParallelImages.IMG_NODE_USER_ALLOC_EXCL), ParallelImages.getImage(ParallelImages.IMG_NODE_USER_ALLOC_EXCL_SEL) },
-			{ ParallelImages.getImage(ParallelImages.IMG_NODE_USER_ALLOC_SHARED), ParallelImages.getImage(ParallelImages.IMG_NODE_USER_ALLOC_SHARED_SEL) }, { ParallelImages.getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_EXCL), ParallelImages.getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_EXCL_SEL) },
-			{ ParallelImages.getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_SHARED), ParallelImages.getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_SHARED_SEL) }, { ParallelImages.getImage(ParallelImages.IMG_NODE_DOWN), ParallelImages.getImage(ParallelImages.IMG_NODE_DOWN_SEL) },
-			{ ParallelImages.getImage(ParallelImages.IMG_NODE_ERROR), ParallelImages.getImage(ParallelImages.IMG_NODE_ERROR_SEL) }, { ParallelImages.getImage(ParallelImages.IMG_NODE_EXITED), ParallelImages.getImage(ParallelImages.IMG_NODE_EXITED_SEL) },
-			{ ParallelImages.getImage(ParallelImages.IMG_NODE_RUNNING), ParallelImages.getImage(ParallelImages.IMG_NODE_RUNNING_SEL) }, { ParallelImages.getImage(ParallelImages.IMG_NODE_UNKNOWN), ParallelImages.getImage(ParallelImages.IMG_NODE_UNKNOWN_SEL) },
-			{ ParallelImages.getImage(ParallelImages.IMG_NODE_UP), ParallelImages.getImage(ParallelImages.IMG_NODE_UP_SEL) } };
-	public static Image[][] procImages = { { ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR), ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR_SEL) }, { ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED), ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SEL) },
-			{ ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL), ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL_SEL) }, { ParallelImages.getImage(ParallelImages.IMG_PROC_RUNNING), ParallelImages.getImage(ParallelImages.IMG_PROC_RUNNING_SEL) },
-			{ ParallelImages.getImage(ParallelImages.IMG_PROC_STARTING), ParallelImages.getImage(ParallelImages.IMG_PROC_STARTING_SEL) }, { ParallelImages.getImage(ParallelImages.IMG_PROC_STOPPED), ParallelImages.getImage(ParallelImages.IMG_PROC_STOPPED_SEL) } };
 
 	public ParallelMachineView() {
 		instance = this;
@@ -97,13 +87,8 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			sashForm.setWeights(new int[] { 3, 1 });
 		}
 	}
-	protected void initElementAttribute() {
-		e_offset_x = 5;
-		e_spacing_x = 4;
-		e_offset_y = 5;
-		e_spacing_y = 4;
-		e_width = 16;
-		e_height = 16;
+	public Image getImage(int index1, int index2) {
+		return ParallelImages.nodeImages[index1][index2];
 	}
 	protected void initialElement() {
 		selectMachine(manager.initial());
@@ -188,18 +173,14 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		super.buildInToolBarActions(toolBarMgr);
 	}
 	protected void setActionEnable() {}
-	protected void doubleClickAction(int element_num) {
-		if (cur_element_set !=  null) {
-			IElement element = cur_element_set.get(element_num);
-			if (element != null) {
-				boolean isElementRegistered = element.isRegistered();
-				unregister();
-				if (!isElementRegistered) {
-					register(element);
-					getCurrentElementHandler().addRegisterElement(element.getID());
-				}
-			}
+	public void doubleClick(IElement element) {
+		boolean isElementRegistered = element.isRegistered();
+		unregister();
+		if (!isElementRegistered) {
+			register(element);
+			getCurrentElementHandler().addRegisterElement(element.getID());
 		}
+		updateLowerTextRegions();
 	}
 	public void register(IElement element) {
 		element.setRegistered(true);
@@ -215,23 +196,23 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		}
 		elementHandler.removeAllRegisterElements();
 	}
-	protected String getToolTipText(int element_num) {
+	public String getToolTipText(int index) {
 		IElementHandler setManager = getCurrentElementHandler();
 		if (setManager == null || cur_element_set == null)
-			return "Unknown element";
-		IElement element = cur_element_set.get(element_num);
+			return " Unknown element";
+		IElement element = cur_element_set.get(index);
 		if (element == null)
-			return "Unknown element";
+			return " Unknown element";
 		IPNode node = ((MachineManager) manager).findNode(getCurrentID(), element.getID());
 		if (node == null)
-			return "Unknown node";
+			return " Unknown node";
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("Node ID: " + node.getNodeNumber());
+		buffer.append(" Node ID: " + node.getNodeNumber());
 		buffer.append("\n");
-		buffer.append("Node name: " + node.getElementName());
+		buffer.append(" Node name: " + node.getElementName());
 		IElementSet[] groups = setManager.getSetsWithElement(element.getID());
 		if (groups.length > 1)
-			buffer.append("\nGroup: ");
+			buffer.append("\n Group: ");
 		for (int i = 1; i < groups.length; i++) {
 			buffer.append(groups[i].getID());
 			if (i < groups.length - 1)
@@ -239,10 +220,6 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		}
 		// buffer.append("\nStatus: " + getMachineManager().getNodeStatusText(node));
 		return buffer.toString();
-	}
-	protected Image getStatusIcon(IElement element) {
-		int status = ((MachineManager) manager).getNodeStatus(getCurrentID(), element.getID());
-		return nodeImages[status][element.isSelected() ? 1 : 0];
 	}
 	public String getCurrentID() {
 		return ((MachineManager) manager).getCurrentMachineId();
@@ -260,14 +237,6 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	protected void updateAction() {
 		super.updateAction();
 		changeMachineAction.setEnabled(((MachineManager) manager).getMachines().length > 0);
-	}
-	public void deSelectSet() {
-		super.deSelectSet();
-		cur_selected_element_id = "";
-	}
-	protected void paintCanvas(GC g) {
-		super.paintCanvas(g);
-		updateLowerTextRegions();
 	}
 	public void clearLowerTextRegions() {
 		BLtable.removeAll();
@@ -298,23 +267,25 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			for (int i = 0; i < procs.length; i++) {
 				int proc_state = ((MachineManager) manager).getProcStatus(procs[i].getStatus());
 				item = new TableItem(BRtable, SWT.NULL);
-				item.setImage(procImages[proc_state][0]);
+				item.setImage(ParallelImages.procImages[proc_state][0]);
 				item.setText("Process " + procs[i].getProcessNumber() + ", Job " + procs[i].getJob().getJobNumber());
 			}
 		}
 	}
 	public void run(String arg) {
-		System.out.println("------------ machine run - job "+arg);
+		System.out.println("------------ machine run - job " + arg);
 		IPJob job = ((MachineManager) manager).findJob(arg);
-		if(job != null) {
+		if (job != null) {
 			IPMachine[] machines = job.getMachines();
-			if(machines.length > 0) {
-				System.out.println("MACHINE = "+machines[0]);
+			if (machines.length > 0) {
 				selectMachine(machines[0].getIDString());
 			}
 		}
 		update();
 		refresh();
+	}
+	public void updateView(Object condition) {
+		updateLowerTextRegions();
 	}
 	public void start() {
 		System.out.println("------------ machine start");

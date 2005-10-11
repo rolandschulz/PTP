@@ -36,7 +36,7 @@ public class ElementHandler extends Container implements IElementHandler {
 	private final String REGISTERED_KEY = "registeredset";
 
 	public ElementHandler() {
-		super(null, SET_ROOT_ID, SET_ROOT_ID, false, IContainer.SET_TYPE);
+		super(null, SET_ROOT_ID, SET_ROOT_ID, IContainer.SET_TYPE);
 		//store registered list
 		setData(REGISTERED_KEY, new ArrayList());
 		

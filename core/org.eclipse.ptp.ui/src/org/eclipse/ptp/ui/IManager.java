@@ -70,4 +70,7 @@ public interface IManager {
 	public void removeJob(IPJob job);
 	public void removeAllStoppedJobs();
 	public boolean hasStoppedJob();	
+	
+	//image
+	public int getStatus(String id);
 }

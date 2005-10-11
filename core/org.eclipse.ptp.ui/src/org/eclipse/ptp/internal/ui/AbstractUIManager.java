@@ -132,7 +132,7 @@ public abstract class AbstractUIManager implements IManager {
 		fireEvent(ADD_ELEMENT_TYPE, elements, set, null);
 	}
 	public String createSet(IElement[] elements, String setID, String setName, IElementHandler elementHandler) {
-		IElementSet set = new ElementSet(elementHandler, setID, setName, true);
+		IElementSet set = new ElementSet(elementHandler, setID, setName);
 		addToSet(elements, set);
 		elementHandler.add(set);
 		updateMatchElementSets(set, elementHandler);

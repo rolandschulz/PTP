@@ -134,6 +134,17 @@ public class ParallelImages {
 	public static final ImageDescriptor ID_IMG_PROC_STOPPED = createImageDescriptor(PROCESSICONURL, IMG_PROC_STOPPED, IMG_PROC_STOPPED);
 	public static final ImageDescriptor ID_IMG_PROC_STOPPED_SEL = createImageDescriptor(PROCESSICONURL, IMG_PROC_STOPPED_SEL, IMG_PROC_STOPPED_SEL);
 	
+	public static final Image[][] nodeImages = { { getImage(ParallelImages.IMG_NODE_USER_ALLOC_EXCL), getImage(ParallelImages.IMG_NODE_USER_ALLOC_EXCL_SEL) },
+		{ getImage(ParallelImages.IMG_NODE_USER_ALLOC_SHARED), getImage(ParallelImages.IMG_NODE_USER_ALLOC_SHARED_SEL) }, { getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_EXCL), getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_EXCL_SEL) },
+		{ getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_SHARED), getImage(ParallelImages.IMG_NODE_OTHER_ALLOC_SHARED_SEL) }, { getImage(ParallelImages.IMG_NODE_DOWN), getImage(ParallelImages.IMG_NODE_DOWN_SEL) },
+		{ getImage(ParallelImages.IMG_NODE_ERROR), getImage(ParallelImages.IMG_NODE_ERROR_SEL) }, { getImage(ParallelImages.IMG_NODE_EXITED), getImage(ParallelImages.IMG_NODE_EXITED_SEL) },
+		{ getImage(ParallelImages.IMG_NODE_RUNNING), getImage(ParallelImages.IMG_NODE_RUNNING_SEL) }, { getImage(ParallelImages.IMG_NODE_UNKNOWN), getImage(ParallelImages.IMG_NODE_UNKNOWN_SEL) },
+		{ getImage(ParallelImages.IMG_NODE_UP), getImage(ParallelImages.IMG_NODE_UP_SEL) } };
+	public static final Image[][] procImages = { { getImage(ParallelImages.IMG_PROC_ERROR), getImage(ParallelImages.IMG_PROC_ERROR_SEL) }, { getImage(ParallelImages.IMG_PROC_EXITED), getImage(ParallelImages.IMG_PROC_EXITED_SEL) },
+		{ getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL), getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL_SEL) }, { getImage(ParallelImages.IMG_PROC_RUNNING), getImage(ParallelImages.IMG_PROC_RUNNING_SEL) },
+		{ getImage(ParallelImages.IMG_PROC_STARTING), getImage(ParallelImages.IMG_PROC_STARTING_SEL) }, { getImage(ParallelImages.IMG_PROC_STOPPED), getImage(ParallelImages.IMG_PROC_STOPPED_SEL) } };
+	public static Image[] jobImages = { getImage(ParallelImages.ICON_RUNMODE_NORMAL), getImage(ParallelImages.ICON_DEBUGMODE_NORMAL), getImage(ParallelImages.ICON_TERMINATE_ALL_NORMAL) };
+	
 	public static Image getImage(String key) {
 		return getImageRegistry().get(key);
 	}

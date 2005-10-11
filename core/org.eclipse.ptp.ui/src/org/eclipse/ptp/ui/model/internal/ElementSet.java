@@ -19,9 +19,7 @@
 package org.eclipse.ptp.ui.model.internal;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.ptp.ui.model.IContainer;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
@@ -35,10 +33,7 @@ public class ElementSet extends Container implements IElementSet {
 	private final String MATCHSET_KEY = "matchset";
 	
 	public ElementSet(IElement parent, String id, String name) {
-		this(parent, id, name, false);
-	}
-	public ElementSet(IElement parent, String id, String name, boolean selected) {
-		super(parent, id, name, selected, IContainer.ELEMENT_TYPE);
+		super(parent, id, name, IContainer.ELEMENT_TYPE);
 		setData(MATCHSET_KEY, new ArrayList());
 	}
 	public IElementHandler getElementHandler() {
@@ -48,36 +43,6 @@ public class ElementSet extends Container implements IElementSet {
 	public boolean isRootSet() {
 		return (id.equals(IElementHandler.SET_ROOT_ID));
 	}
-	public IElement[] getSelectedElements() {
-		List selectedElements = new ArrayList();
-		for (Iterator i=elementMap.values().iterator(); i.hasNext();) {
-			IElement element = (IElement)i.next();
-			if (element.isSelected())
-				selectedElements.add(element);
-		}
-		return (IElement[])selectedElements.toArray(new IElement[selectedElements.size()]);
-	}
-	public void removeAllSelected() {
-		for (Iterator i=elementMap.values().iterator(); i.hasNext();) {
-			IElement element = (IElement)i.next();
-			if (element.isSelected())
-				element.setSelected(false);
-		}
-	}
-	public void select(int index, boolean selectIt) {
-		IElement element = getElement(index);
-		element.setSelected(selectIt);
-	}
-	public void select(int index) {
-		IElement element = getElement(index);
-		element.setSelected(!element.isSelected());
-	}
-	public void setAllSelect(boolean selectIt) {
-		for (Iterator i=elementMap.values().iterator(); i.hasNext();) {
-			((IElement)i.next()).setSelected(selectIt);
-		}
-	}
-	
 	public IElement[] get() {
 		return getElements();
 	}

@@ -26,14 +26,14 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.internal.ui.actions.ChangeSetAction;
 import org.eclipse.ptp.internal.ui.actions.CreateSetAction;
-import org.eclipse.ptp.internal.ui.actions.DeleteProcessAction;
+import org.eclipse.ptp.internal.ui.actions.RemoveElementAction;
 import org.eclipse.ptp.internal.ui.actions.DeleteSetAction;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.actions.ParallelAction;
+import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -52,8 +52,6 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	protected ParallelAction deleteSetAction = null;
 	protected ParallelAction deleteProcessAction = null;
 	protected ParallelAction changeSetAction = null;
-	protected int DEFAULT_DEL_KEY = '\u007f';
-	protected int DEFAULT_BACK_KEY = '\u0008';
 
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
@@ -76,7 +74,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	protected void buildInToolBarActions(IToolBarManager toolBarMgr) {
 		createSetAction = new CreateSetAction(this);
 		deleteSetAction = new DeleteSetAction(this);
-		deleteProcessAction = new DeleteProcessAction(this);
+		deleteProcessAction = new RemoveElementAction(this);
 		changeSetAction = new ChangeSetAction(this);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUISETGROUP, createSetAction);
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUISETGROUP, deleteSetAction);
@@ -92,13 +90,11 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
-				// if right click occur, eclipse will ignore the key up event, so clear keyCode when popup occur.
-				keyCode = SWT.NONE;
 				fillContextMenu(manager);
 			}
 		});
-		Menu menu = menuMgr.createContextMenu(drawComp);
-		drawComp.setMenu(menu);
+		Menu menu = menuMgr.createContextMenu(canvas);
+		canvas.setMenu(menu);
 		// Be sure to register it so that other plug-ins can add actions.
 		getSite().registerContextMenu(menuMgr, this);
 	}
@@ -128,17 +124,6 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		IElementHandler elementHandler = getCurrentElementHandler();
 		changeSetAction.setEnabled(!(elementHandler == null || elementHandler.size() == 0));
 	}
-	protected void keyDownEvent(int mx, int my, int keyCode) {
-		if (keyCode == DEFAULT_DEL_KEY || keyCode == DEFAULT_BACK_KEY) // delete key
-			removeProcess();
-		else
-			super.keyDownEvent(mx, my, keyCode);
-	}
-	public void removeProcess() {
-		if (!manager.getCurrentSetId().equals(IElementHandler.SET_ROOT_ID)) {
-			deleteProcessAction.run(cur_element_set.getSelectedElements());
-		}
-	}
 	protected void openProcessViewer(final IPProcess element) {
 		if (element == null)
 			return;
@@ -151,5 +136,8 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 				}
 			}
 		});
+	}
+	public void removeElements(IElement[] elements) {
+		deleteProcessAction.run(elements);
 	}
 }

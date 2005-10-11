@@ -108,23 +108,18 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, unregisterAction);
 		super.buildInToolBarActions(toolBarMgr);
 	}
-	protected void doubleClickAction(int element_num) {
-		if (cur_element_set != null) {
-			IElement element = cur_element_set.get(element_num);
-			if (element != null) {
-				try {
-					registerElement(element);
-				} catch (CoreException e) {
-					PTPDebugUIPlugin.errorDialog(getViewSite().getShell(), "Error", e.getStatus());
-				}
-			}
+	public void doubleClick(IElement element) {
+		try {
+			registerElement(element);
+		} catch (CoreException e) {
+			PTPDebugUIPlugin.errorDialog(getViewSite().getShell(), "Error", e.getStatus());
 		}
 	}
-	protected String getToolTipText(int element_num) {
+	public String getToolTipText(int index) {
 		IElementHandler setManager = getCurrentElementHandler();
 		if (setManager == null || cur_element_set == null)
 			return "Unknown element";
-		IElement element = cur_element_set.get(element_num);
+		IElement element = cur_element_set.get(index);
 		if (element == null)
 			return "Unknown element";
 		IPProcess proc = ((UIDebugManager) manager).findProcess(getCurrentID(), element.getID());
@@ -153,14 +148,12 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	}
 	public void registerSelectedElements() throws CoreException {
 		if (cur_element_set != null) {
-			IElement[] elements = cur_element_set.getSelectedElements();
-			((UIDebugManager) manager).registerElements(elements);
+			((UIDebugManager) manager).registerElements(canvas.getSelectedElements());
 		}
 	}
 	public void unregisterSelectedElements() throws CoreException {
 		if (cur_element_set != null) {
-			IElement[] elements = cur_element_set.getSelectedElements();
-			((UIDebugManager) manager).unregisterElements(elements);
+			((UIDebugManager) manager).unregisterElements(canvas.getSelectedElements());
 		}
 	}
 	public void run() {
@@ -191,8 +184,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 				updateSuspendResumeButton(suspendedTaskList, set, terminatedTaskList);
 				updateTerminateButton(terminatedTaskList, set, suspendedTaskList);
 			}
-		}
-		else
+		} else
 			setEnableResumeButtonGroup(false);
 	}
 	public void updateSuspendResumeButton(BitList tasks, IElementSet set, BitList targetTasks) {
@@ -219,7 +211,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		resumeAction.setEnabled(isEnabled);
 		stepIntoAction.setEnabled(isEnabled);
 		stepOverAction.setEnabled(isEnabled);
-		//stepReturnAction.setEnabled(isEnabled);
+		// stepReturnAction.setEnabled(isEnabled);
 	}
 	public void updateTerminateButton(BitList tasks, IElementSet set, BitList targetTasks) {
 		if (set == null || tasks == null)
@@ -245,7 +237,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		}
 		terminateAction.setEnabled(isEnabled);
 		if (isEnabled) {// not all processes terminated
-			setEnableResumeButtonGroup(totalSuspendedSize>0);
+			setEnableResumeButtonGroup(totalSuspendedSize > 0);
 			// no suspended process or running process: total terminated + total suspended != set size
 			suspendAction.setEnabled(totalSuspendedSize == 0 || (setSize != (totalTerminatedSize + totalSuspendedSize)));
 		} else {// all process terminated

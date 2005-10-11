@@ -151,9 +151,13 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 		}
 		return IPTPUIConstants.NODE_UNKNOWN;
 	}
-	public int getNodeStatus(String machine_id, String node_id) {
+	public int getStatus(String machine_id, String node_id) {
 		return getNodeStatus(findNode(machine_id, node_id));
 	}
+	public int getStatus(String id) {
+		return getStatus(getCurrentMachineId(), id);
+	}
+	
 	public IPNode findNode(String machine_id, String node_id) {
 		IPMachine machine = findMachineById(machine_id);
 		if (machine == null)
