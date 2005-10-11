@@ -33,10 +33,10 @@ import org.eclipse.ptp.ui.views.AbstractParallelElementView;
  * @author clement chu
  *
  */
-public class DeleteProcessAction extends ParallelAction {
+public class RemoveElementAction extends ParallelAction {
 	public static final String name = "Remove Elements";
 	
-	public DeleteProcessAction(AbstractParallelElementView view) {
+	public RemoveElementAction(AbstractParallelElementView view) {
 		super(name, view);
 	    setImageDescriptor(ParallelImages.ID_ICON_DELETEELEMENT_NORMAL);
 	}

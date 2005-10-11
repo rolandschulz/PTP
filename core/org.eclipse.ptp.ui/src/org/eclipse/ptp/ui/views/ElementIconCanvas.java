@@ -18,49 +18,90 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
-import org.eclipse.ptp.ui.IManager;
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 /**
  * @author Clement chu
- *
+ * 
  */
-public abstract class ElementIconCanvas extends IconCanvas {
+public class ElementIconCanvas extends AbstractIconCanvas {
 	// Set
-	protected IManager manager = null;
-	protected IElementSet cur_element_set = null;
-	protected int cur_set_size = 0;
-	protected int fisrt_selected_element_id = -1;
-	
-	public ElementIconCanvas(Composite parent, int style) {
+	private IElementSet cur_element_set = null;
+	private AbstractParallelElementView view = null;
+	private Color registerColor = null;
+
+	public ElementIconCanvas(AbstractParallelElementView view, Composite parent, int style) {
 		super(parent, style);
+		this.view = view;
+		registerColor = getDisplay().getSystemColor(SWT.COLOR_WIDGET_BORDER);
 	}
-	
-	protected void setElementSet(IElementSet e_set) {
+	public void dispose() {
+		super.dispose();
+		cur_element_set = null;
+	}
+	public void setRegisterColor(Color color) {
+		registerColor = color;
+	}
+	public void setElementSet(IElementSet e_set) {
 		this.cur_element_set = e_set;
-		setTotal(cur_element_set.size());
+		BusyIndicator.showWhile(getDisplay(), new Runnable() {
+			public void run() {
+				setTotal(cur_element_set == null ? 0 : cur_element_set.size());
+			}
+		});
 	}
-	protected IElementSet getCurrentElementSet() {
+	public IElementSet getCurrentElementSet() {
 		return cur_element_set;
 	}
-	protected IElement getElement(int index) {
+	public IElement getElement(int index) {
+		if (cur_element_set == null)
+			return null;
 		return cur_element_set.getSortedElements()[index];
 	}
-	protected String getToolTipText(int index) {
-		return getToolTipText(getElement(index));
-	}	
-	protected void drawRectangle(int index, GC gc, int x_loc, int y_loc, int width, int height) {
-		IElement element = getElement(index);
-		if (element.isRegistered())
-			gc.drawRectangle(x_loc, y_loc, width, height);
+	public String getToolTipText(int index) {
+		return view.getToolTipText(index);
 	}
-	protected Image getStatusIcon(int index) {
-		return getStatusIcon(getElement(index));
+	public void drawRectangle(int index, GC gc, int x_loc, int y_loc, int width, int height) {
+		if (cur_element_set != null) {
+			IElement element = getElement(index);
+			if (element.isRegistered()) {
+				gc.setForeground(registerColor);
+				gc.drawRectangle(x_loc, y_loc, width, height);
+				gc.setForeground(getForeground());
+			}
+		}
 	}
-	protected abstract Image getStatusIcon(IElement element);
-	protected abstract String getToolTipText(IElement element);
+	public Image getStatusIcon(int index, boolean isSelected) {
+		if (cur_element_set == null)
+			return null;
+		int status = view.getUIManager().getStatus(getElement(index).getID());
+		return view.getImage(status, isSelected ? 1 : 0);
+	}
+	public void deleteElements(int[] indexes) {
+		view.doRemoveElements(getElements(indexes));
+	}
+	public void doubleClickAction(int index) {
+		view.doDoubleClickAction(getElement(index));
+	}
+	public IElement[] getElements(int[] indexes) {
+		if (cur_element_set == null)
+			return new IElement[0];
+		List selectedElements = new ArrayList();
+		for (int i = 0; i < indexes.length; i++) {
+			selectedElements.add(cur_element_set.get(indexes[i]));
+		}
+		return (IElement[]) selectedElements.toArray(new IElement[selectedElements.size()]);
+	}
+	public IElement[] getSelectedElements() {
+		return getElements(getSelectedIndexes());
+	}
 }

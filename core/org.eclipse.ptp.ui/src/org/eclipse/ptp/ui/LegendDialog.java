@@ -19,7 +19,7 @@
 
 package org.eclipse.ptp.ui;
 
-import org.eclipse.ptp.ui.views.ParallelMachineView;
+import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -87,7 +87,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		CLabel b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelMachineView.nodeImages[IPTPUIConstants.NODE_DOWN][0]);
+		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_DOWN][0]);
 		CLabel l = new CLabel(c, SWT.LEFT);
 		l.setText("DOWN");
 		/* formdata stuff so they take up the right amount of space */
@@ -109,7 +109,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelMachineView.nodeImages[IPTPUIConstants.NODE_UP][0]);
+		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_UP][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("UNALLOCATED");
 		/* formdata stuff so they take up the right amount of space */
@@ -131,7 +131,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelMachineView.nodeImages[IPTPUIConstants.NODE_USER_ALLOC_EXCL][0]);
+		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_USER_ALLOC_EXCL][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("ALLOCATED TO YOU EXCLUSIVELY, BUT IDLE");
 		/* formdata stuff so they take up the right amount of space */
@@ -153,7 +153,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelMachineView.nodeImages[IPTPUIConstants.NODE_USER_ALLOC_SHARED][0]);
+		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_USER_ALLOC_SHARED][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("ALLOCATED TO YOU SHARED, BUT IDLE");
 		/* formdata stuff so they take up the right amount of space */
@@ -175,7 +175,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelMachineView.nodeImages[IPTPUIConstants.NODE_OTHER_ALLOC_EXCL][0]);
+		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_OTHER_ALLOC_EXCL][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("ALLOCATED TO SOMEONE ELSE EXCLUSIVELY");
 		/* formdata stuff so they take up the right amount of space */
@@ -197,7 +197,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelMachineView.nodeImages[IPTPUIConstants.NODE_OTHER_ALLOC_SHARED][0]);
+		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_OTHER_ALLOC_SHARED][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("ALLOCATED TO SOMEONE ELSE SHARED");
 		/* formdata stuff so they take up the right amount of space */
@@ -219,7 +219,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelMachineView.nodeImages[IPTPUIConstants.NODE_RUNNING][0]);
+		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_RUNNING][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("JOB RUNNING");
 		/* formdata stuff so they take up the right amount of space */
@@ -241,7 +241,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelMachineView.nodeImages[IPTPUIConstants.NODE_EXITED][0]);
+		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_EXITED][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("JOB STOPPED");
 		/* formdata stuff so they take up the right amount of space */
@@ -263,7 +263,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelMachineView.nodeImages[IPTPUIConstants.NODE_ERROR][0]);
+		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_ERROR][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("ERROR");
 		/* formdata stuff so they take up the right amount of space */
@@ -285,7 +285,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelMachineView.nodeImages[IPTPUIConstants.NODE_UNKNOWN][0]);
+		b.setImage(ParallelImages.nodeImages[IPTPUIConstants.NODE_UNKNOWN][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("UNKNOWN / UNDEFINED");
 		/* formdata stuff so they take up the right amount of space */
@@ -318,7 +318,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelMachineView.procImages[IPTPUIConstants.PROC_STARTING][0]);
+		b.setImage(ParallelImages.procImages[IPTPUIConstants.PROC_STARTING][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("STARTING");
 		/* formdata stuff so they take up the right amount of space */
@@ -341,7 +341,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelMachineView.procImages[IPTPUIConstants.PROC_RUNNING][0]);
+		b.setImage(ParallelImages.procImages[IPTPUIConstants.PROC_RUNNING][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("RUNNING");
 		/* formdata stuff so they take up the right amount of space */
@@ -364,7 +364,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelMachineView.procImages[IPTPUIConstants.PROC_EXITED][0]);
+		b.setImage(ParallelImages.procImages[IPTPUIConstants.PROC_EXITED][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("EXITED NORMALLY");
 		/* formdata stuff so they take up the right amount of space */
@@ -387,7 +387,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelMachineView.procImages[IPTPUIConstants.PROC_EXITED_SIGNAL][0]);
+		b.setImage(ParallelImages.procImages[IPTPUIConstants.PROC_EXITED_SIGNAL][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("EXITED WITH SIGNAL");
 		/* formdata stuff so they take up the right amount of space */
@@ -410,7 +410,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelMachineView.procImages[IPTPUIConstants.PROC_STOPPED][0]);
+		b.setImage(ParallelImages.procImages[IPTPUIConstants.PROC_STOPPED][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("STOPPED");
 		/* formdata stuff so they take up the right amount of space */
@@ -433,7 +433,7 @@ public class LegendDialog extends Dialog
         c.setLayout(layout);
         /* the contents of the horizontal box */
 		b = new CLabel(c, SWT.FLAT);
-		b.setImage(ParallelMachineView.procImages[IPTPUIConstants.PROC_ERROR][0]);
+		b.setImage(ParallelImages.procImages[IPTPUIConstants.PROC_ERROR][0]);
 		l = new CLabel(c, SWT.LEFT);
 		l.setText("ERROR");
 		/* formdata stuff so they take up the right amount of space */

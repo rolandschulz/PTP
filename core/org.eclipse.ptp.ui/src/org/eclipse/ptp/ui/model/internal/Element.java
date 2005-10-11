@@ -28,18 +28,13 @@ import org.eclipse.ptp.ui.model.IElement;
 public class Element implements IElement, Cloneable, Comparable {
 	protected String id = "0";
 	protected String name = "";
-	protected boolean selected = false;
 	protected boolean registered = false;
 	protected IElement parent = null;
 	
-	public Element(IElement parent, String id, String name, boolean selected) {
+	public Element(IElement parent, String id, String name) {
 		this.parent = parent;
 		this.id = id;
 		this.name = name;
-		this.selected = selected;
-	}
-	public Element(IElement parent, String id, String name) {
-		this(parent, id, name, false);
 	}
 	
 	public IElement getParent() {
@@ -58,12 +53,6 @@ public class Element implements IElement, Cloneable, Comparable {
 	}
 	public String getName() {
 		return name;
-	}
-	public boolean isSelected() {
-		return selected;
-	}	
-	public void setSelected(boolean selected) {
-		this.selected = selected;
 	}
 	public boolean isRegistered() {
 		return registered;

@@ -30,11 +30,6 @@ public interface IElementSet extends IContainer {
 	public boolean isContainSets(String set_id);
 	
 	public boolean isRootSet();
-	public IElement[] getSelectedElements();
-	public void removeAllSelected();
-	public void select(int index);
-	public void select(int index, boolean selectIt);
-	public void setAllSelect(boolean select);	
 
 	public IElement[] getSortedElements();
 	public IElement[] getElements();

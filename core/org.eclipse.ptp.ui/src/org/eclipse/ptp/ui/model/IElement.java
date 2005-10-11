@@ -27,8 +27,6 @@ public interface IElement {
 	public String getName();
 	public int getIDNum();
 	public String getID();
-	public boolean isSelected();
-	public void setSelected(boolean selected);
 	public boolean isRegistered();
 	public void setRegistered(boolean registered);
 	public IElement cloneElement();

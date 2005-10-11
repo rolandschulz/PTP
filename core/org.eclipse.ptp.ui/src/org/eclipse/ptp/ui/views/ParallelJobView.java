@@ -76,10 +76,6 @@ public class ParallelJobView extends AbstractParallelSetView {
 	public static final String JOB_VIEW = "1";
 	public static final String PRO_VIEW = "2";
 	protected String current_view = BOTH_VIEW;
-	public static Image[] jobImages = { ParallelImages.getImage(ParallelImages.ICON_RUNMODE_NORMAL), ParallelImages.getImage(ParallelImages.ICON_DEBUGMODE_NORMAL), ParallelImages.getImage(ParallelImages.ICON_TERMINATE_ALL_NORMAL) };
-	public static Image[][] procImages = { { ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR), ParallelImages.getImage(ParallelImages.IMG_PROC_ERROR_SEL) }, { ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED), ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SEL) },
-			{ ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL), ParallelImages.getImage(ParallelImages.IMG_PROC_EXITED_SIGNAL_SEL) }, { ParallelImages.getImage(ParallelImages.IMG_PROC_RUNNING), ParallelImages.getImage(ParallelImages.IMG_PROC_RUNNING_SEL) },
-			{ ParallelImages.getImage(ParallelImages.IMG_PROC_STARTING), ParallelImages.getImage(ParallelImages.IMG_PROC_STARTING_SEL) }, { ParallelImages.getImage(ParallelImages.IMG_PROC_STOPPED), ParallelImages.getImage(ParallelImages.IMG_PROC_STOPPED_SEL) } };
 
 	public ParallelJobView() {
 		instance = this;
@@ -104,19 +100,14 @@ public class ParallelJobView extends AbstractParallelSetView {
 			sashForm.setWeights(new int[] { 1, 2 });
 		}
 	}
-	protected void initElementAttribute() {
-		e_offset_x = 5;
-		e_spacing_x = 4;
-		e_offset_y = 5;
-		e_spacing_y = 4;
-		e_width = 16;
-		e_height = 16;
-	}
 	protected void initialElement() {
 		manager.initial();
 	}
 	protected void initialView() {
 		initialElement();
+	}
+	public Image getImage(int index1, int index2) {
+		return ParallelImages.procImages[index1][index2];
 	}
 	public static ParallelJobView getJobViewInstance() {
 		if (instance == null)
@@ -142,10 +133,10 @@ public class ParallelJobView extends AbstractParallelSetView {
 				if (element instanceof IPJob) {
 					IPJob job = (IPJob) element;
 					if (job.isAllStop())
-						return jobImages[2];
+						return ParallelImages.jobImages[2];
 					if (job.isDebug())
-						return jobImages[1];
-					return jobImages[0];
+						return ParallelImages.jobImages[1];
+					return ParallelImages.jobImages[0];
 				}
 				return null;
 			}
@@ -201,31 +192,26 @@ public class ParallelJobView extends AbstractParallelSetView {
 		super.buildInToolBarActions(toolBarMgr);
 	}
 	protected void setActionEnable() {}
-	protected void doubleClickAction(int element_num) {
-		if (cur_element_set != null) {
-			IElement element = cur_element_set.get(element_num);
-			if (element != null) {
-				openProcessViewer(((JobManager) manager).findProcess(getCurrentID(), element.getID()));
-			}
-		}
+	public void doubleClick(IElement element) {
+		openProcessViewer(((JobManager) manager).findProcess(getCurrentID(), element.getID()));
 	}
-	protected String getToolTipText(int element_num) {
+	public String getToolTipText(int index) {
 		IElementHandler setManager = getCurrentElementHandler();
 		if (setManager == null || cur_element_set == null)
-			return "Unknown element";
-		IElement element = cur_element_set.get(element_num);
+			return " Unknown element";
+		IElement element = cur_element_set.get(index);
 		if (element == null)
-			return "Unknown element";
+			return " Unknown element";
 		IPProcess proc = ((JobManager) manager).findProcess(getCurrentID(), element.getID());
 		if (proc == null)
-			return "Unknown process";
+			return " Unknown process";
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("Task ID: " + proc.getTaskId());
+		buffer.append(" Task ID: " + proc.getTaskId());
 		buffer.append("\n");
-		buffer.append("Process ID: " + proc.getPid());
+		buffer.append(" Process ID: " + proc.getPid());
 		IElementSet[] groups = setManager.getSetsWithElement(element.getID());
 		if (groups.length > 1)
-			buffer.append("\nGroup: ");
+			buffer.append("\n Group: ");
 		for (int i = 1; i < groups.length; i++) {
 			buffer.append(groups[i].getID());
 			if (i < groups.length - 1)
@@ -233,10 +219,6 @@ public class ParallelJobView extends AbstractParallelSetView {
 		}
 		// buffer.append("\nStatus: " + getJobManager().getProcessStatusText(proc));
 		return buffer.toString();
-	}
-	protected Image getStatusIcon(IElement element) {
-		int status = ((JobManager) manager).getProcessStatus(getCurrentID(), element.getID());
-		return procImages[status][element.isSelected() ? 1 : 0];
 	}
 	public String getCurrentID() {
 		return ((JobManager) manager).getCurrentJobId();
@@ -281,18 +263,13 @@ public class ParallelJobView extends AbstractParallelSetView {
 			}
 		}
 	}
-	public void repaint(Object condition) {
+	public void updateView(Object condition) {
 		if (condition != null) {
-			getDisplay().asyncExec(new Runnable() {
-				public void run() {
-					if (!jobTableViewer.getTable().isDisposed()) {
-						jobTableViewer.refresh(true);
-						update();
-					}
-				}
-			});
+			if (!jobTableViewer.getTable().isDisposed()) {
+				jobTableViewer.refresh(true);
+				update();
+			}
 		}
-		refresh();
 	}
 	public void run(final String arg) {
 		System.out.println("------------ job run: " + arg);

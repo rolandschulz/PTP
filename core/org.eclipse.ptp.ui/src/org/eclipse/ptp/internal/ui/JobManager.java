@@ -114,7 +114,10 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 			return "Error";
 		}
 	}
-	public int getProcessStatus(String job_id, String proc_id) {
+	public int getStatus(String id) {
+		return getStatus(getCurrentJobId(), id);
+	}	
+	public int getStatus(String job_id, String proc_id) {
 		return getProcessStatus(findProcess(job_id, proc_id));
 	}
 	public int getProcessStatus(IPProcess proc) {
