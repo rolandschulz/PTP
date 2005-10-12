@@ -22,10 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -33,22 +29,13 @@ import org.eclipse.swt.widgets.Composite;
  * 
  */
 public class ElementIconCanvas extends AbstractIconCanvas {
-	// Set
 	private IElementSet cur_element_set = null;
-	private AbstractParallelElementView view = null;
-	private Color registerColor = null;
 
 	public ElementIconCanvas(AbstractParallelElementView view, Composite parent, int style) {
 		super(parent, style);
-		this.view = view;
-		registerColor = getDisplay().getSystemColor(SWT.COLOR_WIDGET_BORDER);
 	}
 	public void dispose() {
 		super.dispose();
-		cur_element_set = null;
-	}
-	public void setRegisterColor(Color color) {
-		registerColor = color;
 	}
 	public void setElementSet(IElementSet e_set) {
 		this.cur_element_set = e_set;
@@ -65,31 +52,6 @@ public class ElementIconCanvas extends AbstractIconCanvas {
 		if (cur_element_set == null)
 			return null;
 		return cur_element_set.getSortedElements()[index];
-	}
-	public String getToolTipText(int index) {
-		return view.getToolTipText(index);
-	}
-	public void drawRectangle(int index, GC gc, int x_loc, int y_loc, int width, int height) {
-		if (cur_element_set != null) {
-			IElement element = getElement(index);
-			if (element.isRegistered()) {
-				gc.setForeground(registerColor);
-				gc.drawRectangle(x_loc, y_loc, width, height);
-				gc.setForeground(getForeground());
-			}
-		}
-	}
-	public Image getStatusIcon(int index, boolean isSelected) {
-		if (cur_element_set == null)
-			return null;
-		int status = view.getUIManager().getStatus(getElement(index).getID());
-		return view.getImage(status, isSelected ? 1 : 0);
-	}
-	public void deleteElements(int[] indexes) {
-		view.doRemoveElements(getElements(indexes));
-	}
-	public void doubleClickAction(int index) {
-		view.doDoubleClickAction(getElement(index));
 	}
 	public IElement[] getElements(int[] indexes) {
 		if (cur_element_set == null)

@@ -27,6 +27,8 @@ import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -36,7 +38,7 @@ import org.eclipse.swt.widgets.Composite;
  * @author clement chu
  * 
  */
-public abstract class AbstractParallelElementView extends AbstractParallelView implements IPaintListener {
+public abstract class AbstractParallelElementView extends AbstractParallelView implements IPaintListener, IIconCanvasActionListener, IToolTipProvider, IImageProvider {
 	protected IManager manager = null;
 	// Set
 	protected IElementSet cur_element_set = null;
@@ -44,11 +46,16 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	protected ElementIconCanvas canvas = null;
 	// title
 	protected final String EMPTY_TITLE = " ";
+	protected Color registerColor = null;
 
 	public void createPartControl(Composite parent) {
 		createView(parent);
 		setContentDescription(EMPTY_TITLE);
 		manager.addPaintListener(this);
+		registerColor = getDisplay().getSystemColor(SWT.COLOR_WIDGET_BORDER);
+	}
+	public void setRegisterColor(Color color) {
+		this.registerColor = color;
 	}
 	protected void createView(Composite parent) {
 		createElementView(parent);
@@ -75,6 +82,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		composite.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		canvas = new ElementIconCanvas(this, composite, SWT.NONE);
+		canvas.setImageProvider(this);
+		canvas.setToolTipProvider(this);
+		canvas.addActionListener(this);
 		return composite;
 	}
 	public void setSelection(ISelection selection) {
@@ -89,6 +99,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	}
 	public void dispose() {
 		manager.removePaintListener(this);
+		canvas.removeActionListener(this);
 		super.dispose();
 	}
 	public void setFocus() {
@@ -115,11 +126,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		}
 		canvas.setElementSet(cur_element_set);
 	}
-	public void doRemoveElements(IElement[] elements) {
-		if (!manager.getCurrentSetId().equals(IElementHandler.SET_ROOT_ID)) {
-			removeElements(canvas.getSelectedElements());
-		}
-	}
 	public IElementSet getCurrentSet() {
 		return cur_element_set;
 	}
@@ -135,11 +141,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			}
 		});
 	}
-	public void doDoubleClickAction(IElement element) {
-		if (cur_element_set != null && element != null) {
-			doubleClick(element);
-		}
-	}
 	// Set element info
 	protected abstract void initialView();
 	// Set element to display
@@ -148,15 +149,40 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	public abstract void update();
 	public abstract void updateTitle();
 	public abstract String getCurrentID();
-	public abstract String getToolTipText(int index);
-	public abstract Image getImage(int index1, int index2);
 	protected abstract void doubleClick(IElement element);
-	protected abstract void removeElements(IElement[] elements);
 	protected abstract void updateView(Object condition);
-	/**
+	protected abstract Image getImage(int index1, int index2);
+	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * Paint Listener
-	 */
+	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public void repaint(Object condition) {
 		refresh(condition);
+	}
+	/*******************************************************************************************************************************************************************************************************************************************************************************************************
+	 * Image Provider
+	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	public Image getStatusIcon(int index, boolean isSelected) {
+		if (cur_element_set == null)
+			return null;
+		int status = manager.getStatus(canvas.getElement(index).getID());
+		return getImage(status, isSelected ? 1 : 0);
+	}
+	public void drawSpecial(int index, GC gc, int x_loc, int y_loc, int width, int height) {
+		if (cur_element_set != null) {
+			IElement element = canvas.getElement(index);
+			if (element.isRegistered()) {
+				gc.setForeground(registerColor);
+				gc.drawRectangle(x_loc, y_loc, width, height);
+				gc.setForeground(canvas.getForeground());
+			}
+		}
+	}
+	/*******************************************************************************************************************************************************************************************************************************************************************************************************
+	 * IIconCanvasActionListener
+	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	public void handleAction(int type, int index) {
+		if (type == IIconCanvasActionListener.DOUBLE_CLICK_ACTION) {
+			doubleClick(canvas.getElement(index));
+		}
 	}
 }
