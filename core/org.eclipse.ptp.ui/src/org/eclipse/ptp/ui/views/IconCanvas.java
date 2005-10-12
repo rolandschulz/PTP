@@ -18,11 +18,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.accessibility.Accessible;
@@ -37,6 +40,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -51,7 +55,7 @@ import org.eclipse.swt.widgets.Shell;
  * @author Clement chu
  * 
  */
-public abstract class AbstractIconCanvas extends Canvas {
+public class IconCanvas extends Canvas {
 	public final static int SE = 1;
 	public final static int SW = 2;
 	public final static int NW = 3;
@@ -71,12 +75,12 @@ public abstract class AbstractIconCanvas extends Canvas {
 	// tooltip
 	protected Shell toolTipShell = null;
 	protected Label toolTipLabel = null;
-	//key and listener
+	// key and listener
 	protected Hashtable keyActionMap = new Hashtable();
-	protected Listener listener = null;	
+	protected Listener listener = null;
 	protected boolean mouseDown = false;
 	protected boolean mouseDoubleClick = false;
-	//scrolling and selection
+	// scrolling and selection
 	protected BitSet selectedElements = new BitSet();
 	protected BitSet tempSelectedElements = new BitSet();
 	protected int sel_size = 1;
@@ -90,7 +94,7 @@ public abstract class AbstractIconCanvas extends Canvas {
 	protected int actualScrollStart_y = 0;
 	protected int autoScrollDirection = SWT.NULL;
 	protected int verticalScrollOffset = 0;
-	//mouse and color
+	// mouse and color
 	protected Cursor defaultCursor = null;
 	protected Color background = null;
 	protected Color foreground = null;
@@ -106,7 +110,7 @@ public abstract class AbstractIconCanvas extends Canvas {
 		DOUBLE_BUFFER = !IS_CARBON;
 	}
 
-	public AbstractIconCanvas(Composite parent, int style) {
+	public IconCanvas(Composite parent, int style) {
 		super(parent, SWT.V_SCROLL | SWT.WRAP | SWT.MULTI | style);
 		Display display = getDisplay();
 		calculateVerticalScrollBar();
@@ -130,15 +134,15 @@ public abstract class AbstractIconCanvas extends Canvas {
 	protected void fireAction(int type) {
 		int[] indexes = getSelectedIndexes();
 		if (indexes.length > 0) {
-			for (Iterator i=actionListeners.iterator(); i.hasNext();) {
-				((IIconCanvasActionListener)i.next()).handleAction(type, indexes);
+			for (Iterator i = actionListeners.iterator(); i.hasNext();) {
+				((IIconCanvasActionListener) i.next()).handleAction(type, indexes);
 			}
 		}
 	}
 	protected void fireAction(int type, int index) {
 		if (index > -1) {
-			for (Iterator i=actionListeners.iterator(); i.hasNext();) {
-				((IIconCanvasActionListener)i.next()).handleAction(type, index);
+			for (Iterator i = actionListeners.iterator(); i.hasNext();) {
+				((IIconCanvasActionListener) i.next()).handleAction(type, index);
 			}
 		}
 	}
@@ -164,7 +168,7 @@ public abstract class AbstractIconCanvas extends Canvas {
 		resetCanvas();
 	}
 	public void setIconSpace(int e_spacing_x, int e_spacing_y) {
-		if (e_spacing_x < 0 || e_spacing_y <0 ) {
+		if (e_spacing_x < 0 || e_spacing_y < 0) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
 		this.e_spacing_x = e_spacing_x;
@@ -172,7 +176,7 @@ public abstract class AbstractIconCanvas extends Canvas {
 		resetCanvas();
 	}
 	public void setIconSize(int e_width, int e_height) {
-		if (e_width <= 0 || e_height <=0 ) {
+		if (e_width <= 0 || e_height <= 0) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
 		this.e_height = e_height;
@@ -898,12 +902,12 @@ public abstract class AbstractIconCanvas extends Canvas {
 		return newElements;
 	}
 	private Point getStartedPoint(int x, int y) {
-		//return new Point(x, Math.max(-1, Math.min(getClientArea().height, y)));
-		return new Point(x, Math.max(-1, Math.min((getMaxRow()-current_top_row)*getElementHeight()+sel_size, y)));
+		// return new Point(x, Math.max(-1, Math.min(getClientArea().height, y)));
+		return new Point(x, Math.max(-1, Math.min((getMaxRow() - current_top_row) * getElementHeight() + sel_size, y)));
 	}
 	private Point getFinishedPoint(int x, int y) {
-		//return new Point(Math.min(getMaxCol() * getElementWidth(), Math.max(0 + sel_size, x)), Math.min(getClientArea().height - e_spacing_y-sel_size, Math.max(0 + sel_size, y)));
-		return new Point(Math.min(getMaxCol() * getElementWidth(), Math.max(0 + sel_size, x)), Math.min((getMaxRow()-current_top_row)*getElementHeight()+sel_size, Math.max(0 + sel_size, y)));
+		// return new Point(Math.min(getMaxCol() * getElementWidth(), Math.max(0 + sel_size, x)), Math.min(getClientArea().height - e_spacing_y-sel_size, Math.max(0 + sel_size, y)));
+		return new Point(Math.min(getMaxCol() * getElementWidth(), Math.max(0 + sel_size, x)), Math.min((getMaxRow() - current_top_row) * getElementHeight() + sel_size, Math.max(0 + sel_size, y)));
 	}
 	protected void doMouseSelection(int mouse_start_x, int mouse_start_y, int mouse_end_x, int mouse_end_y, boolean isScrolling) {
 		boolean isInitialPage = (mouse_start_y - verticalScrollOffset == actualScrollStart_y);
@@ -1018,7 +1022,7 @@ public abstract class AbstractIconCanvas extends Canvas {
 		int end_index = end_pt == null ? -1 : findSelectedIndexByLocation(end_pt.x, end_pt.y, false);
 		int start_count = start_index + 1;
 		int end_count = end_index;
-		if (start_index > end_index) {//swarp
+		if (start_index > end_index) {// swarp
 			if (end_index == -1)
 				return false;
 			start_count = end_count;
@@ -1028,7 +1032,7 @@ public abstract class AbstractIconCanvas extends Canvas {
 				selectElement(end_index);
 				return true;
 			}
-		} else {//equals
+		} else {// equals
 			if (start_index > -1) {
 				selectElement(start_index);
 				return true;
@@ -1282,8 +1286,8 @@ public abstract class AbstractIconCanvas extends Canvas {
 		}
 		canSelectElements(isShift ? (selection != null ? new Point(selection.x, actualScrollStart_y - verticalScrollOffset) : null) : null, new Point(event.x, event.y));
 		int start_x = Math.min(getMaxCol() * getElementWidth(), Math.max(0 + sel_size, event.x));
-		//int start_y = (Math.min(getClientArea().height, Math.max(0 + sel_size, event.y)));
-		int start_y = (Math.min((getMaxRow()-current_top_row)*getElementHeight()+sel_size, Math.max(0 + sel_size, event.y)));
+		// int start_y = (Math.min(getClientArea().height, Math.max(0 + sel_size, event.y)));
+		int start_y = (Math.min((getMaxRow() - current_top_row) * getElementHeight() + sel_size, Math.max(0 + sel_size, event.y)));
 		selection = new Point(start_x, start_y);
 		actualScrollStart_y = selection.y + verticalScrollOffset;
 		redraw();
@@ -1369,7 +1373,7 @@ public abstract class AbstractIconCanvas extends Canvas {
 			row_start = Math.max(0, current_top_row);
 			row_end = Math.min(row_end + row_start + 1, getMaxRow());
 		}
-		//System.out.println("performPaint: " + col_start + "," + col_end + " - " + row_start + "," + row_end);
+		// System.out.println("performPaint: " + col_start + "," + col_end + " - " + row_start + "," + row_end);
 		performPaint(event.gc, col_start, col_end, row_start, row_end, 0, 0, renderWidth, renderHeight);
 	}
 	protected void handleResize(Event event) {
@@ -1443,22 +1447,66 @@ public abstract class AbstractIconCanvas extends Canvas {
 		}
 		return retValue;
 	}
-	// abstract function
 	protected String getToolTipText(int index) {
 		if (toolTipProvider == null)
 			return "";
-		
 		return toolTipProvider.getToolTipText(index);
 	}
 	protected Image getStatusIcon(int index, boolean isSelected) {
 		if (imageProvider == null)
 			return null;
-		
 		return imageProvider.getStatusIcon(index, isSelected);
 	}
 	protected void drawSpecial(int index, GC gc, int x_loc, int y_loc, int width, int height) {
 		if (imageProvider != null) {
 			imageProvider.drawSpecial(index, gc, x_loc, y_loc, width, height);
 		}
+	}
+	/*******************************************************************************************************************************************************************************************************************************************************************************************************
+	 * Self testing
+	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	public static void main(String[] args) {
+		final int totalImage = 10000;
+        final Display display = new Display();
+        final Shell shell = new Shell(display);
+        shell.setLocation(0, 0);
+        shell.setSize(600, 600);
+        shell.setLayout(new FillLayout());
+
+		File normalFile = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running.gif");
+		File selectedFile = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
+		
+		URL normalURL = null;
+		URL selectedlURL = null;
+		try {
+			normalURL = normalFile.toURL();
+			selectedlURL = selectedFile.toURL();
+		} catch (Exception e) {
+			System.out.println("Cannot create the URL: " + e.getMessage());
+			return;
+		}
+		final Image normalImage = ImageDescriptor.createFromURL(normalURL).createImage();
+		final Image selectedImage = ImageDescriptor.createFromURL(selectedlURL).createImage();
+        
+        IconCanvas iconCanvas = new IconCanvas(shell, SWT.NONE);
+        iconCanvas.setImageProvider(new IImageProvider() {
+        	public Image getStatusIcon(int index, boolean isSelected) {
+        		return isSelected?selectedImage:normalImage;
+        	}
+        	public void drawSpecial(int index, GC gc, int x_loc, int y_loc, int width, int height) {
+        	}
+        });
+        iconCanvas.setToolTipProvider(new IToolTipProvider() {
+        	public String getToolTipText(int index) {
+        		return " The element: " + index;
+        	}
+        });
+        iconCanvas.setTotal(totalImage);
+
+        shell.open();
+        while (!shell.isDisposed()) {
+        	if (!display.readAndDispatch())
+        		display.sleep();
+       	}        
 	}
 }

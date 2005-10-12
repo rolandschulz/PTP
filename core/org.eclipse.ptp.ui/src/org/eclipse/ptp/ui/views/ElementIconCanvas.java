@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Composite;
  * @author Clement chu
  * 
  */
-public class ElementIconCanvas extends AbstractIconCanvas {
+public class ElementIconCanvas extends IconCanvas {
 	private IElementSet cur_element_set = null;
 
 	public ElementIconCanvas(AbstractParallelElementView view, Composite parent, int style) {
