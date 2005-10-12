@@ -140,4 +140,21 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	public void removeElements(IElement[] elements) {
 		deleteProcessAction.run(elements);
 	}
+	/*******************************************************************************************************************************************************************************************************************************************************************************************************
+	 * IIconCanvasActionListener
+	 ******************************************************************************************************************************************************************************************************************************************************************************************************/	
+	public void handleAction(int type, int[] indexes) {
+		IElement[] elements = canvas.getElements(indexes);
+		switch (type) {
+		case IIconCanvasActionListener.COPY_ACTION:
+			break;
+		case IIconCanvasActionListener.CUT_ACTION:
+			break;
+		case IIconCanvasActionListener.PASTE_ACTION:
+			break;
+		case IIconCanvasActionListener.DELETE_ACTION:
+			removeElements(elements);
+			break;
+		}
+	}
 }

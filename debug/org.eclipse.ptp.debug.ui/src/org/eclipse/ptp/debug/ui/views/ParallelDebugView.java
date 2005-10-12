@@ -118,20 +118,20 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 	public String getToolTipText(int index) {
 		IElementHandler setManager = getCurrentElementHandler();
 		if (setManager == null || cur_element_set == null)
-			return "Unknown element";
+			return " Unknown element";
 		IElement element = cur_element_set.get(index);
 		if (element == null)
-			return "Unknown element";
+			return " Unknown element";
 		IPProcess proc = ((UIDebugManager) manager).findProcess(getCurrentID(), element.getID());
 		if (proc == null)
-			return "Unknow process";
+			return " Unknow process";
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("Tast ID: " + proc.getTaskId());
+		buffer.append(" Tast ID: " + proc.getTaskId());
 		buffer.append("\n");
-		buffer.append("Process ID: " + proc.getPid());
+		buffer.append(" Process ID: " + proc.getPid());
 		IElementSet[] groups = setManager.getSetsWithElement(element.getID());
 		if (groups.length > 1)
-			buffer.append("\nGroup: ");
+			buffer.append("\n Group: ");
 		for (int i = 1; i < groups.length; i++) {
 			buffer.append(groups[i].getID());
 			if (i < groups.length - 1)

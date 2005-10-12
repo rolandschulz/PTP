@@ -106,7 +106,6 @@ public class PDebugPreferencePage extends AbstractDebugPerferencePage {
 		if (pres != null) {
 			pres.setAttribute(PDebugModelPresentation.DISPLAY_FULL_PATHS, fPathsButton.getSelection()?Boolean.TRUE:Boolean.FALSE);
 		}
-		//DebugUIPlugin.getDefault().getPluginPreferences()
 	}
 	
     public void propertyChange(PropertyChangeEvent event) {

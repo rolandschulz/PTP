@@ -18,8 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.accessibility.Accessible;
@@ -53,6 +56,9 @@ public abstract class AbstractIconCanvas extends Canvas {
 	public final static int SW = 2;
 	public final static int NW = 3;
 	public final static int NE = 4;
+	protected List actionListeners = new ArrayList();
+	protected IToolTipProvider toolTipProvider = null;
+	protected IImageProvider imageProvider = null;
 	// default element info
 	protected final int e_offset_x = 5;
 	protected final int e_offset_y = 5;
@@ -111,17 +117,67 @@ public abstract class AbstractIconCanvas extends Canvas {
 		initializeAccessible();
 		sel_color = display.getSystemColor(SWT.COLOR_RED);
 	}
-	public void setTotal(int total) {
-		checkWidget();
-		if (total < 0) {
-			SWT.error(SWT.ERROR_NULL_ARGUMENT);
+	public void addActionListener(IIconCanvasActionListener actionListener) {
+		if (!actionListeners.contains(actionListener)) {
+			actionListeners.add(actionListener);
 		}
-		this.total_elements = total;
+	}
+	public void removeActionListener(IIconCanvasActionListener actionListener) {
+		if (actionListeners.contains(actionListener)) {
+			actionListeners.remove(actionListener);
+		}
+	}
+	protected void fireAction(int type) {
+		int[] indexes = getSelectedIndexes();
+		if (indexes.length > 0) {
+			for (Iterator i=actionListeners.iterator(); i.hasNext();) {
+				((IIconCanvasActionListener)i.next()).handleAction(type, indexes);
+			}
+		}
+	}
+	protected void fireAction(int type, int index) {
+		if (index > -1) {
+			for (Iterator i=actionListeners.iterator(); i.hasNext();) {
+				((IIconCanvasActionListener)i.next()).handleAction(type, index);
+			}
+		}
+	}
+	private void resetCanvas() {
+		checkWidget();
 		selectedElements.clear();
 		tempSelectedElements.clear();
 		resetInfo();
 		calculateVerticalScrollBar();
 		redraw();
+	}
+	public void setToolTipProvider(IToolTipProvider toolTipProvider) {
+		this.toolTipProvider = toolTipProvider;
+	}
+	public void setImageProvider(IImageProvider imageProvider) {
+		this.imageProvider = imageProvider;
+	}
+	public void setTotal(int total) {
+		if (total < 0) {
+			SWT.error(SWT.ERROR_NULL_ARGUMENT);
+		}
+		this.total_elements = total;
+		resetCanvas();
+	}
+	public void setIconSpace(int e_spacing_x, int e_spacing_y) {
+		if (e_spacing_x < 0 || e_spacing_y <0 ) {
+			SWT.error(SWT.ERROR_NULL_ARGUMENT);
+		}
+		this.e_spacing_x = e_spacing_x;
+		this.e_spacing_y = e_spacing_y;
+		resetCanvas();
+	}
+	public void setIconSize(int e_width, int e_height) {
+		if (e_width <= 0 || e_height <=0 ) {
+			SWT.error(SWT.ERROR_NULL_ARGUMENT);
+		}
+		this.e_height = e_height;
+		this.e_width = e_width;
+		resetCanvas();
 	}
 	public int getTotalElements() {
 		return total_elements;
@@ -344,13 +400,13 @@ public abstract class AbstractIconCanvas extends Canvas {
 			break;
 		// Modification
 		case ST.CUT:
-			// cut();
+			doCut();
 			break;
 		case ST.COPY:
-			// copy();
+			doCopy();
 			break;
 		case ST.PASTE:
-			// paste();
+			doPaste();
 			break;
 		case ST.DELETE_PREVIOUS:
 			doDelete();
@@ -564,7 +620,16 @@ public abstract class AbstractIconCanvas extends Canvas {
 		}
 	}
 	protected void doDelete() {
-		deleteElements(getSelectedIndexes());
+		fireAction(IIconCanvasActionListener.DELETE_ACTION);
+	}
+	protected void doCopy() {
+		fireAction(IIconCanvasActionListener.COPY_ACTION);
+	}
+	protected void doCut() {
+		fireAction(IIconCanvasActionListener.CUT_ACTION);
+	}
+	protected void doPaste() {
+		fireAction(IIconCanvasActionListener.PASTE_ACTION);
 	}
 	protected void doPageUp(int rows) {
 		if (current_top_row >= 0 && verticalScrollOffset > 0) {
@@ -1012,7 +1077,7 @@ public abstract class AbstractIconCanvas extends Canvas {
 		for (int row_count = row_start; row_count < row_end; row_count++) {
 			for (int col_count = col_start; col_count < col_end; col_count++) {
 				int index = findSelectedIndex(row_count, col_count);
-				if (index < total) {
+				if (index > -1 && index < total) {
 					int x_loc = e_offset_x + ((col_count) * getElementWidth());
 					int y_loc = e_offset_y + ((row_count) * getElementHeight()) - verticalScrollOffset;
 					drawImage(newGC, index, x_loc, y_loc, (selectedElements.get(index) || tempSelectedElements.get(index)));
@@ -1033,7 +1098,7 @@ public abstract class AbstractIconCanvas extends Canvas {
 		Image statusImage = getStatusIcon(index, isSelected);
 		if (statusImage != null) {
 			gc.drawImage(statusImage, x_loc, y_loc);
-			drawRectangle(index, gc, x_loc, y_loc, e_width, e_height);
+			drawSpecial(index, gc, x_loc, y_loc, e_width, e_height);
 		}
 	}
 	private void drawSelection(GC gc) {
@@ -1187,6 +1252,7 @@ public abstract class AbstractIconCanvas extends Canvas {
 		keyActionMap = null;
 		defaultCursor.dispose();
 		defaultCursor = null;
+		actionListeners.clear();
 		total_elements = 0;
 	}
 	protected void handleKeyDown(Event event) {
@@ -1200,7 +1266,7 @@ public abstract class AbstractIconCanvas extends Canvas {
 	protected void handleMouseDown(Event event) {
 		mouseDown = true;
 		mouseDoubleClick = false;
-		if ((event.button != 1) || (IS_CARBON && (event.stateMask & SWT.MOD4) != 0)) {
+		if (getTotalElements() == 0 || (event.button != 1) || (IS_CARBON && (event.stateMask & SWT.MOD4) != 0)) {
 			return;
 		}
 		boolean isCtrl = (event.stateMask & SWT.MOD1) != 0;
@@ -1238,14 +1304,14 @@ public abstract class AbstractIconCanvas extends Canvas {
 		mouseDoubleClick = true;
 		int index = findSelectedIndexByLocation(event.x, event.y, false);
 		if (index > -1) {
-			doubleClickAction(index);
+			fireAction(IIconCanvasActionListener.DOUBLE_CLICK_ACTION, index);
 			redraw(index, index);
 		}
 	}
 	protected void handleMouseMove(Event event) {
 		if (autoScrollDirection == SWT.NULL)
 			doMouseMoving(event);
-		if (!mouseDown || mouseDoubleClick)
+		if (!mouseDown || mouseDoubleClick || getTotalElements() == 0)
 			return;
 		if ((event.stateMask & SWT.BUTTON1) == 0) {
 			return;
@@ -1255,7 +1321,7 @@ public abstract class AbstractIconCanvas extends Canvas {
 	}
 	protected void handlePaint(Event event) {
 		Rectangle clientArea = getClientArea();
-		if (event.height == 0 || (clientArea.width == 0 && clientArea.height == 0)) {
+		if (getTotalElements() == 0 || event.height == 0 || (clientArea.width == 0 && clientArea.height == 0)) {
 			// Check if there is work to do
 			return;
 		}
@@ -1321,7 +1387,7 @@ public abstract class AbstractIconCanvas extends Canvas {
 		hideToolTip();
 	}
 	protected void showToolTip(int index, int mx, int my, Display display) {
-		if (index == -1) {
+		if (toolTipProvider == null || index == -1) {
 			hideToolTip();
 			return;
 		}
@@ -1378,9 +1444,21 @@ public abstract class AbstractIconCanvas extends Canvas {
 		return retValue;
 	}
 	// abstract function
-	public abstract String getToolTipText(int index);
-	public abstract Image getStatusIcon(int index, boolean isSelected);
-	public abstract void drawRectangle(int index, GC gc, int x_loc, int y_loc, int width, int height);
-	public abstract void deleteElements(int[] indexes);
-	public abstract void doubleClickAction(int index);
+	protected String getToolTipText(int index) {
+		if (toolTipProvider == null)
+			return "";
+		
+		return toolTipProvider.getToolTipText(index);
+	}
+	protected Image getStatusIcon(int index, boolean isSelected) {
+		if (imageProvider == null)
+			return null;
+		
+		return imageProvider.getStatusIcon(index, isSelected);
+	}
+	protected void drawSpecial(int index, GC gc, int x_loc, int y_loc, int width, int height) {
+		if (imageProvider != null) {
+			imageProvider.drawSpecial(index, gc, x_loc, y_loc, width, height);
+		}
+	}
 }
