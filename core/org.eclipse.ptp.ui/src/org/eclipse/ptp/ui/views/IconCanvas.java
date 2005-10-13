@@ -120,6 +120,8 @@ public class IconCanvas extends Canvas {
 		installListeners();
 		initializeAccessible();
 		sel_color = display.getSystemColor(SWT.COLOR_RED);
+		super.setBackground(getBackground());
+		super.setForeground(getForeground());
 	}
 	public void addActionListener(IIconCanvasActionListener actionListener) {
 		if (!actionListeners.contains(actionListener)) {
@@ -261,7 +263,7 @@ public class IconCanvas extends Canvas {
 		if (verticalBar != null) {
 			Rectangle clientArea = getClientArea();
 			final int INACTIVE = 1;
-			int max_height = getMaxHeight() + e_offset_y + 1;
+			int max_height = getMaxHeight() + e_offset_y + sel_size;
 			if (clientArea.height < max_height) {
 				verticalBar.setValues(verticalBar.getSelection(), verticalBar.getMinimum(), max_height, clientArea.height, getVerticalIncrement(), clientArea.height);
 			} else if (verticalBar.getThumb() != INACTIVE || verticalBar.getMaximum() != INACTIVE) {
@@ -655,7 +657,7 @@ public class IconCanvas extends Canvas {
 			int scrollRows = Math.max(1, Math.min(max_row - current_top_row - max_client_row, rows));
 			current_top_row += scrollRows;
 			// scroll one page down or to the bottom
-			int scrollOffset = Math.min(verticalScrollOffset + scrollRows * getVerticalIncrement(), (getMaxRow() - getMaxClientRow()) * getElementHeight());
+			int scrollOffset = Math.min(verticalScrollOffset + (scrollRows * getVerticalIncrement()), (max_row - max_client_row) * getElementHeight());
 			if (scrollOffset > verticalScrollOffset) {
 				setVerticalScrollOffset(scrollOffset, true);
 			}
