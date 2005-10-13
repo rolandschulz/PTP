@@ -135,10 +135,8 @@ public class IconCanvas extends Canvas {
 	}
 	protected void fireAction(int type) {
 		int[] indexes = getSelectedIndexes();
-		if (indexes.length > 0) {
-			for (Iterator i = actionListeners.iterator(); i.hasNext();) {
-				((IIconCanvasActionListener) i.next()).handleAction(type, indexes);
-			}
+		for (Iterator i = actionListeners.iterator(); i.hasNext();) {
+			((IIconCanvasActionListener) i.next()).handleAction(type, indexes);
 		}
 	}
 	protected void fireAction(int type, int index) {

@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -26,8 +28,8 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.internal.ui.actions.ChangeSetAction;
 import org.eclipse.ptp.internal.ui.actions.CreateSetAction;
-import org.eclipse.ptp.internal.ui.actions.RemoveElementAction;
 import org.eclipse.ptp.internal.ui.actions.DeleteSetAction;
+import org.eclipse.ptp.internal.ui.actions.RemoveElementAction;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
@@ -45,6 +47,7 @@ import org.eclipse.ui.PartInitException;
  * 
  */
 public abstract class AbstractParallelSetView extends AbstractParallelElementView {
+	protected List clipboard = new ArrayList();
 	// selected element
 	protected String cur_selected_element_id = IManager.EMPTY_ID;
 	// default actions
@@ -53,6 +56,10 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 	protected ParallelAction deleteProcessAction = null;
 	protected ParallelAction changeSetAction = null;
 
+	public void dispose() {
+		clipboard.clear();
+		super.dispose();
+	}
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		IToolBarManager toolBarMgr = getViewSite().getActionBars().getToolBarManager();
@@ -137,23 +144,52 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 			}
 		});
 	}
-	public void removeElements(IElement[] elements) {
-		deleteProcessAction.run(elements);
-	}
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * IIconCanvasActionListener
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/	
 	public void handleAction(int type, int[] indexes) {
+		if (cur_element_set == null)
+			return;
+		
 		IElement[] elements = canvas.getElements(indexes);
 		switch (type) {
 		case IIconCanvasActionListener.COPY_ACTION:
+			if (elements.length > 0) {
+				clipboard.clear();
+				clipboard.add(elements);
+			}
 			break;
 		case IIconCanvasActionListener.CUT_ACTION:
+			if (elements.length > 0) {
+				if (!cur_element_set.isRootSet()) {
+					manager.removeFromSet(elements, cur_element_set.getID(), cur_element_set.getElementHandler());
+					clipboard.clear();
+					clipboard.add(elements);
+					selectSet(cur_element_set.getElementHandler().getSet(cur_element_set.getID()));
+					updateTitle();
+					refresh();
+				}
+			}
 			break;
 		case IIconCanvasActionListener.PASTE_ACTION:
+			if (clipboard.size() > 0) {
+				IElement[] clipElements = (IElement[])clipboard.get(0);
+				if (cur_element_set.isRootSet())
+					createSetAction.run(clipElements);
+				else {
+					manager.addToSet(clipElements, cur_element_set.getID(), cur_element_set.getElementHandler());
+					selectSet(cur_element_set.getElementHandler().getSet(cur_element_set.getID()));					
+					update();
+					refresh();
+				}
+			}
 			break;
 		case IIconCanvasActionListener.DELETE_ACTION:
-			removeElements(elements);
+			if (elements.length > 0) {
+				if (!cur_element_set.isRootSet()) {
+					deleteProcessAction.run(elements);
+				}
+			}
 			break;
 		}
 	}
