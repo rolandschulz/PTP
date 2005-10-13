@@ -1127,7 +1127,7 @@ public class IconCanvas extends Canvas {
 			start_y -= sel_gap;
 			end_x = start_x;
 			end_y = start_y;
-			if (isReachBottom() || movingSelectionEnd.y < (getMaxClientRow() * getElementHeight())) {
+			if (isReachBottom() || movingSelectionEnd.y < getClientArea().height) {
 				while (end_x > stationary_pt.x) {
 					gc.drawLine(end_x - sel_length, start_y, end_x, start_y);
 					end_x -= (sel_length * sel_gap);
@@ -1151,7 +1151,7 @@ public class IconCanvas extends Canvas {
 			start_y -= sel_gap;
 			end_x = start_x;
 			end_y = start_y;
-			if (isReachBottom() || movingSelectionEnd.y < (getMaxClientRow() * getElementHeight())) {
+			if (isReachBottom() || movingSelectionEnd.y < getClientArea().height) {
 				while (end_x < stationary_pt.x) {
 					gc.drawLine(end_x, start_y, end_x + sel_length, start_y);
 					end_x += (sel_length * sel_gap);
@@ -1473,8 +1473,10 @@ public class IconCanvas extends Canvas {
         shell.setSize(600, 600);
         shell.setLayout(new FillLayout());
 
-		File normalFile = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running.gif");
-		File selectedFile = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
+		//File normalFile = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running.gif");
+		//File selectedFile = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
+		File normalFile = new File("/home/clement/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running.gif");
+		File selectedFile = new File("/home/clement/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
 		
 		URL normalURL = null;
 		URL selectedlURL = null;
