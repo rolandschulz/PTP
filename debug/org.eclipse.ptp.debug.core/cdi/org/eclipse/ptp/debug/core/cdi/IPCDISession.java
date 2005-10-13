@@ -35,6 +35,7 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 
 public interface IPCDISession extends ICDISession {
 	
+	public void registerTarget(int procNum, boolean sendEvent, boolean resumeTarget);
 	public void registerTarget(int procNum, boolean sendEvent);
 	public void registerTargets(int[] procNums, boolean sendEvent);
 	public void unregisterTarget(int procNum, boolean sendEvent);
