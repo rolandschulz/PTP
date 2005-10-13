@@ -113,8 +113,6 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 		} catch (CDIException e) {
 		}
 		
-		/* Initially we only create process/target 0 */
-		registerTarget(0, true, true);
 	}
 	
 	public String getProjectName() {
