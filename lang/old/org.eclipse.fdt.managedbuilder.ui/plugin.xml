@@ -1159,7 +1159,7 @@
                       superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
                           id="gnu.fortran.compiler.exe.debug.option.optimization.level"
-                          defaultValue="gnu.fortran.compiler.optimization.level.none"
+                          defaultValue="gnu.fortran.optimization.level.none"
                           superClass="gnu.fortran.compiler.option.optimization.level">
                       </option>
                       <option
@@ -1224,12 +1224,12 @@
                       superClass="fdt.managedbuild.tool.gnu.fortran.compiler">                     
 					  <option
 						  id="gnu.fortran.compiler.exe.release.option.optimization.level"
-						  defaultValue="gnu.fortran.compiler.optimization.level.most"
+						  defaultValue="gnu.fortran.optimization.level.most"
 						  superClass="gnu.fortran.compiler.option.optimization.level">
 					  </option>
 					  <option
 						  id="gnu.fortran.compiler.exe.release.option.debugging.level"
-						  defaultValue="gnu.fortran.compiler.debugging.level.none"
+						  defaultValue="gnu.fortran.debugging.level.none"
 						  superClass="gnu.fortran.compiler.option.debugging.level">
 					  </option>
                   </tool>
@@ -1297,7 +1297,7 @@
                       superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
                           id="gnu.fortran.compiler.macosx.exe.debug.option.optimization.level"
-                          defaultValue="gnu.fortran.compiler.optimization.level.none"
+                          defaultValue="gnu.fortran.optimization.level.none"
                           superClass="gnu.fortran.compiler.option.optimization.level">
                       </option>
                       <option
@@ -1362,12 +1362,12 @@
                       superClass="fdt.managedbuild.tool.gnu.fortran.compiler">
                       <option
                           id="gnu.fortran.compiler.macosx.exe.release.option.optimization.level"
-                          defaultValue="gnu.fortran.compiler.optimization.level.most"
+                          defaultValue="gnu.fortran.optimization.level.most"
                           superClass="gnu.fortran.compiler.option.optimization.level">
                       </option>
                       <option
                           id="gnu.fortran.compiler.macosx.exe.release.option.debugging.level"
-                          defaultValue="gnu.fortran.compiler.debugging.level.none"
+                          defaultValue="gnu.fortran.debugging.level.none"
                           superClass="gnu.fortran.compiler.option.debugging.level">
                       </option>
                    </tool>
@@ -1434,12 +1434,12 @@
                       superClass="fdt.managedbuild.tool.xlf.fortran.compiler">
                       <option
                           id="xlf.fortran.compiler.macosx.exe.debug.option.optimization.level"
-                          defaultValue="xlf.fortran.compiler.optimization.level.none"
+                          defaultValue="xlf.fortran.optimization.level.none"
                           superClass="xlf.fortran.compiler.option.optimization.level">
                       </option>
                       <option
                           id="xlf.fortran.compiler.macosx.exe.debug.option.debugging.level"
-                          defaultValue="xlf.fortran.compiler.debugging.level.max"
+                          defaultValue="xlf.fortran.debugging.level.default"
                           superClass="xlf.fortran.compiler.option.debugging.level">
                       </option>
                   </tool>
@@ -1499,12 +1499,12 @@
                       superClass="fdt.managedbuild.tool.xlf.fortran.compiler">
                       <option
                           id="xlf.fortran.compiler.macosx.exe.release.option.optimization.level"
-                          defaultValue="xlf.fortran.compiler.optimization.level.most"
+                          defaultValue="xlf.fortran.optimization.level.most"
                           superClass="xlf.fortran.compiler.option.optimization.level">
                       </option>
                       <option
                           id="xlf.fortran.compiler.macosx.exe.release.option.debugging.level"
-                          defaultValue="xlf.fortran.compiler.debugging.level.none"
+                          defaultValue="xlf.fortran.debugging.level.none"
                           superClass="xlf.fortran.compiler.option.debugging.level">
                       </option>
                    </tool>
