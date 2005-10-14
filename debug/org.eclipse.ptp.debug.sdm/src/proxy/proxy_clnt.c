@@ -70,136 +70,23 @@ proxy_clnt_progress(proxy *p, void *data)
 }
 
 int
-proxy_clnt_startsession(proxy *p, void *data, char *prog, char *args)
+proxy_clnt_sendcmd(proxy *p, void *data, char *cmd, char *fmt, ...)
 {
-	if (p != NULL)
-		return p->clnt_funcs->startsession(data, prog, args);
-		
-	return -1;
-}
-
-int 
-proxy_clnt_setlinebreakpoint(proxy *p, void *data, procset *set, int bpid, char *file, int line)
-{
-	if (p != NULL)
-		return p->clnt_funcs->setlinebreakpoint(data, set, bpid, file, line);
-		
-	return -1;
-}
-
-int 
-proxy_clnt_setfuncbreakpoint(proxy *p, void *data, procset *set, int bpid, char *file, char *func)
-{
-	if (p != NULL)
-		return p->clnt_funcs->setfuncbreakpoint(data, set, bpid, file, func);
-		
-	return -1;
-}
-
-int 
-proxy_clnt_deletebreakpoint(proxy *p, void *data, procset *set, int bpid)
-{
-	if (p != NULL)
-		return p->clnt_funcs->deletebreakpoint(data, set, bpid);
-		
-	return -1;
-}
-
-int
-proxy_clnt_go(proxy *p, void *data, procset *set)
-{
-	if (p != NULL)
-		return p->clnt_funcs->go(data, set);
-		
-	return -1;
-}
-
-int 
-proxy_clnt_step(proxy *p, void *data, procset *set, int count, int type)
-{
-	if (p != NULL)
-		return p->clnt_funcs->step(data, set, count, type);
-		
-	return -1;
-}
-
-int
-proxy_clnt_terminate(proxy *p, void *data, procset *set)
-{
-	if (p != NULL)
-		return p->clnt_funcs->terminate(data, set);
-		
-	return -1;
-}
-
-int 
-proxy_clnt_liststackframes(proxy *p, void *data, procset *set, int current)
-{
-	if (p != NULL)
-		return p->clnt_funcs->liststackframes(data, set, current);
-		
-	return -1;
-}
-
-int 
-proxy_clnt_setcurrentstackframe(proxy *p, void *data, procset *set, int level)
-{
-	if (p != NULL)
-		return p->clnt_funcs->setcurrentstackframe(data, set, level);
-		
-	return -1;
-}
-
-int 
-proxy_clnt_evaluateexpression(proxy *p, void *data, procset *set, char *expr)
-{
-	if (p != NULL)
-		return p->clnt_funcs->evaluateexpression(data, set, expr);
-		
-	return -1;
-}
-
-int 
-proxy_clnt_gettype(proxy *p, void *data, procset *set, char *expr)
-{
-	if (p != NULL)
-		return p->clnt_funcs->gettype(data, set, expr);
-		
-	return -1;
-}
-
-int 
-proxy_clnt_listlocalvariables(proxy *p, void *data, procset *set)
-{
-	if (p != NULL)
-		return p->clnt_funcs->listlocalvariables(data, set);
-		
-	return -1;
-}
-
-int 
-proxy_clnt_listarguments(proxy *p, void *data, procset *set)
-{
-	if (p != NULL)
-		return p->clnt_funcs->listarguments(data, set);
-		
-	return -1;
-}
-
-int 
-proxy_clnt_listglobalvariables(proxy *p, void *data, procset *set)
-{
-	if (p != NULL)
-		return p->clnt_funcs->listglobalvariables(data, set);
-		
-	return -1;
+	int		res = -1;
+	va_list	ap;
+	
+	if (p != NULL) {
+		va_start(ap, fmt);
+		res = p->clnt_funcs->sendcmd(data, cmd, fmt, ap);
+		va_end(ap);
+	}
+	
+	return res;
 }
 
 int 
 proxy_clnt_quit(proxy *p, void *data)
 {
-	if (p != NULL)
-		return p->clnt_funcs->quit(data);
-		
-	return -1;
+	return proxy_clnt_sendcmd(p, data, PROXY_QUIT_CMD, NULL);
 }
+

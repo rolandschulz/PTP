@@ -54,21 +54,7 @@ static int proxy_tcp_clnt_connect(void *);
 static int proxy_tcp_clnt_create(void *);
 static int proxy_tcp_clnt_accept(int, void *);
 static int proxy_tcp_clnt_progress(void *);
-static int proxy_tcp_clnt_startsession(void *, char *, char *);
-static int proxy_tcp_clnt_setlinebreakpoint(void *, procset *, int, char *, int);
-static int proxy_tcp_clnt_setfuncbreakpoint(void *, procset *, int, char *, char *);
-static int proxy_tcp_clnt_deletebreakpoint(void *, procset *, int);
-static int proxy_tcp_clnt_go(void *, procset *);
-static int proxy_tcp_clnt_step(void *, procset *, int, int);
-static int proxy_tcp_clnt_terminate(void *, procset *);
-static int proxy_tcp_clnt_liststackframes(void *, procset *, int);
-static int proxy_tcp_clnt_setcurrentstackframe(void *, procset *, int);
-static int proxy_tcp_clnt_evaluateexpression(void *, procset *, char *);
-static int proxy_tcp_clnt_gettype(void *, procset *, char *);
-static int proxy_tcp_clnt_listlocalvariables(void *, procset *);
-static int proxy_tcp_clnt_listarguments(void *, procset *);
-static int proxy_tcp_clnt_listglobalvariables(void *, procset *);
-static int proxy_tcp_clnt_quit(void *);
+static int proxy_tcp_clnt_sendcmd(void *, char *, char *, va_list);
 
 proxy_clnt_funcs proxy_tcp_clnt_funcs =
 {
@@ -76,50 +62,8 @@ proxy_clnt_funcs proxy_tcp_clnt_funcs =
 	proxy_tcp_clnt_connect,
 	proxy_tcp_clnt_create,
 	proxy_tcp_clnt_progress,
-	proxy_tcp_clnt_startsession,
-	proxy_tcp_clnt_setlinebreakpoint,
-	proxy_tcp_clnt_setfuncbreakpoint,
-	proxy_tcp_clnt_deletebreakpoint,
-	proxy_tcp_clnt_go,
-	proxy_tcp_clnt_step,
-	proxy_tcp_clnt_terminate,
-	proxy_tcp_clnt_liststackframes,
-	proxy_tcp_clnt_setcurrentstackframe,
-	proxy_tcp_clnt_evaluateexpression,
-	proxy_tcp_clnt_gettype,
-	proxy_tcp_clnt_listlocalvariables,
-	proxy_tcp_clnt_listarguments,
-	proxy_tcp_clnt_listglobalvariables,
-	proxy_tcp_clnt_quit,
+	proxy_tcp_clnt_sendcmd,
 };
-
-static int
-proxy_tcp_clnt_send_cmd(proxy_tcp_conn *conn, char *fmt, ...)
-{
-	va_list					ap;
-	char *					request;
-	proxy_clnt_helper_funcs *	helper = (proxy_clnt_helper_funcs *)conn->helper;
-	
-	if (!conn->connected)
-		return DBGRES_ERR;
-		
-	va_start(ap, fmt);
-	vasprintf(&request, fmt, ap);
-	va_end(ap);
-printf("tcp_clnt_send_cmd: <%s>\n", request);
-
-	if ( proxy_tcp_send_msg(conn, request, strlen(request)) < 0 )
-	{
-			DbgSetError(DBGERR_PROXY_TERM, NULL);
-			helper->unregfile(conn->sess_sock);
-			free(request);
-			return DBGRES_ERR;
-	}
-	
-	free(request);
-	
-	return DBGRES_OK;
-}
 
 static int
 proxy_tcp_clnt_recv_msgs(int fd, void *data)
@@ -338,237 +282,34 @@ proxy_tcp_clnt_progress(void *data)
 }
 
 static int
-proxy_tcp_clnt_startsession(void *data, char *prog, char *args)
+proxy_tcp_clnt_sendcmd(void *data, char *cmd, char *fmt, va_list ap)
 {
+	char *					request;
+	char *					args;
 	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
+	proxy_clnt_helper_funcs *	helper = (proxy_clnt_helper_funcs *)conn->helper;
 	
-	fix_null(&prog);
-	fix_null(&args);
+	if (!conn->connected)
+		return DBGRES_ERR;
 	
-	return proxy_tcp_clnt_send_cmd(conn, "INI \"%s\" \"%s\"", prog, args);
-}
-
-static int
-proxy_tcp_clnt_setlinebreakpoint(void *data, procset *set, int bpid, char *file, int line)
-{
-	int				res;
-	char *			procs;
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-
-	procs = procset_to_str(set);
-	
-	fix_null(&file);
-	        
-	res = proxy_tcp_clnt_send_cmd(conn, "SLB %s %d \"%s\" %d", procs, bpid, file, line);
-	
-	free(procs);
+	if (fmt != NULL) {
+		vasprintf(&args, fmt, ap);
+		asprintf(&request, "%s %s", cmd, args);
+		free(args);
+	} else 
+		request = strdup(cmd);
 		
-	return res;
-}
+printf("tcp_clnt_send_cmd: <%s>\n", request);
 
-static int 
-proxy_tcp_clnt_setfuncbreakpoint(void *data, procset *set, int bpid, char *file, char *func)
-{
-	int				res;
-	char *			procs;
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-
-	procs = procset_to_str(set);
+	if ( proxy_tcp_send_msg(conn, request, strlen(request)) < 0 )
+	{
+			DbgSetError(DBGERR_PROXY_TERM, NULL);
+			helper->unregfile(conn->sess_sock);
+			free(request);
+			return DBGRES_ERR;
+	}
 	
-	fix_null(&file);
-	fix_null(&func);
-		        
-	res = proxy_tcp_clnt_send_cmd(conn, "SFB %s %d \"%s\" \"%s\"", procs, bpid, file, func);
+	free(request);
 	
-	free(procs);
-		
-	return res;
-}
-
-static int 
-proxy_tcp_clnt_deletebreakpoint(void *data, procset *set, int bpid)
-{
-	int				res;
-	char *			procs;
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-
-	procs = procset_to_str(set);
-	        
-	res = proxy_tcp_clnt_send_cmd(conn, "DBP %s %d", procs, bpid);
-	
-	free(procs);
-		
-	return res;
-}
-
-static int
-proxy_tcp_clnt_go(void *data, procset *set)
-{
-	int				res;
-	char *			procs;
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-
-	procs = procset_to_str(set);
-	        
-	res = proxy_tcp_clnt_send_cmd(conn, "GOP %s", procs);
-	
-	free(procs);
-		
-	return res;
-}
-
-static int 
-proxy_tcp_clnt_step(void *data, procset *set, int count, int type)
-{
-	int				res;
-	char *			procs;
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-
-	procs = procset_to_str(set);
-	        
-	res = proxy_tcp_clnt_send_cmd(conn, "STP %s %d %d", procs, count, type);
-	
-	free(procs);
-		
-	return res;
-}
-
-static int
-proxy_tcp_clnt_terminate(void *data, procset *set)
-{
-	int				res;
-	char *			procs;
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-
-	procs = procset_to_str(set);
-	        
-	res = proxy_tcp_clnt_send_cmd(conn, "HLT %s", procs);
-	
-	free(procs);
-		
-	return res;
-}
-
-static int 
-proxy_tcp_clnt_liststackframes(void *data, procset *set, int current)
-{
-	int				res;
-	char *			procs;
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-
-	procs = procset_to_str(set);
-	        
-	res = proxy_tcp_clnt_send_cmd(conn, "LSF %s %d", procs, current);
-	
-	free(procs);
-		
-	return res;
-}
-
-static int 
-proxy_tcp_clnt_setcurrentstackframe(void *data, procset *set, int level)
-{
-	int				res;
-	char *			procs;
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-
-	procs = procset_to_str(set);
-	        
-	res = proxy_tcp_clnt_send_cmd(conn, "SCS %s %d", procs, level);
-	
-	free(procs);
-		
-	return res;
-}
-
-static int 
-proxy_tcp_clnt_evaluateexpression(void *data, procset *set, char *expr)
-{
-	int				res;
-	char *			procs;
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-
-	procs = procset_to_str(set);
-	
-	fix_null(&expr);
-	
-	res = proxy_tcp_clnt_send_cmd(conn, "EEX %s \"%s\"", procs, expr);
-	
-	free(procs);
-		
-	return res;
-}
-
-static int 
-proxy_tcp_clnt_gettype(void *data, procset *set, char *expr)
-{
-	int				res;
-	char *			procs;
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-
-	procs = procset_to_str(set);
-	
-	fix_null(&expr);
-	
-	res = proxy_tcp_clnt_send_cmd(conn, "TYP %s \"%s\"", procs, expr);
-	
-	free(procs);
-		
-	return res;
-}
-
-static int 
-proxy_tcp_clnt_listlocalvariables(void *data, procset *set)
-{
-	int				res;
-	char *			procs;
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-
-	procs = procset_to_str(set);
-	        
-	res = proxy_tcp_clnt_send_cmd(conn, "LLV %s", procs);
-	
-	free(procs);
-		
-	return res;
-}
-
-static int 
-proxy_tcp_clnt_listarguments(void *data, procset *set)
-{
-	int				res;
-	char *			procs;
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-
-	procs = procset_to_str(set);
-	        
-	res = proxy_tcp_clnt_send_cmd(conn, "LAR %s", procs);
-	
-	free(procs);
-		
-	return res;
-}
-
-static int 
-proxy_tcp_clnt_listglobalvariables(void *data, procset *set)
-{
-	int				res;
-	char *			procs;
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-
-	procs = procset_to_str(set);
-	        
-	res = proxy_tcp_clnt_send_cmd(conn, "LGV %s", procs);
-	
-	free(procs);
-		
-	return res;
-}
-
-static int
-proxy_tcp_clnt_quit(void *data)
-{
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-	
-	return proxy_tcp_clnt_send_cmd(conn, "QUI");
+	return DBGRES_OK;
 }

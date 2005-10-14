@@ -45,25 +45,7 @@ struct proxy_clnt_funcs {
 	int (*connect)(void *);
 	int (*create)(void *);
 	int (*progress)(void *);
-	
-	/*
-	 * Protocol functions
-	 */
-	int (*startsession)(void *, char *, char *);
-	int (*setlinebreakpoint)(void *, struct procset *, int, char *, int);
-	int (*setfuncbreakpoint)(void *, struct procset *, int, char *, char *);
-	int (*deletebreakpoint)(void *, struct procset *, int);
-	int (*go)(void *, struct procset *);
-	int (*step)(void *, struct procset *, int, int);
-	int (*terminate)(void *, struct procset *);
-	int (*liststackframes)(void *, struct procset *, int);
-	int (*setcurrentstackframe)(void *, struct procset *, int);
-	int (*evaluateexpression)(void *, struct procset *, char *);
-	int (*gettype)(void *, struct procset *, char *);
-	int (*listlocalvariables)(void *, struct procset *);
-	int (*listarguments)(void *, struct procset *);
-	int (*listglobalvariables)(void *, struct procset *);
-	int (*quit)(void *);
+	int (*sendcmd)(void *, char *, char *, va_list);
 };
 typedef struct proxy_clnt_funcs	proxy_clnt_funcs;
 
@@ -117,6 +99,8 @@ struct proxy {
 };
 typedef struct proxy	proxy;
 
+#define PROXY_QUIT_CMD	"QUI"
+
 extern proxy 	proxies[];
 
 extern int	find_proxy(char *, proxy **);
@@ -131,21 +115,7 @@ extern int proxy_clnt_init(proxy *, proxy_clnt_helper_funcs *, void **, char *, 
 extern int proxy_clnt_connect(proxy *, void *);
 extern int proxy_clnt_create(proxy *, void *);
 extern int proxy_clnt_progress(proxy *, void *);
-extern int proxy_clnt_startsession(proxy *, void *, char *, char *);
-extern int proxy_clnt_setlinebreakpoint(proxy *, void *, struct procset *, int, char *, int);
-extern int proxy_clnt_setfuncbreakpoint(proxy *, void *, struct procset *, int, char *, char *);
-extern int proxy_clnt_deletebreakpoint(proxy *, void *, struct procset *, int);
-extern int proxy_clnt_go(proxy *, void *, struct procset *);
-extern int proxy_clnt_step(proxy *, void *, struct procset *, int, int);
-extern int proxy_clnt_terminate(proxy *, void *, struct procset *);
-extern int proxy_clnt_liststackframes(proxy *, void *, struct procset *, int);
-extern int proxy_clnt_setcurrentstackframe(proxy *, void*, struct procset *, int);
-extern int proxy_clnt_evaluateexpression(proxy *, void *, struct procset *, char *);
-extern int proxy_clnt_gettype(proxy *, void *, struct procset *, char *);
-extern int proxy_clnt_listlocalvariables(proxy *, void *, struct procset *);
-extern int proxy_clnt_listarguments(proxy *, void *, struct procset *);
-extern int proxy_clnt_listglobalvariables(proxy *, void *, struct procset *);
+extern int proxy_clnt_sendcmd(proxy *, void *, char *, char *, ...);
 extern int proxy_clnt_quit(proxy *, void *);
-
 
 #endif /* _PROXY_H_*/
