@@ -29,9 +29,9 @@
 /*
  * Session control
  */
-int DbgClntInit(int, char *, proxy_svr_helper_funcs *);
+int DbgClntInit(int, char *, proxy_svr_helper_funcs *, proxy_svr_commands *);
 int DbgClntCreateSession(char *, int);
-int DbgClntStartSession(char *, char *);
+int DbgClntStartSession(char **);
 int DbgClntQuit(void);
 int DbgClntIsShutdown(void);
 void DbgClntFinish(void);
@@ -39,31 +39,31 @@ void DbgClntFinish(void);
 /*
  * Breakpoint operations
  */
-int DbgClntSetLineBreakpoint(procset *set, int bpid, char *file, int line);
-int DbgClntSetFuncBreakpoint(procset *set, int bpid, char *file, char *func);
-int DbgClntDeleteBreakpoint(procset *set, int);
+int DbgClntSetLineBreakpoint(char **);
+int DbgClntSetFuncBreakpoint(char **);
+int DbgClntDeleteBreakpoint(char **);
 
 /*
  * Process control operations
  */
-int DbgClntGo(procset *set);
-int DbgClntStep(procset *set, int count, int type);
-int DbgClntTerminate(procset *set);
+int DbgClntGo(char **);
+int DbgClntStep(char **);
+int DbgClntTerminate(char **);
 
 /*
  * Stack frame operations
  */
-int DbgClntListStackframes(procset *set, int);
-int DbgClntSetCurrentStackframe(procset *set, int level);
+int DbgClntListStackframes(char **);
+int DbgClntSetCurrentStackframe(char **);
 
 /*
  * Expression/variable operations
  */
-int DbgClntEvaluateExpression(procset *set, char *);
-int DbgClntGetType(procset *set, char *);
-int DbgClntListLocalVariables(procset *set);
-int DbgClntListArguments(procset *set);
-int DbgClntListGlobalVariables(procset *set);
+int DbgClntEvaluateExpression(char **);
+int DbgClntGetType(char **);
+int DbgClntListLocalVariables(char **);
+int DbgClntListArguments(char **);
+int DbgClntListGlobalVariables(char **);
 
 /*
  * Event Handling

@@ -29,6 +29,7 @@
 
 #include "compat.h"
 #include "dbg.h"
+#include "dbg_proxy.h"
 #include "dbg_client.h"
 #include "client_srv.h"
 #include "procset.h"
@@ -76,7 +77,7 @@ fix_null(char **str)
 }
 
 int
-DbgClntInit(int num_svrs, char *proxy, proxy_svr_helper_funcs *funcs)
+DbgClntInit(int num_svrs, char *proxy, proxy_svr_helper_funcs *funcs, proxy_svr_commands *cmds)
 {
 	/*
 	 * Initialize client/server interface
@@ -101,7 +102,7 @@ DbgClntInit(int num_svrs, char *proxy, proxy_svr_helper_funcs *funcs)
 		return DBGRES_ERR;
 	}
 	
-	proxy_svr_init(dbg_proxy, funcs, &dbg_proxy_data);
+	proxy_svr_init(dbg_proxy, funcs, cmds, &dbg_proxy_data);
 	
 	return DBGRES_OK;
 }
@@ -128,15 +129,12 @@ DbgClntIsShutdown(void)
 }
 
 int 
-DbgClntStartSession(char *prog, char *args)
+DbgClntStartSession(char **args)
 {
 	int		res;
 	char *	cmd;
 	
-	fix_null(&prog);
-	fix_null(&args);
-		
-	asprintf(&cmd, "INI \"%s\" \"%s\"", prog, args);
+	asprintf(&cmd, "%s \"%s\" \"%s\"", DBG_STARTSESSION_CMD, args[1], args[2]);
 	res = ClntSendCommand(dbg_procs, cmd, NULL);
 	free(cmd);
 	return res;
@@ -146,43 +144,68 @@ DbgClntStartSession(char *prog, char *args)
  * Breakpoint operations
  */
 int 
-DbgClntSetLineBreakpoint(procset *set, int bpid, char *file, int line)
+DbgClntSetLineBreakpoint(char **args)
 {
-	int		res;
-	char *	cmd;
+	int			res;
+	char *		cmd;
+	procset *	set; 
 
-	fix_null(&file);
+	set = str_to_procset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
 	
-	asprintf(&cmd, "SLB %d \"%s\" %d", bpid, file, line);
+	asprintf(&cmd, "%s %s \"%s\" %s", DBG_SETLINEBREAKPOINT_CMD, args[2], args[3], args[4]);
 	res = ClntSendCommand(set, cmd, NULL);
+	
 	free(cmd);
+	procset_free(set);
+	
 	return res;
 }
 
 int 
-DbgClntSetFuncBreakpoint(procset *set, int bpid, char *file, char *func)
+DbgClntSetFuncBreakpoint(char **args)
 {
-	int		res;
-	char *	cmd;
+	int			res;
+	char *		cmd;
+	procset *	set; 
 
-	fix_null(&file);
-	fix_null(&func);
-	
-	asprintf(&cmd, "SFB %d \"%s\" \"%s\"", bpid, file, func);
+	set = str_to_procset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+
+	asprintf(&cmd, "%s %s \"%s\" \"%s\"", DBG_SETFUNCBREAKPOINT_CMD, args[2], args[3], args[4]);
 	res = ClntSendCommand(set, cmd, NULL);
+	
 	free(cmd);
+	procset_free(set);
+		
 	return res;
 }
 
 int 
-DbgClntDeleteBreakpoint(procset *set, int bpid)
+DbgClntDeleteBreakpoint(char **args)
 {
-	int		res;
-	char *	cmd;
+	int			res;
+	char *		cmd;
+	procset *	set; 
+
+	set = str_to_procset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
 	
-	asprintf(&cmd, "DBP %d", bpid);
+	asprintf(&cmd, "%s %s", DBG_DELETEBREAKPOINT_CMD, args[2]);
 	res = ClntSendCommand(set, cmd, NULL);
+	
 	free(cmd);
+	procset_free(set);
+		
 	return res;
 }
 
@@ -190,53 +213,109 @@ DbgClntDeleteBreakpoint(procset *set, int bpid)
  * Process control operations
  */
 int 
-DbgClntGo(procset *set)
+DbgClntGo(char **args)
 {
-	return ClntSendCommand(set, "GOP", NULL);
-}
+	int			res;
+	procset *	set; 
 
-int 
-DbgClntStep(procset *set, int count, int type)
-{
-	int		res;
-	char *	cmd;
+	set = str_to_procset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
 	
-	asprintf(&cmd, "STP %d %d", count, type);
-	res = ClntSendCommand(set, cmd, NULL);
-	free(cmd);
+	res = ClntSendCommand(set, DBG_GO_CMD, NULL);
+	
+	procset_free(set);
+		
 	return res;
 }
 
 int 
-DbgClntTerminate(procset *set)
+DbgClntStep(char **args)
 {
-	return ClntSendCommand(set, "HLT", NULL);
+	int			res;
+	char *		cmd;
+	procset *	set; 
+
+	set = str_to_procset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	asprintf(&cmd, "%s %s %s", DBG_STEP_CMD, args[2], args[3]);
+	res = ClntSendCommand(set, cmd, NULL);
+	
+	free(cmd);
+	procset_free(set);
+	
+	return res;
+}
+
+int 
+DbgClntTerminate(char **args)
+{
+	int			res;
+	procset *	set; 
+
+	set = str_to_procset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	res = ClntSendCommand(set, DBG_TERMINATE_CMD, NULL);
+	
+	procset_free(set);
+	
+	return res;
 }
 
 /*
  * Stack frame operations
  */
 int 
-DbgClntListStackframes(procset *set, int current)
+DbgClntListStackframes(char **args)
 {
-	int		res;
-	char *	cmd;
+	int			res;
+	char *		cmd;
+	procset *	set; 
+
+	set = str_to_procset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
 	
-	asprintf(&cmd, "LSF %d", current);
+	asprintf(&cmd, "%s %s", DBG_LISTSTACKFRAMES_CMD, args[2]);
 	res = ClntSendCommand(set, cmd, NULL);
+	
 	free(cmd);
+	procset_free(set);
+	
 	return res;
 }
 
 int 
-DbgClntSetCurrentStackframe(procset *set, int level)
+DbgClntSetCurrentStackframe(char **args)
 {
-	int		res;
-	char *	cmd;
+	int			res;
+	char *		cmd;
+	procset *	set; 
+
+	set = str_to_procset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
 	
-	asprintf(&cmd, "SCS %d", level);
+	asprintf(&cmd, "%s %s", DBG_SETCURRENTSTACKFRAME_CMD, args[2]);
 	res = ClntSendCommand(set, cmd, NULL);
+	
 	free(cmd);
+	procset_free(set);
+	
 	return res;
 }
 
@@ -244,49 +323,104 @@ DbgClntSetCurrentStackframe(procset *set, int level)
  * Expression/variable operations
  */
 int 
-DbgClntEvaluateExpression(procset *set, char *expr)
+DbgClntEvaluateExpression(char **args)
 {
-	int		res;
-	char *	cmd;
+	int			res;
+	char *		cmd;
+	procset *	set; 
+
+	set = str_to_procset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
 	
-	fix_null(&expr);
-	
-	asprintf(&cmd, "EEX \"%s\"", expr);
+	asprintf(&cmd, "%s \"%s\"", DBG_EVALUATEEXPRESSION_CMD, args[2]);
 	res = ClntSendCommand(set, cmd, NULL);
+	
 	free(cmd);
+	procset_free(set);
+	
 	return res;
 }
 
 int 
-DbgClntGetType(procset *set, char *expr)
+DbgClntGetType(char **args)
 {
 	int		res;
 	char *	cmd;
+	procset *	set; 
+
+	set = str_to_procset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
 	
-	fix_null(&expr);
-	
-	asprintf(&cmd, "TYP \"%s\"", expr);
+	asprintf(&cmd, "%s \"%s\"", DBG_GETTYPE_CMD, args[2]);
 	res = ClntSendCommand(set, cmd, NULL);
+	
 	free(cmd);
+	procset_free(set);
+	
 	return res;
 }
 
 int 
-DbgClntListLocalVariables(procset *set)
+DbgClntListLocalVariables(char **args)
 {
-	return ClntSendCommand(set, "LLV", NULL);
+	int			res;
+	procset *	set; 
+
+	set = str_to_procset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	res = ClntSendCommand(set, DBG_LISTLOCALVARIABLES_CMD, NULL);
+	
+	procset_free(set);
+	
+	return res;
 }
 
 int 
-DbgClntListArguments(procset *set)
+DbgClntListArguments(char **args)
 {
-	return ClntSendCommand(set, "LAR", NULL);
+	int			res;
+	procset *	set; 
+
+	set = str_to_procset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	res = ClntSendCommand(set, DBG_LISTARGUMENTS_CMD, NULL);
+	
+	procset_free(set);
+	
+	return res;
 }
 
 int 
-DbgClntListGlobalVariables(procset *set)
+DbgClntListGlobalVariables(char **args)
 {
-	return ClntSendCommand(set, "LGV", NULL);
+	int			res;
+	procset *	set; 
+
+	set = str_to_procset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	res = ClntSendCommand(set, DBG_LISTGLOBALVARIABLES_CMD, NULL);
+	
+	procset_free(set);
+	
+	return res;
 }
 
 int 

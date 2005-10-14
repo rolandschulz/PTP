@@ -42,6 +42,7 @@ struct proxy_tcp_conn {
 	void		(*event_handler)(dbg_event *, void *);
 	void *	event_data;
 	void *	helper;
+	void *	commands;
 };
 typedef struct proxy_tcp_conn	proxy_tcp_conn;
 
