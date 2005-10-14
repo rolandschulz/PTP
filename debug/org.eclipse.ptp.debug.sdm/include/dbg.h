@@ -31,8 +31,8 @@
 #include "list.h"
 #include "proxy.h"
 
-#define DBGRES_OK			0
-#define DBGRES_ERR			-1
+#define DBGRES_OK			PROXY_RES_OK
+#define DBGRES_ERR			PROXY_RES_ERR
 
 /*
  * Session control
