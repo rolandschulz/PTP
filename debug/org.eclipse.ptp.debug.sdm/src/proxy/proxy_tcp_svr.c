@@ -151,8 +151,10 @@ proxy_tcp_svr_create(int port, void *data)
 	conn->svr_sock = sd;
 	conn->port = (int) ntohs(sname.sin_port);
 	
-	helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_svr_accept, (void *)conn);
-	helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
+	if (helper->regfile != NULL)
+		helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_svr_accept, (void *)conn);
+	if (helper->regeventhandler != NULL)
+		helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
 	
 	return DBGRES_OK;
 }
@@ -210,11 +212,13 @@ proxy_tcp_svr_connect(char *host, int port, void *data)
 	conn->host = strdup(host);
 	conn->port = port;
 	
-	helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
-	helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_svr_recv_msgs, (void *)conn);
+	if (helper->regeventhandler != NULL)
+		helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
+	if (helper->regfile != NULL)
+		helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_svr_recv_msgs, (void *)conn);
 	
 	e = NewEvent(DBGEV_INIT);
-	e->num_servers = helper->numservers();
+	e->num_servers = (helper->numservers != NULL) ? helper->numservers() : 1;
 	proxy_tcp_svr_event_callback(e, data);
 	
 	return DBGRES_OK;
@@ -248,7 +252,7 @@ proxy_tcp_svr_accept(int fd, void *data)
 		return DBGRES_OK;
 	}
 	
-	if (helper->newconn() < 0) {
+	if (helper->newconnn != NULL && helper->newconn() < 0) {
 		CLOSE_SOCKET(ns); // reject
 		return DBGRES_OK;
 	}
@@ -256,10 +260,11 @@ proxy_tcp_svr_accept(int fd, void *data)
 	conn->sess_sock = ns;
 	conn->connected++;
 	
-	helper->regfile(ns, READ_FILE_HANDLER, proxy_tcp_svr_recv_msgs, (void *)conn);
+	if (helper->regfile != NULL)
+		helper->regfile(ns, READ_FILE_HANDLER, proxy_tcp_svr_recv_msgs, (void *)conn);
 	
 	e = NewEvent(DBGEV_INIT);
-	e->num_servers = helper->numservers();
+	e->num_servers = (helper->numservers != NULL) ? helper->numservers() : 1;
 	proxy_tcp_svr_event_callback(e, data);
 	
 	return DBGRES_OK;
@@ -275,14 +280,14 @@ proxy_tcp_svr_finish(void *data)
 	proxy_svr_helper_funcs *	helper = (proxy_svr_helper_funcs *)conn->helper;
 	
 	if (conn->sess_sock != INVALID_SOCKET) {
-		if (helper != NULL)
+		if (helper->unregfile != NULL)
 			helper->unregfile(conn->sess_sock);
 		CLOSE_SOCKET(conn->sess_sock);
 		conn->sess_sock = INVALID_SOCKET;
 	}
 	
 	if (conn->svr_sock != INVALID_SOCKET) {
-		if (helper != NULL)
+		if (helper->unregfile != NULL)
 			helper->unregfile(conn->svr_sock);
 		CLOSE_SOCKET(conn->svr_sock);
 		conn->svr_sock = INVALID_SOCKET;
@@ -310,7 +315,7 @@ proxy_tcp_svr_progress(void *data)
 	}
 	
 	if (proxy_tcp_svr_shutdown) {
-		if (helper != NULL)
+		if (helper->shutdown_completed != NULL)
 			 return helper->shutdown_completed() ? DBGRES_ERR : DBGRES_OK;
 		else
 			return DBGRES_ERR;
@@ -379,9 +384,10 @@ proxy_tcp_svr_recv_msgs(int fd, void *data)
 static int
 proxy_tcp_svr_quit(proxy_svr_helper_funcs *helper, char **args)
 {
-	int	res;
+	int	res = PROXY_RES_OK;
 	
-	res = helper->quit();
+	if (helper->quit != NULL)
+		res = helper->quit();
 	
 	proxy_tcp_svr_shutdown++;
 	
