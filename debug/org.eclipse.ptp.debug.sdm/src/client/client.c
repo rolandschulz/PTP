@@ -36,6 +36,7 @@
 
 #include "dbg.h"
 #include "dbg_client.h"
+#include "dbg_proxy.h"
 #include "procset.h"
 #include "list.h"
 #include "proxy.h"
@@ -67,21 +68,25 @@ static proxy_svr_helper_funcs helper_funcs = {
 	RegisterFileHandler,
 	UnregisterFileHandler,
 	DbgClntRegisterEventHandler,
-	DbgClntStartSession,
-	DbgClntSetLineBreakpoint,
-	DbgClntSetFuncBreakpoint,
-	DbgClntDeleteBreakpoint,
-	DbgClntGo,
-	DbgClntStep,
-	DbgClntTerminate,
-	DbgClntListStackframes,
-	DbgClntSetCurrentStackframe,
-	DbgClntEvaluateExpression,
-	DbgClntGetType,
-	DbgClntListLocalVariables,
-	DbgClntListArguments,
-	DbgClntListGlobalVariables,
 	DbgClntQuit
+};
+
+static proxy_svr_commands command_tab[] = { 
+	{DBG_STARTSESSION_CMD,			DbgClntStartSession},
+	{DBG_SETLINEBREAKPOINT_CMD,		DbgClntSetLineBreakpoint},
+	{DBG_SETFUNCBREAKPOINT_CMD,		DbgClntSetFuncBreakpoint},
+	{DBG_DELETEBREAKPOINT_CMD,		DbgClntDeleteBreakpoint},
+	{DBG_GO_CMD,						DbgClntGo},
+	{DBG_STEP_CMD,					DbgClntStep},
+	{DBG_TERMINATE_CMD,				DbgClntTerminate},
+	{DBG_LISTSTACKFRAMES_CMD,			DbgClntListStackframes},
+	{DBG_SETCURRENTSTACKFRAME_CMD,	DbgClntSetCurrentStackframe},
+	{DBG_EVALUATEEXPRESSION_CMD,		DbgClntEvaluateExpression},
+	{DBG_GETTYPE_CMD,				DbgClntGetType},
+	{DBG_LISTLOCALVARIABLES_CMD,		DbgClntListLocalVariables},
+	{DBG_LISTARGUMENTS_CMD,			DbgClntListArguments},
+	{DBG_LISTGLOBALVARIABLES_CMD,		DbgClntListGlobalVariables},
+	{NULL,							NULL}
 };
 
 void 
@@ -89,7 +94,7 @@ client(int svr_num, int task_id, char *proxy, char *host, int port)
 {
 	num_servers = svr_num;
 	
-	if (DbgClntInit(svr_num, proxy, &helper_funcs) != DBGRES_OK ||
+	if (DbgClntInit(svr_num, proxy, &helper_funcs, command_tab) != DBGRES_OK ||
 			DbgClntCreateSession(host, port) != DBGRES_OK) {
 		fprintf(stderr, "%s\n", DbgGetErrorStr());
 		DbgClntQuit(); //TODO fixme!

@@ -28,17 +28,18 @@
 extern proxy_svr_funcs 	proxy_tcp_svr_funcs;
 
 proxy proxies[] = {
-	{"tcp", NULL, NULL,  &proxy_tcp_svr_funcs, NULL},
+	{"tcp", NULL, NULL,  &proxy_tcp_svr_funcs, NULL, NULL},
 	{NULL, NULL, NULL, NULL, NULL}
 };
 
 void
-proxy_svr_init(proxy *p, proxy_svr_helper_funcs *funcs, void **data)
+proxy_svr_init(proxy *p, proxy_svr_helper_funcs *funcs, proxy_svr_commands *cmds, void **data)
 {
 	if (p != NULL)
-		p->svr_funcs->init(funcs, data);
+		p->svr_funcs->init(funcs, cmds, data);
 
 	p->svr_helper_funcs = funcs;
+	p->svr_commands = cmds;
 }
 
 int
