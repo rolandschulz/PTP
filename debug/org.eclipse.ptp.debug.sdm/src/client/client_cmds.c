@@ -69,13 +69,6 @@ dbg_clnt_cmd_completed(dbg_event *e, void *data)
 		dbg_shutdown = SHUTDOWN_COMPLETED;
 }
 
-static void
-fix_null(char **str)
-{
-	if (*str == NULL)
-		*str = "";
-}
-
 int
 DbgClntInit(int num_svrs, char *proxy, proxy_svr_helper_funcs *funcs, proxy_svr_commands *cmds)
 {
