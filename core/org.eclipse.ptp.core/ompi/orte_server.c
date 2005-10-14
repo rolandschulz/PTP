@@ -1,3 +1,53 @@
+#include <getopt.h>
+#include <proxy.h>
+#include <proxy_tcp.h>
+#include <handler.h>
+
+#define DEFAULT_PROXY		"tcp"
+
+int ORTEIsShutdown(void);
+
+int ORTERun(char **);
+int OMPIGetJobs(char **);
+int OMPIGetProcesses(char **);
+int OMPIGetProcessAttribute(char **);
+int OMPIGetMachines(char **);
+int OMPIGetNodes(char **);
+int OMPIGetNodeAttribute(char **);
+int OMPIGetNodemachineID(char **);
+int OMPIQuit(void);
+
+int shutdown = 0;
+
+static proxy_svr_helper_funcs helper_funcs = {
+	NULL,					// newconn() - can be used to reject connections
+	NULL,					// numservers() - if there are multiple servers, return the number
+	ORTEIsShutdown,			// shutdown_completed() - proxy will not complete until this returns true
+	RegisterFileHandler,		// regfile() - call to register a file handler
+	UnregisterFileHandler,	// unregfile() - called to unregister file handler
+	RegisterEventHandler,		// regeventhandler() - called to register the proxy event handler
+	OMPIQuit					// quit() - called when quit message received
+};
+
+static proxy_svr_commands command_tab[] = { 
+	{"RUN", 		ORTERun},
+	{"GETJOBS", 	OMPIGetJobs},
+	{"GETPROCS",	OMPIGetProcesses},
+	{"GETATTR",	OMPIGetProcessAttribute},
+	{"GETMACHS",	OMPIGetMachines},
+	{"GETNODES",	OMPIGetNodes},
+	{"GETNATTR",	OMPIGetNodeAttribute},
+	{"GETNMID",	OMPIGetNodemachineID},
+	{NULL,		NULL}
+};
+
+static struct option longopts[] = {
+	{"proxy",			required_argument,	NULL, 	'P'}, 
+	{"port",				required_argument,	NULL, 	'p'}, 
+	{"host",				required_argument,	NULL, 	'h'}, 
+	{NULL,				0,					NULL,	0}
+};
+
 int
 ORTECheckErrorCode(int type, int rc)
 {
@@ -45,7 +95,14 @@ int
 ORTEShutdown(void)
 {
 	ompi_sendcmd(ORTE_DAEMON_EXIT_CMD);
+	shutdown++;
 	return 0;
+}
+
+int
+ORTEIsShutdown(void)
+{
+	return shutdown != 0;
 }
 
 /* this is the event progress bit.  we'll have to figure out how to hook
@@ -53,11 +110,77 @@ ORTEShutdown(void)
 int
 ORTEProgress(void)
 {
+	fd_set			rfds;
+	fd_set			wfds;
+	fd_set			efds;
+	int				res;
+	int				nfds = 0;
+	struct timeval	tv;
+	handler *		h;
+
+	/***********************************
+	 * First: Check for any file events
+	 */
+	 
+	/*
+	 * Set up fd sets
+	 */
+	FD_ZERO(&rfds);
+	FD_ZERO(&wfds);
+	FD_ZERO(&efds);
+	
+	for (SetHandler(); (h = GetHandler()) != NULL; ) {
+		if (h->htype == HANDLER_FILE) {
+			if (h->file_type & READ_FILE_HANDLER)
+				FD_SET(h->fd, &rfds);
+			if (h->file_type & WRITE_FILE_HANDLER)
+				FD_SET(h->fd, &wfds);
+			if (h->file_type & EXCEPT_FILE_HANDLER)
+				FD_SET(h->fd, &efds);
+			if (h->fd > nfds)
+				nfds = h->fd;
+		}
+	}
+	
+	tv = TIMEOUT;
+	
+	for ( ;; ) {
+		res = select(nfds+1, &rfds, &wfds, &efds, &tv);
+	
+		switch (res) {
+		case INVALID_SOCKET:
+			if ( errno == EINTR )
+				continue;
+		
+			perror("socket");
+			return PROXY_RES_ERR;
+		
+		case 0:
+			/*
+			 * Timeout.
+			 */
+			 break;
+			 		
+		default:
+			for (SetHandler(); (h = GetHandler()) != NULL; ) {
+				if (h->htype == HANDLER_FILE
+					&& ((h->file_type & READ_FILE_HANDLER && FD_ISSET(h->fd, &rfds))
+						|| (h->file_type & WRITE_FILE_HANDLER && FD_ISSET(h->fd, &wfds))
+						|| (h->file_type & EXCEPT_FILE_HANDLER && FD_ISSET(h->fd, &efds)))
+					&& h->file_handler(h->fd, h->data) < 0)
+					return PROXY_RES_ERR;
+			}
+			
+		}
+	
+		break;
+	}
+	
 	opal_mutex_lock(&opal_event_lock);
 	opal_event_loop(0);
 	opal_mutex_unlock(&opal_event_lock);
 	
-	return 0;
+	return PROXY_RES_OK;
 }
 
 /* terminate a job, given a jobid
@@ -81,7 +204,7 @@ ORTETerminateJob(int jobid)
  *   data = "jobid" (example: "848")
  */
 int
-ORTERun(char *exec_path, int num_procs)
+ORTERun(char **args)
 {
 	int rc; 
 	
@@ -91,6 +214,8 @@ ORTERun(char *exec_path, int num_procs)
 	char *c;
 	orte_app_context_t **apps;
 	int num_apps;
+	char *exec_path = args[1];
+	int num_procs = atoi(args[2]);
 
 	c = rindex(app, '/');
 
@@ -141,12 +266,15 @@ ORTERun(char *exec_path, int num_procs)
 	 * information about a job */
 	GenerateEvent(ORTE_RUN, jobid);
 	
-	return 0;
+	return PROXY_RES_OK;
 }
 
 static void
 job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 {
+	handler *		h;
+	proxy_event *	e;
+	
 	/* not sure yet how we want to handle this callback, what events
 	 * we want to generate, but here are the states that I know of
 	 * that a job can go through.  I've watched ORTE call this callback
@@ -182,6 +310,14 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 		case ORTE_PROC_STATE_ABORTED:
 			printf("    state = ORTE_PROC_STATE_ABORTED\n");
 			break;
+	}
+
+	// e = NewEvent(...);
+	
+	for (SetHandler(); (h = GetHandler()) != NULL; ) {
+		if (h->htype == HANDLER_EVENT) {
+			h->event_handler(e, h->data);
+		}
 	}
 }
 
@@ -223,8 +359,9 @@ ptp_ompi_sendcmd(orte_daemon_cmd_flag_t usercmd)
  *   type = GET_JOBS
  *   data = [99,195,4555] <-- job IDs */
 int
-OMPIGetJobs()
+OMPIGetJobs(char **args)
 {
+	return PROXY_RES_OK;
 }
 
 /* given a jobid (valid from OMPIGetJobs()) we request a list of the process
@@ -235,8 +372,10 @@ OMPIGetJobs()
  *   data = [85,86,87,88] <-- those are process IDs
  */
 int 
-OMPIGetProcesses(int jobid)
+OMPIGetProcesses(char **args)
 {
+	int jobid = atoi(args[1]);
+	return PROXY_RES_OK;
 }
 
 /* given a processID (associated with some jobID, but that part is implied)
@@ -250,8 +389,12 @@ OMPIGetProcesses(int jobid)
  *   data = "key=value" (example "state=running", "node=54" <-- 54 = node ID, not necessary node number)
  */
 int
-OMPIGetProcessAttribute(int procid, string attrib)
+OMPIGetProcessAttribute(char **args)
 {
+	int procid = atoi(args[1]);
+	char *attrib = args[2];
+	
+	return PROXY_RES_OK;
 }
 
 /* MONITORING RELATED FUNCTIONS */
@@ -263,8 +406,9 @@ OMPIGetProcessAttribute(int procid, string attrib)
  *   data = [2,3,4,5] <--- those are machine IDs
  */
 int
-OMPIGetMachines()
+OMPIGetMachines(char **args)
 {
+	return PROXY_RES_OK;
 }
 
 /* given a machine ID, this generates an event which contains a list of
@@ -274,8 +418,10 @@ OMPIGetMachines()
  *   data = [10,11,12,13,14,15] <-- those are node IDs
  */
 int
-OMPIGetNodes(int machineid)
+OMPIGetNodes(char **args)
 {
+	int machineid = atoi(args[1]);
+	return PROXY_RES_OK;
 }
 
 /* given a nodeid and an attribute key this generates an event with
@@ -287,8 +433,12 @@ OMPIGetNodes(int machineid)
  *   data = "key=value" (example "state=down", "user=ndebard")
  */
 int
-OMPIGetNodeAttribute(int nodeid, string attrib)
+OMPIGetNodeAttribute(char **args)
 {
+	int nodeid = atoi(args[1]);
+	char *attrib = args[2];
+	
+	return PROXY_RES_OK;
 }
 
 /* perhaps we don't need this function.
@@ -303,6 +453,76 @@ OMPIGetNodeAttribute(int nodeid, string attrib)
  *   data = "nodeid=machineid" (example node 1000 owned by machine 4 -> "1000=4")
  */ 
 int
-OMPIGetNodeMachineID(int nodeid)
+OMPIGetNodeMachineID(char **args)
 {
+	int nodeid = atoi(args[1]);
+	
+	return PROXY_RES_OK;
+}
+
+int
+OMPIQuit(void)
+{
+	return PROXY_RES_OK;
+}
+
+void
+server(proxy *p)
+{
+	void *	proxy_data;
+	
+	proxy_svr_init(p, helper_funcs, command_tab, &proxy_data);
+	
+	proxy_svr_connect(p, host, port, proxy_data);
+
+	
+	for (;;) {
+		if (ORTEProgress() != PROXY_RES_OK ||
+			proxy_svr_progress(p, proxy_data) != PROXY_RES_OK)
+			break;
+	}
+	
+	proxy_svr_finish(p, proxy_data);
+}
+
+int
+main(int argc, char *argv[])
+{
+	int				ch;
+	int				port = PROXY_TCP_PORT;
+	char *			host = "localhost";
+	char *			proxy_str = DEFAULT_PROXY;
+	proxy *			p;
+	
+	while ((ch = getopt_long(argc, argv, "P:p:h:", longopts, NULL)) != -1)
+	switch (ch) {
+	case 'P':
+		proxy_str = optarg;
+		break;
+	case 'p':
+		port = atoi(optarg);
+		break;
+	case 'h':
+		host = optarg;
+		break;
+	default:
+		fprintf(stderr, "orte_server [--proxy=proxy] [--host=host_name] [--port=port]\n");
+		return 1;
+	}
+	
+	if (find_proxy(proxy_str, &p) < 0) {
+		fprintf(stderr, "No such proxy: \"%s\"\n", proxy_str);
+		return 1;
+	}
+
+	if (!ORTEInit()) {
+		fprintf(stderr, "Faild to initialize ORTE\n");
+		return 1;
+	}
+	
+	server();
+	
+	ORTEFinalize();
+	
+	return 0;
 }
