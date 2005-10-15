@@ -33,9 +33,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.debug.core.CDebugUtils;
-import org.eclipse.cdt.debug.core.cdi.ICDILocation;
+import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -55,7 +56,6 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IProcess;
-import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
@@ -104,7 +104,7 @@ public class PCDIDebugModel {
 	 * @return a debug target
 	 * @throws DebugException
 	 */
-	public static IDebugTarget newDebugTarget( final ILaunch launch, final IProject project, final IPCDITarget cdiTarget, final String name, final IProcess debuggeeProcess, final IBinaryObject file, final boolean allowTerminate, final boolean allowDisconnect, final boolean stopInMain, final boolean resumeTarget ) throws DebugException {
+	public static IDebugTarget newDebugTarget( final ILaunch launch, final IProject project, final IPCDITarget cdiTarget, final String name, final IProcess debuggeeProcess, final IBinaryObject file, final boolean allowTerminate, final boolean allowDisconnect, final boolean resumeTarget ) throws DebugException {
 		final IDebugTarget[] target = new IDebugTarget[1];
 		IWorkspaceRunnable r = new IWorkspaceRunnable() {
 			public void run( IProgressMonitor m ) throws CoreException {
@@ -114,10 +114,6 @@ public class PCDIDebugModel {
 				dProcesses.put(name, debuggeeProcess);
 				
 				ICDITargetConfiguration config = cdiTarget.getConfiguration();
-				if ( config.supportsBreakpoints() && stopInMain ) {
-					// FIXME DONNY
-					stopInMain( (PDebugTarget)target[0] );
-				}
 				if ( config.supportsResume() && resumeTarget ) {
 					target[0].resume();
 				}
@@ -133,12 +129,15 @@ public class PCDIDebugModel {
 		return target[0];
 	}
 
+	/*
+	 * stopInMain functionality has been moved to Session
+	 * 
 	protected static void stopInMain( PDebugTarget target ) throws DebugException {
 		PTPDebugCorePlugin.getDefault().getLogger().finer("");
-		ICDILocation location = ((IPCDISession) target.getCDISession()).createFunctionLocation( "", "main" ); //$NON-NLS-1$ //$NON-NLS-2$
+		ICDIFunctionLocation location = ((IPCDISession) target.getCDISession()).createFunctionLocation( "", "main" ); //$NON-NLS-1$ //$NON-NLS-2$
 		//ICDILocation location = target.getCDITarget().createFunctionLocation( "", "main" ); //$NON-NLS-1$ //$NON-NLS-2$
 		try {
-			target.setInternalTemporaryBreakpoint( location );
+			target.setInternalTemporaryBreakpoint(location);
 		}
 		catch( DebugException e ) {
 			String message = MessageFormat.format( DebugCoreMessages.getString( "CDebugModel.0" ), new String[]{ e.getStatus().getMessage() } ); //$NON-NLS-1$
@@ -149,7 +148,8 @@ public class PCDIDebugModel {
 			}
 		}
 	}
-
+	*/
+	
 	/*
 	//TODO ONLY workwith CBreakpoint
 	public static IBreakpoint addRemoveBreakpoint(ICLineBreakpoint breakpoint, String set_id, String job_id) throws CoreException {
@@ -169,6 +169,7 @@ public class PCDIDebugModel {
 		return null;
 	}
 	*/
+	
 	public static IPLineBreakpoint[] lineBreakpointsExists(String sourceHandle, IResource resource, int lineNumber) throws CoreException {
 		IBreakpoint[] breakpoints = getPBreakpoints();
 		List foundBreakpoints = new ArrayList(0);

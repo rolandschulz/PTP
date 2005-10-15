@@ -30,6 +30,7 @@ import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDIEventManager;
 import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
+import org.eclipse.cdt.debug.core.cdi.ICDILocation;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionConfiguration;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
@@ -113,6 +114,15 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 		} catch (CDIException e) {
 		}
 		
+		try {
+			boolean stopInMain = dLaunch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
+			if (stopInMain) {
+				ICDIFunctionLocation location = createFunctionLocation( "", "main" );
+				setInternalTemporaryBreakpoint(modelManager.getProcessSet("Root"), location);
+			}
+		} catch (CoreException e) {
+		}	
+
 	}
 	
 	public String getProjectName() {
@@ -149,18 +159,14 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 		}
 		
 		try {
-			boolean stopInMain = dLaunch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
-
 			Process process = target.getProcess();
 			IProcess iprocess = null;
 			if (process != null) {
 				iprocess = DebugPlugin.newProcess(dLaunch, process, "Launch Label " + target.getTargetId());
 			}
 
-			PCDIDebugModel.newDebugTarget(dLaunch, null, target, "Process " + target.getTargetId(), iprocess, dBinObject, true, false, stopInMain, resumeTarget);
+			PCDIDebugModel.newDebugTarget(dLaunch, null, target, "Process " + target.getTargetId(), iprocess, dBinObject, true, false, resumeTarget);
 		} catch (DebugException e) {
-			e.printStackTrace();
-		} catch (CoreException e) {
 			e.printStackTrace();
 		}
 	}
@@ -353,6 +359,20 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	public ICDIAddressBreakpoint setAddressBreakpoint(IPCDIDebugProcessSet bSet, int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException {
 		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
 		return bMgr.setAddressBreakpoint(bSet, type, location, condition, deferred);
+	}
+	
+	public void setInternalTemporaryBreakpoint(IPCDIDebugProcessSet bSet,  ICDILocation location ) throws DebugException {
+		try {
+			if (location instanceof ICDIFunctionLocation) {
+				setFunctionBreakpoint(bSet, ICDIBreakpoint.TEMPORARY, (ICDIFunctionLocation)location, null, false );
+			} else if (location instanceof ICDILineLocation) {
+				setLineBreakpoint(bSet, ICDIBreakpoint.TEMPORARY, (ICDILineLocation)location, null, false );
+			} else if (location instanceof ICDIAddressLocation) {
+				setAddressBreakpoint(bSet, ICDIBreakpoint.TEMPORARY, (ICDIAddressLocation)location, null, false );
+			}
+		}
+		catch( CDIException e ) {
+		}
 	}
 	
 	/* Location Management */
