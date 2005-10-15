@@ -75,16 +75,6 @@ proxy_tcp_destroy_conn(proxy_tcp_conn *conn)
 	free(conn);
 }
 
-int
-proxy_tcp_result_to_event(char *result, dbg_event **ev)
-{
-	dbg_event *e;
-	
-	e = (dbg_event *)malloc(sizeof(dbg_event));
-	*ev = e;
-	return 0;
-}
-
 static int
 tcp_recv(proxy_tcp_conn *conn)
 {

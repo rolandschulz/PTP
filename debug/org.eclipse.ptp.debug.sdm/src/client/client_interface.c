@@ -31,7 +31,7 @@
 
 static struct timeval	TIMEOUT = { 0, 1000 };
 
-static void session_event_handler(dbg_event *, void *);
+static void session_event_handler(proxy_event *, void *);
 
 static proxy_clnt_helper_funcs helper_funcs = {
 	RegisterFileHandler,
@@ -44,16 +44,38 @@ static proxy_clnt_helper_funcs helper_funcs = {
  * Intercept INIT events to obtain number of procs
  */
 static void
-session_event_handler(dbg_event *e, void *data)
+session_event_handler(proxy_event *event, void *data)
 {
+	dbg_event *	de;
+	proxy_event *pe = (proxy_event *)event;
 	session *	s = (session *)data;
 	
-	if (e != NULL && e->event == DBGEV_INIT) {
-		s->sess_procs = e->num_servers;
+	if (pe->event == PROXY_EV_OK) {
+		if (DbgStrToEvent(pe->event_data, &de) < 0) {
+			de = NewDbgEvent(DBGEV_ERROR);
+			de->error_code = DBGERR_PROXY_PROTO;
+			de->error_msg = strdup("");
+		} else if (de->event == DBGEV_INIT) {
+			s->sess_procs = de->num_servers;
+		}
+	} else {
+		de = NewDbgEvent(DBGEV_ERROR);
+		
+		switch (pe->error_code) {
+		case PROXY_ERR_CLIENT:
+			de->error_code = DBGERR_DEBUGGER;
+			de->error_msg = strdup(pe->error_msg);
+			break;
+			
+		case PROXY_ERR_SYSTEM:
+			de->error_code = DBGERR_SYSTEM;
+			de->error_msg = strdup(pe->error_msg);
+			break;
+		}
 	}
 	
 	if (s->sess_event_handler != NULL)
-		s->sess_event_handler(e, s->sess_event_data);
+		s->sess_event_handler(de, s->sess_event_data);
 }
 
 /*

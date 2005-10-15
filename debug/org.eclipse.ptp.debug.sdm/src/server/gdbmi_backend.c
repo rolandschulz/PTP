@@ -114,7 +114,7 @@ dbg_backend_funcs	GDBMIBackend =
 	}
 	
 #define ERROR_TO_EVENT(e) \
-	e = NewEvent(DBGEV_ERROR); \
+	e = NewDbgEvent(DBGEV_ERROR); \
 	e->error_code = DbgGetError(); \
 	e->error_msg = strdup(DbgGetErrorStr())
 
@@ -136,7 +136,7 @@ static void
 SaveEvent(dbg_event *e)
 {
 	if (LastEvent != NULL)
-		FreeEvent(LastEvent);
+		FreeDbgEvent(LastEvent);
 		
 	LastEvent = e;
 }
@@ -248,7 +248,7 @@ AsyncStop(void *data)
 	switch ( stop->reason )
 	{
 	case sr_bkpt_hit:
-		e = NewEvent(DBGEV_BPHIT);
+		e = NewDbgEvent(DBGEV_BPHIT);
 		e->bpid = LocalToRemoteBP(stop->bkptno);
 		break;
 
@@ -260,7 +260,7 @@ AsyncStop(void *data)
 			ERROR_TO_EVENT(e);
 		} else {
 			SetList(frames);
-			e = NewEvent(DBGEV_STEP);
+			e = NewDbgEvent(DBGEV_STEP);
 			e->frame = (stackframe *)GetListElement(frames);
 			DestroyList(frames, NULL);
 		}
@@ -268,19 +268,19 @@ AsyncStop(void *data)
 
 	case sr_exited_signalled:
 	case sr_signal_received:
-		e = NewEvent(DBGEV_SIGNAL);
+		e = NewDbgEvent(DBGEV_SIGNAL);
 		e->sig_name = strdup(stop->signal_name);
 		e->sig_meaning = strdup(stop->signal_meaning);
 		e->thread_id = stop->thread_id;
 		break;
 
 	case sr_exited:
-		e = NewEvent(DBGEV_EXIT);
+		e = NewDbgEvent(DBGEV_EXIT);
 		e->exit_status = stop->exit_code;
 		break;
 
 	case sr_exited_normally:
-		e = NewEvent(DBGEV_EXIT);
+		e = NewDbgEvent(DBGEV_EXIT);
 		e->exit_status = 0;
 		break;
 
@@ -294,7 +294,7 @@ AsyncStop(void *data)
 	if (EventCallback != NULL)
 		EventCallback(e, EventCallbackData);
 		
-	FreeEvent(e);
+	FreeDbgEvent(e);
 	
 	return DBGRES_OK;
 }
@@ -413,7 +413,7 @@ GDBMIStartSession(char *gdb_path, char *prog, char *args)
 	}
 	
 	Started = 0;
-	SaveEvent(NewEvent(DBGEV_OK));
+	SaveEvent(NewDbgEvent(DBGEV_OK));
 
 	return DBGRES_OK;
 }
@@ -448,7 +448,7 @@ GDBMIProgress(void)
 			res = -1;
 		}
 			
-		FreeEvent(LastEvent);
+		FreeDbgEvent(LastEvent);
 		LastEvent = NULL;
 		
 		return res;
@@ -568,7 +568,7 @@ SetAndCheckBreak(int bpid, char *where)
 
 	AddBPMap(bpt->number, bpid);
 	
-	e = NewEvent(DBGEV_BPSET);
+	e = NewDbgEvent(DBGEV_BPSET);
 	e->bpid = bpid;
 	SaveEvent(e);
 	
@@ -604,7 +604,7 @@ GDBMIDeleteBreakpoint(int bpid)
 
 	RemoveBPMap(bpid);
 
-	SaveEvent(NewEvent(DBGEV_OK));
+	SaveEvent(NewDbgEvent(DBGEV_OK));
 
 	return DBGRES_OK;
 }
@@ -699,7 +699,7 @@ GDBMISetCurrentStackframe(int level)
 		return DBGRES_ERR;
 	}
 
-	SaveEvent(NewEvent(DBGEV_OK));
+	SaveEvent(NewDbgEvent(DBGEV_OK));
 	
 	return DBGRES_OK;
 }
@@ -759,7 +759,7 @@ GDBMIListStackframes(int current)
 	if (GetStackframes(current, &frames) != DBGRES_OK)
 		return DBGRES_ERR;
 	
-	e = NewEvent(DBGEV_FRAMES);
+	e = NewDbgEvent(DBGEV_FRAMES);
 	e->list = frames;	
 	SaveEvent(e);
 	
@@ -864,7 +864,7 @@ GDBMIEvaluateExpression(char *exp)
 	res = GDBMIBuildAIFVar(exp, type, tmp, &a);
 	
 	if (res == DBGRES_OK) {
-		e = NewEvent(DBGEV_DATA);
+		e = NewDbgEvent(DBGEV_DATA);
 		e->data = a;
 		SaveEvent(e);
 	}
@@ -1123,7 +1123,7 @@ GDBMIGetType(char *var)
 		return DBGRES_ERR;
 	}
 
-	e = NewEvent(DBGEV_TYPE);
+	e = NewDbgEvent(DBGEV_TYPE);
 	e->type_desc = strdup(fds->buf);
 	SaveEvent(e);
 	
@@ -1156,7 +1156,7 @@ GDBMIGetLocalVariables(void)
 		return DBGRES_ERR;
 	}
 
-	e = NewEvent(DBGEV_VARS);
+	e = NewDbgEvent(DBGEV_VARS);
 	e->list = NewList();
 
 	c = res;
@@ -1210,7 +1210,7 @@ GDBMIQuit(void)
 	if (MIHandle != NULL)
 		gmi_gdb_exit(MIHandle);
 		
-	SaveEvent(NewEvent(DBGEV_OK));
+	SaveEvent(NewDbgEvent(DBGEV_OK));
 	ServerExit++;
 	
 	return DBGRES_OK;

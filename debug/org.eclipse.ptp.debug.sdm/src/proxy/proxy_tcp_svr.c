@@ -34,8 +34,6 @@
 #include <stdlib.h>
 
 #include "compat.h"
-#include "dbg.h"
-#include "dbg_client.h"
 #include "args.h"
 #include "session.h"
 #include "proxy.h"
@@ -71,12 +69,12 @@ static int proxy_tcp_svr_shutdown;
  * Sends the event to the proxy peer.
  */
 static void
-proxy_tcp_svr_event_callback(dbg_event *ev, void *data)
+proxy_tcp_svr_event_callback(proxy_event *ev, void *data)
 {
 	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
 	char *			str;
 	
-	if (proxy_tcp_event_to_str(ev, &str) < 0) {
+	if (proxy_event_to_str(ev, &str) < 0) {
 		/*
 		 * TODO should send an error back to proxy peer
 		 */
@@ -116,8 +114,8 @@ proxy_tcp_svr_create(int port, void *data)
 	
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
-		DbgSetError(DBGERR_SYSTEM, strerror(errno));
-		return DBGRES_ERR;
+		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
+		return PROXY_RES_ERR;
 	}
 	
 	memset (&sname, 0, sizeof(sname));
@@ -127,25 +125,25 @@ proxy_tcp_svr_create(int port, void *data)
 	
 	if (bind(sd,(struct sockaddr *) &sname, sizeof(sname)) == SOCKET_ERROR )
 	{
-		DbgSetError(DBGERR_SYSTEM, strerror(errno));
+		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
-		return DBGRES_ERR;
+		return PROXY_RES_ERR;
 	}
 	
 	slen = sizeof(sname);
 	
 	if ( getsockname(sd, (struct sockaddr *)&sname, &slen) == SOCKET_ERROR )
 	{
-		DbgSetError(DBGERR_SYSTEM, strerror(errno));
+		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
-		return DBGRES_ERR;
+		return PROXY_RES_ERR;
 	}
 	
 	if ( listen(sd, 5) == SOCKET_ERROR )
 	{
-		DbgSetError(DBGERR_SYSTEM, strerror(errno));
+		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
-		return DBGRES_ERR;
+		return PROXY_RES_ERR;
 	}
 	
 	conn->svr_sock = sd;
@@ -156,7 +154,7 @@ proxy_tcp_svr_create(int port, void *data)
 	if (helper->regeventhandler != NULL)
 		helper->regeventhandler(proxy_tcp_svr_event_callback, (void *)conn);
 	
-	return DBGRES_OK;
+	return PROXY_RES_OK;
 }
 
 /**
@@ -169,20 +167,19 @@ proxy_tcp_svr_connect(char *host, int port, void *data)
 	struct hostent *			hp;
 	long int					haddr;
 	struct sockaddr_in		scket;
-	dbg_event *				e;
 	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
 	proxy_svr_helper_funcs *	helper = (proxy_svr_helper_funcs *)conn->helper;
 		        
 	if (host == NULL) {
-		DbgSetError(DBGERR_DEBUGGER, "no host specified");
-		return DBGRES_ERR;
+		proxy_set_error(PROXY_ERR_SERVER, "no host specified");
+		return PROXY_RES_ERR;
 	}
 	
 	hp = gethostbyname(host);
 	        
 	if (hp == (struct hostent *)NULL) {
-		DbgSetError(DBGERR_DEBUGGER, "could not find host");
-		return DBGRES_ERR;
+		proxy_set_error(PROXY_ERR_SERVER, "could not find host");
+		return PROXY_RES_ERR;
 	}
 	
 	haddr = ((hp->h_addr[0] & 0xff) << 24) |
@@ -192,8 +189,8 @@ proxy_tcp_svr_connect(char *host, int port, void *data)
 	
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
-		DbgSetError(DBGERR_SYSTEM, strerror(errno));
-		return DBGRES_ERR;
+		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
+		return PROXY_RES_ERR;
 	}
 	
 	memset (&scket,0,sizeof(scket));
@@ -203,9 +200,9 @@ proxy_tcp_svr_connect(char *host, int port, void *data)
 	
 	if ( connect(sd, (struct sockaddr *) &scket, sizeof(scket)) == SOCKET_ERROR )
 	{
-		DbgSetError(DBGERR_SYSTEM, strerror(errno));
+		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
 		CLOSE_SOCKET(sd);
-		return DBGRES_ERR;
+		return PROXY_RES_ERR;
 	}
 
 	conn->sess_sock = sd;
@@ -217,11 +214,7 @@ proxy_tcp_svr_connect(char *host, int port, void *data)
 	if (helper->regfile != NULL)
 		helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_svr_recv_msgs, (void *)conn);
 	
-	e = NewEvent(DBGEV_INIT);
-	e->num_servers = (helper->numservers != NULL) ? helper->numservers() : 1;
-	proxy_tcp_svr_event_callback(e, data);
-	
-	return DBGRES_OK;
+	return PROXY_RES_OK;
 }
 
 /**
@@ -233,15 +226,14 @@ proxy_tcp_svr_accept(int fd, void *data)
 	socklen_t				fromlen;
 	SOCKET					ns;
 	struct sockaddr			addr;
-	dbg_event *				e;
 	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
 	proxy_svr_helper_funcs *	helper = (proxy_svr_helper_funcs *)conn->helper;
 	
 	fromlen = sizeof(addr);
 	ns = accept(fd, &addr, &fromlen);
 	if (ns < 0) {
-		DbgSetError(DBGERR_SYSTEM, strerror(errno));
-		return DBGRES_ERR;
+		proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
+		return PROXY_RES_ERR;
 	}
 	
 	/*
@@ -249,12 +241,12 @@ proxy_tcp_svr_accept(int fd, void *data)
 	 */
 	if (conn->connected) {
 		CLOSE_SOCKET(ns); // reject
-		return DBGRES_OK;
+		return PROXY_RES_OK;
 	}
 	
-	if (helper->newconnn != NULL && helper->newconn() < 0) {
+	if (helper->newconn != NULL && helper->newconn() < 0) {
 		CLOSE_SOCKET(ns); // reject
-		return DBGRES_OK;
+		return PROXY_RES_OK;
 	}
 	
 	conn->sess_sock = ns;
@@ -263,11 +255,7 @@ proxy_tcp_svr_accept(int fd, void *data)
 	if (helper->regfile != NULL)
 		helper->regfile(ns, READ_FILE_HANDLER, proxy_tcp_svr_recv_msgs, (void *)conn);
 	
-	e = NewEvent(DBGEV_INIT);
-	e->num_servers = (helper->numservers != NULL) ? helper->numservers() : 1;
-	proxy_tcp_svr_event_callback(e, data);
-	
-	return DBGRES_OK;
+	return PROXY_RES_OK;
 }
 
 /**
@@ -316,12 +304,12 @@ proxy_tcp_svr_progress(void *data)
 	
 	if (proxy_tcp_svr_shutdown) {
 		if (helper->shutdown_completed != NULL)
-			 return helper->shutdown_completed() ? DBGRES_ERR : DBGRES_OK;
+			 return helper->shutdown_completed() ? PROXY_RES_ERR : PROXY_RES_OK;
 		else
-			return DBGRES_ERR;
+			return PROXY_RES_ERR;
 	}
 		
-	return DBGRES_OK;
+	return PROXY_RES_OK;
 }
 
 /*
@@ -336,14 +324,14 @@ proxy_tcp_svr_dispatch(proxy_tcp_conn *conn, char *msg)
 {
 	int					res;
 	char **				args;
-	dbg_event *			e;
+	proxy_event *		e;
 	proxy_svr_commands * cmd;
 	
 printf("SVR received <%s>\n", msg);
 
 	if (proxy_tcp_svr_shutdown) {
-		e = NewEvent(DBGEV_ERROR);
-		e->error_code = DBGERR_DEBUGGER;
+		e = new_proxy_event(PROXY_EV_ERROR);
+		e->error_code = PROXY_ERR_SERVER;
 		e->error_msg = strdup("server is shutting down");
 		proxy_tcp_svr_event_callback(e, (void *)conn);
 	}
@@ -363,10 +351,10 @@ printf("SVR received <%s>\n", msg);
 	
 	FreeArgs(args);
 	
-	if (res != DBGRES_OK) {
-		e = NewEvent(DBGEV_ERROR);
-		e->error_code = DbgGetError();
-		e->error_msg = strdup(DbgGetErrorStr());
+	if (res != PROXY_RES_OK) {
+		e = new_proxy_event(PROXY_EV_ERROR);
+		e->error_code = proxy_get_error();
+		e->error_msg = strdup(proxy_get_error_str());
 		proxy_tcp_svr_event_callback(e, (void *)conn);
 	}
 	

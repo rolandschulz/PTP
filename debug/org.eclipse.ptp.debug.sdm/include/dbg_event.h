@@ -27,9 +27,6 @@
 #include "procset.h"
 #include "list.h"
 
-#define DBGEV_OK			0
-#define DBGEV_ERROR		1
-
 #define DBG_EV_OFFSET		100
 #define DBGEV_BPHIT		DBG_EV_OFFSET + 0
 #define DBGEV_SIGNAL		DBG_EV_OFFSET + 1
@@ -41,6 +38,8 @@
 #define DBGEV_TYPE		DBG_EV_OFFSET + 7
 #define DBGEV_VARS		DBG_EV_OFFSET + 8
 #define DBGEV_INIT		DBG_EV_OFFSET + 9
+#define DBGEV_OK			DBG_EV_OFFSET + 10
+#define DBGEV_ERROR		DBG_EV_OFFSET + 11
 
 struct dbg_event {
 	int			event;
@@ -96,6 +95,8 @@ struct dbg_event {
 };
 typedef struct dbg_event dbg_event;
 
-extern dbg_event *	NewEvent(int);
-extern void			FreeEvent(dbg_event *);
+extern int DbgStrToEvent(char *, dbg_event **);
+extern int DbgEventToStr(dbg_event *, char **);
+extern dbg_event *	NewDbgEvent(int);
+extern void			FreeDbgEvent(dbg_event *);
 #endif /* _DBG_EVENT_H_ */

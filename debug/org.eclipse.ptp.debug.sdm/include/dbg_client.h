@@ -30,7 +30,7 @@
  * Session control
  */
 int DbgClntInit(int, char *, proxy_svr_helper_funcs *, proxy_svr_commands *);
-int DbgClntCreateSession(char *, int);
+int DbgClntCreateSession(int, char *, int);
 int DbgClntStartSession(char **);
 int DbgClntQuit(void);
 int DbgClntIsShutdown(void);

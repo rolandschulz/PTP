@@ -21,7 +21,6 @@
 #define _PROXY_TCP_H_
 
 #include "compat.h"
-#include "dbg_event.h"
 
 #define PROXY_TCP_PORT	12345
 #define MAX_MSG_LEN_SIZE	8
@@ -39,7 +38,7 @@ struct proxy_tcp_conn {
 	int		total_read;
 	char *	msg;
 	int		msg_len;
-	void		(*event_handler)(dbg_event *, void *);
+	void		(*event_handler)(proxy_event *, void *);
 	void *	event_data;
 	void *	helper;
 	void *	commands;
@@ -52,12 +51,9 @@ extern proxy_svr_funcs proxy_tcp_svr_funcs;
 
 extern void		proxy_tcp_create_conn(proxy_tcp_conn **);
 extern void		proxy_tcp_destroy_conn(proxy_tcp_conn *);
-extern int		proxy_tcp_result_to_event(char *, dbg_event **);
 extern int		proxy_tcp_recv_msgs(proxy_tcp_conn *);
 extern int		proxy_tcp_get_msg(proxy_tcp_conn *, char **);
 extern int		proxy_tcp_send_msg(proxy_tcp_conn *, char *, int);
-extern int		proxy_tcp_str_to_event(char *, dbg_event **);
-extern int		proxy_tcp_event_to_str(dbg_event *, char **);
 extern void		skipspace(char *);
 extern char *	getword(char **);
 

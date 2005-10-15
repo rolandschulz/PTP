@@ -17,48 +17,30 @@
  * LA-CC 04-115
  ******************************************************************************/
  
-#ifndef _HANDLER_H_
-#define _HANDLER_H_
+#ifndef _PROXY_EVENT_H_
+#define _PROXY_EVENT_H_
 
-#include "proxy_event.h"
+#include "list.h"
 
-#define HANDLER_FILE		1
-#define HANDLER_SIGNAL	2
-#define HANDLER_EVENT		3
+#define PROXY_EV_OK			0
+#define PROXY_EV_ERROR		1
 
-#define READ_FILE_HANDLER		1
-#define WRITE_FILE_HANDLER	2
-#define EXCEPT_FILE_HANDLER	4
-
-struct handler {
-	int		htype;
-	void *	data;
-		
-	/*
-	 * HANDLER_FILE
-	 */
-	int		file_type;
-	int		fd;
-	int		(*file_handler)(int, void *);
-	
-	/*
-	 * HANDLER_SIGNAL
-	 */
-	int		signal;
-
-	/*
-	 * HANDLER_EVENT
-	 */
-	 void 	(*event_handler)(proxy_event *, void *);
+struct proxy_event {
+	int		event;
+	char *	event_data;
+	int		error_code;
+	char *	error_msg;
 };
-typedef struct handler	handler;
+typedef struct proxy_event proxy_event;
 
-handler *	NewHandler(int, void *);
-void			DestroyHandler(handler *);
-void			SetHandler(void);
-handler *	GetHandler(void);
-void			RegisterEventHandler(void (*)(proxy_event *, void *), void *);
-void			UnregisterEventHandler(void (*)(proxy_event *, void *));
-void			RegisterFileHandler(int fd, int type, int (*)(int, void *), void *);
-void			UnregisterFileHandler(int);
-#endif /* !_HANDLER_H_ */
+extern int 			proxy_data_to_str(char *, int, char **);
+extern int 			proxy_cstring_to_str(char *, char **);
+extern int 			proxy_list_to_str(List *, int (*)(void *, char **), char **);
+extern int 			proxy_str_to_data(char *, char **, int *);
+extern int 			proxy_str_to_cstring(char *, char **);
+extern int 			proxy_str_to_int(char *, int *);
+extern int 			proxy_str_to_event(char *, proxy_event **);
+extern int 			proxy_event_to_str(proxy_event *, char **);
+extern proxy_event *	new_proxy_event(int);
+extern void			free_proxy_event(proxy_event *);
+#endif /* proxy_event */

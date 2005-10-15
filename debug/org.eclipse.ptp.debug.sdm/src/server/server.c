@@ -31,7 +31,7 @@ event_callback(dbg_event *e, void *data)
 	char *	reply_buf;
 	unsigned int	hdr[2];
 		
-	if (proxy_tcp_event_to_str(e, &reply_buf) < 0)
+	if (DbgEventToStr(e, &reply_buf) < 0)
 		reply_buf = strdup("ERROR");
 	
 	len = strlen(reply_buf);

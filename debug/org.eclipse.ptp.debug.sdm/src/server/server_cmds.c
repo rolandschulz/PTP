@@ -116,11 +116,11 @@ svr_progress(dbg_backend *db)
 	dbg_event *	e;
 	
 	if (svr_res != DBGRES_OK) {
-		e = NewEvent(DBGEV_ERROR);
+		e = NewDbgEvent(DBGEV_ERROR);
 		e->error_code = DbgGetError();
 		e->error_msg = strdup(DbgGetErrorStr());
 		svr_event_callback(e, svr_data);
-		FreeEvent(e);
+		FreeDbgEvent(e);
 		svr_res = DBGRES_OK;
 		return 0;
 	}

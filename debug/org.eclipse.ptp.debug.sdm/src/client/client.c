@@ -67,7 +67,7 @@ static proxy_svr_helper_funcs helper_funcs = {
 	DbgClntIsShutdown,
 	RegisterFileHandler,
 	UnregisterFileHandler,
-	DbgClntRegisterEventHandler,
+	RegisterEventHandler,
 	DbgClntQuit
 };
 
@@ -95,7 +95,7 @@ client(int svr_num, int task_id, char *proxy, char *host, int port)
 	num_servers = svr_num;
 	
 	if (DbgClntInit(svr_num, proxy, &helper_funcs, command_tab) != DBGRES_OK ||
-			DbgClntCreateSession(host, port) != DBGRES_OK) {
+			DbgClntCreateSession(svr_num, host, port) != DBGRES_OK) {
 		fprintf(stderr, "%s\n", DbgGetErrorStr());
 		DbgClntQuit(); //TODO fixme!
 		DbgClntProgress();
