@@ -44,7 +44,7 @@ libdbgproxy_a_SOURCES =	src/client/client_interface.c \
 						src/proxy/proxy_clnt.c \
 						src/proxy/proxy_tcp.c \
 						src/proxy/proxy_tcp_clnt.c \
-						src/proxy/proxy_tcp_event.c
+						src/proxy/proxy_event.c
 libdbgproxy_a_CFLAGS =	-I./include -I./bitvector -I./libaif $(AM_CFLAGS) -g
 
 libutils_a_SOURCES =		src/utils/procset.c \
