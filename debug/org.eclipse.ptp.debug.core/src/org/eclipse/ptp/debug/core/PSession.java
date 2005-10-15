@@ -33,7 +33,8 @@ public class PSession implements IPSession, IBreakpointsListener {
 		initializeBreakpoints();
 		
 		/* Initially we only create process/target 0 */
-		session.registerTarget(0, true, true);
+		session.registerTarget(0, true);
+		session.resume("Root");
 	}
 
 	public IPCDISession getPCDISession() {
