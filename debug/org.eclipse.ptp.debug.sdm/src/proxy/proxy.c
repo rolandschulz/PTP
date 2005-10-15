@@ -27,6 +27,12 @@
 #include "session.h"
 #include "proxy.h"
 
+static int 			proxy_errno = PROXY_RES_OK;
+static char *		proxy_errstr = NULL;
+
+static char * proxy_error_tab[] = {
+};
+
 int
 find_proxy(char *name, proxy **pp)
 {
@@ -39,4 +45,47 @@ find_proxy(char *name, proxy **pp)
 		}
 	}
 	return -1;
+}
+
+
+/*
+ * Error handling
+ */
+void
+proxy_set_error(int errnum, char *msg)
+{
+	proxy_errno = errnum;
+	
+	if (proxy_errstr != NULL) {
+		free(proxy_errstr);
+		proxy_errstr = NULL;
+	}
+	
+	if (proxy_errno >= sizeof(proxy_error_tab)/sizeof(char *)) {
+		if (msg != NULL) {
+			proxy_errstr = strdup(msg);
+		} else {
+			asprintf(&proxy_errstr, "Error %d occurred.", proxy_errno);
+		}
+	} else {
+		if (msg == NULL)
+			msg = "<null>";
+			
+		asprintf(&proxy_errstr, proxy_error_tab[proxy_errno], msg);
+	}
+}
+
+int
+proxy_get_error(void)
+{
+	return proxy_errno;
+}
+
+char *
+proxy_get_error_str(void)
+{
+	if (proxy_errstr == NULL)
+		return "";
+		
+	return proxy_errstr;
 }

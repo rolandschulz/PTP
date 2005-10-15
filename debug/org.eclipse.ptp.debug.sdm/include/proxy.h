@@ -21,18 +21,24 @@
 #define _PROXY_H_
 
 #include <stdarg.h>
- 
-#include "procset.h"
-#include "breakpoint.h"
-#include "stackframe.h"
-#include "dbg_event.h"
+#include "proxy_event.h"
+
+#define PROXY_RES_OK			0
+#define PROXY_RES_ERR			-1
+
+#define PROXY_ERR_CLIENT		0
+#define PROXY_ERR_SERVER		1
+#define PROXY_ERR_PROTO		2
+#define PROXY_ERR_SYSTEM		3
+
+#define PROXY_QUIT_CMD		"QUI"
 
 struct proxy;
 
 struct proxy_clnt_helper_funcs {
 	void (*regfile)(int, int, int (*)(int, void *), void *); 
 	void (*unregfile)(int); 
-	void (*eventhandler)(dbg_event *, void *);
+	void (*eventhandler)(proxy_event *, void *);
 	void *eventdata;
 };
 typedef struct proxy_clnt_helper_funcs	proxy_clnt_helper_funcs;
@@ -58,7 +64,7 @@ struct proxy_svr_helper_funcs {
 	int (*shutdown_completed)(void);
 	void (*regfile)(int, int, int (*)(int, void *), void *); 
 	void (*unregfile)(int); 
-	void (*regeventhandler)(void (*)(dbg_event *, void *), void *);
+	void (*regeventhandler)(void (*)(proxy_event *, void *), void *);
 	int (*quit)(void);
 };
 typedef struct proxy_svr_helper_funcs	proxy_svr_helper_funcs;
@@ -88,23 +94,24 @@ struct proxy {
 };
 typedef struct proxy	proxy;
 
-#define PROXY_QUIT_CMD	"QUI"
-
 extern proxy 	proxies[];
 
-extern int	find_proxy(char *, proxy **);
+extern int		find_proxy(char *, proxy **);
+extern void		proxy_set_error(int, char *);
+extern int		proxy_get_error(void);
+extern char *	proxy_get_error_str(void);
 
-extern void	proxy_svr_init(proxy *, proxy_svr_helper_funcs *, proxy_svr_commands *cmds, void **);
-extern int	proxy_svr_create(proxy *, int, void *);
-extern int	proxy_svr_connect(proxy *, char *, int, void *);
-extern int	proxy_svr_progress(proxy *, void *);
-extern void	proxy_svr_finish(proxy *, void *);
+extern void		proxy_svr_init(proxy *, proxy_svr_helper_funcs *, proxy_svr_commands *cmds, void **);
+extern int		proxy_svr_create(proxy *, int, void *);
+extern int		proxy_svr_connect(proxy *, char *, int, void *);
+extern int		proxy_svr_progress(proxy *, void *);
+extern void		proxy_svr_finish(proxy *, void *);
 
-extern int proxy_clnt_init(proxy *, proxy_clnt_helper_funcs *, void **, char *, va_list);
-extern int proxy_clnt_connect(proxy *, void *);
-extern int proxy_clnt_create(proxy *, void *);
-extern int proxy_clnt_progress(proxy *, void *);
-extern int proxy_clnt_sendcmd(proxy *, void *, char *, char *, ...);
-extern int proxy_clnt_quit(proxy *, void *);
+extern int		proxy_clnt_init(proxy *, proxy_clnt_helper_funcs *, void **, char *, va_list);
+extern int 		proxy_clnt_connect(proxy *, void *);
+extern int 		proxy_clnt_create(proxy *, void *);
+extern int 		proxy_clnt_progress(proxy *, void *);
+extern int 		proxy_clnt_sendcmd(proxy *, void *, char *, char *, ...);
+extern int 		proxy_clnt_quit(proxy *, void *);
 
 #endif /* _PROXY_H_*/

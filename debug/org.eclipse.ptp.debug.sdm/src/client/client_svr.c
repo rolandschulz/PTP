@@ -41,8 +41,6 @@
 #include "procset.h"
 #include "list.h"
 #include "hash.h"
-#include "proxy.h"
-#include "proxy_tcp.h"
 
 /*
  * A request represents an asynchronous send/receive transaction between the client
@@ -78,7 +76,7 @@ send_completed(Hash *h, void *data)
 		e = (dbg_event *)he->h_data;
 		cmd_completed_callback(e, data);
 		HashRemove(h, he->h_hval);
-		FreeEvent(e);
+		FreeDbgEvent(e);
 	}
 }
 	
@@ -247,8 +245,8 @@ ClntProgressCmds(void)
 				 * Save event if it is new, otherwise just add this process to the event
 				 */
 				if ((e = HashSearch(r->events, hdr[0])) == NULL) {
-					if (proxy_tcp_str_to_event(reply_buf, &e) < 0) {
-						fprintf(stderr, "Bad protocol: conversion to event failed!\n");
+					if (DbgStrToEvent(reply_buf, &e) < 0) {
+						fprintf(stderr, "Bad protocol: conversion to event failed! <%s>\n", reply_buf);
 					} else {
 						e->procs = procset_new(num_servers);
 						HashInsert(r->events, hdr[0], (void *)e);

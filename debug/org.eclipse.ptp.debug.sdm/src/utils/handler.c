@@ -17,6 +17,9 @@
  * LA-CC 04-115
  ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "handler.h"
 #include "list.h"
 
@@ -65,7 +68,7 @@ GetHandler(void)
 }
 
 void
-RegisterEventHandler(void (*event_callback)(dbg_event *, void *), void *data)
+RegisterEventHandler(void (*event_callback)(proxy_event *, void *), void *data)
 {
 	handler *	h;
 
@@ -78,7 +81,7 @@ RegisterEventHandler(void (*event_callback)(dbg_event *, void *), void *data)
  * Unregister file descriptor handler
  */
 void
-UnregisterEventHandler(void (*event_callback)(dbg_event *, void *))
+UnregisterEventHandler(void (*event_callback)(proxy_event *, void *))
 {
 	handler *	h;
 

@@ -32,6 +32,7 @@
 #include "dbg_proxy.h"
 #include "dbg_client.h"
 #include "client_srv.h"
+#include "proxy_event.h"
 #include "procset.h"
 #include "handler.h"
 #include "list.h"
@@ -51,13 +52,24 @@ static struct timeval	TIMEOUT = { 0, 1000 };
  * call all registered event handlers.
  */
 static void
-dbg_clnt_cmd_completed(dbg_event *e, void *data)
+dbg_clnt_cmd_completed(dbg_event *de, void *data)
 {
-	handler *	h;
+	proxy_event *	pe;
+	char *			str;
+	handler *		h;
 
 	for (SetHandler(); (h = GetHandler()) != NULL; ) {
 		if (h->htype == HANDLER_EVENT) {
-			h->event_handler(e, h->data);
+			if (DbgEventToStr(de, &str) < 0) {
+				pe = new_proxy_event(PROXY_EV_ERROR);
+				pe->error_code = PROXY_ERR_SERVER;
+				pe->error_msg = strdup("bad dbg_event conversion");
+			} else {
+				pe = new_proxy_event(PROXY_EV_OK);
+				pe->event_data = str;
+			}
+
+			h->event_handler(pe, h->data);
 		}
 	}
 	
@@ -76,6 +88,11 @@ DbgClntInit(int num_svrs, char *proxy, proxy_svr_helper_funcs *funcs, proxy_svr_
 	 * Initialize client/server interface
 	 */
 	ClntInit(num_svrs);
+	
+	/*
+	 * Register callback
+	 */
+	ClntRegisterCallback(dbg_clnt_cmd_completed);
 	
 	/*
 	 * Create a procset containing all processes
@@ -101,12 +118,25 @@ DbgClntInit(int num_svrs, char *proxy, proxy_svr_helper_funcs *funcs, proxy_svr_
 }
 
 int
-DbgClntCreateSession(char *host, int port)
+DbgClntCreateSession(int num, char *host, int port)
 {
-	if (host != NULL)
-		return proxy_svr_connect(dbg_proxy, host, port, dbg_proxy_data);
+	int			res;
+	dbg_event *	e;
 	
-	return proxy_svr_create(dbg_proxy, port, dbg_proxy_data);
+	if (host != NULL)
+		res = proxy_svr_connect(dbg_proxy, host, port, dbg_proxy_data);
+	else
+		res = proxy_svr_create(dbg_proxy, port, dbg_proxy_data);
+	
+	if (res == PROXY_RES_ERR)
+		return DBGRES_ERR;
+	
+	e = NewDbgEvent(DBGEV_INIT);
+	e->num_servers = num;
+	
+	dbg_clnt_cmd_completed(e, NULL);
+	
+	return DBGRES_OK;
 }
 
 void
@@ -509,16 +539,10 @@ DbgClntProgress(void)
 	return proxy_svr_progress(dbg_proxy, dbg_proxy_data);
 }
 
+#if 0
 void
 DbgClntRegisterEventHandler(void (*event_callback)(dbg_event *, void *), void *data)
 {
-	static int	registered = 0;
-	
-	if (registered == 0) {
-		ClntRegisterCallback(dbg_clnt_cmd_completed);
-		registered++;
-	}
-
 	RegisterEventHandler(event_callback, data);
 }
 
@@ -530,6 +554,7 @@ DbgClntUnregisterEventHandler(void (*event_callback)(dbg_event *, void *))
 {
 	UnregisterEventHandler(event_callback);
 }
+#endif
 
 /**
  * Register a handler for file descriptor events.
