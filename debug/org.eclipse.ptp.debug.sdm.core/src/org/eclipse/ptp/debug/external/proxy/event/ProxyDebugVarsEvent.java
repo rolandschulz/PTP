@@ -17,28 +17,23 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.debug.external.proxy;
+package org.eclipse.ptp.debug.external.proxy.event;
 
-import org.eclipse.ptp.core.proxy.event.IProxyEvent;
-import org.eclipse.ptp.core.proxy.event.AbstractProxyEvent;
 import org.eclipse.ptp.core.util.BitList;
 
-public class ProxyDebugBreakpointEvent extends AbstractProxyEvent implements IProxyEvent {
-	private int				bpId;
+public class ProxyDebugVarsEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+	private String[] vars;
 	
-	public ProxyDebugBreakpointEvent(BitList set, int type, int id) {
-		super(type, set);
-		this.bpId = id;
+	public ProxyDebugVarsEvent(BitList set, String[] vars) {
+		super(EVENT_DBG_INIT, set);
+		this.vars = vars;
 	}
 	
-	public int getBreakpointId() {
-		return this.bpId;
+	public String[] getVariables() {
+		return this.vars;
 	}
 	
 	public String toString() {
-		if (this.getEventID() == EVENT_DBG_BPHIT)
-			return "EVENT_DBG_BPHIT " + this.getBitSet().toString();
-		else
-			return "EVENT_DBG_BPSET " + this.getBitSet().toString();
+		return "EVENT_DBG_VARS " + this.getBitSet().toString() + " <" + this.vars.length + " vars>";
 	}
 }

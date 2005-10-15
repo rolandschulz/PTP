@@ -17,13 +17,12 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.debug.external.proxy;
+package org.eclipse.ptp.debug.external.proxy.event;
 
-import org.eclipse.ptp.core.proxy.event.AbstractProxyEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.external.proxy.ProxyDebugStackframe;
 
-public class ProxyDebugStackframeEvent extends AbstractProxyEvent implements IProxyEvent {
+public class ProxyDebugStackframeEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
 	private ProxyDebugStackframe[] frames;
 	
 	public ProxyDebugStackframeEvent(BitList set, ProxyDebugStackframe[] frames) {

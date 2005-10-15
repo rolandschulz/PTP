@@ -17,37 +17,23 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.debug.external.proxy;
+package org.eclipse.ptp.debug.external.proxy.event;
 
-import org.eclipse.ptp.core.proxy.event.AbstractProxyEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.util.BitList;
 
-public class ProxyDebugSignalEvent extends AbstractProxyEvent implements IProxyEvent {
-	private String	signalName;
-	private String	signalMeaning;
-	private int		threadID;
+public class ProxyDebugTypeEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+	private String type;
 	
-	public ProxyDebugSignalEvent(BitList set, String name, String meaning, int tid) {
-		super(EVENT_DBG_SIGNAL, set);
-		this.signalName = name;
-		this.signalMeaning = meaning;
-		this.threadID = tid;
+	public ProxyDebugTypeEvent(BitList set, String type) {
+		super(EVENT_DBG_TYPE, set);
+		this.type = type;
 	}
 	
-	public String getSignalName() {
-		return this.signalName;
-	}
-	
-	public String getSignalMeaning() {
-		return this.signalMeaning;
-	}
-	
-	public int getThreadID() {
-		return this.threadID;
+	public String getType() {
+		return this.type;
 	}
 	
 	public String toString() {
-		return "EVENT_DBG_SIGNAL " + this.getBitSet().toString() + " " + this.signalName;
+		return "EVENT_DBG_TYPE " + this.getBitSet().toString() + " " + this.type;
 	}
 }

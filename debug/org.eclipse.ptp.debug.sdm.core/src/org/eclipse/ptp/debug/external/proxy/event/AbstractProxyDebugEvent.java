@@ -17,25 +17,24 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.debug.external.proxy;
+package org.eclipse.ptp.debug.external.proxy.event;
 
-import org.eclipse.ptp.core.proxy.event.AbstractProxyEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.util.BitList;
 
-public class ProxyDebugVarsEvent extends AbstractProxyEvent implements IProxyEvent {
-	private String[] vars;
+public abstract class AbstractProxyDebugEvent implements IProxyDebugEvent {
+	private int		eventID;
+	private BitList	procSet;
 	
-	public ProxyDebugVarsEvent(BitList set, String[] vars) {
-		super(EVENT_DBG_INIT, set);
-		this.vars = vars;
+	public AbstractProxyDebugEvent(int id, BitList set) {
+		eventID = id;
+		procSet = set;
 	}
 	
-	public String[] getVariables() {
-		return this.vars;
+	public int getEventID() {
+		return eventID;
 	}
 	
-	public String toString() {
-		return "EVENT_DBG_VARS " + this.getBitSet().toString() + " <" + this.vars.length + " vars>";
+	public BitList getBitSet() {
+		return procSet;
 	}
 }
