@@ -25,10 +25,12 @@ import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
+import org.eclipse.cdt.debug.core.cdi.ICDILocation;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIAddressBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
@@ -62,6 +64,8 @@ public interface IPCDISession extends ICDISession {
 			ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException;
 	public ICDIAddressBreakpoint setAddressBreakpoint(IPCDIDebugProcessSet bSet, int type,
 			ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException;
+	
+	public void setInternalTemporaryBreakpoint(IPCDIDebugProcessSet bSet,  ICDILocation location ) throws DebugException;
 
 	/* Location */
 	public ICDILineLocation createLineLocation(String file, int line);

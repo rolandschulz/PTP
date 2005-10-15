@@ -2,6 +2,7 @@ package org.eclipse.ptp.debug.core;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
+import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILocation;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
@@ -17,6 +18,7 @@ import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
+import org.eclipse.ptp.debug.core.model.IPFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupDirector;
 
@@ -77,9 +79,9 @@ public class PSession implements IPSession, IBreakpointsListener {
 			
 			if ( breakpoint instanceof IPLineBreakpoint )
 				setLineBreakpoint( (IPLineBreakpoint)breakpoint );
-/*			else if ( breakpoint instanceof IPFunctionBreakpoint )
-				setFunctionBreakpoint( (ICFunctionBreakpoint)breakpoint );
-			else if ( breakpoint instanceof IPAddressBreakpoint )
+			else if ( breakpoint instanceof IPFunctionBreakpoint )
+				setFunctionBreakpoint( (IPFunctionBreakpoint)breakpoint );
+/*			else if ( breakpoint instanceof IPAddressBreakpoint )
 				setAddressBreakpoint( (ICAddressBreakpoint)breakpoint );
 			else if ( breakpoint instanceof IPWatchpoint )
 				setWatchpoint( (ICWatchpoint)breakpoint );
@@ -92,6 +94,17 @@ public class PSession implements IPSession, IBreakpointsListener {
 		}
 	}
 
+	private void setFunctionBreakpoint( IPFunctionBreakpoint breakpoint ) throws CDIException, CoreException {
+		boolean enabled = breakpoint.isEnabled();
+		String handle = breakpoint.getSourceHandle();
+		IPath path = convertPath( handle );
+		
+		ICDIFunctionLocation location = pCDISession.createFunctionLocation( path.lastSegment(), breakpoint.getFunction() );
+		ICDICondition condition = null;
+		
+		setLocationBreakpointOnSession( breakpoint, location, condition, enabled );
+	}
+	
 	private void setLineBreakpoint( IPLineBreakpoint breakpoint ) throws CDIException, CoreException {
 		boolean enabled = breakpoint.isEnabled();
 		String handle = breakpoint.getSourceHandle();
@@ -111,10 +124,11 @@ public class PSession implements IPSession, IBreakpointsListener {
 						IPCDIDebugProcessSet set = pCDISession.getModelManager().getProcessSet(breakpoint.getCurSetId());
 						pCDISession.setLineBreakpoint(set, ICDIBreakpoint.REGULAR,
 								(ICDILineLocation)location, condition, true);
-/*					} else if ( breakpoint instanceof ICFunctionBreakpoint ) {
-						target.setFunctionBreakpoint( ICDIBreakpoint.REGULAR,
-								(ICDIFunctionLocation)location, condition, true );								
-					} else if ( breakpoint instanceof ICAddressBreakpoint ) {
+					} else if ( breakpoint instanceof IPFunctionBreakpoint ) {
+						IPCDIDebugProcessSet set = pCDISession.getModelManager().getProcessSet(breakpoint.getCurSetId());
+						pCDISession.setFunctionBreakpoint(set, ICDIBreakpoint.REGULAR,
+								(ICDIFunctionLocation)location, condition, true);
+/*					} else if ( breakpoint instanceof ICAddressBreakpoint ) {
 						target.setAddressBreakpoint( ICDIBreakpoint.REGULAR,
 								(ICDIAddressLocation)location, condition, true );
 */					}
