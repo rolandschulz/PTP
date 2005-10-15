@@ -66,7 +66,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient {
 		
 	protected synchronized void fireEvent(IProxyEvent event) {
 		IProxyDebugEvent e = null;
-	System.out.println("got event " + event.getEventID());	
+
 		if (listeners == null)
 			return;
 		
