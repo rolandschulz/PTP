@@ -37,72 +37,58 @@ public class TargetConfiguration extends PTPObject implements ICDITargetConfigur
 	}
 
 	public boolean supportsTerminate() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return true;
 	}
 
 	public boolean supportsDisconnect() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public boolean supportsSuspend() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return true;
 	}
 
 	public boolean supportsResume() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return true;
 	}
 
 	public boolean supportsRestart() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public boolean supportsStepping() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return true;
 	}
 
 	public boolean supportsInstructionStepping() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public boolean supportsBreakpoints() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return true;
 	}
 
 	public boolean supportsRegisters() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public boolean supportsRegisterModification() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public boolean supportsSharedLibrary() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public boolean supportsMemoryRetrieval() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public boolean supportsMemoryModification() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return false;
 	}
 
 	public boolean supportsExpressionEvaluation() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return true;
 	}
 
