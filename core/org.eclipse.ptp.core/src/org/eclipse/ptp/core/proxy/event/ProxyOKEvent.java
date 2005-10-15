@@ -19,15 +19,19 @@
 
 package org.eclipse.ptp.core.proxy.event;
 
-import org.eclipse.ptp.core.util.BitList;
-
 public class ProxyOKEvent extends AbstractProxyEvent implements IProxyEvent {
+	private String eventData;
 	
-	public ProxyOKEvent(BitList set) {
-		super(EVENT_OK, set);
+	public ProxyOKEvent(String data) {
+		super(EVENT_OK);
+		eventData = data;
 	}
 	
+	public String getData() {
+		return eventData;
+	}
+
 	public String toString() {
-		return "EVENT_OK " + this.getBitSet().toString();
+		return "EVENT_OK " + eventData;
 	}
 }
