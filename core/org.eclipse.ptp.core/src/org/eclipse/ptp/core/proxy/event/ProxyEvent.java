@@ -22,27 +22,34 @@ package org.eclipse.ptp.core.proxy.event;
 import org.eclipse.ptp.core.util.BitList;
 
 public class ProxyEvent {
-	
+	private static String join(int start, String[] strs, String delim) {
+		StringBuffer buf = new StringBuffer();
+		for (int i = start; i < strs.length; i++) {
+			if (i > start)
+				buf.append(delim);
+			buf.append(strs[i]);
+		}
+		return buf.toString();
+	}
+
 	public static IProxyEvent toEvent(String str) {
 		IProxyEvent evt = null;
 		String[] args = str.split(" ");
 		
 		int type = Integer.parseInt(args[0]);
 		
-		BitList set = decodeBitSet(args[1]);
-		
 		switch (type) {
 		case IProxyEvent.EVENT_OK:
-			evt = new ProxyOKEvent(set);
+			evt = new ProxyOKEvent(join(1, args, " "));
 			break;
 			
 		case IProxyEvent.EVENT_ERROR:
-			int errCode = Integer.parseInt(args[2]);
-			evt = new ProxyErrorEvent(set, errCode, decodeString(args[3]));
+			int errCode = Integer.parseInt(args[1]);
+			evt = new ProxyErrorEvent(errCode, decodeString(args[2]));
 			break;
 			
 		default:
-			evt = new ProxyErrorEvent(set, ProxyErrorEvent.EVENT_ERR_EVENT, "Invalid event type");
+			evt = new ProxyErrorEvent(ProxyErrorEvent.EVENT_ERR_EVENT, "Invalid event type");
 			break;
 		}
 		

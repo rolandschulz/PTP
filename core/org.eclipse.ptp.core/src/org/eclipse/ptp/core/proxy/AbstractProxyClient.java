@@ -66,11 +66,6 @@ public abstract class AbstractProxyClient {
 		return String.valueOf(res);
 	}
 	
-	private String encodeBitSet(BitList set) {
-		String lenStr = Integer.toHexString(set.size());
-		return lenStr + ":" + set.toString();
-	}
-	
 	protected void sendCommand(String cmd) throws IOException {
 		if (sessSock != null && sessSock.isConnected()) {
 			String buf = encodeLength(cmd.length()) + " " + cmd;
@@ -84,16 +79,6 @@ public abstract class AbstractProxyClient {
 		this.sendCommand(cmd + " " + args);
 	}
 	
-	protected void sendCommand(String cmd, BitList set) throws IOException {
-		String setStr = encodeBitSet(set);
-		this.sendCommand(cmd, setStr);
-	}
-	
-	protected void sendCommand(String cmd, BitList set, String args) throws IOException {
-		String setStr = encodeBitSet(set);
-		this.sendCommand(cmd, setStr + " " + args);
-	}
-
 	public void addEventListener(IProxyEventListener listener) {
 		listeners.add(listener);
 	}
@@ -175,17 +160,11 @@ public abstract class AbstractProxyClient {
 		}
 
 		String event_str = new String(event_bytes);
-		
-		IProxyEvent e = convertEvent(event_str);
-		if (e == null)
-			e = ProxyEvent.toEvent(event_str);
-		
-		fireEvent(e);
+
+		fireEvent(ProxyEvent.toEvent(event_str));
 	}
 
 	public void sessionFinish() throws IOException {
 		this.sendCommand("QUI");
 	}
-	
-	public abstract IProxyEvent convertEvent(String str);
 }
