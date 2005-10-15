@@ -21,11 +21,9 @@ package org.eclipse.ptp.debug.external.proxy;
 
 import java.io.IOException;
 
-import org.eclipse.ptp.core.proxy.AbstractProxyClient;
-import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.util.BitList;
 
-public class ProxyDebugClient extends AbstractProxyClient {
+public class ProxyDebugClient extends AbstractProxyDebugClient {
 
 	public ProxyDebugClient(String host, int port) {
 		super(host, port);
@@ -85,9 +83,5 @@ public class ProxyDebugClient extends AbstractProxyClient {
 
 	public void debugListGlobalVariables(BitList procs) throws IOException {
 		sendCommand("LGV", procs);
-	}
-
-	public IProxyEvent convertEvent(String str) {
-		return ProxyDebugEvent.toEvent(str);
 	}
 }

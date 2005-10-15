@@ -17,25 +17,29 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.debug.external.proxy;
+package org.eclipse.ptp.debug.external.proxy.event;
 
-import org.eclipse.ptp.core.proxy.event.AbstractProxyEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.util.BitList;
 
-public class ProxyDebugInitEvent extends AbstractProxyEvent implements IProxyEvent {
-	private int		num_servers;
+public class ProxyDebugErrorEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+	private int		errorCode;
+	private String	errorMsg;
 	
-	public ProxyDebugInitEvent(BitList set, int num) {
-		super(EVENT_DBG_INIT, set);
-		this.num_servers = num;
+	public ProxyDebugErrorEvent(BitList set, int code, String msg) {
+		super(EVENT_DBG_ERROR, set);
+		this.errorCode = code;
+		this.errorMsg = msg;
 	}
 	
-	public int getNumServers() {
-		return this.num_servers;
+	public int getErrorCode() {
+		return this.errorCode;
 	}
 	
+	public String getErrorMessage() {
+		return this.errorMsg;
+	}
+
 	public String toString() {
-		return "EVENT_DBG_INIT " + this.getBitSet().toString() + " " + this.num_servers;
+		return "EVENT_DBG_EXIT " + this.getBitSet().toString() + " " + this.errorCode + " " + this.errorMsg;
 	}
 }

@@ -17,24 +17,27 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.debug.external.proxy;
+package org.eclipse.ptp.debug.external.proxy.event;
 
 import java.math.BigInteger;
 
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
+import org.eclipse.ptp.core.proxy.event.ProxyErrorEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
+import org.eclipse.ptp.core.proxy.event.ProxyOKEvent;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.external.cdi.Condition;
 import org.eclipse.ptp.debug.external.cdi.Location;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.AddressBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.FunctionBreakpoint;
+import org.eclipse.ptp.debug.external.proxy.ProxyDebugStackframe;
 
 public class ProxyDebugEvent {
 	
-	public static IProxyEvent toEvent(String str) {
-		IProxyEvent evt = null;
+	public static IProxyDebugEvent toEvent(String str) {
+		IProxyDebugEvent evt = null;
 		String[] args = str.split(" ");
 		
 		int type = Integer.parseInt(args[0]);
@@ -42,30 +45,39 @@ public class ProxyDebugEvent {
 		BitList set = ProxyEvent.decodeBitSet(args[1]);
 		
 		switch (type) {
-		case IProxyEvent.EVENT_DBG_BPHIT:
-		case IProxyEvent.EVENT_DBG_BPSET:
+		case IProxyDebugEvent.EVENT_DBG_OK:
+			evt = new ProxyDebugOKEvent(set);
+			break;
+			
+		case IProxyDebugEvent.EVENT_DBG_ERROR:
+			int errCode = Integer.parseInt(args[2]);
+			evt = new ProxyDebugErrorEvent(set, errCode, decodeString(args[3]));
+			break;
+
+		case IProxyDebugEvent.EVENT_DBG_BPHIT:
+		case IProxyDebugEvent.EVENT_DBG_BPSET:
 			int idVal = Integer.parseInt(args[2]);
 			evt = new ProxyDebugBreakpointEvent(set, type, idVal);
 			break;
 			
-		case IProxyEvent.EVENT_DBG_SIGNAL:
+		case IProxyDebugEvent.EVENT_DBG_SIGNAL:
 			int sigTid = Integer.parseInt(args[4]);
 			evt = new ProxyDebugSignalEvent(set, decodeString(args[2]), decodeString(args[3]), sigTid);
 			break;
 			
-		case IProxyEvent.EVENT_DBG_EXIT:
+		case IProxyDebugEvent.EVENT_DBG_EXIT:
 			int status = Integer.parseInt(args[2]);
 			evt = new ProxyDebugExitEvent(set, status);
 			break;
 			
-		case IProxyEvent.EVENT_DBG_STEP:
+		case IProxyDebugEvent.EVENT_DBG_STEP:
 			int stepLevel = Integer.parseInt(args[2]);
 			int stepLine = Integer.parseInt(args[6]);
 			ProxyDebugStackframe frame = new ProxyDebugStackframe(stepLevel, decodeString(args[3]), decodeString(args[4]), stepLine, decodeString(args[5]));
 			evt = new ProxyDebugStepEvent(set, frame);
 			break;
 			
-		case IProxyEvent.EVENT_DBG_FRAMES:
+		case IProxyDebugEvent.EVENT_DBG_FRAMES:
 			int numFrames = Integer.parseInt(args[2]);
 			ProxyDebugStackframe[] frames = new ProxyDebugStackframe[numFrames];
 			for (int i = 0; i < numFrames; i++) {
@@ -76,15 +88,15 @@ public class ProxyDebugEvent {
 			evt = new ProxyDebugStackframeEvent(set, frames);
 			break;
 			
-		case IProxyEvent.EVENT_DBG_DATA:
+		case IProxyDebugEvent.EVENT_DBG_DATA:
 			evt = new ProxyDebugDataEvent(set, args[2], args[3]);
 			break;
 			
-		case IProxyEvent.EVENT_DBG_TYPE:
+		case IProxyDebugEvent.EVENT_DBG_TYPE:
 			evt = new ProxyDebugTypeEvent(set, args[2]);
 			break;
 			
-		case IProxyEvent.EVENT_DBG_VARS:
+		case IProxyDebugEvent.EVENT_DBG_VARS:
 			int numVars = Integer.parseInt(args[2]);
 			String[] vars = new String[numVars];
 			for (int i = 0; i < numVars; i++) {
@@ -93,7 +105,7 @@ public class ProxyDebugEvent {
 			evt = new ProxyDebugVarsEvent(set, vars);
 			break;
 			
-		case IProxyEvent.EVENT_DBG_INIT:
+		case IProxyDebugEvent.EVENT_DBG_INIT:
 			int num_servers = Integer.parseInt(args[2]);
 			evt = new ProxyDebugInitEvent(set, num_servers);
 			break;
