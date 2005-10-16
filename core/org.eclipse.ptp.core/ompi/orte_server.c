@@ -5,6 +5,11 @@
 
 #define DEFAULT_PROXY		"tcp"
 
+#define RTEV_OFFSET		200
+#define RTEV_OK			RTEV_OFFSET + 0
+#define RTEV_ERROR		RTEV_OFFSET + 1
+#define RTEV_JBSTATE		RTEV_OFFSET + 2
+
 int ORTEIsShutdown(void);
 
 int ORTERun(char **);
@@ -17,15 +22,20 @@ int OMPIGetNodeAttribute(char **);
 int OMPIGetNodemachineID(char **);
 int OMPIQuit(void);
 
-int shutdown = 0;
+int 			shutdown = 0;
+proxy_svr *	proxy;
+
+static proxy_handler_funcs handler_funcs = {
+	RegisterFileHandler,		// regfile() - call to register a file handler
+	UnregisterFileHandler,	// unregfile() - called to unregister file handler
+	RegisterEventHandler,		// regeventhandler() - called to register the proxy event handler
+	CallEventHandlers
+};
 
 static proxy_svr_helper_funcs helper_funcs = {
 	NULL,					// newconn() - can be used to reject connections
 	NULL,					// numservers() - if there are multiple servers, return the number
 	ORTEIsShutdown,			// shutdown_completed() - proxy will not complete until this returns true
-	RegisterFileHandler,		// regfile() - call to register a file handler
-	UnregisterFileHandler,	// unregfile() - called to unregister file handler
-	RegisterEventHandler,		// regeventhandler() - called to register the proxy event handler
 	OMPIQuit					// quit() - called when quit message received
 };
 
@@ -272,8 +282,7 @@ ORTERun(char **args)
 static void
 job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 {
-	handler *		h;
-	proxy_event *	e;
+	char *	res;
 	
 	/* not sure yet how we want to handle this callback, what events
 	 * we want to generate, but here are the states that I know of
@@ -312,13 +321,9 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 			break;
 	}
 
-	// e = NewEvent(...);
-	
-	for (SetHandler(); (h = GetHandler()) != NULL; ) {
-		if (h->htype == HANDLER_EVENT) {
-			h->event_handler(e, h->data);
-		}
-	}
+	asprintf(res, "%d %d", RTEV_JOBSTATE, state);
+	proxy_svr_event_callback(proxy, res);
+	free(res);
 }
 
 /* this is an internal function we'll call from within this, consider
@@ -361,6 +366,12 @@ ptp_ompi_sendcmd(orte_daemon_cmd_flag_t usercmd)
 int
 OMPIGetJobs(char **args)
 {
+	char *	res;
+	
+	// jobs = get_jobs();
+	// joblist_to_str(jobs, &res);
+	proxy_event_callback(res);
+	free(res);
 	return PROXY_RES_OK;
 }
 
@@ -374,7 +385,26 @@ OMPIGetJobs(char **args)
 int 
 OMPIGetProcesses(char **args)
 {
-	int jobid = atoi(args[1]);
+	int				jobid;
+	bitset *			procs;
+	char *			pstr;
+	char *			res;
+	
+	jobid = atoi(args[1]);
+	procs = get_procs(jobid);
+	
+	if (procs == NULL) {
+		asprintf(&res, "%d %s", RTEV_ERROR, "no such jobid");
+	} else {
+		pstr = bitset_to_str(procs);
+		asprintf(res, "%d %s", RTEV_PROCS, pstr);
+		free(pstr);
+	}
+	
+	proxy_svr_event_callback(proxy, res);
+	
+	free(res);
+	
 	return PROXY_RES_OK;
 }
 
@@ -467,22 +497,20 @@ OMPIQuit(void)
 }
 
 void
-server(proxy *p)
+server(char *name)
 {
-	void *	proxy_data;
+	if (proxy_svr_init(name, handler_funcs, helper_funcs, command_tab, &proxy) != PROXY_RES_OK)
+		return;
 	
-	proxy_svr_init(p, helper_funcs, command_tab, &proxy_data);
-	
-	proxy_svr_connect(p, host, port, proxy_data);
-
+	proxy_svr_connect(proxy, host, port);
 	
 	for (;;) {
 		if (ORTEProgress() != PROXY_RES_OK ||
-			proxy_svr_progress(p, proxy_data) != PROXY_RES_OK)
+			proxy_svr_progress(proxy) != PROXY_RES_OK)
 			break;
 	}
 	
-	proxy_svr_finish(p, proxy_data);
+	proxy_svr_finish(proxy);
 }
 
 int
@@ -492,7 +520,6 @@ main(int argc, char *argv[])
 	int				port = PROXY_TCP_PORT;
 	char *			host = "localhost";
 	char *			proxy_str = DEFAULT_PROXY;
-	proxy *			p;
 	
 	while ((ch = getopt_long(argc, argv, "P:p:h:", longopts, NULL)) != -1)
 	switch (ch) {
@@ -510,17 +537,12 @@ main(int argc, char *argv[])
 		return 1;
 	}
 	
-	if (find_proxy(proxy_str, &p) < 0) {
-		fprintf(stderr, "No such proxy: \"%s\"\n", proxy_str);
-		return 1;
-	}
-
 	if (!ORTEInit()) {
 		fprintf(stderr, "Faild to initialize ORTE\n");
 		return 1;
 	}
 	
-	server();
+	server(proxy_str);
 	
 	ORTEFinalize();
 	
