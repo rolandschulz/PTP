@@ -31,11 +31,11 @@ public class ProxyRuntimeEvent extends ProxyEvent {
 		int type = Integer.parseInt(args[0]);
 		
 		switch (type) {
-		case IProxyEvent.EVENT_OK:
+		case IProxyRuntimeEvent.EVENT_RUNTIME_OK:
 			evt = new ProxyRuntimeOKEvent();
 			break;
 			
-		case IProxyEvent.EVENT_ERROR:
+		case IProxyRuntimeEvent.EVENT_RUNTIME_ERROR:
 			int errCode = Integer.parseInt(args[1]);
 			evt = new ProxyRuntimeErrorEvent(errCode, decodeString(args[2]));
 			break;
