@@ -20,12 +20,12 @@
 #ifndef _CLIENT_SRV_H_
 #define _CLIENT_SRV_H_
 
-#include "procset.h"
+#include "bitset.h"
 #include "dbg_event.h"
 
 void ClntRegisterCallback(void (*)(dbg_event *, void *));
 void ClntInit(int);
-int ClntSendCommand(procset *, char *, char *);
+int ClntSendCommand(bitset *, char *, char *);
 int ClntProgressCmds(void);
 
 #endif /* _CLIENT_SRV_H_ */

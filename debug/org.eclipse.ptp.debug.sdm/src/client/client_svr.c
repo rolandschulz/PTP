@@ -38,7 +38,7 @@
 
 #include "dbg.h"
 #include "dbg_client.h"
-#include "procset.h"
+#include "bitset.h"
 #include "list.h"
 #include "hash.h"
 
@@ -47,15 +47,15 @@
  * and all servers. completed() is called once all replys have been received.
  */
 struct active_request {
-	procset *		procs;
+	bitset *		procs;
 	void *			data;
 	Hash *			events;
 };
 typedef struct active_request	active_request;
 
 static int			num_servers;
-static procset *		sending_procs;
-static procset *		receiving_procs;
+static bitset *		sending_procs;
+static bitset *		receiving_procs;
 static List *		active_requests;
 static char **		send_bufs;
 static MPI_Request *	send_requests;
@@ -101,49 +101,49 @@ ClntInit(int svr_no)
 	for (i = 0; i < num_servers; i++)
 		send_requests[i] = MPI_REQUEST_NULL;
 
-	sending_procs = procset_new(num_servers);
-	receiving_procs = procset_new(num_servers);
+	sending_procs = bitset_new(num_servers);
+	receiving_procs = bitset_new(num_servers);
 
 	active_requests = NewList();
 }
 
 /*
- * Send a command to the servers specified in procset. 
+ * Send a command to the servers specified in bitset. 
  * 
  * It is permissible to have multiple outstanding commands, provided
  * the processes each command applies to are disjoint sets.
  */
 int
-ClntSendCommand(procset *procs, char *str, void *data)
+ClntSendCommand(bitset *procs, char *str, void *data)
 {
 	int				pid;
 	int				cmd_len;
-	procset *		p;
+	bitset *			p;
 	active_request *	r;
 
 	/*
 	 * Check if any processes already have active requests
 	 */
-	p = procset_and(sending_procs, procs);
-	procset_andeq(p, receiving_procs);
-	if (!procset_isempty(p)) {
+	p = bitset_and(sending_procs, procs);
+	bitset_andeq(p, receiving_procs);
+	if (!bitset_isempty(p)) {
 		DbgSetError(DBGERR_INPROGRESS, NULL);
 		return -1;
 	}
 	
-	procset_free(p);
+	bitset_free(p);
 	/*
 	 * Update sending processes
 	 */	
-	procset_oreq(sending_procs, procs);
+	bitset_oreq(sending_procs, procs);
 
 	/*
 	 * Create a new request and add it too the active list
 	 */
 	r = (active_request *)malloc(sizeof(active_request));
-	r->procs = procset_copy(procs);
+	r->procs = bitset_copy(procs);
 	r->data = data;
-	r->events = HashCreate(log2l(procset_size(procs))); // TODO: Check this is a sensible size
+	r->events = HashCreate(log2l(bitset_size(procs))); // TODO: Check this is a sensible size
 	
 	AddToList(active_requests, (void *)r);
 
@@ -151,7 +151,7 @@ ClntSendCommand(procset *procs, char *str, void *data)
 	 * Now post commands to the servers
 	 */
 	for (pid = 0; pid < num_servers; pid++) {
-		if (procset_test(procs, pid)) {
+		if (bitset_test(procs, pid)) {
 			/*
 			 * MPI spec does not allow read access to a send buffer while send is in progress
 			 * so we must make a copy for each send.
@@ -187,7 +187,7 @@ ClntProgressCmds(void)
 	/*
 	 * Check for completed sends
 	 */
-	count = procset_size(sending_procs);
+	count = bitset_size(sending_procs);
 	if (count > 0) {
 		if (MPI_Testsome(num_servers, send_requests, &completed, pids, stats) != MPI_SUCCESS) {
 			printf("error in testsome\n");
@@ -195,8 +195,8 @@ ClntProgressCmds(void)
 		}
 		
 		for (i = 0; i < completed; i++) {
-			procset_remove_proc(sending_procs, pids[i]);
-			procset_add_proc(receiving_procs, pids[i]);
+			bitset_unset(sending_procs, pids[i]);
+			bitset_set(receiving_procs, pids[i]);
 			free(send_bufs[pids[i]]);
 		}
 	}
@@ -204,7 +204,7 @@ ClntProgressCmds(void)
 	/*
 	 * Check for replys
 	 */
-	count = procset_size(receiving_procs);
+	count = bitset_size(receiving_procs);
 	if (count > 0) {
 		MPI_Iprobe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &avail, &stat);
 	
@@ -240,7 +240,7 @@ ClntProgressCmds(void)
 		 * Find request for this proc
 		 */
 		for (SetList(active_requests); (r = (active_request *)GetListElement(active_requests)) != NULL; ) {
-			if (procset_test(r->procs, recv_pid)) {
+			if (bitset_test(r->procs, recv_pid)) {
 				/*
 				 * Save event if it is new, otherwise just add this process to the event
 				 */
@@ -248,23 +248,23 @@ ClntProgressCmds(void)
 					if (DbgStrToEvent(reply_buf, &e) < 0) {
 						fprintf(stderr, "Bad protocol: conversion to event failed! <%s>\n", reply_buf);
 					} else {
-						e->procs = procset_new(num_servers);
+						e->procs = bitset_new(num_servers);
 						HashInsert(r->events, hdr[0], (void *)e);
 					}
 				}
 				
 				if (e != NULL)
-					procset_add_proc(e->procs, recv_pid);
+					bitset_set(e->procs, recv_pid);
 								
 				/*
 				 * Call notify function if all receives have been completed
 				 */
-				procset_remove_proc(r->procs, recv_pid);
+				bitset_unset(r->procs, recv_pid);
 
-				if (procset_isempty(r->procs)) {
+				if (bitset_isempty(r->procs)) {
 					RemoveFromList(active_requests, (void *)r);
 					send_completed(r->events, r->data);
-					procset_free(r->procs);
+					bitset_free(r->procs);
 					free(r);
 				}
 			}
@@ -275,9 +275,9 @@ ClntProgressCmds(void)
 		free(reply_buf);
 		
 		/*
-		 * remove from receiving procsets
+		 * remove from receiving bitsets
 		 */
-		procset_remove_proc(receiving_procs, recv_pid);
+		bitset_unset(receiving_procs, recv_pid);
 	}
 	
 	return 0;

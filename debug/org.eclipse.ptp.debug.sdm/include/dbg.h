@@ -23,7 +23,7 @@
 #include <stdarg.h>
 
 #include "session.h"
-#include "procset.h"
+#include "bitset.h"
 #include "breakpoint.h"
 #include "stackframe.h"
 #include "dbg_error.h"
@@ -47,31 +47,31 @@ int DbgQuit(session *);
 /*
  * Breakpoint operations
  */
-int DbgSetLineBreakpoint(session *s, procset *set, int bpid, char *file, int line);
-int DbgSetFuncBreakpoint(session *s, procset *set, int bpid, char *file, char *func);
-int DbgDeleteBreakpoint(session *s, procset *set, int bpid);
+int DbgSetLineBreakpoint(session *s, bitset *set, int bpid, char *file, int line);
+int DbgSetFuncBreakpoint(session *s, bitset *set, int bpid, char *file, char *func);
+int DbgDeleteBreakpoint(session *s, bitset *set, int bpid);
 
 /*
  * Process control operations
  */
-int DbgGo(session *s, procset *set);
-int DbgStep(session *s, procset *set, int count, int type);
-int DbgTerminate(session *s, procset *set);
+int DbgGo(session *s, bitset *set);
+int DbgStep(session *s, bitset *set, int count, int type);
+int DbgTerminate(session *s, bitset *set);
 
 /*
  * Stack frame operations
  */
-int DbgListStackframes(session *s, procset *set, int current);
-int DbgSetCurrentStackframe(session *s, procset *set, int level);
+int DbgListStackframes(session *s, bitset *set, int current);
+int DbgSetCurrentStackframe(session *s, bitset *set, int level);
 
 /*
  * Expression/variable operations
  */
-int DbgEvaluateExpression(session *s, procset *set, char *exp);
-int DbgGetType(session *s, procset *set, char *exp);
-int DbgListLocalVariables(session *s, procset *set);
-int DbgListArguments(session *s, procset *set);
-int DbgListGlobalVariables(session *s, procset *set);
+int DbgEvaluateExpression(session *s, bitset *set, char *exp);
+int DbgGetType(session *s, bitset *set, char *exp);
+int DbgListLocalVariables(session *s, bitset *set);
+int DbgListArguments(session *s, bitset *set);
+int DbgListGlobalVariables(session *s, bitset *set);
 
 /*
  * Event Handling

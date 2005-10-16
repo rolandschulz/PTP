@@ -33,7 +33,7 @@
 #include "dbg_client.h"
 #include "client_srv.h"
 #include "proxy_event.h"
-#include "procset.h"
+#include "bitset.h"
 #include "handler.h"
 #include "list.h"
 
@@ -42,7 +42,7 @@
 #define SHUTDOWN_COMPLETED	2
 
 static int			dbg_shutdown;
-static procset *		dbg_procs = NULL;
+static bitset *		dbg_procs = NULL;
 static proxy_svr *	dbg_proxy;
 static struct timeval	TIMEOUT = { 0, 1000 };
 
@@ -83,10 +83,10 @@ DbgClntInit(int num_svrs, char *name, proxy_handler_funcs *handlers, proxy_svr_h
 	ClntRegisterCallback(dbg_clnt_cmd_completed);
 	
 	/*
-	 * Create a procset containing all processes
+	 * Create a bitset containing all processes
 	 */
-	dbg_procs = procset_new(num_svrs);
-	procset_invert(dbg_procs);
+	dbg_procs = bitset_new(num_svrs);
+	bitset_invert(dbg_procs);
 	
 	/*
 	 * Reset shutdown flag
@@ -156,9 +156,9 @@ DbgClntSetLineBreakpoint(char **args)
 {
 	int			res;
 	char *		cmd;
-	procset *	set; 
+	bitset *		set; 
 
-	set = str_to_procset(args[1]);
+	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
@@ -168,7 +168,7 @@ DbgClntSetLineBreakpoint(char **args)
 	res = ClntSendCommand(set, cmd, NULL);
 	
 	free(cmd);
-	procset_free(set);
+	bitset_free(set);
 	
 	return res;
 }
@@ -178,9 +178,9 @@ DbgClntSetFuncBreakpoint(char **args)
 {
 	int			res;
 	char *		cmd;
-	procset *	set; 
+	bitset *		set; 
 
-	set = str_to_procset(args[1]);
+	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
@@ -190,7 +190,7 @@ DbgClntSetFuncBreakpoint(char **args)
 	res = ClntSendCommand(set, cmd, NULL);
 	
 	free(cmd);
-	procset_free(set);
+	bitset_free(set);
 		
 	return res;
 }
@@ -200,9 +200,9 @@ DbgClntDeleteBreakpoint(char **args)
 {
 	int			res;
 	char *		cmd;
-	procset *	set; 
+	bitset *		set; 
 
-	set = str_to_procset(args[1]);
+	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
@@ -212,7 +212,7 @@ DbgClntDeleteBreakpoint(char **args)
 	res = ClntSendCommand(set, cmd, NULL);
 	
 	free(cmd);
-	procset_free(set);
+	bitset_free(set);
 		
 	return res;
 }
@@ -224,9 +224,9 @@ int
 DbgClntGo(char **args)
 {
 	int			res;
-	procset *	set; 
+	bitset *		set; 
 
-	set = str_to_procset(args[1]);
+	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
@@ -234,7 +234,7 @@ DbgClntGo(char **args)
 	
 	res = ClntSendCommand(set, DBG_GO_CMD, NULL);
 	
-	procset_free(set);
+	bitset_free(set);
 		
 	return res;
 }
@@ -244,9 +244,9 @@ DbgClntStep(char **args)
 {
 	int			res;
 	char *		cmd;
-	procset *	set; 
+	bitset *		set; 
 
-	set = str_to_procset(args[1]);
+	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
@@ -256,7 +256,7 @@ DbgClntStep(char **args)
 	res = ClntSendCommand(set, cmd, NULL);
 	
 	free(cmd);
-	procset_free(set);
+	bitset_free(set);
 	
 	return res;
 }
@@ -265,9 +265,9 @@ int
 DbgClntTerminate(char **args)
 {
 	int			res;
-	procset *	set; 
+	bitset *		set; 
 
-	set = str_to_procset(args[1]);
+	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
@@ -275,7 +275,7 @@ DbgClntTerminate(char **args)
 	
 	res = ClntSendCommand(set, DBG_TERMINATE_CMD, NULL);
 	
-	procset_free(set);
+	bitset_free(set);
 	
 	return res;
 }
@@ -288,9 +288,9 @@ DbgClntListStackframes(char **args)
 {
 	int			res;
 	char *		cmd;
-	procset *	set; 
+	bitset *		set; 
 
-	set = str_to_procset(args[1]);
+	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
@@ -300,7 +300,7 @@ DbgClntListStackframes(char **args)
 	res = ClntSendCommand(set, cmd, NULL);
 	
 	free(cmd);
-	procset_free(set);
+	bitset_free(set);
 	
 	return res;
 }
@@ -310,9 +310,9 @@ DbgClntSetCurrentStackframe(char **args)
 {
 	int			res;
 	char *		cmd;
-	procset *	set; 
+	bitset *		set; 
 
-	set = str_to_procset(args[1]);
+	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
@@ -322,7 +322,7 @@ DbgClntSetCurrentStackframe(char **args)
 	res = ClntSendCommand(set, cmd, NULL);
 	
 	free(cmd);
-	procset_free(set);
+	bitset_free(set);
 	
 	return res;
 }
@@ -335,9 +335,9 @@ DbgClntEvaluateExpression(char **args)
 {
 	int			res;
 	char *		cmd;
-	procset *	set; 
+	bitset *		set; 
 
-	set = str_to_procset(args[1]);
+	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
@@ -347,7 +347,7 @@ DbgClntEvaluateExpression(char **args)
 	res = ClntSendCommand(set, cmd, NULL);
 	
 	free(cmd);
-	procset_free(set);
+	bitset_free(set);
 	
 	return res;
 }
@@ -357,9 +357,9 @@ DbgClntGetType(char **args)
 {
 	int		res;
 	char *	cmd;
-	procset *	set; 
+	bitset *	set; 
 
-	set = str_to_procset(args[1]);
+	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
@@ -369,7 +369,7 @@ DbgClntGetType(char **args)
 	res = ClntSendCommand(set, cmd, NULL);
 	
 	free(cmd);
-	procset_free(set);
+	bitset_free(set);
 	
 	return res;
 }
@@ -378,9 +378,9 @@ int
 DbgClntListLocalVariables(char **args)
 {
 	int			res;
-	procset *	set; 
+	bitset *		set; 
 
-	set = str_to_procset(args[1]);
+	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
@@ -388,7 +388,7 @@ DbgClntListLocalVariables(char **args)
 	
 	res = ClntSendCommand(set, DBG_LISTLOCALVARIABLES_CMD, NULL);
 	
-	procset_free(set);
+	bitset_free(set);
 	
 	return res;
 }
@@ -397,9 +397,9 @@ int
 DbgClntListArguments(char **args)
 {
 	int			res;
-	procset *	set; 
+	bitset *		set; 
 
-	set = str_to_procset(args[1]);
+	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
@@ -407,7 +407,7 @@ DbgClntListArguments(char **args)
 	
 	res = ClntSendCommand(set, DBG_LISTARGUMENTS_CMD, NULL);
 	
-	procset_free(set);
+	bitset_free(set);
 	
 	return res;
 }
@@ -416,9 +416,9 @@ int
 DbgClntListGlobalVariables(char **args)
 {
 	int			res;
-	procset *	set; 
+	bitset *		set; 
 
-	set = str_to_procset(args[1]);
+	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
@@ -426,7 +426,7 @@ DbgClntListGlobalVariables(char **args)
 	
 	res = ClntSendCommand(set, DBG_LISTGLOBALVARIABLES_CMD, NULL);
 	
-	procset_free(set);
+	bitset_free(set);
 	
 	return res;
 }

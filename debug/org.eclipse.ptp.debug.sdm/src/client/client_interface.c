@@ -27,7 +27,7 @@
 #include "session.h"
 #include "proxy.h"
 #include "proxy_event.h"
-#include "procset.h"
+#include "bitset.h"
 #include "handler.h"
 
 static struct timeval	TIMEOUT = { 0, 1000 };
@@ -134,10 +134,10 @@ DbgStartSession(session *s, char *prog, char *args)
  * Breakpoint operations
  */
 int 
-DbgSetLineBreakpoint(session *s, procset *set, int bpid, char *file, int line)
+DbgSetLineBreakpoint(session *s, bitset *set, int bpid, char *file, int line)
 {
 	int		res;
-	char *	set_str = procset_to_str(set);
+	char *	set_str = bitset_to_str(set);
 
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_SETLINEBREAKPOINT_CMD, DBG_SETLINEBREAKPOINT_FMT, set_str, bpid, file, line);
 	free(set_str);
@@ -145,10 +145,10 @@ DbgSetLineBreakpoint(session *s, procset *set, int bpid, char *file, int line)
 }
 
 int 
-DbgSetFuncBreakpoint(session *s, procset *set, int bpid, char *file, char *func)
+DbgSetFuncBreakpoint(session *s, bitset *set, int bpid, char *file, char *func)
 {
 	int		res;
-	char *	set_str = procset_to_str(set);
+	char *	set_str = bitset_to_str(set);
 
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_SETFUNCBREAKPOINT_CMD, DBG_SETFUNCBREAKPOINT_FMT, set_str, bpid, file, func);
 	free(set_str);
@@ -156,10 +156,10 @@ DbgSetFuncBreakpoint(session *s, procset *set, int bpid, char *file, char *func)
 }
 
 int 
-DbgDeleteBreakpoint(session *s, procset *set, int bpid)
+DbgDeleteBreakpoint(session *s, bitset *set, int bpid)
 {
 	int		res;
-	char *	set_str = procset_to_str(set);
+	char *	set_str = bitset_to_str(set);
 	
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_DELETEBREAKPOINT_CMD, DBG_DELETEBREAKPOINT_FMT, set_str, bpid);
 	free(set_str);
@@ -170,20 +170,20 @@ DbgDeleteBreakpoint(session *s, procset *set, int bpid)
  * Process control operations
  */
 int 
-DbgGo(session *s, procset *set)
+DbgGo(session *s, bitset *set)
 {
 	int		res;
-	char *	set_str = procset_to_str(set);
+	char *	set_str = bitset_to_str(set);
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_GO_CMD, DBG_GO_FMT, set_str);
 	free(set_str);
 	return res;
 }
 
 int 
-DbgStep(session *s, procset *set, int count, int type)
+DbgStep(session *s, bitset *set, int count, int type)
 {
 	int		res;
-	char *	set_str = procset_to_str(set);
+	char *	set_str = bitset_to_str(set);
 	
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_STEP_CMD, DBG_STEP_FMT, set_str, count, type);
 	free(set_str);
@@ -191,10 +191,10 @@ DbgStep(session *s, procset *set, int count, int type)
 }
 
 int 
-DbgTerminate(session *s, procset *set)
+DbgTerminate(session *s, bitset *set)
 {
 	int		res;
-	char *	set_str = procset_to_str(set);
+	char *	set_str = bitset_to_str(set);
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_TERMINATE_CMD, DBG_TERMINATE_FMT, set_str);
 	free(set_str);
 	return res;
@@ -204,10 +204,10 @@ DbgTerminate(session *s, procset *set)
  * Stack frame operations
  */
 int 
-DbgListStackframes(session *s, procset *set, int current)
+DbgListStackframes(session *s, bitset *set, int current)
 {
 	int		res;
-	char *	set_str = procset_to_str(set);
+	char *	set_str = bitset_to_str(set);
 	
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTSTACKFRAMES_CMD, DBG_LISTSTACKFRAMES_FMT, set_str, current);
 	free(set_str);
@@ -215,10 +215,10 @@ DbgListStackframes(session *s, procset *set, int current)
 }
 
 int 
-DbgSetCurrentStackframe(session *s, procset *set, int level)
+DbgSetCurrentStackframe(session *s, bitset *set, int level)
 {
 	int		res;
-	char *	set_str = procset_to_str(set);
+	char *	set_str = bitset_to_str(set);
 	
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_SETCURRENTSTACKFRAME_CMD, DBG_SETCURRENTSTACKFRAME_FMT, set_str, level);
 	free(set_str);
@@ -229,50 +229,50 @@ DbgSetCurrentStackframe(session *s, procset *set, int level)
  * Expression/variable operations
  */
 int 
-DbgEvaluateExpression(session *s, procset *set, char *exp)
+DbgEvaluateExpression(session *s, bitset *set, char *exp)
 {
 	int		res;
-	char *	set_str = procset_to_str(set);
+	char *	set_str = bitset_to_str(set);
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_EVALUATEEXPRESSION_CMD, DBG_EVALUATEEXPRESSION_FMT, set_str, exp);
 	free(set_str);
 	return res;
 }
 
 int 
-DbgGetType(session *s, procset *set, char *exp)
+DbgGetType(session *s, bitset *set, char *exp)
 {
 	int		res;
-	char *	set_str = procset_to_str(set);
+	char *	set_str = bitset_to_str(set);
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_GETTYPE_CMD, DBG_GETTYPE_FMT, set_str, exp);
 	free(set_str);
 	return res;
 }
 
 int 
-DbgListLocalVariables(session *s, procset *set)
+DbgListLocalVariables(session *s, bitset *set)
 {
 	int		res;
-	char *	set_str = procset_to_str(set);
+	char *	set_str = bitset_to_str(set);
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTLOCALVARIABLES_CMD, DBG_LISTLOCALVARIABLES_FMT, set_str);
 	free(set_str);
 	return res;
 }
 
 int 
-DbgListArguments(session *s, procset *set)
+DbgListArguments(session *s, bitset *set)
 {
 	int		res;
-	char *	set_str = procset_to_str(set);
+	char *	set_str = bitset_to_str(set);
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTARGUMENTS_CMD, DBG_LISTARGUMENTS_FMT, set_str);
 	free(set_str);
 	return res;
 }
 
 int 
-DbgListGlobalVariables(session *s, procset *set)
+DbgListGlobalVariables(session *s, bitset *set)
 {
 	int		res;
-	char *	set_str = procset_to_str(set);
+	char *	set_str = bitset_to_str(set);
 	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTGLOBALVARIABLES_CMD, DBG_LISTGLOBALVARIABLES_FMT, set_str);
 	free(set_str);
 	return res;

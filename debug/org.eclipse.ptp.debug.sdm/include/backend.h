@@ -22,7 +22,7 @@
 
 #include <stdarg.h>
  
-#include "procset.h"
+#include "bitset.h"
 #include "breakpoint.h"
 #include "stackframe.h"
 #include "dbg_event.h"
