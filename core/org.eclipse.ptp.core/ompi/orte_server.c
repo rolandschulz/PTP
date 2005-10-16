@@ -362,16 +362,28 @@ ptp_ompi_sendcmd(orte_daemon_cmd_flag_t usercmd)
  * an event with a list of jobIDs
  * EVENT RETURN:
  *   type = GET_JOBS
- *   data = [99,195,4555] <-- job IDs */
+ *   data = [99,195,4555] <-- job IDs 
+ * 
+ * NOTE: we assume there are unlikely to be many jobs running simultaneously,
+ * we can return this as a list of id's.
+ */
 int
 OMPIGetJobs(char **args)
 {
 	char *	res;
+	char *	str;
+	int		n;
+	int *	jobs
 	
-	// jobs = get_jobs();
-	// joblist_to_str(jobs, &res);
-	proxy_event_callback(res);
+	n = get_jobs(&jobs);
+	intarray_to_str(n, jobs, &str);
+	
+	asprintf(&res, "%d %s", RTEV_JOBS, str);
+	proxy_svr_event_callback(proxy, res);
+	
+	free(str);
 	free(res);
+	
 	return PROXY_RES_OK;
 }
 
@@ -381,6 +393,10 @@ OMPIGetJobs(char **args)
  * EVENT RETURN:
  *   type = GET_PROCESSES
  *   data = [85,86,87,88] <-- those are process IDs
+ * 
+ * NOTE: for processes we must return a bitset, since there may be vary many. This
+ * means that we may need to map between internal/external representation of
+ * process id's (if they don't start with 0).
  */
 int 
 OMPIGetProcesses(char **args)
@@ -421,9 +437,22 @@ OMPIGetProcesses(char **args)
 int
 OMPIGetProcessAttribute(char **args)
 {
-	int procid = atoi(args[1]);
-	char *attrib = args[2];
+	int		procid = atoi(args[1]);
+	char *	key = args[2];
+	char *	val;
 	
+	val = get_proc_attribute(procid, key);
+	
+	if (val == NULL) {
+		asprintf(&res, "%d %s", RTEV_ERROR, "no such attribute");
+	} else {
+		asprintf(res, "%d %s=%s", RTEV_PROCATTR, key, val);
+	}
+	
+	proxy_svr_event_callback(proxy, res);
+	
+	free(res);
+
 	return PROXY_RES_OK;
 }
 
@@ -434,10 +463,27 @@ OMPIGetProcessAttribute(char **args)
  * EVENT RETURN:
  *   type = GET_MACHINES
  *   data = [2,3,4,5] <--- those are machine IDs
+ * 
+ * NOTE: we assume there are unlikely to be many machines,
+ * so we can return this as a list of id's.
  */
 int
 OMPIGetMachines(char **args)
 {
+	char *	res;
+	char *	str;
+	int		n;
+	int *	machines
+	
+	n = get_machines(&machines);
+	intarray_to_str(n, machines, &res);
+	
+	asprintf(&res, "%d %s", RTEV_MACHINES, str);
+	proxy_svr_event_callback(proxy, res);
+	
+	free(str);
+	free(res);
+
 	return PROXY_RES_OK;
 }
 
@@ -446,11 +492,33 @@ OMPIGetMachines(char **args)
  * EVENT RETURN:
  *   type = GET_NODES
  *   data = [10,11,12,13,14,15] <-- those are node IDs
+ * 
+ * NOTE: for nodes we must return a bitset, since there may be vary many. This
+ * means that we may need to map between internal/external representation of
+ * nodes id's (if they don't start with 0).
  */
 int
 OMPIGetNodes(char **args)
-{
-	int machineid = atoi(args[1]);
+{	
+	int				mid;
+	bitset *			nodes;
+	char *			pstr;
+	char *			res;
+	
+	mid = atoi(args[1]);
+	nodes = get_nodes(mid);
+	
+	if (nodes == NULL) {
+		asprintf(&res, "%d %s", RTEV_ERROR, "no such jobid");
+	} else {
+		pstr = bitset_to_str(nodes);
+		asprintf(res, "%d %s", RTEV_NODES, pstr);
+		free(pstr);
+	}
+	
+	proxy_svr_event_callback(proxy, res);
+	
+	free(res);
 	return PROXY_RES_OK;
 }
 
@@ -465,9 +533,21 @@ OMPIGetNodes(char **args)
 int
 OMPIGetNodeAttribute(char **args)
 {
-	int nodeid = atoi(args[1]);
-	char *attrib = args[2];
+	int		nodeid = atoi(args[1]);
+	char *	key = args[2];
+	char *	val;
 	
+	val = get_node_attribute(nodeid, key);
+	
+	if (val == NULL) {
+		asprintf(&res, "%d %s", RTEV_ERROR, "no such attribute");
+	} else {
+		asprintf(res, "%d %s=%s", RTEV_NODEATTR, key, val);
+	}
+	
+	proxy_svr_event_callback(proxy, res);
+	
+	free(res);	
 	return PROXY_RES_OK;
 }
 
