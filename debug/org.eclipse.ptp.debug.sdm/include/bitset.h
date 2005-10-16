@@ -17,8 +17,8 @@
  * LA-CC 04-115
  ******************************************************************************/
  
-#ifndef PROCSET_H_
-#define PROCSET_H_
+#ifndef _BITSET_H_
+#define _BITSET_H_
 
 #include "bitvector.h"
 
@@ -38,28 +38,28 @@
 #define BITVECTOR_INVERT(v1)		bitvector_invert((v1))
 #define BITVECTOR_CLEAR(v1)		bitvector_clear((v1))
 
-struct procset {
-	char *			ps_name;
-	int				ps_nprocs;
-	BITVECTOR_TYPE	ps_procs;
+struct bitset {
+	char *			bs_name;
+	int				bs_nbits;
+	BITVECTOR_TYPE	bs_bits;
 };
-typedef struct procset procset;
+typedef struct bitset bitset;
 
-procset *	procset_new(int);
-void			procset_free(procset *);
-procset *	procset_copy(procset *);
-int			procset_isempty(procset *);
-void			procset_clear(procset *);
-void			procset_add_proc(procset *, int);
-void			procset_remove_proc(procset *, int);
-int			procset_test(procset *, int);
-procset *	procset_and(procset *, procset *);
-void			procset_andeq(procset *, procset *);
-procset *	procset_or(procset *, procset *);
-void			procset_oreq(procset *, procset *);
-void			procset_invert(procset *);
-char *		procset_to_str(procset *);
-procset *	str_to_procset(char *);
-int			procset_size(procset *);
-char *		procset_to_set(procset *);
-#endif /*PROCSET_H_*/
+bitset *		bitset_new(int);
+void			bitset_free(bitset *);
+bitset *		bitset_copy(bitset *);
+int			bitset_isempty(bitset *);
+void			bitset_clear(bitset *);
+void			bitset_set(bitset *, int);
+void			bitset_unset(bitset *, int);
+int			bitset_test(bitset *, int);
+bitset *		bitset_and(bitset *, bitset *);
+void			bitset_andeq(bitset *, bitset *);
+bitset *		bitset_or(bitset *, bitset *);
+void			bitset_oreq(bitset *, bitset *);
+void			bitset_invert(bitset *);
+char *		bitset_to_str(bitset *);
+bitset *		str_to_bitset(char *);
+int			bitset_size(bitset *);
+char *		bitset_to_set(bitset *);
+#endif /*_BITSET_H_*/

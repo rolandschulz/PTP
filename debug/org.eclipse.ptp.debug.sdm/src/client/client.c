@@ -37,7 +37,6 @@
 #include "dbg.h"
 #include "dbg_client.h"
 #include "dbg_proxy.h"
-#include "procset.h"
 #include "list.h"
 #include "proxy.h"
 #include "proxy_tcp.h"

@@ -20,7 +20,7 @@
 #ifndef _DBG_CLIENT_H_
 #define _DBG_CLIENT_H_
 
-#include "procset.h"
+#include "bitset.h"
 #include "breakpoint.h"
 #include "stackframe.h"
 #include "dbg_event.h"

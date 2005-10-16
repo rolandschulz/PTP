@@ -117,7 +117,7 @@ DbgEventToStr(dbg_event *e, char **result)
 	if (e == NULL)
 		return -1;
 	
-	pstr = procset_to_str(e->procs);
+	pstr = bitset_to_str(e->procs);
 	
 	switch (e->event)
 	{
@@ -320,14 +320,14 @@ DbgStrToEvent(char *str, dbg_event **ev)
 	int			event;
 	char **		args;
 	dbg_event *	e = NULL;
-	procset *	procs = NULL;
+	bitset *		procs = NULL;
 	
 	if (str == NULL || (args = Str2Args(str)) == NULL)
 		return -1;
 		
 	event = atoi(args[0]);
 	
-	procs = str_to_procset(args[1]);
+	procs = str_to_bitset(args[1]);
 
 	switch (event)
 	{
@@ -419,7 +419,7 @@ error_out:
 	FreeArgs(args);
 	
 	if (procs != NULL)
-		procset_free(procs);
+		bitset_free(procs);
 	
 	if (e != NULL)
 		FreeDbgEvent(e);
@@ -482,7 +482,7 @@ FreeDbgEvent(dbg_event *e) {
 	}
 	
 	if (e->procs != NULL)
-		procset_free(e->procs);
+		bitset_free(e->procs);
 
 	free(e);
 }

@@ -39,7 +39,6 @@
 #include "proxy.h"
 #include "proxy_event.h"
 #include "proxy_tcp.h"
-#include "procset.h"
 #include "handler.h"
 
 static int	proxy_tcp_svr_init(proxy_svr *, void **);

@@ -23,11 +23,11 @@
 #include "dbg.h"
 #include "proxy.h"
 #include "proxy_tcp.h"
-#include "procset.h"
+#include "bitset.h"
 
 int 			completed;
 int			fatal;
-procset *	procs_outstanding;
+bitset *		procs_outstanding;
 
 void
 event_callback(dbg_event *e, void *data)
@@ -41,7 +41,7 @@ event_callback(dbg_event *e, void *data)
 	}
 	
 	if (e->procs != NULL) {
-		s = procset_to_set(e->procs);
+		s = bitset_to_set(e->procs);
 		printf("%s ", s);
 		free(s);
 	}
@@ -95,9 +95,9 @@ event_callback(dbg_event *e, void *data)
 	}
 
 	if (e->procs != NULL) {
-		procset_invert(e->procs);
-		procset_andeq(procs_outstanding, e->procs);
-		if (!procset_isempty(procs_outstanding))
+		bitset_invert(e->procs);
+		bitset_andeq(procs_outstanding, e->procs);
+		if (!bitset_isempty(procs_outstanding))
 			return;
 	}
 	
@@ -105,13 +105,13 @@ event_callback(dbg_event *e, void *data)
 }
 
 int
-wait_for_event(session *s, procset *p)
+wait_for_event(session *s, bitset *p)
 {
 	completed = 0;
 	fatal = 0;
 	
 	if (p != NULL)
-		procs_outstanding = procset_copy(p);
+		procs_outstanding = bitset_copy(p);
 		
 	while (!completed) {
 		if (DbgProgress(s) < 0) {
@@ -121,7 +121,7 @@ wait_for_event(session *s, procset *p)
 	}
 	
 	if (p != NULL)	
-		procset_free(procs_outstanding);
+		bitset_free(procs_outstanding);
 		
 	/*
 	 * Check a fatal error hasn't ocurred
@@ -133,7 +133,7 @@ wait_for_event(session *s, procset *p)
  * Tell server to quit
  */
 void
-cleanup_and_exit(session *s, procset *p)
+cleanup_and_exit(session *s, bitset *p)
 {
 	DbgQuit(s);
 	wait_for_event(s, p);
@@ -143,14 +143,14 @@ cleanup_and_exit(session *s, procset *p)
 int
 do_test(session *s, char *exe)
 {
-	procset *	p1;
-	procset *	p2;
+	bitset *		p1;
+	bitset *		p2;
 	int			bpid = 54;
 	
-	p1 = procset_new(s->sess_procs);
-	procset_invert(p1);
-	p2 = procset_new(s->sess_procs);
-	procset_add_proc(p2, 0);
+	p1 = bitset_new(s->sess_procs);
+	bitset_invert(p1);
+	p2 = bitset_new(s->sess_procs);
+	bitset_set(p2, 0);
 	
 	if (DbgStartSession(s, "yyy", NULL) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());

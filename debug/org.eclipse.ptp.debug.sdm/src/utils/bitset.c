@@ -23,93 +23,93 @@
 #include <ctype.h>
 
 #include "compat.h"
-#include "procset.h"
+#include "bitset.h"
 
-procset *
-procset_new(int size)
+bitset *
+bitset_new(int size)
 {
-	procset *	p;
+	bitset *	p;
 	
-	p = malloc(sizeof(procset));
+	p = malloc(sizeof(bitset));
 	
-	p->ps_nprocs = size;
-	p->ps_procs = BITVECTOR_CREATE(size);
+	p->bs_nbits = size;
+	p->bs_bits = BITVECTOR_CREATE(size);
 	
 	return p;
 }
 
 void		
-procset_free(procset *p)
+bitset_free(bitset *p)
 {
-	BITVECTOR_FREE(p->ps_procs);
+	BITVECTOR_FREE(p->bs_bits);
 	free(p);
 }
 
-procset *	
-procset_copy(procset *p)
+bitset *	
+bitset_copy(bitset *p)
 {
-	procset *np = procset_new(p->ps_nprocs);
+	bitset *np = bitset_new(p->bs_nbits);
 	
-	BITVECTOR_COPY(np->ps_procs, p->ps_procs);
+	BITVECTOR_COPY(np->bs_bits, p->bs_bits);
 	
 	return np;
 }
 
 int	
-procset_isempty(procset *p)
+bitset_isempty(bitset *p)
 {
-	return BITVECTOR_ISEMPTY(p->ps_procs);
+	return BITVECTOR_ISEMPTY(p->bs_bits);
 }
 
 
 void	
-procset_clear(procset *p)
+bitset_clear(bitset *p)
 {
-	return BITVECTOR_CLEAR(p->ps_procs);
+	return BITVECTOR_CLEAR(p->bs_bits);
 }
 
-procset *	
-procset_and(procset *p1, procset *p2)
+bitset *	
+bitset_and(bitset *p1, bitset *p2)
 {
-	procset *np = procset_new(MAX(p1->ps_nprocs, p2->ps_nprocs));
+	bitset *np = bitset_new(MAX(p1->bs_nbits, p2->bs_nbits));
 	
-	BITVECTOR_AND(np->ps_procs, p1->ps_procs, p2->ps_procs);
+	BITVECTOR_AND(np->bs_bits, p1->bs_bits, p2->bs_bits);
 	
 	return np;
 }
 
 void
-procset_andeq(procset *p1, procset *p2)
+bitset_andeq(bitset *p1, bitset *p2)
 {
 	/*
 	 * Silently fail if sets are different sizes
 	 * */
-	if (p1->ps_nprocs != p2->ps_nprocs)
+	if (p1->bs_nbits != p2->bs_nbits)
 		return;
 	
-	BITVECTOR_ANDEQ(p1->ps_procs, p2->ps_procs);
+	BITVECTOR_ANDEQ(p1->bs_bits, p2->bs_bits);
 }
 
-procset *	
-procset_or(procset *p1, procset *p2)
+bitset *	
+bitset_or(bitset *p1, bitset *p2)
 {
-	procset *np = procset_new(MAX(p1->ps_nprocs, p2->ps_nprocs));
+	bitset *np = bitset_new(MAX(p1->bs_nbits, p2->bs_nbits));
 	
-	BITVECTOR_OR(np->ps_procs, p1->ps_procs, p2->ps_procs);
+	BITVECTOR_OR(np->bs_bits, p1->bs_bits, p2->bs_bits);
 	
 	return np;
 }
 
 void
-procset_oreq(procset *p1, procset *p2)
+bitset_oreq(bitset *p1, bitset *p2)
 {
 	/*
 	 * Silently fail if sets are different sizes
 	 * */
-	if (p1->ps_nprocs != p2->ps_nprocs)
+	if (p1->bs_nbits != p2->bs_nbits)
 		return;
 	
-	BITVECTOR_OREQ(p1->ps_procs, p2->ps_procs);
+	BITVECTOR_OREQ(p1->bs_bits, p2->bs_bits);
 }
 
 /*
@@ -127,54 +127,54 @@ _invert_helper(int nb, BITVECTOR_TYPE bv)
 }
 
 void		
-procset_invert(procset *p)
+bitset_invert(bitset *p)
 {
-	BITVECTOR_INVERT(p->ps_procs);
-	_invert_helper(p->ps_nprocs, p->ps_procs);
+	BITVECTOR_INVERT(p->bs_bits);
+	_invert_helper(p->bs_nbits, p->bs_bits);
 }
 	
 /**
- * Add a process to the set. Processes are numbered from 0.
+ * Add a bit to the set. Bits are numbered from 0.
  */
 void		
-procset_add_proc(procset *p, int proc)
+bitset_set(bitset *p, int proc)
 {
-	if (proc < 0 || proc >= p->ps_nprocs)
+	if (proc < 0 || proc >= p->bs_nbits)
 		return;
 		
-	BITVECTOR_SET(p->ps_procs, proc);
+	BITVECTOR_SET(p->bs_bits, proc);
 }
 
 void		
-procset_remove_proc(procset *p, int proc)
+bitset_unset(bitset *p, int proc)
 {
-	if (proc < 0 || proc >= p->ps_nprocs)
+	if (proc < 0 || proc >= p->bs_nbits)
 		return;
 		
-	BITVECTOR_UNSET(p->ps_procs, proc);
+	BITVECTOR_UNSET(p->bs_bits, proc);
 }
 
 int		
-procset_test(procset *p, int proc)
+bitset_test(bitset *p, int proc)
 {
-	if (proc < 0 || proc >= p->ps_nprocs)
+	if (proc < 0 || proc >= p->bs_nbits)
 		return 0;
 		
-	return BITVECTOR_GET(p->ps_procs, proc);
+	return BITVECTOR_GET(p->bs_bits, proc);
 }
 
 static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
 /**
- * Return a string representation of a procset. We use hex to compress
+ * Return a string representation of a bitset. We use hex to compress
  * the string somewhat and drop leading zeros.
  * 
  * Format is "nnnnnnnn:bbbbbbb..." where "nnnnnnnn" is a hex representation of the
- * actual number of processes, and "bbbbb...." are bits representing processes in the
+ * actual number of bits, and "bbbbb...." are bits in the
  * set (in hex).
  */
 char *
-procset_to_str(procset *p)
+bitset_to_str(bitset *p)
 {
 	int				n;
 	int				nonzero = 0;
@@ -191,14 +191,14 @@ procset_to_str(procset *p)
 	/*
 	 * Find out how many bytes needed (rounded up)
 	 */
-	bytes = (p->ps_nprocs >> 3) + 1;
+	bytes = (p->bs_nbits >> 3) + 1;
 
 	str = (char *)malloc((bytes * 2) + 8 + 2);
 	
 	/*
-	 * Start with actual number of processes (silently truncate to 32 bits)
+	 * Start with actual number of bits (silently truncate to 32 bits)
 	 */
-	n = sprintf(str, "%X", p->ps_nprocs & 0xffffffff);
+	n = sprintf(str, "%X", p->bs_nbits & 0xffffffff);
 	
 	s = str + n;
 	
@@ -206,7 +206,7 @@ procset_to_str(procset *p)
 	
 	for (pbit = (bytes << 3) - 1; pbit > 0; ) {
 		for (byte = 0, bit = 3; bit >= 0; bit--, pbit--) {
-			if (pbit < p->ps_nprocs && BITVECTOR_GET(p->ps_procs, pbit)) {
+			if (pbit < p->bs_nbits && BITVECTOR_GET(p->bs_bits, pbit)) {
 				byte |= (1 << bit);
 				nonzero = 1;
 			}
@@ -226,18 +226,18 @@ procset_to_str(procset *p)
 }
 
 /**
- * Convert string into a procset. Inverse of procset_to_str().
+ * Convert string into a bitset. Inverse of bitset_to_str().
  * 
  */
-procset *
-str_to_procset(char *str)
+bitset *
+str_to_bitset(char *str)
 {
 	int			nprocs;
 	int			n;
 	int			pos;
 	int			b;
 	char *		end;
-	procset *	p;
+	bitset *	p;
 	
 	if (str == NULL)
 		return NULL;
@@ -252,7 +252,7 @@ str_to_procset(char *str)
 	if (*str != ':' || nprocs == 0)
 		return NULL;
 		
-	p = procset_new(nprocs);
+	p = bitset_new(nprocs);
 	
 	/*
 	 * Easier if we start from end
@@ -261,13 +261,13 @@ str_to_procset(char *str)
 		b = digittoint(*end);
 		for (n = 0; n < 4; n++, pos++) {
 			if (b & (1 << n)) {
-				procset_add_proc(p, pos);
+				bitset_set(p, pos);
 			}
 		}
 	}
 	
 	if (end != str) {
-		procset_free(p);
+		bitset_free(p);
 		return NULL;
 	}
 	
@@ -297,12 +297,12 @@ emit_range(char ** str, char sep, int lower, int upper)
 }
 
 /*
- * Convert procset to set notation of the form
+ * Convert bitset to set notation of the form
  * 
  * 	{0-2,4,5-100}
  */
 char *
-procset_to_set(procset *p)
+bitset_to_set(bitset *p)
 {
 	int			proc;
 	int			lower;
@@ -314,12 +314,12 @@ procset_to_set(procset *p)
 	if (p == NULL)
 		return strdup("{}");
 		
-	str = s = (char *)malloc(p->ps_nprocs * 2 + 3);
+	str = s = (char *)malloc(p->bs_nbits * 2 + 3);
 
 	*s++ = '{';
 	
-	for (proc = 0, lower = -1, upper = -1; proc < p->ps_nprocs; proc++) {	
-		if (procset_test(p, proc)) {
+	for (proc = 0, lower = -1, upper = -1; proc < p->bs_nbits; proc++) {	
+		if (bitset_test(p, proc)) {
 			if (lower < 0)
 				lower = proc;
 			
@@ -340,15 +340,15 @@ procset_to_set(procset *p)
 }
 
 /**
- * Number of processes in the set (as opposed to the total size of the set)
+ * Number of bits in the set (as opposed to the total size of the set)
  */
 int
-procset_size(procset *p)
+bitset_size(bitset *p)
 {
 	int	i;
 	int	size = 0;
 	
-	for (i = 0; i < p->ps_nprocs; i++)
-		size += BITVECTOR_GET(p->ps_procs, i);
+	for (i = 0; i < p->bs_nbits; i++)
+		size += BITVECTOR_GET(p->bs_bits, i);
 	return size;
 }

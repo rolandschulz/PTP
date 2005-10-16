@@ -23,11 +23,11 @@
 #include "dbg.h"
 #include "proxy.h"
 #include "proxy_tcp.h"
-#include "procset.h"
+#include "bitset.h"
 
 extern int	do_test(session *, char *);
 extern void	event_callback(dbg_event *, void *);
-extern int	wait_for_event(session *, procset *);
+extern int	wait_for_event(session *, bitset *);
 
 int
 main(int argc, char *argv[])

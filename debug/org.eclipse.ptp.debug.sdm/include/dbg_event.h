@@ -24,7 +24,7 @@
 
 #include "breakpoint.h"
 #include "stackframe.h"
-#include "procset.h"
+#include "bitset.h"
 #include "list.h"
 
 #define DBG_EV_OFFSET		100
@@ -43,7 +43,7 @@
 
 struct dbg_event {
 	int			event;
-	procset *	procs;
+	bitset *		procs;
 	
 	/*
 	 * DBGEV_INIT
@@ -95,8 +95,8 @@ struct dbg_event {
 };
 typedef struct dbg_event dbg_event;
 
-extern int DbgStrToEvent(char *, dbg_event **);
-extern int DbgEventToStr(dbg_event *, char **);
+extern int 			DbgStrToEvent(char *, dbg_event **);
+extern int 			DbgEventToStr(dbg_event *, char **);
 extern dbg_event *	NewDbgEvent(int);
 extern void			FreeDbgEvent(dbg_event *);
 #endif /* _DBG_EVENT_H_ */
