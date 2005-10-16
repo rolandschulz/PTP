@@ -68,11 +68,12 @@ GetHandler(void)
 }
 
 void
-RegisterEventHandler(void (*event_callback)(proxy_event *, void *), void *data)
+RegisterEventHandler(int type, void (*event_callback)(void *, void *), void *data)
 {
 	handler *	h;
 
 	h = NewHandler(HANDLER_EVENT, NULL);
+	h->event_type = type;
 	h->event_handler = event_callback;
 	h->data = data;
 }
@@ -81,12 +82,12 @@ RegisterEventHandler(void (*event_callback)(proxy_event *, void *), void *data)
  * Unregister file descriptor handler
  */
 void
-UnregisterEventHandler(void (*event_callback)(proxy_event *, void *))
+UnregisterEventHandler(int type, void (*event_callback)(void *, void *))
 {
 	handler *	h;
 
 	for (SetHandler(); (h = GetHandler()) != NULL; ) {
-		if (h->htype == HANDLER_EVENT && h->event_handler == event_callback)
+		if (h->htype == HANDLER_EVENT && h->event_type == type && h->event_handler == event_callback)
 			DestroyHandler(h);
 	}
 }
@@ -116,5 +117,19 @@ UnregisterFileHandler(int fd)
 	for (SetHandler(); (h = GetHandler()) != NULL; ) {
 		if (h->htype == HANDLER_FILE && h->fd == fd)
 			DestroyHandler(h);
+	}
+}
+
+/**
+ * Call all event handlers of a particular type
+ */
+void
+CallEventHandlers(int type, void *data)
+{
+	handler *	h;
+
+	for (SetHandler(); (h = GetHandler()) != NULL; ) {
+		if (h->htype == HANDLER_EVENT && h->event_type == type)
+			h->event_handler(data, h->data);
 	}
 }

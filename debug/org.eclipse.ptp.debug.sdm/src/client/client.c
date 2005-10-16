@@ -61,13 +61,17 @@ server_count(void)
 	return num_servers;
 }
 
+static proxy_handler_funcs handler_funcs = {
+	RegisterFileHandler,
+	UnregisterFileHandler,
+	RegisterEventHandler,
+	CallEventHandlers
+};
+
 static proxy_svr_helper_funcs helper_funcs = {
 	new_connection,
 	server_count,
 	DbgClntIsShutdown,
-	RegisterFileHandler,
-	UnregisterFileHandler,
-	RegisterEventHandler,
 	DbgClntQuit
 };
 
@@ -94,7 +98,7 @@ client(int svr_num, int task_id, char *proxy, char *host, int port)
 {
 	num_servers = svr_num;
 	
-	if (DbgClntInit(svr_num, proxy, &helper_funcs, command_tab) != DBGRES_OK ||
+	if (DbgClntInit(svr_num, proxy, &handler_funcs, &helper_funcs, command_tab) != DBGRES_OK ||
 			DbgClntCreateSession(svr_num, host, port) != DBGRES_OK) {
 		fprintf(stderr, "%s\n", DbgGetErrorStr());
 		DbgClntQuit(); //TODO fixme!

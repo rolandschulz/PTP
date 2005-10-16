@@ -29,55 +29,74 @@
 #include "dbg.h"
  
 proxy proxies[] = {
-	{"tcp", &proxy_tcp_clnt_funcs, NULL, NULL, NULL},
-	{NULL, NULL, NULL, NULL, NULL}
+	{"tcp", NULL, &proxy_tcp_clnt_funcs, NULL},
+	{NULL, NULL, NULL, NULL}
 };
 
 int 
-proxy_clnt_init(proxy *p, proxy_clnt_helper_funcs *funcs, void **data, char *attr, va_list ap)
+proxy_clnt_init(char *name, proxy_handler_funcs *pf, proxy_clnt_helper_funcs *cf, proxy_clnt **clnt, char *attr, va_list ap)
 {
-	if (p != NULL)
-		return p->clnt_funcs->init(funcs, data, attr, ap);
+	proxy *		p;
+	proxy_clnt *	pc;
+	void *		data;
+	
+	if (find_proxy(name, &p) < 0)
+		return PROXY_RES_ERR;
 		
-	return -1;
+	p->handler_funcs = pf;
+
+	pc = (proxy_clnt *)malloc(sizeof(proxy_clnt));
+	pc->proxy = p;
+	pc->clnt_helper_funcs = cf;
+	
+	if (p->clnt_funcs->init(pc, &data, attr, ap) < 0) {
+		free(pc);
+		return PROXY_RES_ERR;
+	}
+
+	pc->clnt_data = data;
+	
+	*clnt = pc;
+	
+	return PROXY_RES_OK;	
 }
 
 int 
-proxy_clnt_connect(proxy *p, void *data)
+proxy_clnt_connect(proxy_clnt *pc)
 {
-	if (p != NULL)
-		return p->clnt_funcs->connect(data);
+	if (pc != NULL)
+		return pc->proxy->clnt_funcs->connect(pc);
 		
-	return -1;
+	return PROXY_RES_ERR;
 }
 
 int 
-proxy_clnt_create(proxy *p, void *data)
+proxy_clnt_create(proxy_clnt *pc)
 {
-	if (p != NULL)
-		return p->clnt_funcs->create(data);
+	if (pc != NULL)
+		return pc->proxy->clnt_funcs->create(pc);
 		
-	return -1;
+	return PROXY_RES_ERR;
 }
 
 int
-proxy_clnt_progress(proxy *p, void *data)
+proxy_clnt_progress(proxy_clnt *pc)
 {
-	if (p != NULL)
-		return p->clnt_funcs->progress(data);
+	if (pc != NULL)
+		return pc->proxy->clnt_funcs->progress(pc);
 		
-	return -1;
+	return PROXY_RES_ERR;
 }
 
 int
-proxy_clnt_sendcmd(proxy *p, void *data, char *cmd, char *fmt, ...)
+proxy_clnt_sendcmd(proxy_clnt *pc, char *cmd, char *fmt, ...)
 {
-	int		res = -1;
+	int		res = PROXY_RES_ERR;
 	va_list	ap;
 	
-	if (p != NULL) {
+	if (pc != NULL) {
 		va_start(ap, fmt);
-		res = p->clnt_funcs->sendcmd(data, cmd, fmt, ap);
+		res = pc->proxy->clnt_funcs->sendcmd(pc, cmd, fmt, ap);
 		va_end(ap);
 	}
 	
@@ -85,8 +104,14 @@ proxy_clnt_sendcmd(proxy *p, void *data, char *cmd, char *fmt, ...)
 }
 
 int 
-proxy_clnt_quit(proxy *p, void *data)
+proxy_clnt_quit(proxy_clnt *pc)
 {
-	return proxy_clnt_sendcmd(p, data, PROXY_QUIT_CMD, NULL);
+	return proxy_clnt_sendcmd(pc, PROXY_QUIT_CMD, NULL);
 }
 
+void
+proxy_clnt_event_callback(proxy_clnt *pc, char *data)
+{
+	if (pc != NULL)
+		proxy_event_callback(pc->proxy, data);
+}

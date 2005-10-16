@@ -20,8 +20,6 @@
 #ifndef _HANDLER_H_
 #define _HANDLER_H_
 
-#include "proxy_event.h"
-
 #define HANDLER_FILE		1
 #define HANDLER_SIGNAL	2
 #define HANDLER_EVENT		3
@@ -49,7 +47,8 @@ struct handler {
 	/*
 	 * HANDLER_EVENT
 	 */
-	 void 	(*event_handler)(proxy_event *, void *);
+	int		event_type;
+	void 	(*event_handler)(void *, void *);
 };
 typedef struct handler	handler;
 
@@ -57,8 +56,9 @@ handler *	NewHandler(int, void *);
 void			DestroyHandler(handler *);
 void			SetHandler(void);
 handler *	GetHandler(void);
-void			RegisterEventHandler(void (*)(proxy_event *, void *), void *);
-void			UnregisterEventHandler(void (*)(proxy_event *, void *));
+void			RegisterEventHandler(int, void (*)(void *, void *), void *);
+void			UnregisterEventHandler(int, void (*)(void *, void *));
 void			RegisterFileHandler(int fd, int type, int (*)(int, void *), void *);
 void			UnregisterFileHandler(int);
+void			CallEventHandlers(int, void *);
 #endif /* !_HANDLER_H_ */

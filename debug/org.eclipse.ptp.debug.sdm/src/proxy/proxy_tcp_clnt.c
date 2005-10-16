@@ -42,17 +42,18 @@
 #include "compat.h"
 #include "session.h"
 #include "proxy.h"
+#include "proxy_event.h"
 #include "proxy_tcp.h"
 #include "handler.h"
 
 struct timeval	SELECT_TIMEOUT = {0, 1000};
 
-static int proxy_tcp_clnt_init(proxy_clnt_helper_funcs *, void **, char *, va_list);
-static int proxy_tcp_clnt_connect(void *);
-static int proxy_tcp_clnt_create(void *);
+static int proxy_tcp_clnt_init(proxy_clnt *, void **, char *, va_list);
+static int proxy_tcp_clnt_connect(proxy_clnt *);
+static int proxy_tcp_clnt_create(proxy_clnt *);
 static int proxy_tcp_clnt_accept(int, void *);
-static int proxy_tcp_clnt_progress(void *);
-static int proxy_tcp_clnt_sendcmd(void *, char *, char *, va_list);
+static int proxy_tcp_clnt_progress(proxy_clnt *);
+static int proxy_tcp_clnt_sendcmd(proxy_clnt *, char *, char *, va_list);
 
 proxy_clnt_funcs proxy_tcp_clnt_funcs =
 {
@@ -67,10 +68,10 @@ static int
 proxy_tcp_clnt_recv_msgs(int fd, void *data)
 {
 	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
-	proxy_clnt_helper_funcs *	helper = (proxy_clnt_helper_funcs *)conn->helper;
 	
 	if (proxy_tcp_recv_msgs(conn) < 0) {
-		helper->unregfile(conn->sess_sock);
+		if (conn->clnt->proxy->handler_funcs->unregfile != NULL)
+			conn->clnt->proxy->handler_funcs->unregfile(conn->sess_sock);
 		return PROXY_RES_ERR;
 	}
 	
@@ -81,7 +82,7 @@ proxy_tcp_clnt_recv_msgs(int fd, void *data)
  * CLIENT FUNCTIONS
  */
 static int
-proxy_tcp_clnt_init(proxy_clnt_helper_funcs *helper, void **data, char *attr, va_list ap)
+proxy_tcp_clnt_init(proxy_clnt *pc, void **data, char *attr, va_list ap)
 {
 	int					port;
 	char *				host;
@@ -98,9 +99,9 @@ proxy_tcp_clnt_init(proxy_clnt_helper_funcs *helper, void **data, char *attr, va
 
 	proxy_tcp_create_conn(&conn);
 	
+	conn->clnt = pc;
 	conn->host = strdup(host);
 	conn->port = port;
-	conn->helper = (void *)helper;
 
 	*data = (void *)conn;
 	
@@ -111,14 +112,13 @@ proxy_tcp_clnt_init(proxy_clnt_helper_funcs *helper, void **data, char *attr, va
  * Connect to a remote proxy.
  */
 static int
-proxy_tcp_clnt_connect(void *data)
+proxy_tcp_clnt_connect(proxy_clnt *pc)
 {
 	SOCKET					sd;
 	struct hostent *			hp;
 	long int					haddr;
 	struct sockaddr_in		scket;
-	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
-	proxy_clnt_helper_funcs *	helper = (proxy_clnt_helper_funcs *)conn->helper;
+	proxy_tcp_conn *			conn = (proxy_tcp_conn *)pc->clnt_data;
 		        
 	if (conn->host == NULL) {
 		proxy_set_error(PROXY_ERR_CLIENT, "no host specified");
@@ -158,19 +158,19 @@ proxy_tcp_clnt_connect(void *data)
 	conn->sess_sock = sd;
 	conn->connected++;
 	
-	helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_clnt_recv_msgs, (void *)conn);
+	if (pc->proxy->handler_funcs->regfile != NULL)
+		pc->proxy->handler_funcs->regfile(sd, READ_FILE_HANDLER, proxy_tcp_clnt_recv_msgs, (void *)conn);
 	
 	return PROXY_RES_OK;
 }
 
 static int 
-proxy_tcp_clnt_create(void *data)
+proxy_tcp_clnt_create(proxy_clnt *pc)
 {
 	socklen_t				slen;
 	SOCKET					sd;
 	struct sockaddr_in		sname;
-	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
-	proxy_clnt_helper_funcs *	helper = (proxy_clnt_helper_funcs *)conn->helper;
+	proxy_tcp_conn *			conn = (proxy_tcp_conn *)pc->clnt_data;
 	
 	if ( (sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET )
 	{
@@ -209,7 +209,8 @@ proxy_tcp_clnt_create(void *data)
 	conn->svr_sock = sd;
 	conn->port = (int) ntohs(sname.sin_port);
 	
-	helper->regfile(sd, READ_FILE_HANDLER, proxy_tcp_clnt_accept, (void *)conn);
+	if (pc->proxy->handler_funcs->regfile != NULL)
+		pc->proxy->handler_funcs->regfile(sd, READ_FILE_HANDLER, proxy_tcp_clnt_accept, (void *)conn);
 	
 	return PROXY_RES_OK;
 }
@@ -221,7 +222,6 @@ proxy_tcp_clnt_accept(int fd, void *data)
 	socklen_t				fromlen;
 	struct sockaddr			addr;
 	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
-	proxy_clnt_helper_funcs *	helper = (proxy_clnt_helper_funcs *)conn->helper;
 	
 	fromlen = sizeof(addr);
 	ns = accept(fd, &addr, &fromlen);
@@ -241,23 +241,26 @@ proxy_tcp_clnt_accept(int fd, void *data)
 	conn->sess_sock = ns;
 	conn->connected++;
 
-	helper->regfile(ns, READ_FILE_HANDLER, proxy_tcp_clnt_recv_msgs, (void *)conn);
+	if (conn->clnt->proxy->handler_funcs->regfile != NULL)
+		conn->clnt->proxy->handler_funcs->regfile(ns, READ_FILE_HANDLER, proxy_tcp_clnt_recv_msgs, (void *)conn);
 	
 	return PROXY_RES_OK;
 	
 }
 
 static int 
-proxy_tcp_clnt_progress(void *data)
+proxy_tcp_clnt_progress(proxy_clnt *pc)
 {
 	int						res;
 	char *					result;
 	proxy_event *			ev;
-	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
-	proxy_clnt_helper_funcs *	helper = (proxy_clnt_helper_funcs *)conn->helper;
+	proxy_tcp_conn *			conn = (proxy_tcp_conn *)pc->clnt_data;
 
 	if ((res = proxy_tcp_get_msg(conn, &result)) <= 0)
 		return res;
+	
+	if (pc->	clnt_helper_funcs->eventhandler == NULL)
+		return PROXY_RES_OK;
 	
 	if (proxy_str_to_event(result, &ev) < 0) {
 		ev = new_proxy_event(PROXY_EV_ERROR);
@@ -266,18 +269,17 @@ proxy_tcp_clnt_progress(void *data)
 	
 	free(result);
 	
-	helper->eventhandler(ev, helper->eventdata);
+	pc->clnt_helper_funcs->eventhandler(ev, pc->clnt_helper_funcs->eventdata);
 	
 	return PROXY_RES_OK;
 }
 
 static int
-proxy_tcp_clnt_sendcmd(void *data, char *cmd, char *fmt, va_list ap)
+proxy_tcp_clnt_sendcmd(proxy_clnt *pc, char *cmd, char *fmt, va_list ap)
 {
 	char *					request;
 	char *					args;
-	proxy_tcp_conn *	conn = (proxy_tcp_conn *)data;
-	proxy_clnt_helper_funcs *	helper = (proxy_clnt_helper_funcs *)conn->helper;
+	proxy_tcp_conn *	conn = (proxy_tcp_conn *)pc->clnt_data;
 	
 	if (!conn->connected)
 		return PROXY_RES_ERR;
@@ -294,7 +296,8 @@ printf("tcp_clnt_send_cmd: <%s>\n", request);
 	if ( proxy_tcp_send_msg(conn, request, strlen(request)) < 0 )
 	{
 			proxy_set_error(PROXY_ERR_CLIENT, "connection unexpectedly terminated");
-			helper->unregfile(conn->sess_sock);
+			if (pc->proxy->handler_funcs->unregfile != NULL)
+				pc->proxy->handler_funcs->unregfile(conn->sess_sock);
 			free(request);
 			return PROXY_RES_ERR;
 	}

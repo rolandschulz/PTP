@@ -43,8 +43,7 @@
 
 static int			dbg_shutdown;
 static procset *		dbg_procs = NULL;
-static proxy *		dbg_proxy;
-static void *		dbg_proxy_data;
+static proxy_svr *	dbg_proxy;
 static struct timeval	TIMEOUT = { 0, 1000 };
 
 /**
@@ -52,25 +51,14 @@ static struct timeval	TIMEOUT = { 0, 1000 };
  * call all registered event handlers.
  */
 static void
-dbg_clnt_cmd_completed(dbg_event *de, void *data)
+dbg_clnt_cmd_completed(dbg_event *e, void *data)
 {
-	proxy_event *	pe;
 	char *			str;
-	handler *		h;
 
-	for (SetHandler(); (h = GetHandler()) != NULL; ) {
-		if (h->htype == HANDLER_EVENT) {
-			if (DbgEventToStr(de, &str) < 0) {
-				pe = new_proxy_event(PROXY_EV_ERROR);
-				pe->error_code = PROXY_ERR_SERVER;
-				pe->error_msg = strdup("bad dbg_event conversion");
-			} else {
-				pe = new_proxy_event(PROXY_EV_OK);
-				pe->event_data = str;
-			}
-
-			h->event_handler(pe, h->data);
-		}
+	if (DbgEventToStr(e, &str) < 0) {
+		fprintf(stderr, "bad dbg_event conversion");
+	} else {	
+		proxy_svr_event_callback(dbg_proxy, str);
 	}
 	
 	/*
@@ -82,7 +70,7 @@ dbg_clnt_cmd_completed(dbg_event *de, void *data)
 }
 
 int
-DbgClntInit(int num_svrs, char *proxy, proxy_svr_helper_funcs *funcs, proxy_svr_commands *cmds)
+DbgClntInit(int num_svrs, char *name, proxy_handler_funcs *handlers, proxy_svr_helper_funcs *funcs, proxy_svr_commands *cmds)
 {
 	/*
 	 * Initialize client/server interface
@@ -108,11 +96,8 @@ DbgClntInit(int num_svrs, char *proxy, proxy_svr_helper_funcs *funcs, proxy_svr_
 	/*
 	 * Initialize proxy
 	 */
-	if (find_proxy(proxy, &dbg_proxy) < 0) {
+	if (proxy_svr_init(name, handlers, funcs, cmds, &dbg_proxy) != PROXY_RES_OK)
 		return DBGRES_ERR;
-	}
-	
-	proxy_svr_init(dbg_proxy, funcs, cmds, &dbg_proxy_data);
 	
 	return DBGRES_OK;
 }
@@ -124,9 +109,9 @@ DbgClntCreateSession(int num, char *host, int port)
 	dbg_event *	e;
 	
 	if (host != NULL)
-		res = proxy_svr_connect(dbg_proxy, host, port, dbg_proxy_data);
+		res = proxy_svr_connect(dbg_proxy, host, port);
 	else
-		res = proxy_svr_create(dbg_proxy, port, dbg_proxy_data);
+		res = proxy_svr_create(dbg_proxy, port);
 	
 	if (res == PROXY_RES_ERR)
 		return DBGRES_ERR;
@@ -142,7 +127,7 @@ DbgClntCreateSession(int num, char *host, int port)
 void
 DbgClntFinish(void)
 {
-	proxy_svr_finish(dbg_proxy, dbg_proxy_data);
+	proxy_svr_finish(dbg_proxy);
 }
 
 int
@@ -536,7 +521,7 @@ DbgClntProgress(void)
 	 * Third: Check for proxy events
 	 */
 	 
-	return proxy_svr_progress(dbg_proxy, dbg_proxy_data);
+	return proxy_svr_progress(dbg_proxy);
 }
 
 #if 0
