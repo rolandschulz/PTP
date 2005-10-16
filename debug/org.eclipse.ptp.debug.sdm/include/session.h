@@ -23,11 +23,10 @@
 #include "dbg_event.h"
 
 struct session {
-	int				sess_procs;
-	struct proxy *	sess_proxy;
-	void *			sess_proxy_data;
-	void				(*sess_event_handler)(dbg_event *, void *);
-	void *			sess_event_data;
+	int					sess_procs;
+	struct proxy_clnt *	sess_proxy;
+	void					(*sess_event_handler)(dbg_event *, void *);
+	void *				sess_event_data;
 };
 typedef struct session	session;
 

@@ -23,6 +23,7 @@
 #include <ctype.h>
 
 #include "proxy.h"
+#include "proxy_event.h"
 #include "args.h"
 #include "list.h"
 
@@ -275,4 +276,16 @@ free_proxy_event(proxy_event *e) {
 	}
 		
 	free(e);
+}
+
+void
+proxy_event_callback(proxy *p, char *data)
+{
+	proxy_event *	e;
+	
+	if (p->handler_funcs->eventcallback != NULL) {
+		e = new_proxy_event(PROXY_EV_OK);
+		e->event_data = strdup(data);
+		p->handler_funcs->eventcallback(PROXY_EVENT_HANDLER, (void *)e);
+	}
 }

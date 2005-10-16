@@ -26,16 +26,22 @@
 #include "dbg_proxy.h"
 #include "session.h"
 #include "proxy.h"
+#include "proxy_event.h"
 #include "procset.h"
 #include "handler.h"
 
 static struct timeval	TIMEOUT = { 0, 1000 };
 
-static void session_event_handler(proxy_event *, void *);
+static void session_event_handler(void *, void *);
 
-static proxy_clnt_helper_funcs helper_funcs = {
+static proxy_handler_funcs handler_funcs = {
 	RegisterFileHandler,
 	UnregisterFileHandler,
+	RegisterEventHandler,
+	CallEventHandlers
+};
+
+static proxy_clnt_helper_funcs clnt_helper_funcs = {
 	session_event_handler,
 	NULL
 };
@@ -44,7 +50,7 @@ static proxy_clnt_helper_funcs helper_funcs = {
  * Intercept INIT events to obtain number of procs
  */
 static void
-session_event_handler(proxy_event *event, void *data)
+session_event_handler(void *event, void *data)
 {
 	dbg_event *	de;
 	proxy_event *pe = (proxy_event *)event;
@@ -82,33 +88,26 @@ session_event_handler(proxy_event *event, void *data)
  * Session initialization
  */
 int
-DbgInit(session **s, char *proxy, char *attr, ...)
+DbgInit(session **sess, char *name, char *attr, ...)
 {
-	va_list	ap;
-	void *	data;
-	int		res;
+	va_list		ap;
+	int			res;
+	session *	s;
 	
-	*s = malloc(sizeof(session));
+	s = malloc(sizeof(session));
 	
-	if (find_proxy(proxy, &(*s)->sess_proxy) < 0) {
-		free(*s);
-		return -1;
-	}
-	
-	helper_funcs.eventdata = (void *)(*s);
-	(*s)->sess_proxy->clnt_helper_funcs = &helper_funcs;
+	clnt_helper_funcs.eventdata = (void *)s;
 	
 	va_start(ap, attr);
-	res = proxy_clnt_init((*s)->sess_proxy, &helper_funcs, &data, attr, ap);
+	res = proxy_clnt_init(name, &handler_funcs, &clnt_helper_funcs, &s->sess_proxy, attr, ap);
 	va_end(ap);
 	
 	if (res < 0) {
-		free(*s);
+		free(s);
 		return -1;
 	}
 	
-	(*s)->sess_proxy_data = data;
-	(*s)->sess_event_handler = NULL;
+	s->sess_event_handler = NULL;
 	
 	return 0;
 }
@@ -116,19 +115,19 @@ DbgInit(session **s, char *proxy, char *attr, ...)
 int
 DbgConnect(session *s)
 {
-	return proxy_clnt_connect(s->sess_proxy, s->sess_proxy_data);
+	return proxy_clnt_connect(s->sess_proxy);
 }
 
 int
 DbgCreate(session *s)
 {
-	return proxy_clnt_create(s->sess_proxy, s->sess_proxy_data);
+	return proxy_clnt_create(s->sess_proxy);
 }
 
 int
 DbgStartSession(session *s, char *prog, char *args)
 {
-	return proxy_clnt_sendcmd(s->sess_proxy, s->sess_proxy_data, DBG_STARTSESSION_CMD, DBG_STARTSESSION_FMT, prog, args);
+	return proxy_clnt_sendcmd(s->sess_proxy, DBG_STARTSESSION_CMD, DBG_STARTSESSION_FMT, prog, args);
 }
 
 /*
@@ -140,7 +139,7 @@ DbgSetLineBreakpoint(session *s, procset *set, int bpid, char *file, int line)
 	int		res;
 	char *	set_str = procset_to_str(set);
 
-	res = proxy_clnt_sendcmd(s->sess_proxy, s->sess_proxy_data, DBG_SETLINEBREAKPOINT_CMD, DBG_SETLINEBREAKPOINT_FMT, set_str, bpid, file, line);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_SETLINEBREAKPOINT_CMD, DBG_SETLINEBREAKPOINT_FMT, set_str, bpid, file, line);
 	free(set_str);
 	return res;
 }
@@ -151,7 +150,7 @@ DbgSetFuncBreakpoint(session *s, procset *set, int bpid, char *file, char *func)
 	int		res;
 	char *	set_str = procset_to_str(set);
 
-	res = proxy_clnt_sendcmd(s->sess_proxy, s->sess_proxy_data, DBG_SETFUNCBREAKPOINT_CMD, DBG_SETFUNCBREAKPOINT_FMT, set_str, bpid, file, func);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_SETFUNCBREAKPOINT_CMD, DBG_SETFUNCBREAKPOINT_FMT, set_str, bpid, file, func);
 	free(set_str);
 	return res;
 }
@@ -162,7 +161,7 @@ DbgDeleteBreakpoint(session *s, procset *set, int bpid)
 	int		res;
 	char *	set_str = procset_to_str(set);
 	
-	res = proxy_clnt_sendcmd(s->sess_proxy, s->sess_proxy_data, DBG_DELETEBREAKPOINT_CMD, DBG_DELETEBREAKPOINT_FMT, set_str, bpid);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_DELETEBREAKPOINT_CMD, DBG_DELETEBREAKPOINT_FMT, set_str, bpid);
 	free(set_str);
 	return res;
 }
@@ -175,7 +174,7 @@ DbgGo(session *s, procset *set)
 {
 	int		res;
 	char *	set_str = procset_to_str(set);
-	res = proxy_clnt_sendcmd(s->sess_proxy, s->sess_proxy_data, DBG_GO_CMD, DBG_GO_FMT, set_str);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_GO_CMD, DBG_GO_FMT, set_str);
 	free(set_str);
 	return res;
 }
@@ -186,7 +185,7 @@ DbgStep(session *s, procset *set, int count, int type)
 	int		res;
 	char *	set_str = procset_to_str(set);
 	
-	res = proxy_clnt_sendcmd(s->sess_proxy, s->sess_proxy_data, DBG_STEP_CMD, DBG_STEP_FMT, set_str, count, type);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_STEP_CMD, DBG_STEP_FMT, set_str, count, type);
 	free(set_str);
 	return res;
 }
@@ -196,7 +195,7 @@ DbgTerminate(session *s, procset *set)
 {
 	int		res;
 	char *	set_str = procset_to_str(set);
-	res = proxy_clnt_sendcmd(s->sess_proxy, s->sess_proxy_data, DBG_TERMINATE_CMD, DBG_TERMINATE_FMT, set_str);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_TERMINATE_CMD, DBG_TERMINATE_FMT, set_str);
 	free(set_str);
 	return res;
 }
@@ -210,7 +209,7 @@ DbgListStackframes(session *s, procset *set, int current)
 	int		res;
 	char *	set_str = procset_to_str(set);
 	
-	res = proxy_clnt_sendcmd(s->sess_proxy, s->sess_proxy_data, DBG_LISTSTACKFRAMES_CMD, DBG_LISTSTACKFRAMES_FMT, set_str, current);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTSTACKFRAMES_CMD, DBG_LISTSTACKFRAMES_FMT, set_str, current);
 	free(set_str);
 	return res;
 }
@@ -221,7 +220,7 @@ DbgSetCurrentStackframe(session *s, procset *set, int level)
 	int		res;
 	char *	set_str = procset_to_str(set);
 	
-	res = proxy_clnt_sendcmd(s->sess_proxy, s->sess_proxy_data, DBG_SETCURRENTSTACKFRAME_CMD, DBG_SETCURRENTSTACKFRAME_FMT, set_str, level);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_SETCURRENTSTACKFRAME_CMD, DBG_SETCURRENTSTACKFRAME_FMT, set_str, level);
 	free(set_str);
 	return res;
 }
@@ -234,7 +233,7 @@ DbgEvaluateExpression(session *s, procset *set, char *exp)
 {
 	int		res;
 	char *	set_str = procset_to_str(set);
-	res = proxy_clnt_sendcmd(s->sess_proxy, s->sess_proxy_data, DBG_EVALUATEEXPRESSION_CMD, DBG_EVALUATEEXPRESSION_FMT, set_str, exp);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_EVALUATEEXPRESSION_CMD, DBG_EVALUATEEXPRESSION_FMT, set_str, exp);
 	free(set_str);
 	return res;
 }
@@ -244,7 +243,7 @@ DbgGetType(session *s, procset *set, char *exp)
 {
 	int		res;
 	char *	set_str = procset_to_str(set);
-	res = proxy_clnt_sendcmd(s->sess_proxy, s->sess_proxy_data, DBG_GETTYPE_CMD, DBG_GETTYPE_FMT, set_str, exp);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_GETTYPE_CMD, DBG_GETTYPE_FMT, set_str, exp);
 	free(set_str);
 	return res;
 }
@@ -254,7 +253,7 @@ DbgListLocalVariables(session *s, procset *set)
 {
 	int		res;
 	char *	set_str = procset_to_str(set);
-	res = proxy_clnt_sendcmd(s->sess_proxy, s->sess_proxy_data, DBG_LISTLOCALVARIABLES_CMD, DBG_LISTLOCALVARIABLES_FMT, set_str);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTLOCALVARIABLES_CMD, DBG_LISTLOCALVARIABLES_FMT, set_str);
 	free(set_str);
 	return res;
 }
@@ -264,7 +263,7 @@ DbgListArguments(session *s, procset *set)
 {
 	int		res;
 	char *	set_str = procset_to_str(set);
-	res = proxy_clnt_sendcmd(s->sess_proxy, s->sess_proxy_data, DBG_LISTARGUMENTS_CMD, DBG_LISTARGUMENTS_FMT, set_str);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTARGUMENTS_CMD, DBG_LISTARGUMENTS_FMT, set_str);
 	free(set_str);
 	return res;
 }
@@ -274,7 +273,7 @@ DbgListGlobalVariables(session *s, procset *set)
 {
 	int		res;
 	char *	set_str = procset_to_str(set);
-	res = proxy_clnt_sendcmd(s->sess_proxy, s->sess_proxy_data, DBG_LISTGLOBALVARIABLES_CMD, DBG_LISTGLOBALVARIABLES_FMT, set_str);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTGLOBALVARIABLES_CMD, DBG_LISTGLOBALVARIABLES_FMT, set_str);
 	free(set_str);
 	return res;
 }
@@ -282,7 +281,7 @@ DbgListGlobalVariables(session *s, procset *set)
 int 
 DbgQuit(session *s)
 {
-	return proxy_clnt_quit(s->sess_proxy, s->sess_proxy_data);
+	return proxy_clnt_quit(s->sess_proxy);
 }
 
 /*
@@ -358,7 +357,7 @@ DbgProgress(session *s)
 	if (res < 0)
 		return DBGRES_ERR;
 		
-	return proxy_clnt_progress(s->sess_proxy, s->sess_proxy_data);
+	return proxy_clnt_progress(s->sess_proxy);
 }
 
 void
@@ -366,7 +365,7 @@ DbgRegisterEventHandler(session *s, void (*event_callback)(dbg_event *, void *),
 {
 	s->sess_event_handler = event_callback;
 	s->sess_event_data = data;
-	RegisterEventHandler(session_event_handler, (void *)s);
+	RegisterEventHandler(PROXY_EVENT_HANDLER, session_event_handler, (void *)s);
 	//s->sess_proxy->clnt_funcs->regeventhandler(s->sess_proxy_data, session_event_handler, (void *)s);
 }
 
@@ -377,7 +376,7 @@ void
 DbgUnregisterEventHandler(session *s, void (*event_callback)(dbg_event *, void *))
 {
 	s->sess_event_handler = NULL;
-	UnregisterEventHandler(session_event_handler);
+	UnregisterEventHandler(PROXY_EVENT_HANDLER, session_event_handler);
 }
 
 /**

@@ -59,7 +59,6 @@ proxy_tcp_create_conn(proxy_tcp_conn **conn)
 	c->buf_pos = 0;
 	c->total_read = 0;
 	c->msg_len = 0;
-	c->helper = NULL;
 	
 	signal(SIGPIPE, SIG_IGN);
 	
