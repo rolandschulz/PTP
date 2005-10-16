@@ -72,7 +72,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient {
 		
 		switch (event.getEventID()) {
 		case IProxyEvent.EVENT_OK:
-			e = ProxyDebugEvent.toEvent(((ProxyOKEvent) event).getData());
+			e = (IProxyDebugEvent) ProxyDebugEvent.toEvent(((ProxyOKEvent) event).getData());
 			break;
 			
 		case IProxyEvent.EVENT_ERROR:

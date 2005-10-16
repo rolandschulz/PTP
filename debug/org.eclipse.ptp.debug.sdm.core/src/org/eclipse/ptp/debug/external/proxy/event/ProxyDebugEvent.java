@@ -24,9 +24,7 @@ import java.math.BigInteger;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
-import org.eclipse.ptp.core.proxy.event.ProxyErrorEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
-import org.eclipse.ptp.core.proxy.event.ProxyOKEvent;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.external.cdi.Condition;
 import org.eclipse.ptp.debug.external.cdi.Location;
@@ -34,9 +32,9 @@ import org.eclipse.ptp.debug.external.cdi.breakpoints.AddressBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.FunctionBreakpoint;
 import org.eclipse.ptp.debug.external.proxy.ProxyDebugStackframe;
 
-public class ProxyDebugEvent {
+public class ProxyDebugEvent extends ProxyEvent {
 	
-	public static IProxyDebugEvent toEvent(String str) {
+	public static IProxyEvent toEvent(String str) {
 		IProxyDebugEvent evt = null;
 		String[] args = str.split(" ");
 		
@@ -114,20 +112,6 @@ public class ProxyDebugEvent {
 		return evt;
 	}
 	
-	public static String decodeString(String str) {
-		String[] parts = str.split(":");
-		int len = Integer.parseInt(parts[0], 16) - 1; // Skip trailing NULL
-		byte[] strBytes = new byte[len];
-		
-		for (int i = 0, p = 0; i < len; i++, p += 2) {
-			byte c = (byte) ((Character.digit(parts[1].charAt(p), 16) & 0xf) << 4);
-			c |= (byte) ((Character.digit(parts[1].charAt(p+1), 16) & 0xf));
-			strBytes[i] = c;
-		}
-		
-		return new String(strBytes);
-	}
-		
 	public static BigInteger decodeAddr(String str) {
 		String[] parts = str.split(":");
 		int len = Integer.parseInt(parts[0], 16) - 1; // Skip trailing NULL

@@ -19,19 +19,15 @@
 
 package org.eclipse.ptp.debug.external.proxy.event;
 
+import org.eclipse.ptp.core.proxy.event.AbstractProxyEvent;
 import org.eclipse.ptp.core.util.BitList;
 
-public abstract class AbstractProxyDebugEvent implements IProxyDebugEvent {
-	private int		eventID;
+public abstract class AbstractProxyDebugEvent extends AbstractProxyEvent implements IProxyDebugEvent {
 	private BitList	procSet;
 	
 	public AbstractProxyDebugEvent(int id, BitList set) {
-		eventID = id;
+		super(id);
 		procSet = set;
-	}
-	
-	public int getEventID() {
-		return eventID;
 	}
 	
 	public BitList getBitSet() {
