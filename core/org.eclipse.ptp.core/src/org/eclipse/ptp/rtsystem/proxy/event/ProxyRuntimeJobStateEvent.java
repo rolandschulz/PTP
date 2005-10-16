@@ -19,14 +19,19 @@
 
 package org.eclipse.ptp.rtsystem.proxy.event;
 
-import org.eclipse.ptp.core.proxy.event.IProxyEvent;
-import org.eclipse.ptp.core.util.BitList;
+public class ProxyRuntimeJobStateEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeEvent {
+	private int		jobState;
 
-public interface IProxyRuntimeEvent extends IProxyEvent {
-	public static final int RUNTIME_EVENT_OFFSET = 200;
-	public static final int EVENT_RUNTIME_OK = RUNTIME_EVENT_OFFSET + 0;
-	public static final int EVENT_RUNTIME_ERROR = RUNTIME_EVENT_OFFSET + 1;
-	public static final int EVENT_RUNTIME_JOBSTATE = RUNTIME_EVENT_OFFSET + 2;
+	public ProxyRuntimeJobStateEvent(int state) {
+		super(EVENT_RUNTIME_JOBSTATE);
+		this.jobState = state;
+	}
 	
-	public BitList getBitSet();
+	public int getJobState() {
+		return this.jobState;
+	}
+	
+	public String toString() {
+		return "EVENT_RUNTIME_JOBSTATE " + this.jobState;
+	}
 }
