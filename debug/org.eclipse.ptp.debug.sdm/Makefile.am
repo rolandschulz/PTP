@@ -28,7 +28,7 @@ test_proxy_rev_CFLAGS =	-I./include -I./bitvector -I./libaif $(AM_CFLAGS) -g
 test_proxy_rev_LDFLAGS = 	-g
 test_proxy_rev_LDADD =	libdbgproxy.a libutils.a bitvector/.libs/libbitvector.a libaif/libaif.a
 
-include_HEADERS =		include/breakpoint.h include/dbg.h include/location.h include/procset.h include/stackframe.h
+include_HEADERS =		include/breakpoint.h include/dbg.h include/location.h include/bitset.h include/stackframe.h
 
 lib_LTLIBRARIES =
 if PTPDBGJNI
@@ -47,7 +47,7 @@ libdbgproxy_a_SOURCES =	src/client/client_interface.c \
 						src/proxy/proxy_event.c
 libdbgproxy_a_CFLAGS =	-I./include -I./bitvector -I./libaif $(AM_CFLAGS) -g
 
-libutils_a_SOURCES =		src/utils/procset.c \
+libutils_a_SOURCES =		src/utils/bitset.c \
 						src/utils/args.c \
 						src/utils/list.c \
 						src/utils/error.c \
