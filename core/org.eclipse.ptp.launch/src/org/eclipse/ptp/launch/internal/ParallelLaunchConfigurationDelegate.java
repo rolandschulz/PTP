@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.MessageFormat;
+
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IBinaryParser;
 import org.eclipse.cdt.core.ICExtensionReference;
@@ -44,7 +45,6 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
@@ -53,9 +53,7 @@ import org.eclipse.ptp.debug.core.PLaunch;
 import org.eclipse.ptp.debug.core.PSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
-import org.eclipse.ptp.rtsystem.simulation.SimProcess;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 
 /**
