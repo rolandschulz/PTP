@@ -40,7 +40,6 @@
 #include <unistd.h>
 
 #include "compat.h"
-#include "session.h"
 #include "proxy.h"
 #include "proxy_event.h"
 #include "proxy_tcp.h"

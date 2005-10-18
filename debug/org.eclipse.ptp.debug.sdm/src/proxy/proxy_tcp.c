@@ -33,7 +33,6 @@
 #include <errno.h>
 
 #include "compat.h"
-#include "session.h"
 #include "proxy.h"
 #include "proxy_tcp.h"
 #include "dbg_error.h"

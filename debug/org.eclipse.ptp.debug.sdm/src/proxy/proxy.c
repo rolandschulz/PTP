@@ -24,7 +24,6 @@
 #include <stdio.h>
 #include <string.h>
  
-#include "session.h"
 #include "proxy.h"
 
 static int 			proxy_errno = PROXY_RES_OK;
