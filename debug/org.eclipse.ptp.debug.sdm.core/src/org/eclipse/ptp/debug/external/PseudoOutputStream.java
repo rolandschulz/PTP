@@ -16,17 +16,16 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.rtsystem.simulation;
+package org.eclipse.ptp.debug.external;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class SimOutputStream extends OutputStream {
+public class PseudoOutputStream extends OutputStream {
 
 	public void write(int arg0) throws IOException {
-		// Auto-generated method stub
-		System.out.println("SimOutputStream.write()");
-		
+		// Send "arg0" to the process on the remote machine
+		System.out.println("PseudoOutputStream.write()");	
 	}
 
 }

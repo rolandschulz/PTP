@@ -97,10 +97,16 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 			threads[i] = new SimThread(this, i, taskId);
 		}
 		err = null;
-		in = new SimInputStream();
-		out = new SimOutputStream();
+		in = null;
+		out = null;
 		procThread = new Thread() {
 			public void run() {
+				/* to give time for others to register the listener to
+				this process */
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+				}
 				outerWhile: while (true) {
 					try {
 						if (isTerminated)
@@ -117,7 +123,7 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 						String cmd = (String) command.get(1);
 						String arg = (String) command.get(2);
 						if (!destination.equals("-1")) {
-							threads[Integer.parseInt(destination)].runCommand((SimInputStream) in, cmd, arg);
+							threads[Integer.parseInt(destination)].runCommand(cmd, arg);
 						} else {
 							if (cmd.equals("sleep")) {
 								Thread.sleep(Integer.parseInt(arg));
@@ -133,7 +139,6 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 				for (int i = 0; i < numThreads; i++) {
 					threads[i].terminate();
 				}
-				((SimInputStream) in).destroy();
 			}
 		};
 		procThread.start();
@@ -425,7 +430,6 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 	}
 	public void destroy() {
 		setTerminated(true);
-		((SimInputStream) in).destroy();
 	}
 	private void initCommands(SimQueue cmds) {
 		ArrayList cmd, /*cmd2,*/ cmd3/*, cmd4*/;

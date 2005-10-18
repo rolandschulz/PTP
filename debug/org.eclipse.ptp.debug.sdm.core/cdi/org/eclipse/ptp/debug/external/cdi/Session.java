@@ -138,7 +138,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	}
 	
 	public Process getProcess(int i) {
-		return debugger.getProcess(i).getProcess();
+		return debugger.getPseudoProcess(debugger.getProcess(i));
 	}
 
 	public void registerTarget(int procNum, boolean sendEvent) {
@@ -197,6 +197,7 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 		
 		String targetId = Integer.toString(procNum);
 		currentDebugTargetList.remove(targetId);
+		debugger.removePseudoProcess(debugger.getProcess(procNum));
 
 		if (sendEvent) {
 			debugger.fireEvent(new TargetUnregisteredEvent(this, new DebugProcessSet(this, procNum)));

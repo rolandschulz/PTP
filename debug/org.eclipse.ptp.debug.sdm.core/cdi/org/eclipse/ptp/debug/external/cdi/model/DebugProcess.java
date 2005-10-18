@@ -27,12 +27,10 @@ import org.eclipse.ptp.debug.external.cdi.SessionObject;
 public class DebugProcess extends SessionObject implements IPCDIDebugProcess {
 	
 	private IPProcess pProcess;
-	private Process process;
 
-	public DebugProcess(IPCDISession s, IPProcess pP, Process p) {
+	public DebugProcess(IPCDISession s, IPProcess pP) {
 		super((Session) s);
 		pProcess = pP;
-		process = p;
 	}
 	
 	public IPProcess getPProcess() {
@@ -43,14 +41,6 @@ public class DebugProcess extends SessionObject implements IPCDIDebugProcess {
 		return pProcess.getElementName();
 	}
 
-	public void setProcess(Process p) {
-		process = p;
-	}
-
-	public Process getProcess() {
-		return process;
-	}
-	
 	public boolean isTerminated() {
 		return pProcess.isTerminated();
 	}

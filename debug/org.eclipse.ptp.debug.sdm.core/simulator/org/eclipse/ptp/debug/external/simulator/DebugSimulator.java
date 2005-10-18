@@ -313,7 +313,7 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		IPCDIDebugProcess[] list = procs.getProcesses();
 		for (int i = 0; i < list.length; i++) {
 			((DebugProcess) list[i]).getPProcess().setTerminated(true);
-			list[i].getProcess().destroy();
+			removePseudoProcess(list[i]);
 		}
 	}
 

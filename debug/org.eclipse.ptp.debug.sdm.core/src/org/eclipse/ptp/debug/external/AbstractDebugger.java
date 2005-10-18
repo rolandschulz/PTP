@@ -23,6 +23,7 @@
 package org.eclipse.ptp.debug.external;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -52,6 +53,7 @@ public abstract class AbstractDebugger extends Observable implements IDebugger, 
 	protected boolean isExitingFlag = false; /* Checked by the eventThread */
 
 	protected abstract void startDebugger(IPJob job);
+	private HashMap pseudoProcesses;
 	
 	public final void initialize(IPJob job) {
 		eventQueue = new Queue();
@@ -61,6 +63,8 @@ public abstract class AbstractDebugger extends Observable implements IDebugger, 
 		userDefinedProcessSetList = new ArrayList();
 		
 		procs = job.getSortedProcesses();
+		pseudoProcesses = new HashMap();
+
 		
 		// Initialize state variables
 		startDebugger(job);
@@ -134,7 +138,7 @@ public abstract class AbstractDebugger extends Observable implements IDebugger, 
 	}
 	
 	public final IPCDIDebugProcess getProcess(int number) {
-		IPCDIDebugProcess proc = new DebugProcess(session, procs[number], (Process) procs[number]);
+		IPCDIDebugProcess proc = new DebugProcess(session, procs[number]);
 		return proc;
 	}
 	
@@ -146,7 +150,7 @@ public abstract class AbstractDebugger extends Observable implements IDebugger, 
 		IPCDIDebugProcess[] list = new IPCDIDebugProcess[procs.length];
 		
 		for (int i = 0; i < procs.length; i++) {
-			IPCDIDebugProcess proc = new DebugProcess(session, procs[i], (Process) procs[i]);
+			IPCDIDebugProcess proc = new DebugProcess(session, procs[i]);
 			list[i] = proc;
 		}
 		
@@ -167,5 +171,17 @@ public abstract class AbstractDebugger extends Observable implements IDebugger, 
 		}
 		
 		fireEvent(event);
+	}
+	
+	public Process getPseudoProcess(IPCDIDebugProcess proc) {
+		if (!pseudoProcesses.containsKey(proc.getName()))
+			pseudoProcesses.put(proc.getName(), new PseudoProcess(proc.getPProcess()));
+		
+		return (Process) pseudoProcesses.get(proc.getName());
+	}
+	
+	public void removePseudoProcess(IPCDIDebugProcess proc) {
+		PseudoProcess p = (PseudoProcess) pseudoProcesses.remove(proc.getName());
+		p.destroy();
 	}
 }

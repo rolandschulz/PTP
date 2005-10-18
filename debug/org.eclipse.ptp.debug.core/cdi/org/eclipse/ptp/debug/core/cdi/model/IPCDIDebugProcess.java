@@ -18,9 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
+import org.eclipse.ptp.core.IPProcess;
+
 public interface IPCDIDebugProcess extends IPCDIDebugEntity {
-	public void setProcess(Process p);
-	public Process getProcess();
 	public boolean isTerminated();
 	public boolean isSuspended();
+	public IPProcess getPProcess();
 }
