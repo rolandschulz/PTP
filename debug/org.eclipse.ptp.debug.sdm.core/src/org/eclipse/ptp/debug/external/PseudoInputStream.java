@@ -16,25 +16,27 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.rtsystem.simulation;
+package org.eclipse.ptp.debug.external;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-public class SimInputStream extends InputStream {
+import org.eclipse.ptp.core.util.Queue;
 
+public class PseudoInputStream extends InputStream {
+	final String DESTROY = "destroyPseudoInputStream";
 	boolean finished;
-	SimQueue queue;
+	Queue queue;
 	
 	String str;
 	int strLen;
 	
-	public SimInputStream() {
+	public PseudoInputStream() {
 		super();
-		queue = new SimQueue();
+		queue = new Queue();
 		finished = false;
 		str = null;
-		strLen = -2;
+		strLen = -1;
 	}
 	
 	public void printString(String s) {
@@ -43,27 +45,22 @@ public class SimInputStream extends InputStream {
 	
 	public void destroy() {
 		finished = true;
-		queue.addItem("destroy");
+		queue.addItem(DESTROY);
 	}
 	
 	public int read() throws IOException {
 		if (strLen == 0) {
 			strLen--;
-			return '\n';
+			return -1;
 		}
 		
 		if (strLen == -1) {
-			strLen--;
-			return -1;
-		}
-			
-		if (strLen == -2) {
 			try {
 				if (finished) {
 					return -1;
 				}
 				str = (String) queue.removeItem();
-				if (str.equals("destroy")) {
+				if (str.equals(DESTROY)) {
 					return -1;
 				}
 				strLen = str.length();

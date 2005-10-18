@@ -26,10 +26,10 @@ import java.util.Observer;
 
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
-import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.external.cdi.PCDIException;
 
 /**
@@ -63,5 +63,7 @@ public interface IAbstractDebugger {
 	public IPCDIDebugProcess getProcess(int number);
 	public IPCDIDebugProcess getProcess();
 	public IPCDIDebugProcess[] getProcesses();
+	public Process getPseudoProcess(IPCDIDebugProcess proc);
+	public void removePseudoProcess(IPCDIDebugProcess proc);
 
 }

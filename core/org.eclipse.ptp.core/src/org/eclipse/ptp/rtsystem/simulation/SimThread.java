@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Observable;
 
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.IProcessEvent;
+import org.eclipse.ptp.core.ProcessEvent;
 
 
 public class SimThread extends Observable {
@@ -82,9 +84,9 @@ public class SimThread extends Observable {
 		return (SimStackFrame[]) newList.toArray(new SimStackFrame[0]);
 	}
 	
-	public void runCommand(SimInputStream in, String cmd, String arg) {
+	public void runCommand(String cmd, String arg) {
 		if (cmd.equals("print")) {
-			in.printString(curLine + " : " + arg + " from process with task id: " + processId + " & thread #" + threadId);
+			simProcess.addOutput(curLine + " : " + arg + " from process with task id: " + processId + " & thread #" + threadId);
 			curLine++;
 		}
 		checkStepping();
