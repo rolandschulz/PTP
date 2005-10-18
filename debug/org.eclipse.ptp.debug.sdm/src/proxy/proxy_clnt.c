@@ -22,11 +22,10 @@
  */
  
 #include <stdio.h>
+#include <stdlib.h>
 
-#include "session.h"
 #include "proxy.h"
 #include "proxy_tcp.h"
-#include "dbg.h"
  
 proxy proxies[] = {
 	{"tcp", NULL, &proxy_tcp_clnt_funcs, NULL},
