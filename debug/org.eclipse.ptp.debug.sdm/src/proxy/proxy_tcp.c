@@ -35,7 +35,6 @@
 #include "compat.h"
 #include "proxy.h"
 #include "proxy_tcp.h"
-#include "dbg_error.h"
 
 struct timeval TCPTIMEOUT = { 25, 0 };
 
@@ -86,9 +85,9 @@ tcp_recv(proxy_tcp_conn *conn)
 	n = recv(conn->sess_sock, &conn->buf[conn->buf_pos], conn->buf_size - conn->total_read, 0);
 	if (n <= 0) {
 		if (n < 0)
-			DbgSetError(DBGERR_SYSTEM, strerror(errno));
+			proxy_set_error(PROXY_ERR_SYSTEM, strerror(errno));
 		else
-			DbgSetError(DBGERR_PROXY_TERM, NULL);
+			proxy_set_error(PROXY_ERR_PROTO, "connection terminated");
 		
 		CLOSE_SOCKET(conn->sess_sock);
 		conn->connected = 0;
@@ -170,7 +169,7 @@ proxy_tcp_get_msg_len(proxy_tcp_conn *conn)
 	 * check if we've received the length
 	 */
 	if (conn->msg_len == 0 || (conn->msg_len > 0 && *end != ' ')) {
-		DbgSetError(DBGERR_PROXY_PROTO, NULL);
+		proxy_set_error(PROXY_ERR_PROTO, NULL);
 		return -1;
 	}
 
