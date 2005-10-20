@@ -21,13 +21,14 @@ package org.eclipse.ptp.debug.internal.ui;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILocationBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IWorkspaceRunnable;
@@ -43,7 +44,6 @@ import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPDebugListener;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
@@ -423,6 +423,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			IPJob job = event.getDebugJob();
 			if (job == null)
 				continue;
+			
+			String workingDirectory = (String)job.getAttribute("dir"); 
 			if (event instanceof TargetRegisteredEvent) {
 				IElementHandler elementHandler = getElementHandler(job.getIDString());
 				int[] processes = event.getAllProcesses().toIntArray();
@@ -444,11 +446,14 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			} else if (event instanceof BreakpointHitEvent) {
 				BreakpointHitEvent bptHitEvent = (BreakpointHitEvent) event;
 				ICDIBreakpoint bpt = ((BreakpointHitInfo) bptHitEvent.getReason()).getBreakpoint();
-				if (bpt instanceof ICDILineBreakpoint) {
-					ICDILocator locator = ((ICDILineBreakpoint) bpt).getLocator();
+				if (bpt instanceof ICDILocationBreakpoint) {
+					ICDILocator locator = ((ICDILocationBreakpoint) bpt).getLocator();
 					int lineNumber = locator.getLineNumber();
+					if (lineNumber == 0)
+						lineNumber = 1;
 					// FIXME: Hardcode the filename
-					String fileName = PreferenceConstants.SIMULATION_PROJECT_NAME + "/" + PreferenceConstants.SIMULATION_FILE_NAME + ".c";
+					//String fileName = PreferenceConstants.SIMULATION_PROJECT_NAME + "/" + PreferenceConstants.SIMULATION_FILE_NAME + ".c";
+					String fileName = workingDirectory + "/" + "test.c";
 					try {
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses().toBitList(), false);
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses().toBitList(), true);
@@ -456,14 +461,18 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 						PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
 					}
 				}
+				System.out.println("##### 6 end");
 				fireSuspendEvent(job, event.getAllProcesses().toBitList());
 			} else if (event instanceof EndSteppingRangeEvent) {
 				EndSteppingRangeEvent endStepEvent = (EndSteppingRangeEvent) event;
 				ICDILineLocation lineLocation = ((EndSteppingRangeInfo) endStepEvent.getReason()).getLineLocation();
 				if (lineLocation != null) {
 					int lineNumber = lineLocation.getLineNumber();
+					if (lineNumber == 0)
+						lineNumber = 1;
 					// FIXME: Hardcode the filename
-					String fileName = PreferenceConstants.SIMULATION_PROJECT_NAME + "/" + PreferenceConstants.SIMULATION_FILE_NAME + ".c";
+					//String fileName = PreferenceConstants.SIMULATION_PROJECT_NAME + "/" + PreferenceConstants.SIMULATION_FILE_NAME + ".c";
+					String fileName = workingDirectory + "/" + "test.c";
 					try {
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses().toBitList(), false);
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses().toBitList(), true);
