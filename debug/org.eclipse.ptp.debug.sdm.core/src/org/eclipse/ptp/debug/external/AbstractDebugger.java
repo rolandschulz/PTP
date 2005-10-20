@@ -30,10 +30,14 @@ import java.util.Observer;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
-import org.eclipse.ptp.core.util.Queue;
+import org.eclipse.ptp.debug.external.cdi.event.ErrorEvent;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
 
 /**
@@ -117,9 +121,27 @@ public abstract class AbstractDebugger extends Observable implements IDebugger, 
 			}
 		}
 	}
+	private void setProcessStatus(int[] tasks, String state) {
+		for (int i=0; i<tasks.length; i++) {
+			procs[i].setStatus(state);
+		}
+	}
 
 	public final void fireEvent(IPCDIEvent event) {
 		if (event != null) {
+			int[] tasks = event.getAllProcesses().toIntArray();
+			if (event instanceof IPCDIExitedEvent) {
+				setProcessStatus(tasks, IPProcess.EXITED);
+			} else if (event instanceof IPCDIResumedEvent) {
+				setProcessStatus(tasks, IPProcess.RUNNING);
+			} else if (event instanceof IPCDISuspendedEvent) {
+				if (event instanceof ErrorEvent) {
+					setProcessStatus(tasks, IPProcess.ERROR);
+				}
+				else {
+					setProcessStatus(tasks, IPProcess.STOPPED);
+				}
+			}
 			eventQueue.addItem(event);
 		}
 	}
