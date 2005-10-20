@@ -44,7 +44,6 @@ import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IPDebugListener;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
@@ -453,7 +452,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					if (lineNumber == 0)
 						lineNumber = 1;
 					// FIXME: Hardcode the filename
-					String fileName = workingDirectory + "/" + PreferenceConstants.SIMULATION_FILE_NAME + ".c";
+					String fileName = workingDirectory + "/" + locator.getFile();
 					try {
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses().toBitList(), false);
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses().toBitList(), true);
@@ -470,7 +469,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					if (lineNumber == 0)
 						lineNumber = 1;
 					// FIXME: Hardcode the filename
-					String fileName = workingDirectory + "/" + PreferenceConstants.SIMULATION_FILE_NAME + ".c";
+					String fileName = workingDirectory + "/" + lineLocation.getFile();
 					try {
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses().toBitList(), false);
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses().toBitList(), true);
