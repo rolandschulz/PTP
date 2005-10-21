@@ -34,21 +34,13 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
-import org.eclipse.ptp.debug.external.IAbstractDebugger;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
-import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
-import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
-import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
-import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
-import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
-import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
@@ -350,74 +342,36 @@ public class DebugSimulator extends AbstractDebugger implements Observer {
 		
 	}
 
+	//FIXME: from clement....each time only one process??
 	/* Do not worry about this method, this method is only peculiar to this DebugSimulator */
 	public void update(Observable o, Object arg) {
 		ArrayList list = (ArrayList) arg;
 		int procId = ((Integer) list.get(0)).intValue();
 		String event = (String) list.get(1);
 		
-		String[] args = null;
 		BitList procs = new BitList(this.procs.length);
 		procs.set(procId);
 		
 		if (event.equals("BREAKPOINTHIT")) {
-			args = new String[2];
-			args[0] = (String) list.get(2);
-			args[1] = ((Integer) list.get(3)).toString();
-			handleDebugEvent(IAbstractDebugger.IDBGEV_BPHIT, procs, args);
+			handleBreakpointHitEvent(procs, ((Integer) list.get(3)).intValue(), (String) list.get(2));
 			debuggerOutput.addItem("BreakpointHit Event for " + procId);
 			
 		} else if (event.equals("ENDSTEPPINGRANGE")) {
-			args = new String[2];
-			args[0] = (String) list.get(2);
-			args[1] = ((Integer) list.get(3)).toString();
-			handleDebugEvent(IAbstractDebugger.IDBGEV_ENDSTEPPING, procs, args);
+			handleEndSteppingEvent(procs, ((Integer) list.get(3)).intValue(), (String) list.get(2));
 			debuggerOutput.addItem("EndSteppingRange Event for " + procId);
 			
 		} else if (event.equals("RESUMED")) {
-			handleDebugEvent(IAbstractDebugger.IDBGEV_PROCESSRESUMED, procs, args);
+			handleProcessResumedEvent(procs);
 			debuggerOutput.addItem("InferiorResumed Event for " + procId);
 			
 		} else if (event.equals("TERMINATED")) {
-			handleDebugEvent(IAbstractDebugger.IDBGEV_PROCESSTERMINATED, procs, args);
+			handleProcessTerminatedEvent(procs);
 			debuggerOutput.addItem("InferiorExited Event for " + procId);
 			
 		} else if (event.equals("SUSPENDED")) {
-			args = new String[2];
-			args[0] = (String) list.get(2);
-			args[1] = ((Integer) list.get(3)).toString();
-			handleDebugEvent(IAbstractDebugger.IDBGEV_ENDSTEPPING, procs, args);
+			handleEndSteppingEvent(procs, ((Integer) list.get(3)).intValue(), (String) list.get(2));
 			debuggerOutput.addItem("EndSteppingRange Event for " + procId);
-
 		}
 
 	}
-	
-	public IPCDIEvent handleBreakpointHitEvent(BitList procs, String[] args) {
-		String file = args[0];
-		int line = Integer.parseInt(args[1]);
-		LineLocation loc = new LineLocation(file, line);
-		LineBreakpoint bpt = new LineBreakpoint(ICDIBreakpoint.REGULAR, loc, null);
-		IPCDIEvent ev = new BreakpointHitEvent(getSession(), new DebugProcessSet(session, procs), bpt);
-		return ev;
-	}
-
-	public IPCDIEvent handleEndSteppingEvent(BitList procs, String[] args) {
-		String file = args[0];
-		int line = Integer.parseInt(args[1]);
-		LineLocation loc = new LineLocation(file, line);
-		IPCDIEvent ev = new EndSteppingRangeEvent(getSession(), new DebugProcessSet(session, procs), loc);
-		return ev;
-	}
-
-	public IPCDIEvent handleProcessResumedEvent(BitList procs, String[] args) {
-		IPCDIEvent ev = new InferiorResumedEvent(getSession(), new DebugProcessSet(session, procs));
-		return ev;
-	}
-
-	public IPCDIEvent handleProcessTerminatedEvent(BitList procs, String[] args) {
-		IPCDIEvent ev = new InferiorExitedEvent(getSession(), new DebugProcessSet(session, procs));
-		return ev;
-	}
-
 }

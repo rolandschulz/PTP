@@ -36,9 +36,9 @@ public interface IDebuggerEvent {
 	 * public void handleDebugEvent(int eventType, BitList procs, String[] args) (IAbstractDebugger)
 	 * based on the type of the event.
 	 */
-	public abstract IPCDIEvent handleBreakpointHitEvent(BitList procs, String[] args);
-	public abstract IPCDIEvent handleEndSteppingEvent(BitList procs, String[] args);
-	public abstract IPCDIEvent handleProcessResumedEvent(BitList procs, String[] args);
-	public abstract IPCDIEvent handleProcessTerminatedEvent(BitList procs, String[] args);
+	public abstract IPCDIEvent handleBreakpointHitEvent(BitList procs, int lineNumber, String filename);
+	public abstract IPCDIEvent handleEndSteppingEvent(BitList procs, int lineNumber, String filename);
+	public abstract IPCDIEvent handleProcessResumedEvent(BitList procs);
+	public abstract IPCDIEvent handleProcessTerminatedEvent(BitList procs);
 	
 }
