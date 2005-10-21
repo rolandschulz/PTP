@@ -135,8 +135,13 @@ DbgEventToStr(dbg_event *e, char **result)
 		break;
 	
 	case DBGEV_BPHIT:
-	case DBGEV_BPSET:
 		asprintf(result, "%d %s %d", e->event, pstr, e->bpid);
+		break;
+
+	case DBGEV_BPSET:
+		dbg_breakpoint_to_str(e->bp, &str);
+		asprintf(result, "%d %s %d %s", e->event, pstr, e->bpid, str);
+		free(str);
 		break;
 
 	case DBGEV_SIGNAL:
@@ -356,7 +361,8 @@ DbgStrToEvent(char *str, dbg_event **ev)
 	
 	case DBGEV_BPSET:
 		e = NewDbgEvent(DBGEV_BPSET);
-		if (proxy_str_to_int(args[2], &e->bpid) < 0)
+		if (proxy_str_to_int(args[2], &e->bpid) < 0 ||
+			dbg_str_to_breakpoint(&args[3], &e->bp)	< 0)
 			goto error_out;
 		break;
 	
@@ -444,7 +450,6 @@ FreeDbgEvent(dbg_event *e) {
 	case DBGEV_OK:
 	case DBGEV_EXIT:
 	case DBGEV_INIT:
-	case DBGEV_BPSET:
 	case DBGEV_BPHIT:
 		break;
 		
@@ -478,6 +483,11 @@ FreeDbgEvent(dbg_event *e) {
 			free(e->sig_name);
 			free(e->sig_meaning);
 		}
+		break;
+		
+	case DBGEV_BPSET:
+		if (e->bp != NULL)
+			FreeBreakpoint(e->bp);
 		break;
 	}
 	

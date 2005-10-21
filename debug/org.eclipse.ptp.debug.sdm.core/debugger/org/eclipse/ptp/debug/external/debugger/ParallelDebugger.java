@@ -57,7 +57,8 @@ import org.eclipse.ptp.debug.external.cdi.model.Thread;
 import org.eclipse.ptp.debug.external.proxy.ProxyDebugClient;
 import org.eclipse.ptp.debug.external.proxy.ProxyDebugStackframe;
 import org.eclipse.ptp.debug.external.proxy.event.IProxyDebugEvent;
-import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugBreakpointEvent;
+import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugBreakpointHitEvent;
+import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugBreakpointSetEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugInitEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugStackframeEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugStepEvent;
@@ -102,7 +103,6 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 	private ProxyDebugClient		proxy;
 	private int					numServers;
 	private Queue				events = new Queue();
-	private ICDIBreakpoint		currBP;
 	private HashMap				bpMap = new HashMap();
 	private ArrayList			bpArray = new ArrayList();
 	private int					bpId = 0;
@@ -228,8 +228,6 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 			return;
 		}
 		
-		this.currBP = bpt;
-		
 		waitForEvents(procs.toBitList());
 	}
 
@@ -239,8 +237,6 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 		} catch (IOException e1) {
 			return;
 		}
-
-		this.currBP = bpt;
 		
 		waitForEvents(procs.toBitList());
 	}
@@ -373,7 +369,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 			/*
 			 * Retrieve the breakpoint object.
 			 */
-			BreakpointMapping bp = findBreakpointInfo(((ProxyDebugBreakpointEvent)e).getBreakpointId());
+			BreakpointMapping bp = findBreakpointInfo(((ProxyDebugBreakpointHitEvent)e).getBreakpointId());
 			if (bp != null) {
 				IPCDIEvent ev = new BreakpointHitEvent(getSession(), new DebugProcessSet(session, de.getBitSet()), bp.bpObject);
 				super.fireEvent(ev);
@@ -388,9 +384,8 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 			break;	
 			
 		case IProxyDebugEvent.EVENT_DBG_BPSET:
-			if (this.currBP != null) {
-				updateBreakpointInfo(((ProxyDebugBreakpointEvent)e).getBreakpointId(), de.getBitSet(), this.currBP);
-			}
+			ProxyDebugBreakpointSetEvent bpEvt = (ProxyDebugBreakpointSetEvent)e;	
+			updateBreakpointInfo(bpEvt.getBreakpointId(), de.getBitSet(), bpEvt.getBreakpoint());
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_FRAMES:

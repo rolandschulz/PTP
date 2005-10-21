@@ -56,6 +56,11 @@ struct dbg_event {
 	int			bpid;
 	
 	/*
+	 * DBGEV_BPSET
+	 */
+	breakpoint *	bp;
+	
+	/*
 	 * DBGEV_FRAMES, DBGEV_VARS
 	 */
 	List *		list;

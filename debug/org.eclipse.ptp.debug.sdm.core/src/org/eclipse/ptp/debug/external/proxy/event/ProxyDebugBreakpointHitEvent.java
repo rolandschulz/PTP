@@ -21,11 +21,11 @@ package org.eclipse.ptp.debug.external.proxy.event;
 
 import org.eclipse.ptp.core.util.BitList;
 
-public class ProxyDebugBreakpointEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
-	private int				bpId;
+public class ProxyDebugBreakpointHitEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+	private int	bpId;
 	
-	public ProxyDebugBreakpointEvent(BitList set, int type, int id) {
-		super(type, set);
+	public ProxyDebugBreakpointHitEvent(BitList set, int id) {
+		super(EVENT_DBG_BPHIT, set);
 		this.bpId = id;
 	}
 	
@@ -34,9 +34,6 @@ public class ProxyDebugBreakpointEvent extends AbstractProxyDebugEvent implement
 	}
 	
 	public String toString() {
-		if (this.getEventID() == EVENT_DBG_BPHIT)
-			return "EVENT_DBG_BPHIT " + this.getBitSet().toString();
-		else
-			return "EVENT_DBG_BPSET " + this.getBitSet().toString();
+		return "EVENT_DBG_BPHIT " + this.getBitSet().toString();
 	}
 }

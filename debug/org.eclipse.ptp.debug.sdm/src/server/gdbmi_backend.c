@@ -551,6 +551,7 @@ SetAndCheckBreak(int bpid, char *where)
 {
 	dbg_event *	e;
 	mi_bkpt *	bpt;
+	breakpoint *	bp;
 
 	ResetError();
 
@@ -568,8 +569,37 @@ SetAndCheckBreak(int bpid, char *where)
 
 	AddBPMap(bpt->number, bpid);
 	
+	bp = NewBreakpoint(bpt->number);
+
+	bp->ignore = bpt->ignore;
+
+	switch ( bpt->type ) {
+	case t_unknown:
+		bp->type = strdup("unknown");
+		break;
+
+	case t_breakpoint:
+		bp->type = strdup("breakpoint");
+		break;
+
+	case t_hw:
+		bp->type = strdup("hw");
+		break;
+	}
+
+	bp->hits = bpt->times;
+
+	if ( bpt->file != NULL )
+		bp->loc.file = strdup(bpt->file);
+	if ( bpt->func != NULL )
+		bp->loc.func = strdup(bpt->func);
+	if ( bpt->addr != 0 )
+		asprintf(&bp->loc.addr, "0x%p", bpt->addr);
+	bp->loc.line = bpt->line;
+	
 	e = NewDbgEvent(DBGEV_BPSET);
 	e->bpid = bpid;
+	e->bp = bp;
 	SaveEvent(e);
 	
 	mi_free_bkpt(bpt);
