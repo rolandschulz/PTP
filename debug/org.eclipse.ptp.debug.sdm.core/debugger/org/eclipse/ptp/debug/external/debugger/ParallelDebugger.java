@@ -42,12 +42,14 @@ import org.eclipse.ptp.core.proxy.event.ProxyErrorEvent;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
+import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
@@ -59,6 +61,7 @@ import org.eclipse.ptp.debug.external.proxy.ProxyDebugStackframe;
 import org.eclipse.ptp.debug.external.proxy.event.IProxyDebugEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugBreakpointHitEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugBreakpointSetEvent;
+import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugExitEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugInitEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugStackframeEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugStepEvent;
@@ -399,8 +402,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 			for (int i = 0; i < procList.length; i++) {
 				int taskId = ((DebugProcess) procList[i]).getPProcess().getTaskId();
 				ICDITarget target = getSession().getTarget(taskId);
-				SimThread simThread = ((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0);
-				ICDIThread thread = new Thread((Target) target, simThread.getThreadId());
+				ICDIThread thread = new Thread((Target) target, 0);
 				for (int j = 0; j < frameEvent.getFrames().length; j++) {
 					ProxyDebugStackframe f = frameEvent.getFrames()[j];
 					int level = f.getLevel();
@@ -415,6 +417,10 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 			}
 			this.lastFrames = (ICDIStackFrame[]) list.toArray(new ICDIStackFrame[0]);
 			break;
+			
+		case IProxyDebugEvent.EVENT_DBG_EXIT:
+			IPCDIExitedEvent ee = new InferiorExitedEvent(getSession(), new DebugProcessSet(session, de.getBitSet()));
+			super.fireEvent(ee);
 		}
 		
 		this.events.addItem(e);
