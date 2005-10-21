@@ -66,6 +66,48 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 		sLine = line;
 		sAddress = address;
 	}
+	
+	public BigInteger getBigInteger(String address) {
+		int index = 0;
+		int radix = 10;
+		boolean negative = false;
+
+		// Handle zero length
+		address = address.trim();
+		if (address.length() == 0) {
+			return BigInteger.ZERO;
+		}
+
+		// Handle minus sign, if present
+		if (address.startsWith("-")) { //$NON-NLS-1$
+			negative = true;
+			index++;
+		}
+		if (address.startsWith("0x", index) || address.startsWith("0X", index)) { //$NON-NLS-1$ //$NON-NLS-2$
+			index += 2;
+			radix = 16;
+		} else if (address.startsWith("#", index)) { //$NON-NLS-1$
+			index ++;
+			radix = 16;
+		} else if (address.startsWith("0", index) && address.length() > 1 + index) { //$NON-NLS-1$
+			index ++;
+			radix = 8;
+		}
+
+		if (index > 0) {
+			address = address.substring(index);
+		}
+		if (negative) {
+			address = "-" + address; //$NON-NLS-1$
+		}
+		try {
+			return new BigInteger(address, radix);
+		} catch (NumberFormatException e) {
+			// ...
+			// What can we do ???
+		}
+		return BigInteger.ZERO;
+	}	
 
 	public ICDILocator getLocator() {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
@@ -74,7 +116,7 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 			if (fLocator == null) {
 				String address = sAddress;
 				if (address != null) {
-					addr = new BigInteger(address);
+					addr = getBigInteger(address);
 				}
 				fLocator = new Locator(sFile, sFunction, sLine, addr);
 			}
