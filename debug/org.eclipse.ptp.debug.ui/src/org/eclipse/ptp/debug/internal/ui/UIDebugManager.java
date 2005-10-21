@@ -424,7 +424,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			if (job == null)
 				continue;
 			
-			String workingDirectory = (String)job.getAttribute("dir"); 
+			String workingDebugDir = (String)job.getAttribute("debugdir");
 			if (event instanceof TargetRegisteredEvent) {
 				IElementHandler elementHandler = getElementHandler(job.getIDString());
 				int[] processes = event.getAllProcesses().toIntArray();
@@ -449,10 +449,11 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				if (bpt instanceof ICDILocationBreakpoint) {
 					ICDILocator locator = ((ICDILocationBreakpoint) bpt).getLocator();
 					int lineNumber = locator.getLineNumber();
+					System.out.println("----- linenumber: " + lineNumber + ", file: "+ locator.getFile());
 					if (lineNumber == 0)
 						lineNumber = 1;
 					// FIXME: Hardcode the filename
-					String fileName = workingDirectory + "/" + locator.getFile();
+					String fileName = workingDebugDir + "/" + locator.getFile();
 					try {
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses().toBitList(), false);
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses().toBitList(), true);
@@ -469,7 +470,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					if (lineNumber == 0)
 						lineNumber = 1;
 					// FIXME: Hardcode the filename
-					String fileName = workingDirectory + "/" + lineLocation.getFile();
+					String fileName = workingDebugDir + "/" + lineLocation.getFile();
 					try {
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses().toBitList(), false);
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses().toBitList(), true);

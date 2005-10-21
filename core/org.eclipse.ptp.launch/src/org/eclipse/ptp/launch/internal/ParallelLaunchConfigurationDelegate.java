@@ -200,6 +200,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			
 			try {
 				if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+					job.setAttribute("debugdir", exePath.removeLastSegments(1).toOSString());
 					IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 					IPCDISession dSession = debugConfig.createDebugger().createDebuggerSession(pLaunch, exeFile, new SubProgressMonitor(monitor, 3));
 					IPSession pSession = (IPSession) new PSession(dSession, pLaunch);
