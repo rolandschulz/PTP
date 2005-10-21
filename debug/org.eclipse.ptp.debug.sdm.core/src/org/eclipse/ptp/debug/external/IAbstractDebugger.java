@@ -25,7 +25,6 @@ package org.eclipse.ptp.debug.external;
 import java.util.Observer;
 
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
@@ -54,7 +53,6 @@ public interface IAbstractDebugger {
 	public void fireEvent(IPCDIEvent event);
 	public void notifyObservers(Object arg);
 	public Queue getEventQueue();
-	public void handleDebugEvent(int eventType, BitList procs, String[] args);
 	
 	/* Miscellaneous */
 	public IPCDISession getSession();

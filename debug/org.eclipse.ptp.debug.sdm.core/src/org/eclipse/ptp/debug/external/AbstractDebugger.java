@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
@@ -37,14 +38,21 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
+import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
+import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
+import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
 import org.eclipse.ptp.debug.external.cdi.event.ErrorEvent;
+import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
+import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
+import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
+import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
 
 /**
  * @author donny
  *
  */
-public abstract class AbstractDebugger extends Observable implements IDebugger, IDebuggerEvent {
+public abstract class AbstractDebugger extends Observable implements IDebugger {
 	protected Queue eventQueue = null;
 	protected EventThread eventThread = null;
 
@@ -56,7 +64,6 @@ public abstract class AbstractDebugger extends Observable implements IDebugger, 
 	
 	protected boolean isExitingFlag = false; /* Checked by the eventThread */
 
-	protected abstract void startDebugger(IPJob job);
 	private HashMap pseudoProcesses;
 	
 	public final void initialize(IPJob job) {
@@ -73,8 +80,6 @@ public abstract class AbstractDebugger extends Observable implements IDebugger, 
 		// Initialize state variables
 		startDebugger(job);
 	}
-	
-	protected abstract void stopDebugger();
 	
 	public final void exit() {
 		isExitingFlag = true;
@@ -129,6 +134,7 @@ public abstract class AbstractDebugger extends Observable implements IDebugger, 
 
 	public final void fireEvent(IPCDIEvent event) {
 		if (event != null) {
+			System.out.println("     --- Abs debugger: " + event);
 			int[] tasks = event.getAllProcesses().toIntArray();
 			if (event instanceof IPCDIExitedEvent) {
 				setProcessStatus(tasks, IPProcess.EXITED);
@@ -178,23 +184,7 @@ public abstract class AbstractDebugger extends Observable implements IDebugger, 
 		
 		return list;
 	}
-	
-	public void handleDebugEvent(int eventType, BitList procs, String[] args) {
-		IPCDIEvent event = null;
 		
-		if (eventType == IDBGEV_BPHIT) {
-			event = handleBreakpointHitEvent(procs, args);
-		} else if (eventType == IDBGEV_ENDSTEPPING) {
-			event = handleEndSteppingEvent(procs, args);
-		} else if (eventType == IDBGEV_PROCESSRESUMED) {
-			event = handleProcessResumedEvent(procs, args);
-		} else if (eventType == IDBGEV_PROCESSTERMINATED) {
-			event = handleProcessTerminatedEvent(procs, args);
-		}
-		
-		fireEvent(event);
-	}
-	
 	public Process getPseudoProcess(IPCDIDebugProcess proc) {
 		if (!pseudoProcesses.containsKey(proc.getName()))
 			pseudoProcesses.put(proc.getName(), new PseudoProcess(proc.getPProcess()));
@@ -206,4 +196,23 @@ public abstract class AbstractDebugger extends Observable implements IDebugger, 
 		PseudoProcess p = (PseudoProcess) pseudoProcesses.remove(proc.getName());
 		p.destroy();
 	}
+	
+	public void handleBreakpointHitEvent(BitList procs, int lineNumber, String filename) {
+		LineLocation loc = new LineLocation(filename, lineNumber);
+		LineBreakpoint bpt = new LineBreakpoint(ICDIBreakpoint.REGULAR, loc, null);
+		fireEvent(new BreakpointHitEvent(getSession(), new DebugProcessSet(session, procs), bpt));
+	}
+	public void handleEndSteppingEvent(BitList procs, int lineNumber, String filename) {
+		LineLocation loc = new LineLocation(filename, lineNumber);
+		fireEvent(new EndSteppingRangeEvent(getSession(), new DebugProcessSet(session, procs), loc));
+	}
+	public void handleProcessResumedEvent(BitList procs) {
+		fireEvent(new InferiorResumedEvent(getSession(), new DebugProcessSet(session, procs)));
+	}
+	public void handleProcessTerminatedEvent(BitList procs) {
+		fireEvent(new InferiorExitedEvent(getSession(), new DebugProcessSet(session, procs)));
+	}	
+
+	protected abstract void stopDebugger();
+	protected abstract void startDebugger(IPJob job);
 }
