@@ -11,4 +11,7 @@ public interface IPCDIModelManager {
 	public IPCDIDebugProcessSetNamed[] getProcessSets();
 	public IPCDIDebugProcessSetNamed newProcessSet(String setName, int[] procs);
 	public IPCDIDebugProcessSetNamed newProcessSet(String setName, BitList list);
+	
+	//Created by Clement
+	public BitList getTasks(String setName);
 }

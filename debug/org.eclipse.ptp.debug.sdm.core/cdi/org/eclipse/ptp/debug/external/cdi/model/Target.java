@@ -60,7 +60,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
-import org.eclipse.ptp.debug.external.IDebugger;
+import org.eclipse.ptp.debug.external.IAbstractDebugger;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
@@ -71,7 +71,7 @@ import org.eclipse.ptp.debug.external.cdi.model.variable.GlobalVariableDescripto
 public class Target extends SessionObject implements IPCDITarget {
 	
 	private TargetConfiguration fConfiguration;
-	private IDebugger fDebugger;
+	private IAbstractDebugger fDebugger;
 	
 	Thread[] currentThreads;
 	int currentThreadId;
@@ -80,7 +80,7 @@ public class Target extends SessionObject implements IPCDITarget {
 	int targetId; /* synonymous with the process number/id */
 	IPCDIDebugProcess debugProcess;
 	
-	public Target(Session session, IDebugger debugger, int tId) {
+	public Target(Session session, IAbstractDebugger debugger, int tId) {
 		super(session);
 		fDebugger = debugger;
 		targetId = tId;
@@ -134,8 +134,7 @@ public class Target extends SessionObject implements IPCDITarget {
 
 	public void terminate() throws CDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		DebugProcessSet newSet = new DebugProcessSet((Session) getSession(), getTargetId());
-		fDebugger.kill(newSet);
+		fDebugger.killAction(((Session) getSession()).createBitList(getTargetId()));
 	}
 
 	public boolean isDisconnected() {
@@ -146,13 +145,12 @@ public class Target extends SessionObject implements IPCDITarget {
 	public void disconnect() throws CDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		//fDebugger.detach(null);
-		DebugProcessSet newSet = new DebugProcessSet((Session) getSession(), getTargetId());
-		fDebugger.kill(newSet);
+		fDebugger.killAction(((Session) getSession()).createBitList(getTargetId()));
 	}
 
 	public void restart() throws CDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		fDebugger.restart();
+		fDebugger.restartAction();
 	}
 
 	public void resume() throws CDIException {
@@ -242,8 +240,7 @@ public class Target extends SessionObject implements IPCDITarget {
 
 	public void stepOver(int count) throws CDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		DebugProcessSet newSet = new DebugProcessSet((Session) getSession(), getTargetId());
-		fDebugger.stepOver(newSet, count);
+		fDebugger.stepOverAction(((Session) getSession()).createBitList(getTargetId()), count);
 	}
 
 	public void stepOverInstruction(int count) throws CDIException {
@@ -252,8 +249,7 @@ public class Target extends SessionObject implements IPCDITarget {
 
 	public void stepInto(int count) throws CDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		DebugProcessSet newSet = new DebugProcessSet((Session) getSession(), getTargetId());
-		fDebugger.stepInto(newSet, count);
+		fDebugger.stepIntoAction(((Session) getSession()).createBitList(getTargetId()), count);
 	}
 
 	public void stepIntoInstruction(int count) throws CDIException {
@@ -262,14 +258,12 @@ public class Target extends SessionObject implements IPCDITarget {
 
 	public void stepUntil(ICDILocation location) throws CDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		DebugProcessSet newSet = new DebugProcessSet((Session) getSession(), getTargetId());
-		fDebugger.stepFinish(newSet, 0);
+		fDebugger.stepFinishAction(((Session) getSession()).createBitList(getTargetId()), 0);
 	}
 
 	public void resume(boolean passSignal) throws CDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		DebugProcessSet newSet = new DebugProcessSet((Session) getSession(), getTargetId());
-		fDebugger.go(newSet);
+		fDebugger.goAction(((Session) getSession()).createBitList(getTargetId()));
 	}
 
 	public void resume(ICDILocation location) throws CDIException {
@@ -282,7 +276,7 @@ public class Target extends SessionObject implements IPCDITarget {
 
 	public void suspend() throws CDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		fDebugger.halt(null);
+		fDebugger.haltAction(null);
 	}
 
 	public boolean isSuspended() {

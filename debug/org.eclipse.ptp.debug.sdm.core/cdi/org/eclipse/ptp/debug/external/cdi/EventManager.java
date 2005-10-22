@@ -83,9 +83,8 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	 */
 	public void fireEvents(ICDIEvent[] cdiEvents) {
 		if (cdiEvents != null && cdiEvents.length > 0) {
-			ICDIEventListener[] listeners = (ICDIEventListener[])list.toArray(new ICDIEventListener[0]);
-			for (int i = 0; i < listeners.length; i++) {
-				listeners[i].handleDebugEvents(cdiEvents);
+			for (int i = 0; i < list.size(); i++) {
+				((ICDIEventListener)list.get(i)).handleDebugEvents(cdiEvents);
 			}			
 		}
 	}
@@ -99,15 +98,14 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 		IPCDIEvent event = (IPCDIEvent) ev;
 		
 		List cdiList = new ArrayList(1);
-		
 		cdiList.add(event);
-		
+
 		if (event instanceof ICDISuspendedEvent) {
 			processSuspendedEvent(event);
 		}
 		
 		// Fire the event;
-		ICDIEvent[] cdiEvents = (ICDIEvent[])cdiList.toArray(new ICDIEvent[0]);
+		ICDIEvent[] cdiEvents = (ICDIEvent[])cdiList.toArray(new ICDIEvent[cdiList.size()]);
 		fireEvents(cdiEvents);
 	}
 
@@ -119,7 +117,7 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	boolean processSuspendedEvent(IPCDIEvent event) {
 		Session session = (Session) getSession();
 		
-		int[] procs = ((AbstractEvent) event).getAllRegisteredProcesses().toIntArray();
+		int[] procs = ((AbstractEvent) event).getAllRegisteredProcesses().toArray();
 		
 		for (int i = 0; i < procs.length; i++) {
 			Target currentTarget = (Target) session.getTarget(procs[i]);

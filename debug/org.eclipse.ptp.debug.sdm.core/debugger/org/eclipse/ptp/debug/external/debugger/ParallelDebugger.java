@@ -22,7 +22,6 @@ package org.eclipse.ptp.debug.external.debugger;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
@@ -33,21 +32,19 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
+import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
-import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
-import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
@@ -62,7 +59,7 @@ import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugStackframeEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugStepEvent;
 
 
-public class ParallelDebugger extends AbstractDebugger implements IProxyEventListener {
+public class ParallelDebugger extends AbstractDebugger implements IDebugger, IProxyEventListener {
 	private class BreakpointMapping {
 		private ICDIBreakpoint		bpObject;
 		private BitList				bpSet;
@@ -102,7 +99,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 	private ArrayList			bpArray = new ArrayList();
 	private int					bpId = 0;
 	private ICDIStackFrame[]		lastFrames = null;
-	private IPCDIDebugProcessSet	currProcs = null;
+	private BitList	curTasks = null;
 	
 	/*
 	 * Wait for any event
@@ -142,8 +139,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 		}
 		return buf.toString();
 	}
-	
-	protected void startDebugger(IPJob job) {
+	public void startDebugger(IPJob job) {
 		proxy = new ProxyDebugClient("localhost", 12345);
 		proxy.addEventListener(this);
 		try {
@@ -160,8 +156,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 			return;
 		}
 	}
-	
-	protected void stopDebugger() {
+	public void stopDebugger() {
 		try {
 			proxy.sessionFinish();
 		} catch (IOException e) {
@@ -182,74 +177,66 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "run");		
 	}
 	
-	public void go(IPCDIDebugProcessSet procs) throws PCDIException {
+	public void go(BitList tasks) throws PCDIException {
 		try {
-			BitList tasks = procs.toBitList();
-			handleProcessResumedEvent(tasks);
 			proxy.debugGo(tasks);
 		} catch (IOException e) {
 			// TODO deal with IOException (maybe should be dealt with in ProxyClient?)
 		}
 	}
 
-	public void kill(IPCDIDebugProcessSet procs) throws PCDIException {
+	public void kill(BitList tasks) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "kill");
 	}
 
-	public void halt(IPCDIDebugProcessSet procs) throws PCDIException {
+	public void halt(BitList tasks) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "halt");
 	}
 	
-	public void stepInto(IPCDIDebugProcessSet procs, int count) throws PCDIException {
+	public void stepInto(BitList tasks, int count) throws PCDIException {
 		try {
-			BitList tasks = procs.toBitList();
-			handleProcessResumedEvent(tasks);
 			proxy.debugStep(tasks, count, 0);
 		} catch (IOException e) {
 		}
 	}
-
-	public void stepOver(IPCDIDebugProcessSet procs, int count) throws PCDIException {
+	public void stepOver(BitList tasks, int count) throws PCDIException {
 		try {
-			BitList tasks = procs.toBitList();
-			handleProcessResumedEvent(tasks);
 			proxy.debugStep(tasks, count, 1);
 		} catch (IOException e) {
 		}
 	}
-
-	public void stepFinish(IPCDIDebugProcessSet procs, int count) throws PCDIException {
+	public void stepFinish(BitList tasks, int count) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "stepFinish");
 	}
-
-	public void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDILineBreakpoint bpt) throws PCDIException {
+	public void setLineBreakpoint(BitList tasks, ICDILineBreakpoint bpt) throws PCDIException {
 		try {
-			proxy.debugSetLineBreakpoint(procs.toBitList(), newBreakpointId(), bpt.getLocator().getFile(), bpt.getLocator().getLineNumber());
+			proxy.debugSetLineBreakpoint(tasks, newBreakpointId(), bpt.getLocator().getFile(), bpt.getLocator().getLineNumber());
 		} catch (IOException e1) {
 			return;
 		}
 		
-		waitForEvents(procs.toBitList());
+		waitForEvents(tasks);
 	}
 
-	public void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIFunctionBreakpoint bpt) throws PCDIException {
+	public void setFunctionBreakpoint(BitList tasks, ICDIFunctionBreakpoint bpt) throws PCDIException {
+		System.out.println("@@@@@@@@@@@@@@: " + tasks.cardinality());
 		try {
-			proxy.debugSetFuncBreakpoint(procs.toBitList(), newBreakpointId(), bpt.getLocator().getFile(), bpt.getLocator().getFunction());
+			proxy.debugSetFuncBreakpoint(tasks, newBreakpointId(), bpt.getLocator().getFile(), bpt.getLocator().getFunction());
 		} catch (IOException e1) {
 			return;
 		}
 		
-		waitForEvents(procs.toBitList());
+		waitForEvents(tasks);
 	}
 
-	private void deleteBreakpoint(BitList procs, int bpid)  throws PCDIException {
+	private void deleteBreakpoint(BitList tasks, int bpid)  throws PCDIException {
 		try {
-			proxy.debugDeleteBreakpoint(procs, bpid);
+			proxy.debugDeleteBreakpoint(tasks, bpid);
 		} catch (IOException e1) {
 			return;
 		}
 
-		waitForEvents(procs);
+		waitForEvents(tasks);
 	}
 	
 	private void deleteBreakpoint(ICDIBreakpoint bp)  throws PCDIException {
@@ -272,33 +259,33 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 	 * list stack frames for first process in procs
 	 * TODO: extend to support multiple processes
 	 */
-	public ICDIStackFrame[] listStackFrames(IPCDIDebugProcessSet procs) throws PCDIException {
-		this.currProcs = procs;
+	public ICDIStackFrame[] listStackFrames(BitList tasks) throws PCDIException {
+		this.curTasks = tasks;
 		
 		try {
-			proxy.debugListStackframes(procs.toBitList(), 0);
+			proxy.debugListStackframes(tasks, 0);
 		} catch (IOException e) {
 		}
 		
-		waitForEvents(procs.toBitList());
+		waitForEvents(tasks);
 		
 		return this.lastFrames;
 	}
 	
-	public void setCurrentStackFrame(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException {
+	public void setCurrentStackFrame(BitList tasks, ICDIStackFrame frame) throws PCDIException {
 		try {
-			proxy.debugSetCurrentStackframe(procs.toBitList(), frame.getLevel());
+			proxy.debugSetCurrentStackframe(tasks, frame.getLevel());
 		} catch (IOException e) {
 		}
 		
-		waitForEvents(procs.toBitList());
+		waitForEvents(tasks);
 	}
 	
 	/**
 	 * evaluate expression for first process in procs
 	 * TODO: extend to support multiple processes
 	 */
-	public String evaluateExpression(IPCDIDebugProcessSet procs, String expr) throws PCDIException {
+	public String evaluateExpression(BitList tasks, String expr) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "evaluateExpression");
 	}
 	
@@ -306,7 +293,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 	 * get variable type for first process in procs
 	 * TODO: extend to support multiple processes
 	 */
-	public String getVariableType(IPCDIDebugProcessSet procs, String varName) throws PCDIException {
+	public String getVariableType(BitList tasks, String varName) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "getVariableType");
 	}
 	
@@ -314,7 +301,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 	 * list local variables for first process in procs
 	 * TODO: extend to support multiple processes
 	 */
-	public ICDILocalVariable[] listLocalVariables(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException {
+	public ICDILocalVariable[] listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listLocalVariables");
 	}
 	
@@ -322,7 +309,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 	 * list global variables for first process in procs
 	 * TODO: extend to support multiple processes
 	 */
-	public ICDIGlobalVariable[] listGlobalVariables(IPCDIDebugProcessSet procs) throws PCDIException {
+	public ICDIGlobalVariable[] listGlobalVariables(BitList tasks) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listGlobalVariables");
 	}
 	
@@ -330,28 +317,28 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 	 * list arguments for first process in procs
 	 * TODO: extend to support multiple processes
 	 */
-	public ICDIArgument[] listArguments(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException {
+	public ICDIArgument[] listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listGlobalVariables");
 	}
 
-	public IPCDIEvent handleBreakpointHitEvent(BitList procs, String[] args) {
+	public IPCDIEvent handleBreakpointHitEvent(BitList tasks, String[] args) {
 		// Handled by direct call to super.fireEvent();
 		return null;
 	}
 
-	public IPCDIEvent handleEndSteppingEvent(BitList procs, String[] args) {
+	public IPCDIEvent handleEndSteppingEvent(BitList tasks, String[] args) {
 		// Auto-generated method stub
 		System.out.println("ParallelDebugger.handleEndSteppingEvent()");
 		return null;
 	}
 
-	public IPCDIEvent handleProcessResumedEvent(BitList procs, String[] args) {
+	public IPCDIEvent handleProcessResumedEvent(BitList tasks, String[] args) {
 		// Auto-generated method stub
 		System.out.println("ParallelDebugger.handleProcessResumedEvent()");
 		return null;
 	}
 
-	public IPCDIEvent handleProcessTerminatedEvent(BitList procs, String[] args) {
+	public IPCDIEvent handleProcessTerminatedEvent(BitList tasks, String[] args) {
 		// Auto-generated method stub
 		System.out.println("ParallelDebugger.handleProcessTerminatedEvent()");
 		return null;
@@ -372,7 +359,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 			 */
 			BreakpointMapping bp = findBreakpointInfo(((ProxyDebugBreakpointHitEvent)e).getBreakpointId());
 			if (bp != null) {
-				IPCDIEvent ev = new BreakpointHitEvent(getSession(), new DebugProcessSet(session, de.getBitSet()), bp.bpObject);
+				IPCDIEvent ev = new BreakpointHitEvent(getSession(), de.getBitSet(), bp.bpObject);
 				super.fireEvent(ev);
 			}
 			break;
@@ -380,7 +367,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 		case IProxyDebugEvent.EVENT_DBG_STEP:
 			ProxyDebugStepEvent stepEvent = (ProxyDebugStepEvent)e;
 			LineLocation loc = new LineLocation(stepEvent.getFrame().getFile(), stepEvent.getFrame().getLine());
-			IPCDIEvent ev = new EndSteppingRangeEvent(getSession(), new DebugProcessSet(session, de.getBitSet()), loc);
+			IPCDIEvent ev = new EndSteppingRangeEvent(getSession(), de.getBitSet(), loc);
 			super.fireEvent(ev);
 			break;	
 			
@@ -390,15 +377,15 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_FRAMES:
-			if (this.currProcs == null)
+			if (this.curTasks == null)
 				return;
 			
 			ProxyDebugStackframeEvent frameEvent = (ProxyDebugStackframeEvent)e;
 			ArrayList list = new ArrayList();
 			
-			IPCDIDebugProcess[] procList = this.currProcs.getProcesses();
-			for (int i = 0; i < procList.length; i++) {
-				int taskId = ((DebugProcess) procList[i]).getPProcess().getTaskId();
+			IPProcess[] processes = getProcesses(curTasks);
+			for (int i = 0; i < processes.length; i++) {
+				int taskId = processes[i].getTaskId();
 				ICDITarget target = getSession().getTarget(taskId);
 			    //SimThread simThread = ((SimProcess) ((DebugProcess) procList[i]).getPProcess()).getThread(0);
 				//ICDIThread thread = new Thread((Target) target, simThread.getThreadId());
@@ -419,7 +406,7 @@ public class ParallelDebugger extends AbstractDebugger implements IProxyEventLis
 			break;
 
 		case IProxyDebugEvent.EVENT_DBG_EXIT:
-			IPCDIExitedEvent ee = new InferiorExitedEvent(getSession(), new DebugProcessSet(session, de.getBitSet()));
+			IPCDIExitedEvent ee = new InferiorExitedEvent(getSession(), de.getBitSet());
 			super.fireEvent(ee);
 		}
 		

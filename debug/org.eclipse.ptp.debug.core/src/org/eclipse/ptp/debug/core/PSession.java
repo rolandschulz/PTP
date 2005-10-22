@@ -15,8 +15,8 @@ import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.IBreakpointsListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.ISourceLocator;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
@@ -24,19 +24,20 @@ import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupDirector;
 
 public class PSession implements IPSession, IBreakpointsListener {
 	private IPCDISession pCDISession;
+
 	private IPLaunch pLaunch;
-	
+
 	public PSession(IPCDISession session, IPLaunch launch) {
-		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener( this );
+		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
 
 		pCDISession = session;
 		pLaunch = launch;
-		
+
 		initializeBreakpoints();
-		
+
 		/* Initially we only create process/target 0 */
 		session.registerTarget(0, true);
-		session.resume("Root");
+		session.resume(session.createBitList());
 	}
 
 	public IPCDISession getPCDISession() {
@@ -45,8 +46,8 @@ public class PSession implements IPSession, IBreakpointsListener {
 
 	public void breakpointsAdded(IBreakpoint[] breakpoints) {
 		PTPDebugCorePlugin.getDefault().getLogger().finer("");
-		for ( int i = 0; i < breakpoints.length; ++i ) {
-			if ( breakpoints[i] instanceof IPBreakpoint ) {
+		for (int i = 0; i < breakpoints.length; ++i) {
+			if (breakpoints[i] instanceof IPBreakpoint) {
 				setBreakpoint((IPBreakpoint) breakpoints[i]);
 			}
 		}
@@ -59,95 +60,91 @@ public class PSession implements IPSession, IBreakpointsListener {
 	public void breakpointsChanged(IBreakpoint[] breakpoints, IMarkerDelta[] deltas) {
 		PTPDebugCorePlugin.getDefault().getLogger().finer("");
 	}
-	
+
 	private void initializeBreakpoints() {
 		IBreakpointManager manager = DebugPlugin.getDefault().getBreakpointManager();
-		IBreakpoint[] bps = manager.getBreakpoints( PCDIDebugModel.getPluginIdentifier() );
-		for( int i = 0; i < bps.length; i++ ) {
-			if ( bps[i] instanceof IPBreakpoint ) {
+		IBreakpoint[] bps = manager.getBreakpoints(PCDIDebugModel.getPluginIdentifier());
+		for (int i = 0; i < bps.length; i++) {
+			if (bps[i] instanceof IPBreakpoint) {
 				setBreakpoint((IPBreakpoint) bps[i]);
 			}
 		}
 	}
-	
-	private void setBreakpoint( IPBreakpoint breakpoint ) {
+
+	private void setBreakpoint(IPBreakpoint breakpoint) {
 		try {
-			if (!breakpoint.getJobId().equals(pLaunch.getPJob().getIDString()) &&
-				!breakpoint.getJobId().equals("Global")) {
+			if (!breakpoint.getJobId().equals(pLaunch.getPJob().getIDString()) && !breakpoint.getJobId().equals("Global")) {
 				return;
 			}
-			
-			if ( breakpoint instanceof IPLineBreakpoint )
-				setLineBreakpoint( (IPLineBreakpoint)breakpoint );
-			else if ( breakpoint instanceof IPFunctionBreakpoint )
-				setFunctionBreakpoint( (IPFunctionBreakpoint)breakpoint );
-/*			else if ( breakpoint instanceof IPAddressBreakpoint )
-				setAddressBreakpoint( (ICAddressBreakpoint)breakpoint );
-			else if ( breakpoint instanceof IPWatchpoint )
-				setWatchpoint( (ICWatchpoint)breakpoint );
-*/		}
-		catch( CoreException e ) {
-		}
-		catch( NumberFormatException e ) {
-		}
-		catch( CDIException e ) {
+
+			if (breakpoint instanceof IPLineBreakpoint)
+				setLineBreakpoint((IPLineBreakpoint) breakpoint);
+			else if (breakpoint instanceof IPFunctionBreakpoint)
+				setFunctionBreakpoint((IPFunctionBreakpoint) breakpoint);
+			/*
+			 * else if ( breakpoint instanceof IPAddressBreakpoint )
+			 * setAddressBreakpoint( (ICAddressBreakpoint)breakpoint ); else if (
+			 * breakpoint instanceof IPWatchpoint ) setWatchpoint(
+			 * (ICWatchpoint)breakpoint );
+			 */} catch (CoreException e) {
+		} catch (NumberFormatException e) {
+		} catch (CDIException e) {
 		}
 	}
 
-	private void setFunctionBreakpoint( IPFunctionBreakpoint breakpoint ) throws CDIException, CoreException {
+	private void setFunctionBreakpoint(IPFunctionBreakpoint breakpoint) throws CDIException, CoreException {
 		boolean enabled = breakpoint.isEnabled();
 		String handle = breakpoint.getSourceHandle();
-		IPath path = convertPath( handle );
-		
-		ICDIFunctionLocation location = pCDISession.createFunctionLocation( path.lastSegment(), breakpoint.getFunction() );
+		IPath path = convertPath(handle);
+
+		ICDIFunctionLocation location = pCDISession.createFunctionLocation(path.lastSegment(), breakpoint.getFunction());
 		ICDICondition condition = null;
-		
-		setLocationBreakpointOnSession( breakpoint, location, condition, enabled );
+
+		setLocationBreakpointOnSession(breakpoint, location, condition, enabled);
 	}
-	
-	private void setLineBreakpoint( IPLineBreakpoint breakpoint ) throws CDIException, CoreException {
+
+	private void setLineBreakpoint(IPLineBreakpoint breakpoint) throws CDIException, CoreException {
 		boolean enabled = breakpoint.isEnabled();
 		String handle = breakpoint.getSourceHandle();
-		IPath path = convertPath( handle );
-		
-		ICDILineLocation location = pCDISession.createLineLocation( path.lastSegment(), breakpoint.getLineNumber() );
+		IPath path = convertPath(handle);
+
+		ICDILineLocation location = pCDISession.createLineLocation(path.lastSegment(), breakpoint.getLineNumber());
 		ICDICondition condition = null;
-		
-		setLocationBreakpointOnSession( breakpoint, location, condition, enabled );
+
+		setLocationBreakpointOnSession(breakpoint, location, condition, enabled);
 	}
-	
-	private void setLocationBreakpointOnSession( final IPBreakpoint breakpoint, final ICDILocation location, final ICDICondition condition, final boolean enabled ) {
-		DebugPlugin.getDefault().asyncExec( new Runnable() {				
+
+	private void setLocationBreakpointOnSession(final IPBreakpoint breakpoint, final ICDILocation location, final ICDICondition condition, final boolean enabled) {
+		DebugPlugin.getDefault().asyncExec(new Runnable() {
 			public void run() {
 				try {
-					if ( breakpoint instanceof IPLineBreakpoint ) {
-						IPCDIDebugProcessSet set = pCDISession.getModelManager().getProcessSet(breakpoint.getCurSetId());
-						pCDISession.setLineBreakpoint(set, ICDIBreakpoint.REGULAR,
-								(ICDILineLocation)location, condition, true);
-					} else if ( breakpoint instanceof IPFunctionBreakpoint ) {
-						IPCDIDebugProcessSet set = pCDISession.getModelManager().getProcessSet(breakpoint.getCurSetId());
-						pCDISession.setFunctionBreakpoint(set, ICDIBreakpoint.REGULAR,
-								(ICDIFunctionLocation)location, condition, true);
-/*					} else if ( breakpoint instanceof ICAddressBreakpoint ) {
-						target.setAddressBreakpoint( ICDIBreakpoint.REGULAR,
-								(ICDIAddressLocation)location, condition, true );
-*/					}
-				} catch( CDIException e ) {
-				} catch( CoreException e ) {
-				} 
+					if (breakpoint instanceof IPLineBreakpoint) {
+						BitList tasks = pCDISession.getModelManager().getTasks(breakpoint.getCurSetId());
+						pCDISession.setLineBreakpoint(tasks, ICDIBreakpoint.REGULAR, (ICDILineLocation) location, condition, true);
+					} else if (breakpoint instanceof IPFunctionBreakpoint) {
+						BitList tasks = pCDISession.getModelManager().getTasks(breakpoint.getCurSetId());
+						pCDISession.setFunctionBreakpoint(tasks, ICDIBreakpoint.REGULAR, (ICDIFunctionLocation) location, condition, true);
+						/*
+						 * } else if ( breakpoint instanceof ICAddressBreakpoint ) {
+						 * target.setAddressBreakpoint( ICDIBreakpoint.REGULAR,
+						 * (ICDIAddressLocation)location, condition, true );
+						 */}
+				} catch (CDIException e) {
+				} catch (CoreException e) {
+				}
 			}
-		} );
+		});
 	}
 
-	private IPath convertPath( String sourceHandle ) {
+	private IPath convertPath(String sourceHandle) {
 		IPath path = null;
-		if ( Path.EMPTY.isValidPath( sourceHandle ) ) {
+		if (Path.EMPTY.isValidPath(sourceHandle)) {
 			ISourceLocator sl = pLaunch.getSourceLocator();
-			if ( sl instanceof CSourceLookupDirector ) {
-				path = ((CSourceLookupDirector)sl).getCompilationPath( sourceHandle );
+			if (sl instanceof CSourceLookupDirector) {
+				path = ((CSourceLookupDirector) sl).getCompilationPath(sourceHandle);
 			}
-			if ( path == null ) {
-				path = new Path( sourceHandle );
+			if (path == null) {
+				path = new Path(sourceHandle);
 			}
 		}
 		return path;

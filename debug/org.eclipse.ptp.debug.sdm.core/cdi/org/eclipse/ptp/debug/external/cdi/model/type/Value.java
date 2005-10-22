@@ -35,7 +35,6 @@ import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.Session;
-import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.PTPObject;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.variable.Variable;
@@ -67,8 +66,7 @@ public class Value extends PTPObject implements ICDIValue {
 		Target target = (Target) variable.getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
-		return debugger.evaluateExpression(newSet, variable.getName());
+		return debugger.evaluateExpression(session.createBitList(target.getTargetId()), variable.getName());
 	}
 
 	public int getChildrenNumber() throws CDIException {

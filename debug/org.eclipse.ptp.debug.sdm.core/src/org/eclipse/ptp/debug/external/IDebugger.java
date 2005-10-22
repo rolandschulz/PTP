@@ -29,14 +29,10 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.external.cdi.PCDIException;
 
-/**
- * @author donny
- *
- */
-public interface IDebugger extends IAbstractDebugger {
+public interface IDebugger {
 
 	/* Debugger Initialization/Termination */
 	
@@ -54,31 +50,31 @@ public interface IDebugger extends IAbstractDebugger {
 	 */
 	
 	/* Program Information */
-	public abstract ICDIStackFrame[] listStackFrames(IPCDIDebugProcessSet procs) throws PCDIException;
-	public abstract void setCurrentStackFrame(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException;
+	public ICDIStackFrame[] listStackFrames(BitList tasks) throws PCDIException;
+	public void setCurrentStackFrame(BitList tasks, ICDIStackFrame frame) throws PCDIException;
 	
 	/* Data Display and Manipulation */
-	public abstract String evaluateExpression(IPCDIDebugProcessSet procs, String expression) throws PCDIException;
-	public abstract String getVariableType(IPCDIDebugProcessSet procs, String varName) throws PCDIException;	
-	public abstract ICDIArgument[] listArguments(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException;
-	public abstract ICDILocalVariable[] listLocalVariables(IPCDIDebugProcessSet procs, ICDIStackFrame frame) throws PCDIException;
-	public abstract ICDIGlobalVariable[] listGlobalVariables(IPCDIDebugProcessSet procs) throws PCDIException;
+	public String evaluateExpression(BitList tasks, String expression) throws PCDIException;
+	public String getVariableType(BitList tasks, String varName) throws PCDIException;	
+	public ICDIArgument[] listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException;
+	public ICDILocalVariable[] listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException;
+	public ICDIGlobalVariable[] listGlobalVariables(BitList tasks) throws PCDIException;
 	
 	/* Execution Control */
-	public abstract void stepInto(IPCDIDebugProcessSet procs, int count) throws PCDIException;
-	public abstract void stepOver(IPCDIDebugProcessSet procs, int count) throws PCDIException;
-	public abstract void stepFinish(IPCDIDebugProcessSet procs, int count) throws PCDIException;
-	public abstract void go(IPCDIDebugProcessSet procs) throws PCDIException;
-	public abstract void halt(IPCDIDebugProcessSet procs) throws PCDIException;
-	public abstract void kill(IPCDIDebugProcessSet procs) throws PCDIException;
-	public abstract void run(String[] args) throws PCDIException;
-	public abstract void restart() throws PCDIException;
+	public void stepInto(BitList tasks, int count) throws PCDIException;
+	public void stepOver(BitList tasks, int count) throws PCDIException;
+	public void stepFinish(BitList tasks, int count) throws PCDIException;
+	public void go(BitList tasks) throws PCDIException;
+	public void halt(BitList tasks) throws PCDIException;
+	public void kill(BitList tasks) throws PCDIException;
+	public void run(String[] args) throws PCDIException;
+	public void restart() throws PCDIException;
 	
 	/* Breakpoints */
-	public abstract void setLineBreakpoint(IPCDIDebugProcessSet procs, ICDILineBreakpoint bpt) throws PCDIException;
-	public abstract void setFunctionBreakpoint(IPCDIDebugProcessSet procs, ICDIFunctionBreakpoint bpt) throws PCDIException;
-	public abstract void deleteBreakpoints(ICDIBreakpoint[] bp) throws PCDIException;
+	public void setLineBreakpoint(BitList tasks, ICDILineBreakpoint bpt) throws PCDIException;
+	public void setFunctionBreakpoint(BitList tasks, ICDIFunctionBreakpoint bpt) throws PCDIException;
+	public void deleteBreakpoints(ICDIBreakpoint[] bp) throws PCDIException;
 
 	/* Miscellaneous */
-	public abstract Process getDebuggerProcess();
+	public Process getDebuggerProcess();
 }

@@ -22,7 +22,6 @@ import java.math.BigInteger;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Properties;
-
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
@@ -54,13 +53,11 @@ import org.eclipse.ptp.debug.core.IPLaunch;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.cdi.IPCDIModelManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
-import org.eclipse.ptp.debug.external.IDebugger;
+import org.eclipse.ptp.debug.external.IAbstractDebugger;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.event.TargetUnregisteredEvent;
-import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
 public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointManagement {
@@ -69,177 +66,136 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 	ExpressionManager expressionManager;
 	VariableManager variableManager;
 	IPCDIModelManager modelManager;
-	
 	Properties props;
 	SessionConfiguration configuration;
-	
 	IPLaunch dLaunch;
 	IBinaryObject dBinObject;
-	IDebugger debugger;
+	IAbstractDebugger debugger;
 	IPJob dJob;
-	
 	Hashtable currentDebugTargetList;
-	
-	public Session(IDebugger iDebugger, IPLaunch launch, IBinaryObject binObj) {
+
+	public Session(IAbstractDebugger absDebugger, IPLaunch launch, IBinaryObject binObj) {
 		props = new Properties();
 		configuration = new SessionConfiguration(this);
-		
 		dLaunch = launch;
 		dBinObject = binObj;
-		debugger = iDebugger;
-		debugger.setSession(this);
+		this.debugger = absDebugger;
+		this.debugger.setSession(this);
 		dJob = launch.getPJob();
-		
 		eventManager = new EventManager(this);
 		breakpointManager = new BreakpointManager(this);
 		expressionManager = new ExpressionManager(this);
 		variableManager = new VariableManager(this);
 		modelManager = new ModelManager(this);
-		
 		/* Set the root process set */
 		BitList root = new BitList(dJob.size());
 		root.set(0, dJob.size());
 		modelManager.newProcessSet("Root", root);
-		
 		currentDebugTargetList = new Hashtable();
-		
-		debugger.addDebuggerObserver(eventManager);
-		
+		this.debugger.addDebuggerObserver(eventManager);
 		try {
-			Process debugger = getSessionProcess();
-			if (debugger != null) {
-				IProcess debuggerProcess = DebugPlugin.newProcess(dLaunch, debugger, "Debugger");
-				dLaunch.addProcess(debuggerProcess);
+			Process debuggerProc = getSessionProcess();
+			if (debuggerProc != null) {
+				IProcess iProcess = DebugPlugin.newProcess(dLaunch, debuggerProc, "Debugger");
+				dLaunch.addProcess(iProcess);
 			}
 		} catch (CDIException e) {
 		}
-		
 		try {
-			boolean stopInMain = dLaunch.getLaunchConfiguration().getAttribute( IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false );
+			boolean stopInMain = dLaunch.getLaunchConfiguration().getAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false);
 			if (stopInMain) {
-				ICDIFunctionLocation location = createFunctionLocation( "", "main" );
-				setInternalTemporaryBreakpoint(modelManager.getProcessSet("Root"), location);
+				ICDIFunctionLocation location = createFunctionLocation("", "main");
+				setInternalTemporaryBreakpoint(createBitList(), location);
 			}
 		} catch (CoreException e) {
-		}	
-
+		}
 	}
-	
 	public String getProjectName() {
 		return dLaunch.getProjectName();
 	}
-	
-	public IDebugger getDebugger() {
+	public IAbstractDebugger getDebugger() {
 		return debugger;
 	}
-	
 	public IPJob getJob() {
 		return dJob;
 	}
-	
 	public Process getProcess(int i) {
 		return debugger.getPseudoProcess(debugger.getProcess(i));
 	}
-
 	public void registerTarget(int procNum, boolean sendEvent) {
 		registerTarget(procNum, sendEvent, false);
 	}
-	
 	public void registerTarget(int procNum, boolean sendEvent, boolean resumeTarget) {
 		if (isRegistered(procNum))
 			return;
-		
 		Target target = new Target(this, debugger, procNum);
 		currentDebugTargetList.put(Integer.toString(target.getTargetId()), target);
-		
 		if (sendEvent) {
-			debugger.fireEvent(new TargetRegisteredEvent(this, new DebugProcessSet(this, procNum)));
-			dJob.findProcessByTaskId(procNum).
-				setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(true));
+			debugger.fireEvent(new TargetRegisteredEvent(this, createBitList(procNum)));
+			dJob.findProcessByTaskId(procNum).setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(true));
 		}
-		
 		try {
 			Process process = target.getProcess();
 			IProcess iprocess = null;
 			if (process != null) {
 				iprocess = DebugPlugin.newProcess(dLaunch, process, "Launch Label " + target.getTargetId());
 			}
-
 			PCDIDebugModel.newDebugTarget(dLaunch, null, target, "Process " + target.getTargetId(), iprocess, dBinObject, true, false, resumeTarget);
 		} catch (DebugException e) {
 			e.printStackTrace();
 		}
 	}
-	
 	public void registerTargets(int[] procNums, boolean sendEvent) {
-		DebugProcessSet procSet = new DebugProcessSet(this);
-		
+		BitList tasks = new BitList(getTotalProcesses());
 		for (int i = 0; i < procNums.length; i++) {
 			registerTarget(procNums[i], false);
-			procSet.addProcess(procNums[i]);
-			
+			tasks.set(procNums[i]);
 			if (sendEvent)
-				dJob.findProcessByTaskId(procNums[i]).
-					setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(true));
+				dJob.findProcessByTaskId(procNums[i]).setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(true));
 		}
-		
 		if (sendEvent) {
-			debugger.fireEvent(new TargetRegisteredEvent(this, procSet));
+			debugger.fireEvent(new TargetRegisteredEvent(this, tasks));
 		}
 	}
-
 	public void unregisterTarget(int procNum, boolean sendEvent) {
 		if (!isRegistered(procNum))
 			return;
-		
 		// Remove DebugTarget & IProcess;
 		PCDIDebugModel.removeDebugTarget(dLaunch, "Process " + procNum);
-		
 		String targetId = Integer.toString(procNum);
 		currentDebugTargetList.remove(targetId);
 		debugger.removePseudoProcess(debugger.getProcess(procNum));
-
 		if (sendEvent) {
-			debugger.fireEvent(new TargetUnregisteredEvent(this, new DebugProcessSet(this, procNum)));
-			dJob.findProcessByTaskId(procNum).
-				setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
+			debugger.fireEvent(new TargetUnregisteredEvent(this, createBitList(procNum)));
+			dJob.findProcessByTaskId(procNum).setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
 		}
 	}
-	
 	public void unregisterTargets(int[] procNums, boolean sendEvent) {
-		DebugProcessSet procSet = new DebugProcessSet(this);
-		
+		BitList tasks = new BitList(getTotalProcesses());
 		for (int i = 0; i < procNums.length; i++) {
 			unregisterTarget(procNums[i], false);
-			procSet.addProcess(procNums[i]);
-			
+			tasks.set(procNums[i]);
 			if (sendEvent)
-				dJob.findProcessByTaskId(procNums[i]).
-					setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
+				dJob.findProcessByTaskId(procNums[i]).setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
 		}
-		
 		if (sendEvent) {
-			debugger.fireEvent(new TargetRegisteredEvent(this, procSet));
+			debugger.fireEvent(new TargetRegisteredEvent(this, tasks));
 		}
 	}
-	
 	public int[] getRegisteredTargetIds() {
 		int size = currentDebugTargetList.size();
 		int[] targetIds = new int[size];
 		int index = 0;
-		
-	    Iterator it = currentDebugTargetList.keySet().iterator();
-	    while (it.hasNext()) {
-	       String targetId =  (String) it.next();
-	       targetIds[index++] = Integer.parseInt(targetId);
-	    }
-	    return targetIds;
+		Iterator it = currentDebugTargetList.keySet().iterator();
+		while (it.hasNext()) {
+			String targetId = (String) it.next();
+			targetIds[index++] = Integer.parseInt(targetId);
+		}
+		return targetIds;
 	}
-	
 	public boolean isRegistered(int i) {
 		return currentDebugTargetList.containsKey(Integer.toString(i));
 	}
-	
 	public IPCDITarget getTarget(int i) {
 		if (isRegistered(i))
 			return (IPCDITarget) currentDebugTargetList.get(Integer.toString(i));
@@ -247,222 +203,183 @@ public class Session implements IPCDISession, ICDISessionObject, ICDIBreakpointM
 			return null;
 		}
 	}
-	
 	public ICDITarget[] getTargets() {
 		int size = currentDebugTargetList.size();
 		IPCDITarget[] targets = new IPCDITarget[size];
 		int index = 0;
-		
-	    Iterator it = currentDebugTargetList.keySet().iterator();
-	    while (it.hasNext()) {
-	       String targetId =  (String) it.next();
-	       IPCDITarget target = (IPCDITarget) currentDebugTargetList.get(targetId);
-	       targets[index++] = target;
-	    }
-	    return targets;
+		Iterator it = currentDebugTargetList.keySet().iterator();
+		while (it.hasNext()) {
+			String targetId = (String) it.next();
+			IPCDITarget target = (IPCDITarget) currentDebugTargetList.get(targetId);
+			targets[index++] = target;
+		}
+		return targets;
 	}
-	
 	public void setAttribute(String key, String value) {
 		props.setProperty(key, value);
 	}
-
 	public String getAttribute(String key) {
 		return props.getProperty(key);
 	}
-
 	public VariableManager getVariableManager() {
 		return variableManager;
 	}
-	
 	public BreakpointManager getBreakpointManager() {
 		return breakpointManager;
 	}
-	
 	public ICDIEventManager getEventManager() {
 		return eventManager;
 	}
-
 	public IPCDIModelManager getModelManager() {
 		return modelManager;
 	}
-
 	public ExpressionManager getExpressionManager() {
 		return expressionManager;
 	}
-
 	public ICDISessionConfiguration getConfiguration() {
 		return configuration;
 	}
-
 	public void terminate() throws CDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		debugger.deleteDebuggerObserver(eventManager);
 	}
-
 	public Process getSessionProcess() throws CDIException {
 		return debugger.getDebuggerProcess();
 	}
-
 	public ICDISession getSession() {
 		return this;
 	}
-
 	/* Breakpoint Management */
-	
 	public ICDIWatchpoint setWatchpoint(int type, int watchType, String expression, ICDICondition condition) throws CDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
-
 	public ICDIExceptionpoint setExceptionBreakpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch) throws CDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
-
 	public ICDIBreakpoint[] getBreakpoints() throws CDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
-
 	public void deleteBreakpoints(ICDIBreakpoint[] breakpoints) throws CDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
-
 	public void deleteAllBreakpoints() throws CDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
-	
+	public BitList createBitList() {
+		BitList tasks = new BitList(getTotalProcesses());
+		tasks.set(0, getTotalProcesses());
+		return tasks;
+	}
+	public BitList createBitList(int index) {
+		BitList tasks = new BitList(getTotalProcesses());
+		tasks.set(index);
+		return tasks;
+	}
+	// TODO who will call this method
 	public ICDILineBreakpoint setLineBreakpoint(int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException {
-		IPCDIDebugProcessSet newSet = new DebugProcessSet(this, 0);
-		return setLineBreakpoint(newSet, type, location, condition, deferred);
+		return setLineBreakpoint(createBitList(), type, location, condition, deferred);
 	}
-
 	public ICDIFunctionBreakpoint setFunctionBreakpoint(int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException {
-		IPCDIDebugProcessSet newSet = new DebugProcessSet(this, 0);
-		return setFunctionBreakpoint(newSet, type, location, condition, deferred);
+		return setFunctionBreakpoint(createBitList(), type, location, condition, deferred);
 	}
-
 	public ICDIAddressBreakpoint setAddressBreakpoint(int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException {
-		IPCDIDebugProcessSet newSet = new DebugProcessSet(this, 0);
-		return setAddressBreakpoint(newSet, type, location, condition, deferred);
+		return setAddressBreakpoint(createBitList(), type, location, condition, deferred);
 	}
-
-	public ICDILineBreakpoint setLineBreakpoint(IPCDIDebugProcessSet bSet, int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException {
-		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
-		return bMgr.setLineBreakpoint(bSet, type, location, condition, deferred);
+	public ICDILineBreakpoint setLineBreakpoint(BitList tasks, int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException {
+		BreakpointManager bMgr = ((Session) getSession()).getBreakpointManager();
+		return bMgr.setLineBreakpoint(this, tasks, type, location, condition, deferred);
 	}
-
-	public ICDIFunctionBreakpoint setFunctionBreakpoint(IPCDIDebugProcessSet bSet, int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException {
-		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
-		return bMgr.setFunctionBreakpoint(bSet, type, location, condition, deferred);
+	public ICDIFunctionBreakpoint setFunctionBreakpoint(BitList tasks, int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException {
+		BreakpointManager bMgr = ((Session) getSession()).getBreakpointManager();
+		return bMgr.setFunctionBreakpoint(this, tasks, type, location, condition, deferred);
 	}
-
-	public ICDIAddressBreakpoint setAddressBreakpoint(IPCDIDebugProcessSet bSet, int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException {
-		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
-		return bMgr.setAddressBreakpoint(bSet, type, location, condition, deferred);
+	public ICDIAddressBreakpoint setAddressBreakpoint(BitList tasks, int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException {
+		BreakpointManager bMgr = ((Session) getSession()).getBreakpointManager();
+		return bMgr.setAddressBreakpoint(this, tasks, type, location, condition, deferred);
 	}
-	
-	public void setInternalTemporaryBreakpoint(IPCDIDebugProcessSet bSet,  ICDILocation location ) throws DebugException {
+	public void setInternalTemporaryBreakpoint(BitList tasks, ICDILocation location) throws DebugException {
 		try {
 			if (location instanceof ICDIFunctionLocation) {
-				setFunctionBreakpoint(bSet, ICDIBreakpoint.TEMPORARY, (ICDIFunctionLocation)location, null, false );
+				setFunctionBreakpoint(tasks, ICDIBreakpoint.TEMPORARY, (ICDIFunctionLocation) location, null, false);
 			} else if (location instanceof ICDILineLocation) {
-				setLineBreakpoint(bSet, ICDIBreakpoint.TEMPORARY, (ICDILineLocation)location, null, false );
+				setLineBreakpoint(tasks, ICDIBreakpoint.TEMPORARY, (ICDILineLocation) location, null, false);
 			} else if (location instanceof ICDIAddressLocation) {
-				setAddressBreakpoint(bSet, ICDIBreakpoint.TEMPORARY, (ICDIAddressLocation)location, null, false );
+				setAddressBreakpoint(tasks, ICDIBreakpoint.TEMPORARY, (ICDIAddressLocation) location, null, false);
 			}
-		}
-		catch( CDIException e ) {
+		} catch (CDIException e) {
 		}
 	}
-	
 	/* Location Management */
-	
 	public ICDILineLocation createLineLocation(String file, int line) {
-		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
+		BreakpointManager bMgr = ((Session) getSession()).getBreakpointManager();
 		return bMgr.createLineLocation(file, line);
 	}
-
 	public ICDIFunctionLocation createFunctionLocation(String file, String function) {
-		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
+		BreakpointManager bMgr = ((Session) getSession()).getBreakpointManager();
 		return bMgr.createFunctionLocation(file, function);
 	}
-
 	public ICDIAddressLocation createAddressLocation(BigInteger address) {
-		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
+		BreakpointManager bMgr = ((Session) getSession()).getBreakpointManager();
 		return bMgr.createAddressLocation(address);
 	}
-
 	/* Execution */
-	
-	public void stepOver(String setName) {
-		stepOver(setName, 1);
+	public void stepOver(BitList tasks) {
+		stepOver(tasks, 1);
 	}
-
-	public void stepOver(String setName, int count) {
+	public void stepOver(BitList tasks, int count) {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
 		try {
-			debugger.stepOver(set, count);
+			getDebugger().stepOverAction(tasks, count);
 		} catch (PCDIException e) {
 			e.printStackTrace();
 		}
 	}
-
-	public void stepInto(String setName) {
-		stepInto(setName, 1);
+	public void stepInto(BitList tasks) {
+		stepInto(tasks, 1);
 	}
-
-	public void stepInto(String setName, int count) {
+	public void stepInto(BitList tasks, int count) {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
 		try {
-			debugger.stepInto(set, count);
+			getDebugger().stepIntoAction(tasks, count);
 		} catch (PCDIException e) {
 			e.printStackTrace();
 		}
 	}
-
-	public void stepFinish(String setName) {
+	public void stepFinish(BitList tasks) {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
 		try {
-			debugger.stepFinish(set, 0);
+			getDebugger().stepFinishAction(tasks, 0);
 		} catch (PCDIException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public void resume(String setName) {
+	public void resume(BitList tasks) {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
 		try {
-			debugger.go(set);
+			getDebugger().goAction(tasks);
 		} catch (PCDIException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public void suspend(String setName) {
+	public void suspend(BitList tasks) {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
 		try {
-			debugger.halt(set);
+			getDebugger().haltAction(tasks);
 		} catch (PCDIException e) {
 			e.printStackTrace();
 		}
 	}
-
-	public void terminate(String setName) {
+	public void terminate(BitList tasks) {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		IPCDIDebugProcessSet set = getModelManager().getProcessSet(setName);
 		try {
-			debugger.kill(set);
+			getDebugger().killAction(tasks);
 		} catch (PCDIException e) {
 			e.printStackTrace();
 		}
 	}
-
 	public int getTotalProcesses() {
 		return dJob.size();
 	}

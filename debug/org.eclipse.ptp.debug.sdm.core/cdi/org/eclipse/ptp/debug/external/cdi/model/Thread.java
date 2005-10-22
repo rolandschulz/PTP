@@ -38,6 +38,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorage;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorageDescriptor;
+import org.eclipse.ptp.debug.external.IAbstractDebugger;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.Session;
@@ -94,9 +95,8 @@ public class Thread extends PTPObject implements ICDIThread {
 			
 			Target target = (Target) getTarget();
 			Session session = (Session) target.getSession();
-			IDebugger debugger = session.getDebugger();
-			DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
-			ICDIStackFrame[] frames = debugger.listStackFrames(newSet);
+			IAbstractDebugger debugger = session.getDebugger();
+			ICDIStackFrame[] frames = debugger.listStackFrames(session.createBitList(target.getTargetId()));
 			
 			for (int i = 0; i < frames.length; i++) {
 				currentFrames.add(frames[i]);
@@ -132,8 +132,7 @@ public class Thread extends PTPObject implements ICDIThread {
 			Target target = (Target) getTarget();
 			Session session = (Session) target.getSession();
 			IDebugger debugger = session.getDebugger();
-			DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
-			ICDIStackFrame[] frames = debugger.listStackFrames(newSet);
+			ICDIStackFrame[] frames = debugger.listStackFrames(session.createBitList(target.getTargetId()));
 			stackdepth = frames.length;
 		}
 		return stackdepth;
@@ -177,9 +176,7 @@ public class Thread extends PTPObject implements ICDIThread {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		Target target = (Target) getTarget();
 		Session session = (Session) target.getSession();
-		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
-		debugger.stepFinish(newSet, 0);
+		session.getDebugger().stepFinishAction(session.createBitList(target.getTargetId()), 0);
 	}
 
 	public void runUntil(ICDILocation location) throws CDIException {
@@ -211,9 +208,7 @@ public class Thread extends PTPObject implements ICDIThread {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		Target target = (Target) getTarget();
 		Session session = (Session) target.getSession();
-		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
-		debugger.stepOver(newSet, count);
+		session.getDebugger().stepOverAction(session.createBitList(target.getTargetId()), count);
 	}
 
 	public void stepOverInstruction(int count) throws CDIException {
@@ -224,9 +219,7 @@ public class Thread extends PTPObject implements ICDIThread {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		Target target = (Target) getTarget();
 		Session session = (Session) target.getSession();
-		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
-		debugger.stepInto(newSet, count);
+		session.getDebugger().stepIntoAction(session.createBitList(target.getTargetId()), count);
 	}
 
 	public void stepIntoInstruction(int count) throws CDIException {
@@ -241,9 +234,7 @@ public class Thread extends PTPObject implements ICDIThread {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		Target target = (Target) getTarget();
 		Session session = (Session) target.getSession();
-		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
-		debugger.go(newSet);
+		session.getDebugger().goAction(session.createBitList(target.getTargetId()));
 	}
 
 	public void resume(ICDILocation location) throws CDIException {

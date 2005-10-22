@@ -31,18 +31,14 @@ public class PTPDebugger implements IPTPDebugger {
 	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) {
 		try {
 			IPJob job = launch.getPJob();
-			
-			IDebugger debugger = new DebugSimulator();
+			IAbstractDebugger debugger = new DebugSimulator();
+			//IAbstractDebugger debugger = new ParallelDebugger();
 			debugger.initialize(job);
-			
 			Session session = new Session(debugger, launch, exe);
-			
 			return session;
-			
 		} catch (Exception e) {
 			e.printStackTrace();
-		}		 
-		
+		}
 		return null;
 	}
 }

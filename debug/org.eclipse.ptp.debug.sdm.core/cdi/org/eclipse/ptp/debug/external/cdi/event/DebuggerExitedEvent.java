@@ -29,22 +29,21 @@
 package org.eclipse.ptp.debug.external.cdi.event;
 
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 
 /**
  */
 public class DebuggerExitedEvent extends AbstractEvent implements IPCDIExitedEvent {
 
-	public DebuggerExitedEvent(IPCDISession s, IPCDIDebugProcessSet sources) {
-		super(s, sources);
+	public DebuggerExitedEvent(IPCDISession session, BitList tasks) {
+		super(session, tasks);
 	}
 	
 	public ICDISessionObject getReason() {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return null;
 	}
-
 }
