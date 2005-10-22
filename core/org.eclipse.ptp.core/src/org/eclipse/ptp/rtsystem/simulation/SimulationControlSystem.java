@@ -83,7 +83,7 @@ public class SimulationControlSystem implements IControlSystem {
 
 		processMap.put(s, new Integer(ss.spawned_num_procs));
 
-		ss.spawned_app_state = IPProcess.RUNNING;
+		ss.spawned_app_state = IPProcess.STARTING;
 		ss.spawned_app_exit_code = new String("");
 		ss.spawned_app_signal = new String("");
 		
