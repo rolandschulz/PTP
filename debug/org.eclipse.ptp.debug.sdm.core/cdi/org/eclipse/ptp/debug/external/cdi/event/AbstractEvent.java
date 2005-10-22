@@ -75,7 +75,7 @@ public abstract class AbstractEvent implements IPCDIEvent {
 				index++;
 			}
 		}
-		BitList regList = new BitList(index);
+		BitList regList = new BitList(session.getTotalProcesses());
 		for (int i=0; i<index; i++) {
 			regList.set(regTasks[i]);
 		}
