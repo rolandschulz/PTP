@@ -60,7 +60,7 @@ public class PProcess extends Parent implements IPProcess {
 		attribs.put(AttributeConstants.ATTRIB_TASKID, new Integer(taskId));
 		attribs.put(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
 		this.exitCode = exitCode;
-		setStatus(status);
+		this.status = status;
 		setOutputStore();
 		outputFile = new OutputTextFile(name, outputDirPath, storeLine);
 	}

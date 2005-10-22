@@ -84,7 +84,7 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		this.pid = pid;
 		attribs.put(AttributeConstants.ATTRIB_TASKID, new Integer(taskId));
 		this.exitCode = exitCode;
-		setStatus(status);
+		this.status = status;
 		setOutputStore();
 		outputFile = new OutputTextFile(name, outputDirPath, storeLine);
 		SimQueue cmds = null;

@@ -253,7 +253,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			if (controlSystem instanceof SimulationControlSystem)
 				proc = new SimProcess(job, ne[j], "" + j + "", "" + pid + "", j, "-1", "", "");
 			else
-				proc = new PProcess(job, ne[j], "" + j + "", "" + pid + "", j, "-1", "", "");
+				proc = new PProcess(job, ne[j], "" + j + "", "" + pid + "", j, IPProcess.STARTING, "", "");
 			
 			job.addChild(proc);
 
