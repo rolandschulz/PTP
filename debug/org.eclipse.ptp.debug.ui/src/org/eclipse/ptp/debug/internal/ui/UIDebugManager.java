@@ -427,22 +427,22 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			String workingDebugDir = (String)job.getAttribute("debugdir");
 			if (event instanceof TargetRegisteredEvent) {
 				IElementHandler elementHandler = getElementHandler(job.getIDString());
-				int[] processes = event.getAllProcesses().toIntArray();
+				int[] processes = event.getAllProcesses().toArray();
 				for (int j = 0; j < processes.length; j++) {
 					IPProcess proc = job.findProcessByTaskId(processes[i]);
 					elementHandler.addRegisterElement(proc.getIDString());
 					elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(true);
 				}
-				fireRegListener(REG_TYPE, event.getAllRegisteredProcesses().toBitList());
+				fireRegListener(REG_TYPE, event.getAllRegisteredProcesses());
 			} else if (event instanceof TargetUnregisteredEvent) {
 				IElementHandler elementHandler = getElementHandler(job.getIDString());
-				int[] processes = event.getAllProcesses().toIntArray();
+				int[] processes = event.getAllProcesses().toArray();
 				for (int j = 0; j < processes.length; j++) {
 					IPProcess proc = job.findProcessByTaskId(processes[i]);
 					elementHandler.removeRegisterElement(proc.getIDString());
 					elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(false);
 				}
-				fireRegListener(UNREG_TYPE, event.getAllUnregisteredProcesses().toBitList());
+				fireRegListener(UNREG_TYPE, event.getAllUnregisteredProcesses());
 			} else if (event instanceof BreakpointHitEvent) {
 				BreakpointHitEvent bptHitEvent = (BreakpointHitEvent) event;
 				ICDIBreakpoint bpt = ((BreakpointHitInfo) bptHitEvent.getReason()).getBreakpoint();
@@ -455,13 +455,13 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					// FIXME: Hardcode the filename
 					String fileName = workingDebugDir + "/" + locator.getFile();
 					try {
-						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses().toBitList(), false);
-						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses().toBitList(), true);
+						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses(), false);
+						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses(), true);
 					} catch (CoreException e) {
 						PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
 					}
 				}
-				fireSuspendEvent(job, event.getAllProcesses().toBitList());
+				fireSuspendEvent(job, event.getAllProcesses());
 			} else if (event instanceof EndSteppingRangeEvent) {
 				EndSteppingRangeEvent endStepEvent = (EndSteppingRangeEvent) event;
 				ICDILineLocation lineLocation = ((EndSteppingRangeInfo) endStepEvent.getReason()).getLineLocation();
@@ -472,33 +472,33 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					// FIXME: Hardcode the filename
 					String fileName = workingDebugDir + "/" + lineLocation.getFile();
 					try {
-						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses().toBitList(), false);
-						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses().toBitList(), true);
+						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses(), false);
+						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses(), true);
 					} catch (CoreException e) {
 						PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
 					}
 				}
 				// System.out.println("-------------------- end stepping ------------------------");
 				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
-				fireSuspendEvent(job, event.getAllProcesses().toBitList());
+				fireSuspendEvent(job, event.getAllProcesses());
 			} else if (event instanceof InferiorResumedEvent) {
 				try {
-					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses().toBitList());
+					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses());
 				} catch (CoreException e) {
 					PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
 				}
 				// System.out.println("-------------------- resume ------------------------");
 				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
-				fireResumeEvent(job, event.getAllProcesses().toBitList());
+				fireResumeEvent(job, event.getAllProcesses());
 			} else if (event instanceof InferiorExitedEvent || event instanceof ErrorEvent) {
 				try {
-					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses().toBitList());
+					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses());
 				} catch (CoreException e) {
 					PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
 				}
 				// System.out.println("-------------------- terminate ------------------------");
 				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
-				fireTerminatedEvent(job, event.getAllProcesses().toBitList());
+				fireTerminatedEvent(job, event.getAllProcesses());
 				if (job.isAllStop()) {
 					condition = new Boolean(true);
 					annotationMgr.removeAnnotationGroup(job.getIDString());
@@ -510,6 +510,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			firePaintListener(condition);
 		}
 	}
+	//internal function
 	private BitList addTasks(BitList curTasks, BitList newTasks) {
 		if (curTasks.size() < newTasks.size()) {
 			newTasks.or(curTasks);
@@ -548,6 +549,40 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * debug actions
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	
+	private BitList getSuspendedTasks(String job_id, String set_id) {
+		IElementHandler elementHandler = getElementHandler(job_id);
+		BitList currentTasks = getCurrentSetTasks(elementHandler, set_id);
+		removeTasks(currentTasks, (BitList) elementHandler.getData(TERMINATED_PROC_KEY));
+		currentTasks.and((BitList) elementHandler.getData(SUSPENDED_PROC_KEY));
+		return currentTasks;
+	}
+	private BitList getRunningTasks(String job_id, String set_id) {
+		IElementHandler elementHandler = getElementHandler(job_id);
+		BitList currentTasks = getCurrentSetTasks(elementHandler, set_id);
+		removeTasks(currentTasks, (BitList) elementHandler.getData(TERMINATED_PROC_KEY));
+		removeTasks(currentTasks, (BitList) elementHandler.getData(SUSPENDED_PROC_KEY));
+		return currentTasks;
+	}
+	private BitList getNotTerminatedTasks(String job_id, String set_id) {
+		IElementHandler elementHandler = getElementHandler(job_id);
+		BitList currentTasks = getCurrentSetTasks(elementHandler, set_id);
+		removeTasks(currentTasks, (BitList) elementHandler.getData(TERMINATED_PROC_KEY));
+		return currentTasks;
+	}
+	private BitList getCurrentSetTasks(IElementHandler elementHandler, String set_id) {
+		IElementSet set = elementHandler.getSet(set_id);
+		BitList currentTasks = null;
+		if (set.isRootSet()) {
+			currentTasks = new BitList(set.size());
+			currentTasks.set(0, set.size());
+		}
+		else {
+			currentTasks = ((BitList)set.getData(BITSET_KEY)).copy();
+		}
+		return currentTasks;
+	}
+	
 	public void resume() throws CoreException {
 		resume(getCurrentJobId(), getCurrentSetId());
 	}
@@ -555,7 +590,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		session.resume(set_id);
+		session.resume(getSuspendedTasks(job_id, set_id));
 	}
 	public void suspend() throws CoreException {
 		suspend(getCurrentJobId(), getCurrentSetId());
@@ -564,7 +599,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		session.suspend(set_id);
+		session.suspend(getRunningTasks(job_id, set_id));
 	}
 	public void terminate() throws CoreException {
 		terminate(getCurrentJobId(), getCurrentSetId());
@@ -575,7 +610,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			IPCDISession session = (IPCDISession) getDebugSession(job);
 			if (session == null)
 				throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-			session.terminate(set_id);
+			session.terminate(getNotTerminatedTasks(job_id, set_id));
 		} else {
 			super.terminateAll(job_id);
 		}
@@ -587,7 +622,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		session.stepInto(set_id);
+		session.stepInto(getSuspendedTasks(job_id, set_id));
 	}
 	public void stepOver() throws CoreException {
 		stepOver(getCurrentJobId(), getCurrentSetId());
@@ -596,7 +631,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		session.stepOver(set_id);
+		session.stepOver(getSuspendedTasks(job_id, set_id));
 	}
 	public void stepReturn() throws CoreException {
 		stepReturn(getCurrentJobId(), getCurrentSetId());
@@ -605,7 +640,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		session.stepFinish(set_id);
+		session.stepFinish(getSuspendedTasks(job_id, set_id));
 	}
 	public void removeJob(IPJob job) {
 		super.removeJob(job);

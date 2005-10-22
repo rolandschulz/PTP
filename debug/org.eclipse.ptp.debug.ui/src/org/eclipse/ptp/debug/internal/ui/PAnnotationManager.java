@@ -140,7 +140,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	protected IEditorPart getEditorPart(final IFile file) {
 		String fileExt = file.getFileExtension();
 		// FIXME hard the extension
-		if (!fileExt.equals("c") && !fileExt.equals("cpp"))
+		if (fileExt == null || (!fileExt.equals("c") && !fileExt.equals("cpp")))
 			return null;
 		final IEditorPart[] editor = new IEditorPart[] { null };
 		Display.getDefault().syncExec(new Runnable() {
