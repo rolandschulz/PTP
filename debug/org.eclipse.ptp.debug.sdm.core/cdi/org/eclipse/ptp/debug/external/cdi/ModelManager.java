@@ -38,14 +38,16 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSetNamed;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
+import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSetNamed;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
 /**
  */
 public class ModelManager extends Manager implements IPCDIModelManager {
-	
+
 	private Hashtable currentProcessSetList;
+
 	private Hashtable processListCache;
 
 	public ModelManager(Session session) {
@@ -55,13 +57,13 @@ public class ModelManager extends Manager implements IPCDIModelManager {
 	}
 
 	protected void update(Target target) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");	}
-	
+		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
+	}
 	public IPCDIDebugProcess getProcess(int proc) {
 		IPCDIDebugProcess p = (IPCDIDebugProcess) processListCache.get(new Integer(proc));
 		if (p == null) {
-			p = ((Session) getSession()).getDebugger().getProcess(proc);
-			processListCache.put(new Integer(proc), p);
+			p = new DebugProcess((IPCDISession)getSession(), ((Session) getSession()).getDebugger().getProcess(proc));
+			 processListCache.put(new Integer(proc), p);
 		}
 		return p;
 	}
@@ -82,26 +84,30 @@ public class ModelManager extends Manager implements IPCDIModelManager {
 		currentProcessSetList.put(newSet.getName(), newSet);
 		return newSet;
 	}
-	
+
 	public void delProcessSet(String name) {
 		currentProcessSetList.remove(name);
 	}
-	
+
 	public IPCDIDebugProcessSetNamed[] getProcessSets() {
 		int size = currentProcessSetList.size();
 		IPCDIDebugProcessSetNamed[] pSets = new IPCDIDebugProcessSetNamed[size];
 		int index = 0;
-		
-	    Iterator it = currentProcessSetList.keySet().iterator();
-	    while (it.hasNext()) {
-	       String procSetName =  (String) it.next();
-	       IPCDIDebugProcessSetNamed procSet = (IPCDIDebugProcessSetNamed) currentProcessSetList.get(procSetName);
-	       pSets[index++] = procSet;
-	    }
-	    return pSets;
+
+		Iterator it = currentProcessSetList.keySet().iterator();
+		while (it.hasNext()) {
+			String procSetName = (String) it.next();
+			IPCDIDebugProcessSetNamed procSet = (IPCDIDebugProcessSetNamed) currentProcessSetList.get(procSetName);
+			pSets[index++] = procSet;
+		}
+		return pSets;
 	}
-	
+
 	public IPCDIDebugProcessSetNamed getProcessSet(String name) {
 		return (IPCDIDebugProcessSetNamed) currentProcessSetList.get(name);
+	}
+
+	public BitList getTasks(String setName) {
+		return ((IPCDIDebugProcessSetNamed) currentProcessSetList.get(setName)).toBitList();
 	}
 }

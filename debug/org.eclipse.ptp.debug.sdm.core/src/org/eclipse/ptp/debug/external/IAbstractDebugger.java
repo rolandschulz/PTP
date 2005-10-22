@@ -23,30 +23,20 @@
 package org.eclipse.ptp.debug.external;
 
 import java.util.Observer;
-
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.external.cdi.PCDIException;
 
-/**
- * @author donny
- *
- */
-public interface IAbstractDebugger {
+public interface IAbstractDebugger extends IDebugger {
 
 	/* Debugger Initialization/Termination */
 	public void initialize(IPJob job);
 	public void exit() throws PCDIException;
 	
-	/* Events */
-	public final int IDBGEV_BPHIT = 0;
-	public final int IDBGEV_ENDSTEPPING = 1;
-	public final int IDBGEV_PROCESSRESUMED = 2;
-	public final int IDBGEV_PROCESSTERMINATED = 3;
-
 	public void addDebuggerObserver(Observer obs);
 	public void deleteDebuggerObserver(Observer obs);
 	public void fireEvents(IPCDIEvent[] events);
@@ -58,10 +48,17 @@ public interface IAbstractDebugger {
 	public IPCDISession getSession();
 	public void setSession(IPCDISession session);
 	public boolean isExiting();
-	public IPCDIDebugProcess getProcess(int number);
-	public IPCDIDebugProcess getProcess();
-	public IPCDIDebugProcess[] getProcesses();
-	public Process getPseudoProcess(IPCDIDebugProcess proc);
-	public void removePseudoProcess(IPCDIDebugProcess proc);
 
+	public Process getPseudoProcess(IPProcess proc);
+	public void removePseudoProcess(IPProcess proc);
+	public IPProcess getProcess(int number);
+	
+	public void goAction(BitList tasks) throws PCDIException;
+	public void stepIntoAction(BitList tasks, int count) throws PCDIException;
+	public void stepOverAction(BitList tasks, int count) throws PCDIException;
+	public void stepFinishAction(BitList tasks, int count) throws PCDIException;
+	public void haltAction(BitList tasks) throws PCDIException;
+	public void killAction(BitList tasks) throws PCDIException;
+	public void runAction(String[] args) throws PCDIException;
+	public void restartAction() throws PCDIException;
 }

@@ -34,69 +34,61 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
-import org.eclipse.ptp.debug.external.cdi.Session;
-import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 
 /**
  */
 public abstract class AbstractEvent implements IPCDIEvent {
 	IPCDISession session;	
-	IPCDIDebugProcessSet sources;
+	BitList tasks;
 	ICDIObject src; /* For compatibility with CDI/CDT */
 
-	public AbstractEvent(IPCDISession s, IPCDIDebugProcessSet srcs) {
-		session = s;
-		sources = srcs;
+	public AbstractEvent(IPCDISession session, BitList tasks) {
+		this.session = session;
+		this.tasks = tasks;
 	}
-	
 	public IPJob getDebugJob() {
 		return PTPDebugCorePlugin.getDefault().getDebugJob(session);
 	}
-
-	public IPCDIDebugProcessSet getAllProcesses() {
-		return sources;
+	public BitList getAllProcesses() {
+		return tasks;
 	}
-
-	public IPCDIDebugProcessSet getAllUnregisteredProcesses() {
-		IPCDIDebugProcessSet retVal = new DebugProcessSet((DebugProcessSet) sources);
-		
+	public BitList getAllUnregisteredProcesses() {
 		int[] registeredTargets = session.getRegisteredTargetIds();
-		BitList bitList = retVal.toBitList();
+		BitList unregList = tasks.copy();
 		
 		for (int i = 0; i < registeredTargets.length; i++) {
-			if (bitList.get(registeredTargets[i])) {
-				retVal.removeProcess(registeredTargets[i]);
+			if (tasks.get(registeredTargets[i])) {
+				unregList.clear(registeredTargets[i]);
 			}
 		}
-		
-		return retVal;
+		return unregList;
 	}
 
-	public IPCDIDebugProcessSet getAllRegisteredProcesses() {
-		IPCDIDebugProcessSet retVal = new DebugProcessSet((Session) session);
-		
+	public BitList getAllRegisteredProcesses() {
 		int[] registeredTargets = session.getRegisteredTargetIds();
-		BitList bitList = sources.toBitList();
-		
+		int[] regTasks = new int[registeredTargets.length];
+		int index = 0;
 		for (int i = 0; i < registeredTargets.length; i++) {
-			if (bitList.get(registeredTargets[i])) {
-				retVal.addProcess(registeredTargets[i]);
+			if (tasks.get(registeredTargets[i])) {
+				regTasks[index] = registeredTargets[i];
+				index++;
 			}
 		}
-		
-		return retVal;
+		BitList regList = new BitList(index);
+		for (int i=0; i<index; i++) {
+			regList.set(regTasks[i]);
+		}
+		return regList;
 	}
 	
 	public ICDIObject getSource() {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (src == null) {
 			int[] registeredTargets = session.getRegisteredTargetIds();
-			BitList bitList = sources.toBitList();
 			
 			for (int i = 0; i < registeredTargets.length; i++) {
-				if (bitList.get(registeredTargets[i])) {
+				if (tasks.get(registeredTargets[i])) {
 					src = session.getTarget(registeredTargets[i]);
 					break;
 				}
@@ -106,6 +98,6 @@ public abstract class AbstractEvent implements IPCDIEvent {
 	}
 	
 	public boolean isForProcess(int procNumber) {
-		return sources.toBitList().get(procNumber);
+		return tasks.get(procNumber);
 	}
 }

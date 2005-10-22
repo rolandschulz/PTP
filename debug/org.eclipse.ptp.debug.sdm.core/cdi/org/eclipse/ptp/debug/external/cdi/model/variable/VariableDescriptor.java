@@ -38,7 +38,6 @@ import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
-import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.PTPObject;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
@@ -100,8 +99,7 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 		Target target = (Target) getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
-		return debugger.getVariableType(newSet, getName());
+		return debugger.getVariableType(session.createBitList(target.getTargetId()), getName());
 	}
 	
 	public String getQualifiedName() throws CDIException {

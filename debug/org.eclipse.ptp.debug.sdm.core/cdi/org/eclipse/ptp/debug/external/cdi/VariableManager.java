@@ -39,7 +39,6 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariableDescriptor;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
-import org.eclipse.ptp.debug.external.cdi.model.DebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
@@ -89,8 +88,7 @@ public class VariableManager extends Manager {
 		Target target = (Target)frame.getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
-		ICDIArgument[] args = debugger.listArguments(newSet, frame);
+		ICDIArgument[] args = debugger.listArguments(session.createBitList(target.getTargetId()), frame);
 		if (args != null) {
 			for (int i = 0; i < args.length; i++) {
 				Thread thread = (Thread) ((VariableDescriptor) args[i]).getThread();
@@ -110,8 +108,7 @@ public class VariableManager extends Manager {
 		Target target = (Target)frame.getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
-		ICDILocalVariable[] args = debugger.listLocalVariables(newSet, frame);
+		ICDILocalVariable[] args = debugger.listLocalVariables(session.createBitList(target.getTargetId()), frame);
 		if (args != null) {
 			for (int i = 0; i < args.length; i++) {
 				Thread thread = (Thread) ((VariableDescriptor) args[i]).getThread();
@@ -143,8 +140,7 @@ public class VariableManager extends Manager {
 		Target target = (Target)frame.getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
-		ICDILocalVariable[] vars = debugger.listLocalVariables(newSet, frame);
+		ICDILocalVariable[] vars = debugger.listLocalVariables(session.createBitList(target.getTargetId()), frame);
 		for (int i = 0; i < vars.length; i++) {
 			if (varDesc.getName().equals(vars[i].getName()))
 				return new LocalVariable(varDesc);
@@ -158,8 +154,7 @@ public class VariableManager extends Manager {
 		Target target = (Target)frame.getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
-		ICDIGlobalVariable[] vars = debugger.listGlobalVariables(newSet);
+		ICDIGlobalVariable[] vars = debugger.listGlobalVariables(session.createBitList(target.getTargetId()));
 		for (int i = 0; i < vars.length; i++) {
 			if (varDesc.getName().equals(vars[i].getName()))
 				return new GlobalVariable(varDesc);
@@ -173,8 +168,7 @@ public class VariableManager extends Manager {
 		Target target = (Target)frame.getTarget();
 		Session session = (Session) target.getSession();
 		IDebugger debugger = session.getDebugger();
-		DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
-		ICDIArgument[] vars = debugger.listArguments(newSet, frame);
+		ICDIArgument[] vars = debugger.listArguments(session.createBitList(target.getTargetId()), frame);
 		for (int i = 0; i < vars.length; i++) {
 			if (argDesc.getName().equals(vars[i].getName()))
 				return new Argument(argDesc);

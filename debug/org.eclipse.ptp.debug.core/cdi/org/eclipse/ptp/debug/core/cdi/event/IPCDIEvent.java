@@ -19,7 +19,7 @@
 package org.eclipse.ptp.debug.core.cdi.event;
 
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
+import org.eclipse.ptp.core.util.BitList;
 
 /**
  * 
@@ -28,9 +28,9 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
  * @since Jul 18, 2002
  */
 public interface IPCDIEvent {
-	public IPCDIDebugProcessSet getAllProcesses();
-	public IPCDIDebugProcessSet getAllUnregisteredProcesses();
-	public IPCDIDebugProcessSet getAllRegisteredProcesses();
+	public BitList getAllProcesses();
+	public BitList getAllUnregisteredProcesses();
+	public BitList getAllRegisteredProcesses();
 	public IPJob getDebugJob();
 	public boolean isForProcess(int procNumber);
 }
