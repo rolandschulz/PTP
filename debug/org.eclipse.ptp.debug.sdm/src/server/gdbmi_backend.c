@@ -668,7 +668,7 @@ GDBMIGo(void)
 }
 
 /*
-** Execute count statements. If type == 0, do not enter
+** Execute count statements. If type == 1, do not enter
 ** function calls.
 */
 static int
@@ -680,7 +680,7 @@ GDBMIStep(int count, int type)
 
 	ResetError();
 
-	if ( type == 0 )
+	if ( type == 1 )
 		res = gmi_exec_next_cnt(MIHandle, count);
 	else
 		res = gmi_exec_step_cnt(MIHandle, count);
