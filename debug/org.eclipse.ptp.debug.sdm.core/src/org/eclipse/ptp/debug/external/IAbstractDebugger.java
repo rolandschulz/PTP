@@ -32,7 +32,9 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.external.cdi.PCDIException;
 
 public interface IAbstractDebugger extends IDebugger {
-
+	public final static String TERMINATED_PROC_KEY = "terminated";
+	public final static String SUSPENDED_PROC_KEY = "suspended";
+	
 	/* Debugger Initialization/Termination */
 	public void initialize(IPJob job);
 	public void exit() throws PCDIException;

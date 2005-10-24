@@ -25,6 +25,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.external.IAbstractDebugger;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.internal.ui.actions.RegisterAction;
 import org.eclipse.ptp.debug.internal.ui.actions.ResumeAction;
@@ -179,8 +180,8 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 			IElementHandler elementHandler = getCurrentElementHandler();
 			if (elementHandler != null) {
 				IElementSet set = getCurrentSet();
-				BitList suspendedTaskList = (BitList) elementHandler.getData(UIDebugManager.SUSPENDED_PROC_KEY);
-				BitList terminatedTaskList = (BitList) elementHandler.getData(UIDebugManager.TERMINATED_PROC_KEY);
+				BitList suspendedTaskList = (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY);
+				BitList terminatedTaskList = (BitList) job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY);
 				updateSuspendResumeButton(suspendedTaskList, set, terminatedTaskList);
 				updateTerminateButton(terminatedTaskList, set, suspendedTaskList);
 			}

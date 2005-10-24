@@ -219,7 +219,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	}
 
 	public void setFunctionBreakpoint(BitList tasks, ICDIFunctionBreakpoint bpt) throws PCDIException {
-		System.out.println("@@@@@@@@@@@@@@: " + tasks.cardinality());
 		try {
 			proxy.debugSetFuncBreakpoint(tasks, newBreakpointId(), bpt.getLocator().getFile(), bpt.getLocator().getFunction());
 		} catch (IOException e1) {
