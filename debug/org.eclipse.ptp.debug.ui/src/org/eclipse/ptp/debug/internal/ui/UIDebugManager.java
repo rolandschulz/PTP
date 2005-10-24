@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.internal.ui;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
@@ -50,9 +49,11 @@ import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
+import org.eclipse.ptp.debug.external.IAbstractDebugger;
 import org.eclipse.ptp.debug.external.cdi.BreakpointHitInfo;
 import org.eclipse.ptp.debug.external.cdi.EndSteppingRangeInfo;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
+import org.eclipse.ptp.debug.external.cdi.event.DebuggerExitedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
 import org.eclipse.ptp.debug.external.cdi.event.ErrorEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
@@ -79,8 +80,6 @@ import org.eclipse.ptp.ui.model.IElementSet;
  */
 public class UIDebugManager extends JobManager implements ISetListener, IBreakpointListener, ICDIEventListener, IPDebugListener {
 	public final static String BITSET_KEY = "bitset";
-	public final static String TERMINATED_PROC_KEY = "terminated";
-	public final static String SUSPENDED_PROC_KEY = "suspended";
 	private final static int REG_TYPE = 1;
 	private final static int UNREG_TYPE = 2;
 	private List regListeners = new ArrayList();
@@ -116,10 +115,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IElementHandler elementHandler = getElementHandler(new_job_id);
 		if (elementHandler != null) {
 			defaultRegister(elementHandler);
-			if ((BitList) elementHandler.getData(TERMINATED_PROC_KEY) == null)
-				elementHandler.setData(TERMINATED_PROC_KEY, new BitList(elementHandler.getSetRoot().size()));
-			if ((BitList) elementHandler.getData(SUSPENDED_PROC_KEY) == null)
-				elementHandler.setData(SUSPENDED_PROC_KEY, new BitList(elementHandler.getSetRoot().size()));
 		}
 		createEventListener(new_job_id);
 		return new_job_id;
@@ -499,48 +494,24 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				// System.out.println("-------------------- terminate ------------------------");
 				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
 				fireTerminatedEvent(job, event.getAllProcesses());
-				if (job.isAllStop()) {
-					condition = new Boolean(true);
-					annotationMgr.removeAnnotationGroup(job.getIDString());
-				}
 			} else if (event instanceof BreakpointHitEvent) {
 				// do nothing in breakpoint hit event
 				continue;
+			} else if (event instanceof DebuggerExitedEvent) {
+				condition = new Boolean(true);
+				annotationMgr.removeAnnotationGroup(job.getIDString());
 			}
 			firePaintListener(condition);
 		}
 	}
-	//internal function
-	private BitList addTasks(BitList curTasks, BitList newTasks) {
-		if (curTasks.size() < newTasks.size()) {
-			newTasks.or(curTasks);
-			return newTasks.copy();
-		}
-		curTasks.or(newTasks);
-		return curTasks;
-	}
-	private void removeTasks(BitList curTasks, BitList newTasks) {
-		curTasks.andNot(newTasks);
-	}
 	public void fireSuspendEvent(IPJob job, BitList tasks) {
-		IElementHandler elementHandler = getElementHandler(job.getIDString());
-		BitList suspendedTasks = (BitList) elementHandler.getData(SUSPENDED_PROC_KEY);
-		suspendedTasks = addTasks(suspendedTasks, tasks);
-		fireDebugEvent(new SuspendedDebugEvent(job.getIDString(), suspendedTasks, (BitList) elementHandler.getData(TERMINATED_PROC_KEY)));
+		fireDebugEvent(new SuspendedDebugEvent(job.getIDString(), (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY), (BitList) job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY)));
 	}
 	public void fireResumeEvent(IPJob job, BitList tasks) {
-		IElementHandler elementHandler = getElementHandler(job.getIDString());
-		BitList suspendedTasks = (BitList) elementHandler.getData(SUSPENDED_PROC_KEY);
-		removeTasks(suspendedTasks, tasks);
-		fireDebugEvent(new ResumedDebugEvent(job.getIDString(), suspendedTasks, (BitList) elementHandler.getData(TERMINATED_PROC_KEY)));
+		fireDebugEvent(new ResumedDebugEvent(job.getIDString(), (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY), (BitList) job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY)));
 	}
 	public void fireTerminatedEvent(IPJob job, BitList tasks) {
-		IElementHandler elementHandler = getElementHandler(job.getIDString());
-		BitList suspendedTasks = (BitList) elementHandler.getData(SUSPENDED_PROC_KEY);
-		removeTasks(suspendedTasks, tasks);
-		BitList terminatedTasks = (BitList) elementHandler.getData(TERMINATED_PROC_KEY);
-		terminatedTasks = addTasks(terminatedTasks, tasks);
-		fireDebugEvent(new TerminatedDebugEvent(job.getIDString(), terminatedTasks, suspendedTasks));
+		fireDebugEvent(new TerminatedDebugEvent(job.getIDString(), (BitList) job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY), (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY)));
 	}
 	// ONLY for detect the debug sesssion is created
 	public void update(IPCDISession session) {
@@ -549,29 +520,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * debug actions
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	
-	private BitList getSuspendedTasks(String job_id, String set_id) {
-		IElementHandler elementHandler = getElementHandler(job_id);
-		BitList currentTasks = getCurrentSetTasks(elementHandler, set_id);
-		removeTasks(currentTasks, (BitList) elementHandler.getData(TERMINATED_PROC_KEY));
-		currentTasks.and((BitList) elementHandler.getData(SUSPENDED_PROC_KEY));
-		return currentTasks;
-	}
-	private BitList getRunningTasks(String job_id, String set_id) {
-		IElementHandler elementHandler = getElementHandler(job_id);
-		BitList currentTasks = getCurrentSetTasks(elementHandler, set_id);
-		removeTasks(currentTasks, (BitList) elementHandler.getData(TERMINATED_PROC_KEY));
-		removeTasks(currentTasks, (BitList) elementHandler.getData(SUSPENDED_PROC_KEY));
-		return currentTasks;
-	}
-	private BitList getNotTerminatedTasks(String job_id, String set_id) {
-		IElementHandler elementHandler = getElementHandler(job_id);
-		BitList currentTasks = getCurrentSetTasks(elementHandler, set_id);
-		removeTasks(currentTasks, (BitList) elementHandler.getData(TERMINATED_PROC_KEY));
-		return currentTasks;
-	}
-	private BitList getCurrentSetTasks(IElementHandler elementHandler, String set_id) {
-		IElementSet set = elementHandler.getSet(set_id);
+	private BitList getCurrentSetTasks(String job_id, String set_id) {
+		IElementSet set = getElementHandler(job_id).getSet(set_id);
 		BitList currentTasks = null;
 		if (set.isRootSet()) {
 			currentTasks = new BitList(set.size());
@@ -590,7 +540,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		session.resume(getSuspendedTasks(job_id, set_id));
+		session.resume(getCurrentSetTasks(job_id, set_id));
 	}
 	public void suspend() throws CoreException {
 		suspend(getCurrentJobId(), getCurrentSetId());
@@ -599,7 +549,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		session.suspend(getRunningTasks(job_id, set_id));
+		session.suspend(getCurrentSetTasks(job_id, set_id));
 	}
 	public void terminate() throws CoreException {
 		terminate(getCurrentJobId(), getCurrentSetId());
@@ -610,7 +560,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			IPCDISession session = (IPCDISession) getDebugSession(job);
 			if (session == null)
 				throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-			session.terminate(getNotTerminatedTasks(job_id, set_id));
+			session.terminate(getCurrentSetTasks(job_id, set_id));
 		} else {
 			super.terminateAll(job_id);
 		}
@@ -622,7 +572,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		session.stepInto(getSuspendedTasks(job_id, set_id));
+		session.stepInto(getCurrentSetTasks(job_id, set_id));
 	}
 	public void stepOver() throws CoreException {
 		stepOver(getCurrentJobId(), getCurrentSetId());
@@ -631,7 +581,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		session.stepOver(getSuspendedTasks(job_id, set_id));
+		session.stepOver(getCurrentSetTasks(job_id, set_id));
 	}
 	public void stepReturn() throws CoreException {
 		stepReturn(getCurrentJobId(), getCurrentSetId());
@@ -640,7 +590,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPCDISession session = (IPCDISession) getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		session.stepFinish(getSuspendedTasks(job_id, set_id));
+		session.stepFinish(getCurrentSetTasks(job_id, set_id));
 	}
 	public void removeJob(IPJob job) {
 		super.removeJob(job);
