@@ -24,7 +24,10 @@ import java.io.IOException;
 import org.eclipse.ptp.core.util.BitList;
 
 public class ProxyDebugClient extends AbstractProxyDebugClient {
-
+	public static final int STEP_INTO = 0;
+	public static final int STEP_OVER = 1;
+	public static final int STEP_FINISH = 2;
+	
 	public ProxyDebugClient(String host, int port) {
 		super(host, port);
 	}
