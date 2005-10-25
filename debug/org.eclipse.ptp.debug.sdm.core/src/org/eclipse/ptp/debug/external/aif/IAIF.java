@@ -17,24 +17,8 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.debug.external.proxy.event;
+package org.eclipse.ptp.debug.external.aif;
 
-import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.external.aif.IAIF;
+public interface IAIF {
 
-public class ProxyDebugDataEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
-	private IAIF data;
-	
-	public ProxyDebugDataEvent(BitList set, IAIF data) {
-		super(EVENT_DBG_DATA, set);
-		this.data = data;
-	}
-	
-	public IAIF getData() {
-		return this.data;
-	}
-	
-	public String toString() {
-		return "EVENT_DBG_DATA " + this.getBitSet().toString() + " " + this.data.toString();
-	}
 }
