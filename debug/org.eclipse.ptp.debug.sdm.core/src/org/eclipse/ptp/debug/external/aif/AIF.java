@@ -17,24 +17,33 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.debug.external.proxy.event;
+package org.eclipse.ptp.debug.external.aif;
 
-import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.external.aif.IAIF;
+public class AIF {
+	private static final char FDS_INTEGER = 'i';
+	
+	private static final int FDS_INTEGER_SIGN_POS = 1;
+	private static final int FDS_INTEGER_LEN_POS = 2;
+	
+	public static IAIF toAIF(String format, String data) {
+		IAIF res = null;
+		
+		switch (format.charAt(0)) {
+		case FDS_INTEGER:
+			int len = Character.digit(format.charAt(FDS_INTEGER_LEN_POS), 10);
+			int intVal = 0;
+			byte[] intBytes = data.getBytes();
+			
+			if ( len > 4) {
+				// throw AIFLenException
+			}
+			
+			for (int i = 0 ; i < len ; i++ )
+				intVal = intVal * 0x100 + (intBytes[i] & 0xff);
 
-public class ProxyDebugDataEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
-	private IAIF data;
-	
-	public ProxyDebugDataEvent(BitList set, IAIF data) {
-		super(EVENT_DBG_DATA, set);
-		this.data = data;
-	}
-	
-	public IAIF getData() {
-		return this.data;
-	}
-	
-	public String toString() {
-		return "EVENT_DBG_DATA " + this.getBitSet().toString() + " " + this.data.toString();
+			res = new AIFInt(intVal);
+		}
+		
+		return res;
 	}
 }

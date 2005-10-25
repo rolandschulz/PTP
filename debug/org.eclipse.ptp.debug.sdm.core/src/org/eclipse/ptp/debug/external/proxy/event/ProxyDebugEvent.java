@@ -28,6 +28,8 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.external.aif.AIF;
+import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.Condition;
 import org.eclipse.ptp.debug.external.cdi.Location;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.AddressBreakpoint;
@@ -97,7 +99,8 @@ public class ProxyDebugEvent extends ProxyEvent {
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_DATA:
-			evt = new ProxyDebugDataEvent(set, args[2], args[3]);
+			IAIF data = AIF.toAIF(args[2], args[3]);
+			evt = new ProxyDebugDataEvent(set, data);
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_TYPE:
