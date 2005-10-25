@@ -244,7 +244,7 @@ AsyncStop(void *data)
 	List *		frames;
 	dbg_event *	e;
 	mi_stop *	stop = (	mi_stop *)data;
-	
+
 	switch ( stop->reason )
 	{
 	case sr_bkpt_hit:
@@ -313,7 +313,7 @@ AsyncCallback(mi_output *mio, void *data)
 
 	stop = mi_get_stopped(mio->c);
 
-	if ( !stop )
+	if ( stop == NULL )
 		return;
 
 	AsyncFunc = AsyncStop;
@@ -484,7 +484,7 @@ GDBMIProgress(void)
 	
 		break;
 	}
-	
+
 	ResetError();
 	while ( (res = mi_get_response(MIHandle)) <= 0 ) {
 		if ( res < 0 ) {
@@ -493,7 +493,7 @@ GDBMIProgress(void)
 			MIHandle = NULL;
 		}
 	}
-	
+
 	/*
 	 * Do any extra async functions. We can call gdbmi safely here
 	 */
@@ -668,22 +668,39 @@ GDBMIGo(void)
 }
 
 /*
-** Execute count statements. If type == 1, do not enter
-** function calls.
-*/
+ * Execute count statements. 
+ * 
+ * type	step kind
+ * 0		enter function calls
+ * 1		do not enter function calls
+ * 2		step out of function (count ignored)
+ */
 static int
 GDBMIStep(int count, int type)
 {
-	int		res;
+	int		res = -1;
 
 	CHECK_SESSION()
 
 	ResetError();
 
-	if ( type == 1 )
-		res = gmi_exec_next_cnt(MIHandle, count);
-	else
+	switch ( type ) {
+	case 0:
 		res = gmi_exec_step_cnt(MIHandle, count);
+		break;
+		
+	case 1:
+		res = gmi_exec_next_cnt(MIHandle, count);
+		break;
+		
+	case 2:
+		res = gmi_exec_finish(MIHandle);
+		break;
+		
+	default:
+		DbgSetError(DBGERR_DEBUGGER, "Unknown step type");
+		return DBGRES_ERR;
+	}
 
 	if ( !res )
 	{
@@ -703,11 +720,20 @@ GDBMITerminate(void)
 	CHECK_SESSION()
 
 	ResetError();
-	
-	if (!gmi_exec_kill(MIHandle))
+
+	if (!gmi_exec_interrupt(MIHandle))
 	{
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
+	}
+
+	/*
+	 * Must check async here due to broken MI implementation. AsyncCallback will
+	 * be called inside gmi_exec_interrupt().
+	 */
+	if (AsyncFunc != NULL) {
+		AsyncFunc(AsyncFuncData);
+		AsyncFunc = NULL;
 	}
 	
 	return DBGRES_OK;
