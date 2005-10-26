@@ -94,7 +94,7 @@ struct dbg_event {
 	char *		error_msg;
 	
 	/*
-	 * DBGEV_STEP
+	 * DBGEV_STEP, DBGEV_SIGNAL
 	 */
 	stackframe *	frame;
 };

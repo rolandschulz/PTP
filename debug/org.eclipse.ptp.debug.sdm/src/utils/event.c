@@ -25,6 +25,8 @@
 #include "proxy_event.h"
 #include "args.h"
 
+#define NULL_STR	"*"
+
 static int
 dbg_location_to_str(location *loc, char **result)
 {
@@ -67,6 +69,11 @@ static int
 dbg_stackframe_to_str(stackframe *sf, char **result)
 {
 	char *	loc;
+	
+	if (sf == NULL) {
+		asprintf(result, "%s", NULL_STR);
+		return 0;
+	}
 	
 	dbg_location_to_str(&sf->loc, &loc);
 	
@@ -112,6 +119,7 @@ DbgEventToStr(dbg_event *e, char **result)
 	int		res = 0;
 	char *	str;
 	char *	str2;
+	char *	str3;
 	char *	pstr;
 
 	if (e == NULL)
@@ -147,9 +155,11 @@ DbgEventToStr(dbg_event *e, char **result)
 	case DBGEV_SIGNAL:
 		proxy_cstring_to_str(e->sig_name, &str);
 		proxy_cstring_to_str(e->sig_meaning, &str2);
-		asprintf(result, "%d %s %s %s %d", e->event, pstr, str, str2, e->thread_id);
+		dbg_stackframe_to_str(e->frame, &str3);
+		asprintf(result, "%d %s %s %s %d %s", e->event, pstr, str, str2, e->thread_id, str3);
 		free(str);
 		free(str2);
+		free(str3);
 		break;
 
 	case DBGEV_EXIT:
@@ -240,6 +250,11 @@ dbg_str_to_stackframe(char **args, stackframe **frame)
 {
 	int			level;
 	stackframe *	sf;
+	
+	if (strcmp(args[0], NULL_STR) == 0) {
+		*frame = NULL;
+		return 0;
+	}
 	
 	if (proxy_str_to_int(args[0], &level) < 0) {
 		return -1;
@@ -370,7 +385,8 @@ DbgStrToEvent(char *str, dbg_event **ev)
 		e = NewDbgEvent(DBGEV_SIGNAL);
 		if (proxy_str_to_cstring(args[2], &e->sig_name) < 0 ||
 			proxy_str_to_cstring(args[3], &e->sig_meaning) < 0 ||
-			proxy_str_to_int(args[4], &e->thread_id) < 0)
+			proxy_str_to_int(args[4], &e->thread_id) < 0 ||
+			dbg_str_to_stackframe(&args[5], &e->frame) < 0)
 			goto error_out;
 		break;
 	
