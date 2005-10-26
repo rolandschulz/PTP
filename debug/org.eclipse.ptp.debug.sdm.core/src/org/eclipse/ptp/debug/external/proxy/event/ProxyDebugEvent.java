@@ -23,7 +23,7 @@ import java.math.BigInteger;
 
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDILocation;
+import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
@@ -31,9 +31,7 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.external.aif.AIF;
 import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.Condition;
-import org.eclipse.ptp.debug.external.cdi.Location;
-import org.eclipse.ptp.debug.external.cdi.breakpoints.AddressBreakpoint;
-import org.eclipse.ptp.debug.external.cdi.breakpoints.FunctionBreakpoint;
+import org.eclipse.ptp.debug.external.cdi.Locator;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.proxy.ProxyDebugStackframe;
@@ -65,20 +63,20 @@ public class ProxyDebugEvent extends ProxyEvent {
 			
 		case IProxyDebugEvent.EVENT_DBG_BPSET:
 			int setId = Integer.parseInt(args[2]);
-			ICDILineLocation loc = toLocation(args[8], args[9], args[10], args[11]);
+			ICDILineLocation loc = toLineLocation(args[8], args[11]);
 			ICDIBreakpoint bpt = toBreakpoint(args[4], args[5], args[6], args[7], loc);
 			evt = new ProxyDebugBreakpointSetEvent(set, setId, bpt);
 			break;
 
 		case IProxyDebugEvent.EVENT_DBG_SIGNAL:
 			int sigTid = Integer.parseInt(args[4]);
-			ProxyDebugStackframe sigFrame = null;
+			ICDILocator sigLoc = null;
 			
 			if (!(args[5].compareTo("*") == 0)) {
-				sigFrame = toFrame(args[5], args[6], args[7], args[9], args[8]);
+				sigLoc = toLocator(args[6], args[7], args[8], args[9]);
 			}
 
-			evt = new ProxyDebugSignalEvent(set, decodeString(args[2]), decodeString(args[3]), sigTid, sigFrame);
+			evt = new ProxyDebugSignalEvent(set, decodeString(args[2]), decodeString(args[3]), sigTid, sigLoc);
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_EXIT:
@@ -165,12 +163,25 @@ public class ProxyDebugEvent extends ProxyEvent {
 		return bpt;
 	}
 	
-	public static ICDILineLocation toLocation(String fileStr, String funcStr, String addrStr, String lineStr) {
+	public static ICDILineLocation toLineLocation(String fileStr, String lineStr) {
 		String file = decodeString(fileStr);
 		int line = Integer.parseInt(lineStr);
 		return new LineLocation(file, line);
 	}
 	
+	public static ICDILocator toLocator(String fileStr, String funcStr, String addrStr, String lineStr) {
+		String file = decodeString(fileStr);
+		String func = decodeString(funcStr);
+		int line = Integer.parseInt(lineStr);
+		String addr = decodeString(addrStr);
+		BigInteger addrVal = BigInteger.ZERO;
+		
+		if (addr.compareTo("") != 0)
+			addrVal = new BigInteger(addr);
+		
+		return new Locator(file, func, line, addrVal);
+	}
+
 	public static ProxyDebugStackframe toFrame(String level, String file, String func, String line, String addr)  {
 		int stepLevel = Integer.parseInt(level);
 		int stepLine = Integer.parseInt(line);

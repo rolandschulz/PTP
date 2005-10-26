@@ -28,8 +28,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
+import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
@@ -38,17 +38,18 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
  *
  */
 public class InferiorSignaledEvent extends AbstractEvent implements IPCDISuspendedEvent {
-	private ICDIStackFrame	frame;
+	private ICDILocator	loc;
 	
-	public InferiorSignaledEvent(IPCDISession session, BitList tasks, ICDIStackFrame frame) {
+	public InferiorSignaledEvent(IPCDISession session, BitList tasks, ICDILocator loc) {
 		super(session, tasks);
+		this.loc = loc;
 	}
 	
 	public ICDISessionObject getReason() {
 		return null;
 	}
 	
-	public ICDIStackFrame getFrame() {
-		return frame;
+	public ICDILocator getLocator() {
+		return this.loc;
 	}
 }

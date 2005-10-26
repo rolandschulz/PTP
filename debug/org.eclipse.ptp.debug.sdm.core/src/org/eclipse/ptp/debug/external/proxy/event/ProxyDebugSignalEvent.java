@@ -19,21 +19,21 @@
 
 package org.eclipse.ptp.debug.external.proxy.event;
 
+import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.external.proxy.ProxyDebugStackframe;
 
 public class ProxyDebugSignalEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
-	private String				signalName;
-	private String				signalMeaning;
-	private int					threadID;
-	private ProxyDebugStackframe	frame;
+	private String		signalName;
+	private String		signalMeaning;
+	private int			threadID;
+	private ICDILocator	locator;
 	
-	public ProxyDebugSignalEvent(BitList set, String name, String meaning, int tid, ProxyDebugStackframe frame) {
+	public ProxyDebugSignalEvent(BitList set, String name, String meaning, int tid, ICDILocator loc) {
 		super(EVENT_DBG_SIGNAL, set);
 		this.signalName = name;
 		this.signalMeaning = meaning;
 		this.threadID = tid;
-		this.frame = frame;
+		this.locator = loc;
 	}
 	
 	public String getSignalName() {
@@ -48,14 +48,14 @@ public class ProxyDebugSignalEvent extends AbstractProxyDebugEvent implements IP
 		return this.threadID;
 	}
 	
-	public ProxyDebugStackframe getFrame() {
-		return this.frame;
+	public ICDILocator getLocator() {
+		return this.locator;
 	}
 	
 	public String toString() {
 		String res = "EVENT_DBG_SIGNAL " + this.getBitSet().toString() + " " + this.signalName;
-		if (this.frame != null)
-			res += " " + frame.toString();
+		if (this.locator != null)
+			res += " " + locator.toString();
 		return res;
 	}
 }

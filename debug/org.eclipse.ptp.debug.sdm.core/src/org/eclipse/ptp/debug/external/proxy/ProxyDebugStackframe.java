@@ -19,51 +19,29 @@
 
 package org.eclipse.ptp.debug.external.proxy;
 
+import java.math.BigInteger;
+
+import org.eclipse.cdt.debug.core.cdi.ICDILocator;
+import org.eclipse.ptp.debug.external.cdi.Locator;
+
 public class ProxyDebugStackframe {
-	private int		level;
-	private String	file;
-	private String	func;
-	private int		line;
-	private String	addr;
+	private int			level;
+	private ICDILocator	loc;
 	
 	public ProxyDebugStackframe(int level, String file, String func, int line, String addr) {
 		this.level = level;
-		this.file = file;
-		this.func = func;
-		this.line = line;
-		this.addr = addr;
+		this.loc = new Locator(file, func, line, new BigInteger(addr));
 	}
 	
 	public int getLevel() {
 		return this.level;
 	}
-
-	public String getFile() {
-		return this.file;
-	}
 	
-	public String getFunc() {
-		return this.func;
-	}
-	
-	public int getLine() {
-		return this.line;
-	}
-	
-	public String getAddr() {
-		return this.addr;
+	public ICDILocator getLocator() {
+		return this.loc;
 	}
 	
 	public String toString() {
-		String res = getLevel() + " file=\"" + getFile() + "\"";
-		
-		if (getFunc().compareTo("") != 0)
-			res += " func=" + getFunc();
-		if (getLine() != 0)
-			res += " line=" + getLine();
-		if (getAddr().compareTo("") != 0)
-			res += " addr=" + getAddr();	
-		
-		return res;
+		return getLevel() + " " + loc.toString();	
 	}
 }
