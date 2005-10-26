@@ -72,7 +72,13 @@ public class ProxyDebugEvent extends ProxyEvent {
 
 		case IProxyDebugEvent.EVENT_DBG_SIGNAL:
 			int sigTid = Integer.parseInt(args[4]);
-			evt = new ProxyDebugSignalEvent(set, decodeString(args[2]), decodeString(args[3]), sigTid);
+			ProxyDebugStackframe sigFrame = null;
+			
+			if (!(args[5].compareTo("*") == 0)) {
+				sigFrame = toFrame(args[5], args[6], args[7], args[9], args[8]);
+			}
+
+			evt = new ProxyDebugSignalEvent(set, decodeString(args[2]), decodeString(args[3]), sigTid, sigFrame);
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_EXIT:
@@ -81,9 +87,7 @@ public class ProxyDebugEvent extends ProxyEvent {
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_STEP:
-			int stepLevel = Integer.parseInt(args[2]);
-			int stepLine = Integer.parseInt(args[6]);
-			ProxyDebugStackframe frame = new ProxyDebugStackframe(stepLevel, decodeString(args[3]), decodeString(args[4]), stepLine, decodeString(args[5]));
+			ProxyDebugStackframe frame = toFrame(args[2], args[3], args[4], args[6], args[5]);
 			evt = new ProxyDebugStepEvent(set, frame);
 			break;
 			
@@ -165,5 +169,11 @@ public class ProxyDebugEvent extends ProxyEvent {
 		String file = decodeString(fileStr);
 		int line = Integer.parseInt(lineStr);
 		return new LineLocation(file, line);
+	}
+	
+	public static ProxyDebugStackframe toFrame(String level, String file, String func, String line, String addr)  {
+		int stepLevel = Integer.parseInt(level);
+		int stepLine = Integer.parseInt(line);
+		return new ProxyDebugStackframe(stepLevel, decodeString(file), decodeString(func), stepLine, decodeString(addr));
 	}
 }

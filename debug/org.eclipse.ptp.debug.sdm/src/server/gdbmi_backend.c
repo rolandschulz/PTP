@@ -239,10 +239,29 @@ Reap(int sig)
 }
 
 static int
+get_current_frame(stackframe **frame)
+{
+	List *	frames;
+	
+	if (GetStackframes(1, &frames) != DBGRES_OK)
+		return -1;
+
+	if (EmptyList(frames)) {
+		DbgSetError(DBGERR_DEBUGGER, "Could not get current stack frame");
+		return -1;
+	} 
+	
+	SetList(frames);
+	*frame = (stackframe *)GetListElement(frames);
+	DestroyList(frames, NULL);
+	return 0;
+}
+
+static int
 AsyncStop(void *data)
 {
-	List *		frames;
 	dbg_event *	e;
+	stackframe *	frame;
 	mi_stop *	stop = (	mi_stop *)data;
 
 	switch ( stop->reason )
@@ -253,25 +272,32 @@ AsyncStop(void *data)
 		break;
 
 	case sr_end_stepping_range:
-		if (GetStackframes(1, &frames) != DBGRES_OK) {
-			ERROR_TO_EVENT(e);
-		} else if (EmptyList(frames)) {
-			DbgSetError(DBGERR_DEBUGGER, "Could not get current stack frame");
+		if (get_current_frame(&frame) < 0) {
 			ERROR_TO_EVENT(e);
 		} else {
-			SetList(frames);
 			e = NewDbgEvent(DBGEV_STEP);
-			e->frame = (stackframe *)GetListElement(frames);
-			DestroyList(frames, NULL);
+			e->frame = frame;
 		}
 		break;
 
 	case sr_exited_signalled:
-	case sr_signal_received:
 		e = NewDbgEvent(DBGEV_SIGNAL);
 		e->sig_name = strdup(stop->signal_name);
 		e->sig_meaning = strdup(stop->signal_meaning);
 		e->thread_id = stop->thread_id;
+		e->frame = NULL;
+		break;
+		
+	case sr_signal_received:
+		if (get_current_frame(&frame) < 0) {
+			ERROR_TO_EVENT(e);
+		} else {
+			e = NewDbgEvent(DBGEV_SIGNAL);
+			e->sig_name = strdup(stop->signal_name);
+			e->sig_meaning = strdup(stop->signal_meaning);
+			e->thread_id = stop->thread_id;
+			e->frame = frame;
+		}
 		break;
 
 	case sr_exited:

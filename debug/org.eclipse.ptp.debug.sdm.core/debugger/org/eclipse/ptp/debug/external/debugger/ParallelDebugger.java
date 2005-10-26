@@ -39,6 +39,7 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.aif.IAIF;
@@ -46,6 +47,7 @@ import org.eclipse.ptp.debug.external.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
+import org.eclipse.ptp.debug.external.cdi.event.InferiorSignaledEvent;
 import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
@@ -58,6 +60,7 @@ import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugBreakpointHitEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugBreakpointSetEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugDataEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugInitEvent;
+import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugSignalEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugStackframeEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugStepEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugTypeEvent;
@@ -437,30 +440,13 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_FRAMES:
-			if (this.currTasks == null)
-				return;
-			
 			ProxyDebugStackframeEvent frameEvent = (ProxyDebugStackframeEvent)e;
-			ArrayList frameList = new ArrayList();
+			this.lastFrames = null;
 			
-			IPProcess[] frameProcs = getProcesses(currTasks);
-			for (int i = 0; i < frameProcs.length; i++) {
-				int taskId = frameProcs[i].getTaskId();
-				ICDITarget target = getSession().getTarget(taskId);
-			    ICDIThread thread = new Thread((Target) target, 0);
-				for (int j = 0; j < frameEvent.getFrames().length; j++) {
-					ProxyDebugStackframe f = frameEvent.getFrames()[j];
-					int level = f.getLevel();
-					String file = f.getFile();
-					String func = f.getFunc();
-					int line = f.getLine();
-					String addr = f.getAddr();
-					System.out.println("frame " + level + " " + file + " " + func + " " + line + " " + addr);
-					StackFrame frame = new StackFrame((Thread) thread, level, file, func, line, addr);
-					frameList.add(frame);
-				}
+			IPProcess[] frameProcs = getProcesses(frameEvent.getBitSet());
+			if (frameProcs.length > 0) {
+				this.lastFrames = convertFrames(frameProcs[0], frameEvent.getFrames());
 			}
-			this.lastFrames = (ICDIStackFrame[]) frameList.toArray(new ICDIStackFrame[0]);
 			break;
 
 		case IProxyDebugEvent.EVENT_DBG_TYPE:
@@ -480,15 +466,15 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			ProxyDebugVarsEvent varsEvent = (ProxyDebugVarsEvent)e;
 			ArrayList varList = new ArrayList();
 			
-			IPProcess[] varProcs = getProcesses(this.currTasks);
-			for (int i = 0; i < varProcs.length; i++) {
+			IPProcess[] varProcs = getProcesses(varsEvent.getBitSet());
+			if(varProcs.length > 0) {
 				// ICDITarget target = procList[i].getTarget();
-				int taskId = varProcs[i].getTaskId();
+				int taskId = varProcs[0].getTaskId();
 				ICDITarget target = getSession().getTarget(taskId);
 				ICDIThread thread = new Thread((Target) target, 0);
 				String vars[] = varsEvent.getVariables();
 				for (int j = 0; j < vars.length; j++) {
-					LocalVariable var = new LocalVariable((Target) target, (Thread) thread, (StackFrame) this.currFrame, vars[i], vars[i], vars.length - j, this.currFrame.getLevel());
+					LocalVariable var = new LocalVariable((Target) target, (Thread) thread, (StackFrame) this.currFrame, vars[j], vars[j], vars.length - j, this.currFrame.getLevel());
 					varList.add(var);
 				}
 			}
@@ -499,12 +485,47 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		case IProxyDebugEvent.EVENT_DBG_EXIT:
 			IPCDIExitedEvent ee = new InferiorExitedEvent(getSession(), de.getBitSet());
 			super.fireEvent(ee);
+			break;
+			
+		case IProxyDebugEvent.EVENT_DBG_SIGNAL:
+			ProxyDebugSignalEvent sigEvent = (ProxyDebugSignalEvent)e;
+			IPProcess[] sigProcs = getProcesses(sigEvent.getBitSet());
+			if (sigProcs.length > 0) {
+				int taskId = sigProcs[0].getTaskId();
+				ICDITarget target = getSession().getTarget(taskId);
+			    ICDIThread thread = new Thread((Target) target, 0);
+				ICDIStackFrame sigFrame = convertFrame(thread, sigEvent.getFrame());
+				IPCDISuspendedEvent sigEv = new InferiorSignaledEvent(getSession(), de.getBitSet(), sigFrame);
+				super.fireEvent(sigEv);
+			}
+			break;
 		}
 		
 		this.events.addItem(e);
 		notify();
 	}
 	
+	private ICDIStackFrame convertFrame(ICDIThread thread, ProxyDebugStackframe frame) {
+		int level = frame.getLevel();
+		String file = frame.getFile();
+		String func = frame.getFunc();
+		int line = frame.getLine();
+		String addr = frame.getAddr();
+		System.out.println("frame " + level + " " + file + " " + func + " " + line + " " + addr);
+		return new StackFrame((Thread) thread, level, file, func, line, addr);
+	}
+	
+	private ICDIStackFrame[] convertFrames(IPProcess proc, ProxyDebugStackframe[] frames) {
+		ArrayList frameList = new ArrayList();
+		int taskId = proc.getTaskId();
+		ICDITarget target = getSession().getTarget(taskId);
+	    ICDIThread thread = new Thread((Target) target, 0);
+		for (int j = 0; j < frames.length; j++) {
+			frameList.add(convertFrame(thread, frames[j]));
+		}
+		return (ICDIStackFrame[]) frameList.toArray(new ICDIStackFrame[0]);
+	}
+
 	/*
 	 * Keep two data structures:
 	 * 
