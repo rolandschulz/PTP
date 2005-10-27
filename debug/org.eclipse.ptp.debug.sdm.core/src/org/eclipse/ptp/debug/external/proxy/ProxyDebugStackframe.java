@@ -19,9 +19,8 @@
 
 package org.eclipse.ptp.debug.external.proxy;
 
-import java.math.BigInteger;
-
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
+import org.eclipse.ptp.debug.external.ExtFormat;
 import org.eclipse.ptp.debug.external.cdi.Locator;
 
 public class ProxyDebugStackframe {
@@ -30,7 +29,7 @@ public class ProxyDebugStackframe {
 	
 	public ProxyDebugStackframe(int level, String file, String func, int line, String addr) {
 		this.level = level;
-		this.loc = new Locator(file, func, line, new BigInteger(addr));
+		this.loc = new Locator(file, func, line, ExtFormat.getBigInteger(addr));
 	}
 	
 	public int getLevel() {
