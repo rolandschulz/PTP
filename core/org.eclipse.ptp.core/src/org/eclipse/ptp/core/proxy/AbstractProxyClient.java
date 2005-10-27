@@ -30,7 +30,9 @@ import java.util.List;
 
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
+import org.eclipse.ptp.core.proxy.event.ProxyConnectedEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
+import org.eclipse.ptp.core.proxy.event.ProxyOKEvent;
 import org.eclipse.ptp.core.util.BitList;
 
 public abstract class AbstractProxyClient {
@@ -100,6 +102,7 @@ public abstract class AbstractProxyClient {
 					sessOut = new OutputStreamWriter(sessSock.getOutputStream());
 					sessIn = new InputStreamReader(sessSock.getInputStream());
 					connected = true;
+					fireEvent(new ProxyConnectedEvent());
 					startEventThread();
 				} catch (IOException e) {
 				}
