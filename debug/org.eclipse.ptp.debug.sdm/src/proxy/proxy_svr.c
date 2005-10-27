@@ -21,6 +21,8 @@
  * Miscellaneous proxy functions.
  */
  
+ #include <stdlib.h>
+ 
  #include "session.h"
  #include "proxy.h"
  #include "dbg.h"
