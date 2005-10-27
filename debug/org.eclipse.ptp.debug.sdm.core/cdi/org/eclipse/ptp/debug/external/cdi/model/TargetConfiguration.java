@@ -29,67 +29,51 @@
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
-import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 
 public class TargetConfiguration extends PTPObject implements ICDITargetConfiguration {
 	public TargetConfiguration(Target target) {
 		super(target);
 	}
-
 	public boolean supportsTerminate() {
 		return true;
 	}
-
 	public boolean supportsDisconnect() {
 		return false;
 	}
-
 	public boolean supportsSuspend() {
 		return true;
 	}
-
 	public boolean supportsResume() {
 		return true;
 	}
-
 	public boolean supportsRestart() {
 		return false;
 	}
-
 	public boolean supportsStepping() {
 		return true;
 	}
-
 	public boolean supportsInstructionStepping() {
 		return false;
 	}
-
 	public boolean supportsBreakpoints() {
 		return true;
 	}
-
 	public boolean supportsRegisters() {
 		return false;
 	}
-
 	public boolean supportsRegisterModification() {
 		return false;
 	}
-
 	public boolean supportsSharedLibrary() {
 		return false;
 	}
-
 	public boolean supportsMemoryRetrieval() {
 		return false;
 	}
-
 	public boolean supportsMemoryModification() {
 		return false;
 	}
-
 	public boolean supportsExpressionEvaluation() {
 		return true;
 	}
-
 }

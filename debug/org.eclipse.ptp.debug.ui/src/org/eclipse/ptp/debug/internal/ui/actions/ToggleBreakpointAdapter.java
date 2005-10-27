@@ -93,20 +93,20 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 							String sid = uiDebugManager.getCurrentSetId();
 							sid = (sid == null || sid.length() == 0)?IElementHandler.SET_ROOT_ID:sid;
 							String sourceHandle = getSourceHandle(input);
-							IPLineBreakpoint[] breakpoints = PCDIDebugModel.lineBreakpointsExists(sourceHandle, resource, lineNumber);
+							IPLineBreakpoint[] breakpoints = PCDIDebugModel.getDefault().lineBreakpointsExists(sourceHandle, resource, lineNumber);
 							if (jid.equals(IPBreakpoint.GLOBAL) && breakpoints.length > 0)//remove all breakpoints if found any breakpoints in none job selected mode
 								DebugPlugin.getDefault().getBreakpointManager().removeBreakpoints(breakpoints, true);
 							else if (breakpoints.length > 0) {//remove breakpoint if found any breakpoint in current job
-								IPLineBreakpoint breakpoint = PCDIDebugModel.lineBreakpointExists(breakpoints, jid);
+								IPLineBreakpoint breakpoint = PCDIDebugModel.getDefault().lineBreakpointExists(breakpoints, jid);
 								if (breakpoint != null) {
 									if (!breakpoint.isGlobal())//remove breakpoint when it is not in none job selected mode
 										DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);
 								}
 								else // create a new breakpoint
-									PCDIDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, jid, jobName);
+									PCDIDebugModel.getDefault().createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, jid, jobName);
 							}
 							else // no breakpoint found and create a new one
-								PCDIDebugModel.createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, jid, jobName);
+								PCDIDebugModel.getDefault().createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, jid, jobName);
 							return;
 						}
 					}

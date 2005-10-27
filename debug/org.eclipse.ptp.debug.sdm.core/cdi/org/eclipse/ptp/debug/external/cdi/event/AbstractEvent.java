@@ -29,69 +29,55 @@
 package org.eclipse.ptp.debug.external.cdi.event;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
+import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 
-/**
- */
 public abstract class AbstractEvent implements IPCDIEvent {
-	IPCDISession session;	
-	BitList tasks;
-	ICDIObject src; /* For compatibility with CDI/CDT */
+	IPCDISession session = null;
+	BitList tasks = null;
+	ICDIObject object = null;
 
-	public AbstractEvent(IPCDISession session, BitList tasks) {
+	public AbstractEvent(IPCDISession session, BitList tasks, ICDIObject object) {
 		this.session = session;
 		this.tasks = tasks;
+		this.object = object;
+	}
+	public AbstractEvent(IPCDISession session, BitList tasks) {
+		this(session, tasks, null);
 	}
 	public IPJob getDebugJob() {
-		return PTPDebugCorePlugin.getDefault().getDebugJob(session);
+		return session.getJob();
 	}
 	public BitList getAllProcesses() {
 		return tasks;
 	}
 	public BitList getAllUnregisteredProcesses() {
-		int[] registeredTargets = session.getRegisteredTargetIds();
-		BitList unregList = tasks.copy();
-		
-		for (int i = 0; i < registeredTargets.length; i++) {
-			if (tasks.get(registeredTargets[i])) {
-				unregList.clear(registeredTargets[i]);
-			}
-		}
-		return unregList;
+		BitList regTasks = session.getRegisteredTargets();
+		BitList orgTasks = tasks.copy();
+		orgTasks.andNot(regTasks);
+		return orgTasks;
 	}
 
 	public BitList getAllRegisteredProcesses() {
-		int[] registeredTargets = session.getRegisteredTargetIds();
-		BitList regList = new BitList(session.getTotalProcesses());
-		for (int i = 0; i < registeredTargets.length; i++) {
-			if (tasks.get(registeredTargets[i])) {
-				regList.set(registeredTargets[i]);
-			}
-		}
-		return regList;
-	}
-	
-	public ICDIObject getSource() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		if (src == null) {
-			int[] registeredTargets = session.getRegisteredTargetIds();
-			
-			for (int i = 0; i < registeredTargets.length; i++) {
-				if (tasks.get(registeredTargets[i])) {
-					src = session.getTarget(registeredTargets[i]);
-					break;
-				}
-			}
-		}
-		return src;
+		BitList regTasks = session.getRegisteredTargets();
+		BitList orgTasks = tasks.copy();
+		orgTasks.and(regTasks);
+		return orgTasks;
 	}
 	
 	public boolean isForProcess(int procNumber) {
 		return tasks.get(procNumber);
+	}
+	public ICDIObject getSource() {
+		if (object == null) {
+			int[] regTasks = getAllRegisteredProcesses().toArray();
+			if (regTasks.length > 0) {
+				object = session.getTarget(regTasks[0]);
+			}
+		}
+		return object;
 	}
 }

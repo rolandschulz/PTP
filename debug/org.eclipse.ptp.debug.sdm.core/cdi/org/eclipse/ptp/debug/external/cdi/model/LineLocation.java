@@ -33,9 +33,7 @@ import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.ptp.debug.external.cdi.Location;
 
 public class LineLocation extends Location implements ICDILineLocation {
-
 	public LineLocation(String file, int line) {
 		super(file, line);
 	}
-
 }

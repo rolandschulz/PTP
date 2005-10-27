@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.MessageFormat;
-
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IBinaryParser;
 import org.eclipse.cdt.core.ICExtensionReference;
@@ -48,11 +47,8 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
-import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.PLaunch;
-import org.eclipse.ptp.debug.core.PSession;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 
@@ -195,18 +191,15 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			
 			PLaunch pLaunch = (PLaunch) launch;
 			pLaunch.setPJob(job);
-			pLaunch.setProjectName(project.getElementName());
 			String[] commandLine = new String[] { "/bin/date" };
 			
 			try {
 				if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 					job.setAttribute("debugdir", exePath.removeLastSegments(1).toOSString());
 					IPDebugConfiguration debugConfig = getDebugConfig(configuration);
-					IPCDISession dSession = debugConfig.createDebugger().createDebuggerSession(pLaunch, exeFile, new SubProgressMonitor(monitor, 3));
-					IPSession pSession = (IPSession) new PSession(dSession, pLaunch);
-					pLaunch.setPSession(pSession);
-					/* Make the Debug Session accessible by others through the PTPDebugCorePlugin */
-					PTPDebugCorePlugin.getDefault().addDebugLaunch(pLaunch);
+					debugConfig.createDebugger().createDebuggerSession(pLaunch, exeFile, new SubProgressMonitor(monitor, 3));
+					//IPSession pSession = (IPSession) new PSession(dSession, pLaunch);
+					//pLaunch.setPSession(pSession);
 				} else if (mode.equals(ILaunchManager.RUN_MODE)) {
 					/*
 					 * FIXME We still haven't discussed about the whole run/debug stuff So, if it's the simulation control system.... it's ok.... if not... just run /bin/date

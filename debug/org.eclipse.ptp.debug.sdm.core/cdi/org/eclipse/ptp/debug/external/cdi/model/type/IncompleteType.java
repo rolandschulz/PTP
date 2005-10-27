@@ -30,16 +30,8 @@
 package org.eclipse.ptp.debug.external.cdi.model.type;
 
 import org.eclipse.ptp.debug.external.cdi.model.Target;
-
-/**
- */
 public class IncompleteType extends Type {
-
-	/**
-	 * @param name
-	 */
 	public IncompleteType(Target target, String name) {
 		super(target, name);
 	}
-
 }

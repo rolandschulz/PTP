@@ -31,16 +31,19 @@ package org.eclipse.ptp.debug.external.cdi.breakpoints;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
-import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
+import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
+import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.cdi.model.Condition;
+import org.eclipse.ptp.debug.external.cdi.model.PTPObject;
 
-public class Breakpoint implements ICDIBreakpoint {
+public abstract class Breakpoint extends PTPObject implements ICDIBreakpoint {
 	ICDICondition condition;
 	
 	int type;
 	boolean enable;
 
 	public Breakpoint(int kind, ICDICondition cond) {
+		super(null);
 		type = kind;
 		condition = cond;
 		enable = true;
@@ -48,33 +51,38 @@ public class Breakpoint implements ICDIBreakpoint {
 
 	public ICDICondition getCondition() throws CDIException {
 		if (condition == null) {
-			return null;
+			condition =  new Condition(0, new String(), null);
 		}
 		return condition;
 	}
-
 	public boolean isEnabled() throws CDIException {
 		return enable;
 	}
-
 	public boolean isHardware() {
 		return (type == ICDIBreakpoint.HARDWARE);
 	}
-
 	public boolean isTemporary() {
 		return (type == ICDIBreakpoint.TEMPORARY);
 	}
-
 	public void setCondition(ICDICondition newCondition) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
+		Session session = (Session)getTarget().getSession();
+		BreakpointManager mgr = session.getBreakpointManager();
+		mgr.setCondition(this, newCondition);
+		setCondition0(newCondition);
 	}
-
+	public void setCondition0(ICDICondition newCondition) {
+		condition = newCondition;
+	}
 	public void setEnabled(boolean on) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
+		Session session = (Session)getTarget().getSession();
+		BreakpointManager mgr = session.getBreakpointManager();
+		if (on == false && isEnabled() == true) { 
+			mgr.disableBreakpoint(this);
+		} else if (on == true && isEnabled() == false) {
+			mgr.enableBreakpoint(this);
+		}
 	}
-
-	public ICDITarget getTarget() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
+	public void setEnabled0(boolean on) {
+		enable = on;
 	}
 }

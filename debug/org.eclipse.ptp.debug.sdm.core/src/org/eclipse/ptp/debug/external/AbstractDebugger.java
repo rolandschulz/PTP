@@ -31,12 +31,13 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
-import org.eclipse.ptp.debug.external.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.DebuggerExitedEvent;
@@ -53,7 +54,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	protected IPCDISession session = null;
 	protected IPProcess[] procs;
 	protected boolean isExitingFlag = false; /* Checked by the eventThread */
-	private HashMap pseudoProcesses;
+	private HashMap pseudoProcesses = null;
 	private IPJob job = null;
 
 	public final void initialize(IPJob job) {
@@ -101,6 +102,9 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public final void deleteDebuggerObserver(Observer obs) {
 		this.deleteObserver(obs);
 	}
+	public final void deleteAllObservers() {
+		this.deleteObservers();
+	}
 	public final void fireEvents(IPCDIEvent[] events) {
 		if (events != null && events.length > 0) {
 			for (int i = 0; i < events.length; i++) {
@@ -135,7 +139,12 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			if (event instanceof IPCDIExitedEvent) {
 				if (isJobFinished()) {
 					eventQueue.addItem(new DebuggerExitedEvent(getSession(), new BitList(0)));
-					stopDebugger();
+					//debugger.deleteDebuggerObserver(eventManager);
+					exit();
+					//remove all observers when the job is finished
+					deleteAllObservers();
+					//remove session
+					PTPDebugCorePlugin.getDefault().removeDebugSession(job);
 				}
 			}
 		}
@@ -174,40 +183,35 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public void handleProcessTerminatedEvent(BitList procs) {
 		fireEvent(new InferiorExitedEvent(getSession(), procs));
 	}
-	public void goAction(BitList tasks) throws PCDIException {
+	public void resume(BitList tasks) throws PCDIException {
 		filterRunningTasks(tasks);
 		handleProcessResumedEvent(tasks);
 		go(tasks);
 	}
-	public void stepIntoAction(BitList tasks, int count) throws PCDIException {
+	public void stepInto(BitList tasks) throws PCDIException {
 		filterRunningTasks(tasks);
 		handleProcessResumedEvent(tasks);
-		stepInto(tasks, count);
+		stepInto(tasks, 1);
 	}
-	public void stepOverAction(BitList tasks, int count) throws PCDIException {
+	public void stepOver(BitList tasks) throws PCDIException {
 		filterRunningTasks(tasks);
 		handleProcessResumedEvent(tasks);
-		stepOver(tasks, count);
+		stepOver(tasks, 1);
 	}
-	public void stepFinishAction(BitList tasks, int count) throws PCDIException {
+	public void stepReturn(BitList tasks) throws PCDIException {
 		filterRunningTasks(tasks);
 		handleProcessResumedEvent(tasks);
-		stepFinish(tasks, count);
+		stepFinish(tasks, 0);
 	}
-	public void haltAction(BitList tasks) throws PCDIException {
+	public void suspend(BitList tasks) throws PCDIException {
 		filterSuspendTasks(tasks);
 		halt(tasks);
 	}
-	public void killAction(BitList tasks) throws PCDIException {
+	public void stop(BitList tasks) throws PCDIException {
 		filterTerminateTasks(tasks);
 		kill(tasks);
 	}
-	public void runAction(String[] args) throws PCDIException {
-		run(args);
-	}
-	public void restartAction() throws PCDIException {
-		restart();
-	}
+
 	public IPProcess getProcess(int number) {
 		return procs[number];
 	}
@@ -222,8 +226,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 
 	public abstract void stopDebugger();
 	public abstract void startDebugger(IPJob job);
-	
-	
+		
 	private BitList addTasks(BitList curTasks, BitList newTasks) {
 		if (curTasks.size() < newTasks.size()) {
 			newTasks.or(curTasks);

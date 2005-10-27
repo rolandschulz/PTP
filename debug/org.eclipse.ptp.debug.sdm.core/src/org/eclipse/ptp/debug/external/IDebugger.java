@@ -30,7 +30,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.external.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 public interface IDebugger {
 

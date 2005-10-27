@@ -18,13 +18,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model.variable;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariableDescriptor;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorage;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
 
-public class LocalVariableDescriptor extends VariableDescriptor implements ICDILocalVariableDescriptor {
-	public LocalVariableDescriptor(Target target, Thread thread, StackFrame frame, String n, String fn, int pos, int depth) {
-		super(target, thread, frame, n, fn, pos, depth);
+/**
+ * @author Clement chu
+ * 
+ */
+public class ThreadStorage extends Variable implements ICDIThreadStorage {
+	public ThreadStorage(VariableDescriptor obj) {
+		super(obj);
+	}
+	public ThreadStorage(Target target, Thread thread, StackFrame frame, String n, String q, int pos, int depth) {
+		super(target, thread, frame, n, q, pos, depth);
+	}
+	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth) {
+		return null;
 	}
 }

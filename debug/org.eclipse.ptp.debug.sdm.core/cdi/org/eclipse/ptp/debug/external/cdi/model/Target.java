@@ -29,7 +29,8 @@
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import java.math.BigInteger;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
@@ -58,10 +59,10 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
-import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
+import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
 import org.eclipse.ptp.debug.external.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
@@ -69,394 +70,467 @@ import org.eclipse.ptp.debug.external.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.cdi.model.variable.GlobalVariableDescriptor;
 
 public class Target extends SessionObject implements IPCDITarget {
-	
-	private TargetConfiguration fConfiguration;
-	private IAbstractDebugger fDebugger;
-	
+	ICDITargetConfiguration fConfiguration;
+	Thread[] noThreads = new Thread[0];
 	Thread[] currentThreads;
 	int currentThreadId;
+	String fEndian = null;
 	boolean suspended = true;
-	
-	int targetId; /* synonymous with the process number/id */
-	IPCDIDebugProcess debugProcess;
-	
-	public Target(Session session, IAbstractDebugger debugger, int tId) {
+
+	private int task_id = -1;
+
+	public Target(Session session, int task_id) {
 		super(session);
-		fDebugger = debugger;
-		targetId = tId;
-		debugProcess = session.getModelManager().getProcess(targetId);
-		
-		fConfiguration = new TargetConfiguration(this);
-		currentThreads = new Thread[0];
+		this.task_id = task_id;
+		currentThreads = noThreads;
 	}
-	
-	public IPCDIDebugProcess getDebugProcess() {
-		return debugProcess;
+	public IAbstractDebugger getDebugger() {
+		return ((Session)getSession()).getDebugger();
 	}
-	
-	public int getTargetId() {
-		return targetId;
+	public void setConfiguration(ICDITargetConfiguration configuration) {
+		fConfiguration = configuration;
 	}
-	
-	public Process getProcess() {
-		return ((Session) getSession()).getProcess(targetId);
-	}
-
-	public ICDITargetConfiguration getConfiguration() {
-		return fConfiguration;
-	}
-
-	public String evaluateExpressionToString(ICDIStackFrame frame, String expressionText) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		// Target target = (Target) frame.getTarget();
-		// Session session = (Session) target.getSession();
-		// IDebugger debugger = session.getDebugger();
-		// DebugProcessSet newSet = new DebugProcessSet(session, target.getTargetId());
-
-		return createExpression(expressionText).getValue(frame).getValueString();
-	}
-
-	public ICDIGlobalVariableDescriptor getGlobalVariableDescriptors(String filename, String function, String name) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		VariableManager varMgr = ((Session)getSession()).getVariableManager();
-		return varMgr.getGlobalVariableDescriptor(this, filename, function, name);
-	}
-	
-	public ICDIRegisterGroup[] getRegisterGroups() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
-	}
-
-	public boolean isTerminated() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return getDebugProcess().isTerminated();
-	}
-
-	public void terminate() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		fDebugger.killAction(((Session) getSession()).createBitList(getTargetId()));
-	}
-
-	public boolean isDisconnected() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return false;
-	}
-
-	public void disconnect() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		//fDebugger.detach(null);
-		fDebugger.killAction(((Session) getSession()).createBitList(getTargetId()));
-	}
-
-	public void restart() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		fDebugger.restartAction();
-	}
-
-	public void resume() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		resume(false);
-	}
-
-	public void stepOver() throws CDIException {
-		stepOver(1);
-	}
-
-	public void stepInto() throws CDIException {
-		stepInto(1);
-	}
-
-	public void stepOverInstruction() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public void stepIntoInstruction() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public void runUntil(ICDILocation location) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public void jump(ICDILocation location) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public void signal() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public void signal(ICDISignal signal) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public ICDIRuntimeOptions getRuntimeOptions() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
-	}
-
-	public ICDICondition createCondition(int ignoreCount, String expression) {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
-	}
-
-	public ICDICondition createCondition(int ignoreCount, String expression, String[] threadIds) {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
-	}
-	
-	public ICDIThread getThread(int threadId) throws CDIException {
-		if (currentThreads.length == 0)
-			getThreads();
-		
-		return currentThreads[threadId];
-	}
-	
-	/**
-	 * Called when stopping because of breakpoints etc ..
-	 */
-	public void updateState() {
-		// get the new Threads.
-		
-		for (int i = 0; i < currentThreads.length; i++) {
-			currentThreads[i].clearState();
-		}
-	}
-	
-	public ICDIThread[] getThreads() throws CDIException {
-		/* Currently the debug external interface doesn't support thread
-		 */
-		if (currentThreads.length == 0) {
-			currentThreads = new Thread[1];
-			currentThreads[0] = new Thread(this, 0);
-			currentThreadId = 0;
-		}
-		return currentThreads;
-	}
-	
-	public ICDIThread getCurrentThread() throws CDIException {
-		return currentThreads[currentThreadId];
-	}
-
-	public void stepOver(int count) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		fDebugger.stepOverAction(((Session) getSession()).createBitList(getTargetId()), count);
-	}
-
-	public void stepOverInstruction(int count) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public void stepInto(int count) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		fDebugger.stepIntoAction(((Session) getSession()).createBitList(getTargetId()), count);
-	}
-
-	public void stepIntoInstruction(int count) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public void stepUntil(ICDILocation location) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		fDebugger.stepFinishAction(((Session) getSession()).createBitList(getTargetId()), 0);
-	}
-
-	public void resume(boolean passSignal) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		fDebugger.goAction(((Session) getSession()).createBitList(getTargetId()));
-	}
-
-	public void resume(ICDILocation location) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public void resume(ICDISignal signal) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public void suspend() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		fDebugger.haltAction(null);
-	}
-
-	public boolean isSuspended() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return getDebugProcess().isSuspended();
-	}
-
-	public ICDISignal[] getSignals() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
-	}
-
 	public ICDITarget getTarget() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return this;
 	}
-	
-	public synchronized void setSuspended(boolean state) {
+	public void setCurrentThread(ICDIThread cthread) throws CDIException {
+		if (cthread instanceof Thread) {
+			setCurrentThread(cthread, true);
+		} else {
+			throw new CDIException("Target - Unknown_thread");
+		}
+	}
+	public void setCurrentThread(ICDIThread cthread, boolean doUpdate) throws CDIException {
+		if (cthread instanceof Thread) {
+			setCurrentThread((Thread)cthread, doUpdate);
+		} else {
+			throw new CDIException("Target - Unknown_thread");
+		}
+	}
+	public synchronized void setSupended(boolean state) {
 		suspended = state;
 		notifyAll();
 	}
+	public void setCurrentThread(Thread cthread, boolean doUpdate) throws CDIException {
+		int id = cthread.getId();
+		if (id == 0) {
+			return;
+		}
+		if (currentThreadId != id) {
+			currentThreadId = cthread.getStackFrameCount();
+			if (doUpdate) {
+				Session session = (Session)getSession();
+				VariableManager varMgr = session.getVariableManager();
+				if (varMgr.isAutoUpdate()) {
+					varMgr.update(this);
+				}
+			}
+		}
+		if (currentThreadId != id) {
+			throw new CDIException("Cannot switch to thread " + id);
+		}
+	}
+	public synchronized void updateState(int newThreadId) {
+		Thread[] oldThreads = currentThreads;
+		currentThreadId = newThreadId;
+		try {
+			currentThreads = getCThreads();
+		} catch (CDIException e) {
+			currentThreads = noThreads;
+		}
 
+		List cList = new ArrayList(currentThreads.length);
+		for (int i = 0; i < currentThreads.length; i++) {
+			boolean found = false;
+			for (int j = 0; j < oldThreads.length; j++) {
+				if (currentThreads[i].getId() == oldThreads[j].getId()) {
+					oldThreads[j].clearState();
+					currentThreads[i] = oldThreads[j];
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				cList.add(new Integer(currentThreads[i].getId()));
+			}
+		}
+		if (!cList.isEmpty()) {
+			//TODO - thread created event?
+		}
+		List dList = new ArrayList(oldThreads.length);
+		for (int i = 0; i < oldThreads.length; i++) {
+			boolean found = false;
+			for (int j = 0; j < currentThreads.length; j++) {
+				if (currentThreads[j].getId() == oldThreads[i].getId()) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				dList.add(new Integer(oldThreads[i].getId()));
+			}
+		}
+		if (!dList.isEmpty()) {
+			//TODO - thread created event?
+		}
+	}
+	private Thread[] getCThreads() throws CDIException {
+		Thread[] cthreads = noThreads;
+		//TODO - implement list threads
+		//Session session = (Sessoin)getSession();
+		//cthreads = debugger.listTheads(session.createBitList(getTargetID()));
+		cthreads = new Thread[]{new Thread(this, 0)};
+		if (currentThreadId == 0 && cthreads.length > 0) {
+			currentThreadId = cthreads[0].getId();
+		}
+		return cthreads;
+	}
+	public ICDIThread getCurrentThread() throws CDIException {
+		ICDIThread[] threads = getThreads();
+		for (int i = 0; i < threads.length; i++) {
+			Thread cthread = (Thread)threads[i];
+			if (cthread.getId() == currentThreadId) {
+				return cthread;
+			}
+		}
+		return null;
+	}
+	public synchronized ICDIThread[] getThreads() throws CDIException {
+		if (currentThreads.length == 0) {
+			currentThreads = getCThreads();
+		}
+		return currentThreads;
+	}
+	public ICDIThread getThread(int tid) throws CDIException {
+		Thread th = null;
+		if (currentThreads != null) {
+			for (int i = 0; i < currentThreads.length; i++) {
+				Thread cthread = currentThreads[i];
+				if (cthread.getId() == tid) {
+					th = cthread;
+					break;
+				}
+			}
+		}
+		return th;
+	}
+	public void restart() throws CDIException {
+		getDebugger().restart();
+	}
+	public void stepInto() throws CDIException {
+		stepInto(1);
+	}
+	public void stepInto(int count) throws CDIException {
+		getDebugger().stepInto(((Session)getSession()).createBitList(getTargetID()), count);
+	}
+	public void stepIntoInstruction() throws CDIException {
+		stepIntoInstruction(1);
+	}
+	public void stepIntoInstruction(int count) throws CDIException {
+		//TODO - implement step into instruction
+		//getDebugger().stepIntoInstrunction(count);
+		throw new CDIException("Not implement yet - Target: stepIntoInstruction");
+	}
+	public void stepOver() throws CDIException {
+		stepOver(1);
+	}
+	public void stepOver(int count) throws CDIException {
+		getDebugger().stepOver(((Session)getSession()).createBitList(getTargetID()), count);
+	}
+	public void stepOverInstruction() throws CDIException {
+		stepOverInstruction(1);
+	}
+	public void stepOverInstruction(int count) throws CDIException {
+		//TODO - implement step over instruction
+		//getDebugger().stepOverInstrunction(count);
+		throw new CDIException("Not implement yet - Target: stepOverInstruction");
+	}
+	public void stepReturn() throws CDIException {
+		((Thread)getCurrentThread()).getCurrentStackFrame().stepReturn();
+	}
+	public void runUntil(ICDILocation location) throws CDIException {
+		stepUntil(location);
+	}
+	public void stepUntil(ICDILocation location) throws CDIException {
+		String file = "";
+		String func = "";
+		String addr = "";
+		int line = -1;
+		if (location instanceof ICDILineLocation) {
+			ICDILineLocation lineLocation = (ICDILineLocation)location;
+			if (lineLocation.getFile() != null && lineLocation.getFile().length() > 0) {
+				file = lineLocation.getFile(); 
+				line = lineLocation.getLineNumber();
+			}
+		}
+		else if (location instanceof ICDIFunctionLocation) {
+			ICDIFunctionLocation funcLocation = (ICDIFunctionLocation)location;
+			if (funcLocation.getFunction() != null && funcLocation.getFunction().length() > 0) {
+				func = funcLocation.getFunction();
+			}
+			if (funcLocation.getFile() != null && funcLocation.getFile().length() > 0) {
+				file = funcLocation.getFile();
+			}
+		}
+		else if (location instanceof ICDIAddressLocation) {
+			ICDIAddressLocation addrLocation = (ICDIAddressLocation) location;
+			if (! addrLocation.getAddress().equals(BigInteger.ZERO)) {
+				addr = "*0x" + addrLocation.getAddress().toString(16);
+			}
+		}
+		//TODO - implement step until location
+		//getDebugger().stepUntil(file, func, addr, line);
+		throw new CDIException("Not implement yet - stepUntil(location)");
+	}
+	public void suspend() throws CDIException {
+		getDebugger().halt(((Session)getSession()).createBitList(getTargetID()));
+	}
+	public void disconnect() throws CDIException {
+		//Do nothing
+	}
+	public void resume() throws CDIException {
+		resume(false);
+	}
+	public void resume(ICDILocation location) throws CDIException {
+		jump(location);
+	}
+	public void resume(ICDISignal signal) throws CDIException {
+		signal(signal);
+	}
+	public void resume(boolean passSignal) throws CDIException {
+		String state = getPProcess().getStatus();
+		if (state.equals(IPProcess.RUNNING)) {
+			throw new CDIException("The process is already running");
+		}
+		else if (state.equals(IPProcess.STOPPED)) {
+			if (passSignal) {
+				signal();
+			} else {
+				continuation();
+			}
+		} else if (state.equals(IPProcess.EXITED)) {
+			restart();
+		} else {
+			restart();
+		}
+	}
+	public void continuation() throws CDIException {
+		getDebugger().go(((Session)getSession()).createBitList(getTargetID()));
+	}
+	public void jump(ICDILocation location) throws CDIException {
+		String file = "";
+		String func = "";
+		String addr = "";
+		int line = -1;
+		if (location instanceof ICDILineLocation) {
+			ICDILineLocation lineLocation = (ICDILineLocation)location;
+			if (lineLocation.getFile() != null && lineLocation.getFile().length() > 0) {
+				file = lineLocation.getFile(); 
+				line = lineLocation.getLineNumber();
+			}
+		}
+		else if (location instanceof ICDIFunctionLocation) {
+			ICDIFunctionLocation funcLocation = (ICDIFunctionLocation)location;
+			if (funcLocation.getFunction() != null && funcLocation.getFunction().length() > 0) {
+				func = funcLocation.getFunction();
+			}
+			if (funcLocation.getFile() != null && funcLocation.getFile().length() > 0) {
+				file = funcLocation.getFile();
+			}
+		}
+		else if (location instanceof ICDIAddressLocation) {
+			ICDIAddressLocation addrLocation = (ICDIAddressLocation) location;
+			if (! addrLocation.getAddress().equals(BigInteger.ZERO)) {
+				addr = "*0x" + addrLocation.getAddress().toString(16);
+			}
+		}
+		//TODO - implement jump location
+		//getDebugger().jump(file, func, addr, line);
+		throw new CDIException("Not implement yet - jump(location)");
+	}
+	public void signal() throws CDIException {
+		//TODO - implement signal
+		//getDebugger().singal();
+		throw new CDIException("Not implement yet - signal");
+	}
+	public void signal(ICDISignal signal) throws CDIException {
+		//TODO - implement signal(ICDISignal)
+		//getDebugger().singal(signal.getName());
+		throw new CDIException("Not implement yet - signal(ICDISignal)");
+	}
+	public String evaluateExpressionToString(ICDIStackFrame frame, String expressionText) throws CDIException {
+		Target target = (Target)frame.getTarget();
+		Thread currentThread = (Thread)target.getCurrentThread();
+		StackFrame currentFrame = currentThread.getCurrentStackFrame();
+		target.setCurrentThread(frame.getThread(), false);
+		((Thread)frame.getThread()).setCurrentStackFrame((StackFrame)frame, false);
+		try {
+			return getDebugger().evaluateExpression(((Session)getSession()).createBitList(getTargetID()), expressionText);
+		} finally {
+			target.setCurrentThread(currentThread, false);
+			currentThread.setCurrentStackFrame(currentFrame, false);
+		}
+	}
+	public void terminate() throws CDIException {
+		getDebugger().kill(((Session)getSession()).createBitList(getTargetID()));
+	}
+	public boolean isTerminated() {
+		return getPProcess().isTerminated();
+	}
+	public boolean isDisconnected() {
+		return isTerminated();
+	}
+	public boolean isSuspended() {
+		return getPProcess().getStatus().equals(IPProcess.STOPPED);
+	}
+	public boolean isRunning() {
+		return getPProcess().getStatus().equals(IPProcess.RUNNING);
+	}
+	public Process getProcess() {
+		return getDebugger().getPseudoProcess(getPProcess());
+	}
+	public ICDILineBreakpoint setLineBreakpoint(int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException {
+		Session session = (Session)getSession();
+		BreakpointManager bMgr = session.getBreakpointManager();
+		return bMgr.setLineBreakpoint(session.createBitList(getTargetID()), type, location, condition, deferred);
+	}
+	public ICDIFunctionBreakpoint setFunctionBreakpoint(int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException {		
+		Session session = (Session)getSession();
+		BreakpointManager bMgr = session.getBreakpointManager();
+		return bMgr.setFunctionBreakpoint(session.createBitList(getTargetID()), type, location, condition, deferred);
+	}
+	public ICDIAddressBreakpoint setAddressBreakpoint(int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException {
+		Session session = (Session)getSession();
+		BreakpointManager bMgr = session.getBreakpointManager();
+		return bMgr.setAddressBreakpoint(session.createBitList(getTargetID()), type, location, condition, deferred);
+	}
+	public ICDIWatchpoint setWatchpoint(int type, int watchType, String expression, ICDICondition condition) throws CDIException {
+		Session session = (Session)getSession();
+		BreakpointManager bMgr = session.getBreakpointManager();
+		return bMgr.setWatchpoint(session.createBitList(getTargetID()), type, watchType, expression, condition);
+	}
+	public ICDIExceptionpoint setExceptionBreakpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch) throws CDIException {
+		throw new CDIException("Not implemented yet setExceptionBreakpoint");
+	}
+	public ICDIBreakpoint[] getBreakpoints() throws CDIException {
+		throw new CDIException("Not implemented yet - Target: getBreakpoints");
+	}
+	public void deleteBreakpoints(ICDIBreakpoint[] breakpoints) throws CDIException {
+		throw new CDIException("Not implemented yet - Target: deleteBreakpoints");
+	}
+	public void deleteAllBreakpoints() throws CDIException {
+		throw new CDIException("Not implemented yet - Target: deleteAllBreakpoints");
+	}
+	public ICDICondition createCondition(int ignoreCount, String expression) {
+		return createCondition(ignoreCount, expression, null);
+	}
+	public ICDICondition createCondition(int ignoreCount, String expression, String[] tids) {
+		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
+		return bMgr.createCondition(ignoreCount, expression, tids);
+	}
+	public ICDILineLocation createLineLocation(String file, int line) {
+		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
+		return bMgr.createLineLocation(file, line);
+	}
+	public ICDIFunctionLocation createFunctionLocation(String file, String function) {
+		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
+		return bMgr.createFunctionLocation(file, function);
+	}
+	public ICDIAddressLocation createAddressLocation(BigInteger address) {
+		BreakpointManager bMgr = ((Session)getSession()).getBreakpointManager();
+		return bMgr.createAddressLocation(address);
+	}
+	public ICDIRuntimeOptions getRuntimeOptions() {
+		//TODO implement later
+		//return new RuntimeOptions(this);
+		return null;
+	}
 	public ICDIExpression createExpression(String code) throws CDIException {
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
 		return expMgr.createExpression(this, code);
 	}
-
 	public ICDIExpression[] getExpressions() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
 		return expMgr.getExpressions(this);
 	}
-
 	public void destroyExpressions(ICDIExpression[] expressions) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
 		expMgr.destroyExpressions(this, expressions);
-	}
-
+	}	
 	public void destroyAllExpressions() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
 		expMgr.destroyAllExpressions(this);
 	}
-
-	public void addSourcePaths(String[] srcPaths) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
+	public ICDISignal[] getSignals() throws CDIException {
+		throw new CDIException("Not implemented yet - Target: getSignals");
 	}
-
-	public String[] getSourcePaths() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
-	}
-
-	public ICDIInstruction[] getInstructions(BigInteger startAddress, BigInteger endAddress) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
-	}
-
-	public ICDIInstruction[] getInstructions(String filename, int linenum) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
-	}
-
-	public ICDIInstruction[] getInstructions(String filename, int linenum, int lines) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
-	}
-
-	public ICDIMixedInstruction[] getMixedInstructions(BigInteger startAddress, BigInteger endAddress) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
-	}
-
-	public ICDIMixedInstruction[] getMixedInstructions(String filename, int linenum) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
-	}
-
-	public ICDIMixedInstruction[] getMixedInstructions(String filename, int linenum, int lines) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
-	}
-
-	public ICDISharedLibrary[] getSharedLibraries() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
-	}
-
-	public ICDIMemoryBlock createMemoryBlock(String address, int units, int wordSize) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
-	}
-
-	public void removeBlocks(ICDIMemoryBlock[] memoryBlocks) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public void removeAllBlocks() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public ICDIMemoryBlock[] getMemoryBlocks() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
-	}
-
 	public void setSourcePaths(String[] srcPaths) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
+		//throw new CDIException("Not implemented yet - Target: setSourcePaths");
 	}
-
-	
-	
-	/* Unused methods, see org.eclipse.ptp.debug.external.cdi.Session */
-	
-	public ICDILineLocation createLineLocation(String file, int line) {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
+	public String[] getSourcePaths() throws CDIException {
+		throw new CDIException("Not implemented yet - Target: getSourcePaths");
 	}
-
-	public ICDIFunctionLocation createFunctionLocation(String file, String function) {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
+	public ICDIInstruction[] getInstructions(BigInteger startAddress, BigInteger endAddress) throws CDIException {
+		throw new CDIException("Not implemented yet - Target: getInstructions");
 	}
-
-	public ICDIAddressLocation createAddressLocation(BigInteger address) {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
+	public ICDIInstruction[] getInstructions(String filename, int linenum) throws CDIException {
+		throw new CDIException("Not implemented yet - Target: getInstructions");
 	}
-
-	public ICDILineBreakpoint setLineBreakpoint(int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
+	public ICDIInstruction[] getInstructions(String filename, int linenum, int lines) throws CDIException {
+		throw new CDIException("Not implemented yet - Target: getInstructions");
 	}
-
-	public ICDIFunctionBreakpoint setFunctionBreakpoint(int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
+	public ICDIMixedInstruction[] getMixedInstructions(BigInteger startAddress, BigInteger endAddress) throws CDIException {
+		throw new CDIException("Not implemented yet - Target: getMixedInstructions");
 	}
-
-	public ICDIAddressBreakpoint setAddressBreakpoint(int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
+	public ICDIMixedInstruction[] getMixedInstructions(String filename, int linenum) throws CDIException {
+		throw new CDIException("Not implemented yet - Target: getMixedInstructions");
 	}
-
-	public ICDIWatchpoint setWatchpoint(int type, int watchType, String expression, ICDICondition condition) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
+	public ICDIMixedInstruction[] getMixedInstructions(String filename, int linenum, int lines) throws CDIException {
+		throw new CDIException("Not implemented yet - Target: getMixedInstructions");
 	}
-
-	public ICDIExceptionpoint setExceptionBreakpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
+	public ICDIMemoryBlock createMemoryBlock(String address, int units, int wordSize) throws CDIException {
+		throw new CDIException("Not implemented yet - Target: createMemoryBlock");
 	}
-
-	public ICDIBreakpoint[] getBreakpoints() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
+	public void removeBlocks(ICDIMemoryBlock[] memoryBlocks) throws CDIException {
+		throw new CDIException("Not implemented yet - Target: removeBlocks");
 	}
-
-	public void deleteBreakpoints(ICDIBreakpoint[] breakpoints) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
+	public void removeAllBlocks() throws CDIException {
+		throw new CDIException("Not implemented yet - Target: removeAllBlocks");
 	}
-
-	public void deleteAllBreakpoints() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
+	public ICDIMemoryBlock[] getMemoryBlocks() throws CDIException {
+		throw new CDIException("Not implemented yet - Target: getMemoryBlocks");
 	}
-
+	public ICDISharedLibrary[] getSharedLibraries() throws CDIException {
+		throw new CDIException("Not implemented yet - Target: getSharedLibraries");
+	}
+	public ICDIGlobalVariableDescriptor getGlobalVariableDescriptors(String filename, String function, String name) throws CDIException {
+		VariableManager varMgr = ((Session)getSession()).getVariableManager();
+		return varMgr.getGlobalVariableDescriptor(this, filename, function, name);
+	}
+	public ICDIRegisterGroup[] getRegisterGroups() throws CDIException {
+		throw new CDIException("Not implemented yet - Target: getRegisterGroups");
+	}
+	public ICDITargetConfiguration getConfiguration() {
+		if (fConfiguration == null) {
+			fConfiguration = new TargetConfiguration(this);				
+		}		
+		return fConfiguration;
+	}
 	public ICDIGlobalVariable createGlobalVariable(ICDIGlobalVariableDescriptor varDesc) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (varDesc instanceof GlobalVariableDescriptor) {
 			VariableManager varMgr = ((Session)getSession()).getVariableManager();
 			return varMgr.createGlobalVariable((GlobalVariableDescriptor)varDesc);
 		}
 		return null;
 	}
-
 	public ICDIRegister createRegister(ICDIRegisterDescriptor varDesc) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
+		throw new CDIException("Not implemented yet - Target: createRegister");
 	}
-
+	
+	public IPProcess getPProcess() {
+		return getDebugger().getProcess(task_id);
+	}
+	public int getTargetID() {
+		return task_id;
+	}
 }

@@ -24,7 +24,9 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSet;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
-
+/**
+ * @deprecated
+ */
 public class DebugProcessSet extends SessionObject implements IPCDIDebugProcessSet {
 	static private int tempId = 0;
 	final private String PREFIX = "TempSet_";
@@ -70,7 +72,8 @@ public class DebugProcessSet extends SessionObject implements IPCDIDebugProcessS
 	}
 
 	public IPCDIDebugProcess getProcess(int number) {
-		return ((Session) getSession()).getModelManager().getProcess(number);
+		return null;
+		//return ((Session) getSession()).getModelManager().getProcess(number);
 	}
 
 	public int getSize() {

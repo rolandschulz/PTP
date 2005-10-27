@@ -35,9 +35,7 @@ import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
 import org.eclipse.ptp.debug.external.cdi.Location;
 
 public class AddressLocation extends Location implements ICDIAddressLocation {
-
 	public AddressLocation(BigInteger address) {
 		super(address);
 	}
-
 }

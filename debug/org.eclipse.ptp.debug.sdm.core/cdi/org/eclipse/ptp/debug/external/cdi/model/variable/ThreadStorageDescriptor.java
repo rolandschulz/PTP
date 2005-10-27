@@ -16,33 +16,19 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.cdi;
+package org.eclipse.ptp.debug.external.cdi.model.variable;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorageDescriptor;
+import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
+import org.eclipse.ptp.debug.external.cdi.model.Target;
+import org.eclipse.ptp.debug.external.cdi.model.Thread;
 
-public class PCDIException extends CDIException {
-	/**
-	 * All serializable objects should have a stable serialVersionUID
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	public static final int NOT_IMPLEMENTED = 100;
-	public static final int COMMAND_TIMEOUT = 101;
-	public static final int INVALID_PROCESS_SET = 102;
-
-	private int status;
-
-	public PCDIException(String desc) {
-		super(desc);
-		this.status = NOT_IMPLEMENTED;
-	}
-	
-	public PCDIException(int status, String desc) {
-		super(desc);
-		this.status = status;
-	}
-	
-	public int getStatus() {
-		return this.status;
+/**
+ * @author Clement chu
+ * 
+ */
+public class ThreadStorageDescriptor extends VariableDescriptor implements ICDIThreadStorageDescriptor {
+	public ThreadStorageDescriptor(Target target, Thread thread, StackFrame stack, String n, String fn, int pos, int depth) {
+		super(target, thread, stack, n, fn, pos, depth);
 	}
 }

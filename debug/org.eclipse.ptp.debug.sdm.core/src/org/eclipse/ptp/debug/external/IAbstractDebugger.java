@@ -25,13 +25,13 @@ package org.eclipse.ptp.debug.external;
 import java.util.Observer;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
+import org.eclipse.ptp.debug.core.cdi.ICommonActions;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.external.cdi.PCDIException;
 
-public interface IAbstractDebugger extends IDebugger {
+public interface IAbstractDebugger extends ICommonActions, IDebugger {
 	public final static String TERMINATED_PROC_KEY = "terminated";
 	public final static String SUSPENDED_PROC_KEY = "suspended";
 	
@@ -41,6 +41,7 @@ public interface IAbstractDebugger extends IDebugger {
 	
 	public void addDebuggerObserver(Observer obs);
 	public void deleteDebuggerObserver(Observer obs);
+	public void deleteAllObservers();
 	public void fireEvents(IPCDIEvent[] events);
 	public void fireEvent(IPCDIEvent event);
 	public void notifyObservers(Object arg);
@@ -53,14 +54,5 @@ public interface IAbstractDebugger extends IDebugger {
 
 	public Process getPseudoProcess(IPProcess proc);
 	public void removePseudoProcess(IPProcess proc);
-	public IPProcess getProcess(int number);
-	
-	public void goAction(BitList tasks) throws PCDIException;
-	public void stepIntoAction(BitList tasks, int count) throws PCDIException;
-	public void stepOverAction(BitList tasks, int count) throws PCDIException;
-	public void stepFinishAction(BitList tasks, int count) throws PCDIException;
-	public void haltAction(BitList tasks) throws PCDIException;
-	public void killAction(BitList tasks) throws PCDIException;
-	public void runAction(String[] args) throws PCDIException;
-	public void restartAction() throws PCDIException;
+	public IPProcess getProcess(int number);	
 }

@@ -26,7 +26,6 @@
  * Contributors:
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.external;
 
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;

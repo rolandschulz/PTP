@@ -33,129 +33,127 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIEventManager;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
 import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDICreatedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIDisconnectedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
-import org.eclipse.ptp.debug.external.cdi.event.AbstractEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
 
 /**
  */
 public class EventManager extends SessionObject implements ICDIEventManager, Observer {
-
 	List list = Collections.synchronizedList(new ArrayList(1));
+
+	public void update(Observable o, Object arg) {
+		IPCDIEvent event = (IPCDIEvent) arg;
+		List cdiList = new ArrayList(1);
+
+		cdiList.add(event);
+		if (event instanceof IPCDISuspendedEvent) {
+			processSuspendedEvent((IPCDISuspendedEvent)event);
+		}
+		else if (event instanceof IPCDIResumedEvent) {
+			
+		}
+		else if (event instanceof IPCDIExitedEvent) {
+			
+		}
+		else if (event instanceof IPCDIDisconnectedEvent) {
+			
+		}
+		else if (event instanceof IPCDICreatedEvent) {
+			
+		}
+		
+		// Fire the event;
+		ICDIEvent[] cdiEvents = (ICDIEvent[])cdiList.toArray(new ICDIEvent[0]);
+		fireEvents(cdiEvents);
+	}
 	
 	public EventManager(Session session) {
 		super(session);
 	}
-
-	/**
-	 * @see org.eclipse.cdt.debug.core.cdi.ICDIEventManager#addEventListener(ICDIEventListener)
-	 */
 	public void addEventListener(ICDIEventListener listener) {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (!list.contains(listener))
 			list.add(listener);
 	}
-
-	/**
-	 * @see org.eclipse.cdt.debug.core.cdi.ICDIEventManager#removeEventListener(ICDIEventListener)
-	 */
 	public void removeEventListener(ICDIEventListener listener) {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (list.contains(listener))
 			list.remove(listener);
 	}
-
 	public void removeEventListeners() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		list.clear();
 	}
-
-	/**
-	 * Send ICDIEvent to the listeners.
-	 */
 	public void fireEvents(ICDIEvent[] cdiEvents) {
 		if (cdiEvents != null && cdiEvents.length > 0) {
-			for (int i = 0; i < list.size(); i++) {
-				((ICDIEventListener)list.get(i)).handleDebugEvents(cdiEvents);
+			ICDIEventListener[] listeners = (ICDIEventListener[])list.toArray(new ICDIEventListener[0]);
+			for (int i = 0; i < listeners.length; i++) {
+				listeners[i].handleDebugEvents(cdiEvents);
 			}			
 		}
 	}
-
-	/**
-	 * Process the event from the back end debugger, do any state work on the CDI,
-	 * and fire the corresponding CDI event.
-	 */
-	public void update(Observable obs, Object ev) {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		IPCDIEvent event = (IPCDIEvent) ev;
-		
-		List cdiList = new ArrayList(1);
-		cdiList.add(event);
-
-		if (event instanceof ICDISuspendedEvent) {
-			processSuspendedEvent(event);
-		}
-		
-		// Fire the event;
-		ICDIEvent[] cdiEvents = (ICDIEvent[])cdiList.toArray(new ICDIEvent[cdiList.size()]);
-		fireEvents(cdiEvents);
-	}
-
-	/**
-	 * When suspended arrives, reset managers and target.
-	 * Alse the variable and the memory needs to be updated and events
-	 * fired for changes.
-	 */
-	boolean processSuspendedEvent(IPCDIEvent event) {
-		Session session = (Session) getSession();
-		
-		int[] procs = ((AbstractEvent) event).getAllRegisteredProcesses().toArray();
-		
-		for (int i = 0; i < procs.length; i++) {
-			Target currentTarget = (Target) session.getTarget(procs[i]);
-			currentTarget.setSuspended(true);
-
-			//int threadId = threadId = stopped.getThreadId();
-			//currentTarget.updateState(threadId);
-			currentTarget.updateState();
-			
-			try {
-				Thread cthread = (Thread) currentTarget.getCurrentThread();
-				if (cthread != null) {
-					cthread.getCurrentStackFrame();
-				} else {
-					return true;
-				}
-			} catch (CDIException e1) {
-				//e1.printStackTrace();
-				return true;
-			}
-		}
-
-		// Update the managers.
-		// For the Variable/Expression Managers call only the updateManager.
+	
+	boolean processSuspendedEvent(IPCDISuspendedEvent event) {
+		Session session = (Session)getSession();
 		VariableManager varMgr = session.getVariableManager();
 		ExpressionManager expMgr  = session.getExpressionManager();		
 		BreakpointManager bpMgr = session.getBreakpointManager();
-		try {
-			if (varMgr.isAutoUpdate()) {
-				varMgr.update(null);
+		SourceManager srcMgr = session.getSourceManager();
+		
+		int[] procs = event.getAllRegisteredProcesses().toArray();
+		for (int i = 0; i < procs.length; i++) {
+			Target currentTarget = (Target) session.getTarget(procs[i]);
+			currentTarget.setSupended(true);
+			/*
+			if (processSharedLibEvent(event)) {
+				return false;
 			}
-			if (expMgr.isAutoUpdate()) { 
-				expMgr.update(null);
+			if (processBreakpointHitEvent(event)) {
+				return false;
 			}
-			if (bpMgr.isAutoUpdate()) {
-				bpMgr.update(null);
+			*/
+			//TODO -- no thread id provided
+			//int threadId = threadId = event.getThreadId();
+			currentTarget.updateState(0);
+
+			try {
+				Thread cthread = (Thread)currentTarget.getCurrentThread();
+				if (cthread != null) {
+					cthread.getCurrentStackFrame();
+				}
+				else {
+					return true;
+				}
+			} catch (CDIException e1) {
+				e1.printStackTrace();
+				return true;
 			}
-		} catch (CDIException e) {
+			/*
+			try {
+				if (varMgr.isAutoUpdate()) {
+					varMgr.update(currentTarget);
+				}
+				if (expMgr.isAutoUpdate()) { 
+					expMgr.update(currentTarget);
+				}
+				if (bpMgr.isAutoUpdate()) {
+					bpMgr.update(currentTarget);
+				}
+				if (srcMgr.isAutoUpdate()) {
+					srcMgr.update(currentTarget);
+				}
+			} catch (CDIException e) {
+				e.printStackTrace();
+			}
+			*/
 		}
 		return true;
 	}

@@ -48,6 +48,7 @@ import org.eclipse.ptp.debug.core.IPDebugListener;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
 import org.eclipse.ptp.debug.external.cdi.BreakpointHitInfo;
@@ -79,17 +80,18 @@ import org.eclipse.ptp.ui.model.IElementSet;
  * 
  */
 public class UIDebugManager extends JobManager implements ISetListener, IBreakpointListener, ICDIEventListener, IPDebugListener {
-	public final static String BITSET_KEY = "bitset";
 	private final static int REG_TYPE = 1;
 	private final static int UNREG_TYPE = 2;
 	private List regListeners = new ArrayList();
 	private List debugEventListeners = new ArrayList();
 	private PAnnotationManager annotationMgr = null;
+	private PCDIDebugModel debugModel = null;
 
 	public UIDebugManager() {
 		addSetListener(this);
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
 		PTPDebugCorePlugin.getDefault().addDebugSessionListener(this);
+		debugModel = PCDIDebugModel.getDefault();
 		annotationMgr = new PAnnotationManager(this);
 	}
 	public void shutdown() {
@@ -97,6 +99,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
 		PTPDebugCorePlugin.getDefault().removeDebugSessionListener(this);
 		regListeners.clear();
+		debugModel.deleteJobs();
 		annotationMgr.shutdown();
 		super.shutdown();
 	}
@@ -114,9 +117,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		String new_job_id = super.initial();
 		IElementHandler elementHandler = getElementHandler(new_job_id);
 		if (elementHandler != null) {
-			defaultRegister(elementHandler);
+			//defaultRegister(elementHandler);
 		}
-		createEventListener(new_job_id);
 		return new_job_id;
 	}
 	public boolean isDebugMode(String job_id) {
@@ -191,27 +193,21 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			});
 		}
 	}
-	public void createEventListener(String job_id) {
-		ICDISession session = getDebugSession(job_id);
-		if (session != null) {
-			session.getEventManager().addEventListener(this);
-		}
-	}
 	public void removeEventListener(String job_id) {
 		ICDISession session = getDebugSession(job_id);
 		if (session != null)
 			session.getEventManager().removeEventListener(this);
 	}
-	public ICDISession getDebugSession(String job_id) {
+	public IPCDISession getDebugSession(String job_id) {
 		if (isNoJob(job_id))
 			return null;
 		IPJob job = findJobById(job_id);
 		if (job == null)
 			return null;
-		return PTPDebugCorePlugin.getDefault().getDebugSession(job);
+		return getDebugSession(job);
 	}
-	public ICDISession getDebugSession(IPJob job) {
-		return PTPDebugCorePlugin.getDefault().getDebugSession(job);
+	public IPCDISession getDebugSession(IPJob job) {
+		return (IPCDISession)PTPDebugCorePlugin.getDefault().getDebugSession(job);
 	}
 	public int convertToInt(String id) {
 		return Integer.parseInt(id);
@@ -229,7 +225,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPJob job = findJobById(getCurrentJobId());
 		if (job == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No job found", null));
-		IPCDISession session = (IPCDISession) getDebugSession(job);
+		IPCDISession session = getDebugSession(job);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
 		for (int i = 0; i < elements.length; i++) {
@@ -245,7 +241,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPJob job = findJobById(getCurrentJobId());
 		if (job == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No job found", null));
-		IPCDISession session = (IPCDISession) getDebugSession(job);
+		IPCDISession session = getDebugSession(job);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
 		for (int i = 0; i < elements.length; i++) {
@@ -278,7 +274,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public void updateBreakpointMarker(String cur_sid) {
 		try {
-			PCDIDebugModel.updatePBreakpoints(cur_sid);
+			debugModel.updatePBreakpoints(cur_sid);
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 		}
@@ -292,7 +288,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			public void run(IProgressMonitor monitor) throws CoreException {
 				new Job("Removing registered processes") {
 					protected IStatus run(IProgressMonitor pmonitor) {
-						IPCDISession session = (IPCDISession) getDebugSession(job_id);
+						IPCDISession session = getDebugSession(job_id);
 						if (session == null)
 							return Status.CANCEL_STATUS;
 						String[] registerElementsID = elementHandler.getRegisteredElementsID();
@@ -316,7 +312,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			public void run(IProgressMonitor monitor) throws CoreException {
 				new Job("Updating registered/unregistered processes") {
 					protected IStatus run(IProgressMonitor pmonitor) {
-						IPCDISession session = (IPCDISession) getDebugSession(job_id);
+						IPCDISession session = getDebugSession(job_id);
 						if (session == null)
 							return Status.CANCEL_STATUS;
 						String[] registerElementsID = elementHandler.getRegisteredElementsID();
@@ -352,14 +348,14 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	// Delete the set that will delete the all related breakpoint
 	public void deleteSetEvent(IElementSet set) {
 		try {
-			PCDIDebugModel.deletePBreakpointBySet(getCurrentJobId(), set.getID());
+			debugModel.deletePBreakpointBySet(getCurrentJobId(), set.getID());
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 		}
-		set.setData(BITSET_KEY, null);
-		IPCDISession session = (IPCDISession) getDebugSession(getCurrentJobId());
-		if (session != null) {
-			session.getModelManager().delProcessSet(set.getID());
+		try {
+			debugModel.deleteSet(getCurrentJobId(), set.getID());
+		} catch (CoreException e) {
+			PTPDebugUIPlugin.log(e);
 		}
 	}
 	public void createSetEvent(IElementSet set, IElement[] elements) {
@@ -367,22 +363,32 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		for (int i = 0; i < elements.length; i++) {
 			tasks.set(convertToInt(elements[i].getName()));
 		}
-		set.setData(BITSET_KEY, tasks);
-		IPCDISession session = (IPCDISession) getDebugSession(getCurrentJobId());
-		if (session != null) {
-			session.getModelManager().newProcessSet(set.getID(), tasks);
+		try {
+			debugModel.createSet(getCurrentJobId(), set.getID(), tasks);
+		} catch (CoreException e) {
+			PTPDebugUIPlugin.log(e);
 		}
 	}
 	public void addElementsEvent(IElementSet set, IElement[] elements) {
-		BitList tasks = (BitList) set.getData(BITSET_KEY);
+		BitList tasks = new BitList(set.getElementHandler().getSetRoot().size());
 		for (int i = 0; i < elements.length; i++) {
 			tasks.set(convertToInt(elements[i].getName()));
 		}
+		try {
+			debugModel.addTasks(getCurrentJobId(), set.getID(), tasks);
+		} catch (CoreException e) {
+			PTPDebugUIPlugin.log(e);
+		}
 	}
 	public void removeElementsEvent(IElementSet set, IElement[] elements) {
-		BitList tasks = (BitList) set.getData(BITSET_KEY);
+		BitList tasks = new BitList(set.getElementHandler().getSetRoot().size());
 		for (int i = 0; i < elements.length; i++) {
-			tasks.clear(convertToInt(elements[i].getName()));
+			tasks.set(convertToInt(elements[i].getName()));
+		}
+		try {
+			debugModel.removeTasks(getCurrentJobId(), set.getID(), tasks);
+		} catch (CoreException e) {
+			PTPDebugUIPlugin.log(e);
 		}
 	}
 	/*
@@ -513,43 +519,51 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	public void fireTerminatedEvent(IPJob job, BitList tasks) {
 		fireDebugEvent(new TerminatedDebugEvent(job.getIDString(), (BitList) job.getAttribute(IAbstractDebugger.TERMINATED_PROC_KEY), (BitList) job.getAttribute(IAbstractDebugger.SUSPENDED_PROC_KEY)));
 	}
-	// ONLY for detect the debug sesssion is created
-	public void update(IPCDISession session) {
-		createEventListener(getCurrentJobId());
+	/**
+	 * Session event
+	 */
+	public void startSession(IPCDISession session) {
+		if (session != null) {
+			session.getEventManager().addEventListener(this);
+		}
+	}
+	public void endSession(IPCDISession session) {
+		if (session != null) {
+			session.getEventManager().removeEventListener(this);
+		}
 	}
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * debug actions
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	private BitList getCurrentSetTasks(String job_id, String set_id) {
-		IElementSet set = getElementHandler(job_id).getSet(set_id);
-		BitList currentTasks = null;
-		if (set.isRootSet()) {
-			currentTasks = new BitList(set.size());
-			currentTasks.set(0, set.size());
-		}
-		else {
-			currentTasks = ((BitList)set.getData(BITSET_KEY)).copy();
-		}
-		return currentTasks;
+	public BitList getCurrentSetTasks(String job_id, String set_id) throws CoreException{
+		return debugModel.getTasks(job_id, set_id);
 	}
 	
 	public void resume() throws CoreException {
 		resume(getCurrentJobId(), getCurrentSetId());
 	}
 	public void resume(String job_id, String set_id) throws CoreException {
-		IPCDISession session = (IPCDISession) getDebugSession(job_id);
+		IPCDISession session = getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		session.resume(getCurrentSetTasks(job_id, set_id));
+		try {
+			session.resume(getCurrentSetTasks(job_id, set_id));
+		} catch (PCDIException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+		}
 	}
 	public void suspend() throws CoreException {
 		suspend(getCurrentJobId(), getCurrentSetId());
 	}
 	public void suspend(String job_id, String set_id) throws CoreException {
-		IPCDISession session = (IPCDISession) getDebugSession(job_id);
+		IPCDISession session = getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		session.suspend(getCurrentSetTasks(job_id, set_id));
+		try {
+			session.suspend(getCurrentSetTasks(job_id, set_id));
+		} catch (PCDIException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+		}
 	}
 	public void terminate() throws CoreException {
 		terminate(getCurrentJobId(), getCurrentSetId());
@@ -560,7 +574,11 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			IPCDISession session = (IPCDISession) getDebugSession(job);
 			if (session == null)
 				throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-			session.terminate(getCurrentSetTasks(job_id, set_id));
+			try {
+				session.stop(getCurrentSetTasks(job_id, set_id));
+			} catch (PCDIException e) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+			}
 		} else {
 			super.terminateAll(job_id);
 		}
@@ -569,35 +587,48 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		stepInto(getCurrentJobId(), getCurrentSetId());
 	}
 	public void stepInto(String job_id, String set_id) throws CoreException {
-		IPCDISession session = (IPCDISession) getDebugSession(job_id);
+		IPCDISession session = getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		session.stepInto(getCurrentSetTasks(job_id, set_id));
+		try {
+			session.stepInto(getCurrentSetTasks(job_id, set_id));
+		} catch (PCDIException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+		}
 	}
 	public void stepOver() throws CoreException {
 		stepOver(getCurrentJobId(), getCurrentSetId());
 	}
 	public void stepOver(String job_id, String set_id) throws CoreException {
-		IPCDISession session = (IPCDISession) getDebugSession(job_id);
+		IPCDISession session = getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		session.stepOver(getCurrentSetTasks(job_id, set_id));
+		try {
+			session.stepOver(getCurrentSetTasks(job_id, set_id));
+		} catch (PCDIException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+		}
 	}
 	public void stepReturn() throws CoreException {
 		stepReturn(getCurrentJobId(), getCurrentSetId());
 	}
 	public void stepReturn(String job_id, String set_id) throws CoreException {
-		IPCDISession session = (IPCDISession) getDebugSession(job_id);
+		IPCDISession session = getDebugSession(job_id);
 		if (session == null)
 			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, "No session found", null));
-		session.stepFinish(getCurrentSetTasks(job_id, set_id));
+		try {
+			session.stepReturn(getCurrentSetTasks(job_id, set_id));
+		} catch (PCDIException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugUIPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+		}
 	}
 	public void removeJob(IPJob job) {
 		super.removeJob(job);
 		try {
-			PCDIDebugModel.deletePBreakpointBySet(job.getIDString());
+			debugModel.deletePBreakpointBySet(job.getIDString());
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 		}
+		debugModel.deleteJob(job.getIDString());
 	}
 }

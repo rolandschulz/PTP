@@ -30,18 +30,18 @@ package org.eclipse.ptp.debug.external.cdi.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDILocation;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISignal;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorage;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorageDescriptor;
-import org.eclipse.ptp.debug.external.IAbstractDebugger;
-import org.eclipse.ptp.debug.external.IDebugger;
-import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.cdi.VariableManager;
+import org.eclipse.ptp.debug.external.cdi.model.variable.ThreadStorageDescriptor;
 
 public class Thread extends PTPObject implements ICDIThread {
 	static ICDIStackFrame[] noStack = new ICDIStackFrame[0];
@@ -50,31 +50,32 @@ public class Thread extends PTPObject implements ICDIThread {
 	StackFrame currentFrame;
 	List currentFrames;
 	int stackdepth = 0;
-	int procNumber;
-	
-	final public static int STACKFRAME_DEFAULT_DEPTH = 200;
 
+	final public static int STACKFRAME_DEFAULT_DEPTH = 200;
+	
 	public Thread(Target target, int threadId) {
 		this(target, threadId, null);
 	}
-
 	public Thread(Target target, int threadId, String threadName) {
 		super(target);
-		procNumber = target.getTargetId();
 		id = threadId;
 		name = threadName;
 	}
-	
 	public int getId() {
 		return id;
 	}
-	
 	public void clearState() {
 		stackdepth = 0;
 		currentFrame = null;
 		currentFrames = null;
 	}
-	
+	public String toString() {
+		String str = Integer.toString(id);
+		if (name != null) {
+			str += " " + name;
+		}
+		return str;
+	}
 	public StackFrame getCurrentStackFrame() throws CDIException {
 		if (currentFrame == null) {
 			ICDIStackFrame[] frames = getStackFrames(0, 0);
@@ -84,178 +85,198 @@ public class Thread extends PTPObject implements ICDIThread {
 		}
 		return currentFrame;
 	}
-
 	public ICDIStackFrame[] getStackFrames() throws CDIException {
-		// get the frames depth
 		int depth = getStackFrameCount();
 
 		// refresh if we have nothing or if we have just a subset get everything.
 		if (currentFrames == null || currentFrames.size() < depth) {
 			currentFrames = new ArrayList();
-			
-			Target target = (Target) getTarget();
+			Target target = (Target)getTarget();
+			ICDIThread currentThread = target.getCurrentThread();
+			target.setCurrentThread(this, false);
+
 			Session session = (Session) target.getSession();
-			IAbstractDebugger debugger = session.getDebugger();
-			ICDIStackFrame[] frames = debugger.listStackFrames(session.createBitList(target.getTargetId()));
-			
-			for (int i = 0; i < frames.length; i++) {
-				currentFrames.add(frames[i]);
+			try {
+				ICDIStackFrame[] frames = target.getDebugger().listStackFrames(session.createBitList(target.getTargetID()));
+				for (int i = 0; i < frames.length; i++) {
+					currentFrames.add(frames[i]);
+				}
+			} finally {
+				target.setCurrentThread(currentThread, false);
 			}
-			
 			// assign the currentFrame if it was not done yet.
 			if (currentFrame == null) {
 				for (int i = 0; i < currentFrames.size(); i++) {
 					ICDIStackFrame stack = (ICDIStackFrame) currentFrames.get(i);
-					
-					/* For a thread with 1 stack, the level of the stack is 0, however
-					 * the depth is 1
-					 */
-					if (stack.getLevel() + 1 == depth) {
+					//TODO -- checking correct?
+					if (stack.getLevel() == depth) {
 						currentFrame = (StackFrame)stack;
 					}
 				}
 			}
-
-			//target.setCurrentThread(currentThread, false);
 		}
 		return (ICDIStackFrame[]) currentFrames.toArray(noStack);
 	}
-
-	public ICDIStackFrame[] getStackFrames(int fromIndex, int len) throws CDIException {
-		getStackFrames();
-		List list = currentFrames.subList(fromIndex, len);
-		return (ICDIStackFrame[]) list.toArray(noStack);
-	}
-
 	public int getStackFrameCount() throws CDIException {
-		if (stackdepth == 0) {
+		if (stackdepth == 0 || currentFrames == null) {
+			currentFrames = new ArrayList();
 			Target target = (Target) getTarget();
 			Session session = (Session) target.getSession();
-			IDebugger debugger = session.getDebugger();
-			ICDIStackFrame[] frames = debugger.listStackFrames(session.createBitList(target.getTargetId()));
-			stackdepth = frames.length;
+			ICDIStackFrame[] frames = session.getDebugger().listStackFrames(session.createBitList(target.getTargetID()));
+			for (int i = 0; i < frames.length; i++) {
+				currentFrames.add(frames[i]);
+			}
+			stackdepth = currentFrames.size();
+			if (frames.length > 0)
+				currentFrame = (StackFrame)frames[0];
 		}
 		return stackdepth;
 	}
-
-	public ICDIThreadStorageDescriptor[] getThreadStorageDescriptors() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
+	public ICDIStackFrame[] getStackFrames(int low, int high) throws CDIException {
+		if (currentFrames == null || currentFrames.size() < high) {
+			getStackFrames();
+		}
+		List list = ((high - low + 1) <= currentFrames.size()) ? currentFrames.subList(low, high + 1) : currentFrames;
+		return (ICDIStackFrame[])list.toArray(noStack);
 	}
+	public void setCurrentStackFrame(StackFrame stackframe, boolean doUpdate) throws CDIException {
+		int frameLevel = 0;
+		if (stackframe != null) {
+			frameLevel = stackframe.getLevel();
+		}
 
-	public void resume() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
+		// Check to see if we are already at this level
+		if (currentFrame != null && currentFrame.getLevel() == frameLevel) {
+			if (stackframe != null) {
+				Thread aThread = (Thread)stackframe.getThread();
+				if (aThread != null && aThread.getId() == getId()) {
+					return;
+				}
+			}
+		}
 
-	public void stepOver() throws CDIException {
-		stepOver(1);
-	}
+		Target target = (Target)getTarget();
+		Session session = (Session) target.getSession();
+		target.getDebugger().setCurrentStackFrame(session.createBitList(target.getTargetID()), stackframe);
 
+		currentFrame = stackframe;
+		if (doUpdate) {
+			VariableManager varMgr = session.getVariableManager();
+			if (varMgr.isAutoUpdate()) {
+				varMgr.update(target);
+			}
+		}
+	}	
 	public void stepInto() throws CDIException {
 		stepInto(1);
 	}
-	
-	public String toString() {
-		String str = Integer.toString(procNumber);
-		str += " - " + Integer.toString(id);
-		if (name != null) {
-			str += " " + name; //$NON-NLS-1$
-		}
-		return str;
+	public void stepInto(int count) throws CDIException {
+		((Target)getTarget()).setCurrentThread(this);
+		getTarget().stepInto(count);
 	}
-
-	public void stepOverInstruction() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
 	public void stepIntoInstruction() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
+		stepIntoInstruction(1);
 	}
-
+	public void stepIntoInstruction(int count) throws CDIException {
+		((Target)getTarget()).setCurrentThread(this);
+		getTarget().stepIntoInstruction(count);
+	}
+	public void stepOver() throws CDIException {
+		stepOver(1);
+	}
+	public void stepOver(int count) throws CDIException {
+		((Target)getTarget()).setCurrentThread(this);
+		getTarget().stepOver(count);
+	}
+	public void stepOverInstruction() throws CDIException {
+		stepOverInstruction(1);
+	}
+	public void stepOverInstruction(int count) throws CDIException {
+		((Target)getTarget()).setCurrentThread(this);
+		getTarget().stepOverInstruction(count);
+	}
 	public void stepReturn() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		Target target = (Target) getTarget();
-		Session session = (Session) target.getSession();
-		session.getDebugger().stepFinishAction(session.createBitList(target.getTargetId()), 0);
+		getCurrentStackFrame().stepReturn();
 	}
-
 	public void runUntil(ICDILocation location) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
+		stepUntil(location);
 	}
-
+	public void stepUntil(ICDILocation location) throws CDIException {
+		((Target)getTarget()).setCurrentThread(this);
+		getTarget().stepUntil(location);
+	}
+	public boolean isSuspended() {
+		return getTarget().isSuspended();
+	}
+	public void suspend() throws CDIException {
+		getTarget().suspend();
+	}
+	public void resume() throws CDIException {
+		resume(false);
+	}
+	public void resume(boolean passSignal) throws CDIException {
+		((Target)getTarget()).setCurrentThread(this);
+		getTarget().resume(passSignal);
+	}
+	public void resume(ICDILocation location) throws CDIException {
+		((Target)getTarget()).setCurrentThread(this);
+		getTarget().resume(location);
+	}
+	public void resume(ICDISignal signal) throws CDIException {
+		((Target)getTarget()).setCurrentThread(this);
+		getTarget().resume(signal);
+	}
 	public void jump(ICDILocation location) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
+		resume(location);
 	}
-
 	public void signal() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
+		resume(false);
 	}
-
 	public void signal(ICDISignal signal) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
+		resume(signal);
 	}
-
 	public boolean equals(ICDIThread thread) {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (thread instanceof Thread) {
 			Thread cthread = (Thread) thread;
 			return id == cthread.getId();
 		}
 		return super.equals(thread);
 	}
-
-	public void stepOver(int count) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		Target target = (Target) getTarget();
-		Session session = (Session) target.getSession();
-		session.getDebugger().stepOverAction(session.createBitList(target.getTargetId()), count);
+	public ICDIBreakpoint[] getBreakpoints() throws CDIException {
+		Target target = (Target)getTarget();
+		ICDIBreakpoint[] bps = target.getBreakpoints();
+		ArrayList list = new ArrayList(bps.length);
+		for (int i = 0; i < bps.length; i++) {
+			ICDICondition condition = bps[i].getCondition();
+			if (condition == null) {
+				continue;
+			}
+			String[] threadIds = condition.getThreadIds();
+			for (int j = 0; j < threadIds.length; j++) {
+				int tid = 0;
+				try {
+					tid = Integer.parseInt(threadIds[j]);
+				} catch (NumberFormatException e) {
+					//
+				}
+				if (tid == getId()) {
+					list.add(bps[i]);
+				}
+			}
+		}
+		return (ICDIBreakpoint[]) list.toArray(new ICDIBreakpoint[list.size()]);
 	}
-
-	public void stepOverInstruction(int count) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
+	public ICDIThreadStorageDescriptor[] getThreadStorageDescriptors() throws CDIException {
+		Session session = (Session)getTarget().getSession();
+		VariableManager varMgr = session.getVariableManager();
+		return varMgr.getThreadStorageDescriptors(this);
 	}
-
-	public void stepInto(int count) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		Target target = (Target) getTarget();
-		Session session = (Session) target.getSession();
-		session.getDebugger().stepIntoAction(session.createBitList(target.getTargetId()), count);
-	}
-
-	public void stepIntoInstruction(int count) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public void stepUntil(ICDILocation location) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public void resume(boolean passSignal) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		Target target = (Target) getTarget();
-		Session session = (Session) target.getSession();
-		session.getDebugger().goAction(session.createBitList(target.getTargetId()));
-	}
-
-	public void resume(ICDILocation location) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public void resume(ICDISignal signal) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public void suspend() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-	}
-
-	public boolean isSuspended() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return getTarget().isSuspended();
-	}
-
 	public ICDIThreadStorage createThreadStorage(ICDIThreadStorageDescriptor varDesc) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
+		if (varDesc instanceof ThreadStorageDescriptor) {
+			Session session = (Session)getTarget().getSession();
+			VariableManager varMgr = session.getVariableManager();
+			return varMgr.createThreadStorage((ThreadStorageDescriptor)varDesc);
+		}
 		return null;
 	}
 }
