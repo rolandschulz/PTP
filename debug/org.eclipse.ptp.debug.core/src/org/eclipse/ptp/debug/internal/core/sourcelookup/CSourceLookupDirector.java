@@ -46,12 +46,13 @@ import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.WorkspaceSourceContainer;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.sourcelookup.CDirectorySourceContainer;
+import org.eclipse.ptp.debug.core.sourcelookup.ICSourceLookupDirector;
 import org.eclipse.ptp.debug.core.sourcelookup.MappingSourceContainer;
  
 /**
  * C/C++ source lookup director.
  */
-public class CSourceLookupDirector extends AbstractSourceLookupDirector {
+public class CSourceLookupDirector extends AbstractSourceLookupDirector implements ICSourceLookupDirector {
 
 	private static Set fSupportedTypes;
 

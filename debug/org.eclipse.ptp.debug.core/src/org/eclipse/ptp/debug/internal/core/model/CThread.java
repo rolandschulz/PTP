@@ -371,6 +371,8 @@ public class CThread extends PDebugElement implements ICThread, IRestart, IResum
 		for( int i = 0; i < events.length; i++ ) {
 			ICDIEvent event = events[i];
 			ICDIObject source = event.getSource();
+			//FIXME clement hardcode
+			setRefreshChildren( true );
 			if ( source instanceof ICDIThread && source.equals( getCDIThread() ) ) {
 				if ( event instanceof ICDISuspendedEvent ) {
 					handleSuspendedEvent( (ICDISuspendedEvent)event );
