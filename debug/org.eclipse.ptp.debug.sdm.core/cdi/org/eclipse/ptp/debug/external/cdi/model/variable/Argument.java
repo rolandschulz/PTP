@@ -16,16 +16,6 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model.variable;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
@@ -33,24 +23,14 @@ import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
 
-/**
- */
 public class Argument extends Variable implements ICDIArgument {
-
-	public Argument(Target target, Thread thread, StackFrame frame,
-			String name, String fullName, int pos, int depth) {
+	public Argument(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth) {
 		super(target, thread, frame, name, fullName, pos, depth);
 	}
-
 	public Argument(ArgumentDescriptor obj) {
 		super(obj);
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.mi.core.cdi.model.Variable#createVariable(org.eclipse.cdt.debug.mi.core.cdi.model.Target, org.eclipse.cdt.debug.core.cdi.model.ICDIThread, org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame, java.lang.String, java.lang.String, int, int, org.eclipse.cdt.debug.mi.core.output.MIVar)
-	 */
 	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth) {
 		return new Argument(target, thread, frame, name, fullName, pos, depth);
 	}
-
 }

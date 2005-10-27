@@ -23,28 +23,25 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
-
+/**
+ * @deprecated
+ */
 public class DebugProcess extends SessionObject implements IPCDIDebugProcess {
-	
 	private IPProcess pProcess;
 
 	public DebugProcess(IPCDISession s, IPProcess pP) {
 		super((Session) s);
 		pProcess = pP;
 	}
-	
 	public IPProcess getPProcess() {
 		return pProcess;
 	}
-	
 	public String getName() {
 		return pProcess.getElementName();
 	}
-
 	public boolean isTerminated() {
 		return pProcess.isTerminated();
 	}
-	
 	public boolean isSuspended() {
 		String status = pProcess.getStatus();
 		return (status.equals(IPProcess.STOPPED));

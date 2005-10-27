@@ -16,15 +16,33 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.cdi.model.variable;
+package org.eclipse.ptp.debug.external.cdi.breakpoints;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariableDescriptor;
-import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
-import org.eclipse.ptp.debug.external.cdi.model.Target;
-import org.eclipse.ptp.debug.external.cdi.model.Thread;
+import org.eclipse.cdt.debug.core.cdi.ICDICondition;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIExceptionpoint;
 
-public class LocalVariableDescriptor extends VariableDescriptor implements ICDILocalVariableDescriptor {
-	public LocalVariableDescriptor(Target target, Thread thread, StackFrame frame, String n, String fn, int pos, int depth) {
-		super(target, thread, frame, n, fn, pos, depth);
+/**
+ * @author Clement chu
+ * 
+ */
+public class Exceptionpoint extends Breakpoint implements ICDIExceptionpoint {
+	String fClazz;
+	boolean fStopOnThrow;
+	boolean fStopOnCatch;
+	public Exceptionpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch, ICDICondition cond) {
+		super(ICDIBreakpoint.REGULAR, cond);
+		fClazz = clazz;
+		fStopOnThrow = stopOnThrow;
+		fStopOnCatch = stopOnCatch;
+	}
+	public String getExceptionName() {
+		return fClazz;
+	}
+	public boolean isStopOnThrow() {
+		return fStopOnThrow;
+	}
+	public boolean isStopOnCatch() {
+		return fStopOnCatch;
 	}
 }

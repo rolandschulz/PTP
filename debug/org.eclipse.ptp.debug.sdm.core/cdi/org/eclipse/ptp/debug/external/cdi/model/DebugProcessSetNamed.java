@@ -4,7 +4,9 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcessSetNamed;
 import org.eclipse.ptp.debug.external.cdi.Session;
-
+/**
+ * @deprecated 
+ */
 public class DebugProcessSetNamed extends DebugProcessSet implements IPCDIDebugProcessSetNamed {
 	public DebugProcessSetNamed(IPCDISession s, String name) {
 		super((Session) s);

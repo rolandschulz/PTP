@@ -33,8 +33,7 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDICreatedEvent;
 
 public class BreakpointCreatedEvent extends AbstractEvent implements IPCDICreatedEvent {
-
-	public BreakpointCreatedEvent(IPCDISession s, BitList tasks) {
-		super(s, tasks);
+	public BreakpointCreatedEvent(IPCDISession session, BitList tasks) {
+		super(session, tasks);
 	}
 }

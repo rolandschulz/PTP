@@ -33,7 +33,6 @@ import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
 import org.eclipse.ptp.debug.external.cdi.Location;
 
 public class FunctionLocation extends Location implements ICDIFunctionLocation {
-
 	public FunctionLocation(String file, String function) {
 		super(file, function);
 	}

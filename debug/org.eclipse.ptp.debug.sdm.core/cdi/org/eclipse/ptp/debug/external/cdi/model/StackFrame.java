@@ -29,7 +29,6 @@
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import java.math.BigInteger;
-
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
@@ -39,7 +38,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
-import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
+import org.eclipse.ptp.debug.external.ExtFormat;
 import org.eclipse.ptp.debug.external.cdi.Locator;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
@@ -48,98 +47,74 @@ import org.eclipse.ptp.debug.external.cdi.model.variable.LocalVariableDescriptor
 
 public class StackFrame extends PTPObject implements ICDIStackFrame {
 	Thread cthread;
-	int sLevel;
-	String sFile;
-	String sFunction;
-	int sLine;
-	String sAddress;
 	ICDIArgumentDescriptor[] argDescs;
 	ICDILocalVariableDescriptor[] localDescs;
 	Locator fLocator;
+	int level = -1;
+	String addr = "";
+	String file = "";
+	int line = -1;
+	String func = "";
 
-	public StackFrame(Thread thread, int level, String file, String function, int line, String address) {
+	public StackFrame(Thread thread, int level, String file, String func, int line, String addr) {
 		super((Target)thread.getTarget());
 		cthread = thread;
-		sLevel = level;
-		sFile = file;
-		sFunction = function;
-		sLine = line;
-		sAddress = address;
+		this.level = level;
+		this.addr = addr;
+		this.file = file;
+		this.line = line;
+		this.func = func;
 	}
-	
-	public BigInteger getBigInteger(String address) {
-		int index = 0;
-		int radix = 10;
-		boolean negative = false;
-
-		// Handle zero length
-		address = address.trim();
-		if (address.length() == 0) {
-			return BigInteger.ZERO;
-		}
-
-		// Handle minus sign, if present
-		if (address.startsWith("-")) { //$NON-NLS-1$
-			negative = true;
-			index++;
-		}
-		if (address.startsWith("0x", index) || address.startsWith("0X", index)) { //$NON-NLS-1$ //$NON-NLS-2$
-			index += 2;
-			radix = 16;
-		} else if (address.startsWith("#", index)) { //$NON-NLS-1$
-			index ++;
-			radix = 16;
-		} else if (address.startsWith("0", index) && address.length() > 1 + index) { //$NON-NLS-1$
-			index ++;
-			radix = 8;
-		}
-
-		if (index > 0) {
-			address = address.substring(index);
-		}
-		if (negative) {
-			address = "-" + address; //$NON-NLS-1$
-		}
-		try {
-			return new BigInteger(address, radix);
-		} catch (NumberFormatException e) {
-			// ...
-			// What can we do ???
-		}
-		return BigInteger.ZERO;
-	}	
-
-	public ICDILocator getLocator() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		BigInteger addr = BigInteger.ZERO;
-		if (sFile != null && sFunction != null) {
-			if (fLocator == null) {
-				String address = sAddress;
-				if (address != null) {
-					addr = getBigInteger(address);
-				}
-				fLocator = new Locator(sFile, sFunction, sLine, addr);
-			}
-			return fLocator;
-		}
-		return new Locator("", "", 0, addr); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
 	public ICDIThread getThread() {
 		return cthread;
 	}
-
-	public int getLevel() {
-		return sLevel;
+	public ICDIArgumentDescriptor[] getArgumentDescriptors() throws CDIException {
+		if (argDescs == null) {
+			Session session = (Session)getTarget().getSession();
+			VariableManager mgr = session.getVariableManager();
+			argDescs = mgr.getArgumentDescriptors(this);
+		}
+		return argDescs;
 	}
-
+	public ICDILocalVariableDescriptor[] getLocalVariableDescriptors() throws CDIException {
+		if (localDescs == null) {
+			Session session = (Session)getTarget().getSession();
+			VariableManager mgr = session.getVariableManager();
+			localDescs = mgr.getLocalVariableDescriptors(this);
+		}
+		return localDescs;
+	}
+	public ICDIArgument createArgument(ICDIArgumentDescriptor varDesc) throws CDIException {
+		if (varDesc instanceof ArgumentDescriptor) {
+			Session session = (Session)getTarget().getSession();
+			VariableManager mgr = session.getVariableManager();
+			return mgr.createArgument((ArgumentDescriptor)varDesc);
+		}
+		return null;
+	}
+	public ICDILocalVariable createLocalVariable(ICDILocalVariableDescriptor varDesc) throws CDIException {
+		if (varDesc instanceof ArgumentDescriptor) {
+			return createArgument((ICDIArgumentDescriptor)varDesc);
+		} else if (varDesc instanceof LocalVariableDescriptor) {
+			Session session = (Session)getTarget().getSession();
+			VariableManager mgr = session.getVariableManager();
+			return mgr.createLocalVariable((LocalVariableDescriptor)varDesc);			
+		}
+		return null;
+	}
+	public ICDILocator getLocator() {
+		BigInteger bigAddr = BigInteger.ZERO;
+		if (fLocator == null) {
+			bigAddr = ExtFormat.getBigInteger(getAddress());
+			fLocator = new Locator(getFile(), getFunction(), getLine(), bigAddr);
+		}
+		return fLocator;
+		//return new Locator("", "", 0, bigAddr);
+	}	
 	public boolean equals(ICDIStackFrame stackframe) {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		if (stackframe instanceof StackFrame) {
 			StackFrame stack = (StackFrame)stackframe;
-			boolean equal =  cthread != null &&
-				cthread.equals(stack.getThread()) &&
-				getLevel() == stack.getLevel();
+			boolean equal =  cthread != null && cthread.equals(stack.getThread()) && getLevel() == stack.getLevel();
 			if (equal) {
 				ICDILocator otherLocator = stack.getLocator();
 				ICDILocator myLocator = getLocator();
@@ -152,57 +127,40 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 		}
 		return super.equals(stackframe);
 	}
-
 	public void stepReturn() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		
-		// FIXME Donny, correct way to do this?
-		((Thread) getThread()).stepReturn();
+		finish();
 	}
-
 	public void stepReturn(ICDIValue value) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
+		execReturn(value.toString());
+	}
+	protected void finish() throws CDIException {
+		((Thread)getThread()).setCurrentStackFrame(this, false);
+
+		Target target = (Target)getTarget();
+		//FIXME - what is last parameter?
+		target.getDebugger().stepFinish(((Session)target.getSession()).createBitList(target.getTargetID()), 0);
+	}	
+	protected void execReturn(String value) throws CDIException {
+		((Thread)getThread()).setCurrentStackFrame(this, false);
+
+		Target target = (Target)getTarget();
+		//FIXME - how to deal with value?
+		target.getDebugger().stepFinish(((Session)target.getSession()).createBitList(target.getTargetID()), 0);
 	}
 
-	public ICDILocalVariableDescriptor[] getLocalVariableDescriptors() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-        if (localDescs == null) {
-                Session session = (Session) getTarget().getSession();
-                VariableManager mgr = session.getVariableManager();
-                localDescs = mgr.getLocalVariableDescriptors(this);
-        }
-        return localDescs;
+	public int getLevel() {
+		return level;
 	}
-
-	public ICDIArgumentDescriptor[] getArgumentDescriptors() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-        if (argDescs == null) {
-                Session session = (Session)getTarget().getSession();
-                VariableManager mgr = session.getVariableManager();
-                argDescs = mgr.getArgumentDescriptors(this);
-        }
-        return argDescs;
+	public String getAddress() {
+		return addr;
 	}
-
-	public ICDIArgument createArgument(ICDIArgumentDescriptor varDesc) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		if (varDesc instanceof ArgumentDescriptor) {
-			Session session = (Session)getTarget().getSession();
-			VariableManager mgr = session.getVariableManager();
-			return mgr.createArgument((ArgumentDescriptor)varDesc);
-		}
-		return null;
+	public String getFile() {
+		return file;
 	}
-
-	public ICDILocalVariable createLocalVariable(ICDILocalVariableDescriptor varDesc) throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		if (varDesc instanceof ArgumentDescriptor) {
-			return createArgument((ICDIArgumentDescriptor)varDesc);
-		} else if (varDesc instanceof LocalVariableDescriptor) {
-			Session session = (Session)getTarget().getSession();
-			VariableManager mgr = session.getVariableManager();
-			return mgr.createLocalVariable((LocalVariableDescriptor)varDesc);			
-		}
-		return null;
+	public int getLine() {
+		return line;
+	}
+	public String getFunction() {
+		return func;
 	}
 }

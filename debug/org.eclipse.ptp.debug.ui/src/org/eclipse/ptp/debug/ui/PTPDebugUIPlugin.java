@@ -175,6 +175,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e));
 	}
 	
+	public static void errorDialog(Shell shell, String title, Throwable t) {
+		errorDialog(shell, title, t.getMessage(), t);
+	}
 	public static void errorDialog(Shell shell, String title, String message, Throwable t) {
 		IStatus status;
 		if (t instanceof CoreException) {

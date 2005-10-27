@@ -33,12 +33,8 @@ import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDILocation;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 
-public class FunctionBreakpoint extends LocationBreakpoint implements
-		ICDIFunctionBreakpoint {
-
-	public FunctionBreakpoint(int kind, ICDILocation loc,
-			ICDICondition cond) {
+public class FunctionBreakpoint extends LocationBreakpoint implements ICDIFunctionBreakpoint {
+	public FunctionBreakpoint(int kind, ICDILocation loc, ICDICondition cond) {
 		super(kind, loc, cond);
 	}
-
 }

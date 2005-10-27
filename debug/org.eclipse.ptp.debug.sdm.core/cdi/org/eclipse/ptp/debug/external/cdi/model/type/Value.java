@@ -16,71 +16,46 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model.type;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
-import org.eclipse.ptp.debug.external.IDebugger;
-import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.model.PTPObject;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.variable.Variable;
 
-/**
- */
 public class Value extends PTPObject implements ICDIValue {
-
 	protected Variable variable;
 
-	public Value(Variable v) {
-		super((Target)v.getTarget());
-		variable = v;
+	public Value(Variable var) {
+		super((Target) var.getTarget());
+		variable = var;
 	}
-
+	protected Variable getVariable() throws CDIException {
+		return variable;
+	}	
 	public String getTypeName() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		return variable.getTypeName();
 	}
-
-	public ICDIType getType() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return variable.getType();
-	}
-
 	public String getValueString() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-
 		Target target = (Target) variable.getTarget();
 		Session session = (Session) target.getSession();
-		IDebugger debugger = session.getDebugger();
-		return debugger.evaluateExpression(session.createBitList(target.getTargetId()), variable.getName());
+		return target.getDebugger().evaluateExpression(session.createBitList(target.getTargetID()), variable.getName());
 	}
-
 	public int getChildrenNumber() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
+		//FIXME - how to get the number of children??
 		return 0;
 	}
-
 	public boolean hasChildren() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return false;
+		return (getChildrenNumber() > 0);	
 	}
-
 	public ICDIVariable[] getVariables() throws CDIException {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
+		return getVariable().getChildren();
+	}
+	public ICDIType getType() throws CDIException {
+		return getVariable().getType();
 	}
 }

@@ -196,13 +196,17 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 			isEnabled = !tasks.isEmpty();// tasks != 0: some processes suspended
 			suspendAction.setEnabled(set.size() != tasks.cardinality()); // disable suspend Action if all tasks same as root size
 		} else {
-			BitList setTasks = (BitList) set.getData(UIDebugManager.BITSET_KEY);
-			// this set contains some suspended processes
-			isEnabled = setTasks.intersects(tasks);
-			BitList refTasks = tasks.copy();
-			refTasks.and(setTasks);
-			// the size is not equal: there is some processes running
-			suspendAction.setEnabled(set.size() != refTasks.cardinality());
+			try {
+				BitList setTasks = ((UIDebugManager) manager).getCurrentSetTasks(getCurrentID(), set.getID());
+				// this set contains some suspended processes
+				isEnabled = setTasks.intersects(tasks);
+				BitList refTasks = tasks.copy();
+				refTasks.and(setTasks);
+				// the size is not equal: there is some processes running
+				suspendAction.setEnabled(set.size() != refTasks.cardinality());
+			} catch (CoreException e) {
+				PTPDebugUIPlugin.log(e);
+			}
 		}
 		setEnableResumeButtonGroup(isEnabled);
 	}
@@ -223,17 +227,21 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		// size equals: all processes are terminated
 		boolean isEnabled = (setSize != totalTerminatedSize);
 		if (!set.isRootSet()) {
-			BitList setTasks = (BitList) set.getData(UIDebugManager.BITSET_KEY);
-			setSize = setTasks.cardinality();
-			BitList refTasks = tasks.copy();
-			refTasks.and(setTasks);
-			// size equals: the set contains all terminated processes
-			totalTerminatedSize = refTasks.cardinality();
-			isEnabled = (setSize != totalTerminatedSize);
-			if (isEnabled) {
-				BitList tarRefTasks = targetTasks.copy();
-				tarRefTasks.and(setTasks);
-				totalSuspendedSize = tarRefTasks.cardinality();
+			try {
+				BitList setTasks = ((UIDebugManager) manager).getCurrentSetTasks(getCurrentID(), set.getID());
+				setSize = setTasks.cardinality();
+				BitList refTasks = tasks.copy();
+				refTasks.and(setTasks);
+				// size equals: the set contains all terminated processes
+				totalTerminatedSize = refTasks.cardinality();
+				isEnabled = (setSize != totalTerminatedSize);
+				if (isEnabled) {
+					BitList tarRefTasks = targetTasks.copy();
+					tarRefTasks.and(setTasks);
+					totalSuspendedSize = tarRefTasks.cardinality();
+				}
+			} catch (CoreException e) {
+				PTPDebugUIPlugin.log(e);
 			}
 		}
 		terminateAction.setEnabled(isEnabled);

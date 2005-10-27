@@ -34,9 +34,7 @@ import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 
 public class LineBreakpoint extends LocationBreakpoint implements ICDILineBreakpoint {
-
 	public LineBreakpoint(int kind, ICDILineLocation loc, ICDICondition cond) {
 		super(kind, loc, cond);
-	}
-
+	}	
 }

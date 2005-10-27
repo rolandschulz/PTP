@@ -16,15 +16,35 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.cdi.model.variable;
+package org.eclipse.ptp.debug.external.cdi.breakpoints;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariableDescriptor;
-import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
-import org.eclipse.ptp.debug.external.cdi.model.Target;
-import org.eclipse.ptp.debug.external.cdi.model.Thread;
+import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.cdt.debug.core.cdi.ICDICondition;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
 
-public class LocalVariableDescriptor extends VariableDescriptor implements ICDILocalVariableDescriptor {
-	public LocalVariableDescriptor(Target target, Thread thread, StackFrame frame, String n, String fn, int pos, int depth) {
-		super(target, thread, frame, n, fn, pos, depth);
+/**
+ * @author Clement chu
+ * 
+ */
+public class Watchpoint extends Breakpoint implements ICDIWatchpoint {
+	int watchType;
+	String what;
+
+	public Watchpoint(String expression, int type, int wType, ICDICondition cond) {
+		super(type, cond);
+		watchType = wType;
+		what = expression;
+	}
+	public String getWatchExpression() throws CDIException {
+		if (what == null) {
+			return null;
+		}
+		return what;
+	}
+	public boolean isReadType() {
+		return ((watchType & ICDIWatchpoint.READ) == ICDIWatchpoint.READ);
+	}
+	public boolean isWriteType() {
+		return ((watchType & ICDIWatchpoint.WRITE) == ICDIWatchpoint.WRITE);
 	}
 }

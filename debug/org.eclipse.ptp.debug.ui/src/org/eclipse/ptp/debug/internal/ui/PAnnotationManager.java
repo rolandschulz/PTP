@@ -46,6 +46,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
@@ -288,10 +289,12 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		String set_id = uiDebugManager.getCurrentSetId();
 		if (set_id.equals(IElementHandler.SET_ROOT_ID))
 			return true;
-		IElementHandler handler = uiDebugManager.getElementHandler(uiDebugManager.getCurrentJobId());
-		IElementSet set = handler.getSet(set_id);
-		BitList tasks = (BitList) set.getData(UIDebugManager.BITSET_KEY);
-		return (tasks != null && tasks.intersects(aTasks));
+		try {
+			BitList tasks = PCDIDebugModel.getDefault().getTasks(uiDebugManager.getCurrentJobId(), set_id);
+			return (tasks != null && tasks.intersects(aTasks));
+		} catch (CoreException e) {
+			return false;
+		}
 	}
 	//FIXME temp testing method
 	public void printBitList(BitList tasks) {
@@ -443,16 +446,20 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				new Job("Update Annotation") {
 					protected IStatus run(IProgressMonitor pmonitor) {
-						BitList tasks = (BitList) currentSet.getData(UIDebugManager.BITSET_KEY);
-						for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
-							PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation) i.next();
-							//change icon for unregistered processes only if the set is changed
-							if (!isRegisterType(annotation.getType())) {
-								if (currentSet.isRootSet())
-									changeAnnotationType(annotation, IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT);
-								else
-									changeAnnotationType(annotation, annotation.contains(tasks) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
+						try {
+							BitList tasks = PCDIDebugModel.getDefault().getTasks(uiDebugManager.getCurrentJobId(), currentSet.getID());
+							for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
+								PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation) i.next();
+								//change icon for unregistered processes only if the set is changed
+								if (!isRegisterType(annotation.getType())) {
+									if (currentSet.isRootSet())
+										changeAnnotationType(annotation, IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT);
+									else
+										changeAnnotationType(annotation, annotation.contains(tasks) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
+								}
 							}
+						} catch (CoreException e) {
+							return Status.CANCEL_STATUS;
 						}
 						return Status.OK_STATUS;
 					}
