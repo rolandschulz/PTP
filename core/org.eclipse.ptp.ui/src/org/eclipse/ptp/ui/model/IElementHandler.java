@@ -18,12 +18,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.model;
 
+import org.eclipse.ptp.core.PreferenceConstants;
+
 /**
  * @author clement chu
  *
  */
 public interface IElementHandler extends IContainer {
-	public static final String SET_ROOT_ID = "Root";	
+	public final static String SET_ROOT_ID = PreferenceConstants.SET_ROOT_ID;
 	public IElementSet getSetRoot();
 	
 	public IElementSet[] getSetsWithElement(String id);
