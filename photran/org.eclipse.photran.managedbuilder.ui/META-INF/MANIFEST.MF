@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.eclipse.photran.managedbuilder.ui; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-ClassPath: photranmngbuildui.jar
+Bundle-Activator: org.eclipse.photran.managedbuilder.internal.ui.ManagedBuilderUIPlugin
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
+Export-Package: org.eclipse.photran.managedbuilder.internal.ui
+Require-Bundle: org.eclipse.core.resources,
+ org.eclipse.ui,
+ org.eclipse.core.runtime
+Eclipse-AutoStart: true

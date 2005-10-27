@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.eclipse.photran.managedbuilder.core
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.photran.managedbuilder.core.ManagedBuilderCorePlugin
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.cdt.core,
+ org.eclipse.photran.core,
+ org.eclipse.core.runtime,
+ org.eclipse.cdt.managedbuilder.core,
+ org.eclipse.core.resources
+Eclipse-AutoStart: true
+Bundle-ClassPath: photranmngbuildcore.jar
