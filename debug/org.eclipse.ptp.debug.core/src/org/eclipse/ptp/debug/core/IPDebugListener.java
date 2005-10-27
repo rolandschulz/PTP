@@ -31,5 +31,6 @@ package org.eclipse.ptp.debug.core;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 
 public interface IPDebugListener {
-	public void update(IPCDISession session);
+	public void startSession(IPCDISession session);
+	public void endSession(IPCDISession session);
 }

@@ -18,25 +18,31 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi;
 
-import org.eclipse.cdt.debug.core.cdi.ICDISession;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.cdt.debug.core.cdi.CDIException;
 
-public interface IPCDISession extends ICDISession, ICommonActions {
-	public void registerTarget(int procNum, boolean sendEvent, boolean resumeTarget);
-	public void registerTargets(int[] procNums, boolean sendEvent, boolean resumeTarget);
-	public void registerTarget(int procNum, boolean sendEvent);
-	public void registerTargets(int[] procNums, boolean sendEvent);
-	public void unregisterTarget(int procNum, boolean sendEvent);
-	public void unregisterTargets(int[] targets, boolean sendEvent);
-	public IPJob getJob();
-	public int getTotalProcesses();
+public class PCDIException extends CDIException {
+	/**
+	 * All serializable objects should have a stable serialVersionUID
+	 */
+	private static final long serialVersionUID = 1L;
 	
-	public BitList createBitList();
-	public BitList createEmptyBitList();
-	public BitList createBitList(int index);
+	public static final int NOT_IMPLEMENTED = 100;
+	public static final int COMMAND_TIMEOUT = 101;
+	public static final int INVALID_PROCESS_SET = 102;
+
+	private int status;
+
+	public PCDIException(String desc) {
+		super(desc);
+		this.status = NOT_IMPLEMENTED;
+	}
 	
-	public BitList getRegisteredTargets();
-	public ICDITarget getTarget(int target_id);
+	public PCDIException(int status, String desc) {
+		super(desc);
+		this.status = status;
+	}
+	
+	public int getStatus() {
+		return this.status;
+	}
 }

@@ -21,12 +21,6 @@ package org.eclipse.ptp.debug.core.cdi.event;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 
-/**
- * 
- * A base interface for all CDI events.
- * 
- * @since Jul 18, 2002
- */
 public interface IPCDIEvent {
 	public BitList getAllProcesses();
 	public BitList getAllUnregisteredProcesses();
