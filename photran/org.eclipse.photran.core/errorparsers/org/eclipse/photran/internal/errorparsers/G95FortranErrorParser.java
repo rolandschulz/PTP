@@ -70,8 +70,10 @@ public class G95FortranErrorParser implements IErrorParser
 				//We produce only the one above for now. 
 				//Since leading blanks are elided before we see these lines, 
 				//we can't count columns. Tabs are an issue here too...
-				String markerLine = (String) lines.pop();
-				String codeLine = (String) lines.pop();
+				
+				/*String markerLine = (String)*/ lines.pop();
+				/*String codeLine = (String)*/ lines.pop();
+				
 				//Revert to hunting for fresh errors...
 				state = new InFileSearchState();
 				//Shows up in the console of the debugging session...

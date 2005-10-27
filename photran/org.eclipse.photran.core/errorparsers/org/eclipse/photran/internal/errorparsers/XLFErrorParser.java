@@ -49,10 +49,10 @@ public class XLFErrorParser implements IErrorParser
 		//      I     : Informational message.
 		
 		String fileName;
-        String cc;
+        //String cc;
         String lineNum;
-        String colNum;
-        String msgNum;
+        //String colNum;
+        //String msgNum;
         String desc;
         String varName = "";
         String level = "S";
@@ -63,9 +63,9 @@ public class XLFErrorParser implements IErrorParser
         {
             fileName = m.group(1);
             lineNum = m.group(2);
-            colNum = m.group(3);
-            cc = m.group(4);
-            msgNum = m.group(5);
+            /*colNum =*/ m.group(3);
+            /*cc =*/ m.group(4);
+            /*msgNum =*/ m.group(5);
             level = m.group(6);
             desc = m.group(7);
 
@@ -84,8 +84,8 @@ public class XLFErrorParser implements IErrorParser
             if (m.matches())
             {
                 fileName = m.group(1);
-                cc = m.group(2);
-                msgNum = m.group(3);
+                /*cc =*/ m.group(2);
+                /*msgNum =*/ m.group(3);
                 level = m.group(4);
                 desc = m.group(5);
             }

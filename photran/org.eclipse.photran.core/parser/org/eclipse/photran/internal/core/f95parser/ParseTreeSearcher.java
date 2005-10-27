@@ -417,6 +417,40 @@ public final class ParseTreeSearcher
     }
 
     /**
+     * Returns the first token in the given tree whose line number is
+     * greater than the given value, or
+     * <code>null</code> if none could be found.
+     * 
+     * @param targetLine
+     * @param tree
+     * @return <code>Token</code> (possibly <code>null</code>)
+     */
+    public static Token findFirstTokenAfterLineIn(final int targetLine, AbstractParseTreeNode tree)
+    {
+        if (tree == null) return null;
+
+        try
+        {
+            tree.visitUsing(new GenericParseTreeVisitor()
+            {
+                public void visitToken(Token token)
+                {
+                    int thisLine = token.getStartLine();
+
+                    if (thisLine > targetLine)
+                        throw new VisitorTokenNotification(token);
+                }
+            });
+        }
+        catch (VisitorTokenNotification tokenFound)
+        {
+            return tokenFound.getNotificationToken();
+        }
+
+        return null;
+    }
+
+    /**
      * Returns true iff the given tree contains the given target (<code>Token</code> or
      * <code>ParseTreeNode</code>), according to an identity comparison.
      * 

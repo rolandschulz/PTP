@@ -25,7 +25,7 @@ import org.eclipse.photran.internal.core.f95parser.Token;
  */
 final class ReferenceCollector extends ParseTreeVisitor
 {
-    private ParseTreeNode parseTreeRoot = null;
+    //private ParseTreeNode parseTreeRoot = null;
 
     private SymbolTable rootSymbolTable = null;
 
@@ -50,7 +50,7 @@ final class ReferenceCollector extends ParseTreeVisitor
     ReferenceCollector(SymbolTable rootSymbolTable, ParseTreeNode parseTreeRoot)
     {
         this.rootSymbolTable = rootSymbolTable;
-        this.parseTreeRoot = parseTreeRoot;
+        //this.parseTreeRoot = parseTreeRoot;
         parseTreeRoot.visitUsing(this);
     }
 
@@ -76,10 +76,10 @@ final class ReferenceCollector extends ParseTreeVisitor
             return node == (ParseTreeNode)parentParseTreeNodeStack.getLast();
     }
 
-    private void addEntry(SymbolTableEntry entry)
-    {
-        getCurrentParent().addEntry(entry);
-    }
+    //private void addEntry(SymbolTableEntry entry)
+    //{
+    //    getCurrentParent().addEntry(entry);
+    //}
 
     private void enterSymbolTableFor(ParseTreeNode node)
     {

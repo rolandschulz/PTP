@@ -1,11 +1,11 @@
 package org.eclipse.photran.internal.ui.preferences;
 
-import org.eclipse.photran.ui.FortranUIPlugin;
 import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.photran.ui.FortranUIPlugin;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;

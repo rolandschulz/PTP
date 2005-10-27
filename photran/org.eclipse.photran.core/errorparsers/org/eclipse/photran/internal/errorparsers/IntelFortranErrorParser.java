@@ -20,14 +20,14 @@ public class IntelFortranErrorParser implements IErrorParser
      */
     public boolean processLine(String line, ErrorParserManager eoParser)
     {
-        String fortcom, severitystr, filestr, linestr, message;
+        String /*fortcom,*/ severitystr, filestr, linestr, message;
 
         StringTokenizer tokenizer = new StringTokenizer(line, ":");
         if (line.startsWith("fortcom: "))
         {
             try
             {
-                fortcom = tokenizer.nextToken(); // fortcom
+                /*fortcom =*/ tokenizer.nextToken(); // fortcom
                 severitystr = tokenizer.nextToken().trim(); // Error
                 filestr = tokenizer.nextToken(",").substring(2).trim(); // filename
                 linestr = tokenizer.nextToken(":").substring(2).trim(); // line

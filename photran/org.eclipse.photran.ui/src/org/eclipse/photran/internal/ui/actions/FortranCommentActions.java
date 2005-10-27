@@ -16,9 +16,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import org.eclipse.photran.internal.ui.actions.FortranCommentActions.Edit.EditFactory;
-import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
-import org.eclipse.photran.internal.ui.editor.FortranFreeFormEditor;
 import org.eclipse.jface.text.Assert;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPartitioningException;
@@ -32,6 +29,8 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.photran.internal.ui.actions.FortranCommentActions.Edit.EditFactory;
+import org.eclipse.photran.internal.ui.editor.AbstractFortranEditor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;

@@ -85,7 +85,7 @@
       <editor
             default="true"
             name="Fortran Editor"
-            extensions="f,f77,f90,f95"
+            extensions="f,for,f77,f90,f95"
             icon="icons/full/obj16/f_file_obj.gif"
             class="org.eclipse.photran.internal.ui.editor.FortranFreeFormEditor"
             contributorClass="org.eclipse.photran.internal.ui.editor.FortranEditorActionContributor"

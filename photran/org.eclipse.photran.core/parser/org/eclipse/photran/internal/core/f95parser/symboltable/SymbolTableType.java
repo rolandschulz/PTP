@@ -29,7 +29,7 @@ public abstract class SymbolTableType
         if (kindOrCharSelector == null) return "";
         
         // Create a name by concatening the text of the child tokens
-        Token name = new Token();
+        //Token name = new Token();
         final StringBuffer sb = new StringBuffer();
         sb.append(", ");
         kindOrCharSelector.visitUsing(new GenericParseTreeVisitor()

@@ -1,8 +1,8 @@
 package org.eclipse.photran.ui;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.photran.internal.ui.preferences.ColorPreferencePage;
 import org.eclipse.photran.internal.ui.preferences.FortranFreeFormSpacePreferencePage;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 

@@ -5,34 +5,7 @@ package org.eclipse.photran.internal.ui.editor;
  * All Rights Reserved.
  */
   
-import java.util.ResourceBundle;
-
-import org.eclipse.cdt.internal.ui.CPluginImages;
-import org.eclipse.cdt.internal.ui.IContextMenuConstants;
-import org.eclipse.cdt.internal.ui.editor.CEditorMessages;
-import org.eclipse.cdt.internal.ui.editor.GotoAnnotationAction;
-import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
-import org.eclipse.cdt.internal.ui.editor.TogglePresentationAction;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IStatusLineManager;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.text.ITextOperationTarget;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IEditorActionBarContributor;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.editors.text.TextEditorActionContributor;
-import org.eclipse.ui.internal.part.components.services.IActionBarContributor;
-import org.eclipse.ui.texteditor.ITextEditor;
-import org.eclipse.ui.texteditor.ITextEditorActionConstants;
-import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
-import org.eclipse.ui.texteditor.RetargetTextEditorAction;
-import org.eclipse.ui.texteditor.TextEditorAction;
 
 /**
  * TODO-Nicholas or Cheah: Comment this.  Where was is copied from, and what does it do?

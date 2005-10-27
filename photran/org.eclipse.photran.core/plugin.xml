@@ -34,7 +34,7 @@
    <extension-point id="FortranFileTypeAssociation" name="FortranFileTypeAssociation" schema="schema/FortranFileTypeAssociation.exsd"/-->
 
 <!-- =================================================================================== -->
-<!-- Define the list of Error Parser provided by the FDT                                 -->
+<!-- Define the list of Error Parsers provided by the FDT                                 -->
 <!-- =================================================================================== -->
    <extension
          id="XLFErrorParser"
@@ -42,6 +42,14 @@
          point="org.eclipse.cdt.core.ErrorParser">
       <errorparser
             class="org.eclipse.photran.internal.errorparsers.XLFErrorParser">
+      </errorparser>
+   </extension>
+   <extension
+         id="GFortranErrorParser"
+         name="%FDTGFortranErrorParser.name"
+         point="org.eclipse.cdt.core.ErrorParser">
+      <errorparser
+            class="org.eclipse.photran.internal.errorparsers.GFortranErrorParser">
       </errorparser>
    </extension>
    <extension

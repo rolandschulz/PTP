@@ -2,7 +2,6 @@ package org.eclipse.photran.internal.ui.editor;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IRule;
@@ -17,7 +16,6 @@ import org.eclipse.photran.internal.ui.preferences.ColorPreferencePage;
 import org.eclipse.photran.ui.FortranUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
 
 public class FortranKeywordRuleBasedScanner extends RuleBasedScanner {
 	private final class FortranWordDetector implements IWordDetector {

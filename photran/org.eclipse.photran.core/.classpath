@@ -4,7 +4,6 @@
 	<classpathentry kind="src" path="errorparsers"/>
 	<classpathentry kind="src" path="model"/>
 	<classpathentry kind="src" path="parser"/>
-	<classpathentry kind="src" path="refactoring"/>
 	<classpathentry kind="src" path="preferences"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>

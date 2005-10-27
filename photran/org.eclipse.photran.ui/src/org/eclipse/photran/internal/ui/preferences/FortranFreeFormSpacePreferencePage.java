@@ -1,11 +1,10 @@
 package org.eclipse.photran.internal.ui.preferences;
 
-import org.eclipse.photran.ui.FortranUIPlugin;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
-import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.photran.ui.FortranUIPlugin;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;

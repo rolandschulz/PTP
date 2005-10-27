@@ -39,7 +39,7 @@ import org.eclipse.photran.internal.core.f95parser.symboltable.entries.VariableE
  */
 final class DeclarationCollector extends ParseTreeVisitor
 {
-    private ParseTreeNode parseTreeRoot = null;
+    //private ParseTreeNode parseTreeRoot = null;
 
     private SymbolTable rootSymbolTable = null;
 
@@ -63,7 +63,7 @@ final class DeclarationCollector extends ParseTreeVisitor
      */
     DeclarationCollector(ParseTreeNode parseTree)
     {
-        this.parseTreeRoot = parseTree;
+        //this.parseTreeRoot = parseTree;
         this.rootSymbolTable = new SymbolTable(null, null);
         parseTree.visitUsing(this);
     }

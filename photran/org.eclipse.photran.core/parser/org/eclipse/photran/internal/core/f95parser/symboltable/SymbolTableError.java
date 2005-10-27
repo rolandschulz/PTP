@@ -11,7 +11,9 @@ package org.eclipse.photran.internal.core.f95parser.symboltable;
  */
 public class SymbolTableError extends Error
 {
-    public SymbolTableError(String message)
+	private static final long serialVersionUID = 1L;
+
+	public SymbolTableError(String message)
     {
         super(message);
     }

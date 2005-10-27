@@ -31,7 +31,7 @@ public class LaheyFortranErrorParser implements IErrorParser
      */
     public boolean processLine(String line, ErrorParserManager epm)
     {
-        String lahey, severityString, fileString, lineString, message;
+        String /*lahey,*/ severityString, fileString, lineString, message;
 
         //If we ever see a line that starts this way, we are
         //henceforth in business...
@@ -48,7 +48,7 @@ public class LaheyFortranErrorParser implements IErrorParser
             StringTokenizer tokenizer = new StringTokenizer(line, ":");
             try
             {
-                lahey = tokenizer.nextToken(); // __####-S:
+                /*lahey =*/ tokenizer.nextToken(); // __####-S:
                 //$TODO Fix this when we see what a warning looks like...
                 severityString = "Error";
                 fileString = tokenizer.nextToken(",").substring(2).trim();

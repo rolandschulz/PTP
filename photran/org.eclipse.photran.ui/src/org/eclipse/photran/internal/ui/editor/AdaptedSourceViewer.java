@@ -9,18 +9,13 @@ import java.util.List;
 
 import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.source.IOverviewRuler;
-import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.jface.text.source.ISourceViewerExtension;
-import org.eclipse.jface.text.source.ISourceViewerExtension2;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.swt.widgets.Composite;
 
-class AdaptedSourceViewer extends SourceViewer{
-	/**
-	 * 
-	 */
+class AdaptedSourceViewer extends SourceViewer
+{
 	private final SourceViewerConfiguration editor;
 
 	private List textConverters;
