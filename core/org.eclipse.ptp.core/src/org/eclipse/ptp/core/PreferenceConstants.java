@@ -19,6 +19,8 @@
 package org.eclipse.ptp.core;
 
 public interface PreferenceConstants {
+	public static final String SET_ROOT_ID = "Root";
+
 	public static final String MONITORING_SYSTEM_SELECTION = "MONITORING_SYSTEM_SELECTION";
 	
 	public static final String CONTROL_SYSTEM_SELECTION = "CONTROL_SYSTEM_SELECTION";
