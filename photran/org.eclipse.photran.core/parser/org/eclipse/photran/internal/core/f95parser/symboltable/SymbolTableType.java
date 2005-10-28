@@ -22,6 +22,8 @@ public abstract class SymbolTableType
      */
     public abstract String getDescription();
     
+    public abstract Object processUsing(SymbolTableTypeProcessor p);
+    
     protected ParseTreeNode kindOrCharSelector = null;
     
     protected String describeKindOrCharSelector()
@@ -107,6 +109,11 @@ public abstract class SymbolTableType
         {
             return "integer" + describeKindOrCharSelector();
         }
+        
+        public Object processUsing(SymbolTableTypeProcessor p)
+        {
+        	return p.ifInteger(this);
+        }
     };
 
     public static SymbolTableType REAL = new SymbolTableType()
@@ -114,6 +121,11 @@ public abstract class SymbolTableType
         public String getDescription()
         {
             return "real" + describeKindOrCharSelector();
+        }
+        
+        public Object processUsing(SymbolTableTypeProcessor p)
+        {
+        	return p.ifReal(this);
         }
     };
 
@@ -123,6 +135,11 @@ public abstract class SymbolTableType
         {
             return "double precision" + describeKindOrCharSelector();
         }
+        
+        public Object processUsing(SymbolTableTypeProcessor p)
+        {
+        	return p.ifDoublePrecision(this);
+        }
     };
 
     public static SymbolTableType COMPLEX = new SymbolTableType()
@@ -130,6 +147,11 @@ public abstract class SymbolTableType
         public String getDescription()
         {
             return "complex" + describeKindOrCharSelector();
+        }
+        
+        public Object processUsing(SymbolTableTypeProcessor p)
+        {
+        	return p.ifComplex(this);
         }
     };
 
@@ -139,6 +161,11 @@ public abstract class SymbolTableType
         {
             return "logical" + describeKindOrCharSelector();
         }
+        
+        public Object processUsing(SymbolTableTypeProcessor p)
+        {
+        	return p.ifLogical(this);
+        }
     };
 
     public static SymbolTableType CHARACTER = new SymbolTableType()
@@ -146,6 +173,11 @@ public abstract class SymbolTableType
         public String getDescription()
         {
             return "character" + describeKindOrCharSelector();
+        }
+        
+        public Object processUsing(SymbolTableTypeProcessor p)
+        {
+        	return p.ifCharacter(this);
         }
     };
 
@@ -158,6 +190,11 @@ public abstract class SymbolTableType
 	            return "type(" + description.getText() + ")"
 	            	+ describeKindOrCharSelector();
 	            // Yeah, I know it *shouldn't* have a kind or char selector...
+	        }
+	        
+	        public Object processUsing(SymbolTableTypeProcessor p)
+	        {
+	        	return p.ifDerivedType(description.getText(), this);
 	        }
         };
     };

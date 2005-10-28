@@ -108,6 +108,11 @@ public class FortranProcessor
         return createSymbolTableFromParseTree(parse(filename));
     }
 
+    public SymbolTable parseAndCreateSymbolTableFor(InputStream in, String filename) throws Exception
+    {
+        return createSymbolTableFromParseTree(parse(in, filename));
+    }
+
     public boolean lastParseWasFixedForm()
     {
         return lastParseWasFixedForm;

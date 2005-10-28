@@ -1,10 +1,13 @@
 package org.eclipse.photran.internal.core.f95parser.symboltable.entries;
 
+import java.util.ArrayList;
+
 import org.eclipse.photran.internal.core.f95parser.ParseTreeNode;
 import org.eclipse.photran.internal.core.f95parser.Token;
 import org.eclipse.photran.internal.core.f95parser.symboltable.SymbolTable;
 import org.eclipse.photran.internal.core.f95parser.symboltable.SymbolTableEntry;
 import org.eclipse.photran.internal.core.f95parser.symboltable.SymbolTableType;
+import org.eclipse.photran.internal.core.f95parser.symboltable.SymbolTableVisitor;
 
 /**
  * Superclass for <code>FunctionEntry</code> and <code>SubroutineEntry</code>
@@ -85,5 +88,21 @@ public abstract class AbstractSubprogramEntry extends SymbolTableEntry
     public void setElemental(boolean isElemental)
     {
         this.isElemental = isElemental;
+    }
+    
+    public ArrayList/*<VariableEntry>*/ getParameters()
+    {
+    	final ArrayList/*<VariableEntry>*/ params = new ArrayList/*<VariableEntry>*/();
+    	
+    	childTable.visitUsing(new SymbolTableVisitor()
+		{
+			public void visit(VariableEntry entry)
+			{
+				if (entry.isFunctionOrSubroutineParameter())
+					params.add(entry);
+			}
+		});
+    	
+    	return params;
     }
 }
