@@ -620,7 +620,7 @@ SetAndCheckBreak(int bpid, char *where)
 	if ( bpt->func != NULL )
 		bp->loc.func = strdup(bpt->func);
 	if ( bpt->addr != 0 )
-		asprintf(&bp->loc.addr, "%lx", bpt->addr);
+		asprintf(&bp->loc.addr, "%p", bpt->addr);
 	bp->loc.line = bpt->line;
 	
 	e = NewDbgEvent(DBGEV_BPSET);
@@ -810,7 +810,7 @@ GetStackframes(int current, List **flist)
 		s = NewStackframe(f->level);
 
 		if ( f->addr != 0 )
-			asprintf(&s->loc.addr, "%lx", f->addr);
+			asprintf(&s->loc.addr, "%p", f->addr);
 		if ( f->func != NULL )
 			s->loc.func = strdup(f->func);
 		if ( f->file != NULL )
