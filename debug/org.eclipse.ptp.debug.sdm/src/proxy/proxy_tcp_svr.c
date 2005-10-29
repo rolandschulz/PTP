@@ -340,20 +340,13 @@ printf("SVR received <%s>\n", msg);
 	else {
 		for (cmd = conn->svr->svr_commands; cmd->cmd_name != NULL; cmd++) {
 			if (strcmp(args[0], cmd->cmd_name) == 0) {
-				res = cmd->cmd_func(args);
+				(void)cmd->cmd_func(args);
 				break;
 			}
 		}
 	}
 	
 	FreeArgs(args);
-	
-	if (res != PROXY_RES_OK) {
-		e = new_proxy_event(PROXY_EV_ERROR);
-		e->error_code = proxy_get_error();
-		e->error_msg = strdup(proxy_get_error_str());
-		proxy_tcp_svr_event_callback((void *)e, (void *)conn);
-	}
 	
 	return 0;
 }
