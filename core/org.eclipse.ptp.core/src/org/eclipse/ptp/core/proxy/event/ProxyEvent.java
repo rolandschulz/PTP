@@ -48,6 +48,10 @@ public class ProxyEvent {
 			evt = new ProxyErrorEvent(errCode, decodeString(args[2]));
 			break;
 			
+		case IProxyEvent.EVENT_CONNECTED:
+			evt = new ProxyConnectedEvent();
+			break;
+			
 		default:
 			evt = new ProxyErrorEvent(ProxyErrorEvent.EVENT_ERR_EVENT, "Invalid event type");
 			break;
