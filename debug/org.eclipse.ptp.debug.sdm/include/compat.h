@@ -26,6 +26,10 @@
 #define MAX(a, b)		((a) < (b) ? (b) : (a))
 #endif /* MAX */
 
+#ifndef MIN
+#define MIN(a, b)		((a) > (b) ? (b) : (a))
+#endif /* MAX */
+
 #ifdef __APPLE__
 #define BITSPERBYTE     NBBY
 #elif __linux__
