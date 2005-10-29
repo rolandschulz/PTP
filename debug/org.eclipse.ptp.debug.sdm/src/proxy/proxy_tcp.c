@@ -169,7 +169,7 @@ proxy_tcp_get_msg_len(proxy_tcp_conn *conn)
 	 * check if we've received the length
 	 */
 	if (conn->msg_len == 0 || (conn->msg_len > 0 && *end != ' ')) {
-		proxy_set_error(PROXY_ERR_PROTO, NULL);
+		proxy_set_error(PROXY_ERR_PROTO, "could not understand message");
 		return -1;
 	}
 
