@@ -20,28 +20,16 @@
 #ifndef _BITSET_H_
 #define _BITSET_H_
 
-#include "bitvector.h"
+#define BIT_INDEX(bit)		((bit) >> 3) / (sizeof(bits))
+#define BIT_IN_OBJ(bit)		((bit) - ((BIT_INDEX((bit)) * sizeof(bits)) << 3))
+#define SIZE_TO_BYTES(size)	(sizeof(bits) * (size))
 
-#define BITVECTOR_TYPE			bitvector *
-#define BITVECTOR_NUMBITS(v)		((v)->size)
-#define BITVECTOR_CREATE(size)	bitvector_create(size)
-#define BITVECTOR_FREE(v)			bitvector_free(v)
-#define BITVECTOR_SET(v, bit)		bitvector_set((v), (bit))
-#define BITVECTOR_UNSET(v, bit)	bitvector_unset((v), (bit))
-#define BITVECTOR_GET(v, bit)		(bitvector_get((v), (bit))!=0)
-#define BITVECTOR_COPY(v1, v2)	bitvector_copy((v2), (v1))
-#define BITVECTOR_ISEMPTY(v)		bitvector_isempty(v)
-#define BITVECTOR_ANDEQ(v1, v2)	bitvector_andeq((v1), (v2))
-#define BITVECTOR_OREQ(v1, v2)	bitvector_oreq((v1), (v2))
-#define BITVECTOR_AND(v1, v2, v3)	bitvector_and((v1), (v2), (v3))
-#define BITVECTOR_OR(v1, v2, v3)	bitvector_or((v1), (v2), (v3))
-#define BITVECTOR_INVERT(v1)		bitvector_invert((v1))
-#define BITVECTOR_CLEAR(v1)		bitvector_clear((v1))
+typedef unsigned int	bits;
 
 struct bitset {
-	char *			bs_name;
-	int				bs_nbits;
-	BITVECTOR_TYPE	bs_bits;
+	unsigned int		bs_nbits;	/* total number of bits in set */
+	bits *			bs_bits;		/* actual bits (unused bits are always 0)*/
+	unsigned int		bs_size;		/* number of 'bits' objects */
 };
 typedef struct bitset bitset;
 

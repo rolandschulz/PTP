@@ -26,141 +26,180 @@
 #include "bitset.h"
 
 bitset *
-bitset_new(int size)
+bitset_new(int nbits)
 {
-	bitset *	p;
+	bitset *	b;
 	
-	p = malloc(sizeof(bitset));
+	b = malloc(sizeof(bitset));
 	
-	p->bs_nbits = size;
-	p->bs_bits = BITVECTOR_CREATE(size);
+	b->bs_nbits = nbits;
+	b->bs_size = BIT_INDEX(nbits) + 1;
+	b->bs_bits = (bits *)malloc(SIZE_TO_BYTES(b->bs_size));
+	memset(b->bs_bits, 0, SIZE_TO_BYTES(b->bs_size));
 	
-	return p;
+	return b;
 }
 
 void		
-bitset_free(bitset *p)
+bitset_free(bitset *b)
 {
-	BITVECTOR_FREE(p->bs_bits);
-	free(p);
+	free(b->bs_bits);
+	free(b);
 }
 
 bitset *	
-bitset_copy(bitset *p)
+bitset_copy(bitset *b)
 {
-	bitset *np = bitset_new(p->bs_nbits);
+	bitset *nb = bitset_new(b->bs_nbits);
 	
-	BITVECTOR_COPY(np->bs_bits, p->bs_bits);
+	memcpy(nb->bs_bits, b->bs_bits, SIZE_TO_BYTES(b->bs_size));
 	
-	return np;
+	return nb;
 }
 
 int	
-bitset_isempty(bitset *p)
+bitset_isempty(bitset *b)
 {
-	return BITVECTOR_ISEMPTY(p->bs_bits);
+	int	i;
+	
+	for (i = 0; i < b->bs_size; i++)
+		if (b->bs_bits[i] != 0)
+			return 0;
+			
+	return 1;
 }
 
 
 void	
-bitset_clear(bitset *p)
+bitset_clear(bitset *b)
 {
-	return BITVECTOR_CLEAR(p->bs_bits);
-}
-
-bitset *	
-bitset_and(bitset *p1, bitset *p2)
-{
-	bitset *np = bitset_new(MAX(p1->bs_nbits, p2->bs_nbits));
-	
-	BITVECTOR_AND(np->bs_bits, p1->bs_bits, p2->bs_bits);
-	
-	return np;
-}
-
-void
-bitset_andeq(bitset *p1, bitset *p2)
-{
-	/*
-	 * Silently fail if sets are different sizes
-	 * */
-	if (p1->bs_nbits != p2->bs_nbits)
-		return;
-	
-	BITVECTOR_ANDEQ(p1->bs_bits, p2->bs_bits);
-}
-
-bitset *	
-bitset_or(bitset *p1, bitset *p2)
-{
-	bitset *np = bitset_new(MAX(p1->bs_nbits, p2->bs_nbits));
-	
-	BITVECTOR_OR(np->bs_bits, p1->bs_bits, p2->bs_bits);
-	
-	return np;
-}
-
-void
-bitset_oreq(bitset *p1, bitset *p2)
-{
-	/*
-	 * Silently fail if sets are different sizes
-	 * */
-	if (p1->bs_nbits != p2->bs_nbits)
-		return;
-	
-	BITVECTOR_OREQ(p1->bs_bits, p2->bs_bits);
+	memset(b->bs_bits, 0, SIZE_TO_BYTES(b->bs_size));
 }
 
 /*
- * Bitvector always rounds up the number of bits to the nearest
- * chunk size. We need to reset the top most bits or they
- * will be incorrectly tested by isempty().
+ * Compute logical AND of bitsets
+ * 
+ * If bitsets are different sizes, create a new bitset that
+ * is the same size as the larger of the two. The high bits
+ * will be ANDed with 0.
  */
-static void
-_invert_helper(int nb, BITVECTOR_TYPE bv)
+bitset *	
+bitset_and(bitset *b1, bitset *b2)
 {
-	int	b;
+	bitset *	nb;
 	
-	for (b = nb; b < BV_BITSIZE(bv); b++)
-		BITVECTOR_UNSET(bv, b);
+	if (b1->bs_size > b2->bs_size) {
+		nb = bitset_copy(b1);
+		bitset_andeq(nb, b2);
+	} else {
+		nb = bitset_copy(b2);
+		bitset_andeq(nb, b1);
+	}
+	
+	return nb;
+}
+
+/*
+ * Compute b1 &= b2
+ * 
+ * If bitsets are different sizes, high bits are assumed
+ * to be 0.
+ */
+void
+bitset_andeq(bitset *b1, bitset *b2)
+{
+	int	i;
+	
+	for (i = 0; i < MIN(b1->bs_size, b2->bs_size); i++)
+		b1->bs_bits[i] &= b2->bs_bits[i];
+		
+	/*
+	 * Mask high bits (if any)
+	 */
+	for ( ; i < b1->bs_size; i++)
+		b1->bs_bits[i] = 0;
+}
+
+/*
+ * Compute logical OR of bitsets
+ */
+bitset *	
+bitset_or(bitset *b1, bitset *b2)
+{
+	bitset *	nb;
+	
+	if (b1->bs_size > b2->bs_size) {
+		nb = bitset_copy(b1);
+		bitset_oreq(nb, b2);
+	} else {
+		nb = bitset_copy(b2);
+		bitset_oreq(nb, b1);
+	}
+	
+	return nb;
+}
+
+/*
+ * Compute b1 |= b2
+ */
+void
+bitset_oreq(bitset *b1, bitset *b2)
+{
+	int	i;
+	
+	for (i = 0; i < MIN(b1->bs_size, b2->bs_size); i++)
+		b1->bs_bits[i] |= b2->bs_bits[i];
 }
 
 void		
-bitset_invert(bitset *p)
+bitset_invert(bitset *b)
 {
-	BITVECTOR_INVERT(p->bs_bits);
-	_invert_helper(p->bs_nbits, p->bs_bits);
+	int		i;
+	bits		mask;
+	
+	for (i = 0; i < b->bs_size; i++)
+		b->bs_bits[i] = ~b->bs_bits[i];
+
+	/*
+	 * Fix unused high bits
+	 */
+	mask = 0;
+	for (i = 0; i <= BIT_IN_OBJ(b->bs_nbits-1); i++)
+		mask |= (1 << i);
+
+	b->bs_bits[b->bs_size-1] &= mask;	
 }
 	
 /**
  * Add a bit to the set. Bits are numbered from 0.
  */
 void		
-bitset_set(bitset *p, int proc)
+bitset_set(bitset *b, int bit)
 {
-	if (proc < 0 || proc >= p->bs_nbits)
+	if (bit < 0 || bit >= b->bs_nbits)
 		return;
 		
-	BITVECTOR_SET(p->bs_bits, proc);
+	b->bs_bits[BIT_INDEX(bit)] |= (1 << BIT_IN_OBJ(bit));
 }
 
 void		
-bitset_unset(bitset *p, int proc)
+bitset_unset(bitset *b, int bit)
 {
-	if (proc < 0 || proc >= p->bs_nbits)
+	if (bit < 0 || bit >= b->bs_nbits)
 		return;
 		
-	BITVECTOR_UNSET(p->bs_bits, proc);
+	b->bs_bits[BIT_INDEX(bit)] &= ~(1 << BIT_IN_OBJ(bit));
 }
 
 int		
-bitset_test(bitset *p, int proc)
+bitset_test(bitset *b, int bit)
 {
-	if (proc < 0 || proc >= p->bs_nbits)
+	bits		mask = (1 << BIT_IN_OBJ(bit));
+	
+	if (bit < 0 || bit >= b->bs_nbits)
 		return 0;
 		
-	return BITVECTOR_GET(p->bs_bits, proc);
+	return (b->bs_bits[BIT_INDEX(bit)] & mask) == mask;
 }
 
 static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
@@ -174,7 +213,7 @@ static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B
  * set (in hex).
  */
 char *
-bitset_to_str(bitset *p)
+bitset_to_str(bitset *b)
 {
 	int				n;
 	int				nonzero = 0;
@@ -185,20 +224,20 @@ bitset_to_str(bitset *p)
 	char *			s;
 	unsigned char	byte;
 	
-	if (p == NULL)
+	if (b == NULL)
 		return strdup("0:0");
 		
 	/*
 	 * Find out how many bytes needed (rounded up)
 	 */
-	bytes = (p->bs_nbits >> 3) + 1;
+	bytes = (b->bs_nbits >> 3) + 1;
 
 	str = (char *)malloc((bytes * 2) + 8 + 2);
 	
 	/*
 	 * Start with actual number of bits (silently truncate to 32 bits)
 	 */
-	n = sprintf(str, "%X", p->bs_nbits & 0xffffffff);
+	n = sprintf(str, "%X", b->bs_nbits & 0xffffffff);
 	
 	s = str + n;
 	
@@ -206,7 +245,7 @@ bitset_to_str(bitset *p)
 	
 	for (pbit = (bytes << 3) - 1; pbit > 0; ) {
 		for (byte = 0, bit = 3; bit >= 0; bit--, pbit--) {
-			if (pbit < p->bs_nbits && BITVECTOR_GET(p->bs_bits, pbit)) {
+			if (pbit < b->bs_nbits && bitset_test(b, pbit)) {
 				byte |= (1 << bit);
 				nonzero = 1;
 			}
@@ -237,7 +276,7 @@ str_to_bitset(char *str)
 	int			pos;
 	int			b;
 	char *		end;
-	bitset *	p;
+	bitset *		bp;
 	
 	if (str == NULL)
 		return NULL;
@@ -252,7 +291,7 @@ str_to_bitset(char *str)
 	if (*str != ':' || nprocs == 0)
 		return NULL;
 		
-	p = bitset_new(nprocs);
+	bp = bitset_new(nprocs);
 	
 	/*
 	 * Easier if we start from end
@@ -261,17 +300,17 @@ str_to_bitset(char *str)
 		b = digittoint(*end);
 		for (n = 0; n < 4; n++, pos++) {
 			if (b & (1 << n)) {
-				bitset_set(p, pos);
+				bitset_set(bp, pos);
 			}
 		}
 	}
 	
 	if (end != str) {
-		bitset_free(p);
+		bitset_free(bp);
 		return NULL;
 	}
 	
-	return p;
+	return bp;
 }
 
 int
@@ -302,32 +341,32 @@ emit_range(char ** str, char sep, int lower, int upper)
  * 	{0-2,4,5-100}
  */
 char *
-bitset_to_set(bitset *p)
+bitset_to_set(bitset *b)
 {
-	int			proc;
+	int			bit;
 	int			lower;
 	int			upper;
 	char			sep = 0;
 	char *		str;
 	char *		s;
 	
-	if (p == NULL)
+	if (b == NULL)
 		return strdup("{}");
 		
-	str = s = (char *)malloc(p->bs_nbits * 2 + 3);
+	str = s = (char *)malloc(b->bs_nbits * 2 + 3);
 
 	*s++ = '{';
 	
-	for (proc = 0, lower = -1, upper = -1; proc < p->bs_nbits; proc++) {	
-		if (bitset_test(p, proc)) {
+	for (bit = 0, lower = -1, upper = -1; bit < b->bs_nbits; bit++) {	
+		if (bitset_test(b, bit)) {
 			if (lower < 0)
-				lower = proc;
+				lower = bit;
 			
-			upper = proc;
+			upper = bit;
 		} else {
 			if (emit_range(&s, sep, lower, upper))
 				sep = ',';
-			lower = proc + 1;
+			lower = bit + 1;
 		}
 	}
 	
@@ -339,16 +378,30 @@ bitset_to_set(bitset *p)
 	return str;
 }
 
+unsigned int
+count_bits(bits b)
+{
+	unsigned int	n = 0;
+	
+	while (b != 0) {
+		n++;
+		b &= (b-1);
+	}
+
+	return n;	
+}
+
 /**
  * Number of bits in the set (as opposed to the total size of the set)
  */
 int
-bitset_size(bitset *p)
+bitset_size(bitset *b)
 {
 	int	i;
 	int	size = 0;
 	
-	for (i = 0; i < p->bs_nbits; i++)
-		size += BITVECTOR_GET(p->bs_bits, i);
+	for (i = 0; i < b->bs_size; i++)
+		size += count_bits(b->bs_bits[i]);
+	
 	return size;
 }
