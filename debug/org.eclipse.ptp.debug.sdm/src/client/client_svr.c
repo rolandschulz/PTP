@@ -48,8 +48,8 @@
  */
 struct active_request {
 	bitset *		procs;
-	void *			data;
-	Hash *			events;
+	void *		data;
+	Hash *		events;
 };
 typedef struct active_request	active_request;
 
@@ -127,7 +127,8 @@ ClntSendCommand(bitset *procs, char *str, void *data)
 	p = bitset_and(sending_procs, procs);
 	bitset_andeq(p, receiving_procs);
 	if (!bitset_isempty(p)) {
-		DbgSetError(DBGERR_INPROGRESS, NULL);
+		if (cmd_completed_callback != NULL)
+			cmd_completed_callback(DbgErrorEvent(DBGERR_INPROGRESS, NULL), NULL);
 		return -1;
 	}
 	
