@@ -35,6 +35,11 @@ public class ProxyDebugDataEvent extends AbstractProxyDebugEvent implements IPro
 	}
 	
 	public String toString() {
-		return "EVENT_DBG_DATA " + this.getBitSet().toString() + " " + this.data.toString();
+		String res = "EVENT_DBG_DATA " + this.getBitSet().toString();
+		if (this.data != null)
+			res += " " + this.data.toString();
+		else
+			res += " AIFNULL";
+		return res;
 	}
 }
