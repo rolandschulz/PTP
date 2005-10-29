@@ -40,6 +40,6 @@ public class ProxyDebugErrorEvent extends AbstractProxyDebugEvent implements IPr
 	}
 
 	public String toString() {
-		return "EVENT_DBG_EXIT " + this.getBitSet().toString() + " " + this.errorCode + " " + this.errorMsg;
+		return "EVENT_DBG_ERROR " + this.getBitSet().toString() + " " + this.errorCode + " " + this.errorMsg;
 	}
 }
