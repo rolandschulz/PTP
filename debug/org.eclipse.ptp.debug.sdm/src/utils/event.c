@@ -126,7 +126,7 @@ DbgEventToStr(dbg_event *e, char **result)
 		return -1;
 	
 	pstr = bitset_to_str(e->procs);
-	
+
 	switch (e->event)
 	{
 	case DBGEV_OK:
@@ -511,4 +511,16 @@ FreeDbgEvent(dbg_event *e) {
 		bitset_free(e->procs);
 
 	free(e);
+}
+
+dbg_event *
+DbgErrorEvent(int err, char *msg)
+{
+	dbg_event *	e = NewDbgEvent(DBGEV_ERROR);
+	
+	e->error_code = err;
+	if (msg != NULL)
+		e->error_msg = strdup(msg);
+		
+	return e;
 }
