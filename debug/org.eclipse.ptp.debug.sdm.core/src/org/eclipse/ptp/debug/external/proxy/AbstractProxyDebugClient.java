@@ -31,14 +31,28 @@ import org.eclipse.ptp.core.proxy.event.ProxyErrorEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyOKEvent;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.external.proxy.event.IProxyDebugEvent;
+import org.eclipse.ptp.debug.external.proxy.event.IProxyDebugEventListener;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugErrorEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugEvent;
 
 public abstract class AbstractProxyDebugClient extends AbstractProxyClient {
-	protected List				listeners = new ArrayList(2);
+	protected List		listeners = new ArrayList(2);
+	private boolean		waiting = false;
 
 	public AbstractProxyDebugClient(String host, int port) {
 		super(host, port);
+	}
+	
+	public synchronized void sessionCreate(boolean wait) throws IOException {
+		super.sessionCreate();
+		if (wait) {
+			waiting = true;
+			try {
+				wait();
+			} catch (InterruptedException e) {
+			}
+			waiting = false;
+		}
 	}
 	
 	private String encodeBitSet(BitList set) {
@@ -56,17 +70,17 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient {
 		this.sendCommand(cmd, setStr + " " + args);
 	}
 
-	public void addEventListener(IProxyEventListener listener) {
+	public void addEventListener(IProxyDebugEventListener listener) {
 		listeners.add(listener);
 	}
 	
-	public void removeEventListener(IProxyEventListener listener) {
+	public void removeEventListener(IProxyDebugEventListener listener) {
 		listeners.remove(listener);
 	}
 		
 	protected synchronized void fireEvent(IProxyEvent event) {
 		IProxyDebugEvent e = null;
-
+System.out.println("got event " + event);
 		if (listeners == null)
 			return;
 		
@@ -78,12 +92,18 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient {
 		case IProxyEvent.EVENT_ERROR:
 			e = new ProxyDebugErrorEvent(null, ((ProxyErrorEvent)event).getErrorCode(), ((ProxyErrorEvent)event).getErrorMessage());
 			break;
+			
+		case IProxyEvent.EVENT_CONNECTED:
+			if (waiting) {
+				notify();
+			}
+			return;
 		}
 		
 		if (e != null) {
 			Iterator i = listeners.iterator();
 			while (i.hasNext()) {
-				IProxyEventListener listener = (IProxyEventListener) i.next();
+				IProxyDebugEventListener listener = (IProxyDebugEventListener) i.next();
 				listener.fireEvent(e);
 			}
 		}
