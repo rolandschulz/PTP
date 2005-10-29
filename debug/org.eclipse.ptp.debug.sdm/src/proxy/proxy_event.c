@@ -38,7 +38,7 @@ proxy_data_to_str(char *data, int len, char **result)
 	char *	res;
 	
 	if (data == NULL) {
-		*result = strdup("0:0");
+		*result = strdup("1:00");
 		return 0;
 	}
 	
@@ -68,11 +68,9 @@ proxy_data_to_str(char *data, int len, char **result)
 int
 proxy_cstring_to_str(char *str, char **result)
 {
-	int	len;
+	int	len = 0;
 	
-	if (str == NULL)
-		len = 0;
-	else
+	if (str != NULL)
 		len = strlen(str) + 1;
 
 	return proxy_data_to_str(str, len, result);
