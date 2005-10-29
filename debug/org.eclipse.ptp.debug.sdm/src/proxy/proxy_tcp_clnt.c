@@ -264,6 +264,7 @@ proxy_tcp_clnt_progress(proxy_clnt *pc)
 	if (proxy_str_to_event(result, &ev) < 0) {
 		ev = new_proxy_event(PROXY_EV_ERROR);
 		ev->error_code = PROXY_ERR_PROTO;
+		ev->error_msg = strdup("Could not covert to event");
 	}
 	
 	free(result);
