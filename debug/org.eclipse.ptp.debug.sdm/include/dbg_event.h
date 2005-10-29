@@ -104,4 +104,5 @@ extern int 			DbgStrToEvent(char *, dbg_event **);
 extern int 			DbgEventToStr(dbg_event *, char **);
 extern dbg_event *	NewDbgEvent(int);
 extern void			FreeDbgEvent(dbg_event *);
+extern dbg_event *	DbgErrorEvent(int, char *);
 #endif /* _DBG_EVENT_H_ */
