@@ -151,6 +151,9 @@ bitset_oreq(bitset *b1, bitset *b2)
 		b1->bs_bits[i] |= b2->bs_bits[i];
 }
 
+/*
+ * Compute ~b
+ */
 void		
 bitset_invert(bitset *b)
 {
@@ -169,7 +172,27 @@ bitset_invert(bitset *b)
 
 	b->bs_bits[b->bs_size-1] &= mask;	
 }
+
+/*
+ * Test if two bitsets are equal
+ * 
+ * Bitsets must be the same size
+ */
+int
+bitset_eq(bitset *b1, bitset *b2)
+{
+	int	i;
 	
+	if (b1->bs_nbits != b2->bs_nbits)
+		return 0;
+		
+	for (i = 0; i < b1->bs_size; i++)
+		if (b1->bs_bits[i] != b2->bs_bits[i])
+			return 0;
+			
+	return 1;
+}
+
 /**
  * Add a bit to the set. Bits are numbered from 0.
  */

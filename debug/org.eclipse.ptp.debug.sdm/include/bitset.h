@@ -46,6 +46,7 @@ void			bitset_andeq(bitset *, bitset *);
 bitset *		bitset_or(bitset *, bitset *);
 void			bitset_oreq(bitset *, bitset *);
 void			bitset_invert(bitset *);
+int			bitset_eq(bitset *, bitset *);
 char *		bitset_to_str(bitset *);
 bitset *		str_to_bitset(char *);
 int			bitset_size(bitset *);
