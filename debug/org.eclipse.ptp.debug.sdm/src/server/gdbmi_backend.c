@@ -1237,7 +1237,9 @@ GDBMIGetType(char *var)
 {
 	dbg_event *	e;
 	mi_gvar *	gvar;
+#ifdef USE_AIF_TYPE
 	str_ptr		fds;
+#endif /* USE_AIF_TYPE */
 
 	CHECK_SESSION()
 
@@ -1251,17 +1253,30 @@ GDBMIGetType(char *var)
 		return DBGRES_ERR;
 	}
 
+#ifdef USE_AIF_TYPE	
 	fds = str_init();
 
 	if ( ConvertType(gvar, fds) != DBGRES_OK ) {
 		return DBGRES_ERR;
 	}
+#else /* USE_AIF_TYPE */
+	if ( !gmi_var_info_type(MIHandle, gvar) )
+	{
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		return DBGRES_ERR;
+	}
+#endif /* USE_AIF_TYPE */
 
 	e = NewDbgEvent(DBGEV_TYPE);
+
+#ifdef USE_AIF_TYPE
 	e->type_desc = strdup(fds->buf);
-	SaveEvent(e);
-	
 	str_free(fds);
+#else /* USE_AIF_TYPE */
+	e->type_desc = strdup(gvar->type);
+#endif /* USE_AIF_TYPE */
+
+	SaveEvent(e);
 
 	mi_free_gvar(gvar);
 
