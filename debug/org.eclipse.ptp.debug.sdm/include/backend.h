@@ -37,12 +37,13 @@ struct dbg_backend_funcs {
 	int (*go)(void);
 	int (*step)(int, int);
 	int (*terminate)(void);
+	int (*suspend)(void);
 	int (*liststackframes)(int);
 	int (*setcurrentstackframe)(int);
 	int (*evaluateexpression)(char *);
 	int (*gettype)(char *);
 	int (*listlocalvariables)(void);
-	int (*listarguments)(void);
+	int (*listarguments)(int);
 	int (*listglobalvariables)(void);
 	int (*quit)(void);
 };

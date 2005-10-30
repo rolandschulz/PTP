@@ -280,6 +280,25 @@ DbgClntTerminate(char **args)
 	return res;
 }
 
+int 
+DbgClntSuspend(char **args)
+{
+	int			res;
+	bitset *		set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	res = ClntSendCommand(set, DBG_SUSPEND_CMD, NULL);
+	
+	bitset_free(set);
+	
+	return res;
+}
+
 /*
  * Stack frame operations
  */
@@ -397,6 +416,7 @@ int
 DbgClntListArguments(char **args)
 {
 	int			res;
+	char *		cmd;
 	bitset *		set; 
 
 	set = str_to_bitset(args[1]);
@@ -405,8 +425,10 @@ DbgClntListArguments(char **args)
 		return DBGRES_ERR;
 	}
 	
-	res = ClntSendCommand(set, DBG_LISTARGUMENTS_CMD, NULL);
+	asprintf(&cmd, "%s %s", DBG_LISTARGUMENTS_CMD, args[2]);
+	res = ClntSendCommand(set, cmd, NULL);
 	
+	free(cmd);
 	bitset_free(set);
 	
 	return res;

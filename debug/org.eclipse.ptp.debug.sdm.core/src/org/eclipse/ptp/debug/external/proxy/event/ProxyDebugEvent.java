@@ -28,6 +28,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.external.ExtFormat;
 import org.eclipse.ptp.debug.external.aif.AIF;
 import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.Condition;
@@ -118,6 +119,15 @@ public class ProxyDebugEvent extends ProxyEvent {
 			evt = new ProxyDebugVarsEvent(set, vars);
 			break;
 			
+		case IProxyDebugEvent.EVENT_DBG_ARGS:
+			int numArgs = Integer.parseInt(args[2]);
+			String[] arg_strs = new String[numArgs];
+			for (int i = 0; i < numArgs; i++) {
+				arg_strs[i] = decodeString(args[i+3]);
+			}
+			evt = new ProxyDebugArgsEvent(set, arg_strs);
+			break;
+			
 		case IProxyDebugEvent.EVENT_DBG_INIT:
 			int num_servers = Integer.parseInt(args[2]);
 			evt = new ProxyDebugInitEvent(set, num_servers);
@@ -174,12 +184,8 @@ public class ProxyDebugEvent extends ProxyEvent {
 		String func = decodeString(funcStr);
 		int line = Integer.parseInt(lineStr);
 		String addr = decodeString(addrStr);
-		BigInteger addrVal = BigInteger.ZERO;
 		
-		if (addr.compareTo("") != 0)
-			addrVal = new BigInteger(addr);
-		
-		return new Locator(file, func, line, addrVal);
+		return new Locator(file, func, line, ExtFormat.getBigInteger(addr));
 	}
 
 	public static ProxyDebugStackframe toFrame(String level, String file, String func, String line, String addr)  {

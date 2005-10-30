@@ -37,9 +37,10 @@
 #define DBGEV_DATA		DBG_EV_OFFSET + 6
 #define DBGEV_TYPE		DBG_EV_OFFSET + 7
 #define DBGEV_VARS		DBG_EV_OFFSET + 8
-#define DBGEV_INIT		DBG_EV_OFFSET + 9
-#define DBGEV_OK			DBG_EV_OFFSET + 10
-#define DBGEV_ERROR		DBG_EV_OFFSET + 11
+#define DBGEV_ARGS		DBG_EV_OFFSET + 9
+#define DBGEV_INIT		DBG_EV_OFFSET + 10
+#define DBGEV_OK			DBG_EV_OFFSET + 11
+#define DBGEV_ERROR		DBG_EV_OFFSET + 12
 
 struct dbg_event {
 	int			event;
@@ -61,7 +62,7 @@ struct dbg_event {
 	breakpoint *	bp;
 	
 	/*
-	 * DBGEV_FRAMES, DBGEV_VARS
+	 * DBGEV_FRAMES, DBGEV_VARS, DBGEV_ARGS
 	 */
 	List *		list;
 	

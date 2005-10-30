@@ -27,6 +27,7 @@
 #include "args.h"
 #include "dbg.h"
 #include "dbg_event.h"
+#include "dbg_proxy.h"
 #include "backend.h"
 
 struct svr_cmd {
@@ -43,6 +44,7 @@ static int svr_deletebreakpoint(dbg_backend *, char **);
 static int svr_go(dbg_backend *, char **);
 static int svr_step(dbg_backend *, char **);
 static int svr_terminate(dbg_backend *, char **);
+static int svr_suspend(dbg_backend *, char **);
 static int svr_liststackframes(dbg_backend *, char **);
 static int svr_setcurrentstackframe(dbg_backend *, char **);
 static int svr_evaluateexpression(dbg_backend *, char **);
@@ -54,21 +56,22 @@ static int svr_quit(dbg_backend *, char **);
 
 static svr_cmd svr_cmd_tab[] =
 {
-	{"INI",	svr_start_session},
-	{"SLB",	svr_setlinebreakpoint},
-	{"SFB",	svr_setfuncbreakpoint},
-	{"DBP",	svr_deletebreakpoint},
-	{"GOP",	svr_go},
-	{"STP",	svr_step},
-	{"HLT",	svr_terminate},
-	{"LSF",	svr_liststackframes},
-	{"SCS",	svr_setcurrentstackframe},
-	{"EEX",	svr_evaluateexpression},
-	{"TYP",	svr_gettype},
-	{"LLV",	svr_listlocalvariables},
-	{"LAR",	svr_listarguments},
-	{"LGV",	svr_listglobalvariables},
-	{"QUI",	svr_quit},
+	{DBG_STARTSESSION_CMD,			svr_start_session},
+	{DBG_SETLINEBREAKPOINT_CMD,		svr_setlinebreakpoint},
+	{DBG_SETFUNCBREAKPOINT_CMD,		svr_setfuncbreakpoint},
+	{DBG_DELETEBREAKPOINT_CMD,		svr_deletebreakpoint},
+	{DBG_GO_CMD,						svr_go},
+	{DBG_STEP_CMD,					svr_step},
+	{DBG_TERMINATE_CMD,				svr_terminate},
+	{DBG_SUSPEND_CMD,				svr_suspend},
+	{DBG_LISTSTACKFRAMES_CMD,			svr_liststackframes},
+	{DBG_SETCURRENTSTACKFRAME_CMD,	svr_setcurrentstackframe},
+	{DBG_EVALUATEEXPRESSION_CMD,		svr_evaluateexpression},
+	{DBG_GETTYPE_CMD,				svr_gettype},
+	{DBG_LISTLOCALVARIABLES_CMD,		svr_listlocalvariables},
+	{DBG_LISTARGUMENTS_CMD,			svr_listarguments},
+	{DBG_LISTGLOBALVARIABLES_CMD,		svr_listglobalvariables},
+	{"QUI",							svr_quit},
 };
 
 static int			svr_res;
@@ -165,6 +168,12 @@ svr_step(dbg_backend *db, char **args)
 }
 
 static int 
+svr_suspend(dbg_backend *db, char **args)
+{
+	return db->db_funcs->suspend();
+}
+
+static int 
 svr_terminate(dbg_backend *db, char **args)
 {
 	return db->db_funcs->terminate();
@@ -203,7 +212,7 @@ svr_listlocalvariables(dbg_backend *db, char **args)
 static int 
 svr_listarguments(dbg_backend *db, char **args)
 {
-	return db->db_funcs->listarguments();
+	return db->db_funcs->listarguments(atoi(args[1]));
 }
 
 static int 

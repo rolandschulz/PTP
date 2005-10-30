@@ -82,6 +82,7 @@ static proxy_svr_commands command_tab[] = {
 	{DBG_GO_CMD,						DbgClntGo},
 	{DBG_STEP_CMD,					DbgClntStep},
 	{DBG_TERMINATE_CMD,				DbgClntTerminate},
+	{DBG_SUSPEND_CMD,				DbgClntSuspend},
 	{DBG_LISTSTACKFRAMES_CMD,			DbgClntListStackframes},
 	{DBG_SETCURRENTSTACKFRAME_CMD,	DbgClntSetCurrentStackframe},
 	{DBG_EVALUATEEXPRESSION_CMD,		DbgClntEvaluateExpression},
