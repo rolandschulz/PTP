@@ -77,12 +77,13 @@ static int	GDBMIDeleteBreakpoint(int);
 static int	GDBMIGo(void);
 static int	GDBMIStep(int, int);
 static int	GDBMITerminate(void);
+static int	GDBMISuspend(void);
 static int	GDBMIListStackframes(int);
 static int	GDBMISetCurrentStackframe(int);
 static int	GDBMIEvaluateExpression(char *);
 static int	GDBMIGetType(char *);
 static int	GDBMIGetLocalVariables(void);
-static int	GDBMIGetArguments(void);
+static int	GDBMIListArguments(int);
 static int	GDBMIGetGlobalVariables(void);
 static int	GDBMIQuit(void);
 
@@ -97,12 +98,13 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIGo,
 	GDBMIStep,
 	GDBMITerminate,
+	GDBMISuspend,
 	GDBMIListStackframes,
 	GDBMISetCurrentStackframe,
 	GDBMIEvaluateExpression,
 	GDBMIGetType,
 	GDBMIGetLocalVariables,
-	GDBMIGetArguments,
+	GDBMIListArguments,
 	GDBMIGetGlobalVariables,
 	GDBMIQuit
 };
@@ -381,6 +383,11 @@ from_gdb_cb(const char *str, void *data)
 }
 #endif /* DEBUG */
 
+int timeout_cb(void *data)
+{
+	return 0;
+}
+
 /*
  * Start GDB session
  */	
@@ -422,7 +429,7 @@ GDBMIStartSession(char *gdb_path, char *prog, char *args)
 	}
 
 	mi_set_async_cb(MIHandle, AsyncCallback, NULL);
-
+	
 #ifdef DEBUG
 	mi_set_to_gdb_cb(MIHandle, to_gdb_cb, NULL);
 	mi_set_from_gdb_cb(MIHandle, from_gdb_cb, NULL);
@@ -458,6 +465,7 @@ GDBMIProgress(void)
 	fd_set			fds;
 	int				res = 0;
 	struct timeval	tv;
+	mi_output		*o;
 
 	/*
 	 * Check for existing events
@@ -465,7 +473,6 @@ GDBMIProgress(void)
 	if (LastEvent != NULL) {
 		if (EventCallback != NULL)
 			EventCallback(LastEvent, EventCallbackData);
-		
 		if (ServerExit && LastEvent->event == DBGEV_OK) {
 			if (MIHandle != NULL) {
 				mi_disconnect(MIHandle);
@@ -482,7 +489,7 @@ GDBMIProgress(void)
 	
 	if (MIHandle == NULL)
 		return 0;
-	
+	/*
 	FD_ZERO(&fds);
 	FD_SET(MIHandle->from_gdb[0], &fds);
 	tv = SELECT_TIMEOUT;
@@ -509,8 +516,24 @@ GDBMIProgress(void)
 		}
 	
 		break;
+	}*/
+	
+	
+	mi_set_time_out(MIHandle, 0, 100000);
+	mi_set_time_out_cb(MIHandle, timeout_cb, NULL);
+
+	o = mi_get_response_blk(MIHandle);
+
+	mi_set_time_out(MIHandle, MI_DEFAULT_TIME_OUT, 0);
+	mi_set_time_out_cb(MIHandle, NULL, NULL);
+
+	if (o == NULL) {
+		if (mi_error == MI_GDB_TIME_OUT)
+			mi_error = MI_OK;
+		return 0;
 	}
 
+/*
 	ResetError();
 	while ( (res = mi_get_response(MIHandle)) <= 0 ) {
 		if ( res < 0 ) {
@@ -519,7 +542,8 @@ GDBMIProgress(void)
 			MIHandle = NULL;
 		}
 	}
-
+	*/
+	
 	/*
 	 * Do any extra async functions. We can call gdbmi safely here
 	 */
@@ -747,6 +771,34 @@ GDBMITerminate(void)
 
 	ResetError();
 
+	if (!gmi_exec_kill(MIHandle))
+	{
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		return DBGRES_ERR;
+	}
+
+	/*
+	 * Must check async here due to broken MI implementation. AsyncCallback will
+	 * be called inside gmi_exec_interrupt().
+	 */
+	if (AsyncFunc != NULL) {
+		AsyncFunc(AsyncFuncData);
+		AsyncFunc = NULL;
+	}
+	
+	return DBGRES_OK;
+}
+
+/*
+** Suspend an executing program.
+*/
+static int
+GDBMISuspend(void)
+{
+	CHECK_SESSION()
+
+	ResetError();
+
 	if (!gmi_exec_interrupt(MIHandle))
 	{
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
@@ -792,7 +844,7 @@ GetStackframes(int current, List **flist)
 	mi_frames *	frames;
 	mi_frames *	f;
 	stackframe *	s;
-		
+	
 	if (current)
 		frames = gmi_stack_info_frame(MIHandle);
 	else
@@ -1263,12 +1315,44 @@ GDBMIGetLocalVariables(void)
 ** List arguments.
 */
 static int
-GDBMIGetArguments(void)
+GDBMIListArguments(int level)
 {
+	dbg_event *	e;
+	mi_results *	c;
+	mi_frames *	frames;
+
 	CHECK_SESSION()
 
-	DbgSetError(DBGERR_NOTIMP, NULL);
-	return DBGRES_ERR;
+	ResetError();
+
+	frames = gmi_stack_list_arguments_r(MIHandle, 0, level, level);
+
+	if ( frames == NULL )
+	{
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		return DBGRES_ERR;
+	}
+
+	e = NewDbgEvent(DBGEV_ARGS);
+	e->list = NewList();
+
+	c = frames->args;
+
+	while ( c != NULL )
+	{
+		/* get frame...
+		if ( c->type == t_const && strcmp(c->var, "name") == 0 ) 
+		{
+			AddToList(e->list, strdup(c->var));
+		}*/
+		c = c->next;
+	}
+
+	mi_free_frames(frames);
+
+	SaveEvent(e);
+	
+	return DBGRES_OK;
 }
 
 /*
