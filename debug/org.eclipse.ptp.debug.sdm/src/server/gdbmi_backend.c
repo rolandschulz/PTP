@@ -1276,6 +1276,7 @@ GDBMIGetLocalVariables(void)
 {
 	dbg_event *	e;
 	mi_results *	c;
+	mi_results *	r;
 	mi_results *	res;
 
 	CHECK_SESSION()
@@ -1293,15 +1294,30 @@ GDBMIGetLocalVariables(void)
 	e = NewDbgEvent(DBGEV_VARS);
 	e->list = NewList();
 
-	c = res;
+	/*
+	 * __APPLE__ returns a tuple of tuples: locals={{name="a"},{name="b"}}
+	 * Linux returns a list: locals=[name="a",name="b"]
+	 * 
+	 */
+	
+	if (res->type == t_tuple)	
+		r = res->v.rs;
+	else
+		r = res;
 
-	while ( c != NULL )
+	while ( r != NULL )
 	{
+		if (r->type == t_tuple)
+			c = r->v.rs;
+		else
+			c = r;
+		
 		if ( c->type == t_const && strcmp(c->var, "name") == 0 ) 
 		{
-			AddToList(e->list, strdup(c->var));
+			AddToList(e->list, strdup(c->v.cstr));
 		}
-		c = c->next;
+		
+		r = r->next;
 	}
 
 	mi_free_results(res);
@@ -1319,6 +1335,7 @@ GDBMIListArguments(int level)
 {
 	dbg_event *	e;
 	mi_results *	c;
+	mi_results *	r;
 	mi_frames *	frames;
 
 	CHECK_SESSION()
@@ -1336,16 +1353,27 @@ GDBMIListArguments(int level)
 	e = NewDbgEvent(DBGEV_ARGS);
 	e->list = NewList();
 
-	c = frames->args;
+	/*
+	 * __APPLE__ returns a tuple of tuples: args={{name="argc"},{name="argv"}}
+	 * Linux returns a list: args=[name="argc",name="argv"]
+	 * 
+	 */
+	 
+	r = frames->args;
 
-	while ( c != NULL )
+	while ( r != NULL )
 	{
-		/* get frame...
+		if (r->type == t_tuple)
+			c = r->v.rs;
+		else
+			c = r;
+		
 		if ( c->type == t_const && strcmp(c->var, "name") == 0 ) 
 		{
-			AddToList(e->list, strdup(c->var));
-		}*/
-		c = c->next;
+			AddToList(e->list, strdup(c->v.cstr));
+		}
+		
+		r = r->next;
 	}
 
 	mi_free_frames(frames);
