@@ -21,25 +21,25 @@ package org.eclipse.ptp.debug.external.proxy.event;
 
 import org.eclipse.ptp.core.util.BitList;
 
-public class ProxyDebugVarsEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
-	private String[] vars;
+public class ProxyDebugArgsEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
+	private String[] args;
 	
-	public ProxyDebugVarsEvent(BitList set, String[] vars) {
-		super(EVENT_DBG_VARS, set);
-		this.vars = vars;
+	public ProxyDebugArgsEvent(BitList set, String[] args) {
+		super(EVENT_DBG_ARGS, set);
+		this.args = args;
 	}
 	
 	public String[] getVariables() {
-		return this.vars;
+		return this.args;
 	}
 	
 	public String toString() {
-		String res = "EVENT_DBG_VARS " + this.getBitSet().toString() + " {";
+		String res = "EVENT_DBG_ARGS " + this.getBitSet().toString() + " {";
 
-		for (int i = 0; i < vars.length; i++) {
+		for (int i = 0; i < args.length; i++) {
 			if (i > 0)
 				res += ", ";
-			res += vars[i];
+			res += args[i];
 		}
 		
 		res += "}";

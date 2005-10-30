@@ -57,6 +57,7 @@ int DbgDeleteBreakpoint(session *s, bitset *set, int bpid);
 int DbgGo(session *s, bitset *set);
 int DbgStep(session *s, bitset *set, int count, int type);
 int DbgTerminate(session *s, bitset *set);
+int DbgSuspend(session *s, bitset *set);
 
 /*
  * Stack frame operations
@@ -70,7 +71,7 @@ int DbgSetCurrentStackframe(session *s, bitset *set, int level);
 int DbgEvaluateExpression(session *s, bitset *set, char *exp);
 int DbgGetType(session *s, bitset *set, char *exp);
 int DbgListLocalVariables(session *s, bitset *set);
-int DbgListArguments(session *s, bitset *set);
+int DbgListArguments(session *s, bitset *set, int);
 int DbgListGlobalVariables(session *s, bitset *set);
 
 /*

@@ -201,6 +201,15 @@ DbgTerminate(session *s, bitset *set)
 	return res;
 }
 
+int 
+DbgSuspend(session *s, bitset *set)
+{
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_SUSPEND_CMD, DBG_SUSPEND_FMT, set_str);
+	free(set_str);
+	return res;
+}
 /*
  * Stack frame operations
  */
@@ -260,11 +269,11 @@ DbgListLocalVariables(session *s, bitset *set)
 }
 
 int 
-DbgListArguments(session *s, bitset *set)
+DbgListArguments(session *s, bitset *set, int level)
 {
 	int		res;
 	char *	set_str = bitset_to_str(set);
-	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTARGUMENTS_CMD, DBG_LISTARGUMENTS_FMT, set_str);
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_LISTARGUMENTS_CMD, DBG_LISTARGUMENTS_FMT, set_str, level);
 	free(set_str);
 	return res;
 }

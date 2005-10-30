@@ -57,9 +57,13 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	}
 	
 	public void debugTerminate(BitList procs) throws IOException {
-		sendCommand("HLT", procs);
+		sendCommand("TRM", procs);
 	}
 	
+	public void debugSuspend(BitList procs) throws IOException {
+		sendCommand("HLT", procs);
+	}
+
 	public void debugListStackframes(BitList procs, int current) throws IOException {
 		sendCommand("LSF", procs, Integer.toString(current));
 	}
@@ -80,8 +84,8 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		sendCommand("LLV", procs);
 	}
 
-	public void debugListArguments(BitList procs) throws IOException {
-		sendCommand("LAR", procs);
+	public void debugListArguments(BitList procs, int level) throws IOException {
+		sendCommand("LAR", procs, Integer.toString(level));
 	}
 
 	public void debugListGlobalVariables(BitList procs) throws IOException {

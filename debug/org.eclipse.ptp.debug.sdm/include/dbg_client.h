@@ -49,6 +49,7 @@ int DbgClntDeleteBreakpoint(char **);
 int DbgClntGo(char **);
 int DbgClntStep(char **);
 int DbgClntTerminate(char **);
+int DbgClntSuspend(char **);
 
 /*
  * Stack frame operations

@@ -51,11 +51,13 @@ import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
+import org.eclipse.ptp.debug.external.cdi.model.variable.Argument;
 import org.eclipse.ptp.debug.external.cdi.model.variable.LocalVariable;
 import org.eclipse.ptp.debug.external.proxy.ProxyDebugClient;
 import org.eclipse.ptp.debug.external.proxy.ProxyDebugStackframe;
 import org.eclipse.ptp.debug.external.proxy.event.IProxyDebugEvent;
 import org.eclipse.ptp.debug.external.proxy.event.IProxyDebugEventListener;
+import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugArgsEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugBreakpointHitEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugBreakpointSetEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugDataEvent;
@@ -110,6 +112,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	private String				lastStrRes = null;
 	private IAIF					lastDataRes = null;
 	private ICDILocalVariable[] 	lastVars = null;
+	private ICDIArgument[]		lastArgs = null;
 	private ICDIStackFrame		currFrame = null;
 	
 	/*
@@ -212,7 +215,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 
 	public void halt(BitList tasks) throws PCDIException {
 		try {
-			proxy.debugTerminate(tasks);
+			proxy.debugSuspend(tasks);
 		} catch (IOException e) {
 			// TODO deal with IOException (maybe should be dealt with in ProxyClient?)
 		}
@@ -376,7 +379,18 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	 * list arguments for first process in procs
 	 */
 	public ICDIArgument[] listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException {
-		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listGlobalVariables");
+		this.lastArgs = null;
+		this.currFrame = frame;
+		
+		try {
+			proxy.debugListArguments(tasks, frame.getLevel());
+		} catch (IOException e1) {
+			return null;
+		}
+		
+		waitForEvents(tasks);
+		
+		return this.lastArgs;
 	}
 
 	public IPCDIEvent handleBreakpointHitEvent(BitList tasks, String[] args) {
@@ -474,6 +488,28 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			}
 			
 			this.lastVars = (ICDILocalVariable[]) varList.toArray(new ICDILocalVariable[0]);
+			break;
+			
+		case IProxyDebugEvent.EVENT_DBG_ARGS:
+			if (this.currFrame == null)
+				return;
+
+			ProxyDebugArgsEvent argsEvent = (ProxyDebugArgsEvent)e;
+			ArrayList argList = new ArrayList();
+			
+			IPProcess[] argProcs = getProcesses(argsEvent.getBitSet());
+			if(argProcs.length > 0) {
+				// ICDITarget target = procList[i].getTarget();
+				int taskId = argProcs[0].getTaskId();
+				ICDITarget target = getSession().getTarget(taskId);
+				ICDIThread thread = new Thread((Target) target, 0);
+				String args[] = argsEvent.getVariables();
+				for (int j = 0; j < args.length; j++) {
+						Argument arg = new Argument((Target) target, (Thread) thread, (StackFrame) this.currFrame, args[j], args[j], args.length - j, this.currFrame.getLevel());
+						argList.add(arg);
+				}
+			}
+			this.lastArgs = (ICDIArgument[]) argList.toArray(new ICDIArgument[0]);
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_EXIT:
