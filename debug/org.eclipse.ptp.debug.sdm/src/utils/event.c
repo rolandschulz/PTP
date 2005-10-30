@@ -84,8 +84,9 @@ dbg_stackframe_to_str(stackframe *sf, char **result)
 	return 0;
 }
 
+
 static int
-dbg_vars_to_str(List *lst, char **result)
+dbg_cstring_list_to_str(List *lst, char **result)
 {
 	return proxy_list_to_str(lst, (int (*)(void *, char **))proxy_cstring_to_str, result);
 }
@@ -178,7 +179,13 @@ DbgEventToStr(dbg_event *e, char **result)
 		break;
 
 	case DBGEV_VARS:
-		dbg_vars_to_str(e->list, &str);
+		dbg_cstring_list_to_str(e->list, &str);
+		asprintf(result, "%d %s %s", e->event, pstr, str);
+		free(str);
+		break;
+
+	case DBGEV_ARGS:
+		dbg_cstring_list_to_str(e->list, &str);
 		asprintf(result, "%d %s %s", e->event, pstr, str);
 		free(str);
 		break;
@@ -292,7 +299,7 @@ dbg_str_to_stackframes(char **args, List **lst)
 }
 
 static int
-dbg_str_to_vars(char **args, List **lst)
+dbg_str_to_cstring_list(char **args, List **lst)
 {
 	int		i;
 	int		count = atoi(args[0]);
@@ -410,7 +417,13 @@ DbgStrToEvent(char *str, dbg_event **ev)
 
 	case DBGEV_VARS:
 		e = NewDbgEvent(DBGEV_VARS);
-		if (dbg_str_to_vars(&args[2], &e->list) < 0)
+		if (dbg_str_to_cstring_list(&args[2], &e->list) < 0)
+			goto error_out;
+		break;
+
+	case DBGEV_ARGS:
+		e = NewDbgEvent(DBGEV_ARGS);
+		if (dbg_str_to_cstring_list(&args[2], &e->list) < 0)
 			goto error_out;
 		break;
 
