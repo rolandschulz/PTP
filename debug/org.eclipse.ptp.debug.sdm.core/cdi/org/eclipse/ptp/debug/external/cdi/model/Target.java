@@ -60,8 +60,8 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
-import org.eclipse.ptp.debug.external.IAbstractDebugger;
 import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
 import org.eclipse.ptp.debug.external.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
@@ -221,7 +221,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		stepInto(1);
 	}
 	public void stepInto(int count) throws CDIException {
-		getDebugger().stepInto(((Session)getSession()).createBitList(getTargetID()), count);
+		getDebugger().steppingInto(((Session)getSession()).createBitList(getTargetID()), count);
 	}
 	public void stepIntoInstruction() throws CDIException {
 		stepIntoInstruction(1);
@@ -235,7 +235,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		stepOver(1);
 	}
 	public void stepOver(int count) throws CDIException {
-		getDebugger().stepOver(((Session)getSession()).createBitList(getTargetID()), count);
+		getDebugger().steppingOver(((Session)getSession()).createBitList(getTargetID()), count);
 	}
 	public void stepOverInstruction() throws CDIException {
 		stepOverInstruction(1);
@@ -283,7 +283,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		throw new CDIException("Not implement yet - stepUntil(location)");
 	}
 	public void suspend() throws CDIException {
-		getDebugger().halt(((Session)getSession()).createBitList(getTargetID()));
+		getDebugger().suspend(((Session)getSession()).createBitList(getTargetID()));
 	}
 	public void disconnect() throws CDIException {
 		//Do nothing
@@ -315,7 +315,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		}
 	}
 	public void continuation() throws CDIException {
-		getDebugger().go(((Session)getSession()).createBitList(getTargetID()));
+		getDebugger().resume(((Session)getSession()).createBitList(getTargetID()));
 	}
 	public void jump(ICDILocation location) throws CDIException {
 		String file = "";
@@ -372,7 +372,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		}
 	}
 	public void terminate() throws CDIException {
-		getDebugger().kill(((Session)getSession()).createBitList(getTargetID()));
+		getDebugger().stop(((Session)getSession()).createBitList(getTargetID()));
 	}
 	public boolean isTerminated() {
 		return getPProcess().isTerminated();
@@ -387,7 +387,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		return getPProcess().getStatus().equals(IPProcess.RUNNING);
 	}
 	public Process getProcess() {
-		return getDebugger().getPseudoProcess(getPProcess());
+		return null;
 	}
 	public ICDILineBreakpoint setLineBreakpoint(int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException {
 		Session session = (Session)getSession();

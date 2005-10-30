@@ -25,7 +25,6 @@ import org.eclipse.cdt.debug.core.cdi.ICDIEventManager;
 import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionConfiguration;
 import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
-import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IWorkspaceRunnable;
@@ -34,25 +33,20 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointListener;
-import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.debug.core.model.IProcess;
-import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.PCDIDebugModel;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
-import org.eclipse.ptp.debug.external.IAbstractDebugger;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
-import org.eclipse.ptp.debug.external.cdi.event.TargetRegisteredEvent;
-import org.eclipse.ptp.debug.external.cdi.event.TargetUnregisteredEvent;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
 public class Session implements IPCDISession, ICDISessionObject, IBreakpointListener {
@@ -67,20 +61,20 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 	ICDISessionConfiguration configuration;
 	IAbstractDebugger debugger = null;
 	IPJob job = null;
-	ILaunch launch = null;
+	IPLaunch launch = null;
 	IBinaryObject file;
 	
-	public Session(IAbstractDebugger debugger, IPJob job, ILaunch launch, IBinaryObject file) {
+	public Session(IAbstractDebugger debugger, IPJob job, IPLaunch launch, IBinaryObject file) {
 		this.debugger = debugger;
 		this.job = job;
 		this.launch = launch;
 		this.file = file;
 		this.debugger.setSession(this);
 		commonSetup();
+		job.setAttribute(PreferenceConstants.JOB_DEBUG_SESSION, this);
 		
 		//add observer
 		this.debugger.addDebuggerObserver(eventManager);
-		PTPDebugCorePlugin.getDefault().addDebugSession(job, this);
 		start();
 	}
 	private void commonSetup() {
@@ -94,7 +88,7 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 		variableManager = new VariableManager(this);
 		sourceManager = new SourceManager(this);
 	}
-	public ILaunch getLaunch() {
+	public IPLaunch getLaunch() {
 		return launch;
 	}
 	public IAbstractDebugger getDebugger() {
@@ -112,7 +106,8 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 	private void start() {
 		IWorkspaceRunnable r = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor m) throws CoreException {
-				PCDIDebugModel.getDefault().newJob(getJob().getIDString(), getTotalProcesses());
+				PTPDebugCorePlugin.getDebugModel().newJob(getJob().getIDString(), getTotalProcesses());
+				launch.launchedStarted();
 				defaultSetting();
 				boolean stopInMain = getLaunch().getLaunchConfiguration().getAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false);
 				getBreakpointManager().setInitialBreakpoints();
@@ -133,9 +128,6 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 		}
 	}	
 	
-	public Process getProcess(int tasksId) {
-		return getDebugger().getPseudoProcess(getDebugger().getProcess(tasksId));
-	}
 	public void registerTarget(int procNum, boolean sendEvent) {
 		registerTarget(procNum, sendEvent, false);
 	}
@@ -149,25 +141,10 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 		Target[] targets = new Target[procNums.length];
 		for (int i = 0; i < targets.length; i++) {
 			targets[i] = new Target(this, procNums[i]);
-			if (sendEvent) {
-				getJob().findProcessByTaskId(targets[i].getTargetID()).setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(true));
-			}
-			try {
-				Process process = targets[i].getProcess();
-				IProcess iprocess = null;
-				if (process != null) {
-					iprocess = DebugPlugin.newProcess(launch, process, "Launch Label " + targets[i].getTargetID());
-				}
-				PCDIDebugModel.getDefault().newDebugTarget(launch, null, targets[i], "Process " + targets[i].getTargetID(), iprocess, file, true, false, resumeTarget);
-			} catch (DebugException e) {
-				e.printStackTrace();
-			}
 		}
 		BitList regTasks = createEmptyBitList();
 		processManager.addTargets(targets, regTasks);
-		if (sendEvent) {
-			((EventManager) getEventManager()).fireEvents(new ICDIEvent[] { new TargetRegisteredEvent(this, regTasks) });
-		}
+		PTPDebugCorePlugin.getDebugModel().addNewDebugTargets(launch, regTasks, targets, file, resumeTarget, sendEvent);
 	}
 	public void unregisterTarget(int procNum, boolean sendEvent) {
 		unregisterTargets(new int[] { procNum }, sendEvent);
@@ -176,15 +153,10 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 		BitList unregTasks = createEmptyBitList();
 		for (int i = 0; i < procNums.length; i++) {
 			if (processManager.removeTarget(procNums[i])) {
-				PCDIDebugModel.getDefault().removeDebugTarget(launch, "Process " + procNums[i]);
-				getDebugger().removePseudoProcess(getDebugger().getProcess(procNums[i]));
-				getJob().findProcessByTaskId(procNums[i]).setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
 				unregTasks.set(procNums[i]);
 			}
 		}
-		if (sendEvent) {
-			((EventManager) getEventManager()).fireEvents(new ICDIEvent[] { new TargetUnregisteredEvent(this, unregTasks) });
-		}
+		PTPDebugCorePlugin.getDebugModel().removeDebugTarget(launch, unregTasks, sendEvent);
 	}
 	public String getAttribute(String key) {
 		return props.getProperty(key);
@@ -278,13 +250,19 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 	public void suspend(BitList tasks) throws PCDIException {
 		getDebugger().suspend(tasks);
 	}
-	public void stepInto(BitList tasks) throws PCDIException {
-		getDebugger().stepInto(tasks);
+	public void steppingInto(BitList tasks, int count) throws PCDIException {
+		getDebugger().steppingInto(tasks, count);
 	}
-	public void stepOver(BitList tasks) throws PCDIException {
-		getDebugger().stepOver(tasks);
+	public void steppingInto(BitList tasks) throws PCDIException {
+		getDebugger().steppingInto(tasks);
 	}
-	public void stepReturn(BitList tasks) throws PCDIException {
-		getDebugger().stepReturn(tasks);
+	public void steppingOver(BitList tasks, int count) throws PCDIException {
+		getDebugger().steppingOver(tasks, count);
+	}
+	public void steppingOver(BitList tasks) throws PCDIException {
+		getDebugger().steppingOver(tasks);
+	}
+	public void steppingReturn(BitList tasks) throws PCDIException {
+		getDebugger().steppingReturn(tasks);
 	}
 }

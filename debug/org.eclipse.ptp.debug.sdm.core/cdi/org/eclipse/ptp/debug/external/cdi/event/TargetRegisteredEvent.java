@@ -33,6 +33,7 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDICreatedEvent;
 
 /**
+ * @deprecated
  */
 public class TargetRegisteredEvent extends AbstractEvent implements IPCDICreatedEvent {
 

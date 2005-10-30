@@ -28,18 +28,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external;
 
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.core.util.Queue;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 
 /**
  * Event Thread blocks on the event Queue, wakes up
  * when events are available and notify all the observers.
  */
 public class EventThread extends Thread {
-	AbstractDebugger dbg;
+	IAbstractDebugger dbg;
 	
-	public EventThread(AbstractDebugger d) {
-		super("IDebugger Event Thread"); //$NON-NLS-1$
+	public EventThread(IAbstractDebugger d) {
+		super("IDebugger Event Thread");
 		dbg = d;
 	}
 	

@@ -33,9 +33,9 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
-import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
@@ -264,7 +264,7 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 		IPProcess[] processes = getProcesses(tasks);
 		for (int i = 0; i < processes.length; i++) {
 			processes[i].setTerminated(true);
-			removePseudoProcess(processes[i]);
+			//removePseudoProcess(processes[i]);
 		}
 	}
 	public void run(String[] args) throws PCDIException {
