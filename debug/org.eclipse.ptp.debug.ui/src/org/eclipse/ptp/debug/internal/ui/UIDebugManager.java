@@ -67,6 +67,7 @@ import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
 import org.eclipse.ptp.debug.external.cdi.event.ErrorEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
+import org.eclipse.ptp.debug.internal.ui.preferences.IPDebugPreferenceConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.events.IDebugActionEvent;
 import org.eclipse.ptp.debug.ui.events.ResumedDebugEvent;
@@ -109,18 +110,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		annotationMgr.shutdown();
 		super.shutdown();
 	}
-	/*
-	 * private void defaultRegister(IElementHandler elementHandler) { //register process 0 if the preference is checked if
-	 * (PTPDebugUIPlugin.getDefault().getPreferenceStore().getBoolean(IPDebugPreferenceConstants.PREF_PTP_DEBUG_REGISTER_PROC_0)) { IElement element = elementHandler.getSetRoot().get(0); if (element !=
-	 * null) { elementHandler.addRegisterElement(element.getID()); element.setRegistered(true); } } }
-	 */
-	public String initial() {
-		String new_job_id = super.initial();
-		IElementHandler elementHandler = getElementHandler(new_job_id);
-		if (elementHandler != null) {
-			// defaultRegister(elementHandler);
+	private void defaultRegister(IPCDISession session) { // register process 0 if the preference is checked
+		if (PTPDebugUIPlugin.getDefault().getPreferenceStore().getBoolean(IPDebugPreferenceConstants.PREF_PTP_DEBUG_REGISTER_PROC_0)) {
+			registerProcess(session, 0, true);
 		}
-		return new_job_id;
 	}
 	public boolean isDebugMode(String job_id) {
 		if (isNoJob(job_id))
@@ -217,7 +210,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		consoleWindows.put(proc, new OutputConsole(proc.getElementName(), new ProcessInputStream(proc)));
 	}
 	private void removeConsoleWindow(IPProcess proc) {
-		OutputConsole outputConsole = (OutputConsole)consoleWindows.remove(proc);
+		OutputConsole outputConsole = (OutputConsole) consoleWindows.remove(proc);
 		if (outputConsole != null) {
 			outputConsole.kill();
 		}
@@ -229,6 +222,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		IPJob job = event.getJob();
 		if (event instanceof PLaunchStartedEvent) {
 			getDebugSession(job).getEventManager().addEventListener(this);
+			defaultRegister(getDebugSession(job));
 		} else if (event instanceof PDebugTargetRegisterEvent) {
 			IElementHandler elementHandler = getElementHandler(job.getIDString());
 			BitList tasks = ((PDebugTargetRegisterEvent) event).getTasks();
@@ -528,8 +522,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				} catch (CoreException e) {
 					PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
 				}
-				//System.out.println("-------------------- terminate ------------------------");
-				//annotationMgr.printBitList(event.getAllProcesses());
+				// System.out.println("-------------------- terminate ------------------------");
+				// annotationMgr.printBitList(event.getAllProcesses());
 				fireTerminatedEvent(job, event.getAllProcesses());
 			} else if (event instanceof BreakpointHitEvent) {
 				// do nothing in breakpoint hit event
