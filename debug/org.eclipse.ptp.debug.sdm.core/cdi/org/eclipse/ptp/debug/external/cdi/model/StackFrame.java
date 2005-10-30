@@ -135,17 +135,13 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 	}
 	protected void finish() throws CDIException {
 		((Thread)getThread()).setCurrentStackFrame(this, false);
-
 		Target target = (Target)getTarget();
-		//FIXME - what is last parameter?
-		target.getDebugger().stepFinish(((Session)target.getSession()).createBitList(target.getTargetID()), 0);
+		target.getDebugger().steppingReturn(((Session)target.getSession()).createBitList(target.getTargetID()));
 	}	
 	protected void execReturn(String value) throws CDIException {
 		((Thread)getThread()).setCurrentStackFrame(this, false);
-
 		Target target = (Target)getTarget();
-		//FIXME - how to deal with value?
-		target.getDebugger().stepFinish(((Session)target.getSession()).createBitList(target.getTargetID()), 0);
+		target.getDebugger().steppingReturn(((Session)target.getSession()).createBitList(target.getTargetID()));
 	}
 
 	public int getLevel() {

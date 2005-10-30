@@ -29,7 +29,6 @@
 package org.eclipse.ptp.debug.external.cdi.event;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
@@ -68,16 +67,15 @@ public abstract class AbstractEvent implements IPCDIEvent {
 		return orgTasks;
 	}
 	
-	public boolean isForProcess(int procNumber) {
-		return tasks.get(procNumber);
-	}
 	public ICDIObject getSource() {
-		if (object == null) {
-			int[] regTasks = getAllRegisteredProcesses().toArray();
-			if (regTasks.length > 0) {
-				object = session.getTarget(regTasks[0]);
-			}
-		}
 		return object;
+	}
+	public ICDIObject getSource(int task_id) {
+		if (containTask(task_id))
+			return session.getTarget(task_id);
+		return null;
+	}
+	public boolean containTask(int task_id) {
+		return tasks.get(task_id);
 	}
 }

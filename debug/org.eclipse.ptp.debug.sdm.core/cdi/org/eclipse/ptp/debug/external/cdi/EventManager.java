@@ -37,7 +37,6 @@ import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIEventManager;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
-import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDICreatedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIDisconnectedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
@@ -61,18 +60,13 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 			processSuspendedEvent((IPCDISuspendedEvent)event);
 		}
 		else if (event instanceof IPCDIResumedEvent) {
-			
 		}
 		else if (event instanceof IPCDIExitedEvent) {
-			
 		}
 		else if (event instanceof IPCDIDisconnectedEvent) {
-			
 		}
 		else if (event instanceof IPCDICreatedEvent) {
-			
 		}
-		
 		// Fire the event;
 		ICDIEvent[] cdiEvents = (ICDIEvent[])cdiList.toArray(new ICDIEvent[0]);
 		fireEvents(cdiEvents);
@@ -92,7 +86,7 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	public void removeEventListeners() {
 		list.clear();
 	}
-	public void fireEvents(ICDIEvent[] cdiEvents) {
+	public synchronized void fireEvents(ICDIEvent[] cdiEvents) {
 		if (cdiEvents != null && cdiEvents.length > 0) {
 			ICDIEventListener[] listeners = (ICDIEventListener[])list.toArray(new ICDIEventListener[0]);
 			for (int i = 0; i < listeners.length; i++) {
@@ -103,10 +97,12 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	
 	boolean processSuspendedEvent(IPCDISuspendedEvent event) {
 		Session session = (Session)getSession();
+		/*
 		VariableManager varMgr = session.getVariableManager();
 		ExpressionManager expMgr  = session.getExpressionManager();		
 		BreakpointManager bpMgr = session.getBreakpointManager();
 		SourceManager srcMgr = session.getSourceManager();
+		*/
 		
 		int[] procs = event.getAllRegisteredProcesses().toArray();
 		for (int i = 0; i < procs.length; i++) {
@@ -123,20 +119,16 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 			//TODO -- no thread id provided
 			//int threadId = threadId = event.getThreadId();
 			currentTarget.updateState(0);
-
 			try {
 				Thread cthread = (Thread)currentTarget.getCurrentThread();
 				if (cthread != null) {
 					cthread.getCurrentStackFrame();
 				}
-				else {
-					return true;
-				}
 			} catch (CDIException e1) {
 				e1.printStackTrace();
-				return true;
 			}
 			/*
+			 * TODO - not important at this moment
 			try {
 				if (varMgr.isAutoUpdate()) {
 					varMgr.update(currentTarget);

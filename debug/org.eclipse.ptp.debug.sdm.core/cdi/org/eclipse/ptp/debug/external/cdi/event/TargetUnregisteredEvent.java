@@ -33,6 +33,7 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIDisconnectedEvent;
 
 /**
+ * @deprecated
  */
 public class TargetUnregisteredEvent extends AbstractEvent implements IPCDIDisconnectedEvent {
 

@@ -23,7 +23,6 @@
 package org.eclipse.ptp.debug.external;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
@@ -31,7 +30,7 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
@@ -53,8 +52,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	protected ArrayList userDefinedProcessSetList = null;
 	protected IPCDISession session = null;
 	protected IPProcess[] procs;
-	protected boolean isExitingFlag = false; /* Checked by the eventThread */
-	private HashMap pseudoProcesses = null;
+	protected boolean isExitingFlag = false;
 	private IPJob job = null;
 
 	public final void initialize(IPJob job) {
@@ -67,7 +65,6 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		eventThread.start();
 		userDefinedProcessSetList = new ArrayList();
 		procs = job.getSortedProcesses();
-		pseudoProcesses = new HashMap();
 		// Initialize state variables
 		startDebugger(job);
 	}
@@ -139,12 +136,9 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			if (event instanceof IPCDIExitedEvent) {
 				if (isJobFinished()) {
 					eventQueue.addItem(new DebuggerExitedEvent(getSession(), new BitList(0)));
-					//debugger.deleteDebuggerObserver(eventManager);
 					exit();
 					//remove all observers when the job is finished
 					deleteAllObservers();
-					//remove session
-					PTPDebugCorePlugin.getDefault().removeDebugSession(job);
 				}
 			}
 		}
@@ -158,15 +152,6 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	}
 	public final boolean isExiting() {
 		return isExitingFlag;
-	}
-	public Process getPseudoProcess(IPProcess proc) {
-		if (!pseudoProcesses.containsKey(proc.getElementName()))
-			pseudoProcesses.put(proc.getElementName(), new PseudoProcess(proc));
-		return (Process) pseudoProcesses.get(proc.getElementName());
-	}
-	public void removePseudoProcess(IPProcess proc) {
-		PseudoProcess p = (PseudoProcess) pseudoProcesses.remove(proc.getElementName());
-		p.destroy();
 	}
 	public void handleBreakpointHitEvent(BitList procs, int lineNumber, String filename) {
 		LineLocation loc = new LineLocation(filename, lineNumber);
@@ -188,17 +173,23 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		handleProcessResumedEvent(tasks);
 		go(tasks);
 	}
-	public void stepInto(BitList tasks) throws PCDIException {
+	public void steppingInto(BitList tasks, int count) throws PCDIException {
 		filterRunningTasks(tasks);
 		handleProcessResumedEvent(tasks);
-		stepInto(tasks, 1);
+		stepInto(tasks, count);
 	}
-	public void stepOver(BitList tasks) throws PCDIException {
+	public void steppingInto(BitList tasks) throws PCDIException {
+		steppingInto(tasks, 1);
+	}
+	public void steppingOver(BitList tasks, int count) throws PCDIException {
 		filterRunningTasks(tasks);
 		handleProcessResumedEvent(tasks);
 		stepOver(tasks, 1);
 	}
-	public void stepReturn(BitList tasks) throws PCDIException {
+	public void steppingOver(BitList tasks) throws PCDIException {
+		steppingOver(tasks, 1);
+	}
+	public void steppingReturn(BitList tasks) throws PCDIException {
 		filterRunningTasks(tasks);
 		handleProcessResumedEvent(tasks);
 		stepFinish(tasks, 0);

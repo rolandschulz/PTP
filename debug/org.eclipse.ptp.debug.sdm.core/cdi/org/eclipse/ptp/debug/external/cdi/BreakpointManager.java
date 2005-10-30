@@ -54,7 +54,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.PCDIDebugModel;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
@@ -95,7 +95,7 @@ public class BreakpointManager extends Manager {
 	}
 	
 	public void setBreakpoint(String job_id, IPBreakpoint bpt) throws CoreException {
-		BitList tasks = PCDIDebugModel.getDefault().getTasks(job_id, bpt.getSetId());
+		BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(job_id, bpt.getSetId());
 		ICDILocation location = getLocation(bpt);
 		try {
 			setLocationBreakpointOnSession(bpt, location, null, bpt.isEnabled(), tasks);
@@ -105,7 +105,7 @@ public class BreakpointManager extends Manager {
 	}	
 	public void setInitialBreakpoints() throws CoreException{
 		String job_id = ((Session)getSession()).getJob().getIDString();
-		IPBreakpoint[] bpts = PCDIDebugModel.getDefault().findPBreakpointsByJob(job_id, true);
+		IPBreakpoint[] bpts = PTPDebugCorePlugin.getDebugModel().findPBreakpointsByJob(job_id, true);
 		for (int i = 0; i < bpts.length; i++) {
 			setBreakpoint(job_id, bpts[i]);
 		}

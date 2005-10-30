@@ -52,7 +52,7 @@ import org.eclipse.ptp.debug.external.cdi.model.variable.VariableDescriptor;
 public class VariableManager extends Manager {
 	static final ICDIVariable[] EMPTY_VARIABLES = {};
 	int MAX_STACK_DEPTH = Thread.STACKFRAME_DEFAULT_DEPTH;
-	Map variablesMap;
+	private Map variablesMap;
 
 	public VariableManager(Session session) {
 		super(session, true);
@@ -129,6 +129,8 @@ public class VariableManager extends Manager {
 
 			try {
 				//TODO -- dunno how to do here?
+				//incorrect type will throw exception
+				throw new CDIException("Not implemented yet - VariableManager: checkType");
 			} finally {
 				target.setCurrentThread(currentThread, false);
 				currentThread.setCurrentStackFrame(currentFrame, false);
@@ -417,7 +419,6 @@ public class VariableManager extends Manager {
 	}
 
 	public void update(Target target) throws CDIException {
-		/*
 		int highLevel = 0;
 		int lowLevel = 0;
 		List eventList = new ArrayList();
@@ -451,8 +452,7 @@ public class VariableManager extends Manager {
 		}
 		ICDIEvent[] events = (ICDIEvent[]) eventList.toArray(new ICDIEvent[0]);
 		((EventManager)((Session)getSession()).getEventManager()).fireEvents(events);		
-		throw new CDIException("Not implement yet - VariableManager: update");
-		*/
+		//throw new CDIException("Not implement yet - VariableManager: update");
 	}
 	public void update(Variable variable) throws CDIException {
 		Target target = (Target)variable.getTarget();
@@ -467,8 +467,7 @@ public class VariableManager extends Manager {
 		//variable.setUpdated(true);
 		throw new CDIException("Not implement yet - VariableManager: update");
 	}
-	boolean isVariableNeedsToBeUpdate(Variable variable, ICDIStackFrame current, ICDIStackFrame[] frames, int lowLevel)
-		throws CDIException {
+	boolean isVariableNeedsToBeUpdate(Variable variable, ICDIStackFrame current, ICDIStackFrame[] frames, int lowLevel) throws CDIException {
 		ICDIStackFrame varStack = variable.getStackFrame();
 		boolean inScope = false;
 
