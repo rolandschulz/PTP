@@ -46,7 +46,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.PCDIDebugModel;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
@@ -216,7 +216,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	}
 	public BitList getTasks(IDebugTarget debugTarget) {
 		if (debugTarget instanceof IPDebugTarget) {
-			int taskId = ((IPDebugTarget) debugTarget).getTargetId();
+			int taskId = ((IPDebugTarget) debugTarget).getTargetID();
 			if (taskId == -1)
 				return null;
 			
@@ -290,7 +290,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		if (set_id.equals(IElementHandler.SET_ROOT_ID))
 			return true;
 		try {
-			BitList tasks = PCDIDebugModel.getDefault().getTasks(uiDebugManager.getCurrentJobId(), set_id);
+			BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(uiDebugManager.getCurrentJobId(), set_id);
 			return (tasks != null && tasks.intersects(aTasks));
 		} catch (CoreException e) {
 			return false;
@@ -447,7 +447,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 				new Job("Update Annotation") {
 					protected IStatus run(IProgressMonitor pmonitor) {
 						try {
-							BitList tasks = PCDIDebugModel.getDefault().getTasks(uiDebugManager.getCurrentJobId(), currentSet.getID());
+							BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(uiDebugManager.getCurrentJobId(), currentSet.getID());
 							for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
 								PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation) i.next();
 								//change icon for unregistered processes only if the set is changed
