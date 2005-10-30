@@ -91,8 +91,16 @@ public class PTPDebugCorePlugin extends Plugin {
 	 */
 	private CommonSourceLookupDirector fCommonSourceLookupDirector;
 	private SessionManager fSessionManager = null;
+	/**
+	 * @deprecated 
+	 */
 	private Hashtable fDebugSessions = null;
+	/**
+	 * @deprecated 
+	 */
 	private ListenerList fDebugSessionListeners;
+	
+	private static PCDIDebugModel debugModel = null;
 
 	/**
 	 * The constructor.
@@ -166,7 +174,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	 *            status to log
 	 */
 	public static void log(String message) {
-		getDefault().getLog().log(new Status(IStatus.ERROR, PCDIDebugModel.getDefault().getPluginIdentifier(), INTERNAL_ERROR, message, null));
+		getDefault().getLog().log(new Status(IStatus.ERROR, getUniqueIdentifier(), INTERNAL_ERROR, message, null));
 	}
 	private void initializeDebugConfiguration() {
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(getUniqueIdentifier(), "PTPDebugger"); //$NON-NLS-1$
@@ -249,10 +257,16 @@ public class PTPDebugCorePlugin extends Plugin {
 		fBreakpointListeners.removeAll();
 		fBreakpointListeners = null;
 	}
-	/* Debug Session Listeners */
+	/**
+	 * Debug Session Listeners
+	 * @deprecated
+	 */
 	public void addDebugSessionListener(IPDebugListener listener) {
 		fDebugSessionListeners.add(listener);
 	}
+	/**
+	 * @deprecated
+	 */
 	public void removeDebugSessionListener(IPDebugListener listener) {
 		fDebugSessionListeners.remove(listener);
 	}
@@ -263,20 +277,32 @@ public class PTPDebugCorePlugin extends Plugin {
 		fDebugSessionListeners.removeAll();
 		fDebugSessionListeners = null;
 	}
+	/**
+	 * @deprecated 
+	 */
 	public void addDebugSession(IPJob job, IPCDISession session) {
 		fDebugSessions.put(job, session);
 		Object[] listeners = fDebugSessionListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i)
 			((IPDebugListener) listeners[i]).startSession((IPCDISession) session);
 	}
+	/**
+	 * @deprecated 
+	 */
 	public IPCDISession getDebugSession(IPJob job) {
 		return (IPCDISession) fDebugSessions.get(job);
 	}
+	/**
+	 * @deprecated 
+	 */
 	public void removeDebugSession(IPJob job) {
 		IPCDISession session = (IPCDISession)fDebugSessions.remove(job);
 		Object[] listeners = fDebugSessionListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i)
 			((IPDebugListener) listeners[i]).endSession((IPCDISession) session);
+	}
+	public static PCDIDebugModel getDebugModel() {
+		return debugModel;
 	}
 	/*
 	 * (non-Javadoc)
@@ -285,6 +311,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		debugModel = new PCDIDebugModel();
 		initializeCommonSourceLookupDirector();
 		fDebugSessions = new Hashtable();
 		createBreakpointListenersList();

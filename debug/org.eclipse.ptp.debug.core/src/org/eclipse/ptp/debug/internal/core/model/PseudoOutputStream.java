@@ -16,22 +16,16 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2004 QNX Software Systems and others. All rights reserved. This
- * program and the accompanying materials are made available under the terms of
- * the Common Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors: QNX Software Systems - initial API and implementation
- ******************************************************************************/
-package org.eclipse.ptp.debug.core;
+package org.eclipse.ptp.debug.internal.core.model;
 
-import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.launch.IPLaunch;
+import java.io.IOException;
+import java.io.OutputStream;
 
-public interface IPTPDebugger {
-	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException;
+public class PseudoOutputStream extends OutputStream {
+
+	public void write(int arg0) throws IOException {
+		// Send "arg0" to the process on the remote machine
+		System.out.println("PseudoOutputStream.write()");	
+	}
+
 }

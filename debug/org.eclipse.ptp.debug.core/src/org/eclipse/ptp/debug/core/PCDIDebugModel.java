@@ -20,13 +20,12 @@ package org.eclipse.ptp.debug.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -37,16 +36,16 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.debug.core.model.IDebugTarget;
-import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.core.launch.IPLaunch;
+import org.eclipse.ptp.debug.core.launch.IPLaunchEvent;
+import org.eclipse.ptp.debug.core.launch.IPLaunchListener;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
+import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.internal.core.breakpoint.PLineBreakpoint;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
@@ -56,59 +55,48 @@ import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
  * 
  */
 public class PCDIDebugModel {
-	private static PCDIDebugModel instance = null;
 	private Map jobSets = new HashMap();
-	private Hashtable dTargets = new Hashtable();
-	private Hashtable dProcesses = new Hashtable();
+	private List jobListeners = new ArrayList();
 
-	public static PCDIDebugModel getDefault() {
-		if (instance == null)
-			instance = new PCDIDebugModel();
-		return instance;
+	public void addLaunchListener(IPLaunchListener listener) {
+		if (!jobListeners.contains(listener))
+			jobListeners.add(listener);
 	}
+	public void removeLaunchListener(IPLaunchListener listener) {
+		if (jobListeners.contains(listener))
+			jobListeners.remove(listener);
+	}
+	public void fireEvent(IPLaunchEvent event) {
+		for (Iterator i=jobListeners.iterator(); i.hasNext();) {
+			((IPLaunchListener)i.next()).handleLaunchEvent(event);
+		}
+	}
+	public void shutdonw() {
+		jobSets.clear();
+		jobListeners.clear();
+	}
+	
 	public static String getPluginIdentifier() {
 		return PTPDebugCorePlugin.getUniqueIdentifier();
 	}
-	public void removeDebugTarget(ILaunch launch, String name) {
-		launch.removeDebugTarget((IDebugTarget) dTargets.get(name));
-		launch.removeProcess((IProcess) dProcesses.get(name));
+	public void removeDebugTarget(IPLaunch launch, BitList tasks, boolean sendEvent) {
+		launch.removeDebugTargets(tasks, sendEvent);
 	}
-	/**
-	 * Creates and returns a debug target for the given CDI target, with the specified name, and associates it with the given process for console I/O. The debug target is added to the given launch.
-	 * 
-	 * @param launch
-	 *            the launch the new debug target will be contained in
-	 * @param project
-	 *            the project to use to persist breakpoints.
-	 * @param cdiTarget
-	 *            the CDI target to create a debug target for
-	 * @param name
-	 *            the name to associate with this target, which will be returned from <code>IDebugTarget.getName</code>.
-	 * @param debuggeeProcess
-	 *            the process to associate with the debug target, which will be returned from <code>IDebugTarget.getProcess</code>
-	 * @param file
-	 *            the executable to debug.
-	 * @param allowTerminate
-	 *            allow terminate().
-	 * @param allowDisconnect
-	 *            allow disconnect().
-	 * @param stopInMain
-	 *            place temporary breakpoint at main()
-	 * @param resumeTarget
-	 *            resume target.
-	 * @return a debug target
-	 * @throws DebugException
-	 */
-	public IDebugTarget newDebugTarget(final ILaunch launch, final IProject project, final IPCDITarget cdiTarget, final String name, final IProcess debuggeeProcess, final IBinaryObject file, final boolean allowTerminate, final boolean allowDisconnect, final boolean resumeTarget) throws DebugException {
-		final IDebugTarget[] target = new IDebugTarget[1];
+	public void addNewDebugTargets(IPLaunch launch, BitList tasks, IPCDITarget[] targets, IBinaryObject file, boolean resumeTarget, boolean sendEvent) {
+		IPDebugTarget[] debugTargets = newDebugTargets(launch, targets, file, true, false, resumeTarget);
+		launch.addDebugTargets(debugTargets, tasks, sendEvent);
+	}
+	
+	public IPDebugTarget[] newDebugTargets(final IPLaunch launch, final IPCDITarget[] cdiTargets, final IBinaryObject file, final boolean allowTerminate, final boolean allowDisconnect, final boolean resumeTarget) {
+		final IPDebugTarget[] targets = new IPDebugTarget[cdiTargets.length];
 		IWorkspaceRunnable r = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor m) throws CoreException {
-				target[0] = new PDebugTarget(launch, project, cdiTarget, name, debuggeeProcess, file, allowTerminate, allowDisconnect);
-				dTargets.put(name, target[0]);
-				dProcesses.put(name, debuggeeProcess);
-				ICDITargetConfiguration config = cdiTarget.getConfiguration();
-				if (config.supportsResume() && resumeTarget) {
-					target[0].resume();
+				for (int i=0; i<targets.length; i++) {
+					targets[i] = new PDebugTarget(launch, cdiTargets[i], null, file, allowTerminate, allowDisconnect);
+					ICDITargetConfiguration config = cdiTargets[i].getConfiguration();
+					if (config.supportsResume() && resumeTarget) {
+						targets[i].resume();
+					}
 				}
 			}
 		};
@@ -116,9 +104,9 @@ public class PCDIDebugModel {
 			ResourcesPlugin.getWorkspace().run(r, null);
 		} catch (CoreException e) {
 			PTPDebugCorePlugin.log(e);
-			throw new DebugException(e.getStatus());
+			return new IPDebugTarget[0];
 		}
-		return target[0];
+		return targets;
 	}
 	public IPLineBreakpoint[] lineBreakpointsExists(String sourceHandle, IResource resource, int lineNumber) throws CoreException {
 		IBreakpoint[] breakpoints = getPBreakpoints();
@@ -293,9 +281,6 @@ public class PCDIDebugModel {
 	public void deleteJob(String job_id) {
 		getJobSet(job_id).clearAllSets();
 		jobSets.remove(job_id);
-	}
-	public void deleteJobs() {
-		jobSets.clear();
 	}
 	
 	private JobSet getJobSet(String job_id) {
