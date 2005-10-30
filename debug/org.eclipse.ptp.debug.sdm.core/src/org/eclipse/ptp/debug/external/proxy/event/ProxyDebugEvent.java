@@ -107,7 +107,7 @@ public class ProxyDebugEvent extends ProxyEvent {
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_TYPE:
-			evt = new ProxyDebugTypeEvent(set, args[2]);
+			evt = new ProxyDebugTypeEvent(set, decodeString(args[2]));
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_VARS:
