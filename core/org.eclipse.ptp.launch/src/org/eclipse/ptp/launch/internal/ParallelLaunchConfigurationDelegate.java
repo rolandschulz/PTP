@@ -46,9 +46,10 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
-import org.eclipse.ptp.debug.core.PLaunch;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 
@@ -185,9 +186,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			}
 			
 			IPJob job = getLaunchManager().run(launch, workDirectory, null, jrunconfig, new SubProgressMonitor(monitor, 5));
-			job.setAttribute("app", exePath.lastSegment());
-			job.setAttribute("dir", workDirectory.getAbsolutePath());
-			job.setAttribute("args", args);
+			job.setAttribute(PreferenceConstants.JOB_APP, exePath.lastSegment());
+			job.setAttribute(PreferenceConstants.JOB_WORK_DIR, workDirectory.getAbsolutePath());
+			job.setAttribute(PreferenceConstants.JOB_ARGS, args);
 			
 			PLaunch pLaunch = (PLaunch) launch;
 			pLaunch.setPJob(job);
@@ -195,7 +196,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			
 			try {
 				if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-					job.setAttribute("debugdir", exePath.removeLastSegments(1).toOSString());
+					job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, exePath.removeLastSegments(1).toOSString());
 					IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 					debugConfig.createDebugger().createDebuggerSession(pLaunch, exeFile, new SubProgressMonitor(monitor, 3));
 					//IPSession pSession = (IPSession) new PSession(dSession, pLaunch);

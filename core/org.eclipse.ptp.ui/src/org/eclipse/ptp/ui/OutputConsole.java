@@ -16,89 +16,86 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.internal.ui.console;
+package org.eclipse.ptp.ui;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.ui.old.ParallelImages;
+import org.eclipse.ptp.internal.ui.ParallelImages;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
+import org.eclipse.ui.console.MessageConsoleStream;
 
 /**
+ * @author clement
  *
  */
 public class OutputConsole extends MessageConsole {
 	private InputStream inputStream = null;
+	private MessageConsoleStream messageOutputStream = null;
 	private Thread thread = null;
 	private static final int BUFFER_SIZE = 8192;
 	private boolean isKilled = false;
-	
+
 	public OutputConsole(String name, InputStream inputStream) {
-		this(name, ParallelImages.DESC_PARALLEL);
+		this(name, ParallelImages.ID_ICON_SHOWLEGEND_ACTION_NORMAL, inputStream);
+	}
+	public OutputConsole(String name, ImageDescriptor imageDescriptor, InputStream inputStream) {
+		super(name, imageDescriptor);
 		this.inputStream = inputStream;
+		messageOutputStream = newMessageStream();
 		startMonitorOutput();
 	}
-	public OutputConsole(String name, ImageDescriptor imageDescriptor) {
-		super(name, imageDescriptor);
-	}
-	
 	protected void startMonitorOutput() {
 		if (thread == null) {
-			System.out.println("Create console windows");
-			ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] {this} );
-			//consoleManager.showConsoleView(this);
-			
+			ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { this });
 			Runnable runnable = new Runnable() {
 				public void run() {
-					read();
+					try {
+						read();
+					} catch (IOException e) {
+						kill();
+					}
 				}
 			};
 			thread = new Thread(runnable, "Output Console Monitor");
 			thread.start();
 		}
 	}
-	
-	protected void close() {
+	private void close() throws IOException {
 		if (thread != null) {
-			System.out.println("Remove console windows");
-			ConsolePlugin.getDefault().getConsoleManager().removeConsoles(new IConsole[] {this} );
-			closeStream();
-			Thread newThread = thread;
-			thread = null;
 			try {
-				newThread.join();
-			} catch (InterruptedException e) {				
+				closeStream();
+				messageOutputStream.close();
+				thread.interrupt();
+			} finally {
+				thread = null;
+				isKilled = true;
+				ConsolePlugin.getDefault().getConsoleManager().removeConsoles(new IConsole[] { this });
 			}
 		}
 	}
-	
 	private void appendText(String text) {
-	    newMessageStream().print(text);
-		//appendToDocument(text, newMessageStream());
+		messageOutputStream.print(text);
 	}
-	
 	public void kill() {
-		isKilled = true;
-		close();
-	}
-	
-	private void closeStream() {
-		if (inputStream == null)
-			return;
-		
 		try {
-			inputStream.close();
-		} catch (IOException ioe) {			
+			close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	private void closeStream() throws IOException {
+		try {
+			if (inputStream != null)
+				inputStream.close();
 		} finally {
 			inputStream = null;
 			isKilled = true;
 		}
 	}
-	
-	private void read() {
+	private void read() throws IOException {
 		byte[] bytes = new byte[BUFFER_SIZE];
 		int read = 0;
 		while (read >= 0) {
@@ -110,10 +107,8 @@ public class OutputConsole extends MessageConsole {
 				if (read > 0) {
 					appendText(new String(bytes, 0, read));
 				}
-			} catch (IOException ioe) {
-				return;
 			} catch (NullPointerException e) {
-				return;
+				break;
 			}
 		}
 		closeStream();

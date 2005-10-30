@@ -247,7 +247,7 @@ public class ParallelImages {
 			return ImageDescriptor.getMissingImageDescriptor();
 		}
 	}
-	
+	/*
 	private static ImageDescriptor create(String name) {
 		try {
 			return ImageDescriptor.createFromURL(makeIconFileURL(name));
@@ -255,6 +255,7 @@ public class ParallelImages {
 			return ImageDescriptor.getMissingImageDescriptor();
 		}
 	}
+	*/
 	
 	private static URL makeIconFileURL(String name) throws MalformedURLException {
 		if (iconBaseURL == null)
