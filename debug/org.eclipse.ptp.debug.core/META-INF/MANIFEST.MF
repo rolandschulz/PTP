@@ -10,12 +10,14 @@ Export-Package: org.eclipse.ptp.debug.core,
  org.eclipse.ptp.debug.core.cdi.event,
  org.eclipse.ptp.debug.core.cdi.model,
  org.eclipse.ptp.debug.core.model,
+ org.eclipse.ptp.debug.core.launch,
  org.eclipse.ptp.debug.core.sourcelookup
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.debug.core,
  org.eclipse.cdt.core,
  org.eclipse.cdt.debug.core,
- org.eclipse.ptp.core
+ org.eclipse.ptp.core,
+ org.eclipse.search
 Eclipse-AutoStart: true
 Bundle-Vendor: Eclipse.org
