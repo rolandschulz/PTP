@@ -28,7 +28,7 @@ import org.eclipse.debug.ui.actions.IToggleBreakpointsTarget;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ptp.debug.core.PCDIDebugModel;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
@@ -93,20 +93,20 @@ public class ToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 							String sid = uiDebugManager.getCurrentSetId();
 							sid = (sid == null || sid.length() == 0)?IElementHandler.SET_ROOT_ID:sid;
 							String sourceHandle = getSourceHandle(input);
-							IPLineBreakpoint[] breakpoints = PCDIDebugModel.getDefault().lineBreakpointsExists(sourceHandle, resource, lineNumber);
+							IPLineBreakpoint[] breakpoints = PTPDebugCorePlugin.getDebugModel().lineBreakpointsExists(sourceHandle, resource, lineNumber);
 							if (jid.equals(IPBreakpoint.GLOBAL) && breakpoints.length > 0)//remove all breakpoints if found any breakpoints in none job selected mode
 								DebugPlugin.getDefault().getBreakpointManager().removeBreakpoints(breakpoints, true);
 							else if (breakpoints.length > 0) {//remove breakpoint if found any breakpoint in current job
-								IPLineBreakpoint breakpoint = PCDIDebugModel.getDefault().lineBreakpointExists(breakpoints, jid);
+								IPLineBreakpoint breakpoint = PTPDebugCorePlugin.getDebugModel().lineBreakpointExists(breakpoints, jid);
 								if (breakpoint != null) {
 									if (!breakpoint.isGlobal())//remove breakpoint when it is not in none job selected mode
 										DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);
 								}
 								else // create a new breakpoint
-									PCDIDebugModel.getDefault().createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, jid, jobName);
+									PTPDebugCorePlugin.getDebugModel().createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, jid, jobName);
 							}
 							else // no breakpoint found and create a new one
-								PCDIDebugModel.getDefault().createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, jid, jobName);
+								PTPDebugCorePlugin.getDebugModel().createLineBreakpoint(sourceHandle, resource, lineNumber, true, 0, "", true, sid, jid, jobName);
 							return;
 						}
 					}
