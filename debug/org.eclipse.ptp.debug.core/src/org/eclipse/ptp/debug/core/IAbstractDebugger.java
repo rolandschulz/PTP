@@ -16,22 +16,41 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2004 QNX Software Systems and others. All rights reserved. This
- * program and the accompanying materials are made available under the terms of
- * the Common Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors: QNX Software Systems - initial API and implementation
- ******************************************************************************/
+/*
+ * Created on Feb 18, 2005
+ *
+ */
 package org.eclipse.ptp.debug.core;
 
-import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
+import java.util.Observer;
+import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.util.Queue;
+import org.eclipse.ptp.debug.core.cdi.ICommonActions;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.launch.IPLaunch;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 
-public interface IPTPDebugger {
-	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException;
+public interface IAbstractDebugger extends ICommonActions, IDebugger {
+	public final static String TERMINATED_PROC_KEY = "terminated";
+	public final static String SUSPENDED_PROC_KEY = "suspended";
+	
+	/* Debugger Initialization/Termination */
+	public void initialize(IPJob job);
+	public void exit() throws PCDIException;
+	
+	public void addDebuggerObserver(Observer obs);
+	public void deleteDebuggerObserver(Observer obs);
+	public void deleteAllObservers();
+	public void fireEvents(IPCDIEvent[] events);
+	public void fireEvent(IPCDIEvent event);
+	public void notifyObservers(Object arg);
+	public Queue getEventQueue();
+	
+	/* Miscellaneous */
+	public IPCDISession getSession();
+	public void setSession(IPCDISession session);
+	public boolean isExiting();
+
+	public IPProcess getProcess(int number);	
 }

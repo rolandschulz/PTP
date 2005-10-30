@@ -16,22 +16,60 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2004 QNX Software Systems and others. All rights reserved. This
- * program and the accompanying materials are made available under the terms of
- * the Common Public License v1.0 which accompanies this distribution, and is
- * available at http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors: QNX Software Systems - initial API and implementation
- ******************************************************************************/
-package org.eclipse.ptp.debug.core;
+package org.eclipse.ptp.debug.internal.core.model;
 
-import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.launch.IPLaunch;
+import java.io.IOException;
+import java.io.InputStream;
 
-public interface IPTPDebugger {
-	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException;
+import org.eclipse.ptp.core.util.Queue;
+
+public class PseudoInputStream extends InputStream {
+	final String DESTROY = "destroyPseudoInputStream";
+	boolean finished;
+	Queue queue;
+	
+	String str;
+	int strLen;
+	
+	public PseudoInputStream() {
+		super();
+		queue = new Queue();
+		finished = false;
+		str = null;
+		strLen = -1;
+	}
+	
+	public void printString(String s) {
+		queue.addItem(s);
+	}
+	
+	public void destroy() {
+		finished = true;
+		queue.addItem(DESTROY);
+	}
+	
+	public int read() throws IOException {
+		if (strLen == 0) {
+			strLen--;
+			return -1;
+		}
+		
+		if (strLen == -1) {
+			try {
+				if (finished) {
+					return -1;
+				}
+				str = (String) queue.removeItem();
+				if (str.equals(DESTROY)) {
+					return -1;
+				}
+				strLen = str.length();
+			} catch (InterruptedException e) {
+			}
+		}
+			
+		int chr = str.charAt(str.length() - strLen);
+		strLen--;
+		return chr;
+	}
 }

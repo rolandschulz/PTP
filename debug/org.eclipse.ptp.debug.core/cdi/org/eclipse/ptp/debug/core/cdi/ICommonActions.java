@@ -28,8 +28,10 @@ public interface ICommonActions {
 	public void stop(BitList tasks) throws PCDIException;
 	public void resume(BitList tasks) throws PCDIException;
 	public void suspend(BitList tasks) throws PCDIException;
-	public void stepInto(BitList tasks) throws PCDIException;
-	public void stepOver(BitList tasks) throws PCDIException;
-	public void stepReturn(BitList tasks) throws PCDIException;
+	public void steppingInto(BitList tasks, int count) throws PCDIException;
+	public void steppingInto(BitList tasks) throws PCDIException;
+	public void steppingOver(BitList tasks, int count) throws PCDIException;
+	public void steppingOver(BitList tasks) throws PCDIException;
+	public void steppingReturn(BitList tasks) throws PCDIException;
 }
 
