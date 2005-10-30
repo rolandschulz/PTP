@@ -121,11 +121,13 @@ ClntSendCommand(bitset *procs, char *str, void *data)
 	bitset *			p;
 	active_request *	r;
 
+	if (bitset_isempty(procs))
+		return 0;
+		
 	/*
 	 * Check if any processes already have active requests
 	 */
 	p = bitset_and(sending_procs, procs);
-	bitset_andeq(p, receiving_procs);
 	if (!bitset_isempty(p)) {
 		if (cmd_completed_callback != NULL)
 			cmd_completed_callback(DbgErrorEvent(DBGERR_INPROGRESS, NULL), NULL);
@@ -133,20 +135,30 @@ ClntSendCommand(bitset *procs, char *str, void *data)
 	}
 	
 	bitset_free(p);
+	
 	/*
 	 * Update sending processes
 	 */	
 	bitset_oreq(sending_procs, procs);
 
 	/*
-	 * Create a new request and add it too the active list
+	 * Check if there are any requests already for these procs, otherwise
+	 * create a new request and add it to the active list
 	 */
-	r = (active_request *)malloc(sizeof(active_request));
-	r->procs = bitset_copy(procs);
-	r->data = data;
-	r->events = HashCreate(log2l(bitset_size(procs))); // TODO: Check this is a sensible size
 	
-	AddToList(active_requests, (void *)r);
+	for (SetList(active_requests); (r = (active_request *)GetListElement(active_requests)) != NULL; ) {
+		if (bitset_eq(procs, r->procs))
+			break;
+	}
+	
+	if (r == NULL) {	
+		printf("creating new request for %s\n", bitset_to_set(procs));
+		r = (active_request *)malloc(sizeof(active_request));
+		r->procs = bitset_copy(procs);
+		r->data = data;
+		r->events = HashCreate(log2l(bitset_size(procs)));
+		AddToList(active_requests, (void *)r);
+	}
 
 	/*
 	 * Now post commands to the servers
@@ -238,7 +250,7 @@ ClntProgressCmds(void)
 		reply_buf[count] = '\0';
 
 		/*
-		 * Find request for this proc
+		 * Check if any requests are completed for this proc
 		 */
 		for (SetList(active_requests); (r = (active_request *)GetListElement(active_requests)) != NULL; ) {
 			if (bitset_test(r->procs, recv_pid)) {
