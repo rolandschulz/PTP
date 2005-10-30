@@ -100,15 +100,11 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 	public IBinaryObject getBinaryFile() {
 		return file;
 	}
-	private void defaultSetting() {
-		registerTarget(0, true);
-	}
 	private void start() {
 		IWorkspaceRunnable r = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor m) throws CoreException {
 				PTPDebugCorePlugin.getDebugModel().newJob(getJob().getIDString(), getTotalProcesses());
 				launch.launchedStarted();
-				defaultSetting();
 				boolean stopInMain = getLaunch().getLaunchConfiguration().getAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false);
 				getBreakpointManager().setInitialBreakpoints();
 				if (stopInMain) {
