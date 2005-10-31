@@ -58,6 +58,10 @@ public class VariableManager extends Manager {
 		super(session, true);
 		variablesMap = new Hashtable();
 	}
+	public void shutdown() {
+		variablesMap.clear();
+		variablesMap = null;
+	}	
 	synchronized List getVariablesList(Target target) {
 		List variablesList = (List) variablesMap.get(target);
 		if (variablesList == null) {

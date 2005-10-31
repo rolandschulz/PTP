@@ -49,6 +49,9 @@ public class ModelManager extends Manager implements IPCDIModelManager {
 		// currentProcessSetList = new Hashtable();
 		processListCache = new Hashtable();
 	}
+	public void shutdown() {
+		
+	}
 	protected void update(Target target) throws CDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}

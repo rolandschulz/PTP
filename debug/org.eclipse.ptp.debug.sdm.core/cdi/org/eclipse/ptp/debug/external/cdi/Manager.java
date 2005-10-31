@@ -39,33 +39,21 @@ import org.eclipse.ptp.debug.external.cdi.model.Target;
  *
  */
 public abstract class Manager extends SessionObject {
-
 	boolean autoUpdate;
 
 	public Manager(Session session, boolean update) {
 		super(session);
 		autoUpdate = update;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.cdi.ICDIUpdateManager#setAutoUpdate(boolean)
-	 */
 	public void setAutoUpdate(boolean update) {
 		autoUpdate = update;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.cdi.ICDIUpdateManager#isAutoUpdate()
-	 */
 	public boolean isAutoUpdate() {
 		return autoUpdate;
 	}
-
 	protected abstract void update (Target target) throws CDIException;
+	protected abstract void shutdown();
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.cdi.impl.Manager#update()
-	 */
 	public void update() throws CDIException {
 		ICDITarget[] targets = getSession().getTargets();
 		for (int i = 0; i < targets.length; ++i) {
@@ -74,11 +62,5 @@ public abstract class Manager extends SessionObject {
 			}
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener#handleDebugEvents(org.eclipse.cdt.debug.core.cdi.event.ICDIEvent[])
-	 */
-	public void handleDebugEvents(ICDIEvent[] events) {
-	}
-	
+	public void handleDebugEvents(ICDIEvent[] events) {}
 }

@@ -48,7 +48,9 @@ public class SourceManager extends Manager {
 	public void update(Target target) throws CDIException {
 		//Do dothing here
 	}
-
+	public void shutdown() {
+		
+	}
 	public Type getType(Target target, String name) throws CDIException {
 		if (name == null) {
 			name = new String();

@@ -18,15 +18,17 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.simulator;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
@@ -53,23 +55,24 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	private String last_file = "";
 	private int last_line = -1;
 	private boolean running_timer = true;
+	private final boolean EVENT_BY_EACH_PROC = false;
 
 	public void startDebugger(IPJob job) {
 		total_process = job.size();
 		tasks = new BitList(total_process);
 		for (int i = 0; i < total_process; i++) {
 			SimulateProgram sim_program = new SimulateProgram(i);
-			this.addObserver(sim_program);
-			sim_program.addObserver(this);
+			sim_program.addObserver(DebugSimulation2.this);
 			sim_list.add(sim_program);
+			sim_program.startProgram();
 		}
 	}
 	public void stopDebugger() {
 		for (Iterator i = sim_list.iterator(); i.hasNext();) {
 			SimulateProgram sim_program = (SimulateProgram) i.next();
-			this.deleteObserver(sim_program);
-			sim_program.stopProgram();
+			sim_program.deleteObservers();
 		}
+		sim_list.clear();
 	}
 	/***************************************************************************************************************************************************************************************************
 	 * not implement yet
@@ -91,81 +94,118 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	 **************************************************************************************************************************************************************************************************/
 	
 	public void go(BitList tasks) throws PCDIException {
-		int[] taskArray = tasks.toArray();
-		for (int i=0; i<taskArray.length; i++) {
-			((SimulateProgram)sim_list.get(taskArray[i])).nextLine();
-		}
+		final int[] taskArray = tasks.toArray();
+		new Thread(new Runnable() {
+			public void run() {
+				for (int i=0; i<taskArray.length; i++) {
+					((SimulateProgram)sim_list.get(taskArray[i])).go();
+				}
+			}
+		}).start();
 	}
 	public void kill(BitList tasks) throws PCDIException {
-		int[] taskArray = tasks.toArray();
-		for (int i=0; i<taskArray.length; i++) {
-			((SimulateProgram)sim_list.get(taskArray[i])).stopProgram();
-		}
+		final int[] taskArray = tasks.toArray();
+		new Thread(new Runnable() {
+			public void run() {
+				for (int i=0; i<taskArray.length; i++) {
+					((SimulateProgram)sim_list.get(taskArray[i])).stopProgram();
+				}
+			}
+		}).start();
 	}
 	public void halt(BitList tasks) throws PCDIException {
-		int[] taskArray = tasks.toArray();
-		for (int i=0; i<taskArray.length; i++) {
-			((SimulateProgram)sim_list.get(taskArray[i])).suspend();
-		}
+		final int[] taskArray = tasks.toArray();
+		new Thread(new Runnable() {
+			public void run() {
+				for (int i=0; i<taskArray.length; i++) {
+					((SimulateProgram)sim_list.get(taskArray[i])).suspend();
+				}
+			}
+		}).start();
 	}
 	public void stepInto(BitList tasks, int count) throws PCDIException {
-		int[] taskArray = tasks.toArray();
-		for (int i=0; i<taskArray.length; i++) {
-			((SimulateProgram)sim_list.get(taskArray[i])).stepLine();
-		}
+		final int[] taskArray = tasks.toArray();
+		new Thread(new Runnable() {
+			public void run() {
+				for (int i=0; i<taskArray.length; i++) {
+					((SimulateProgram)sim_list.get(taskArray[i])).stepLine();
+				}
+			}
+		}).start();
 	}
 	public void stepOver(BitList tasks, int count) throws PCDIException {
-		int[] taskArray = tasks.toArray();
-		for (int i=0; i<taskArray.length; i++) {
-			((SimulateProgram)sim_list.get(taskArray[i])).stepOverLine();
-		}
+		final int[] taskArray = tasks.toArray();
+		new Thread(new Runnable() {
+			public void run() {
+				for (int i=0; i<taskArray.length; i++) {
+					((SimulateProgram)sim_list.get(taskArray[i])).stepOverLine();
+				}
+			}
+		}).start();
 	}
 	public void stepFinish(BitList tasks, int count) throws PCDIException {
-		int[] taskArray = tasks.toArray();
-		for (int i=0; i<taskArray.length; i++) {
-			getSimProg(taskArray[i]).stepFinish();
-		}
+		final int[] taskArray = tasks.toArray();
+		new Thread(new Runnable() {
+			public void run() {
+				for (int i=0; i<taskArray.length; i++) {
+					getSimProg(taskArray[i]).stepFinish();
+				}
+			}
+		}).start();
 	}	
 	public void setLineBreakpoint(BitList tasks, ICDILineBreakpoint bpt) throws PCDIException {
-		int line = bpt.getLocator().getLineNumber();
-		int[] taskArray = tasks.toArray();
-		for (int i=0; i<taskArray.length; i++) {
-			getSimProg(taskArray[i]).setBpt(line);
-		}
+		final int line = bpt.getLocator().getLineNumber();
+		final int[] taskArray = tasks.toArray();
+		new Thread(new Runnable() {
+			public void run() {
+				for (int i=0; i<taskArray.length; i++) {
+					getSimProg(taskArray[i]).setBpt(line);
+				}
+			}
+		}).start();
 	}
-	//current support main function breakpoint
+	//current support main function breakpoint only
 	public void setFunctionBreakpoint(BitList tasks, ICDIFunctionBreakpoint bpt) throws PCDIException {
-		int line = bpt.getLocator().getLineNumber();
+		final int[] taskArray = tasks.toArray();
+		new Thread(new Runnable() {
+			public void run() {
+				for (int i=0; i<taskArray.length; i++) {
+					SimulateProgram sim_prog = getSimProg(taskArray[i]);
+					sim_prog.setStopInMain();
+				}
+			}
+		}).start();
+	}
+	public ICDIStackFrame[] listStackFrames(BitList tasks) throws PCDIException {
 		int[] taskArray = tasks.toArray();
 		for (int i=0; i<taskArray.length; i++) {
-			SimulateProgram sim_prog = getSimProg(taskArray[i]);
-			sim_prog.setBpt(line);
-			sim_prog.setStopInMain();
+			//((SimulateProgram)sim_list.get(taskArray[i])).stopProgram();
 		}
-	}
-	/*
-	public ICDIStackFrame[] listStackFrames(BitList tasks) throws PCDIException {
-		this.curTasks = tasks;
-		
-		try {
-			proxy.debugListStackframes(tasks, 0);
-		} catch (IOException e) {
-		}
-		
-		waitForEvents(tasks);
-		
-		return this.lastFrames;
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listStackFrames");
 	}
 	
 	public void setCurrentStackFrame(BitList tasks, ICDIStackFrame frame) throws PCDIException {
-		try {
-			proxy.debugSetCurrentStackframe(tasks, frame.getLevel());
-		} catch (IOException e) {
+		int[] taskArray = tasks.toArray();
+		for (int i=0; i<taskArray.length; i++) {
+			//((SimulateProgram)sim_list.get(taskArray[i])).stopProgram();
 		}
-		
-		waitForEvents(tasks);
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "setCurrentStackFrame");
 	}
-	*/
+	public String evaluateExpression(BitList tasks, String expression) throws PCDIException {
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "evaluateExpression");
+	}
+	public String getVariableType(BitList tasks, String varName) throws PCDIException {
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "getVariableType");
+	}
+	public ICDIArgument[] listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException {
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listArguments");
+	}
+	public ICDILocalVariable[] listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException {
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listLocalVariables");
+	}
+	public ICDIGlobalVariable[] listGlobalVariables(BitList tasks) throws PCDIException {
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listGlobalVariables");
+	}
 	
 	public synchronized void update(Observable obs, Object obj) {
 		if (obs instanceof SimulateProgram) {
@@ -175,36 +215,44 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				String state = args[1];
 				String file = args[2];
 				int line = convertInt(args[3]);
-				if (isSameAsLast(state, file, line)) {
-					addTask(task);
-				} else {
-					updateEvent(tasks.copy(), last_state, last_file, last_line);
-					clearRecord();
-					addTask(task);
-					last_state = state;
-					last_file = file;
-					last_line = line;
+				if (EVENT_BY_EACH_PROC) {
+					tasks = new BitList(total_process);
+					tasks.set(task);
+					updateEvent(tasks, state, file, line);
 				}
-				start_time_range();
+				else {
+					if (isSameAsLast(state, file, line)) {
+						addTask(task);
+					} else {
+						updateEvent(tasks.copy(), last_state, last_file, last_line);
+						clearRecord();
+						addTask(task);
+						last_state = state;
+						last_file = file;
+						last_line = line;
+					}
+					start_time_range();
+				}
 			}
 		}
 	}
 	private SimulateProgram getSimProg(int id) {
 		return (SimulateProgram)sim_list.get(id);		
 	}
-	private void addTask(int task) {
+	private synchronized void addTask(int task) {
 		synchronized (tasks) {
 			tasks.set(task);
 		}
 	}
-	private void start_time_range() {
+	private synchronized void start_time_range() {
 		if (timer == null) {
 			running_timer = true;
 			current_time = System.currentTimeMillis();
 			Runnable runnable = new Runnable() {
-				public void run() {
+				public synchronized void run() {
 					while (running_timer) {
 						if (System.currentTimeMillis() - current_time >= time_range) {
+							System.out.println(" === update - start_time_range: " + last_state + ", tasks: " + tasks.cardinality());
 							updateEvent(tasks.copy(), last_state, last_file, last_line);
 							clearRecord();
 						}
@@ -215,7 +263,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 			timer.start();
 		}
 	}
-	private void clearRecord() {
+	private synchronized void clearRecord() {
 		running_timer = false;
 		timer = null;
 		tasks = new BitList(total_process);
@@ -223,7 +271,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		last_file = "";
 		last_line = -1;
 	}
-	private boolean isSameAsLast(String state, String file, int line) {
+	private synchronized boolean isSameAsLast(String state, String file, int line) {
 		if (state.length() == 0 && file.length() == 0 && line == -1) {
 			last_state = state;
 			last_file = file;
@@ -232,7 +280,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		}
 		return (state.equals(last_state) && file.equals(last_file) && line == last_line);
 	}
-	private void updateEvent(BitList tran_tasks, String state, String file, int line) {
+	private synchronized void updateEvent(BitList tran_tasks, String state, String file, int line) {
 		if (state.equals(EXIT_STATE)) {
 			if (tran_tasks != null) {
 				handleProcessTerminatedEvent(tran_tasks);
@@ -258,101 +306,146 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		}
 	}
 
-	private class SimulateProgram extends Observable implements Observer {
-		private final int sim_program_line = 20;
+	private class SimulateProgram extends Observable implements Runnable {
+		private final int sim_program_line = 37;
 		private final int main_method_line = 5;
-		private final int start_step_line = 10;
 		private final int end_step_line = 15;
+		private int start_step_line = 0;
 		private int current_line = 0;
-		private int current_step_line = start_step_line;
 		private boolean isStepping = false;
 		private int tid = -1;
 		private List bpts = new ArrayList();
 		private boolean isStopInMain = false;
+		private boolean isPause = false;
 
 		public SimulateProgram(int tid) {
 			this.tid = tid;
 		}
-		public void startProgram() {
-			Runnable runnable = new Runnable() {
-				public void run() {
-					while (current_line < sim_program_line) {
-						try {
-							SimulateProgram.this.wait();
-							printMessage();
-						} catch (InterruptedException e) {
-						}
-					}
-					notifyObservers(new String[] { String.valueOf(tid), EXIT_STATE, APP_NAME, String.valueOf(current_line) });
-				}
-			};
-			new Thread(runnable).start();
-		}
-		public void stopProgram() {
-			current_line = sim_program_line;
-			notifyAll();
-		}
-		private synchronized void printMessage() {
-			System.out.println("printMessage at current line: " + current_line);
-		}
-		private synchronized void gotoLine(int line) {
-			this.current_line = line;
-			nextLine();
-		}
-		public synchronized void stepFinish() {
-			current_step_line = end_step_line;
-			stepLine();
-		}
-		public synchronized void stepOverLine() {
-			stepLine();
-		}		
-		public synchronized void stepLine() {
-			if (current_line < start_step_line) {
-				if (current_step_line > end_step_line) {
-					isStepping = false;
-					gotoLine(current_line);
-				} else {
-					isStepping = true;
-					notifyObservers(new String[] { String.valueOf(tid), STEP_END_STATE, APP_NAME, String.valueOf(current_step_line) });
-					current_step_line++;
-				}
-			}
-		}
-		public void suspend() {
-			notifyObservers(new String[] { String.valueOf(tid), STEP_END_STATE, APP_NAME, String.valueOf(current_step_line) });
+		private synchronized void waitForNotify() {
 			try {
 				SimulateProgram.this.wait();
 			} catch (InterruptedException e) {
+				System.out.println("----- Err in waiting: " + e.getMessage());
 			}
+		}
+		private void waitForWhile(long timeout) {
+			try {
+				Thread.sleep(timeout);
+			} catch (InterruptedException e) {
+				System.out.println("----- Err in waiting: " + e.getMessage());
+			}
+		}
+		public synchronized void run() {
+			SimulateProgram.this.notifyAll();
+			waitForNotify();
+			while (current_line < sim_program_line) {
+				if (isStopInMain) {
+					isStopInMain = false;
+					gotoLine(main_method_line);
+				}
+				else if (isPause) {
+					setChanged();
+					notifyObservers(new String[] { String.valueOf(tid), STEP_END_STATE, APP_NAME, String.valueOf(current_line) });
+					waitForNotify();
+				}
+				else if (isHitBreakpoint(current_line)) {
+					isPause = true;
+					printMessage();
+					setChanged();
+					notifyObservers(new String[] { String.valueOf(tid), HIT_BPT_STATE, APP_NAME, String.valueOf(current_line) });
+					waitForNotify();
+				}
+				else if (isStepping) {
+					printMessage();
+					setChanged();
+					notifyObservers(new String[] { String.valueOf(tid), STEP_END_STATE, APP_NAME, String.valueOf(current_line) });					
+					waitForNotify();
+				}
+				else {
+					printMessage();
+					nextLine();
+					waitForWhile(500);
+				}
+			}
+			System.out.println("==== finished: " + tid);
+			setChanged();
+			notifyObservers(new String[] { String.valueOf(tid), EXIT_STATE, APP_NAME, String.valueOf(current_line) });
+		}
+		public synchronized void startProgram() {
+			new Thread(this).start();
+			try {
+				//wait the program is ready to start
+				SimulateProgram.this.wait(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		public void stopProgram() {
+			current_line = sim_program_line;
+			if (isPause || isStepping) {
+				go();
+			}
+		}
+		private synchronized void printMessage() {
+			System.out.println("Task: " + tid + " - Message at current line: " + current_line);
+		}
+		public synchronized void gotoLine(int line) {
+			this.current_line = line;
+		}
+		public synchronized void go() {
+			isPause = false;
+			isStepping = false;
+			SimulateProgram.this.notifyAll();
+			nextLine();
+		}
+		public synchronized void stepFinish() {
+			if (isStepping) {
+				if (start_step_line > 0) {
+					gotoLine(start_step_line);
+					start_step_line = 0;
+				}
+				isPause = true;
+				isStepping = false;
+				SimulateProgram.this.notifyAll();					
+			}
+		}
+		public synchronized void stepOverLine() {
+			if (isStepping && start_step_line > 0 && current_line == end_step_line) {
+				stepFinish();
+			}
+			else {
+				isPause = false;
+				isStepping = true;
+				SimulateProgram.this.notifyAll();
+				nextLine();
+			}
+		}		
+		public synchronized void stepLine() {
+			if (!isStepping) {
+				start_step_line = current_line;
+			}
+			isPause = false;
+			isStepping = true;
+			SimulateProgram.this.notifyAll();
+			nextLine();
+		}
+		public void suspend() {
+			isPause = true;
 		}
 		public synchronized void nextLine() {
-			if (isStopInMain) {
-				gotoLine(main_method_line);
-				isStopInMain = false;
-			}
-
-			if (!isStepping) {
-				if (!isHitBreakpoint(current_line)) {
-					SimulateProgram.this.notifyAll();
-				} else {
-					notifyObservers(new String[] { String.valueOf(tid), HIT_BPT_STATE, APP_NAME, String.valueOf(current_line) });
-				}
-				current_line++;
-			}
+			current_line++;
 		}
-		public synchronized boolean isHitBreakpoint(int line) {
+		public boolean isHitBreakpoint(int line) {
 			return bpts.contains(new Integer(line));
 		}
-		public synchronized void setBpt(int bpt_line) {
+		public void setBpt(int bpt_line) {
 			if (!isHitBreakpoint(bpt_line)) {
 				bpts.add(new Integer(bpt_line));
 			}
 		}
 		public void setStopInMain() {
+			setBpt(main_method_line);
 			isStopInMain = true;
-		}
-		public void update(Observable obs, Object obj) {
-			nextLine();
 		}
 	}
 }
