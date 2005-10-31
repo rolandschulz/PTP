@@ -9,6 +9,13 @@
 #define RTEV_OK			RTEV_OFFSET + 0
 #define RTEV_ERROR		RTEV_OFFSET + 1
 #define RTEV_JBSTATE		RTEV_OFFSET + 2
+#define RTEV_JOBS		RTEV_OFFSET + 3;
+#define RTEV_PROCS		RTEV_OFFSET + 4;
+#define RTEV_PROCATTR		RTEV_OFFSET + 5;
+#define RTEV_MACHINES		RTEV_OFFSET + 6;
+#define RTEV_NODES		RTEV_OFFSET + 7;
+#define RTEV_NODEATTR		RTEV_OFFSET + 8;
+#define RTEV_MACHID		RTEV_OFFSET + 9;
 
 int ORTEIsShutdown(void);
 
@@ -43,7 +50,7 @@ static proxy_svr_commands command_tab[] = {
 	{"RUN", 		ORTERun},
 	{"GETJOBS", 	OMPIGetJobs},
 	{"GETPROCS",	OMPIGetProcesses},
-	{"GETATTR",	OMPIGetProcessAttribute},
+	{"GETPATTR",	OMPIGetProcessAttribute},
 	{"GETMACHS",	OMPIGetMachines},
 	{"GETNODES",	OMPIGetNodes},
 	{"GETNATTR",	OMPIGetNodeAttribute},

@@ -19,11 +19,45 @@
 
 package org.eclipse.ptp.rtsystem.proxy;
 
+import java.io.IOException;
+
 import org.eclipse.ptp.core.proxy.AbstractProxyClient;
 
 public class ProxyRuntimeClient extends AbstractProxyClient {
 
 	public ProxyRuntimeClient(String host, int port) {
 		super(host, port);
+	}
+	
+	public void run(String prog, int numProcs, boolean debug) throws IOException {
+		sendCommand("RUN", "\""+ prog + "\" " + Integer.toString(numProcs) + " " + Boolean.toString(debug));
+	}
+	
+	public void getJobs() throws IOException {
+		sendCommand("GETJOBS");
+	}
+	
+	public void getProcesses(int jobId) throws IOException {
+		sendCommand("GETPROCS", Integer.toString(jobId));
+	}
+	
+	public void getProcessAttribute(int procId, String key) throws IOException {
+		sendCommand("GETPATTR", Integer.toString(procId) + " " + key);
+	}
+	
+	public void getMachines() throws IOException {
+		sendCommand("GETMACHS");
+	}
+
+	public void getNodes(int machId) throws IOException {
+		sendCommand("GETNODES", Integer.toString(machId));
+	}
+
+	public void getNodeAttribute(int nodeId, String key) throws IOException {
+		sendCommand("GETNATTR", Integer.toString(nodeId) + " " + key);
+	}
+
+	public void getNodeMachineID(int nodeId) throws IOException {
+		sendCommand("GETNMID", Integer.toString(nodeId));
 	}
 }

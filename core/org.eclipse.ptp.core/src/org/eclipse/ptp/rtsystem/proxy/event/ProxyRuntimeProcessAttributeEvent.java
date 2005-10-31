@@ -19,21 +19,19 @@
 
 package org.eclipse.ptp.rtsystem.proxy.event;
 
-import org.eclipse.ptp.core.proxy.event.IProxyEvent;
-import org.eclipse.ptp.core.util.BitList;
+public class ProxyRuntimeProcessAttributeEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeEvent {
+	private int		jobState;
 
-public interface IProxyRuntimeEvent extends IProxyEvent {
-	public static final int RUNTIME_EVENT_OFFSET = 200;
-	public static final int EVENT_RUNTIME_OK = RUNTIME_EVENT_OFFSET + 0;
-	public static final int EVENT_RUNTIME_ERROR = RUNTIME_EVENT_OFFSET + 1;
-	public static final int EVENT_RUNTIME_JOBSTATE = RUNTIME_EVENT_OFFSET + 2;
-	public static final int EVENT_RUNTIME_JOBS = RUNTIME_EVENT_OFFSET + 3;
-	public static final int EVENT_RUNTIME_PROCS = RUNTIME_EVENT_OFFSET + 4;
-	public static final int EVENT_RUNTIME_PROCATTR = RUNTIME_EVENT_OFFSET + 5;
-	public static final int EVENT_RUNTIME_MACHINES = RUNTIME_EVENT_OFFSET + 6;
-	public static final int EVENT_RUNTIME_NODES = RUNTIME_EVENT_OFFSET + 7;
-	public static final int EVENT_RUNTIME_NODEATTR = RUNTIME_EVENT_OFFSET + 8;
-	public static final int EVENT_RUNTIME_MACHID = RUNTIME_EVENT_OFFSET + 9;
+	public ProxyRuntimeProcessAttributeEvent(int state) {
+		super(EVENT_RUNTIME_PROCATTR);
+		this.jobState = state;
+	}
 	
-	public BitList getBitSet();
+	public int getJobState() {
+		return this.jobState;
+	}
+	
+	public String toString() {
+		return "EVENT_RUNTIME_PROCATTR " + this.jobState;
+	}
 }
