@@ -38,8 +38,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IBreakpoint;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.IPLaunchEvent;
@@ -252,6 +254,12 @@ public class PCDIDebugModel {
 			}
 		};
 		ResourcesPlugin.getWorkspace().run(runnable, null);
+	}
+	public void shutdownSession(IPJob job) {
+		if (job != null) {
+			IPCDISession session = (IPCDISession)job.getAttribute(PreferenceConstants.JOB_DEBUG_SESSION);
+			session.shutdown();
+		}
 	}
 	public void newJob(String job_id, int totalTasks) throws CoreException {
 		BitList rootTasks = new BitList(totalTasks);
