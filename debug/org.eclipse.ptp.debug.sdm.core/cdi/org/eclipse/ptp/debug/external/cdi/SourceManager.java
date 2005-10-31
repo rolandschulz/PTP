@@ -18,12 +18,24 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi;
 
+import java.util.StringTokenizer;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
+import org.eclipse.ptp.debug.external.cdi.model.type.BoolType;
+import org.eclipse.ptp.debug.external.cdi.model.type.CharType;
+import org.eclipse.ptp.debug.external.cdi.model.type.DoubleType;
+import org.eclipse.ptp.debug.external.cdi.model.type.EnumType;
+import org.eclipse.ptp.debug.external.cdi.model.type.FloatType;
 import org.eclipse.ptp.debug.external.cdi.model.type.IntType;
+import org.eclipse.ptp.debug.external.cdi.model.type.LongLongType;
+import org.eclipse.ptp.debug.external.cdi.model.type.LongType;
+import org.eclipse.ptp.debug.external.cdi.model.type.ShortType;
+import org.eclipse.ptp.debug.external.cdi.model.type.StructType;
 import org.eclipse.ptp.debug.external.cdi.model.type.Type;
+import org.eclipse.ptp.debug.external.cdi.model.type.VoidType;
+import org.eclipse.ptp.debug.external.cdi.model.type.WCharType;
 
 /**
  * @author Clement chu
@@ -42,6 +54,8 @@ public class SourceManager extends Manager {
 			name = new String();
 		}
 		String typename = name.trim();
+		//FIXME ignore GDBType 
+		//GDBType gdbType = gdbTypeParser.parse(typename);
 		return toCDIType(target, typename);
 		//throw new CDIException("Not implement yet - SourceManager: getType");
 	}
@@ -52,74 +66,73 @@ public class SourceManager extends Manager {
 		String typename = name.trim();
 		// Check the primitives.
 		if (typename.equals("char")) { 
-			//return new CharType(target, typename);
+			return new CharType(target, typename);
 		} else if (typename.equals("wchar_t")) { 
-			//return new WCharType(target, typename);
+			return new WCharType(target, typename);
 		} else if (typename.equals("short")) { 
-			//return new ShortType(target, typename);
+			return new ShortType(target, typename);
 		} else if (typename.equals("int")) { 
 			return new IntType(target, typename);
 		} else if (typename.equals("long")) { 
-			//return new LongType(target, typename);
+			return new LongType(target, typename);
 		} else if (typename.equals("unsigned")) { 
-			//return new IntType(target, typename, true);
+			return new IntType(target, typename, true);
 		} else if (typename.equals("signed")) { 
-			//return new IntType(target, typename);
+			return new IntType(target, typename);
 		} else if (typename.equals("bool")) { 
-			//return new BoolType(target, typename);
+			return new BoolType(target, typename);
 		} else if (typename.equals("_Bool")) { 
-			//return new BoolType(target, typename);
+			return new BoolType(target, typename);
 		} else if (typename.equals("float")) { 
-			//return new FloatType(target, typename);
+			return new FloatType(target, typename);
 		} else if (typename.equals("double")) { 
-			//return new DoubleType(target, typename);
+			return new DoubleType(target, typename);
 		} else if (typename.equals("void")) { 
-			//return new VoidType(target, typename);
+			return new VoidType(target, typename);
 		} else if (typename.equals("enum")) { 
-			//return new EnumType(target, typename);
+			return new EnumType(target, typename);
 		} else if (typename.equals("union")) { 
-			//return new StructType(target, typename);
+			return new StructType(target, typename);
 		} else if (typename.equals("struct")) { 
-			//return new StructType(target, typename);
+			return new StructType(target, typename);
 		} else if (typename.equals("class")) { 
-			//return new StructType(target, typename);
+			return new StructType(target, typename);
 		}
 
 		// GDB has some special types for int
 		if (typename.equals("int8_t")) { 
-			//return new CharType(target, typename);
+			return new CharType(target, typename);
 		} else if (typename.equals("int16_t")) { 
-			//return new ShortType(target, typename);
+			return new ShortType(target, typename);
 		} else if (typename.equals("int32_t")) { 
-			//return new LongType(target, typename);
+			return new LongType(target, typename);
 		} else if (typename.equals("int64_t")) { 
-			//return new LongLongType(target, typename);
+			return new LongLongType(target, typename);
 		} else if (typename.equals("int128_t")) { 
-			//return new IntType(target, typename); // ????
+			return new IntType(target, typename); // ????
 		}
 
 		if (typename.equals("int8_t")) { 
-			//return new CharType(target, typename);
+			return new CharType(target, typename);
 		} else if (typename.equals("uint8_t")) { 
-			//return new CharType(target, typename, true);
+			return new CharType(target, typename, true);
 		} else if (typename.equals("int16_t")) { 
-			//return new ShortType(target, typename);
+			return new ShortType(target, typename);
 		} else if (typename.equals("uint16_t")) { 
-			//return new ShortType(target, typename, true);
+			return new ShortType(target, typename, true);
 		} else if (typename.equals("int32_t")) { 
-			//return new LongType(target, typename);
+			return new LongType(target, typename);
 		} else if (typename.equals("uint32_t")) { 
-			//return new LongType(target, typename, true);
+			return new LongType(target, typename, true);
 		} else if (typename.equals("int64_t")) { 
-			//return new LongLongType(target, typename);
+			return new LongLongType(target, typename);
 		} else if (typename.equals("uint64_t")) { 
-			//return new LongLongType(target, typename, true);
+			return new LongLongType(target, typename, true);
 		} else if (typename.equals("int128_t")) { 
-			//return new IntType(target, typename); // ????
+			return new IntType(target, typename); // ????
 		} else if (typename.equals("uint128_t")) { 
-			//return new IntType(target, typename, true); // ????			
+			return new IntType(target, typename, true); // ????			
 		}
-		/*
 		StringTokenizer st = new StringTokenizer(typename);
 		int count = st.countTokens();
 
@@ -193,7 +206,6 @@ public class SourceManager extends Manager {
 			boolean isComplex =   (first.equals("complex") || second.equals("complex") || third.equals("complex") || first.equals("_Complex") || second.equals("_Complex") || third.equals("_Complex"));   
 			boolean isImaginery = (first.equals("_Imaginary") || second.equals("_Imaginary") || third.equals("_Imaginary"));   
 
-
 			if (isShort && isInt && (isSigned || unSigned)) {
 				return new ShortType(target, typename, unSigned);
 			} else if (isLong && isInt && (isSigned || unSigned)) {
@@ -222,8 +234,7 @@ public class SourceManager extends Manager {
 				return new LongLongType(target, typename, unSigned);
 			}
 		}
-		*/
-		throw new CDIException("Not implement yet - SourceManager: toCDIType");
+		throw new CDIException("SourceManager.Unknown_type");
 	}
 	public String getDetailTypeNameFromVariable(StackFrame frame, String variable) throws CDIException {
 		Target target = (Target)frame.getTarget();

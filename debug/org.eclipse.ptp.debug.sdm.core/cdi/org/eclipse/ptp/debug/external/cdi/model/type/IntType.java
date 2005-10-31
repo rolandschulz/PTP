@@ -32,19 +32,11 @@ package org.eclipse.ptp.debug.external.cdi.model.type;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIIntType;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
-/**
- */
 public class IntType extends IntegralType implements ICDIIntType {
-
-	/**
-	 * @param typename
-	 */
 	public IntType(Target target, String typename) {
 		this(target, typename, false);
 	}
-
 	public IntType(Target target, String typename, boolean isUnsigned) {
 		super(target, typename, isUnsigned);
 	}
-
 }

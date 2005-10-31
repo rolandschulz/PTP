@@ -44,8 +44,22 @@ import org.eclipse.ptp.debug.external.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
+import org.eclipse.ptp.debug.external.cdi.model.type.ArrayValue;
+import org.eclipse.ptp.debug.external.cdi.model.type.BoolValue;
+import org.eclipse.ptp.debug.external.cdi.model.type.CharValue;
+import org.eclipse.ptp.debug.external.cdi.model.type.DoubleValue;
+import org.eclipse.ptp.debug.external.cdi.model.type.EnumValue;
+import org.eclipse.ptp.debug.external.cdi.model.type.FloatValue;
+import org.eclipse.ptp.debug.external.cdi.model.type.FunctionValue;
 import org.eclipse.ptp.debug.external.cdi.model.type.IntValue;
+import org.eclipse.ptp.debug.external.cdi.model.type.LongLongValue;
+import org.eclipse.ptp.debug.external.cdi.model.type.LongValue;
+import org.eclipse.ptp.debug.external.cdi.model.type.PointerValue;
+import org.eclipse.ptp.debug.external.cdi.model.type.ReferenceValue;
+import org.eclipse.ptp.debug.external.cdi.model.type.ShortValue;
+import org.eclipse.ptp.debug.external.cdi.model.type.StructValue;
 import org.eclipse.ptp.debug.external.cdi.model.type.Value;
+import org.eclipse.ptp.debug.external.cdi.model.type.WCharValue;
 
 /**
  */
@@ -99,14 +113,10 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		return getChildren(-1);
 	}
 	public ICDIVariable[] getChildren(int timeout) throws CDIException {
-		/*
-		Target target = (Target)getTarget();
-		IAbstractDebugger debugger = ;
-		Session session = (Session)target.getSession();
-		*/ 
+		//Target target = (Target)getTarget();
+		//Session session = (Session)target.getSession();
 		//TODO - not implement yet - listLocalVariables with variable name
-		//Variable[] children = target.getDebugger().listLocalVariables(session.createBitList(target.getTargetID()), getName());
-		//return children;
+		//return target.getDebugger().listLocalVariables(session.createBitList(target.getTargetID()), getName());
 		throw new CDIException("Not implement yet - Variable - getChildren");
 	}
 
@@ -121,49 +131,35 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		if (value == null) {
 			ICDIType t = getType();
 			if (t instanceof ICDIBoolType) {
-				//value = new BoolValue(this);
-				throw new CDIException("Not implemented - Variable: getValue - ICDIBoolType");
+				value = new BoolValue(this);
 			} else if (t instanceof ICDICharType) {
-				//value = new CharValue(this);
-				throw new CDIException("Not implemented - Variable: getValue - ICDICharType");
+				value = new CharValue(this);
 			} else if (t instanceof ICDIWCharType) {
-				//value = new WCharValue(this);
-				throw new CDIException("Not implemented - Variable: getValue - ICDIWCharType");
+				value = new WCharValue(this);
 			} else if (t instanceof ICDIShortType) {
-				//value = new ShortValue(this);
-				throw new CDIException("Not implemented - Variable: getValue - ICDIShortType");
+				value = new ShortValue(this);
 			} else if (t instanceof ICDIIntType) {
 				value = new IntValue(this);
 			} else if (t instanceof ICDILongType) {
-				//value = new LongValue(this);
-				throw new CDIException("Not implemented - Variable: getValue - ICDILongType");
+				value = new LongValue(this);
 			} else if (t instanceof ICDILongLongType) {
-				//value = new LongLongValue(this);
-				throw new CDIException("Not implemented - Variable: getValue - ICDILongLongType");
+				value = new LongLongValue(this);
 			} else if (t instanceof ICDIEnumType) {
-				//value = new EnumValue(this);
-				throw new CDIException("Not implemented - Variable: getValue - ICDIEnumType");
+				value = new EnumValue(this);
 			} else if (t instanceof ICDIFloatType) {
-				//value = new FloatValue(this);
-				throw new CDIException("Not implemented - Variable: getValue - ICDIFloatType");
+				value = new FloatValue(this);
 			} else if (t instanceof ICDIDoubleType) {
-				//value = new DoubleValue(this);
-				throw new CDIException("Not implemented - Variable: getValue - ICDIDoubleType");
+				value = new DoubleValue(this);
 			} else if (t instanceof ICDIFunctionType) {
-				//value = new FunctionValue(this);
-				throw new CDIException("Not implemented - Variable: getValue - ICDIFunctionType");
+				value = new FunctionValue(this);
 			} else if (t instanceof ICDIPointerType) {
-				//value = new PointerValue(this);
-				throw new CDIException("Not implemented - Variable: getValue - ICDIPointerType");
+				value = new PointerValue(this);
 			} else if (t instanceof ICDIReferenceType) {
-				//value = new ReferenceValue(this);
-				throw new CDIException("Not implemented - Variable: getValue - ICDIReferenceType");
+				value = new ReferenceValue(this);
 			} else if (t instanceof ICDIArrayType) {
-				//value = new ArrayValue(this);
-				throw new CDIException("Not implemented - Variable: getValue - ICDIArrayType");
+				value = new ArrayValue(this);
 			} else if (t instanceof ICDIStructType) {
-				//value = new StructValue(this);
-				throw new CDIException("Not implemented - Variable: getValue - ICDIStructType");
+				value = new StructValue(this);
 			} else {
 				value = new Value(this);
 			}

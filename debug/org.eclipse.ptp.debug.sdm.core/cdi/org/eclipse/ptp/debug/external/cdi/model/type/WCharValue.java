@@ -16,23 +16,22 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
-
 package org.eclipse.ptp.debug.external.cdi.model.type;
 
-import org.eclipse.ptp.debug.external.cdi.model.Target;
+import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.cdt.debug.core.cdi.model.type.ICDIWCharValue;
+import org.eclipse.ptp.debug.external.cdi.model.variable.Variable;
 
-public class IncompleteType extends Type {
-	public IncompleteType(Target target, String name) {
-		super(target, name);
+/**
+ * @author Clement chu
+ * 
+ */
+public class WCharValue extends IntegralValue implements ICDIWCharValue {
+	public WCharValue(Variable v) {
+		super(v);
 	}
+	public char getValue() throws CDIException {
+		return 0;
+	}
+
 }

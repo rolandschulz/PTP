@@ -16,23 +16,17 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
-
 package org.eclipse.ptp.debug.external.cdi.model.type;
 
+import org.eclipse.cdt.debug.core.cdi.model.type.ICDIAggregateType;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
-public class IncompleteType extends Type {
-	public IncompleteType(Target target, String name) {
-		super(target, name);
+/**
+ * @author Clement chu
+ * 
+ */
+public abstract class AggregateType extends Type implements ICDIAggregateType {
+	public AggregateType(Target target, String typename) {
+		super(target, typename);
 	}
 }
