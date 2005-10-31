@@ -61,12 +61,14 @@ import org.eclipse.ptp.debug.core.launch.PDebugTargetUnRegisterEvent;
 import org.eclipse.ptp.debug.core.launch.PLaunchStartedEvent;
 import org.eclipse.ptp.debug.external.cdi.BreakpointHitInfo;
 import org.eclipse.ptp.debug.external.cdi.EndSteppingRangeInfo;
+import org.eclipse.ptp.debug.external.cdi.event.BreakpointCreatedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.DebuggerExitedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
 import org.eclipse.ptp.debug.external.cdi.event.ErrorEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
+import org.eclipse.ptp.debug.external.cdi.event.InferiorSignaledEvent;
 import org.eclipse.ptp.debug.internal.ui.preferences.IPDebugPreferenceConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.events.IDebugActionEvent;
@@ -462,13 +464,26 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				continue;
 			String workingDebugDir = (String) job.getAttribute(PreferenceConstants.JOB_DEBUG_DIR);
 			/*
-			 * if (event instanceof TargetRegisteredEvent) { IElementHandler elementHandler = getElementHandler(job.getIDString()); int[] processes = event.getAllProcesses().toArray(); for (int j = 0;
-			 * j < processes.length; j++) { IPProcess proc = job.findProcessByTaskId(processes[j]); elementHandler.addRegisterElement(proc.getIDString());
-			 * elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(true); } fireRegListener(REG_TYPE, event.getAllRegisteredProcesses()); } else if (event instanceof
-			 * TargetUnregisteredEvent) { IElementHandler elementHandler = getElementHandler(job.getIDString()); int[] processes = event.getAllProcesses().toArray(); for (int j = 0; j <
-			 * processes.length; j++) { IPProcess proc = job.findProcessByTaskId(processes[j]); elementHandler.removeRegisterElement(proc.getIDString());
-			 * elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(false); } fireRegListener(UNREG_TYPE, event.getAllUnregisteredProcesses()); } else
-			 */
+			if (event instanceof TargetRegisteredEvent) {
+				IElementHandler elementHandler = getElementHandler(job.getIDString());
+				int[] processes = event.getAllProcesses().toArray();
+				for (int j = 0; j < processes.length; j++) {
+					IPProcess proc = job.findProcessByTaskId(processes[j]);
+					elementHandler.addRegisterElement(proc.getIDString());
+					elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(true);
+				}
+				fireRegListener(REG_TYPE, event.getAllRegisteredProcesses());
+			} else if (event instanceof TargetUnregisteredEvent) {
+				IElementHandler elementHandler = getElementHandler(job.getIDString());
+				int[] processes = event.getAllProcesses().toArray();
+				for (int j = 0; j < processes.length; j++) {
+					IPProcess proc = job.findProcessByTaskId(processes[j]);
+					elementHandler.removeRegisterElement(proc.getIDString());
+					elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(false);
+				}
+				fireRegListener(UNREG_TYPE, event.getAllUnregisteredProcesses());
+			}
+			*/
 			if (event instanceof BreakpointHitEvent) {
 				BreakpointHitEvent bptHitEvent = (BreakpointHitEvent) event;
 				ICDIBreakpoint bpt = ((BreakpointHitInfo) bptHitEvent.getReason()).getBreakpoint();
@@ -478,7 +493,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					System.out.println("----- linenumber: " + lineNumber + ", file: " + locator.getFile());
 					if (lineNumber == 0)
 						lineNumber = 1;
-					// FIXME: Hardcode the filename
 					String fileName = workingDebugDir + "/" + locator.getFile();
 					try {
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses(), false);
@@ -495,7 +509,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					int lineNumber = lineLocation.getLineNumber();
 					if (lineNumber == 0)
 						lineNumber = 1;
-					// FIXME: Hardcode the filename
 					String fileName = workingDebugDir + "/" + lineLocation.getFile();
 					try {
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses(), false);
@@ -525,8 +538,26 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				// System.out.println("-------------------- terminate ------------------------");
 				// annotationMgr.printBitList(event.getAllProcesses());
 				fireTerminatedEvent(job, event.getAllProcesses());
-			} else if (event instanceof BreakpointHitEvent) {
-				// do nothing in breakpoint hit event
+			} else if (event instanceof InferiorSignaledEvent) {
+				InferiorSignaledEvent signalEvent = (InferiorSignaledEvent) event;
+				ICDILocator locator = signalEvent.getLocator();
+				if (locator != null) {
+					int lineNumber = locator.getLineNumber();
+					if (lineNumber == 0)
+						lineNumber = 1;
+					String fileName = workingDebugDir + "/" + locator.getFile();
+					try {
+						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses(), false);
+						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses(), true);
+					} catch (CoreException e) {
+						PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
+					}
+				}
+				// System.out.println("-------------------- suspend ------------------------");
+				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
+				fireSuspendEvent(job, event.getAllProcesses());
+			} else if (event instanceof BreakpointCreatedEvent) {
+				// do nothing in breakpoint created event
 				continue;
 			} else if (event instanceof DebuggerExitedEvent) {
 				condition = new Boolean(true);
