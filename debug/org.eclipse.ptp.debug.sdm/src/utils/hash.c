@@ -99,6 +99,9 @@ HashCreate(int logsize)
 	*/
 	if ( logsize > BITSPERBYTE * sizeof(unsigned int) - 1 )
 		logsize = BITSPERBYTE * sizeof(unsigned int) - 1;
+		
+	if ( logsize <= 0 )
+		logsize = 2;
 
 	htab->logsize = logsize;
 	htab->size = (unsigned int)(1 << logsize);
