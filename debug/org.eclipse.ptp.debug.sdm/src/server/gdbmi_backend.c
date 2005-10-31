@@ -1315,10 +1315,10 @@ GDBMIGetLocalVariables(void)
 	 * 
 	 */
 	
-	if (res->type == t_tuple)	
-		r = res->v.rs;
-	else
-		r = res;
+	/*
+	 * Get value of list or tuple
+	 */
+	r = res->v.rs;
 
 	while ( r != NULL )
 	{
@@ -1326,7 +1326,7 @@ GDBMIGetLocalVariables(void)
 			c = r->v.rs;
 		else
 			c = r;
-		
+
 		if ( c->type == t_const && strcmp(c->var, "name") == 0 ) 
 		{
 			AddToList(e->list, strdup(c->v.cstr));
