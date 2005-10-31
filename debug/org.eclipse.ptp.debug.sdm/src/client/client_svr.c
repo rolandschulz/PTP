@@ -133,7 +133,7 @@ ClntSendCommand(bitset *procs, char *str, void *data)
 			cmd_completed_callback(DbgErrorEvent(DBGERR_INPROGRESS, NULL), NULL);
 		return -1;
 	}
-	
+
 	bitset_free(p);
 	
 	/*
@@ -150,13 +150,13 @@ ClntSendCommand(bitset *procs, char *str, void *data)
 		if (bitset_eq(procs, r->procs))
 			break;
 	}
-	
+
 	if (r == NULL) {	
 		printf("creating new request for %s\n", bitset_to_set(procs));
 		r = (active_request *)malloc(sizeof(active_request));
 		r->procs = bitset_copy(procs);
 		r->data = data;
-		r->events = HashCreate(log2l(bitset_size(procs)));
+		r->events = HashCreate((int)log2((float)bitset_size(procs)));;
 		AddToList(active_requests, (void *)r);
 	}
 
