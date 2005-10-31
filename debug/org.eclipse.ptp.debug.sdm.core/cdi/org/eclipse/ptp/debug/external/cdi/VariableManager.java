@@ -351,6 +351,7 @@ public class VariableManager extends Manager {
 		
 		try {
 			ICDILocalVariable[] vars = target.getDebugger().listLocalVariables(((Session)getSession()).createBitList(target.getTargetID()), currentFrame);
+			System.out.println("----------- local variable: " + vars.length);
 			for (int i = 0; i < vars.length; i++) {
 				Thread thread = (Thread) ((VariableDescriptor) vars[i]).getThread();
 				String name = vars[i].getName();
