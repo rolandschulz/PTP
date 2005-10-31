@@ -32,22 +32,14 @@ package org.eclipse.ptp.debug.external.cdi.model.type;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIIntegralType;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
-/**
- */
 public abstract class IntegralType extends Type implements ICDIIntegralType {
-
 	boolean unSigned;
 
 	public IntegralType(Target target, String typename, boolean isUnsigned) {
 		super(target, typename);
 		unSigned = isUnsigned;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.cdi.model.ICDIIntegralType#isUnsigned()
-	 */
 	public boolean isUnsigned() {
 		return unSigned;
 	}
-
 }
