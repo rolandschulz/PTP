@@ -148,6 +148,10 @@ public class IconCanvas extends Canvas {
 	}
 	private void resetCanvas() {
 		checkWidget();
+		current_top_row = -1;
+		actualScrollStart_y = 0;
+		autoScrollDirection = SWT.NULL;
+		verticalScrollOffset = 0;
 		selectedElements.clear();
 		tempSelectedElements.clear();
 		resetInfo();
