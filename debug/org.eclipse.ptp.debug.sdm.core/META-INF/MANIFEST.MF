@@ -18,6 +18,7 @@ Export-Package: org.eclipse.ptp.debug.external,
  org.eclipse.ptp.debug.external.ui
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
+ org.eclipse.cdt.debug.mi.core,
  org.eclipse.cdt.debug.core,
  org.eclipse.cdt.core,
  org.eclipse.ptp.debug.core,

@@ -73,8 +73,6 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 		commonSetup();
 		job.setAttribute(PreferenceConstants.JOB_DEBUG_SESSION, this);
 		
-		//add observer
-		this.debugger.addDebuggerObserver(eventManager);
 		start();
 	}
 	private void commonSetup() {
@@ -87,6 +85,19 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 		expressionManager = new ExpressionManager(this);
 		variableManager = new VariableManager(this);
 		sourceManager = new SourceManager(this);
+		//add observer
+		this.debugger.addDebuggerObserver(eventManager);
+	}
+	
+	public void shutdown() {
+		getDebugger().deleteAllObservers();
+		processManager.shutdown();
+		breakpointManager.shutdown();
+		eventManager.shutdown();
+		expressionManager.shutdown();
+		variableManager.shutdown();
+		sourceManager.shutdown();
+		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
 	}
 	public IPLaunch getLaunch() {
 		return launch;

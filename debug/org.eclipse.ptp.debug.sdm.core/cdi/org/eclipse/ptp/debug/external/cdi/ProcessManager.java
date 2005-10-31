@@ -39,6 +39,10 @@ public class ProcessManager extends Manager {
 		super(session, true);
 		debugTargetMap = Collections.synchronizedMap(new HashMap());
 	}
+	public void shutdown() {
+		debugTargetMap.clear();
+		debugTargetMap = null;
+	}
 	public Target[] getTargets() {
 		return (Target[]) debugTargetMap.values().toArray(new Target[debugTargetMap.size()]);
 	}

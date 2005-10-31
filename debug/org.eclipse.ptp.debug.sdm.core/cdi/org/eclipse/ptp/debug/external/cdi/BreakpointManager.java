@@ -85,6 +85,12 @@ public class BreakpointManager extends Manager {
 		deferredMap = Collections.synchronizedMap(new HashMap());
 		allowInterrupt = true;
 	}
+	public void shutdown() {
+		breakMap.clear();
+		deferredMap.clear();
+		breakMap = null;
+		deferredMap = null;
+	}
 	synchronized List getBreakpointsList(Target target) {
 		List bList = (List)breakMap.get(target);
 		if (bList == null) {

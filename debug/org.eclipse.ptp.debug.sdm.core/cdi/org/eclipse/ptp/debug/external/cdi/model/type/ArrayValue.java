@@ -39,7 +39,7 @@ public class ArrayValue extends DerivedValue implements ICDIArrayValue {
 	public ICDIVariable[] getVariables() throws CDIException {
 		//FIXME ignore NumChild
 		//int timeout = getVariable().getMIVar().getNumChild() * 8 + 5000;
-		return getVariable().getChildren(5000);
+		return getVariable().getChildren();
 	}
 	public ICDIVariable[] getVariables(int index, int length) throws CDIException {
 		//int children = getChildrenNumber();

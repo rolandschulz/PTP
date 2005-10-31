@@ -18,7 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model.variable;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
@@ -112,12 +115,20 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		// Use the default timeout.
 		return getChildren(-1);
 	}
+	//TODO - dunno whether it implemented correctly or not
 	public ICDIVariable[] getChildren(int timeout) throws CDIException {
-		//Target target = (Target)getTarget();
-		//Session session = (Session)target.getSession();
-		//TODO - not implement yet - listLocalVariables with variable name
-		//return target.getDebugger().listLocalVariables(session.createBitList(target.getTargetID()), getName());
-		throw new CDIException("Not implement yet - Variable - getChildren");
+		List varList = new ArrayList(1);
+		Target target = (Target)getTarget();
+		Session session = (Session)target.getSession();
+		
+		String name = getQualifiedName();
+		ICDILocalVariable[] vars = target.getDebugger().listLocalVariables(session.createBitList(target.getTargetID()), getStackFrame());
+		for (int i = 0; i < vars.length; i++) {
+			if (name.equals(vars[i].getQualifiedName())) {
+				varList.add(vars[i]);
+			}
+		}
+		return (ICDIVariable[])varList.toArray(new ICDIVariable[0]);
 	}
 
 	protected abstract Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth);

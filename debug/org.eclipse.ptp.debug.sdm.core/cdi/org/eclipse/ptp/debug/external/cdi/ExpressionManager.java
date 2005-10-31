@@ -38,6 +38,12 @@ public class ExpressionManager extends Manager {
 		expMap = new Hashtable();
 		varMap = new Hashtable();
 	}
+	public void shutdown() {
+		expMap.clear();
+		varMap.clear();
+		expMap = null;
+		varMap = null;
+	}
 
 	synchronized List getExpressionList(Target target) {
 		List expList = (List)expMap.get(target);
