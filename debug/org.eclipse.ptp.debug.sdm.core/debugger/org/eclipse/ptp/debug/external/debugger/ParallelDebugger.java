@@ -482,7 +482,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 				ICDIThread thread = new Thread((Target) target, 0);
 				String vars[] = varsEvent.getVariables();
 				for (int j = 0; j < vars.length; j++) {
-					LocalVariable var = new LocalVariable((Target) target, (Thread) thread, (StackFrame) this.currFrame, vars[j], vars[j], vars.length - j, this.currFrame.getLevel());
+					LocalVariable var = new LocalVariable((Target) target, (Thread) thread, (StackFrame) this.currFrame, vars[j], vars[j], vars.length - j, this.currFrame.getLevel(), null);
 					varList.add(var);
 				}
 			}
@@ -505,8 +505,8 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 				ICDIThread thread = new Thread((Target) target, 0);
 				String args[] = argsEvent.getVariables();
 				for (int j = 0; j < args.length; j++) {
-						Argument arg = new Argument((Target) target, (Thread) thread, (StackFrame) this.currFrame, args[j], args[j], args.length - j, this.currFrame.getLevel());
-						argList.add(arg);
+					Argument arg = new Argument((Target) target, (Thread) thread, (StackFrame) this.currFrame, args[j], args[j], args.length - j, this.currFrame.getLevel(), null);
+					argList.add(arg);
 				}
 			}
 			this.lastArgs = (ICDIArgument[]) argList.toArray(new ICDIArgument[0]);

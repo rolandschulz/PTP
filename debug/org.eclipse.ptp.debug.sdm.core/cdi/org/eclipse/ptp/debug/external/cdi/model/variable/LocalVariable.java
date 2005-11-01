@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.external.cdi.model.variable;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
+import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
@@ -27,10 +28,10 @@ public class LocalVariable extends Variable implements ICDILocalVariable {
 	public LocalVariable(LocalVariableDescriptor obj) {
 		super(obj);
 	}
-	public LocalVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth) {
-		super(target, thread, frame, name, fullName, pos, depth);
+	public LocalVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, IAIF aif) {
+		super(target, thread, frame, name, fullName, pos, depth, aif);
 	}
-	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth) {
-		return new LocalVariable(target, thread, frame, name, fullName, pos, depth);
+	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, IAIF aif) {
+		return new LocalVariable(target, thread, frame, name, fullName, pos, depth, aif);
 	}
 }

@@ -173,7 +173,7 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 					SimVariable[] args = simFrames[j].getArgs();
 					for (int k = 0; k < args.length; k++) {
 						String aName = args[k].getName();
-						Argument arg = new Argument((Target) target, (Thread) thread, (StackFrame) frame, aName, aName, args.length - k, frame.getLevel());
+						Argument arg = new Argument((Target) target, (Thread) thread, (StackFrame) frame, aName, aName, args.length - k, frame.getLevel(), null);
 						list.add(arg);
 					}
 				}
@@ -202,7 +202,7 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 					SimVariable[] args = simFrames[j].getLocalVars();
 					for (int k = 0; k < args.length; k++) {
 						String aName = args[k].getName();
-						LocalVariable arg = new LocalVariable((Target) target, (Thread) thread, (StackFrame) frame, aName, aName, args.length - k, frame.getLevel());
+						LocalVariable arg = new LocalVariable((Target) target, (Thread) thread, (StackFrame) frame, aName, aName, args.length - k, frame.getLevel(), null);
 						list.add(arg);
 					}
 				}

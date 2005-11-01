@@ -19,11 +19,12 @@
 package org.eclipse.ptp.debug.external.cdi.model.variable;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgumentDescriptor;
+import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
 public class ArgumentDescriptor extends LocalVariableDescriptor implements ICDIArgumentDescriptor {
-	public ArgumentDescriptor(Target target, Thread thread, StackFrame frame, String n, String fn, int pos, int depth) {
-		super(target, thread, frame, n, fn, pos, depth);
+	public ArgumentDescriptor(Target target, Thread thread, StackFrame frame, String n, String fn, int pos, int depth, IAIF aif) {
+		super(target, thread, frame, n, fn, pos, depth, aif);
 	}
 }

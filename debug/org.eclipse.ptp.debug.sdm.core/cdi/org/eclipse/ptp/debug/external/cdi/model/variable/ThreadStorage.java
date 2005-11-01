@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.external.cdi.model.variable;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorage;
+import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
@@ -31,10 +32,10 @@ public class ThreadStorage extends Variable implements ICDIThreadStorage {
 	public ThreadStorage(VariableDescriptor obj) {
 		super(obj);
 	}
-	public ThreadStorage(Target target, Thread thread, StackFrame frame, String n, String q, int pos, int depth) {
-		super(target, thread, frame, n, q, pos, depth);
+	public ThreadStorage(Target target, Thread thread, StackFrame frame, String n, String q, int pos, int depth, IAIF aif) {
+		super(target, thread, frame, n, q, pos, depth, aif);
 	}
-	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth) {
+	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, IAIF aif) {
 		return null;
 	}
 }
