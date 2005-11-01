@@ -107,19 +107,14 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			getProcess(tasks[i]).setStatus(state);
 		}
 	}
-	public final void fireEvent(IPCDIEvent event) {
+	public synchronized final void fireEvent(IPCDIEvent event) {
 		if (event != null) {
 			System.out.println("    --- Abs debugger: " + event);
-			eventQueue.addItem(event);
 			BitList tasks = event.getAllProcesses();
 			if (event instanceof IPCDIExitedEvent) {
 				setSuspendTasks(false, tasks);
 				setTerminateTasks(true, tasks);
 				setProcessStatus(tasks.toArray(), IPProcess.EXITED);
-				if (isJobFinished()) {
-					eventQueue.addItem(new DebuggerExitedEvent(getSession(), new BitList(0)));
-					stopDebugger();
-				}
 			} else if (event instanceof IPCDIResumedEvent) {
 				setSuspendTasks(false, tasks);
 				setProcessStatus(tasks.toArray(), IPProcess.RUNNING);
@@ -128,6 +123,13 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			} else if (event instanceof IPCDISuspendedEvent) {
 				setSuspendTasks(true, tasks);				
 				setProcessStatus(tasks.toArray(), IPProcess.STOPPED);
+			}
+			eventQueue.addItem(event);
+			if (event instanceof IPCDIExitedEvent) {
+				if (isJobFinished()) {
+					eventQueue.addItem(new DebuggerExitedEvent(getSession(), new BitList(0)));
+					stopDebugger();
+				}
 			}
 		}
 	}
