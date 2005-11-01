@@ -34,34 +34,41 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.proxy.event.IProxyEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.internal.core.CoreUtils;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.NamedEntity;
 import org.eclipse.ptp.rtsystem.RuntimeEvent;
+import org.eclipse.ptp.rtsystem.proxy.ProxyRuntimeClient;
 
 
-public class OMPIControlSystem implements IControlSystem {
+public class OMPIControlSystem implements IControlSystem, IProxyEventListener{
 	private Process orted_process = null;
 	private Vector knownJobs = null;
 	
 	protected List listeners = new ArrayList(2);
 	
-	private OMPIJNIBroker jniBroker = null;
+	private OMPIProxyRuntimeClient proxy = null;
 
-	public OMPIControlSystem(OMPIJNIBroker jniBroker) {
-		this.jniBroker = jniBroker;
+	public OMPIControlSystem(OMPIProxyRuntimeClient proxy) {
+		this.proxy = proxy;
 	}
 	
 	private boolean failed_init = false;
 	
+    private synchronized void wait_for_event() {
+        try {
+            wait();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    
 	public void startup() {
-		if(!jniBroker.libraryLoaded()) {
-			System.err.println("Unable to startup OMPI Control System because of a failed "+
-					"library load.");
-			return;
-		}
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		String orted_path = preferences.getString(PreferenceConstants.ORTE_ORTED_PATH);
 		System.out.println("ORTED path = ."+orted_path+".");
@@ -90,11 +97,30 @@ public class OMPIControlSystem implements IControlSystem {
 			System.out.println("["+x+"] = "+split_path[x]);
 		
 		/* start the daemon using JNI */
-		jniBroker.OMPIStartDaemon(ompi_bin_path, orted_path, split_path[split_path.length - 1], split_args);
+		//jniBroker.OMPIStartDaemon(ompi_bin_path, orted_path, split_path[split_path.length - 1], split_args);
 		
 		/* start the daemon using Java */
 		//OMPIStartORTEd(orted_full);
 		
+		System.out.println("OMPIControlSystem - firing up proxy.");
+		try {
+			proxy.addEventListener(this);
+			proxy.sessionCreate();
+			wait_for_event();
+		} catch (IOException e) {
+			System.err.println("Exception starting up proxy. :(");
+			System.exit(1);
+		}
+		
+		try {
+			proxy.startDaemon(ompi_bin_path, orted_path, split_path[split_path.length - 1], split_args);
+			System.out.println("Control SYSTEM: startDaemon command issued!");
+		} catch(IOException e) {
+			System.err.println("Exception starting daemon. :(");
+			System.exit(1);
+		}
+		
+		/*
 		int rc = jniBroker.OMPIInit();
 		System.out.println("OMPI Init() return code = "+rc);
 		if(rc != 0) {
@@ -102,15 +128,16 @@ public class OMPIControlSystem implements IControlSystem {
 			CoreUtils.showErrorDialog("OMPI Runtime Initialization Error", error_msg, null);
 			failed_init = true;
 			return;
-		}
+		}*/
 
-		startProgressMaker();
+		//startProgressMaker();
 	}
 	
 	/* this is how we can/would start the daemon from Java.  Call this if you really
 	 * want to do this, but for OMPI it's probably required to start it through
 	 * JNI.
 	 */
+	/*
 	private void OMPIStartORTEd(String cmd)
 	{
 		try {
@@ -124,7 +151,9 @@ public class OMPIControlSystem implements IControlSystem {
 			failed_init = true;
 		}
 	}
+	*/
     
+	/*
 	public void startProgressMaker() {
 		if(!jniBroker.libraryLoaded()) {
 			System.err.println("Unable to startup OMPI Control System because of a failed "+
@@ -138,6 +167,7 @@ public class OMPIControlSystem implements IControlSystem {
 		};
 		progressThread.start();
 	}
+	*/
 	
 	/* returns the new job name that it started - unique */
 	public String run(JobRunConfiguration jobRunConfig) {
@@ -153,11 +183,11 @@ public class OMPIControlSystem implements IControlSystem {
 		args[5] = ""+jobRunConfig.getNumberOfProcessesPerNode()+"";
 		args[6] = "firstNodeNumber";
 		args[7] = ""+jobRunConfig.getFirstNodeNumber()+"";
-		jobID = jniBroker.OMPIRun(args);
+		//jobID = jniBroker.OMPIRun(args);
 		if(jobID == -1) {
 			/* error occurred */
-			String error_msg = jniBroker.OMPIGetError();
-			CoreUtils.showErrorDialog("OMPI Parallel Run/Spawn Error", error_msg, null);
+			//String error_msg = jniBroker.OMPIGetError();
+			//CoreUtils.showErrorDialog("OMPI Parallel Run/Spawn Error", error_msg, null);
 			return null;
 		}
 		else {
@@ -183,7 +213,7 @@ public class OMPIControlSystem implements IControlSystem {
 		}
 		if(jobID >= 0) {
 			System.out.println("JAVA OMPI: abortJob() with name "+job.toString()+" and ID "+jobID);
-			jniBroker.OMPITerminateJob(jobID);
+		//	jniBroker.OMPITerminateJob(jobID);
 		}
 		else {
 			System.err.println("ERROR: Tried to abort a null job.");
@@ -270,28 +300,41 @@ public class OMPIControlSystem implements IControlSystem {
 	}
 
 	public void shutdown() {
-		if(!jniBroker.libraryLoaded()) {
-			System.err.println("Unable to startup OMPI Control System because of a failed "+
-					"library load.");
-			return;
-		}
+//		if(!jniBroker.libraryLoaded()) {
+//			System.err.println("Unable to startup OMPI Control System because of a failed "+
+//					"library load.");
+//			return;
+//		}
 		System.out.println("JAVA OMPI: shutdown() called");
-		
-		/* shutdown/kill the ORTE daemon */
-		jniBroker.OMPIShutdown();
-		
-		/* finalize the registry - yes, it's odd it is in this order */
-		jniBroker.OMPIFinalize();
-		
-		/*
-		if(orted_process != null) {
-			System.out.println("DESTROY ORTED!");
-			orted_process.destroy();
-			orted_process = null;
-			orted_process = null;
-		}
-		*/
+//		
+//		/* shutdown/kill the ORTE daemon */
+//		jniBroker.OMPIShutdown();
+//		
+//		/* finalize the registry - yes, it's odd it is in this order */
+//		jniBroker.OMPIFinalize();
+//		
+//		/*
+//		if(orted_process != null) {
+//			System.out.println("DESTROY ORTED!");
+//			orted_process.destroy();
+//			orted_process = null;
+//			orted_process = null;
+//		}
+//		*/
 		listeners.clear();
 		listeners = null;
 	}
+
+    public synchronized void fireEvent(IProxyEvent e) {
+        // TODO Auto-generated method stub
+        System.out.println("got event: " + e.toString());
+        /*
+        if (e.getEventID() == IProxyDebugEvent.EVENT_DBG_INIT) {
+            numServers = ((ProxyDebugInitEvent)e).getNumServers();
+            System.out.println("num servers = " + numServers);
+        }
+        */
+        //this.events.addItem(e);
+        notify();
+    }
 }

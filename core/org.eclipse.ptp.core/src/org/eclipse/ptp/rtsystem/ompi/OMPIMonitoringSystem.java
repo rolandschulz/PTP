@@ -30,10 +30,10 @@ public class OMPIMonitoringSystem implements IMonitoringSystem {
 
 	protected List listeners = new ArrayList(2);
 	
-	private OMPIJNIBroker jniBroker = null;
+	private OMPIProxyRuntimeClient proxy = null;
 
-	public OMPIMonitoringSystem(OMPIJNIBroker jniBroker) {
-		this.jniBroker = jniBroker;
+	public OMPIMonitoringSystem(OMPIProxyRuntimeClient proxy) {
+		this.proxy = proxy;
 	}
 
 	public void addRuntimeListener(IRuntimeListener listener) {

@@ -143,6 +143,7 @@ public abstract class AbstractProxyClient {
 		
 		int n = sessIn.read(len_bytes, 0, 9);
 		if (n < 0) {
+			System.out.println("CLOSING SOCKETS");
 			sessIn.close();
 			sessOut.close();
 			exitThread = true;

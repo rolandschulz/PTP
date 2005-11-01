@@ -52,6 +52,7 @@ import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.ompi.OMPIControlSystem;
 import org.eclipse.ptp.rtsystem.ompi.OMPIJNIBroker;
 import org.eclipse.ptp.rtsystem.ompi.OMPIMonitoringSystem;
+import org.eclipse.ptp.rtsystem.ompi.OMPIProxyRuntimeClient;
 import org.eclipse.ptp.rtsystem.simulation.SimProcess;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
@@ -151,13 +152,15 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		else if(monitoringSystemID == MonitoringSystemChoices.ORTE && controlSystemID == ControlSystemChoices.ORTE) {
 			universe = new PUniverse();
 			/* load up the control and monitoring systems for OMPI */
-			OMPIJNIBroker jnibroker = new OMPIJNIBroker();
-			monitoringSystem = new OMPIMonitoringSystem(jnibroker);
-			controlSystem = new OMPIControlSystem(jnibroker);
+			//OMPIJNIBroker jnibroker = new OMPIJNIBroker();
+			OMPIProxyRuntimeClient proxy = new OMPIProxyRuntimeClient("localhost", 12377);
+			monitoringSystem = new OMPIMonitoringSystem(proxy);
+			controlSystem = new OMPIControlSystem(proxy);
 			monitoringSystem.startup();
 			controlSystem.startup();
 			setupMS();
 			fireEvent(null, EVENT_MONITORING_SYSTEM_CHANGE);
+			//refreshRuntimeSystems(ControlSystemChoices.SIMULATED_ID, MonitoringSystemChoices.SIMULATED_ID);
 		}
 		else {
 			CoreUtils.showErrorDialog("Runtime System Error", "Invalid monitoring/control system selected.  Set using the PTP preferences page.", null);
