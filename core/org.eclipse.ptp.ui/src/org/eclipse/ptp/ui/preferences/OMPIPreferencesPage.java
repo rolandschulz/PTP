@@ -34,9 +34,10 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -51,15 +52,20 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 {
 	public static final String EMPTY_STRING = "";
 
+	protected Text port = null;
 	protected Text ortedPathText = null;
 	protected Text ortedArgsText = null;
 	protected Text ortedFullText = null;
+	protected Text orteServerText = null;
 
 	protected Button browseButton = null;
+	protected Button browseButton2 = null;
 
 	private String defaultOrtedArgs = "--scope public --seed --persistent";
 	private String ortedArgs = EMPTY_STRING;
 	private String ortedFile = EMPTY_STRING;
+	private String orteServerFile = EMPTY_STRING;
+	private String ortePort = "12345";
 
 
 	public OMPIPreferencesPage() {
@@ -72,6 +78,8 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 			Object source = e.getSource();
 			if (source == browseButton)
 				handlePathBrowseButtonSelected();
+			else if (source == browseButton2)
+				handlePathBrowseButtonSelected2();
 			else
 				updatePreferencePage();
 		}
@@ -152,6 +160,52 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		ortedFullText.addModifyListener(listener);
 		ortedFullText.setText(ortedPathText.getText()+" "+ortedArgsText.getText());
 		
+		
+		Group bGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
+		bGroup.setLayout(createGridLayout(1, true, 10, 10));
+		bGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
+		bGroup.setText(CoreMessages.getResourceString("OMPIPreferencesPage.group_proxy"));
+		
+		new Label(bGroup, SWT.WRAP).setText("Enter the path to the PTP ORTE proxy server.");
+		new Label(bGroup, SWT.WRAP).setText("PTP will run this proxy server and have it connect to the port you specify below.");
+		new Label(bGroup, SWT.WRAP).setText("Example port: 12345.");
+		
+		Composite orteserver = new Composite(bGroup, SWT.NONE);
+		orteserver.setLayout(createGridLayout(3, false, 0, 0));
+		orteserver.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
+		
+		new Label(orteserver, SWT.NONE).setText(CoreMessages
+				.getResourceString("OMPIPreferencesPage.orteServer_text"));
+		orteServerText = new Text(orteserver, SWT.SINGLE | SWT.BORDER);
+		orteServerText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		browseButton2 = SWTUtil.createPushButton(orteserver, CoreMessages
+				.getResourceString("PTPPreferencesPage.browseButton"), null);
+		browseButton2.addSelectionListener(listener);
+		
+		Composite ortespin = new Composite(bGroup, SWT.NONE);
+		ortespin.setLayout(createGridLayout(2, false, 0, 0));
+		ortespin.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
+		
+		new Label(ortespin, SWT.NONE).setText(CoreMessages
+				.getResourceString("OMPIPreferencesPage.orteServerPort_text"));
+		port = new Text(ortespin, SWT.BORDER | SWT.SINGLE);
+		port.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		/* only integers allowed */
+		port.addVerifyListener(new VerifyListener() {
+			public void verifyText(VerifyEvent e) {
+				String text = e.text;
+				char[] chars = new char[text.length()];
+				text.getChars(0, chars.length, chars, 0);
+				for(int i=0; i<chars.length; i++) {
+					if(!('0' <= chars[i] && chars[i] <= '9')) {
+						e.doit = false;
+						return;
+					}
+				}
+			}
+		});
+		port.addModifyListener(listener);
+		
 		/*
 		Group bGroup = new Group(aGroup, SWT.SHADOW_ETCHED_IN);
 		bGroup.setLayout(createGridLayout(1, true, 10, 10));
@@ -169,6 +223,9 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 
 	protected void defaultSetting() 
 	{
+		orteServerText.setText(orteServerFile);
+		port.setText(ortePort);
+		
 		ortedPathText.setText(ortedFile);
 		ortedArgsText.setText(ortedArgs);
 		ortedFullText.setText(ortedPathText.getText()+" "+ortedArgsText.getText());
@@ -177,6 +234,13 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 	private void loadSaved()
 	{
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
+		
+		orteServerFile = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
+		orteServerText.setText(orteServerFile);
+		
+		ortePort = preferences.getString(PreferenceConstants.ORTE_SERVER_PORT);
+		port.setText(ortePort);
+
 		ortedFile = preferences.getString(PreferenceConstants.ORTE_ORTED_PATH);
 		ortedPathText.setText(ortedFile);
 		ortedArgs = preferences.getString(PreferenceConstants.ORTE_ORTED_ARGS);
@@ -203,6 +267,7 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 	{
 		ortedFile = ortedPathText.getText();
 		ortedArgs = ortedArgsText.getText();
+		orteServerFile = orteServerText.getText();
 	}
 
 	public boolean performOk() 
@@ -213,6 +278,8 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 
 		preferences.setValue(PreferenceConstants.ORTE_ORTED_PATH, ortedFile);
 		preferences.setValue(PreferenceConstants.ORTE_ORTED_ARGS, ortedArgs);
+		preferences.setValue(PreferenceConstants.ORTE_SERVER_PATH, orteServerFile);
+		preferences.setValue(PreferenceConstants.ORTE_SERVER_PORT, port.getText());
 
 		PTPCorePlugin.getDefault().savePluginPreferences();
 
@@ -239,6 +306,24 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		if (selectedPath != null)
 			ortedPathText.setText(selectedPath);
 	}
+	
+	protected void handlePathBrowseButtonSelected2() 
+	{
+		FileDialog dialog = new FileDialog(getShell());
+		dialog.setText(CoreMessages
+				.getResourceString("OMPIPreferencesPage.Select_ORTE_PROXY_FILE"));
+		String correctPath = getFieldContent(orteServerText.getText());
+		if (correctPath != null) {
+			File path = new File(correctPath);
+			if (path.exists())
+				dialog.setFilterPath(path.isFile() ? correctPath : path
+						.getParent());
+		}
+
+		String selectedPath = dialog.open();
+		if (selectedPath != null)
+			orteServerText.setText(selectedPath);
+	}
 
 	protected boolean isValidORTEdSetting() 
 	{
@@ -254,6 +339,23 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 			if (!path.exists() || !path.isFile()) {
 				setErrorMessage(CoreMessages
 					.getResourceString("OMPIPreferencesPage.Incorrect_ORTEd_file"));
+				//setValid(false);
+				//return false;
+			}
+		}
+		
+		name = getFieldContent(orteServerText.getText());
+		if (name == null) {
+			setErrorMessage(CoreMessages
+					.getResourceString("OMPIPreferencesPage.Incorrect_server_file"));
+			//setValid(false);
+			//return false;
+		}
+		else {
+			File path = new File(name);
+			if (!path.exists() || !path.isFile()) {
+				setErrorMessage(CoreMessages
+					.getResourceString("OMPIPreferencesPage.Incorrect_server_file"));
 				//setValid(false);
 				//return false;
 			}
