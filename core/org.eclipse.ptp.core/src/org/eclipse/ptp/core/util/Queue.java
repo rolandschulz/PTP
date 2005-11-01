@@ -35,7 +35,6 @@ public class Queue {
 			while (list.isEmpty()) {
 				list.wait();
 			}
-
 			return list.remove(0);
 		}
 	}
@@ -64,5 +63,3 @@ public class Queue {
 		return empty;
 	}
 }
-	
-
