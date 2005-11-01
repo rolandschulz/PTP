@@ -490,7 +490,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				if (bpt instanceof ICDILocationBreakpoint) {
 					ICDILocator locator = ((ICDILocationBreakpoint) bpt).getLocator();
 					int lineNumber = locator.getLineNumber();
-					System.out.println("----- linenumber: " + lineNumber + ", file: " + locator.getFile());
 					if (lineNumber == 0)
 						lineNumber = 1;
 					String fileName = workingDebugDir + "/" + locator.getFile();
@@ -666,12 +665,13 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}
 	}
 	public void removeJob(IPJob job) {
-		super.removeJob(job);
 		try {
 			debugModel.deletePBreakpointBySet(job.getIDString());
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 		}
 		debugModel.deleteJob(job.getIDString());
+		debugModel.shutdownSession(job);
+		super.removeJob(job);
 	}
 }
