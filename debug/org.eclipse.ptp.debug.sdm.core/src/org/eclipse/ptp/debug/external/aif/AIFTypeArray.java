@@ -19,7 +19,18 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public interface IAIF {
-	public IAIFType getType();
-	public IAIFValue getValue();
+public class AIFTypeArray implements IAIFType {
+	private IAIFType baseType;
+	private int lowIndex;
+	private int highIndex;
+	
+	public AIFTypeArray(int low, int high, IAIFType base) {
+		this.lowIndex = low;
+		this.highIndex = high;
+		this.baseType = base;
+	}
+
+	public String toString() {
+		return "[" + Integer.toString(this.lowIndex) + ".." + Integer.toString(this.highIndex) + "]" + this.baseType.toString();
+	}
 }

@@ -19,7 +19,24 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public interface IAIF {
-	public IAIFType getType();
-	public IAIFValue getValue();
+public class AIFTypeFunction implements IAIFType {
+	private IAIFType[] 	argTypes;
+	private IAIFType		returnType;
+	
+	public AIFTypeFunction(IAIFType[] args, IAIFType ret) {
+		this.argTypes = args;
+		this.returnType = ret;
+	}
+
+	public String toString() {
+		String res = "&";
+		
+		for (int i = 0; i < this.argTypes.length; i++) {
+			if (i > 0)
+				res += ",";
+			res += this.argTypes[i].toString();
+		}
+		
+		return res + "/" + this.returnType.toString();
+	}
 }

@@ -19,7 +19,16 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public interface IAIF {
-	public IAIFType getType();
-	public IAIFValue getValue();
+import java.math.BigDecimal;
+
+public class AIFValueFloating implements IAIFValue {
+	private BigDecimal val;
+	
+	public AIFValueFloating(BigDecimal val) {
+		this.val = val;
+	}
+
+	public String toString() {
+		return this.val.toString();
+	}
 }

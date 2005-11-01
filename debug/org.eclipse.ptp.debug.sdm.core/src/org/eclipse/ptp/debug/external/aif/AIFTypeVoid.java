@@ -19,7 +19,14 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public interface IAIF {
-	public IAIFType getType();
-	public IAIFValue getValue();
+public class AIFTypeVoid implements IAIFType {
+	private int length;
+	
+	public AIFTypeVoid(int length) {
+		this.length = length;
+	}
+
+	public String toString() {
+		return "v" + Integer.toString(this.length);
+	}
 }

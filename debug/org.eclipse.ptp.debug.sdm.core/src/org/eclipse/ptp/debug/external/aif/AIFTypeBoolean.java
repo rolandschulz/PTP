@@ -19,7 +19,8 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public interface IAIF {
-	public IAIFType getType();
-	public IAIFValue getValue();
+public class AIFTypeBoolean implements IAIFType {
+	public String toString() {
+		return "b";
+	}
 }

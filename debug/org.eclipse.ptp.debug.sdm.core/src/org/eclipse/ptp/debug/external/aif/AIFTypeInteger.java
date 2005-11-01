@@ -19,7 +19,23 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public interface IAIF {
-	public IAIFType getType();
-	public IAIFValue getValue();
+public class AIFTypeInteger implements IAIFType {
+	private int length;
+	private boolean signed;
+	
+	public AIFTypeInteger(boolean signed, int length) {
+		this.length = length;
+		this.signed = signed;
+	}
+
+	public String toString() {
+		String res = "i";
+		
+		if (signed)
+			res += "s";
+		else
+			res += "u";
+		
+		return res + Integer.toString(this.length);
+	}
 }

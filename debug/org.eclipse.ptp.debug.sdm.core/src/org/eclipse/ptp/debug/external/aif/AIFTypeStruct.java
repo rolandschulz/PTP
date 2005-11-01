@@ -19,7 +19,35 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public interface IAIF {
-	public IAIFType getType();
-	public IAIFValue getValue();
+public class AIFTypeStruct implements IAIFType {
+	private int 				id = -1;
+	private AIFTypeField[]	fields;
+	
+	public AIFTypeStruct(AIFTypeField[] fields) {
+		this.fields = fields;
+	}
+
+	public AIFTypeStruct(int id, AIFTypeField[] fields) {
+		this(fields);
+		this.id = id;
+	}
+
+	public int getId() {
+		return this.id;
+	}
+	
+	public String toString() {
+		String res = "{";
+		
+		if (this.id >= 0)
+			res += Integer.toString(this.id) + "|";
+		
+		for (int i = 0; i < this.fields.length; i++) {
+			if (i > 0)
+				res += ",";
+			res += this.fields[i].toString();
+		}
+		
+		return res + ";;;}";
+	}
 }
