@@ -170,14 +170,10 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	//current support main function breakpoint only
 	public void setFunctionBreakpoint(BitList tasks, ICDIFunctionBreakpoint bpt) throws PCDIException {
 		final int[] taskArray = tasks.toArray();
-		new Thread(new Runnable() {
-			public void run() {
-				for (int i=0; i<taskArray.length; i++) {
-					SimulateProgram sim_prog = getSimProg(taskArray[i]);
-					sim_prog.setStopInMain();
-				}
-			}
-		}).start();
+		for (int i=0; i<taskArray.length; i++) {
+			SimulateProgram sim_prog = getSimProg(taskArray[i]);
+			sim_prog.setStopInMain();
+		}
 	}
 	public ICDIStackFrame[] listStackFrames(BitList tasks) throws PCDIException {
 		int[] taskArray = tasks.toArray();
@@ -257,7 +253,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	}
 	private synchronized void updateEvent(QueueItem qItem) {
 		String state = qItem.getState();
-		System.out.println("**** Event Update: " + state + ", tasks: " + qItem.getTasks().cardinality());
+		//System.out.println("**** Event Update: " + state + ", tasks: " + qItem.getTasks().cardinality());
 		if (state.equals(EXIT_STATE)) {
 			handleProcessTerminatedEvent(qItem.getTasks());
 		} else if (state.equals(HIT_BPT_STATE)) {
@@ -285,13 +281,6 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		}
 		public QueueItem getItem() {
 			synchronized (queue) {
-				while (queue.isEmpty()) {
-					try {
-						queue.wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
 				return (QueueItem)queue.remove(0);
 			}
 		}
@@ -300,7 +289,6 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				if (same(item)) {
 					queue.add(item);
 				} else {
-					queue.notifyAll();
 					updateEvent();
 				}
 			}
@@ -432,7 +420,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 			}
 		}
 		private synchronized void printMessage() {
-			System.out.println("Task: " + tid + " - Message at current line: " + current_line);
+			//System.out.println("Task: " + tid + " - Message at current line: " + current_line);
 		}
 		public synchronized void gotoLine(int line) {
 			this.current_line = line;
