@@ -39,7 +39,12 @@ public class ProxyRuntimeEvent extends ProxyEvent {
 			int errCode = Integer.parseInt(args[1]);
 			evt = new ProxyRuntimeErrorEvent(errCode, decodeString(args[2]));
 			break;
-			
+
+		case IProxyRuntimeEvent.EVENT_RUNTIME_JOBSTATE:
+			int state = Integer.parseInt(args[1]);
+			evt = new ProxyRuntimeJobStateEvent(state);
+			break;
+
 		default:
 			evt = new ProxyRuntimeErrorEvent(ProxyErrorEvent.EVENT_ERR_EVENT, "Invalid event type");
 			break;
