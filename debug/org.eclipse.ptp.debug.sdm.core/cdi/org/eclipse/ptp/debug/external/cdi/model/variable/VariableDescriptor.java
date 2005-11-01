@@ -251,11 +251,7 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 		return fThread;
 	}
 	public String getTypeName() throws CDIException {
-		if (aif != null) {
-			//TODO - fix the toString later
-			fTypename = aif.getType().toString();
-		}
-		else {
+		if (aif == null) {
 			Target target = (Target)getTarget();
 			StackFrame frame = (StackFrame)getStackFrame();
 			if (frame == null) {
@@ -273,6 +269,10 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 			} else {
 				fTypename = sourceMgr.getTypeName(target, getQualifiedName());
 			}
+		}
+		else {
+			//TODO - fix the toString later
+			fTypename = aif.getType().toString();
 		}
 		return fTypename;
 	}

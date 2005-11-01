@@ -371,18 +371,20 @@ public class VariableManager extends Manager {
 		
 		try {
 			ICDILocalVariable[] vars = target.getDebugger().listLocalVariables(((Session)getSession()).createBitList(target.getTargetID()), currentFrame);
-			for (int i = 0; i < vars.length; i++) {
-				VariableDescriptor varDesc = (VariableDescriptor)vars[i];
-				Thread thread = (Thread)varDesc.getThread();
-				String name = varDesc.getName();
-				String fName = varDesc.getQualifiedName();
-				int pos = varDesc.getPosition();
-				int depth = varDesc.getStackDepth();
-				IAIF aif = varDesc.getAIF();
-				if (aif == null) {
-					//TODO - get AIF from debugger
+			if (vars != null) {
+				for (int i = 0; i < vars.length; i++) {
+					VariableDescriptor varDesc = (VariableDescriptor)vars[i];
+					Thread thread = (Thread)varDesc.getThread();
+					String name = varDesc.getName();
+					String fName = varDesc.getQualifiedName();
+					int pos = varDesc.getPosition();
+					int depth = varDesc.getStackDepth();
+					IAIF aif = varDesc.getAIF();
+					if (aif == null) {
+						//TODO - get AIF from debugger
+					}
+					varObjects.add(new LocalVariableDescriptor(target, thread, frame, name, fName, pos, depth, aif));
 				}
-				varObjects.add(new LocalVariableDescriptor(target, thread, frame, name, fName, pos, depth, aif));
 			}
 		} finally {
 			target.setCurrentThread(currentThread, false);

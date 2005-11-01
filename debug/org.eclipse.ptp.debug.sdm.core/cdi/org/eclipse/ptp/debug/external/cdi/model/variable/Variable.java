@@ -238,14 +238,14 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		varMgr.destroyVariable(this);
 	}
 	public String getTypeName() throws CDIException {
-		if (aif != null) {
-			//TODO - fix the toString later
-			fTypename = aif.getType().toString();
-		}
-		else {
+		if (aif == null) {
 			Target target = (Target)getTarget();
 			Session session = (Session)target.getSession();
 			fTypename = target.getDebugger().getVariableType(session.createBitList(target.getTargetID()), getName());
+		}
+		else {
+			//TODO - fix the toString later
+			fTypename = aif.getType().toString();
 		}
 		return fTypename;
 	}
