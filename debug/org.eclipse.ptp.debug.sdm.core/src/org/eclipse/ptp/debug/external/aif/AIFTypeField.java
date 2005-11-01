@@ -19,14 +19,16 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public class AIFInt implements IAIF {
-	private int val;
+public class AIFTypeField {
+	private String 	fieldName;
+	private IAIFType	fieldType;
 	
-	public AIFInt(int val) {
-		this.val = val;
+	public AIFTypeField(String name, IAIFType type) {
+		this.fieldName = name;
+		this.fieldType = type;
 	}
 	
 	public String toString() {
-		return Integer.toString(this.val);
+		return this.fieldName + "=" + this.fieldType.toString();
 	}
 }

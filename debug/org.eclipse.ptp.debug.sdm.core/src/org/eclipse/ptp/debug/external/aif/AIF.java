@@ -19,31 +19,76 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public class AIF {
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+public class AIF implements IAIF {
+	private IAIFType		aifType;
+	private IAIFValue	aifValue;
+
+	private static final char FDS_ARRAY = '[';
+	private static final char FDS_BOOLEAN = 'b';
+	private static final char FDS_CHARACTER = 'c';
+	private static final char FDS_ENUMERATION = '<';
+	private static final char FDS_FLOATING = 'f';
+	private static final char FDS_FUNCTION = '&';
 	private static final char FDS_INTEGER = 'i';
-	
+	private static final char FDS_POINTER = '^';
+	private static final char FDS_STRING = 's';
+	private static final char FDS_STRUCT = '{';
+	private static final char FDS_UNION = '(';
+	private static final char FDS_VOID = 'v';
+
+	private static final int FDS_FLOATING_LEN_POS = 1;
 	private static final int FDS_INTEGER_SIGN_POS = 1;
 	private static final int FDS_INTEGER_LEN_POS = 2;
 	
-	public static IAIF toAIF(String format, String data) {
-		IAIF res = null;
-		
+	public AIF(String fds, String data) {
+		convertToAIF(this, fds, data);
+	}
+	
+	public static void convertToAIF(AIF aif, String format, String data) {
 		switch (format.charAt(0)) {
+		case FDS_FLOATING:
+			int floatLen = Character.digit(format.charAt(FDS_FLOATING_LEN_POS), 10);
+			BigDecimal floatVal = new BigDecimal(data);
+			
+			aif.setType(new AIFTypeFloating(floatLen));
+			aif.setValue(new AIFValueFloating(floatVal));
+			break;
+			
 		case FDS_INTEGER:
-			int len = Character.digit(format.charAt(FDS_INTEGER_LEN_POS), 10);
-			int intVal = 0;
-			byte[] intBytes = data.getBytes();
-			
-			if ( len > 4) {
-				// throw AIFLenException
-			}
-			
-			for (int i = 0 ; i < len ; i++ )
-				intVal = intVal * 0x100 + (intBytes[i] & 0xff);
+			int intLen = Character.digit(format.charAt(FDS_INTEGER_LEN_POS), 10);
+			boolean signed;
 
-			res = new AIFInt(intVal);
+			BigInteger intVal = new BigInteger(data);
+			
+			if (format.charAt(FDS_INTEGER_SIGN_POS) == 's')
+				signed = true;
+			else {
+				signed = false;
+				intVal = intVal.abs();
+			}
+
+			aif.setType(new AIFTypeInteger(signed, intLen));
+			aif.setValue(new AIFValueInteger(intVal));
+			break;
 		}
-		
-		return res;
+	}
+
+	public IAIFType getType() {
+		return aifType;
+	}
+
+	public IAIFValue getValue() {
+		return aifValue;
+	}
+	
+	protected void setType(IAIFType t) {
+		aifType = t;
+	}
+
+	protected void setValue(IAIFValue v) {
+		aifValue = v;
 	}
 }

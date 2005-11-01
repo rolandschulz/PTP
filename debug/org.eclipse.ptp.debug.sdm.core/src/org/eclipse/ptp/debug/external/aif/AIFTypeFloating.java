@@ -19,7 +19,14 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public interface IAIF {
-	public IAIFType getType();
-	public IAIFValue getValue();
+public class AIFTypeFloating implements IAIFType {
+	private int length;
+	
+	public AIFTypeFloating(int length) {
+		this.length = length;
+	}
+
+	public String toString() {
+		return "f" + Integer.toString(this.length);
+	}
 }

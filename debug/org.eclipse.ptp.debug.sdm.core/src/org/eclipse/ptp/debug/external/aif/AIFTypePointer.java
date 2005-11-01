@@ -19,7 +19,14 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public interface IAIF {
-	public IAIFType getType();
-	public IAIFValue getValue();
+public class AIFTypePointer implements IAIFType {
+	private IAIFType baseType;
+	
+	public AIFTypePointer(IAIFType base) {
+		this.baseType = base;
+	}
+
+	public String toString() {
+		return "^" + baseType.toString();
+	}
 }

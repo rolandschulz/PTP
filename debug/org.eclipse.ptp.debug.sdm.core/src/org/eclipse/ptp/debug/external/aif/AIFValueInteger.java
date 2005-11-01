@@ -19,7 +19,16 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public interface IAIF {
-	public IAIFType getType();
-	public IAIFValue getValue();
+import java.math.BigInteger;
+
+public class AIFValueInteger implements IAIFValue {
+	private BigInteger val;
+	
+	public AIFValueInteger(BigInteger val) {
+		this.val = val;
+	}
+
+	public String toString() {
+		return this.val.toString();
+	}
 }

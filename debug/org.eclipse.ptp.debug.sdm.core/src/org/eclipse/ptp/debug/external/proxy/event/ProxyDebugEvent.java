@@ -102,7 +102,7 @@ public class ProxyDebugEvent extends ProxyEvent {
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_DATA:
-			IAIF data = AIF.toAIF(args[2], args[3]);
+			IAIF data = new AIF(args[2], args[3]);
 			evt = new ProxyDebugDataEvent(set, data);
 			break;
 			
