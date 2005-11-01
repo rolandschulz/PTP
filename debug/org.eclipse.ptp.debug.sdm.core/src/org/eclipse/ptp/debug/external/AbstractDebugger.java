@@ -22,7 +22,6 @@
  */
 package org.eclipse.ptp.debug.external;
 
-import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
@@ -49,10 +48,9 @@ import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
 public abstract class AbstractDebugger extends Observable implements IAbstractDebugger {
 	protected Queue eventQueue = null;
 	protected EventThread eventThread = null;
-	protected ArrayList userDefinedProcessSetList = null;
 	protected IPCDISession session = null;
 	protected IPProcess[] procs;
-	protected boolean isExitingFlag = false;
+	protected boolean isExited = false;
 	private IPJob job = null;
 
 	public final void initialize(IPJob job) {
@@ -60,32 +58,27 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		job.setAttribute(TERMINATED_PROC_KEY, new BitList(job.size()));
 		job.setAttribute(SUSPENDED_PROC_KEY, new BitList(job.size()));
 		
+		isExited = false;
 		eventQueue = new Queue();
 		eventThread = new EventThread(this);
 		eventThread.start();
-		userDefinedProcessSetList = new ArrayList();
 		procs = job.getSortedProcesses();
 		// Initialize state variables
 		startDebugger(job);
 	}
 	public final void exit() {
-		isExitingFlag = true;
-		stopDebugger();
-		// Allow (10 secs) for the EventThread to finish processing the queue.
-		for (int i = 0; !eventQueue.isEmpty() && i < 5; i++) {
+		isExited = true;
+		if (!eventThread.equals(Thread.currentThread())) {			
+			// Kill the event Thread.
 			try {
-				java.lang.Thread.sleep(2000);
+				if (eventThread.isAlive()) {
+					eventThread.interrupt();
+					eventThread.join(5000);
+				}
 			} catch (InterruptedException e) {
-			}
+			}		
 		}
-		// Kill the event Thread.
-		try {
-			if (eventThread.isAlive()) {
-				eventThread.interrupt();
-				eventThread.join(); // Should use a timeout ?
-			}
-		} catch (InterruptedException e) {
-		}
+		deleteObservers();
 	}
 	public final IPCDISession getSession() {
 		return session;
@@ -116,12 +109,17 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	}
 	public final void fireEvent(IPCDIEvent event) {
 		if (event != null) {
-			BitList tasks = event.getAllProcesses();
 			System.out.println("    --- Abs debugger: " + event);
+			eventQueue.addItem(event);
+			BitList tasks = event.getAllProcesses();
 			if (event instanceof IPCDIExitedEvent) {
 				setSuspendTasks(false, tasks);
 				setTerminateTasks(true, tasks);
 				setProcessStatus(tasks.toArray(), IPProcess.EXITED);
+				if (isJobFinished()) {
+					eventQueue.addItem(new DebuggerExitedEvent(getSession(), new BitList(0)));
+					stopDebugger();
+				}
 			} else if (event instanceof IPCDIResumedEvent) {
 				setSuspendTasks(false, tasks);
 				setProcessStatus(tasks.toArray(), IPProcess.RUNNING);
@@ -130,14 +128,6 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			} else if (event instanceof IPCDISuspendedEvent) {
 				setSuspendTasks(true, tasks);				
 				setProcessStatus(tasks.toArray(), IPProcess.STOPPED);
-			}
-			eventQueue.addItem(event);
-			//check if the job finished
-			if (event instanceof IPCDIExitedEvent) {
-				if (isJobFinished()) {
-					eventQueue.addItem(new DebuggerExitedEvent(getSession(), new BitList(0)));
-					exit();
-				}
 			}
 		}
 	}
@@ -148,8 +138,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public final Queue getEventQueue() {
 		return eventQueue;
 	}
-	public final boolean isExiting() {
-		return isExitingFlag;
+	public final boolean isExited() {
+		return isExited;
 	}
 	public void handleBreakpointHitEvent(BitList procs, int lineNumber, String filename) {
 		LineLocation loc = new LineLocation(filename, lineNumber);
