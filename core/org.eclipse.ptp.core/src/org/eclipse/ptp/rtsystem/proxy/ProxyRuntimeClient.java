@@ -29,6 +29,10 @@ public class ProxyRuntimeClient extends AbstractProxyClient {
 		super(host, port);
 	}
 	
+    public void sendCommand(String cmd) throws IOException {
+        super.sendCommand(cmd);
+    }
+
 	public void run(String prog, int numProcs, boolean debug) throws IOException {
 		sendCommand("RUN", "\""+ prog + "\" " + Integer.toString(numProcs) + " " + Boolean.toString(debug));
 	}
