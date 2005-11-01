@@ -19,7 +19,9 @@
 package org.eclipse.ptp.debug.external.simulator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -41,33 +43,34 @@ import org.eclipse.ptp.debug.external.AbstractDebugger;
  * 
  */
 public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Observer {
+	private final boolean EVENT_BY_EACH_PROC = false;
 	private static final String HIT_BPT_STATE = "HIT_BPT";
 	private static final String EXIT_STATE = "EXIT";
 	private static final String STEP_END_STATE = "STEP_END";
 	private static final String APP_NAME = "../main.c";
 	private List sim_list = new ArrayList();
-	private BitList tasks = null;
 	private final long time_range = 5;
 	private long current_time = 0;
 	private int total_process = 0;
 	private Thread timer = null;
-	private String last_state = "";
-	private String last_file = "";
-	private int last_line = -1;
 	private boolean running_timer = true;
-	private final boolean EVENT_BY_EACH_PROC = false;
+	private InternalEventQueue intQueue = null;
 
+	public DebugSimulation2() {
+		intQueue = new InternalEventQueue();
+	}
 	public void startDebugger(IPJob job) {
 		total_process = job.size();
-		tasks = new BitList(total_process);
 		for (int i = 0; i < total_process; i++) {
 			SimulateProgram sim_program = new SimulateProgram(i);
 			sim_program.addObserver(DebugSimulation2.this);
 			sim_list.add(sim_program);
 			sim_program.startProgram();
 		}
+		start_time_range();
 	}
 	public void stopDebugger() {
+		stop_time_range();
 		for (Iterator i = sim_list.iterator(); i.hasNext();) {
 			SimulateProgram sim_program = (SimulateProgram) i.next();
 			sim_program.deleteObservers();
@@ -216,22 +219,10 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				String file = args[2];
 				int line = convertInt(args[3]);
 				if (EVENT_BY_EACH_PROC) {
-					tasks = new BitList(total_process);
-					tasks.set(task);
-					updateEvent(tasks, state, file, line);
+					updateEvent(new QueueItem(state, file, line, task)); 
 				}
 				else {
-					if (isSameAsLast(state, file, line)) {
-						addTask(task);
-					} else {
-						updateEvent(tasks.copy(), last_state, last_file, last_line);
-						clearRecord();
-						addTask(task);
-						last_state = state;
-						last_file = file;
-						last_line = line;
-					}
-					start_time_range();
+					intQueue.addItem(new QueueItem(state, file, line, task));
 				}
 			}
 		}
@@ -239,22 +230,16 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	private SimulateProgram getSimProg(int id) {
 		return (SimulateProgram)sim_list.get(id);		
 	}
-	private synchronized void addTask(int task) {
-		synchronized (tasks) {
-			tasks.set(task);
-		}
-	}
-	private synchronized void start_time_range() {
-		if (timer == null) {
+	private void start_time_range() {
+		if (timer == null && !EVENT_BY_EACH_PROC) {
 			running_timer = true;
 			current_time = System.currentTimeMillis();
 			Runnable runnable = new Runnable() {
 				public synchronized void run() {
 					while (running_timer) {
 						if (System.currentTimeMillis() - current_time >= time_range) {
-							System.out.println(" === update - start_time_range: " + last_state + ", tasks: " + tasks.cardinality());
-							updateEvent(tasks.copy(), last_state, last_file, last_line);
-							clearRecord();
+							current_time = System.currentTimeMillis();
+							updateEvent();
 						}
 					}
 				}
@@ -263,46 +248,106 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 			timer.start();
 		}
 	}
-	private synchronized void clearRecord() {
+	private void stop_time_range() {
 		running_timer = false;
+		if (timer != null) {
+			timer.interrupt();
+		} 
 		timer = null;
-		tasks = new BitList(total_process);
-		last_state = "";
-		last_file = "";
-		last_line = -1;
 	}
-	private synchronized boolean isSameAsLast(String state, String file, int line) {
-		if (state.length() == 0 && file.length() == 0 && line == -1) {
-			last_state = state;
-			last_file = file;
-			last_line = line;
-			return true;
-		}
-		return (state.equals(last_state) && file.equals(last_file) && line == last_line);
-	}
-	private synchronized void updateEvent(BitList tran_tasks, String state, String file, int line) {
+	private synchronized void updateEvent(QueueItem qItem) {
+		String state = qItem.getState();
+		System.out.println("**** Event Update: " + state + ", tasks: " + qItem.getTasks().cardinality());
 		if (state.equals(EXIT_STATE)) {
-			if (tran_tasks != null) {
-				handleProcessTerminatedEvent(tran_tasks);
-				tran_tasks = null;
-			}
+			handleProcessTerminatedEvent(qItem.getTasks());
 		} else if (state.equals(HIT_BPT_STATE)) {
-			if (tran_tasks != null) {
-				handleBreakpointHitEvent(tran_tasks, line, file);
-				tran_tasks = null;
-			}
+			handleBreakpointHitEvent(qItem.getTasks(), qItem.getLine(), qItem.getFile());
 		} else if (state.equals(STEP_END_STATE)) {
-			if (tran_tasks != null) {
-				handleEndSteppingEvent(tran_tasks, line, file);
-				tran_tasks = null;
-			}
+			handleEndSteppingEvent(qItem.getTasks(), qItem.getLine(), qItem.getFile());
 		}
+	}
+	private synchronized void updateEvent() {
+		if (!intQueue.isEmpty())
+			updateEvent(intQueue.getItem());
 	}
 	private int convertInt(String s_id) {
 		try {
 			return Integer.parseInt(s_id);
 		} catch (NumberFormatException e) {
 			return -1;
+		}
+	}
+	
+	private class InternalEventQueue {
+		List queue = null;
+		InternalEventQueue() {
+			queue = Collections.synchronizedList(new LinkedList());
+		}
+		public QueueItem getItem() {
+			synchronized (queue) {
+				while (queue.isEmpty()) {
+					try {
+						queue.wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				return (QueueItem)queue.remove(0);
+			}
+		}
+		public void addItem(QueueItem item) {
+			synchronized (queue) {
+				if (same(item)) {
+					queue.add(item);
+				} else {
+					queue.notifyAll();
+					updateEvent();
+				}
+			}
+		}
+		public boolean same(QueueItem qItem) {
+			synchronized (queue) {
+				if (queue.isEmpty())
+					return true;
+				QueueItem item = getItem();
+				if (item.equals(qItem)) {
+					qItem.getTasks().or(item.getTasks());
+					return true;
+				}
+				return false;
+			}
+		}
+		public boolean isEmpty() {
+			synchronized (queue) {
+				return queue.isEmpty();
+			}
+		}
+	}
+	private class QueueItem {
+		private String file = "";
+		private String state = "";
+		private int line = -1;
+		private BitList tasks = new BitList(total_process);
+		public QueueItem(String state, String file, int line, int task) {
+			this.state = state;
+			this.file = file;
+			this.line = line;
+			tasks.set(task);
+		}
+		public boolean equals(QueueItem qItem) {
+			return (state.equals(qItem.getState()) && file.equals(qItem.getFile()) && line == qItem.getLine());
+		}
+		public String getFile() {
+			return file;
+		}
+		public String getState() {
+			return state;
+		}
+		public int getLine() {
+			return line;
+		}
+		public BitList getTasks() {
+			return tasks;
 		}
 	}
 
@@ -364,7 +409,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				else {
 					printMessage();
 					nextLine();
-					waitForWhile(500);
+					waitForWhile(50);
 				}
 			}
 			System.out.println("==== finished: " + tid);
