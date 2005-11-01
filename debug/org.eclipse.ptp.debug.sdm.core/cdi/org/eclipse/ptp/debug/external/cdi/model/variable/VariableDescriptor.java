@@ -34,6 +34,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
+import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SourceManager;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
@@ -61,13 +62,15 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 	protected ICDIType fType = null;
 	protected String fTypename = null;
 	String sizeof = null;
-
+	IAIF aif = null;
+	
 	public VariableDescriptor(VariableDescriptor desc) {
 		super((Target)desc.getTarget());
 		fName = desc.getName();
 		fFullName = desc.fFullName;
 		sizeof = desc.sizeof;
 		fType = desc.fType;
+		aif = desc.getAIF();
 		try {
 			fStackFrame = (StackFrame)desc.getStackFrame();
 			fThread = (Thread)desc.getThread();
@@ -80,7 +83,7 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 		castingTypes = desc.getCastingTypes();
 	}
 	
-	public VariableDescriptor(Target target, Thread thread, StackFrame stack, String n, String fn, int pos, int depth) {
+	public VariableDescriptor(Target target, Thread thread, StackFrame stack, String n, String fn, int pos, int depth, IAIF aif) {
 		super(target);
 		fName = n;
 		fFullName = fn;
@@ -88,6 +91,10 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 		fThread = thread;
 		position = pos;
 		stackdepth = depth;
+		this.aif = aif;
+	}
+	public IAIF getAIF() {
+		return aif;
 	}
 
 	public int getPosition() {
@@ -244,7 +251,11 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 		return fThread;
 	}
 	public String getTypeName() throws CDIException {
-		if (fTypename == null) {
+		if (aif != null) {
+			//TODO - fix the toString later
+			fTypename = aif.getType().toString();
+		}
+		else {
 			Target target = (Target)getTarget();
 			StackFrame frame = (StackFrame)getStackFrame();
 			if (frame == null) {

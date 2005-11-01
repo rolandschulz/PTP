@@ -504,8 +504,9 @@ public class Target extends SessionObject implements IPCDITarget {
 		throw new CDIException("Not implemented yet - Target: getSharedLibraries");
 	}
 	public ICDIGlobalVariableDescriptor getGlobalVariableDescriptors(String filename, String function, String name) throws CDIException {
-		VariableManager varMgr = ((Session)getSession()).getVariableManager();
-		return varMgr.getGlobalVariableDescriptor(this, filename, function, name);
+		//VariableManager varMgr = ((Session)getSession()).getVariableManager();
+		//return varMgr.getGlobalVariableDescriptor(this, filename, function, name);
+		throw new CDIException("Not implemented yet - Target: getGlobalVariableDescriptors");
 	}
 	public ICDIRegisterGroup[] getRegisterGroups() throws CDIException {
 		throw new CDIException("Not implemented yet - Target: getRegisterGroups");

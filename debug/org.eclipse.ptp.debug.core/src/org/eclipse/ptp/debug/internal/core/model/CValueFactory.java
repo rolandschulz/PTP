@@ -45,79 +45,61 @@ import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
  * The value factory for variable and expressions.
  */
 public class CValueFactory {
-
 	static public final ICValue NULL_VALUE = new ICValue() {
-
 		public String getReferenceTypeName() throws DebugException {
-			return ""; //$NON-NLS-1$
+			return "";
 		}
-
 		public String getValueString() throws DebugException {
-			return ""; //$NON-NLS-1$
+			return "";
 		}
-
 		public boolean isAllocated() throws DebugException {
 			return true;
 		}
-
 		public IVariable[] getVariables() throws DebugException {
 			return new IVariable[0];
 		}
-
 		public boolean hasVariables() throws DebugException {
 			return false;
 		}
-
 		public String getModelIdentifier() {
 			return PTPDebugCorePlugin.getUniqueIdentifier();
 		}
-
 		public IDebugTarget getDebugTarget() {
 			return null;
 		}
-
 		public ILaunch getLaunch() {
 			return null;
 		}
-
-		public Object getAdapter( Class adapter ) {
+		public Object getAdapter(Class adapter) {
 			return null;
 		}
-
 		public ICType getType() throws DebugException {
 			return null;
 		}
-
-		public String evaluateAsExpression( ICStackFrame frame ) {
-			return ""; //$NON-NLS-1$
+		public String evaluateAsExpression(ICStackFrame frame) {
+			return "";
 		}
-
 		public CDebugElementState getState() {
 			return CDebugElementState.UNDEFINED;
 		}
-
 		public Object getCurrentStateInfo() {
 			return null;
 		}
-		
 	};
 
-	static public CValue createValue( CVariable parent, ICDIValue cdiValue ) {
-		if ( cdiValue instanceof ICDIFloatingPointValue ) {
-			return new CFloatingPointValue( parent, cdiValue );
+	static public CValue createValue(CVariable parent, ICDIValue cdiValue) {
+		if (cdiValue instanceof ICDIFloatingPointValue) {
+			return new CFloatingPointValue(parent, cdiValue);
 		}
-		return new CValue( parent, cdiValue );
+		return new CValue(parent, cdiValue);
 	}
-
-	static public CIndexedValue createIndexedValue( AbstractCVariable parent, ICDIArrayValue cdiValue, int start, int length ) {
-		return new CIndexedValue( parent, cdiValue, start, length );
+	static public CIndexedValue createIndexedValue(AbstractCVariable parent, ICDIArrayValue cdiValue, int start, int length) {
+		return new CIndexedValue(parent, cdiValue, start, length);
 	}
-
-	static public CValue createGlobalValue( CVariable parent, ICDIValue cdiValue ) {
-		return new CGlobalValue( parent, cdiValue );
+	static public CValue createGlobalValue(CVariable parent, ICDIValue cdiValue) {
+		return new CGlobalValue(parent, cdiValue);
 	}
-
-	static public ICValue createValueWithError( CVariable parent, String message ) {
-		return new CValue( parent, message );
+	static public ICValue createValueWithError(CVariable parent, String message) {
+		return new CValue(parent, message);
 	}
 }

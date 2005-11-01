@@ -35,6 +35,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorageDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
+import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
@@ -169,16 +170,17 @@ public class VariableManager extends Manager {
 		String fullName = varDesc.getFullName();
 		int pos = varDesc.getPosition();
 		int depth = varDesc.getStackDepth();
+		IAIF aif = varDesc.getAIF();
 		VariableDescriptor vo = null;
 
 		if (varDesc instanceof ArgumentDescriptor || varDesc instanceof Argument) {
-			vo = new ArgumentDescriptor(target, thread, frame, name, fullName, pos, depth);
+			vo = new ArgumentDescriptor(target, thread, frame, name, fullName, pos, depth, aif);
 		} else if (varDesc instanceof LocalVariableDescriptor || varDesc instanceof LocalVariable) {
-			vo = new LocalVariableDescriptor(target, thread, frame, name, fullName, pos, depth);
+			vo = new LocalVariableDescriptor(target, thread, frame, name, fullName, pos, depth, aif);
 		} else if (varDesc instanceof GlobalVariableDescriptor || varDesc instanceof GlobalVariable) {
-			vo = new GlobalVariableDescriptor(target, thread, frame, name, fullName, pos, depth);
+			vo = new GlobalVariableDescriptor(target, thread, frame, name, fullName, pos, depth, aif);
 		} else if (varDesc instanceof ThreadStorageDescriptor || varDesc instanceof ThreadStorage) {
-			vo = new ThreadStorageDescriptor(target, thread, frame, name, fullName, pos, depth);
+			vo = new ThreadStorageDescriptor(target, thread, frame, name, fullName, pos, depth, aif);
 		} else {
 			throw new CDIException("VariableManager.Unknown_variable_object");			
 		}
@@ -195,6 +197,7 @@ public class VariableManager extends Manager {
 		String fullName = varDesc.getFullName();
 		int pos = varDesc.getPosition();
 		int depth = varDesc.getStackDepth();
+		IAIF aif = varDesc.getAIF();		
 
 		// Check the type validity.
 		{
@@ -213,13 +216,13 @@ public class VariableManager extends Manager {
 		VariableDescriptor vo = null;
 
 		if (varDesc instanceof ArgumentDescriptor || varDesc instanceof Argument) {
-			vo = new ArgumentDescriptor(target, thread, frame, name, fullName, pos, depth);
+			vo = new ArgumentDescriptor(target, thread, frame, name, fullName, pos, depth, aif);
 		} else if (varDesc instanceof LocalVariableDescriptor || varDesc instanceof LocalVariable) {
-			vo = new LocalVariableDescriptor(target, thread, frame, name, fullName, pos, depth);
+			vo = new LocalVariableDescriptor(target, thread, frame, name, fullName, pos, depth, aif);
 		} else if (varDesc instanceof GlobalVariableDescriptor || varDesc instanceof GlobalVariable) {
-			vo = new GlobalVariableDescriptor(target, thread, frame, name, fullName, pos, depth);
+			vo = new GlobalVariableDescriptor(target, thread, frame, name, fullName, pos, depth, aif);
 		} else if (varDesc instanceof ThreadStorageDescriptor || varDesc instanceof ThreadStorage) {
-			vo = new ThreadStorageDescriptor(target, thread, frame, name, fullName, pos, depth);
+			vo = new ThreadStorageDescriptor(target, thread, frame, name, fullName, pos, depth, aif);
 		} else {
 			throw new CDIException("VariableManager.Unknown_variable_object");			
 		}
@@ -255,7 +258,7 @@ public class VariableManager extends Manager {
 			argument = (Argument) variable;
 		}
 		if (argument == null) {
-			String name = argDesc.getQualifiedName();
+			//String name = argDesc.getQualifiedName();
 			StackFrame stack = (StackFrame)argDesc.getStackFrame();
 			Target target = (Target)argDesc.getTarget();
 			Thread currentThread = (Thread)target.getCurrentThread();
@@ -263,6 +266,12 @@ public class VariableManager extends Manager {
 			target.setCurrentThread(stack.getThread(), false);
 			((Thread)stack.getThread()).setCurrentStackFrame(stack, false);
 			try {
+				argument = new Argument(argDesc);
+				List variablesList = getVariablesList(target);
+				if (!variablesList.contains(argument))
+					variablesList.add(argument);
+
+				/*
 				ICDIArgument[] args = target.getDebugger().listArguments(((Session)getSession()).createBitList(target.getTargetID()), currentFrame);
 				for (int i=0; i<args.length; i++) {
 					if (name.equals(args[i].getQualifiedName())) {
@@ -271,6 +280,7 @@ public class VariableManager extends Manager {
 						variablesList.add(argument);
 					}	
 				}
+				*/
 			} finally {
 				target.setCurrentThread(currentThread, false);
 				currentThread.setCurrentStackFrame(currentFrame, false);
@@ -289,13 +299,17 @@ public class VariableManager extends Manager {
 			ICDIArgument[] args = target.getDebugger().listArguments(((Session)getSession()).createBitList(target.getTargetID()), frame);
 			if (args != null) {
 				for (int i = 0; i < args.length; i++) {
-					Thread thread = (Thread) ((VariableDescriptor) args[i]).getThread();
-					String name = args[i].getName();
-					String fName = args[i].getQualifiedName();
-					int pos = ((VariableDescriptor) args[i]).getPosition();
-					int depth = ((VariableDescriptor) args[i]).getStackDepth();
-					ArgumentDescriptor argObj = new ArgumentDescriptor(target, thread, frame, name, fName, pos, depth);
-					argObjects.add(argObj);
+					VariableDescriptor varDesc = (VariableDescriptor) args[i];
+					Thread thread = (Thread)varDesc.getThread();
+					String name = varDesc.getName();
+					String fName = varDesc.getQualifiedName();
+					int pos = varDesc.getPosition();
+					int depth = varDesc.getStackDepth();
+					IAIF aif = varDesc.getAIF();
+					if (aif == null) {
+						//TODO - get AIF from debugger
+					}
+					argObjects.add(new ArgumentDescriptor(target, thread, frame, name, fName, pos, depth, aif));
 				}
 			}
 		} finally {
@@ -322,7 +336,8 @@ public class VariableManager extends Manager {
 			buffer.append(function).append("::");
 		}
 		buffer.append(name);
-		return new GlobalVariableDescriptor(target, null, null, buffer.toString(), null, 0, 0);
+		//TODO - put null for AIF
+		return new GlobalVariableDescriptor(target, null, null, buffer.toString(), null, 0, 0, null);
 	}
 	public GlobalVariable createGlobalVariable(GlobalVariableDescriptor varDesc) throws CDIException {
 		Variable variable = findVariable(varDesc);
@@ -334,6 +349,7 @@ public class VariableManager extends Manager {
 			String name = varDesc.getQualifiedName();
 			Target target = (Target)varDesc.getTarget();
 			ICDIGlobalVariable[] vars = target.getDebugger().listGlobalVariables(((Session)getSession()).createBitList(target.getTargetID()));
+			System.out.println(" ++++++++++++++++ listGlobalVariables: " + vars.length + " ++++++++++++++++");
 			for (int i = 0; i < vars.length; i++) {
 				if (name.equals(vars[i].getQualifiedName())) {
 					global = new GlobalVariable(varDesc);
@@ -355,15 +371,18 @@ public class VariableManager extends Manager {
 		
 		try {
 			ICDILocalVariable[] vars = target.getDebugger().listLocalVariables(((Session)getSession()).createBitList(target.getTargetID()), currentFrame);
-			System.out.println("----------- local variable: " + vars.length);
 			for (int i = 0; i < vars.length; i++) {
-				Thread thread = (Thread) ((VariableDescriptor) vars[i]).getThread();
-				String name = vars[i].getName();
-				String fName = vars[i].getQualifiedName();
-				int pos = ((VariableDescriptor) vars[i]).getPosition();
-				int depth = ((VariableDescriptor) vars[i]).getStackDepth();
-				LocalVariableDescriptor varObj = new LocalVariableDescriptor(target, thread, frame, name, fName, pos, depth);
-				varObjects.add(varObj);
+				VariableDescriptor varDesc = (VariableDescriptor)vars[i];
+				Thread thread = (Thread)varDesc.getThread();
+				String name = varDesc.getName();
+				String fName = varDesc.getQualifiedName();
+				int pos = varDesc.getPosition();
+				int depth = varDesc.getStackDepth();
+				IAIF aif = varDesc.getAIF();
+				if (aif == null) {
+					//TODO - get AIF from debugger
+				}
+				varObjects.add(new LocalVariableDescriptor(target, thread, frame, name, fName, pos, depth, aif));
 			}
 		} finally {
 			target.setCurrentThread(currentThread, false);
@@ -378,7 +397,7 @@ public class VariableManager extends Manager {
 			local = (LocalVariable)variable;
 		}
 		if (local == null) {
-			String name = varDesc.getQualifiedName();
+			//String name = varDesc.getQualifiedName();
 			StackFrame stack = (StackFrame)varDesc.getStackFrame();
 			Target target = (Target)varDesc.getTarget();
 			Thread currentThread = (Thread)target.getCurrentThread();
@@ -386,6 +405,12 @@ public class VariableManager extends Manager {
 			target.setCurrentThread(stack.getThread(), false);
 			((Thread)stack.getThread()).setCurrentStackFrame(stack, false);
 			try {
+				local = new LocalVariable(varDesc);
+				List variablesList = getVariablesList(target);
+				if (!variablesList.contains(local))
+					variablesList.add(local);
+
+				/*
 				ICDILocalVariable[] vars = target.getDebugger().listLocalVariables(((Session)getSession()).createBitList(target.getTargetID()), currentFrame);
 				for (int i = 0; i < vars.length; i++) {
 					if (name.equals(vars[i].getQualifiedName())) {
@@ -394,6 +419,7 @@ public class VariableManager extends Manager {
 						variablesList.add(local);
 					}
 				}
+				*/
 			} finally {
 				target.setCurrentThread(currentThread, false);
 				currentThread.setCurrentStackFrame(currentFrame, false);

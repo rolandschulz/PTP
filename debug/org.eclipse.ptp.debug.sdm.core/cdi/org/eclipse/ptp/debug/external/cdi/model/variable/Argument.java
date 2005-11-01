@@ -19,18 +19,19 @@
 package org.eclipse.ptp.debug.external.cdi.model.variable;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
+import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
 
 public class Argument extends Variable implements ICDIArgument {
-	public Argument(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth) {
-		super(target, thread, frame, name, fullName, pos, depth);
+	public Argument(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, IAIF aif) {
+		super(target, thread, frame, name, fullName, pos, depth, aif);
 	}
 	public Argument(ArgumentDescriptor obj) {
 		super(obj);
 	}
-	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth) {
-		return new Argument(target, thread, frame, name, fullName, pos, depth);
+	protected Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, IAIF aif) {
+		return new Argument(target, thread, frame, name, fullName, pos, depth, aif);
 	}
 }

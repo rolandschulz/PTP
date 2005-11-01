@@ -33,5 +33,4 @@ public class WCharValue extends IntegralValue implements ICDIWCharValue {
 	public char getValue() throws CDIException {
 		return 0;
 	}
-
 }

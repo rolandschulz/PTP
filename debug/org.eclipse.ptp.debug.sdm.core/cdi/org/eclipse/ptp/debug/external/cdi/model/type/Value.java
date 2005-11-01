@@ -22,6 +22,7 @@ import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
+import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.model.PTPObject;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
@@ -41,9 +42,14 @@ public class Value extends PTPObject implements ICDIValue {
 		return variable.getTypeName();
 	}
 	public String getValueString() throws CDIException {
-		Target target = (Target) variable.getTarget();
-		Session session = (Session) target.getSession();
-		return target.getDebugger().evaluateExpression(session.createBitList(target.getTargetID()), variable.getName());
+		IAIF aif = variable.getAIF();
+		if (aif == null) {
+			Target target = (Target) variable.getTarget();
+			Session session = (Session) target.getSession();
+			return target.getDebugger().evaluateExpression(session.createBitList(target.getTargetID()), variable.getName());
+		}
+		//TODO - fix the toString later
+		return aif.getValue().toString();
 	}
 	public int getChildrenNumber() throws CDIException {
 		//FIXME - how to get the number of children??

@@ -41,6 +41,7 @@ import org.eclipse.cdt.debug.core.cdi.model.type.ICDIShortType;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIStructType;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIWCharType;
+import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
@@ -77,8 +78,8 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 	public Variable(VariableDescriptor obj) {
 		super(obj);
 	}
-	public Variable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth) {
-		super(target, thread, frame, name, fullName, pos, depth);
+	public Variable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, IAIF aif) {
+		super(target, thread, frame, name, fullName, pos, depth, aif);
 	}
 	public void setUpdated(boolean update) {
 		isUpdated = update;
@@ -131,7 +132,7 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		return (ICDIVariable[])varList.toArray(new ICDIVariable[0]);
 	}
 
-	protected abstract Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth);
+	protected abstract Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, IAIF aif);
 	
 	public int getChildrenNumber() throws CDIException {
 		//FIXME no child number provided
@@ -237,7 +238,11 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		varMgr.destroyVariable(this);
 	}
 	public String getTypeName() throws CDIException {
-		if (fTypename == null) {
+		if (aif != null) {
+			//TODO - fix the toString later
+			fTypename = aif.getType().toString();
+		}
+		else {
 			Target target = (Target)getTarget();
 			Session session = (Session)target.getSession();
 			fTypename = target.getDebugger().getVariableType(session.createBitList(target.getTargetID()), getName());

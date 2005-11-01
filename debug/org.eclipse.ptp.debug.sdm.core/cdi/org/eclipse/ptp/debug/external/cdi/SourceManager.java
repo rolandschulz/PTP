@@ -58,8 +58,8 @@ public class SourceManager extends Manager {
 		String typename = name.trim();
 		//FIXME ignore GDBType 
 		//GDBType gdbType = gdbTypeParser.parse(typename);
+		//FIXME - NOTE: Mapping AIF type string
 		return toCDIType(target, typename);
-		//throw new CDIException("Not implement yet - SourceManager: getType");
 	}
 	Type toCDIType(Target target, String name) throws CDIException {
 		if (name == null) {
