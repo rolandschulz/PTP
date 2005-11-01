@@ -28,7 +28,6 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.cdi.ICommonActions;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 
 public interface IAbstractDebugger extends ICommonActions, IDebugger {
@@ -37,7 +36,7 @@ public interface IAbstractDebugger extends ICommonActions, IDebugger {
 	
 	/* Debugger Initialization/Termination */
 	public void initialize(IPJob job);
-	public void exit() throws PCDIException;
+	public void exit();
 	
 	public void addDebuggerObserver(Observer obs);
 	public void deleteDebuggerObserver(Observer obs);
@@ -50,7 +49,7 @@ public interface IAbstractDebugger extends ICommonActions, IDebugger {
 	/* Miscellaneous */
 	public IPCDISession getSession();
 	public void setSession(IPCDISession session);
-	public boolean isExiting();
+	public boolean isExited();
 
 	public IPProcess getProcess(int number);	
 }
