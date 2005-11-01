@@ -46,7 +46,7 @@ public class FortranFixedFormEditor extends AbstractFortranEditor {
 
 	// This is '6' because of the way Eclipse handles spaces and tabs.
 	// If this were '7', the tab would insert 7 spaces and you would start at column 8
-	private static final int COLUMM_6_WIDTH = 6;
+	public static final int COLUMM_6_WIDTH = 6;
 	private static final int COLUMN_5_WIDTH = 5;
 	private static final int COLUMN_72_WIDTH = 72;
 

@@ -8,6 +8,8 @@ import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ILineTracker;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.viewers.ISelection;
 
 /**
  * @author nchen
@@ -19,6 +21,7 @@ class TabConverter implements ITextConverter {
 	private int fTabRatio;
 
 	private ILineTracker fLineTracker;
+
 
 	public TabConverter() {
 	}
@@ -49,11 +52,10 @@ class TabConverter implements ITextConverter {
 		if (text == null)
 			return;
 
-		int index = text.indexOf('\t');
+		int index = text.indexOf('\t');// + text.indexOf('\n');
 		if (index > -1) {
 
 			StringBuffer buffer = new StringBuffer();
-
 			fLineTracker.set(command.text);
 			int lines = fLineTracker.getNumberOfLines();
 
@@ -75,7 +77,7 @@ class TabConverter implements ITextConverter {
 					int length = line.length();
 					for (int j = 0; j < length; j++) {
 						char c = line.charAt(j);
-						if (c == '\t') {
+						if (c == '\t') { // a tab has been inserted
 							position += insertTabString(buffer, position);
 						} else {
 							buffer.append(c);
@@ -88,6 +90,7 @@ class TabConverter implements ITextConverter {
 				command.text = buffer.toString();
 
 			} catch (BadLocationException x) {
+				x.printStackTrace();
 			}
 		}
 	}

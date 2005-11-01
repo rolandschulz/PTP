@@ -3,7 +3,11 @@ package org.eclipse.photran.internal.ui.editor;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.cdt.internal.ui.text.CAutoIndentStrategy;
+import org.eclipse.cdt.internal.ui.text.CCommentAutoIndentStrategy;
+import org.eclipse.cdt.internal.ui.text.ICPartitions;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.TextAttribute;
@@ -103,6 +107,16 @@ public class FortranSourceViewerConfiguration extends SourceViewerConfiguration 
 	public ITextDoubleClickStrategy getDoubleClickStrategy(
 			ISourceViewer sourceViewer, String contentType) {
 		return doubleClickStrategy;
+	}
+	
+	// ----- AUTO-INDENTING STRATEGY ------------------------------------------
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getAutoEditStrategies(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
+	 */
+	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
+
+		
+		return new IAutoEditStrategy[] {new FortranAutoIndentStrategy(editor instanceof FortranFreeFormEditor)};
 	}
 
 	// ----- SYNTAX HIGHLIGHTING -----------------------------------------------

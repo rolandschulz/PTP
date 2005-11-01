@@ -7,7 +7,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * @ author nchen
+ * @author nchen
  * @author cheah
  * 
  * Basic ruler that extends as wide as the editor
