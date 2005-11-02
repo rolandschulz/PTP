@@ -19,7 +19,7 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public class AIFTypeFloating implements IAIFType {
+public class AIFTypeFloating extends AIFType {
 	private int length;
 	
 	public AIFTypeFloating(int length) {

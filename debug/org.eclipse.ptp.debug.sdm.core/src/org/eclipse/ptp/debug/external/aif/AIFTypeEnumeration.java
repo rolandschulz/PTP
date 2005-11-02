@@ -19,7 +19,7 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public class AIFTypeEnumeration implements IAIFType {
+public class AIFTypeEnumeration extends AIFType {
 	private int		id = -1;
 	private String[]	names;
 	private int[]	values;

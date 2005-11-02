@@ -19,7 +19,7 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public class AIFTypeStruct implements IAIFType {
+public class AIFTypeStruct extends AIFType {
 	private int 				id = -1;
 	private AIFTypeField[]	fields;
 	

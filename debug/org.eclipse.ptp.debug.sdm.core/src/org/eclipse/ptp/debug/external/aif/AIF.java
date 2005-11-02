@@ -43,33 +43,37 @@ public class AIF implements IAIF {
 	private static final int FDS_INTEGER_SIGN_POS = 1;
 	private static final int FDS_INTEGER_LEN_POS = 2;
 	
-	public AIF(String fds, String data) {
+	public AIF(String fds, byte[] data) {
 		convertToAIF(this, fds, data);
 	}
 	
-	public static void convertToAIF(AIF aif, String format, String data) {
+	public AIF(String desc, String fds, byte[] data) {
+		this(fds, data);
+		aifType.setDescription(desc);
+	}
+	
+	public static void convertToAIF(AIF aif, String format, byte[] data) {
 		switch (format.charAt(0)) {
 		case FDS_FLOATING:
 			int floatLen = Character.digit(format.charAt(FDS_FLOATING_LEN_POS), 10);
-			BigDecimal floatVal = new BigDecimal(data);
-			
+			double floatVal;
+			if (floatLen > 4) {
+				BigInteger longBits = new BigInteger(data);
+				floatVal = Double.longBitsToDouble(longBits.longValue());
+			} else {
+				BigInteger intBits = new BigInteger(data);
+				floatVal = (double)Float.intBitsToFloat(intBits.intValue());
+			}
 			aif.setType(new AIFTypeFloating(floatLen));
 			aif.setValue(new AIFValueFloating(floatVal));
 			break;
 			
 		case FDS_INTEGER:
 			int intLen = Character.digit(format.charAt(FDS_INTEGER_LEN_POS), 10);
-			boolean signed;
-
+			boolean signed = (format.charAt(FDS_INTEGER_SIGN_POS) == 's');
 			BigInteger intVal = new BigInteger(data);
-			
-			if (format.charAt(FDS_INTEGER_SIGN_POS) == 's')
-				signed = true;
-			else {
-				signed = false;
+			if (!signed) 
 				intVal = intVal.abs();
-			}
-
 			aif.setType(new AIFTypeInteger(signed, intLen));
 			aif.setValue(new AIFValueInteger(intVal));
 			break;

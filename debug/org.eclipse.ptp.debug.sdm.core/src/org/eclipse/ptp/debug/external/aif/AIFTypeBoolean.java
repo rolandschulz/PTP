@@ -19,7 +19,7 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public class AIFTypeBoolean implements IAIFType {
+public class AIFTypeBoolean extends AIFType {
 	public String toString() {
 		return "b";
 	}
