@@ -20,6 +20,8 @@
 package org.eclipse.ptp.rtsystem.ompi;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,12 +32,15 @@ import java.util.Vector;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.ptp.core.ControlSystemChoices;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
+import org.eclipse.ptp.core.proxy.event.ProxyConnectedEvent;
 import org.eclipse.ptp.internal.core.CoreUtils;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
@@ -43,9 +48,11 @@ import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.NamedEntity;
 import org.eclipse.ptp.rtsystem.RuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.ProxyRuntimeClient;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
 
 
-public class OMPIControlSystem implements IControlSystem, IProxyEventListener{
+public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventListener{
 	private Process orted_process = null;
 	private Vector knownJobs = null;
 	
@@ -74,7 +81,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyEventListener{
 		System.out.println("ORTED path = ."+orted_path+".");
 		if(orted_path == "") {
 			String err = "Some error occurred trying to spawn the ORTEd (ORTE daemon).  Check the "+
-				"PTP/OPen MPI preferences page and be certain that the path and arguments "+
+				"PTP/Open MPI preferences page and be certain that the path and arguments "+
 				"are correct.";
 			System.err.println(err);
 			CoreUtils.showErrorDialog("ORTEd Start Failure", err, null);
@@ -102,15 +109,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyEventListener{
 		/* start the daemon using Java */
 		//OMPIStartORTEd(orted_full);
 		
-		System.out.println("OMPIControlSystem - firing up proxy.");
-		try {
-			proxy.addEventListener(this);
-			proxy.sessionCreate();
-			wait_for_event();
-		} catch (IOException e) {
-			System.err.println("Exception starting up proxy. :(");
-			System.exit(1);
-		}
+		proxy.addEventListener(this);
 		
 		try {
 			proxy.startDaemon(ompi_bin_path, orted_path, split_path[split_path.length - 1], split_args);
@@ -325,7 +324,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyEventListener{
 		listeners = null;
 	}
 
-    public synchronized void fireEvent(IProxyEvent e) {
+    public synchronized void fireEvent(IProxyRuntimeEvent e) {
         // TODO Auto-generated method stub
         System.out.println("got event: " + e.toString());
         /*

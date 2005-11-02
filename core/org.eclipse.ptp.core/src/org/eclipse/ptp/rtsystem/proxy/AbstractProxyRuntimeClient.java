@@ -30,6 +30,7 @@ import org.eclipse.ptp.core.proxy.event.ProxyErrorEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyOKEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeConnectedEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeEvent;
 
@@ -52,10 +53,14 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient {
 			waiting = false;
 		}
 	}
+	
+	public void addEventListener(IProxyRuntimeEventListener listener) {
+		listeners.add(listener);
+	}
 			
 	protected synchronized void fireEvent(IProxyEvent event) {
 		IProxyRuntimeEvent e = null;
-System.out.println("got event " + event);
+		System.out.println("got event " + event);
 		if (listeners == null)
 			return;
 		
@@ -69,10 +74,12 @@ System.out.println("got event " + event);
 			break;
 			
 		case IProxyEvent.EVENT_CONNECTED:
+			e = new ProxyRuntimeConnectedEvent();
 			if (waiting) {
+				System.out.println("NOTIFYIN!");
 				notify();
 			}
-			return;
+			break;
 		}
 		
 		if (e != null) {
