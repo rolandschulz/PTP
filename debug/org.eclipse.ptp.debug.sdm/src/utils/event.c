@@ -103,7 +103,7 @@ dbg_aif_to_str(AIF *a, char **result)
 	char *	fmt;
 	char *	data;
 		
-	proxy_data_to_str(AIF_FORMAT(a), strlen(AIF_FORMAT(a)), &fmt);
+	proxy_cstring_to_str(AIF_FORMAT(a), &fmt);
 	proxy_data_to_str(AIF_DATA(a), AIF_LEN(a), &data);
 	
 	asprintf(result, "%s %s", fmt, data);
@@ -321,13 +321,12 @@ dbg_str_to_cstring_list(char **args, List **lst)
 static int
 dbg_str_to_aif(char **args, AIF **res)
 {
-	int		fmt_len;
 	int		data_len;
 	AIF *	a;
 	char *	fmt;
 	char *	data;
 	
-	if (proxy_str_to_data(args[0], &fmt, &fmt_len) < 0 ||
+	if (proxy_str_to_cstring(args[0], &fmt) < 0 ||
 		proxy_str_to_data(args[1], &data, &data_len))
 		return -1;
 	
