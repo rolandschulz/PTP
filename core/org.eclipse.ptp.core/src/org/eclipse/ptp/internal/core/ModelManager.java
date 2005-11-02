@@ -19,6 +19,7 @@
 package org.eclipse.ptp.internal.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -45,6 +46,8 @@ import org.eclipse.ptp.core.IParallelModelListener;
 import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.proxy.event.IProxyEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
@@ -53,6 +56,8 @@ import org.eclipse.ptp.rtsystem.ompi.OMPIControlSystem;
 import org.eclipse.ptp.rtsystem.ompi.OMPIJNIBroker;
 import org.eclipse.ptp.rtsystem.ompi.OMPIMonitoringSystem;
 import org.eclipse.ptp.rtsystem.ompi.OMPIProxyRuntimeClient;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.simulation.SimProcess;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
@@ -60,7 +65,7 @@ import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
 
-public class ModelManager implements IModelManager, IRuntimeListener {
+public class ModelManager implements IModelManager, IRuntimeListener, IProxyRuntimeEventListener {
 	protected List listeners = new ArrayList(2);
 
 	protected int currentState = STATE_EXIT;
@@ -153,7 +158,19 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			universe = new PUniverse();
 			/* load up the control and monitoring systems for OMPI */
 			//OMPIJNIBroker jnibroker = new OMPIJNIBroker();
-			OMPIProxyRuntimeClient proxy = new OMPIProxyRuntimeClient("localhost", 12377);
+			Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
+			int port = preferences.getInt(PreferenceConstants.ORTE_SERVER_PORT);
+			System.out.println("port = "+port);
+			if(port <= 0) {
+				CoreUtils.showErrorDialog("Invalid ORTE Proxy Server",
+						"Invalid ORTE proxy server port specified.  See the PTP->OMPI preferences pages.", null);
+				return;
+			}
+			
+			OMPIProxyRuntimeClient proxy = new OMPIProxyRuntimeClient("localhost", port);
+			
+			proxyConnect(proxy);
+			
 			monitoringSystem = new OMPIMonitoringSystem(proxy);
 			controlSystem = new OMPIControlSystem(proxy);
 			monitoringSystem.startup();
@@ -166,7 +183,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			CoreUtils.showErrorDialog("Runtime System Error", "Invalid monitoring/control system selected.  Set using the PTP preferences page.", null);
 		}
 	}
-	
+
 	/* setup the monitoring system */
 	public void setupMS() 
 	{
@@ -589,4 +606,73 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	public IPUniverse getUniverse() {
 		return universe;
 	}
+	
+	
+    private synchronized void wait_for_event() {
+        try {
+        		System.out.println("MM waiting...");
+            wait();
+            System.out.println("MM awoke!");
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+	
+	private void proxyConnect(OMPIProxyRuntimeClient proxy)
+	{
+		System.out.println("OMPIControlSystem - firing up proxy.");
+		try {
+			proxy.addEventListener((IProxyRuntimeEventListener)this);
+			proxy.sessionCreate(false);
+			
+			Thread runThread = new Thread("Proxy Server Thread") {
+				public void run() {
+					String cmd;
+					
+					Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
+					
+					int port = preferences.getInt(PreferenceConstants.ORTE_SERVER_PORT);
+					String proxyPath = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
+				
+					Runtime rt = Runtime.getRuntime ();
+					
+					cmd = proxyPath + " --port="+port;
+					
+					System.out.println("RUNNING PROXY SERVER COMMAND: '"+cmd+"'");
+					
+					try {
+						Process process = rt.exec(cmd);
+					} catch(Exception e) {
+						String err;
+						err = "Error running proxy server with command: '"+cmd+"'.";
+						e.printStackTrace();
+						System.out.println(err);
+						CoreUtils.showErrorDialog("Running Proxy Server", err, null);
+					}
+				}
+			};
+			runThread.start();
+			
+			System.out.println("Waiting on accept.");
+			wait_for_event();
+		} catch (IOException e) {
+			System.err.println("Exception starting up proxy. :(");
+			System.exit(1);
+		}
+	}
+	
+    public synchronized void fireEvent(IProxyRuntimeEvent e) {
+        // TODO Auto-generated method stub
+        System.out.println("MODEL MANAGER got event: " + e.toString());
+        /*
+        if (e.getEventID() == IProxyDebugEvent.EVENT_DBG_INIT) {
+            numServers = ((ProxyDebugInitEvent)e).getNumServers();
+            System.out.println("num servers = " + numServers);
+        }
+        */
+        //this.events.addItem(e);
+        notify();
+    }
+	
 }
