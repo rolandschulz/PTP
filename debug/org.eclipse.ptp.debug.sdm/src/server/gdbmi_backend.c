@@ -67,6 +67,7 @@ static void *		AsyncFuncData;
 static int	GDBMIBuildAIFVar(char *, char *, char *, AIF **);
 static int	SetAndCheckBreak(int, char *);
 static int	GetStackframes(int, List **);
+static int	GetTypeInfo(char *, char **, char **);
 
 static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIProgress(void);
@@ -81,7 +82,7 @@ static int	GDBMISuspend(void);
 static int	GDBMIListStackframes(int);
 static int	GDBMISetCurrentStackframe(int);
 static int	GDBMIEvaluateExpression(char *);
-static int	GDBMIGetType(char *);
+static int	GDBMIGetNativeType(char *);
 static int	GDBMIGetAIFType(char *);
 static int	GDBMIGetLocalVariables(void);
 static int	GDBMIListArguments(int);
@@ -103,7 +104,7 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIListStackframes,
 	GDBMISetCurrentStackframe,
 	GDBMIEvaluateExpression,
-	GDBMIGetType,
+	GDBMIGetNativeType,
 	GDBMIGetLocalVariables,
 	GDBMIListArguments,
 	GDBMIGetGlobalVariables,
@@ -472,8 +473,10 @@ GDBMIProgress(void)
 	 * Check for existing events
 	 */
 	if (LastEvent != NULL) {
-		if (EventCallback != NULL)
+		if (EventCallback != NULL) {
 			EventCallback(LastEvent, EventCallbackData);
+		}
+			
 		if (ServerExit && LastEvent->event == DBGEV_OK) {
 			if (MIHandle != NULL) {
 				mi_disconnect(MIHandle);
@@ -971,15 +974,14 @@ GDBMIEvaluateExpression(char *exp)
 {
 	int			res;
 	char *		type;
+	char *		fds;
 	char			tmp[18];
 	AIF *		a;
 	dbg_event *	e;
 
-	if (GDBMIGetAIFType(exp) != DBGRES_OK)
+	if (GetTypeInfo(exp, &type, &fds) != DBGRES_OK)
 		return DBGRES_ERR;
-			
-	type = strdup(LastEvent->type_desc);
-
+		
 	strcpy(tmp, "/tmp/guard.XXXXXX");
 
 	if ( mktemp(tmp) == NULL )
@@ -996,15 +998,17 @@ GDBMIEvaluateExpression(char *exp)
 		return DBGRES_ERR;
 	}
 
-	res = GDBMIBuildAIFVar(exp, type, tmp, &a);
-	
+	res = GDBMIBuildAIFVar(exp, fds, tmp, &a);
+
 	if (res == DBGRES_OK) {
 		e = NewDbgEvent(DBGEV_DATA);
 		e->data = a;
+		e->type_desc = strdup(type);
 		SaveEvent(e);
 	}
 
-	(void)free(type);
+	free(type);
+	free(fds);
 	(void)unlink(tmp);
 	
 	return res;
@@ -1242,63 +1246,58 @@ ConvertType(mi_gvar *gvar, str_ptr fds)
 }
 
 /*
-** Find type of variable.
+** Find native type of variable.
 */
 static int
-GDBMIGetType(char *var)
+GDBMIGetNativeType(char *var)
 {
 	dbg_event *	e;
-	mi_gvar *	gvar;
-#ifdef USE_AIF_TYPE
-	str_ptr		fds;
-#endif /* USE_AIF_TYPE */
+	char *		type;
+	char *		fds;
 
 	CHECK_SESSION()
 
-	ResetError();
-
-	gvar = gmi_var_create(MIHandle, -1, var);
-
-	if ( gvar == NULL )
-	{
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+	if (GetTypeInfo(var, &type, &fds) != DBGRES_OK)
 		return DBGRES_ERR;
-	}
-
-#ifdef USE_AIF_TYPE	
-	fds = str_init();
-
-	if ( ConvertType(gvar, fds) != DBGRES_OK ) {
-		return DBGRES_ERR;
-	}
-#else /* USE_AIF_TYPE */
-	if ( !gmi_var_info_type(MIHandle, gvar) )
-	{
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-		return DBGRES_ERR;
-	}
-#endif /* USE_AIF_TYPE */
-
+		
 	e = NewDbgEvent(DBGEV_TYPE);
-
-#ifdef USE_AIF_TYPE
-	e->type_desc = strdup(fds->buf);
-	str_free(fds);
-#else /* USE_AIF_TYPE */
-	e->type_desc = strdup(gvar->type);
-#endif /* USE_AIF_TYPE */
+	e->type_desc = type;
 
 	SaveEvent(e);
 
-	mi_free_gvar(gvar);
+	free(fds);
+
+	return DBGRES_OK;
+}
+
+/*
+** Find AIF type of variable.
+*/
+static int
+GDBMIGetAIFType(char *var)
+{
+	dbg_event *	e;
+	char *		type;
+	char *		fds;
+
+	CHECK_SESSION()
+
+	if (GetTypeInfo(var, &type, &fds) != DBGRES_OK)
+		return DBGRES_ERR;
+		
+	e = NewDbgEvent(DBGEV_TYPE);
+	e->type_desc = fds;
+
+	SaveEvent(e);
+
+	free(type);
 
 	return DBGRES_OK;
 }
 
 static int
-GDBMIGetAIFType(char *var)
+GetTypeInfo(char *var, char **type, char **fds_type)
 {
-	dbg_event *	e;
 	mi_gvar *	gvar;
 	str_ptr		fds;
 
@@ -1311,6 +1310,14 @@ GDBMIGetAIFType(char *var)
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
 	}
+	
+	if ( !gmi_var_info_type(MIHandle, gvar) )
+	{
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		return DBGRES_ERR;
+	}
+	
+	*type = strdup(gvar->type);
 
 	fds = str_init();
 
@@ -1318,12 +1325,8 @@ GDBMIGetAIFType(char *var)
 		return DBGRES_ERR;
 	}
 
-	e = NewDbgEvent(DBGEV_TYPE);
-
-	e->type_desc = strdup(str_val(fds));
+	*fds_type = strdup(str_val(fds));
 	str_free(fds);
-
-	SaveEvent(e);
 
 	mi_free_gvar(gvar);
 

@@ -198,8 +198,10 @@ DbgEventToStr(dbg_event *e, char **result)
 
 	case DBGEV_DATA:
 		dbg_aif_to_str(e->data, &str);
-		asprintf(result, "%d %s %s", e->event, pstr, str);
+		proxy_cstring_to_str(e->type_desc, &str2);
+		asprintf(result, "%d %s %s %s", e->event, pstr, str, str2);
 		free(str);
+		free(str2);
 		break;
 		
 	default:
@@ -434,7 +436,8 @@ DbgStrToEvent(char *str, dbg_event **ev)
 
 	case DBGEV_DATA:
 		e = NewDbgEvent(DBGEV_DATA);
-		if (dbg_str_to_aif(&args[2], &e->data) < 0)
+		if (dbg_str_to_aif(&args[2], &e->data) < 0 ||
+			proxy_str_to_cstring(args[4], &e->type_desc) < 0)
 			goto error_out;
 		break;
 
@@ -494,6 +497,8 @@ FreeDbgEvent(dbg_event *e) {
 	case DBGEV_DATA:
 		if (e->data != NULL)
 			AIFFree(e->data);
+		if (e->type_desc != NULL)
+			free(e->type_desc);
 		break;
 		
 	case DBGEV_TYPE:

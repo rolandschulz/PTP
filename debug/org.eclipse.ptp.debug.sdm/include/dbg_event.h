@@ -67,7 +67,7 @@ struct dbg_event {
 	List *		list;
 	
 	/*
-	 * DBGEV_TYPE
+	 * DBGEV_TYPE, DBGEV_DATA
 	 */
 	char *		type_desc;
 	
