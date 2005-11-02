@@ -82,6 +82,7 @@ static int	GDBMIListStackframes(int);
 static int	GDBMISetCurrentStackframe(int);
 static int	GDBMIEvaluateExpression(char *);
 static int	GDBMIGetType(char *);
+static int	GDBMIGetAIFType(char *);
 static int	GDBMIGetLocalVariables(void);
 static int	GDBMIListArguments(int);
 static int	GDBMIGetGlobalVariables(void);
@@ -974,7 +975,7 @@ GDBMIEvaluateExpression(char *exp)
 	AIF *		a;
 	dbg_event *	e;
 
-	if (GDBMIGetType(exp) != DBGRES_OK)
+	if (GDBMIGetAIFType(exp) != DBGRES_OK)
 		return DBGRES_ERR;
 			
 	type = strdup(LastEvent->type_desc);
@@ -1057,7 +1058,7 @@ str_init(void)
 	s->buf = (char *)malloc(STRSIZE);
 	s->blen = STRSIZE;
 	s->slen = 0;
-	*(s->buf) = '\0';
+	s->buf[0] = '\0';
 
 	return s;
 }
@@ -1167,6 +1168,9 @@ SimpleTypeToFDS(char *type, str_ptr fds)
 static int
 ConvertType(mi_gvar *gvar, str_ptr fds)
 {
+	int	i;
+	int	num;
+	
 	ResetError();
 
 	if ( gvar->numchild == 0 )
@@ -1204,7 +1208,7 @@ ConvertType(mi_gvar *gvar, str_ptr fds)
 			}
 
 			break;
-#if 0
+
 		case '}': /* struct */
 			str_add(fds, "{|");
 			num = gvar->numchild;
@@ -1216,9 +1220,17 @@ ConvertType(mi_gvar *gvar, str_ptr fds)
 				}
 				gvar = gvar->next;
 			}
-			add_to_str(fds, ";;;}");
+			str_add(fds, ";;;}");
 			break;
-#endif
+
+		case '*': /* pointer */
+			str_add(fds, "^");
+			gvar = gvar->child;
+			if ( ConvertType(gvar, fds) != DBGRES_OK ) {
+				return DBGRES_ERR;
+			}
+			break;
+						
 		default:
 			DbgSetError(DBGERR_DEBUGGER, "type not supported (yet)");
 			return DBGRES_ERR;
@@ -1275,6 +1287,41 @@ GDBMIGetType(char *var)
 #else /* USE_AIF_TYPE */
 	e->type_desc = strdup(gvar->type);
 #endif /* USE_AIF_TYPE */
+
+	SaveEvent(e);
+
+	mi_free_gvar(gvar);
+
+	return DBGRES_OK;
+}
+
+static int
+GDBMIGetAIFType(char *var)
+{
+	dbg_event *	e;
+	mi_gvar *	gvar;
+	str_ptr		fds;
+
+	ResetError();
+
+	gvar = gmi_var_create(MIHandle, -1, var);
+
+	if ( gvar == NULL )
+	{
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		return DBGRES_ERR;
+	}
+
+	fds = str_init();
+
+	if ( ConvertType(gvar, fds) != DBGRES_OK ) {
+		return DBGRES_ERR;
+	}
+
+	e = NewDbgEvent(DBGEV_TYPE);
+
+	e->type_desc = strdup(str_val(fds));
+	str_free(fds);
 
 	SaveEvent(e);
 
