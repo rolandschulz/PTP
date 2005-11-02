@@ -20,13 +20,4 @@
 package org.eclipse.ptp.debug.external.aif;
 
 public abstract class AIFType implements IAIFType {
-	private String typeDesc = "";
-	
-	public String getDescription() {
-		return this.typeDesc;
-	}
-
-	public void setDescription(String desc) {
-		this.typeDesc = desc;
-	}
 }

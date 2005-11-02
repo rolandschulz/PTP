@@ -20,6 +20,4 @@
 package org.eclipse.ptp.debug.external.aif;
 
 public interface IAIFType {
-	public String getDescription();
-	public void setDescription(String desc);
 }
