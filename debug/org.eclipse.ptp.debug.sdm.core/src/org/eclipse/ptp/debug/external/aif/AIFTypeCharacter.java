@@ -19,7 +19,7 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public class AIFTypeCharacter implements IAIFType {
+public class AIFTypeCharacter extends AIFType {
 	public String toString() {
 		return "c";
 	}

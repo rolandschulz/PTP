@@ -19,7 +19,7 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public class AIFTypePointer implements IAIFType {
+public class AIFTypePointer extends AIFType {
 	private IAIFType baseType;
 	
 	public AIFTypePointer(IAIFType base) {

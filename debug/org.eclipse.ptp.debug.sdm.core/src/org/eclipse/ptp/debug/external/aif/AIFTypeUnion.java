@@ -19,7 +19,7 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public class AIFTypeUnion implements IAIFType {
+public class AIFTypeUnion extends AIFType {
 	private int 				id = -1;
 	private AIFTypeField[]	fields;
 	

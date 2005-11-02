@@ -19,7 +19,7 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public class AIFTypeVoid implements IAIFType {
+public class AIFTypeVoid extends AIFType {
 	private int length;
 	
 	public AIFTypeVoid(int length) {

@@ -19,8 +19,14 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-public class AIFTypeString extends AIFType {
-	public String toString() {
-		return "s";
+public abstract class AIFType implements IAIFType {
+	private String typeDesc = "";
+	
+	public String getDescription() {
+		return this.typeDesc;
+	}
+
+	public void setDescription(String desc) {
+		this.typeDesc = desc;
 	}
 }
