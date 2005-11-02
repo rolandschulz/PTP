@@ -63,6 +63,16 @@ public class ProxyEvent {
 	public static String decodeString(String str) {
 		String[] parts = str.split(":");
 		int len = Integer.parseInt(parts[0], 16) - 1; // Skip trailing NULL
+		return new String(decodeBytes(parts, len));
+	}
+
+	public static byte[] decodeBytes(String str) {
+		String[] parts = str.split(":");
+		int len = Integer.parseInt(parts[0], 16);
+		return decodeBytes(parts, len);
+	}
+
+	private static byte[] decodeBytes(String[] parts, int len) {
 		byte[] strBytes = new byte[len];
 		
 		for (int i = 0, p = 0; i < len; i++, p += 2) {
@@ -71,7 +81,7 @@ public class ProxyEvent {
 			strBytes[i] = c;
 		}
 		
-		return new String(strBytes);
+		return strBytes;
 	}
 	
 	public static BitList decodeBitSet(String str) {
