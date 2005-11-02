@@ -19,12 +19,12 @@
 
 package org.eclipse.ptp.debug.external.aif;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public class AIF implements IAIF {
 	private IAIFType		aifType;
 	private IAIFValue	aifValue;
+	private String 		typeDesc  = "";
 
 	private static final char FDS_ARRAY = '[';
 	private static final char FDS_BOOLEAN = 'b';
@@ -47,9 +47,9 @@ public class AIF implements IAIF {
 		convertToAIF(this, fds, data);
 	}
 	
-	public AIF(String desc, String fds, byte[] data) {
+	public AIF(String fds, byte[] data, String desc) {
 		this(fds, data);
-		aifType.setDescription(desc);
+		typeDesc = desc;
 	}
 	
 	public static void convertToAIF(AIF aif, String format, byte[] data) {
@@ -94,5 +94,9 @@ public class AIF implements IAIF {
 
 	protected void setValue(IAIFValue v) {
 		aifValue = v;
+	}
+	
+	public String getDescription() {
+		return this.typeDesc;
 	}
 }
