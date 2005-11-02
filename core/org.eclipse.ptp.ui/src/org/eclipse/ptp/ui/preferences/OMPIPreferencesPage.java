@@ -67,6 +67,7 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 	private String orteServerFile = EMPTY_STRING;
 	private String ortePort = "12345";
 
+	private boolean loading = true;
 
 	public OMPIPreferencesPage() {
 		setPreferenceStore(PTPCorePlugin.getDefault().getPreferenceStore());
@@ -86,7 +87,7 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 
 		public void modifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
-			if(source == ortedPathText)
+			if(!loading && (source == ortedPathText || source == orteServerText))
 				updatePreferencePage();
 			else if(source == ortedArgsText) {
 				ortedFullText.setText(ortedPathText.getText()+" "+ortedArgsText.getText());
@@ -109,7 +110,10 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 
 		createORTEdContents(composite);
 
+		loading = true;
 		loadSaved();
+		loading = false;
+		
 		defaultSetting();
 		return composite;
 	}
