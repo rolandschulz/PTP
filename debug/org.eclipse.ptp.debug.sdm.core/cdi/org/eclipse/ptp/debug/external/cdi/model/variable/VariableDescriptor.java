@@ -60,7 +60,6 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 	String qualifiedName = null;
 	String fFullName = null;
 	protected ICDIType fType = null;
-	protected String fTypename = null;
 	String sizeof = null;
 	IAIF aif = null;
 	
@@ -265,16 +264,12 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 			Session session = (Session) target.getSession();
 			SourceManager sourceMgr = session.getSourceManager();
 			if (frame != null) {
-				fTypename = sourceMgr.getTypeNameFromVariable(frame, getQualifiedName());
+				aif = sourceMgr.getAIFFromVariable(frame, getQualifiedName());
 			} else {
-				fTypename = sourceMgr.getTypeName(target, getQualifiedName());
+				aif = sourceMgr.getAIF(target, getQualifiedName());
 			}
 		}
-		else {
-			//TODO - fix the toString later
-			fTypename = aif.getType().toString();
-		}
-		return fTypename;
+		return aif.getDescription();
 	}
 	public String getQualifiedName() throws CDIException {
 		if (qualifiedName == null) {

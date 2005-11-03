@@ -35,6 +35,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorageDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
@@ -296,7 +297,8 @@ public class VariableManager extends Manager {
 		target.setCurrentThread(frame.getThread(), false);
 		((Thread)frame.getThread()).setCurrentStackFrame(frame, false);
 		try {
-			ICDIArgument[] args = target.getDebugger().listArguments(((Session)getSession()).createBitList(target.getTargetID()), frame);
+			BitList tasks = ((Session)getSession()).createBitList(target.getTargetID());
+			ICDIArgument[] args = target.getDebugger().listArguments(tasks, frame);
 			if (args != null) {
 				for (int i = 0; i < args.length; i++) {
 					VariableDescriptor varDesc = (VariableDescriptor) args[i];
@@ -307,7 +309,7 @@ public class VariableManager extends Manager {
 					int depth = varDesc.getStackDepth();
 					IAIF aif = varDesc.getAIF();
 					if (aif == null) {
-						//TODO - get AIF from debugger
+						aif = target.getDebugger().getAIFValue(tasks, fName);
 					}
 					argObjects.add(new ArgumentDescriptor(target, thread, frame, name, fName, pos, depth, aif));
 				}
@@ -370,7 +372,8 @@ public class VariableManager extends Manager {
 		((Thread)frame.getThread()).setCurrentStackFrame(frame, false);
 		
 		try {
-			ICDILocalVariable[] vars = target.getDebugger().listLocalVariables(((Session)getSession()).createBitList(target.getTargetID()), currentFrame);
+			BitList tasks = ((Session)getSession()).createBitList(target.getTargetID());
+			ICDILocalVariable[] vars = target.getDebugger().listLocalVariables(tasks, currentFrame);
 			if (vars != null) {
 				for (int i = 0; i < vars.length; i++) {
 					VariableDescriptor varDesc = (VariableDescriptor)vars[i];
@@ -381,7 +384,7 @@ public class VariableManager extends Manager {
 					int depth = varDesc.getStackDepth();
 					IAIF aif = varDesc.getAIF();
 					if (aif == null) {
-						//TODO - get AIF from debugger
+						aif = target.getDebugger().getAIFValue(tasks, fName);
 					}
 					varObjects.add(new LocalVariableDescriptor(target, thread, frame, name, fName, pos, depth, aif));
 				}

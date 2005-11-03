@@ -18,26 +18,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external;
 
-import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.debug.core.IPTPDebugger;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.launch.IPLaunch;
-import org.eclipse.ptp.debug.external.cdi.Session;
-import org.eclipse.ptp.debug.external.debugger.ParallelDebugger;
+import java.io.IOException;
+import java.io.OutputStream;
 
-public class PTPDebugger implements IPTPDebugger {
-	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) {
-		try {
-			IPJob job = launch.getPJob();
-			//IAbstractDebugger debugger = new DebugSimulation2();
-			IAbstractDebugger debugger = new ParallelDebugger();
-			debugger.initialize(job);
-			return new Session(debugger, job, launch, exe);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+public class PseudoOutputStream extends OutputStream {
+
+	public void write(int arg0) throws IOException {
+		// Send "arg0" to the process on the remote machine
+		System.out.println("PseudoOutputStream.write()");	
 	}
+
 }

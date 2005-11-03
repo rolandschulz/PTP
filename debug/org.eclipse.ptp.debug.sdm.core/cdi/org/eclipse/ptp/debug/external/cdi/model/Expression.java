@@ -23,6 +23,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
+import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SourceManager;
@@ -55,13 +56,13 @@ public class Expression extends PTPObject implements ICDIExpression {
 		Target target = (Target) getTarget();
 		Session session = (Session) (target.getSession());
 		SourceManager sourceMgr = session.getSourceManager();
-		String nametype = sourceMgr.getTypeNameFromVariable((StackFrame) frame, getExpressionText());
+		IAIF aif = sourceMgr.getAIFFromVariable((StackFrame) frame, getExpressionText());
 		try {
-			type = sourceMgr.getType(target, nametype);
+			type = sourceMgr.getType(target, aif);
 		} catch (CDIException e) {
 			// Try with ptype.
 			try {
-				String ptype = sourceMgr.getDetailTypeName(target, nametype);
+				String ptype = sourceMgr.getDetailTypeName(target, aif.getDescription());
 				type = sourceMgr.getType(target, ptype);
 			} catch (CDIException ex) {
 				// Some version of gdb does not work with the name of the class
@@ -76,7 +77,7 @@ public class Expression extends PTPObject implements ICDIExpression {
 			}
 		}
 		if (type == null) {
-			type = new IncompleteType(target, nametype);
+			type = new IncompleteType(target, aif.getDescription());
 		}
 		return type;
 	}

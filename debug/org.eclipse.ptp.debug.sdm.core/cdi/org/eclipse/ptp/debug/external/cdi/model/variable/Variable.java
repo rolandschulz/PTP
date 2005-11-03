@@ -241,12 +241,8 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		if (aif == null) {
 			Target target = (Target)getTarget();
 			Session session = (Session)target.getSession();
-			fTypename = target.getDebugger().getVariableType(session.createBitList(target.getTargetID()), getName());
+			aif = target.getDebugger().getAIFValue(session.createBitList(target.getTargetID()), getName());
 		}
-		else {
-			//TODO - fix the toString later
-			fTypename = aif.getType().toString();
-		}
-		return fTypename;
+		return aif.getDescription();
 	}
 }
