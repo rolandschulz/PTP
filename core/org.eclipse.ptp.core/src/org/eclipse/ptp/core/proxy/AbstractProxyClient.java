@@ -94,15 +94,17 @@ public abstract class AbstractProxyClient {
 	}
 	
 	public void sessionCreate() throws IOException {
+		System.out.println("sessionCreate()");
 		sessSvrSock = new ServerSocket(sessPort);
 		acceptThread = new Thread("Proxy Client Accept Thread") {
 			public void run() {
 				try {
+					System.out.println("accept thread starting...");
 					sessSock = sessSvrSock.accept();
 					sessOut = new OutputStreamWriter(sessSock.getOutputStream());
 					sessIn = new InputStreamReader(sessSock.getInputStream());
 					connected = true;
-					fireEvent(new ProxyConnectedEvent());
+					fireProxyEvent(new ProxyConnectedEvent());
 					startEventThread();
 				} catch (IOException e) {
 				}
@@ -115,6 +117,7 @@ public abstract class AbstractProxyClient {
 	private void startEventThread() throws IOException {
 		eventThread = new Thread("Proxy Client Event Thread") {
 			public void run() {
+				System.out.println("event thread starting...");
 				try {
 					exitThread = false;
 					while (!exitThread) {
@@ -128,17 +131,17 @@ public abstract class AbstractProxyClient {
 		eventThread.start();
 	}
 	
-	protected synchronized void fireEvent(IProxyEvent event) {
+	protected void fireProxyEvent(IProxyEvent event) {
 		if (listeners == null)
 			return;
 		Iterator i = listeners.iterator();
 		while (i.hasNext()) {
 			IProxyEventListener listener = (IProxyEventListener) i.next();
-			listener.fireEvent(event);
+			listener.handleEvent(event);
 		}
 	}
 	
-	public void sessionProgress() throws IOException {
+	private void sessionProgress() throws IOException {
 		char[] len_bytes = new char[9];
 		
 		int n = sessIn.read(len_bytes, 0, 9);
@@ -165,7 +168,7 @@ public abstract class AbstractProxyClient {
 
 		String event_str = new String(event_bytes);
 
-		fireEvent(ProxyEvent.toEvent(event_str));
+		fireProxyEvent(ProxyEvent.toEvent(event_str));
 	}
 
 	public void sessionFinish() throws IOException {
