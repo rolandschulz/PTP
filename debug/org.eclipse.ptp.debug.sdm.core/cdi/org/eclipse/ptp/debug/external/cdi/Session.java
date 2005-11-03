@@ -18,6 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
@@ -44,6 +46,7 @@ import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
@@ -145,13 +148,18 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 		registerTargets(new int[] { procNum }, sendEvent, resumeTarget);
 	}
 	public void registerTargets(int[] procNums, boolean sendEvent, boolean resumeTarget) {
-		Target[] targets = new Target[procNums.length];
-		for (int i = 0; i < targets.length; i++) {
-			targets[i] = new Target(this, procNums[i]);
+		List targetList = new ArrayList();
+		for (int i = 0; i < procNums.length; i++) {
+			if (!processManager.containTarget(procNums[i])) {
+				targetList.add(new Target(this, procNums[i]));
+			}
 		}
-		BitList regTasks = createEmptyBitList();
-		processManager.addTargets(targets, regTasks);
-		PTPDebugCorePlugin.getDebugModel().addNewDebugTargets(launch, regTasks, targets, file, resumeTarget, sendEvent);
+		IPCDITarget[] targets = (IPCDITarget[])targetList.toArray(new IPCDITarget[0]);
+		if (targets.length > 0) {
+			BitList regTasks = createEmptyBitList();
+			processManager.addTargets(targets, regTasks);
+			PTPDebugCorePlugin.getDebugModel().addNewDebugTargets(launch, regTasks, targets, file, resumeTarget, sendEvent);
+		}
 	}
 	public void unregisterTarget(int procNum, boolean sendEvent) {
 		unregisterTargets(new int[] { procNum }, sendEvent);

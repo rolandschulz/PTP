@@ -76,6 +76,10 @@ public abstract class AbstractEvent implements IPCDIEvent {
 		return null;
 	}
 	public boolean containTask(int task_id) {
-		return tasks.get(task_id);
+		try {
+			return tasks.get(task_id);
+		} catch (IndexOutOfBoundsException e) {
+			return false;
+		}
 	}
 }

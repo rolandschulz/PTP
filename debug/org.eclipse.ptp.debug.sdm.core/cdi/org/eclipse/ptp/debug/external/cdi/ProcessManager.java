@@ -25,6 +25,7 @@ import java.util.Map;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
 /**
@@ -61,9 +62,9 @@ public class ProcessManager extends Manager {
 	public int[] getRegisteredTargetIDs() {
 		return getRegisteredTargets().toArray();
 	}
-	public void addTargets(Target[] targets, BitList regTasks) {
+	public void addTargets(IPCDITarget[] targets, BitList regTasks) {
 		for (int i = 0; i<targets.length; i++) {
-			Target target = targets[i];
+			IPCDITarget target = targets[i];
 			Integer key = new Integer(target.getTargetID());
 			if (debugTargetMap.containsKey(key))
 				continue;
@@ -86,7 +87,7 @@ public class ProcessManager extends Manager {
 				regTasks.set(target_ids[i]);
 		}
 	}
-	public void removeTargets(Target[] targets, BitList regTasks) {
+	public void removeTargets(IPCDITarget[] targets, BitList regTasks) {
 		for (int i = 0; i<targets.length; i++) {
 			if (removeTarget(targets[i].getTargetID()))
 				regTasks.set(targets[i].getTargetID());
