@@ -118,6 +118,7 @@ import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
 import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
@@ -136,6 +137,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	private ArrayList fThreads;
 	private IProcess fDebuggeeProcess = null;
 	private IPCDITarget fCDITarget;
+	private IPProcess process;
 	private IPLaunch fLaunch;
 	private ICDITargetConfiguration fConfig;
 	private PGlobalVariableManager fGlobalVariableManager;
@@ -148,19 +150,24 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		super(null);
 		fLaunch = launch;
 		fCDITarget = cdiTarget;
+		process = cdiTarget.getPProcess();
 		setDebugTarget(this);
 		setProcess(debuggeeProcess);
 		setExecFile(file);
-		setState(CDebugElementState.SUSPENDED);
 		initializePreferences();
 		setConfiguration(cdiTarget.getConfiguration());
-		setThreadList(new ArrayList(5));
-		setGlobalVariableManager(new PGlobalVariableManager(this));
-		initialize();
-
-		DebugPlugin.getDefault().getLaunchManager().addLaunchListener(this);
-		DebugPlugin.getDefault().getExpressionManager().addExpressionListener(this);
-		getCDISession().getEventManager().addEventListener(this);
+		if (!process.getStatus().equals(IPProcess.EXITED)) {
+			setState(CDebugElementState.SUSPENDED);
+			setThreadList(new ArrayList(5));
+			setGlobalVariableManager(new PGlobalVariableManager(this));
+			initialize();	
+			DebugPlugin.getDefault().getLaunchManager().addLaunchListener(this);
+			DebugPlugin.getDefault().getExpressionManager().addExpressionListener(this);
+			getCDISession().getEventManager().addEventListener(this);
+		} else {
+			setState(CDebugElementState.TERMINATED);
+			setThreadList(new ArrayList(5));
+		}
 	}
 	public int getTargetID() {
 		return fCDITarget.getTargetID();
@@ -391,7 +398,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return getConfiguration().supportsTerminate();
 	}
 	public boolean canDisconnect() {
-		//No discount
+		//No disconnet
 		//return supportsDisconnect() && isAvailable();
 		return false;
 	}

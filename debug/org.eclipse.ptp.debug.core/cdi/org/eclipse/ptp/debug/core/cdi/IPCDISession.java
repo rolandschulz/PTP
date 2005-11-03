@@ -22,6 +22,7 @@ import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.launch.IPLaunch;
 
 public interface IPCDISession extends ICDISession, ICommonActions {
 	public void registerTarget(int procNum, boolean sendEvent, boolean resumeTarget);
@@ -40,4 +41,5 @@ public interface IPCDISession extends ICDISession, ICommonActions {
 	public BitList getRegisteredTargets();
 	public ICDITarget getTarget(int target_id);
 	public void shutdown();
+	public IPLaunch getLaunch();
 }
