@@ -18,26 +18,58 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external;
 
-import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.debug.core.IPTPDebugger;
-import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.launch.IPLaunch;
-import org.eclipse.ptp.debug.external.cdi.Session;
-import org.eclipse.ptp.debug.external.debugger.ParallelDebugger;
+import java.io.IOException;
+import java.io.InputStream;
 
-public class PTPDebugger implements IPTPDebugger {
-	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) {
-		try {
-			IPJob job = launch.getPJob();
-			//IAbstractDebugger debugger = new DebugSimulation2();
-			IAbstractDebugger debugger = new ParallelDebugger();
-			debugger.initialize(job);
-			return new Session(debugger, job, launch, exe);
-		} catch (Exception e) {
-			e.printStackTrace();
+import org.eclipse.ptp.core.util.Queue;
+
+public class PseudoInputStream extends InputStream {
+	final String DESTROY = "destroyPseudoInputStream";
+	boolean finished;
+	Queue queue;
+	
+	String str;
+	int strLen;
+	
+	public PseudoInputStream() {
+		super();
+		queue = new Queue();
+		finished = false;
+		str = null;
+		strLen = -1;
+	}
+	
+	public void printString(String s) {
+		queue.addItem(s);
+	}
+	
+	public void destroy() {
+		finished = true;
+		queue.addItem(DESTROY);
+	}
+	
+	public int read() throws IOException {
+		if (strLen == 0) {
+			strLen--;
+			return -1;
 		}
-		return null;
+		
+		if (strLen == -1) {
+			try {
+				if (finished) {
+					return -1;
+				}
+				str = (String) queue.removeItem();
+				if (str.equals(DESTROY)) {
+					return -1;
+				}
+				strLen = str.length();
+			} catch (InterruptedException e) {
+			}
+		}
+			
+		int chr = str.charAt(str.length() - strLen);
+		strLen--;
+		return chr;
 	}
 }

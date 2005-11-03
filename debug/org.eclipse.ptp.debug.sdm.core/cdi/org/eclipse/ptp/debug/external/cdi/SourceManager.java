@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.external.cdi;
 
 import java.util.StringTokenizer;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
@@ -51,14 +52,18 @@ public class SourceManager extends Manager {
 	public void shutdown() {
 		
 	}
+	public Type getType(Target target, IAIF aif) throws CDIException {
+		if (aif == null) {
+			throw new CDIException("No AIF found - SourceManager: getType");
+		}
+		return toCDIType(target, aif.getDescription());
+	}
+
 	public Type getType(Target target, String name) throws CDIException {
 		if (name == null) {
 			name = new String();
 		}
 		String typename = name.trim();
-		//FIXME ignore GDBType 
-		//GDBType gdbType = gdbTypeParser.parse(typename);
-		//FIXME - NOTE: Mapping AIF type string
 		return toCDIType(target, typename);
 	}
 	Type toCDIType(Target target, String name) throws CDIException {
@@ -255,20 +260,23 @@ public class SourceManager extends Manager {
 		throw new CDIException("Not implement yet - SourceManager: getDetailsTypeName");
 		//return target.getDebugger().getVariableType(((Session)getSession()).createBitList(target.getTargetID()), typeName);
 	}
-	public String getTypeNameFromVariable(StackFrame frame, String variable) throws CDIException {
+	public IAIF getAIFFromVariable(StackFrame frame, String variable) throws CDIException {
 		Target target = (Target)frame.getTarget();
 		Thread currentThread = (Thread)target.getCurrentThread();
 		StackFrame currentFrame = currentThread.getCurrentStackFrame();
 		target.setCurrentThread(frame.getThread(), false);
 		((Thread)frame.getThread()).setCurrentStackFrame(frame, false);
 		try {
-			return getTypeName(target, variable);
+			return getAIF(target, variable);
 		} finally {
 			target.setCurrentThread(currentThread, false);
 			currentThread.setCurrentStackFrame(currentFrame, false);
 		}
 	}
-	public String getTypeName(Target target, String variable) throws CDIException {
-		return target.getDebugger().getVariableType(((Session)getSession()).createBitList(target.getTargetID()), variable);
+	public IAIF getAIF(Target target, String variable) throws CDIException {
+		return target.getDebugger().getAIFValue(((Session)getSession()).createBitList(target.getTargetID()), variable);
 	}
+	//public String getTypeName(Target target, String variable) throws CDIException {
+		//return target.getDebugger().getVariableType(((Session)getSession()).createBitList(target.getTargetID()), variable);
+	//}
 }

@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.external;
 
 import org.eclipse.ptp.core.util.Queue;
-import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 
 public class EventThread extends Thread {
