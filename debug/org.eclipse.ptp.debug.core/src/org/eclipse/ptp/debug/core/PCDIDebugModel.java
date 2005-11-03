@@ -257,7 +257,9 @@ public class PCDIDebugModel {
 	}
 	public void shutdownSession(IPJob job) {
 		if (job != null) {
-			((IPCDISession)job.getAttribute(PreferenceConstants.JOB_DEBUG_SESSION)).shutdown();
+			IPCDISession session = (IPCDISession)job.getAttribute(PreferenceConstants.JOB_DEBUG_SESSION);
+			DebugPlugin.getDefault().getLaunchManager().removeLaunch(session.getLaunch());
+			session.shutdown();
 		}
 	}
 	public void newJob(String job_id, int totalTasks) throws CoreException {

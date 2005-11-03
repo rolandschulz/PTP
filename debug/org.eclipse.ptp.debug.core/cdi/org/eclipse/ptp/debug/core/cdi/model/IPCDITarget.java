@@ -19,7 +19,9 @@
 package org.eclipse.ptp.debug.core.cdi.model;
 
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
+import org.eclipse.ptp.core.IPProcess;
 
 public interface IPCDITarget extends ICDITarget {
 	public int getTargetID();
+	public IPProcess getPProcess();
 }
