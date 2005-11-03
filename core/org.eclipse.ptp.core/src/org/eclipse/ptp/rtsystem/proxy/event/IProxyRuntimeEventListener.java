@@ -20,5 +20,5 @@
 package org.eclipse.ptp.rtsystem.proxy.event;
 
 public interface IProxyRuntimeEventListener {
-	public void fireEvent(IProxyRuntimeEvent e);
+	public void handleEvent(IProxyRuntimeEvent e);
 }
