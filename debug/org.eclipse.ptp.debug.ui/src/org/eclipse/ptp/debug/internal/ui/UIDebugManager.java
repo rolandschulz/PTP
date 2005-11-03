@@ -114,7 +114,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	}
 	private void defaultRegister(IPCDISession session) { // register process 0 if the preference is checked
 		if (PTPDebugUIPlugin.getDefault().getPreferenceStore().getBoolean(IPDebugPreferenceConstants.PREF_PTP_DEBUG_REGISTER_PROC_0)) {
-			registerProcess(session, 0, true);
+			IPProcess proc = session.getJob().findProcessByTaskId(0);
+			if (proc != null)
+				registerProcess(session, proc, true);
 		}
 	}
 	public boolean isDebugMode(String job_id) {
@@ -231,9 +233,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			int[] processes = tasks.toArray();
 			for (int j = 0; j < processes.length; j++) {
 				IPProcess proc = job.findProcessByTaskId(processes[j]);
-				elementHandler.removeRegisterElement(proc.getIDString());
-				elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(true);
-				addConsoleWindow(proc);
+				IElement element = elementHandler.getSetRoot().get(proc.getIDString());
+				element.setRegistered(true);
+				elementHandler.addRegisterElement(element);
 			}
 			fireRegListener(REG_TYPE, tasks);
 		} else if (event instanceof PDebugTargetUnRegisterEvent) {
@@ -242,10 +244,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			int[] processes = tasks.toArray();
 			for (int j = 0; j < processes.length; j++) {
 				IPProcess proc = job.findProcessByTaskId(processes[j]);
-				consoleWindows.put(proc, new OutputConsole(proc.getElementName(), new ProcessInputStream(proc)));
-				elementHandler.removeRegisterElement(proc.getIDString());
-				elementHandler.getSetRoot().get(proc.getIDString()).setRegistered(false);
-				removeConsoleWindow(proc);
+				IElement element = elementHandler.getSetRoot().get(proc.getIDString());
+				element.setRegistered(false);
+				elementHandler.removeRegisterElement(element);
 			}
 			fireRegListener(UNREG_TYPE, tasks);
 		}
@@ -254,11 +255,13 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	/***************************************************************************************************************************************************************************************************
 	 * Register / Unregister
 	 **************************************************************************************************************************************************************************************************/
-	public void registerProcess(IPCDISession session, int task_id, boolean isChanged) {
-		session.registerTarget(task_id, isChanged);
+	public void registerProcess(IPCDISession session, IPProcess proc, boolean isChanged) {
+		session.registerTarget(proc.getTaskId(), isChanged);
+		addConsoleWindow(proc);
 	}
-	public void unregisterProcess(IPCDISession session, int task_id, boolean isChanged) {
-		session.unregisterTarget(task_id, isChanged);
+	public void unregisterProcess(IPCDISession session, IPProcess proc, boolean isChanged) {
+		session.unregisterTarget(proc.getTaskId(), isChanged);
+		removeConsoleWindow(proc);
 	}
 	public void unregisterElements(IElement[] elements) throws CoreException {
 		IPJob job = findJobById(getCurrentJobId());
@@ -272,7 +275,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			if (elements[i].isRegistered()) {
 				IPProcess process = findProcess(job, elements[i].getID());
 				if (process != null)
-					unregisterProcess(session, process.getTaskId(), true);
+					unregisterProcess(session, process, true);
 			}
 		}
 	}
@@ -288,7 +291,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			if (!elements[i].isRegistered()) {
 				IPProcess process = findProcess(job, elements[i].getID());
 				if (process != null && !process.isAllStop())
-					registerProcess(session, process.getTaskId(), true);
+					registerProcess(session, process, true);
 			}
 		}
 	}
@@ -329,10 +332,11 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 						IPCDISession session = getDebugSession(job_id);
 						if (session == null)
 							return Status.CANCEL_STATUS;
-						String[] registerElementsID = elementHandler.getRegisteredElementsID();
-						for (int i = 0; i < registerElementsID.length; i++) {
-							int taskID = convertToInt(elementHandler.getSetRoot().get(registerElementsID[i]).getName());
-							unregisterProcess(session, taskID, false);
+						IElement[] registerElements = elementHandler.getRegisteredElements();
+						for (int i = 0; i < registerElements.length; i++) {
+							IPProcess proc = findProcess(job_id, registerElements[i].getID());
+							if (proc != null)
+								unregisterProcess(session, proc, false);
 						}
 						return Status.OK_STATUS;
 					}
@@ -352,16 +356,18 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 						IPCDISession session = getDebugSession(job_id);
 						if (session == null)
 							return Status.CANCEL_STATUS;
-						String[] registerElementsID = elementHandler.getRegisteredElementsID();
-						for (int i = 0; i < registerElementsID.length; i++) {
-							if (curSet.contains(registerElementsID[i])) {
-								if (curSet.isRootSet() || (preSet != null && !preSet.contains(registerElementsID[i]))) {
-									int taskID = convertToInt(elementHandler.getSetRoot().get(registerElementsID[i]).getName());
-									registerProcess(session, taskID, false);
+						IElement[] registerElements = elementHandler.getRegisteredElements();
+						for (int i = 0; i < registerElements.length; i++) {
+							if (curSet.contains(registerElements[i].getID())) {
+								if (curSet.isRootSet() || (preSet != null && !curSet.equals(preSet) && !preSet.contains(registerElements[i].getID()))) {
+									IPProcess proc = findProcess(job_id, registerElements[i].getID());
+									if (proc != null)
+										registerProcess(session, proc, false);
 								}
 							} else {
-								int taskID = convertToInt(elementHandler.getSetRoot().get(registerElementsID[i]).getName());
-								unregisterProcess(session, taskID, false);
+								IPProcess proc = findProcess(job_id, registerElements[i].getID());
+								if (proc != null)
+									unregisterProcess(session, proc, false);
 							}
 						}
 						return Status.OK_STATUS;

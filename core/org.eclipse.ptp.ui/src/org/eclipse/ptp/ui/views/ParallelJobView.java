@@ -243,6 +243,9 @@ public class ParallelJobView extends AbstractParallelSetView {
 		});
 	}
 	protected void changeJob(final IPJob job) {
+		String cur_id = getCurrentID();
+		if (cur_id != null && job != null && cur_id.equals(job.getIDString()))
+			return;
 		selectJob((job == null ? IManager.EMPTY_ID : job.getIDString()));
 		update();
 		refresh();
