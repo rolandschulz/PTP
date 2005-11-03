@@ -18,8 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -81,6 +83,8 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 
 	protected IControlSystem controlSystem = null;
 	protected IMonitoringSystem monitoringSystem = null;
+	
+	protected OMPIProxyRuntimeClient proxy = null; 
 
 	public boolean isParallelPerspectiveOpen() {
 		return isPerspectiveOpen;
@@ -167,7 +171,7 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 				return;
 			}
 			
-			OMPIProxyRuntimeClient proxy = new OMPIProxyRuntimeClient("localhost", port);
+			proxy = new OMPIProxyRuntimeClient("localhost", port);
 			
 			proxyConnect(proxy);
 			
@@ -429,6 +433,15 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 		perspectiveListener = null;
 		listeners.clear();
 		listeners = null;
+		try {
+			proxy.sessionFinish();
+			System.out.println("Telling proxy server to shutdown...");
+			wait_for_event();
+			System.out.println("Proxy server acknowledged shutdown.");
+		} catch(IOException e) {
+			System.err.println(e.toString());
+			e.printStackTrace();
+		}
 		controlSystem.shutdown();
 		monitoringSystem.shutdown();
 	}
@@ -621,7 +634,7 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 	
 	private void proxyConnect(OMPIProxyRuntimeClient proxy)
 	{
-		System.out.println("OMPIControlSystem - firing up proxy.");
+		System.out.println("ModelManager - firing up proxy, waiting for connecting.  Please wait!  This can take a minute . . .");
 		try {
 			proxy.addEventListener((IProxyRuntimeEventListener)this);
 			proxy.sessionCreate(false);
@@ -643,6 +656,12 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 					
 					try {
 						Process process = rt.exec(cmd);
+						InputStreamReader reader = new InputStreamReader (process.getInputStream ());
+						BufferedReader buf_reader = new BufferedReader (reader);
+						
+						String line;
+						while ((line = buf_reader.readLine ()) != null)
+							System.out.println ("ORTE PROXY SERVER: "+line);
 					} catch(Exception e) {
 						String err;
 						err = "Error running proxy server with command: '"+cmd+"'.";

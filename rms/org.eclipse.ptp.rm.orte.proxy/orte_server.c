@@ -26,14 +26,17 @@
 #define RTEV_OFFSET				200
 #define RTEV_OK					RTEV_OFFSET + 0
 #define RTEV_ERROR				RTEV_OFFSET + 1
-#define RTEV_JBSTATE				RTEV_OFFSET + 2
+#define RTEV_JOBSTATE				RTEV_OFFSET + 2
+
 #define RTEV_ERROR_ORTE_INIT		RTEV_OFFSET + 1000
 #define RTEV_ERROR_ORTE_FINALIZE	RTEV_OFFSET + 1001
+#define RTEV_ERROR_ORTE_RUN		RTEV_OFFSET + 1002
 
 int ORTEIsShutdown(void);
 int ORTEQuit(void);
 
 int ORTEStartDaemon(char **);
+int ORTERun(char **);
 /*
 int ORTERun(char **);
 int OMPIGetJobs(char **);
@@ -47,11 +50,14 @@ int OMPIGetNodemachineID(char **);
 
 */
 
+static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
 static int ompi_sendcmd(orte_daemon_cmd_flag_t usercmd);
+static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd);
 
 int 			orte_shutdown = 0;
 proxy_svr *	orte_proxy;
 int			is_orte_initialized = 0;
+int			orted_pid = 0;
 
 static proxy_handler_funcs handler_funcs = {
 	RegisterFileHandler,		// regfile() - call to register a file handler
@@ -69,6 +75,7 @@ static proxy_svr_helper_funcs helper_funcs = {
 
 static proxy_svr_commands command_tab[] = {
 	{"STARTDAEMON", 	ORTEStartDaemon},
+	{"RUN",			ORTERun},
 	{NULL,			NULL},
 	/*
 	{"RUN",			ORTERun},
@@ -99,9 +106,13 @@ ORTEInitialized(void)
 int
 ORTECheckErrorCode(int type, int rc)
 {
+	printf("Checking error code...\n"); fflush(stdout);
 	if(rc != ORTE_SUCCESS) {
 		char *res;
-		asprintf(&res, "%s %s", type, ORTE_ERROR_NAME(rc));
+		printf("ARgh!  An error!\n"); fflush(stdout);
+		printf("ERROR %s\n", ORTE_ERROR_NAME(rc)); fflush(stdout);
+		asprintf(&res, "%d %s", type, ORTE_ERROR_NAME(rc));
+		printf("ERROR: %s\n", res); fflush(stdout);
 		proxy_svr_event_callback(orte_proxy, res);
 		free(res);
 		return 1;
@@ -117,7 +128,7 @@ int ORTEStartDaemon(char **args)
 	
 	printf("START DAEMON CALLED!  OMG!\n");
 	
-	switch(fork()) {
+	switch(orted_pid = fork()) {
 		case -1:
 			{
 				char *res;
@@ -241,14 +252,16 @@ int ORTEStartDaemon(char **args)
 			break;
 	    /* parent */
 	    default:
+	    		printf("PARENT: orted_pid = %d\n", orted_pid); fflush(stdout);
 			/* sleep - letting the daemon get started up */
 			sleep(1);
 			wait(&ret);
-			printf("parent ret from child = %d\n", ret);
+			printf("parent ret from child = %d\n", ret); fflush(stdout);
 			break;
 	}
 
 	printf("Start daemon returning.\n");
+	ORTEInit();
 	return 0;
 }
 
@@ -256,6 +269,8 @@ int
 ORTEInit(void)
 {
 	int rc;
+	
+	printf("ORTEInit\n"); fflush(stdout);
 	
 	/* this makes the orte_init() fail if the orte daemon isn't
 	 * running */
@@ -287,7 +302,10 @@ ORTEFinalize(void)
 int
 ORTEShutdown(void)
 {
-	ompi_sendcmd(ORTE_DAEMON_EXIT_CMD);
+	printf("ORTEShutdown() called.  Telling daemon to turn off.\n"); fflush(stdout);
+	//ompi_sendcmd(ORTE_DAEMON_EXIT_CMD);
+	orte_console_send_command(ORTE_DAEMON_EXIT_CMD);
+	printf("ORTEShutdown() - told ORTEd to exit.\n"); fflush(stdout);
 	orte_shutdown++;
 	return 0;
 }
@@ -403,118 +421,124 @@ ORTETerminateJob(int jobid)
  *   type = RUN
  *   data = "jobid" (example: "848")
  */
-//int
-//ORTERun(char **args)
-//{
-//	int rc; 
-//	
-//	int i;
-//	orte_jobid_t jobid = ORTE_JOBID_MAX;
-//	char pgm_name[128], cwd[128];
-//	char *c;
-//	orte_app_context_t **apps;
-//	int num_apps;
-//	char *exec_path = args[1];
-//	int num_procs = atoi(args[2]);
-//
-//	c = rindex(app, '/');
-//
-//	strncpy(pgm_name, c + 1, strlen(c));
-//	strncpy(cwd, app, c - app + 1);
-//	cwd[c-app+1] = '\0';
-//
-//	/* hard coded test for spawning just 1 job (JOB not PROCESSES!) */
-//	num_apps = 1;
-//
-//	/* format the app_context_t struct */
-//	apps = malloc(sizeof(orte_app_context_t *) * num_apps);
-//	apps[0] = OBJ_NEW(orte_app_context_t);
-//	apps[0]->num_procs = num_procs;
-//	apps[0]->app = strdup(app);
-//	apps[0]->cwd = strdup(cwd);
-//	/* no special environment variables */
-//	apps[0]->num_env = 0;
-//	apps[0]->env = NULL;
-//	/* no special mapping of processes to nodes */
-//	apps[0]->num_map = 0;
-//	apps[0]->map_data = NULL;
-//	/* setup argv */
-//	apps[0]->argv = (char **)malloc(2 * sizeof(char *));
-//	apps[0]->argv[0] = strdup(pgm_name);
-//	apps[0]->argv[1] = NULL;
-//
-//	apps[0]->argc = 1;
-//
-//	/*
-//	printf("Spawning %d processes of job '%s'\n", apps[0]->num_procs, apps[0]->app);
-//	fflush(stdout);
-//	*/
-//	
-//	opal_mutex_lock(&opal_event_lock);
-//	/* calls the ORTE spawn function with the app to spawn.  Return the
-//	 * jobid assigned by the registry/ORTE.  Passes a callback function
-//	 * that ORTE will call with state change on this job */
-//	rc = orte_rmgr.spawn(apps, num_apps, &jobid, job_state_callback);
-//	opal_mutex_unlock(&opal_event_lock);
-//	
-//	
-//	
-//	if(ORTECheckErrorCode(ORTE_RUN, rc)) return 1;
-//	
-//	/* generate an event stating what the new/assigned job ID is.
-//	 * The caller must record this and use this as an identifier to get
-//	 * information about a job */
-//	GenerateEvent(ORTE_RUN, jobid);
-//	
-//	return PROXY_RES_OK;
-//}
-//
-//static void
-//job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
-//{
-//	char *	res;
-//	
-//	/* not sure yet how we want to handle this callback, what events
-//	 * we want to generate, but here are the states that I know of
-//	 * that a job can go through.  I've watched ORTE call this callback
-//	 * with each of these states.  We'll want to come in here and
-//	 * generate events where appropriate */
-//	
-//	printf("job_state_callback(%d)\n", jobid);
-//	switch(state) {
-//		case ORTE_PROC_STATE_INIT:
-//			printf("    state = ORTE_PROC_STATE_INIT\n");
-//			break;
-//		case ORTE_PROC_STATE_LAUNCHED:
-//			printf("    state = ORTE_PROC_STATE_LAUNCHED\n");
-//			break;
-//		case ORTE_PROC_STATE_AT_STG1:
-//			printf("    state = ORTE_PROC_STATE_AT_STG1\n");
-//			break;
-//		case ORTE_PROC_STATE_AT_STG2:
-//			printf("    state = ORTE_PROC_STATE_AT_STG2\n");
-//			break;
-//		case ORTE_PROC_STATE_RUNNING:
-//			printf("    state = ORTE_PROC_STATE_RUNNING\n");
-//			break;
-//		case ORTE_PROC_STATE_AT_STG3:
-//			printf("    state = ORTE_PROC_STATE_AT_STG3\n");
-//			break;
-//		case ORTE_PROC_STATE_FINALIZED:
-//			printf("    state = ORTE_PROC_STATE_FINALIZED\n");
-//			break;
-//		case ORTE_PROC_STATE_TERMINATED:
-//			printf("    state = ORTE_PROC_STATE_TERMINATED\n");
-//			break;
-//		case ORTE_PROC_STATE_ABORTED:
-//			printf("    state = ORTE_PROC_STATE_ABORTED\n");
-//			break;
-//	}
-//
-//	asprintf(res, "%d %d", RTEV_JOBSTATE, state);
-//	proxy_svr_event_callback(orte_proxy, res);
-//	free(res);
-//}
+int
+ORTERun(char **args)
+{
+	int rc; 
+	
+	int i;
+	orte_jobid_t jobid = ORTE_JOBID_MAX;
+	char pgm_name[128], cwd[128];
+	char *c;
+	orte_app_context_t **apps;
+	int num_apps;
+	char *exec_path = args[1];
+	int num_procs = atoi(args[2]);
+
+	c = rindex(exec_path, '/');
+
+	strncpy(pgm_name, c + 1, strlen(c));
+	strncpy(cwd, exec_path, c - exec_path + 1);
+	cwd[c-exec_path+1] = '\0';
+	
+	printf("CWD = '%s'\n", cwd);
+
+	/* hard coded test for spawning just 1 job (JOB not PROCESSES!) */
+	num_apps = 1;
+
+	/* format the app_context_t struct */
+	apps = malloc(sizeof(orte_app_context_t *) * num_apps);
+	apps[0] = OBJ_NEW(orte_app_context_t);
+	apps[0]->num_procs = num_procs;
+	apps[0]->app = strdup(exec_path);
+	apps[0]->cwd = strdup(cwd);
+	/* no special environment variables */
+	apps[0]->num_env = 0;
+	apps[0]->env = NULL;
+	/* no special mapping of processes to nodes */
+	apps[0]->num_map = 0;
+	apps[0]->map_data = NULL;
+	/* setup argv */
+	apps[0]->argv = (char **)malloc(2 * sizeof(char *));
+	apps[0]->argv[0] = strdup(pgm_name);
+	apps[0]->argv[1] = NULL;
+
+	apps[0]->argc = 1;
+
+	printf("Spawning %d processes of job '%s'\n", apps[0]->num_procs, apps[0]->app);
+	printf("\tprogram name '%s'\n", apps[0]->argv[0]);
+	fflush(stdout);
+	
+	//opal_mutex_lock(&opal_event_lock);
+	/* calls the ORTE spawn function with the app to spawn.  Return the
+	 * jobid assigned by the registry/ORTE.  Passes a callback function
+	 * that ORTE will call with state change on this job */
+	printf("LOCKED, now spawning\n"); fflush(stdout);
+	rc = 0;
+	rc = orte_rmgr.spawn(apps, num_apps, &jobid, job_state_callback);
+	//rc = orte_rmgr.spawn(NULL, 0, NULL, NULL);
+	printf("SPAWNED [error code %d = '%s'], now unlocking\n", rc, ORTE_ERROR_NAME(rc)); fflush(stdout);
+	//opal_mutex_unlock(&opal_event_lock);
+	printf("UNLOCKED!\n"); fflush(stdout);
+	
+	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_RUN, rc)) return 1;
+	
+	printf("NEW JOBID = %d\n", jobid); fflush(stdout);
+	
+	/* generate an event stating what the new/assigned job ID is.
+	 * The caller must record this and use this as an identifier to get
+	 * information about a job */
+	//GenerateEvent(ORTE_RUN, jobid);
+	
+	return PROXY_RES_OK;
+}
+
+static void
+job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
+{
+	char *	res;
+	
+	/* not sure yet how we want to handle this callback, what events
+	 * we want to generate, but here are the states that I know of
+	 * that a job can go through.  I've watched ORTE call this callback
+	 * with each of these states.  We'll want to come in here and
+	 * generate events where appropriate */
+	
+	printf("job_state_callback(%d)\n", jobid); fflush(stdout);
+	switch(state) {
+		case ORTE_PROC_STATE_INIT:
+			printf("    state = ORTE_PROC_STATE_INIT\n");
+			break;
+		case ORTE_PROC_STATE_LAUNCHED:
+			printf("    state = ORTE_PROC_STATE_LAUNCHED\n");
+			break;
+		case ORTE_PROC_STATE_AT_STG1:
+			printf("    state = ORTE_PROC_STATE_AT_STG1\n");
+			break;
+		case ORTE_PROC_STATE_AT_STG2:
+			printf("    state = ORTE_PROC_STATE_AT_STG2\n");
+			break;
+		case ORTE_PROC_STATE_RUNNING:
+			printf("    state = ORTE_PROC_STATE_RUNNING\n");
+			break;
+		case ORTE_PROC_STATE_AT_STG3:
+			printf("    state = ORTE_PROC_STATE_AT_STG3\n");
+			break;
+		case ORTE_PROC_STATE_FINALIZED:
+			printf("    state = ORTE_PROC_STATE_FINALIZED\n");
+			break;
+		case ORTE_PROC_STATE_TERMINATED:
+			printf("    state = ORTE_PROC_STATE_TERMINATED\n");
+			break;
+		case ORTE_PROC_STATE_ABORTED:
+			printf("    state = ORTE_PROC_STATE_ABORTED\n");
+			break;
+	}
+
+	asprintf(&res, "%d %d", RTEV_JOBSTATE, state);
+	proxy_svr_event_callback(orte_proxy, res);
+	free(res);
+}
 
 /* this is an internal function we'll call from within this, consider
  * it 'private' */
@@ -526,25 +550,83 @@ ompi_sendcmd(orte_daemon_cmd_flag_t usercmd)
 	int rc;
 	orte_process_name_t seed={0,0,0};
 
+	printf("ompi_sendcmd 1\n"); fflush(stdout);
 	cmd = OBJ_NEW(orte_buffer_t);
+	printf("ompi_sendcmd 2\n"); fflush(stdout);
+	
 	if (NULL == cmd) {
 		fprintf(stderr, "console: comm failure\n");
 		return 1;
 	}
 	command = usercmd;
-
+	
+	printf("ompi_sendcmd 3\n"); fflush(stdout);
 	if (ORTE_SUCCESS != (rc = orte_dps.pack(cmd, &command, 1, ORTE_DAEMON_CMD))) {
 		ORTE_ERROR_LOG(rc);
 		return 1;
 	}
+	
+	printf("ompi_sendcmd 4\n"); fflush(stdout);
 	if (0 > orte_rml.send_buffer(&seed, cmd, ORTE_RML_TAG_DAEMON, 0)) {
 		ORTE_ERROR_LOG(ORTE_ERR_COMM_FAILURE);
 		return 1;
 	}
+	
+	printf("ompi_sendcmd 5\n"); fflush(stdout);
 	OBJ_RELEASE(cmd);
+	printf("ompi_sendcmd 6\n"); fflush(stdout);
 	
 	return 0;
 }
+
+static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd)
+{
+    orte_buffer_t *cmd;
+    orte_daemon_cmd_flag_t command;
+    orte_process_name_t    seed = {0,0,0};
+    int rc;
+
+	printf("ompi_sendcmd 1\n"); fflush(stdout);
+	/*
+    if(!daemon_is_active) {
+        opal_show_help("help-orteconsole.txt", "orteconsole:no-daemon-started", false);
+        return ORTE_SUCCESS;
+    }*/
+    printf("ompi_sendcmd 2\n"); fflush(stdout);
+
+    cmd = OBJ_NEW(orte_buffer_t);
+    printf("ompi_sendcmd 3\n"); fflush(stdout);
+    if (NULL == cmd) {
+        ORTE_ERROR_LOG(ORTE_ERROR);
+        return ORTE_ERROR;
+    }
+
+    command = usercmd;
+	
+	printf("ompi_sendcmd 4\n"); fflush(stdout);
+    rc = orte_dps.pack(cmd, &command, 1, ORTE_DAEMON_CMD);
+    printf("ompi_sendcmd 5\n"); fflush(stdout);
+    if ( ORTE_SUCCESS != rc ) {
+        ORTE_ERROR_LOG(rc);
+        OBJ_RELEASE(cmd);
+        return rc;
+    } 
+
+	printf("ompi_sendcmd 6\n"); fflush(stdout);
+    rc = orte_rml.send_buffer(&seed, cmd, ORTE_RML_TAG_DAEMON, 0);
+    printf("ompi_sendcmd 7\n"); fflush(stdout);
+    if ( 0 > rc ) {
+        ORTE_ERROR_LOG(ORTE_ERR_COMM_FAILURE);
+        OBJ_RELEASE(cmd);
+        return ORTE_ERR_COMM_FAILURE;
+    }
+
+    OBJ_RELEASE(cmd);
+    printf("ompi_sendcmd 8\n"); fflush(stdout);
+
+    return ORTE_SUCCESS;
+}
+
 
 /* JOB RELATED FUNCTIONS */
 
@@ -763,7 +845,8 @@ ompi_sendcmd(orte_daemon_cmd_flag_t usercmd)
 int
 ORTEQuit(void)
 {
-	printf("ORTEQuit ca  sdasdflled!\n");
+	printf("ORTEQuit called!\n"); fflush(stdout);
+	ORTEShutdown();
 	return PROXY_RES_OK;
 }
 
