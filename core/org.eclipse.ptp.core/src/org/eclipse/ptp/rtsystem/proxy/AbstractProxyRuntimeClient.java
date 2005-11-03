@@ -19,13 +19,14 @@
 
 package org.eclipse.ptp.rtsystem.proxy;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.ptp.core.proxy.AbstractProxyClient;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
+import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
+import org.eclipse.ptp.core.proxy.event.ProxyConnectedEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyErrorEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyOKEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
@@ -34,59 +35,39 @@ import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeConnectedEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeEvent;
 
-public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient {
+public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient implements IProxyEventListener {
 	protected List		listeners = new ArrayList(2);
-	private boolean		waiting = false;
 
 	public AbstractProxyRuntimeClient(String host, int port) {
 		super(host, port);
-	}
-	
-	public synchronized void sessionCreate(boolean wait) throws IOException {
-		super.sessionCreate();
-		if (wait) {
-			waiting = true;
-			try {
-				wait();
-			} catch (InterruptedException e) {
-			}
-			waiting = false;
-		}
+		super.addEventListener(this);
 	}
 	
 	public void addEventListener(IProxyRuntimeEventListener listener) {
 		listeners.add(listener);
 	}
-			
-	protected synchronized void fireEvent(IProxyEvent event) {
+	
+	public void handleEvent(IProxyEvent event) {
 		IProxyRuntimeEvent e = null;
-		System.out.println("got event " + event);
-		if (listeners == null)
+		System.out.println("AbstractProxyRuntimeClient.handleEvent() got event " + event);
+		if (listeners == null) {
+			System.out.println("AbstractProxyRuntimeClient.handleEvent() no listeners!");
 			return;
+		}
 		
-		switch (event.getEventID()) {
-		case IProxyEvent.EVENT_OK:
+		if (event instanceof ProxyOKEvent) {
 			e = (IProxyRuntimeEvent) ProxyRuntimeEvent.toEvent(((ProxyOKEvent) event).getData());
-			break;
-			
-		case IProxyEvent.EVENT_ERROR:
+		} else if (event instanceof ProxyErrorEvent) {
 			e = new ProxyRuntimeErrorEvent(null, ((ProxyErrorEvent)event).getErrorCode(), ((ProxyErrorEvent)event).getErrorMessage());
-			break;
-			
-		case IProxyEvent.EVENT_CONNECTED:
+		} else if (event instanceof ProxyConnectedEvent) {
 			e = new ProxyRuntimeConnectedEvent();
-			if (waiting) {
-				System.out.println("NOTIFYIN!");
-				notify();
-			}
-			break;
 		}
 		
 		if (e != null) {
 			Iterator i = listeners.iterator();
 			while (i.hasNext()) {
 				IProxyRuntimeEventListener listener = (IProxyRuntimeEventListener) i.next();
-				listener.fireEvent(e);
+				listener.handleEvent(e);
 			}
 		}
 	}
