@@ -37,9 +37,10 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.IDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
+import org.eclipse.ptp.debug.external.IDebugger;
+import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.variable.Argument;
@@ -130,6 +131,10 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	 * not implement yet
 	 **************************************************************************************************************************************************************************************************/
 	
+	public IAIF getAIFValue(BitList tasks, String expr) throws PCDIException {
+		return null;
+	}
+
 	public void go(BitList tasks) throws PCDIException {
 		final int[] taskArray = tasks.toArray();
 		new Thread(new Runnable() {
