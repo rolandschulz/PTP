@@ -33,10 +33,11 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.IDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
+import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
+import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
@@ -55,6 +56,10 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 	boolean finished = false;
 	private Process debuggerProcess = null;
 	DQueue debuggerOutput = null;
+	
+	public IAIF getAIFValue(BitList tasks, String expr) throws PCDIException {
+		return null;
+	}
 
 	private void initializeSimulatedProcessesCode(DQueue dQ) {
 		dQ.addItem("DEBUG SIMULATOR");
