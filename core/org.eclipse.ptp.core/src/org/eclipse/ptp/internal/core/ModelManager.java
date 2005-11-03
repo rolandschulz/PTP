@@ -624,11 +624,11 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
     private synchronized void wait_for_event() {
         try {
         		System.out.println("MM waiting...");
-            wait();
-            System.out.println("MM awoke!");
+        		wait();
+        		System.out.println("MM awoke!");
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        		// TODO Auto-generated catch block
+        		e.printStackTrace();
         }
     }
 	
@@ -637,7 +637,7 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 		System.out.println("ModelManager - firing up proxy, waiting for connecting.  Please wait!  This can take a minute . . .");
 		try {
 			proxy.addEventListener((IProxyRuntimeEventListener)this);
-			proxy.sessionCreate(false);
+			proxy.sessionCreate();
 			
 			Thread runThread = new Thread("Proxy Server Thread") {
 				public void run() {
@@ -681,7 +681,7 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 		}
 	}
 	
-    public synchronized void fireEvent(IProxyRuntimeEvent e) {
+    public synchronized void handleEvent(IProxyRuntimeEvent e) {
         // TODO Auto-generated method stub
         System.out.println("MODEL MANAGER got event: " + e.toString());
         /*
@@ -691,7 +691,7 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
         }
         */
         //this.events.addItem(e);
-        notify();
+        notifyAll();
     }
 	
 }

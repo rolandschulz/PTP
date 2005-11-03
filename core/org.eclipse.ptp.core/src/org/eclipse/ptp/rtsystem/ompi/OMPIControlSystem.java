@@ -340,7 +340,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		listeners = null;
 	}
 
-    public synchronized void fireEvent(IProxyRuntimeEvent e) {
+    public synchronized void handleEvent(IProxyRuntimeEvent e) {
         // TODO Auto-generated method stub
         System.out.println("got event: " + e.toString());
         /*
@@ -350,6 +350,6 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
         }
         */
         //this.events.addItem(e);
-        notify();
+        notifyAll();
     }
 }
