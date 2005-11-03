@@ -182,19 +182,35 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		args[5] = ""+jobRunConfig.getNumberOfProcessesPerNode()+"";
 		args[6] = "firstNodeNumber";
 		args[7] = ""+jobRunConfig.getFirstNodeNumber()+"";
+		/*
+		try {
+			proxy.startDaemon(ompi_bin_path, orted_path, split_path[split_path.length - 1], split_args);
+			System.out.println("Control SYSTEM: startDaemon command issued!");
+		} catch(IOException e) {
+			System.err.println("Exception starting daemon. :(");
+			System.exit(1);
+		}*/
+		
+		try {
+			proxy.run(jobRunConfig.getPathToExec(), jobRunConfig.getNumberOfProcesses(), false);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+		
 		//jobID = jniBroker.OMPIRun(args);
-		if(jobID == -1) {
-			/* error occurred */
-			//String error_msg = jniBroker.OMPIGetError();
-			//CoreUtils.showErrorDialog("OMPI Parallel Run/Spawn Error", error_msg, null);
-			return null;
-		}
-		else {
-			/* the job creation worked - we have a new job, tell the caller the new job name */
-			String s = new String("job"+jobID);
-			knownJobs.addElement(s);
-			return s;
-		}
+//		if(jobID == -1) {
+//			/* error occurred */
+//			//String error_msg = jniBroker.OMPIGetError();
+//			//CoreUtils.showErrorDialog("OMPI Parallel Run/Spawn Error", error_msg, null);
+//			return null;
+//		}
+//		else {
+//			/* the job creation worked - we have a new job, tell the caller the new job name */
+//			String s = new String("job"+jobID);
+//			knownJobs.addElement(s);
+//			return s;
+//		}
 	}
 
 	public void terminateJob(IPJob job) {
@@ -304,7 +320,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 //					"library load.");
 //			return;
 //		}
-		System.out.println("JAVA OMPI: shutdown() called");
+		System.out.println("OMPIControlSystem: shutdown() called");
 //		
 //		/* shutdown/kill the ORTE daemon */
 //		jniBroker.OMPIShutdown();
