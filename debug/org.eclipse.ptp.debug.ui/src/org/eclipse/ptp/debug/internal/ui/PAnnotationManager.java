@@ -452,6 +452,8 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 								PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation) i.next();
 								//change icon for unregistered processes only if the set is changed
 								if (!isRegisterType(annotation.getType())) {
+									//if all the tasks in current is not match the unregistered tasks, display SET_ANN
+									//simply only display SET_ANN when the current set only contain registered tasks
 									if (currentSet.isRootSet())
 										changeAnnotationType(annotation, IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT);
 									else
@@ -459,6 +461,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 								}
 							}
 						} catch (CoreException e) {
+							System.out.println("asasd");
 							return Status.CANCEL_STATUS;
 						}
 						return Status.OK_STATUS;

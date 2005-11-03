@@ -178,7 +178,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		unregister();
 		if (!isElementRegistered) {
 			register(element);
-			getCurrentElementHandler().addRegisterElement(element.getID());
+			getCurrentElementHandler().addRegisterElement(element);
 		}
 		updateLowerTextRegions();
 	}
@@ -188,9 +188,9 @@ public class ParallelMachineView extends AbstractParallelSetView {
 	public void unregister() {
 		IElementHandler elementHandler = getCurrentElementHandler();
 		IElementSet rootSet = elementHandler.getSetRoot();
-		String[] registerElements = elementHandler.getRegisteredElementsID();
+		IElement[] registerElements = elementHandler.getRegisteredElements();
 		for (int i = 0; i < registerElements.length; i++) {
-			IElement pE = rootSet.get(registerElements[i]);
+			IElement pE = rootSet.get(registerElements[i].getID());
 			if (pE != null)
 				pE.setRegistered(false);
 		}
@@ -251,7 +251,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		IElementHandler elementHandler = getCurrentElementHandler();
 		if (elementHandler == null || cur_element_set == null || elementHandler.totalRegisterElements() == 0)
 			return;
-		String firstRegisteredElementID = elementHandler.getRegisteredElementsID()[0];
+		String firstRegisteredElementID = elementHandler.getRegisteredElements()[0].getID();
 		if (!cur_element_set.contains(firstRegisteredElementID))
 			return;
 		cur_selected_element_id = firstRegisteredElementID;

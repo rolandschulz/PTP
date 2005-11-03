@@ -21,11 +21,10 @@ package org.eclipse.ptp.ui.model.internal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.ptp.ui.model.IContainer;
 import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.ptp.ui.model.IElementHandler;
+import org.eclipse.ptp.ui.model.IElementSet;
 
 /**
  * @author clement chu
@@ -64,7 +63,7 @@ public class ElementHandler extends Container implements IElementHandler {
 		return (IElementSet[])getSorted();
 	}
 	public IElementSet[] getSets() {
-		return (IElementSet[])elementMap.values().toArray(new IElementSet[elementMap.size()]);
+		return (IElementSet[])elementMap.values().toArray(new IElementSet[0]);
 	}
 	public IElementSet getSet(String id) {
 		return (IElementSet)get(id);
@@ -79,26 +78,26 @@ public class ElementHandler extends Container implements IElementHandler {
 			if (sets[i].contains(id))
 				aList.add(sets[i]);
 		}
-		return (IElementSet[])aList.toArray(new IElementSet[aList.size()]);
+		return (IElementSet[])aList.toArray(new IElementSet[0]);
 	}
 
-	public boolean containsRegisterElement(String eid) {
+	public boolean containsRegisterElement(IElement element) {
 		List setList = getRegisteredSetList();
-		return setList.contains(eid);
+		return setList.contains(element);
 	}
-	public void addRegisterElement(String eid) {
+	public void addRegisterElement(IElement element) {
 		List setList = getRegisteredSetList();
-		if (!setList.contains(eid))
-			setList.add(eid);
+		if (!setList.contains(element))
+			setList.add(element);
 	}
-	public void removeRegisterElement(String eid) {
+	public void removeRegisterElement(IElement element) {
 		List setList = getRegisteredSetList();
-		if (setList.contains(eid))
-			setList.remove(eid);
+		if (setList.contains(element))
+			setList.remove(element);
 	}
-	public String[] getRegisteredElementsID() {
+	public IElement[] getRegisteredElements() {
 		List setList = getRegisteredSetList();
-		return (String[])setList.toArray(new String[setList.size()]);
+		return (IElement[])setList.toArray(new IElement[0]);
 	}
 	public void removeAllRegisterElements() {
 		List setList = getRegisteredSetList();

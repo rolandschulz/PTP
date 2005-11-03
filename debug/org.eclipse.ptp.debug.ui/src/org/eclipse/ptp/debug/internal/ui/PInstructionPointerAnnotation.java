@@ -64,7 +64,7 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 		setText(message);
 	}
 	public void setMessage(boolean isRegister) {
-		int[] tasks = getTasks();
+		int[] tasks = getTasks().toArray();
 		if (tasks.length == 0) {
 			setMessage("");
 			deleteMarker();
@@ -98,8 +98,8 @@ public class PInstructionPointerAnnotation extends MarkerAnnotation {
 	public void setTasks(BitList tasks) {
 		this.tasks = tasks;
 	}
-	public int[] getTasks() {
-		return tasks.toArray();
+	public BitList getTasks() {
+		return tasks;
 	}
 	public void addTasks(BitList aTasks) {
 		if (tasks == null) {
