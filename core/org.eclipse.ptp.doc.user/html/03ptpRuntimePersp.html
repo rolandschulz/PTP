@@ -1,0 +1,145 @@
+<html>
+<head>
+<title>Details of the PTP Runtime Perspective</title>
+<head>
+<body>
+
+<h1 id="top">Details of the PTP Runtime Perspective</h1>
+<p>Views in this perspective include the Machines view, and the Jobs view.
+<ul>
+
+<li><a href="#persp">The perspective - overall view</a>
+<li><a href="#machines">The machines view</a>
+<li><a href="#jobs">The jobs view</a>
+</ul>
+
+
+<h2 id="persp"><img src="images/fromPTP/parallel_perspective.gif">PTP Runtime Perspective</h2>
+<p>To populate the PTP Runtime perspective, you should have
+a program running.  See <a href="02pLaunchConfig.html">launching parallel programs </a> for how to launch a parallel program.
+<p>To open the PTP Runtime perspective,
+Select Window > Open Perspective > Other ... and Select PTP Runtime.
+<p>The PTP Runtime Perspective includes
+the Machines view and the Jobs view.
+<p><img src="images/ptpRunOview.gif">
+<h2>Choosing which resources to view</h2>
+<p>Select between the Machines or Jobs view.
+<p><img src="images/resourcesView.gif">
+<h2 id="machines"><img src="images/fromPTP/parallel_perspective.gif">Machines view</h2>
+<p>In the Machines view, an icon represents each node.
+
+<p>
+<table><tr>
+<td><img src="images/machines1.gif"></td>
+
+
+
+
+<td valign="top"><p>Node icons indicate the status of the node:
+<br><img src="images/legendNodes.gif"></td>
+</tr></table>
+
+
+
+<p> <b>Selecting a node:</b>
+Double-click on a node icon to display the node information..
+<p><img src="images/ptpRun2.gif">
+<p>Close-up of node and process info displayed
+<p><img src="images/nodeProcess.gif">
+
+<p>Switch between machines using the dropdown menu
+<img src="images/fromPTP/machine_normal.gif">
+in the toolbar of the Machines view.
+<p><img src="images/selectMachine.gif">
+
+<p> <b>Node state icons:</b>
+Each node in the machines view is indicated by an icon.
+The icons and their meanings are shown in the Legend dialog,
+available from the
+<img src="images/legendIcon.gif"> legend icon in the toolbar.
+<br><img src="images/legend.gif">
+
+<p><b>'Hover' information:</b>
+You can also see information on a particular node by hovering the
+mouse pointer over a node.
+<br><img src="images/nodeHover.gif">
+
+<p><b>Node information:</b>
+To display information on a particular node, double-click
+on the node icon and the Node info box
+<!-- TODO: 'Node info box' or what to call it? -->
+<br>
+will be populated with information about that node.
+Here the Node info box and the hover information on the node are
+both shown.
+<br><img src="images/nodeInfo.gif">
+
+<p><b>Processes running on a node:</b>
+While running, the process information is also shown:
+<br><img src="images/nodeInfoProcess.gif">
+
+<h2 id="jobs"><img src="images/fromPTP/parallel_perspective.gif">Jobs View</h2>
+<p>In the Jobs view, the current status of jobs is shown.
+Running and completed jobs are listed.
+The jobs are shown in the left pane, and the processes running
+in the selected job are shown in the right pane.
+<p><img src="images/jobsView.gif">
+<p>As shown above, hovering over a process shows the MPI task ID and process ID.
+
+Again, the icons and their meanings are shown in the Legend dialog,
+available from the
+<img src="images/legendIcon.gif"> legend icon in the toolbar.
+The Job and process icons are listed again here:
+<table border=1>
+<tr>
+<td>Job status icon</td>
+<td>Process state icon</td>
+</tr>
+<tr>
+<td>
+<img src="images/fromPTP/runmode_normal.gif"> Currently running job
+<br><img src="images/fromPTP/debugmode_normal.gif"> Job under debug
+           <img src="images/q.gif"><img src="images/q.gif"><img src="images/q.gif">
+<br><img src="images/fromPTP/terminate_all_normal.gif"> Finished job
+<br>&nbsp;<br>&nbsp;
+</td>
+<td>
+<img src="images/fromPTP/proc_starting.gif"> process starting
+<br><img src="images/fromPTP/proc_running.gif"> process running
+<br><img src="images/fromPTP/proc_exited.gif"> process exited normally
+<br><img src="images/fromPTP/proc_exited_signal.gif"> process exited with signal
+<br><img src="images/fromPTP/proc_stopped.gif"> process stopped
+<br><img src="images/fromPTP/proc_error.gif"> process error
+</td>
+</tr>
+</table>
+<p>Selecting a job shows the processes belonging to the job.
+<p>The Terminate button can be used to kill a job.
+<p><img src="images/jobsVterm.gif">
+
+
+<p><b>Selecting a process: </b>
+Double-clicking on a process in the right pane of the Jobs view
+brings up a details view for that process.
+<br><img src="images/jobDetailsView.gif"> 
+
+<p><!-- TODO -->Process error: (still under construction)
+
+<p><!-- TODO -->Process information (still under construction)
+
+
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
