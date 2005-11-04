@@ -192,7 +192,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		}*/
 		
 		try {
-			proxy.run(jobRunConfig.getPathToExec(), jobRunConfig.getNumberOfProcesses(), false);
+			proxy.run(jobRunConfig.getPathToExec(), jobRunConfig.getNumberOfProcesses(), jobRunConfig.isDebug());
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
