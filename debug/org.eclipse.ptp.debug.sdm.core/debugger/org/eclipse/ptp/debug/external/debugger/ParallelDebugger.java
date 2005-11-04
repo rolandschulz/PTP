@@ -120,9 +120,9 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	 */
 	private synchronized void waitForEvent() {
 		try {
-			wait();
-			if (!this.events.isEmpty())
-				this.events.removeItem();
+			while (this.events.isEmpty())
+				wait();
+			this.events.removeItem();
 		} catch (InterruptedException e) {
 		}
 	}
@@ -136,10 +136,9 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		try {
 			while (!remain.isEmpty()) {
 				wait();
-
 				while (!this.events.isEmpty()) {
 					IProxyDebugEvent e = (IProxyDebugEvent)this.events.removeItem();
-					remain.andNot(e.getBitSet());
+					remain.andNot(e.getBitSet());		
 				}
 			}
 		} catch (InterruptedException e) {
@@ -422,8 +421,8 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		return null;
 	}
 
-	public synchronized void fireEvent(IProxyDebugEvent e) {
-		System.out.println("got event: " + e.toString());
+	public synchronized void handleEvent(IProxyDebugEvent e) {
+		System.out.println("got debug event: " + e.toString());
 		switch (e.getEventID()) {
 		case IProxyDebugEvent.EVENT_DBG_INIT:
 			numServers = ((ProxyDebugInitEvent)e).getNumServers();
@@ -536,7 +535,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		}
 		
 		this.events.addItem(e);
-		notify();
+		notifyAll();
 	}
 	
 	private ICDIStackFrame convertFrame(ICDIThread thread, ProxyDebugStackframe frame) {
