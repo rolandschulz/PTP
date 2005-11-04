@@ -37,6 +37,8 @@ public class PJob extends Parent implements IPJob {
 	private ArrayList taskIdMap;
 
 	final public static int BASE_OFFSET = 10000;
+	
+	final public static int STATE_NEW = 5000;
 
 	public PJob(IPUniverse uni, String name, String key, int jobNumber) {
 		super(uni, name, key, P_JOB);

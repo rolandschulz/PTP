@@ -41,8 +41,9 @@ public class ProxyRuntimeEvent extends ProxyEvent {
 			break;
 
 		case IProxyRuntimeEvent.EVENT_RUNTIME_JOBSTATE:
-			int state = Integer.parseInt(args[1]);
-			evt = new ProxyRuntimeJobStateEvent(state);
+			int jobid = Integer.parseInt(args[1]);
+			int state = Integer.parseInt(args[2]);
+			evt = new ProxyRuntimeJobStateEvent(jobid, state);
 			break;
 
 		default:
