@@ -50,6 +50,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
+import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
@@ -86,6 +87,8 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 	protected IMonitoringSystem monitoringSystem = null;
 	
 	protected OMPIProxyRuntimeClient proxy = null; 
+	
+	protected Queue events = new Queue();
 
 	public boolean isParallelPerspectiveOpen() {
 		return isPerspectiveOpen;
@@ -578,7 +581,35 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 		*/
 
 		monitor.subTask("Creating the job...");
-		String nejob = controlSystem.run(jobRunConfig);
+		controlSystem.run(jobRunConfig);
+		
+		/*
+		 * Wait for STATE_NEW job state event, but keep processing other events.
+		 * 
+		 * We should wait here so that we can create the new job and return it
+		 * to the launcher.
+		 * 
+		 * Check for errors?
+		 */
+	
+		IPJob job = null;
+		
+		while (true) {
+			IProxyRuntimeEvent event = wait_for_event();
+			
+			if (event == null)
+				break;
+			
+			if (event instanceof ProxyRuntimeJobStateEvent) {
+				ProxyRuntimeJobStateEvent jse = (ProxyRuntimeJobStateEvent)event;
+	        		if(jse.getJobState() == PJob.STATE_NEW) {
+	        			job = newJob(jse);
+	        			break;
+	        		}
+			}
+		}
+		
+		/*
 		if (nejob != null) {
 			PJob job;
 
@@ -601,7 +632,8 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 			fireState(STATE_RUN, nejob);
 			return job;
 		}
-		return null;
+		*/
+		return job;
 	}
 
 	protected void clearUsedMemory() {
@@ -621,16 +653,22 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 		return universe;
 	}	
 	
-    private synchronized void wait_for_event() {
-        try {
+	private synchronized IProxyRuntimeEvent wait_for_event() {
+    		IProxyRuntimeEvent event = null;
+    		
+    		try {
         		System.out.println("MM waiting...");
-        		wait();
+        		while (this.events.isEmpty())
+        			wait();
         		System.out.println("MM awoke!");
-        } catch (InterruptedException e) {
+        		event = (IProxyRuntimeEvent) this.events.removeItem();
+    		} catch (InterruptedException e) {
         		// TODO Auto-generated catch block
         		e.printStackTrace();
-        }
-    }
+    		}
+    		
+    		return event;
+	}
 
 	private void proxyConnect(OMPIProxyRuntimeClient proxy)
 	{
@@ -713,19 +751,23 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
     public synchronized void handleEvent(IProxyRuntimeEvent e) {
         // TODO Auto-generated method stub
         System.out.println("MODEL MANAGER got event: " + e.toString());
+        /*
+         * Moved to run()
+         * TODO remove this code
+         *
         if(e instanceof ProxyRuntimeJobStateEvent) {
         		ProxyRuntimeJobStateEvent e2 = (ProxyRuntimeJobStateEvent)e;
         		if(e2.getJobState() == PJob.STATE_NEW) {
         			newJob(e2);
         		}
-        }
+        }*/
         /*
         if (e.getEventID() == IProxyDebugEvent.EVENT_DBG_INIT) {
             numServers = ((ProxyDebugInitEvent)e).getNumServers();
             System.out.println("num servers = " + numServers);
         }
         */
-        //this.events.addItem(e);
+        this.events.addItem(e);
         notifyAll();
     }
 	
