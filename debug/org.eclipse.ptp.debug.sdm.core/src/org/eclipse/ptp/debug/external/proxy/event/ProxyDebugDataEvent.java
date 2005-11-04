@@ -20,7 +20,7 @@
 package org.eclipse.ptp.debug.external.proxy.event;
 
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.external.aif.IAIF;
+import org.eclipse.ptp.debug.core.aif.IAIF;
 
 public class ProxyDebugDataEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
 	private IAIF data;

@@ -20,7 +20,7 @@ package org.eclipse.ptp.debug.external.cdi;
 
 import java.util.StringTokenizer;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.ptp.debug.external.aif.IAIF;
+import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;

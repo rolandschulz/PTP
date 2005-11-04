@@ -41,7 +41,7 @@ import org.eclipse.cdt.debug.core.cdi.model.type.ICDIShortType;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIStructType;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
 import org.eclipse.cdt.debug.core.cdi.model.type.ICDIWCharType;
-import org.eclipse.ptp.debug.external.aif.IAIF;
+import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
