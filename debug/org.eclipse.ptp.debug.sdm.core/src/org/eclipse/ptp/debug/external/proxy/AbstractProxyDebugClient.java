@@ -35,12 +35,14 @@ import org.eclipse.ptp.debug.external.proxy.event.IProxyDebugEventListener;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugErrorEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugEvent;
 
-public abstract class AbstractProxyDebugClient extends AbstractProxyClient {
+public abstract class AbstractProxyDebugClient extends AbstractProxyClient implements IProxyEventListener {
 	protected List		listeners = new ArrayList(2);
 	private boolean		waiting = false;
+	private boolean		connected = false;
 
 	public AbstractProxyDebugClient(String host, int port) {
 		super(host, port);
+		super.addEventListener(this);
 	}
 	
 	public synchronized void sessionCreate(boolean wait) throws IOException {
@@ -48,7 +50,8 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient {
 		if (wait) {
 			waiting = true;
 			try {
-				wait();
+				while (!connected)
+					wait();
 			} catch (InterruptedException e) {
 			}
 			waiting = false;
@@ -78,7 +81,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient {
 		listeners.remove(listener);
 	}
 		
-	protected synchronized void fireEvent(IProxyEvent event) {
+	public synchronized void handleEvent(IProxyEvent event) {
 		IProxyDebugEvent e = null;
 System.out.println("got event " + event);
 		if (listeners == null)
@@ -95,7 +98,8 @@ System.out.println("got event " + event);
 			
 		case IProxyEvent.EVENT_CONNECTED:
 			if (waiting) {
-				notify();
+				connected = true;
+				notifyAll();
 			}
 			return;
 		}
@@ -104,7 +108,7 @@ System.out.println("got event " + event);
 			Iterator i = listeners.iterator();
 			while (i.hasNext()) {
 				IProxyDebugEventListener listener = (IProxyDebugEventListener) i.next();
-				listener.fireEvent(e);
+				listener.handleEvent(e);
 			}
 		}
 	}
