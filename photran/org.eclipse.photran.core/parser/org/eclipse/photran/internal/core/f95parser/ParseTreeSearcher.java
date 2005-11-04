@@ -259,7 +259,7 @@ public final class ParseTreeSearcher
     {
         if (node == null) return false;
 
-        for (Iterator it = node.getChildren().iterator(); it.hasNext();)
+        for (Iterator it = node.iterator(); it.hasNext();)
         {
             AbstractParseTreeNode child = (AbstractParseTreeNode)it.next();
             if (child instanceof Token)

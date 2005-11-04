@@ -184,7 +184,7 @@ final class DeclarationCollector extends ParseTreeVisitor
         
     	public void visitXprefixspec(ParseTreeNode node)
     	{
-    	    AbstractParseTreeNode child = (AbstractParseTreeNode)node.getChildren().getFirst();
+    	    AbstractParseTreeNode child = (AbstractParseTreeNode)node.getFirstChild();
     	    
     	    if (child instanceof ParseTreeNode && ((ParseTreeNode)child).getRootNonterminal() == Nonterminal.XTYPESPEC)
     	        entry.setReturnType(SymbolTableType.createFromTypeSpecNode((ParseTreeNode)child));
