@@ -20,11 +20,17 @@
 package org.eclipse.ptp.rtsystem.proxy.event;
 
 public class ProxyRuntimeJobStateEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeEvent {
+	private int		jobID;
 	private int		jobState;
 
-	public ProxyRuntimeJobStateEvent(int state) {
+	public ProxyRuntimeJobStateEvent(int jobid, int state) {
 		super(EVENT_RUNTIME_JOBSTATE);
+		this.jobID = jobid;
 		this.jobState = state;
+	}
+	
+	public int getJobID() {
+		return this.jobID;
 	}
 	
 	public int getJobState() {
@@ -32,6 +38,6 @@ public class ProxyRuntimeJobStateEvent extends AbstractProxyRuntimeEvent impleme
 	}
 	
 	public String toString() {
-		return "EVENT_RUNTIME_JOBSTATE " + this.jobState;
+		return "EVENT_RUNTIME_JOBSTATE (jobid="+jobID+") state=" + this.jobState;
 	}
 }

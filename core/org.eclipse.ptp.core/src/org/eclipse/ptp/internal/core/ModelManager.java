@@ -60,6 +60,7 @@ import org.eclipse.ptp.rtsystem.ompi.OMPIMonitoringSystem;
 import org.eclipse.ptp.rtsystem.ompi.OMPIProxyRuntimeClient;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeJobStateEvent;
 import org.eclipse.ptp.rtsystem.simulation.SimProcess;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
@@ -618,8 +619,7 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 
 	public IPUniverse getUniverse() {
 		return universe;
-	}
-	
+	}	
 	
     private synchronized void wait_for_event() {
         try {
@@ -631,7 +631,7 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
         		e.printStackTrace();
         }
     }
-	
+
 	private void proxyConnect(OMPIProxyRuntimeClient proxy)
 	{
 		System.out.println("ModelManager - firing up proxy, waiting for connecting.  Please wait!  This can take a minute . . .");
@@ -680,10 +680,45 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 			System.exit(1);
 		}
 	}
+
+	private IPJob newJob(ProxyRuntimeJobStateEvent e) {
+		int jobID;
+		String jobName;
+
+		jobID = e.getJobID();
+		jobName = "job"+jobID;
+		
+		System.out.println("MODEL MANAGER: newJob("+jobID+")");
+		
+		PJob job;
+		
+		job = new PJob(universe, jobName, "" + (PJob.BASE_OFFSET + jobID) + "", jobID);
+		
+		System.err.println("TODO: MM.newJob() - We need to figure out how to setDebug on this Job if it's under debug control");
+		
+		universe.addChild(job);
+		try {
+			getProcsForNewJob(jobName, job, null);
+		} catch(InterruptedException e2) {
+			universe.deleteJob(job);
+			System.err.println("TODO: MM.newJob() we need to throw a CoreException CANCEL_STATUS here somehow.");
+			//throw new CoreException(Status.CANCEL_STATUS);
+		}
+		
+		fireState(STATE_RUN, jobName);
+		
+		return job;
+	}
 	
     public synchronized void handleEvent(IProxyRuntimeEvent e) {
         // TODO Auto-generated method stub
         System.out.println("MODEL MANAGER got event: " + e.toString());
+        if(e instanceof ProxyRuntimeJobStateEvent) {
+        		ProxyRuntimeJobStateEvent e2 = (ProxyRuntimeJobStateEvent)e;
+        		if(e2.getJobState() == PJob.STATE_NEW) {
+        			newJob(e2);
+        		}
+        }
         /*
         if (e.getEventID() == IProxyDebugEvent.EVENT_DBG_INIT) {
             numServers = ((ProxyDebugInitEvent)e).getNumServers();
