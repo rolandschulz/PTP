@@ -186,6 +186,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			}
 			
 			IPJob job = getLaunchManager().run(launch, workDirectory, null, jrunconfig, new SubProgressMonitor(monitor, 5));
+			if (job == null)
+				return;
+			
 			job.setAttribute(PreferenceConstants.JOB_APP, exePath.lastSegment());
 			job.setAttribute(PreferenceConstants.JOB_WORK_DIR, workDirectory.getAbsolutePath());
 			job.setAttribute(PreferenceConstants.JOB_ARGS, args);
@@ -218,7 +221,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			getLaunchManager().setPTPConfiguration(configuration);
+			//getLaunchManager().setPTPConfiguration(configuration); TODO remove this from ModelManager as it doesn't seem to be used any more
 		} finally {
 			monitor.done();
 		}
