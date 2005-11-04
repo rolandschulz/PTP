@@ -1,0 +1,185 @@
+<html>
+<head>
+<title>The PTP Debug Perspective</title>
+</head>
+<body>
+
+<h1>The PTP Debug Perspective</h1>
+<ul>
+<li><a href="#feat">PTP Debug Perspective </a> - main features
+<li><a href="#pSets">Process Sets</a>
+<li><a href="#pSetsOper">Operations on Process Sets</a>
+<li><a href="#pSetsCreate">Creating Process Sets</a>
+<li><a href="#pSetsOper">Operations on Process Sets</a>
+<li><a href="#bkpt">Breakpoints</a>
+<li><a href="#cip">Current Instruction Pointer</a>
+<li><a href="#reg">Process Registration </a>
+
+</ul>
+
+<h2 id="feat">Main features of the PTP Debug perspective</h2>
+<br>
+<img src="images/ptpDebugOview.gif">
+
+
+<h2>Launching a parallel debug session</h2>
+<ul>
+<li>Create a Parallel Application in the usual way
+<p><!-- TODO: need screenshot -->
+(See <a href="02pLaunchConfig.html">Launching parallel programs</a>)
+</li>
+<li>Select 'Stop in main' to automatically stop the job</li>
+<li>Select 'Debugger' tab to change any default settings (not normally required)</li>
+<li>Select Apply, then Debug
+<p>For existing Parallel Application launch configurations,
+launch using the debug button rather than the Run button
+<p>
+<img src="images/parDebugIcon.gif">
+</li>
+
+<li>Eclipse will switch to the PTP Debug perspective.</li>
+</ul>
+<h2 id="pSets">Process Sets</h2>
+<p>Traditional debuggers apply operations to a single
+process.  Parallel debugging operations apply to a single process
+<i>or to arbitrary collections of processes.</i> 
+<p>A <i>process set </i> is a means of simultaneously referring
+to one or more processes.
+
+<p>When a parallel debug session is first started, all processes are placed
+in a set, called the 'Root' set.  Sets are always associated with a single Job.
+A job can have any number of process sets.  A set can contain from 1 to the
+number of processes in a job.
+<p><img src="images/pSets.gif">
+<h2 id="pSetsOper">Operations on Process sets</h2>
+<p>
+<br><img src="images/pSetOper.gif">
+<p>
+<ul>
+<li>Create/add to set</li>
+<li>Delete set</li>
+<li>Remove from set</li>
+<li>Change current set</li>
+</ul>
+<p>Debug operations always apply to the current set.
+<br><img src="images/pSetDebug.gif">
+
+<h2 id="pSetsCreate">Creating Process Sets</h2>
+<p><!-- TODO : need screenshots here--> 
+<p>Select the processes to be placed in the set
+by selecting a rectangular region with the mouse,
+or click the mouse and shift-click or ctrl-click to 
+select a contiguous region, or separate processes, respectively.
+<br><img src="images/pSetSelect.gif">
+<p>
+<p>Choose the set to add processes to
+<br><img src="images/pSetChoose.gif">
+<p>To remove processes from a set, select the processes
+as described above, and remove them.
+<br><img src="images/pSetSelect.gif">
+<p>To change the current process set, select the icon
+<img src="images/pSetChooseIcon.gif">
+and choose from the list.  Clicking on the icon will cycle through
+the sets.)
+<br><img src="images/pSetChange.gif">
+<p>Select the "Delete Set" icon to delete the current process set.
+<br><img src="images/pSetDelete.gif">
+
+<h2 id="bkpt">Breakpoints</h2>
+<p>There are two main types of breakpoints.
+<ul>
+<li><i>Global Breakpoints</i> apply to <i>all</i> processes in <i>any</i> job. 
+
+<br><img src="images/bkptGlobal.gif">
+
+</li>
+<li><i>Set Breakpoints</i> apply only to a process in a particular set
+for a single job. 
+<p>Green indicates the breakpoint is applied to the current set. 
+<br>Blue indicates the breakpoint is applied to some other set.
+<br><img src="images/bkptSet.gif">
+
+ </li>
+
+</ul>
+
+<h3>Setting Breakpoints</h3><p>
+To create a breakpoint, double-click on the left edge of 
+an editor window, at the line on which you want to set the breakpoint.
+Or, right click and use the context menu.
+<br><img src="images/bkptSetContext.gif">
+<p>A global breakpoint is created if no jobs are selected.
+If a job is selected, the breakpoint will apply to the current set.
+<h3>Breakpoint information</h3>
+<p>Hover over a breakpoint to see more information.
+<br><img src="images/bkptHover.gif">
+<p>Use the Breakpoints view to see all breakpoints.
+<br><img src="images/bkptsView.gif">
+<p>Use the menu in the Breakpoints view to group breakpoints
+by type.
+<br><img src="images/bkptsViewMenu.gif">
+
+<h2 id="cip">Current Instruction Pointer</h2>
+<p>The current instruction pointer is used to show the current
+location of <i>suspended</i> processes.
+In traditional programs, there is a single instruction pointer.
+(The exception to this is multi-threaded programs.)
+In parallel programs, there is an instruction pointer for every process.
+<p>The PTP debugger shows one instruction pointer for
+<i>every group of processes at the same location</i>.
+<blockquote><b>Note:</b> The group of processes represented by an instruction pointer
+is not necessarily the same as a process set.</blockquote>
+<p>In the normal debugger, the single instruction pointer
+is indicated with the blue arrow icon.  The current source line is also highlighted.
+<br><img src="images/sip.gif">
+<p>In the PTP (parallel) debugger, there are multiple instruction pointers.
+<br><img src="images/mip.gif">
+<p>Hovering over the instruction pointer provides additional information.
+<br><img src="images/cipHover.gif">
+<h2 id="reg">Process Registration</h2>
+<p>Process set commands apply to groups of processes.
+For finer control and more detailed information, a process can be
+<i>registered</i>.
+Registered processes appear in the 'Debug' view.
+Any number of processes can be registered,
+and processes can be registered or un-registered at any time.
+<p>To register a process, double-click its process icon.
+<br><img src="images/reg1.gif">
+<p>To un-register a process, double-click on the same icon.
+<h2>Putting it all together</h2>
+<p>Try this:
+<ul>
+<li>Set a global breakpont</li>
+<li>Start a 100 process job</li>
+<li>When the breakpoint is reached,</li>
+  <ul>
+  <li>Create a process set containing processes 0-10 (set_1)
+  <li>Create a process set containing processes 20-30 (set_2)
+  <li>Single step all processes
+  <li>Single step processes in set_1
+  <li>Register a process
+  <li>Single step the registered process
+  <li>Select a stack frame and view the variables
+  </ul>
+<li>Terminate execution</li>
+
+</ul>
+
+
+
+
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
