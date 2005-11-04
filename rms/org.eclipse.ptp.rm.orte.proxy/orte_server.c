@@ -32,6 +32,8 @@
 #define RTEV_ERROR_ORTE_FINALIZE	RTEV_OFFSET + 1001
 #define RTEV_ERROR_ORTE_RUN		RTEV_OFFSET + 1002
 
+#define JOB_STATE_NEW				5000
+
 int ORTEIsShutdown(void);
 int ORTEQuit(void);
 
@@ -425,6 +427,7 @@ int
 ORTERun(char **args)
 {
 	int rc; 
+	char *res;
 	
 	int i;
 	orte_jobid_t jobid = ORTE_JOBID_MAX;
@@ -484,6 +487,10 @@ ORTERun(char **args)
 	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_RUN, rc)) return 1;
 	
 	printf("NEW JOBID = %d\n", jobid); fflush(stdout);
+	
+	asprintf(&res, "%d %d %d", RTEV_JOBSTATE, jobid, JOB_STATE_NEW);
+	proxy_svr_event_callback(orte_proxy, res);
+	free(res);
 	
 	/* generate an event stating what the new/assigned job ID is.
 	 * The caller must record this and use this as an identifier to get
