@@ -3,13 +3,9 @@ package org.eclipse.photran.internal.ui.editor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.cdt.internal.ui.text.CAutoIndentStrategy;
-import org.eclipse.cdt.internal.ui.text.CCommentAutoIndentStrategy;
-import org.eclipse.cdt.internal.ui.text.ICPartitions;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
@@ -36,8 +32,6 @@ import org.eclipse.swt.widgets.Display;
  */
 public class FortranSourceViewerConfiguration extends SourceViewerConfiguration {
 	protected AbstractFortranEditor editor;
-
-	private FortranDoubleClickStrategy doubleClickStrategy = new FortranDoubleClickStrategy();
 
 	private PresentationReconciler reconciler;
 
@@ -100,13 +94,6 @@ public class FortranSourceViewerConfiguration extends SourceViewerConfiguration 
 	 */
 	protected IPreferenceStore getPreferenceStore() {
 		return FortranUIPlugin.getDefault().getPreferenceStore();
-	}
-
-	// ----- CUSTOM DOUBLE-CLICK ACTION ----------------------------------------
-
-	public ITextDoubleClickStrategy getDoubleClickStrategy(
-			ISourceViewer sourceViewer, String contentType) {
-		return doubleClickStrategy;
 	}
 	
 	// ----- AUTO-INDENTING STRATEGY ------------------------------------------
