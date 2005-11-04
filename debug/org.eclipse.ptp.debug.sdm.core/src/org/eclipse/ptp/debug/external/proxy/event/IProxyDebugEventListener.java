@@ -20,5 +20,5 @@
 package org.eclipse.ptp.debug.external.proxy.event;
 
 public interface IProxyDebugEventListener {
-	public void fireEvent(IProxyDebugEvent e);
+	public void handleEvent(IProxyDebugEvent e);
 }
