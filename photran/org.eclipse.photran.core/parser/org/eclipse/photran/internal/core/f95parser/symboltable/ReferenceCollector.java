@@ -9,6 +9,7 @@ import org.eclipse.photran.internal.core.f95parser.ParseTreeVisitor;
 import org.eclipse.photran.internal.core.f95parser.SemanticError;
 import org.eclipse.photran.internal.core.f95parser.Terminal;
 import org.eclipse.photran.internal.core.f95parser.Token;
+import org.eclipse.photran.internal.core.f95parser.symboltable.entries.VariableEntry;
 
 /**
  * This should be called after creating an initial symbol table hierarchy via a
@@ -107,9 +108,14 @@ final class ReferenceCollector extends ParseTreeVisitor
         SymbolTableEntry entry = getCurrentParent().getEntryInHierarchyFor(token.getText());
         if (entry != null)
             entry.addReference(token);
-        else if (getCurrentParent().getImplicitSpec() == null)
-            throw new SemanticError(token, token.getText()
-                + " is used but not defined in an \"implicit none\" context");
+        else if (getCurrentParent().isImplicitNone())
+            throw new SemanticError(token, token.getText() + " is used but not defined in an \"implicit none\" context");
+        else // implicitly-declared variable
+        {
+            VariableEntry newEntry = new VariableEntry(getCurrentParent(), token, token.getParent());
+            newEntry.setImplicitDeclared(true);
+            getCurrentParent().addEntry(newEntry);
+        }
     }
 
     //--VISITOR METHODS-------------------------------------------------

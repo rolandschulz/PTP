@@ -65,6 +65,11 @@ public class SymbolTable
     {
         return implicitSpec;
     }
+    
+    public boolean isImplicitNone()
+    {
+        return implicitSpec == null;
+    }
 
     /**
      * Sets the IMPLICIT specification for this symbol table: either a valid

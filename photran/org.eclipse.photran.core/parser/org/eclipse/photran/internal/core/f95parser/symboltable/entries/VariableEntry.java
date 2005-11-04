@@ -25,7 +25,7 @@ public class VariableEntry extends SymbolTableEntry
             && correspondingParseTreeNode.getRootNonterminal() != Nonterminal.XNAME
             && correspondingParseTreeNode.getRootNonterminal() != Nonterminal.XSUBROUTINEPAR
             && correspondingParseTreeNode.getRootNonterminal() != Nonterminal.XOBJECTNAME)
-            throw new SymbolTableError("The ParseTreeNode passed to the VariableEntry constructor should be one of the following: xComponentName, xFunctionPar, xName (if in the RESULT clause of a function), xSubroutinePar, xObjectName");
+            throw new SymbolTableError("The ParseTreeNode passed to the VariableEntry constructor should be one of the following: xComponentName, xFunctionPar, xName (if IMPLICIT or in the RESULT clause of a function), xSubroutinePar, xObjectName");
     }
 
     public String getTypeDescription()
@@ -82,5 +82,15 @@ public class VariableEntry extends SymbolTableEntry
     public void setFunctionOrSubroutineParameter(boolean isFunctionOrSubroutineParameter)
     {
         this.isFunctionOrSubroutineParameter = isFunctionOrSubroutineParameter;
+    }
+    
+    private boolean isImplicit = false;
+    public boolean isImplicitlyDeclared()
+    {
+        return isImplicit;
+    }
+    public void setImplicitDeclared(boolean isImplicit)
+    {
+        this.isImplicit = isImplicit;
     }
 }
