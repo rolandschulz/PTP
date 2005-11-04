@@ -6,11 +6,12 @@ Bundle-Version: 1.0.0
 Bundle-Activator: org.eclipse.ptp.debug.core.PTPDebugCorePlugin
 Bundle-Localization: plugin
 Export-Package: org.eclipse.ptp.debug.core,
+ org.eclipse.ptp.debug.core.aif,
  org.eclipse.ptp.debug.core.cdi,
  org.eclipse.ptp.debug.core.cdi.event,
  org.eclipse.ptp.debug.core.cdi.model,
- org.eclipse.ptp.debug.core.model,
  org.eclipse.ptp.debug.core.launch,
+ org.eclipse.ptp.debug.core.model,
  org.eclipse.ptp.debug.core.sourcelookup
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
