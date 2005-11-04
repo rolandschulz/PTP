@@ -53,7 +53,15 @@ public class AIF implements IAIF {
 	}
 	
 	public static void convertToAIF(AIF aif, String format, byte[] data) {
+		IAIFType type = null;
+		IAIFValue val = null;
+		
 		switch (format.charAt(0)) {
+		case FDS_CHARACTER:
+			type = new AIFTypeCharacter();
+			val = new AIFValueCharacter((char)data[0]);
+			break;
+
 		case FDS_FLOATING:
 			int floatLen = Character.digit(format.charAt(FDS_FLOATING_LEN_POS), 10);
 			double floatVal;
@@ -64,8 +72,8 @@ public class AIF implements IAIF {
 				BigInteger intBits = new BigInteger(data);
 				floatVal = (double)Float.intBitsToFloat(intBits.intValue());
 			}
-			aif.setType(new AIFTypeFloating(floatLen));
-			aif.setValue(new AIFValueFloating(floatVal));
+			type = new AIFTypeFloating(floatLen);
+			val = new AIFValueFloating(floatVal);
 			break;
 			
 		case FDS_INTEGER:
@@ -74,10 +82,18 @@ public class AIF implements IAIF {
 			BigInteger intVal = new BigInteger(data);
 			if (!signed) 
 				intVal = intVal.abs();
-			aif.setType(new AIFTypeInteger(signed, intLen));
-			aif.setValue(new AIFValueInteger(intVal));
+			type = new AIFTypeInteger(signed, intLen);
+			val = new AIFValueInteger(intVal);
+			break;
+		
+		default:
+			type = new AIFTypeUnknown(format);
+			val = new AIFValueUnknown();
 			break;
 		}
+		
+		aif.setType(type);
+		aif.setValue(val);
 	}
 
 	public IAIFType getType() {
