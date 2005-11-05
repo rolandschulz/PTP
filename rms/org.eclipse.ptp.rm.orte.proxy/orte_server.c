@@ -27,6 +27,7 @@
 #define RTEV_OK					RTEV_OFFSET + 0
 #define RTEV_ERROR				RTEV_OFFSET + 1
 #define RTEV_JOBSTATE				RTEV_OFFSET + 2
+#define RTEV_NEWJOB				RTEV_OFFSET + 11
 
 #define RTEV_ERROR_ORTE_INIT		RTEV_OFFSET + 1000
 #define RTEV_ERROR_ORTE_FINALIZE	RTEV_OFFSET + 1001
@@ -113,7 +114,7 @@ ORTECheckErrorCode(int type, int rc)
 		char *res;
 		printf("ARgh!  An error!\n"); fflush(stdout);
 		printf("ERROR %s\n", ORTE_ERROR_NAME(rc)); fflush(stdout);
-		asprintf(&res, "%d %s", type, ORTE_ERROR_NAME(rc));
+		asprintf(&res, "%d %d %s", RTEV_ERROR, type, ORTE_ERROR_NAME(rc));
 		printf("ERROR: %s\n", res); fflush(stdout);
 		proxy_svr_event_callback(orte_proxy, res);
 		free(res);
@@ -127,6 +128,7 @@ ORTECheckErrorCode(int type, int rc)
 int ORTEStartDaemon(char **args)
 {
 	int ret;
+	char *res;
 	
 	printf("START DAEMON CALLED!  OMG!\n");
 	
@@ -262,8 +264,22 @@ int ORTEStartDaemon(char **args)
 			break;
 	}
 
-	printf("Start daemon returning.\n");
-	ORTEInit();
+	if (ret != 0) {
+		printf("Start daemon returning ERROR.\n");
+		asprintf(&res, "%d %d %s", RTEV_ERROR, RTEV_ERROR_ORTE_INIT, "initialization failed");
+		proxy_svr_event_callback(orte_proxy, res);
+		free(res);
+		return 0;
+	}
+	
+	if (ORTEInit() != 0)
+		return 0;
+	
+	printf("Start daemon returning OK.\n");
+	asprintf(&res, "%d", RTEV_OK);
+	proxy_svr_event_callback(orte_proxy, res);
+	free(res);
+	
 	return 0;
 }
 
@@ -488,7 +504,7 @@ ORTERun(char **args)
 	
 	printf("NEW JOBID = %d\n", jobid); fflush(stdout);
 	
-	asprintf(&res, "%d %d %d", RTEV_JOBSTATE, jobid, JOB_STATE_NEW);
+	asprintf(&res, "%d %d", RTEV_NEWJOB, jobid);
 	proxy_svr_event_callback(orte_proxy, res);
 	free(res);
 	
@@ -542,7 +558,7 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 			break;
 	}
 
-	asprintf(&res, "%d %d", RTEV_JOBSTATE, state);
+	asprintf(&res, "%d %d %d", jobid, RTEV_JOBSTATE, state);
 	proxy_svr_event_callback(orte_proxy, res);
 	free(res);
 }
@@ -852,8 +868,12 @@ static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd)
 int
 ORTEQuit(void)
 {
+	char *res;
 	printf("ORTEQuit called!\n"); fflush(stdout);
 	ORTEShutdown();
+	asprintf(&res, "%d", RTEV_OK);
+	proxy_svr_event_callback(orte_proxy, res);
+	free(res);	
 	return PROXY_RES_OK;
 }
 
