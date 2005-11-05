@@ -100,6 +100,22 @@ static struct option longopts[] = {
 	{NULL,				0,					NULL,	0}
 };
 
+char *
+ORTEErrorStr(int type, char *msg)
+{
+	char *str;
+	static char *res = NULL;
+	
+	if (res != NULL)
+		free(res);
+	
+	proxy_cstring_to_str(msg, &str);
+	asprintf(&res, "%d %d %s", RTEV_ERROR, type, str);
+	free(str);
+	
+	return res;	
+}
+
 int
 ORTEInitialized(void)
 {
@@ -111,13 +127,9 @@ ORTECheckErrorCode(int type, int rc)
 {
 	printf("Checking error code...\n"); fflush(stdout);
 	if(rc != ORTE_SUCCESS) {
-		char *res;
 		printf("ARgh!  An error!\n"); fflush(stdout);
 		printf("ERROR %s\n", ORTE_ERROR_NAME(rc)); fflush(stdout);
-		asprintf(&res, "%d %d %s", RTEV_ERROR, type, ORTE_ERROR_NAME(rc));
-		printf("ERROR: %s\n", res); fflush(stdout);
-		proxy_svr_event_callback(orte_proxy, res);
-		free(res);
+		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(type, (char *)ORTE_ERROR_NAME(rc)));
 		return 1;
 	}
 	
@@ -135,13 +147,9 @@ int ORTEStartDaemon(char **args)
 	switch(orted_pid = fork()) {
 		case -1:
 			{
-				char *res;
-				
-				asprintf(&res, "ERROR fork() failed for the orted spawn in ORTESpawnDaemon");
+				res = ORTEErrorStr(RTEV_ERROR_ORTE_INIT, "fork() failed for the orted spawn in ORTESpawnDaemon");
 				proxy_svr_event_callback(orte_proxy, res);
-				printf("\t%s", res);
-				free(res);
-				
+				printf("\t%s\n", res);
 				return 1;
 			}
 			break;
@@ -163,12 +171,10 @@ int ORTEStartDaemon(char **args)
 	
 				orted_args_len = len - 4;
 				if(orted_args_len < 0) {
-					char *res;
-		
-					asprintf(&res, "ERROR in args to ORTEStartDaemon.  Not enough arguments sent!");
+					res = ORTEErrorStr(RTEV_ERROR_ORTE_INIT, "Not enough arguments sent!");
 					proxy_svr_event_callback(orte_proxy, res);
+
 					printf("\t%s\n", res);
-					free(res);
 		
 					return 1;
 				}
@@ -266,9 +272,8 @@ int ORTEStartDaemon(char **args)
 
 	if (ret != 0) {
 		printf("Start daemon returning ERROR.\n");
-		asprintf(&res, "%d %d %s", RTEV_ERROR, RTEV_ERROR_ORTE_INIT, "initialization failed");
+		res = ORTEErrorStr(RTEV_ERROR_ORTE_INIT, "initialization failed");
 		proxy_svr_event_callback(orte_proxy, res);
-		free(res);
 		return 0;
 	}
 	
@@ -453,6 +458,10 @@ ORTERun(char **args)
 	int num_apps;
 	char *exec_path = args[1];
 	int num_procs = atoi(args[2]);
+	int debug = 0;
+	
+	if (strcmp(args[3], "true") == 0)
+		debug++;
 
 	c = rindex(exec_path, '/');
 
