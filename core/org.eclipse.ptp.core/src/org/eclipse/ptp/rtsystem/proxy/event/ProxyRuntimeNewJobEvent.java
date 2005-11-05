@@ -19,43 +19,19 @@
 
 package org.eclipse.ptp.rtsystem.proxy.event;
 
-import org.eclipse.ptp.core.proxy.event.IProxyEvent;
-import org.eclipse.ptp.core.proxy.event.ProxyErrorEvent;
-import org.eclipse.ptp.core.proxy.event.ProxyEvent;
+public class ProxyRuntimeNewJobEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeEvent {
+	private int		jobID;
 
-public class ProxyRuntimeEvent extends ProxyEvent {
-	public static IProxyEvent toEvent(String str) {
-		IProxyRuntimeEvent evt = null;
-		String[] args = str.split(" ");
-		
-		int type = Integer.parseInt(args[0]);
-		
-		switch (type) {
-		case IProxyRuntimeEvent.EVENT_RUNTIME_OK:
-			evt = new ProxyRuntimeOKEvent();
-			break;
-			
-		case IProxyRuntimeEvent.EVENT_RUNTIME_ERROR:
-			int errCode = Integer.parseInt(args[1]);
-			evt = new ProxyRuntimeErrorEvent(errCode, decodeString(args[2]));
-			break;
-
-		case IProxyRuntimeEvent.EVENT_RUNTIME_JOBSTATE:
-			int jobid = Integer.parseInt(args[1]);
-			int state = Integer.parseInt(args[2]);
-			evt = new ProxyRuntimeJobStateEvent(jobid, state);
-			break;
-
-		case IProxyRuntimeEvent.EVENT_RUNTIME_NEWJOB:
-			int njobid = Integer.parseInt(args[1]);
-			evt = new ProxyRuntimeNewJobEvent(njobid);
-			break;
-
-		default:
-			evt = new ProxyRuntimeErrorEvent(ProxyErrorEvent.EVENT_ERR_EVENT, "Invalid event type");
-			break;
-		}
-		
-		return evt;
+	public ProxyRuntimeNewJobEvent(int jobid) {
+		super(EVENT_RUNTIME_NEWJOB);
+		this.jobID = jobid;
+	}
+	
+	public int getJobID() {
+		return this.jobID;
+	}
+	
+	public String toString() {
+		return "EVENT_RUNTIME_NEWJOB jobid="+jobID;
 	}
 }

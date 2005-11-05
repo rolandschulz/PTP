@@ -35,6 +35,7 @@ public interface IProxyRuntimeEvent extends IProxyEvent {
 	public static final int EVENT_RUNTIME_NODEATTR = RUNTIME_EVENT_OFFSET + 8;
 	public static final int EVENT_RUNTIME_MACHID = RUNTIME_EVENT_OFFSET + 9;
 	public static final int EVENT_RUNTIME_CONNECTED = RUNTIME_EVENT_OFFSET + 10;
+	public static final int EVENT_RUNTIME_NEWJOB = RUNTIME_EVENT_OFFSET + 11;
 	
 	public BitList getBitSet();
 }
