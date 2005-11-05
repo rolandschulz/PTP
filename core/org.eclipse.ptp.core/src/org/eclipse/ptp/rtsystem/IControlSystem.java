@@ -27,7 +27,7 @@ import org.eclipse.ptp.rtsystem.JobRunConfiguration;
  */
 public interface IControlSystem {	
 	/* returns the new job name string that it spawns, unique */
-	public String run(JobRunConfiguration jobRunConfig);
+	public int run(JobRunConfiguration jobRunConfig);
 
 	public void terminateJob(IPJob job);
 	
