@@ -37,10 +37,11 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.IDebugger;
+import org.eclipse.ptp.debug.external.aif.AIF;
+import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.variable.Argument;
@@ -132,7 +133,14 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	 **************************************************************************************************************************************************************************************************/
 	
 	public IAIF getAIFValue(BitList tasks, String expr) throws PCDIException {
-		return null;
+		SimVariable variable = findVariable(expr);
+		if (variable == null)
+			variable = findArgument(expr);
+		if (variable == null)
+			return new AIF("unknown", new byte[0]);
+
+		String value = "" + random(10,20);
+		return new AIF("is4", value.getBytes());
 	}
 
 	public void go(BitList tasks) throws PCDIException {
