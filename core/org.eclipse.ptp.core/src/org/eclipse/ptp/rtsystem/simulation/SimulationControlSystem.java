@@ -58,7 +58,7 @@ public class SimulationControlSystem implements IControlSystem {
 	}
 	
 	/* returns the new job name that it started - unique */
-	public String run(JobRunConfiguration jobRunConfig) {
+	public int run(JobRunConfiguration jobRunConfig) {
 		/*
 		if (spawned_app_state != null
 				&& (spawned_app_state.equals(IPProcess.STARTING) || spawned_app_state
@@ -144,7 +144,7 @@ public class SimulationControlSystem implements IControlSystem {
 		runningAppFinishThread.start();
 		*/
 
-		return new String(s);
+		return numJobs;
 	}
 
 	public void terminateJob(IPJob jobName) {
