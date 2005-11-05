@@ -18,10 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -33,7 +30,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.AttributeConstants;
@@ -48,20 +44,14 @@ import org.eclipse.ptp.core.IParallelModelListener;
 import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.core.proxy.event.IProxyEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
-import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
+import org.eclipse.ptp.rtsystem.IRuntimeProxy;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.ompi.OMPIControlSystem;
-import org.eclipse.ptp.rtsystem.ompi.OMPIJNIBroker;
 import org.eclipse.ptp.rtsystem.ompi.OMPIMonitoringSystem;
 import org.eclipse.ptp.rtsystem.ompi.OMPIProxyRuntimeClient;
-import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
-import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
-import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeJobStateEvent;
 import org.eclipse.ptp.rtsystem.simulation.SimProcess;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
@@ -69,7 +59,7 @@ import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
 
-public class ModelManager implements IModelManager, IRuntimeListener, IProxyRuntimeEventListener {
+public class ModelManager implements IModelManager, IRuntimeListener {
 	protected List listeners = new ArrayList(2);
 
 	protected int currentState = STATE_EXIT;
@@ -85,10 +75,7 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 
 	protected IControlSystem controlSystem = null;
 	protected IMonitoringSystem monitoringSystem = null;
-	
-	protected OMPIProxyRuntimeClient proxy = null; 
-	
-	protected Queue events = new Queue();
+	protected IRuntimeProxy runtimeProxy = null;
 
 	public boolean isParallelPerspectiveOpen() {
 		return isPerspectiveOpen;
@@ -153,17 +140,11 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 	public void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID)
 	{
 		if(monitoringSystemID == MonitoringSystemChoices.SIMULATED_ID && controlSystemID == ControlSystemChoices.SIMULATED_ID) {
-			universe = new PUniverse();
 			/* load up the control and monitoring systems for the simulation */
 			monitoringSystem = new SimulationMonitoringSystem();
 			controlSystem = new SimulationControlSystem();
-			monitoringSystem.startup();
-			controlSystem.startup();
-			setupMS();
-			fireEvent(null, EVENT_MONITORING_SYSTEM_CHANGE);
 		}
 		else if(monitoringSystemID == MonitoringSystemChoices.ORTE && controlSystemID == ControlSystemChoices.ORTE) {
-			universe = new PUniverse();
 			/* load up the control and monitoring systems for OMPI */
 			//OMPIJNIBroker jnibroker = new OMPIJNIBroker();
 			Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
@@ -174,22 +155,24 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 						"Invalid ORTE proxy server port specified.  See the PTP->OMPI preferences pages.", null);
 				return;
 			}
-			
-			proxy = new OMPIProxyRuntimeClient("localhost", port);
-			
-			proxyConnect(proxy);
-			
-			monitoringSystem = new OMPIMonitoringSystem(proxy);
-			controlSystem = new OMPIControlSystem(proxy);
-			monitoringSystem.startup();
-			controlSystem.startup();
-			setupMS();
-			fireEvent(null, EVENT_MONITORING_SYSTEM_CHANGE);
+
+			runtimeProxy = new OMPIProxyRuntimeClient("localhost", port);
+			monitoringSystem = new OMPIMonitoringSystem((OMPIProxyRuntimeClient)runtimeProxy);
+			controlSystem = new OMPIControlSystem((OMPIProxyRuntimeClient)runtimeProxy);
 			//refreshRuntimeSystems(ControlSystemChoices.SIMULATED_ID, MonitoringSystemChoices.SIMULATED_ID);
 		}
 		else {
 			CoreUtils.showErrorDialog("Runtime System Error", "Invalid monitoring/control system selected.  Set using the PTP preferences page.", null);
+			return;
 		}
+
+		universe = new PUniverse();
+		if (runtimeProxy != null)
+			runtimeProxy.startup();
+		monitoringSystem.startup();
+		controlSystem.startup();
+		setupMS();
+		fireEvent(null, EVENT_MONITORING_SYSTEM_CHANGE);
 	}
 
 	/* setup the monitoring system */
@@ -278,9 +261,9 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 			} catch(Exception e) {
 			}
 			
-			//if (controlSystem instanceof SimulationControlSystem)
-				//proc = new SimProcess(job, ne[j], "" + j + "", "" + pid + "", j, IPProcess.STARTING, "", "");
-			//else
+			if (controlSystem instanceof SimulationControlSystem)
+				proc = new SimProcess(job, ne[j], "" + j + "", "" + pid + "", j, IPProcess.STARTING, "", "");
+			else
 				proc = new PProcess(job, ne[j], "" + j + "", "" + pid + "", j, IPProcess.STARTING, "", "");
 			
 			job.addChild(proc);
@@ -437,17 +420,10 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 		perspectiveListener = null;
 		listeners.clear();
 		listeners = null;
-		try {
-			proxy.sessionFinish();
-			System.out.println("Telling proxy server to shutdown...");
-			wait_for_event();
-			System.out.println("Proxy server acknowledged shutdown.");
-		} catch(IOException e) {
-			System.err.println(e.toString());
-			e.printStackTrace();
-		}
-		controlSystem.shutdown();
 		monitoringSystem.shutdown();
+		controlSystem.shutdown();
+		if (runtimeProxy != null)
+			runtimeProxy.shutdown();
 	}
 
 	public void addParallelLaunchListener(IParallelModelListener listener) {
@@ -581,33 +557,11 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 		*/
 
 		monitor.subTask("Creating the job...");
-		controlSystem.run(jobRunConfig);
-		
-		/*
-		 * Wait for STATE_NEW job state event, but keep processing other events.
-		 * 
-		 * We should wait here so that we can create the new job and return it
-		 * to the launcher.
-		 * 
-		 * Check for errors?
-		 */
-	
-		IPJob job = null;
-		
-		while (true) {
-			IProxyRuntimeEvent event = wait_for_event();
+		int jobID = controlSystem.run(jobRunConfig);
+		if (jobID < 0)
+			return null;
 			
-			if (event == null)
-				break;
-			
-			if (event instanceof ProxyRuntimeJobStateEvent) {
-				ProxyRuntimeJobStateEvent jse = (ProxyRuntimeJobStateEvent)event;
-	        		if(jse.getJobState() == PJob.STATE_NEW) {
-	        			job = newJob(jse);
-	        			break;
-	        		}
-			}
-		}
+		return newJob(jobID);
 		
 		/*
 		if (nejob != null) {
@@ -633,7 +587,6 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 			return job;
 		}
 		*/
-		return job;
 	}
 
 	protected void clearUsedMemory() {
@@ -652,78 +605,10 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 	public IPUniverse getUniverse() {
 		return universe;
 	}	
-	
-	private synchronized IProxyRuntimeEvent wait_for_event() {
-    		IProxyRuntimeEvent event = null;
-    		
-    		try {
-        		System.out.println("MM waiting...");
-        		while (this.events.isEmpty())
-        			wait();
-        		System.out.println("MM awoke!");
-        		event = (IProxyRuntimeEvent) this.events.removeItem();
-    		} catch (InterruptedException e) {
-        		// TODO Auto-generated catch block
-        		e.printStackTrace();
-    		}
-    		
-    		return event;
-	}
 
-	private void proxyConnect(OMPIProxyRuntimeClient proxy)
-	{
-		System.out.println("ModelManager - firing up proxy, waiting for connecting.  Please wait!  This can take a minute . . .");
-		try {
-			proxy.addEventListener((IProxyRuntimeEventListener)this);
-			proxy.sessionCreate();
-			
-			Thread runThread = new Thread("Proxy Server Thread") {
-				public void run() {
-					String cmd;
-					
-					Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-					
-					int port = preferences.getInt(PreferenceConstants.ORTE_SERVER_PORT);
-					String proxyPath = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
-				
-					Runtime rt = Runtime.getRuntime ();
-					
-					cmd = proxyPath + " --port="+port;
-					
-					System.out.println("RUNNING PROXY SERVER COMMAND: '"+cmd+"'");
-					
-					try {
-						Process process = rt.exec(cmd);
-						InputStreamReader reader = new InputStreamReader (process.getInputStream ());
-						BufferedReader buf_reader = new BufferedReader (reader);
-						
-						String line;
-						while ((line = buf_reader.readLine ()) != null)
-							System.out.println ("ORTE PROXY SERVER: "+line);
-					} catch(Exception e) {
-						String err;
-						err = "Error running proxy server with command: '"+cmd+"'.";
-						e.printStackTrace();
-						System.out.println(err);
-						CoreUtils.showErrorDialog("Running Proxy Server", err, null);
-					}
-				}
-			};
-			runThread.start();
-			
-			System.out.println("Waiting on accept.");
-			wait_for_event();
-		} catch (IOException e) {
-			System.err.println("Exception starting up proxy. :(");
-			System.exit(1);
-		}
-	}
-
-	private IPJob newJob(ProxyRuntimeJobStateEvent e) {
-		int jobID;
+	private IPJob newJob(int jobID) {
 		String jobName;
 
-		jobID = e.getJobID();
 		jobName = "job"+jobID;
 		
 		System.out.println("MODEL MANAGER: newJob("+jobID+")");
@@ -747,28 +632,4 @@ public class ModelManager implements IModelManager, IRuntimeListener, IProxyRunt
 		
 		return job;
 	}
-	
-    public synchronized void handleEvent(IProxyRuntimeEvent e) {
-        // TODO Auto-generated method stub
-        System.out.println("MODEL MANAGER got event: " + e.toString());
-        /*
-         * Moved to run()
-         * TODO remove this code
-         *
-        if(e instanceof ProxyRuntimeJobStateEvent) {
-        		ProxyRuntimeJobStateEvent e2 = (ProxyRuntimeJobStateEvent)e;
-        		if(e2.getJobState() == PJob.STATE_NEW) {
-        			newJob(e2);
-        		}
-        }*/
-        /*
-        if (e.getEventID() == IProxyDebugEvent.EVENT_DBG_INIT) {
-            numServers = ((ProxyDebugInitEvent)e).getNumServers();
-            System.out.println("num servers = " + numServers);
-        }
-        */
-        this.events.addItem(e);
-        notifyAll();
-    }
-	
 }
