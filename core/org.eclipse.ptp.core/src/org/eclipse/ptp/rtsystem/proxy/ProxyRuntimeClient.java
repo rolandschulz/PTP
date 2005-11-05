@@ -21,10 +21,7 @@ package org.eclipse.ptp.rtsystem.proxy;
 
 import java.io.IOException;
 
-import org.eclipse.ptp.core.proxy.AbstractProxyClient;
-
 public class ProxyRuntimeClient extends AbstractProxyRuntimeClient {
-
 	public ProxyRuntimeClient(String host, int port) {
 		super(host, port);
 	}
@@ -64,4 +61,5 @@ public class ProxyRuntimeClient extends AbstractProxyRuntimeClient {
 	public void getNodeMachineID(int nodeId) throws IOException {
 		sendCommand("GETNMID", Integer.toString(nodeId));
 	}
+
 }
