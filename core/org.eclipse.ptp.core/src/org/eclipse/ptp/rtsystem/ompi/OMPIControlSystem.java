@@ -42,6 +42,7 @@ import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.ProxyConnectedEvent;
 import org.eclipse.ptp.internal.core.CoreUtils;
+import org.eclipse.ptp.internal.core.PJob;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
@@ -50,9 +51,11 @@ import org.eclipse.ptp.rtsystem.RuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.ProxyRuntimeClient;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeErrorEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeJobStateEvent;
 
 
-public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventListener{
+public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventListener {
 	private Process orted_process = null;
 	private Vector knownJobs = null;
 	
@@ -66,42 +69,8 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 	
 	private boolean failed_init = false;
 	
-    private synchronized void wait_for_event() {
-        try {
-            wait();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-    
 	public void startup() {
-		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		String orted_path = preferences.getString(PreferenceConstants.ORTE_ORTED_PATH);
-		System.out.println("ORTED path = ."+orted_path+".");
-		if(orted_path == "") {
-			String err = "Some error occurred trying to spawn the ORTEd (ORTE daemon).  Check the "+
-				"PTP/Open MPI preferences page and be certain that the path and arguments "+
-				"are correct.";
-			System.err.println(err);
-			CoreUtils.showErrorDialog("ORTEd Start Failure", err, null);
-			return;
-		}
-		
 		knownJobs = new Vector();
-		
-		String ompi_bin_path = orted_path.substring(0, orted_path.lastIndexOf("/"));
-		
-		String orted_args = preferences.getString(PreferenceConstants.ORTE_ORTED_ARGS);
-		String orted_full = orted_path + " " + orted_args;
-		System.out.println("ORTED = "+orted_full);
-		/* start the orted */
-		String[] split_args = orted_args.split("\\s");
-		for (int x=0; x<split_args.length; x++)
-	         System.out.println("["+x+"] = "+split_args[x]);
-		String[] split_path = orted_path.split("\\/");
-		for(int x=0; x<split_path.length; x++)
-			System.out.println("["+x+"] = "+split_path[x]);
 		
 		/* start the daemon using JNI */
 		//jniBroker.OMPIStartDaemon(ompi_bin_path, orted_path, split_path[split_path.length - 1], split_args);
@@ -109,15 +78,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		/* start the daemon using Java */
 		//OMPIStartORTEd(orted_full);
 		
-		proxy.addEventListener(this);
-		
-		try {
-			proxy.startDaemon(ompi_bin_path, orted_path, split_path[split_path.length - 1], split_args);
-			System.out.println("Control SYSTEM: startDaemon command issued!");
-		} catch(IOException e) {
-			System.err.println("Exception starting daemon. :(");
-			System.exit(1);
-		}
+		proxy.addRuntimeEventListener(this);
 		
 		/*
 		int rc = jniBroker.OMPIInit();
@@ -169,7 +130,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 	*/
 	
 	/* returns the new job name that it started - unique */
-	public String run(JobRunConfiguration jobRunConfig) {
+	public int run(JobRunConfiguration jobRunConfig) {
 		int jobID = -1;
 		System.out.println("JAVA OMPI: run() with args:\n"+jobRunConfig.toString());
 
@@ -192,11 +153,12 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		}*/
 		
 		try {
-			proxy.run(jobRunConfig.getPathToExec(), jobRunConfig.getNumberOfProcesses(), jobRunConfig.isDebug());
+			jobID = proxy.runJob(jobRunConfig.getPathToExec(), jobRunConfig.getNumberOfProcesses(), jobRunConfig.isDebug());
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
-		return null;
+		
+		return jobID;
 		
 		//jobID = jniBroker.OMPIRun(args);
 //		if(jobID == -1) {
@@ -341,15 +303,6 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 	}
 
     public synchronized void handleEvent(IProxyRuntimeEvent e) {
-        // TODO Auto-generated method stub
         System.out.println("got event: " + e.toString());
-        /*
-        if (e.getEventID() == IProxyDebugEvent.EVENT_DBG_INIT) {
-            numServers = ((ProxyDebugInitEvent)e).getNumServers();
-            System.out.println("num servers = " + numServers);
-        }
-        */
-        //this.events.addItem(e);
-        notifyAll();
     }
 }
