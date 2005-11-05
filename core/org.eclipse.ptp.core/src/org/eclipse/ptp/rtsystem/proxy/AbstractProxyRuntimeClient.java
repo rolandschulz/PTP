@@ -43,7 +43,7 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		super.addEventListener(this);
 	}
 	
-	public void addEventListener(IProxyRuntimeEventListener listener) {
+	public void addRuntimeEventListener(IProxyRuntimeEventListener listener) {
 		listeners.add(listener);
 	}
 	
