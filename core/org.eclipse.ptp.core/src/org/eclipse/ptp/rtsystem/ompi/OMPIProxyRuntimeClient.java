@@ -1,26 +1,179 @@
 package org.eclipse.ptp.rtsystem.ompi;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.BitSet;
 
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.util.Queue;
+import org.eclipse.ptp.internal.core.CoreUtils;
+import org.eclipse.ptp.rtsystem.IRuntimeProxy;
 import org.eclipse.ptp.rtsystem.proxy.ProxyRuntimeClient;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeErrorEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNewJobEvent;
 
-public class OMPIProxyRuntimeClient extends ProxyRuntimeClient {
-
+public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRuntimeProxy, IProxyRuntimeEventListener {
+	protected Queue events = new Queue();
+	protected BitSet waitEvents = new BitSet();
+	
 	public OMPIProxyRuntimeClient(String host, int port) {
 		super(host, port);
+		super.addRuntimeEventListener(this);
 	}
+	
+	public int runJob(String prog, int numProcs, boolean debug) throws IOException {
+		run(prog, numProcs, debug);
+		IProxyRuntimeEvent event = waitForRuntimeEvent(IProxyRuntimeEvent.EVENT_RUNTIME_NEWJOB);
+		return ((ProxyRuntimeNewJobEvent)event).getJobID();
+	}
+	
+	public void startup() {
+		System.out.println("OMPIProxyRuntimeClient - firing up proxy, waiting for connecting.  Please wait!  This can take a minute . . .");
+		try {
+			sessionCreate();
+			
+			Thread runThread = new Thread("Proxy Server Thread") {
+				public void run() {
+					String cmd;
+					
+					Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
+					
+					int port = preferences.getInt(PreferenceConstants.ORTE_SERVER_PORT);
+					String proxyPath = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
+				
+					Runtime rt = Runtime.getRuntime ();
+					
+					cmd = proxyPath + " --port="+port;
+					
+					System.out.println("RUNNING PROXY SERVER COMMAND: '"+cmd+"'");
+					
+					try {
+						Process process = rt.exec(cmd);
+						InputStreamReader reader = new InputStreamReader (process.getInputStream ());
+						BufferedReader buf_reader = new BufferedReader (reader);
+						
+						String line;
+						while ((line = buf_reader.readLine ()) != null)
+							System.out.println ("ORTE PROXY SERVER: "+line);
+					} catch(Exception e) {
+						String err;
+						err = "Error running proxy server with command: '"+cmd+"'.";
+						e.printStackTrace();
+						System.out.println(err);
+						CoreUtils.showErrorDialog("Running Proxy Server", err, null);
+					}
+				}
+			};
+			runThread.start();
+			
+			System.out.println("Waiting on accept.");
+			waitForRuntimeEvent(IProxyRuntimeEvent.EVENT_RUNTIME_CONNECTED);
+		} catch (IOException e) {
+			System.err.println("Exception starting up proxy. :(");
+			System.exit(1);
+		}
+		
+		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
+		String orted_path = preferences.getString(PreferenceConstants.ORTE_ORTED_PATH);
+		System.out.println("ORTED path = ."+orted_path+".");
+		if(orted_path == "") {
+			String err = "Some error occurred trying to spawn the ORTEd (ORTE daemon).  Check the "+
+				"PTP/Open MPI preferences page and be certain that the path and arguments "+
+				"are correct.";
+			System.err.println(err);
+			CoreUtils.showErrorDialog("ORTEd Start Failure", err, null);
+			return;
+		}
+		
+		String ompi_bin_path = orted_path.substring(0, orted_path.lastIndexOf("/"));
+		
+		String orted_args = preferences.getString(PreferenceConstants.ORTE_ORTED_ARGS);
+		String orted_full = orted_path + " " + orted_args;
+		System.out.println("ORTED = "+orted_full);
+		/* start the orted */
+		String[] split_args = orted_args.split("\\s");
+		for (int x=0; x<split_args.length; x++)
+	         System.out.println("["+x+"] = "+split_args[x]);
+		String[] split_path = orted_path.split("\\/");
+		for(int x=0; x<split_path.length; x++)
+			System.out.println("["+x+"] = "+split_path[x]);
 
-	public void startDaemon(String ompi_bin_path, String orted_path, String orted_bin, String[] args) throws IOException {
 		String str_arg, arg_array_as_string;
 		
 		arg_array_as_string = new String("");
 		
-		for(int i=0; i<args.length; i++) {
-			arg_array_as_string = arg_array_as_string + " " + args[i];
+		for(int i=0; i<split_args.length; i++) {
+			arg_array_as_string = arg_array_as_string + " " + split_args[i];
 		}
+	
+		str_arg = ompi_bin_path + " " + orted_path + "  " + split_path[split_path.length - 1] + arg_array_as_string;
 		
-		str_arg = ompi_bin_path + " " + orted_path + "  " + orted_bin + arg_array_as_string;
-		
-		sendCommand("STARTDAEMON", str_arg);
+		try {
+			sendCommand("STARTDAEMON", str_arg);
+			waitForRuntimeEvent(IProxyRuntimeEvent.EVENT_RUNTIME_OK);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
+
+	public void shutdown() {
+		try {
+			System.out.println("OMPIProxyRuntimeClient shutting down server...");
+			sessionFinish();
+			waitForRuntimeEvent(IProxyRuntimeEvent.EVENT_RUNTIME_OK);
+			System.out.println("OMPIProxyRuntimeClient shut down.");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}	
+
+	public synchronized IProxyRuntimeEvent waitForRuntimeEvent(int eventID) throws IOException {
+		waitEvents.set(eventID);
+		waitEvents.set(IProxyRuntimeEvent.EVENT_RUNTIME_ERROR);
+		
+    		IProxyRuntimeEvent event = null;
+    		
+    		try {
+        		System.out.println("OMPIProxyRuntimeClient waiting on " + waitEvents.toString());
+        		while (this.events.isEmpty())
+        			wait();
+        		System.out.println("OMPIProxyRuntimeClient awoke!");
+        		event = (IProxyRuntimeEvent) this.events.removeItem();
+        		if (event instanceof ProxyRuntimeErrorEvent) {
+        	   		waitEvents.clear(eventID);
+            		waitEvents.clear(IProxyRuntimeEvent.EVENT_RUNTIME_ERROR);
+        			throw new IOException(((ProxyRuntimeErrorEvent)event).getErrorMessage());
+        		}
+    		} catch (InterruptedException e) {
+        		// TODO Auto-generated catch block
+        		e.printStackTrace();
+    		}
+    		
+    		waitEvents.clear(eventID);
+    		waitEvents.clear(IProxyRuntimeEvent.EVENT_RUNTIME_ERROR);
+   		
+    		return event;
+	}
+
+	/*
+	 * Only handle events we're responsible for
+	 */
+    public synchronized void handleEvent(IProxyRuntimeEvent e) {
+		System.out.println("OMPIProxyRuntimeClient got event: " + e.toString());
+		
+		if (waitEvents.get(e.getEventID())) {
+			System.out.println("OMPIProxyRuntimeClient notifying...");
+			this.events.addItem(e);
+			notifyAll();
+		}
+    }
+
 }
