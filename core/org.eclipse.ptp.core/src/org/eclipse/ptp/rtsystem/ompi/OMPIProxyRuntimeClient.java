@@ -27,14 +27,16 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 	}
 	
 	public int runJob(String prog, int numProcs, boolean debug) throws IOException {
+		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_NEWJOB);
 		run(prog, numProcs, debug);
-		IProxyRuntimeEvent event = waitForRuntimeEvent(IProxyRuntimeEvent.EVENT_RUNTIME_NEWJOB);
+		IProxyRuntimeEvent event = waitForRuntimeEvent();
 		return ((ProxyRuntimeNewJobEvent)event).getJobID();
 	}
 	
 	public void startup() {
 		System.out.println("OMPIProxyRuntimeClient - firing up proxy, waiting for connecting.  Please wait!  This can take a minute . . .");
 		try {
+			setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_CONNECTED);
 			sessionCreate();
 			
 			Thread runThread = new Thread("Proxy Server Thread") {
@@ -72,7 +74,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 			runThread.start();
 			
 			System.out.println("Waiting on accept.");
-			waitForRuntimeEvent(IProxyRuntimeEvent.EVENT_RUNTIME_CONNECTED);
+			waitForRuntimeEvent();
 		} catch (IOException e) {
 			System.err.println("Exception starting up proxy. :(");
 			System.exit(1);
@@ -114,8 +116,9 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		str_arg = ompi_bin_path + " " + orted_path + "  " + split_path[split_path.length - 1] + arg_array_as_string;
 		
 		try {
+			setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_OK);
 			sendCommand("STARTDAEMON", str_arg);
-			waitForRuntimeEvent(IProxyRuntimeEvent.EVENT_RUNTIME_OK);
+			waitForRuntimeEvent();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -126,8 +129,9 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 	public void shutdown() {
 		try {
 			System.out.println("OMPIProxyRuntimeClient shutting down server...");
+			setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_OK);
 			sessionFinish();
-			waitForRuntimeEvent(IProxyRuntimeEvent.EVENT_RUNTIME_OK);
+			waitForRuntimeEvent();
 			System.out.println("OMPIProxyRuntimeClient shut down.");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -135,10 +139,12 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		}
 	}	
 
-	public synchronized IProxyRuntimeEvent waitForRuntimeEvent(int eventID) throws IOException {
+	private void setWaitEvent(int eventID) {
 		waitEvents.set(eventID);
-		waitEvents.set(IProxyRuntimeEvent.EVENT_RUNTIME_ERROR);
-		
+		waitEvents.set(IProxyRuntimeEvent.EVENT_RUNTIME_ERROR); // always check for errors
+	}
+	
+	private synchronized IProxyRuntimeEvent waitForRuntimeEvent() throws IOException {
     		IProxyRuntimeEvent event = null;
     		
     		try {
@@ -148,8 +154,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
         		System.out.println("OMPIProxyRuntimeClient awoke!");
         		event = (IProxyRuntimeEvent) this.events.removeItem();
         		if (event instanceof ProxyRuntimeErrorEvent) {
-        	   		waitEvents.clear(eventID);
-            		waitEvents.clear(IProxyRuntimeEvent.EVENT_RUNTIME_ERROR);
+        	   		waitEvents.clear();
         			throw new IOException(((ProxyRuntimeErrorEvent)event).getErrorMessage());
         		}
     		} catch (InterruptedException e) {
@@ -157,14 +162,13 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
         		e.printStackTrace();
     		}
     		
-    		waitEvents.clear(eventID);
-    		waitEvents.clear(IProxyRuntimeEvent.EVENT_RUNTIME_ERROR);
-   		
+    		waitEvents.clear();
+ 
     		return event;
 	}
 
 	/*
-	 * Only handle events we're responsible for
+	 * Only handle events we're interested in
 	 */
     public synchronized void handleEvent(IProxyRuntimeEvent e) {
 		System.out.println("OMPIProxyRuntimeClient got event: " + e.toString());
