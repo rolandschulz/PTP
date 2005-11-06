@@ -25,10 +25,13 @@ package org.eclipse.ptp.debug.external;
 import java.util.Observer;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.cdi.ICommonActions;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
+import org.eclipse.ptp.debug.external.target.ITargetEvent;
 
 public interface IAbstractDebugger extends ICommonActions, IDebugger {
 	public final static String TERMINATED_PROC_KEY = "terminated";
@@ -51,5 +54,10 @@ public interface IAbstractDebugger extends ICommonActions, IDebugger {
 	public void setSession(IPCDISession session);
 	public boolean isExited();
 
-	public IPProcess getProcess(int number);	
+	public IPProcess getProcess(int number);
+	
+	/* target */
+	public ITargetEvent getTargetEvent(BitList tasks, int type) throws PCDIException;
+	public void setTargetResult(BitList tasks, Object result, int type) throws PCDIException;
+	public void addTargetEvent(ITargetEvent event);
 }
