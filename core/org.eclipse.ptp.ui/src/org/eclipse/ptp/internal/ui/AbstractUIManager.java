@@ -24,10 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPElement;
@@ -59,8 +57,7 @@ public abstract class AbstractUIManager implements IManager {
 
 	protected abstract class SafeNotifier implements ISafeRunnable {
 		public void handleException(Throwable ex) {
-			IStatus status = new Status(IStatus.ERROR, PTPUIPlugin.PLUGIN_ID, IStatus.OK, "UIManager failed to notify an UIListener", ex);
-			PTPUIPlugin.log(status);
+			PTPUIPlugin.log(ex);
 		}
 	}
 
