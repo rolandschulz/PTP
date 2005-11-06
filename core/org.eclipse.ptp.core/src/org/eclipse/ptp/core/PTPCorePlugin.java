@@ -21,6 +21,7 @@ package org.eclipse.ptp.core;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.internal.core.ModelManager;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
@@ -82,6 +83,12 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 	 * @return Returns the modelManager.
 	 */
 	public IModelManager getModelManager() {
+		if (modelManager != null) {
+			Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
+			int MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
+			int CSChoiceID = preferences.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
+			modelManager.refreshRuntimeSystems(CSChoiceID, MSChoiceID);
+		}
 		return modelManager;
 	}
 

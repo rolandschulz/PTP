@@ -424,10 +424,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				isPerspectiveOpen = true;
 				System.out.println("MYPERSPECTIVE: Active: " + perspective.getId());
 			}
-			Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-			int MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
-			int CSChoiceID = preferences.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
-			refreshRuntimeSystems(CSChoiceID, MSChoiceID);
 		}
 
 		public void perspectiveChanged(IWorkbenchPage page,
