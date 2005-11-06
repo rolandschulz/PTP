@@ -28,11 +28,21 @@ import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.debugger.ParallelDebugger;
 
 public class PTPDebugger implements IPTPDebugger {
+	IAbstractDebugger debugger;
+	
+	public PTPDebugger() {
+		debugger = new ParallelDebugger();
+	}
+	
+	public void startDebuggerListener() {
+		debugger.startDebuggerListener();
+	}
+
 	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) {
 		try {
 			IPJob job = launch.getPJob();
 			//IAbstractDebugger debugger = new DebugSimulation2();
-			IAbstractDebugger debugger = new ParallelDebugger();
+			//IAbstractDebugger debugger = new ParallelDebugger();
 			debugger.initialize(job);
 			return new Session(debugger, job, launch, exe);
 		} catch (Exception e) {

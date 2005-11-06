@@ -48,6 +48,7 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
+import org.eclipse.ptp.debug.core.IPTPDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
@@ -174,8 +175,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			monitor.worked(1);
 			// done the verification phase
 			JobRunConfiguration jrunconfig = getJobRunConfiguration(configuration);
-			if (mode.equals(ILaunchManager.DEBUG_MODE))
-				jrunconfig.setDebug();
 			String[] args = verifyArgument(configuration);
 			File workDirectory = vertifyWorkDirectory(configuration);
 			/* Assuming we have parsed the configuration */
@@ -183,6 +182,15 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			ICProject project = verifyCProject(configuration);
 			if (exePath != null) {
 				exeFile = verifyBinary(project, exePath);
+			}
+			
+			IPTPDebugger debugger = null;
+			
+			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
+				debugger = debugConfig.createDebugger();
+				debugger.startDebuggerListener();
+				jrunconfig.setDebug();
 			}
 			
 			IPJob job = getLaunchManager().run(launch, workDirectory, null, jrunconfig, new SubProgressMonitor(monitor, 5));
@@ -200,14 +208,13 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			try {
 				if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 					job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, exePath.removeLastSegments(1).toOSString());
-					IPDebugConfiguration debugConfig = getDebugConfig(configuration);
-					debugConfig.createDebugger().createDebuggerSession(pLaunch, exeFile, new SubProgressMonitor(monitor, 3));
+					debugger.createDebuggerSession(pLaunch, exeFile, new SubProgressMonitor(monitor, 3));
 					//IPSession pSession = (IPSession) new PSession(dSession, pLaunch);
 					//pLaunch.setPSession(pSession);
 				} else if (mode.equals(ILaunchManager.RUN_MODE)) {
 					/*
 					 * FIXME We still haven't discussed about the whole run/debug stuff So, if it's the simulation control system.... it's ok.... if not... just run /bin/date
-					 */
+					 *
 					if (getLaunchManager().getControlSystem() instanceof SimulationControlSystem) {
 						IPProcess[] procs = job.getSortedProcesses();
 						Process process = ((Process) procs[0]);
@@ -215,7 +222,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					} else {
 						Process process = DebugPlugin.exec(commandLine, null);
 						DebugPlugin.newProcess(launch, process, "Launch Label");
-					}
+					}*/
 					monitor.worked(1);
 				}
 			} catch (Exception e) {

@@ -45,16 +45,13 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		super.addEventListener(this);
 	}
 	
-	public synchronized void sessionCreate(boolean wait) throws IOException {
-		super.sessionCreate();
-		if (wait) {
-			waiting = true;
-			try {
-				while (!connected)
-					wait();
-			} catch (InterruptedException e) {
+	public synchronized void waitForConnect() throws IOException {
+		try {
+			while (!connected) {
+				waiting = true;
+				wait();
 			}
-			waiting = false;
+		} catch (InterruptedException e) {
 		}
 	}
 	
@@ -83,7 +80,7 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		
 	public synchronized void handleEvent(IProxyEvent event) {
 		IProxyDebugEvent e = null;
-System.out.println("got event " + event);
+System.out.println("AbstractProxyDebugClientgot event " + event);
 		if (listeners == null)
 			return;
 		
@@ -97,9 +94,10 @@ System.out.println("got event " + event);
 			break;
 			
 		case IProxyEvent.EVENT_CONNECTED:
+			connected = true;
 			if (waiting) {
-				connected = true;
 				notifyAll();
+				waiting = false;
 			}
 			return;
 		}
