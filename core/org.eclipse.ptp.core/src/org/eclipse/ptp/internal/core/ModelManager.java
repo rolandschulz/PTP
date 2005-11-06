@@ -279,9 +279,9 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			} catch(Exception e) {
 			}
 			
-			if (controlSystem instanceof SimulationControlSystem)
-				proc = new SimProcess(job, ne[j], "" + j + "", "" + pid + "", j, IPProcess.STARTING, "", "");
-			else
+			//if (controlSystem instanceof SimulationControlSystem)
+			//	proc = new SimProcess(job, ne[j], "" + j + "", "" + pid + "", j, IPProcess.STARTING, "", "");
+			//else
 				proc = new PProcess(job, ne[j], "" + j + "", "" + pid + "", j, IPProcess.STARTING, "", "");
 			
 			job.addChild(proc);
@@ -579,7 +579,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		if (jobID < 0)
 			return null;
 			
-		return newJob(jobID);
+		return newJob(jobID, jobRunConfig.isDebug());
 		
 		/*
 		if (nejob != null) {
@@ -624,7 +624,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		return universe;
 	}	
 
-	private IPJob newJob(int jobID) {
+	private IPJob newJob(int jobID, boolean debug) {
 		String jobName;
 
 		jobName = "job"+jobID;
@@ -635,7 +635,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		
 		job = new PJob(universe, jobName, "" + (PJob.BASE_OFFSET + jobID) + "", jobID);
 		
-		System.err.println("TODO: MM.newJob() - We need to figure out how to setDebug on this Job if it's under debug control");
+		if (debug)
+			job.setDebug();
 		
 		universe.addChild(job);
 		try {
