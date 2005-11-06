@@ -216,7 +216,7 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 		return this;
 	}
 	public Process getSessionProcess() throws CDIException {
-		return getDebugger().getDebuggerProcess();
+		return null;
 	}
 	public BitList createEmptyBitList() {
 		return new BitList(getTotalProcesses());

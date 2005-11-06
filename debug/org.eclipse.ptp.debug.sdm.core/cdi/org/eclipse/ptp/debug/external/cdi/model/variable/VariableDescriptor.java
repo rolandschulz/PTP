@@ -43,6 +43,7 @@ import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
 import org.eclipse.ptp.debug.external.cdi.model.type.IncompleteType;
+import org.eclipse.ptp.debug.external.target.TargetExpressValueEvent;
 
 public abstract class VariableDescriptor extends PTPObject implements ICDIVariableDescriptor {
 	
@@ -222,7 +223,7 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 			String exp = "sizeof(" + getTypeName() + ")";
 			Session session = (Session)target.getSession();			
 			try {
-				sizeof = target.getDebugger().evaluateExpression(session.createBitList(target.getTargetID()), exp);
+				sizeof = new TargetExpressValueEvent(session, session.createBitList(target.getTargetID()), exp).getExpressValue();
 			} finally {
 				if (frame != null) {
 					target.setCurrentThread(currentThread, false);

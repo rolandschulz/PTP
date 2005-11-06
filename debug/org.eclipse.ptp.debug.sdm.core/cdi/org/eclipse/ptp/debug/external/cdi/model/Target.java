@@ -68,6 +68,7 @@ import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.cdi.model.variable.GlobalVariableDescriptor;
+import org.eclipse.ptp.debug.external.target.TargetExpressValueEvent;
 
 public class Target extends SessionObject implements IPCDITarget {
 	ICDITargetConfiguration fConfiguration;
@@ -76,14 +77,14 @@ public class Target extends SessionObject implements IPCDITarget {
 	int currentThreadId;
 	String fEndian = null;
 	boolean suspended = true;
-
 	private int task_id = -1;
-
+	
 	public Target(Session session, int task_id) {
 		super(session);
 		this.task_id = task_id;
 		currentThreads = noThreads;
 	}
+	
 	public IAbstractDebugger getDebugger() {
 		return ((Session)getSession()).getDebugger();
 	}
@@ -365,7 +366,8 @@ public class Target extends SessionObject implements IPCDITarget {
 		target.setCurrentThread(frame.getThread(), false);
 		((Thread)frame.getThread()).setCurrentStackFrame((StackFrame)frame, false);
 		try {
-			return getDebugger().evaluateExpression(((Session)getSession()).createBitList(getTargetID()), expressionText);
+			Session session = (Session) target.getSession();			
+			return new TargetExpressValueEvent(session, session.createBitList(target.getTargetID()), expressionText).getExpressValue();
 		} finally {
 			target.setCurrentThread(currentThread, false);
 			currentThread.setCurrentStackFrame(currentFrame, false);
