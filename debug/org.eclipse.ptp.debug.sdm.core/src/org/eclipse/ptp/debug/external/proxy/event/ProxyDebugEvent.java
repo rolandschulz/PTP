@@ -104,7 +104,6 @@ public class ProxyDebugEvent extends ProxyEvent {
 		case IProxyDebugEvent.EVENT_DBG_DATA:
 			IAIF data = new AIF(decodeString(args[2]), decodeBytes(args[3]), decodeString(args[4]));
 			evt = new ProxyDebugDataEvent(set, data);
-			System.out.println("native type =" + data.getDescription());
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_TYPE:
