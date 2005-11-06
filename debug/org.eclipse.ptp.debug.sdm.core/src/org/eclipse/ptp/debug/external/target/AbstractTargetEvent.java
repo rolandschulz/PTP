@@ -43,11 +43,6 @@ public abstract class AbstractTargetEvent implements ITargetEvent {
 			public void run() {
 				try {
 					session.getDebugger().addTargetEvent(AbstractTargetEvent.this);
-					if (type == AIFVALUE_TYPE) {
-						try {
-							Thread.sleep(1000);
-						} catch (Exception e) {}
-					}
 					action();
 				} catch (PCDIException e) {
 					synchronized(AbstractTargetEvent.this) {
