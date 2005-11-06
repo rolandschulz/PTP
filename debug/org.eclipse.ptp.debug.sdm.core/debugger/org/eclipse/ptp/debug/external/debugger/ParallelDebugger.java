@@ -350,6 +350,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	 */
 	public void listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException {
 		System.out.println(" *********** call listLocalVariables");
+		this.currFrame = frame;
 		try {
 			proxy.debugListLocalVariables(tasks);
 		} catch (IOException e1) {
@@ -370,6 +371,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	 */
 	public void listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException {
 		System.out.println(" *********** call listArguments");
+		this.currFrame = frame;
 		try {
 			proxy.debugListArguments(tasks, frame.getLevel());
 		} catch (IOException e1) {
