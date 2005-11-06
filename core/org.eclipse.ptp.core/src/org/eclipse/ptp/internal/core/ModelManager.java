@@ -77,6 +77,9 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	protected IMonitoringSystem monitoringSystem = null;
 	protected IRuntimeProxy runtimeProxy = null;
 
+	private int currentControlSystem = 0;
+	private int currentMonitoringSystem = 0;
+	
 	public boolean isParallelPerspectiveOpen() {
 		return isPerspectiveOpen;
 	}
@@ -126,7 +129,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			System.out.println("Your Monitoring System Choice: '"+MSChoice+"'");
 		}
 
-		refreshRuntimeSystems(CSChoiceID, MSChoiceID);
+		//refreshRuntimeSystems(CSChoiceID, MSChoiceID);
 	}
 	
 	public IControlSystem getControlSystem() {
@@ -139,6 +142,19 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	
 	public void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID)
 	{
+		if (controlSystemID == currentControlSystem && monitoringSystemID == currentMonitoringSystem)
+			return;
+
+		/*
+		 * Shutdown runtime if it is already active
+		 */
+		if (controlSystem != null)
+			controlSystem.shutdown();
+		if (monitoringSystem != null)
+			monitoringSystem.shutdown();
+		if (runtimeProxy != null)
+			runtimeProxy.shutdown();
+
 		if(monitoringSystemID == MonitoringSystemChoices.SIMULATED_ID && controlSystemID == ControlSystemChoices.SIMULATED_ID) {
 			/* load up the control and monitoring systems for the simulation */
 			monitoringSystem = new SimulationMonitoringSystem();
@@ -173,6 +189,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		controlSystem.startup();
 		setupMS();
 		fireEvent(null, EVENT_MONITORING_SYSTEM_CHANGE);
+		currentControlSystem = controlSystemID;
+		currentMonitoringSystem = monitoringSystemID;
 	}
 
 	/* setup the monitoring system */
@@ -406,6 +424,10 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				isPerspectiveOpen = true;
 				System.out.println("MYPERSPECTIVE: Active: " + perspective.getId());
 			}
+			Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
+			int MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
+			int CSChoiceID = preferences.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
+			refreshRuntimeSystems(CSChoiceID, MSChoiceID);
 		}
 
 		public void perspectiveChanged(IWorkbenchPage page,
