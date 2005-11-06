@@ -45,11 +45,10 @@ public class InternalEventQueue extends Observable {
 	}
 	public void addItem(QueueItem item) {
 		synchronized (queue) {
-			if (same(item)) {
-				queue.add(item);
-			} else {
+			if (!same(item)) {
 				notifySimulator();
 			}
+			queue.add(item);
 		}
 	}
 	public boolean same(QueueItem qItem) {
@@ -61,6 +60,7 @@ public class InternalEventQueue extends Observable {
 				qItem.getTasks().or(item.getTasks());
 				return true;
 			}
+			queue.add(item);			
 			return false;
 		}
 	}
