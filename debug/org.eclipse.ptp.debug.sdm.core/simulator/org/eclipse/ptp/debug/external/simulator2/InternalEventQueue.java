@@ -83,10 +83,19 @@ public class InternalEventQueue extends Observable {
 			Runnable runnable = new Runnable() {
 				public void run() {
 					while (running_timer) {
+						try {
+							Thread.sleep(FIX_TIME);
+							notifySimulator();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						
+						/*
 						if (System.currentTimeMillis() - current_time >= FIX_TIME) {
 							current_time = System.currentTimeMillis();
 							notifySimulator();
 						}
+						*/
 					}
 				}
 			};
