@@ -29,7 +29,6 @@ import java.util.Random;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
@@ -46,6 +45,7 @@ import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.variable.Argument;
 import org.eclipse.ptp.debug.external.cdi.model.variable.LocalVariable;
+import org.eclipse.ptp.debug.external.target.ITargetEvent;
 
 /**
  * @author Clement chu
@@ -90,10 +90,8 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	private SimVariable[] getVariables() {
 		return (SimVariable[])variables.values().toArray(new SimVariable[0]);
 	}
-	public void startDebuggerListener() {
-	}
+	
 	public void startDebugger(IPJob job) {
-		System.out.println("   ------ start debugger");
 		total_process = job.size();
 		for (int i = 0; i < total_process; i++) {
 			SimulateProgram sim_program = new SimulateProgram(i, APP_NAME);
@@ -134,15 +132,20 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	 * not implement yet
 	 **************************************************************************************************************************************************************************************************/
 	
-	public IAIF getAIFValue(BitList tasks, String expr) throws PCDIException {
+	public void getAIFValue(BitList tasks, String expr) throws PCDIException {
+		IAIF aif = null;
 		SimVariable variable = findVariable(expr);
 		if (variable == null)
 			variable = findArgument(expr);
 		if (variable == null)
-			return new AIF("unknown", new byte[0]);
+			aif = new AIF("unknown", new byte[0]);
 
-		String value = "" + random(10,20);
-		return new AIF("is4", value.getBytes());
+		if (aif == null) {
+			String value = "" + random(10,20);
+			aif = new AIF("is4", value.getBytes());
+		}
+		
+		setTargetResult(tasks, aif, ITargetEvent.AIFVALUE_TYPE);		
 	}
 
 	public void go(BitList tasks) throws PCDIException {
@@ -224,7 +227,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 			sim_prog.setStopInMain();
 		}
 	}
-	public ICDIStackFrame[] listStackFrames(BitList tasks) throws PCDIException {
+	public void listStackFrames(BitList tasks) throws PCDIException {
 		int[] taskArray = tasks.toArray();
 		List frameList = new ArrayList();
 		for (int i=0; i<taskArray.length; i++) {
@@ -235,7 +238,8 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		    	frameList.add(new StackFrame((org.eclipse.ptp.debug.external.cdi.model.Thread) thread, frames[j].getLevel(), frames[j].getFile(), frames[j].getFunc(), frames[j].getLine(), frames[j].getAddr()));
 		    }
 		}
-		return (ICDIStackFrame[]) frameList.toArray(new ICDIStackFrame[0]);
+
+		setTargetResult(tasks, (ICDIStackFrame[]) frameList.toArray(new ICDIStackFrame[0]), ITargetEvent.STACKFRAME_TYPE);
 	}
 	
 	public void setCurrentStackFrame(BitList tasks, ICDIStackFrame frame) throws PCDIException {
@@ -244,29 +248,25 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		//}
 		//throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "setCurrentStackFrame");
 	}
-	public String evaluateExpression(BitList tasks, String expression) throws PCDIException {
+	public void evaluateExpression(BitList tasks, String expression) throws PCDIException {
 		SimVariable variable = findVariable(expression);
-		if (variable != null)
-			return variable.getValue();
-
-		variable = findArgument(expression);
-		if (variable != null)
-			return variable.getValue();
-
-		return "";
-	}
-	public String getVariableType(BitList tasks, String varName) throws PCDIException {
-		SimVariable variable = findVariable(varName);
-		if (variable != null)
-			return variable.getType();
-
-		variable = findArgument(varName);
-		if (variable != null)
-			return variable.getType();
+		if (variable == null)
+			variable = findArgument(expression);
+		if (variable == null)
+			throw new PCDIException("No expression value found");
 		
-		return "";
+		setTargetResult(tasks, variable.getValue(), ITargetEvent.EXPRESSVALUE_TYPE);
 	}
-	public ICDIArgument[] listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException {
+	public void getVariableType(BitList tasks, String varName) throws PCDIException {
+		SimVariable variable = findVariable(varName);
+		if (variable == null)
+			variable = findArgument(varName);
+		if (variable == null)
+			throw new PCDIException("No variable type found");
+		
+		setTargetResult(tasks, variable.getValue(), ITargetEvent.VARIABLETYPE_TYPE);
+	}
+	public void listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException {
 		int[] taskArray = tasks.toArray();
 		List argList = new ArrayList();
 		for (int i=0; i<taskArray.length; i++) {
@@ -277,9 +277,10 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				argList.add(new Argument((Target) target, (org.eclipse.ptp.debug.external.cdi.model.Thread) thread, (StackFrame)frame, args[j].getVariable(), args[j].getVariable(), args.length - j, frame.getLevel(), null));
 		    }
 		}
-		return (ICDIArgument[]) argList.toArray(new ICDIArgument[0]);
+
+		setTargetResult(tasks, (ICDIArgument[]) argList.toArray(new ICDIArgument[0]), ITargetEvent.ARGUMENTS_TYPE);
 	}
-	public ICDILocalVariable[] listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException {
+	public void listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException {
 		int[] taskArray = tasks.toArray();
 		List varList = new ArrayList();
 		for (int i=0; i<taskArray.length; i++) {
@@ -290,9 +291,10 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		    	varList.add(new LocalVariable((Target) target, (org.eclipse.ptp.debug.external.cdi.model.Thread) thread, (StackFrame)frame, vars[j].getVariable(), vars[j].getVariable(), vars.length - j, frame.getLevel(), null));
 		    }
 		}
-		return (ICDILocalVariable[]) varList.toArray(new ICDILocalVariable[0]);
+		
+		setTargetResult(tasks, (ICDILocalVariable[]) varList.toArray(new ICDILocalVariable[0]), ITargetEvent.LOCALVARIABLES_TYPE);		
 	}
-	public ICDIGlobalVariable[] listGlobalVariables(BitList tasks) throws PCDIException {
+	public void listGlobalVariables(BitList tasks) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listGlobalVariables");
 	}
 	
