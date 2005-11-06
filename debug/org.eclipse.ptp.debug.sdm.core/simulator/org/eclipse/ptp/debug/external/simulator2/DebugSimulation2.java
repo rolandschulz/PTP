@@ -70,6 +70,9 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		createArguments();
 		createVariables();
 	}
+	public void startDebuggerListener() {
+		
+	}
 	private void createArguments() {
 		arguments.put("argc", new SimVariable("argc", "char **", ""));
 		arguments.put("argv", new SimVariable("argv", "int", "-"));
