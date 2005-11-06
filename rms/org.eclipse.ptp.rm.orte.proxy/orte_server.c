@@ -487,12 +487,22 @@ ORTERun(char **args)
 	apps[0]->num_map = 0;
 	apps[0]->map_data = NULL;
 	/* setup argv */
-	apps[0]->argv = (char **)malloc(2 * sizeof(char *));
-	apps[0]->argv[0] = strdup(pgm_name);
-	apps[0]->argv[1] = NULL;
-
-	apps[0]->argc = 1;
-
+	if (!debug) {
+		apps[0]->argv = (char **)malloc(2 * sizeof(char *));
+		apps[0]->argv[0] = strdup(pgm_name);
+		apps[0]->argv[1] = NULL;
+		apps[0]->argc = 1;
+	} else {
+		apps[0]->num_procs++;
+		apps[0]->argv = (char **)malloc(5 * sizeof(char *));
+		apps[0]->argv[0] = strdup("/Volumes/Home/greg/Desktop/workspaces/3.1/ptp/org.eclipse.ptp.debug.sdm/sdm");
+		apps[0]->argv[1] = strdup("--debugger=gdb-mi");
+		apps[0]->argv[2] = strdup("--host=localhost");
+		apps[0]->argv[3] = strdup("--port=12346");
+		apps[0]->argv[4] = NULL;
+		apps[0]->argc = 4;
+	}
+	
 	printf("Spawning %d processes of job '%s'\n", apps[0]->num_procs, apps[0]->app);
 	printf("\tprogram name '%s'\n", apps[0]->argv[0]);
 	fflush(stdout);
@@ -510,7 +520,7 @@ ORTERun(char **args)
 	printf("UNLOCKED!\n"); fflush(stdout);
 	
 	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_RUN, rc)) return 1;
-	
+
 	printf("NEW JOBID = %d\n", jobid); fflush(stdout);
 	
 	asprintf(&res, "%d %d", RTEV_NEWJOB, jobid);
