@@ -124,4 +124,8 @@ public class AIF implements IAIF {
 	public String getDescription() {
 		return this.typeDesc;
 	}
+	
+	public String toString() {
+		return "<\"" + aifType.toString() + "\", " + aifValue.toString() + ">";
+	}
 }
