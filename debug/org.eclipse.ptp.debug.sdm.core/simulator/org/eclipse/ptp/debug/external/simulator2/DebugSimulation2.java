@@ -37,11 +37,11 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.aif.AIF;
+import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.IDebugger;
-import org.eclipse.ptp.debug.external.aif.AIF;
-import org.eclipse.ptp.debug.external.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.variable.Argument;
@@ -58,7 +58,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	private static final String APP_NAME = "../main.c";
 	private final boolean EVENT_BY_EACH_PROC = false;
 	private List sim_list = new ArrayList();
-	private final long TIME_RANGE = 10;
+	private final long TIME_RANGE = 100;
 	private int total_process = 0;
 	private InternalEventQueue intQueue = null;
 	private Map variables = new HashMap();
@@ -92,6 +92,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	}
 	
 	public void startDebugger(IPJob job) {
+		System.out.println("   ------ start debugger");
 		total_process = job.size();
 		for (int i = 0; i < total_process; i++) {
 			SimulateProgram sim_program = new SimulateProgram(i, APP_NAME);
