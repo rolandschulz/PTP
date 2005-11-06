@@ -42,6 +42,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorageDescriptor;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.cdi.model.variable.ThreadStorageDescriptor;
+import org.eclipse.ptp.debug.external.target.TargetStackFrameEvent;
 
 public class Thread extends PTPObject implements ICDIThread {
 	static ICDIStackFrame[] noStack = new ICDIStackFrame[0];
@@ -95,15 +96,16 @@ public class Thread extends PTPObject implements ICDIThread {
 			ICDIThread currentThread = target.getCurrentThread();
 			target.setCurrentThread(this, false);
 
-			Session session = (Session) target.getSession();
+			Session session = (Session) target.getSession();			
 			try {
-				ICDIStackFrame[] frames = target.getDebugger().listStackFrames(session.createBitList(target.getTargetID()));
+				ICDIStackFrame[] frames = new TargetStackFrameEvent(session, session.createBitList(target.getTargetID())).getStackFrames();
 				for (int i = 0; i < frames.length; i++) {
 					currentFrames.add(frames[i]);
 				}
 			} finally {
 				target.setCurrentThread(currentThread, false);
 			}
+			
 			// assign the currentFrame if it was not done yet.
 			if (currentFrame == null) {
 				for (int i = 0; i < currentFrames.size(); i++) {
@@ -120,9 +122,10 @@ public class Thread extends PTPObject implements ICDIThread {
 	public int getStackFrameCount() throws CDIException {
 		if (stackdepth == 0 || currentFrames == null) {
 			currentFrames = new ArrayList();
-			Target target = (Target) getTarget();
-			Session session = (Session) target.getSession();
-			ICDIStackFrame[] frames = session.getDebugger().listStackFrames(session.createBitList(target.getTargetID()));
+			final Target target = (Target) getTarget();
+			final Session session = (Session) target.getSession();
+			
+			ICDIStackFrame[] frames = new TargetStackFrameEvent(session, session.createBitList(target.getTargetID())).getStackFrames();
 			for (int i = 0; i < frames.length; i++) {
 				currentFrames.add(frames[i]);
 			}

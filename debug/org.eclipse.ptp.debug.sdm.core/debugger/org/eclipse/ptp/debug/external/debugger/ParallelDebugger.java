@@ -26,7 +26,6 @@ import java.util.HashMap;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
@@ -67,6 +66,7 @@ import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugStackframeEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugStepEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugTypeEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugVarsEvent;
+import org.eclipse.ptp.debug.external.target.ITargetEvent;
 
 
 public class ParallelDebugger extends AbstractDebugger implements IDebugger, IProxyDebugEventListener {
@@ -108,11 +108,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	private HashMap				bpMap = new HashMap();
 	private ArrayList			bpArray = new ArrayList();
 	private int					bpId = 0;
-	private ICDIStackFrame[]		lastFrames = null;
-	private String				lastStrRes = null;
-	private IAIF					lastDataRes = null;
-	private ICDILocalVariable[] 	lastVars = null;
-	private ICDIArgument[]		lastArgs = null;
 	private ICDIStackFrame		currFrame = null;
 	
 	/*
@@ -302,110 +297,81 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	/**
 	 * list stack frames for first process in procs
 	 */
-	public ICDIStackFrame[] listStackFrames(BitList tasks) throws PCDIException {
+	public void listStackFrames(BitList tasks) throws PCDIException {
 		try {
 			proxy.debugListStackframes(tasks, 0);
 		} catch (IOException e) {
+			throw new PCDIException(e.getMessage());
 		}
-		
 		waitForEvents(tasks);
-		
-		return this.lastFrames;
 	}
 	
 	public void setCurrentStackFrame(BitList tasks, ICDIStackFrame frame) throws PCDIException {
 		try {
 			proxy.debugSetCurrentStackframe(tasks, frame.getLevel());
 		} catch (IOException e) {
+			throw new PCDIException(e.getMessage());
 		}
-		
 		waitForEvents(tasks);
 	}
 	
 	/**
 	 * evaluate expression for first process in procs
 	 */
-	public String evaluateExpression(BitList tasks, String expr) throws PCDIException {
-		IAIF aif = getAIFValue(tasks, expr);
-		
-		if (aif == null)
-			return "";
-		
-		return aif.getValue().toString();
+	public void evaluateExpression(BitList tasks, String expr) throws PCDIException {
+		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "evaluateExpression");
 	}
 	
-	public IAIF getAIFValue(BitList tasks, String expr) throws PCDIException {
-		this.lastStrRes = null;
-		
+	public void getAIFValue(BitList tasks, String expr) throws PCDIException {
 		try {
 			proxy.debugEvaluateExpression(tasks, expr);
 		} catch (IOException e1) {
-			return null;
+			throw new PCDIException(e1.getMessage());
 		}
-
 		waitForEvents(tasks);
-		
-		return this.lastDataRes;
 	}
 	
 	/**
 	 * get variable type for first process in procs
 	 */
-	public String getVariableType(BitList tasks, String varName) throws PCDIException {
-		this.lastStrRes = null;
-		
+	public void getVariableType(BitList tasks, String varName) throws PCDIException {
 		try {
 			proxy.debugGetType(tasks, varName);
 		} catch (IOException e1) {
-			return "";
+			throw new PCDIException(e1.getMessage());
 		}
-
 		waitForEvents(tasks);
-		
-		return this.lastStrRes;
 	}
 	
 	/**
 	 * list local variables for first process in procs
 	 */
-	public ICDILocalVariable[] listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException {
-		this.lastVars = null;
-		this.currFrame = frame;
-
+	public void listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException {
 		try {
 			proxy.debugListLocalVariables(tasks);
 		} catch (IOException e1) {
-			return null;
+			throw new PCDIException(e1.getMessage());
 		}
-		
 		waitForEvents(tasks);
-		
-		return this.lastVars;
 	}
 	
 	/**
 	 * list global variables for first process in procs
 	 */
-	public ICDIGlobalVariable[] listGlobalVariables(BitList tasks) throws PCDIException {
+	public void listGlobalVariables(BitList tasks) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listGlobalVariables");
 	}
 	
 	/**
 	 * list arguments for first process in procs
 	 */
-	public ICDIArgument[] listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException {
-		this.lastArgs = null;
-		this.currFrame = frame;
-		
+	public void listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException {
 		try {
 			proxy.debugListArguments(tasks, frame.getLevel());
 		} catch (IOException e1) {
-			return null;
+			throw new PCDIException(e1.getMessage());
 		}
-		
 		waitForEvents(tasks);
-		
-		return this.lastArgs;
 	}
 
 	public IPCDIEvent handleBreakpointHitEvent(BitList tasks, String[] args) {
@@ -464,22 +430,33 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			
 		case IProxyDebugEvent.EVENT_DBG_FRAMES:
 			ProxyDebugStackframeEvent frameEvent = (ProxyDebugStackframeEvent)e;
-			this.lastFrames = null;
 			
-			IPProcess[] frameProcs = getProcesses(frameEvent.getBitSet());
+			IPProcess[] frameProcs = getProcesses(e.getBitSet());
 			if (frameProcs.length > 0) {
-				this.lastFrames = convertFrames(frameProcs[0], frameEvent.getFrames());
+				try {
+					setTargetResult(e.getBitSet(), convertFrames(frameProcs[0], frameEvent.getFrames()), ITargetEvent.STACKFRAME_TYPE);
+				} catch (PCDIException pe) {
+					
+				}
 			}
 			break;
 
 		case IProxyDebugEvent.EVENT_DBG_TYPE:
 			ProxyDebugTypeEvent type = (ProxyDebugTypeEvent)e;
-			this.lastStrRes = type.getType();
+			try {
+				setTargetResult(e.getBitSet(), type.getType(), ITargetEvent.VARIABLETYPE_TYPE);
+			} catch (PCDIException pe) {
+				
+			}
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_DATA:
 			ProxyDebugDataEvent data = (ProxyDebugDataEvent)e;
-			this.lastDataRes = data.getData();
+			try {
+				setTargetResult(e.getBitSet(), data.getData(), ITargetEvent.AIFVALUE_TYPE);		
+			} catch (PCDIException pe) {
+				
+			}
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_VARS:
@@ -501,8 +478,11 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 					varList.add(var);
 				}
 			}
-			
-			this.lastVars = (ICDILocalVariable[]) varList.toArray(new ICDILocalVariable[0]);
+			try {
+				setTargetResult(e.getBitSet(), (ICDILocalVariable[]) varList.toArray(new ICDILocalVariable[0]), ITargetEvent.LOCALVARIABLES_TYPE);
+			} catch (PCDIException pe) {
+				
+			}
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_ARGS:
@@ -524,7 +504,11 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 					argList.add(arg);
 				}
 			}
-			this.lastArgs = (ICDIArgument[]) argList.toArray(new ICDIArgument[0]);
+			try {
+				setTargetResult(e.getBitSet(), (ICDIArgument[]) argList.toArray(new ICDIArgument[0]), ITargetEvent.ARGUMENTS_TYPE);
+			} catch (PCDIException pe) {
+				
+			}
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_EXIT:

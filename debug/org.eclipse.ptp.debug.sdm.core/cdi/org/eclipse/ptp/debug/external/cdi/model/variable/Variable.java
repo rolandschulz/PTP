@@ -64,6 +64,8 @@ import org.eclipse.ptp.debug.external.cdi.model.type.ShortValue;
 import org.eclipse.ptp.debug.external.cdi.model.type.StructValue;
 import org.eclipse.ptp.debug.external.cdi.model.type.Value;
 import org.eclipse.ptp.debug.external.cdi.model.type.WCharValue;
+import org.eclipse.ptp.debug.external.target.TargetAIFValueEvent;
+import org.eclipse.ptp.debug.external.target.TargetLocalVariablesEvent;
 
 /**
  */
@@ -123,7 +125,7 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		Session session = (Session)target.getSession();
 		
 		String name = getQualifiedName();
-		ICDILocalVariable[] vars = target.getDebugger().listLocalVariables(session.createBitList(target.getTargetID()), getStackFrame());
+		ICDILocalVariable[] vars = new TargetLocalVariablesEvent(session, session.createBitList(target.getTargetID()), getStackFrame()).getLocalVariables();
 		for (int i = 0; i < vars.length; i++) {
 			if (name.equals(vars[i].getQualifiedName())) {
 				varList.add(vars[i]);
@@ -241,7 +243,7 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		if (aif == null) {
 			Target target = (Target)getTarget();
 			Session session = (Session)target.getSession();
-			aif = target.getDebugger().getAIFValue(session.createBitList(target.getTargetID()), getName());
+			aif = new TargetAIFValueEvent(session, session.createBitList(target.getTargetID()), getName()).getAIF();
 		}
 		return aif.getDescription();
 	}
