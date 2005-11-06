@@ -22,57 +22,42 @@
  */
 package org.eclipse.ptp.debug.external;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
-import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 public interface IDebugger {
 
 	/* Debugger Initialization/Termination */
 	
-	/*
-	 * startDebuggerListener() is called prior to job launch. This
-	 * gives the debugger the opportunity to listen for incoming
-	 * connections (say from an external debugger)
-	 */
-	public void startDebuggerListener();
-	
 	/* The debugger must implement startDebugger()
 	 * This method will be called by initialize()
-	 */
-	public void startDebugger(IPJob job);
-	
-	/* 
+	 * protected abstract void startDebugger(IPJob job);
+	 * 
 	 * The debugger must implement stopDebugger()
 	 * This method will be called by exit()
-	 */
-	public void stopDebugger();
-	 
-	/* 
+	 * protected abstract void stopDebugger();
+	 * 
 	 * The debugger must call
 	 * public void handleDebugEvent(int eventType, BitList procs, String[] args);
 	 * to give notifications about events
 	 */
 	
 	/* Program Information */
-	public ICDIStackFrame[] listStackFrames(BitList tasks) throws PCDIException;
+	
+	public void listStackFrames(BitList tasks) throws PCDIException;
 	public void setCurrentStackFrame(BitList tasks, ICDIStackFrame frame) throws PCDIException;
 	
 	/* Data Display and Manipulation */
-	public IAIF getAIFValue(BitList tasks, String expr) throws PCDIException;
-	public String evaluateExpression(BitList tasks, String expression) throws PCDIException;
-	public String getVariableType(BitList tasks, String varName) throws PCDIException;	
-	public ICDIArgument[] listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException;
-	public ICDILocalVariable[] listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException;
-	public ICDIGlobalVariable[] listGlobalVariables(BitList tasks) throws PCDIException;
+	public void getAIFValue(BitList tasks, String expr) throws PCDIException;
+	public void evaluateExpression(BitList tasks, String expression) throws PCDIException;
+	public void getVariableType(BitList tasks, String varName) throws PCDIException;	
+	public void listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException;
+	public void listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException;
+	public void listGlobalVariables(BitList tasks) throws PCDIException;
 	
 	/* Execution Control */
 	public void stepInto(BitList tasks, int count) throws PCDIException;
@@ -88,7 +73,4 @@ public interface IDebugger {
 	public void setLineBreakpoint(BitList tasks, ICDILineBreakpoint bpt) throws PCDIException;
 	public void setFunctionBreakpoint(BitList tasks, ICDIFunctionBreakpoint bpt) throws PCDIException;
 	public void deleteBreakpoints(ICDIBreakpoint[] bp) throws PCDIException;
-
-	/* Miscellaneous */
-	public Process getDebuggerProcess();
 }
