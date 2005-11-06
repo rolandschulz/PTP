@@ -90,7 +90,8 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	private SimVariable[] getVariables() {
 		return (SimVariable[])variables.values().toArray(new SimVariable[0]);
 	}
-	
+	public void startDebuggerListener() {
+	}
 	public void startDebugger(IPJob job) {
 		System.out.println("   ------ start debugger");
 		total_process = job.size();

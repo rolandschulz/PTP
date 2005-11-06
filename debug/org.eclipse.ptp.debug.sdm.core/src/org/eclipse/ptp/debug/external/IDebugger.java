@@ -29,6 +29,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -37,14 +38,25 @@ public interface IDebugger {
 
 	/* Debugger Initialization/Termination */
 	
+	/*
+	 * startDebuggerListener() is called prior to job launch. This
+	 * gives the debugger the opportunity to listen for incoming
+	 * connections (say from an external debugger)
+	 */
+	public void startDebuggerListener();
+	
 	/* The debugger must implement startDebugger()
 	 * This method will be called by initialize()
-	 * protected abstract void startDebugger(IPJob job);
-	 * 
+	 */
+	public void startDebugger(IPJob job);
+	
+	/* 
 	 * The debugger must implement stopDebugger()
 	 * This method will be called by exit()
-	 * protected abstract void stopDebugger();
-	 * 
+	 */
+	public void stopDebugger();
+	 
+	/* 
 	 * The debugger must call
 	 * public void handleDebugEvent(int eventType, BitList procs, String[] args);
 	 * to give notifications about events

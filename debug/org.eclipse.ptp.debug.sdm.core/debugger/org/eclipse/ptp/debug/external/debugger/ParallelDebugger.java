@@ -155,19 +155,29 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		return buf.toString();
 	}
 	
-	public void startDebugger(IPJob job) {
-		proxy = new ProxyDebugClient("localhost", 12345);
-		proxy.addEventListener(this);
+	public void startDebuggerListener() {
+		proxy = new ProxyDebugClient("localhost", 12346);
 		try {
-			proxy.sessionCreate(true);
-			waitForEvent();
+			proxy.sessionCreate();
+		} catch (IOException e) {
+			return;
+		}
+		
+	}
+	
+	public void startDebugger(IPJob job) {
+		try {
+			proxy.waitForConnect(); // PROXY_DEBUG_CONNECT
+			proxy.addEventListener(this);
+
+			waitForEvent(); // PROXY_DEBUG_INIT
 			
 			String app = (String) job.getAttribute("app");
 			//String dir = (String) job.getAttribute("dir");
 			String[] args = (String[]) job.getAttribute("args");
 			
 			proxy.debugStartSession(app, join(args, " "));
-			waitForEvent();
+			waitForEvent(); // PROXY_DEBUG_OK
 		} catch (IOException e) {
 			return;
 		}
