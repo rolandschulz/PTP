@@ -35,7 +35,6 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
-import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
@@ -298,6 +297,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	 * list stack frames for first process in procs
 	 */
 	public void listStackFrames(BitList tasks) throws PCDIException {
+		System.out.println(" *********** call stack frame");
 		try {
 			proxy.debugListStackframes(tasks, 0);
 		} catch (IOException e) {
@@ -323,6 +323,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	}
 	
 	public void getAIFValue(BitList tasks, String expr) throws PCDIException {
+		System.out.println(" *********** call getAIF");
 		try {
 			proxy.debugEvaluateExpression(tasks, expr);
 		} catch (IOException e1) {
@@ -335,6 +336,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	 * get variable type for first process in procs
 	 */
 	public void getVariableType(BitList tasks, String varName) throws PCDIException {
+		System.out.println(" *********** call getVariableType");
 		try {
 			proxy.debugGetType(tasks, varName);
 		} catch (IOException e1) {
@@ -347,6 +349,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	 * list local variables for first process in procs
 	 */
 	public void listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException {
+		System.out.println(" *********** call listLocalVariables");
 		try {
 			proxy.debugListLocalVariables(tasks);
 		} catch (IOException e1) {
@@ -366,6 +369,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	 * list arguments for first process in procs
 	 */
 	public void listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException {
+		System.out.println(" *********** call listArguments");
 		try {
 			proxy.debugListArguments(tasks, frame.getLevel());
 		} catch (IOException e1) {
@@ -434,9 +438,10 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			IPProcess[] frameProcs = getProcesses(e.getBitSet());
 			if (frameProcs.length > 0) {
 				try {
+					System.out.println("========== set stack frame to target event");
 					setTargetResult(e.getBitSet(), convertFrames(frameProcs[0], frameEvent.getFrames()), ITargetEvent.STACKFRAME_TYPE);
 				} catch (PCDIException pe) {
-					
+					pe.printStackTrace();
 				}
 			}
 			break;
@@ -444,18 +449,20 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		case IProxyDebugEvent.EVENT_DBG_TYPE:
 			ProxyDebugTypeEvent type = (ProxyDebugTypeEvent)e;
 			try {
+				System.out.println("========== set variable type to target event");
 				setTargetResult(e.getBitSet(), type.getType(), ITargetEvent.VARIABLETYPE_TYPE);
 			} catch (PCDIException pe) {
-				
+				pe.printStackTrace();
 			}
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_DATA:
 			ProxyDebugDataEvent data = (ProxyDebugDataEvent)e;
 			try {
+				System.out.println("========== set AIF data to target event");
 				setTargetResult(e.getBitSet(), data.getData(), ITargetEvent.AIFVALUE_TYPE);		
 			} catch (PCDIException pe) {
-				
+				pe.printStackTrace();
 			}
 			break;
 			
@@ -479,9 +486,10 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 				}
 			}
 			try {
+				System.out.println("========== set local variable to target event");
 				setTargetResult(e.getBitSet(), (ICDILocalVariable[]) varList.toArray(new ICDILocalVariable[0]), ITargetEvent.LOCALVARIABLES_TYPE);
 			} catch (PCDIException pe) {
-				
+				pe.printStackTrace();
 			}
 			break;
 			
@@ -505,9 +513,10 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 				}
 			}
 			try {
+				System.out.println("========== set arguments to target event");
 				setTargetResult(e.getBitSet(), (ICDIArgument[]) argList.toArray(new ICDIArgument[0]), ITargetEvent.ARGUMENTS_TYPE);
 			} catch (PCDIException pe) {
-				
+				pe.printStackTrace();
 			}
 			break;
 			
