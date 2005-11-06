@@ -18,16 +18,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external;
 
-import org.eclipse.ui.plugin.*;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.osgi.framework.BundleContext;
-import java.util.*;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.BundleContext;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -154,4 +157,11 @@ public class PTPDebugExternalPlugin extends AbstractUIPlugin {
 		return logger;
 	}
 	
+	/***** LOG *****/
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
+	}
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, "Internal Error", e));
+	}	
 }
