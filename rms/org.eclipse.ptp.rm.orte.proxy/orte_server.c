@@ -5,6 +5,7 @@
 #include "orte_config.h"
 #include <stdbool.h>
 #include <errno.h>
+#include <list.h>
 
 #include "include/orte_constants.h"
 #include "mca/errmgr/errmgr.h"
@@ -61,6 +62,7 @@ int 			orte_shutdown = 0;
 proxy_svr *	orte_proxy;
 int			is_orte_initialized = 0;
 int			orted_pid = 0;
+List *		eventList;
 
 static proxy_handler_funcs handler_funcs = {
 	RegisterFileHandler,		// regfile() - call to register a file handler
@@ -349,6 +351,7 @@ ORTEProgress(void)
 	fd_set			efds;
 	int				res;
 	int				nfds = 0;
+	char *			event;
 	struct timeval	tv;
 	handler *		h;
 	
@@ -356,6 +359,12 @@ ORTEProgress(void)
 	TIMEOUT.tv_sec = 0;
 	TIMEOUT.tv_usec = 2000;
 
+	for (SetList(eventList); (event = (char *)GetListElement(eventList)) != NULL; ) {
+		proxy_svr_event_callback(orte_proxy, event);
+		RemoveFromList(eventList, (void *)event);
+		free(event);	
+	}
+	
 	/***********************************
 	 * First: Check for any file events
 	 */
@@ -577,9 +586,8 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 			break;
 	}
 
-	asprintf(&res, "%d %d %d", jobid, RTEV_JOBSTATE, state);
-	proxy_svr_event_callback(orte_proxy, res);
-	free(res);
+	asprintf(&res, "%d %d %d", RTEV_JOBSTATE, jobid, state);
+	AddToList(eventList, (void *)res);
 }
 
 /* this is an internal function we'll call from within this, consider
@@ -899,6 +907,8 @@ ORTEQuit(void)
 void
 server(char *name, char *host, int port)
 {
+	eventList = NewList();
+	
 	if (proxy_svr_init(name, &handler_funcs, &helper_funcs, command_tab, &orte_proxy) != PROXY_RES_OK)
 		return;
 	
