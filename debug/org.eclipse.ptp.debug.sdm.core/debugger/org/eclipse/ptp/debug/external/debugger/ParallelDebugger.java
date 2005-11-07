@@ -152,13 +152,13 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	
 	public void startDebuggerListener() {
 		proxy = new ProxyDebugClient("localhost", 12346);
-		cmdQueue = new DebuggerCommandQueue(proxy);
 		try {
 			proxy.sessionCreate();
 		} catch (IOException e) {
+			System.out.println("could not create proxy");
 			return;
 		}
-		
+		cmdQueue = new DebuggerCommandQueue(proxy);	
 	}
 	
 	public void startDebugger(IPJob job) {
