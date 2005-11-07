@@ -213,7 +213,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		} catch (IOException e) {
 			// TODO deal with IOException (maybe should be dealt with in ProxyClient?)
 		}
-		//waitForEvents(tasks);		
+		waitForEvents(tasks);		
 		IPCDIExitedEvent e = new InferiorExitedEvent(getSession(), tasks);
 		super.fireEvent(e);
 	}
