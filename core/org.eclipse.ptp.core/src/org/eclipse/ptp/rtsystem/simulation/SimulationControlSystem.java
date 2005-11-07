@@ -315,7 +315,7 @@ public class SimulationControlSystem implements IControlSystem {
 				listener.runtimeJobExited(ne);
 				break;
 			case RuntimeEvent.EVENT_JOB_STATE_CHANGED:
-				listener.runtimeJobStateChanged(ne);
+				listener.runtimeJobStateChanged(ne, "<SIMULATED>");
 				break;
 			case RuntimeEvent.EVENT_NEW_JOB:
 				listener.runtimeNewJob(ne);

@@ -372,8 +372,18 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		 */
 	}
 
-	public void runtimeJobStateChanged(String ne) {
-		refreshJobStatus(ne);
+	public void runtimeJobStateChanged(String nejob, String state) {
+		IPJob job = universe.findJobByName(nejob);
+		if (job != null) {
+			IPProcess[] procs = job.getProcesses();
+			if (procs != null) {
+				for (int i = 0; i < procs.length; i++) {
+					procs[i].setStatus(state);
+				}
+			}
+			fireEvent(job, EVENT_UPDATED_STATUS);
+		}
+		//refreshJobStatus(ne);
 	}
 
 	public void runtimeNewJob(String ne) {

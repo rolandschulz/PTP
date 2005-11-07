@@ -334,6 +334,9 @@ ORTEShutdown(void)
 	orte_console_send_command(ORTE_DAEMON_EXIT_CMD);
 	printf("ORTEShutdown() - told ORTEd to exit.\n"); fflush(stdout);
 	orte_shutdown++;
+	
+	orte_finalize();
+	
 	return 0;
 }
 
