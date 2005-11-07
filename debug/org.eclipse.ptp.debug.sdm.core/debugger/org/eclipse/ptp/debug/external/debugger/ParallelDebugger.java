@@ -304,14 +304,12 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	}
 	
 	public void setCurrentStackFrame(BitList tasks, ICDIStackFrame frame) throws PCDIException {
-		/*
 		try {
 			proxy.debugSetCurrentStackframe(tasks, frame.getLevel());
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
 		}
 		waitForEvents(tasks);
-		*/
 	}
 	
 	/**
