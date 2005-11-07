@@ -96,6 +96,9 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 	public IAIF getAIF() {
 		return aif;
 	}
+	public void setAIF(IAIF aif) {
+		this.aif = aif;
+	}
 
 	public int getPosition() {
 		return position;

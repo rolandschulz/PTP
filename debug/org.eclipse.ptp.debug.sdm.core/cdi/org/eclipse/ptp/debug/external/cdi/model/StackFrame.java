@@ -38,12 +38,15 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.external.ExtFormat;
 import org.eclipse.ptp.debug.external.cdi.Locator;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.cdi.model.variable.ArgumentDescriptor;
 import org.eclipse.ptp.debug.external.cdi.model.variable.LocalVariableDescriptor;
+import org.eclipse.ptp.debug.external.target.TargetAIFValueEvent;
 
 public class StackFrame extends PTPObject implements ICDIStackFrame {
 	Thread cthread;
@@ -74,6 +77,16 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 			VariableManager mgr = session.getVariableManager();
 			argDescs = mgr.getArgumentDescriptors(this);
 		}
+		else {
+			Target target = (Target)getTarget();
+			Session session = (Session)target.getSession();
+			BitList tasks = session.createBitList(target.getTargetID());
+			for (int i=0; i<argDescs.length; i++) {
+				ArgumentDescriptor argDesc = (ArgumentDescriptor)argDescs[i];
+				IAIF aif = new TargetAIFValueEvent(session, tasks, argDesc.getQualifiedName()).getAIF();
+				argDesc.setAIF(aif);
+			}
+		}
 		return argDescs;
 	}
 	public ICDILocalVariableDescriptor[] getLocalVariableDescriptors() throws CDIException {
@@ -81,6 +94,16 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 			Session session = (Session)getTarget().getSession();
 			VariableManager mgr = session.getVariableManager();
 			localDescs = mgr.getLocalVariableDescriptors(this);
+		}
+		else {
+			Target target = (Target)getTarget();
+			Session session = (Session)target.getSession();
+			BitList tasks = session.createBitList(target.getTargetID());
+			for (int i=0; i<localDescs.length; i++) {
+				LocalVariableDescriptor localDesc = (LocalVariableDescriptor)localDescs[i];
+				IAIF aif = new TargetAIFValueEvent(session, tasks, localDesc.getQualifiedName()).getAIF();
+				localDesc.setAIF(aif);
+			}
 		}
 		return localDescs;
 	}

@@ -66,9 +66,10 @@ public class Thread extends PTPObject implements ICDIThread {
 		return id;
 	}
 	public void clearState() {
-		stackdepth = 0;
-		currentFrame = null;
-		currentFrames = null;
+		//FIXME commented
+		//stackdepth = 0;
+		//currentFrame = null;
+		//currentFrames = null;
 	}
 	public String toString() {
 		String str = Integer.toString(id);
@@ -157,13 +158,13 @@ public class Thread extends PTPObject implements ICDIThread {
 				}
 			}
 		}
-
 		Target target = (Target)getTarget();
 		Session session = (Session) target.getSession();
 		target.getDebugger().setCurrentStackFrame(session.createBitList(target.getTargetID()), stackframe);
 
 		currentFrame = stackframe;
 		if (doUpdate) {
+
 			VariableManager varMgr = session.getVariableManager();
 			if (varMgr.isAutoUpdate()) {
 				varMgr.update(target);

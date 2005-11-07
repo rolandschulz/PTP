@@ -183,7 +183,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		} catch (IOException e) {
 			return;
 		}
-		waitForEvent();
+		//waitForEvent();
 	}
 	
 	public Process getDebuggerProcess() {
@@ -213,7 +213,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		} catch (IOException e) {
 			// TODO deal with IOException (maybe should be dealt with in ProxyClient?)
 		}
-		waitForEvents(tasks);		
+		//waitForEvents(tasks);		
 		IPCDIExitedEvent e = new InferiorExitedEvent(getSession(), tasks);
 		super.fireEvent(e);
 	}
@@ -253,7 +253,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		} catch (IOException e1) {
 			return;
 		}
-		
 		waitForEvents(tasks);
 	}
 
@@ -263,7 +262,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		} catch (IOException e1) {
 			return;
 		}
-		
 		waitForEvents(tasks);
 	}
 
@@ -273,7 +271,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		} catch (IOException e1) {
 			return;
 		}
-
 		waitForEvents(tasks);
 	}
 	
@@ -303,16 +300,18 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
 		}
-		waitForEvents(tasks);
+		//waitForEvents(tasks);
 	}
 	
 	public void setCurrentStackFrame(BitList tasks, ICDIStackFrame frame) throws PCDIException {
+		/*
 		try {
 			proxy.debugSetCurrentStackframe(tasks, frame.getLevel());
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
 		}
 		waitForEvents(tasks);
+		*/
 	}
 	
 	/**
@@ -329,7 +328,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		} catch (IOException e1) {
 			throw new PCDIException(e1.getMessage());
 		}
-		waitForEvents(tasks);
+		//waitForEvents(tasks);
 	}
 	
 	/**
@@ -342,7 +341,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		} catch (IOException e1) {
 			throw new PCDIException(e1.getMessage());
 		}
-		waitForEvents(tasks);
+		//waitForEvents(tasks);
 	}
 	
 	/**
@@ -356,7 +355,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		} catch (IOException e1) {
 			throw new PCDIException(e1.getMessage());
 		}
-		waitForEvents(tasks);
+		//waitForEvents(tasks);
 	}
 	
 	/**
@@ -377,30 +376,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		} catch (IOException e1) {
 			throw new PCDIException(e1.getMessage());
 		}
-		waitForEvents(tasks);
-	}
-
-	public IPCDIEvent handleBreakpointHitEvent(BitList tasks, String[] args) {
-		// Handled by direct call to super.fireEvent();
-		return null;
-	}
-
-	public IPCDIEvent handleEndSteppingEvent(BitList tasks, String[] args) {
-		// Auto-generated method stub
-		System.out.println("ParallelDebugger.handleEndSteppingEvent()");
-		return null;
-	}
-
-	public IPCDIEvent handleProcessResumedEvent(BitList tasks, String[] args) {
-		// Auto-generated method stub
-		System.out.println("ParallelDebugger.handleProcessResumedEvent()");
-		return null;
-	}
-
-	public IPCDIEvent handleProcessTerminatedEvent(BitList tasks, String[] args) {
-		// Auto-generated method stub
-		System.out.println("ParallelDebugger.handleProcessTerminatedEvent()");
-		return null;
+		//waitForEvents(tasks);
 	}
 
 	public synchronized void handleEvent(IProxyDebugEvent e) {
@@ -440,7 +416,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			IPProcess[] frameProcs = getProcesses(e.getBitSet());
 			if (frameProcs.length > 0) {
 				try {
-					System.out.println("========== set stack frame to target event");
+					System.out.println("########### set stack frame to target event");
 					setTargetResult(e.getBitSet(), convertFrames(frameProcs[0], frameEvent.getFrames()), ITargetEvent.STACKFRAME_TYPE);
 				} catch (PCDIException pe) {
 					pe.printStackTrace();
@@ -451,7 +427,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		case IProxyDebugEvent.EVENT_DBG_TYPE:
 			ProxyDebugTypeEvent type = (ProxyDebugTypeEvent)e;
 			try {
-				System.out.println("========== set variable type to target event");
+				System.out.println("########### set variable type to target event");
 				setTargetResult(e.getBitSet(), type.getType(), ITargetEvent.VARIABLETYPE_TYPE);
 			} catch (PCDIException pe) {
 				pe.printStackTrace();
@@ -461,7 +437,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		case IProxyDebugEvent.EVENT_DBG_DATA:
 			ProxyDebugDataEvent data = (ProxyDebugDataEvent)e;
 			try {
-				System.out.println("========== set AIF data to target event");
+				System.out.println("########### set AIF data to target event");
 				setTargetResult(e.getBitSet(), data.getData(), ITargetEvent.AIFVALUE_TYPE);		
 			} catch (PCDIException pe) {
 				pe.printStackTrace();
@@ -488,7 +464,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 				}
 			}
 			try {
-				System.out.println("========== set local variable to target event");
+				System.out.println("########### set local variable to target event");
 				setTargetResult(e.getBitSet(), (ICDILocalVariable[]) varList.toArray(new ICDILocalVariable[0]), ITargetEvent.LOCALVARIABLES_TYPE);
 			} catch (PCDIException pe) {
 				pe.printStackTrace();
@@ -515,7 +491,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 				}
 			}
 			try {
-				System.out.println("========== set arguments to target event");
+				System.out.println("########### set arguments to target event");
 				setTargetResult(e.getBitSet(), (ICDIArgument[]) argList.toArray(new ICDIArgument[0]), ITargetEvent.ARGUMENTS_TYPE);
 			} catch (PCDIException pe) {
 				pe.printStackTrace();
