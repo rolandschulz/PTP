@@ -21,8 +21,8 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 	protected Queue events = new Queue();
 	protected BitSet waitEvents = new BitSet();
 	
-	public OMPIProxyRuntimeClient(String host, int port) {
-		super(host, port);
+	public OMPIProxyRuntimeClient() {
+		super();
 		super.addRuntimeEventListener(this);
 	}
 	
@@ -45,12 +45,12 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 					
 					Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 					
-					int port = preferences.getInt(PreferenceConstants.ORTE_SERVER_PORT);
+					//int port = preferences.getInt(PreferenceConstants.ORTE_SERVER_PORT);
 					String proxyPath = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
 				
 					Runtime rt = Runtime.getRuntime ();
 					
-					cmd = proxyPath + " --port="+port;
+					cmd = proxyPath + " --port="+getSessionPort();
 					
 					System.out.println("RUNNING PROXY SERVER COMMAND: '"+cmd+"'");
 					

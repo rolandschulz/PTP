@@ -25,6 +25,7 @@ public class JobRunConfiguration {
 	protected int numberOfProcesses;
 	protected int numberOfProcessesPerNode;
 	protected int firstNodeNumber;
+	protected int remoteInfo;
 	protected boolean isDebugJob = false;
 	
 	public JobRunConfiguration(String p, String mn, int np, int npp, int fn, boolean debug)
@@ -35,6 +36,7 @@ public class JobRunConfiguration {
 		numberOfProcessesPerNode = npp;
 		firstNodeNumber = fn;
 		isDebugJob = debug;
+		remoteInfo = 0;
 	}
 	
 	public String getPathToExec()
@@ -62,6 +64,11 @@ public class JobRunConfiguration {
 		return firstNodeNumber;
 	}
 	
+	public int getRemoteInfo()
+	{
+		return remoteInfo;
+	}
+	
 	public boolean isDebug()
 	{
 		return isDebugJob;
@@ -70,6 +77,11 @@ public class JobRunConfiguration {
 	public void setDebug()
 	{
 		isDebugJob = true;
+	}
+	
+	public void setRemoteInfo(int val)
+	{
+		remoteInfo = val;
 	}
 	
 	public String toString()

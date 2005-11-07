@@ -66,7 +66,8 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 		dQ.addItem("Look at this console window for output from the Debug Simulator");
 		dQ.addItem("  ");
 	}
-	public void startDebuggerListener() {
+	public int startDebuggerListener() {
+		return 0;
 	}
 	public void startDebugger(IPJob job) {
 		state = SUSPENDED;

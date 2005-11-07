@@ -189,7 +189,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				debugger = debugConfig.createDebugger();
-				debugger.startDebuggerListener();
+				jrunconfig.setRemoteInfo(debugger.startDebuggerListener());
 				jrunconfig.setDebug();
 			}
 			

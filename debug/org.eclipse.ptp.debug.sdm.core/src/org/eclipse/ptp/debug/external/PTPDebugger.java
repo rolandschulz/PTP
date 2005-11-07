@@ -34,8 +34,8 @@ public class PTPDebugger implements IPTPDebugger {
 		debugger = new ParallelDebugger();
 	}
 	
-	public void startDebuggerListener() {
-		debugger.startDebuggerListener();
+	public int startDebuggerListener() {
+		return debugger.startDebuggerListener();
 	}
 
 	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) {
