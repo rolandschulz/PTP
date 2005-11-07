@@ -305,6 +305,8 @@ ORTEInit(void)
 	
 	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_INIT, rc)) return 1;
 	
+	is_orte_initialized = true;
+	
 	return 0;
 }
 
@@ -314,9 +316,9 @@ ORTEFinalize(void)
 {
 	int rc;
 	
-	opal_mutex_lock(&opal_event_lock);
+	//opal_mutex_lock(&opal_event_lock);
 	rc = orte_finalize();
-	opal_mutex_unlock(&opal_event_lock);
+	//opal_mutex_unlock(&opal_event_lock);
 	
 	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_FINALIZE, rc)) return 1;
 	
@@ -425,9 +427,7 @@ ORTEProgress(void)
 	
 	/* only run the progress of the ORTE code if we've initted the ORTE daemon */
 	if(ORTEInitialized()) {
-		opal_mutex_lock(&opal_event_lock);
-		opal_event_loop(0);
-		opal_mutex_unlock(&opal_event_lock);
+		opal_event_loop(OPAL_EVLOOP_ONCE);
 	}
 	
 	return PROXY_RES_OK;
@@ -516,17 +516,11 @@ ORTERun(char **args)
 	printf("\tprogram name '%s'\n", apps[0]->argv[0]);
 	fflush(stdout);
 	
-	//opal_mutex_lock(&opal_event_lock);
 	/* calls the ORTE spawn function with the app to spawn.  Return the
 	 * jobid assigned by the registry/ORTE.  Passes a callback function
 	 * that ORTE will call with state change on this job */
-	printf("LOCKED, now spawning\n"); fflush(stdout);
-	rc = 0;
 	rc = orte_rmgr.spawn(apps, num_apps, &jobid, job_state_callback);
-	//rc = orte_rmgr.spawn(NULL, 0, NULL, NULL);
 	printf("SPAWNED [error code %d = '%s'], now unlocking\n", rc, ORTE_ERROR_NAME(rc)); fflush(stdout);
-	//opal_mutex_unlock(&opal_event_lock);
-	printf("UNLOCKED!\n"); fflush(stdout);
 	
 	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_RUN, rc)) return 1;
 
