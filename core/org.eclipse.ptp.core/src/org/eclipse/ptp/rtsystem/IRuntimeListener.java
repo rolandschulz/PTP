@@ -25,7 +25,7 @@ public interface IRuntimeListener {
 
 	public void runtimeJobExited(String ID);
 
-	public void runtimeJobStateChanged(String ID);
+	public void runtimeJobStateChanged(String ID, String state);
 
 	public void runtimeNewJob(String ID);
 }

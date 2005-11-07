@@ -267,7 +267,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 				listener.runtimeJobExited(ID);
 				break;
 			case RuntimeEvent.EVENT_JOB_STATE_CHANGED:
-				listener.runtimeJobStateChanged(ID);
+				listener.runtimeJobStateChanged(ID, event.getText());
 				break;
 			case RuntimeEvent.EVENT_NEW_JOB:
 				listener.runtimeNewJob(ID);
@@ -304,5 +304,21 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 
     public synchronized void handleEvent(IProxyRuntimeEvent e) {
         System.out.println("got event: " + e.toString());
+        if(e instanceof ProxyRuntimeJobStateEvent) {
+        		RuntimeEvent re = new RuntimeEvent(RuntimeEvent.EVENT_JOB_STATE_CHANGED);
+        		int state = ((ProxyRuntimeJobStateEvent)e).getJobState();
+        		String stateStr = new String("error");
+        		
+        		switch(state) {
+        			case 3:
+        				stateStr = new String("running");
+        				break;
+        			case 8: case 9:
+        				stateStr = new String("exited");
+        		}
+        		
+        		re.setText(stateStr);
+        		fireEvent("job"+((ProxyRuntimeJobStateEvent)e).getJobID(), re);
+        }
     }
 }
