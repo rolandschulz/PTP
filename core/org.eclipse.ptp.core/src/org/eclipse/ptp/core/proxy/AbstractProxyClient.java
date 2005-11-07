@@ -123,6 +123,7 @@ public abstract class AbstractProxyClient {
 					while (!exitThread) {
 						sessionProgress();
 					}
+					sessSvrSock.close();
 				} catch (IOException e) {
 				}
 				System.out.println("event thread exiting...");
