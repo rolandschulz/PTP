@@ -26,36 +26,38 @@ import org.eclipse.ptp.debug.external.cdi.Session;
  * @author Clement chu
  *
  */
-public abstract class AbstractTargetEvent implements ITargetEvent {
+public abstract class AbstractTargetEvent extends Thread implements ITargetEvent {
+	private final Object lock = new Object();
 	protected Session session = null;
 	protected BitList targets = null;
 	protected Object result = null;
 	protected int type;
-	private final int TIME_OUT = 20000;
+	private final int TIME_OUT = 30000;
 	
 	public AbstractTargetEvent(Session session, BitList targets, int type) {
 		this.session = session;
 		this.targets = targets;
 		this.type = type;
 	}
-	public void exec() {
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					session.getDebugger().addTargetEvent(AbstractTargetEvent.this);
-					action();
-				} catch (PCDIException e) {
-					synchronized(AbstractTargetEvent.this) {
-						AbstractTargetEvent.this.notifyAll();
-					}
-				}
+	
+	public void run() {
+		try {
+			session.getDebugger().addTargetEvent(AbstractTargetEvent.this);
+			action();
+		} catch (PCDIException e) {
+			e.printStackTrace();
+			synchronized(AbstractTargetEvent.this) {
+				AbstractTargetEvent.this.notifyAll();
 			}
-		}).start();
-		synchronized (this) {
-			try {
-				wait(TIME_OUT);
-			} catch (InterruptedException e) {}
 		}
+	}
+	public void exec() {
+		start();		
+		synchronized (lock) {
+			try {
+				lock.wait(TIME_OUT);
+			} catch (InterruptedException e) {}
+		}		
 	}
 	public Session getSession() {
 		return session;
@@ -73,9 +75,9 @@ public abstract class AbstractTargetEvent implements ITargetEvent {
 		return result;
 	}
 	public void setResult(Object result) {
-		synchronized (this) {
+		synchronized (lock) {
 			this.result = result;
-			notifyAll();
+			lock.notifyAll();
 		}
 	}
 	public int getType() {

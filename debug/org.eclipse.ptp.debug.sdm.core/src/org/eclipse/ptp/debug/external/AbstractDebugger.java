@@ -28,8 +28,6 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
@@ -58,15 +56,17 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	protected boolean isExited = false;
 	private IPJob job = null;
 	protected List targetEventQueue = null;
-	
+
 	public ITargetEvent getTargetEvent(BitList tasks, int type) throws PCDIException {
 		synchronized (targetEventQueue) {
+			System.out.println("----------- find size : " + targetEventQueue.size());
 			for (int i=0; i<targetEventQueue.size(); i++) {
 				ITargetEvent event = (ITargetEvent)targetEventQueue.get(i);
 				if (event.getType() == type && event.contain(tasks)) {
 					return (ITargetEvent)targetEventQueue.remove(i);
 				}
 			}
+			System.out.println("----------- NOT FOUND ------------");
 			throw new PCDIException("No target event found");
 		}
 	}
@@ -78,8 +78,24 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public void addTargetEvent(ITargetEvent event) {
 		synchronized (targetEventQueue) {
 			targetEventQueue.add(event);
+			System.out.println("----------- add size : " + targetEventQueue.size());
 		}
-	}	
+	}
+	public boolean isEmptyTargetEvent() {
+		return targetEventQueue.isEmpty();
+	}
+	public void removeTargetEvent(BitList tasks) {
+		synchronized (targetEventQueue) {
+			for (int i=0; i<targetEventQueue.size(); i++) {
+				ITargetEvent event = (ITargetEvent)targetEventQueue.get(i);
+				if (event.contain(tasks)) {
+					event.notifyAll();
+					targetEventQueue.remove(i);
+					break;
+				}
+			}
+		}
+	}
 	public void listStackFrames(ITargetEvent event) throws PCDIException {
 		listStackFrames(event.getTargets());
 		addTargetEvent(event);
@@ -149,39 +165,33 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		}
 	}
 	public synchronized final void fireEvent(final IPCDIEvent event) {
-		Platform.run(new ISafeRunnable() {
-			public void handleException(Throwable ex) {
-				PTPDebugExternalPlugin.log(ex);
+		if (event != null) {
+			//FIXME - add item here or??
+			eventQueue.addItem(event);
+			System.out.println("    --- Abs debugger: " + event);
+			BitList tasks = event.getAllProcesses();
+			if (event instanceof IPCDIExitedEvent) {
+				setSuspendTasks(false, tasks);
+				setTerminateTasks(true, tasks);
+				setProcessStatus(tasks.toArray(), IPProcess.EXITED);
+				//removeTargetEvent(tasks);
+			} else if (event instanceof IPCDIResumedEvent) {
+				setSuspendTasks(false, tasks);
+				setProcessStatus(tasks.toArray(), IPProcess.RUNNING);
+			} else if (event instanceof ErrorEvent) {
+				setProcessStatus(tasks.toArray(), IPProcess.ERROR);
+			} else if (event instanceof IPCDISuspendedEvent) {
+				setSuspendTasks(true, tasks);				
+				setProcessStatus(tasks.toArray(), IPProcess.STOPPED);
 			}
-			public void run() {
-				if (event != null) {
-					//FIXME - add item here or??
-					eventQueue.addItem(event);
-					System.out.println("    --- Abs debugger: " + event);
-					BitList tasks = event.getAllProcesses();
-					if (event instanceof IPCDIExitedEvent) {
-						setSuspendTasks(false, tasks);
-						setTerminateTasks(true, tasks);
-						setProcessStatus(tasks.toArray(), IPProcess.EXITED);
-					} else if (event instanceof IPCDIResumedEvent) {
-						setSuspendTasks(false, tasks);
-						setProcessStatus(tasks.toArray(), IPProcess.RUNNING);
-					} else if (event instanceof ErrorEvent) {
-						setProcessStatus(tasks.toArray(), IPProcess.ERROR);
-					} else if (event instanceof IPCDISuspendedEvent) {
-						setSuspendTasks(true, tasks);				
-						setProcessStatus(tasks.toArray(), IPProcess.STOPPED);
-					}
-					//eventQueue.addItem(event);
-					if (event instanceof IPCDIExitedEvent) {
-						if (isJobFinished()) {
-							eventQueue.addItem(new DebuggerExitedEvent(getSession(), new BitList(0)));
-							stopDebugger();
-						}
-					}
+			//eventQueue.addItem(event);
+			if (event instanceof IPCDIExitedEvent) {
+				if (isJobFinished()) {
+					eventQueue.addItem(new DebuggerExitedEvent(getSession(), new BitList(0)));
+					stopDebugger();
 				}
 			}
-		});
+		}
 	}
 	public final void notifyObservers(Object arg) {
 		setChanged();
