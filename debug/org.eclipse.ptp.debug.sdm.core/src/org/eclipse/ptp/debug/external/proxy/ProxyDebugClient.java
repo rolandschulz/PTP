@@ -28,8 +28,8 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	public static final int STEP_OVER = 1;
 	public static final int STEP_FINISH = 2;
 	
-	public ProxyDebugClient(String host, int port) {
-		super(host, port);
+	public ProxyDebugClient() {
+		super();
 	}
 
 	public void debugStartSession(String prog, String args) throws IOException {

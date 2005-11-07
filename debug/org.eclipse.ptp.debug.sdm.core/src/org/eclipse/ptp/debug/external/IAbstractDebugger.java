@@ -37,7 +37,7 @@ public interface IAbstractDebugger extends ICommonActions, IDebugger {
 	public final static String TERMINATED_PROC_KEY = "terminated";
 	public final static String SUSPENDED_PROC_KEY = "suspended";
 	
-	public void startDebuggerListener();
+	public int startDebuggerListener();
 	
 	/* Debugger Initialization/Termination */
 	public void initialize(IPJob job);

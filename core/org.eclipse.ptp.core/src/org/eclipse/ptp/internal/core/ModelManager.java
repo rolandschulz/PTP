@@ -172,7 +172,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				return;
 			}
 
-			runtimeProxy = new OMPIProxyRuntimeClient("localhost", port);
+			runtimeProxy = new OMPIProxyRuntimeClient();
 			monitoringSystem = new OMPIMonitoringSystem((OMPIProxyRuntimeClient)runtimeProxy);
 			controlSystem = new OMPIControlSystem((OMPIProxyRuntimeClient)runtimeProxy);
 			//refreshRuntimeSystems(ControlSystemChoices.SIMULATED_ID, MonitoringSystemChoices.SIMULATED_ID);

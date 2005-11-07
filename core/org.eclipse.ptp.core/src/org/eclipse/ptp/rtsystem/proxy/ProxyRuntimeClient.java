@@ -22,8 +22,8 @@ package org.eclipse.ptp.rtsystem.proxy;
 import java.io.IOException;
 
 public class ProxyRuntimeClient extends AbstractProxyRuntimeClient {
-	public ProxyRuntimeClient(String host, int port) {
-		super(host, port);
+	public ProxyRuntimeClient() {
+		super();
 	}
 	
     public void sendCommand(String cmd) throws IOException {

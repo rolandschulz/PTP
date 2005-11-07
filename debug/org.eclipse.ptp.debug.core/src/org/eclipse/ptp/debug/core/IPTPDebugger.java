@@ -33,6 +33,6 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 
 public interface IPTPDebugger {
-	public void startDebuggerListener();
+	public int startDebuggerListener();
 	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException;
 }

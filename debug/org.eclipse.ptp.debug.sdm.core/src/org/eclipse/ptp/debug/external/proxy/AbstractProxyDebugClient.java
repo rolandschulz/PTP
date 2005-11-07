@@ -40,8 +40,8 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 	private boolean		waiting = false;
 	private boolean		connected = false;
 
-	public AbstractProxyDebugClient(String host, int port) {
-		super(host, port);
+	public AbstractProxyDebugClient() {
+		super();
 		super.addEventListener(this);
 	}
 	

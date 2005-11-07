@@ -32,27 +32,18 @@ import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.ProxyConnectedEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
-import org.eclipse.ptp.core.proxy.event.ProxyOKEvent;
-import org.eclipse.ptp.core.util.BitList;
 
 public abstract class AbstractProxyClient {
-	private String				sessHost;
-	private int					sessPort;
+	private String				sessHost = null;
+	private int					sessPort = 0;
 	private ServerSocket			sessSvrSock;
 	private Socket				sessSock;
 	private OutputStreamWriter	sessOut;
 	private InputStreamReader		sessIn;
-	private boolean				connected;
 	private boolean				exitThread;
 	private Thread				eventThread;
 	private Thread				acceptThread;
 	protected List				listeners = new ArrayList(2);
-
-	public AbstractProxyClient(String host, int port) {
-		this.sessHost = host;
-		this.sessPort = port;
-		this.connected = false;
-	}
 	
 	private String encodeLength(int val) {
 		char[] res = new char[8];
@@ -92,10 +83,17 @@ public abstract class AbstractProxyClient {
 	public int sessionConnect() {
 		return 0;
 	}
-	
+
 	public void sessionCreate() throws IOException {
+		sessionCreate(0);
+	}
+	
+	public void sessionCreate(int port) throws IOException {
 		System.out.println("sessionCreate()");
-		sessSvrSock = new ServerSocket(sessPort);
+		sessSvrSock = new ServerSocket(port);
+		sessPort = sessSvrSock.getLocalPort();
+		sessHost = sessSvrSock.getLocalSocketAddress().toString();
+		System.out.println("port=" + sessPort);
 		acceptThread = new Thread("Proxy Client Accept Thread") {
 			public void run() {
 				try {
@@ -103,7 +101,6 @@ public abstract class AbstractProxyClient {
 					sessSock = sessSvrSock.accept();
 					sessOut = new OutputStreamWriter(sessSock.getOutputStream());
 					sessIn = new InputStreamReader(sessSock.getInputStream());
-					connected = true;
 					fireProxyEvent(new ProxyConnectedEvent());
 					startEventThread();
 				} catch (IOException e) {
@@ -112,6 +109,14 @@ public abstract class AbstractProxyClient {
 			}
 		};
 		acceptThread.start();
+	}
+
+	public int getSessionPort() {
+		return sessPort;
+	}
+	
+	public String getSessionHost() {
+		return sessHost;
 	}
 
 	private void startEventThread() throws IOException {

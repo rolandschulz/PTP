@@ -38,8 +38,8 @@ import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeEvent;
 public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient implements IProxyEventListener {
 	protected List		listeners = new ArrayList(2);
 
-	public AbstractProxyRuntimeClient(String host, int port) {
-		super(host, port);
+	public AbstractProxyRuntimeClient() {
+		super();
 		super.addEventListener(this);
 	}
 	
