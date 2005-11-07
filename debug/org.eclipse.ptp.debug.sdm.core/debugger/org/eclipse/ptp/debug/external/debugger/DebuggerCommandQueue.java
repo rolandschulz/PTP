@@ -52,7 +52,6 @@ public class DebuggerCommandQueue {
 					}
 					cmdProcs = cmdInProgress.getProcs().copy();
 					
-					System.out.println("executing command...");
 					try {
 						cmdInProgress.execute(cmdProxy);
 					} catch (PCDIException e) {
@@ -69,7 +68,6 @@ public class DebuggerCommandQueue {
 	private synchronized boolean waitForCommand() {
 		try {
 			while (cmdInProgress != null || cmdQueue.isEmpty()) {
-				System.out.println("waiting for command");
 				wait();
 			}
 		} catch (InterruptedException e) {
