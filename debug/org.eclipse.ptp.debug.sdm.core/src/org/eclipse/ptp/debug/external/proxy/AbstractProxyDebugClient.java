@@ -90,7 +90,7 @@ System.out.println("AbstractProxyDebugClientgot event " + event);
 			break;
 			
 		case IProxyEvent.EVENT_ERROR:
-			e = new ProxyDebugErrorEvent(null, ((ProxyErrorEvent)event).getErrorCode(), ((ProxyErrorEvent)event).getErrorMessage());
+			e = new ProxyDebugErrorEvent(new BitList(0), ((ProxyErrorEvent)event).getErrorCode(), ((ProxyErrorEvent)event).getErrorMessage());
 			break;
 			
 		case IProxyEvent.EVENT_CONNECTED:
