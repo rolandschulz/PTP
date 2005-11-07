@@ -108,6 +108,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	private ArrayList			bpArray = new ArrayList();
 	private int					bpId = 0;
 	private ICDIStackFrame		currFrame = null;
+	private DebuggerCommandQueue	cmdQueue;
 	
 	/*
 	 * Wait for any event
@@ -151,6 +152,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	
 	public void startDebuggerListener() {
 		proxy = new ProxyDebugClient("localhost", 12346);
+		cmdQueue = new DebuggerCommandQueue(proxy);
 		try {
 			proxy.sessionCreate();
 		} catch (IOException e) {
@@ -227,17 +229,23 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	}
 	
 	public void stepInto(BitList tasks, int count) throws PCDIException {
+		cmdQueue.flushCommands();
+		cmdQueue.addCommand(new StepIntoCommand(tasks, count));
+		/*
 		try {
 			proxy.debugStep(tasks, count, ProxyDebugClient.STEP_INTO);
 		} catch (IOException e) {
-		}
+		}*/
 	}
 	
 	public void stepOver(BitList tasks, int count) throws PCDIException {
+		cmdQueue.flushCommands();
+		cmdQueue.addCommand(new StepOverCommand(tasks, count));
+		/*
 		try {
 			proxy.debugStep(tasks, count, ProxyDebugClient.STEP_OVER);
 		} catch (IOException e) {
-		}
+		}*/
 	}
 	
 	public void stepFinish(BitList tasks, int count) throws PCDIException {
@@ -294,22 +302,25 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	 * list stack frames for first process in procs
 	 */
 	public void listStackFrames(BitList tasks) throws PCDIException {
+		cmdQueue.addCommand(new ListStackFramesCommand(tasks));
 		System.out.println(" *********** call stack frame");
+		/*
 		try {
 			proxy.debugListStackframes(tasks, 0);
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
-		}
+		}*/
 		//waitForEvents(tasks);
 	}
 	
 	public void setCurrentStackFrame(BitList tasks, ICDIStackFrame frame) throws PCDIException {
-		try {
+		cmdQueue.addCommand(new SetCurrentStackFrameCommand(tasks, frame.getLevel()));
+		/*try {
 			proxy.debugSetCurrentStackframe(tasks, frame.getLevel());
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
 		}
-		waitForEvents(tasks);
+		waitForEvents(tasks);*/
 	}
 	
 	/**
@@ -320,12 +331,13 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	}
 	
 	public void getAIFValue(BitList tasks, String expr) throws PCDIException {
+		cmdQueue.addCommand(new EvaluateExpressionCommand(tasks, expr));
 		System.out.println(" *********** call getAIF");
-		try {
+		/*try {
 			proxy.debugEvaluateExpression(tasks, expr);
 		} catch (IOException e1) {
 			throw new PCDIException(e1.getMessage());
-		}
+		}*/
 		//waitForEvents(tasks);
 	}
 	
@@ -348,11 +360,12 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	public void listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException {
 		System.out.println(" *********** call listLocalVariables");
 		this.currFrame = frame;
-		try {
+		cmdQueue.addCommand(new ListLocalVariablesCommand(tasks));
+		/*try {
 			proxy.debugListLocalVariables(tasks);
 		} catch (IOException e1) {
 			throw new PCDIException(e1.getMessage());
-		}
+		}*/
 		//waitForEvents(tasks);
 	}
 	
@@ -369,17 +382,22 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	public void listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException {
 		System.out.println(" *********** call listArguments");
 		this.currFrame = frame;
-		try {
+		cmdQueue.addCommand(new ListArgumentsCommand(tasks, frame.getLevel()));
+		/*try {
 			proxy.debugListArguments(tasks, frame.getLevel());
 		} catch (IOException e1) {
 			throw new PCDIException(e1.getMessage());
-		}
+		}*/
 		//waitForEvents(tasks);
 	}
 
 	public synchronized void handleEvent(IProxyDebugEvent e) {
 		System.out.println("got debug event: " + e.toString());
 		switch (e.getEventID()) {
+		case IProxyDebugEvent.EVENT_DBG_OK:
+			cmdQueue.updateCompleted(e.getBitSet());
+			break;
+			
 		case IProxyDebugEvent.EVENT_DBG_INIT:
 			numServers = ((ProxyDebugInitEvent)e).getNumServers();
 			System.out.println("num servers = " + numServers);
@@ -397,6 +415,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_STEP:
+			cmdQueue.updateCompleted(e.getBitSet());
 			ProxyDebugStepEvent stepEvent = (ProxyDebugStepEvent)e;
 			LineLocation loc = new LineLocation(stepEvent.getFrame().getLocator().getFile(), stepEvent.getFrame().getLocator().getLineNumber());
 			IPCDIEvent ev = new EndSteppingRangeEvent(getSession(), e.getBitSet(), loc);
@@ -409,6 +428,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_FRAMES:
+			cmdQueue.updateCompleted(e.getBitSet());
 			ProxyDebugStackframeEvent frameEvent = (ProxyDebugStackframeEvent)e;
 			
 			IPProcess[] frameProcs = getProcesses(e.getBitSet());
@@ -433,6 +453,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_DATA:
+			cmdQueue.updateCompleted(e.getBitSet());
 			ProxyDebugDataEvent data = (ProxyDebugDataEvent)e;
 			try {
 				System.out.println("########### set AIF data to target event");
@@ -446,6 +467,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			if (this.currFrame == null)
 				return;
 
+			cmdQueue.updateCompleted(e.getBitSet());
 			ProxyDebugVarsEvent varsEvent = (ProxyDebugVarsEvent)e;
 			ArrayList varList = new ArrayList();
 			
@@ -473,6 +495,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			if (this.currFrame == null)
 				return;
 
+			cmdQueue.updateCompleted(e.getBitSet());
 			ProxyDebugArgsEvent argsEvent = (ProxyDebugArgsEvent)e;
 			ArrayList argList = new ArrayList();
 			
