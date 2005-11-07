@@ -60,7 +60,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		sendCommand("TRM", procs);
 	}
 	
-	public void debugSuspend(BitList procs) throws IOException {
+	public void debugInterrupt(BitList procs) throws IOException {
 		sendCommand("HLT", procs);
 	}
 

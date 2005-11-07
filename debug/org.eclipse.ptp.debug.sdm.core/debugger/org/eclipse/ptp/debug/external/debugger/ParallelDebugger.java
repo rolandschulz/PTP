@@ -207,23 +207,23 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	}
 
 	public void kill(BitList tasks) throws PCDIException {
+		halt(tasks);
 		try {
 			proxy.debugTerminate(tasks);
 		} catch (IOException e) {
 			// TODO deal with IOException (maybe should be dealt with in ProxyClient?)
 		}
-		
-		waitForEvents(tasks);
+		waitForEvents(tasks);		
+		IPCDIExitedEvent e = new InferiorExitedEvent(getSession(), tasks);
+		super.fireEvent(e);
 	}
 
 	public void halt(BitList tasks) throws PCDIException {
 		try {
-			proxy.debugSuspend(tasks);
+			proxy.debugInterrupt(tasks);
 		} catch (IOException e) {
 			// TODO deal with IOException (maybe should be dealt with in ProxyClient?)
 		}
-		
-		waitForEvents(tasks);
 	}
 	
 	public void stepInto(BitList tasks, int count) throws PCDIException {
