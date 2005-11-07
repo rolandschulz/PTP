@@ -66,10 +66,9 @@ public class Thread extends PTPObject implements ICDIThread {
 		return id;
 	}
 	public void clearState() {
-		//FIXME commented
-		//stackdepth = 0;
-		//currentFrame = null;
-		//currentFrames = null;
+		stackdepth = 0;
+		currentFrame = null;
+		currentFrames = null;
 	}
 	public String toString() {
 		String str = Integer.toString(id);
