@@ -292,7 +292,7 @@ DbgClntSuspend(char **args)
 		return DBGRES_ERR;
 	}
 	
-	res = ClntSendCommand(set, DBG_SUSPEND_CMD, NULL);
+	res = ClntSendInterrupt(set);
 	
 	bitset_free(set);
 	

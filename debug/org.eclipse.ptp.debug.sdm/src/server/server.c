@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "dbg_mpi.h"
 #include "hash.h"
 #include "backend.h"
 #include "proxy.h"
@@ -22,6 +23,7 @@
 extern int	svr_init(dbg_backend *, void (*)(dbg_event *, void *), void *);
 extern int	svr_dispatch(dbg_backend *, char *);
 extern int	svr_progress(dbg_backend *);
+extern int	svr_interrupt(dbg_backend *);
 
 static void
 event_callback(dbg_event *e, void *data)
@@ -61,21 +63,25 @@ do_commands(dbg_backend *dbgr, int client_task_id, int my_task_id)
 	char *		cmd_buf;
 	MPI_Status	stat;
 
-	MPI_Iprobe(client_task_id, 0, MPI_COMM_WORLD, &flag, &stat);
+	MPI_Iprobe(client_task_id, MPI_ANY_TAG, MPI_COMM_WORLD, &flag, &stat);
 	
 	if (flag == 0)
 		return 0;
 		
-	MPI_Get_count(&stat, MPI_CHAR, &len);
+	if (stat.MPI_TAG == TAG_NORMAL) {
+		MPI_Get_count(&stat, MPI_CHAR, &len);
+		
+		cmd_buf = (char *)malloc(len + 1);
+		MPI_Recv(cmd_buf, len, MPI_CHAR, client_task_id, TAG_NORMAL, MPI_COMM_WORLD, &stat);
+		cmd_buf[len] = '\0';
 	
-	cmd_buf = (char *)malloc(len + 1);
-	MPI_Recv(cmd_buf, len, MPI_CHAR, client_task_id, 0, MPI_COMM_WORLD, &stat);
-	cmd_buf[len] = '\0';
-
-	ret = svr_dispatch(dbgr, cmd_buf);
-	
-	free(cmd_buf);
-	
+		ret = svr_dispatch(dbgr, cmd_buf);
+		
+		free(cmd_buf);
+	} else {
+		MPI_Recv(NULL, 0, MPI_CHAR, client_task_id, TAG_INTERRUPT, MPI_COMM_WORLD, &stat);
+		ret = svr_interrupt(dbgr);
+	}
 	return ret;
 }
 

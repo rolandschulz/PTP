@@ -16,17 +16,10 @@
  *
  * LA-CC 04-115
  ******************************************************************************/
- 
-#ifndef _CLIENT_SRV_H_
-#define _CLIENT_SRV_H_
 
-#include "bitset.h"
-#include "dbg_event.h"
+#ifndef _DBG_MPI_H_
+#define _DBG_MPI_H_
 
-void ClntRegisterCallback(void (*)(dbg_event *, void *));
-void ClntInit(int);
-int ClntSendCommand(bitset *, char *, char *);
-int ClntSendInterrupt(bitset *);
-int ClntProgressCmds(void);
-
-#endif /* _CLIENT_SRV_H_ */
+#define	TAG_NORMAL		0
+#define	TAG_INTERRUPT	1
+#endif /*_DBG_MPI_H_*/

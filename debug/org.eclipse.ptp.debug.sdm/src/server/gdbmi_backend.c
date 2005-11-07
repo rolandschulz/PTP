@@ -71,6 +71,7 @@ static int	GetTypeInfo(char *, char **, char **);
 
 static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIProgress(void);
+static int	GDBMIInterrupt(void);
 static int	GDBMIStartSession(char *, char *, char*);
 static int	GDBMISetLineBreakpoint(int, char *, int);
 static int	GDBMISetFuncBreakpoint(int, char *, char *);
@@ -78,7 +79,6 @@ static int	GDBMIDeleteBreakpoint(int);
 static int	GDBMIGo(void);
 static int	GDBMIStep(int, int);
 static int	GDBMITerminate(void);
-static int	GDBMISuspend(void);
 static int	GDBMIListStackframes(int);
 static int	GDBMISetCurrentStackframe(int);
 static int	GDBMIEvaluateExpression(char *);
@@ -93,6 +93,7 @@ dbg_backend_funcs	GDBMIBackend =
 {
 	GDBMIInit,
 	GDBMIProgress,
+	GDBMIInterrupt,
 	GDBMIStartSession,
 	GDBMISetLineBreakpoint,
 	GDBMISetFuncBreakpoint,
@@ -100,7 +101,6 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMIGo,
 	GDBMIStep,
 	GDBMITerminate,
-	GDBMISuspend,
 	GDBMIListStackframes,
 	GDBMISetCurrentStackframe,
 	GDBMIEvaluateExpression,
@@ -781,34 +781,28 @@ GDBMITerminate(void)
 		return DBGRES_ERR;
 	}
 
-	/*
-	 * Must check async here due to broken MI implementation. AsyncCallback will
-	 * be called inside gmi_exec_interrupt().
-	 */
-	if (AsyncFunc != NULL) {
-		AsyncFunc(AsyncFuncData);
-		AsyncFunc = NULL;
-	}
+	SaveEvent(NewDbgEvent(DBGEV_OK));
 	
 	return DBGRES_OK;
 }
 
 /*
-** Suspend an executing program.
+** Interrupt an executing program.
 */
 static int
-GDBMISuspend(void)
+GDBMIInterrupt(void)
 {
 	CHECK_SESSION()
 
 	ResetError();
 
-	if (!gmi_exec_interrupt(MIHandle))
-	{
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-		return DBGRES_ERR;
-	}
-
+	/*
+	 * Don't do anything if there's an event pending or the
+	 * target is not running.
+	 */
+	if (LastEvent != NULL || !gmi_exec_interrupt(MIHandle))
+		return DBGRES_OK;
+		
 	/*
 	 * Must check async here due to broken MI implementation. AsyncCallback will
 	 * be called inside gmi_exec_interrupt().
