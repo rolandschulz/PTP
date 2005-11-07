@@ -44,7 +44,6 @@ static int svr_deletebreakpoint(dbg_backend *, char **);
 static int svr_go(dbg_backend *, char **);
 static int svr_step(dbg_backend *, char **);
 static int svr_terminate(dbg_backend *, char **);
-static int svr_suspend(dbg_backend *, char **);
 static int svr_liststackframes(dbg_backend *, char **);
 static int svr_setcurrentstackframe(dbg_backend *, char **);
 static int svr_evaluateexpression(dbg_backend *, char **);
@@ -63,7 +62,6 @@ static svr_cmd svr_cmd_tab[] =
 	{DBG_GO_CMD,						svr_go},
 	{DBG_STEP_CMD,					svr_step},
 	{DBG_TERMINATE_CMD,				svr_terminate},
-	{DBG_SUSPEND_CMD,				svr_suspend},
 	{DBG_LISTSTACKFRAMES_CMD,			svr_liststackframes},
 	{DBG_SETCURRENTSTACKFRAME_CMD,	svr_setcurrentstackframe},
 	{DBG_EVALUATEEXPRESSION_CMD,		svr_evaluateexpression},
@@ -131,6 +129,12 @@ svr_progress(dbg_backend *db)
 	return db->db_funcs->progress();
 }
 
+int 
+svr_interrupt(dbg_backend *db)
+{
+	return db->db_funcs->interrupt();
+}
+
 static int 
 svr_start_session(dbg_backend *db, char **args)
 {
@@ -165,12 +169,6 @@ static int
 svr_step(dbg_backend *db, char **args)
 {
 	return db->db_funcs->step(atoi(args[1]), atoi(args[2]));
-}
-
-static int 
-svr_suspend(dbg_backend *db, char **args)
-{
-	return db->db_funcs->suspend();
 }
 
 static int 

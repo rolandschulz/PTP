@@ -38,6 +38,7 @@
 
 #include "dbg.h"
 #include "dbg_client.h"
+#include "dbg_mpi.h"
 #include "bitset.h"
 #include "list.h"
 #include "hash.h"
@@ -56,6 +57,7 @@ typedef struct active_request	active_request;
 static int			num_servers;
 static bitset *		sending_procs;
 static bitset *		receiving_procs;
+static bitset *		interrupt_procs;
 static List *		active_requests;
 static char **		send_bufs;
 static MPI_Request *	send_requests;
@@ -103,15 +105,17 @@ ClntInit(int svr_no)
 
 	sending_procs = bitset_new(num_servers);
 	receiving_procs = bitset_new(num_servers);
-
+	interrupt_procs = bitset_new(num_servers);
+	
 	active_requests = NewList();
 }
 
 /*
  * Send a command to the servers specified in bitset. 
  * 
- * It is permissible to have multiple outstanding commands, provided
- * the processes each command applies to are disjoint sets.
+ * Commands can only be send to processes that do not have an active request pending. The
+ * exception is the interrupt command which can be sent at any time. The response to
+ * an interrupt command is to complete the pending request.
  */
 int
 ClntSendCommand(bitset *procs, char *str, void *data)
@@ -128,6 +132,7 @@ ClntSendCommand(bitset *procs, char *str, void *data)
 	 * Check if any processes already have active requests
 	 */
 	p = bitset_and(sending_procs, procs);
+	bitset_andeq(receiving_procs, procs);
 	if (!bitset_isempty(p)) {
 		if (cmd_completed_callback != NULL)
 			cmd_completed_callback(DbgErrorEvent(DBGERR_INPROGRESS, NULL), NULL);
@@ -172,8 +177,21 @@ ClntSendCommand(bitset *procs, char *str, void *data)
 			send_bufs[pid] = strdup(str);
 			cmd_len = strlen(str);
 
-			MPI_Isend(send_bufs[pid], cmd_len, MPI_CHAR, pid, 0, MPI_COMM_WORLD, &send_requests[pid]); // TODO: handle fatal errors
+			MPI_Isend(send_bufs[pid], cmd_len, MPI_CHAR, pid, TAG_NORMAL, MPI_COMM_WORLD, &send_requests[pid]); // TODO: handle fatal errors
 		}
+	}
+
+	return 0;
+}
+
+int
+ClntSendInterrupt(bitset *procs)
+{
+	if (!bitset_isempty(procs)) {
+		/*
+		 * Update procs to interrupt
+		 */	
+		bitset_oreq(interrupt_procs, procs);
 	}
 
 	return 0;
@@ -196,6 +214,7 @@ ClntProgressCmds(void)
 	active_request *	r;
 	MPI_Status		stat;
 	dbg_event *		e;
+	bitset *			p;
 
 	/*
 	 * Check for completed sends
@@ -213,7 +232,19 @@ ClntProgressCmds(void)
 			free(send_bufs[pids[i]]);
 		}
 	}
-		
+	
+	/*
+	 * Only interrupt procs that have received our command
+	 */
+	p = bitset_and(interrupt_procs, receiving_procs); 
+	for (i = 0; i < num_servers; i++) {
+		if (bitset_test(p, i)) {
+			MPI_Send(NULL, 0, MPI_CHAR, i, TAG_INTERRUPT, MPI_COMM_WORLD); // TODO: handle fatal errors
+			bitset_unset(interrupt_procs, i);
+		}
+	}
+	bitset_free(p);
+	
 	/*
 	 * Check for replys
 	 */
