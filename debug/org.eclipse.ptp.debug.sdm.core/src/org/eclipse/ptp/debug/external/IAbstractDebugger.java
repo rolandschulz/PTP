@@ -27,13 +27,11 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
-import org.eclipse.ptp.debug.core.cdi.ICommonActions;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.external.target.ITargetEvent;
+import org.eclipse.ptp.debug.external.commands.IDebugCommand;
 
-public interface IAbstractDebugger extends ICommonActions, IDebugger {
+public interface IAbstractDebugger extends IDebugger {
 	public final static String TERMINATED_PROC_KEY = "terminated";
 	public final static String SUSPENDED_PROC_KEY = "suspended";
 	
@@ -58,8 +56,20 @@ public interface IAbstractDebugger extends ICommonActions, IDebugger {
 
 	public IPProcess getProcess(int number);
 	
-	/* target */
-	public ITargetEvent getTargetEvent(BitList tasks, int type) throws PCDIException;
-	public void setTargetResult(BitList tasks, Object result, int type) throws PCDIException;
-	public void addTargetEvent(ITargetEvent event);
+	/* event */
+	public void handleBreakpointCreatedEvent(BitList tasks);
+	public void handleBreakpointHitEvent(BitList tasks, int lineNumber, String filename);
+	public void handleEndSteppingEvent(BitList tasks, int lineNumber, String filename);
+	public void handleProcessResumedEvent(BitList tasks);
+	public void handleProcessTerminatedEvent(BitList tasks);
+	
+	/* others */
+	public BitList filterRunningTasks(BitList tasks);
+	public BitList filterSuspendTasks(BitList tasks);
+	public BitList filterTerminateTasks(BitList tasks);
+	public boolean isJobFinished();
+	
+	/* Command */
+	public void postCommand(IDebugCommand command);
+	public void completeCommand(Object result);	
 }
