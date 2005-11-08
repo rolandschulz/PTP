@@ -37,7 +37,7 @@ import org.eclipse.ptp.debug.external.cdi.model.type.StructType;
 import org.eclipse.ptp.debug.external.cdi.model.type.Type;
 import org.eclipse.ptp.debug.external.cdi.model.type.VoidType;
 import org.eclipse.ptp.debug.external.cdi.model.type.WCharType;
-import org.eclipse.ptp.debug.external.target.TargetAIFValueEvent;
+import org.eclipse.ptp.debug.external.commands.GetAIFCommand;
 
 /**
  * @author Clement chu
@@ -276,7 +276,9 @@ public class SourceManager extends Manager {
 	}
 	public IAIF getAIF(Target target, String variable) throws CDIException {
 		Session session = (Session)getSession();
-		return new TargetAIFValueEvent(session, session.createBitList(target.getTargetID()), variable).getAIF();
+		GetAIFCommand command = new GetAIFCommand(session.createBitList(target.getTargetID()), variable);
+		session.getDebugger().postCommand(command);
+		return command.getAIF();
 	}
 	//public String getTypeName(Target target, String variable) throws CDIException {
 		//return target.getDebugger().getVariableType(((Session)getSession()).createBitList(target.getTargetID()), variable);

@@ -16,32 +16,43 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.target;
+package org.eclipse.ptp.debug.external.commands;
 
+import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
  * @author Clement chu
- *
+ * 
  */
-public class TargetVariableTypesEvent extends AbstractTargetEvent {
-	private String variableName = "";
+public class SetLineBreakpointCommand extends AbstractDebugCommand {
+	private ICDILineBreakpoint lineBpt = null;
+	//private IAbstractDebugger debugger = null;
 	
-	public TargetVariableTypesEvent(Session session, BitList tasks, String variableName) {
-		super(session, tasks, VARIABLETYPE_TYPE);
-		this.variableName = variableName;
+	public SetLineBreakpointCommand(BitList tasks, ICDILineBreakpoint lineBpt) {
+		super(tasks, true, false);
+		this.lineBpt = lineBpt;
 	}
-	public String getVariableType() throws PCDIException {
-		exec();
-		if (result instanceof String)
-			return (String)result;
-
-		throw new PCDIException("No express value found in " + getTargets().toString());
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		//this.debugger = debugger;
+		debugger.setLineBreakpoint(tasks, lineBpt);
+		debugger.handleBreakpointCreatedEvent(tasks);
 	}
-	
-	public void action() throws PCDIException {
-		session.getDebugger().getVariableType(getTargets(), variableName);
-	}	
+	/*
+	public void setReturn(Object result) {
+		super.setReturn(result);
+		if (result.equals(OK)) {
+			debugger.handleBreakpointCreatedEvent(tasks);
+		}
+	}
+	public void setLineBreakpoint() throws PCDIException {
+		if (waitForReturn()) {
+			if (result.equals(OK))
+				return;
+		}
+		throw new PCDIException("Line breakpoint cannot set in " + tasks.toString());		
+	}
+	*/
 }

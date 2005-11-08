@@ -68,7 +68,12 @@ import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.cdi.model.variable.GlobalVariableDescriptor;
-import org.eclipse.ptp.debug.external.target.TargetExpressValueEvent;
+import org.eclipse.ptp.debug.external.commands.EvaluteExpressionCommand;
+import org.eclipse.ptp.debug.external.commands.GoCommand;
+import org.eclipse.ptp.debug.external.commands.HaltCommand;
+import org.eclipse.ptp.debug.external.commands.KillCommand;
+import org.eclipse.ptp.debug.external.commands.StepIntoCommand;
+import org.eclipse.ptp.debug.external.commands.StepOverCommand;
 
 public class Target extends SessionObject implements IPCDITarget {
 	ICDITargetConfiguration fConfiguration;
@@ -222,7 +227,8 @@ public class Target extends SessionObject implements IPCDITarget {
 		stepInto(1);
 	}
 	public void stepInto(int count) throws CDIException {
-		getDebugger().steppingInto(((Session)getSession()).createBitList(getTargetID()), count);
+		getDebugger().postCommand(new StepIntoCommand(((Session)getSession()).createBitList(getTargetID()), count));
+		//getDebugger().steppingInto(((Session)getSession()).createBitList(getTargetID()), count);
 	}
 	public void stepIntoInstruction() throws CDIException {
 		stepIntoInstruction(1);
@@ -236,7 +242,8 @@ public class Target extends SessionObject implements IPCDITarget {
 		stepOver(1);
 	}
 	public void stepOver(int count) throws CDIException {
-		getDebugger().steppingOver(((Session)getSession()).createBitList(getTargetID()), count);
+		getDebugger().postCommand(new StepOverCommand(((Session)getSession()).createBitList(getTargetID()), count));
+		//getDebugger().steppingOver(((Session)getSession()).createBitList(getTargetID()), count);
 	}
 	public void stepOverInstruction() throws CDIException {
 		stepOverInstruction(1);
@@ -284,7 +291,8 @@ public class Target extends SessionObject implements IPCDITarget {
 		throw new CDIException("Not implement yet - stepUntil(location)");
 	}
 	public void suspend() throws CDIException {
-		getDebugger().suspend(((Session)getSession()).createBitList(getTargetID()));
+		getDebugger().postCommand(new HaltCommand(((Session)getSession()).createBitList(getTargetID())));
+		//getDebugger().suspend(((Session)getSession()).createBitList(getTargetID()));
 	}
 	public void disconnect() throws CDIException {
 		//Do nothing
@@ -316,7 +324,8 @@ public class Target extends SessionObject implements IPCDITarget {
 		}
 	}
 	public void continuation() throws CDIException {
-		getDebugger().resume(((Session)getSession()).createBitList(getTargetID()));
+		getDebugger().postCommand(new GoCommand(((Session)getSession()).createBitList(getTargetID())));
+		//getDebugger().resume(((Session)getSession()).createBitList(getTargetID()));
 	}
 	public void jump(ICDILocation location) throws CDIException {
 		String file = "";
@@ -366,15 +375,18 @@ public class Target extends SessionObject implements IPCDITarget {
 		target.setCurrentThread(frame.getThread(), false);
 		((Thread)frame.getThread()).setCurrentStackFrame((StackFrame)frame, false);
 		try {
-			Session session = (Session) target.getSession();			
-			return new TargetExpressValueEvent(session, session.createBitList(target.getTargetID()), expressionText).getExpressValue();
+			Session session = (Session) target.getSession();
+			EvaluteExpressionCommand command = new EvaluteExpressionCommand(session.createBitList(target.getTargetID()), expressionText);
+			session.getDebugger().postCommand(command);
+			return command.getExpressionValue();
 		} finally {
 			target.setCurrentThread(currentThread, false);
 			currentThread.setCurrentStackFrame(currentFrame, false);
 		}
 	}
 	public void terminate() throws CDIException {
-		getDebugger().stop(((Session)getSession()).createBitList(getTargetID()));
+		getDebugger().postCommand(new KillCommand(((Session)getSession()).createBitList(getTargetID())));
+		//getDebugger().stop(((Session)getSession()).createBitList(getTargetID()));
 	}
 	public boolean isTerminated() {
 		return getPProcess().isTerminated();

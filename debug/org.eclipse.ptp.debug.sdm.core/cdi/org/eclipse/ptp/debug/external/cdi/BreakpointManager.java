@@ -66,11 +66,12 @@ import org.eclipse.ptp.debug.external.cdi.breakpoints.FunctionBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.LocationBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.Watchpoint;
-import org.eclipse.ptp.debug.external.cdi.event.BreakpointCreatedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.AddressLocation;
 import org.eclipse.ptp.debug.external.cdi.model.FunctionLocation;
 import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
+import org.eclipse.ptp.debug.external.commands.SetFunctionBreakpointCommand;
+import org.eclipse.ptp.debug.external.commands.SetLineBreakpointCommand;
 
 public class BreakpointManager extends Manager {
 	public static ICDIBreakpoint[] EMPTY_BREAKPOINTS = {};
@@ -176,8 +177,6 @@ public class BreakpointManager extends Manager {
 	}
 	protected void setNewLocationBreakpoint(BitList tasks, LocationBreakpoint bkpt, boolean deferred) throws CDIException {
 		setLocationBreakpoint(tasks, bkpt);
-		Session session = (Session)getSession();
-		session.getDebugger().fireEvent(new BreakpointCreatedEvent(session, tasks));
 	}
 	public ICDIWatchpoint setWatchpoint(BitList tasks, int type, int watchType, String expression, ICDICondition condition) throws CDIException {
 		try {
@@ -196,11 +195,10 @@ public class BreakpointManager extends Manager {
 	}
 	public void setLocationBreakpoint(BitList tasks, LocationBreakpoint bkpt) throws CDIException {
 		Session session = (Session)getSession();
-
 		if (bkpt instanceof LineBreakpoint) {
-			session.getDebugger().setLineBreakpoint(tasks, (ICDILineBreakpoint) bkpt);
+			session.getDebugger().postCommand(new SetLineBreakpointCommand(tasks, (ICDILineBreakpoint) bkpt));
 		} else if (bkpt instanceof FunctionBreakpoint) {
-			session.getDebugger().setFunctionBreakpoint(tasks, (ICDIFunctionBreakpoint) bkpt);
+			session.getDebugger().postCommand(new SetFunctionBreakpointCommand(tasks, (ICDIFunctionBreakpoint) bkpt));
 		}
 	}
 

@@ -16,20 +16,32 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.cdi;
+package org.eclipse.ptp.debug.external.commands;
 
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
  * @author Clement chu
  * 
  */
-public interface ICommonActions {
-	public void stop(BitList tasks) throws PCDIException;
-	public void resume(BitList tasks) throws PCDIException;
-	public void suspend(BitList tasks) throws PCDIException;
-	public void steppingInto(BitList tasks) throws PCDIException;
-	public void steppingOver(BitList tasks) throws PCDIException;
-	public void steppingReturn(BitList tasks) throws PCDIException;
+public class GetVariableTypeCommand extends AbstractDebugCommand {
+	private String varName = "";
+	
+	public GetVariableTypeCommand(BitList tasks, String varName) {
+		super(tasks, false, true);
+		this.varName = varName;
+	}
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		debugger.getVariableType(tasks, varName);
+	}
+	
+	public String getVariableType() throws PCDIException {
+		if (waitForReturn()) {
+			if (result instanceof String)
+				return (String)result;
+		}
+		throw new PCDIException("No variable type found in " + tasks.toString());
+	}
 }
-

@@ -42,7 +42,8 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorageDescriptor;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.cdi.model.variable.ThreadStorageDescriptor;
-import org.eclipse.ptp.debug.external.target.TargetStackFrameEvent;
+import org.eclipse.ptp.debug.external.commands.ListStackFramesCommand;
+import org.eclipse.ptp.debug.external.commands.SetCurrentStackFrameCommand;
 
 public class Thread extends PTPObject implements ICDIThread {
 	static ICDIStackFrame[] noStack = new ICDIStackFrame[0];
@@ -98,7 +99,9 @@ public class Thread extends PTPObject implements ICDIThread {
 
 			Session session = (Session) target.getSession();			
 			try {
-				ICDIStackFrame[] frames = new TargetStackFrameEvent(session, session.createBitList(target.getTargetID())).getStackFrames();
+				ListStackFramesCommand command = new ListStackFramesCommand(session.createBitList(target.getTargetID()));
+				session.getDebugger().postCommand(command);
+				ICDIStackFrame[] frames = command.getStackFrames();
 				for (int i = 0; i < frames.length; i++) {
 					currentFrames.add(frames[i]);
 				}
@@ -125,7 +128,9 @@ public class Thread extends PTPObject implements ICDIThread {
 			final Target target = (Target) getTarget();
 			final Session session = (Session) target.getSession();
 			
-			ICDIStackFrame[] frames = new TargetStackFrameEvent(session, session.createBitList(target.getTargetID())).getStackFrames();
+			ListStackFramesCommand command = new ListStackFramesCommand(session.createBitList(target.getTargetID()));
+			session.getDebugger().postCommand(command);
+			ICDIStackFrame[] frames = command.getStackFrames();
 			for (int i = 0; i < frames.length; i++) {
 				currentFrames.add(frames[i]);
 			}
@@ -159,7 +164,9 @@ public class Thread extends PTPObject implements ICDIThread {
 		}
 		Target target = (Target)getTarget();
 		Session session = (Session) target.getSession();
-		target.getDebugger().setCurrentStackFrame(session.createBitList(target.getTargetID()), stackframe);
+		SetCurrentStackFrameCommand command = new SetCurrentStackFrameCommand(session.createBitList(target.getTargetID()), stackframe);
+		session.getDebugger().postCommand(command);
+		command.setStackFrame();
 
 		currentFrame = stackframe;
 		if (doUpdate) {

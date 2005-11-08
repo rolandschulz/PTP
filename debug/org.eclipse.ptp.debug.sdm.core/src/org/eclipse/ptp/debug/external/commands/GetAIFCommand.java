@@ -16,28 +16,33 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.target;
+package org.eclipse.ptp.debug.external.commands;
 
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
  * @author Clement chu
- *
+ * 
  */
-public interface ITargetEvent {
-	public static final int STACKFRAME_TYPE = 0;
-	public static final int AIFVALUE_TYPE = 1;
-	public static final int EXPRESSVALUE_TYPE = 2;
-	public static final int VARIABLETYPE_TYPE = 3;
-	public static final int ARGUMENTS_TYPE = 4;
-	public static final int LOCALVARIABLES_TYPE = 5;
-	public static final int GLOBALVARIABLES_TYPE = 6;
-
-	public int getType();
-	public BitList getTargets();
-	public boolean contain(int task);
-	public boolean contain(BitList tasks);
+public class GetAIFCommand extends AbstractDebugCommand {
+	private String varName = "";
 	
-	public Object getResult();
-	public void setResult(Object result);	
+	public GetAIFCommand(BitList tasks, String varName) {
+		super(tasks, false, true);
+		this.varName = varName;
+	}
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		debugger.getAIFValue(tasks, varName);
+	}
+	
+	public IAIF getAIF() throws PCDIException {
+		if (waitForReturn()) {
+			if (result instanceof IAIF)
+				return (IAIF)result;
+		}
+		throw new PCDIException("No aif found in " + tasks.toString());
+	}
 }

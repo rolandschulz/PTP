@@ -16,30 +16,24 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.target;
+package org.eclipse.ptp.debug.external.commands;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
  * @author Clement chu
- *
+ * 
  */
-public class TargetGlobalVariablesEvent extends AbstractTargetEvent {
-	public TargetGlobalVariablesEvent(Session session, BitList tasks) {
-		super(session, tasks, GLOBALVARIABLES_TYPE);
-	}
-	public ICDIGlobalVariable[] getGlobalVariables() throws PCDIException {
-		exec();
-		if (result instanceof ICDIGlobalVariable[])
-			return (ICDIGlobalVariable[])result;
-
-		throw new PCDIException("No global variables found in " + getTargets().toString());
-	}
+public class DeleteBreakpointsCommand extends AbstractDebugCommand {
+	private ICDIBreakpoint[] bpts = null;
 	
-	public void action() throws PCDIException {
-		session.getDebugger().listGlobalVariables(getTargets());
-	}				
+	public DeleteBreakpointsCommand(ICDIBreakpoint[] bpts) {
+		super(null, false, false);
+		this.bpts = bpts;
+	}
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		debugger.deleteBreakpoints(bpts);
+	}
 }

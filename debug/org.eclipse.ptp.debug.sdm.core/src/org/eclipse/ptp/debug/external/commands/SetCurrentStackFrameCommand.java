@@ -16,32 +16,33 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.target;
+package org.eclipse.ptp.debug.external.commands;
 
+import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
  * @author Clement chu
- *
+ * 
  */
-public class TargetExpressValueEvent extends AbstractTargetEvent {
-	private String variableName = "";
+public class SetCurrentStackFrameCommand extends AbstractDebugCommand {
+	private ICDIStackFrame frame = null;
 	
-	public TargetExpressValueEvent(Session session, BitList tasks, String variableName) {
-		super(session, tasks, EXPRESSVALUE_TYPE);
-		this.variableName = variableName;
+	public SetCurrentStackFrameCommand(BitList tasks, ICDIStackFrame frame) {
+		super(tasks, false, true);
+		this.frame = frame;
 	}
-	public String getExpressValue() throws PCDIException {
-		exec();
-		if (result instanceof String)
-			return (String)result;
-
-		throw new PCDIException("No express value found in " + getTargets().toString());
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		debugger.setCurrentStackFrame(tasks, frame);
 	}
-
-	public void action() throws PCDIException {
-		session.getDebugger().evaluateExpression(getTargets(), variableName);
-	}			
+	public void setStackFrame() throws PCDIException {
+		if (waitForReturn()) {
+			if (result.equals(OK))
+				return;
+		}
+		throw new PCDIException("Stack frame have not set in " + tasks.toString());
+	}	
 }
+

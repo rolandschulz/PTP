@@ -22,9 +22,6 @@
  */
 package org.eclipse.ptp.debug.external;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
@@ -33,12 +30,12 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
+import org.eclipse.ptp.debug.external.cdi.event.BreakpointCreatedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.DebuggerExitedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
@@ -46,7 +43,7 @@ import org.eclipse.ptp.debug.external.cdi.event.ErrorEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
-import org.eclipse.ptp.debug.external.target.ITargetEvent;
+import org.eclipse.ptp.debug.external.commands.IDebugCommand;
 
 public abstract class AbstractDebugger extends Observable implements IAbstractDebugger {
 	protected Queue eventQueue = null;
@@ -55,58 +52,22 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	protected IPProcess[] procs;
 	protected boolean isExited = false;
 	private IPJob job = null;
-	protected List targetEventQueue = null;
-
-	public ITargetEvent getTargetEvent(BitList tasks, int type) throws PCDIException {
-		synchronized (targetEventQueue) {
-			System.out.println("----------- find size : " + targetEventQueue.size());
-			for (int i=0; i<targetEventQueue.size(); i++) {
-				ITargetEvent event = (ITargetEvent)targetEventQueue.get(i);
-				if (event.getType() == type && event.contain(tasks)) {
-					return (ITargetEvent)targetEventQueue.remove(i);
-				}
-			}
-			System.out.println("----------- NOT FOUND ------------");
-			throw new PCDIException("No target event found");
-		}
+	protected DebugCommandQueue commandQueue = null;
+	
+	public void postCommand(IDebugCommand command) {
+		commandQueue.addCommand(command);
 	}
-	public void setTargetResult(BitList tasks, Object result, int type) throws PCDIException {
-		synchronized (targetEventQueue) {
-			getTargetEvent(tasks, type).setResult(result);
-		}
-	}
-	public void addTargetEvent(ITargetEvent event) {
-		synchronized (targetEventQueue) {
-			targetEventQueue.add(event);
-			System.out.println("----------- add size : " + targetEventQueue.size());
-		}
-	}
-	public boolean isEmptyTargetEvent() {
-		return targetEventQueue.isEmpty();
-	}
-	public void removeTargetEvent(BitList tasks) {
-		synchronized (targetEventQueue) {
-			for (int i=0; i<targetEventQueue.size(); i++) {
-				ITargetEvent event = (ITargetEvent)targetEventQueue.get(i);
-				if (event.contain(tasks)) {
-					event.notifyAll();
-					targetEventQueue.remove(i);
-					break;
-				}
-			}
-		}
-	}
-	public void listStackFrames(ITargetEvent event) throws PCDIException {
-		listStackFrames(event.getTargets());
-		addTargetEvent(event);
+	public void completeCommand(Object result) {
+		commandQueue.setCommandReturn(result);
 	}
 
 	public final void initialize(IPJob job) {
 		this.job = job;
 		job.setAttribute(TERMINATED_PROC_KEY, new BitList(job.size()));
 		job.setAttribute(SUSPENDED_PROC_KEY, new BitList(job.size()));
-
-		targetEventQueue = Collections.synchronizedList(new LinkedList());
+		commandQueue = new DebugCommandQueue(this);
+		commandQueue.start();
+		
 		isExited = false;
 		eventQueue = new Queue();
 		eventThread = new EventThread(this);
@@ -128,14 +89,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			} catch (InterruptedException e) {
 			}		
 		}
-		deleteObservers();		
-		for (int i=0; i<targetEventQueue.size(); i++) {			
-			ITargetEvent event = (ITargetEvent)targetEventQueue.get(i);
-			synchronized (event) {
-				event.notifyAll();
-			}
-		}
-		targetEventQueue.clear();
+		deleteObservers();
+		commandQueue.setTerminated();
 	}
 	public final IPCDISession getSession() {
 		return session;
@@ -203,56 +158,27 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public final boolean isExited() {
 		return isExited;
 	}
-	public void handleBreakpointHitEvent(BitList procs, int lineNumber, String filename) {
+
+	//event
+	public void handleBreakpointCreatedEvent(BitList tasks) {
+		fireEvent(new BreakpointCreatedEvent(getSession(), tasks));		
+	}
+	public void handleBreakpointHitEvent(BitList tasks, int lineNumber, String filename) {
 		LineLocation loc = new LineLocation(filename, lineNumber);
 		LineBreakpoint bpt = new LineBreakpoint(ICDIBreakpoint.REGULAR, loc, null);
-		fireEvent(new BreakpointHitEvent(getSession(), procs, bpt));
+		fireEvent(new BreakpointHitEvent(getSession(), tasks, bpt));
 	}
-	public void handleEndSteppingEvent(BitList procs, int lineNumber, String filename) {
+	public void handleEndSteppingEvent(BitList tasks, int lineNumber, String filename) {
 		LineLocation loc = new LineLocation(filename, lineNumber);
-		fireEvent(new EndSteppingRangeEvent(getSession(), procs, loc));
+		fireEvent(new EndSteppingRangeEvent(getSession(), tasks, loc));
 	}
-	public void handleProcessResumedEvent(BitList procs) {
-		fireEvent(new InferiorResumedEvent(getSession(), procs));
+	public void handleProcessResumedEvent(BitList tasks) {
+		fireEvent(new InferiorResumedEvent(getSession(), tasks));
 	}
-	public void handleProcessTerminatedEvent(BitList procs) {
-		fireEvent(new InferiorExitedEvent(getSession(), procs));
+	public void handleProcessTerminatedEvent(BitList tasks) {
+		fireEvent(new InferiorExitedEvent(getSession(), tasks));
 	}
-	public void resume(BitList tasks) throws PCDIException {
-		filterRunningTasks(tasks);
-		handleProcessResumedEvent(tasks);
-		go(tasks);
-	}
-	public void steppingInto(BitList tasks, int count) throws PCDIException {
-		filterRunningTasks(tasks);
-		handleProcessResumedEvent(tasks);
-		stepInto(tasks, count);
-	}
-	public void steppingInto(BitList tasks) throws PCDIException {
-		steppingInto(tasks, 1);
-	}
-	public void steppingOver(BitList tasks, int count) throws PCDIException {
-		filterRunningTasks(tasks);
-		handleProcessResumedEvent(tasks);
-		stepOver(tasks, 1);
-	}
-	public void steppingOver(BitList tasks) throws PCDIException {
-		steppingOver(tasks, 1);
-	}
-	public void steppingReturn(BitList tasks) throws PCDIException {
-		filterRunningTasks(tasks);
-		handleProcessResumedEvent(tasks);
-		stepFinish(tasks, 0);
-	}
-	public void suspend(BitList tasks) throws PCDIException {
-		filterSuspendTasks(tasks);
-		halt(tasks);
-	}
-	public void stop(BitList tasks) throws PCDIException {
-		filterTerminateTasks(tasks);
-		kill(tasks);
-	}
-
+	
 	public IPProcess getProcess(int number) {
 		return procs[number];
 	}
@@ -265,9 +191,29 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		return processes;
 	}
 
-	public abstract void stopDebugger();
-	public abstract void startDebugger(IPJob job);
-		
+	public BitList filterRunningTasks(BitList tasks) {//get suspend tasks
+		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));
+		BitList suspendedTasks = (BitList) job.getAttribute(SUSPENDED_PROC_KEY);
+		//if the case is in startup, there is no suspended tasks
+		if (suspendedTasks.cardinality() > 0)
+			tasks.and(suspendedTasks);
+		return tasks;
+	}
+	public BitList filterSuspendTasks(BitList tasks) {//get running tasks
+		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));
+		removeTasks(tasks, (BitList) job.getAttribute(SUSPENDED_PROC_KEY));
+		return tasks;
+	}
+	public BitList filterTerminateTasks(BitList tasks) {//get not terminate tasks
+		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));
+		return tasks;
+	}
+	public boolean isJobFinished() {
+		BitList terminatedTasks = (BitList) job.getAttribute(TERMINATED_PROC_KEY);
+		return (terminatedTasks.cardinality() == job.size());
+	}
+
+	//internal functions
 	private BitList addTasks(BitList curTasks, BitList newTasks) {
 		if (curTasks.size() < newTasks.size()) {
 			newTasks.or(curTasks);
@@ -279,7 +225,6 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	private void removeTasks(BitList curTasks, BitList newTasks) {
 		curTasks.andNot(newTasks);
 	}
-	
 	private void setTerminateTasks(boolean isAdd, BitList tasks) {
 		BitList terminatedTasks = (BitList) job.getAttribute(TERMINATED_PROC_KEY);
 		if (isAdd)
@@ -294,25 +239,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		else
 			removeTasks(suspendedTasks, tasks);
 	}
-	private BitList filterRunningTasks(BitList tasks) {//get suspend tasks
-		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));
-		BitList suspendedTasks = (BitList) job.getAttribute(SUSPENDED_PROC_KEY);
-		//if the case is in startup, there is no suspended tasks
-		if (suspendedTasks.cardinality() > 0)
-			tasks.and(suspendedTasks);
-		return tasks;
-	}
-	private BitList filterSuspendTasks(BitList tasks) {//get running tasks
-		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));
-		removeTasks(tasks, (BitList) job.getAttribute(SUSPENDED_PROC_KEY));
-		return tasks;
-	}
-	private BitList filterTerminateTasks(BitList tasks) {//get not terminate tasks
-		removeTasks(tasks, (BitList) job.getAttribute(TERMINATED_PROC_KEY));
-		return tasks;
-	}
-	private boolean isJobFinished() {
-		BitList terminatedTasks = (BitList) job.getAttribute(TERMINATED_PROC_KEY);
-		return (terminatedTasks.cardinality() == job.size());
-	}
+	
+	//abstract functions
+	public abstract void stopDebugger();
+	public abstract void startDebugger(IPJob job);
 }
