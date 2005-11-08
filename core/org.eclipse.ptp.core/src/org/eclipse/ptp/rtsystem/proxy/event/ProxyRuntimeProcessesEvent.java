@@ -20,18 +20,18 @@
 package org.eclipse.ptp.rtsystem.proxy.event;
 
 public class ProxyRuntimeProcessesEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeEvent {
-	private int		jobState;
+	private int		numProcs;
 
-	public ProxyRuntimeProcessesEvent(int state) {
+	public ProxyRuntimeProcessesEvent(int numProcs) {
 		super(EVENT_RUNTIME_PROCS);
-		this.jobState = state;
+		this.numProcs = numProcs;
 	}
 	
-	public int getJobState() {
-		return this.jobState;
+	public int getNumProcs() {
+		return this.numProcs;
 	}
 	
 	public String toString() {
-		return "EVENT_RUNTIME_PROCS " + this.jobState;
+		return "EVENT_RUNTIME_PROCS " + this.numProcs;
 	}
 }

@@ -50,6 +50,11 @@ public class ProxyRuntimeEvent extends ProxyEvent {
 			int njobid = Integer.parseInt(args[1]);
 			evt = new ProxyRuntimeNewJobEvent(njobid);
 			break;
+		
+		case IProxyRuntimeEvent.EVENT_RUNTIME_PROCS:
+			int nprocs = Integer.parseInt(args[1]);
+			evt = new ProxyRuntimeProcessesEvent(nprocs);
+			break;
 
 		default:
 			evt = new ProxyRuntimeErrorEvent(ProxyErrorEvent.EVENT_ERR_EVENT, "Invalid event type");

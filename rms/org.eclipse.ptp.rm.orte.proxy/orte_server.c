@@ -28,11 +28,13 @@
 #define RTEV_OK					RTEV_OFFSET + 0
 #define RTEV_ERROR				RTEV_OFFSET + 1
 #define RTEV_JOBSTATE				RTEV_OFFSET + 2
+#define RTEV_PROCS				RTEV_OFFSET + 4
 #define RTEV_NEWJOB				RTEV_OFFSET + 11
 
 #define RTEV_ERROR_ORTE_INIT		RTEV_OFFSET + 1000
 #define RTEV_ERROR_ORTE_FINALIZE	RTEV_OFFSET + 1001
 #define RTEV_ERROR_ORTE_RUN		RTEV_OFFSET + 1002
+#define RTEV_ERROR_TERMINATE_JOB	RTEV_OFFSET + 1003
 
 #define JOB_STATE_NEW				5000
 
@@ -41,6 +43,8 @@ int ORTEQuit(void);
 
 int ORTEStartDaemon(char **);
 int ORTERun(char **);
+int ORTETerminateJob(char **);
+int ORTEGetProcesses(char **);
 /*
 int ORTERun(char **);
 int OMPIGetJobs(char **);
@@ -81,6 +85,8 @@ static proxy_svr_helper_funcs helper_funcs = {
 static proxy_svr_commands command_tab[] = {
 	{"STARTDAEMON", 	ORTEStartDaemon},
 	{"RUN",			ORTERun},
+	{"TERMJOB",		ORTETerminateJob},
+	{"GETPROCS",		ORTEGetProcesses},
 	{NULL,			NULL},
 	/*
 	{"RUN",			ORTERun},
@@ -436,26 +442,20 @@ ORTEProgress(void)
 	return PROXY_RES_OK;
 }
 
-/* terminate a job, given a jobid
- * EVENT RETURN:
- *   type = TERMINATE_JOB
- *   data = "success" ?
+/* terminate a job, given a jobid */
 int
-ORTETerminateJob(int jobid)
+ORTETerminateJob(char **args)
 {
 	int rc;
+	int jobid = atoi(args[1]);
 	
 	rc = orte_rmgr.terminate_job(jobid);
-	if(ORTECheckErrorCode(ORTE_TERMINATE_JOB, rc)) return 1;
+	if(ORTECheckErrorCode(RTEV_ERROR_TERMINATE_JOB, rc)) return 1;
 	
-	return 0;
+	return PROXY_RES_OK;
 }
 
-/* spawn a job with the given executable path and # of procs.
- * EVENT RETURN:
- *   type = RUN
- *   data = "jobid" (example: "848")
- */
+/* spawn a job with the given executable path and # of procs. */
 int
 ORTERun(char **args)
 {
@@ -706,42 +706,71 @@ static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd)
 //	return PROXY_RES_OK;
 //}
 //
-///* given a jobid (valid from OMPIGetJobs()) we request a list of the process
-// * IDs associated with that job.  this will return an event with a list of
-// * processIDs 
-// * EVENT RETURN:
-// *   type = GET_PROCESSES
-// *   data = [85,86,87,88] <-- those are process IDs
-// * 
-// * NOTE: for processes we must return a bitset, since there may be vary many. This
-// * means that we may need to map between internal/external representation of
-// * process id's (if they don't start with 0).
-// */
-//int 
-//OMPIGetProcesses(char **args)
-//{
-//	int				jobid;
-//	bitset *			procs;
-//	char *			pstr;
-//	char *			res;
-//	
-//	jobid = atoi(args[1]);
-//	procs = get_procs(jobid);
-//	
-//	if (procs == NULL) {
-//		asprintf(&res, "%d %s", RTEV_ERROR, "no such jobid");
-//	} else {
-//		pstr = bitset_to_str(procs);
-//		asprintf(res, "%d %s", RTEV_PROCS, pstr);
-//		free(pstr);
-//	}
-//	
-//	proxy_svr_event_callback(orte_proxy, res);
-//	
-//	free(res);
-//	
-//	return PROXY_RES_OK;
-//}
+
+int
+get_procs(orte_jobid_t jobid)
+{
+	char *keys[2];
+	int rc, ret;
+	size_t cnt;
+	char *segment = NULL;
+	char *jobid_str = NULL;
+	orte_gpr_value_t **values;
+	
+	keys[0] = ORTE_PROC_PID_KEY;
+	keys[1] = NULL;
+	
+	rc = orte_ns.convert_jobid_to_string(&jobid_str, jobid);
+	if(rc != ORTE_SUCCESS) {
+		ret = 0;
+		goto cleanup;
+	}
+	
+	asprintf(&segment, "%s-%s", ORTE_JOB_SEGMENT, jobid_str);
+	
+	rc = orte_gpr.get(ORTE_GPR_KEYS_OR | ORTE_GPR_TOKENS_OR,
+			segment, NULL, keys, &cnt, &values);
+	if(rc != ORTE_SUCCESS) {
+		ret = 0;
+		goto cleanup;
+	}
+	
+	ret = cnt;
+	
+cleanup:
+	if(jobid_str != NULL)
+		free(jobid_str);
+	if(segment != NULL)
+		free(segment);
+		
+	return ret;
+}
+
+/* given a jobid (valid from OMPIGetJobs()) we request the number of processes
+ * associated with this job.  A simple int response is sent back.
+ */
+int 
+ORTEGetProcesses(char **args)
+{
+	int				jobid;
+	int				procs;
+	char *			res;
+	
+	jobid = atoi(args[1]);
+	procs = get_procs((orte_jobid_t)jobid);
+	
+	if (procs == 0) {
+		asprintf(&res, "%d %s", RTEV_ERROR, "no such jobid or error retrieving processes on job");
+	} else {
+		asprintf(&res, "%d %d", RTEV_PROCS, procs);
+	}
+	
+	proxy_svr_event_callback(orte_proxy, res);
+	
+	free(res);
+	
+	return PROXY_RES_OK;
+}
 //
 ///* given a processID (associated with some jobID, but that part is implied)
 // * we request the value of an attribute.  the attribute keys are defined

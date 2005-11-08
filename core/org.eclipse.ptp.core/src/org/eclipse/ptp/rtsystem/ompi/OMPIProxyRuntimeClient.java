@@ -16,6 +16,7 @@ import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNewJobEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessesEvent;
 
 public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRuntimeProxy, IProxyRuntimeEventListener {
 	protected Queue events = new Queue();
@@ -31,6 +32,13 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		run(prog, numProcs, debug);
 		IProxyRuntimeEvent event = waitForRuntimeEvent();
 		return ((ProxyRuntimeNewJobEvent)event).getJobID();
+	}
+	
+	public int getJobProcesses(int jobID) throws IOException {
+		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_PROCS);
+		getProcesses(jobID);
+		IProxyRuntimeEvent event = waitForRuntimeEvent();
+		return ((ProxyRuntimeProcessesEvent)event).getNumProcs();
 	}
 	
 	public void startup() {

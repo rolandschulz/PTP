@@ -84,6 +84,11 @@ public class PJob extends Parent implements IPJob {
 		 * -1) { return ""+(i - BASE_OFFSET)+""; } else return "";
 		 */
 	}
+	
+	public int getJobNumberInt()
+	{
+		return ((Integer) attribs.get(AttributeConstants.ATTRIB_JOBID)).intValue();
+	}
 
 	public synchronized IPNode[] getSortedNodes() {
 		IPNode[] nodes = getNodes();

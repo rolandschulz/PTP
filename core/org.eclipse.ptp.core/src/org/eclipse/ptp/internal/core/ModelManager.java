@@ -256,7 +256,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	 * model with the processes that correspond to that Job
 	 */
 	private void getProcsForNewJob(String nejob, IPJob job, IProgressMonitor monitor) throws InterruptedException {
-		String[] ne = controlSystem.getProcesses(nejob);
+		String[] ne = controlSystem.getProcesses(job);
 		if (ne != null)
 			System.out.println("getProcsForNewJob:" + nejob + " - #procs = " + ne.length);
 		
