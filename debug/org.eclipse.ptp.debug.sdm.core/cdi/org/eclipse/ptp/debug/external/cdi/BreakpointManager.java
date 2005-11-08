@@ -196,9 +196,9 @@ public class BreakpointManager extends Manager {
 	public void setLocationBreakpoint(BitList tasks, LocationBreakpoint bkpt) throws CDIException {
 		Session session = (Session)getSession();
 		if (bkpt instanceof LineBreakpoint) {
-			session.getDebugger().postCommand(new SetLineBreakpointCommand(tasks, (ICDILineBreakpoint) bkpt));
+			session.getDebugger().postCommandAndWait(new SetLineBreakpointCommand(tasks, (ICDILineBreakpoint) bkpt));
 		} else if (bkpt instanceof FunctionBreakpoint) {
-			session.getDebugger().postCommand(new SetFunctionBreakpointCommand(tasks, (ICDIFunctionBreakpoint) bkpt));
+			session.getDebugger().postCommandAndWait(new SetFunctionBreakpointCommand(tasks, (ICDIFunctionBreakpoint) bkpt));
 		}
 	}
 

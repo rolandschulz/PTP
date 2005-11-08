@@ -26,6 +26,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
@@ -47,6 +48,9 @@ public interface IDebugger {
 	 */
 	
 	/* Program Information */
+	
+	public void connection() throws PCDIException;
+	public void startDebugger(IPJob job) throws PCDIException;
 	
 	public void listStackFrames(BitList tasks) throws PCDIException;
 	public void setCurrentStackFrame(BitList tasks, ICDIStackFrame frame) throws PCDIException;

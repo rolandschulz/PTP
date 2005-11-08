@@ -18,30 +18,33 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.commands;
 
-import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
+
 
 /**
  * @author Clement chu
  * 
  */
-public class KillCommand extends AbstractDebugCommand {
-	public KillCommand(BitList tasks) throws PCDIException {
-		super(tasks, true, true);
+public class StartDebuggerCommand extends AbstractDebugCommand {
+	private IPJob job = null;
+	
+	public StartDebuggerCommand(IPJob job) {
+		super(null, false, true);
+		this.job = job;
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
-		debugger.filterTerminateTasks(tasks);
-		debugger.kill(tasks);
-		waitFinish(debugger);
+		debugger.startDebugger(job);
+		waitFnish();
 	}
-	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
+	
+	public void waitFnish() throws PCDIException {
 		if (waitForReturn()) {
-			if (result.equals(OK)) {
-				debugger.handleProcessTerminatedEvent(tasks);
+			if (result.equals(OK))
 				return;
-			}
 		}
-		throw new PCDIException("Cannot kill " + tasks.toString());		
-	}	
+		throw new PCDIException("Cannot start debugger");		
+	}
 }
+

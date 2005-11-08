@@ -386,7 +386,6 @@ public class Target extends SessionObject implements IPCDITarget {
 	}
 	public void terminate() throws CDIException {
 		getDebugger().postCommand(new KillCommand(((Session)getSession()).createBitList(getTargetID())));
-		//getDebugger().stop(((Session)getSession()).createBitList(getTargetID()));
 	}
 	public boolean isTerminated() {
 		return getPProcess().isTerminated();
