@@ -51,6 +51,7 @@ public interface IDebugger {
 	
 	public void connection() throws PCDIException;
 	public void startDebugger(IPJob job) throws PCDIException;
+	public void stopDebugger() throws PCDIException;
 	
 	public void listStackFrames(BitList tasks) throws PCDIException;
 	public void setCurrentStackFrame(BitList tasks, ICDIStackFrame frame) throws PCDIException;

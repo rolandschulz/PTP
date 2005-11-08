@@ -46,6 +46,7 @@ import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.commands.ConnectionCommand;
 import org.eclipse.ptp.debug.external.commands.IDebugCommand;
 import org.eclipse.ptp.debug.external.commands.StartDebuggerCommand;
+import org.eclipse.ptp.debug.external.commands.StopDebuggerCommand;
 
 public abstract class AbstractDebugger extends Observable implements IAbstractDebugger {
 	protected Queue eventQueue = null;
@@ -151,7 +152,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			if (event instanceof IPCDIExitedEvent) {
 				if (isJobFinished()) {
 					eventQueue.addItem(new DebuggerExitedEvent(getSession(), new BitList(0)));
-					stopDebugger();
+					postCommand(new StopDebuggerCommand());
 				}
 			}
 		}
@@ -247,7 +248,4 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		else
 			removeTasks(suspendedTasks, tasks);
 	}
-	
-	//abstract functions
-	public abstract void stopDebugger();
 }
