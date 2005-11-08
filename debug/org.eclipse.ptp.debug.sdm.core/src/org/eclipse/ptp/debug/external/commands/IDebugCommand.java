@@ -16,20 +16,25 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.cdi;
+package org.eclipse.ptp.debug.external.commands;
 
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
  * @author Clement chu
  * 
  */
-public interface ICommonActions {
-	public void stop(BitList tasks) throws PCDIException;
-	public void resume(BitList tasks) throws PCDIException;
-	public void suspend(BitList tasks) throws PCDIException;
-	public void steppingInto(BitList tasks) throws PCDIException;
-	public void steppingOver(BitList tasks) throws PCDIException;
-	public void steppingReturn(BitList tasks) throws PCDIException;
+public interface IDebugCommand {
+	public static final String OK = "OK";
+	
+	public BitList getTasks();
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException;
+	public boolean isWaitForReturn();
+	public Object getReturn();
+	public void setReturn(Object result);
+	public boolean waitForReturn();
+	public boolean canInterrupt();
 }
 

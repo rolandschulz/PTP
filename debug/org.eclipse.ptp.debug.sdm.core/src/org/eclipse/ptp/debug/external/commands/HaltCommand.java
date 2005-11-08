@@ -16,34 +16,22 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.target;
+package org.eclipse.ptp.debug.external.commands;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
  * @author Clement chu
- *
+ * 
  */
-public class TargetLocalVariablesEvent extends AbstractTargetEvent {
-	private ICDIStackFrame frame = null;
-	
-	public TargetLocalVariablesEvent(Session session, BitList tasks, ICDIStackFrame frame) {
-		super(session, tasks, LOCALVARIABLES_TYPE);
-		this.frame = frame;
+public class HaltCommand extends AbstractDebugCommand {
+	public HaltCommand(BitList tasks) {
+		super(tasks, true, false);
 	}
-	public ICDILocalVariable[] getLocalVariables() throws PCDIException {
-		exec();
-		if (result instanceof ICDILocalVariable[])
-			return (ICDILocalVariable[])result;
-
-		throw new PCDIException("No local variables found in " + getTargets().toString());
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		debugger.filterSuspendTasks(tasks);
+		debugger.halt(tasks);
 	}
-
-	public void action() throws PCDIException {
-		session.getDebugger().listLocalVariables(getTargets(), frame);
-	}			
 }

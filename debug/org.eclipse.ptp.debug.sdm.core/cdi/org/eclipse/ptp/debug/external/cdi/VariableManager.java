@@ -50,10 +50,10 @@ import org.eclipse.ptp.debug.external.cdi.model.variable.ThreadStorage;
 import org.eclipse.ptp.debug.external.cdi.model.variable.ThreadStorageDescriptor;
 import org.eclipse.ptp.debug.external.cdi.model.variable.Variable;
 import org.eclipse.ptp.debug.external.cdi.model.variable.VariableDescriptor;
-import org.eclipse.ptp.debug.external.target.TargetAIFValueEvent;
-import org.eclipse.ptp.debug.external.target.TargetArgumentsEvent;
-import org.eclipse.ptp.debug.external.target.TargetGlobalVariablesEvent;
-import org.eclipse.ptp.debug.external.target.TargetLocalVariablesEvent;
+import org.eclipse.ptp.debug.external.commands.GetAIFCommand;
+import org.eclipse.ptp.debug.external.commands.ListArgumentsCommand;
+import org.eclipse.ptp.debug.external.commands.ListGlobalVariablesCommand;
+import org.eclipse.ptp.debug.external.commands.ListLocalVariablesCommand;
 
 public class VariableManager extends Manager {
 	static final ICDIVariable[] EMPTY_VARIABLES = {};
@@ -303,7 +303,9 @@ public class VariableManager extends Manager {
 		try {
 			Session session = (Session)getSession();
 			BitList tasks = session.createBitList(target.getTargetID());
-			ICDIArgument[] args = new TargetArgumentsEvent(session, tasks, frame).getArguments();
+			ListArgumentsCommand argCmd = new ListArgumentsCommand(tasks, frame);
+			session.getDebugger().postCommand(argCmd);
+			ICDIArgument[] args = argCmd.getArguments();
 			if (args != null) {
 				for (int i = 0; i < args.length; i++) {
 					VariableDescriptor varDesc = (VariableDescriptor) args[i];
@@ -314,7 +316,9 @@ public class VariableManager extends Manager {
 					int depth = varDesc.getStackDepth();
 					IAIF aif = varDesc.getAIF();
 					if (aif == null) {
-						aif = new TargetAIFValueEvent(session, tasks, fName).getAIF();
+						GetAIFCommand aifCmd = new GetAIFCommand(tasks, fName);
+						session.getDebugger().postCommand(aifCmd);
+						aif = aifCmd.getAIF();
 					}
 					argObjects.add(new ArgumentDescriptor(target, thread, frame, name, fName, pos, depth, aif));
 				}
@@ -356,7 +360,9 @@ public class VariableManager extends Manager {
 			String name = varDesc.getQualifiedName();
 			Target target = (Target)varDesc.getTarget();
 			Session session = (Session)getSession();
-			ICDIGlobalVariable[] vars = new TargetGlobalVariablesEvent(session, session.createBitList(target.getTargetID())).getGlobalVariables();
+			ListGlobalVariablesCommand varCmd = new ListGlobalVariablesCommand(session.createBitList(target.getTargetID()));
+			session.getDebugger().postCommand(varCmd);
+			ICDIGlobalVariable[] vars = varCmd.getGlobalVariables();
 			System.out.println(" ++++++++++++++++ listGlobalVariables: " + vars.length + " ++++++++++++++++");
 			for (int i = 0; i < vars.length; i++) {
 				if (name.equals(vars[i].getQualifiedName())) {
@@ -380,7 +386,9 @@ public class VariableManager extends Manager {
 		try {
 			Session session = (Session)getSession();
 			BitList tasks = session.createBitList(target.getTargetID());
-			ICDILocalVariable[] vars = new TargetLocalVariablesEvent(session, tasks, currentFrame).getLocalVariables();
+			ListLocalVariablesCommand varCmd = new ListLocalVariablesCommand(tasks, currentFrame);
+			session.getDebugger().postCommand(varCmd);
+			ICDILocalVariable[] vars = varCmd.getLocalVariables();
 			if (vars != null) {
 				for (int i = 0; i < vars.length; i++) {
 					VariableDescriptor varDesc = (VariableDescriptor)vars[i];
@@ -391,7 +399,9 @@ public class VariableManager extends Manager {
 					int depth = varDesc.getStackDepth();
 					IAIF aif = varDesc.getAIF();
 					if (aif == null) {
-						aif = new TargetAIFValueEvent(session, tasks, fName).getAIF();
+						GetAIFCommand aifCmd = new GetAIFCommand(tasks, fName);
+						session.getDebugger().postCommand(aifCmd);
+						aif = aifCmd.getAIF();
 					}
 					varObjects.add(new LocalVariableDescriptor(target, thread, frame, name, fName, pos, depth, aif));
 				}

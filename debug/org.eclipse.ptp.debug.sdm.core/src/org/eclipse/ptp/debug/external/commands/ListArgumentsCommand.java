@@ -16,20 +16,35 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.cdi;
+package org.eclipse.ptp.debug.external.commands;
 
+import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
  * @author Clement chu
  * 
  */
-public interface ICommonActions {
-	public void stop(BitList tasks) throws PCDIException;
-	public void resume(BitList tasks) throws PCDIException;
-	public void suspend(BitList tasks) throws PCDIException;
-	public void steppingInto(BitList tasks) throws PCDIException;
-	public void steppingOver(BitList tasks) throws PCDIException;
-	public void steppingReturn(BitList tasks) throws PCDIException;
+public class ListArgumentsCommand extends AbstractDebugCommand {
+	private ICDIStackFrame frame = null;
+	
+	public ListArgumentsCommand(BitList tasks, ICDIStackFrame frame) {
+		super(tasks, false, true);
+		this.frame = frame;
+	}
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		debugger.listArguments(tasks, frame);
+	}
+	
+	public ICDIArgument[] getArguments() throws PCDIException {
+		if (waitForReturn()) {
+			if (result instanceof ICDIArgument[])
+				return (ICDIArgument[])result;
+		}
+		throw new PCDIException("No arguments found in " + tasks.toString());
+	}
 }
 

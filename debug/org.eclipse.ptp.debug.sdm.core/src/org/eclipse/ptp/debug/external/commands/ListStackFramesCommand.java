@@ -16,34 +16,30 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.target;
+package org.eclipse.ptp.debug.external.commands;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
  * @author Clement chu
- *
+ * 
  */
-public class TargetArgumentsEvent extends AbstractTargetEvent {
-	private ICDIStackFrame frame = null;
-
-	public TargetArgumentsEvent(Session session, BitList tasks, ICDIStackFrame frame) {
-		super(session, tasks, ARGUMENTS_TYPE);
-		this.frame = frame;
+public class ListStackFramesCommand extends AbstractDebugCommand {
+	public ListStackFramesCommand(BitList tasks) {
+		super(tasks, false, true);
 	}
-	public ICDIArgument[] getArguments() throws PCDIException {
-		exec();
-		if (result instanceof ICDIArgument[])
-			return (ICDIArgument[])result;
-
-		throw new PCDIException("No arguments found in " + getTargets().toString());
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		debugger.listStackFrames(tasks);
 	}
 	
-	public void action() throws PCDIException {
-		session.getDebugger().listArguments(getTargets(), frame);
-	}			
+	public ICDIStackFrame[] getStackFrames() throws PCDIException {
+		if (waitForReturn()) {
+			if (result instanceof ICDIStackFrame[])
+				return (ICDIStackFrame[])result;
+		}
+		throw new PCDIException("No stack frames found in " + tasks.toString());
+	}
 }

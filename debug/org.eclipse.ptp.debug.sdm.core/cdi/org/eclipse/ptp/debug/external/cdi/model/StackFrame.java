@@ -39,14 +39,14 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.external.ExtFormat;
 import org.eclipse.ptp.debug.external.cdi.Locator;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.cdi.model.variable.ArgumentDescriptor;
 import org.eclipse.ptp.debug.external.cdi.model.variable.LocalVariableDescriptor;
-import org.eclipse.ptp.debug.external.target.TargetAIFValueEvent;
+import org.eclipse.ptp.debug.external.commands.GetAIFCommand;
+import org.eclipse.ptp.debug.external.commands.StepFinishCommand;
 
 public class StackFrame extends PTPObject implements ICDIStackFrame {
 	Thread cthread;
@@ -83,8 +83,9 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 			BitList tasks = session.createBitList(target.getTargetID());
 			for (int i=0; i<argDescs.length; i++) {
 				ArgumentDescriptor argDesc = (ArgumentDescriptor)argDescs[i];
-				IAIF aif = new TargetAIFValueEvent(session, tasks, argDesc.getQualifiedName()).getAIF();
-				argDesc.setAIF(aif);
+				GetAIFCommand command = new GetAIFCommand(tasks, argDesc.getQualifiedName());
+				session.getDebugger().postCommand(command);
+				argDesc.setAIF(command.getAIF());
 			}
 		}
 		return argDescs;
@@ -101,8 +102,9 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 			BitList tasks = session.createBitList(target.getTargetID());
 			for (int i=0; i<localDescs.length; i++) {
 				LocalVariableDescriptor localDesc = (LocalVariableDescriptor)localDescs[i];
-				IAIF aif = new TargetAIFValueEvent(session, tasks, localDesc.getQualifiedName()).getAIF();
-				localDesc.setAIF(aif);
+				GetAIFCommand command = new GetAIFCommand(tasks, localDesc.getQualifiedName());
+				session.getDebugger().postCommand(command);
+				localDesc.setAIF(command.getAIF());
 			}
 		}
 		return localDescs;
@@ -159,12 +161,12 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 	protected void finish() throws CDIException {
 		((Thread)getThread()).setCurrentStackFrame(this, false);
 		Target target = (Target)getTarget();
-		target.getDebugger().steppingReturn(((Session)target.getSession()).createBitList(target.getTargetID()));
+		target.getDebugger().postCommand(new StepFinishCommand(((Session)target.getSession()).createBitList(target.getTargetID())));
 	}	
 	protected void execReturn(String value) throws CDIException {
 		((Thread)getThread()).setCurrentStackFrame(this, false);
 		Target target = (Target)getTarget();
-		target.getDebugger().steppingReturn(((Session)target.getSession()).createBitList(target.getTargetID()));
+		target.getDebugger().postCommand(new StepFinishCommand(((Session)target.getSession()).createBitList(target.getTargetID())));
 	}
 
 	public int getLevel() {

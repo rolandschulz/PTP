@@ -51,6 +51,12 @@ import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
+import org.eclipse.ptp.debug.external.commands.GoCommand;
+import org.eclipse.ptp.debug.external.commands.HaltCommand;
+import org.eclipse.ptp.debug.external.commands.KillCommand;
+import org.eclipse.ptp.debug.external.commands.StepFinishCommand;
+import org.eclipse.ptp.debug.external.commands.StepIntoCommand;
+import org.eclipse.ptp.debug.external.commands.StepOverCommand;
 
 public class Session implements IPCDISession, ICDISessionObject, IBreakpointListener {
 	public final static Target[] EMPTY_TARGETS = {};
@@ -257,27 +263,21 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 		stop(createBitList());
 	}
 	public void stop(BitList tasks) throws PCDIException {
-		getDebugger().stop(tasks);
+		getDebugger().postCommand(new KillCommand(tasks));
 	}
 	public void resume(BitList tasks) throws PCDIException {
-		getDebugger().resume(tasks);
+		getDebugger().postCommand(new GoCommand(tasks));
 	}
 	public void suspend(BitList tasks) throws PCDIException {
-		getDebugger().suspend(tasks);
-	}
-	public void steppingInto(BitList tasks, int count) throws PCDIException {
-		getDebugger().steppingInto(tasks, count);
+		getDebugger().postCommand(new HaltCommand(tasks));
 	}
 	public void steppingInto(BitList tasks) throws PCDIException {
-		getDebugger().steppingInto(tasks);
-	}
-	public void steppingOver(BitList tasks, int count) throws PCDIException {
-		getDebugger().steppingOver(tasks, count);
+		getDebugger().postCommand(new StepIntoCommand(tasks));
 	}
 	public void steppingOver(BitList tasks) throws PCDIException {
-		getDebugger().steppingOver(tasks);
+		getDebugger().postCommand(new StepOverCommand(tasks));
 	}
 	public void steppingReturn(BitList tasks) throws PCDIException {
-		getDebugger().steppingReturn(tasks);
+		getDebugger().postCommand(new StepFinishCommand(tasks));
 	}
 }

@@ -16,33 +16,44 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.target;
+package org.eclipse.ptp.debug.external.commands;
 
+import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.external.cdi.Session;
+import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
  * @author Clement chu
- *
+ * 
  */
-public class TargetAIFValueEvent extends AbstractTargetEvent {
-	private String variableName = "";
+public class SetFunctionBreakpointCommand extends AbstractDebugCommand {
+	private ICDIFunctionBreakpoint funcBpt = null;
+	//private IAbstractDebugger debugger = null;
 	
-	public TargetAIFValueEvent(Session session, BitList tasks, String variableName) {
-		super(session, tasks, AIFVALUE_TYPE);
-		this.variableName = variableName;
+	public SetFunctionBreakpointCommand(BitList tasks, ICDIFunctionBreakpoint funcBpt) {
+		super(tasks, true, false);
+		this.funcBpt = funcBpt;
 	}
-	public IAIF getAIF() throws PCDIException {
-		exec();
-		if (result instanceof IAIF)
-			return (IAIF)result;
-
-		throw new PCDIException("No AIF found in " + getTargets().toString());
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		//this.debugger = debugger;
+		debugger.setFunctionBreakpoint(tasks, funcBpt);
+		debugger.handleBreakpointCreatedEvent(tasks);
 	}
-	
-	public void action() throws PCDIException {
-		session.getDebugger().getAIFValue(getTargets(), variableName);
-	}		
+	/*
+	public void setReturn(Object result) {
+		super.setReturn(result);
+		if (result.equals(OK)) {
+			debugger.handleBreakpointCreatedEvent(tasks);
+		}
+	}
+	public void setLineBreakpoint() throws PCDIException {
+		if (waitForReturn()) {
+			if (result.equals(OK)) {
+				return;
+			}
+		}
+		throw new PCDIException("Function breakpoint cannot set in " + tasks.toString());		
+	}
+	*/
 }

@@ -27,7 +27,7 @@ import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.model.PTPObject;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.variable.Variable;
-import org.eclipse.ptp.debug.external.target.TargetExpressValueEvent;
+import org.eclipse.ptp.debug.external.commands.EvaluteExpressionCommand;
 
 public class Value extends PTPObject implements ICDIValue {
 	protected Variable variable;
@@ -47,8 +47,9 @@ public class Value extends PTPObject implements ICDIValue {
 		if (aif == null) {
 			Target target = (Target) variable.getTarget();
 			Session session = (Session) target.getSession();
-			
-			return new TargetExpressValueEvent(session, session.createBitList(target.getTargetID()), variable.getName()).getExpressValue();
+			EvaluteExpressionCommand command = new EvaluteExpressionCommand(session.createBitList(target.getTargetID()), variable.getName());
+			session.getDebugger().postCommand(command);
+			return command.getExpressionValue();
 		}
 		//TODO - fix the toString later
 		return aif.getValue().toString();

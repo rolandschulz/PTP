@@ -128,11 +128,13 @@ public class PseudoProcess implements IProcessListener, IPseudoProcess {
 	}
 	public void kill() throws DebugException {
 		if (!finished) {
+			/*
 			try {
 				debugger.stop(debugger.getSession().createBitList(getTargetID()));
 			} catch (PCDIException e) {
 				throw new DebugException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 			}
+			*/
 		}
 	}
 	public int getTargetID() {
