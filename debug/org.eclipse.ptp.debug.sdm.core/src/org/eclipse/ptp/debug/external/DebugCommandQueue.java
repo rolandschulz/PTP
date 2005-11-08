@@ -48,14 +48,11 @@ public class DebugCommandQueue extends Thread {
 				break;
 			}
 			currentCommand = getCommand();
-			System.out.println("---- current command: "+ currentCommand);
 			try {
 				currentCommand.execCommand(debugger);
-				System.out.println("---- waiting for return current command: "+ currentCommand);
 				if (!currentCommand.waitForReturn()) {
 					System.out.println("************ ERROR occurred in DebugCommandQueue -- wait for return **********");
 				}
-				System.out.println("---- finished for return current command: "+ currentCommand);
 			} catch (PCDIException e) {
 				System.out.println("************ ERROR occurred in DebugCommandQueue -- execCommand **********");
 			}
@@ -84,13 +81,12 @@ public class DebugCommandQueue extends Thread {
 		synchronized (queue) {
 			if (!queue.contains(command)) {
 				if (command.canInterrupt() && currentCommand != null) {
-					System.out.println("---- Interrupted add new command: "+ currentCommand);
 					flushCommands();
-					currentCommand.setReturn(null);
-					//if (currentCommand.waitForReturn()) {
-						//do nothing
-					//}
-					System.out.println("---- Interrupted wait for last command finish: "+ currentCommand);
+					setCommandReturn(null);
+					try {
+						//To make sure all events fired via AsbtractDebugger, so wait 1 sec here
+						queue.wait(1000);
+					} catch (Exception e) {}
 				}
 				queue.add(command);
 				queue.notifyAll();
@@ -109,7 +105,6 @@ public class DebugCommandQueue extends Thread {
 			queue.clear();
 		}
 	}
-	
 	public void setCommandReturn(Object result) {
 		synchronized (queue) {
 			if (currentCommand != null) {
