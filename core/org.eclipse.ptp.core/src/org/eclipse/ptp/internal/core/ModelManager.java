@@ -279,8 +279,12 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			
 			job.addChild(proc);
 
-			String pname = proc.getElementName();
+			//String pname = proc.getElementName();
+			
 			String nname = vals[1];
+			/* this is a hack until I get this working correctly w/ the monitoring system! */
+			nname = new String("machine0_node0");
+			
 			//String nname = controlSystem.getProcessAttribute(job, proc, AttributeConstants.ATTRIB_PROCESS_NODE_NAME);
 			String mname = monitoringSystem.getNodeMachineName(nname);
 			// System.out.println("Process "+pname+" running on node:");

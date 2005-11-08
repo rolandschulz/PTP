@@ -24,7 +24,11 @@ public class ProxyRuntimeProcessAttributeEvent extends AbstractProxyRuntimeEvent
 
 	public ProxyRuntimeProcessAttributeEvent(String[] values) {
 		super(EVENT_RUNTIME_PROCATTR);
-		this.values = values;
+		int s = values.length - 1;
+		this.values = new String[s];
+		for(int i=0; i<s; i++) {
+			this.values[i] = new String(values[i+1]);
+		}
 	}
 	
 	public String[] getValues() {
