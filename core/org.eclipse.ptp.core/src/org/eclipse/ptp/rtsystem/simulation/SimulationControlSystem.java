@@ -188,7 +188,8 @@ public class SimulationControlSystem implements IControlSystem {
 	}
 
 	/* get the processes pertaining to a certain job */
-	public String[] getProcesses(String jobName) {
+	public String[] getProcesses(IPJob job) {
+		String jobName = job.toString();
 		System.out.println("getProcesses("+jobName+")");
 		/* find this machineName in the map - if it's there */
 		if (!processMap.containsKey(jobName)) {

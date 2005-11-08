@@ -181,15 +181,15 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 			return;
 		}
 		
-		String jobIDs = job.getJobNumber();
-		int jobID = -1;
-		try {
-			jobID = Integer.parseInt(jobIDs);
-		} catch (NumberFormatException e) {
-			jobID = -1;
-		}
+		int jobID = job.getJobNumberInt();
+
 		if(jobID >= 0) {
-			System.out.println("JAVA OMPI: abortJob() with name "+job.toString()+" and ID "+jobID);
+			System.out.println("OMPIControlSystem: abortJob() with name "+job.toString()+" and ID "+jobID);
+			try {
+				proxy.terminateJob(jobID);
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
 		//	jniBroker.OMPITerminateJob(jobID);
 		}
 		else {
@@ -212,13 +212,27 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 	}
 
 	/* get the processes pertaining to a certain job */
-	public String[] getProcesses(String jobName) {
-		System.out.println("JAVA OMPI: getProcesses(" + jobName + ") called");
+	public String[] getProcesses(IPJob job) {
+		System.out.println("JAVA OMPI: getProcesses(" + job.toString() + ") called");
 
+		int jobID = job.getJobNumberInt();
+		int numProcs = -1;
+		
 		/* need to check is jobName is a valid job name */
+		try {
+			numProcs = proxy.getJobProcesses(jobID);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		
+		if(numProcs <= 0) return null;
 
-		String[] ne = new String[1];
-		ne[0] = new String("job0_process0");
+		String[] ne = new String[numProcs];
+		
+		for(int i=0; i<numProcs; i++) {
+			ne[i] = new String("job"+jobID+"_process"+i);
+		}
+		
 		return ne;
 	}
 	

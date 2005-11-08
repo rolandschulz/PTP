@@ -36,6 +36,8 @@ public interface IPJob extends IPElement {
 	 */
 	public String getJobNumber();
 	
+	public int getJobNumberInt();
+	
 	/**
 	 * Returns true/false regarding whether this Job is a debug job 
 	 * 

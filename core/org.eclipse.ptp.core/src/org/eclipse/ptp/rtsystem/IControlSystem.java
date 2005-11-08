@@ -33,7 +33,7 @@ public interface IControlSystem {
 	
 	public String[] getJobs();
 
-	public String[] getProcesses(String jobName);
+	public String[] getProcesses(IPJob job);
 	
 	public String getProcessAttribute(String procName, String attrib);
 

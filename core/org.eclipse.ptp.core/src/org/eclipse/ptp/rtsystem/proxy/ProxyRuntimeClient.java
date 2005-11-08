@@ -34,6 +34,10 @@ public class ProxyRuntimeClient extends AbstractProxyRuntimeClient {
 		sendCommand("RUN", "\""+ prog + "\" " + Integer.toString(numProcs) + " " + Boolean.toString(debug));
 	}
 	
+	public void terminateJob(int jobId) throws IOException {
+		sendCommand("TERMJOB", Integer.toString(jobId));
+	}
+	
 	public void getJobs() throws IOException {
 		sendCommand("GETJOBS");
 	}
