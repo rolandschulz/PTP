@@ -463,17 +463,22 @@ ORTERun(char **args)
 	char *res;
 	
 	int i;
+	int num_args;
 	orte_jobid_t jobid = ORTE_JOBID_MAX;
 	char pgm_name[128], cwd[128];
 	char *c;
 	orte_app_context_t **apps;
 	int num_apps;
-	char *exec_path = args[1];
+	char *exec_path = args[3];
 	int num_procs = atoi(args[2]);
 	int debug = 0;
 	
-	if (strcmp(args[3], "true") == 0)
+	if (strcmp(args[1], "true") == 0)
 		debug++;
+	
+	/* count number of args */
+	for (i = 4, num_args = 0; args[i] != NULL; i++)
+		num_args++;
 
 	c = rindex(exec_path, '/');
 
@@ -499,21 +504,12 @@ ORTERun(char **args)
 	apps[0]->num_map = 0;
 	apps[0]->map_data = NULL;
 	/* setup argv */
-	if (!debug) {
-		apps[0]->argv = (char **)malloc(2 * sizeof(char *));
-		apps[0]->argv[0] = strdup(pgm_name);
-		apps[0]->argv[1] = NULL;
-		apps[0]->argc = 1;
-	} else {
-		apps[0]->num_procs++;
-		apps[0]->argv = (char **)malloc(5 * sizeof(char *));
-		apps[0]->argv[0] = strdup("/Volumes/Home/greg/Desktop/workspaces/3.1/ptp/org.eclipse.ptp.debug.sdm/sdm");
-		apps[0]->argv[1] = strdup("--debugger=gdb-mi");
-		apps[0]->argv[2] = strdup("--host=localhost");
-		apps[0]->argv[3] = strdup("--port=12346");
-		apps[0]->argv[4] = NULL;
-		apps[0]->argc = 4;
-	}
+	apps[0]->argv = (char **)malloc((2+num_args) * sizeof(char *));
+	apps[0]->argv[0] = strdup(pgm_name);
+	for (i = 0; i < num_args; i++)
+		apps[0]->argv[i+1] = strdup(args[i+4]);
+	apps[0]->argv[num_args+1] = NULL;
+	apps[0]->argc = num_args + 1;
 	
 	printf("Spawning %d processes of job '%s'\n", apps[0]->num_procs, apps[0]->app);
 	printf("\tprogram name '%s'\n", apps[0]->argv[0]);
