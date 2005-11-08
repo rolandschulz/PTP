@@ -55,6 +55,10 @@ public class ProxyRuntimeEvent extends ProxyEvent {
 			int nprocs = Integer.parseInt(args[1]);
 			evt = new ProxyRuntimeProcessesEvent(nprocs);
 			break;
+		
+		case IProxyRuntimeEvent.EVENT_RUNTIME_PROCATTR:
+			evt = new ProxyRuntimeProcessAttributeEvent(args);
+			break;
 
 		default:
 			evt = new ProxyRuntimeErrorEvent(ProxyErrorEvent.EVENT_ERR_EVENT, "Invalid event type");

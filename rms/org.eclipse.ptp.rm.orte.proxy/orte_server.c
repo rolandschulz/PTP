@@ -29,14 +29,20 @@
 #define RTEV_ERROR				RTEV_OFFSET + 1
 #define RTEV_JOBSTATE				RTEV_OFFSET + 2
 #define RTEV_PROCS				RTEV_OFFSET + 4
+#define RTEV_PATTR				RTEV_OFFSET + 5
 #define RTEV_NEWJOB				RTEV_OFFSET + 11
 
 #define RTEV_ERROR_ORTE_INIT		RTEV_OFFSET + 1000
 #define RTEV_ERROR_ORTE_FINALIZE	RTEV_OFFSET + 1001
 #define RTEV_ERROR_ORTE_RUN		RTEV_OFFSET + 1002
 #define RTEV_ERROR_TERMINATE_JOB	RTEV_OFFSET + 1003
+#define RTEV_ERROR_PATTR			RTEV_OFFSET + 1004
+#define RTEV_ERROR_PROCS			RTEV_OFFSET + 1005
 
 #define JOB_STATE_NEW				5000
+
+#define PTP_UINT32				1
+#define PTP_STRING				2
 
 int ORTEIsShutdown(void);
 int ORTEQuit(void);
@@ -45,6 +51,7 @@ int ORTEStartDaemon(char **);
 int ORTERun(char **);
 int ORTETerminateJob(char **);
 int ORTEGetProcesses(char **);
+int ORTEGetProcessAttribute(char **);
 /*
 int ORTERun(char **);
 int OMPIGetJobs(char **);
@@ -58,6 +65,7 @@ int OMPIGetNodemachineID(char **);
 
 */
 
+int get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *input_types, char **input_values, int input_num_keys);
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
 static int ompi_sendcmd(orte_daemon_cmd_flag_t usercmd);
 static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd);
@@ -87,12 +95,13 @@ static proxy_svr_commands command_tab[] = {
 	{"RUN",			ORTERun},
 	{"TERMJOB",		ORTETerminateJob},
 	{"GETPROCS",		ORTEGetProcesses},
+	{"GETPATTR",	   	ORTEGetProcessAttribute},
 	{NULL,			NULL},
 	/*
 	{"RUN",			ORTERun},
 	{"GETJOBS",		OMPIGetJobs},
 	{"GETPROCS",		OMPIGetProcesses},
-	{"GETATTR",	   	OMPIGetProcessAttribute},
+	
 	{"GETMACHS",		OMPIGetMachines},
 	{"GETNODES",		OMPIGetNodes},
 	{"GETNATTR",		OMPIGetNodeAttribute},
@@ -470,10 +479,10 @@ ORTERun(char **args)
 	orte_app_context_t **apps;
 	int num_apps;
 	char *exec_path = args[3];
-	int num_procs = atoi(args[2]);
+	int num_procs = atoi(args[1]);
 	int debug = 0;
 	
-	if (strcmp(args[1], "true") == 0)
+	if (strcmp(args[2], "true") == 0)
 		debug++;
 	
 	/* count number of args */
@@ -704,7 +713,7 @@ static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd)
 //
 
 int
-get_procs(orte_jobid_t jobid)
+get_num_procs(orte_jobid_t jobid)
 {
 	char *keys[2];
 	int rc, ret;
@@ -753,10 +762,10 @@ ORTEGetProcesses(char **args)
 	char *			res;
 	
 	jobid = atoi(args[1]);
-	procs = get_procs((orte_jobid_t)jobid);
+	procs = get_num_procs((orte_jobid_t)jobid);
 	
 	if (procs == 0) {
-		asprintf(&res, "%d %s", RTEV_ERROR, "no such jobid or error retrieving processes on job");
+		res = ORTEErrorStr(RTEV_ERROR_PROCS, "no such jobid or error retrieving processes on job");
 	} else {
 		asprintf(&res, "%d %d", RTEV_PROCS, procs);
 	}
@@ -767,6 +776,210 @@ ORTEGetProcesses(char **args)
 	
 	return PROXY_RES_OK;
 }
+
+/* given a jobID and a processID inside that job we attempt to find the values associated
+ * with the given keys.  the caller can pass any number of possible keys and the response
+ * message will be in the same order.
+ */
+int
+ORTEGetProcessAttribute(char **args)
+{
+	int				jobid;
+	int				procid;
+	char *			res;
+	int				last_arg;
+	int				i;
+	char **			keys = NULL;
+	char **			values = NULL;
+	int *			types = NULL;
+	int				tot_len;
+	char *			valstr = NULL;
+	
+	jobid = atoi(args[1]);
+	procid = atoi(args[2]);
+	
+	/* run through the rest of the args, counting the keys */
+	i = 3;
+	while(args[i] != NULL) i++;
+	
+	last_arg = i;
+	
+	keys = (char**)malloc((last_arg - 2)*sizeof(char*));
+	values = (char**)malloc((last_arg - 2)*sizeof(char*));
+	types = (int*)malloc((last_arg - 2)*sizeof(int));
+	
+	/* go through the args now, set up the key array */
+	for(i=3; i<last_arg; i++) {
+		if(!strcmp(args[i], "ATTRIB_PROCESS_PID")) {
+			asprintf(&(keys[i-3]), "%s", ORTE_PROC_PID_KEY);
+			types[i-3] = PTP_UINT32;
+		} else if(!strcmp(args[i], "ATTRIB_PROCESS_NODE_NAME")) {
+			asprintf(&(keys[i-3]), "%s", ORTE_NODE_NAME_KEY);
+			types[i-3] = PTP_STRING;
+		} else {
+			asprintf(&(keys[i-3]), "UNDEFINED");
+			types[i-3] = PTP_STRING;
+		}
+	}
+	
+	for(i=3; i<last_arg; i++) {
+		printf("BEFORE CALL KEYS[%d] = '%s'\n", i-3, keys[i-3]); fflush(stdout);
+	}
+		
+	if(get_proc_attribute(jobid, procid, keys, types, values, last_arg-3)) {
+		/* error - so bail out */
+		res = ORTEErrorStr(RTEV_ERROR_PATTR, "error finding key on process or error getting keys");
+		proxy_svr_event_callback(orte_proxy, res);
+		
+		return;
+	}
+	/* else we're good, use the values */
+	
+	tot_len = 0;
+	for(i=3; i<last_arg; i++) {
+		//printf("AFTER CALL! VALS[%d] = '%s'\n", i-3, values[i-3]); fflush(stdout);
+		tot_len += strlen(values[i-3]);
+	}
+	
+	//printf("totlen = %d\n", tot_len);
+	tot_len += last_arg; /* add on some for spaces and null, etc - little bit of extra here */
+	valstr = (char*)malloc(tot_len * sizeof(char));
+	
+	sprintf(valstr, "");
+	for(i=3; i<last_arg; i++) {	
+		sprintf(valstr, "%s%s%s", valstr, i == 3 ? "" : " ", values[i-3]);
+	}
+	
+	//printf("valSTR = '%s'\n", valstr);
+	
+	asprintf(&res, "%d %s", RTEV_PATTR, valstr);
+	
+	proxy_svr_event_callback(orte_proxy, res);
+	
+	free(res);
+	
+	for(i=3; i<last_arg; i++) {
+		if(keys[i-3] != NULL) free(keys[i-3]);
+	}
+	for(i=3; i<last_arg; i++) {
+		if(values[i-3] != NULL) free(values[i-3]);
+	}
+		
+	free(keys);
+	free(values);
+	free(types);
+	free(valstr);
+	
+	return PROXY_RES_OK;
+}
+
+/*
+** Very inefficient! Probably better to build a data structure
+** from keyvals, then work with that.
+*/
+int get_ui32_value(orte_gpr_value_t *value, char *key)
+{
+        int k;
+
+        for(k=0; k<value->cnt; k++) {
+                orte_gpr_keyval_t* keyval = value->keyvals[k];
+                if (strcmp(key, keyval->key) == 0)
+                        return keyval->value.ui32;
+        }
+
+        return -1;
+}
+
+/*
+** Ditto.
+*/
+char *get_str_value(orte_gpr_value_t *value, char *key)
+{
+        int k;
+
+        for(k=0; k<value->cnt; k++) {
+                orte_gpr_keyval_t* keyval = value->keyvals[k];
+                if (strcmp(key, keyval->key) == 0)
+                        return keyval->value.strptr;
+        }
+
+        return "";
+}
+
+int
+get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *input_types, char **input_values, int input_num_keys)
+{
+	char **keys;;
+	int rc;
+	size_t cnt;
+	char *segment = NULL;
+	char *jobid_str = NULL;
+	orte_gpr_value_t **values;
+	orte_gpr_value_t *value;
+	int i, ret;
+	
+	keys = (char**)malloc((input_num_keys + 1)* sizeof(char*));
+	for(i=0; i<input_num_keys; i++) {
+		keys[i] = strdup(input_keys[i]);
+	}
+	/* null terminated */
+	keys[input_num_keys] = NULL;
+	
+	rc = orte_ns.convert_jobid_to_string(&jobid_str, jobid);
+	if(rc != ORTE_SUCCESS) {
+		ret = 1;
+		goto cleanup;
+	}
+	
+	asprintf(&segment, "%s-%s", ORTE_JOB_SEGMENT, jobid_str);
+	
+	rc = orte_gpr.get(ORTE_GPR_KEYS_OR | ORTE_GPR_TOKENS_OR,
+			segment, NULL, keys, &cnt, &values);
+	if(rc != ORTE_SUCCESS) {
+		ret = 1;
+		goto cleanup;
+	}
+	
+	/* specified a proc bigger than any we know of in this job, bail out */
+	if(proc_num >= cnt) {
+		ret = 1;
+		goto cleanup;
+	}
+	
+	value = values[proc_num];
+	
+	for(i=0; i<input_num_keys; i++) {
+		switch(input_types[i]) {
+			case PTP_STRING:
+				asprintf(&(input_values[i]), "%s", get_str_value(value, input_keys[i]));
+				break;
+			case PTP_UINT32:
+				asprintf(&(input_values[i]), "%d", get_ui32_value(value, input_keys[i]));
+				break;
+		}
+		printf("VALUES IN GET FUNC[%d] = '%s'\n", i, input_values[i]); fflush(stdout);
+	}
+	
+	/* success */
+	ret = 0;
+	
+cleanup:
+	if(keys != NULL) {
+		for(i=0; i<input_num_keys; i++) {
+			if(keys[i] != NULL) free(keys[i]);
+		}
+		free(keys);
+	}
+	if(jobid_str != NULL)
+		free(jobid_str);
+	if(segment != NULL)
+		free(segment);
+		
+	return ret;
+}
+
+
+
 //
 ///* given a processID (associated with some jobID, but that part is implied)
 // * we request the value of an attribute.  the attribute keys are defined

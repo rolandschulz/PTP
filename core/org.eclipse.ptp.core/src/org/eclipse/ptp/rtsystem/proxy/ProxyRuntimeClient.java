@@ -56,8 +56,8 @@ public class ProxyRuntimeClient extends AbstractProxyRuntimeClient {
 		sendCommand("GETPROCS", Integer.toString(jobId));
 	}
 	
-	public void getProcessAttribute(int procId, String key) throws IOException {
-		sendCommand("GETPATTR", Integer.toString(procId) + " " + key);
+	public void getProcessAttribute(int jobId, int procId, String key) throws IOException {
+		sendCommand("GETPATTR", Integer.toString(jobId) + " " + Integer.toString(procId) + " " + key);
 	}
 	
 	public void getMachines() throws IOException {
