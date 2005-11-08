@@ -152,8 +152,21 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 			System.exit(1);
 		}*/
 		
+		String prog = jobRunConfig.getPathToExec();
+		int procs = jobRunConfig.getNumberOfProcesses();
+		String[] pargs = null;
+		
+		if (jobRunConfig.isDebug()) {
+			prog = "/Volumes/Home/greg/Desktop/workspaces/3.1/ptp/org.eclipse.ptp.debug.sdm/sdm";
+			pargs = new String[3];
+			pargs[0] = "--debugger=gdb-mi";
+			pargs[1] = "--host=localhost";
+			pargs[2] = "--port=" + jobRunConfig.getRemoteInfo();
+			procs++;
+		}
+		
 		try {
-			jobID = proxy.runJob(jobRunConfig.getPathToExec(), jobRunConfig.getNumberOfProcesses(), jobRunConfig.isDebug());
+			jobID = proxy.runJob(prog, pargs, procs, jobRunConfig.isDebug());
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
