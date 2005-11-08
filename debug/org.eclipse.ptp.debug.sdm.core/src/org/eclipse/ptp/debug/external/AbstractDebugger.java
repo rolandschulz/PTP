@@ -43,7 +43,9 @@ import org.eclipse.ptp.debug.external.cdi.event.ErrorEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
+import org.eclipse.ptp.debug.external.commands.ConnectionCommand;
 import org.eclipse.ptp.debug.external.commands.IDebugCommand;
+import org.eclipse.ptp.debug.external.commands.StartDebuggerCommand;
 
 public abstract class AbstractDebugger extends Observable implements IAbstractDebugger {
 	protected Queue eventQueue = null;
@@ -56,6 +58,10 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	
 	public void postCommand(IDebugCommand command) {
 		commandQueue.addCommand(command);
+	}
+	public void postCommandAndWait(IDebugCommand command) {
+		postCommand(command);
+		command.waitForReturn();
 	}
 	public void completeCommand(Object result) {
 		commandQueue.setCommandReturn(result);
@@ -74,7 +80,9 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		eventThread.start();
 		procs = job.getSortedProcesses();
 		// Initialize state variables
-		startDebugger(job);
+		
+		postCommandAndWait(new ConnectionCommand());
+		postCommandAndWait(new StartDebuggerCommand(job));
 	}
 	
 	public final void exit() {
@@ -242,5 +250,4 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	
 	//abstract functions
 	public abstract void stopDebugger();
-	public abstract void startDebugger(IPJob job);
 }

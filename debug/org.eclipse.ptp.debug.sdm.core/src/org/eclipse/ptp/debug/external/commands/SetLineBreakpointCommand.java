@@ -29,30 +29,22 @@ import org.eclipse.ptp.debug.external.IAbstractDebugger;
  */
 public class SetLineBreakpointCommand extends AbstractDebugCommand {
 	private ICDILineBreakpoint lineBpt = null;
-	//private IAbstractDebugger debugger = null;
 	
 	public SetLineBreakpointCommand(BitList tasks, ICDILineBreakpoint lineBpt) {
-		super(tasks, true, false);
+		super(tasks, false, true);
 		this.lineBpt = lineBpt;
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
-		//this.debugger = debugger;
 		debugger.setLineBreakpoint(tasks, lineBpt);
-		debugger.handleBreakpointCreatedEvent(tasks);
+		waitFinish(debugger);
 	}
-	/*
-	public void setReturn(Object result) {
-		super.setReturn(result);
-		if (result.equals(OK)) {
-			debugger.handleBreakpointCreatedEvent(tasks);
-		}
-	}
-	public void setLineBreakpoint() throws PCDIException {
+	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
 		if (waitForReturn()) {
-			if (result.equals(OK))
+			if (result.equals(OK)) {
+				debugger.handleBreakpointCreatedEvent(tasks);
 				return;
+			}
 		}
 		throw new PCDIException("Line breakpoint cannot set in " + tasks.toString());		
 	}
-	*/
 }

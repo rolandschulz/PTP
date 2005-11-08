@@ -28,12 +28,26 @@ import org.eclipse.ptp.debug.external.IAbstractDebugger;
  */
 public class DeleteBreakpointsCommand extends AbstractDebugCommand {
 	private ICDIBreakpoint[] bpts = null;
+	private int returnCounter = 0;
 	
 	public DeleteBreakpointsCommand(ICDIBreakpoint[] bpts) {
-		super(null, false, false);
+		super(null, false, true);
 		this.bpts = bpts;
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.deleteBreakpoints(bpts);
 	}
+	public void deleteBreakpoints() throws PCDIException {
+		while (returnCounter < bpts.length) {
+			if (waitForReturn()) {
+				if (result.equals(OK)) {
+					returnCounter++;
+					result = null;
+					if (returnCounter >= bpts.length)
+						return;
+				}
+			}
+			throw new PCDIException("Breakpoint cannot be deleted in " + tasks.toString());
+		}
+	}	
 }

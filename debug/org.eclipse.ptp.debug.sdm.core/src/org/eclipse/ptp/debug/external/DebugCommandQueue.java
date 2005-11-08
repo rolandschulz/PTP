@@ -62,7 +62,7 @@ public class DebugCommandQueue extends Thread {
 	private boolean waitForCommand() {
 		synchronized (queue) {
 			try {
-				while (queue.isEmpty()) {
+				while (currentCommand != null || queue.isEmpty()) {
 					queue.wait();
 				}
 			} catch (InterruptedException e) {
@@ -85,8 +85,8 @@ public class DebugCommandQueue extends Thread {
 					setCommandReturn(null);
 					try {
 						//To make sure all events fired via AsbtractDebugger, so wait 1 sec here
-						queue.wait(1000);
-					} catch (Exception e) {}
+						queue.wait(500);
+					} catch (InterruptedException e) {}
 				}
 				queue.add(command);
 				queue.notifyAll();

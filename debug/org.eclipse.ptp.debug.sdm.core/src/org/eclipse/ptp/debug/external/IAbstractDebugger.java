@@ -71,5 +71,6 @@ public interface IAbstractDebugger extends IDebugger {
 	
 	/* Command */
 	public void postCommand(IDebugCommand command);
+	public void postCommandAndWait(IDebugCommand command);
 	public void completeCommand(Object result);	
 }

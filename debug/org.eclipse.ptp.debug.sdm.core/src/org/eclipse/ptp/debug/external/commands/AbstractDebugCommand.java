@@ -25,8 +25,8 @@ import org.eclipse.ptp.core.util.BitList;
  * 
  */
 public abstract class AbstractDebugCommand implements IDebugCommand {
-	private final long WAIT_COMMAND_RETURN_TIME = 30000; 
-	private final Object lock = new Object(); 
+	protected final long WAIT_COMMAND_RETURN_TIME = 30000; 
+	protected final Object lock = new Object(); 
 	
 	protected BitList tasks = null;
 	protected Object result = null;
