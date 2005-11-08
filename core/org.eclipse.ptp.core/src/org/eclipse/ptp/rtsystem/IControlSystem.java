@@ -20,6 +20,7 @@
 package org.eclipse.ptp.rtsystem;
 
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
 /* This is the interface to a control system which controls a runtime system.
@@ -35,7 +36,7 @@ public interface IControlSystem {
 
 	public String[] getProcesses(IPJob job);
 	
-	public String getProcessAttribute(String procName, String attrib);
+	public String[] getProcessAttribute(IPJob job, IPProcess proc, String attrib);
 
 	/* event stuff */
 	public void addRuntimeListener(IRuntimeListener listener);

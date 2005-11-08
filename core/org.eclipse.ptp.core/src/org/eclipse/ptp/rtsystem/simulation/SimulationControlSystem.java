@@ -271,8 +271,10 @@ public class SimulationControlSystem implements IControlSystem {
 		return "-1";
 	}
 	
-	public String getProcessAttribute(String procName, String attrib)
+	public String[] getProcessAttribute(IPJob job, IPProcess proc, String attrib)
 	{
+		String procName = proc.getElementName();
+		
 		System.out.println("JAVA OMPI: getProcessAttribute(" + procName + ", "
 				+ attrib + ") called");
 		String s = null;
@@ -288,7 +290,10 @@ public class SimulationControlSystem implements IControlSystem {
 		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_NODE_NAME)) {
 			s = getProcessNodeName(procName);
 		}
-		return s;
+		
+		String[] s2 = new String[1];
+		s2[0] = s;
+		return s2;
 	}
 
 	public void addRuntimeListener(IRuntimeListener listener) {

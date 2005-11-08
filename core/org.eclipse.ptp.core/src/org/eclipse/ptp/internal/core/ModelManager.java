@@ -272,22 +272,16 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			IPProcess proc;
 			// System.out.println("process name = "+ne[j]);
 			
-			String pids = controlSystem.getProcessAttribute(ne[j], AttributeConstants.ATTRIB_PROCESS_PID);
-			int pid = -1;
-			try {
-				pid = (Integer.valueOf(pids)).intValue();
-			} catch(Exception e) {
-			}
+			proc = new PProcess(job, ne[j], "" + j + "", "0", j, IPProcess.STARTING, "", "");
+			String[] vals = controlSystem.getProcessAttribute(job, proc, AttributeConstants.ATTRIB_PROCESS_PID + " " + AttributeConstants.ATTRIB_PROCESS_NODE_NAME);	
 			
-			//if (controlSystem instanceof SimulationControlSystem)
-			//	proc = new SimProcess(job, ne[j], "" + j + "", "" + pid + "", j, IPProcess.STARTING, "", "");
-			//else
-				proc = new PProcess(job, ne[j], "" + j + "", "" + pid + "", j, IPProcess.STARTING, "", "");
+			proc.setPid(vals[0]);
 			
 			job.addChild(proc);
 
 			String pname = proc.getElementName();
-			String nname = controlSystem.getProcessAttribute(pname, AttributeConstants.ATTRIB_PROCESS_NODE_NAME);
+			String nname = vals[1];
+			//String nname = controlSystem.getProcessAttribute(job, proc, AttributeConstants.ATTRIB_PROCESS_NODE_NAME);
 			String mname = monitoringSystem.getNodeMachineName(nname);
 			// System.out.println("Process "+pname+" running on node:");
 			// System.out.println("\t"+nname);
@@ -306,8 +300,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					proc.setNode(node);
 				}
 			}
-			String status = controlSystem.getProcessAttribute(ne[j], AttributeConstants.ATTRIB_PROCESS_STATUS);
-			proc.setStatus(status);
+			//String status = controlSystem.getProcessAttribute(job, proc, AttributeConstants.ATTRIB_PROCESS_STATUS);
+			//proc.setStatus(status);
 			monitor.worked(1);
 		}
 		monitor.done();
@@ -315,18 +309,19 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 	private void refreshJobStatus(String nejob) {
 		// System.out.println("refreshJobStatus("+nejob+")");
+		System.err.println("TODO: refreshJobStatus("+nejob+") called - finish this.");
+		/*
 		IPJob job = universe.findJobByName(nejob);
 		if (job != null) {
 			IPProcess[] procs = job.getProcesses();
 			if (procs != null) {
 				for (int i = 0; i < procs.length; i++) {
-					String procName = procs[i].getElementName();
-					String status = controlSystem.getProcessAttribute(procName, AttributeConstants.ATTRIB_PROCESS_STATUS);
+					String status = controlSystem.getProcessAttribute(job, procs[i], AttributeConstants.ATTRIB_PROCESS_STATUS);
 					// System.out.println("Status = "+status+" on process -
 					// "+procName);
 					procs[i].setStatus(status);
-					String signal = controlSystem.getProcessAttribute(procName, AttributeConstants.ATTRIB_PROCESS_SIGNAL);
-					String exitCode = controlSystem.getProcessAttribute(procName, AttributeConstants.ATTRIB_PROCESS_EXIT_CODE);
+					String signal = controlSystem.getProcessAttribute(job, procs[i], AttributeConstants.ATTRIB_PROCESS_SIGNAL);
+					String exitCode = controlSystem.getProcessAttribute(job, procs[i], AttributeConstants.ATTRIB_PROCESS_EXIT_CODE);
 					if (!signal.equals(""))
 						procs[i].setSignalName(signal);
 					if (!exitCode.equals(""))
@@ -335,6 +330,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			}
 			fireEvent(job, EVENT_UPDATED_STATUS);
 		}
+		*/
 	}
 
 	public void runtimeNodeStatusChange(String ne) {

@@ -210,7 +210,8 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		}
 	}
 	
-	public String[] getJobs() {
+	public String[] getJobs() 
+	{
 		Object a[];
 		System.out.println("JAVA OMPI: getJobs() called");
 
@@ -225,9 +226,8 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 	}
 
 	/* get the processes pertaining to a certain job */
-	public String[] getProcesses(IPJob job) {
-		System.out.println("JAVA OMPI: getProcesses(" + job.toString() + ") called");
-
+	public String[] getProcesses(IPJob job) 
+	{
 		int jobID = job.getJobNumberInt();
 		int numProcs = -1;
 		
@@ -249,24 +249,24 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		return ne;
 	}
 	
-	public String getProcessAttribute(String procName, String attrib)
+	public String[] getProcessAttribute(IPJob job, IPProcess proc, String attrib)
 	{
-		System.out.println("JAVA OMPI: getProcessAttribute(" + procName + ", "
-				+ attrib + ") called");
-		String s = null;
-
-		if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_PID)) {
-			s = ""+((int)(Math.random() * 10000)) + 1000+"";
-		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_EXIT_CODE)) {
-			s = "-1";
-		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_SIGNAL)) {
-			s = "-1";
-		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_STATUS)) {
-			s = "-1";
-		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_NODE_NAME)) {
-			s = "machine0_node0";
+		String[] values = null;
+		
+		try {
+			int jobID = job.getJobNumberInt();
+			int procID = proc.getTaskId();
+			values = proxy.getProcessAttributeBlocking(jobID, procID, attrib);
+		} catch(IOException e) {
+			e.printStackTrace();
 		}
-		return s;
+		
+		/* this part is hacked right now until we get this out of ORTE */
+		//if(attrib.equals(AttributeConstants.ATTRIB_PROCESS_NODE_NAME)) {
+		//	return "machine0_node0";
+		//}
+		
+		return values;
 	}
 
 	public void addRuntimeListener(IRuntimeListener listener) {
