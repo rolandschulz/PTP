@@ -30,6 +30,7 @@
 #define RTEV_JOBSTATE				RTEV_OFFSET + 2
 #define RTEV_PROCS				RTEV_OFFSET + 4
 #define RTEV_PATTR				RTEV_OFFSET + 5
+#define RTEV_NODES				RTEV_OFFSET + 7
 #define RTEV_NEWJOB				RTEV_OFFSET + 11
 
 #define RTEV_ERROR_ORTE_INIT		RTEV_OFFSET + 1000
@@ -38,6 +39,7 @@
 #define RTEV_ERROR_TERMINATE_JOB	RTEV_OFFSET + 1003
 #define RTEV_ERROR_PATTR			RTEV_OFFSET + 1004
 #define RTEV_ERROR_PROCS			RTEV_OFFSET + 1005
+#define RTEV_ERROR_NODES			RTEV_OFFSET + 1006
 
 #define JOB_STATE_NEW				5000
 
@@ -52,6 +54,7 @@ int ORTERun(char **);
 int ORTETerminateJob(char **);
 int ORTEGetProcesses(char **);
 int ORTEGetProcessAttribute(char **);
+int ORTEGetNodes(char **);
 /*
 int ORTERun(char **);
 int OMPIGetJobs(char **);
@@ -103,6 +106,7 @@ static proxy_svr_commands command_tab[] = {
 	{"TERMJOB",		ORTETerminateJob},
 	{"GETPROCS",		ORTEGetProcesses},
 	{"GETPATTR",	   	ORTEGetProcessAttribute},
+	{"GETNODES",		ORTEGetNodes},
 	{NULL,			NULL},
 	/*
 	{"RUN",			ORTERun},
@@ -149,7 +153,6 @@ ORTEInitialized(void)
 int
 ORTECheckErrorCode(int type, int rc)
 {
-	printf("Checking error code...\n"); fflush(stdout);
 	if(rc != ORTE_SUCCESS) {
 		printf("ARgh!  An error!\n"); fflush(stdout);
 		printf("ERROR %s\n", ORTE_ERROR_NAME(rc)); fflush(stdout);
@@ -165,8 +168,6 @@ int ORTEStartDaemon(char **args)
 {
 	int ret;
 	char *res;
-	
-	printf("START DAEMON CALLED!  OMG!\n");
 	
 	switch(orted_pid = fork()) {
 		case -1:
@@ -191,7 +192,7 @@ int ORTEStartDaemon(char **args)
 				while(args[i] != NULL) i++;
 	
 				len = i;
-				printf("\tARRAY is %d elements long.\n", len);
+				//printf("\tARRAY is %d elements long.\n", len);
 	
 				orted_args_len = len - 4;
 				if(orted_args_len < 0) {
@@ -213,7 +214,7 @@ int ORTEStartDaemon(char **args)
 	
 				i = 1;
 				while(args[i] != NULL) {
-					printf("ARG %d = %s\n", i, args[i]);
+					//printf("ARG %d = %s\n", i, args[i]);
 	
 					/* ompi_bin_path */
 					if(i == 1)  {
@@ -238,22 +239,22 @@ int ORTEStartDaemon(char **args)
 					i++;
 				}
 				
-				printf("ORTED_PATH = '%s' \n", orted_path);
-				for(i=0; i<orted_args_len+2; i++) {
-		    			if(orted_args[i] != NULL) 
-		    				printf("[C] #%d = '%s'\n", i, orted_args[i]);
-		    			else
-						printf("[C] #%d = NULL\n", i);
-		    			fflush(stdout);
-				}
+//				printf("ORTED_PATH = '%s' \n", orted_path);
+//				for(i=0; i<orted_args_len+2; i++) {
+//		    			if(orted_args[i] != NULL) 
+//		    				printf("[C] #%d = '%s'\n", i, orted_args[i]);
+//		    			else
+//						printf("[C] #%d = NULL\n", i);
+//		    			fflush(stdout);
+//				}
 				
 				user_path = getenv("PATH");
-				printf("Original user's PATH: %s\n", user_path);
+				//printf("Original user's PATH: %s\n", user_path);
 				asprintf(&user_path_new, "%s:%s", ompi_bin_path, user_path);
 				setenv("PATH", user_path_new, 1);
 				user_path = getenv("PATH");
-				printf("New user's PATH (temporarily) after prepending "
-				  "OMPI bin: %s\n", user_path);
+				//printf("New user's PATH (temporarily) after prepending "
+				//  "OMPI bin: %s\n", user_path);
 
 				/* we don't have to (in fact, we're not supposed to) free the pointer returned
 				 * by getenv().  the function just points into an internal structure that we
@@ -261,7 +262,7 @@ int ORTEStartDaemon(char **args)
 				free(user_path_new);
 				
 				/* spawn the daemon */
-				printf("Starting execv now!\n"); fflush(stdout);
+				//printf("Starting execv now!\n"); fflush(stdout);
 				errno = 0;
 //				ret = execv("/bin/echo", orted_args);
 				ret = execv(orted_path, orted_args);
@@ -272,8 +273,8 @@ int ORTEStartDaemon(char **args)
 					ret = execv(orted_path, cmd);
 				}
 				*/
-				printf("Line below execv - ret = %d.\n", ret); fflush(stdout);
-				printf("Error: %s\n", strerror(errno));
+				//printf("Line below execv - ret = %d.\n", ret); fflush(stdout);
+				//printf("Error: %s\n", strerror(errno));
 
 				free(orted_path);
 				free(orted_bin);
@@ -290,7 +291,7 @@ int ORTEStartDaemon(char **args)
 			/* sleep - letting the daemon get started up */
 			sleep(1);
 			wait(&ret);
-			printf("parent ret from child = %d\n", ret); fflush(stdout);
+			//printf("parent ret from child = %d\n", ret); fflush(stdout);
 			break;
 	}
 
@@ -1023,40 +1024,6 @@ cleanup:
 	return ret;
 }
 
-
-
-//
-///* given a processID (associated with some jobID, but that part is implied)
-// * we request the value of an attribute.  the attribute keys are defined
-// * elsewhere but an example might be ATTRIB_PROCESS_STATE, ATTRIB_PROCESS_NODE
-// * which would be the state of the process (starting, running, terminated,
-// * exited, etc) and the nodeID of the node the process is running on, 
-// * respectively 
-// * EVENT RETURN:
-// *   type = GET_NODE_ATTRIBUTE
-// *   data = "key=value" (example "state=running", "node=54" <-- 54 = node ID, not necessary node number)
-// */
-//int
-//OMPIGetProcessAttribute(char **args)
-//{
-//	int		procid = atoi(args[1]);
-//	char *	key = args[2];
-//	char *	val;
-//	
-//	val = get_proc_attribute(procid, key);
-//	
-//	if (val == NULL) {
-//		asprintf(&res, "%d %s", RTEV_ERROR, "no such attribute");
-//	} else {
-//		asprintf(res, "%d %s=%s", RTEV_PROCATTR, key, val);
-//	}
-//	
-//	proxy_svr_event_callback(orte_proxy, res);
-//	
-//	free(res);
-//
-//	return PROXY_RES_OK;
-//}
 //
 ///* MONITORING RELATED FUNCTIONS */
 //
@@ -1089,41 +1056,47 @@ cleanup:
 //	return PROXY_RES_OK;
 //}
 //
-///* given a machine ID, this generates an event which contains a list of
-// * all the nodeIDs associated with the given machineID
-// * EVENT RETURN:
-// *   type = GET_NODES
-// *   data = [10,11,12,13,14,15] <-- those are node IDs
-// * 
-// * NOTE: for nodes we must return a bitset, since there may be vary many. This
-// * means that we may need to map between internal/external representation of
-// * nodes id's (if they don't start with 0).
-// */
-//int
-//OMPIGetNodes(char **args)
-//{	
-//	int				mid;
-//	bitset *			nodes;
-//	char *			pstr;
-//	char *			res;
-//	
-//	mid = atoi(args[1]);
-//	nodes = get_nodes(mid);
-//	
-//	if (nodes == NULL) {
-//		asprintf(&res, "%d %s", RTEV_ERROR, "no such jobid");
-//	} else {
-//		pstr = bitset_to_str(nodes);
-//		asprintf(res, "%d %s", RTEV_NODES, pstr);
-//		free(pstr);
-//	}
-//	
-//	proxy_svr_event_callback(orte_proxy, res);
-//	
-//	free(res);
-//	return PROXY_RES_OK;
-//}
-//
+
+int
+get_num_nodes(int machid)
+{
+	int rc, ret;
+	size_t cnt;
+	orte_gpr_value_t **values;
+	
+	/* we're going to ignore machine ID until ORTE implements that */
+	
+	rc = orte_gpr.get(ORTE_GPR_KEYS_OR|ORTE_GPR_TOKENS_OR,
+                        ORTE_NODE_SEGMENT, NULL, NULL, &cnt, &values);
+                        
+	if(rc != ORTE_SUCCESS) {
+		return 0;
+	}
+	
+	return cnt;
+}
+
+/* given a machine ID this generates an event which has a single int
+ * return - the number of nodes associated with this machine
+ */
+int
+ORTEGetNodes(char **args)
+{	
+	int				mid;
+	char *			res;
+	int				nodes;
+	
+	mid = atoi(args[1]);
+	nodes = get_num_nodes(mid);
+
+	asprintf(&res, "%d %d", RTEV_NODES, nodes);
+	
+	proxy_svr_event_callback(orte_proxy, res);
+	
+	free(res);
+	return PROXY_RES_OK;
+}
+
 ///* given a nodeid and an attribute key this generates an event with
 // * the attribute's value.  sample attributes might be ATTRIB_NODE_STATE
 // * or ATTRIB_NODE_OS which might return up, down, booting, or error and

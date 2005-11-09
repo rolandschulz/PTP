@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
@@ -35,16 +36,22 @@ public class PMachine extends Parent implements IPMachine {
 
 	protected String arch = "undefined";
 
-	public PMachine(IPUniverse uni, String name, String key) {
-		super(uni, name, key, P_MACHINE);
-		System.out.println("Name is " + name + ", key is " + key);
+	public PMachine(IPUniverse uni, String name, int machineID) {
+		super(uni, name, ""+machineID+"", P_MACHINE);
+		System.out.println("Name is " + name + ", key is " + machineID);
 		System.out.println("NAME_TAG = " + NAME_TAG + ", toString = "
 				+ this.toString() + ", key# = " + this.getID());
+		attribs.put(AttributeConstants.ATTRIB_MACHINEID, new Integer(machineID));
 	}
 
-	/*
-	 * public String getElementName() { return NAME_TAG + getKey(); }
-	 */
+	public String getMachineNumber() {
+		return ""+((Integer) attribs.get(AttributeConstants.ATTRIB_MACHINEID)).intValue()+"";
+	}
+	
+	public int getMachineNumberInt()
+	{
+		return ((Integer) attribs.get(AttributeConstants.ATTRIB_MACHINEID)).intValue();
+	}
 
 	public IPUniverse getUniverse() {
 		IPElement current = this;
