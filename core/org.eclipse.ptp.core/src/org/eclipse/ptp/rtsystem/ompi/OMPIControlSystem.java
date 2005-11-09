@@ -41,6 +41,7 @@ import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.ProxyConnectedEvent;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.internal.core.CoreUtils;
 import org.eclipse.ptp.internal.core.PJob;
 import org.eclipse.ptp.rtsystem.IControlSystem;
@@ -248,14 +249,28 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		return ne;
 	}
 	
-	public String[] getProcessAttribute(IPJob job, IPProcess proc, String attrib)
+	public String[] getAllProcessesAttributes(IPJob job, String attribs)
+	{
+		String[] values = null;
+		
+		try {
+			int jobID = job.getJobNumberInt();
+			values = proxy.getAllProcessesAttribuesBlocking(jobID, attribs);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		
+		return values;
+	}
+	
+	public String[] getProcessAttributes(IPJob job, IPProcess proc, String attrib)
 	{
 		String[] values = null;
 		
 		try {
 			int jobID = job.getJobNumberInt();
 			int procID = proc.getTaskId();
-			values = proxy.getProcessAttributeBlocking(jobID, procID, attrib);
+			values = proxy.getProcessAttributesBlocking(jobID, procID, attrib);
 		} catch(IOException e) {
 			e.printStackTrace();
 		}

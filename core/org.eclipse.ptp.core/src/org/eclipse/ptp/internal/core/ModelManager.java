@@ -44,6 +44,7 @@ import org.eclipse.ptp.core.IParallelModelListener;
 import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
@@ -278,6 +279,11 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		if (monitor == null)
 			monitor = new NullProgressMonitor();
 		
+		int num_attribs = 2;
+		String[] attribs = controlSystem.getAllProcessesAttributes(job, AttributeConstants.ATTRIB_PROCESS_PID + " " + AttributeConstants.ATTRIB_PROCESS_NODE_NAME);
+		for(int i=0; i<attribs.length; i++) 
+			System.out.println("*** attribs["+i+"] = "+attribs[i]);
+		
 		monitor.beginTask("Initialing the process...", numProcs);
 		for (int i = 0; i < numProcs; i++) {
 			if (monitor.isCanceled()) {
@@ -290,10 +296,10 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				continue;
 			}
 			
-			String[] vals = controlSystem.getProcessAttribute(job, proc, AttributeConstants.ATTRIB_PROCESS_PID + " " + AttributeConstants.ATTRIB_PROCESS_NODE_NAME);	
-			
-			proc.setPid(vals[0]);
-			String nname = vals[1];
+			//String[] vals = controlSystem.getProcessAttributes(job, proc, AttributeConstants.ATTRIB_PROCESS_PID + " " + AttributeConstants.ATTRIB_PROCESS_NODE_NAME);	
+			proc.setPid(attribs[i * num_attribs]);
+			String nname = attribs[(i * num_attribs) + 1];
+
 			/* this is a hack until I get this working correctly w/ the monitoring system! */
 			nname = new String("machine0_node0");
 			

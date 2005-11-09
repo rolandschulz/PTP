@@ -580,7 +580,7 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 	 * with each of these states.  We'll want to come in here and
 	 * generate events where appropriate */
 	
-	printf("job_state_callback(%d)\n", jobid); fflush(stdout);
+	//printf("job_state_callback(%d)\n", jobid); fflush(stdout);
 	switch(state) {
 		case ORTE_PROC_STATE_INIT:
 			printf("    state = ORTE_PROC_STATE_INIT\n");
@@ -826,6 +826,9 @@ ORTEGetProcesses(char **args)
 /* given a jobID and a processID inside that job we attempt to find the values associated
  * with the given keys.  the caller can pass any number of possible keys and the response
  * message will be in the same order.
+ * 
+ * the user can pass in a process ID they want info on or -1 if they want info on EVERY
+ * process contained in this job
  */
 int
 ORTEGetProcessAttribute(char **args)
@@ -840,6 +843,7 @@ ORTEGetProcessAttribute(char **args)
 	int *			types = NULL;
 	int				tot_len;
 	char *			valstr = NULL;
+	int				values_len;
 	
 	jobid = atoi(args[1]);
 	procid = atoi(args[2]);
@@ -850,9 +854,16 @@ ORTEGetProcessAttribute(char **args)
 	
 	last_arg = i;
 	
-	keys = (char**)malloc((last_arg - 2)*sizeof(char*));
-	values = (char**)malloc((last_arg - 2)*sizeof(char*));
-	types = (int*)malloc((last_arg - 2)*sizeof(int));
+	keys = (char**)malloc((last_arg - 3)*sizeof(char*));
+	values_len = last_arg - 3;
+	/* if they want to see ALL the processes then the requested values
+	 * have to be multipled by how many processes are in this job */
+	if(procid == -1) {
+		int numprocs = get_num_procs((orte_jobid_t)jobid);
+		values_len = values_len * numprocs;
+	}
+	values = (char**)malloc(values_len * sizeof(char*));
+	types = (int*)malloc((last_arg - 3)*sizeof(int));
 	
 	/* go through the args now, set up the key array */
 	for(i=3; i<last_arg; i++) {
@@ -868,9 +879,9 @@ ORTEGetProcessAttribute(char **args)
 		}
 	}
 	
-	for(i=3; i<last_arg; i++) {
-		printf("BEFORE CALL KEYS[%d] = '%s'\n", i-3, keys[i-3]); fflush(stdout);
-	}
+	//for(i=3; i<last_arg; i++) {
+	//	printf("BEFORE CALL KEYS[%d] = '%s'\n", i-3, keys[i-3]); fflush(stdout);
+	//}
 		
 	if(get_proc_attribute(jobid, procid, keys, types, values, last_arg-3)) {
 		/* error - so bail out */
@@ -882,9 +893,9 @@ ORTEGetProcessAttribute(char **args)
 	/* else we're good, use the values */
 	
 	tot_len = 0;
-	for(i=3; i<last_arg; i++) {
-		//printf("AFTER CALL! VALS[%d] = '%s'\n", i-3, values[i-3]); fflush(stdout);
-		tot_len += strlen(values[i-3]);
+	for(i=0; i<values_len; i++) {
+		//printf("AFTER CALL! VALS[%d] = '%s'\n", i, values[i]); fflush(stdout);
+		tot_len += strlen(values[i]);
 	}
 	
 	//printf("totlen = %d\n", tot_len);
@@ -892,8 +903,8 @@ ORTEGetProcessAttribute(char **args)
 	valstr = (char*)malloc(tot_len * sizeof(char));
 	
 	sprintf(valstr, "");
-	for(i=3; i<last_arg; i++) {	
-		sprintf(valstr, "%s%s%s", valstr, i == 3 ? "" : " ", values[i-3]);
+	for(i=0; i<values_len; i++) {
+		sprintf(valstr, "%s%s%s", valstr, i == 0 ? "" : " ", values[i]);
 	}
 	
 	//printf("valSTR = '%s'\n", valstr);
@@ -907,8 +918,8 @@ ORTEGetProcessAttribute(char **args)
 	for(i=3; i<last_arg; i++) {
 		if(keys[i-3] != NULL) free(keys[i-3]);
 	}
-	for(i=3; i<last_arg; i++) {
-		if(values[i-3] != NULL) free(values[i-3]);
+	for(i=0; i<values_len; i++) {
+		if(values[i] != NULL) free(values[i]);
 	}
 		
 	free(keys);
@@ -962,7 +973,7 @@ get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *inp
 	char *jobid_str = NULL;
 	orte_gpr_value_t **values;
 	orte_gpr_value_t *value;
-	int i, ret;
+	int i, ret, j, min, max;
 	
 	keys = (char**)malloc((input_num_keys + 1)* sizeof(char*));
 	for(i=0; i<input_num_keys; i++) {
@@ -973,6 +984,7 @@ get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *inp
 	
 	rc = orte_ns.convert_jobid_to_string(&jobid_str, jobid);
 	if(rc != ORTE_SUCCESS) {
+		printf("ERROR: '%s'\n", ORTE_ERROR_NAME(rc));
 		ret = 1;
 		goto cleanup;
 	}
@@ -982,28 +994,45 @@ get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *inp
 	rc = orte_gpr.get(ORTE_GPR_KEYS_OR | ORTE_GPR_TOKENS_OR,
 			segment, NULL, keys, &cnt, &values);
 	if(rc != ORTE_SUCCESS) {
+		printf("ERROR2: '%s'\n", ORTE_ERROR_NAME(rc));
 		ret = 1;
 		goto cleanup;
 	}
 	
 	/* specified a proc bigger than any we know of in this job, bail out */
-	if(proc_num >= cnt) {
+	if(proc_num != -1 && proc_num >= cnt) {
 		ret = 1;
+		//printf("BIGGER!  QUIT!\n"); fflush(stdout);
 		goto cleanup;
 	}
 	
-	value = values[proc_num];
+	/* they want a full dump */
+	if(proc_num == -1) {
+		min = 0;
+		max = cnt;
+	}
+	/* they were looking for a specific process - quick and dirty */
+	else {
+		min = proc_num;
+		max = proc_num + 1;
+	}
 	
-	for(i=0; i<input_num_keys; i++) {
-		switch(input_types[i]) {
-			case PTP_STRING:
-				asprintf(&(input_values[i]), "%s", get_str_value(value, input_keys[i]));
-				break;
-			case PTP_UINT32:
-				asprintf(&(input_values[i]), "%d", get_ui32_value(value, input_keys[i]));
-				break;
+	//printf("MAX = %d, MIN = %d\n", max, min); fflush(stdout);
+		
+	for(i=min; i<max; i++) {
+		value = values[i];
+			
+		for(j=0; j<input_num_keys; j++) {
+			switch(input_types[j]) {
+				case PTP_STRING:
+					asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%s", get_str_value(value, input_keys[j]));
+					break;
+				case PTP_UINT32:
+					asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%d", get_ui32_value(value, input_keys[j]));
+					break;
+			}
+			//printf("VALUES IN GET FUNC[%d][%d] = '%s'\n", i, j, input_values[((i-min) * input_num_keys) + j]); fflush(stdout);
 		}
-		printf("VALUES IN GET FUNC[%d] = '%s'\n", i, input_values[i]); fflush(stdout);
 	}
 	
 	/* success */

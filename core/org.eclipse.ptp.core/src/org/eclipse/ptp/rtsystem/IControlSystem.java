@@ -36,7 +36,8 @@ public interface IControlSystem {
 
 	public String[] getProcesses(IPJob job);
 	
-	public String[] getProcessAttribute(IPJob job, IPProcess proc, String attrib);
+	public String[] getAllProcessesAttributes(IPJob job, String attribs);
+	public String[] getProcessAttributes(IPJob job, IPProcess proc, String attribs);
 
 	/* event stuff */
 	public void addRuntimeListener(IRuntimeListener listener);

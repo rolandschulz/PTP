@@ -43,9 +43,16 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		return ((ProxyRuntimeProcessesEvent)event).getNumProcs();
 	}
 	
-	public String[] getProcessAttributeBlocking(int jobID, int procID, String key) throws IOException {
+	public String[] getProcessAttributesBlocking(int jobID, int procID, String keys) throws IOException {
 		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_PROCATTR);
-		getProcessAttribute(jobID, procID, key);
+		getProcessAttribute(jobID, procID, keys);
+		IProxyRuntimeEvent event = waitForRuntimeEvent();
+		return ((ProxyRuntimeProcessAttributeEvent)event).getValues();
+	}
+	
+	public String[] getAllProcessesAttribuesBlocking(int jobID, String keys) throws IOException {
+		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_PROCATTR);
+		getProcessAttribute(jobID, -1, keys);
 		IProxyRuntimeEvent event = waitForRuntimeEvent();
 		return ((ProxyRuntimeProcessAttributeEvent)event).getValues();
 	}
@@ -172,10 +179,10 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
     		IProxyRuntimeEvent event = null;
     		
     		try {
-        		System.out.println("OMPIProxyRuntimeClient waiting on " + waitEvents.toString());
+        		//System.out.println("OMPIProxyRuntimeClient waiting on " + waitEvents.toString());
         		while (this.events.isEmpty())
         			wait();
-        		System.out.println("OMPIProxyRuntimeClient awoke!");
+        		//System.out.println("OMPIProxyRuntimeClient awoke!");
         		event = (IProxyRuntimeEvent) this.events.removeItem();
         		if (event instanceof ProxyRuntimeErrorEvent) {
         	   		waitEvents.clear();
