@@ -19,10 +19,12 @@
 
 package org.eclipse.ptp.rtsystem.ompi;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
 
@@ -64,20 +66,42 @@ public class OMPIMonitoringSystem implements IMonitoringSystem {
 	}
 
 	/* get the nodes pertaining to a certain machine */
-	public String[] getNodes(String machineName) {
-		System.out.println("JAVA OMPI: getNodes(" + machineName + ") called");
+	public String[] getNodes(IPMachine machine) {
+		System.out.println("OMPIMonitoringSystem: getNodes(" + machine.getElementName() + ") called");
 
 		/* need to check if machineName is a valid machine name */
 
-		/* default to just returning 10 nodes on this machine */
-		int n = 10;
-		String[] ne = new String[n];
-
-		for (int i = 0; i < ne.length; i++) {
-			/* prepend this node name with the machine name */
-			ne[i] = new String(machineName + "_node" + i);
+//		/* default to just returning 10 nodes on this machine */
+//		int n = 10;
+//		String[] ne = new String[n];
+//
+//		for (int i = 0; i < ne.length; i++) {
+//			/* prepend this node name with the machine name */
+//			ne[i] = new String(machineName + "_node" + i);
+//		}
+		
+		int numNodes = 0;
+		
+		int machID = machine.getMachineNumberInt();
+		
+		try {
+			numNodes = proxy.getNumNodesBlocking(machID);
+		} catch(IOException e) {
+			e.printStackTrace();
 		}
-
+		
+		/* this is an error, so we'll return 1 empty node */
+		if(numNodes <= 0) {
+			String[] ne = new String[1];
+			ne[0] = new String(machine.getElementName()+"_node0");
+			return ne;
+		}
+		
+		String[] ne = new String[numNodes];
+		for(int i=0; i<numNodes; i++) {
+			ne[i] = new String(machine.getElementName()+"_node"+i);
+		}	
+		
 		return ne;
 	}
 

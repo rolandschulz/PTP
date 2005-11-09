@@ -19,16 +19,8 @@
 package org.eclipse.ptp.core;
 
 public interface AttributeConstants {
-	
-	/* WARNING WARNING WARNING
-	 * 
-	 * If you change any of the string values in here you must change where they are used in the C 
-	 * code used by JNI (OMPI for example) as well.  We have no good way to define constants that
-	 * both Java and C can use - so these values (such as "ATTRIB_PROCESS_PID") exist identically
-	 * in the JNI code.  If you change it here, it must change there as well.
-	 * 
-	 * WARNING WARNING WARNING
-	 */
+
+	public static final String ATTRIB_MACHINEID = "ATTRIB_MACHINEID";
 	
 	public static final String ATTRIB_JOBID = "ATTRIB_JOBID";
 	

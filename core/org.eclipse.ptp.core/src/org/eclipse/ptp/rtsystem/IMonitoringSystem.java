@@ -19,6 +19,8 @@
 
 package org.eclipse.ptp.rtsystem;
 
+import org.eclipse.ptp.core.IPMachine;
+
 /* This is the interface to a monitoring system.  Things it has to do include
  * getting status of the parallel machine (number of nodes, number of jobs, etc.)
  */
@@ -26,7 +28,7 @@ public interface IMonitoringSystem {
 	/* constructor will establish a new parallel session / a handle */
 	public String[] getMachines();
 
-	public String[] getNodes(String machineName);
+	public String[] getNodes(IPMachine machine);
 
 	public String getNodeMachineName(String nodeName);
 

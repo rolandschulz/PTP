@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.internal.core.CoreUtils;
@@ -246,7 +247,8 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 	}
 
 	/* get the nodes pertaining to a certain machine */
-	public String[] getNodes(String machineName) {
+	public String[] getNodes(IPMachine machine) {
+		String machineName = machine.getElementName();
 		/* find this machineName in the map - if it's there */
 		if (!nodeMap.containsKey(machineName))
 			return null;

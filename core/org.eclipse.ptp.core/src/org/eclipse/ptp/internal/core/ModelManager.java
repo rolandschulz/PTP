@@ -199,12 +199,15 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		String[] ne = monitoringSystem.getMachines();
 		for (int i = 0; i < ne.length; i++) {
 			PMachine mac;
-			mac = new PMachine(universe, ne[i], ne[i].substring(new String(
-					"machine").length()));
+			
+			String ids = ne[i].substring(new String("machine").length());
+			int machID = (new Integer(ids)).intValue();
+			
+			mac = new PMachine(universe, ne[i], machID);
 
 			universe.addChild(mac);
 
-			String[] ne2 = monitoringSystem.getNodes(ne[i]);
+			String[] ne2 = monitoringSystem.getNodes(mac);
 
 			System.out.println("MACHINE: " + ne[i]+" - #nodes = "+ne2.length);
 
