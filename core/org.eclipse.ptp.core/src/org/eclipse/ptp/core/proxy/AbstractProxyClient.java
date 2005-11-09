@@ -25,6 +25,7 @@ import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public abstract class AbstractProxyClient {
 	private boolean				exitThread;
 	private Thread				eventThread;
 	private Thread				acceptThread;
-	protected List				listeners = new ArrayList(2);
+	protected List 				listeners = Collections.synchronizedList(new ArrayList());
 	
 	private String encodeLength(int val) {
 		char[] res = new char[8];
@@ -73,11 +74,15 @@ public abstract class AbstractProxyClient {
 	}
 	
 	public void addEventListener(IProxyEventListener listener) {
-		listeners.add(listener);
+		synchronized (listeners) {
+			listeners.add(listener);
+		}
 	}
 	
 	public void removeEventListener(IProxyEventListener listener) {
-		listeners.remove(listener);
+		synchronized (listeners) {
+			listeners.remove(listener);
+		}
 	}
 	
 	public int sessionConnect() {
@@ -140,10 +145,12 @@ public abstract class AbstractProxyClient {
 	protected void fireProxyEvent(IProxyEvent event) {
 		if (listeners == null)
 			return;
-		Iterator i = listeners.iterator();
-		while (i.hasNext()) {
-			IProxyEventListener listener = (IProxyEventListener) i.next();
-			listener.handleEvent(event);
+		synchronized (listeners) {
+			Iterator i = listeners.iterator();
+			while (i.hasNext()) {
+				IProxyEventListener listener = (IProxyEventListener) i.next();
+				listener.handleEvent(event);
+			}
 		}
 	}
 	
