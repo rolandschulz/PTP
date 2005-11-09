@@ -607,8 +607,11 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		int jobID = controlSystem.run(jobRunConfig);
 		if (jobID < 0)
 			return null;
-			
-		return newJob(jobID, jobRunConfig.getNumberOfProcesses(), jobRunConfig.isDebug());
+		
+		System.out.println("ModelManager.run() - new JobID = "+jobID);
+		
+		IPJob j = newJob(jobID, jobRunConfig.getNumberOfProcesses(), jobRunConfig.isDebug());
+		return j;
 		
 		/*
 		if (nejob != null) {

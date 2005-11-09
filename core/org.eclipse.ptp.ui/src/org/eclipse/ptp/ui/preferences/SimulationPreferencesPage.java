@@ -170,7 +170,7 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 		mcombo.addSelectionListener(listener);
 		
 		nodeLabel = new Label(bGroup, SWT.NONE);
-		nodeLabel.setText("Number of nodes for machine #1:");
+		nodeLabel.setText("Number of nodes for machine #0:");
 		nodeLabel.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		
 		nodeText = new Text(bGroup, SWT.BORDER | SWT.SINGLE);
@@ -218,7 +218,7 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 		
 		mcombo.removeAll();
 		
-		for(int i=1; i<= choice; i++) {
+		for(int i=0; i< choice; i++) {
 			mcombo.add("Machine "+i);
 		}
 		
@@ -234,7 +234,7 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 		mcombo.pack();
 		
 		sel = mcombo.getSelectionIndex();
-		nodeLabel.setText("Number of nodes for machine #"+(sel+1)+":");
+		nodeLabel.setText("Number of nodes for machine #"+(sel)+":");
 		//nodeLabel.pack();
 		if(nodes != null)
 			nodeText.setText(""+nodes[sel]+"");
@@ -254,11 +254,11 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 		
 		nodes = new int[numMachines];
 		
-		for(int i=1; i<=numMachines; i++) {
+		for(int i=0; i<numMachines; i++) {
 			/* look for a #nodes for each machine */
 			int nnodes = preferences.getInt(PreferenceConstants.SIMULATION_MACHINE_NODE_PREFIX + ""+i+"");
 			if(nnodes < 1) nnodes = 1;
-			nodes[i-1] = nnodes;
+			nodes[i] = nnodes;
 		}
 		nodeText.setText(""+nodes[0]+"");
 	}
@@ -284,10 +284,10 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 		
 		Preferences preferences = PTPCorePlugin.getDefault()
 				.getPluginPreferences();
-
+		
 		preferences.setValue(PreferenceConstants.SIMULATION_NUM_MACHINES, nmacs);
-		for(int i=1; i<=nmacs; i++) {
-			preferences.setValue(PreferenceConstants.SIMULATION_MACHINE_NODE_PREFIX + ""+i+"", nodes[i-1]);
+		for(int i=0; i<nmacs; i++) {
+			preferences.setValue(PreferenceConstants.SIMULATION_MACHINE_NODE_PREFIX + ""+i+"", nodes[i]);
 		}
 		
 		PTPCorePlugin.getDefault().savePluginPreferences();
