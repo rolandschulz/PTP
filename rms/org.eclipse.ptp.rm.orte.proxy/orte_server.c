@@ -65,6 +65,12 @@ int OMPIGetNodemachineID(char **);
 
 */
 
+struct debug_job {
+	int	jobid;
+	int	num_procs;
+};
+typedef struct debug_job debug_job;
+
 int get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *input_types, char **input_values, int input_num_keys);
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
 static int ompi_sendcmd(orte_daemon_cmd_flag_t usercmd);
@@ -75,6 +81,7 @@ proxy_svr *	orte_proxy;
 int			is_orte_initialized = 0;
 int			orted_pid = 0;
 List *		eventList;
+List *		debugJobs;
 
 static proxy_handler_funcs handler_funcs = {
 	RegisterFileHandler,		// regfile() - call to register a file handler
@@ -481,6 +488,7 @@ ORTERun(char **args)
 	char *exec_path = args[3];
 	int num_procs = atoi(args[1]);
 	int debug = 0;
+	debug_job * djob;
 	
 	if (strcmp(args[2], "true") == 0)
 		debug++;
@@ -520,6 +528,12 @@ ORTERun(char **args)
 	apps[0]->argv[num_args+1] = NULL;
 	apps[0]->argc = num_args + 1;
 	
+	if (debug) {
+		djob = (debug_job *)malloc(sizeof(debug_job));
+		djob->num_procs = num_procs;
+		apps[0]->num_procs++;
+	}
+	
 	printf("Spawning %d processes of job '%s'\n", apps[0]->num_procs, apps[0]->app);
 	printf("\tprogram name '%s'\n", apps[0]->argv[0]);
 	fflush(stdout);
@@ -533,6 +547,11 @@ ORTERun(char **args)
 	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_RUN, rc)) return 1;
 
 	printf("NEW JOBID = %d\n", jobid); fflush(stdout);
+	
+	if (debug) {
+		djob->jobid = jobid;
+		AddToList(debugJobs, (void *)djob);
+	}
 	
 	asprintf(&res, "%d %d", RTEV_NEWJOB, jobid);
 	proxy_svr_event_callback(orte_proxy, res);
@@ -549,8 +568,9 @@ ORTERun(char **args)
 static void
 job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 {
-	char *	res;
-	
+	char *		res;
+	debug_job *	djob;
+			
 	/* not sure yet how we want to handle this callback, what events
 	 * we want to generate, but here are the states that I know of
 	 * that a job can go through.  I've watched ORTE call this callback
@@ -586,6 +606,19 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 		case ORTE_PROC_STATE_ABORTED:
 			printf("    state = ORTE_PROC_STATE_ABORTED\n");
 			break;
+	}
+	
+	if (state == ORTE_PROC_STATE_FINALIZED ||
+		state == ORTE_PROC_STATE_TERMINATED ||
+		state == ORTE_PROC_STATE_ABORTED)
+	{
+		for (SetList(debugJobs); (djob = (debug_job *)GetListElement(debugJobs)) != NULL; ) {
+			if (djob->jobid == jobid) {
+				RemoveFromList(debugJobs, (void *)djob);
+				free(djob);
+				break;
+			}
+		}
 	}
 
 	asprintf(&res, "%d %d %d", RTEV_JOBSTATE, jobid, state);
@@ -758,11 +791,21 @@ int
 ORTEGetProcesses(char **args)
 {
 	int				jobid;
-	int				procs;
+	int				procs = 0;
 	char *			res;
+	debug_job *		djob;
 	
 	jobid = atoi(args[1]);
-	procs = get_num_procs((orte_jobid_t)jobid);
+	
+	for (SetList(debugJobs); (djob = (debug_job *)GetListElement(debugJobs)) != NULL; ) {
+		if (djob->jobid == jobid) {
+			procs = djob->num_procs;
+			break;
+		}
+	}
+	
+	if (procs == 0)
+		procs = get_num_procs((orte_jobid_t)jobid);
 	
 	if (procs == 0) {
 		res = ORTEErrorStr(RTEV_ERROR_PROCS, "no such jobid or error retrieving processes on job");
@@ -1143,6 +1186,7 @@ void
 server(char *name, char *host, int port)
 {
 	eventList = NewList();
+	debugJobs = NewList();
 	
 	if (proxy_svr_init(name, &handler_funcs, &helper_funcs, command_tab, &orte_proxy) != PROXY_RES_OK)
 		return;
