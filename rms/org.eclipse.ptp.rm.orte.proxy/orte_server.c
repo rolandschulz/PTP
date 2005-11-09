@@ -303,6 +303,8 @@ int ORTEStartDaemon(char **args)
 	
 	if (ORTEInit() != 0)
 		return 0;
+		
+	orte_rmgr.query();
 	
 	printf("Start daemon returning OK.\n");
 	asprintf(&res, "%d", RTEV_OK);
