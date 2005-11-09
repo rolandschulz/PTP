@@ -271,29 +271,37 @@ public class SimulationControlSystem implements IControlSystem {
 		return "-1";
 	}
 	
-	public String[] getProcessAttribute(IPJob job, IPProcess proc, String attrib)
+	public String[] getProcessAttribute(IPJob job, IPProcess proc, String attribString)
 	{
 		String procName = proc.getElementName();
 		
-		System.out.println("JAVA OMPI: getProcessAttribute(" + procName + ", "
-				+ attrib + ") called");
-		String s = null;
-
-		if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_PID)) {
-			s = ""+((int)(Math.random() * 10000)) + 1000+"";
-		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_EXIT_CODE)) {
-			s = getProcessExitCode(procName);
-		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_SIGNAL)) {
-			s = getProcessSignal(procName);
-		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_STATUS)) {
-			s = getProcessStatus(procName);
-		} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_NODE_NAME)) {
-			s = getProcessNodeName(procName);
-		}
+		String[] attribs = attribString.split(" ");
 		
-		String[] s2 = new String[1];
-		s2[0] = s;
-		return s2;
+		System.out.println("JAVA OMPI: getProcessAttribute(" + procName + ", "
+				+ attribString + ") called");
+		
+		String[] retstr = new String[attribs.length];
+
+		for(int i=0; i<attribs.length; i++) {
+			String attrib = attribs[i];
+			String s = null;
+			
+			if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_PID)) {
+				s = ""+((int)(Math.random() * 10000)) + 1000+"";
+			} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_EXIT_CODE)) {
+				s = getProcessExitCode(procName);
+			} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_SIGNAL)) {
+				s = getProcessSignal(procName);
+			} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_STATUS)) {
+				s = getProcessStatus(procName);
+			} else if (attrib.equals(AttributeConstants.ATTRIB_PROCESS_NODE_NAME)) {
+				s = getProcessNodeName(procName);
+			}
+			
+			retstr[i] = new String(s);
+		}
+
+		return retstr;
 	}
 
 	public void addRuntimeListener(IRuntimeListener listener) {
