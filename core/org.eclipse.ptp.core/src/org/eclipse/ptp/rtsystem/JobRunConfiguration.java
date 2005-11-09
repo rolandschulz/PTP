@@ -91,6 +91,6 @@ public class JobRunConfiguration {
 		       "#procs:\t\t"+numberOfProcesses+"\n"+
 		       "#proc/node:\t"+numberOfProcessesPerNode+"\n"+
 		       "firstNode#:\t"+firstNodeNumber+"\n"+
-		       "isDebug?\t\t"+isDebugJob+"\n";
+		       "isDebug?\t\t"+isDebugJob;
 	}
 }

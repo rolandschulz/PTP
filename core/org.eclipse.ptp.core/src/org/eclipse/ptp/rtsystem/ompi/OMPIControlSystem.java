@@ -212,7 +212,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 	public String[] getJobs() 
 	{
 		Object a[];
-		System.out.println("JAVA OMPI: getJobs() called");
+		//System.out.println("JAVA OMPI: getJobs() called");
 
 		if(knownJobs == null) {
 			System.out.println("NULL JOBS!");
