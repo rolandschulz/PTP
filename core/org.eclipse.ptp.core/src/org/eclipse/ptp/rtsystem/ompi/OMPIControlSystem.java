@@ -162,7 +162,6 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 			pargs[0] = "--debugger=gdb-mi";
 			pargs[1] = "--host=localhost";
 			pargs[2] = "--port=" + jobRunConfig.getRemoteInfo();
-			procs++;
 		}
 		
 		try {
