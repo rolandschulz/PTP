@@ -38,9 +38,9 @@ public class PMachine extends Parent implements IPMachine {
 
 	public PMachine(IPUniverse uni, String name, int machineID) {
 		super(uni, name, ""+machineID+"", P_MACHINE);
-		System.out.println("Name is " + name + ", key is " + machineID);
-		System.out.println("NAME_TAG = " + NAME_TAG + ", toString = "
-				+ this.toString() + ", key# = " + this.getID());
+		//System.out.println("Name is " + name + ", key is " + machineID);
+		//System.out.println("NAME_TAG = " + NAME_TAG + ", toString = "
+		//		+ this.toString() + ", key# = " + this.getID());
 		attribs.put(AttributeConstants.ATTRIB_MACHINEID, new Integer(machineID));
 	}
 

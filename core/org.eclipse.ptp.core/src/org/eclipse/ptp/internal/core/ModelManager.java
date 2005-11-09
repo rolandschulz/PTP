@@ -149,6 +149,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		/*
 		 * Shutdown runtime if it is already active
 		 */
+		System.out.println("SHUTTING DOWN CONTROL/MONITORING/PROXY systems where appropriate");
 		if (controlSystem != null)
 			controlSystem.shutdown();
 		if (monitoringSystem != null)
@@ -160,6 +161,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			/* load up the control and monitoring systems for the simulation */
 			monitoringSystem = new SimulationMonitoringSystem();
 			controlSystem = new SimulationControlSystem();
+			runtimeProxy = null;
 		}
 		else if(monitoringSystemID == MonitoringSystemChoices.ORTE && controlSystemID == ControlSystemChoices.ORTE) {
 			/* load up the control and monitoring systems for OMPI */
@@ -476,8 +478,10 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		perspectiveListener = null;
 		listeners.clear();
 		listeners = null;
-		monitoringSystem.shutdown();
-		controlSystem.shutdown();
+		if(monitoringSystem != null)
+			monitoringSystem.shutdown();
+		if(controlSystem != null)
+			controlSystem.shutdown();
 		if (runtimeProxy != null)
 			runtimeProxy.shutdown();
 	}
