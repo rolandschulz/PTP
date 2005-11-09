@@ -198,7 +198,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				return;
 			
 			job.setAttribute(PreferenceConstants.JOB_APP, exePath.lastSegment());
-			job.setAttribute(PreferenceConstants.JOB_WORK_DIR, workDirectory.getAbsolutePath());
+			job.setAttribute(PreferenceConstants.JOB_WORK_DIR, exePath.removeLastSegments(1).toString());
 			job.setAttribute(PreferenceConstants.JOB_ARGS, args);
 			
 			PLaunch pLaunch = (PLaunch) launch;
