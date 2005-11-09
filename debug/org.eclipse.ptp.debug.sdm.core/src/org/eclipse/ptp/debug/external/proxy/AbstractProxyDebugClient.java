@@ -55,11 +55,6 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		}
 	}
 	
-	private String encodeBitSet(BitList set) {
-		String lenStr = Integer.toHexString(set.size());
-		return lenStr + ":" + set.toString();
-	}
-	
 	protected void sendCommand(String cmd, BitList set) throws IOException {
 		String setStr = encodeBitSet(set);
 		this.sendCommand(cmd, setStr);
