@@ -33,6 +33,7 @@ import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
 import org.eclipse.ptp.core.proxy.event.ProxyConnectedEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
+import org.eclipse.ptp.core.util.BitList;
 
 public abstract class AbstractProxyClient {
 	private String				sessHost = null;
@@ -69,6 +70,11 @@ public abstract class AbstractProxyClient {
 		}
 	}
 
+	protected String encodeBitSet(BitList set) {
+		String lenStr = Integer.toHexString(set.size());
+		return lenStr + ":" + set.toString();
+	}
+	
 	protected void sendCommand(String cmd, String args) throws IOException {
 		this.sendCommand(cmd + " " + args);
 	}
