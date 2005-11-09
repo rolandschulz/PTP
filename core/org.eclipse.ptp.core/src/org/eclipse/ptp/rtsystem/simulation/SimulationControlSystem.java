@@ -271,7 +271,26 @@ public class SimulationControlSystem implements IControlSystem {
 		return "-1";
 	}
 	
-	public String[] getProcessAttribute(IPJob job, IPProcess proc, String attribString)
+	public String[] getAllProcessesAttributes(IPJob job, String attribString)
+	{
+		IPProcess[] procs = job.getSortedProcesses();
+		
+		String[] attribs = attribString.split(" ");
+		
+		String[] allvals = new String[attribs.length * procs.length];
+		
+		for(int i=0; i<procs.length; i++) {
+			String[] pvals = getProcessAttributes(job, procs[i], attribString);
+			
+			for(int j=0; j<pvals.length; j++) {
+				allvals[(i * pvals.length) + j] = new String(pvals[j]);
+			}
+		}
+		
+		return allvals;
+	}
+	
+	public String[] getProcessAttributes(IPJob job, IPProcess proc, String attribString)
 	{
 		String procName = proc.getElementName();
 		
