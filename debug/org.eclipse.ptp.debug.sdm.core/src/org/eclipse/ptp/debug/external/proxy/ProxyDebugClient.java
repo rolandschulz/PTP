@@ -32,8 +32,8 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		super();
 	}
 
-	public void debugStartSession(String prog, String args) throws IOException {
-		sendCommand("INI", "\""+ prog + "\" \"" + args + "\"");
+	public void debugStartSession(String dir, String prog, String args) throws IOException {
+		sendCommand("INI", dir + " \""+ prog + "\" \"" + args + "\"");
 	}
 	
 	public void debugSetLineBreakpoint(BitList procs, int bpid, String file, int line) throws IOException {

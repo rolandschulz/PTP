@@ -36,7 +36,7 @@
 #define DBG_LISTARGUMENTS_CMD			"LAR"
 #define DBG_LISTGLOBALVARIABLES_CMD	"LGV"
 
-#define DBG_STARTSESSION_FMT			"\"%s\" \"%s\""
+#define DBG_STARTSESSION_FMT			"%s \"%s\" \"%s\""
 #define DBG_SETLINEBREAKPOINT_FMT		"%s %d \"%s\" %d"
 #define DBG_SETFUNCBREAKPOINT_FMT		"%s %d \"%s\" \"%s\""
 #define DBG_DELETEBREAKPOINT_FMT		"%s %d"

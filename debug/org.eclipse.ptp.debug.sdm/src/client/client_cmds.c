@@ -116,10 +116,10 @@ DbgClntCreateSession(int num, char *host, int port)
 	if (res == PROXY_RES_ERR)
 		return DBGRES_ERR;
 	
-	e = NewDbgEvent(DBGEV_INIT);
-	e->num_servers = num;
+	//e = NewDbgEvent(DBGEV_INIT);
+	//e->num_servers = num;
 	
-	dbg_clnt_cmd_completed(e, NULL);
+	//dbg_clnt_cmd_completed(e, NULL);
 	
 	return DBGRES_OK;
 }
@@ -142,7 +142,7 @@ DbgClntStartSession(char **args)
 	int		res;
 	char *	cmd;
 	
-	asprintf(&cmd, "%s \"%s\" \"%s\"", DBG_STARTSESSION_CMD, args[1], args[2]);
+	asprintf(&cmd, "%s %s \"%s\" \"%s\"", DBG_STARTSESSION_CMD, args[1], args[2], args[3]);
 	res = ClntSendCommand(dbg_procs, cmd, NULL);
 	free(cmd);
 	return res;

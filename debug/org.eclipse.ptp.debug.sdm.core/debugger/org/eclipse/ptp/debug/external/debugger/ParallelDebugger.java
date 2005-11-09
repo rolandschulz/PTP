@@ -33,6 +33,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
@@ -169,11 +170,11 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	}	
 	public void startDebugger(IPJob job) throws PCDIException {
 		try {
-			String app = (String) job.getAttribute("app");
-			//String dir = (String) job.getAttribute("dir");
-			String[] args = (String[]) job.getAttribute("args");
-
-			proxy.debugStartSession(app, join(args, " "));
+			String app = (String) job.getAttribute(PreferenceConstants.JOB_APP);
+			String dir = (String) job.getAttribute(PreferenceConstants.JOB_WORK_DIR);
+			String[] args = (String[]) job.getAttribute(PreferenceConstants.JOB_ARGS);
+			proxy.addEventListener(this);
+			proxy.debugStartSession(dir, app, join(args, " "));
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
 		}

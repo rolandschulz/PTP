@@ -138,7 +138,7 @@ svr_interrupt(dbg_backend *db)
 static int 
 svr_start_session(dbg_backend *db, char **args)
 {
-	return db->db_funcs->start_session(db->db_exe_path, args[1], args[2]);
+	return db->db_funcs->start_session(db->db_exe_path, args[1], args[2], args[3]);
 }
 
 static int 
