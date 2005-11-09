@@ -120,13 +120,13 @@ public class OMPIMonitoringSystem implements IMonitoringSystem {
 		String s = null;
 
 		if (attrib.equals(AttributeConstants.ATTRIB_NODE_STATE)) {
-			s = "down";
+			s = "up";
 		} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_MODE)) {
 			s = "0100";
 		} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_USER)) {
-			s = "root";
+			s = System.getProperty("user.name");
 		} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_GROUP)) {
-			s = "root";
+			s = "ptp";
 		}
 		return s;
 	}
