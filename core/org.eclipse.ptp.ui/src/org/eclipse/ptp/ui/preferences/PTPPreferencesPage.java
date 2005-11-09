@@ -190,15 +190,15 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		Preferences preferences = PTPCorePlugin.getDefault()
 				.getPluginPreferences();
 		
-		System.out.println("PREFS:");
-		String[] foo = preferences.defaultPropertyNames();
-		for(int i=0; i<foo.length; i++) {
-			System.out.println("DEFAULT["+i+"] = "+foo[i]);
-		}
-		foo = preferences.propertyNames();
-		for(int i=0; i<foo.length; i++) {
-			System.out.println("non-default prop["+i+"] = "+foo[i]);
-		}
+		//System.out.println("PREFS:");
+		//String[] foo = preferences.defaultPropertyNames();
+		//for(int i=0; i<foo.length; i++) {
+		//	System.out.println("DEFAULT["+i+"] = "+foo[i]);
+		//}
+		//foo = preferences.propertyNames();
+		//for(int i=0; i<foo.length; i++) {
+		//	System.out.println("non-default prop["+i+"] = "+foo[i]);
+		//}
 		
 		outputDIR = preferences.getString(PreferenceConstants.OUTPUT_DIR);
 		if(outputDIR.equals("")) outputDIR = defaultOutputDIR;
