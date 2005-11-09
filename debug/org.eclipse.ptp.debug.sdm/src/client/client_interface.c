@@ -126,9 +126,9 @@ DbgCreate(session *s)
 }
 
 int
-DbgStartSession(session *s, char *prog, char *args)
+DbgStartSession(session *s, char *dir, char *prog, char *args)
 {
-	return proxy_clnt_sendcmd(s->sess_proxy, DBG_STARTSESSION_CMD, DBG_STARTSESSION_FMT, prog, args);
+	return proxy_clnt_sendcmd(s->sess_proxy, DBG_STARTSESSION_CMD, DBG_STARTSESSION_FMT, dir, prog, args);
 }
 
 /*

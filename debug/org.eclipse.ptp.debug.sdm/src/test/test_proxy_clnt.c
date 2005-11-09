@@ -152,7 +152,7 @@ do_test(session *s, char *exe)
 	p2 = bitset_new(s->sess_procs);
 	bitset_set(p2, 0);
 	
-	if (DbgStartSession(s, "yyy", NULL) < 0) {
+	if (DbgStartSession(s, "", "yyy", NULL) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
@@ -160,7 +160,7 @@ do_test(session *s, char *exe)
 		cleanup_and_exit(s, p1);
 	}
 		
-	if (DbgStartSession(s, exe, NULL) < 0) {
+	if (DbgStartSession(s, "", exe, NULL) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
