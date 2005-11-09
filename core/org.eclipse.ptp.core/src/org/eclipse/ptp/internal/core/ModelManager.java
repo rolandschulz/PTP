@@ -239,8 +239,15 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				}
 				job = new PJob(universe, ne[i], "" + (PJob.BASE_OFFSET + x) + "", x);
 				universe.addChild(job);
+				String[] ne2 = controlSystem.getProcesses(job);
+				for (int j = 0; j < ne2.length; j++) {		
+					IPProcess proc;
+					
+					proc = new PProcess(job, ne[i]+"_process"+j, "" + j + "", "0", j, IPProcess.STARTING, "", "");
+					job.addChild(proc);
+				}	
 				try {
-					getProcsForNewJob(ne[i], job, null);
+					getProcsStatusForNewJob(ne[i], job, null);
 				} catch (InterruptedException e) {
 					universe.deleteJob(job);
 					break;
@@ -255,32 +262,34 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	/* given a Job, this contacts the monitoring system and populates the runtime 
 	 * model with the processes that correspond to that Job
 	 */
-	private void getProcsForNewJob(String nejob, IPJob job, IProgressMonitor monitor) throws InterruptedException {
-		String[] ne = controlSystem.getProcesses(job);
-		if (ne != null)
-			System.out.println("getProcsForNewJob:" + nejob + " - #procs = " + ne.length);
+	private void getProcsStatusForNewJob(String nejob, IPJob job, IProgressMonitor monitor) throws InterruptedException {
+		//String[] ne = controlSystem.getProcesses(job);
+		//IPProcess procs[] = job.getSortedProcesses();
+		//if(procs == null) return;
+		int numProcs = job.totalProcesses();
+		
+		if(numProcs <= 0) return;
+		
+		System.out.println("getProcsStatusForNewJob:" + nejob + " - #procs = " + numProcs);
 		
 		if (monitor == null)
 			monitor = new NullProgressMonitor();
 		
-		monitor.beginTask("Initialing the process...", ne.length);
-		for (int j = 0; ne != null && j < ne.length; j++) {
+		monitor.beginTask("Initialing the process...", numProcs);
+		for (int i = 0; i < numProcs; i++) {
 			if (monitor.isCanceled()) {
 				throw new InterruptedException("Cancelled by user");
 			}
 			
-			IPProcess proc;
-			// System.out.println("process name = "+ne[j]);
+			IPProcess proc = job.findProcessByName(nejob+"_process"+i);
+			if(proc == null) {
+				System.err.println("*** ERROR: Unable to find process #"+i+" on job "+nejob);
+				continue;
+			}
 			
-			proc = new PProcess(job, ne[j], "" + j + "", "0", j, IPProcess.STARTING, "", "");
 			String[] vals = controlSystem.getProcessAttribute(job, proc, AttributeConstants.ATTRIB_PROCESS_PID + " " + AttributeConstants.ATTRIB_PROCESS_NODE_NAME);	
 			
 			proc.setPid(vals[0]);
-			
-			job.addChild(proc);
-
-			//String pname = proc.getElementName();
-			
 			String nname = vals[1];
 			/* this is a hack until I get this working correctly w/ the monitoring system! */
 			nname = new String("machine0_node0");
@@ -373,6 +382,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	}
 
 	public void runtimeJobStateChanged(String nejob, String state) {
+		System.out.println("*********** JOB STATE CHANGE: "+state+" (job = "+nejob+")");
 		IPJob job = universe.findJobByName(nejob);
 		if (job != null) {
 			IPProcess[] procs = job.getProcesses();
@@ -385,7 +395,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		}
 		//refreshJobStatus(ne);
 	}
-
+	
 	public void runtimeNewJob(String ne) {
 		IPJob job = universe.findJobByName(ne);
 		/* if it already existed, then destroy it first */
@@ -409,8 +419,17 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		pjob = new PJob(universe, ne, "" + (PJob.BASE_OFFSET + x) + "", x);
 
 		universe.addChild(pjob);
+		
+		String[] ne2 = controlSystem.getProcesses(pjob);
+		for (int j = 0; j < ne2.length; j++) {		
+			IPProcess proc;
+			
+			proc = new PProcess(pjob, ne+"_process"+j, "" + j + "", "0", j, IPProcess.STARTING, "", "");
+			pjob.addChild(proc);
+		}	
+		
 		try {
-			getProcsForNewJob(ne, pjob, null);
+			getProcsStatusForNewJob(ne, pjob, null);
 		} catch (InterruptedException e) {
 			universe.deleteJob(job);
 			return;
@@ -589,7 +608,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		if (jobID < 0)
 			return null;
 			
-		return newJob(jobID, jobRunConfig.isDebug());
+		return newJob(jobID, jobRunConfig.getNumberOfProcesses(), jobRunConfig.isDebug());
 		
 		/*
 		if (nejob != null) {
@@ -634,7 +653,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		return universe;
 	}	
 
-	private IPJob newJob(int jobID, boolean debug) {
+	private IPJob newJob(int jobID, int numProcesses, boolean debug) {
 		String jobName;
 
 		jobName = "job"+jobID;
@@ -649,8 +668,20 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			job.setDebug();
 		
 		universe.addChild(job);
+		
+		/* we know that we succeeded, so we can create this many procs in the job.  we just
+		 * need to run getProcsStatusForNewJob() to fill in the status later
+		 */
+		for (int i = 0; i < numProcesses; i++) {		
+			IPProcess proc;
+			// System.out.println("process name = "+ne[j]);
+			
+			proc = new PProcess(job, jobName+"_process"+i, "" + i + "", "0", i, IPProcess.STARTING, "", "");
+			job.addChild(proc);
+		}	
+		
 		try {
-			getProcsForNewJob(jobName, job, null);
+			getProcsStatusForNewJob(jobName, job, null);
 		} catch(InterruptedException e2) {
 			universe.deleteJob(job);
 			System.err.println("TODO: MM.newJob() we need to throw a CoreException CANCEL_STATUS here somehow.");
