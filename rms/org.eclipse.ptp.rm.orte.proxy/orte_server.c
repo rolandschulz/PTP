@@ -822,6 +822,14 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 			break;
 		case ORTE_PROC_STATE_TERMINATED:
 			printf("    state = ORTE_PROC_STATE_TERMINATED\n");
+			if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
+                ORTE_ERROR_LOG(rc);
+                break;
+            	}
+            	printf("name = %s\n", name); fflush(stdout);
+			if (ORTE_SUCCESS != (rc = orte_iof.iof_unsubscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR))) {                
+                	opal_output(0, "[%s:%d] orte_iof.iof_unsubscribed failed\n", __FILE__, __LINE__);
+           	}
 			break;
 		case ORTE_PROC_STATE_ABORTED:
 			printf("    state = ORTE_PROC_STATE_ABORTED\n");
