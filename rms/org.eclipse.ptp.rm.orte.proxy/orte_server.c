@@ -745,11 +745,32 @@ ORTERun(char **args)
 	return PROXY_RES_OK;
 }
 
+static void iof_callback(
+    orte_process_name_t* src_name,
+    orte_iof_base_tag_t src_tag,
+    void* cbdata,
+    const unsigned char* data,
+    size_t count)
+{
+	unsigned char str[256];
+	
+	printf("IO callback!  count = %d\n", count); fflush(stdout);
+    if(count > 0) {
+        fprintf(stdout, "[%lu,%lu,%lu] ", ORTE_NAME_ARGS(src_name));
+        strncpy((char*)str, (char*)data, count);
+        str[count] = '\0';
+        printf("STR = '%s'\n", str);
+        write(STDOUT_FILENO, data, count);
+    }
+}
+
 static void
 job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 {
 	char *		res;
 	debug_job *	djob;
+	int			rc;
+	orte_process_name_t* name;
 			
 	/* not sure yet how we want to handle this callback, what events
 	 * we want to generate, but here are the states that I know of
@@ -761,6 +782,17 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 	switch(state) {
 		case ORTE_PROC_STATE_INIT:
 			printf("    state = ORTE_PROC_STATE_INIT\n");
+			if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
+                ORTE_ERROR_LOG(rc);
+                break;
+            	}
+            	printf("name = %s\n", name); fflush(stdout);
+			if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT, iof_callback, NULL))) {                
+				opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
+            	}
+            	if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR, iof_callback, NULL))) {                
+                	opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
+           	}
 			break;
 		case ORTE_PROC_STATE_LAUNCHED:
 			printf("    state = ORTE_PROC_STATE_LAUNCHED\n");

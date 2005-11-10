@@ -348,14 +348,17 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
         if(e instanceof ProxyRuntimeJobStateEvent) {
         		RuntimeEvent re = new RuntimeEvent(RuntimeEvent.EVENT_JOB_STATE_CHANGED);
         		int state = ((ProxyRuntimeJobStateEvent)e).getJobState();
-        		String stateStr = new String("error");
+        		String stateStr = IPProcess.ERROR;
         		
         		switch(state) {
-        			case 3:
-        				stateStr = new String("running");
+        			case 1: case 3:
+        				stateStr = IPProcess.STARTING;
+        				break;
+        			case 4:
+        				stateStr = IPProcess.RUNNING;
         				break;
         			case 8: case 9:
-        				stateStr = new String("exited");
+        				stateStr = IPProcess.EXITED;
         		}
         		
         		re.setText(stateStr);
