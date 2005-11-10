@@ -107,38 +107,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	private ArrayList			bpArray = new ArrayList();
 	private int					bpId = 0;
 	private ICDIStackFrame		currFrame = null;
-	//private DebuggerCommandQueue	cmdQueue;
-	//private Queue				events = new Queue();
-	/*
-	 * Wait for any event
-	 */
-	/*
-	private synchronized void waitForEvent() {
-		try {
-			while (this.events.isEmpty())
-				wait();
-			this.events.removeItem();
-		} catch (InterruptedException e) {
-		}
-	}
-	*/
-	/*
-	 * Wait until events have been received from all processes in 'procs'
-	 */
-	/*
-	private synchronized void waitForEvents(BitList procs) throws PCDIException {
-		BitList remain = procs.copy();
-		try {
-			while (!remain.isEmpty()) {
-				wait();
-				while (!this.events.isEmpty()) {
-					IProxyDebugEvent e = (IProxyDebugEvent)this.events.removeItem();
-					remain.andNot(e.getBitSet());		
-				}
-			}
-		} catch (InterruptedException e) {
-		}
-	}*/
 
 	private String join(String[] strs, String delim) {
 		StringBuffer buf = new StringBuffer();
@@ -161,18 +129,14 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	}
 	
 	public void connection() throws PCDIException {
-		try {
-			proxy.waitForConnect(); // PROXY_DEBUG_CONNECT
-			proxy.addEventListener(this);
-		} catch (IOException e) {
-			throw new PCDIException(e.getMessage());
-		}
-	}	
+	}
+	
 	public void startDebugger(IPJob job) throws PCDIException {
 		try {
 			String app = (String) job.getAttribute(PreferenceConstants.JOB_APP);
 			String dir = (String) job.getAttribute(PreferenceConstants.JOB_WORK_DIR);
 			String[] args = (String[]) job.getAttribute(PreferenceConstants.JOB_ARGS);
+			proxy.waitForConnect();
 			proxy.addEventListener(this);
 			proxy.debugStartSession(dir, app, join(args, " "));
 		} catch (IOException e) {
@@ -348,7 +312,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		System.out.println("got debug event: " + e.toString());
 		switch (e.getEventID()) {
 		case IProxyDebugEvent.EVENT_DBG_OK:
-			//cmdQueue.updateCompleted(e.getBitSet());
 			completeCommand(IDebugCommand.OK);
 			break;
 			
@@ -397,7 +360,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_DATA:
-			//cmdQueue.updateCompleted(e.getBitSet());
 			ProxyDebugDataEvent data = (ProxyDebugDataEvent)e;
 			completeCommand(data.getData());			
 			break;
