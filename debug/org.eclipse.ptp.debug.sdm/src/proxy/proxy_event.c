@@ -103,7 +103,7 @@ proxy_list_to_str(List *lst, int (*el_to_str)(void *, char **), char **result)
 
 	*result = res = (char *)malloc(9 + len + 1);
 	
-	sprintf(res, "%X ", count & 0xffff);
+	sprintf(res, "%d ", count & 0xffff);
 	
 	for (i = 0; i < count; i++) {
 		if (i > 0)
