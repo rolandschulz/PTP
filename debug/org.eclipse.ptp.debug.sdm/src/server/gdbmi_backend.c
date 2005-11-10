@@ -971,44 +971,57 @@ gmi_dump_binary_value(mi_h *h, char *exp, char *file)
 static int
 GDBMIEvaluateExpression(char *exp)
 {
-	int			res;
+	int			res  = DBGRES_OK;
 	char *		type;
-	char *		fds;
+	char *		fds = NULL;
 	char			tmp[18];
 	AIF *		a;
 	dbg_event *	e;
 
-	if (GetTypeInfo(exp, &type, &fds) != DBGRES_OK)
-		return DBGRES_ERR;
-		
-	strcpy(tmp, "/tmp/guard.XXXXXX");
-
-	if ( mktemp(tmp) == NULL )
-	{
-		DbgSetError(DBGERR_DEBUGGER, (char *)strerror(errno));
-		return DBGRES_ERR;
-	}
-
-	ResetError();
-
-	if ( !gmi_dump_binary_value(MIHandle, exp, tmp) )
-	{
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-		return DBGRES_ERR;
-	}
-
-	res = GDBMIBuildAIFVar(exp, fds, tmp, &a);
-
-	if (res == DBGRES_OK) {
+	if (GetTypeInfo(exp, &type, &fds) == DBGRES_OK) {
+		strcpy(tmp, "/tmp/guard.XXXXXX");
+	
+		if ( mktemp(tmp) == NULL )
+		{
+			DbgSetError(DBGERR_DEBUGGER, (char *)strerror(errno));
+			return DBGRES_ERR;
+		}
+	
+		ResetError();
+	
+		if ( !gmi_dump_binary_value(MIHandle, exp, tmp) )
+		{
+			DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+			return DBGRES_ERR;
+		}
+	
+		res = GDBMIBuildAIFVar(exp, fds, tmp, &a);
+	
+		if (res == DBGRES_OK) {
+			e = NewDbgEvent(DBGEV_DATA);
+			e->data = a;
+			e->type_desc = strdup(type);
+			SaveEvent(e);
+		}
+	
+		free(fds);
+		(void)unlink(tmp);
+	} else {
+		mi_gvar * gvar = gmi_var_create(MIHandle, -1, exp);
+	
+		if ( gvar == NULL || !gmi_var_evaluate_expression(MIHandle, gvar) )
+		{
+			DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+			return DBGRES_ERR;
+		}
+	
 		e = NewDbgEvent(DBGEV_DATA);
-		e->data = a;
+		e->data = StringToAIF(gvar->value);
 		e->type_desc = strdup(type);
 		SaveEvent(e);
 	}
-
+	
 	free(type);
-	free(fds);
-	(void)unlink(tmp);
 	
 	return res;
 }
@@ -1171,8 +1184,9 @@ SimpleTypeToFDS(char *type, str_ptr fds)
 static int
 ConvertType(mi_gvar *gvar, str_ptr fds)
 {
-	int	i;
-	int	num;
+	int		i;
+	int		num;
+	char *	s;
 	
 	ResetError();
 
@@ -1218,6 +1232,10 @@ ConvertType(mi_gvar *gvar, str_ptr fds)
 			gvar = gvar->child;
 			for ( i = 0 ; i < num ; i++ )
 			{
+				if (i > 0)
+					str_add(fds, ",");
+				if ((s = strrchr(gvar->name, '.')) != NULL)
+					str_add(fds, "%s=", ++s);
 				if ( ConvertType(gvar, fds) != DBGRES_OK ) {
 					return DBGRES_ERR;
 				}
@@ -1228,9 +1246,27 @@ ConvertType(mi_gvar *gvar, str_ptr fds)
 
 		case '*': /* pointer */
 			str_add(fds, "^");
-			gvar = gvar->child;
-			if ( ConvertType(gvar, fds) != DBGRES_OK ) {
-				return DBGRES_ERR;
+			if (strncmp(gvar->type, "struct", 6) == 0) {
+				str_add(fds, "{|");
+				num = gvar->numchild;
+				gvar = gvar->child;
+				for ( i = 0 ; i < num ; i++ )
+				{
+					if (i > 0)
+						str_add(fds, ",");
+					if ((s = strrchr(gvar->name, '.')) != NULL)
+						str_add(fds, "%s=", ++s);
+					if ( ConvertType(gvar, fds) != DBGRES_OK ) {
+						return DBGRES_ERR;
+					}
+					gvar = gvar->next;
+				}
+				str_add(fds, ";;;}");
+			} else {
+				gvar = gvar->child;
+				if ( ConvertType(gvar, fds) != DBGRES_OK ) {
+					return DBGRES_ERR;
+				}
 			}
 			break;
 						
@@ -1321,6 +1357,7 @@ GetTypeInfo(char *var, char **type, char **fds_type)
 	fds = str_init();
 
 	if ( ConvertType(gvar, fds) != DBGRES_OK ) {
+		str_free(fds);
 		return DBGRES_ERR;
 	}
 
