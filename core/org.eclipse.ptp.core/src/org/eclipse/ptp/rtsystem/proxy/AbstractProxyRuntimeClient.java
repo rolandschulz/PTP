@@ -20,6 +20,7 @@
 package org.eclipse.ptp.rtsystem.proxy;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,7 +37,7 @@ import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeEvent;
 
 public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient implements IProxyEventListener {
-	protected List		listeners = new ArrayList(2);
+	protected List 	listeners = Collections.synchronizedList(new ArrayList());
 
 	public AbstractProxyRuntimeClient() {
 		super();
@@ -44,7 +45,9 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 	}
 	
 	public void addRuntimeEventListener(IProxyRuntimeEventListener listener) {
-		listeners.add(listener);
+		synchronized (listeners) {
+			listeners.add(listener);
+		}
 	}
 	
 	public void handleEvent(IProxyEvent event) {
@@ -64,10 +67,12 @@ public abstract class AbstractProxyRuntimeClient extends AbstractProxyClient imp
 		}
 		
 		if (e != null) {
-			Iterator i = listeners.iterator();
-			while (i.hasNext()) {
-				IProxyRuntimeEventListener listener = (IProxyRuntimeEventListener) i.next();
-				listener.handleEvent(e);
+			synchronized (listeners) {
+				Iterator i = listeners.iterator();
+				while (i.hasNext()) {
+					IProxyRuntimeEventListener listener = (IProxyRuntimeEventListener) i.next();
+					listener.handleEvent(e);
+				}
 			}
 		}
 	}
