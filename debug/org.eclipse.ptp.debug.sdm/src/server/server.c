@@ -20,7 +20,7 @@
 #include "proxy.h"
 #include "proxy_tcp.h"
 
-extern int	svr_init(dbg_backend *, void (*)(dbg_event *, void *), void *);
+extern int	svr_init(dbg_backend *, void (*)(dbg_event *, void *), void *, char **);
 extern int	svr_dispatch(dbg_backend *, char *);
 extern int	svr_progress(dbg_backend *);
 extern int	svr_interrupt(dbg_backend *);
@@ -128,15 +128,17 @@ server(int client_task_id, int my_task_id, int job_id, dbg_backend *dbgr)
 	//int signal;
 	//char status;
 	//char **args;
+	char **env = NULL;
 	
 	printf("starting server on [%d]\n", my_task_id);
 	
-	/*
-	 * It's ok to do this as long as MPI_Init() has been called
-	 */
-	setenviron("OMPI_MCA_ns_nds_jobid", job_id);
-	setenviron("OMPI_MCA_ns_nds_vpid", my_task_id);
-	setenviron("OMPI_MCA_ns_nds_num_procs", client_task_id);
+	if (job_id >= 0) {
+		env = (char **)malloc(4 * sizeof(char **));
+		asprintf(&env[0], "OMPI_MCA_ns_nds_jobid=%d", job_id);
+		asprintf(&env[1], "OMPI_MCA_ns_nds_vpid=%d", my_task_id);
+		asprintf(&env[2], "OMPI_MCA_ns_nds_num_procs=%d", client_task_id);
+		env[3] = NULL;
+	}
 	
 	//unpack_executable(&args);
 	
@@ -145,7 +147,7 @@ server(int client_task_id, int my_task_id, int job_id, dbg_backend *dbgr)
 	//signal = start_inferior(&args, &status);
 	srand(my_task_id);
 	
-	svr_init(dbgr, event_callback, (void *)&client_task_id);
+	svr_init(dbgr, event_callback, (void *)&client_task_id, env);
 	
 	for (;;) {
 		do_commands(dbgr, client_task_id, my_task_id);
