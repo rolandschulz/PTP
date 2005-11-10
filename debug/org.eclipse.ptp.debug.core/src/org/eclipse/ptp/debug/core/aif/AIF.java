@@ -24,10 +24,12 @@ import java.math.BigInteger;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeCharacter;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeFloating;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeInteger;
+import org.eclipse.ptp.debug.internal.core.aif.AIFTypeString;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeUnknown;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueCharacter;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueFloating;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueInteger;
+import org.eclipse.ptp.debug.internal.core.aif.AIFValueString;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueUnknown;
 
 public class AIF implements IAIF {
@@ -95,6 +97,20 @@ public class AIF implements IAIF {
 			val = new AIFValueInteger(intVal);
 			break;
 		
+		case FDS_STRING:
+			int len = 0;
+			len = data[0];
+			len <<= 8;
+			len += data[1];
+			
+			byte[] strBytes = new byte[len];
+			for (int i = 0; i < len; i++) {
+				strBytes[i] = data[i+2];
+			}
+			type = new AIFTypeString();
+			val = new AIFValueString(new String(strBytes));
+			break;
+			
 		default:
 			type = new AIFTypeUnknown(format);
 			val = new AIFValueUnknown();
