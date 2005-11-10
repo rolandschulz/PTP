@@ -51,10 +51,10 @@ public class DebugCommandQueue extends Thread {
 			try {
 				currentCommand.execCommand(debugger);
 				if (!currentCommand.waitForReturn()) {
-					System.out.println("************ ERROR occurred in DebugCommandQueue -- wait for return **********");
+					System.out.println("************ ERROR in DebugCommandQueue -- wait for return, cmd: " + currentCommand);
 				}
 			} catch (PCDIException e) {
-				System.out.println("************ ERROR occurred in DebugCommandQueue -- execCommand **********");
+				System.out.println("************ ERROR in DebugCommandQueue -- execCommand, cmd: " + currentCommand);
 			}
 			currentCommand = null;
 		}
@@ -92,7 +92,7 @@ public class DebugCommandQueue extends Thread {
 				queue.notifyAll();
 			}
 			else {
-				System.out.println("************ ERROR occurred in DebugCommandQueue -- duplicate command **********");
+				System.out.println("************ ERROR in DebugCommandQueue -- duplicate, cmd: " + currentCommand);
 			}
 		}
 	}
