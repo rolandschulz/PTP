@@ -72,7 +72,7 @@ static int	GetTypeInfo(char *, char **, char **);
 static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIProgress(void);
 static int	GDBMIInterrupt(void);
-static int	GDBMIStartSession(char *, char *, char *, char*);
+static int	GDBMIStartSession(char *, char *, char *, char *, char **);
 static int	GDBMISetLineBreakpoint(int, char *, int);
 static int	GDBMISetFuncBreakpoint(int, char *, char *);
 static int	GDBMIDeleteBreakpoint(int);
@@ -394,9 +394,10 @@ int timeout_cb(void *data)
  * Start GDB session
  */	
 static int
-GDBMIStartSession(char *gdb_path, char *dir, char *prog, char *args)
+GDBMIStartSession(char *gdb_path, char *dir, char *prog, char *args, char **env)
 {
 	char *		p;
+	char **		e;
 	struct stat	st;
 	
 	if (MIHandle != NULL) {
@@ -435,6 +436,10 @@ GDBMIStartSession(char *gdb_path, char *dir, char *prog, char *args)
 		return DBGRES_ERR;
 	}
 
+	for (e = env; e != NULL && *e != NULL; e++) {
+		gmi_gdb_set(MIHandle, "environment", *e);
+	}
+	
 	mi_set_async_cb(MIHandle, AsyncCallback, NULL);
 	
 #ifdef DEBUG

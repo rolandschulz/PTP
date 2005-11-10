@@ -75,12 +75,14 @@ static svr_cmd svr_cmd_tab[] =
 static int			svr_res;
 static void			(*svr_event_callback)(dbg_event *, void *);
 static void *		svr_data;
+static char **		svr_env;
 
 int
-svr_init(dbg_backend *db, void (*cb)(dbg_event *, void *), void *data)
+svr_init(dbg_backend *db, void (*cb)(dbg_event *, void *), void *data, char **env)
 {
 	svr_event_callback = cb;
 	svr_data = data;
+	svr_env = env;
 	return db->db_funcs->init(cb, data);
 }
 
@@ -138,7 +140,7 @@ svr_interrupt(dbg_backend *db)
 static int 
 svr_start_session(dbg_backend *db, char **args)
 {
-	return db->db_funcs->start_session(db->db_exe_path, args[1], args[2], args[3]);
+	return db->db_funcs->start_session(db->db_exe_path, args[1], args[2], args[3], svr_env);
 }
 
 static int 
