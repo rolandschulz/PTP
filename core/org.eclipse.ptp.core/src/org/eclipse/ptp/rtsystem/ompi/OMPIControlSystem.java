@@ -54,6 +54,7 @@ import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeJobStateEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessOutputEvent;
 
 
 public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventListener {
@@ -363,6 +364,15 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
         		
         		re.setText(stateStr);
         		fireEvent("job"+((ProxyRuntimeJobStateEvent)e).getJobID(), re);
+        }
+        else if(e instanceof ProxyRuntimeProcessOutputEvent) {
+        		RuntimeEvent re = new RuntimeEvent(RuntimeEvent.EVENT_PROCESS_OUTPUT);
+        		int jobID = ((ProxyRuntimeProcessOutputEvent)e).getJobID();
+        		int procID = ((ProxyRuntimeProcessOutputEvent)e).getProcessID();
+        		String text = ((ProxyRuntimeProcessOutputEvent)e).getText();
+        		
+        		re.setText(text);
+        		fireEvent("job"+jobID+"_process"+procID, re);
         }
     }
 }

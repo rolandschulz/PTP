@@ -33,6 +33,7 @@
 #define RTEV_PATTR				RTEV_OFFSET + 5
 #define RTEV_NODES				RTEV_OFFSET + 7
 #define RTEV_NEWJOB				RTEV_OFFSET + 11
+#define RTEV_PROCOUT				RTEV_OFFSET + 12
 
 #define RTEV_ERROR_ORTE_INIT		RTEV_OFFSET + 1000
 #define RTEV_ERROR_ORTE_FINALIZE	RTEV_OFFSET + 1001
@@ -752,15 +753,22 @@ static void iof_callback(
     const unsigned char* data,
     size_t count)
 {
-	unsigned char str[256];
+	char *res;
+	unsigned char str[1024];
 	
-	printf("IO callback!  count = %d\n", count); fflush(stdout);
+	//printf("IO callback!  count = %d\n", count); fflush(stdout);
     if(count > 0) {
-        fprintf(stdout, "[%lu,%lu,%lu] ", ORTE_NAME_ARGS(src_name));
+        //fprintf(stdout, "[%lu,%lu,%lu] ", ORTE_NAME_ARGS(src_name));
         strncpy((char*)str, (char*)data, count);
+        if(str[count-1] == '\n') str[count-1] = '\0';
         str[count] = '\0';
-        printf("STR = '%s'\n", str);
-        write(STDOUT_FILENO, data, count);
+        //printf("STR = '%s'\n", str);
+        /* src_name->jobid = jobid
+         * src_name->vpid = processID */
+        //write(STDOUT_FILENO, data, count);
+        asprintf(&res, "%d %d %d %s", RTEV_PROCOUT, src_name->jobid, src_name->vpid, str);
+        proxy_svr_event_callback(orte_proxy, res);
+        free(res);
     }
 }
 
