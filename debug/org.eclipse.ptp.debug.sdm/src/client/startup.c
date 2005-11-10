@@ -30,7 +30,7 @@
 #define DEFAULT_PROXY		"tcp"
 
 extern void client(int, int, char *, char *, int);
-extern void server(int, int, dbg_backend *);
+extern void server(int, int, int, dbg_backend *);
 
 static struct option longopts[] = {
 	{"debugger",			required_argument,	NULL,	'b'},
@@ -38,6 +38,7 @@ static struct option longopts[] = {
 	{"proxy",			required_argument,	NULL, 	'P'}, 
 	{"port",				required_argument,	NULL, 	'p'}, 
 	{"host",				required_argument,	NULL, 	'h'}, 
+	{"jobid",			required_argument,	NULL, 	'j'},
 	{NULL,				0,					NULL,	0}
 };
 
@@ -62,6 +63,7 @@ error_msg(int rank, char *fmt, ...)
  * @arg	-p port		port number to listen on/connect to
  * @arg	-h host		host to connect to
  * @arg	-P proxy		type of proxy connection to use
+ * @arg	-j jobid		jobid of application being debugged
  */
 int
 main(int argc, char *argv[])
@@ -69,6 +71,7 @@ main(int argc, char *argv[])
 	int 				rank;
 	int 				size;
 	int				ch;
+	int				jobid = 0;
 	int				port = PROXY_TCP_PORT;
 	char *			host = NULL;
 	char *			debugger_str = DEFAULT_BACKEND;
@@ -99,10 +102,14 @@ main(int argc, char *argv[])
 	case 'h':
 		host = optarg;
 		break;
+	case 'j':
+		jobid = atoi(optarg);
+		break;
 	default:
 		error_msg(rank, "sdm [--debugger=value] [--debugger_path=path]\n");
 		error_msg(rank, "    [--proxy=proxy]\n");
 		error_msg(rank, "    [--host=host_name] [--port=port]\n");
+		error_msg(rank, "    [--jobid=jobid]\n");
 		exit(1);
 	}
 	
@@ -136,7 +143,7 @@ main(int argc, char *argv[])
 	if (rank == size-1) {
 		client(size - 1, rank, proxy_str, host, port);
 	} else {
-		server(size - 1, rank, d);
+		server(size - 1, rank, jobid, d);
 	}
 	
 	MPI_Finalize();

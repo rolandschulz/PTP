@@ -85,6 +85,16 @@ do_commands(dbg_backend *dbgr, int client_task_id, int my_task_id)
 	return ret;
 }
 
+void
+setenviron(char *str, int val)
+{
+	char *	buf;
+	
+	asprintf(&buf, "%s=%d", str, val);
+	putenv(buf);
+	free(buf);
+}
+
 /*
  * Debug server implementation
  * 
@@ -113,13 +123,20 @@ do_commands(dbg_backend *dbgr, int client_task_id, int my_task_id)
  * 
  */
 void
-server(int client_task_id, int my_task_id, dbg_backend *dbgr)
+server(int client_task_id, int my_task_id, int job_id, dbg_backend *dbgr)
 {
 	//int signal;
 	//char status;
 	//char **args;
 	
 	printf("starting server on [%d]\n", my_task_id);
+	
+	/*
+	 * It's ok to do this as long as MPI_Init() has been called
+	 */
+	setenviron("OMPI_MCA_ns_nds_jobid", job_id);
+	setenviron("OMPI_MCA_ns_nds_vpid", my_task_id);
+	setenviron("OMPI_MCA_ns_nds_num_procs", client_task_id);
 	
 	//unpack_executable(&args);
 	
