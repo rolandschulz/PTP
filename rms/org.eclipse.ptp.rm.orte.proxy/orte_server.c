@@ -81,6 +81,7 @@ int get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int 
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
 static int ompi_sendcmd(orte_daemon_cmd_flag_t usercmd);
 static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd);
+static void iof_callback(orte_process_name_t* src_name, orte_iof_base_tag_t src_tag, void* cbdata, const unsigned char* data, size_t count);
 
 int 			orte_shutdown = 0;
 proxy_svr *	orte_proxy;
@@ -477,6 +478,58 @@ ORTETerminateJob(char **args)
 	return PROXY_RES_OK;
 }
 
+/*
+ * If we're under debug control, let the debugger handle process state update. 
+ * We still want to wire up stdio though.
+ */
+static void
+debug_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
+{
+	char *		res;
+	debug_job *	djob;
+	int			rc;
+	orte_process_name_t* name;
+			
+	switch(state) {
+		case ORTE_PROC_STATE_INIT:
+			if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
+                ORTE_ERROR_LOG(rc);
+                break;
+            	}
+ 			if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT, iof_callback, NULL))) {                
+				opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
+            	}
+            	if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR, iof_callback, NULL))) {                
+                	opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
+           	}
+			break;
+		case ORTE_PROC_STATE_LAUNCHED:
+			break;
+		case ORTE_PROC_STATE_AT_STG1:
+			break;
+		case ORTE_PROC_STATE_AT_STG2:
+			break;
+		case ORTE_PROC_STATE_RUNNING:
+			break;
+		case ORTE_PROC_STATE_AT_STG3:
+			break;
+		case ORTE_PROC_STATE_FINALIZED:
+			break;
+		case ORTE_PROC_STATE_TERMINATED:
+			if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
+                ORTE_ERROR_LOG(rc);
+                break;
+            	}
+			if (ORTE_SUCCESS != (rc = orte_iof.iof_unsubscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR))) {                
+                	opal_output(0, "[%s:%d] orte_iof.iof_unsubscribed failed\n", __FILE__, __LINE__);
+           	}
+			break;
+		case ORTE_PROC_STATE_ABORTED:
+			break;
+	}
+}
+
+
 static void debug_wireup_stdin(orte_jobid_t jobid)
 {
 	int rc;
@@ -607,7 +660,7 @@ debug_allocate(orte_app_context_t** app_context, size_t num_context, orte_jobid_
 }
 
 int
-debug_spawn(orte_app_context_t** app_context, size_t num_context, orte_jobid_t* jobid, orte_rmgr_cb_fn_t cbfunc)
+debug_spawn(orte_app_context_t** app_context, size_t num_context, orte_jobid_t* jobid)
 {
 	int i;
 	int rc;
@@ -617,7 +670,7 @@ debug_spawn(orte_app_context_t** app_context, size_t num_context, orte_jobid_t* 
 	orte_app_context_t **debug_context;
 	debug_job *djob;
 
-	if ((rc = debug_allocate(app_context, num_context, &app_jobid, cbfunc)) != ORTE_SUCCESS)
+	if ((rc = debug_allocate(app_context, num_context, &app_jobid, debug_job_state_callback)) != ORTE_SUCCESS)
 		return rc;
 
 	debug_context = malloc(sizeof(orte_app_context_t *) * num_context);
@@ -727,7 +780,7 @@ ORTERun(char **args)
 	if (!debug)
 		rc = orte_rmgr.spawn(apps, num_apps, &jobid, job_state_callback);
 	else
-		rc = debug_spawn(apps, num_apps, &jobid, job_state_callback);
+		rc = debug_spawn(apps, num_apps, &jobid);
 	printf("SPAWNED [error code %d = '%s'], now unlocking\n", rc, ORTE_ERROR_NAME(rc)); fflush(stdout);
 	
 	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_RUN, rc)) return 1;
