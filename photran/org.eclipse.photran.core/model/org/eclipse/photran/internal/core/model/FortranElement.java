@@ -163,7 +163,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
      */
 	public FortranElement(Parent parent, String name) //, int type)
     {
-		super(parent, name, -1); //type);
+		super(parent, name == null ? "" : name, -1); //type);
 		this.parseTreeNode = null;
 	}
 
