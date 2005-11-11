@@ -149,13 +149,14 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		
 		if (jobRunConfig.isDebug()) {
 			argList.add("debuggerPath");
-			argList.add("/Volumes/Home/greg/Desktop/workspaces/3.1/ptp/org.eclipse.ptp.debug.sdm/sdm");
-			argList.add("debuggerArg");
-			argList.add("--debugger=gdb-mi");
-			argList.add("debuggerArg");
-			argList.add("--host=localhost");
-			argList.add("debuggerArg");
-			argList.add("--port=" + jobRunConfig.getRemoteInfo());
+			argList.add(jobRunConfig.getDebuggerPath());
+			String[] dbgArgs = jobRunConfig.getDebuggerArgs();
+			if (dbgArgs != null) {
+				for (int i = 0; i < dbgArgs.length; i++) {
+					argList.add("debuggerArg");
+					argList.add(dbgArgs[i]);
+				}
+			}
 		}
 		
 		try {

@@ -29,7 +29,7 @@
 package org.eclipse.ptp.debug.core;
 
 /**
- * Constant definitions for C/C++ debug plug-in.
+ * Constant definitions for PTP debug plug-in.
  */
 public interface IPDebugConstants {
 
@@ -55,4 +55,15 @@ public interface IPDebugConstants {
 	 * The identifier of the common source locations list
 	 */
 	public static final String PREF_SOURCE_LOCATIONS = PLUGIN_ID + "pDebug.Source.source_locations"; //$NON-NLS-1$
+	
+	/**
+	 * Location of the sdm
+	 */
+	public static final String PREF_PTP_SDM_FILE = PLUGIN_ID + ".pDebug.sdm_file"; //$NON-NLS-1$
+
+	/**
+	 * Default arguments for the sdm
+	 */
+	public static final String PREF_PTP_SDM_ARGS = PLUGIN_ID + ".pDebug.sdm_args"; //$NON-NLS-1$
+
 }
