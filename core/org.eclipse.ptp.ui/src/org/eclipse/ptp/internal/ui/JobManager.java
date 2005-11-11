@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IProcessEvent;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.ui.IPTPUIConstants;
@@ -78,7 +79,11 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		}
 	}
 	public IPJob[] getJobs() {
-		return modelManager.getUniverse().getSortedJobs();
+		IPUniverse universe = modelManager.getUniverse();
+		if (universe == null) {
+			return new IPJob[0];
+		}
+		return universe.getSortedJobs();
 	}
 	public String getCurrentJobId() {
 		return cur_job_id;

@@ -27,6 +27,7 @@ import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
@@ -65,7 +66,11 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 		}
 	}
 	public IPMachine[] getMachines() {
-		return modelManager.getUniverse().getSortedMachines();
+		IPUniverse universe = modelManager.getUniverse();
+		if (universe == null) {
+			return new IPMachine[0];
+		}
+		return universe.getSortedMachines();
 	}
 	public String getCurrentMachineId() {
 		return cur_machine_id;
