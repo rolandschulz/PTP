@@ -29,9 +29,9 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		super.addRuntimeEventListener(this);
 	}
 	
-	public int runJob(String prog, String[] args, int numProcs, boolean debug) throws IOException {
+	public int runJob(String[] args) throws IOException {
 		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_NEWJOB);
-		run(prog, args, numProcs, debug);
+		run(args);
 		IProxyRuntimeEvent event = waitForRuntimeEvent();
 		return ((ProxyRuntimeNewJobEvent)event).getJobID();
 	}

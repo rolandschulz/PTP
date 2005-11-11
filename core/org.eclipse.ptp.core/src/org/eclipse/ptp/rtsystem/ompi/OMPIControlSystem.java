@@ -136,57 +136,35 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		int jobID = -1;
 		System.out.println("JAVA OMPI: run() with args:\n"+jobRunConfig.toString());
 
-		String[] args = new String[8];
-		args[0] = "pathToExecutable";
-		args[1] = jobRunConfig.getPathToExec();
-		args[2] = "numberOfProcesses";
-		args[3] = ""+jobRunConfig.getNumberOfProcesses()+"";
-		args[4] = "numberOfProcessesPerNode";
-		args[5] = ""+jobRunConfig.getNumberOfProcessesPerNode()+"";
-		args[6] = "firstNodeNumber";
-		args[7] = ""+jobRunConfig.getFirstNodeNumber()+"";
-		/*
-		try {
-			proxy.startDaemon(ompi_bin_path, orted_path, split_path[split_path.length - 1], split_args);
-			System.out.println("Control SYSTEM: startDaemon command issued!");
-		} catch(IOException e) {
-			System.err.println("Exception starting daemon. :(");
-			System.exit(1);
-		}*/
+		List argList = new ArrayList();
 		
-		String prog = jobRunConfig.getPathToExec();
-		int procs = jobRunConfig.getNumberOfProcesses();
-		String[] pargs = null;
+		argList.add("pathToExecutable");
+		argList.add(jobRunConfig.getPathToExec());
+		argList.add("numberOfProcesses");
+		argList.add(Integer.toString(jobRunConfig.getNumberOfProcesses()));
+		argList.add("numberOfProcessesPerNode");
+		argList.add(Integer.toString(jobRunConfig.getNumberOfProcessesPerNode()));
+		argList.add("firstNodeNumber");
+		argList.add(Integer.toString(jobRunConfig.getFirstNodeNumber()));
 		
 		if (jobRunConfig.isDebug()) {
-			prog = "/Volumes/Home/greg/Desktop/workspaces/3.1/ptp/org.eclipse.ptp.debug.sdm/sdm";
-			pargs = new String[3];
-			pargs[0] = "--debugger=gdb-mi";
-			pargs[1] = "--host=localhost";
-			pargs[2] = "--port=" + jobRunConfig.getRemoteInfo();
+			argList.add("debuggerPath");
+			argList.add("/Volumes/Home/greg/Desktop/workspaces/3.1/ptp/org.eclipse.ptp.debug.sdm/sdm");
+			argList.add("debuggerArg");
+			argList.add("--debugger=gdb-mi");
+			argList.add("debuggerArg");
+			argList.add("--host=localhost");
+			argList.add("debuggerArg");
+			argList.add("--port=" + jobRunConfig.getRemoteInfo());
 		}
 		
 		try {
-			jobID = proxy.runJob(prog, pargs, procs, jobRunConfig.isDebug());
+			jobID = proxy.runJob((String[])argList.toArray(new String[0]));
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
 		
 		return jobID;
-		
-		//jobID = jniBroker.OMPIRun(args);
-//		if(jobID == -1) {
-//			/* error occurred */
-//			//String error_msg = jniBroker.OMPIGetError();
-//			//CoreUtils.showErrorDialog("OMPI Parallel Run/Spawn Error", error_msg, null);
-//			return null;
-//		}
-//		else {
-//			/* the job creation worked - we have a new job, tell the caller the new job name */
-//			String s = new String("job"+jobID);
-//			knownJobs.addElement(s);
-//			return s;
-//		}
 	}
 
 	public void terminateJob(IPJob job) {

@@ -660,23 +660,22 @@ debug_allocate(orte_app_context_t** app_context, size_t num_context, orte_jobid_
 }
 
 int
-debug_spawn(orte_app_context_t** app_context, size_t num_context, orte_jobid_t* jobid)
+debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_context, size_t num_context, orte_jobid_t* jobid)
 {
-	int i;
-	int rc;
-	orte_process_name_t* name;
-	orte_jobid_t debug_jobid;
-	orte_jobid_t app_jobid;
-	orte_app_context_t **debug_context;
-	debug_job *djob;
+	int					i;
+	int					rc;
+	orte_process_name_t *	name;
+	orte_jobid_t			debug_jobid;
+	orte_jobid_t			app_jobid;
+	orte_app_context_t **	debug_context;
 
 	if ((rc = debug_allocate(app_context, num_context, &app_jobid, debug_job_state_callback)) != ORTE_SUCCESS)
 		return rc;
 
-	debug_context = malloc(sizeof(orte_app_context_t *) * num_context);
+	debug_context = malloc(sizeof(orte_app_context_t *));
 	debug_context[0] = OBJ_NEW(orte_app_context_t);
 	debug_context[0]->num_procs = app_context[0]->num_procs + 1;
-	debug_context[0]->app = strdup("/Volumes/Home/greg/Desktop/workspaces/3.1/ptp/org.eclipse.ptp.debug.sdm/sdm");
+	debug_context[0]->app = strdup(debug_path);
 	debug_context[0]->cwd = strdup(app_context[0]->cwd);
 	/* no special environment variables */
 	debug_context[0]->num_env = 0;
@@ -685,10 +684,10 @@ debug_spawn(orte_app_context_t** app_context, size_t num_context, orte_jobid_t* 
 	debug_context[0]->num_map = 0;
 	debug_context[0]->map_data = NULL;
 	/* setup argv */
-	debug_context[0]->argv = (char **)malloc((app_context[0]->argc+2) * sizeof(char *));
-	debug_context[0]->argv[0] = strdup("sdm");
-	for (i = 1; i < app_context[0]->argc; i++)
-		debug_context[0]->argv[i] = strdup(app_context[0]->argv[i]);
+	debug_context[0]->argv = (char **)malloc((argc+2) * sizeof(char *));
+	for (i = 0; i < argc; i++) {
+		debug_context[0]->argv[i] = strdup(argv[i]);
+	}
 	asprintf(&debug_context[0]->argv[i++], "--jobid=%d", app_jobid);
 	debug_context[0]->argv[i++] = NULL;
 	debug_context[0]->argc = i;
@@ -697,9 +696,7 @@ debug_spawn(orte_app_context_t** app_context, size_t num_context, orte_jobid_t* 
 		// TODO free debug_context...
 		return rc;
 	}
-	
-	printf(">>>>>>debugjobid=%d appjobid=%d\n", debug_jobid, app_jobid);
-	
+
 	/*
 	 * launch the debugger
 	 */
@@ -717,35 +714,56 @@ debug_spawn(orte_app_context_t** app_context, size_t num_context, orte_jobid_t* 
 int
 ORTERun(char **args)
 {
-	int rc; 
-	char *res;
+	int					rc; 
+	int					i;
+	int					a;
+	int					num_procs;
+	int					debug = 0;
+	int					num_apps;
+	int					debug_argc = 0;
+	char					pgm_name[128];
+	char					cwd[128];
+	char *				c;
+	char *				res;
+	char *				exec_path;
+	char *				debug_exec_path;
+	char **				debug_args;
+	orte_app_context_t **	apps;
+	orte_jobid_t			jobid = ORTE_JOBID_MAX;
 	
-	int i;
-	int num_args;
-	orte_jobid_t jobid = ORTE_JOBID_MAX;
-	char pgm_name[128], cwd[128];
-	char *c;
-	orte_app_context_t **apps;
-	int num_apps;
-	char *exec_path = args[3];
-	int num_procs = atoi(args[1]);
-	int debug = 0;
-	debug_job * djob;
+	for (i = 1; args[i] != NULL; i += 2) {
+		if (strcmp(args[i], "pathToExecutable") == 0) {
+			exec_path = args[i+1];
+		} else if (strcmp(args[i], "numberOfProcesses") == 0) {
+			num_procs = atoi(args[i+1]);
+		} else if (strcmp(args[i], "numberOfProcessesPerNode") == 0) {
+			// not yet
+		} else if (strcmp(args[i], "firstNodeNumber") == 0) {
+			// not yet
+		} else if (strcmp(args[i], "debuggerPath") == 0) {
+			debug_exec_path = args[i+1];
+			debug = 1;
+		} else if (strcmp(args[i], "debuggerArg") == 0) {
+			debug_argc++;
+		}
+	}
 	
-	if (strcmp(args[2], "true") == 0)
-		debug++;
+	if (debug) {
+		debug_argc++;
+		debug_args = (char **)malloc((debug_argc+1) * sizeof(char *));
+		debug_args[0] = debug_exec_path;
+		for (i = 1, a = 1; args[i] != NULL; i += 2) {
+			if (strcmp(args[i], "debuggerArg") == 0) {
+				debug_args[a++] = args[i+1];
+			}
+		}
+		debug_args[a] = NULL;
+	}
 	
-	/* count number of args */
-	for (i = 4, num_args = 0; args[i] != NULL; i++)
-		num_args++;
-
 	c = rindex(exec_path, '/');
-
 	strncpy(pgm_name, c + 1, strlen(c));
 	strncpy(cwd, exec_path, c - exec_path + 1);
 	cwd[c-exec_path+1] = '\0';
-	
-	printf("CWD = '%s'\n", cwd);
 
 	/* hard coded test for spawning just 1 job (JOB not PROCESSES!) */
 	num_apps = 1;
@@ -763,12 +781,10 @@ ORTERun(char **args)
 	apps[0]->num_map = 0;
 	apps[0]->map_data = NULL;
 	/* setup argv */
-	apps[0]->argv = (char **)malloc((2+num_args) * sizeof(char *));
+	apps[0]->argv = (char **)malloc((2) * sizeof(char *));
 	apps[0]->argv[0] = strdup(pgm_name);
-	for (i = 0; i < num_args; i++)
-		apps[0]->argv[i+1] = strdup(args[i+4]);
-	apps[0]->argv[num_args+1] = NULL;
-	apps[0]->argc = num_args + 1;
+	apps[0]->argv[1] = NULL;
+	apps[0]->argc = 1;
 	
 	printf("Spawning %d processes of job '%s'\n", apps[0]->num_procs, apps[0]->app);
 	printf("\tprogram name '%s'\n", apps[0]->argv[0]);
@@ -780,7 +796,7 @@ ORTERun(char **args)
 	if (!debug)
 		rc = orte_rmgr.spawn(apps, num_apps, &jobid, job_state_callback);
 	else
-		rc = debug_spawn(apps, num_apps, &jobid);
+		rc = debug_spawn(debug_exec_path, debug_argc, debug_args, apps, num_apps, &jobid);
 	printf("SPAWNED [error code %d = '%s'], now unlocking\n", rc, ORTE_ERROR_NAME(rc)); fflush(stdout);
 	
 	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_RUN, rc)) return 1;
@@ -789,7 +805,9 @@ ORTERun(char **args)
 	
 	asprintf(&res, "%d %d", RTEV_NEWJOB, jobid);
 	proxy_svr_event_callback(orte_proxy, res);
+
 	free(res);
+	free(debug_args);
 	
 	/* generate an event stating what the new/assigned job ID is.
 	 * The caller must record this and use this as an identifier to get
