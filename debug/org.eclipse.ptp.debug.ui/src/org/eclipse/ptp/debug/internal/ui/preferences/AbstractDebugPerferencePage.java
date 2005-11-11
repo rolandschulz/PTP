@@ -117,7 +117,10 @@ public abstract class AbstractDebugPerferencePage extends PreferencePage impleme
 	}	
 	
 	protected Button createCheckButton(Composite parent, String label) {
-		Button button = new Button(parent, SWT.CHECK | SWT.LEFT);
+		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
+	}
+	protected Button createButton(Composite parent, String label, int type) {
+		Button button = new Button(parent, type);
 		button.setText(label);
 		GridData data = new GridData();
 		button.setLayoutData(data);

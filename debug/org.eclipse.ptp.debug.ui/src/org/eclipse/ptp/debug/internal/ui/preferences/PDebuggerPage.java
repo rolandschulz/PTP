@@ -18,27 +18,48 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.preferences;
 
+import java.io.File;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 
 /**
  * @author Clement chu
  *
  */
 public class PDebuggerPage extends AbstractDebugPerferencePage {
-	public final String DEBUG_SIMULATOR_NAME = "Debug Simulator";
-	private Combo simulatorCombo = null;
-	private IntegerFieldEditor timeoutField = null;
-	private IntegerFieldEditor eventTimeField = null;
+	//public final String DEBUG_SIMULATOR_NAME = "Debug Simulator";
+	//private Combo simulatorCombo = null;
+	//private IntegerFieldEditor timeoutField = null;
+	//private IntegerFieldEditor eventTimeField = null;
+	private Text sdmPathText = null;
+	private Button sdmPathButton = null;
 	
+    protected class WidgetListener extends SelectionAdapter implements ModifyListener {
+	    public void widgetSelected(SelectionEvent e) {
+	        Object source = e.getSource();
+	        if (source == sdmPathButton)
+	            handleSDMButtonSelected();
+	    }
+        public void modifyText(ModifyEvent e) {
+        	setValid(isValid());        	
+        }
+    }
+    protected WidgetListener listener = new WidgetListener();
+    
 	public PDebuggerPage() {
 		super();
 		setPreferenceStore(PTPDebugUIPlugin.getDefault().getPreferenceStore());
@@ -60,19 +81,28 @@ public class PDebuggerPage extends AbstractDebugPerferencePage {
 		data.horizontalAlignment = GridData.FILL;
 		composite.setLayoutData(data);
 		createSpacer(composite, 1);
-		createDebuggerSetting(composite);
-		createSpacer(composite, 1);
-		createCommunicationSetting(composite);
-		createSpacer(composite, 1);
-		createEventSetting(composite);
+		createSDMSetting(composite);
+		//createSpacer(composite, 1);
+		//createCommunicationSetting(composite);
+		//createSpacer(composite, 1);
+		//createEventSetting(composite);
 		defaultSetting();
 		setValues();
 		return composite;
 	}
-	protected void createDebuggerSetting(Composite parent) {
-		Composite group = createGroupComposite(parent, 2, false, PreferenceMessages.getString("PDebuggerPage.default1"));
-		simulatorCombo = createCombo(group, PreferenceMessages.getString("PDebuggerPage.default2"), getDubuggers(), DEBUG_SIMULATOR_NAME);
+	protected void createSDMSetting(Composite parent) {
+		Composite group = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PDebuggerPage.sdm_group"));
+		Composite comp = createComposite(group, 3);
+		new Label(comp, SWT.NONE).setText(PreferenceMessages.getString("PDebuggerPage.sdm_selection"));
+
+		sdmPathText = new Text(comp, SWT.SINGLE | SWT.BORDER);
+		sdmPathText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		sdmPathText.addModifyListener(listener);
+		
+		sdmPathButton = createButton(comp, PreferenceMessages.getString("PDebuggerPage.browse_1"), SWT.PUSH);
+		sdmPathButton.addSelectionListener(listener);
 	}
+	/*
 	protected void createCommunicationSetting(Composite parent) {
 		Composite group = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PDebuggerPage.default3"));
 		Composite comp = createComposite(group, 1);
@@ -86,8 +116,7 @@ public class PDebuggerPage extends AbstractDebugPerferencePage {
 		eventTimeField = new IntegerFieldEditor(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME, PreferenceMessages.getString("PDebuggerPage.default6"), comp);
 		eventTimeField.setPropertyChangeListener(this);
 		eventTimeField.setEmptyStringAllowed(false);
-	}	
-	
+	}
 	private String[] getDubuggers() {
 		return new String[] {DEBUG_SIMULATOR_NAME};
 	}
@@ -99,31 +128,36 @@ public class PDebuggerPage extends AbstractDebugPerferencePage {
 		}
 		return -1;
 	}
+	*/
 	
 	protected void defaultSetting() {
-		IPreferenceStore store = getPreferenceStore();
-		store.setDefault(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, IPDebugPreferenceConstants.DEFAULT_DEBUG_TIMEOUT);
-		store.setDefault(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME, IPDebugPreferenceConstants.DEFAULT_DEBUG_EVENTTIME);
+		//IPreferenceStore store = getPreferenceStore();
+		//store.setDefault(IPDebugPreferenceConstants.PREF_PTP_SDM_FILE, sdmPathText.getText());
+		//store.setDefault(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, IPDebugPreferenceConstants.DEFAULT_DEBUG_TIMEOUT);
+		//store.setDefault(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME, IPDebugPreferenceConstants.DEFAULT_DEBUG_EVENTTIME);
 	}
 	public void performDefaults() { 
-		IPreferenceStore store = getPreferenceStore();
-		timeoutField.setStringValue(""+store.getDefaultInt(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT));
-		eventTimeField.setStringValue(""+store.getDefaultInt(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME));
+		//IPreferenceStore store = getPreferenceStore();
+		//sdmPathText.setText(store.getString(IPDebugPreferenceConstants.PREF_PTP_SDM_FILE));
+		//timeoutField.setStringValue(""+store.getDefaultInt(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT));
+		//eventTimeField.setStringValue(""+store.getDefaultInt(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME));
 		super.performDefaults();
 	}
 	
 	protected void setValues() {
 		IPreferenceStore store = getPreferenceStore();
-		simulatorCombo.select(getSelectedDebugger(store.getString(IPDebugPreferenceConstants.PREF_PTP_DEBUGGER)));
-		timeoutField.setStringValue(""+store.getInt(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT));
-		eventTimeField.setStringValue(""+store.getInt(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME));
+		sdmPathText.setText(store.getString(IPDebugPreferenceConstants.PREF_PTP_SDM_FILE));
+		//simulatorCombo.select(getSelectedDebugger(store.getString(IPDebugPreferenceConstants.PREF_PTP_DEBUGGER)));
+		//timeoutField.setStringValue(""+store.getInt(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT));
+		//eventTimeField.setStringValue(""+store.getInt(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME));
 	}	
 		
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
-		store.setValue(IPDebugPreferenceConstants.PREF_PTP_DEBUGGER, simulatorCombo.getText());
-		store.setValue(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, timeoutField.getIntValue());
-		store.setValue(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME, eventTimeField.getIntValue());
+		store.setValue(IPDebugPreferenceConstants.PREF_PTP_SDM_FILE, sdmPathText.getText());
+		//store.setValue(IPDebugPreferenceConstants.PREF_PTP_DEBUGGER, simulatorCombo.getText());
+		//store.setValue(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, timeoutField.getIntValue());
+		//store.setValue(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME, eventTimeField.getIntValue());
 	}
 	
     public void propertyChange(PropertyChangeEvent event) {
@@ -133,7 +167,18 @@ public class PDebuggerPage extends AbstractDebugPerferencePage {
 	public boolean isValid() {
 		setErrorMessage(null);
 		setMessage(null);
-		
+		String name = sdmPathText.getText();
+		if (name == null) {
+			setErrorMessage(PreferenceMessages.getString("PDebuggerPage.no_sdm"));
+			return false;
+		}
+		File sdmFile = new File(name);
+		if (!sdmFile.isFile()) {
+			setErrorMessage(PreferenceMessages.getString("PDebuggerPage.Selection_must_be_file"));
+			return false;
+		}
+
+		/*
 		if (!timeoutField.isValid()) {
 			setErrorMessage(timeoutField.getErrorMessage());
 			return false;
@@ -142,6 +187,15 @@ public class PDebuggerPage extends AbstractDebugPerferencePage {
 			setErrorMessage(eventTimeField.getErrorMessage());
 			return false;
 		}
+		*/
 		return true;
+	}
+	
+	private void handleSDMButtonSelected() {
+        FileDialog dialog = new FileDialog(getShell(), SWT.NONE);
+        String filePath = dialog.open();
+        if (filePath != null) {
+        	sdmPathText.setText(filePath);
+        }
 	}
 }
