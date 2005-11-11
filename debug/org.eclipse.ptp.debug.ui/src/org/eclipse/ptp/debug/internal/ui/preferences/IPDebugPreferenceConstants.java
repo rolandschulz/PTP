@@ -27,8 +27,6 @@ import org.eclipse.ptp.debug.ui.IPTPDebugUIConstants;
  */
 public interface IPDebugPreferenceConstants {
 	public static final String PREF_SHOW_FULL_PATHS = IPTPDebugUIConstants.PLUGIN_ID + ".pDebug.show_full_paths";
-	//TODO should be declared in debug.core 
-	public static final String PREF_PTP_SDM_FILE = IPTPDebugUIConstants.PLUGIN_ID + ".pDebug.sdm_file";
 
 	public static final String PREF_PTP_DEBUGGER = IPTPDebugUIConstants.PLUGIN_ID + ".pDebug.debuggers";
 	public static final String PREF_PTP_DEBUG_COMM_TIMEOUT = IPTPDebugUIConstants.PLUGIN_ID + ".pDebug.timeout";
