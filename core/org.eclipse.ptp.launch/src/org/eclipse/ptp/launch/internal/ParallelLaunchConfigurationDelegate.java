@@ -48,9 +48,12 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
+import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.IPTPDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 
@@ -77,9 +80,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		} catch (ClassCastException e) {
 		} catch (IOException e) {
 		}
-		Throwable exception = new FileNotFoundException("AbstractCLaunchDelegate.Program_is_not_a_recongnized_executable"); //$NON-NLS-1$
+		Throwable exception = new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Program_is_not_a_recongnized_executable")); //$NON-NLS-1$
 		int code = ICDTLaunchConfigurationConstants.ERR_PROGRAM_NOT_BINARY;
-		MultiStatus status = new MultiStatus("PluginID", code, "AbstractCLaunchDelegate.Program_is_not_a_recongnized_executable", exception); //$NON-NLS-1$
+		MultiStatus status = new MultiStatus("PluginID", code, LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Program_is_not_a_recongnized_executable"), exception); //$NON-NLS-1$
 		status.add(new Status(IStatus.ERROR, "PluginID", code, exception == null ? "" : exception.getLocalizedMessage(), //$NON-NLS-1$
 				exception));
 		throw new CoreException(status);
@@ -102,8 +105,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			programPath = wsProgramPath.getLocation();
 		}
 		if (!programPath.toFile().exists()) {
-			abort("AbstractCLaunchDelegate.Program_file_does_not_exist", //$NON-NLS-1$
-					new FileNotFoundException("AbstractCLaunchDelegate.PROGRAM_PATH_not_found"), //$NON-NLS-1$
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Program_file_does_not_exist"), //$NON-NLS-1$
+					new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.PROGRAM_PATH_not_found")), //$NON-NLS-1$
 					ICDTLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
 		}
 		return programPath;
@@ -125,20 +128,20 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	private ICProject verifyCProject(ILaunchConfiguration config) throws CoreException {
 		String name = getProjectName(config);
 		if (name == null) {
-			abort("AbstractCLaunchDelegate.C_Project_not_specified", null, //$NON-NLS-1$
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.C_Project_not_specified"), null, //$NON-NLS-1$
 					ICDTLaunchConfigurationConstants.ERR_UNSPECIFIED_PROJECT);
 		}
 		ICProject cproject = getCProject(config);
 		if (cproject == null) {
 			IProject proj = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 			if (!proj.exists()) {
-				abort("AbstractCLaunchDelegate.Project_NAME_does_not_exist", null, //$NON-NLS-1$
+				abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Project_NAME_does_not_exist"), null, //$NON-NLS-1$
 						ICDTLaunchConfigurationConstants.ERR_NOT_A_C_PROJECT);
 			} else if (!proj.isOpen()) {
-				abort("AbstractCLaunchDelegate.Project_NAME_is_closed", null, //$NON-NLS-1$
+				abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Project_NAME_is_closed"), null, //$NON-NLS-1$
 						ICDTLaunchConfigurationConstants.ERR_NOT_A_C_PROJECT);
 			}
-			abort("AbstractCLaunchDelegate.Not_a_C_CPP_project", null, //$NON-NLS-1$
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Not_a_C_CPP_project"), null, //$NON-NLS-1$
 					ICDTLaunchConfigurationConstants.ERR_NOT_A_C_PROJECT);
 		}
 		return cproject;
@@ -152,6 +155,14 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			throw e;
 		}
 		return dbgCfg;
+	}
+	private void verifyDebuggerPath(String path) throws CoreException {
+		IPath programPath = new Path(path);
+		if (programPath == null || programPath.isEmpty() || !programPath.toFile().exists()) {
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Debugger_path_not_found"), //$NON-NLS-1$
+					new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Debugger_path_not_found")), //$NON-NLS-1$
+					ICDTLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
+		}
 	}
 	/*
 	 * (non-Javadoc)
@@ -187,9 +198,14 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			IPTPDebugger debugger = null;
 			
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				String dbgPath = PTPDebugUIPlugin.getDefault().getPreferenceStore().getString(IPDebugConstants.PREF_PTP_SDM_FILE);
+				verifyDebuggerPath(dbgPath);
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				debugger = debugConfig.createDebugger();
-				jrunconfig.setRemoteInfo(debugger.startDebuggerListener());
+				jrunconfig.setDebuggerPath(dbgPath);
+				String dbgArgs = PTPDebugUIPlugin.getDefault().getPreferenceStore().getString(IPDebugConstants.PREF_PTP_SDM_ARGS);
+				dbgArgs += " --port=" + debugger.startDebuggerListener();
+				jrunconfig.setDebuggerArgs(dbgArgs);
 				jrunconfig.setDebug();
 			}
 			
@@ -203,32 +219,16 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			
 			PLaunch pLaunch = (PLaunch) launch;
 			pLaunch.setPJob(job);
-			String[] commandLine = new String[] { "/bin/date" };
 			
 			try {
 				if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 					job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, exePath.removeLastSegments(1).toOSString());
 					debugger.createDebuggerSession(pLaunch, exeFile, new SubProgressMonitor(monitor, 3));
-					//IPSession pSession = (IPSession) new PSession(dSession, pLaunch);
-					//pLaunch.setPSession(pSession);
-				} else if (mode.equals(ILaunchManager.RUN_MODE)) {
-					/*
-					 * FIXME We still haven't discussed about the whole run/debug stuff So, if it's the simulation control system.... it's ok.... if not... just run /bin/date
-					 *
-					if (getLaunchManager().getControlSystem() instanceof SimulationControlSystem) {
-						IPProcess[] procs = job.getSortedProcesses();
-						Process process = ((Process) procs[0]);
-						DebugPlugin.newProcess(launch, process, "Launch Label " + 0);
-					} else {
-						Process process = DebugPlugin.exec(commandLine, null);
-						DebugPlugin.newProcess(launch, process, "Launch Label");
-					}*/
-					monitor.worked(1);
 				}
+				monitor.worked(1);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			//getLaunchManager().setPTPConfiguration(configuration); TODO remove this from ModelManager as it doesn't seem to be used any more
 		} finally {
 			monitor.done();
 		}
