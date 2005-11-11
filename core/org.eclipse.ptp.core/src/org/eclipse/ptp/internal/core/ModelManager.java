@@ -185,9 +185,12 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			return;
 		}
 
+		if (runtimeProxy != null && !runtimeProxy.startup()) {
+			runtimeProxy = null;
+			CoreUtils.showErrorDialog("Runtime System Error", "Could not start runtime system", null);
+			return;
+		}
 		universe = new PUniverse();
-		if (runtimeProxy != null)
-			runtimeProxy.startup();
 		monitoringSystem.startup();
 		controlSystem.startup();
 		setupMS();
