@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.internal.ui.preferences;
 import java.io.File;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -49,14 +50,14 @@ public class PDebuggerPage extends AbstractDebugPerferencePage {
 	private Button sdmPathButton = null;
 	
     protected class WidgetListener extends SelectionAdapter implements ModifyListener {
-	    public void widgetSelected(SelectionEvent e) {
-	        Object source = e.getSource();
+    		public void widgetSelected(SelectionEvent e) {
+	    		Object source = e.getSource();
 	        if (source == sdmPathButton)
-	            handleSDMButtonSelected();
+	        		handleSDMButtonSelected();
+    		}
+	    public void modifyText(ModifyEvent e) {
+	    		setValid(isValid());        	
 	    }
-        public void modifyText(ModifyEvent e) {
-        	setValid(isValid());        	
-        }
     }
     protected WidgetListener listener = new WidgetListener();
     
@@ -131,10 +132,12 @@ public class PDebuggerPage extends AbstractDebugPerferencePage {
 	*/
 	
 	protected void defaultSetting() {
-		//IPreferenceStore store = getPreferenceStore();
+		IPreferenceStore store = getPreferenceStore();
 		//store.setDefault(IPDebugPreferenceConstants.PREF_PTP_SDM_FILE, sdmPathText.getText());
 		//store.setDefault(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, IPDebugPreferenceConstants.DEFAULT_DEBUG_TIMEOUT);
 		//store.setDefault(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME, IPDebugPreferenceConstants.DEFAULT_DEBUG_EVENTTIME);
+		store.setDefault(IPDebugConstants.PREF_PTP_SDM_FILE, "/path/to/sdm");
+		store.setDefault(IPDebugConstants.PREF_PTP_SDM_ARGS, "--host=localhost --debugger=gdb-mi");
 	}
 	public void performDefaults() { 
 		//IPreferenceStore store = getPreferenceStore();
@@ -146,7 +149,7 @@ public class PDebuggerPage extends AbstractDebugPerferencePage {
 	
 	protected void setValues() {
 		IPreferenceStore store = getPreferenceStore();
-		sdmPathText.setText(store.getString(IPDebugPreferenceConstants.PREF_PTP_SDM_FILE));
+		sdmPathText.setText(store.getString(IPDebugConstants.PREF_PTP_SDM_FILE));
 		//simulatorCombo.select(getSelectedDebugger(store.getString(IPDebugPreferenceConstants.PREF_PTP_DEBUGGER)));
 		//timeoutField.setStringValue(""+store.getInt(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT));
 		//eventTimeField.setStringValue(""+store.getInt(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME));
@@ -154,7 +157,7 @@ public class PDebuggerPage extends AbstractDebugPerferencePage {
 		
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
-		store.setValue(IPDebugPreferenceConstants.PREF_PTP_SDM_FILE, sdmPathText.getText());
+		store.setValue(IPDebugConstants.PREF_PTP_SDM_FILE, sdmPathText.getText());
 		//store.setValue(IPDebugPreferenceConstants.PREF_PTP_DEBUGGER, simulatorCombo.getText());
 		//store.setValue(IPDebugPreferenceConstants.PREF_PTP_DEBUG_COMM_TIMEOUT, timeoutField.getIntValue());
 		//store.setValue(IPDebugPreferenceConstants.PREF_PTP_DEBUG_EVENT_TIME, eventTimeField.getIntValue());
@@ -192,10 +195,10 @@ public class PDebuggerPage extends AbstractDebugPerferencePage {
 	}
 	
 	private void handleSDMButtonSelected() {
-        FileDialog dialog = new FileDialog(getShell(), SWT.NONE);
-        String filePath = dialog.open();
-        if (filePath != null) {
-        	sdmPathText.setText(filePath);
-        }
+		FileDialog dialog = new FileDialog(getShell(), SWT.NONE);
+		String filePath = dialog.open();
+		if (filePath != null) {
+			sdmPathText.setText(filePath);
+		}
 	}
 }
