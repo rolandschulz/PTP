@@ -30,16 +30,12 @@ public class ProxyRuntimeClient extends AbstractProxyRuntimeClient {
         super.sendCommand(cmd);
     }
 
-	public void run(String prog, String[] args, int numProcs, boolean debug) throws IOException {
-		String runArgs = Integer.toString(numProcs) + " " + Boolean.toString(debug) + " \""+ prog + "\"";
-		
-		if (args != null) {
-			runArgs += " ";
-			for (int i = 0; i < args.length; i++) {
-				if (i > 0)
-					runArgs += " ";
-				runArgs += args[i];
-			}
+	public void run(String[] args) throws IOException {
+		String runArgs = "";
+		for (int i = 0; i < args.length; i++) {
+			if (i > 0)
+				runArgs += " ";
+			runArgs += args[i];
 		}
 		sendCommand("RUN", runArgs);
 	}
