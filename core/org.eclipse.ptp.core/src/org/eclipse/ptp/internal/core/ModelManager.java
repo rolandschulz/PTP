@@ -169,7 +169,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 			int port = preferences.getInt(PreferenceConstants.ORTE_SERVER_PORT);
 			System.out.println("port = "+port);
-			if(port <= 0) {
+			if(port < 0) {
 				CoreUtils.showErrorDialog("Invalid ORTE Proxy Server",
 						"Invalid ORTE proxy server port specified.  See the PTP->OMPI preferences pages.", null);
 				return;
@@ -220,7 +220,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				node.setAttrib(AttributeConstants.ATTRIB_NODE_USER, 
 						monitoringSystem.getNodeAttribute(ne2[j],
 						AttributeConstants.ATTRIB_NODE_USER));
-				node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP, 
+				node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP,  
 						monitoringSystem.getNodeAttribute(ne2[j],
 						AttributeConstants.ATTRIB_NODE_GROUP));
 				node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, 
