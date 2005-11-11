@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: %pluginName
+Bundle-Name: Photran Managed Builder Core Plug-in
 Bundle-SymbolicName: org.eclipse.photran.managedbuilder.core
-Bundle-Version: 1.0.0
+Bundle-Version: 3.0.0
 Bundle-Activator: org.eclipse.photran.managedbuilder.core.ManagedBuilderCorePlugin
-Bundle-Vendor: %providerName
+Bundle-Vendor: University of Illinois at Urbana-Champaign and Los Alamos National Laboratory
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.cdt.core,
  org.eclipse.photran.core,
