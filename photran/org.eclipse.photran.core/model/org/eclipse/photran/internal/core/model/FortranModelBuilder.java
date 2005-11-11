@@ -22,6 +22,10 @@ import org.eclipse.photran.internal.core.preferences.FortranShowParseTreePrefere
  * The Fortran model builder calls a <code>FortranModelBuildingVisitor</code> to create the model
  * you see in the (normal) Outline view.
  * 
+ * Editors can force the model builder to use fixed or free format for a given file by calling
+ * <code>forceFormat</code>.  Otherwise, the format is determined by content type (i.e., by the
+ * filename extension and the user's workspace preferences).
+ * 
  * All CDT extension languages are expected to supply a model builder.
  * @see IModelBuilder
  * 
@@ -32,6 +36,13 @@ public final class FortranModelBuilder implements IModelBuilder
     private org.eclipse.cdt.internal.core.model.TranslationUnit translationUnit;
 
     private Map newElements;
+    
+    private static Map/*<String,Boolean>*/ formatAssociations = new HashMap();
+    
+    public static void forceFormat(String filename, boolean isFixedFormat)
+    {
+        formatAssociations.put(filename, Boolean.valueOf(isFixedFormat));
+    }
 
     public FortranModelBuilder(org.eclipse.cdt.internal.core.model.TranslationUnit tu)
     {
@@ -50,7 +61,11 @@ public final class FortranModelBuilder implements IModelBuilder
         {
             FortranProcessor processor = new FortranProcessor();
 
-            ParseTreeNode parseTree = processor.parse(inputStream, filename);
+            ParseTreeNode parseTree;
+            if (formatAssociations.containsKey(filename))
+                parseTree = processor.parse(inputStream, filename, ((Boolean)formatAssociations.get(filename)).booleanValue());
+            else
+                parseTree = processor.parse(inputStream, filename);
 
             FortranElement note = new FortranElement.UnknownNode(translationUnit, processor
                 .lastParseWasFixedForm() ? "<Fixed Form Source>" : "<Free Form Source>");

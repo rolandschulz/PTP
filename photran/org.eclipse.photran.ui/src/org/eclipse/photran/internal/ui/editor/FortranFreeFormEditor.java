@@ -15,7 +15,7 @@ import org.eclipse.jface.text.rules.DefaultPartitioner;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.photran.internal.ui.actions.FortranCommentActions;
-import org.eclipse.photran.internal.ui.preferences.FortranFreeFormSpacePreferencePage;
+import org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -97,20 +97,20 @@ public class FortranFreeFormEditor extends AbstractFortranEditor {
 			if (asv != null) {
 				String property = event.getProperty();
 
-				if (FortranFreeFormSpacePreferencePage.SPACES_FOR_TABS_PREF.equals(property)) {
+				if (FortranEditorPreferencePage.SPACES_FOR_TABS_PREF.equals(property)) {
 					asv.updateIndentationPrefixes();
-					if (FortranFreeFormSpacePreferencePage.isTabConversionEnabled())
+					if (FortranEditorPreferencePage.isTabConversionEnabled())
 						doTabConversion();
 					else
 						endTabConversion();
 					return;
 				}
 
-				if (FortranFreeFormSpacePreferencePage.TAB_WIDTH_PREF.equals(property)) {
+				if (FortranEditorPreferencePage.TAB_WIDTH_PREF.equals(property)) {
 					asv.updateIndentationPrefixes();
 					if (tabConverter != null)
 						tabConverter
-								.setNumberOfSpacesPerTab(FortranFreeFormSpacePreferencePage
+								.setNumberOfSpacesPerTab(FortranEditorPreferencePage
 										.getTabSize());
 					Object value = event.getNewValue();
 					if (value instanceof Integer) {
@@ -147,7 +147,7 @@ public class FortranFreeFormEditor extends AbstractFortranEditor {
 		if (tabConverter == null) {
 			tabConverter = new TabConverter();
 			configureTabConverter();
-			tabConverter.setNumberOfSpacesPerTab(FortranFreeFormSpacePreferencePage
+			tabConverter.setNumberOfSpacesPerTab(FortranEditorPreferencePage
 					.getTabSize());
 			AdaptedSourceViewer asv = (AdaptedSourceViewer) getSourceViewer();
 			asv.addTextConverter(tabConverter);
@@ -175,7 +175,7 @@ public class FortranFreeFormEditor extends AbstractFortranEditor {
 	 */
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
-		if (FortranFreeFormSpacePreferencePage.isTabConversionEnabled())
+		if (FortranEditorPreferencePage.isTabConversionEnabled())
 			doTabConversion();
 
 		Composite childComp = (Composite) ((Composite) parent.getChildren()[0])

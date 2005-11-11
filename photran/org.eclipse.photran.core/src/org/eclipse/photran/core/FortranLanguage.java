@@ -1,6 +1,6 @@
 package org.eclipse.photran.core;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -23,12 +23,7 @@ public class FortranLanguage implements IAdditionalLanguage
 
     public Collection getRegisteredContentTypeIds()
     {
-        ArrayList/* <String> */contentTypes = new ArrayList(1);
-
-        contentTypes.add("org.eclipse.photran.core.fortranSource");
-        // contentTypes.add("org.eclipse.photran.core.fortranHeader");
-
-        return contentTypes;
+        return Arrays.asList(new String[]{FortranCorePlugin.FIXED_FORM_CONTENT_TYPE, FortranCorePlugin.FREE_FORM_CONTENT_TYPE});
     }
 
     public IModelBuilder createModelBuilder(TranslationUnit tu, Map newElements)

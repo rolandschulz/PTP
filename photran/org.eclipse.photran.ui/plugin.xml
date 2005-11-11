@@ -82,26 +82,41 @@
    <extension
          point="org.eclipse.ui.editors"
          id="org.eclipse.photran.ui.FortranEditor">
+         
+      <!-- Since freeFormFortranSource and fixedFormFortranSource are "sub-content types" of fortranSource,
+           we will bind both editors to the fortranSource content type; however, the freeFormFortranSource
+           or fixedFormFortranSource content type binding will be "tigher" and used as the default.
+           That way, fixed form files will open in the fixed form editor by default, but they can also
+           be opened in the free form editor (right click, and choose Open With).  Similarly, free form files
+           can be opened in the fixed form editor. -->
+      
       <editor
             default="true"
-            name="Fortran Editor"
-            extensions="f,for,f77,f90,f95"
+            name="Fortran Editor (Free Format)"
             icon="icons/full/obj16/f_file_obj.gif"
             class="org.eclipse.photran.internal.ui.editor.FortranFreeFormEditor"
             contributorClass="org.eclipse.photran.internal.ui.editor.FortranEditorActionContributor"
             symbolicFontName="org.eclipse.cdt.ui.editors.textfont"
             id="org.eclipse.photran.ui.editor.FortranEditor">
+         <contentTypeBinding
+            contentTypeId="org.eclipse.photran.core.freeFormFortranSource" />
+         <contentTypeBinding
+            contentTypeId="org.eclipse.photran.core.fortranSource" />
       </editor>
       <editor
             default="true"
-            name="Fortran Fixed Form Editor"
-            extensions="ff"
+            name="Fortran Editor (Fixed Format)"
             icon="icons/full/obj16/f_file_obj.gif"
             class="org.eclipse.photran.internal.ui.editor.FortranFixedFormEditor"
             contributorClass="org.eclipse.photran.internal.ui.editor.FortranEditorActionContributor"
             symbolicFontName="org.eclipse.cdt.ui.editors.textfont"
             id="org.eclipse.photran.ui.editor.FortranFixedFormEditor">
+         <contentTypeBinding
+            contentTypeId="org.eclipse.photran.core.fixedFormFortranSource" />
+         <contentTypeBinding
+            contentTypeId="org.eclipse.photran.core.fortranSource" />
       </editor>
+      
    </extension>
    <extension
          point="org.eclipse.ui.editorActions">
@@ -152,24 +167,25 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            name="Fortran Parser"
+            name="Fortran"
+            class="org.eclipse.photran.internal.ui.preferences.MainFortranPreferencePage"
+            id="org.eclipse.photran.internal.ui.preferences.MainFortranPreferencePage">
+      </page>
+      <page
+            name="Parser"
+            category="org.eclipse.photran.internal.ui.preferences.MainFortranPreferencePage"
             class="org.eclipse.photran.internal.ui.preferences.FortranParserPreferencePage"
             id="org.eclipse.photran.ui.preferences.FortranParserPreferencePage">
       </page>
       <page
-            name="Module Paths"
-            category="org.eclipse.photran.ui.preferences.FortranParserPreferencePage"
-            class="org.eclipse.photran.internal.ui.preferences.FortranModulePathsPreferencePage"
-            id="org.eclipse.photran.ui.preferences.FortranModulePathsPreferencePage">
-      </page>
-      <page
-            name="Fortran Editor"
-            class="org.eclipse.photran.internal.ui.preferences.FortranFreeFormSpacePreferencePage"
-            id="org.eclipse.photran.internal.ui.preferences.FortranFreeFormSpacePreferencePage">
+            name="Editor"
+            category="org.eclipse.photran.internal.ui.preferences.MainFortranPreferencePage"
+            class="org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage"
+            id="org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage">
       </page>
       <page
             name="Colors"
-            category="org.eclipse.photran.internal.ui.preferences.FortranFreeFormSpacePreferencePage"
+            category="org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage"
             class="org.eclipse.photran.internal.ui.preferences.ColorPreferencePage"
             id="org.eclipse.photran.internal.ui.preferences.ColorPreferencePage">
       </page>

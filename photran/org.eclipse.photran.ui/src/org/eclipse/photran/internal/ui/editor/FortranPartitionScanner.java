@@ -20,11 +20,11 @@ import org.eclipse.photran.internal.core.f95parser.ILexer;
 import org.eclipse.photran.internal.core.f95parser.Lexer;
 import org.eclipse.photran.internal.core.f95parser.Terminal;
 import org.eclipse.photran.internal.core.f95parser.Token;
+import org.eclipse.photran.internal.core.model.FortranModelBuilder;
 import org.eclipse.photran.internal.ui.preferences.ColorPreferencePage;
 import org.eclipse.photran.ui.FortranUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
 
 /**
  * Defines a lexer-based partition scanner for Fortran files.
@@ -196,9 +196,10 @@ public final class FortranPartitionScanner implements IDocumentPartitioner {
 
 		this.filename = filename;
 		this.isFixedForm = isFixedForm;
+        
+        FortranModelBuilder.forceFormat(filename, isFixedForm);
 
-		FortranUIPlugin.getDefault().getPreferenceStore()
-				.addPropertyChangeListener(colorPreferenceListener);
+		FortranUIPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(colorPreferenceListener);
 	}
 
 	/**

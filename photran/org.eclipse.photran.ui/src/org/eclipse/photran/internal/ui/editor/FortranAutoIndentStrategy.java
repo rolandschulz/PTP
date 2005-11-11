@@ -18,7 +18,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.photran.internal.core.f95parser.Terminal;
-import org.eclipse.photran.internal.ui.preferences.FortranFreeFormSpacePreferencePage;
+import org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage;
 
 import org.eclipse.cdt.ui.CUIPlugin;
 
@@ -119,7 +119,7 @@ public class FortranAutoIndentStrategy extends
 						- doc.getLineOffset(line);
 
 				if (isFreeForm)
-					numberOfSpacesOnLeft -= FortranFreeFormSpacePreferencePage
+					numberOfSpacesOnLeft -= FortranEditorPreferencePage
 							.getTabSize();
 				else
 					numberOfSpacesOnLeft -= FortranFixedFormEditor.COLUMM_6_WIDTH;

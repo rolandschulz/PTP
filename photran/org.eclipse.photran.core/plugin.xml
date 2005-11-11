@@ -136,7 +136,7 @@
 <!-- =================================================================================== -->
 <!-- Some well known Fortran file extensions override for the team plugins               -->
 <!-- =================================================================================== -->
-   <extension
+   <!--extension
          point="org.eclipse.team.core.fileTypes">
       <fileTypes
             type="text"
@@ -158,34 +158,30 @@
             type="text"
             extension="fh">
       </fileTypes>
-   </extension>
+   </extension-->
 
 <!-- =================================================================================== -->
-<!-- Define Fortran files ContentTypes                                                   -->
+<!-- Define Fortran file ContentTypes                                                   -->
 <!-- =================================================================================== -->
   <extension point="org.eclipse.core.runtime.contentTypes">
-	  <!-- declares a content type for Fortran source files -->
-	  <content-type id="fortranSource" name="%fortranSourceName" 
+  
+      <!-- A "base" content type, so that we can refer to both free and fixed form at once -->
+	  <content-type id="fortranSource" name="Fortran Source File"
 		  base-type="org.eclipse.core.runtime.text"
 		  priority="high"/>
-	  <!-- declares a content type for Fortran header files -->
-      <!--content-type id="fortranHeader" name="%fortranHeaderName" 
-          base-type="org.eclipse.photran.core.fortranSource"
-          priority="high"/-->
+  
+      <!-- Individual content types for free and fixed format -->
+	  <content-type id="freeFormFortranSource" name="Fortran Source File - Free Format"
+		  base-type="org.eclipse.photran.core.fortranSource"
+		  file-extensions="f77,f90,f95"
+		  priority="high"/>
+
+	  <content-type id="fixedFormFortranSource" name="Fortran Source File - Fixed Format"
+		  base-type="org.eclipse.photran.core.fortranSource"
+		  file-extensions="f,for,ftn,fix,fpp,F,FOR,FTN,FIX,FPP"
+		  priority="high"/>
   </extension>
 
-   <extension point="org.eclipse.core.runtime.contentTypes"> 
-      <file-association 
-       content-type="org.eclipse.photran.core.fortranSource"
-       file-extensions="f,f77,f90,f95"/>
-   </extension> 
-
-   <!--extension point="org.eclipse.core.runtime.contentTypes"> 
-      <file-association 
-       content-type="org.eclipse.photran.core.fortranHeader"
-       file-extensions="fh"/>
-   </extension--> 
-   
    <!-- JO -->
    <extension point="org.eclipse.cdt.core.AdditionalLanguages">
       <language

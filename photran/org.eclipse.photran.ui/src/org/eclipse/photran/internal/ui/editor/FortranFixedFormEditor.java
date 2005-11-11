@@ -16,7 +16,7 @@ import org.eclipse.jface.text.MarginPainter;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.photran.internal.ui.actions.FortranCommentActions;
-import org.eclipse.photran.internal.ui.preferences.FortranFreeFormSpacePreferencePage;
+import org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
@@ -68,8 +68,7 @@ public class FortranFixedFormEditor extends AbstractFortranEditor {
 		IDocument document = this.getDocumentProvider().getDocument(input);
 		
 		if (document != null) {
-			IDocumentPartitioner partitioner = new FortranPartitionScanner(
-					input.getName(), true);
+			IDocumentPartitioner partitioner = new FortranPartitionScanner(input.getName(), true);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
 			configureTabConverter(); // prepare a new TabConverter for the document
@@ -92,20 +91,20 @@ public class FortranFixedFormEditor extends AbstractFortranEditor {
 			if (asv != null) {
 				String property = event.getProperty();
 
-				if (FortranFreeFormSpacePreferencePage.SPACES_FOR_TABS_PREF.equals(property)) {
+				if (FortranEditorPreferencePage.SPACES_FOR_TABS_PREF.equals(property)) {
 					asv.updateIndentationPrefixes();
-					if (FortranFreeFormSpacePreferencePage.isTabConversionEnabled())
+					if (FortranEditorPreferencePage.isTabConversionEnabled())
 						doTabConversion();
 					else
 						endTabConversion();
 					return;
 				}
 
-				if (FortranFreeFormSpacePreferencePage.TAB_WIDTH_PREF.equals(property)) {
+				if (FortranEditorPreferencePage.TAB_WIDTH_PREF.equals(property)) {
 					asv.updateIndentationPrefixes();
 					if (tabConverter != null)
 						tabConverter
-								.setNumberOfSpacesPerTab(FortranFreeFormSpacePreferencePage
+								.setNumberOfSpacesPerTab(FortranEditorPreferencePage
 										.getTabSize());
 					Object value = event.getNewValue();
 					if (value instanceof Integer) {

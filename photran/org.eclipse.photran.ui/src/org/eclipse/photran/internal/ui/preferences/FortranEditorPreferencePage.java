@@ -15,7 +15,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  * @author Nicholas Chen
  * @author Cheah Chin Fei
  */
-public class FortranFreeFormSpacePreferencePage extends FieldEditorPreferencePage implements
+public class FortranEditorPreferencePage extends FieldEditorPreferencePage implements
     IWorkbenchPreferencePage
 {
 
@@ -28,11 +28,11 @@ public class FortranFreeFormSpacePreferencePage extends FieldEditorPreferencePag
     /*
      * Creates the preference page
      */
-    public FortranFreeFormSpacePreferencePage()
+    public FortranEditorPreferencePage()
     {
         super(FieldEditorPreferencePage.GRID);
         setPreferenceStore(FortranUIPlugin.getDefault().getPreferenceStore());
-        setDescription("Select your preferences");
+        setDescription("");
     }
 
     /**

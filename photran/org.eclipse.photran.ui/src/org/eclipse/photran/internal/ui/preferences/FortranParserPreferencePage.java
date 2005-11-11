@@ -1,21 +1,15 @@
 package org.eclipse.photran.internal.ui.preferences;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.jface.dialogs.IInputValidator;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.ListEditor;
+import org.eclipse.jface.preference.PathEditor;
 import org.eclipse.photran.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.preferences.FortranEnableParserDebuggingPreference;
-import org.eclipse.photran.internal.core.preferences.FortranFixedFormExtensionListPreference;
+import org.eclipse.photran.internal.core.preferences.FortranModulePathsPreference;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.internal.core.preferences.FortranShowParseTreePreference;
 import org.eclipse.photran.ui.FortranUIPlugin;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -37,7 +31,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class FortranParserPreferencePage extends FieldEditorPreferencePage implements
     IWorkbenchPreferencePage
 {
-    protected FortranFixedFormExtensionListPreference extensionListPreference = FortranPreferences.FIXED_FORM_EXTENSION_LIST;
+    protected FortranModulePathsPreference modulePathsPreference = FortranPreferences.MODULE_PATHS;
 
     protected FortranEnableParserDebuggingPreference enableParserDebuggingPreference = FortranPreferences.ENABLE_PARSER_DEBUGGING;
 
@@ -51,7 +45,10 @@ public class FortranParserPreferencePage extends FieldEditorPreferencePage imple
     {
         super(GRID); // Grid layout
         setPreferenceStore(FortranUIPlugin.getDefault().getPreferenceStore());
-        // setDescription("Fortran parser preferences");
+        setDescription("When a USE or INCLUDE statement is encountered in a "
+            + "Fortran program, or when an #include directive is found, "
+            + "the following directories will be searched, in the order listed, "
+            + "for the indicated file or module.");
         initializeDefaults();
     }
 
@@ -60,7 +57,7 @@ public class FortranParserPreferencePage extends FieldEditorPreferencePage imple
      */
     private void initializeDefaults()
     {
-        extensionListPreference.setDefault(uiPreferences);
+        modulePathsPreference.setDefault(uiPreferences);
         enableParserDebuggingPreference.setDefault(uiPreferences);
         showParseTreePreference.setDefault(uiPreferences);
     }
@@ -72,8 +69,8 @@ public class FortranParserPreferencePage extends FieldEditorPreferencePage imple
      */
     public void createFieldEditors()
     {
-        addField(new ExtensionListEditor(extensionListPreference.getName(),
-            "What file &extensions should correspond to fixed source form?", getFieldEditorParent()));
+        addField(new PathEditor(modulePathsPreference.getName(), "&Module Paths",
+            "Select a directory to be searched for Fortran modules", getFieldEditorParent()));
 
         addField(new BooleanFieldEditor(enableParserDebuggingPreference.getName(),
             "(Debugging) Enable parser &debugging output", getFieldEditorParent()));
@@ -90,8 +87,8 @@ public class FortranParserPreferencePage extends FieldEditorPreferencePage imple
     {
         if (!super.performOk()) return false;
 
-        String currentString = extensionListPreference.getValue(uiPreferences);
-        extensionListPreference.setValue(corePreferences, currentString);
+        String currentValue = modulePathsPreference.getValue(uiPreferences);
+        modulePathsPreference.setValue(corePreferences, currentValue);
 
         boolean currentBool = enableParserDebuggingPreference.getValue(uiPreferences);
         enableParserDebuggingPreference.setValue(corePreferences, currentBool);
@@ -100,59 +97,5 @@ public class FortranParserPreferencePage extends FieldEditorPreferencePage imple
         showParseTreePreference.setValue(corePreferences, currentBool);
 
         return true;
-    }
-
-    // ----- NESTED CLASS ------------------------------------------------
-
-    private static final class ExtensionListEditor extends ListEditor
-    {
-        private ExtensionListEditor(String name, String labelText, Composite parent)
-        {
-            super(name, labelText, parent);
-        }
-
-        // Combines the given list of items into a single string. This
-        // method is the converse of parseString.
-        protected String createList(String[] items)
-        {
-            return FortranFixedFormExtensionListPreference
-                .combineExtensionListIntoSingleString(items);
-        }
-
-        // Creates and returns a new item for the list.
-        protected String getNewInputObject()
-        {
-            final Pattern extensionPattern = Pattern.compile("\\.?([A-Za-z0-9_\\-]+)");
-
-            InputDialog dialog = new InputDialog(getShell(), "File Extension",
-                "Enter a file extension that should correspond to fixed source form:", "",
-                new IInputValidator()
-                {
-                    public String isValid(String newText)
-                    {
-                        if (extensionPattern.matcher(newText).matches())
-                            return null;
-                        else if (newText.equals("") || newText.equals("."))
-                            return "The extension must contain at least one character";
-                        else
-                            return "The extension should only contain letters, numbers, underscores, and hyphens; it should contain at least one character.";
-                    }
-                });
-            dialog.setBlockOnOpen(true);
-            if (dialog.open() != InputDialog.OK) return null;
-
-            Matcher extensionMatcher = extensionPattern.matcher(dialog.getValue());
-            if (!extensionMatcher.find()) return null;
-            String extension = extensionMatcher.group(1);
-            if (!extension.startsWith(".")) extension = "." + extension;
-            return extension;
-        }
-
-        // Splits the given string into a list of strings. This method
-        // is the converse of createList.
-        protected String[] parseString(String stringList)
-        {
-            return FortranFixedFormExtensionListPreference.parseExtensionList(stringList);
-        }
     }
 }

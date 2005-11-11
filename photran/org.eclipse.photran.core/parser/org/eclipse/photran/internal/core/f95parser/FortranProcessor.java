@@ -5,10 +5,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.photran.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.f95parser.symboltable.SymbolTable;
 import org.eclipse.photran.internal.core.preferences.FortranEnableParserDebuggingPreference;
-import org.eclipse.photran.internal.core.preferences.FortranFixedFormExtensionListPreference;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
 /**
@@ -41,23 +41,35 @@ public class FortranProcessor
      * Parses the given input stream as a Fortran 95 source file. The filename parameter should
      * indicate the filename of the file being parsed; it is saved in each <code>Token</code>
      * produced and used in error messages, although no one actually checks to see if it's a legal
-     * filename or not.
+     * filename or not.  Fixed/free format is determined automatically based on the filename.
      * @param inputStream
      * @param filename
      * @return <code>ParseResult</code>
      */
     public ParseTreeNode parse(InputStream inputStream, String filename) throws Exception
     {
-        boolean wasFixedForm = hasFixedFormFileExtension(filename);
+        return parse(inputStream, filename, hasFixedFormFileExtension(filename));
+    }
 
-        ILexer lexer = Lexer.createLexer(inputStream, filename, wasFixedForm);
+    /**
+     * Parses the given input stream as a Fortran 95 source file. The filename parameter should
+     * indicate the filename of the file being parsed; it is saved in each <code>Token</code>
+     * produced and used in error messages, although no one actually checks to see if it's a legal
+     * filename or not.
+     * @param inputStream
+     * @param filename
+     * @param isFixedForm
+     * @return <code>ParseResult</code>
+     */
+    public ParseTreeNode parse(InputStream inputStream, String filename, boolean isFixedForm) throws Exception
+    {
+        ILexer lexer = Lexer.createLexer(inputStream, filename, isFixedForm);
         Parser parser = new Parser();
 
         try
         {
             ParseTreeNode result = parser.parse(lexer);
-            lastParseWasFixedForm = wasFixedForm; // In case we processed other files while
-            // parsing
+            lastParseWasFixedForm = isFixedForm; // In case we processed other files while parsing
             return result;
         }
         catch (Exception e)
@@ -146,20 +158,17 @@ public class FortranProcessor
      */
     public static boolean hasFixedFormFileExtension(String filename)
     {
-        String[] fixedFormExtensions;
-
         if (overrideFixedFormExtensions != null) // Used by JUnit tests
-            fixedFormExtensions = overrideFixedFormExtensions;
+        {
+            for (int i = 0; i < overrideFixedFormExtensions.length; i++)
+                if (filename.endsWith(overrideFixedFormExtensions[i]))
+                    return true;
+            return false;
+        }
         else
         {
-            FortranFixedFormExtensionListPreference pref = FortranPreferences.FIXED_FORM_EXTENSION_LIST;
-            fixedFormExtensions = pref.parseCurrentValue();
+            return Platform.getContentTypeManager().findContentTypeFor(filename).getId().equals(FortranCorePlugin.FIXED_FORM_CONTENT_TYPE);
         }
-
-        for (int i = 0; i < fixedFormExtensions.length; i++)
-            if (filename.endsWith(fixedFormExtensions[i])) return true;
-
-        return false;
     }
 
     /**

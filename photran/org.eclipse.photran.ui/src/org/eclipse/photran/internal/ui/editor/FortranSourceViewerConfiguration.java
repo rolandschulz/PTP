@@ -14,7 +14,7 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.photran.internal.ui.editor.FortranPartitionScanner.Partition;
-import org.eclipse.photran.internal.ui.preferences.FortranFreeFormSpacePreferencePage;
+import org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage;
 import org.eclipse.photran.ui.FortranUIPlugin;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -58,9 +58,9 @@ public class FortranSourceViewerConfiguration extends SourceViewerConfiguration 
 		List list = new ArrayList();
 		// prefix[0] is either '\t' or ' ' x tabWidth, depending on useSpaces
 		int tabWidth = getPreferenceStore().getInt(
-				FortranFreeFormSpacePreferencePage.TAB_WIDTH_PREF);
+				FortranEditorPreferencePage.TAB_WIDTH_PREF);
 		boolean useSpaces = getPreferenceStore().getBoolean(
-				FortranFreeFormSpacePreferencePage.SPACES_FOR_TABS_PREF);
+				FortranEditorPreferencePage.SPACES_FOR_TABS_PREF);
 		for (int i = 0; i <= tabWidth; i++) {
 			StringBuffer prefix = new StringBuffer();
 			if (useSpaces) {
@@ -85,7 +85,7 @@ public class FortranSourceViewerConfiguration extends SourceViewerConfiguration 
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getTabWidth(org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	public int getTabWidth(ISourceViewer sourceViewer) {
-		return getPreferenceStore().getInt(FortranFreeFormSpacePreferencePage.TAB_WIDTH_PREF);
+		return getPreferenceStore().getInt(FortranEditorPreferencePage.TAB_WIDTH_PREF);
 	}
 
 	/**

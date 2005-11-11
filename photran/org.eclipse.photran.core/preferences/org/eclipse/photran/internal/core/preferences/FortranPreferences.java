@@ -29,8 +29,6 @@ public final class FortranPreferences
         }
     }
 
-    public static final FortranFixedFormExtensionListPreference FIXED_FORM_EXTENSION_LIST = new FortranFixedFormExtensionListPreference();
-
     public static final FortranModulePathsPreference MODULE_PATHS = new FortranModulePathsPreference();
 
     public static final FortranEnableParserDebuggingPreference ENABLE_PARSER_DEBUGGING = new FortranEnableParserDebuggingPreference();
