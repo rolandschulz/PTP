@@ -20,6 +20,6 @@
 package org.eclipse.ptp.rtsystem;
 
 public interface IRuntimeProxy {
-	public void startup();
+	public boolean startup();
 	public void shutdown();
 }
