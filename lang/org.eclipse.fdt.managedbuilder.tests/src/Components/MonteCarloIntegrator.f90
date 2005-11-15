@@ -16,7 +16,7 @@ function integrate_mc(lowBound, upBound, count)
 
   ! LOCAL VARIABLES:
 
-  integer :: i, j, multiplier(3) = (/1,4,1/)
+  integer :: i
   real(kind(1.0D0)) :: width, x, sum = 0.0D0
 
   integrate_mc = 0.0D0
