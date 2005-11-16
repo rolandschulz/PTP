@@ -251,6 +251,7 @@ final class DeclarationCollector extends ParseTreeVisitor
         Token name = ParseTreeSearcher.findFirstIdentifierIn(node);
         VariableEntry varEntry = new VariableEntry(getCurrentSymTbl(), name, node);
         varEntry.setFunctionOrSubroutineParameter(true);
+        varEntry.setImplicitDeclared(true); // until we find an actual definition
         addEntry(varEntry);
     }
 
@@ -290,6 +291,7 @@ final class DeclarationCollector extends ParseTreeVisitor
         {
 	        VariableEntry varEntry = new VariableEntry(getCurrentSymTbl(), name, node);
 	        varEntry.setFunctionOrSubroutineParameter(true);
+            varEntry.setImplicitDeclared(true); // until we find an actual definition
 	        addEntry(varEntry);
         }
     }
@@ -334,6 +336,7 @@ final class DeclarationCollector extends ParseTreeVisitor
 	                
 	                SymbolTableEntry symTblEntry;
 	                VariableEntry varEntry;
+                    
 	                if ((symTblEntry=getCurrentSymTbl().getImmediateEntryFor(name.getText())) != null
 	                    && symTblEntry instanceof VariableEntry)
 	                    varEntry = (VariableEntry)symTblEntry;
@@ -341,6 +344,7 @@ final class DeclarationCollector extends ParseTreeVisitor
 	                    varEntry = new VariableEntry(getCurrentSymTbl(), name, node);
 	                
 	                varEntry.setType(SymbolTableType.createFromTypeSpecNode(typeSpec));
+                    varEntry.setImplicitDeclared(false);
 	                addEntry(varEntry);
 	            }
             });
