@@ -57,7 +57,13 @@ public class VariableEntry extends SymbolTableEntry
     private SymbolTableType type = null;
     public SymbolTableType getType()
     {
-        return type;
+        if (isImplicitlyDeclared()) // implicitly declared
+        {
+            char firstCharOfName = identifier.getText().charAt(0);
+            return getTableContainingEntry().getImplicitSpec().getType(firstCharOfName);
+        }
+        else
+            return type;
     }
     public void setType(SymbolTableType type)
     {
