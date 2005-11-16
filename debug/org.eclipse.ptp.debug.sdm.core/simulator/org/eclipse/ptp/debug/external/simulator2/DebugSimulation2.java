@@ -45,7 +45,7 @@ import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.variable.Argument;
 import org.eclipse.ptp.debug.external.cdi.model.variable.LocalVariable;
-import org.eclipse.ptp.debug.external.target.ITargetEvent;
+import org.eclipse.ptp.debug.external.commands.IDebugCommand;
 
 /**
  * @author Clement chu
@@ -63,12 +63,16 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	private InternalEventQueue intQueue = null;
 	private Map variables = new HashMap();
 	private Map arguments = new HashMap();
+	private ICDIStackFrame current_frame = null;
 
 	public DebugSimulation2() {
 		intQueue = new InternalEventQueue(TIME_RANGE);
 		intQueue.addObserver(this);
 		createArguments();
 		createVariables();
+	}
+	public void connection() {
+		completeCommand(IDebugCommand.OK);
 	}
 	public int startDebuggerListener() {
 		return 0;
@@ -94,27 +98,37 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		return (SimVariable[])variables.values().toArray(new SimVariable[0]);
 	}
 	
-	public void startDebugger(IPJob job) {
-		total_process = job.size();
-		for (int i = 0; i < total_process; i++) {
-			SimulateProgram sim_program = new SimulateProgram(i, APP_NAME);
-			sim_program.addObserver(DebugSimulation2.this);
-			sim_list.add(sim_program);
-			sim_program.startProgram();
-		}
-		if (!EVENT_BY_EACH_PROC)
-			intQueue.startTimer();
+	public void startDebugger(final IPJob job) {
+		new Thread(new Runnable() {
+			public void run() {
+				total_process = job.size();
+				for (int i = 0; i < total_process; i++) {
+					SimulateProgram sim_program = new SimulateProgram(i, APP_NAME);
+					sim_program.addObserver(DebugSimulation2.this);
+					sim_list.add(sim_program);
+					sim_program.startProgram();
+				}
+				if (!EVENT_BY_EACH_PROC)
+					intQueue.startTimer();
+				
+				completeCommand(IDebugCommand.OK);
+			}
+		}).start();
 	}
 	public void stopDebugger() {
-		if (!EVENT_BY_EACH_PROC)
-			intQueue.stopTimer();
-
-		for (Iterator i = sim_list.iterator(); i.hasNext();) {
-			SimulateProgram sim_program = (SimulateProgram) i.next();
-			sim_program.deleteObservers();
-		}
-		intQueue.deleteObservers();
-		sim_list.clear();
+		new Thread(new Runnable() {
+			public void run() {
+				if (!EVENT_BY_EACH_PROC)
+					intQueue.stopTimer();
+		
+				for (Iterator i = sim_list.iterator(); i.hasNext();) {
+					SimulateProgram sim_program = (SimulateProgram) i.next();
+					sim_program.deleteObservers();
+				}
+				intQueue.deleteObservers();
+				sim_list.clear();
+			}
+		}).start();
 	}
 	/***************************************************************************************************************************************************************************************************
 	 * not implement yet
@@ -135,167 +149,204 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	 * not implement yet
 	 **************************************************************************************************************************************************************************************************/
 	
-	public void getAIFValue(BitList tasks, String expr) throws PCDIException {
-		IAIF aif = null;
-		SimVariable variable = findVariable(expr);
-		if (variable == null)
-			variable = findArgument(expr);
-		if (variable == null)
-			aif = new AIF("unknown", new byte[0]);
-
-		if (aif == null) {
-			String value = "" + random(10,20);
-			aif = new AIF("is4", value.getBytes());
-		}
-		
-		setTargetResult(tasks, aif, ITargetEvent.AIFVALUE_TYPE);		
-	}
-
-	public void go(BitList tasks) throws PCDIException {
-		final int[] taskArray = tasks.toArray();
+	public void getAIFValue(final BitList tasks, final String expr) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
+				IAIF aif = null;
+				SimVariable variable = findVariable(expr);
+				if (variable == null)
+					variable = findArgument(expr);
+				if (variable == null)
+					aif = new AIF("unknown", new byte[0]);
+		
+				if (aif == null) {
+					String value = "" + random(10,20);
+					aif = new AIF("is4", value.getBytes());
+				}
+				completeCommand(aif);
+			}
+		}).start();
+	}
+	public void go(final BitList tasks) throws PCDIException {
+		new Thread(new Runnable() {
+			public void run() {
+				int[] taskArray = tasks.toArray();
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).go();
 				}
 			}
 		}).start();
 	}
-	public void kill(BitList tasks) throws PCDIException {
-		final int[] taskArray = tasks.toArray();
+	public void kill(final BitList tasks) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
+				int[] taskArray = tasks.toArray();
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).stopProgram();
 				}
 			}
 		}).start();
 	}
-	public void halt(BitList tasks) throws PCDIException {
-		final int[] taskArray = tasks.toArray();
+	public void halt(final BitList tasks) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
+				int[] taskArray = tasks.toArray();
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).suspend();
 				}
 			}
 		}).start();
 	}
-	public void stepInto(BitList tasks, int count) throws PCDIException {
-		final int[] taskArray = tasks.toArray();
+	public void stepInto(final BitList tasks, final int count) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
+				int[] taskArray = tasks.toArray();
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).stepLine();
 				}
 			}
 		}).start();
 	}
-	public void stepOver(BitList tasks, int count) throws PCDIException {
-		final int[] taskArray = tasks.toArray();
+	public void stepOver(final BitList tasks, final int count) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
+				int[] taskArray = tasks.toArray();
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).stepOverLine();
 				}
 			}
 		}).start();
 	}
-	public void stepFinish(BitList tasks, int count) throws PCDIException {
-		final int[] taskArray = tasks.toArray();
+	public void stepFinish(final BitList tasks, final int count) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
+				int[] taskArray = tasks.toArray();
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).stepFinish();
 				}
 			}
 		}).start();
 	}	
-	public void setLineBreakpoint(BitList tasks, ICDILineBreakpoint bpt) throws PCDIException {
-		final int line = bpt.getLocator().getLineNumber();
-		final int[] taskArray = tasks.toArray();
+	public void setLineBreakpoint(final BitList tasks, final ICDILineBreakpoint bpt) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
+				int line = bpt.getLocator().getLineNumber();
+				int[] taskArray = tasks.toArray();
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).setBpt(line);
 				}
+				completeCommand(IDebugCommand.OK);
 			}
 		}).start();
 	}
 	//current support main function breakpoint only
-	public void setFunctionBreakpoint(BitList tasks, ICDIFunctionBreakpoint bpt) throws PCDIException {
-		final int[] taskArray = tasks.toArray();
-		for (int i=0; i<taskArray.length; i++) {
-			SimulateProgram sim_prog = getSimProg(taskArray[i]);
-			sim_prog.setStopInMain();
-		}
+	public void setFunctionBreakpoint(final BitList tasks, final ICDIFunctionBreakpoint bpt) throws PCDIException {
+		new Thread(new Runnable() {
+			public void run() {
+				int[] taskArray = tasks.toArray();
+				for (int i=0; i<taskArray.length; i++) {
+					SimulateProgram sim_prog = getSimProg(taskArray[i]);
+					sim_prog.setStopInMain();
+				}
+				completeCommand(IDebugCommand.OK);
+			}
+		}).start();
 	}
-	public void listStackFrames(BitList tasks) throws PCDIException {
-		int[] taskArray = tasks.toArray();
-		List frameList = new ArrayList();
-		for (int i=0; i<taskArray.length; i++) {
-			ICDITarget target = getSession().getTarget(taskArray[i]);
-		    ICDIThread thread = new org.eclipse.ptp.debug.external.cdi.model.Thread((Target) target, 0);
-		    SimulateFrame[] frames = getSimProg(taskArray[i]).getSimStackFrames();
-		    for (int j=0; j<frames.length; j++) {
-		    	frameList.add(new StackFrame((org.eclipse.ptp.debug.external.cdi.model.Thread) thread, frames[j].getLevel(), frames[j].getFile(), frames[j].getFunc(), frames[j].getLine(), frames[j].getAddr()));
-		    }
-		}
-
-		setTargetResult(tasks, (ICDIStackFrame[]) frameList.toArray(new ICDIStackFrame[0]), ITargetEvent.STACKFRAME_TYPE);
+	public void listStackFrames(final BitList tasks) throws PCDIException {
+		new Thread(new Runnable() {
+			public void run() {
+				int[] taskArray = tasks.toArray();
+				List frameList = new ArrayList();
+				for (int i=0; i<taskArray.length; i++) {
+					ICDITarget target = getSession().getTarget(taskArray[i]);
+				    ICDIThread thread = new org.eclipse.ptp.debug.external.cdi.model.Thread((Target) target, 0);
+				    SimulateFrame[] frames = getSimProg(taskArray[i]).getSimStackFrames();
+				    for (int j=0; j<frames.length; j++) {
+				    	frameList.add(new StackFrame((org.eclipse.ptp.debug.external.cdi.model.Thread) thread, frames[j].getLevel(), frames[j].getFile(), frames[j].getFunc(), frames[j].getLine(), frames[j].getAddr()));
+				    }
+				}
+				completeCommand((ICDIStackFrame[]) frameList.toArray(new ICDIStackFrame[0]));
+			}
+		}).start();
 	}
 	
-	public void setCurrentStackFrame(BitList tasks, ICDIStackFrame frame) throws PCDIException {
-		//int[] taskArray = tasks.toArray();
-		//for (int i=0; i<taskArray.length; i++) {
-		//}
-		//throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "setCurrentStackFrame");
+	public void setCurrentStackFrame(final BitList tasks, final ICDIStackFrame frame) throws PCDIException {
+		new Thread(new Runnable() {
+			public void run() {
+				current_frame = frame;
+				completeCommand(IDebugCommand.OK);
+			}
+		}).start();
 	}
-	public void evaluateExpression(BitList tasks, String expression) throws PCDIException {
-		SimVariable variable = findVariable(expression);
-		if (variable == null)
-			variable = findArgument(expression);
-		if (variable == null)
-			throw new PCDIException("No expression value found");
-		
-		setTargetResult(tasks, variable.getValue(), ITargetEvent.EXPRESSVALUE_TYPE);
+	public void evaluateExpression(final BitList tasks, final String expression) throws PCDIException {
+		new Thread(new Runnable() {
+			public void run() {
+				SimVariable variable = findVariable(expression);
+				if (variable == null)
+					variable = findArgument(expression);
+				if (variable == null) {
+					completeCommand(null);
+					//throw new PCDIException("No expression value found");				
+				}
+				else {
+					completeCommand(variable.getValue());
+				}
+			}
+		}).start();
 	}
-	public void getVariableType(BitList tasks, String varName) throws PCDIException {
-		SimVariable variable = findVariable(varName);
-		if (variable == null)
-			variable = findArgument(varName);
-		if (variable == null)
-			throw new PCDIException("No variable type found");
-		
-		setTargetResult(tasks, variable.getValue(), ITargetEvent.VARIABLETYPE_TYPE);
+	public void getVariableType(final BitList tasks, final String varName) throws PCDIException {
+		new Thread(new Runnable() {
+			public void run() {
+				SimVariable variable = findVariable(varName);
+				if (variable == null)
+					variable = findArgument(varName);
+				if (variable == null) {
+					completeCommand(null);
+					//throw new PCDIException("No variable type found");
+				}
+				else {
+					completeCommand(variable.getType());
+				}
+			}
+		}).start();
 	}
-	public void listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException {
-		int[] taskArray = tasks.toArray();
-		List argList = new ArrayList();
-		for (int i=0; i<taskArray.length; i++) {
-			ICDITarget target = getSession().getTarget(taskArray[i]);
-		    ICDIThread thread = new org.eclipse.ptp.debug.external.cdi.model.Thread((Target) target, 0);
-		    SimVariable[] args = getArguments();
-		    for (int j=0; j<args.length; j++) {
-				argList.add(new Argument((Target) target, (org.eclipse.ptp.debug.external.cdi.model.Thread) thread, (StackFrame)frame, args[j].getVariable(), args[j].getVariable(), args.length - j, frame.getLevel(), null));
-		    }
-		}
+	public void listArguments(final BitList tasks, final ICDIStackFrame frame) throws PCDIException {
+		new Thread(new Runnable() {
+			public void run() {
+				current_frame = frame;
 
-		setTargetResult(tasks, (ICDIArgument[]) argList.toArray(new ICDIArgument[0]), ITargetEvent.ARGUMENTS_TYPE);
+				int[] taskArray = tasks.toArray();
+				List argList = new ArrayList();
+				for (int i=0; i<taskArray.length; i++) {
+					ICDITarget target = getSession().getTarget(taskArray[i]);
+				    ICDIThread thread = new org.eclipse.ptp.debug.external.cdi.model.Thread((Target) target, 0);
+				    SimVariable[] args = getArguments();
+				    for (int j=0; j<args.length; j++) {
+						argList.add(new Argument((Target) target, (org.eclipse.ptp.debug.external.cdi.model.Thread) thread, (StackFrame)current_frame, args[j].getVariable(), args[j].getVariable(), args.length - j, frame.getLevel(), null));
+				    }
+				}
+				completeCommand((ICDIArgument[]) argList.toArray(new ICDIArgument[0]));
+			}
+		}).start();
 	}
-	public void listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException {
-		int[] taskArray = tasks.toArray();
-		List varList = new ArrayList();
-		for (int i=0; i<taskArray.length; i++) {
-			ICDITarget target = getSession().getTarget(taskArray[i]);
-		    ICDIThread thread = new org.eclipse.ptp.debug.external.cdi.model.Thread((Target) target, 0);
-		    SimVariable[] vars = getVariables();
-		    for (int j=0; j<vars.length; j++) {
-		    	varList.add(new LocalVariable((Target) target, (org.eclipse.ptp.debug.external.cdi.model.Thread) thread, (StackFrame)frame, vars[j].getVariable(), vars[j].getVariable(), vars.length - j, frame.getLevel(), null));
-		    }
-		}
+	public void listLocalVariables(final BitList tasks, final ICDIStackFrame frame) throws PCDIException {
+		new Thread(new Runnable() {
+			public void run() {
+				current_frame = frame;
 		
-		setTargetResult(tasks, (ICDILocalVariable[]) varList.toArray(new ICDILocalVariable[0]), ITargetEvent.LOCALVARIABLES_TYPE);		
+				int[] taskArray = tasks.toArray();
+				List varList = new ArrayList();
+				for (int i=0; i<taskArray.length; i++) {
+					ICDITarget target = getSession().getTarget(taskArray[i]);
+				    ICDIThread thread = new org.eclipse.ptp.debug.external.cdi.model.Thread((Target) target, 0);
+				    SimVariable[] vars = getVariables();
+				    for (int j=0; j<vars.length; j++) {
+				    	varList.add(new LocalVariable((Target) target, (org.eclipse.ptp.debug.external.cdi.model.Thread) thread, (StackFrame)current_frame, vars[j].getVariable(), vars[j].getVariable(), vars.length - j, frame.getLevel(), null));
+				    }
+				}
+				completeCommand((ICDILocalVariable[])varList.toArray(new ICDILocalVariable[0]));
+			}
+		}).start();
 	}
 	public void listGlobalVariables(BitList tasks) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listGlobalVariables");
