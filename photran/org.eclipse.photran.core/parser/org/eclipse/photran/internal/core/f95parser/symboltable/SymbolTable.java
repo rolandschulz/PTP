@@ -383,32 +383,32 @@ public class SymbolTable
      */
     public final static class ImplicitSpec
     {
-        private SymbolTableType[] typeMap = { SymbolTableType.REAL, // A
-                                             SymbolTableType.REAL, // B
-                                             SymbolTableType.REAL, // C
-                                             SymbolTableType.REAL, // D
-                                             SymbolTableType.REAL, // E
-                                             SymbolTableType.REAL, // F
-                                             SymbolTableType.REAL, // G
-                                             SymbolTableType.REAL, // H
-                                             SymbolTableType.REAL, // I
-                                             SymbolTableType.REAL, // J
-                                             SymbolTableType.REAL, // K
-                                             SymbolTableType.REAL, // L
-                                             SymbolTableType.REAL, // M
-                                             SymbolTableType.REAL, // N
-                                             SymbolTableType.REAL, // O
-                                             SymbolTableType.REAL, // P
-                                             SymbolTableType.REAL, // Q
-                                             SymbolTableType.REAL, // R
-                                             SymbolTableType.REAL, // S
-                                             SymbolTableType.REAL, // T
-                                             SymbolTableType.REAL, // U
-                                             SymbolTableType.REAL, // V
-                                             SymbolTableType.REAL, // W
-                                             SymbolTableType.REAL, // X
-                                             SymbolTableType.REAL, // Y
-                                             SymbolTableType.REAL // Z
+        private SymbolTableType[] typeMap = {SymbolTableType.REAL,    // A
+                                             SymbolTableType.REAL,    // B
+                                             SymbolTableType.REAL,    // C
+                                             SymbolTableType.REAL,    // D
+                                             SymbolTableType.REAL,    // E
+                                             SymbolTableType.REAL,    // F
+                                             SymbolTableType.REAL,    // G
+                                             SymbolTableType.REAL,    // H
+                                             SymbolTableType.INTEGER, // I
+                                             SymbolTableType.INTEGER, // J
+                                             SymbolTableType.INTEGER, // K
+                                             SymbolTableType.INTEGER, // L
+                                             SymbolTableType.INTEGER, // M
+                                             SymbolTableType.INTEGER, // N
+                                             SymbolTableType.REAL,    // O
+                                             SymbolTableType.REAL,    // P
+                                             SymbolTableType.REAL,    // Q
+                                             SymbolTableType.REAL,    // R
+                                             SymbolTableType.REAL,    // S
+                                             SymbolTableType.REAL,    // T
+                                             SymbolTableType.REAL,    // U
+                                             SymbolTableType.REAL,    // V
+                                             SymbolTableType.REAL,    // W
+                                             SymbolTableType.REAL,    // X
+                                             SymbolTableType.REAL,    // Y
+                                             SymbolTableType.REAL     // Z
         };
 
         /**
