@@ -36,7 +36,6 @@ public class StartDebuggerCommand extends AbstractDebugCommand {
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.startDebugger(job);
-		waitFnish();
 	}
 	
 	public void waitFnish() throws PCDIException {

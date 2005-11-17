@@ -227,7 +227,7 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 			Session session = (Session)target.getSession();			
 			try {
 				EvaluteExpressionCommand command = new EvaluteExpressionCommand(session.createBitList(target.getTargetID()), exp);
-				session.getDebugger().postCommand(command);
+				session.getDebugger().postCommandAndWait(command);
 				sizeof = command.getExpressionValue();
 			} finally {
 				if (frame != null) {

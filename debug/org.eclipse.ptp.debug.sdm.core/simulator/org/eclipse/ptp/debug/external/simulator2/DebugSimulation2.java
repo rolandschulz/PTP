@@ -108,8 +108,9 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 					sim_list.add(sim_program);
 					sim_program.startProgram();
 				}
-				if (!EVENT_BY_EACH_PROC)
+				if (!EVENT_BY_EACH_PROC) {
 					intQueue.startTimer();
+				}
 				
 				completeCommand(IDebugCommand.OK);
 			}
@@ -118,8 +119,9 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	public void stopDebugger() {
 		new Thread(new Runnable() {
 			public void run() {
-				if (!EVENT_BY_EACH_PROC)
+				if (!EVENT_BY_EACH_PROC) {
 					intQueue.stopTimer();
+				}
 		
 				for (Iterator i = sim_list.iterator(); i.hasNext();) {
 					SimulateProgram sim_program = (SimulateProgram) i.next();
@@ -178,6 +180,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		}).start();
 	}
 	public void kill(final BitList tasks) throws PCDIException {
+		halt(tasks);
 		new Thread(new Runnable() {
 			public void run() {
 				int[] taskArray = tasks.toArray();
@@ -379,7 +382,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	}
 	private synchronized void updateEvent(QueueItem qItem) {
 		String state = qItem.getState();
-		//System.out.println("**** Event Update: " + state + ", tasks: " + qItem.getTasks().cardinality());
+		System.out.println("**** Event Update: " + state + ", tasks: " + qItem.getTasks().cardinality());
 		if (state.equals(EXIT_STATE)) {
 			handleProcessTerminatedEvent(qItem.getTasks());
 		} else if (state.equals(HIT_BPT_STATE)) {
