@@ -382,7 +382,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	}
 	private synchronized void updateEvent(QueueItem qItem) {
 		String state = qItem.getState();
-		System.out.println("**** Event Update: " + state + ", tasks: " + qItem.getTasks().cardinality());
+		//System.out.println("**** Event Update: " + state + ", tasks: " + qItem.getTasks().cardinality());
 		if (state.equals(EXIT_STATE)) {
 			handleProcessTerminatedEvent(qItem.getTasks());
 		} else if (state.equals(HIT_BPT_STATE)) {
