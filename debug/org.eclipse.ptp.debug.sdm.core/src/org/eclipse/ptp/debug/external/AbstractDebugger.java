@@ -43,7 +43,6 @@ import org.eclipse.ptp.debug.external.cdi.event.ErrorEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
-import org.eclipse.ptp.debug.external.commands.ConnectionCommand;
 import org.eclipse.ptp.debug.external.commands.IDebugCommand;
 import org.eclipse.ptp.debug.external.commands.StartDebuggerCommand;
 import org.eclipse.ptp.debug.external.commands.StopDebuggerCommand;

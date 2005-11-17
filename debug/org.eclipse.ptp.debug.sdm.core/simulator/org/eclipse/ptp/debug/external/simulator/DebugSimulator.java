@@ -21,19 +21,15 @@ package org.eclipse.ptp.debug.external.simulator;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.IDebugger;
@@ -44,11 +40,16 @@ import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
 import org.eclipse.ptp.debug.external.cdi.model.variable.Argument;
 import org.eclipse.ptp.debug.external.cdi.model.variable.LocalVariable;
+import org.eclipse.ptp.debug.external.commands.IDebugCommand;
 import org.eclipse.ptp.rtsystem.simulation.SimProcess;
 import org.eclipse.ptp.rtsystem.simulation.SimStackFrame;
 import org.eclipse.ptp.rtsystem.simulation.SimThread;
 import org.eclipse.ptp.rtsystem.simulation.SimVariable;
 
+/**
+ * @deprecated
+ * changed the debug architecture -- need re-implemented again 
+ */
 public class DebugSimulator extends AbstractDebugger implements IDebugger, Observer {
 	final int RUNNING = 10;
 	final int SUSPENDED = 11;
@@ -56,9 +57,13 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 	boolean finished = false;
 	private Process debuggerProcess = null;
 	DQueue debuggerOutput = null;
+
+	public void connection() {
+		completeCommand(IDebugCommand.OK);
+	}
 	
-	public IAIF getAIFValue(BitList tasks, String expr) throws PCDIException {
-		return null;
+	public void getAIFValue(BitList tasks, String expr) throws PCDIException {
+		throw new PCDIException("not implemented yet");
 	}
 
 	private void initializeSimulatedProcessesCode(DQueue dQ) {
@@ -85,7 +90,7 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 	public Process getDebuggerProcess() {
 		return debuggerProcess;
 	}
-	public ICDIStackFrame[] listStackFrames(BitList tasks) throws PCDIException {
+	public void listStackFrames(BitList tasks) throws PCDIException {
 		ArrayList list = new ArrayList();
 		IPProcess[] processes = getProcesses(tasks);
 		for (int i = 0; i < processes.length; i++) {
@@ -105,12 +110,13 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 				list.add(frame);
 			}
 		}
-		return (ICDIStackFrame[]) list.toArray(new ICDIStackFrame[0]);
+		//return (ICDIStackFrame[]) list.toArray(new ICDIStackFrame[0]);
+		throw new PCDIException("Need reimplemented again");
 	}
 	public void setCurrentStackFrame(BitList tasks, ICDIStackFrame frame) throws PCDIException {
-	// TODO Auto-generated method stub
+		throw new PCDIException("not implemented yet");
 	}
-	public String evaluateExpression(BitList tasks, String expr) throws PCDIException {
+	public void evaluateExpression(BitList tasks, String expr) throws PCDIException {
 		String retVal = null;
 		IPProcess[] processes = getProcesses(tasks);
 		for (int i = 0; i < processes.length; i++) {
@@ -121,21 +127,24 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 				for (int k = 0; k < args.length; k++) {
 					String aName = args[k].getName();
 					String aVal = args[k].getValue();
-					if (aName.equals(expr))
-						return aVal;
+					if (aName.equals(expr)) {
+						//return aVal;
+					}
 				}
 				SimVariable[] local = simFrames[j].getLocalVars();
 				for (int k = 0; k < local.length; k++) {
 					String aName = local[k].getName();
 					String aVal = local[k].getValue();
-					if (aName.equals(expr))
-						return aVal;
+					if (aName.equals(expr)) {
+						//return aVal;
+					}
 				}
 			}
 		}
-		return retVal;
+		//return retVal;
+		throw new PCDIException("Need reimplemented again");
 	}
-	public String getVariableType(BitList tasks, String varName) throws PCDIException {
+	public void getVariableType(BitList tasks, String varName) throws PCDIException {
 		String retVal = null;
 		IPProcess[] processes = getProcesses(tasks);
 		for (int i = 0; i < processes.length; i++) {
@@ -146,21 +155,24 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 				for (int k = 0; k < args.length; k++) {
 					String aName = args[k].getName();
 					String aType = args[k].getType();
-					if (aName.equals(varName))
-						return aType;
+					if (aName.equals(varName)) {
+						//return aType;
+					}
 				}
 				SimVariable[] local = simFrames[j].getLocalVars();
 				for (int k = 0; k < local.length; k++) {
 					String aName = local[k].getName();
 					String aType = local[k].getType();
-					if (aName.equals(varName))
-						return aType;
+					if (aName.equals(varName)) {
+						//return aType;
+					}
 				}
 			}
 		}
-		return retVal;
+		//return retVal;
+		throw new PCDIException("Need reimplemented again");
 	}
-	public ICDIArgument[] listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException {
+	public void listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException {
 		ArrayList list = new ArrayList();
 		IPProcess[] processes = getProcesses(tasks);
 		for (int i = 0; i < processes.length; i++) {
@@ -187,9 +199,10 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 				}
 			}
 		}
-		return (ICDIArgument[]) list.toArray(new ICDIArgument[0]);
+		//return (ICDIArgument[]) list.toArray(new ICDIArgument[0]);
+		throw new PCDIException("Need reimplemented again");
 	}
-	public ICDILocalVariable[] listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException {
+	public void listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException {
 		ArrayList list = new ArrayList();
 		IPProcess[] processes = getProcesses(tasks);
 		for (int i = 0; i < processes.length; i++) {
@@ -216,11 +229,11 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 				}
 			}
 		}
-		return (ICDILocalVariable[]) list.toArray(new ICDILocalVariable[0]);
+		//return (ICDILocalVariable[]) list.toArray(new ICDILocalVariable[0]);
+		throw new PCDIException("Need reimplemented again");
 	}
-	public ICDIGlobalVariable[] listGlobalVariables(BitList tasks) throws PCDIException {
-		// TODO Auto-generated method stub
-		return null;
+	public void listGlobalVariables(BitList tasks) throws PCDIException {
+		throw new PCDIException("not implemented yet");
 	}
 	public void stepInto(BitList tasks, int count) throws PCDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");

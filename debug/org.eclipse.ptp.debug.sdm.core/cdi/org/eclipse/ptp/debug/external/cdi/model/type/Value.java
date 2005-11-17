@@ -48,7 +48,7 @@ public class Value extends PTPObject implements ICDIValue {
 			Target target = (Target) variable.getTarget();
 			Session session = (Session) target.getSession();
 			EvaluteExpressionCommand command = new EvaluteExpressionCommand(session.createBitList(target.getTargetID()), variable.getName());
-			session.getDebugger().postCommand(command);
+			session.getDebugger().postCommandAndWait(command);
 			return command.getExpressionValue();
 		}
 		//TODO - fix the toString later

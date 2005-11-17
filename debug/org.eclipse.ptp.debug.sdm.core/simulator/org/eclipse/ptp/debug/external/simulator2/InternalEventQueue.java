@@ -29,7 +29,7 @@ import java.util.Observable;
  */
 public class InternalEventQueue extends Observable {
 	private List queue = null;
-	private long current_time = 0;
+	//private long current_time = 0;
 	private Thread timer = null;
 	private boolean running_timer = true;
 	private long FIX_TIME = 0;
@@ -79,15 +79,16 @@ public class InternalEventQueue extends Observable {
 	public void startTimer() {
 		if (timer == null) {
 			running_timer = true;
-			current_time = System.currentTimeMillis();
+			//current_time = System.currentTimeMillis();
 			Runnable runnable = new Runnable() {
 				public void run() {
 					while (running_timer) {
 						try {
 							Thread.sleep(FIX_TIME);
-							notifySimulator();
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+							stopTimer();
+						} finally {
+							notifySimulator();
 						}
 						
 						/*

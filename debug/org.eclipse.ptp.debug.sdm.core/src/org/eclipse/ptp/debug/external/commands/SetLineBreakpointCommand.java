@@ -36,7 +36,6 @@ public class SetLineBreakpointCommand extends AbstractDebugCommand {
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.setLineBreakpoint(tasks, lineBpt);
-		waitFinish(debugger);
 	}
 	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
 		if (waitForReturn()) {

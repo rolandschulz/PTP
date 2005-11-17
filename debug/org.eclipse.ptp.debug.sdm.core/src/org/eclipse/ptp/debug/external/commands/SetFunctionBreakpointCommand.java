@@ -36,7 +36,6 @@ public class SetFunctionBreakpointCommand extends AbstractDebugCommand {
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.setFunctionBreakpoint(tasks, funcBpt);
-		waitFinish(debugger);
 	}
 	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
 		if (waitForReturn()) {

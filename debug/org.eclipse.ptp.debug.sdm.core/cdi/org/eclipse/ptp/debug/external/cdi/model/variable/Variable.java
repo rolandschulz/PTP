@@ -126,7 +126,7 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		
 		String name = getQualifiedName();
 		ListLocalVariablesCommand command = new ListLocalVariablesCommand(session.createBitList(target.getTargetID()), getStackFrame());
-		session.getDebugger().postCommand(command);
+		session.getDebugger().postCommandAndWait(command);
 		ICDILocalVariable[] vars = command.getLocalVariables();
 		for (int i = 0; i < vars.length; i++) {
 			if (name.equals(vars[i].getQualifiedName())) {
@@ -246,7 +246,7 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 			Target target = (Target)getTarget();
 			Session session = (Session)target.getSession();
 			GetAIFCommand command = new GetAIFCommand(session.createBitList(target.getTargetID()), getName());
-			session.getDebugger().postCommand(command);
+			session.getDebugger().postCommandAndWait(command);
 			aif = command.getAIF();
 		}
 		return aif.getDescription();

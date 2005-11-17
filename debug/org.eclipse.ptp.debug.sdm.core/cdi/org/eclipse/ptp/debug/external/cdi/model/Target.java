@@ -377,7 +377,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		try {
 			Session session = (Session) target.getSession();
 			EvaluteExpressionCommand command = new EvaluteExpressionCommand(session.createBitList(target.getTargetID()), expressionText);
-			session.getDebugger().postCommand(command);
+			session.getDebugger().postCommandAndWait(command);
 			return command.getExpressionValue();
 		} finally {
 			target.setCurrentThread(currentThread, false);

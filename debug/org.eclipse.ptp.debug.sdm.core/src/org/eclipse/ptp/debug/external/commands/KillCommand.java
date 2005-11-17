@@ -28,13 +28,14 @@ import org.eclipse.ptp.debug.external.IAbstractDebugger;
  */
 public class KillCommand extends AbstractDebugCommand {
 	public KillCommand(BitList tasks) throws PCDIException {
-		super(tasks, true, true);
+		super(tasks, true, false);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterTerminateTasks(tasks);
 		debugger.kill(tasks);
-		waitFinish(debugger);
+		//waitFinish(debugger);
 	}
+	/*
 	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
 		if (waitForReturn()) {
 			if (result.equals(OK)) {
@@ -43,5 +44,6 @@ public class KillCommand extends AbstractDebugCommand {
 			}
 		}
 		throw new PCDIException("Cannot kill " + tasks.toString());		
-	}	
+	}
+	*/	
 }

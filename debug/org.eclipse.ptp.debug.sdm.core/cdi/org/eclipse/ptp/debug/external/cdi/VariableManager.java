@@ -304,7 +304,7 @@ public class VariableManager extends Manager {
 			Session session = (Session)getSession();
 			BitList tasks = session.createBitList(target.getTargetID());
 			ListArgumentsCommand argCmd = new ListArgumentsCommand(tasks, frame);
-			session.getDebugger().postCommand(argCmd);
+			session.getDebugger().postCommandAndWait(argCmd);
 			ICDIArgument[] args = argCmd.getArguments();
 			if (args != null) {
 				for (int i = 0; i < args.length; i++) {
@@ -317,7 +317,7 @@ public class VariableManager extends Manager {
 					IAIF aif = varDesc.getAIF();
 					if (aif == null) {
 						GetAIFCommand aifCmd = new GetAIFCommand(tasks, fName);
-						session.getDebugger().postCommand(aifCmd);
+						session.getDebugger().postCommandAndWait(aifCmd);
 						aif = aifCmd.getAIF();
 					}
 					argObjects.add(new ArgumentDescriptor(target, thread, frame, name, fName, pos, depth, aif));
@@ -361,7 +361,7 @@ public class VariableManager extends Manager {
 			Target target = (Target)varDesc.getTarget();
 			Session session = (Session)getSession();
 			ListGlobalVariablesCommand varCmd = new ListGlobalVariablesCommand(session.createBitList(target.getTargetID()));
-			session.getDebugger().postCommand(varCmd);
+			session.getDebugger().postCommandAndWait(varCmd);
 			ICDIGlobalVariable[] vars = varCmd.getGlobalVariables();
 			System.out.println(" ++++++++++++++++ listGlobalVariables: " + vars.length + " ++++++++++++++++");
 			for (int i = 0; i < vars.length; i++) {
@@ -387,7 +387,7 @@ public class VariableManager extends Manager {
 			Session session = (Session)getSession();
 			BitList tasks = session.createBitList(target.getTargetID());
 			ListLocalVariablesCommand varCmd = new ListLocalVariablesCommand(tasks, currentFrame);
-			session.getDebugger().postCommand(varCmd);
+			session.getDebugger().postCommandAndWait(varCmd);
 			ICDILocalVariable[] vars = varCmd.getLocalVariables();
 			if (vars != null) {
 				for (int i = 0; i < vars.length; i++) {
@@ -400,7 +400,7 @@ public class VariableManager extends Manager {
 					IAIF aif = varDesc.getAIF();
 					if (aif == null) {
 						GetAIFCommand aifCmd = new GetAIFCommand(tasks, fName);
-						session.getDebugger().postCommand(aifCmd);
+						session.getDebugger().postCommandAndWait(aifCmd);
 						aif = aifCmd.getAIF();
 					}
 					varObjects.add(new LocalVariableDescriptor(target, thread, frame, name, fName, pos, depth, aif));
