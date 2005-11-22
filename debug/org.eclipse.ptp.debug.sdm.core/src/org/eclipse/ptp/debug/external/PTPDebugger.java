@@ -32,6 +32,7 @@ public class PTPDebugger implements IPTPDebugger {
 	
 	public PTPDebugger() {
 		debugger = new ParallelDebugger();
+		//debugger = new DebugSimulation2();
 	}
 	
 	public int startDebuggerListener() {
@@ -41,8 +42,6 @@ public class PTPDebugger implements IPTPDebugger {
 	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) {
 		try {
 			IPJob job = launch.getPJob();
-			//IAbstractDebugger debugger = new DebugSimulation2();
-			//IAbstractDebugger debugger = new ParallelDebugger();
 			debugger.initialize(job);
 			return new Session(debugger, job, launch, exe);
 		} catch (Exception e) {

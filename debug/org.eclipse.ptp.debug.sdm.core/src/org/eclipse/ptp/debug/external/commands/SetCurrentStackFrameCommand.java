@@ -37,7 +37,7 @@ public class SetCurrentStackFrameCommand extends AbstractDebugCommand {
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.setCurrentStackFrame(tasks, frame);
 	}
-	public void setStackFrame() throws PCDIException {
+	public void waitFinish() throws PCDIException {
 		if (waitForReturn()) {
 			if (result.equals(OK))
 				return;

@@ -100,7 +100,7 @@ public class Thread extends PTPObject implements ICDIThread {
 			Session session = (Session) target.getSession();			
 			try {
 				ListStackFramesCommand command = new ListStackFramesCommand(session.createBitList(target.getTargetID()));
-				session.getDebugger().postCommandAndWait(command);
+				session.getDebugger().postCommand(command);
 				ICDIStackFrame[] frames = command.getStackFrames();
 				for (int i = 0; i < frames.length; i++) {
 					currentFrames.add(frames[i]);
@@ -108,7 +108,7 @@ public class Thread extends PTPObject implements ICDIThread {
 			} finally {
 				target.setCurrentThread(currentThread, false);
 			}
-			
+
 			// assign the currentFrame if it was not done yet.
 			if (currentFrame == null) {
 				for (int i = 0; i < currentFrames.size(); i++) {
@@ -129,14 +129,15 @@ public class Thread extends PTPObject implements ICDIThread {
 			final Session session = (Session) target.getSession();
 			
 			ListStackFramesCommand command = new ListStackFramesCommand(session.createBitList(target.getTargetID()));
-			session.getDebugger().postCommandAndWait(command);
+			session.getDebugger().postCommand(command);
 			ICDIStackFrame[] frames = command.getStackFrames();
 			for (int i = 0; i < frames.length; i++) {
 				currentFrames.add(frames[i]);
 			}
 			stackdepth = currentFrames.size();
-			if (frames.length > 0)
+			if (frames.length > 0) {
 				currentFrame = (StackFrame)frames[0];
+			}
 		}
 		return stackdepth;
 	}
@@ -165,12 +166,11 @@ public class Thread extends PTPObject implements ICDIThread {
 		Target target = (Target)getTarget();
 		Session session = (Session) target.getSession();
 		SetCurrentStackFrameCommand command = new SetCurrentStackFrameCommand(session.createBitList(target.getTargetID()), stackframe);
-		session.getDebugger().postCommandAndWait(command);
-		command.setStackFrame();
+		session.getDebugger().postCommand(command);
+		command.waitFinish();
 		
 		currentFrame = stackframe;
 		if (doUpdate) {
-
 			VariableManager varMgr = session.getVariableManager();
 			if (varMgr.isAutoUpdate()) {
 				varMgr.update(target);

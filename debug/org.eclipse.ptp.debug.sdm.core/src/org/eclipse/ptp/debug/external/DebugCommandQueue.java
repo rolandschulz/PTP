@@ -50,13 +50,15 @@ public class DebugCommandQueue extends Thread {
 			currentCommand = getCommand();
 			try {
 				currentCommand.execCommand(debugger);
+				System.out.println("***** CURRENT COMMAND: " + currentCommand);
 				if (!currentCommand.waitForReturn()) {
 					System.out.println("************ ERROR in DebugCommandQueue -- wait for return, cmd: " + currentCommand);
 				}
 			} catch (PCDIException e) {
-				System.out.println("************ ERROR in DebugCommandQueue -- execCommand, cmd: " + currentCommand);
+				System.out.println("************ ERROR in DebugCommandQueue -- execCommand, cmd: " + currentCommand + ", err: " + e.getMessage());
+			} finally {
+				currentCommand = null;
 			}
-			currentCommand = null;
 		}
 	}
 	private boolean waitForCommand() {
@@ -82,7 +84,7 @@ public class DebugCommandQueue extends Thread {
 			if (!queue.contains(command)) {
 				if (command.canInterrupt() && currentCommand != null) {
 					flushCommands();
-					setCommandReturn(null);
+					currentCommand.flush();
 					try {
 						//To make sure all events fired via AsbtractDebugger, so wait 1 sec here
 						queue.wait(500);
@@ -99,8 +101,8 @@ public class DebugCommandQueue extends Thread {
 	public void flushCommands() {
 		synchronized (queue) {
 			IDebugCommand[] commands = (IDebugCommand[])queue.toArray(new IDebugCommand[0]);
-			for (int i=0; i<commands.length; i++) {
-				commands[i].setReturn(null);
+			for (int i=commands.length-1; i>-1; i--) {
+				commands[i].flush();
 			}
 			queue.clear();
 		}

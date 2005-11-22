@@ -32,6 +32,7 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	protected Object result = null;
 	protected boolean waitForReturn = false;
 	protected boolean interrupt = false;
+	private boolean isFlush = false;
 	
 	public AbstractDebugCommand(BitList tasks) {
 		this(tasks, false, false);
@@ -65,6 +66,9 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 
 		synchronized (lock) {
 			try {
+				if (isFlush)
+					return false;
+				
 				if (getReturn() == null) {
 					lock.wait(WAIT_COMMAND_RETURN_TIME);
 					if (getReturn() == null) {
@@ -75,6 +79,13 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 				return false;
 			}
 			return true;
+		}
+	}
+	
+	public void flush() {
+		synchronized (lock) {
+			lock.notifyAll();
+			isFlush = true;
 		}
 	}
 }

@@ -84,7 +84,7 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 			for (int i=0; i<argDescs.length; i++) {
 				ArgumentDescriptor argDesc = (ArgumentDescriptor)argDescs[i];
 				GetAIFCommand command = new GetAIFCommand(tasks, argDesc.getQualifiedName());
-				session.getDebugger().postCommandAndWait(command);
+				session.getDebugger().postCommand(command);
 				argDesc.setAIF(command.getAIF());
 			}
 		}
@@ -103,7 +103,7 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 			for (int i=0; i<localDescs.length; i++) {
 				LocalVariableDescriptor localDesc = (LocalVariableDescriptor)localDescs[i];
 				GetAIFCommand command = new GetAIFCommand(tasks, localDesc.getQualifiedName());
-				session.getDebugger().postCommandAndWait(command);
+				session.getDebugger().postCommand(command);
 				localDesc.setAIF(command.getAIF());
 			}
 		}
