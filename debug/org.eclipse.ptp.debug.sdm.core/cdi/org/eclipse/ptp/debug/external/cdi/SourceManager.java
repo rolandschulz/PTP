@@ -277,7 +277,7 @@ public class SourceManager extends Manager {
 	public IAIF getAIF(Target target, String variable) throws CDIException {
 		Session session = (Session)getSession();
 		GetAIFCommand command = new GetAIFCommand(session.createBitList(target.getTargetID()), variable);
-		session.getDebugger().postCommandAndWait(command);
+		session.getDebugger().postCommand(command);
 		return command.getAIF();
 	}
 	//public String getTypeName(Target target, String variable) throws CDIException {

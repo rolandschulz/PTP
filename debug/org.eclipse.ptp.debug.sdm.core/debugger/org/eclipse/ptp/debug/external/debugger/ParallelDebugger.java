@@ -327,16 +327,14 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			 */
 			BreakpointMapping bp = findBreakpointInfo(((ProxyDebugBreakpointHitEvent)e).getBreakpointId());
 			if (bp != null) {
-				IPCDIEvent ev = new BreakpointHitEvent(getSession(), e.getBitSet(), bp.bpObject);
-				super.fireEvent(ev);
+				fireEvent(new BreakpointHitEvent(getSession(), e.getBitSet(), bp.bpObject));
 			}
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_STEP:
 			ProxyDebugStepEvent stepEvent = (ProxyDebugStepEvent)e;
 			LineLocation loc = new LineLocation(stepEvent.getFrame().getLocator().getFile(), stepEvent.getFrame().getLocator().getLineNumber());
-			IPCDIEvent ev = new EndSteppingRangeEvent(getSession(), e.getBitSet(), loc);
-			super.fireEvent(ev);
+			fireEvent(new EndSteppingRangeEvent(getSession(), e.getBitSet(), loc));
 			break;	
 			
 		case IProxyDebugEvent.EVENT_DBG_BPSET:
@@ -409,21 +407,18 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_EXIT:
-			IPCDIExitedEvent ee = new InferiorExitedEvent(getSession(), e.getBitSet());
-			super.fireEvent(ee);
+			fireEvent(new InferiorExitedEvent(getSession(), e.getBitSet()));
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_SIGNAL:
 			ProxyDebugSignalEvent sigEvent = (ProxyDebugSignalEvent)e;
-			IPCDISuspendedEvent suspEv = new InferiorSignaledEvent(getSession(), e.getBitSet(), sigEvent.getLocator());
-			super.fireEvent(suspEv);
+			fireEvent(new InferiorSignaledEvent(getSession(), e.getBitSet(), sigEvent.getLocator()));
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_ERROR:
 			System.out.println("got error from server");
 			completeCommand(null);
-			IPCDIExitedEvent ex = new InferiorExitedEvent(getSession(), e.getBitSet());
-			super.fireEvent(ex);
+			fireEvent(new InferiorExitedEvent(getSession(), e.getBitSet()));
 			break;
 		}
 	}

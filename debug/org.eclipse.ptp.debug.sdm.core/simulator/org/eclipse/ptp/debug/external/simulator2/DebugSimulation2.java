@@ -83,7 +83,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	}
 	private void createVariables() {
 		variables.put("name", new SimVariable("name", "string", "hello"));
-		variables.put("number", new SimVariable("number", "int", "101"));
+		variables.put("number", new SimVariable("number", "boolean", "-1"));
 	}
 	private SimVariable findVariable(String name) {
 		return (SimVariable)variables.get(name);
@@ -163,7 +163,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		
 				if (aif == null) {
 					String value = "" + random(10,20);
-					aif = new AIF("is4", value.getBytes());
+					aif = new AIF("b", value.getBytes());
 				}
 				completeCommand(aif);
 			}

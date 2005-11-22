@@ -36,5 +36,7 @@ public interface IDebugCommand {
 	public void setReturn(Object result);
 	public boolean waitForReturn();
 	public boolean canInterrupt();
+	
+	public void flush();
 }
 
