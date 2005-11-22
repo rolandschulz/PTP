@@ -1,24 +1,14 @@
 /*
-** Routines for comparing AIF objects.
-**
-** Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 59 Temple Place - Suite 330,
-** Boston, MA 02111-1307, USA.
-**
-*/
+ * Routines for comparing AIF objects.
+ *
+ * Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ */
 
 #ifdef HAVE_CONFIG_H
 #include	<config.h>
@@ -249,9 +239,9 @@ _aif_int_is_zero(char *data, int len)
 }
 
 /*
-** Compare types of two AIF values. Return true if they are equivalent,
-** false if not.
-*/
+ * Compare types of two AIF values. Return true if they are equivalent,
+ * false if not.
+ */
 int
 AIFTypeCompare(AIF *a1, AIF *a2)
 {
@@ -381,18 +371,18 @@ _aif_cmp_char(int *res, char *d1, char *d2)
 }
 
 /*
-** data points to the data part of an AIF, starting at the format byte.
-**  0 means null
-**  1 means ordinary pointer
-**  2 means ordinary pointer, named
-**  3 means refer to existing name
-**
-** We save any names we see.  We offset the index for saving/retrieving 
-** values by "offset" in order to simultaneously maintain targets for multiple 
-** AIFs.  We return a pointer to the data region where the value actually 
-** starts, or 0 if null.  We also advance the data pointer past the initial 
-** code (and name if present).
-*/
+ * data points to the data part of an AIF, starting at the format byte.
+ *  0 means null
+ *  1 means ordinary pointer
+ *  2 means ordinary pointer, named
+ *  3 means refer to existing name
+ *
+ * We save any names we see.  We offset the index for saving/retrieving 
+ * values by "offset" in order to simultaneously maintain targets for multiple 
+ * AIFs.  We return a pointer to the data region where the value actually 
+ * starts, or 0 if null.  We also advance the data pointer past the initial 
+ * code (and name if present).
+ */
 
 char *
 _find_target(char **data, int offset)
@@ -428,24 +418,24 @@ _find_target(char **data, int offset)
 }
 
 /*
-** Compare two AIF values. 
-**
-** For numeric values, sets res to:
-**
-**      -1 if d1 < d2
-**       0 if d1 == d2
-**       1 if d1 > d2
-**
-** For other values, sets res to:
-**
-**       0 if d1 == d2
-**       1 if d1 != d2
-**
-** For array type, res is 0 if all elements are equal, 1 otherwise.
-** The parameters f1, d1, f2, d2 are advanced through their structures; on
-** return, they are in the position following the relevant parts.
-** The return value is negative if there is a type failure.
-*/
+ * Compare two AIF values. 
+ *
+ * For numeric values, sets res to:
+ *
+ *      -1 if d1 < d2
+ *       0 if d1 == d2
+ *       1 if d1 > d2
+ *
+ * For other values, sets res to:
+ *
+ *       0 if d1 == d2
+ *       1 if d1 != d2
+ *
+ * For array type, res is 0 if all elements are equal, 1 otherwise.
+ * The parameters f1, d1, f2, d2 are advanced through their structures; on
+ * return, they are in the position following the relevant parts.
+ * The return value is negative if there is a type failure.
+ */
 int
 _aif_compare(int depth, int *res, char **f1, char **d1, char **f2, char **d2)
 {
@@ -1424,17 +1414,17 @@ AIFDiff(int depth, AIF *a1, AIF *a2)
 }
 
 /*
-** Compare two AIF values. Returns an AIF value that represents the
-** 'difference' between the values.
-**
-** In the case of scalar values the difference is: val1 - val2
-** In the case of booleans it is TRUE if they are different
-** In the case of strings it is a string containing '1' in the positions
-**   where characters differ and '0' in positions where they are the same.
-** 
-** Complex objects can also be compared. In this case the above rules are
-** applied to each field or element in the object.
-*/
+ * Compare two AIF values. Returns an AIF value that represents the
+ * 'difference' between the values.
+ *
+ * In the case of scalar values the difference is: val1 - val2
+ * In the case of booleans it is TRUE if they are different
+ * In the case of strings it is a string containing '1' in the positions
+ *   where characters differ and '0' in positions where they are the same.
+ * 
+ * Complex objects can also be compared. In this case the above rules are
+ * applied to each field or element in the object.
+ */
 int
 _aif_diff(int depth, char **rf, char **rd,
 	  	     char **f1, char **d1,

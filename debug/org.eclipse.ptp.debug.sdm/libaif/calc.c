@@ -1,33 +1,23 @@
 /*
-** Routines that support arithmetic/logical operations on
-** AIF objects.
-**
-** Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
-** 
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 59 Temple Place - Suite 330,
-** Boston, MA 02111-1307, USA.
-**
-** The _aif_div_int() routine was derived from source under
-** the following copyright:
-**
-**   Use of this program, for any purpose, is granted the author,
-**   Ian Kaplan, as long as this copyright notice is included in
-**   the source code or any source code derived from this program.
-**   The user assumes all responsibility for using this code.
-**
-*/
+ * Routines that support arithmetic/logical operations on
+ * AIF objects.
+ *
+ * Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
+ * 
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * The _aif_div_int() routine was derived from source under
+ * the following copyright:
+ *
+ *   Use of this program, for any purpose, is granted the author,
+ *   Ian Kaplan, as long as this copyright notice is included in
+ *   the source code or any source code derived from this program.
+ *   The user assumes all responsibility for using this code.
+ *
+ */
 
 #ifdef HAVE_CONFIG_H
 #include	<config.h>
@@ -50,8 +40,8 @@
 #endif /* WINDOWSNT || WIN32 */
 
 /*
-** Boolean bitwise and.
-*/
+ * Boolean bitwise and.
+ */
 void
 _aif_and_bool(char *rd, char *d1, int l1, char *d2, int l2)
 {
@@ -59,8 +49,8 @@ _aif_and_bool(char *rd, char *d1, int l1, char *d2, int l2)
 }
 
 /*
-** Boolean bitwise or.
-*/
+ * Boolean bitwise or.
+ */
 void
 _aif_or_bool(char *rd, char *d1, int l1, char *d2, int l2)
 {
@@ -68,8 +58,8 @@ _aif_or_bool(char *rd, char *d1, int l1, char *d2, int l2)
 }
 
 /*
-** Boolean 2's compliment.
-*/
+ * Boolean 2's compliment.
+ */
 void
 _aif_not_bool(char *rd, char *data, int len)
 {
@@ -77,8 +67,8 @@ _aif_not_bool(char *rd, char *data, int len)
 }
 
 /*
-** Integer 2's compliment.
-*/
+ * Integer 2's compliment.
+ */
 void
 _aif_not_int(char *rd, char *data, int len)
 {
@@ -90,8 +80,8 @@ _aif_not_int(char *rd, char *data, int len)
 }
 
 /*
-** Integer negation.
-*/
+ * Integer negation.
+ */
 void
 _aif_neg_int(char *rd, char *data, int len)
 {
@@ -103,8 +93,8 @@ _aif_neg_int(char *rd, char *data, int len)
 }
 
 /*
-** Integer addition.
-*/
+ * Integer addition.
+ */
 void
 _aif_add_int(char *rd, char *d1, int l1, char *d2, int l2)
 {
@@ -119,8 +109,8 @@ _aif_add_int(char *rd, char *d1, int l1, char *d2, int l2)
 }
 
 /*
-** Integer bitwise and.
-*/
+ * Integer bitwise and.
+ */
 void
 _aif_and_int(char *rd, char *d1, int l1, char *d2, int l2)
 {
@@ -135,8 +125,8 @@ _aif_and_int(char *rd, char *d1, int l1, char *d2, int l2)
 }
 
 /*
-** Integer bitwise or.
-*/
+ * Integer bitwise or.
+ */
 void
 _aif_or_int(char *rd, char *d1, int l1, char *d2, int l2)
 {
@@ -151,8 +141,8 @@ _aif_or_int(char *rd, char *d1, int l1, char *d2, int l2)
 }
 
 /*
-** Integer subtraction.
-*/
+ * Integer subtraction.
+ */
 void
 _aif_sub_int(char *rd, char *d1, int l1, char *d2, int l2)
 {
@@ -167,9 +157,9 @@ _aif_sub_int(char *rd, char *d1, int l1, char *d2, int l2)
 }
 
 /*
-** Integer multiplication. Result is same size as the largest
-** argument. 
-*/
+ * Integer multiplication. Result is same size as the largest
+ * argument. 
+ */
 void
 _aif_mul_int(char *rd, char *d1, int l1, char *d2, int l2)
 {
@@ -184,11 +174,11 @@ _aif_mul_int(char *rd, char *d1, int l1, char *d2, int l2)
 } 
 
 /*
-** Compare two integers. Returns:
-**	-1 if d1 < d2
-**	 0 if d1 == d2
-**	 1 if d1 > d2
-*/
+ * Compare two integers. Returns:
+ *	-1 if d1 < d2
+ *	 0 if d1 == d2
+ *	 1 if d1 > d2
+ */
 int
 compare_int(char *d1, int l1, char *d2, int l2)
 {
@@ -221,9 +211,9 @@ compare_int(char *d1, int l1, char *d2, int l2)
 }
 
 /*
-** Shift d, s bits to the left. s < BITSPERBYTE. Result in r.
-** d and r can overlap, but must be the same size.
-*/
+ * Shift d, s bits to the left. s < BITSPERBYTE. Result in r.
+ * d and r can overlap, but must be the same size.
+ */
 void
 lshift_int(unsigned char *r, unsigned char *d, int l, int s)
 {
@@ -238,9 +228,9 @@ lshift_int(unsigned char *r, unsigned char *d, int l, int s)
 }
 
 /*
-** Shift d, s bits to the right. s < BITSPERBYTE. Result in r.
-** d and r can overlap, but must be the same size.
-*/
+ * Shift d, s bits to the right. s < BITSPERBYTE. Result in r.
+ * d and r can overlap, but must be the same size.
+ */
 void
 rshift_int(unsigned char *r, unsigned char *d, int l, int s)
 {
@@ -255,11 +245,11 @@ rshift_int(unsigned char *r, unsigned char *d, int l, int s)
 }
 
 /*
-** Integer division d1/d2 = rq + rr/d2. Quotient is same size as the largest
-** argument. Note: d2 != 0.
-**
-** XXX need to check remainder for correct sign.
-*/
+ * Integer division d1/d2 = rq + rr/d2. Quotient is same size as the largest
+ * argument. Note: d2 != 0.
+ *
+ * XXX need to check remainder for correct sign.
+ */
 void
 _aif_div_int(char *rq, char *rr, char *d1, int l1, char *d2, int l2)
 {
@@ -276,8 +266,8 @@ _aif_div_int(char *rq, char *rr, char *d1, int l1, char *d2, int l2)
 } 
 
 /*
-** Perform a binary integer operation.
-*/
+ * Perform a binary integer operation.
+ */
 int
 _aif_binary_op_int(aifop op, char **rd, char *d1, int l1, char *d2, int l2)
 {
@@ -372,8 +362,8 @@ _aif_binary_op_int(aifop op, char **rd, char *d1, int l1, char *d2, int l2)
 }
 
 /*
-** Perform a binary boolean operation.
-*/
+ * Perform a binary boolean operation.
+ */
 int
 _aif_binary_op_bool(aifop op, char **rd, char *d1, int l1, char *d2, int l2)
 {
@@ -399,8 +389,8 @@ _aif_binary_op_bool(aifop op, char **rd, char *d1, int l1, char *d2, int l2)
 }
 
 /*
-** Perform a unary boolean operation.
-*/
+ * Perform a unary boolean operation.
+ */
 int
 _aif_unary_op_bool(aifop op, char **rd, char *d, int l)
 {
@@ -422,8 +412,8 @@ _aif_unary_op_bool(aifop op, char **rd, char *d, int l)
 }
 
 /*
-** Perform a unary integer operation.
-*/
+ * Perform a unary integer operation.
+ */
 int
 _aif_unary_op_int(aifop op, char **rd, char *d, int l)
 {
@@ -449,8 +439,8 @@ _aif_unary_op_int(aifop op, char **rd, char *d, int l)
 }
 
 /*
-** Perform a binary floating point operation.
-*/
+ * Perform a binary floating point operation.
+ */
 int
 _aif_binary_op_float(aifop op, char **rd, char *d1, int l1, char *d2, int l2)
 {
@@ -501,8 +491,8 @@ _aif_binary_op_float(aifop op, char **rd, char *d1, int l1, char *d2, int l2)
 }
 
 /*
-** Perform a unary floating point operation.
-*/
+ * Perform a unary floating point operation.
+ */
 int
 _aif_unary_op_float(aifop op, char **rd, char *d1, int l1)
 {
@@ -527,15 +517,15 @@ _aif_unary_op_float(aifop op, char **rd, char *d1, int l1)
 }
 
 /*
-** Perform a binary operation. Arguments can be integer or
-** floating point or structs or arrays resulting in such.
-** Advance the data and format pointers across the data.
-** Return 0 for success, -1 for failure.
-** Result in rd and rf.
-** If rd is null, we generate our own format and data strings.  It is
-** impossible to decide the proper length for the data for structured types; we
-** make wild guesses.  It's a bug.
-*/
+ * Perform a binary operation. Arguments can be integer or
+ * floating point or structs or arrays resulting in such.
+ * Advance the data and format pointers across the data.
+ * Return 0 for success, -1 for failure.
+ * Result in rd and rf.
+ * If rd is null, we generate our own format and data strings.  It is
+ * impossible to decide the proper length for the data for structured types; we
+ * make wild guesses.  It's a bug.
+ */
 int
 _aif_binary_op(aifop op, 
 	char **rf, char **rd, 
@@ -1419,15 +1409,15 @@ _aif_binary_op(aifop op,
 }
 
 /*
-** Perform a unary operation. Argument can be integer or
-** floating point or structs or arrays resulting in such.
-** Advance the data and format pointers across the data.
-** Return 0 for success, -1 for failure.
-** Result in rd and rf.
-** If rd is null, we generate our own format and data strings.  It is
-** impossible to decide the proper length for the data for structured types; we
-** make wild guesses.  It's a bug.
-*/
+ * Perform a unary operation. Argument can be integer or
+ * floating point or structs or arrays resulting in such.
+ * Advance the data and format pointers across the data.
+ * Return 0 for success, -1 for failure.
+ * Result in rd and rf.
+ * If rd is null, we generate our own format and data strings.  It is
+ * impossible to decide the proper length for the data for structured types; we
+ * make wild guesses.  It's a bug.
+ */
 int
 _aif_unary_op(aifop op, char **rf, char **rd, char **fds, char **data)
 {

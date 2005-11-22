@@ -1,24 +1,14 @@
 /*
-** Master header file for the AIF library.
-**
-** Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 59 Temple Place - Suite 330,
-** Boston, MA 02111-1307, USA.
-**
-*/
+ * Master header file for the AIF library.
+ *
+ * Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ */
 
 #ifndef _AIF_H
 #define _AIF_H
@@ -34,8 +24,8 @@
 #endif /*DEBUG */
 
 /*
-** Include for MIN & MAX
-*/
+ * Include for MIN & MAX
+ */
 #if defined(sun)
 #include <sys/sysmacros.h>
 #elif defined(__sgi) || defined(__linux)
@@ -107,9 +97,9 @@ typedef double AIFDOUBLEST;
 #define AIF_PTR_INVALID		4
 
 /*
-** Structure used to index into a 
-** muli-dimensional array.
-*/
+ * Structure used to index into a 
+ * muli-dimensional array.
+ */
 struct AIFIndex
 {
 	int	i_finished;
@@ -124,8 +114,8 @@ struct AIFIndex
 typedef struct AIFIndex	AIFIndex;
 
 /*
-** AIF Object
-*/
+ * AIF Object
+ */
 struct AIF
 {
 	char *	a_fds;
@@ -143,9 +133,9 @@ typedef struct AIF AIF;
 #define AIF_DATA(a)	(a)->a_data.a_data_val
 
 /*
-** Arithmetic/logical operations that can be 
-** performed on AIF objects.
-*/
+ * Arithmetic/logical operations that can be 
+ * performed on AIF objects.
+ */
 enum aifop
 {
 	AIFOP_ADD,
@@ -161,8 +151,8 @@ enum aifop
 typedef enum aifop	aifop;
 
 /*
-** AIF Object Access Specifiers
-*/
+ * AIF Object Access Specifiers
+ */
 enum aifaccess
 {
 	AIFACC_PRIVATE,
@@ -172,8 +162,8 @@ enum aifaccess
 typedef enum aifaccess	aifaccess;
 
 /*
-** AIF error codes.
-*/
+ * AIF error codes.
+ */
 enum aiferr
 {
 	AIFERR_NOERR,
@@ -200,8 +190,8 @@ typedef enum aiferr	aiferr;
 extern aiferr		AIFErrno;
 
 /*
-** AIF option codes.
-*/
+ * AIF option codes.
+ */
 enum aifopt
 {
 	AIFOPT_CMP_DEPTH,
@@ -213,9 +203,9 @@ typedef enum aifopt	aifopt;
 #define AIF_CMP_BY_NAME		1
 
 /*
-** Definitons for reading/writing AIF
-** data to a file.
-*/
+ * Definitons for reading/writing AIF
+ * data to a file.
+ */
 
 #define AIFMODE_READ	0x001
 #define AIFMODE_CREATE	0x002
@@ -251,8 +241,8 @@ typedef struct AIFFILE	AIFFILE;
 #define AIF_VOID_TYPE(len)		TypeToFDS(AIF_VOID, (len))
 
 /*
-** AIF routines.
-*/
+ * AIF routines.
+ */
 
 extern AIF *		AIFAdd(AIF *, AIF *);
 extern int		AIFAddConstToEnum(AIF *, char *, AIF *);

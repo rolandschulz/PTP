@@ -1,24 +1,14 @@
 /*
-** Routines dealing with format descriptor strings (FDS).
-**
-** Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 59 Temple Place - Suite 330,
-** Boston, MA 02111-1307, USA.
-**
-*/
+ * Routines dealing with format descriptor strings (FDS).
+ *
+ * Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ */
 
 #ifdef HAVE_CONFIG_H
 #include	<config.h>
@@ -134,9 +124,9 @@ _fds_skipto(char *str, char *set)
 }
 
 /* 
-** Convert an ascii number to a number. NOTE: silently truncates
-** the number to fit in sizeof int.
-*/
+ * Convert an ascii number to a number. NOTE: silently truncates
+ * the number to fit in sizeof int.
+ */
 
 int
 _fds_getnum(char *str)
@@ -312,18 +302,18 @@ _fds_base_type(char *type)
 }
 
 /* In AIF, we can find out about the size of the AIF object by looking at the
-** AIF_LEN(), but this method cannot be used to find out about the size
-** of each individual element in a struct. To overcome this problem, we can use
-** FDSTypeSize() with the FDS for each element.
-** 
-** However, FDSTypeSize() cannot be used to know the real size if the struct
-** contains references or strings (since we also need to access the data to
-** know the size of these data types).
-** 
-** We use FDSDataSize() to overcome the limitation of FDSTypeSize(). It can 
-** access FDS and the data of an AIF object to calculate the (real) size of 
-** the data.
-*/
+ * AIF_LEN(), but this method cannot be used to find out about the size
+ * of each individual element in a struct. To overcome this problem, we can use
+ * FDSTypeSize() with the FDS for each element.
+ * 
+ * However, FDSTypeSize() cannot be used to know the real size if the struct
+ * contains references or strings (since we also need to access the data to
+ * know the size of these data types).
+ * 
+ * We use FDSDataSize() to overcome the limitation of FDSTypeSize(). It can 
+ * access FDS and the data of an AIF object to calculate the (real) size of 
+ * the data.
+ */
 
 int
 FDSDataSize(char *fds, char *data)
@@ -342,13 +332,13 @@ FDSDataSize(char *fds, char *data)
 }
 
 /*
-** Gets the size of a type in bytes, specified by the type descriptor.
-** If the size cannot fit in a int, then it is silently truncated.
-** returns size if successful, -1 otherwise.
-**
-** Note: we no longer know the size of structs or unions so these are
-** always -1.
-*/
+ * Gets the size of a type in bytes, specified by the type descriptor.
+ * If the size cannot fit in a int, then it is silently truncated.
+ * returns size if successful, -1 otherwise.
+ *
+ * Note: we no longer know the size of structs or unions so these are
+ * always -1.
+ */
 int
 FDSTypeSize(char *type)
 {
@@ -481,16 +471,16 @@ FDSIsSigned(char *fds)
 }
 
 /*
-** We support nested calls to TypeToFDS() by making a copy of any 
-** string arguments before overwriting the static buffer. e.g.
-** 
-**    TypeToFDS(AIF_ARRAY, 
-**      TypeToFDS(AIF_RANGE, 0, 10, 
-**        TypeToFDS(AIF_INTEGER, 4)
-**      ),
-**      TypeToFDS(AIF_INTEGER, 10)
-**   );
-*/
+ * We support nested calls to TypeToFDS() by making a copy of any 
+ * string arguments before overwriting the static buffer. e.g.
+ * 
+ *    TypeToFDS(AIF_ARRAY, 
+ *      TypeToFDS(AIF_RANGE, 0, 10, 
+ *        TypeToFDS(AIF_INTEGER, 4)
+ *      ),
+ *      TypeToFDS(AIF_INTEGER, 10)
+ *   );
+ */
 char *
 TypeToFDS(int type, ...)
 {
@@ -711,8 +701,8 @@ FDSTypeCompare(char *f1, char *f2)
 }
 
 /************************************************************
-*********************** ARRAY ROUTINES **********************
-*************************************************************/
+ ********************** ARRAY ROUTINES **********************
+ ************************************************************/
 
 /* extracts the index type of an array type, specified by the              */
 /* type descriptor.                                                        */
@@ -802,8 +792,8 @@ FDSArrayMaxIndex(char *fds, int n)
 }
 
 /*
-** Calculate the number of dimensions of an array.
-*/
+ * Calculate the number of dimensions of an array.
+ */
 int
 FDSArrayRank(char *fds)
 {
@@ -819,8 +809,8 @@ FDSArrayRank(char *fds)
 }
 
 /*
-** Calculate the total size of an array
-*/
+ * Calculate the total size of an array
+ */
 int
 FDSArraySize(char *fds)
 {
@@ -841,10 +831,10 @@ FDSArraySize(char *fds)
 }
 
 /*
-** Parse array type descriptor and extract the minimum and maximum
-** array index values for each dimension. Also, if size is not NULL,
-** will return the size of dimension.
-*/
+ * Parse array type descriptor and extract the minimum and maximum
+ * array index values for each dimension. Also, if size is not NULL,
+ * will return the size of dimension.
+ */
 void
 FDSArrayBounds(char *fds, int rank, int **min, int **max, int **size)
 {
@@ -885,13 +875,13 @@ FDSArrayBounds(char *fds, int rank, int **min, int **max, int **size)
 }
 
 /*
-** Extract info about an array. Returns the index type of the
-** first dimension (assumes all dimensions are the same type),
-** the element type of the array, and the number of dimensions
-** of the array. It is the responsibility of the caller to free
-** memory allocated to el.
-** 
-*/
+ * Extract info about an array. Returns the index type of the
+ * first dimension (assumes all dimensions are the same type),
+ * the element type of the array, and the number of dimensions
+ * of the array. It is the responsibility of the caller to free
+ * memory allocated to el.
+ * 
+ */
 void
 FDSArrayInfo(char *fds, int *rank, char **el, char **ix)
 {
@@ -947,19 +937,19 @@ FDSArrayIndexInit(char *fmt)
 }
 
 /************************************************************
-*********************** STRUCT ROUTINES **********************
-*************************************************************/
+ ********************** STRUCT ROUTINES **********************
+ ************************************************************/
 
 /*
-** The fds of a struct has this format:
-**
-**  {name|entry,...;entry,...;entry,...;entry,...}
-**
-**  name is the name of the structure, or empty for an unnamed type
-**  each entry has the format "name=type"
-**  a structure comprises 4 sections seperated by ';', corresponding
-**    to public, private, protected and hidden members 
-*/
+ * The fds of a struct has this format:
+ *
+ *  {name|entry,...;entry,...;entry,...;entry,...}
+ *
+ *  name is the name of the structure, or empty for an unnamed type
+ *  each entry has the format "name=type"
+ *  a structure comprises 4 sections seperated by ';', corresponding
+ *    to public, private, protected and hidden members 
+ */
 
 #define STRUCT_START(fds, res) \
 	if (*(fds) == FDS_NAME) { \
@@ -1030,8 +1020,8 @@ _fds_skiptomatch(char *fds)
 }
 
 /*
-** The function ignores access specifiers
-*/
+ * The function ignores access specifiers
+ */
 char *
 _fds_skiptofield(char *fds, int n)
 {
@@ -1074,8 +1064,8 @@ _fds_skiptofield(char *fds, int n)
 }
 
 /*
-** The function ignores access specifiers, ie: total number of fields
-*/
+ * The function ignores access specifiers, ie: total number of fields
+ */
 int
 FDSNumFields(char *fds)
 {
@@ -1136,9 +1126,9 @@ FDSNumFields(char *fds)
 }
 
 /*
-** Returns a newly alloced string for name and type
-** The function ignores access specifiers
-*/
+ * Returns a newly alloced string for name and type
+ * The function ignores access specifiers
+ */
 int
 FDSStructFieldByNumber(char *fds, int n, char **name, char **type)
 {
@@ -1155,9 +1145,9 @@ FDSStructFieldByNumber(char *fds, int n, char **name, char **type)
 }
 
 /*
-** Returns a newly alloced string for type
-** The function ignores access specifiers
-*/
+ * Returns a newly alloced string for type
+ * The function ignores access specifiers
+ */
 int
 FDSStructFieldByName(char *fds, char *name, char **type)
 {
@@ -1200,21 +1190,21 @@ FDSStructFieldByName(char *fds, char *name, char **type)
 }
 
 /*
-** Arrange the members of AIF struct defined by fds and data into a new_fds
-** and a new_data so that the FDS looks like fdsref
-**
-** If number_of_members of fdsref > number_of_members of fds 
-**	returns -1
-** Else
-** 	creates the new_fds and new_data accordingly and returns 0
-**
-** If fds got more members, the rest will be appended at the end, so
-** fdsref can be thought of as a prefix of fds.
-**
-** The function only works with the public section.
-** It does not change fdsref, fds and data.
-** It allocates the memory for new_fds and new_data
-*/
+ * Arrange the members of AIF struct defined by fds and data into a new_fds
+ * and a new_data so that the FDS looks like fdsref
+ *
+ * If number_of_members of fdsref > number_of_members of fds 
+ *	returns -1
+ * Else
+ * 	creates the new_fds and new_data accordingly and returns 0
+ *
+ * If fds got more members, the rest will be appended at the end, so
+ * fdsref can be thought of as a prefix of fds.
+ *
+ * The function only works with the public section.
+ * It does not change fdsref, fds and data.
+ * It allocates the memory for new_fds and new_data
+ */
 int
 _fds_struct_arrange(char *fdsref, char *fds, char *data, char **new_fds, char **new_data)
 {
@@ -1418,11 +1408,11 @@ FDSStructFieldSize(char *fds, char *name)
 }
 
 /*
-** The function ignores access specifiers
-** return value indicates the position of the field
-** the counter starts at 0, ie: first element is at position 0
-** if the field cannot be found, it returns -1
-*/
+ * The function ignores access specifiers
+ * return value indicates the position of the field
+ * the counter starts at 0, ie: first element is at position 0
+ * if the field cannot be found, it returns -1
+ */
 int
 FDSStructFieldIndex(char *fds, char *name)
 {
@@ -1461,8 +1451,8 @@ FDSStructInit(void)
 }
 
 /*
-** puts the new field in the public section 
-*/
+ * puts the new field in the public section 
+ */
 char *
 FDSAddFieldToStruct(char *fds, char *name, char *type)
 {
@@ -1486,8 +1476,8 @@ FDSStructAdd(char **fds, char *name, char *type)
 }
 
 /*
-** returns the data length from field 0 until field n (inclusive)
-*/
+ * returns the data length from field 0 until field n (inclusive)
+ */
 int
 _data_len_index(char *fds, int n)
 {
@@ -1574,8 +1564,8 @@ _data_len_public(char *fds)
 }
 
 /*
-** returns a pointer to a newly allocated structure
-*/
+ * returns a pointer to a newly allocated structure
+ */
 char *
 _field_attribute(char *s, char *starter, char *ender)
 {
@@ -1904,8 +1894,8 @@ FDSClassInit(void)
 }
 
 /*
-** returns a newly alloced string for name and type
-*/
+ * returns a newly alloced string for name and type
+ */
 int
 FDSClassFieldByName(char *fds, char *name, char **type)
 {
@@ -1913,8 +1903,8 @@ FDSClassFieldByName(char *fds, char *name, char **type)
 }
 
 /*
-** returns a newly alloced string for name and type
-*/
+ * returns a newly alloced string for name and type
+ */
 int
 FDSClassFieldByNumber(char *fds, int n, char **name, char **type)
 {
@@ -1922,11 +1912,11 @@ FDSClassFieldByNumber(char *fds, int n, char **name, char **type)
 }
 
 /*
-** The function ignores access specifiers
-** return value indicates the position of the field
-** the counter starts at 0, ie: first element is at position 0
-** if the field cannot be found, it returns -1
-*/
+ * The function ignores access specifiers
+ * return value indicates the position of the field
+ * the counter starts at 0, ie: first element is at position 0
+ * if the field cannot be found, it returns -1
+ */
 int
 FDSClassFieldIndex(char *fds, char *name)
 {
@@ -2222,9 +2212,9 @@ _fds_advance(char **fds)
 }
 
 /*
-** **fds is integer, float, or character.  Return how many bytes it
-** has and advance *fds to its end
-*/
+ * **fds is integer, float, or character.  Return how many bytes it
+ * has and advance *fds to its end
+ */
 int
 _fds_count_bytes(char **fds)
 {
@@ -2273,8 +2263,8 @@ _fds_count_bytes(char **fds)
 }
 
 /*
-** Count bytes but don't advance pointer
-*/
+ * Count bytes but don't advance pointer
+ */
 int
 _fds_count_bytes_na(char **fds)
 {
@@ -2310,9 +2300,9 @@ _fds_lookup(char **fmt)
 }
 
 /* 
-** Skip over one full data unit, specified by the fds,
-** At return, fds should be at its end, and data is advanced.
-*/
+ * Skip over one full data unit, specified by the fds,
+ * At return, fds should be at its end, and data is advanced.
+ */
 
 void
 _fds_skip_data(char **fds, char **data)
