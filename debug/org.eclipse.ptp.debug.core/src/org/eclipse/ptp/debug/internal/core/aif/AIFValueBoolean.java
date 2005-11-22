@@ -16,20 +16,24 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.internal.core.aif;
-
-import java.math.BigInteger;
 
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 
-public class AIFValueInteger implements IAIFValue {
-	private BigInteger val;
+/**
+ * @author Clement chu
+ * 
+ */
+public class AIFValueBoolean implements IAIFValue {
+	private boolean val;
 	
-	public AIFValueInteger(BigInteger val) {
+	public AIFValueBoolean(boolean val) {
 		this.val = val;
 	}
+
 	public String toString() {
-		return this.val.toString();
+		return Boolean.toString(val);
 	}
 }
+
+

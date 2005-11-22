@@ -20,12 +20,13 @@
 package org.eclipse.ptp.debug.core.aif;
 
 import java.math.BigInteger;
-
+import org.eclipse.ptp.debug.internal.core.aif.AIFTypeBoolean;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeCharacter;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeFloating;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeInteger;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeString;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeUnknown;
+import org.eclipse.ptp.debug.internal.core.aif.AIFValueBoolean;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueCharacter;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueFloating;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueInteger;
@@ -33,7 +34,7 @@ import org.eclipse.ptp.debug.internal.core.aif.AIFValueString;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueUnknown;
 
 public class AIF implements IAIF {
-	private IAIFType		aifType;
+	private IAIFType	aifType;
 	private IAIFValue	aifValue;
 	private String 		typeDesc  = "";
 
@@ -53,6 +54,9 @@ public class AIF implements IAIF {
 	private static final int FDS_FLOATING_LEN_POS = 1;
 	private static final int FDS_INTEGER_SIGN_POS = 1;
 	private static final int FDS_INTEGER_LEN_POS = 2;
+	private static final String FDS_START_RANGE = "[";
+	private static final String FDS_END_RANGE = "]";
+	private static final int FDS_RANGE_DOT_LEN = 2;
 	
 	public AIF(String fds, byte[] data) {
 		convertToAIF(this, fds, data);
@@ -110,7 +114,43 @@ public class AIF implements IAIF {
 			type = new AIFTypeString();
 			val = new AIFValueString(new String(strBytes));
 			break;
+
+		case FDS_ARRAY: //TODO check it pls
+			System.out.println("        ======= array: " + format);
+			getRange(format);
+			type = new AIFTypeUnknown(format);
+			val = new AIFValueUnknown();
 			
+			
+			break;
+
+		case FDS_BOOLEAN: //TODO check it pls
+			System.out.println("        ======= boolean: " + format);
+			BigInteger intBits = new BigInteger(data);
+			type = new AIFTypeBoolean();
+			val = new AIFValueBoolean(intBits.intValue()==0?false:true);
+			break;
+			
+		case FDS_ENUMERATION:
+			System.out.println("        ======= enum: " + format);
+
+			break;
+			
+		case FDS_FUNCTION:
+			break;
+
+		case FDS_STRUCT:
+			break;
+
+		case FDS_POINTER:
+			break;
+			
+		case FDS_UNION:
+			break;
+			
+		case FDS_VOID:
+			break;
+		
 		default:
 			type = new AIFTypeUnknown(format);
 			val = new AIFValueUnknown();
@@ -119,6 +159,32 @@ public class AIF implements IAIF {
 		
 		aif.setType(type);
 		aif.setValue(val);
+	}
+	private static Range getRange(String format) {
+		//format example: [r0..9is4]is4
+		int lower_start_pos = format.indexOf(FDS_START_RANGE) + 2;
+		int lower_end_pos = getDigitPos(format, lower_start_pos);
+		int lower = Integer.parseInt(format.substring(lower_start_pos, lower_end_pos), 10);
+		int upper_start_pos = lower_end_pos + FDS_RANGE_DOT_LEN;
+		int upper_end_pos = getDigitPos(format, upper_start_pos);
+		int upper = Integer.parseInt(format.substring(upper_start_pos, upper_end_pos), 10);
+		
+		Range range = new Range(lower, upper);
+		
+		int last_pos = format.indexOf(FDS_END_RANGE);
+		
+		return range;
+	}
+	private static int getDigitPos(String format, int pos) {
+		int len = format.length();
+		while (pos < len) {
+			char aChar = format.charAt(pos);
+			if (!Character.isDigit(aChar)) {
+				break;
+			}
+			pos++;
+		}
+		return pos;
 	}
 
 	public IAIFType getType() {
@@ -143,5 +209,28 @@ public class AIF implements IAIF {
 	
 	public String toString() {
 		return "<\"" + aifType.toString() + "\", " + aifValue.toString() + ">";
+	}
+	
+	private static class Range {
+		private int from = 0;
+		private int to = 0;
+		private String type = "";
+		
+		public Range(int from, int to) {
+			this.from = from;
+			this.to = to;
+		}
+		public void setType(String type) {
+			this.type = type;
+		}
+		public int getFrom() {
+			return from;
+		}
+		public int getTo() {
+			return to;
+		}
+		public String getType() {
+			return type;
+		}
 	}
 }
