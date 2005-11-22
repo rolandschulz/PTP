@@ -1,25 +1,15 @@
 /*
-** Routines for converting between native data format and
-** AIF or for constructing AIF objects.
-**
-** Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 59 Temple Place - Suite 330,
-** Boston, MA 02111-1307, USA.
-**
-*/
+ * Routines for converting between native data format and
+ * AIF or for constructing AIF objects.
+ *
+ * Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ */
 
 #ifdef HAVE_CONFIG_H
 #include	<config.h>
@@ -60,15 +50,15 @@ union ieee
 };
 
 /*
-** For _aif_*_to_str() functions
-*/
+ * For _aif_*_to_str() functions
+ */
 static char *_str_buf = NULL;
 static char *_str_pos = NULL;
 static int _str_buf_len = 0;
 
 /*
-** Convert base type to standard byte ordering.
-*/
+ * Convert base type to standard byte ordering.
+ */
 void
 _aif_normalise(char *dst, int dstlen, char *src, int srclen)
 {
@@ -103,8 +93,8 @@ _aif_normalise(char *dst, int dstlen, char *src, int srclen)
 }
 
 /*
-** Normalise a value to the standard format
-*/
+ * Normalise a value to the standard format
+ */
 void
 AIFNormalise(char *dst, int dstlen, char *src, int srclen)
 {
@@ -112,8 +102,8 @@ AIFNormalise(char *dst, int dstlen, char *src, int srclen)
 }
 
 /*
-** Convert a pointer value to AIF data format. Result is rd.
-*/
+ * Convert a pointer value to AIF data format. Result is rd.
+ */
 int
 _pointer_to_aif(char **rd, const AIF *val)
 {
@@ -136,9 +126,9 @@ _pointer_to_aif(char **rd, const AIF *val)
 }
 
 /*
-** Convert an integer value of any length to AIF data format.
-** Result is rd.
-*/
+ * Convert an integer value of any length to AIF data format.
+ * Result is rd.
+ */
 int
 _longest_to_aif(char **rd, int len, AIFLONGEST val)
 {
@@ -173,8 +163,8 @@ _longest_to_aif(char **rd, int len, AIFLONGEST val)
 }
 
 /*
-** Convert a character value to AIF data format. Result is rd.
-*/
+ * Convert a character value to AIF data format. Result is rd.
+ */
 int
 _char_to_aif(char **rd, char val)
 {
@@ -199,8 +189,8 @@ _char_to_aif(char **rd, char val)
 }
 
 /*
-** Create an empty named AIF object.
-*/
+ * Create an empty named AIF object.
+ */
 AIF *
 NameAIF(AIF *oldAIF, int name)
 {
@@ -231,8 +221,8 @@ AIFGetIdentifier(AIF *a)
 }
 
 /*
-** Create an empty reference to an AIF object
-*/
+ * Create an empty reference to an AIF object
+ */
 AIF *
 ReferenceAIF(int name)
 {
@@ -249,10 +239,10 @@ ReferenceAIF(int name)
 }
 
 /*
-** toWhat represents the sort of thing to which a null pointer needs to be
-** created.  If it is named, that name is used in the resulting AIF; otherwise,
-** the format of toWhat is used to generate the format of the new AIF.
-*/
+ * toWhat represents the sort of thing to which a null pointer needs to be
+ * created.  If it is named, that name is used in the resulting AIF; otherwise,
+ * the format of toWhat is used to generate the format of the new AIF.
+ */
 AIF *
 AIFNull(AIF *toWhat)
 {
@@ -343,8 +333,8 @@ PointerReferenceToAIF(AIF *toWhat)
 }
 
 /*
-** Create a pointer to an AIF object.
-*/
+ * Create a pointer to an AIF object.
+ */
 AIF *
 PointerToAIF(AIF *i)
 {
@@ -366,9 +356,9 @@ PointerToAIF(AIF *i)
 }
 
 /*
-** Convert a string (defined as a pointer to a null terminated array
-** of characters) to AIF format.
-*/
+ * Convert a string (defined as a pointer to a null terminated array
+ * of characters) to AIF format.
+ */
 AIF *
 StringToAIF(char *i)
 {
@@ -396,8 +386,8 @@ StringToAIF(char *i)
 }
 
 /*
-** Convert a boolean value to AIF.
-*/
+ * Convert a boolean value to AIF.
+ */
 AIF *
 BoolToAIF(int b)
 {
@@ -419,8 +409,8 @@ BoolToAIF(int b)
 }
 
 /*
-** Convert a character to AIF.
-*/
+ * Convert a character to AIF.
+ */
 AIF *
 CharToAIF(char c)
 {
@@ -440,8 +430,8 @@ CharToAIF(char c)
 }
 
 /*
-** Convert an integer to AIF.
-*/
+ * Convert an integer to AIF.
+ */
 AIF *
 IntToAIF(int i)
 {
@@ -461,8 +451,8 @@ IntToAIF(int i)
 }
 
 /*
-** Convert an unsigned integer to AIF.
-*/
+ * Convert an unsigned integer to AIF.
+ */
 AIF *
 UnsignedIntToAIF(unsigned int i)
 {
@@ -482,8 +472,8 @@ UnsignedIntToAIF(unsigned int i)
 }
 
 /*
-** Convert an integer of any length to AIF.
-*/
+ * Convert an integer of any length to AIF.
+ */
 AIF *
 LongestToAIF(AIFLONGEST i)
 {
@@ -503,9 +493,9 @@ LongestToAIF(AIFLONGEST i)
 }
 
 /*
-** Convert a floating point value of any length to AIF data format.
-** Result in rd.
-*/
+ * Convert a floating point value of any length to AIF data format.
+ * Result in rd.
+ */
 int
 _doublest_to_aif(char **rd, int len, AIFDOUBLEST val)
 {
@@ -535,8 +525,8 @@ _doublest_to_aif(char **rd, int len, AIFDOUBLEST val)
 }
 
 /*
-** Convert a single precision floating point value to AIF.
-*/
+ * Convert a single precision floating point value to AIF.
+ */
 AIF *
 FloatToAIF(float f)
 {
@@ -553,8 +543,8 @@ FloatToAIF(float f)
 }
 
 /*
-** Convert a double precision floating point value to AIF.
-*/
+ * Convert a double precision floating point value to AIF.
+ */
 AIF *
 DoubleToAIF(double f)
 {
@@ -571,17 +561,17 @@ DoubleToAIF(double f)
 }
 
 /*
-** Convert an array to AIF.
-**
-** AIF *ArrayToAIF(int rank, int *min, int *max, char *data, int len, char *btype)
-**
-** - rank is the rank of the array
-** - min is the index lower bound, or an array of lower bounds if rank > 1
-** - max is the index upper bound, or an array of upper bounds if rank > 1
-** - data is a pointer to the array data, or NULL, and must be normalised
-** - len is length in bytes of the entire array
-** - btype is the type of the array elements
-*/
+ * Convert an array to AIF.
+ *
+ * AIF *ArrayToAIF(int rank, int *min, int *max, char *data, int len, char *btype)
+ *
+ * - rank is the rank of the array
+ * - min is the index lower bound, or an array of lower bounds if rank > 1
+ * - max is the index upper bound, or an array of upper bounds if rank > 1
+ * - data is a pointer to the array data, or NULL, and must be normalised
+ * - len is length in bytes of the entire array
+ * - btype is the type of the array elements
+ */
 AIF *
 ArrayToAIF(int rank, int *min, int *max, char *data, int len, char *btype)
 {
@@ -624,8 +614,8 @@ ArrayToAIF(int rank, int *min, int *max, char *data, int len, char *btype)
 }
 
 /*
-** Create an empty AIF enumerated type.
-*/
+ * Create an empty AIF enumerated type.
+ */
 AIF *
 EmptyEnumToAIF(void) 
 {
@@ -641,8 +631,8 @@ EmptyEnumToAIF(void)
 }
 
 /*
-** Add a constant to enumerated type.
-*/
+ * Add a constant to enumerated type.
+ */
 int
 AIFAddConstToEnum(AIF *a, char *id, AIF *content)
 {
@@ -667,8 +657,8 @@ AIFAddConstToEnum(AIF *a, char *id, AIF *content)
 }
 
 /*
-** Set AIF enum type to a particular value.
-*/
+ * Set AIF enum type to a particular value.
+ */
 int
 AIFSetEnum(AIF *a, char *id)
 {
@@ -690,8 +680,8 @@ AIFSetEnum(AIF *a, char *id)
 }
 
 /*
-** Get current value of enum.
-*/
+ * Get current value of enum.
+ */
 AIF *
 AIFGetEnum(AIF *a)
 {
@@ -717,8 +707,8 @@ AIFGetEnum(AIF *a)
 }
 
 /*
-** Create an empty AIF union type.
-*/
+ * Create an empty AIF union type.
+ */
 AIF *
 EmptyUnionToAIF(void) 
 {
@@ -734,8 +724,8 @@ EmptyUnionToAIF(void)
 }
 
 /*
-** Add a filed to an AIF union.
-*/
+ * Add a filed to an AIF union.
+ */
 int
 AIFAddFieldToUnion(AIF *a, char *field, char *fmt)
 {
@@ -756,8 +746,8 @@ AIFAddFieldToUnion(AIF *a, char *field, char *fmt)
 }
 
 /*
-** Set the value of a union.
-*/
+ * Set the value of a union.
+ */
 int
 AIFSetUnion(AIF *a, char *field, AIF *data)
 {
@@ -790,8 +780,8 @@ AIFSetUnion(AIF *a, char *field, AIF *data)
 }
 
 /*
-** Get the value of a union.
-*/
+ * Get the value of a union.
+ */
 AIF *
 AIFGetUnion(AIF *a, char *field)
 {
@@ -819,8 +809,8 @@ AIFGetUnion(AIF *a, char *field)
 }
 
 /*
-** Create an empty AIF structure.
-*/
+ * Create an empty AIF structure.
+ */
 AIF *
 EmptyStructToAIF(void)
 {
@@ -836,8 +826,8 @@ EmptyStructToAIF(void)
 }
 
 /* 
-** Add a field to the public section of a structure
-*/
+ * Add a field to the public section of a structure
+ */
 int
 AIFAddFieldToStruct(AIF *a, char* field, AIF *content)
 {
@@ -894,8 +884,8 @@ AIFAddFieldToStruct(AIF *a, char* field, AIF *content)
 }
 
 /* 
-** Set the value of a field in a structure
-*/
+ * Set the value of a field in a structure
+ */
 int
 AIFSetStruct(AIF *a, char* field, AIF *content)
 {
@@ -922,8 +912,8 @@ AIFSetStruct(AIF *a, char* field, AIF *content)
 }
 
 /*
-** Get the value of a field in a structure
-*/
+ * Get the value of a field in a structure
+ */
 AIF *
 AIFGetStruct(AIF *a, char *field)
 {
@@ -959,8 +949,8 @@ AIFGetStruct(AIF *a, char *field)
 }
 
 /*
-** Convert an AIF value to a native character.
-*/
+ * Convert an AIF value to a native character.
+ */
 int
 _aif_to_char(char *data, char *val)
 {
@@ -981,8 +971,8 @@ _aif_to_char(char *data, char *val)
 }
 
 /*
-** Convert an AIF integer to the longest integer available.
-*/
+ * Convert an AIF integer to the longest integer available.
+ */
 int
 _aif_to_longest(char *data, int len, AIFLONGEST *val)
 {
@@ -1012,9 +1002,9 @@ _aif_to_longest(char *data, int len, AIFLONGEST *val)
 }
 
 /*
-** Convert AIF integer to native integer. If native integer
-** size is too small, return low order bytes.
-*/
+ * Convert AIF integer to native integer. If native integer
+ * size is too small, return low order bytes.
+ */
 int
 AIFToInt(AIF *a, int *val)
 {
@@ -1029,9 +1019,9 @@ AIFToInt(AIF *a, int *val)
 }
 
 /*
-** Convert AIF value to longest integer available. Implicitly converts
-** an floating value to an integer.
-*/
+ * Convert AIF value to longest integer available. Implicitly converts
+ * an floating value to an integer.
+ */
 int
 AIFToLongest(AIF *a, AIFLONGEST *val)
 {
@@ -1067,9 +1057,9 @@ AIFToLongest(AIF *a, AIFLONGEST *val)
 }
 
 /*
-** Convert an AIF floating data type to the largest native
-** floating poing representation available.
-*/
+ * Convert an AIF floating data type to the largest native
+ * floating poing representation available.
+ */
 int
 _aif_to_doublest(char *data, int len, AIFDOUBLEST *val)
 {
@@ -1103,8 +1093,8 @@ _aif_to_doublest(char *data, int len, AIFDOUBLEST *val)
 }
 
 /*
-** Convert an AIF float to a native single precision floating point value.
-*/
+ * Convert an AIF float to a native single precision floating point value.
+ */
 int
 AIFToFloat(AIF *a, float *val)
 {
@@ -1140,8 +1130,8 @@ AIFToFloat(AIF *a, float *val)
 }
 
 /*
-** Convert an AIF float to a native double precision floating point value.
-*/
+ * Convert an AIF float to a native double precision floating point value.
+ */
 int
 AIFToDouble(AIF *a, double *val)
 {
@@ -1162,10 +1152,10 @@ AIFToDouble(AIF *a, double *val)
 }
 
 /*
-** Convert an AIF value to a native floating point value using the
-** largest precision available. Implicitly converts an integer to
-** a float.
-*/
+ * Convert an AIF value to a native floating point value using the
+ * largest precision available. Implicitly converts an integer to
+ * a float.
+ */
 int
 AIFToDoublest(AIF *a, AIFDOUBLEST *val)
 {
@@ -1196,9 +1186,9 @@ AIFToDoublest(AIF *a, AIFDOUBLEST *val)
 }
 
 /*
-** Convert an AIF integer to and AIF float using largest precision
-** available.
-*/
+ * Convert an AIF integer to and AIF float using largest precision
+ * available.
+ */
 int
 _aif_int_to_doublest(char *data, int len, AIFDOUBLEST *val)
 {
@@ -1213,8 +1203,8 @@ _aif_int_to_doublest(char *data, int len, AIFDOUBLEST *val)
 }
 
 /*
-** Convert AIF integer to AIF float. Result is always f8.
-*/
+ * Convert AIF integer to AIF float. Result is always f8.
+ */
 int
 _aif_int_to_aif_float(char **data, char *d, int l)
 {
@@ -1229,8 +1219,8 @@ _aif_int_to_aif_float(char **data, char *d, int l)
 }
 
 /*
-** Convert AIF float to AIF integer. Result is always is4 (for convenience).
-*/
+ * Convert AIF float to AIF integer. Result is always is4 (for convenience).
+ */
 int
 _aif_float_to_aif_int(char **f, char *d, int l)
 {
@@ -1248,8 +1238,8 @@ _aif_float_to_aif_int(char **f, char *d, int l)
 }
 
 /*
-** Convert number to ascii.
-*/
+ * Convert number to ascii.
+ */
 char
 ToAscii(int n, int base)
 {
@@ -1260,8 +1250,8 @@ ToAscii(int n, int base)
 }
 
 /*
-** Create a void AIF object.
-*/
+ * Create a void AIF object.
+ */
 AIF *
 VoidToAIF(char *data, int len)
 {
@@ -1278,8 +1268,8 @@ VoidToAIF(char *data, int len)
 }
 
 /*
-** Convert an AIF void object to its native representation.
-*/
+ * Convert an AIF void object to its native representation.
+ */
 int
 AIFToVoid(AIF *a, char *data, int len)
 {
@@ -1303,8 +1293,8 @@ AIFToVoid(AIF *a, char *data, int len)
 }
 
 /*
-** Coerce an AIF object into type t if possible.
-*/
+ * Coerce an AIF object into type t if possible.
+ */
 AIF *
 AIFCoerce(AIF *a, char *t)
 {
@@ -1404,8 +1394,8 @@ AIFCoerce(AIF *a, char *t)
 }
 
 /* 
-** build an AIF from two ascii strings. 
-*/
+ * build an AIF from two ascii strings. 
+ */
 AIF *
 AsciiToAIF(char *format, char *data)
 {
@@ -2403,10 +2393,10 @@ _aif_name_to_str(int depth, char **fds, char **data)
 }
 
 /* 
-** Prints the object in human-readable form to fp, advances fds and data to
-** the first location after the part printed.  Arithmetic values are given at
-** least len bytes of significance, more if the fds indicates.
-*/
+ * Prints the object in human-readable form to fp, advances fds and data to
+ * the first location after the part printed.  Arithmetic values are given at
+ * least len bytes of significance, more if the fds indicates.
+ */
 int
 _aif_to_str(int depth, char **fds, char **data)
 {

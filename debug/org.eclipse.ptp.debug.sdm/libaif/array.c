@@ -1,24 +1,14 @@
 /*
-** AIF routines that operate specifically on arrays.
-**
-** Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 59 Temple Place - Suite 330,
-** Boston, MA 02111-1307, USA.
-**
-*/
+ * AIF routines that operate specifically on arrays.
+ *
+ * Copyright (c) 1996-2002 by Guardsoft Pty Ltd.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ */
 
 #ifdef HAVE_CONFIG_H
 #include	<config.h>
@@ -69,10 +59,10 @@ AIFArraySize(AIF *a)
 }
 
 /*
-** Parse array type descriptor and extract the minimum and maximum
-** array index values for each dimension. Also, if size is not NULL,
-** will return the size of dimension.
-*/
+ * Parse array type descriptor and extract the minimum and maximum
+ * array index values for each dimension. Also, if size is not NULL,
+ * will return the size of dimension.
+ */
 int
 AIFArrayBounds(AIF *a, int rank, int **min, int **max, int **size)
 {
@@ -94,11 +84,11 @@ AIFArrayBounds(AIF *a, int rank, int **min, int **max, int **size)
 }
 
 /*
-** Extract info about an array. Returns the index type of the
-** first dimension (assumes all dimensions are the same type),
-** the element type of the array, and the number of dimensions
-** of the array.
-*/
+ * Extract info about an array. Returns the index type of the
+ * first dimension (assumes all dimensions are the same type),
+ * the element type of the array, and the number of dimensions
+ * of the array.
+ */
 int
 AIFArrayInfo(AIF *a, int *rank, char **type, int *idx)
 {
@@ -351,9 +341,9 @@ _aif_array_slice_pre(char **fds, char **data, char **res)
 }
 
 /*
-** Evaluate array slice.
-** XXX: TOFIX
-*/
+ * Evaluate array slice.
+ * XXX: TOFIX
+ */
 AIF *
 AIFArraySlice(AIF *a, int rank, int *mn, int *mx)
 {
@@ -550,8 +540,8 @@ AIFArraySlice(AIF *a, int rank, int *mn, int *mx)
 }
 
 /*
-** XXX: TOFIX
-*/
+ * XXX: TOFIX
+ */
 /*
  * The old AIFArrayPerm() relied on the assumption that all elements of the
  * AIF array have the same size (i.e. it wrote the data for the 
@@ -724,19 +714,19 @@ AIFArrayMaxIndex(AIF *a, int n)
 }
 
 /*
-** The index array is used to compute the location of data in
-** a multi-dimensional array, and basically corresponds to a loop
-** counter in normal circumstances.
-*/
+ * The index array is used to compute the location of data in
+ * a multi-dimensional array, and basically corresponds to a loop
+ * counter in normal circumstances.
+ */
 
 #define PERMUTE(p, d) ((p) != NULL ? (p)[d] : d)
 
 /*
-** Initialise an index array to the minimum index value for each 
-** dimension, given the number of dimensions (rank), and the minimum 
-** and maximum values of each dimension (min, max). Returns the number 
-** of elements in the array.
-*/
+ * Initialise an index array to the minimum index value for each 
+ * dimension, given the number of dimensions (rank), and the minimum 
+ * and maximum values of each dimension (min, max). Returns the number 
+ * of elements in the array.
+ */
 AIFIndex *
 AIFArrayIndexInit(AIF *a)
 {
@@ -756,12 +746,12 @@ AIFArrayIndexInit(AIF *a)
 }
 
 /*
-** Check that the index value of each index in rankp is within the range
-** specified by min and max. Returns 1 if they are, otherwise 0.
-**
-** Note: rankp, index, min and max are guaranteed to have at least
-** rank elements.
-*/
+ * Check that the index value of each index in rankp is within the range
+ * specified by min and max. Returns 1 if they are, otherwise 0.
+ *
+ * Note: rankp, index, min and max are guaranteed to have at least
+ * rank elements.
+ */
 int
 AIFIndexInRange(int rank, int *index, int *min, int *max)
 {
@@ -780,9 +770,9 @@ AIFIndexInRange(int rank, int *index, int *min, int *max)
 }
 
 /*
-** Step through indexes in the order specified by the perm array.
-** Indexes cycle from min to max. Returns 1 on carry out.
-*/
+ * Step through indexes in the order specified by the perm array.
+ * Indexes cycle from min to max. Returns 1 on carry out.
+ */
 int
 AIFArrayIndexInc(AIFIndex *ix)
 {
@@ -815,9 +805,9 @@ AIFArrayIndexFree(AIFIndex *ix)
 }
 
 /*
-** Index array element and return as doublest
-** XXX: TOFIX
-*/
+ * Index array element and return as doublest
+ * XXX: TOFIX
+ */
 int
 AIFArrayElementToDoublest(AIF *a, AIFIndex *ix, AIFDOUBLEST *val)
 {
@@ -857,9 +847,9 @@ AIFArrayElementToDouble(AIF *a, AIFIndex *ix, double *val)
 }
 
 /*
-** Index array element and return as longest
-** XXX: TOFIX
-*/
+ * Index array element and return as longest
+ * XXX: TOFIX
+ */
 int
 AIFArrayElementToLongest(AIF *a, AIFIndex *ix, AIFLONGEST *val)
 {
@@ -927,8 +917,8 @@ _aif_array_ref(AIF *a, int rank, int *index, int *min, int *max, char *btype, in
 }
 
 /*
-** Compute size of array.
-*/
+ * Compute size of array.
+ */
 int
 _aif_array_size(char *fds, char *data)
 {
@@ -957,8 +947,8 @@ _aif_array_size(char *fds, char *data)
 }
 
 /*
-** Return array element at index.
-*/
+ * Return array element at index.
+ */
 AIF *
 AIFArrayElement(AIF *a, AIFIndex *ix)
 {
@@ -981,8 +971,8 @@ AIFArrayElement(AIF *a, AIFIndex *ix)
 }
 
 /*
-** Return array element at location.
-*/
+ * Return array element at location.
+ */
 AIF *
 AIFArrayRef(AIF *a, int rank, int *loc)
 {
@@ -1029,9 +1019,9 @@ AIFArrayRef(AIF *a, int rank, int *loc)
 }
 
 /*
-** Copy data into an array.
-** XXX: TOFIX
-*/
+ * Copy data into an array.
+ * XXX: TOFIX
+ */
 int
 AIFSetArrayData(AIF *dst, AIFIndex *ix, AIF *src)
 {
@@ -1069,9 +1059,9 @@ AIFSetArrayData(AIF *dst, AIFIndex *ix, AIF *src)
 }
 
 /*
-** Calculate the data offset in the array given the current value
-** of the indexes, and the minimum and maximum indices of each dimension.
-*/
+ * Calculate the data offset in the array given the current value
+ * of the indexes, and the minimum and maximum indices of each dimension.
+ */
 int
 AIFIndexOffset(int rank, int *index, int *min, int *max, int *perm)
 {
