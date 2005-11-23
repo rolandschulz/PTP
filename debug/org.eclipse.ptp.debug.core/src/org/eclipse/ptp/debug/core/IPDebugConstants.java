@@ -65,5 +65,6 @@ public interface IPDebugConstants {
 	 * Default arguments for the sdm
 	 */
 	public static final String PREF_PTP_SDM_ARGS = PLUGIN_ID + ".pDebug.sdm_args"; //$NON-NLS-1$
+	public static final String PREF_DEFAULT_SDM_ARGS = "--host=localhost --debugger=gdb-mi"; //$NON-NLS-1$
 
 }
