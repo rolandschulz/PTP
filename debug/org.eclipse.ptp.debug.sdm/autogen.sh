@@ -12,7 +12,7 @@ autogen()
 	$AUTOCONF
 }
 	
-DIRS=". bitvector"
+DIRS="."
 
 for dir in $DIRS
 do
