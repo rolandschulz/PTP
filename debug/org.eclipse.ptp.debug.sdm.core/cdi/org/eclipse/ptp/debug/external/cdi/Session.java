@@ -99,14 +99,17 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 	}
 	
 	public void shutdown() {
-		getDebugger().exit();
-		sourceManager.shutdown();
-		variableManager.shutdown();
-		expressionManager.shutdown();
-		eventManager.shutdown();
-		breakpointManager.shutdown();
-		processManager.shutdown();
-		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
+		if (debugger != null) {
+			debugger.exit();
+			sourceManager.shutdown();
+			variableManager.shutdown();
+			expressionManager.shutdown();
+			eventManager.shutdown();
+			breakpointManager.shutdown();
+			processManager.shutdown();
+			DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
+			debugger = null;
+		}
 	}
 	public IPLaunch getLaunch() {
 		return launch;

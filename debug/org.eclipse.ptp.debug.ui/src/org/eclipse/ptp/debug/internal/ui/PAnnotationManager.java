@@ -461,7 +461,6 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 								}
 							}
 						} catch (CoreException e) {
-							System.out.println("asasd");
 							return Status.CANCEL_STATUS;
 						}
 						return Status.OK_STATUS;

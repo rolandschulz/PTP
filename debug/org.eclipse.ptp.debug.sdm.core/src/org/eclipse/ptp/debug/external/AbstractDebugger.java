@@ -151,6 +151,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 				if (isJobFinished()) {
 					eventQueue.addItem(new DebuggerExitedEvent(getSession(), new BitList(0)));
 					postCommand(new StopDebuggerCommand());
+					getSession().shutdown();
 				}
 			}
 		}
