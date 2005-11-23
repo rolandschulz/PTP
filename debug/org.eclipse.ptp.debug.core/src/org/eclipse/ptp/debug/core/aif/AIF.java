@@ -20,6 +20,8 @@
 package org.eclipse.ptp.debug.core.aif;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeBoolean;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeCharacter;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeFloating;
@@ -79,13 +81,12 @@ public class AIF implements IAIF {
 
 		case FDS_FLOATING:
 			int floatLen = Character.digit(format.charAt(FDS_FLOATING_LEN_POS), 10);
+			ByteBuffer floatBuf = ByteBuffer.wrap(data);
 			double floatVal;
 			if (floatLen > 4) {
-				BigInteger longBits = new BigInteger(data);
-				floatVal = Double.longBitsToDouble(longBits.longValue());
+				floatVal = floatBuf.getDouble();
 			} else {
-				BigInteger intBits = new BigInteger(data);
-				floatVal = (double)Float.intBitsToFloat(intBits.intValue());
+				floatVal = (double)floatBuf.getFloat();
 			}
 			type = new AIFTypeFloating(floatLen);
 			val = new AIFValueFloating(floatVal);
@@ -94,9 +95,16 @@ public class AIF implements IAIF {
 		case FDS_INTEGER:
 			int intLen = Character.digit(format.charAt(FDS_INTEGER_LEN_POS), 10);
 			boolean signed = (format.charAt(FDS_INTEGER_SIGN_POS) == 's');
-			BigInteger intVal = new BigInteger(data);
+			ByteBuffer intBuf = ByteBuffer.wrap(data);
+			long intVal;
+			if (intLen > 4) {
+				intVal = intBuf.getLong();
+			}
+			else {
+				intVal = (long)intBuf.getInt();
+			}
 			if (!signed) 
-				intVal = intVal.abs();
+				intVal = Math.abs(intVal);
 			type = new AIFTypeInteger(signed, intLen);
 			val = new AIFValueInteger(intVal);
 			break;
