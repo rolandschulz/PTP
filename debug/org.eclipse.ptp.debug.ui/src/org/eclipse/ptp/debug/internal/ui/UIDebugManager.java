@@ -47,6 +47,7 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.ProcessInputStream;
@@ -69,7 +70,6 @@ import org.eclipse.ptp.debug.external.cdi.event.ErrorEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorSignaledEvent;
-import org.eclipse.ptp.debug.internal.ui.preferences.IPDebugPreferenceConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.debug.ui.events.IDebugActionEvent;
 import org.eclipse.ptp.debug.ui.events.ResumedDebugEvent;
@@ -113,7 +113,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		super.shutdown();
 	}
 	private void defaultRegister(IPCDISession session) { // register process 0 if the preference is checked
-		if (PTPDebugUIPlugin.getDefault().getPreferenceStore().getBoolean(IPDebugPreferenceConstants.PREF_PTP_DEBUG_REGISTER_PROC_0)) {
+		if (PTPDebugUIPlugin.getDefault().getPreferenceStore().getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0)) {
 			IPProcess proc = session.getJob().findProcessByTaskId(0);
 			if (proc != null)
 				registerProcess(session, proc, true);

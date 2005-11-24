@@ -24,8 +24,8 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation;
-import org.eclipse.ptp.debug.internal.ui.preferences.IPDebugPreferenceConstants;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.swt.custom.BusyIndicator;
 
@@ -35,7 +35,7 @@ import org.eclipse.swt.custom.BusyIndicator;
  */
 public class ShowFullPathsAction extends ViewFilterAction {
 	protected String getPreferenceKey() {
-		return IPDebugPreferenceConstants.PREF_SHOW_FULL_PATHS;
+		return IPDebugConstants.PREF_SHOW_FULL_PATHS;
 	}
 	
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
