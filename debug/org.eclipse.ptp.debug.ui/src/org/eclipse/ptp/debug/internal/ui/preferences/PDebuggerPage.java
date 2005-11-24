@@ -19,9 +19,10 @@
 package org.eclipse.ptp.debug.internal.ui.preferences;
 
 import java.io.File;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -46,13 +47,13 @@ public class PDebuggerPage extends AbstractDebugPerferencePage {
 	private Button sdmPathButton = null;
 	
     protected class WidgetListener extends SelectionAdapter implements ModifyListener {
-    		public void widgetSelected(SelectionEvent e) {
-	    		Object source = e.getSource();
-	        if (source == sdmPathButton)
-	        		handleSDMButtonSelected();
-    		}
+   		public void widgetSelected(SelectionEvent e) {
+    		Object source = e.getSource();
+        if (source == sdmPathButton)
+       		handleSDMButtonSelected();
+   		}
 	    public void modifyText(ModifyEvent e) {
-	    		setValid(isValid());        	
+    		setValid(isValid());        	
 	    }
     }
     protected WidgetListener listener = new WidgetListener();
@@ -102,29 +103,33 @@ public class PDebuggerPage extends AbstractDebugPerferencePage {
 		sdmArgsText.addModifyListener(listener);
 	}
 	protected void defaultSetting() {
-		IPreferenceStore store = getPreferenceStore();
-		//store.setDefault(IPDebugConstants.PREF_PTP_SDM_FILE, "");
-		store.setValue(IPDebugConstants.PREF_PTP_SDM_ARGS, IPDebugConstants.PREF_DEFAULT_SDM_ARGS);
+		//IPreferenceStore store = getPreferenceStore();
+		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
+		preferences.setDefault(IPDebugConstants.PREF_PTP_SDM_FILE, IPDebugConstants.PREF_PTP_SDM_FILE);
+		preferences.setValue(IPDebugConstants.PREF_PTP_SDM_ARGS, IPDebugConstants.PREF_DEFAULT_SDM_ARGS);
 	}
 	public void performDefaults() { 
-		IPreferenceStore store = getPreferenceStore();
-		sdmPathText.setText(store.getDefaultString(IPDebugConstants.PREF_PTP_SDM_FILE));
-		sdmArgsText.setText(store.getDefaultString(IPDebugConstants.PREF_PTP_SDM_ARGS));
+		//IPreferenceStore store = getPreferenceStore();
+		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
+		sdmPathText.setText(preferences.getDefaultString(IPDebugConstants.PREF_PTP_SDM_FILE));
+		sdmArgsText.setText(preferences.getDefaultString(IPDebugConstants.PREF_PTP_SDM_ARGS));
 		super.performDefaults();
 	}
 	protected void setValues() {
-		IPreferenceStore store = getPreferenceStore();
-		sdmPathText.setText(store.getString(IPDebugConstants.PREF_PTP_SDM_FILE));
-		sdmArgsText.setText(store.getString(IPDebugConstants.PREF_PTP_SDM_ARGS));
+		//IPreferenceStore store = getPreferenceStore();
+		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
+		sdmPathText.setText(preferences.getString(IPDebugConstants.PREF_PTP_SDM_FILE));
+		sdmArgsText.setText(preferences.getString(IPDebugConstants.PREF_PTP_SDM_ARGS));
 	}	
 	protected void storeValues() {
-		IPreferenceStore store = getPreferenceStore();
-		store.setValue(IPDebugConstants.PREF_PTP_SDM_FILE, sdmPathText.getText());
-		store.setValue(IPDebugConstants.PREF_PTP_SDM_ARGS, sdmArgsText.getText());
+		//IPreferenceStore store = getPreferenceStore();
+		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
+		preferences.setValue(IPDebugConstants.PREF_PTP_SDM_FILE, sdmPathText.getText());
+		preferences.setValue(IPDebugConstants.PREF_PTP_SDM_ARGS, sdmArgsText.getText());
 	}
 	
     public void propertyChange(PropertyChangeEvent event) {
-    		setValid(isValid());
+    	setValid(isValid());
     }	
 
 	public boolean isValid() {
