@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.preferences;
 
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -77,9 +78,10 @@ public class PDebugPreferencePage extends AbstractDebugPerferencePage {
 		store.setDefault(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, true);
 	}
 	public void performDefaults() { 
-		IPreferenceStore store = getPreferenceStore();
-		fPathsButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS));
-		fRegisteredProcessButton.setSelection(store.getDefaultBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0));		
+		//IPreferenceStore store = getPreferenceStore();
+		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
+		fPathsButton.setSelection(preferences.getBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS));
+		fRegisteredProcessButton.setSelection(preferences.getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0));		
 		super.performDefaults();
 	}
 	
@@ -89,20 +91,21 @@ public class PDebugPreferencePage extends AbstractDebugPerferencePage {
 			refreshViews(new String[] {IDebugUIConstants.ID_BREAKPOINT_VIEW});
 		}
 
-		PTPDebugUIPlugin.getDefault().savePluginPreferences();
 		PTPDebugCorePlugin.getDefault().savePluginPreferences();
 		return true;
 	}
 	
 	protected void setValues() {
-		IPreferenceStore store = getPreferenceStore();
-		fPathsButton.setSelection(store.getBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS));
-		fRegisteredProcessButton.setSelection(store.getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0));
+		//IPreferenceStore store = getPreferenceStore();
+		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
+		fPathsButton.setSelection(preferences.getBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS));
+		fRegisteredProcessButton.setSelection(preferences.getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0));
 	}
 	protected void storeValues() {
-		IPreferenceStore store = getPreferenceStore();
-		store.setValue(IPDebugConstants.PREF_SHOW_FULL_PATHS, fPathsButton.getSelection());
-		store.setValue(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, fRegisteredProcessButton.getSelection());
+		//IPreferenceStore store = getPreferenceStore();
+		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
+		preferences.setValue(IPDebugConstants.PREF_SHOW_FULL_PATHS, fPathsButton.getSelection());
+		preferences.setValue(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, fRegisteredProcessButton.getSelection());
 		IDebugModelPresentation pres = PTPDebugUIPlugin.getDebugModelPresentation();
 		if (pres != null) {
 			pres.setAttribute(PDebugModelPresentation.DISPLAY_FULL_PATHS, fPathsButton.getSelection()?Boolean.TRUE:Boolean.FALSE);
