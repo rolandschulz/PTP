@@ -67,4 +67,16 @@ public interface IPDebugConstants {
 	public static final String PREF_PTP_SDM_ARGS = PLUGIN_ID + ".pDebug.sdm_args"; //$NON-NLS-1$
 	public static final String PREF_DEFAULT_SDM_ARGS = "--host=localhost --debugger=gdb-mi"; //$NON-NLS-1$
 
+	
+	public static final String PREF_SHOW_FULL_PATHS = PLUGIN_ID + ".pDebug.show_full_paths";
+
+	public static final String PREF_PTP_DEBUGGER = PLUGIN_ID + ".pDebug.debuggers";
+	public static final String PREF_PTP_DEBUG_COMM_TIMEOUT = PLUGIN_ID + ".pDebug.timeout";
+	public static final String PREF_PTP_DEBUG_EVENT_TIME = PLUGIN_ID + ".pDebug.eventTime";
+
+	public static final String PREF_PTP_DEBUG_REGISTER_PROC_0 = PLUGIN_ID + ".pDebug.regPro0";
+	
+	public static final int DEFAULT_DEBUG_TIMEOUT = 0;
+	public static final int DEFAULT_DEBUG_EVENTTIME = 0;
+	
 }

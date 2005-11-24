@@ -24,7 +24,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -162,8 +162,9 @@ public abstract class AbstractDebugPerferencePage extends PreferencePage impleme
 
 	public boolean performOk() {
 		storeValues();
-		PTPDebugUIPlugin.getDefault().savePluginPreferences();
-		PTPDebugCorePlugin.getDefault().savePluginPreferences();
+		//PTPDebugUIPlugin.getDefault().savePluginPreferences();
+		//PTPDebugCorePlugin.getDefault().savePluginPreferences();
+		PTPCorePlugin.getDefault().savePluginPreferences();
 		return true;
 	}
 	
