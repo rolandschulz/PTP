@@ -35,6 +35,9 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+/**
+ * @deprecated
+ */
 public class DebugPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage
 {
 	static public final int SIMULATOR = 100;

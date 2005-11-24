@@ -56,6 +56,7 @@ public class ManagedCProjectCreation extends SimulationProjectCreation {
 	protected String getTemplateFile() {
 		return "ctemplate.txt";
 	}
+	//TODO - hardcode the C editor
 	protected String getEditorID() {
 		return "org.eclipse.cdt.ui.editor.CEditor";
 	}
