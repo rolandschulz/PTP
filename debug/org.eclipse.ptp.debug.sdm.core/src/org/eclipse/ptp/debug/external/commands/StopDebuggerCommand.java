@@ -27,9 +27,19 @@ import org.eclipse.ptp.debug.external.IAbstractDebugger;
  */
 public class StopDebuggerCommand extends AbstractDebugCommand {
 	public StopDebuggerCommand() {
-		super(null, false, false);
+		super(null, false, true);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.stopDebugger();
+		waitFinish(debugger);
+	}
+	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
+		if (waitForReturn()) {
+			if (result.equals(OK)) {
+				debugger.handleStopDebuggerEvent();
+				return;
+			}
+		}
+		throw new PCDIException("Cannot stop debugger");		
 	}
 }

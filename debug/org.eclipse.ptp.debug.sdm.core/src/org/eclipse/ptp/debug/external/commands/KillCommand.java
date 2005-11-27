@@ -32,8 +32,10 @@ public class KillCommand extends AbstractDebugCommand {
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterTerminateTasks(tasks);
-		debugger.kill(tasks);
-		waitFinish(debugger);
+		if (!tasks.isEmpty()) {
+			debugger.kill(tasks);
+			waitFinish(debugger);
+		}
 	}
 	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
 		if (waitForReturn()) {

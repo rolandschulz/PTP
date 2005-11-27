@@ -37,7 +37,9 @@ public class StepFinishCommand extends AbstractDebugCommand {
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterRunningTasks(tasks);
-		debugger.handleProcessResumedEvent(tasks);
-		debugger.stepFinish(tasks, count);
+		if (!tasks.isEmpty()) {
+			debugger.handleProcessResumedEvent(tasks);
+			debugger.stepFinish(tasks, count);
+		}
 	}
 }

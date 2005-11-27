@@ -1,11 +1,5 @@
 package org.eclipse.ptp.debug.core;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.cdi.ICDICondition;
-import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDILocation;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -14,12 +8,9 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointsListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.ISourceLocator;
-import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
-import org.eclipse.ptp.debug.core.model.IPFunctionBreakpoint;
-import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupDirector;
 
 /**

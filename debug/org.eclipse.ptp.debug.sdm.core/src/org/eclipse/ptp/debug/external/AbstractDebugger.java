@@ -149,9 +149,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			//eventQueue.addItem(event);
 			if (event instanceof IPCDIExitedEvent) {
 				if (isJobFinished()) {
-					eventQueue.addItem(new DebuggerExitedEvent(getSession(), new BitList(0)));
 					postCommand(new StopDebuggerCommand());
-					getSession().shutdown();
 				}
 			}
 		}
@@ -168,6 +166,10 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	}
 
 	//event
+	public void handleStopDebuggerEvent() {
+		eventQueue.addItem(new DebuggerExitedEvent(getSession(), new BitList(0)));
+		getSession().shutdown();
+	}
 	public void handleBreakpointCreatedEvent(BitList tasks) {
 		fireEvent(new BreakpointCreatedEvent(getSession(), tasks));		
 	}

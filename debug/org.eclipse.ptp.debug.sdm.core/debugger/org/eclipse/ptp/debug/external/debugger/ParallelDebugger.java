@@ -36,13 +36,11 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
-import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
+import org.eclipse.ptp.debug.external.cdi.event.ErrorEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorSignaledEvent;
 import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
@@ -407,6 +405,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_EXIT:
+			System.out.println("======================= EVENT_DBG_EXIT ====================");
 			fireEvent(new InferiorExitedEvent(getSession(), e.getBitSet()));
 			break;
 			
@@ -416,9 +415,10 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_ERROR:
-			System.out.println("got error from server");
+			System.out.println("======================= EVENT_DBG_ERROR ====================");
 			completeCommand(null);
-			fireEvent(new InferiorExitedEvent(getSession(), e.getBitSet()));
+			fireEvent(new ErrorEvent(getSession(), e.getBitSet()));
+			//fireEvent(new InferiorExitedEvent(getSession(), e.getBitSet()));
 			break;
 		}
 	}

@@ -40,6 +40,7 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 
 /**
+ * @deprecated
  * Default implementation of the session manager. Terminates the session when the last target is terminated;
  */
 public class SessionManager implements IDebugEventSetListener {

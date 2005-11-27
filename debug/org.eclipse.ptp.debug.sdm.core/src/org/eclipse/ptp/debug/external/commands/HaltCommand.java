@@ -32,6 +32,8 @@ public class HaltCommand extends AbstractDebugCommand {
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterSuspendTasks(tasks);
-		debugger.halt(tasks);
+		if (!tasks.isEmpty()) {
+			debugger.halt(tasks);
+		}
 	}
 }
