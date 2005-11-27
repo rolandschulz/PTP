@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
-import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
@@ -190,11 +189,6 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				}
 			});
 		}
-	}
-	public void removeEventListener(String job_id) {
-		ICDISession session = getDebugSession(job_id);
-		if (session != null)
-			session.getEventManager().removeEventListener(this);
 	}
 	public IPCDISession getDebugSession(String job_id) {
 		if (isNoJob(job_id))
@@ -534,7 +528,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				// System.out.println("-------------------- resume ------------------------");
 				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
 				fireResumeEvent(job, event.getAllProcesses());
-			} else if (event instanceof InferiorExitedEvent || event instanceof ErrorEvent) {
+			} else if (event instanceof InferiorExitedEvent) {
 				try {
 					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses());
 				} catch (CoreException e) {
@@ -543,6 +537,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				// System.out.println("-------------------- terminate ------------------------");
 				// annotationMgr.printBitList(event.getAllProcesses());
 				fireTerminatedEvent(job, event.getAllProcesses());
+			} else if (event instanceof ErrorEvent) {
+				PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", new Exception("Internal error on tasks: "+ event.getAllProcesses().toString()));
 			} else if (event instanceof InferiorSignaledEvent) {
 				InferiorSignaledEvent signalEvent = (InferiorSignaledEvent) event;
 				ICDILocator locator = signalEvent.getLocator();
@@ -567,7 +563,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			} else if (event instanceof DebuggerExitedEvent) {
 				condition = new Boolean(true);
 				annotationMgr.removeAnnotationGroup(job.getIDString());
-				getDebugSession(job).getEventManager().addEventListener(this);
+				getDebugSession(job).getEventManager().removeEventListener(this);
 			}
 			firePaintListener(condition);
 		}
