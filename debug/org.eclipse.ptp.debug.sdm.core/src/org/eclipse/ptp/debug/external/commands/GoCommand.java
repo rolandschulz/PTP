@@ -32,7 +32,9 @@ public class GoCommand extends AbstractDebugCommand {
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterRunningTasks(tasks);
-		debugger.handleProcessResumedEvent(tasks);
-		debugger.go(tasks);
+		if (!tasks.isEmpty()) {
+			debugger.handleProcessResumedEvent(tasks);
+			debugger.go(tasks);
+		}
 	}
 }

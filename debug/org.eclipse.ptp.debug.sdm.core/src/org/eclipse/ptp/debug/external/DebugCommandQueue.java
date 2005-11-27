@@ -83,8 +83,7 @@ public class DebugCommandQueue extends Thread {
 		synchronized (queue) {
 			if (!queue.contains(command)) {
 				if (command.canInterrupt() && currentCommand != null) {
-					flushCommands();
-					currentCommand.flush();
+					setCommandReturn(null);
 					try {
 						//To make sure all events fired via AsbtractDebugger, so wait 1 sec here
 						queue.wait(500);
@@ -110,7 +109,13 @@ public class DebugCommandQueue extends Thread {
 	public void setCommandReturn(Object result) {
 		synchronized (queue) {
 			if (currentCommand != null) {
-				currentCommand.setReturn(result);
+				if (result == null) {
+					flushCommands();
+					currentCommand.flush();
+				}
+				else {
+					currentCommand.setReturn(result);
+				}
 			}
 		}
 	}

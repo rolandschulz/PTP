@@ -77,7 +77,6 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	}
 	public void shutdown() {
 		list.clear();
-		list = null;
 	}
 	public void addEventListener(ICDIEventListener listener) {
 		if (!list.contains(listener))
