@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.core.aif;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
-
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeBoolean;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeCharacter;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeFloating;
@@ -73,13 +72,19 @@ public class AIF implements IAIF {
 		IAIFType type = null;
 		IAIFValue val = null;
 		
+		for (int i=0; i<data.length; i++) {
+			System.out.println("Data: " + data[i]);
+		}
+
 		switch (format.charAt(0)) {
 		case FDS_CHARACTER:
+			System.out.println("        ======= character: " + format);
 			type = new AIFTypeCharacter();
 			val = new AIFValueCharacter((char)data[0]);
 			break;
 
 		case FDS_FLOATING:
+			System.out.println("        ======= floating: " + format);
 			int floatLen = Character.digit(format.charAt(FDS_FLOATING_LEN_POS), 10);
 			ByteBuffer floatBuf = ByteBuffer.wrap(data);
 			double floatVal;
@@ -93,6 +98,7 @@ public class AIF implements IAIF {
 			break;
 			
 		case FDS_INTEGER:
+			System.out.println("        ======= integer: " + format);
 			int intLen = Character.digit(format.charAt(FDS_INTEGER_LEN_POS), 10);
 			boolean signed = (format.charAt(FDS_INTEGER_SIGN_POS) == 's');
 			ByteBuffer intBuf = ByteBuffer.wrap(data);
@@ -110,6 +116,7 @@ public class AIF implements IAIF {
 			break;
 		
 		case FDS_STRING:
+			System.out.println("        ======= string: " + format);
 			int len = 0;
 			len = data[0];
 			len <<= 8;
@@ -124,12 +131,16 @@ public class AIF implements IAIF {
 			break;
 
 		case FDS_ARRAY: //TODO check it pls
-			System.out.println("        ======= array: " + format);
-			getRange(format);
-			type = new AIFTypeUnknown(format);
-			val = new AIFValueUnknown();
-			
-			
+			try {
+				System.out.println("        ======= array: " + format);
+				int dim = format.split("]").length -1;
+				System.out.println("------------- dims: " + dim + ", data: " + data.length);
+				getRange(format);
+				type = new AIFTypeUnknown(format);
+				val = new AIFValueUnknown();
+			} catch (Exception e) {
+				System.out.println("err: " + e.getMessage());
+			}
 			break;
 
 		case FDS_BOOLEAN: //TODO check it pls
@@ -141,22 +152,28 @@ public class AIF implements IAIF {
 			
 		case FDS_ENUMERATION:
 			System.out.println("        ======= enum: " + format);
-
 			break;
 			
 		case FDS_FUNCTION:
+			System.out.println("        ======= function: " + format);
 			break;
 
 		case FDS_STRUCT:
+			System.out.println("        ======= structure: " + format);
 			break;
 
 		case FDS_POINTER:
+			System.out.println("        ======= pointer: " + format);
+			type = new AIFTypeUnknown(format);
+			val = new AIFValueUnknown();
 			break;
 			
 		case FDS_UNION:
+			System.out.println("        ======= union: " + format);
 			break;
 			
 		case FDS_VOID:
+			System.out.println("        ======= void: " + format);
 			break;
 		
 		default:
@@ -180,6 +197,7 @@ public class AIF implements IAIF {
 		Range range = new Range(lower, upper);
 		
 		int last_pos = format.indexOf(FDS_END_RANGE);
+		
 		
 		return range;
 	}
@@ -216,7 +234,11 @@ public class AIF implements IAIF {
 	}
 	
 	public String toString() {
-		return "<\"" + aifType.toString() + "\", " + aifValue.toString() + ">";
+		try {
+			return "<\"" + aifType.toString() + "\", " + aifValue.toString() + ">";
+		} catch (Exception e) {
+			return "err: " + e.getMessage();
+		}
 	}
 	
 	private static class Range {
