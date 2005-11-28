@@ -66,7 +66,6 @@ public class VariableManager extends Manager {
 	}
 	public void shutdown() {
 		variablesMap.clear();
-		variablesMap = null;
 	}	
 	synchronized List getVariablesList(Target target) {
 		List variablesList = (List) variablesMap.get(target);

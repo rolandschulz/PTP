@@ -42,7 +42,6 @@ public class ProcessManager extends Manager {
 	}
 	public void shutdown() {
 		debugTargetMap.clear();
-		debugTargetMap = null;
 	}
 	public Target[] getTargets() {
 		return (Target[]) debugTargetMap.values().toArray(new Target[debugTargetMap.size()]);
