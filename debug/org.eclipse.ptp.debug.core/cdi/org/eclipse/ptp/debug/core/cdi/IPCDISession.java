@@ -41,5 +41,6 @@ public interface IPCDISession extends ICDISession, ICommonActions {
 	public BitList getRegisteredTargets();
 	public ICDITarget getTarget(int target_id);
 	public void shutdown();
+
 	public IPLaunch getLaunch();
 }

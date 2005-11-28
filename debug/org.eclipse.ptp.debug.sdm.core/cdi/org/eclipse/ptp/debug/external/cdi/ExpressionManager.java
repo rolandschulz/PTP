@@ -41,8 +41,6 @@ public class ExpressionManager extends Manager {
 	public void shutdown() {
 		expMap.clear();
 		varMap.clear();
-		expMap = null;
-		varMap = null;
 	}
 
 	synchronized List getExpressionList(Target target) {
