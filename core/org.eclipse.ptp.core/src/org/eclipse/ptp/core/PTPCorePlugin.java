@@ -87,7 +87,11 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 			Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 			int MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
 			int CSChoiceID = preferences.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
-			modelManager.refreshRuntimeSystems(CSChoiceID, MSChoiceID);
+			int curMSID = modelManager.getControlSystemID();
+			int curCSID = modelManager.getMonitoringSystemID();
+			if(curMSID != MSChoiceID || curCSID != CSChoiceID) {
+				modelManager.refreshRuntimeSystems(CSChoiceID, MSChoiceID);
+			}
 		}
 		return modelManager;
 	}
