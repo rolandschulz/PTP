@@ -45,6 +45,8 @@ public interface IModelManager {
 
 	public IControlSystem getControlSystem();
 	public IMonitoringSystem getMonitoringSystem();
+	public int getControlSystemID();
+	public int getMonitoringSystemID();
 	public boolean isParallelPerspectiveOpen();
 	public void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID);
 	public void shutdown();

@@ -78,8 +78,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	protected IMonitoringSystem monitoringSystem = null;
 	protected IRuntimeProxy runtimeProxy = null;
 
-	private int currentControlSystem = 0;
-	private int currentMonitoringSystem = 0;
+	private int currentControlSystem = -1;
+	private int currentMonitoringSystem = -1;
 	
 	public boolean isParallelPerspectiveOpen() {
 		return isPerspectiveOpen;
@@ -137,14 +137,20 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		return controlSystem;
 	}
 	
+	public int getControlSystemID() { return currentControlSystem; }
+	
 	public IMonitoringSystem getMonitoringSystem() {
 		return monitoringSystem;
 	}
 	
+	public int getMonitoringSystemID() { return currentMonitoringSystem; }
+	
 	public void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID)
 	{
-		if (controlSystemID == currentControlSystem && monitoringSystemID == currentMonitoringSystem)
-			return;
+		//System.out.println("************************* REFRESH SYSTEM!");
+		
+		//if (controlSystemID == currentControlSystem && monitoringSystemID == currentMonitoringSystem)
+		//	return;
 
 		/*
 		 * Shutdown runtime if it is already active
