@@ -98,6 +98,9 @@ public class IconCanvas extends Canvas {
 	protected Cursor defaultCursor = null;
 	protected Color background = null;
 	protected Color foreground = null;
+	
+	//setting
+	protected int MARK_INDEX = 100; 
 	// input
 	protected int total_elements = 0;
 	final static boolean IS_CARBON, IS_GTK, IS_MOTIF;
@@ -169,6 +172,13 @@ public class IconCanvas extends Canvas {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
 		this.total_elements = total;
+		resetCanvas();
+	}
+	public void setMarkNumber(int number) {
+		if (number < 10) {
+			SWT.error(SWT.ERROR_INVALID_ARGUMENT);
+		}
+		this.MARK_INDEX = number;
 		resetCanvas();
 	}
 	public void setIconSpace(int e_spacing_x, int e_spacing_y) {
@@ -1088,6 +1098,11 @@ public class IconCanvas extends Canvas {
 				if (index > -1 && index < total) {
 					int x_loc = e_offset_x + ((col_count) * getElementWidth());
 					int y_loc = e_offset_y + ((row_count) * getElementHeight()) - verticalScrollOffset;
+					if (index > 0 && index % MARK_INDEX == 0) {
+						newGC.setBackground(getDisplay().getSystemColor(SWT.COLOR_RED));
+						newGC.fillRectangle(x_loc-e_spacing_x, y_loc, e_spacing_x, e_height);
+						newGC.setBackground(getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+					}
 					drawImage(newGC, index, x_loc, y_loc, (selectedElements.get(index) || tempSelectedElements.get(index)));
 				}
 			}
@@ -1470,7 +1485,7 @@ public class IconCanvas extends Canvas {
 	 * Self testing
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public static void main(String[] args) {
-		final int totalImage = 10000;
+		final int totalImage = 5000;
         final Display display = new Display();
         final Shell shell = new Shell(display);
         shell.setLocation(0, 0);
@@ -1479,8 +1494,8 @@ public class IconCanvas extends Canvas {
 
 		//File normalFile = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running.gif");
 		//File selectedFile = new File("D:/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
-		File normalFile = new File("/home/clement/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running.gif");
-		File selectedFile = new File("/home/clement/eclipse3.1/workspace/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
+		File normalFile = new File("/home/clement/eclipse3.1.1/workspace/org.eclipse.ptp.ui/icons/node/node_running.gif");
+		File selectedFile = new File("/home/clement/eclipse3.1.1/workspace/org.eclipse.ptp.ui/icons/node/node_running_sel.gif");
 		
 		URL normalURL = null;
 		URL selectedlURL = null;
@@ -1507,6 +1522,7 @@ public class IconCanvas extends Canvas {
         		return " The element: " + index;
         	}
         });
+        iconCanvas.setMarkNumber(300);
         iconCanvas.setTotal(totalImage);
 
         shell.open();
