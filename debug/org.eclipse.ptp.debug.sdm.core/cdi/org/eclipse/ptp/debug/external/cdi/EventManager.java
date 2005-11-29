@@ -37,6 +37,7 @@ import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIEventManager;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
 import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIChangedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDICreatedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIDisconnectedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
@@ -66,6 +67,9 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 		else if (event instanceof IPCDIDisconnectedEvent) {
 		}
 		else if (event instanceof IPCDICreatedEvent) {
+		}
+		else if (event instanceof IPCDIChangedEvent) {
+			
 		}
 		// Fire the event;
 		ICDIEvent[] cdiEvents = (ICDIEvent[])cdiList.toArray(new ICDIEvent[0]);
@@ -100,12 +104,10 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	
 	boolean processSuspendedEvent(IPCDISuspendedEvent event) {
 		Session session = (Session)getSession();
-		/*
 		VariableManager varMgr = session.getVariableManager();
 		ExpressionManager expMgr  = session.getExpressionManager();		
-		BreakpointManager bpMgr = session.getBreakpointManager();
+		//BreakpointManager bpMgr = session.getBreakpointManager();
 		SourceManager srcMgr = session.getSourceManager();
-		*/
 		
 		int[] procs = event.getAllRegisteredProcesses().toArray();
 		for (int i = 0; i < procs.length; i++) {
@@ -130,8 +132,6 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 			} catch (CDIException e1) {
 				e1.printStackTrace();
 			}
-			/*
-			 * TODO - not important at this moment
 			try {
 				if (varMgr.isAutoUpdate()) {
 					varMgr.update(currentTarget);
@@ -139,16 +139,15 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 				if (expMgr.isAutoUpdate()) { 
 					expMgr.update(currentTarget);
 				}
-				if (bpMgr.isAutoUpdate()) {
-					bpMgr.update(currentTarget);
-				}
+				//if (bpMgr.isAutoUpdate()) {
+					//bpMgr.update(currentTarget);
+				//}
 				if (srcMgr.isAutoUpdate()) {
 					srcMgr.update(currentTarget);
 				}
 			} catch (CDIException e) {
 				e.printStackTrace();
 			}
-			*/
 		}
 		return true;
 	}
