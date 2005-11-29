@@ -111,6 +111,8 @@ public class AIF implements IAIF {
 			}
 			if (!signed) 
 				intVal = Math.abs(intVal);
+			
+			System.out.println("------------------------ intVal: " + intVal);
 			type = new AIFTypeInteger(signed, intLen);
 			val = new AIFValueInteger(intVal);
 			break;
