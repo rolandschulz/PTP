@@ -108,10 +108,12 @@ public class VariableManager extends Manager {
 					// check stackframes
 					ICDIStackFrame frame = vars[i].getStackFrame();
 					if (vstack == null && frame == null) {
+						vars[i].setAIF(v.getAIF());
 						return vars[i];
 					} else if (frame != null && vstack != null && frame.equals(vstack)) {
 						if (vars[i].getPosition() == position) {
 							if (vars[i].getStackDepth() == depth) {
+								vars[i].setAIF(v.getAIF());
 								return vars[i];
 							}
 						}
@@ -399,7 +401,7 @@ public class VariableManager extends Manager {
 					IAIF aif = varDesc.getAIF();
 					if (aif == null) {
 						GetAIFCommand aifCmd = new GetAIFCommand(tasks, fName);
-						session.getDebugger().postCommandAndWait(aifCmd);
+						session.getDebugger().postCommand(aifCmd);
 						aif = aifCmd.getAIF();
 					}
 					varObjects.add(new LocalVariableDescriptor(target, thread, frame, name, fName, pos, depth, aif));
@@ -492,18 +494,20 @@ public class VariableManager extends Manager {
 			}
 			frames = currentThread.getStackFrames(0, highLevel);
 		}
+		Session session = (Session)target.getSession();
 		for (int i = 0; i < vars.length; i++) {
 			Variable variable = vars[i];
 			if (isVariableNeedsToBeUpdate(variable, currentStack, frames, lowLevel)) {
 				//String varName = variable.getName();
 				//TODO how to implement ?
 				variable.setUpdated(true);
+				//eventList.add(new ChangedEvent(session, session.createBitList(target.getTargetID()), variable));
 			} else {
 				variable.setUpdated(false);
 			}
 		}
 		ICDIEvent[] events = (ICDIEvent[]) eventList.toArray(new ICDIEvent[0]);
-		((EventManager)((Session)getSession()).getEventManager()).fireEvents(events);		
+		((EventManager)session.getEventManager()).fireEvents(events);		
 		//throw new CDIException("Not implement yet - VariableManager: update");
 	}
 	public void update(Variable variable) throws CDIException {

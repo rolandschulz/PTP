@@ -29,7 +29,6 @@
 package org.eclipse.ptp.debug.internal.core.model; 
 
 import java.text.MessageFormat;
-
 import org.eclipse.cdt.core.IBinaryParser.ISymbol;
 import org.eclipse.cdt.core.model.IBinaryModule;
 import org.eclipse.cdt.core.model.ICElement;

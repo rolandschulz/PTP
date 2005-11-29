@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.core.aif;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.util.Random;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeBoolean;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeCharacter;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeFloating;
@@ -111,8 +112,8 @@ public class AIF implements IAIF {
 			}
 			if (!signed) 
 				intVal = Math.abs(intVal);
-			
-			System.out.println("------------------------ intVal: " + intVal);
+
+			//intVal = random_num(10, 100);
 			type = new AIFTypeInteger(signed, intLen);
 			val = new AIFValueInteger(intVal);
 			break;
@@ -187,6 +188,13 @@ public class AIF implements IAIF {
 		aif.setType(type);
 		aif.setValue(val);
 	}
+	private static int random_num(int min, int max) {
+	    Random generator = new Random();
+	    long range = (long)max - (long)min + 1;
+	    long fraction = (long)(range * generator.nextDouble());
+	    return (int)(fraction + min);
+	}
+	
 	private static Range getRange(String format) {
 		//format example: [r0..9is4]is4
 		int lower_start_pos = format.indexOf(FDS_START_RANGE) + 2;

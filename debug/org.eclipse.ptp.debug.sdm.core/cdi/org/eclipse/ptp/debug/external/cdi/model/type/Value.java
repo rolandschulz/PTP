@@ -43,6 +43,9 @@ public class Value extends PTPObject implements ICDIValue {
 		return variable.getTypeName();
 	}
 	public String getValueString() throws CDIException {
+		if (!getVariable().isUpdated()) {
+			getVariable().update();
+		}
 		IAIF aif = variable.getAIF();
 		if (aif == null) {
 			Target target = (Target) variable.getTarget();
@@ -51,7 +54,6 @@ public class Value extends PTPObject implements ICDIValue {
 			session.getDebugger().postCommand(command);
 			return command.getExpressionValue();
 		}
-		//TODO - fix the toString later
 		return aif.getValue().toString();
 	}
 	public int getChildrenNumber() throws CDIException {
