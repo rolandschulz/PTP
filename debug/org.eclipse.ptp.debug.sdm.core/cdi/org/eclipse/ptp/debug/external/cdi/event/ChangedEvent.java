@@ -16,31 +16,28 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
+package org.eclipse.ptp.debug.external.cdi.event;
 
-package org.eclipse.ptp.debug.internal.core.aif;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
+import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIChangedEvent;
 
-import org.eclipse.ptp.debug.core.aif.IAIFType;
-
-public class AIFTypeArray extends AIFType {
-	private IAIFType baseType;
-	private int lowIndex;
-	private int highIndex;
+/**
+ * @author Clement chu
+ * 
+ */
+public class ChangedEvent extends AbstractEvent implements IPCDIChangedEvent {
+	public ChangedEvent(IPCDISession session, BitList tasks, ICDIObject source) {
+		super(session, tasks, source);
+	}
 	
-	public AIFTypeArray(int low, int high, IAIFType base) {
-		this.lowIndex = low;
-		this.highIndex = high;
-		this.baseType = base;
-	}
-	public int getLowIndex() {
-		return lowIndex;
-	}
-	public int getHightIndex() {
-		return highIndex;
-	}
-	public IAIFType getBaseType() {
-		return baseType;
-	}
-	public String toString() {
-		return "[" + Integer.toString(this.lowIndex) + ".." + Integer.toString(this.highIndex) + "]" + this.baseType.toString();
+	public String getVariableName() {
+		if (getSource() instanceof ICDIVariable) {
+			return ((ICDIVariable)getSource()).getName();
+		}
+		return "";
 	}
 }
+

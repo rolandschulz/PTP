@@ -28,9 +28,6 @@ public class AIFValueInteger implements IAIFValue {
 		this.val = val;
 	}
 	public String toString() {
-		System.out.println("  ################# AIFValueInteger - val: " + val);
-		String value = Long.toString(this.val);
-		System.out.println("  ################# AIFValueInteger - string val: " + value);
-		return value;
+		return Long.toString(this.val);
 	}
 }

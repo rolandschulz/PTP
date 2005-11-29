@@ -104,11 +104,12 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	
 	boolean processSuspendedEvent(IPCDISuspendedEvent event) {
 		Session session = (Session)getSession();
+		/*
 		VariableManager varMgr = session.getVariableManager();
 		ExpressionManager expMgr  = session.getExpressionManager();		
-		//BreakpointManager bpMgr = session.getBreakpointManager();
+		BreakpointManager bpMgr = session.getBreakpointManager();
 		SourceManager srcMgr = session.getSourceManager();
-		
+		*/
 		int[] procs = event.getAllRegisteredProcesses().toArray();
 		for (int i = 0; i < procs.length; i++) {
 			Target currentTarget = (Target) session.getTarget(procs[i]);
@@ -132,6 +133,8 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 			} catch (CDIException e1) {
 				e1.printStackTrace();
 			}
+			/**
+			 * TODO not quite important
 			try {
 				if (varMgr.isAutoUpdate()) {
 					varMgr.update(currentTarget);
@@ -139,15 +142,16 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 				if (expMgr.isAutoUpdate()) { 
 					expMgr.update(currentTarget);
 				}
-				//if (bpMgr.isAutoUpdate()) {
-					//bpMgr.update(currentTarget);
-				//}
+				if (bpMgr.isAutoUpdate()) {
+					bpMgr.update(currentTarget);
+				}
 				if (srcMgr.isAutoUpdate()) {
 					srcMgr.update(currentTarget);
 				}
 			} catch (CDIException e) {
 				e.printStackTrace();
 			}
+			 */
 		}
 		return true;
 	}
