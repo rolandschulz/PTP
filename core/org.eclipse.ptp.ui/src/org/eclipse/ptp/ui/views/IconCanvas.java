@@ -183,7 +183,7 @@ public class IconCanvas extends Canvas {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
 		this.total_elements = total;
-		this.e_offset_x = String.valueOf(total).length() * font_size;
+		this.e_offset_x = String.valueOf(total).length() * font_size + e_spacing_x;
 		resetCanvas();
 	}
 	public void setIconSpace(int e_spacing_x, int e_spacing_y) {
@@ -1510,7 +1510,7 @@ public class IconCanvas extends Canvas {
 	 * Self testing
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public static void main(String[] args) {
-		final int totalImage = 5000;
+		final int totalImage = 50;
         final Display display = new Display();
         final Shell shell = new Shell(display);
         shell.setLocation(0, 0);
