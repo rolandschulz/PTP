@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.core.aif;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Random;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeBoolean;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeCharacter;
@@ -103,6 +104,7 @@ public class AIF implements IAIF {
 			int intLen = Character.digit(format.charAt(FDS_INTEGER_LEN_POS), 10);
 			boolean signed = (format.charAt(FDS_INTEGER_SIGN_POS) == 's');
 			ByteBuffer intBuf = ByteBuffer.wrap(data);
+			intBuf.order(ByteOrder.nativeOrder());
 			long intVal;
 			if (intLen > 4) {
 				intVal = intBuf.getLong();
