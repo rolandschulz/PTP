@@ -66,7 +66,7 @@ public class IconCanvas extends Canvas {
 	protected IToolTipProvider toolTipProvider = null;
 	protected IImageProvider imageProvider = null;
 	// default element info
-	protected int e_offset_x = 20;
+	protected int e_offset_x = 5;
 	protected int e_offset_y = 5;
 	protected int e_spacing_x = 4;
 	protected int e_spacing_y = 4;
@@ -101,7 +101,9 @@ public class IconCanvas extends Canvas {
 	protected Color background = null;
 	protected Color foreground = null;
 	//font
-	protected final int font_size = 8;
+	protected final int font_size = 9;
+	
+	protected Color margin_color = null;
 	
 	// input
 	protected int total_elements = 0;
@@ -125,6 +127,7 @@ public class IconCanvas extends Canvas {
 		installListeners();
 		initializeAccessible();
 		sel_color = display.getSystemColor(SWT.COLOR_RED);
+		margin_color = display.getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
 		changeFontSize(display);
 		super.setBackground(getBackground());
 		super.setForeground(getForeground());
@@ -183,8 +186,7 @@ public class IconCanvas extends Canvas {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
 		this.total_elements = total;
-		int len = String.valueOf(total).length();
-		this.e_offset_x = len * font_size + (len<3?e_spacing_x:0);
+		this.e_offset_x = String.valueOf(total).length() * font_size;
 		resetCanvas();
 	}
 	public void setIconSpace(int e_spacing_x, int e_spacing_y) {
@@ -1128,7 +1130,7 @@ public class IconCanvas extends Canvas {
 					int x_loc = e_offset_x + ((col_count) * getElementWidth());
 					int y_loc = e_offset_y + ((row_count) * getElementHeight()) - verticalScrollOffset;
 					if (col_count == 0) {
-						newGC.drawString(String.valueOf(index), 5, y_loc + (e_spacing_y));
+						drawMargin(newGC, String.valueOf(index), y_loc);
 					}
 					drawImage(newGC, index, x_loc, y_loc, (selectedElements.get(index) || tempSelectedElements.get(index)));
 				}
@@ -1143,6 +1145,14 @@ public class IconCanvas extends Canvas {
 			imageBuffer.dispose();
 		}
 		clearMargin(gc, getBackground());
+	}
+	protected void drawMargin(GC gc, String text, int y_loc) {
+		gc.setBackground(margin_color);
+		gc.fillRectangle(0, y_loc, e_offset_x - e_spacing_x, getElementHeight());
+
+		Point text_size = gc.stringExtent(text);
+		gc.drawText(text, e_offset_x - e_spacing_x - text_size.x, y_loc);
+		gc.setBackground(getBackground());
 	}
 	protected void drawImage(GC gc, int index, int x_loc, int y_loc, boolean isSelected) {
 		Image statusImage = getStatusIcon(index, isSelected);
@@ -1511,7 +1521,7 @@ public class IconCanvas extends Canvas {
 	 * Self testing
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public static void main(String[] args) {
-		final int totalImage = 50000;
+		final int totalImage = 10000;
         final Display display = new Display();
         final Shell shell = new Shell(display);
         shell.setLocation(0, 0);
