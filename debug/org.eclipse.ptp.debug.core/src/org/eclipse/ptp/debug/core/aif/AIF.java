@@ -104,7 +104,7 @@ public class AIF implements IAIF {
 			int intLen = Character.digit(format.charAt(FDS_INTEGER_LEN_POS), 10);
 			boolean signed = (format.charAt(FDS_INTEGER_SIGN_POS) == 's');
 			ByteBuffer intBuf = ByteBuffer.wrap(data);
-			intBuf.order(ByteOrder.nativeOrder());
+			intBuf.order(ByteOrder.nativeOrder()); // TODO: MUST BE FIXED AT SERVER END!!!!
 			long intVal;
 			if (intLen > 4) {
 				intVal = intBuf.getLong();
