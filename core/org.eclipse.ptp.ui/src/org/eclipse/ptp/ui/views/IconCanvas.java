@@ -102,7 +102,8 @@ public class IconCanvas extends Canvas {
 	protected Color foreground = null;
 	//font
 	protected final int font_size = 9;
-	
+	//margin
+	protected final int margin_text = 2;
 	protected Color margin_color = null;
 	
 	// input
@@ -188,7 +189,7 @@ public class IconCanvas extends Canvas {
 		this.total_elements = total;
 		GC newGC = getGC();
 		newGC.setFont(getFont());
-		this.e_offset_x = newGC.stringExtent(String.valueOf(total-1)).x + e_spacing_x;
+		this.e_offset_x = newGC.stringExtent(String.valueOf(total-1)).x + e_spacing_x + margin_text;
 		newGC.dispose();
 		resetCanvas();
 	}
@@ -1524,7 +1525,7 @@ public class IconCanvas extends Canvas {
 	 * Self testing
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public static void main(String[] args) {
-		final int totalImage = 1000;
+		final int totalImage = 1;
         final Display display = new Display();
         final Shell shell = new Shell(display);
         shell.setLocation(0, 0);
