@@ -112,7 +112,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		super.shutdown();
 	}
 	private void defaultRegister(IPCDISession session) { // register process 0 if the preference is checked
-		if (PTPDebugUIPlugin.getDefault().getPreferenceStore().getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0)) {
+		if (PTPDebugCorePlugin.getDefault().getPluginPreferences().getBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0)) {
 			IPProcess proc = session.getJob().findProcessByTaskId(0);
 			if (proc != null)
 				registerProcess(session, proc, true);
