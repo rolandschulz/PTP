@@ -127,7 +127,7 @@ public class IconCanvas extends Canvas {
 		installListeners();
 		initializeAccessible();
 		sel_color = display.getSystemColor(SWT.COLOR_RED);
-		margin_color = display.getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
+		margin_color = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 		changeFontSize(display);
 		super.setBackground(getBackground());
 		super.setForeground(getForeground());
@@ -186,7 +186,10 @@ public class IconCanvas extends Canvas {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
 		this.total_elements = total;
-		this.e_offset_x = String.valueOf(total).length() * font_size + 2;
+		GC newGC = getGC();
+		newGC.setFont(getFont());
+		this.e_offset_x = newGC.stringExtent(String.valueOf(total-1)).x + e_spacing_x;
+		newGC.dispose();
 		resetCanvas();
 	}
 	public void setIconSpace(int e_spacing_x, int e_spacing_y) {
@@ -1151,7 +1154,7 @@ public class IconCanvas extends Canvas {
 		gc.fillRectangle(0, y_loc, e_offset_x - e_spacing_x, getElementHeight());
 
 		Point text_size = gc.stringExtent(text);
-		gc.drawText(text, e_offset_x - e_spacing_x - text_size.x - 2, y_loc);
+		gc.drawText(text, e_offset_x - e_spacing_x - text_size.x, y_loc);
 		gc.setBackground(getBackground());
 	}
 	protected void drawImage(GC gc, int index, int x_loc, int y_loc, boolean isSelected) {
@@ -1521,7 +1524,7 @@ public class IconCanvas extends Canvas {
 	 * Self testing
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public static void main(String[] args) {
-		final int totalImage = 50000;
+		final int totalImage = 1000;
         final Display display = new Display();
         final Shell shell = new Shell(display);
         shell.setLocation(0, 0);
