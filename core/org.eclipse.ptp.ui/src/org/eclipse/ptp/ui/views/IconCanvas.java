@@ -1126,6 +1126,10 @@ public class IconCanvas extends Canvas {
 			newGC = gc;
 		}
 		newGC.setFont(getFont());
+		//draw margin background
+		newGC.setBackground(margin_color);
+		newGC.fillRectangle(0, 0, e_offset_x - e_spacing_x, getClientArea().height);
+
 		int total = getTotalElements();
 		for (int row_count = row_start; row_count < row_end; row_count++) {
 			for (int col_count = col_start; col_count < col_end; col_count++) {
@@ -1134,7 +1138,7 @@ public class IconCanvas extends Canvas {
 					int x_loc = e_offset_x + ((col_count) * getElementWidth());
 					int y_loc = e_offset_y + ((row_count) * getElementHeight()) - verticalScrollOffset;
 					if (col_count == 0) {
-						drawMargin(newGC, String.valueOf(index), y_loc);
+						drawIndex(newGC, String.valueOf(index), y_loc);
 					}
 					drawImage(newGC, index, x_loc, y_loc, (selectedElements.get(index) || tempSelectedElements.get(index)));
 				}
@@ -1150,13 +1154,11 @@ public class IconCanvas extends Canvas {
 		}
 		clearMargin(gc, getBackground());
 	}
-	protected void drawMargin(GC gc, String text, int y_loc) {
-		gc.setBackground(margin_color);
-		gc.fillRectangle(0, y_loc, e_offset_x - e_spacing_x, getElementHeight());
-
+	protected void drawIndex(GC gc, String text, int y_loc) {
 		Point text_size = gc.stringExtent(text);
-		gc.drawText(text, e_offset_x - e_spacing_x - text_size.x, y_loc);
-		gc.setBackground(getBackground());
+		int align =  e_offset_x - e_spacing_x - text_size.x;
+		int valign = y_loc + e_height/2 - text_size.y/2 ;
+		gc.drawText(text, align, valign);
 	}
 	protected void drawImage(GC gc, int index, int x_loc, int y_loc, boolean isSelected) {
 		Image statusImage = getStatusIcon(index, isSelected);
@@ -1525,7 +1527,7 @@ public class IconCanvas extends Canvas {
 	 * Self testing
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public static void main(String[] args) {
-		final int totalImage = 1;
+		final int totalImage = 100;
         final Display display = new Display();
         final Shell shell = new Shell(display);
         shell.setLocation(0, 0);
