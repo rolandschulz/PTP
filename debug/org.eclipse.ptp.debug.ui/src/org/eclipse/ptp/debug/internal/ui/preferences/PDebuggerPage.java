@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.ui.preferences.AbstractPerferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -41,7 +42,7 @@ import org.eclipse.swt.widgets.Text;
  * @author Clement chu
  *
  */
-public class PDebuggerPage extends AbstractDebugPerferencePage {
+public class PDebuggerPage extends AbstractPerferencePage {
 	private Text sdmPathText = null;
 	private Text sdmArgsText = null;
 	private Button sdmPathButton = null;
@@ -60,7 +61,6 @@ public class PDebuggerPage extends AbstractDebugPerferencePage {
     
 	public PDebuggerPage() {
 		super();
-		getPreferenceStore().addPropertyChangeListener(this);
 		setDescription(PreferenceMessages.getString("PDebuggerPage.desc"));
 	}
 	
@@ -131,6 +131,11 @@ public class PDebuggerPage extends AbstractDebugPerferencePage {
     public void propertyChange(PropertyChangeEvent event) {
     	setValid(isValid());
     }	
+	public boolean performOk() {
+		storeValues();
+		PTPDebugCorePlugin.getDefault().savePluginPreferences();
+		return true;
+	}
 
 	public boolean isValid() {
 		setErrorMessage(null);

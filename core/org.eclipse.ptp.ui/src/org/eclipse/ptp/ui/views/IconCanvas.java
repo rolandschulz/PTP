@@ -103,8 +103,10 @@ public class IconCanvas extends Canvas {
 	//font
 	protected final int font_size = 9;
 	//margin
-	protected final int margin_text = 2;
+	protected final int margin_text = 1;
 	protected Color margin_color = null;
+	protected boolean displayRuler = true;
+	private final int DEFAULT_OFFSET = 5;
 	
 	// input
 	protected int total_elements = 0;
@@ -172,6 +174,7 @@ public class IconCanvas extends Canvas {
 		verticalScrollOffset = 0;
 		selectedElements.clear();
 		tempSelectedElements.clear();
+		resetMargin();
 		resetInfo();
 		calculateVerticalScrollBar();
 		redraw();
@@ -187,11 +190,18 @@ public class IconCanvas extends Canvas {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
 		this.total_elements = total;
-		GC newGC = getGC();
-		newGC.setFont(getFont());
-		this.e_offset_x = newGC.stringExtent(String.valueOf(total-1)).x + e_spacing_x + margin_text;
-		newGC.dispose();
 		resetCanvas();
+	}
+	private void resetMargin() {
+		if (isDisplayRuler()) {
+			GC newGC = getGC();
+			newGC.setFont(getFont());
+			e_offset_x = newGC.stringExtent(String.valueOf(total_elements-1)).x + e_spacing_x + margin_text;
+			newGC.dispose();
+		}
+		else {
+			e_offset_x = DEFAULT_OFFSET;
+		}
 	}
 	public void setIconSpace(int e_spacing_x, int e_spacing_y) {
 		if (e_spacing_x < 0 || e_spacing_y < 0) {
@@ -218,6 +228,13 @@ public class IconCanvas extends Canvas {
 	public void setSelectionColor(int colorIndex) {
 		checkWidget();
 		this.sel_color = getDisplay().getSystemColor(colorIndex);
+	}
+	public void setDisplayRuler(boolean displayRuler) {
+		this.displayRuler = displayRuler;
+		resetCanvas();
+	}
+	public boolean isDisplayRuler() {
+		return displayRuler;
 	}
 	public Color getBackground() {
 		checkWidget();
@@ -1127,8 +1144,10 @@ public class IconCanvas extends Canvas {
 		}
 		newGC.setFont(getFont());
 		//draw margin background
-		newGC.setBackground(margin_color);
-		newGC.fillRectangle(0, 0, e_offset_x - e_spacing_x, getClientArea().height);
+		if (isDisplayRuler()) {
+			newGC.setBackground(margin_color);
+			newGC.fillRectangle(0, 0, e_offset_x - e_spacing_x, getClientArea().height);
+		}
 
 		int total = getTotalElements();
 		for (int row_count = row_start; row_count < row_end; row_count++) {
@@ -1137,7 +1156,7 @@ public class IconCanvas extends Canvas {
 				if (index > -1 && index < total) {
 					int x_loc = e_offset_x + ((col_count) * getElementWidth());
 					int y_loc = e_offset_y + ((row_count) * getElementHeight()) - verticalScrollOffset;
-					if (col_count == 0) {
+					if (col_count == 0 && isDisplayRuler()) {
 						drawIndex(newGC, String.valueOf(index), y_loc);
 					}
 					drawImage(newGC, index, x_loc, y_loc, (selectedElements.get(index) || tempSelectedElements.get(index)));
@@ -1527,7 +1546,7 @@ public class IconCanvas extends Canvas {
 	 * Self testing
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public static void main(String[] args) {
-		final int totalImage = 100;
+		final int totalImage = 10;
         final Display display = new Display();
         final Shell shell = new Shell(display);
         shell.setLocation(0, 0);

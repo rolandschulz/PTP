@@ -16,16 +16,11 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.ui.preferences;
+package org.eclipse.ptp.ui.preferences;
 
-import org.eclipse.debug.ui.IDebugView;
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.StructuredViewer;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridData;
@@ -35,7 +30,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -45,53 +39,18 @@ import org.eclipse.ui.IWorkbenchWindow;
  * @author Clement chu
  *
  */
-public abstract class AbstractDebugPerferencePage extends PreferencePage implements IWorkbenchPreferencePage, IPropertyChangeListener {
+public abstract class AbstractPerferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 	protected IWorkbench fWorkbench;
-	protected boolean changed = false;
 	
-	public AbstractDebugPerferencePage() {
+	public AbstractPerferencePage() {
 		super();
-		setPreferenceStore(PTPDebugUIPlugin.getDefault().getPreferenceStore());
 	}
-	
 	public void init(IWorkbench workbench) {
 		fWorkbench = workbench;
 	}
-	
 	protected IWorkbench getWorkbench() {
 		return fWorkbench;
 	}
-	
-	protected void refreshViews(final String[] views_id) {
-		BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
-			public void run() {
-				IWorkbenchWindow[] windows = PTPDebugUIPlugin.getDefault().getWorkbench().getWorkbenchWindows();
-				IWorkbenchPage page = null;
-				for( int i = 0; i < windows.length; i++ ) {
-					page = windows[i].getActivePage();
-					if (page != null) {
-						for (int j=0; j<views_id.length; j++) {
-							refreshViews(page, views_id[j]);
-						}
-					}
-				}
-			}
-		} );
-	}
-	
-	protected void refreshViews(IWorkbenchPage page, String viewID) {
-		IViewPart part = page.findView(viewID);
-		if (part != null) {
-			IDebugView adapter = (IDebugView)part.getAdapter(IDebugView.class);
-			if (adapter != null) {				
-				Viewer viewer = adapter.getViewer();
-				if (viewer instanceof StructuredViewer) {
-					((StructuredViewer)viewer).refresh();
-				}
-			}
-		}
-	}	
-	
 	protected Composite createGroupComposite(Composite parent, int numColumns, boolean makeBalance, String labelText) {
         Group comp = new Group(parent, SWT.SHADOW_ETCHED_IN);
         GridLayout layout = new GridLayout(numColumns, makeBalance);
@@ -155,20 +114,21 @@ public abstract class AbstractDebugPerferencePage extends PreferencePage impleme
 		label.setLayoutData(gd);
 	}
 		
-	public void dispose() {
-		super.dispose();
-		getPreferenceStore().removePropertyChangeListener(this);
-	}
+	protected IWorkbenchPage[] getPages() {
+		final List pages = new ArrayList();
+		BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
+			public void run() {
+				if (fWorkbench != null) {
+					IWorkbenchWindow[] windows = fWorkbench.getWorkbenchWindows();
+					for (int i=0; i<windows.length; i++) {
+						pages.add(windows[i].getActivePage());
+					}
+				}
+			}
+		} );
+		return (IWorkbenchPage[])pages.toArray(new IWorkbenchPage[0]);
+	}   
 
-	public boolean performOk() {
-		storeValues();
-		PTPDebugCorePlugin.getDefault().savePluginPreferences();
-		return true;
-	}
-	
-    public void propertyChange(PropertyChangeEvent event) {
-    }	
-	
-	protected abstract void storeValues();
+protected abstract void storeValues();
 	protected abstract void setValues();
 }

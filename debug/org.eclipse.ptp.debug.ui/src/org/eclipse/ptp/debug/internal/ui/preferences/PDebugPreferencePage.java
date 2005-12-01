@@ -21,33 +21,36 @@ package org.eclipse.ptp.debug.internal.ui.preferences;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugUIConstants;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.debug.ui.IDebugView;
+import org.eclipse.jface.viewers.StructuredViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.ui.preferences.AbstractPerferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
 
 /**
  * @author Clement chu
  *
  */
-public class PDebugPreferencePage extends AbstractDebugPerferencePage {
+public class PDebugPreferencePage extends AbstractPerferencePage {
 	private Button fPathsButton = null;
 	private Button fRegisteredProcessButton = null;
 	
 	public PDebugPreferencePage() {
 		super();
 		setDescription(PreferenceMessages.getString("PDebugPreferencePage.desc"));
-		getPreferenceStore().addPropertyChangeListener(this);
+		setPreferenceStore(PTPDebugUIPlugin.getDefault().getPreferenceStore());
 	}
-	
 	protected Control createContents(Composite parent) {
 		//TODO ignored help
 		//getWorkbench().getHelpSystem().setHelp(getControl(), IPDebugHelpContextIds.P_DEBUG_PREFERENCE_PAGE);
@@ -73,9 +76,10 @@ public class PDebugPreferencePage extends AbstractDebugPerferencePage {
 		fRegisteredProcessButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.registerProcess"));
 	}
 	protected void defaultSetting() {
-		IPreferenceStore store = getPreferenceStore();
-		store.setDefault(IPDebugConstants.PREF_SHOW_FULL_PATHS, false);
-		store.setDefault(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, true);
+		//IPreferenceStore store = getPreferenceStore();
+		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
+		preferences.setDefault(IPDebugConstants.PREF_SHOW_FULL_PATHS, false);
+		preferences.setDefault(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, true);
 	}
 	public void performDefaults() { 
 		//IPreferenceStore store = getPreferenceStore();
@@ -87,11 +91,8 @@ public class PDebugPreferencePage extends AbstractDebugPerferencePage {
 	
 	public boolean performOk() {
 		storeValues();
-		if (changed) {
-			refreshViews(new String[] {IDebugUIConstants.ID_BREAKPOINT_VIEW});
-		}
-
 		PTPDebugCorePlugin.getDefault().savePluginPreferences();
+		refreshView();
 		return true;
 	}
 	
@@ -111,11 +112,19 @@ public class PDebugPreferencePage extends AbstractDebugPerferencePage {
 			pres.setAttribute(PDebugModelPresentation.DISPLAY_FULL_PATHS, fPathsButton.getSelection()?Boolean.TRUE:Boolean.FALSE);
 		}
 	}
-	
-    public void propertyChange(PropertyChangeEvent event) {
-    	if (event.getProperty().equals(IPDebugConstants.PREF_SHOW_FULL_PATHS))
-    		changed = true;
-    	else
-    		changed = false;
-    }	
+    protected void refreshView() {
+    	IWorkbenchPage[] pages = getPages();
+    	for (int i=0; i<pages.length; i++) {
+			IViewPart part = pages[i].findView(IDebugUIConstants.ID_BREAKPOINT_VIEW);
+			if (part != null) {
+				IDebugView adapter = (IDebugView)part.getAdapter(IDebugView.class);
+				if (adapter != null) {				
+					Viewer viewer = adapter.getViewer();
+					if (viewer instanceof StructuredViewer) {
+						((StructuredViewer)viewer).refresh();
+					}
+				}
+			}
+    	}
+	}    
 }
