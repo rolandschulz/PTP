@@ -388,8 +388,7 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		return text;
 	}
 
-	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) 
-	{
+	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw)  {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
 		gridLayout.makeColumnsEqualWidth = isEqual;

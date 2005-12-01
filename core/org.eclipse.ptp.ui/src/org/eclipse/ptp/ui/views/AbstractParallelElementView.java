@@ -22,10 +22,13 @@ import java.util.Iterator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.ui.IManager;
+import org.eclipse.ptp.ui.IPTPUIConstants;
+import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.listeners.IPaintListener;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.ptp.ui.preferences.IPreferencesListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -38,7 +41,7 @@ import org.eclipse.swt.widgets.Composite;
  * @author clement chu
  * 
  */
-public abstract class AbstractParallelElementView extends AbstractParallelView implements IPaintListener, IIconCanvasActionListener, IToolTipProvider, IImageProvider {
+public abstract class AbstractParallelElementView extends AbstractParallelView implements IPaintListener, IIconCanvasActionListener, IToolTipProvider, IImageProvider, IPreferencesListener {
 	protected IManager manager = null;
 	// Set
 	protected IElementSet cur_element_set = null;
@@ -85,6 +88,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		canvas.setImageProvider(this);
 		canvas.setToolTipProvider(this);
 		canvas.addActionListener(this);
+		canvas.setDisplayRuler(PTPUIPlugin.getDefault().getPluginPreferences().getBoolean(IPTPUIConstants.SHOW_RULER));
+		PTPUIPlugin.getDefault().addPreferenceListener(this);
 		return composite;
 	}
 	public void setSelection(ISelection selection) {
@@ -100,6 +105,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	public void dispose() {
 		manager.removePaintListener(this);
 		canvas.removeActionListener(this);
+		PTPUIPlugin.getDefault().removePreferenceListener(this);
 		super.dispose();
 	}
 	public void setFocus() {
@@ -136,8 +142,9 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				updateView(condition);
-				if (!canvas.isDisposed())
+				if (!canvas.isDisposed()) {
 					canvas.redraw();
+				}
 			}
 		});
 	}
@@ -184,5 +191,15 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		if (type == IIconCanvasActionListener.DOUBLE_CLICK_ACTION) {
 			doubleClick(canvas.getElement(index));
 		}
+	}
+	public void preferenceUpdated() {
+		getDisplay().asyncExec(new Runnable() {
+			public void run() {
+				updateView(null);
+				if (!canvas.isDisposed()) {
+					canvas.setDisplayRuler(PTPUIPlugin.getDefault().getPluginPreferences().getBoolean(IPTPUIConstants.SHOW_RULER));
+				}
+			}
+		});
 	}
 }

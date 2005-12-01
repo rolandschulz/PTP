@@ -20,6 +20,9 @@
 package org.eclipse.ptp.ui;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import org.eclipse.core.runtime.IStatus;
@@ -28,6 +31,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.internal.ui.MachineManager;
+import org.eclipse.ptp.ui.preferences.IPreferencesListener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -49,26 +53,34 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	private MachineManager machineManager = null;
 	private JobManager jobManager = null;
 
-	/**
-	 * The constructor.
-	 */
+	protected List listeners = new ArrayList();
+
 	public PTPUIPlugin() {
 		super();
 		plugin = this;
 	}
+	public void addPreferenceListener(IPreferencesListener listener) {
+		if (!listeners.contains(listener)) {
+			listeners.add(listener);
+		}
+	}
+	public void removePreferenceListener(IPreferencesListener listener) {
+		if (listeners.contains(listener)) {
+			listeners.remove(listener);
+		}
+	}
+	public void firePreferencesListeners() {
+		for (Iterator i=listeners.iterator(); i.hasNext();) {
+			((IPreferencesListener)i.next()).preferenceUpdated();
+		}
+	}
 
-	/**
-	 * This method is called upon plug-in activation
-	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		machineManager = new MachineManager();
 		jobManager = new JobManager();
 	}
 
-	/**
-	 * This method is called when the plug-in is stopped
-	 */
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
 		machineManager.shutdown();

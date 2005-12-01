@@ -66,4 +66,7 @@ public interface IPTPUIConstants {
 	public static final int STATUS_CODE_QUESTION = 10000;
 	public static final int STATUS_CODE_INFO = 10001;
 	public static final int STATUS_CODE_ERROR = 10002;
+	
+	//preferences
+	public static final String SHOW_RULER = "showRuler";
 }
