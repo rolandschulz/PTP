@@ -103,7 +103,7 @@ public class IconCanvas extends Canvas {
 	//font
 	protected final int font_size = 9;
 	//margin
-	protected final int margin_text = 1;
+	protected final int margin_text = 2;
 	protected Color margin_color = null;
 	protected boolean displayRuler = true;
 	private final int DEFAULT_OFFSET = 5;
@@ -1546,7 +1546,7 @@ public class IconCanvas extends Canvas {
 	 * Self testing
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
 	public static void main(String[] args) {
-		final int totalImage = 10;
+		final int totalImage = 100000;
         final Display display = new Display();
         final Shell shell = new Shell(display);
         shell.setLocation(0, 0);
