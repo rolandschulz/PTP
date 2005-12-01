@@ -164,6 +164,9 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				if (aif == null) {
 					String value = "" + random(10,20);
 					aif = new AIF("b", value.getBytes());
+					//Integer value = new Integer(random(10,20));
+					//aif = new AIF("is4", new byte[] {value.byteValue()});
+					
 				}
 				completeCommand(aif);
 			}
@@ -187,6 +190,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).stopProgram();
 				}
+				completeCommand(IDebugCommand.OK);
 			}
 		}).start();
 	}
