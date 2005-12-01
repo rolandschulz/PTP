@@ -147,11 +147,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	
 	public void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID)
 	{
-		//System.out.println("************************* REFRESH SYSTEM!");
-		
-		//if (controlSystemID == currentControlSystem && monitoringSystemID == currentMonitoringSystem)
-		//	return;
-
 		/*
 		 * Shutdown runtime if it is already active
 		 */
@@ -184,7 +179,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			runtimeProxy = new OMPIProxyRuntimeClient();
 			monitoringSystem = new OMPIMonitoringSystem((OMPIProxyRuntimeClient)runtimeProxy);
 			controlSystem = new OMPIControlSystem((OMPIProxyRuntimeClient)runtimeProxy);
-			//refreshRuntimeSystems(ControlSystemChoices.SIMULATED_ID, MonitoringSystemChoices.SIMULATED_ID);
 		}
 		else {
 			CoreUtils.showErrorDialog("Runtime System Error", "Invalid monitoring/control system selected.  Set using the PTP preferences page.", null);
