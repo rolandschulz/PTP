@@ -23,24 +23,42 @@ import org.eclipse.ptp.debug.core.aif.IAIFType;
 
 public class AIFTypeArray extends AIFType {
 	private IAIFType baseType;
-	private int lowIndex;
-	private int highIndex;
+	private int[] range = {0, 0};
 	
-	public AIFTypeArray(int low, int high, IAIFType base) {
-		this.lowIndex = low;
-		this.highIndex = high;
+	public AIFTypeArray(IAIFType base, int[] range) {
 		this.baseType = base;
+		this.range = range;
 	}
 	public int getLowIndex() {
-		return lowIndex;
+		return getLowIndex(1);
 	}
-	public int getHightIndex() {
-		return highIndex;
+	public int getHighIndex() {
+		return getHighIndex(1);
 	}
 	public IAIFType getBaseType() {
 		return baseType;
 	}
+	public int getDimension() {
+		return (range.length / 2);
+	}
+	public int getLowIndex(int dim_pos) {
+		if (dim_pos > getDimension())
+			return 0;
+		return range[(dim_pos * 2) - 2];
+	}
+	public int getHighIndex(int dim_pos) {
+		if (dim_pos > getDimension())
+			return 0;
+		return range[(dim_pos * 2) - 1];
+	}
+	public int[] getRange() {
+		return range;
+	}
 	public String toString() {
-		return "[" + Integer.toString(this.lowIndex) + ".." + Integer.toString(this.highIndex) + "]" + this.baseType.toString();
+		String output = "";
+		for (int i=0; i<getDimension(); i++) {
+			output += "[" + String.valueOf(getLowIndex(i+1)) + ".." + String.valueOf(getHighIndex(i+1)) + "]"; 
+		}
+		return output += getBaseType().toString();
 	}
 }

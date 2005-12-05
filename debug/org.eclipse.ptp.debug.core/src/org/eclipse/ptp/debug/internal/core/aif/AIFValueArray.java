@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
-import java.math.BigInteger;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 
 /**
@@ -26,12 +25,20 @@ import org.eclipse.ptp.debug.core.aif.IAIFValue;
  * 
  */
 public class AIFValueArray implements IAIFValue {
-	private BigInteger val;
+	private IAIFValue[] vals;
 
-	public AIFValueArray(BigInteger val) {
-		this.val = val;
+	public AIFValueArray(IAIFValue[] vals) {
+		this.vals = vals;
 	}
 	public String toString() {
-		return this.val.toString();
+		String output = "";
+		for (int i=0; i<vals.length; i++) {
+			if (vals[i] != null) {
+				output += vals[i].toString();
+				if (i < vals.length - 1)
+					output += " ";
+			}
+		}
+		return output;
 	}
 }
