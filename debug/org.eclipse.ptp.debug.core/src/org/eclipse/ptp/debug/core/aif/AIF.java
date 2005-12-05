@@ -23,12 +23,20 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Random;
+import org.eclipse.ptp.debug.internal.core.aif.AIFTypeArray;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeBoolean;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeCharacter;
+import org.eclipse.ptp.debug.internal.core.aif.AIFTypeEnumeration;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeFloating;
+import org.eclipse.ptp.debug.internal.core.aif.AIFTypeFunction;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeInteger;
+import org.eclipse.ptp.debug.internal.core.aif.AIFTypePointer;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeString;
+import org.eclipse.ptp.debug.internal.core.aif.AIFTypeStruct;
+import org.eclipse.ptp.debug.internal.core.aif.AIFTypeUnion;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeUnknown;
+import org.eclipse.ptp.debug.internal.core.aif.AIFTypeVoid;
+import org.eclipse.ptp.debug.internal.core.aif.AIFValueArray;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueBoolean;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueCharacter;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueFloating;
@@ -72,56 +80,50 @@ public class AIF implements IAIF {
 	
 	public static void convertToAIF(AIF aif, String format, byte[] data) {
 		IAIFType type = null;
-		IAIFValue val = null;
-		
-		for (int i=0; i<data.length; i++) {
-			System.out.println("Data: " + data[i]);
+		IAIFValue value = null;
+		try {
+			type = getAIFType(format);
+			value = getAIFValue(type, data);
+		} catch (AIFException e) {
+			System.out.println("************************* AIF Error: " + e.getMessage() + " ************************");
+			type = new AIFTypeUnknown(format);
+			value = new AIFValueUnknown();
 		}
-
-		switch (format.charAt(0)) {
-		case FDS_CHARACTER:
-			System.out.println("        ======= character: " + format);
-			type = new AIFTypeCharacter();
-			val = new AIFValueCharacter((char)data[0]);
-			break;
-
-		case FDS_FLOATING:
-			System.out.println("        ======= floating: " + format);
-			int floatLen = Character.digit(format.charAt(FDS_FLOATING_LEN_POS), 10);
+		aif.setType(type);
+		aif.setValue(value);
+	}
+	
+	private static IAIFValue getAIFValue(IAIFType type, byte[] data) throws AIFException {
+		if (type instanceof AIFTypeCharacter) {
+			return new AIFValueCharacter((char)data[0]);
+		} else if (type instanceof AIFTypeFloating) {
+			AIFTypeFloating floatType = (AIFTypeFloating)type;
 			ByteBuffer floatBuf = ByteBuffer.wrap(data);
+			floatBuf.order(ByteOrder.nativeOrder()); // TODO: MUST BE FIXED AT SERVER END!!!!
 			double floatVal;
-			if (floatLen > 4) {
+			if (floatType.getLength() > 4) {
 				floatVal = floatBuf.getDouble();
 			} else {
 				floatVal = (double)floatBuf.getFloat();
 			}
-			type = new AIFTypeFloating(floatLen);
-			val = new AIFValueFloating(floatVal);
-			break;
-			
-		case FDS_INTEGER:
-			System.out.println("        ======= integer: " + format);
-			int intLen = Character.digit(format.charAt(FDS_INTEGER_LEN_POS), 10);
-			boolean signed = (format.charAt(FDS_INTEGER_SIGN_POS) == 's');
+			return new AIFValueFloating(floatVal);
+		} else if (type instanceof AIFTypeInteger) {
+			AIFTypeInteger intType = (AIFTypeInteger)type;
 			ByteBuffer intBuf = ByteBuffer.wrap(data);
 			intBuf.order(ByteOrder.nativeOrder()); // TODO: MUST BE FIXED AT SERVER END!!!!
-			long intVal;
-			if (intLen > 4) {
-				intVal = intBuf.getLong();
+			long val;
+			if (intType.getLength() > 4) {
+				val = intBuf.getLong();
 			}
 			else {
-				intVal = (long)intBuf.getInt();
+				val = (long)intBuf.getInt();
 			}
-			if (!signed) 
-				intVal = Math.abs(intVal);
+			if (!intType.isSigned()) 
+				val = Math.abs(val);
 
 			//intVal = random_num(10, 100);
-			type = new AIFTypeInteger(signed, intLen);
-			val = new AIFValueInteger(intVal);
-			break;
-		
-		case FDS_STRING:
-			System.out.println("        ======= string: " + format);
+			return new AIFValueInteger(val);			
+		} else if (type instanceof AIFTypeString) {
 			int len = 0;
 			len = data[0];
 			len <<= 8;
@@ -131,65 +133,125 @@ public class AIF implements IAIF {
 			for (int i = 0; i < len; i++) {
 				strBytes[i] = data[i+2];
 			}
-			type = new AIFTypeString();
-			val = new AIFValueString(new String(strBytes));
-			break;
-
-		case FDS_ARRAY: //TODO check it pls
-			try {
-				System.out.println("        ======= array: " + format);
-				int dim = format.split("]").length -1;
-				System.out.println("------------- dims: " + dim + ", data: " + data.length);
-				getRange(format);
-				type = new AIFTypeUnknown(format);
-				val = new AIFValueUnknown();
-			} catch (Exception e) {
-				System.out.println("err: " + e.getMessage());
+			return new AIFValueString(new String(strBytes));
+		} else if (type instanceof AIFTypeArray) {
+			AIFTypeArray arrayType = (AIFTypeArray)type;
+			IAIFType baseType = arrayType.getBaseType();
+			//TODO hard code
+			int len = 0;
+			if (baseType instanceof AIFTypeInteger) {
+				len = ((AIFTypeInteger)baseType).getLength();
 			}
-			break;
-
-		case FDS_BOOLEAN: //TODO check it pls
+			else if (baseType instanceof AIFTypeFloating) {
+				len = ((AIFTypeFloating)baseType).getLength();
+			}
+			else {
+				len = 1;
+			}
+			return getAIFArrayValue(ByteBuffer.wrap(data), arrayType, 1, len, baseType);
+		} else if (type instanceof AIFTypeBoolean) {
+			return new AIFValueBoolean(new BigInteger(data).intValue()==0?false:true);
+		} else if (type instanceof AIFTypeEnumeration) {
+			return new AIFValueUnknown();			
+		} else if (type instanceof AIFTypeFunction) {
+			return new AIFValueUnknown();			
+		} else if (type instanceof AIFTypeStruct) {
+			return new AIFValueUnknown();			
+		} else if (type instanceof AIFTypePointer) {
+			return new AIFValueUnknown();			
+		} else if (type instanceof AIFTypeUnion) {
+			return new AIFValueUnknown();			
+		} else if (type instanceof AIFTypeVoid) {
+			return new AIFValueUnknown();			
+		} else {//AIFTypeUnknown
+			return new AIFValueUnknown();	
+		}
+	}
+	private static AIFValueArray getAIFArrayValue(ByteBuffer dataBuf, AIFTypeArray arrayType, int dimension_pos, int baseLength, IAIFType baseType) throws AIFException {
+		int lower = arrayType.getLowIndex(dimension_pos);
+		int upper = arrayType.getHighIndex(dimension_pos);
+		int inner_length = upper-lower+1;
+		IAIFValue[] innerValues = new IAIFValue[inner_length];
+		byte[] innerData = new byte[baseLength];
+		
+		for (int j=0; j<inner_length; j++) {
+			if (dimension_pos < arrayType.getDimension()) {
+				innerValues[j] = getAIFArrayValue(dataBuf, arrayType, dimension_pos+1, baseLength, baseType);
+			}
+			else {
+				for (int h=0; h<baseLength; h++) {
+					if (!dataBuf.hasRemaining()) {
+						throw new AIFException("AIF Array out bound exception");
+					}
+					innerData[h] = dataBuf.get();
+				}
+				innerValues[j] = getAIFValue(baseType, innerData);
+			}
+		}
+		return new AIFValueArray(innerValues);
+	}
+	private static IAIFType getAIFType(String format) throws AIFException {
+		switch (format.charAt(0)) {
+		case FDS_CHARACTER:
+			System.out.println("        ======= character: " + format);
+			return new AIFTypeCharacter();
+		case FDS_FLOATING:
+			System.out.println("        ======= floating: " + format);
+			int floatLen = Character.digit(format.charAt(FDS_FLOATING_LEN_POS), 10);
+			return new AIFTypeFloating(floatLen);
+		case FDS_INTEGER:
+			System.out.println("        ======= integer: " + format);
+			int intLen = Character.digit(format.charAt(FDS_INTEGER_LEN_POS), 10);
+			boolean signed = (format.charAt(FDS_INTEGER_SIGN_POS) == 's');
+			return new AIFTypeInteger(signed, intLen);
+		case FDS_STRING:
+			System.out.println("        ======= string: " + format);
+			return new AIFTypeString();
+		case FDS_ARRAY:
+			System.out.println("        ======= array: " + format);
+			String[] dims = format.split("]");
+			int dimension = dims.length - 1;
+			IAIFType baseType = getAIFType(dims[dimension]);
+			int[] range = new int[dimension*2];
+			for (int i=0; i<dimension; i++) {
+				//format example: [r0..9is4]
+				int lower_start_pos = dims[i].indexOf(FDS_START_RANGE) + 2;
+				int lower_end_pos = getDigitPos(dims[i], lower_start_pos);
+				int lower = Integer.parseInt(dims[i].substring(lower_start_pos, lower_end_pos), 10);
+				int upper_start_pos = lower_end_pos + FDS_RANGE_DOT_LEN;
+				int upper_end_pos = getDigitPos(dims[i], upper_start_pos);
+				int upper = Integer.parseInt(dims[i].substring(upper_start_pos, upper_end_pos), 10);
+				range[i*2] = lower;
+				range[i*2 + 1] = upper;
+			}
+			return new AIFTypeArray(baseType, range);
+		case FDS_BOOLEAN:
 			System.out.println("        ======= boolean: " + format);
-			BigInteger intBits = new BigInteger(data);
-			type = new AIFTypeBoolean();
-			val = new AIFValueBoolean(intBits.intValue()==0?false:true);
-			break;
-			
+			return new AIFTypeBoolean();
 		case FDS_ENUMERATION:
 			System.out.println("        ======= enum: " + format);
-			break;
-			
+			return new AIFTypeEnumeration(null, null);//TODO String[], String[]
 		case FDS_FUNCTION:
 			System.out.println("        ======= function: " + format);
-			break;
-
+			return new AIFTypeFunction(null, null);//TODO IAIFType[], IAIFType
 		case FDS_STRUCT:
 			System.out.println("        ======= structure: " + format);
-			break;
-
+			return new AIFTypeStruct(null);//TODO AIFTypeField
 		case FDS_POINTER:
 			System.out.println("        ======= pointer: " + format);
-			type = new AIFTypeUnknown(format);
-			val = new AIFValueUnknown();
-			break;
-			
+			return new AIFTypePointer(null);//TODO IAIFType
 		case FDS_UNION:
 			System.out.println("        ======= union: " + format);
-			break;
-			
+			return new AIFTypeUnion(null);//TODO AIFTypeField[]
 		case FDS_VOID:
 			System.out.println("        ======= void: " + format);
-			break;
-		
+			return new AIFTypeVoid(0);//TODO int
 		default:
-			type = new AIFTypeUnknown(format);
-			val = new AIFValueUnknown();
-			break;
+			System.out.println("        ======= unknown: " + format);
+			return new AIFTypeUnknown(format);//TODO String
 		}
-		
-		aif.setType(type);
-		aif.setValue(val);
 	}
+	
 	private static int random_num(int min, int max) {
 	    Random generator = new Random();
 	    long range = (long)max - (long)min + 1;
@@ -197,22 +259,6 @@ public class AIF implements IAIF {
 	    return (int)(fraction + min);
 	}
 	
-	private static Range getRange(String format) {
-		//format example: [r0..9is4]is4
-		int lower_start_pos = format.indexOf(FDS_START_RANGE) + 2;
-		int lower_end_pos = getDigitPos(format, lower_start_pos);
-		int lower = Integer.parseInt(format.substring(lower_start_pos, lower_end_pos), 10);
-		int upper_start_pos = lower_end_pos + FDS_RANGE_DOT_LEN;
-		int upper_end_pos = getDigitPos(format, upper_start_pos);
-		int upper = Integer.parseInt(format.substring(upper_start_pos, upper_end_pos), 10);
-		
-		Range range = new Range(lower, upper);
-		
-		int last_pos = format.indexOf(FDS_END_RANGE);
-		
-		
-		return range;
-	}
 	private static int getDigitPos(String format, int pos) {
 		int len = format.length();
 		while (pos < len) {
@@ -250,29 +296,6 @@ public class AIF implements IAIF {
 			return "<\"" + aifType.toString() + "\", " + aifValue.toString() + ">";
 		} catch (Exception e) {
 			return "err: " + e.getMessage();
-		}
-	}
-	
-	private static class Range {
-		private int from = 0;
-		private int to = 0;
-		private String type = "";
-		
-		public Range(int from, int to) {
-			this.from = from;
-			this.to = to;
-		}
-		public void setType(String type) {
-			this.type = type;
-		}
-		public int getFrom() {
-			return from;
-		}
-		public int getTo() {
-			return to;
-		}
-		public String getType() {
-			return type;
 		}
 	}
 }

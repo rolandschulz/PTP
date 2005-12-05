@@ -16,33 +16,16 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
-package org.eclipse.ptp.debug.internal.core.aif;
-
-public class AIFTypeInteger extends AIFType {
-	private int length;
-	private boolean signed;
-	
-	public AIFTypeInteger(boolean signed, int length) {
-		this.length = length;
-		this.signed = signed;
-	}
-	
-	public int getLength() {
-		return length;
-	}
-	public boolean isSigned() {
-		return signed;
-	}
-
-	public String toString() {
-		String res = "i";
-		
-		if (signed)
-			res += "s";
-		else
-			res += "u";
-		
-		return res + Integer.toString(this.length);
-	}
+package org.eclipse.ptp.debug.core.aif;
+/**
+ * @author Clement chu
+ * 
+ */
+public class AIFException extends Exception {
+    static final long serialVersionUID = -3387516993124229949L;
+    
+    public AIFException(String msg) {
+    	super(msg);
+    }
 }
+

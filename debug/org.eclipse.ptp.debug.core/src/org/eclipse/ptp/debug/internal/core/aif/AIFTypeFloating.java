@@ -25,7 +25,9 @@ public class AIFTypeFloating extends AIFType {
 	public AIFTypeFloating(int length) {
 		this.length = length;
 	}
-
+	public int getLength() {
+		return length;
+	}
 	public String toString() {
 		return "f" + Integer.toString(this.length);
 	}
