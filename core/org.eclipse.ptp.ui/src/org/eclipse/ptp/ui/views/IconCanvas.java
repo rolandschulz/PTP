@@ -107,6 +107,9 @@ public class IconCanvas extends Canvas {
 	protected Color margin_color = null;
 	protected boolean displayRuler = true;
 	private final int DEFAULT_OFFSET = 5;
+	//tooltip
+	protected Color tooltip_color_bg = null;
+	protected Color tooltip_color_fg = null;	
 	
 	// input
 	protected int total_elements = 0;
@@ -131,6 +134,9 @@ public class IconCanvas extends Canvas {
 		initializeAccessible();
 		sel_color = display.getSystemColor(SWT.COLOR_RED);
 		margin_color = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+		tooltip_color_fg = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
+		tooltip_color_bg = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
+			
 		changeFontSize(display);
 		super.setBackground(getBackground());
 		super.setForeground(getForeground());
@@ -1312,9 +1318,8 @@ public class IconCanvas extends Canvas {
 	protected void doMouseMoving(Event event) {
 		int index = findSelectedIndexByLocation(event.x, event.y, false);
 		if (index > -1) {
-			Display display = getDisplay();
-			setCursor(new Cursor(display, SWT.CURSOR_HAND));
-			showToolTip(index, event.x, event.y, display);
+			setCursor(new Cursor(getDisplay(), SWT.CURSOR_HAND));
+			showToolTip(index, event.x, event.y);
 		} else {
 			setCursor(null);
 			hideToolTip();
@@ -1470,7 +1475,7 @@ public class IconCanvas extends Canvas {
 	protected void handleFocusOut(Event event) {
 		hideToolTip();
 	}
-	protected void showToolTip(int index, int mx, int my, Display display) {
+	protected void showToolTip(int index, int mx, int my) {
 		if (toolTipProvider == null || index == -1) {
 			hideToolTip();
 			return;
@@ -1478,8 +1483,8 @@ public class IconCanvas extends Canvas {
 		if (toolTipShell == null) {
 			toolTipShell = new Shell(getShell(), SWT.ON_TOP | SWT.TOOL);
 			toolTipLabel = new Label(toolTipShell, SWT.LEFT);
-			toolTipLabel.setForeground(display.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-			toolTipLabel.setBackground(display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+			toolTipLabel.setForeground(tooltip_color_fg);
+			toolTipLabel.setBackground(tooltip_color_bg);
 		}
 		toolTipLabel.setText(getToolTipText(index));
 		Point l_size = toolTipLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT);
@@ -1496,8 +1501,10 @@ public class IconCanvas extends Canvas {
 		final int gap_x = 5;
 		int display_x = location.x + getElementWidth() + gap_x;
 		int display_y = location.y + getElementHeight();
-		if (display_x + t_size.x > clientArea.width - e_offset_x) {
-			display_x = location.x - t_size.x - gap_x;
+		if (display_x + t_size.x > clientArea.width) {
+			int lx = location.x - t_size.x - gap_x;
+			if (lx > 0)
+				display_x = lx; 
 		}
 		if (display_y > clientArea.height - e_offset_y) {
 			display_y = location.y - t_size.y;
