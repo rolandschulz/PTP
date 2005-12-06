@@ -22,13 +22,12 @@ package org.eclipse.ptp.debug.internal.core.aif;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 
 public class AIFValueCharacter implements IAIFValue {
-	private char val;
+	private byte val;
 	
-	public AIFValueCharacter(char val) {
+	public AIFValueCharacter(byte val) {
 		this.val = val;
 	}
-
 	public String toString() {
-		return Character.toString(this.val);
+		return val + " '" + (char)val + "'";
 	}
 }

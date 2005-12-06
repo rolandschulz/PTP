@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Random;
+import org.eclipse.ptp.debug.internal.core.aif.AIFPrimitiveType;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeArray;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeBoolean;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeCharacter;
@@ -82,6 +83,7 @@ public class AIF implements IAIF {
 		IAIFType type = null;
 		IAIFValue value = null;
 		try {
+			System.out.println("-------- FORMAT: " + format + " -------------");
 			type = getAIFType(format);
 			value = getAIFValue(type, data);
 		} catch (AIFException e) {
@@ -94,8 +96,11 @@ public class AIF implements IAIF {
 	}
 	
 	private static IAIFValue getAIFValue(IAIFType type, byte[] data) throws AIFException {
+		if (data == null || data.length == 0) {
+			throw new AIFException("AIF value is empty");
+		}
 		if (type instanceof AIFTypeCharacter) {
-			return new AIFValueCharacter((char)data[0]);
+			 return new AIFValueCharacter(data[0]);
 		} else if (type instanceof AIFTypeFloating) {
 			AIFTypeFloating floatType = (AIFTypeFloating)type;
 			ByteBuffer floatBuf = ByteBuffer.wrap(data);
@@ -137,18 +142,7 @@ public class AIF implements IAIF {
 		} else if (type instanceof AIFTypeArray) {
 			AIFTypeArray arrayType = (AIFTypeArray)type;
 			IAIFType baseType = arrayType.getBaseType();
-			//TODO hard code
-			int len = 0;
-			if (baseType instanceof AIFTypeInteger) {
-				len = ((AIFTypeInteger)baseType).getLength();
-			}
-			else if (baseType instanceof AIFTypeFloating) {
-				len = ((AIFTypeFloating)baseType).getLength();
-			}
-			else {
-				len = 1;
-			}
-			return getAIFArrayValue(ByteBuffer.wrap(data), arrayType, 1, len, baseType);
+			return getAIFArrayValue(ByteBuffer.wrap(data), arrayType, 1, getBaseTypeLength(baseType), baseType);
 		} else if (type instanceof AIFTypeBoolean) {
 			return new AIFValueBoolean(new BigInteger(data).intValue()==0?false:true);
 		} else if (type instanceof AIFTypeEnumeration) {
@@ -166,6 +160,12 @@ public class AIF implements IAIF {
 		} else {//AIFTypeUnknown
 			return new AIFValueUnknown();	
 		}
+	}
+	private static int getBaseTypeLength(IAIFType baseType) {
+		if (baseType instanceof AIFPrimitiveType) {
+			return ((AIFPrimitiveType)baseType).getLength();
+		}
+		return 1;
 	}
 	private static AIFValueArray getAIFArrayValue(ByteBuffer dataBuf, AIFTypeArray arrayType, int dimension_pos, int baseLength, IAIFType baseType) throws AIFException {
 		int lower = arrayType.getLowIndex(dimension_pos);
@@ -191,6 +191,9 @@ public class AIF implements IAIF {
 		return new AIFValueArray(innerValues);
 	}
 	private static IAIFType getAIFType(String format) throws AIFException {
+		if (format == null || format.length() == 0) {
+			throw new AIFException("AIF type format is empty");
+		}
 		switch (format.charAt(0)) {
 		case FDS_CHARACTER:
 			System.out.println("        ======= character: " + format);
@@ -251,7 +254,9 @@ public class AIF implements IAIF {
 			return new AIFTypeUnknown(format);//TODO String
 		}
 	}
-	
+	/**
+	 * testing purpose 
+	 */
 	private static int random_num(int min, int max) {
 	    Random generator = new Random();
 	    long range = (long)max - (long)min + 1;

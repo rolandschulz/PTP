@@ -19,7 +19,10 @@
 
 package org.eclipse.ptp.debug.internal.core.aif;
 
-public class AIFTypeBoolean extends AIFType {
+public class AIFTypeBoolean extends AIFPrimitiveType {
+	public int getLength() {
+		return 1;
+	}
 	public String toString() {
 		return "b";
 	}

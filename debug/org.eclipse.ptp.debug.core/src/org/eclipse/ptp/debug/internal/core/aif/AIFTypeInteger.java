@@ -19,7 +19,7 @@
 
 package org.eclipse.ptp.debug.internal.core.aif;
 
-public class AIFTypeInteger extends AIFType {
+public class AIFTypeInteger extends AIFPrimitiveType {
 	private int length;
 	private boolean signed;
 	
