@@ -16,14 +16,12 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.internal.core.aif;
-
-public class AIFTypeCharacter extends AIFPrimitiveType {
-	public int getLength() {
-		return 1;
-	}
-	public String toString() {
-		return "c";
-	}
+/**
+ * @author Clement chu
+ * 
+ */
+public abstract class AIFPrimitiveType extends AIFType {
+	public abstract int getLength();
 }
+

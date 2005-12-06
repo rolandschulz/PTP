@@ -32,7 +32,7 @@ public class AIFValueBoolean implements IAIFValue {
 	}
 
 	public String toString() {
-		return Boolean.toString(val);
+		return String.valueOf(val);
 	}
 }
 
