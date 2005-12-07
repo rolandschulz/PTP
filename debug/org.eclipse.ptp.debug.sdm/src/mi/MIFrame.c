@@ -8,95 +8,116 @@
  * Contributors:
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
+ 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-/**
- * GDB/MI Frame tuple parsing.
- */
+#include "list.h"
+#include "MIValue.h"
+#include "MIResult.h"
+#include "MIArg.h"
+#include "MIFrame.h"
 
 MIFrame *
 MIFrameNew(void)
 {
+	MIFrame *	frame;
+	
+	frame = (MIFrame *)malloc(sizeof(MIFrame));
+	frame->addr = NULL;
+	frame->func = NULL;
+	frame->file = NULL;
+	frame->args = NULL;
+	return frame;	
 }
 
 void
-MIFrameFree(MIFrame *f)
+MIFrameFree(MIFrame *frame)
 {
-}
-
-MIString *
-MIFrameToString(MIFrame *f)
-{
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("level=\"" + level + "\"");  //$NON-NLS-1$//$NON-NLS-2$
-		buffer.append(",addr=\"" + addr + "\"");  //$NON-NLS-1$//$NON-NLS-2$
-		buffer.append(",func=\"" + func + "\"");  //$NON-NLS-1$//$NON-NLS-2$
-		buffer.append(",file=\"" + file + "\"");  //$NON-NLS-1$//$NON-NLS-2$
-		buffer.append(",line=\"").append(line).append('"'); //$NON-NLS-1$
-		buffer.append(",args=["); //$NON-NLS-1$
-		for (int i = 0; i < args.length; i++) {
-			if (i != 0) {
-				buffer.append(',');
-			}
-			buffer.append("{name=\"" + args[i].getName() + "\"");//$NON-NLS-1$//$NON-NLS-2$
-			buffer.append(",value=\"" + args[i].getValue() + "\"}");//$NON-NLS-1$//$NON-NLS-2$
-		}
-		buffer.append(']');
-		return buffer.toString();
+	if (	frame->addr != NULL)
+		free(frame->addr);
+	if (	frame->func != NULL)
+		free(frame->func);
+	if (	frame->file != NULL)
+		free(frame->file);
+	if (	frame->args != NULL)
+		DestroyList(frame->args, MIArgFree);
+	free(frame);
 }
 
 MIFrame *
 MIFrameParse(MIValue *tuple)
 {
-		MIResult[] results = tuple.getMIResults();
-		for (int i = 0; i < results.length; i++) {
-			String var = results[i].getVariable();
-			MIValue value = results[i].getMIValue();
-			String str = ""; //$NON-NLS-1$
-			if (value != null && value instanceof MIConst) {
-				str = ((MIConst)value).getCString();
-			}
+	char *		str;
+	char *		var;
+	MIValue *	value;
+	MIResult *	result;
+	List *		results = tuple->results;
+	MIFrame *	frame = MIFrameNew();
+	
+	for (SetList(results); (result = (MIResult *)GetListElement(results)) != NULL; ) {
+		var = result->variable;
+		value = result->value;
+		
+		if (value == NULL || value->type != MIValueTypeConst)
+			continue;
 
-			if (var.equals("level")) { //$NON-NLS-1$
-				try {
-					level = Integer.parseInt(str.trim());
-				} catch (NumberFormatException e) {
-				}
-			} else if (var.equals("addr")) { //$NON-NLS-1$
-				try {
-					addr = str.trim();
-				} catch (NumberFormatException e) {
-				}
-			} else if (var.equals("func")) { //$NON-NLS-1$
-				func = null;
-				if ( str != null ) {
-					str = str.trim();
-					if ( str.equals( "??" ) ) //$NON-NLS-1$
-						func = ""; //$NON-NLS-1$
-					else
-					{
-						// In some situations gdb returns the function names that include parameter types.
-						// To make the presentation consistent truncate the parameters. PR 46592
-						int end = str.indexOf( '(' );
-						if ( end != -1 )
-							func = str.substring( 0, end );
-						else
-							func = str;
-					}
-				}
-			} else if (var.equals("file")) { //$NON-NLS-1$
-				file = str;
-			} else if (var.equals("line")) { //$NON-NLS-1$
-				try {
-					line = Integer.parseInt(str.trim());
-				} catch (NumberFormatException e) {
-				}
-			} else if (var.equals("args")) { //$NON-NLS-1$
-				if (value instanceof MIList) {
-					args = MIArg.getMIArgs((MIList)value);
-				} else if (value instanceof MITuple) {
-					args = MIArg.getMIArgs((MITuple)value);
+		str = value->cstring;
+
+		if (strcmp(var, "level") == 0) { //$NON-NLS-1$
+			frame->level = atoi(str);
+		} else if (strcmp(var, "addr") == 0) { //$NON-NLS-1$
+			frame->addr = strdup(str);
+		} else if (strcmp(var, "func") == 0) { //$NON-NLS-1$
+			frame->func = NULL;
+			if ( str != NULL ) {
+				if (strcmp(str, "??") == 0) //$NON-NLS-1$
+					frame->func = strdup(""); //$NON-NLS-1$
+				else
+				{
+					// In some situations gdb returns the function names that include parameter types.
+					// To make the presentation consistent truncate the parameters. PR 46592
+					char * s = strchr(str, '(');
+					if (s != NULL)
+						*s = '\0';
+					frame->func = strdup(str);
 				}
 			}
+		} else if (strcmp(var, "file") == 0) { //$NON-NLS-1$
+			frame->file = strdup(str);
+		} else if (strcmp(var, "line") == 0) { //$NON-NLS-1$
+			frame->line = atoi(str);
+		} else if (strcmp(var, "args") == 0) { //$NON-NLS-1$
+			frame->args = MIArgsParse(value);
 		}
 	}
+	
+	return frame;
+}
+
+MIString *
+MIFrameToString(MIFrame *f)
+{
+	int			first = 1;
+	MIArg *		arg;
+	MIString *	str = MIStringNew("level=\"%d\"", f->level);
+	
+	MIStringAppend(str, MIStringNew(",addr=\"%s\"", f->addr));
+	MIStringAppend(str, MIStringNew(",func=\"%s\"", f->func));
+	MIStringAppend(str, MIStringNew(",file=\"%s\"", f->file));
+	MIStringAppend(str, MIStringNew(",line=\"%d\"", f->line));
+	MIStringAppend(str, MIStringNew(",args=["));
+	
+	for (SetList(f->args); (arg = (MIArg *)GetListElement(f->args)) != NULL; ) {
+		if (!first) {
+			MIStringAppend(str, MIStringNew(","));
+		}
+		first = 0;
+		MIStringAppend(str, MIStringNew("{name=\"%s\"", arg->name));
+		MIStringAppend(str, MIStringNew(",value=\"%s\"", arg->value));
+	}
+	MIStringAppend(str, MIStringNew("]"));
+		
+	return str;
 }
