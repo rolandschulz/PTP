@@ -10,8 +10,8 @@ struct MIString {
 };
 typedef struct MIString MIString;
 
-extern MIString *NewMIString(char *fmt, ...);
-extern void FreeMIString(MIString *str);
-extern void AppendMIString(MIString *str, MIString *str2);
-extern char *ToCString(MIString *str);
+extern MIString *MIStringNew(char *fmt, ...);
+extern void MIStringFree(MIString *str);
+extern void MIStringAppend(MIString *str, MIString *str2);
+extern char *MIStringToCString(MIString *str);
 #endif _MISTRING_H_

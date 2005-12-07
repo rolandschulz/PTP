@@ -5,7 +5,7 @@
 #include "MIString.h"
 
 MIString *
-NewMIString(char *fmt, ...)
+MIStringNew(char *fmt, ...)
 {
 	va_list ap;
 	MIString *s;
@@ -20,14 +20,14 @@ NewMIString(char *fmt, ...)
 }
 
 void
-FreeMIString(MIString *str)
+MIStringFree(MIString *str)
 {
 	free(str->buf);
 	free(str);
 }
 
 void
-AppendMIString(MIString *str, MIString *str2)
+MIStringAppend(MIString *str, MIString *str2)
 {
 	int len = str->slen + str2->slen;
 	char *buf = (char *)malloc(len + 1);
@@ -41,12 +41,12 @@ AppendMIString(MIString *str, MIString *str2)
 	str->buf = buf;
 	str->slen = len;
 	
-	FreeMIString(str2);
+	MIStringFree(str2);
 }
 
 
 char *
-ToCString(MIString *str)
+MIStringToCString(MIString *str)
 {
 	return str->buf;
 }

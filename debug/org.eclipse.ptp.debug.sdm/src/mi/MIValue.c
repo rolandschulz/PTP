@@ -11,6 +11,7 @@
 
 #include <stdlib.h>
 
+#include "list.h"
 #include "MIValue.h"
 #include "MIResult.h"
 
@@ -20,6 +21,9 @@ NewMIValue(void)
 	MIValue *	val;
 	
 	val = (MIValue *)malloc(sizeof(MIValue));
+	val->cstring = NULL;
+	val->values = NULL;
+	val->results = NULL;
 	return val;	
 }
 
@@ -28,7 +32,6 @@ NewMIConst(void)
 {
 	MIValue *	val = NewMIValue();
 	val->type = MIValueTypeConst;
-	val->cstring = NULL;
 	return val;
 }
 
@@ -37,7 +40,6 @@ NewMITuple(void)
 {
 	MIValue *	val = NewMIValue();
 	val->type = MIValueTypeTuple;
-	val->results = NULL;
 	return val;
 }
 
@@ -46,39 +48,37 @@ NewMIList(void)
 {
 	MIValue *	val = NewMIValue();
 	val->type = MIValueTypeList;
-	val->values = NULL;
-	val->results = NULL;
 	return val;
 }
 
 MIString *
 MIConstToString(MIValue *v)
 {
-	return NewMIString(v->cstring);
+	return MIStringNew(v->cstring);
 }
 
 MIString *
 MIListToString(MIValue *v)
 {
 	int			first = 1;
-	MIString *	str = NewMIString("[");
+	MIString *	str = MIStringNew("[");
 	MIResult *	r;
 	MIValue *	val;
 
 	for (SetList(v->results); (r = (MIResult *)GetListElement(v->results)) != NULL;) {
 		if (!first)
-			AppendMIString(str, NewMIString(","));
+			MIStringAppend(str, MIStringNew(","));
 		first = 0;
-		AppendMIString(str, MIResultToString(r));
+		MIStringAppend(str, MIResultToString(r));
 	}
 	first = 1;
 	for (SetList(v->values); (val = (MIValue *)GetListElement(v->values)) != NULL;) {
 		if (!first)
-			AppendMIString(str, NewMIString(","));
+			MIStringAppend(str, MIStringNew(","));
 		first = 0;
-		AppendMIString(str, MIValueToString(val));
+		MIStringAppend(str, MIValueToString(val));
 	}
-	AppendMIString(str, NewMIString("]"));
+	MIStringAppend(str, MIStringNew("]"));
 	return str;
 }
 
@@ -86,7 +86,7 @@ MIString *
 MITupleToString(MIValue *v)
 {
 	int			first = 1;
-	MIString *	str = NewMIString("{");
+	MIString *	str = MIStringNew("{");
 	MIResult *	r;
 #ifdef __APPLE__
 	MIValue *	val;
@@ -94,20 +94,20 @@ MITupleToString(MIValue *v)
 
 	for (SetList(v->results); (r = (MIResult *)GetListElement(v->results)) != NULL;) {
 		if (!first)
-			AppendMIString(str, NewMIString(","));
+			MIStringAppend(str, MIStringNew(","));
 		first = 0;
-		AppendMIString(str, MIResultToString(r));
+		MIStringAppend(str, MIResultToString(r));
 	}
 #ifdef __APPLE__
 	first = 1;
 	for (SetList(v->values); (val = (MIValue *)GetListElement(v->values)) != NULL;) {
 		if (!first)
-			AppendMIString(str, NewMIString(","));
+			MIStringAppend(str, MIStringNew(","));
 		first = 0;
-		AppendMIString(str, MIValueToString(val));
+		MIStringAppend(str, MIValueToString(val));
 	}
 #endif /* __APPLE__ */
-	AppendMIString(str, NewMIString("}"));
+	MIStringAppend(str, MIStringNew("}"));
 	return str;
 }
 
@@ -131,4 +131,16 @@ MIValueToString(MIValue *v)
 	}
 	
 	return str;
+}
+
+void
+MIValueFree(MIValue *v)
+{
+	if (v->cstring != NULL)
+		free(v->cstring);
+	if (v->results != NULL)
+		DestroyList(v->results, MIResultFree);
+	if (v->values != NULL)
+		DestroyList(v->values, MIValueFree);
+	free(v);
 }

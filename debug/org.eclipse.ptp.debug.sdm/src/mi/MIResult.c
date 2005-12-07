@@ -15,7 +15,7 @@
 #include "MIResult.h"
 
 MIResult *
-NewMIResult(void)
+MIResultNew(void)
 {
 	MIResult *	res;
 	
@@ -26,20 +26,30 @@ NewMIResult(void)
 MIString *
 MIResultToString(MIResult *r)
 {
-	MIString *	str = NewMIString(r->variable);
+	MIString *	str = MIStringNew(r->variable);
 	MIString *	str2;
 	char *		p;
 	
 	if (r->value != NULL) {
-		AppendMIString(str, NewMIString("="));
+		MIStringAppend(str, MIStringNew("="));
 		str2 = MIValueToString(r->value);
-		p = ToCString(str2);
+		p = MIStringToCString(str2);
 		if (*p == '[' || *p =='{') {
-			AppendMIString(str, str2);
+			MIStringAppend(str, str2);
 		} else {
-			AppendMIString(str, NewMIString("\"%s\"", p));
-			FreeMIString(str2);
+			MIStringAppend(str, MIStringNew("\"%s\"", p));
+			MIStringFree(str2);
 		}
 	}
 	return str;
+}
+
+void
+MIResultFree(MIResult *r)
+{
+	if (r->variable != NULL)
+		free(r->variable);
+	if (r->value != NULL)
+		MIValueFree(r->value);
+	free(r);
 }

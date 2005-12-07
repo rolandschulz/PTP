@@ -41,4 +41,4 @@ extern MIOOBRecord *NewMINotifyAsyncOutput(void);
 extern MIOOBRecord *NewMIConsoleStreamOutput(void);
 extern MIOOBRecord *NewMITargetStreamOutput(void);
 extern MIOOBRecord *NewMILogStreamOutput(void);
-				
+extern void MIOOBRecordFree(MIOOBRecord *);

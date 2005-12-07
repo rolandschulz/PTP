@@ -12,12 +12,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "list.h"
 #include "MIValue.h"
 #include "MIResult.h"
 #include "MIResultRecord.h"
 
 MIResultRecord *
-NewMIResultRecord(void)
+MIResultRecordNew(void)
 {
 	MIResultRecord *	rr;
 	
@@ -35,14 +36,22 @@ MIResultRecordToString(MIResultRecord *rr)
 	MIResult * r;
 	
 	if (rr->token != -1)
-		str = NewMIString("%d^%s", rr->token, rr->resultClass);
+		str = MIStringNew("%d^%s", rr->token, rr->resultClass);
 	else
-		str = NewMIString("^%s", rr->resultClass);
+		str = MIStringNew("^%s", rr->resultClass);
 	
 	for (SetList(rr->results); (r = (MIResult *)GetListElement(rr->results)) != NULL;) {
-			AppendMIString(str, NewMIString(","));
-			AppendMIString(str, MIResultToString(r));
+			MIStringAppend(str, MIStringNew(","));
+			MIStringAppend(str, MIResultToString(r));
 	}
 	
 	return str;
+}
+
+void
+MIResultRecordFree(MIResultRecord *rr)
+{
+	if (rr->results != NULL)
+		DestroyList(rr->results, MIResultFree);
+	free(rr);
 }
