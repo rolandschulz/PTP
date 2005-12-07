@@ -116,12 +116,19 @@ public class AIF implements IAIF {
 			AIFTypeInteger intType = (AIFTypeInteger)type;
 			ByteBuffer intBuf = ByteBuffer.wrap(data);
 			intBuf.order(ByteOrder.nativeOrder()); // TODO: MUST BE FIXED AT SERVER END!!!!
-			long val;
-			if (intType.getLength() > 4) {
+			long val = 0;
+			switch (intType.getLength()) {
+			case 8:
 				val = intBuf.getLong();
-			}
-			else {
+				break;
+			case 4:
 				val = (long)intBuf.getInt();
+				break;
+			case 2:
+				val = (long)intBuf.getShort();
+				break;
+			default:
+				throw new AIFException("Invalid integer length: " + intType.getLength());
 			}
 			if (!intType.isSigned()) 
 				val = Math.abs(val);
