@@ -1057,14 +1057,14 @@ struct simple_type {
 struct simple_type simple_types[] = {
 	{ "char", "c", 0 },
 	{ "unsigned char", "c", 0 },
-	{ "short", "is%d", sizeof(short) },
-	{ "unsigned short", "iu%d", sizeof(unsigned short) },
+	{ "short int", "is%d", sizeof(short) },
+	{ "short unsigned int", "iu%d", sizeof(unsigned short) },
 	{ "int", "is%d", sizeof(int) },
 	{ "unsigned int", "iu%d", sizeof(unsigned int) },
-	{ "long", "is%d", sizeof(long) },
-	{ "unsigned long", "iu%d", sizeof(unsigned long) },
-	{ "long long", "is%d", sizeof(long long) },
-	{ "unsigned long long", "iu%d", sizeof(unsigned long long) },
+	{ "long int", "is%d", sizeof(long) },
+	{ "long unsigned int", "iu%d", sizeof(unsigned long) },
+	{ "long long int", "is%d", sizeof(long long) },
+	{ "long long unsigned int", "iu%d", sizeof(unsigned long long) },
 	{ "float", "f%d", sizeof(float) },
 	{ "double", "f%d", sizeof(double) },
 	{ NULL, NULL }
@@ -1135,12 +1135,12 @@ int
 SimpleTypeToFDS(char *type, str_ptr fds)
 {
 	char *				p;
-	char *				last = &type[strlen(type) - 1];
 	struct simple_type *	s;
 
 	if ( strcmp(type, "<text variable, no debug info>") == 0 )
 		return -1;
 
+#if 0
 	switch ( *last )
 	{
 	case '*': /* pointer */
@@ -1154,8 +1154,9 @@ SimpleTypeToFDS(char *type, str_ptr fds)
 
 		*p = '\0';
 		break;
+#endif
 
-	case ')': /* function */
+	if (type[strlen(type) - 1] == ')') { /* function */
 		str_add(fds, "&");
 
 		/*
@@ -1170,8 +1171,7 @@ SimpleTypeToFDS(char *type, str_ptr fds)
 		}
 
 		str_add(fds, "/");
-		break;
-
+		return 0;
 	}
 
 	for (s = simple_types ; s->type_c != NULL ; s++ )
@@ -1231,24 +1231,6 @@ ConvertType(mi_gvar *gvar, str_ptr fds)
 
 			break;
 
-		case '}': /* struct */
-			str_add(fds, "{|");
-			num = gvar->numchild;
-			gvar = gvar->child;
-			for ( i = 0 ; i < num ; i++ )
-			{
-				if (i > 0)
-					str_add(fds, ",");
-				if ((s = strrchr(gvar->name, '.')) != NULL)
-					str_add(fds, "%s=", ++s);
-				if ( ConvertType(gvar, fds) != DBGRES_OK ) {
-					return DBGRES_ERR;
-				}
-				gvar = gvar->next;
-			}
-			str_add(fds, ";;;}");
-			break;
-
 		case '*': /* pointer */
 			str_add(fds, "^");
 			if (strncmp(gvar->type, "struct", 6) == 0) {
@@ -1276,8 +1258,29 @@ ConvertType(mi_gvar *gvar, str_ptr fds)
 			break;
 						
 		default:
-			DbgSetError(DBGERR_DEBUGGER, "type not supported (yet)");
-			return DBGRES_ERR;
+			if (strncmp(gvar->type, "struct", 6) == 0) { /* struct */
+				if (gvar->type[6] == ' ' && gvar->type[7] != '{')
+					str_add(fds, "{%s|", &gvar->type[7]);
+				else
+					str_add(fds, "{|");
+				num = gvar->numchild;
+				gvar = gvar->child;
+				for ( i = 0 ; i < num ; i++ )
+				{
+					if (i > 0)
+						str_add(fds, ",");
+					if ((s = strrchr(gvar->name, '.')) != NULL)
+						str_add(fds, "%s=", ++s);
+					if ( ConvertType(gvar, fds) != DBGRES_OK ) {
+						return DBGRES_ERR;
+					}
+					gvar = gvar->next;
+				}
+				str_add(fds, ";;;}");
+			} else {
+				DbgSetError(DBGERR_DEBUGGER, "type not supported (yet)");
+				return DBGRES_ERR;
+			}
 		}
 		
 	}
@@ -1351,11 +1354,13 @@ GetTypeInfo(char *var, char **type, char **fds_type)
 		return DBGRES_ERR;
 	}
 	
+#if 0	// var create returns type already
 	if ( !gmi_var_info_type(MIHandle, gvar) )
 	{
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
 	}
+#endif
 	
 	*type = strdup(gvar->type);
 
