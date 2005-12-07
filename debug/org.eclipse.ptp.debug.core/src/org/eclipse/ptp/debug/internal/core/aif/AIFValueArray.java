@@ -31,14 +31,14 @@ public class AIFValueArray implements IAIFValue {
 		this.vals = vals;
 	}
 	public String toString() {
-		String output = "";
+		String output = "[";
 		for (int i=0; i<vals.length; i++) {
 			if (vals[i] != null) {
+				if (i > 0)
+					output += ", ";
 				output += vals[i].toString();
-				if (i < vals.length - 1)
-					output += " ";
 			}
 		}
-		return output;
+		return output + "]";
 	}
 }
