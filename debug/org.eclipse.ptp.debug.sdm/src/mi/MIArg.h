@@ -9,22 +9,26 @@
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
 
-#ifndef _MIFRAME_H_
-#define _MIFRAME_H_
+#ifndef _MIARG_H_
+#define _MIARG_H_
 
-struct MIFrame {
-	int		level;
-	char *	addr;
-	char *	func;
-	char *	file;
-	int		line;
-	List *	args;
+#include "list.h"
+#include "MIString.h"
+
+/**
+ * Represents a set name=value.
+ */
+struct MIArg {
+	char * name;
+	char * value;
 };
-typedef struct MIFrame	MIFrame;
+typedef struct MIArg	MIArg;
 
-extern MIFrame *MIFrameNew(void);
-extern void MIFrameFree(MIFrame *f);
-extern MIFrame *MIFrameParse(MIValue *tuple);
-extern MIString *MIFrameToString(MIFrame *f);
-#endif _MIFRAME_H_
+extern MIArg *MIArgNew(char *name, char *value);
+extern void MIArgFree(MIArg *arg);
+extern List *MIArgsParse(MIValue *miValue);
+extern MIArg *MIArgParse(MIValue *tuple);
+extern MIString *MIArgToString(MIArg *arg);
+#endif _MIARG_H_
+
 

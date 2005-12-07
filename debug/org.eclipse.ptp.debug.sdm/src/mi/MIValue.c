@@ -16,7 +16,7 @@
 #include "MIResult.h"
 
 MIValue *
-NewMIValue(void)
+MIValueNew(void)
 {
 	MIValue *	val;
 	
@@ -30,7 +30,7 @@ NewMIValue(void)
 MIValue *
 NewMIConst(void)
 {
-	MIValue *	val = NewMIValue();
+	MIValue *	val = MIValueNew();
 	val->type = MIValueTypeConst;
 	return val;
 }
@@ -38,7 +38,7 @@ NewMIConst(void)
 MIValue *
 NewMITuple(void)
 {
-	MIValue *	val = NewMIValue();
+	MIValue *	val = MIValueNew();
 	val->type = MIValueTypeTuple;
 	return val;
 }
@@ -46,7 +46,7 @@ NewMITuple(void)
 MIValue *
 NewMIList(void)
 {
-	MIValue *	val = NewMIValue();
+	MIValue *	val = MIValueNew();
 	val->type = MIValueTypeList;
 	return val;
 }
