@@ -11,6 +11,9 @@
 
 #include <stdlib.h>
 
+#include "list.h"
+#include "MIValue.h"
+#include "MIResult.h"
 #include "MIOOBRecord.h"
 
 MIOOBRecord * 
@@ -19,6 +22,9 @@ NewMIMIOOBRecord(void)
 	MIOOBRecord *	oob;
 	
 	oob = (MIOOBRecord *)malloc(sizeof(MIOOBRecord));
+	oob->results = NULL;
+	oob->class = NULL;
+	oob->cstring = NULL;
 	return oob;
 }
 
@@ -76,3 +82,14 @@ NewMILogStreamOutput(void)
 	return oob;
 }
 
+void 
+MIOOBRecordFree(MIOOBRecord *oob)
+{
+	if (oob->results != NULL)
+		DestroyList(oob->results, MIResultFree);
+	if (oob->class != NULL)
+		free(oob->class);
+	if (oob->cstring != NULL)
+		free(oob->cstring);
+	free(oob);
+}

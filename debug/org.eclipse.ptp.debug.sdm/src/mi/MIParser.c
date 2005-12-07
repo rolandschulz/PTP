@@ -119,7 +119,7 @@ char *secondaryPrompt = ">"; //$NON-NLS-1$
  MIOutput *
  MIParse(char *buffer) 
  {
-	MIOutput *mi = NewMIOutput();
+	MIOutput *mi = MIOutputNew();
 	MIResultRecord *rr = NULL;
 	List *oobs = NewList();
 	int id = -1;
@@ -165,7 +165,7 @@ char *secondaryPrompt = ">"; //$NON-NLS-1$
 static MIResultRecord *
 processMIResultRecord(char *buffer, int id)
 {
-	MIResultRecord *rr = NewMIResultRecord();
+	MIResultRecord *rr = MIResultRecordNew();
 	rr->token = id;
 	if (strncmp(buffer, MIResultRecordDONE, strlen(MIResultRecordDONE)) == 0) {
 		rr->resultClass = MIResultRecordDONE;
@@ -292,7 +292,7 @@ processMIResults(char **buffer)
 static MIResult *
 processMIResult(char **buffer)
 {
-	MIResult *result = NewMIResult();
+	MIResult *result = MIResultNew();
 	MIValue *value;
 	char *equal;
 	if (*(*buffer) != '\0' && isalpha(*(*buffer)) && (equal = strchr(*buffer, '=')) != NULL) {
@@ -363,6 +363,9 @@ processMITuple(char **buffer)
 		} else {
 			result = processMIResult(buffer);
 			if (result != NULL) {
+				if (results == NULL) {
+					results = NewList();
+				}				
 				AddToList(results, (void *)result);
 			}
 		}
@@ -375,9 +378,6 @@ processMITuple(char **buffer)
 	}
 	if (*(*buffer) != '\0' && *(*buffer) == '}') {
 		(*buffer)++;
-	}
-	if (results == NULL) {
-		results = NewList();
 	}
 	tuple->results = results;
 #ifdef __APPLE__

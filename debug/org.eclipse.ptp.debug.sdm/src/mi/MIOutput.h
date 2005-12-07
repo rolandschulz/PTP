@@ -20,5 +20,6 @@ struct MIOutput {
 };
 typedef struct MIOutput MIOutput;
 
-extern MIOutput *NewMIOutput(void);
+extern MIOutput *MIOutputNew(void);
 extern MIOutput *MIParse(char *buffer);
+extern void MIOutputFree(MIOutput *op);

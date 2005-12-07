@@ -9,30 +9,17 @@
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
 
-#include <stdlib.h>
+#ifndef _MIFRAME_H_
+#define _MIFRAME_H_
 
-#include "list.h"
-#include "MIOOBRecord.h"
-#include "MIResultRecord.h"
-#include "MIOutput.h"
+struct MIFrame {
+	int		level;
+	char *	addr;
+	char *	func;
+	char *	file;
+	int		line;
+	List *	args;
+};
+typedef struct MIFrame	MIFrame;
 
-MIOutput *
-MIOutputNew(void)
-{
-	MIOutput *	op;
-	
-	op = (MIOutput *)malloc(sizeof(MIOutput));
-	op->rr = NULL;
-	op->oobs = NULL;
-	return op;
-}
-
-void
-MIOutputFree(MIOutput *op)
-{
-	if (op->rr != NULL)
-		MIResultRecordFree(op->rr);
-	if (op->oobs != NULL)
-		DestroyList(op->oobs, MIOOBRecordFree);
-	free(op);
-}
+#endif _MIFRAME_H_

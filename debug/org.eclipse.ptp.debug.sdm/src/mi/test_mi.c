@@ -28,9 +28,10 @@ int main(int argc, char *argv[])
 		out = MIParse(line);
 		if (out->rr != NULL) {
 			str = MIResultRecordToString(out->rr);
-			printf("rr = %s\n", ToCString(str));
-			FreeMIString(str);
+			printf("rr = %s\n", MIStringToCString(str));
+			MIStringFree(str);
 		}
+		MIOutputFree(out);
 	}
 	return 0;
 }

@@ -30,6 +30,7 @@ struct MIResultRecord {
 };
 typedef struct MIResultRecord MIResultRecord;
 
-extern MIResultRecord *NewMIResultRecord(void);
+extern MIResultRecord *MIResultRecordNew(void);
 extern MIString *MIResultRecordToString(MIResultRecord *rr);
+extern void MIResultRecordFree(MIResultRecord *rr);
 #endif _MIRESULTRECORD_H_
