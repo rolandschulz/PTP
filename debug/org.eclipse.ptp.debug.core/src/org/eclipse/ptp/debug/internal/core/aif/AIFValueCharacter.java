@@ -28,6 +28,42 @@ public class AIFValueCharacter implements IAIFValue {
 		this.val = val;
 	}
 	public String toString() {
-		return val + " '" + (char)val + "'";
+		String ch = ""+(char)val+"";
+		
+		switch (this.val) {
+		case 7:
+			ch = "\\a";
+			break;
+		case 8:
+			ch = "\\b";
+			break;
+		case 9:
+			ch = "\\t";
+			break;
+		case 10:
+			ch = "\n";
+			break;
+		case 11:
+			ch = "\\v";
+			break;
+		case 13:
+			ch = "\\r";
+			break;
+		case 27:
+			ch = "\\e";
+			break;
+		case 39:
+			ch = "\\'";
+			break;
+		case 92:
+			ch = "\\\\";
+			break;
+		default:
+			if (this.val < 32 || this.val >= 127) {
+				ch = "\\" + Integer.toOctalString(val & 0xff);
+			}
+		}
+			
+		return Byte.toString(val) + " '" + ch + "'";
 	}
 }
