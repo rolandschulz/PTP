@@ -29,8 +29,7 @@ struct MISession {
 	int			in_fd; /* GDB input */
 	int			out_fd; /* GDB output */
 	int			pid;
-	int			command_completed;
-	MIOutput *	output;
+	MICommand *	command;
 	List *		send_queue;
 	void			(*cmd_callback)(MIResultRecord *);
 	void			(*exec_callback)(char *, List *);
@@ -45,10 +44,18 @@ typedef struct MISession	MISession;
 extern MISession *MISessionNew(void);
 extern void MISessionFree(MISession *sess);
 extern MISession *MISessionLocal(void);
+extern void MISessionRegisterCommandCallback(MISession *sess, void (*callback)(MIResultRecord *));
+extern void MISessionRegisterExecCallback(MISession *sess, void (*callback)(char *, List *));
+extern void MISessionRegisterStatusCallback(MISession *sess, void (*callback)(char *, List *));
+extern void MISessionRegisterNotifyCallback(MISession *sess, void (*callback)(char *, List *));
+extern void MISessionRegisterConsoleCallback(MISession *sess, void (*callback)(char *));
+extern void MISessionRegisterLogCallback(MISession *sess, void (*callback)(char *));
+extern void MISessionRegisterTargetCallback(MISession *sess, void (*callback)(char *));
 extern void MISessionSetGDBPath(char *path);
 extern int MISessionSendCommand(MISession *sess, MICommand *cmd);
 extern void MISessionProcessCommandsAndResponses(fd_set *rfds, fd_set *wfds);
 extern void MISessionDoCallbacks(void);
 extern void MISessionGetFds(int *nfds, fd_set *rfds, fd_set *wfds, fd_set *efds);
+extern int MISessionProgress(void);
 #endif _MISESSION_H_
 
