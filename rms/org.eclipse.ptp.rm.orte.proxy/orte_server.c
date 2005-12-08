@@ -32,6 +32,7 @@
 #define RTEV_PROCS				RTEV_OFFSET + 4
 #define RTEV_PATTR				RTEV_OFFSET + 5
 #define RTEV_NODES				RTEV_OFFSET + 7
+#define RTEV_NATTR				RTEV_OFFSET + 8
 #define RTEV_NEWJOB				RTEV_OFFSET + 11
 #define RTEV_PROCOUT				RTEV_OFFSET + 12
 
@@ -42,6 +43,7 @@
 #define RTEV_ERROR_PATTR			RTEV_OFFSET + 1004
 #define RTEV_ERROR_PROCS			RTEV_OFFSET + 1005
 #define RTEV_ERROR_NODES			RTEV_OFFSET + 1006
+#define RTEV_ERROR_NATTR			RTEV_OFFSET + 1007;
 
 #define JOB_STATE_NEW				5000
 
@@ -57,6 +59,7 @@ int ORTETerminateJob(char **);
 int ORTEGetProcesses(char **);
 int ORTEGetProcessAttribute(char **);
 int ORTEGetNodes(char **);
+int ORTEGetNodeAttribute(char **);
 /*
 int ORTERun(char **);
 int OMPIGetJobs(char **);
@@ -111,6 +114,7 @@ static proxy_svr_commands command_tab[] = {
 	{"GETPROCS",		ORTEGetProcesses},
 	{"GETPATTR",	   	ORTEGetProcessAttribute},
 	{"GETNODES",		ORTEGetNodes},
+	{"GETNATTR",		ORTEGetNodeAttribute},
 	{NULL,			NULL},
 	/*
 	{"RUN",			ORTERun},
@@ -1399,6 +1403,200 @@ ORTEGetNodes(char **args)
 	
 	free(res);
 	return PROXY_RES_OK;
+}
+
+/* given a machineID and a nodeID inside that machine we attempt to find the values associated
+ * with the given keys.  the caller can pass any number of possible keys and the response
+ * message will be in the same order.
+ * 
+ * the user can pass in a node ID they want info on or -1 if they want info on EVERY
+ * machine contained in this machine
+ */
+int
+ORTEGetNodeAttribute(char **args)
+{
+	int				machid;
+	int				nodeid;
+	char *			res;
+	int				last_arg;
+	int				i;
+	char **			keys = NULL;
+	char **			values = NULL;
+	int *			types = NULL;
+	int				tot_len;
+	char *			valstr = NULL;
+	int				values_len;
+	
+	machid = atoi(args[1]);
+	nodeid = atoi(args[2]);
+	
+	/* run through the rest of the args, counting the keys */
+	i = 3;
+	while(args[i] != NULL) i++;
+	
+	last_arg = i;
+	
+	keys = (char**)malloc((last_arg - 3)*sizeof(char*));
+	values_len = last_arg - 3;
+	/* if they want to see ALL the processes then the requested values
+	 * have to be multipled by how many processes are in this job */
+	if(nodeid == -1) {
+		int numnodes = get_num_nodes(machid);
+		values_len = values_len * numnodes;
+	}
+	values = (char**)malloc(values_len * sizeof(char*));
+	types = (int*)malloc((last_arg - 3)*sizeof(int));
+	
+	/* go through the args now, set up the key array */
+	for(i=3; i<last_arg; i++) {
+		if(!strcmp(args[i], "ATTRIB_NODE_NAME")) {
+			asprintf(&(keys[i-3]), "%s", "orte-node-name");
+			types[i-3] = PTP_STRING;
+		} else if(!strcmp(args[i], "ATTRIB_NODE_STATUS")) {
+			asprintf(&[keys[i-3]), "%s", "orte-node-bproc-status");
+			types[i-3] = PTP_STRING;
+		} else if(!strcmp(args[i], "ATTRIB_NODE_MODE")) {
+			asprintf(&[keys[i-3]), "%s", "orte-node-bproc-mode");
+		} else if(!strcmp(args[i], "ATTRIB_NODE_USER")) {
+			asprintf(&[keys[i-3]), "%s", "orte-node-bproc-user");	
+		} else if(!strcmp(args[i], "ATTRIB_NODE_GROUP")) {
+			asprintf(&[keys[i-3]), "%s", "orte-node-bproc-group");
+		} else {
+			asprintf(&(keys[i-3]), "UNDEFINED");
+			types[i-3] = PTP_STRING;
+		}
+	}
+	
+	//for(i=3; i<last_arg; i++) {
+	//	printf("BEFORE CALL KEYS[%d] = '%s'\n", i-3, keys[i-3]); fflush(stdout);
+	//}
+		
+	if(get_proc_attribute(machid, nodeid, keys, types, values, last_arg-3)) {
+		/* error - so bail out */
+		res = ORTEErrorStr(RTEV_ERROR_NATTR, "error finding key on node or error getting keys");
+		proxy_svr_event_callback(orte_proxy, res);
+		
+		return;
+	}
+	/* else we're good, use the values */
+	
+	tot_len = 0;
+	for(i=0; i<values_len; i++) {
+		//printf("AFTER CALL! VALS[%d] = '%s'\n", i, values[i]); fflush(stdout);
+		tot_len += strlen(values[i]);
+	}
+	
+	//printf("totlen = %d\n", tot_len);
+	tot_len += last_arg; /* add on some for spaces and null, etc - little bit of extra here */
+	valstr = (char*)malloc(tot_len * sizeof(char));
+	
+	sprintf(valstr, "");
+	for(i=0; i<values_len; i++) {
+		sprintf(valstr, "%s%s%s", valstr, i == 0 ? "" : " ", values[i]);
+	}
+	
+	//printf("valSTR = '%s'\n", valstr);
+	
+	asprintf(&res, "%d %s", RTEV_NATTR, valstr);
+	
+	proxy_svr_event_callback(orte_proxy, res);
+	
+	free(res);
+	
+	for(i=3; i<last_arg; i++) {
+		if(keys[i-3] != NULL) free(keys[i-3]);
+	}
+	for(i=0; i<values_len; i++) {
+		if(values[i] != NULL) free(values[i]);
+	}
+		
+	free(keys);
+	free(values);
+	free(types);
+	free(valstr);
+	
+	return PROXY_RES_OK;
+}
+
+int
+get_node_attribute(int machid, int node_num, char **input_keys, int *input_types, char **input_values, int input_num_keys)
+{
+	char **keys;;
+	int rc;
+	size_t cnt;
+	orte_gpr_value_t **values;
+	orte_gpr_value_t *value;
+	int i, ret, j, min, max;
+	
+	/* ignore the machine ID until ORTE implements this part */
+	
+	keys = (char**)malloc((input_num_keys + 1)* sizeof(char*));
+	for(i=0; i<input_num_keys; i++) {
+		keys[i] = strdup(input_keys[i]);
+	}
+	/* null terminated */
+	keys[input_num_keys] = NULL;
+	
+	rc = orte_gpr.get(ORTE_GPR_KEYS_OR | ORTE_GPR_TOKENS_OR,
+			ORTE_NODE_SEGMENT, NULL, NULL, &cnt, &values);
+	if(rc != ORTE_SUCCESS) {
+		printf("ERROR2: '%s'\n", ORTE_ERROR_NAME(rc));
+		ret = 1;
+		goto cleanup;
+	}
+	
+	/* specified a proc bigger than any we know of in this job, bail out */
+	if(node_num != -1 && node_num >= cnt) {
+		ret = 1;
+		//printf("BIGGER!  QUIT!\n"); fflush(stdout);
+		goto cleanup;
+	}
+	
+	/* they want a full dump */
+	if(node_num == -1) {
+		min = 0;
+		max = cnt;
+	}
+	/* they were looking for a specific process - quick and dirty */
+	else {
+		min = node_num;
+		max = node_num + 1;
+	}
+	
+	//printf("MAX = %d, MIN = %d\n", max, min); fflush(stdout);
+		
+	for(i=min; i<max; i++) {
+		value = values[i];
+			
+		for(j=0; j<input_num_keys; j++) {
+			switch(input_types[j]) {
+				case PTP_STRING:
+					asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%s", get_str_value(value, input_keys[j]));
+					break;
+				case PTP_UINT32:
+					asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%d", get_ui32_value(value, input_keys[j]));
+					break;
+			}
+			//printf("VALUES IN GET FUNC[%d][%d] = '%s'\n", i, j, input_values[((i-min) * input_num_keys) + j]); fflush(stdout);
+		}
+	}
+	
+	/* success */
+	ret = 0;
+	
+cleanup:
+	if(keys != NULL) {
+		for(i=0; i<input_num_keys; i++) {
+			if(keys[i] != NULL) free(keys[i]);
+		}
+		free(keys);
+	}
+	if(jobid_str != NULL)
+		free(jobid_str);
+	if(segment != NULL)
+		free(segment);
+		
+	return ret;
 }
 
 ///* given a nodeid and an attribute key this generates an event with

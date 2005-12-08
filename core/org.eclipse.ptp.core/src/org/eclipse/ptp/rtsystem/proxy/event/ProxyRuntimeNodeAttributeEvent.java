@@ -20,18 +20,22 @@
 package org.eclipse.ptp.rtsystem.proxy.event;
 
 public class ProxyRuntimeNodeAttributeEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeEvent {
-	private int		jobState;
+	private String[] values;
 
-	public ProxyRuntimeNodeAttributeEvent(int state) {
+	public ProxyRuntimeNodeAttributeEvent(String[] values) {
 		super(EVENT_RUNTIME_NODEATTR);
-		this.jobState = state;
+		int s = values.length - 1;
+		this.values = new String[s];
+		for(int i=0; i<s; i++) {
+			this.values[i] = new String(values[i+1]);
+		}
 	}
 	
-	public int getJobState() {
-		return this.jobState;
+	public String[] getValues() {
+		return this.values;
 	}
 	
 	public String toString() {
-		return "EVENT_RUNTIME_NODEATTR " + this.jobState;
+		return "EVENT_RUNTIME_PROCATTR " + this.values;
 	}
 }

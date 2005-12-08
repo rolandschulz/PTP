@@ -44,6 +44,7 @@ public interface IPNode extends IPElement {
 	 *            The Process number to find
 	 * @return The Process if found, else <code>null</code>
 	 */
+	public int getNodeNumberInt();
 	public IPProcess findProcess(String processNumber);
 	/**
 	 * Returns the parent Machine that this Node is contained within.

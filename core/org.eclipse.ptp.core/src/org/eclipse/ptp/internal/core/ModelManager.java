@@ -216,22 +216,26 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			String[] ne2 = monitoringSystem.getNodes(mac);
 
 			System.out.println("MACHINE: " + ne[i]+" - #nodes = "+ne2.length);
+			
+			int num_attribs = 5;
+			String[] attribs = monitoringSystem.getAllNodesAttributes(mac, 
+					AttributeConstants.ATTRIB_NODE_NAME + " " +
+					AttributeConstants.ATTRIB_NODE_USER + " " + 
+					AttributeConstants.ATTRIB_NODE_GROUP + " " +
+					AttributeConstants.ATTRIB_NODE_STATE + " " +
+					AttributeConstants.ATTRIB_NODE_MODE);
+			
+			for(int j=0; j<attribs.length; j++) 
+				System.out.println("*** attribs["+j+"] = "+attribs[j]);
 
 			for (int j = 0; j < ne2.length; j++) {
 				PNode node;
 				node = new PNode(mac, ne2[j], "" + j + "", j);
-				node.setAttrib(AttributeConstants.ATTRIB_NODE_USER, 
-						monitoringSystem.getNodeAttribute(ne2[j],
-						AttributeConstants.ATTRIB_NODE_USER));
-				node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP,  
-						monitoringSystem.getNodeAttribute(ne2[j],
-						AttributeConstants.ATTRIB_NODE_GROUP));
-				node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, 
-						monitoringSystem.getNodeAttribute(ne2[j],
-						AttributeConstants.ATTRIB_NODE_STATE));
-				node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE, 
-						monitoringSystem.getNodeAttribute(ne2[j],
-						AttributeConstants.ATTRIB_NODE_MODE));
+				node.setAttrib(AttributeConstants.ATTRIB_NODE_NAME, attribs[(i * num_attribs)]);
+				node.setAttrib(AttributeConstants.ATTRIB_NODE_USER, attribs[(i * num_attribs) + 1]); 
+				node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP, attribs[(i * num_attribs) + 2]);
+				node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, attribs[(i * num_attribs) + 3]);
+				node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE, attribs[(i * num_attribs) + 4]);
 
 				mac.addChild(node);
 			}
@@ -364,7 +368,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		/* so let's find which node this is */
 		IPNode n = universe.findNodeByName(ne);
 		if (n != null) {
-			n.setAttrib("state", monitoringSystem.getNodeAttribute(ne, "state"));
+			n.setAttrib("state", monitoringSystem.getNodeAttributes(n, AttributeConstants.ATTRIB_NODE_STATE));
 			fireEvent(n, EVENT_SYS_STATUS_CHANGE);
 		}
 	}

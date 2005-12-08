@@ -53,6 +53,10 @@ public class PNode extends Parent implements IPNode {
 	public String getNodeNumber() {
 		return (String) getAttrib(AttributeConstants.ATTRIB_NODE_NUMBER);
 	}
+	public int getNodeNumberInt()
+	{
+		return ((Integer) attribs.get(AttributeConstants.ATTRIB_NODE_NUMBER)).intValue();
+	}
 	public IPProcess[] getProcesses() {
 		return (IPProcess[]) getCollection().toArray(new IPProcess[size()]);
 	}

@@ -20,19 +20,46 @@
 package org.eclipse.ptp.rtsystem;
 
 import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.core.IPNode;
 
-/* This is the interface to a monitoring system.  Things it has to do include
- * getting status of the parallel machine (number of nodes, number of jobs, etc.)
+/**
+ * A Monitoring System is a portion of a runtime system that handles status and information about
+ * the system (generally things outside the control of the runtime system).  This includes
+ * what machines are available, the nodes for those machines, the status of those nodes, etc.
+ * Monitoring Systems also can fire events, specifically {@link RuntimeEvent}s.
+ * 
+ * @author Nathan DeBardeleben
+ *
  */
 public interface IMonitoringSystem {
-	/* constructor will establish a new parallel session / a handle */
+	/**
+	 * Gets all the machines visible to this Monitoring System and returns their names
+	 * as a {@link String} array of the form [ "machine0", "machine1", "etc" ]
+	 * 
+	 * @return the machines visible to the monitoring system
+	 */
 	public String[] getMachines();
 
+	/**
+	 * Gets the names of all the nodes contained in a specified {@link IPMachine}.
+	 * The nodes must be named of the form "machinename_nodename" like
+	 * [ "machine0_node0", "machine0_node1", "etc" ]
+	 * 
+	 * @param machine the machine to look for nodes on
+	 * @return a list of the node names
+	 */
 	public String[] getNodes(IPMachine machine);
 
+	/**
+	 * Gets the name of the machine given 
+	 * @param nodeName
+	 * @return
+	 */
 	public String getNodeMachineName(String nodeName);
+	
+	public String[] getAllNodesAttributes(IPMachine machine, String attrib);
 
-	public String getNodeAttribute(String nodeName, String attrib);
+	public String[] getNodeAttributes(IPNode node, String attrib);
 
 	/* event stuff */
 	public void addRuntimeListener(IRuntimeListener listener);

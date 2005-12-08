@@ -243,9 +243,11 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		return values;
 	}
 	
-	public String[] getProcessAttributes(IPJob job, IPProcess proc, String attrib)
+	public String[] getProcessAttributes(IPProcess proc, String attrib)
 	{
 		String[] values = null;
+		
+		IPJob job = proc.getJob();
 		
 		try {
 			int jobID = job.getJobNumberInt();
