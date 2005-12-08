@@ -1453,14 +1453,14 @@ ORTEGetNodeAttribute(char **args)
 			asprintf(&(keys[i-3]), "%s", "orte-node-name");
 			types[i-3] = PTP_STRING;
 		} else if(!strcmp(args[i], "ATTRIB_NODE_STATUS")) {
-			asprintf(&[keys[i-3]), "%s", "orte-node-bproc-status");
+			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-status");
 			types[i-3] = PTP_STRING;
 		} else if(!strcmp(args[i], "ATTRIB_NODE_MODE")) {
-			asprintf(&[keys[i-3]), "%s", "orte-node-bproc-mode");
+			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-mode");
 		} else if(!strcmp(args[i], "ATTRIB_NODE_USER")) {
-			asprintf(&[keys[i-3]), "%s", "orte-node-bproc-user");	
+			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-user");	
 		} else if(!strcmp(args[i], "ATTRIB_NODE_GROUP")) {
-			asprintf(&[keys[i-3]), "%s", "orte-node-bproc-group");
+			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-group");
 		} else {
 			asprintf(&(keys[i-3]), "UNDEFINED");
 			types[i-3] = PTP_STRING;
@@ -1591,10 +1591,6 @@ cleanup:
 		}
 		free(keys);
 	}
-	if(jobid_str != NULL)
-		free(jobid_str);
-	if(segment != NULL)
-		free(segment);
 		
 	return ret;
 }
