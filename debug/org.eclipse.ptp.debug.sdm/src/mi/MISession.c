@@ -38,6 +38,11 @@ static char *			MISessionGDBPath = NULL;
 static List *			MISessionList = NULL;
 static struct timeval		MISessionSelectTimeout = {0, 1000};
 
+static void DoOOBCallbacks(MISession *sess, List *oobs);
+static void HandleChild(int sig);
+static int WriteCommand(int fd, char *cmd);
+static char *ReadResponse(int fd);
+
 MISession *
 MISessionNew(void)
 {
@@ -46,9 +51,7 @@ MISessionNew(void)
 	sess->in_fd = -1;
 	sess->out_fd = -1;
 	sess->pid = -1;
-	sess->command_completed = 1;
 	sess->send_queue = NewList();
-	sess->output = NULL;
 	sess->cmd_callback = NULL;
 	sess->exec_callback = NULL;
 	sess->status_callback = NULL;
@@ -72,7 +75,7 @@ MISessionFree(MISession *sess)
 }
 
 static void
-MISessionHandleChild(int sig)
+HandleChild(int sig)
 {
 	int			stat;
 	pid_t		pid;
@@ -101,6 +104,9 @@ MISessionLocal(void)
 	int			p2[2];
 	MISession *	sess = MISessionNew();
 	
+	if (MISessionGDBPath == NULL)
+		MISessionSetGDBPath("gdb");
+		
 	if (pipe(p1) < 0 || pipe(p2) < 0) {
 		MISetError(MI_ERROR_SYSTEM, strerror(errno));
 		MISessionFree(sess);
@@ -113,7 +119,7 @@ MISessionLocal(void)
 		return NULL;
 	}
 	
-	signal(SIGCHLD, MISessionHandleChild);
+	signal(SIGCHLD, HandleChild);
 	
 	switch (sess->pid = fork())
 	{
@@ -148,6 +154,48 @@ MISessionLocal(void)
 }
 
 void
+MISessionRegisterCommandCallback(MISession *sess, void (*callback)(MIResultRecord *))
+{
+	sess->cmd_callback = callback;
+}
+
+void
+MISessionRegisterExecCallback(MISession *sess, void (*callback)(char *, List *))
+{
+	sess->exec_callback = callback;
+}
+
+void
+MISessionRegisterStatusCallback(MISession *sess, void (*callback)(char *, List *))
+{
+	sess->status_callback = callback;
+}
+
+void
+MISessionRegisterNotifyCallback(MISession *sess, void (*callback)(char *, List *))
+{
+	sess->notify_callback = callback;
+}
+
+void
+MISessionRegisterConsoleCallback(MISession *sess, void (*callback)(char *))
+{
+	sess->console_callback = callback;
+}
+
+void
+MISessionRegisterLogCallback(MISession *sess, void (*callback)(char *))
+{
+	sess->log_callback = callback;
+}
+
+void
+MISessionRegisterTargetCallback(MISession *sess, void (*callback)(char *))
+{
+	sess->target_callback = callback;
+}
+
+void
 MISessionSetGDBPath(char *path)
 {
 	if (MISessionGDBPath != NULL)
@@ -179,7 +227,9 @@ WriteCommand(int fd, char *cmd)
 {
 	int	n;
 	int	len = strlen(cmd);
-	
+
+	printf("gdb>>> %s\n", cmd);
+		
 	while (len > 0) {
 		n = write(fd, cmd, len);
 		if (n <= 0) {
@@ -194,7 +244,7 @@ WriteCommand(int fd, char *cmd)
 		cmd += n;
 		len -= n;
 	}
-	
+		
 	return 0;
 }
 
@@ -252,6 +302,10 @@ ReadResponse(int fd)
 		p = &res_buf[len];
 	}
 	
+	if (n > 0)
+		p[n] = '\0';
+	printf("<<<gdb %s\n", res_buf);
+	
 	return res_buf;
 }
 
@@ -269,7 +323,7 @@ MISessionProcessCommandsAndResponses(fd_set *rfds, fd_set *wfds)
 {
 	char *		str;
 	MISession *	sess;
-	MICommand *	cmd;
+	MIOutput *	output;
 	
 	if (MISessionList == NULL)
 		return;
@@ -280,15 +334,14 @@ MISessionProcessCommandsAndResponses(fd_set *rfds, fd_set *wfds)
 			
 		if (sess->in_fd != -1
 			&& !EmptyList(sess->send_queue)
-			&& sess->command_completed
+			&& sess->command == NULL
 			&& FD_ISSET(sess->in_fd, wfds))
 		{
-			cmd = (MICommand *)RemoveFirst(sess->send_queue);
-			if (WriteCommand(sess->in_fd, MICommandToString(cmd)) < 0) {
+			sess->command = (MICommand *)RemoveFirst(sess->send_queue);
+			if (WriteCommand(sess->in_fd, MICommandToString(sess->command)) < 0) {
 				sess->in_fd = -1;
 				continue;
 			}
-			sess->command_completed = 0;
 		}
 
 		if (sess->out_fd != -1 && FD_ISSET(sess->out_fd, rfds)) {
@@ -297,75 +350,67 @@ MISessionProcessCommandsAndResponses(fd_set *rfds, fd_set *wfds)
 				continue;
 			}
 			
-			if (sess->output != NULL)
-				MIOutputFree(sess->output);
-			sess->output = MIParse(str);	
+			output = MIParse(str);	
 					
-			sess->command_completed = 1;
+			if (output->oobs != NULL)
+				DoOOBCallbacks(sess, output->oobs);
+				
+			if (output->rr != NULL) {
+				if (sess->command->callback != NULL)
+					sess->command->callback(output->rr);
+				sess->command->completed = 1;
+				sess->command = NULL;
+			}
+			
+			MIOutputFree(output);
 		}
 	}
 }
 
-/*
- * Checks output for each session and calls any
- * callbacks that have been registered.
- */
-void
-MISessionDoCallbacks(void)
+static void
+DoOOBCallbacks(MISession *sess, List *oobs)
 {
-	MISession *		sess;
 	MIOOBRecord *	oob;
 	
-	if (MISessionList == NULL)
-		return;
-		
-	for (SetList(MISessionList); (sess = (MISession *)GetListElement(MISessionList)) != NULL; ) {
-		if (sess->pid != -1 && sess->output != NULL) {
-			if (sess->output->rr != NULL && sess->cmd_callback != NULL)
-				sess->cmd_callback(sess->output->rr);
-			if (sess->output->oobs != NULL) {
-				for (SetList(sess->output->oobs); (oob = (MIOOBRecord *)GetListElement(sess->output->oobs)) != NULL; ) {
-					switch (oob->type) {
-					case MIOOBRecordTypeAsync:
-						switch (oob->sub_type) {
-						case MIOOBRecordExecAsync:
-							if (sess->exec_callback != NULL)
-								sess->exec_callback(oob->class, oob->results);
-							break;
-							
-						case MIOOBRecordStatusAsync:
-							if (sess->status_callback != NULL)
-								sess->status_callback(oob->class, oob->results);
-							break;
-							
-						case MIOOBRecordNotifyAsync:
-							if (sess->notify_callback != NULL)
-								sess->notify_callback(oob->class, oob->results);
-							break;
-						}
-						break;
-						
-					case MIOOBRecordTypeStream:
-						switch (oob->sub_type) {
-						case MIOOBRecordConsoleStream:
-							if (sess->console_callback != NULL)
-								sess->console_callback(oob->cstring);
-							break;
-							
-						case MIOOBRecordLogStream:
-							if (sess->log_callback != NULL)
-								sess->log_callback(oob->cstring);
-							break;
-							
-						case MIOOBRecordTargetStream:
-							if (sess->target_callback != NULL)
-								sess->target_callback(oob->cstring);
-							break;
-						}
-						break;
-					}
-				}
+	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
+		switch (oob->type) {
+		case MIOOBRecordTypeAsync:
+			switch (oob->sub_type) {
+			case MIOOBRecordExecAsync:
+				if (sess->exec_callback != NULL)
+					sess->exec_callback(oob->class, oob->results);
+				break;
+				
+			case MIOOBRecordStatusAsync:
+				if (sess->status_callback != NULL)
+					sess->status_callback(oob->class, oob->results);
+				break;
+				
+			case MIOOBRecordNotifyAsync:
+				if (sess->notify_callback != NULL)
+					sess->notify_callback(oob->class, oob->results);
+				break;
 			}
+			break;
+			
+		case MIOOBRecordTypeStream:
+			switch (oob->sub_type) {
+			case MIOOBRecordConsoleStream:
+				if (sess->console_callback != NULL)
+					sess->console_callback(oob->cstring);
+				break;
+				
+			case MIOOBRecordLogStream:
+				if (sess->log_callback != NULL)
+					sess->log_callback(oob->cstring);
+				break;
+				
+			case MIOOBRecordTargetStream:
+				if (sess->target_callback != NULL)
+					sess->target_callback(oob->cstring);
+				break;
+			}
+			break;
 		}
 	}
 }
@@ -404,7 +449,7 @@ MISessionGetFds(int *nfds, fd_set *rfds, fd_set *wfds, fd_set *efds)
 	}
 	
 	if (nfds != NULL)
-		*nfds = n;
+		*nfds = n + 1;
 }
 
 /*
@@ -431,7 +476,6 @@ MISessionProgress(void)
 	}
 	
 	MISessionProcessCommandsAndResponses(&rfds, &wfds);
-	MISessionDoCallbacks();
 	
 	return n;
 }

@@ -26,7 +26,7 @@
 #include "MICommand.h"
 
 MICommand *
-MICommandNew(char *command)
+MICommandNew(char *command, void (*callback)(MIResultRecord *))
 {
 	MICommand *	cmd;
 	
@@ -35,6 +35,8 @@ MICommandNew(char *command)
 	cmd->options = (char **)malloc(MICOMMAND_OPT_SIZE * sizeof(char *));
 	cmd->opt_size = MICOMMAND_OPT_SIZE;
 	cmd->num_options = 0;
+	cmd->completed = 0;
+	cmd->callback = callback;
 	return cmd;
 }
 
@@ -72,6 +74,12 @@ MICommandAddOption(MICommand *cmd, char *opt, char *arg)
 		cmd->options[cmd->num_options++] = strdup(arg);
 }
 
+int
+MICommandCompleted(MICommand *cmd)
+{
+	return cmd->completed;
+}
+
 char *
 MICommandToString(MICommand *cmd)
 {
@@ -93,13 +101,13 @@ MICommandToString(MICommand *cmd)
 	}
 	
 	strcpy(str_res, cmd->command);
-	strcat(str_res, " ");
 	
 	for (i = 0; i < cmd->num_options; i++) {
-		if (i > 0)
-			strcat(str_res, " ");
+		strcat(str_res, " ");
 		strcat(str_res, cmd->options[i]);
 	}
+	
+	strcat(str_res, "\n");
 	
 	return str_res;
 }

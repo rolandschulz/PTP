@@ -19,17 +19,22 @@
 #ifndef _MICOMMAND_H_
 #define _MICOMMAND_H_
 
+#include "MIResultRecord.h"
+
 struct MICommand {
-	char *	command;		/* command to execute */
-	char **	options;		/* command options */
-	int		num_options;	/* number of options for command */
-	int		opt_size;	/* allocated size of options */
+	char *	command;							/* command to execute */
+	char **	options;							/* command options */
+	int		num_options;						/* number of options for command */
+	int		opt_size;						/* allocated size of options */
+	int		completed;						/* command has been completed */
+	void		(*callback)(MIResultRecord *);	/* command completed callback */
 };
 typedef struct MICommand	MICommand;
 
-extern MICommand *MICommandNew(char *);
+extern MICommand *MICommandNew(char *, void (*callback)(MIResultRecord *));
 extern void MICommandFree(MICommand *cmd);
 extern void MICommandAddOption(MICommand *cmd, char *opt, char *arg);
+extern int MICommandCompleted(MICommand *cmd);
 extern char *MICommandToString(MICommand *cmd);
 #endif _MICOMMAND_H_
 

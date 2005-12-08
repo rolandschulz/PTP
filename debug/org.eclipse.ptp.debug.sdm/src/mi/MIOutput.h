@@ -9,6 +9,9 @@
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
 
+#ifndef _MIOUTPUT_H_
+#define _MIOUTPUT_H_
+
 #include "list.h"
 #include "MIResultRecord.h"
 
@@ -24,3 +27,4 @@ typedef struct MIOutput MIOutput;
 extern MIOutput *MIOutputNew(void);
 extern MIOutput *MIParse(char *buffer);
 extern void MIOutputFree(MIOutput *op);
+#endif _MIOUTPUT_H_

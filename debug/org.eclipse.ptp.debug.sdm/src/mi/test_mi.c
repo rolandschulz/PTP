@@ -3,35 +3,59 @@
 #include <string.h>
 
 #include "MIString.h"
+#include "MISession.h"
+#include "MIError.h"
 #include "MIResultRecord.h"
-#include "MIOutput.h"
+
+void
+cmd_callback(MIResultRecord *rr)
+{
+	MIString *str = MIResultRecordToString(rr);
+	printf("res> %s\n", MIStringToCString(str));
+	MIStringFree(str);
+}
+
+void
+console_callback(char *str)
+{
+	printf("cons> %s\n", str);
+}
+
+void
+log_callback(char *str)
+{
+	printf("log> %s\n", str);
+}
+
+void
+sendcmd_wait(MISession *sess, MICommand *cmd)
+{
+	MISessionSendCommand(sess, cmd);
+	
+	while (!MICommandCompleted(cmd)) {
+		MISessionProgress();
+	}
+	
+	MICommandFree(cmd);
+}
 
 int main(int argc, char *argv[])
 {
-	char *line;
-	char *p;
-	int needs_nl = 0;
-	size_t len;
-	MIOutput *out;
-	MIString *str;
+	MISession *sess;
+	MICommand *cmd;
 	
-	FILE *fp = fopen("src/mi/test.input", "r");
-	while ((p = fgetln(fp, &len)) != NULL) {
-		if (p[len-1] != '\n')
-			needs_nl = 1;
-		line = malloc(len+needs_nl+1);
-		memcpy(line, p, len+needs_nl);
-		if (needs_nl)
-			line[len] = '\n';
-		line[len+needs_nl] = '\0'; 
-		printf("line is <%s>", line);
-		out = MIParse(line);
-		if (out->rr != NULL) {
-			str = MIResultRecordToString(out->rr);
-			printf("rr = %s\n", MIStringToCString(str));
-			MIStringFree(str);
-		}
-		MIOutputFree(out);
+	sess = MISessionLocal();
+	if (sess == NULL) {
+		fprintf(stderr, "%s", MIGetErrorStr());
+		return 1;
 	}
+	
+	MISessionRegisterConsoleCallback(sess, console_callback);
+	MISessionRegisterLogCallback(sess, log_callback);
+	
+	cmd = MICommandNew("help", cmd_callback);
+	
+	sendcmd_wait(sess, cmd);
+	
 	return 0;
 }

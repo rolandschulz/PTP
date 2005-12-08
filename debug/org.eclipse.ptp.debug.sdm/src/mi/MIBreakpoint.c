@@ -137,7 +137,7 @@ MIBreakInsert(MISession *sess, int isTemporary, int isHardware, char *condition,
 	char *		str;
 	MICommand *	cmd;
 	
-	cmd = MICommandNew("-break-insert");
+	cmd = MICommandNew("-break-insert", NULL);
 
 	if (isTemporary) {
 		MICommandAddOption(cmd, "-t", NULL);
@@ -160,6 +160,6 @@ MIBreakInsert(MISession *sess, int isTemporary, int isHardware, char *condition,
 	
 	MICommandAddOption(cmd, line, NULL);
 	
-	return MICommandSend(sess, cmd);
+	return MISessionSendCommand(sess, cmd);
 }
 
