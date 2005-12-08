@@ -16,14 +16,14 @@
  *
  * LA-CC 04-115
  ******************************************************************************/
-#ifndef _MISESSION_H_
-#define _MISESSION_H_
+#ifndef _MIERROR_H_
+#define _MIERROR_H_
 
-struct MISession {
-	int	gdb_fd[2];
-	int	gdb_pid;
-};
-typedef struct MISession	MISession;
+#define MI_ERROR_SYSTEM	1
 
-#endif _MISESSION_H_
+extern void MISetError(int errnum, char *msg);
+extern int MIGetError(void);
+extern char *MIGetErrorStr(void);
+#endif _MIERROR_H_
+
 
