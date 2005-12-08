@@ -10,13 +10,14 @@
  *******************************************************************************/
 
 #include "list.h"
+#include "MIResultRecord.h"
 
 /**
  * GDB/MI response.
  */
 struct MIOutput {
-	MIResultRecord *rr;
-	List *oobs;
+	MIResultRecord *	rr;
+	List *			oobs;
 };
 typedef struct MIOutput MIOutput;
 

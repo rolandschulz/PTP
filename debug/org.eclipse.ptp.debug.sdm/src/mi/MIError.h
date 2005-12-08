@@ -20,6 +20,7 @@
 #define _MIERROR_H_
 
 #define MI_ERROR_SYSTEM	1
+#define MI_ERROR_SESSION	2
 
 extern void MISetError(int errnum, char *msg);
 extern int MIGetError(void);

@@ -19,11 +19,29 @@
 #ifndef _MISESSION_H_
 #define _MISESSION_H_
 
+#include "list.h"
+#include "MIOutput.h"
+
 struct MISession {
-	int	gdb_fd[2];
-	int	gdb_pid;
+	int			in_fd; /* GDB input */
+	int			out_fd; /* GDB output */
+	int			pid;
+	int			command_completed;
+	MIOutput *	output;
+	List *		send_queue;
+	void			(*cmd_callback)(MIResultRecord *);
+	void			(*exec_callback)(char *, List *);
+	void			(*status_callback)(char *, List *);
+	void			(*notify_callback)(char *, List *);
+	void			(*console_callback)(char *);
+	void			(*log_callback)(char *);
+	void			(*target_callback)(char *);	
 };
 typedef struct MISession	MISession;
 
+extern MISession *MISessionNew(void);
+extern void MISessionFree(MISession *sess);
+extern MISession *MISessionLocal(void);
+extern void MISessionSetGDBPath(char *path);
 #endif _MISESSION_H_
 
