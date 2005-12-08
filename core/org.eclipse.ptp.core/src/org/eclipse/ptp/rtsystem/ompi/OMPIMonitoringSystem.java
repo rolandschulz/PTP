@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
 
@@ -114,11 +115,22 @@ public class OMPIMonitoringSystem implements IMonitoringSystem {
 		return "machine0";
 	}
 
-	public String getNodeAttribute(String nodeName, String attrib) {
-		System.out.println("JAVA OMPI: getNodeAttribute(" + nodeName + ", "
-				+ attrib + ") called");
-		String s = null;
+	public String[] getNodeAttributes(IPNode node, String attribs) {
+		System.out.println("JAVA OMPI: getNodeAttribute(" + node.getElementName() + ", "
+				+ attribs + ") called");
+		IPMachine machine = node.getMachine();
+		int machID = machine.getMachineNumberInt();
+		int nodeID = node.getNodeNumberInt();
 
+		String[] values = null;
+		
+		try {
+			values = proxy.getNodeAttributesBlocking(machID, nodeID, attribs);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+
+		/*
 		if (attrib.equals(AttributeConstants.ATTRIB_NODE_STATE)) {
 			s = "up";
 		} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_MODE)) {
@@ -129,5 +141,22 @@ public class OMPIMonitoringSystem implements IMonitoringSystem {
 			s = "ptp";
 		}
 		return s;
+		*/
+		
+		return values;
+	}
+	
+	public String[] getAllNodesAttributes(IPMachine machine, String attribs) {
+		int machID = machine.getMachineNumberInt();
+		
+		String[] values = null;
+		
+		try {
+			values = proxy.getAllNodesAttributesBlocking(machID, attribs);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		
+		return values;
 	}
 }

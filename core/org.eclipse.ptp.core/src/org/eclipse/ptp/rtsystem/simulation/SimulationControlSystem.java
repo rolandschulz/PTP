@@ -280,7 +280,7 @@ public class SimulationControlSystem implements IControlSystem {
 		String[] allvals = new String[attribs.length * procs.length];
 		
 		for(int i=0; i<procs.length; i++) {
-			String[] pvals = getProcessAttributes(job, procs[i], attribString);
+			String[] pvals = getProcessAttributes(procs[i], attribString);
 			
 			for(int j=0; j<pvals.length; j++) {
 				allvals[(i * pvals.length) + j] = new String(pvals[j]);
@@ -290,7 +290,7 @@ public class SimulationControlSystem implements IControlSystem {
 		return allvals;
 	}
 	
-	public String[] getProcessAttributes(IPJob job, IPProcess proc, String attribString)
+	public String[] getProcessAttributes(IPProcess proc, String attribString)
 	{
 		String procName = proc.getElementName();
 		

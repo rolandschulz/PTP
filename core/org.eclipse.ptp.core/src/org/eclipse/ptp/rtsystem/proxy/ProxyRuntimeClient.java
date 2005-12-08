@@ -52,8 +52,12 @@ public class ProxyRuntimeClient extends AbstractProxyRuntimeClient {
 		sendCommand("GETPROCS", Integer.toString(jobId));
 	}
 	
-	public void getProcessAttribute(int jobId, int procId, String key) throws IOException {
-		sendCommand("GETPATTR", Integer.toString(jobId) + " " + Integer.toString(procId) + " " + key);
+	public void getProcessAttribute(int jobId, int procId, String keys) throws IOException {
+		sendCommand("GETPATTR", Integer.toString(jobId) + " " + Integer.toString(procId) + " " + keys);
+	}
+	
+	public void getNodeAttribute(int machID, int nodeID, String keys) throws IOException {
+		sendCommand("GETNATTR", Integer.toString(machID) + " " + Integer.toString(nodeID) + " " + keys);
 	}
 	
 	public void getMachines() throws IOException {
@@ -62,10 +66,6 @@ public class ProxyRuntimeClient extends AbstractProxyRuntimeClient {
 
 	public void getNodes(int machId) throws IOException {
 		sendCommand("GETNODES", Integer.toString(machId));
-	}
-
-	public void getNodeAttribute(int nodeId, String key) throws IOException {
-		sendCommand("GETNATTR", Integer.toString(nodeId) + " " + key);
 	}
 
 	public void getNodeMachineID(int nodeId) throws IOException {

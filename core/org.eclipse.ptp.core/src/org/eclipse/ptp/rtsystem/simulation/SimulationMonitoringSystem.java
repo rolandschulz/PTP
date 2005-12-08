@@ -27,7 +27,10 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.AttributeConstants;
+import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
+import org.eclipse.ptp.core.IPNode;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.internal.core.CoreUtils;
@@ -274,17 +277,48 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 		return "";
 	}
 
-	public String getNodeAttribute(String nodeName, String attrib) {
-		String s = null;
-		if (attrib.equals(AttributeConstants.ATTRIB_NODE_STATE)) {
-			s = (String) nodeStateMap.get(nodeName);
-		} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_MODE)) {
-			s = (String) nodeModeMap.get(nodeName);
-		} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_USER)) {
-			s = (String) nodeUserMap.get(nodeName);
-		} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_GROUP)) {
-			s = (String) nodeGroupMap.get(nodeName);
+	public String[] getNodeAttributes(IPNode node, String attribString) {
+		String nodeName = node.getElementName();
+		String[] attribs = attribString.split(" ");
+		String[] retstr = new String[attribs.length];
+		
+		for(int i=0; i<attribs.length; i++) {
+			String attrib = attribs[i];
+			String s = null;
+			
+			if (attrib.equals(AttributeConstants.ATTRIB_NODE_NAME)) {
+				s = nodeName;
+			} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_STATE)) {
+				s = (String) nodeStateMap.get(nodeName);
+			} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_MODE)) {
+				s = (String) nodeModeMap.get(nodeName);
+			} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_USER)) {
+				s = (String) nodeUserMap.get(nodeName);
+			} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_GROUP)) {
+				s = (String) nodeGroupMap.get(nodeName);
+			}
+			
+			retstr[i] = new String(s);
 		}
-		return s;
+		
+		return retstr;
+	}
+	
+	public String[] getAllNodesAttributes(IPMachine machine, String attribString) {
+		IPNode[] nodes = machine.getSortedNodes();
+		String[] attribs = attribString.split(" ");
+		
+		String[] allvals = new String[attribs.length * nodes.length];
+		
+		for(int i=0; i<nodes.length; i++) {
+			String[] nvals = getNodeAttributes(nodes[i], attribString);
+			
+			for(int j=0; j<nvals.length; j++) {
+				allvals[(i * nvals.length) + j] = new String(nvals[j]);
+			}
+		}
+
+		
+		return allvals;
 	}
 }

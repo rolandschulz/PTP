@@ -27,6 +27,8 @@ import org.eclipse.ptp.rtsystem.JobRunConfiguration;
  * A Control System is a portion of a runtime system that handles controlling jobs.  This includes
  * starting new jobs, terminating jobs, getting information about running jobs and processes, etc.
  * Control Systems also can fire events, specifically {@link RuntimeEvent}s.
+ * 
+ * @author Nathan DeBardeleben
  */
 
 public interface IControlSystem {	
@@ -86,12 +88,11 @@ public interface IControlSystem {
 	 * attributes are defined in {@link org.eclipse.ptp.core.AttributeConstants}.  The
 	 * return array's length is equal to the number of attributes requested.
 	 * 
-	 * @param job the job to get the process attributes from
 	 * @param proc the process contained in the job to get the process attributes from
 	 * @param attribs the attribute String where attributes are space separated
 	 * @return an array of the attribute values
 	 */
-	public String[] getProcessAttributes(IPJob job, IPProcess proc, String attribs);
+	public String[] getProcessAttributes(IPProcess proc, String attribs);
 
 	/**
 	 * Adds a listener to the control system.  The control system may fire {@link RuntimeEvent}s

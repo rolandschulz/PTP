@@ -31,6 +31,7 @@ public interface AttributeConstants {
 	public static final String ATTRIB_ISREGISTERED = "ATTRIB_ISREGISTERED";
 	
 	/* node attributes */
+	public static final String ATTRIB_NODE_NAME = "ATTRIB_NODE_NAME";
 	public static final String ATTRIB_NODE_NUMBER = "ATTRIB_NODE_NUMBER";
 	public static final String ATTRIB_NODE_STATE = "ATTRIB_NODE_STATE";
 	public static final String ATTRIB_NODE_GROUP = "ATTRIB_NODE_GROUP";
