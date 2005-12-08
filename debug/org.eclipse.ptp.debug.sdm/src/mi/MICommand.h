@@ -19,8 +19,6 @@
 #ifndef _MICOMMAND_H_
 #define _MICOMMAND_H_
 
-#include "MISession.h"
-
 struct MICommand {
 	char *	command;		/* command to execute */
 	char **	options;		/* command options */
@@ -32,6 +30,6 @@ typedef struct MICommand	MICommand;
 extern MICommand *MICommandNew(char *);
 extern void MICommandFree(MICommand *cmd);
 extern void MICommandAddOption(MICommand *cmd, char *opt, char *arg);
-extern int MICommandSend(MISession *sess, MICommand *cmd);
+extern char *MICommandToString(MICommand *cmd);
 #endif _MICOMMAND_H_
 

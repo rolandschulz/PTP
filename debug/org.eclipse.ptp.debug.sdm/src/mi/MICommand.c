@@ -23,7 +23,6 @@
 
 #define MICOMMAND_OPT_SIZE	10
 
-#include "MISession.h"
 #include "MICommand.h"
 
 MICommand *
@@ -73,8 +72,35 @@ MICommandAddOption(MICommand *cmd, char *opt, char *arg)
 		cmd->options[cmd->num_options++] = strdup(arg);
 }
 
-int
-MICommandSend(MISession *sess, MICommand *cmd)
+char *
+MICommandToString(MICommand *cmd)
 {
+	int				i;
+	int				size;
+	static int		str_size = 0;
+	static char *	str_res = NULL;
+	
+	size = strlen(cmd->command) + 1;
+	
+	for (i = 0; i < cmd->num_options; i++)
+		size += strlen(cmd->options[i]) + 1;
+		
+	if (size > str_size) {
+		if (str_res != NULL)
+			free(str_res);
+		str_res = (char *)malloc(size);
+		str_size = size;
+	}
+	
+	strcpy(str_res, cmd->command);
+	strcat(str_res, " ");
+	
+	for (i = 0; i < cmd->num_options; i++) {
+		if (i > 0)
+			strcat(str_res, " ");
+		strcat(str_res, cmd->options[i]);
+	}
+	
+	return str_res;
 }
 

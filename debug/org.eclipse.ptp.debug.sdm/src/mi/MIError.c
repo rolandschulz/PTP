@@ -29,7 +29,8 @@ static char *	MIErrorStr = NULL;
 static char * MIErrorTab[] =
 {
 	"NO_ERROR",
-	"system error: %s",
+	"System error: %s",
+	"GDB session does not exist or was terminated",
 };
 
 /*
