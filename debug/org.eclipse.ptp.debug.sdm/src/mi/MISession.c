@@ -34,8 +34,9 @@
 #include "MIError.h"
 #include "MIOOBRecord.h"
 
-static char *	MISessionGDBPath = NULL;
-static List *	MISessionList = NULL;
+static char *			MISessionGDBPath = NULL;
+static List *			MISessionList = NULL;
+static struct timeval		MISessionSelectTimeout = {0, 1000};
 
 MISession *
 MISessionNew(void)
@@ -198,38 +199,6 @@ WriteCommand(int fd, char *cmd)
 }
 
 /*
- * Send first pending command to GDB for each session.
- * 
- * Assumes that fds contains file descriptors ready
- * for writing.
- */
-void
-MISessionProcessCommands(fd_set *fds)
-{
-	MISession *	sess;
-	MICommand *	cmd;
-	
-	if (MISessionList == NULL)
-		return;
-		
-	for (SetList(MISessionList); (sess = (MISession *)GetListElement(MISessionList)) != NULL; ) {
-		if (sess->pid != -1
-			&& sess->in_fd != -1
-			&& !EmptyList(sess->send_queue)
-			&& sess->command_completed
-			&& FD_ISSET(sess->in_fd, fds))
-		{
-			cmd = (MICommand *)RemoveFirst(sess->send_queue);
-			if (WriteCommand(sess->in_fd, MICommandToString(cmd)) < 0) {
-				sess->in_fd = -1;
-				continue;
-			}
-			sess->command_completed = 0;
-		}
-	}
-}
-
-/*
  * Read BUFSIZ chunks of data until we have read
  * everything available.
  * 
@@ -287,23 +256,42 @@ ReadResponse(int fd)
 }
 
 /*
+ * Send first pending command to GDB for each session.
+ * 
  * For each session, read response from GDB and 
  * parse the result.
  * 
- * Assumes fds contains file descriptors ready
- * for reading.
+ * Assumes that fds contains file descriptors ready
+ * for writing.
  */
 void
-MISessionProcessResponses(fd_set *fds)
+MISessionProcessCommandsAndResponses(fd_set *rfds, fd_set *wfds)
 {
 	char *		str;
 	MISession *	sess;
+	MICommand *	cmd;
 	
 	if (MISessionList == NULL)
 		return;
 		
 	for (SetList(MISessionList); (sess = (MISession *)GetListElement(MISessionList)) != NULL; ) {
-		if (sess->pid != -1 && sess->out_fd != -1 && FD_ISSET(sess->out_fd, fds)) {
+		if (sess->pid == -1)
+			continue;
+			
+		if (sess->in_fd != -1
+			&& !EmptyList(sess->send_queue)
+			&& sess->command_completed
+			&& FD_ISSET(sess->in_fd, wfds))
+		{
+			cmd = (MICommand *)RemoveFirst(sess->send_queue);
+			if (WriteCommand(sess->in_fd, MICommandToString(cmd)) < 0) {
+				sess->in_fd = -1;
+				continue;
+			}
+			sess->command_completed = 0;
+		}
+
+		if (sess->out_fd != -1 && FD_ISSET(sess->out_fd, rfds)) {
 			if ((str = ReadResponse(sess->out_fd)) == NULL) {
 				sess->out_fd = -1;
 				continue;
@@ -311,7 +299,6 @@ MISessionProcessResponses(fd_set *fds)
 			
 			if (sess->output != NULL)
 				MIOutputFree(sess->output);
-				
 			sess->output = MIParse(str);	
 					
 			sess->command_completed = 1;
@@ -384,19 +371,67 @@ MISessionDoCallbacks(void)
 }
 
 void
-MISessionGetFds(fd_set *rfds, fd_set *wfds, fd_set *efds)
+MISessionGetFds(int *nfds, fd_set *rfds, fd_set *wfds, fd_set *efds)
 {
-	MISession *sess;
+	int			n = 0;
+	MISession *	sess;
 	
 	if (MISessionList == NULL)
 		return;
+	
+	if (rfds != NULL)	
+		FD_ZERO(rfds);
 		
+	if (wfds != NULL)	
+		FD_ZERO(wfds);
+		
+	if (efds != NULL)	
+		FD_ZERO(efds);
+	
 	for (SetList(MISessionList); (sess = (MISession *)GetListElement(MISessionList)) != NULL; ) {
 		if (sess->pid != -1) {
-			if (sess->in_fd != -1)
+			if (wfds != NULL && sess->in_fd != -1) {
 				FD_SET(sess->in_fd, wfds);
-			if (sess->out_fd != -1)
+				if (sess->in_fd > n)
+					n = sess->in_fd;
+			}
+			if (rfds != NULL && sess->out_fd != -1) {
 				FD_SET(sess->out_fd, rfds);
+				if (sess->out_fd > n)
+					n = sess->out_fd;
+			}
 		}
 	}
+	
+	if (nfds != NULL)
+		*nfds = n;
+}
+
+/*
+ * Default progress command if none supplied.
+ */
+int
+MISessionProgress(void)
+{
+	int		n;
+	int		nfds;
+	fd_set	rfds;
+	fd_set	wfds;
+	
+	MISessionGetFds(&nfds, &rfds, &wfds, NULL);
+	
+	n = select(nfds, &rfds, &wfds, NULL, &MISessionSelectTimeout);
+	
+	if (n == 0)
+		return 0;
+		
+	if (n < 0) {
+		MISetError(MI_ERROR_SYSTEM, strerror(errno));
+		return -1;
+	}
+	
+	MISessionProcessCommandsAndResponses(&rfds, &wfds);
+	MISessionDoCallbacks();
+	
+	return n;
 }

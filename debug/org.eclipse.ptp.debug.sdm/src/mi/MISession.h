@@ -19,8 +19,11 @@
 #ifndef _MISESSION_H_
 #define _MISESSION_H_
 
+#include <sys/select.h>
+
 #include "list.h"
 #include "MIOutput.h"
+#include "MICommand.h"
 
 struct MISession {
 	int			in_fd; /* GDB input */
@@ -43,5 +46,9 @@ extern MISession *MISessionNew(void);
 extern void MISessionFree(MISession *sess);
 extern MISession *MISessionLocal(void);
 extern void MISessionSetGDBPath(char *path);
+extern int MISessionSendCommand(MISession *sess, MICommand *cmd);
+extern void MISessionProcessCommandsAndResponses(fd_set *rfds, fd_set *wfds);
+extern void MISessionDoCallbacks(void);
+extern void MISessionGetFds(int *nfds, fd_set *rfds, fd_set *wfds, fd_set *efds);
 #endif _MISESSION_H_
 
