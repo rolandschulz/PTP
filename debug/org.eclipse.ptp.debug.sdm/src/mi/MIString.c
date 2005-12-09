@@ -44,9 +44,19 @@ MIStringAppend(MIString *str, MIString *str2)
 	MIStringFree(str2);
 }
 
-
 char *
 MIStringToCString(MIString *str)
 {
 	return str->buf;
+}
+
+char *
+MIIntToCString(int val)
+{
+	static char *	str = NULL;
+	
+	if (str != NULL)
+		free(str);
+	asprintf(&str, "%d", val);
+	return str;
 }

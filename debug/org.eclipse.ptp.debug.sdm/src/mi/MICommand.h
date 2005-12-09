@@ -42,7 +42,31 @@ extern MIResultRecord *MICommandResult(MICommand *cmd);
 extern void MICommandRegisterCallback(MICommand *cmd, void (*callback)(MIResultRecord *));
 extern char *MICommandToString(MICommand *cmd);
 
+/*
+ * -gdb-* commands
+ */
 extern MICommand *MIGDBSet(char *, char *);
 extern MICommand *MIGDBExit(void);
+
+/*
+ * -exec-* commands
+ */
+extern MICommand *MIExecContinue(void);
+extern MICommand *MIExecRun(void);
+extern MICommand *MIExecStep(int);
+extern MICommand *MIExecNext(int);
+extern MICommand *MIExecFinish(void);
+extern MICommand *MIExecInterrupt(void);
+
+/*
+ * -break-* commands
+ */
+extern MICommand *MIBreakInsert(int isTemporary, int isHardware, char *condition, int ignoreCount, char *line, int tid);
+extern MICommand *MIBreakDelete(int nbps, int *bpids);
+
+/*
+ * -stack-* commands
+ */
+extern MICommand *MIStackSelectFrame(int level);
 #endif _MICOMMAND_H_
 
