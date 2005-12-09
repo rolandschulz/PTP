@@ -16,16 +16,15 @@
  *
  * LA-CC 04-115
  ******************************************************************************/
-
+ 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include	"list.h"
 #include "MICommand.h"
 
 MICommand *
-MIGDBExit(void)
+MIExecContinue(void)
 {
-	return MICommandNew("-gdb-exit", MIResultRecordEXIT);
+	return MICommandNew("-gdb-set", MIResultRecordDONE);
 }
