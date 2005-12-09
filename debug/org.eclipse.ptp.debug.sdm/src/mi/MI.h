@@ -19,9 +19,12 @@
 #ifndef _MI_H_
 #define _MI_H_
 
+#include "MIValue.h"
+#include "MIResult.h"
 #include "MISession.h"
 #include "MICommand.h"
 #include "MIBreakpoint.h"
+#include "MIFrame.h"
 #include "MIError.h"
 
 #endif _MI_H_

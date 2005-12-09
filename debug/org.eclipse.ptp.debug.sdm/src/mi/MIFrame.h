@@ -12,6 +12,8 @@
 #ifndef _MIFRAME_H_
 #define _MIFRAME_H_
 
+#include "MICommand.h"
+
 struct MIFrame {
 	int		level;
 	char *	addr;
@@ -25,6 +27,7 @@ typedef struct MIFrame	MIFrame;
 extern MIFrame *MIFrameNew(void);
 extern void MIFrameFree(MIFrame *f);
 extern MIFrame *MIFrameParse(MIValue *tuple);
+extern List *MIFrameGetStackListFramesInfo(MICommand *cmd);
 extern MIString *MIFrameToString(MIFrame *f);
 #endif _MIFRAME_H_
 
