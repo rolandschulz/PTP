@@ -96,6 +96,40 @@ MIFrameParse(MIValue *tuple)
 	return frame;
 }
 
+List *
+MIFrameGetStackListFramesInfo(MICommand *cmd)
+{
+	MIValue *		val;
+	MIResultRecord *	rr;
+	MIResult *		result;
+	List *			frames = NULL;
+	
+	if (!cmd->completed || cmd->result == NULL)
+		return NULL;
+		
+	rr = cmd->result;
+	
+	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
+		if (strcmp(result->variable, "stack") == 0) {
+			val = result->value;
+			if (val->type == MIValueTypeList || val->type == MIValueTypeTuple) {
+				for (SetList(val->results); (result = (MIResult *)GetListElement(val->results)) != NULL; ) {
+					if (strcmp(result->variable, "frame") == 0) {
+						val = result->value;
+						if (val->type == MIValueTypeTuple) {
+							if (frames == NULL)
+								frames = NewList();
+							AddToList(frames, MIFrameParse(val));
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	return frames;
+}
+
 MIString *
 MIFrameToString(MIFrame *f)
 {

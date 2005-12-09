@@ -68,5 +68,10 @@ extern MICommand *MIBreakDelete(int nbps, int *bpids);
  * -stack-* commands
  */
 extern MICommand *MIStackSelectFrame(int level);
+extern MICommand *MIStackListFrames(int low, int high);
+extern MICommand *MIStackListAllFrames(void);
+extern MICommand *MIStackListLocals(int vals);
+extern MICommand *MIStackListArguments(int vals, int low, int high);
+extern MICommand *MIStackListAllArguments(int vals);
 #endif _MICOMMAND_H_
 

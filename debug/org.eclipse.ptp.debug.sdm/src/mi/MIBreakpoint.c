@@ -150,26 +150,26 @@ MIBreakpointGetBreakInsertInfo(MICommand *cmd)
 		var = result->variable;
 		val = result->value;
 		bpt = NULL;
-		if (strcmp(var, "wpt") == 0) { //$NON-NLS-1$
+		if (strcmp(var, "wpt") == 0) {
 			if (val->type == MIValueTypeTuple) {
 				bpt = MIBreakpointParse(val);
 				bpt->enabled = 1;
 				bpt->isWpt = 1;
 				bpt->isWWpt = 1;
 			}
-		} else if (strcmp(var, "bkpt") == 0) { //$NON-NLS-1$
+		} else if (strcmp(var, "bkpt") == 0) {
 			if (val->type == MIValueTypeTuple) {
 				bpt = MIBreakpointParse(val);
 				bpt->enabled = 1;
 			}
-		} else if (strcmp(var, "hw-awpt") == 0) { //$NON-NLS-1$
+		} else if (strcmp(var, "hw-awpt") == 0) {
 			if (val->type == MIValueTypeTuple) {
 				bpt = MIBreakpointParse(val);
 				bpt->enabled = 1;
 				bpt->isWpt = 1;
 				bpt->isAWpt = 1;
 			}
-		} else if (strcmp(var, "hw-rwpt") == 0) { //$NON-NLS-1$
+		} else if (strcmp(var, "hw-rwpt") == 0) {
 			if (val->type == MIValueTypeTuple) {
 				bpt = MIBreakpointParse(val);
 				bpt->enabled = 1;
