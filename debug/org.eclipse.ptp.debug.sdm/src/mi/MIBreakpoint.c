@@ -17,6 +17,7 @@
 #include "MIBreakpoint.h"
 #include "MIValue.h"
 #include "MIResult.h"
+#include "MIString.h"
 
 MIBreakpoint *
 MIBreakpointNew(void)
@@ -184,53 +185,4 @@ MIBreakpointGetBreakInsertInfo(MICommand *cmd)
 	}
 		
 	return breakpoints;
-}
-		
-MICommand *
-MIBreakInsert(int isTemporary, int isHardware, char *condition, int ignoreCount, char *line, int tid)
-{
-	char *		str;
-	MICommand *	cmd;
-	
-	cmd = MICommandNew("-break-insert", MIResultRecordDONE);
-
-	if (isTemporary) {
-		MICommandAddOption(cmd, "-t", NULL);
-	} else if (isHardware) {
-		MICommandAddOption(cmd, "-h", NULL);
-	}
-	if (condition != NULL) {
-		MICommandAddOption(cmd, "-c", condition);
-	}
-	if (ignoreCount > 0) {
-		asprintf(&str, "%d", ignoreCount);
-		MICommandAddOption(cmd, "-i", str);
-		free(str);
-	}
-	if (tid > 0) {
-		asprintf(&str, "%d", tid);
-		MICommandAddOption(cmd, "-p", str);
-		free(str);
-	}
-	
-	MICommandAddOption(cmd, line, NULL);
-	
-	return cmd;
-}
-
-MICommand *
-MIBreakDelete(int nbps, int *bpids)
-{
-	char *		str;
-	MICommand *	cmd;
-	
-	cmd = MICommandNew("-break-delete", MIResultRecordDONE);
-	
-	for (i = 0; i < nbps; i++) {
-		asprintf(&str, "%d", bpids[i]);
-		MICommandAddOption(cmd, str, NULL);
-		free(str);
-	}
-	
-	return cmd;
 }

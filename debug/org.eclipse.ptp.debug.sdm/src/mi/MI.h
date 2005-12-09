@@ -16,50 +16,14 @@
  *
  * LA-CC 04-115
  ******************************************************************************/
- 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef _MI_H_
+#define _MI_H_
 
+#include "MISession.h"
 #include "MICommand.h"
-#include "MIString.h"
+#include "MIBreakpoint.h"
+#include "MIError.h"
 
-MICommand *
-MIExecContinue(void)
-{
-	return MICommandNew("-exec-continue", MIResultRecordRUNNING);
-}
+#endif _MI_H_
 
-MICommand *
-MIExecRun(void)
-{
-	return MICommandNew("-exec-run", MIResultRecordRUNNING);
-}
 
-MICommand *
-MIExecStep(int count)
-{
-	MICommand *	cmd = MICommandNew("-exec-step", MIResultRecordRUNNING);
-	MICommandAddOption(cmd, MIIntToCString(count), NULL);
-	return cmd;
-}
-
-MICommand *
-MIExecNext(int count)
-{
-	MICommand *	cmd = MICommandNew("-exec-next", MIResultRecordRUNNING);
-	MICommandAddOption(cmd, MIIntToCString(count), NULL);
-	return cmd;
-}
-
-MICommand *
-MIExecFinish(void)
-{
-	return MICommandNew("-exec-finish", MIResultRecordRUNNING);
-}
-
-MICommand *
-MIExecInterrupt(void)
-{
-	return MICommandNew("-exec-interrupt", MIResultRecordDONE);
-}

@@ -78,8 +78,6 @@ typedef struct MIBreakpoint	MIBreakpoint;
 extern MIBreakpoint *MIBreakpointNew(void);
 extern void MIBreakpointFree(MIBreakpoint *bp);
 extern MIBreakpoint *MIBreakpointParse(MIValue *tuple);
-extern MICommand *MIBreakInsert(int isTemporary, int isHardware, char *condition, int ignoreCount, char *line, int tid);
-extern MICommand *MIBreakDelete(int nbps, int *bpids);
 extern List *MIBreakpointGetBreakInsertInfo(MICommand *cmd);
 #endif _MIBREAKPOINT_H_
 
