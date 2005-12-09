@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "list.h"
 #include "MIString.h"
 #include "MISession.h"
 #include "MIError.h"
@@ -33,20 +34,20 @@ sendcmd_wait(MISession *sess, MICommand *cmd)
 {
 	MISessionSendCommand(sess, cmd);
 	
-	while (!MICommandCompleted(cmd)) {
-		MISessionProgress();
-	}
-	
-	MICommandFree(cmd);
+	do {
+		MISessionProgress(sess);
+	} while (!MISessionCommandCompleted(sess));
 }
 
 int main(int argc, char *argv[])
 {
 	MISession *sess;
 	MICommand *cmd;
+	List *bpts;
+	MIBreakpoint *bpt;
 	
-	sess = MISessionLocal();
-	if (sess == NULL) {
+	sess = MISessionNew();
+	if (MISessionStartLocal(sess, "/Volumes/Home/greg/x") < 0) {
 		fprintf(stderr, "%s", MIGetErrorStr());
 		return 1;
 	}
@@ -55,21 +56,37 @@ int main(int argc, char *argv[])
 	MISessionRegisterLogCallback(sess, log_callback);
 
 printf("help command\n");
-	cmd = MICommandNew("help");
+	cmd = MICommandNew("help", MIResultRecordDONE);
 	MICommandRegisterCallback(cmd, cmd_callback);
 	sendcmd_wait(sess, cmd);
+	if (!MICommandResultOK(cmd))
+		fprintf(stderr, "command failed\n");
+	MICommandFree(cmd);
 printf("set command\n");	
 	cmd = MIGDBSet("confirm", "off");
 	MICommandRegisterCallback(cmd, cmd_callback);
 	sendcmd_wait(sess, cmd);
+	if (!MICommandResultOK(cmd))
+		fprintf(stderr, "command failed\n");
+	MICommandFree(cmd);
 printf("break command\n");	
 	cmd = MIBreakInsert(0, 0, NULL, 0, "4", 0);
 	MICommandRegisterCallback(cmd, cmd_callback);
 	sendcmd_wait(sess, cmd);
+	if (!MICommandResultOK(cmd))
+		fprintf(stderr, "command failed\n");
+	bpts = MIBreakpointGetBreakInsertInfo(cmd);
+	if (bpts != NULL)
+		for (SetList(bpts); (bpt = (MIBreakpoint *)GetListElement(bpts)) != NULL; )
+			printf("bpt id = %d\n", bpt->number);
+	MICommandFree(cmd);
 printf("quit command\n");		
-	cmd = MICommandNew("quit");
+	cmd = MIGDBExit();
 	MICommandRegisterCallback(cmd, cmd_callback);
 	sendcmd_wait(sess, cmd);
+	if (!MICommandResultOK(cmd))
+		fprintf(stderr, "command failed\n");
+	MICommandFree(cmd);
 
 	return 0;
 }

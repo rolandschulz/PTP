@@ -26,7 +26,7 @@
 #include "MICommand.h"
 
 MICommand *
-MICommandNew(char *command)
+MICommandNew(char *command, int class)
 {
 	MICommand *	cmd;
 	
@@ -36,6 +36,8 @@ MICommandNew(char *command)
 	cmd->opt_size = MICOMMAND_OPT_SIZE;
 	cmd->num_options = 0;
 	cmd->completed = 0;
+	cmd->expected_class = class;
+	cmd->result = NULL;
 	cmd->callback = NULL;
 	return cmd;
 }
@@ -52,6 +54,8 @@ MICommandFree(MICommand *cmd)
 			free(cmd->options[i]);
 		free(cmd->options);
 	}
+	if (cmd->result != NULL)
+		MIResultRecordFree(cmd->result);
 	free(cmd);
 }
 
@@ -84,6 +88,21 @@ int
 MICommandCompleted(MICommand *cmd)
 {
 	return cmd->completed;
+}
+
+MIResultRecord *
+MICommandResult(MICommand *cmd)
+{
+	return cmd->result;
+}
+
+int
+MICommandResultOK(MICommand *cmd)
+{
+	if (!cmd->completed || cmd->result == NULL)
+		return 0;
+		
+	return cmd->result->resultClass == cmd->expected_class;
 }
 
 char *

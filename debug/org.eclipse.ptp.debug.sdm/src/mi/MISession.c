@@ -34,7 +34,6 @@
 #include "MIError.h"
 #include "MIOOBRecord.h"
 
-static char *			MISessionGDBPath = NULL;
 static List *			MISessionList = NULL;
 static struct timeval		MISessionSelectTimeout = {0, 1000};
 
@@ -51,7 +50,10 @@ MISessionNew(void)
 	sess->in_fd = -1;
 	sess->out_fd = -1;
 	sess->pid = -1;
+	sess->exited = 1;
+	sess->exit_status = 0;
 	sess->send_queue = NewList();
+	sess->gdb_path = strdup("gdb");
 	sess->cmd_callback = NULL;
 	sess->exec_callback = NULL;
 	sess->status_callback = NULL;
@@ -86,40 +88,36 @@ HandleChild(int sig)
 	if (MISessionList != NULL) {
 		for (SetList(MISessionList); (sess = (MISession *)GetListElement(MISessionList)) != NULL; ) {
 			if (sess->pid == pid) {
-				// TODO notify that gdb has died
-				sess->pid = -1;
-				close(sess->in_fd);
-				close(sess->out_fd);
-				sess->in_fd = -1;
-				sess->out_fd = -1;
+				fprintf(stderr, "gdb pid %d has exited\n", pid);
+				sess->exited = 1;
+				sess->exit_status = stat;
 			}
 		}
 	}
 }
 
-MISession *
-MISessionLocal(void)
+int
+MISessionStartLocal(MISession *sess, char *prog)
 {
 	int			p1[2];
 	int			p2[2];
-	MISession *	sess = MISessionNew();
 	
-	if (MISessionGDBPath == NULL)
-		MISessionSetGDBPath("gdb");
-		
 	if (pipe(p1) < 0 || pipe(p2) < 0) {
 		MISetError(MI_ERROR_SYSTEM, strerror(errno));
-		MISessionFree(sess);
-		return NULL;
+		return -1;
 	}
 	
 	if (fcntl(p1[0], F_SETFL, O_NONBLOCK) < 0) {
 		MISetError(MI_ERROR_SYSTEM, strerror(errno));
-		MISessionFree(sess);
-		return NULL;
+		return -1;
 	}
 	
+	sess->in_fd = p2[1];
+	sess->out_fd = p1[0];
+	sess->exited = 0;
+	
 	signal(SIGCHLD, HandleChild);
+	signal(SIGPIPE, SIG_IGN);
 	
 	switch (sess->pid = fork())
 	{
@@ -131,26 +129,25 @@ MISessionLocal(void)
 		close(p2[0]);
 		close(p2[1]);
 		
-		execlp(MISessionGDBPath, "gdb", "-q", "-i", "mi", NULL);
+		if (prog == NULL)
+			execlp(sess->gdb_path, "gdb", "-q", "-i", "mi", NULL);
+		else
+			execlp(sess->gdb_path, "gdb", "-q", "-i", "mi", prog, NULL);
 		
 		exit(1);
 	
 	case -1:
 		MISetError(MI_ERROR_SYSTEM, strerror(errno));
-		MISessionFree(sess);
-		return NULL;
+		return -1;
 	        
 	default:
 	    break;
 	}
 
-	sess->in_fd = p2[1];
-	sess->out_fd = p1[0];
-	
 	close(p1[1]);
 	close(p2[0]);
 	
-	return sess;
+	return 0;
 }
 
 void
@@ -196,11 +193,11 @@ MISessionRegisterTargetCallback(MISession *sess, void (*callback)(char *))
 }
 
 void
-MISessionSetGDBPath(char *path)
+MISessionSetGDBPath(MISession *sess, char *path)
 {
-	if (MISessionGDBPath != NULL)
-		free(MISessionGDBPath);
-	MISessionGDBPath = strdup(path);
+	if (sess->gdb_path != NULL)
+		free(sess->gdb_path);
+	sess->gdb_path = strdup(path);
 }
 
 int
@@ -323,52 +320,53 @@ ReadResponse(int fd)
  * for writing.
  */
 void
-MISessionProcessCommandsAndResponses(fd_set *rfds, fd_set *wfds)
+MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds)
 {
 	char *		str;
-	MISession *	sess;
 	MIOutput *	output;
 	
-	if (MISessionList == NULL)
+	if (sess->pid == -1)
 		return;
 		
-	for (SetList(MISessionList); (sess = (MISession *)GetListElement(MISessionList)) != NULL; ) {
-		if (sess->pid == -1)
-			continue;
-			
-		if (sess->in_fd != -1
-			&& !EmptyList(sess->send_queue)
-			&& sess->command == NULL
-			&& FD_ISSET(sess->in_fd, wfds))
-		{
-			sess->command = (MICommand *)RemoveFirst(sess->send_queue);
-			if (WriteCommand(sess->in_fd, MICommandToString(sess->command)) < 0) {
-				sess->in_fd = -1;
-				continue;
-			}
-		}
-
-		if (sess->out_fd != -1 && FD_ISSET(sess->out_fd, rfds)) {
-			if ((str = ReadResponse(sess->out_fd)) == NULL) {
-				sess->out_fd = -1;
-				continue;
-			}
-			
-			output = MIParse(str);	
-					
-			if (output->oobs != NULL)
-				DoOOBCallbacks(sess, output->oobs);
-				
-			if (output->rr != NULL) {
-				if (sess->command->callback != NULL)
-					sess->command->callback(output->rr);
-				sess->command->completed = 1;
-				sess->command = NULL;
-			}
-			
-			MIOutputFree(output);
+	if (sess->in_fd != -1
+		&& !EmptyList(sess->send_queue)
+		&& sess->command == NULL
+		&& FD_ISSET(sess->in_fd, wfds))
+	{
+		sess->command = (MICommand *)RemoveFirst(sess->send_queue);
+		if (WriteCommand(sess->in_fd, MICommandToString(sess->command)) < 0) {
+			sess->in_fd = -1;
 		}
 	}
+
+	if (sess->out_fd != -1 && FD_ISSET(sess->out_fd, rfds)) {
+		if ((str = ReadResponse(sess->out_fd)) == NULL) {
+			sess->out_fd = -1;
+			return;
+		}
+		
+		output = MIParse(str);	
+				
+		if (output->oobs != NULL)
+			DoOOBCallbacks(sess, output->oobs);
+			
+		if (output->rr != NULL) {
+			if (sess->command->callback != NULL)
+				sess->command->callback(output->rr);
+			sess->command->completed = 1;
+			sess->command->result = output->rr;
+			output->rr = NULL; /* Freed by MICommandFree() */
+			sess->command = NULL;
+		}
+		
+		MIOutputFree(output);
+	}
+}
+
+int
+MISessionCommandCompleted(MISession *sess)
+{
+	return sess->command == NULL;
 }
 
 static void
@@ -420,35 +418,20 @@ DoOOBCallbacks(MISession *sess, List *oobs)
 }
 
 void
-MISessionGetFds(int *nfds, fd_set *rfds, fd_set *wfds, fd_set *efds)
+MISessionGetFds(MISession *sess, int *nfds, fd_set *rfds, fd_set *wfds, fd_set *efds)
 {
 	int			n = 0;
-	MISession *	sess;
 	
-	if (MISessionList == NULL)
-		return;
-	
-	if (rfds != NULL)	
-		FD_ZERO(rfds);
-		
-	if (wfds != NULL)	
-		FD_ZERO(wfds);
-		
-	if (efds != NULL)	
-		FD_ZERO(efds);
-	
-	for (SetList(MISessionList); (sess = (MISession *)GetListElement(MISessionList)) != NULL; ) {
-		if (sess->pid != -1) {
-			if (wfds != NULL && sess->in_fd != -1) {
-				FD_SET(sess->in_fd, wfds);
-				if (sess->in_fd > n)
-					n = sess->in_fd;
-			}
-			if (rfds != NULL && sess->out_fd != -1) {
-				FD_SET(sess->out_fd, rfds);
-				if (sess->out_fd > n)
-					n = sess->out_fd;
-			}
+	if (sess->pid != -1) {
+		if (wfds != NULL && sess->in_fd != -1) {
+			FD_SET(sess->in_fd, wfds);
+			if (sess->in_fd > n)
+				n = sess->in_fd;
+		}
+		if (rfds != NULL && sess->out_fd != -1) {
+			FD_SET(sess->out_fd, rfds);
+			if (sess->out_fd > n)
+				n = sess->out_fd;
 		}
 	}
 	
@@ -460,14 +443,17 @@ MISessionGetFds(int *nfds, fd_set *rfds, fd_set *wfds, fd_set *efds)
  * Default progress command if none supplied.
  */
 int
-MISessionProgress(void)
+MISessionProgress(MISession *sess)
 {
 	int		n;
 	int		nfds;
 	fd_set	rfds;
 	fd_set	wfds;
 	
-	MISessionGetFds(&nfds, &rfds, &wfds, NULL);
+	FD_ZERO(&rfds);
+	FD_ZERO(&wfds);
+	
+	MISessionGetFds(sess, &nfds, &rfds, &wfds, NULL);
 	
 	n = select(nfds, &rfds, &wfds, NULL, &MISessionSelectTimeout);
 	
@@ -479,7 +465,7 @@ MISessionProgress(void)
 		return -1;
 	}
 	
-	MISessionProcessCommandsAndResponses(&rfds, &wfds);
+	MISessionProcessCommandsAndResponses(sess, &rfds, &wfds);
 	
 	return n;
 }

@@ -121,7 +121,7 @@ char *secondaryPrompt = ">"; //$NON-NLS-1$
  {
 	MIOutput *mi = MIOutputNew();
 	MIResultRecord *rr = NULL;
-	List *oobs = NewList();
+	List *oobs = NULL;
 	int id = -1;
 	char *s;
 	char *token;
@@ -149,6 +149,8 @@ char *secondaryPrompt = ">"; //$NON-NLS-1$
 			} else {
 				MIOOBRecord *band = processMIOOBRecord(token, id);
 				if (band != NULL) {
+					if (oobs == NULL)
+						oobs = NewList();
 					AddToList(oobs, (void *)band);
 				}
 			}
@@ -167,21 +169,21 @@ processMIResultRecord(char *buffer, int id)
 {
 	MIResultRecord *rr = MIResultRecordNew();
 	rr->token = id;
-	if (strncmp(buffer, MIResultRecordDONE, strlen(MIResultRecordDONE)) == 0) {
+	if (strncmp(buffer, "done", 4) == 0) {
 		rr->resultClass = MIResultRecordDONE;
-		buffer += strlen(MIResultRecordDONE);
-	} else if (strncmp(buffer, MIResultRecordERROR, strlen(MIResultRecordERROR)) == 0) {
+		buffer += 4;
+	} else if (strncmp(buffer, "error", 5) == 0) {
 		rr->resultClass = MIResultRecordERROR;
-		buffer += strlen(MIResultRecordERROR);
-	} else if (strncmp(buffer, MIResultRecordEXIT, strlen(MIResultRecordEXIT)) == 0) {
+		buffer += 5;
+	} else if (strncmp(buffer, "exit", 4) == 0) {
 		rr->resultClass = MIResultRecordEXIT;
-		buffer += strlen(MIResultRecordEXIT);
-	} else if (strncmp(buffer, MIResultRecordRUNNING, strlen(MIResultRecordRUNNING)) == 0) {
+		buffer += 4;
+	} else if (strncmp(buffer, "running", 7) == 0) {
 		rr->resultClass = MIResultRecordRUNNING;
-		buffer += strlen(MIResultRecordRUNNING);
-	} else if (strncmp(buffer, MIResultRecordCONNECTED, strlen(MIResultRecordCONNECTED)) == 0) {
+		buffer += 7;
+	} else if (strncmp(buffer, "connected", 9) == 0) {
 		rr->resultClass = MIResultRecordCONNECTED;
-		buffer += strlen(MIResultRecordCONNECTED);
+		buffer += 9;
 	} else {
 		// FIXME:
 		// Error throw an exception?
