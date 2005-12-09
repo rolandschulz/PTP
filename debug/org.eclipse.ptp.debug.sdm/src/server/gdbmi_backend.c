@@ -575,7 +575,8 @@ GDBMIProgress(void)
 static int
 GDBMISetLineBreakpoint(int bpid, char *file, int line)
 {
-	char *where;
+	int		res;
+	char *	where;
 
 	CHECK_SESSION()
 
@@ -584,7 +585,11 @@ GDBMISetLineBreakpoint(int bpid, char *file, int line)
 	else
 		asprintf(&where, "%s:%d", file, line);
 
-	return SetAndCheckBreak(bpid, where);
+	res = SetAndCheckBreak(bpid, where);
+	
+	free(where);
+	
+	return res;
 }
 
 /*
@@ -593,7 +598,8 @@ GDBMISetLineBreakpoint(int bpid, char *file, int line)
 static int
 GDBMISetFuncBreakpoint(int bpid, char *file, char *func)
 {
-	char *where;
+	int		res;
+	char *	where;
 
 	CHECK_SESSION()
 
@@ -602,7 +608,11 @@ GDBMISetFuncBreakpoint(int bpid, char *file, char *func)
 	else
 		asprintf(&where, "%s:%s", file, func);
 
-	return SetAndCheckBreak(bpid, where);
+	res = SetAndCheckBreak(bpid, where);
+	
+	free(where);
+	
+	return res;
 }
 
 /*
@@ -621,8 +631,6 @@ SetAndCheckBreak(int bpid, char *where)
 
 	bpt = gmi_break_insert_full(MIHandle, 0, 0, NULL, -1, -1, where);
 
-	free(where);
-	
 	if ( bpt == NULL ) {
 		if (mi_error == MI_OK)
 			DbgSetError(DBGERR_DEBUGGER, "Attempt to set breakpoint failed");
