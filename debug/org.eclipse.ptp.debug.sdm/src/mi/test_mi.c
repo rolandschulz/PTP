@@ -14,8 +14,6 @@ cmd_callback(MIResultRecord *rr)
 	MIString *str = MIResultRecordToString(rr);
 	printf("res> %s\n", MIStringToCString(str));
 	MIStringFree(str);
-	
-	rr->resultClass
 }
 
 void
@@ -53,24 +51,24 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	
-	MISessionRegisterCompletedCallback(sess, cmd_completed);
 	MISessionRegisterConsoleCallback(sess, console_callback);
 	MISessionRegisterLogCallback(sess, log_callback);
-	
-	cmd = MICommandNew("help", cmd_callback);
-	
+
+printf("help command\n");
+	cmd = MICommandNew("help");
+	MICommandRegisterCallback(cmd, cmd_callback);
 	sendcmd_wait(sess, cmd);
-	
-	MIGDBSet(sess, "confirm", "off");
-	
-	wait_for_cmd();
-	
-	MIBreakInsert(sess, 0, 0, NULL, 0, "4", 0);
-	
+printf("set command\n");	
+	cmd = MIGDBSet("confirm", "off");
+	MICommandRegisterCallback(cmd, cmd_callback);
 	sendcmd_wait(sess, cmd);
-		
-	cmd = MICommandNew("quit", cmd_callback);
-	
+printf("break command\n");	
+	cmd = MIBreakInsert(0, 0, NULL, 0, "4", 0);
+	MICommandRegisterCallback(cmd, cmd_callback);
+	sendcmd_wait(sess, cmd);
+printf("quit command\n");		
+	cmd = MICommandNew("quit");
+	MICommandRegisterCallback(cmd, cmd_callback);
 	sendcmd_wait(sess, cmd);
 
 	return 0;

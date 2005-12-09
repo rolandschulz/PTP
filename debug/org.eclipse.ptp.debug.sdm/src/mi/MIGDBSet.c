@@ -22,15 +22,14 @@
 #include <string.h>
 
 #include	"list.h"
-#include "MISession.h"
 #include "MICommand.h"
 
-int
-MIGDBSet(MISession *sess, char *var, char *val)
+MICommand *
+MIGDBSet(char *var, char *val)
 {
-	MICommand *	cmd = MICommandNew("-gdb-set", NULL);
+	MICommand *	cmd = MICommandNew("-gdb-set");
 	
 	MICommandAddOption(cmd, var, val);
 	
-	return MISessionSendCommand(sess, cmd);
+	return cmd;
 }

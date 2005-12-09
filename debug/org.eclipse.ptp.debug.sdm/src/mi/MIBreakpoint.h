@@ -49,7 +49,7 @@
 #ifndef _MIBREAKPOINT_H_
 #define _MIBREAKPOINT_H_
 
-#include "MISession.h"
+#include "MICommand.h"
 #include "MIValue.h"
 
 struct MIBreakpoint {
@@ -78,6 +78,6 @@ typedef struct MIBreakpoint	MIBreakpoint;
 extern MIBreakpoint *MIBreakpointNew(void);
 extern void MIBreakpointFree(MIBreakpoint *bp);
 extern MIBreakpoint *MIBreakpointParse(MIValue *tuple);
-extern int MIBreakInsert(MISession *sess, int isTemporary, int isHardware, char *condition, int ignoreCount, char *line, int tid);
+extern MICommand *MIBreakInsert(int isTemporary, int isHardware, char *condition, int ignoreCount, char *line, int tid);
 #endif _MIBREAKPOINT_H_
 
