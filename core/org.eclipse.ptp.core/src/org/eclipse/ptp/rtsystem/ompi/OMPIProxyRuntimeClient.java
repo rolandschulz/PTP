@@ -204,10 +204,10 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
     		IProxyRuntimeEvent event = null;
     		
     		try {
-        		//System.out.println("OMPIProxyRuntimeClient waiting on " + waitEvents.toString());
+        		System.out.println("OMPIProxyRuntimeClient waiting on " + waitEvents.toString());
         		while (this.events.isEmpty())
         			wait();
-        		//System.out.println("OMPIProxyRuntimeClient awoke!");
+        		System.out.println("OMPIProxyRuntimeClient awoke!");
         		event = (IProxyRuntimeEvent) this.events.removeItem();
         		if (event instanceof ProxyRuntimeErrorEvent) {
         	   		waitEvents.clear();

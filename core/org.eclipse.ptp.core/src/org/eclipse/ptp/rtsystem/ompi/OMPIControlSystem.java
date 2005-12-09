@@ -326,7 +326,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 	}
 
     public synchronized void handleEvent(IProxyRuntimeEvent e) {
-        System.out.println("got event: " + e.toString());
+        System.out.println("OMPIControlSystem got event: " + e.toString());
         if(e instanceof ProxyRuntimeJobStateEvent) {
         		RuntimeEvent re = new RuntimeEvent(RuntimeEvent.EVENT_JOB_STATE_CHANGED);
         		int state = ((ProxyRuntimeJobStateEvent)e).getJobState();

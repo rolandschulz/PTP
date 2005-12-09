@@ -17,47 +17,38 @@
  * LA-CC 04-115
  *******************************************************************************/
 
-package org.eclipse.ptp.rtsystem;
+package org.eclipse.ptp.rtsystem.proxy.event;
 
-public class RuntimeEvent {
-	int eventNumber;
+public class ProxyRuntimeNodeChangeEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeEvent {
+	private int machID;
+	private int nodeID;
+	private String key;
+	private String val;
 
-	String text, alttext;
-
-	public static final int EVENT_NODE_STATUS_CHANGE = 1;
-
-	public static final int EVENT_PROCESS_OUTPUT = 2;
-
-	public static final int EVENT_JOB_EXITED = 3;
-
-	public static final int EVENT_JOB_STATE_CHANGED = 4;
-
-	public static final int EVENT_NEW_JOB = 5;
-	
-	public static final int EVENT_NODE_GENERAL_CHANGE = 6;
-
-	public RuntimeEvent(int eventNumber) {
-		this.eventNumber = eventNumber;
-		text = new String("");
-	}
-
-	public int getEventNumber() {
-		return eventNumber;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public String getAltText() {
-		return alttext;
+	public ProxyRuntimeNodeChangeEvent(String[] args) {
+		super(EVENT_RUNTIME_NODECHANGE);
+		this.machID = Integer.parseInt(args[1]);
+		this.nodeID = Integer.parseInt(args[2]);
+		
+		String text = new String("");
+		for(int i=3; i<args.length; i++) {
+			if(i == 3) text = args[i];
+			else text = text + " " +args[i];
+		}
+		
+		int idx = text.indexOf('=');
+		key = text.substring(0, idx);
+		val = text.substring(idx+1, text.length());
+		
+		System.out.println("key = '"+key+"', val = '"+val+"'");
 	}
 	
-	public void setText(String text) {
-		this.text = text;
-	}
+	public int getMachineID() { return this.machID; }
+	public int getNodeID() { return this.nodeID; }
+	public String getKey() { return this.key; }
+	public String getValue() { return this.val; }
 	
-	public void setAltText(String text) {
-		this.alttext = text;
+	public String toString() {
+		return "EVENT_RUNTIME_NODECHANGE (machID="+this.machID+", nodeIE="+this.nodeID+") key='"+this.key+"' val='"+this.val+"'";
 	}
 }

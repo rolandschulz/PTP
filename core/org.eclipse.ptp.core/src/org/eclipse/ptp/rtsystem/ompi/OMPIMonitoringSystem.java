@@ -21,15 +21,23 @@ package org.eclipse.ptp.rtsystem.ompi;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
+import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
+import org.eclipse.ptp.rtsystem.RuntimeEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeJobStateEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNodeChangeEvent;
+import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessOutputEvent;
 
-public class OMPIMonitoringSystem implements IMonitoringSystem {
+public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEventListener {
 
 	protected List listeners = new ArrayList(2);
 	
@@ -37,6 +45,7 @@ public class OMPIMonitoringSystem implements IMonitoringSystem {
 
 	public OMPIMonitoringSystem(OMPIProxyRuntimeClient proxy) {
 		this.proxy = proxy;
+		proxy.addRuntimeEventListener(this);
 	}
 
 	public void addRuntimeListener(IRuntimeListener listener) {
@@ -159,4 +168,51 @@ public class OMPIMonitoringSystem implements IMonitoringSystem {
 		
 		return values;
 	}
+
+    public synchronized void handleEvent(IProxyRuntimeEvent e) {
+        System.out.println("OMPIMonitoringSystem got event: " + e.toString());
+        if(e instanceof ProxyRuntimeNodeChangeEvent) {
+        		RuntimeEvent re = new RuntimeEvent(RuntimeEvent.EVENT_NODE_GENERAL_CHANGE);
+        		String key = ((ProxyRuntimeNodeChangeEvent)e).getKey();
+        		String val = ((ProxyRuntimeNodeChangeEvent)e).getValue();
+        		int machID = ((ProxyRuntimeNodeChangeEvent)e).getMachineID();
+        		int nodeID = ((ProxyRuntimeNodeChangeEvent)e).getNodeID();
+        		
+        		/* TODO
+        		 * COME BACK HERE AND CONVERT CODES LIKE bproc-soh-state INTO ATTRIBUTE_CONSTANTS.NODE_STATE, ETC
+        		 * To do this you gotta get the SoH crap working so you can bpctl it.
+        		 */
+        		/*
+        		if(key.equals(""))
+        		
+        		public static final String ATTRIB_NODE_NAME = "ATTRIB_NODE_NAME";
+        		public static final String ATTRIB_NODE_NUMBER = "ATTRIB_NODE_NUMBER";
+        		public static final String ATTRIB_NODE_STATE = "ATTRIB_NODE_STATE";
+        		public static final String ATTRIB_NODE_GROUP = "ATTRIB_NODE_GROUP";
+        		public static final String ATTRIB_NODE_USER = "ATTRIB_NODE_USER";
+        		public static final String ATTRIB_NODE_MODE = "ATTRIB_NODE_MODE";
+        		*/
+        		
+        		
+        		re.setText(key);
+        		re.setAltText(val);
+        		
+        		fireEvent("machine"+machID+"_node"+nodeID, re);
+        }
+    }
+    
+	protected synchronized void fireEvent(String ID, RuntimeEvent event) {
+		if (listeners == null)
+			return;
+		Iterator i = listeners.iterator();
+		while (i.hasNext()) {
+			IRuntimeListener listener = (IRuntimeListener) i.next();
+			switch (event.getEventNumber()) {
+			case RuntimeEvent.EVENT_NODE_GENERAL_CHANGE:
+				listener.runtimeNodeGeneralChange(ID, event.getText(), event.getAltText());
+				break;
+			}
+		}
+	}
 }
+

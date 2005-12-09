@@ -22,6 +22,7 @@ import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
@@ -119,21 +120,21 @@ public class ParallelElementLabelProvider extends LabelProvider implements IColo
 			}
 			
 			else {
-				String nodeState = (String)node.getAttrib("state");
+				String nodeState = (String)node.getAttrib(AttributeConstants.ATTRIB_NODE_STATE);
 				//System.out.println("NODE: "+node+" - state = "+nodeState);
 				
 				if (nodeState != null && nodeState.equals("up")) {
-					String user = (String)node.getAttrib("user");
+					String user = (String)node.getAttrib(AttributeConstants.ATTRIB_NODE_USER);
 
 					if (user.equals(System.getProperty("user.name"))) {
-						String mode = (String)node.getAttrib("mode");
+						String mode = (String)node.getAttrib(AttributeConstants.ATTRIB_NODE_MODE);
 						if (mode != null && mode.equals("0100"))
 							return NODE_USER_ALLOC_EXCL;
 						else if (mode != null && (mode.equals("0110") || mode.equals("0111") || mode.equals("0101")))
 							return NODE_USER_ALLOC_SHARED;
 					}
 					else if (user != null && !user.equals("root")) {
-						String mode = (String)node.getAttrib("mode");
+						String mode = (String)node.getAttrib(AttributeConstants.ATTRIB_NODE_MODE);
 						if (mode != null && mode.equals("0100"))
 							return NODE_OTHER_ALLOC_EXCL;
 						else if (mode != null && (mode.equals("0110") || mode.equals("0111") || mode.equals("0101")))
