@@ -24,7 +24,7 @@ MIResultRecordNew(void)
 	
 	rr = (MIResultRecord *)malloc(sizeof(MIResultRecord));
 	rr->results = NewList();
-	rr->resultClass = NULL;
+	rr->resultClass = MIResultRecordINVALID;
 	rr->token = -1;
 	return rr;
 }
@@ -32,13 +32,35 @@ MIResultRecordNew(void)
 MIString *
 MIResultRecordToString(MIResultRecord *rr)
 {
-	MIString *str;
-	MIResult * r;
+	char *		class;
+	MIString *	str;
+	MIResult *	r;
+	
+	switch (rr->resultClass) {
+	case MIResultRecordDONE:
+		class = "done";
+		break;
+	case MIResultRecordRUNNING:
+		class = "running";
+		break;
+	case MIResultRecordCONNECTED:
+		class = "connected";
+		break;
+	case MIResultRecordERROR:
+		class = "error";
+		break;
+	case MIResultRecordEXIT:
+		class = "exit";
+		break;
+	default:
+		class = "<invalid>";
+		break;
+	}
 	
 	if (rr->token != -1)
-		str = MIStringNew("%d^%s", rr->token, rr->resultClass);
+		str = MIStringNew("%d^%s", rr->token, class);
 	else
-		str = MIStringNew("^%s", rr->resultClass);
+		str = MIStringNew("^%s", class);
 	
 	for (SetList(rr->results); (r = (MIResult *)GetListElement(rr->results)) != NULL;) {
 			MIStringAppend(str, MIStringNew(","));

@@ -14,19 +14,20 @@
 #include "list.h"
 #include "MIString.h"
 
-#define MIResultRecordDONE		"done"
-#define MIResultRecordRUNNING		"running"
-#define MIResultRecordCONNECTED	"connected"
-#define MIResultRecordERROR		"error"
-#define MIResultRecordEXIT		"exit"
+#define MIResultRecordINVALID		0
+#define MIResultRecordDONE		1
+#define MIResultRecordRUNNING		2
+#define MIResultRecordCONNECTED	3
+#define MIResultRecordERROR		4
+#define MIResultRecordEXIT		5
 
 /**
  * GDB/MI ResultRecord.
  */
 struct MIResultRecord {
-	List *results;
-	char *resultClass;
-	int token;
+	List *	results;
+	int		resultClass;
+	int		token;
 };
 typedef struct MIResultRecord MIResultRecord;
 

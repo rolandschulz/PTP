@@ -130,13 +130,69 @@ MIBreakpointParse(MIValue *tuple)
 	return bp;
 }
 
+List *
+MIBreakpointGetBreakInsertInfo(MICommand *cmd)
+{
+	char *			var;
+	MIValue *		val;
+	MIResult *		result;
+	MIBreakpoint *	bpt;
+	MIResultRecord *	rr;
+	List *			breakpoints = NULL;
+	
+	if (!cmd->completed || cmd->result == NULL)
+		return NULL;
+		
+	rr = cmd->result;
+	
+	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
+		var = result->variable;
+		val = result->value;
+		bpt = NULL;
+		if (strcmp(var, "wpt") == 0) { //$NON-NLS-1$
+			if (val->type == MIValueTypeTuple) {
+				bpt = MIBreakpointParse(val);
+				bpt->enabled = 1;
+				bpt->isWpt = 1;
+				bpt->isWWpt = 1;
+			}
+		} else if (strcmp(var, "bkpt") == 0) { //$NON-NLS-1$
+			if (val->type == MIValueTypeTuple) {
+				bpt = MIBreakpointParse(val);
+				bpt->enabled = 1;
+			}
+		} else if (strcmp(var, "hw-awpt") == 0) { //$NON-NLS-1$
+			if (val->type == MIValueTypeTuple) {
+				bpt = MIBreakpointParse(val);
+				bpt->enabled = 1;
+				bpt->isWpt = 1;
+				bpt->isAWpt = 1;
+			}
+		} else if (strcmp(var, "hw-rwpt") == 0) { //$NON-NLS-1$
+			if (val->type == MIValueTypeTuple) {
+				bpt = MIBreakpointParse(val);
+				bpt->enabled = 1;
+				bpt->isWpt = 1;
+				bpt->isRWpt = 1;
+			}
+		}
+		if (bpt != NULL) {
+			if (breakpoints == NULL)
+				breakpoints = NewList();
+			AddToList(breakpoints, (void *)bpt);
+		}
+	}
+		
+	return breakpoints;
+}
+		
 MICommand *
 MIBreakInsert(int isTemporary, int isHardware, char *condition, int ignoreCount, char *line, int tid)
 {
 	char *		str;
 	MICommand *	cmd;
 	
-	cmd = MICommandNew("-break-insert");
+	cmd = MICommandNew("-break-insert", MIResultRecordDONE);
 
 	if (isTemporary) {
 		MICommandAddOption(cmd, "-t", NULL);

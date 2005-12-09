@@ -25,11 +25,7 @@
 #include "MICommand.h"
 
 MICommand *
-MIGDBSet(char *var, char *val)
+MIGDBExit(void)
 {
-	MICommand *	cmd = MICommandNew("-gdb-set", MIResultRecordDONE);
-	
-	MICommandAddOption(cmd, var, val);
-	
-	return cmd;
+	return MICommandNew("-gdb-exit", MIResultRecordEXIT);
 }
