@@ -43,7 +43,7 @@
 #define RTEV_ERROR_PATTR			RTEV_OFFSET + 1004
 #define RTEV_ERROR_PROCS			RTEV_OFFSET + 1005
 #define RTEV_ERROR_NODES			RTEV_OFFSET + 1006
-#define RTEV_ERROR_NATTR			RTEV_OFFSET + 1007;
+#define RTEV_ERROR_NATTR			RTEV_OFFSET + 1007
 
 #define JOB_STATE_NEW				5000
 
@@ -80,6 +80,7 @@ struct debug_job {
 };
 typedef struct debug_job debug_job;
 
+int get_node_attribute(int machid, int node_num, char **input_keys, int *input_types, char **input_values, int input_num_keys);
 int get_proc_attribute(orte_jobid_t jobid, int proc_num, char **input_keys, int *input_types, char **input_values, int input_num_keys);
 static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
 static int ompi_sendcmd(orte_daemon_cmd_flag_t usercmd);
@@ -1178,7 +1179,7 @@ ORTEGetProcessAttribute(char **args)
 	}
 	
 	//printf("totlen = %d\n", tot_len);
-	tot_len += last_arg; /* add on some for spaces and null, etc - little bit of extra here */
+	tot_len += values_len * 2; /* add on some for spaces and null, etc - little bit of extra here */
 	valstr = (char*)malloc(tot_len * sizeof(char));
 	
 	sprintf(valstr, "");
@@ -1443,6 +1444,7 @@ ORTEGetNodeAttribute(char **args)
 	if(nodeid == -1) {
 		int numnodes = get_num_nodes(machid);
 		values_len = values_len * numnodes;
+		//printf("values_len = %d\n", values_len); fflush(stdout);
 	}
 	values = (char**)malloc(values_len * sizeof(char*));
 	types = (int*)malloc((last_arg - 3)*sizeof(int));
@@ -1452,15 +1454,18 @@ ORTEGetNodeAttribute(char **args)
 		if(!strcmp(args[i], "ATTRIB_NODE_NAME")) {
 			asprintf(&(keys[i-3]), "%s", "orte-node-name");
 			types[i-3] = PTP_STRING;
-		} else if(!strcmp(args[i], "ATTRIB_NODE_STATUS")) {
+		} else if(!strcmp(args[i], "ATTRIB_NODE_STATE")) {
 			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-status");
 			types[i-3] = PTP_STRING;
 		} else if(!strcmp(args[i], "ATTRIB_NODE_MODE")) {
 			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-mode");
+			types[i-3] = PTP_UINT32;
 		} else if(!strcmp(args[i], "ATTRIB_NODE_USER")) {
 			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-user");	
+			types[i-3] = PTP_STRING;
 		} else if(!strcmp(args[i], "ATTRIB_NODE_GROUP")) {
 			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-group");
+			types[i-3] = PTP_STRING;
 		} else {
 			asprintf(&(keys[i-3]), "UNDEFINED");
 			types[i-3] = PTP_STRING;
@@ -1471,7 +1476,7 @@ ORTEGetNodeAttribute(char **args)
 	//	printf("BEFORE CALL KEYS[%d] = '%s'\n", i-3, keys[i-3]); fflush(stdout);
 	//}
 		
-	if(get_proc_attribute(machid, nodeid, keys, types, values, last_arg-3)) {
+	if(get_node_attribute(machid, nodeid, keys, types, values, last_arg-3)) {
 		/* error - so bail out */
 		res = ORTEErrorStr(RTEV_ERROR_NATTR, "error finding key on node or error getting keys");
 		proxy_svr_event_callback(orte_proxy, res);
@@ -1486,30 +1491,30 @@ ORTEGetNodeAttribute(char **args)
 		tot_len += strlen(values[i]);
 	}
 	
-	//printf("totlen = %d\n", tot_len);
-	tot_len += last_arg; /* add on some for spaces and null, etc - little bit of extra here */
+	//printf("totlen = %d\n", tot_len); fflush(stdout);
+	tot_len += values_len * 2; /* add on some for spaces and null, etc - little bit of extra here */
+	//printf("totlen = %d\n", tot_len); fflush(stdout);
 	valstr = (char*)malloc(tot_len * sizeof(char));
 	
 	sprintf(valstr, "");
 	for(i=0; i<values_len; i++) {
-		sprintf(valstr, "%s%s%s", valstr, i == 0 ? "" : " ", values[i]);
+		sprintf(valstr, "%s%s%s%s", valstr, i == 0 ? "" : " ", values[i], i == values_len-1 ? "\0" : "");
 	}
 	
-	//printf("valSTR = '%s'\n", valstr);
+	//printf("valSTR = '%s'\n", valstr); fflush(stdout);
 	
 	asprintf(&res, "%d %s", RTEV_NATTR, valstr);
-	
 	proxy_svr_event_callback(orte_proxy, res);
-	
 	free(res);
-	
+
 	for(i=3; i<last_arg; i++) {
 		if(keys[i-3] != NULL) free(keys[i-3]);
 	}
+	
 	for(i=0; i<values_len; i++) {
 		if(values[i] != NULL) free(values[i]);
 	}
-		
+	
 	free(keys);
 	free(values);
 	free(types);
@@ -1530,12 +1535,14 @@ get_node_attribute(int machid, int node_num, char **input_keys, int *input_types
 	
 	/* ignore the machine ID until ORTE implements this part */
 	
+	#if 0
 	keys = (char**)malloc((input_num_keys + 1)* sizeof(char*));
 	for(i=0; i<input_num_keys; i++) {
 		keys[i] = strdup(input_keys[i]);
 	}
 	/* null terminated */
 	keys[input_num_keys] = NULL;
+	#endif
 	
 	rc = orte_gpr.get(ORTE_GPR_KEYS_OR | ORTE_GPR_TOKENS_OR,
 			ORTE_NODE_SEGMENT, NULL, NULL, &cnt, &values);
@@ -1563,7 +1570,7 @@ get_node_attribute(int machid, int node_num, char **input_keys, int *input_types
 		max = node_num + 1;
 	}
 	
-	//printf("MAX = %d, MIN = %d\n", max, min); fflush(stdout);
+	printf("MAX = %d, MIN = %d\n", max, min); fflush(stdout);
 		
 	for(i=min; i<max; i++) {
 		value = values[i];
@@ -1577,7 +1584,7 @@ get_node_attribute(int machid, int node_num, char **input_keys, int *input_types
 					asprintf(&(input_values[((i-min) * input_num_keys) + j]), "%d", get_ui32_value(value, input_keys[j]));
 					break;
 			}
-			//printf("VALUES IN GET FUNC[%d][%d] = '%s'\n", i, j, input_values[((i-min) * input_num_keys) + j]); fflush(stdout);
+			printf("VALUES IN GET FUNC[%d][%d] = '%s'\n", i, j, input_values[((i-min) * input_num_keys) + j]); fflush(stdout);
 		}
 	}
 	
@@ -1585,12 +1592,14 @@ get_node_attribute(int machid, int node_num, char **input_keys, int *input_types
 	ret = 0;
 	
 cleanup:
+#if 0
 	if(keys != NULL) {
 		for(i=0; i<input_num_keys; i++) {
 			if(keys[i] != NULL) free(keys[i]);
 		}
 		free(keys);
 	}
+	#endif
 		
 	return ret;
 }

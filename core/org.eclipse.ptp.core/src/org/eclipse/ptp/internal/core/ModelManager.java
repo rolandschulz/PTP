@@ -217,8 +217,10 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 			System.out.println("MACHINE: " + ne[i]+" - #nodes = "+ne2.length);
 			
+			/*
+			PNode foo = new PNode(mac, ne2[0], ""+0+"", 0);
 			int num_attribs = 5;
-			String[] attribs = monitoringSystem.getAllNodesAttributes(mac, 
+			String[] attribs = monitoringSystem.getNodeAttributes(foo, 
 					AttributeConstants.ATTRIB_NODE_NAME + " " +
 					AttributeConstants.ATTRIB_NODE_USER + " " + 
 					AttributeConstants.ATTRIB_NODE_GROUP + " " +
@@ -227,15 +229,29 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			
 			for(int j=0; j<attribs.length; j++) 
 				System.out.println("*** attribs["+j+"] = "+attribs[j]);
+			
+			*/
+			int num_attribs = 5;
+			String[] attribs = monitoringSystem.getAllNodesAttributes(mac, 
+					AttributeConstants.ATTRIB_NODE_NAME + " " +
+					AttributeConstants.ATTRIB_NODE_USER + " " + 
+					AttributeConstants.ATTRIB_NODE_GROUP + " " +
+					AttributeConstants.ATTRIB_NODE_STATE + " " +
+					AttributeConstants.ATTRIB_NODE_MODE);
+				
+			
+			//for(int j=0; j<attribs.length; j++) 
+			//	System.out.println("*** attribs["+j+"] = "+attribs[j]);
+				
 
 			for (int j = 0; j < ne2.length; j++) {
 				PNode node;
 				node = new PNode(mac, ne2[j], "" + j + "", j);
-				node.setAttrib(AttributeConstants.ATTRIB_NODE_NAME, attribs[(i * num_attribs)]);
-				node.setAttrib(AttributeConstants.ATTRIB_NODE_USER, attribs[(i * num_attribs) + 1]); 
-				node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP, attribs[(i * num_attribs) + 2]);
-				node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, attribs[(i * num_attribs) + 3]);
-				node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE, attribs[(i * num_attribs) + 4]);
+				node.setAttrib(AttributeConstants.ATTRIB_NODE_NAME, attribs[(j * num_attribs)]);
+				node.setAttrib(AttributeConstants.ATTRIB_NODE_USER, attribs[(j * num_attribs) + 1]); 
+				node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP, attribs[(j * num_attribs) + 2]);
+				node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, attribs[(j * num_attribs) + 3]);
+				node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE, attribs[(j * num_attribs) + 4]);
 
 				mac.addChild(node);
 			}

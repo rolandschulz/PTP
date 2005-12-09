@@ -40,7 +40,7 @@ public class PNode extends Parent implements IPNode {
 	public PNode(IPElement element, String name, String key, int nodeNumber) {
 		super(element, name, key, P_NODE);
 		attribs = new HashMap(0);
-		this.setAttrib(AttributeConstants.ATTRIB_NODE_NUMBER, new String("" + nodeNumber + ""));
+		attribs.put(AttributeConstants.ATTRIB_NODE_NUMBER, new Integer(nodeNumber));
 	}
 	public IPMachine getMachine() {
 		IPElement current = this;
@@ -51,7 +51,7 @@ public class PNode extends Parent implements IPNode {
 		return null;
 	}
 	public String getNodeNumber() {
-		return (String) getAttrib(AttributeConstants.ATTRIB_NODE_NUMBER);
+		return ""+((Integer) attribs.get(AttributeConstants.ATTRIB_NODE_NUMBER)).intValue()+"";
 	}
 	public int getNodeNumberInt()
 	{
