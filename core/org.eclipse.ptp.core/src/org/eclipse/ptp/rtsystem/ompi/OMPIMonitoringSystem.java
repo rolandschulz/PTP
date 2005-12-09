@@ -116,7 +116,7 @@ public class OMPIMonitoringSystem implements IMonitoringSystem {
 	}
 
 	public String[] getNodeAttributes(IPNode node, String attribs) {
-		System.out.println("JAVA OMPI: getNodeAttribute(" + node.getElementName() + ", "
+		System.out.println("ORTE Monitoring System: getNodeAttribute(" + node.getElementName() + ", "
 				+ attribs + ") called");
 		IPMachine machine = node.getMachine();
 		int machID = machine.getMachineNumberInt();
