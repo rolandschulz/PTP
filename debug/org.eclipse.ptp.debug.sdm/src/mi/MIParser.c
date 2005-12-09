@@ -126,7 +126,7 @@ char *secondaryPrompt = ">"; //$NON-NLS-1$
 	char *s;
 	char *token;
 
-	while (*buffer != '\0') {
+	while (buffer != NULL && *buffer != '\0') {
 		s = strchr(buffer, '\n');
 		if (s != NULL)
 			*s++ = '\0';

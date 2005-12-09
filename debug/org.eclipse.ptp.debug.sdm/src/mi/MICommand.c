@@ -26,7 +26,7 @@
 #include "MICommand.h"
 
 MICommand *
-MICommandNew(char *command, void (*callback)(MIResultRecord *))
+MICommandNew(char *command)
 {
 	MICommand *	cmd;
 	
@@ -36,7 +36,7 @@ MICommandNew(char *command, void (*callback)(MIResultRecord *))
 	cmd->opt_size = MICOMMAND_OPT_SIZE;
 	cmd->num_options = 0;
 	cmd->completed = 0;
-	cmd->callback = callback;
+	cmd->callback = NULL;
 	return cmd;
 }
 
@@ -72,6 +72,12 @@ MICommandAddOption(MICommand *cmd, char *opt, char *arg)
 	
 	if (arg != NULL)
 		cmd->options[cmd->num_options++] = strdup(arg);
+}
+
+void
+MICommandRegisterCallback(MICommand *cmd, void (*callback)(MIResultRecord *))
+{
+	cmd->callback = callback;
 }
 
 int

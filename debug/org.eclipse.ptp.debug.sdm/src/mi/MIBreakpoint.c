@@ -17,7 +17,6 @@
 #include "MIBreakpoint.h"
 #include "MIValue.h"
 #include "MIResult.h"
-#include "MICommand.h"
 
 MIBreakpoint *
 MIBreakpointNew(void)
@@ -131,13 +130,13 @@ MIBreakpointParse(MIValue *tuple)
 	return bp;
 }
 
-int
-MIBreakInsert(MISession *sess, int isTemporary, int isHardware, char *condition, int ignoreCount, char *line, int tid)
+MICommand *
+MIBreakInsert(int isTemporary, int isHardware, char *condition, int ignoreCount, char *line, int tid)
 {
 	char *		str;
 	MICommand *	cmd;
 	
-	cmd = MICommandNew("-break-insert", NULL);
+	cmd = MICommandNew("-break-insert");
 
 	if (isTemporary) {
 		MICommandAddOption(cmd, "-t", NULL);
@@ -160,6 +159,6 @@ MIBreakInsert(MISession *sess, int isTemporary, int isHardware, char *condition,
 	
 	MICommandAddOption(cmd, line, NULL);
 	
-	return MISessionSendCommand(sess, cmd);
+	return cmd;
 }
 

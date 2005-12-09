@@ -31,10 +31,11 @@ struct MICommand {
 };
 typedef struct MICommand	MICommand;
 
-extern MICommand *MICommandNew(char *, void (*callback)(MIResultRecord *));
+extern MICommand *MICommandNew(char *);
 extern void MICommandFree(MICommand *cmd);
 extern void MICommandAddOption(MICommand *cmd, char *opt, char *arg);
 extern int MICommandCompleted(MICommand *cmd);
+extern void MICommandRegisterCallback(MICommand *cmd, void (*callback)(MIResultRecord *));
 extern char *MICommandToString(MICommand *cmd);
 #endif _MICOMMAND_H_
 
