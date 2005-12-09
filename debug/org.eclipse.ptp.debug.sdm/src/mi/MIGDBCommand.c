@@ -33,3 +33,10 @@ MIGDBSet(char *var, char *val)
 	
 	return cmd;
 }
+
+MICommand *
+MIGDBExit(void)
+{
+	return MICommandNew("-gdb-exit", MIResultRecordEXIT);
+}
+

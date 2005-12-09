@@ -351,10 +351,10 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 			DoOOBCallbacks(sess, output->oobs);
 			
 		if (output->rr != NULL) {
-			if (sess->command->callback != NULL)
-				sess->command->callback(output->rr);
 			sess->command->completed = 1;
 			sess->command->result = output->rr;
+			if (sess->command->callback != NULL)
+				sess->command->callback(output->rr);
 			output->rr = NULL; /* Freed by MICommandFree() */
 			sess->command = NULL;
 		}

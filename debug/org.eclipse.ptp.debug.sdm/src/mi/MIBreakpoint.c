@@ -218,3 +218,19 @@ MIBreakInsert(int isTemporary, int isHardware, char *condition, int ignoreCount,
 	return cmd;
 }
 
+MICommand *
+MIBreakDelete(int nbps, int *bpids)
+{
+	char *		str;
+	MICommand *	cmd;
+	
+	cmd = MICommandNew("-break-delete", MIResultRecordDONE);
+	
+	for (i = 0; i < nbps; i++) {
+		asprintf(&str, "%d", bpids[i]);
+		MICommandAddOption(cmd, str, NULL);
+		free(str);
+	}
+	
+	return cmd;
+}
