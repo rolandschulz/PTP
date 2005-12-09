@@ -6,6 +6,7 @@
 #include "MISession.h"
 #include "MIError.h"
 #include "MIResultRecord.h"
+#include "MIBreakpoint.h"
 
 void
 cmd_callback(MIResultRecord *rr)
@@ -13,6 +14,8 @@ cmd_callback(MIResultRecord *rr)
 	MIString *str = MIResultRecordToString(rr);
 	printf("res> %s\n", MIStringToCString(str));
 	MIStringFree(str);
+	
+	rr->resultClass
 }
 
 void
@@ -50,6 +53,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	
+	MISessionRegisterCompletedCallback(sess, cmd_completed);
 	MISessionRegisterConsoleCallback(sess, console_callback);
 	MISessionRegisterLogCallback(sess, log_callback);
 	
@@ -57,5 +61,17 @@ int main(int argc, char *argv[])
 	
 	sendcmd_wait(sess, cmd);
 	
+	MIGDBSet(sess, "confirm", "off");
+	
+	wait_for_cmd();
+	
+	MIBreakInsert(sess, 0, 0, NULL, 0, "4", 0);
+	
+	sendcmd_wait(sess, cmd);
+		
+	cmd = MICommandNew("quit", cmd_callback);
+	
+	sendcmd_wait(sess, cmd);
+
 	return 0;
 }
