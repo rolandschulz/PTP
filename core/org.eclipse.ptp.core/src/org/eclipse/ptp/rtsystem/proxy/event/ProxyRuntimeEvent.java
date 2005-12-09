@@ -69,6 +69,10 @@ public class ProxyRuntimeEvent extends ProxyEvent {
 			evt = new ProxyRuntimeNodeAttributeEvent(args);
 			break;
 		
+		case IProxyRuntimeEvent.EVENT_RUNTIME_NODECHANGE:
+			evt = new ProxyRuntimeNodeChangeEvent(args);
+			break;
+		
 		case IProxyRuntimeEvent.EVENT_RUNTIME_PROCOUT:
 			evt = new ProxyRuntimeProcessOutputEvent(args);
 			break;

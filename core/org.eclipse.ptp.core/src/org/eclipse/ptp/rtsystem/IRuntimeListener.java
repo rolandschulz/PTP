@@ -28,4 +28,6 @@ public interface IRuntimeListener {
 	public void runtimeJobStateChanged(String ID, String state);
 
 	public void runtimeNewJob(String ID);
+	
+	public void runtimeNodeGeneralChange(String ID, String key, String value);
 }

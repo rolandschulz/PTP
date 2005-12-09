@@ -380,11 +380,19 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		*/
 	}
 
+	public void runtimeNodeGeneralChange(String ne, String key, String value) {
+		IPNode n = universe.findNodeByName(ne);
+		if(n != null) {
+			n.setAttribute(key, value);
+			fireEvent(n, EVENT_SYS_STATUS_CHANGE);
+		}
+	}
+	
 	public void runtimeNodeStatusChange(String ne) {
 		/* so let's find which node this is */
 		IPNode n = universe.findNodeByName(ne);
 		if (n != null) {
-			n.setAttrib("state", monitoringSystem.getNodeAttributes(n, AttributeConstants.ATTRIB_NODE_STATE));
+			n.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, monitoringSystem.getNodeAttributes(n, AttributeConstants.ATTRIB_NODE_STATE));
 			fireEvent(n, EVENT_SYS_STATUS_CHANGE);
 		}
 	}
