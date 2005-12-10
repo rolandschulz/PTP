@@ -73,5 +73,12 @@ extern MICommand *MIStackListAllFrames(void);
 extern MICommand *MIStackListLocals(int vals);
 extern MICommand *MIStackListArguments(int vals, int low, int high);
 extern MICommand *MIStackListAllArguments(int vals);
+
+/*
+ * -var-* commands
+ */
+extern MICommand *MIVarCreate(char *name, char *frame, char *expr);
+extern MICommand *MIVarDelete(char *name);
+extern MICommand *MIVarListChildren(char *name);
 #endif _MICOMMAND_H_
 
