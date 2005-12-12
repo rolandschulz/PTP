@@ -24,6 +24,7 @@
 #include "list.h"
 #include "MIOutput.h"
 #include "MICommand.h"
+#include "MIEvent.h"
 
 struct MISession {
 	int			in_fd; /* GDB input */
@@ -34,6 +35,7 @@ struct MISession {
 	MICommand *	command;
 	List *		send_queue;
 	char *		gdb_path;
+	void			(*event_callback)(MIEvent *);
 	void			(*cmd_callback)(MIResultRecord *);
 	void			(*exec_callback)(char *, List *);
 	void			(*status_callback)(char *, List *);
@@ -47,6 +49,7 @@ typedef struct MISession	MISession;
 extern MISession *MISessionNew(void);
 extern void MISessionFree(MISession *sess);
 extern int MISessionStartLocal(MISession *sess, char *);
+extern void MISessionRegisterEventCallback(MISession *sess, void (*callback)(MIEvent *));
 extern void MISessionRegisterCommandCallback(MISession *sess, void (*callback)(MIResultRecord *));
 extern void MISessionRegisterExecCallback(MISession *sess, void (*callback)(char *, List *));
 extern void MISessionRegisterStatusCallback(MISession *sess, void (*callback)(char *, List *));

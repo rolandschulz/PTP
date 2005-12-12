@@ -33,6 +33,8 @@
 #include "MICommand.h"
 #include "MIError.h"
 #include "MIOOBRecord.h"
+#include "MIValue.h"
+#include "MIResult.h"
 
 static List *			MISessionList = NULL;
 static struct timeval		MISessionSelectTimeout = {0, 1000};
@@ -54,6 +56,7 @@ MISessionNew(void)
 	sess->exit_status = 0;
 	sess->send_queue = NewList();
 	sess->gdb_path = strdup("gdb");
+	sess->event_callback = NULL;
 	sess->cmd_callback = NULL;
 	sess->exec_callback = NULL;
 	sess->status_callback = NULL;
@@ -148,6 +151,12 @@ MISessionStartLocal(MISession *sess, char *prog)
 	close(p2[0]);
 	
 	return 0;
+}
+
+void
+MISessionRegisterEventCallback(MISession *sess, void (*callback)(MIEvent *))
+{
+	sess->event_callback = callback;
 }
 
 void
@@ -373,6 +382,8 @@ static void
 DoOOBCallbacks(MISession *sess, List *oobs)
 {
 	MIOOBRecord *	oob;
+	MIResult *		res;
+	MIValue *		val;
 	
 	for (SetList(oobs); (oob = (MIOOBRecord *)GetListElement(oobs)) != NULL; ) {
 		switch (oob->type) {
@@ -381,6 +392,17 @@ DoOOBCallbacks(MISession *sess, List *oobs)
 			case MIOOBRecordExecAsync:
 				if (sess->exec_callback != NULL)
 					sess->exec_callback(oob->class, oob->results);
+				if (strcmp(oob->class, "stopped") == 0) {
+					for (SetList(oob->results); (res = (MIResult *)GetListElement(oob->results)); ) {
+						if (strcmp(res->variable, "reason") == 0) {
+							val = res->value;
+							if (val->type == MIValueTypeConst) {
+								if (sess->event_callback)
+									sess->event_callback(MIEventCreateStoppedEvent(val->cstring, oob->results));
+							}
+						}
+					}
+				}
 				break;
 				
 			case MIOOBRecordStatusAsync:

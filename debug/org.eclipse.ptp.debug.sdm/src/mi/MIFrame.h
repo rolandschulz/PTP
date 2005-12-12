@@ -13,6 +13,7 @@
 #define _MIFRAME_H_
 
 #include "MICommand.h"
+#include "MIValue.h"
 
 struct MIFrame {
 	int		level;
