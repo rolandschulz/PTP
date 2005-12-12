@@ -50,14 +50,14 @@ MIVarFree(MIVar *var)
 }
 
 MIVar *
-MIVarParse(MIValue *tuple)
+MIVarParse(List *results)
 {
 	MIValue *	value;
 	MIResult *	result;
 	MIVar *		var = MIVarNew();
 	char *		str;
 	
-	for (SetList(tuple->results); (result = (MIResult *)GetListElement(tuple->results)) != NULL; ) {
+	for (SetList(results); (result = (MIResult *)GetListElement(results)) != NULL; ) {
 		value = result->value;
 		if (value != NULL && value->type == MIValueTypeConst) {
 			str = value->cstring;
@@ -77,6 +77,15 @@ MIVarParse(MIValue *tuple)
 	}
 	
 	return var;
+}
+
+MIVar *
+MIVarGetVarCreateInfo(MICommand *cmd) 
+{
+	if (!cmd->completed || cmd->result == NULL)
+		return NULL;
+		
+	return MIVarParse(cmd->result->results);
 }
 
 /*
@@ -99,7 +108,7 @@ parseChildren(MIValue *val, List **res)
 				if (value->type == MIValueTypeTuple) {
 					if (children == NULL)
 						children = NewList();
-					AddToList(children, MIVarParse(value));
+					AddToList(children, MIVarParse(value->results));
 				}
 			}
 		}
@@ -109,13 +118,19 @@ parseChildren(MIValue *val, List **res)
 }
 
 void
-MIVarGetVarListChildrenInfo(MIVar *var, MIResultRecord *rr)
+MIVarGetVarListChildrenInfo(MIVar *var, MICommand *cmd)
 {
-	int			num;
-	MIVar *		child;
-	MIValue *	value;
-	MIResult *	result;
-	List *		children = NULL;
+	int				num;
+	MIVar *			child;
+	MIValue *		value;
+	MIResult *		result;
+	MIResultRecord *	rr;
+	List *			children = NULL;
+	
+	if (!cmd->completed)
+		return;
+
+	rr = cmd->result;
 	
 	if (rr != NULL) {
 		for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {

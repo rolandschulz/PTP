@@ -15,6 +15,7 @@
 #include "list.h"
 #include "MIString.h"
 #include "MIResultRecord.h"
+#include "MICommand.h"
 
 /**
  * Represents a set variable object.
@@ -30,8 +31,9 @@ typedef struct MIVar	MIVar;
 
 extern MIVar *MIVarNew(void);
 extern void MIVarFree(MIVar *var);
-extern MIVar *MIVarParse(MIValue *tuple);
-extern void MIVarGetVarListChildrenInfo(MIVar *var, MIResultRecord *rr);
+extern MIVar *MIVarParse(List *results);
+extern MIVar *MIVarGetVarCreateInfo(MICommand *cmd);
+extern void MIVarGetVarListChildrenInfo(MIVar *var, MICommand *cmd);
 #endif _MIVAR_H_
 
 
