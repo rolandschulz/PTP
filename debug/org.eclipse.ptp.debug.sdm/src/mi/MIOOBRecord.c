@@ -22,6 +22,7 @@ NewMIMIOOBRecord(void)
 	MIOOBRecord *	oob;
 	
 	oob = (MIOOBRecord *)malloc(sizeof(MIOOBRecord));
+	oob->token = -1;
 	oob->results = NULL;
 	oob->class = NULL;
 	oob->cstring = NULL;

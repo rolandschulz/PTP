@@ -36,6 +36,11 @@ MIEventNew(int class, int type)
 	MIEvent * event = (MIEvent *)malloc(sizeof(MIEvent));
 	event->class = class;
 	event->type = type;
+	
+	event->threadId = 0;
+	event->bkptno = 0;
+	event->number = 0;
+	event->code = 0;
 	event->frame = NULL;
 	event->sigName = NULL;
 	event->sigMeaning = NULL;
@@ -45,6 +50,7 @@ MIEventNew(int class, int type)
 	event->exp = NULL;
 	event->oldValue = NULL;
 	event->newValue = NULL;
+	
 	return event;
 }
 

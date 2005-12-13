@@ -27,6 +27,8 @@ MIFrameNew(void)
 	MIFrame *	frame;
 	
 	frame = (MIFrame *)malloc(sizeof(MIFrame));
+	frame->level = 0;
+	frame->line = 0;
 	frame->addr = NULL;
 	frame->func = NULL;
 	frame->file = NULL;

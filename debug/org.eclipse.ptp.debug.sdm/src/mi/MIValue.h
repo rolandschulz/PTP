@@ -14,9 +14,10 @@
 #include "list.h"
 #include "MIString.h"
 
-#define MIValueTypeConst	1
-#define MIValueTypeList	2
-#define MIValueTypeTuple	3
+#define MIValueTypeInvalid	0
+#define MIValueTypeConst		1
+#define MIValueTypeList		2
+#define MIValueTypeTuple		3
 
 /**
  * GDB/MI value.

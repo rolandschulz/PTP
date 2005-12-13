@@ -25,6 +25,16 @@ MIBreakpointNew(void)
 	MIBreakpoint *	bp;
 	
 	bp = (MIBreakpoint *)malloc(sizeof(MIBreakpoint));
+	bp->number = 0;
+	bp->enabled = 0;
+	bp->line = 0;
+	bp->times = 0;
+	bp->ignore = 0;
+	bp->isWpt = 0;
+	bp->isAWpt = 0;
+	bp->isRWpt = 0;
+	bp->isWWpt = 0;
+	bp->isHdw = 0;
 	bp->type = NULL;
 	bp->disp = NULL;
 	bp->address = NULL;
