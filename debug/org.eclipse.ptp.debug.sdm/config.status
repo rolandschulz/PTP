@@ -504,10 +504,10 @@ s,@am__leading_dot@,.,;t t
 s,@AMTAR@,${SHELL} /Volumes/Home/greg/Desktop/workspaces/3.1/ptp/org.eclipse.ptp.debug.sdm/missing --run tar,;t t
 s,@am__tar@,${AMTAR} chof - "$$tardir",;t t
 s,@am__untar@,${AMTAR} xf -,;t t
-s,@build@,powerpc-apple-darwin8.2.0,;t t
+s,@build@,powerpc-apple-darwin8.3.0,;t t
 s,@build_cpu@,powerpc,;t t
 s,@build_vendor@,apple,;t t
-s,@build_os@,darwin8.2.0,;t t
+s,@build_os@,darwin8.3.0,;t t
 s,@CC@,mpicc,;t t
 s,@CFLAGS@, -Wall,;t t
 s,@LDFLAGS@,,;t t
@@ -526,10 +526,10 @@ s,@am__fastdepCC_TRUE@,,;t t
 s,@am__fastdepCC_FALSE@,#,;t t
 s,@RANLIB@,ranlib,;t t
 s,@ac_ct_RANLIB@,ranlib,;t t
-s,@host@,powerpc-apple-darwin8.2.0,;t t
+s,@host@,powerpc-apple-darwin8.3.0,;t t
 s,@host_cpu@,powerpc,;t t
 s,@host_vendor@,apple,;t t
-s,@host_os@,darwin8.2.0,;t t
+s,@host_os@,darwin8.3.0,;t t
 s,@EGREP@,grep -E,;t t
 s,@LN_S@,ln -s,;t t
 s,@ECHO@,echo,;t t

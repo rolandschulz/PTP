@@ -10,3 +10,6 @@ stamp-h1
 *.la
 config.h
 *.a
+sdm
+.gdb_history
+test_*
