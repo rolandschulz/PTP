@@ -26,6 +26,7 @@
 #include "MIBreakpoint.h"
 #include "MIFrame.h"
 #include "MIVar.h"
+#include "MIArg.h"
 #include "MIError.h"
 
 #endif _MI_H_

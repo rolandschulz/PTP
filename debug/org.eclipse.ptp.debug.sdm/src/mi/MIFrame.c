@@ -97,7 +97,7 @@ MIFrameParse(MIValue *tuple)
 }
 
 List *
-MIFrameGetStackListFramesInfo(MICommand *cmd)
+MIGetStackListFramesInfo(MICommand *cmd)
 {
 	MIValue *		val;
 	MIResultRecord *	rr;
@@ -128,6 +128,64 @@ MIFrameGetStackListFramesInfo(MICommand *cmd)
 	}
 	
 	return frames;
+}
+
+List *
+MIGetFrameInfo(MICommand *cmd)
+{
+	MIValue *		val;
+	MIResultRecord *	rr;
+	MIResult *		result;
+	List *			frames = NULL;
+	
+	if (!cmd->completed || cmd->result == NULL)
+		return NULL;
+		
+	rr = cmd->result;
+	
+	SetList(rr->results); 
+	if ((result = (MIResult *)GetListElement(rr->results)) != NULL) {
+		if (strcmp(result->variable, "frame") == 0) {
+			val = result->value;
+			if (val->type == MIValueTypeTuple) {
+				if (frames == NULL)
+					frames = NewList();
+				AddToList(frames, (void *)MIFrameParse(val));
+			}
+		}
+	}
+	
+	return frames;
+}
+
+List *
+MIGetStackListLocalsInfo(MICommand *cmd)
+{
+	MIValue *		val;
+	MIResultRecord *	rr;
+	MIResult *		result;
+	List *			locals = NULL;
+
+	if (!cmd->completed || cmd->result == NULL)
+		return NULL;
+	
+	rr = cmd->result;
+	printf("rr,res is %p\n", rr);
+	
+	printf("res is %p\n", rr->results);
+	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
+		printf("var is %s\n", result->variable);
+		if (strcmp(result->variable, "locals") == 0) {
+			val = result->value;
+			if (val->type == MIValueTypeList || val->type == MIValueTypeTuple) {
+		printf("before args\n");
+				locals = MIArgsParse(val);
+		printf("after args\n");
+			}
+		}
+	}
+	printf("returning %p\n", locals);
+	return locals;
 }
 
 MIString *

@@ -24,7 +24,7 @@ struct MIArg {
 };
 typedef struct MIArg	MIArg;
 
-extern MIArg *MIArgNew(char *name, char *value);
+extern MIArg *MIArgNew(void);
 extern void MIArgFree(MIArg *arg);
 extern List *MIArgsParse(MIValue *miValue);
 extern MIArg *MIArgParse(MIValue *tuple);

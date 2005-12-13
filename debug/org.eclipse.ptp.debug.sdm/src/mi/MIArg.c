@@ -19,19 +19,21 @@
 #include "MIArg.h"
 
 MIArg *
-MIArgNew(char *name, char *value)
+MIArgNew(void)
 {
 	MIArg *	arg = (MIArg *)malloc(sizeof(MIArg));
-	arg->name = strdup(name);
-	arg->value = strdup(value);
+	arg->name = NULL;
+	arg->value = NULL;
 	return arg;
 }
 
 void
 MIArgFree(MIArg *arg)
 {
-	free(arg->name);
-	free(arg->value);
+	if (arg->name != NULL)
+		free(arg->name);
+	if (arg->value != NULL)
+		free(arg->value);
 	free(arg);
 }
 
@@ -55,20 +57,26 @@ MIArgsParse(MIValue *miValue)
 	MIValue *	value;
 	MIResult *	result;
 	
-	for (SetList(values); (value = (MIValue *)GetListElement(values)) != NULL; ) {
-		if (value->type == MIValueTypeTuple) {
-			MIArg *arg = MIArgParse(value);
-			if (arg != NULL) {
-				AddToList(aList, (void *)arg);
+	if (values != NULL) {
+		printf("values != NULL\n");
+		for (SetList(values); (value = (MIValue *)GetListElement(values)) != NULL; ) {
+			if (value->type == MIValueTypeTuple) {
+				MIArg *arg = MIArgParse(value);
+				if (arg != NULL) {
+					AddToList(aList, (void *)arg);
+				}
 			}
 		}
 	}
 	
-	for (SetList(results); (result = (MIResult *)GetListElement(results)) != NULL; ) {
-		value = result->value;
-		if (value->type == MIValueTypeConst) {
-			MIArg *arg = MIArgNew(value->cstring, "");
-			AddToList(aList, (void *)arg);
+	if (results != NULL) {
+		for (SetList(results); (result = (MIResult *)GetListElement(results)) != NULL; ) {
+			value = result->value;
+			if (value->type == MIValueTypeConst) {
+				MIArg *arg = MIArgNew();
+				arg->name = strdup(value->cstring);
+				AddToList(aList, (void *)arg);
+			}
 		}
 	}
 	
@@ -83,36 +91,24 @@ MIArgsParse(MIValue *miValue)
 MIArg *
 MIArgParse(MIValue *tuple)
 {
-	List *		args = tuple->results;
-	MIArg *		arg = NULL;
 	MIValue *	value;
 	MIResult *	result;
-	char *		aName;
-	char *		aValue;
+	char *		str;
+	MIArg *		arg = MIArgNew();
 	
-	SetList(args);
-	
-	if (!EmptyList(args)) {
-		// Name
-		result = (MIResult *)GetListElement(args);
+	for (SetList(tuple->results); (result = (MIResult *)GetListElement(tuple->results)) != NULL; ) {
 		value = result->value;
 		if (value != NULL && value->type == MIValueTypeConst) {
-			aName = value->cstring;
+			str = value->cstring;
 		} else {
-			aName = "";
+			str = "";
 		}
 
-		// Value
-		if ((result = (MIResult *)GetListElement(args)) != NULL) {
-			value = result->value;
-			if (value != NULL && value->type == MIValueTypeConst) {
-				aValue = value->cstring;
-			} else {
-				aValue = "";
-			}
+		if (strcmp(result->variable, "name") == 0) {
+			arg->name = strdup(str);
+		} else if (strcmp(result->variable, "value") == 0) {
+			arg->value = strdup(str);
 		}
-
-		arg = MIArgNew(aName, aValue);
 	}
 	
 	return arg;

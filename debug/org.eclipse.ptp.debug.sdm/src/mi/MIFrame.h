@@ -28,7 +28,9 @@ typedef struct MIFrame	MIFrame;
 extern MIFrame *MIFrameNew(void);
 extern void MIFrameFree(MIFrame *f);
 extern MIFrame *MIFrameParse(MIValue *tuple);
-extern List *MIFrameGetStackListFramesInfo(MICommand *cmd);
+extern List *MIGetStackListFramesInfo(MICommand *cmd);
+extern List *MIGetFrameInfo(MICommand *cmd);
+extern List *MIGetStackListLocalsInfo(MICommand *cmd);
 extern MIString *MIFrameToString(MIFrame *f);
 #endif _MIFRAME_H_
 
