@@ -58,7 +58,6 @@ MIArgsParse(MIValue *miValue)
 	MIResult *	result;
 	
 	if (values != NULL) {
-		printf("values != NULL\n");
 		for (SetList(values); (value = (MIValue *)GetListElement(values)) != NULL; ) {
 			if (value->type == MIValueTypeTuple) {
 				MIArg *arg = MIArgParse(value);
