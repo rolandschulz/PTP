@@ -19,6 +19,8 @@
 #include "MIArg.h"
 #include "MIFrame.h"
 
+static List *MIFrameInfoParse(List *results);
+
 MIFrame *
 MIFrameNew(void)
 {
@@ -59,12 +61,11 @@ MIFrameParse(MIValue *tuple)
 	for (SetList(results); (result = (MIResult *)GetListElement(results)) != NULL; ) {
 		var = result->variable;
 		value = result->value;
-		
-		if (value == NULL || value->type != MIValueTypeConst)
-			continue;
-
-		str = value->cstring;
-
+	
+		if (value != NULL || value->type == MIValueTypeConst) {
+			str = value->cstring;
+		}
+	
 		if (strcmp(var, "level") == 0) { //$NON-NLS-1$
 			frame->level = atoi(str);
 		} else if (strcmp(var, "addr") == 0) { //$NON-NLS-1$
@@ -130,21 +131,15 @@ MIGetStackListFramesInfo(MICommand *cmd)
 	return frames;
 }
 
-List *
-MIGetFrameInfo(MICommand *cmd)
+static List *
+MIFrameInfoParse(List *results)
 {
-	MIValue *		val;
-	MIResultRecord *	rr;
-	MIResult *		result;
-	List *			frames = NULL;
-	
-	if (!cmd->completed || cmd->result == NULL)
-		return NULL;
-		
-	rr = cmd->result;
-	
-	SetList(rr->results); 
-	if ((result = (MIResult *)GetListElement(rr->results)) != NULL) {
+	MIValue *	val;
+	MIResult *	result;
+	List *		frames = NULL;
+
+	SetList(results); 
+	if ((result = (MIResult *)GetListElement(results)) != NULL) {
 		if (strcmp(result->variable, "frame") == 0) {
 			val = result->value;
 			if (val->type == MIValueTypeTuple) {
@@ -154,8 +149,20 @@ MIGetFrameInfo(MICommand *cmd)
 			}
 		}
 	}
-	
 	return frames;
+}
+
+List *
+MIGetFrameInfo(MICommand *cmd)
+{
+	MIResultRecord *	rr;
+	
+	if (!cmd->completed || cmd->result == NULL)
+		return NULL;
+		
+	rr = cmd->result;
+	
+	return MIFrameInfoParse(rr->results);
 }
 
 List *
@@ -170,22 +177,43 @@ MIGetStackListLocalsInfo(MICommand *cmd)
 		return NULL;
 	
 	rr = cmd->result;
-	printf("rr,res is %p\n", rr);
 	
-	printf("res is %p\n", rr->results);
 	for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
-		printf("var is %s\n", result->variable);
 		if (strcmp(result->variable, "locals") == 0) {
 			val = result->value;
 			if (val->type == MIValueTypeList || val->type == MIValueTypeTuple) {
-		printf("before args\n");
 				locals = MIArgsParse(val);
-		printf("after args\n");
 			}
 		}
 	}
-	printf("returning %p\n", locals);
+
 	return locals;
+}
+
+List *
+MIGetStackListArgumentsInfo(MICommand *cmd)
+{
+	MIValue *		val;
+	MIResultRecord *	rr;
+	MIResult *		result;
+	List *			frames = NULL;
+
+	if (!cmd->completed || cmd->result == NULL)
+		return NULL;
+	
+	rr = cmd->result;
+	
+	SetList(rr->results); 
+	if ((result = (MIResult *)GetListElement(rr->results)) != NULL) {
+		if (strcmp(result->variable, "stack-args") == 0) {
+			val = result->value;
+			if (val->type == MIValueTypeList || val->type == MIValueTypeTuple) {
+				frames = MIFrameInfoParse(val->results);
+			}
+		}
+	}
+
+	return frames;
 }
 
 MIString *
