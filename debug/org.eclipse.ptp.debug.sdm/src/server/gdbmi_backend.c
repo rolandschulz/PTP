@@ -28,17 +28,20 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
+#include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
 
-#include <mi_gdb.h>
 #include <aif.h>
 
 #include "dbg.h"
 #include "dbg_event.h"
 #include "backend.h"
 #include "list.h"
+
+#include "MI.h"
 
 //#define DEBUG
 
@@ -54,7 +57,7 @@ struct bpmap {
 };
 
 static struct timeval	SELECT_TIMEOUT = { 0, 1000 };
-static mi_h *		MIHandle;
+static MISession *	DebugSession;
 static dbg_event *	LastEvent;
 static void			(*EventCallback)(dbg_event *, void *);
 static void *		EventCallbackData;
@@ -112,7 +115,7 @@ dbg_backend_funcs	GDBMIBackend =
 };
 
 #define CHECK_SESSION() \
-	if (MIHandle == NULL) { \
+	if (DebugSession == NULL) { \
 		DbgSetError(DBGERR_NOSESSION, NULL); \
 		return DBGRES_ERR; \
 	}
@@ -125,15 +128,7 @@ dbg_backend_funcs	GDBMIBackend =
 static char *
 GetLastErrorStr(void)
 {
-	if (mi_error == MI_FROM_GDB && mi_error_from_gdb != NULL)
- 		return mi_error_from_gdb;
-	return (char *)mi_get_error_str();
-}
-
-static void
-ResetError(void)
-{
-	mi_error=MI_OK;
+	return MIGetErrorStr();
 }
 
 static void
@@ -231,17 +226,6 @@ RemoteToLocalBP(int remote)
 	return -1;
 }
 
-/*
- * Wait for terminated children
- */
-static void
-Reap(int sig)
-{
-	int	status;
-	printf("waiting on child...\n");
-	wait(&status);
-}
-
 static int
 get_current_frame(stackframe **frame)
 {
@@ -266,16 +250,16 @@ AsyncStop(void *data)
 {
 	dbg_event *	e;
 	stackframe *	frame;
-	mi_stop *	stop = (	mi_stop *)data;
+	MIEvent *	evt = (MIEvent *)data;
 
-	switch ( stop->reason )
+	switch ( evt->type )
 	{
-	case sr_bkpt_hit:
+	case MIEventTypeBreakpointHit:
 		e = NewDbgEvent(DBGEV_BPHIT);
-		e->bpid = LocalToRemoteBP(stop->bkptno);
+		e->bpid = LocalToRemoteBP(evt->bkptno);
 		break;
 
-	case sr_end_stepping_range:
+	case MIEventTypeSteppingRange:
 		if (get_current_frame(&frame) < 0) {
 			ERROR_TO_EVENT(e);
 		} else {
@@ -284,34 +268,29 @@ AsyncStop(void *data)
 		}
 		break;
 
-	case sr_exited_signalled:
+	case MIEventTypeInferiorSignalExit:
 		e = NewDbgEvent(DBGEV_SIGNAL);
-		e->sig_name = strdup(stop->signal_name);
-		e->sig_meaning = strdup(stop->signal_meaning);
-		e->thread_id = stop->thread_id;
+		e->sig_name = strdup(evt->sigName);
+		e->sig_meaning = strdup(evt->sigMeaning);
+		e->thread_id = evt->threadId;
 		e->frame = NULL;
 		break;
 		
-	case sr_signal_received:
+	case MIEventTypeSignal:
 		if (get_current_frame(&frame) < 0) {
 			ERROR_TO_EVENT(e);
 		} else {
 			e = NewDbgEvent(DBGEV_SIGNAL);
-			e->sig_name = strdup(stop->signal_name);
-			e->sig_meaning = strdup(stop->signal_meaning);
-			e->thread_id = stop->thread_id;
+			e->sig_name = strdup(evt->sigName);
+			e->sig_meaning = strdup(evt->sigMeaning);
+			e->thread_id = evt->threadId;
 			e->frame = frame;
 		}
 		break;
 
-	case sr_exited:
+	case MIEventTypeInferiorExit:
 		e = NewDbgEvent(DBGEV_EXIT);
-		e->exit_status = stop->exit_code;
-		break;
-
-	case sr_exited_normally:
-		e = NewDbgEvent(DBGEV_EXIT);
-		e->exit_status = 0;
+		e->exit_status = evt->code;
 		break;
 
 	default:
@@ -319,7 +298,7 @@ AsyncStop(void *data)
 		return DBGRES_ERR;
 	}
 
-	mi_free_stop(stop);
+	MIEventFree(evt);
 
 	if (EventCallback != NULL)
 		EventCallback(e, EventCallbackData);
@@ -337,17 +316,10 @@ AsyncStop(void *data)
 ** loop using the AsyncFunc() mechanism. 
 */
 static void
-AsyncCallback(mi_output *mio, void *data)
+AsyncCallback(MIEvent *evt)
 {
-	mi_stop *	stop;
-
-	stop = mi_get_stopped(mio->c);
-
-	if ( stop == NULL )
-		return;
-
 	AsyncFunc = AsyncStop;
-	AsyncFuncData = (void *)stop;
+	AsyncFuncData = (void *)evt;
 }
 
 
@@ -359,35 +331,33 @@ GDBMIInit(void (*event_callback)(dbg_event *, void *), void *data)
 {
 	EventCallback = event_callback;
 	EventCallbackData = data;
-	MIHandle = NULL;
+	DebugSession = NULL;
 	LastEvent = NULL;
 	ServerExit = 0;
 		
-	signal(SIGCHLD, Reap);
 	signal(SIGTERM, SIG_IGN);
 	signal(SIGHUP, SIG_IGN);
 	signal(SIGINT, SIG_IGN);
-	signal(SIGPIPE, SIG_IGN);
 
 	return DBGRES_OK;
 }
 
-#ifdef DEBUG
-void
-to_gdb_cb(const char *str, void *data)
-{
-	printf(">>> %s\n", str);
-}
-void
-from_gdb_cb(const char *str, void *data)
-{
-	printf("<<< %s\n", str);
-}
-#endif /* DEBUG */
-
 int timeout_cb(void *data)
 {
 	return 0;
+}
+
+/*
+ * Send command and wait for immediate response.
+ */
+static void
+SendCommandWait(MISession *sess, MICommand *cmd)
+{
+	MISessionSendCommand(sess, cmd);
+	
+	do {
+		MISessionProgress(sess);
+	} while (!MISessionCommandCompleted(sess));
 }
 
 /*
@@ -396,11 +366,12 @@ int timeout_cb(void *data)
 static int
 GDBMIStartSession(char *gdb_path, char *dir, char *prog, char *args, char **env)
 {
-	char *		p;
 	char **		e;
 	struct stat	st;
+	MICommand *	cmd;
+	MISession *	sess;
 	
-	if (MIHandle != NULL) {
+	if (DebugSession != NULL) {
 		DbgSetError(DBGERR_SESSION, NULL);
 		return DBGRES_ERR;
 	}
@@ -413,50 +384,36 @@ GDBMIStartSession(char *gdb_path, char *dir, char *prog, char *args, char **env)
 	 		DbgSetError(DBGERR_NOBACKEND, gdb_path);
 	 		return DBGRES_ERR;
 	 	}
-	} else {
-		p = mi_search_in_path(gdb_path);
-		if (p == NULL) {
-	 		DbgSetError(DBGERR_NOBACKEND, gdb_path);
-	 		return DBGRES_ERR;
-	 	}
-	 	gdb_path = p;
 	}
+
+	sess = MISessionNew();
 	
-	mi_set_gdb_exe(gdb_path);
+	MISessionSetGDBPath(sess, gdb_path);
 	
 	if (*dir != '\0' && chdir(dir) < 0) {
 		DbgSetError(DBGERR_SYSTEM, strerror(errno));
 		return DBGRES_ERR;
 	}
-	
-	ResetError();
-	
-	if ((MIHandle = mi_connect_local()) == NULL) {
+
+	if (MISessionStartLocal(sess, prog) < 0) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		return DBGRES_ERR;
 	}
 
 	for (e = env; e != NULL && *e != NULL; e++) {
-		gmi_gdb_set(MIHandle, "environment", *e);
+		cmd = MIGDBSet("environment", *e);
+		SendCommandWait(sess, cmd);
+		MICommandFree(cmd);
 	}
 	
-	mi_set_async_cb(MIHandle, AsyncCallback, NULL);
+	cmd = MIGDBSet("confirm", "off");
+	SendCommandWait(sess, cmd);
+	MICommandFree(cmd);
 	
-#ifdef DEBUG
-	mi_set_to_gdb_cb(MIHandle, to_gdb_cb, NULL);
-	mi_set_from_gdb_cb(MIHandle, from_gdb_cb, NULL);
-#endif /* DEBUG */
+	MISessionRegisterEventCallback(sess, AsyncCallback);
+	
+	DebugSession = sess;
 
-	ResetError();
-	if ( !gmi_set_exec(MIHandle, prog, args) ||
-		!gmi_gdb_set(MIHandle, "confirm", "off") )
-	{
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-		gmi_gdb_exit(MIHandle);
-		MIHandle = NULL;
-		return DBGRES_ERR;
-	}
-	
 	Started = 0;
 	SaveEvent(NewDbgEvent(DBGEV_OK));
 
@@ -474,10 +431,10 @@ GDBMIStartSession(char *gdb_path, char *dir, char *prog, char *args, char **env)
 static int	
 GDBMIProgress(void)
 {
-	fd_set			fds;
+	//fd_set			fds;
 	int				res = 0;
-	struct timeval	tv;
-	mi_output		*o;
+	//struct timeval	tv;
+	//mi_output		*o;
 
 	/*
 	 * Check for existing events
@@ -488,9 +445,9 @@ GDBMIProgress(void)
 		}
 			
 		if (ServerExit && LastEvent->event == DBGEV_OK) {
-			if (MIHandle != NULL) {
-				mi_disconnect(MIHandle);
-				MIHandle = NULL;
+			if (DebugSession != NULL) {
+				//mi_disconnect(MIHandle);
+				DebugSession = NULL;
 			}
 			res = -1;
 		}
@@ -501,7 +458,7 @@ GDBMIProgress(void)
 		return res;
 	}
 	
-	if (MIHandle == NULL)
+	if (DebugSession == NULL)
 		return 0;
 	/*
 	FD_ZERO(&fds);
@@ -532,7 +489,9 @@ GDBMIProgress(void)
 		break;
 	}*/
 	
+	MISessionProgress(DebugSession);
 	
+	/*
 	mi_set_time_out(MIHandle, 0, 100000);
 	mi_set_time_out_cb(MIHandle, timeout_cb, NULL);
 
@@ -546,18 +505,8 @@ GDBMIProgress(void)
 			mi_error = MI_OK;
 		return 0;
 	}
+*/
 
-/*
-	ResetError();
-	while ( (res = mi_get_response(MIHandle)) <= 0 ) {
-		if ( res < 0 ) {
-			DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-			mi_disconnect(MIHandle);
-			MIHandle = NULL;
-		}
-	}
-	*/
-	
 	/*
 	 * Do any extra async functions. We can call gdbmi safely here
 	 */
@@ -623,50 +572,48 @@ GDBMISetFuncBreakpoint(int bpid, char *file, char *func)
 static int
 SetAndCheckBreak(int bpid, char *where)
 {
-	dbg_event *	e;
-	mi_bkpt *	bpt;
-	breakpoint *	bp;
+	dbg_event *		e;
+	MIBreakpoint *	bpt;
+	MICommand *		cmd;
+	List *			bpts;
+	breakpoint *		bp;
 
-	ResetError();
-
-	bpt = gmi_break_insert_full(MIHandle, 0, 0, NULL, -1, -1, where);
-
-	if ( bpt == NULL ) {
-		if (mi_error == MI_OK)
-			DbgSetError(DBGERR_DEBUGGER, "Attempt to set breakpoint failed");
-		else
-			DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+	cmd = MIBreakInsert(0, 0, NULL, 0, where, 0);
+	SendCommandWait(DebugSession, cmd);
+	
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
 
+	bpts = MIBreakpointGetBreakInsertInfo(cmd);
+
+	
+	MICommandFree(cmd);
+			
+	if (bpts == NULL) {
+		DbgSetError(DBGERR_DEBUGGER, "error getting breakpoint information");
+		return DBGRES_ERR;
+	}
+		
+	SetList(bpts);
+	bpt = (MIBreakpoint *)GetListElement(bpts);
+	
 	AddBPMap(bpt->number, bpid);
 	
 	bp = NewBreakpoint(bpt->number);
 
 	bp->ignore = bpt->ignore;
-
-	switch ( bpt->type ) {
-	case t_unknown:
-		bp->type = strdup("unknown");
-		break;
-
-	case t_breakpoint:
-		bp->type = strdup("breakpoint");
-		break;
-
-	case t_hw:
-		bp->type = strdup("hw");
-		break;
-	}
-
+	bp->type = strdup(bpt->type);
 	bp->hits = bpt->times;
 
 	if ( bpt->file != NULL )
 		bp->loc.file = strdup(bpt->file);
 	if ( bpt->func != NULL )
 		bp->loc.func = strdup(bpt->func);
-	if ( bpt->addr != 0 )
-		asprintf(&bp->loc.addr, "%p", bpt->addr);
+	if ( bpt->address != NULL )
+		bp->loc.addr = strdup(bpt->address);
 	bp->loc.line = bpt->line;
 	
 	e = NewDbgEvent(DBGEV_BPSET);
@@ -674,7 +621,7 @@ SetAndCheckBreak(int bpid, char *where)
 	e->bp = bp;
 	SaveEvent(e);
 	
-	mi_free_bkpt(bpt);
+	DestroyList(bpts, MIBreakpointFree);
 
 	return DBGRES_OK;
 }
@@ -685,12 +632,11 @@ SetAndCheckBreak(int bpid, char *where)
 static int
 GDBMIDeleteBreakpoint(int bpid)
 {
-	int		lbpid;
-	char *	bpstr;
+	int			lbpid;
+	char *		bpstr;
+	MICommand *	cmd;
 	
 	CHECK_SESSION()
-
-	ResetError();
 
 	if ((lbpid = RemoteToLocalBP(bpid)) < 0) {
 		asprintf(&bpstr, "%d", bpid);
@@ -699,8 +645,12 @@ GDBMIDeleteBreakpoint(int bpid)
 		return DBGRES_ERR;
 	}
 	
-	if ( !gmi_break_delete(MIHandle, lbpid) ) {
+	cmd = MIBreakDelete(1, &lbpid);
+	SendCommandWait(DebugSession, cmd);
+	
+	if (!MICommandResultOK(cmd)) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
 
@@ -717,25 +667,27 @@ GDBMIDeleteBreakpoint(int bpid)
 static int
 GDBMIGo(void)
 {
-	int res;
-	
+	MICommand *	cmd;
+		
 	CHECK_SESSION()
 
-	ResetError();
-
 	if (Started)
-		res = gmi_exec_continue(MIHandle);
+		cmd = MIExecContinue();
 	else {
-		res = gmi_exec_run(MIHandle);
+		cmd = MIExecRun();
 		Started = 1;
 	}
-		
-	if ( !res )
-	{
+
+	SendCommandWait(DebugSession, cmd);
+	
+	if (!MICommandResultOK(cmd)) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
-
+		
+	MICommandFree(cmd);
+	
 	return DBGRES_OK;
 }
 
@@ -750,23 +702,21 @@ GDBMIGo(void)
 static int
 GDBMIStep(int count, int type)
 {
-	int		res = -1;
+	MICommand *	cmd;
 
 	CHECK_SESSION()
 
-	ResetError();
-
 	switch ( type ) {
 	case 0:
-		res = gmi_exec_step_cnt(MIHandle, count);
+		cmd = MIExecStep(count);
 		break;
 		
 	case 1:
-		res = gmi_exec_next_cnt(MIHandle, count);
+		cmd = MIExecNext(count);
 		break;
 		
 	case 2:
-		res = gmi_exec_finish(MIHandle);
+		cmd = MIExecFinish();
 		break;
 		
 	default:
@@ -774,11 +724,15 @@ GDBMIStep(int count, int type)
 		return DBGRES_ERR;
 	}
 
-	if ( !res )
-	{
+	SendCommandWait(DebugSession, cmd);
+	
+	if (!MICommandResultOK(cmd)) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
+		
+	MICommandFree(cmd);
 
 	return DBGRES_OK;
 }
@@ -789,15 +743,21 @@ GDBMIStep(int count, int type)
 static int
 GDBMITerminate(void)
 {
+	MICommand *	cmd;
+	
 	CHECK_SESSION()
 
-	ResetError();
-
-	if (!gmi_exec_kill(MIHandle))
-	{
+	cmd = MICommandNew("kill", MIResultRecordDONE);
+	
+	SendCommandWait(DebugSession, cmd);
+	
+	if (!MICommandResultOK(cmd)) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
+		
+	MICommandFree(cmd);
 
 	SaveEvent(NewDbgEvent(DBGEV_OK));
 	
@@ -810,25 +770,35 @@ GDBMITerminate(void)
 static int
 GDBMIInterrupt(void)
 {
+	MICommand *	cmd;
+	
 	CHECK_SESSION()
-
-	ResetError();
 
 	/*
 	 * Don't do anything if there's an event pending or the
 	 * target is not running.
-	 */
+	 *
 	if (LastEvent != NULL || !gmi_exec_interrupt(MIHandle))
-		return DBGRES_OK;
+		return DBGRES_OK;*/
 		
 	/*
 	 * Must check async here due to broken MI implementation. AsyncCallback will
 	 * be called inside gmi_exec_interrupt().
-	 */
+	 *
 	if (AsyncFunc != NULL) {
 		AsyncFunc(AsyncFuncData);
 		AsyncFunc = NULL;
-	}
+	}*/
+	
+	/*
+	 * Ignore error if target is not running
+	 */
+	
+	cmd = MIExecInterrupt();
+	
+	SendCommandWait(DebugSession, cmd);
+	
+	MICommandFree(cmd);
 	
 	return DBGRES_OK;
 }
@@ -839,15 +809,21 @@ GDBMIInterrupt(void)
 static int
 GDBMISetCurrentStackframe(int level)
 {
+	MICommand *	cmd;
+	
 	CHECK_SESSION()
 
-	ResetError();
-
-	if (!gmi_stack_select_frame(MIHandle, level))
-	{
+	cmd = MIStackSelectFrame(level);
+	
+	SendCommandWait(DebugSession, cmd);
+	
+	if (!MICommandResultOK(cmd)) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
+		
+	MICommandFree(cmd);
 
 	SaveEvent(NewDbgEvent(DBGEV_OK));
 	
@@ -857,15 +833,31 @@ GDBMISetCurrentStackframe(int level)
 static int
 GetStackframes(int current, List **flist)
 {
-	mi_frames *	frames;
-	mi_frames *	f;
+	List *		frames;
+	MIFrame *	f;
+	MICommand *	cmd;
 	stackframe *	s;
 	
 	if (current)
-		frames = gmi_stack_info_frame(MIHandle);
+		cmd = MICommandNew("frame", MIResultRecordDONE);
 	else
-		frames = gmi_stack_list_frames(MIHandle);
+		cmd = MIStackListAllFrames();
 		
+	SendCommandWait(DebugSession, cmd);
+	
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return DBGRES_ERR;
+	}
+	
+	if (current)
+		frames = MIGetFrameInfo(cmd);
+	else
+		frames = MIGetStackListFramesInfo(cmd);
+			
+	MICommandFree(cmd);
+	
 	if ( frames == NULL )
 	{
 		DbgSetError(DBGERR_DEBUGGER, "Failed to get stack frames from backend");
@@ -874,11 +866,11 @@ GetStackframes(int current, List **flist)
 	
 	*flist = NewList();
 
-	for (f = frames; f != NULL; f = f->next) {
+	for (SetList(frames); (f = (MIFrame *)GetListElement(frames)) != NULL; ) {
 		s = NewStackframe(f->level);
 
-		if ( f->addr != 0 )
-			asprintf(&s->loc.addr, "%p", f->addr);
+		if ( f->addr != NULL )
+			s->loc.addr = strdup(f->addr);
 		if ( f->func != NULL )
 			s->loc.func = strdup(f->func);
 		if ( f->file != NULL )
@@ -888,7 +880,7 @@ GetStackframes(int current, List **flist)
 		AddToList(*flist, (void *)s);
 	}
 
-	mi_free_frames(frames);
+	DestroyList(frames, MIFrameFree);
 	
 	return DBGRES_OK;
 }
@@ -904,8 +896,6 @@ GDBMIListStackframes(int current)
 	
 	CHECK_SESSION()
 
-	ResetError();
-
 	if (GetStackframes(current, &frames) != DBGRES_OK)
 		return DBGRES_ERR;
 	
@@ -916,6 +906,7 @@ GDBMIListStackframes(int current)
 	return DBGRES_OK;
 }
 
+#ifdef notdef
 struct mi_aif_struct
 {
 	char *fds;
@@ -970,12 +961,27 @@ gmi_aif_evaluate_expression(mi_h *h, char *exp)
 	mi_send(h, "-aif-evaluate-expression \"%s\"\n", exp);
 	return mi_res_aif(h);
 }
+#endif
 
 int
-gmi_dump_binary_value(mi_h *h, char *exp, char *file)
+DumpBinaryValue(MISession *sess, char *exp, char *file)
 {
-	mi_send(h, "dump binary value %s %s\n", file, exp);
-	return mi_res_simple_done(h);
+	MICommand *	cmd;
+	
+	cmd = MICommandNew("dump binary value", MIResultRecordDONE);
+	MICommandAddOption(cmd, file, exp);
+	
+	SendCommandWait(DebugSession, cmd);
+	
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return -1;
+	}
+		
+	MICommandFree(cmd);
+	
+	return 0;
 }
 
 /*
@@ -1000,13 +1006,8 @@ GDBMIEvaluateExpression(char *exp)
 			return DBGRES_ERR;
 		}
 	
-		ResetError();
-	
-		if ( !gmi_dump_binary_value(MIHandle, exp, tmp) )
-		{
-			DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		if ( DumpBinaryValue(DebugSession, exp, tmp) < 0 )
 			return DBGRES_ERR;
-		}
 	
 		res = GDBMIBuildAIFVar(exp, fds, tmp, &a);
 	
@@ -1019,23 +1020,10 @@ GDBMIEvaluateExpression(char *exp)
 	
 		free(fds);
 		(void)unlink(tmp);
-	} else {
-		mi_gvar * gvar = gmi_var_create(MIHandle, -1, exp);
-	
-		if ( gvar == NULL || !gmi_var_evaluate_expression(MIHandle, gvar) )
-		{
-			DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-			return DBGRES_ERR;
-		}
-	
-		e = NewDbgEvent(DBGEV_DATA);
-		e->data = StringToAIF(gvar->value);
-		e->type_desc = strdup(type);
-		SaveEvent(e);
-	}
-	
-	free(type);
-	
+		
+		free(type);
+	} 
+		
 	return res;
 }
 
@@ -1195,23 +1183,17 @@ SimpleTypeToFDS(char *type, str_ptr fds)
 }
 
 static int
-ConvertType(mi_gvar *gvar, str_ptr fds)
+ConvertType(MIVar *var, str_ptr fds)
 {
-	int		i;
-	int		num;
-	char *	s;
+	int			i;
+	int			num;
+	char *		s;
+	MIVar *		v;
+	MICommand *	cmd;
 	
-	ResetError();
-
-	if ( gvar->numchild == 0 )
+	if ( var->numchild == 0 )
 	{
-		if ( !gmi_var_info_type(MIHandle, gvar) )
-		{
-			DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-			return DBGRES_ERR;
-		}
-
-		if ( SimpleTypeToFDS(gvar->type, fds) < 0 )
+		if ( SimpleTypeToFDS(var->type, fds) < 0 )
 		{
 			DbgSetError(DBGERR_NOSYMS, "");
 			return DBGRES_ERR;
@@ -1219,21 +1201,29 @@ ConvertType(mi_gvar *gvar, str_ptr fds)
 	}
 	else
 	{
-		if ( !gmi_var_list_children(MIHandle, gvar) )
-		{
+		cmd = MIVarListChildren(var->name);
+	
+		SendCommandWait(DebugSession, cmd);
+		
+		if (!MICommandResultOK(cmd)) {
 			DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-			return DBGRES_ERR;
+			MICommandFree(cmd);
+			return -1;
 		}
+			
+		MIVarGetVarListChildrenInfo(var, cmd);
+		
+		MICommandFree(cmd);
 
-		switch ( gvar->type[strlen(gvar->type) - 1] )
+		switch ( var->type[strlen(var->type) - 1] )
 		{
 		case ']': /* array */
-			str_add(fds, "[r0..%dis4]", gvar->numchild-1);
+			str_add(fds, "[r0..%dis4]", var->numchild-1);
 
 			/*
 			** Just look at first child to determine type
 			*/
-			if ( ConvertType(gvar->child, fds) != DBGRES_OK ) {
+			if ( ConvertType(var->children[0], fds) != DBGRES_OK ) {
 				return DBGRES_ERR;
 			}
 
@@ -1241,48 +1231,45 @@ ConvertType(mi_gvar *gvar, str_ptr fds)
 
 		case '*': /* pointer */
 			str_add(fds, "^");
-			if (strncmp(gvar->type, "struct", 6) == 0) {
+			if (strncmp(var->type, "struct", 6) == 0) {
 				str_add(fds, "{|");
-				num = gvar->numchild;
-				gvar = gvar->child;
+				num = var->numchild;
 				for ( i = 0 ; i < num ; i++ )
 				{
+					v = var->children[i];
 					if (i > 0)
 						str_add(fds, ",");
-					if ((s = strrchr(gvar->name, '.')) != NULL)
+					if ((s = strrchr(v->name, '.')) != NULL)
 						str_add(fds, "%s=", ++s);
-					if ( ConvertType(gvar, fds) != DBGRES_OK ) {
+					if ( ConvertType(v, fds) != DBGRES_OK ) {
 						return DBGRES_ERR;
 					}
-					gvar = gvar->next;
 				}
 				str_add(fds, ";;;}");
 			} else {
-				gvar = gvar->child;
-				if ( ConvertType(gvar, fds) != DBGRES_OK ) {
+				if ( ConvertType(var->children[0], fds) != DBGRES_OK ) {
 					return DBGRES_ERR;
 				}
 			}
 			break;
 						
 		default:
-			if (strncmp(gvar->type, "struct", 6) == 0) { /* struct */
-				if (gvar->type[6] == ' ' && gvar->type[7] != '{')
-					str_add(fds, "{%s|", &gvar->type[7]);
+			if (strncmp(var->type, "struct", 6) == 0) { /* struct */
+				if (var->type[6] == ' ' && var->type[7] != '{')
+					str_add(fds, "{%s|", &var->type[7]);
 				else
 					str_add(fds, "{|");
-				num = gvar->numchild;
-				gvar = gvar->child;
+				num = var->numchild;
 				for ( i = 0 ; i < num ; i++ )
 				{
+					v = var->children[i];
 					if (i > 0)
 						str_add(fds, ",");
-					if ((s = strrchr(gvar->name, '.')) != NULL)
+					if ((s = strrchr(v->name, '.')) != NULL)
 						str_add(fds, "%s=", ++s);
-					if ( ConvertType(gvar, fds) != DBGRES_OK ) {
+					if ( ConvertType(v, fds) != DBGRES_OK ) {
 						return DBGRES_ERR;
 					}
-					gvar = gvar->next;
 				}
 				str_add(fds, ";;;}");
 			} else {
@@ -1349,19 +1336,24 @@ GDBMIGetAIFType(char *var)
 static int
 GetTypeInfo(char *var, char **type, char **fds_type)
 {
-	mi_gvar *	gvar;
+	MIVar *		mivar;
 	str_ptr		fds;
-
-	ResetError();
-
-	gvar = gmi_var_create(MIHandle, -1, var);
-
-	if ( gvar == NULL )
-	{
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-		return DBGRES_ERR;
-	}
+	MICommand *	cmd;
 	
+	cmd = MIVarCreate("-", "*", var);
+
+	SendCommandWait(DebugSession, cmd);
+	
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return -1;
+	}
+		
+	mivar = MIVarGetVarCreateInfo(cmd);
+	
+	MICommandFree(cmd);
+
 #if 0	// var create returns type already
 	if ( !gmi_var_info_type(MIHandle, gvar) )
 	{
@@ -1370,11 +1362,11 @@ GetTypeInfo(char *var, char **type, char **fds_type)
 	}
 #endif
 	
-	*type = strdup(gvar->type);
+	*type = strdup(mivar->type);
 
 	fds = str_init();
 
-	if ( ConvertType(gvar, fds) != DBGRES_OK ) {
+	if ( ConvertType(mivar, fds) != DBGRES_OK ) {
 		str_free(fds);
 		return DBGRES_ERR;
 	}
@@ -1382,7 +1374,13 @@ GetTypeInfo(char *var, char **type, char **fds_type)
 	*fds_type = strdup(str_val(fds));
 	str_free(fds);
 
-	mi_free_gvar(gvar);
+	cmd = MIVarDelete(mivar->name);
+	
+	SendCommandWait(DebugSession, cmd);
+	
+	MICommandFree(cmd);
+	
+	MIVarFree(mivar);
 
 	return DBGRES_OK;
 }
@@ -1394,52 +1392,34 @@ static int
 GDBMIGetLocalVariables(void)
 {
 	dbg_event *	e;
-	mi_results *	c;
-	mi_results *	r;
-	mi_results *	res;
+	MICommand *	cmd;
+	MIArg *		arg;
+	List *		args;
 
 	CHECK_SESSION()
 
-	ResetError();
+	cmd = MIStackListLocals(0);
 
-	res = gmi_stack_list_locals(MIHandle, 0);
-
-	if ( res == NULL )
-	{
+	SendCommandWait(DebugSession, cmd);
+	
+	if (!MICommandResultOK(cmd)) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
 
+	args = MIGetStackListLocalsInfo(cmd);
+	
+	MICommandFree(cmd);
+	
 	e = NewDbgEvent(DBGEV_VARS);
 	e->list = NewList();
 
-	/*
-	 * __APPLE__ returns a tuple of tuples: locals={{name="a"},{name="b"}}
-	 * Linux returns a list: locals=[name="a",name="b"]
-	 * 
-	 */
-	
-	/*
-	 * Get value of list or tuple
-	 */
-	r = res->v.rs;
-
-	while ( r != NULL )
-	{
-		if (r->type == t_tuple)
-			c = r->v.rs;
-		else
-			c = r;
-
-		if ( c->type == t_const && strcmp(c->var, "name") == 0 ) 
-		{
-			AddToList(e->list, strdup(c->v.cstr));
-		}
-		
-		r = r->next;
+	for (SetList(args); (arg = (MIArg *)GetListElement(args)) != NULL; ) {
+		AddToList(e->list, (void *)strdup(arg->name));
 	}
-
-	mi_free_results(res);
+	
+	DestroyList(args, MIArgFree);
 
 	SaveEvent(e);
 	
@@ -1453,50 +1433,42 @@ static int
 GDBMIListArguments(int level)
 {
 	dbg_event *	e;
-	mi_results *	c;
-	mi_results *	r;
-	mi_frames *	frames;
+	MICommand *	cmd;
+	MIArg *		arg;
+	MIFrame *	frame;
+	List *		frames;
 
 	CHECK_SESSION()
 
-	ResetError();
+	cmd = MIStackListArguments(0, level, level);
 
-	frames = gmi_stack_list_arguments_r(MIHandle, 0, level, level);
-
-	if ( frames == NULL )
-	{
+	SendCommandWait(DebugSession, cmd);
+	
+	if (!MICommandResultOK(cmd)) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
 		return DBGRES_ERR;
 	}
+
+	frames = MIGetStackListArgumentsInfo(cmd);
+	
+	MICommandFree(cmd);
 
 	e = NewDbgEvent(DBGEV_ARGS);
 	e->list = NewList();
 
 	/*
-	 * __APPLE__ returns a tuple of tuples: args={{name="argc"},{name="argv"}}
-	 * Linux returns a list: args=[name="argc",name="argv"]
-	 * 
-	 */
-	 
-	r = frames->args;
-
-	while ( r != NULL )
-	{
-		if (r->type == t_tuple)
-			c = r->v.rs;
-		else
-			c = r;
-		
-		if ( c->type == t_const && strcmp(c->var, "name") == 0 ) 
-		{
-			AddToList(e->list, strdup(c->v.cstr));
-		}
-		
-		r = r->next;
+ 	 * Just look at first frame - we should only get
+ 	 * one anyway...
+ 	 */ 
+	SetList(frames);
+	if ((frame = (MIFrame *)GetListElement(frames)) != NULL) {
+		for (SetList(frame->args); (arg = (MIArg *)GetListElement(frame->args)) != NULL; )
+			AddToList(e->list, (void *)strdup(arg->name));
 	}
-
-	mi_free_frames(frames);
-
+	
+	DestroyList(frames, MIFrameFree);
+	
 	SaveEvent(e);
 	
 	return DBGRES_OK;
@@ -1520,8 +1492,13 @@ GDBMIGetGlobalVariables(void)
 static int
 GDBMIQuit(void)
 {
-	if (MIHandle != NULL)
-		gmi_gdb_exit(MIHandle);
+	MICommand *	cmd;
+	
+	if (DebugSession != NULL) {
+		cmd = MIGDBExit();
+		SendCommandWait(DebugSession, cmd);
+		MICommandFree(cmd);
+	}
 		
 	SaveEvent(NewDbgEvent(DBGEV_OK));
 	ServerExit++;
