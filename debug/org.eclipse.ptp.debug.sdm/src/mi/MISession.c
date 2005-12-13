@@ -35,6 +35,7 @@
 #include "MIOOBRecord.h"
 #include "MIValue.h"
 #include "MIResult.h"
+#define DEBUG
 
 static List *			MISessionList = NULL;
 static struct timeval		MISessionSelectTimeout = {0, 1000};

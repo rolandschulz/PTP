@@ -80,6 +80,7 @@ MIBreakpointParse(MIValue *tuple)
 		if (strcmp(var, "number") == 0) {
 			bp->number = atoi(str);
 		} else if (strcmp(var, "type") == 0) {
+			bp->type = strdup(str);
 			//type="hw watchpoint"
 			if (strncmp(str, "hw", 2) == 0) {
 				bp->isHdw = 1;
