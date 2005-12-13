@@ -9,3 +9,4 @@ libtool
 stamp-h1
 *.la
 config.h
+*.a
