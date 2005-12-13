@@ -21,6 +21,7 @@ MIValueNew(void)
 	MIValue *	val;
 	
 	val = (MIValue *)malloc(sizeof(MIValue));
+	val->type = MIValueTypeInvalid;
 	val->cstring = NULL;
 	val->values = NULL;
 	val->results = NULL;

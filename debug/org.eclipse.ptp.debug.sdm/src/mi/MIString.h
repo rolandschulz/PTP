@@ -3,9 +3,7 @@
 #include <stdarg.h>
 
 struct MIString {
-	int     blen;
 	int     slen;
-	int     end;
 	char *  buf;
 };
 typedef struct MIString MIString;
