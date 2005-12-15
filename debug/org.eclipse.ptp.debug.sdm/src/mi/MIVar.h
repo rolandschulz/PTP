@@ -34,6 +34,6 @@ extern void MIVarFree(MIVar *var);
 extern MIVar *MIVarParse(List *results);
 extern MIVar *MIVarGetVarCreateInfo(MICommand *cmd);
 extern void MIVarGetVarListChildrenInfo(MIVar *var, MICommand *cmd);
-#endif _MIVAR_H_
+#endif /* _MIVAR_H_ */
 
 

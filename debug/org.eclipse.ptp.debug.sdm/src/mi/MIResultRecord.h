@@ -34,4 +34,4 @@ typedef struct MIResultRecord MIResultRecord;
 extern MIResultRecord *MIResultRecordNew(void);
 extern MIString *MIResultRecordToString(MIResultRecord *rr);
 extern void MIResultRecordFree(MIResultRecord *rr);
-#endif _MIRESULTRECORD_H_
+#endif /* _MIRESULTRECORD_H_ */

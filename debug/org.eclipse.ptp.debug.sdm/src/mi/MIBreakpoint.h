@@ -79,5 +79,5 @@ extern MIBreakpoint *MIBreakpointNew(void);
 extern void MIBreakpointFree(MIBreakpoint *bp);
 extern MIBreakpoint *MIBreakpointParse(MIValue *tuple);
 extern List *MIBreakpointGetBreakInsertInfo(MICommand *cmd);
-#endif _MIBREAKPOINT_H_
+#endif /* _MIBREAKPOINT_H_ */
 

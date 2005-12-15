@@ -13,4 +13,4 @@ extern void MIStringFree(MIString *str);
 extern void MIStringAppend(MIString *str, MIString *str2);
 extern char *MIStringToCString(MIString *str);
 extern char *MIIntToCString(int val);
-#endif _MISTRING_H_
+#endif /* _MISTRING_H_ */

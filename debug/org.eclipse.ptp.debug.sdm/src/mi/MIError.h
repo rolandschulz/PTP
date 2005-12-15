@@ -25,6 +25,6 @@
 extern void MISetError(int errnum, char *msg);
 extern int MIGetError(void);
 extern char *MIGetErrorStr(void);
-#endif _MIERROR_H_
+#endif /* _MIERROR_H_ */
 
 

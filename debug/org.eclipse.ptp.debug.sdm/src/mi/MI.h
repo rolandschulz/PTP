@@ -29,6 +29,4 @@
 #include "MIArg.h"
 #include "MIError.h"
 
-#endif _MI_H_
-
-
+#endif /* _MI_H_ */

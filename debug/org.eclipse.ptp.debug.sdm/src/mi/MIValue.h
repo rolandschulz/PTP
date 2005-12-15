@@ -38,4 +38,4 @@ extern MIString *MIListToString(MIValue *);
 extern MIString *MITupleToString(MIValue *);
 extern MIString *MIValueToString(MIValue *);
 extern void MIValueFree(MIValue *v);
-#endif _MIVALUE_H_
+#endif /* _MIVALUE_H_ */
