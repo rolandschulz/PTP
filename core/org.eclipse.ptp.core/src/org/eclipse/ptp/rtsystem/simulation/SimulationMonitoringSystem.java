@@ -113,16 +113,16 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 			}
 			int nstart = ((int) (Math.random() * 50));
 			int nlen = ((int) (Math.random() * 40 + 10));
-			String nmode = new String(((int) (Math.random() * 2)) == 0 ? "0111"
-					: "0100");
+			String nmode = new String(((int) (Math.random() * 2)) == 0 ? "73"
+					: "64");
 			int gstart = ((int) (Math.random() * 50 + (nstart + nlen)));
 			int glen = ((int) (Math.random() * 100 + 40));
-			String gmode = new String(((int) (Math.random() * 2)) == 0 ? "0111"
-					: "0100");
+			String gmode = new String(((int) (Math.random() * 2)) == 0 ? "73"
+					: "64");
 			int cstart = ((int) (Math.random() * 50 + (nstart + nlen + gstart + glen)));
 			int clen = ((int) (Math.random() * 75 + 25));
-			String cmode = new String(((int) (Math.random() * 2)) == 0 ? "0111"
-					: "0100");
+			String cmode = new String(((int) (Math.random() * 2)) == 0 ? "73"
+					: "64");
 			for (int i = 0; i < numNodes[3]; i++) {
 				String s = new String("machine3_node" + i);
 				if (i >= nstart && i <= (nstart + nlen)) {

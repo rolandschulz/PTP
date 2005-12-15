@@ -137,15 +137,15 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 					return (node.isAllStop() ? IPTPUIConstants.NODE_EXITED : IPTPUIConstants.NODE_RUNNING);
 				if (node.getAttrib(AttributeConstants.ATTRIB_NODE_USER).equals(System.getProperty("user.name"))) {
 					String mode = (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_MODE);
-					if (mode.equals("0100"))
+					if (mode.equals("64"))
 						return IPTPUIConstants.NODE_USER_ALLOC_EXCL;
-					else if (mode.equals("0110") || mode.equals("0111") || mode.equals("0101"))
+					else if (mode.equals("72") || mode.equals("73") || mode.equals("65"))
 						return IPTPUIConstants.NODE_USER_ALLOC_SHARED;
 				} else if (!node.getAttrib(AttributeConstants.ATTRIB_NODE_USER).equals("")) {
 					String mode = (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_MODE);
-					if (mode.equals("0100"))
+					if (mode.equals("64"))
 						return IPTPUIConstants.NODE_OTHER_ALLOC_EXCL;
-					else if (mode.equals("0110") || mode.equals("0111") || mode.equals("0101"))
+					else if (mode.equals("72") || mode.equals("73") || mode.equals("65"))
 						return IPTPUIConstants.NODE_OTHER_ALLOC_SHARED;
 				}
 				return IPTPUIConstants.NODE_UP;
