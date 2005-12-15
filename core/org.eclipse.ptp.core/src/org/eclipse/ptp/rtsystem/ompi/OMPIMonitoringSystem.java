@@ -170,7 +170,7 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
 	}
 
     public synchronized void handleEvent(IProxyRuntimeEvent e) {
-        System.out.println("OMPIMonitoringSystem got event: " + e.toString());
+        //System.out.println("OMPIMonitoringSystem got event: " + e.toString());
         if(e instanceof ProxyRuntimeNodeChangeEvent) {
         		RuntimeEvent re = new RuntimeEvent(RuntimeEvent.EVENT_NODE_GENERAL_CHANGE);
         		String key = ((ProxyRuntimeNodeChangeEvent)e).getKey();
@@ -193,11 +193,21 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
         		public static final String ATTRIB_NODE_MODE = "ATTRIB_NODE_MODE";
         		*/
         		
+        		String valid_key = null;
+        		if(key.equals("orte-node-bproc-user")) valid_key = AttributeConstants.ATTRIB_NODE_USER;
+        		else if(key.equals("orte-node-bproc-mode")) valid_key = AttributeConstants.ATTRIB_NODE_MODE;
+        		else if(key.equals("orte-node-bproc-group")) valid_key = AttributeConstants.ATTRIB_NODE_GROUP;
+        		else if(key.equals("orte-node-bproc-status")) valid_key = AttributeConstants.ATTRIB_NODE_STATE;
         		
-        		re.setText(key);
-        		re.setAltText(val);
+        		if(valid_key != null) {
+        			re.setText(valid_key);
+        			re.setAltText(val);
         		
-        		fireEvent("machine"+machID+"_node"+nodeID, re);
+        			fireEvent("machine"+machID+"_node"+nodeID, re);
+        		}
+        		else {
+        			System.out.println("UNKNOWN KEY '"+key+"', value '"+val+"' - IGNORING.");
+        		}
         }
     }
     

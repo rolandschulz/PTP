@@ -49,6 +49,6 @@ public class ProxyRuntimeNodeChangeEvent extends AbstractProxyRuntimeEvent imple
 	public String getValue() { return this.val; }
 	
 	public String toString() {
-		return "EVENT_RUNTIME_NODECHANGE (machID="+this.machID+", nodeIE="+this.nodeID+") key='"+this.key+"' val='"+this.val+"'";
+		return "EVENT_RUNTIME_NODECHANGE (machID="+this.machID+", nodeID="+this.nodeID+") key='"+this.key+"' val='"+this.val+"'";
 	}
 }
