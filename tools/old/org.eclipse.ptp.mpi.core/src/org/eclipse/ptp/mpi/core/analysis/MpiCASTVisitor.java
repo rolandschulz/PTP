@@ -31,6 +31,8 @@ import org.eclipse.ptp.mpi.core.ScanReturn;
  */
 public class MpiCASTVisitor extends CASTVisitor
 {
+	private static final String MPI_PREFIX = "MPI_";
+	
     /**
      * 
      */
@@ -69,7 +71,7 @@ public class MpiCASTVisitor extends CASTVisitor
             IASTExpression astExpr = ((IASTFunctionCallExpression) expression).getFunctionNameExpression();
             String signature = astExpr.getRawSignature();
             System.out.println("func signature=" + signature);
-            if (signature.startsWith("MPI_")) {
+            if (signature.startsWith(MPI_PREFIX)) {
                 if (astExpr instanceof IASTIdExpression) {
                     IASTName funcName = ((IASTIdExpression) astExpr).getName();
                     generalMpiVisitorBehavior.processFuncName(funcName, astExpr);

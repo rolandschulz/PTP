@@ -35,6 +35,9 @@ import org.eclipse.ptp.mpi.core.ScanReturn;
  */
 public class MpiCPPASTVisitor extends CPPASTVisitor
 {
+	private static final String MPI_PREFIX = "MPI_";
+	private static final String MPICPP_PREFIX = "MPI::";
+	
     /**
      * 
      */
@@ -93,7 +96,7 @@ public class MpiCPPASTVisitor extends CPPASTVisitor
             IASTExpression astExpr = ((IASTFunctionCallExpression) expression).getFunctionNameExpression();
             String signature = astExpr.getRawSignature();
             System.out.println("func signature=" + signature);
-            if (usingNamespaceMPI || signature.startsWith("MPI_") || signature.startsWith("MPI::")) {
+            if (usingNamespaceMPI || signature.startsWith(MPI_PREFIX) || signature.startsWith(MPICPP_PREFIX)) {
                 IASTName funcName = null;
                 if (astExpr instanceof CPPASTFieldReference) {
                     // This is method call through C++ member functions (e.g. MPI::COMM_WORLD.Get_size)
