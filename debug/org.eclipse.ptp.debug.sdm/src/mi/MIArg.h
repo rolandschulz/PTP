@@ -29,6 +29,4 @@ extern void MIArgFree(MIArg *arg);
 extern List *MIArgsParse(MIValue *miValue);
 extern MIArg *MIArgParse(MIValue *tuple);
 extern MIString *MIArgToString(MIArg *arg);
-#endif _MIARG_H_
-
-
+#endif /* _MIARG_H_ */

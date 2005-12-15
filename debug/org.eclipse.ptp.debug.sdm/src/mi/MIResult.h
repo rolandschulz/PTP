@@ -25,4 +25,4 @@ typedef struct MIResult MIResult;
 extern MIResult *MIResultNew(void);
 extern MIString *MIResultToString(MIResult *r);
 extern void MIResultFree(MIResult *r);
-#endif _MIRESULT_H_
+#endif /* _MIRESULT_H_ */

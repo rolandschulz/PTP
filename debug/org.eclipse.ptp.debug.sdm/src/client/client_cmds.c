@@ -106,7 +106,6 @@ int
 DbgClntCreateSession(int num, char *host, int port)
 {
 	int			res;
-	dbg_event *	e;
 	
 	if (host != NULL)
 		res = proxy_svr_connect(dbg_proxy, host, port);
@@ -115,11 +114,6 @@ DbgClntCreateSession(int num, char *host, int port)
 	
 	if (res == PROXY_RES_ERR)
 		return DBGRES_ERR;
-	
-	//e = NewDbgEvent(DBGEV_INIT);
-	//e->num_servers = num;
-	
-	//dbg_clnt_cmd_completed(e, NULL);
 	
 	return DBGRES_OK;
 }

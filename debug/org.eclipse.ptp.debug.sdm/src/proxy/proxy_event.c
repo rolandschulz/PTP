@@ -16,6 +16,9 @@
  * 
  * LA-CC 04-115
  ******************************************************************************/
+#ifdef __gnu_linux__
+#define _GNU_SOURCE
+#endif /* __gnu_linux__ */
 
 #include <string.h>
 #include <stdlib.h>
@@ -26,6 +29,10 @@
 #include "proxy_event.h"
 #include "args.h"
 #include "list.h"
+
+#ifdef __linux__
+extern int digittoint(int c);
+#endif /* __linux__ */
 
 static char tohex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 

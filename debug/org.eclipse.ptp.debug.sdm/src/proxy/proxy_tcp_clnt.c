@@ -25,7 +25,7 @@
  
 #ifdef __gnu_linux__
 #define _GNU_SOURCE
-#endif
+#endif /* __gnu_linux__ */
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -38,6 +38,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #include "compat.h"
 #include "proxy.h"

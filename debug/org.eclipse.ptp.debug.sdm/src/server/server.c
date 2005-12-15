@@ -10,6 +10,10 @@
  * task ids.
  */
 
+#ifdef __gnu_linux__
+#define _GNU_SOURCE
+#endif /* __gnu_linux__ */
+
 #include <mpi.h>
 #include <stdlib.h>
 #include <string.h>

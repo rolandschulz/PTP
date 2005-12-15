@@ -61,6 +61,6 @@ typedef struct MIEvent	MIEvent;
 extern MIEvent *MIEventNew(int, int);
 extern void MIEventFree(MIEvent *var);
 extern MIEvent *MIEventCreateStoppedEvent(char *reason, List *results);
-#endif _MIEVENT_H_
+#endif /* _MIEVENT_H_ */
 
 

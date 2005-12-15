@@ -27,4 +27,4 @@ typedef struct MIOutput MIOutput;
 extern MIOutput *MIOutputNew(void);
 extern MIOutput *MIParse(char *buffer);
 extern void MIOutputFree(MIOutput *op);
-#endif _MIOUTPUT_H_
+#endif /* _MIOUTPUT_H_ */

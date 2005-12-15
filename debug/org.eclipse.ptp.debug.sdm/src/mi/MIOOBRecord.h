@@ -8,7 +8,8 @@
  * Contributors:
  *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
-
+#ifndef _MIOOBRECORD_H_
+#define _MIOOBRECORD_H_
 #include "list.h"
 
 #define MIOOBRecordTypeAsync	1
@@ -42,3 +43,4 @@ extern MIOOBRecord *NewMIConsoleStreamOutput(void);
 extern MIOOBRecord *NewMITargetStreamOutput(void);
 extern MIOOBRecord *NewMILogStreamOutput(void);
 extern void MIOOBRecordFree(MIOOBRecord *);
+#endif /* _MIOOBRECORD_H_ */
