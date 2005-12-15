@@ -141,7 +141,7 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 				} else {
 					nodeUserMap.put(s, new String(""));
 					nodeGroupMap.put(s, new String(""));
-					nodeModeMap.put(s, new String("0111"));
+					nodeModeMap.put(s, new String("73"));
 				}
 			}
 		}
@@ -152,7 +152,7 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 				nodeStateMap.put(s, new String("up"));
 				nodeUserMap.put(s, new String(System.getProperty("user.name")));
 				nodeGroupMap.put(s, new String("ptp"));
-				nodeModeMap.put(s, new String("0100"));
+				nodeModeMap.put(s, new String("64"));
 			}
 		}
 
@@ -164,19 +164,19 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 					nodeUserMap.put(s, new String(System
 							.getProperty("user.name")));
 					nodeGroupMap.put(s, new String("ptp"));
-					nodeModeMap.put(s, new String("0100"));
+					nodeModeMap.put(s, new String("64"));
 				} else if (i < 64) {
 					nodeUserMap.put(s, new String(""));
 					nodeGroupMap.put(s, new String(""));
-					nodeModeMap.put(s, new String("0111"));
+					nodeModeMap.put(s, new String("73"));
 				} else if (i < 128) {
 					nodeUserMap.put(s, new String("wjones"));
 					nodeGroupMap.put(s, new String("parl"));
-					nodeModeMap.put(s, new String("0100"));
+					nodeModeMap.put(s, new String("64"));
 				} else {
 					nodeUserMap.put(s, new String("jsmith"));
 					nodeGroupMap.put(s, new String("awhere"));
-					nodeModeMap.put(s, new String("0111"));
+					nodeModeMap.put(s, new String("73"));
 				}
 			}
 		}
@@ -198,7 +198,7 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 					nodeUserMap.put(s, new String(System
 							.getProperty("user.name")));
 					nodeGroupMap.put(s, new String("ptp"));
-					nodeModeMap.put(s, new String("0100"));
+					nodeModeMap.put(s, new String("64"));
 				}
 			}
 		}
@@ -209,7 +209,7 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 				nodeStateMap.put(s, new String("up"));
 				nodeUserMap.put(s, new String(System.getProperty("user.name")));
 				nodeGroupMap.put(s, new String("ptp"));
-				nodeModeMap.put(s, new String("0100"));
+				nodeModeMap.put(s, new String("64"));
 			}
 		}
 	}
