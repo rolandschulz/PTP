@@ -714,35 +714,32 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		
 		job = new PJob(universe, jobName, "" + (PJob.BASE_OFFSET + jobID) + "", jobID);
 		
+		if (debug)
+			job.setDebug();
+		
+		universe.addChild(job);
+		
+		/* we know that we succeeded, so we can create this many procs in the job.  we just
+		 * need to run getProcsStatusForNewJob() to fill in the status later
+		 */
+		for (int i = 0; i < numProcesses; i++) {		
+			IPProcess proc;
+			// System.out.println("process name = "+ne[j]);
+			
+			proc = new PProcess(job, jobName+"_process"+i, "" + i + "", "0", i, IPProcess.STARTING, "", "");
+			job.addChild(proc);
+		}	
+		
+		try {
+			getProcsStatusForNewJob(jobName, job, null);
+		} catch(InterruptedException e2) {
+			universe.deleteJob(job);
+			System.err.println("TODO: MM.newJob() we need to throw a CoreException CANCEL_STATUS here somehow.");
+			//throw new CoreException(Status.CANCEL_STATUS);
+		}
+		
+		fireState(STATE_RUN, jobName);
+		
 		return job;
-//		
-//		
-//		if (debug)
-//			job.setDebug();
-//		
-//		universe.addChild(job);
-//		
-//		/* we know that we succeeded, so we can create this many procs in the job.  we just
-//		 * need to run getProcsStatusForNewJob() to fill in the status later
-//		 */
-//		for (int i = 0; i < numProcesses; i++) {		
-//			IPProcess proc;
-//			// System.out.println("process name = "+ne[j]);
-//			
-//			proc = new PProcess(job, jobName+"_process"+i, "" + i + "", "0", i, IPProcess.STARTING, "", "");
-//			job.addChild(proc);
-//		}	
-//		
-//		try {
-//			getProcsStatusForNewJob(jobName, job, null);
-//		} catch(InterruptedException e2) {
-//			universe.deleteJob(job);
-//			System.err.println("TODO: MM.newJob() we need to throw a CoreException CANCEL_STATUS here somehow.");
-//			//throw new CoreException(Status.CANCEL_STATUS);
-//		}
-//		
-//		fireState(STATE_RUN, jobName);
-//		
-//		return job;
 	}
 }

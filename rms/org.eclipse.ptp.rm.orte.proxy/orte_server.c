@@ -891,8 +891,6 @@ ORTERun(char **args)
 	strncpy(pgm_name, c + 1, strlen(c));
 	strncpy(cwd, exec_path, c - exec_path + 1);
 	cwd[c-exec_path+1] = '\0';
-printf("A\n");
-
 
 	/* hard coded test for spawning just 1 job (JOB not PROCESSES!) */
 	num_apps = 1;
@@ -927,7 +925,6 @@ printf("A\n");
 	else
 		rc = debug_spawn(debug_exec_path, debug_argc, debug_args, apps, num_apps, &jobid);
 
-//jobid = 2;
 	printf("SPAWNED [error code %d = '%s'], now unlocking\n", rc, ORTE_ERROR_NAME(rc)); fflush(stdout);
 	
 	if(ORTECheckErrorCode(RTEV_ERROR_ORTE_RUN, rc)) return 1;
@@ -938,7 +935,10 @@ printf("A\n");
 	printf("res = '%s'\n", res); fflush(stdout);
 	proxy_svr_event_callback(orte_proxy, res);
 
+	printf("A!\n"); fflush(stdout);
 	if(res) free(res);
+	
+	printf("B!\n"); fflush(stdout);
 	if(debug_args) free(debug_args);
 	
 //	/* generate an event stating what the new/assigned job ID is.
@@ -985,6 +985,8 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 	int			rc;
 	orte_process_name_t* name;
 			
+		printf("JOB STATE CALLBACK!\n"); fflush(stdout);
+		
 			#if 0
 	/* not sure yet how we want to handle this callback, what events
 	 * we want to generate, but here are the states that I know of
