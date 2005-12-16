@@ -19,6 +19,7 @@
    </license>
 
    <url>
+      <update label="%updateSiteName" url="http://download.eclipse.org/technology/ptp/update-site/"/>
       <discovery label="%updateSiteName" url="http://update.eclipse.org/technology/ptp/releases"/>
    </url>
 
