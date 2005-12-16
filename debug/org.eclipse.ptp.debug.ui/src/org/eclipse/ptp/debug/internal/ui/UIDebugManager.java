@@ -25,10 +25,6 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
-import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
-import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocationBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IWorkspaceRunnable;
@@ -53,6 +49,10 @@ import org.eclipse.ptp.debug.core.ProcessInputStream;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocationBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 import org.eclipse.ptp.debug.core.launch.IPLaunchEvent;
 import org.eclipse.ptp.debug.core.launch.IPLaunchListener;
 import org.eclipse.ptp.debug.core.launch.PDebugTargetRegisterEvent;
@@ -87,7 +87,7 @@ import org.eclipse.ptp.ui.model.IElementSet;
  * @author clement chu
  * 
  */
-public class UIDebugManager extends JobManager implements ISetListener, IBreakpointListener, ICDIEventListener, IPLaunchListener {
+public class UIDebugManager extends JobManager implements ISetListener, IBreakpointListener, IPCDIEventListener, IPLaunchListener {
 	private final static int REG_TYPE = 1;
 	private final static int UNREG_TYPE = 2;
 	private List regListeners = new ArrayList();
@@ -436,7 +436,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	/***************************************************************************************************************************************************************************************************
 	 * Event
 	 **************************************************************************************************************************************************************************************************/
-	public void handleDebugEvents(final ICDIEvent[] events) {
+	public void handleDebugEvents(final IPCDIEvent[] events) {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				new Job("Update Events") {
@@ -453,10 +453,10 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			PTPDebugUIPlugin.log(e);
 		}
 	}
-	private synchronized void handleDebugEvents(ICDIEvent[] events, IProgressMonitor monitor) {
+	private synchronized void handleDebugEvents(IPCDIEvent[] events, IProgressMonitor monitor) {
 		for (int i = 0; i < events.length; i++) {
 			Object condition = null;
-			IPCDIEvent event = (IPCDIEvent) events[i];
+			IPCDIEvent event = events[i];
 			System.out.println("===================== event: " + event);
 			// all events must be running under a job
 			IPJob job = event.getDebugJob();
@@ -486,9 +486,9 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			*/
 			if (event instanceof BreakpointHitEvent) {
 				BreakpointHitEvent bptHitEvent = (BreakpointHitEvent) event;
-				ICDIBreakpoint bpt = ((BreakpointHitInfo) bptHitEvent.getReason()).getBreakpoint();
-				if (bpt instanceof ICDILocationBreakpoint) {
-					ICDILocator locator = ((ICDILocationBreakpoint) bpt).getLocator();
+				IPCDIBreakpoint bpt = ((BreakpointHitInfo) bptHitEvent.getReason()).getBreakpoint();
+				if (bpt instanceof IPCDILocationBreakpoint) {
+					IPCDILocator locator = ((IPCDILocationBreakpoint) bpt).getLocator();
 					int lineNumber = locator.getLineNumber();
 					if (lineNumber == 0)
 						lineNumber = 1;
