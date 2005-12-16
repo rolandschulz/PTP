@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.mpi"
       label="%featureName"
-      version="0.1.5"
+      version="1.0.0"
       provider-name="%providerName">
 
    <description>
@@ -18,7 +18,7 @@
    </license>
 
    <url>
-      <discovery label="%updateSiteName" url="http://update.eclipse.org/technology/ptp/releases"/>
+      <update label="%updateSiteName" url="http://download.eclipse.org/technology/ptp/update-site/"/>
    </url>
 
    <requires>
@@ -50,12 +50,12 @@
          id="org.eclipse.ptp.mpi.help"
          download-size="0"
          install-size="0"
-         version="0.1.5"/>
+         version="1.0.0"/>
 
    <plugin
          id="org.eclipse.ptp.mpi.core"
          download-size="0"
          install-size="0"
-         version="0.1.5"/>
+         version="1.0.0"/>
 
 </feature>
