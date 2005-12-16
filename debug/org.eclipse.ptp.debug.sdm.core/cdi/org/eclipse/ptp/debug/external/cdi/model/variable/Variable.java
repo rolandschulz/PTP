@@ -31,7 +31,6 @@ import org.eclipse.ptp.debug.external.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
-import org.eclipse.ptp.debug.external.cdi.model.type.Value;
 import org.eclipse.ptp.debug.external.commands.GetAIFCommand;
 import org.eclipse.ptp.debug.external.commands.ListLocalVariablesCommand;
 
@@ -40,7 +39,6 @@ import org.eclipse.ptp.debug.external.commands.ListLocalVariablesCommand;
  * 
  */
 public abstract class Variable extends VariableDescriptor implements IPCDIVariable {
-	Value value;
 	public IPCDIVariable[] children = new IPCDIVariable[0];
 	String editable = null;
 	String language;

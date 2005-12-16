@@ -21,16 +21,16 @@ package org.eclipse.ptp.debug.external.simulator;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
@@ -96,9 +96,9 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 		for (int i = 0; i < processes.length; i++) {
 			// ICDITarget target = procList[i].getTarget();
 			int taskId = processes[i].getTaskId();
-			ICDITarget target = getSession().getTarget(taskId);
+			IPCDITarget target = getSession().getTarget(taskId);
 			SimThread simThread = ((SimProcess) processes[i]).getThread(0);
-			ICDIThread thread = new Thread((Target) target, simThread.getThreadId());
+			IPCDIThread thread = new Thread((Target) target, simThread.getThreadId());
 			SimStackFrame[] simFrames = simThread.getStackFrames();
 			for (int j = 0; j < simFrames.length; j++) {
 				int level = simFrames[j].getLevel();
@@ -113,7 +113,7 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 		//return (ICDIStackFrame[]) list.toArray(new ICDIStackFrame[0]);
 		throw new PCDIException("Need reimplemented again");
 	}
-	public void setCurrentStackFrame(BitList tasks, ICDIStackFrame frame) throws PCDIException {
+	public void setCurrentStackFrame(BitList tasks, IPCDIStackFrame frame) throws PCDIException {
 		throw new PCDIException("not implemented yet");
 	}
 	public void evaluateExpression(BitList tasks, String expr) throws PCDIException {
@@ -172,15 +172,15 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 		//return retVal;
 		throw new PCDIException("Need reimplemented again");
 	}
-	public void listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException {
+	public void listArguments(BitList tasks, IPCDIStackFrame frame) throws PCDIException {
 		ArrayList list = new ArrayList();
 		IPProcess[] processes = getProcesses(tasks);
 		for (int i = 0; i < processes.length; i++) {
 			// ICDITarget target = procList[i].getTarget();
 			int taskId = processes[i].getTaskId();
-			ICDITarget target = getSession().getTarget(taskId);
+			IPCDITarget target = getSession().getTarget(taskId);
 			SimThread simThread = ((SimProcess) processes[i]).getThread(0);
-			ICDIThread thread = new Thread((Target) target, simThread.getThreadId());
+			IPCDIThread thread = new Thread((Target) target, simThread.getThreadId());
 			SimStackFrame[] simFrames = simThread.getStackFrames();
 			for (int j = 0; j < simFrames.length; j++) {
 				int level = simFrames[j].getLevel();
@@ -202,15 +202,15 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 		//return (ICDIArgument[]) list.toArray(new ICDIArgument[0]);
 		throw new PCDIException("Need reimplemented again");
 	}
-	public void listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException {
+	public void listLocalVariables(BitList tasks, IPCDIStackFrame frame) throws PCDIException {
 		ArrayList list = new ArrayList();
 		IPProcess[] processes = getProcesses(tasks);
 		for (int i = 0; i < processes.length; i++) {
 			// ICDITarget target = procList[i].getTarget();
 			int taskId = processes[i].getTaskId();
-			ICDITarget target = getSession().getTarget(taskId);
+			IPCDITarget target = getSession().getTarget(taskId);
 			SimThread simThread = ((SimProcess) processes[i]).getThread(0);
-			ICDIThread thread = new Thread((Target) target, simThread.getThreadId());
+			IPCDIThread thread = new Thread((Target) target, simThread.getThreadId());
 			SimStackFrame[] simFrames = simThread.getStackFrames();
 			for (int j = 0; j < simFrames.length; j++) {
 				int level = simFrames[j].getLevel();
@@ -294,7 +294,7 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 	public void restart() throws PCDIException {
 	// TODO Auto-generated method stub
 	}
-	public void setLineBreakpoint(BitList tasks, ICDILineBreakpoint bpt) throws PCDIException {
+	public void setLineBreakpoint(BitList tasks, IPCDILineBreakpoint bpt) throws PCDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 		int line = ((LineBreakpoint) bpt).getLineNumber();
 		IPProcess[] processes = getProcesses(tasks);
@@ -306,10 +306,10 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 		// ((SimProcess) ((DebugProcess)
 		// getProcess(0)).getPProcess()).getThread(0).addBreakpoint(line);
 	}
-	public void setFunctionBreakpoint(BitList tasks, ICDIFunctionBreakpoint bpt) throws PCDIException {
+	public void setFunctionBreakpoint(BitList tasks, IPCDIFunctionBreakpoint bpt) throws PCDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
-	public void deleteBreakpoints(ICDIBreakpoint[] bp) throws PCDIException {
+	public void deleteBreakpoints(IPCDIBreakpoint[] bp) throws PCDIException {
 	// TODO Auto-generated method stub
 	}
 	// FIXME: from clement....each time only one process??

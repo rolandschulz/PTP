@@ -26,19 +26,19 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.aif.AIF;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariable;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
@@ -63,7 +63,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	private InternalEventQueue intQueue = null;
 	private Map variables = new HashMap();
 	private Map arguments = new HashMap();
-	private ICDIStackFrame current_frame = null;
+	private IPCDIStackFrame current_frame = null;
 
 	public DebugSimulation2() {
 		intQueue = new InternalEventQueue(TIME_RANGE);
@@ -144,7 +144,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	public void run(String[] args) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "run");
 	}
-	public void deleteBreakpoints(ICDIBreakpoint[] bp) throws PCDIException {
+	public void deleteBreakpoints(IPCDIBreakpoint[] bp) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "deleteBreakpoints");
 	}	
 	/***************************************************************************************************************************************************************************************************
@@ -234,7 +234,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 			}
 		}).start();
 	}	
-	public void setLineBreakpoint(final BitList tasks, final ICDILineBreakpoint bpt) throws PCDIException {
+	public void setLineBreakpoint(final BitList tasks, final IPCDILineBreakpoint bpt) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
 				int line = bpt.getLocator().getLineNumber();
@@ -247,7 +247,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		}).start();
 	}
 	//current support main function breakpoint only
-	public void setFunctionBreakpoint(final BitList tasks, final ICDIFunctionBreakpoint bpt) throws PCDIException {
+	public void setFunctionBreakpoint(final BitList tasks, final IPCDIFunctionBreakpoint bpt) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
 				int[] taskArray = tasks.toArray();
@@ -265,19 +265,19 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				int[] taskArray = tasks.toArray();
 				List frameList = new ArrayList();
 				for (int i=0; i<taskArray.length; i++) {
-					ICDITarget target = getSession().getTarget(taskArray[i]);
-				    ICDIThread thread = new org.eclipse.ptp.debug.external.cdi.model.Thread((Target) target, 0);
+					IPCDITarget target = getSession().getTarget(taskArray[i]);
+				    IPCDIThread thread = new org.eclipse.ptp.debug.external.cdi.model.Thread((Target) target, 0);
 				    SimulateFrame[] frames = getSimProg(taskArray[i]).getSimStackFrames();
 				    for (int j=0; j<frames.length; j++) {
 				    	frameList.add(new StackFrame((org.eclipse.ptp.debug.external.cdi.model.Thread) thread, frames[j].getLevel(), frames[j].getFile(), frames[j].getFunc(), frames[j].getLine(), frames[j].getAddr()));
 				    }
 				}
-				completeCommand((ICDIStackFrame[]) frameList.toArray(new ICDIStackFrame[0]));
+				completeCommand((IPCDIStackFrame[]) frameList.toArray(new IPCDIStackFrame[0]));
 			}
 		}).start();
 	}
 	
-	public void setCurrentStackFrame(final BitList tasks, final ICDIStackFrame frame) throws PCDIException {
+	public void setCurrentStackFrame(final BitList tasks, final IPCDIStackFrame frame) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
 				current_frame = frame;
@@ -317,7 +317,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 			}
 		}).start();
 	}
-	public void listArguments(final BitList tasks, final ICDIStackFrame frame) throws PCDIException {
+	public void listArguments(final BitList tasks, final IPCDIStackFrame frame) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
 				current_frame = frame;
@@ -325,18 +325,18 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				int[] taskArray = tasks.toArray();
 				List argList = new ArrayList();
 				for (int i=0; i<taskArray.length; i++) {
-					ICDITarget target = getSession().getTarget(taskArray[i]);
-				    ICDIThread thread = new org.eclipse.ptp.debug.external.cdi.model.Thread((Target) target, 0);
+					IPCDITarget target = getSession().getTarget(taskArray[i]);
+				    IPCDIThread thread = new org.eclipse.ptp.debug.external.cdi.model.Thread((Target) target, 0);
 				    SimVariable[] args = getArguments();
 				    for (int j=0; j<args.length; j++) {
 						argList.add(new Argument((Target) target, (org.eclipse.ptp.debug.external.cdi.model.Thread) thread, (StackFrame)current_frame, args[j].getVariable(), args[j].getVariable(), args.length - j, frame.getLevel(), null));
 				    }
 				}
-				completeCommand((ICDIArgument[]) argList.toArray(new ICDIArgument[0]));
+				completeCommand((IPCDIArgument[]) argList.toArray(new IPCDIArgument[0]));
 			}
 		}).start();
 	}
-	public void listLocalVariables(final BitList tasks, final ICDIStackFrame frame) throws PCDIException {
+	public void listLocalVariables(final BitList tasks, final IPCDIStackFrame frame) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
 				current_frame = frame;
@@ -344,14 +344,14 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				int[] taskArray = tasks.toArray();
 				List varList = new ArrayList();
 				for (int i=0; i<taskArray.length; i++) {
-					ICDITarget target = getSession().getTarget(taskArray[i]);
-				    ICDIThread thread = new org.eclipse.ptp.debug.external.cdi.model.Thread((Target) target, 0);
+					IPCDITarget target = getSession().getTarget(taskArray[i]);
+				    IPCDIThread thread = new org.eclipse.ptp.debug.external.cdi.model.Thread((Target) target, 0);
 				    SimVariable[] vars = getVariables();
 				    for (int j=0; j<vars.length; j++) {
 				    	varList.add(new LocalVariable((Target) target, (org.eclipse.ptp.debug.external.cdi.model.Thread) thread, (StackFrame)current_frame, vars[j].getVariable(), vars[j].getVariable(), vars.length - j, frame.getLevel(), null));
 				    }
 				}
-				completeCommand((ICDILocalVariable[])varList.toArray(new ICDILocalVariable[0]));
+				completeCommand((IPCDILocalVariable[])varList.toArray(new IPCDILocalVariable[0]));
 			}
 		}).start();
 	}
