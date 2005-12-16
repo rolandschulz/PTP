@@ -286,6 +286,8 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 			String attrib = attribs[i];
 			String s = null;
 			
+			//System.out.println("attrib = "+attrib);
+			
 			if (attrib.equals(AttributeConstants.ATTRIB_NODE_NAME)) {
 				s = nodeName;
 			} else if (attrib.equals(AttributeConstants.ATTRIB_NODE_STATE)) {
@@ -299,6 +301,7 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 			}
 			
 			retstr[i] = new String(s);
+			//System.out.println("ret["+i+"] = '"+retstr[i]+"'");
 		}
 		
 		return retstr;

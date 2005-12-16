@@ -155,15 +155,44 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
 		return values;
 	}
 	
-	public String[] getAllNodesAttributes(IPMachine machine, String attribs) {
+	public String[] getAllNodesAttributes(IPMachine machine, String attribString) {
 		int machID = machine.getMachineNumberInt();
 		
 		String[] values = null;
 		
 		try {
-			values = proxy.getAllNodesAttributesBlocking(machID, attribs);
+			values = proxy.getAllNodesAttributesBlocking(machID, attribString);
 		} catch(IOException e) {
 			e.printStackTrace();
+		}
+		
+		if(values == null || values.length == 0) {
+			System.out.println("NOTHING RETURNED FROM ORTE_SERVER, faking it with some blank data.");
+			
+			IPNode[] nodes = machine.getSortedNodes();
+			
+			int nlen = nodes.length;
+			if(nodes == null || nodes.length == 0) nlen = 1;
+			
+			String[] attribs = attribString.split(" ");
+			
+			values = new String[attribs.length * nlen];
+			
+			for(int i=0; i<nlen; i++) {
+				for(int j=0; j<attribs.length; j++) {
+					String attrib = attribs[j];
+					if(attrib.equals(AttributeConstants.ATTRIB_NODE_NAME))
+						values[(i * attribs.length) + j] = new String(""+i+"");
+					else if(attrib.equals(AttributeConstants.ATTRIB_NODE_USER))
+						values[(i * attribs.length) + j] = System.getProperty("user.name");
+					else if(attrib.equals(AttributeConstants.ATTRIB_NODE_GROUP))
+						values[(i * attribs.length) + j] = new String("ptp");
+					else if(attrib.equals(AttributeConstants.ATTRIB_NODE_STATE))
+						values[(i * attribs.length) + j] = new String("up");
+					else if(attrib.equals(AttributeConstants.ATTRIB_NODE_MODE))
+						values[(i * attribs.length) + j] = new String("73");
+				}
+			}
 		}
 		
 		return values;

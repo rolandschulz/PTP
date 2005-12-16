@@ -217,43 +217,57 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 			System.out.println("MACHINE: " + ne[i]+" - #nodes = "+ne2.length);
 			
-			/*
-			PNode foo = new PNode(mac, ne2[0], ""+0+"", 0);
-			int num_attribs = 5;
-			String[] attribs = monitoringSystem.getNodeAttributes(foo, 
-					AttributeConstants.ATTRIB_NODE_NAME + " " +
-					AttributeConstants.ATTRIB_NODE_USER + " " + 
-					AttributeConstants.ATTRIB_NODE_GROUP + " " +
-					AttributeConstants.ATTRIB_NODE_STATE + " " +
-					AttributeConstants.ATTRIB_NODE_MODE);
-			
-			for(int j=0; j<attribs.length; j++) 
-				System.out.println("*** attribs["+j+"] = "+attribs[j]);
-			
-			*/
-			int num_attribs = 5;
-			String[] attribs = monitoringSystem.getAllNodesAttributes(mac, 
-					AttributeConstants.ATTRIB_NODE_NAME + " " +
-					AttributeConstants.ATTRIB_NODE_USER + " " + 
-					AttributeConstants.ATTRIB_NODE_GROUP + " " +
-					AttributeConstants.ATTRIB_NODE_STATE + " " +
-					AttributeConstants.ATTRIB_NODE_MODE);
-				
-			
-			//for(int j=0; j<attribs.length; j++) 
-			//	System.out.println("*** attribs["+j+"] = "+attribs[j]);
-				
+			if(monitoringSystem instanceof OMPIMonitoringSystem) {
+				int num_attribs = 5;
+				String[] attribs = monitoringSystem.getAllNodesAttributes(mac,
+						AttributeConstants.ATTRIB_NODE_NAME + " "
+								+ AttributeConstants.ATTRIB_NODE_USER + " "
+								+ AttributeConstants.ATTRIB_NODE_GROUP + " "
+								+ AttributeConstants.ATTRIB_NODE_STATE + " "
+								+ AttributeConstants.ATTRIB_NODE_MODE);
+				if (attribs == null || attribs.length == 0) {
+					return;
+				}
 
-			for (int j = 0; j < ne2.length; j++) {
-				PNode node;
-				node = new PNode(mac, ne2[j], "" + j + "", j);
-				node.setAttrib(AttributeConstants.ATTRIB_NODE_NAME, attribs[(j * num_attribs)]);
-				node.setAttrib(AttributeConstants.ATTRIB_NODE_USER, attribs[(j * num_attribs) + 1]); 
-				node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP, attribs[(j * num_attribs) + 2]);
-				node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, attribs[(j * num_attribs) + 3]);
-				node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE, attribs[(j * num_attribs) + 4]);
+				//for (int j = 0; j < attribs.length; j++)
+				//	System.out
+				//			.println("*** attribs[" + j + "] = " + attribs[j]);
 
-				mac.addChild(node);
+				for (int j = 0; j < ne2.length; j++) {
+					PNode node;
+					node = new PNode(mac, ne2[j], "" + j + "", j);
+					node.setAttrib(AttributeConstants.ATTRIB_NODE_NAME,
+							attribs[(j * num_attribs)]);
+					node.setAttrib(AttributeConstants.ATTRIB_NODE_USER,
+							attribs[(j * num_attribs) + 1]);
+					node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP,
+							attribs[(j * num_attribs) + 2]);
+					node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE,
+							attribs[(j * num_attribs) + 3]);
+					node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE,
+							attribs[(j * num_attribs) + 4]);
+
+					mac.addChild(node);
+				}
+			}
+			else if(monitoringSystem instanceof SimulationMonitoringSystem) {
+				for(int j=0; j<ne2.length; j++) {
+					//System.out.println("node "+j);
+					PNode node;
+					node = new PNode(mac, ne2[j], ""+j+"", j);
+					node.setAttrib(AttributeConstants.ATTRIB_NODE_NAME, 
+							monitoringSystem.getNodeAttributes(node, AttributeConstants.ATTRIB_NODE_NAME)[0]);
+					node.setAttrib(AttributeConstants.ATTRIB_NODE_USER, 
+							monitoringSystem.getNodeAttributes(node, AttributeConstants.ATTRIB_NODE_USER)[0]);
+					node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP, 
+							monitoringSystem.getNodeAttributes(node, AttributeConstants.ATTRIB_NODE_GROUP)[0]);
+					node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, 
+							monitoringSystem.getNodeAttributes(node, AttributeConstants.ATTRIB_NODE_STATE)[0]);
+					node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE, 
+							monitoringSystem.getNodeAttributes(node, AttributeConstants.ATTRIB_NODE_MODE)[0]);
+					
+					mac.addChild(node);
+				}
 			}
 		}
 		ne = controlSystem.getJobs();
@@ -283,7 +297,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				}
 			}
 		}
-
 		monitoringSystem.addRuntimeListener(this);
 		controlSystem.addRuntimeListener(this);
 	}
