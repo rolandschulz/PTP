@@ -987,7 +987,7 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 			
 		printf("JOB STATE CALLBACK!\n"); fflush(stdout);
 		
-			#if 0
+#if 1
 	/* not sure yet how we want to handle this callback, what events
 	 * we want to generate, but here are the states that I know of
 	 * that a job can go through.  I've watched ORTE call this callback
@@ -1050,7 +1050,7 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 	printf("B!\n"); fflush(stdout);
 	AddToList(eventList, (void *)res);
 	printf("state callback retrning!\n"); fflush(stdout);
-	#endif
+#endif
 }
 
 /* this is an internal function we'll call from within this, consider
@@ -1263,7 +1263,7 @@ ORTEGetProcessAttribute(char **args)
 	int				values_len;
 	
 	printf("ORTEGetProcessAttribute!\n"); fflush(stdout);
-	return;
+	//return;
 	
 	jobid = atoi(args[1]);
 	procid = atoi(args[2]);
@@ -1275,7 +1275,7 @@ ORTEGetProcessAttribute(char **args)
 	while(args[i] != NULL) i++;
 	
 	last_arg = i;
-	
+
 	keys = (char**)malloc((last_arg - 3)*sizeof(char*));
 	values_len = last_arg - 3;
 	/* if they want to see ALL the processes then the requested values
