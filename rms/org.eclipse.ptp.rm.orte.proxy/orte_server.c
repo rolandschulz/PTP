@@ -1629,13 +1629,13 @@ ORTEGetNodeAttribute(char **args)
 	
 	tot_len = 0;
 	for(i=0; i<values_len; i++) {
-		//printf("AFTER CALL! VALS[%d] = '%s'\n", i, values[i]); fflush(stdout);
+		printf("AFTER CALL! VALS[%d] = '%s'\n", i, values[i]); fflush(stdout);
 		tot_len += strlen(values[i]);
 	}
 	
-	//printf("totlen = %d\n", tot_len); fflush(stdout);
+	printf("totlen = %d\n", tot_len); fflush(stdout);
 	tot_len += values_len * 2; /* add on some for spaces and null, etc - little bit of extra here */
-	//printf("totlen = %d\n", tot_len); fflush(stdout);
+	printf("totlen = %d\n", tot_len); fflush(stdout);
 	valstr = (char*)malloc(tot_len * sizeof(char));
 	
 	sprintf(valstr, "");
@@ -1643,7 +1643,7 @@ ORTEGetNodeAttribute(char **args)
 		sprintf(valstr, "%s%s%s%s", valstr, i == 0 ? "" : " ", values[i], i == values_len-1 ? "\0" : "");
 	}
 	
-	//printf("valSTR = '%s'\n", valstr); fflush(stdout);
+	printf("valSTR = '%s'\n", valstr); fflush(stdout);
 	
 	asprintf(&res, "%d %s", RTEV_NATTR, valstr);
 	proxy_svr_event_callback(orte_proxy, res);
