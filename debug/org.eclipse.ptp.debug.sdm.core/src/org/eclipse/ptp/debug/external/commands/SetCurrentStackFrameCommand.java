@@ -18,9 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.commands;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
@@ -28,9 +28,9 @@ import org.eclipse.ptp.debug.external.IAbstractDebugger;
  * 
  */
 public class SetCurrentStackFrameCommand extends AbstractDebugCommand {
-	private ICDIStackFrame frame = null;
+	private IPCDIStackFrame frame = null;
 	
-	public SetCurrentStackFrameCommand(BitList tasks, ICDIStackFrame frame) {
+	public SetCurrentStackFrameCommand(BitList tasks, IPCDIStackFrame frame) {
 		super(tasks, false, true);
 		this.frame = frame;
 	}

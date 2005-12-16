@@ -24,9 +24,13 @@ import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILocation;
-import org.eclipse.cdt.debug.core.cdi.ICDILocator;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 import org.eclipse.ptp.debug.external.cdi.Locator;
 
+/**
+ * @author Clement chu
+ * 
+ */
 public abstract class LocationBreakpoint extends Breakpoint {
 	ICDILocation fLocation;
 
@@ -60,7 +64,7 @@ public abstract class LocationBreakpoint extends Breakpoint {
 		}
 		return null;
 	}
-	public ICDILocator getLocator() {
+	public IPCDILocator getLocator() {
 		return new Locator(getFile(), getFunction(), getLineNumber(), getAddress());
 	}
 }

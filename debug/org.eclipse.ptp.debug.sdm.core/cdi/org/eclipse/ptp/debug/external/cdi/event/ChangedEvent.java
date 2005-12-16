@@ -18,24 +18,24 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIChangedEvent;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
 
 /**
  * @author Clement chu
  * 
  */
 public class ChangedEvent extends AbstractEvent implements IPCDIChangedEvent {
-	public ChangedEvent(IPCDISession session, BitList tasks, ICDIObject source) {
+	public ChangedEvent(IPCDISession session, BitList tasks, IPCDIObject source) {
 		super(session, tasks, source);
 	}
 	
 	public String getVariableName() {
-		if (getSource() instanceof ICDIVariable) {
-			return ((ICDIVariable)getSource()).getName();
+		if (getSource() instanceof IPCDIVariable) {
+			return ((IPCDIVariable)getSource()).getName();
 		}
 		return "";
 	}

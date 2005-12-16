@@ -16,27 +16,14 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
-import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 
-/**
- *
- */
 public class InferiorSignaledEvent extends AbstractEvent implements IPCDISuspendedEvent {
 	private ICDILocator	loc;
 	
@@ -45,7 +32,7 @@ public class InferiorSignaledEvent extends AbstractEvent implements IPCDISuspend
 		this.loc = loc;
 	}
 	
-	public ICDISessionObject getReason() {
+	public IPCDISessionObject getReason() {
 		return null;
 	}
 	

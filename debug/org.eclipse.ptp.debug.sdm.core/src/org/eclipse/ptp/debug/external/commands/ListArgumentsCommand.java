@@ -18,10 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.commands;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
@@ -29,9 +29,9 @@ import org.eclipse.ptp.debug.external.IAbstractDebugger;
  * 
  */
 public class ListArgumentsCommand extends AbstractDebugCommand {
-	private ICDIStackFrame frame = null;
+	private IPCDIStackFrame frame = null;
 	
-	public ListArgumentsCommand(BitList tasks, ICDIStackFrame frame) {
+	public ListArgumentsCommand(BitList tasks, IPCDIStackFrame frame) {
 		super(tasks, false, true);
 		this.frame = frame;
 	}
@@ -39,10 +39,10 @@ public class ListArgumentsCommand extends AbstractDebugCommand {
 		debugger.listArguments(tasks, frame);
 	}
 	
-	public ICDIArgument[] getArguments() throws PCDIException {
+	public IPCDIArgument[] getArguments() throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof ICDIArgument[])
-				return (ICDIArgument[])result;
+			if (result instanceof IPCDIArgument[])
+				return (IPCDIArgument[])result;
 		}
 		throw new PCDIException("No arguments found in " + tasks.toString());
 	}

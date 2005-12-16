@@ -16,10 +16,21 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.internal.core.aif;
 
-public class AIFTypeClass extends AIFType {
+import org.eclipse.ptp.debug.core.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeClass;
+
+public class AIFTypeClass extends AIFTypeAggregate implements IAIFTypeClass {
+	//{ID|N1=F1,...; N2=F2,...; N3=F3,...; N4=F4,...}
+	public AIFTypeClass(String format) {
+		super(format);
+	}
+	public String toString() {
+		return AIFFactory.FDS_STRUCT + super.toString() + AIFFactory.FDS_CLASS_END;
+	}
+	
+	/*
 	private int 				id = -1;
 	private AIFTypeField[]	publicFields;
 	private AIFTypeField[]	protectedFields;
@@ -31,7 +42,7 @@ public class AIFTypeClass extends AIFType {
 		this.protectedFields = prot;
 		this.privateFields = priv;
 		this.hiddenFields = hid;
-}
+	}
 
 	public AIFTypeClass(int id, AIFTypeField[] pub, AIFTypeField[] prot, AIFTypeField[] priv, AIFTypeField[] hid) {
 		this(pub, prot, priv, hid);
@@ -80,4 +91,5 @@ public class AIFTypeClass extends AIFType {
 		
 		return res + "}";
 	}
+	*/
 }

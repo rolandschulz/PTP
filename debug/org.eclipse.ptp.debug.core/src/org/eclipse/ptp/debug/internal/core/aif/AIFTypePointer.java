@@ -20,15 +20,14 @@
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import org.eclipse.ptp.debug.core.aif.IAIFType;
+import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
 
-public class AIFTypePointer extends AIFType {
-	private IAIFType baseType;
-	
-	public AIFTypePointer(IAIFType base) {
-		this.baseType = base;
+public class AIFTypePointer extends AIFTypeDerived implements IAIFTypePointer {
+	//char*: ^c
+	public AIFTypePointer(IAIFType basetype) {
+		super(basetype);
 	}
-
 	public String toString() {
-		return "^" + baseType.toString();
+		return "^" + super.toString();
 	}
 }

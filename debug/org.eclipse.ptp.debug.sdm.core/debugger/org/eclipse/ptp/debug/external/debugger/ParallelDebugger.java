@@ -16,26 +16,25 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.external.debugger;
 
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariable;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.IDebugger;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
@@ -68,11 +67,11 @@ import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugVarsEvent;
 
 public class ParallelDebugger extends AbstractDebugger implements IDebugger, IProxyDebugEventListener {
 	private class BreakpointMapping {
-		private ICDIBreakpoint		bpObject;
+		private IPCDIBreakpoint		bpObject;
 		private BitList				bpSet;
 		private int					bpId;
 		
-		public BreakpointMapping(int bpid, BitList set, ICDIBreakpoint bpt) {
+		public BreakpointMapping(int bpid, BitList set, IPCDIBreakpoint bpt) {
 			this.bpId = bpid;
 			this.bpSet = set;
 			this.bpObject = bpt;
@@ -86,7 +85,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			return this.bpSet;
 		}
 		
-		public ICDIBreakpoint getBreakpoint() {
+		public IPCDIBreakpoint getBreakpoint() {
 			return this.bpObject;
 		}	
 		
@@ -99,12 +98,12 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		}
 	}
 	
-	private ProxyDebugClient		proxy;
+	private ProxyDebugClient	proxy;
 	private int					numServers;
 	private HashMap				bpMap = new HashMap();
 	private ArrayList			bpArray = new ArrayList();
 	private int					bpId = 0;
-	private ICDIStackFrame		currFrame = null;
+	private IPCDIStackFrame		currFrame = null;
 
 	private String join(String[] strs, String delim) {
 		StringBuffer buf = new StringBuffer();
@@ -203,14 +202,14 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
-	public void setLineBreakpoint(BitList tasks, ICDILineBreakpoint bpt) throws PCDIException {
+	public void setLineBreakpoint(BitList tasks, IPCDILineBreakpoint bpt) throws PCDIException {
 		try {
 			proxy.debugSetLineBreakpoint(tasks, newBreakpointId(), bpt.getLocator().getFile(), bpt.getLocator().getLineNumber());
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
 		}
 	}
-	public void setFunctionBreakpoint(BitList tasks, ICDIFunctionBreakpoint bpt) throws PCDIException {
+	public void setFunctionBreakpoint(BitList tasks, IPCDIFunctionBreakpoint bpt) throws PCDIException {
 		try {
 			proxy.debugSetFuncBreakpoint(tasks, newBreakpointId(), bpt.getLocator().getFile(), bpt.getLocator().getFunction());
 		} catch (IOException e) {
@@ -224,13 +223,13 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
-	private void deleteBreakpoint(ICDIBreakpoint bp)  throws PCDIException {
+	private void deleteBreakpoint(IPCDIBreakpoint bp)  throws PCDIException {
 		BreakpointMapping bpm = findBreakpointInfo(bp);
 		if (bpm != null) {
 			deleteBreakpoint(bpm.getBreakpointProcs(), bpm.getBreakpointId());				
 		}
 	}
-	public void deleteBreakpoints(ICDIBreakpoint[] bp) throws PCDIException {
+	public void deleteBreakpoints(IPCDIBreakpoint[] bp) throws PCDIException {
 		if (bp != null) {
 			for (int i = 0; i < bp.length; i++) {
 				deleteBreakpoint(bp[i]);
@@ -247,7 +246,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
-	public void setCurrentStackFrame(BitList tasks, ICDIStackFrame frame) throws PCDIException {
+	public void setCurrentStackFrame(BitList tasks, IPCDIStackFrame frame) throws PCDIException {
 		try {
 			proxy.debugSetCurrentStackframe(tasks, frame.getLevel());
 		} catch (IOException e) {
@@ -281,7 +280,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	/**
 	 * list local variables for first process in procs
 	 */
-	public void listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException {
+	public void listLocalVariables(BitList tasks, IPCDIStackFrame frame) throws PCDIException {
 		this.currFrame = frame;
 		try {
 			proxy.debugListLocalVariables(tasks);
@@ -298,7 +297,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	/**
 	 * list arguments for first process in procs
 	 */
-	public void listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException {
+	public void listArguments(BitList tasks, IPCDIStackFrame frame) throws PCDIException {
 		this.currFrame = frame;
 		try {
 			proxy.debugListArguments(tasks, frame.getLevel());
@@ -371,15 +370,15 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			if(varProcs.length > 0) {
 				// ICDITarget target = procList[i].getTarget();
 				int taskId = varProcs[0].getTaskId();
-				ICDITarget target = getSession().getTarget(taskId);
-				ICDIThread thread = new Thread((Target) target, 0);
+				IPCDITarget target = getSession().getTarget(taskId);
+				IPCDIThread thread = new Thread((Target) target, 0);
 				String vars[] = varsEvent.getVariables();
 				for (int j = 0; j < vars.length; j++) {
 					LocalVariable var = new LocalVariable((Target) target, (Thread) thread, (StackFrame) this.currFrame, vars[j], vars[j], vars.length - j, this.currFrame.getLevel(), null);
 					varList.add(var);
 				}
 			}
-			completeCommand((ICDILocalVariable[])varList.toArray(new ICDILocalVariable[0]));			
+			completeCommand((IPCDILocalVariable[])varList.toArray(new IPCDILocalVariable[0]));			
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_ARGS:
@@ -393,15 +392,15 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			if(argProcs.length > 0) {
 				// ICDITarget target = procList[i].getTarget();
 				int taskId = argProcs[0].getTaskId();
-				ICDITarget target = getSession().getTarget(taskId);
-				ICDIThread thread = new Thread((Target) target, 0);
+				IPCDITarget target = getSession().getTarget(taskId);
+				IPCDIThread thread = new Thread((Target) target, 0);
 				String args[] = argsEvent.getVariables();
 				for (int j = 0; j < args.length; j++) {
 					Argument arg = new Argument((Target) target, (Thread) thread, (StackFrame) this.currFrame, args[j], args[j], args.length - j, this.currFrame.getLevel(), null);
 					argList.add(arg);
 				}
 			}
-			completeCommand((ICDIArgument[]) argList.toArray(new ICDIArgument[0]));			
+			completeCommand((IPCDIArgument[]) argList.toArray(new IPCDIArgument[0]));			
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_EXIT:
@@ -423,7 +422,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		}
 	}
 	
-	private ICDIStackFrame convertFrame(ICDIThread thread, ProxyDebugStackframe frame) {
+	private IPCDIStackFrame convertFrame(IPCDIThread thread, ProxyDebugStackframe frame) {
 		int level = frame.getLevel();
 		String file = frame.getLocator().getFile();
 		String func = frame.getLocator().getFunction();
@@ -432,15 +431,15 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		System.out.println("frame " + level + " " + file + " " + func + " " + line + " " + addr);
 		return new StackFrame((Thread) thread, level, file, func, line, addr.toString(16));
 	}
-	private ICDIStackFrame[] convertFrames(IPProcess proc, ProxyDebugStackframe[] frames) {
+	private IPCDIStackFrame[] convertFrames(IPProcess proc, ProxyDebugStackframe[] frames) {
 		ArrayList frameList = new ArrayList();
 		int taskId = proc.getTaskId();
-		ICDITarget target = getSession().getTarget(taskId);
-	    ICDIThread thread = new Thread((Target) target, 0);
+		IPCDITarget target = getSession().getTarget(taskId);
+	    IPCDIThread thread = new Thread((Target) target, 0);
 		for (int j = 0; j < frames.length; j++) {
 			frameList.add(convertFrame(thread, frames[j]));
 		}
-		return (ICDIStackFrame[]) frameList.toArray(new ICDIStackFrame[0]);
+		return (IPCDIStackFrame[]) frameList.toArray(new IPCDIStackFrame[0]);
 	}
 
 	/*
@@ -458,7 +457,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	 * achieved by generating a new breakpoint id every time a breakpoint is set.
 	 * 
 	 */
-	private void updateBreakpointInfo(int bpid, BitList bpset, ICDIBreakpoint bpt) {
+	private void updateBreakpointInfo(int bpid, BitList bpset, IPCDIBreakpoint bpt) {
 		/*
 		 * First update bpMap
 		 */
@@ -483,7 +482,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	}
 
 	
-	private BreakpointMapping findBreakpointInfo(ICDIBreakpoint bpt) {
+	private BreakpointMapping findBreakpointInfo(IPCDIBreakpoint bpt) {
 		return (BreakpointMapping)bpMap.get(bpt);
 	}
 

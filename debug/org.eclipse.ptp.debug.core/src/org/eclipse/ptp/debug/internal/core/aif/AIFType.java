@@ -16,10 +16,8 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 
-public abstract class AIFType implements IAIFType {
-}
+public abstract class AIFType implements IAIFType {}

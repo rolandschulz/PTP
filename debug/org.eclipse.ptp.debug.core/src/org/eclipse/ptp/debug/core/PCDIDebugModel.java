@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRunnable;
@@ -43,6 +42,7 @@ import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDITargetConfiguration;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.launch.IPLaunchEvent;
 import org.eclipse.ptp.debug.core.launch.IPLaunchListener;
@@ -95,7 +95,7 @@ public class PCDIDebugModel {
 			public void run(IProgressMonitor m) throws CoreException {
 				for (int i=0; i<targets.length; i++) {
 					targets[i] = new PDebugTarget(launch, cdiTargets[i], null, file, allowTerminate, allowDisconnect);
-					ICDITargetConfiguration config = cdiTargets[i].getConfiguration();
+					IPCDITargetConfiguration config = cdiTargets[i].getConfiguration();
 					if (config.supportsResume() && resumeTarget) {
 						targets[i].resume();
 					}

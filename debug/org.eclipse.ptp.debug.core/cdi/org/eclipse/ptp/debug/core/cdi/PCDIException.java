@@ -20,29 +20,19 @@ package org.eclipse.ptp.debug.core.cdi;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 
+/**
+ * @author Clement chu
+ *
+ */
 public class PCDIException extends CDIException {
-	/**
-	 * All serializable objects should have a stable serialVersionUID
-	 */
-	private static final long serialVersionUID = 1L;
+	static final long serialVersionUID = -2387516993124229949L;
 	
-	public static final int NOT_IMPLEMENTED = 100;
-	public static final int COMMAND_TIMEOUT = 101;
-	public static final int INVALID_PROCESS_SET = 102;
-
-	private int status;
-
-	public PCDIException(String desc) {
-		super(desc);
-		this.status = NOT_IMPLEMENTED;
+	public static final String NOT_IMPLEMENTED = "<Not implemented>";
+	
+	public PCDIException(String msg) {
+		super(msg);
 	}
-	
-	public PCDIException(int status, String desc) {
-		super(desc);
-		this.status = status;
-	}
-	
-	public int getStatus() {
-		return this.status;
+	public PCDIException(String msg, String details) {
+		super(msg, details);
 	}
 }

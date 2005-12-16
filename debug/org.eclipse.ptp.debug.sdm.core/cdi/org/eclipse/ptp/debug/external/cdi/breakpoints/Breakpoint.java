@@ -16,27 +16,21 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.breakpoints;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.model.Condition;
-import org.eclipse.ptp.debug.external.cdi.model.PTPObject;
+import org.eclipse.ptp.debug.external.cdi.model.PObject;
 
-public abstract class Breakpoint extends PTPObject implements ICDIBreakpoint {
+/**
+ * @author Clement chu
+ *
+ */
+public abstract class Breakpoint extends PObject implements IPCDIBreakpoint {
 	ICDICondition condition;
 	
 	int type;
@@ -59,10 +53,10 @@ public abstract class Breakpoint extends PTPObject implements ICDIBreakpoint {
 		return enable;
 	}
 	public boolean isHardware() {
-		return (type == ICDIBreakpoint.HARDWARE);
+		return (type == IPCDIBreakpoint.HARDWARE);
 	}
 	public boolean isTemporary() {
-		return (type == ICDIBreakpoint.TEMPORARY);
+		return (type == IPCDIBreakpoint.TEMPORARY);
 	}
 	public void setCondition(ICDICondition newCondition) throws CDIException {
 		Session session = (Session)getTarget().getSession();

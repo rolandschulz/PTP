@@ -16,49 +16,95 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeArray;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeRange;
 
-public class AIFTypeArray extends AIFType {
-	private IAIFType baseType;
-	private int[] range = {0, 0};
-	
-	public AIFTypeArray(IAIFType base, int[] range) {
-		this.baseType = base;
-		this.range = range;
-	}
-	public int getLowIndex() {
-		return getLowIndex(1);
-	}
-	public int getHighIndex() {
-		return getHighIndex(1);
-	}
-	public IAIFType getBaseType() {
-		return baseType;
+public class AIFTypeArray extends AIFTypeDerived implements IAIFTypeArray {
+	private List ranges = new ArrayList();
+
+	//char[]: [r0..3is4]c
+	//2D[3][2]: [r0..1is4][r0..2is4]is4
+	//2D[2][3]: [r0..2is4][r0..1is4]is4
+	//int[]: [r0..9is4]is4
+	//char[]: [r0..4is4]c
+	public AIFTypeArray(String format, IAIFType basetype) {
+		super(basetype);
+		parse(format);
 	}
 	public int getDimension() {
-		return (range.length / 2);
+		return ranges.size();
 	}
-	public int getLowIndex(int dim_pos) {
-		if (dim_pos > getDimension())
-			return 0;
-		return range[(dim_pos * 2) - 2];
+	public IAIFTypeRange[] getRanges() {
+		return (IAIFTypeRange[])ranges.toArray(new IAIFTypeRange[0]);
 	}
-	public int getHighIndex(int dim_pos) {
-		if (dim_pos > getDimension())
-			return 0;
-		return range[(dim_pos * 2) - 1];
+	public IAIFTypeRange getRange(int index) {
+		return (IAIFTypeRange)ranges.get(index);
 	}
-	public int[] getRange() {
-		return range;
+	public int getLower(int index) {
+		return getRange(index).getLower();
+	}
+	public int getUpper(int index) {
+		return getRange(index).getUpper();
+	}
+	public IAIFType getInternalType(int index) {
+		return getRange(index).getInternalType();
+	}
+	
+	private void parse(String fmt) {
+		while (fmt.length() > 0) {
+			fmt = parseRange(fmt);
+		}
+	}
+	protected String parseRange(String fmt) {
+		int pos = fmt.indexOf(AIFFactory.SIGN_CLOSE);
+		ranges.add(getRange(fmt.substring(1, pos)));
+		return fmt.substring(pos+1);
+	}
+	//range: rL..UT
+	protected IAIFTypeRange getRange(String fmt) {
+		int low_pos = AIFFactory.getDigitPos(fmt, 1);
+		int lower = Integer.parseInt(fmt.substring(1, low_pos));
+		int up_pos = AIFFactory.getDigitPos(fmt, low_pos+2);
+		int upper = Integer.parseInt(fmt.substring(low_pos+2, up_pos));
+		return new AIFTypeRange(lower, upper, AIFFactory.getAIFType(fmt.substring(up_pos)));
+	}
+	public String toString(int dimension) {
+		IAIFTypeRange range = (IAIFTypeRange)ranges.get(dimension);
+		return "[r" + range.getLower() + ".." + range.getUpper() + "U" + range.getInternalType().toString() + "]";		
 	}
 	public String toString() {
-		String output = "";
-		for (int i=0; i<getDimension(); i++) {
-			output += "[" + String.valueOf(getLowIndex(i+1)) + ".." + String.valueOf(getHighIndex(i+1)) + "]"; 
+		String content = "";
+		for (int i=0; i<ranges.size(); i++) {
+			content += toString(i);
 		}
-		return output += getBaseType().toString();
+		content += getBaseType().toString();
+		return content;
+	}
+	
+	class AIFTypeRange implements IAIFTypeRange {
+		int lower;
+		int upper;
+		IAIFType interalType;
+		
+		AIFTypeRange(int lower, int upper, IAIFType interalType) {
+			this.lower = lower;
+			this.upper = upper;
+			this.interalType = interalType;
+		}
+		public int getLower() {
+			return lower;
+		}
+		public int getUpper() {
+			return upper;
+		}
+		public IAIFType getInternalType() {
+			return interalType;
+		}
 	}
 }

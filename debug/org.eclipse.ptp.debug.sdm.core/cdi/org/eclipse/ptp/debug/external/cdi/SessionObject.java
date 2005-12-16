@@ -18,16 +18,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi;
 
-import org.eclipse.cdt.debug.core.cdi.ICDISession;
-import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
 
-public class SessionObject implements ICDISessionObject {
+/**
+ * @author Clement chu
+ *
+ */
+public class SessionObject implements IPCDISessionObject {
 	private Session fSession;
 
 	public SessionObject(Session session) {
 		fSession = session;
 	}
-	public ICDISession getSession() {
+	public IPCDISession getSession() {
 		return fSession;
 	}
 }

@@ -18,8 +18,18 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.event;
 
-import org.eclipse.cdt.debug.core.cdi.event.ICDIResumedEvent;
+/**
+ * @author Clement chu
+ *
+ */
+public interface IPCDIResumedEvent extends IPCDIEvent {
+	final static public int CONTINUE = 0;
+	final static public int STEP_OVER = 1;
+	final static public int STEP_INTO = 2;
+	final static public int STEP_OVER_INSTRUCTION = 3;
+	final static public int STEP_INTO_INSTRUCTION = 4;
+	final static public int STEP_RETURN = 5;
 
-public interface IPCDIResumedEvent extends IPCDIEvent, ICDIResumedEvent {
+	int getType();	
 }
 

@@ -11,7 +11,7 @@ import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupDirector;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceLookupDirector;
 
 /**
  * @deprecated 
@@ -109,8 +109,8 @@ public class PSession implements IPSession, IBreakpointsListener {
 		IPath path = null;
 		if (Path.EMPTY.isValidPath(sourceHandle)) {
 			ISourceLocator sl = pLaunch.getSourceLocator();
-			if (sl instanceof CSourceLookupDirector) {
-				path = ((CSourceLookupDirector) sl).getCompilationPath(sourceHandle);
+			if (sl instanceof PSourceLookupDirector) {
+				path = ((PSourceLookupDirector) sl).getCompilationPath(sourceHandle);
 			}
 			if (path == null) {
 				path = new Path(sourceHandle);

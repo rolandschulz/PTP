@@ -20,7 +20,7 @@
 package org.eclipse.ptp.debug.external.proxy;
 
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
-import org.eclipse.ptp.debug.external.ExtFormat;
+import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.external.cdi.Locator;
 
 public class ProxyDebugStackframe {

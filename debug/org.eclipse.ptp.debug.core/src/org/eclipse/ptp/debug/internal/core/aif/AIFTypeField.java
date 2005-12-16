@@ -16,12 +16,14 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.internal.core.aif;
 
-import org.eclipse.ptp.debug.core.aif.IAIFType;
 
+/**
+ * @deprecated temporary
+ */
 public class AIFTypeField {
+	/*
 	private String 	fieldName;
 	private IAIFType	fieldType;
 	
@@ -33,4 +35,5 @@ public class AIFTypeField {
 	public String toString() {
 		return this.fieldName + "=" + this.fieldType.toString();
 	}
+	*/
 }

@@ -16,53 +16,30 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
-
 package org.eclipse.ptp.debug.core.sourcelookup;
 
-import org.eclipse.cdt.debug.core.sourcelookup.ICSourceLocator;
-import org.eclipse.cdt.debug.core.sourcelookup.IDirectorySourceLocation;
-import org.eclipse.cdt.debug.core.sourcelookup.IProjectSourceLocation;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.CDirectorySourceLocation;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.CProjectSourceLocation;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLocator;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceManager;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.PDirectorySourceLocation;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.PProjectSourceLocation;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceLocator;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceManager;
 
 /**
- * Enter type comment.
+ * @author Clement chu
  * 
- * @since Jul 14, 2003
  */
-public class SourceLookupFactory
-{
-	public static IProjectSourceLocation createProjectSourceLocation( IProject project )
-	{
-		return new CProjectSourceLocation( project );
+public class SourceLookupFactory {
+	public static IProjectSourceLocation createProjectSourceLocation(IProject project) {
+		return new PProjectSourceLocation(project);
 	}
-
-	public static IProjectSourceLocation createProjectSourceLocation( IProject project, boolean generated )
-	{
-		return new CProjectSourceLocation( project, generated );
+	public static IProjectSourceLocation createProjectSourceLocation(IProject project, boolean generated) {
+		return new PProjectSourceLocation(project, generated);
 	}
-
-	public static IDirectorySourceLocation createDirectorySourceLocation( IPath directory, IPath association, boolean searchSubfolders )
-	{
-		return new CDirectorySourceLocation( directory, association, searchSubfolders );
+	public static IDirectorySourceLocation createDirectorySourceLocation(IPath directory, IPath association, boolean searchSubfolders) {
+		return new PDirectorySourceLocation(directory, association, searchSubfolders);
 	}
-
-	public static ICSourceLocator createSourceLocator( IProject project )
-	{
-		return new CSourceManager( new CSourceLocator( project ) );
+	public static IPSourceLocator createSourceLocator(IProject project) {
+		return new PSourceManager(new PSourceLocator(project));
 	}
 }

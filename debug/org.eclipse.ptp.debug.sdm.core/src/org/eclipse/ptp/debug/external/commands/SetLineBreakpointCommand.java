@@ -18,9 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.commands;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
@@ -28,9 +28,9 @@ import org.eclipse.ptp.debug.external.IAbstractDebugger;
  * 
  */
 public class SetLineBreakpointCommand extends AbstractDebugCommand {
-	private ICDILineBreakpoint lineBpt = null;
+	private IPCDILineBreakpoint lineBpt = null;
 	
-	public SetLineBreakpointCommand(BitList tasks, ICDILineBreakpoint lineBpt) {
+	public SetLineBreakpointCommand(BitList tasks, IPCDILineBreakpoint lineBpt) {
 		super(tasks, false, true);
 		this.lineBpt = lineBpt;
 	}

@@ -16,16 +16,6 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi;
 
 import java.util.ArrayList;
@@ -34,22 +24,19 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.cdi.ICDIEventManager;
-import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
-import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
+import org.eclipse.ptp.debug.core.cdi.IPCDIEventManager;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIChangedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDICreatedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIDisconnectedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
 
-/**
- */
-public class EventManager extends SessionObject implements ICDIEventManager, Observer {
+public class EventManager extends SessionObject implements IPCDIEventManager, Observer {
 	List list = Collections.synchronizedList(new ArrayList(1));
 
 	public void update(Observable o, Object arg) {
@@ -72,7 +59,7 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 			
 		}
 		// Fire the event;
-		ICDIEvent[] cdiEvents = (ICDIEvent[])cdiList.toArray(new ICDIEvent[0]);
+		IPCDIEvent[] cdiEvents = (IPCDIEvent[])cdiList.toArray(new IPCDIEvent[0]);
 		fireEvents(cdiEvents);
 	}
 	
@@ -82,20 +69,20 @@ public class EventManager extends SessionObject implements ICDIEventManager, Obs
 	public void shutdown() {
 		list.clear();
 	}
-	public void addEventListener(ICDIEventListener listener) {
+	public void addEventListener(IPCDIEventListener listener) {
 		if (!list.contains(listener))
 			list.add(listener);
 	}
-	public void removeEventListener(ICDIEventListener listener) {
+	public void removeEventListener(IPCDIEventListener listener) {
 		if (list.contains(listener))
 			list.remove(listener);
 	}
 	public void removeEventListeners() {
 		list.clear();
 	}
-	public synchronized void fireEvents(ICDIEvent[] cdiEvents) {
+	public synchronized void fireEvents(IPCDIEvent[] cdiEvents) {
 		if (cdiEvents != null && cdiEvents.length > 0) {
-			ICDIEventListener[] listeners = (ICDIEventListener[])list.toArray(new ICDIEventListener[0]);
+			IPCDIEventListener[] listeners = (IPCDIEventListener[])list.toArray(new IPCDIEventListener[0]);
 			for (int i = 0; i < listeners.length; i++) {
 				listeners[i].handleDebugEvents(cdiEvents);
 			}			

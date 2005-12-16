@@ -18,13 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi;
 
-import org.eclipse.cdt.debug.core.cdi.ICDISessionConfiguration;
+import org.eclipse.ptp.debug.core.cdi.IPCDISessionConfiguration;
 
-public class SessionConfiguration extends SessionObject implements ICDISessionConfiguration {
+public class SessionConfiguration extends SessionObject implements IPCDISessionConfiguration {
 	public SessionConfiguration(Session session) {
 		super(session);
 	}
-
 	public boolean terminateSessionOnExit() {
 		return true;
 	}

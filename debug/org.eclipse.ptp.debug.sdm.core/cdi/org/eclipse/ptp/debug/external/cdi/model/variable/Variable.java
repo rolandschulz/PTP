@@ -21,57 +21,27 @@ package org.eclipse.ptp.debug.external.cdi.model.variable;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDIArrayType;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDIBoolType;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDICharType;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDIDoubleType;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDIEnumType;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDIFloatType;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDIFunctionType;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDIIntType;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDILongLongType;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDILongType;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDIPointerType;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDIReferenceType;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDIShortType;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDIStructType;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDIWCharType;
 import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariable;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
 import org.eclipse.ptp.debug.external.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
-import org.eclipse.ptp.debug.external.cdi.model.type.ArrayValue;
-import org.eclipse.ptp.debug.external.cdi.model.type.BoolValue;
-import org.eclipse.ptp.debug.external.cdi.model.type.CharValue;
-import org.eclipse.ptp.debug.external.cdi.model.type.DoubleValue;
-import org.eclipse.ptp.debug.external.cdi.model.type.EnumValue;
-import org.eclipse.ptp.debug.external.cdi.model.type.FloatValue;
-import org.eclipse.ptp.debug.external.cdi.model.type.FunctionValue;
-import org.eclipse.ptp.debug.external.cdi.model.type.IntValue;
-import org.eclipse.ptp.debug.external.cdi.model.type.LongLongValue;
-import org.eclipse.ptp.debug.external.cdi.model.type.LongValue;
-import org.eclipse.ptp.debug.external.cdi.model.type.PointerValue;
-import org.eclipse.ptp.debug.external.cdi.model.type.ReferenceValue;
-import org.eclipse.ptp.debug.external.cdi.model.type.ShortValue;
-import org.eclipse.ptp.debug.external.cdi.model.type.StructValue;
 import org.eclipse.ptp.debug.external.cdi.model.type.Value;
-import org.eclipse.ptp.debug.external.cdi.model.type.WCharValue;
 import org.eclipse.ptp.debug.external.commands.GetAIFCommand;
 import org.eclipse.ptp.debug.external.commands.ListLocalVariablesCommand;
 
 /**
+ * @author Clement chu
+ * 
  */
-public abstract class Variable extends VariableDescriptor implements ICDIVariable {
+public abstract class Variable extends VariableDescriptor implements IPCDIVariable {
 	Value value;
-	public ICDIVariable[] children = new ICDIVariable[0];
+	public IPCDIVariable[] children = new IPCDIVariable[0];
 	String editable = null;
 	String language;
 	boolean isFake = false;
@@ -114,12 +84,12 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 	boolean isFake() {
 		return isFake;
 	}
-	public ICDIVariable[] getChildren() throws CDIException {
+	public IPCDIVariable[] getChildren() throws CDIException {
 		// Use the default timeout.
 		return getChildren(-1);
 	}
 	//TODO - dunno whether it implemented correctly or not
-	public ICDIVariable[] getChildren(int timeout) throws CDIException {
+	public IPCDIVariable[] getChildren(int timeout) throws CDIException {
 		List varList = new ArrayList(1);
 		Target target = (Target)getTarget();
 		Session session = (Session)target.getSession();
@@ -127,13 +97,13 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		String name = getQualifiedName();
 		ListLocalVariablesCommand command = new ListLocalVariablesCommand(session.createBitList(target.getTargetID()), getStackFrame());
 		session.getDebugger().postCommand(command);
-		ICDILocalVariable[] vars = command.getLocalVariables();
+		IPCDILocalVariable[] vars = command.getLocalVariables();
 		for (int i = 0; i < vars.length; i++) {
 			if (name.equals(vars[i].getQualifiedName())) {
 				varList.add(vars[i]);
 			}
 		}
-		return (ICDIVariable[])varList.toArray(new ICDIVariable[0]);
+		return (IPCDIVariable[])varList.toArray(new IPCDIVariable[0]);
 	}
 
 	protected abstract Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, IAIF aif);
@@ -143,6 +113,7 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		return 1;
 	}
 
+	/*
 	public ICDIValue getValue() throws CDIException {
 		if (value == null) {
 			ICDIType t = getType();
@@ -185,6 +156,11 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 	public void setValue(ICDIValue value) throws CDIException {
 		setValue(value.getValueString());
 	}
+	*/
+	public void setValue(IAIF aif) throws CDIException {
+		setAIF(aif);
+	}
+	
 	public void setValue(String expression) throws CDIException {
 		Target target = (Target)getTarget();
 		Session session = (Session)target.getSession();
@@ -226,7 +202,7 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		//debugger.setFormat(session.createBitList(target.getTargetID()), getName());
 		throw new CDIException("Not implement yet - Variable: setFormat");
 	}
-	public boolean equals(ICDIVariable var) {
+	public boolean equals(IPCDIVariable var) {
 		if (var instanceof Variable) {
 			Variable variable = (Variable) var;
 			return equals(variable);
@@ -237,7 +213,7 @@ public abstract class Variable extends VariableDescriptor implements ICDIVariabl
 		return getName().equals(variable.getName());
 	}	
 	public void dispose() throws CDIException {
-		ICDITarget target = getTarget();
+		IPCDITarget target = getTarget();
 		VariableManager varMgr = ((Session)target.getSession()).getVariableManager();
 		varMgr.destroyVariable(this);
 	}

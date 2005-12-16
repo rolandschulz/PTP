@@ -18,13 +18,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model.variable;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
 import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
 
-public class Argument extends Variable implements ICDIArgument {
+public class Argument extends Variable implements IPCDIArgument {
 	public Argument(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, IAIF aif) {
 		super(target, thread, frame, name, fullName, pos, depth, aif);
 	}

@@ -16,17 +16,20 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.internal.core.aif;
 
-public class AIFTypeVoid extends AIFType {
-	private int length;
-	
-	public AIFTypeVoid(int length) {
-		this.length = length;
-	}
+import org.eclipse.ptp.debug.core.aif.IAIFTypeVoid;
 
+public class AIFTypeVoid extends AIFType implements IAIFTypeVoid {
+	private int size;
+	
+	public AIFTypeVoid(int size) {
+		this.size = size;
+	}
+	public int sizeof() {
+		return size;
+	}
 	public String toString() {
-		return "v" + Integer.toString(this.length);
+		return "v" + sizeof();
 	}
 }

@@ -22,13 +22,13 @@
  */
 package org.eclipse.ptp.debug.external;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 
 public interface IDebugger {
 
@@ -54,14 +54,14 @@ public interface IDebugger {
 	public void stopDebugger() throws PCDIException;
 	
 	public void listStackFrames(BitList tasks) throws PCDIException;
-	public void setCurrentStackFrame(BitList tasks, ICDIStackFrame frame) throws PCDIException;
+	public void setCurrentStackFrame(BitList tasks, IPCDIStackFrame frame) throws PCDIException;
 	
 	/* Data Display and Manipulation */
 	public void getAIFValue(BitList tasks, String expr) throws PCDIException;
 	public void evaluateExpression(BitList tasks, String expression) throws PCDIException;
 	public void getVariableType(BitList tasks, String varName) throws PCDIException;	
-	public void listArguments(BitList tasks, ICDIStackFrame frame) throws PCDIException;
-	public void listLocalVariables(BitList tasks, ICDIStackFrame frame) throws PCDIException;
+	public void listArguments(BitList tasks, IPCDIStackFrame frame) throws PCDIException;
+	public void listLocalVariables(BitList tasks, IPCDIStackFrame frame) throws PCDIException;
 	public void listGlobalVariables(BitList tasks) throws PCDIException;
 	
 	/* Execution Control */
@@ -75,7 +75,7 @@ public interface IDebugger {
 	public void restart() throws PCDIException;
 	
 	/* Breakpoints */
-	public void setLineBreakpoint(BitList tasks, ICDILineBreakpoint bpt) throws PCDIException;
-	public void setFunctionBreakpoint(BitList tasks, ICDIFunctionBreakpoint bpt) throws PCDIException;
-	public void deleteBreakpoints(ICDIBreakpoint[] bp) throws PCDIException;
+	public void setLineBreakpoint(BitList tasks, IPCDILineBreakpoint bpt) throws PCDIException;
+	public void setFunctionBreakpoint(BitList tasks, IPCDIFunctionBreakpoint bpt) throws PCDIException;
+	public void deleteBreakpoints(IPCDIBreakpoint[] bp) throws PCDIException;
 }

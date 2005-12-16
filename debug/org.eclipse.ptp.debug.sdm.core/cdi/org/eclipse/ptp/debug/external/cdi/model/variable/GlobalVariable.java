@@ -18,13 +18,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model.variable;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIGlobalVariable;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
 
-public class GlobalVariable extends Variable implements ICDIGlobalVariable {
+public class GlobalVariable extends Variable implements IPCDIGlobalVariable {
 	public GlobalVariable(VariableDescriptor obj) {
 		super(obj);
 	}

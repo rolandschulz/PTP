@@ -16,16 +16,6 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import java.math.BigInteger;
@@ -37,15 +27,7 @@ import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILocation;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIAddressBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIExceptionpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariableDescriptor;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIInstruction;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIMemoryBlock;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIMixedInstruction;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRegister;
@@ -54,13 +36,21 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIRegisterGroup;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIRuntimeOptions;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISharedLibrary;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISignal;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIAddressBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIExceptionpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIExpression;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIGlobalVariable;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIGlobalVariableDescriptor;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDITargetConfiguration;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
 import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
 import org.eclipse.ptp.debug.external.cdi.ExpressionManager;
@@ -75,8 +65,12 @@ import org.eclipse.ptp.debug.external.commands.KillCommand;
 import org.eclipse.ptp.debug.external.commands.StepIntoCommand;
 import org.eclipse.ptp.debug.external.commands.StepOverCommand;
 
+/**
+ * @author Clement chu
+ *
+ */
 public class Target extends SessionObject implements IPCDITarget {
-	ICDITargetConfiguration fConfiguration;
+	IPCDITargetConfiguration fConfiguration;
 	Thread[] noThreads = new Thread[0];
 	Thread[] currentThreads;
 	int currentThreadId;
@@ -93,24 +87,28 @@ public class Target extends SessionObject implements IPCDITarget {
 	public IAbstractDebugger getDebugger() {
 		return ((Session)getSession()).getDebugger();
 	}
-	public void setConfiguration(ICDITargetConfiguration configuration) {
+	public void setConfiguration(IPCDITargetConfiguration configuration) {
 		fConfiguration = configuration;
 	}
-	public ICDITarget getTarget() {
+	public IPCDITarget getTarget() {
 		return this;
 	}
-	public void setCurrentThread(ICDIThread cthread) throws CDIException {
+	public void setCurrentThread(IPCDIThread cthread) throws PCDIException {
 		if (cthread instanceof Thread) {
 			setCurrentThread(cthread, true);
 		} else {
-			throw new CDIException("Target - Unknown_thread");
+			throw new PCDIException("Target - Unknown_thread");
 		}
 	}
-	public void setCurrentThread(ICDIThread cthread, boolean doUpdate) throws CDIException {
+	public void setCurrentThread(IPCDIThread cthread, boolean doUpdate) throws PCDIException {
 		if (cthread instanceof Thread) {
-			setCurrentThread((Thread)cthread, doUpdate);
+			try {
+				setCurrentThread((Thread)cthread, doUpdate);
+			} catch (CDIException e) {
+				throw new PCDIException(e.getMessage());
+			}
 		} else {
-			throw new CDIException("Target - Unknown_thread");
+			throw new PCDIException("Target - Unknown_thread");
 		}
 	}
 	public synchronized void setSupended(boolean state) {
@@ -191,8 +189,8 @@ public class Target extends SessionObject implements IPCDITarget {
 		}
 		return cthreads;
 	}
-	public ICDIThread getCurrentThread() throws CDIException {
-		ICDIThread[] threads = getThreads();
+	public IPCDIThread getCurrentThread() throws CDIException {
+		IPCDIThread[] threads = getThreads();
 		for (int i = 0; i < threads.length; i++) {
 			Thread cthread = (Thread)threads[i];
 			if (cthread.getId() == currentThreadId) {
@@ -201,13 +199,13 @@ public class Target extends SessionObject implements IPCDITarget {
 		}
 		return null;
 	}
-	public synchronized ICDIThread[] getThreads() throws CDIException {
+	public synchronized IPCDIThread[] getThreads() throws CDIException {
 		if (currentThreads.length == 0) {
 			currentThreads = getCThreads();
 		}
 		return currentThreads;
 	}
-	public ICDIThread getThread(int tid) throws CDIException {
+	public IPCDIThread getThread(int tid) throws CDIException {
 		Thread th = null;
 		if (currentThreads != null) {
 			for (int i = 0; i < currentThreads.length; i++) {
@@ -301,7 +299,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		resume(false);
 	}
 	public void resume(ICDILocation location) throws CDIException {
-		jump(location);
+		resume(location);
 	}
 	public void resume(ICDISignal signal) throws CDIException {
 		signal(signal);
@@ -368,11 +366,11 @@ public class Target extends SessionObject implements IPCDITarget {
 		//getDebugger().singal(signal.getName());
 		throw new CDIException("Not implement yet - signal(ICDISignal)");
 	}
-	public String evaluateExpressionToString(ICDIStackFrame frame, String expressionText) throws CDIException {
+	public String evaluateExpressionToString(IPCDIStackFrame frame, String expressionText) throws CDIException {
 		Target target = (Target)frame.getTarget();
 		Thread currentThread = (Thread)target.getCurrentThread();
 		StackFrame currentFrame = currentThread.getCurrentStackFrame();
-		target.setCurrentThread(frame.getThread(), false);
+		target.setCurrentThread((IPCDIThread)frame.getThread(), false);
 		((Thread)frame.getThread()).setCurrentStackFrame((StackFrame)frame, false);
 		try {
 			Session session = (Session) target.getSession();
@@ -402,33 +400,33 @@ public class Target extends SessionObject implements IPCDITarget {
 	public Process getProcess() {
 		return null;
 	}
-	public ICDILineBreakpoint setLineBreakpoint(int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException {
+	public IPCDILineBreakpoint setLineBreakpoint(int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException {
 		Session session = (Session)getSession();
 		BreakpointManager bMgr = session.getBreakpointManager();
 		return bMgr.setLineBreakpoint(session.createBitList(getTargetID()), type, location, condition, deferred);
 	}
-	public ICDIFunctionBreakpoint setFunctionBreakpoint(int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException {		
+	public IPCDIFunctionBreakpoint setFunctionBreakpoint(int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException {		
 		Session session = (Session)getSession();
 		BreakpointManager bMgr = session.getBreakpointManager();
 		return bMgr.setFunctionBreakpoint(session.createBitList(getTargetID()), type, location, condition, deferred);
 	}
-	public ICDIAddressBreakpoint setAddressBreakpoint(int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException {
+	public IPCDIAddressBreakpoint setAddressBreakpoint(int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException {
 		Session session = (Session)getSession();
 		BreakpointManager bMgr = session.getBreakpointManager();
 		return bMgr.setAddressBreakpoint(session.createBitList(getTargetID()), type, location, condition, deferred);
 	}
-	public ICDIWatchpoint setWatchpoint(int type, int watchType, String expression, ICDICondition condition) throws CDIException {
+	public IPCDIWatchpoint setWatchpoint(int type, int watchType, String expression, ICDICondition condition) throws CDIException {
 		Session session = (Session)getSession();
 		BreakpointManager bMgr = session.getBreakpointManager();
 		return bMgr.setWatchpoint(session.createBitList(getTargetID()), type, watchType, expression, condition);
 	}
-	public ICDIExceptionpoint setExceptionBreakpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch) throws CDIException {
+	public IPCDIExceptionpoint setExceptionBreakpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch) throws CDIException {
 		throw new CDIException("Not implemented yet setExceptionBreakpoint");
 	}
-	public ICDIBreakpoint[] getBreakpoints() throws CDIException {
+	public IPCDIBreakpoint[] getBreakpoints() throws CDIException {
 		throw new CDIException("Not implemented yet - Target: getBreakpoints");
 	}
-	public void deleteBreakpoints(ICDIBreakpoint[] breakpoints) throws CDIException {
+	public void deleteBreakpoints(IPCDIBreakpoint[] breakpoints) throws CDIException {
 		throw new CDIException("Not implemented yet - Target: deleteBreakpoints");
 	}
 	public void deleteAllBreakpoints() throws CDIException {
@@ -458,17 +456,17 @@ public class Target extends SessionObject implements IPCDITarget {
 		//return new RuntimeOptions(this);
 		return null;
 	}
-	public ICDIExpression createExpression(String code) throws CDIException {
+	public IPCDIExpression createExpression(String code) throws CDIException {
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
 		return expMgr.createExpression(this, code);
 	}
-	public ICDIExpression[] getExpressions() throws CDIException {
+	public IPCDIExpression[] getExpressions() throws CDIException {
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
 		return expMgr.getExpressions(this);
 	}
-	public void destroyExpressions(ICDIExpression[] expressions) throws CDIException {
+	public void destroyExpressions(IPCDIExpression[] expressions) throws CDIException {
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
-		expMgr.destroyExpressions(this, expressions);
+		expMgr.destroyExpressions(this, (IPCDIExpression[])expressions);
 	}	
 	public void destroyAllExpressions() throws CDIException {
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
@@ -516,21 +514,22 @@ public class Target extends SessionObject implements IPCDITarget {
 	public ICDISharedLibrary[] getSharedLibraries() throws CDIException {
 		throw new CDIException("Not implemented yet - Target: getSharedLibraries");
 	}
-	public ICDIGlobalVariableDescriptor getGlobalVariableDescriptors(String filename, String function, String name) throws CDIException {
+	public IPCDIGlobalVariableDescriptor getGlobalVariableDescriptors(String filename, String function, String name) throws PCDIException {
 		//VariableManager varMgr = ((Session)getSession()).getVariableManager();
 		//return varMgr.getGlobalVariableDescriptor(this, filename, function, name);
-		throw new CDIException("Not implemented yet - Target: getGlobalVariableDescriptors");
+		throw new PCDIException("Not implemented yet - Target: getGlobalVariableDescriptors");
 	}
+
 	public ICDIRegisterGroup[] getRegisterGroups() throws CDIException {
 		throw new CDIException("Not implemented yet - Target: getRegisterGroups");
 	}
-	public ICDITargetConfiguration getConfiguration() {
+	public IPCDITargetConfiguration getConfiguration() {
 		if (fConfiguration == null) {
 			fConfiguration = new TargetConfiguration(this);				
 		}		
 		return fConfiguration;
 	}
-	public ICDIGlobalVariable createGlobalVariable(ICDIGlobalVariableDescriptor varDesc) throws CDIException {
+	public IPCDIGlobalVariable createGlobalVariable(IPCDIGlobalVariableDescriptor varDesc) throws CDIException {
 		if (varDesc instanceof GlobalVariableDescriptor) {
 			VariableManager varMgr = ((Session)getSession()).getVariableManager();
 			return varMgr.createGlobalVariable((GlobalVariableDescriptor)varDesc);

@@ -18,8 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.event;
 
-import org.eclipse.cdt.debug.core.cdi.event.ICDIExitedEvent;
+import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
 
-public interface IPCDIExitedEvent extends IPCDIEvent, ICDIExitedEvent {
+/**
+ * @author Clement chu
+ *
+ */
+public interface IPCDIExitedEvent extends IPCDIDestroyedEvent {
+	IPCDISessionObject getReason();	
 }
-

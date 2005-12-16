@@ -19,14 +19,14 @@
 
 package org.eclipse.ptp.debug.external.proxy.event;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 
 public class ProxyDebugBreakpointSetEvent extends AbstractProxyDebugEvent implements IProxyDebugEvent {
 	private int				bpId;
-	private ICDIBreakpoint	bpt;
+	private IPCDIBreakpoint	bpt;
 	
-	public ProxyDebugBreakpointSetEvent(BitList set, int id, ICDIBreakpoint bpt) {
+	public ProxyDebugBreakpointSetEvent(BitList set, int id, IPCDIBreakpoint bpt) {
 		super(EVENT_DBG_BPSET, set);
 		this.bpId = id;
 		this.bpt = bpt;
@@ -36,7 +36,7 @@ public class ProxyDebugBreakpointSetEvent extends AbstractProxyDebugEvent implem
 		return this.bpId;
 	}
 	
-	public ICDIBreakpoint getBreakpoint() {
+	public IPCDIBreakpoint getBreakpoint() {
 		return this.bpt;
 	}
 

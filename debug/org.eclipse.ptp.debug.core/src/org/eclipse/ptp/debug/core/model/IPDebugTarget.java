@@ -18,8 +18,38 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.model;
 
-import org.eclipse.cdt.debug.core.model.ICDebugTarget;
+import org.eclipse.cdt.core.IAddress;
+import org.eclipse.cdt.debug.core.model.ICModule;
+import org.eclipse.cdt.debug.core.model.ICSignal;
+import org.eclipse.cdt.debug.core.model.IDisassembly;
+import org.eclipse.cdt.debug.core.model.IPersistableRegisterGroup;
+import org.eclipse.cdt.debug.core.model.IRegisterDescriptor;
+import org.eclipse.cdt.debug.core.model.IRestart;
+import org.eclipse.cdt.debug.core.model.IResumeWithoutSignal;
+import org.eclipse.cdt.debug.core.model.ISteppingModeTarget;
+import org.eclipse.cdt.debug.core.model.ITargetProperties;
+import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.core.model.IRegisterGroup;
 
-public interface IPDebugTarget extends ICDebugTarget {
+/**
+ * @author Clement chu
+ * 
+ */
+public interface IPDebugTarget extends IDebugTarget, IExecFileInfo, IRestart, IResumeWithoutSignal, IPDebugElement, ISteppingModeTarget, ITargetProperties {
 	public int getTargetID();
+	public boolean isLittleEndian();
+	public boolean hasSignals() throws DebugException;
+	public ICSignal[] getSignals() throws DebugException;
+	public IDisassembly getDisassembly() throws DebugException;
+	public boolean isPostMortem();
+	public boolean hasModules() throws DebugException;
+	public ICModule[] getModules() throws DebugException;
+	public void loadSymbolsForAllModules() throws DebugException;
+	public IRegisterDescriptor[] getRegisterDescriptors() throws DebugException;
+	public void addRegisterGroup(String name, IRegisterDescriptor[] descriptors);
+	public void removeRegisterGroups(IRegisterGroup[] groups);
+	public void modifyRegisterGroup(IPersistableRegisterGroup group, IRegisterDescriptor[] descriptors);
+	public void restoreDefaultRegisterGroups();
+	public IAddress getBreakpointAddress(IPLineBreakpoint breakpoint) throws DebugException;
 }

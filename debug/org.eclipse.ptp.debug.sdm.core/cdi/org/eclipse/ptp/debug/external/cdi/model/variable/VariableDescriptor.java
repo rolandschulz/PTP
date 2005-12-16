@@ -16,37 +16,29 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model.variable;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
 import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.aif.IAIFType;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariableDescriptor;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SourceManager;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
-import org.eclipse.ptp.debug.external.cdi.model.PTPObject;
+import org.eclipse.ptp.debug.external.cdi.model.PObject;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
-import org.eclipse.ptp.debug.external.cdi.model.type.IncompleteType;
-import org.eclipse.ptp.debug.external.commands.EvaluteExpressionCommand;
 
-public abstract class VariableDescriptor extends PTPObject implements ICDIVariableDescriptor {
-	
+/**
+ * @author Clement chu
+ *
+ */
+public abstract class VariableDescriptor extends PObject implements IPCDIVariableDescriptor {
 	// Casting info.
 	String[] castingTypes;
 	int castingIndex;
@@ -60,21 +52,19 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 
 	String qualifiedName = null;
 	String fFullName = null;
-	protected ICDIType fType = null;
-	String sizeof = null;
+	protected IAIFType fType = null;
 	IAIF aif = null;
 	
 	public VariableDescriptor(VariableDescriptor desc) {
 		super((Target)desc.getTarget());
 		fName = desc.getName();
 		fFullName = desc.fFullName;
-		sizeof = desc.sizeof;
 		fType = desc.fType;
 		aif = desc.getAIF();
 		try {
 			fStackFrame = (StackFrame)desc.getStackFrame();
 			fThread = (Thread)desc.getThread();
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 		}
 		position = desc.getPosition();
 		stackdepth = desc.getStackDepth();
@@ -170,8 +160,10 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 	public String getName() {
 		return fName;
 	}
-	public ICDIType getType() throws CDIException {
+	public IAIFType getType() throws PCDIException {
 		if (fType == null) {
+			fType = getAIF().getType();
+			/*
 			String nametype = getTypeName();
 			Target target = (Target)getTarget();
 			Session session = (Session) target.getSession();
@@ -207,11 +199,13 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 			if (fType == null) {
 				fType = new IncompleteType(target, nametype);
 			}
+			*/
 		}
 		return fType;
 	}
 	public int sizeof() throws CDIException {
-		if (sizeof == null) {
+		return getType().sizeof();
+			/*
 			Target target = (Target) getTarget();
 			Thread currentThread = (Thread)target.getCurrentThread();
 			StackFrame currentFrame = currentThread.getCurrentStackFrame();
@@ -237,22 +231,19 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 					target.setCurrentThread(currentThread, false);
 				}
 			}
-		}
-
-		if (sizeof != null) {
-			try {
-				return Integer.parseInt(sizeof);
-			} catch (NumberFormatException e) {
-				throw new CDIException(e.getMessage());
+			if (sizeof != null) {
+				try {
+					return Integer.parseInt(sizeof);
+				} catch (NumberFormatException e) {
+					throw new PCDIException(e.getMessage());
+				}
 			}
-		}
-		return 0;
+			*/
 	}
-	public ICDIStackFrame getStackFrame() throws CDIException {
+	public IPCDIStackFrame getStackFrame() throws PCDIException {
 		return fStackFrame;
 	}
-
-	public ICDIThread getThread() throws CDIException {
+	public IPCDIThread getThread() throws PCDIException {
 		return fThread;
 	}
 	public String getTypeName() throws CDIException {
@@ -277,7 +268,7 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 		}
 		return aif.getDescription();
 	}
-	public String getQualifiedName() throws CDIException {
+	public String getQualifiedName() throws PCDIException {
 		if (qualifiedName == null) {
 			qualifiedName = encodeVariable();
 		}
@@ -299,7 +290,7 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 		}
 		return false;
 	}
-	public boolean equals(ICDIVariableDescriptor varDesc) {
+	public boolean equals(IPCDIVariableDescriptor varDesc) {
 		if (varDesc instanceof VariableDescriptor) {
 			VariableDescriptor desc = (VariableDescriptor) varDesc;
 			if (desc.getName().equals(getName())
@@ -308,23 +299,22 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 				&& equalsCasting(desc, this)) {
 
 				// Check the threads
-				ICDIThread varThread = null;
-				ICDIThread ourThread = null;
+				IPCDIThread varThread = null;
+				IPCDIThread ourThread = null;
 				try {
 					varThread = desc.getThread();
 					ourThread = getThread();
-				} catch (CDIException e) {
+				} catch (PCDIException e) {
 					// ignore
 				}
-				if ((ourThread == null && varThread == null) ||
-						(varThread != null && ourThread != null && varThread.equals(ourThread))) {
+				if ((ourThread == null && varThread == null) || (varThread != null && ourThread != null && varThread.equals(ourThread))) {
 					// check the stackFrames
-					ICDIStackFrame varFrame = null;
-					ICDIStackFrame ourFrame = null;
+					IPCDIStackFrame varFrame = null;
+					IPCDIStackFrame ourFrame = null;
 					try {
 						varFrame = desc.getStackFrame();
 						ourFrame = getStackFrame();
-					} catch (CDIException e) {
+					} catch (PCDIException e) {
 						// ignore
 					}
 					if (ourFrame == null && varFrame == null) {
@@ -342,18 +332,22 @@ public abstract class VariableDescriptor extends PTPObject implements ICDIVariab
 		}
 		return super.equals(varDesc);
 	}
-	public ICDIVariableDescriptor getVariableDescriptorAsArray(int start, int length) throws CDIException {
+	public IPCDIVariableDescriptor getVariableDescriptorAsArray(int start, int length) throws CDIException {
 		Session session = (Session)getTarget().getSession();
 		VariableManager mgr = session.getVariableManager();
 		return mgr.getVariableDescriptorAsArray(this, start, length);
 	}
-	public ICDIVariableDescriptor getVariableDescriptorAsType(String type) throws CDIException {
+	public IPCDIVariable[] getVariablesAsArray(int start, int length) throws CDIException {
+		Session session = (Session)getTarget().getSession();
+		VariableManager mgr = session.getVariableManager();
+		return mgr.getVariablesAsArray(this, start, length);
+	}
+	public IPCDIVariableDescriptor getVariableDescriptorAsType(String type) throws CDIException {
 		Session session = (Session)getTarget().getSession();
 		VariableManager mgr = session.getVariableManager();
 		return mgr.getVariableDescriptorAsType(this, type);
 	}
-	
-	public ICDIVariable createVariable() throws CDIException {
+	public IPCDIVariable createVariable() throws CDIException {
 		Session session = (Session)getTarget().getSession();
 		VariableManager mgr = session.getVariableManager();
 		return mgr.createVariable(this);

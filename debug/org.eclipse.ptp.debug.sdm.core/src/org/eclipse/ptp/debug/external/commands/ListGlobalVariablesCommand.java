@@ -18,9 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.commands;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIGlobalVariable;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIGlobalVariable;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
@@ -35,10 +35,10 @@ public class ListGlobalVariablesCommand extends AbstractDebugCommand {
 		debugger.listGlobalVariables(tasks);
 	}
 	
-	public ICDIGlobalVariable[] getGlobalVariables() throws PCDIException {
+	public IPCDIGlobalVariable[] getGlobalVariables() throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof ICDIGlobalVariable[])
-				return (ICDIGlobalVariable[])result;
+			if (result instanceof IPCDIGlobalVariable[])
+				return (IPCDIGlobalVariable[])result;
 		}
 		throw new PCDIException("No global variables found in " + tasks.toString());
 	}

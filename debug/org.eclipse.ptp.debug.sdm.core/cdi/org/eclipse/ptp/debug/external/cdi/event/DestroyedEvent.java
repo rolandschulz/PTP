@@ -18,24 +18,24 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIVariable;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIDestroyedEvent;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
 
 /**
  * @author Clement chu
  * 
  */
 public class DestroyedEvent extends AbstractEvent implements IPCDIDestroyedEvent {
-	public DestroyedEvent(IPCDISession session, BitList tasks, ICDIObject source) {
+	public DestroyedEvent(IPCDISession session, BitList tasks, IPCDIObject source) {
 		super(session, tasks, source);
 	}
 	
 	public String getVariableName() {
-		if (getSource() instanceof ICDIVariable) {
-			return ((ICDIVariable)getSource()).getName();
+		if (getSource() instanceof IPCDIVariable) {
+			return ((IPCDIVariable)getSource()).getName();
 		}
 		return "";
 	}

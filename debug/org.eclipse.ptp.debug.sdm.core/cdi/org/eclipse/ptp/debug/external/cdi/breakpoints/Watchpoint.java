@@ -20,13 +20,13 @@ package org.eclipse.ptp.debug.external.cdi.breakpoints;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
 
 /**
  * @author Clement chu
  * 
  */
-public class Watchpoint extends Breakpoint implements ICDIWatchpoint {
+public class Watchpoint extends Breakpoint implements IPCDIWatchpoint {
 	int watchType;
 	String what;
 
@@ -42,9 +42,9 @@ public class Watchpoint extends Breakpoint implements ICDIWatchpoint {
 		return what;
 	}
 	public boolean isReadType() {
-		return ((watchType & ICDIWatchpoint.READ) == ICDIWatchpoint.READ);
+		return ((watchType & IPCDIWatchpoint.READ) == IPCDIWatchpoint.READ);
 	}
 	public boolean isWriteType() {
-		return ((watchType & ICDIWatchpoint.WRITE) == ICDIWatchpoint.WRITE);
+		return ((watchType & IPCDIWatchpoint.WRITE) == IPCDIWatchpoint.WRITE);
 	}
 }

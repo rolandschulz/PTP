@@ -31,10 +31,6 @@ package org.eclipse.ptp.debug.internal.core.model;
 import java.text.MessageFormat;
 import org.eclipse.cdt.debug.core.CDebugUtils;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.cdi.ICDISession;
-import org.eclipse.cdt.debug.core.model.CDebugElementState;
-import org.eclipse.cdt.debug.core.model.ICDebugElement;
-import org.eclipse.cdt.debug.core.model.ICDebugElementStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
@@ -47,15 +43,18 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.core.model.IPDebugElement;
+import org.eclipse.ptp.debug.core.model.IPDebugElementStatus;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
+import org.eclipse.ptp.debug.core.model.PDebugElementState;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 
-public abstract class PDebugElement extends PlatformObject implements ICDebugElement, ICDebugElementStatus {
+public abstract class PDebugElement extends PlatformObject implements IPDebugElement, IPDebugElementStatus {
 	private PDebugTarget fDebugTarget;
-	private int fSeverity = ICDebugElementStatus.OK;
+	private int fSeverity = IPDebugElementStatus.OK;
 	private String fMessage = null;
-	private CDebugElementState fState = CDebugElementState.UNDEFINED;
-	private CDebugElementState fOldState = CDebugElementState.UNDEFINED;
+	private PDebugElementState fState = PDebugElementState.UNDEFINED;
+	private PDebugElementState fOldState = PDebugElementState.UNDEFINED;
 	private Object fCurrentStateInfo = null;
 
 	public PDebugElement(PDebugTarget target) {
@@ -115,8 +114,8 @@ public abstract class PDebugElement extends PlatformObject implements ICDebugEle
 	public DebugEvent createChangeEvent(int detail) {
 		return new DebugEvent(this, DebugEvent.CHANGE, detail);
 	}
-	public ICDISession getCDISession() {
-		return getCDITarget().getSession();
+	public IPCDISession getCDISession() {
+		return (IPCDISession)getCDITarget().getSession();
 	}
 	public IPCDITarget getCDITarget() {
 		return (IPCDITarget) getDebugTarget().getAdapter(IPCDITarget.class);
@@ -146,11 +145,11 @@ public abstract class PDebugElement extends PlatformObject implements ICDebugEle
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IDebugElement.class))
 			return this;
-		if (adapter.equals(ICDebugElement.class))
+		if (adapter.equals(IPDebugElement.class))
 			return this;
 		if (adapter.equals(PDebugElement.class))
 			return this;
-		if (adapter.equals(ICDebugElementStatus.class))
+		if (adapter.equals(IPDebugElementStatus.class))
 			return this;
 		if (adapter.equals(IPCDISession.class))
 			return getCDISession();
@@ -165,11 +164,11 @@ public abstract class PDebugElement extends PlatformObject implements ICDebugEle
 			fMessage.trim();
 	}
 	protected void resetStatus() {
-		fSeverity = ICDebugElementStatus.OK;
+		fSeverity = IPDebugElementStatus.OK;
 		fMessage = null;
 	}
 	public boolean isOK() {
-		return (fSeverity == ICDebugElementStatus.OK);
+		return (fSeverity == IPDebugElementStatus.OK);
 	}
 	public int getSeverity() {
 		return fSeverity;
@@ -177,10 +176,10 @@ public abstract class PDebugElement extends PlatformObject implements ICDebugEle
 	public String getMessage() {
 		return fMessage;
 	}
-	public CDebugElementState getState() {
+	public PDebugElementState getState() {
 		return fState;
 	}
-	protected synchronized void setState(CDebugElementState state) throws IllegalArgumentException {
+	protected synchronized void setState(PDebugElementState state) throws IllegalArgumentException {
 		fOldState = fState;
 		fState = state;
 	}

@@ -18,8 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.event;
 
-import org.eclipse.cdt.debug.core.cdi.event.ICDIDisconnectedEvent;
-
-public interface IPCDIDisconnectedEvent extends IPCDIEvent, ICDIDisconnectedEvent {
-}
+/**
+ * @author Clement chu
+ *
+ */
+public interface IPCDIDisconnectedEvent extends IPCDIEvent {}
 

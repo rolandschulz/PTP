@@ -16,13 +16,24 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.internal.core.aif;
 
-import org.eclipse.ptp.debug.core.aif.IAIFValue;
+import org.eclipse.ptp.debug.core.aif.IAIFType;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
-public class AIFValueUnknown implements IAIFValue {
+public class AIFValueUnknown extends AIFValue {
+	public AIFValueUnknown(IAIFType type) {
+		super(type, new byte[0]);
+	}
+	public String getValueString() throws PCDIException {
+		if (result == null) {
+			result = "<value not supported>";
+		}
+		return result;
+	}
+	/*
 	public String toString() {
 		return "<value not supported>";
 	}
+	*/
 }
