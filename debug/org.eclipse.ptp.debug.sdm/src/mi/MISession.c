@@ -54,6 +54,7 @@ MISessionNew(void)
 	sess->pid = -1;
 	sess->exited = 1;
 	sess->exit_status = 0;
+	sess->command = NULL;
 	sess->send_queue = NewList();
 	sess->gdb_path = strdup("gdb");
 	sess->event_callback = NULL;
