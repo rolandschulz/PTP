@@ -990,6 +990,7 @@ DumpBinaryValue(MISession *sess, char *exp, char *file)
 static int
 GDBMIEvaluateExpression(char *exp)
 {
+	int			fd;
 	int			res  = DBGRES_OK;
 	char *		type;
 	char *		fds = NULL;
@@ -1000,11 +1001,13 @@ GDBMIEvaluateExpression(char *exp)
 	if (GetTypeInfo(exp, &type, &fds) == DBGRES_OK) {
 		strcpy(tmp, "/tmp/guard.XXXXXX");
 	
-		if ( mktemp(tmp) == NULL )
+		if ( (fd = mkstemp(tmp)) < 0 )
 		{
 			DbgSetError(DBGERR_DEBUGGER, (char *)strerror(errno));
 			return DBGRES_ERR;
 		}
+		
+		close(fd);
 	
 		if ( DumpBinaryValue(DebugSession, exp, tmp) < 0 )
 			return DBGRES_ERR;
