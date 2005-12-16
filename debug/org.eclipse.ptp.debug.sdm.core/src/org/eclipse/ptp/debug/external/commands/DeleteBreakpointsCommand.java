@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.commands;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
@@ -27,10 +27,10 @@ import org.eclipse.ptp.debug.external.IAbstractDebugger;
  * 
  */
 public class DeleteBreakpointsCommand extends AbstractDebugCommand {
-	private ICDIBreakpoint[] bpts = null;
+	private IPCDIBreakpoint[] bpts = null;
 	private int returnCounter = 0;
 	
-	public DeleteBreakpointsCommand(ICDIBreakpoint[] bpts) {
+	public DeleteBreakpointsCommand(IPCDIBreakpoint[] bpts) {
 		super(null, false, true);
 		this.bpts = bpts;
 	}

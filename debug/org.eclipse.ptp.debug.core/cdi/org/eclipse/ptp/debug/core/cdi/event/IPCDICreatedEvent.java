@@ -18,8 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.event;
 
-import org.eclipse.cdt.debug.core.cdi.event.ICDICreatedEvent;
-
-public interface IPCDICreatedEvent extends IPCDIEvent, ICDICreatedEvent {
-}
+/**
+ * @author Clement chu
+ *
+ */
+public interface IPCDICreatedEvent extends IPCDIEvent {}
 

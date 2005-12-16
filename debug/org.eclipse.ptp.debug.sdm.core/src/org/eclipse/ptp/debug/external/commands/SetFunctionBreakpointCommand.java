@@ -18,9 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.commands;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
@@ -28,9 +28,9 @@ import org.eclipse.ptp.debug.external.IAbstractDebugger;
  * 
  */
 public class SetFunctionBreakpointCommand extends AbstractDebugCommand {
-	private ICDIFunctionBreakpoint funcBpt = null;
+	private IPCDIFunctionBreakpoint funcBpt = null;
 	
-	public SetFunctionBreakpointCommand(BitList tasks, ICDIFunctionBreakpoint funcBpt) {
+	public SetFunctionBreakpointCommand(BitList tasks, IPCDIFunctionBreakpoint funcBpt) {
 		super(tasks, false, true);
 		this.funcBpt = funcBpt;
 	}

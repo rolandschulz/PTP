@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model.variable;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorageDescriptor;
 import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIThreadStorageDescriptor;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
@@ -28,7 +28,7 @@ import org.eclipse.ptp.debug.external.cdi.model.Thread;
  * @author Clement chu
  * 
  */
-public class ThreadStorageDescriptor extends VariableDescriptor implements ICDIThreadStorageDescriptor {
+public class ThreadStorageDescriptor extends VariableDescriptor implements IPCDIThreadStorageDescriptor {
 	public ThreadStorageDescriptor(Target target, Thread thread, StackFrame stack, String n, String fn, int pos, int depth, IAIF aif) {
 		super(target, thread, stack, n, fn, pos, depth, aif);
 	}

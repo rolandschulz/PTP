@@ -23,11 +23,6 @@ import java.util.List;
 import java.util.Properties;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.cdi.ICDIEventManager;
-import org.eclipse.cdt.debug.core.cdi.ICDISession;
-import org.eclipse.cdt.debug.core.cdi.ICDISessionConfiguration;
-import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -43,7 +38,10 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.cdi.IPCDIEventManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.IPCDISessionConfiguration;
+import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
@@ -58,7 +56,11 @@ import org.eclipse.ptp.debug.external.commands.StepFinishCommand;
 import org.eclipse.ptp.debug.external.commands.StepIntoCommand;
 import org.eclipse.ptp.debug.external.commands.StepOverCommand;
 
-public class Session implements IPCDISession, ICDISessionObject, IBreakpointListener {
+/**
+ * @author Clement chu
+ *
+ */
+public class Session implements IPCDISession, IPCDISessionObject, IBreakpointListener {
 	public final static Target[] EMPTY_TARGETS = {};
 	Properties props;
 	ProcessManager processManager;
@@ -67,7 +69,7 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 	ExpressionManager expressionManager;
 	VariableManager variableManager;
 	SourceManager sourceManager;
-	ICDISessionConfiguration configuration;
+	IPCDISessionConfiguration configuration;
 	IAbstractDebugger debugger = null;
 	IPJob job = null;
 	IPLaunch launch = null;
@@ -188,7 +190,7 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 	public BreakpointManager getBreakpointManager() {
 		return breakpointManager;
 	}
-	public ICDIEventManager getEventManager() {
+	public IPCDIEventManager getEventManager() {
 		return eventManager;
 	}
 	public ExpressionManager getExpressionManager() {
@@ -200,25 +202,25 @@ public class Session implements IPCDISession, ICDISessionObject, IBreakpointList
 	public SourceManager getSourceManager() {
 		return sourceManager;
 	}
-	public ICDITarget[] getTargets() {
+	public IPCDITarget[] getTargets() {
 		return getProcessManager().getCDITargets();
 	}
 	public BitList getRegisteredTargets() {
 		return getProcessManager().getRegisteredTargets();
 	}
-	public ICDITarget getTarget(int target_id) {
+	public IPCDITarget getTarget(int target_id) {
 		return getProcessManager().getTarget(target_id);
 	}
 	public void setAttribute(String key, String value) {
 		props.setProperty(key, value);
 	}
-	public ICDISessionConfiguration getConfiguration() {
+	public IPCDISessionConfiguration getConfiguration() {
 		return configuration;
 	}
-	public void setConfiguration(ICDISessionConfiguration conf) {
+	public void setConfiguration(IPCDISessionConfiguration conf) {
 		configuration = conf;
 	}
-	public ICDISession getSession() {
+	public IPCDISession getSession() {
 		return this;
 	}
 	public Process getSessionProcess() throws CDIException {

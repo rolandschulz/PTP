@@ -20,17 +20,16 @@
 package org.eclipse.ptp.debug.external.proxy.event;
 
 import java.math.BigInteger;
-
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDILocator;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.ptp.core.proxy.event.IProxyEvent;
 import org.eclipse.ptp.core.proxy.event.ProxyEvent;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.ExtFormat;
 import org.eclipse.ptp.debug.core.aif.AIF;
 import org.eclipse.ptp.debug.core.aif.IAIF;
-import org.eclipse.ptp.debug.external.ExtFormat;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
 import org.eclipse.ptp.debug.external.cdi.Condition;
 import org.eclipse.ptp.debug.external.cdi.Locator;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
@@ -65,13 +64,13 @@ public class ProxyDebugEvent extends ProxyEvent {
 		case IProxyDebugEvent.EVENT_DBG_BPSET:
 			int setId = Integer.parseInt(args[2]);
 			ICDILineLocation loc = toLineLocation(args[8], args[11]);
-			ICDIBreakpoint bpt = toBreakpoint(args[4], args[5], args[6], args[7], loc);
+			IPCDIBreakpoint bpt = toBreakpoint(args[4], args[5], args[6], args[7], loc);
 			evt = new ProxyDebugBreakpointSetEvent(set, setId, bpt);
 			break;
 
 		case IProxyDebugEvent.EVENT_DBG_SIGNAL:
 			int sigTid = Integer.parseInt(args[4]);
-			ICDILocator sigLoc = null;
+			IPCDILocator sigLoc = null;
 			
 			if (!(args[5].compareTo("*") == 0)) {
 				sigLoc = toLocator(args[6], args[7], args[8], args[9]);
@@ -152,8 +151,8 @@ public class ProxyDebugEvent extends ProxyEvent {
 		return a;
 	}
 	
-	public static ICDIBreakpoint toBreakpoint(String ignoreStr, String spec, String del, String typeStr, ICDILineLocation loc) {
-		ICDIBreakpoint bpt = null;
+	public static IPCDIBreakpoint toBreakpoint(String ignoreStr, String spec, String del, String typeStr, ICDILineLocation loc) {
+		IPCDIBreakpoint bpt = null;
 		int typeVal;
 		
 		int ignore = Integer.parseInt(ignoreStr);
@@ -162,11 +161,11 @@ public class ProxyDebugEvent extends ProxyEvent {
 		String type = decodeString(typeStr);
 
 		if (type.compareTo("breakpoint") == 0)
-			typeVal = ICDIBreakpoint.REGULAR;
+			typeVal = IPCDIBreakpoint.REGULAR;
 		else if (type.compareTo("hw") == 0)
-			typeVal = ICDIBreakpoint.HARDWARE;
+			typeVal = IPCDIBreakpoint.HARDWARE;
 		else
-			typeVal = ICDIBreakpoint.TEMPORARY;
+			typeVal = IPCDIBreakpoint.TEMPORARY;
 		
 		bpt = new LineBreakpoint(typeVal, loc, cond);
 	
@@ -179,7 +178,7 @@ public class ProxyDebugEvent extends ProxyEvent {
 		return new LineLocation(file, line);
 	}
 	
-	public static ICDILocator toLocator(String fileStr, String funcStr, String addrStr, String lineStr) {
+	public static IPCDILocator toLocator(String fileStr, String funcStr, String addrStr, String lineStr) {
 		String file = decodeString(fileStr);
 		String func = decodeString(funcStr);
 		int line = Integer.parseInt(lineStr);

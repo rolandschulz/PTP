@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
@@ -44,10 +43,10 @@ public class ProcessManager extends Manager {
 		debugTargetMap.clear();
 	}
 	public Target[] getTargets() {
-		return (Target[]) debugTargetMap.values().toArray(new Target[debugTargetMap.size()]);
+		return (Target[]) debugTargetMap.values().toArray(new Target[0]);
 	}
-	public ICDITarget[] getCDITargets() {
-		return (ICDITarget[]) debugTargetMap.values().toArray(new ICDITarget[debugTargetMap.size()]);
+	public IPCDITarget[] getCDITargets() {
+		return (IPCDITarget[]) debugTargetMap.values().toArray(new IPCDITarget[0]);
 	}
 	public BitList getRegisteredTargets() {
 		BitList regTasks = ((Session)getSession()).createEmptyBitList();

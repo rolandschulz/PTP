@@ -16,16 +16,6 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
 import java.io.File;
@@ -39,56 +29,21 @@ import org.eclipse.cdt.core.IAddressFactory;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.core.IBinaryParser.ISymbol;
 import org.eclipse.cdt.debug.core.CDebugUtils;
-import org.eclipse.cdt.debug.core.ICGlobalVariableManager;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDIBreakpointHit;
-import org.eclipse.cdt.debug.core.cdi.ICDIEndSteppingRange;
-import org.eclipse.cdt.debug.core.cdi.ICDIErrorInfo;
 import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDILocation;
-import org.eclipse.cdt.debug.core.cdi.ICDISession;
-import org.eclipse.cdt.debug.core.cdi.ICDISessionConfiguration;
-import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
-import org.eclipse.cdt.debug.core.cdi.ICDISharedLibraryEvent;
-import org.eclipse.cdt.debug.core.cdi.ICDISignalReceived;
-import org.eclipse.cdt.debug.core.cdi.ICDIWatchpointScope;
-import org.eclipse.cdt.debug.core.cdi.ICDIWatchpointTrigger;
-import org.eclipse.cdt.debug.core.cdi.event.ICDIChangedEvent;
-import org.eclipse.cdt.debug.core.cdi.event.ICDICreatedEvent;
-import org.eclipse.cdt.debug.core.cdi.event.ICDIDestroyedEvent;
-import org.eclipse.cdt.debug.core.cdi.event.ICDIDisconnectedEvent;
-import org.eclipse.cdt.debug.core.cdi.event.ICDIEvent;
-import org.eclipse.cdt.debug.core.cdi.event.ICDIEventListener;
-import org.eclipse.cdt.debug.core.cdi.event.ICDIExitedEvent;
-import org.eclipse.cdt.debug.core.cdi.event.ICDIRestartedEvent;
-import org.eclipse.cdt.debug.core.cdi.event.ICDIResumedEvent;
-import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITargetConfiguration;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIVariableDescriptor;
-import org.eclipse.cdt.debug.core.model.CDebugElementState;
-import org.eclipse.cdt.debug.core.model.ICDebugElement;
-import org.eclipse.cdt.debug.core.model.ICDebugElementStatus;
-import org.eclipse.cdt.debug.core.model.ICGlobalVariable;
-import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
 import org.eclipse.cdt.debug.core.model.ICModule;
 import org.eclipse.cdt.debug.core.model.ICSignal;
 import org.eclipse.cdt.debug.core.model.IDebuggerProcessSupport;
 import org.eclipse.cdt.debug.core.model.IDisassembly;
-import org.eclipse.cdt.debug.core.model.IExecFileInfo;
-import org.eclipse.cdt.debug.core.model.IGlobalVariableDescriptor;
 import org.eclipse.cdt.debug.core.model.IPersistableRegisterGroup;
 import org.eclipse.cdt.debug.core.model.IRegisterDescriptor;
-import org.eclipse.cdt.debug.core.sourcelookup.ICSourceLocator;
-import org.eclipse.cdt.debug.core.sourcelookup.ISourceLookupChangeListener;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
@@ -120,26 +75,64 @@ import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointHit;
+import org.eclipse.ptp.debug.core.cdi.IPCDIEndSteppingRange;
+import org.eclipse.ptp.debug.core.cdi.IPCDIErrorInfo;
+import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.IPCDISessionConfiguration;
+import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
+import org.eclipse.ptp.debug.core.cdi.IPCDISharedLibraryEvent;
+import org.eclipse.ptp.debug.core.cdi.IPCDISignalReceived;
+import org.eclipse.ptp.debug.core.cdi.IPCDIWatchpointScope;
+import org.eclipse.ptp.debug.core.cdi.IPCDIWatchpointTrigger;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIChangedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDICreatedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIDestroyedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIDisconnectedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIRestartedEvent;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDITargetConfiguration;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariableDescriptor;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
+import org.eclipse.ptp.debug.core.model.IExecFileInfo;
+import org.eclipse.ptp.debug.core.model.IGlobalVariableDescriptor;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
+import org.eclipse.ptp.debug.core.model.IPDebugElement;
+import org.eclipse.ptp.debug.core.model.IPDebugElementStatus;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
-import org.eclipse.ptp.debug.core.sourcelookup.CDirectorySourceContainer;
+import org.eclipse.ptp.debug.core.model.IPGlobalVariable;
+import org.eclipse.ptp.debug.core.model.IPGlobalVariableManager;
+import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
+import org.eclipse.ptp.debug.core.model.PDebugElementState;
+import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator;
+import org.eclipse.ptp.debug.core.sourcelookup.ISourceLookupChangeListener;
+import org.eclipse.ptp.debug.core.sourcelookup.PDirectorySourceContainer;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PGlobalVariableManager;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceLookupParticipant;
-import org.eclipse.ptp.debug.internal.core.sourcelookup.CSourceManager;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceLookupParticipant;
+import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceManager;
 
-public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEventListener, ILaunchListener, IExpressionListener, ISourceLookupChangeListener {
+/**
+ * @author Clement chu
+ *
+ */
+public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIEventListener, ILaunchListener, IExpressionListener, ISourceLookupChangeListener {
 	private final String PROCESS_NAME = "Process ";
 	private ArrayList fThreads;
 	private IProcess fDebuggeeProcess = null;
 	private IPCDITarget fCDITarget;
 	private IPProcess process;
 	private IPLaunch fLaunch;
-	private ICDITargetConfiguration fConfig;
+	private IPCDITargetConfiguration fConfig;
 	private PGlobalVariableManager fGlobalVariableManager;
 	private IBinaryObject fBinaryFile;
 	private Boolean fIsLittleEndian = null;
@@ -155,17 +148,17 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		setProcess(debuggeeProcess);
 		setExecFile(file);
 		initializePreferences();
-		setConfiguration(cdiTarget.getConfiguration());
+		setConfiguration((IPCDITargetConfiguration)cdiTarget.getConfiguration());
 		if (!process.getStatus().equals(IPProcess.EXITED)) {
-			setState(CDebugElementState.SUSPENDED);
+			setState(PDebugElementState.SUSPENDED);
 			setThreadList(new ArrayList(5));
 			setGlobalVariableManager(new PGlobalVariableManager(this));
-			initialize();	
+			initialize();
 			DebugPlugin.getDefault().getLaunchManager().addLaunchListener(this);
 			DebugPlugin.getDefault().getExpressionManager().addExpressionListener(this);
 			getCDISession().getEventManager().addEventListener(this);
 		} else {
-			setState(CDebugElementState.TERMINATED);
+			setState(PDebugElementState.TERMINATED);
 			setThreadList(new ArrayList(5));
 		}
 	}
@@ -181,15 +174,15 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		fireEventSet((DebugEvent[]) debugEvents.toArray(new DebugEvent[debugEvents.size()]));
 	}
 	protected void initializeThreads(List debugEvents) {
-		ICDIThread[] cdiThreads = new ICDIThread[0];
+		IPCDIThread[] cdiThreads = new IPCDIThread[0];
 		try {
-			cdiThreads = getCDITarget().getThreads();
+			cdiThreads = (IPCDIThread[])getCDITarget().getThreads();
 		} catch (CDIException e) {
 			// ignore
 		}
 		DebugEvent suspendEvent = null;
 		for (int i = 0; i < cdiThreads.length; ++i) {
-			CThread thread = createThread(cdiThreads[i]);
+			PThread thread = createThread(cdiThreads[i]);
 			debugEvents.add(thread.createCreateEvent());
 			try {
 				if (cdiThreads[i].equals(getCDITarget().getCurrentThread()) && thread.isSuspended()) {
@@ -207,15 +200,15 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	protected void initializeSourceManager() {
 		ISourceLocator locator = getLaunch().getSourceLocator();
 		if (locator instanceof IAdaptable) {
-			ICSourceLocator clocator = (ICSourceLocator) ((IAdaptable) locator).getAdapter(ICSourceLocator.class);
+			IPSourceLocator clocator = (IPSourceLocator) ((IAdaptable) locator).getAdapter(IPSourceLocator.class);
 			if (clocator instanceof IAdaptable) {
-				CSourceManager sm = (CSourceManager) ((IAdaptable) clocator).getAdapter(CSourceManager.class);
+				PSourceManager sm = (PSourceManager) ((IAdaptable) clocator).getAdapter(PSourceManager.class);
 				if (sm != null)
 					sm.setDebugTarget(this);
 			}
 			IResourceChangeListener listener = (IResourceChangeListener) ((IAdaptable) locator).getAdapter(IResourceChangeListener.class);
 			if (listener != null)
-				CCorePlugin.getWorkspace().addResourceChangeListener(listener);
+				ResourcesPlugin.getWorkspace().addResourceChangeListener(listener);
 		}
 	}
 	protected void initializeSourceLookupPath() {
@@ -223,8 +216,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		if (locator instanceof ISourceLookupDirector) {
 			ISourceLookupParticipant[] participants = ((ISourceLookupDirector) locator).getParticipants();
 			for (int i = 0; i < participants.length; ++i) {
-				if (participants[i] instanceof CSourceLookupParticipant) {
-					((CSourceLookupParticipant) participants[i]).addSourceLookupChangeListener(this);
+				if (participants[i] instanceof PSourceLookupParticipant) {
+					((PSourceLookupParticipant) participants[i]).addSourceLookupChangeListener(this);
 				}
 			}
 			setSourceLookupPath(((ISourceLookupDirector) locator).getSourceContainers());
@@ -262,18 +255,17 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	}
 	public void launchAdded(ILaunch launch) {}
 	public void launchChanged(ILaunch launch) {}
-
 	public boolean canTerminate() {
 		return supportsTerminate() && isAvailable();
 	}
 	public boolean isTerminated() {
-		return (getState().equals(CDebugElementState.TERMINATED));
+		return (getState().equals(PDebugElementState.TERMINATED));
 	}
 	public void terminate() throws DebugException {
 		if (!canTerminate()) {
 			return;
 		}
-		changeState(CDebugElementState.TERMINATING);
+		changeState(PDebugElementState.TERMINATING);
 		try {
 			getCDITarget().terminate();
 		} catch (CDIException e) {
@@ -287,7 +279,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	public boolean canSuspend() {
 		if (!getConfiguration().supportsSuspend())
 			return false;
-		if (getState().equals(CDebugElementState.RESUMED)) {
+		if (getState().equals(PDebugElementState.RESUMED)) {
 			// only allow suspend if no threads are currently suspended
 			IThread[] threads = getThreads();
 			for (int i = 0; i < threads.length; i++) {
@@ -300,12 +292,12 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return false;
 	}
 	public boolean isSuspended() {
-		return (getState().equals(CDebugElementState.SUSPENDED));
+		return (getState().equals(PDebugElementState.SUSPENDED));
 	}
 	public void resume() throws DebugException {
 		if (!canResume())
 			return;
-		changeState(CDebugElementState.RESUMING);
+		changeState(PDebugElementState.RESUMING);
 		try {
 			getCDITarget().resume(false);
 		} catch (CDIException e) {
@@ -316,7 +308,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	public void suspend() throws DebugException {
 		if (!canSuspend())
 			return;
-		changeState(CDebugElementState.SUSPENDING);
+		changeState(PDebugElementState.SUSPENDING);
 		try {
 			getCDITarget().suspend();
 		} catch (CDIException e) {
@@ -325,15 +317,15 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		}
 	}
 	protected boolean isSuspending() {
-		return (getState().equals(CDebugElementState.SUSPENDING));
+		return (getState().equals(PDebugElementState.SUSPENDING));
 	}
-	protected void suspendThreads(ICDISuspendedEvent event) {
+	protected void suspendThreads(IPCDISuspendedEvent event) {
 		Iterator it = getThreadList().iterator();
 		while (it.hasNext()) {
-			CThread thread = (CThread) it.next();
-			ICDIThread suspensionThread = null;
+			PThread thread = (PThread) it.next();
+			IPCDIThread suspensionThread = null;
 			try {
-				suspensionThread = getCDITarget().getCurrentThread();
+				suspensionThread = (IPCDIThread)getCDITarget().getCurrentThread();
 			} catch (CDIException e) {
 				// ignore
 			}
@@ -345,17 +337,17 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		ArrayList list = new ArrayList(5);
 		ArrayList debugEvents = new ArrayList(5);
 		List oldList = (List) getThreadList().clone();
-		ICDIThread[] cdiThreads = new ICDIThread[0];
-		ICDIThread currentCDIThread = null;
+		IPCDIThread[] cdiThreads = new IPCDIThread[0];
+		IPCDIThread currentCDIThread = null;
 		try {
-			cdiThreads = getCDITarget().getThreads();
-			currentCDIThread = getCDITarget().getCurrentThread();
+			cdiThreads = (IPCDIThread[])getCDITarget().getThreads();
+			currentCDIThread = (IPCDIThread)getCDITarget().getCurrentThread();
 		} catch (CDIException e) {
 		}
 		for (int i = 0; i < cdiThreads.length; ++i) {
-			CThread thread = findThread(oldList, cdiThreads[i]);
+			PThread thread = findThread(oldList, cdiThreads[i]);
 			if (thread == null) {
-				thread = new CThread(this, cdiThreads[i]);
+				thread = new PThread(this, cdiThreads[i]);
 				newThreads.add(thread);
 			} else {
 				oldList.remove(thread);
@@ -365,14 +357,14 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		}
 		Iterator it = oldList.iterator();
 		while (it.hasNext()) {
-			CThread thread = (CThread) it.next();
+			PThread thread = (PThread) it.next();
 			thread.terminated();
 			debugEvents.add(thread.createTerminateEvent());
 		}
 		setThreadList(list);
 		it = newThreads.iterator();
 		while (it.hasNext()) {
-			debugEvents.add(((CThread) it.next()).createCreateEvent());
+			debugEvents.add(((PThread) it.next()).createCreateEvent());
 		}
 		if (debugEvents.size() > 0)
 			fireEventSet((DebugEvent[]) debugEvents.toArray(new DebugEvent[debugEvents.size()]));
@@ -381,32 +373,30 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	protected synchronized void resumeThreads(List debugEvents, int detail) {
 		Iterator it = getThreadList().iterator();
 		while (it.hasNext()) {
-			((CThread) it.next()).resumedByTarget(detail, debugEvents);
+			((PThread) it.next()).resumedByTarget(detail, debugEvents);
 		}
 	}
-
-	public void breakpointAdded( IBreakpoint breakpoint ) {}
-	public void breakpointRemoved( IBreakpoint breakpoint, IMarkerDelta delta ) {}
-	public void breakpointChanged( IBreakpoint breakpoint, IMarkerDelta delta ) {}
-	
+	public void breakpointAdded(IBreakpoint breakpoint) {}
+	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {}
+	public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {}
 	protected boolean supportsDisconnect() {
-		//No Discount
-		//return getConfiguration().supportsDisconnect();
+		// No Discount
+		// return getConfiguration().supportsDisconnect();
 		return false;
 	}
 	protected boolean supportsTerminate() {
 		return getConfiguration().supportsTerminate();
 	}
 	public boolean canDisconnect() {
-		//No disconnet
-		//return supportsDisconnect() && isAvailable();
+		// No disconnet
+		// return supportsDisconnect() && isAvailable();
 		return false;
 	}
 	public void disconnect() throws DebugException {
 		if (isDisconnecting()) {
 			return;
 		}
-		changeState(CDebugElementState.DISCONNECTING);
+		changeState(PDebugElementState.DISCONNECTING);
 		try {
 			getCDITarget().disconnect();
 		} catch (CDIException e) {
@@ -415,7 +405,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		}
 	}
 	public boolean isDisconnected() {
-		return (getState().equals(CDebugElementState.DISCONNECTED));
+		return (getState().equals(PDebugElementState.DISCONNECTED));
 	}
 	public boolean supportsStorageRetrieval() {
 		return false;
@@ -433,7 +423,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		fThreads = threads;
 	}
 	public Object getAdapter(Class adapter) {
-		if (adapter.equals(ICDebugElement.class))
+		if (adapter.equals(IPDebugElement.class))
 			return this;
 		if (adapter.equals(PDebugElement.class))
 			return this;
@@ -449,70 +439,68 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 			return this;
 		if (adapter.equals(IExecFileInfo.class))
 			return this;
-		if (adapter.equals(ICGlobalVariableManager.class))
+		if (adapter.equals(IPGlobalVariableManager.class))
 			return getGlobalVariableManager();
-		if (adapter.equals(ICDISession.class))
+		if (adapter.equals(IPCDISession.class))
 			return getCDISession();
 		return super.getAdapter(adapter);
 	}
-	public void handleDebugEvents(ICDIEvent[] events) {		
+	public void handleDebugEvents(IPCDIEvent[] events) {
 		for (int i = 0; i < events.length; i++) {
-			IPCDIEvent event = (IPCDIEvent)events[i];
+			IPCDIEvent event = events[i];
 			if (!event.containTask(getTargetID()))
 				return;
-			
-			ICDIObject source = event.getSource(getTargetID());
-			if (source == null && event instanceof ICDIDestroyedEvent) {
-				handleTerminatedEvent((ICDIDestroyedEvent) event, source);
-			}
-			else if (source != null && source.getTarget().equals(getCDITarget())) {
-				if (event instanceof ICDICreatedEvent) {
-					if (source instanceof ICDIThread) {
-						handleThreadCreatedEvent((ICDICreatedEvent) event, source);
+			IPCDIObject source = event.getSource(getTargetID());
+			if (source == null && event instanceof IPCDIDestroyedEvent) {
+				handleTerminatedEvent((IPCDIDestroyedEvent) event, source);
+			} else if (source != null && source.getTarget().equals(getCDITarget())) {
+				if (event instanceof IPCDICreatedEvent) {
+					if (source instanceof IPCDIThread) {
+						handleThreadCreatedEvent((IPCDICreatedEvent) event, source);
 					}
 				} else if (event instanceof IPCDISuspendedEvent) {
 					if (source instanceof IPCDITarget) {
 						handleSuspendedEvent((IPCDISuspendedEvent) event, source);
 					}
-				} else if (event instanceof ICDIResumedEvent) {
+				} else if (event instanceof IPCDIResumedEvent) {
 					if (source instanceof IPCDITarget) {
-						handleResumedEvent((ICDIResumedEvent) event, source);
+						handleResumedEvent((IPCDIResumedEvent) event, source);
 					}
-				} else if (event instanceof ICDIExitedEvent) {
+				} else if (event instanceof IPCDIExitedEvent) {
 					if (source instanceof IPCDITarget) {
-						handleExitedEvent((ICDIExitedEvent) event, source);
+						handleExitedEvent((IPCDIExitedEvent) event, source);
 					}
-				} else if (event instanceof ICDIDestroyedEvent) {
-					if (source instanceof ICDIThread) {
-						handleThreadTerminatedEvent((ICDIDestroyedEvent) event, source);
+				} else if (event instanceof IPCDIDestroyedEvent) {
+					if (source instanceof IPCDIThread) {
+						handleThreadTerminatedEvent((IPCDIDestroyedEvent) event, source);
 					}
-				} else if (event instanceof ICDIDisconnectedEvent) {
+				} else if (event instanceof IPCDIDisconnectedEvent) {
 					if (source instanceof IPCDITarget) {
-						handleDisconnectedEvent((ICDIDisconnectedEvent) event, source);
+						handleDisconnectedEvent((IPCDIDisconnectedEvent) event, source);
 					}
-				} else if (event instanceof ICDIChangedEvent) {
+				} else if (event instanceof IPCDIChangedEvent) {
 					if (source instanceof IPCDITarget) {
-						handleChangedEvent((ICDIChangedEvent) event, source);
+						handleChangedEvent((IPCDIChangedEvent) event, source);
 					}
-				} else if (event instanceof ICDIRestartedEvent) {
+				} else if (event instanceof IPCDIRestartedEvent) {
 					if (source instanceof IPCDITarget) {
-						handleRestartedEvent((ICDIRestartedEvent) event, source);
+						handleRestartedEvent((IPCDIRestartedEvent) event, source);
 					}
 				}
 			}
 		}
 	}
 	public boolean canRestart() {
-		//return getConfiguration().supportsRestart() && isSuspended();
-		//Cannot restart
+		// return getConfiguration().supportsRestart() && isSuspended();
+		// Cannot restart
 		return false;
 	}
 	public void restart() throws DebugException {
 		if (!canRestart()) {
 			return;
 		}
-		changeState(CDebugElementState.RESTARTING);
-		ICDILocation location = getCDITarget().createFunctionLocation("", "main");
+		changeState(PDebugElementState.RESTARTING);
+		IPCDILocation location = (IPCDILocation)getCDITarget().createFunctionLocation("", "main");
 		setInternalTemporaryBreakpoint(location);
 		try {
 			getCDITarget().restart();
@@ -525,23 +513,23 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return !(isTerminated() || isTerminating() || isDisconnected() || isDisconnecting());
 	}
 	protected boolean isTerminating() {
-		return (getState().equals(CDebugElementState.TERMINATING));
+		return (getState().equals(PDebugElementState.TERMINATING));
 	}
 	protected void terminated() {
 		if (!isTerminated()) {
 			if (!isDisconnected()) {
-				setState(CDebugElementState.TERMINATED);
+				setState(PDebugElementState.TERMINATED);
 			}
 			cleanup();
 			fireTerminateEvent();
 		}
 	}
 	protected boolean isDisconnecting() {
-		return (getState().equals(CDebugElementState.DISCONNECTING));
+		return (getState().equals(PDebugElementState.DISCONNECTING));
 	}
 	protected void disconnected() {
 		if (!isDisconnected()) {
-			setState(CDebugElementState.DISCONNECTED);
+			setState(PDebugElementState.DISCONNECTED);
 			cleanup();
 			fireTerminateEvent();
 		}
@@ -565,7 +553,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		ArrayList debugEvents = new ArrayList(threads.size());
 		Iterator it = threads.iterator();
 		while (it.hasNext()) {
-			CThread thread = (CThread) it.next();
+			PThread thread = (PThread) it.next();
 			thread.terminated();
 			debugEvents.add(thread.createTerminateEvent());
 		}
@@ -575,19 +563,19 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		IExpressionManager em = DebugPlugin.getDefault().getExpressionManager();
 		IExpression[] expressions = em.getExpressions();
 		for (int i = 0; i < expressions.length; ++i) {
-			if (expressions[i] instanceof CExpression && expressions[i].getDebugTarget().equals(this)) {
+			if (expressions[i] instanceof PExpression && expressions[i].getDebugTarget().equals(this)) {
 				em.removeExpression(expressions[i]);
 			}
 		}
 	}
-	protected CThread createThread(ICDIThread cdiThread) {
-		CThread thread = new CThread(this, cdiThread);
+	protected PThread createThread(IPCDIThread cdiThread) {
+		PThread thread = new PThread(this, cdiThread);
 		getThreadList().add(thread);
 		return thread;
 	}
-	private void handleSuspendedEvent(IPCDISuspendedEvent event, ICDIObject source) {
-		setState(CDebugElementState.SUSPENDED);
-		ICDISessionObject reason = event.getReason();
+	private void handleSuspendedEvent(IPCDISuspendedEvent event, IPCDIObject source) {
+		setState(PDebugElementState.SUSPENDED);
+		IPCDISessionObject reason = event.getReason();
 		setCurrentStateInfo(reason);
 		skipBreakpoints(false);
 		List newThreads = refreshThreads();
@@ -596,50 +584,50 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		}
 		// We need this for debuggers that don't have notifications
 		// for newly created threads.
-		else if (source instanceof ICDIThread) {
-			CThread thread = findThread((ICDIThread)source);
+		else if (source instanceof IPCDIThread) {
+			PThread thread = findThread((IPCDIThread) source);
 			if (thread != null && newThreads.contains(thread)) {
-				ICDIEvent[] evts = new ICDIEvent[] { event };
+				IPCDIEvent[] evts = new IPCDIEvent[] { event };
 				thread.handleDebugEvents(evts);
 			}
 		}
-		if (reason instanceof ICDIEndSteppingRange) {
-			handleEndSteppingRange((ICDIEndSteppingRange) reason);
-		} else if (reason instanceof ICDIBreakpointHit) {
-			handleBreakpointHit((ICDIBreakpointHit) reason);
-		} else if (reason instanceof ICDISignalReceived) {
-			handleSuspendedBySignal((ICDISignalReceived) reason);
-		} else if (reason instanceof ICDIWatchpointTrigger) {
-			handleWatchpointTrigger((ICDIWatchpointTrigger) reason);
-		} else if (reason instanceof ICDIWatchpointScope) {
-			handleWatchpointScope((ICDIWatchpointScope) reason);
-		} else if (reason instanceof ICDIErrorInfo) {
-			handleErrorInfo((ICDIErrorInfo) reason);
-		} else if (reason instanceof ICDISharedLibraryEvent) {
-			handleSuspendedBySolibEvent((ICDISharedLibraryEvent) reason);
+		if (reason instanceof IPCDIEndSteppingRange) {
+			handleEndSteppingRange((IPCDIEndSteppingRange) reason);
+		} else if (reason instanceof IPCDIBreakpointHit) {
+			handleBreakpointHit((IPCDIBreakpointHit) reason);
+		} else if (reason instanceof IPCDISignalReceived) {
+			handleSuspendedBySignal((IPCDISignalReceived) reason);
+		} else if (reason instanceof IPCDIWatchpointTrigger) {
+			handleWatchpointTrigger((IPCDIWatchpointTrigger) reason);
+		} else if (reason instanceof IPCDIWatchpointScope) {
+			handleWatchpointScope((IPCDIWatchpointScope) reason);
+		} else if (reason instanceof IPCDIErrorInfo) {
+			handleErrorInfo((IPCDIErrorInfo) reason);
+		} else if (reason instanceof IPCDISharedLibraryEvent) {
+			handleSuspendedBySolibEvent((IPCDISharedLibraryEvent) reason);
 		} else { // reason is not specified
 			fireSuspendEvent(DebugEvent.UNSPECIFIED);
 		}
 	}
-	private void handleResumedEvent(ICDIResumedEvent event, ICDIObject source) {
-		setState(CDebugElementState.RESUMED);
+	private void handleResumedEvent(IPCDIResumedEvent event, IPCDIObject source) {
+		setState(PDebugElementState.RESUMED);
 		setCurrentStateInfo(null);
 		resetStatus();
 		ArrayList debugEvents = new ArrayList(10);
 		int detail = DebugEvent.UNSPECIFIED;
 		switch (event.getType()) {
-		case ICDIResumedEvent.CONTINUE:
+		case IPCDIResumedEvent.CONTINUE:
 			detail = DebugEvent.CLIENT_REQUEST;
 			break;
-		case ICDIResumedEvent.STEP_INTO:
-		case ICDIResumedEvent.STEP_INTO_INSTRUCTION:
+		case IPCDIResumedEvent.STEP_INTO:
+		case IPCDIResumedEvent.STEP_INTO_INSTRUCTION:
 			detail = DebugEvent.STEP_INTO;
 			break;
-		case ICDIResumedEvent.STEP_OVER:
-		case ICDIResumedEvent.STEP_OVER_INSTRUCTION:
+		case IPCDIResumedEvent.STEP_OVER:
+		case IPCDIResumedEvent.STEP_OVER_INSTRUCTION:
 			detail = DebugEvent.STEP_OVER;
 			break;
-		case ICDIResumedEvent.STEP_RETURN:
+		case IPCDIResumedEvent.STEP_RETURN:
 			detail = DebugEvent.STEP_RETURN;
 			break;
 		}
@@ -647,24 +635,24 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		resumeThreads(debugEvents, detail);
 		fireEventSet((DebugEvent[]) debugEvents.toArray(new DebugEvent[debugEvents.size()]));
 	}
-	private void handleEndSteppingRange(ICDIEndSteppingRange endSteppingRange) {
+	private void handleEndSteppingRange(IPCDIEndSteppingRange endSteppingRange) {
 		fireSuspendEvent(DebugEvent.UNSPECIFIED);
 	}
-	private void handleBreakpointHit(ICDIBreakpointHit breakpointHit) {
+	private void handleBreakpointHit(IPCDIBreakpointHit breakpointHit) {
 		fireSuspendEvent(DebugEvent.BREAKPOINT);
 	}
-	private void handleWatchpointTrigger(ICDIWatchpointTrigger wt) {
+	private void handleWatchpointTrigger(IPCDIWatchpointTrigger wt) {
 		fireSuspendEvent(DebugEvent.BREAKPOINT);
 	}
-	private void handleWatchpointScope(ICDIWatchpointScope ws) {
+	private void handleWatchpointScope(IPCDIWatchpointScope ws) {
 	// DONNY
-	//getBreakpointManager().watchpointOutOfScope( ws.getWatchpoint() ); fireSuspendEvent( DebugEvent.BREAKPOINT );
+	// getBreakpointManager().watchpointOutOfScope( ws.getWatchpoint() ); fireSuspendEvent( DebugEvent.BREAKPOINT );
 	}
-	private void handleSuspendedBySignal(ICDISignalReceived signal) {
+	private void handleSuspendedBySignal(IPCDISignalReceived signal) {
 		fireSuspendEvent(DebugEvent.UNSPECIFIED);
 	}
-	private void handleErrorInfo(ICDIErrorInfo info) {
-		setStatus(ICDebugElementStatus.ERROR, (info != null) ? info.getMessage() : null);
+	private void handleErrorInfo(IPCDIErrorInfo info) {
+		setStatus(IPDebugElementStatus.ERROR, (info != null) ? info.getMessage() : null);
 		if (info != null) {
 			MultiStatus status = new MultiStatus(PTPDebugCorePlugin.getUniqueIdentifier(), IPDebugInternalConstants.STATUS_CODE_ERROR, CoreModelMessages.getString("CDebugTarget.1"), null);
 			StringTokenizer st = new StringTokenizer(info.getDetailMessage(), "\n\r");
@@ -679,64 +667,64 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		}
 		fireSuspendEvent(DebugEvent.UNSPECIFIED);
 	}
-	private void handleSuspendedBySolibEvent(ICDISharedLibraryEvent solibEvent) {
+	private void handleSuspendedBySolibEvent(IPCDISharedLibraryEvent solibEvent) {
 		fireSuspendEvent(DebugEvent.UNSPECIFIED);
 	}
-	private void handleExitedEvent(ICDIExitedEvent event, ICDIObject source) {
+	private void handleExitedEvent(IPCDIExitedEvent event, IPCDIObject source) {
 		removeAllThreads();
-		setState(CDebugElementState.EXITED);
+		setState(PDebugElementState.EXITED);
 		setCurrentStateInfo(event.getReason());
 		fireChangeEvent(DebugEvent.CONTENT);
-		ICDISessionConfiguration sessionConfig = getCDISession().getConfiguration();
+		IPCDISessionConfiguration sessionConfig = getCDISession().getConfiguration();
 		if (sessionConfig != null && sessionConfig.terminateSessionOnExit())
 			terminated();
 	}
-	private void handleTerminatedEvent(ICDIDestroyedEvent event, ICDIObject source) {
+	private void handleTerminatedEvent(IPCDIDestroyedEvent event, IPCDIObject source) {
 		terminated();
 	}
-	private void handleDisconnectedEvent(ICDIDisconnectedEvent event, ICDIObject source) {
+	private void handleDisconnectedEvent(IPCDIDisconnectedEvent event, IPCDIObject source) {
 		disconnected();
 	}
-	private void handleChangedEvent(ICDIChangedEvent event, ICDIObject source) {}
-	private void handleRestartedEvent(ICDIRestartedEvent event, ICDIObject source) {}
-	private void handleThreadCreatedEvent(ICDICreatedEvent event, ICDIObject source) {
-		ICDIThread cdiThread = (ICDIThread) source;
-		CThread thread = findThread(cdiThread);
+	private void handleChangedEvent(IPCDIChangedEvent event, IPCDIObject source) {}
+	private void handleRestartedEvent(IPCDIRestartedEvent event, IPCDIObject source) {}
+	private void handleThreadCreatedEvent(IPCDICreatedEvent event, IPCDIObject source) {
+		IPCDIThread cdiThread = (IPCDIThread) source;
+		PThread thread = findThread(cdiThread);
 		if (thread == null) {
 			thread = createThread(cdiThread);
 			thread.fireCreationEvent();
 		}
 	}
-	private void handleThreadTerminatedEvent(ICDIDestroyedEvent event, ICDIObject source) {
-		ICDIThread cdiThread = (ICDIThread) source;
-		CThread thread = findThread(cdiThread);
+	private void handleThreadTerminatedEvent(IPCDIDestroyedEvent event, IPCDIObject source) {
+		IPCDIThread cdiThread = (IPCDIThread) source;
+		PThread thread = findThread(cdiThread);
 		if (thread != null) {
 			getThreadList().remove(thread);
 			thread.terminated();
 			thread.fireTerminateEvent();
 		}
 	}
-	public CThread findThread(ICDIThread cdiThread) {
+	public PThread findThread(IPCDIThread cdiThread) {
 		List threads = getThreadList();
 		for (int i = 0; i < threads.size(); i++) {
-			CThread t = (CThread) threads.get(i);
+			PThread t = (PThread) threads.get(i);
 			if (t.getCDIThread().equals(cdiThread))
 				return t;
 		}
 		return null;
 	}
-	public CThread findThread(List threads, ICDIThread cdiThread) {
+	public PThread findThread(List threads, IPCDIThread cdiThread) {
 		for (int i = 0; i < threads.size(); i++) {
-			CThread t = (CThread) threads.get(i);
+			PThread t = (PThread) threads.get(i);
 			if (t.getCDIThread().equals(cdiThread))
 				return t;
 		}
 		return null;
 	}
-	protected ICDITargetConfiguration getConfiguration() {
+	protected IPCDITargetConfiguration getConfiguration() {
 		return fConfig;
 	}
-	private void setConfiguration(ICDITargetConfiguration config) {
+	private void setConfiguration(IPCDITargetConfiguration config) {
 		fConfig = config;
 	}
 	protected boolean supportsExpressionEvaluation() {
@@ -745,18 +733,18 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	public void expressionAdded(IExpression expression) {}
 	public void expressionChanged(IExpression expression) {}
 	public void expressionRemoved(IExpression expression) {
-		if (expression instanceof CExpression && expression.getDebugTarget().equals(this)) {
-			((CExpression) expression).dispose();
+		if (expression instanceof PExpression && expression.getDebugTarget().equals(this)) {
+			((PExpression) expression).dispose();
 		}
 	}
-	public void setInternalTemporaryBreakpoint(ICDILocation location) throws DebugException {
+	public void setInternalTemporaryBreakpoint(IPCDILocation location) throws DebugException {
 		try {
 			if (location instanceof ICDIFunctionLocation) {
-				getCDITarget().setFunctionBreakpoint(ICDIBreakpoint.TEMPORARY, (ICDIFunctionLocation) location, null, false);
+				getCDITarget().setFunctionBreakpoint(IPCDIBreakpoint.TEMPORARY, (ICDIFunctionLocation) location, null, false);
 			} else if (location instanceof ICDILineLocation) {
-				getCDITarget().setLineBreakpoint(ICDIBreakpoint.TEMPORARY, (ICDILineLocation) location, null, false);
+				getCDITarget().setLineBreakpoint(IPCDIBreakpoint.TEMPORARY, (ICDILineLocation) location, null, false);
 			} else if (location instanceof ICDIAddressLocation) {
-				getCDITarget().setAddressBreakpoint(ICDIBreakpoint.TEMPORARY, (ICDIAddressLocation) location, null, false);
+				getCDITarget().setAddressBreakpoint(IPCDIBreakpoint.TEMPORARY, (ICDIAddressLocation) location, null, false);
 			} else {
 				// ???
 				targetRequestFailed("not_a_location", null);
@@ -768,7 +756,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	protected IThread getCurrentThread() throws DebugException {
 		IThread[] threads = getThreads();
 		for (int i = 0; i < threads.length; ++i) {
-			if (((CThread) threads[i]).isCurrent())
+			if (((PThread) threads[i]).isCurrent())
 				return threads[i];
 		}
 		return null;
@@ -803,12 +791,12 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	}
 	public boolean canResumeWithoutSignal() {
 		// Check if the configuration supports this!!!
-		return (canResume() && getCurrentStateInfo() instanceof ICDISignalReceived);
+		return (canResume() && getCurrentStateInfo() instanceof IPCDISignalReceived);
 	}
 	public void resumeWithoutSignal() throws DebugException {
 		if (!canResume())
 			return;
-		changeState(CDebugElementState.RESUMING);
+		changeState(PDebugElementState.RESUMING);
 		try {
 			getCDITarget().resume(false);
 		} catch (CDIException e) {
@@ -829,8 +817,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		if (locator instanceof ISourceLookupDirector) {
 			ISourceLookupParticipant[] participants = ((ISourceLookupDirector) locator).getParticipants();
 			for (int i = 0; i < participants.length; ++i) {
-				if (participants[i] instanceof CSourceLookupParticipant) {
-					((CSourceLookupParticipant) participants[i]).removeSourceLookupChangeListener(this);
+				if (participants[i] instanceof PSourceLookupParticipant) {
+					((PSourceLookupParticipant) participants[i]).removeSourceLookupChangeListener(this);
 				}
 			}
 		}
@@ -844,15 +832,15 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return result;
 	}
 	public ICSignal[] getSignals() throws DebugException {
-		//TODO Not implement yet
+		// TODO Not implement yet
 		return new ICSignal[0];
 	}
 	public boolean hasSignals() throws DebugException {
-		//TODO Not implement yet
+		// TODO Not implement yet
 		return false;
 	}
-	public IAddress getBreakpointAddress(ICLineBreakpoint breakpoint) throws DebugException {
-		//TODO Not implement yet
+	public IAddress getBreakpointAddress(IPLineBreakpoint breakpoint) throws DebugException {
+		// TODO Not implement yet
 		return null;
 	}
 	public void enableInstructionStepping(boolean enabled) {
@@ -862,8 +850,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		return getConfiguration().supportsInstructionStepping();
 	}
 	public boolean isInstructionSteppingEnabled() {
-		//TODO Not implement yet
-		//return fPreferences.getBoolean( PREF_INSTRUCTION_STEPPING_MODE ) || CDebugCorePlugin.getDefault().getPluginPreferences().getBoolean( ICDebugConstants.PREF_INSTRUCTION_STEP_MODE_ON );
+		// TODO Not implement yet
+		// return fPreferences.getBoolean( PREF_INSTRUCTION_STEPPING_MODE ) || CDebugCorePlugin.getDefault().getPluginPreferences().getBoolean( ICDebugConstants.PREF_INSTRUCTION_STEP_MODE_ON );
 		return false;
 	}
 	private void initializePreferences() {
@@ -901,18 +889,18 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		}
 		return fAddressFactory;
 	}
-	private void changeState(CDebugElementState state) {
+	private void changeState(PDebugElementState state) {
 		setState(state);
 		Iterator it = getThreadList().iterator();
 		while (it.hasNext()) {
-			((CThread) it.next()).setState(state);
+			((PThread) it.next()).setState(state);
 		}
 	}
 	protected void restoreOldState() {
 		restoreState();
 		Iterator it = getThreadList().iterator();
 		while (it.hasNext()) {
-			((CThread) it.next()).restoreState();
+			((PThread) it.next()).restoreState();
 		}
 	}
 	protected void skipBreakpoints(boolean enabled) {
@@ -921,44 +909,44 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 	// getBreakpointManager().skipBreakpoints( enabled );
 	}
 	public IDisassembly getDisassembly() throws DebugException {
-		//TODO Not implement yet
+		// TODO Not implement yet
 		return null;
 	}
-	public ICGlobalVariable createGlobalVariable(IGlobalVariableDescriptor info) throws DebugException {
-		ICDIVariableDescriptor vo = null;
+	public IPGlobalVariable createGlobalVariable(IGlobalVariableDescriptor info) throws DebugException {
+		IPCDIVariableDescriptor vo = null;
 		try {
-			vo = getCDITarget().getGlobalVariableDescriptors(info.getPath().lastSegment(), null, info.getName());
+			vo = (IPCDIVariableDescriptor)getCDITarget().getGlobalVariableDescriptors(info.getPath().lastSegment(), null, info.getName());
 		} catch (CDIException e) {
 			throw new DebugException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), DebugException.TARGET_REQUEST_FAILED, (vo != null) ? vo.getName() + ": " + e.getMessage() : e.getMessage(), null)); //$NON-NLS-1$
 		}
-		return CVariableFactory.createGlobalVariable(this, info, vo);
+		return PVariableFactory.createGlobalVariable(this, info, vo);
 	}
 	public boolean hasModules() throws DebugException {
-		//TODO Not implement yet
+		// TODO Not implement yet
 		return false;
 	}
 	public ICModule[] getModules() throws DebugException {
-		//TODO Not implement yet
+		// TODO Not implement yet
 		return null;
 	}
 	public void loadSymbolsForAllModules() throws DebugException {
-		//TODO Not implement yet
+		// TODO Not implement yet
 	}
 	public IRegisterDescriptor[] getRegisterDescriptors() throws DebugException {
-		//TODO Not implement yet
+		// TODO Not implement yet
 		return null;
 	}
 	public void addRegisterGroup(String name, IRegisterDescriptor[] descriptors) {
-		//TODO Not implement yet
+		// TODO Not implement yet
 	}
 	public void removeRegisterGroups(IRegisterGroup[] groups) {
-		//TODO Not implement yet
+		// TODO Not implement yet
 	}
 	public void modifyRegisterGroup(IPersistableRegisterGroup group, IRegisterDescriptor[] descriptors) {
-		//TODO Not implement yet
+		// TODO Not implement yet
 	}
 	public void restoreDefaultRegisterGroups() {
-		//TODO Not implement yet
+		// TODO Not implement yet
 	}
 	public IGlobalVariableDescriptor[] getGlobals() throws DebugException {
 		ArrayList list = new ArrayList();
@@ -973,7 +961,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 		ISymbol[] symbols = file.getSymbols();
 		for (int i = 0; i < symbols.length; ++i) {
 			if (symbols[i].getType() == ISymbol.VARIABLE) {
-				list.add(CVariableFactory.createGlobalVariableDescriptor(symbols[i]));
+				list.add(PVariableFactory.createGlobalVariableDescriptor(symbols[i]));
 			}
 		}
 		return list;
@@ -1002,8 +990,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, ICDIEv
 				if (container != null && container.exists())
 					list.add(container.getLocation().toPortableString());
 			}
-			if (containers[i] instanceof CDirectorySourceContainer) {
-				File dir = ((CDirectorySourceContainer) containers[i]).getDirectory();
+			if (containers[i] instanceof PDirectorySourceContainer) {
+				File dir = ((PDirectorySourceContainer) containers[i]).getDirectory();
 				if (dir != null && dir.exists()) {
 					IPath path = new Path(dir.getAbsolutePath());
 					list.add(path.toPortableString());

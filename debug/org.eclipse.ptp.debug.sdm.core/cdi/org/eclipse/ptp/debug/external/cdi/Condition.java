@@ -16,24 +16,11 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi;
 
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 
-/**
- */
 public class Condition implements ICDICondition {
-
 	int ignoreCount;
 	String expression;
 	String[] tids;
@@ -43,34 +30,18 @@ public class Condition implements ICDICondition {
 		expression = (exp == null) ? new String() : exp;
 		tids = (ids == null) ? new String[0] : ids;
 	}
-
-	/**
-	 * @see org.eclipse.cdt.debug.core.cdi.ICDICondition#getIgnoreCount()
-	 */
 	public int getIgnoreCount() {
 		return ignoreCount;
 	}
-
-	/**
-	 * @see org.eclipse.cdt.debug.core.cdi.ICDICondition#getExpression()
-	 */
 	public String getExpression() {
 		return expression;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.cdt.debug.core.cdi.ICDICondition#getThreadId()
-	 */
 	public String[] getThreadIds() {
 		return tids;
 	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	public boolean equals(ICDICondition obj) {
 		if (obj instanceof Condition) {
-			Condition cond = (Condition)obj;
+			Condition cond = (Condition) obj;
 			if (cond.getIgnoreCount() != this.getIgnoreCount())
 				return false;
 			if (cond.getExpression().compareTo(this.getExpression()) != 0)

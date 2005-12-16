@@ -16,12 +16,13 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.internal.core.aif;
 
-import org.eclipse.ptp.debug.core.aif.IAIFValue;
-
-public class AIFValueString implements IAIFValue {
+/**
+ * @deprecated
+ */
+public class AIFValueString {
+	/*
 	private String val;
 	
 	public AIFValueString(String val) {
@@ -31,4 +32,5 @@ public class AIFValueString implements IAIFValue {
 	public String toString() {
 		return this.val;
 	}
+	*/
 }

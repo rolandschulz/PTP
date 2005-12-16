@@ -20,13 +20,13 @@ package org.eclipse.ptp.debug.external.cdi.breakpoints;
 
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIExceptionpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIExceptionpoint;
 
 /**
  * @author Clement chu
  * 
  */
-public class Exceptionpoint extends Breakpoint implements ICDIExceptionpoint {
+public class Exceptionpoint extends Breakpoint implements IPCDIExceptionpoint {
 	String fClazz;
 	boolean fStopOnThrow;
 	boolean fStopOnCatch;

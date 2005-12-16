@@ -16,40 +16,26 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi;
 
-import org.eclipse.cdt.debug.core.cdi.ICDIBreakpointHit;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.IPCDIBreakpointHit;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 
 /**
+ * @author Clement chu
+ * 
  */
-public class BreakpointHitInfo extends SessionObject implements ICDIBreakpointHit {
-
+public class BreakpointHitInfo extends SessionObject implements IPCDIBreakpointHit {
 	BreakpointHitEvent breakEvent;
-	ICDIBreakpoint breakPoint;
+	IPCDIBreakpoint breakPoint;
 
-	public BreakpointHitInfo(Session session, BreakpointHitEvent e, ICDIBreakpoint bp) {
+	public BreakpointHitInfo(Session session, BreakpointHitEvent e, IPCDIBreakpoint bp) {
 		super(session);
 		breakEvent = e;
 		breakPoint = bp;
 	}
-
-	/**
-	 * @see org.eclipse.cdt.debug.core.cdi.ICDIBreakpointHit#getBreakpoint()
-	 */
-	public ICDIBreakpoint getBreakpoint() {
+	public IPCDIBreakpoint getBreakpoint() {
 		return breakPoint;
 	}
-
 }

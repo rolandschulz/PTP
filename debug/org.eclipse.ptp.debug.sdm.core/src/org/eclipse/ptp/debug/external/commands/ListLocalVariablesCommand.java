@@ -18,10 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.commands;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariable;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
@@ -29,9 +29,9 @@ import org.eclipse.ptp.debug.external.IAbstractDebugger;
  * 
  */
 public class ListLocalVariablesCommand extends AbstractDebugCommand {
-	private ICDIStackFrame frame = null;
+	private IPCDIStackFrame frame = null;
 	
-	public ListLocalVariablesCommand(BitList tasks, ICDIStackFrame frame) {
+	public ListLocalVariablesCommand(BitList tasks, IPCDIStackFrame frame) {
 		super(tasks, false, true);
 		this.frame = frame;
 	}
@@ -39,10 +39,10 @@ public class ListLocalVariablesCommand extends AbstractDebugCommand {
 		debugger.listLocalVariables(tasks, frame);
 	}
 	
-	public ICDILocalVariable[] getLocalVariables() throws PCDIException {
+	public IPCDILocalVariable[] getLocalVariables() throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof ICDILocalVariable[])
-				return (ICDILocalVariable[])result;
+			if (result instanceof IPCDILocalVariable[])
+				return (IPCDILocalVariable[])result;
 		}
 		throw new PCDIException("No local variables found in " + tasks.toString());
 	}

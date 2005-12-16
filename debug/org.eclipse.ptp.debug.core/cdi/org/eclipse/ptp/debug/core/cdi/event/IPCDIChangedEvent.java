@@ -18,11 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.event;
 
-import org.eclipse.cdt.debug.core.cdi.event.ICDIChangedEvent;
-
 /**
  * @author Clement chu
  * 
  */
-public interface IPCDIChangedEvent extends IPCDIEvent, ICDIChangedEvent {
-}
+public interface IPCDIChangedEvent extends IPCDIEvent {}

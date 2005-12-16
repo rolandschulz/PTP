@@ -18,9 +18,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.event;
 
-import org.eclipse.cdt.debug.core.cdi.event.ICDISuspendedEvent;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
+import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
 
-public interface IPCDISuspendedEvent extends IPCDIEvent, ICDISuspendedEvent {
+/**
+ * @author Clement chu
+ *
+ */
+public interface IPCDISuspendedEvent extends IPCDIEvent {
+	IPCDISessionObject getReason();	
 }
 

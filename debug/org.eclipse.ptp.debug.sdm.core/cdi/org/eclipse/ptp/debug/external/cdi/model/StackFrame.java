@@ -16,30 +16,21 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import java.math.BigInteger;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.cdi.ICDILocator;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIArgument;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIArgumentDescriptor;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariable;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILocalVariableDescriptor;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
 import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.debug.external.ExtFormat;
+import org.eclipse.ptp.debug.core.ExtFormat;
+import org.eclipse.ptp.debug.core.aif.IAIFValue;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgumentDescriptor;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariable;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariableDescriptor;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocator;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.external.cdi.Locator;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
@@ -48,10 +39,14 @@ import org.eclipse.ptp.debug.external.cdi.model.variable.LocalVariableDescriptor
 import org.eclipse.ptp.debug.external.commands.GetAIFCommand;
 import org.eclipse.ptp.debug.external.commands.StepFinishCommand;
 
-public class StackFrame extends PTPObject implements ICDIStackFrame {
+/**
+ * @author Clement chu
+ *
+ */
+public class StackFrame extends PObject implements IPCDIStackFrame {
 	Thread cthread;
-	ICDIArgumentDescriptor[] argDescs;
-	ICDILocalVariableDescriptor[] localDescs;
+	IPCDIArgumentDescriptor[] argDescs;
+	IPCDILocalVariableDescriptor[] localDescs;
 	Locator fLocator;
 	int level = -1;
 	String addr = "";
@@ -68,10 +63,10 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 		this.line = line;
 		this.func = func;
 	}
-	public ICDIThread getThread() {
+	public IPCDIThread getThread() {
 		return cthread;
 	}
-	public ICDIArgumentDescriptor[] getArgumentDescriptors() throws CDIException {
+	public IPCDIArgumentDescriptor[] getArgumentDescriptors() throws CDIException {
 		if (argDescs == null) {
 			Session session = (Session)getTarget().getSession();
 			VariableManager mgr = session.getVariableManager();
@@ -90,7 +85,7 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 		}
 		return argDescs;
 	}
-	public ICDILocalVariableDescriptor[] getLocalVariableDescriptors() throws CDIException {
+	public IPCDILocalVariableDescriptor[] getLocalVariableDescriptors() throws CDIException {
 		if (localDescs == null) {
 			Session session = (Session)getTarget().getSession();
 			VariableManager mgr = session.getVariableManager();
@@ -109,7 +104,7 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 		}
 		return localDescs;
 	}
-	public ICDIArgument createArgument(ICDIArgumentDescriptor varDesc) throws CDIException {
+	public IPCDIArgument createArgument(IPCDIArgumentDescriptor varDesc) throws CDIException {
 		if (varDesc instanceof ArgumentDescriptor) {
 			Session session = (Session)getTarget().getSession();
 			VariableManager mgr = session.getVariableManager();
@@ -117,9 +112,9 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 		}
 		return null;
 	}
-	public ICDILocalVariable createLocalVariable(ICDILocalVariableDescriptor varDesc) throws CDIException {
+	public IPCDILocalVariable createLocalVariable(IPCDILocalVariableDescriptor varDesc) throws CDIException {
 		if (varDesc instanceof ArgumentDescriptor) {
-			return createArgument((ICDIArgumentDescriptor)varDesc);
+			return createArgument((IPCDIArgumentDescriptor)varDesc);
 		} else if (varDesc instanceof LocalVariableDescriptor) {
 			Session session = (Session)getTarget().getSession();
 			VariableManager mgr = session.getVariableManager();
@@ -127,7 +122,7 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 		}
 		return null;
 	}
-	public ICDILocator getLocator() {
+	public IPCDILocator getLocator() {
 		BigInteger bigAddr = BigInteger.ZERO;
 		if (fLocator == null) {
 			bigAddr = ExtFormat.getBigInteger(getAddress());
@@ -136,13 +131,13 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 		return fLocator;
 		//return new Locator("", "", 0, bigAddr);
 	}	
-	public boolean equals(ICDIStackFrame stackframe) {
+	public boolean equals(IPCDIStackFrame stackframe) {
 		if (stackframe instanceof StackFrame) {
 			StackFrame stack = (StackFrame)stackframe;
 			boolean equal =  cthread != null && cthread.equals(stack.getThread()) && getLevel() == stack.getLevel();
 			if (equal) {
-				ICDILocator otherLocator = stack.getLocator();
-				ICDILocator myLocator = getLocator();
+				IPCDILocator otherLocator = stack.getLocator();
+				IPCDILocator myLocator = getLocator();
 				if (Locator.equalString(myLocator.getFile(), otherLocator.getFile())) {
 					if (Locator.equalString(myLocator.getFunction(), otherLocator.getFunction())) {
 						return true;
@@ -152,11 +147,19 @@ public class StackFrame extends PTPObject implements ICDIStackFrame {
 		}
 		return super.equals(stackframe);
 	}
-	public void stepReturn() throws CDIException {
-		finish();
+	public void stepReturn() throws PCDIException {
+		try {
+			finish();
+		} catch (CDIException e) {
+			throw new PCDIException(e.getMessage());
+		}
 	}
-	public void stepReturn(ICDIValue value) throws CDIException {
-		execReturn(value.toString());
+	public void stepReturn(IAIFValue value) throws PCDIException {
+		try {
+			execReturn(value.getValueString());
+		} catch (CDIException e) {
+			throw new PCDIException(e.getMessage());
+		}
 	}
 	protected void finish() throws CDIException {
 		((Thread)getThread()).setCurrentStackFrame(this, false);

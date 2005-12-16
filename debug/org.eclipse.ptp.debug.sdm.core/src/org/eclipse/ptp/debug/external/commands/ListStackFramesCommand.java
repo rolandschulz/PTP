@@ -18,9 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.commands;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
 /**
@@ -35,10 +35,10 @@ public class ListStackFramesCommand extends AbstractDebugCommand {
 		debugger.listStackFrames(tasks);
 	}
 	
-	public ICDIStackFrame[] getStackFrames() throws PCDIException {
+	public IPCDIStackFrame[] getStackFrames() throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof ICDIStackFrame[])
-				return (ICDIStackFrame[])result;
+			if (result instanceof IPCDIStackFrame[])
+				return (IPCDIStackFrame[])result;
 		}
 		throw new PCDIException("No stack frames found in " + tasks.toString());
 	}

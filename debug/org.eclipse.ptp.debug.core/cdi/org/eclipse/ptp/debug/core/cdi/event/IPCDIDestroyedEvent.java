@@ -18,12 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.event;
 
-import org.eclipse.cdt.debug.core.cdi.event.ICDIDestroyedEvent;
-
 /**
  * @author Clement chu
  * 
  */
-public interface IPCDIDestroyedEvent extends IPCDIEvent, ICDIDestroyedEvent {
-}
+public interface IPCDIDestroyedEvent extends IPCDIEvent {}
 

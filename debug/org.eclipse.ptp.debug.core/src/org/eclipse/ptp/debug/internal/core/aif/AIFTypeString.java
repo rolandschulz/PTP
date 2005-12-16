@@ -19,8 +19,13 @@
 
 package org.eclipse.ptp.debug.internal.core.aif;
 
-public class AIFTypeString extends AIFType {
+/**
+ * @deprecated temporary
+ */
+public class AIFTypeString {
+	/*
 	public String toString() {
 		return "s";
 	}
+	*/
 }

@@ -16,16 +16,6 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi;
 
 import java.math.BigInteger;
@@ -39,13 +29,6 @@ import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
-import org.eclipse.cdt.debug.core.cdi.ICDILocation;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIAddressBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIExceptionpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIFunctionBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDILineBreakpoint;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIWatchpoint;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -55,10 +38,17 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIAddressBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIExceptionpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
-import org.eclipse.ptp.debug.core.sourcelookup.ICSourceLookupDirector;
+import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLookupDirector;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.AddressBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.breakpoints.Breakpoint;
@@ -74,7 +64,7 @@ import org.eclipse.ptp.debug.external.commands.SetFunctionBreakpointCommand;
 import org.eclipse.ptp.debug.external.commands.SetLineBreakpointCommand;
 
 public class BreakpointManager extends Manager {
-	public static ICDIBreakpoint[] EMPTY_BREAKPOINTS = {};
+	public static IPCDIBreakpoint[] EMPTY_BREAKPOINTS = {};
 
 	Map breakMap;
 	Map deferredMap;
@@ -101,7 +91,7 @@ public class BreakpointManager extends Manager {
 	
 	public void setBreakpoint(String job_id, IPBreakpoint bpt) throws CoreException {
 		BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(job_id, bpt.getSetId());
-		ICDILocation location = getLocation(bpt);
+		IPCDILocation location = getLocation(bpt);
 		try {
 			setLocationBreakpointOnSession(bpt, location, null, bpt.isEnabled(), tasks);
 		} catch (CDIException e) {
@@ -115,7 +105,7 @@ public class BreakpointManager extends Manager {
 			setBreakpoint(job_id, bpts[i]);
 		}
 	}
-	private ICDILocation getLocation(IPBreakpoint bpt) throws CoreException {
+	private IPCDILocation getLocation(IPBreakpoint bpt) throws CoreException {
 		IPath path = convertPath(bpt.getSourceHandle());
 		if (bpt instanceof IPLineBreakpoint) {
 			return createLineLocation(path.lastSegment(), ((IPLineBreakpoint)bpt).getLineNumber());
@@ -125,19 +115,19 @@ public class BreakpointManager extends Manager {
 		}
 		return null;
 	}
-	private void setLocationBreakpointOnSession(final IPBreakpoint breakpoint, final ICDILocation location, final ICDICondition condition, final boolean enabled, final BitList tasks) throws CDIException {
+	private void setLocationBreakpointOnSession(final IPBreakpoint breakpoint, final IPCDILocation location, final ICDICondition condition, final boolean enabled, final BitList tasks) throws CDIException {
 		if (breakpoint instanceof IPLineBreakpoint) {
-			setLineBreakpoint(tasks, ICDIBreakpoint.REGULAR, (ICDILineLocation) location, condition, enabled);
+			setLineBreakpoint(tasks, IPCDIBreakpoint.REGULAR, (ICDILineLocation) location, condition, enabled);
 		} else if (breakpoint instanceof IPFunctionBreakpoint) {
-			setFunctionBreakpoint(tasks, ICDIBreakpoint.REGULAR, (ICDIFunctionLocation) location, condition, enabled);
+			setFunctionBreakpoint(tasks, IPCDIBreakpoint.REGULAR, (ICDIFunctionLocation) location, condition, enabled);
 		}
 	}
 	private IPath convertPath(String sourceHandle) {
 		IPath path = null;
 		if (Path.EMPTY.isValidPath(sourceHandle)) {
 			ISourceLocator sl = ((Session)getSession()).getLaunch().getSourceLocator();
-			if (sl instanceof ICSourceLookupDirector) {
-				path = ((ICSourceLookupDirector) sl).getCompilationPath(sourceHandle);
+			if (sl instanceof IPSourceLookupDirector) {
+				path = ((IPSourceLookupDirector) sl).getCompilationPath(sourceHandle);
 			}
 			if (path == null) {
 				path = new Path(sourceHandle);
@@ -145,30 +135,30 @@ public class BreakpointManager extends Manager {
 		}
 		return path;
 	}		
-	public void setInternalTemporaryBreakpoint(BitList tasks, ICDILocation location) throws DebugException {
+	public void setInternalTemporaryBreakpoint(BitList tasks, IPCDILocation location) throws DebugException {
 		try {
 			if (location instanceof ICDIFunctionLocation) {
-				setFunctionBreakpoint(tasks, ICDIBreakpoint.TEMPORARY, (ICDIFunctionLocation) location, null, false);
+				setFunctionBreakpoint(tasks, IPCDIBreakpoint.TEMPORARY, (ICDIFunctionLocation) location, null, false);
 			} else if (location instanceof ICDILineLocation) {
-				setLineBreakpoint(tasks, ICDIBreakpoint.TEMPORARY, (ICDILineLocation) location, null, false);
+				setLineBreakpoint(tasks, IPCDIBreakpoint.TEMPORARY, (ICDILineLocation) location, null, false);
 			} else if (location instanceof ICDIAddressLocation) {
-				setAddressBreakpoint(tasks, ICDIBreakpoint.TEMPORARY, (ICDIAddressLocation) location, null, false);
+				setAddressBreakpoint(tasks, IPCDIBreakpoint.TEMPORARY, (ICDIAddressLocation) location, null, false);
 			}
 		} catch (CDIException e) {
 		}
 	}
 	
-	public ICDILineBreakpoint setLineBreakpoint(BitList tasks, int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException {		
+	public IPCDILineBreakpoint setLineBreakpoint(BitList tasks, int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException {		
 		LineBreakpoint bkpt = new LineBreakpoint(type, location, condition);
 		setNewLocationBreakpoint(tasks, bkpt, deferred);
 		return bkpt;
 	}
-	public ICDIFunctionBreakpoint setFunctionBreakpoint(BitList tasks, int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException {		
+	public IPCDIFunctionBreakpoint setFunctionBreakpoint(BitList tasks, int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException {		
 		FunctionBreakpoint bkpt = new FunctionBreakpoint(type, location, condition);
 		setNewLocationBreakpoint(tasks, bkpt, deferred);
 		return bkpt;
 	}
-	public ICDIAddressBreakpoint setAddressBreakpoint(BitList tasks, int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException {		
+	public IPCDIAddressBreakpoint setAddressBreakpoint(BitList tasks, int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException {		
 		AddressBreakpoint bkpt = new AddressBreakpoint(type, location, condition);
 		setNewLocationBreakpoint(tasks, bkpt, deferred);
 		return bkpt;
@@ -176,7 +166,7 @@ public class BreakpointManager extends Manager {
 	protected void setNewLocationBreakpoint(BitList tasks, LocationBreakpoint bkpt, boolean deferred) throws CDIException {
 		setLocationBreakpoint(tasks, bkpt);
 	}
-	public ICDIWatchpoint setWatchpoint(BitList tasks, int type, int watchType, String expression, ICDICondition condition) throws CDIException {
+	public IPCDIWatchpoint setWatchpoint(BitList tasks, int type, int watchType, String expression, ICDICondition condition) throws CDIException {
 		try {
 			// Check if this an address watchpoint, and add a '*'
 			Integer.decode(expression);
@@ -194,9 +184,9 @@ public class BreakpointManager extends Manager {
 	public void setLocationBreakpoint(BitList tasks, LocationBreakpoint bkpt) throws CDIException {
 		Session session = (Session)getSession();
 		if (bkpt instanceof LineBreakpoint) {
-			session.getDebugger().postCommandAndWait(new SetLineBreakpointCommand(tasks, (ICDILineBreakpoint) bkpt));
+			session.getDebugger().postCommandAndWait(new SetLineBreakpointCommand(tasks, (IPCDILineBreakpoint) bkpt));
 		} else if (bkpt instanceof FunctionBreakpoint) {
-			session.getDebugger().postCommandAndWait(new SetFunctionBreakpointCommand(tasks, (ICDIFunctionBreakpoint) bkpt));
+			session.getDebugger().postCommandAndWait(new SetFunctionBreakpointCommand(tasks, (IPCDIFunctionBreakpoint) bkpt));
 		}
 	}
 
@@ -212,7 +202,7 @@ public class BreakpointManager extends Manager {
 		throw new CDIException("Not implement yet - setWatchpoint");
 	}
 
-	public ICDIExceptionpoint setExceptionpoint(BitList tasks, String clazz, boolean stopOnThrow, boolean stopOnCatch) throws CDIException {
+	public IPCDIExceptionpoint setExceptionpoint(BitList tasks, String clazz, boolean stopOnThrow, boolean stopOnCatch) throws CDIException {
 		if (!stopOnThrow && !stopOnCatch) {
 			throw new CDIException("Must suspend on throw or catch");
 		}

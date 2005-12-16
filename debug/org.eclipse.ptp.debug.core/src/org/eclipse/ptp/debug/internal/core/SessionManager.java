@@ -29,7 +29,6 @@
 package org.eclipse.ptp.debug.internal.core;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.cdi.ICDISession;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
@@ -81,7 +80,7 @@ public class SessionManager implements IDebugEventSetListener {
 		}
 	}
 
-	private void handleTerminateEvent( ILaunch launch, ICDISession session ) {
+	private void handleTerminateEvent( ILaunch launch, IPCDISession session ) {
 		IDebugTarget[] targets = launch.getDebugTargets();
 		boolean terminate = true;
 		for( int i = 0; i < targets.length; ++i ) {

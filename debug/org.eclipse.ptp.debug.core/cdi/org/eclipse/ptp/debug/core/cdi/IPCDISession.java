@@ -18,13 +18,21 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi;
 
-import org.eclipse.cdt.debug.core.cdi.ICDISession;
-import org.eclipse.cdt.debug.core.cdi.model.ICDITarget;
+import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 
-public interface IPCDISession extends ICDISession, ICommonActions {
+public interface IPCDISession extends ICommonActions {
+	IPCDITarget[] getTargets();
+	void setAttribute(String key, String value);
+	String getAttribute(String key);
+	IPCDIEventManager getEventManager();
+	IPCDISessionConfiguration getConfiguration();
+	void terminate() throws CDIException;
+	Process getSessionProcess() throws CDIException;
+	
 	public void registerTarget(int procNum, boolean sendEvent, boolean resumeTarget);
 	public void registerTargets(int[] procNums, boolean sendEvent, boolean resumeTarget);
 	public void registerTarget(int procNum, boolean sendEvent);
@@ -39,7 +47,7 @@ public interface IPCDISession extends ICDISession, ICommonActions {
 	public BitList createBitList(int index);
 	
 	public BitList getRegisteredTargets();
-	public ICDITarget getTarget(int target_id);
+	public IPCDITarget getTarget(int target_id);
 	public void shutdown();
 
 	public IPLaunch getLaunch();

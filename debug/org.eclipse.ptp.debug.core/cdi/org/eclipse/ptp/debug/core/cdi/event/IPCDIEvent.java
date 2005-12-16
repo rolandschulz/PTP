@@ -18,16 +18,21 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.event;
 
-import org.eclipse.cdt.debug.core.cdi.model.ICDIObject;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIObject;
 
+/**
+ * @author Clement chu
+ *
+ */
 public interface IPCDIEvent {
 	public BitList getAllProcesses();
 	public BitList getAllUnregisteredProcesses();
 	public BitList getAllRegisteredProcesses();
 	public IPJob getDebugJob();
 	public boolean containTask(int task_id);
-	public ICDIObject getSource(int task_id);
+	public IPCDIObject getSource(int task_id);
+	IPCDIObject getSource();
 }
 

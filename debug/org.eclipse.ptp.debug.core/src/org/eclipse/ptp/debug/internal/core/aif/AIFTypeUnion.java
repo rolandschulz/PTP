@@ -16,39 +16,17 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.internal.core.aif;
 
-public class AIFTypeUnion extends AIFType {
-	private int 				id = -1;
-	private AIFTypeField[]	fields;
-	
-	public AIFTypeUnion(AIFTypeField[] fields) {
-		this.fields = fields;
-	}
+import org.eclipse.ptp.debug.core.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeUnion;
 
-	public AIFTypeUnion(int id, AIFTypeField[] fields) {
-		this(fields);
-		this.id = id;
+public class AIFTypeUnion extends AIFTypeAggregate implements IAIFTypeUnion {
+	//(ID|N1=F1,N2=F2,...)
+	public AIFTypeUnion(String format) {
+		super(format);
 	}
-
-	public int getId() {
-		return this.id;
-	}
-
 	public String toString() {
-		String res = "(";
-		
-		if (this.id >= 0)
-			res += Integer.toString(this.id) + "|";
-		
-		for (int i = 0; i < this.fields.length; i++) {
-			if (i > 0)
-				res += ",";
-			res += this.fields[i].toString();
-		}
-		
-		return res + ")";
+		return AIFFactory.FDS_UNION + super.toString() + AIFFactory.FDS_UNION_END;
 	}
-
 }

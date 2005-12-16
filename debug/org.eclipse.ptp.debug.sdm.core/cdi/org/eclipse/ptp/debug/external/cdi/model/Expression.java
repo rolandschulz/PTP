@@ -19,19 +19,19 @@
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import org.eclipse.cdt.debug.core.cdi.CDIException;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIExpression;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIValue;
-import org.eclipse.cdt.debug.core.cdi.model.type.ICDIType;
 import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIExpression;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.external.cdi.ExpressionManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SourceManager;
-import org.eclipse.ptp.debug.external.cdi.model.type.IncompleteType;
-import org.eclipse.ptp.debug.external.cdi.model.type.Type;
-import org.eclipse.ptp.debug.external.cdi.model.variable.Variable;
 
-public class Expression extends PTPObject implements ICDIExpression {
+/**
+ * @author Clement chu
+ *
+ */
+public class Expression extends PObject implements IPCDIExpression {
 	private static int ID_COUNT = 0;
 	private int id;
 	String fExpression;
@@ -44,13 +44,25 @@ public class Expression extends PTPObject implements ICDIExpression {
 	public String getExpressionText() {
 		return fExpression;
 	}
-	public boolean equals(ICDIExpression obj) {
+	public boolean equals(IPCDIExpression obj) {
 		if (obj instanceof Expression) {
 			Expression other = (Expression) obj;
 			return other.id == id;
 		}
 		return false;
 	}
+	public IAIF getAIF(IPCDIStackFrame frame) throws PCDIException {
+		Target target = (Target) getTarget();
+		Session session = (Session) (target.getSession());
+		SourceManager sourceMgr = session.getSourceManager();
+		try {
+			return sourceMgr.getAIFFromVariable((StackFrame) frame, getExpressionText());
+		} catch (CDIException e) {
+			throw new PCDIException(e.getMessage());
+		}
+	}
+
+	/*
 	public ICDIType getType(ICDIStackFrame frame) throws CDIException {
 		Type type = null;
 		Target target = (Target) getTarget();
@@ -87,6 +99,7 @@ public class Expression extends PTPObject implements ICDIExpression {
 		Variable var = mgr.createVariable((StackFrame) context, getExpressionText());
 		return var.getValue();
 	}
+	*/
 	public void dispose() throws CDIException {
 		Session session = (Session) getTarget().getSession();
 		ExpressionManager mgr = session.getExpressionManager();

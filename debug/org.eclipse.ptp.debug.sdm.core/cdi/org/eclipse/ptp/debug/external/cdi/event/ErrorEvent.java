@@ -18,9 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.event;
 
-import org.eclipse.cdt.debug.core.cdi.ICDISessionObject;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.external.cdi.ErrorInfo;
 import org.eclipse.ptp.debug.external.cdi.Session;
@@ -29,7 +29,7 @@ public class ErrorEvent extends AbstractEvent implements IPCDISuspendedEvent {
 	public ErrorEvent(IPCDISession session, BitList tasks) {
 		super(session, tasks);
 	}
-	public ICDISessionObject getReason() {
+	public IPCDISessionObject getReason() {
 		return new ErrorInfo((Session) session, this);
 	}
 }

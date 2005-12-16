@@ -16,38 +16,18 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.internal.core.aif;
 
-public class AIFTypeStruct extends AIFType {
-	private int 				id = -1;
-	private AIFTypeField[]	fields;
-	
-	public AIFTypeStruct(AIFTypeField[] fields) {
-		this.fields = fields;
-	}
+import org.eclipse.ptp.debug.core.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeStruct;
 
-	public AIFTypeStruct(int id, AIFTypeField[] fields) {
-		this(fields);
-		this.id = id;
+public class AIFTypeStruct extends AIFTypeAggregate implements IAIFTypeStruct {	
+	//only base type: {structName|floatnumber=f4,intnumber=is4,shortnumber=is2,longnumber=is4,doubleumber=f8;;;}
+	//complex type: {structName|floatnumber=f4,intnumber=is4,tStr22={testStruct|aFloat=f4,intNum=is4;;;},shortnumber=is2;;;}
+	public AIFTypeStruct(String format) {
+		super(format);
 	}
-
-	public int getId() {
-		return this.id;
-	}
-	
 	public String toString() {
-		String res = "{";
-		
-		if (this.id >= 0)
-			res += Integer.toString(this.id) + "|";
-		
-		for (int i = 0; i < this.fields.length; i++) {
-			if (i > 0)
-				res += ",";
-			res += this.fields[i].toString();
-		}
-		
-		return res + ";;;}";
+		return AIFFactory.FDS_STRUCT + super.toString() + AIFFactory.FDS_STRUCT_END;
 	}
 }

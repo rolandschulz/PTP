@@ -16,16 +16,6 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-/*******************************************************************************
- * Copyright (c) 2000, 2004 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import java.util.ArrayList;
@@ -33,20 +23,25 @@ import java.util.List;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDILocation;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISignal;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIStackFrame;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIThread;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorage;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIThreadStorageDescriptor;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIThreadStorage;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIThreadStorageDescriptor;
 import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.cdi.model.variable.ThreadStorageDescriptor;
 import org.eclipse.ptp.debug.external.commands.ListStackFramesCommand;
 import org.eclipse.ptp.debug.external.commands.SetCurrentStackFrameCommand;
 
-public class Thread extends PTPObject implements ICDIThread {
-	static ICDIStackFrame[] noStack = new ICDIStackFrame[0];
+/**
+ * @author Clement chu
+ *
+ */
+public class Thread extends PObject implements IPCDIThread {
+	static IPCDIStackFrame[] noStack = new IPCDIStackFrame[0];
 	int id;
 	String name;
 	StackFrame currentFrame;
@@ -80,28 +75,28 @@ public class Thread extends PTPObject implements ICDIThread {
 	}
 	public StackFrame getCurrentStackFrame() throws CDIException {
 		if (currentFrame == null) {
-			ICDIStackFrame[] frames = getStackFrames(0, 0);
+			IPCDIStackFrame[] frames = getStackFrames(0, 0);
 			if (frames.length > 0) {
 				currentFrame = (StackFrame)frames[0];
 			}
 		}
 		return currentFrame;
 	}
-	public ICDIStackFrame[] getStackFrames() throws CDIException {
+	public IPCDIStackFrame[] getStackFrames() throws CDIException {
 		int depth = getStackFrameCount();
 
 		// refresh if we have nothing or if we have just a subset get everything.
 		if (currentFrames == null || currentFrames.size() < depth) {
 			currentFrames = new ArrayList();
 			Target target = (Target)getTarget();
-			ICDIThread currentThread = target.getCurrentThread();
+			IPCDIThread currentThread = (IPCDIThread)target.getCurrentThread();
 			target.setCurrentThread(this, false);
 
 			Session session = (Session) target.getSession();			
 			try {
 				ListStackFramesCommand command = new ListStackFramesCommand(session.createBitList(target.getTargetID()));
 				session.getDebugger().postCommand(command);
-				ICDIStackFrame[] frames = command.getStackFrames();
+				IPCDIStackFrame[] frames = command.getStackFrames();
 				for (int i = 0; i < frames.length; i++) {
 					currentFrames.add(frames[i]);
 				}
@@ -112,7 +107,7 @@ public class Thread extends PTPObject implements ICDIThread {
 			// assign the currentFrame if it was not done yet.
 			if (currentFrame == null) {
 				for (int i = 0; i < currentFrames.size(); i++) {
-					ICDIStackFrame stack = (ICDIStackFrame) currentFrames.get(i);
+					IPCDIStackFrame stack = (IPCDIStackFrame) currentFrames.get(i);
 					//TODO -- checking correct?
 					if (stack.getLevel() == depth) {
 						currentFrame = (StackFrame)stack;
@@ -120,7 +115,7 @@ public class Thread extends PTPObject implements ICDIThread {
 				}
 			}
 		}
-		return (ICDIStackFrame[]) currentFrames.toArray(noStack);
+		return (IPCDIStackFrame[]) currentFrames.toArray(noStack);
 	}
 	public int getStackFrameCount() throws CDIException {
 		if (stackdepth == 0 || currentFrames == null) {
@@ -130,7 +125,7 @@ public class Thread extends PTPObject implements ICDIThread {
 			
 			ListStackFramesCommand command = new ListStackFramesCommand(session.createBitList(target.getTargetID()));
 			session.getDebugger().postCommand(command);
-			ICDIStackFrame[] frames = command.getStackFrames();
+			IPCDIStackFrame[] frames = command.getStackFrames();
 			for (int i = 0; i < frames.length; i++) {
 				currentFrames.add(frames[i]);
 			}
@@ -141,12 +136,16 @@ public class Thread extends PTPObject implements ICDIThread {
 		}
 		return stackdepth;
 	}
-	public ICDIStackFrame[] getStackFrames(int low, int high) throws CDIException {
+	public IPCDIStackFrame[] getStackFrames(int low, int high) throws PCDIException {
 		if (currentFrames == null || currentFrames.size() < high) {
-			getStackFrames();
+			try {
+				getStackFrames();
+			} catch (CDIException e) {
+				throw new PCDIException(e.getMessage());
+			}
 		}
 		List list = ((high - low + 1) <= currentFrames.size()) ? currentFrames.subList(low, high + 1) : currentFrames;
-		return (ICDIStackFrame[])list.toArray(noStack);
+		return (IPCDIStackFrame[])list.toArray(noStack);
 	}
 	public void setCurrentStackFrame(StackFrame stackframe, boolean doUpdate) throws CDIException {
 		int frameLevel = 0;
@@ -245,16 +244,16 @@ public class Thread extends PTPObject implements ICDIThread {
 	public void signal(ICDISignal signal) throws CDIException {
 		resume(signal);
 	}
-	public boolean equals(ICDIThread thread) {
+	public boolean equals(IPCDIThread thread) {
 		if (thread instanceof Thread) {
 			Thread cthread = (Thread) thread;
 			return id == cthread.getId();
 		}
 		return super.equals(thread);
 	}
-	public ICDIBreakpoint[] getBreakpoints() throws CDIException {
+	public IPCDIBreakpoint[] getBreakpoints() throws CDIException {
 		Target target = (Target)getTarget();
-		ICDIBreakpoint[] bps = target.getBreakpoints();
+		IPCDIBreakpoint[] bps = target.getBreakpoints();
 		ArrayList list = new ArrayList(bps.length);
 		for (int i = 0; i < bps.length; i++) {
 			ICDICondition condition = bps[i].getCondition();
@@ -274,14 +273,14 @@ public class Thread extends PTPObject implements ICDIThread {
 				}
 			}
 		}
-		return (ICDIBreakpoint[]) list.toArray(new ICDIBreakpoint[list.size()]);
+		return (IPCDIBreakpoint[]) list.toArray(new IPCDIBreakpoint[list.size()]);
 	}
-	public ICDIThreadStorageDescriptor[] getThreadStorageDescriptors() throws CDIException {
+	public IPCDIThreadStorageDescriptor[] getThreadStorageDescriptors() throws CDIException {
 		Session session = (Session)getTarget().getSession();
 		VariableManager varMgr = session.getVariableManager();
 		return varMgr.getThreadStorageDescriptors(this);
 	}
-	public ICDIThreadStorage createThreadStorage(ICDIThreadStorageDescriptor varDesc) throws CDIException {
+	public IPCDIThreadStorage createThreadStorage(IPCDIThreadStorageDescriptor varDesc) throws CDIException {
 		if (varDesc instanceof ThreadStorageDescriptor) {
 			Session session = (Session)getTarget().getSession();
 			VariableManager varMgr = session.getVariableManager();

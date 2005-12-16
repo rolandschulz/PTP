@@ -18,25 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi;
 
-import java.util.StringTokenizer;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
-import org.eclipse.ptp.debug.external.cdi.model.type.BoolType;
-import org.eclipse.ptp.debug.external.cdi.model.type.CharType;
-import org.eclipse.ptp.debug.external.cdi.model.type.DoubleType;
-import org.eclipse.ptp.debug.external.cdi.model.type.EnumType;
-import org.eclipse.ptp.debug.external.cdi.model.type.FloatType;
-import org.eclipse.ptp.debug.external.cdi.model.type.IntType;
-import org.eclipse.ptp.debug.external.cdi.model.type.LongLongType;
-import org.eclipse.ptp.debug.external.cdi.model.type.LongType;
-import org.eclipse.ptp.debug.external.cdi.model.type.ShortType;
-import org.eclipse.ptp.debug.external.cdi.model.type.StructType;
-import org.eclipse.ptp.debug.external.cdi.model.type.Type;
-import org.eclipse.ptp.debug.external.cdi.model.type.VoidType;
-import org.eclipse.ptp.debug.external.cdi.model.type.WCharType;
 import org.eclipse.ptp.debug.external.commands.GetAIFCommand;
 
 /**
@@ -53,13 +39,13 @@ public class SourceManager extends Manager {
 	public void shutdown() {
 		
 	}
+	/*
 	public Type getType(Target target, IAIF aif) throws CDIException {
 		if (aif == null) {
 			throw new CDIException("No AIF found - SourceManager: getType");
 		}
 		return toCDIType(target, aif.getDescription());
 	}
-
 	public Type getType(Target target, String name) throws CDIException {
 		if (name == null) {
 			name = new String();
@@ -244,6 +230,7 @@ public class SourceManager extends Manager {
 		}
 		throw new CDIException("SourceManager.Unknown_type");
 	}
+	*/
 	public String getDetailTypeNameFromVariable(StackFrame frame, String variable) throws CDIException {
 		Target target = (Target)frame.getTarget();
 		Thread currentThread = (Thread)target.getCurrentThread();

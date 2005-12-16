@@ -16,29 +16,30 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeFunction;
 
-public class AIFTypeFunction extends AIFType {
-	private IAIFType[] 	argTypes;
-	private IAIFType		returnType;
+public class AIFTypeFunction extends AIFTypeDerived implements IAIFTypeFunction {
+	private String[] args = new String[0];
 	
-	public AIFTypeFunction(IAIFType[] args, IAIFType ret) {
-		this.argTypes = args;
-		this.returnType = ret;
+	//&A1,A2,.../T	
+	public AIFTypeFunction(String format, IAIFType basetype) {
+		super(basetype);
+		parse(format);
 	}
-
+	private void parse(String fmt) {
+		args = fmt.split(AIFFactory.SIGN_COMMA);
+	}
 	public String toString() {
-		String res = "&";
-		
-		for (int i = 0; i < this.argTypes.length; i++) {
-			if (i > 0)
-				res += ",";
-			res += this.argTypes[i].toString();
+		String content = "&";
+		for (int i = 0; i<args.length; i++) {
+			content += args[i];
+			if (i < args.length - 1)
+				content += ",";
 		}
-		
-		return res + "/" + this.returnType.toString();
+		return content + "/" + super.toString();
 	}
 }
