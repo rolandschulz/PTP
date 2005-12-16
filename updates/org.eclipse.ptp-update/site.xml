@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/org.eclipse.fdt_0.9.0.jar" id="org.eclipse.fdt" version="0.9.0">
-      <category name="FDT 0.9-31M5a"/>
+   <description url="http://download.eclipse.org/technology/ptp/update-site/">
+      Parallel Tools Platform update site
+   </description>
+   <feature url="features/org.eclipse.fdt_1.0.0.jar" id="org.eclipse.fdt" version="1.0.0">
+      <category name="Fortran Development Tools 1.0"/>
    </feature>
-   <category-def name="FDT 0.9-31M5a" label="FDT_0_9_31M5a">
+   <feature url="features/org.eclipse.ptp.mpi_1.0.0.jar" id="org.eclipse.ptp.mpi" version="1.0.0">
+      <category name="MPI Development Tools 1.0"/>
+   </feature>
+   <category-def name="Fortran Development Tools 1.0" label="FDT_1_0">
       <description>
-         Fortran Development Tools Pre-release (requires Eclipse 3.1M5a)
+         Fortran Development Tools Release 1.0
+      </description>
+   </category-def>
+   <category-def name="MPI Development Tools 1.0" label="MDT_1_0">
+      <description>
+         MPI Development Tools Release 1.0
       </description>
    </category-def>
 </site>
