@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<site>
+<site mirrorsURL="http://www.eclipse.org/downloads/download.php?file=/technology/ptp/update-site/&amp;format=xml">
    <description url="http://download.eclipse.org/technology/ptp/update-site/">
       Parallel Tools Platform update site
    </description>
