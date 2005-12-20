@@ -23,17 +23,16 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 public class AIFValueUnknown extends AIFValue {
 	public AIFValueUnknown(IAIFType type) {
-		super(type, new byte[0]);
+		super(type);
 	}
+	protected void parse(byte[] data) {}
+	
 	public String getValueString() throws PCDIException {
 		if (result == null) {
 			result = "<value not supported>";
 		}
 		return result;
 	}
-	public int getBufferLength() {
-		return 0;
-	}		
 	/*
 	public String toString() {
 		return "<value not supported>";

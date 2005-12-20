@@ -36,17 +36,16 @@ public class AIFValueArray extends AIFValueDerived implements IAIFValueArray {
 	private int current_dimension_position = 0;
 	private int current_position = 0;
 	private IAIFValueArray parentArray;
-	private int bufferLength = 0;
 
 	public AIFValueArray(IAIFValueArray parsentArray, int current_pos) {
-		super((IAIFTypeArray)parsentArray.getType(), new byte[0]);
+		super((IAIFTypeArray)parsentArray.getType());
 		this.parentArray = parsentArray;
 		current_dimension_position = parentArray.getCurrentDimensionPosition()+1;
 		current_position = current_pos;
 	}
 	public AIFValueArray(IAIFTypeArray type, byte[] data) {
-		super(type, data);
-		parseValue();
+		super(type);
+		parse(data);
 		parentArray = this;
 	}
 	public IAIFValueArray getParent() {
@@ -61,20 +60,16 @@ public class AIFValueArray extends AIFValueDerived implements IAIFValueArray {
 	public int getCurrentPosition() {
 		return current_position;
 	}
-	public int getBufferLength() {
-		return bufferLength;
-	}
 	public String getValueString() throws PCDIException {
 		if (result == null) {
 			result = getString();
 		}
 		return result;
 	}
-	private void parseValue() {
+	protected void parse(byte[] data) {
 		IAIFTypeArray arrType = (IAIFTypeArray)type;
-		ByteBuffer buffer = byteBuffer();
+		ByteBuffer buffer = byteBuffer(data);
 		values = parseRange(buffer, 1, arrType.getBaseType(), arrType.getDimension());
-		bufferLength = buffer.position();
 	}
 	private Object[] parseRange(ByteBuffer dataBuf, int dim_pos, IAIFType baseType, int dimension) {
 		IAIFTypeArray arrType = (IAIFTypeArray)type;

@@ -47,7 +47,6 @@ public class AIFTypeFloatingPoint extends AIFType implements IAIFTypeFloatingPoi
 	public int sizeof() {
 		return size;
 	}
-	
 	public String toString() {
 		return "f" + sizeof();
 	}

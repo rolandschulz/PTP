@@ -16,28 +16,10 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.aif;
-
-import org.eclipse.ptp.debug.core.aif.IAIFTypeEnum;
-import org.eclipse.ptp.debug.core.aif.IAIFValueEnum;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-
+package org.eclipse.ptp.debug.core.aif;
 /**
  * @author Clement chu
  * 
  */
-public class AIFValueEnum extends AIFValueIntegral implements IAIFValueEnum { 
-	public AIFValueEnum(IAIFTypeEnum type, byte[] data) {
-		super(type);
-		parse(data);
-	}
-	public String getValueString() throws PCDIException {
-		if (result == null) {
-			result = String.valueOf("");
-		}
-		return result;
-	}
-	protected void parse(byte[] data) {
-		
-	}
-}
+public interface IAIFValueClass extends IAIFValueAggregate {}
+

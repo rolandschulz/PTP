@@ -28,7 +28,8 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  */
 public class AIFValueFunction extends AIFValueDerived implements IAIFValueFunction {
 	public AIFValueFunction(IAIFTypeFunction type, byte[] data) {
-		super(type, data);
+		super(type);
+		parse(data);
 	}
 	public String getValueString() throws PCDIException {
 		if (result == null) {
@@ -36,8 +37,8 @@ public class AIFValueFunction extends AIFValueDerived implements IAIFValueFuncti
 		}
 		return null;
 	}
-	public int getBufferLength() {
-		return 1;
-	}	
+	protected void parse(byte[] data) {
+		
+	}
 }
 

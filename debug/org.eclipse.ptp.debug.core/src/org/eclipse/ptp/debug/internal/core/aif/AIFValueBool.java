@@ -27,8 +27,11 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * 
  */
 public class AIFValueBool extends AIFValueIntegral implements IAIFValueBool {
+	boolean boolValue;
+	
 	public AIFValueBool(IAIFTypeBool type, byte[] data) {
-		super(type, data);
+		super(type);
+		parse(data);
 	}
 	public String getValueString() throws PCDIException {
 		if (result == null) {
@@ -36,10 +39,10 @@ public class AIFValueBool extends AIFValueIntegral implements IAIFValueBool {
 		}
 		return result;
 	}
-	public boolean booleanValue() throws PCDIException {
-		return (data[0]>0);
+	protected void parse(byte[] data) {
+		boolValue = (data[0]>0);
 	}
-	public int getBufferLength() {
-		return 1;
+	public boolean booleanValue() throws PCDIException {
+		return boolValue;
 	}
 }

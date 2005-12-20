@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
@@ -26,6 +25,7 @@ import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeAggregate;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueAggregate;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -33,31 +33,47 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueAggregate;
  */
 public abstract class AIFValueAggregate extends AIFValue implements IAIFValueAggregate {
 	protected List values = new ArrayList();
-	private int bufferLength = 0;
 	
 	public AIFValueAggregate(IAIFTypeAggregate type, byte[] data) {
-		super(type, data);
-		parse();
+		super(type);
+		parse(data);
 	}
-	public int getBufferLength() {
-		return bufferLength;
-	}	
-	
-	protected void parse() {
+	protected void parse(byte[] data) {
 		IAIFTypeAggregate typeAggregate = (IAIFTypeAggregate)getType();
 		int length = typeAggregate.getNumberOfChildren();
-		System.out.println("-- data len: " + data.length);
-		ByteBuffer buffer = byteBuffer();
+		int from = 0;
 		for (int i=0; i<length; i++) {
 			IAIFType aifType = typeAggregate.getType(i);
-			//buffer.
-			IAIFValue aifValue = AIFFactory.getAIFValue(aifType, byteBuffer(bufferLength).array());
-			bufferLength += aifValue.getBufferLength();
-			System.out.println("-- aifValue: " + aifValue.toString() + ", buffer len: " + bufferLength);
-			//aifType
-			//AIFFactory.getAIFValue();
-			//values.add(AIFFactory.)
+			byte[] newData = createByteArray(data, from, aifType.sizeof());
+			values.add(AIFFactory.getAIFValue(aifType, newData));
+			from += newData.length;
 		}
 	}
+	private byte[] createByteArray(byte[] data, int from, int size) {
+		byte[] newByte = new byte[size];
+		System.arraycopy(data, from, newByte, 0, size);
+		return newByte;
+	}
+	
+	public String getValueString() throws PCDIException {
+		if (result == null) {
+			result = getString();
+		}
+		return result;
+	}
+	
+	private String getString() throws PCDIException {
+		String content = "{";
+		int length = values.size();
+		for (int i=0; i<length; i++) {
+			IAIFValue value = (IAIFValue)values.get(i);
+			content += value.getValueString();
+			if (i < length - 1) {
+				content += ",";
+			}
+		}
+		return content + "}";
+	}
+	
 }
 

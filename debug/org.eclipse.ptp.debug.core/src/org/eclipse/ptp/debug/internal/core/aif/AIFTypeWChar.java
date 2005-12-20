@@ -31,6 +31,7 @@ public class AIFTypeWChar extends AIFTypeIntegral implements IAIFTypeWChar {
 	}
 	public AIFTypeWChar(boolean signed) {
 		super(signed);
+		System.out.println("======================= NEED TEST ====================");
 	}
 	public int sizeof() {
 		return AIFFactory.SIZE_INVALID;

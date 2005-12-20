@@ -32,6 +32,7 @@ public abstract class AIFTypeAggregate extends AIFType implements IAIFTypeAggreg
 	protected List fields = new ArrayList(); 
 	protected List types = new ArrayList();
 	protected String name;
+	private int size = 1;
 
 	public AIFTypeAggregate(String format) {
 		parse(format);
@@ -55,7 +56,7 @@ public abstract class AIFTypeAggregate extends AIFType implements IAIFTypeAggreg
 		return fields.size();
 	}
 	public int sizeof() {
-		return AIFFactory.SIZE_INVALID;
+		return size;
 	}
 	protected void parse(String fmt) {
 		fmt = parseName(fmt);
@@ -94,7 +95,10 @@ public abstract class AIFTypeAggregate extends AIFType implements IAIFTypeAggreg
 		if (pos == -1) {
 			pos = fmt.length();
 		}
-		types.add(AIFFactory.getAIFType(fmt.substring(0, pos)));
+		IAIFType aifType = AIFFactory.getAIFType(fmt.substring(0, pos));
+		size += aifType.sizeof();
+		types.add(aifType);
+		
 		if (pos == fmt.length())
 			return "";
 

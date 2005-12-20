@@ -26,8 +26,8 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueDerived;
  * 
  */
 public abstract class AIFValueDerived extends AIFValue implements IAIFValueDerived {
-	public AIFValueDerived(IAIFTypeDerived type, byte[] data) {
-		super(type, data);
+	public AIFValueDerived(IAIFTypeDerived type) {
+		super(type);
 	}
 }
 

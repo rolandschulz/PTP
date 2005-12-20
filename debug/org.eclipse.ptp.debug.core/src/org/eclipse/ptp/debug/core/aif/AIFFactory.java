@@ -114,11 +114,12 @@ public class AIFFactory {
 			return new AIFValuePointer((IAIFTypePointer)type, data);
 		} else if (type instanceof IAIFTypeStruct) {
 			return new AIFValueStruct((IAIFTypeStruct)type, data);			
+		
 		/*
 		} else if (type instanceof IAIFTypeClass) {
 			return new AIFValueClass((IAIFTypeClass)type, data);
 		} else if (type instanceof IAIFTypeUnion) {
-			return new AIFValueUnion((IAIFTypeUnion)type, data);			
+			return new AIFValueUnion((IAIFTypeUnion)type, data);
 		} else if (type instanceof IAIFTypeFunction) {
 			return new AIFValueFunction((IAIFTypeFunction)type, data);			
 		} else if (type instanceof IAIFTypeEnum) {

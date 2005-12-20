@@ -27,6 +27,7 @@ import org.eclipse.ptp.debug.core.aif.IAIFTypeRange;
 
 public class AIFTypeArray extends AIFTypeDerived implements IAIFTypeArray {
 	private List ranges = new ArrayList();
+	private int size = 1;
 
 	//char[]: [r0..3is4]c
 	//2D[3][2]: [r0..1is4][r0..2is4]is4
@@ -40,6 +41,10 @@ public class AIFTypeArray extends AIFTypeDerived implements IAIFTypeArray {
 	public int getDimension() {
 		return ranges.size();
 	}
+	public int sizeof() {
+		return size;
+	}
+	
 	public IAIFTypeRange[] getRanges() {
 		return (IAIFTypeRange[])ranges.toArray(new IAIFTypeRange[0]);
 	}
@@ -72,7 +77,9 @@ public class AIFTypeArray extends AIFTypeDerived implements IAIFTypeArray {
 		int lower = Integer.parseInt(fmt.substring(1, low_pos));
 		int up_pos = AIFFactory.getDigitPos(fmt, low_pos+2);
 		int upper = Integer.parseInt(fmt.substring(low_pos+2, up_pos));
-		return new AIFTypeRange(lower, upper, AIFFactory.getAIFType(fmt.substring(up_pos)));
+		IAIFType aifType = AIFFactory.getAIFType(fmt.substring(up_pos));
+		size = size * (upper-lower+1) * aifType.sizeof();
+		return new AIFTypeRange(lower, upper, aifType);
 	}
 	public String toString(int dimension) {
 		IAIFTypeRange range = (IAIFTypeRange)ranges.get(dimension);

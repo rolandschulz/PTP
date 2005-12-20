@@ -24,8 +24,11 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueChar;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 public class AIFValueChar extends AIFValueIntegral implements IAIFValueChar {
+	byte byteValue;
+	
 	public AIFValueChar(IAIFTypeChar type, byte[] data) {
-		super(type, data);
+		super(type);
+		parse(data);
 	}
 	public String getValueString() throws PCDIException {
 		if (result == null) {
@@ -33,11 +36,14 @@ public class AIFValueChar extends AIFValueIntegral implements IAIFValueChar {
 		}
 		return result;
 	}
+	protected void parse(byte[] data) {
+		byteValue = data[0];
+	}
 	public char charValue() throws PCDIException {
 		return (char)byteValue();
 	}
 	public byte byteValue() throws PCDIException {
-		return data[0];
+		return byteValue;
 	}
 	public String toString() {
 		try {
@@ -47,10 +53,6 @@ public class AIFValueChar extends AIFValueIntegral implements IAIFValueChar {
 			return "err: " + e.getMessage();
 		}
 	}
-	public int getBufferLength() {
-		return 1;
-	}	
-
 	/*
 	public String toString() {
 		String ch = ""+(char)val+"";
