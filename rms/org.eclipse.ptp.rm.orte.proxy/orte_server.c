@@ -939,7 +939,7 @@ ORTERun(char **args)
 	if(res) free(res);
 	
 	printf("B!\n"); fflush(stdout);
-	if(debug_args) free(debug_args);
+	if(debug) free(debug_args);
 	
 //	/* generate an event stating what the new/assigned job ID is.
 //	 * The caller must record this and use this as an identifier to get
