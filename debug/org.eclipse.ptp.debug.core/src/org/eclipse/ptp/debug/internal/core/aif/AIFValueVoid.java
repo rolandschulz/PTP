@@ -27,14 +27,13 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  */
 public class AIFValueVoid extends AIFValue {
 	public AIFValueVoid(IAIFType type, byte[] data) {
-		super(type, data);
+		super(type);
+		parse(data);
 	}
-	
+	protected void parse(byte[] data) {
+		
+	}	
 	public String getValueString() throws PCDIException {
 		return "";
 	}
-	public int getBufferLength() {
-		return 1;
-	}		
 }
-

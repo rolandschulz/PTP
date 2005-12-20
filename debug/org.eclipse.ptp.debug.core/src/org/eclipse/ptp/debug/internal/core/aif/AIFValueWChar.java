@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeWChar;
 import org.eclipse.ptp.debug.core.aif.IAIFValueWChar;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -27,8 +28,14 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * 
  */
 public class AIFValueWChar extends AIFValueIntegral implements IAIFValueWChar {
+	ByteBuffer byteBuffer;
+	
 	public AIFValueWChar(IAIFTypeWChar type, byte[] data) {
-		super(type, data);
+		super(type);
+		parse(data);
+	}
+	protected void parse(byte[] data) {
+		byteBuffer = byteBuffer(data);
 	}
 	public String getValueString() throws PCDIException {
 		if (result == null) {
@@ -36,12 +43,8 @@ public class AIFValueWChar extends AIFValueIntegral implements IAIFValueWChar {
 		}
 		return result;
 	}
-	public int getBufferLength() {
-		return data[0];
-	}	
-	
 	private String stringValue() throws PCDIException {
-		return new String(byteBuffer(2).array());
+		return new String(byteBuffer.array());
 		/*
 		int len = data.get();
 		len <<= 8; //2^8

@@ -26,5 +26,4 @@ public interface IAIFValue {
 	String getValueString() throws PCDIException;
 	int getChildrenNumber() throws PCDIException;
 	boolean hasChildren() throws PCDIException;
-	public int getBufferLength();
 }

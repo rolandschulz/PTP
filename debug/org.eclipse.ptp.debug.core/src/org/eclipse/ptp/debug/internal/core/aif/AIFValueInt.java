@@ -20,13 +20,20 @@
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeInt;
 import org.eclipse.ptp.debug.core.aif.IAIFValueInt;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 public class AIFValueInt extends AIFValueIntegral implements IAIFValueInt {
+	ByteBuffer byteBuffer;
+	
 	public AIFValueInt(IAIFTypeInt type, byte[] data) {
-		super(type, data);
+		super(type);
+		parse(data);
+	}
+	protected void parse(byte[] data) {
+		byteBuffer = byteBuffer(data);
 	}
 	public String getValueString() throws PCDIException {
 		if (result == null) {
@@ -48,38 +55,35 @@ public class AIFValueInt extends AIFValueIntegral implements IAIFValueInt {
 			return new String(byteValue());
 		}
 	}
-	public int getBufferLength() {
-		return type.sizeof();
-	}	
 	public boolean isLong() {
-		return (getBufferLength() == 8);
+		return (type.sizeof() == 8);
 	}
 	public boolean isShort() {
-		return (getBufferLength() == 2);
+		return (type.sizeof() == 2);
 	}
 	public boolean isInt() {
-		return (getBufferLength() == 4);
+		return (type.sizeof() == 4);
 	}
 	public byte[] byteValue() throws PCDIException {
-		return data;
+		return byteBuffer.array();
 	}
 	public long longValue() throws PCDIException {
 		try {
-			return byteBuffer().getLong();
+			return byteBuffer.getLong();
 		} catch (BufferUnderflowException e) {
 			return 0;
 		}
 	}
 	public short shortValue() throws PCDIException {
 		try {
-			return byteBuffer().getShort();
+			return byteBuffer.getShort();
 		} catch (BufferUnderflowException e) {
 			return 0;
 		}
 	}
 	public int intValue() throws PCDIException {
 		try {
-			return byteBuffer().getInt();
+			return byteBuffer.getInt();
 		} catch (BufferUnderflowException e) {
 			return 0;
 		}

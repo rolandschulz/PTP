@@ -20,22 +20,13 @@ package org.eclipse.ptp.debug.internal.core.aif;
 
 import org.eclipse.ptp.debug.core.aif.IAIFTypeStruct;
 import org.eclipse.ptp.debug.core.aif.IAIFValueStruct;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
  * 
  */
 public class AIFValueStruct extends AIFValueAggregate implements IAIFValueStruct {
-	//only base type: {structName|floatnumber=f4,intnumber=is4,shortnumber=is2,longnumber=is4,doubleumber=f8;;;}
 	public AIFValueStruct(IAIFTypeStruct type, byte[] data) {
 		super(type, data);
 	}
-	public String getValueString() throws PCDIException {
-		if (result == null) {
-			result = String.valueOf("");
-		}
-		return result;
-	}
 }
-

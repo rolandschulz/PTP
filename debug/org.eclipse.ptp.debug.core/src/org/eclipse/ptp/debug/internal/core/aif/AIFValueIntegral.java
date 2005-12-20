@@ -29,8 +29,8 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * 
  */
 public abstract class AIFValueIntegral extends AIFValue implements IAIFValueIntegral {
-	public AIFValueIntegral(IAIFTypeIntegral type, byte[] data) {
-		super(type, data);
+	public AIFValueIntegral(IAIFTypeIntegral type) {
+		super(type);
 	}
 	
 	public BigInteger bigIntegerValue() throws PCDIException {

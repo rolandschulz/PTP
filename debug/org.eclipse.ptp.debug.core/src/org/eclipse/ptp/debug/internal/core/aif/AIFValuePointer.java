@@ -29,27 +29,25 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * 
  */
 public class AIFValuePointer extends AIFValueDerived implements IAIFValuePointer {
-	private int marker = 0;
+	ByteBuffer byteBuffer; 
+	int marker = 0;
 	
 	public AIFValuePointer(IAIFTypePointer type, byte[] data) {
-		super(type, data);
-		parse();
+		super(type);
+		parse(data);
 	}
 	public String getValueString() throws PCDIException {
 		if (result == null) {
-			result = String.valueOf(data);
+			result = String.valueOf(byteBuffer.array());
 		}
 		return result;
 	}
-	protected void parse() {
-		ByteBuffer buffer = byteBuffer();
-		marker = (int)buffer.get();
+	protected void parse(byte[] data) {
+		byteBuffer = byteBuffer(data);
+		marker = (int)byteBuffer.get();
 	}
 	
 	public BigInteger pointerValue() throws PCDIException {
 		return AIFValueIntegral.bigIntegerValue(getValueString());
 	}
-	public int getBufferLength() {
-		return 1;
-	}	
 }

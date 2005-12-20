@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeFloatingPoint;
 import org.eclipse.ptp.debug.core.aif.IAIFValueFloatingPoint;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -28,9 +29,16 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * 
  */
 public class AIFValueFloatingPoint extends AIFValue implements IAIFValueFloatingPoint {
+	ByteBuffer byteBuffer;
+	
 	public AIFValueFloatingPoint(IAIFTypeFloatingPoint type, byte[] data) {
-		super(type, data);
+		super(type);
+		parse(data);
 	}
+	protected void parse(byte[] data) {
+		byteBuffer = byteBuffer(data);
+	}
+	
 	public String getValueString() throws PCDIException {
 		if (result == null) {
 			result = getString();
@@ -43,33 +51,29 @@ public class AIFValueFloatingPoint extends AIFValue implements IAIFValueFloating
 		} else if (isDouble()) {
 			return String.valueOf(doubleValue());
 		} else {
-			return new String(data);
+			return new String(byteBuffer.array());
 		}
 	}
 	public float floatValue() throws PCDIException {
 		try {
-			return byteBuffer().getFloat();
+			return byteBuffer.getFloat();
 		} catch (BufferUnderflowException e) {
 			return 0;
 		}
 	}
 	public double doubleValue() throws PCDIException {
 		try {
-			return byteBuffer().getDouble();
+			return byteBuffer.getDouble();
 		} catch (BufferUnderflowException e) {
 			return 0;
 		}
 	}
 	
-	public int getBufferLength() {
-		return type.sizeof();
-	}
-	
 	public boolean isDouble() {
-		return (getBufferLength() == 8);
+		return (type.sizeof() == 8);
 	}
 	public boolean isFloat() {
-		return (getBufferLength() == 4);
+		return (type.sizeof() == 4);
 	}
 	/*
 	public double doubleValue() throws PCDIException {

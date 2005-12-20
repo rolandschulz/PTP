@@ -43,7 +43,7 @@ public class AIFTypeEnum extends AIFTypeIntegral implements IAIFTypeEnum {
 		return basetype;
 	}
 	public int sizeof() {
-		return basetype.sizeof();
+		return getNumberOfChildren() * basetype.sizeof();
 	}
 	
 	protected void parse(String fmt) {

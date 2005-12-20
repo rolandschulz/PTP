@@ -29,7 +29,11 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  */
 public class AIFValueReference extends AIFValueDerived implements IAIFValueReference {
 	public AIFValueReference(IAIFTypeReference type, byte[] data) {
-		super(type, data);
+		super(type);
+		parse(data);
+	}
+	protected void parse(byte[] data) {
+		
 	}
 	public String getValueString() throws PCDIException {
 		if (result == null) {
@@ -37,9 +41,6 @@ public class AIFValueReference extends AIFValueDerived implements IAIFValueRefer
 		}
 		return null;
 	}
-	public int getBufferLength() {
-		return 1;
-	}		
 	public IAIFValue referenceValue() throws PCDIException {
 		IAIFValue value = null;
 		/*

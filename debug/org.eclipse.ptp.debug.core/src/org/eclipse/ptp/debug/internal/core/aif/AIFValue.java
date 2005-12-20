@@ -31,11 +31,9 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
 public abstract class AIFValue implements IAIFValue {
 	protected IAIFType type = null;
 	protected String result = null;
-	protected byte[] data = null;
 	
-	public AIFValue(IAIFType type, byte[] data) {
+	public AIFValue(IAIFType type) {
 		this.type = type;
-		this.data = data;
 	}
 	public IAIFType getType() {
 		return type;
@@ -46,10 +44,10 @@ public abstract class AIFValue implements IAIFValue {
 	public boolean hasChildren() throws PCDIException {
 		return (getChildrenNumber() > 0);
 	}
-	protected ByteBuffer byteBuffer() {
-		return byteBuffer(0);
+	protected ByteBuffer byteBuffer(byte[] data) {
+		return byteBuffer(data, 0);
 	}
-	protected ByteBuffer byteBuffer(int offset) {
+	protected ByteBuffer byteBuffer(byte[] data, int offset) {
 		ByteBuffer bBuffer = ByteBuffer.wrap(data, offset, data.length);
 		bBuffer.order(ByteOrder.nativeOrder());
 		return bBuffer;
@@ -60,6 +58,7 @@ public abstract class AIFValue implements IAIFValue {
 		} catch (PCDIException e) {
 			return "err: " + e.getMessage();
 		}
-	}	
+	}
+	
+	protected abstract void parse(byte[] data);
 }
-
