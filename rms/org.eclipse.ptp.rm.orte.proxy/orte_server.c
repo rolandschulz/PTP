@@ -921,7 +921,7 @@ ORTERun(char **args)
 	 * jobid assigned by the registry/ORTE.  Passes a callback function
 	 * that ORTE will call with state change on this job */
 	if (!debug)
-		rc = orte_rmgr.spawn(apps, num_apps, &jobid, NULL);
+		rc = orte_rmgr.spawn(apps, num_apps, &jobid, job_state_callback);
 	else
 		rc = debug_spawn(debug_exec_path, debug_argc, debug_args, apps, num_apps, &jobid);
 
@@ -933,7 +933,7 @@ ORTERun(char **args)
 	
 	asprintf(&res, "%d %d", RTEV_NEWJOB, jobid);
 	printf("res = '%s'\n", res); fflush(stdout);
-	//proxy_svr_event_callback(orte_proxy, res);
+	proxy_svr_event_callback(orte_proxy, res);
 
 	printf("A!\n"); fflush(stdout);
 	if(res) free(res);
@@ -997,18 +997,18 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 	switch(state) {
 		case ORTE_PROC_STATE_INIT:
 			printf("    state = ORTE_PROC_STATE_INIT\n");
-//			if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
-//                ORTE_ERROR_LOG(rc);
-//                break;
-//            	}
-//            	printf("name = '%s'\n", name); fflush(stdout);
-            	/*
+			if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
+                ORTE_ERROR_LOG(rc);
+                break;
+            	}
+            	printf("name = '%s'\n", name); fflush(stdout);
+            	
 			if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT, iof_callback, NULL))) {                
 				opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
             	}
             	if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR, iof_callback, NULL))) {                
                 	opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
-           	}*/
+           	}
 			break;
 		case ORTE_PROC_STATE_LAUNCHED:
 			printf("    state = ORTE_PROC_STATE_LAUNCHED\n");
@@ -1030,14 +1030,14 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 			break;
 		case ORTE_PROC_STATE_TERMINATED:
 			printf("    state = ORTE_PROC_STATE_TERMINATED\n");
-//			if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
-//                ORTE_ERROR_LOG(rc);
-//                break;
-//            	}
-//            	printf("name = %s\n", name); fflush(stdout);
-//			if (ORTE_SUCCESS != (rc = orte_iof.iof_unsubscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR))) {                
-//                	opal_output(0, "[%s:%d] orte_iof.iof_unsubscribed failed\n", __FILE__, __LINE__);
-//           	}
+			if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
+                ORTE_ERROR_LOG(rc);
+                break;
+            	}
+            	printf("name = %s\n", name); fflush(stdout);
+			if (ORTE_SUCCESS != (rc = orte_iof.iof_unsubscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR))) {                
+				opal_output(0, "[%s:%d] orte_iof.iof_unsubscribed failed\n", __FILE__, __LINE__);
+			}
 			break;
 		case ORTE_PROC_STATE_ABORTED:
 			printf("    state = ORTE_PROC_STATE_ABORTED\n");
@@ -1045,9 +1045,9 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 	}
 	
 //	printf("A!\n"); fflush(stdout);
-//	asprintf(&res, "%d %d %d", RTEV_JOBSTATE, jobid, state);
+	asprintf(&res, "%d %d %d", RTEV_JOBSTATE, jobid, state);
 //	printf("B!\n"); fflush(stdout);
-//	AddToList(eventList, (void *)res);
+	AddToList(eventList, (void *)res);
 	printf("state callback retrning!\n"); fflush(stdout);
 }
 
