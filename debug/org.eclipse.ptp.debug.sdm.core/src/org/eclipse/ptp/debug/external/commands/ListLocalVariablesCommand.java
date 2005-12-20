@@ -46,4 +46,7 @@ public class ListLocalVariablesCommand extends AbstractDebugCommand {
 		}
 		throw new PCDIException("No local variables found in " + tasks.toString());
 	}
+	public String getName() {
+		return "List local variables"; 
+	}
 }

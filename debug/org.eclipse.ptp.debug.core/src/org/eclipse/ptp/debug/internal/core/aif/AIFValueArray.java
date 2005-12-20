@@ -35,7 +35,8 @@ public class AIFValueArray extends AIFValueDerived implements IAIFValueArray {
 	private Object[] values;
 	private int current_dimension_position = 0;
 	private int current_position = 0;
-	private IAIFValueArray parentArray;	
+	private IAIFValueArray parentArray;
+	private int bufferLength = 0;
 
 	public AIFValueArray(IAIFValueArray parsentArray, int current_pos) {
 		super((IAIFTypeArray)parsentArray.getType(), new byte[0]);
@@ -60,6 +61,9 @@ public class AIFValueArray extends AIFValueDerived implements IAIFValueArray {
 	public int getCurrentPosition() {
 		return current_position;
 	}
+	public int getBufferLength() {
+		return bufferLength;
+	}
 	public String getValueString() throws PCDIException {
 		if (result == null) {
 			result = getString();
@@ -68,7 +72,9 @@ public class AIFValueArray extends AIFValueDerived implements IAIFValueArray {
 	}
 	private void parseValue() {
 		IAIFTypeArray arrType = (IAIFTypeArray)type;
-		values = parseRange(byteBuffer(), 1, arrType.getBaseType(), arrType.getDimension());
+		ByteBuffer buffer = byteBuffer();
+		values = parseRange(buffer, 1, arrType.getBaseType(), arrType.getDimension());
+		bufferLength = buffer.position();
 	}
 	private Object[] parseRange(ByteBuffer dataBuf, int dim_pos, IAIFType baseType, int dimension) {
 		IAIFTypeArray arrType = (IAIFTypeArray)type;
@@ -107,7 +113,12 @@ public class AIFValueArray extends AIFValueDerived implements IAIFValueArray {
 		for (int i=0; i<objs.length; i++) {
 			Object obj = objs[i];
 			if (obj instanceof IAIFValue) {
-				content += obj.toString();
+				String tmp = obj.toString();
+				if (tmp.length() == 0) {
+					content = content.substring(0, content.length()-1);
+				} else {
+					content += obj.toString();
+				}
 			} else if (obj instanceof Object[]) {
 				content += getString("[", (Object[])obj) + "]";
 			}

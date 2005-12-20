@@ -46,6 +46,7 @@ import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.ProcessInputStream;
+import org.eclipse.ptp.debug.core.cdi.IPCDIErrorInfo;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
@@ -538,7 +539,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				// annotationMgr.printBitList(event.getAllProcesses());
 				fireTerminatedEvent(job, event.getAllProcesses());
 			} else if (event instanceof ErrorEvent) {
-				PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", new Exception("Internal error on tasks: "+ event.getAllProcesses().toString()));
+				IPCDIErrorInfo info = (IPCDIErrorInfo)((ErrorEvent)event).getReason();
+				PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", new Exception("Error: " + info.getMessage() + " on tasks: "+ event.getAllProcesses().toString()));
 			} else if (event instanceof InferiorSignaledEvent) {
 				InferiorSignaledEvent signalEvent = (InferiorSignaledEvent) event;
 				ICDILocator locator = signalEvent.getLocator();

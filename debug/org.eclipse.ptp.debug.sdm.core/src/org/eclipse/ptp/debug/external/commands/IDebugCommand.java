@@ -38,5 +38,7 @@ public interface IDebugCommand {
 	public boolean canInterrupt();
 	
 	public void flush();
+	
+	public String getName();
 }
 

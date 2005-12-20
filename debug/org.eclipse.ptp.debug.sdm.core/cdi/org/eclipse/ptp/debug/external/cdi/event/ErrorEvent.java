@@ -26,8 +26,13 @@ import org.eclipse.ptp.debug.external.cdi.ErrorInfo;
 import org.eclipse.ptp.debug.external.cdi.Session;
 
 public class ErrorEvent extends AbstractEvent implements IPCDISuspendedEvent {
-	public ErrorEvent(IPCDISession session, BitList tasks) {
+	private String message = "";
+	public ErrorEvent(IPCDISession session, BitList tasks, String message) {
 		super(session, tasks);
+		this.message = message;
+	}
+	public String getMessage() {
+		return message;
 	}
 	public IPCDISessionObject getReason() {
 		return new ErrorInfo((Session) session, this);

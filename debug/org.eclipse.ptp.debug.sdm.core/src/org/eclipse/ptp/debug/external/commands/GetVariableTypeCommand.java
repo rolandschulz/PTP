@@ -44,4 +44,7 @@ public class GetVariableTypeCommand extends AbstractDebugCommand {
 		}
 		throw new PCDIException("No variable type found in " + tasks.toString());
 	}
+	public String getName() {
+		return "Get Variable type"; 
+	}
 }

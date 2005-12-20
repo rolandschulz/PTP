@@ -45,4 +45,7 @@ public class GetAIFCommand extends AbstractDebugCommand {
 		}
 		throw new PCDIException("No aif found in " + tasks.toString());
 	}
+	public String getName() {
+		return "Get AIF"; 
+	}
 }

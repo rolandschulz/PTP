@@ -33,5 +33,8 @@ public class AIFValueVoid extends AIFValue {
 	public String getValueString() throws PCDIException {
 		return "";
 	}
+	public int getBufferLength() {
+		return 1;
+	}		
 }
 

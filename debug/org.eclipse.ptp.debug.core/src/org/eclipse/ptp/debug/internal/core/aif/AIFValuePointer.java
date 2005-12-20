@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
 import org.eclipse.ptp.debug.core.aif.IAIFValuePointer;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -28,16 +29,27 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * 
  */
 public class AIFValuePointer extends AIFValueDerived implements IAIFValuePointer {
+	private int marker = 0;
+	
 	public AIFValuePointer(IAIFTypePointer type, byte[] data) {
 		super(type, data);
+		parse();
 	}
 	public String getValueString() throws PCDIException {
 		if (result == null) {
-			result = String.valueOf("");
+			result = String.valueOf(data);
 		}
-		return null;
+		return result;
 	}
+	protected void parse() {
+		ByteBuffer buffer = byteBuffer();
+		marker = (int)buffer.get();
+	}
+	
 	public BigInteger pointerValue() throws PCDIException {
 		return AIFValueIntegral.bigIntegerValue(getValueString());
 	}
+	public int getBufferLength() {
+		return 1;
+	}	
 }

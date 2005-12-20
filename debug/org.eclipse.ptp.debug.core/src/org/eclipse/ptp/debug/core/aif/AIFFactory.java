@@ -39,6 +39,8 @@ import org.eclipse.ptp.debug.internal.core.aif.AIFValueBool;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueChar;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueFloatingPoint;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueInt;
+import org.eclipse.ptp.debug.internal.core.aif.AIFValuePointer;
+import org.eclipse.ptp.debug.internal.core.aif.AIFValueStruct;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueUnknown;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueWChar;
 
@@ -108,16 +110,15 @@ public class AIFFactory {
 			return new AIFValueBool((IAIFTypeBool)type, data);
 		} else if (type instanceof IAIFTypeArray) {
 			return new AIFValueArray((IAIFTypeArray)type, data);
-
-		/*
+		} else if (type instanceof IAIFTypePointer) {
+			return new AIFValuePointer((IAIFTypePointer)type, data);
 		} else if (type instanceof IAIFTypeStruct) {
 			return new AIFValueStruct((IAIFTypeStruct)type, data);			
+		/*
 		} else if (type instanceof IAIFTypeClass) {
 			return new AIFValueClass((IAIFTypeClass)type, data);
 		} else if (type instanceof IAIFTypeUnion) {
 			return new AIFValueUnion((IAIFTypeUnion)type, data);			
-		} else if (type instanceof IAIFTypePointer) {
-			return new AIFValuePointer((IAIFTypePointer)type, data);			
 		} else if (type instanceof IAIFTypeFunction) {
 			return new AIFValueFunction((IAIFTypeFunction)type, data);			
 		} else if (type instanceof IAIFTypeEnum) {

@@ -37,6 +37,9 @@ public class AIFValueReference extends AIFValueDerived implements IAIFValueRefer
 		}
 		return null;
 	}
+	public int getBufferLength() {
+		return 1;
+	}		
 	public IAIFValue referenceValue() throws PCDIException {
 		IAIFValue value = null;
 		/*

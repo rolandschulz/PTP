@@ -32,6 +32,7 @@ import org.eclipse.ptp.debug.external.cdi.model.PObject;
  */
 public abstract class Breakpoint extends PObject implements IPCDIBreakpoint {
 	ICDICondition condition;
+	int bpid = -1;
 	
 	int type;
 	boolean enable;
@@ -78,5 +79,12 @@ public abstract class Breakpoint extends PObject implements IPCDIBreakpoint {
 	}
 	public void setEnabled0(boolean on) {
 		enable = on;
+	}
+
+	public int getBreakpointId() {
+		return bpid;
+	}
+	public void setBreakpointId(int bpid) {
+		this.bpid = bpid;
 	}
 }

@@ -42,4 +42,7 @@ public class StepFinishCommand extends AbstractDebugCommand {
 			debugger.stepFinish(tasks, count);
 		}
 	}
+	public String getName() {
+		return "Step finish"; 
+	}
 }

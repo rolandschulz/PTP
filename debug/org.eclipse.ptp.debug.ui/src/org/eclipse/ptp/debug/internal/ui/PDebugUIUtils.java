@@ -18,13 +18,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui;
 
-import org.eclipse.cdt.debug.core.model.ICStackFrame;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
+import org.eclipse.ptp.debug.core.model.IPStackFrame;
 
 /**
  * @author Clement chu
@@ -69,8 +69,8 @@ public class PDebugUIUtils {
 		return null;
 	}
 
-	static public ICStackFrame getCurrentStackFrame() {
+	static public IPStackFrame getCurrentStackFrame() {
 		IAdaptable context = DebugUITools.getDebugContext();
-		return ( context != null ) ? (ICStackFrame)context.getAdapter( ICStackFrame.class ) : null;
+		return ( context != null ) ? (IPStackFrame)context.getAdapter( IPStackFrame.class ) : null;
 	}
 }

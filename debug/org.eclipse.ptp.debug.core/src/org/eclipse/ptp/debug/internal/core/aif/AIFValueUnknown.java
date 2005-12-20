@@ -31,6 +31,9 @@ public class AIFValueUnknown extends AIFValue {
 		}
 		return result;
 	}
+	public int getBufferLength() {
+		return 0;
+	}		
 	/*
 	public String toString() {
 		return "<value not supported>";

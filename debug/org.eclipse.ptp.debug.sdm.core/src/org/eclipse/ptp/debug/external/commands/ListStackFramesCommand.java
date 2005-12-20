@@ -42,4 +42,7 @@ public class ListStackFramesCommand extends AbstractDebugCommand {
 		}
 		throw new PCDIException("No stack frames found in " + tasks.toString());
 	}
+	public String getName() {
+		return "List stack frames"; 
+	}
 }

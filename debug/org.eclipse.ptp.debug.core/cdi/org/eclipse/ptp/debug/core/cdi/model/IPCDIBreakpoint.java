@@ -36,5 +36,6 @@ public interface IPCDIBreakpoint extends IPCDIObject {
 	void setEnabled(boolean enabled) throws CDIException;
 	ICDICondition getCondition() throws CDIException;
 	void setCondition(ICDICondition condition) throws CDIException;
+	int getBreakpointId();	
+	void setBreakpointId(int bpid);
 }
-

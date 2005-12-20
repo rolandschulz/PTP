@@ -33,4 +33,7 @@ public class RestartCommand extends AbstractDebugCommand {
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.restart();
 	}
+	public String getName() {
+		return "Restart"; 
+	}
 }

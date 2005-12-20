@@ -44,5 +44,7 @@ public class SetCurrentStackFrameCommand extends AbstractDebugCommand {
 		}
 		throw new PCDIException("Stack frame have not set in " + tasks.toString());
 	}	
+	public String getName() {
+		return "Set current stack frame"; 
+	}
 }
-

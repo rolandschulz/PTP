@@ -25,7 +25,6 @@ package org.eclipse.ptp.debug.external;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
@@ -77,5 +76,5 @@ public interface IDebugger {
 	/* Breakpoints */
 	public void setLineBreakpoint(BitList tasks, IPCDILineBreakpoint bpt) throws PCDIException;
 	public void setFunctionBreakpoint(BitList tasks, IPCDIFunctionBreakpoint bpt) throws PCDIException;
-	public void deleteBreakpoints(IPCDIBreakpoint[] bp) throws PCDIException;
+	public void deleteBreakpoint(BitList tasks, int bpid) throws PCDIException;
 }

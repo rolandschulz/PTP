@@ -24,7 +24,7 @@ package org.eclipse.ptp.debug.external;
 
 import java.util.Observable;
 import java.util.Observer;
-import org.eclipse.cdt.debug.core.cdi.model.ICDIBreakpoint;
+import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
@@ -34,7 +34,8 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
-import org.eclipse.ptp.debug.external.cdi.breakpoints.LineBreakpoint;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
+import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointCreatedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
 import org.eclipse.ptp.debug.external.cdi.event.DebuggerExitedEvent;
@@ -42,6 +43,7 @@ import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
 import org.eclipse.ptp.debug.external.cdi.event.ErrorEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
 import org.eclipse.ptp.debug.external.cdi.event.InferiorResumedEvent;
+import org.eclipse.ptp.debug.external.cdi.event.InferiorSignaledEvent;
 import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.commands.IDebugCommand;
 import org.eclipse.ptp.debug.external.commands.StartDebuggerCommand;
@@ -135,12 +137,13 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			if (event instanceof IPCDIExitedEvent) {
 				setSuspendTasks(false, tasks);
 				setTerminateTasks(true, tasks);
+				session.unregisterTargets(tasks.toArray(), true);
 				setProcessStatus(tasks.toArray(), IPProcess.EXITED);
-				//removeTargetEvent(tasks);
 			} else if (event instanceof IPCDIResumedEvent) {
 				setSuspendTasks(false, tasks);
 				setProcessStatus(tasks.toArray(), IPProcess.RUNNING);
 			} else if (event instanceof ErrorEvent) {
+				session.unregisterTargets(tasks.toArray(), true);
 				setProcessStatus(tasks.toArray(), IPProcess.ERROR);
 			} else if (event instanceof IPCDISuspendedEvent) {
 				setSuspendTasks(true, tasks);				
@@ -173,10 +176,11 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public void handleBreakpointCreatedEvent(BitList tasks) {
 		fireEvent(new BreakpointCreatedEvent(getSession(), tasks));		
 	}
-	public void handleBreakpointHitEvent(BitList tasks, int lineNumber, String filename) {
-		LineLocation loc = new LineLocation(filename, lineNumber);
-		LineBreakpoint bpt = new LineBreakpoint(ICDIBreakpoint.REGULAR, loc, null);
-		fireEvent(new BreakpointHitEvent(getSession(), tasks, bpt));
+	public void handleBreakpointHitEvent(BitList tasks, int bpid) {
+		IPCDIBreakpoint bpt = ((Session)getSession()).getBreakpointManager().findCDIBreakpoint(bpid);
+		if (bpt != null) {
+			fireEvent(new BreakpointHitEvent(getSession(), tasks, bpt));
+		}
 	}
 	public void handleEndSteppingEvent(BitList tasks, int lineNumber, String filename) {
 		LineLocation loc = new LineLocation(filename, lineNumber);
@@ -187,6 +191,12 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	}
 	public void handleProcessTerminatedEvent(BitList tasks) {
 		fireEvent(new InferiorExitedEvent(getSession(), tasks));
+	}
+	public void handleProcessSignaledEvent(BitList tasks, ICDILocator locator) {
+		fireEvent(new InferiorSignaledEvent(getSession(), tasks, locator));
+	}
+	public void handleErrorEvent(BitList tasks, String errMsg) {
+		fireEvent(new ErrorEvent(getSession(), tasks, errMsg));
 	}
 	
 	public IPProcess getProcess(int number) {
