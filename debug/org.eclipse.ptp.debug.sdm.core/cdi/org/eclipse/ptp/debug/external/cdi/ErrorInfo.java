@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.external.cdi;
 
 import org.eclipse.ptp.debug.core.cdi.IPCDIErrorInfo;
-import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.event.ErrorEvent;
 
 public class ErrorInfo extends SessionObject implements IPCDIErrorInfo {
@@ -30,11 +29,9 @@ public class ErrorInfo extends SessionObject implements IPCDIErrorInfo {
 		event = e;
 	}
 	public String getMessage() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
+		return event.getMessage();
 	}
 	public String getDetailMessage() {
-		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
-		return null;
+		return getMessage();
 	}
 }

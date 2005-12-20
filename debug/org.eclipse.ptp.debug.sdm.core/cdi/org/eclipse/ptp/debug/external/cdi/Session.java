@@ -244,8 +244,8 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 	}
 
 	public void breakpointAdded(IBreakpoint breakpoint) {
-		String job_id = getJob().getIDString();
 		if (breakpoint instanceof IPBreakpoint) {
+			String job_id = getJob().getIDString();
 			try {
 				String bp_job_id = ((IPBreakpoint)breakpoint).getJobId(); 
 				if (bp_job_id.equals(job_id) || bp_job_id.equals(IPBreakpoint.GLOBAL)) {
@@ -259,7 +259,16 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 		// TODO Auto-generated method stub
 	}
 	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
-		// TODO Auto-generated method stub
+		if (breakpoint instanceof IPBreakpoint) {
+			String job_id = getJob().getIDString();
+			try {
+				String bp_job_id = ((IPBreakpoint)breakpoint).getJobId(); 
+				if (bp_job_id.equals(job_id) || bp_job_id.equals(IPBreakpoint.GLOBAL)) {
+					getBreakpointManager().deleteBreakpoint(job_id, (IPBreakpoint)breakpoint);
+				}
+			} catch (CoreException e) {
+			}
+		}
 	}
 	public void terminate() throws CDIException {
 		stop(createBitList());

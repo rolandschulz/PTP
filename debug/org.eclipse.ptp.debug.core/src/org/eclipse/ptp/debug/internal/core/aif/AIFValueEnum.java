@@ -36,5 +36,7 @@ public class AIFValueEnum extends AIFValueIntegral implements IAIFValueEnum {
 		}
 		return result;
 	}
+	public int getBufferLength() {
+		return 1;
+	}
 }
-

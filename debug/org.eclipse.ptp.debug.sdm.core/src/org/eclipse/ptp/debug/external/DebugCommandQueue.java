@@ -52,10 +52,12 @@ public class DebugCommandQueue extends Thread {
 				currentCommand.execCommand(debugger);
 				System.out.println("***** CURRENT COMMAND: " + currentCommand);
 				if (!currentCommand.waitForReturn()) {
-					System.out.println("************ ERROR in DebugCommandQueue -- wait for return, cmd: " + currentCommand);
+					debugger.handleErrorEvent(currentCommand.getTasks(), "Wait for return error in " + currentCommand.getName() + " command");
+					//System.out.println("************ ERROR in DebugCommandQueue -- wait for return, cmd: " + currentCommand);
 				}
 			} catch (PCDIException e) {
-				System.out.println("************ ERROR in DebugCommandQueue -- execCommand, cmd: " + currentCommand + ", err: " + e.getMessage());
+				debugger.handleErrorEvent(currentCommand.getTasks(), "Err on execute " + currentCommand.getName() + " command, err: " + e.getMessage());
+				//System.out.println("************ ERROR in DebugCommandQueue -- execCommand, cmd: " + currentCommand + ", err: " + e.getMessage());
 			} finally {
 				currentCommand = null;
 			}
@@ -85,7 +87,7 @@ public class DebugCommandQueue extends Thread {
 				if (command.canInterrupt() && currentCommand != null) {
 					setCommandReturn(null);
 					try {
-						//To make sure all events fired via AsbtractDebugger, so wait 1 sec here
+						//To make sure all events fired via AsbtractDebugger, so wait 0.5 sec here
 						queue.wait(500);
 					} catch (InterruptedException e) {}
 				}
@@ -93,7 +95,8 @@ public class DebugCommandQueue extends Thread {
 				queue.notifyAll();
 			}
 			else {
-				System.out.println("************ ERROR in DebugCommandQueue -- duplicate, cmd: " + currentCommand);
+				debugger.handleErrorEvent(command.getTasks(), "Duplicate in " + command.getName() + " command");
+				//System.out.println("************ ERROR in DebugCommandQueue -- duplicate, cmd: " + currentCommand);
 			}
 		}
 	}

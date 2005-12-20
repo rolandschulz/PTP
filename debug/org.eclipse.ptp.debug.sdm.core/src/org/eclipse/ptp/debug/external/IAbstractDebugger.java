@@ -23,6 +23,7 @@
 package org.eclipse.ptp.debug.external;
 
 import java.util.Observer;
+import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
@@ -59,10 +60,12 @@ public interface IAbstractDebugger extends IDebugger {
 	/* event */
 	public void handleStopDebuggerEvent();
 	public void handleBreakpointCreatedEvent(BitList tasks);
-	public void handleBreakpointHitEvent(BitList tasks, int lineNumber, String filename);
+	public void handleBreakpointHitEvent(BitList tasks, int bpid);
+	public void handleErrorEvent(BitList tasks, String errMsg);
 	public void handleEndSteppingEvent(BitList tasks, int lineNumber, String filename);
 	public void handleProcessResumedEvent(BitList tasks);
 	public void handleProcessTerminatedEvent(BitList tasks);
+	public void handleProcessSignaledEvent(BitList tasks, ICDILocator locator);
 	
 	/* others */
 	public BitList filterRunningTasks(BitList tasks);

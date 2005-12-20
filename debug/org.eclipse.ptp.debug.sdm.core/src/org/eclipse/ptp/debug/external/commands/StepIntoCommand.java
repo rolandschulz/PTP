@@ -42,4 +42,7 @@ public class StepIntoCommand extends AbstractDebugCommand {
 			debugger.stepInto(tasks, count);
 		}
 	}
+	public String getName() {
+		return "Step Into"; 
+	}
 }

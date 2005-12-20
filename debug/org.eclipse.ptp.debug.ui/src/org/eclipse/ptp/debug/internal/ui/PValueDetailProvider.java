@@ -18,11 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui;
 
-import org.eclipse.cdt.debug.core.model.ICStackFrame;
-import org.eclipse.cdt.debug.core.model.ICValue;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.ui.IValueDetailListener;
+import org.eclipse.ptp.debug.core.model.IPStackFrame;
+import org.eclipse.ptp.debug.core.model.IPValue;
 
 /**
  * @author Clement chu
@@ -38,12 +38,12 @@ public class PValueDetailProvider {
 		return fInstance;
 	}
 	public void computeDetail(final IValue value, final IValueDetailListener listener) {
-		if (value instanceof ICValue) {
-			final ICStackFrame frame = PDebugUIUtils.getCurrentStackFrame();
+		if (value instanceof IPValue) {
+			final IPStackFrame frame = PDebugUIUtils.getCurrentStackFrame();
 			if (frame != null) {
 				DebugPlugin.getDefault().asyncExec(new Runnable() {
 					public void run() {
-						listener.detailComputed(value, ((ICValue) value).evaluateAsExpression(frame));
+						listener.detailComputed(value, ((IPValue) value).evaluateAsExpression(frame));
 					}
 				});
 			}

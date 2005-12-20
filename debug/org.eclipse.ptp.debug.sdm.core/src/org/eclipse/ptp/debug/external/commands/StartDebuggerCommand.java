@@ -45,5 +45,7 @@ public class StartDebuggerCommand extends AbstractDebugCommand {
 		}
 		throw new PCDIException("Cannot start debugger");		
 	}
+	public String getName() {
+		return "Start debugger"; 
+	}
 }
-

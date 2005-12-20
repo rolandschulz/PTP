@@ -27,6 +27,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * 
  */
 public class AIFValueStruct extends AIFValueAggregate implements IAIFValueStruct {
+	//only base type: {structName|floatnumber=f4,intnumber=is4,shortnumber=is2,longnumber=is4,doubleumber=f8;;;}
 	public AIFValueStruct(IAIFTypeStruct type, byte[] data) {
 		super(type, data);
 	}

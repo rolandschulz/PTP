@@ -37,12 +37,6 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.external.AbstractDebugger;
 import org.eclipse.ptp.debug.external.IDebugger;
-import org.eclipse.ptp.debug.external.cdi.event.BreakpointHitEvent;
-import org.eclipse.ptp.debug.external.cdi.event.EndSteppingRangeEvent;
-import org.eclipse.ptp.debug.external.cdi.event.ErrorEvent;
-import org.eclipse.ptp.debug.external.cdi.event.InferiorExitedEvent;
-import org.eclipse.ptp.debug.external.cdi.event.InferiorSignaledEvent;
-import org.eclipse.ptp.debug.external.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
@@ -216,24 +210,11 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
-	private void deleteBreakpoint(BitList tasks, int bpid)  throws PCDIException {
+	public void deleteBreakpoint(BitList tasks, int bpid)  throws PCDIException {
 		try {
 			proxy.debugDeleteBreakpoint(tasks, bpid);
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
-		}
-	}
-	private void deleteBreakpoint(IPCDIBreakpoint bp)  throws PCDIException {
-		BreakpointMapping bpm = findBreakpointInfo(bp);
-		if (bpm != null) {
-			deleteBreakpoint(bpm.getBreakpointProcs(), bpm.getBreakpointId());				
-		}
-	}
-	public void deleteBreakpoints(IPCDIBreakpoint[] bp) throws PCDIException {
-		if (bp != null) {
-			for (int i = 0; i < bp.length; i++) {
-				deleteBreakpoint(bp[i]);
-			}
 		}
 	}
 	/**
@@ -319,25 +300,21 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_BPHIT:
-			/*
-			 * Retrieve the breakpoint object.
-			 */
-			BreakpointMapping bp = findBreakpointInfo(((ProxyDebugBreakpointHitEvent)e).getBreakpointId());
-			if (bp != null) {
-				fireEvent(new BreakpointHitEvent(getSession(), e.getBitSet(), bp.bpObject));
-			}
+			ProxyDebugBreakpointHitEvent bptHitEvent = (ProxyDebugBreakpointHitEvent)e;
+			handleBreakpointHitEvent(e.getBitSet(), bptHitEvent.getBreakpointId());
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_STEP:
 			ProxyDebugStepEvent stepEvent = (ProxyDebugStepEvent)e;
-			LineLocation loc = new LineLocation(stepEvent.getFrame().getLocator().getFile(), stepEvent.getFrame().getLocator().getLineNumber());
-			fireEvent(new EndSteppingRangeEvent(getSession(), e.getBitSet(), loc));
+			handleEndSteppingEvent(e.getBitSet(), stepEvent.getFrame().getLocator().getLineNumber(), stepEvent.getFrame().getLocator().getFile());
+			//LineLocation loc = new LineLocation(stepEvent.getFrame().getLocator().getFile(), stepEvent.getFrame().getLocator().getLineNumber());
+			//fireEvent(new EndSteppingRangeEvent(getSession(), e.getBitSet(), loc));
 			break;	
 			
 		case IProxyDebugEvent.EVENT_DBG_BPSET:
-			ProxyDebugBreakpointSetEvent bpEvt = (ProxyDebugBreakpointSetEvent)e;	
-			updateBreakpointInfo(bpEvt.getBreakpointId(), e.getBitSet(), bpEvt.getBreakpoint());
-			completeCommand(IDebugCommand.OK);
+			ProxyDebugBreakpointSetEvent bpEvt = (ProxyDebugBreakpointSetEvent)e;
+			completeCommand(bpEvt.getBreakpoint());
+			//updateBreakpointInfo(bpEvt.getBreakpointId(), e.getBitSet(), bpEvt.getBreakpoint());
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_FRAMES:
@@ -405,18 +382,21 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			
 		case IProxyDebugEvent.EVENT_DBG_EXIT:
 			System.out.println("======================= EVENT_DBG_EXIT ====================");
-			fireEvent(new InferiorExitedEvent(getSession(), e.getBitSet()));
+			handleProcessTerminatedEvent(e.getBitSet());
+			//fireEvent(new InferiorExitedEvent(getSession(), e.getBitSet()));
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_SIGNAL:
 			ProxyDebugSignalEvent sigEvent = (ProxyDebugSignalEvent)e;
-			fireEvent(new InferiorSignaledEvent(getSession(), e.getBitSet(), sigEvent.getLocator()));
+			handleProcessSignaledEvent(e.getBitSet(), sigEvent.getLocator());
+			//fireEvent(new InferiorSignaledEvent(getSession(), e.getBitSet(), sigEvent.getLocator()));
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_ERROR:
 			System.out.println("======================= EVENT_DBG_ERROR ====================");
 			completeCommand(null);
-			fireEvent(new ErrorEvent(getSession(), e.getBitSet()));
+			handleErrorEvent(e.getBitSet(), "Internal debugger error");
+			//fireEvent(new ErrorEvent(getSession(), e.getBitSet(), "Internal debugger error"));
 			//fireEvent(new InferiorExitedEvent(getSession(), e.getBitSet()));
 			break;
 		}
@@ -481,7 +461,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		return (BreakpointMapping)bpArray.get(bpid);
 	}
 
-	
 	private BreakpointMapping findBreakpointInfo(IPCDIBreakpoint bpt) {
 		return (BreakpointMapping)bpMap.get(bpt);
 	}

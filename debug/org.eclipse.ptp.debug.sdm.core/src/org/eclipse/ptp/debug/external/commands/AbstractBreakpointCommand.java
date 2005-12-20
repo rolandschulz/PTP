@@ -16,41 +16,25 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.aif;
+package org.eclipse.ptp.debug.external.commands;
 
-import org.eclipse.ptp.debug.core.aif.IAIFTypeWChar;
-import org.eclipse.ptp.debug.core.aif.IAIFValueWChar;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 
 /**
  * @author Clement chu
  * 
  */
-public class AIFValueWChar extends AIFValueIntegral implements IAIFValueWChar {
-	public AIFValueWChar(IAIFTypeWChar type, byte[] data) {
-		super(type, data);
+public abstract class AbstractBreakpointCommand extends AbstractDebugCommand {
+	public AbstractBreakpointCommand(BitList tasks) {
+		super(tasks, false, true);
 	}
-	public String getValueString() throws PCDIException {
-		if (result == null) {
-			result = stringValue();
+	public IPCDIBreakpoint getBreakpoint() {
+		if (waitForReturn()) {
+			if (result instanceof IPCDIBreakpoint)
+				return (IPCDIBreakpoint)result;
 		}
-		return result;
-	}
-	public int getBufferLength() {
-		return data[0];
-	}	
-	
-	private String stringValue() throws PCDIException {
-		return new String(byteBuffer(2).array());
-		/*
-		int len = data.get();
-		len <<= 8; //2^8
-		len += data.get();
-		byte[] dst = new byte[len];
-		for (int i=0; i<len; i++) {
-		    dst[i] = data.get();
-		}
-		return new String(dst);
-		*/
+		return null;
 	}
 }
+

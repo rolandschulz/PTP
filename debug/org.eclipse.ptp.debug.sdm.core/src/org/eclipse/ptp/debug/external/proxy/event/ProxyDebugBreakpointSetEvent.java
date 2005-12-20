@@ -30,6 +30,7 @@ public class ProxyDebugBreakpointSetEvent extends AbstractProxyDebugEvent implem
 		super(EVENT_DBG_BPSET, set);
 		this.bpId = id;
 		this.bpt = bpt;
+		bpt.setBreakpointId(id);
 	}
 	
 	public int getBreakpointId() {

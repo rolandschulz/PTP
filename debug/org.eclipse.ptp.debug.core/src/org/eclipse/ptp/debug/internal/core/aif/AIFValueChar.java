@@ -39,6 +39,17 @@ public class AIFValueChar extends AIFValueIntegral implements IAIFValueChar {
 	public byte byteValue() throws PCDIException {
 		return data[0];
 	}
+	public String toString() {
+		try {
+			char charValue = charValue();
+			return ((Character.isISOControl(charValue) && charValue != '\b' && charValue != '\t' && charValue != '\n' && charValue != '\f' && charValue != '\r') || charValue < 0) ? "" : String.valueOf(charValue);		
+		} catch (PCDIException e) {
+			return "err: " + e.getMessage();
+		}
+	}
+	public int getBufferLength() {
+		return 1;
+	}	
 
 	/*
 	public String toString() {

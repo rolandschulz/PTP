@@ -46,5 +46,7 @@ public class ListArgumentsCommand extends AbstractDebugCommand {
 		}
 		throw new PCDIException("No arguments found in " + tasks.toString());
 	}
+	public String getName() {
+		return "List arguments"; 
+	}
 }
-

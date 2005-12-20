@@ -46,4 +46,7 @@ public class KillCommand extends AbstractDebugCommand {
 		}
 		throw new PCDIException("Cannot terminate tasks: " + tasks.toString());		
 	}
+	public String getName() {
+		return "Kill"; 
+	}
 }

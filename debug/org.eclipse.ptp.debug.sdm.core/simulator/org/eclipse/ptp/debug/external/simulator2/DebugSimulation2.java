@@ -32,7 +32,6 @@ import org.eclipse.ptp.debug.core.aif.AIF;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariable;
@@ -144,7 +143,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	public void run(String[] args) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "run");
 	}
-	public void deleteBreakpoints(IPCDIBreakpoint[] bp) throws PCDIException {
+	public void deleteBreakpoint(BitList tasks, int bpid) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "deleteBreakpoints");
 	}	
 	/***************************************************************************************************************************************************************************************************
@@ -390,7 +389,8 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		if (state.equals(EXIT_STATE)) {
 			handleProcessTerminatedEvent(qItem.getTasks());
 		} else if (state.equals(HIT_BPT_STATE)) {
-			handleBreakpointHitEvent(qItem.getTasks(), qItem.getLine(), qItem.getFile());
+			//TODO add breakpoint id
+			//handleBreakpointHitEvent(qItem.getTasks(), qItem.getLine(), qItem.getFile());
 		} else if (state.equals(STEP_END_STATE)) {
 			handleEndSteppingEvent(qItem.getTasks(), qItem.getLine(), qItem.getFile());
 		}

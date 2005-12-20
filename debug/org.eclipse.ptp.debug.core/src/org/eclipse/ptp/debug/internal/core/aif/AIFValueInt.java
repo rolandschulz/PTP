@@ -48,14 +48,17 @@ public class AIFValueInt extends AIFValueIntegral implements IAIFValueInt {
 			return new String(byteValue());
 		}
 	}
+	public int getBufferLength() {
+		return type.sizeof();
+	}	
 	public boolean isLong() {
-		return (type.sizeof() == 8);
+		return (getBufferLength() == 8);
 	}
 	public boolean isShort() {
-		return (type.sizeof() == 2);
+		return (getBufferLength() == 2);
 	}
 	public boolean isInt() {
-		return (type.sizeof() == 4);
+		return (getBufferLength() == 4);
 	}
 	public byte[] byteValue() throws PCDIException {
 		return data;

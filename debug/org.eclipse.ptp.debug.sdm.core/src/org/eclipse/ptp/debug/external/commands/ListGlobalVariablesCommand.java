@@ -34,12 +34,14 @@ public class ListGlobalVariablesCommand extends AbstractDebugCommand {
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.listGlobalVariables(tasks);
 	}
-	
 	public IPCDIGlobalVariable[] getGlobalVariables() throws PCDIException {
 		if (waitForReturn()) {
 			if (result instanceof IPCDIGlobalVariable[])
 				return (IPCDIGlobalVariable[])result;
 		}
 		throw new PCDIException("No global variables found in " + tasks.toString());
+	}
+	public String getName() {
+		return "List global variables"; 
 	}
 }

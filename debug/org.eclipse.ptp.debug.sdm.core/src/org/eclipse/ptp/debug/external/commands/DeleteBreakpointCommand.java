@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.commands;
 
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
@@ -26,28 +27,23 @@ import org.eclipse.ptp.debug.external.IAbstractDebugger;
  * @author Clement chu
  * 
  */
-public class DeleteBreakpointsCommand extends AbstractDebugCommand {
-	private IPCDIBreakpoint[] bpts = null;
-	private int returnCounter = 0;
-	
-	public DeleteBreakpointsCommand(IPCDIBreakpoint[] bpts) {
-		super(null, false, true);
-		this.bpts = bpts;
+public class DeleteBreakpointCommand extends AbstractBreakpointCommand {
+	public DeleteBreakpointCommand(BitList tasks, IPCDIBreakpoint cdiBpt) {
+		super(tasks);
+		result = cdiBpt;
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
-		debugger.deleteBreakpoints(bpts);
+		debugger.deleteBreakpoint(tasks, ((IPCDIBreakpoint)result).getBreakpointId());
 	}
 	public void deleteBreakpoints() throws PCDIException {
-		while (returnCounter < bpts.length) {
-			if (waitForReturn()) {
-				if (result.equals(OK)) {
-					returnCounter++;
-					result = null;
-					if (returnCounter >= bpts.length)
-						return;
-				}
+		if (waitForReturn()) {
+			if (result.equals(OK)) {
+				return;
 			}
-			throw new PCDIException("Breakpoint cannot be deleted in " + tasks.toString());
 		}
+		throw new PCDIException("Breakpoint cannot be deleted in " + tasks.toString());
 	}	
+	public String getName() {
+		return "Delete breakpoint"; 
+	}
 }

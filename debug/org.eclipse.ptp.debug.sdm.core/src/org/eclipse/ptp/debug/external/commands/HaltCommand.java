@@ -36,4 +36,7 @@ public class HaltCommand extends AbstractDebugCommand {
 			debugger.halt(tasks);
 		}
 	}
+	public String getName() {
+		return "Halt"; 
+	}
 }

@@ -87,7 +87,6 @@ public class PValueFactory {
 		return pValue;
 	}
 	static public PIndexedValue createIndexedValue(AbstractPVariable parent, IAIFValueArray aifArray, int start, int length) {
-		//System.out.println("@@@@@@@@@@ PValueFactory - createIndexedValue - start: " + start + ", length: " + length);
 		return new PIndexedValue(parent, aifArray, start, length);
 	}
 	static public IPValue createValue(PVariable parent) {

@@ -27,23 +27,17 @@ import org.eclipse.ptp.debug.external.IAbstractDebugger;
  * @author Clement chu
  * 
  */
-public class SetFunctionBreakpointCommand extends AbstractDebugCommand {
+public class SetFunctionBreakpointCommand extends AbstractBreakpointCommand {
 	private IPCDIFunctionBreakpoint funcBpt = null;
 	
 	public SetFunctionBreakpointCommand(BitList tasks, IPCDIFunctionBreakpoint funcBpt) {
-		super(tasks, false, true);
+		super(tasks);
 		this.funcBpt = funcBpt;
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.setFunctionBreakpoint(tasks, funcBpt);
 	}
-	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
-		if (waitForReturn()) {
-			if (result.equals(OK)) {
-				debugger.handleBreakpointCreatedEvent(tasks);
-				return;
-			}
-		}
-		throw new PCDIException("Function breakpoint cannot set in " + tasks.toString());		
+	public String getName() {
+		return "Set function breakpoint"; 
 	}
 }

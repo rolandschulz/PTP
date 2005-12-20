@@ -44,4 +44,7 @@ public class EvaluteExpressionCommand extends AbstractDebugCommand {
 		}
 		throw new PCDIException("No evalute expression found in " + tasks.toString());
 	}
+	public String getName() {
+		return "Evalute expression"; 
+	}
 }

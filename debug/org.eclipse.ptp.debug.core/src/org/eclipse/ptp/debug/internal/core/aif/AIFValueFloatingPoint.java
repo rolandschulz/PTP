@@ -61,11 +61,15 @@ public class AIFValueFloatingPoint extends AIFValue implements IAIFValueFloating
 		}
 	}
 	
+	public int getBufferLength() {
+		return type.sizeof();
+	}
+	
 	public boolean isDouble() {
-		return (type.sizeof() == 8);
+		return (getBufferLength() == 8);
 	}
 	public boolean isFloat() {
-		return (type.sizeof() == 4);
+		return (getBufferLength() == 4);
 	}
 	/*
 	public double doubleValue() throws PCDIException {

@@ -32,12 +32,15 @@ public class ConnectionCommand extends AbstractDebugCommand {
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.connection();
 	}
-	
 	public void waitFinish() throws PCDIException {
 		if (waitForReturn()) {
 			if (result.equals(OK))
 				return;
 		}
 		throw new PCDIException("Cannot start debugger");		
+	}
+	
+	public String getName() {
+		return "Connaction"; 
 	}
 }

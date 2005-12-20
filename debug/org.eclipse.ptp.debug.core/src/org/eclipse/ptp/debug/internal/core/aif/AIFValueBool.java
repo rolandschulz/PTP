@@ -39,4 +39,7 @@ public class AIFValueBool extends AIFValueIntegral implements IAIFValueBool {
 	public boolean booleanValue() throws PCDIException {
 		return (data[0]>0);
 	}
+	public int getBufferLength() {
+		return 1;
+	}
 }

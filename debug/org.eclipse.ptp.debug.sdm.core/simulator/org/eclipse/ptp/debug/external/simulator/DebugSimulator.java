@@ -25,7 +25,6 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
@@ -309,7 +308,7 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 	public void setFunctionBreakpoint(BitList tasks, IPCDIFunctionBreakpoint bpt) throws PCDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
-	public void deleteBreakpoints(IPCDIBreakpoint[] bp) throws PCDIException {
+	public void deleteBreakpoint(BitList tasks, int bpid) throws PCDIException {
 	// TODO Auto-generated method stub
 	}
 	// FIXME: from clement....each time only one process??
@@ -323,7 +322,7 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 		BitList procs = new BitList(this.procs.length);
 		procs.set(procId);
 		if (event.equals("BREAKPOINTHIT")) {
-			handleBreakpointHitEvent(procs, ((Integer) list.get(3)).intValue(), (String) list.get(2));
+			//handleBreakpointHitEvent(procs, ((Integer) list.get(3)).intValue(), (String) list.get(2));
 			debuggerOutput.addItem("BreakpointHit Event for " + procId);
 		} else if (event.equals("ENDSTEPPINGRANGE")) {
 			handleEndSteppingEvent(procs, ((Integer) list.get(3)).intValue(), (String) list.get(2));

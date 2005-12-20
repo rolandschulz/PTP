@@ -36,5 +36,8 @@ public class AIFValueFunction extends AIFValueDerived implements IAIFValueFuncti
 		}
 		return null;
 	}
+	public int getBufferLength() {
+		return 1;
+	}	
 }
 

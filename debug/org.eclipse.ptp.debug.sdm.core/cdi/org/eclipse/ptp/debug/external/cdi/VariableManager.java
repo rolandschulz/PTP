@@ -380,7 +380,7 @@ public class VariableManager extends Manager {
 					IAIF aif = varDesc.getAIF();
 					if (aif == null) {
 						GetAIFCommand aifCmd = new GetAIFCommand(tasks, fName);
-						session.getDebugger().postCommandAndWait(aifCmd);
+						session.getDebugger().postCommand(aifCmd);
 						aif = aifCmd.getAIF();
 					}
 					argObjects.add(new ArgumentDescriptor(target, thread, frame, name, fName, pos, depth, aif));
