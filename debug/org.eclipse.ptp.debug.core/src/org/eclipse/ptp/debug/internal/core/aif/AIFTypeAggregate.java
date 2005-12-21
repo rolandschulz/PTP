@@ -32,7 +32,7 @@ public abstract class AIFTypeAggregate extends AIFType implements IAIFTypeAggreg
 	protected List fields = new ArrayList(); 
 	protected List types = new ArrayList();
 	protected String name;
-	private int size = 1;
+	private int size = 0;
 
 	public AIFTypeAggregate(String format) {
 		parse(format);

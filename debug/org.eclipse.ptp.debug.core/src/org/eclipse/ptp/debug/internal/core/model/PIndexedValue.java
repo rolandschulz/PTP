@@ -162,7 +162,6 @@ public class PIndexedValue extends AbstractPValue implements IIndexedValue {
 		int prefSize = getPreferredPartitionSize();
 		int psize = getPartitionSize(index);
 		
-		//System.out.println("----- preSize: " + prefSize + ", psize: " + psize + ", index: " + index + ", start: " + (index*prefSize));
 		IPCDIVariable[] cdiVars = new IPCDIVariable[0]; 
 		try {
 			cdiVars = getParentVariable().getCDIVariable().getVariablesAsArray(index * prefSize, psize);

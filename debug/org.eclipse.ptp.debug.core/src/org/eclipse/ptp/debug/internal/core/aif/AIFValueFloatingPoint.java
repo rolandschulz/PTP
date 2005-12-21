@@ -59,6 +59,8 @@ public class AIFValueFloatingPoint extends AIFValue implements IAIFValueFloating
 			return byteBuffer.getFloat();
 		} catch (BufferUnderflowException e) {
 			return 0;
+		} finally {
+			byteBuffer.rewind();			
 		}
 	}
 	public double doubleValue() throws PCDIException {
@@ -66,6 +68,8 @@ public class AIFValueFloatingPoint extends AIFValue implements IAIFValueFloating
 			return byteBuffer.getDouble();
 		} catch (BufferUnderflowException e) {
 			return 0;
+		} finally {
+			byteBuffer.rewind();			
 		}
 	}
 	

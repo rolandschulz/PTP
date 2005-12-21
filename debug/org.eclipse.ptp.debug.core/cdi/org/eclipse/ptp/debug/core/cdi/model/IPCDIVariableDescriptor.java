@@ -36,4 +36,5 @@ public interface IPCDIVariableDescriptor extends IPCDIObject {
 	IPCDIVariableDescriptor getVariableDescriptorAsType(String type) throws CDIException;
 	boolean equals(IPCDIVariableDescriptor varDesc);
 	IPCDIVariable[] getVariablesAsArray(int start, int length) throws CDIException;
+	IPCDIVariable[] getVariables() throws CDIException;
 }
