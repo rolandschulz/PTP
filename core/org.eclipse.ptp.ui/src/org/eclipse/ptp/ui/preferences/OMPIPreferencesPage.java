@@ -52,7 +52,6 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 {
 	public static final String EMPTY_STRING = "";
 
-	protected Text port = null;
 	protected Text ortedPathText = null;
 	protected Text ortedArgsText = null;
 	protected Text ortedFullText = null;
@@ -65,7 +64,6 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 	private String ortedArgs = EMPTY_STRING;
 	private String ortedFile = EMPTY_STRING;
 	private String orteServerFile = EMPTY_STRING;
-	private String ortePort = "12345";
 
 	private boolean loading = true;
 
@@ -171,8 +169,6 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		bGroup.setText(CoreMessages.getResourceString("OMPIPreferencesPage.group_proxy"));
 		
 		new Label(bGroup, SWT.WRAP).setText("Enter the path to the PTP ORTE proxy server.");
-		new Label(bGroup, SWT.WRAP).setText("PTP will run this proxy server and have it connect to the port you specify below.");
-		new Label(bGroup, SWT.WRAP).setText("Example port: 12345.");
 		
 		Composite orteserver = new Composite(bGroup, SWT.NONE);
 		orteserver.setLayout(createGridLayout(3, false, 0, 0));
@@ -185,50 +181,11 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		browseButton2 = SWTUtil.createPushButton(orteserver, CoreMessages
 				.getResourceString("PTPPreferencesPage.browseButton"), null);
 		browseButton2.addSelectionListener(listener);
-		
-		Composite ortespin = new Composite(bGroup, SWT.NONE);
-		ortespin.setLayout(createGridLayout(2, false, 0, 0));
-		ortespin.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-		
-		new Label(ortespin, SWT.NONE).setText(CoreMessages
-				.getResourceString("OMPIPreferencesPage.orteServerPort_text"));
-		port = new Text(ortespin, SWT.BORDER | SWT.SINGLE);
-		port.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		/* only integers allowed */
-		port.addVerifyListener(new VerifyListener() {
-			public void verifyText(VerifyEvent e) {
-				String text = e.text;
-				char[] chars = new char[text.length()];
-				text.getChars(0, chars.length, chars, 0);
-				for(int i=0; i<chars.length; i++) {
-					if(!('0' <= chars[i] && chars[i] <= '9')) {
-						e.doit = false;
-						return;
-					}
-				}
-			}
-		});
-		port.addModifyListener(listener);
-		
-		/*
-		Group bGroup = new Group(aGroup, SWT.SHADOW_ETCHED_IN);
-		bGroup.setLayout(createGridLayout(1, true, 10, 10));
-		bGroup.setText("External Daemon, ORTEd, Start Method");
-	    	Button ortedStartButtonSystem = new Button(bGroup, SWT.RADIO);
-	    	ortedStartButtonSystem.setText("Start ORTEd with JNI/C/system() call");
-	    	Button ortedStartButtonForkExec = new Button(bGroup, SWT.RADIO);
-	    	ortedStartButtonForkExec.setText("Start ORTEd with JNI/C/fork()/exec() calls");
-	    	Button ortedStartButtonJava = new Button(bGroup, SWT.RADIO);
-	    	ortedStartButtonJava.setText("Start ORTEd with Java Runtime.getRuntime().exec(...)");
-	    	Button ortedStartButtonExternal = new Button(bGroup, SWT.RADIO);
-	    	ortedStartButtonExternal.setText("Do NOT start ORTEd (user must start it external to PTP)");
-	    	*/  
 	}
 
 	protected void defaultSetting() 
 	{
 		orteServerText.setText(orteServerFile);
-		port.setText(ortePort);
 		
 		ortedPathText.setText(ortedFile);
 		ortedArgsText.setText(ortedArgs);
@@ -241,9 +198,6 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		
 		orteServerFile = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
 		orteServerText.setText(orteServerFile);
-		
-		ortePort = preferences.getString(PreferenceConstants.ORTE_SERVER_PORT);
-		port.setText(ortePort);
 
 		ortedFile = preferences.getString(PreferenceConstants.ORTE_ORTED_PATH);
 		ortedPathText.setText(ortedFile);
@@ -283,7 +237,6 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		preferences.setValue(PreferenceConstants.ORTE_ORTED_PATH, ortedFile);
 		preferences.setValue(PreferenceConstants.ORTE_ORTED_ARGS, ortedArgs);
 		preferences.setValue(PreferenceConstants.ORTE_SERVER_PATH, orteServerFile);
-		preferences.setValue(PreferenceConstants.ORTE_SERVER_PORT, port.getText());
 
 		PTPCorePlugin.getDefault().savePluginPreferences();
 

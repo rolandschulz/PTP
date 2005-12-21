@@ -113,8 +113,6 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 				public void run() {
 					String cmd;
 					
-					//int port = preferences.getInt(PreferenceConstants.ORTE_SERVER_PORT);
-				
 					Runtime rt = Runtime.getRuntime ();
 					
 					cmd = proxyPath + " --port="+getSessionPort();
