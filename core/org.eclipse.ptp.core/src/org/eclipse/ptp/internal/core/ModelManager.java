@@ -166,16 +166,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		}
 		else if(monitoringSystemID == MonitoringSystemChoices.ORTE && controlSystemID == ControlSystemChoices.ORTE) {
 			/* load up the control and monitoring systems for OMPI */
-			//OMPIJNIBroker jnibroker = new OMPIJNIBroker();
-			Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-			int port = preferences.getInt(PreferenceConstants.ORTE_SERVER_PORT);
-			System.out.println("port = "+port);
-			if(port < 0) {
-				CoreUtils.showErrorDialog("Invalid ORTE Proxy Server",
-						"Invalid ORTE proxy server port specified.  See the PTP->OMPI preferences pages.", null);
-				return;
-			}
-
 			runtimeProxy = new OMPIProxyRuntimeClient();
 			monitoringSystem = new OMPIMonitoringSystem((OMPIProxyRuntimeClient)runtimeProxy);
 			controlSystem = new OMPIControlSystem((OMPIProxyRuntimeClient)runtimeProxy);
