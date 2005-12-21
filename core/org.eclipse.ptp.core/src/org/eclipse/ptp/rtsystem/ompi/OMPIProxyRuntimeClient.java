@@ -6,6 +6,9 @@ import java.io.InputStreamReader;
 import java.util.BitSet;
 
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.core.ControlSystemChoices;
+import org.eclipse.ptp.core.IModelManager;
+import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.Queue;
@@ -20,14 +23,18 @@ import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNodeAttributeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNodesEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessAttributeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessesEvent;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRuntimeProxy, IProxyRuntimeEventListener {
 	protected Queue events = new Queue();
 	protected BitSet waitEvents = new BitSet();
+	protected IModelManager modelManager;
 	
-	public OMPIProxyRuntimeClient() {
+	public OMPIProxyRuntimeClient(IModelManager modelManager) {
 		super();
 		super.addRuntimeEventListener(this);
+		this.modelManager = modelManager;
 	}
 	
 	public int runJob(String[] args) throws IOException {
@@ -81,30 +88,60 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 	
 	public boolean startup() {
 		System.out.println("OMPIProxyRuntimeClient - firing up proxy, waiting for connecting.  Please wait!  This can take a minute . . .");
-
+		
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
-		final String proxyPath = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
-		System.out.println("ORTE_SERVER path = ."+proxyPath+".");
-		if(proxyPath == "") {
+		String proxyPath = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
+		System.out.println("ORTE_SERVER path = '"+proxyPath+"'");
+		String orted_path = preferences.getString(PreferenceConstants.ORTE_ORTED_PATH);
+		System.out.println("ORTED path = '"+orted_path+"'");
+		
+		if(proxyPath.equals("") || orted_path.equals("")) {
+			Shell s = Display.getDefault().getActiveShell();
+			if(s != null)
+				new OMPIPrefsDialog(s).open();
+		}
+		
+		proxyPath = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
+		System.out.println("ORTE_SERVER path = '"+proxyPath+"'");
+		if(proxyPath.equals("")) {
 			String err = "Could not start the ORTE server.  Check the "+
 				"PTP/Open RTE preferences page and be certain that the path and arguments "+
-				"are correct.";
+				"are correct.  Defaulting to Simulation Mode.";
 			System.err.println(err);
 			CoreUtils.showErrorDialog("ORTE Server Start Failure", err, null);
+
+			int MSI = MonitoringSystemChoices.SIMULATED;
+			int CSI = ControlSystemChoices.SIMULATED;
+							
+			preferences.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSI);
+			preferences.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSI);
+
+			PTPCorePlugin.getDefault().savePluginPreferences();
+			
 			return false;
 		}
 
-		String orted_path = preferences.getString(PreferenceConstants.ORTE_ORTED_PATH);
-		System.out.println("ORTED path = ."+orted_path+".");
-		if(orted_path == "") {
+		orted_path = preferences.getString(PreferenceConstants.ORTE_ORTED_PATH);
+		System.out.println("ORTED path = '"+orted_path+"'");
+		if(orted_path.equals("")) {
 			String err = "Some error occurred trying to spawn the ORTEd (ORTE daemon).  Check the "+
 				"PTP/Open RTE preferences page and be certain that the path and arguments "+
-				"are correct.";
+				"are correct.  Defaulting to Simulation Mode.";
 			System.err.println(err);
 			CoreUtils.showErrorDialog("ORTEd Start Failure", err, null);
+			
+			int MSI = MonitoringSystemChoices.SIMULATED;
+			int CSI = ControlSystemChoices.SIMULATED;
+							
+			preferences.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSI);
+			preferences.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSI);
+
+			PTPCorePlugin.getDefault().savePluginPreferences();
+		
 			return false;
 		}
 
+		final String proxyPath2 = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
 		try {
 			setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_CONNECTED);
 			sessionCreate();
@@ -115,7 +152,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 					
 					Runtime rt = Runtime.getRuntime ();
 					
-					cmd = proxyPath + " --port="+getSessionPort();
+					cmd = proxyPath2 + " --port="+getSessionPort();
 					
 					System.out.println("RUNNING PROXY SERVER COMMAND: '"+cmd+"'");
 					
