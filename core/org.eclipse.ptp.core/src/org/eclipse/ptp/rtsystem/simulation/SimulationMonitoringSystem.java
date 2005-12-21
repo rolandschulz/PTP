@@ -67,7 +67,7 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 
 			CoreUtils.showErrorDialog("Default Simulation Num Machines Set",
 				"No existing / invalid number of machines to to simulate detected.  Default "+
-				"number of machines set to 1.  Set using the PTP preferences -> simulation page", null);
+				"number of machines set to 1.  Set using the PTP preferences -> simulation page.", null);
 			numNodes = new int[1];
 			numNodes[0] = 256;
 		}

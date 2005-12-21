@@ -30,7 +30,7 @@ public class ControlSystemChoices {
 	 */
 	
 	/* ID numbers for each of the CSs */
-	static public final int SIMULATED_ID = 100;
+	static public final int SIMULATED = 100;
 	static public final int ORTE = 101;
 	static public final int LAMPI = 102;
 	static public final int LAMMPI = 103;
@@ -47,7 +47,7 @@ public class ControlSystemChoices {
 	};
 	
 	static private int[] CSIDs = new int[] {
-			SIMULATED_ID,
+			SIMULATED,
 			ORTE,
 			LAMPI,
 			LAMMPI,
