@@ -339,7 +339,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			String nname = attribs[(i * num_attribs) + 1];
 
 			/* this is a hack until I get this working correctly w/ the monitoring system! */
-			nname = new String("machine0_node0");
+			nname = new String("machine0_node"+nname);
 			
 			//String nname = controlSystem.getProcessAttribute(job, proc, AttributeConstants.ATTRIB_PROCESS_NODE_NAME);
 			String mname = monitoringSystem.getNodeMachineName(nname);
