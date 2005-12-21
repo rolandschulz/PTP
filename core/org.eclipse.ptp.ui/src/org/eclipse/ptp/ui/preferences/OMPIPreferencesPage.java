@@ -178,6 +178,7 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 				.getResourceString("OMPIPreferencesPage.orteServer_text"));
 		orteServerText = new Text(orteserver, SWT.SINGLE | SWT.BORDER);
 		orteServerText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		orteServerText.addModifyListener(listener);
 		browseButton2 = SWTUtil.createPushButton(orteserver, CoreMessages
 				.getResourceString("PTPPreferencesPage.browseButton"), null);
 		browseButton2.addSelectionListener(listener);
