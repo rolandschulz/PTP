@@ -430,10 +430,14 @@ ORTE_Subscribe_Bproc(void)
 	value.addr_mode = ORTE_GPR_TOKENS_XAND | ORTE_GPR_KEYS_OR;
 	value.segment = strdup(ORTE_NODE_SEGMENT);
 	
-	value.cnt = 5; /* number of keyvals */
+	value.cnt = 6; /* number of keyvals */
 	value.keyvals = (orte_gpr_keyval_t**)malloc(value.cnt * sizeof(orte_gpr_keyval_t*));
 	
 	i = 0;
+	
+	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
+	value.keyvals[i++]->key = strdup(ORTE_NODE_NAME_KEY);
+	
 	value.keyvals[i] = OBJ_NEW(orte_gpr_keyval_t);
 	value.keyvals[i++]->key = strdup(ORTE_NODE_STATE_KEY);
 	
@@ -935,10 +939,8 @@ ORTERun(char **args)
 	printf("res = '%s'\n", res); fflush(stdout);
 	proxy_svr_event_callback(orte_proxy, res);
 
-	printf("A!\n"); fflush(stdout);
 	if(res) free(res);
 	
-	printf("B!\n"); fflush(stdout);
 	if(debug) free(debug_args);
 	
 //	/* generate an event stating what the new/assigned job ID is.
