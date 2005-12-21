@@ -109,8 +109,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		{
 			Preferences p = PTPCorePlugin.getDefault().getPluginPreferences();
 
-			int MSI = MonitoringSystemChoices.getMSIDByName("Simulated");
-			int CSI = ControlSystemChoices.getCSIDByName("Simulated");
+			int MSI = MonitoringSystemChoices.ORTE;
+			int CSI = ControlSystemChoices.ORTE;
 				
 			p.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSI);
 			p.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSI);
@@ -119,7 +119,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 			CoreUtils.showErrorDialog("Default Runtime System Set",
 				"No existing / invalid control or monitoring system detected.  "+
-				"Default systems set to simulation.  Set using the PTP preferences page.", null);
+				"Default systems set to Open Runtime Environment (ORTE).  To change, use the Window->Preferences->PTP preferences page.", null);
 			
 			MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
 			MSChoice = MonitoringSystemChoices.getMSNameByID(MSChoiceID);
@@ -158,7 +158,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		if (runtimeProxy != null)
 			runtimeProxy.shutdown();
 
-		if(monitoringSystemID == MonitoringSystemChoices.SIMULATED_ID && controlSystemID == ControlSystemChoices.SIMULATED_ID) {
+		if(monitoringSystemID == MonitoringSystemChoices.SIMULATED && controlSystemID == ControlSystemChoices.SIMULATED) {
 			/* load up the control and monitoring systems for the simulation */
 			monitoringSystem = new SimulationMonitoringSystem();
 			controlSystem = new SimulationControlSystem();
@@ -166,7 +166,18 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		}
 		else if(monitoringSystemID == MonitoringSystemChoices.ORTE && controlSystemID == ControlSystemChoices.ORTE) {
 			/* load up the control and monitoring systems for OMPI */
-			runtimeProxy = new OMPIProxyRuntimeClient();
+			runtimeProxy = new OMPIProxyRuntimeClient(this);
+			if(runtimeProxy != null && !runtimeProxy.startup()) {
+				runtimeProxy = null;
+				Preferences p = PTPCorePlugin.getDefault().getPluginPreferences();
+				int MSChoiceID = p.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
+				int CSChoiceID = p.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
+				monitoringSystem = null;
+				controlSystem = null;
+				refreshRuntimeSystems(CSChoiceID, MSChoiceID);
+				
+				return;
+			}
 			monitoringSystem = new OMPIMonitoringSystem((OMPIProxyRuntimeClient)runtimeProxy);
 			controlSystem = new OMPIControlSystem((OMPIProxyRuntimeClient)runtimeProxy);
 		}
@@ -175,11 +186,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			return;
 		}
 
-		if (runtimeProxy != null && !runtimeProxy.startup()) {
-			runtimeProxy = null;
-			CoreUtils.showErrorDialog("Runtime System Error", "Could not start runtime system", null);
-			return;
-		}
 		universe = new PUniverse();
 		monitoringSystem.startup();
 		controlSystem.startup();

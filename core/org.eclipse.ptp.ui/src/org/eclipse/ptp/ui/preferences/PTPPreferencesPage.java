@@ -333,7 +333,7 @@ public class PTPPreferencesPage extends PreferencePage implements IWorkbenchPref
 		int CSID = ControlSystemChoices.getCSIDByIndex(CS);
 		int MSID = MonitoringSystemChoices.getMSIDByIndex(MS);
 		
-		if(CSID == ControlSystemChoices.SIMULATED_ID && MSID == MonitoringSystemChoices.SIMULATED_ID)
+		if(CSID == ControlSystemChoices.SIMULATED && MSID == MonitoringSystemChoices.SIMULATED)
 			return true;
 		if(CSID == ControlSystemChoices.ORTE && MSID == MonitoringSystemChoices.ORTE)
 			return true;
