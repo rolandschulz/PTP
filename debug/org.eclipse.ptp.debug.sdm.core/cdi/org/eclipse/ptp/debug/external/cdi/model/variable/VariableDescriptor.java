@@ -332,6 +332,11 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 		}
 		return super.equals(varDesc);
 	}
+	public IPCDIVariable[] getVariables() throws CDIException {
+		Session session = (Session)getTarget().getSession();
+		VariableManager mgr = session.getVariableManager();
+		return mgr.getVariables(this);
+	}
 	public IPCDIVariableDescriptor getVariableDescriptorAsArray(int start, int length) throws CDIException {
 		Session session = (Session)getTarget().getSession();
 		VariableManager mgr = session.getVariableManager();

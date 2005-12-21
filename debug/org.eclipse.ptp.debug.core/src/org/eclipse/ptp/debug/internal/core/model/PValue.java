@@ -116,17 +116,9 @@ public class PValue extends AbstractPValue {
 		return getAIF().getValue();
 	}
 	protected List getCDIVariables() throws DebugException {
-		IPCDIVariable[] vars = null;
+		IPCDIVariable[] vars = new IPCDIVariable[0];
 		try {
-			IPCDIVariable parent = getParentVariable().getCDIVariable();
-			if (parent != null) {
-				vars = parent.getChildren();
-				// Quick fix.
-				// getVariables should return an empty array instead of null.
-				if (vars == null) {
-					vars = new IPCDIVariable[0];
-				}
-			}
+			vars = getParentVariable().getCDIVariable().getVariables();
 		} catch (CDIException e) {
 			requestFailed(e.getMessage(), e);
 		}
@@ -207,22 +199,24 @@ public class PValue extends AbstractPValue {
 	}
 	private String getFloatingPointValueString(IAIFValueFloatingPoint value) throws CDIException {
 		if (value.isDouble()) {
-			return getDoubleValueString(value.doubleValue());
+			return getDoubleValueString(value.getValueString());
 		} else if (value.isFloat()) {
-			return getFloatValueString(value.floatValue());
+			return getFloatValueString(value.getValueString());
 		} else {
 			return value.getValueString();
 		}
 	}
-	private String getFloatValueString(float floatValue) throws CDIException {
+	private String getFloatValueString(String floatValue) throws CDIException {
+		PVariableFormat format = getParentVariable().getFormat();
+		if (PVariableFormat.NATURAL.equals(format)) {
+			return floatValue;
+		}
+
 		Float flt = new Float(floatValue);
 		if (flt.isNaN() || flt.isInfinite())
 			return "";
 		long longValue = flt.longValue();
-		PVariableFormat format = getParentVariable().getFormat();
-		if (PVariableFormat.NATURAL.equals(format)) {
-			return Float.toString(floatValue);
-		} else if (PVariableFormat.DECIMAL.equals(format)) {
+		if (PVariableFormat.DECIMAL.equals(format)) {
 			return Long.toString(longValue);
 		} else if (PVariableFormat.HEXADECIMAL.equals(format)) {
 			StringBuffer sb = new StringBuffer("0x");
@@ -230,17 +224,19 @@ public class PValue extends AbstractPValue {
 			sb.append((stringValue.length() > 8) ? stringValue.substring(stringValue.length() - 8) : stringValue);
 			return sb.toString();
 		}
-		return null;
+		return floatValue;
 	}
-	private String getDoubleValueString(double doubleValue) throws CDIException {
+	private String getDoubleValueString(String doubleValue) throws CDIException {
+		PVariableFormat format = getParentVariable().getFormat();
+		if (PVariableFormat.NATURAL.equals(format)) {
+			return doubleValue;
+		}
+
 		Double dbl = new Double(doubleValue);
 		if (dbl.isNaN() || dbl.isInfinite())
 			return "";
 		long longValue = dbl.longValue();
-		PVariableFormat format = getParentVariable().getFormat();
-		if (PVariableFormat.NATURAL.equals(format)) {
-			return dbl.toString();
-		} else if (PVariableFormat.DECIMAL.equals(format)) {
+		if (PVariableFormat.DECIMAL.equals(format)) {
 			return Long.toString(longValue);
 		} else if (PVariableFormat.HEXADECIMAL.equals(format)) {
 			StringBuffer sb = new StringBuffer("0x");
@@ -248,7 +244,7 @@ public class PValue extends AbstractPValue {
 			sb.append((stringValue.length() > 16) ? stringValue.substring(stringValue.length() - 16) : stringValue);
 			return sb.toString();
 		}
-		return null;
+		return doubleValue;
 	}
 	private String getPointerValueString(IAIFValuePointer value) throws CDIException {
 		// TODO:IPF_TODO Workaround to solve incorrect handling of structures referenced by pointers or references

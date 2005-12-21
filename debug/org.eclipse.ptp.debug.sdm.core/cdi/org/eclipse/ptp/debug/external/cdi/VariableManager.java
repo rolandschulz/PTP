@@ -29,7 +29,9 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.aif.AIF;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeAggregate;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
+import org.eclipse.ptp.debug.core.aif.IAIFValueAggregate;
 import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
@@ -176,6 +178,23 @@ public class VariableManager extends Manager {
 		}
 		return null;
 	}
+	public IPCDIVariable[] getVariables(VariableDescriptor varDesc) throws CDIException {
+		IAIFValue parrentValue = varDesc.getAIF().getValue();
+		
+		if (parrentValue instanceof IAIFValueAggregate) {
+			IAIFValueAggregate parentAggrValue = (IAIFValueAggregate)parrentValue;
+			IAIFTypeAggregate parentAggrType = (IAIFTypeAggregate)parentAggrValue.getType();
+			int length = parentAggrValue.getChildrenNumber();
+			IPCDIVariable[] vars = new IPCDIVariable[length];			
+			for (int i=0; i<length; i++) {
+				IAIF newAIF = new AIF(parentAggrType.getType(i), parentAggrValue.getValue(i));
+				vars[i] = createVariable(createVariableDescriptor(varDesc, newAIF, parentAggrType.getField(i), false));				
+			}
+			return vars;
+		}
+		return new IPCDIVariable[0];
+	}
+
 	public IPCDIVariable[] getVariablesAsArray(VariableDescriptor varDesc, int start, int length) throws CDIException {
 		IAIFValue parrentValue = varDesc.getAIF().getValue();
 		
@@ -199,12 +218,14 @@ public class VariableManager extends Manager {
 		}
 		return new IPCDIVariable[0];
 	}
-	private VariableDescriptor createVariableDescriptor(VariableDescriptor varDesc, IAIF aif, String eName) throws CDIException {
+	private VariableDescriptor createVariableDescriptor(VariableDescriptor varDesc, IAIF aif, String eName, boolean extName) throws CDIException {
 		Target target = (Target)varDesc.getTarget();
 		Thread thread = (Thread)varDesc.getThread();
 		StackFrame frame = (StackFrame)varDesc.getStackFrame();
-		String name = varDesc.getName() + eName;
-		String fullName = varDesc.getFullName() + eName;
+		
+		String name = extName?(varDesc.getName() + eName) : eName;
+		String fullName = extName?(varDesc.getFullName() + eName) : eName;
+		
 		int pos = varDesc.getPosition();
 		int depth = varDesc.getStackDepth();
 		
@@ -243,7 +264,7 @@ public class VariableManager extends Manager {
 		}	
 	}
 	public VariableDescriptor getVariableDescriptorAsArray(VariableDescriptor varDesc, IAIF aif, String eName, int start, int length) throws CDIException {
-		VariableDescriptor vo = createVariableDescriptor(varDesc, aif, eName);
+		VariableDescriptor vo = createVariableDescriptor(varDesc, aif, eName, true);
 		vo.setCastingArrayStart(start);
 		vo.setCastingArrayEnd(length);
 		return vo;

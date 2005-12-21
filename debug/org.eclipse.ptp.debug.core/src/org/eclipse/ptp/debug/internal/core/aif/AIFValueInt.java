@@ -72,6 +72,8 @@ public class AIFValueInt extends AIFValueIntegral implements IAIFValueInt {
 			return byteBuffer.getLong();
 		} catch (BufferUnderflowException e) {
 			return 0;
+		} finally {
+			byteBuffer.rewind();			
 		}
 	}
 	public short shortValue() throws PCDIException {
@@ -79,6 +81,8 @@ public class AIFValueInt extends AIFValueIntegral implements IAIFValueInt {
 			return byteBuffer.getShort();
 		} catch (BufferUnderflowException e) {
 			return 0;
+		} finally {
+			byteBuffer.rewind();			
 		}
 	}
 	public int intValue() throws PCDIException {
@@ -86,6 +90,8 @@ public class AIFValueInt extends AIFValueIntegral implements IAIFValueInt {
 			return byteBuffer.getInt();
 		} catch (BufferUnderflowException e) {
 			return 0;
+		} finally {
+			byteBuffer.rewind();			
 		}
 	}
 }
