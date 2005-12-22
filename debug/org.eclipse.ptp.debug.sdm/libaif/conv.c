@@ -430,6 +430,48 @@ CharToAIF(char c)
 }
 
 /*
+ * Convert a short integer to AIF.
+ */
+AIF *
+ShortToAIF(short i)
+{
+	AIF *	a;
+
+	a = NewAIF(0, sizeof(short));
+
+	AIF_FORMAT(a) = strdup(AIF_INTEGER_TYPE(1, sizeof(short)));
+
+	if ( _longest_to_aif(&AIF_DATA(a), sizeof(short), (AIFLONGEST)i) < 0 )
+	{
+		AIFFree(a);
+		return (AIF *)NULL;
+	}
+
+	return a;
+}
+
+/*
+ * Convert an unsigned short to AIF.
+ */
+AIF *
+UnsignedShortToAIF(unsigned short i)
+{
+	AIF *	a;
+
+	a = NewAIF(0, sizeof(unsigned short));
+
+	AIF_FORMAT(a) = strdup(AIF_INTEGER_TYPE(0, sizeof(unsigned short)));
+
+	if ( _longest_to_aif(&AIF_DATA(a), sizeof(unsigned short), (AIFLONGEST)i) < 0 )
+	{
+		AIFFree(a);
+		return (AIF *)NULL;
+	}
+
+	return a;
+}
+
+/*
  * Convert an integer to AIF.
  */
 AIF *
@@ -470,6 +512,92 @@ UnsignedIntToAIF(unsigned int i)
 
 	return a;
 }
+
+/*
+ * Convert a long integer to AIF.
+ */
+AIF *
+LongToAIF(long i)
+{
+	AIF *	a;
+
+	a = NewAIF(0, sizeof(long));
+
+	AIF_FORMAT(a) = strdup(AIF_INTEGER_TYPE(1, sizeof(long)));
+
+	if ( _longest_to_aif(&AIF_DATA(a), sizeof(long), (AIFLONGEST)i) < 0 )
+	{
+		AIFFree(a);
+		return (AIF *)NULL;
+	}
+
+	return a;
+}
+
+/*
+ * Convert an unsigned long to AIF.
+ */
+AIF *
+UnsignedLongToAIF(unsigned long i)
+{
+	AIF *	a;
+
+	a = NewAIF(0, sizeof(unsigned long));
+
+	AIF_FORMAT(a) = strdup(AIF_INTEGER_TYPE(0, sizeof(unsigned long)));
+
+	if ( _longest_to_aif(&AIF_DATA(a), sizeof(unsigned long), (AIFLONGEST)i) < 0 )
+	{
+		AIFFree(a);
+		return (AIF *)NULL;
+	}
+
+	return a;
+}
+
+#ifdef CC_HAS_LONG_LONG
+/*
+ * Convert a long long integer to AIF.
+ */
+AIF *
+LongLongToAIF(long long i)
+{
+	AIF *	a;
+
+	a = NewAIF(0, sizeof(long long));
+
+	AIF_FORMAT(a) = strdup(AIF_INTEGER_TYPE(1, sizeof(long long)));
+
+	if ( _longest_to_aif(&AIF_DATA(a), sizeof(long long), (AIFLONGEST)i) < 0 )
+	{
+		AIFFree(a);
+		return (AIF *)NULL;
+	}
+
+	return a;
+}
+
+/*
+ * Convert an unsigned long long to AIF.
+ */
+AIF *
+UnsignedLongLongToAIF(unsigned long long i)
+{
+	AIF *	a;
+
+	a = NewAIF(0, sizeof(unsigned long long));
+
+	AIF_FORMAT(a) = strdup(AIF_INTEGER_TYPE(0, sizeof(unsigned long long)));
+
+	if ( _longest_to_aif(&AIF_DATA(a), sizeof(unsigned long long), (AIFLONGEST)i) < 0 )
+	{
+		AIFFree(a);
+		return (AIF *)NULL;
+	}
+
+	return a;
+}
+#endif /* CC_HAS_LONG_LONG */
 
 /*
  * Convert an integer of any length to AIF.
@@ -614,16 +742,58 @@ ArrayToAIF(int rank, int *min, int *max, char *data, int len, char *btype)
 }
 
 /*
+ * Create an empty array containing elemenst min..max and
+ * with a base type given by btype
+ */
+AIF *
+EmptyArrayToAIF(int min, int max, AIF *btype)
+{
+	AIF *	a;
+	int		len = (max - min + 1) * AIFTypeSize(btype);
+	
+	a = NewAIF(0, len);
+	
+	AIF_FORMAT(a) = FDSArrayInit(min, max, AIF_FORMAT(btype));
+	
+	ResetAIFError();
+	
+	return a;
+}
+
+/*
+ * Add the element el to the array at the index given by idx.
+ * This is used for array construction.
+ */
+void
+AIFAddArrayElement(AIF *a, int idx, AIF *el)
+{
+	int	min;
+	int	max;
+	int len = AIFTypeSize(el);
+	
+	if (len == 0 || AIFTypeSize(a) == 0)
+		return;
+		
+	min = FDSArrayMinIndex(AIF_FORMAT(a), 0);
+	max = FDSArrayMaxIndex(AIF_FORMAT(a), 0);
+	
+	if (idx < min || idx > max)
+		return;
+		
+	memcpy(AIF_DATA(a) + len * (idx - min), AIF_DATA(el), len);
+}
+
+/*
  * Create an empty AIF enumerated type.
  */
 AIF *
-EmptyEnumToAIF(void) 
+EmptyEnumToAIF(char *id) 
 {
         AIF *   a;
 
         a = NewAIF(0, sizeof(int));
 
-        AIF_FORMAT(a) = strdup(AIF_ENUM_TYPE(1));
+        AIF_FORMAT(a) = FDSEnumInit(id);
 
         ResetAIFError();
 
@@ -710,13 +880,13 @@ AIFGetEnum(AIF *a)
  * Create an empty AIF union type.
  */
 AIF *
-EmptyUnionToAIF(void) 
+EmptyUnionToAIF(char *id) 
 {
         AIF *   a;
 
         a = NewAIF(0, 0);
 
-        AIF_FORMAT(a) = strdup(AIF_UNION_TYPE());
+        AIF_FORMAT(a) = FDSUnionInit(id);
 
         ResetAIFError();
 
@@ -812,13 +982,13 @@ AIFGetUnion(AIF *a, char *field)
  * Create an empty AIF structure.
  */
 AIF *
-EmptyStructToAIF(void)
+EmptyStructToAIF(char *id)
 {
 	AIF *	a;
 
 	a = NewAIF(0, 0);
 
-	AIF_FORMAT(a) = strdup(AIF_STRUCT_TYPE());
+	AIF_FORMAT(a) = FDSStructInit(id);
 
 	ResetAIFError();
 
