@@ -45,7 +45,7 @@
 #define FDS_STRUCT_FIELD_SEP		','
 #define FDS_STRUCT_START			'{'
 #define FDS_UNION_END				')'
-#define FDS_UNION_FIELD_NAME_END	':'
+#define FDS_UNION_FIELD_NAME_END	'='
 #define FDS_UNION_FIELD_SEP		','
 #define FDS_UNION_START			'('
 #define FDS_VOID				'v'
