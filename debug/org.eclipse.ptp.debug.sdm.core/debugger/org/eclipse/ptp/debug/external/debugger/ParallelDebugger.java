@@ -129,7 +129,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	
 	public void startDebugger(IPJob job) throws PCDIException {
 		try {
-			String app = (String) job.getAttribute(PreferenceConstants.JOB_APP) + "no";
+			String app = (String) job.getAttribute(PreferenceConstants.JOB_APP);
 			String dir = (String) job.getAttribute(PreferenceConstants.JOB_WORK_DIR);
 			String[] args = (String[]) job.getAttribute(PreferenceConstants.JOB_ARGS);
 			proxy.waitForConnect();

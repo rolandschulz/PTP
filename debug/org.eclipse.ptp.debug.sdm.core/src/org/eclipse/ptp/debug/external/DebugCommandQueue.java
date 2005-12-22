@@ -51,10 +51,11 @@ public class DebugCommandQueue extends Thread {
 			try {
 				currentCommand.execCommand(debugger);
 				System.out.println("***** CURRENT COMMAND: " + currentCommand);
-				if (!currentCommand.waitForReturn()) {
-					debugger.handleErrorEvent(currentCommand.getTasks(), "Wait for return error in " + currentCommand.getName() + " command");
+				currentCommand.waitForReturn();
+				//if (!currentCommand.waitForReturn()) {
+					//debugger.handleErrorEvent(currentCommand.getTasks(), "Wait for return error in " + currentCommand.getName() + " command");
 					//System.out.println("************ ERROR in DebugCommandQueue -- wait for return, cmd: " + currentCommand);
-				}
+				//}
 			} catch (PCDIException e) {
 				debugger.handleErrorEvent(currentCommand.getTasks(), "Err on execute " + currentCommand.getName() + " command, err: " + e.getMessage());
 				//System.out.println("************ ERROR in DebugCommandQueue -- execCommand, cmd: " + currentCommand + ", err: " + e.getMessage());
