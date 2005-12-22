@@ -30,6 +30,7 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
@@ -142,9 +143,15 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			} else if (event instanceof IPCDIResumedEvent) {
 				setSuspendTasks(false, tasks);
 				setProcessStatus(tasks.toArray(), IPProcess.RUNNING);
-			} else if (event instanceof ErrorEvent) {
+			} else if (event instanceof IPCDIErrorEvent) {
+				setSuspendTasks(false, tasks);
+				setTerminateTasks(true, tasks);
 				session.unregisterTargets(tasks.toArray(), true);
 				setProcessStatus(tasks.toArray(), IPProcess.ERROR);
+				IPCDIErrorEvent errEvent = (IPCDIErrorEvent)event;
+				if (errEvent.getErrorCode() == IPCDIErrorEvent.ERR_SERIOUS) {
+					postCommand(new StopDebuggerCommand());
+				}
 			} else if (event instanceof IPCDISuspendedEvent) {
 				setSuspendTasks(true, tasks);				
 				setProcessStatus(tasks.toArray(), IPProcess.STOPPED);
@@ -194,6 +201,9 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	}
 	public void handleProcessSignaledEvent(BitList tasks, ICDILocator locator) {
 		fireEvent(new InferiorSignaledEvent(getSession(), tasks, locator));
+	}
+	public void handleErrorEvent(BitList tasks, String errMsg, int errCode) {
+		fireEvent(new ErrorEvent(getSession(), tasks, errMsg, errCode));
 	}
 	public void handleErrorEvent(BitList tasks, String errMsg) {
 		fireEvent(new ErrorEvent(getSession(), tasks, errMsg));

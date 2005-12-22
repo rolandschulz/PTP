@@ -27,6 +27,7 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
@@ -51,6 +52,7 @@ import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugArgsEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugBreakpointHitEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugBreakpointSetEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugDataEvent;
+import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugErrorEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugInitEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugSignalEvent;
 import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugStackframeEvent;
@@ -60,6 +62,9 @@ import org.eclipse.ptp.debug.external.proxy.event.ProxyDebugVarsEvent;
 
 
 public class ParallelDebugger extends AbstractDebugger implements IDebugger, IProxyDebugEventListener {
+	/**
+	 * @deprecated
+	 */
 	private class BreakpointMapping {
 		private IPCDIBreakpoint		bpObject;
 		private BitList				bpSet;
@@ -124,7 +129,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	
 	public void startDebugger(IPJob job) throws PCDIException {
 		try {
-			String app = (String) job.getAttribute(PreferenceConstants.JOB_APP);
+			String app = (String) job.getAttribute(PreferenceConstants.JOB_APP) + "no";
 			String dir = (String) job.getAttribute(PreferenceConstants.JOB_WORK_DIR);
 			String[] args = (String[]) job.getAttribute(PreferenceConstants.JOB_ARGS);
 			proxy.waitForConnect();
@@ -394,8 +399,16 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			
 		case IProxyDebugEvent.EVENT_DBG_ERROR:
 			System.out.println("======================= EVENT_DBG_ERROR ====================");
+			ProxyDebugErrorEvent errEvent = (ProxyDebugErrorEvent)e;
 			completeCommand(null);
-			handleErrorEvent(e.getBitSet(), "Internal debugger error");
+			int code = errEvent.getErrorCode();
+			if (code == IParallelDebuggerConstants.DBGERR_DEBUGGER || code == IParallelDebuggerConstants.DBGERR_NOFILEDIR || code == IParallelDebuggerConstants.DBGERR_CHDIR) {
+				code = IPCDIErrorEvent.ERR_SERIOUS;
+			}
+			else {
+				code = IPCDIErrorEvent.ERR_NORMAL;
+			}
+			handleErrorEvent(e.getBitSet(), errEvent.getErrorMessage(), code);
 			//fireEvent(new ErrorEvent(getSession(), e.getBitSet(), "Internal debugger error"));
 			//fireEvent(new InferiorExitedEvent(getSession(), e.getBitSet()));
 			break;
