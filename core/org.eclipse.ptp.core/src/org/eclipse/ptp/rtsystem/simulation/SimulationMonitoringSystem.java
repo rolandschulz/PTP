@@ -36,6 +36,7 @@ import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.internal.core.CoreUtils;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
+import org.eclipse.swt.widgets.Display;
 
 public class SimulationMonitoringSystem implements IMonitoringSystem {
 	protected List listeners = new ArrayList(2);
@@ -65,9 +66,9 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 
 			PTPCorePlugin.getDefault().savePluginPreferences();
 
-			CoreUtils.showErrorDialog("Default Simulation Num Machines Set",
+			CoreUtils.showWarningDialog(Display.getDefault().getActiveShell(), "Default Simulation Num Machines Set",
 				"No existing / invalid number of machines to to simulate detected.  Default "+
-				"number of machines set to 1.  Set using the PTP preferences -> simulation page.", null);
+				"number of machines set to 1.  Set using the PTP preferences -> simulation page.", CoreUtils.ASYNC);
 			numNodes = new int[1];
 			numNodes[0] = 256;
 		}

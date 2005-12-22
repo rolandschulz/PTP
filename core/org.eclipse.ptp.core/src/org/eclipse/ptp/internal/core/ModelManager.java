@@ -56,6 +56,7 @@ import org.eclipse.ptp.rtsystem.ompi.OMPIProxyRuntimeClient;
 import org.eclipse.ptp.rtsystem.simulation.SimProcess;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -117,9 +118,9 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 			PTPCorePlugin.getDefault().savePluginPreferences();
 
-			CoreUtils.showErrorDialog("Default Runtime System Set",
+			CoreUtils.showWarningDialog(Display.getDefault().getActiveShell(), "Default Runtime System Set",
 				"No existing / invalid control or monitoring system detected.  "+
-				"Default systems set to Open Runtime Environment (ORTE).  To change, use the Window->Preferences->PTP preferences page.", null);
+				"Default systems set to Open Runtime Environment (ORTE).  To change, use the Window->Preferences->PTP preferences page.", CoreUtils.ASYNC);
 			
 			MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
 			MSChoice = MonitoringSystemChoices.getMSNameByID(MSChoiceID);
