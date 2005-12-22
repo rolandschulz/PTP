@@ -520,9 +520,11 @@ TypeToFDS(int type, ...)
 		break;
 
 	case AIF_ENUM:
-		v3 = strdup(va_arg(args, char *));
+		v3 = va_arg(args, char *);
 		if (v3 == NULL)
 			v3 = strdup("");
+		else
+			v3 = strdup(v3);
 		v1 = va_arg(args, int);
 		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v3, v1 ? FDS_INTEGER_SIGNED : FDS_INTEGER_UNSIGNED);
 		_aif_free(v3);
@@ -536,9 +538,11 @@ TypeToFDS(int type, ...)
 
 	case AIF_STRUCT:
 	case AIF_UNION:
-		v3 = strdup(va_arg(args, char *));
+		v3 = va_arg(args, char *);
 		if (v3 == NULL)
 			v3 = strdup("");
+		else
+			v3 = strdup(v3);
 		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v3);
 		_aif_free(v3);
 		break;
