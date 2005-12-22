@@ -263,7 +263,25 @@ public class OMPIPrefsDialog extends Dialog
 		}
 
 		ortedFile = preferences.getString(PreferenceConstants.ORTE_ORTED_PATH);
-		ortedPathText.setText(ortedFile);
+		
+		if(ortedFile.equals("")) {
+			ortedPathText.setText("");
+			String path = System.getenv("PATH");
+			//System.out.println("PATH = '"+path+"'");
+			String[] splits = path.split(":");
+			for(int i=0; i<splits.length; i++) {
+				//System.out.println(i+": '"+splits[i]+"'");
+				File f = new File(splits[i] + "/orted");
+				if(f.exists()) {
+					System.out.println("Found orted in path: '"+splits[i]+"'");
+					ortedPathText.setText(splits[i] + "/orted");
+					break;
+				}
+			}
+		}
+		else {
+			ortedPathText.setText(ortedFile);
+		}
 	}
 	
 	protected void handlePathBrowseButtonSelected() 
