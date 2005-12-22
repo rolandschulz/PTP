@@ -153,7 +153,7 @@ public class PProcess extends Parent implements IPProcess {
 		// outputList.clear();
 	}
 	public boolean isAllStop() {
-		return getStatus().startsWith(EXITED);
+		return (getStatus().startsWith(EXITED) || getStatus().startsWith(ERROR));
 	}
 	public void setNode(IPNode node) {
 		this.node = node;
