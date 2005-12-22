@@ -67,10 +67,10 @@ static struct bpmap	BPMap = { 0, 0, NULL };
 static int			(*AsyncFunc)(void *) = NULL;
 static void *		AsyncFuncData;
 
-static int	GDBMIBuildAIFVar(char *, char *, char *, AIF **);
 static int	SetAndCheckBreak(int, char *);
 static int	GetStackframes(int, List **);
-static int	GetTypeInfo(char *, char **, char **);
+static int	GetAIFVar(char *, AIF **, char **);
+static AIF *	ConvertVarToAIF(char *, MIVar *);
 
 static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIProgress(void);
@@ -386,17 +386,23 @@ GDBMIStartSession(char *gdb_path, char *dir, char *prog, char *args, char **env)
 	 	}
 	}
 
+	if (*dir != '\0' && chdir(dir) < 0) {
+		DbgSetError(DBGERR_CHDIR, dir);
+		return DBGRES_ERR;
+	}
+
+	if (access(prog, R_OK) < 0) {
+		DbgSetError(DBGERR_NOFILEDIR, prog);
+		return DBGRES_ERR;
+	}
+	
 	sess = MISessionNew();
 	
 	MISessionSetGDBPath(sess, gdb_path);
 	
-	if (*dir != '\0' && chdir(dir) < 0) {
-		DbgSetError(DBGERR_SYSTEM, strerror(errno));
-		return DBGRES_ERR;
-	}
-
 	if (MISessionStartLocal(sess, prog) < 0) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MISessionFree(sess);
 		return DBGRES_ERR;
 	}
 
@@ -990,217 +996,257 @@ DumpBinaryValue(MISession *sess, char *exp, char *file)
 static int
 GDBMIEvaluateExpression(char *exp)
 {
-	int			fd;
-	int			res  = DBGRES_OK;
 	char *		type;
-	char *		fds = NULL;
-	char			tmp[18];
 	AIF *		a;
 	dbg_event *	e;
 
-	if (GetTypeInfo(exp, &type, &fds) == DBGRES_OK) {
-		strcpy(tmp, "/tmp/guard.XXXXXX");
-	
-		if ( (fd = mkstemp(tmp)) < 0 )
-		{
-			DbgSetError(DBGERR_DEBUGGER, (char *)strerror(errno));
-			return DBGRES_ERR;
-		}
+	if (GetAIFVar(exp, &a, &type) != DBGRES_OK)
+		return DBGRES_ERR;
 		
-		close(fd);
-	
-		if ( DumpBinaryValue(DebugSession, exp, tmp) < 0 )
-			return DBGRES_ERR;
-	
-		res = GDBMIBuildAIFVar(exp, fds, tmp, &a);
-	
-		if (res == DBGRES_OK) {
-			e = NewDbgEvent(DBGEV_DATA);
-			e->data = a;
-			e->type_desc = strdup(type);
-			SaveEvent(e);
-		}
-	
-		free(fds);
-		(void)unlink(tmp);
-		
-		free(type);
-	} 
-		
-	return res;
+	e = NewDbgEvent(DBGEV_DATA);
+	e->data = a;
+	e->type_desc = type;
+	SaveEvent(e);
+
+	return DBGRES_OK;
 }
-
-struct str_type
-{
-	int     blen;
-	int     slen;
-	int     end;
-	char *  buf;
-};
-typedef struct str_type *	str_ptr;
-
-#define STRSIZE	100
-
-str_ptr	str_init(void);
-void	str_add(str_ptr, char *, ...);
-void	str_free(str_ptr);
-char *	str_val(str_ptr);
-str_ptr	str_dup(char *);
 
 struct simple_type {
 	char *	type_c;
-	char *	type_fds;
-	int	type_len;
+	int		type;
 };
+
+#define CHAR			0
+#define SHORT		1
+#define USHORT		2
+#define INT			3
+#define UINT			4
+#define LONG			5
+#define ULONG		6
+#define LONGLONG		7
+#define ULONGLONG	8
+#define FLOAT		9
+#define DOUBLE		10
 
 struct simple_type simple_types[] = {
-	{ "char", "c", 0 },
-	{ "unsigned char", "c", 0 },
-	{ "short int", "is%d", sizeof(short) },
-	{ "short unsigned int", "iu%d", sizeof(unsigned short) },
-	{ "int", "is%d", sizeof(int) },
-	{ "unsigned int", "iu%d", sizeof(unsigned int) },
-	{ "long int", "is%d", sizeof(long) },
-	{ "long unsigned int", "iu%d", sizeof(unsigned long) },
-	{ "long long int", "is%d", sizeof(long long) },
-	{ "long long unsigned int", "iu%d", sizeof(unsigned long long) },
-	{ "float", "f%d", sizeof(float) },
-	{ "double", "f%d", sizeof(double) },
-	{ NULL, NULL }
+	{ "char", CHAR },
+	{ "unsigned char", CHAR },
+	{ "short int", SHORT },
+	{ "short unsigned int", USHORT },
+	{ "int", INT },
+	{ "unsigned int", UINT },
+	{ "long int", LONG },
+	{ "long unsigned int", ULONG },
+#ifdef CC_HAS_LONG_LONG
+	{ "long long int", LONGLONG },
+	{ "long long unsigned int", ULONGLONG },
+#endif /* CC_HAS_LONG_LONG */
+	{ "float", FLOAT },
+	{ "double", DOUBLE },
+	{ NULL, 0 }
 };
 
-str_ptr
-str_init(void)
-{
-	str_ptr s;
-
-	s = (str_ptr)malloc(sizeof(struct str_type));
-	s->buf = (char *)malloc(STRSIZE);
-	s->blen = STRSIZE;
-	s->slen = 0;
-	s->buf[0] = '\0';
-
-	return s;
-}
-
-void
-str_add(str_ptr s1, char *s2, ...)
-{
-	va_list	ap;
-	int     l2;
-	char *	buf;
-
-	va_start(ap, s2);
-	vasprintf(&buf, s2, ap);
-	va_end(ap);
-
-	l2 = strlen(buf);
-
-	if (s1->slen + l2 >= s1->blen)
-	{
-		s1->blen += MAX(STRSIZE, l2);
-		s1->buf = (char *) realloc (s1->buf, s1->blen);
-	}
-
-	memcpy(&(s1->buf[s1->slen]), buf, l2);
-	s1->slen += l2;
-	s1->buf[s1->slen] = '\0';
-
-	free(buf);
-}
-
-void
-str_free(str_ptr s)
-{
-	free(s->buf);
-	free(s);
-}
-
-char *
-str_val(str_ptr s)
-{
-	return s->buf;
-}
-
-str_ptr
-str_dup(char *s1)
-{
-	str_ptr s = str_init();
-	str_add(s, s1);
-	return s;
-}
-
-int
-SimpleTypeToFDS(char *type, str_ptr fds)
+static AIF *
+SimpleVarToAIF(char *exp, MIVar *var)
 {
 	char *				p;
+	char *				res;
+	AIF *				a;
 	struct simple_type *	s;
+	MICommand *			cmd;
 
-	if ( strcmp(type, "<text variable, no debug info>") == 0 )
-		return -1;
+	if ( strcmp(var->type, "<text variable, no debug info>") == 0 ) {
+		DbgSetError(DBGERR_NOSYMS, "");
+		return NULL;
+	}
 
-#if 0
-	switch ( *last )
-	{
-	case '*': /* pointer */
-		str_add(fds, "^");
-
-		/*
-		** get rid of '*'
-		*/
-		for ( p = last ; p != type && *(p-1) == ' ' ; p-- )
-			;
-
-		*p = '\0';
-		break;
-#endif
-
-	if (type[strlen(type) - 1] == ')') { /* function */
-		str_add(fds, "&");
-
-		/*
-		** get rid of '(..)' for now
-		*/
-		if ( (p = strrchr(type, '(')) != NULL )
-		{
-			for ( ; p != type && *(p-1) == ' ' ; p-- )
-				;
-
-			*p = '\0';
-		}
-
-		str_add(fds, "/");
-		return 0;
+	if (var->type[strlen(var->type) - 1] == ')') { /* function */
+		return MakeAIF("&/is4", exp);
+	} else if (strncmp(var->type, "enum", 4) == 0) { /* enum */
+		if ((p = strchr(var->type, ' ')) != NULL) {
+			*p++ = '\0';
+			a = EmptyEnumToAIF(p);
+		} else
+			a = EmptyEnumToAIF(NULL);
+		return a;
 	}
 
 	for (s = simple_types ; s->type_c != NULL ; s++ )
 	{
-		if ( strcmp(type, s->type_c) == 0 )
+		if ( strcmp(var->type, s->type_c) == 0 )
 		{
-			str_add(fds, s->type_fds, s->type_len);
-			break;
+			cmd = MIVarEvaluateExpression(var->name);
+			SendCommandWait(DebugSession, cmd);
+			
+			if (!MICommandResultOK(cmd)) {
+				DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+				MICommandFree(cmd);
+				return NULL;
+			}
+				
+			res = MIGetVarEvaluateExpressionInfo(cmd);
+			
+			if (res == NULL) {
+				DbgSetError(DBGERR_DEBUGGER, "could not evaluate expression");
+				return NULL;
+			}
+			
+			switch (s->type) {
+			case CHAR:
+				if ((p = strchr(res, ' ')) != NULL)
+					*p = '\0';
+					a = CharToAIF((char)atoi(res));
+					break;
+				
+			case SHORT:
+				a = ShortToAIF((short)atoi(res));
+				break;
+				
+			case USHORT:
+				a = UnsignedShortToAIF((unsigned short)atoi(res));
+				break;
+				
+			case INT:
+				a = IntToAIF(atoi(res));
+				break;
+				
+			case UINT:
+				a = UnsignedIntToAIF((unsigned int)atoi(res));
+				break;
+				
+			case LONG:
+				a = LongToAIF(atol(res));
+				break;
+				
+			case ULONG:
+				a = UnsignedLongToAIF((unsigned long)atol(res));
+				break;
+				
+#ifdef CC_HAS_LONG_LONG					
+			case LONGLONG:
+				a = LongLongToAIF(atoll(res));
+				break;
+				
+			case ULONGLONG:
+				a = UnsignedLongLongToAIF((unsigned long long)atoll(res));
+				break;
+#endif /* CC_HAS_LONG_LONG */
+				
+			case FLOAT:
+				a = FloatToAIF((float)atof(res));
+				break;
+				
+			case DOUBLE:
+				a = DoubleToAIF(atof(res));
+				break;				
+			}
+		
+			MICommandFree(cmd);
+			return a;
 		}
 	}
 
-	return 0;
+	DbgSetError(DBGERR_DEBUGGER, "could not convert simple type");
+	return NULL;
 }
 
-static int
-ConvertType(MIVar *var, str_ptr fds)
+static AIF *
+CreateStruct(MIVar *var)
 {
-	int			i;
-	int			num;
-	char *		s;
-	MIVar *		v;
+	int		i;
+	char *	s;
+	MIVar *	v;
+	AIF *	a;
+	AIF *	ac;
+	
+	if (var->type[6] == ' ' && var->type[7] != '{')
+		a = EmptyStructToAIF(&var->type[7]);
+	else
+		a = EmptyStructToAIF(NULL);
+	
+	for ( i = 0 ; i < var->numchild ; i++ )
+	{
+		v = var->children[i];
+		if ((s = strrchr(v->name, '.')) != NULL) {
+			if ( (ac = ConvertVarToAIF(v->exp, v)) == NULL ) {
+				AIFFree(a);
+				return NULL;
+			}
+			AIFAddFieldToStruct(a, ++s, ac);
+		}
+	}
+	return a;
+}
+
+static AIF *
+CreateUnion(MIVar *var)
+{
+	int		i;
+	char *	s;
+	char *	name = NULL;
+	MIVar *	v;
+	AIF *	a;
+	AIF *	ac;
+
+	if (var->type[6] == ' ' && var->type[7] != '{')
+		a = EmptyUnionToAIF(&var->type[7]);
+	else
+		a = EmptyUnionToAIF(NULL);
+				
+	for ( i = 0 ; i < var->numchild ; i++ )
+	{
+		v = var->children[i];
+		if ((s = strrchr(v->name, '.')) != NULL) {
+			if ( (ac = ConvertVarToAIF(v->exp, v)) == NULL ) {
+				AIFFree(a);
+				return NULL;
+			}
+			name = ++s;
+			AIFAddFieldToUnion(a, name, AIF_FORMAT(ac));
+		}
+	}
+	
+	/*
+	 * Set the union value
+	 */
+	if (name != NULL)
+		AIFSetUnion(a, name, ac);
+		
+	return a;
+}
+
+static AIF *
+CreateArray(MIVar *var)
+{
+	int		i;
+	MIVar *	v;
+	AIF *	a = NULL;
+	AIF *	ac;
+
+	for (i = 0; i < var->numchild; i++) {
+		v = var->children[i];
+		if ((ac = ConvertVarToAIF(v->exp, v)) == NULL) {
+			return NULL;
+		}
+		if (a == NULL)
+			a = EmptyArrayToAIF(0, var->numchild-1, ac);
+		AIFAddArrayElement(a, i, ac);
+		AIFFree(ac);
+	}
+	
+	return a;
+}
+
+static AIF *
+ConvertVarToAIF(char *exp, MIVar *var)
+{
+	AIF *		a;
 	MICommand *	cmd;
 	
 	if ( var->numchild == 0 )
 	{
-		if ( SimpleTypeToFDS(var->type, fds) < 0 )
-		{
-			DbgSetError(DBGERR_NOSYMS, "");
-			return DBGRES_ERR;
-		}
+		if ( (a = SimpleVarToAIF(exp, var)) == NULL )
+			return NULL;
 	}
 	else
 	{
@@ -1211,79 +1257,45 @@ ConvertType(MIVar *var, str_ptr fds)
 		if (!MICommandResultOK(cmd)) {
 			DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 			MICommandFree(cmd);
-			return -1;
+			return NULL;
 		}
 			
-		MIVarGetVarListChildrenInfo(var, cmd);
+		MIGetVarListChildrenInfo(var, cmd);
 		
 		MICommandFree(cmd);
 
 		switch ( var->type[strlen(var->type) - 1] )
 		{
 		case ']': /* array */
-			str_add(fds, "[r0..%dis4]", var->numchild-1);
-
-			/*
-			** Just look at first child to determine type
-			*/
-			if ( ConvertType(var->children[0], fds) != DBGRES_OK ) {
-				return DBGRES_ERR;
-			}
-
+			a = CreateArray(var);
 			break;
 
 		case '*': /* pointer */
-			str_add(fds, "^");
 			if (strncmp(var->type, "struct", 6) == 0) {
-				str_add(fds, "{|");
-				num = var->numchild;
-				for ( i = 0 ; i < num ; i++ )
-				{
-					v = var->children[i];
-					if (i > 0)
-						str_add(fds, ",");
-					if ((s = strrchr(v->name, '.')) != NULL)
-						str_add(fds, "%s=", ++s);
-					if ( ConvertType(v, fds) != DBGRES_OK ) {
-						return DBGRES_ERR;
-					}
-				}
-				str_add(fds, ";;;}");
+				a = CreateStruct(var);
+			} else if (strncmp(var->type, "union", 5) == 0) {
+				a = CreateUnion(var);
 			} else {
-				if ( ConvertType(var->children[0], fds) != DBGRES_OK ) {
-					return DBGRES_ERR;
-				}
+				a = ConvertVarToAIF(var->children[0]->exp, var->children[0]);
 			}
+			if (a != NULL)
+				a = PointerToAIF(a);
 			break;
 						
 		default:
 			if (strncmp(var->type, "struct", 6) == 0) { /* struct */
-				if (var->type[6] == ' ' && var->type[7] != '{')
-					str_add(fds, "{%s|", &var->type[7]);
-				else
-					str_add(fds, "{|");
-				num = var->numchild;
-				for ( i = 0 ; i < num ; i++ )
-				{
-					v = var->children[i];
-					if (i > 0)
-						str_add(fds, ",");
-					if ((s = strrchr(v->name, '.')) != NULL)
-						str_add(fds, "%s=", ++s);
-					if ( ConvertType(v, fds) != DBGRES_OK ) {
-						return DBGRES_ERR;
-					}
-				}
-				str_add(fds, ";;;}");
+				a = CreateStruct(var);
+			} else if (strncmp(var->type, "union", 5) == 0) {
+				a = CreateUnion(var);
 			} else {
 				DbgSetError(DBGERR_DEBUGGER, "type not supported (yet)");
-				return DBGRES_ERR;
+				return NULL;
 			}
 		}
 		
 	}
 
-	return DBGRES_OK;
+	return a;
 }
 
 /*
@@ -1293,12 +1305,12 @@ static int
 GDBMIGetNativeType(char *var)
 {
 	dbg_event *	e;
+	AIF *		a;
 	char *		type;
-	char *		fds;
 
 	CHECK_SESSION()
 
-	if (GetTypeInfo(var, &type, &fds) != DBGRES_OK)
+	if (GetAIFVar(var, &a, &type) != DBGRES_OK)
 		return DBGRES_ERR;
 		
 	e = NewDbgEvent(DBGEV_TYPE);
@@ -1306,7 +1318,7 @@ GDBMIGetNativeType(char *var)
 
 	SaveEvent(e);
 
-	free(fds);
+	AIFFree(a);
 
 	return DBGRES_OK;
 }
@@ -1318,29 +1330,29 @@ static int
 GDBMIGetAIFType(char *var)
 {
 	dbg_event *	e;
+	AIF *		a;
 	char *		type;
-	char *		fds;
 
 	CHECK_SESSION()
 
-	if (GetTypeInfo(var, &type, &fds) != DBGRES_OK)
+	if (GetAIFVar(var, &a, &type) != DBGRES_OK)
 		return DBGRES_ERR;
 		
 	e = NewDbgEvent(DBGEV_TYPE);
-	e->type_desc = fds;
+	e->type_desc = AIF_FORMAT(a);
 
 	SaveEvent(e);
 
-	free(type);
+	AIFFree(a);
 
 	return DBGRES_OK;
 }
 
 static int
-GetTypeInfo(char *var, char **type, char **fds_type)
+GetAIFVar(char *var, AIF **val, char **type)
 {
+	AIF *		res;
 	MIVar *		mivar;
-	str_ptr		fds;
 	MICommand *	cmd;
 	
 	cmd = MIVarCreate("-", "*", var);
@@ -1350,32 +1362,19 @@ GetTypeInfo(char *var, char **type, char **fds_type)
 	if (!MICommandResultOK(cmd)) {
 		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
 		MICommandFree(cmd);
-		return -1;
+		return DBGRES_ERR;
 	}
 		
-	mivar = MIVarGetVarCreateInfo(cmd);
+	mivar = MIGetVarCreateInfo(cmd);
 	
 	MICommandFree(cmd);
 
-#if 0	// var create returns type already
-	if ( !gmi_var_info_type(MIHandle, gvar) )
-	{
-		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+	if ( (res = ConvertVarToAIF(var, mivar)) == NULL ) {
 		return DBGRES_ERR;
 	}
-#endif
-	
+
 	*type = strdup(mivar->type);
-
-	fds = str_init();
-
-	if ( ConvertType(mivar, fds) != DBGRES_OK ) {
-		str_free(fds);
-		return DBGRES_ERR;
-	}
-
-	*fds_type = strdup(str_val(fds));
-	str_free(fds);
+	*val = res;
 
 	cmd = MIVarDelete(mivar->name);
 	
@@ -1509,6 +1508,7 @@ GDBMIQuit(void)
 	return DBGRES_OK;
 }
 
+#if 0
 char tohex[] =	{'0', '1', '2', '3', '4', '5', '6', '7', 
 				 '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
@@ -1544,7 +1544,7 @@ GDBMIBuildAIFVar(char *var, char *type, char *file, AIF **aif)
 
 		*ap++ = '\0';
 	}
-	else 
+	else
 	{
 		if ( (fd = open(file, O_RDONLY)) < 0 )
 		{
@@ -1569,7 +1569,19 @@ GDBMIBuildAIFVar(char *var, char *type, char *file, AIF **aif)
 
 		(void)close(fd);
 	}
-
+	
+	if ( FDSType(type) == AIF_POINTER )
+	{
+		/*
+		 * Need to add marker to data
+		 */
+		ap = malloc(sb.st_size * 2 + 3);
+		*ap++ = '0';
+		*ap++ = '1'; // normal pointer
+		memcpy(ap, data, sb.st_size * 2 + 1);
+		data = ap;		
+	}
+	
 	if ( (*aif = AsciiToAIF(type, data)) == NULL )
 	{
 		DbgSetError(DBGERR_DEBUGGER, AIFErrorStr());
@@ -1578,3 +1590,4 @@ GDBMIBuildAIFVar(char *var, char *type, char *file, AIF **aif)
 	
 	return DBGRES_OK;
 }
+#endif

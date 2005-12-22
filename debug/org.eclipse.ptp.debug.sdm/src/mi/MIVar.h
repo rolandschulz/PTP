@@ -32,8 +32,9 @@ typedef struct MIVar	MIVar;
 extern MIVar *MIVarNew(void);
 extern void MIVarFree(MIVar *var);
 extern MIVar *MIVarParse(List *results);
-extern MIVar *MIVarGetVarCreateInfo(MICommand *cmd);
-extern void MIVarGetVarListChildrenInfo(MIVar *var, MICommand *cmd);
+extern MIVar *MIGetVarCreateInfo(MICommand *cmd);
+extern void MIGetVarListChildrenInfo(MIVar *var, MICommand *cmd);
+extern char *MIGetVarEvaluateExpressionInfo(MICommand *cmd);
 #endif /* _MIVAR_H_ */
 
 
