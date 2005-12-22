@@ -97,6 +97,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		
 		if(proxyPath.equals("") || orted_path.equals("")) {
 			Shell s = Display.getDefault().getActiveShell();
+			System.out.println("SHELL = "+s);
 			if(s != null)
 				new OMPIPrefsDialog(s).open();
 		}

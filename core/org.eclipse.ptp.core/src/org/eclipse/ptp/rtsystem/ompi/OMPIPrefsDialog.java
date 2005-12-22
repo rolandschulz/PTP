@@ -20,7 +20,10 @@
 package org.eclipse.ptp.rtsystem.ompi;
 
 import java.io.File;
+import java.net.URL;
 
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.debug.internal.ui.SWTUtil;
 import org.eclipse.jface.preference.FieldEditor;
@@ -115,7 +118,7 @@ public class OMPIPrefsDialog extends Dialog
 		createContents(shell);
 		shell.pack();
 		Point p = shell.getSize();
-		shell.setSize((p.x) * 2,p.y);
+		shell.setSize((p.x) * 6/5, p.y);
 		shell.open();
 		Display display = getParent().getDisplay();
 		while(!shell.isDisposed()) {
@@ -200,7 +203,6 @@ public class OMPIPrefsDialog extends Dialog
 		
         cancel.addSelectionListener(new SelectionAdapter() {
         	public void widgetSelected(SelectionEvent event) {
-        		System.out.println("CLOSE selected");
         		parent.dispose();
         	}
         });
@@ -211,8 +213,6 @@ public class OMPIPrefsDialog extends Dialog
         
         ok.addSelectionListener(new SelectionAdapter() {
         	public void widgetSelected(SelectionEvent event) {
-        		System.out.println("OK selected");
-
         		ortedFile = ortedPathText.getText();
         		String ortedArgs = defaultOrtedArgs;
         		orteServerFile = orteServerText.getText();
@@ -237,7 +237,30 @@ public class OMPIPrefsDialog extends Dialog
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		
 		orteServerFile = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
-		orteServerText.setText(orteServerFile);
+		
+		/* if they don't have the orte_server path set, let's try and give them a default that might help */
+		if(orteServerFile.equals("")) {
+			URL url = Platform.find(Platform.getBundle(PTPCorePlugin.PLUGIN_ID), new Path("/"));
+
+			if (url != null) {
+				try {
+					File path = new File(Platform.asLocalURL(url).getPath());
+					String ipath = path.getAbsolutePath();
+					System.out.println("Plugin install dir = '"+ipath+"'");
+					int idx = ipath.indexOf("org.eclipse.ptp.core");
+					String ipath2 = ipath.substring(0, idx) + "org.eclipse.ptp.orte/orte_server";
+					orteServerText.setText(ipath2);
+				} catch(Exception e) { 
+					orteServerText.setText("");
+				}
+			}
+			else {
+				orteServerText.setText("");
+			}
+        }
+		else {
+			orteServerText.setText(orteServerFile);
+		}
 
 		ortedFile = preferences.getString(PreferenceConstants.ORTE_ORTED_PATH);
 		ortedPathText.setText(ortedFile);
