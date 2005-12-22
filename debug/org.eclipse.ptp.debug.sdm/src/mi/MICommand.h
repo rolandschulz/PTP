@@ -80,5 +80,6 @@ extern MICommand *MIStackListAllArguments(int vals);
 extern MICommand *MIVarCreate(char *name, char *frame, char *expr);
 extern MICommand *MIVarDelete(char *name);
 extern MICommand *MIVarListChildren(char *name);
+extern MICommand *MIVarEvaluateExpression(char *name);
 #endif /* _MICOMMAND_H_ */
 

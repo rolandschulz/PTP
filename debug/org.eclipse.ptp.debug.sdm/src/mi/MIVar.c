@@ -80,7 +80,7 @@ MIVarParse(List *results)
 }
 
 MIVar *
-MIVarGetVarCreateInfo(MICommand *cmd) 
+MIGetVarCreateInfo(MICommand *cmd) 
 {
 	if (!cmd->completed || cmd->result == NULL)
 		return NULL;
@@ -118,7 +118,7 @@ parseChildren(MIValue *val, List **res)
 }
 
 void
-MIVarGetVarListChildrenInfo(MIVar *var, MICommand *cmd)
+MIGetVarListChildrenInfo(MIVar *var, MICommand *cmd)
 {
 	int				num;
 	MIVar *			child;
@@ -156,4 +156,31 @@ MIVarGetVarListChildrenInfo(MIVar *var, MICommand *cmd)
 	}
 }
 
+char *
+MIGetVarEvaluateExpressionInfo(MICommand *cmd)
+{
+	MIValue *		value;
+	MIResult *		result;
+	MIResultRecord *	rr;
+	char *			expr = NULL;
+
+	if (!cmd->completed)
+		return NULL;
+
+	rr = cmd->result;
+	
+	if (rr != NULL) {
+		for (SetList(rr->results); (result = (MIResult *)GetListElement(rr->results)) != NULL; ) {
+			value = result->value;
+
+			if (strcmp(result->variable, "value") == 0) {
+				if (value->type == MIValueTypeConst) {
+					expr = value->cstring;
+				}
+			}
+		}
+	}
+	
+	return expr;
+}
 

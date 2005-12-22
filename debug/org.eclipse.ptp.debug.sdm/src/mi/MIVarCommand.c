@@ -48,3 +48,12 @@ MIVarListChildren(char *name)
 	return cmd;
 }
 
+MICommand *
+MIVarEvaluateExpression(char *name)
+{
+	MICommand *	cmd;
+	
+	cmd = MICommandNew("-var-evaluate-expression", MIResultRecordDONE);
+	MICommandAddOption(cmd, name, NULL);
+	return cmd;
+}
