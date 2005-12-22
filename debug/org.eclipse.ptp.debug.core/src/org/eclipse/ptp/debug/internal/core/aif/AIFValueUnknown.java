@@ -24,6 +24,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
 public class AIFValueUnknown extends AIFValue {
 	public AIFValueUnknown(IAIFType type) {
 		super(type);
+		size = 0;
 	}
 	protected void parse(byte[] data) {}
 	

@@ -16,46 +16,13 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.aif;
-
-import java.nio.ByteBuffer;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeWChar;
-import org.eclipse.ptp.debug.core.aif.IAIFValueWChar;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-
+package org.eclipse.ptp.debug.core.cdi.event;
 /**
  * @author Clement chu
  * 
  */
-public class AIFValueWChar extends AIFValueIntegral implements IAIFValueWChar {
-	ByteBuffer byteBuffer;
-	
-	public AIFValueWChar(IAIFTypeWChar type, byte[] data) {
-		super(type);
-		parse(data);
-	}
-	protected void parse(byte[] data) {
-		byteBuffer = byteBuffer(data);
-		//TODO -- redo it
-		size = data.length;
-	}
-	public String getValueString() throws PCDIException {
-		if (result == null) {
-			result = stringValue();
-		}
-		return result;
-	}
-	private String stringValue() throws PCDIException {
-		return new String(byteBuffer.array());
-		/*
-		int len = data.get();
-		len <<= 8; //2^8
-		len += data.get();
-		byte[] dst = new byte[len];
-		for (int i=0; i<len; i++) {
-		    dst[i] = data.get();
-		}
-		return new String(dst);
-		*/
-	}
+public interface IPCDIErrorEvent extends IPCDISuspendedEvent {
+	public static final int ERR_NORMAL = 0; // do nothing ans dislpay error
+	public static final int ERR_SERIOUS = 1; // display error and terminate debugger
+	public int getErrorCode();
 }

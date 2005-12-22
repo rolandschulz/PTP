@@ -92,6 +92,7 @@ public class AIFValueArray extends AIFValueDerived implements IAIFValueArray {
 					dst[h] = dataBuf.get();
 				}
 				innerValues[j] = AIFFactory.getAIFValue(baseType, dst);
+				size += ((IAIFValue)innerValues[j]).sizeof(); 
 			}
 		}
 		return innerValues;

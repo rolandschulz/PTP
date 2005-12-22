@@ -37,8 +37,8 @@ public class AIFValueFloatingPoint extends AIFValue implements IAIFValueFloating
 	}
 	protected void parse(byte[] data) {
 		byteBuffer = byteBuffer(data);
+		size = data.length;
 	}
-	
 	public String getValueString() throws PCDIException {
 		if (result == null) {
 			result = getString();

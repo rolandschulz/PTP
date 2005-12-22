@@ -164,6 +164,7 @@ public class AIFFactory {
 	
 	public static IAIFType getAIFType(String fmt) {
 		if (fmt == null || fmt.length() == 0) {
+			System.out.println("        ======= null: " + fmt);
 			return UNKNOWNTYPE;			
 		}
 		switch (fmt.charAt(0)) {

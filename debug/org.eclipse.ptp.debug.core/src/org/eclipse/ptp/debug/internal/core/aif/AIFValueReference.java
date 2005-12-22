@@ -33,7 +33,7 @@ public class AIFValueReference extends AIFValueDerived implements IAIFValueRefer
 		parse(data);
 	}
 	protected void parse(byte[] data) {
-		
+		size = data.length;
 	}
 	public String getValueString() throws PCDIException {
 		if (result == null) {

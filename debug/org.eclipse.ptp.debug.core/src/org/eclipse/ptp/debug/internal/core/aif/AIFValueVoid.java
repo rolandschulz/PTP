@@ -31,7 +31,7 @@ public class AIFValueVoid extends AIFValue {
 		parse(data);
 	}
 	protected void parse(byte[] data) {
-		
+		size = data.length;
 	}	
 	public String getValueString() throws PCDIException {
 		return "";

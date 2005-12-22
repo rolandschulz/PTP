@@ -31,6 +31,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
 public abstract class AIFValue implements IAIFValue {
 	protected IAIFType type = null;
 	protected String result = null;
+	protected int size;
 	
 	public AIFValue(IAIFType type) {
 		this.type = type;
@@ -61,4 +62,7 @@ public abstract class AIFValue implements IAIFValue {
 	}
 	
 	protected abstract void parse(byte[] data);
+	public int sizeof() {
+		return size;
+	}
 }
