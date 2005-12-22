@@ -26,4 +26,5 @@ public interface IAIFValue {
 	String getValueString() throws PCDIException;
 	int getChildrenNumber() throws PCDIException;
 	boolean hasChildren() throws PCDIException;
+	int sizeof();
 }

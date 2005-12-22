@@ -38,6 +38,6 @@ public class AIFValueEnum extends AIFValueIntegral implements IAIFValueEnum {
 		return result;
 	}
 	protected void parse(byte[] data) {
-		
+		size = data.length;
 	}
 }

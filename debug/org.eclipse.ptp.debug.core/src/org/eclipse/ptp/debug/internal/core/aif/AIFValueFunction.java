@@ -38,7 +38,7 @@ public class AIFValueFunction extends AIFValueDerived implements IAIFValueFuncti
 		return null;
 	}
 	protected void parse(byte[] data) {
-		
+		size = data.length;
 	}
 }
 

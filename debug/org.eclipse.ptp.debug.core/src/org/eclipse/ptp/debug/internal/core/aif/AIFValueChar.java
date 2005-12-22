@@ -38,6 +38,7 @@ public class AIFValueChar extends AIFValueIntegral implements IAIFValueChar {
 	}
 	protected void parse(byte[] data) {
 		byteValue = data[0];
+		size = data.length;
 	}
 	public char charValue() throws PCDIException {
 		return (char)byteValue();

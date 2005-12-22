@@ -38,6 +38,7 @@ public abstract class AIFValueAggregate extends AIFValue implements IAIFValueAgg
 		super(type);
 		parse(data);
 	}
+
 	public int getChildrenNumber() throws PCDIException {
 		return values.size();
 	}
@@ -45,14 +46,18 @@ public abstract class AIFValueAggregate extends AIFValue implements IAIFValueAgg
 		IAIFTypeAggregate typeAggregate = (IAIFTypeAggregate)getType();
 		int length = typeAggregate.getNumberOfChildren();
 		int from = 0;
+		System.out.println("---data len: " + data.length);
 		for (int i=0; i<length; i++) {
 			IAIFType aifType = typeAggregate.getType(i);
 			byte[] newData = createByteArray(data, from, aifType.sizeof());
-			values.add(AIFFactory.getAIFValue(aifType, newData));
-			from += newData.length;
+			IAIFValue val = AIFFactory.getAIFValue(aifType, newData);
+			values.add(val);
+			from += val.sizeof();
 		}
+		size = from;
 	}
 	private byte[] createByteArray(byte[] data, int from, int size) {
+		System.out.println("---data len: " + data.length  + ", from: " + from + ", size: " + size);
 		byte[] newByte = new byte[size];
 		System.arraycopy(data, from, newByte, 0, size);
 		return newByte;

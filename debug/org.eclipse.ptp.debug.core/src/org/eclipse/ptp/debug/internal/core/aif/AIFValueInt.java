@@ -34,6 +34,7 @@ public class AIFValueInt extends AIFValueIntegral implements IAIFValueInt {
 	}
 	protected void parse(byte[] data) {
 		byteBuffer = byteBuffer(data);
+		size = data.length;		
 	}
 	public String getValueString() throws PCDIException {
 		if (result == null) {
@@ -56,13 +57,13 @@ public class AIFValueInt extends AIFValueIntegral implements IAIFValueInt {
 		}
 	}
 	public boolean isLong() {
-		return (type.sizeof() == 8);
+		return (size == 8);
 	}
 	public boolean isShort() {
-		return (type.sizeof() == 2);
+		return (size == 2);
 	}
 	public boolean isInt() {
-		return (type.sizeof() == 4);
+		return (size == 4);
 	}
 	public byte[] byteValue() throws PCDIException {
 		return byteBuffer.array();

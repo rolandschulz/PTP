@@ -41,6 +41,7 @@ public class AIFValueBool extends AIFValueIntegral implements IAIFValueBool {
 	}
 	protected void parse(byte[] data) {
 		boolValue = (data[0]>0);
+		size = data.length;
 	}
 	public boolean booleanValue() throws PCDIException {
 		return boolValue;
