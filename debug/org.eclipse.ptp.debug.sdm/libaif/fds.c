@@ -37,9 +37,9 @@ static char	_fds_type_str[NUM_AIF_TYPES][12] =
 
 	{ FDS_ARRAY_START, '%', 's', FDS_ARRAY_END, '%', 's', '\0' },
 
-	{ FDS_STRUCT_START, FDS_ID, ';', ';', ';', FDS_STRUCT_END, '\0' },
+	{ FDS_STRUCT_START, '%', 's', FDS_ID, ';', ';', ';', FDS_STRUCT_END, '\0' },
 
-	{ FDS_UNION_START, FDS_ID, FDS_UNION_END, '\0' },
+	{ FDS_UNION_START, '%', 's', FDS_ID, FDS_UNION_END, '\0' },
 
 	{ FDS_FUNCTION, FDS_FUNCTION_ARG_END, '%', 's', '\0' },
 
@@ -59,7 +59,7 @@ static char	_fds_type_str[NUM_AIF_TYPES][12] =
 	  FDS_RANGE_SEP, FDS_RANGE_SEP, 
 	  '%', 'd', '%', 's', '\0' },
 
-	{ FDS_ENUM_START, FDS_ID, FDS_ENUM_END, FDS_INTEGER, '%', 'c', '4', '\0' },
+	{ FDS_ENUM_START, '%', 's', FDS_ID, FDS_ENUM_END, FDS_INTEGER, '%', 'c', '4', '\0' },
 
 	{ FDS_BOOLEAN, '\0' }
 };
@@ -520,16 +520,27 @@ TypeToFDS(int type, ...)
 		break;
 
 	case AIF_ENUM:
+		v3 = strdup(va_arg(args, char *));
+		if (v3 == NULL)
+			v3 = strdup("");
 		v1 = va_arg(args, int);
-		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v1 ? FDS_INTEGER_SIGNED : FDS_INTEGER_UNSIGNED);
+		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v3, v1 ? FDS_INTEGER_SIGNED : FDS_INTEGER_UNSIGNED);
+		_aif_free(v3);
 		break;
 
 	case AIF_STRING:
 	case AIF_CHARACTER:
 	case AIF_BOOLEAN:
+		strcpy(_fds_buf, _fds_type_str[type]);
+		break;
+
 	case AIF_STRUCT:
 	case AIF_UNION:
-		strcpy(_fds_buf, _fds_type_str[type]);
+		v3 = strdup(va_arg(args, char *));
+		if (v3 == NULL)
+			v3 = strdup("");
+		snprintf(_fds_buf, BUFSIZ-1, _fds_type_str[type], v3);
+		_aif_free(v3);
 		break;
 
 	case AIF_RANGE:
@@ -828,6 +839,23 @@ FDSArraySize(char *fds)
 	}
 
 	return size;
+}
+
+char *
+FDSRangeInit(int min, int max)
+{
+	return strdup(TypeToFDS(AIF_RANGE, min, max, "is4"));
+}
+
+char *
+FDSArrayInit(int min, int max, char *btype)
+{
+	char *	res;
+	char *	range = FDSRangeInit(min, max);
+	
+	res = strdup(TypeToFDS(AIF_ARRAY, range, btype));
+	_aif_free(range);
+	return res;
 }
 
 /*
@@ -1445,9 +1473,9 @@ FDSStructFieldIndex(char *fds, char *name)
 }
 
 char *
-FDSStructInit(void)
+FDSStructInit(char *id)
 {
-	return strdup(TypeToFDS(AIF_STRUCT));
+	return strdup(TypeToFDS(AIF_STRUCT, id));
 }
 
 /*
@@ -1686,9 +1714,9 @@ FDSEnumConstByName(char *fds, char *name, int *val)
 }
 
 char *
-FDSEnumInit(void)
+FDSEnumInit(char *id)
 {
-	return strdup(TypeToFDS(AIF_ENUM, 1));
+	return strdup(TypeToFDS(AIF_ENUM, id, 1));
 }
 
 char *
@@ -1815,9 +1843,9 @@ FDSUnionFieldByName(char *fds, char *name, char **type)
 }
 
 char *
-FDSUnionInit(void)
+FDSUnionInit(char *id)
 {
-	return strdup(TypeToFDS(AIF_UNION));
+	return strdup(TypeToFDS(AIF_UNION, id));
 }
 
 char *
@@ -1888,9 +1916,9 @@ FDSUnionAdd(char **fds, char *name, char *type)
 }
 
 char *
-FDSClassInit(void)
+FDSClassInit(char *id)
 {
-	return FDSStructInit();
+	return FDSStructInit(id);
 }
 
 /*

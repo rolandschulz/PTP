@@ -102,14 +102,14 @@ typedef double AIFDOUBLEST;
  */
 struct AIFIndex
 {
-	int	i_finished;
-	int	i_rank;
-	int	i_nel;
+	int		i_finished;
+	int		i_rank;
+	int		i_nel;
 	int *	i_min;
 	int *	i_max;
 	int *	i_index;
 	char *	i_btype;
-	int	i_bsize;
+	int		i_bsize;
 };
 typedef struct AIFIndex	AIFIndex;
 
@@ -122,7 +122,7 @@ struct AIF
 
 	struct
 	{
-		unsigned	a_data_len;
+		unsigned		a_data_len;
 		char *		a_data_val;
 	} a_data;
 };
@@ -207,7 +207,7 @@ typedef enum aifopt	aifopt;
  * data to a file.
  */
 
-#define AIFMODE_READ	0x001
+#define AIFMODE_READ		0x001
 #define AIFMODE_CREATE	0x002
 #define AIFMODE_APPEND	0x004
 
@@ -216,29 +216,29 @@ typedef enum aifopt	aifopt;
 struct AIFFILE
 {
 	FILE *	af_fp;
-	int	af_mode;
-	int	af_cnt;
+	int		af_mode;
+	int		af_cnt;
 };
 typedef struct AIFFILE	AIFFILE;
 
 #include	"fds.h"
 
 #define AIF_ARRAY_TYPE(range, base)	TypeToFDS(AIF_ARRAY, (range), (base))
-#define AIF_BOOLEAN_TYPE()		TypeToFDS(AIF_BOOLEAN)
-#define AIF_CHARACTER_TYPE()		TypeToFDS(AIF_CHARACTER)
-#define AIF_ENUM_TYPE(sign)		TypeToFDS(AIF_ENUM, (sign))
+#define AIF_BOOLEAN_TYPE()			TypeToFDS(AIF_BOOLEAN)
+#define AIF_CHARACTER_TYPE()			TypeToFDS(AIF_CHARACTER)
+#define AIF_ENUM_TYPE(sign)			TypeToFDS(AIF_ENUM, (sign))
 #define AIF_FLOATING_TYPE(len)		TypeToFDS(AIF_FLOATING, (len))
 #define AIF_FUNCTION_TYPE(base)		TypeToFDS(AIF_FUNCTION, (base))
 #define AIF_INTEGER_TYPE(sign, len)	TypeToFDS(AIF_INTEGER, (sign), (len))
-#define AIF_NAME_TYPE(name, base)	TypeToFDS(AIF_ARRAY, (name), (base))
+#define AIF_NAME_TYPE(name, base)		TypeToFDS(AIF_ARRAY, (name), (base))
 #define AIF_POINTER_TYPE(base)		TypeToFDS(AIF_POINTER, (base))
 #define AIF_RANGE_TYPE(lo, hi, base)	TypeToFDS(AIF_RANGE, (lo), (hi), (base))
 #define AIF_REFERENCE_TYPE(ref)		TypeToFDS(AIF_REFERENCE, (ref))
 #define AIF_REGION_TYPE(name, base)	TypeToFDS(AIF_ARRAY, (name), (base))
-#define AIF_STRING_TYPE()		TypeToFDS(AIF_STRING)
-#define AIF_STRUCT_TYPE()		TypeToFDS(AIF_STRUCT)
-#define AIF_UNION_TYPE()		TypeToFDS(AIF_UNION)
-#define AIF_VOID_TYPE(len)		TypeToFDS(AIF_VOID, (len))
+#define AIF_STRING_TYPE()				TypeToFDS(AIF_STRING)
+#define AIF_STRUCT_TYPE()				TypeToFDS(AIF_STRUCT)
+#define AIF_UNION_TYPE()				TypeToFDS(AIF_UNION)
+#define AIF_VOID_TYPE(len)			TypeToFDS(AIF_VOID, (len))
 
 /*
  * AIF routines.
@@ -248,6 +248,7 @@ extern AIF *		AIFAdd(AIF *, AIF *);
 extern int		AIFAddConstToEnum(AIF *, char *, AIF *);
 extern int		AIFAddFieldToStruct(AIF *, char *, AIF *);
 extern int		AIFAddFieldToUnion(AIF *, char *, char *);
+extern void		AIFAddArrayElement(AIF *, int, AIF *);
 extern AIF *		AIFAnd(AIF *, AIF *);
 extern int		AIFArrayBounds(AIF *, int, int **, int **, int **);
 extern AIF *		AIFArrayElement(AIF *, AIFIndex *);
@@ -257,10 +258,10 @@ extern int		AIFArrayElementToInt(AIF *, AIFIndex *, int *);
 extern int		AIFArrayElementToLongest(AIF *, AIFIndex *, AIFLONGEST *);
 extern void		AIFArrayIndexFree(AIFIndex *);
 extern int		AIFArrayIndexInc(AIFIndex *);
-extern AIFIndex *	AIFArrayIndexInit(AIF *);
+extern AIFIndex *AIFArrayIndexInit(AIF *);
 extern int		AIFArrayIndexInRange(int, int *, int *, int *);
 extern int		AIFArrayIndexToStr(char **, AIFIndex *);
-extern char *		AIFArrayIndexType(AIF *);
+extern char *	AIFArrayIndexType(AIF *);
 extern int		AIFArrayInfo(AIF *, int *, char **, int *);
 extern int		AIFArrayMaxIndex(AIF *, int);
 extern int		AIFArrayMinIndex(AIF *, int);
@@ -279,8 +280,8 @@ extern AIF *		AIFDiff(int, AIF *, AIF *);
 extern AIF *		AIFDiv(AIF *, AIF *);
 extern int		AIFEPS(AIF *, AIF *, AIF *, int *);
 extern int		AIFEnumToStr(char **, int, AIF *);
-extern aiferr		AIFError(void);
-extern char *		AIFErrorStr(void);
+extern aiferr	AIFError(void);
+extern char *	AIFErrorStr(void);
 extern int		AIFFieldToDouble(AIF *, char *, double *);
 extern int		AIFFieldToDoublest(AIF *, char *, AIFDOUBLEST *);
 extern int		AIFFieldToInt(AIF *, char *, int *);
@@ -290,7 +291,7 @@ extern int		AIFFloatToStr(char **, int, AIF *);
 extern int		AIFFunctionToStr(char **, int, AIF *);
 extern void		AIFFree(AIF *);
 extern AIF *		AIFGetEnum(AIF *);
-extern char *		AIFGetIdentifier(AIF *);
+extern char *	AIFGetIdentifier(AIF *);
 extern int		AIFGetOption(aifopt);
 extern AIF *		AIFGetStruct(AIF *, char *);
 extern AIF *		AIFGetUnion(AIF *, char *);
@@ -352,15 +353,20 @@ extern int		AIFVoidToStr(char **, int, AIF *);
 extern int		AIFWriteSet(AIFFILE *, AIF *, char *);
 extern AIF *		ArrayToAIF(int, int *, int *, char *, int, char *);
 extern AIF *		AsciiToAIF(char *, char *);
-extern AIF * 		BoolToAIF(int);
+extern AIF * 	BoolToAIF(int);
 extern AIF *		CharToAIF(char);
 extern AIF *		CopyAIF(AIF *);
 extern AIF *		DoubleToAIF(double);
-extern AIF *		EmptyEnumToAIF(void);
-extern AIF *		EmptyStructToAIF(void);
-extern AIF *		EmptyUnionToAIF(void);
+extern AIF *		EmptyArrayToAIF(int, int, AIF *);
+extern AIF *		EmptyEnumToAIF(char *);
+extern AIF *		EmptyStructToAIF(char *);
+extern AIF *		EmptyUnionToAIF(char *);
 extern AIF *		FloatToAIF(float);
 extern AIF *		IntToAIF(int);
+extern AIF *		LongToAIF(long);
+#ifdef CC_HAS_LONG_LONG
+extern AIF *		LongLongToAIF(long long);
+#endif /* CC_HAS_LONG_LONG */
 extern AIF *		LongestToAIF(AIFLONGEST);
 extern AIF *		MakeAIF(char *, char *);
 extern AIF *		NameAIF(AIF *, int);
@@ -369,8 +375,14 @@ extern AIF *		PointerNameToAIF(AIF *);
 extern AIF *		PointerReferenceToAIF(AIF *);
 extern AIF *		PointerToAIF(AIF *);
 extern AIF *		ReferenceAIF(int); 
+extern AIF *		ShortToAIF(short);
 extern AIF *		StringToAIF(char *);
+extern AIF *		UnsignedShortToAIF(unsigned short);
 extern AIF *		UnsignedIntToAIF(unsigned int);
+extern AIF *		UnsignedLongToAIF(unsigned long);
+#ifdef CC_HAS_LONG_LONG
+extern AIF *		UnsignedLongLongToAIF(unsigned long long);
+#endif /* CC_HAS_LONG_LONG */
 extern AIF *		VoidToAIF(char *, int);
 
 #endif /* !_AIF_H */
