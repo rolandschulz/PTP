@@ -22,7 +22,8 @@ package org.eclipse.ptp.debug.core.cdi.event;
  * 
  */
 public interface IPCDIErrorEvent extends IPCDISuspendedEvent {
-	public static final int ERR_NORMAL = 0; // do nothing ans dislpay error
-	public static final int ERR_SERIOUS = 1; // display error and terminate debugger
+	public static final int DBG_WARNING = 0; // do nothing
+	public static final int DBG_ERROR = 1; // display error only
+	public static final int DBG_FATAL = 2; // display error and terminate debugger
 	public int getErrorCode();
 }

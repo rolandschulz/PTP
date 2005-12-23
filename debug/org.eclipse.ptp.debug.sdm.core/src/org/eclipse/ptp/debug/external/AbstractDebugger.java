@@ -149,7 +149,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 				session.unregisterTargets(tasks.toArray(), true);
 				setProcessStatus(tasks.toArray(), IPProcess.ERROR);
 				IPCDIErrorEvent errEvent = (IPCDIErrorEvent)event;
-				if (errEvent.getErrorCode() == IPCDIErrorEvent.ERR_SERIOUS) {
+				if (errEvent.getErrorCode() == IPCDIErrorEvent.DBG_FATAL) {
 					postCommand(new StopDebuggerCommand());
 				}
 			} else if (event instanceof IPCDISuspendedEvent) {

@@ -79,10 +79,10 @@ public class AIFFactory {
 	public static final String SIGN_DOT = ".";
 	
 	public static final String FDS_STRUCT_END = ";;;}";
-	public static final String FDS_CLASS_END = "...}";
-	public static final String FDS_UNION_END = "...)";
-	public static final String FDS_ENUM_END =  "...>";
-	public static final String FDS_FUNC_END =  ".../";
+	public static final String FDS_CLASS_END = "}";
+	public static final String FDS_UNION_END = ")";
+	public static final String FDS_ENUM_END =  ">";
+	public static final String FDS_FUNC_END =  "/";
 	public static final String FDS_REF_END = "/";
 	
 	public static final int SIZE_BOOL = 1;

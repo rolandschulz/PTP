@@ -403,10 +403,10 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			completeCommand(null);
 			int code = errEvent.getErrorCode();
 			if (code == IParallelDebuggerConstants.DBGERR_DEBUGGER || code == IParallelDebuggerConstants.DBGERR_NOFILEDIR || code == IParallelDebuggerConstants.DBGERR_CHDIR) {
-				code = IPCDIErrorEvent.ERR_SERIOUS;
+				code = IPCDIErrorEvent.DBG_FATAL;
 			}
 			else {
-				code = IPCDIErrorEvent.ERR_NORMAL;
+				code = IPCDIErrorEvent.DBG_ERROR;
 			}
 			handleErrorEvent(e.getBitSet(), errEvent.getErrorMessage(), code);
 			//fireEvent(new ErrorEvent(getSession(), e.getBitSet(), "Internal debugger error"));
