@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
 import org.eclipse.ptp.debug.external.commands.IDebugCommand;
 
 /**
@@ -57,7 +58,7 @@ public class DebugCommandQueue extends Thread {
 					//System.out.println("************ ERROR in DebugCommandQueue -- wait for return, cmd: " + currentCommand);
 				//}
 			} catch (PCDIException e) {
-				debugger.handleErrorEvent(currentCommand.getTasks(), "Err on execute " + currentCommand.getName() + " command, err: " + e.getMessage());
+				debugger.handleErrorEvent(currentCommand.getTasks(), "Err on execute " + currentCommand.getName() + " command, err: " + e.getMessage(), IPCDIErrorEvent.DBG_ERROR);
 				//System.out.println("************ ERROR in DebugCommandQueue -- execCommand, cmd: " + currentCommand + ", err: " + e.getMessage());
 			} finally {
 				currentCommand = null;
@@ -96,7 +97,7 @@ public class DebugCommandQueue extends Thread {
 				queue.notifyAll();
 			}
 			else {
-				debugger.handleErrorEvent(command.getTasks(), "Duplicate in " + command.getName() + " command");
+				debugger.handleErrorEvent(command.getTasks(), "Duplicate in " + command.getName() + " command", IPCDIErrorEvent.DBG_WARNING);
 				//System.out.println("************ ERROR in DebugCommandQueue -- duplicate, cmd: " + currentCommand);
 			}
 		}
