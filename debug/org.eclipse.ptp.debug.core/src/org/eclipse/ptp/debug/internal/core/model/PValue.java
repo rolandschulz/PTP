@@ -31,11 +31,11 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueChar;
-import org.eclipse.ptp.debug.core.aif.IAIFValueFloatingPoint;
+import org.eclipse.ptp.debug.core.aif.IAIFValueFloat;
 import org.eclipse.ptp.debug.core.aif.IAIFValueInt;
 import org.eclipse.ptp.debug.core.aif.IAIFValuePointer;
 import org.eclipse.ptp.debug.core.aif.IAIFValueReference;
-import org.eclipse.ptp.debug.core.aif.IAIFValueWChar;
+import org.eclipse.ptp.debug.core.aif.IAIFValueString;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
 import org.eclipse.ptp.debug.core.model.IPDebugElementStatus;
@@ -146,14 +146,14 @@ public class PValue extends AbstractPValue {
 				return getCharValueString((IAIFValueChar) aifValue);
 			else if (aifValue instanceof IAIFValueInt)
 				return getIntValueString((IAIFValueInt) aifValue);
-			else if (aifValue instanceof IAIFValueFloatingPoint)
-				return getFloatingPointValueString((IAIFValueFloatingPoint) aifValue);
+			else if (aifValue instanceof IAIFValueFloat)
+				return getFloatingPointValueString((IAIFValueFloat) aifValue);
 			else if (aifValue instanceof IAIFValuePointer)
 				return getPointerValueString((IAIFValuePointer) aifValue);
 			else if (aifValue instanceof IAIFValueReference)
 				return processUnderlyingValue(((IAIFValueReference) aifValue).referenceValue());
-			else if (aifValue instanceof IAIFValueWChar)
-				return getWCharValueString((IAIFValueWChar) aifValue);
+			else if (aifValue instanceof IAIFValueString)
+				return getWCharValueString((IAIFValueString) aifValue);
 			else
 				return aifValue.getValueString();
 		}
@@ -197,7 +197,7 @@ public class PValue extends AbstractPValue {
 		}
 		return null;
 	}
-	private String getFloatingPointValueString(IAIFValueFloatingPoint value) throws CDIException {
+	private String getFloatingPointValueString(IAIFValueFloat value) throws CDIException {
 		if (value.isDouble()) {
 			return getDoubleValueString(value.getValueString());
 		} else if (value.isFloat()) {
@@ -262,7 +262,7 @@ public class PValue extends AbstractPValue {
 			return address.toString();
 		return null;
 	}
-	private String getWCharValueString(IAIFValueWChar value) throws CDIException {
+	private String getWCharValueString(IAIFValueString value) throws CDIException {
 		return value.getValueString();
 		/*
 		if (getParentVariable() instanceof PVariable) {

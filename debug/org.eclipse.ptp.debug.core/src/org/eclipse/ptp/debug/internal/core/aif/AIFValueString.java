@@ -18,19 +18,44 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
-/**
- * @deprecated
- */
-public class AIFValueString {
-	/*
-	private String val;
-	
-	public AIFValueString(String val) {
-		this.val = val;
-	}
+import java.nio.ByteBuffer;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeString;
+import org.eclipse.ptp.debug.core.aif.IAIFValueString;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
-	public String toString() {
-		return this.val;
+/**
+ * @author Clement chu
+ * 
+ */
+public class AIFValueString extends ValueIntegral implements IAIFValueString {
+	ByteBuffer byteBuffer;
+	
+	public AIFValueString(IAIFTypeString type, byte[] data) {
+		super(type);
+		parse(data);
 	}
-	*/
+	protected void parse(byte[] data) {
+		byteBuffer = byteBuffer(data);
+		//TODO -- redo it
+		size = data.length;
+	}
+	public String getValueString() throws PCDIException {
+		if (result == null) {
+			result = stringValue();
+		}
+		return result;
+	}
+	private String stringValue() throws PCDIException {
+		return new String(byteBuffer.array());
+		/*
+		int len = data.get();
+		len <<= 8; //2^8
+		len += data.get();
+		byte[] dst = new byte[len];
+		for (int i=0; i<len; i++) {
+		    dst[i] = data.get();
+		}
+		return new String(dst);
+		*/
+	}
 }

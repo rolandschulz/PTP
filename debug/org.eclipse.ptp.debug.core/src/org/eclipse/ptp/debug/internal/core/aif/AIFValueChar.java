@@ -23,7 +23,7 @@ import org.eclipse.ptp.debug.core.aif.IAIFTypeChar;
 import org.eclipse.ptp.debug.core.aif.IAIFValueChar;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
-public class AIFValueChar extends AIFValueIntegral implements IAIFValueChar {
+public class AIFValueChar extends ValueIntegral implements IAIFValueChar {
 	byte byteValue;
 	
 	public AIFValueChar(IAIFTypeChar type, byte[] data) {

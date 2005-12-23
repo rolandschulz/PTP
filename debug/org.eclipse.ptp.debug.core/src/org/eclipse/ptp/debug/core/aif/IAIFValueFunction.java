@@ -21,5 +21,5 @@ package org.eclipse.ptp.debug.core.aif;
  * @author Clement chu
  * 
  */
-public interface IAIFValueFunction extends IAIFValueDerived {}
+public interface IAIFValueFunction extends IValueDerived {}
 

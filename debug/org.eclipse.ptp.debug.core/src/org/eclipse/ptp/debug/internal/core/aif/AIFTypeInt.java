@@ -20,7 +20,7 @@ package org.eclipse.ptp.debug.internal.core.aif;
 
 import org.eclipse.ptp.debug.core.aif.IAIFTypeInt;
 
-public class AIFTypeInt extends AIFTypeIntegral implements IAIFTypeInt {
+public class AIFTypeInt extends TypeIntegral implements IAIFTypeInt {
 	private int size;
 	//is?
 	public AIFTypeInt(int size) {

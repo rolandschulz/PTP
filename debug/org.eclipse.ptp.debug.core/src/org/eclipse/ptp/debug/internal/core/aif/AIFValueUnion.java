@@ -25,7 +25,7 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueUnion;
  * @author Clement chu
  * 
  */
-public class AIFValueUnion extends AIFValueAggregate implements IAIFValueUnion {
+public class AIFValueUnion extends ValueAggregate implements IAIFValueUnion {
 	public AIFValueUnion(IAIFTypeUnion type, byte[] data) {
 		super(type, data);
 	}

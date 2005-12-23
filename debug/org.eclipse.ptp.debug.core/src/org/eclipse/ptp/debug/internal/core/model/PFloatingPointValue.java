@@ -21,7 +21,7 @@ package org.eclipse.ptp.debug.internal.core.model;
 import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
-import org.eclipse.ptp.debug.core.aif.IAIFValueFloatingPoint;
+import org.eclipse.ptp.debug.core.aif.IAIFValueFloat;
 
 /**
  * @author clement CHU
@@ -41,8 +41,8 @@ public class PFloatingPointValue extends PValue {
 			} catch (DebugException e) {
 				throw new CDIException(e.getMessage());
 			}
-			if (cdiValue instanceof IAIFValueFloatingPoint) {
-				fFloatingPointValue = new Float(((IAIFValueFloatingPoint)cdiValue).getValueString());
+			if (cdiValue instanceof IAIFValueFloat) {
+				fFloatingPointValue = new Float(((IAIFValueFloat)cdiValue).getValueString());
 			}
 		}
 		return fFloatingPointValue;

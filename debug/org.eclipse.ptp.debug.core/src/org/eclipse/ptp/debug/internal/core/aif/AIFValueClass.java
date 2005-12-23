@@ -25,7 +25,7 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueClass;
  * @author Clement chu
  * 
  */
-public class AIFValueClass extends AIFValueAggregate implements IAIFValueClass {
+public class AIFValueClass extends ValueAggregate implements IAIFValueClass {
 	public AIFValueClass(IAIFTypeClass type, byte[] data) {
 		super(type, data);
 	}

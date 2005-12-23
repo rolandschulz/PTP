@@ -22,7 +22,7 @@ import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeFunction;
 
-public class AIFTypeFunction extends AIFTypeDerived implements IAIFTypeFunction {
+public class AIFTypeFunction extends TypeDerived implements IAIFTypeFunction {
 	private String[] args = new String[0];
 	
 	//&A1,A2,.../T	

@@ -25,7 +25,7 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueStruct;
  * @author Clement chu
  * 
  */
-public class AIFValueStruct extends AIFValueAggregate implements IAIFValueStruct {
+public class AIFValueStruct extends ValueAggregate implements IAIFValueStruct {
 	public AIFValueStruct(IAIFTypeStruct type, byte[] data) {
 		super(type, data);
 	}

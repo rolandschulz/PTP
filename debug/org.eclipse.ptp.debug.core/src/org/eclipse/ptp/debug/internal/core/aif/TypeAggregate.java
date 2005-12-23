@@ -22,19 +22,19 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeAggregate;
+import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
 
 /**
  * @author Clement chu
  * 
  */
-public abstract class AIFTypeAggregate extends AIFType implements IAIFTypeAggregate {
+public abstract class TypeAggregate extends AIFType implements ITypeAggregate {
 	protected List fields = new ArrayList(); 
 	protected List types = new ArrayList();
 	protected String name;
 	private int size = 0;
 
-	public AIFTypeAggregate(String format) {
+	public TypeAggregate(String format) {
 		parse(format);
 	}
 	public String getName() {

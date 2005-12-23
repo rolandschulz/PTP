@@ -16,45 +16,12 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.aif;
-
-import java.math.BigInteger;
-import org.eclipse.ptp.debug.core.ExtFormat;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeIntegral;
-import org.eclipse.ptp.debug.core.aif.IAIFValueIntegral;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-
+package org.eclipse.ptp.debug.core.aif;
 /**
  * @author Clement chu
  * 
  */
-public abstract class AIFValueIntegral extends AIFValue implements IAIFValueIntegral {
-	public AIFValueIntegral(IAIFTypeIntegral type) {
-		super(type);
-	}
-	
-	public BigInteger bigIntegerValue() throws PCDIException {
-		return bigIntegerValue(getValueString());
-	}
-	
-	public static BigInteger bigIntegerValue(String valueString) {
-		if (valueString.startsWith("@")) {
-			valueString = valueString.substring(1);
-			int colon = valueString.indexOf(':');
-			if (colon != -1) {
-				valueString = valueString.substring(colon + 1); 
-			}
-		} else {
-			int space = valueString.indexOf(' ');
-			if (space != -1) {
-				valueString = valueString.substring(0, space).trim();
-			}			
-		}
-
-		try {
-			return ExtFormat.getBigInteger(valueString);
-		} catch (NumberFormatException e) {
-		}
-		return BigInteger.ZERO;
-	}
+public interface IValueAggregate extends IAIFValue {
+	public IAIFValue getValue(int index);
 }
+

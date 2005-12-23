@@ -18,36 +18,27 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
-import org.eclipse.ptp.debug.core.aif.IAIFTypeFloatingPoint;
+import org.eclipse.ptp.debug.core.aif.IAIFType;
+import org.eclipse.ptp.debug.core.aif.ITypeDerived;
 
-public class AIFTypeFloatingPoint extends AIFType implements IAIFTypeFloatingPoint {
-	int size;
-	boolean complex;
-	boolean imaginary;
-	boolean islong;
+/**
+ * @author Clement chu
+ * 
+ */
+public abstract class TypeDerived extends AIFType implements ITypeDerived {
+	protected IAIFType basetype;
 	
-	public AIFTypeFloatingPoint(int size) {
-		this(size, false, false, false);
+	public TypeDerived(IAIFType basetype) {
+		this.basetype = basetype;
 	}
-	public AIFTypeFloatingPoint(int size, boolean complex, boolean imaginary, boolean islong) {
-		this.size = size;
-		this.complex = complex;
-		this.imaginary = imaginary;
-		this.islong = islong;
-	}
-	public boolean isComplex() {
-		return complex;
-	}
-	public boolean isImaginary() {
-		return imaginary;
-	}
-	public boolean isLong() {
-		return islong;
+	public IAIFType getBaseType() {
+		return basetype;
 	}
 	public int sizeof() {
-		return size;
+		return basetype.sizeof();
 	}
 	public String toString() {
-		return "f" + sizeof();
+		return getBaseType().toString();
 	}
 }
+

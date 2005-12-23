@@ -21,7 +21,7 @@ package org.eclipse.ptp.debug.core.aif;
  * @author Clement chu
  * 
  */
-public interface IAIFTypeEnum extends IAIFTypeIntegral {
+public interface IAIFTypeEnum extends ITypeIntegral {
 	public IAIFType getBaseType();
 	public String getName();
 	public String[] getFields();

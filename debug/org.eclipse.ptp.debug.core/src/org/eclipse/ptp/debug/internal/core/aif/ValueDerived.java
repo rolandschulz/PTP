@@ -16,14 +16,18 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.aif;
+package org.eclipse.ptp.debug.internal.core.aif;
 
+import org.eclipse.ptp.debug.core.aif.ITypeDerived;
+import org.eclipse.ptp.debug.core.aif.IValueDerived;
 
 /**
  * @author Clement chu
  * 
  */
-public interface IAIFTypeDerived extends IAIFType {
-	IAIFType getBaseType();
+public abstract class ValueDerived extends AIFValue implements IValueDerived {
+	public ValueDerived(ITypeDerived type) {
+		super(type);
+	}
 }
 

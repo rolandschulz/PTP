@@ -21,5 +21,11 @@ package org.eclipse.ptp.debug.core.aif;
  * @author Clement chu
  * 
  */
-public interface IAIFTypeWChar extends IAIFTypeIntegral {}
-
+public interface ITypeAggregate extends IAIFType {
+	public String getName();
+	public String[] getFields();
+	public IAIFType[] getTypes();
+	public String getField(int index);
+	public IAIFType getType(int index);
+	public int getNumberOfChildren();
+}

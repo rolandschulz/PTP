@@ -21,7 +21,7 @@ package org.eclipse.ptp.debug.internal.core.aif;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeBool;
 
-public class AIFTypeBool extends AIFTypeIntegral implements IAIFTypeBool {
+public class AIFTypeBool extends TypeIntegral implements IAIFTypeBool {
 	//b
 	public AIFTypeBool() {
 		this(true);

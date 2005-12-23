@@ -29,7 +29,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * @author Clement chu
  * 
  */
-public class AIFValuePointer extends AIFValueDerived implements IAIFValuePointer {
+public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 	int marker = 0;
 	IAIFValue value;
 	
@@ -72,6 +72,6 @@ public class AIFValuePointer extends AIFValueDerived implements IAIFValuePointer
 	}
 	
 	public BigInteger pointerValue() throws PCDIException {
-		return AIFValueIntegral.bigIntegerValue(getValueString());
+		return ValueIntegral.bigIntegerValue(getValueString());
 	}
 }

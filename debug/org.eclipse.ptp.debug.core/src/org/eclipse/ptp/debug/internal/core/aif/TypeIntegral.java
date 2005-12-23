@@ -18,44 +18,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
-import java.nio.ByteBuffer;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeWChar;
-import org.eclipse.ptp.debug.core.aif.IAIFValueWChar;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.aif.ITypeIntegral;
 
 /**
  * @author Clement chu
  * 
  */
-public class AIFValueWChar extends AIFValueIntegral implements IAIFValueWChar {
-	ByteBuffer byteBuffer;
+public abstract class TypeIntegral extends AIFType implements ITypeIntegral {
+	boolean signed;
 	
-	public AIFValueWChar(IAIFTypeWChar type, byte[] data) {
-		super(type);
-		parse(data);
+	public TypeIntegral(boolean signed) {
+		this.signed = signed;
 	}
-	protected void parse(byte[] data) {
-		byteBuffer = byteBuffer(data);
-		//TODO -- redo it
-		size = data.length;
+	public boolean isSigned() {
+		return signed;
 	}
-	public String getValueString() throws PCDIException {
-		if (result == null) {
-			result = stringValue();
-		}
-		return result;
-	}
-	private String stringValue() throws PCDIException {
-		return new String(byteBuffer.array());
-		/*
-		int len = data.get();
-		len <<= 8; //2^8
-		len += data.get();
-		byte[] dst = new byte[len];
-		for (int i=0; i<len; i++) {
-		    dst[i] = data.get();
-		}
-		return new String(dst);
-		*/
-	}
+	public String toString() {
+		return "i" + (isSigned()?"s":"u") + sizeof();
+	}	
 }
+

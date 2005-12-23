@@ -27,7 +27,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * @author Clement chu
  * 
  */
-public class AIFValueReference extends AIFValueDerived implements IAIFValueReference {
+public class AIFValueReference extends ValueDerived implements IAIFValueReference {
 	public AIFValueReference(IAIFTypeReference type, byte[] data) {
 		super(type);
 		parse(data);

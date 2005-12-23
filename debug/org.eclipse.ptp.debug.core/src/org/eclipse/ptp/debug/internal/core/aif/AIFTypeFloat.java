@@ -16,16 +16,38 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.aif;
-/**
- * @author Clement chu
- * 
- */
-public interface IAIFTypeAggregate extends IAIFType {
-	public String getName();
-	public String[] getFields();
-	public IAIFType[] getTypes();
-	public String getField(int index);
-	public IAIFType getType(int index);
-	public int getNumberOfChildren();
+package org.eclipse.ptp.debug.internal.core.aif;
+
+import org.eclipse.ptp.debug.core.aif.IAIFTypeFloat;
+
+public class AIFTypeFloat extends AIFType implements IAIFTypeFloat {
+	int size;
+	boolean complex;
+	boolean imaginary;
+	boolean islong;
+	
+	public AIFTypeFloat(int size) {
+		this(size, false, false, false);
+	}
+	public AIFTypeFloat(int size, boolean complex, boolean imaginary, boolean islong) {
+		this.size = size;
+		this.complex = complex;
+		this.imaginary = imaginary;
+		this.islong = islong;
+	}
+	public boolean isComplex() {
+		return complex;
+	}
+	public boolean isImaginary() {
+		return imaginary;
+	}
+	public boolean isLong() {
+		return islong;
+	}
+	public int sizeof() {
+		return size;
+	}
+	public String toString() {
+		return "f" + sizeof();
+	}
 }

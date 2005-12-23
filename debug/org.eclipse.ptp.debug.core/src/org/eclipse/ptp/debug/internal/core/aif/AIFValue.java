@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -49,9 +48,9 @@ public abstract class AIFValue implements IAIFValue {
 		return byteBuffer(data, 0);
 	}
 	protected ByteBuffer byteBuffer(byte[] data, int offset) {
-		ByteBuffer bBuffer = ByteBuffer.wrap(data, offset, data.length);
-		bBuffer.order(ByteOrder.nativeOrder());
-		return bBuffer;
+		return ByteBuffer.wrap(data, offset, data.length);
+		//bBuffer.order(ByteOrder.nativeOrder());
+		//return bBuffer;
 	}
 	public String toString() {
 		try {

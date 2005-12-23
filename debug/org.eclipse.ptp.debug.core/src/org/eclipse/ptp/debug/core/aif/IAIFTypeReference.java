@@ -21,7 +21,7 @@ package org.eclipse.ptp.debug.core.aif;
  * @author Clement chu
  * 
  */
-public interface IAIFTypeReference extends IAIFTypeDerived {
+public interface IAIFTypeReference extends ITypeDerived {
 	public String getName();
 }
 

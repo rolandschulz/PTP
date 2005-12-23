@@ -21,4 +21,4 @@ package org.eclipse.ptp.debug.core.aif;
  * @author Clement chu
  * 
  */
-public interface IAIFTypeUnion extends IAIFTypeAggregate {}
+public interface IAIFTypeUnion extends ITypeAggregate {}

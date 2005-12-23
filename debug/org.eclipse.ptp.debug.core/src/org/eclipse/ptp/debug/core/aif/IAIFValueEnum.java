@@ -21,5 +21,5 @@ package org.eclipse.ptp.debug.core.aif;
  * @author Clement chu
  * 
  */
-public interface IAIFValueEnum extends IAIFValueIntegral {}
+public interface IAIFValueEnum extends IValueIntegral {}
 

@@ -21,7 +21,7 @@ package org.eclipse.ptp.debug.internal.core.aif;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeChar;
 
-public class AIFTypeChar extends AIFTypeIntegral implements IAIFTypeChar {
+public class AIFTypeChar extends TypeIntegral implements IAIFTypeChar {
 	//c
 	public AIFTypeChar() {
 		this(true);

@@ -24,7 +24,7 @@ import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeEnum;
 
-public class AIFTypeEnum extends AIFTypeIntegral implements IAIFTypeEnum {
+public class AIFTypeEnum extends TypeIntegral implements IAIFTypeEnum {
 	private List fields = new ArrayList();
 	private List values = new ArrayList();
 	private IAIFType basetype;

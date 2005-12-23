@@ -31,7 +31,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * @author Clement chu
  * 
  */
-public class AIFValueArray extends AIFValueDerived implements IAIFValueArray {
+public class AIFValueArray extends ValueDerived implements IAIFValueArray {
 	private Object[] values;
 	private int current_dimension_position = 0;
 	private int current_position = 0;

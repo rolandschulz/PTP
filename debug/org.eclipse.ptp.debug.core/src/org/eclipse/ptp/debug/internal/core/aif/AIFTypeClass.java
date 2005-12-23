@@ -21,7 +21,7 @@ package org.eclipse.ptp.debug.internal.core.aif;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeClass;
 
-public class AIFTypeClass extends AIFTypeAggregate implements IAIFTypeClass {
+public class AIFTypeClass extends TypeAggregate implements IAIFTypeClass {
 	//{ID|N1=F1,...; N2=F2,...; N3=F3,...; N4=F4,...}
 	public AIFTypeClass(String format) {
 		super(format);

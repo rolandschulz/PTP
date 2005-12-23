@@ -25,7 +25,7 @@ import org.eclipse.ptp.debug.core.aif.IAIFTypeReference;
  * @author Clement chu
  * 
  */
-public class AIFTypeReference extends AIFTypeDerived implements IAIFTypeReference {
+public class AIFTypeReference extends TypeDerived implements IAIFTypeReference {
 	private String name;
 	//>name/
 	public AIFTypeReference(String format) {

@@ -22,7 +22,7 @@ package org.eclipse.ptp.debug.internal.core.aif;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
 
-public class AIFTypePointer extends AIFTypeDerived implements IAIFTypePointer {
+public class AIFTypePointer extends TypeDerived implements IAIFTypePointer {
 	//char*: ^c
 	public AIFTypePointer(IAIFType basetype) {
 		super(basetype);
