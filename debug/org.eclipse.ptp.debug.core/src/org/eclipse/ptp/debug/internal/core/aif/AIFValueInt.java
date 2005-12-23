@@ -25,7 +25,7 @@ import org.eclipse.ptp.debug.core.aif.IAIFTypeInt;
 import org.eclipse.ptp.debug.core.aif.IAIFValueInt;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
-public class AIFValueInt extends AIFValueIntegral implements IAIFValueInt {
+public class AIFValueInt extends ValueIntegral implements IAIFValueInt {
 	ByteBuffer byteBuffer;
 	
 	public AIFValueInt(IAIFTypeInt type, byte[] data) {

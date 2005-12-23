@@ -24,7 +24,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * @author Clement chu
  * 
  */
-public interface IAIFValueInt extends IAIFValueIntegral {
+public interface IAIFValueInt extends IValueIntegral {
 	public boolean isLong();
 	public boolean isShort();
 	public boolean isInt();

@@ -24,7 +24,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * @author Clement chu
  * 
  */
-public interface IAIFValueBool extends IAIFValueIntegral {
+public interface IAIFValueBool extends IValueIntegral {
 	public boolean booleanValue() throws PCDIException;
 }
 

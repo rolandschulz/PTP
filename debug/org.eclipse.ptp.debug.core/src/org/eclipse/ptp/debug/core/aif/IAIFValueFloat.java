@@ -24,7 +24,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * @author Clement chu
  * 
  */
-public interface IAIFValueFloatingPoint extends IAIFValue {
+public interface IAIFValueFloat extends IAIFValue {
 	public boolean isFloat();
 	public boolean isDouble();
 	public double doubleValue() throws PCDIException;

@@ -16,25 +16,16 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.aif;
+package org.eclipse.ptp.debug.core.aif;
 
-import org.eclipse.ptp.debug.core.aif.IAIFTypeIntegral;
+import java.math.BigInteger;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
  * 
  */
-public abstract class AIFTypeIntegral extends AIFType implements IAIFTypeIntegral {
-	boolean signed;
-	
-	public AIFTypeIntegral(boolean signed) {
-		this.signed = signed;
-	}
-	public boolean isSigned() {
-		return signed;
-	}
-	public String toString() {
-		return "i" + (isSigned()?"s":"u") + sizeof();
-	}	
+public interface IValueIntegral extends IAIFValue {
+	public BigInteger bigIntegerValue() throws PCDIException;
 }
 

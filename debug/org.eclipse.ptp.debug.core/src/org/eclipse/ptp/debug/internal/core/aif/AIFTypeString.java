@@ -16,16 +16,27 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import org.eclipse.ptp.debug.core.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeString;
+
 /**
- * @deprecated temporary
+ * @author Clement chu
+ * 
  */
-public class AIFTypeString {
-	/*
+public class AIFTypeString extends TypeIntegral implements IAIFTypeString {
+	public AIFTypeString() {
+		this(true);
+	}
+	public AIFTypeString(boolean signed) {
+		super(signed);
+		System.out.println("======================= NEED TEST ====================");
+	}
+	public int sizeof() {
+		return AIFFactory.SIZE_INVALID;
+	}
 	public String toString() {
 		return "s";
-	}
-	*/
+	}		
 }

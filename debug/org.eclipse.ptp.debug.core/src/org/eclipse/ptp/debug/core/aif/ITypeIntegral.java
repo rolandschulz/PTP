@@ -21,5 +21,7 @@ package org.eclipse.ptp.debug.core.aif;
  * @author Clement chu
  * 
  */
-public interface IAIFValueDerived extends IAIFValue {}
+public interface ITypeIntegral extends IAIFType {
+	boolean isSigned();
+}
 

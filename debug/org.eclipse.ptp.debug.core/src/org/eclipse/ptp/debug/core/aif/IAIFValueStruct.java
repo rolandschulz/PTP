@@ -21,5 +21,5 @@ package org.eclipse.ptp.debug.core.aif;
  * @author Clement chu
  * 
  */
-public interface IAIFValueStruct extends IAIFValueAggregate {}
+public interface IAIFValueStruct extends IValueAggregate {}
 

@@ -26,7 +26,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * @author Clement chu
  * 
  */
-public class AIFValueBool extends AIFValueIntegral implements IAIFValueBool {
+public class AIFValueBool extends ValueIntegral implements IAIFValueBool {
 	boolean boolValue;
 	
 	public AIFValueBool(IAIFTypeBool type, byte[] data) {

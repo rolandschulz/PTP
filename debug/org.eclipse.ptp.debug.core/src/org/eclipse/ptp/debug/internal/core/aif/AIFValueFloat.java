@@ -20,18 +20,18 @@ package org.eclipse.ptp.debug.internal.core.aif;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeFloatingPoint;
-import org.eclipse.ptp.debug.core.aif.IAIFValueFloatingPoint;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeFloat;
+import org.eclipse.ptp.debug.core.aif.IAIFValueFloat;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
  * 
  */
-public class AIFValueFloatingPoint extends AIFValue implements IAIFValueFloatingPoint {
+public class AIFValueFloat extends AIFValue implements IAIFValueFloat {
 	ByteBuffer byteBuffer;
 	
-	public AIFValueFloatingPoint(IAIFTypeFloatingPoint type, byte[] data) {
+	public AIFValueFloat(IAIFTypeFloat type, byte[] data) {
 		super(type);
 		parse(data);
 	}

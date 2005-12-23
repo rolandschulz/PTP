@@ -21,7 +21,7 @@ package org.eclipse.ptp.debug.core.aif;
  * @author Clement chu
  * 
  */
-public interface IAIFTypeArray extends IAIFTypeDerived {
+public interface IAIFTypeArray extends ITypeDerived {
 	public int getDimension();
 	public IAIFTypeRange[] getRanges();
 	public IAIFTypeRange getRange(int index);

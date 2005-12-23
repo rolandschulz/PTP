@@ -24,7 +24,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * @author Clement chu
  * 
  */
-public interface IAIFValueReference extends IAIFValueDerived {
+public interface IAIFValueReference extends IValueDerived {
 	IAIFValue referenceValue() throws PCDIException;
 }
 

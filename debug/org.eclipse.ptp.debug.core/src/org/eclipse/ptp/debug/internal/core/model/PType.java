@@ -21,8 +21,8 @@ package org.eclipse.ptp.debug.internal.core.model;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeArray;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeChar;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeFloatingPoint;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeIntegral;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeFloat;
+import org.eclipse.ptp.debug.core.aif.ITypeIntegral;
 import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeRange;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeReference;
@@ -64,7 +64,7 @@ public class PType implements IPType {
 		return (getAIFType() instanceof IAIFTypeChar);
 	}
 	public boolean isFloatingPointType() {
-		return (getAIFType() instanceof IAIFTypeFloatingPoint);
+		return (getAIFType() instanceof IAIFTypeFloat);
 	}
 	public boolean isPointer() {
 		return (getAIFType() instanceof IAIFTypePointer);
@@ -76,10 +76,10 @@ public class PType implements IPType {
 		return (getAIFType() instanceof IAIFTypeStruct);
 	}
 	public boolean isSigned() {
-		return (isIntegralType()) ? false: ((IAIFTypeIntegral) getAIFType()).isSigned();
+		return (isIntegralType()) ? false: ((ITypeIntegral) getAIFType()).isSigned();
 	}
 	public boolean isIntegralType() {
-		return (getAIFType() instanceof IAIFTypeIntegral);
+		return (getAIFType() instanceof ITypeIntegral);
 	}
 	protected IAIFType getAIFType() {
 		return fAIFType;

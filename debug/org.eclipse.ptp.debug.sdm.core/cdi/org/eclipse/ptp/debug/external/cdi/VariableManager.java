@@ -29,9 +29,9 @@ import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.aif.AIF;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIF;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeAggregate;
+import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
-import org.eclipse.ptp.debug.core.aif.IAIFValueAggregate;
+import org.eclipse.ptp.debug.core.aif.IValueAggregate;
 import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
@@ -181,9 +181,9 @@ public class VariableManager extends Manager {
 	public IPCDIVariable[] getVariables(VariableDescriptor varDesc) throws CDIException {
 		IAIFValue parrentValue = varDesc.getAIF().getValue();
 		
-		if (parrentValue instanceof IAIFValueAggregate) {
-			IAIFValueAggregate parentAggrValue = (IAIFValueAggregate)parrentValue;
-			IAIFTypeAggregate parentAggrType = (IAIFTypeAggregate)parentAggrValue.getType();
+		if (parrentValue instanceof IValueAggregate) {
+			IValueAggregate parentAggrValue = (IValueAggregate)parrentValue;
+			ITypeAggregate parentAggrType = (ITypeAggregate)parentAggrValue.getType();
 			int length = parentAggrValue.getChildrenNumber();
 			IPCDIVariable[] vars = new IPCDIVariable[length];			
 			for (int i=0; i<length; i++) {

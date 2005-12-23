@@ -21,7 +21,7 @@ package org.eclipse.ptp.debug.internal.core.aif;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeStruct;
 
-public class AIFTypeStruct extends AIFTypeAggregate implements IAIFTypeStruct {	
+public class AIFTypeStruct extends TypeAggregate implements IAIFTypeStruct {	
 	//only base type: {structName|floatnumber=f4,intnumber=is4,shortnumber=is2,longnumber=is4,doubleumber=f8;;;}
 	//complex type: {structName|floatnumber=f4,intnumber=is4,tStr22={testStruct|aFloat=f4,intNum=is4;;;},shortnumber=is2;;;}
 	public AIFTypeStruct(String format) {

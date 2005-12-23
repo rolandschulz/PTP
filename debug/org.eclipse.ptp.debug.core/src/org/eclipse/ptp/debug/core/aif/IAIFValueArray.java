@@ -25,7 +25,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * @author Clement chu
  * 
  */
-public interface IAIFValueArray extends IAIFValueDerived {
+public interface IAIFValueArray extends IValueDerived {
 	public int getCurrentDimensionPosition();
 	public int getCurrentPosition();
 	public IAIFValueArray getParent();

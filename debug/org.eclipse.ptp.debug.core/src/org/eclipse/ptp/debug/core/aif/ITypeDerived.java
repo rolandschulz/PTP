@@ -17,11 +17,13 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.aif;
+
+
 /**
  * @author Clement chu
  * 
  */
-public interface IAIFTypeIntegral extends IAIFType {
-	boolean isSigned();
+public interface ITypeDerived extends IAIFType {
+	IAIFType getBaseType();
 }
 

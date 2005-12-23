@@ -21,5 +21,5 @@ package org.eclipse.ptp.debug.core.aif;
  * @author Clement chu
  * 
  */
-public interface IAIFTypeChar extends IAIFTypeIntegral {}
+public interface IAIFTypeChar extends ITypeIntegral {}
 

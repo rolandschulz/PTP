@@ -21,7 +21,7 @@ package org.eclipse.ptp.debug.core.aif;
  * @author Clement chu
  * 
  */
-public interface IAIFTypeFloatingPoint extends IAIFType {
+public interface IAIFTypeFloat extends IAIFType {
 	boolean isImaginary();
 	boolean isComplex();
 	boolean isLong();

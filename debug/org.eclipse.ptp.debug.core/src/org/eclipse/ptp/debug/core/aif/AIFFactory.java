@@ -24,7 +24,7 @@ import org.eclipse.ptp.debug.internal.core.aif.AIFTypeBool;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeChar;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeClass;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeEnum;
-import org.eclipse.ptp.debug.internal.core.aif.AIFTypeFloatingPoint;
+import org.eclipse.ptp.debug.internal.core.aif.AIFTypeFloat;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeFunction;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeIncomplete;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeInt;
@@ -33,16 +33,17 @@ import org.eclipse.ptp.debug.internal.core.aif.AIFTypeReference;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeStruct;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeUnion;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeVoid;
-import org.eclipse.ptp.debug.internal.core.aif.AIFTypeWChar;
+import org.eclipse.ptp.debug.internal.core.aif.AIFTypeString;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueArray;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueBool;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueChar;
-import org.eclipse.ptp.debug.internal.core.aif.AIFValueFloatingPoint;
+import org.eclipse.ptp.debug.internal.core.aif.AIFValueFloat;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueInt;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValuePointer;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueStruct;
+import org.eclipse.ptp.debug.internal.core.aif.AIFValueUnion;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueUnknown;
-import org.eclipse.ptp.debug.internal.core.aif.AIFValueWChar;
+import org.eclipse.ptp.debug.internal.core.aif.AIFValueString;
 
 /**
  * @author Clement chu
@@ -100,12 +101,12 @@ public class AIFFactory {
 		}
 		if (type instanceof IAIFTypeChar) {
 			 return new AIFValueChar((IAIFTypeChar)type, data);
-		} else if (type instanceof IAIFTypeFloatingPoint) {
-			return new AIFValueFloatingPoint((IAIFTypeFloatingPoint)type, data);
+		} else if (type instanceof IAIFTypeFloat) {
+			return new AIFValueFloat((IAIFTypeFloat)type, data);
 		} else if (type instanceof IAIFTypeInt) {
 			return new AIFValueInt((IAIFTypeInt)type, data);
-		} else if (type instanceof IAIFTypeWChar) {
-			return new AIFValueWChar((IAIFTypeWChar)type, data);
+		} else if (type instanceof IAIFTypeString) {
+			return new AIFValueString((IAIFTypeString)type, data);
 		} else if (type instanceof IAIFTypeBool) {
 			return new AIFValueBool((IAIFTypeBool)type, data);
 		} else if (type instanceof IAIFTypeArray) {
@@ -114,12 +115,12 @@ public class AIFFactory {
 			return new AIFValuePointer((IAIFTypePointer)type, data);
 		} else if (type instanceof IAIFTypeStruct) {
 			return new AIFValueStruct((IAIFTypeStruct)type, data);			
+		} else if (type instanceof IAIFTypeUnion) {
+			return new AIFValueUnion((IAIFTypeUnion)type, data);
 		
 		/*
 		} else if (type instanceof IAIFTypeClass) {
 			return new AIFValueClass((IAIFTypeClass)type, data);
-		} else if (type instanceof IAIFTypeUnion) {
-			return new AIFValueUnion((IAIFTypeUnion)type, data);
 		} else if (type instanceof IAIFTypeFunction) {
 			return new AIFValueFunction((IAIFTypeFunction)type, data);			
 		} else if (type instanceof IAIFTypeEnum) {
@@ -174,7 +175,7 @@ public class AIFFactory {
 		case FDS_FLOAT:
 			int float_size = Character.digit(fmt.charAt(FDS_FLOAT_SIZE_POS), 10);
 			System.out.println("        ======= floating: " + fmt + ", size: " + float_size);
-			return new AIFTypeFloatingPoint(float_size);
+			return new AIFTypeFloat(float_size);
 		case FDS_INT: //long and int is same???  long long type
 			boolean signed = (fmt.charAt(FDS_INTEGER_SIGN_POS) == 's');
 			int int_size = Character.digit(fmt.charAt(FDS_INTEGER_SIZE_POS), 10);
@@ -182,7 +183,7 @@ public class AIFFactory {
 			return new AIFTypeInt(signed, int_size);
 		case FDS_STRING:
 			System.out.println("        ======= string: " + fmt);
-			return new AIFTypeWChar();
+			return new AIFTypeString();
 		case FDS_BOOL:
 			System.out.println("        ======= boolean: " + fmt);
 			return new AIFTypeBool();

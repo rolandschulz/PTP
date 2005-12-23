@@ -26,7 +26,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * @author Clement chu
  * 
  */
-public class AIFValueEnum extends AIFValueIntegral implements IAIFValueEnum { 
+public class AIFValueEnum extends ValueIntegral implements IAIFValueEnum { 
 	public AIFValueEnum(IAIFTypeEnum type, byte[] data) {
 		super(type);
 		parse(data);

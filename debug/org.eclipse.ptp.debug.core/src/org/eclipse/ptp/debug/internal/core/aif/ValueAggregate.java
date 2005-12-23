@@ -22,19 +22,19 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeAggregate;
+import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
-import org.eclipse.ptp.debug.core.aif.IAIFValueAggregate;
+import org.eclipse.ptp.debug.core.aif.IValueAggregate;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
  * 
  */
-public abstract class AIFValueAggregate extends AIFValue implements IAIFValueAggregate {
+public abstract class ValueAggregate extends AIFValue implements IValueAggregate {
 	protected List values = new ArrayList();
 	
-	public AIFValueAggregate(IAIFTypeAggregate type, byte[] data) {
+	public ValueAggregate(ITypeAggregate type, byte[] data) {
 		super(type);
 		parse(data);
 	}
@@ -43,7 +43,7 @@ public abstract class AIFValueAggregate extends AIFValue implements IAIFValueAgg
 		return values.size();
 	}
 	protected void parse(byte[] data) {
-		IAIFTypeAggregate typeAggregate = (IAIFTypeAggregate)getType();
+		ITypeAggregate typeAggregate = (ITypeAggregate)getType();
 		int length = typeAggregate.getNumberOfChildren();
 		int from = 0;
 		System.out.println("---data len: " + data.length);
