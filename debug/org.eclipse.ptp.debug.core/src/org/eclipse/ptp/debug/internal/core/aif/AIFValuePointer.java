@@ -45,20 +45,15 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 	}
 	protected void parse(byte[] data) {
 		marker = data[0];
-		String bb = String.valueOf(data[0]);
-		System.out.println("--------------- len: " + data.length);
-		System.out.println("--------------- type: " + type.sizeof());
-		System.out.println("--------------- marker1: " + bb);
-		System.out.println("--------------- marker2: " + marker);
+		IAIFTypePointer pType = (IAIFTypePointer)type;
+		System.out.println("--------------- marker: " + marker);
 		switch (marker) {
 		case 0:
 			value = AIFFactory.UNKNOWNVALUE;
 			break;
 		case 1:
-			byte[] newByte = new byte[data.length-1];
-			System.arraycopy(data, 1, newByte, 0, newByte.length);
-			String a = new String(newByte);
-			System.out.println("=============== 1: " + a);
+			byte[] newByte = createByteArray(data, 1, data.length-1);
+			value = AIFFactory.getAIFValue(pType.getBaseType(), newByte);
 			break;
 		case 2:
 			break;
@@ -68,7 +63,8 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 			value = AIFFactory.UNKNOWNVALUE;
 			break;
 		}
-		size = data.length;		
+		size = value.sizeof();		
+		System.out.println("--------------- pointer value: " + value.toString());
 	}
 	
 	public BigInteger pointerValue() throws AIFException {
