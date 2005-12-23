@@ -541,12 +541,15 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				fireTerminatedEvent(job, event.getAllProcesses());
 			} else if (event instanceof ErrorEvent) {
 				final ErrorEvent errEvent = (ErrorEvent)event;
-				Display.getDefault().asyncExec(new Runnable() {
-					public void run() {
-						IPCDIErrorInfo info = (IPCDIErrorInfo)errEvent.getReason();
-						PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", new Exception("Error: " + info.getMessage() + " on tasks: "+ errEvent.getAllProcesses().toString()));						
-					}
-				});
+				int errCode = errEvent.getErrorCode();
+				if (errCode == ErrorEvent.DBG_ERROR || errCode == ErrorEvent.DBG_FATAL) {
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run() {
+							IPCDIErrorInfo info = (IPCDIErrorInfo)errEvent.getReason();
+							PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", new Exception("Error: " + info.getMessage() + " on tasks: "+ errEvent.getAllProcesses().toString()));						
+						}
+					});
+				}
 			} else if (event instanceof InferiorSignaledEvent) {
 				InferiorSignaledEvent signalEvent = (InferiorSignaledEvent) event;
 				ICDILocator locator = signalEvent.getLocator();
