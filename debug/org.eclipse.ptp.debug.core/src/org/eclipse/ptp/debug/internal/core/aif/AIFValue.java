@@ -49,8 +49,12 @@ public abstract class AIFValue implements IAIFValue {
 	}
 	protected ByteBuffer byteBuffer(byte[] data, int offset) {
 		return ByteBuffer.wrap(data, offset, data.length);
-		//bBuffer.order(ByteOrder.nativeOrder());
-		//return bBuffer;
+	}
+	protected byte[] createByteArray(byte[] data, int from, int size) {
+		System.out.println("---data len: " + data.length  + ", from: " + from + ", size: " + size);
+		byte[] newByte = new byte[size];
+		System.arraycopy(data, from, newByte, 0, size);
+		return newByte;
 	}
 	public String toString() {
 		try {

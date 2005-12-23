@@ -34,9 +34,4 @@ public class AIFValueUnknown extends AIFValue {
 		}
 		return result;
 	}
-	/*
-	public String toString() {
-		return "<value not supported>";
-	}
-	*/
 }

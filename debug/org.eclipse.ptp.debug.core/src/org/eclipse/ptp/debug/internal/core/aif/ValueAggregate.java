@@ -46,7 +46,6 @@ public abstract class ValueAggregate extends AIFValue implements IValueAggregate
 		ITypeAggregate typeAggregate = (ITypeAggregate)getType();
 		int length = typeAggregate.getNumberOfChildren();
 		int from = 0;
-		System.out.println("---data len: " + data.length);
 		for (int i=0; i<length; i++) {
 			IAIFType aifType = typeAggregate.getType(i);
 			byte[] newData = createByteArray(data, from, aifType.sizeof());
@@ -55,12 +54,6 @@ public abstract class ValueAggregate extends AIFValue implements IValueAggregate
 			from += val.sizeof();
 		}
 		size = from;
-	}
-	private byte[] createByteArray(byte[] data, int from, int size) {
-		System.out.println("---data len: " + data.length  + ", from: " + from + ", size: " + size);
-		byte[] newByte = new byte[size];
-		System.arraycopy(data, from, newByte, 0, size);
-		return newByte;
 	}
 	public String getValueString() throws AIFException {
 		if (result == null) {
