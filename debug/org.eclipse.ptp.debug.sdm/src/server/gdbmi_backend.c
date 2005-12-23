@@ -1111,7 +1111,7 @@ SimpleVarToAIF(char *exp, MIVar *var)
 			if ((res = GetVarValue(var->name)) == NULL) {
 				return NULL;
 			}
-			
+		
 			switch (s->type) {
 			case CHAR:
 				if ((p = strchr(res, ' ')) != NULL)
@@ -1174,7 +1174,6 @@ static AIF *
 CreateStruct(MIVar *var)
 {
 	int		i;
-	char *	s;
 	MIVar *	v;
 	AIF *	a;
 	AIF *	ac;
@@ -1187,13 +1186,11 @@ CreateStruct(MIVar *var)
 	for ( i = 0 ; i < var->numchild ; i++ )
 	{
 		v = var->children[i];
-		if ((s = strrchr(v->name, '.')) != NULL) {
-			if ( (ac = ConvertVarToAIF(v->exp, v)) == NULL ) {
-				AIFFree(a);
-				return NULL;
-			}
-			AIFAddFieldToStruct(a, ++s, ac);
+		if ( (ac = ConvertVarToAIF(v->exp, v)) == NULL ) {
+			AIFFree(a);
+			return NULL;
 		}
+		AIFAddFieldToStruct(a, v->exp, ac);
 	}
 	return a;
 }
@@ -1202,8 +1199,6 @@ static AIF *
 CreateUnion(MIVar *var)
 {
 	int		i;
-	char *	s;
-	char *	name = NULL;
 	MIVar *	v;
 	AIF *	a;
 	AIF *	ac;
@@ -1216,22 +1211,19 @@ CreateUnion(MIVar *var)
 	for ( i = 0 ; i < var->numchild ; i++ )
 	{
 		v = var->children[i];
-		if ((s = strrchr(v->name, '.')) != NULL) {
-			if ( (ac = ConvertVarToAIF(v->exp, v)) == NULL ) {
-				AIFFree(a);
-				return NULL;
-			}
-			name = ++s;
-			AIFAddFieldToUnion(a, name, AIF_FORMAT(ac));
+		if ( (ac = ConvertVarToAIF(v->exp, v)) == NULL ) {
+			AIFFree(a);
+			return NULL;
 		}
+		AIFAddFieldToUnion(a, v->exp, AIF_FORMAT(ac));
+		
+		/*
+		 * Set the union value
+		 */
+		if (i == var->numchild - 1)
+			AIFSetUnion(a, v->exp, ac);
 	}
 	
-	/*
-	 * Set the union value
-	 */
-	if (name != NULL)
-		AIFSetUnion(a, name, ac);
-		
 	return a;
 }
 
@@ -1253,7 +1245,7 @@ CreateArray(MIVar *var)
 		AIFAddArrayElement(a, i, ac);
 		AIFFree(ac);
 	}
-	
+
 	return a;
 }
 
