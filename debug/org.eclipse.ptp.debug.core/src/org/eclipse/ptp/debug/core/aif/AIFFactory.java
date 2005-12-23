@@ -30,20 +30,20 @@ import org.eclipse.ptp.debug.internal.core.aif.AIFTypeIncomplete;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeInt;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypePointer;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeReference;
+import org.eclipse.ptp.debug.internal.core.aif.AIFTypeString;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeStruct;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeUnion;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeVoid;
-import org.eclipse.ptp.debug.internal.core.aif.AIFTypeString;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueArray;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueBool;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueChar;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueFloat;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueInt;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValuePointer;
+import org.eclipse.ptp.debug.internal.core.aif.AIFValueString;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueStruct;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueUnion;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueUnknown;
-import org.eclipse.ptp.debug.internal.core.aif.AIFValueString;
 
 /**
  * @author Clement chu

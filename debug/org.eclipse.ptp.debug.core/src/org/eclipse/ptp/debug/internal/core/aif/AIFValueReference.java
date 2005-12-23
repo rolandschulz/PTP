@@ -18,10 +18,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeReference;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueReference;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -35,13 +35,13 @@ public class AIFValueReference extends ValueDerived implements IAIFValueReferenc
 	protected void parse(byte[] data) {
 		size = data.length;
 	}
-	public String getValueString() throws PCDIException {
+	public String getValueString() throws AIFException {
 		if (result == null) {
 			result = String.valueOf("");
 		}
 		return null;
 	}
-	public IAIFValue referenceValue() throws PCDIException {
+	public IAIFValue referenceValue() throws AIFException {
 		IAIFValue value = null;
 		/*
 		IAIFTypeReference rt = (IAIFTypeReference)getType();

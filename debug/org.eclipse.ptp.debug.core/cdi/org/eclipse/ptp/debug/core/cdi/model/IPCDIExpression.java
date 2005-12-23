@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
@@ -29,7 +28,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
 public interface IPCDIExpression extends IPCDIObject {
 	String getExpressionText();
 	boolean equals(IPCDIExpression expr);
-	void dispose() throws CDIException;
+	void dispose() throws PCDIException;
 	IAIF getAIF(IPCDIStackFrame frame) throws PCDIException;
 }
 

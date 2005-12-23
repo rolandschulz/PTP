@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -30,5 +30,5 @@ public interface IPCDIWatchpoint extends IPCDIBreakpoint {
 
 	boolean isWriteType();
 	boolean isReadType();
-	String getWatchExpression() throws CDIException;
+	String getWatchExpression() throws PCDIException;
 }

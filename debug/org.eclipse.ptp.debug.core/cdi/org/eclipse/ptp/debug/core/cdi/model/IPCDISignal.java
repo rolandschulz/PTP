@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -29,7 +29,7 @@ public interface IPCDISignal extends IPCDIObject {
 	String getDescription();
 	boolean isIgnore();
 	boolean isStopSet();
-	void signal() throws CDIException ;
-	void handle(boolean ignore, boolean stop) throws CDIException;
+	void signal() throws PCDIException ;
+	void handle(boolean ignore, boolean stop) throws PCDIException;
 }
 

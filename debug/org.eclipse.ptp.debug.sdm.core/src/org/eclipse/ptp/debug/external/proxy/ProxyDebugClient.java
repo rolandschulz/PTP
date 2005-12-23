@@ -20,7 +20,6 @@
 package org.eclipse.ptp.debug.external.proxy;
 
 import java.io.IOException;
-
 import org.eclipse.ptp.core.util.BitList;
 
 public class ProxyDebugClient extends AbstractProxyDebugClient {

@@ -18,14 +18,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
  * 
  */
 public interface IPCDIThreadStorageDescriptor extends IPCDIVariableDescriptor {
-	IPCDIThread getThread() throws CDIException;
+	IPCDIThread getThread() throws PCDIException;
 }
 
 

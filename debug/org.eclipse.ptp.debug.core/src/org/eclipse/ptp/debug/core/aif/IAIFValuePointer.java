@@ -19,13 +19,12 @@
 package org.eclipse.ptp.debug.core.aif;
 
 import java.math.BigInteger;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
  * 
  */
 public interface IAIFValuePointer extends IValueDerived {
-	BigInteger pointerValue() throws PCDIException;
+	BigInteger pointerValue() throws AIFException;
 }
 

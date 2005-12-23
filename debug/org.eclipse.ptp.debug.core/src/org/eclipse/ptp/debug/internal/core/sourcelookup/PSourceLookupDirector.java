@@ -35,9 +35,9 @@ import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.WorkspaceSourceContainer;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
-import org.eclipse.ptp.debug.core.sourcelookup.PDirectorySourceContainer;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLookupDirector;
 import org.eclipse.ptp.debug.core.sourcelookup.MappingSourceContainer;
+import org.eclipse.ptp.debug.core.sourcelookup.PDirectorySourceContainer;
 
 public class PSourceLookupDirector extends AbstractSourceLookupDirector implements IPSourceLookupDirector {
 	private static Set fSupportedTypes;

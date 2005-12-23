@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.external.cdi.model;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
@@ -104,7 +103,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		if (cthread instanceof Thread) {
 			try {
 				setCurrentThread((Thread)cthread, doUpdate);
-			} catch (CDIException e) {
+			} catch (PCDIException e) {
 				throw new PCDIException(e.getMessage());
 			}
 		} else {
@@ -115,7 +114,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		suspended = state;
 		notifyAll();
 	}
-	public void setCurrentThread(Thread cthread, boolean doUpdate) throws CDIException {
+	public void setCurrentThread(Thread cthread, boolean doUpdate) throws PCDIException {
 		int id = cthread.getId();
 		if (id == 0) {
 			return;
@@ -131,7 +130,7 @@ public class Target extends SessionObject implements IPCDITarget {
 			}
 		}
 		if (currentThreadId != id) {
-			throw new CDIException("Cannot switch to thread " + id);
+			throw new PCDIException("Cannot switch to thread " + id);
 		}
 	}
 	public synchronized void updateState(int newThreadId) {
@@ -139,7 +138,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		currentThreadId = newThreadId;
 		try {
 			currentThreads = getCThreads();
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			currentThreads = noThreads;
 		}
 
@@ -178,7 +177,7 @@ public class Target extends SessionObject implements IPCDITarget {
 			//TODO - thread created event?
 		}
 	}
-	private Thread[] getCThreads() throws CDIException {
+	private Thread[] getCThreads() throws PCDIException {
 		Thread[] cthreads = noThreads;
 		//TODO - implement list threads
 		//Session session = (Sessoin)getSession();
@@ -189,7 +188,7 @@ public class Target extends SessionObject implements IPCDITarget {
 		}
 		return cthreads;
 	}
-	public IPCDIThread getCurrentThread() throws CDIException {
+	public IPCDIThread getCurrentThread() throws PCDIException {
 		IPCDIThread[] threads = getThreads();
 		for (int i = 0; i < threads.length; i++) {
 			Thread cthread = (Thread)threads[i];
@@ -199,13 +198,13 @@ public class Target extends SessionObject implements IPCDITarget {
 		}
 		return null;
 	}
-	public synchronized IPCDIThread[] getThreads() throws CDIException {
+	public synchronized IPCDIThread[] getThreads() throws PCDIException {
 		if (currentThreads.length == 0) {
 			currentThreads = getCThreads();
 		}
 		return currentThreads;
 	}
-	public IPCDIThread getThread(int tid) throws CDIException {
+	public IPCDIThread getThread(int tid) throws PCDIException {
 		Thread th = null;
 		if (currentThreads != null) {
 			for (int i = 0; i < currentThreads.length; i++) {
@@ -218,46 +217,46 @@ public class Target extends SessionObject implements IPCDITarget {
 		}
 		return th;
 	}
-	public void restart() throws CDIException {
+	public void restart() throws PCDIException {
 		getDebugger().restart();
 	}
-	public void stepInto() throws CDIException {
+	public void stepInto() throws PCDIException {
 		stepInto(1);
 	}
-	public void stepInto(int count) throws CDIException {
+	public void stepInto(int count) throws PCDIException {
 		getDebugger().postCommand(new StepIntoCommand(((Session)getSession()).createBitList(getTargetID()), count));
 		//getDebugger().steppingInto(((Session)getSession()).createBitList(getTargetID()), count);
 	}
-	public void stepIntoInstruction() throws CDIException {
+	public void stepIntoInstruction() throws PCDIException {
 		stepIntoInstruction(1);
 	}
-	public void stepIntoInstruction(int count) throws CDIException {
+	public void stepIntoInstruction(int count) throws PCDIException {
 		//TODO - implement step into instruction
 		//getDebugger().stepIntoInstrunction(count);
-		throw new CDIException("Not implement yet - Target: stepIntoInstruction");
+		throw new PCDIException("Not implement yet - Target: stepIntoInstruction");
 	}
-	public void stepOver() throws CDIException {
+	public void stepOver() throws PCDIException {
 		stepOver(1);
 	}
-	public void stepOver(int count) throws CDIException {
+	public void stepOver(int count) throws PCDIException {
 		getDebugger().postCommand(new StepOverCommand(((Session)getSession()).createBitList(getTargetID()), count));
 		//getDebugger().steppingOver(((Session)getSession()).createBitList(getTargetID()), count);
 	}
-	public void stepOverInstruction() throws CDIException {
+	public void stepOverInstruction() throws PCDIException {
 		stepOverInstruction(1);
 	}
-	public void stepOverInstruction(int count) throws CDIException {
+	public void stepOverInstruction(int count) throws PCDIException {
 		//TODO - implement step over instruction
 		//getDebugger().stepOverInstrunction(count);
-		throw new CDIException("Not implement yet - Target: stepOverInstruction");
+		throw new PCDIException("Not implement yet - Target: stepOverInstruction");
 	}
-	public void stepReturn() throws CDIException {
+	public void stepReturn() throws PCDIException {
 		((Thread)getCurrentThread()).getCurrentStackFrame().stepReturn();
 	}
-	public void runUntil(ICDILocation location) throws CDIException {
+	public void runUntil(ICDILocation location) throws PCDIException {
 		stepUntil(location);
 	}
-	public void stepUntil(ICDILocation location) throws CDIException {
+	public void stepUntil(ICDILocation location) throws PCDIException {
 		String file = "";
 		String func = "";
 		String addr = "";
@@ -286,28 +285,28 @@ public class Target extends SessionObject implements IPCDITarget {
 		}
 		//TODO - implement step until location
 		//getDebugger().stepUntil(file, func, addr, line);
-		throw new CDIException("Not implement yet - stepUntil(location)");
+		throw new PCDIException("Not implement yet - stepUntil(location)");
 	}
-	public void suspend() throws CDIException {
+	public void suspend() throws PCDIException {
 		getDebugger().postCommand(new HaltCommand(((Session)getSession()).createBitList(getTargetID())));
 		//getDebugger().suspend(((Session)getSession()).createBitList(getTargetID()));
 	}
-	public void disconnect() throws CDIException {
+	public void disconnect() throws PCDIException {
 		//Do nothing
 	}
-	public void resume() throws CDIException {
+	public void resume() throws PCDIException {
 		resume(false);
 	}
-	public void resume(ICDILocation location) throws CDIException {
+	public void resume(ICDILocation location) throws PCDIException {
 		resume(location);
 	}
-	public void resume(ICDISignal signal) throws CDIException {
+	public void resume(ICDISignal signal) throws PCDIException {
 		signal(signal);
 	}
-	public void resume(boolean passSignal) throws CDIException {
+	public void resume(boolean passSignal) throws PCDIException {
 		String state = getPProcess().getStatus();
 		if (state.equals(IPProcess.RUNNING)) {
-			throw new CDIException("The process is already running");
+			throw new PCDIException("The process is already running");
 		}
 		else if (state.equals(IPProcess.STOPPED)) {
 			if (passSignal) {
@@ -321,11 +320,11 @@ public class Target extends SessionObject implements IPCDITarget {
 			restart();
 		}
 	}
-	public void continuation() throws CDIException {
+	public void continuation() throws PCDIException {
 		getDebugger().postCommand(new GoCommand(((Session)getSession()).createBitList(getTargetID())));
 		//getDebugger().resume(((Session)getSession()).createBitList(getTargetID()));
 	}
-	public void jump(ICDILocation location) throws CDIException {
+	public void jump(ICDILocation location) throws PCDIException {
 		String file = "";
 		String func = "";
 		String addr = "";
@@ -354,19 +353,19 @@ public class Target extends SessionObject implements IPCDITarget {
 		}
 		//TODO - implement jump location
 		//getDebugger().jump(file, func, addr, line);
-		throw new CDIException("Not implement yet - jump(location)");
+		throw new PCDIException("Not implement yet - jump(location)");
 	}
-	public void signal() throws CDIException {
+	public void signal() throws PCDIException {
 		//TODO - implement signal
 		//getDebugger().singal();
-		throw new CDIException("Not implement yet - signal");
+		throw new PCDIException("Not implement yet - signal");
 	}
-	public void signal(ICDISignal signal) throws CDIException {
+	public void signal(ICDISignal signal) throws PCDIException {
 		//TODO - implement signal(ICDISignal)
 		//getDebugger().singal(signal.getName());
-		throw new CDIException("Not implement yet - signal(ICDISignal)");
+		throw new PCDIException("Not implement yet - signal(ICDISignal)");
 	}
-	public String evaluateExpressionToString(IPCDIStackFrame frame, String expressionText) throws CDIException {
+	public String evaluateExpressionToString(IPCDIStackFrame frame, String expressionText) throws PCDIException {
 		Target target = (Target)frame.getTarget();
 		Thread currentThread = (Thread)target.getCurrentThread();
 		StackFrame currentFrame = currentThread.getCurrentStackFrame();
@@ -382,7 +381,7 @@ public class Target extends SessionObject implements IPCDITarget {
 			currentThread.setCurrentStackFrame(currentFrame, false);
 		}
 	}
-	public void terminate() throws CDIException {
+	public void terminate() throws PCDIException {
 		getDebugger().postCommand(new KillCommand(((Session)getSession()).createBitList(getTargetID())));
 	}
 	public boolean isTerminated() {
@@ -400,37 +399,37 @@ public class Target extends SessionObject implements IPCDITarget {
 	public Process getProcess() {
 		return null;
 	}
-	public IPCDILineBreakpoint setLineBreakpoint(int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException {
+	public IPCDILineBreakpoint setLineBreakpoint(int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws PCDIException {
 		Session session = (Session)getSession();
 		BreakpointManager bMgr = session.getBreakpointManager();
 		return bMgr.setLineBreakpoint(session.createBitList(getTargetID()), type, location, condition, deferred);
 	}
-	public IPCDIFunctionBreakpoint setFunctionBreakpoint(int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException {		
+	public IPCDIFunctionBreakpoint setFunctionBreakpoint(int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws PCDIException {		
 		Session session = (Session)getSession();
 		BreakpointManager bMgr = session.getBreakpointManager();
 		return bMgr.setFunctionBreakpoint(session.createBitList(getTargetID()), type, location, condition, deferred);
 	}
-	public IPCDIAddressBreakpoint setAddressBreakpoint(int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException {
+	public IPCDIAddressBreakpoint setAddressBreakpoint(int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws PCDIException {
 		Session session = (Session)getSession();
 		BreakpointManager bMgr = session.getBreakpointManager();
 		return bMgr.setAddressBreakpoint(session.createBitList(getTargetID()), type, location, condition, deferred);
 	}
-	public IPCDIWatchpoint setWatchpoint(int type, int watchType, String expression, ICDICondition condition) throws CDIException {
+	public IPCDIWatchpoint setWatchpoint(int type, int watchType, String expression, ICDICondition condition) throws PCDIException {
 		Session session = (Session)getSession();
 		BreakpointManager bMgr = session.getBreakpointManager();
 		return bMgr.setWatchpoint(session.createBitList(getTargetID()), type, watchType, expression, condition);
 	}
-	public IPCDIExceptionpoint setExceptionBreakpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch) throws CDIException {
-		throw new CDIException("Not implemented yet setExceptionBreakpoint");
+	public IPCDIExceptionpoint setExceptionBreakpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch) throws PCDIException {
+		throw new PCDIException("Not implemented yet setExceptionBreakpoint");
 	}
-	public IPCDIBreakpoint[] getBreakpoints() throws CDIException {
-		throw new CDIException("Not implemented yet - Target: getBreakpoints");
+	public IPCDIBreakpoint[] getBreakpoints() throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: getBreakpoints");
 	}
-	public void deleteBreakpoints(IPCDIBreakpoint[] breakpoints) throws CDIException {
-		throw new CDIException("Not implemented yet - Target: deleteBreakpoints");
+	public void deleteBreakpoints(IPCDIBreakpoint[] breakpoints) throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: deleteBreakpoints");
 	}
-	public void deleteAllBreakpoints() throws CDIException {
-		throw new CDIException("Not implemented yet - Target: deleteAllBreakpoints");
+	public void deleteAllBreakpoints() throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: deleteAllBreakpoints");
 	}
 	public ICDICondition createCondition(int ignoreCount, String expression) {
 		return createCondition(ignoreCount, expression, null);
@@ -456,63 +455,63 @@ public class Target extends SessionObject implements IPCDITarget {
 		//return new RuntimeOptions(this);
 		return null;
 	}
-	public IPCDIExpression createExpression(String code) throws CDIException {
+	public IPCDIExpression createExpression(String code) throws PCDIException {
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
 		return expMgr.createExpression(this, code);
 	}
-	public IPCDIExpression[] getExpressions() throws CDIException {
+	public IPCDIExpression[] getExpressions() throws PCDIException {
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
 		return expMgr.getExpressions(this);
 	}
-	public void destroyExpressions(IPCDIExpression[] expressions) throws CDIException {
+	public void destroyExpressions(IPCDIExpression[] expressions) throws PCDIException {
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
 		expMgr.destroyExpressions(this, (IPCDIExpression[])expressions);
 	}	
-	public void destroyAllExpressions() throws CDIException {
+	public void destroyAllExpressions() throws PCDIException {
 		ExpressionManager expMgr = ((Session)getSession()).getExpressionManager();
 		expMgr.destroyAllExpressions(this);
 	}
-	public ICDISignal[] getSignals() throws CDIException {
-		throw new CDIException("Not implemented yet - Target: getSignals");
+	public ICDISignal[] getSignals() throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: getSignals");
 	}
-	public void setSourcePaths(String[] srcPaths) throws CDIException {
-		//throw new CDIException("Not implemented yet - Target: setSourcePaths");
+	public void setSourcePaths(String[] srcPaths) throws PCDIException {
+		//throw new PCDIException("Not implemented yet - Target: setSourcePaths");
 	}
-	public String[] getSourcePaths() throws CDIException {
-		throw new CDIException("Not implemented yet - Target: getSourcePaths");
+	public String[] getSourcePaths() throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: getSourcePaths");
 	}
-	public ICDIInstruction[] getInstructions(BigInteger startAddress, BigInteger endAddress) throws CDIException {
-		throw new CDIException("Not implemented yet - Target: getInstructions");
+	public ICDIInstruction[] getInstructions(BigInteger startAddress, BigInteger endAddress) throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: getInstructions");
 	}
-	public ICDIInstruction[] getInstructions(String filename, int linenum) throws CDIException {
-		throw new CDIException("Not implemented yet - Target: getInstructions");
+	public ICDIInstruction[] getInstructions(String filename, int linenum) throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: getInstructions");
 	}
-	public ICDIInstruction[] getInstructions(String filename, int linenum, int lines) throws CDIException {
-		throw new CDIException("Not implemented yet - Target: getInstructions");
+	public ICDIInstruction[] getInstructions(String filename, int linenum, int lines) throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: getInstructions");
 	}
-	public ICDIMixedInstruction[] getMixedInstructions(BigInteger startAddress, BigInteger endAddress) throws CDIException {
-		throw new CDIException("Not implemented yet - Target: getMixedInstructions");
+	public ICDIMixedInstruction[] getMixedInstructions(BigInteger startAddress, BigInteger endAddress) throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: getMixedInstructions");
 	}
-	public ICDIMixedInstruction[] getMixedInstructions(String filename, int linenum) throws CDIException {
-		throw new CDIException("Not implemented yet - Target: getMixedInstructions");
+	public ICDIMixedInstruction[] getMixedInstructions(String filename, int linenum) throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: getMixedInstructions");
 	}
-	public ICDIMixedInstruction[] getMixedInstructions(String filename, int linenum, int lines) throws CDIException {
-		throw new CDIException("Not implemented yet - Target: getMixedInstructions");
+	public ICDIMixedInstruction[] getMixedInstructions(String filename, int linenum, int lines) throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: getMixedInstructions");
 	}
-	public ICDIMemoryBlock createMemoryBlock(String address, int units, int wordSize) throws CDIException {
-		throw new CDIException("Not implemented yet - Target: createMemoryBlock");
+	public ICDIMemoryBlock createMemoryBlock(String address, int units, int wordSize) throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: createMemoryBlock");
 	}
-	public void removeBlocks(ICDIMemoryBlock[] memoryBlocks) throws CDIException {
-		throw new CDIException("Not implemented yet - Target: removeBlocks");
+	public void removeBlocks(ICDIMemoryBlock[] memoryBlocks) throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: removeBlocks");
 	}
-	public void removeAllBlocks() throws CDIException {
-		throw new CDIException("Not implemented yet - Target: removeAllBlocks");
+	public void removeAllBlocks() throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: removeAllBlocks");
 	}
-	public ICDIMemoryBlock[] getMemoryBlocks() throws CDIException {
-		throw new CDIException("Not implemented yet - Target: getMemoryBlocks");
+	public ICDIMemoryBlock[] getMemoryBlocks() throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: getMemoryBlocks");
 	}
-	public ICDISharedLibrary[] getSharedLibraries() throws CDIException {
-		throw new CDIException("Not implemented yet - Target: getSharedLibraries");
+	public ICDISharedLibrary[] getSharedLibraries() throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: getSharedLibraries");
 	}
 	public IPCDIGlobalVariableDescriptor getGlobalVariableDescriptors(String filename, String function, String name) throws PCDIException {
 		//VariableManager varMgr = ((Session)getSession()).getVariableManager();
@@ -520,8 +519,8 @@ public class Target extends SessionObject implements IPCDITarget {
 		throw new PCDIException("Not implemented yet - Target: getGlobalVariableDescriptors");
 	}
 
-	public ICDIRegisterGroup[] getRegisterGroups() throws CDIException {
-		throw new CDIException("Not implemented yet - Target: getRegisterGroups");
+	public ICDIRegisterGroup[] getRegisterGroups() throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: getRegisterGroups");
 	}
 	public IPCDITargetConfiguration getConfiguration() {
 		if (fConfiguration == null) {
@@ -529,15 +528,15 @@ public class Target extends SessionObject implements IPCDITarget {
 		}		
 		return fConfiguration;
 	}
-	public IPCDIGlobalVariable createGlobalVariable(IPCDIGlobalVariableDescriptor varDesc) throws CDIException {
+	public IPCDIGlobalVariable createGlobalVariable(IPCDIGlobalVariableDescriptor varDesc) throws PCDIException {
 		if (varDesc instanceof GlobalVariableDescriptor) {
 			VariableManager varMgr = ((Session)getSession()).getVariableManager();
 			return varMgr.createGlobalVariable((GlobalVariableDescriptor)varDesc);
 		}
 		return null;
 	}
-	public ICDIRegister createRegister(ICDIRegisterDescriptor varDesc) throws CDIException {
-		throw new CDIException("Not implemented yet - Target: createRegister");
+	public ICDIRegister createRegister(ICDIRegisterDescriptor varDesc) throws PCDIException {
+		throw new PCDIException("Not implemented yet - Target: createRegister");
 	}
 	
 	public IPProcess getPProcess() {

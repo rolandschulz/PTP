@@ -18,9 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeEnum;
 import org.eclipse.ptp.debug.core.aif.IAIFValueEnum;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -31,7 +31,7 @@ public class AIFValueEnum extends ValueIntegral implements IAIFValueEnum {
 		super(type);
 		parse(data);
 	}
-	public String getValueString() throws PCDIException {
+	public String getValueString() throws AIFException {
 		if (result == null) {
 			result = String.valueOf("");
 		}

@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IExpression;
 import org.eclipse.debug.core.model.IValue;
@@ -122,7 +121,7 @@ public class PExpression extends PLocalVariable implements IExpression {
 			try {
 				fCDIExpression.dispose();
 				fCDIExpression = null;
-			} catch (CDIException e) {
+			} catch (PCDIException e) {
 			}
 		}
 		if (fValue instanceof AbstractPValue) {

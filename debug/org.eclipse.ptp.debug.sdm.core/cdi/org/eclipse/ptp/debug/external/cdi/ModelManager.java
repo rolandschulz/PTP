@@ -29,9 +29,9 @@
 package org.eclipse.ptp.debug.external.cdi;
 
 import java.util.Hashtable;
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.ptp.debug.core.cdi.IPCDIModelManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIDebugProcess;
 import org.eclipse.ptp.debug.external.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.cdi.model.DebugProcess;
@@ -52,7 +52,7 @@ public class ModelManager extends Manager implements IPCDIModelManager {
 	public void shutdown() {
 		
 	}
-	protected void update(Target target) throws CDIException {
+	protected void update(Target target) throws PCDIException {
 		PTPDebugExternalPlugin.getDefault().getLogger().finer("");
 	}
 	public IPCDIDebugProcess getProcess(int proc) {

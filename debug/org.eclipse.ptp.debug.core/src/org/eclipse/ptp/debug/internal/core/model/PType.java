@@ -22,11 +22,11 @@ import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeArray;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeChar;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeFloat;
-import org.eclipse.ptp.debug.core.aif.ITypeIntegral;
 import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeRange;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeReference;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeStruct;
+import org.eclipse.ptp.debug.core.aif.ITypeIntegral;
 import org.eclipse.ptp.debug.core.model.IPType;
 
 /**

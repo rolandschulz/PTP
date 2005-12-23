@@ -21,9 +21,9 @@ package org.eclipse.ptp.debug.internal.core.aif;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeInt;
 import org.eclipse.ptp.debug.core.aif.IAIFValueInt;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 public class AIFValueInt extends ValueIntegral implements IAIFValueInt {
 	ByteBuffer byteBuffer;
@@ -36,13 +36,13 @@ public class AIFValueInt extends ValueIntegral implements IAIFValueInt {
 		byteBuffer = byteBuffer(data);
 		size = data.length;		
 	}
-	public String getValueString() throws PCDIException {
+	public String getValueString() throws AIFException {
 		if (result == null) {
 			result = getString();
 		}
 		return result;
 	}
-	private String getString() throws PCDIException {
+	private String getString() throws AIFException {
 		if (isShort()) {
 			return String.valueOf(shortValue());
 		}
@@ -65,10 +65,10 @@ public class AIFValueInt extends ValueIntegral implements IAIFValueInt {
 	public boolean isInt() {
 		return (size == 4);
 	}
-	public byte[] byteValue() throws PCDIException {
+	public byte[] byteValue() throws AIFException {
 		return byteBuffer.array();
 	}
-	public long longValue() throws PCDIException {
+	public long longValue() throws AIFException {
 		try {
 			return byteBuffer.getLong();
 		} catch (BufferUnderflowException e) {
@@ -77,7 +77,7 @@ public class AIFValueInt extends ValueIntegral implements IAIFValueInt {
 			byteBuffer.rewind();			
 		}
 	}
-	public short shortValue() throws PCDIException {
+	public short shortValue() throws AIFException {
 		try {
 			return byteBuffer.getShort();
 		} catch (BufferUnderflowException e) {
@@ -86,7 +86,7 @@ public class AIFValueInt extends ValueIntegral implements IAIFValueInt {
 			byteBuffer.rewind();			
 		}
 	}
-	public int intValue() throws PCDIException {
+	public int intValue() throws AIFException {
 		try {
 			return byteBuffer.getInt();
 		} catch (BufferUnderflowException e) {

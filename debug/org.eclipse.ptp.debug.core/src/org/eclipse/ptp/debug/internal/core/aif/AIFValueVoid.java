@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -33,7 +33,7 @@ public class AIFValueVoid extends AIFValue {
 	protected void parse(byte[] data) {
 		size = data.length;
 	}	
-	public String getValueString() throws PCDIException {
+	public String getValueString() throws AIFException {
 		return "";
 	}
 }

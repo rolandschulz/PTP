@@ -19,9 +19,9 @@
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import java.math.BigInteger;
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.ExtFormat;
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
@@ -66,7 +66,7 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 	public IPCDIThread getThread() {
 		return cthread;
 	}
-	public IPCDIArgumentDescriptor[] getArgumentDescriptors() throws CDIException {
+	public IPCDIArgumentDescriptor[] getArgumentDescriptors() throws PCDIException {
 		if (argDescs == null) {
 			Session session = (Session)getTarget().getSession();
 			VariableManager mgr = session.getVariableManager();
@@ -85,7 +85,7 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 		}
 		return argDescs;
 	}
-	public IPCDILocalVariableDescriptor[] getLocalVariableDescriptors() throws CDIException {
+	public IPCDILocalVariableDescriptor[] getLocalVariableDescriptors() throws PCDIException {
 		if (localDescs == null) {
 			Session session = (Session)getTarget().getSession();
 			VariableManager mgr = session.getVariableManager();
@@ -104,7 +104,7 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 		}
 		return localDescs;
 	}
-	public IPCDIArgument createArgument(IPCDIArgumentDescriptor varDesc) throws CDIException {
+	public IPCDIArgument createArgument(IPCDIArgumentDescriptor varDesc) throws PCDIException {
 		if (varDesc instanceof ArgumentDescriptor) {
 			Session session = (Session)getTarget().getSession();
 			VariableManager mgr = session.getVariableManager();
@@ -112,7 +112,7 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 		}
 		return null;
 	}
-	public IPCDILocalVariable createLocalVariable(IPCDILocalVariableDescriptor varDesc) throws CDIException {
+	public IPCDILocalVariable createLocalVariable(IPCDILocalVariableDescriptor varDesc) throws PCDIException {
 		if (varDesc instanceof ArgumentDescriptor) {
 			return createArgument((IPCDIArgumentDescriptor)varDesc);
 		} else if (varDesc instanceof LocalVariableDescriptor) {
@@ -150,23 +150,23 @@ public class StackFrame extends PObject implements IPCDIStackFrame {
 	public void stepReturn() throws PCDIException {
 		try {
 			finish();
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			throw new PCDIException(e.getMessage());
 		}
 	}
 	public void stepReturn(IAIFValue value) throws PCDIException {
 		try {
 			execReturn(value.getValueString());
-		} catch (CDIException e) {
+		} catch (AIFException e) {
 			throw new PCDIException(e.getMessage());
 		}
 	}
-	protected void finish() throws CDIException {
+	protected void finish() throws PCDIException {
 		((Thread)getThread()).setCurrentStackFrame(this, false);
 		Target target = (Target)getTarget();
 		target.getDebugger().postCommand(new StepFinishCommand(((Session)target.getSession()).createBitList(target.getTargetID())));
 	}	
-	protected void execReturn(String value) throws CDIException {
+	protected void execReturn(String value) throws PCDIException {
 		((Thread)getThread()).setCurrentStackFrame(this, false);
 		Target target = (Target)getTarget();
 		target.getDebugger().postCommand(new StepFinishCommand(((Session)target.getSession()).createBitList(target.getTargetID())));

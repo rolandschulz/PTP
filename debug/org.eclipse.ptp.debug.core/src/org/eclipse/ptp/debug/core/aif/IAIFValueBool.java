@@ -18,13 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.aif;
 
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-
 /**
  * @author Clement chu
  * 
  */
 public interface IAIFValueBool extends IValueIntegral {
-	public boolean booleanValue() throws PCDIException;
+	public boolean booleanValue() throws AIFException;
 }
 

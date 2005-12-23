@@ -22,8 +22,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
@@ -97,7 +97,7 @@ public class ProcessManager extends Manager {
 	public Target getTarget(int target_id) {
 		return (Target)debugTargetMap.get(new Integer(target_id));
 	}
-	public void update(Target target) throws CDIException {
+	public void update(Target target) throws PCDIException {
 		//Do nothing here
 	}
 }

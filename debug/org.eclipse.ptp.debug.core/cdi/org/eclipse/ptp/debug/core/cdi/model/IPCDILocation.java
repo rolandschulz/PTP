@@ -20,9 +20,9 @@ package org.eclipse.ptp.debug.core.cdi.model;
 
 import org.eclipse.cdt.debug.core.cdi.ICDILocation;
 
+
 /**
  * @author Clement chu
  * 
  */
 public interface IPCDILocation extends ICDILocation {}
-

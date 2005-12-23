@@ -18,9 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeBool;
 import org.eclipse.ptp.debug.core.aif.IAIFValueBool;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -33,7 +33,7 @@ public class AIFValueBool extends ValueIntegral implements IAIFValueBool {
 		super(type);
 		parse(data);
 	}
-	public String getValueString() throws PCDIException {
+	public String getValueString() throws AIFException {
 		if (result == null) {
 			result = String.valueOf(booleanValue());
 		}
@@ -43,7 +43,7 @@ public class AIFValueBool extends ValueIntegral implements IAIFValueBool {
 		boolValue = (data[0]>0);
 		size = data.length;
 	}
-	public boolean booleanValue() throws PCDIException {
+	public boolean booleanValue() throws AIFException {
 		return boolValue;
 	}
 }

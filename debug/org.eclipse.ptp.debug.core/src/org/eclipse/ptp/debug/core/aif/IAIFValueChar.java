@@ -18,14 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.aif;
 
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-
 /**
  * @author Clement chu
  * 
  */
 public interface IAIFValueChar extends IValueIntegral {
-	public char charValue() throws PCDIException;
-	public byte byteValue() throws PCDIException;
+	public char charValue() throws AIFException;
+	public byte byteValue() throws AIFException;
 }
 

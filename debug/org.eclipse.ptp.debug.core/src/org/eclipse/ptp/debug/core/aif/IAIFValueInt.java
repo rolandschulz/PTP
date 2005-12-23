@@ -18,8 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.aif;
 
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-
 /**
  * @author Clement chu
  * 
@@ -28,9 +26,9 @@ public interface IAIFValueInt extends IValueIntegral {
 	public boolean isLong();
 	public boolean isShort();
 	public boolean isInt();
-	public byte[] byteValue() throws PCDIException;
-	public long longValue() throws PCDIException;
-	public short shortValue() throws PCDIException;
-	public int intValue() throws PCDIException;
+	public byte[] byteValue() throws AIFException;
+	public long longValue() throws AIFException;
+	public short shortValue() throws AIFException;
+	public int intValue() throws AIFException;
 }
 

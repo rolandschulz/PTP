@@ -19,9 +19,9 @@
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import java.nio.ByteBuffer;
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeString;
 import org.eclipse.ptp.debug.core.aif.IAIFValueString;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -39,13 +39,13 @@ public class AIFValueString extends ValueIntegral implements IAIFValueString {
 		//TODO -- redo it
 		size = data.length;
 	}
-	public String getValueString() throws PCDIException {
+	public String getValueString() throws AIFException {
 		if (result == null) {
 			result = stringValue();
 		}
 		return result;
 	}
-	private String stringValue() throws PCDIException {
+	private String stringValue() throws AIFException {
 		return new String(byteBuffer.array());
 		/*
 		int len = data.get();

@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.breakpoints;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.external.cdi.BreakpointManager;
 import org.eclipse.ptp.debug.external.cdi.Session;
@@ -44,13 +44,13 @@ public abstract class Breakpoint extends PObject implements IPCDIBreakpoint {
 		enable = true;
 	}
 
-	public ICDICondition getCondition() throws CDIException {
+	public ICDICondition getCondition() throws PCDIException {
 		if (condition == null) {
 			condition =  new Condition(0, new String(), null);
 		}
 		return condition;
 	}
-	public boolean isEnabled() throws CDIException {
+	public boolean isEnabled() throws PCDIException {
 		return enable;
 	}
 	public boolean isHardware() {
@@ -59,7 +59,7 @@ public abstract class Breakpoint extends PObject implements IPCDIBreakpoint {
 	public boolean isTemporary() {
 		return (type == IPCDIBreakpoint.TEMPORARY);
 	}
-	public void setCondition(ICDICondition newCondition) throws CDIException {
+	public void setCondition(ICDICondition newCondition) throws PCDIException {
 		Session session = (Session)getTarget().getSession();
 		BreakpointManager mgr = session.getBreakpointManager();
 		mgr.setCondition(this, newCondition);
@@ -68,7 +68,7 @@ public abstract class Breakpoint extends PObject implements IPCDIBreakpoint {
 	public void setCondition0(ICDICondition newCondition) {
 		condition = newCondition;
 	}
-	public void setEnabled(boolean on) throws CDIException {
+	public void setEnabled(boolean on) throws PCDIException {
 		Session session = (Session)getTarget().getSession();
 		BreakpointManager mgr = session.getBreakpointManager();
 		if (on == false && isEnabled() == true) { 

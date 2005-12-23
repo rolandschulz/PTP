@@ -18,12 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IIndexedValue;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
 import org.eclipse.ptp.debug.core.model.IPType;
 
@@ -165,7 +165,7 @@ public class PIndexedValue extends AbstractPValue implements IIndexedValue {
 		IPCDIVariable[] cdiVars = new IPCDIVariable[0]; 
 		try {
 			cdiVars = getParentVariable().getCDIVariable().getVariablesAsArray(index * prefSize, psize);
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			requestFailed(e.getMessage(), null);
 		}
 		for (int i=0; i<psize; ++i) {

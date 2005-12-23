@@ -19,11 +19,11 @@
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import java.math.BigInteger;
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValuePointer;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -37,7 +37,7 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 		super(type);
 		parse(data);
 	}
-	public String getValueString() throws PCDIException {
+	public String getValueString() throws AIFException {
 		if (result == null) {
 			result = value.getValueString();
 		}
@@ -71,7 +71,7 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 		size = data.length;		
 	}
 	
-	public BigInteger pointerValue() throws PCDIException {
+	public BigInteger pointerValue() throws AIFException {
 		return ValueIntegral.bigIntegerValue(getValueString());
 	}
 }

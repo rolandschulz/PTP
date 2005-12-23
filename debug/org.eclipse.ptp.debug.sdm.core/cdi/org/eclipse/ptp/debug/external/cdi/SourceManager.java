@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 import org.eclipse.ptp.debug.external.cdi.model.Thread;
@@ -33,27 +33,27 @@ public class SourceManager extends Manager {
 	public SourceManager(Session session) {
 		super(session, false);
 	}
-	public void update(Target target) throws CDIException {
+	public void update(Target target) throws PCDIException {
 		//Do dothing here
 	}
 	public void shutdown() {
 		
 	}
 	/*
-	public Type getType(Target target, IAIF aif) throws CDIException {
+	public Type getType(Target target, IAIF aif) throws PCDIException {
 		if (aif == null) {
-			throw new CDIException("No AIF found - SourceManager: getType");
+			throw new PCDIException("No AIF found - SourceManager: getType");
 		}
 		return toCDIType(target, aif.getDescription());
 	}
-	public Type getType(Target target, String name) throws CDIException {
+	public Type getType(Target target, String name) throws PCDIException {
 		if (name == null) {
 			name = new String();
 		}
 		String typename = name.trim();
 		return toCDIType(target, typename);
 	}
-	Type toCDIType(Target target, String name) throws CDIException {
+	Type toCDIType(Target target, String name) throws PCDIException {
 		if (name == null) {
 			name = new String();
 		}
@@ -228,10 +228,10 @@ public class SourceManager extends Manager {
 				return new LongLongType(target, typename, unSigned);
 			}
 		}
-		throw new CDIException("SourceManager.Unknown_type");
+		throw new PCDIException("SourceManager.Unknown_type");
 	}
 	*/
-	public String getDetailTypeNameFromVariable(StackFrame frame, String variable) throws CDIException {
+	public String getDetailTypeNameFromVariable(StackFrame frame, String variable) throws PCDIException {
 		Target target = (Target)frame.getTarget();
 		Thread currentThread = (Thread)target.getCurrentThread();
 		StackFrame currentFrame = currentThread.getCurrentStackFrame();
@@ -244,11 +244,11 @@ public class SourceManager extends Manager {
 			currentThread.setCurrentStackFrame(currentFrame, false);
 		}
 	}
-	public String getDetailTypeName(Target target, String typeName) throws CDIException {
-		throw new CDIException("Not implement yet - SourceManager: getDetailsTypeName");
+	public String getDetailTypeName(Target target, String typeName) throws PCDIException {
+		throw new PCDIException("Not implement yet - SourceManager: getDetailsTypeName");
 		//return target.getDebugger().getVariableType(((Session)getSession()).createBitList(target.getTargetID()), typeName);
 	}
-	public IAIF getAIFFromVariable(StackFrame frame, String variable) throws CDIException {
+	public IAIF getAIFFromVariable(StackFrame frame, String variable) throws PCDIException {
 		Target target = (Target)frame.getTarget();
 		Thread currentThread = (Thread)target.getCurrentThread();
 		StackFrame currentFrame = currentThread.getCurrentStackFrame();
@@ -261,13 +261,13 @@ public class SourceManager extends Manager {
 			currentThread.setCurrentStackFrame(currentFrame, false);
 		}
 	}
-	public IAIF getAIF(Target target, String variable) throws CDIException {
+	public IAIF getAIF(Target target, String variable) throws PCDIException {
 		Session session = (Session)getSession();
 		GetAIFCommand command = new GetAIFCommand(session.createBitList(target.getTargetID()), variable);
 		session.getDebugger().postCommand(command);
 		return command.getAIF();
 	}
-	//public String getTypeName(Target target, String variable) throws CDIException {
+	//public String getTypeName(Target target, String variable) throws PCDIException {
 		//return target.getDebugger().getVariableType(((Session)getSession()).createBitList(target.getTargetID()), variable);
 	//}
 }

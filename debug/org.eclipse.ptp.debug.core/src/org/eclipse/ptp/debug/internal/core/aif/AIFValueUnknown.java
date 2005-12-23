@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 public class AIFValueUnknown extends AIFValue {
 	public AIFValueUnknown(IAIFType type) {
@@ -28,7 +28,7 @@ public class AIFValueUnknown extends AIFValue {
 	}
 	protected void parse(byte[] data) {}
 	
-	public String getValueString() throws PCDIException {
+	public String getValueString() throws AIFException {
 		if (result == null) {
 			result = "<value not supported>";
 		}

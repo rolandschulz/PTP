@@ -39,6 +39,7 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.ptp.debug.core.cdi.IPCDIEndSteppingRange;
 import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
 import org.eclipse.ptp.debug.core.cdi.IPCDISignalReceived;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIChangedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIDestroyedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIDisconnectedEvent;
@@ -155,7 +156,7 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 	protected IPCDIStackFrame[] getCDIStackFrames(int lowFrame, int highFrame) throws DebugException {
 		try {
 			return getCDIThread().getStackFrames(lowFrame, highFrame);
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			setStatus(IPDebugElementStatus.WARNING, MessageFormat.format(CoreModelMessages.getString("CThread.0"), new String[] { e.getMessage() }));
 			targetRequestFailed(e.getMessage(), null);
 		}
@@ -255,7 +256,7 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		setState(PDebugElementState.RESUMING);
 		try {
 			getCDIThread().resume(false);
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			setState(oldState);
 			targetRequestFailed(e.getMessage(), null);
 		}
@@ -491,7 +492,7 @@ public class PThread extends PDebugElement implements IPThread, IRestart, IResum
 		int depth = 0;
 		try {
 			depth = getCDIThread().getStackFrameCount();
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			setStatus(IPDebugElementStatus.WARNING, MessageFormat.format(CoreModelMessages.getString("CThread.1"), new String[] { e.getMessage() }));
 		}
 		return depth;

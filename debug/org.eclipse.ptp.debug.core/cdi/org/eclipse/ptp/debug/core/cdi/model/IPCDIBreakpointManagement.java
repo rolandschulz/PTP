@@ -18,23 +18,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
  * 
  */
 public interface IPCDIBreakpointManagement {
-	IPCDILineBreakpoint setLineBreakpoint(int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws CDIException;		
-	IPCDIFunctionBreakpoint setFunctionBreakpoint(int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws CDIException;
-	IPCDIAddressBreakpoint setAddressBreakpoint(int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws CDIException;		
-	IPCDIWatchpoint setWatchpoint(int type, int watchType, String expression, ICDICondition condition) throws CDIException;
-	IPCDIExceptionpoint setExceptionBreakpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch) throws CDIException;
-	IPCDIBreakpoint[] getBreakpoints() throws CDIException;
-	void deleteBreakpoints(IPCDIBreakpoint[] breakpoints) throws CDIException;
-	void deleteAllBreakpoints() throws CDIException;
+	IPCDILineBreakpoint setLineBreakpoint(int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws PCDIException;		
+	IPCDIFunctionBreakpoint setFunctionBreakpoint(int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws PCDIException;
+	IPCDIAddressBreakpoint setAddressBreakpoint(int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws PCDIException;		
+	IPCDIWatchpoint setWatchpoint(int type, int watchType, String expression, ICDICondition condition) throws PCDIException;
+	IPCDIExceptionpoint setExceptionBreakpoint(String clazz, boolean stopOnThrow, boolean stopOnCatch) throws PCDIException;
+	IPCDIBreakpoint[] getBreakpoints() throws PCDIException;
+	void deleteBreakpoints(IPCDIBreakpoint[] breakpoints) throws PCDIException;
+	void deleteAllBreakpoints() throws PCDIException;
 }

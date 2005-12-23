@@ -19,13 +19,13 @@
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import java.nio.ByteBuffer;
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeArray;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeRange;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -51,7 +51,7 @@ public class AIFValueArray extends ValueDerived implements IAIFValueArray {
 	public IAIFValueArray getParent() {
 		return parentArray;
 	}
-	public int getChildrenNumber() throws PCDIException {
+	public int getChildrenNumber() throws AIFException {
 		return getCurrentValues().length;
 	}	
 	public int getCurrentDimensionPosition() {
@@ -60,7 +60,7 @@ public class AIFValueArray extends ValueDerived implements IAIFValueArray {
 	public int getCurrentPosition() {
 		return current_position;
 	}
-	public String getValueString() throws PCDIException {
+	public String getValueString() throws AIFException {
 		if (result == null) {
 			result = getString();
 		}
@@ -124,10 +124,10 @@ public class AIFValueArray extends ValueDerived implements IAIFValueArray {
 		}
 		return content;
 	}
-	public Object[] getCurrentValues() throws PCDIException {
+	public Object[] getCurrentValues() throws AIFException {
 		int dimension = ((IAIFTypeArray)type).getDimension();
 		if (current_dimension_position > dimension) {
-			throw new PCDIException("Dimension is out of bound");
+			throw new AIFException("Dimension is out of bound");
 		}
 		if (current_dimension_position == 0)
 			return getValues();

@@ -23,8 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.ptp.debug.core.cdi.IPCDIEventManager;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIChangedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDICreatedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIDisconnectedEvent;
@@ -117,7 +117,7 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 				if (cthread != null) {
 					cthread.getCurrentStackFrame();
 				}
-			} catch (CDIException e1) {
+			} catch (PCDIException e1) {
 				e1.printStackTrace();
 			}
 			/**
@@ -135,7 +135,7 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 				if (srcMgr.isAutoUpdate()) {
 					srcMgr.update(currentTarget);
 				}
-			} catch (CDIException e) {
+			} catch (PCDIException e) {
 				e.printStackTrace();
 			}
 			 */

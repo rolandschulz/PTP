@@ -18,17 +18,17 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDILocation;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISignal;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
  * 
  */
 public interface IPCDIExecuteResume {
-	void resume(boolean passSignal) throws CDIException;
-	void resume(ICDILocation location) throws CDIException;
-	void resume(ICDISignal signal) throws CDIException;	
+	void resume(boolean passSignal) throws PCDIException;
+	void resume(ICDILocation location) throws PCDIException;
+	void resume(ICDISignal signal) throws PCDIException;	
 }
 

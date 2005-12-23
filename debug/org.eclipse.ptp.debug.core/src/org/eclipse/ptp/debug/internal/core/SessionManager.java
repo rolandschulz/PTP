@@ -28,7 +28,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
@@ -36,63 +35,57 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 
 /**
- * @deprecated
- * Default implementation of the session manager. Terminates the session when the last target is terminated;
+ * @deprecated Default implementation of the session manager. Terminates the session when the last target is terminated;
  */
 public class SessionManager implements IDebugEventSetListener {
-
 	public SessionManager() {
-		DebugPlugin.getDefault().addDebugEventListener( this );
+		DebugPlugin.getDefault().addDebugEventListener(this);
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
-	public Object getAdapter( Class adapter ) {
-		if ( SessionManager.class.equals( adapter ) )
+	public Object getAdapter(Class adapter) {
+		if (SessionManager.class.equals(adapter))
 			return this;
 		return null;
 	}
-
 	public void dispose() {
-		DebugPlugin.getDefault().removeDebugEventListener( this );
+		DebugPlugin.getDefault().removeDebugEventListener(this);
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.debug.core.IDebugEventSetListener#handleDebugEvents(org.eclipse.debug.core.DebugEvent[])
 	 */
-	public void handleDebugEvents( DebugEvent[] events ) {
-		for( int i = 0; i < events.length; i++ ) {
+	public void handleDebugEvents(DebugEvent[] events) {
+		for (int i = 0; i < events.length; i++) {
 			DebugEvent event = events[i];
-			if ( event.getKind() == DebugEvent.TERMINATE ) {
+			if (event.getKind() == DebugEvent.TERMINATE) {
 				Object element = event.getSource();
-				if ( element instanceof IDebugTarget && ((IDebugTarget)element).getAdapter( IPCDITarget.class ) != null ) {
-					handleTerminateEvent( ((IDebugTarget)element).getLaunch(), ((IPCDITarget)((IDebugTarget)element).getAdapter( IPCDITarget.class )).getSession() );
+				if (element instanceof IDebugTarget && ((IDebugTarget) element).getAdapter(IPCDITarget.class) != null) {
+					handleTerminateEvent(((IDebugTarget) element).getLaunch(), ((IPCDITarget) ((IDebugTarget) element).getAdapter(IPCDITarget.class)).getSession());
 				}
 			}
 		}
 	}
-
-	private void handleTerminateEvent( ILaunch launch, IPCDISession session ) {
+	private void handleTerminateEvent(ILaunch launch, IPCDISession session) {
 		IDebugTarget[] targets = launch.getDebugTargets();
 		boolean terminate = true;
-		for( int i = 0; i < targets.length; ++i ) {
-			if ( targets[i].getAdapter( IPCDITarget.class ) != null && session.equals( ((IPCDITarget)targets[i].getAdapter( IPCDITarget.class )).getSession() ) && !targets[i].isTerminated() && !targets[i].isDisconnected() )
+		for (int i = 0; i < targets.length; ++i) {
+			if (targets[i].getAdapter(IPCDITarget.class) != null && session.equals(((IPCDITarget) targets[i].getAdapter(IPCDITarget.class)).getSession()) && !targets[i].isTerminated() && !targets[i].isDisconnected())
 				terminate = false;
 		}
-		if ( terminate && ((IPCDISession) session).getJob().isAllStop()) {
+		if (terminate && ((IPCDISession) session).getJob().isAllStop()) {
 			try {
 				session.terminate();
-			}
-			catch( CDIException e ) {
-				PTPDebugCorePlugin.log( e );
+			} catch (PCDIException e) {
+				PTPDebugCorePlugin.log(e);
 			}
 		}
 	}

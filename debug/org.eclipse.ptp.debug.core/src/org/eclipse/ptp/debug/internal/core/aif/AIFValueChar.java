@@ -19,9 +19,9 @@
 
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeChar;
 import org.eclipse.ptp.debug.core.aif.IAIFValueChar;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 public class AIFValueChar extends ValueIntegral implements IAIFValueChar {
 	byte byteValue;
@@ -30,7 +30,7 @@ public class AIFValueChar extends ValueIntegral implements IAIFValueChar {
 		super(type);
 		parse(data);
 	}
-	public String getValueString() throws PCDIException {
+	public String getValueString() throws AIFException {
 		if (result == null) {
 			result = String.valueOf(charValue());
 		}
@@ -40,17 +40,17 @@ public class AIFValueChar extends ValueIntegral implements IAIFValueChar {
 		byteValue = data[0];
 		size = data.length;
 	}
-	public char charValue() throws PCDIException {
+	public char charValue() throws AIFException {
 		return (char)byteValue();
 	}
-	public byte byteValue() throws PCDIException {
+	public byte byteValue() throws AIFException {
 		return byteValue;
 	}
 	public String toString() {
 		try {
 			char charValue = charValue();
 			return ((Character.isISOControl(charValue) && charValue != '\b' && charValue != '\t' && charValue != '\n' && charValue != '\f' && charValue != '\r') || charValue < 0) ? "" : String.valueOf(charValue);		
-		} catch (PCDIException e) {
+		} catch (AIFException e) {
 			return "err: " + e.getMessage();
 		}
 	}

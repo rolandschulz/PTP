@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueFloat;
 
@@ -33,13 +33,13 @@ public class PFloatingPointValue extends PValue {
 	public PFloatingPointValue(PVariable parent) {
 		super(parent);
 	}
-	public Number getFloatingPointValue() throws CDIException {
+	public Number getFloatingPointValue() throws AIFException {
 		if (fFloatingPointValue == null) {
 			IAIFValue cdiValue = null;
 			try {
 				cdiValue = getUnderlyingValue();
 			} catch (DebugException e) {
-				throw new CDIException(e.getMessage());
+				throw new AIFException(e.getMessage());
 			}
 			if (cdiValue instanceof IAIFValueFloat) {
 				fFloatingPointValue = new Float(((IAIFValueFloat)cdiValue).getValueString());
