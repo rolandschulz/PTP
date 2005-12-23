@@ -30,7 +30,6 @@ package org.eclipse.ptp.debug.internal.core.model;
 
 import java.text.MessageFormat;
 import org.eclipse.cdt.debug.core.CDebugUtils;
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
@@ -42,6 +41,7 @@ import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.ptp.debug.core.PCDIDebugModel;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.model.IPDebugElement;
 import org.eclipse.ptp.debug.core.model.IPDebugElementStatus;
@@ -123,7 +123,7 @@ public abstract class PDebugElement extends PlatformObject implements IPDebugEle
 	public static void requestFailed(String message, Exception e) throws DebugException {
 		requestFailed(message, e, DebugException.REQUEST_FAILED);
 	}
-	public static void targetRequestFailed(String message, CDIException e) throws DebugException {
+	public static void targetRequestFailed(String message, PCDIException e) throws DebugException {
 		requestFailed(MessageFormat.format("Target request failed: {0}.", new String[] { message }), e, DebugException.TARGET_REQUEST_FAILED); //$NON-NLS-1$
 	}
 	public static void requestFailed(String message, Throwable e, int code) throws DebugException {

@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -26,10 +26,10 @@ import org.eclipse.cdt.debug.core.cdi.CDIException;
  */
 public interface IPCDIStackFrame extends IPCDIExecuteStepReturn, IPCDIObject  {
 	IPCDILocator getLocator();
-	IPCDILocalVariableDescriptor[] getLocalVariableDescriptors() throws CDIException;
-	IPCDIArgument createArgument(IPCDIArgumentDescriptor varDesc) throws CDIException;
-	IPCDILocalVariable createLocalVariable(IPCDILocalVariableDescriptor varDesc) throws CDIException;
-	IPCDIArgumentDescriptor[] getArgumentDescriptors() throws CDIException;
+	IPCDILocalVariableDescriptor[] getLocalVariableDescriptors() throws PCDIException;
+	IPCDIArgument createArgument(IPCDIArgumentDescriptor varDesc) throws PCDIException;
+	IPCDILocalVariable createLocalVariable(IPCDILocalVariableDescriptor varDesc) throws PCDIException;
+	IPCDIArgumentDescriptor[] getArgumentDescriptors() throws PCDIException;
 	IPCDIThread getThread();
 	int getLevel();
 	boolean equals(IPCDIStackFrame stackframe);

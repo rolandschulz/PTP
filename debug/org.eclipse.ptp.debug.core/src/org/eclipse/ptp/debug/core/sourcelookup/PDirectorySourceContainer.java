@@ -31,7 +31,6 @@ package org.eclipse.ptp.debug.core.sourcelookup;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.debug.core.sourcelookup.ISourceContainer;

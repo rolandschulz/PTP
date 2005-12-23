@@ -37,7 +37,6 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IProcessEvent;
 import org.eclipse.ptp.core.IProcessListener;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.model.IPseudoProcess;
 

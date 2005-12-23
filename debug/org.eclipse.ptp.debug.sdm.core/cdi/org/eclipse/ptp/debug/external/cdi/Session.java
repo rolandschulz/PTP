@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -223,7 +222,7 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 	public IPCDISession getSession() {
 		return this;
 	}
-	public Process getSessionProcess() throws CDIException {
+	public Process getSessionProcess() throws PCDIException {
 		return null;
 	}
 	public BitList createEmptyBitList() {
@@ -270,7 +269,7 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 			}
 		}
 	}
-	public void terminate() throws CDIException {
+	public void terminate() throws PCDIException {
 		stop(createBitList());
 	}
 	public void stop(BitList tasks) throws PCDIException {

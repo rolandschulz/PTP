@@ -30,7 +30,6 @@ package org.eclipse.ptp.debug.internal.core.sourcelookup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;

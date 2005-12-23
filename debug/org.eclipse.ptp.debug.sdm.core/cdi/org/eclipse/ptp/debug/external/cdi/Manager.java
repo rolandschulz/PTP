@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.external.cdi.model.Target;
 
@@ -35,10 +35,10 @@ public abstract class Manager extends SessionObject {
 	public boolean isAutoUpdate() {
 		return autoUpdate;
 	}
-	protected abstract void update (Target target) throws CDIException;
+	protected abstract void update (Target target) throws PCDIException;
 	protected abstract void shutdown();
 
-	public void update() throws CDIException {
+	public void update() throws PCDIException {
 		IPCDITarget[] targets = getSession().getTargets();
 		for (int i = 0; i < targets.length; ++i) {
 			if (targets[i] instanceof Target) {

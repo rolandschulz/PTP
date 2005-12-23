@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.aif;
 
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 
 /**
@@ -30,7 +29,7 @@ public interface IAIFValueArray extends IValueDerived {
 	public int getCurrentPosition();
 	public IAIFValueArray getParent();
 	public Object[] getValues();
-	public Object[] getCurrentValues() throws PCDIException;
+	public Object[] getCurrentValues() throws AIFException;
 	public boolean hasMoreDimension(Object[] objs);
 	
 	//testing

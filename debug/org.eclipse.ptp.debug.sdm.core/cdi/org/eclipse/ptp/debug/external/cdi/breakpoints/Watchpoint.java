@@ -18,8 +18,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.breakpoints;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
 
 /**
@@ -35,7 +35,7 @@ public class Watchpoint extends Breakpoint implements IPCDIWatchpoint {
 		watchType = wType;
 		what = expression;
 	}
-	public String getWatchExpression() throws CDIException {
+	public String getWatchExpression() throws PCDIException {
 		if (what == null) {
 			return null;
 		}

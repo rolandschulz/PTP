@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
@@ -62,7 +61,7 @@ public class PLocalVariable extends PVariable {
 			IInternalVariable iv = null;
 			try {
 				iv = new InternalVariable(getVariable(), getCDIVariableObject().getVariableDescriptorAsArray(start, length));
-			} catch (CDIException e) {
+			} catch (PCDIException e) {
 				requestFailed(e.getMessage(), null);
 			}
 			return iv;
@@ -71,7 +70,7 @@ public class PLocalVariable extends PVariable {
 			IInternalVariable iv = null;
 			try {
 				iv = new InternalVariable(getVariable(), getCDIVariableObject().getVariableDescriptorAsType(type));
-			} catch (CDIException e) {
+			} catch (PCDIException e) {
 				requestFailed(e.getMessage(), null);
 			}
 			return iv;
@@ -80,7 +79,7 @@ public class PLocalVariable extends PVariable {
 			if (fCDIVariable == null) {
 				try {
 					fCDIVariable = ((PStackFrame) getStackFrame()).getCDIStackFrame().createLocalVariable((IPCDILocalVariableDescriptor)getCDIVariableObject());
-				} catch (CDIException e) {
+				} catch (PCDIException e) {
 					requestFailed(e.getMessage(), null);
 				}
 			}
@@ -102,7 +101,7 @@ public class PLocalVariable extends PVariable {
 			if (fQualifiedName == null) {
 				try {
 					fQualifiedName = (fCDIVariableObject != null) ? fCDIVariableObject.getQualifiedName() : null;
-				} catch (CDIException e) {
+				} catch (PCDIException e) {
 					requestFailed(e.getMessage(), null);
 				}
 			}
@@ -129,7 +128,7 @@ public class PLocalVariable extends PVariable {
 			try {
 				if (destroy && fCDIVariable != null)
 					fCDIVariable.dispose();
-			} catch (CDIException e) {
+			} catch (PCDIException e) {
 				logError(e.getMessage());
 			}
 			invalidateValue();
@@ -148,7 +147,7 @@ public class PLocalVariable extends PVariable {
 			if (getCDIVariableObject() != null) {
 				try {
 					return getCDIVariableObject().sizeof();
-				} catch (CDIException e) {
+				} catch (PCDIException e) {
 				}
 			}
 			return 0;
@@ -164,7 +163,7 @@ public class PLocalVariable extends PVariable {
 					cdiVariable.setValue(expression);
 				else
 					requestFailed(CoreModelMessages.getString("CModificationVariable.0"), null);
-			} catch (CDIException e) {
+			} catch (PCDIException e) {
 				targetRequestFailed(e.getMessage(), null);
 			}
 		}
@@ -193,7 +192,7 @@ public class PLocalVariable extends PVariable {
 							}
 						}
 					}
-					catch( CDIException e ) {
+					catch( PCDIException e ) {
 						requestFailed( e.getMessage(), e );
 					}
 				}
@@ -240,7 +239,7 @@ public class PLocalVariable extends PVariable {
 			if (var != null) {
 				try {
 					return var.isEditable();
-				} catch (CDIException e) {
+				} catch (PCDIException e) {
 				}
 			}
 			return false;

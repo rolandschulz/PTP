@@ -25,7 +25,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import org.eclipse.cdt.debug.core.ICBreakpointListener;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -36,14 +35,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.IBreakpointManager;
-import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
-import org.eclipse.ptp.debug.internal.core.ListenerList;
 import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
-import org.eclipse.ptp.debug.internal.core.breakpoint.PBreakpoint;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CommonSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.SourceUtils;
@@ -56,7 +50,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	private HashMap fDebugConfigurations;
 	private static Logger logger;
 	private Level loggingLevel = Level.FINE;
-	private ListenerList fBreakpointListeners;
+	//private ListenerList fBreakpointListeners;
 	private CommonSourceLookupDirector fCommonSourceLookupDirector;
 	private static PCDIDebugModel debugModel = null;
 
@@ -125,6 +119,8 @@ public class PTPDebugCorePlugin extends Plugin {
 		}
 		return dbgCfg;
 	}
+	
+	/*
 	protected void resetBreakpointsInstallCount() {
 		IBreakpointManager bm = DebugPlugin.getDefault().getBreakpointManager();
 		IBreakpoint[] breakpoints = bm.getBreakpoints(getUniqueIdentifier());
@@ -154,6 +150,7 @@ public class PTPDebugCorePlugin extends Plugin {
 		fBreakpointListeners.removeAll();
 		fBreakpointListeners = null;
 	}
+	*/
 	public static PCDIDebugModel getDebugModel() {
 		return debugModel;
 	}
@@ -161,13 +158,13 @@ public class PTPDebugCorePlugin extends Plugin {
 		super.start(context);
 		debugModel = new PCDIDebugModel();
 		initializeCommonSourceLookupDirector();
-		createBreakpointListenersList();
-		resetBreakpointsInstallCount();
+		//createBreakpointListenersList();
+		//resetBreakpointsInstallCount();
 		// setSessionManager(new SessionManager());
 	}
 	public void stop(BundleContext context) throws Exception {
-		disposeBreakpointListenersList();
-		resetBreakpointsInstallCount();
+		//disposeBreakpointListenersList();
+		//resetBreakpointsInstallCount();
 		disposeCommonSourceLookupDirector();
 		super.stop(context);
 	}

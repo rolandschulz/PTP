@@ -18,9 +18,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeFunction;
 import org.eclipse.ptp.debug.core.aif.IAIFValueFunction;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -31,7 +31,7 @@ public class AIFValueFunction extends ValueDerived implements IAIFValueFunction 
 		super(type);
 		parse(data);
 	}
-	public String getValueString() throws PCDIException {
+	public String getValueString() throws AIFException {
 		if (result == null) {
 			result = String.valueOf("");
 		}

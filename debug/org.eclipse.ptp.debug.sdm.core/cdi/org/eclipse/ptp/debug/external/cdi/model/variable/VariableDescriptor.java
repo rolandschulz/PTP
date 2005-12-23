@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model.variable;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -170,12 +169,12 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 			SourceManager sourceMgr = session.getSourceManager();
 			try {
 				fType = sourceMgr.getType(target, nametype);
-			} catch (CDIException e) {
+			} catch (PCDIException e) {
 				// Try with ptype.
 				try {
 					String ptype = sourceMgr.getDetailTypeName(target, nametype);
 					fType = sourceMgr.getType(target, ptype);
-				} catch (CDIException ex) {
+				} catch (PCDIException ex) {
 					// Some version of gdb does not work on the name of the class
 					// ex: class data foo --> ptype data --> fails
 					// ex: class data foo --> ptype foo --> succeed
@@ -191,7 +190,7 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 					try {
 						String ptype = sourceMgr.getDetailTypeNameFromVariable(frame, getQualifiedName());
 						fType = sourceMgr.getType(target, ptype);
-					} catch (CDIException e2) {
+					} catch (PCDIException e2) {
 						// give up.
 					}
 				}
@@ -203,7 +202,7 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 		}
 		return fType;
 	}
-	public int sizeof() throws CDIException {
+	public int sizeof() throws PCDIException {
 		return getType().sizeof();
 			/*
 			Target target = (Target) getTarget();
@@ -246,7 +245,7 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 	public IPCDIThread getThread() throws PCDIException {
 		return fThread;
 	}
-	public String getTypeName() throws CDIException {
+	public String getTypeName() throws PCDIException {
 		if (aif == null) {
 			Target target = (Target)getTarget();
 			StackFrame frame = (StackFrame)getStackFrame();
@@ -332,27 +331,27 @@ public abstract class VariableDescriptor extends PObject implements IPCDIVariabl
 		}
 		return super.equals(varDesc);
 	}
-	public IPCDIVariable[] getVariables() throws CDIException {
+	public IPCDIVariable[] getVariables() throws PCDIException {
 		Session session = (Session)getTarget().getSession();
 		VariableManager mgr = session.getVariableManager();
 		return mgr.getVariables(this);
 	}
-	public IPCDIVariableDescriptor getVariableDescriptorAsArray(int start, int length) throws CDIException {
+	public IPCDIVariableDescriptor getVariableDescriptorAsArray(int start, int length) throws PCDIException {
 		Session session = (Session)getTarget().getSession();
 		VariableManager mgr = session.getVariableManager();
 		return mgr.getVariableDescriptorAsArray(this, start, length);
 	}
-	public IPCDIVariable[] getVariablesAsArray(int start, int length) throws CDIException {
+	public IPCDIVariable[] getVariablesAsArray(int start, int length) throws PCDIException {
 		Session session = (Session)getTarget().getSession();
 		VariableManager mgr = session.getVariableManager();
 		return mgr.getVariablesAsArray(this, start, length);
 	}
-	public IPCDIVariableDescriptor getVariableDescriptorAsType(String type) throws CDIException {
+	public IPCDIVariableDescriptor getVariableDescriptorAsType(String type) throws PCDIException {
 		Session session = (Session)getTarget().getSession();
 		VariableManager mgr = session.getVariableManager();
 		return mgr.getVariableDescriptorAsType(this, type);
 	}
-	public IPCDIVariable createVariable() throws CDIException {
+	public IPCDIVariable createVariable() throws PCDIException {
 		Session session = (Session)getTarget().getSession();
 		VariableManager mgr = session.getVariableManager();
 		return mgr.createVariable(this);

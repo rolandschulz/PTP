@@ -19,7 +19,6 @@
 package org.eclipse.ptp.debug.core.cdi.model;
 
 import java.math.BigInteger;
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
@@ -33,6 +32,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDISharedLibraryManagement;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISourceManagement;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 public interface IPCDITarget extends IPCDIThreadGroup, IPCDIExpressionManagement, ICDISourceManagement, ICDISharedLibraryManagement, ICDIMemoryBlockManagement, IPCDISessionObject {
 	public int getTargetID();
@@ -40,16 +40,16 @@ public interface IPCDITarget extends IPCDIThreadGroup, IPCDIExpressionManagement
 	
 	Process getProcess();
 	IPCDITargetConfiguration getConfiguration();
-	String evaluateExpressionToString(IPCDIStackFrame context, String expressionText) throws CDIException;
-	IPCDIGlobalVariableDescriptor getGlobalVariableDescriptors(String filename, String function, String name) throws CDIException;
-	IPCDIGlobalVariable createGlobalVariable(IPCDIGlobalVariableDescriptor varDesc) throws CDIException;
-	ICDIRegisterGroup[] getRegisterGroups() throws CDIException;
-	ICDIRegister createRegister(ICDIRegisterDescriptor varDesc) throws CDIException;
+	String evaluateExpressionToString(IPCDIStackFrame context, String expressionText) throws PCDIException;
+	IPCDIGlobalVariableDescriptor getGlobalVariableDescriptors(String filename, String function, String name) throws PCDIException;
+	IPCDIGlobalVariable createGlobalVariable(IPCDIGlobalVariableDescriptor varDesc) throws PCDIException;
+	ICDIRegisterGroup[] getRegisterGroups() throws PCDIException;
+	ICDIRegister createRegister(ICDIRegisterDescriptor varDesc) throws PCDIException;
 	boolean isTerminated();
-	void terminate() throws CDIException;
+	void terminate() throws PCDIException;
 	boolean isDisconnected();
-	void disconnect() throws CDIException;
-	void restart() throws CDIException;
+	void disconnect() throws PCDIException;
+	void restart() throws PCDIException;
 	
 	ICDIRuntimeOptions getRuntimeOptions();
 	ICDICondition createCondition(int ignoreCount, String expression);

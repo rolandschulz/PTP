@@ -20,9 +20,9 @@ package org.eclipse.ptp.debug.internal.core.aif;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeFloat;
 import org.eclipse.ptp.debug.core.aif.IAIFValueFloat;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -39,13 +39,13 @@ public class AIFValueFloat extends AIFValue implements IAIFValueFloat {
 		byteBuffer = byteBuffer(data);
 		size = data.length;
 	}
-	public String getValueString() throws PCDIException {
+	public String getValueString() throws AIFException {
 		if (result == null) {
 			result = getString();
 		}
 		return result;
 	}
-	private String getString() throws PCDIException {
+	private String getString() throws AIFException {
 		if (isFloat()) {
 			return String.valueOf(floatValue());
 		} else if (isDouble()) {
@@ -54,7 +54,7 @@ public class AIFValueFloat extends AIFValue implements IAIFValueFloat {
 			return new String(byteBuffer.array());
 		}
 	}
-	public float floatValue() throws PCDIException {
+	public float floatValue() throws AIFException {
 		try {
 			return byteBuffer.getFloat();
 		} catch (BufferUnderflowException e) {
@@ -63,7 +63,7 @@ public class AIFValueFloat extends AIFValue implements IAIFValueFloat {
 			byteBuffer.rewind();			
 		}
 	}
-	public double doubleValue() throws PCDIException {
+	public double doubleValue() throws AIFException {
 		try {
 			return byteBuffer.getDouble();
 		} catch (BufferUnderflowException e) {

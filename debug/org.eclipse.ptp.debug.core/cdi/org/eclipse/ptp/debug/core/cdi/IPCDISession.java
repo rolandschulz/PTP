@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
@@ -30,8 +29,8 @@ public interface IPCDISession extends ICommonActions {
 	String getAttribute(String key);
 	IPCDIEventManager getEventManager();
 	IPCDISessionConfiguration getConfiguration();
-	void terminate() throws CDIException;
-	Process getSessionProcess() throws CDIException;
+	void terminate() throws PCDIException;
+	Process getSessionProcess() throws PCDIException;
 	
 	public void registerTarget(int procNum, boolean sendEvent, boolean resumeTarget);
 	public void registerTargets(int[] procNums, boolean sendEvent, boolean resumeTarget);

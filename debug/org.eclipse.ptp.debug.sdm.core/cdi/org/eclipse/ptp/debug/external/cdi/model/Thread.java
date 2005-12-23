@@ -73,7 +73,7 @@ public class Thread extends PObject implements IPCDIThread {
 		}
 		return str;
 	}
-	public StackFrame getCurrentStackFrame() throws CDIException {
+	public StackFrame getCurrentStackFrame() throws PCDIException {
 		if (currentFrame == null) {
 			IPCDIStackFrame[] frames = getStackFrames(0, 0);
 			if (frames.length > 0) {
@@ -82,7 +82,7 @@ public class Thread extends PObject implements IPCDIThread {
 		}
 		return currentFrame;
 	}
-	public IPCDIStackFrame[] getStackFrames() throws CDIException {
+	public IPCDIStackFrame[] getStackFrames() throws PCDIException {
 		int depth = getStackFrameCount();
 
 		// refresh if we have nothing or if we have just a subset get everything.
@@ -117,7 +117,7 @@ public class Thread extends PObject implements IPCDIThread {
 		}
 		return (IPCDIStackFrame[]) currentFrames.toArray(noStack);
 	}
-	public int getStackFrameCount() throws CDIException {
+	public int getStackFrameCount() throws PCDIException {
 		if (stackdepth == 0 || currentFrames == null) {
 			currentFrames = new ArrayList();
 			final Target target = (Target) getTarget();
@@ -140,14 +140,14 @@ public class Thread extends PObject implements IPCDIThread {
 		if (currentFrames == null || currentFrames.size() < high) {
 			try {
 				getStackFrames();
-			} catch (CDIException e) {
+			} catch (PCDIException e) {
 				throw new PCDIException(e.getMessage());
 			}
 		}
 		List list = ((high - low + 1) <= currentFrames.size()) ? currentFrames.subList(low, high + 1) : currentFrames;
 		return (IPCDIStackFrame[])list.toArray(noStack);
 	}
-	public void setCurrentStackFrame(StackFrame stackframe, boolean doUpdate) throws CDIException {
+	public void setCurrentStackFrame(StackFrame stackframe, boolean doUpdate) throws PCDIException {
 		int frameLevel = 0;
 		if (stackframe != null) {
 			frameLevel = stackframe.getLevel();
@@ -176,72 +176,96 @@ public class Thread extends PObject implements IPCDIThread {
 			}
 		}
 	}	
-	public void stepInto() throws CDIException {
+	public void stepInto() throws PCDIException {
 		stepInto(1);
 	}
-	public void stepInto(int count) throws CDIException {
+	public void stepInto(int count) throws PCDIException {
 		((Target)getTarget()).setCurrentThread(this);
-		getTarget().stepInto(count);
+		try {
+			getTarget().stepInto(count);
+		} catch (CDIException e) {
+			throw new PCDIException(e);
+		}
 	}
-	public void stepIntoInstruction() throws CDIException {
+	public void stepIntoInstruction() throws PCDIException {
 		stepIntoInstruction(1);
 	}
-	public void stepIntoInstruction(int count) throws CDIException {
+	public void stepIntoInstruction(int count) throws PCDIException {
 		((Target)getTarget()).setCurrentThread(this);
-		getTarget().stepIntoInstruction(count);
+		try {
+			getTarget().stepIntoInstruction(count);
+		} catch (CDIException e) {
+			throw new PCDIException(e);
+		}
 	}
-	public void stepOver() throws CDIException {
+	public void stepOver() throws PCDIException {
 		stepOver(1);
 	}
-	public void stepOver(int count) throws CDIException {
+	public void stepOver(int count) throws PCDIException {
 		((Target)getTarget()).setCurrentThread(this);
-		getTarget().stepOver(count);
+		try {
+			getTarget().stepOver(count);
+		} catch (CDIException e) {
+			throw new PCDIException(e);
+		}
 	}
-	public void stepOverInstruction() throws CDIException {
+	public void stepOverInstruction() throws PCDIException {
 		stepOverInstruction(1);
 	}
-	public void stepOverInstruction(int count) throws CDIException {
+	public void stepOverInstruction(int count) throws PCDIException {
 		((Target)getTarget()).setCurrentThread(this);
-		getTarget().stepOverInstruction(count);
+		try {
+			getTarget().stepOverInstruction(count);
+		} catch (CDIException e) {
+			throw new PCDIException(e);
+		}
 	}
-	public void stepReturn() throws CDIException {
+	public void stepReturn() throws PCDIException {
 		getCurrentStackFrame().stepReturn();
 	}
-	public void runUntil(ICDILocation location) throws CDIException {
+	public void runUntil(ICDILocation location) throws PCDIException {
 		stepUntil(location);
 	}
-	public void stepUntil(ICDILocation location) throws CDIException {
+	public void stepUntil(ICDILocation location) throws PCDIException {
 		((Target)getTarget()).setCurrentThread(this);
-		getTarget().stepUntil(location);
+		try {
+			getTarget().stepUntil(location);
+		} catch (CDIException e) {
+			throw new PCDIException(e);
+		}
 	}
 	public boolean isSuspended() {
 		return getTarget().isSuspended();
 	}
-	public void suspend() throws CDIException {
-		getTarget().suspend();
+	public void suspend() throws PCDIException {
+		try {
+			getTarget().suspend();
+		} catch (CDIException e) {
+			throw new PCDIException(e);
+		}
 	}
-	public void resume() throws CDIException {
+	public void resume() throws PCDIException {
 		resume(false);
 	}
-	public void resume(boolean passSignal) throws CDIException {
+	public void resume(boolean passSignal) throws PCDIException {
 		((Target)getTarget()).setCurrentThread(this);
 		getTarget().resume(passSignal);
 	}
-	public void resume(ICDILocation location) throws CDIException {
+	public void resume(ICDILocation location) throws PCDIException {
 		((Target)getTarget()).setCurrentThread(this);
 		getTarget().resume(location);
 	}
-	public void resume(ICDISignal signal) throws CDIException {
+	public void resume(ICDISignal signal) throws PCDIException {
 		((Target)getTarget()).setCurrentThread(this);
 		getTarget().resume(signal);
 	}
-	public void jump(ICDILocation location) throws CDIException {
+	public void jump(ICDILocation location) throws PCDIException {
 		resume(location);
 	}
-	public void signal() throws CDIException {
+	public void signal() throws PCDIException {
 		resume(false);
 	}
-	public void signal(ICDISignal signal) throws CDIException {
+	public void signal(ICDISignal signal) throws PCDIException {
 		resume(signal);
 	}
 	public boolean equals(IPCDIThread thread) {
@@ -251,7 +275,7 @@ public class Thread extends PObject implements IPCDIThread {
 		}
 		return super.equals(thread);
 	}
-	public IPCDIBreakpoint[] getBreakpoints() throws CDIException {
+	public IPCDIBreakpoint[] getBreakpoints() throws PCDIException {
 		Target target = (Target)getTarget();
 		IPCDIBreakpoint[] bps = target.getBreakpoints();
 		ArrayList list = new ArrayList(bps.length);
@@ -275,12 +299,12 @@ public class Thread extends PObject implements IPCDIThread {
 		}
 		return (IPCDIBreakpoint[]) list.toArray(new IPCDIBreakpoint[list.size()]);
 	}
-	public IPCDIThreadStorageDescriptor[] getThreadStorageDescriptors() throws CDIException {
+	public IPCDIThreadStorageDescriptor[] getThreadStorageDescriptors() throws PCDIException {
 		Session session = (Session)getTarget().getSession();
 		VariableManager varMgr = session.getVariableManager();
 		return varMgr.getThreadStorageDescriptors(this);
 	}
-	public IPCDIThreadStorage createThreadStorage(IPCDIThreadStorageDescriptor varDesc) throws CDIException {
+	public IPCDIThreadStorage createThreadStorage(IPCDIThreadStorageDescriptor varDesc) throws PCDIException {
 		if (varDesc instanceof ThreadStorageDescriptor) {
 			Session session = (Session)getTarget().getSession();
 			VariableManager varMgr = session.getVariableManager();

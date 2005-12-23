@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.model;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -66,7 +65,7 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			IInternalVariable iv = null;
 			try {
 				iv = new InternalVariable(getVariable(), getCDIVariableObject().getVariableDescriptorAsArray(start, length));
-			} catch (CDIException e) {
+			} catch (PCDIException e) {
 				requestFailed(e.getMessage(), null);
 			}
 			return iv;
@@ -75,7 +74,7 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			IInternalVariable iv = null;
 			try {
 				iv = new InternalVariable(getVariable(), getCDIVariableObject().getVariableDescriptorAsType(type));
-			} catch (CDIException e) {
+			} catch (PCDIException e) {
 				requestFailed(e.getMessage(), null);
 			}
 			return iv;
@@ -84,7 +83,7 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			if (fCDIVariable == null) {
 				try {
 					fCDIVariable = getCDITarget().createGlobalVariable((IPCDIGlobalVariableDescriptor) getCDIVariableObject());
-				} catch (CDIException e) {
+				} catch (PCDIException e) {
 					requestFailed(e.getMessage(), null);
 				}
 			}
@@ -106,7 +105,7 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			if (fQualifiedName == null) {
 				try {
 					fQualifiedName = (fCDIVariableObject != null) ? fCDIVariableObject.getQualifiedName() : null;
-				} catch (CDIException e) {
+				} catch (PCDIException e) {
 					requestFailed(e.getMessage(), null);
 				}
 			}
@@ -133,7 +132,7 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			try {
 				if (destroy && fCDIVariable != null)
 					fCDIVariable.dispose();
-			} catch (CDIException e) {
+			} catch (PCDIException e) {
 				logError(e.getMessage());
 			}
 			invalidateValue();
@@ -152,7 +151,7 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			if (getCDIVariableObject() != null) {
 				try {
 					return getCDIVariableObject().sizeof();
-				} catch (CDIException e) {
+				} catch (PCDIException e) {
 				}
 			}
 			return 0;
@@ -168,7 +167,7 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 					cdiVariable.setValue(expression);
 				else
 					requestFailed(CoreModelMessages.getString("CModificationVariable.0"), null);
-			} catch (CDIException e) {
+			} catch (PCDIException e) {
 				targetRequestFailed(e.getMessage(), null);
 			}
 		}
@@ -221,7 +220,7 @@ public class PGlobalVariable extends PVariable implements IPGlobalVariable {
 			if (var != null) {
 				try {
 					return var.isEditable();
-				} catch (CDIException e) {
+				} catch (PCDIException e) {
 				}
 			}
 			return false;

@@ -18,20 +18,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.cdt.debug.core.cdi.model.ICDIExecuteStep;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISuspend;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
  * 
  */
 public interface IPCDIThread extends ICDIExecuteStep, IPCDIExecuteResume, ICDISuspend, IPCDIObject {
-	IPCDIStackFrame[] getStackFrames() throws CDIException;
-	IPCDIStackFrame[] getStackFrames(int fromIndex, int len) throws CDIException;
-	int getStackFrameCount() throws CDIException;
-	IPCDIThreadStorageDescriptor[] getThreadStorageDescriptors() throws CDIException;
-	IPCDIThreadStorage createThreadStorage(IPCDIThreadStorageDescriptor varDesc) throws CDIException;
+	IPCDIStackFrame[] getStackFrames() throws PCDIException;
+	IPCDIStackFrame[] getStackFrames(int fromIndex, int len) throws PCDIException;
+	int getStackFrameCount() throws PCDIException;
+	IPCDIThreadStorageDescriptor[] getThreadStorageDescriptors() throws PCDIException;
+	IPCDIThreadStorage createThreadStorage(IPCDIThreadStorageDescriptor varDesc) throws PCDIException;
 	boolean equals(IPCDIThread thead);
 }
 

@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.core.sourcelookup;
 
-import org.eclipse.cdt.debug.core.model.ICStackFrame;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -29,6 +28,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocator;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
@@ -49,8 +49,8 @@ public class PSourceManager implements IPSourceLocator, IPersistableSourceLocato
 		if (getPSourceLocator() != null) {
 			return getPSourceLocator().getLineNumber(frame);
 		}
-		if (frame instanceof ICStackFrame) {
-			return ((ICStackFrame) frame).getFrameLineNumber();
+		if (frame instanceof IPStackFrame) {
+			return ((IPStackFrame) frame).getFrameLineNumber();
 		}
 		return 0;
 	}

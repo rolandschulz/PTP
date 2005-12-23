@@ -20,8 +20,8 @@ package org.eclipse.ptp.debug.external.cdi.model.variable;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariable;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
@@ -57,7 +57,7 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 	public boolean isUpdated() {
 		return isUpdated;
 	}
-	public void update() throws CDIException {
+	public void update() throws PCDIException {
 		Session session = (Session)getTarget().getSession();
 		VariableManager mgr = session.getVariableManager();
 		mgr.update(this);
@@ -82,12 +82,12 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 	boolean isFake() {
 		return isFake;
 	}
-	public IPCDIVariable[] getChildren() throws CDIException {
+	public IPCDIVariable[] getChildren() throws PCDIException {
 		// Use the default timeout.
 		return getChildren(-1);
 	}
 	//TODO - dunno whether it implemented correctly or not
-	public IPCDIVariable[] getChildren(int timeout) throws CDIException {
+	public IPCDIVariable[] getChildren(int timeout) throws PCDIException {
 		List varList = new ArrayList(1);
 		Target target = (Target)getTarget();
 		Session session = (Session)target.getSession();
@@ -106,13 +106,13 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 
 	protected abstract Variable createVariable(Target target, Thread thread, StackFrame frame, String name, String fullName, int pos, int depth, IAIF aif);
 	
-	public int getChildrenNumber() throws CDIException {
+	public int getChildrenNumber() throws PCDIException {
 		//FIXME no child number provided
 		return 1;
 	}
 
 	/*
-	public ICDIValue getValue() throws CDIException {
+	public ICDIValue getValue() throws PCDIException {
 		if (value == null) {
 			ICDIType t = getType();
 			if (t instanceof ICDIBoolType) {
@@ -151,15 +151,15 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 		}
 		return value;
 	}
-	public void setValue(ICDIValue value) throws CDIException {
+	public void setValue(ICDIValue value) throws PCDIException {
 		setValue(value.getValueString());
 	}
 	*/
-	public void setValue(IAIF aif) throws CDIException {
+	public void setValue(IAIF aif) throws PCDIException {
 		setAIF(aif);
 	}
 	
-	public void setValue(String expression) throws CDIException {
+	public void setValue(String expression) throws PCDIException {
 		Target target = (Target)getTarget();
 		Session session = (Session)target.getSession();
 		//TODO - not implement yet - variable assign
@@ -175,9 +175,9 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 		if (varMgr.isAutoUpdate()) {
 			varMgr.update(target);
 		}
-		throw new CDIException("Not implemented yet - Variable: setValue");
+		throw new PCDIException("Not implemented yet - Variable: setValue");
 	}
-	public boolean isEditable() throws CDIException {
+	public boolean isEditable() throws PCDIException {
 		if (editable == null) {
 			/*
 			Target target = (Target)getTarget();
@@ -186,11 +186,11 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 			*/
 			//TODO - not implement yet - show attributes
 			//editable = String.valueOf(debugger.showAttributes(session.createBitList(target.getTargetID()), getName()));
-			throw new CDIException("Not implement yet - Variable: isEditable");
+			throw new PCDIException("Not implement yet - Variable: isEditable");
 		}
 		return (editable == null) ? false : editable.equalsIgnoreCase("true");
 	}
-	public void setFormat(int format) throws CDIException {
+	public void setFormat(int format) throws PCDIException {
 		/*
 		Target target = (Target)getTarget();
 		IAbstractDebugger debugger = target.getDebugger();
@@ -198,7 +198,7 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 		*/
 		//TODO - not implement yet - set format
 		//debugger.setFormat(session.createBitList(target.getTargetID()), getName());
-		throw new CDIException("Not implement yet - Variable: setFormat");
+		throw new PCDIException("Not implement yet - Variable: setFormat");
 	}
 	public boolean equals(IPCDIVariable var) {
 		if (var instanceof Variable) {
@@ -210,12 +210,12 @@ public abstract class Variable extends VariableDescriptor implements IPCDIVariab
 	public boolean equals(Variable variable) {
 		return getName().equals(variable.getName());
 	}	
-	public void dispose() throws CDIException {
+	public void dispose() throws PCDIException {
 		IPCDITarget target = getTarget();
 		VariableManager varMgr = ((Session)target.getSession()).getVariableManager();
 		varMgr.destroyVariable(this);
 	}
-	public String getTypeName() throws CDIException {
+	public String getTypeName() throws PCDIException {
 		if (aif == null) {
 			Target target = (Target)getTarget();
 			Session session = (Session)target.getSession();

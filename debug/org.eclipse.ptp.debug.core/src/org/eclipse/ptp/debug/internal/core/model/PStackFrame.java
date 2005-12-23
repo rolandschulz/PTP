@@ -46,6 +46,7 @@ import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIExpression;
@@ -356,7 +357,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		List list = new ArrayList();
 		try {
 			list.addAll(Arrays.asList(getCDIStackFrame().getLocalVariableDescriptors()));
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			targetRequestFailed(e.getMessage(), null);
 		}
 		return list;
@@ -365,7 +366,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		List list = new ArrayList();
 		try {
 			list.addAll(Arrays.asList(getCDIStackFrame().getArgumentDescriptors()));
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			targetRequestFailed(e.getMessage(), null);
 		}
 		return list;
@@ -457,7 +458,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	public String evaluateExpressionToString(String expression) throws DebugException {
 		try {
 			return getCDITarget().evaluateExpressionToString(getCDIStackFrame(), expression);
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			targetRequestFailed(e.getMessage(), null);
 		}
 		return null;
@@ -469,7 +470,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	protected void doStepReturn() throws DebugException {
 		try {
 			getCDIStackFrame().stepReturn();
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			targetRequestFailed(e.getMessage(), null);
 		}
 	}
@@ -492,7 +493,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 			IPCDIExpression cdiExpression = (IPCDIExpression)((PDebugTarget) getDebugTarget()).getCDITarget().createExpression(expressionText);
 			expression = new PExpression(this, cdiExpression, null);
 			fExpressions.add(expression);
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			targetRequestFailed(e.getMessage(), null);
 		}
 		return expression;
@@ -566,7 +567,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		IPCDILocation location = (IPCDILocation)getCDITarget().createLineLocation(fileName, lineNumber);
 		try {
 			getCDIThread().resume(location);
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			targetRequestFailed(e.getMessage(), e);
 		}
 	}
@@ -579,7 +580,7 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 		IPCDILocation location = (IPCDILocation)getCDITarget().createAddressLocation(new BigInteger(address.toString()));
 		try {
 			getCDIThread().resume(location);
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			targetRequestFailed(e.getMessage(), e);
 		}
 	}

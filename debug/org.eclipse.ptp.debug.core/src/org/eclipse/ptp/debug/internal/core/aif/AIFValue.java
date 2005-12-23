@@ -19,9 +19,9 @@
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import java.nio.ByteBuffer;
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -38,10 +38,10 @@ public abstract class AIFValue implements IAIFValue {
 	public IAIFType getType() {
 		return type;
 	}
-	public int getChildrenNumber() throws PCDIException {
+	public int getChildrenNumber() throws AIFException {
 		return 0;
 	}
-	public boolean hasChildren() throws PCDIException {
+	public boolean hasChildren() throws AIFException {
 		return (getChildrenNumber() > 0);
 	}
 	protected ByteBuffer byteBuffer(byte[] data) {
@@ -55,7 +55,7 @@ public abstract class AIFValue implements IAIFValue {
 	public String toString() {
 		try {
 			return getValueString();
-		} catch (PCDIException e) {
+		} catch (AIFException e) {
 			return "err: " + e.getMessage();
 		}
 	}

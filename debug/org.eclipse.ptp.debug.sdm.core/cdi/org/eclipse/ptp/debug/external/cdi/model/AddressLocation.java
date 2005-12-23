@@ -30,7 +30,6 @@
 package org.eclipse.ptp.debug.external.cdi.model;
 
 import java.math.BigInteger;
-
 import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
 import org.eclipse.ptp.debug.external.cdi.Location;
 

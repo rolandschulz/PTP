@@ -19,12 +19,10 @@
 
 package org.eclipse.ptp.debug.core.aif;
 
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-
 public interface IAIFValue {
 	IAIFType getType();
-	String getValueString() throws PCDIException;
-	int getChildrenNumber() throws PCDIException;
-	boolean hasChildren() throws PCDIException;
+	String getValueString() throws AIFException;
+	int getChildrenNumber() throws AIFException;
+	boolean hasChildren() throws AIFException;
 	int sizeof();
 }

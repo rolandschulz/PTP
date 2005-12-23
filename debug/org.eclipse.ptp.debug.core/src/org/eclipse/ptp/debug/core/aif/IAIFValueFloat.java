@@ -18,8 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.aif;
 
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-
 /**
  * @author Clement chu
  * 
@@ -27,7 +25,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
 public interface IAIFValueFloat extends IAIFValue {
 	public boolean isFloat();
 	public boolean isDouble();
-	public double doubleValue() throws PCDIException;
-	public float floatValue() throws PCDIException;	
+	public double doubleValue() throws AIFException;
+	public float floatValue() throws AIFException;	
 }
 

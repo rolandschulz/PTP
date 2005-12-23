@@ -85,6 +85,7 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISharedLibraryEvent;
 import org.eclipse.ptp.debug.core.cdi.IPCDISignalReceived;
 import org.eclipse.ptp.debug.core.cdi.IPCDIWatchpointScope;
 import org.eclipse.ptp.debug.core.cdi.IPCDIWatchpointTrigger;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIChangedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDICreatedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIDestroyedEvent;
@@ -177,7 +178,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		IPCDIThread[] cdiThreads = new IPCDIThread[0];
 		try {
 			cdiThreads = (IPCDIThread[])getCDITarget().getThreads();
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			// ignore
 		}
 		DebugEvent suspendEvent = null;
@@ -189,7 +190,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 					// Use BREAKPOINT as a detail to force perspective switch
 					suspendEvent = thread.createSuspendEvent(DebugEvent.BREAKPOINT);
 				}
-			} catch (CDIException e) {
+			} catch (PCDIException e) {
 				// ignore
 			}
 		}
@@ -268,7 +269,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		changeState(PDebugElementState.TERMINATING);
 		try {
 			getCDITarget().terminate();
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			restoreOldState();
 			targetRequestFailed(e.getMessage(), null);
 		}
@@ -300,7 +301,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		changeState(PDebugElementState.RESUMING);
 		try {
 			getCDITarget().resume(false);
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			restoreOldState();
 			targetRequestFailed(e.getMessage(), null);
 		}
@@ -326,7 +327,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 			IPCDIThread suspensionThread = null;
 			try {
 				suspensionThread = (IPCDIThread)getCDITarget().getCurrentThread();
-			} catch (CDIException e) {
+			} catch (PCDIException e) {
 				// ignore
 			}
 			thread.suspendByTarget(event.getReason(), suspensionThread);
@@ -342,7 +343,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		try {
 			cdiThreads = (IPCDIThread[])getCDITarget().getThreads();
 			currentCDIThread = (IPCDIThread)getCDITarget().getCurrentThread();
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 		}
 		for (int i = 0; i < cdiThreads.length; ++i) {
 			PThread thread = findThread(oldList, cdiThreads[i]);
@@ -399,7 +400,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		changeState(PDebugElementState.DISCONNECTING);
 		try {
 			getCDITarget().disconnect();
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			restoreOldState();
 			targetRequestFailed(e.getMessage(), null);
 		}
@@ -504,7 +505,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		setInternalTemporaryBreakpoint(location);
 		try {
 			getCDITarget().restart();
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			restoreOldState();
 			targetRequestFailed(e.getMessage(), e);
 		}
@@ -749,7 +750,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 				// ???
 				targetRequestFailed("not_a_location", null);
 			}
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			targetRequestFailed(e.getMessage(), null);
 		}
 	}
@@ -799,7 +800,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		changeState(PDebugElementState.RESUMING);
 		try {
 			getCDITarget().resume(false);
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			restoreOldState();
 			targetRequestFailed(e.getMessage(), e);
 		}
@@ -916,7 +917,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 		IPCDIVariableDescriptor vo = null;
 		try {
 			vo = (IPCDIVariableDescriptor)getCDITarget().getGlobalVariableDescriptors(info.getPath().lastSegment(), null, info.getName());
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			throw new DebugException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), DebugException.TARGET_REQUEST_FAILED, (vo != null) ? vo.getName() + ": " + e.getMessage() : e.getMessage(), null)); //$NON-NLS-1$
 		}
 		return PVariableFactory.createGlobalVariable(this, info, vo);

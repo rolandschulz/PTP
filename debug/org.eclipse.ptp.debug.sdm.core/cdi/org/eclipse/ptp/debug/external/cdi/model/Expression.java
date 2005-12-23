@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.cdi.model;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIExpression;
@@ -57,13 +56,13 @@ public class Expression extends PObject implements IPCDIExpression {
 		SourceManager sourceMgr = session.getSourceManager();
 		try {
 			return sourceMgr.getAIFFromVariable((StackFrame) frame, getExpressionText());
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			throw new PCDIException(e.getMessage());
 		}
 	}
 
 	/*
-	public ICDIType getType(ICDIStackFrame frame) throws CDIException {
+	public ICDIType getType(ICDIStackFrame frame) throws PCDIException {
 		Type type = null;
 		Target target = (Target) getTarget();
 		Session session = (Session) (target.getSession());
@@ -71,19 +70,19 @@ public class Expression extends PObject implements IPCDIExpression {
 		IAIF aif = sourceMgr.getAIFFromVariable((StackFrame) frame, getExpressionText());
 		try {
 			type = sourceMgr.getType(target, aif);
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			// Try with ptype.
 			try {
 				String ptype = sourceMgr.getDetailTypeName(target, aif.getDescription());
 				type = sourceMgr.getType(target, ptype);
-			} catch (CDIException ex) {
+			} catch (PCDIException ex) {
 				// Some version of gdb does not work with the name of the class
 				// ex: class data foo --> ptype data --> fails
 				// ex: class data foo --> ptype foo --> succeed
 				try {
 					String ptype = sourceMgr.getDetailTypeNameFromVariable((StackFrame) frame, getExpressionText());
 					type = sourceMgr.getType(target, ptype);
-				} catch (CDIException e2) {
+				} catch (PCDIException e2) {
 					// give up.
 				}
 			}
@@ -93,14 +92,14 @@ public class Expression extends PObject implements IPCDIExpression {
 		}
 		return type;
 	}
-	public ICDIValue getValue(ICDIStackFrame context) throws CDIException {
+	public ICDIValue getValue(ICDIStackFrame context) throws PCDIException {
 		Session session = (Session) getTarget().getSession();
 		ExpressionManager mgr = session.getExpressionManager();
 		Variable var = mgr.createVariable((StackFrame) context, getExpressionText());
 		return var.getValue();
 	}
 	*/
-	public void dispose() throws CDIException {
+	public void dispose() throws PCDIException {
 		Session session = (Session) getTarget().getSession();
 		ExpressionManager mgr = session.getExpressionManager();
 		mgr.destroyExpressions((Target) getTarget(), new Expression[] { this });

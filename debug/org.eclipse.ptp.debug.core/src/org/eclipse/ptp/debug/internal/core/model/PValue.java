@@ -26,9 +26,9 @@ import java.util.Iterator;
 import java.util.List;
 import org.eclipse.cdt.core.IAddress;
 import org.eclipse.cdt.core.IAddressFactory;
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueChar;
 import org.eclipse.ptp.debug.core.aif.IAIFValueFloat;
@@ -70,7 +70,7 @@ public class PValue extends AbstractPValue {
 			if (isSuspended) {
 				try {
 					fValueString = processUnderlyingValue(getUnderlyingValue());
-				} catch (CDIException e) {
+				} catch (AIFException e) {
 					setStatus(IPDebugElementStatus.ERROR, e.getMessage());
 				}
 			}
@@ -107,7 +107,7 @@ public class PValue extends AbstractPValue {
 			IAIFValue value = getUnderlyingValue();
 			if (value != null)
 				return value.getChildrenNumber() > 0;
-		} catch (CDIException e) {
+		} catch (AIFException e) {
 			targetRequestFailed(e.getMessage(), null);
 		}
 		return false;
@@ -119,7 +119,7 @@ public class PValue extends AbstractPValue {
 		IPCDIVariable[] vars = new IPCDIVariable[0];
 		try {
 			vars = getParentVariable().getCDIVariable().getVariables();
-		} catch (CDIException e) {
+		} catch (PCDIException e) {
 			requestFailed(e.getMessage(), e);
 		}
 		return Arrays.asList(vars);
@@ -140,7 +140,7 @@ public class PValue extends AbstractPValue {
 			((AbstractPVariable) it.next()).dispose();
 		}
 	}
-	private String processUnderlyingValue(IAIFValue aifValue) throws CDIException {
+	private String processUnderlyingValue(IAIFValue aifValue) throws AIFException {
 		if (aifValue != null) {
 			if (aifValue instanceof IAIFValueChar)
 				return getCharValueString((IAIFValueChar) aifValue);
@@ -159,7 +159,7 @@ public class PValue extends AbstractPValue {
 		}
 		return null;
 	}
-	private String getCharValueString(IAIFValueChar value) throws PCDIException {
+	private String getCharValueString(IAIFValueChar value) throws AIFException {
 		PVariableFormat format = getParentVariable().getFormat();
 		char charValue = value.charValue();
 		if (PVariableFormat.NATURAL.equals(format)) {
@@ -176,7 +176,7 @@ public class PValue extends AbstractPValue {
 		}
 		return null;
 	}
-	private String getIntValueString(IAIFValueInt value) throws CDIException {
+	private String getIntValueString(IAIFValueInt value) throws AIFException {
 		PVariableFormat format = getParentVariable().getFormat();
 		String stringValue = value.getValueString();
 		if (PVariableFormat.NATURAL.equals(format) || PVariableFormat.DECIMAL.equals(format)) {
@@ -197,7 +197,7 @@ public class PValue extends AbstractPValue {
 		}
 		return null;
 	}
-	private String getFloatingPointValueString(IAIFValueFloat value) throws CDIException {
+	private String getFloatingPointValueString(IAIFValueFloat value) throws AIFException {
 		if (value.isDouble()) {
 			return getDoubleValueString(value.getValueString());
 		} else if (value.isFloat()) {
@@ -206,7 +206,7 @@ public class PValue extends AbstractPValue {
 			return value.getValueString();
 		}
 	}
-	private String getFloatValueString(String floatValue) throws CDIException {
+	private String getFloatValueString(String floatValue) throws AIFException {
 		PVariableFormat format = getParentVariable().getFormat();
 		if (PVariableFormat.NATURAL.equals(format)) {
 			return floatValue;
@@ -226,7 +226,7 @@ public class PValue extends AbstractPValue {
 		}
 		return floatValue;
 	}
-	private String getDoubleValueString(String doubleValue) throws CDIException {
+	private String getDoubleValueString(String doubleValue) throws AIFException {
 		PVariableFormat format = getParentVariable().getFormat();
 		if (PVariableFormat.NATURAL.equals(format)) {
 			return doubleValue;
@@ -246,7 +246,7 @@ public class PValue extends AbstractPValue {
 		}
 		return doubleValue;
 	}
-	private String getPointerValueString(IAIFValuePointer value) throws CDIException {
+	private String getPointerValueString(IAIFValuePointer value) throws AIFException {
 		// TODO:IPF_TODO Workaround to solve incorrect handling of structures referenced by pointers or references
 		IAddressFactory factory = ((PDebugTarget) getDebugTarget()).getAddressFactory();
 		BigInteger pv = value.pointerValue();
@@ -262,7 +262,7 @@ public class PValue extends AbstractPValue {
 			return address.toString();
 		return null;
 	}
-	private String getWCharValueString(IAIFValueString value) throws CDIException {
+	private String getWCharValueString(IAIFValueString value) throws AIFException {
 		return value.getValueString();
 		/*
 		if (getParentVariable() instanceof PVariable) {
@@ -336,7 +336,7 @@ public class PValue extends AbstractPValue {
 }
 
 /*
-	private String getLongValueString(IAIFValueLong value) throws CDIException {
+	private String getLongValueString(IAIFValueLong value) throws PCDIException {
 		try {
 			PVariableFormat format = getParentVariable().getFormat();
 			if (PVariableFormat.NATURAL.equals(format) || PVariableFormat.DECIMAL.equals(format)) {
@@ -359,7 +359,7 @@ public class PValue extends AbstractPValue {
 		}
 		return null;
 	}
-	private String getLongLongValueString(IAIFValueLongLong value) throws CDIException {
+	private String getLongLongValueString(IAIFValueLongLong value) throws PCDIException {
 		try {
 			PVariableFormat format = getParentVariable().getFormat();
 			if (PVariableFormat.NATURAL.equals(format) || PVariableFormat.DECIMAL.equals(format)) {
@@ -382,7 +382,7 @@ public class PValue extends AbstractPValue {
 		}
 		return null;
 	}
-	private String getShortValueString(IAIFValueShort value) throws CDIException {
+	private String getShortValueString(IAIFValueShort value) throws PCDIException {
 		PVariableFormat format = getParentVariable().getFormat();
 		if (PVariableFormat.NATURAL.equals(format) || PVariableFormat.DECIMAL.equals(format)) {
 			return (isSigned()) ? Short.toString(value.shortValue()) : Integer.toString(value.intValue());

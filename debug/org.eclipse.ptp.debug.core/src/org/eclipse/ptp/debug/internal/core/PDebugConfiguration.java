@@ -33,14 +33,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.debug.core.IPTPDebugger;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
+import org.eclipse.ptp.debug.core.IPTPDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 
 public class PDebugConfiguration implements IPDebugConfiguration {

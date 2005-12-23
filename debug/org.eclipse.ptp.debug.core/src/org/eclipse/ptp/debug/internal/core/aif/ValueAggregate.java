@@ -20,12 +20,12 @@ package org.eclipse.ptp.debug.internal.core.aif;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
-import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
+import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
 import org.eclipse.ptp.debug.core.aif.IValueAggregate;
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
@@ -39,7 +39,7 @@ public abstract class ValueAggregate extends AIFValue implements IValueAggregate
 		parse(data);
 	}
 
-	public int getChildrenNumber() throws PCDIException {
+	public int getChildrenNumber() throws AIFException {
 		return values.size();
 	}
 	protected void parse(byte[] data) {
@@ -62,13 +62,13 @@ public abstract class ValueAggregate extends AIFValue implements IValueAggregate
 		System.arraycopy(data, from, newByte, 0, size);
 		return newByte;
 	}
-	public String getValueString() throws PCDIException {
+	public String getValueString() throws AIFException {
 		if (result == null) {
 			result = getString();
 		}
 		return result;
 	}
-	private String getString() throws PCDIException {
+	private String getString() throws AIFException {
 		String content = "{";
 		int length = values.size();
 		for (int i=0; i<length; i++) {

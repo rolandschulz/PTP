@@ -20,6 +20,7 @@ package org.eclipse.ptp.debug.core.cdi.model;
 
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 
+
 /**
  * @author Clement chu
  * 

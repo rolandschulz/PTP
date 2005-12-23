@@ -20,7 +20,6 @@ package org.eclipse.ptp.debug.external;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import org.eclipse.ptp.core.util.Queue;
 
 public class PseudoInputStream extends InputStream {

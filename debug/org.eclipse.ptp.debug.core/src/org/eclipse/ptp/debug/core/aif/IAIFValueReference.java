@@ -18,13 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.aif;
 
-import org.eclipse.ptp.debug.core.cdi.PCDIException;
-
 /**
  * @author Clement chu
  * 
  */
 public interface IAIFValueReference extends IValueDerived {
-	IAIFValue referenceValue() throws PCDIException;
+	IAIFValue referenceValue() throws AIFException;
 }
 

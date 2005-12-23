@@ -18,20 +18,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi.model;
 
-import org.eclipse.cdt.debug.core.cdi.CDIException;
 import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
 
 /**
  * @author Clement chu
  * 
  */
 public interface IPCDIVariable  extends IPCDIVariableDescriptor {
-	boolean isEditable() throws CDIException;
-	void setValue(String expression) throws CDIException;
-	void setValue(IAIF aif) throws CDIException;
-	void dispose() throws CDIException;
+	boolean isEditable() throws PCDIException;
+	void setValue(String expression) throws PCDIException;
+	void setValue(IAIF aif) throws PCDIException;
+	void dispose() throws PCDIException;
 	boolean equals(IPCDIVariable variable);
-	public IPCDIVariable[] getChildren() throws CDIException;
+	public IPCDIVariable[] getChildren() throws PCDIException;
 }
 
 

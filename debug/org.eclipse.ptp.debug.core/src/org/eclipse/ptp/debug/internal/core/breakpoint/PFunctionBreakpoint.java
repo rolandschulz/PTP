@@ -20,7 +20,6 @@ package org.eclipse.ptp.debug.internal.core.breakpoint;
 
 import java.text.MessageFormat;
 import java.util.Map;
-
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.debug.core.model.IPFunctionBreakpoint;

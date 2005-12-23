@@ -35,4 +35,7 @@ public class PCDIException extends CDIException {
 	public PCDIException(String msg, String details) {
 		super(msg, details);
 	}
+	public PCDIException(Throwable e) {
+		this(e.getMessage());
+	}	
 }
