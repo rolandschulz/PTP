@@ -1046,23 +1046,56 @@ struct simple_type simple_types[] = {
 	{ NULL, 0 }
 };
 
+static char *
+GetVarValue(char *var)
+{
+	char *		res;
+	MICommand *	cmd = MIVarEvaluateExpression(var);
+	
+	SendCommandWait(DebugSession, cmd);
+	
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return NULL;
+	}
+		
+	res = MIGetVarEvaluateExpressionInfo(cmd);
+	
+	MICommandFree(cmd);
+	
+	return res;
+}
+
 static AIF *
 SimpleVarToAIF(char *exp, MIVar *var)
 {
+	int					len;
 	char *				p;
 	char *				res;
 	AIF *				a;
+	AIF *				av;
 	struct simple_type *	s;
-	MICommand *			cmd;
 
 	if ( strcmp(var->type, "<text variable, no debug info>") == 0 ) {
 		DbgSetError(DBGERR_NOSYMS, "");
 		return NULL;
 	}
 
-	if (var->type[strlen(var->type) - 1] == ')') { /* function */
+	len = strlen(var->type);
+	
+	if (var->type[len - 1] == ')') { /* function */
 		return MakeAIF("&/is4", exp);
-	} else if (strncmp(var->type, "enum", 4) == 0) { /* enum */
+	} 
+	
+	if (strcmp(var->type, "void *") == 0) { /* void pointer */
+		av = VoidToAIF(0, 0);
+		a = PointerToAIF(av);
+		AIFFree(av);
+		return a;
+	} 
+	
+	if (strncmp(var->type, "enum", 4) == 0) { /* enum */
 		if ((p = strchr(var->type, ' ')) != NULL) {
 			*p++ = '\0';
 			a = EmptyEnumToAIF(p);
@@ -1075,19 +1108,7 @@ SimpleVarToAIF(char *exp, MIVar *var)
 	{
 		if ( strcmp(var->type, s->type_c) == 0 )
 		{
-			cmd = MIVarEvaluateExpression(var->name);
-			SendCommandWait(DebugSession, cmd);
-			
-			if (!MICommandResultOK(cmd)) {
-				DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
-				MICommandFree(cmd);
-				return NULL;
-			}
-				
-			res = MIGetVarEvaluateExpressionInfo(cmd);
-			
-			if (res == NULL) {
-				DbgSetError(DBGERR_DEBUGGER, "could not evaluate expression");
+			if ((res = GetVarValue(var->name)) == NULL) {
 				return NULL;
 			}
 			
@@ -1141,7 +1162,6 @@ SimpleVarToAIF(char *exp, MIVar *var)
 				break;				
 			}
 		
-			MICommandFree(cmd);
 			return a;
 		}
 	}

@@ -175,7 +175,7 @@ MIGetVarEvaluateExpressionInfo(MICommand *cmd)
 
 			if (strcmp(result->variable, "value") == 0) {
 				if (value->type == MIValueTypeConst) {
-					expr = value->cstring;
+					expr = strdup(value->cstring);
 				}
 			}
 		}
