@@ -199,7 +199,7 @@ TestAllConstructors()
 	aPointer = PointerToAIF(aPointer);
 	AIFTest("subtest6", aPointer, "a double pointer", flag);
 
-	aStruct = EmptyStructToAIF();
+	aStruct = EmptyStructToAIF("test_struct");
 	AIFTest("subtest7", aStruct, "empty struct", flag);
 
         AIFAddFieldToStruct(aStruct, "field1", aFloat);
@@ -219,12 +219,12 @@ TestAllConstructors()
         AIFTest("subtest12", aStruct, "after the array is field 4", flag);
 
         /* test a linked list: 1 -> 2 -> nil */
-        aStruct = EmptyStructToAIF();
+        aStruct = EmptyStructToAIF("test_struct");
         aStruct = NameAIF(aStruct, 0);
         AIFAddFieldToStruct(aStruct, "value", IntToAIF(2));
         AIFAddFieldToStruct(aStruct, "next", AIFNull(aStruct));
         aPointer = PointerToAIF(aStruct);
-        aStruct = EmptyStructToAIF();
+        aStruct = EmptyStructToAIF("test_struct");
         AIFAddFieldToStruct(aStruct, "value", IntToAIF(1));
         AIFAddFieldToStruct(aStruct, "next", aPointer);
         aPointer = PointerToAIF(aStruct);
@@ -237,7 +237,7 @@ TestAllConstructors()
 		int index;
 		int smallArray[2] = {1,2};
 
-		aStruct = EmptyStructToAIF();
+		aStruct = EmptyStructToAIF("test_struct");
 		AIFAddFieldToStruct(aStruct, "a", FloatToAIF(2.1));
 		dest = data;
 		for (index = 0; index < 2; index++) 
@@ -262,7 +262,7 @@ TestAllConstructors()
 	}
 
 
-	anEnum = EmptyEnumToAIF();
+	anEnum = EmptyEnumToAIF("test_enum");
 	AIFTest("subtest16", anEnum, "empty enum", flag);
 
 	AIFAddConstToEnum(anEnum, "const1", IntToAIF(10));
@@ -271,12 +271,12 @@ TestAllConstructors()
 	AIFSetEnum(anEnum, "const1");
 	AIFTest("subtest17", anEnum, "enum: 10", flag);
 
-	aStruct = EmptyStructToAIF();
+	aStruct = EmptyStructToAIF("test_enum");
 	AIFAddFieldToStruct(aStruct, "field1", anEnum);
 	AIFTest("subtest18", aStruct, "an enum in a struct", flag);
 
 	AIFSetEnum(anEnum, "const3");
-	aStruct = EmptyStructToAIF();
+	aStruct = EmptyStructToAIF("test_enum");
 	AIFAddFieldToStruct(aStruct, "field1", anEnum);
 	AIFTest("subtest19", aStruct, "same struct but the enum is set to another value", flag);
 
@@ -316,7 +316,7 @@ TestAllConstructors()
         }
 
 
-	aUnion = EmptyUnionToAIF();
+	aUnion = EmptyUnionToAIF("test_union");
 	AIFTest("subtest22", aUnion, "empty union", flag);
 
 	AIFAddFieldToUnion(aUnion, "const1", "is4");
@@ -324,7 +324,7 @@ TestAllConstructors()
 	AIFSetUnion(aUnion, "const1", IntToAIF(10));
 	AIFTest("subtest23", aUnion, "union: 10", flag);
 
-	aStruct = EmptyStructToAIF();
+	aStruct = EmptyStructToAIF("test_struct");
         AIFAddFieldToStruct(aStruct, "field1", IntToAIF(1));
         AIFAddFieldToStruct(aStruct, "field2", StringToAIF("Hello World"));
         AIFAddFieldToStruct(aStruct, "field3", IntToAIF(2));
@@ -454,8 +454,8 @@ TestAllArithmetic()
 	_testArithmetic("subtest10", IntToAIF(3), "3 and 7.0", flag, FloatToAIF(7.0));
 
 
-        anEnum1 = EmptyEnumToAIF();
-        anEnum2 = EmptyEnumToAIF();
+        anEnum1 = EmptyEnumToAIF("test_enum1");
+        anEnum2 = EmptyEnumToAIF("test_enum2");
         AIFAddConstToEnum(anEnum1, "const1", IntToAIF(16));
         AIFAddConstToEnum(anEnum1, "const2", IntToAIF(18));
         AIFAddConstToEnum(anEnum2, "const1", IntToAIF(17));
@@ -464,16 +464,16 @@ TestAllArithmetic()
         AIFSetEnum(anEnum2, "const1");
 	_testArithmetic("subtest11", anEnum1, "anEnum1 and anEnum2", flag, anEnum2);
 
-        aStruct1 = EmptyStructToAIF();
-        aStruct2 = EmptyStructToAIF();
+        aStruct1 = EmptyStructToAIF("test_struct1");
+        aStruct2 = EmptyStructToAIF("test_struct2");
         AIFAddFieldToStruct(aStruct1, "field1", IntToAIF(16));
         AIFAddFieldToStruct(aStruct1, "field2", IntToAIF(18));
         AIFAddFieldToStruct(aStruct2, "field1", IntToAIF(17));
         AIFAddFieldToStruct(aStruct2, "field2", IntToAIF(17));
 	_testArithmetic("subtest12", aStruct1, "aStruct1 and aStruct2", flag, aStruct2);
 
-	aStruct1 = EmptyStructToAIF();
-        aStruct2 = EmptyStructToAIF();
+	aStruct1 = EmptyStructToAIF("test_struct1");
+        aStruct2 = EmptyStructToAIF("test_struct2");
         AIFAddFieldToStruct(aStruct1, "field1", IntToAIF(18));
         AIFAddFieldToStruct(aStruct1, "field2", anEnum1);
         AIFAddFieldToStruct(aStruct2, "field1", IntToAIF(17));
@@ -563,8 +563,8 @@ TestAllArithmetic()
 		_testArithmetic("subtest20", anArray1, "anArray1 and anArray2", flag, anArray2);
         }
 
-	aStruct1 = EmptyStructToAIF();
-	aStruct2 = EmptyStructToAIF();
+	aStruct1 = EmptyStructToAIF("test_struct1");
+	aStruct2 = EmptyStructToAIF("test_struct2");
 	AIFAddFieldToStruct(aStruct1, "field1", IntToAIF(10));
 	AIFAddFieldToStruct(aStruct1, "field2", IntToAIF(10));
 	AIFAddFieldToStruct(aStruct2, "field1", FloatToAIF(7));
@@ -716,17 +716,17 @@ TestAllEPS()
 
 	//AIF_ENUM
 	printf("\n>>>>>>> ENUM\n");
-        a = EmptyEnumToAIF();
+        a = EmptyEnumToAIF("test_enum");
         AIFAddConstToEnum(a, "const1", IntToAIF(10));
         AIFAddConstToEnum(a, "const2", IntToAIF(20));
         AIFAddConstToEnum(a, "const3", IntToAIF(15));
         AIFSetEnum(a, "const3");
-        lo = EmptyEnumToAIF();
+        lo = EmptyEnumToAIF(NULL);
         AIFAddConstToEnum(lo, "const1", IntToAIF(10));
         AIFAddConstToEnum(lo, "const2", IntToAIF(20));
         AIFAddConstToEnum(lo, "const3", IntToAIF(15));
         AIFSetEnum(lo, "const1");
-        hi = EmptyEnumToAIF();
+        hi = EmptyEnumToAIF(NULL);
         AIFAddConstToEnum(hi, "const1", IntToAIF(10));
         AIFAddConstToEnum(hi, "const2", IntToAIF(20));
         AIFAddConstToEnum(hi, "const3", IntToAIF(15));
@@ -736,17 +736,17 @@ TestAllEPS()
 	_testEPS(hi, a, lo);
 	AIFFree(a); AIFFree(lo); AIFFree(hi);
 
-        a = EmptyEnumToAIF();
+        a = EmptyEnumToAIF("test_enum");
         AIFAddConstToEnum(a, "const1a", IntToAIF(10));
         AIFAddConstToEnum(a, "const2a", IntToAIF(20));
         AIFAddConstToEnum(a, "const3a", IntToAIF(15));
         AIFSetEnum(a, "const3a");
-        lo = EmptyEnumToAIF();
+        lo = EmptyEnumToAIF(NULL);
         AIFAddConstToEnum(lo, "const1lo", IntToAIF(10));
         AIFAddConstToEnum(lo, "const2lo", IntToAIF(20));
         AIFAddConstToEnum(lo, "const3lo", IntToAIF(15));
         AIFSetEnum(lo, "const1lo");
-        hi = EmptyEnumToAIF();
+        hi = EmptyEnumToAIF(NULL);
         AIFAddConstToEnum(hi, "const1hi", IntToAIF(10));
         AIFAddConstToEnum(hi, "const2hi", IntToAIF(20));
         AIFAddConstToEnum(hi, "const3hi", IntToAIF(15));
@@ -815,7 +815,7 @@ TestAllEPS()
 	//AIF_STRUCT
 	printf("\n>>>>>>> STRUCT\n");
 	{
-		a = EmptyStructToAIF();
+		a = EmptyStructToAIF("test_struct");
 		AIFAddFieldToStruct(a, "val1", IntToAIF(11));
 		AIFAddFieldToStruct(a, "val2", IntToAIF(12));
 		AIFAddFieldToStruct(a, "val3", IntToAIF(13));
