@@ -20,7 +20,9 @@
 package org.eclipse.ptp.rtsystem.ompi;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.Properties;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -266,23 +268,44 @@ public class OMPIPrefsDialog extends Dialog
 		
 		if(ortedFile.equals("")) {
 			ortedPathText.setText("");
-			String path = System.getenv("PATH");
-			//System.out.println("PATH = '"+path+"'");
-			String[] splits = path.split(":");
-			for(int i=0; i<splits.length; i++) {
-				//System.out.println(i+": '"+splits[i]+"'");
-				File f = new File(splits[i] + "/orted");
-				if(f.exists()) {
-					System.out.println("Found orted in path: '"+splits[i]+"'");
-					ortedPathText.setText(splits[i] + "/orted");
-					break;
-				}
-			}
+			
+			try {
+				Properties p=new Properties();
+				Process pro = Runtime.getRuntime().exec("env");
+				InputStream in = pro.getInputStream();
+				p.load(in);
+				
+				String path = p.getProperty("PATH");
+		    
+				//String path = System.getenv("PATH");
+				System.out.println("PATH = '"+path+"'");
+				if(path != null) {
+					String[] splits = path.split(":");
+					for(int i=0; i<splits.length; i++) {
+						//System.out.println(i+": '"+splits[i]+"'");
+						File f = new File(splits[i] + "/orted");
+						if(f.exists()) {
+							System.out.println("Found orted in path: '"+splits[i]+"'");
+							ortedPathText.setText(splits[i] + "/orted");
+							break;
+						}
+					}
+				}			
+			} catch(Exception e) { }
+
 		}
 		else {
 			ortedPathText.setText(ortedFile);
 		}
 	}
+	
+	public Properties executenv(String command) throws Exception{
+	    Properties p=new Properties();
+	    Process pro = Runtime.getRuntime().exec("env");
+	    InputStream in = pro.getInputStream();
+	    p.load(in);
+	    return p;
+	} 
 	
 	protected void handlePathBrowseButtonSelected() 
 	{
