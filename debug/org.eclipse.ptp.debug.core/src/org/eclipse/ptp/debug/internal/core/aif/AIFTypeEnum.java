@@ -30,7 +30,7 @@ public class AIFTypeEnum extends TypeIntegral implements IAIFTypeEnum {
 	private IAIFType basetype;
 	private String name;
 	
-	//<ID|S1=V1,S2=V2,...>is4
+	//<ID|S1=V1,S2=V2>is4
 	public AIFTypeEnum(String format, IAIFType basetype) {
 		this(format, true, basetype);
 	}
@@ -48,17 +48,22 @@ public class AIFTypeEnum extends TypeIntegral implements IAIFTypeEnum {
 	
 	protected void parse(String fmt) {
 		fmt = parseName(fmt);
-		String[] pairs = fmt.split(AIFFactory.SIGN_COMMA);
-		for (int i=0; i<pairs.length; i++) {
-			String[] results = pairs[i].split(AIFFactory.SIGN_EQUAL);
-			fields.add(results[0]);
-			values.add(results[1]);
+		if (fmt.length() > 0) {
+			String[] pairs = fmt.split(AIFFactory.SIGN_COMMA);
+			for (int i=0; i<pairs.length; i++) {
+				String[] results = pairs[i].split(AIFFactory.SIGN_EQUAL);
+				fields.add(results[0]);
+				values.add(results[1]);
+			}
 		}
 	}
 	protected String parseName(String fmt) {
 		int pos = fmt.indexOf(AIFFactory.SIGN_STROKE);
 		name = fmt.substring(0, pos);
 		int last_pos = fmt.lastIndexOf(AIFFactory.FDS_ENUM_END);
+		if (last_pos == -1)
+			return "";
+		
 		return fmt.substring(pos+1, last_pos);
 	}
 	

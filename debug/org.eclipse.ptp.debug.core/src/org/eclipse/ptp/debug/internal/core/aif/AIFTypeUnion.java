@@ -22,7 +22,7 @@ import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeUnion;
 
 public class AIFTypeUnion extends TypeAggregate implements IAIFTypeUnion {
-	//(ID|N1=F1,N2=F2,...)
+	//(ID|N1=F1,N2=F2)
 	public AIFTypeUnion(String format) {
 		super(format);
 	}
