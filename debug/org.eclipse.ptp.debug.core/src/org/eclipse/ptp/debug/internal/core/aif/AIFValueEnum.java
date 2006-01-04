@@ -19,25 +19,31 @@
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import org.eclipse.ptp.debug.core.aif.AIFException;
+import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeEnum;
+import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueEnum;
 
 /**
  * @author Clement chu
  * 
  */
-public class AIFValueEnum extends ValueIntegral implements IAIFValueEnum { 
+public class AIFValueEnum extends ValueIntegral implements IAIFValueEnum {
+	IAIFValue value;
+	
 	public AIFValueEnum(IAIFTypeEnum type, byte[] data) {
 		super(type);
 		parse(data);
 	}
 	public String getValueString() throws AIFException {
 		if (result == null) {
-			result = String.valueOf("");
+			result = value.getValueString();
 		}
 		return result;
 	}
 	protected void parse(byte[] data) {
 		size = data.length;
+		IAIFTypeEnum pType = (IAIFTypeEnum)type;
+		value = AIFFactory.getAIFValue(pType.getBaseType(), data);
 	}
 }

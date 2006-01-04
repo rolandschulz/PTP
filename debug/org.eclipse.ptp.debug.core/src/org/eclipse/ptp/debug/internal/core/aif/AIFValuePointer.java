@@ -63,7 +63,7 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 			value = AIFFactory.UNKNOWNVALUE;
 			break;
 		}
-		size = value.sizeof();		
+		size = value.sizeof();
 		System.out.println("--------------- pointer value: " + value.toString());
 	}
 	
