@@ -334,6 +334,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			//String[] vals = controlSystem.getProcessAttributes(job, proc, AttributeConstants.ATTRIB_PROCESS_PID + " " + AttributeConstants.ATTRIB_PROCESS_NODE_NAME);	
 			proc.setPid(attribs[i * num_attribs]);
 			String nname = attribs[(i * num_attribs) + 1];
+			if(nname.equals("localhost")) nname = "0";
 
 			/* this is a hack until I get this working correctly w/ the monitoring system! */
 			nname = new String("machine0_node"+nname);
