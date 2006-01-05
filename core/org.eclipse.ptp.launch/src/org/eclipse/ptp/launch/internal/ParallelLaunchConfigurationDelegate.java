@@ -76,10 +76,10 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		} catch (ClassCastException e) {
 		} catch (IOException e) {
 		}
-		Throwable exception = new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Program_is_not_a_recongnized_executable")); //$NON-NLS-1$
+		Throwable exception = new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Program_is_not_a_recongnized_executable"));
 		int code = ICDTLaunchConfigurationConstants.ERR_PROGRAM_NOT_BINARY;
-		MultiStatus status = new MultiStatus("PluginID", code, LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Program_is_not_a_recongnized_executable"), exception); //$NON-NLS-1$
-		status.add(new Status(IStatus.ERROR, "PluginID", code, exception == null ? "" : exception.getLocalizedMessage(), //$NON-NLS-1$
+		MultiStatus status = new MultiStatus("PluginID", code, LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Program_is_not_a_recongnized_executable"), exception);
+		status.add(new Status(IStatus.ERROR, "PluginID", code, exception == null ? "" : exception.getLocalizedMessage(),
 				exception));
 		throw new CoreException(status);
 	}
@@ -101,8 +101,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			programPath = wsProgramPath.getLocation();
 		}
 		if (!programPath.toFile().exists()) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Program_file_does_not_exist"), //$NON-NLS-1$
-					new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.PROGRAM_PATH_not_found")), //$NON-NLS-1$
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Program_file_does_not_exist"),
+					new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.PROGRAM_PATH_not_found")),
 					ICDTLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
 		}
 		return programPath;
@@ -124,20 +124,20 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	private ICProject verifyCProject(ILaunchConfiguration config) throws CoreException {
 		String name = getProjectName(config);
 		if (name == null) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.C_Project_not_specified"), null, //$NON-NLS-1$
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.C_Project_not_specified"), null,
 					ICDTLaunchConfigurationConstants.ERR_UNSPECIFIED_PROJECT);
 		}
 		ICProject cproject = getCProject(config);
 		if (cproject == null) {
 			IProject proj = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 			if (!proj.exists()) {
-				abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Project_NAME_does_not_exist"), null, //$NON-NLS-1$
+				abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Project_NAME_does_not_exist"), null,
 						ICDTLaunchConfigurationConstants.ERR_NOT_A_C_PROJECT);
 			} else if (!proj.isOpen()) {
-				abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Project_NAME_is_closed"), null, //$NON-NLS-1$
+				abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Project_NAME_is_closed"), null,
 						ICDTLaunchConfigurationConstants.ERR_NOT_A_C_PROJECT);
 			}
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Not_a_C_CPP_project"), null, //$NON-NLS-1$
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Not_a_C_CPP_project"), null,
 					ICDTLaunchConfigurationConstants.ERR_NOT_A_C_PROJECT);
 		}
 		return cproject;
@@ -155,8 +155,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 	private void verifyDebuggerPath(String path) throws CoreException {
 		IPath programPath = new Path(path);
 		if (programPath == null || programPath.isEmpty() || !programPath.toFile().exists()) {
-			abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Debugger_path_not_found"), //$NON-NLS-1$
-					new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Debugger_path_not_found")), //$NON-NLS-1$
+			abort(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Debugger_path_not_found"),
+					new FileNotFoundException(LaunchMessages.getResourceString("AbstractParallelLaunchDelegate.Debugger_path_not_found")),
 					ICDTLaunchConfigurationConstants.ERR_PROGRAM_NOT_EXIST);
 		}
 	}
@@ -219,7 +219,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			try {
 				if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 					job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, exePath.removeLastSegments(1).toOSString());
-					debugger.createDebuggerSession(pLaunch, exeFile, new SubProgressMonitor(monitor, 3));
+					PTPDebugCorePlugin.getDebugModel().createDebuggerSession(debugger, pLaunch, exeFile, new SubProgressMonitor(monitor, 3));
+					//debugger.createDebuggerSession(pLaunch, exeFile, new SubProgressMonitor(monitor, 3));
 				}
 				monitor.worked(1);
 			} catch (Exception e) {
