@@ -51,6 +51,7 @@ import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.internal.core.breakpoint.PLineBreakpoint;
 import org.eclipse.ptp.debug.internal.core.model.PDebugTarget;
+import org.eclipse.ptp.debug.internal.core.model.PSession;
 
 /**
  * @author clement chu
@@ -76,6 +77,10 @@ public class PCDIDebugModel {
 	public void shutdonw() {
 		jobSets.clear();
 		jobListeners.clear();
+	}
+	
+	public IPSession createDebuggerSession(IPTPDebugger debugger, IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException {
+		return new PSession(debugger.createDebuggerSession(launch, exe, monitor));
 	}
 	
 	public static String getPluginIdentifier() {
