@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Linux PPC ORTE Fragment
+Bundle-SymbolicName: org.eclipse.ptp.orte.linux.ppc
+Bundle-Version: 1.0.0
+Fragment-Host: org.eclipse.ptp.core;bundle-version="1.0.0"
+Bundle-Localization: plugin
