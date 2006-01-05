@@ -365,15 +365,14 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 	size_t i, j, k;
 	orte_gpr_value_t **values, *value;
 	orte_gpr_keyval_t **keyvals;
-	char *res, *str;
-	int machID, nodeID;
+	char *res, *str, *nodename;
+	int machID;
 	
 	printf("BPROC NOTIFY CALLBACK!\n"); fflush(stdout);
 	
 	values = (orte_gpr_value_t**)(data->values)->addr;
 	
 	machID = 0;
-	nodeID = 1;
 	
 	for(i=0, k=0; k<data->cnt && i < (data->values)->size; i++) {
 		if(values[i] == NULL) continue;
@@ -381,6 +380,9 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 		k++;
 		value = values[i];
 		keyvals = value->keyvals;
+		
+		asprintf(&nodename, "%s", value->tokens[1]);
+		printf("NODE NAME = %s\n", nodename);
 		
 		for(j=0; j<value->cnt; j++) {
 			orte_gpr_keyval_t *keyval = keyvals[j];
@@ -405,11 +407,13 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 					asprintf(&str, "%s=%d", keyval->key, keyval->type);
 			}
 			
-			asprintf(&res, "%d %d %d %s", RTEV_NODECHANGE, machID, nodeID, str);
+			asprintf(&res, "%d %d %s %s", RTEV_NODECHANGE, machID, nodename, str);
         	proxy_svr_event_callback(orte_proxy, res);
         	free(res);
         	free(str);
 		}
+		
+		free(nodename);
 	}
 }
 
@@ -963,9 +967,9 @@ static void iof_callback(
 	char *res;
 	unsigned char str[1024];
 	
-	//printf("IO callback!  count = %d\n", count); fflush(stdout);
+	printf("IO callback!  count = %d\n", count); fflush(stdout);
     if(count > 0) {
-        //fprintf(stdout, "[%lu,%lu,%lu] ", ORTE_NAME_ARGS(src_name));
+        fprintf(stdout, "[%lu,%lu,%lu] ", ORTE_NAME_ARGS(src_name));
         strncpy((char*)str, (char*)data, count);
         if(str[count-1] == '\n') str[count-1] = '\0';
         str[count] = '\0';

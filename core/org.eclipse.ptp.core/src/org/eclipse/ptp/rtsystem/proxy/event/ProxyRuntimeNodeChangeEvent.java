@@ -21,14 +21,14 @@ package org.eclipse.ptp.rtsystem.proxy.event;
 
 public class ProxyRuntimeNodeChangeEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeEvent {
 	private int machID;
-	private int nodeID;
 	private String key;
 	private String val;
+	private String nodeName;
 
 	public ProxyRuntimeNodeChangeEvent(String[] args) {
 		super(EVENT_RUNTIME_NODECHANGE);
 		this.machID = Integer.parseInt(args[1]);
-		this.nodeID = Integer.parseInt(args[2]);
+		this.nodeName = args[2];
 		
 		String text = new String("");
 		for(int i=3; i<args.length; i++) {
@@ -44,11 +44,11 @@ public class ProxyRuntimeNodeChangeEvent extends AbstractProxyRuntimeEvent imple
 	}
 	
 	public int getMachineID() { return this.machID; }
-	public int getNodeID() { return this.nodeID; }
+	public String getNodeName() { return this.nodeName; }
 	public String getKey() { return this.key; }
 	public String getValue() { return this.val; }
 	
 	public String toString() {
-		return "EVENT_RUNTIME_NODECHANGE (machID="+this.machID+", nodeID="+this.nodeID+") key='"+this.key+"' val='"+this.val+"'";
+		return "EVENT_RUNTIME_NODECHANGE (machID="+this.machID+", nodeID="+this.nodeName+") key='"+this.key+"' val='"+this.val+"'";
 	}
 }
