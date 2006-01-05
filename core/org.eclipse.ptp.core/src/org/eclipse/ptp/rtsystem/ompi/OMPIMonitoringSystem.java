@@ -205,7 +205,7 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
         		String key = ((ProxyRuntimeNodeChangeEvent)e).getKey();
         		String val = ((ProxyRuntimeNodeChangeEvent)e).getValue();
         		int machID = ((ProxyRuntimeNodeChangeEvent)e).getMachineID();
-        		int nodeID = ((ProxyRuntimeNodeChangeEvent)e).getNodeID();
+        		String nodeName = ((ProxyRuntimeNodeChangeEvent)e).getNodeName();
         		
         		/* TODO
         		 * COME BACK HERE AND CONVERT CODES LIKE bproc-soh-state INTO ATTRIBUTE_CONSTANTS.NODE_STATE, ETC
@@ -232,7 +232,7 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
         			re.setText(valid_key);
         			re.setAltText(val);
         		
-        			fireEvent("machine"+machID+"_node"+nodeID, re);
+        			fireEvent("machine"+machID+"_node"+nodeName, re);
         		}
         		else {
         			System.out.println("UNKNOWN KEY '"+key+"', value '"+val+"' - IGNORING.");
