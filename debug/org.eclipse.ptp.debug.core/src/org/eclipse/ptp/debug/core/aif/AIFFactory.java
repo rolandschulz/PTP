@@ -190,12 +190,12 @@ public class AIFFactory {
 		case FDS_ENUM:
 			System.out.println("        ======= enum: " + fmt);
 			int enum_end_pos = getEndPos(fmt, FDS_ENUM_END);
-			String enum_type = fmt.substring(enum_end_pos+FDS_ENUM_END.length())+1;
+			String enum_type = fmt.substring(enum_end_pos+FDS_ENUM_END.length());
 			return new AIFTypeEnum(extractFormat(fmt, 1, enum_end_pos), getAIFType(enum_type));
 		case FDS_FUNCTION:
 			System.out.println("        ======= function: " + fmt);
 			int func_end_pos = getEndPos(fmt, FDS_FUNC_END);
-			String func_type = fmt.substring(func_end_pos+FDS_FUNC_END.length())+1;
+			String func_type = fmt.substring(func_end_pos+FDS_FUNC_END.length());
 			return new AIFTypeFunction(extractFormat(fmt, 1, func_end_pos), getAIFType(func_type));
 		case FDS_STRUCT:
 			int struct_end_pos = getEndPos(fmt, FDS_STRUCT_END);
