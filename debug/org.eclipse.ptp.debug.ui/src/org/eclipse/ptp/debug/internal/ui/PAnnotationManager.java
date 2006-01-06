@@ -80,7 +80,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		this.uiDebugManager = uiDebugManager;
 		uiDebugManager.addRegListener(this);
 		uiDebugManager.addJobChangeListener(this);
-		//make sure every time created the same object reference
+		// make sure every time created the same object reference
 		if (instance == null)
 			instance = this;
 	}
@@ -104,8 +104,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	public void removeAnnotationGroup(String job_id) {
 		if (!annotationMap.containsKey(job_id))
 			return;
-		
-		AnnotationGroup annotationGroup = (AnnotationGroup)annotationMap.remove(job_id);
+		AnnotationGroup annotationGroup = (AnnotationGroup) annotationMap.remove(job_id);
 		if (annotationGroup != null) {
 			annotationGroup.removeAllMarkers();
 			annotationGroup.clear();
@@ -219,8 +218,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			int taskId = ((IPDebugTarget) debugTarget).getTargetID();
 			if (taskId == -1)
 				return null;
-			
-			//FIXME it later
+			// FIXME it later
 			BitList tasks = new BitList(100);
 			tasks.set(taskId);
 			return tasks;
@@ -252,7 +250,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		String job_id = uiDebugManager.getCurrentJobId();
 		AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 		if (annotationGroup == null)
-			annotationGroup = new AnnotationGroup();		
+			annotationGroup = new AnnotationGroup();
 		synchronized (tasks) {
 			addAnnotation(annotationGroup, textEditor, file, stackFrame.getLineNumber(), tasks, type);
 			putAnnotationGroup(job_id, annotationGroup);
@@ -271,15 +269,14 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		ITextEditor textEditor = getTextEditor(editorPart);
 		if (textEditor == null)
 			throw new CoreException(Status.CANCEL_STATUS);
-		
-		String type = isRegister?IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT:((containsCurrentSet(tasks))?IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
+		String type = isRegister ? IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT : ((containsCurrentSet(tasks)) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
 		AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 		if (annotationGroup == null)
 			annotationGroup = new AnnotationGroup();
 		synchronized (tasks) {
 			addAnnotation(annotationGroup, textEditor, file, lineNumber, tasks, type);
 			putAnnotationGroup(job_id, annotationGroup);
-			//remove marker if it is not in current job
+			// remove marker if it is not in current job
 			if (!uiDebugManager.getCurrentJobId().equals(job_id)) {
 				annotationGroup.removeAllMarkers();
 			}
@@ -296,24 +293,23 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			return false;
 		}
 	}
-	//FIXME temp testing method
+	// FIXME temp testing method
 	public void printBitList(BitList tasks) {
 		System.out.print("++++++++++++++++ tasks: " + tasks.cardinality() + ": ");
-		for(int i=tasks.nextSetBit(0), j=0; i>=0; i=tasks.nextSetBit(i+1), j++) {
+		for (int i = tasks.nextSetBit(0), j = 0; i >= 0; i = tasks.nextSetBit(i + 1), j++) {
 			System.out.print("[" + i + "], ");
 		}
 		System.out.println();
 	}
 	// generic
-	public synchronized void addAnnotation(AnnotationGroup annotationGroup, ITextEditor textEditor, IFile file, int lineNumber, BitList tasks, String type) throws CoreException {
+	public synchronized void addAnnotation(AnnotationGroup annotationGroup, final ITextEditor textEditor, final IFile file, final int lineNumber, final BitList tasks, final String type) throws CoreException {
 		IDocumentProvider docProvider = textEditor.getDocumentProvider();
 		IAnnotationModel annotationModel = docProvider.getAnnotationModel(textEditor.getEditorInput());
 		if (annotationModel == null)
 			throw new CoreException(Status.CANCEL_STATUS);
-		Position position = createPosition(lineNumber, docProvider.getDocument(textEditor.getEditorInput()));
+		final Position position = createPosition(lineNumber, docProvider.getDocument(textEditor.getEditorInput()));
 		if (position == null)
 			throw new CoreException(Status.CANCEL_STATUS);
-		
 		boolean isRegister = isRegisterType(type);
 		PInstructionPointerAnnotation annotation = findAnnotation(annotationGroup, position, type);
 		if (annotation == null) {
@@ -322,6 +318,11 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			annotationGroup.addAnnotation(annotation);
 			annotationModel.addAnnotation(annotation, position);
 		}
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				textEditor.selectAndReveal(position.getOffset(), 0);
+			}
+		});
 		annotation.addTasks(tasks);
 		annotation.setMessage(isRegister);
 	}
@@ -334,11 +335,9 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 					return (PInstructionPointerAnnotation) annotation;
 				}
 				/*
-				if (!isRegister) { 
-					if (annotationType.equals(IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT) || annotationType.equals(IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT)) {
-						return (PInstructionPointerAnnotation) annotation;
-					}
-				}*/
+				 * if (!isRegister) { if (annotationType.equals(IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT) || annotationType.equals(IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT)) {
+				 * return (PInstructionPointerAnnotation) annotation; } }
+				 */
 			}
 		}
 		return null;
@@ -400,7 +399,6 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		PInstructionPointerAnnotation annotation = findAnnotation(annotationGroup, tasks);
 		if (annotation != null)
 			return annotation.getPosition();
-
 		return null;
 	}
 	public synchronized PInstructionPointerAnnotation findAnnotation(AnnotationGroup annotationGroup, BitList tasks) {
@@ -422,11 +420,10 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 				String annotationType = annotation.getType();
 				if (isRegister) {
 					if (annotationType.equals(IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT) || annotationType.equals(IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT))
-						return annotation;					
-				}
-				else {
+						return annotation;
+				} else {
 					if (annotationType.equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT) || annotationType.equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_SECONDARY))
-						return annotation;					
+						return annotation;
 				}
 			}
 		}
@@ -450,10 +447,10 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 							BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(uiDebugManager.getCurrentJobId(), currentSet.getID());
 							for (Iterator i = annotationGroup.getAnnotationIterator(); i.hasNext();) {
 								PInstructionPointerAnnotation annotation = (PInstructionPointerAnnotation) i.next();
-								//change icon for unregistered processes only if the set is changed
+								// change icon for unregistered processes only if the set is changed
 								if (!isRegisterType(annotation.getType())) {
-									//if all the tasks in current is not match the unregistered tasks, display SET_ANN
-									//simply only display SET_ANN when the current set only contain registered tasks
+									// if all the tasks in current is not match the unregistered tasks, display SET_ANN
+									// simply only display SET_ANN when the current set only contain registered tasks
 									if (currentSet.isRootSet())
 										changeAnnotationType(annotation, IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT);
 									else
@@ -470,9 +467,9 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 		};
 		ResourcesPlugin.getWorkspace().run(runnable, null);
 	}
-	/*******************************************************************************************************************************************************************************************************************************************************************************************************
+	/***************************************************************************************************************************************************************************************************
 	 * Register listener
-	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	 **************************************************************************************************************************************************************************************************/
 	public void register(final BitList tasks) {
 		String job_id = uiDebugManager.getCurrentJobId();
 		final AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
@@ -486,9 +483,10 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 						if (annotation != null) {
 							boolean isRegister = isRegisterType(annotation.getType());
 							try {
-								if (isRegister)//register annotation
+								if (isRegister)// register annotation
 									addToExistedAnnotation(annotationGroup, annotation, tasks, isRegister);
-								else //unregister annotation
+								else
+									// unregister annotation
 									removeFromExistedAnnotation(annotationGroup, annotation, tasks, isRegister);
 							} catch (CoreException e) {
 								return Status.CANCEL_STATUS;
@@ -518,9 +516,10 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 						if (annotation != null) {
 							boolean isRegister = isRegisterType(annotation.getType());
 							try {
-								if (isRegister)//register annotation
+								if (isRegister)// register annotation
 									removeFromExistedAnnotation(annotationGroup, annotation, tasks, isRegister);
-								else//unregister annotation
+								else
+									// unregister annotation
 									addToExistedAnnotation(annotationGroup, annotation, tasks, isRegister);
 							} catch (CoreException e) {
 								return Status.CANCEL_STATUS;
@@ -546,11 +545,10 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			if (oAnnotation.isEmpty()) {
 				if (oAnnotation.deleteMarker())
 					annotationGroup.removeAnnotation(oAnnotation);
-			}
-			else
+			} else
 				oAnnotation.setMessage(!isRegister);
 		} else {
-			String type = isRegister?IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT:((containsCurrentSet(tasks))?IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
+			String type = isRegister ? IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT : ((containsCurrentSet(tasks)) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT);
 			IMarker marker = annotationGroup.createMarker(annotation.getMarker().getResource(), type);
 			oAnnotation = new PInstructionPointerAnnotation(marker, annotation.getPosition(), annotation.getAnnotationModel());
 			annotationGroup.addAnnotation(oAnnotation);
@@ -559,23 +557,19 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			oAnnotation.setMessage(!isRegister);
 		}
 	}
-	
 	private synchronized void removeFromExistedAnnotation(AnnotationGroup annotationGroup, PInstructionPointerAnnotation annotation, BitList tasks, boolean isRegister) throws CoreException {
 		annotation.removeTasks(tasks);
 		if (annotation.isEmpty()) {
 			if (annotation.deleteMarker())
 				annotationGroup.removeAnnotation(annotation);
-		}
-		else
+		} else
 			annotation.setMessage(isRegister);
-
 		PInstructionPointerAnnotation oAnnotation = findOtherAnnotation(annotationGroup, annotation.getPosition(), isRegister);
 		if (oAnnotation != null) {
 			oAnnotation.addTasks(tasks);
 			oAnnotation.setMessage(!isRegister);
-		}
-		else {
-			String type = isRegister?((containsCurrentSet(tasks))?IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT):IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT;
+		} else {
+			String type = isRegister ? ((containsCurrentSet(tasks)) ? IPTPDebugUIConstants.CURSET_ANN_INSTR_POINTER_CURRENT : IPTPDebugUIConstants.SET_ANN_INSTR_POINTER_CURRENT) : IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT;
 			IMarker marker = annotationGroup.createMarker(annotation.getMarker().getResource(), type);
 			oAnnotation = new PInstructionPointerAnnotation(marker, annotation.getPosition(), annotation.getAnnotationModel());
 			annotationGroup.addAnnotation(oAnnotation);
@@ -584,9 +578,9 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 			oAnnotation.setMessage(!isRegister);
 		}
 	}
-	/*******************************************************************************************************************************************************************************************************************************************************************************************************
+	/***************************************************************************************************************************************************************************************************
 	 * Job Change Listener
-	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	 **************************************************************************************************************************************************************************************************/
 	public synchronized void changeJobEvent(String cur_job_id, String pre_job_id) {
 		if (pre_job_id != null && !pre_job_id.equals(IManager.EMPTY_ID)) {
 			AnnotationGroup preAnnotationGroup = getAnnotationGroup(pre_job_id);
