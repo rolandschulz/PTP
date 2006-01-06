@@ -566,7 +566,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		super.dispose();
 	}
 	public boolean addAnnotations(IEditorPart editorPart, IStackFrame stackFrame) {
-		return true;
+		return false;
 		//FIXME - some error here
 		/*
 		try {
