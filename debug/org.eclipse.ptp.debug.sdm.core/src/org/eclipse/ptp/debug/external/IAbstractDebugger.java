@@ -24,6 +24,7 @@ package org.eclipse.ptp.debug.external;
 
 import java.util.Observer;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
@@ -36,7 +37,7 @@ public interface IAbstractDebugger extends IDebugger {
 	public final static String TERMINATED_PROC_KEY = "terminated";
 	public final static String SUSPENDED_PROC_KEY = "suspended";
 	
-	public int startDebuggerListener();
+	public int startDebuggerListener() throws CoreException;
 	
 	/* Debugger Initialization/Termination */
 	public void initialize(IPJob job);

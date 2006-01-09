@@ -74,7 +74,7 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 	IPLaunch launch = null;
 	IBinaryObject file;
 	
-	public Session(IAbstractDebugger debugger, IPJob job, IPLaunch launch, IBinaryObject file) {
+	public Session(IAbstractDebugger debugger, IPJob job, IPLaunch launch, IBinaryObject file, IProgressMonitor monitor) {
 		this.debugger = debugger;
 		this.job = job;
 		this.launch = launch;
@@ -83,7 +83,7 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 		commonSetup();
 		job.setAttribute(PreferenceConstants.JOB_DEBUG_SESSION, this);
 		
-		start();
+		start(monitor);
 	}
 	private void commonSetup() {
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
@@ -121,25 +121,32 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 	public IBinaryObject getBinaryFile() {
 		return file;
 	}
-	private void start() {
+	private void start(IProgressMonitor monitor) {
 		IWorkspaceRunnable r = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor m) throws CoreException {
-				PTPDebugCorePlugin.getDebugModel().newJob(getJob().getIDString(), getTotalProcesses());
+				m.beginTask("Creating debugging session...", 3);
+				PTPDebugCorePlugin.getDebugModel().newJob(getJob().getIDString(), getTotalProcesses());				
 				launch.launchedStarted();
+				m.worked(1);
+				
 				boolean stopInMain = getLaunch().getLaunchConfiguration().getAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false);
+				m.subTask("Initialing breakpoints...");
 				getBreakpointManager().setInitialBreakpoints();
 				if (stopInMain) {
 					getBreakpointManager().setInternalTemporaryBreakpoint(createBitList(), getBreakpointManager().createFunctionLocation("", "main"));
 				}
+				m.worked(1);
 				try {
 					resume(createBitList());
 				} catch (PCDIException e) {
 					throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));			
+				} finally {
+					m.done();
 				}
 			}
 		};
 		try {
-			ResourcesPlugin.getWorkspace().run(r, null);
+			ResourcesPlugin.getWorkspace().run(r, monitor);
 		} catch (CoreException e) {
 			PTPDebugCorePlugin.log(e);
 		}

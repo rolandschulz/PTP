@@ -88,6 +88,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	}
 	
 	public final void exit() {
+		postCommand(new StopDebuggerCommand());
 		isExited = true;
 		if (!eventThread.equals(Thread.currentThread())) {			
 			// Kill the event Thread.

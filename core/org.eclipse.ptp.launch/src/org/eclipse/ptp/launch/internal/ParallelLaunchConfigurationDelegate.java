@@ -170,14 +170,15 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		monitor.beginTask(MessageFormat.format("{0}...", new String[] { configuration.getName() }),  10);
-		// check for cancellation
+		monitor.beginTask(MessageFormat.format("{0}...", new String[] { "Launching " + configuration.getName() }),  10);
 		if (monitor.isCanceled()) {
 			return;
 		}
 		
 		// Switch the perspective
 		// LaunchUtils.switchPerspectiveTo(LaunchUtils.PPerspectiveFactory_ID);
+		IPTPDebugger debugger = null;
+		IPJob job = null;
 		try {
 			monitor.worked(1);
 			// done the verification phase
@@ -191,8 +192,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				exeFile = verifyBinary(project, exePath);
 			}
 			
-			IPTPDebugger debugger = null;
-			
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				String dbgPath = PTPDebugCorePlugin.getDefault().getPluginPreferences().getString(IPDebugConstants.PREF_PTP_SDM_FILE);
 				verifyDebuggerPath(dbgPath);
@@ -205,10 +204,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				jrunconfig.setDebug();
 			}
 			
-			IPJob job = getLaunchManager().run(launch, workDirectory, null, jrunconfig, new SubProgressMonitor(monitor, 5));
-			if (job == null)
-				return;
-			
+			job = getLaunchManager().run(launch, workDirectory, null, jrunconfig, new SubProgressMonitor(monitor, 8));
 			job.setAttribute(PreferenceConstants.JOB_APP, exePath.lastSegment());
 			job.setAttribute(PreferenceConstants.JOB_WORK_DIR, exePath.removeLastSegments(1).toString());
 			job.setAttribute(PreferenceConstants.JOB_ARGS, args);
@@ -216,16 +212,21 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			PLaunch pLaunch = (PLaunch) launch;
 			pLaunch.setPJob(job);
 			
-			try {
-				if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-					job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, exePath.removeLastSegments(1).toOSString());
-					PTPDebugCorePlugin.getDebugModel().createDebuggerSession(debugger, pLaunch, exeFile, new SubProgressMonitor(monitor, 3));
-					//debugger.createDebuggerSession(pLaunch, exeFile, new SubProgressMonitor(monitor, 3));
+			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, exePath.removeLastSegments(1).toOSString());
+				PTPDebugCorePlugin.getDebugModel().createDebuggerSession(debugger, pLaunch, exeFile, new SubProgressMonitor(monitor, 2));
+				if (monitor.isCanceled()) {
+					PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
 				}
-				monitor.worked(1);
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
+		} catch (CoreException e) {
+			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
+				if (debugger != null) {
+					debugger.stopDebugger();
+				}
+			}
+			throw e;
 		} finally {
 			monitor.done();
 		}

@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.commands;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
@@ -30,7 +31,11 @@ public class StopDebuggerCommand extends AbstractDebugCommand {
 		super(null, true, true);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
-		debugger.stopDebugger();
+		try {
+			debugger.stopDebugger();
+		} catch (CoreException e) {
+			throw new PCDIException(e);
+		}
 		waitFinish(debugger);
 	}
 	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {

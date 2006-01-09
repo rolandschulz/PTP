@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.external;
 
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.debug.core.IPTPDebugger;
@@ -35,18 +36,17 @@ public class PTPDebugger implements IPTPDebugger {
 		//debugger = new DebugSimulation2();
 	}
 	
-	public int startDebuggerListener() {
+	public int startDebuggerListener() throws CoreException {
 		return debugger.startDebuggerListener();
 	}
+	
+	public void stopDebugger() throws CoreException {
+		debugger.stopDebugger();
+	}
 
-	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) {
-		try {
-			IPJob job = launch.getPJob();
-			debugger.initialize(job);
-			return new Session(debugger, job, launch, exe);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException {
+		IPJob job = launch.getPJob();
+		debugger.initialize(job);
+		return new Session(debugger, job, launch, exe, monitor);
 	}
 }
