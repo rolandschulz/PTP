@@ -188,6 +188,8 @@ int ORTEStartDaemon(char **args)
 	int ret;
 	char *res;
 	
+	printf("StartDaemon()\n"); fflush(stdout);
+	
 	switch(orted_pid = fork()) {
 		case -1:
 			{
@@ -259,13 +261,13 @@ int ORTEStartDaemon(char **args)
 				}
 				
 //				printf("ORTED_PATH = '%s' \n", orted_path);
-//				for(i=0; i<orted_args_len+2; i++) {
-//		    			if(orted_args[i] != NULL) 
-//		    				printf("[C] #%d = '%s'\n", i, orted_args[i]);
-//		    			else
-//						printf("[C] #%d = NULL\n", i);
-//		    			fflush(stdout);
-//				}
+				for(i=0; i<orted_args_len+2; i++) {
+		    			if(orted_args[i] != NULL) 
+		    				printf("[C] #%d = '%s'\n", i, orted_args[i]);
+		    			else
+						printf("[C] #%d = NULL\n", i);
+		    			fflush(stdout);
+				}
 				
 				user_path = getenv("PATH");
 				//printf("Original user's PATH: %s\n", user_path);
@@ -281,7 +283,7 @@ int ORTEStartDaemon(char **args)
 				free(user_path_new);
 				
 				/* spawn the daemon */
-				//printf("Starting execv now!\n"); fflush(stdout);
+				printf("Starting execv now!\n"); fflush(stdout);
 				errno = 0;
 //				ret = execv("/bin/echo", orted_args);
 				ret = execv(orted_path, orted_args);
@@ -1573,6 +1575,7 @@ ORTEGetNodeAttribute(char **args)
 	int				tot_len;
 	char *			valstr = NULL;
 	int				values_len;
+	int				node_name_requested = 0;
 	
 	machid = atoi(args[1]);
 	nodeid = atoi(args[2]);
@@ -1600,6 +1603,7 @@ ORTEGetNodeAttribute(char **args)
 		if(!strcmp(args[i], "ATTRIB_NODE_NAME")) {
 			asprintf(&(keys[i-3]), "%s", "orte-node-name");
 			types[i-3] = PTP_STRING;
+			node_name_requested = 1;
 		} else if(!strcmp(args[i], "ATTRIB_NODE_STATE")) {
 			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-status");
 			types[i-3] = PTP_STRING;
@@ -1640,11 +1644,24 @@ ORTEGetNodeAttribute(char **args)
 	printf("totlen = %d\n", tot_len); fflush(stdout);
 	tot_len += values_len * 2; /* add on some for spaces and null, etc - little bit of extra here */
 	printf("totlen = %d\n", tot_len); fflush(stdout);
-	valstr = (char*)malloc(tot_len * sizeof(char));
 	
-	sprintf(valstr, "");
-	for(i=0; i<values_len; i++) {
-		sprintf(valstr, "%s%s%s%s", valstr, i == 0 ? "" : " ", values[i], i == values_len-1 ? "\0" : "");
+	if(tot_len == 0 && node_name_requested == 1) {
+		char hostname[256];
+		
+		valstr = (char*)malloc(1 * sizeof(char));
+		
+		gethostname(hostname, 256);
+		printf("Hostname = '%s'\n", hostname);
+		
+		sprintf(valstr, "%s\0", hostname);
+	}
+	else {
+		valstr = (char*)malloc(tot_len * sizeof(char));
+	
+		sprintf(valstr, "");
+		for(i=0; i<values_len; i++) {
+			sprintf(valstr, "%s%s%s%s", valstr, i == 0 ? "" : " ", values[i], i == values_len-1 ? "\0" : "");
+		}
 	}
 	
 	printf("valSTR = '%s'\n", valstr); fflush(stdout);
