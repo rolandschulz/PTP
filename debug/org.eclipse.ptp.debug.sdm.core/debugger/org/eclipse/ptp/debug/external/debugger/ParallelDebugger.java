@@ -22,10 +22,14 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
@@ -113,21 +117,20 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		}
 		return buf.toString();
 	}
-	public int startDebuggerListener() {
+	public int startDebuggerListener() throws CoreException {
 		proxy = new ProxyDebugClient();
 		try {
 			proxy.sessionCreate();
 		} catch (IOException e) {
-			System.out.println("could not create proxy");
-			return 0;
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "could not create proxy", null));
 		}
 		return proxy.getSessionPort();
 	}
 	
-	public void connection() throws PCDIException {
+	public void connection() throws CoreException {
 	}
 	
-	public void startDebugger(IPJob job) throws PCDIException {
+	public void startDebugger(IPJob job) throws CoreException {
 		try {
 			String app = (String) job.getAttribute(PreferenceConstants.JOB_APP);
 			String dir = (String) job.getAttribute(PreferenceConstants.JOB_WORK_DIR);
@@ -136,14 +139,17 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			proxy.addEventListener(this);
 			proxy.debugStartSession(dir, app, join(args, " "));
 		} catch (IOException e) {
-			throw new PCDIException(e.getMessage());
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Cannot start debugger", e));
 		}
 	}
-	public void stopDebugger() throws PCDIException {
-		try {
-			proxy.sessionFinish();
-		} catch (IOException e) {
-			throw new PCDIException(e.getMessage());
+	public void stopDebugger() throws CoreException {
+		if (proxy != null) {
+			try {
+				proxy.sessionFinish();
+				proxy = null;
+			} catch (IOException e) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Cannot stop debugger", e));
+			}
 		}
 	}
 	public Process getDebuggerProcess() {

@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.commands;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
@@ -30,7 +31,11 @@ public class ConnectionCommand extends AbstractDebugCommand {
 		super(null, false, true);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
-		debugger.connection();
+		try {
+			debugger.connection();
+		} catch (CoreException e) {
+			throw new PCDIException(e);
+		}
 	}
 	public void waitFinish() throws PCDIException {
 		if (waitForReturn()) {

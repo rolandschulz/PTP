@@ -22,6 +22,7 @@
  */
 package org.eclipse.ptp.debug.external;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -48,9 +49,9 @@ public interface IDebugger {
 	
 	/* Program Information */
 	
-	public void connection() throws PCDIException;
-	public void startDebugger(IPJob job) throws PCDIException;
-	public void stopDebugger() throws PCDIException;
+	public void connection() throws CoreException;
+	public void startDebugger(IPJob job) throws CoreException;
+	public void stopDebugger() throws CoreException;
 	
 	public void listStackFrames(BitList tasks) throws PCDIException;
 	public void setCurrentStackFrame(BitList tasks, IPCDIStackFrame frame) throws PCDIException;

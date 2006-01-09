@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.aif.AIF;
@@ -70,10 +71,10 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		createArguments();
 		createVariables();
 	}
-	public void connection() {
+	public void connection() throws CoreException {
 		completeCommand(IDebugCommand.OK);
 	}
-	public int startDebuggerListener() {
+	public int startDebuggerListener() throws CoreException {
 		return 0;
 	}
 	private void createArguments() {
@@ -115,7 +116,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 			}
 		}).start();
 	}
-	public void stopDebugger() {
+	public void stopDebugger() throws CoreException {
 		new Thread(new Runnable() {
 			public void run() {
 				if (!EVENT_BY_EACH_PROC) {
