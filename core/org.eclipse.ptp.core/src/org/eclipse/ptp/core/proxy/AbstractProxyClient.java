@@ -38,10 +38,11 @@ import org.eclipse.ptp.core.util.BitList;
 public abstract class AbstractProxyClient {
 	private String				sessHost = null;
 	private int					sessPort = 0;
-	private ServerSocket			sessSvrSock;
-	private Socket				sessSock;
+	private ServerSocket			sessSvrSock = null;
+	private Socket				sessSock = null;
 	private OutputStreamWriter	sessOut;
 	private InputStreamReader		sessIn;
+	private boolean				sessConnected = false;
 	private boolean				exitThread;
 	private Thread				eventThread;
 	private Thread				acceptThread;
@@ -62,7 +63,7 @@ public abstract class AbstractProxyClient {
 	}
 	
 	protected void sendCommand(String cmd) throws IOException {
-		if (sessSock != null && sessSock.isConnected()) {
+		if (sessConnected) {
 			String buf = encodeLength(cmd.length()) + " " + cmd;
 			System.out.println("<" + buf + ">");
 			sessOut.write(buf);
@@ -112,8 +113,25 @@ public abstract class AbstractProxyClient {
 					sessSock = sessSvrSock.accept();
 					sessOut = new OutputStreamWriter(sessSock.getOutputStream());
 					sessIn = new InputStreamReader(sessSock.getInputStream());
+					sessConnected = true;
 					fireProxyEvent(new ProxyConnectedEvent());
 					startEventThread();
+				} catch (IOException e) {
+					try {
+						sessIn.close();
+					} catch (IOException e1) {
+					}
+					try {
+						sessOut.close();
+					} catch (IOException e1) {
+					}
+					try {
+						sessSock.close();
+					} catch (IOException e1) {
+					} 
+				}
+				try {
+					sessSvrSock.close();
 				} catch (IOException e) {
 				}
 				System.out.println("accept thread exiting...");
@@ -139,9 +157,21 @@ public abstract class AbstractProxyClient {
 					while (!exitThread) {
 						sessionProgress();
 					}
-					sessSvrSock.close();
+				} catch (IOException e) {
+				} 
+				sessConnected = false;
+				try {
+					sessIn.close();
 				} catch (IOException e) {
 				}
+				try {
+					sessOut.close();
+				} catch (IOException e) {
+				}
+				try {
+					sessSock.close();
+				} catch (IOException e) {
+				} 
 				System.out.println("event thread exiting...");
 			}
 		};
@@ -165,9 +195,6 @@ public abstract class AbstractProxyClient {
 		
 		int n = sessIn.read(len_bytes, 0, 9);
 		if (n < 0) {
-			System.out.println("CLOSING SOCKETS");
-			sessIn.close();
-			sessOut.close();
 			exitThread = true;
 			return;
 		}
@@ -179,8 +206,6 @@ public abstract class AbstractProxyClient {
 
 		n = sessIn.read(event_bytes, 0, len);
 		if (n < 0) {
-			sessIn.close();
-			sessOut.close();
 			exitThread = true;
 			return;
 		}
@@ -192,5 +217,7 @@ public abstract class AbstractProxyClient {
 
 	public void sessionFinish() throws IOException {
 		this.sendCommand("QUI");
+		if (acceptThread.isAlive())
+			acceptThread.interrupt();
 	}
 }
