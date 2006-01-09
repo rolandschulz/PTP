@@ -94,6 +94,9 @@ public interface IPUniverse extends IPElement {
 	 * @return The Node object if found, else null
 	 */
 	public IPNode findNodeByName(String nname);
+	
+	
+	public IPNode findNodeByHostname(String nname);
 
 	/**
 	 * Given a Process name, returns the Process object located on one of the

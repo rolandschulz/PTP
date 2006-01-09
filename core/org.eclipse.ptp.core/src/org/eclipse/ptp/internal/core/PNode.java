@@ -37,8 +37,8 @@ public class PNode extends Parent implements IPNode {
 	protected Map attribs = null;
 	protected List listeners = new ArrayList();
 
-	public PNode(IPElement element, String name, String key, int nodeNumber) {
-		super(element, name, key, P_NODE);
+	public PNode(IPElement mac, String name, String key, int nodeNumber) {
+		super(mac, name, key, P_NODE);
 		attribs = new HashMap(0);
 		attribs.put(AttributeConstants.ATTRIB_NODE_NUMBER, new Integer(nodeNumber));
 	}

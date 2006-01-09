@@ -25,6 +25,7 @@ import java.util.Vector;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
@@ -107,6 +108,29 @@ public class PUniverse extends Parent implements IPUniverse {
 				IPNode node = ((IPMachine) ob).findNodeByName(nname);
 				if (node != null)
 					return node;
+			}
+		}
+		return null;
+	}
+	
+	public synchronized IPNode findNodeByHostname(String nname) {
+		Collection col = getCollection();
+		Iterator it = col.iterator();
+		while (it.hasNext()) {
+			Object ob = it.next();
+			if (ob instanceof IPMachine) {
+				IPNode nodes[] = ((IPMachine)ob).getNodes();
+				for(int i=0; i<nodes.length; i++) {
+					String aname = (String)nodes[i].getAttrib(AttributeConstants.ATTRIB_NODE_NAME);
+					if(aname.equals(nname)) return nodes[i];
+					
+					/* what if the name is something like 'foo.bar.com' and later we just get 'foo' out of
+					 * the system?  maybe we should try and cut that up and say it's the same node.
+					 */
+					int idx = aname.indexOf('.');
+					if(idx > 0) aname = aname.substring(0, idx);
+					if(aname.equals(nname)) return nodes[i];
+				}
 			}
 		}
 		return null;

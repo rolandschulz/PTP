@@ -232,17 +232,47 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 				for (int j = 0; j < ne2.length; j++) {
 					PNode node;
+					//node = new PNode(mac, ne2[j], "" + j + "", j);
+					
+					String nodename = ""+j+"";
+					if(attribs.length > 0) {
+						nodename = attribs[(j * num_attribs)];
+					}
 					node = new PNode(mac, ne2[j], "" + j + "", j);
-					node.setAttrib(AttributeConstants.ATTRIB_NODE_NAME,
-							attribs[(j * num_attribs)]);
-					node.setAttrib(AttributeConstants.ATTRIB_NODE_USER,
-							attribs[(j * num_attribs) + 1]);
-					node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP,
-							attribs[(j * num_attribs) + 2]);
-					node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE,
+					node.setAttrib(AttributeConstants.ATTRIB_NODE_NAME, nodename);
+					System.out.println("NodeName According to ORTE = '"+node.getAttrib(AttributeConstants.ATTRIB_NODE_NAME)+"'");
+					
+					if(attribs.length > 1) {
+						node.setAttrib(AttributeConstants.ATTRIB_NODE_USER,
+								attribs[(j * num_attribs) + 1]);
+					}
+					else {
+						node.setAttrib(AttributeConstants.ATTRIB_NODE_USER, "UNKNOWN");
+					}
+					
+					if(attribs.length > 2) {
+						node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP,
+								attribs[(j * num_attribs) + 2]);
+					}
+					else {
+						node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP, "UNKNOWN");
+					}
+					
+					if(attribs.length > 3) {
+						node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE,
 							attribs[(j * num_attribs) + 3]);
-					node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE,
+					}
+					else {
+						node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, "up");
+					}
+					
+					if(attribs.length > 4) {
+						node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE,
 							attribs[(j * num_attribs) + 4]);
+					}
+					else {
+						node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE, "73");
+					}					
 
 					mac.addChild(node);
 				}
@@ -340,23 +370,22 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			nname = new String("machine0_node"+nname);
 			
 			//String nname = controlSystem.getProcessAttribute(job, proc, AttributeConstants.ATTRIB_PROCESS_NODE_NAME);
-			String mname = monitoringSystem.getNodeMachineName(nname);
+			//String mname = monitoringSystem.getNodeMachineName(nname);
 			// System.out.println("Process "+pname+" running on node:");
 			// System.out.println("\t"+nname);
 			// System.out.println("\tand that's running on machine: "+mname);
-			IPMachine mac = universe.findMachineByName(mname);
-			if (mac != null) {
-				IPNode node = mac.findNodeByName(nname);
-				if (node != null) {
-					// System.out.println("**** THIS NODE IS WHERE THIS PROCESS
-					// IS RUNNING!");
-					/*
-					 * this sets the data member in both classes stating that
-					 * this process is running on this node and telling this
-					 * node that it now has a child process running on it.
-					 */
-					proc.setNode(node);
-				}
+			
+			IPNode node = universe.findNodeByName(nname);
+			if(node == null) {
+				node = universe.findNodeByHostname(attribs[(i * num_attribs) + 1]);
+			}
+			if(node != null) {
+				/*
+				 * this sets the data member in both classes stating that
+				 * this process is running on this node and telling this
+				 * node that it now has a child process running on it.
+				 */
+				proc.setNode(node);
 			}
 			//String status = controlSystem.getProcessAttribute(job, proc, AttributeConstants.ATTRIB_PROCESS_STATUS);
 			//proc.setStatus(status);
