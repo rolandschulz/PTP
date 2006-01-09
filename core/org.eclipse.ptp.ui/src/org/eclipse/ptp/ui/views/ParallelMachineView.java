@@ -260,6 +260,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 			return;
 		}
 		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Node #", node.getNodeNumber() });
+		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Name", (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_NAME) });
 		new TableItem(BLtable, SWT.NULL).setText(new String[] { "State", (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_STATE) });
 		new TableItem(BLtable, SWT.NULL).setText(new String[] { "User", (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_USER) });
 		new TableItem(BLtable, SWT.NULL).setText(new String[] { "Group", (String) node.getAttrib(AttributeConstants.ATTRIB_NODE_GROUP) });
