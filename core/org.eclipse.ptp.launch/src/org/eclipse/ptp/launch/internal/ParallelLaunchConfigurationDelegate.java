@@ -180,7 +180,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		IPTPDebugger debugger = null;
 		IPJob job = null;
 		try {
-			monitor.worked(1);
 			// done the verification phase
 			JobRunConfiguration jrunconfig = getJobRunConfiguration(configuration);
 			String[] args = verifyArgument(configuration);
@@ -203,6 +202,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				jrunconfig.setDebuggerArgs(dbgArgs);
 				jrunconfig.setDebug();
 			}
+			monitor.worked(1);
 			
 			job = getLaunchManager().run(launch, workDirectory, null, jrunconfig, new SubProgressMonitor(monitor, 8));
 			job.setAttribute(PreferenceConstants.JOB_APP, exePath.lastSegment());
