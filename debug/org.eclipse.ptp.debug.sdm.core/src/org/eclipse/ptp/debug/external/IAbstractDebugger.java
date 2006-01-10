@@ -40,8 +40,8 @@ public interface IAbstractDebugger extends IDebugger {
 	public int startDebuggerListener() throws CoreException;
 	
 	/* Debugger Initialization/Termination */
-	public void initialize(IPJob job);
-	public void exit();
+	public void initialize(IPJob job) throws CoreException;
+	public void exit() throws CoreException;
 	
 	public void addDebuggerObserver(Observer obs);
 	public void deleteDebuggerObserver(Observer obs);
