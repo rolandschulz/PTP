@@ -670,38 +670,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	//protected IPJob myjob = null;
 
 	public IPJob run(final ILaunch launch, File workingDirectory, String[] envp, final JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException {
-		/*
-		 * PORT IProgressMonitor subMonitor = new SubProgressMonitor(monitor,
-		 * 5); subMonitor.beginTask("Executing job", 10);
-		 * subMonitor.subTask("Creating MPI session"); createMPISession();
-		 * subMonitor.worked(2); subMonitor.subTask("Executing run command");
-		 * mpirun(args); subMonitor.worked(2); subMonitor.subTask("Remove all
-		 * processes"); processRoot.removeAllProcesses(); clearUsedMemory();
-		 * subMonitor.worked(2);
-		 * DebugPlugin.getDefault().getLaunchManager().removeLaunch(launch);
-		 * //DebugPlugin.newProcess(launch, session.getSessionProcess(),
-		 * renderLabel("mpictrl")); subMonitor.subTask("Executing sys status
-		 * command"); mpisysstatus(); subMonitor.worked(2);
-		 * subMonitor.subTask("Executing status command"); mpistatus();
-		 */
-
-		/*
-		 * what if I had already run a job? Better clean that up first! this is
-		 * a hack - we should remove this one day
-		 */
-		/*
-		if (myjob != null) {
-			IPProcess[] procs = myjob.getProcesses();
-			for (int i = 0; i < procs.length; i++) {
-				IPNode node = procs[i].getNode();
-				node.removeChild(procs[i]);
-			}
-			myjob.removeChildren();
-			universe.removeChild(myjob);
-			myjob = null;
-		}
-		*/
-
 		monitor.subTask("Creating the job...");
 		int jobID = controlSystem.run(jobRunConfig);
 		if (jobID < 0)
@@ -709,31 +677,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		
 		System.out.println("ModelManager.run() - new JobID = "+jobID);
 		return newJob(jobID, jobRunConfig.getNumberOfProcesses(), jobRunConfig.isDebug(), monitor);
-		
-		/*
-		if (nejob != null) {
-			PJob job;
-
-			int x = 0;
-			try {
-				x = (new Integer(nejob.substring(3))).intValue();
-			} catch (NumberFormatException e) {
-			}
-			job = new PJob(universe, nejob, "" + (PJob.BASE_OFFSET + x) + "", x);
-			if(jobRunConfig.isDebug()) job.setDebug();
-
-		//	myjob = job;
-			universe.addChild(job);
-			try {
-				getProcsForNewJob(nejob, job, monitor);
-			} catch (InterruptedException e) {
-				universe.deleteJob(job);
-				throw new CoreException(Status.CANCEL_STATUS);
-			}
-			fireState(STATE_RUN, nejob);
-			return job;
-		}
-		*/
 	}
 
 	protected void clearUsedMemory() {
@@ -783,9 +726,11 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		try {
 			getProcsStatusForNewJob(jobName, job, new SubProgressMonitor(monitor, numProcesses));
 		} catch(InterruptedException e2) {
+			controlSystem.terminateJob(job);
 			universe.deleteJob(job);
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e2.getMessage(), e2));			
 		} catch (CoreException e) {
+			controlSystem.terminateJob(job);
 			universe.deleteJob(job);
 			throw e;
 		}
