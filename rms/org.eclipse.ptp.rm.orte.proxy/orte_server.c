@@ -94,6 +94,9 @@ static void job_state_callback(orte_jobid_t jobid, orte_proc_state_t state);
 static int ompi_sendcmd(orte_daemon_cmd_flag_t usercmd);
 static int orte_console_send_command(orte_daemon_cmd_flag_t usercmd);
 static void iof_callback(orte_process_name_t* src_name, orte_iof_base_tag_t src_tag, void* cbdata, const unsigned char* data, size_t count);
+static void debug_add_job(int app_jobid, int debug_jobid);
+static void debug_remove_job(int jobid);
+static int debug_find_jobid(int jobid);
 
 #ifdef HAVE_SYS_BPROC_H
 int ORTE_Subscribe_Bproc(void);
@@ -613,21 +616,67 @@ ORTETerminateJob(char **args)
 	rc = orte_rmgr.terminate_job(jobid);
 	if(ORTECheckErrorCode(RTEV_ERROR_TERMINATE_JOB, rc)) return 1;
 	
+	if ((jobid = debug_find_jobid(jobid)) >= 0) {
+		rc = orte_rmgr.terminate_job(jobid);
+		if(ORTECheckErrorCode(RTEV_ERROR_TERMINATE_JOB, rc)) return 1;
+	}
+	
 	return PROXY_RES_OK;
+}
+
+static void
+debug_add_job(int app_jobid, int debug_jobid)
+{
+	debug_job *	djob = (debug_job *)malloc(sizeof(debug_job));
+    djob->app_jobid = app_jobid;
+    djob->debugger_jobid = debug_jobid;
+    AddToList(debugJobs, (void *)djob);
+}
+
+static void
+debug_remove_job(int jobid)
+{
+	debug_job *	djob;
+	printf("remove debug job %d\n", jobid); fflush(stdout);
+	for (SetList(debugJobs); (djob = (debug_job *)GetListElement(debugJobs)) != NULL; ) {
+		if (djob->debugger_jobid == jobid) {
+			RemoveFromList(debugJobs, (void *)djob);
+			break;
+		}
+	}
+}
+
+static int
+debug_find_jobid(int jobid)
+{
+	debug_job *	djob;
+	
+	for (SetList(debugJobs); (djob = (debug_job *)GetListElement(debugJobs)) != NULL; ) {
+		if (djob->app_jobid == jobid) {
+			return djob->debugger_jobid;
+		}
+	}
+	return -1;
 }
 
 /*
  * If we're under debug control, let the debugger handle process state update. 
  * We still want to wire up stdio though.
+ * 
+ * Note: this will only be used if the debugger allows the program to
+ * reach MPI_Init(), which may not ever happen. Don't rely this to do anything
+ * for any type of job.
+ * 
+ * Note also: the debugger manages process state updates so we don't need
+ * to send events back to the runtime.
  */
 static void
-debug_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
+debug_app_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 {
 	char *		res;
-	debug_job *	djob;
 	int			rc;
 	orte_process_name_t* name;
-			
+
 	switch(state) {
 		case ORTE_PROC_STATE_INIT:
 			if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
@@ -641,18 +690,6 @@ debug_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
                 	opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
            	}
 			break;
-		case ORTE_PROC_STATE_LAUNCHED:
-			break;
-		case ORTE_PROC_STATE_AT_STG1:
-			break;
-		case ORTE_PROC_STATE_AT_STG2:
-			break;
-		case ORTE_PROC_STATE_RUNNING:
-			break;
-		case ORTE_PROC_STATE_AT_STG3:
-			break;
-		case ORTE_PROC_STATE_FINALIZED:
-			break;
 		case ORTE_PROC_STATE_TERMINATED:
 			if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
                 ORTE_ERROR_LOG(rc);
@@ -662,11 +699,27 @@ debug_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
                 	opal_output(0, "[%s:%d] orte_iof.iof_unsubscribed failed\n", __FILE__, __LINE__);
            	}
 			break;
-		case ORTE_PROC_STATE_ABORTED:
-			break;
 	}
 }
 
+/*
+ * job_state_callback for the debugger. Detects debugger exit and cleans up
+ * job id map.
+ */
+static void
+debug_job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
+{
+	char *		res;
+	int			rc;
+	orte_process_name_t* name;
+	
+	switch(state) {
+		case ORTE_PROC_STATE_TERMINATED:
+		case ORTE_PROC_STATE_ABORTED:
+           	debug_remove_job(jobid);
+    			break;
+	}
+}
 
 static void debug_wireup_stdin(orte_jobid_t jobid)
 {
@@ -802,12 +855,13 @@ debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_co
 {
 	int					i;
 	int					rc;
+	debug_job			djob;
 	orte_process_name_t *	name;
 	orte_jobid_t			debug_jobid;
 	orte_jobid_t			app_jobid;
 	orte_app_context_t **	debug_context;
 
-	if ((rc = debug_allocate(app_context, num_context, &app_jobid, debug_job_state_callback)) != ORTE_SUCCESS)
+	if ((rc = debug_allocate(app_context, num_context, &app_jobid, debug_app_job_state_callback)) != ORTE_SUCCESS)
 		return rc;
 
 	debug_context = malloc(sizeof(orte_app_context_t *));
@@ -830,7 +884,7 @@ debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_co
 	debug_context[0]->argv[i++] = NULL;
 	debug_context[0]->argc = i;
 
-	if ((rc = debug_allocate(debug_context, num_context, &debug_jobid, NULL)) != ORTE_SUCCESS) {
+	if ((rc = debug_allocate(debug_context, num_context, &debug_jobid, debug_job_state_callback)) != ORTE_SUCCESS) {
 		// TODO free debug_context...
 		return rc;
 	}
@@ -844,6 +898,8 @@ debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_co
 	}
     	
 	*jobid = app_jobid;
+    
+    debug_add_job(app_jobid, debug_jobid);
     
 	return ORTE_SUCCESS;
 }
