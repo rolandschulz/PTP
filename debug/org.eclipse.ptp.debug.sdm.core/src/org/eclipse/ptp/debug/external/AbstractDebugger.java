@@ -25,6 +25,7 @@ package org.eclipse.ptp.debug.external;
 import java.util.Observable;
 import java.util.Observer;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
@@ -70,7 +71,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		commandQueue.setCommandReturn(result);
 	}
 
-	public final void initialize(IPJob job) {
+	public final void initialize(IPJob job) throws CoreException {
 		this.job = job;
 		job.setAttribute(TERMINATED_PROC_KEY, new BitList(job.size()));
 		job.setAttribute(SUSPENDED_PROC_KEY, new BitList(job.size()));
@@ -87,8 +88,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		postCommandAndWait(new StartDebuggerCommand(job));
 	}
 	
-	public final void exit() {
-		postCommand(new StopDebuggerCommand());
+	public final void exit() throws CoreException {
+		stopDebugger();
 		isExited = true;
 		if (!eventThread.equals(Thread.currentThread())) {			
 			// Kill the event Thread.
@@ -97,8 +98,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 					eventThread.interrupt();
 					eventThread.join(5000);
 				}
-			} catch (InterruptedException e) {
-			}		
+			} catch (InterruptedException e) {}		
 		}
 		deleteObservers();
 		commandQueue.setTerminated();
@@ -145,11 +145,11 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 				setSuspendTasks(false, tasks);
 				setProcessStatus(tasks.toArray(), IPProcess.RUNNING);
 			} else if (event instanceof IPCDIErrorEvent) {
+				IPCDIErrorEvent errEvent = (IPCDIErrorEvent)event;
 				setSuspendTasks(false, tasks);
 				setTerminateTasks(true, tasks);
 				session.unregisterTargets(tasks.toArray(), true);
 				setProcessStatus(tasks.toArray(), IPProcess.ERROR);
-				IPCDIErrorEvent errEvent = (IPCDIErrorEvent)event;
 				if (errEvent.getErrorCode() == IPCDIErrorEvent.DBG_FATAL) {
 					postCommand(new StopDebuggerCommand());
 				}
@@ -204,6 +204,9 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		fireEvent(new InferiorSignaledEvent(getSession(), tasks, locator));
 	}
 	public void handleErrorEvent(BitList tasks, String errMsg, int errCode) {
+		if (errCode == IPCDIErrorEvent.DBG_FATAL) {
+			tasks = ((Session)session).createBitList();
+		}
 		fireEvent(new ErrorEvent(getSession(), tasks, errMsg, errCode));
 	}
 	public void handleErrorEvent(BitList tasks, String errMsg) {

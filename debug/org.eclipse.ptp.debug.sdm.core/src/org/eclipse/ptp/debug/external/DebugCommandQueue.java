@@ -41,6 +41,7 @@ public class DebugCommandQueue extends Thread {
 	}
 	public void setTerminated() {
 		isTerminated = true;
+		cleanup();
 	}
 	
 	public void run()  {
@@ -122,6 +123,11 @@ public class DebugCommandQueue extends Thread {
 					currentCommand.setReturn(result);
 				}
 			}
+		}
+	}
+	public void cleanup() {
+		synchronized (queue) {
+			queue.clear();
 		}
 	}
 }

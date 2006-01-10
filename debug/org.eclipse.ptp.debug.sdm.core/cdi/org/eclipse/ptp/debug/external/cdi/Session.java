@@ -100,7 +100,11 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 	}
 	
 	public void shutdown() {
-		debugger.exit();
+		try {
+			debugger.exit();
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
 		variableManager.shutdown();
 		expressionManager.shutdown();
