@@ -678,13 +678,15 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}
 	}
 	public void removeJob(IPJob job) {
-		try {
-			debugModel.deletePBreakpointBySet(job.getIDString());
-		} catch (CoreException e) {
-			PTPDebugUIPlugin.log(e);
+		if (job.isDebug()) {
+			try {
+				debugModel.deletePBreakpointBySet(job.getIDString());
+			} catch (CoreException e) {
+				PTPDebugUIPlugin.log(e);
+			}
+			debugModel.deleteJob(job.getIDString());
+			debugModel.shutdownSession(job);
 		}
-		debugModel.deleteJob(job.getIDString());
-		debugModel.shutdownSession(job);
 		super.removeJob(job);
 	}
 }
