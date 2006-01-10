@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <list.h>
+#include <grp.h>
+#include <pwd.h>
 
 #include "include/orte_constants.h"
 #include "mca/errmgr/errmgr.h"
@@ -1575,7 +1577,7 @@ ORTEGetNodeAttribute(char **args)
 	int				tot_len;
 	char *			valstr = NULL;
 	int				values_len;
-	int				node_name_requested = 0;
+	int				default_needed = 0;
 	
 	machid = atoi(args[1]);
 	nodeid = atoi(args[2]);
@@ -1598,24 +1600,25 @@ ORTEGetNodeAttribute(char **args)
 	values = (char**)malloc(values_len * sizeof(char*));
 	types = (int*)malloc((last_arg - 3)*sizeof(int));
 	
+	default_needed = 0;
+	
 	/* go through the args now, set up the key array */
 	for(i=3; i<last_arg; i++) {
 		if(!strcmp(args[i], "ATTRIB_NODE_NAME")) {
 			asprintf(&(keys[i-3]), "%s", "orte-node-name");
 			types[i-3] = PTP_STRING;
-			node_name_requested = 1;
-		} else if(!strcmp(args[i], "ATTRIB_NODE_STATE")) {
-			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-status");
-			types[i-3] = PTP_STRING;
-		} else if(!strcmp(args[i], "ATTRIB_NODE_MODE")) {
-			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-mode");
-			types[i-3] = PTP_UINT32;
+			default_needed++;
 		} else if(!strcmp(args[i], "ATTRIB_NODE_USER")) {
 			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-user");	
 			types[i-3] = PTP_STRING;
+			default_needed++;
 		} else if(!strcmp(args[i], "ATTRIB_NODE_GROUP")) {
 			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-group");
 			types[i-3] = PTP_STRING;
+			default_needed++;
+		} else if(!strcmp(args[i], "ATTRIB_NODE_STATE")) {
+			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-status");
+			types[i-3] = PTP_STRING;		
 		} else {
 			asprintf(&(keys[i-3]), "UNDEFINED");
 			types[i-3] = PTP_STRING;
@@ -1645,15 +1648,32 @@ ORTEGetNodeAttribute(char **args)
 	tot_len += values_len * 2; /* add on some for spaces and null, etc - little bit of extra here */
 	printf("totlen = %d\n", tot_len); fflush(stdout);
 	
-	if(tot_len == 0 && node_name_requested == 1) {
+	if(tot_len == 0 && default_needed == 3) {
 		char hostname[256];
+		gid_t gid;
+		struct group *grp;
+		struct passwd *pwd;
 		
-		valstr = (char*)malloc(1 * sizeof(char));
+		pwd = getpwuid(geteuid());
+		gid = getgid();
+		grp = getgrgid(gid);
 		
 		gethostname(hostname, 256);
-		printf("Hostname = '%s'\n", hostname);
+		printf("Hostname = '%s'\n", hostname); fflush(stdout);
+		printf("Username = '%s'\n", pwd->pw_name); fflush(stdout);
+		printf("Groupname = '%s'\n", grp->gr_name); fflush(stdout);
+		tot_len = 0;
+		tot_len += strlen(hostname);
+		if(pwd != NULL) tot_len += strlen(pwd->pw_name);
+		if(grp != NULL) tot_len += strlen(grp->gr_name);
+		tot_len += 6; /* extra space for spaces, null, etc */
 		
-		sprintf(valstr, "%s\0", hostname);
+		printf("Total length = %d\n", tot_len); fflush(stdout);
+		
+		valstr = (char*)malloc(tot_len * sizeof(char));
+		
+		sprintf(valstr, "%s %s %s\0", hostname, pwd->pw_name, grp->gr_name);
+	
 	}
 	else {
 		valstr = (char*)malloc(tot_len * sizeof(char));
