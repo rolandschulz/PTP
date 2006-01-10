@@ -110,7 +110,7 @@ public class PDebuggerPage extends AbstractPerferencePage {
 		//IPreferenceStore store = getPreferenceStore();
 		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
 		
-		preferences.setDefault(IPDebugConstants.PREF_PTP_SDM_FILE, IPDebugConstants.PREF_PTP_SDM_FILE);
+		preferences.setValue(IPDebugConstants.PREF_PTP_SDM_FILE, IPDebugConstants.PREF_PTP_SDM_FILE);
 		
 		URL url = Platform.find(Platform.getBundle(PTPDebugCorePlugin.PLUGIN_ID), new Path("/"));
 
@@ -118,10 +118,10 @@ public class PDebuggerPage extends AbstractPerferencePage {
 			try {
 				File path = new File(Platform.asLocalURL(url).getPath());
 				String ipath = path.getAbsolutePath();
-				System.out.println("Plugin install dir = '"+ipath+"'");
+				System.out.println("PDebuggerPage Plugin install dir = '"+ipath+"'");
 				int idx = ipath.indexOf("org.eclipse.ptp.debug.core");
 				String ipath2 = ipath.substring(0, idx) + "org.eclipse.ptp.debug.sdm/sdm";
-				preferences.setDefault(IPDebugConstants.PREF_PTP_SDM_FILE, ipath2);
+				preferences.setValue(IPDebugConstants.PREF_PTP_SDM_FILE, ipath2);
 			} catch(Exception e) { 
 			}
 		}
