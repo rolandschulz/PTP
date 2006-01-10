@@ -107,7 +107,7 @@ public class BuildModelParserAction implements AbstractParserUserActions
      */
     protected Parser parser = null;
 
-    BuildModelParserAction(Parser p, TranslationUnit tu)
+    public BuildModelParserAction(Parser p, TranslationUnit tu)
     {
         parser = p;
         translationUnit = tu;
@@ -142,9 +142,13 @@ public class BuildModelParserAction implements AbstractParserUserActions
      * This method is called when the parser is about to reduce by
      * <xExecutableProgram> ::= <xExecutableProgram> <xProgramUnit>  ;
      */
-    public List/*<FortranElement>*/ production2UserAction(List/*<FortranElement>*/ v1, FortranElement v2)
+    public Map/*<FortranElement, FortranElementInfo>*/ production2UserAction(Map/*<FortranElement, FortranElementInfo>*/ v1, FortranElement v2)
     {
-        return m.list(v1, v2);
+        //return m.list(v1, v2);
+
+        v2.setParent(translationUnit);
+        //try { translationUnit.addChild(v1); } catch (CModelException x) {;}
+        return m.getAllElements();
     }
 
     /**

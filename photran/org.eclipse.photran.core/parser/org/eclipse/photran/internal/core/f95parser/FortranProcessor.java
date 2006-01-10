@@ -4,16 +4,12 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
-import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.internal.core.model.TranslationUnit;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.photran.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.f95parser.symboltable.SymbolTable;
-import org.eclipse.photran.internal.core.model.FortranElement;
 import org.eclipse.photran.internal.core.preferences.FortranEnableParserDebuggingPreference;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
@@ -25,6 +21,8 @@ import org.eclipse.photran.internal.core.preferences.FortranPreferences;
  */
 public class FortranProcessor
 {
+    private boolean lastParseWasFixedForm = false;
+    
     /**
      * Determines whether or not the given file is a fixed-format file (based on its filename
      * extension) and returns a lexer capable of processing that file. Does <i>not</i> alter the
@@ -40,9 +38,7 @@ public class FortranProcessor
 
         return Lexer.createLexer(inputStream, filename, isFixedForm);
     }
-
-    private boolean lastParseWasFixedForm = false;
-
+    
     /**
      * Parses the given input stream as a Fortran 95 source file. The filename parameter should
      * indicate the filename of the file being parsed; it is saved in each <code>Token</code>

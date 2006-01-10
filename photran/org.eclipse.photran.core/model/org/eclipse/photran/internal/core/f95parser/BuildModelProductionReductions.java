@@ -51,10 +51,10 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
 
         // Reduce by <xExecutableProgram> ::= <xExecutableProgram> <xProgramUnit>  ;
         FortranElement v2 = (FortranElement)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
-        List/*<FortranElement>*/ v1 = (List/*<FortranElement>*/)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
+        Map/*<FortranElement, FortranElementInfo>*/ v1 = (Map/*<FortranElement, FortranElementInfo>*/)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        List/*<FortranElement>*/ userValue = parserActions.production2UserAction(v1, v2);
+        Map/*<FortranElement, FortranElementInfo>*/ userValue = parserActions.production2UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XexecutableprogramNonterminal.getInstance(), 2, userValue);

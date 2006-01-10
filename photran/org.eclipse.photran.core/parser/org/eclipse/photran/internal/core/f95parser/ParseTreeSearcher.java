@@ -390,7 +390,7 @@ public final class ParseTreeSearcher
      * @param tree
      * @return <code>Token</code> (possibly <code>null</code>)
      */
-    public static Token findFirstTokenOnLineIn(final int targetLine, AbstractParseTreeNode tree)
+    public static Token findFirstTokenOnLine(final int targetLine, AbstractParseTreeNode tree)
     {
         if (tree == null || targetLine < 1) return null;
 
