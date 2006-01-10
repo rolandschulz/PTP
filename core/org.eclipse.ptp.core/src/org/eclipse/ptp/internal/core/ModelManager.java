@@ -705,7 +705,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		monitor.subTask("Creating the job...");
 		int jobID = controlSystem.run(jobRunConfig);
 		if (jobID < 0)
-			return null;
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "cannot create a job.", null));
 		
 		System.out.println("ModelManager.run() - new JobID = "+jobID);
 		return newJob(jobID, jobRunConfig.getNumberOfProcesses(), jobRunConfig.isDebug(), monitor);
@@ -784,7 +784,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			getProcsStatusForNewJob(jobName, job, new SubProgressMonitor(monitor, numProcesses));
 		} catch(InterruptedException e2) {
 			universe.deleteJob(job);
-			return null;
+			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e2.getMessage(), e2));			
 		} catch (CoreException e) {
 			universe.deleteJob(job);
 			throw e;
