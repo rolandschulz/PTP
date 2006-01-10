@@ -4,10 +4,16 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
+import org.eclipse.cdt.core.model.CModelException;
+import org.eclipse.cdt.internal.core.model.TranslationUnit;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.photran.core.FortranCorePlugin;
 import org.eclipse.photran.internal.core.f95parser.symboltable.SymbolTable;
+import org.eclipse.photran.internal.core.model.FortranElement;
 import org.eclipse.photran.internal.core.preferences.FortranEnableParserDebuggingPreference;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
@@ -63,12 +69,35 @@ public class FortranProcessor
      */
     public ParseTreeNode parse(InputStream inputStream, String filename, boolean isFixedForm) throws Exception
     {
-        ILexer lexer = Lexer.createLexer(inputStream, filename, isFixedForm);
         Parser parser = new Parser();
+        return (ParseTreeNode)parse(inputStream, filename, isFixedForm, parser, new BuildParseTreeProductionReductions(new BuildParseTreeParserAction(parser)));
+    }
+
+    /**
+     * Parses the given input stream as a Fortran 95 source file. The filename parameter should
+     * indicate the filename of the file being parsed; it is saved in each <code>Token</code>
+     * produced and used in error messages, although no one actually checks to see if it's a legal
+     * filename or not.
+     * @param inputStream
+     * @param filename
+     * @param isFixedForm
+     * @return <code>ParseResult</code>
+     */
+    public Map parseForModel(InputStream inputStream, String filename, Boolean isFixedForm, TranslationUnit tu) throws Exception
+    {
+        boolean isFixedFormB = isFixedForm == null ? hasFixedFormFileExtension(filename) : isFixedForm.booleanValue();
+        Parser parser = new Parser();
+        Map/*<FortranElement, FortranElementInfo>*/ newElements = (Map)parse(inputStream, filename, isFixedFormB, parser, new BuildModelProductionReductions(new BuildModelParserAction(parser, tu)));
+        return newElements;
+    }
+
+    private Object parse(InputStream inputStream, String filename, boolean isFixedForm, Parser parser, AbstractProductionReductions productionReductions) throws Exception
+    {
+        ILexer lexer = Lexer.createLexer(inputStream, filename, isFixedForm);
 
         try
         {
-            ParseTreeNode result = parser.parse(lexer);
+            Object result = parser.parse(lexer, new ParsingTable(productionReductions));
             lastParseWasFixedForm = isFixedForm; // In case we processed other files while parsing
             return result;
         }

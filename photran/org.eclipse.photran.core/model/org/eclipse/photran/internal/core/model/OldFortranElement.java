@@ -44,9 +44,45 @@ import org.eclipse.photran.modelicons.ModelIconsPlugin;
  * @see Parent
  * @see FortranElementInfo
  */
-public abstract class FortranElement extends SourceManipulation // Parent
+public abstract class OldFortranElement extends SourceManipulation // Parent
     implements ICElement, IParent, ISourceReference, IAdditionalLanguageElement
 {
+
+    /**
+     * With the exception of unknown and error nodes, every element in the
+     * <code>FortranElement</code> hierarchy corresponds to part of its container's parse tree.
+     * For example, a function corresponds to a "function-subprogram-node." This is the
+     * <code>ParseTreeNode</code> that corresponds to this <code>FortranElement</code>.
+     */
+    protected ParseTreeNode parseTreeNode = null;
+
+    /**
+     * With the exception of unknown and error nodes, every element in the
+     * <code>FortranElement</code> hierarchy corresponds to part of its container's parse tree.
+     * For example, a function corresponds to a "function-subprogram-node."
+     * 
+     * @return the <code>ParseTreeNode</code> corresponding to this <code>FortranElement</code>
+     */
+    public ParseTreeNode getParseTreeNode()
+    {
+        return parseTreeNode;
+    }
+
+    /**
+     * With the exception of unknown and error nodes, every element in the
+     * <code>FortranElement</code> hierarchy corresponds to part of its container's parse tree.
+     * For example, a function corresponds to a "function-subprogram-node." This sets the
+     * <code>ParseTreeNode</code> corresponding to this <code>FortranElement</code>.
+     * 
+     * @param parseTreeNode
+     */
+    public void setParseTreeNode(ParseTreeNode parseTreeNode)
+    {
+        this.parseTreeNode = parseTreeNode;
+    }
+
+    // -------------------------------------------------------------
+
     /**
      * Most elements in the <code>FortranElement</code> hierarchy have a name (functions,
      * subroutines, etc.). For the ones that do, this is the <code>Token</code> for that name. It
@@ -76,6 +112,26 @@ public abstract class FortranElement extends SourceManipulation // Parent
     public void setIdentifier(Token identifier)
     {
         this.identifier = identifier;
+    }
+
+	//-------------------------------------------------------------
+
+	/**
+     * Creates a new <code>FortranElement</code> under the given parent, which has the given name
+     * (passed as a <code>Token</code>) and corresponds to the given part of the parse tree for
+     * the file in which it appears.
+     * 
+     * @param parent
+     * @param identifier
+     * @param parseTreeNode
+     */
+	public OldFortranElement(Parent parent, Token identifier,
+	//int type,
+			ParseTreeNode parseTreeNode)
+    {
+		super(parent, identifier != null ? identifier.getText() : "(anonymous)", -1); // type);
+        this.parseTreeNode = parseTreeNode;
+        this.identifier = identifier;
 
         if (identifier != null)
         {
@@ -83,22 +139,19 @@ public abstract class FortranElement extends SourceManipulation // Parent
             setPos(identifier.getOffset(), identifier.getLength());
             setLines(identifier.getStartLine(), identifier.getEndLine());
         }
-    }
 
-	//-------------------------------------------------------------
-
-	/**
-     * Creates a new <code>FortranElement</code> under the given parent, which has the given name
-     * (passed as a <code>Token</code>) from the source text.
-     * 
-     * @param parent
-     * @param identifier
-     * @param parseTreeNode
-     */
-	public FortranElement(Parent parent, Token identifier)
-    {
-		super(parent, identifier != null ? identifier.getText() : "(anonymous)", -1); // type);
-        this.setIdentifier(identifier);
+        if (parseTreeNode != null)
+        {
+            Token firstToken = ParseTreeSearcher.findFirstTokenIn(parseTreeNode);
+            Token lastToken = ParseTreeSearcher.findLastTokenIn(parseTreeNode);
+            if (firstToken != null && lastToken != null)
+            {
+                int length = (lastToken.getOffset() + lastToken.getLength())
+                    - firstToken.getOffset() - 1;
+                setPos(firstToken.getOffset(), length);
+                setLines(firstToken.getStartLine(), lastToken.getEndLine());
+            }
+        }
     }
 
     /**
@@ -108,9 +161,10 @@ public abstract class FortranElement extends SourceManipulation // Parent
      * @param parent
      * @param name
      */
-	public FortranElement(Parent parent, String name) //, int type)
+	public OldFortranElement(Parent parent, String name) //, int type)
     {
 		super(parent, name == null ? "" : name, -1); //type);
+		this.parseTreeNode = null;
 	}
 
 	/**
@@ -147,15 +201,95 @@ public abstract class FortranElement extends SourceManipulation // Parent
      */
 	protected Object getImageDescriptorForIcon(String filename)
     {
-	    return ModelIconsPlugin.getImageDescriptor("icons/" + filename);
+//		try {
+//			String iconName = filename;
+//			URL fgIconBaseURL = new URL(CCorePlugin.getDefault().getBundle()
+//					.getEntry("/"), "icons/");
+//			URL iconURL = new URL(fgIconBaseURL, iconName);
+//			return ImageDescriptor.createFromURL(iconURL);
+			return ModelIconsPlugin.getImageDescriptor("icons/" + filename);
+//		} catch (MalformedURLException e) {
+//			CCorePlugin.log(e);
+//			return null;
+//		}
 	}
+
+//	//--------------------------------------------------------------------
+//	// Inherited CElement abstract methods, copied from SourceManipulation
+//	//--------------------------------------------------------------------
+//
+//    protected CElementInfo createElementInfo()
+//    {
+//        return new FortranElementInfo(this);
+//    }
+//
+//    /*
+//     * @see JavaElement#generateInfos
+//     */
+//    protected void generateInfos(Object info, Map newElements,
+//                                 IProgressMonitor pm) throws CModelException
+//    {
+//        Openable openableParent = (Openable) getOpenableParent();
+//        if (openableParent == null) { return; }
+//
+//        CElementInfo openableParentInfo = (CElementInfo) CModelManager
+//                        .getDefault().getInfo(openableParent);
+//        if (openableParentInfo == null)
+//        {
+//            openableParent.generateInfos(openableParent.createElementInfo(),
+//                                         newElements, pm);
+//        }
+//        newElements.put(this, info);
+//    }
+//
+//    public IResource getResource()
+//    {
+//        return null;
+//    }
+//
+//    /**
+//     * @see ISourceReference
+//     */
+//    public String getSource() throws CModelException
+//    {
+//        return getFortranElementInfo().getSource();
+//    }
+//
+//    /**
+//     * @see ISourceReference
+//     */
+//    public ISourceRange getSourceRange() throws CModelException
+//    {
+//        return getFortranElementInfo().getSourceRange();
+//    }
+//
+//    /**
+//     * @see IMember
+//     */
+//    public ITranslationUnit getTranslationUnit()
+//    {
+//        try
+//        {
+//            return getFortranElementInfo().getTranslationUnit();
+//        }
+//        catch (CModelException e)
+//        {
+//            return null;
+//        }
+//    }
+//
+//    protected FortranElementInfo getFortranElementInfo()
+//                                                                throws CModelException
+//    {
+//        return (FortranElementInfo) getElementInfo();
+//    }
 
 	// --- Concrete Subclasses -------------------------------------------
 
     /**
      * An element for any random thing that you want in the Outline view
      */
-    public static class UnknownNode extends FortranElement
+    public static class UnknownNode extends OldFortranElement
     {
         public UnknownNode(Parent parent, String name)
         {
@@ -166,7 +300,7 @@ public abstract class FortranElement extends SourceManipulation // Parent
     /**
      * An element representing an error; will display as an error message in the Outline view
      */
-    public static class ErrorNode extends FortranElement
+    public static class ErrorNode extends OldFortranElement
     {
         public ErrorNode(Parent parent, String name)
         {
@@ -179,11 +313,11 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
     }
 
-    public static class MainProgram extends FortranElement
+    public static class MainProgram extends OldFortranElement
     {
-        public MainProgram(Parent parent, Token nameToken)
+        public MainProgram(Parent parent, ParseTreeNode mainProgramNode)
         {
-            super(parent, nameToken);
+            super(parent, ParseTreeSearcher.findFirstIdentifierIn(mainProgramNode), mainProgramNode);
         }
 
         public Object getBaseImageDescriptor()
@@ -192,11 +326,11 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
     }
 
-    public static class Module extends FortranElement
+    public static class Module extends OldFortranElement
     {
-        public Module(Parent parent, Token nameToken)
+        public Module(Parent parent, ParseTreeNode moduleNode)
         {
-            super(parent, nameToken);
+            super(parent, ParseTreeSearcher.findFirstIdentifierIn(moduleNode), moduleNode);
         }
 
         public Object getBaseImageDescriptor()
@@ -205,11 +339,12 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
     }
 
-    public static class DerivedType extends FortranElement
+    public static class DerivedType extends OldFortranElement
     {
-        public DerivedType(Parent parent, Token nameToken)
+        public DerivedType(Parent parent, ParseTreeNode derivedTypeDefNode)
         {
-            super(parent, nameToken);
+            super(parent, ParseTreeSearcher.findFirstIdentifierIn(derivedTypeDefNode),
+                derivedTypeDefNode);
         }
 
         public Object getBaseImageDescriptor()
@@ -218,11 +353,12 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
     }
 
-    public static class Function extends FortranElement
+    public static class Function extends OldFortranElement
     {
-        public Function(Parent parent, Token nameToken)
+        public Function(Parent parent, ParseTreeNode functionSubprogramNode)
         {
-            super(parent, nameToken);
+            super(parent, ParseTreeSearcher.findFirstIdentifierIn(functionSubprogramNode),
+                functionSubprogramNode);
         }
 
         public Object getBaseImageDescriptor()
@@ -231,11 +367,12 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
     }
 
-    public static class Subroutine extends FortranElement
+    public static class Subroutine extends OldFortranElement
     {
-        public Subroutine(Parent parent, Token nameToken)
+        public Subroutine(Parent parent, ParseTreeNode subroutineSubprogramNode)
         {
-            super(parent, nameToken);
+            super(parent, ParseTreeSearcher.findFirstIdentifierIn(subroutineSubprogramNode),
+                subroutineSubprogramNode);
         }
 
         public Object getBaseImageDescriptor()
@@ -244,24 +381,25 @@ public abstract class FortranElement extends SourceManipulation // Parent
         }
     }
 
-    public static class BlockData extends FortranElement
+    public static class BlockData extends OldFortranElement
     {
-        public BlockData(Parent parent, Token nameToken)
+        public BlockData(Parent parent, ParseTreeNode blockDataSubprogramNode)
         {
-            super(parent, nameToken);
+            super(parent, ParseTreeSearcher.findFirstIdentifierIn(blockDataSubprogramNode),
+                blockDataSubprogramNode);
         }
-        
+
         public Object getBaseImageDescriptor()
         {
             return getImageDescriptorForIcon("subroutine.gif");
         }
     }
 
-    public static class Variable extends FortranElement
+    public static class Variable extends OldFortranElement
     {
-        public Variable(Parent parent, Token nameToken)
+        public Variable(Parent parent, ParseTreeNode nameNode)
         {
-            super(parent, nameToken);
+            super(parent, ParseTreeSearcher.findFirstIdentifierIn(nameNode), nameNode);
         }
 
         public Object getBaseImageDescriptor()
