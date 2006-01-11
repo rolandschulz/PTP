@@ -566,20 +566,17 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		super.dispose();
 	}
 	public boolean addAnnotations(IEditorPart editorPart, IStackFrame stackFrame) {
-		return false;
-		//FIXME - some error here
-		/*
 		try {
-			PAnnotationManager.getDefault().addAnnotation(editorPart, stackFrame);
+			PAnnotationManager.getDefault().focusAnnotation(editorPart, stackFrame);
 			return true;
 		} catch (CoreException e) {
 			PTPDebugUIPlugin.log(e);
 			return false;
 		}
-		*/
 	}
 	
 	public void removeAnnotations(IEditorPart editorPart, IThread thread) {
+		System.err.println("-------------PDebugModePresentation - removeAnnotations");
 		//FIXME - some error here
 		/*
 		try{
