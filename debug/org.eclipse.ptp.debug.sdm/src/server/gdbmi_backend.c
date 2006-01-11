@@ -92,6 +92,8 @@ static int	GDBMIListArguments(int);
 static int	GDBMIGetGlobalVariables(void);
 static int	GDBMIQuit(void);
 
+static char* GetModifierType(char *);
+
 dbg_backend_funcs	GDBMIBackend =
 {
 	GDBMIInit,
@@ -1028,6 +1030,14 @@ struct simple_type {
 #define FLOAT		9
 #define DOUBLE		10
 
+#define TOTAL_MODIFIER 3
+
+char* MODIFIERS[] = {
+	"const",
+	"volatile",
+	"const volatile"
+};
+
 struct simple_type simple_types[] = {
 	{ "char", CHAR },
 	{ "unsigned char", CHAR },
@@ -1076,27 +1086,30 @@ SimpleVarToAIF(char *exp, MIVar *var)
 	AIF *				a;
 	AIF *				av;
 	struct simple_type *	s;
+	char * 				type;
+	
+	type = var->type;
 
-	if ( strcmp(var->type, "<text variable, no debug info>") == 0 ) {
+	if ( strcmp(type, "<text variable, no debug info>") == 0 ) {
 		DbgSetError(DBGERR_NOSYMS, "");
 		return NULL;
 	}
 
-	len = strlen(var->type);
+	len = strlen(type);
 	
-	if (var->type[len - 1] == ')') { /* function */
+	if (type[len - 1] == ')') { /* function */
 		return MakeAIF("&/is4", exp);
 	} 
 	
-	if (strcmp(var->type, "void *") == 0) { /* void pointer */
+	if (strcmp(type, "void *") == 0) { /* void pointer */
 		av = VoidToAIF(0, 0);
 		a = PointerToAIF(av);
 		AIFFree(av);
 		return a;
 	} 
 	
-	if (strncmp(var->type, "enum", 4) == 0) { /* enum */
-		if ((p = strchr(var->type, ' ')) != NULL) {
+	if (strncmp(type, "enum", 4) == 0) { /* enum */
+		if ((p = strchr(type, ' ')) != NULL) {
 			*p++ = '\0';
 			a = EmptyEnumToAIF(p);
 		} else
@@ -1106,7 +1119,9 @@ SimpleVarToAIF(char *exp, MIVar *var)
 
 	for (s = simple_types ; s->type_c != NULL ; s++ )
 	{
-		if ( strcmp(var->type, s->type_c) == 0 )
+		type = GetModifierType(type);
+
+		if ( strcmp(type, s->type_c) == 0 )
 		{
 			if ((res = GetVarValue(var->name)) == NULL) {
 				return NULL;
@@ -1168,6 +1183,18 @@ SimpleVarToAIF(char *exp, MIVar *var)
 
 	DbgSetError(DBGERR_DEBUGGER, "could not convert simple type");
 	return NULL;
+}
+
+static char* GetModifierType(char* original_type) {
+	int modifier_len;
+	int index;
+	for (index=0; index<TOTAL_MODIFIER; index++) {
+		modifier_len = strlen(MODIFIERS[index]);
+		if (strncmp(original_type, MODIFIERS[index], modifier_len) == 0) {
+			return original_type + modifier_len + 1;
+		}
+	}
+	return original_type;
 }
 
 static AIF *
