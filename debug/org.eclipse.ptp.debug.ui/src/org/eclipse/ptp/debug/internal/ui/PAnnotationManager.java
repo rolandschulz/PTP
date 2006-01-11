@@ -234,6 +234,39 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	private boolean isRegisterType(String type) {
 		return (type.equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_CURRENT) || type.equals(IPTPDebugUIConstants.REG_ANN_INSTR_POINTER_SECONDARY));
 	}
+	public void focusAnnotation(IEditorPart editorPart, IStackFrame stackFrame) throws CoreException {
+		ITextEditor textEditor = getTextEditor(editorPart);
+		int charStart = stackFrame.getCharStart();
+		if (charStart > 0) {
+			textEditor.selectAndReveal(charStart, 0);
+			return;
+		}
+		int lineNumber = stackFrame.getLineNumber();
+		lineNumber--;
+		IRegion region= getLineInformation(textEditor, lineNumber);
+		if (region != null) {
+			textEditor.selectAndReveal(region.getOffset(), 0);
+		}
+	}
+	private IRegion getLineInformation(ITextEditor editor, int lineNumber) {
+		IDocumentProvider provider= editor.getDocumentProvider();
+		IEditorInput input= editor.getEditorInput();
+		try {
+			provider.connect(input);
+		} catch (CoreException e) {
+			return null;
+		}
+		try {
+			IDocument document= provider.getDocument(input);
+			if (document != null)
+				return document.getLineInformation(lineNumber);
+		} catch (BadLocationException e) {
+		} finally {
+			provider.disconnect(input);
+		}
+		return null;
+	}	
+	
 	// called by debug view
 	public void addAnnotation(IEditorPart editorPart, IStackFrame stackFrame) throws CoreException {
 		ITextEditor textEditor = getTextEditor(editorPart);
@@ -359,7 +392,7 @@ public class PAnnotationManager implements IRegListener, IJobChangeListener {
 	}
 	// called by event
 	public void removeAnnotation(String job_id, BitList tasks) throws CoreException {
-		if (tasks.isEmpty())
+		if (tasks == null || tasks.isEmpty())
 			return;
 		AnnotationGroup annotationGroup = getAnnotationGroup(job_id);
 		if (annotationGroup != null) {

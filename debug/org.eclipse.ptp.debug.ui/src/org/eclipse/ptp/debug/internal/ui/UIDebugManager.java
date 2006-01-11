@@ -540,6 +540,11 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 				// annotationMgr.printBitList(event.getAllProcesses());
 				fireTerminatedEvent(job, event.getAllProcesses());
 			} else if (event instanceof ErrorEvent) {
+				try {
+					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses());
+				} catch (CoreException e) {
+					PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
+				}
 				final ErrorEvent errEvent = (ErrorEvent)event;
 				int errCode = errEvent.getErrorCode();
 				if (errCode == ErrorEvent.DBG_ERROR || errCode == ErrorEvent.DBG_FATAL) {
