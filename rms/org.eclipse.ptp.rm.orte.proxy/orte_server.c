@@ -1729,7 +1729,6 @@ ORTEGetNodeAttribute(char **args)
 		valstr = (char*)malloc(tot_len * sizeof(char));
 		
 		sprintf(valstr, "%s %s %s\0", hostname, pwd->pw_name, grp->gr_name);
-	
 	}
 	else {
 		valstr = (char*)malloc(tot_len * sizeof(char));
