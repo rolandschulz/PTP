@@ -310,4 +310,15 @@
        //-->
    </extension>    
 
+   <extension
+         point="org.eclipse.cdt.ui.textHovers">
+      <hover
+            label="%DebugTextHover.label"
+            description="%DebugTextHover.description"
+            perspective="org.eclipse.ptp.debug.ui.PTPDebugPerspective"
+            class="org.eclipse.ptp.debug.internal.ui.editors.DebugTextHover"
+            id="org.eclipse.ptp.debug.internal.ui.editors.DebugTextHover">
+      </hover>
+   </extension>
+
 </plugin>
