@@ -36,6 +36,7 @@ import org.eclipse.cdt.debug.core.cdi.model.ICDIRuntimeOptions;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISharedLibrary;
 import org.eclipse.cdt.debug.core.cdi.model.ICDISignal;
 import org.eclipse.ptp.core.IPProcess;
+import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIAddressBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
@@ -57,6 +58,7 @@ import org.eclipse.ptp.debug.external.cdi.Session;
 import org.eclipse.ptp.debug.external.cdi.SessionObject;
 import org.eclipse.ptp.debug.external.cdi.VariableManager;
 import org.eclipse.ptp.debug.external.cdi.model.variable.GlobalVariableDescriptor;
+import org.eclipse.ptp.debug.external.cdi.model.variable.Variable;
 import org.eclipse.ptp.debug.external.commands.EvaluteExpressionCommand;
 import org.eclipse.ptp.debug.external.commands.GoCommand;
 import org.eclipse.ptp.debug.external.commands.HaltCommand;
@@ -373,6 +375,14 @@ public class Target extends SessionObject implements IPCDITarget {
 		((Thread)frame.getThread()).setCurrentStackFrame((StackFrame)frame, false);
 		try {
 			Session session = (Session) target.getSession();
+			Variable var = session.getVariableManager().getVariable(target, expressionText);
+			if (var == null) {
+				return null;
+			}
+			IAIF aif = var.getAIF();
+			if (aif != null) {
+				return aif.getValue().toString();
+			}
 			EvaluteExpressionCommand command = new EvaluteExpressionCommand(session.createBitList(target.getTargetID()), expressionText);
 			session.getDebugger().postCommand(command);
 			return command.getExpressionValue();

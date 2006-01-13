@@ -40,4 +40,5 @@ public interface IPStackFrame extends IRunToLine, IRunToAddress, IJumpToLine, IJ
 	public IValue evaluateExpression(String expression) throws DebugException;
 	public String evaluateExpressionToString(String expression) throws DebugException;
 	boolean canEvaluate();
+	public String getTargetID();
 }

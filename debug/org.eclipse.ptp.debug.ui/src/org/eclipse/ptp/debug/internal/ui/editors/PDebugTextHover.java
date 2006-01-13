@@ -43,12 +43,12 @@ import org.eclipse.ui.IWorkbenchPart;
  * @author Clement chu
  * 
  */
-public class DebugTextHover implements ICEditorTextHover, ITextHoverExtension, ISelectionListener, IPartListener {
+public class PDebugTextHover implements ICEditorTextHover, ITextHoverExtension, ISelectionListener, IPartListener {
 	static final private int MAX_HOVER_INFO_SIZE = 100;
 	protected ISelection fSelection = null;
 	protected IEditorPart fEditor;
 
-	public DebugTextHover() {
+	public PDebugTextHover() {
 		super();
 	}
 
@@ -69,9 +69,10 @@ public class DebugTextHover implements ICEditorTextHover, ITextHoverExtension, I
 				String result = evaluateExpression(frame, expression);
 				if (result == null)
 					return null;
+				
 				try {
 					if (result != null)
-						appendVariable(buffer, makeHTMLSafe(expression), makeHTMLSafe(result.trim()));
+						appendVariable(buffer, frame.getTargetID(), makeHTMLSafe(expression), makeHTMLSafe(result.trim()));
 				}
 				catch(DebugException x) {
 					PTPDebugUIPlugin.log(x);
@@ -104,13 +105,13 @@ public class DebugTextHover implements ICEditorTextHover, ITextHoverExtension, I
 		return result;
 	}
 
-	private static void appendVariable(StringBuffer buffer, String expression, String value) throws DebugException {
+	private static void appendVariable(StringBuffer buffer, String taskID, String expression, String value) throws DebugException {
 		if (value.length() > MAX_HOVER_INFO_SIZE)
 			value = value.substring(0, MAX_HOVER_INFO_SIZE) + " ...";
 		buffer.append("<p>");
-		buffer.append("<pre>").append(expression).append("</pre>"); //$NON-NLS-2$
+		buffer.append("<pre>").append("(Task " + taskID + "): ").append(expression).append("</pre>");
 		buffer.append(" = ");
-		buffer.append("<b><pre>").append(value).append("</pre></b>"); //$NON-NLS-2$
+		buffer.append("<b><pre>").append(value).append("</pre></b>");
 		buffer.append("</p>");
 	}
 
