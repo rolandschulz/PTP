@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.swt.widgets.Display;
@@ -160,11 +159,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		return getActiveWorkbenchWindow().getActivePage().getPerspective().getId();
 	}
 	public static boolean isPTPDebugPerspective() {
-		return getCurrentPerspectiveID().equals(IPTPDebugUIConstants.PERSPECTIVE_DEBUG);		
-	}
-	
-	public static PDebugModelPresentation getDebugModelPresentation() {
-		return PDebugModelPresentation.getDefault();
+		return getCurrentPerspectiveID().equals(IPTPDebugUIConstants.ID_PERSPECTIVE_DEBUG);		
 	}
 	
 	/***** LOG *****/
@@ -219,5 +214,12 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 			fDebuggerPageMap.put(id, infos[i]);
 		}
 	}
-
+	
+	public static Display getStandardDisplay() {
+		Display display;
+		display = Display.getCurrent();
+		if ( display == null )
+			display = Display.getDefault();
+		return display;
+	}	
 }

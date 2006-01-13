@@ -249,15 +249,15 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	 * evaluate expression for first process in procs
 	 */
 	public void evaluateExpression(BitList tasks, String expr) throws PCDIException {
-		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "evaluateExpression");
-	}
-	
-	public void getAIFValue(BitList tasks, String expr) throws PCDIException {
 		try {
 			proxy.debugEvaluateExpression(tasks, expr);
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
 		}
+	}
+	
+	public void getAIFValue(BitList tasks, String expr) throws PCDIException {
+		evaluateExpression(tasks, expr);
 	}
 	/**
 	 * get variable type for first process in procs

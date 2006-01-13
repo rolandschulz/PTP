@@ -40,12 +40,12 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 		folder1.addView(IConsoleConstants.ID_CONSOLE_VIEW);
 
 		IFolderLayout folder2= layout.createFolder("topLeftUp", IPageLayout.TOP, (float)0.5, editorArea);
-		folder2.addView(IPTPDebugUIConstants.VIEW_PARALLELDEBUG);
+		folder2.addView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 
 		IFolderLayout folder4= layout.createFolder("topRight", IPageLayout.RIGHT, (float)0.6, "topLeftUp");
 		folder4.addView(IDebugUIConstants.ID_BREAKPOINT_VIEW);
 		folder4.addView(IDebugUIConstants.ID_VARIABLE_VIEW);
-		folder4.addView(IPTPDebugUIConstants.VIEW_ARRAY);
+		folder4.addView(IPTPDebugUIConstants.ID_VIEW_ARRAY);
 		folder4.addView(IDebugUIConstants.ID_EXPRESSION_VIEW);
 
 		IFolderLayout folder3= layout.createFolder("topLeftDown", IPageLayout.BOTTOM, (float)0.6, "topLeftUp");
@@ -60,8 +60,8 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 		// views - short cut
 		layout.addShowViewShortcut(IConsoleConstants.ID_CONSOLE_VIEW);
 		layout.addShowViewShortcut(NewSearchUI.SEARCH_VIEW_ID);
-		layout.addShowViewShortcut(IPTPDebugUIConstants.VIEW_PARALLELDEBUG);
-		layout.addShowViewShortcut(IPTPDebugUIConstants.VIEW_ARRAY);
+		layout.addShowViewShortcut(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
+		layout.addShowViewShortcut(IPTPDebugUIConstants.ID_VIEW_ARRAY);
 		layout.addShowViewShortcut(IDebugUIConstants.ID_BREAKPOINT_VIEW);
 		layout.addShowViewShortcut(IDebugUIConstants.ID_VARIABLE_VIEW);
 		layout.addShowViewShortcut(IDebugUIConstants.ID_DEBUG_VIEW);
@@ -71,8 +71,8 @@ public class PTPDebugPerspectiveFactory implements IPerspectiveFactory {
 		layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
 
 		// link - things we should do
-		layout.addShowInPart(IPTPDebugUIConstants.VIEW_PARALLELDEBUG);
-		layout.addShowInPart(IPTPDebugUIConstants.VIEW_ARRAY);
+		layout.addShowInPart(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
+		layout.addShowInPart(IPTPDebugUIConstants.ID_VIEW_ARRAY);
 		//layout.addShowInPart(IPageLayout.ID_RES_NAV);
 	}
 }

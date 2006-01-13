@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.external.commands;
 
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
 
@@ -39,8 +40,8 @@ public class EvaluteExpressionCommand extends AbstractDebugCommand {
 	
 	public String getExpressionValue() throws PCDIException {
 		if (waitForReturn()) {
-			if (result instanceof String)
-				return (String)result;
+			if (result instanceof IAIF)
+				return ((IAIF)result).getValue().toString();
 		}
 		throw new PCDIException("No evalute expression found in " + tasks.toString());
 	}

@@ -30,6 +30,7 @@ import org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.ui.preferences.AbstractPerferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -107,10 +108,6 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
 		preferences.setValue(IPDebugConstants.PREF_SHOW_FULL_PATHS, fPathsButton.getSelection());
 		preferences.setValue(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, fRegisteredProcessButton.getSelection());
-		IDebugModelPresentation pres = PTPDebugUIPlugin.getDebugModelPresentation();
-		if (pres != null) {
-			pres.setAttribute(PDebugModelPresentation.DISPLAY_FULL_PATHS, fPathsButton.getSelection()?Boolean.TRUE:Boolean.FALSE);
-		}
 	}
     protected void refreshView() {
     	IWorkbenchPage[] pages = getPages();
@@ -120,8 +117,17 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 				IDebugView adapter = (IDebugView)part.getAdapter(IDebugView.class);
 				if (adapter != null) {				
 					Viewer viewer = adapter.getViewer();
+					IDebugModelPresentation pres = adapter.getPresentation(PTPDebugCorePlugin.getUniqueIdentifier());
+					if (pres != null) {
+						pres.setAttribute(PDebugModelPresentation.DISPLAY_FULL_PATHS, fPathsButton.getSelection()?Boolean.TRUE:Boolean.FALSE);
+					}
 					if (viewer instanceof StructuredViewer) {
-						((StructuredViewer)viewer).refresh();
+						final StructuredViewer structViewer = (StructuredViewer)viewer;
+						BusyIndicator.showWhile( structViewer.getControl().getDisplay(), new Runnable() {
+							public void run() {
+								structViewer.refresh();
+							}
+						} );
 					}
 				}
 			}

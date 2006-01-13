@@ -26,10 +26,10 @@ public interface IPTPDebugUIConstants {
 	public static final String PLUGIN_ID = PTPDebugUIPlugin.getUniqueIdentifier();
 	public static final String PREFIX = PLUGIN_ID + ".";
 	
-	public static final String PERSPECTIVE_DEBUG = PREFIX + "PTPDebugPerspective";
-
-	public static final String VIEW_PARALLELDEBUG = PREFIX + "views.parallelDebugView";
-	public static final String VIEW_ARRAY = PREFIX + "views.ArrayView";
+	public static final String ID_PERSPECTIVE_DEBUG = PREFIX + "PTPDebugPerspective";
+	public static final String ID_VIEW_PARALLELDEBUG = PREFIX + "views.parallelDebugView";
+	public static final String ID_VIEW_ARRAY = PREFIX + "views.ArrayView";
+	public static final String ID_BREAKPOINT_ORGANIZER = PREFIX + "pBreakpointSetOrganizer";
 	
 	public static final String ACTION_BREAKPOINT_PROPERTIES = PREFIX + "breakpointProperties";
 	public static final String ACTION_ENABLE_DISABLE_BREAKPOINT = PREFIX + "enableDisableBreakpoint";

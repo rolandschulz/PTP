@@ -43,7 +43,7 @@ public class GotoSet implements IViewActionDelegate {
 	public void run(IAction action) {
 		IPBreakpoint breakpoint = getPBreakpoint();
 		if (breakpoint != null) {
-			UIUtils.showView(IPTPDebugUIConstants.VIEW_PARALLELDEBUG);
+			UIUtils.showView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 			ParallelDebugView view = ParallelDebugView.getDebugViewInstance();
 			if (view != null) {
 				try {				

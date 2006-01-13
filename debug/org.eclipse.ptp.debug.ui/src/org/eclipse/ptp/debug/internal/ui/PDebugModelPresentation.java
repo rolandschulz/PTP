@@ -87,15 +87,20 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	private OverlayImageCache imageCache = new OverlayImageCache();
 
 	public PDebugModelPresentation() {
-		uiDebugManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
 		// make sure using the one created by start up
 		if (instance == null)
 			instance = this;
-	}
+	} 
 	public static PDebugModelPresentation getDefault() {
 		if (instance == null)
 			instance = new PDebugModelPresentation();
 		return instance;
+	}
+	private UIDebugManager getUIDebugManager() {
+		if (uiDebugManager == null) {
+			uiDebugManager = PTPDebugUIPlugin.getDefault().getUIDebugManager();
+		}
+		return uiDebugManager;
 	}
 	public String getEditorId(IEditorInput input, Object element) {
 		if (input != null) {
@@ -191,16 +196,16 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	}
 	protected Image getLineBreakpointImage(IPLineBreakpoint breakpoint) throws CoreException {
 		String job_id = breakpoint.getJobId();
-		String cur_job_id = uiDebugManager.getCurrentJobId();
+		String cur_job_id = getUIDebugManager().getCurrentJobId();
 		// Display nothing if the breakpoint is not in current job
 		if (!job_id.equals(IPBreakpoint.GLOBAL) && !job_id.equals(cur_job_id))
 			return new Image(null, 1, 1);
 		String descriptor = null;
-		IElementHandler setManager = uiDebugManager.getElementHandler(job_id);
+		IElementHandler setManager = getUIDebugManager().getElementHandler(job_id);
 		if (setManager == null) // no job running
 			descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_BPTCURSET_EN : PDebugImage.IMG_DEBUG_BPTCURSET_DI;
 		else { // created job
-			String cur_set_id = uiDebugManager.getCurrentSetId();
+			String cur_set_id = getUIDebugManager().getCurrentSetId();
 			String bpt_set_id = breakpoint.getSetId();
 			if (bpt_set_id.equals(cur_set_id)) {
 				descriptor = breakpoint.isEnabled() ? PDebugImage.IMG_DEBUG_BPTCURSET_EN : PDebugImage.IMG_DEBUG_BPTCURSET_DI;
@@ -576,8 +581,7 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 	}
 	
 	public void removeAnnotations(IEditorPart editorPart, IThread thread) {
-		System.err.println("-------------PDebugModePresentation - removeAnnotations");
-		//FIXME - some error here
+		//System.err.println("-------------PDebugModePresentation - removeAnnotations");
 		/*
 		try{
 			PAnnotationManager.getDefault().removeAnnotation(editorPart, thread);
