@@ -21,7 +21,6 @@ Require-Bundle: org.eclipse.jface.text,
  org.eclipse.ptp.core,
  org.eclipse.ptp.ui,
  org.eclipse.cdt.ui,
- org.eclipse.cdt.debug.ui,
  org.eclipse.cdt.debug.core
 Eclipse-AutoStart: true
 Bundle-Vendor: Eclipse.org
