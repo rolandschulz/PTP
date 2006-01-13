@@ -316,8 +316,8 @@
             label="%DebugTextHover.label"
             description="%DebugTextHover.description"
             perspective="org.eclipse.ptp.debug.ui.PTPDebugPerspective"
-            class="org.eclipse.ptp.debug.internal.ui.editors.DebugTextHover"
-            id="org.eclipse.ptp.debug.internal.ui.editors.DebugTextHover">
+            class="org.eclipse.ptp.debug.internal.ui.editors.PDebugTextHover"
+            id="org.eclipse.ptp.debug.internal.ui.editors.PDebugTextHover">
       </hover>
    </extension>
 

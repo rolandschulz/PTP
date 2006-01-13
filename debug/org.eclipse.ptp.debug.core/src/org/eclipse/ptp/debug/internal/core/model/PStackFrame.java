@@ -82,6 +82,9 @@ public class PStackFrame extends PDebugElement implements IPStackFrame, IRestart
 	public IThread getThread() {
 		return fThread;
 	}
+	public String getTargetID() {
+		return String.valueOf(getCDITarget().getTargetID());
+	}
 	public IVariable[] getVariables() throws DebugException {
 		IPGlobalVariable[] globals = getGlobals();
 		List vars = getVariables0();
