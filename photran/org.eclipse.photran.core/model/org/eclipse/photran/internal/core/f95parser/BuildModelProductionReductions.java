@@ -4,6 +4,7 @@ package org.eclipse.photran.internal.core.f95parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.photran.internal.core.model.FortranElement;
 
@@ -32,7 +33,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         FortranElement v1 = (FortranElement)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        List/*<FortranElement>*/ userValue = userActions.production1UserAction(v1);
+        Map/*<FortranElement, FortranElementInfo>*/ userValue = userActions.production1UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexecutableprogramNonterminal.getInstance(), 1, userValue);
@@ -47,10 +48,10 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
 
         // Reduce by <xExecutableProgram> ::= <xExecutableProgram> <xProgramUnit>  ;
         FortranElement v2 = (FortranElement)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
-        List/*<FortranElement>*/ v1 = (List/*<FortranElement>*/)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
+        Map/*<FortranElement, FortranElementInfo>*/ v1 = (Map/*<FortranElement, FortranElementInfo>*/)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        List/*<FortranElement>*/ userValue = userActions.production2UserAction(v1, v2);
+        Map/*<FortranElement, FortranElementInfo>*/ userValue = userActions.production2UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XexecutableprogramNonterminal.getInstance(), 2, userValue);

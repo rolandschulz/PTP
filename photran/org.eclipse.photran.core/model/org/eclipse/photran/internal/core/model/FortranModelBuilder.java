@@ -224,6 +224,8 @@ public final class FortranModelBuilder implements IModelBuilder
      */
     FortranElement addF90Element(FortranElement element) throws CModelException
     {
+        if (element.getParent() == null) element.setParent(translationUnit);
+            
         ICElement parent = element.getParent();
         if (parent instanceof Parent) ((Parent)parent).addChild(element);
 
@@ -234,7 +236,8 @@ public final class FortranModelBuilder implements IModelBuilder
 
     private void addF90Elements(Map elts) throws CModelException
     {
-        addF90ElementsFor(translationUnit, elts);
+        // Add all top-level elements (those with no parent) and recurse
+        addF90ElementsFor(null, elts);
     }
 
     private void addF90ElementsFor(Parent parent, Map elts) throws CModelException

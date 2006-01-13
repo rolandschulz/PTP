@@ -31,9 +31,9 @@ public class BuildModelParserAction implements AbstractParserUserActions
 
     private class M
     {
-        private Map/*<FortranElement, FortranElementInfo> */ allElements = new HashMap();
+        private Map/*<FortranElement, FOrtranElementInfo> */ allElements = new HashMap();
         
-        public Map/*<FortranElement, FortranElementInfo> */ getAllElements()
+        public Map/*<FortranElement, FOrtranElementInfo> */ getAllElements()
         {
             return allElements;
         }
@@ -128,18 +128,18 @@ public class BuildModelParserAction implements AbstractParserUserActions
      * This method is called when the parser is about to reduce by
      * <xExecutableProgram> ::= <xProgramUnit>  ;
      */
-    public List/*<FortranElement>*/ production1UserAction(FortranElement v1)
+    public Map/*<FortranElement, FortranElementInfo>*/ production1UserAction(FortranElement v1)
     {
-        return m.list(v1);
+        return m.getAllElements();
     }
 
     /**
      * This method is called when the parser is about to reduce by
      * <xExecutableProgram> ::= <xExecutableProgram> <xProgramUnit>  ;
      */
-    public List/*<FortranElement>*/ production2UserAction(List/*<FortranElement>*/ v1, FortranElement v2)
+    public Map/*<FortranElement, FortranElementInfo>*/ production2UserAction(Map/*<FortranElement, FortranElementInfo>*/ v1, FortranElement v2)
     {
-        return m.list(v1, v2);
+        return m.getAllElements();
     }
 
     /**
