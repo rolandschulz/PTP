@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.cdt.core.model.CModelException;
-import org.eclipse.cdt.internal.core.model.Parent;
-import org.eclipse.cdt.internal.core.model.TranslationUnit;
 import org.eclipse.photran.internal.core.model.FortranElement;
 
 /**
@@ -19,11 +17,23 @@ import org.eclipse.photran.internal.core.model.FortranElement;
  */
 public class BuildModelParserAction implements AbstractParserUserActions
 {
+    private BuildModelParserAction() {;} // Singleton
+    private static final BuildModelParserAction singletonInstance = new BuildModelParserAction();
+    public static final BuildModelParserAction getInstance() { return singletonInstance; }
+
+    /**
+     * Returns the production reductions associated with these user actions
+     */
+    public AbstractProductionReductions getProductionReductions()
+    {
+        return BuildModelProductionReductions.getInstance();
+    }
+
     private class M
     {
-        private Map/*<FortranElement, FOrtranElementInfo> */ allElements = new HashMap();
+        private Map/*<FortranElement, FortranElementInfo> */ allElements = new HashMap();
         
-        public Map/*<FortranElement, FOrtranElementInfo> */ getAllElements()
+        public Map/*<FortranElement, FortranElementInfo> */ getAllElements()
         {
             return allElements;
         }
@@ -99,19 +109,6 @@ public class BuildModelParserAction implements AbstractParserUserActions
     }
 
     protected M m = new M();
-    
-    protected TranslationUnit translationUnit;
-    
-    /**
-     * A reference to the parser
-     */
-    protected Parser parser = null;
-
-    public BuildModelParserAction(Parser p, TranslationUnit tu)
-    {
-        parser = p;
-        translationUnit = tu;
-    }
 
     /**
      * This method is called before parsing begins
@@ -131,24 +128,18 @@ public class BuildModelParserAction implements AbstractParserUserActions
      * This method is called when the parser is about to reduce by
      * <xExecutableProgram> ::= <xProgramUnit>  ;
      */
-    public Map/*<FortranElement, FortranElementInfo>*/ production1UserAction(FortranElement v1)
+    public List/*<FortranElement>*/ production1UserAction(FortranElement v1)
     {
-        v1.setParent(translationUnit);
-        //try { translationUnit.addChild(v1); } catch (CModelException x) {;}
-        return m.getAllElements();
+        return m.list(v1);
     }
 
     /**
      * This method is called when the parser is about to reduce by
      * <xExecutableProgram> ::= <xExecutableProgram> <xProgramUnit>  ;
      */
-    public Map/*<FortranElement, FortranElementInfo>*/ production2UserAction(Map/*<FortranElement, FortranElementInfo>*/ v1, FortranElement v2)
+    public List/*<FortranElement>*/ production2UserAction(List/*<FortranElement>*/ v1, FortranElement v2)
     {
-        //return m.list(v1, v2);
-
-        v2.setParent(translationUnit);
-        //try { translationUnit.addChild(v1); } catch (CModelException x) {;}
-        return m.getAllElements();
+        return m.list(v1, v2);
     }
 
     /**

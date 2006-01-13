@@ -66,7 +66,7 @@ public class FortranProcessor
     public ParseTreeNode parse(InputStream inputStream, String filename, boolean isFixedForm) throws Exception
     {
         Parser parser = new Parser();
-        return (ParseTreeNode)parse(inputStream, filename, isFixedForm, parser, new BuildParseTreeProductionReductions(new BuildParseTreeParserAction(parser)));
+        return (ParseTreeNode)parse(inputStream, filename, isFixedForm, parser, BuildParseTreeParserAction.getInstance());
     }
 
     /**
@@ -84,21 +84,19 @@ public class FortranProcessor
         boolean isFixedFormB = isFixedForm == null ? hasFixedFormFileExtension(filename) : isFixedForm.booleanValue();
         long startTime = System.currentTimeMillis();
         Parser parser = new Parser();
-        BuildModelParserAction pa = new BuildModelParserAction(parser, tu);
-        BuildModelProductionReductions pr = new BuildModelProductionReductions(pa);
-        Map/*<FortranElement, FortranElementInfo>*/ newElements = (Map)parse(inputStream, filename, isFixedFormB, parser, pr);
+        Map/*<FortranElement, FortranElementInfo>*/ newElements = (Map)parse(inputStream, filename, isFixedFormB, parser, BuildModelParserAction.getInstance());
         long endTime = System.currentTimeMillis();
         System.out.println("Parse time for " + filename + ": " + (endTime - startTime) + " ms");
         return newElements;
     }
 
-    private Object parse(InputStream inputStream, String filename, boolean isFixedForm, Parser parser, AbstractProductionReductions productionReductions) throws Exception
+    private Object parse(InputStream inputStream, String filename, boolean isFixedForm, Parser parser, AbstractParserUserActions parseAction) throws Exception
     {
         ILexer lexer = Lexer.createLexer(inputStream, filename, isFixedForm);
 
         try
         {
-            Object result = parser.parse(lexer, new ParsingTable(productionReductions));
+            Object result = parser.parse(lexer, new ParsingTable(parseAction));
             lastParseWasFixedForm = isFixedForm; // In case we processed other files while parsing
             return result;
         }

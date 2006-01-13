@@ -4,7 +4,6 @@ package org.eclipse.photran.internal.core.f95parser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.photran.internal.core.model.FortranElement;
 
@@ -13,17 +12,14 @@ import org.eclipse.photran.internal.core.model.FortranElement;
  */
 public class BuildModelProductionReductions implements AbstractProductionReductions
 {
-    private BuildModelParserAction parserActions;
-    
-    public BuildModelProductionReductions(BuildModelParserAction parserActions)
-    {
-        this.parserActions = parserActions;
-    }
+    private BuildModelProductionReductions() {;} // Singleton
+    private static final BuildModelProductionReductions singletonInstance = new BuildModelProductionReductions();
+    public static final BuildModelProductionReductions getInstance() { return singletonInstance; }
 
-    public AbstractParserUserActions getUserActions()
-    {
-        return parserActions;
-    }
+    /**
+     * Contains the user code that should be run upon a each reduction
+     */
+    private final BuildModelParserAction userActions = BuildModelParserAction.getInstance();
 
     /**
      * Reduce by <xExecutableProgram> ::= <xProgramUnit>  ;
@@ -36,7 +32,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         FortranElement v1 = (FortranElement)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Map/*<FortranElement, FortranElementInfo>*/ userValue = parserActions.production1UserAction(v1);
+        List/*<FortranElement>*/ userValue = userActions.production1UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexecutableprogramNonterminal.getInstance(), 1, userValue);
@@ -51,10 +47,10 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
 
         // Reduce by <xExecutableProgram> ::= <xExecutableProgram> <xProgramUnit>  ;
         FortranElement v2 = (FortranElement)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
-        Map/*<FortranElement, FortranElementInfo>*/ v1 = (Map/*<FortranElement, FortranElementInfo>*/)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
+        List/*<FortranElement>*/ v1 = (List/*<FortranElement>*/)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Map/*<FortranElement, FortranElementInfo>*/ userValue = parserActions.production2UserAction(v1, v2);
+        List/*<FortranElement>*/ userValue = userActions.production2UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XexecutableprogramNonterminal.getInstance(), 2, userValue);
@@ -71,7 +67,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         FortranElement v1 = (FortranElement)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production3UserAction(v1);
+        FortranElement userValue = userActions.production3UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprogramunitNonterminal.getInstance(), 1, userValue);
@@ -88,7 +84,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         FortranElement v1 = (FortranElement)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production4UserAction(v1);
+        FortranElement userValue = userActions.production4UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprogramunitNonterminal.getInstance(), 1, userValue);
@@ -102,10 +98,10 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         ArrayList valueStack = parser.getValueStack();
 
         // Reduce by <xProgramUnit> ::= <xSubroutineSubprogram>  ;
-        Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
+        FortranElement v1 = (FortranElement)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production5UserAction((FortranElement)v1);
+        FortranElement userValue = userActions.production5UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprogramunitNonterminal.getInstance(), 1, userValue);
@@ -122,7 +118,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         FortranElement v1 = (FortranElement)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production6UserAction(v1);
+        FortranElement userValue = userActions.production6UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprogramunitNonterminal.getInstance(), 1, userValue);
@@ -139,7 +135,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         FortranElement v1 = (FortranElement)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production7UserAction(v1);
+        FortranElement userValue = userActions.production7UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprogramunitNonterminal.getInstance(), 1, userValue);
@@ -156,7 +152,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         List/*<FortranElement>*/ v1 = (List/*<FortranElement>*/)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production8UserAction(v1);
+        FortranElement userValue = userActions.production8UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XmainprogramNonterminal.getInstance(), 1, userValue);
@@ -174,7 +170,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production9UserAction(v1, v2);
+        FortranElement userValue = userActions.production9UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XmainprogramNonterminal.getInstance(), 2, userValue);
@@ -192,7 +188,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        List/*<FortranElement>*/ userValue = parserActions.production10UserAction(v1, v2);
+        List/*<FortranElement>*/ userValue = userActions.production10UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XmainrangeNonterminal.getInstance(), 2, userValue);
@@ -210,7 +206,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         List/*<FortranElement>*/ v1 = (List/*<FortranElement>*/)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        List/*<FortranElement>*/ userValue = parserActions.production11UserAction(v1, v2);
+        List/*<FortranElement>*/ userValue = userActions.production11UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XmainrangeNonterminal.getInstance(), 2, userValue);
@@ -227,7 +223,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        List/*<FortranElement>*/ userValue = parserActions.production12UserAction(v1);
+        List/*<FortranElement>*/ userValue = userActions.production12UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XmainrangeNonterminal.getInstance(), 1, userValue);
@@ -244,7 +240,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production13UserAction(v1);
+        Object userValue = userActions.production13UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XbodyNonterminal.getInstance(), 1, userValue);
@@ -262,7 +258,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production14UserAction(v1, v2);
+        Object userValue = userActions.production14UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XbodyNonterminal.getInstance(), 2, userValue);
@@ -279,7 +275,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production15UserAction(v1);
+        Object userValue = userActions.production15UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XbodyconstructNonterminal.getInstance(), 1, userValue);
@@ -296,7 +292,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production16UserAction(v1);
+        Object userValue = userActions.production16UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XbodyconstructNonterminal.getInstance(), 1, userValue);
@@ -314,7 +310,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production17UserAction(v1, v2);
+        FortranElement userValue = userActions.production17UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionsubprogramNonterminal.getInstance(), 2, userValue);
@@ -332,7 +328,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production18UserAction(v1, v2);
+        Object userValue = userActions.production18UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionrangeNonterminal.getInstance(), 2, userValue);
@@ -349,7 +345,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production19UserAction(v1);
+        Object userValue = userActions.production19UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XfunctionrangeNonterminal.getInstance(), 1, userValue);
@@ -367,7 +363,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         List/*<FortranElement>*/ v1 = (List/*<FortranElement>*/)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production20UserAction(v1, v2);
+        Object userValue = userActions.production20UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionrangeNonterminal.getInstance(), 2, userValue);
@@ -385,7 +381,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production21UserAction(v1, v2);
+        FortranElement userValue = userActions.production21UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutinesubprogramNonterminal.getInstance(), 2, userValue);
@@ -403,7 +399,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production22UserAction(v1, v2);
+        Object userValue = userActions.production22UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutinerangeNonterminal.getInstance(), 2, userValue);
@@ -420,7 +416,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production23UserAction(v1);
+        Object userValue = userActions.production23UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsubroutinerangeNonterminal.getInstance(), 1, userValue);
@@ -438,7 +434,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         List/*<FortranElement>*/ v1 = (List/*<FortranElement>*/)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production24UserAction(v1, v2);
+        Object userValue = userActions.production24UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutinerangeNonterminal.getInstance(), 2, userValue);
@@ -456,7 +452,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production25UserAction(v1, v2);
+        FortranElement userValue = userActions.production25UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XmoduleNonterminal.getInstance(), 2, userValue);
@@ -474,7 +470,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         List/*<FortranElement>*/ v1 = (List/*<FortranElement>*/)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        List/*<FortranElement>*/ userValue = parserActions.production26UserAction(v1, v2);
+        List/*<FortranElement>*/ userValue = userActions.production26UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XmoduleblockNonterminal.getInstance(), 2, userValue);
@@ -491,7 +487,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        List/*<FortranElement>*/ userValue = parserActions.production27UserAction(v1);
+        List/*<FortranElement>*/ userValue = userActions.production27UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XmoduleblockNonterminal.getInstance(), 1, userValue);
@@ -508,7 +504,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        List/*<FortranElement>*/ userValue = parserActions.production28UserAction(v1);
+        List/*<FortranElement>*/ userValue = userActions.production28UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XmodulebodyNonterminal.getInstance(), 1, userValue);
@@ -526,7 +522,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         List/*<FortranElement>*/ v1 = (List/*<FortranElement>*/)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        List/*<FortranElement>*/ userValue = parserActions.production29UserAction(v1, v2);
+        List/*<FortranElement>*/ userValue = userActions.production29UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XmodulebodyNonterminal.getInstance(), 2, userValue);
@@ -543,7 +539,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         FortranElement v1 = (FortranElement)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        List/*<FortranElement>*/ userValue = parserActions.production30UserAction(v1);
+        List/*<FortranElement>*/ userValue = userActions.production30UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XmodulebodyNonterminal.getInstance(), 1, userValue);
@@ -561,7 +557,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         List/*<FortranElement>*/ v1 = (List/*<FortranElement>*/)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        List/*<FortranElement>*/ userValue = parserActions.production31UserAction(v1, v2);
+        List/*<FortranElement>*/ userValue = userActions.production31UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XmodulebodyNonterminal.getInstance(), 2, userValue);
@@ -580,7 +576,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production32UserAction(v1, v2, v3);
+        FortranElement userValue = userActions.production32UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XblockdatasubprogramNonterminal.getInstance(), 3, userValue);
@@ -598,7 +594,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production33UserAction(v1, v2);
+        FortranElement userValue = userActions.production33UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XblockdatasubprogramNonterminal.getInstance(), 2, userValue);
@@ -615,7 +611,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production34UserAction(v1);
+        Object userValue = userActions.production34UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XblockdatabodyNonterminal.getInstance(), 1, userValue);
@@ -633,7 +629,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production35UserAction(v1, v2);
+        Object userValue = userActions.production35UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XblockdatabodyNonterminal.getInstance(), 2, userValue);
@@ -650,7 +646,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production36UserAction(v1);
+        Object userValue = userActions.production36UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XblockdatabodyconstructNonterminal.getInstance(), 1, userValue);
@@ -667,7 +663,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production37UserAction(v1);
+        Object userValue = userActions.production37UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationpartconstructNonterminal.getInstance(), 1, userValue);
@@ -684,7 +680,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production38UserAction(v1);
+        Object userValue = userActions.production38UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationpartconstructNonterminal.getInstance(), 1, userValue);
@@ -701,7 +697,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production39UserAction(v1);
+        Object userValue = userActions.production39UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationpartconstructNonterminal.getInstance(), 1, userValue);
@@ -718,7 +714,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production40UserAction(v1);
+        Object userValue = userActions.production40UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationpartconstructNonterminal.getInstance(), 1, userValue);
@@ -735,7 +731,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production41UserAction(v1);
+        Object userValue = userActions.production41UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationpartconstructNonterminal.getInstance(), 1, userValue);
@@ -752,7 +748,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production42UserAction(v1);
+        Object userValue = userActions.production42UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationpartconstructNonterminal.getInstance(), 1, userValue);
@@ -769,7 +765,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production43UserAction(v1);
+        Object userValue = userActions.production43UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdeclarationconstructNonterminal.getInstance(), 1, userValue);
@@ -786,7 +782,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production44UserAction(v1);
+        Object userValue = userActions.production44UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdeclarationconstructNonterminal.getInstance(), 1, userValue);
@@ -803,7 +799,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production45UserAction(v1);
+        Object userValue = userActions.production45UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdeclarationconstructNonterminal.getInstance(), 1, userValue);
@@ -820,7 +816,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production46UserAction(v1);
+        Object userValue = userActions.production46UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdeclarationconstructNonterminal.getInstance(), 1, userValue);
@@ -837,7 +833,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production47UserAction(v1);
+        Object userValue = userActions.production47UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexecutionpartconstructNonterminal.getInstance(), 1, userValue);
@@ -854,7 +850,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production48UserAction(v1);
+        Object userValue = userActions.production48UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexecutionpartconstructNonterminal.getInstance(), 1, userValue);
@@ -871,7 +867,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production49UserAction(v1);
+        Object userValue = userActions.production49UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexecutionpartconstructNonterminal.getInstance(), 1, userValue);
@@ -888,7 +884,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production50UserAction(v1);
+        Object userValue = userActions.production50UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexecutionpartconstructNonterminal.getInstance(), 1, userValue);
@@ -905,7 +901,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production51UserAction(v1);
+        Object userValue = userActions.production51UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XobsoleteexecutionpartconstructNonterminal.getInstance(), 1, userValue);
@@ -924,7 +920,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        List/*<FortranElement>*/ userValue = parserActions.production52UserAction(v1, v2, v3);
+        List/*<FortranElement>*/ userValue = userActions.production52UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XbodyplusinternalsNonterminal.getInstance(), 3, userValue);
@@ -942,7 +938,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        List/*<FortranElement>*/ userValue = parserActions.production53UserAction(v1, v2);
+        List/*<FortranElement>*/ userValue = userActions.production53UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XbodyplusinternalsNonterminal.getInstance(), 2, userValue);
@@ -960,7 +956,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         List/*<FortranElement>*/ v1 = (List/*<FortranElement>*/)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        List/*<FortranElement>*/ userValue = parserActions.production54UserAction(v1, v2);
+        List/*<FortranElement>*/ userValue = userActions.production54UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XbodyplusinternalsNonterminal.getInstance(), 2, userValue);
@@ -977,7 +973,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         FortranElement v1 = (FortranElement)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production55UserAction(v1);
+        FortranElement userValue = userActions.production55UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XinternalsubprogramNonterminal.getInstance(), 1, userValue);
@@ -994,7 +990,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         FortranElement v1 = (FortranElement)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production56UserAction(v1);
+        FortranElement userValue = userActions.production56UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XinternalsubprogramNonterminal.getInstance(), 1, userValue);
@@ -1011,7 +1007,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production57UserAction(v1);
+        FortranElement userValue = userActions.production57UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XmodulesubprogrampartconstructNonterminal.getInstance(), 1, userValue);
@@ -1028,7 +1024,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         FortranElement v1 = (FortranElement)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production58UserAction(v1);
+        FortranElement userValue = userActions.production58UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XmodulesubprogrampartconstructNonterminal.getInstance(), 1, userValue);
@@ -1045,7 +1041,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         FortranElement v1 = (FortranElement)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production59UserAction(v1);
+        FortranElement userValue = userActions.production59UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XmodulesubprogramNonterminal.getInstance(), 1, userValue);
@@ -1062,7 +1058,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         FortranElement v1 = (FortranElement)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        FortranElement userValue = parserActions.production60UserAction(v1);
+        FortranElement userValue = userActions.production60UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XmodulesubprogramNonterminal.getInstance(), 1, userValue);
@@ -1079,7 +1075,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production61UserAction(v1);
+        Object userValue = userActions.production61UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationstmtNonterminal.getInstance(), 1, userValue);
@@ -1096,7 +1092,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production62UserAction(v1);
+        Object userValue = userActions.production62UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationstmtNonterminal.getInstance(), 1, userValue);
@@ -1113,7 +1109,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production63UserAction(v1);
+        Object userValue = userActions.production63UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationstmtNonterminal.getInstance(), 1, userValue);
@@ -1130,7 +1126,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production64UserAction(v1);
+        Object userValue = userActions.production64UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationstmtNonterminal.getInstance(), 1, userValue);
@@ -1147,7 +1143,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production65UserAction(v1);
+        Object userValue = userActions.production65UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationstmtNonterminal.getInstance(), 1, userValue);
@@ -1164,7 +1160,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production66UserAction(v1);
+        Object userValue = userActions.production66UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationstmtNonterminal.getInstance(), 1, userValue);
@@ -1181,7 +1177,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production67UserAction(v1);
+        Object userValue = userActions.production67UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationstmtNonterminal.getInstance(), 1, userValue);
@@ -1198,7 +1194,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production68UserAction(v1);
+        Object userValue = userActions.production68UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationstmtNonterminal.getInstance(), 1, userValue);
@@ -1215,7 +1211,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production69UserAction(v1);
+        Object userValue = userActions.production69UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationstmtNonterminal.getInstance(), 1, userValue);
@@ -1232,7 +1228,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production70UserAction(v1);
+        Object userValue = userActions.production70UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationstmtNonterminal.getInstance(), 1, userValue);
@@ -1249,7 +1245,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production71UserAction(v1);
+        Object userValue = userActions.production71UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationstmtNonterminal.getInstance(), 1, userValue);
@@ -1266,7 +1262,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production72UserAction(v1);
+        Object userValue = userActions.production72UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationstmtNonterminal.getInstance(), 1, userValue);
@@ -1283,7 +1279,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production73UserAction(v1);
+        Object userValue = userActions.production73UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationstmtNonterminal.getInstance(), 1, userValue);
@@ -1300,7 +1296,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production74UserAction(v1);
+        Object userValue = userActions.production74UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XspecificationstmtNonterminal.getInstance(), 1, userValue);
@@ -1317,7 +1313,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production75UserAction(v1);
+        Object userValue = userActions.production75UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexecutableconstructNonterminal.getInstance(), 1, userValue);
@@ -1334,7 +1330,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production76UserAction(v1);
+        Object userValue = userActions.production76UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexecutableconstructNonterminal.getInstance(), 1, userValue);
@@ -1351,7 +1347,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production77UserAction(v1);
+        Object userValue = userActions.production77UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexecutableconstructNonterminal.getInstance(), 1, userValue);
@@ -1368,7 +1364,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production78UserAction(v1);
+        Object userValue = userActions.production78UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexecutableconstructNonterminal.getInstance(), 1, userValue);
@@ -1385,7 +1381,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production79UserAction(v1);
+        Object userValue = userActions.production79UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexecutableconstructNonterminal.getInstance(), 1, userValue);
@@ -1402,7 +1398,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production80UserAction(v1);
+        Object userValue = userActions.production80UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexecutableconstructNonterminal.getInstance(), 1, userValue);
@@ -1419,7 +1415,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production81UserAction(v1);
+        Object userValue = userActions.production81UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexecutableconstructNonterminal.getInstance(), 1, userValue);
@@ -1436,7 +1432,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production82UserAction(v1);
+        Object userValue = userActions.production82UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1453,7 +1449,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production83UserAction(v1);
+        Object userValue = userActions.production83UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1470,7 +1466,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production84UserAction(v1);
+        Object userValue = userActions.production84UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1487,7 +1483,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production85UserAction(v1);
+        Object userValue = userActions.production85UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1504,7 +1500,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production86UserAction(v1);
+        Object userValue = userActions.production86UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1521,7 +1517,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production87UserAction(v1);
+        Object userValue = userActions.production87UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1538,7 +1534,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production88UserAction(v1);
+        Object userValue = userActions.production88UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1555,7 +1551,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production89UserAction(v1);
+        Object userValue = userActions.production89UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1572,7 +1568,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production90UserAction(v1);
+        Object userValue = userActions.production90UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1589,7 +1585,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production91UserAction(v1);
+        Object userValue = userActions.production91UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1606,7 +1602,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production92UserAction(v1);
+        Object userValue = userActions.production92UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1623,7 +1619,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production93UserAction(v1);
+        Object userValue = userActions.production93UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1640,7 +1636,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production94UserAction(v1);
+        Object userValue = userActions.production94UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1657,7 +1653,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production95UserAction(v1);
+        Object userValue = userActions.production95UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1674,7 +1670,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production96UserAction(v1);
+        Object userValue = userActions.production96UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1691,7 +1687,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production97UserAction(v1);
+        Object userValue = userActions.production97UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1708,7 +1704,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production98UserAction(v1);
+        Object userValue = userActions.production98UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1725,7 +1721,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production99UserAction(v1);
+        Object userValue = userActions.production99UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1742,7 +1738,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production100UserAction(v1);
+        Object userValue = userActions.production100UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1759,7 +1755,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production101UserAction(v1);
+        Object userValue = userActions.production101UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1776,7 +1772,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production102UserAction(v1);
+        Object userValue = userActions.production102UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1793,7 +1789,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production103UserAction(v1);
+        Object userValue = userActions.production103UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1810,7 +1806,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production104UserAction(v1);
+        Object userValue = userActions.production104UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1827,7 +1823,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production105UserAction(v1);
+        Object userValue = userActions.production105UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1844,7 +1840,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production106UserAction(v1);
+        Object userValue = userActions.production106UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1861,7 +1857,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production107UserAction(v1);
+        Object userValue = userActions.production107UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XobsoleteactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1878,7 +1874,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production108UserAction(v1);
+        Object userValue = userActions.production108UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XobsoleteactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1895,7 +1891,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production109UserAction(v1);
+        Object userValue = userActions.production109UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XobsoleteactionstmtNonterminal.getInstance(), 1, userValue);
@@ -1912,7 +1908,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production110UserAction(v1);
+        Object userValue = userActions.production110UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XnameNonterminal.getInstance(), 1, userValue);
@@ -1929,7 +1925,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production111UserAction(v1);
+        Object userValue = userActions.production111UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XconstantNonterminal.getInstance(), 1, userValue);
@@ -1946,7 +1942,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production112UserAction(v1);
+        Object userValue = userActions.production112UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XconstantNonterminal.getInstance(), 1, userValue);
@@ -1964,7 +1960,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production113UserAction(v1, v2);
+        Object userValue = userActions.production113UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XconstantNonterminal.getInstance(), 2, userValue);
@@ -1982,7 +1978,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production114UserAction(v1, v2);
+        Object userValue = userActions.production114UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XconstantNonterminal.getInstance(), 2, userValue);
@@ -1999,7 +1995,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production115UserAction(v1);
+        Object userValue = userActions.production115UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XconstantNonterminal.getInstance(), 1, userValue);
@@ -2018,7 +2014,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production116UserAction(v1, v2, v3);
+        Object userValue = userActions.production116UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XconstantNonterminal.getInstance(), 3, userValue);
@@ -2037,7 +2033,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production117UserAction(v1, v2, v3);
+        Object userValue = userActions.production117UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XconstantNonterminal.getInstance(), 3, userValue);
@@ -2054,7 +2050,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production118UserAction(v1);
+        Object userValue = userActions.production118UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XconstantNonterminal.getInstance(), 1, userValue);
@@ -2071,7 +2067,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production119UserAction(v1);
+        Object userValue = userActions.production119UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XconstantNonterminal.getInstance(), 1, userValue);
@@ -2088,7 +2084,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production120UserAction(v1);
+        Object userValue = userActions.production120UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XconstantNonterminal.getInstance(), 1, userValue);
@@ -2105,7 +2101,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production121UserAction(v1);
+        Object userValue = userActions.production121UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XconstantNonterminal.getInstance(), 1, userValue);
@@ -2122,7 +2118,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production122UserAction(v1);
+        Object userValue = userActions.production122UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XnamedconstantNonterminal.getInstance(), 1, userValue);
@@ -2139,7 +2135,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production123UserAction(v1);
+        Object userValue = userActions.production123UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XnamedconstantuseNonterminal.getInstance(), 1, userValue);
@@ -2156,7 +2152,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production124UserAction(v1);
+        Object userValue = userActions.production124UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XpoweropNonterminal.getInstance(), 1, userValue);
@@ -2173,7 +2169,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production125UserAction(v1);
+        Object userValue = userActions.production125UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XmultopNonterminal.getInstance(), 1, userValue);
@@ -2190,7 +2186,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production126UserAction(v1);
+        Object userValue = userActions.production126UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XmultopNonterminal.getInstance(), 1, userValue);
@@ -2207,7 +2203,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production127UserAction(v1);
+        Object userValue = userActions.production127UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XaddopNonterminal.getInstance(), 1, userValue);
@@ -2224,7 +2220,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production128UserAction(v1);
+        Object userValue = userActions.production128UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XaddopNonterminal.getInstance(), 1, userValue);
@@ -2241,7 +2237,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production129UserAction(v1);
+        Object userValue = userActions.production129UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsignNonterminal.getInstance(), 1, userValue);
@@ -2258,7 +2254,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production130UserAction(v1);
+        Object userValue = userActions.production130UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsignNonterminal.getInstance(), 1, userValue);
@@ -2275,7 +2271,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production131UserAction(v1);
+        Object userValue = userActions.production131UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XconcatopNonterminal.getInstance(), 1, userValue);
@@ -2292,7 +2288,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production132UserAction(v1);
+        Object userValue = userActions.production132UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrelopNonterminal.getInstance(), 1, userValue);
@@ -2309,7 +2305,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production133UserAction(v1);
+        Object userValue = userActions.production133UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrelopNonterminal.getInstance(), 1, userValue);
@@ -2326,7 +2322,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production134UserAction(v1);
+        Object userValue = userActions.production134UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrelopNonterminal.getInstance(), 1, userValue);
@@ -2343,7 +2339,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production135UserAction(v1);
+        Object userValue = userActions.production135UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrelopNonterminal.getInstance(), 1, userValue);
@@ -2360,7 +2356,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production136UserAction(v1);
+        Object userValue = userActions.production136UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrelopNonterminal.getInstance(), 1, userValue);
@@ -2377,7 +2373,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production137UserAction(v1);
+        Object userValue = userActions.production137UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrelopNonterminal.getInstance(), 1, userValue);
@@ -2394,7 +2390,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production138UserAction(v1);
+        Object userValue = userActions.production138UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrelopNonterminal.getInstance(), 1, userValue);
@@ -2411,7 +2407,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production139UserAction(v1);
+        Object userValue = userActions.production139UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrelopNonterminal.getInstance(), 1, userValue);
@@ -2428,7 +2424,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production140UserAction(v1);
+        Object userValue = userActions.production140UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrelopNonterminal.getInstance(), 1, userValue);
@@ -2445,7 +2441,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production141UserAction(v1);
+        Object userValue = userActions.production141UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrelopNonterminal.getInstance(), 1, userValue);
@@ -2462,7 +2458,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production142UserAction(v1);
+        Object userValue = userActions.production142UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrelopNonterminal.getInstance(), 1, userValue);
@@ -2479,7 +2475,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production143UserAction(v1);
+        Object userValue = userActions.production143UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrelopNonterminal.getInstance(), 1, userValue);
@@ -2496,7 +2492,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production144UserAction(v1);
+        Object userValue = userActions.production144UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XnotopNonterminal.getInstance(), 1, userValue);
@@ -2513,7 +2509,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production145UserAction(v1);
+        Object userValue = userActions.production145UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XandopNonterminal.getInstance(), 1, userValue);
@@ -2530,7 +2526,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production146UserAction(v1);
+        Object userValue = userActions.production146UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XoropNonterminal.getInstance(), 1, userValue);
@@ -2547,7 +2543,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production147UserAction(v1);
+        Object userValue = userActions.production147UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XequivopNonterminal.getInstance(), 1, userValue);
@@ -2564,7 +2560,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production148UserAction(v1);
+        Object userValue = userActions.production148UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XequivopNonterminal.getInstance(), 1, userValue);
@@ -2581,7 +2577,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production149UserAction(v1);
+        Object userValue = userActions.production149UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdefinedoperatorNonterminal.getInstance(), 1, userValue);
@@ -2598,7 +2594,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production150UserAction(v1);
+        Object userValue = userActions.production150UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdefinedoperatorNonterminal.getInstance(), 1, userValue);
@@ -2615,7 +2611,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production151UserAction(v1);
+        Object userValue = userActions.production151UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdefinedoperatorNonterminal.getInstance(), 1, userValue);
@@ -2632,7 +2628,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production152UserAction(v1);
+        Object userValue = userActions.production152UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdefinedoperatorNonterminal.getInstance(), 1, userValue);
@@ -2649,7 +2645,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production153UserAction(v1);
+        Object userValue = userActions.production153UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdefinedoperatorNonterminal.getInstance(), 1, userValue);
@@ -2666,7 +2662,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production154UserAction(v1);
+        Object userValue = userActions.production154UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdefinedoperatorNonterminal.getInstance(), 1, userValue);
@@ -2683,7 +2679,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production155UserAction(v1);
+        Object userValue = userActions.production155UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdefinedoperatorNonterminal.getInstance(), 1, userValue);
@@ -2700,7 +2696,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production156UserAction(v1);
+        Object userValue = userActions.production156UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdefinedoperatorNonterminal.getInstance(), 1, userValue);
@@ -2717,7 +2713,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production157UserAction(v1);
+        Object userValue = userActions.production157UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdefinedoperatorNonterminal.getInstance(), 1, userValue);
@@ -2734,7 +2730,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production158UserAction(v1);
+        Object userValue = userActions.production158UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdefinedoperatorNonterminal.getInstance(), 1, userValue);
@@ -2751,7 +2747,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production159UserAction(v1);
+        Object userValue = userActions.production159UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdefinedunaryopNonterminal.getInstance(), 1, userValue);
@@ -2768,7 +2764,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production160UserAction(v1);
+        Object userValue = userActions.production160UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdefinedbinaryopNonterminal.getInstance(), 1, userValue);
@@ -2785,7 +2781,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production161UserAction(v1);
+        Object userValue = userActions.production161UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XlabelNonterminal.getInstance(), 1, userValue);
@@ -2802,7 +2798,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production162UserAction(v1);
+        Object userValue = userActions.production162UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XunsignedarithmeticconstantNonterminal.getInstance(), 1, userValue);
@@ -2819,7 +2815,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production163UserAction(v1);
+        Object userValue = userActions.production163UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XunsignedarithmeticconstantNonterminal.getInstance(), 1, userValue);
@@ -2836,7 +2832,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production164UserAction(v1);
+        Object userValue = userActions.production164UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XunsignedarithmeticconstantNonterminal.getInstance(), 1, userValue);
@@ -2853,7 +2849,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production165UserAction(v1);
+        Object userValue = userActions.production165UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XunsignedarithmeticconstantNonterminal.getInstance(), 1, userValue);
@@ -2872,7 +2868,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production166UserAction(v1, v2, v3);
+        Object userValue = userActions.production166UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XunsignedarithmeticconstantNonterminal.getInstance(), 3, userValue);
@@ -2891,7 +2887,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production167UserAction(v1, v2, v3);
+        Object userValue = userActions.production167UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XunsignedarithmeticconstantNonterminal.getInstance(), 3, userValue);
@@ -2910,7 +2906,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production168UserAction(v1, v2, v3);
+        Object userValue = userActions.production168UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XunsignedarithmeticconstantNonterminal.getInstance(), 3, userValue);
@@ -2927,7 +2923,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production169UserAction(v1);
+        Object userValue = userActions.production169UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XkindparamNonterminal.getInstance(), 1, userValue);
@@ -2944,7 +2940,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production170UserAction(v1);
+        Object userValue = userActions.production170UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XkindparamNonterminal.getInstance(), 1, userValue);
@@ -2961,7 +2957,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production171UserAction(v1);
+        Object userValue = userActions.production171UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XbozliteralconstantNonterminal.getInstance(), 1, userValue);
@@ -2978,7 +2974,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production172UserAction(v1);
+        Object userValue = userActions.production172UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XbozliteralconstantNonterminal.getInstance(), 1, userValue);
@@ -2995,7 +2991,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production173UserAction(v1);
+        Object userValue = userActions.production173UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XbozliteralconstantNonterminal.getInstance(), 1, userValue);
@@ -3016,7 +3012,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production174UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production174UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XcomplexconstNonterminal.getInstance(), 5, userValue);
@@ -3033,7 +3029,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production175UserAction(v1);
+        Object userValue = userActions.production175UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XlogicalconstantNonterminal.getInstance(), 1, userValue);
@@ -3050,7 +3046,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production176UserAction(v1);
+        Object userValue = userActions.production176UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XlogicalconstantNonterminal.getInstance(), 1, userValue);
@@ -3069,7 +3065,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production177UserAction(v1, v2, v3);
+        Object userValue = userActions.production177UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XlogicalconstantNonterminal.getInstance(), 3, userValue);
@@ -3088,7 +3084,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production178UserAction(v1, v2, v3);
+        Object userValue = userActions.production178UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XlogicalconstantNonterminal.getInstance(), 3, userValue);
@@ -3107,7 +3103,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production179UserAction(v1, v2, v3);
+        Object userValue = userActions.production179UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XderivedtypedefNonterminal.getInstance(), 3, userValue);
@@ -3124,7 +3120,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production180UserAction(v1);
+        Object userValue = userActions.production180UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XderivedtypebodyNonterminal.getInstance(), 1, userValue);
@@ -3142,7 +3138,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production181UserAction(v1, v2);
+        Object userValue = userActions.production181UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XderivedtypebodyNonterminal.getInstance(), 2, userValue);
@@ -3159,7 +3155,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production182UserAction(v1);
+        Object userValue = userActions.production182UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XderivedtypebodyconstructNonterminal.getInstance(), 1, userValue);
@@ -3176,7 +3172,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production183UserAction(v1);
+        Object userValue = userActions.production183UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XderivedtypebodyconstructNonterminal.getInstance(), 1, userValue);
@@ -3195,7 +3191,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production184UserAction(v1, v2, v3);
+        Object userValue = userActions.production184UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XderivedtypestmtNonterminal.getInstance(), 3, userValue);
@@ -3215,7 +3211,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production185UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production185UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XderivedtypestmtNonterminal.getInstance(), 4, userValue);
@@ -3236,7 +3232,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production186UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production186UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XderivedtypestmtNonterminal.getInstance(), 5, userValue);
@@ -3258,7 +3254,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production187UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production187UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XderivedtypestmtNonterminal.getInstance(), 6, userValue);
@@ -3281,7 +3277,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production188UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production188UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XderivedtypestmtNonterminal.getInstance(), 7, userValue);
@@ -3305,7 +3301,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production189UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production189UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XderivedtypestmtNonterminal.getInstance(), 8, userValue);
@@ -3323,7 +3319,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production190UserAction(v1, v2);
+        Object userValue = userActions.production190UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XprivatesequencestmtNonterminal.getInstance(), 2, userValue);
@@ -3342,7 +3338,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production191UserAction(v1, v2, v3);
+        Object userValue = userActions.production191UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XprivatesequencestmtNonterminal.getInstance(), 3, userValue);
@@ -3360,7 +3356,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production192UserAction(v1, v2);
+        Object userValue = userActions.production192UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XprivatesequencestmtNonterminal.getInstance(), 2, userValue);
@@ -3379,7 +3375,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production193UserAction(v1, v2, v3);
+        Object userValue = userActions.production193UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XprivatesequencestmtNonterminal.getInstance(), 3, userValue);
@@ -3402,7 +3398,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production194UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production194UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentdefstmtNonterminal.getInstance(), 7, userValue);
@@ -3426,7 +3422,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production195UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production195UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentdefstmtNonterminal.getInstance(), 8, userValue);
@@ -3447,7 +3443,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production196UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production196UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentdefstmtNonterminal.getInstance(), 5, userValue);
@@ -3469,7 +3465,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production197UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production197UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentdefstmtNonterminal.getInstance(), 6, userValue);
@@ -3488,7 +3484,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production198UserAction(v1, v2, v3);
+        Object userValue = userActions.production198UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentdefstmtNonterminal.getInstance(), 3, userValue);
@@ -3508,7 +3504,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production199UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production199UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentdefstmtNonterminal.getInstance(), 4, userValue);
@@ -3525,7 +3521,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production200UserAction(v1);
+        Object userValue = userActions.production200UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcomponentattrspeclistNonterminal.getInstance(), 1, userValue);
@@ -3544,7 +3540,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production201UserAction(v1, v2, v3);
+        Object userValue = userActions.production201UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentattrspeclistNonterminal.getInstance(), 3, userValue);
@@ -3561,7 +3557,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production202UserAction(v1);
+        Object userValue = userActions.production202UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcomponentattrspecNonterminal.getInstance(), 1, userValue);
@@ -3581,7 +3577,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production203UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production203UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentattrspecNonterminal.getInstance(), 4, userValue);
@@ -3598,7 +3594,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production204UserAction(v1);
+        Object userValue = userActions.production204UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcomponentarrayspecNonterminal.getInstance(), 1, userValue);
@@ -3615,7 +3611,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production205UserAction(v1);
+        Object userValue = userActions.production205UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcomponentarrayspecNonterminal.getInstance(), 1, userValue);
@@ -3632,7 +3628,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production206UserAction(v1);
+        Object userValue = userActions.production206UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcomponentdecllistNonterminal.getInstance(), 1, userValue);
@@ -3651,7 +3647,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production207UserAction(v1, v2, v3);
+        Object userValue = userActions.production207UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentdecllistNonterminal.getInstance(), 3, userValue);
@@ -3674,7 +3670,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production208UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production208UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentdeclNonterminal.getInstance(), 7, userValue);
@@ -3695,7 +3691,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production209UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production209UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentdeclNonterminal.getInstance(), 5, userValue);
@@ -3715,7 +3711,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production210UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production210UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentdeclNonterminal.getInstance(), 4, userValue);
@@ -3733,7 +3729,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production211UserAction(v1, v2);
+        Object userValue = userActions.production211UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentdeclNonterminal.getInstance(), 2, userValue);
@@ -3755,7 +3751,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production212UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production212UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentdeclNonterminal.getInstance(), 6, userValue);
@@ -3775,7 +3771,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production213UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production213UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentdeclNonterminal.getInstance(), 4, userValue);
@@ -3794,7 +3790,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production214UserAction(v1, v2, v3);
+        Object userValue = userActions.production214UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentdeclNonterminal.getInstance(), 3, userValue);
@@ -3811,7 +3807,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production215UserAction(v1);
+        Object userValue = userActions.production215UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcomponentdeclNonterminal.getInstance(), 1, userValue);
@@ -3829,7 +3825,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production216UserAction(v1, v2);
+        Object userValue = userActions.production216UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentinitializationNonterminal.getInstance(), 2, userValue);
@@ -3849,7 +3845,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production217UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production217UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XcomponentinitializationNonterminal.getInstance(), 4, userValue);
@@ -3867,7 +3863,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production218UserAction(v1, v2);
+        Object userValue = userActions.production218UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XendtypestmtNonterminal.getInstance(), 2, userValue);
@@ -3886,7 +3882,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production219UserAction(v1, v2, v3);
+        Object userValue = userActions.production219UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendtypestmtNonterminal.getInstance(), 3, userValue);
@@ -3905,7 +3901,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production220UserAction(v1, v2, v3);
+        Object userValue = userActions.production220UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendtypestmtNonterminal.getInstance(), 3, userValue);
@@ -3925,7 +3921,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production221UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production221UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendtypestmtNonterminal.getInstance(), 4, userValue);
@@ -3944,7 +3940,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production222UserAction(v1, v2, v3);
+        Object userValue = userActions.production222UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendtypestmtNonterminal.getInstance(), 3, userValue);
@@ -3964,7 +3960,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production223UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production223UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendtypestmtNonterminal.getInstance(), 4, userValue);
@@ -3984,7 +3980,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production224UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production224UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendtypestmtNonterminal.getInstance(), 4, userValue);
@@ -4005,7 +4001,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production225UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production225UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XendtypestmtNonterminal.getInstance(), 5, userValue);
@@ -4025,7 +4021,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production226UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production226UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XstructureconstructorNonterminal.getInstance(), 4, userValue);
@@ -4042,7 +4038,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production227UserAction(v1);
+        Object userValue = userActions.production227UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexprlistNonterminal.getInstance(), 1, userValue);
@@ -4061,7 +4057,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production228UserAction(v1, v2, v3);
+        Object userValue = userActions.production228UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XexprlistNonterminal.getInstance(), 3, userValue);
@@ -4080,7 +4076,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production229UserAction(v1, v2, v3);
+        Object userValue = userActions.production229UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XarrayconstructorNonterminal.getInstance(), 3, userValue);
@@ -4097,7 +4093,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production230UserAction(v1);
+        Object userValue = userActions.production230UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XacvaluelistNonterminal.getInstance(), 1, userValue);
@@ -4114,7 +4110,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production231UserAction(v1);
+        Object userValue = userActions.production231UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XacvaluelistNonterminal.getInstance(), 1, userValue);
@@ -4133,7 +4129,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production232UserAction(v1, v2, v3);
+        Object userValue = userActions.production232UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.Xacvaluelist1Nonterminal.getInstance(), 3, userValue);
@@ -4152,7 +4148,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production233UserAction(v1, v2, v3);
+        Object userValue = userActions.production233UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.Xacvaluelist1Nonterminal.getInstance(), 3, userValue);
@@ -4169,7 +4165,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production234UserAction(v1);
+        Object userValue = userActions.production234UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.Xacvaluelist1Nonterminal.getInstance(), 1, userValue);
@@ -4188,7 +4184,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production235UserAction(v1, v2, v3);
+        Object userValue = userActions.production235UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.Xacvaluelist1Nonterminal.getInstance(), 3, userValue);
@@ -4207,7 +4203,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production236UserAction(v1, v2, v3);
+        Object userValue = userActions.production236UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.Xacvaluelist1Nonterminal.getInstance(), 3, userValue);
@@ -4232,7 +4228,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production237UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production237UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XacimplieddoNonterminal.getInstance(), 9, userValue);
@@ -4259,7 +4255,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production238UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
+        Object userValue = userActions.production238UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
 
         // The production has 11 symbols on its RHS
         parser.reduce(Nonterminal.XacimplieddoNonterminal.getInstance(), 11, userValue);
@@ -4284,7 +4280,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production239UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production239UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XacimplieddoNonterminal.getInstance(), 9, userValue);
@@ -4311,7 +4307,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production240UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
+        Object userValue = userActions.production240UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
 
         // The production has 11 symbols on its RHS
         parser.reduce(Nonterminal.XacimplieddoNonterminal.getInstance(), 11, userValue);
@@ -4333,7 +4329,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production241UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production241UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XtypedeclarationstmtNonterminal.getInstance(), 6, userValue);
@@ -4356,7 +4352,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production242UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production242UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XtypedeclarationstmtNonterminal.getInstance(), 7, userValue);
@@ -4377,7 +4373,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production243UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production243UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XtypedeclarationstmtNonterminal.getInstance(), 5, userValue);
@@ -4399,7 +4395,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production244UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production244UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XtypedeclarationstmtNonterminal.getInstance(), 6, userValue);
@@ -4418,7 +4414,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production245UserAction(v1, v2, v3);
+        Object userValue = userActions.production245UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XtypedeclarationstmtNonterminal.getInstance(), 3, userValue);
@@ -4438,7 +4434,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production246UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production246UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XtypedeclarationstmtNonterminal.getInstance(), 4, userValue);
@@ -4456,7 +4452,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production247UserAction(v1, v2);
+        Object userValue = userActions.production247UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XattrspecseqNonterminal.getInstance(), 2, userValue);
@@ -4475,7 +4471,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production248UserAction(v1, v2, v3);
+        Object userValue = userActions.production248UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XattrspecseqNonterminal.getInstance(), 3, userValue);
@@ -4492,7 +4488,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production249UserAction(v1);
+        Object userValue = userActions.production249UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XtypespecNonterminal.getInstance(), 1, userValue);
@@ -4509,7 +4505,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production250UserAction(v1);
+        Object userValue = userActions.production250UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XtypespecNonterminal.getInstance(), 1, userValue);
@@ -4526,7 +4522,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production251UserAction(v1);
+        Object userValue = userActions.production251UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XtypespecNonterminal.getInstance(), 1, userValue);
@@ -4543,7 +4539,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production252UserAction(v1);
+        Object userValue = userActions.production252UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XtypespecNonterminal.getInstance(), 1, userValue);
@@ -4560,7 +4556,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production253UserAction(v1);
+        Object userValue = userActions.production253UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XtypespecNonterminal.getInstance(), 1, userValue);
@@ -4577,7 +4573,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production254UserAction(v1);
+        Object userValue = userActions.production254UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XtypespecNonterminal.getInstance(), 1, userValue);
@@ -4595,7 +4591,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production255UserAction(v1, v2);
+        Object userValue = userActions.production255UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XtypespecNonterminal.getInstance(), 2, userValue);
@@ -4613,7 +4609,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production256UserAction(v1, v2);
+        Object userValue = userActions.production256UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XtypespecNonterminal.getInstance(), 2, userValue);
@@ -4631,7 +4627,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production257UserAction(v1, v2);
+        Object userValue = userActions.production257UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XtypespecNonterminal.getInstance(), 2, userValue);
@@ -4649,7 +4645,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production258UserAction(v1, v2);
+        Object userValue = userActions.production258UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XtypespecNonterminal.getInstance(), 2, userValue);
@@ -4667,7 +4663,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production259UserAction(v1, v2);
+        Object userValue = userActions.production259UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XtypespecNonterminal.getInstance(), 2, userValue);
@@ -4685,7 +4681,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production260UserAction(v1, v2);
+        Object userValue = userActions.production260UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XtypespecNonterminal.getInstance(), 2, userValue);
@@ -4705,7 +4701,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production261UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production261UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XtypespecNonterminal.getInstance(), 4, userValue);
@@ -4722,7 +4718,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production262UserAction(v1);
+        Object userValue = userActions.production262UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XattrspecNonterminal.getInstance(), 1, userValue);
@@ -4739,7 +4735,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production263UserAction(v1);
+        Object userValue = userActions.production263UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XattrspecNonterminal.getInstance(), 1, userValue);
@@ -4756,7 +4752,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production264UserAction(v1);
+        Object userValue = userActions.production264UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XattrspecNonterminal.getInstance(), 1, userValue);
@@ -4776,7 +4772,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production265UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production265UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XattrspecNonterminal.getInstance(), 4, userValue);
@@ -4793,7 +4789,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production266UserAction(v1);
+        Object userValue = userActions.production266UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XattrspecNonterminal.getInstance(), 1, userValue);
@@ -4813,7 +4809,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production267UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production267UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XattrspecNonterminal.getInstance(), 4, userValue);
@@ -4830,7 +4826,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production268UserAction(v1);
+        Object userValue = userActions.production268UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XattrspecNonterminal.getInstance(), 1, userValue);
@@ -4847,7 +4843,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production269UserAction(v1);
+        Object userValue = userActions.production269UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XattrspecNonterminal.getInstance(), 1, userValue);
@@ -4864,7 +4860,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production270UserAction(v1);
+        Object userValue = userActions.production270UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XattrspecNonterminal.getInstance(), 1, userValue);
@@ -4881,7 +4877,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production271UserAction(v1);
+        Object userValue = userActions.production271UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XattrspecNonterminal.getInstance(), 1, userValue);
@@ -4898,7 +4894,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production272UserAction(v1);
+        Object userValue = userActions.production272UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XattrspecNonterminal.getInstance(), 1, userValue);
@@ -4915,7 +4911,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production273UserAction(v1);
+        Object userValue = userActions.production273UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XentitydecllistNonterminal.getInstance(), 1, userValue);
@@ -4934,7 +4930,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production274UserAction(v1, v2, v3);
+        Object userValue = userActions.production274UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XentitydecllistNonterminal.getInstance(), 3, userValue);
@@ -4951,7 +4947,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production275UserAction(v1);
+        Object userValue = userActions.production275UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XentitydeclNonterminal.getInstance(), 1, userValue);
@@ -4969,7 +4965,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production276UserAction(v1, v2);
+        Object userValue = userActions.production276UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XentitydeclNonterminal.getInstance(), 2, userValue);
@@ -4988,7 +4984,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production277UserAction(v1, v2, v3);
+        Object userValue = userActions.production277UserAction(v1, v2, v3);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XentitydeclNonterminal.getInstance(), 2, userValue);
@@ -5008,7 +5004,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production278UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production278UserAction(v1, v2, v3, v4);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XentitydeclNonterminal.getInstance(), 3, userValue);
@@ -5028,7 +5024,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production279UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production279UserAction(v1, v2, v3, v4);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XentitydeclNonterminal.getInstance(), 2, userValue);
@@ -5049,7 +5045,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production280UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production280UserAction(v1, v2, v3, v4, v5);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XentitydeclNonterminal.getInstance(), 3, userValue);
@@ -5071,7 +5067,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production281UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production281UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XentitydeclNonterminal.getInstance(), 3, userValue);
@@ -5094,7 +5090,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production282UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production282UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XentitydeclNonterminal.getInstance(), 4, userValue);
@@ -5111,7 +5107,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production283UserAction(v1);
+        Object userValue = userActions.production283UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XentitydeclNonterminal.getInstance(), 1, userValue);
@@ -5133,7 +5129,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production284UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production284UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XinvalidentitydeclNonterminal.getInstance(), 6, userValue);
@@ -5156,7 +5152,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production285UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production285UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XinvalidentitydeclNonterminal.getInstance(), 7, userValue);
@@ -5174,7 +5170,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production286UserAction(v1, v2);
+        Object userValue = userActions.production286UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinitializationNonterminal.getInstance(), 2, userValue);
@@ -5194,7 +5190,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production287UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production287UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XinitializationNonterminal.getInstance(), 4, userValue);
@@ -5214,7 +5210,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production288UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production288UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XkindselectorNonterminal.getInstance(), 4, userValue);
@@ -5233,7 +5229,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production289UserAction(v1, v2, v3);
+        Object userValue = userActions.production289UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XkindselectorNonterminal.getInstance(), 3, userValue);
@@ -5250,7 +5246,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production290UserAction(v1);
+        Object userValue = userActions.production290UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcharselectorNonterminal.getInstance(), 1, userValue);
@@ -5273,7 +5269,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production291UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production291UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XcharselectorNonterminal.getInstance(), 7, userValue);
@@ -5295,7 +5291,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production292UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production292UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XcharselectorNonterminal.getInstance(), 6, userValue);
@@ -5315,7 +5311,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production293UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production293UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XcharselectorNonterminal.getInstance(), 4, userValue);
@@ -5335,7 +5331,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production294UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production294UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XcharselectorNonterminal.getInstance(), 4, userValue);
@@ -5354,7 +5350,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production295UserAction(v1, v2, v3);
+        Object userValue = userActions.production295UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcharselectorNonterminal.getInstance(), 3, userValue);
@@ -5372,7 +5368,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production296UserAction(v1, v2);
+        Object userValue = userActions.production296UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XlengthselectorNonterminal.getInstance(), 2, userValue);
@@ -5391,7 +5387,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production297UserAction(v1, v2, v3);
+        Object userValue = userActions.production297UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcharlengthNonterminal.getInstance(), 3, userValue);
@@ -5408,7 +5404,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production298UserAction(v1);
+        Object userValue = userActions.production298UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcharlengthNonterminal.getInstance(), 1, userValue);
@@ -5425,7 +5421,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production299UserAction(v1);
+        Object userValue = userActions.production299UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcharlenparamvalueNonterminal.getInstance(), 1, userValue);
@@ -5442,7 +5438,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production300UserAction(v1);
+        Object userValue = userActions.production300UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcharlenparamvalueNonterminal.getInstance(), 1, userValue);
@@ -5459,7 +5455,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production301UserAction(v1);
+        Object userValue = userActions.production301UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XaccessspecNonterminal.getInstance(), 1, userValue);
@@ -5476,7 +5472,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production302UserAction(v1);
+        Object userValue = userActions.production302UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XaccessspecNonterminal.getInstance(), 1, userValue);
@@ -5493,7 +5489,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production303UserAction(v1);
+        Object userValue = userActions.production303UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XintentspecNonterminal.getInstance(), 1, userValue);
@@ -5510,7 +5506,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production304UserAction(v1);
+        Object userValue = userActions.production304UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XintentspecNonterminal.getInstance(), 1, userValue);
@@ -5527,7 +5523,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production305UserAction(v1);
+        Object userValue = userActions.production305UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XintentspecNonterminal.getInstance(), 1, userValue);
@@ -5545,7 +5541,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production306UserAction(v1, v2);
+        Object userValue = userActions.production306UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XintentspecNonterminal.getInstance(), 2, userValue);
@@ -5562,7 +5558,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production307UserAction(v1);
+        Object userValue = userActions.production307UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XarrayspecNonterminal.getInstance(), 1, userValue);
@@ -5579,7 +5575,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production308UserAction(v1);
+        Object userValue = userActions.production308UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XarrayspecNonterminal.getInstance(), 1, userValue);
@@ -5596,7 +5592,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production309UserAction(v1);
+        Object userValue = userActions.production309UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XarrayspecNonterminal.getInstance(), 1, userValue);
@@ -5613,7 +5609,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production310UserAction(v1);
+        Object userValue = userActions.production310UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XarrayspecNonterminal.getInstance(), 1, userValue);
@@ -5631,7 +5627,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production311UserAction(v1, v2);
+        Object userValue = userActions.production311UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XassumedshapespeclistNonterminal.getInstance(), 2, userValue);
@@ -5651,7 +5647,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production312UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production312UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XassumedshapespeclistNonterminal.getInstance(), 4, userValue);
@@ -5670,7 +5666,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production313UserAction(v1, v2, v3);
+        Object userValue = userActions.production313UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XassumedshapespeclistNonterminal.getInstance(), 3, userValue);
@@ -5687,7 +5683,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production314UserAction(v1);
+        Object userValue = userActions.production314UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexplicitshapespeclistNonterminal.getInstance(), 1, userValue);
@@ -5706,7 +5702,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production315UserAction(v1, v2, v3);
+        Object userValue = userActions.production315UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XexplicitshapespeclistNonterminal.getInstance(), 3, userValue);
@@ -5725,7 +5721,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production316UserAction(v1, v2, v3);
+        Object userValue = userActions.production316UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XexplicitshapespecNonterminal.getInstance(), 3, userValue);
@@ -5742,7 +5738,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production317UserAction(v1);
+        Object userValue = userActions.production317UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexplicitshapespecNonterminal.getInstance(), 1, userValue);
@@ -5759,7 +5755,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production318UserAction(v1);
+        Object userValue = userActions.production318UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XlowerboundNonterminal.getInstance(), 1, userValue);
@@ -5776,7 +5772,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production319UserAction(v1);
+        Object userValue = userActions.production319UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XupperboundNonterminal.getInstance(), 1, userValue);
@@ -5794,7 +5790,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production320UserAction(v1, v2);
+        Object userValue = userActions.production320UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XassumedshapespecNonterminal.getInstance(), 2, userValue);
@@ -5811,7 +5807,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production321UserAction(v1);
+        Object userValue = userActions.production321UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XassumedshapespecNonterminal.getInstance(), 1, userValue);
@@ -5828,7 +5824,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production322UserAction(v1);
+        Object userValue = userActions.production322UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdeferredshapespeclistNonterminal.getInstance(), 1, userValue);
@@ -5847,7 +5843,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production323UserAction(v1, v2, v3);
+        Object userValue = userActions.production323UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XdeferredshapespeclistNonterminal.getInstance(), 3, userValue);
@@ -5864,7 +5860,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production324UserAction(v1);
+        Object userValue = userActions.production324UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdeferredshapespecNonterminal.getInstance(), 1, userValue);
@@ -5881,7 +5877,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production325UserAction(v1);
+        Object userValue = userActions.production325UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XassumedsizespecNonterminal.getInstance(), 1, userValue);
@@ -5900,7 +5896,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production326UserAction(v1, v2, v3);
+        Object userValue = userActions.production326UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XassumedsizespecNonterminal.getInstance(), 3, userValue);
@@ -5919,7 +5915,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production327UserAction(v1, v2, v3);
+        Object userValue = userActions.production327UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XassumedsizespecNonterminal.getInstance(), 3, userValue);
@@ -5940,7 +5936,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production328UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production328UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XassumedsizespecNonterminal.getInstance(), 5, userValue);
@@ -5962,7 +5958,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production329UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production329UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XintentstmtNonterminal.getInstance(), 6, userValue);
@@ -5986,7 +5982,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production330UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production330UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XintentstmtNonterminal.getInstance(), 7, userValue);
@@ -6009,7 +6005,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production331UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production331UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XintentstmtNonterminal.getInstance(), 7, userValue);
@@ -6034,7 +6030,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production332UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production332UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XintentstmtNonterminal.getInstance(), 8, userValue);
@@ -6051,7 +6047,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production333UserAction(v1);
+        Object userValue = userActions.production333UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XintentparlistNonterminal.getInstance(), 1, userValue);
@@ -6070,7 +6066,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production334UserAction(v1, v2, v3);
+        Object userValue = userActions.production334UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XintentparlistNonterminal.getInstance(), 3, userValue);
@@ -6087,7 +6083,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production335UserAction(v1);
+        Object userValue = userActions.production335UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XintentparNonterminal.getInstance(), 1, userValue);
@@ -6106,7 +6102,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production336UserAction(v1, v2, v3);
+        Object userValue = userActions.production336UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XoptionalstmtNonterminal.getInstance(), 3, userValue);
@@ -6127,7 +6123,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production337UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production337UserAction(v1, v2, v3, v4, v5);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XoptionalstmtNonterminal.getInstance(), 4, userValue);
@@ -6147,7 +6143,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production338UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production338UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XoptionalstmtNonterminal.getInstance(), 4, userValue);
@@ -6169,7 +6165,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production339UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production339UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XoptionalstmtNonterminal.getInstance(), 5, userValue);
@@ -6186,7 +6182,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production340UserAction(v1);
+        Object userValue = userActions.production340UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XoptionalparlistNonterminal.getInstance(), 1, userValue);
@@ -6205,7 +6201,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production341UserAction(v1, v2, v3);
+        Object userValue = userActions.production341UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XoptionalparlistNonterminal.getInstance(), 3, userValue);
@@ -6222,7 +6218,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production342UserAction(v1);
+        Object userValue = userActions.production342UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XoptionalparNonterminal.getInstance(), 1, userValue);
@@ -6241,7 +6237,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production343UserAction(v1, v2, v3);
+        Object userValue = userActions.production343UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XaccessstmtNonterminal.getInstance(), 3, userValue);
@@ -6262,7 +6258,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production344UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production344UserAction(v1, v2, v3, v4, v5);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XaccessstmtNonterminal.getInstance(), 4, userValue);
@@ -6282,7 +6278,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production345UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production345UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XaccessstmtNonterminal.getInstance(), 4, userValue);
@@ -6304,7 +6300,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production346UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production346UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XaccessstmtNonterminal.getInstance(), 5, userValue);
@@ -6322,7 +6318,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production347UserAction(v1, v2);
+        Object userValue = userActions.production347UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XaccessstmtNonterminal.getInstance(), 2, userValue);
@@ -6341,7 +6337,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production348UserAction(v1, v2, v3);
+        Object userValue = userActions.production348UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XaccessstmtNonterminal.getInstance(), 3, userValue);
@@ -6358,7 +6354,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production349UserAction(v1);
+        Object userValue = userActions.production349UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XaccessidlistNonterminal.getInstance(), 1, userValue);
@@ -6377,7 +6373,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production350UserAction(v1, v2, v3);
+        Object userValue = userActions.production350UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XaccessidlistNonterminal.getInstance(), 3, userValue);
@@ -6394,7 +6390,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production351UserAction(v1);
+        Object userValue = userActions.production351UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XaccessidNonterminal.getInstance(), 1, userValue);
@@ -6411,7 +6407,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production352UserAction(v1);
+        Object userValue = userActions.production352UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XaccessidNonterminal.getInstance(), 1, userValue);
@@ -6429,7 +6425,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production353UserAction(v1, v2);
+        Object userValue = userActions.production353UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XsavestmtNonterminal.getInstance(), 2, userValue);
@@ -6448,7 +6444,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production354UserAction(v1, v2, v3);
+        Object userValue = userActions.production354UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsavestmtNonterminal.getInstance(), 3, userValue);
@@ -6467,7 +6463,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production355UserAction(v1, v2, v3);
+        Object userValue = userActions.production355UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsavestmtNonterminal.getInstance(), 3, userValue);
@@ -6488,7 +6484,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production356UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production356UserAction(v1, v2, v3, v4, v5);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XsavestmtNonterminal.getInstance(), 4, userValue);
@@ -6508,7 +6504,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production357UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production357UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XsavestmtNonterminal.getInstance(), 4, userValue);
@@ -6530,7 +6526,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production358UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production358UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XsavestmtNonterminal.getInstance(), 5, userValue);
@@ -6547,7 +6543,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production359UserAction(v1);
+        Object userValue = userActions.production359UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsavedentitylistNonterminal.getInstance(), 1, userValue);
@@ -6566,7 +6562,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production360UserAction(v1, v2, v3);
+        Object userValue = userActions.production360UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsavedentitylistNonterminal.getInstance(), 3, userValue);
@@ -6583,7 +6579,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production361UserAction(v1);
+        Object userValue = userActions.production361UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsavedentityNonterminal.getInstance(), 1, userValue);
@@ -6600,7 +6596,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production362UserAction(v1);
+        Object userValue = userActions.production362UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsavedentityNonterminal.getInstance(), 1, userValue);
@@ -6619,7 +6615,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production363UserAction(v1, v2, v3);
+        Object userValue = userActions.production363UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsavedcommonblockNonterminal.getInstance(), 3, userValue);
@@ -6638,7 +6634,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production364UserAction(v1, v2, v3);
+        Object userValue = userActions.production364UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XdimensionstmtNonterminal.getInstance(), 3, userValue);
@@ -6659,7 +6655,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production365UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production365UserAction(v1, v2, v3, v4, v5);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XdimensionstmtNonterminal.getInstance(), 4, userValue);
@@ -6679,7 +6675,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production366UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production366UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XdimensionstmtNonterminal.getInstance(), 4, userValue);
@@ -6701,7 +6697,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production367UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production367UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XdimensionstmtNonterminal.getInstance(), 5, userValue);
@@ -6718,7 +6714,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production368UserAction(v1);
+        Object userValue = userActions.production368UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XarraydeclaratorlistNonterminal.getInstance(), 1, userValue);
@@ -6737,7 +6733,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production369UserAction(v1, v2, v3);
+        Object userValue = userActions.production369UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XarraydeclaratorlistNonterminal.getInstance(), 3, userValue);
@@ -6757,7 +6753,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production370UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production370UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XarraydeclaratorNonterminal.getInstance(), 4, userValue);
@@ -6776,7 +6772,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production371UserAction(v1, v2, v3);
+        Object userValue = userActions.production371UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XallocatablestmtNonterminal.getInstance(), 3, userValue);
@@ -6797,7 +6793,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production372UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production372UserAction(v1, v2, v3, v4, v5);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XallocatablestmtNonterminal.getInstance(), 4, userValue);
@@ -6817,7 +6813,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production373UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production373UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XallocatablestmtNonterminal.getInstance(), 4, userValue);
@@ -6839,7 +6835,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production374UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production374UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XallocatablestmtNonterminal.getInstance(), 5, userValue);
@@ -6856,7 +6852,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production375UserAction(v1);
+        Object userValue = userActions.production375UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XarrayallocationlistNonterminal.getInstance(), 1, userValue);
@@ -6875,7 +6871,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production376UserAction(v1, v2, v3);
+        Object userValue = userActions.production376UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XarrayallocationlistNonterminal.getInstance(), 3, userValue);
@@ -6892,7 +6888,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production377UserAction(v1);
+        Object userValue = userActions.production377UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XarrayallocationNonterminal.getInstance(), 1, userValue);
@@ -6912,7 +6908,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production378UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production378UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XarrayallocationNonterminal.getInstance(), 4, userValue);
@@ -6931,7 +6927,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production379UserAction(v1, v2, v3);
+        Object userValue = userActions.production379UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XpointerstmtNonterminal.getInstance(), 3, userValue);
@@ -6952,7 +6948,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production380UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production380UserAction(v1, v2, v3, v4, v5);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XpointerstmtNonterminal.getInstance(), 4, userValue);
@@ -6972,7 +6968,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production381UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production381UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XpointerstmtNonterminal.getInstance(), 4, userValue);
@@ -6994,7 +6990,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production382UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production382UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XpointerstmtNonterminal.getInstance(), 5, userValue);
@@ -7011,7 +7007,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production383UserAction(v1);
+        Object userValue = userActions.production383UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XpointerstmtobjectlistNonterminal.getInstance(), 1, userValue);
@@ -7030,7 +7026,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production384UserAction(v1, v2, v3);
+        Object userValue = userActions.production384UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XpointerstmtobjectlistNonterminal.getInstance(), 3, userValue);
@@ -7047,7 +7043,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production385UserAction(v1);
+        Object userValue = userActions.production385UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XpointerstmtobjectNonterminal.getInstance(), 1, userValue);
@@ -7067,7 +7063,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production386UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production386UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XpointerstmtobjectNonterminal.getInstance(), 4, userValue);
@@ -7084,7 +7080,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production387UserAction(v1);
+        Object userValue = userActions.production387UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XpointernameNonterminal.getInstance(), 1, userValue);
@@ -7103,7 +7099,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production388UserAction(v1, v2, v3);
+        Object userValue = userActions.production388UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XtargetstmtNonterminal.getInstance(), 3, userValue);
@@ -7124,7 +7120,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production389UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production389UserAction(v1, v2, v3, v4, v5);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XtargetstmtNonterminal.getInstance(), 4, userValue);
@@ -7144,7 +7140,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production390UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production390UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XtargetstmtNonterminal.getInstance(), 4, userValue);
@@ -7166,7 +7162,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production391UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production391UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XtargetstmtNonterminal.getInstance(), 5, userValue);
@@ -7183,7 +7179,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production392UserAction(v1);
+        Object userValue = userActions.production392UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XtargetobjectlistNonterminal.getInstance(), 1, userValue);
@@ -7202,7 +7198,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production393UserAction(v1, v2, v3);
+        Object userValue = userActions.production393UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XtargetobjectlistNonterminal.getInstance(), 3, userValue);
@@ -7219,7 +7215,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production394UserAction(v1);
+        Object userValue = userActions.production394UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XtargetobjectNonterminal.getInstance(), 1, userValue);
@@ -7239,7 +7235,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production395UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production395UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XtargetobjectNonterminal.getInstance(), 4, userValue);
@@ -7256,7 +7252,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production396UserAction(v1);
+        Object userValue = userActions.production396UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XtargetnameNonterminal.getInstance(), 1, userValue);
@@ -7277,7 +7273,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production397UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production397UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XparameterstmtNonterminal.getInstance(), 5, userValue);
@@ -7299,7 +7295,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production398UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production398UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XparameterstmtNonterminal.getInstance(), 6, userValue);
@@ -7316,7 +7312,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production399UserAction(v1);
+        Object userValue = userActions.production399UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XnamedconstantdeflistNonterminal.getInstance(), 1, userValue);
@@ -7335,7 +7331,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production400UserAction(v1, v2, v3);
+        Object userValue = userActions.production400UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XnamedconstantdeflistNonterminal.getInstance(), 3, userValue);
@@ -7354,7 +7350,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production401UserAction(v1, v2, v3);
+        Object userValue = userActions.production401UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XnamedconstantdefNonterminal.getInstance(), 3, userValue);
@@ -7373,7 +7369,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production402UserAction(v1, v2, v3);
+        Object userValue = userActions.production402UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XdatastmtNonterminal.getInstance(), 3, userValue);
@@ -7393,7 +7389,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production403UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production403UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XdatastmtNonterminal.getInstance(), 4, userValue);
@@ -7410,7 +7406,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production404UserAction(v1);
+        Object userValue = userActions.production404UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdatalistNonterminal.getInstance(), 1, userValue);
@@ -7428,7 +7424,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production405UserAction(v1, v2);
+        Object userValue = userActions.production405UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XdatalistNonterminal.getInstance(), 2, userValue);
@@ -7447,7 +7443,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production406UserAction(v1, v2, v3);
+        Object userValue = userActions.production406UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XdatalistNonterminal.getInstance(), 3, userValue);
@@ -7467,7 +7463,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production407UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production407UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XdatastmtsetNonterminal.getInstance(), 4, userValue);
@@ -7484,7 +7480,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production408UserAction(v1);
+        Object userValue = userActions.production408UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdatastmtobjectlistNonterminal.getInstance(), 1, userValue);
@@ -7503,7 +7499,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production409UserAction(v1, v2, v3);
+        Object userValue = userActions.production409UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XdatastmtobjectlistNonterminal.getInstance(), 3, userValue);
@@ -7520,7 +7516,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production410UserAction(v1);
+        Object userValue = userActions.production410UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdatastmtobjectNonterminal.getInstance(), 1, userValue);
@@ -7537,7 +7533,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production411UserAction(v1);
+        Object userValue = userActions.production411UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdatastmtobjectNonterminal.getInstance(), 1, userValue);
@@ -7562,7 +7558,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production412UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production412UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XdataimplieddoNonterminal.getInstance(), 9, userValue);
@@ -7589,7 +7585,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production413UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
+        Object userValue = userActions.production413UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
 
         // The production has 11 symbols on its RHS
         parser.reduce(Nonterminal.XdataimplieddoNonterminal.getInstance(), 11, userValue);
@@ -7606,7 +7602,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production414UserAction(v1);
+        Object userValue = userActions.production414UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdataidoobjectlistNonterminal.getInstance(), 1, userValue);
@@ -7625,7 +7621,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production415UserAction(v1, v2, v3);
+        Object userValue = userActions.production415UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XdataidoobjectlistNonterminal.getInstance(), 3, userValue);
@@ -7642,7 +7638,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production416UserAction(v1);
+        Object userValue = userActions.production416UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdataidoobjectNonterminal.getInstance(), 1, userValue);
@@ -7659,7 +7655,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production417UserAction(v1);
+        Object userValue = userActions.production417UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdataidoobjectNonterminal.getInstance(), 1, userValue);
@@ -7676,7 +7672,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production418UserAction(v1);
+        Object userValue = userActions.production418UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdataidoobjectNonterminal.getInstance(), 1, userValue);
@@ -7693,7 +7689,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production419UserAction(v1);
+        Object userValue = userActions.production419UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdatastmtvaluelistNonterminal.getInstance(), 1, userValue);
@@ -7712,7 +7708,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production420UserAction(v1, v2, v3);
+        Object userValue = userActions.production420UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XdatastmtvaluelistNonterminal.getInstance(), 3, userValue);
@@ -7729,7 +7725,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production421UserAction(v1);
+        Object userValue = userActions.production421UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdatastmtvalueNonterminal.getInstance(), 1, userValue);
@@ -7748,7 +7744,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production422UserAction(v1, v2, v3);
+        Object userValue = userActions.production422UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XdatastmtvalueNonterminal.getInstance(), 3, userValue);
@@ -7767,7 +7763,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production423UserAction(v1, v2, v3);
+        Object userValue = userActions.production423UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XdatastmtvalueNonterminal.getInstance(), 3, userValue);
@@ -7784,7 +7780,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production424UserAction(v1);
+        Object userValue = userActions.production424UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdatastmtconstantNonterminal.getInstance(), 1, userValue);
@@ -7803,7 +7799,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production425UserAction(v1, v2, v3);
+        Object userValue = userActions.production425UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XdatastmtconstantNonterminal.getInstance(), 3, userValue);
@@ -7822,7 +7818,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production426UserAction(v1, v2, v3);
+        Object userValue = userActions.production426UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.TXimplicitstmtNonterminal.getInstance(), 3, userValue);
@@ -7842,7 +7838,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production427UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production427UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.TXimplicitstmtNonterminal.getInstance(), 4, userValue);
@@ -7861,7 +7857,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production428UserAction(v1, v2, v3);
+        Object userValue = userActions.production428UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.TXimplicitstmtNonterminal.getInstance(), 3, userValue);
@@ -7881,7 +7877,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production429UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production429UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.TXimplicitstmtNonterminal.getInstance(), 4, userValue);
@@ -7898,7 +7894,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production430UserAction(v1);
+        Object userValue = userActions.production430UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.TXimplicitspeclistNonterminal.getInstance(), 1, userValue);
@@ -7917,7 +7913,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production431UserAction(v1, v2, v3);
+        Object userValue = userActions.production431UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.TXimplicitspeclistNonterminal.getInstance(), 3, userValue);
@@ -7935,7 +7931,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production432UserAction(v1, v2);
+        Object userValue = userActions.production432UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.TXimplicitspecNonterminal.getInstance(), 2, userValue);
@@ -7954,7 +7950,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production433UserAction(v1, v2, v3);
+        Object userValue = userActions.production433UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XnameliststmtNonterminal.getInstance(), 3, userValue);
@@ -7974,7 +7970,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production434UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production434UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XnameliststmtNonterminal.getInstance(), 4, userValue);
@@ -7994,7 +7990,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production435UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production435UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XnamelistgroupsNonterminal.getInstance(), 4, userValue);
@@ -8015,7 +8011,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production436UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production436UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XnamelistgroupsNonterminal.getInstance(), 5, userValue);
@@ -8037,7 +8033,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production437UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production437UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XnamelistgroupsNonterminal.getInstance(), 6, userValue);
@@ -8056,7 +8052,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production438UserAction(v1, v2, v3);
+        Object userValue = userActions.production438UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XnamelistgroupsNonterminal.getInstance(), 3, userValue);
@@ -8073,7 +8069,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production439UserAction(v1);
+        Object userValue = userActions.production439UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XnamelistgroupobjectNonterminal.getInstance(), 1, userValue);
@@ -8092,7 +8088,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production440UserAction(v1, v2, v3);
+        Object userValue = userActions.production440UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XequivalencestmtNonterminal.getInstance(), 3, userValue);
@@ -8112,7 +8108,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production441UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production441UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XequivalencestmtNonterminal.getInstance(), 4, userValue);
@@ -8129,7 +8125,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production442UserAction(v1);
+        Object userValue = userActions.production442UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XequivalencesetlistNonterminal.getInstance(), 1, userValue);
@@ -8148,7 +8144,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production443UserAction(v1, v2, v3);
+        Object userValue = userActions.production443UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XequivalencesetlistNonterminal.getInstance(), 3, userValue);
@@ -8169,7 +8165,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production444UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production444UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XequivalencesetNonterminal.getInstance(), 5, userValue);
@@ -8186,7 +8182,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production445UserAction(v1);
+        Object userValue = userActions.production445UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XequivalenceobjectlistNonterminal.getInstance(), 1, userValue);
@@ -8205,7 +8201,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production446UserAction(v1, v2, v3);
+        Object userValue = userActions.production446UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XequivalenceobjectlistNonterminal.getInstance(), 3, userValue);
@@ -8222,7 +8218,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production447UserAction(v1);
+        Object userValue = userActions.production447UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XequivalenceobjectNonterminal.getInstance(), 1, userValue);
@@ -8241,7 +8237,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production448UserAction(v1, v2, v3);
+        Object userValue = userActions.production448UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcommonstmtNonterminal.getInstance(), 3, userValue);
@@ -8261,7 +8257,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production449UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production449UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XcommonstmtNonterminal.getInstance(), 4, userValue);
@@ -8278,7 +8274,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production450UserAction(v1);
+        Object userValue = userActions.production450UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcomlistNonterminal.getInstance(), 1, userValue);
@@ -8296,7 +8292,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production451UserAction(v1, v2);
+        Object userValue = userActions.production451UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XcomlistNonterminal.getInstance(), 2, userValue);
@@ -8315,7 +8311,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production452UserAction(v1, v2, v3);
+        Object userValue = userActions.production452UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcomlistNonterminal.getInstance(), 3, userValue);
@@ -8334,7 +8330,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production453UserAction(v1, v2, v3);
+        Object userValue = userActions.production453UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcomlistNonterminal.getInstance(), 3, userValue);
@@ -8354,7 +8350,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production454UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production454UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XcomlistNonterminal.getInstance(), 4, userValue);
@@ -8372,7 +8368,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production455UserAction(v1, v2);
+        Object userValue = userActions.production455UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XcomblockNonterminal.getInstance(), 2, userValue);
@@ -8391,7 +8387,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production456UserAction(v1, v2, v3);
+        Object userValue = userActions.production456UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcomblockNonterminal.getInstance(), 3, userValue);
@@ -8408,7 +8404,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production457UserAction(v1);
+        Object userValue = userActions.production457UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcommonblockobjectNonterminal.getInstance(), 1, userValue);
@@ -8425,7 +8421,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production458UserAction(v1);
+        Object userValue = userActions.production458UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcommonblockobjectNonterminal.getInstance(), 1, userValue);
@@ -8442,7 +8438,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production459UserAction(v1);
+        Object userValue = userActions.production459UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XvariableNonterminal.getInstance(), 1, userValue);
@@ -8463,7 +8459,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production460UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production460UserAction(v1, v2, v3, v4, v5);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XvariableNonterminal.getInstance(), 2, userValue);
@@ -8480,7 +8476,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production461UserAction(v1);
+        Object userValue = userActions.production461UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XvariableNonterminal.getInstance(), 1, userValue);
@@ -8498,7 +8494,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production462UserAction(v1, v2);
+        Object userValue = userActions.production462UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XsubstrconstNonterminal.getInstance(), 2, userValue);
@@ -8515,7 +8511,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production463UserAction(v1);
+        Object userValue = userActions.production463UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XvariablenameNonterminal.getInstance(), 1, userValue);
@@ -8532,7 +8528,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production464UserAction(v1);
+        Object userValue = userActions.production464UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XscalarvariableNonterminal.getInstance(), 1, userValue);
@@ -8549,7 +8545,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production465UserAction(v1);
+        Object userValue = userActions.production465UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XscalarvariableNonterminal.getInstance(), 1, userValue);
@@ -8568,7 +8564,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production466UserAction(v1, v2, v3);
+        Object userValue = userActions.production466UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsubstringrangeNonterminal.getInstance(), 3, userValue);
@@ -8585,7 +8581,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production467UserAction(v1);
+        Object userValue = userActions.production467UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdatarefNonterminal.getInstance(), 1, userValue);
@@ -8604,7 +8600,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production468UserAction(v1, v2, v3);
+        Object userValue = userActions.production468UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XdatarefNonterminal.getInstance(), 3, userValue);
@@ -8626,7 +8622,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production469UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production469UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XdatarefNonterminal.getInstance(), 4, userValue);
@@ -8645,7 +8641,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production470UserAction(v1, v2, v3);
+        Object userValue = userActions.production470UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsfdatarefNonterminal.getInstance(), 3, userValue);
@@ -8665,7 +8661,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production471UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production471UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XsfdatarefNonterminal.getInstance(), 4, userValue);
@@ -8684,7 +8680,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production472UserAction(v1, v2, v3);
+        Object userValue = userActions.production472UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsfdatarefNonterminal.getInstance(), 3, userValue);
@@ -8706,7 +8702,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production473UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production473UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XsfdatarefNonterminal.getInstance(), 4, userValue);
@@ -8724,7 +8720,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production474UserAction(v1, v2);
+        Object userValue = userActions.production474UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XstructurecomponentNonterminal.getInstance(), 2, userValue);
@@ -8742,7 +8738,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production475UserAction(v1, v2);
+        Object userValue = userActions.production475UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XstructurecomponentNonterminal.getInstance(), 2, userValue);
@@ -8763,7 +8759,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production476UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production476UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XfieldselectorNonterminal.getInstance(), 5, userValue);
@@ -8781,7 +8777,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production477UserAction(v1, v2);
+        Object userValue = userActions.production477UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XfieldselectorNonterminal.getInstance(), 2, userValue);
@@ -8801,7 +8797,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production478UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production478UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XarrayelementNonterminal.getInstance(), 4, userValue);
@@ -8821,7 +8817,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production479UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production479UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XarrayelementNonterminal.getInstance(), 4, userValue);
@@ -8838,7 +8834,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production480UserAction(v1);
+        Object userValue = userActions.production480UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsubscriptNonterminal.getInstance(), 1, userValue);
@@ -8855,7 +8851,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production481UserAction(v1);
+        Object userValue = userActions.production481UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsectionsubscriptlistNonterminal.getInstance(), 1, userValue);
@@ -8874,7 +8870,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production482UserAction(v1, v2, v3);
+        Object userValue = userActions.production482UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsectionsubscriptlistNonterminal.getInstance(), 3, userValue);
@@ -8891,7 +8887,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production483UserAction(v1);
+        Object userValue = userActions.production483UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsectionsubscriptNonterminal.getInstance(), 1, userValue);
@@ -8908,7 +8904,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production484UserAction(v1);
+        Object userValue = userActions.production484UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsectionsubscriptNonterminal.getInstance(), 1, userValue);
@@ -8925,7 +8921,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production485UserAction(v1);
+        Object userValue = userActions.production485UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsubscripttripletNonterminal.getInstance(), 1, userValue);
@@ -8943,7 +8939,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production486UserAction(v1, v2);
+        Object userValue = userActions.production486UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XsubscripttripletNonterminal.getInstance(), 2, userValue);
@@ -8961,7 +8957,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production487UserAction(v1, v2);
+        Object userValue = userActions.production487UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XsubscripttripletNonterminal.getInstance(), 2, userValue);
@@ -8980,7 +8976,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production488UserAction(v1, v2, v3);
+        Object userValue = userActions.production488UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsubscripttripletNonterminal.getInstance(), 3, userValue);
@@ -9001,7 +8997,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production489UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production489UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XsubscripttripletNonterminal.getInstance(), 5, userValue);
@@ -9021,7 +9017,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production490UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production490UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XsubscripttripletNonterminal.getInstance(), 4, userValue);
@@ -9041,7 +9037,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production491UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production491UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XsubscripttripletNonterminal.getInstance(), 4, userValue);
@@ -9060,7 +9056,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production492UserAction(v1, v2, v3);
+        Object userValue = userActions.production492UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsubscripttripletNonterminal.getInstance(), 3, userValue);
@@ -9084,7 +9080,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production493UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production493UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XallocatestmtNonterminal.getInstance(), 8, userValue);
@@ -9109,7 +9105,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production494UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production494UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XallocatestmtNonterminal.getInstance(), 9, userValue);
@@ -9130,7 +9126,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production495UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production495UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XallocatestmtNonterminal.getInstance(), 5, userValue);
@@ -9152,7 +9148,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production496UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production496UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XallocatestmtNonterminal.getInstance(), 6, userValue);
@@ -9169,7 +9165,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production497UserAction(v1);
+        Object userValue = userActions.production497UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XallocationlistNonterminal.getInstance(), 1, userValue);
@@ -9188,7 +9184,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production498UserAction(v1, v2, v3);
+        Object userValue = userActions.production498UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XallocationlistNonterminal.getInstance(), 3, userValue);
@@ -9205,7 +9201,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production499UserAction(v1);
+        Object userValue = userActions.production499UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XallocationNonterminal.getInstance(), 1, userValue);
@@ -9223,7 +9219,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production500UserAction(v1, v2);
+        Object userValue = userActions.production500UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XallocationNonterminal.getInstance(), 2, userValue);
@@ -9242,7 +9238,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production501UserAction(v1, v2, v3);
+        Object userValue = userActions.production501UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XallocatedshapeNonterminal.getInstance(), 3, userValue);
@@ -9259,7 +9255,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production502UserAction(v1);
+        Object userValue = userActions.production502UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XallocateobjectlistNonterminal.getInstance(), 1, userValue);
@@ -9278,7 +9274,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production503UserAction(v1, v2, v3);
+        Object userValue = userActions.production503UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XallocateobjectlistNonterminal.getInstance(), 3, userValue);
@@ -9295,7 +9291,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production504UserAction(v1);
+        Object userValue = userActions.production504UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XallocateobjectNonterminal.getInstance(), 1, userValue);
@@ -9313,7 +9309,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production505UserAction(v1, v2);
+        Object userValue = userActions.production505UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XallocateobjectNonterminal.getInstance(), 2, userValue);
@@ -9334,7 +9330,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production506UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production506UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XnullifystmtNonterminal.getInstance(), 5, userValue);
@@ -9356,7 +9352,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production507UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production507UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XnullifystmtNonterminal.getInstance(), 6, userValue);
@@ -9373,7 +9369,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production508UserAction(v1);
+        Object userValue = userActions.production508UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XpointerobjectlistNonterminal.getInstance(), 1, userValue);
@@ -9392,7 +9388,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production509UserAction(v1, v2, v3);
+        Object userValue = userActions.production509UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XpointerobjectlistNonterminal.getInstance(), 3, userValue);
@@ -9409,7 +9405,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production510UserAction(v1);
+        Object userValue = userActions.production510UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XpointerobjectNonterminal.getInstance(), 1, userValue);
@@ -9426,7 +9422,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production511UserAction(v1);
+        Object userValue = userActions.production511UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XpointerobjectNonterminal.getInstance(), 1, userValue);
@@ -9448,7 +9444,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production512UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production512UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XpointerfieldNonterminal.getInstance(), 6, userValue);
@@ -9470,7 +9466,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production513UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production513UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XpointerfieldNonterminal.getInstance(), 6, userValue);
@@ -9489,7 +9485,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production514UserAction(v1, v2, v3);
+        Object userValue = userActions.production514UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XpointerfieldNonterminal.getInstance(), 3, userValue);
@@ -9507,7 +9503,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production515UserAction(v1, v2);
+        Object userValue = userActions.production515UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XpointerfieldNonterminal.getInstance(), 2, userValue);
@@ -9531,7 +9527,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production516UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production516UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XdeallocatestmtNonterminal.getInstance(), 8, userValue);
@@ -9556,7 +9552,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production517UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production517UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XdeallocatestmtNonterminal.getInstance(), 9, userValue);
@@ -9577,7 +9573,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production518UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production518UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XdeallocatestmtNonterminal.getInstance(), 5, userValue);
@@ -9599,7 +9595,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production519UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production519UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XdeallocatestmtNonterminal.getInstance(), 6, userValue);
@@ -9616,7 +9612,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production520UserAction(v1);
+        Object userValue = userActions.production520UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprimaryNonterminal.getInstance(), 1, userValue);
@@ -9633,7 +9629,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production521UserAction(v1);
+        Object userValue = userActions.production521UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprimaryNonterminal.getInstance(), 1, userValue);
@@ -9650,7 +9646,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production522UserAction(v1);
+        Object userValue = userActions.production522UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprimaryNonterminal.getInstance(), 1, userValue);
@@ -9667,7 +9663,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production523UserAction(v1);
+        Object userValue = userActions.production523UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprimaryNonterminal.getInstance(), 1, userValue);
@@ -9684,7 +9680,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production524UserAction(v1);
+        Object userValue = userActions.production524UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprimaryNonterminal.getInstance(), 1, userValue);
@@ -9705,7 +9701,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production525UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production525UserAction(v1, v2, v3, v4, v5);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XprimaryNonterminal.getInstance(), 2, userValue);
@@ -9724,7 +9720,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production526UserAction(v1, v2, v3);
+        Object userValue = userActions.production526UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XprimaryNonterminal.getInstance(), 3, userValue);
@@ -9747,7 +9743,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production527UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production527UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XprimaryNonterminal.getInstance(), 4, userValue);
@@ -9769,7 +9765,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production528UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production528UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XprimaryNonterminal.getInstance(), 6, userValue);
@@ -9795,7 +9791,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production529UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
+        Object userValue = userActions.production529UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XprimaryNonterminal.getInstance(), 7, userValue);
@@ -9812,7 +9808,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production530UserAction(v1);
+        Object userValue = userActions.production530UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprimaryNonterminal.getInstance(), 1, userValue);
@@ -9830,7 +9826,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production531UserAction(v1, v2);
+        Object userValue = userActions.production531UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XprimaryNonterminal.getInstance(), 2, userValue);
@@ -9849,7 +9845,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production532UserAction(v1, v2, v3);
+        Object userValue = userActions.production532UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XprimaryNonterminal.getInstance(), 3, userValue);
@@ -9872,7 +9868,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production533UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production533UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XprimaryNonterminal.getInstance(), 4, userValue);
@@ -9891,7 +9887,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production534UserAction(v1, v2, v3);
+        Object userValue = userActions.production534UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XprimaryNonterminal.getInstance(), 3, userValue);
@@ -9908,7 +9904,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production535UserAction(v1);
+        Object userValue = userActions.production535UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprimaryNonterminal.getInstance(), 1, userValue);
@@ -9925,7 +9921,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production536UserAction(v1);
+        Object userValue = userActions.production536UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcprimaryNonterminal.getInstance(), 1, userValue);
@@ -9944,7 +9940,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production537UserAction(v1, v2, v3);
+        Object userValue = userActions.production537UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcprimaryNonterminal.getInstance(), 3, userValue);
@@ -9961,7 +9957,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production538UserAction(v1);
+        Object userValue = userActions.production538UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcoperandNonterminal.getInstance(), 1, userValue);
@@ -9978,7 +9974,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production539UserAction(v1);
+        Object userValue = userActions.production539UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcoperandNonterminal.getInstance(), 1, userValue);
@@ -9998,7 +9994,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production540UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production540UserAction(v1, v2, v3, v4);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XcoperandNonterminal.getInstance(), 2, userValue);
@@ -10017,7 +10013,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production541UserAction(v1, v2, v3);
+        Object userValue = userActions.production541UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcoperandNonterminal.getInstance(), 3, userValue);
@@ -10039,7 +10035,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production542UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production542UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XcoperandNonterminal.getInstance(), 4, userValue);
@@ -10061,7 +10057,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production543UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production543UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XcoperandNonterminal.getInstance(), 4, userValue);
@@ -10086,7 +10082,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production544UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production544UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XcoperandNonterminal.getInstance(), 5, userValue);
@@ -10103,7 +10099,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production545UserAction(v1);
+        Object userValue = userActions.production545UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcoperandNonterminal.getInstance(), 1, userValue);
@@ -10120,7 +10116,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production546UserAction(v1);
+        Object userValue = userActions.production546UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XufprimaryNonterminal.getInstance(), 1, userValue);
@@ -10137,7 +10133,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production547UserAction(v1);
+        Object userValue = userActions.production547UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XufprimaryNonterminal.getInstance(), 1, userValue);
@@ -10154,7 +10150,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production548UserAction(v1);
+        Object userValue = userActions.production548UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XufprimaryNonterminal.getInstance(), 1, userValue);
@@ -10171,7 +10167,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production549UserAction(v1);
+        Object userValue = userActions.production549UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XufprimaryNonterminal.getInstance(), 1, userValue);
@@ -10192,7 +10188,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production550UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production550UserAction(v1, v2, v3, v4, v5);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XufprimaryNonterminal.getInstance(), 2, userValue);
@@ -10211,7 +10207,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production551UserAction(v1, v2, v3);
+        Object userValue = userActions.production551UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XufprimaryNonterminal.getInstance(), 3, userValue);
@@ -10234,7 +10230,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production552UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production552UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XufprimaryNonterminal.getInstance(), 4, userValue);
@@ -10256,7 +10252,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production553UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production553UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XufprimaryNonterminal.getInstance(), 4, userValue);
@@ -10282,7 +10278,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production554UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
+        Object userValue = userActions.production554UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XufprimaryNonterminal.getInstance(), 5, userValue);
@@ -10301,7 +10297,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production555UserAction(v1, v2, v3);
+        Object userValue = userActions.production555UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XufprimaryNonterminal.getInstance(), 3, userValue);
@@ -10318,7 +10314,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production556UserAction(v1);
+        Object userValue = userActions.production556UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.Xlevel1exprNonterminal.getInstance(), 1, userValue);
@@ -10336,7 +10332,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production557UserAction(v1, v2);
+        Object userValue = userActions.production557UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.Xlevel1exprNonterminal.getInstance(), 2, userValue);
@@ -10353,7 +10349,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production558UserAction(v1);
+        Object userValue = userActions.production558UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XmultoperandNonterminal.getInstance(), 1, userValue);
@@ -10372,7 +10368,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production559UserAction(v1, v2, v3);
+        Object userValue = userActions.production559UserAction(v1, v2, v3);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XmultoperandNonterminal.getInstance(), 2, userValue);
@@ -10389,7 +10385,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production560UserAction(v1);
+        Object userValue = userActions.production560UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XuffactorNonterminal.getInstance(), 1, userValue);
@@ -10408,7 +10404,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production561UserAction(v1, v2, v3);
+        Object userValue = userActions.production561UserAction(v1, v2, v3);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XuffactorNonterminal.getInstance(), 2, userValue);
@@ -10425,7 +10421,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production562UserAction(v1);
+        Object userValue = userActions.production562UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XaddoperandNonterminal.getInstance(), 1, userValue);
@@ -10444,7 +10440,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production563UserAction(v1, v2, v3);
+        Object userValue = userActions.production563UserAction(v1, v2, v3);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XaddoperandNonterminal.getInstance(), 2, userValue);
@@ -10461,7 +10457,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production564UserAction(v1);
+        Object userValue = userActions.production564UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XuftermNonterminal.getInstance(), 1, userValue);
@@ -10480,7 +10476,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production565UserAction(v1, v2, v3);
+        Object userValue = userActions.production565UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XuftermNonterminal.getInstance(), 3, userValue);
@@ -10499,7 +10495,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production566UserAction(v1, v2, v3);
+        Object userValue = userActions.production566UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XuftermNonterminal.getInstance(), 3, userValue);
@@ -10516,7 +10512,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production567UserAction(v1);
+        Object userValue = userActions.production567UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.Xlevel2exprNonterminal.getInstance(), 1, userValue);
@@ -10535,7 +10531,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production568UserAction(v1, v2, v3);
+        Object userValue = userActions.production568UserAction(v1, v2, v3);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.Xlevel2exprNonterminal.getInstance(), 2, userValue);
@@ -10553,7 +10549,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production569UserAction(v1, v2);
+        Object userValue = userActions.production569UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.Xlevel2exprNonterminal.getInstance(), 2, userValue);
@@ -10570,7 +10566,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production570UserAction(v1);
+        Object userValue = userActions.production570UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XufexprNonterminal.getInstance(), 1, userValue);
@@ -10588,7 +10584,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production571UserAction(v1, v2);
+        Object userValue = userActions.production571UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XufexprNonterminal.getInstance(), 2, userValue);
@@ -10607,7 +10603,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production572UserAction(v1, v2, v3);
+        Object userValue = userActions.production572UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XufexprNonterminal.getInstance(), 3, userValue);
@@ -10624,7 +10620,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production573UserAction(v1);
+        Object userValue = userActions.production573UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.Xlevel3exprNonterminal.getInstance(), 1, userValue);
@@ -10643,7 +10639,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production574UserAction(v1, v2, v3);
+        Object userValue = userActions.production574UserAction(v1, v2, v3);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.Xlevel3exprNonterminal.getInstance(), 2, userValue);
@@ -10660,7 +10656,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production575UserAction(v1);
+        Object userValue = userActions.production575UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcexprNonterminal.getInstance(), 1, userValue);
@@ -10679,7 +10675,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production576UserAction(v1, v2, v3);
+        Object userValue = userActions.production576UserAction(v1, v2, v3);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XcexprNonterminal.getInstance(), 2, userValue);
@@ -10696,7 +10692,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production577UserAction(v1);
+        Object userValue = userActions.production577UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.Xlevel4exprNonterminal.getInstance(), 1, userValue);
@@ -10715,7 +10711,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production578UserAction(v1, v2, v3);
+        Object userValue = userActions.production578UserAction(v1, v2, v3);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.Xlevel4exprNonterminal.getInstance(), 2, userValue);
@@ -10732,7 +10728,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production579UserAction(v1);
+        Object userValue = userActions.production579UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XandoperandNonterminal.getInstance(), 1, userValue);
@@ -10750,7 +10746,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production580UserAction(v1, v2);
+        Object userValue = userActions.production580UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XandoperandNonterminal.getInstance(), 2, userValue);
@@ -10767,7 +10763,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production581UserAction(v1);
+        Object userValue = userActions.production581UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XoroperandNonterminal.getInstance(), 1, userValue);
@@ -10786,7 +10782,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production582UserAction(v1, v2, v3);
+        Object userValue = userActions.production582UserAction(v1, v2, v3);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XoroperandNonterminal.getInstance(), 2, userValue);
@@ -10803,7 +10799,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production583UserAction(v1);
+        Object userValue = userActions.production583UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XequivoperandNonterminal.getInstance(), 1, userValue);
@@ -10822,7 +10818,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production584UserAction(v1, v2, v3);
+        Object userValue = userActions.production584UserAction(v1, v2, v3);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XequivoperandNonterminal.getInstance(), 2, userValue);
@@ -10839,7 +10835,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production585UserAction(v1);
+        Object userValue = userActions.production585UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.Xlevel5exprNonterminal.getInstance(), 1, userValue);
@@ -10858,7 +10854,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production586UserAction(v1, v2, v3);
+        Object userValue = userActions.production586UserAction(v1, v2, v3);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.Xlevel5exprNonterminal.getInstance(), 2, userValue);
@@ -10875,7 +10871,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production587UserAction(v1);
+        Object userValue = userActions.production587UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexprNonterminal.getInstance(), 1, userValue);
@@ -10894,7 +10890,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production588UserAction(v1, v2, v3);
+        Object userValue = userActions.production588UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XexprNonterminal.getInstance(), 3, userValue);
@@ -10915,7 +10911,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production589UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production589UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XsfexprlistNonterminal.getInstance(), 5, userValue);
@@ -10935,7 +10931,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production590UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production590UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XsfexprlistNonterminal.getInstance(), 4, userValue);
@@ -10955,7 +10951,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production591UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production591UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XsfexprlistNonterminal.getInstance(), 4, userValue);
@@ -10974,7 +10970,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production592UserAction(v1, v2, v3);
+        Object userValue = userActions.production592UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsfexprlistNonterminal.getInstance(), 3, userValue);
@@ -10994,7 +10990,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production593UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production593UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 4, userValue);
@@ -11015,7 +11011,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production594UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production594UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 5, userValue);
@@ -11038,7 +11034,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production595UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production595UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 7, userValue);
@@ -11062,7 +11058,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production596UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production596UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 8, userValue);
@@ -11086,7 +11082,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production597UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production597UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 8, userValue);
@@ -11111,7 +11107,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production598UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production598UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 9, userValue);
@@ -11135,7 +11131,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production599UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production599UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 8, userValue);
@@ -11160,7 +11156,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production600UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production600UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 9, userValue);
@@ -11182,7 +11178,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production601UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production601UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 6, userValue);
@@ -11208,7 +11204,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production602UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
+        Object userValue = userActions.production602UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 7, userValue);
@@ -11231,7 +11227,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production603UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production603UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 7, userValue);
@@ -11258,7 +11254,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production604UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
+        Object userValue = userActions.production604UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 8, userValue);
@@ -11283,7 +11279,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production605UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production605UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 9, userValue);
@@ -11312,7 +11308,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production606UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13);
+        Object userValue = userActions.production606UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13);
 
         // The production has 10 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 10, userValue);
@@ -11338,7 +11334,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production607UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
+        Object userValue = userActions.production607UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
 
         // The production has 10 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 10, userValue);
@@ -11368,7 +11364,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production608UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14);
+        Object userValue = userActions.production608UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14);
 
         // The production has 11 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 11, userValue);
@@ -11393,7 +11389,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production609UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production609UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 9, userValue);
@@ -11422,7 +11418,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production610UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13);
+        Object userValue = userActions.production610UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13);
 
         // The production has 10 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 10, userValue);
@@ -11448,7 +11444,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production611UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
+        Object userValue = userActions.production611UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
 
         // The production has 10 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 10, userValue);
@@ -11478,7 +11474,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production612UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14);
+        Object userValue = userActions.production612UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14);
 
         // The production has 11 symbols on its RHS
         parser.reduce(Nonterminal.XassignmentstmtNonterminal.getInstance(), 11, userValue);
@@ -11495,7 +11491,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production613UserAction(v1);
+        Object userValue = userActions.production613UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsfexprlistNonterminal.getInstance(), 1, userValue);
@@ -11513,7 +11509,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production614UserAction(v1, v2);
+        Object userValue = userActions.production614UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XsfexprlistNonterminal.getInstance(), 2, userValue);
@@ -11530,7 +11526,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production615UserAction(v1);
+        Object userValue = userActions.production615UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsfexprlistNonterminal.getInstance(), 1, userValue);
@@ -11548,7 +11544,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production616UserAction(v1, v2);
+        Object userValue = userActions.production616UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XsfexprlistNonterminal.getInstance(), 2, userValue);
@@ -11567,7 +11563,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production617UserAction(v1, v2, v3);
+        Object userValue = userActions.production617UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsfexprlistNonterminal.getInstance(), 3, userValue);
@@ -11586,7 +11582,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production618UserAction(v1, v2, v3);
+        Object userValue = userActions.production618UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsfexprlistNonterminal.getInstance(), 3, userValue);
@@ -11605,7 +11601,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production619UserAction(v1, v2, v3);
+        Object userValue = userActions.production619UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsfexprlistNonterminal.getInstance(), 3, userValue);
@@ -11625,7 +11621,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production620UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production620UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XsfexprlistNonterminal.getInstance(), 4, userValue);
@@ -11644,7 +11640,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production621UserAction(v1, v2, v3);
+        Object userValue = userActions.production621UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsfexprlistNonterminal.getInstance(), 3, userValue);
@@ -11664,7 +11660,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production622UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production622UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XsfexprlistNonterminal.getInstance(), 4, userValue);
@@ -11685,7 +11681,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production623UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production623UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XsfexprlistNonterminal.getInstance(), 5, userValue);
@@ -11702,7 +11698,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production624UserAction(v1);
+        Object userValue = userActions.production624UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsfexprNonterminal.getInstance(), 1, userValue);
@@ -11720,7 +11716,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production625UserAction(v1, v2);
+        Object userValue = userActions.production625UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XsfexprNonterminal.getInstance(), 2, userValue);
@@ -11739,7 +11735,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production626UserAction(v1, v2, v3);
+        Object userValue = userActions.production626UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsfexprNonterminal.getInstance(), 3, userValue);
@@ -11756,7 +11752,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production627UserAction(v1);
+        Object userValue = userActions.production627UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsftermNonterminal.getInstance(), 1, userValue);
@@ -11775,7 +11771,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production628UserAction(v1, v2, v3);
+        Object userValue = userActions.production628UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsftermNonterminal.getInstance(), 3, userValue);
@@ -11792,7 +11788,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production629UserAction(v1);
+        Object userValue = userActions.production629UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsffactorNonterminal.getInstance(), 1, userValue);
@@ -11811,7 +11807,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production630UserAction(v1, v2, v3);
+        Object userValue = userActions.production630UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsffactorNonterminal.getInstance(), 3, userValue);
@@ -11828,7 +11824,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production631UserAction(v1);
+        Object userValue = userActions.production631UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsfprimaryNonterminal.getInstance(), 1, userValue);
@@ -11845,7 +11841,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production632UserAction(v1);
+        Object userValue = userActions.production632UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsfprimaryNonterminal.getInstance(), 1, userValue);
@@ -11862,7 +11858,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production633UserAction(v1);
+        Object userValue = userActions.production633UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsfprimaryNonterminal.getInstance(), 1, userValue);
@@ -11879,7 +11875,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production634UserAction(v1);
+        Object userValue = userActions.production634UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsfprimaryNonterminal.getInstance(), 1, userValue);
@@ -11896,7 +11892,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production635UserAction(v1);
+        Object userValue = userActions.production635UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsfprimaryNonterminal.getInstance(), 1, userValue);
@@ -11915,7 +11911,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production636UserAction(v1, v2, v3);
+        Object userValue = userActions.production636UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsfprimaryNonterminal.getInstance(), 3, userValue);
@@ -11935,7 +11931,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production637UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production637UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XpointerassignmentstmtNonterminal.getInstance(), 4, userValue);
@@ -11956,7 +11952,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production638UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production638UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XpointerassignmentstmtNonterminal.getInstance(), 5, userValue);
@@ -11978,7 +11974,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production639UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production639UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XpointerassignmentstmtNonterminal.getInstance(), 6, userValue);
@@ -12001,7 +11997,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production640UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production640UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XpointerassignmentstmtNonterminal.getInstance(), 7, userValue);
@@ -12026,7 +12022,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production641UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production641UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XpointerassignmentstmtNonterminal.getInstance(), 9, userValue);
@@ -12052,7 +12048,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production642UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
+        Object userValue = userActions.production642UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
 
         // The production has 10 symbols on its RHS
         parser.reduce(Nonterminal.XpointerassignmentstmtNonterminal.getInstance(), 10, userValue);
@@ -12077,7 +12073,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production643UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production643UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XpointerassignmentstmtNonterminal.getInstance(), 9, userValue);
@@ -12103,7 +12099,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production644UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
+        Object userValue = userActions.production644UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
 
         // The production has 10 symbols on its RHS
         parser.reduce(Nonterminal.XpointerassignmentstmtNonterminal.getInstance(), 10, userValue);
@@ -12120,7 +12116,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production645UserAction(v1);
+        Object userValue = userActions.production645UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XtargetNonterminal.getInstance(), 1, userValue);
@@ -12141,7 +12137,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production646UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production646UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XwherestmtNonterminal.getInstance(), 5, userValue);
@@ -12163,7 +12159,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production647UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production647UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XwherestmtNonterminal.getInstance(), 6, userValue);
@@ -12181,7 +12177,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production648UserAction(v1, v2);
+        Object userValue = userActions.production648UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XwhereconstructNonterminal.getInstance(), 2, userValue);
@@ -12198,7 +12194,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production649UserAction(v1);
+        Object userValue = userActions.production649UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XwhererangeNonterminal.getInstance(), 1, userValue);
@@ -12216,7 +12212,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production650UserAction(v1, v2);
+        Object userValue = userActions.production650UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XwhererangeNonterminal.getInstance(), 2, userValue);
@@ -12233,7 +12229,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production651UserAction(v1);
+        Object userValue = userActions.production651UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XwhererangeNonterminal.getInstance(), 1, userValue);
@@ -12251,7 +12247,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production652UserAction(v1, v2);
+        Object userValue = userActions.production652UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XwhererangeNonterminal.getInstance(), 2, userValue);
@@ -12268,7 +12264,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production653UserAction(v1);
+        Object userValue = userActions.production653UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XwhererangeNonterminal.getInstance(), 1, userValue);
@@ -12286,7 +12282,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production654UserAction(v1, v2);
+        Object userValue = userActions.production654UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XwhererangeNonterminal.getInstance(), 2, userValue);
@@ -12304,7 +12300,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production655UserAction(v1, v2);
+        Object userValue = userActions.production655UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XmaskedelsewhereconstructNonterminal.getInstance(), 2, userValue);
@@ -12322,7 +12318,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production656UserAction(v1, v2);
+        Object userValue = userActions.production656UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XelsewhereconstructNonterminal.getInstance(), 2, userValue);
@@ -12339,7 +12335,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production657UserAction(v1);
+        Object userValue = userActions.production657UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XelsewherepartNonterminal.getInstance(), 1, userValue);
@@ -12357,7 +12353,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production658UserAction(v1, v2);
+        Object userValue = userActions.production658UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XelsewherepartNonterminal.getInstance(), 2, userValue);
@@ -12374,7 +12370,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production659UserAction(v1);
+        Object userValue = userActions.production659UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XwherebodyconstructblockNonterminal.getInstance(), 1, userValue);
@@ -12392,7 +12388,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production660UserAction(v1, v2);
+        Object userValue = userActions.production660UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XwherebodyconstructblockNonterminal.getInstance(), 2, userValue);
@@ -12415,7 +12411,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production661UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production661UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XwhereconstructstmtNonterminal.getInstance(), 7, userValue);
@@ -12439,7 +12435,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production662UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production662UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XwhereconstructstmtNonterminal.getInstance(), 8, userValue);
@@ -12460,7 +12456,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production663UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production663UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XwhereconstructstmtNonterminal.getInstance(), 5, userValue);
@@ -12482,7 +12478,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production664UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production664UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XwhereconstructstmtNonterminal.getInstance(), 6, userValue);
@@ -12499,7 +12495,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production665UserAction(v1);
+        Object userValue = userActions.production665UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XwherebodyconstructNonterminal.getInstance(), 1, userValue);
@@ -12516,7 +12512,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production666UserAction(v1);
+        Object userValue = userActions.production666UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XwherebodyconstructNonterminal.getInstance(), 1, userValue);
@@ -12533,7 +12529,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production667UserAction(v1);
+        Object userValue = userActions.production667UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XwherebodyconstructNonterminal.getInstance(), 1, userValue);
@@ -12550,7 +12546,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production668UserAction(v1);
+        Object userValue = userActions.production668UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XmaskexprNonterminal.getInstance(), 1, userValue);
@@ -12571,7 +12567,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production669UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production669UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XmaskedelsewherestmtNonterminal.getInstance(), 5, userValue);
@@ -12593,7 +12589,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production670UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production670UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XmaskedelsewherestmtNonterminal.getInstance(), 6, userValue);
@@ -12615,7 +12611,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production671UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production671UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XmaskedelsewherestmtNonterminal.getInstance(), 6, userValue);
@@ -12638,7 +12634,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production672UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production672UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XmaskedelsewherestmtNonterminal.getInstance(), 7, userValue);
@@ -12656,7 +12652,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production673UserAction(v1, v2);
+        Object userValue = userActions.production673UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XelsewherestmtNonterminal.getInstance(), 2, userValue);
@@ -12675,7 +12671,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production674UserAction(v1, v2, v3);
+        Object userValue = userActions.production674UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XelsewherestmtNonterminal.getInstance(), 3, userValue);
@@ -12694,7 +12690,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production675UserAction(v1, v2, v3);
+        Object userValue = userActions.production675UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XelsewherestmtNonterminal.getInstance(), 3, userValue);
@@ -12714,7 +12710,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production676UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production676UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XelsewherestmtNonterminal.getInstance(), 4, userValue);
@@ -12732,7 +12728,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production677UserAction(v1, v2);
+        Object userValue = userActions.production677UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XendwherestmtNonterminal.getInstance(), 2, userValue);
@@ -12751,7 +12747,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production678UserAction(v1, v2, v3);
+        Object userValue = userActions.production678UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendwherestmtNonterminal.getInstance(), 3, userValue);
@@ -12770,7 +12766,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production679UserAction(v1, v2, v3);
+        Object userValue = userActions.production679UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendwherestmtNonterminal.getInstance(), 3, userValue);
@@ -12790,7 +12786,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production680UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production680UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendwherestmtNonterminal.getInstance(), 4, userValue);
@@ -12809,7 +12805,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production681UserAction(v1, v2, v3);
+        Object userValue = userActions.production681UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendwherestmtNonterminal.getInstance(), 3, userValue);
@@ -12829,7 +12825,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production682UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production682UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendwherestmtNonterminal.getInstance(), 4, userValue);
@@ -12849,7 +12845,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production683UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production683UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendwherestmtNonterminal.getInstance(), 4, userValue);
@@ -12870,7 +12866,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production684UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production684UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XendwherestmtNonterminal.getInstance(), 5, userValue);
@@ -12888,7 +12884,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production685UserAction(v1, v2);
+        Object userValue = userActions.production685UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XforallconstructNonterminal.getInstance(), 2, userValue);
@@ -12907,7 +12903,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production686UserAction(v1, v2, v3);
+        Object userValue = userActions.production686UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XforallconstructNonterminal.getInstance(), 3, userValue);
@@ -12924,7 +12920,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production687UserAction(v1);
+        Object userValue = userActions.production687UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XforallbodyNonterminal.getInstance(), 1, userValue);
@@ -12942,7 +12938,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production688UserAction(v1, v2);
+        Object userValue = userActions.production688UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XforallbodyNonterminal.getInstance(), 2, userValue);
@@ -12961,7 +12957,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production689UserAction(v1, v2, v3);
+        Object userValue = userActions.production689UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XforallconstructstmtNonterminal.getInstance(), 3, userValue);
@@ -12981,7 +12977,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production690UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production690UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XforallconstructstmtNonterminal.getInstance(), 4, userValue);
@@ -13002,7 +12998,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production691UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production691UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XforallconstructstmtNonterminal.getInstance(), 5, userValue);
@@ -13024,7 +13020,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production692UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production692UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XforallconstructstmtNonterminal.getInstance(), 6, userValue);
@@ -13043,7 +13039,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production693UserAction(v1, v2, v3);
+        Object userValue = userActions.production693UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XforallheaderNonterminal.getInstance(), 3, userValue);
@@ -13064,7 +13060,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production694UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production694UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XforallheaderNonterminal.getInstance(), 5, userValue);
@@ -13081,7 +13077,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production695UserAction(v1);
+        Object userValue = userActions.production695UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XscalarmaskexprNonterminal.getInstance(), 1, userValue);
@@ -13102,7 +13098,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production696UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production696UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XforalltripletspeclistNonterminal.getInstance(), 5, userValue);
@@ -13125,7 +13121,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production697UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production697UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XforalltripletspeclistNonterminal.getInstance(), 7, userValue);
@@ -13142,7 +13138,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production698UserAction(v1);
+        Object userValue = userActions.production698UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XforallbodyconstructNonterminal.getInstance(), 1, userValue);
@@ -13159,7 +13155,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production699UserAction(v1);
+        Object userValue = userActions.production699UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XforallbodyconstructNonterminal.getInstance(), 1, userValue);
@@ -13176,7 +13172,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production700UserAction(v1);
+        Object userValue = userActions.production700UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XforallbodyconstructNonterminal.getInstance(), 1, userValue);
@@ -13193,7 +13189,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production701UserAction(v1);
+        Object userValue = userActions.production701UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XforallbodyconstructNonterminal.getInstance(), 1, userValue);
@@ -13210,7 +13206,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production702UserAction(v1);
+        Object userValue = userActions.production702UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XforallbodyconstructNonterminal.getInstance(), 1, userValue);
@@ -13227,7 +13223,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production703UserAction(v1);
+        Object userValue = userActions.production703UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XforallbodyconstructNonterminal.getInstance(), 1, userValue);
@@ -13246,7 +13242,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production704UserAction(v1, v2, v3);
+        Object userValue = userActions.production704UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendforallstmtNonterminal.getInstance(), 3, userValue);
@@ -13266,7 +13262,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production705UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production705UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendforallstmtNonterminal.getInstance(), 4, userValue);
@@ -13286,7 +13282,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production706UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production706UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendforallstmtNonterminal.getInstance(), 4, userValue);
@@ -13307,7 +13303,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production707UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production707UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XendforallstmtNonterminal.getInstance(), 5, userValue);
@@ -13325,7 +13321,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production708UserAction(v1, v2);
+        Object userValue = userActions.production708UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XendforallstmtNonterminal.getInstance(), 2, userValue);
@@ -13344,7 +13340,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production709UserAction(v1, v2, v3);
+        Object userValue = userActions.production709UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendforallstmtNonterminal.getInstance(), 3, userValue);
@@ -13363,7 +13359,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production710UserAction(v1, v2, v3);
+        Object userValue = userActions.production710UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendforallstmtNonterminal.getInstance(), 3, userValue);
@@ -13383,7 +13379,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production711UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production711UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendforallstmtNonterminal.getInstance(), 4, userValue);
@@ -13403,7 +13399,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production712UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production712UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XforallstmtNonterminal.getInstance(), 4, userValue);
@@ -13424,7 +13420,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production713UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production713UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XforallstmtNonterminal.getInstance(), 5, userValue);
@@ -13444,7 +13440,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production714UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production714UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XforallstmtNonterminal.getInstance(), 4, userValue);
@@ -13465,7 +13461,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production715UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production715UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XforallstmtNonterminal.getInstance(), 5, userValue);
@@ -13483,7 +13479,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production716UserAction(v1, v2);
+        Object userValue = userActions.production716UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XifconstructNonterminal.getInstance(), 2, userValue);
@@ -13500,7 +13496,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production717UserAction(v1);
+        Object userValue = userActions.production717UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XthenpartNonterminal.getInstance(), 1, userValue);
@@ -13518,7 +13514,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production718UserAction(v1, v2);
+        Object userValue = userActions.production718UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XthenpartNonterminal.getInstance(), 2, userValue);
@@ -13535,7 +13531,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production719UserAction(v1);
+        Object userValue = userActions.production719UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XthenpartNonterminal.getInstance(), 1, userValue);
@@ -13553,7 +13549,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production720UserAction(v1, v2);
+        Object userValue = userActions.production720UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XthenpartNonterminal.getInstance(), 2, userValue);
@@ -13570,7 +13566,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production721UserAction(v1);
+        Object userValue = userActions.production721UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XthenpartNonterminal.getInstance(), 1, userValue);
@@ -13588,7 +13584,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production722UserAction(v1, v2);
+        Object userValue = userActions.production722UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XthenpartNonterminal.getInstance(), 2, userValue);
@@ -13606,7 +13602,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production723UserAction(v1, v2);
+        Object userValue = userActions.production723UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XelseifconstructNonterminal.getInstance(), 2, userValue);
@@ -13624,7 +13620,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production724UserAction(v1, v2);
+        Object userValue = userActions.production724UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XelseconstructNonterminal.getInstance(), 2, userValue);
@@ -13641,7 +13637,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production725UserAction(v1);
+        Object userValue = userActions.production725UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XelsepartNonterminal.getInstance(), 1, userValue);
@@ -13659,7 +13655,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production726UserAction(v1, v2);
+        Object userValue = userActions.production726UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XelsepartNonterminal.getInstance(), 2, userValue);
@@ -13676,7 +13672,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production727UserAction(v1);
+        Object userValue = userActions.production727UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XconditionalbodyNonterminal.getInstance(), 1, userValue);
@@ -13694,7 +13690,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production728UserAction(v1, v2);
+        Object userValue = userActions.production728UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XconditionalbodyNonterminal.getInstance(), 2, userValue);
@@ -13716,7 +13712,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production729UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production729UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XifthenstmtNonterminal.getInstance(), 6, userValue);
@@ -13739,7 +13735,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production730UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production730UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XifthenstmtNonterminal.getInstance(), 7, userValue);
@@ -13763,7 +13759,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production731UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production731UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XifthenstmtNonterminal.getInstance(), 8, userValue);
@@ -13788,7 +13784,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production732UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production732UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XifthenstmtNonterminal.getInstance(), 9, userValue);
@@ -13810,7 +13806,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production733UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production733UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XelseifstmtNonterminal.getInstance(), 6, userValue);
@@ -13833,7 +13829,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production734UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production734UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XelseifstmtNonterminal.getInstance(), 7, userValue);
@@ -13856,7 +13852,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production735UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production735UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XelseifstmtNonterminal.getInstance(), 7, userValue);
@@ -13880,7 +13876,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production736UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production736UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XelseifstmtNonterminal.getInstance(), 8, userValue);
@@ -13903,7 +13899,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production737UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production737UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XelseifstmtNonterminal.getInstance(), 7, userValue);
@@ -13927,7 +13923,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production738UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production738UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XelseifstmtNonterminal.getInstance(), 8, userValue);
@@ -13951,7 +13947,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production739UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production739UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XelseifstmtNonterminal.getInstance(), 8, userValue);
@@ -13976,7 +13972,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production740UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production740UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XelseifstmtNonterminal.getInstance(), 9, userValue);
@@ -13994,7 +13990,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production741UserAction(v1, v2);
+        Object userValue = userActions.production741UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XelsestmtNonterminal.getInstance(), 2, userValue);
@@ -14013,7 +14009,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production742UserAction(v1, v2, v3);
+        Object userValue = userActions.production742UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XelsestmtNonterminal.getInstance(), 3, userValue);
@@ -14032,7 +14028,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production743UserAction(v1, v2, v3);
+        Object userValue = userActions.production743UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XelsestmtNonterminal.getInstance(), 3, userValue);
@@ -14052,7 +14048,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production744UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production744UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XelsestmtNonterminal.getInstance(), 4, userValue);
@@ -14070,7 +14066,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production745UserAction(v1, v2);
+        Object userValue = userActions.production745UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XendifstmtNonterminal.getInstance(), 2, userValue);
@@ -14089,7 +14085,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production746UserAction(v1, v2, v3);
+        Object userValue = userActions.production746UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendifstmtNonterminal.getInstance(), 3, userValue);
@@ -14108,7 +14104,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production747UserAction(v1, v2, v3);
+        Object userValue = userActions.production747UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendifstmtNonterminal.getInstance(), 3, userValue);
@@ -14128,7 +14124,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production748UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production748UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendifstmtNonterminal.getInstance(), 4, userValue);
@@ -14147,7 +14143,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production749UserAction(v1, v2, v3);
+        Object userValue = userActions.production749UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendifstmtNonterminal.getInstance(), 3, userValue);
@@ -14167,7 +14163,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production750UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production750UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendifstmtNonterminal.getInstance(), 4, userValue);
@@ -14187,7 +14183,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production751UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production751UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendifstmtNonterminal.getInstance(), 4, userValue);
@@ -14208,7 +14204,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production752UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production752UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XendifstmtNonterminal.getInstance(), 5, userValue);
@@ -14229,7 +14225,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production753UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production753UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XifstmtNonterminal.getInstance(), 5, userValue);
@@ -14251,7 +14247,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production754UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production754UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XifstmtNonterminal.getInstance(), 6, userValue);
@@ -14269,7 +14265,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production755UserAction(v1, v2);
+        Object userValue = userActions.production755UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XcaseconstructNonterminal.getInstance(), 2, userValue);
@@ -14287,7 +14283,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production756UserAction(v1, v2);
+        Object userValue = userActions.production756UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XselectcaserangeNonterminal.getInstance(), 2, userValue);
@@ -14304,7 +14300,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production757UserAction(v1);
+        Object userValue = userActions.production757UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XselectcaserangeNonterminal.getInstance(), 1, userValue);
@@ -14321,7 +14317,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production758UserAction(v1);
+        Object userValue = userActions.production758UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XselectcasebodyNonterminal.getInstance(), 1, userValue);
@@ -14339,7 +14335,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production759UserAction(v1, v2);
+        Object userValue = userActions.production759UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XselectcasebodyNonterminal.getInstance(), 2, userValue);
@@ -14356,7 +14352,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production760UserAction(v1);
+        Object userValue = userActions.production760UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcasebodyconstructNonterminal.getInstance(), 1, userValue);
@@ -14373,7 +14369,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production761UserAction(v1);
+        Object userValue = userActions.production761UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcasebodyconstructNonterminal.getInstance(), 1, userValue);
@@ -14396,7 +14392,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production762UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production762UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XselectcasestmtNonterminal.getInstance(), 7, userValue);
@@ -14420,7 +14416,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production763UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production763UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XselectcasestmtNonterminal.getInstance(), 8, userValue);
@@ -14441,7 +14437,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production764UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production764UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XselectcasestmtNonterminal.getInstance(), 5, userValue);
@@ -14463,7 +14459,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production765UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production765UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XselectcasestmtNonterminal.getInstance(), 6, userValue);
@@ -14487,7 +14483,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production766UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production766UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XselectcasestmtNonterminal.getInstance(), 8, userValue);
@@ -14512,7 +14508,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production767UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production767UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XselectcasestmtNonterminal.getInstance(), 9, userValue);
@@ -14534,7 +14530,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production768UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production768UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XselectcasestmtNonterminal.getInstance(), 6, userValue);
@@ -14557,7 +14553,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production769UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production769UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XselectcasestmtNonterminal.getInstance(), 7, userValue);
@@ -14576,7 +14572,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production770UserAction(v1, v2, v3);
+        Object userValue = userActions.production770UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcasestmtNonterminal.getInstance(), 3, userValue);
@@ -14596,7 +14592,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production771UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production771UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XcasestmtNonterminal.getInstance(), 4, userValue);
@@ -14616,7 +14612,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production772UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production772UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XcasestmtNonterminal.getInstance(), 4, userValue);
@@ -14637,7 +14633,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production773UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production773UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XcasestmtNonterminal.getInstance(), 5, userValue);
@@ -14655,7 +14651,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production774UserAction(v1, v2);
+        Object userValue = userActions.production774UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XendselectstmtNonterminal.getInstance(), 2, userValue);
@@ -14674,7 +14670,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production775UserAction(v1, v2, v3);
+        Object userValue = userActions.production775UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendselectstmtNonterminal.getInstance(), 3, userValue);
@@ -14693,7 +14689,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production776UserAction(v1, v2, v3);
+        Object userValue = userActions.production776UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendselectstmtNonterminal.getInstance(), 3, userValue);
@@ -14713,7 +14709,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production777UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production777UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendselectstmtNonterminal.getInstance(), 4, userValue);
@@ -14732,7 +14728,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production778UserAction(v1, v2, v3);
+        Object userValue = userActions.production778UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendselectstmtNonterminal.getInstance(), 3, userValue);
@@ -14752,7 +14748,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production779UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production779UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendselectstmtNonterminal.getInstance(), 4, userValue);
@@ -14772,7 +14768,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production780UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production780UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendselectstmtNonterminal.getInstance(), 4, userValue);
@@ -14793,7 +14789,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production781UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production781UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XendselectstmtNonterminal.getInstance(), 5, userValue);
@@ -14812,7 +14808,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production782UserAction(v1, v2, v3);
+        Object userValue = userActions.production782UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcaseselectorNonterminal.getInstance(), 3, userValue);
@@ -14829,7 +14825,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production783UserAction(v1);
+        Object userValue = userActions.production783UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcaseselectorNonterminal.getInstance(), 1, userValue);
@@ -14846,7 +14842,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production784UserAction(v1);
+        Object userValue = userActions.production784UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcasevaluerangelistNonterminal.getInstance(), 1, userValue);
@@ -14865,7 +14861,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production785UserAction(v1, v2, v3);
+        Object userValue = userActions.production785UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcasevaluerangelistNonterminal.getInstance(), 3, userValue);
@@ -14882,7 +14878,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production786UserAction(v1);
+        Object userValue = userActions.production786UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcasevaluerangeNonterminal.getInstance(), 1, userValue);
@@ -14900,7 +14896,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production787UserAction(v1, v2);
+        Object userValue = userActions.production787UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XcasevaluerangeNonterminal.getInstance(), 2, userValue);
@@ -14918,7 +14914,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production788UserAction(v1, v2);
+        Object userValue = userActions.production788UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XcasevaluerangeNonterminal.getInstance(), 2, userValue);
@@ -14937,7 +14933,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production789UserAction(v1, v2, v3);
+        Object userValue = userActions.production789UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcasevaluerangeNonterminal.getInstance(), 3, userValue);
@@ -14954,7 +14950,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production790UserAction(v1);
+        Object userValue = userActions.production790UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdoconstructNonterminal.getInstance(), 1, userValue);
@@ -14971,7 +14967,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production791UserAction(v1);
+        Object userValue = userActions.production791UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XblockdoconstructNonterminal.getInstance(), 1, userValue);
@@ -14991,7 +14987,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production792UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production792UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XlabeldostmtNonterminal.getInstance(), 4, userValue);
@@ -15012,7 +15008,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production793UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production793UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XlabeldostmtNonterminal.getInstance(), 5, userValue);
@@ -15031,7 +15027,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production794UserAction(v1, v2, v3);
+        Object userValue = userActions.production794UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XlabeldostmtNonterminal.getInstance(), 3, userValue);
@@ -15051,7 +15047,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production795UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production795UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XlabeldostmtNonterminal.getInstance(), 4, userValue);
@@ -15070,7 +15066,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production796UserAction(v1, v2, v3);
+        Object userValue = userActions.production796UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XlabeldostmtNonterminal.getInstance(), 3, userValue);
@@ -15090,7 +15086,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production797UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production797UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XlabeldostmtNonterminal.getInstance(), 4, userValue);
@@ -15108,7 +15104,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production798UserAction(v1, v2);
+        Object userValue = userActions.production798UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XlabeldostmtNonterminal.getInstance(), 2, userValue);
@@ -15127,7 +15123,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production799UserAction(v1, v2, v3);
+        Object userValue = userActions.production799UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XlabeldostmtNonterminal.getInstance(), 3, userValue);
@@ -15149,7 +15145,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production800UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production800UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XlabeldostmtNonterminal.getInstance(), 6, userValue);
@@ -15172,7 +15168,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production801UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production801UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XlabeldostmtNonterminal.getInstance(), 7, userValue);
@@ -15193,7 +15189,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production802UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production802UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XlabeldostmtNonterminal.getInstance(), 5, userValue);
@@ -15215,7 +15211,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production803UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production803UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XlabeldostmtNonterminal.getInstance(), 6, userValue);
@@ -15236,7 +15232,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production804UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production804UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XlabeldostmtNonterminal.getInstance(), 5, userValue);
@@ -15258,7 +15254,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production805UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production805UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XlabeldostmtNonterminal.getInstance(), 6, userValue);
@@ -15278,7 +15274,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production806UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production806UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XlabeldostmtNonterminal.getInstance(), 4, userValue);
@@ -15299,7 +15295,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production807UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production807UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XlabeldostmtNonterminal.getInstance(), 5, userValue);
@@ -15317,7 +15313,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production808UserAction(v1, v2);
+        Object userValue = userActions.production808UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XcommaloopcontrolNonterminal.getInstance(), 2, userValue);
@@ -15334,7 +15330,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production809UserAction(v1);
+        Object userValue = userActions.production809UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcommaloopcontrolNonterminal.getInstance(), 1, userValue);
@@ -15355,7 +15351,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production810UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production810UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XloopcontrolNonterminal.getInstance(), 5, userValue);
@@ -15378,7 +15374,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production811UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production811UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XloopcontrolNonterminal.getInstance(), 7, userValue);
@@ -15398,7 +15394,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production812UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production812UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XloopcontrolNonterminal.getInstance(), 4, userValue);
@@ -15416,7 +15412,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production813UserAction(v1, v2);
+        Object userValue = userActions.production813UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XenddostmtNonterminal.getInstance(), 2, userValue);
@@ -15435,7 +15431,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production814UserAction(v1, v2, v3);
+        Object userValue = userActions.production814UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XenddostmtNonterminal.getInstance(), 3, userValue);
@@ -15454,7 +15450,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production815UserAction(v1, v2, v3);
+        Object userValue = userActions.production815UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XenddostmtNonterminal.getInstance(), 3, userValue);
@@ -15474,7 +15470,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production816UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production816UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XenddostmtNonterminal.getInstance(), 4, userValue);
@@ -15493,7 +15489,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production817UserAction(v1, v2, v3);
+        Object userValue = userActions.production817UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XenddostmtNonterminal.getInstance(), 3, userValue);
@@ -15513,7 +15509,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production818UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production818UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XenddostmtNonterminal.getInstance(), 4, userValue);
@@ -15533,7 +15529,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production819UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production819UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XenddostmtNonterminal.getInstance(), 4, userValue);
@@ -15554,7 +15550,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production820UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production820UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XenddostmtNonterminal.getInstance(), 5, userValue);
@@ -15572,7 +15568,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production821UserAction(v1, v2);
+        Object userValue = userActions.production821UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XcyclestmtNonterminal.getInstance(), 2, userValue);
@@ -15591,7 +15587,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production822UserAction(v1, v2, v3);
+        Object userValue = userActions.production822UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcyclestmtNonterminal.getInstance(), 3, userValue);
@@ -15610,7 +15606,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production823UserAction(v1, v2, v3);
+        Object userValue = userActions.production823UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcyclestmtNonterminal.getInstance(), 3, userValue);
@@ -15630,7 +15626,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production824UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production824UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XcyclestmtNonterminal.getInstance(), 4, userValue);
@@ -15648,7 +15644,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production825UserAction(v1, v2);
+        Object userValue = userActions.production825UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XexitstmtNonterminal.getInstance(), 2, userValue);
@@ -15667,7 +15663,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production826UserAction(v1, v2, v3);
+        Object userValue = userActions.production826UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XexitstmtNonterminal.getInstance(), 3, userValue);
@@ -15686,7 +15682,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production827UserAction(v1, v2, v3);
+        Object userValue = userActions.production827UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XexitstmtNonterminal.getInstance(), 3, userValue);
@@ -15706,7 +15702,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production828UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production828UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XexitstmtNonterminal.getInstance(), 4, userValue);
@@ -15725,7 +15721,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production829UserAction(v1, v2, v3);
+        Object userValue = userActions.production829UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XgotostmtNonterminal.getInstance(), 3, userValue);
@@ -15745,7 +15741,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production830UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production830UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XgotostmtNonterminal.getInstance(), 4, userValue);
@@ -15762,7 +15758,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production831UserAction(v1);
+        Object userValue = userActions.production831UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.GotokwNonterminal.getInstance(), 1, userValue);
@@ -15780,7 +15776,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production832UserAction(v1, v2);
+        Object userValue = userActions.production832UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.GotokwNonterminal.getInstance(), 2, userValue);
@@ -15802,7 +15798,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production833UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production833UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XcomputedgotostmtNonterminal.getInstance(), 6, userValue);
@@ -15825,7 +15821,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production834UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production834UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XcomputedgotostmtNonterminal.getInstance(), 7, userValue);
@@ -15847,7 +15843,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production835UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production835UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XcomputedgotostmtNonterminal.getInstance(), 6, userValue);
@@ -15870,7 +15866,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production836UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production836UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XcomputedgotostmtNonterminal.getInstance(), 7, userValue);
@@ -15888,7 +15884,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production837UserAction(v1, v2);
+        Object userValue = userActions.production837UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XcommaexpNonterminal.getInstance(), 2, userValue);
@@ -15905,7 +15901,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production838UserAction(v1);
+        Object userValue = userActions.production838UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XlblreflistNonterminal.getInstance(), 1, userValue);
@@ -15924,7 +15920,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production839UserAction(v1, v2, v3);
+        Object userValue = userActions.production839UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XlblreflistNonterminal.getInstance(), 3, userValue);
@@ -15941,7 +15937,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production840UserAction(v1);
+        Object userValue = userActions.production840UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XlblrefNonterminal.getInstance(), 1, userValue);
@@ -15967,7 +15963,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production841UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
+        Object userValue = userActions.production841UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
 
         // The production has 10 symbols on its RHS
         parser.reduce(Nonterminal.XarithmeticifstmtNonterminal.getInstance(), 10, userValue);
@@ -15994,7 +15990,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production842UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
+        Object userValue = userActions.production842UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
 
         // The production has 11 symbols on its RHS
         parser.reduce(Nonterminal.XarithmeticifstmtNonterminal.getInstance(), 11, userValue);
@@ -16012,7 +16008,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production843UserAction(v1, v2);
+        Object userValue = userActions.production843UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XcontinuestmtNonterminal.getInstance(), 2, userValue);
@@ -16031,7 +16027,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production844UserAction(v1, v2, v3);
+        Object userValue = userActions.production844UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcontinuestmtNonterminal.getInstance(), 3, userValue);
@@ -16049,7 +16045,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production845UserAction(v1, v2);
+        Object userValue = userActions.production845UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XstopstmtNonterminal.getInstance(), 2, userValue);
@@ -16068,7 +16064,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production846UserAction(v1, v2, v3);
+        Object userValue = userActions.production846UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XstopstmtNonterminal.getInstance(), 3, userValue);
@@ -16087,7 +16083,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production847UserAction(v1, v2, v3);
+        Object userValue = userActions.production847UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XstopstmtNonterminal.getInstance(), 3, userValue);
@@ -16107,7 +16103,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production848UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production848UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XstopstmtNonterminal.getInstance(), 4, userValue);
@@ -16126,7 +16122,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production849UserAction(v1, v2, v3);
+        Object userValue = userActions.production849UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XstopstmtNonterminal.getInstance(), 3, userValue);
@@ -16146,7 +16142,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production850UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production850UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XstopstmtNonterminal.getInstance(), 4, userValue);
@@ -16163,7 +16159,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production851UserAction(v1);
+        Object userValue = userActions.production851UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XunitidentifierNonterminal.getInstance(), 1, userValue);
@@ -16180,7 +16176,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production852UserAction(v1);
+        Object userValue = userActions.production852UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XunitidentifierNonterminal.getInstance(), 1, userValue);
@@ -16201,7 +16197,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production853UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production853UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XopenstmtNonterminal.getInstance(), 5, userValue);
@@ -16223,7 +16219,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production854UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production854UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XopenstmtNonterminal.getInstance(), 6, userValue);
@@ -16240,7 +16236,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production855UserAction(v1);
+        Object userValue = userActions.production855UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XconnectspeclistNonterminal.getInstance(), 1, userValue);
@@ -16257,7 +16253,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production856UserAction(v1);
+        Object userValue = userActions.production856UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XconnectspeclistNonterminal.getInstance(), 1, userValue);
@@ -16276,7 +16272,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production857UserAction(v1, v2, v3);
+        Object userValue = userActions.production857UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XconnectspeclistNonterminal.getInstance(), 3, userValue);
@@ -16294,7 +16290,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production858UserAction(v1, v2);
+        Object userValue = userActions.production858UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XconnectspecNonterminal.getInstance(), 2, userValue);
@@ -16312,7 +16308,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production859UserAction(v1, v2);
+        Object userValue = userActions.production859UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XconnectspecNonterminal.getInstance(), 2, userValue);
@@ -16330,7 +16326,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production860UserAction(v1, v2);
+        Object userValue = userActions.production860UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XconnectspecNonterminal.getInstance(), 2, userValue);
@@ -16348,7 +16344,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production861UserAction(v1, v2);
+        Object userValue = userActions.production861UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XconnectspecNonterminal.getInstance(), 2, userValue);
@@ -16366,7 +16362,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production862UserAction(v1, v2);
+        Object userValue = userActions.production862UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XconnectspecNonterminal.getInstance(), 2, userValue);
@@ -16384,7 +16380,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production863UserAction(v1, v2);
+        Object userValue = userActions.production863UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XconnectspecNonterminal.getInstance(), 2, userValue);
@@ -16402,7 +16398,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production864UserAction(v1, v2);
+        Object userValue = userActions.production864UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XconnectspecNonterminal.getInstance(), 2, userValue);
@@ -16420,7 +16416,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production865UserAction(v1, v2);
+        Object userValue = userActions.production865UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XconnectspecNonterminal.getInstance(), 2, userValue);
@@ -16438,7 +16434,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production866UserAction(v1, v2);
+        Object userValue = userActions.production866UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XconnectspecNonterminal.getInstance(), 2, userValue);
@@ -16456,7 +16452,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production867UserAction(v1, v2);
+        Object userValue = userActions.production867UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XconnectspecNonterminal.getInstance(), 2, userValue);
@@ -16474,7 +16470,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production868UserAction(v1, v2);
+        Object userValue = userActions.production868UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XconnectspecNonterminal.getInstance(), 2, userValue);
@@ -16492,7 +16488,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production869UserAction(v1, v2);
+        Object userValue = userActions.production869UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XconnectspecNonterminal.getInstance(), 2, userValue);
@@ -16510,7 +16506,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production870UserAction(v1, v2);
+        Object userValue = userActions.production870UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XconnectspecNonterminal.getInstance(), 2, userValue);
@@ -16531,7 +16527,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production871UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production871UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XclosestmtNonterminal.getInstance(), 5, userValue);
@@ -16553,7 +16549,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production872UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production872UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XclosestmtNonterminal.getInstance(), 6, userValue);
@@ -16570,7 +16566,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production873UserAction(v1);
+        Object userValue = userActions.production873UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XclosespeclistNonterminal.getInstance(), 1, userValue);
@@ -16587,7 +16583,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production874UserAction(v1);
+        Object userValue = userActions.production874UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XclosespeclistNonterminal.getInstance(), 1, userValue);
@@ -16606,7 +16602,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production875UserAction(v1, v2, v3);
+        Object userValue = userActions.production875UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XclosespeclistNonterminal.getInstance(), 3, userValue);
@@ -16624,7 +16620,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production876UserAction(v1, v2);
+        Object userValue = userActions.production876UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XclosespecNonterminal.getInstance(), 2, userValue);
@@ -16642,7 +16638,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production877UserAction(v1, v2);
+        Object userValue = userActions.production877UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XclosespecNonterminal.getInstance(), 2, userValue);
@@ -16660,7 +16656,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production878UserAction(v1, v2);
+        Object userValue = userActions.production878UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XclosespecNonterminal.getInstance(), 2, userValue);
@@ -16678,7 +16674,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production879UserAction(v1, v2);
+        Object userValue = userActions.production879UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XclosespecNonterminal.getInstance(), 2, userValue);
@@ -16698,7 +16694,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production880UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production880UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XreadstmtNonterminal.getInstance(), 4, userValue);
@@ -16719,7 +16715,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production881UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production881UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XreadstmtNonterminal.getInstance(), 5, userValue);
@@ -16738,7 +16734,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production882UserAction(v1, v2, v3);
+        Object userValue = userActions.production882UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XreadstmtNonterminal.getInstance(), 3, userValue);
@@ -16758,7 +16754,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production883UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production883UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XreadstmtNonterminal.getInstance(), 4, userValue);
@@ -16779,7 +16775,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production884UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production884UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XreadstmtNonterminal.getInstance(), 5, userValue);
@@ -16801,7 +16797,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production885UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production885UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XreadstmtNonterminal.getInstance(), 6, userValue);
@@ -16820,7 +16816,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production886UserAction(v1, v2, v3);
+        Object userValue = userActions.production886UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XreadstmtNonterminal.getInstance(), 3, userValue);
@@ -16840,7 +16836,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production887UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production887UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XreadstmtNonterminal.getInstance(), 4, userValue);
@@ -16857,7 +16853,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production888UserAction(v1);
+        Object userValue = userActions.production888UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrdctlspecNonterminal.getInstance(), 1, userValue);
@@ -16876,7 +16872,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production889UserAction(v1, v2, v3);
+        Object userValue = userActions.production889UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XrdctlspecNonterminal.getInstance(), 3, userValue);
@@ -16895,7 +16891,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production890UserAction(v1, v2, v3);
+        Object userValue = userActions.production890UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XrdunitidNonterminal.getInstance(), 3, userValue);
@@ -16914,7 +16910,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production891UserAction(v1, v2, v3);
+        Object userValue = userActions.production891UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XrdunitidNonterminal.getInstance(), 3, userValue);
@@ -16933,7 +16929,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production892UserAction(v1, v2, v3);
+        Object userValue = userActions.production892UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XrdioctlspeclistNonterminal.getInstance(), 3, userValue);
@@ -16952,7 +16948,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production893UserAction(v1, v2, v3);
+        Object userValue = userActions.production893UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XrdioctlspeclistNonterminal.getInstance(), 3, userValue);
@@ -16969,7 +16965,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production894UserAction(v1);
+        Object userValue = userActions.production894UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrdioctlspeclistNonterminal.getInstance(), 1, userValue);
@@ -16988,7 +16984,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production895UserAction(v1, v2, v3);
+        Object userValue = userActions.production895UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XrdioctlspeclistNonterminal.getInstance(), 3, userValue);
@@ -17005,7 +17001,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production896UserAction(v1);
+        Object userValue = userActions.production896UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrdfmtidNonterminal.getInstance(), 1, userValue);
@@ -17022,7 +17018,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production897UserAction(v1);
+        Object userValue = userActions.production897UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrdfmtidNonterminal.getInstance(), 1, userValue);
@@ -17039,7 +17035,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production898UserAction(v1);
+        Object userValue = userActions.production898UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrdfmtidNonterminal.getInstance(), 1, userValue);
@@ -17058,7 +17054,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production899UserAction(v1, v2, v3);
+        Object userValue = userActions.production899UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XrdfmtidNonterminal.getInstance(), 3, userValue);
@@ -17077,7 +17073,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production900UserAction(v1, v2, v3);
+        Object userValue = userActions.production900UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XrdfmtidNonterminal.getInstance(), 3, userValue);
@@ -17096,7 +17092,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production901UserAction(v1, v2, v3);
+        Object userValue = userActions.production901UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XrdfmtidexprNonterminal.getInstance(), 3, userValue);
@@ -17118,7 +17114,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production902UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production902UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XwritestmtNonterminal.getInstance(), 6, userValue);
@@ -17141,7 +17137,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production903UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production903UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XwritestmtNonterminal.getInstance(), 7, userValue);
@@ -17162,7 +17158,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production904UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production904UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XwritestmtNonterminal.getInstance(), 5, userValue);
@@ -17184,7 +17180,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production905UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production905UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XwritestmtNonterminal.getInstance(), 6, userValue);
@@ -17205,7 +17201,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production906UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production906UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XprintstmtNonterminal.getInstance(), 5, userValue);
@@ -17227,7 +17223,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production907UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production907UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XprintstmtNonterminal.getInstance(), 6, userValue);
@@ -17246,7 +17242,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production908UserAction(v1, v2, v3);
+        Object userValue = userActions.production908UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XprintstmtNonterminal.getInstance(), 3, userValue);
@@ -17266,7 +17262,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production909UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production909UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XprintstmtNonterminal.getInstance(), 4, userValue);
@@ -17283,7 +17279,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production910UserAction(v1);
+        Object userValue = userActions.production910UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XiocontrolspeclistNonterminal.getInstance(), 1, userValue);
@@ -17302,7 +17298,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production911UserAction(v1, v2, v3);
+        Object userValue = userActions.production911UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XiocontrolspeclistNonterminal.getInstance(), 3, userValue);
@@ -17321,7 +17317,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production912UserAction(v1, v2, v3);
+        Object userValue = userActions.production912UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XiocontrolspeclistNonterminal.getInstance(), 3, userValue);
@@ -17338,7 +17334,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production913UserAction(v1);
+        Object userValue = userActions.production913UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XiocontrolspeclistNonterminal.getInstance(), 1, userValue);
@@ -17357,7 +17353,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production914UserAction(v1, v2, v3);
+        Object userValue = userActions.production914UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XiocontrolspeclistNonterminal.getInstance(), 3, userValue);
@@ -17375,7 +17371,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production915UserAction(v1, v2);
+        Object userValue = userActions.production915UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XiocontrolspecNonterminal.getInstance(), 2, userValue);
@@ -17393,7 +17389,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production916UserAction(v1, v2);
+        Object userValue = userActions.production916UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XiocontrolspecNonterminal.getInstance(), 2, userValue);
@@ -17411,7 +17407,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production917UserAction(v1, v2);
+        Object userValue = userActions.production917UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XiocontrolspecNonterminal.getInstance(), 2, userValue);
@@ -17429,7 +17425,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production918UserAction(v1, v2);
+        Object userValue = userActions.production918UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XiocontrolspecNonterminal.getInstance(), 2, userValue);
@@ -17447,7 +17443,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production919UserAction(v1, v2);
+        Object userValue = userActions.production919UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XiocontrolspecNonterminal.getInstance(), 2, userValue);
@@ -17465,7 +17461,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production920UserAction(v1, v2);
+        Object userValue = userActions.production920UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XiocontrolspecNonterminal.getInstance(), 2, userValue);
@@ -17483,7 +17479,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production921UserAction(v1, v2);
+        Object userValue = userActions.production921UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XiocontrolspecNonterminal.getInstance(), 2, userValue);
@@ -17501,7 +17497,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production922UserAction(v1, v2);
+        Object userValue = userActions.production922UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XiocontrolspecNonterminal.getInstance(), 2, userValue);
@@ -17519,7 +17515,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production923UserAction(v1, v2);
+        Object userValue = userActions.production923UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XiocontrolspecNonterminal.getInstance(), 2, userValue);
@@ -17537,7 +17533,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production924UserAction(v1, v2);
+        Object userValue = userActions.production924UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XiocontrolspecNonterminal.getInstance(), 2, userValue);
@@ -17554,7 +17550,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production925UserAction(v1);
+        Object userValue = userActions.production925UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XformatidentifierNonterminal.getInstance(), 1, userValue);
@@ -17571,7 +17567,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production926UserAction(v1);
+        Object userValue = userActions.production926UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XformatidentifierNonterminal.getInstance(), 1, userValue);
@@ -17588,7 +17584,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production927UserAction(v1);
+        Object userValue = userActions.production927UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XformatidentifierNonterminal.getInstance(), 1, userValue);
@@ -17605,7 +17601,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production928UserAction(v1);
+        Object userValue = userActions.production928UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XinputitemlistNonterminal.getInstance(), 1, userValue);
@@ -17624,7 +17620,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production929UserAction(v1, v2, v3);
+        Object userValue = userActions.production929UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XinputitemlistNonterminal.getInstance(), 3, userValue);
@@ -17641,7 +17637,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production930UserAction(v1);
+        Object userValue = userActions.production930UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XinputitemNonterminal.getInstance(), 1, userValue);
@@ -17658,7 +17654,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production931UserAction(v1);
+        Object userValue = userActions.production931UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XinputitemNonterminal.getInstance(), 1, userValue);
@@ -17675,7 +17671,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production932UserAction(v1);
+        Object userValue = userActions.production932UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XoutputitemlistNonterminal.getInstance(), 1, userValue);
@@ -17692,7 +17688,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production933UserAction(v1);
+        Object userValue = userActions.production933UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XoutputitemlistNonterminal.getInstance(), 1, userValue);
@@ -17711,7 +17707,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production934UserAction(v1, v2, v3);
+        Object userValue = userActions.production934UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.Xoutputitemlist1Nonterminal.getInstance(), 3, userValue);
@@ -17730,7 +17726,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production935UserAction(v1, v2, v3);
+        Object userValue = userActions.production935UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.Xoutputitemlist1Nonterminal.getInstance(), 3, userValue);
@@ -17747,7 +17743,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production936UserAction(v1);
+        Object userValue = userActions.production936UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.Xoutputitemlist1Nonterminal.getInstance(), 1, userValue);
@@ -17766,7 +17762,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production937UserAction(v1, v2, v3);
+        Object userValue = userActions.production937UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.Xoutputitemlist1Nonterminal.getInstance(), 3, userValue);
@@ -17785,7 +17781,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production938UserAction(v1, v2, v3);
+        Object userValue = userActions.production938UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.Xoutputitemlist1Nonterminal.getInstance(), 3, userValue);
@@ -17810,7 +17806,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production939UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production939UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XinputimplieddoNonterminal.getInstance(), 9, userValue);
@@ -17837,7 +17833,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production940UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
+        Object userValue = userActions.production940UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
 
         // The production has 11 symbols on its RHS
         parser.reduce(Nonterminal.XinputimplieddoNonterminal.getInstance(), 11, userValue);
@@ -17862,7 +17858,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production941UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production941UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XoutputimplieddoNonterminal.getInstance(), 9, userValue);
@@ -17889,7 +17885,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production942UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
+        Object userValue = userActions.production942UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
 
         // The production has 11 symbols on its RHS
         parser.reduce(Nonterminal.XoutputimplieddoNonterminal.getInstance(), 11, userValue);
@@ -17914,7 +17910,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production943UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Object userValue = userActions.production943UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 9 symbols on its RHS
         parser.reduce(Nonterminal.XoutputimplieddoNonterminal.getInstance(), 9, userValue);
@@ -17941,7 +17937,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production944UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
+        Object userValue = userActions.production944UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
 
         // The production has 11 symbols on its RHS
         parser.reduce(Nonterminal.XoutputimplieddoNonterminal.getInstance(), 11, userValue);
@@ -17960,7 +17956,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production945UserAction(v1, v2, v3);
+        Object userValue = userActions.production945UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XbackspacestmtNonterminal.getInstance(), 3, userValue);
@@ -17980,7 +17976,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production946UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production946UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XbackspacestmtNonterminal.getInstance(), 4, userValue);
@@ -18001,7 +17997,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production947UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production947UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XbackspacestmtNonterminal.getInstance(), 5, userValue);
@@ -18023,7 +18019,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production948UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production948UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XbackspacestmtNonterminal.getInstance(), 6, userValue);
@@ -18042,7 +18038,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production949UserAction(v1, v2, v3);
+        Object userValue = userActions.production949UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendfilestmtNonterminal.getInstance(), 3, userValue);
@@ -18062,7 +18058,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production950UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production950UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendfilestmtNonterminal.getInstance(), 4, userValue);
@@ -18083,7 +18079,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production951UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production951UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XendfilestmtNonterminal.getInstance(), 5, userValue);
@@ -18105,7 +18101,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production952UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production952UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XendfilestmtNonterminal.getInstance(), 6, userValue);
@@ -18125,7 +18121,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production953UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production953UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendfilestmtNonterminal.getInstance(), 4, userValue);
@@ -18146,7 +18142,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production954UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production954UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XendfilestmtNonterminal.getInstance(), 5, userValue);
@@ -18168,7 +18164,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production955UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production955UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XendfilestmtNonterminal.getInstance(), 6, userValue);
@@ -18191,7 +18187,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production956UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production956UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XendfilestmtNonterminal.getInstance(), 7, userValue);
@@ -18210,7 +18206,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production957UserAction(v1, v2, v3);
+        Object userValue = userActions.production957UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XrewindstmtNonterminal.getInstance(), 3, userValue);
@@ -18230,7 +18226,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production958UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production958UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XrewindstmtNonterminal.getInstance(), 4, userValue);
@@ -18251,7 +18247,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production959UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production959UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XrewindstmtNonterminal.getInstance(), 5, userValue);
@@ -18273,7 +18269,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production960UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production960UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XrewindstmtNonterminal.getInstance(), 6, userValue);
@@ -18292,7 +18288,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production961UserAction(v1, v2, v3);
+        Object userValue = userActions.production961UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XpositionspeclistNonterminal.getInstance(), 3, userValue);
@@ -18309,7 +18305,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production962UserAction(v1);
+        Object userValue = userActions.production962UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XpositionspeclistNonterminal.getInstance(), 1, userValue);
@@ -18328,7 +18324,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production963UserAction(v1, v2, v3);
+        Object userValue = userActions.production963UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XpositionspeclistNonterminal.getInstance(), 3, userValue);
@@ -18346,7 +18342,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production964UserAction(v1, v2);
+        Object userValue = userActions.production964UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XpositionspecNonterminal.getInstance(), 2, userValue);
@@ -18364,7 +18360,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production965UserAction(v1, v2);
+        Object userValue = userActions.production965UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XpositionspecNonterminal.getInstance(), 2, userValue);
@@ -18382,7 +18378,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production966UserAction(v1, v2);
+        Object userValue = userActions.production966UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XpositionspecNonterminal.getInstance(), 2, userValue);
@@ -18403,7 +18399,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production967UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production967UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XinquirestmtNonterminal.getInstance(), 5, userValue);
@@ -18425,7 +18421,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production968UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production968UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XinquirestmtNonterminal.getInstance(), 6, userValue);
@@ -18448,7 +18444,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production969UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production969UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XinquirestmtNonterminal.getInstance(), 7, userValue);
@@ -18472,7 +18468,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production970UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production970UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XinquirestmtNonterminal.getInstance(), 8, userValue);
@@ -18489,7 +18485,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production971UserAction(v1);
+        Object userValue = userActions.production971UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XinquirespeclistNonterminal.getInstance(), 1, userValue);
@@ -18506,7 +18502,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production972UserAction(v1);
+        Object userValue = userActions.production972UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XinquirespeclistNonterminal.getInstance(), 1, userValue);
@@ -18525,7 +18521,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production973UserAction(v1, v2, v3);
+        Object userValue = userActions.production973UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespeclistNonterminal.getInstance(), 3, userValue);
@@ -18543,7 +18539,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production974UserAction(v1, v2);
+        Object userValue = userActions.production974UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18561,7 +18557,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production975UserAction(v1, v2);
+        Object userValue = userActions.production975UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18579,7 +18575,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production976UserAction(v1, v2);
+        Object userValue = userActions.production976UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18597,7 +18593,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production977UserAction(v1, v2);
+        Object userValue = userActions.production977UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18615,7 +18611,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production978UserAction(v1, v2);
+        Object userValue = userActions.production978UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18633,7 +18629,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production979UserAction(v1, v2);
+        Object userValue = userActions.production979UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18651,7 +18647,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production980UserAction(v1, v2);
+        Object userValue = userActions.production980UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18669,7 +18665,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production981UserAction(v1, v2);
+        Object userValue = userActions.production981UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18687,7 +18683,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production982UserAction(v1, v2);
+        Object userValue = userActions.production982UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18705,7 +18701,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production983UserAction(v1, v2);
+        Object userValue = userActions.production983UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18723,7 +18719,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production984UserAction(v1, v2);
+        Object userValue = userActions.production984UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18741,7 +18737,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production985UserAction(v1, v2);
+        Object userValue = userActions.production985UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18759,7 +18755,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production986UserAction(v1, v2);
+        Object userValue = userActions.production986UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18777,7 +18773,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production987UserAction(v1, v2);
+        Object userValue = userActions.production987UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18795,7 +18791,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production988UserAction(v1, v2);
+        Object userValue = userActions.production988UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18813,7 +18809,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production989UserAction(v1, v2);
+        Object userValue = userActions.production989UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18831,7 +18827,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production990UserAction(v1, v2);
+        Object userValue = userActions.production990UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18849,7 +18845,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production991UserAction(v1, v2);
+        Object userValue = userActions.production991UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18867,7 +18863,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production992UserAction(v1, v2);
+        Object userValue = userActions.production992UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18885,7 +18881,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production993UserAction(v1, v2);
+        Object userValue = userActions.production993UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18903,7 +18899,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production994UserAction(v1, v2);
+        Object userValue = userActions.production994UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18921,7 +18917,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production995UserAction(v1, v2);
+        Object userValue = userActions.production995UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18939,7 +18935,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production996UserAction(v1, v2);
+        Object userValue = userActions.production996UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18957,7 +18953,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production997UserAction(v1, v2);
+        Object userValue = userActions.production997UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18975,7 +18971,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production998UserAction(v1, v2);
+        Object userValue = userActions.production998UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinquirespecNonterminal.getInstance(), 2, userValue);
@@ -18995,7 +18991,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production999UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production999UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XformatstmtNonterminal.getInstance(), 4, userValue);
@@ -19016,7 +19012,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1000UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1000UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XformatstmtNonterminal.getInstance(), 5, userValue);
@@ -19037,7 +19033,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1001UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1001UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XformatstmtNonterminal.getInstance(), 5, userValue);
@@ -19059,7 +19055,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1002UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production1002UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XformatstmtNonterminal.getInstance(), 6, userValue);
@@ -19076,7 +19072,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1003UserAction(v1);
+        Object userValue = userActions.production1003UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XfmtspecNonterminal.getInstance(), 1, userValue);
@@ -19093,7 +19089,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1004UserAction(v1);
+        Object userValue = userActions.production1004UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XfmtspecNonterminal.getInstance(), 1, userValue);
@@ -19111,7 +19107,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1005UserAction(v1, v2);
+        Object userValue = userActions.production1005UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XfmtspecNonterminal.getInstance(), 2, userValue);
@@ -19129,7 +19125,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1006UserAction(v1, v2);
+        Object userValue = userActions.production1006UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XfmtspecNonterminal.getInstance(), 2, userValue);
@@ -19148,7 +19144,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1007UserAction(v1, v2, v3);
+        Object userValue = userActions.production1007UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XfmtspecNonterminal.getInstance(), 3, userValue);
@@ -19167,7 +19163,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1008UserAction(v1, v2, v3);
+        Object userValue = userActions.production1008UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XfmtspecNonterminal.getInstance(), 3, userValue);
@@ -19186,7 +19182,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1009UserAction(v1, v2, v3);
+        Object userValue = userActions.production1009UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XfmtspecNonterminal.getInstance(), 3, userValue);
@@ -19206,7 +19202,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1010UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1010UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XfmtspecNonterminal.getInstance(), 4, userValue);
@@ -19223,7 +19219,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1011UserAction(v1);
+        Object userValue = userActions.production1011UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XformateditNonterminal.getInstance(), 1, userValue);
@@ -19241,7 +19237,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1012UserAction(v1, v2);
+        Object userValue = userActions.production1012UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XformateditNonterminal.getInstance(), 2, userValue);
@@ -19258,7 +19254,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1013UserAction(v1);
+        Object userValue = userActions.production1013UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XformateditNonterminal.getInstance(), 1, userValue);
@@ -19275,7 +19271,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1014UserAction(v1);
+        Object userValue = userActions.production1014UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XformateditNonterminal.getInstance(), 1, userValue);
@@ -19293,7 +19289,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1015UserAction(v1, v2);
+        Object userValue = userActions.production1015UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XformateditNonterminal.getInstance(), 2, userValue);
@@ -19312,7 +19308,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1016UserAction(v1, v2, v3);
+        Object userValue = userActions.production1016UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XformateditNonterminal.getInstance(), 3, userValue);
@@ -19329,7 +19325,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1017UserAction(v1);
+        Object userValue = userActions.production1017UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XeditelementNonterminal.getInstance(), 1, userValue);
@@ -19346,7 +19342,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1018UserAction(v1);
+        Object userValue = userActions.production1018UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XeditelementNonterminal.getInstance(), 1, userValue);
@@ -19363,7 +19359,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1019UserAction(v1);
+        Object userValue = userActions.production1019UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XeditelementNonterminal.getInstance(), 1, userValue);
@@ -19382,7 +19378,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1020UserAction(v1, v2, v3);
+        Object userValue = userActions.production1020UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XeditelementNonterminal.getInstance(), 3, userValue);
@@ -19399,7 +19395,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1021UserAction(v1);
+        Object userValue = userActions.production1021UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XeditelementNonterminal.getInstance(), 1, userValue);
@@ -19416,7 +19412,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1022UserAction(v1);
+        Object userValue = userActions.production1022UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XformatsepNonterminal.getInstance(), 1, userValue);
@@ -19433,7 +19429,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1023UserAction(v1);
+        Object userValue = userActions.production1023UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XformatsepNonterminal.getInstance(), 1, userValue);
@@ -19452,7 +19448,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1024UserAction(v1, v2, v3);
+        Token userValue = userActions.production1024UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XprogramstmtNonterminal.getInstance(), 3, userValue);
@@ -19472,7 +19468,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1025UserAction(v1, v2, v3, v4);
+        Token userValue = userActions.production1025UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XprogramstmtNonterminal.getInstance(), 4, userValue);
@@ -19490,7 +19486,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1026UserAction(v1, v2);
+        Object userValue = userActions.production1026UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XendprogramstmtNonterminal.getInstance(), 2, userValue);
@@ -19509,7 +19505,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1027UserAction(v1, v2, v3);
+        Object userValue = userActions.production1027UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendprogramstmtNonterminal.getInstance(), 3, userValue);
@@ -19527,7 +19523,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1028UserAction(v1, v2);
+        Object userValue = userActions.production1028UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XendprogramstmtNonterminal.getInstance(), 2, userValue);
@@ -19546,7 +19542,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1029UserAction(v1, v2, v3);
+        Object userValue = userActions.production1029UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendprogramstmtNonterminal.getInstance(), 3, userValue);
@@ -19565,7 +19561,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1030UserAction(v1, v2, v3);
+        Object userValue = userActions.production1030UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendprogramstmtNonterminal.getInstance(), 3, userValue);
@@ -19585,7 +19581,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1031UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1031UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendprogramstmtNonterminal.getInstance(), 4, userValue);
@@ -19604,7 +19600,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1032UserAction(v1, v2, v3);
+        Object userValue = userActions.production1032UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendprogramstmtNonterminal.getInstance(), 3, userValue);
@@ -19624,7 +19620,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1033UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1033UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendprogramstmtNonterminal.getInstance(), 4, userValue);
@@ -19644,7 +19640,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1034UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1034UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendprogramstmtNonterminal.getInstance(), 4, userValue);
@@ -19665,7 +19661,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1035UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1035UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XendprogramstmtNonterminal.getInstance(), 5, userValue);
@@ -19684,7 +19680,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1036UserAction(v1, v2, v3);
+        Token userValue = userActions.production1036UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XmodulestmtNonterminal.getInstance(), 3, userValue);
@@ -19704,7 +19700,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1037UserAction(v1, v2, v3, v4);
+        Token userValue = userActions.production1037UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XmodulestmtNonterminal.getInstance(), 4, userValue);
@@ -19722,7 +19718,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1038UserAction(v1, v2);
+        Object userValue = userActions.production1038UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XendmodulestmtNonterminal.getInstance(), 2, userValue);
@@ -19741,7 +19737,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1039UserAction(v1, v2, v3);
+        Object userValue = userActions.production1039UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendmodulestmtNonterminal.getInstance(), 3, userValue);
@@ -19759,7 +19755,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1040UserAction(v1, v2);
+        Object userValue = userActions.production1040UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XendmodulestmtNonterminal.getInstance(), 2, userValue);
@@ -19778,7 +19774,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1041UserAction(v1, v2, v3);
+        Object userValue = userActions.production1041UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendmodulestmtNonterminal.getInstance(), 3, userValue);
@@ -19797,7 +19793,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1042UserAction(v1, v2, v3);
+        Object userValue = userActions.production1042UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendmodulestmtNonterminal.getInstance(), 3, userValue);
@@ -19817,7 +19813,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1043UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1043UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendmodulestmtNonterminal.getInstance(), 4, userValue);
@@ -19836,7 +19832,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1044UserAction(v1, v2, v3);
+        Object userValue = userActions.production1044UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendmodulestmtNonterminal.getInstance(), 3, userValue);
@@ -19856,7 +19852,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1045UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1045UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendmodulestmtNonterminal.getInstance(), 4, userValue);
@@ -19876,7 +19872,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1046UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1046UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendmodulestmtNonterminal.getInstance(), 4, userValue);
@@ -19897,7 +19893,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1047UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1047UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XendmodulestmtNonterminal.getInstance(), 5, userValue);
@@ -19916,7 +19912,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1048UserAction(v1, v2, v3);
+        Object userValue = userActions.production1048UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XusestmtNonterminal.getInstance(), 3, userValue);
@@ -19936,7 +19932,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1049UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1049UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XusestmtNonterminal.getInstance(), 4, userValue);
@@ -19957,7 +19953,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1050UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1050UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XusestmtNonterminal.getInstance(), 5, userValue);
@@ -19979,7 +19975,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1051UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production1051UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XusestmtNonterminal.getInstance(), 6, userValue);
@@ -20001,7 +19997,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1052UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production1052UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XusestmtNonterminal.getInstance(), 6, userValue);
@@ -20024,7 +20020,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1053UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production1053UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XusestmtNonterminal.getInstance(), 7, userValue);
@@ -20047,7 +20043,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1054UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production1054UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XusestmtNonterminal.getInstance(), 7, userValue);
@@ -20071,7 +20067,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1055UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
+        Object userValue = userActions.production1055UserAction(v1, v2, v3, v4, v5, v6, v7, v8);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XusestmtNonterminal.getInstance(), 8, userValue);
@@ -20088,7 +20084,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1056UserAction(v1);
+        Object userValue = userActions.production1056UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XrenamelistNonterminal.getInstance(), 1, userValue);
@@ -20107,7 +20103,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1057UserAction(v1, v2, v3);
+        Object userValue = userActions.production1057UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XrenamelistNonterminal.getInstance(), 3, userValue);
@@ -20124,7 +20120,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1058UserAction(v1);
+        Object userValue = userActions.production1058UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XonlylistNonterminal.getInstance(), 1, userValue);
@@ -20143,7 +20139,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1059UserAction(v1, v2, v3);
+        Object userValue = userActions.production1059UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XonlylistNonterminal.getInstance(), 3, userValue);
@@ -20162,7 +20158,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1060UserAction(v1, v2, v3);
+        Object userValue = userActions.production1060UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XrenameNonterminal.getInstance(), 3, userValue);
@@ -20179,7 +20175,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1061UserAction(v1);
+        Object userValue = userActions.production1061UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XonlyNonterminal.getInstance(), 1, userValue);
@@ -20198,7 +20194,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1062UserAction(v1, v2, v3);
+        Object userValue = userActions.production1062UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XonlyNonterminal.getInstance(), 3, userValue);
@@ -20215,7 +20211,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1063UserAction(v1);
+        Object userValue = userActions.production1063UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XonlyNonterminal.getInstance(), 1, userValue);
@@ -20234,7 +20230,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1064UserAction(v1, v2, v3);
+        Token userValue = userActions.production1064UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XblockdatastmtNonterminal.getInstance(), 3, userValue);
@@ -20254,7 +20250,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1065UserAction(v1, v2, v3, v4);
+        Token userValue = userActions.production1065UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XblockdatastmtNonterminal.getInstance(), 4, userValue);
@@ -20272,7 +20268,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1066UserAction(v1, v2);
+        Token userValue = userActions.production1066UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XblockdatastmtNonterminal.getInstance(), 2, userValue);
@@ -20291,7 +20287,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1067UserAction(v1, v2, v3);
+        Token userValue = userActions.production1067UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XblockdatastmtNonterminal.getInstance(), 3, userValue);
@@ -20309,7 +20305,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1068UserAction(v1, v2);
+        Object userValue = userActions.production1068UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 2, userValue);
@@ -20328,7 +20324,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1069UserAction(v1, v2, v3);
+        Object userValue = userActions.production1069UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 3, userValue);
@@ -20346,7 +20342,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1070UserAction(v1, v2);
+        Object userValue = userActions.production1070UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 2, userValue);
@@ -20365,7 +20361,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1071UserAction(v1, v2, v3);
+        Object userValue = userActions.production1071UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 3, userValue);
@@ -20384,7 +20380,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1072UserAction(v1, v2, v3);
+        Object userValue = userActions.production1072UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 3, userValue);
@@ -20404,7 +20400,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1073UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1073UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 4, userValue);
@@ -20423,7 +20419,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1074UserAction(v1, v2, v3);
+        Object userValue = userActions.production1074UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 3, userValue);
@@ -20443,7 +20439,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1075UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1075UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 4, userValue);
@@ -20463,7 +20459,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1076UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1076UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 4, userValue);
@@ -20484,7 +20480,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1077UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1077UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 5, userValue);
@@ -20503,7 +20499,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1078UserAction(v1, v2, v3);
+        Object userValue = userActions.production1078UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 3, userValue);
@@ -20523,7 +20519,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1079UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1079UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 4, userValue);
@@ -20543,7 +20539,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1080UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1080UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 4, userValue);
@@ -20564,7 +20560,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1081UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1081UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 5, userValue);
@@ -20584,7 +20580,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1082UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1082UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 4, userValue);
@@ -20605,7 +20601,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1083UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1083UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 5, userValue);
@@ -20626,7 +20622,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1084UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1084UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 5, userValue);
@@ -20648,7 +20644,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1085UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production1085UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XendblockdatastmtNonterminal.getInstance(), 6, userValue);
@@ -20666,7 +20662,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1086UserAction(v1, v2);
+        Object userValue = userActions.production1086UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinterfaceblockNonterminal.getInstance(), 2, userValue);
@@ -20684,7 +20680,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1087UserAction(v1, v2);
+        Object userValue = userActions.production1087UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinterfacerangeNonterminal.getInstance(), 2, userValue);
@@ -20701,7 +20697,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1088UserAction(v1);
+        Object userValue = userActions.production1088UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XinterfaceblockbodyNonterminal.getInstance(), 1, userValue);
@@ -20719,7 +20715,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1089UserAction(v1, v2);
+        Object userValue = userActions.production1089UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinterfaceblockbodyNonterminal.getInstance(), 2, userValue);
@@ -20736,7 +20732,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1090UserAction(v1);
+        Object userValue = userActions.production1090UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XinterfacespecificationNonterminal.getInstance(), 1, userValue);
@@ -20753,7 +20749,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1091UserAction(v1);
+        Object userValue = userActions.production1091UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XinterfacespecificationNonterminal.getInstance(), 1, userValue);
@@ -20772,7 +20768,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1092UserAction(v1, v2, v3);
+        Object userValue = userActions.production1092UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XinterfacestmtNonterminal.getInstance(), 3, userValue);
@@ -20792,7 +20788,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1093UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1093UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XinterfacestmtNonterminal.getInstance(), 4, userValue);
@@ -20811,7 +20807,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1094UserAction(v1, v2, v3);
+        Object userValue = userActions.production1094UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XinterfacestmtNonterminal.getInstance(), 3, userValue);
@@ -20831,7 +20827,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1095UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1095UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XinterfacestmtNonterminal.getInstance(), 4, userValue);
@@ -20849,7 +20845,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1096UserAction(v1, v2);
+        Object userValue = userActions.production1096UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinterfacestmtNonterminal.getInstance(), 2, userValue);
@@ -20868,7 +20864,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1097UserAction(v1, v2, v3);
+        Object userValue = userActions.production1097UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XinterfacestmtNonterminal.getInstance(), 3, userValue);
@@ -20886,7 +20882,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1098UserAction(v1, v2);
+        Object userValue = userActions.production1098UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XendinterfacestmtNonterminal.getInstance(), 2, userValue);
@@ -20905,7 +20901,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1099UserAction(v1, v2, v3);
+        Object userValue = userActions.production1099UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendinterfacestmtNonterminal.getInstance(), 3, userValue);
@@ -20924,7 +20920,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1100UserAction(v1, v2, v3);
+        Object userValue = userActions.production1100UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendinterfacestmtNonterminal.getInstance(), 3, userValue);
@@ -20944,7 +20940,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1101UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1101UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendinterfacestmtNonterminal.getInstance(), 4, userValue);
@@ -20963,7 +20959,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1102UserAction(v1, v2, v3);
+        Object userValue = userActions.production1102UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendinterfacestmtNonterminal.getInstance(), 3, userValue);
@@ -20983,7 +20979,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1103UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1103UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendinterfacestmtNonterminal.getInstance(), 4, userValue);
@@ -21003,7 +20999,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1104UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1104UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendinterfacestmtNonterminal.getInstance(), 4, userValue);
@@ -21024,7 +21020,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1105UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1105UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XendinterfacestmtNonterminal.getInstance(), 5, userValue);
@@ -21042,7 +21038,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1106UserAction(v1, v2);
+        Object userValue = userActions.production1106UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinterfacebodyNonterminal.getInstance(), 2, userValue);
@@ -21060,7 +21056,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1107UserAction(v1, v2);
+        Object userValue = userActions.production1107UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XinterfacebodyNonterminal.getInstance(), 2, userValue);
@@ -21078,7 +21074,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1108UserAction(v1, v2);
+        Object userValue = userActions.production1108UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XfunctioninterfacerangeNonterminal.getInstance(), 2, userValue);
@@ -21095,7 +21091,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1109UserAction(v1);
+        Object userValue = userActions.production1109UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XfunctioninterfacerangeNonterminal.getInstance(), 1, userValue);
@@ -21113,7 +21109,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1110UserAction(v1, v2);
+        Object userValue = userActions.production1110UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutineinterfacerangeNonterminal.getInstance(), 2, userValue);
@@ -21130,7 +21126,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1111UserAction(v1);
+        Object userValue = userActions.production1111UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsubroutineinterfacerangeNonterminal.getInstance(), 1, userValue);
@@ -21147,7 +21143,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1112UserAction(v1);
+        Object userValue = userActions.production1112UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsubprograminterfacebodyNonterminal.getInstance(), 1, userValue);
@@ -21165,7 +21161,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1113UserAction(v1, v2);
+        Object userValue = userActions.production1113UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XsubprograminterfacebodyNonterminal.getInstance(), 2, userValue);
@@ -21185,7 +21181,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1114UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1114UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XmoduleprocedurestmtNonterminal.getInstance(), 4, userValue);
@@ -21206,7 +21202,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1115UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1115UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XmoduleprocedurestmtNonterminal.getInstance(), 5, userValue);
@@ -21223,7 +21219,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1116UserAction(v1);
+        Object userValue = userActions.production1116UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprocedurenamelistNonterminal.getInstance(), 1, userValue);
@@ -21242,7 +21238,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1117UserAction(v1, v2, v3);
+        Object userValue = userActions.production1117UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XprocedurenamelistNonterminal.getInstance(), 3, userValue);
@@ -21259,7 +21255,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1118UserAction(v1);
+        Object userValue = userActions.production1118UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprocedurenameNonterminal.getInstance(), 1, userValue);
@@ -21279,7 +21275,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1119UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1119UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XgenericspecNonterminal.getInstance(), 4, userValue);
@@ -21299,7 +21295,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1120UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1120UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XgenericspecNonterminal.getInstance(), 4, userValue);
@@ -21318,7 +21314,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1121UserAction(v1, v2, v3);
+        Object userValue = userActions.production1121UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XexternalstmtNonterminal.getInstance(), 3, userValue);
@@ -21338,7 +21334,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1122UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1122UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XexternalstmtNonterminal.getInstance(), 4, userValue);
@@ -21359,7 +21355,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1123UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1123UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XexternalstmtNonterminal.getInstance(), 5, userValue);
@@ -21381,7 +21377,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1124UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production1124UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XexternalstmtNonterminal.getInstance(), 6, userValue);
@@ -21398,7 +21394,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1125UserAction(v1);
+        Object userValue = userActions.production1125UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexternalnamelistNonterminal.getInstance(), 1, userValue);
@@ -21417,7 +21413,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1126UserAction(v1, v2, v3);
+        Object userValue = userActions.production1126UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XexternalnamelistNonterminal.getInstance(), 3, userValue);
@@ -21436,7 +21432,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1127UserAction(v1, v2, v3);
+        Object userValue = userActions.production1127UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XintrinsicstmtNonterminal.getInstance(), 3, userValue);
@@ -21456,7 +21452,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1128UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1128UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XintrinsicstmtNonterminal.getInstance(), 4, userValue);
@@ -21477,7 +21473,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1129UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1129UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XintrinsicstmtNonterminal.getInstance(), 5, userValue);
@@ -21499,7 +21495,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1130UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production1130UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XintrinsicstmtNonterminal.getInstance(), 6, userValue);
@@ -21516,7 +21512,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1131UserAction(v1);
+        Object userValue = userActions.production1131UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XintrinsiclistNonterminal.getInstance(), 1, userValue);
@@ -21535,7 +21531,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1132UserAction(v1, v2, v3);
+        Object userValue = userActions.production1132UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XintrinsiclistNonterminal.getInstance(), 3, userValue);
@@ -21554,7 +21550,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1133UserAction(v1, v2, v3);
+        Object userValue = userActions.production1133UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionreferenceNonterminal.getInstance(), 3, userValue);
@@ -21574,7 +21570,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1134UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1134UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionreferenceNonterminal.getInstance(), 4, userValue);
@@ -21593,7 +21589,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1135UserAction(v1, v2, v3);
+        Object userValue = userActions.production1135UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcallstmtNonterminal.getInstance(), 3, userValue);
@@ -21613,7 +21609,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1136UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1136UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XcallstmtNonterminal.getInstance(), 4, userValue);
@@ -21634,7 +21630,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1137UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1137UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XcallstmtNonterminal.getInstance(), 5, userValue);
@@ -21656,7 +21652,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1138UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production1138UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XcallstmtNonterminal.getInstance(), 6, userValue);
@@ -21678,7 +21674,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1139UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production1139UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XcallstmtNonterminal.getInstance(), 6, userValue);
@@ -21701,7 +21697,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1140UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production1140UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XcallstmtNonterminal.getInstance(), 7, userValue);
@@ -21718,7 +21714,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1141UserAction(v1);
+        Object userValue = userActions.production1141UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsubroutinearglistNonterminal.getInstance(), 1, userValue);
@@ -21736,7 +21732,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1142UserAction(v1, v2);
+        Object userValue = userActions.production1142UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutinearglistNonterminal.getInstance(), 2, userValue);
@@ -21755,7 +21751,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1143UserAction(v1, v2, v3);
+        Object userValue = userActions.production1143UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutinearglistNonterminal.getInstance(), 3, userValue);
@@ -21772,7 +21768,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1144UserAction(v1);
+        Object userValue = userActions.production1144UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XfunctionarglistNonterminal.getInstance(), 1, userValue);
@@ -21791,7 +21787,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1145UserAction(v1, v2, v3);
+        Object userValue = userActions.production1145UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionarglistNonterminal.getInstance(), 3, userValue);
@@ -21810,7 +21806,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1146UserAction(v1, v2, v3);
+        Object userValue = userActions.production1146UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionarglistNonterminal.getInstance(), 3, userValue);
@@ -21829,7 +21825,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1147UserAction(v1, v2, v3);
+        Object userValue = userActions.production1147UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionargNonterminal.getInstance(), 3, userValue);
@@ -21846,7 +21842,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1148UserAction(v1);
+        Object userValue = userActions.production1148UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsubroutineargNonterminal.getInstance(), 1, userValue);
@@ -21864,7 +21860,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1149UserAction(v1, v2);
+        Object userValue = userActions.production1149UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutineargNonterminal.getInstance(), 2, userValue);
@@ -21883,7 +21879,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1150UserAction(v1, v2, v3);
+        Object userValue = userActions.production1150UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutineargNonterminal.getInstance(), 3, userValue);
@@ -21903,7 +21899,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1151UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1151UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutineargNonterminal.getInstance(), 4, userValue);
@@ -21920,7 +21916,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1152UserAction(v1);
+        Object userValue = userActions.production1152UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsubroutineargNonterminal.getInstance(), 1, userValue);
@@ -21939,7 +21935,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1153UserAction(v1, v2, v3);
+        Object userValue = userActions.production1153UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutineargNonterminal.getInstance(), 3, userValue);
@@ -21960,7 +21956,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1154UserAction(v1, v2, v3, v4, v5);
+        Token userValue = userActions.production1154UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionstmtNonterminal.getInstance(), 5, userValue);
@@ -21985,7 +21981,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1155UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
+        Token userValue = userActions.production1155UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionstmtNonterminal.getInstance(), 6, userValue);
@@ -22007,7 +22003,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1156UserAction(v1, v2, v3, v4, v5, v6);
+        Token userValue = userActions.production1156UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionstmtNonterminal.getInstance(), 6, userValue);
@@ -22033,7 +22029,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1157UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
+        Token userValue = userActions.production1157UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionstmtNonterminal.getInstance(), 7, userValue);
@@ -22055,7 +22051,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1158UserAction(v1, v2, v3, v4, v5, v6);
+        Token userValue = userActions.production1158UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionstmtNonterminal.getInstance(), 6, userValue);
@@ -22081,7 +22077,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1159UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
+        Token userValue = userActions.production1159UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionstmtNonterminal.getInstance(), 7, userValue);
@@ -22104,7 +22100,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1160UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Token userValue = userActions.production1160UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionstmtNonterminal.getInstance(), 7, userValue);
@@ -22131,7 +22127,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1161UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
+        Token userValue = userActions.production1161UserAction(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11);
 
         // The production has 8 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionstmtNonterminal.getInstance(), 8, userValue);
@@ -22148,7 +22144,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1162UserAction(v1);
+        Object userValue = userActions.production1162UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XfunctionparsNonterminal.getInstance(), 1, userValue);
@@ -22166,7 +22162,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1163UserAction(v1, v2);
+        Object userValue = userActions.production1163UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionparsNonterminal.getInstance(), 2, userValue);
@@ -22185,7 +22181,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1164UserAction(v1, v2, v3);
+        Object userValue = userActions.production1164UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionparsNonterminal.getInstance(), 3, userValue);
@@ -22202,7 +22198,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1165UserAction(v1);
+        Object userValue = userActions.production1165UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XfunctionparNonterminal.getInstance(), 1, userValue);
@@ -22219,7 +22215,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1166UserAction(v1);
+        Object userValue = userActions.production1166UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XfunctionprefixNonterminal.getInstance(), 1, userValue);
@@ -22237,7 +22233,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1167UserAction(v1, v2);
+        Object userValue = userActions.production1167UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XfunctionprefixNonterminal.getInstance(), 2, userValue);
@@ -22254,7 +22250,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1168UserAction(v1);
+        Object userValue = userActions.production1168UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprefixspeclistNonterminal.getInstance(), 1, userValue);
@@ -22272,7 +22268,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1169UserAction(v1, v2);
+        Object userValue = userActions.production1169UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XprefixspeclistNonterminal.getInstance(), 2, userValue);
@@ -22289,7 +22285,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1170UserAction(v1);
+        Object userValue = userActions.production1170UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprefixspecNonterminal.getInstance(), 1, userValue);
@@ -22306,7 +22302,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1171UserAction(v1);
+        Object userValue = userActions.production1171UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprefixspecNonterminal.getInstance(), 1, userValue);
@@ -22323,7 +22319,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1172UserAction(v1);
+        Object userValue = userActions.production1172UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprefixspecNonterminal.getInstance(), 1, userValue);
@@ -22340,7 +22336,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1173UserAction(v1);
+        Object userValue = userActions.production1173UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprefixspecNonterminal.getInstance(), 1, userValue);
@@ -22358,7 +22354,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1174UserAction(v1, v2);
+        Object userValue = userActions.production1174UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XendfunctionstmtNonterminal.getInstance(), 2, userValue);
@@ -22377,7 +22373,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1175UserAction(v1, v2, v3);
+        Object userValue = userActions.production1175UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendfunctionstmtNonterminal.getInstance(), 3, userValue);
@@ -22395,7 +22391,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1176UserAction(v1, v2);
+        Object userValue = userActions.production1176UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XendfunctionstmtNonterminal.getInstance(), 2, userValue);
@@ -22414,7 +22410,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1177UserAction(v1, v2, v3);
+        Object userValue = userActions.production1177UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendfunctionstmtNonterminal.getInstance(), 3, userValue);
@@ -22433,7 +22429,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1178UserAction(v1, v2, v3);
+        Object userValue = userActions.production1178UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendfunctionstmtNonterminal.getInstance(), 3, userValue);
@@ -22453,7 +22449,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1179UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1179UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendfunctionstmtNonterminal.getInstance(), 4, userValue);
@@ -22472,7 +22468,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1180UserAction(v1, v2, v3);
+        Object userValue = userActions.production1180UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendfunctionstmtNonterminal.getInstance(), 3, userValue);
@@ -22492,7 +22488,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1181UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1181UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendfunctionstmtNonterminal.getInstance(), 4, userValue);
@@ -22512,7 +22508,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1182UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1182UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendfunctionstmtNonterminal.getInstance(), 4, userValue);
@@ -22533,7 +22529,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1183UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1183UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XendfunctionstmtNonterminal.getInstance(), 5, userValue);
@@ -22552,7 +22548,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1184UserAction(v1, v2, v3);
+        Token userValue = userActions.production1184UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutinestmtNonterminal.getInstance(), 3, userValue);
@@ -22574,7 +22570,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1185UserAction(v1, v2, v3, v4, v5, v6);
+        Token userValue = userActions.production1185UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutinestmtNonterminal.getInstance(), 4, userValue);
@@ -22594,7 +22590,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1186UserAction(v1, v2, v3, v4);
+        Token userValue = userActions.production1186UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutinestmtNonterminal.getInstance(), 4, userValue);
@@ -22617,7 +22613,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1187UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Token userValue = userActions.production1187UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutinestmtNonterminal.getInstance(), 5, userValue);
@@ -22634,7 +22630,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1188UserAction(v1);
+        Object userValue = userActions.production1188UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsubroutineprefixNonterminal.getInstance(), 1, userValue);
@@ -22652,7 +22648,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1189UserAction(v1, v2);
+        Object userValue = userActions.production1189UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutineprefixNonterminal.getInstance(), 2, userValue);
@@ -22669,7 +22665,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1190UserAction(v1);
+        Object userValue = userActions.production1190UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsubroutineparsNonterminal.getInstance(), 1, userValue);
@@ -22687,7 +22683,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1191UserAction(v1, v2);
+        Object userValue = userActions.production1191UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutineparsNonterminal.getInstance(), 2, userValue);
@@ -22706,7 +22702,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1192UserAction(v1, v2, v3);
+        Object userValue = userActions.production1192UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsubroutineparsNonterminal.getInstance(), 3, userValue);
@@ -22723,7 +22719,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1193UserAction(v1);
+        Object userValue = userActions.production1193UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsubroutineparNonterminal.getInstance(), 1, userValue);
@@ -22740,7 +22736,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1194UserAction(v1);
+        Object userValue = userActions.production1194UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsubroutineparNonterminal.getInstance(), 1, userValue);
@@ -22758,7 +22754,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1195UserAction(v1, v2);
+        Object userValue = userActions.production1195UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XendsubroutinestmtNonterminal.getInstance(), 2, userValue);
@@ -22777,7 +22773,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1196UserAction(v1, v2, v3);
+        Object userValue = userActions.production1196UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendsubroutinestmtNonterminal.getInstance(), 3, userValue);
@@ -22795,7 +22791,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1197UserAction(v1, v2);
+        Object userValue = userActions.production1197UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XendsubroutinestmtNonterminal.getInstance(), 2, userValue);
@@ -22814,7 +22810,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1198UserAction(v1, v2, v3);
+        Object userValue = userActions.production1198UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendsubroutinestmtNonterminal.getInstance(), 3, userValue);
@@ -22833,7 +22829,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1199UserAction(v1, v2, v3);
+        Object userValue = userActions.production1199UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendsubroutinestmtNonterminal.getInstance(), 3, userValue);
@@ -22853,7 +22849,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1200UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1200UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendsubroutinestmtNonterminal.getInstance(), 4, userValue);
@@ -22872,7 +22868,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1201UserAction(v1, v2, v3);
+        Object userValue = userActions.production1201UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XendsubroutinestmtNonterminal.getInstance(), 3, userValue);
@@ -22892,7 +22888,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1202UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1202UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendsubroutinestmtNonterminal.getInstance(), 4, userValue);
@@ -22912,7 +22908,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1203UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1203UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XendsubroutinestmtNonterminal.getInstance(), 4, userValue);
@@ -22933,7 +22929,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1204UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1204UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XendsubroutinestmtNonterminal.getInstance(), 5, userValue);
@@ -22952,7 +22948,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1205UserAction(v1, v2, v3);
+        Object userValue = userActions.production1205UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XentrystmtNonterminal.getInstance(), 3, userValue);
@@ -22974,7 +22970,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1206UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production1206UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XentrystmtNonterminal.getInstance(), 4, userValue);
@@ -22994,7 +22990,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1207UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1207UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XentrystmtNonterminal.getInstance(), 4, userValue);
@@ -23017,7 +23013,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1208UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production1208UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XentrystmtNonterminal.getInstance(), 5, userValue);
@@ -23035,7 +23031,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1209UserAction(v1, v2);
+        Object userValue = userActions.production1209UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XreturnstmtNonterminal.getInstance(), 2, userValue);
@@ -23054,7 +23050,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1210UserAction(v1, v2, v3);
+        Object userValue = userActions.production1210UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XreturnstmtNonterminal.getInstance(), 3, userValue);
@@ -23073,7 +23069,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1211UserAction(v1, v2, v3);
+        Object userValue = userActions.production1211UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XreturnstmtNonterminal.getInstance(), 3, userValue);
@@ -23093,7 +23089,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1212UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1212UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XreturnstmtNonterminal.getInstance(), 4, userValue);
@@ -23111,7 +23107,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1213UserAction(v1, v2);
+        Object userValue = userActions.production1213UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XcontainsstmtNonterminal.getInstance(), 2, userValue);
@@ -23130,7 +23126,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1214UserAction(v1, v2, v3);
+        Object userValue = userActions.production1214UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XcontainsstmtNonterminal.getInstance(), 3, userValue);
@@ -23148,7 +23144,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1215UserAction(v1, v2);
+        Object userValue = userActions.production1215UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XstmtfunctionstmtNonterminal.getInstance(), 2, userValue);
@@ -23167,7 +23163,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1216UserAction(v1, v2, v3);
+        Object userValue = userActions.production1216UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XstmtfunctionstmtNonterminal.getInstance(), 3, userValue);
@@ -23188,7 +23184,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1217UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1217UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XstmtfunctionrangeNonterminal.getInstance(), 5, userValue);
@@ -23210,7 +23206,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1218UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production1218UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XstmtfunctionrangeNonterminal.getInstance(), 6, userValue);
@@ -23227,7 +23223,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1219UserAction(v1);
+        Object userValue = userActions.production1219UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsfdummyargnamelistNonterminal.getInstance(), 1, userValue);
@@ -23246,7 +23242,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1220UserAction(v1, v2, v3);
+        Object userValue = userActions.production1220UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XsfdummyargnamelistNonterminal.getInstance(), 3, userValue);
@@ -23263,7 +23259,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1221UserAction(v1);
+        Object userValue = userActions.production1221UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XarraynameNonterminal.getInstance(), 1, userValue);
@@ -23280,7 +23276,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1222UserAction(v1);
+        Token userValue = userActions.production1222UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XblockdatanameNonterminal.getInstance(), 1, userValue);
@@ -23297,7 +23293,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1223UserAction(v1);
+        Object userValue = userActions.production1223UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcommonblocknameNonterminal.getInstance(), 1, userValue);
@@ -23314,7 +23310,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1224UserAction(v1);
+        Object userValue = userActions.production1224UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XcomponentnameNonterminal.getInstance(), 1, userValue);
@@ -23331,7 +23327,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1225UserAction(v1);
+        Object userValue = userActions.production1225UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XdummyargnameNonterminal.getInstance(), 1, userValue);
@@ -23348,7 +23344,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1226UserAction(v1);
+        Object userValue = userActions.production1226UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XendnameNonterminal.getInstance(), 1, userValue);
@@ -23365,7 +23361,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1227UserAction(v1);
+        Object userValue = userActions.production1227UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XentrynameNonterminal.getInstance(), 1, userValue);
@@ -23382,7 +23378,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1228UserAction(v1);
+        Object userValue = userActions.production1228UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XexternalnameNonterminal.getInstance(), 1, userValue);
@@ -23399,7 +23395,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1229UserAction(v1);
+        Token userValue = userActions.production1229UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XfunctionnameNonterminal.getInstance(), 1, userValue);
@@ -23416,7 +23412,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1230UserAction(v1);
+        Object userValue = userActions.production1230UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XgenericnameNonterminal.getInstance(), 1, userValue);
@@ -23433,7 +23429,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1231UserAction(v1);
+        Object userValue = userActions.production1231UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.TXimplieddovariableNonterminal.getInstance(), 1, userValue);
@@ -23450,7 +23446,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1232UserAction(v1);
+        Object userValue = userActions.production1232UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XintrinsicprocedurenameNonterminal.getInstance(), 1, userValue);
@@ -23467,7 +23463,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1233UserAction(v1);
+        Token userValue = userActions.production1233UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XmodulenameNonterminal.getInstance(), 1, userValue);
@@ -23484,7 +23480,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1234UserAction(v1);
+        Object userValue = userActions.production1234UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XnamelistgroupnameNonterminal.getInstance(), 1, userValue);
@@ -23501,7 +23497,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1235UserAction(v1);
+        Object userValue = userActions.production1235UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XobjectnameNonterminal.getInstance(), 1, userValue);
@@ -23518,7 +23514,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Token userValue = parserActions.production1236UserAction(v1);
+        Token userValue = userActions.production1236UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XprogramnameNonterminal.getInstance(), 1, userValue);
@@ -23535,7 +23531,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1237UserAction(v1);
+        Object userValue = userActions.production1237UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsfdummyargnameNonterminal.getInstance(), 1, userValue);
@@ -23552,7 +23548,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1238UserAction(v1);
+        Object userValue = userActions.production1238UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsfvarnameNonterminal.getInstance(), 1, userValue);
@@ -23569,7 +23565,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1239UserAction(v1);
+        Token userValue = userActions.production1239UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsubroutinenameNonterminal.getInstance(), 1, userValue);
@@ -23586,7 +23582,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1240UserAction(v1);
+        Object userValue = userActions.production1240UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XsubroutinenameuseNonterminal.getInstance(), 1, userValue);
@@ -23603,7 +23599,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1241UserAction(v1);
+        Object userValue = userActions.production1241UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XtypenameNonterminal.getInstance(), 1, userValue);
@@ -23620,7 +23616,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1242UserAction(v1);
+        Object userValue = userActions.production1242UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XusenameNonterminal.getInstance(), 1, userValue);
@@ -23637,7 +23633,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1243UserAction(v1);
+        Object userValue = userActions.production1243UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XlbldefNonterminal.getInstance(), 1, userValue);
@@ -23654,7 +23650,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1244UserAction(v1);
+        Object userValue = userActions.production1244UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -23671,7 +23667,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1245UserAction(v1);
+        Object userValue = userActions.production1245UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -23688,7 +23684,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1246UserAction(v1);
+        Object userValue = userActions.production1246UserAction(v1);
 
         // The production has 1 symbol on its RHS
         parser.reduce(Nonterminal.XactionstmtNonterminal.getInstance(), 1, userValue);
@@ -23706,7 +23702,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1247UserAction(v1, v2);
+        Object userValue = userActions.production1247UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XpausestmtNonterminal.getInstance(), 2, userValue);
@@ -23725,7 +23721,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1248UserAction(v1, v2, v3);
+        Object userValue = userActions.production1248UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XpausestmtNonterminal.getInstance(), 3, userValue);
@@ -23744,7 +23740,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1249UserAction(v1, v2, v3);
+        Object userValue = userActions.production1249UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XpausestmtNonterminal.getInstance(), 3, userValue);
@@ -23764,7 +23760,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1250UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1250UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XpausestmtNonterminal.getInstance(), 4, userValue);
@@ -23783,7 +23779,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1251UserAction(v1, v2, v3);
+        Object userValue = userActions.production1251UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XpausestmtNonterminal.getInstance(), 3, userValue);
@@ -23803,7 +23799,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1252UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1252UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XpausestmtNonterminal.getInstance(), 4, userValue);
@@ -23824,7 +23820,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Token v1 = (Token)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1253UserAction(v1, v2, v3, v4, v5);
+        Object userValue = userActions.production1253UserAction(v1, v2, v3, v4, v5);
 
         // The production has 5 symbols on its RHS
         parser.reduce(Nonterminal.XassignstmtNonterminal.getInstance(), 5, userValue);
@@ -23846,7 +23842,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1254UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production1254UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XassignstmtNonterminal.getInstance(), 6, userValue);
@@ -23865,7 +23861,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1255UserAction(v1, v2, v3);
+        Object userValue = userActions.production1255UserAction(v1, v2, v3);
 
         // The production has 3 symbols on its RHS
         parser.reduce(Nonterminal.XassignedgotostmtNonterminal.getInstance(), 3, userValue);
@@ -23885,7 +23881,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1256UserAction(v1, v2, v3, v4);
+        Object userValue = userActions.production1256UserAction(v1, v2, v3, v4);
 
         // The production has 4 symbols on its RHS
         parser.reduce(Nonterminal.XassignedgotostmtNonterminal.getInstance(), 4, userValue);
@@ -23907,7 +23903,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1257UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production1257UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XassignedgotostmtNonterminal.getInstance(), 6, userValue);
@@ -23930,7 +23926,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1258UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production1258UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XassignedgotostmtNonterminal.getInstance(), 7, userValue);
@@ -23952,7 +23948,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1259UserAction(v1, v2, v3, v4, v5, v6);
+        Object userValue = userActions.production1259UserAction(v1, v2, v3, v4, v5, v6);
 
         // The production has 6 symbols on its RHS
         parser.reduce(Nonterminal.XassignedgotostmtNonterminal.getInstance(), 6, userValue);
@@ -23975,7 +23971,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1260UserAction(v1, v2, v3, v4, v5, v6, v7);
+        Object userValue = userActions.production1260UserAction(v1, v2, v3, v4, v5, v6, v7);
 
         // The production has 7 symbols on its RHS
         parser.reduce(Nonterminal.XassignedgotostmtNonterminal.getInstance(), 7, userValue);
@@ -23993,7 +23989,7 @@ public class BuildModelProductionReductions implements AbstractProductionReducti
         Object v1 = (Object)valueStack.get(valueStack.size()-1); valueStack.remove(valueStack.size() - 1);
 
         // Run the user's code for this production
-        Object userValue = parserActions.production1261UserAction(v1, v2);
+        Object userValue = userActions.production1261UserAction(v1, v2);
 
         // The production has 2 symbols on its RHS
         parser.reduce(Nonterminal.XvariablecommaNonterminal.getInstance(), 2, userValue);
