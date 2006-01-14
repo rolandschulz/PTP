@@ -2,87 +2,81 @@
 
 package org.eclipse.photran.internal.core.f95parser;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.eclipse.cdt.core.model.CModelException;
+import java.util.HashMap;
+import java.util.Iterator;
 import org.eclipse.photran.internal.core.model.FortranElement;
+import org.eclipse.cdt.core.model.CModelException;
+
 
 /**
  * User-specified actions, called when the parser is about to
  * reduce by a certain production
  */
-public class BuildModelParserAction implements AbstractParserUserActions
+public class BuildModelParserAction implements AbstractParserAction
 {
     private BuildModelParserAction() {;} // Singleton
-    private static final BuildModelParserAction singletonInstance = new BuildModelParserAction();
-    public static final BuildModelParserAction getInstance() { return singletonInstance; }
+    private static BuildModelParserAction singletonInstance = null;
+    public static final BuildModelParserAction getInstance() { if (singletonInstance == null) singletonInstance = new BuildModelParserAction(); return singletonInstance; }
 
-    /**
-     * Returns the production reductions associated with these user actions
-     */
-    public AbstractProductionReductions getProductionReductions()
-    {
-        return BuildModelProductionReductions.getInstance();
-    }
 
-    private class M
+private class M
     {
-        private Map/*<FortranElement, FOrtranElementInfo> */ allElements = new HashMap();
-        
-        public Map/*<FortranElement, FOrtranElementInfo> */ getAllElements()
+        private Map/*<FortranElement, FortranElementInfo>*/ allElements = new HashMap();
+    
+        public Map/*<FortranElement, FortranElementInfo>*/ getAllElements()
         {
             return allElements;
         }
-
-        public List/* <FortranElement> */list(List list, FortranElement node)
+    
+        public List/*<FortranElement>*/list(List list, FortranElement node)
         {
             if (list == null) list = new LinkedList();
             if (node != null) list.add(node);
             return list;
         }
-
-        public List/* <FortranElement> */list(FortranElement node)
+    
+        public List/*<FortranElement>*/list(FortranElement node)
         {
             return list(new LinkedList(), node);
         }
-
-        public FortranElement mainProgram(Token nameToken, List/* <FortranElement> */children)
+    
+        public FortranElement mainProgram(Token nameToken, List/*<FortranElement>*/children)
         {
             FortranElement e = new FortranElement.MainProgram(null, nameToken);
             reparent(children, e);
             return newElement(e);
         }
-
-        public FortranElement module(Token nameToken, List/* <FortranElement> */children)
+    
+        public FortranElement module(Token nameToken, List/*<FortranElement>*/children)
         {
             FortranElement e = new FortranElement.Module(null, nameToken);
             reparent(children, e);
             return newElement(e);
         }
-
+    
         public FortranElement functionSubprogram(Token nameToken)
         {
             return newElement(new FortranElement.Function(null, nameToken));
         }
-
+    
         public FortranElement subroutineSubprogram(Token nameToken)
         {
             return newElement(new FortranElement.Subroutine(null, nameToken));
         }
-
+    
         public FortranElement blockData(Token nameToken)
         {
             return newElement(new FortranElement.BlockData(null, nameToken));
         }
-
+    
         private void reparent(List children, FortranElement parent)
         {
             if (children == null) return;
-
+    
             //try
             //{
                 Iterator it = children.iterator();
@@ -99,7 +93,7 @@ public class BuildModelParserAction implements AbstractParserUserActions
             //    x.printStackTrace();
             //}
         }
-        
+    
         private FortranElement newElement(FortranElement e)
         {
             try { allElements.put(e, e.getElementInfo()); }
@@ -107,8 +101,17 @@ public class BuildModelParserAction implements AbstractParserUserActions
             return e;
         }
     }
-
+    
     protected M m = new M();
+    
+    
+    /**
+     * Returns the production reductions associated with these user actions
+     */
+    public AbstractProductionReductions getProductionReductions()
+    {
+        return BuildModelProductionReductions.getInstance();
+    }
 
     /**
      * This method is called before parsing begins

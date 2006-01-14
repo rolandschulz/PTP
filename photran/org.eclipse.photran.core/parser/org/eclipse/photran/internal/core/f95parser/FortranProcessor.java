@@ -90,7 +90,7 @@ public class FortranProcessor
         return newElements;
     }
 
-    private Object parse(InputStream inputStream, String filename, boolean isFixedForm, Parser parser, AbstractParserUserActions parseAction) throws Exception
+    private Object parse(InputStream inputStream, String filename, boolean isFixedForm, Parser parser, AbstractParserAction parseAction) throws Exception
     {
         ILexer lexer = Lexer.createLexer(inputStream, filename, isFixedForm);
 

@@ -2,11 +2,15 @@
 
 package org.eclipse.photran.internal.core.f95parser;
 
+import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import java.util.HashMap;
+import java.util.Iterator;
 import org.eclipse.photran.internal.core.model.FortranElement;
+import org.eclipse.cdt.core.model.CModelException;
+
 
 /**
  * Represents the parsing state corresponding to
@@ -14,8 +18,8 @@ import org.eclipse.photran.internal.core.model.FortranElement;
 public class BuildModelProductionReductions implements AbstractProductionReductions
 {
     private BuildModelProductionReductions() {;} // Singleton
-    private static final BuildModelProductionReductions singletonInstance = new BuildModelProductionReductions();
-    public static final BuildModelProductionReductions getInstance() { return singletonInstance; }
+    private static BuildModelProductionReductions singletonInstance = null;
+    public static final BuildModelProductionReductions getInstance() { if (singletonInstance == null) singletonInstance = new BuildModelProductionReductions(); return singletonInstance; }
 
     /**
      * Contains the user code that should be run upon a each reduction
