@@ -535,7 +535,7 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPCDIE
 			fireTerminateEvent();
 		}
 	}
-	protected void cleanup() {
+	public void cleanup() {
 		resetStatus();
 		removeAllThreads();
 		getCDISession().getEventManager().removeEventListener(this);

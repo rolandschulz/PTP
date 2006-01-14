@@ -76,7 +76,9 @@ public class PLaunch extends Launch implements IPLaunch {
 		int[] taskArray = tasks.toArray();
 		for (int i=0; i<taskArray.length; i++) {
 			pJob.findProcessByTaskId(taskArray[i]).setAttribute(AttributeConstants.ATTRIB_ISREGISTERED, new Boolean(false));
-			removeDebugTarget(getDebugTarget(taskArray[i]));
+			IPDebugTarget debugTarget = getDebugTarget(taskArray[i]);
+			removeDebugTarget(debugTarget);
+			debugTarget.cleanup();
 		}
 		if (sendEvent)
 			fireEvent(new PDebugTargetUnRegisterEvent(pJob, tasks));

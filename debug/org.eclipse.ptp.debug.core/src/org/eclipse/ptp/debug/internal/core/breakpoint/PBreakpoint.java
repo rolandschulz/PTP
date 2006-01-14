@@ -134,10 +134,7 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 		setAttribute(JOB_ID, id);
 	}
 	public String getJobName() throws CoreException {
-		String name = ensureMarker().getAttribute(JOB_NAME, "");
-		if (name.equals(IPBreakpoint.GLOBAL))
-			return name + " ";
-		return "Job: " + name + " ";
+		return ensureMarker().getAttribute(JOB_NAME, "");
 	}
 	public void setJobName(String name) throws CoreException {
 		setAttribute(JOB_NAME, name);
@@ -236,5 +233,9 @@ public abstract class PBreakpoint extends Breakpoint implements IPBreakpoint {
 		if (threads != null && threads.length > 0) {
 			fFilteredThreadsByTarget.put(threads[0].getDebugTarget(), new HashSet(Arrays.asList(threads)));
 		}
+	}
+	
+	public String getJobSetFormat() throws CoreException {
+		return "{" + getJobName() + ":" + getSetId() + "}";		
 	}
 }

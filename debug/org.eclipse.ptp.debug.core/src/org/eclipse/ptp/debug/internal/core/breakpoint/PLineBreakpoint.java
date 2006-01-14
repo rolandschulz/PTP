@@ -46,6 +46,6 @@ public class PLineBreakpoint extends AbstractLineBreakpoint {
 		if (fileName != null && fileName.length() > 0) {
 			fileName = ' ' + fileName + ' ';
 		}
-		return getJobName() + MessageFormat.format(BreakpointMessages.getString("PLineBreakpoint"), new Object[] { getSetId(), fileName, new Integer( getLineNumber() ), getConditionText() });
+		return getJobSetFormat() + " " + MessageFormat.format(BreakpointMessages.getString("PLineBreakpoint"), new Object[] { fileName, new Integer(getLineNumber()), getConditionText() });
 	}
 }
