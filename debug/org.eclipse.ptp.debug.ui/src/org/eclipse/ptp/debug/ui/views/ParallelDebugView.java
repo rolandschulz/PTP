@@ -46,6 +46,7 @@ import org.eclipse.ptp.ui.actions.ParallelAction;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
+import org.eclipse.ptp.ui.views.IIconCanvasActionListener;
 import org.eclipse.ptp.ui.views.ParallelJobView;
 
 /**
@@ -109,6 +110,21 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		toolBarMgr.appendToGroup(IPTPUIConstants.IUIACTIONGROUP, unregisterAction);
 		super.buildInToolBarActions(toolBarMgr);
 	}
+	/*******************************************************************************************************************************************************************************************************************************************************************************************************
+	 * IIconCanvasActionListener
+	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	public void handleAction(int type, int index) {
+		IElement element = canvas.getElement(index);
+		if (type == IIconCanvasActionListener.SELECTION_ACTION) {
+			if (element.isRegistered()) {
+				IPJob job = ((UIDebugManager) manager).findJobById(getCurrentID());
+				((UIDebugManager) manager).focusOnDebugTarget(job, Integer.parseInt(element.getName()));
+			}
+		}
+		else if (type == IIconCanvasActionListener.DOUBLE_CLICK_ACTION) {
+			doubleClick(element);
+		}
+	}
 	public void doubleClick(IElement element) {
 		try {
 			registerElement(element);
@@ -127,7 +143,7 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 		if (proc == null)
 			return " Unknow process";
 		StringBuffer buffer = new StringBuffer();
-		buffer.append(" Tast ID: " + proc.getTaskId());
+		buffer.append(" Task ID: " + proc.getTaskId());
 		buffer.append("\n");
 		buffer.append(" Process ID: " + proc.getPid());
 		IElementSet[] groups = setManager.getSetsWithElement(element.getID());

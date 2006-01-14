@@ -109,7 +109,7 @@ public class PDebugTextHover implements ICEditorTextHover, ITextHoverExtension, 
 		if (value.length() > MAX_HOVER_INFO_SIZE)
 			value = value.substring(0, MAX_HOVER_INFO_SIZE) + " ...";
 		buffer.append("<p>");
-		buffer.append("<pre>").append("(Task " + taskID + "): ").append(expression).append("</pre>");
+		buffer.append("<pre>").append(taskID + ": ").append(expression).append("</pre>");
 		buffer.append(" = ");
 		buffer.append("<b><pre>").append(value).append("</pre></b>");
 		buffer.append("</p>");
