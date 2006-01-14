@@ -42,7 +42,7 @@ public class EnableDisableBreakpointRulerAction extends AbstractBreakpointRulerA
 			try {
 				getBreakpoint().setEnabled(!getBreakpoint().isEnabled());
 			} catch (CoreException e) {
-				ErrorDialog.openError(getTargetPart().getSite().getShell(), ActionMessages.getString("EnableDisableBreakpointRulerAction.Enabling_disabling_breakpoints_1"), ActionMessages.getString( "EnableDisableBreakpointRulerAction.Exceptions_occurred_enabling_or_disabling_breakpoint_1" ), e.getStatus());
+				ErrorDialog.openError(getTargetPart().getSite().getShell(), ActionMessages.getString("EnableDisableBreakpointRulerAction.Enabling_disabling_breakpoints_1"), ActionMessages.getString("EnableDisableBreakpointRulerAction.Exceptions_occurred_enabling_or_disabling_breakpoint_1"), e.getStatus());
 			}
 		}
 	}

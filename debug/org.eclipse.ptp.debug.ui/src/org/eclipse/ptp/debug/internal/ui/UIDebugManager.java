@@ -38,6 +38,10 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
+import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.debug.ui.IDebugView;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PreferenceConstants;
@@ -59,6 +63,7 @@ import org.eclipse.ptp.debug.core.launch.IPLaunchListener;
 import org.eclipse.ptp.debug.core.launch.PDebugTargetRegisterEvent;
 import org.eclipse.ptp.debug.core.launch.PDebugTargetUnRegisterEvent;
 import org.eclipse.ptp.debug.core.launch.PLaunchStartedEvent;
+import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.external.IAbstractDebugger;
 import org.eclipse.ptp.debug.external.cdi.BreakpointHitInfo;
 import org.eclipse.ptp.debug.external.cdi.EndSteppingRangeInfo;
@@ -79,11 +84,13 @@ import org.eclipse.ptp.debug.ui.listeners.IDebugActionUpdateListener;
 import org.eclipse.ptp.debug.ui.listeners.IRegListener;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.ui.OutputConsole;
+import org.eclipse.ptp.ui.UIUtils;
 import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IViewPart;
 
 /**
  * @author clement chu
@@ -248,6 +255,25 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		}
 		// firePaintListener(null);
 	}
+	public void focusOnDebugTarget(IPJob job, int task_id) {
+		IPCDISession session = getDebugSession(job);
+		if (session != null) {
+			IPDebugTarget debugTarget = session.getLaunch().getDebugTarget(task_id);
+			if (debugTarget != null) {
+				focusOnDebugView(debugTarget);
+			}
+		}
+	}
+	public void focusOnDebugView(Object selection) {
+		IViewPart part = UIUtils.findView(IDebugUIConstants.ID_DEBUG_VIEW);
+		if (part != null && part instanceof IDebugView) {
+			Viewer viewer = ((IDebugView)part).getViewer();
+			if (viewer != null) {
+				viewer.setSelection(new StructuredSelection(selection));
+			}
+		}
+	}
+	
 	/***************************************************************************************************************************************************************************************************
 	 * Register / Unregister
 	 **************************************************************************************************************************************************************************************************/

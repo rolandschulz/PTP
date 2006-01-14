@@ -432,12 +432,10 @@ public class PDebugModelPresentation extends LabelProvider implements IDebugMode
 		return label;
 	}
 	protected StringBuffer appendBreakpointStatus(IPBreakpoint breakpoint, StringBuffer label) throws CoreException {
-		String jobName = breakpoint.getJobName();
-		if (!jobName.equals(IPBreakpoint.GLOBAL))
-			jobName = "Job: " + jobName;
 		label.append(" ");
 		label.append("{");
-		label.append(jobName + " - ");
+		label.append(breakpoint.getJobName());
+		label.append(":");
 		label.append(breakpoint.getSetId());
 		label.append("}");
 		// label.append(MessageFormat.format(PDebugUIMessages.getString("PTPDebugModelPresentation.details1"), new String[] { jobName, breakpoint.getSetId() }));
