@@ -38,7 +38,6 @@ import org.eclipse.ptp.core.AttributeConstants;
 import org.eclipse.ptp.core.ControlSystemChoices;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPJob;
-import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
@@ -728,7 +727,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		} catch(InterruptedException e2) {
 			controlSystem.terminateJob(job);
 			universe.deleteJob(job);
-			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, e2.getMessage(), e2));			
+			throw new CoreException(new Status(IStatus.CANCEL, PTPCorePlugin.getUniqueIdentifier(), IStatus.CANCEL, e2.getMessage(), e2));			
 		} catch (CoreException e) {
 			controlSystem.terminateJob(job);
 			universe.deleteJob(job);

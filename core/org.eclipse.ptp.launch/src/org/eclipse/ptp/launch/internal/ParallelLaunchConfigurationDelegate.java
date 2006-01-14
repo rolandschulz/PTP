@@ -205,6 +205,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			monitor.worked(1);
 			
 			job = getLaunchManager().run(launch, workDirectory, null, jrunconfig, new SubProgressMonitor(monitor, 8));
+			if (job == null) {
+				
+			}
 			job.setAttribute(PreferenceConstants.JOB_APP, exePath.lastSegment());
 			job.setAttribute(PreferenceConstants.JOB_WORK_DIR, exePath.removeLastSegments(1).toString());
 			job.setAttribute(PreferenceConstants.JOB_ARGS, args);
@@ -226,7 +229,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 					debugger.stopDebugger();
 				}
 			}
-			throw e;
+			if (e.getStatus().getCode() != IStatus.CANCEL) {
+				throw e;
+			}
 		} finally {
 			monitor.done();
 		}
