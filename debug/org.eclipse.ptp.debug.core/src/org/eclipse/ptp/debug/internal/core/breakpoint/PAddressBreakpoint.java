@@ -45,12 +45,6 @@ public class PAddressBreakpoint extends AbstractLineBreakpoint implements IPAddr
 		if (fileName != null && fileName.length() > 0) {
 			fileName = ' ' + fileName + ' ';
 		}
-
-		String jobInfo = "";
-		String jobName = getJobName();
-		if (jobName.length() > 0)
-			jobInfo = "Job " + jobName + " - ";
-
-		return jobInfo + MessageFormat.format(BreakpointMessages.getString("PAddressBreakpoint"), new String[] { getSetId(), fileName, getAddress(), getConditionText() });
+		return getJobSetFormat() + " " + MessageFormat.format(BreakpointMessages.getString("PAddressBreakpoint"), new String[] { fileName, getAddress(), getConditionText() });
 	}
 }
