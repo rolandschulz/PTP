@@ -29,6 +29,7 @@ public interface IIconCanvasActionListener {
 	public static final int PASTE_ACTION = 3;
 	public static final int DELETE_ACTION = 4;
 	public static final int DOUBLE_CLICK_ACTION = 5;
+	public static final int SELECTION_ACTION = 6;
 	
 	public void handleAction(int type, int[] indexes);
 	public void handleAction(int type, int index);

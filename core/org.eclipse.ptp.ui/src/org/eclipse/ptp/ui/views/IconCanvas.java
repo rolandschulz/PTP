@@ -1315,11 +1315,17 @@ public class IconCanvas extends Canvas {
 			super.setCursor(cursor);
 		}
 	}
+	
 	protected void doMouseMoving(Event event) {
 		int index = findSelectedIndexByLocation(event.x, event.y, false);
 		if (index > -1) {
 			setCursor(new Cursor(getDisplay(), SWT.CURSOR_HAND));
 			showToolTip(index, event.x, event.y);
+			getDisplay().timerExec(5000, new Runnable() {
+				public void run() {
+					hideToolTip();
+				}
+			});
 		} else {
 			setCursor(null);
 			hideToolTip();
@@ -1375,6 +1381,10 @@ public class IconCanvas extends Canvas {
 		//int start_y = (Math.min((getMaxRow() - current_top_row) * getElementHeight() + sel_size, Math.max(0 + sel_size, event.y)));
 		selection = new Point(event.x, event.y);
 		actualScrollStart_y = selection.y + verticalScrollOffset;
+		int index = findSelectedIndexByLocation(event.x, event.y, false);
+		if (index > -1) {
+			fireAction(IIconCanvasActionListener.SELECTION_ACTION, index);
+		}
 		redraw();
 	}
 	protected void handleMouseUp(Event event) {
