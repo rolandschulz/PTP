@@ -96,7 +96,7 @@ public class FortranProcessor
 
         try
         {
-            Object result = parser.parse(lexer, new ParsingTable(parseAction));
+            Object result = parser.parse(lexer, parseAction);
             lastParseWasFixedForm = isFixedForm; // In case we processed other files while parsing
             return result;
         }
