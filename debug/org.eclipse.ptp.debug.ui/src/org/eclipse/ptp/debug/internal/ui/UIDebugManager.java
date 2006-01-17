@@ -35,9 +35,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
+import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -256,13 +259,30 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		// firePaintListener(null);
 	}
 	public void focusOnDebugTarget(IPJob job, int task_id) {
+		Object debugObj = getDebugObject(job, task_id);
+		if (debugObj != null) {
+			focusOnDebugView(debugObj);
+		}
+	}
+	public Object getDebugObject(IPJob job, int task_id) {
 		IPCDISession session = getDebugSession(job);
 		if (session != null) {
 			IPDebugTarget debugTarget = session.getLaunch().getDebugTarget(task_id);
 			if (debugTarget != null) {
-				focusOnDebugView(debugTarget);
+				try {
+					IThread[] threads = debugTarget.getThreads();
+					for (int i=0; i<threads.length; i++) {
+						IStackFrame frame = threads[i].getTopStackFrame();
+						if (frame != null)
+							return frame;
+					}
+				} catch (DebugException e) {
+					return debugTarget;
+				}
+				return debugTarget;
 			}
 		}
+		return null;
 	}
 	public void focusOnDebugView(Object selection) {
 		IViewPart part = UIUtils.findView(IDebugUIConstants.ID_DEBUG_VIEW);

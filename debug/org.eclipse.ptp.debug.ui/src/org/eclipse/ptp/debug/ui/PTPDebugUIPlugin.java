@@ -221,5 +221,12 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		if ( display == null )
 			display = Display.getDefault();
 		return display;
+	}
+	
+	public static Shell getShell() {
+		if (getActiveWorkbenchWindow() != null) {
+			return getActiveWorkbenchWindow().getShell();
+		}
+		return null;
 	}	
 }
