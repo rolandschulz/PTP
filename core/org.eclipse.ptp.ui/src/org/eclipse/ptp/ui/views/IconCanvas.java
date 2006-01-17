@@ -77,6 +77,7 @@ public class IconCanvas extends Canvas {
 	// tooltip
 	protected Shell toolTipShell = null;
 	protected Label toolTipLabel = null;
+	protected final int TOOLTIP_TIME = 10000;
 	// key and listener
 	protected Hashtable keyActionMap = new Hashtable();
 	protected Listener listener = null;
@@ -1321,11 +1322,13 @@ public class IconCanvas extends Canvas {
 		if (index > -1) {
 			setCursor(new Cursor(getDisplay(), SWT.CURSOR_HAND));
 			showToolTip(index, event.x, event.y);
-			getDisplay().timerExec(5000, new Runnable() {
-				public void run() {
-					hideToolTip();
-				}
-			});
+			if (toolTipShell != null) {
+				getDisplay().timerExec(TOOLTIP_TIME, new Runnable() {
+					public void run() {
+						hideToolTip();
+					}
+				});
+			}
 		} else {
 			setCursor(null);
 			hideToolTip();
