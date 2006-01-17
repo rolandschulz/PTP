@@ -26,7 +26,6 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.internal.ui.DebugUIPlugin;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.ILaunchGroup;
 import org.eclipse.debug.ui.ILaunchShortcut;
@@ -35,6 +34,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -79,7 +79,7 @@ public class PTPLaunchShortcut implements ILaunchShortcut {
 	        selection = new StructuredSelection(config);
 	        
 	    ILaunchGroup group = DebugUITools.getLaunchGroup(config, mode);
-		DebugUITools.openLaunchConfigurationDialogOnGroup(DebugUIPlugin.getShell(), selection, group.getIdentifier());
+		DebugUITools.openLaunchConfigurationDialogOnGroup(PTPDebugUIPlugin.getShell(), selection, group.getIdentifier());
 	}
 	
 	public ILaunchConfiguration getILaunchConfigure(IFile file) {

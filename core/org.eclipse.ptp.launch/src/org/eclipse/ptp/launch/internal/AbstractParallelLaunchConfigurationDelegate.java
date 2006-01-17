@@ -122,10 +122,10 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	protected JobRunConfiguration getJobRunConfiguration(ILaunchConfiguration configuration) throws CoreException
 	{
 		IFile programFile = getProgramFile(configuration);
-		String path, nprocs_str, nprocpnode_str, firstnode_str, machineName;
+		String nprocs_str, nprocpnode_str, firstnode_str, machineName;
 		
 		machineName = getMachineName(configuration);
-		path = programFile.getLocation().toString();
+		//path = programFile.getLocation().toString();
 		nprocs_str = getNumberOfProcesses(configuration);
 		nprocpnode_str = getNumberOfProcessesPerNode(configuration);
 		firstnode_str = getFirstNodeNumber(configuration);
@@ -220,9 +220,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	protected static String getWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
 	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORK_DIRECTORY, (String)null);
 	}
+	protected static String getDebuggerID(ILaunchConfiguration configuration) throws CoreException {
+	    return configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ID, (String)null);
+	}
 	
 	public ILaunch getLaunch(ILaunchConfiguration configuration, String mode) throws CoreException {
 		return new PLaunch(configuration, mode, null);
 	}
-	
 }
