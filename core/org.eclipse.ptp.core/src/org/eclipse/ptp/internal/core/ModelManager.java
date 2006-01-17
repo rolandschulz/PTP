@@ -226,23 +226,23 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					return;
 				}
 
-				//for (int j = 0; j < attribs.length; j++)
-				//	System.out
-				//			.println("*** attribs[" + j + "] = " + attribs[j]);
+				for (int j = 0; j < attribs.length; j++)
+					System.out.println("*** attribs[" + j + "] = " + attribs[j]);
 
 				for (int j = 0; j < ne2.length; j++) {
 					PNode node;
 					//node = new PNode(mac, ne2[j], "" + j + "", j);
 					
 					String nodename = ""+j+"";
-					if(attribs.length > 0) {
+					if(attribs.length > (j * num_attribs)) {
 						nodename = attribs[(j * num_attribs)];
 					}
 					node = new PNode(mac, ne2[j], "" + j + "", j);
 					node.setAttrib(AttributeConstants.ATTRIB_NODE_NAME, nodename);
 					System.out.println("NodeName According to ORTE = '"+node.getAttrib(AttributeConstants.ATTRIB_NODE_NAME)+"'");
+					System.out.println("\t#attribs returned: "+attribs.length);
 					
-					if(attribs.length > 1) {
+					if(attribs.length > (j * num_attribs) + 1) {
 						node.setAttrib(AttributeConstants.ATTRIB_NODE_USER,
 								attribs[(j * num_attribs) + 1]);
 					}
@@ -250,7 +250,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 						node.setAttrib(AttributeConstants.ATTRIB_NODE_USER, "UNKNOWN");
 					}
 					
-					if(attribs.length > 2) {
+					if(attribs.length > (j * num_attribs) + 2) {
 						node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP,
 								attribs[(j * num_attribs) + 2]);
 					}
@@ -258,7 +258,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 						node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP, "UNKNOWN");
 					}
 					
-					if(attribs.length > 3) {
+					if(attribs.length > (j * num_attribs) + 3) {
 						node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE,
 							attribs[(j * num_attribs) + 3]);
 					}
@@ -266,7 +266,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 						node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, "up");
 					}
 					
-					if(attribs.length > 4) {
+					if(attribs.length > (j * num_attribs) + 4) {
 						node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE,
 							attribs[(j * num_attribs) + 4]);
 					}
