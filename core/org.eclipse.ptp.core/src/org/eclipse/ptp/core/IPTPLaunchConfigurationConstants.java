@@ -36,7 +36,7 @@ public interface IPTPLaunchConfigurationConstants {
 	 * Launch configuration attribute key. The value is a string specifying
 	 * application a C/C++ launch configuration.
 	 */
-	public static final String ATTR_PROGRAM_NAME = PTP_LAUNCH_ID + ".PROGRAM_NAME"; //$NON-NLS-1$
+	//public static final String ATTR_PROGRAM_NAME = PTP_LAUNCH_ID + ".PROGRAM_NAME";
 
 	public static final String ATTR_APPLICATION_NAME = PTP_LAUNCH_ID + ".APPLICATION_NAME";
 	
@@ -46,8 +46,9 @@ public interface IPTPLaunchConfigurationConstants {
 
 	public static final String NUMBER_OF_PROCESSES = PTP_LAUNCH_ID + ".NUMBER_OF_PROCESSES";
 
-	// public static final String NETWORK_TYPE = PTP_LAUNCH_ID +
-	// ".COMMUNICATION";
+	public static final String ATTR_DEBUGGER_ID = PTP_LAUNCH_ID + ".DEBUGGER_ID";
+
+	// public static final String NETWORK_TYPE = PTP_LAUNCH_ID + ".COMMUNICATION";
 	public static final String PROCESSES_PER_NODE = PTP_LAUNCH_ID + ".NUMBER_OF_PROCESSES_START";
 
 	public static final String FIRST_NODE_NUMBER = PTP_LAUNCH_ID + ".NODE_NUMBER";
@@ -60,7 +61,7 @@ public interface IPTPLaunchConfigurationConstants {
 	 * Launch configuration attribute key. The value is the platform string of
 	 * the launch configuration
 	 */
-	public static final String ATTR_PLATFORM = PTP_LAUNCH_ID + ".PLATFFORM"; //$NON-NLS-1$
+	public static final String ATTR_PLATFORM = PTP_LAUNCH_ID + ".PLATFFORM";
 
 	public static final String DEF_NUMBER_OF_PROCESSES = "0";
 
@@ -69,48 +70,38 @@ public interface IPTPLaunchConfigurationConstants {
 	public static final String DEF_PROCESSES_PER_NODE = "1";
 
 	public static final String DEF_FIRST_NODE_NUMBER = "0";
-	/**
-	 * Launch configuration attribute key. The value is the debugger id used
-	 * when launching a C/C++ application for debug.
-	 */
-	public static final String ATTR_DEBUGGER_ID = PTP_LAUNCH_ID + ".DEBUGGER_ID"; //$NON-NLS-1$
-
-	/**
-	 * Launch configuration attribute key. The value is a boolean specifying
-	 * whether to stop at main().
-	 */
-	public static final String ATTR_DEBUGGER_STOP_AT_MAIN = PTP_LAUNCH_ID + ".DEBUGGER_STOP_AT_MAIN"; //$NON-NLS-1$
 
 	/**
 	 * Launch configuration attribute key. The value is the platform string of
 	 * the launch configuration
 	 */
-	public static final String ATTR_DEBUGGER_SPECIFIC_ATTRS_MAP = PTP_LAUNCH_ID + ".DEBUGGER_SPECIFIC_ATTRS_MAP"; //$NON-NLS-1$
+	public static final String ATTR_DEBUGGER_SPECIFIC_ATTRS_MAP = PTP_LAUNCH_ID + ".DEBUGGER_SPECIFIC_ATTRS_MAP";
 	
 	/**
 	 * Launch configuration attribute key. The value is a global variables'
 	 * memento.
 	 */
-	public static final String ATTR_DEBUGGER_GLOBAL_VARIABLES = PTP_LAUNCH_ID + ".GLOBAL_VARIABLES"; //$NON-NLS-1$
+	public static final String ATTR_DEBUGGER_GLOBAL_VARIABLES = PTP_LAUNCH_ID + ".GLOBAL_VARIABLES";
 
 	/**
 	 * Launch configuration attribute key. The value is the startup mode for the
 	 * debugger.
 	 */
-	public static final String ATTR_DEBUGGER_START_MODE = PTP_LAUNCH_ID + ".DEBUGGER_START_MODE"; //$NON-NLS-1$
+	public static final String ATTR_DEBUGGER_START_MODE = PTP_LAUNCH_ID + ".DEBUGGER_START_MODE";
 
 	/**
 	 * Launch configuration attribute key. The value is a boolean specifying
 	 * whether to enable variable bookkeeping.
 	 */
-	public static final String ATTR_DEBUGGER_ENABLE_VARIABLE_BOOKKEEPING = PTP_LAUNCH_ID + ".ENABLE_VARIABLE_BOOKKEEPING"; //$NON-NLS-1$
+	public static final String ATTR_DEBUGGER_ENABLE_VARIABLE_BOOKKEEPING = PTP_LAUNCH_ID + ".ENABLE_VARIABLE_BOOKKEEPING";
 
 	/**
 	 * Launch configuration attribute key. The value is a boolean specifying
 	 * whether to enable register bookkeeping.
 	 */
-	public static final String ATTR_DEBUGGER_ENABLE_REGISTER_BOOKKEEPING = PTP_LAUNCH_ID + ".ENABLE_REGISTER_BOOKKEEPING"; //$NON-NLS-1$
+	public static final String ATTR_DEBUGGER_ENABLE_REGISTER_BOOKKEEPING = PTP_LAUNCH_ID + ".ENABLE_REGISTER_BOOKKEEPING";
 
+	public static final String ATTR_DEBUGGER_PROTOCOL = PTP_LAUNCH_ID + ".protocol";
 	/**
 	 * Launch configuration attribute value. The key is
 	 * ATTR_DEBUGGER_STOP_AT_MAIN.
@@ -121,11 +112,18 @@ public interface IPTPLaunchConfigurationConstants {
 	 * Launch configuration attribute value. The key is
 	 * ATTR_DEBUGGER_START_MODE. Startup debugger running the program.
 	 */
-	public static String DEBUGGER_MODE_RUN = "run"; //$NON-NLS-1$
+	public static String DEBUGGER_MODE_RUN = "run";
 
 	/**
 	 * Launch configuration attribute value. The key is
 	 * ATTR_DEBUGGER_START_MODE. Startup debugger and attach to running process.
 	 */
-	public static String DEBUGGER_MODE_ATTACH = "attach"; //$NON-NLS-1$
+	public static String DEBUGGER_MODE_ATTACH = "attach";
+	
+	/**
+	 * error code
+	 */
+	public static final int ERR_PROGRAM_NOT_EXIST = 104;
+	public static final int ERR_PROGRAM_NOT_BINARY = 107;
+	
 }

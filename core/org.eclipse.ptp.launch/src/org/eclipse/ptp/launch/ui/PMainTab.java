@@ -19,7 +19,6 @@
 package org.eclipse.ptp.launch.ui;
 
 import java.text.MessageFormat;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -69,7 +68,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 public class PMainTab extends PLaunchConfigurationTab {
     protected Text projText = null;
     protected Text appText = null;
-    protected Button stopInMainCheckButton = null;
+    //protected Button stopInMainCheckButton = null;
     protected Button projButton = null;
     protected Button appButton = null;
 
@@ -90,9 +89,6 @@ public class PMainTab extends PLaunchConfigurationTab {
     
     protected WidgetListener listener = new WidgetListener();
     
-    /**
-     * @see ILaunchConfigurationTab#createControl(Composite)
-     */
     public void createControl(Composite parent) {
         Composite comp = new Composite(parent, SWT.NONE);
         setControl(comp);
@@ -129,8 +125,8 @@ public class PMainTab extends PLaunchConfigurationTab {
 		appButton = createPushButton(projectComp, LaunchMessages.getResourceString("Tab.common.B&rowse_2"), null);
 		appButton.addSelectionListener(listener);
 		
+		/*
 		createVerticalSpacer(projectComp, 2);
-		
 		stopInMainCheckButton = createCheckButton(projectComp, LaunchMessages.getResourceString("PMainTab.St&op_in_main"));
 		stopInMainCheckButton.setLayoutData(spanGridData(-1, 2));
 		stopInMainCheckButton.addSelectionListener(new SelectionAdapter() {
@@ -138,13 +134,9 @@ public class PMainTab extends PLaunchConfigurationTab {
 		        updateLaunchConfigurationDialog();
 		    }
 		});
+		*/
     }
     
-    /**
-     * Defaults are empty.
-     * 
-     * @see ILaunchConfigurationTab#setDefaults(ILaunchConfigurationWorkingCopy)
-     */
     public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
         IProject project = getDefaultProject(configuration);
         String projectName = null;
@@ -156,34 +148,25 @@ public class PMainTab extends PLaunchConfigurationTab {
         
         configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, projectName);       
         configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, (String) null);
-        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false);
+        //configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false);
     }    
 
-    /**
-     * @see ILaunchConfigurationTab#initializeFrom(ILaunchConfiguration)
-     */
     public void initializeFrom(ILaunchConfiguration configuration) {
         try {
             projText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, EMPTY_STRING));
             appText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, EMPTY_STRING));
-            stopInMainCheckButton.setSelection(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false));
+            //stopInMainCheckButton.setSelection(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, false));
         } catch (CoreException e) {
             setErrorMessage(LaunchMessages.getFormattedResourceString("CommonTab.common.Exception_occurred_reading_configuration_EXCEPTION", e.getStatus().getMessage()));
         }
     }
 
-    /**
-     * @see ILaunchConfigurationTab#performApply(ILaunchConfigurationWorkingCopy)
-     */
     public void performApply(ILaunchConfigurationWorkingCopy configuration) {
         configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, getFieldContent(projText.getText()));
         configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, getFieldContent(appText.getText()));
-        configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, stopInMainCheckButton.getSelection());
+        //configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_STOP_IN_MAIN, stopInMainCheckButton.getSelection());
     }    
     
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
-	 */
 	public boolean isValid(ILaunchConfiguration config) {
 		setErrorMessage(null);
 		setMessage(null);
