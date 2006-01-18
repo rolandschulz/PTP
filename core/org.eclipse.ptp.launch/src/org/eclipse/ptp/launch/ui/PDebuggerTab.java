@@ -312,11 +312,11 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 		}
 		/**
 		 * TODO: dun check cpu at this stage
+		 */
 		if (!validateCPU(config, debugConfig)) {
 			setErrorMessage(LaunchMessages.getResourceString("PDebuggerTab.CPU_is_not_supported"));
 			return false;
 		}
-		*/
 		return true;
 	}
 
