@@ -6,13 +6,14 @@
          point="org.eclipse.ptp.debug.core.PTPDebugger">
       <debugger
             platform="*"
-            name="PTP"
+            name="%SDM.name"
             modes="run"
-            cpu="native"
+            cpu="*"
             class="org.eclipse.ptp.debug.external.PTPDebugger"
             id="org.eclipse.ptp.debug.external.PTPDebugger">
       </debugger>
    </extension>
+   <!--
    <extension
          point="org.eclipse.ptp.debug.ui.PDebuggerPage">
       <debugPage
@@ -21,5 +22,6 @@
             id="org.eclipse.ptp.debug.external.ui.ExternalDebuggerPage">
       </debugPage>
    </extension>
+   //-->
 
 </plugin>
