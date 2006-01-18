@@ -1,15 +1,11 @@
 package org.eclipse.photran.internal.core.f95parser;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Map;
 
 import org.eclipse.cdt.internal.core.model.TranslationUnit;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.photran.core.FortranCorePlugin;
-import org.eclipse.photran.internal.core.f95parser.symboltable.SymbolTable;
 import org.eclipse.photran.internal.core.preferences.FortranEnableParserDebuggingPreference;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 
@@ -21,7 +17,7 @@ import org.eclipse.photran.internal.core.preferences.FortranPreferences;
  */
 public class FortranProcessor
 {
-    private boolean lastParseWasFixedForm = false;
+    protected boolean lastParseWasFixedForm = false;
     
     /**
      * Determines whether or not the given file is a fixed-format file (based on its filename
@@ -37,36 +33,6 @@ public class FortranProcessor
         boolean isFixedForm = hasFixedFormFileExtension(filename);
 
         return Lexer.createLexer(inputStream, filename, isFixedForm);
-    }
-    
-    /**
-     * Parses the given input stream as a Fortran 95 source file. The filename parameter should
-     * indicate the filename of the file being parsed; it is saved in each <code>Token</code>
-     * produced and used in error messages, although no one actually checks to see if it's a legal
-     * filename or not.  Fixed/free format is determined automatically based on the filename.
-     * @param inputStream
-     * @param filename
-     * @return <code>ParseResult</code>
-     */
-    public ParseTreeNode parse(InputStream inputStream, String filename) throws Exception
-    {
-        return parse(inputStream, filename, hasFixedFormFileExtension(filename));
-    }
-
-    /**
-     * Parses the given input stream as a Fortran 95 source file. The filename parameter should
-     * indicate the filename of the file being parsed; it is saved in each <code>Token</code>
-     * produced and used in error messages, although no one actually checks to see if it's a legal
-     * filename or not.
-     * @param inputStream
-     * @param filename
-     * @param isFixedForm
-     * @return <code>ParseResult</code>
-     */
-    public ParseTreeNode parse(InputStream inputStream, String filename, boolean isFixedForm) throws Exception
-    {
-        Parser parser = new Parser();
-        return (ParseTreeNode)parse(inputStream, filename, isFixedForm, parser, BuildParseTreeParserAction.getInstance());
     }
 
     /**
@@ -90,7 +56,7 @@ public class FortranProcessor
         return newElements;
     }
 
-    private Object parse(InputStream inputStream, String filename, boolean isFixedForm, Parser parser, AbstractParserAction parseAction) throws Exception
+    protected Object parse(InputStream inputStream, String filename, boolean isFixedForm, Parser parser, AbstractParserAction parseAction) throws Exception
     {
         ILexer lexer = Lexer.createLexer(inputStream, filename, isFixedForm);
 
@@ -105,52 +71,6 @@ public class FortranProcessor
             if (isParserDebuggingEnabled()) e.printStackTrace();
             throw e;
         }
-    }
-
-    /**
-     * Parses the given file as a Fortran 95 source file.
-     * @param filename
-     * @return <code>ParseResult</code>
-     */
-    public ParseTreeNode parse(String filename) throws Exception
-    {
-        return parse(new BufferedInputStream(new FileInputStream(new File(filename))), filename);
-    }
-
-    /**
-     * Takes a parse tree (from the <code>parse</code> method) and builds a symbol table hierarchy
-     * from it, returning the global symbol table.
-     * 
-     * @param parseTreeRoot
-     * @return <code>SymbolTable</code>
-     */
-    public SymbolTable createSymbolTableFromParseTree(ParseTreeNode parseTreeRoot) throws Exception
-    {
-        try
-        {
-            SymbolTable result = SymbolTable.createSymbolTableFor(parseTreeRoot);
-
-            if (isParserDebuggingEnabled())
-            ;// System.out.println(result);
-
-            return result;
-        }
-        catch (Exception e)
-        {
-            if (isParserDebuggingEnabled()) e.printStackTrace();
-
-            throw e;
-        }
-    }
-
-    public SymbolTable parseAndCreateSymbolTableFor(String filename) throws Exception
-    {
-        return createSymbolTableFromParseTree(parse(filename));
-    }
-
-    public SymbolTable parseAndCreateSymbolTableFor(InputStream in, String filename) throws Exception
-    {
-        return createSymbolTableFromParseTree(parse(in, filename));
     }
 
     public boolean lastParseWasFixedForm()
