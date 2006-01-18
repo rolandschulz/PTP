@@ -6,10 +6,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.photran.internal.core.f95parser.GenericParseTreeVisitor;
 import org.eclipse.photran.internal.core.f95parser.Nonterminal;
 import org.eclipse.photran.internal.core.f95parser.ParseTreeNode;
 import org.eclipse.photran.internal.core.f95parser.Token;
+import org.eclipse.photran.internal.core.f95parser.symboltable.entries.ModuleEntry;
+import org.eclipse.photran.internal.core.f95parser.symboltable.moduleloader.ModuleLoader;
 
 /**
  * A Fortran 95 symbol table
@@ -372,6 +375,7 @@ public class SymbolTable
     public static SymbolTable createSymbolTableFor(ParseTreeNode parseTree) throws Exception
     {
         SymbolTable tbl = (new DeclarationCollector(parseTree)).getSymbolTable();
+        //ModuleLoader.addUses
         Intrinsics.fill(tbl);
         return (new ReferenceCollector(tbl, parseTree)).getSymbolTable();
     }
@@ -449,19 +453,21 @@ public class SymbolTable
      */
     public abstract static class ModuleUse
     {
+        protected Token moduleName;
+
+        protected Map/* <Token, Token> */importAndRename = new HashMap();
+        
+        protected ModuleEntry moduleEntry = null;
+        
         public ModuleUse(Token moduleName)
         {
             this.moduleName = moduleName;
         }
 
-        protected Token moduleName;
-
         public Token getModuleName()
         {
             return moduleName;
         }
-
-        protected Map/* <Token, Token> */importAndRename = new HashMap();
 
         public void importAndRename(Token from, Token to)
         {
@@ -484,6 +490,12 @@ public class SymbolTable
                 sb.append(to.getText());
             }
             return sb.toString();
+        }
+        
+        public SymbolTable loadModuleSymbolTable(IProgressMonitor pm)
+        {
+            moduleEntry = ModuleLoader.getDefault().findModule(moduleName.getText(), pm);
+            return moduleEntry == null ? null : moduleEntry.getChildTable();
         }
     }
 

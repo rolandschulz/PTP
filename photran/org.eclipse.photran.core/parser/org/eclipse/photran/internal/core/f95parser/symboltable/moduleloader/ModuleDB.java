@@ -7,8 +7,7 @@ import java.util.HashMap;
 import org.eclipse.photran.internal.core.f95parser.symboltable.entries.ModuleEntry;
 
 /**
- * Public interface to the module database, which is managed
- * by Sleepycat Software's Berkeley DB Java Edition.
+ * Public interface to the module database.
  * 
  * The database associates canonical filenames
  * (see File#getCanonicalPath) of Fortran source files
