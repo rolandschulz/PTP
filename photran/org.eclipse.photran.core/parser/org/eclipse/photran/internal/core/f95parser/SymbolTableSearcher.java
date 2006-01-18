@@ -35,6 +35,7 @@ public class SymbolTableSearcher
         if (targetIdentifier.getTerminal() != Terminal.T_IDENT) return null;
 
         // FIXME-Jeff: Need to check references too, not just declarations!
+        // FIXME-Spiros: I am not sure if it also visits the sub-SymbolTables, I think it should, what happens in the case of a subroutine?
         try
         {
             symTbl.visitUsing(new GenericSymbolTableVisitor()
