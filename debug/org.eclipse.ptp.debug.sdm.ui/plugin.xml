@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <!--
+   <extension
+         point="org.eclipse.ptp.debug.ui.PDebuggerPage">
+      <debugPage
+            class="org.eclipse.ptp.debug.external.internal.ui.SDMPage"
+            debuggerID="org.eclipse.ptp.debug.external.sdm"
+            id="org.eclipse.ptp.debug.external.ui.SDMPage">
+      </debugPage>
+   </extension>
+   //-->
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            name="%SDMPreferencePage.name"
+            category="org.eclipse.ptp.debug.ui.PDebugPreferencePage"
+            class="org.eclipse.ptp.debug.external.internal.ui.preferences.SDMPreferencePage"
+            id="org.eclipse.ptp.debug.external.ui.SDMPreferencePage">
+      </page>
+   </extension>
+
+</plugin>
