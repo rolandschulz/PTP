@@ -192,7 +192,6 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 
 		ErrorDialog.openError(shell, title, message, s);
 	}
-
 	public ILaunchConfigurationTab getDebuggerPage(String debuggerID) throws CoreException {
 		if (fDebuggerPageMap == null) {
 			initializeDebuggerPageMap();
@@ -204,7 +203,6 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		}
 		return tab;
 	}
-
 	protected void initializeDebuggerPageMap() {
 		fDebuggerPageMap = new HashMap(10);
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(PLUGIN_ID, "PDebuggerPage");

@@ -60,26 +60,26 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 	}
 
 	public IPTPDebugger createDebugger() throws CoreException {
-		Object debugger = getConfigurationElement().createExecutableExtension("class"); //$NON-NLS-1$
+		Object debugger = getConfigurationElement().createExecutableExtension("class");
 		if (debugger instanceof IPTPDebugger) {
 			return (IPTPDebugger)debugger;
 		}
-		throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), -1, InternalDebugCoreMessages.getString("DebugConfiguration.0"), null)); //$NON-NLS-1$
+		throw new CoreException(new Status(IStatus.ERROR, PTPDebugCorePlugin.getUniqueIdentifier(), -1, InternalDebugCoreMessages.getString("DebugConfiguration.0"), null));
 	}
 
 	public String getName() {
-		String name = getConfigurationElement().getAttribute("name"); //$NON-NLS-1$
-		return name != null ? name : ""; //$NON-NLS-1$
+		String name = getConfigurationElement().getAttribute("name");
+		return name != null ? name : "";
 	}
 
 	public String getID() {
-		return getConfigurationElement().getAttribute("id"); //$NON-NLS-1$
+		return getConfigurationElement().getAttribute("id");
 	}
 
 	public String getPlatform() {
-		String platform = getConfigurationElement().getAttribute("platform"); //$NON-NLS-1$
+		String platform = getConfigurationElement().getAttribute("platform");
 		if (platform == null) {
-			return "*"; //$NON-NLS-1$
+			return "*";
 		}
 		return platform;
 	}
@@ -102,7 +102,7 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 		if ( nativeCPU.startsWith(cpu) ) {
 			ret = getCPUs().contains(CPU_NATIVE);
 		}
-		return ret || getCPUs().contains(cpu) || getCPUs().contains("*"); //$NON-NLS-1$
+		return ret || getCPUs().contains(cpu) || getCPUs().contains("*");
 	}
 	
 	/**
@@ -112,11 +112,11 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 	 */
 	protected Set getModes() {
 		if (fModes == null) {
-			String modes = getConfigurationElement().getAttribute("modes"); //$NON-NLS-1$
+			String modes = getConfigurationElement().getAttribute("modes");
 			if (modes == null) {
 				return new HashSet(0);
 			}
-			StringTokenizer tokenizer = new StringTokenizer(modes, ","); //$NON-NLS-1$
+			StringTokenizer tokenizer = new StringTokenizer(modes, ",");
 			fModes = new HashSet(tokenizer.countTokens());
 			while (tokenizer.hasMoreTokens()) {
 				fModes.add(tokenizer.nextToken().trim());
@@ -127,14 +127,14 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 
 	protected Set getCPUs() {
 		if (fCPUs == null) {
-			String cpus = getConfigurationElement().getAttribute("cpu"); //$NON-NLS-1$
+			String cpus = getConfigurationElement().getAttribute("cpu");
 			if (cpus == null) {
 				fCPUs = new HashSet(1);
 				fCPUs.add(CPU_NATIVE);
 			}
 			else {
 				String nativeCPU = Platform.getOSArch();
-				StringTokenizer tokenizer = new StringTokenizer(cpus, ","); //$NON-NLS-1$
+				StringTokenizer tokenizer = new StringTokenizer(cpus, ",");
 				fCPUs = new HashSet(tokenizer.countTokens());
 				while (tokenizer.hasMoreTokens()) {
 					String cpu = tokenizer.nextToken().trim();
@@ -155,15 +155,15 @@ public class PDebugConfiguration implements IPDebugConfiguration {
 	public String[] getCoreFileExtensions() {
 		if (fCoreExt == null) {
 			List exts = new ArrayList();
-			String cexts = getConfigurationElement().getAttribute("coreFileFilter"); //$NON-NLS-1$
+			String cexts = getConfigurationElement().getAttribute("coreFileFilter");
 			if (cexts != null) {
-				StringTokenizer tokenizer = new StringTokenizer(cexts, ","); //$NON-NLS-1$
+				StringTokenizer tokenizer = new StringTokenizer(cexts, ",");
 				while (tokenizer.hasMoreTokens()) {
 					String ext = tokenizer.nextToken().trim();
 					exts.add(ext);
 				}
 			}
-			exts.add("*.*"); //$NON-NLS-1$
+			exts.add("*.*");
 			fCoreExt = (String[])exts.toArray(new String[exts.size()]);
 		}
 		return fCoreExt;

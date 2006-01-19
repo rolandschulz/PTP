@@ -2,7 +2,7 @@
 <?eclipse version="3.0"?>
 <plugin>
 
-   <extension-point id="PDebuggerPage" name="%PDebuggerPage.name"/>
+   <extension-point id="PDebuggerPage" name="%PDebuggerPage.name" />
 
    <!-- preferences //-->
    <extension
@@ -16,12 +16,6 @@
             category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
             class="org.eclipse.ptp.debug.internal.ui.preferences.PDebugPreferencePage"
             id="org.eclipse.ptp.debug.ui.PDebugPreferencePage">
-      </page>
-      <page
-            name="%PDebuggerPage.name"
-            category="org.eclipse.ptp.debug.ui.PDebugPreferencePage"
-            class="org.eclipse.ptp.debug.internal.ui.preferences.PDebuggerPage"
-            id="org.eclipse.ptp.debug.ui.PDebuggerPage">
       </page>
    </extension>   
 
