@@ -1674,7 +1674,10 @@ ORTEGetNodeAttribute(char **args)
 			default_needed++;
 		} else if(!strcmp(args[i], "ATTRIB_NODE_STATE")) {
 			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-status");
-			types[i-3] = PTP_STRING;		
+			types[i-3] = PTP_STRING;
+		} else if(!strcmp(args[i], "ATTRIB_NODE_MODE")) {		
+			asprintf(&(keys[i-3]), "%s", "orte-node-bproc-mode");
+			types[i-3] = PTP_UINT32;
 		} else {
 			asprintf(&(keys[i-3]), "UNDEFINED");
 			types[i-3] = PTP_STRING;
