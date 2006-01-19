@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
@@ -155,17 +156,17 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			IProject project = verifyProject(configuration);
 			if (exePath != null) {
 				exeFile = verifyBinary(project, exePath);
-				System.out.println("---- bin:" + exeFile);
-				
 			}
 			
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				String dbgPath = PTPDebugCorePlugin.getDefault().getPluginPreferences().getString(IPDebugConstants.PREF_PTP_SDM_FILE);
+				Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
+				String dbgPath = preferences.getString(IPDebugConstants.PREF_PTP_SDM_FILE);
+				String dbgArgs = preferences.getString(IPDebugConstants.PREF_PTP_SDM_ARGS);
+
 				verifyDebuggerPath(dbgPath);
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				debugger = debugConfig.createDebugger();
 				jrunconfig.setDebuggerPath(dbgPath);
-				String dbgArgs = PTPDebugCorePlugin.getDefault().getPluginPreferences().getString(IPDebugConstants.PREF_PTP_SDM_ARGS);
 				dbgArgs += " --port=" + debugger.startDebuggerListener();
 				jrunconfig.setDebuggerArgs(dbgArgs);
 				jrunconfig.setDebug();
