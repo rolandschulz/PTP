@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Extractinterface Plug-in
+Bundle-SymbolicName: org.eclipse.photran.extractinterface; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.eclipse.photran.extractinterface.ExtractinterfacePlugin
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui.ide,
+ org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.photran.core,
+ org.eclipse.core.resources,
+ org.eclipse.photran.refactoring,
+ org.eclipse.ui.workbench.texteditor,
+ org.eclipse.jface.text,
+ org.eclipse.cdt.refactoring
+Eclipse-AutoStart: true
