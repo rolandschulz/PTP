@@ -11,7 +11,6 @@
 package org.eclipse.ptp.launch.internal.ui;
 
 import java.util.Map;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -34,7 +33,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
 public abstract class AbstractPDebuggerTab extends PLaunchConfigurationTab {
-
 	protected ILaunchConfiguration fLaunchConfiguration;
 	protected ILaunchConfigurationWorkingCopy fWorkingCopy;
 	protected IPDebugConfiguration fCurrentDebugConfig;
@@ -129,7 +127,6 @@ public abstract class AbstractPDebuggerTab extends PLaunchConfigurationTab {
 						setLaunchConfigurationWorkingCopy(getLaunchConfiguration().getWorkingCopy());
 					}
 					wc = getLaunchConfigurationWorkingCopy();
-
 				} catch (CoreException e) {
 					return;
 				}
@@ -162,7 +159,7 @@ public abstract class AbstractPDebuggerTab extends PLaunchConfigurationTab {
 			try {
 				tab = PTPDebugUIPlugin.getDefault().getDebuggerPage(debugConfig.getID());
 			} catch (CoreException e) {
-				PTPLaunchPlugin.errorDialog(LaunchMessages.getResourceString("AbstractPDebuggerTab.ErrorLoadingDebuggerPage"), e.getStatus()); //$NON-NLS-1$
+				PTPLaunchPlugin.errorDialog(LaunchMessages.getResourceString("AbstractPDebuggerTab.ErrorLoadingDebuggerPage"), e.getStatus());
 			}
 			setDynamicTab(tab);
 		}
@@ -219,7 +216,7 @@ public abstract class AbstractPDebuggerTab extends PLaunchConfigurationTab {
 		setErrorMessage(null);
 		setMessage(null);
 		if (getDebugConfig() == null) {
-			setErrorMessage(LaunchMessages.getResourceString("AbstractPDebuggerTab.No_debugger_available")); //$NON-NLS-1$
+			setErrorMessage(LaunchMessages.getResourceString("AbstractPDebuggerTab.No_debugger_available"));
 			return false;
 		}
 
@@ -243,7 +240,7 @@ public abstract class AbstractPDebuggerTab extends PLaunchConfigurationTab {
 	}
 
 	public String getName() {
-		return LaunchMessages.getResourceString("AbstractPDebuggerTab.Debugger"); //$NON-NLS-1$
+		return LaunchMessages.getResourceString("AbstractPDebuggerTab.Debugger");
 	}
 
 	protected void createDebuggerCombo(Composite parent, int colspan) {
@@ -254,11 +251,10 @@ public abstract class AbstractPDebuggerTab extends PLaunchConfigurationTab {
 		gd.horizontalSpan = colspan;
 		comboComp.setLayoutData(gd);
 		Label dlabel = new Label(comboComp, SWT.NONE);
-		dlabel.setText(LaunchMessages.getResourceString("Launch.common.DebuggerColon")); //$NON-NLS-1$
+		dlabel.setText(LaunchMessages.getResourceString("Launch.common.DebuggerColon"));
 		fDCombo = new Combo(comboComp, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fDCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		fDCombo.addModifyListener(new ModifyListener() {
-
 			public void modifyText(ModifyEvent e) {
 				if (!isInitializing()) {
 					setInitializeDefault(true);
@@ -283,20 +279,17 @@ public abstract class AbstractPDebuggerTab extends PLaunchConfigurationTab {
 		if (select != -1) {
 			fDCombo.select(select);
 		}
-		//The behaviour is undefined for if the callbacks should be triggered
-		// for this,
-		//so force page update if needed.
+		//The behaviour is undefined for if the callbacks should be triggered for this, so force page update if needed.
 		if (!fPageUpdated) {
 			updateComboFromSelection();
 		}
 		fPageUpdated = false;
 		getControl().getParent().layout(true);
-
 	}
 
 	protected void createDebuggerGroup(Composite parent, int colspan) {
 		Group debuggerGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
-		debuggerGroup.setText(LaunchMessages.getResourceString("PDebuggerTab.Debugger_Options")); //$NON-NLS-1$
+		debuggerGroup.setText(LaunchMessages.getResourceString("PDebuggerTab.Debugger_Options"));
 		setDynamicTabHolder(debuggerGroup);
 		GridLayout tabHolderLayout = new GridLayout();
 		tabHolderLayout.marginHeight = 0;
