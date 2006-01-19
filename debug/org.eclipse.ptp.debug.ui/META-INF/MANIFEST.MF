@@ -16,12 +16,12 @@ Require-Bundle: org.eclipse.jface.text,
  org.eclipse.search,
  org.eclipse.debug.ui,
  org.eclipse.debug.core,
- org.eclipse.ptp.debug.core,
- org.eclipse.ptp.debug.external,
- org.eclipse.ptp.core,
- org.eclipse.ptp.ui,
  org.eclipse.cdt.ui,
- org.eclipse.cdt.debug.core
+ org.eclipse.cdt.debug.core,
+ org.eclipse.ptp.debug.external.core,
+ org.eclipse.ptp.debug.core,
+ org.eclipse.ptp.core,
+ org.eclipse.ptp.ui 
 Eclipse-AutoStart: true
 Bundle-Vendor: Eclipse.org
 Export-Package: org.eclipse.ptp.debug.ui,

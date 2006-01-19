@@ -43,29 +43,29 @@ public interface IPDebugConstants {
 	 * The identifier of the default variable format to use in the variables
 	 * view
 	 */
-	public static final String PREF_DEFAULT_VARIABLE_FORMAT = PLUGIN_ID + "pDebug.default_variable_format"; //$NON-NLS-1$
+	public static final String PREF_DEFAULT_VARIABLE_FORMAT = PLUGIN_ID + "pDebug.default_variable_format";
 	
 	/**
 	 * The identifier of the default expression format to use in the expressions
 	 * views
 	 */
-	public static final String PREF_DEFAULT_EXPRESSION_FORMAT = PLUGIN_ID + "pDebug.default_expression_format"; //$NON-NLS-1$
+	public static final String PREF_DEFAULT_EXPRESSION_FORMAT = PLUGIN_ID + "pDebug.default_expression_format";
 
 	/**
 	 * The identifier of the common source locations list
 	 */
-	public static final String PREF_SOURCE_LOCATIONS = PLUGIN_ID + "pDebug.Source.source_locations"; //$NON-NLS-1$
+	public static final String PREF_SOURCE_LOCATIONS = PLUGIN_ID + "pDebug.Source.source_locations";
 	
 	/**
 	 * Location of the sdm
 	 */
-	public static final String PREF_PTP_SDM_FILE = PLUGIN_ID + ".pDebug.sdm_file"; //$NON-NLS-1$
+	public static final String PREF_PTP_SDM_FILE = PLUGIN_ID + ".pDebug.sdm_file";
 
 	/**
 	 * Default arguments for the sdm
 	 */
-	public static final String PREF_PTP_SDM_ARGS = PLUGIN_ID + ".pDebug.sdm_args"; //$NON-NLS-1$
-	public static final String PREF_DEFAULT_SDM_ARGS = "--host=localhost --debugger=gdb-mi"; //$NON-NLS-1$
+	public static final String PREF_PTP_SDM_ARGS = PLUGIN_ID + ".pDebug.sdm_args";
+	public static final String PREF_DEFAULT_SDM_ARGS = "--host=localhost --debugger=gdb-mi";
 
 	
 	public static final String PREF_SHOW_FULL_PATHS = PLUGIN_ID + ".pDebug.show_full_paths";

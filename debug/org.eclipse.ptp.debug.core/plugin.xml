@@ -2,7 +2,7 @@
 <?eclipse version="3.0"?>
 <plugin>
 
-     <extension-point id="PTPDebugger" name="Parallel Tools Core Debugger Extension" schema="schema/PTPDebugger.exsd"/>
+   <extension-point id="PTPDebugger" name="Parallel Tools Core Debugger Extension" />
 
    <extension
          point="org.eclipse.debug.core.sourcePathComputers">
