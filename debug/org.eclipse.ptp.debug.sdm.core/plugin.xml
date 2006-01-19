@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-
      <extension
          point="org.eclipse.ptp.debug.core.PTPDebugger">
       <debugger
@@ -9,19 +8,8 @@
             name="%SDM.name"
             modes="run"
             cpu="*"
-            class="org.eclipse.ptp.debug.external.PTPDebugger"
-            id="org.eclipse.ptp.debug.external.PTPDebugger">
+            class="org.eclipse.ptp.debug.external.core.PTPDebugger"
+            id="org.eclipse.ptp.debug.external.sdm">
       </debugger>
    </extension>
-   <!--
-   <extension
-         point="org.eclipse.ptp.debug.ui.PDebuggerPage">
-      <debugPage
-            class="org.eclipse.ptp.debug.external.ui.ExternalDebuggerPage"
-            debuggerID="org.eclipse.ptp.debug.external.PTPDebugger"
-            id="org.eclipse.ptp.debug.external.ui.ExternalDebuggerPage">
-      </debugPage>
-   </extension>
-   //-->
-
 </plugin>
