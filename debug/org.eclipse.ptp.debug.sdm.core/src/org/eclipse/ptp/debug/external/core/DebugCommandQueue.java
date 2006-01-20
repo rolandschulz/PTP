@@ -21,9 +21,10 @@ package org.eclipse.ptp.debug.external.core;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.debug.core.IDebugCommand;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
-import org.eclipse.ptp.debug.external.core.commands.IDebugCommand;
 
 /**
  * @author Clement chu
@@ -51,8 +52,8 @@ public class DebugCommandQueue extends Thread {
 			}
 			currentCommand = getCommand();
 			try {
-				currentCommand.execCommand(debugger);
 				System.out.println("***** CURRENT COMMAND: " + currentCommand);
+				currentCommand.execCommand(debugger);
 				currentCommand.waitForReturn();
 				//if (!currentCommand.waitForReturn()) {
 					//debugger.handleErrorEvent(currentCommand.getTasks(), "Wait for return error in " + currentCommand.getName() + " command");

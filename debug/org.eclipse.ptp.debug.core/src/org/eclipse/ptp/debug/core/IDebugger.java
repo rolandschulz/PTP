@@ -20,7 +20,7 @@
  * Created on Feb 18, 2005
  *
  */
-package org.eclipse.ptp.debug.external.core;
+package org.eclipse.ptp.debug.core;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IPJob;
@@ -49,6 +49,8 @@ public interface IDebugger {
 	 */
 	
 	/* Program Information */
+	
+	public int getDebuggerPort() throws CoreException;
 	
 	public void connection() throws CoreException;
 	public void startDebugger(IPJob job) throws CoreException;

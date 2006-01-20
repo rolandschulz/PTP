@@ -26,4 +26,5 @@ public interface IPCDIErrorEvent extends IPCDISuspendedEvent {
 	public static final int DBG_ERROR = 1; // display error only
 	public static final int DBG_FATAL = 2; // display error and terminate debugger
 	public int getErrorCode();
+	public String getMessage();
 }

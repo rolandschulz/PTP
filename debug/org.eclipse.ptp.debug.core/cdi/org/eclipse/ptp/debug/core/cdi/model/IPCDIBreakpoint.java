@@ -30,6 +30,7 @@ public interface IPCDIBreakpoint extends IPCDIObject {
 	final static public int TEMPORARY = 0x1;
 	final static public int HARDWARE = 0x2;
 
+	int getType();
 	boolean isTemporary();
 	boolean isHardware();
 	boolean isEnabled() throws PCDIException;

@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.external.core.commands;
 
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IDebugCommand;
 
 
 /**
@@ -85,8 +86,8 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	
 	public void flush() {
 		synchronized (lock) {
-			lock.notifyAll();
 			isFlush = true;
+			lock.notifyAll();
 		}
 	}
 }

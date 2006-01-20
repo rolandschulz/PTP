@@ -79,7 +79,7 @@ public class PCDIDebugModel {
 		jobListeners.clear();
 	}
 	
-	public IPSession createDebuggerSession(IPTPDebugger debugger, IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException {
+	public IPSession createDebuggerSession(IAbstractDebugger debugger, IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException {
 		return new PSession(debugger.createDebuggerSession(launch, exe, monitor));
 	}
 	

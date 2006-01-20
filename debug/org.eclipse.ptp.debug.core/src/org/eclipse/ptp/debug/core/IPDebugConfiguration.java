@@ -31,9 +31,9 @@ package org.eclipse.ptp.debug.core;
 import org.eclipse.core.runtime.CoreException;
 
 public interface IPDebugConfiguration {
-	final static String CPU_NATIVE = "native"; //$NON-NLS-1$
+	final static String CPU_NATIVE = "native";
 	
-	IPTPDebugger createDebugger() throws CoreException;
+	IAbstractDebugger createDebugger() throws CoreException;
 	String getName();
 	String getID();
 	String getPlatform();

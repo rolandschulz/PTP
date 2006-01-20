@@ -20,7 +20,6 @@ package org.eclipse.ptp.debug.external.core.simulator2;
 
 import org.eclipse.ptp.core.util.BitList;
 
-
 /**
  * @author Clement chu
  * 

@@ -32,8 +32,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 
+/**
+ * @deprecated
+ *
+ */
 public interface IPTPDebugger {
-	public void stopDebugger() throws CoreException;
-	public int startDebuggerListener() throws CoreException;
 	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException;
 }

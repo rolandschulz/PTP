@@ -24,12 +24,16 @@ package org.eclipse.ptp.debug.external.core;
 
 import java.util.Observable;
 import java.util.Observer;
+import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.debug.core.IDebugCommand;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
@@ -37,6 +41,7 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
+import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.external.core.cdi.Session;
 import org.eclipse.ptp.debug.external.core.cdi.event.BreakpointCreatedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.BreakpointHitEvent;
@@ -47,7 +52,6 @@ import org.eclipse.ptp.debug.external.core.cdi.event.InferiorExitedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.InferiorResumedEvent;
 import org.eclipse.ptp.debug.external.core.cdi.event.InferiorSignaledEvent;
 import org.eclipse.ptp.debug.external.core.cdi.model.LineLocation;
-import org.eclipse.ptp.debug.external.core.commands.IDebugCommand;
 import org.eclipse.ptp.debug.external.core.commands.StartDebuggerCommand;
 import org.eclipse.ptp.debug.external.core.commands.StopDebuggerCommand;
 
@@ -59,6 +63,12 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	protected boolean isExited = false;
 	private IPJob job = null;
 	protected DebugCommandQueue commandQueue = null;
+	
+	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException {
+		IPJob job = launch.getPJob();
+		initialize(job);
+		return new Session(this, job, launch, exe, monitor);
+	}
 	
 	public void postCommand(IDebugCommand command) {
 		commandQueue.addCommand(command);
@@ -102,6 +112,10 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		}
 		deleteObservers();
 		commandQueue.setTerminated();
+		//make sure all processes are finished
+		if (!isJobFinished()) {
+			setJobFinished(getSession().createBitList(), IPProcess.EXITED);
+		}
 	}
 	public final IPCDISession getSession() {
 		return session;
@@ -137,19 +151,13 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			System.out.println("    --- Abs debugger: " + event);
 			BitList tasks = event.getAllProcesses();
 			if (event instanceof IPCDIExitedEvent) {
-				setSuspendTasks(false, tasks);
-				setTerminateTasks(true, tasks);
-				session.unregisterTargets(tasks.toArray(), true);
-				setProcessStatus(tasks.toArray(), IPProcess.EXITED);
+				setJobFinished(tasks, IPProcess.EXITED);
 			} else if (event instanceof IPCDIResumedEvent) {
 				setSuspendTasks(false, tasks);
 				setProcessStatus(tasks.toArray(), IPProcess.RUNNING);
 			} else if (event instanceof IPCDIErrorEvent) {
 				IPCDIErrorEvent errEvent = (IPCDIErrorEvent)event;
-				setSuspendTasks(false, tasks);
-				setTerminateTasks(true, tasks);
-				session.unregisterTargets(tasks.toArray(), true);
-				setProcessStatus(tasks.toArray(), IPProcess.ERROR);
+				setJobFinished(tasks, IPProcess.ERROR);
 				if (errEvent.getErrorCode() == IPCDIErrorEvent.DBG_FATAL) {
 					postCommand(new StopDebuggerCommand());
 				}
@@ -164,6 +172,12 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 				}
 			}
 		}
+	}
+	private void setJobFinished(BitList tasks, String status) {
+		setSuspendTasks(false, tasks);
+		setTerminateTasks(true, tasks);
+		session.unregisterTargets(tasks.toArray(), true);
+		setProcessStatus(tasks.toArray(), status);
 	}
 	public final void notifyObservers(Object arg) {
 		setChanged();

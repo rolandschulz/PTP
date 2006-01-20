@@ -8,8 +8,16 @@
             name="%SDM.name"
             modes="run"
             cpu="*"
-            class="org.eclipse.ptp.debug.external.core.PTPDebugger"
+            class="org.eclipse.ptp.debug.external.core.debugger.ParallelDebugger"
             id="org.eclipse.ptp.debug.external.sdm">
+      </debugger>
+      <debugger
+            platform="*"
+            name="%Simulator.name"
+            modes="run"
+            cpu="*"
+            class="org.eclipse.ptp.debug.external.core.simulator2.DebugSimulation2"
+            id="org.eclipse.ptp.debug.external.sim2">
       </debugger>
    </extension>
 </plugin>

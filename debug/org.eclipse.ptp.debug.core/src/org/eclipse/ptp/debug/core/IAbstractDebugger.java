@@ -20,24 +20,26 @@
  * Created on Feb 18, 2005
  *
  */
-package org.eclipse.ptp.debug.external.core;
+package org.eclipse.ptp.debug.core;
 
 import java.util.Observer;
+import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.core.util.Queue;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIEvent;
-import org.eclipse.ptp.debug.external.core.commands.IDebugCommand;
+import org.eclipse.ptp.debug.core.launch.IPLaunch;
 
 public interface IAbstractDebugger extends IDebugger {
 	public final static String TERMINATED_PROC_KEY = "terminated";
 	public final static String SUSPENDED_PROC_KEY = "suspended";
 	
-	public int startDebuggerListener() throws CoreException;
+	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException;
 	
 	/* Debugger Initialization/Termination */
 	public void initialize(IPJob job) throws CoreException;

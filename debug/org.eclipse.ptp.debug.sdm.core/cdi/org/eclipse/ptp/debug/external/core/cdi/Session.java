@@ -36,6 +36,7 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.IPCDIEventManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
@@ -45,7 +46,6 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
-import org.eclipse.ptp.debug.external.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.external.core.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.commands.GoCommand;
@@ -74,7 +74,7 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 	IPLaunch launch = null;
 	IBinaryObject file;
 	
-	public Session(IAbstractDebugger debugger, IPJob job, IPLaunch launch, IBinaryObject file, IProgressMonitor monitor) {
+	public Session(IAbstractDebugger debugger, IPJob job, IPLaunch launch, IBinaryObject file, IProgressMonitor monitor) throws CoreException {
 		this.debugger = debugger;
 		this.job = job;
 		this.launch = launch;
@@ -125,7 +125,7 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 	public IBinaryObject getBinaryFile() {
 		return file;
 	}
-	private void start(IProgressMonitor monitor) {
+	private void start(IProgressMonitor monitor) throws CoreException {
 		IWorkspaceRunnable r = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor m) throws CoreException {
 				m.beginTask("Creating debugging session...", 3);
@@ -140,6 +140,9 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 					getBreakpointManager().setInternalTemporaryBreakpoint(createBitList(), getBreakpointManager().createFunctionLocation("", "main"));
 				}
 				m.worked(1);
+				if (m.isCanceled()) {
+					throw new CoreException(Status.CANCEL_STATUS);
+				}
 				try {
 					resume(createBitList());
 				} catch (PCDIException e) {
@@ -149,11 +152,7 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 				}
 			}
 		};
-		try {
-			ResourcesPlugin.getWorkspace().run(r, monitor);
-		} catch (CoreException e) {
-			PTPDebugCorePlugin.log(e);
-		}
+		ResourcesPlugin.getWorkspace().run(r, monitor);
 	}	
 	
 	public void registerTarget(int procNum, boolean sendEvent) {
