@@ -138,10 +138,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			nprocpnode = (new Integer(nprocpnode_str)).intValue();
 			firstnode = (new Integer(firstnode_str)).intValue();
 		}
-		catch(NumberFormatException e) {	}
+		catch(NumberFormatException e) {}
 		
-		JobRunConfiguration jrc = new JobRunConfiguration(
-			programFile.getLocation().toString(), machineName, nprocs, nprocpnode, firstnode);
+		JobRunConfiguration jrc = new JobRunConfiguration(programFile.getLocation().toString(), machineName, nprocs, nprocpnode, firstnode);
 		
 		return jrc;
 	}

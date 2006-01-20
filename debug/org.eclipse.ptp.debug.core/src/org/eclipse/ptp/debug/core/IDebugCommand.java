@@ -16,11 +16,10 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.external.core.commands;
+package org.eclipse.ptp.debug.core;
 
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.external.core.IAbstractDebugger;
 
 /**
  * @author Clement chu

@@ -36,6 +36,7 @@ import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IProcessEvent;
 import org.eclipse.ptp.core.IProcessListener;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.model.IPseudoProcess;

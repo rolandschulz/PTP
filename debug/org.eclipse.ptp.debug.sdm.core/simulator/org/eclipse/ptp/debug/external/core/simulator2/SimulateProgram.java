@@ -27,14 +27,15 @@ import java.util.Observable;
  * 
  */
 public class SimulateProgram extends Observable implements Runnable {
-	private final int SIM_PROGRAM_LINE = 37;
-	private final int MAIN_METHOD_LINE = 5;
+	public static final int SIM_PROGRAM_LINE = 37;
+	public static final int MAIN_METHOD_LINE = 6;
 	private final int END_STEP_LINE = 15;
 	private int start_step_line = 0;
 	private int current_line = 0;
 	private boolean isStepping = false;
 	private int tid = -1;
 	private String file = "";
+	private List lines = new ArrayList();
 	private List bpts = new ArrayList();
 	private boolean isStopInMain = false;
 	private boolean isPause = false;
@@ -72,9 +73,11 @@ public class SimulateProgram extends Observable implements Runnable {
 		while (current_line < SIM_PROGRAM_LINE) {
 			if (isStopInMain) {
 				isStopInMain = false;
+				printMessage();
 				gotoLine(MAIN_METHOD_LINE);
 			}
 			else if (isPause) {
+				printMessage();
 				setChanged();
 				notifyObservers(new String[] { String.valueOf(tid), DebugSimulation2.STEP_END_STATE, file, String.valueOf(current_line) });
 				waitForNotify();
@@ -83,7 +86,7 @@ public class SimulateProgram extends Observable implements Runnable {
 				isPause = true;
 				printMessage();
 				setChanged();
-				notifyObservers(new String[] { String.valueOf(tid), DebugSimulation2.HIT_BPT_STATE, file, String.valueOf(current_line) });
+				notifyObservers(new String[] { String.valueOf(tid), DebugSimulation2.HIT_BPT_STATE, file, String.valueOf(getHitBreakpointID(current_line)) });
 				waitForNotify();
 			}
 			else if (isStepping) {
@@ -167,15 +170,30 @@ public class SimulateProgram extends Observable implements Runnable {
 		current_line++;
 	}
 	public boolean isHitBreakpoint(int line) {
-		return bpts.contains(new Integer(line));
+		return lines.contains(new Integer(line));
 	}
-	public void setBpt(int bpt_line) {
-		if (!isHitBreakpoint(bpt_line)) {
-			bpts.add(new Integer(bpt_line));
+	public int getHitBreakpointID(int line) {
+		int index = lines.indexOf(new Integer(line));
+		return ((Integer)bpts.get(index)).intValue();
+	}
+	public void deleteBpt(int bpt_id) {
+		int index = bpts.indexOf(new Integer(bpt_id));
+		bpts.remove(index);
+		lines.remove(index);
+	}
+	
+	public void setBpt(int line, int bpt_id) {
+		Integer lineInt = new Integer(line);
+		Integer bptInt = new Integer(bpt_id); 
+		if (!bpts.contains(bptInt)) {
+			if (!lines.contains(lineInt)) {
+				lines.add(lineInt);
+				bpts.add(bptInt);
+			}
 		}
 	}
-	public void setStopInMain() {
-		setBpt(MAIN_METHOD_LINE);
+	public void setStopInMain(int line, int bpt_id) {
+		setBpt(line, bpt_id);
 		isStopInMain = true;
 	}	
 }

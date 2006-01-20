@@ -19,8 +19,8 @@
 package org.eclipse.ptp.debug.external.core.commands;
 
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.external.core.IAbstractDebugger;
 
 /**
  * @author Clement chu
@@ -28,7 +28,7 @@ import org.eclipse.ptp.debug.external.core.IAbstractDebugger;
  */
 public class KillCommand extends AbstractDebugCommand {
 	public KillCommand(BitList tasks) throws PCDIException {
-		super(tasks, true, true);
+		super(tasks, false, true);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterTerminateTasks(tasks);

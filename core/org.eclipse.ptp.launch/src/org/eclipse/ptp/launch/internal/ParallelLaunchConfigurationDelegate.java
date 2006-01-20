@@ -44,9 +44,9 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PreferenceConstants;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
-import org.eclipse.ptp.debug.core.IPTPDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
@@ -144,7 +144,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		
 		// Switch the perspective
 		// LaunchUtils.switchPerspectiveTo(LaunchUtils.PPerspectiveFactory_ID);
-		IPTPDebugger debugger = null;
+		IAbstractDebugger debugger = null;
 		IPJob job = null;
 		try {
 			// done the verification phase
@@ -167,7 +167,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				debugger = debugConfig.createDebugger();
 				jrunconfig.setDebuggerPath(dbgPath);
-				dbgArgs += " --port=" + debugger.startDebuggerListener();
+				dbgArgs += " --port=" + debugger.getDebuggerPort();
 				jrunconfig.setDebuggerArgs(dbgArgs);
 				jrunconfig.setDebug();
 			}

@@ -21,7 +21,6 @@ package org.eclipse.ptp.debug.external.core.debugger;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -29,11 +28,12 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IDebugCommand;
+import org.eclipse.ptp.debug.core.IDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
-import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariable;
@@ -41,13 +41,11 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.external.core.AbstractDebugger;
-import org.eclipse.ptp.debug.external.core.IDebugger;
 import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.Argument;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.LocalVariable;
-import org.eclipse.ptp.debug.external.core.commands.IDebugCommand;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugClient;
 import org.eclipse.ptp.debug.external.core.proxy.ProxyDebugStackframe;
 import org.eclipse.ptp.debug.external.core.proxy.event.IProxyDebugEvent;
@@ -67,31 +65,26 @@ import org.eclipse.ptp.debug.external.core.proxy.event.ProxyDebugVarsEvent;
 
 public class ParallelDebugger extends AbstractDebugger implements IDebugger, IProxyDebugEventListener {
 	/**
-	 * @deprecated
-	 */
+	private HashMap				bpMap = new HashMap();
+	private ArrayList			bpArray = new ArrayList();
 	private class BreakpointMapping {
 		private IPCDIBreakpoint		bpObject;
 		private BitList				bpSet;
 		private int					bpId;
-		
 		public BreakpointMapping(int bpid, BitList set, IPCDIBreakpoint bpt) {
 			this.bpId = bpid;
 			this.bpSet = set;
 			this.bpObject = bpt;
 		}
-		
 		public int getBreakpointId() {
 			return this.bpId;
 		}
-	
 		public BitList getBreakpointProcs() {
 			return this.bpSet;
 		}
-		
 		public IPCDIBreakpoint getBreakpoint() {
 			return this.bpObject;
 		}	
-		
 		public void updateProcs(BitList set) {
 			if (this.bpSet != null) {
 				this.bpSet.or(set);
@@ -100,11 +93,10 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			}
 		}
 	}
+	*/
 	
 	private ProxyDebugClient	proxy;
 	private int					numServers;
-	private HashMap				bpMap = new HashMap();
-	private ArrayList			bpArray = new ArrayList();
 	private int					bpId = 0;
 	private IPCDIStackFrame		currFrame = null;
 
@@ -117,7 +109,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		}
 		return buf.toString();
 	}
-	public int startDebuggerListener() throws CoreException {
+	public int getDebuggerPort() throws CoreException {
 		proxy = new ProxyDebugClient();
 		try {
 			proxy.sessionCreate();
@@ -456,10 +448,8 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	 * achieved by generating a new breakpoint id every time a breakpoint is set.
 	 * 
 	 */
+	/*
 	private void updateBreakpointInfo(int bpid, BitList bpset, IPCDIBreakpoint bpt) {
-		/*
-		 * First update bpMap
-		 */
 		BreakpointMapping bp = (BreakpointMapping) bpMap.get(bpt);
 		
 		if (bp == null) {
@@ -468,21 +458,17 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		} else
 			bp.updateProcs(bpset);
 		
-		/*
-		 * Next update bpArray
-		 */
 		if (bpid >= bpArray.size() || bpArray.get(bpid) == null) {
 			bpArray.add(bpid, bp);
 		}
 	}
-	
 	private BreakpointMapping findBreakpointInfo(int bpid) {
 		return (BreakpointMapping)bpArray.get(bpid);
 	}
-
 	private BreakpointMapping findBreakpointInfo(IPCDIBreakpoint bpt) {
 		return (BreakpointMapping)bpMap.get(bpt);
 	}
+	*/
 
 	private int newBreakpointId() {
 		return this.bpId++;

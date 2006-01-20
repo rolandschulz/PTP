@@ -53,6 +53,9 @@ public abstract class Breakpoint extends PObject implements IPCDIBreakpoint {
 	public boolean isEnabled() throws PCDIException {
 		return enable;
 	}
+	public int getType() {
+		return type;
+	}
 	public boolean isHardware() {
 		return (type == IPCDIBreakpoint.HARDWARE);
 	}

@@ -22,12 +22,17 @@ import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IPTPDebugger;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.external.core.cdi.Session;
 import org.eclipse.ptp.debug.external.core.debugger.ParallelDebugger;
 
+/**
+ * @deprecated
+ *
+ */
 public class PTPDebugger implements IPTPDebugger {
 	IAbstractDebugger debugger;
 	
@@ -37,7 +42,7 @@ public class PTPDebugger implements IPTPDebugger {
 	}
 	
 	public int startDebuggerListener() throws CoreException {
-		return debugger.startDebuggerListener();
+		return debugger.getDebuggerPort();
 	}
 	
 	public void stopDebugger() throws CoreException {

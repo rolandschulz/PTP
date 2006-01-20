@@ -27,12 +27,19 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IDebugCommand;
+import org.eclipse.ptp.debug.core.IDebugger;
 import org.eclipse.ptp.debug.core.aif.AIF;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.event.IPCDIErrorEvent;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIArgument;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocalVariable;
@@ -40,12 +47,13 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.external.core.AbstractDebugger;
-import org.eclipse.ptp.debug.external.core.IDebugger;
+import org.eclipse.ptp.debug.external.core.cdi.breakpoints.LineBreakpoint;
+import org.eclipse.ptp.debug.external.core.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.Argument;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.LocalVariable;
-import org.eclipse.ptp.debug.external.core.commands.IDebugCommand;
+import org.eclipse.ptp.debug.external.core.debugger.IParallelDebuggerConstants;
 
 /**
  * @author Clement chu
@@ -64,6 +72,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	private Map variables = new HashMap();
 	private Map arguments = new HashMap();
 	private IPCDIStackFrame current_frame = null;
+	private int bpt_id = 0;
 
 	public DebugSimulation2() {
 		intQueue = new InternalEventQueue(TIME_RANGE);
@@ -71,10 +80,13 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		createArguments();
 		createVariables();
 	}
+	public int getBreakpointId() {
+		return bpt_id++;
+	}
 	public void connection() throws CoreException {
 		completeCommand(IDebugCommand.OK);
 	}
-	public int startDebuggerListener() throws CoreException {
+	public int getDebuggerPort() throws CoreException {
 		return 0;
 	}
 	private void createArguments() {
@@ -111,24 +123,26 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				if (!EVENT_BY_EACH_PROC) {
 					intQueue.startTimer();
 				}
-				
 				completeCommand(IDebugCommand.OK);
 			}
 		}).start();
 	}
 	public void stopDebugger() throws CoreException {
+		if (sim_list.isEmpty())
+			return;
+
 		new Thread(new Runnable() {
 			public void run() {
 				if (!EVENT_BY_EACH_PROC) {
 					intQueue.stopTimer();
 				}
-		
 				for (Iterator i = sim_list.iterator(); i.hasNext();) {
 					SimulateProgram sim_program = (SimulateProgram) i.next();
 					sim_program.deleteObservers();
 				}
 				intQueue.deleteObservers();
 				sim_list.clear();
+				completeCommand(IDebugCommand.OK);
 			}
 		}).start();
 	}
@@ -144,8 +158,15 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	public void run(String[] args) throws PCDIException {
 		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "run");
 	}
-	public void deleteBreakpoint(BitList tasks, int bpid) throws PCDIException {
-		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "deleteBreakpoints");
+	public void deleteBreakpoint(final BitList tasks, final int bpid) throws PCDIException {
+		new Thread(new Runnable() {
+			public void run() {
+				int[] taskArray = tasks.toArray();
+				for (int i=0; i<taskArray.length; i++) {
+					getSimProg(taskArray[i]).deleteBpt(bpid);
+				}
+			}
+		}).start();
 	}	
 	/***************************************************************************************************************************************************************************************************
 	 * not implement yet
@@ -179,6 +200,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).go();
 				}
+				completeCommand(IDebugCommand.OK);
 			}
 		}).start();
 	}
@@ -201,6 +223,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).suspend();
 				}
+				completeCommand(IDebugCommand.OK);
 			}
 		}).start();
 	}
@@ -211,6 +234,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).stepLine();
 				}
+				completeCommand(IDebugCommand.OK);
 			}
 		}).start();
 	}
@@ -221,6 +245,7 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).stepOverLine();
 				}
+				completeCommand(IDebugCommand.OK);
 			}
 		}).start();
 	}
@@ -231,18 +256,20 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 				for (int i=0; i<taskArray.length; i++) {
 					getSimProg(taskArray[i]).stepFinish();
 				}
+				completeCommand(IDebugCommand.OK);
 			}
 		}).start();
 	}	
 	public void setLineBreakpoint(final BitList tasks, final IPCDILineBreakpoint bpt) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
-				int line = bpt.getLocator().getLineNumber();
 				int[] taskArray = tasks.toArray();
+				int line = bpt.getLocator().getLineNumber();
+				IPCDIBreakpoint new_bpt = createBreakpoint(bpt.getLocator().getFile(), line, bpt);
 				for (int i=0; i<taskArray.length; i++) {
-					getSimProg(taskArray[i]).setBpt(line);
+					getSimProg(taskArray[i]).setBpt(line, new_bpt.getBreakpointId());
 				}
-				completeCommand(IDebugCommand.OK);
+				completeCommand(new_bpt);
 			}
 		}).start();
 	}
@@ -251,14 +278,25 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		new Thread(new Runnable() {
 			public void run() {
 				int[] taskArray = tasks.toArray();
+				int line = SimulateProgram.MAIN_METHOD_LINE;
+				IPCDIBreakpoint new_bpt = createBreakpoint(bpt.getLocator().getFile(), line, bpt);
 				for (int i=0; i<taskArray.length; i++) {
-					SimulateProgram sim_prog = getSimProg(taskArray[i]);
-					sim_prog.setStopInMain();
+					getSimProg(taskArray[i]).setStopInMain(line, new_bpt.getBreakpointId());
 				}
-				completeCommand(IDebugCommand.OK);
+				completeCommand(new_bpt);
 			}
 		}).start();
 	}
+	private IPCDIBreakpoint createBreakpoint(String file, int line, IPCDIBreakpoint oldBpt) {
+		try {
+			IPCDILineBreakpoint bpt = new LineBreakpoint(oldBpt.getType(), new LineLocation(file, line), oldBpt.getCondition());
+			bpt.setBreakpointId(getBreakpointId());
+			return bpt;
+		} catch (PCDIException e) {
+			return null;
+		}
+	}
+	
 	public void listStackFrames(final BitList tasks) throws PCDIException {
 		new Thread(new Runnable() {
 			public void run() {
@@ -356,7 +394,9 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 		}).start();
 	}
 	public void listGlobalVariables(BitList tasks) throws PCDIException {
-		throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listGlobalVariables");
+		completeCommand(null);
+		handleErrorEvent(tasks, PCDIException.NOT_IMPLEMENTED + " - listGlobalVariables", IPCDIErrorEvent.DBG_FATAL);
+		//throw new PCDIException(PCDIException.NOT_IMPLEMENTED, "listGlobalVariables");
 	}
 	
 	public synchronized void update(Observable obs, Object obj) {
@@ -386,11 +426,11 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 	}
 	private synchronized void updateEvent(QueueItem qItem) {
 		String state = qItem.getState();
-		//System.out.println("**** Event Update: " + state + ", tasks: " + qItem.getTasks().cardinality());
+		//System.out.println("**** Event Update: " + state + ", tasks: " + qItem.getTasks().cardinality() + ", line: " + qItem.getLine());
 		if (state.equals(EXIT_STATE)) {
 			handleProcessTerminatedEvent(qItem.getTasks());
 		} else if (state.equals(HIT_BPT_STATE)) {
-			//TODO add breakpoint id
+			handleBreakpointHitEvent(qItem.getTasks(), qItem.getLine());
 			//handleBreakpointHitEvent(qItem.getTasks(), qItem.getLine(), qItem.getFile());
 		} else if (state.equals(STEP_END_STATE)) {
 			handleEndSteppingEvent(qItem.getTasks(), qItem.getLine(), qItem.getFile());

@@ -20,8 +20,8 @@ package org.eclipse.ptp.debug.external.core.commands;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
-import org.eclipse.ptp.debug.external.core.IAbstractDebugger;
 
 
 /**

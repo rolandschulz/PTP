@@ -24,6 +24,8 @@ import java.util.Observer;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IDebugCommand;
+import org.eclipse.ptp.debug.core.IDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
@@ -31,7 +33,6 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIStackFrame;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIThread;
 import org.eclipse.ptp.debug.external.core.AbstractDebugger;
-import org.eclipse.ptp.debug.external.core.IDebugger;
 import org.eclipse.ptp.debug.external.core.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.core.cdi.breakpoints.LineBreakpoint;
 import org.eclipse.ptp.debug.external.core.cdi.model.StackFrame;
@@ -39,7 +40,6 @@ import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.Argument;
 import org.eclipse.ptp.debug.external.core.cdi.model.variable.LocalVariable;
-import org.eclipse.ptp.debug.external.core.commands.IDebugCommand;
 import org.eclipse.ptp.rtsystem.simulation.SimProcess;
 import org.eclipse.ptp.rtsystem.simulation.SimStackFrame;
 import org.eclipse.ptp.rtsystem.simulation.SimThread;
@@ -70,7 +70,7 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 		dQ.addItem("Look at this console window for output from the Debug Simulator");
 		dQ.addItem("  ");
 	}
-	public int startDebuggerListener() {
+	public int getDebuggerPort() {
 		return 0;
 	}
 	public void startDebugger(IPJob job) {
