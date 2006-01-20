@@ -317,9 +317,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				}	
 				try {
 					getProcsStatusForNewJob(ne[i], job, new SubProgressMonitor(monitor, ne2.length));
-				} catch (InterruptedException e) {
-					universe.deleteJob(job);
-					return;
 				} catch (CoreException e) {
 					universe.deleteJob(job);
 					return;
@@ -333,7 +330,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	/* given a Job, this contacts the monitoring system and populates the runtime 
 	 * model with the processes that correspond to that Job
 	 */
-	private void getProcsStatusForNewJob(String nejob, IPJob job, IProgressMonitor monitor) throws InterruptedException, CoreException {
+	private void getProcsStatusForNewJob(String nejob, IPJob job, IProgressMonitor monitor) throws CoreException {
 		//String[] ne = controlSystem.getProcesses(job);
 		//IPProcess procs[] = job.getSortedProcesses();
 		//if(procs == null) return;
@@ -354,7 +351,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		monitor.beginTask("Initialing the process...", numProcs);
 		for (int i = 0; i < numProcs; i++) {
 			if (monitor.isCanceled()) {
-				throw new InterruptedException("Cancelled by user");
+				throw new CoreException(Status.CANCEL_STATUS);
 			}
 			
 			IPProcess proc = job.findProcessByName(nejob+"_process"+i);
@@ -395,7 +392,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			monitor.worked(1);
 		}
 		if (monitor.isCanceled()) {
-			throw new InterruptedException("Cancelled by user");
+			throw new CoreException(Status.CANCEL_STATUS);
 		}
 		monitor.done();
 	}
@@ -523,9 +520,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		
 		try {
 			getProcsStatusForNewJob(ne, pjob, new SubProgressMonitor(monitor, ne2.length));
-		} catch (InterruptedException e) {
-			universe.deleteJob(job);
-			return;
 		} catch (CoreException e) {
 			universe.deleteJob(job);
 			return;
@@ -724,10 +718,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		
 		try {
 			getProcsStatusForNewJob(jobName, job, new SubProgressMonitor(monitor, numProcesses));
-		} catch(InterruptedException e2) {
-			controlSystem.terminateJob(job);
-			universe.deleteJob(job);
-			throw new CoreException(new Status(IStatus.CANCEL, PTPCorePlugin.getUniqueIdentifier(), IStatus.CANCEL, e2.getMessage(), e2));			
 		} catch (CoreException e) {
 			controlSystem.terminateJob(job);
 			universe.deleteJob(job);
