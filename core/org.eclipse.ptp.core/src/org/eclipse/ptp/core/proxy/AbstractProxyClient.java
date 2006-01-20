@@ -190,11 +190,22 @@ public abstract class AbstractProxyClient {
 		}
 	}
 	
+	private boolean fullRead(char[] buf, int len) throws IOException {
+		int offset = 0;
+		while (len > 0) {
+			int n = sessIn.read(buf, offset, len);
+			if (n <= 0)
+				return false;
+			offset += n;
+			len -= n;
+		}
+		return true;
+	}
+	
 	private void sessionProgress() throws IOException {
 		char[] len_bytes = new char[9];
 		
-		int n = sessIn.read(len_bytes, 0, 9);
-		if (n < 0) {
+		if (!fullRead(len_bytes, 9)) {
 			exitThread = true;
 			return;
 		}
@@ -204,14 +215,12 @@ public abstract class AbstractProxyClient {
 		
 		char[] event_bytes = new char[len];
 
-		n = sessIn.read(event_bytes, 0, len);
-		if (n < 0) {
+		if (!fullRead(event_bytes, len)) {
 			exitThread = true;
 			return;
 		}
 
 		String event_str = new String(event_bytes);
-
 		fireProxyEvent(ProxyEvent.toEvent(event_str));
 	}
 
