@@ -372,7 +372,7 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 	size_t i, j, k;
 	orte_gpr_value_t **values, *value;
 	orte_gpr_keyval_t **keyvals;
-	char *res, *str, *nodename;
+	char *res, *kv, *str1, *str2, *nodename;
 	int machID;
 	
 	printf("BPROC NOTIFY CALLBACK!\n"); fflush(stdout);
@@ -399,26 +399,30 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 			switch(keyval->type) {
 				case ORTE_NODE_STATE:
 					printf("--- BPROC CHANGE: (state) val = %d\n", keyval->value.node_state); fflush(stdout);
-					asprintf(&str, "%s=%d", keyval->key, keyval->value.node_state);
+					asprintf(&kv, "%s=%d", keyval->key, keyval->value.node_state);
 					break;
 				case ORTE_STRING:
 					printf("--- BPROC CHANGE: (str) val = %s\n", keyval->value.strptr); fflush(stdout);
-					asprintf(&str, "%s=%s", keyval->key, keyval->value.strptr);
+					asprintf(&kv, "%s=%s", keyval->key, keyval->value.strptr);
 					break;
 				case ORTE_UINT32:
 					printf("--- BPROC CHANGE: (uint32) val = %d\n", keyval->value.ui32); fflush(stdout);
-					asprintf(&str, "%s=%d", keyval->key, keyval->value.ui32);
+					asprintf(&kv, "%s=%d", keyval->key, keyval->value.ui32);
 					break;
 				default:
 					printf("--- BPROC CHANGE: unknown type %d\n", keyval->type); fflush(stdout);
-					asprintf(&str, "%s=%d", keyval->key, keyval->type);
+					asprintf(&kv, "%s=%d", keyval->key, keyval->type);
 			}
 			
-			asprintf(&res, "%d %d %s %s", RTEV_NODECHANGE, machID, nodename, str);
+			proxy_cstring_to_str(nodename, &str1);
+			proxy_cstring_to_str(kv, &str2);
+			asprintf(&res, "%d %d %s %s", RTEV_NODECHANGE, machID, str1, str2);
         	proxy_svr_event_callback(orte_proxy, res);
         	free(res);
-        	free(str);
-		}
+        	free(kv);
+        	free(str1);
+        	free(str2);
+        	}
 		
 		free(nodename);
 	}
@@ -1024,22 +1028,24 @@ static void iof_callback(
     const unsigned char* data,
     size_t count)
 {
-	char *res;
-	unsigned char str[1024];
+	char *res, *str;
+	unsigned char line[1024];
 	
 	printf("IO callback!  count = %d\n", count); fflush(stdout);
     if(count > 0) {
         fprintf(stdout, "[%lu,%lu,%lu] ", ORTE_NAME_ARGS(src_name));
-        strncpy((char*)str, (char*)data, count);
-        if(str[count-1] == '\n') str[count-1] = '\0';
-        str[count] = '\0';
+        strncpy((char*)line, (char*)data, count);
+        if(line[count-1] == '\n') line[count-1] = '\0';
+        line[count] = '\0';
         //printf("STR = '%s'\n", str);
         /* src_name->jobid = jobid
          * src_name->vpid = processID */
         //write(STDOUT_FILENO, data, count);
+        proxy_cstring_to_str(line, &str);
         asprintf(&res, "%d %d %d %s", RTEV_PROCOUT, src_name->jobid, src_name->vpid, str);
         proxy_svr_event_callback(orte_proxy, res);
         free(res);
+        free(str);
     }
 }
 
@@ -1317,6 +1323,8 @@ ORTEGetProcessAttribute(char **args)
 	int				jobid;
 	int				procid;
 	char *			res;
+	char *			str1;
+	char *			str2;
 	int				last_arg;
 	int				i;
 	char **			keys = NULL;
@@ -1390,7 +1398,14 @@ ORTEGetProcessAttribute(char **args)
 	
 	sprintf(valstr, "");
 	for(i=0; i<values_len; i++) {
-		sprintf(valstr, "%s%s%s", valstr, i == 0 ? "" : " ", values[i]);
+		proxy_cstring_to_str(values[i], &str1);
+		if (i > 0) {
+			str2 = valstr;
+			asprintf(&valstr, "%s %s", str2, str1);
+			free(str1);
+			free(str2);
+		} else
+			valstr = str1;
 	}
 	
 	printf("valSTR = '%s'\n", valstr);
@@ -1625,6 +1640,9 @@ ORTEGetNodeAttribute(char **args)
 	int				machid;
 	int				nodeid;
 	char *			res;
+	char *			str1;
+	char *			str2;
+	char *			str3;
 	int				last_arg;
 	int				i;
 	char **			keys = NULL;
@@ -1721,24 +1739,27 @@ ORTEGetNodeAttribute(char **args)
 		printf("Hostname = '%s'\n", hostname); fflush(stdout);
 		printf("Username = '%s'\n", pwd->pw_name); fflush(stdout);
 		printf("Groupname = '%s'\n", grp->gr_name); fflush(stdout);
-		tot_len = 0;
-		tot_len += strlen(hostname);
-		if(pwd != NULL) tot_len += strlen(pwd->pw_name);
-		if(grp != NULL) tot_len += strlen(grp->gr_name);
-		tot_len += 6; /* extra space for spaces, null, etc */
 		
-		printf("Total length = %d\n", tot_len); fflush(stdout);
-		
-		valstr = (char*)malloc(tot_len * sizeof(char));
-		
-		sprintf(valstr, "%s %s %s\0", hostname, pwd->pw_name, grp->gr_name);
+		proxy_cstring_to_str(hostname, &str1);
+		proxy_cstring_to_str(pwd->pw_name, &str2);
+		proxy_cstring_to_str(grp->gr_name, &str3);
+		asprintf(&valstr, "%s %s %s", str1, str2, str3);
+		free(str1);
+		free(str2);
+		free(str3);
 	}
 	else {
-		valstr = (char*)malloc(tot_len * sizeof(char));
-	
-		sprintf(valstr, "");
 		for(i=0; i<values_len; i++) {
-			sprintf(valstr, "%s%s%s%s", valstr, i == 0 ? "" : " ", values[i], i == values_len-1 ? "\0" : "");
+			proxy_cstring_to_str(values[i], &str2);
+			if (i > 0) {
+				str1 = valstr;
+				asprintf(&valstr, "%s %s", str1, str2);
+				free(str1);
+				free(str2);
+			} else {
+				valstr = str2;
+			}
+
 		}
 	}
 	
