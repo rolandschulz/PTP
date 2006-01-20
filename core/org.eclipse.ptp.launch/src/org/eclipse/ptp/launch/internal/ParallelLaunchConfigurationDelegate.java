@@ -160,8 +160,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
-				String dbgPath = preferences.getString(IPDebugConstants.PREF_PTP_SDM_FILE);
-				String dbgArgs = preferences.getString(IPDebugConstants.PREF_PTP_SDM_ARGS);
+				String dbgPath = preferences.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE);
+				String dbgArgs = preferences.getString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS);
 
 				verifyDebuggerPath(dbgPath);
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);

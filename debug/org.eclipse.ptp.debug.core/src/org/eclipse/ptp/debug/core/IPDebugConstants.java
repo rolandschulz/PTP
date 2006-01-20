@@ -59,13 +59,13 @@ public interface IPDebugConstants {
 	/**
 	 * Location of the sdm
 	 */
-	public static final String PREF_PTP_SDM_FILE = PLUGIN_ID + ".pDebug.sdm_file";
+	public static final String PREF_PTP_DEBUGGER_FILE = PLUGIN_ID + ".pDebug.debugger_file";
 
 	/**
 	 * Default arguments for the sdm
 	 */
-	public static final String PREF_PTP_SDM_ARGS = PLUGIN_ID + ".pDebug.sdm_args";
-	public static final String PREF_DEFAULT_SDM_ARGS = "--host=localhost --debugger=gdb-mi";
+	public static final String PREF_PTP_DEBUGGER_ARGS = PLUGIN_ID + ".pDebug.debugger_args";
+	public static final String PREF_DEFAULT_DEUBGGER_ARGS = "--host=localhost --debugger=gdb-mi";
 
 	
 	public static final String PREF_SHOW_FULL_PATHS = PLUGIN_ID + ".pDebug.show_full_paths";
