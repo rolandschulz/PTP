@@ -19,6 +19,8 @@
 
 package org.eclipse.ptp.rtsystem.proxy.event;
 
+import org.eclipse.ptp.core.proxy.event.ProxyEvent;
+
 public class ProxyRuntimeProcessOutputEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeEvent {
 	private String text;
 	private int jobID;
@@ -32,8 +34,8 @@ public class ProxyRuntimeProcessOutputEvent extends AbstractProxyRuntimeEvent im
 		
 		text = new String("");
 		for(int i=3; i<arg.length; i++) {
-			if(i == 3) text = arg[i];
-			else text = text + " " +arg[i];
+			if(i == 3) text = ProxyEvent.decodeString(arg[i]);
+			else text = text + " " + ProxyEvent.decodeString(arg[i]);
 		}
 	}
 	

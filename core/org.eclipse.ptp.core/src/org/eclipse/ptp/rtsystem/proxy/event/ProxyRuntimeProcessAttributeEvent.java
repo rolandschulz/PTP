@@ -19,6 +19,8 @@
 
 package org.eclipse.ptp.rtsystem.proxy.event;
 
+import org.eclipse.ptp.core.proxy.event.ProxyEvent;
+
 public class ProxyRuntimeProcessAttributeEvent extends AbstractProxyRuntimeEvent implements IProxyRuntimeEvent {
 	private String[]	values;
 
@@ -27,7 +29,7 @@ public class ProxyRuntimeProcessAttributeEvent extends AbstractProxyRuntimeEvent
 		int s = values.length - 1;
 		this.values = new String[s];
 		for(int i=0; i<s; i++) {
-			this.values[i] = new String(values[i+1]);
+			this.values[i] = new String(ProxyEvent.decodeString(values[i+1]));
 		}
 	}
 	
