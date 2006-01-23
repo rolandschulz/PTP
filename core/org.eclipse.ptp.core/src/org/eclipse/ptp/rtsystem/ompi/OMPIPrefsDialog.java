@@ -279,7 +279,14 @@ public class OMPIPrefsDialog extends Dialog
 					if(!found_orte_server) {
 						int idx = ipath.indexOf("org.eclipse.ptp.core");
 						String ipath2 = ipath.substring(0, idx) + "org.eclipse.ptp.orte/orte_server";
-						orteServerText.setText(ipath2);
+						File f = new File(ipath2);
+						if(f.exists()) {
+							orteServerText.setText(ipath2);
+							found_orte_server = true;
+						}
+						else {
+							orteServerText.setText(ipath2);
+						}
 					}
 				} catch(Exception e) { 
 					orteServerText.setText("");
