@@ -242,6 +242,8 @@ public class OMPIPrefsDialog extends Dialog
 		
 		/* if they don't have the orte_server path set, let's try and give them a default that might help */
 		if(orteServerFile.equals("")) {
+			boolean found_orte_server = false;
+			
 			URL url = Platform.find(Platform.getBundle(PTPCorePlugin.PLUGIN_ID), new Path("/"));
 
 			if (url != null) {
@@ -249,9 +251,36 @@ public class OMPIPrefsDialog extends Dialog
 					File path = new File(Platform.asLocalURL(url).getPath());
 					String ipath = path.getAbsolutePath();
 					System.out.println("Plugin install dir = '"+ipath+"'");
-					int idx = ipath.indexOf("org.eclipse.ptp.core");
-					String ipath2 = ipath.substring(0, idx) + "org.eclipse.ptp.orte/orte_server";
-					orteServerText.setText(ipath2);
+					
+					/* org.eclipse.ptp.orte.linux.x86_64_1.0.0
+					   org.eclipse.ptp.orte.$(OS).$(ARCH)_$(VERSION) */
+					String ptp_version = (String)PTPCorePlugin.getDefault().getBundle().getHeaders().get("Bundle-Version");
+					System.out.println("PTP Version = "+ptp_version);
+					Properties p = System.getProperties();
+					String os = p.getProperty("osgi.os");
+					String arch = p.getProperty("osgi.arch");
+					System.out.println("osgi.os = "+os);
+					System.out.println("osgi.arch = "+arch);
+					if(os != null && arch != null && ptp_version != null) {
+						String combo = "org.eclipse.ptp.core."+os+"."+arch+"_"+ptp_version;
+						System.out.println("Searching for directory: "+combo);
+						int idx = ipath.indexOf(combo);
+						/* if we found it */
+						if(idx > 0) {
+							String ipath2 = ipath.substring(0, idx) + "org.eclipse.ptp.orte."+os+"."+arch+"_"+ptp_version+"/orte_server";
+							File f = new File(ipath2);
+							if(f.exists()) {
+								orteServerText.setText(ipath2);
+								found_orte_server = true;
+							}
+						}
+					}
+					
+					if(!found_orte_server) {
+						int idx = ipath.indexOf("org.eclipse.ptp.core");
+						String ipath2 = ipath.substring(0, idx) + "org.eclipse.ptp.orte/orte_server";
+						orteServerText.setText(ipath2);
+					}
 				} catch(Exception e) { 
 					orteServerText.setText("");
 				}
