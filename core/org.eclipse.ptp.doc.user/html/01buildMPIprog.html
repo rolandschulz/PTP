@@ -54,10 +54,9 @@ The first error may be that an include file isn't found.
 <br><img src="images/errorInclude.gif">
 <h2 id="include">Include Paths</h2>
 <p>In order to locate needed include files, bring up the Project Properties on this C/C++ project.
-<br>Click the right mouse -- 
-<!-- TODO : MAC? no rightMouse on mac -->
-<br>Bring up the context menu [is that more proper way to address
-mouse clicking?] on the Project, and select "Properties."
+
+<br>To bring up the Project Properties dialog,
+activate the context menu  on the Project, and select "Properties."
 <br><img src="images/projProps.gif">
 <p>
 The project properties window is displayed for this C project.
@@ -86,8 +85,17 @@ Now your project should rebuild without errors relating to finding
 the include files.
 <p>
 <h2 id="mpicc">Specifying the mpicc toolchain</h2>
-<p><!-- TODO TODO: Can't do this on Win -?? -->TBD.
 
+<p>Now specify the build/link command.
+Again in Project properties, C/C++ build page, Tool Settings tab,
+click on "GCC C compiler"
+and change the default "gcc" value to "mpicc"
+(or whatever the build command is for your MPI environment).
+<br><img src="images/projPropsMpicc.gif">
+<p>Then do the same for the "GCC C Linker."
+<br><img src="images/projPropsMpicc2.gif">
+
+<p>&nbsp;
 <h2 id="launch">Launching the MPI program</h2>
 <p>Set up the launch configuration for launching the 
 MPI program by configuring for "external tools."
