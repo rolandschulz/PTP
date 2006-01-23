@@ -210,9 +210,11 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		if (node == null)
 			return " Unknown node";
 		StringBuffer buffer = new StringBuffer();
-		buffer.append(" Node ID: " + node.getNodeNumber());
-		buffer.append("\n");
-		buffer.append(" Node name: " + node.getElementName());
+		//buffer.append(" Node ID: " + node.getNodeNumber());
+		//buffer.append("\n");
+		//buffer.append(" Node name: " + node.getElementName());
+		buffer.append(" Node name: " + node.getAttrib(AttributeConstants.ATTRIB_NODE_NAME));
+		buffer.append(" (ID: "+node.getNodeNumber()+")");
 		IElementSet[] groups = setManager.getSetsWithElement(element.getID());
 		if (groups.length > 1)
 			buffer.append("\n Group: ");
