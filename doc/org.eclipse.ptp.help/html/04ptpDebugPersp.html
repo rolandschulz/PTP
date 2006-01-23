@@ -13,12 +13,13 @@
 <li><a href="#pSetsOper">Operations on Process Sets</a>
 <li><a href="#bkpt">Breakpoints</a>
 <li><a href="#cip">Current Instruction Pointer</a>
-<li><a href="#reg">Process Registration </a>
+<li><a href="#reg">Process Registration </a> and the Debug view (including stack traces)
 
 </ul>
 
 <h2 id="feat">Main features of the PTP Debug perspective</h2>
-<br>
+<p>Note: the Process View in the following screen shot
+is also knows as the Debug View.
 <img src="images/ptpDebugOview.gif">
 
 
@@ -136,16 +137,27 @@ is indicated with the blue arrow icon.  The current source line is also highligh
 <br><img src="images/mip.gif">
 <p>Hovering over the instruction pointer provides additional information.
 <br><img src="images/cipHover.gif">
-<h2 id="reg">Process Registration</h2>
+<h2 id="reg">Process Registration and the Debug View</h2> 
+
 <p>Process set commands apply to groups of processes.
 For finer control and more detailed information, a process can be
-<i>registered</i>.
-Registered processes appear in the 'Debug' view.
+<i>registered</i> and isolated in the Debug View.
+<p>
+Registered processes, including their stack traces, appear in the 'Debug' view.
 Any number of processes can be registered,
 and processes can be registered or un-registered at any time.
-<p>To register a process, double-click its process icon.
+<p>To register a process, double-click its process icon in the Jobs view.
+Note that the process "diamond" then is surrounded by a box.
+The process appears in the debug view.
 <br><img src="images/reg1.gif">
 <p>To un-register a process, double-click on the same icon.
+The box disappears, and the process is removed from the debug view.
+<p>Note that the debug commands (icons including run, step, etc.)
+in the toolbar of the Jobs view (tab title: Parallel Debug)
+control the currently selected process set.
+The debug commands in the toolbar of the Debug view 
+control the single process that is currently selected  in that view.
+
 <h2>Putting it all together</h2>
 <p>Try this:
 <ul>
