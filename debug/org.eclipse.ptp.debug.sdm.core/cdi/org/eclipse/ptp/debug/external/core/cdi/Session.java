@@ -128,7 +128,8 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 	private void start(IProgressMonitor monitor) throws CoreException {
 		IWorkspaceRunnable r = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor m) throws CoreException {
-				m.beginTask("Creating debugging session...", 3);
+				m.beginTask("", 3);
+				m.setTaskName("Creating debugging session...");
 				PTPDebugCorePlugin.getDebugModel().newJob(getJob().getIDString(), getTotalProcesses());				
 				launch.launchedStarted();
 				m.worked(1);
@@ -145,6 +146,7 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 				}
 				try {
 					resume(createBitList());
+					m.worked(1);
 				} catch (PCDIException e) {
 					throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));			
 				} finally {

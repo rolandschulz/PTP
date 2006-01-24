@@ -69,6 +69,7 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		createMenuActions(menuMgr);
 		createContextMenu();
 		initialView();
+		PTPUIPlugin.refreshRuntimeSystem();
 	}
 	protected void createToolBarGroups(IToolBarManager toolBarMgr) {
 		toolBarMgr.add(new Separator(IPTPUIConstants.IUINAVIGATORGROUP));

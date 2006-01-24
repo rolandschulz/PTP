@@ -137,7 +137,8 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		monitor.beginTask(MessageFormat.format("{0}...", new String[] { "Launching " + configuration.getName() }),  10);
+		monitor.beginTask("",  200);
+		monitor.setTaskName(MessageFormat.format("{0}...", new String[] { "Launching " + configuration.getName() }));
 		if (monitor.isCanceled()) {
 			return;
 		}
@@ -159,6 +160,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			}
 			
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				monitor.subTask("Configuring debug setting");
 				Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
 				String dbgPath = preferences.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE);
 				String dbgArgs = preferences.getString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS);
@@ -171,9 +173,10 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				jrunconfig.setDebuggerArgs(dbgArgs);
 				jrunconfig.setDebug();
 			}
-			monitor.worked(1);
+			monitor.worked(10);
 			
-			job = getLaunchManager().run(launch, workDirectory, null, jrunconfig, new SubProgressMonitor(monitor, 8));
+			monitor.subTask("Starting the job");
+			job = getLaunchManager().run(launch, workDirectory, null, jrunconfig, new SubProgressMonitor(monitor, 150));
 			job.setAttribute(PreferenceConstants.JOB_APP, exePath.lastSegment());
 			job.setAttribute(PreferenceConstants.JOB_WORK_DIR, exePath.removeLastSegments(1).toString());
 			job.setAttribute(PreferenceConstants.JOB_ARGS, args);
@@ -182,11 +185,16 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			pLaunch.setPJob(job);
 			
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				monitor.setTaskName("Starting the debugger...");
 				job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, exePath.removeLastSegments(1).toOSString());
-				PTPDebugCorePlugin.getDebugModel().createDebuggerSession(debugger, pLaunch, exeFile, new SubProgressMonitor(monitor, 2));
+				PTPDebugCorePlugin.getDebugModel().createDebuggerSession(debugger, pLaunch, exeFile, new SubProgressMonitor(monitor, 40));
+				monitor.worked(10);
 				if (monitor.isCanceled()) {
 					PTPDebugCorePlugin.getDebugModel().shutdownSession(job);
 				}
+			}
+			else {
+				monitor.worked(40);
 			}
 		} catch (CoreException e) {
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {

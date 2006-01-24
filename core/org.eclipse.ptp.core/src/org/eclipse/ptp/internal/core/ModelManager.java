@@ -56,9 +56,6 @@ import org.eclipse.ptp.rtsystem.ompi.OMPIProxyRuntimeClient;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IPerspectiveDescriptor;
-import org.eclipse.ui.IPerspectiveListener;
-import org.eclipse.ui.IWorkbenchPage;
 
 public class ModelManager implements IModelManager, IRuntimeListener {
 	protected List listeners = new ArrayList(2);
@@ -70,7 +67,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 	protected IPUniverse universe = null;
 
-	protected boolean isPerspectiveOpen = false;
+	//protected boolean isPerspectiveOpen = false;
 
 	protected ILaunchConfiguration config = null;
 
@@ -81,9 +78,11 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	private int currentControlSystem = -1;
 	private int currentMonitoringSystem = -1;
 	
+	/*
 	public boolean isParallelPerspectiveOpen() {
 		return isPerspectiveOpen;
 	}
+	*/
 
 	public void setPTPConfiguration(ILaunchConfiguration config) {
 		this.config = config;
@@ -94,7 +93,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	}
 
 	public ModelManager() {
-		PTPCorePlugin.getDefault().addPerspectiveListener(perspectiveListener);
+		//PTPCorePlugin.getDefault().addPerspectiveListener(perspectiveListener);
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		int MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
 		String MSChoice = MonitoringSystemChoices.getMSNameByID(MSChoiceID);
@@ -145,75 +144,130 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	
 	public int getMonitoringSystemID() { return currentMonitoringSystem; }
 	
-	public void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID)
-	{
-		/*
-		 * Shutdown runtime if it is already active
-		 */
-		System.out.println("SHUTTING DOWN CONTROL/MONITORING/PROXY systems where appropriate");
-		if (controlSystem != null)
-			controlSystem.shutdown();
-		if (monitoringSystem != null)
-			monitoringSystem.shutdown();
-		if (runtimeProxy != null)
-			runtimeProxy.shutdown();
-
-		if(monitoringSystemID == MonitoringSystemChoices.SIMULATED && controlSystemID == ControlSystemChoices.SIMULATED) {
-			/* load up the control and monitoring systems for the simulation */
-			monitoringSystem = new SimulationMonitoringSystem();
-			controlSystem = new SimulationControlSystem();
-			runtimeProxy = null;
+	
+	public void refreshRuntimeSystems(IProgressMonitor monitor) throws CoreException {
+		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
+		int MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
+		int CSChoiceID = preferences.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
+		int curMSID = getControlSystemID();
+		int curCSID = getMonitoringSystemID();
+		if(curMSID != MSChoiceID || curCSID != CSChoiceID) {
+			refreshRuntimeSystems(CSChoiceID, MSChoiceID, monitor);
 		}
-		else if(monitoringSystemID == MonitoringSystemChoices.ORTE && controlSystemID == ControlSystemChoices.ORTE) {
-			/* load up the control and monitoring systems for OMPI */
-			runtimeProxy = new OMPIProxyRuntimeClient(this);
-			if(runtimeProxy != null && !runtimeProxy.startup()) {
-				runtimeProxy = null;
-				Preferences p = PTPCorePlugin.getDefault().getPluginPreferences();
-				int MSChoiceID = p.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
-				int CSChoiceID = p.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
-				monitoringSystem = null;
-				controlSystem = null;
-				refreshRuntimeSystems(CSChoiceID, MSChoiceID);
-				
-				return;
+	}
+	
+	private void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID, IProgressMonitor monitor) throws CoreException {
+		try {
+			monitor.beginTask("Refreshing runtime system...", 200);
+			/*
+			 * Shutdown runtime if it is already active
+			 */
+			System.out.println("SHUTTING DOWN CONTROL/MONITORING/PROXY systems where appropriate");
+			if (controlSystem != null) {
+				monitor.subTask("Shutting down control system...");
+				controlSystem.shutdown();
+				monitor.worked(10);
 			}
-			monitoringSystem = new OMPIMonitoringSystem((OMPIProxyRuntimeClient)runtimeProxy);
-			controlSystem = new OMPIControlSystem((OMPIProxyRuntimeClient)runtimeProxy);
+			if (monitoringSystem != null) {
+				monitor.subTask("Shutting down monitor system...");
+				monitoringSystem.shutdown();
+				monitor.worked(10);
+			}
+			if (runtimeProxy != null) {
+				monitor.subTask("Shutting down runtime proxy...");
+				runtimeProxy.shutdown();
+				monitor.worked(10);
+			}
+			if (monitor.isCanceled()) {
+				throw new CoreException(Status.CANCEL_STATUS);
+			}
+			monitor.worked(10);
+	
+			if(monitoringSystemID == MonitoringSystemChoices.SIMULATED && controlSystemID == ControlSystemChoices.SIMULATED) {
+				/* load up the control and monitoring systems for the simulation */
+				monitor.subTask("Starting simulation...");
+				monitoringSystem = new SimulationMonitoringSystem();
+				monitor.worked(10);
+				controlSystem = new SimulationControlSystem();
+				monitor.worked(10);
+				runtimeProxy = null;
+			}
+			else if(monitoringSystemID == MonitoringSystemChoices.ORTE && controlSystemID == ControlSystemChoices.ORTE) {
+				/* load up the control and monitoring systems for OMPI */
+				monitor.subTask("Starting OMPI proxy runtime...");
+				runtimeProxy = new OMPIProxyRuntimeClient(this);
+				monitor.worked(10);
+				
+				if(runtimeProxy != null && !runtimeProxy.startup()) {
+					runtimeProxy = null;
+					Preferences p = PTPCorePlugin.getDefault().getPluginPreferences();
+					int MSChoiceID = p.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
+					int CSChoiceID = p.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
+					monitoringSystem = null;
+					controlSystem = null;
+					refreshRuntimeSystems(CSChoiceID, MSChoiceID, new SubProgressMonitor(monitor, 50));				
+					return;
+				}
+				monitor.subTask("Starting OMPI monitoring system...");
+				monitoringSystem = new OMPIMonitoringSystem((OMPIProxyRuntimeClient)runtimeProxy);
+				monitor.worked(10);
+				monitor.subTask("Starting OMPI control system...");
+				controlSystem = new OMPIControlSystem((OMPIProxyRuntimeClient)runtimeProxy);
+				monitor.worked(10);
+			}
+			else {
+				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Invalid monitoring/control system selected.  Set using the PTP preferences page.", null));
+				//CoreUtils.showErrorDialog("Runtime System Error", "Invalid monitoring/control system selected.  Set using the PTP preferences page.", null);
+				//return;
+			}
+	
+			universe = new PUniverse();
+			monitor.subTask("Starting up monitor system...");
+			monitoringSystem.startup();
+			monitor.worked(10);
+			monitor.subTask("Starting up control system...");
+			controlSystem.startup();
+			monitor.worked(10);
+			try {
+				monitor.subTask("Setup the monitoring system...");
+				setupMS(new SubProgressMonitor(monitor, 150));
+			} catch (CoreException e) {
+				universe.removeChildren();
+				throw e;
+			}
+	
+			monitor.worked(10);
+			fireEvent(null, EVENT_MONITORING_SYSTEM_CHANGE);
+			currentControlSystem = controlSystemID;
+			currentMonitoringSystem = monitoringSystemID;
+		} finally {
+			monitor.done();
 		}
-		else {
-			CoreUtils.showErrorDialog("Runtime System Error", "Invalid monitoring/control system selected.  Set using the PTP preferences page.", null);
-			return;
-		}
-
-		universe = new PUniverse();
-		monitoringSystem.startup();
-		controlSystem.startup();
-		setupMS();
-		fireEvent(null, EVENT_MONITORING_SYSTEM_CHANGE);
-		currentControlSystem = controlSystemID;
-		currentMonitoringSystem = monitoringSystemID;
 	}
 
 	/* setup the monitoring system */
-	public void setupMS() 
-	{
-		IProgressMonitor monitor = new NullProgressMonitor();		
-		String[] ne = monitoringSystem.getMachines();
+	public void setupMS(IProgressMonitor monitor) throws CoreException {
+		String[] ne = monitoringSystem.getMachines();		
+		monitor.beginTask("", ne.length * 2);
 		for (int i = 0; i < ne.length; i++) {
-			PMachine mac;
-			
+			monitor.setTaskName("Creating machines...");
+			if (monitor.isCanceled()) {
+				throw new CoreException(Status.CANCEL_STATUS);
+			}
+
 			String ids = ne[i].substring(new String("machine").length());
 			int machID = (new Integer(ids)).intValue();
 			
-			mac = new PMachine(universe, ne[i], machID);
-
+			PMachine mac = new PMachine(universe, ne[i], machID);
 			universe.addChild(mac);
 
+			monitor.internalWorked(1);
 			String[] ne2 = monitoringSystem.getNodes(mac);
-
 			System.out.println("MACHINE: " + ne[i]+" - #nodes = "+ne2.length);
-			
+
+			IProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
+			subMonitor.beginTask("", ne2.length);
+			subMonitor.setTaskName("Creating nodes...");
 			if(monitoringSystem instanceof OMPIMonitoringSystem) {
 				int num_attribs = 5;
 				String[] attribs = monitoringSystem.getAllNodesAttributes(mac,
@@ -230,14 +284,15 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					System.out.println("*** attribs[" + j + "] = " + attribs[j]);
 
 				for (int j = 0; j < ne2.length; j++) {
-					PNode node;
+					if (subMonitor.isCanceled()) {
+						throw new CoreException(Status.CANCEL_STATUS);
+					}
 					//node = new PNode(mac, ne2[j], "" + j + "", j);
-					
 					String nodename = ""+j+"";
 					if(attribs.length > (j * num_attribs)) {
 						nodename = attribs[(j * num_attribs)];
 					}
-					node = new PNode(mac, ne2[j], "" + j + "", j);
+					PNode node = new PNode(mac, ne2[j], "" + j + "", j);
 					node.setAttrib(AttributeConstants.ATTRIB_NODE_NAME, nodename);
 					System.out.println("NodeName According to ORTE = '"+node.getAttrib(AttributeConstants.ATTRIB_NODE_NAME)+"'");
 					System.out.println("\t#attribs returned: "+attribs.length);
@@ -273,15 +328,17 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					else {
 						node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE, "73");
 					}					
-
 					mac.addChild(node);
+					subMonitor.worked(1);
 				}
 			}
-			else if(monitoringSystem instanceof SimulationMonitoringSystem) {
+			else if (monitoringSystem instanceof SimulationMonitoringSystem) {
 				for(int j=0; j<ne2.length; j++) {
+					if (subMonitor.isCanceled()) {
+						throw new CoreException(Status.CANCEL_STATUS);
+					}
 					//System.out.println("node "+j);
-					PNode node;
-					node = new PNode(mac, ne2[j], ""+j+"", j);
+					PNode node = new PNode(mac, ne2[j], ""+j+"", j);
 					node.setAttrib(AttributeConstants.ATTRIB_NODE_NAME, 
 							monitoringSystem.getNodeAttributes(node, AttributeConstants.ATTRIB_NODE_NAME)[0]);
 					node.setAttrib(AttributeConstants.ATTRIB_NODE_USER, 
@@ -300,20 +357,31 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		ne = controlSystem.getJobs();
 		if(ne != null) {
 			for (int i = 0; i < ne.length; i++) {
-				PJob job;
+				monitor.setTaskName("Creating jobs...");
+				if (monitor.isCanceled()) {
+					throw new CoreException(Status.CANCEL_STATUS);
+				}
+
 				System.out.println("JOB: " + ne[i]);
 				int x = 0;
 				try {
 					x = (new Integer(ne[i].substring(3))).intValue();
 				} catch (NumberFormatException e) {
 				}
-				job = new PJob(universe, ne[i], "" + (PJob.BASE_OFFSET + x) + "", x);
+				PJob job = new PJob(universe, ne[i], "" + (PJob.BASE_OFFSET + x) + "", x);
 				universe.addChild(job);
+				
 				String[] ne2 = controlSystem.getProcesses(job);
+				IProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
+				subMonitor.beginTask("", ne2.length);
+				subMonitor.setTaskName("Creating processes...");
 				for (int j = 0; j < ne2.length; j++) {		
-					IPProcess proc;
-					proc = new PProcess(job, ne[i]+"_process"+j, "" + j + "", "0", j, IPProcess.STARTING, "", "");
+					if (subMonitor.isCanceled()) {
+						throw new CoreException(Status.CANCEL_STATUS);
+					}
+					IPProcess proc = new PProcess(job, ne[i]+"_process"+j, "" + j + "", "0", j, IPProcess.STARTING, "", "");
 					job.addChild(proc);
+					subMonitor.worked(1);
 				}	
 				try {
 					getProcsStatusForNewJob(ne[i], job, new SubProgressMonitor(monitor, ne2.length));
@@ -323,8 +391,10 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				}
 			}
 		}
+		monitor.worked(1);
 		monitoringSystem.addRuntimeListener(this);
-		controlSystem.addRuntimeListener(this);
+		controlSystem.addRuntimeListener(this);		
+		monitor.done();
 	}
 
 	/* given a Job, this contacts the monitoring system and populates the runtime 
@@ -340,15 +410,13 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		
 		System.out.println("getProcsStatusForNewJob:" + nejob + " - #procs = " + numProcs);
 		
-		if (monitor == null)
-			monitor = new NullProgressMonitor();
-		
 		int num_attribs = 2;
 		String[] attribs = controlSystem.getAllProcessesAttributes(job, AttributeConstants.ATTRIB_PROCESS_PID + " " + AttributeConstants.ATTRIB_PROCESS_NODE_NAME);
 		for(int i=0; i<attribs.length; i++) 
 			System.out.println("*** attribs["+i+"] = "+attribs[i]);
 		
-		monitor.beginTask("Initialing the process...", numProcs);
+		monitor.beginTask("", numProcs);
+		monitor.setTaskName("Initialing the processes...");
 		for (int i = 0; i < numProcs; i++) {
 			if (monitor.isCanceled()) {
 				throw new CoreException(Status.CANCEL_STATUS);
@@ -527,34 +595,30 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		fireEvent(job, EVENT_UPDATED_STATUS);
 	}
 
+	/*
 	private IPerspectiveListener perspectiveListener = new IPerspectiveListener() {
-		/*
-		public void perspectiveOpened(IWorkbenchPage page,
-				IPerspectiveDescriptor perspective) {
+		public void perspectiveOpened(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 			if (perspective.getId().equals(CoreUtils.PPerspectiveFactory_ID)) {
 				isPerspectiveOpen = true;
 			}
-		}*/
-
-		public void perspectiveActivated(IWorkbenchPage page,
-				IPerspectiveDescriptor perspective) {
+		}
+		public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 			System.out.println("PERSPECTIVE: Active: " + perspective.getId());
 			if (perspective.getId().equals(CoreUtils.PPerspectiveFactory_ID)) {
 				isPerspectiveOpen = true;
 				System.out.println("MYPERSPECTIVE: Active: " + perspective.getId());
 			}
 		}
-
-		public void perspectiveChanged(IWorkbenchPage page,
-				IPerspectiveDescriptor perspective, String changeId) {
+		public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId) {
 			if (perspective.getId().equals(CoreUtils.PPerspectiveFactory_ID))
 				System.out.println("PERSPECTIVE: Changed: " + perspective.getId());
 		}
 	};
+	*/
 
 	public void shutdown() {
-		PTPCorePlugin.getDefault().removePerspectiveListener(perspectiveListener);
-		perspectiveListener = null;
+		//PTPCorePlugin.getDefault().removePerspectiveListener(perspectiveListener);
+		//perspectiveListener = null;
 		listeners.clear();
 		listeners = null;
 		if(monitoringSystem != null)
@@ -663,7 +727,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	//protected IPJob myjob = null;
 
 	public IPJob run(final ILaunch launch, File workingDirectory, String[] envp, final JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException {
-		monitor.subTask("Creating the job...");
+		monitor.setTaskName("Creating the job...");
 		int jobID = controlSystem.run(jobRunConfig);
 		if (jobID < 0)
 			throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "cannot create a job.", null));
@@ -704,19 +768,20 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			monitor = new NullProgressMonitor();
 		}
 		
-		monitor = new SubProgressMonitor(monitor, numProcesses);
-		monitor.setTaskName("Creating process....");
+		monitor.beginTask("", numProcesses);
+		monitor.setTaskName("Creating processes....");
 		/* we know that we succeeded, so we can create this many procs in the job.  we just
 		 * need to run getProcsStatusForNewJob() to fill in the status later
 		 */
 		for (int i = 0; i < numProcesses; i++) {		
 			// System.out.println("process name = "+ne[j]);
 			IPProcess proc = new PProcess(job, jobName+"_process"+i, "" + i + "", "0", i, IPProcess.STARTING, "", "");
-			job.addChild(proc);
-			monitor.worked(1);
+			job.addChild(proc);			
 		}	
 		
 		try {
+			monitor.internalWorked(0);
+			monitor.subTask("Setting process status...");
 			getProcsStatusForNewJob(jobName, job, new SubProgressMonitor(monitor, numProcesses));
 		} catch (CoreException e) {
 			controlSystem.terminateJob(job);
