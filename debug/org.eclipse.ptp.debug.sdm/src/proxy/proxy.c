@@ -34,9 +34,9 @@ static int 			proxy_errno = PROXY_RES_OK;
 static char *		proxy_errstr = NULL;
 
 static char * proxy_error_tab[] = {
-	"Proxy client error",
-	"Proxy server error",
-	"Error with proxy protocol",
+	"Proxy client error: %s",
+	"Proxy server error: %s",
+	"Error with proxy protocol: %s",
 	"System error: %s",
 	"%s"
 };
