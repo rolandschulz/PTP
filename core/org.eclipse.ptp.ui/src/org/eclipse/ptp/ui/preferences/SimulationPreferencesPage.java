@@ -25,14 +25,13 @@ import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.ptp.core.ControlSystemChoices;
 import org.eclipse.ptp.core.IModelManager;
-import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.internal.core.CoreMessages;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
+import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -282,25 +281,20 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 	{
 		int nmacs = spin.getSelection();
 		
-		Preferences preferences = PTPCorePlugin.getDefault()
-				.getPluginPreferences();
-		
+		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();		
 		preferences.setValue(PreferenceConstants.SIMULATION_NUM_MACHINES, nmacs);
 		for(int i=0; i<nmacs; i++) {
 			preferences.setValue(PreferenceConstants.SIMULATION_MACHINE_NODE_PREFIX + ""+i+"", nodes[i]);
 		}
-		
 		PTPCorePlugin.getDefault().savePluginPreferences();
-		
+
+		/*
 		IModelManager manager = PTPCorePlugin.getDefault().getModelManager();
-		if (manager.isParallelPerspectiveOpen() &&
-			manager.getMonitoringSystem() instanceof SimulationMonitoringSystem &&
-			manager.getControlSystem() instanceof SimulationControlSystem)
-		{
-			manager.refreshRuntimeSystems(ControlSystemChoices.getCSIDByName("Simulated"),
-					MonitoringSystemChoices.getMSIDByName("Simulated"));
+		if (manager.isParallelPerspectiveOpen() && manager.getMonitoringSystem() instanceof SimulationMonitoringSystem && manager.getControlSystem() instanceof SimulationControlSystem) {
+			manager.refreshRuntimeSystems(ControlSystemChoices.getCSIDByName("Simulated"), MonitoringSystemChoices.getMSIDByName("Simulated"));
 		}
-		
+		*/
+		PTPUIPlugin.refreshRuntimeSystem();	
 		return true;
 	}
 	

@@ -25,10 +25,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.internal.ui.MachineManager;
 import org.eclipse.ptp.ui.preferences.IPreferencesListener;
@@ -36,6 +40,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -180,6 +185,12 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		}
 		return null;
 	}
+	public static Shell getShell() {
+		if (getActiveWorkbenchWindow() != null) {
+			return getActiveWorkbenchWindow().getShell();
+		}
+		return null;
+	}	
 	
 	public String getCurrentPerspectiveID() {
 		return getActiveWorkbenchWindow().getActivePage().getPerspective().getId();
@@ -198,5 +209,44 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	}
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e));
-	}	
+	}
+	
+	public static void refreshRuntimeSystem() {
+		/*
+		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			public void run(IProgressMonitor monitor) throws InvocationTargetException {
+				if (!monitor.isCanceled()) {
+					try {
+						PTPCorePlugin.getDefault().getModelManager().refreshRuntimeSystems(monitor);
+					} catch (CoreException e) {
+						throw new InvocationTargetException(e);
+					}
+				}
+			}		
+		};
+		try {
+			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
+		} catch (InterruptedException e) {
+		} catch (InvocationTargetException e2) {
+			IStatus status = new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Error within PTP UI: ", e2);
+			log(status);	
+			ErrorDialog.openError(getShell(), "Runtime System Error", e2.getMessage(), status);
+		}
+		*/
+		Job job = new Job("Refresh runtime system") {
+			public IStatus run(final IProgressMonitor monitor) {
+				if (!monitor.isCanceled()) {
+					try {
+						PTPCorePlugin.getDefault().getModelManager().refreshRuntimeSystems(monitor);
+					} catch (CoreException e) {
+						return e.getStatus();
+					}
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.setPriority(Job.INTERACTIVE);
+		PlatformUI.getWorkbench().getProgressService().showInDialog(getShell(), job);
+		job.schedule();
+	}
 }

@@ -47,8 +47,8 @@ public interface IModelManager {
 	public IMonitoringSystem getMonitoringSystem();
 	public int getControlSystemID();
 	public int getMonitoringSystemID();
-	public boolean isParallelPerspectiveOpen();
-	public void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID);
+	//public boolean isParallelPerspectiveOpen();
+	public void refreshRuntimeSystems(IProgressMonitor monitor) throws CoreException;
 	public void shutdown();
 	public IPUniverse getUniverse();
 	public void addParallelLaunchListener(IParallelModelListener listener);
