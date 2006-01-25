@@ -55,7 +55,6 @@ public interface IAbstractDebugger extends IDebugger {
 	
 	/* Miscellaneous */
 	public IPCDISession getSession();
-	public void setSession(IPCDISession session);
 	public boolean isExited();
 
 	public IPProcess getProcess(int number);

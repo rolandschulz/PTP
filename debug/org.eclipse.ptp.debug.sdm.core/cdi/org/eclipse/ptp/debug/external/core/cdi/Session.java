@@ -79,7 +79,6 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 		this.job = job;
 		this.launch = launch;
 		this.file = file;
-		this.debugger.setSession(this);
 		commonSetup();
 		job.setAttribute(PreferenceConstants.JOB_DEBUG_SESSION, this);
 		
