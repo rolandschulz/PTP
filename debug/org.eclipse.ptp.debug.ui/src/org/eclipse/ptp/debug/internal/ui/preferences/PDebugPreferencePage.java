@@ -27,7 +27,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation;
-import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.ui.preferences.AbstractPerferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -50,7 +49,6 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 	public PDebugPreferencePage() {
 		super();
 		setDescription(PreferenceMessages.getString("PDebugPreferencePage.desc"));
-		setPreferenceStore(PTPDebugUIPlugin.getDefault().getPreferenceStore());
 	}
 	protected Control createContents(Composite parent) {
 		//TODO ignored help
@@ -79,8 +77,8 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 	protected void defaultSetting() {
 		//IPreferenceStore store = getPreferenceStore();
 		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
-		preferences.setValue(IPDebugConstants.PREF_SHOW_FULL_PATHS, false);
-		preferences.setValue(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, true);
+		preferences.setDefault(IPDebugConstants.PREF_SHOW_FULL_PATHS, false);
+		preferences.setDefault(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, true);
 	}
 	public void performDefaults() { 
 		//IPreferenceStore store = getPreferenceStore();
