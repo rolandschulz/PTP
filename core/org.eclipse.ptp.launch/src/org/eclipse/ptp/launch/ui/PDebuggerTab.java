@@ -268,8 +268,8 @@ public class PDebuggerTab extends AbstractPDebuggerTab {
 		String programName = null;
 		String projectName = null;
 		try {
-			projectName = config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String)null);
-			programName = config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, (String)null);
+			projectName = config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, "");
+			programName = config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, "");
 		} catch (CoreException e) {
 		}
 		IPath exePath = new Path(programName);		
