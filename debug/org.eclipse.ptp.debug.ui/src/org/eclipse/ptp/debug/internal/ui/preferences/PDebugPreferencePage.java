@@ -79,11 +79,12 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 	protected void defaultSetting() {
 		//IPreferenceStore store = getPreferenceStore();
 		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
-		preferences.setDefault(IPDebugConstants.PREF_SHOW_FULL_PATHS, false);
-		preferences.setDefault(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, true);
+		preferences.setValue(IPDebugConstants.PREF_SHOW_FULL_PATHS, false);
+		preferences.setValue(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, true);
 	}
 	public void performDefaults() { 
 		//IPreferenceStore store = getPreferenceStore();
+		defaultSetting();
 		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
 		fPathsButton.setSelection(preferences.getDefaultBoolean(IPDebugConstants.PREF_SHOW_FULL_PATHS));
 		fRegisteredProcessButton.setSelection(preferences.getDefaultBoolean(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0));		

@@ -122,6 +122,7 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 	}
 	public void performDefaults() { 
 		//IPreferenceStore store = getPreferenceStore();
+		defaultSetting();
 		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
 		sdmPathText.setText(preferences.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE));
 		sdmArgsText.setText(preferences.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS));
