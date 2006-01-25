@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Extractinterface Plug-in
-Bundle-SymbolicName: org.eclipse.photran.extractinterface; singleton:=true
+Bundle-Name: FDT Refactoring Plug-in
+Bundle-SymbolicName: org.eclipse.fdt.refactoring; singleton:=true
 Bundle-Version: 1.0.0
-Bundle-Activator: org.eclipse.photran.extractinterface.ExtractinterfacePlugin
+Bundle-Activator: org.eclipse.fdt.refactoring.RefactoringPlugin
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui.ide,
  org.eclipse.ui,
