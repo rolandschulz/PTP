@@ -67,7 +67,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException {
 		IPJob job = launch.getPJob();
 		initialize(job);
-		return new Session(this, job, launch, exe, monitor);
+		session = new Session(this, job, launch, exe, monitor);
+		return session;
 	}
 	
 	public void postCommand(IDebugCommand command) {
@@ -119,9 +120,6 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 	}
 	public final IPCDISession getSession() {
 		return session;
-	}
-	public final void setSession(IPCDISession s) {
-		session = s;
 	}
 	public final void addDebuggerObserver(Observer obs) {
 		this.addObserver(obs);
