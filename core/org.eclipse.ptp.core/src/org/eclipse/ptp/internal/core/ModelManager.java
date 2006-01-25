@@ -152,6 +152,9 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		int curMSID = getControlSystemID();
 		int curCSID = getMonitoringSystemID();
 		if(force || curMSID != MSChoiceID || curCSID != CSChoiceID) {
+			if (monitor == null) {
+				monitor = new NullProgressMonitor();
+			}
 			refreshRuntimeSystems(CSChoiceID, MSChoiceID, monitor);
 		}
 	}
