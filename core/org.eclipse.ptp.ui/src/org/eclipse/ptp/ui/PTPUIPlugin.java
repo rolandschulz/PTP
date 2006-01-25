@@ -20,6 +20,7 @@
 package org.eclipse.ptp.ui;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -34,6 +35,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.internal.ui.JobManager;
@@ -216,11 +219,36 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e));
 	}
 
-	public void refreshRuntimeSystem() {
-		refreshRuntimeSystem(false);
+	public void refreshRuntimeSystem(boolean queue, boolean force) {
+		if (queue) {
+			refreshRuntimeSystemInQueue(getShell(), false);
+		}
+		else {
+			refreshRuntimeSystemNow(getShell(), force);
+		}
+	}
+	
+	private boolean refreshRuntimeSystemNow(Shell shell, final boolean force) {
+		try {
+			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
+				public void run(IProgressMonitor monitor) throws InvocationTargetException {
+					try {
+						PTPCorePlugin.getDefault().getModelManager().refreshRuntimeSystems(monitor, force);
+					} catch (CoreException e) {
+						throw new InvocationTargetException(e);
+					}
+				}
+			});
+			return true;
+		} catch (InterruptedException e) {
+			// cancelled by user
+		} catch (InvocationTargetException e) {
+			ErrorDialog.openError(shell, UIMessage.REFRESH_SYSTEM_JOB_NAME + " error", e.getMessage(), new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, e.getMessage(), e.getTargetException()));
+		}
+		return false;
 	}
 
-	public void refreshRuntimeSystem(final boolean force) {
+	private void refreshRuntimeSystemInQueue(final Shell shell, final boolean force) {
 		synchronized (jobList) {
 			//final IJobManager jManager = Platform.getJobManager();
 			Job job = new Job(UIMessage.REFRESH_SYSTEM_JOB_NAME) {
@@ -237,7 +265,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 			};
 			job.setPriority(Job.INTERACTIVE);
 	        job.addJobChangeListener(jlistener);
-			PlatformUI.getWorkbench().getProgressService().showInDialog(getShell(), job);
+			PlatformUI.getWorkbench().getProgressService().showInDialog(shell, job);
 			jobList.add(job);
 			if (jobList.size() == 1) {
 				//make sure each time only run one job
