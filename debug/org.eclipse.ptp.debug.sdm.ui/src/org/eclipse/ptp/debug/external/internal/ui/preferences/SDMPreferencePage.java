@@ -114,10 +114,12 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 				String ipath = path.getAbsolutePath();
 				int idx = ipath.indexOf(PTPDebugCorePlugin.PLUGIN_ID);
 				String ipath2 = ipath.substring(0, idx) + "org.eclipse.ptp.debug.sdm/sdm";
+				preferences.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_FILE, ipath2);
 				preferences.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_FILE, ipath2);
 			} catch(Exception e) { 
 			}
 		}
+		preferences.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS, IPDebugConstants.PREF_DEFAULT_DEUBGGER_ARGS);
 		preferences.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS, IPDebugConstants.PREF_DEFAULT_DEUBGGER_ARGS);
 	}
 	public void performDefaults() { 
