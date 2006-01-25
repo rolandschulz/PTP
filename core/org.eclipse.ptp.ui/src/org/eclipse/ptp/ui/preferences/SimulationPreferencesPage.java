@@ -290,7 +290,7 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 
 		IModelManager manager = PTPCorePlugin.getDefault().getModelManager();
 		if (manager.getMonitoringSystem() instanceof SimulationMonitoringSystem && manager.getControlSystem() instanceof SimulationControlSystem) {
-			PTPUIPlugin.getDefault().refreshRuntimeSystem(true);	
+			PTPUIPlugin.getDefault().refreshRuntimeSystem(true, true);	
 		}
 		return true;
 	}
