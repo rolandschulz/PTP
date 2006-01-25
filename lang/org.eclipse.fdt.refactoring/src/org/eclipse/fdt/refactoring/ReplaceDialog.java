@@ -190,19 +190,23 @@ class ReplaceDialog extends Dialog {
 	 * @since 3.0
 	 */
 	private boolean fGiveFocusToFindField= true;
+	
+	private String[] fConstants;
 
 
 	/**
 	 * Creates a new dialog with the given shell as parent.
 	 * @param parentShell the parent shell
 	 */
-	public ReplaceDialog(Shell parentShell) {
+	public ReplaceDialog(Shell parentShell, String[] constants) {
 		super(parentShell);
 		
 		// initialize instance variables (CER)
 		
 		fParentShell= null;
 		fTarget= null;
+		
+		fConstants = constants;
 
 		fDialogPositionInit= null;
 		fFindHistory= new ArrayList(HISTORY_SIZE - 1);
@@ -254,7 +258,10 @@ class ReplaceDialog extends Dialog {
 
 		// get find string
 		initFindStringFromSelection();
-		fReplaceField.setText("3.3D0");
+		int start = 2 + fConstants[0].indexOf('=');
+		String in = fConstants[0].substring(start, fConstants[0].length() - 1);
+		fFindField.setText(in);
+		fReplaceField.setText(in + "D0");
 
 		// set dialog position
 		if (fDialogPositionInit != null)

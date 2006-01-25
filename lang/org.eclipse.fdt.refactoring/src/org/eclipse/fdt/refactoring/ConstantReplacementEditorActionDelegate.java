@@ -2,6 +2,7 @@ package org.eclipse.fdt.refactoring;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -60,9 +61,9 @@ public class ConstantReplacementEditorActionDelegate implements IEditorActionDel
                     // SymbolTable symTbl = processor.parseAndCreateSymbolTableFor(
                     //SymbolTable symTbl = processor.createSymbolTableFromParseTree(ptRoot);
                     
-                    String constants = processConstants(parseTree);
+                    final String[] constants = processConstants(parseTree);
                     
-            		   showReplaceDialog();
+            		   showReplaceDialog(constants);
             		   
  //           		   MyDialog dialog = new MyDialog(activeEditor.getSite().getShell());
                     //ReplaceDialog dialog = new ReplaceDialog(activeEditor.getSite().getShell());
@@ -75,7 +76,7 @@ public class ConstantReplacementEditorActionDelegate implements IEditorActionDel
                      * outputDeclarationsForSubprogramsIn(symTbl.getEntryInHierarchyFor("module or program name goes here").getChildTable());
                      */
                     //String cinterface = getDeclarationsForSubprogramsIn(symTbl);
-                    showMessageDialog("C Interop Interface", constants);
+                    //showMessageDialog("C Interop Interface", constants);
                     return new Status(IStatus.OK, RefactoringPlugin.PLUGIN_ID, IStatus.OK, "Done", null);
                 }
                 catch (Exception e)
@@ -88,13 +89,13 @@ public class ConstantReplacementEditorActionDelegate implements IEditorActionDel
                 }
             }
 
-            private void showReplaceDialog()
+            private void showReplaceDialog(final String[] constants)
             {
                 Display.getDefault().syncExec(new Runnable()
                 {
                     public void run()
                     {
-                    	 ReplaceDialog dialog = new ReplaceDialog(activeEditor.getSite().getShell());
+                    	 ReplaceDialog dialog = new ReplaceDialog(activeEditor.getSite().getShell(), constants);
                         //ReplaceDialog dialog = new ReplaceDialog(activeEditor.getSite().getShell());
                 		 dialog.open();
 
@@ -118,8 +119,9 @@ public class ConstantReplacementEditorActionDelegate implements IEditorActionDel
         job.schedule();
     }
 
-    private String processConstants(ParseTreeNode parseTree)
+    private String[] processConstants(ParseTreeNode parseTree)
     {
+    	    final ArrayList /*<String>*/ sa = new ArrayList();
     	    final StringBuffer sb = new StringBuffer();
     	    
         parseTree.visitUsing(new GenericParseTreeVisitor()
@@ -127,20 +129,28 @@ public class ConstantReplacementEditorActionDelegate implements IEditorActionDel
                     public void visitToken(Token thisToken)
                     {
                 		 if (thisToken.getTerminal() == Terminal.T_DCON) {
-                 		sb.append(thisToken.getStartLine() + ":" + thisToken.getStartCol() + ":" + thisToken.getEndCol());
+                 		sb.replace(0, sb.length(), thisToken.getStartLine() + ":" + thisToken.getStartCol() + ":" + thisToken.getEndCol());
                 			sb.append(": text = " + thisToken.getText() + "\n");
+                			sa.add(sb.toString());
                 		 }
                 		 if (thisToken.getTerminal() == Terminal.T_RCON) {
-                      	sb.append(thisToken.getStartLine() + ":" + thisToken.getStartCol() + ":" + thisToken.getEndCol());
+                      	sb.replace(0, sb.length(), thisToken.getStartLine() + ":" + thisToken.getStartCol() + ":" + thisToken.getEndCol());
                 			sb.append(": text = " + thisToken.getText() + "\n");
+                			sa.add(sb.toString());
                 		 }
                 		 if (thisToken.getTerminal() == Terminal.T_ICON) {
-                      	sb.append(thisToken.getStartLine() + ":" + thisToken.getStartCol() + ":" + thisToken.getEndCol());
+                      	sb.replace(0, sb.length(), thisToken.getStartLine() + ":" + thisToken.getStartCol() + ":" + thisToken.getEndCol());
                 			sb.append(": text = " + thisToken.getText() + "\n");
+                			sa.add(sb.toString());
                 		 }
                     }
                 });
-        return sb.toString();
+        
+        String[] s = new String[sa.size()];
+        for (int i = 0; i < sa.size(); i++) {
+        	  s[i] = (String) sa.get(i);
+        }
+        return s;
     }
 
     private String getDeclarationsForSubprogramsIn(SymbolTable symTbl)
@@ -175,7 +185,7 @@ public class ConstantReplacementEditorActionDelegate implements IEditorActionDel
     {
         SymbolTableType returnType = symTblEntry.getReturnType();
         String subprogramName = symTblEntry.getIdentifier().getText();
-        ArrayList/* <VariableEntry> */params = symTblEntry.getParameters();
+        ArrayList /* <VariableEntry> */params = symTblEntry.getParameters();
 
         sb.append(determineCEquivalentOfType(returnType));
         sb.append(" ");
