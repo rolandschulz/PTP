@@ -28,9 +28,11 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.internal.core.CoreMessages;
 import org.eclipse.ptp.launch.internal.ui.LaunchImages;
+import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -115,8 +117,12 @@ public class ParallelTab extends PLaunchConfigurationTab {
 		// dynamicComp.setLayout(createGridLayout(2, false, 10, 10));
 		// dynamicComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		IPMachine[] macs = PTPCorePlugin.getDefault().getModelManager()
-				.getUniverse().getSortedMachines();
+		PTPUIPlugin.getDefault().refreshRuntimeSystem(false, false);
+		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
+		if (universe == null) {
+			return;
+		}
+		IPMachine[] macs = universe.getSortedMachines();
 		new Label(parallelComp, SWT.NONE).setText("Select machine:");
 
 		machineCombo = new Combo(parallelComp, SWT.READ_ONLY);
@@ -237,14 +243,21 @@ public class ParallelTab extends PLaunchConfigurationTab {
 	}
 
 	protected String getMachineName() {
-		IPMachine[] macs = PTPCorePlugin.getDefault().getModelManager()
-				.getUniverse().getSortedMachines();
+		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
+		if (universe == null) {
+			return "";
+		}
+		IPMachine[] macs = universe.getSortedMachines();
 		int i = machineCombo.getSelectionIndex();
 		return macs[i].getElementName();
 	}
 	
 	protected int getMachineNameIndex(String machineName) {
-		IPMachine[] macs = PTPCorePlugin.getDefault().getModelManager().getUniverse().getSortedMachines();
+		IPUniverse universe = PTPCorePlugin.getDefault().getModelManager().getUniverse();
+		if (universe == null) {
+			return -1;
+		}
+		IPMachine[] macs = universe.getSortedMachines();
 		int found = -1;
 		for(int i=0; i<macs.length; i++) {
 			if(macs[i].getElementName().equals(machineName)) {

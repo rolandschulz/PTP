@@ -138,11 +138,12 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		monitor.beginTask("",  200);
+		monitor.beginTask("",  250);
 		monitor.setTaskName(MessageFormat.format("{0}...", new String[] { "Launching " + configuration.getName() }));
 		if (monitor.isCanceled()) {
 			return;
 		}
+		PTPCorePlugin.getDefault().getModelManager().refreshRuntimeSystems(new SubProgressMonitor(monitor, 50), false);
 		
 		// Switch the perspective
 		// LaunchUtils.switchPerspectiveTo(LaunchUtils.PPerspectiveFactory_ID);
