@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.BitSet;
-
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.ControlSystemChoices;
 import org.eclipse.ptp.core.IModelManager;
@@ -159,13 +158,20 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 					
 					try {
 						Process process = rt.exec(cmd);
-						InputStreamReader reader = new InputStreamReader (process.getInputStream ());
+						InputStreamReader reader = new InputStreamReader (process.getErrorStream());
 						BufferedReader buf_reader = new BufferedReader (reader);
 						
+						String line = buf_reader.readLine();
+						if (line != null) {
+							CoreUtils.showErrorDialog("Running Proxy Server", line, null);
+						}
+						/*
 						String line;
-						while ((line = buf_reader.readLine ()) != null)
+						while ((line = buf_reader.readLine ()) != null) {
 							System.out.println ("ORTE PROXY SERVER: "+line);
-					} catch(Exception e) {
+						}
+						*/
+					} catch(IOException e) {
 						String err;
 						err = "Error running proxy server with command: '"+cmd+"'.";
 						e.printStackTrace();

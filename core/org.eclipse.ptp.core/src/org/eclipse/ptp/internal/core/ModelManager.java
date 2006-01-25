@@ -145,18 +145,18 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	public int getMonitoringSystemID() { return currentMonitoringSystem; }
 	
 	
-	public void refreshRuntimeSystems(IProgressMonitor monitor) throws CoreException {
+	public void refreshRuntimeSystems(IProgressMonitor monitor, boolean force) throws CoreException {
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		int MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
 		int CSChoiceID = preferences.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
 		int curMSID = getControlSystemID();
 		int curCSID = getMonitoringSystemID();
-		if(curMSID != MSChoiceID || curCSID != CSChoiceID) {
+		if(force || curMSID != MSChoiceID || curCSID != CSChoiceID) {
 			refreshRuntimeSystems(CSChoiceID, MSChoiceID, monitor);
 		}
 	}
 	
-	private void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID, IProgressMonitor monitor) throws CoreException {
+	public void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID, IProgressMonitor monitor) throws CoreException {
 		try {
 			monitor.beginTask("Refreshing runtime system...", 200);
 			/*

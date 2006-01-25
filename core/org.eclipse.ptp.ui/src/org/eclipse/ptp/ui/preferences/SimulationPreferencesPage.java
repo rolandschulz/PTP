@@ -288,13 +288,10 @@ public class SimulationPreferencesPage extends PreferencePage implements IWorkbe
 		}
 		PTPCorePlugin.getDefault().savePluginPreferences();
 
-		/*
 		IModelManager manager = PTPCorePlugin.getDefault().getModelManager();
-		if (manager.isParallelPerspectiveOpen() && manager.getMonitoringSystem() instanceof SimulationMonitoringSystem && manager.getControlSystem() instanceof SimulationControlSystem) {
-			manager.refreshRuntimeSystems(ControlSystemChoices.getCSIDByName("Simulated"), MonitoringSystemChoices.getMSIDByName("Simulated"));
+		if (manager.getMonitoringSystem() instanceof SimulationMonitoringSystem && manager.getControlSystem() instanceof SimulationControlSystem) {
+			PTPUIPlugin.getDefault().refreshRuntimeSystem(true);	
 		}
-		*/
-		PTPUIPlugin.refreshRuntimeSystem();	
 		return true;
 	}
 	

@@ -23,6 +23,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public class UIMessage {
+	public static final String REFRESH_SYSTEM_JOB_NAME = "Refresh runtime system";
     private static final String BUNDLE_NAME = PTPUIPlugin.PLUGIN_ID + ".UIMessages";
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 

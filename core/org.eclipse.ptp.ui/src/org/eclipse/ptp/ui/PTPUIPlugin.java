@@ -21,6 +21,7 @@ package org.eclipse.ptp.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.MissingResourceException;
@@ -30,6 +31,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -59,7 +62,8 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	private JobManager jobManager = null;
 
 	protected List listeners = new ArrayList();
-
+	private List jobList = Collections.synchronizedList(new ArrayList());
+	
 	public PTPUIPlugin() {
 		super();
 		plugin = this;
@@ -94,6 +98,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		jobManager = null;
 		plugin = null;
 		resourceBundle = null;
+		jobList.clear();
 	}
 	
 	public static String getUniqueIdentifier() {
@@ -210,43 +215,54 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e));
 	}
-	
-	public static void refreshRuntimeSystem() {
-		/*
-		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			public void run(IProgressMonitor monitor) throws InvocationTargetException {
-				if (!monitor.isCanceled()) {
-					try {
-						PTPCorePlugin.getDefault().getModelManager().refreshRuntimeSystems(monitor);
-					} catch (CoreException e) {
-						throw new InvocationTargetException(e);
-					}
-				}
-			}		
-		};
-		try {
-			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(runnable);
-		} catch (InterruptedException e) {
-		} catch (InvocationTargetException e2) {
-			IStatus status = new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Error within PTP UI: ", e2);
-			log(status);	
-			ErrorDialog.openError(getShell(), "Runtime System Error", e2.getMessage(), status);
-		}
-		*/
-		Job job = new Job("Refresh runtime system") {
-			public IStatus run(final IProgressMonitor monitor) {
-				if (!monitor.isCanceled()) {
-					try {
-						PTPCorePlugin.getDefault().getModelManager().refreshRuntimeSystems(monitor);
-					} catch (CoreException e) {
-						return e.getStatus();
-					}
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		job.setPriority(Job.INTERACTIVE);
-		PlatformUI.getWorkbench().getProgressService().showInDialog(getShell(), job);
-		job.schedule();
+
+	public void refreshRuntimeSystem() {
+		refreshRuntimeSystem(false);
 	}
+
+	public void refreshRuntimeSystem(final boolean force) {
+		synchronized (jobList) {
+			//final IJobManager jManager = Platform.getJobManager();
+			Job job = new Job(UIMessage.REFRESH_SYSTEM_JOB_NAME) {
+				public IStatus run(final IProgressMonitor monitor) {
+					if (!monitor.isCanceled()) {
+						try {
+							PTPCorePlugin.getDefault().getModelManager().refreshRuntimeSystems(monitor, force);
+						} catch (CoreException e) {
+							return e.getStatus();
+						}
+					}
+					return Status.OK_STATUS;
+				}
+			};
+			job.setPriority(Job.INTERACTIVE);
+	        job.addJobChangeListener(jlistener);
+			PlatformUI.getWorkbench().getProgressService().showInDialog(getShell(), job);
+			jobList.add(job);
+			if (jobList.size() == 1) {
+				//make sure each time only run one job
+				job.schedule();
+			}
+		}
+	}
+	
+	private IJobChangeListener jlistener = new IJobChangeListener() {
+		public void sleeping(IJobChangeEvent event) {}
+		public void scheduled(IJobChangeEvent event) {}
+		public void running(IJobChangeEvent event) {}
+		public void done(IJobChangeEvent event) {
+			synchronized (jobList) {
+				Job job = event.getJob();
+				jobList.remove(job);
+				job.removeJobChangeListener(this);
+				if (jobList.size() > 0) {
+					//when finished a job, run another if there are more jobs
+					job = (Job)jobList.get(0);
+					job.schedule();
+				}
+			}
+		}
+        public void awake(IJobChangeEvent event) {}
+        public void aboutToRun(IJobChangeEvent event) {}
+    };
 }
