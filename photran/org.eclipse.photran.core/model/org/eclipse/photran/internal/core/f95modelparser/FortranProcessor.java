@@ -1,4 +1,4 @@
-package org.eclipse.photran.internal.core.f95parser;
+package org.eclipse.photran.internal.core.f95modelparser;
 
 import java.io.InputStream;
 import java.util.Map;

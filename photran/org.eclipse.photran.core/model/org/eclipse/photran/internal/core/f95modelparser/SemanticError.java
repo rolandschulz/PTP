@@ -1,4 +1,6 @@
-package org.eclipse.photran.internal.core.f95parser;
+package org.eclipse.photran.internal.core.f95modelparser;
+
+import org.eclipse.photran.internal.core.f95modelparser.Token;
 
 /**
  * Represents a program error discovered after lexing and parsing have

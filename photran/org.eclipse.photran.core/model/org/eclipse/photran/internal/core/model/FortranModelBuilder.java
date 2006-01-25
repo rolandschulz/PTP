@@ -11,10 +11,10 @@ import org.eclipse.cdt.core.model.CModelException;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.photran.core.FortranCorePlugin;
-import org.eclipse.photran.internal.core.f95parser.FortranProcessor;
-import org.eclipse.photran.internal.core.f95parser.SemanticError;
-import org.eclipse.photran.internal.core.f95parser.SyntaxError;
-import org.eclipse.photran.internal.core.f95parser.Token;
+import org.eclipse.photran.internal.core.f95modelparser.FortranProcessor;
+import org.eclipse.photran.internal.core.f95modelparser.SemanticError;
+import org.eclipse.photran.internal.core.f95modelparser.SyntaxError;
+import org.eclipse.photran.internal.core.f95modelparser.Token;
 import org.eclipse.photran.internal.core.preferences.FortranPreferences;
 import org.eclipse.photran.internal.core.preferences.FortranShowParseTreePreference;
 

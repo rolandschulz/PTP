@@ -1,0 +1,2557 @@
+(Generated header code.  Please do not edit manually.)
+<<< BEGIN GENERATED HEADER >>>
+%name {:Fortran 95 (Photran Model Builder):}
+%notes {:Rex Grammar for Fortran 95
+
+Author\: Jeffrey Overbey, based on an Eli grammar
+by W.B. Clodius, W.M. Waite, J. Hoffmann, and R. Jakob
+available from http\://members.aol.com/wclodius/Parse95.html
+
+The Eli grammar on which this is based is
+Copyright (c) <1999> <W. B. Clodius and W. M. Waite>
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following conditions\:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+Changes\:
+19.04.2005 Dirk Rossow\: Added T_Hcon Hollerith Constants
+19.04.2005 Dirk Rossow\: Modified xUFPrimary with <xSubstringRange>
+:}
+%language {:Java 2:}
+%parsertype {:Compact LALR(1):}
+%parseraction {:Run literal code embedded in grammar:}
+%transformations {:Remove epsilon-productions (empty productions) before constructing parse table:}
+%option {:PG:}{:production reductions class name:}{:BuildModelProductionReductions:}
+%option {:PG:}{:parser action class name:}{:BuildModelParserAction:}
+%option {:PG:}{:pluggable parser actions:}{:true:}
+%option {:PG:}{:parser class name:}{:Parser:}
+%option {:PG:}{:generate token class:}{:false:}
+%option {:PG:}{:lexer class or interface:}{:ILexer:}
+%eclipsefolder {:/org.eclipse.photran.core/model/org/eclipse/photran/internal/core/f95modelparser:}
+%directory {::}
+%namespace {:org.eclipse.photran.internal.core.f95modelparser:}
+%import {:import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
+import org.eclipse.photran.internal.core.f95parser.*;
+import org.eclipse.photran.internal.core.model.FortranElement;
+import org.eclipse.cdt.core.model.CModelException;
+:}
+%insert {:private class M
+\{
+    private Map/*<FortranElement, FortranElementInfo>*/ allElements = new HashMap();
+
+    public Map/*<FortranElement, FortranElementInfo>*/ getAllElements()
+    \{
+        return allElements;
+    \}
+
+    public List/*<FortranElement>*/list(List list, FortranElement node)
+    \{
+        if (list == null) list = new LinkedList();
+        if (node != null) list.add(node);
+        return list;
+    \}
+
+    public List/*<FortranElement>*/list(FortranElement node)
+    \{
+        return list(new LinkedList(), node);
+    \}
+
+    public FortranElement mainProgram(Token nameToken, List/*<FortranElement>*/children)
+    \{
+        FortranElement e = new FortranElement.MainProgram(null, nameToken);
+        reparent(children, e);
+        return newElement(e);
+    \}
+
+    public FortranElement module(Token nameToken, List/*<FortranElement>*/children)
+    \{
+        FortranElement e = new FortranElement.Module(null, nameToken);
+        reparent(children, e);
+        return newElement(e);
+    \}
+
+    public FortranElement functionSubprogram(Token nameToken)
+    \{
+        return newElement(new FortranElement.Function(null, nameToken));
+    \}
+
+    public FortranElement subroutineSubprogram(Token nameToken)
+    \{
+        return newElement(new FortranElement.Subroutine(null, nameToken));
+    \}
+
+    public FortranElement blockData(Token nameToken)
+    \{
+        return newElement(new FortranElement.BlockData(null, nameToken));
+    \}
+
+    private void reparent(List children, FortranElement parent)
+    \{
+        if (children == null) return;
+
+        //try
+        //\{
+            Iterator it = children.iterator();
+            while (it.hasNext())
+            \{
+                FortranElement c = (FortranElement)it.next();
+                c.setParent(parent);
+                //parent.addChild(c);
+                //if (parent instanceof Parent) ((Parent)parent).addChild(c);
+            \}
+        //\}
+        //catch (CModelException x)
+        //\{
+        //    x.printStackTrace();
+        //\}
+    \}
+
+    private FortranElement newElement(FortranElement e)
+    \{
+        try \{ allElements.put(e, e.getElementInfo()); \}
+        catch (CModelException x) \{;\}
+        return e;
+    \}
+\}
+
+protected M m = new M();
+
+:}
+%init {::}
+%deinit {::}
+%syntaxerror {:throw new SyntaxError(lookaheadToken);:}
+%left {::}
+%right {::}
+%precchains {::}
+<<< END GENERATED HEADER >>>
+
+%reduce [xSFVarName] %insteadof [xSFDummyArgName] 
+%shift T_COMMA [xIoControlSpecList]
+
+<< Section: Section 2 Rules >>
+
+# R201
+%type Map/*<FortranElement, FortranElementInfo>*/
+<xExecutableProgram> ::=
+                         <xProgramUnit> {: return m.getAllElements(); :}
+  | <xExecutableProgram> <xProgramUnit> {: return m.getAllElements(); :}
+  ;
+
+# R202
+%type FortranElement
+<xProgramUnit> ::=
+    <xMainProgram>          {: return $1; :}
+  | <xFunctionSubprogram>   {: return $1; :}
+  | <xSubroutineSubprogram> {: return $1; :}
+  | <xModule>               {: return $1; :}
+  | <xBlockDataSubprogram>  {: return $1; :}
+  ;
+
+# R203 chain rule eliminated
+
+# R1101 desn"t ensure ordering as the standard requires;
+%type FortranElement
+<xMainProgram> ::=
+                   <xMainRange> {: return m.mainProgram(null, $1); :}
+  | <xProgramStmt> <xMainRange> {: return m.mainProgram($1, $2); :}
+  ;
+
+%type List/*<FortranElement>*/
+<xMainRange> ::=
+    <xBody>              <xEndProgramStmt>
+  | <xBodyPlusInternals> <xEndProgramStmt> {: return $1; :}
+  |                      <xEndProgramStmt>
+  ;
+
+<xBody> ::=
+    <xBodyConstruct>
+  | <xBody> <xBodyConstruct>
+  ;
+
+<xBodyConstruct> ::=
+    <xSpecificationPartConstruct>
+  | <xExecutableConstruct>
+  ;
+
+# R203 chain rule omitted
+
+<< Section: Section 12 Rules >>
+
+#R1216
+%type FortranElement
+<xFunctionSubprogram> ::=
+  <xFunctionStmt> <xFunctionRange> {: return m.functionSubprogram($1); :}
+  ;
+
+<xFunctionRange> ::=
+    <xBody> <xEndFunctionStmt>
+  | <xEndFunctionStmt>
+  | <xBodyPlusInternals> <xEndFunctionStmt>
+  ;
+
+# R1221
+%type FortranElement
+<xSubroutineSubprogram> ::=
+  <xSubroutineStmt> <xSubroutineRange> {: return m.subroutineSubprogram($1); :}
+  ;
+
+<xSubroutineRange> ::=
+    <xBody> <xEndSubroutineStmt>
+  | <xEndSubroutineStmt>
+  | <xBodyPlusInternals> <xEndSubroutineStmt>
+  ;
+
+<< Section: Section 11 Rules >>
+
+# R1104
+%type FortranElement
+<xModule> ::=
+  <xModuleStmt> <xModuleBlock> {: return m.module($1, $2); :}
+  ;
+%type List/*<FortranElement>*/
+<xModuleBlock> ::=
+    <xModuleBody> <xEndModuleStmt> {: return $1; :}
+  |               <xEndModuleStmt>
+  ;
+%type List/*<FortranElement>*/
+<xModuleBody> ::=
+                  <xSpecificationPartConstruct>
+  | <xModuleBody> <xSpecificationPartConstruct> {: return $1; :}
+  |               <xModuleSubprogramPartConstruct> {: return m.list($1); :}
+  | <xModuleBody> <xModuleSubprogramPartConstruct> {: return m.list($1, $2); :}
+  ;
+
+# R1112
+%type FortranElement
+<xBlockDataSubprogram> ::=
+    <xBlockDataStmt> <xBlockDataBody> <xEndBlockDataStmt> {: return m.blockData($1); :}
+  | <xBlockDataStmt>                  <xEndBlockDataStmt> {: return m.blockData($1); :}
+  ;
+
+<xBlockDataBody> ::=
+    <xBlockDataBodyConstruct>
+  | <xBlockDataBody> <xBlockDataBodyConstruct>
+  ;
+<xBlockDataBodyConstruct> ::=
+  <xSpecificationPartConstruct>
+  ;
+
+<< Section: More Section 2 Rules >>
+
+# R204 doesn"t ensure ordering as the standard requires
+<xSpecificationPartConstruct> ::=
+    <xUseStmt>
+  | <T_xImplicitStmt>
+  | <xParameterStmt>
+  | <xFormatStmt>
+  | <xEntryStmt>
+  | <xDeclarationConstruct>
+  ;
+
+# R205 see R204
+
+# R206 see R204
+
+# R207 also see R204
+<xDeclarationConstruct> ::=
+    <xDerivedTypeDef>
+  | <xInterfaceBlock>
+  | <xTypeDeclarationStmt>
+  | <xSpecificationStmt>
+  ;
+
+# R208
+
+# R209
+<xExecutionPartConstruct> ::=
+    <xObsoleteExecutionPartConstruct>
+  | <xExecutableConstruct>
+  | <xFormatStmt>
+  | <xEntryStmt>
+  ;
+<xObsoleteExecutionPartConstruct> ::= <xDataStmt>
+  ;
+
+# R210
+%type List/*<FortranElement>*/
+<xBodyPlusInternals> ::=
+    <xBody> <xContainsStmt> <xInternalSubprogram>	{: return m.list($3); :}
+  |         <xContainsStmt> <xInternalSubprogram>	{: return m.list($2); :}
+  | <xBodyPlusInternals> <xInternalSubprogram>		{: return m.list($1, $2); :}
+  ;
+
+# R211
+%type FortranElement
+<xInternalSubprogram> ::=
+    <xFunctionSubprogram>	{: return $1; :}
+  | <xSubroutineSubprogram>	{: return $1; :}
+  ;
+
+# R212 doesn"t ensure ordering as standard requires
+%type FortranElement
+<xModuleSubprogramPartConstruct> ::=
+    <xContainsStmt>
+  | <xModuleSubprogram> {: return $1; :}
+  ;
+
+# R213
+%type FortranElement
+<xModuleSubprogram> ::=
+    <xFunctionSubprogram>	{: return $1; :}
+  | <xSubroutineSubprogram>	{: return $1; :}
+  ;
+
+# R214
+<xSpecificationStmt> ::=
+    <xAccessStmt>
+  | <xAllocatableStmt>
+  | <xCommonStmt>
+  | <xDataStmt>
+  | <xDimensionStmt>
+  | <xEquivalenceStmt>
+  | <xExternalStmt>
+  | <xIntentStmt>
+  | <xIntrinsicStmt>
+  | <xNamelistStmt>
+  | <xOptionalStmt>
+  | <xPointerStmt>
+  | <xSaveStmt>
+  | <xTargetStmt>
+  ;
+
+# R215
+<xExecutableConstruct> ::=
+    <xActionStmt>
+  | <xCaseConstruct>
+  | <xDoConstruct>
+  | <xForallConstruct>
+  | <xIfConstruct>
+  | <xWhereConstruct>
+  | <xEndDoStmt>
+  ;          #/* see the note on R818 */
+
+# R216
+<xActionStmt> ::=
+  <xObsoleteActionStmt>
+  | <xAllocateStmt>
+  | <xAssignmentStmt>
+  | <xBackspaceStmt>
+  | <xCallStmt>
+  | <xCloseStmt>
+  | <xContinueStmt>
+  | <xCycleStmt>
+  | <xDeallocateStmt>
+  | <xEndfileStmt>
+  | <xExitStmt>
+  | <xForallStmt>
+  | <xGotoStmt>
+  | <xIfStmt>
+  | <xInquireStmt>
+  | <xNullifyStmt>
+  | <xOpenStmt>
+  | <xPointerAssignmentStmt>
+  | <xPrintStmt>
+  | <xReadStmt>
+  | <xReturnStmt>
+  | <xRewindStmt>
+  | <xStopStmt>
+  | <xWhereStmt>
+  | <xWriteStmt>
+  ;
+<xObsoleteActionStmt> ::=
+  <xStmtFunctionStmt>
+  | <xArithmeticIfStmt>
+  | <xComputedGotoStmt>
+  ;
+
+<< Section: Section 3 Rules >>
+
+# R301-R303 are components of symbols recognized by the lexical analyzer
+
+# R304 recognized by the lexical analyzer as T_ICON? is this different in F90
+<xName> ::= T_IDENT
+  ;
+
+# R305
+#dirk rossow added T_HCON
+<xConstant> ::=
+    <xNamedConstantUse>
+  | <xUnsignedArithmeticConstant>
+  | T_PLUS <xUnsignedArithmeticConstant>
+  | T_MINUS <xUnsignedArithmeticConstant>
+  | T_SCON
+  | T_ICON T_UNDERSCORE T_SCON
+  | <xNamedConstantUse> T_UNDERSCORE T_SCON
+  | <xLogicalConstant>
+  | <xStructureConstructor>
+  | <xBozLiteralConstant>
+  | T_HCON
+  ;
+
+# R306 chain rule deleted
+
+# R307
+<xNamedConstant> ::= T_IDENT
+  ;
+<xNamedConstantUse> ::= T_IDENT
+  ;
+
+# R308 chain rule deleted
+
+# R309 chain rule deleted
+
+# R310 recognized semantically
+
+<< Section: Section 7 Rules and R311-313 >>
+
+# R708
+<xPowerOp> ::= T_POW
+  ;
+
+# R709
+<xMultOp> ::=
+    T_ASTERISK
+  | T_SLASH
+  ;
+
+# R710
+<xAddOp> ::=
+    T_PLUS
+  | T_MINUS
+  ;
+<xSign> ::=
+    T_PLUS
+  | T_MINUS
+  ;
+
+# R712
+<xConcatOp> ::= T_SLASHSLASH
+  ;
+
+# R714
+<xRelOp> ::=
+    T_EQ
+  | T_NE
+  | T_LT
+  | T_LE
+  | T_GT
+  | T_GE
+  | T_EQEQ
+  | T_SLASHEQ
+  | T_LESSTHAN
+  | T_LESSTHANEQ
+  | T_GREATERTHAN
+  | T_GREATERTHANEQ
+  ;
+
+# R719
+<xNotOp> ::= T_NOT
+  ;
+
+# R720
+<xAndOp> ::= T_AND
+  ;
+
+# R721
+<xOrOp> ::= T_OR
+  ;
+
+# R722
+<xEquivOp> ::=
+    T_EQV
+  | T_NEQV
+  ;
+
+# R311
+<xDefinedOperator> ::=
+    T_XDOP
+  | <xConcatOp>
+  | <xPowerOp>
+  | <xMultOp>
+  | <xAddOp>
+  | <xRelOp>
+  | <xNotOp>
+  | <xAndOp>
+  | <xOrOp>
+  | <xEquivOp>
+  ;
+
+# R704
+<xDefinedUnaryOp> ::=
+  T_XDOP
+  ;
+
+# R724
+<xDefinedBinaryOp> ::=
+  T_XDOP
+  ;
+
+# R312 recognized semantically
+
+# R313 recognized by the lexical analyzer as T_ICON
+<xLabel> ::=
+  T_ICON
+  ;
+
+<< Section: Section 4 Rules >>
+
+# R401 recognized by the lexical analyzer in the context of R413
+
+# R402 recognized by the lexical analyzer in the context of R413, T_ICON
+
+# R403 chain rule deleted see R305
+
+# R404
+<xUnsignedArithmeticConstant> ::=
+    T_ICON
+  | T_RCON
+  | T_DCON
+  | <xComplexConst>
+  | T_ICON T_UNDERSCORE <xKindParam>
+  | T_RCON T_UNDERSCORE <xKindParam>
+  | T_DCON T_UNDERSCORE <xKindParam>
+  ;
+
+# R405
+<xKindParam> ::=
+    T_ICON
+  | <xNamedConstantUse>
+  ;
+
+# R406 see R305
+
+# R407
+<xBozLiteralConstant> ::=
+    T_BCON
+  | T_OCON
+  | T_ZCON
+  ;
+
+# R408 recognized by the lexical analyzer as T_BCON
+
+# R409 recognized by the lexical analyzer as T_OCON
+
+# R410 recognized by the lexical analyzer as T_ZCON
+
+# R411 component of a symbol recognized by the lexical analyzer
+
+# R412 see R404
+
+# R413 see R404
+
+# R414-R416 components of symbols recognized by the lexical analyzer
+
+# R417
+<xComplexConst> ::= T_LPAREN <xExpr> T_COMMA <xExpr> T_RPAREN
+  ;
+
+# R418 chain rule deleted
+
+# R419 chain rule deleted
+
+# R420 chain rule deleted see R305
+
+# R421
+<xLogicalConstant> ::=
+    T_TRUE
+  | T_FALSE
+  | T_TRUE T_UNDERSCORE <xKindParam>
+  | T_FALSE T_UNDERSCORE <xKindParam>
+  ;
+
+# R422 This does not enforce the required sequence
+<xDerivedTypeDef> ::=
+  <xDerivedTypeStmt> <xDerivedTypeBody> <xEndTypeStmt>
+  ;
+<xDerivedTypeBody> ::=
+    <xDerivedTypeBodyConstruct>
+  | <xDerivedTypeBody> <xDerivedTypeBodyConstruct>
+  ;
+<xDerivedTypeBodyConstruct> ::= <xPrivateSequenceStmt>
+  | <xComponentDefStmt>
+  ;
+
+# R423
+<xDerivedTypeStmt> ::=
+    <xLblDef> T_TYPE <xTypeName> T_EOS
+  | <xLblDef> T_TYPE T_COLON T_COLON <xTypeName> T_EOS
+  | <xLblDef> T_TYPE T_COMMA <xAccessSpec> T_COLON T_COLON <xTypeName> T_EOS
+  ;
+
+# R424
+<xPrivateSequenceStmt> ::=
+    <xLblDef> T_PRIVATE T_EOS
+  | <xLblDef> T_SEQUENCE T_EOS
+  ;
+
+# R425
+<xComponentDefStmt> ::=
+    <xLblDef> <xTypeSpec> T_COMMA <xComponentAttrSpecList> T_COLON T_COLON <xComponentDeclList> T_EOS
+  | <xLblDef> <xTypeSpec> T_COLON T_COLON <xComponentDeclList> T_EOS
+  | <xLblDef> <xTypeSpec> <xComponentDeclList> T_EOS
+  ;
+
+# R426
+<xComponentAttrSpecList> ::=
+    <xComponentAttrSpec>
+  | <xComponentAttrSpecList> T_COMMA <xComponentAttrSpec>
+  ;
+<xComponentAttrSpec> ::=
+    T_POINTER
+  | T_DIMENSION T_LPAREN <xComponentArraySpec> T_RPAREN
+  ;
+
+# R427
+<xComponentArraySpec> ::= <xExplicitShapeSpecList>
+  | <xDeferredShapeSpecList>
+  ;
+
+# R428
+<xComponentDeclList> ::=
+    <xComponentDecl>
+  | <xComponentDeclList> T_COMMA <xComponentDecl>
+  ;
+<xComponentDecl> ::=
+    <xComponentName> T_LPAREN <xComponentArraySpec> T_RPAREN T_ASTERISK <xCharLength> <xComponentInitialization>
+  | <xComponentName> T_LPAREN <xComponentArraySpec> T_RPAREN <xComponentInitialization>
+  | <xComponentName> T_ASTERISK <xCharLength> <xComponentInitialization>
+  | <xComponentName> <xComponentInitialization>
+  | <xComponentName> T_LPAREN <xComponentArraySpec> T_RPAREN T_ASTERISK <xCharLength>
+  | <xComponentName> T_LPAREN <xComponentArraySpec> T_RPAREN
+  | <xComponentName> T_ASTERISK <xCharLength>
+  | <xComponentName>
+  ;
+
+# R429
+<xComponentInitialization> ::=
+    T_EQUALS <xExpr>
+  | T_EQGREATERTHAN T_NULL T_LPAREN T_RPAREN
+  ;
+
+# R430
+<xEndTypeStmt> ::=
+    <xLblDef> T_ENDTYPE [ <xTypeName> ] T_EOS
+  | <xLblDef> T_END T_TYPE [ <xTypeName> ] T_EOS
+  ;
+
+# R431
+<xStructureConstructor> ::= <xTypeName> T_LPAREN <xExprList> T_RPAREN
+  ;
+<xExprList> ::=
+    <xExpr>
+  | <xExprList> T_COMMA <xExpr>
+  ;
+
+# R432
+<xArrayConstructor> ::= T_LPARENSLASH <xAcValueList> T_SLASHRPAREN
+  ;
+
+# R433 Why <xAcValueList1>?
+<xAcValueList> ::=
+    <xExpr>
+  | <xAcValueList1>
+  ;
+<xAcValueList1> ::=
+    <xExpr> T_COMMA <xExpr>
+  | <xExpr> T_COMMA <xAcImpliedDo>
+  | <xAcImpliedDo>
+  | <xAcValueList1> T_COMMA <xExpr>
+  | <xAcValueList1> T_COMMA <xAcImpliedDo>
+  ;
+
+# R434
+<xAcImpliedDo> ::=
+    T_LPAREN <xExpr> T_COMMA <T_xImpliedDoVariable> T_EQUALS <xExpr> T_COMMA <xExpr> T_RPAREN
+  | T_LPAREN <xExpr> T_COMMA <T_xImpliedDoVariable> T_EQUALS <xExpr> T_COMMA <xExpr> T_COMMA <xExpr> T_RPAREN
+  | T_LPAREN <xAcImpliedDo> T_COMMA <T_xImpliedDoVariable> T_EQUALS <xExpr> T_COMMA <xExpr> T_RPAREN
+  | T_LPAREN <xAcImpliedDo> T_COMMA <T_xImpliedDoVariable> T_EQUALS <xExpr> T_COMMA <xExpr> T_COMMA <xExpr> T_RPAREN
+  ;
+
+# R435 chain rule deleted
+
+# R436 chain rule deleted
+
+<< Section: Section 5 Rules >>
+
+# R501
+<xTypeDeclarationStmt> ::=
+    <xLblDef> <xTypeSpec> <xAttrSpecSeq> T_COLON T_COLON <xEntityDeclList> T_EOS
+  | <xLblDef> <xTypeSpec> T_COLON T_COLON <xEntityDeclList> T_EOS
+  | <xLblDef> <xTypeSpec> <xEntityDeclList> T_EOS
+  ;
+<xAttrSpecSeq> ::=
+    T_COMMA <xAttrSpec>
+  | <xAttrSpecSeq> T_COMMA <xAttrSpec>
+  ;
+
+# R502
+<xTypeSpec> ::=
+    T_INTEGER
+  | T_REAL
+  | T_DOUBLEPRECISION
+  | T_COMPLEX
+  | T_LOGICAL
+  | T_CHARACTER
+  | T_INTEGER <xKindSelector>
+  | T_REAL <xKindSelector>
+  | T_DOUBLE T_PRECISION
+  | T_COMPLEX <xKindSelector>
+  | T_CHARACTER <xCharSelector>
+  | T_LOGICAL <xKindSelector>
+  | T_TYPE T_LPAREN <xTypeName> T_RPAREN
+  ;
+
+# R503
+<xAttrSpec> ::=
+    T_PARAMETER
+  | <xAccessSpec>
+  | T_ALLOCATABLE
+  | T_DIMENSION T_LPAREN <xArraySpec> T_RPAREN
+  | T_EXTERNAL
+  | T_INTENT T_LPAREN <xIntentSpec> T_RPAREN
+  | T_INTRINSIC
+  | T_OPTIONAL
+  | T_POINTER
+  | T_SAVE
+  | T_TARGET
+  ;
+
+# R504
+<xEntityDeclList> ::= <xEntityDecl>
+  | <xEntityDeclList> T_COMMA <xEntityDecl>
+  ;
+<xEntityDecl> ::=
+    <xObjectName> [ T_LPAREN <xArraySpec> T_RPAREN ] [ T_ASTERISK <xCharLength> ] [ <xInitialization> ]
+  | <xInvalidEntityDecl>
+  ;
+<xInvalidEntityDecl> ::=
+  <xObjectName> T_ASTERISK <xCharLength> T_LPAREN <xArraySpec> T_RPAREN [ <xInitialization> ]
+  ;
+
+# R505
+<xInitialization> ::=
+    T_EQUALS <xExpr>
+  | T_EQGREATERTHAN T_NULL T_LPAREN T_RPAREN
+  ;
+
+# R506 Should this be "kind=T_ORkind" T_EQUALS?
+<xKindSelector> ::=
+    T_LPAREN T_KINDEQ <xExpr> T_RPAREN
+  | T_LPAREN <xExpr> T_RPAREN
+  ;
+
+# R507
+<xCharSelector> ::=
+    <xLengthSelector>
+  | T_LPAREN T_LENEQ <xCharLenParamValue> T_COMMA T_KINDEQ <xExpr> T_RPAREN
+  | T_LPAREN T_LENEQ <xCharLenParamValue> T_COMMA <xExpr> T_RPAREN
+  | T_LPAREN T_KINDEQ <xExpr> T_RPAREN
+  | T_LPAREN T_LENEQ <xCharLenParamValue> T_RPAREN
+  | T_LPAREN <xCharLenParamValue> T_RPAREN
+  ;
+
+# R508 chain rule deleted
+<xLengthSelector> ::=
+  T_ASTERISK <xCharLength>
+  ;
+
+# R509
+<xCharLength> ::=
+    T_LPAREN <xCharLenParamValue> T_RPAREN
+  | T_ICON
+  ;
+
+# R510 <xCharLenParamValue> was <xTypeParamValue>
+<xCharLenParamValue> ::=
+    <xExpr>
+  | T_ASTERISK
+  ;
+
+# R511
+<xAccessSpec> ::=
+    T_PUBLIC
+  | T_PRIVATE
+  ;
+
+# R512
+<xIntentSpec> ::=
+    T_IN
+  | T_OUT
+  | T_INOUT
+  | T_IN T_OUT
+  ;
+
+# R513 see 16
+<xArraySpec> ::=
+    <xExplicitShapeSpecList>
+  | <xAssumedSizeSpec>
+  | <xAssumedShapeSpecList>
+  | <xDeferredShapeSpecList>
+  ;
+<xAssumedShapeSpecList> ::=
+    <xLowerBound> T_COLON
+  | <xDeferredShapeSpecList> T_COMMA <xLowerBound> T_COLON
+  | <xAssumedShapeSpecList> T_COMMA <xAssumedShapeSpec>
+  ;
+
+# R514
+<xExplicitShapeSpecList> ::=
+    <xExplicitShapeSpec>
+  | <xExplicitShapeSpecList> T_COMMA <xExplicitShapeSpec>
+  ;
+<xExplicitShapeSpec> ::=
+    <xLowerBound> T_COLON <xUpperBound>
+  | <xUpperBound>
+  ;
+
+# R515
+<xLowerBound> ::= <xExpr>
+  ;
+
+# R516
+<xUpperBound> ::= <xExpr>
+  ;
+
+# R517
+<xAssumedShapeSpec> ::=
+    <xLowerBound> T_COLON
+  | T_COLON
+  ;
+
+# R518
+<xDeferredShapeSpecList> ::=
+    <xDeferredShapeSpec>
+  | <xDeferredShapeSpecList> T_COMMA <xDeferredShapeSpec>
+  ;
+<xDeferredShapeSpec> ::= T_COLON
+  ;
+
+# R519
+<xAssumedSizeSpec> ::=
+    T_ASTERISK
+  | <xLowerBound> T_COLON T_ASTERISK
+  | <xExplicitShapeSpecList> T_COMMA T_ASTERISK
+  | <xExplicitShapeSpecList> T_COMMA <xLowerBound> T_COLON T_ASTERISK
+  ;
+
+# R520
+<xIntentStmt> ::=
+  <xLblDef> T_INTENT T_LPAREN <xIntentSpec> T_RPAREN [ T_COLON T_COLON ] <xIntentParList> T_EOS
+  ;
+<xIntentParList> ::=
+    <xIntentPar>
+  | <xIntentParList> T_COMMA <xIntentPar>
+  ;
+<xIntentPar> ::=
+  <xDummyArgName>
+  ;
+
+# R521
+<xOptionalStmt> ::=
+  <xLblDef> T_OPTIONAL [ T_COLON T_COLON ] <xOptionalParList> T_EOS
+  ;
+<xOptionalParList> ::=
+    <xOptionalPar>
+  | <xOptionalParList> T_COMMA <xOptionalPar>
+  ;
+<xOptionalPar> ::= <xDummyArgName>
+  ;
+
+# R522
+<xAccessStmt> ::=
+    <xLblDef> <xAccessSpec> [ T_COLON T_COLON ] <xAccessIdList> T_EOS
+  | <xLblDef> <xAccessSpec> T_EOS
+  ;
+
+# R523
+<xAccessIdList> ::=
+    <xAccessId>
+  | <xAccessIdList> T_COMMA <xAccessId>
+  ;
+<xAccessId> ::=
+    <xGenericName>
+  | <xGenericSpec>
+  ;
+
+# R524
+<xSaveStmt> ::=
+    <xLblDef> T_SAVE T_EOS
+  | <xLblDef> T_SAVE [ T_COLON T_COLON ] <xSavedEntityList> T_EOS
+  ;
+
+# R525
+<xSavedEntityList> ::=
+    <xSavedEntity>
+  | <xSavedEntityList> T_COMMA <xSavedEntity>
+  ;
+<xSavedEntity> ::=
+    <xVariableName>
+  | <xSavedCommonBlock>
+  ;
+<xSavedCommonBlock> ::= T_SLASH <xCommonBlockName> T_SLASH
+  ;
+
+# R526
+<xDimensionStmt> ::=
+  <xLblDef> T_DIMENSION [ T_COLON T_COLON ] <xArrayDeclaratorList> T_EOS
+  ;
+<xArrayDeclaratorList> ::=
+    <xArrayDeclarator>
+  | <xArrayDeclaratorList> T_COMMA <xArrayDeclarator>
+  ;
+<xArrayDeclarator> ::= <xVariableName> T_LPAREN <xArraySpec> T_RPAREN
+  ;
+
+# R527
+<xAllocatableStmt> ::=
+  <xLblDef> T_ALLOCATABLE [ T_COLON T_COLON ] <xArrayAllocationList> T_EOS
+  ;
+<xArrayAllocationList> ::=
+    <xArrayAllocation>
+  | <xArrayAllocationList> T_COMMA <xArrayAllocation>
+  ;
+<xArrayAllocation> ::=
+    <xArrayName>
+  | <xArrayName> T_LPAREN <xDeferredShapeSpecList> T_RPAREN
+  ;
+
+# R528 /* <xObjectName> renamed to <xPointerName> to simplify Sem. Anal. */
+<xPointerStmt> ::=
+  <xLblDef> T_POINTER [ T_COLON T_COLON ] <xPointerStmtObjectList> T_EOS
+  ;
+<xPointerStmtObjectList> ::=
+    <xPointerStmtObject>
+  | <xPointerStmtObjectList> T_COMMA <xPointerStmtObject>
+  ;
+<xPointerStmtObject> ::=
+    <xPointerName>
+  | <xPointerName> T_LPAREN <xDeferredShapeSpecList> T_RPAREN
+  ;
+<xPointerName> ::= T_IDENT
+  ;
+
+# R529 /* <xObjectName> renamed to <xTargetName> to simplify Sem. Anal. */
+<xTargetStmt> ::=
+  <xLblDef> T_TARGET [ T_COLON T_COLON ] <xTargetObjectList> T_EOS
+  ;
+<xTargetObjectList> ::=
+    <xTargetObject>
+  | <xTargetObjectList> T_COMMA <xTargetObject>
+  ;
+<xTargetObject> ::= <xTargetName>
+  | <xTargetName> T_LPAREN <xArraySpec> T_RPAREN
+  ;
+<xTargetName> ::= T_IDENT
+  ;
+
+# R530
+<xParameterStmt> ::=
+  <xLblDef> T_PARAMETER T_LPAREN <xNamedConstantDefList> T_RPAREN T_EOS
+  ;
+
+# R531
+<xNamedConstantDefList> ::=
+    <xNamedConstantDef>
+  | <xNamedConstantDefList> T_COMMA <xNamedConstantDef>
+  ;
+<xNamedConstantDef> ::= <xNamedConstant> T_EQUALS <xExpr>
+  ;
+
+# R532
+<xDataStmt> ::=
+  <xLblDef> T_DATA <xDatalist> T_EOS
+  ;
+<xDatalist> ::=
+    <xDataStmtSet>
+  | <xDatalist> <xDataStmtSet>
+  | <xDatalist> T_COMMA <xDataStmtSet>
+  ;
+
+# R533
+<xDataStmtSet> ::= <xDataStmtObjectList> T_SLASH <xDataStmtValueList> T_SLASH
+  ;
+
+# R534
+<xDataStmtObjectList> ::=
+    <xDataStmtObject>
+  | <xDataStmtObjectList> T_COMMA <xDataStmtObject>
+  ;
+<xDataStmtObject> ::=
+    <xVariable>
+  | <xDataImpliedDo>
+  ;
+
+# R535 <xExpr> must be scalar-int-expr
+<xDataImpliedDo> ::=
+    T_LPAREN <xDataIDoObjectList> T_COMMA <T_xImpliedDoVariable> T_EQUALS <xExpr> T_COMMA <xExpr> T_RPAREN
+  | T_LPAREN <xDataIDoObjectList> T_COMMA <T_xImpliedDoVariable> T_EQUALS <xExpr> T_COMMA <xExpr> T_COMMA <xExpr> T_RPAREN
+  ;
+
+# R536 <xStructureComponent> must be <xScalarStructureComponent>
+<xDataIDoObjectList> ::= <xDataIDoObject>
+  | <xDataIDoObjectList> T_COMMA <xDataIDoObject>
+  ;
+<xDataIDoObject> ::=
+    <xArrayElement>
+  | <xDataImpliedDo>
+  | <xStructureComponent>
+  ;
+
+# R537 chain rule deleted
+
+# R538
+<xDataStmtValueList> ::=
+    <xDataStmtValue>
+  | <xDataStmtValueList> T_COMMA <xDataStmtValue>
+  ;
+<xDataStmtValue> ::=
+    <xDataStmtConstant>
+  | T_ICON T_ASTERISK <xDataStmtConstant>
+  | <xNamedConstantUse> T_ASTERISK <xDataStmtConstant>
+  ;
+
+# R539 chain rule deleted
+
+# R540 only a subset of <xconstant> is allowed
+<xDataStmtConstant> ::=
+    <xConstant>
+  | T_NULL T_LPAREN T_RPAREN
+  ;
+
+# R541
+<T_xImplicitStmt> ::=
+    <xLblDef> T_IMPLICIT <T_xImplicitSpecList> T_EOS
+  | <xLblDef> T_IMPLICIT T_NONE T_EOS
+  ;
+
+# R542
+<T_xImplicitSpecList> ::=
+    <T_xImplicitSpec>
+  | <T_xImplicitSpecList> T_COMMA <T_xImplicitSpec>
+  ;
+<T_xImplicitSpec> ::= <xTypeSpec> T_xImpl
+  ;
+
+# R543 chain rule deleted
+
+# R544
+<xNamelistStmt> ::=
+  <xLblDef> T_NAMELIST <xNamelistGroups> T_EOS
+  ;
+<xNamelistGroups> ::=
+    T_SLASH <xNamelistGroupName> T_SLASH <xNamelistGroupObject>
+  | <xNamelistGroups> T_SLASH <xNamelistGroupName> T_SLASH <xNamelistGroupObject>
+  | <xNamelistGroups> T_COMMA T_SLASH <xNamelistGroupName> T_SLASH <xNamelistGroupObject>
+  | <xNamelistGroups> T_COMMA <xNamelistGroupObject>
+  ;
+
+# R545
+<xNamelistGroupObject> ::= <xVariableName>
+  ;
+
+# R546
+<xEquivalenceStmt> ::=
+  <xLblDef> T_EQUIVALENCE <xEquivalenceSetList> T_EOS
+  ;
+
+# R547
+<xEquivalenceSetList> ::=
+    <xEquivalenceSet>
+  | <xEquivalenceSetList> T_COMMA <xEquivalenceSet>
+  ;
+<xEquivalenceSet> ::= T_LPAREN <xEquivalenceObject> T_COMMA <xEquivalenceObjectList> T_RPAREN
+  ;
+
+# R548
+<xEquivalenceObjectList> ::=
+    <xEquivalenceObject>
+  | <xEquivalenceObjectList> T_COMMA <xEquivalenceObject>
+  ;
+# JO -- Changed xVariable to <xVariable>
+<xEquivalenceObject> ::= <xVariable>
+  ;
+
+# R549
+<xCommonStmt> ::=
+  <xLblDef> T_COMMON <xComlist> T_EOS
+  ;
+<xComlist> ::=
+    <xCommonBlockObject>
+  | <xComblock> <xCommonBlockObject>
+  | <xComlist> T_COMMA <xCommonBlockObject>
+  | <xComlist> <xComblock> <xCommonBlockObject>
+  | <xComlist> T_COMMA <xComblock> <xCommonBlockObject>
+  ;
+<xComblock> ::=
+    T_SLASH T_SLASH
+  | T_SLASH <xCommonBlockName> T_SLASH
+  ;
+
+# R550
+<xCommonBlockObject> ::=
+    <xVariableName>
+  | <xArrayDeclarator>
+  ;
+
+<< Section: Section 6 Rules >>
+
+# R601 The various forms of variables have to be recognized semantically;
+<xVariable> ::= 
+    <xDataRef> [ T_LPAREN <xSectionSubscriptList> T_RPAREN [ <xSubstringRange> ] ]
+  | <xSubstrConst>							# JO -- Added substring of constant strings
+  ;
+<xSubstrConst> ::=
+  T_SCON <xSubstringRange>					# JO -- Added substring of constant strings
+  ;	
+<xVariableName> ::= T_IDENT
+  ;
+<xScalarVariable> ::=
+    <xVariableName>
+  | <xArrayElement>
+  ;
+
+# R603-R608 chain rules deleted
+
+# R609 see 601
+
+# R610 see 601
+
+# R611
+<xSubstringRange> ::= T_LPAREN <xSubscriptTriplet> T_RPAREN
+  ;
+
+# R612
+<xDataRef> ::=
+    <xName>
+  | <xDataRef> [ T_LPAREN <xSectionSubscriptList> T_RPAREN ] T_PERCENT <xName>
+  ;
+<xSFDataRef> ::=
+    <xName> T_PERCENT <xName>
+  | <xName> T_LPAREN <xSectionSubscriptList> T_RPAREN
+  | <xSFDataRef> [ T_LPAREN <xSectionSubscriptList> T_RPAREN ] T_PERCENT <xName>
+  ;
+
+# R613 chain rule deleted;
+
+# R614
+<xStructureComponent> ::=
+    <xVariableName> <xFieldSelector>
+  | <xStructureComponent> <xFieldSelector>
+  ;
+<xFieldSelector> ::=
+    T_LPAREN <xSectionSubscriptList> T_RPAREN T_PERCENT <xName>
+  | T_PERCENT <xName>
+  ;
+
+# R615
+<xArrayElement> ::=
+    <xVariableName> T_LPAREN <xSectionSubscriptList> T_RPAREN
+  | <xStructureComponent> T_LPAREN <xSectionSubscriptList> T_RPAREN
+  ;
+
+# R616 Recognized semantically?
+
+# R617 Recognized semantically
+<xSubscript> ::= <xExpr>
+  ;
+
+# R618 Recognized semantically?
+<xSectionSubscriptList> ::=
+    <xSectionSubscript>
+  | <xSectionSubscriptList> T_COMMA <xSectionSubscript>
+  ;
+<xSectionSubscript> ::=
+    <xExpr>
+  | <xSubscriptTriplet>
+  ;
+
+# R619
+<xSubscriptTriplet> ::=
+    T_COLON
+  | T_COLON <xExpr>
+  | <xExpr> T_COLON
+  | <xExpr> T_COLON <xExpr>
+  | <xExpr> T_COLON <xExpr> T_COLON <xExpr>
+  | <xExpr> T_COLON T_COLON <xExpr>
+  | T_COLON <xExpr> T_COLON <xExpr>
+  | T_COLON T_COLON <xExpr>
+  ;
+
+# R620 chain rule deleted
+
+# R621 recognized semantically?
+
+# R622
+<xAllocateStmt> ::=
+    <xLblDef> T_ALLOCATE T_LPAREN <xAllocationList> T_COMMA T_STATEQ <xVariable> T_RPAREN T_EOS
+  | <xLblDef> T_ALLOCATE T_LPAREN <xAllocationList> T_RPAREN T_EOS
+  ;
+
+# R623 chain rule deleted
+
+# R624
+<xAllocationList> ::=
+    <xAllocation>
+  | <xAllocationList> T_COMMA <xAllocation>
+  ;
+<xAllocation> ::=
+    <xAllocateObject>
+  | <xAllocateObject> <xAllocatedShape>
+  ;
+<xAllocatedShape> ::= T_LPAREN <xSectionSubscriptList> T_RPAREN
+  ;
+# Need to use <xSectionSubscriptList> here to solve an LALR(1) conflict with the
+# <xFieldSelector> in R625.  (Can"t tell which we have until the character
+# following the right paren, but we must reduce WITHIN the parens.)
+
+# R625
+<xAllocateObjectList> ::=
+    <xAllocateObject>
+  | <xAllocateObjectList> T_COMMA <xAllocateObject>
+  ;
+<xAllocateObject> ::=
+    <xVariableName>
+  | <xAllocateObject> <xFieldSelector>
+  ;
+
+# R626
+# Omitted to solve LALR(1) conflict.  see R624
+#
+# <xAllocateShapeSpec>: <xExpr> | <xExpr> T_COLON <xExpr> ;
+
+# R627 chain rule deleted
+
+# R628 chain rule deleted
+
+# R629
+<xNullifyStmt> ::=
+  <xLblDef> T_NULLIFY T_LPAREN <xPointerObjectList> T_RPAREN T_EOS
+  ;
+<xPointerObjectList> ::=
+    <xPointerObject>
+  | <xPointerObjectList> T_COMMA <xPointerObject>
+  ;
+
+# R630
+<xPointerObject> ::= <xName>
+  | <xPointerField>
+  ;
+<xPointerField> ::=
+    <xName> T_LPAREN <xSFExprList> T_RPAREN T_PERCENT <xName>
+  | <xName> T_LPAREN <xSFDummyArgNameList> T_RPAREN T_PERCENT <xName>
+  | <xName> T_PERCENT <xName>
+  | <xPointerField> <xFieldSelector>
+  ;
+
+# R631
+<xDeallocateStmt> ::=
+    <xLblDef> T_DEALLOCATE T_LPAREN <xAllocateObjectList> T_COMMA T_STATEQ <xVariable> T_RPAREN T_EOS
+  | <xLblDef> T_DEALLOCATE T_LPAREN <xAllocateObjectList> T_RPAREN T_EOS
+  ;
+
+<< Section: More Section 7 Rules (Primary) >>
+
+# It is not clear to me whether some of the subcategories of Primary
+# are complete
+
+# R701
+<xPrimary> ::=
+    <xLogicalConstant>
+  | T_SCON
+  | <xUnsignedArithmeticConstant>
+  | <xArrayConstructor>
+  | <xName>  [ T_LPAREN <xSectionSubscriptList> T_RPAREN [ <xSubstringRange> ] ]
+  | <xName> T_PERCENT <xDataRef> [ T_LPAREN <xSectionSubscriptList> T_RPAREN [ <xSubstringRange> ] ]
+  | <xName> T_LPAREN <xSectionSubscriptList> T_RPAREN T_PERCENT <xDataRef> [ T_LPAREN <xSectionSubscriptList> T_RPAREN [ <xSubstringRange> ] ]
+  | <xFunctionReference> [ <xSubstringRange> ]
+  | <xFunctionReference> T_PERCENT <xDataRef> [ T_LPAREN <xSectionSubscriptList> T_RPAREN [ <xSubstringRange> ] ]
+  | T_LPAREN <xExpr> T_RPAREN
+  | <xSubstrConst> ;							# JO -- Added substring of constant strings
+
+<xCPrimary> ::=
+    <xCOperand>
+  | T_LPAREN <xCExpr> T_RPAREN
+  ;
+<xCOperand> ::=
+    T_SCON
+  | <xName> [ T_LPAREN <xSectionSubscriptList> T_RPAREN ]
+  | <xName> [ T_LPAREN <xSectionSubscriptList> T_RPAREN ] T_PERCENT <xDataRef> [ T_LPAREN <xSectionSubscriptList> T_RPAREN ]
+  | <xFunctionReference>
+  ;
+
+# dirk rossow: added <xSubstringRange> to allow: write(text(1)(2:20),*) 'hello'
+<xUFPrimary> ::=
+    T_ICON
+  | T_SCON
+  | <xFunctionReference>
+  | <xName> [ T_LPAREN <xSectionSubscriptList> T_RPAREN [ <xSubstringRange> ] ]
+  | <xName> [ T_LPAREN <xSectionSubscriptList> T_RPAREN ] T_PERCENT <xDataRef> [ T_LPAREN <xSectionSubscriptList> T_RPAREN [ <xSubstringRange> ] ]
+  | T_LPAREN <xUFExpr> T_RPAREN
+  ;
+
+# R702 chain rule deleted
+
+# R703
+<xLevel1Expr> ::=
+    <xPrimary>
+  | <xDefinedUnaryOp> <xPrimary>
+  ;
+
+# R704 defined in source form
+
+# R705
+<xMultOperand> ::= <xLevel1Expr> [ <xPowerOp> <xMultOperand> ]
+  ;
+<xUFFactor> ::= <xUFPrimary> [ <xPowerOp> <xUFFactor> ]
+  ;
+
+# R706
+<xAddOperand> ::= [ <xAddOperand> <xMultOp> ] <xMultOperand>
+  ;
+<xUFTerm> ::=
+    <xUFFactor>
+  | <xUFTerm> <xMultOp> <xUFFactor>
+  | <xUFTerm> <xConcatOp> <xUFPrimary>
+  ;
+
+# R707
+<xLevel2Expr> ::=
+    [ <xLevel2Expr> <xAddOp> ] <xAddOperand>
+  | <xSign> <xAddOperand>
+  ;   # We need to distinguish unary operators
+<xUFExpr> ::=
+    <xUFTerm>
+  | <xSign> <xUFTerm>
+  | <xUFExpr> <xAddOp> <xUFTerm>
+  ;
+
+# R708-710 defined in source form
+
+# R711 
+<xLevel3Expr> ::= [ <xLevel3Expr> <xConcatOp> ] <xLevel2Expr>
+  ;
+<xCExpr> ::= [ <xCExpr> <xConcatOp> ] <xCPrimary>
+  ;
+
+# R712 defined in source form
+
+# R713
+<xLevel4Expr> ::= [<xLevel3Expr> <xRelOp>] <xLevel3Expr>
+  ;
+
+# R714 defined in source form
+
+# R715
+<xAndOperand> ::= [<xNotOp>] <xLevel4Expr>
+  ;
+
+# R716
+<xOrOperand> ::= [<xOrOperand> <xAndOp>] <xAndOperand>
+  ;
+
+# R717
+<xEquivOperand> ::= [<xEquivOperand> <xOrOp>] <xOrOperand>
+  ;
+
+# R718
+<xLevel5Expr> ::= [<xLevel5Expr> <xEquivOp>] <xEquivOperand>
+  ;
+
+# R719-722 defined in source form
+
+# R723
+<xExpr> ::=
+    <xLevel5Expr>
+  | <xExpr> <xDefinedBinaryOp> <xLevel5Expr>
+  ;
+<xSFExprList> ::=
+    <xSFExpr> T_COLON <xExpr> T_COLON <xExpr>
+  | <xSFExpr> T_COLON T_COLON <xExpr>
+  | T_COLON <xExpr> T_COLON <xExpr>
+  | T_COLON T_COLON <xExpr>
+  ;
+
+# R724 defined in source form
+
+# R725-R734 chain rule deleted
+
+# R735 - JO - Macro substituted
+<xAssignmentStmt> ::=
+    <xLblDef> <xName>                                                                                                                                  T_EQUALS <xExpr> T_EOS
+  | <xLblDef> <xName> T_LPAREN <xSFExprList>         T_RPAREN                                                                                          T_EQUALS <xExpr> T_EOS
+  | <xLblDef> <xName> T_LPAREN <xSFExprList>         T_RPAREN                                                                    <xSubstringRange>     T_EQUALS <xExpr> T_EOS
+  | <xLblDef> <xName> T_LPAREN <xSFDummyArgNameList> T_RPAREN                                                                    <xSubstringRange>     T_EQUALS <xExpr> T_EOS
+  | <xLblDef> <xName>                                         T_PERCENT <xDataRef> [ T_LPAREN <xSectionSubscriptList> T_RPAREN [ <xSubstringRange> ] ] T_EQUALS <xExpr> T_EOS
+  | <xLblDef> <xName> T_LPAREN <xSFExprList>         T_RPAREN T_PERCENT <xDataRef> [ T_LPAREN <xSectionSubscriptList> T_RPAREN [ <xSubstringRange> ] ] T_EQUALS <xExpr> T_EOS
+  | <xLblDef> <xName> T_LPAREN <xSFDummyArgNameList> T_RPAREN T_PERCENT <xDataRef> [ T_LPAREN <xSectionSubscriptList> T_RPAREN [ <xSubstringRange> ] ] T_EQUALS <xExpr> T_EOS
+  ;
+
+<xSFExprList> ::=
+    T_COLON
+  | T_COLON <xExpr>
+  | <xSFExpr>
+  | <xSFExpr> T_COLON
+  | <xSFExpr> T_COLON <xExpr>
+  | <xSFExprList> T_COMMA <xSectionSubscript>
+  | <xSFDummyArgNameList> T_COMMA T_COLON
+  | <xSFDummyArgNameList> T_COMMA T_COLON <xExpr>
+  | <xSFDummyArgNameList> T_COMMA <xSFExpr>
+  | <xSFDummyArgNameList> T_COMMA <xSFExpr> T_COLON
+  | <xSFDummyArgNameList> T_COMMA <xSFExpr> T_COLON <xExpr>
+  ;
+<xSFExpr> ::=
+    <xSFTerm>
+  | <xSign> <xAddOperand>
+  | <xSFExpr> <xAddOp> <xAddOperand>
+  ;
+<xSFTerm> ::=
+    <xSFFactor>
+  | <xSFTerm> <xMultOp> <xMultOperand>
+  ;
+<xSFFactor> ::=
+    <xSFPrimary>
+  | <xSFPrimary> <xPowerOp> <xMultOperand>
+  ;
+<xSFPrimary> ::=
+    <xArrayConstructor>
+  | T_ICON
+  | <xSFVarName>
+  | <xSFDataRef>
+  | <xFunctionReference>
+  | T_LPAREN <xExpr> T_RPAREN
+  ;
+#<xAssignmentStmt> ::=
+#  <xLblDef> <xName> T_PERCENT <xDataRef> 
+#    [ T_LPAREN <xSectionSubscriptList> T_RPAREN [ <xSubstringRange> ] ] 
+#    T_EQUALS <xExpr> T_EOS |
+#  <xLblDef> <xName> T_LPAREN <xSFExprList> T_RPAREN T_PERCENT <xDataRef> 
+#    [ T_LPAREN <xSectionSubscriptList> T_RPAREN [ <xSubstringRange> ] ] 
+#    T_EQUALS <xExpr> T_EOS |
+#  <xLblDef> <xName> T_LPAREN <xSFDummyArgNameList> T_RPAREN T_PERCENT <xDataRef> 
+#    [ T_LPAREN <xSectionSubscriptList> T_RPAREN [ <xSubstringRange> ] ] T_EQUALS 
+#        <xExpr> T_EOS ;
+
+
+# R736
+<xPointerAssignmentStmt> ::=
+    <xLblDef> <xName>                                                              T_EQGREATERTHAN <xTarget> T_EOS
+  | <xLblDef> <xName>                                         T_PERCENT <xDataRef> T_EQGREATERTHAN <xTarget> T_EOS
+  | <xLblDef> <xName> T_LPAREN <xSFExprList>         T_RPAREN T_PERCENT <xDataRef> T_EQGREATERTHAN <xTarget> T_EOS
+  | <xLblDef> <xName> T_LPAREN <xSFDummyArgNameList> T_RPAREN T_PERCENT <xDataRef> T_EQGREATERTHAN <xTarget> T_EOS
+  ;
+
+# R737
+<xTarget> ::= <xExpr>
+  ;
+
+# R738
+<xWhereStmt> ::=
+  <xLblDef> T_WHERE T_LPAREN <xMaskExpr> T_RPAREN <xAssignmentStmt>
+  ;
+
+# R739 parallels if ... then ...elseif... else ... endif construct
+<xWhereConstruct> ::=
+  <xWhereConstructStmt> <xWhereRange>
+  ;
+<xWhereRange> ::=
+    <xEndWhereStmt>
+  | <xWhereBodyConstructBlock> <xEndWhereStmt>
+  | <xMaskedElsewhereConstruct>
+  | <xWhereBodyConstructBlock> <xMaskedElsewhereConstruct>
+  | <xElsewhereConstruct>
+  | <xWhereBodyConstructBlock> <xElsewhereConstruct>
+  ;
+
+<xMaskedElsewhereConstruct> ::=
+  <xMaskedElsewhereStmt> <xWhereRange>
+  ;
+
+<xElsewhereConstruct> ::=
+  <xElsewhereStmt> <xElsewherePart>
+  ;
+
+<xElsewherePart> ::=
+    <xEndWhereStmt>
+  | <xWhereBodyConstructBlock> <xEndWhereStmt>
+  ;
+
+<xWhereBodyConstructBlock> ::=
+    <xWhereBodyConstruct>
+  | <xWhereBodyConstructBlock> <xWhereBodyConstruct>
+  ;
+
+# R740
+<xWhereConstructStmt> ::=
+    <xLblDef> <xName> T_COLON T_WHERE T_LPAREN <xMaskExpr> T_RPAREN T_EOS
+  | <xLblDef> T_WHERE T_LPAREN <xMaskExpr> T_RPAREN T_EOS
+  ;
+
+# R741
+<xWhereBodyConstruct> ::=
+    <xAssignmentStmt>
+  | <xWhereStmt>
+  | <xWhereConstruct>
+  ;
+
+# R742 chain rule deleted
+
+# R743
+<xMaskExpr> ::= <xExpr>
+  ;
+
+# R744
+<xMaskedElsewhereStmt> ::=
+  <xLblDef> T_ELSEWHERE T_LPAREN <xMaskExpr> T_RPAREN [ <xEndName> ] T_EOS
+  ;
+
+# R745
+<xElsewhereStmt> ::=
+  <xLblDef> T_ELSEWHERE [ <xEndName> ] T_EOS
+  ;
+
+# R746
+<xEndWhereStmt> ::=
+    <xLblDef> T_ENDWHERE [ <xEndName> ] T_EOS
+  | <xLblDef> T_END T_WHERE [ <xEndName> ] T_EOS
+  ;
+
+# R747
+<xForallConstruct> ::=
+    <xForallConstructStmt>               <xEndForallStmt>
+  | <xForallConstructStmt> <xForallBody> <xEndForallStmt>
+  ;
+<xForallBody> ::=
+                  <xForallBodyConstruct>
+  | <xForallBody> <xForallBodyConstruct>
+  ;
+
+# R748
+<xForallConstructStmt> ::=
+    <xLblDef> T_FORALL <xForallHeader> T_EOS
+  | <xLblDef> <xName> T_COLON T_FORALL <xForallHeader> T_EOS
+  ;
+
+# R749
+<xForallHeader> ::=
+    T_LPAREN <xForallTripletSpecList>                           T_RPAREN
+  | T_LPAREN <xForallTripletSpecList> T_COMMA <xScalarMaskExpr> T_RPAREN
+  ;
+<xScalarMaskExpr> ::= <xMaskExpr>
+  ;
+
+# R750
+<xForallTripletSpecList> ::=
+    <xName> T_EQUALS <xSubscript> T_COLON <xSubscript>
+  | <xName> T_EQUALS <xSubscript> T_COLON <xSubscript> T_COLON <xExpr>
+  ;
+
+# R751
+<xForallBodyConstruct> ::=
+    <xAssignmentStmt>
+  | <xPointerAssignmentStmt>
+  | <xWhereStmt>
+  | <xWhereConstruct>
+  | <xForallConstruct>
+  | <xForallStmt>
+  ;
+
+# R752 chain rule eliminated
+
+# R753
+<xEndForallStmt> ::=
+    <xLblDef> T_END T_FORALL [ <xEndName> ] T_EOS
+  | <xLblDef> T_ENDFORALL [ <xEndName> ] T_EOS
+  ;
+
+# R754
+<xForallStmt> ::=
+    <xLblDef> T_FORALL <xForallHeader> <xAssignmentStmt> T_EOS
+  | <xLblDef> T_FORALL <xForallHeader> <xPointerAssignmentStmt> T_EOS
+  ;
+
+<< Section: Section 8 Rules >>
+
+# R801 see the note on R818
+
+# R802
+<xIfConstruct> ::=
+  <xIfThenStmt> <xThenPart>
+  ;
+<xThenPart> ::=
+    <xEndIfStmt>
+  | <xConditionalBody> <xEndIfStmt>
+  | <xElseIfConstruct>
+  | <xConditionalBody> <xElseIfConstruct>
+  | <xElseConstruct>
+  | <xConditionalBody> <xElseConstruct>
+  ;
+
+<xElseIfConstruct> ::=
+  <xElseIfStmt> <xThenPart>
+  ;
+
+<xElseConstruct> ::=
+  <xElseStmt> <xElsePart>
+  ;
+<xElsePart> ::=
+                       <xEndIfStmt>
+  | <xConditionalBody> <xEndIfStmt>
+  ;
+
+<xConditionalBody> ::=
+                       <xExecutionPartConstruct>
+  | <xConditionalBody> <xExecutionPartConstruct>
+  ;
+
+# R803
+<xIfThenStmt> ::=
+    <xLblDef> T_IF T_LPAREN <xExpr> T_RPAREN T_THEN T_EOS
+  | <xLblDef> <xName> T_COLON T_IF T_LPAREN <xExpr> T_RPAREN T_THEN T_EOS
+  ;
+
+# R804
+<xElseIfStmt> ::=
+    <xLblDef> T_ELSEIF T_LPAREN <xExpr> T_RPAREN T_THEN T_EOS
+  | <xLblDef> T_ELSEIF T_LPAREN <xExpr> T_RPAREN T_THEN <xEndName> T_EOS
+  | <xLblDef> T_ELSE T_IF T_LPAREN <xExpr> T_RPAREN T_THEN T_EOS
+  | <xLblDef> T_ELSE T_IF T_LPAREN <xExpr> T_RPAREN T_THEN <xEndName> T_EOS
+  ;
+
+# R805
+<xElseStmt> ::=
+    <xLblDef> T_ELSE T_EOS
+  | <xLblDef> T_ELSE <xEndName> T_EOS
+  ;
+
+# R806
+<xEndIfStmt> ::=
+    <xLblDef> T_ENDIF [ <xEndName> ] T_EOS
+  | <xLblDef> T_END T_IF [ <xEndName> ] T_EOS
+  ;
+
+# R807
+<xIfStmt> ::=
+  <xLblDef> T_IF T_LPAREN <xExpr> T_RPAREN <xActionStmt>
+  ;
+
+# R808
+<xCaseConstruct> ::=
+  <xSelectCaseStmt> <xSelectCaseRange>
+  ;
+<xSelectCaseRange> ::=
+    <xSelectCaseBody> <xEndSelectStmt>
+  | <xEndSelectStmt>
+  ;
+
+<xSelectCaseBody> ::=
+    <xCaseStmt>
+  | <xSelectCaseBody> <xCaseBodyConstruct>
+  ;
+<xCaseBodyConstruct> ::=
+    <xCaseStmt>
+  | <xExecutionPartConstruct>
+  ;
+
+# R809 chain rule eliminated
+<xSelectCaseStmt> ::=
+    <xLblDef> <xName> T_COLON T_SELECTCASE T_LPAREN <xExpr> T_RPAREN T_EOS
+  | <xLblDef> T_SELECTCASE T_LPAREN <xExpr> T_RPAREN T_EOS
+  | <xLblDef> <xName> T_COLON T_SELECT T_CASE T_LPAREN <xExpr> T_RPAREN T_EOS
+  | <xLblDef> T_SELECT T_CASE T_LPAREN <xExpr> T_RPAREN T_EOS
+  ;
+
+# R810
+<xCaseStmt> ::=
+    <xLblDef> T_CASE <xCaseSelector> T_EOS
+  | <xLblDef> T_CASE <xCaseSelector> <xName> T_EOS
+  ;
+
+# R811
+<xEndSelectStmt> ::=
+    <xLblDef> T_ENDSELECT [ <xEndName> ] T_EOS
+  | <xLblDef> T_END T_SELECT [ <xEndName> ] T_EOS
+  ;
+
+# R812 chain rules deleted
+
+# R813
+<xCaseSelector> ::=
+    T_LPAREN <xCaseValueRangeList> T_RPAREN
+  | T_DEFAULT
+  ;
+<xCaseValueRangeList> ::=
+    <xCaseValueRange>
+  | <xCaseValueRangeList> T_COMMA <xCaseValueRange>
+  ;
+
+# R814
+<xCaseValueRange> ::=
+   <xExpr>
+  | <xExpr> T_COLON
+  | T_COLON <xExpr>
+  | <xExpr> T_COLON <xExpr>
+  ;
+
+# R815 chain rules deleted
+
+# R816
+<xDoConstruct> ::= <xBlockDoConstruct>
+  ;
+
+# R817
+# Block DO constructs cannot be recognized syntactically because there is
+# no requirement that there be an end do statement;
+#
+# <xBlockDoConstruct>:
+#   <xDoStmt> <xBlock> <xEndDoStmt> |
+#   <xDoStmt> <xBlock> ;
+<xBlockDoConstruct> ::= <xLabelDoStmt>
+  ;
+
+# R818
+<xLabelDoStmt> ::=
+    <xLblDef> T_DO <xLblRef> <xCommaLoopControl> T_EOS
+  | <xLblDef> T_DO <xLblRef> T_EOS
+  | <xLblDef> T_DO <xCommaLoopControl> T_EOS
+  | <xLblDef> T_DO T_EOS
+  | <xLblDef> <xName> T_COLON T_DO <xLblRef> <xCommaLoopControl> T_EOS
+  | <xLblDef> <xName> T_COLON T_DO <xLblRef> T_EOS
+  | <xLblDef> <xName> T_COLON T_DO <xCommaLoopControl> T_EOS
+  | <xLblDef> <xName> T_COLON T_DO T_EOS
+  ;
+
+# R819 chain rule deleted
+
+# R820 chain rule deleted
+
+# R821 see 40
+<xCommaLoopControl> ::=
+    T_COMMA <xLoopControl>
+  | <xLoopControl>
+  ;
+<xLoopControl> ::=
+    <xVariableName> T_EQUALS <xExpr> T_COMMA <xExpr>
+  | <xVariableName> T_EQUALS <xExpr> T_COMMA <xExpr> T_COMMA <xExpr>
+  | T_WHILE T_LPAREN <xExpr> T_RPAREN
+  ;
+
+# R822 chain rule deleted
+
+# R823 chain rule deleted
+
+# R824 see note on R817
+
+# R825
+<xEndDoStmt> ::=
+    <xLblDef> T_ENDDO [ <xEndName> ] T_EOS
+  | <xLblDef> T_END T_DO [ <xEndName> ] T_EOS
+  ;
+
+# R826-R833 enforced semantically
+
+# R834
+<xCycleStmt> ::=
+  <xLblDef> T_CYCLE [ <xName> ] T_EOS
+  ;
+
+# R835
+<xExitStmt> ::=
+  <xLblDef> T_EXIT [ <xName> ] T_EOS
+  ;
+
+# R836
+<xGotoStmt> ::=
+  <xLblDef> <GoToKw> <xLblRef> T_EOS
+  ;
+
+<GoToKw> ::=
+    T_GOTO
+  | T_GO T_TO
+  ;
+
+# R837
+<xComputedGotoStmt> ::=
+    <xLblDef> <GoToKw> T_LPAREN <xLblRefList> T_RPAREN <xExpr> T_EOS
+  | <xLblDef> <GoToKw> T_LPAREN <xLblRefList> T_RPAREN <xCommaExp> T_EOS
+  ;
+<xCommaExp> ::= T_COMMA <xExpr>
+  ;
+<xLblRefList> ::=
+    <xLblRef>
+  | <xLblRefList> T_COMMA <xLblRef>
+  ;
+<xLblRef> ::= <xLabel>
+  ;
+
+# R838
+<xArithmeticIfStmt> ::=
+  <xLblDef> T_IF T_LPAREN <xExpr> T_RPAREN <xLblRef> T_COMMA <xLblRef> T_COMMA <xLblRef> T_EOS
+  ;
+
+# R839
+<xContinueStmt> ::=
+  <xLblDef> T_CONTINUE T_EOS
+  ;
+
+# R840
+<xStopStmt> ::=
+    <xLblDef> T_STOP T_EOS
+  | <xLblDef> T_STOP T_ICON T_EOS
+  | <xLblDef> T_STOP T_SCON T_EOS
+  ;
+
+# R841 chain rule deleted
+
+<< Section: Section 9 Rules >>
+
+# R901
+<xUnitIdentifier> ::=
+    <xUFExpr>
+  | T_ASTERISK
+  ;
+
+# R902 chain rule deleted
+
+# R903 chain rule deleted
+
+# R904
+<xOpenStmt> ::=
+  <xLblDef> T_OPEN T_LPAREN <xConnectSpecList> T_RPAREN T_EOS
+  ;
+
+# R905
+<xConnectSpecList> ::=
+    <xUnitIdentifier>
+  | <xConnectSpec>
+  | <xConnectSpecList> T_COMMA <xConnectSpec>
+  ;
+<xConnectSpec> ::=
+    T_UNITEQ <xUnitIdentifier>
+  | T_ERREQ <xLblRef>
+  | T_FILEEQ <xCExpr>
+  | T_STATUSEQ <xCExpr>
+  | T_ACCESSEQ <xCExpr>
+  | T_FORMEQ <xCExpr>
+  | T_RECLEQ <xExpr>
+  | T_BLANKEQ <xCExpr>
+  | T_IOSTATEQ <xScalarVariable>
+  | T_POSITIONEQ <xCExpr>
+  | T_ACTIONEQ <xCExpr>
+  | T_DELIMEQ <xCExpr>
+  | T_PADEQ <xCExpr>
+  ;
+
+# R906 chain rule deleted
+
+# R907
+<xCloseStmt> ::=
+  <xLblDef> T_CLOSE T_LPAREN <xCloseSpecList> T_RPAREN T_EOS
+  ;
+
+# R908
+<xCloseSpecList> ::=
+    <xUnitIdentifier>
+  | <xCloseSpec>
+  | <xCloseSpecList> T_COMMA <xCloseSpec>
+  ;
+<xCloseSpec> ::=
+    T_UNITEQ <xUnitIdentifier>
+  | T_ERREQ <xLblRef>
+  | T_STATUSEQ <xCExpr>
+  | T_IOSTATEQ <xScalarVariable>
+  ;
+
+# R909
+<xReadStmt> ::=
+    <xLblDef> T_READ <xRdCtlSpec> <xInputItemList> T_EOS
+  | <xLblDef> T_READ <xRdCtlSpec> T_EOS
+  | <xLblDef> T_READ <xRdFmtId> T_COMMA <xInputItemList> T_EOS
+  | <xLblDef> T_READ <xRdFmtId> T_EOS
+  ;
+<xRdCtlSpec> ::=
+    <xRdUnitId>
+  | T_LPAREN <xRdIoCtlSpecList> T_RPAREN
+  ;
+<xRdUnitId> ::=
+    T_LPAREN <xUFExpr> T_RPAREN
+  | T_LPAREN T_ASTERISK T_RPAREN
+  ;
+<xRdIoCtlSpecList> ::=
+    <xUnitIdentifier> T_COMMA <xIoControlSpec>
+  | <xUnitIdentifier> T_COMMA <xFormatIdentifier>
+  | <xIoControlSpec>
+  | <xRdIoCtlSpecList> T_COMMA <xIoControlSpec>
+  ;
+<xRdFmtId> ::=
+    <xLblRef>
+  | T_ASTERISK
+  | <xCOperand>
+  | <xCOperand> <xConcatOp> <xCPrimary>
+  | <xRdFmtIdExpr> <xConcatOp> <xCPrimary>
+  ;
+<xRdFmtIdExpr> ::= T_LPAREN <xUFExpr> T_RPAREN
+  ;
+
+# R910
+<xWriteStmt> ::=
+    <xLblDef> T_WRITE T_LPAREN <xIoControlSpecList> T_RPAREN <xOutputItemList> T_EOS
+  | <xLblDef> T_WRITE T_LPAREN <xIoControlSpecList> T_RPAREN T_EOS
+  ;
+
+# R911
+<xPrintStmt> ::=
+    <xLblDef> T_PRINT <xFormatIdentifier> T_COMMA <xOutputItemList> T_EOS
+  | <xLblDef> T_PRINT <xFormatIdentifier> T_EOS
+  ;
+
+# R912
+[xIoControlSpecList] <xIoControlSpecList> ::=
+# JO - $
+#  <xUnitIdentifier> $T_COMMA |
+    <xUnitIdentifier>
+  | <xUnitIdentifier> T_COMMA <xFormatIdentifier>
+  | <xUnitIdentifier> T_COMMA <xIoControlSpec>
+  | <xIoControlSpec>
+  | <xIoControlSpecList> T_COMMA <xIoControlSpec>
+  ;
+<xIoControlSpec> ::=
+    T_FMTEQ <xFormatIdentifier>
+  | T_UNITEQ <xUnitIdentifier>
+  | T_RECEQ <xExpr>
+  | T_ENDEQ <xLblRef>
+  | T_ERREQ <xLblRef>
+  | T_IOSTATEQ <xScalarVariable>
+  | T_NMLEQ <xNamelistGroupName>
+  | T_ADVANCEEQ <xCExpr>
+  | T_SIZEEQ <xVariable>
+  | T_EOREQ <xLblRef>		# JO -- Was T_OR, which is incorrect
+  ;
+
+# R913
+<xFormatIdentifier> ::=
+    <xLblRef>
+  | <xCExpr>
+  | T_ASTERISK
+  ;
+
+# R914
+<xInputItemList> ::=
+    <xInputItem>
+  | <xInputItemList> T_COMMA <xInputItem>
+  ;
+<xInputItem> ::=
+    <xVariable>
+  | <xInputImpliedDo>
+  ;
+
+# 915
+<xOutputItemList> ::=
+    <xExpr>
+  | <xOutputItemList1>
+  ;
+<xOutputItemList1> ::=
+    <xExpr> T_COMMA <xExpr>
+  | <xExpr> T_COMMA <xOutputImpliedDo>
+  | <xOutputImpliedDo>
+  | <xOutputItemList1> T_COMMA <xExpr>
+  | <xOutputItemList1> T_COMMA <xOutputImpliedDo>
+  ;
+
+# R916
+<xInputImpliedDo> ::=
+    T_LPAREN <xInputItemList> T_COMMA <T_xImpliedDoVariable> T_EQUALS <xExpr> T_COMMA <xExpr> T_RPAREN
+  | T_LPAREN <xInputItemList> T_COMMA <T_xImpliedDoVariable> T_EQUALS <xExpr> T_COMMA <xExpr> T_COMMA <xExpr> T_RPAREN
+  ;
+
+<xOutputImpliedDo> ::=
+    T_LPAREN <xExpr> T_COMMA <T_xImpliedDoVariable> T_EQUALS <xExpr> T_COMMA <xExpr> T_RPAREN
+  | T_LPAREN <xExpr> T_COMMA <T_xImpliedDoVariable> T_EQUALS <xExpr> T_COMMA <xExpr> T_COMMA <xExpr> T_RPAREN
+  | T_LPAREN <xOutputItemList1> T_COMMA <T_xImpliedDoVariable> T_EQUALS <xExpr> T_COMMA <xExpr> T_RPAREN
+  | T_LPAREN <xOutputItemList1> T_COMMA <T_xImpliedDoVariable> T_EQUALS <xExpr> T_COMMA <xExpr> T_COMMA <xExpr> T_RPAREN
+  ;
+
+# R917 chain rule deleted
+
+# R918 chain rule deleted
+
+# R919
+<xBackspaceStmt> ::=
+    <xLblDef> T_BACKSPACE <xUnitIdentifier> T_EOS
+  | <xLblDef> T_BACKSPACE T_LPAREN <xPositionSpecList> T_RPAREN T_EOS
+  ;
+
+# R920
+<xEndfileStmt> ::=
+    <xLblDef> T_ENDFILE <xUnitIdentifier> T_EOS
+  | <xLblDef> T_ENDFILE T_LPAREN <xPositionSpecList> T_RPAREN T_EOS
+  | <xLblDef> T_END T_FILE <xUnitIdentifier> T_EOS
+  | <xLblDef> T_END T_FILE T_LPAREN <xPositionSpecList> T_RPAREN T_EOS
+  ;
+
+# R921
+<xRewindStmt> ::=
+    <xLblDef> T_REWIND <xUnitIdentifier> T_EOS
+  | <xLblDef> T_REWIND T_LPAREN <xPositionSpecList> T_RPAREN T_EOS
+  ;
+
+# R922
+<xPositionSpecList> ::=
+    <xUnitIdentifier> T_COMMA <xPositionSpec>
+  | <xPositionSpec>
+  | <xPositionSpecList> T_COMMA <xPositionSpec>
+  ;
+<xPositionSpec> ::=
+    T_UNITEQ <xUnitIdentifier>
+  | T_ERREQ <xLblRef>
+  | T_IOSTATEQ <xScalarVariable>
+  ;
+
+# R923
+<xInquireStmt> ::=
+    <xLblDef> T_INQUIRE T_LPAREN <xInquireSpecList> T_RPAREN T_EOS
+  | <xLblDef> T_INQUIRE T_LPAREN T_IOLENGTHEQ <xScalarVariable> T_RPAREN <xOutputItemList> T_EOS
+  ;
+
+# R924
+<xInquireSpecList> ::=
+    <xUnitIdentifier>
+  | <xInquireSpec>
+  | <xInquireSpecList> T_COMMA <xInquireSpec>
+  ;
+<xInquireSpec> ::=
+    T_UNITEQ <xUnitIdentifier>
+  | T_FILEEQ <xCExpr>
+  | T_ERREQ <xLblRef>
+  | T_IOSTATEQ <xScalarVariable>
+  | T_EXISTEQ <xScalarVariable>
+  | T_OPENEDEQ <xScalarVariable>
+  | T_NUMBEREQ <xScalarVariable>
+  | T_NAMEDEQ <xScalarVariable>
+  | T_NAMEEQ <xScalarVariable>
+  | T_ACCESSEQ <xScalarVariable>
+  | T_SEQUENTIALEQ <xScalarVariable>
+  | T_DIRECTEQ <xScalarVariable>
+  | T_FORMEQ <xScalarVariable>
+  | T_FORMATTEDEQ <xScalarVariable>
+  | T_UNFORMATTEDEQ <xScalarVariable>
+  | T_RECLEQ <xExpr>
+  | T_NEXTRECEQ <xScalarVariable>
+  | T_BLANKEQ <xScalarVariable>
+  | T_POSITIONEQ <xScalarVariable>
+  | T_ACTIONEQ <xScalarVariable>
+  | T_READEQ <xScalarVariable>
+  | T_WRITEEQ <xScalarVariable>
+  | T_READWRITEEQ <xScalarVariable>
+  | T_DELIMEQ <xScalarVariable>
+  | T_PADEQ <xScalarVariable>
+  ;
+
+<< Section: Section 10 Rules >>
+
+# I have trouble verifying this section because of its reliance on
+#  lexical analysis */
+# R1001
+<xFormatStmt> ::=
+  <xLblDef> T_FORMAT T_LPAREN [ <xFmtSpec> ] T_RPAREN T_EOS
+  | <xLblDef> T_FORMAT %error T_EOS
+  ;
+
+# R1002
+<xFmtSpec> ::=
+    <xFormatedit>
+  | <xFormatsep>
+  | <xFormatsep> <xFormatedit>
+  | <xFmtSpec> <xFormatsep>
+  | <xFmtSpec> <xFormatsep> <xFormatedit>
+  | <xFmtSpec> T_COMMA <xFormatedit>
+  | <xFmtSpec> T_COMMA <xFormatsep>
+  | <xFmtSpec> T_COMMA <xFormatsep> <xFormatedit>
+  ;
+
+# R1003
+<xFormatedit> ::=
+    <xEditElement>
+  | T_ICON <xEditElement>
+  | T_XCON
+  | T_PCON
+  | T_PCON <xEditElement>
+  | T_PCON T_ICON <xEditElement>
+  ;
+
+#dirk rossow added T_HCON
+<xEditElement> ::=
+    T_FCON
+  | T_SCON
+  | T_IDENT
+  | T_LPAREN <xFmtSpec> T_RPAREN
+  | T_HCON
+  ;
+
+# R1004 chain rule deleted
+
+# R1005 chain rule deleted as le<xically> recognized elements
+
+# R1010
+<xFormatsep> ::=
+    T_SLASH
+  | T_COLON
+  ;
+
+<< Section: More Section 11 Rules >>
+
+# R1101 see high level synta<x>
+
+# R1102
+%type Token
+<xProgramStmt> ::=
+  <xLblDef> T_PROGRAM <xProgramName> T_EOS {: return $3; :}
+  ;
+
+# R1103
+<xEndProgramStmt> ::=
+    <xLblDef> T_END T_EOS
+  | <xLblDef> T_ENDPROGRAM [ <xEndName> ] T_EOS
+  | <xLblDef> T_END T_PROGRAM [ <xEndName> ] T_EOS
+  ;
+
+# R1104 see high level synta<x>
+
+# R1105
+%type Token
+<xModuleStmt> ::= <xLblDef> T_MODULE <xModuleName> T_EOS {: return $3; :}
+  ;
+
+# R1106
+<xEndModuleStmt> ::=
+    <xLblDef> T_END T_EOS
+  | <xLblDef> T_ENDMODULE [ <xEndName> ] T_EOS
+  | <xLblDef> T_END T_MODULE [ <xEndName> ] T_EOS
+  ;
+
+# R1107
+<xUseStmt> ::=
+    <xLblDef> T_USE <xName> T_EOS
+  | <xLblDef> T_USE <xName> T_COMMA <xRenameList> T_EOS
+  | <xLblDef> T_USE <xName> T_COMMA T_ONLY T_COLON [ <xOnlyList> ] T_EOS
+  ;
+<xRenameList> ::=
+    <xRename>
+  | <xRenameList> T_COMMA <xRename>
+  ;
+<xOnlyList> ::=
+                        <xOnly>
+  | <xOnlyList> T_COMMA <xOnly>
+  ;
+
+# R1108
+<xRename> ::= T_IDENT T_EQGREATERTHAN <xUseName>
+  ;
+
+# R1109
+<xOnly> ::=
+    <xGenericSpec>
+  | T_IDENT T_EQGREATERTHAN <xUseName>
+  | <xUseName>
+  ;
+
+# R1110 chain rule deleted
+
+# R111 chain rule deleted
+
+# R1112 see high level synta<x>
+
+# R1113
+%type Token
+<xBlockDataStmt> ::=
+    <xLblDef> T_BLOCKDATA <xBlockDataName> T_EOS	{: return $3; :}
+  | <xLblDef> T_BLOCKDATA                  T_EOS
+  ;
+
+# R1114
+<xEndBlockDataStmt> ::=
+    <xLblDef> T_END T_EOS
+  | <xLblDef> T_ENDBLOCKDATA [ <xEndName> ] T_EOS
+  | <xLblDef> T_END T_BLOCKDATA [ <xEndName> ] T_EOS
+  | <xLblDef> T_ENDBLOCK T_DATA [ <xEndName> ] T_EOS
+  | <xLblDef> T_END T_BLOCK T_DATA [ <xEndName> ] T_EOS
+  ;
+
+<< Section: More Section 12 Rules >>
+
+# R1201
+<xInterfaceBlock> ::=
+  <xInterfaceStmt> <xInterfaceRange>
+  ;
+<xInterfaceRange> ::=
+  <xInterfaceBlockBody> <xEndInterfaceStmt>
+  ;
+<xInterfaceBlockBody> ::=
+    <xInterfaceSpecification>
+  | <xInterfaceBlockBody> <xInterfaceSpecification>
+  ;
+
+# R1202
+<xInterfaceSpecification> ::=
+    <xInterfaceBody>
+  | <xModuleProcedureStmt>
+  ;
+
+# R1203
+<xInterfaceStmt> ::=
+    <xLblDef> T_INTERFACE <xGenericName> T_EOS
+  | <xLblDef> T_INTERFACE <xGenericSpec> T_EOS
+  | <xLblDef> T_INTERFACE T_EOS
+  ;
+
+# R1204
+<xEndInterfaceStmt> ::=
+    <xLblDef> T_ENDINTERFACE    [<xEndName>] T_EOS
+  | <xLblDef> T_END T_INTERFACE [<xEndName>] T_EOS
+  ;
+
+# R1205
+<xInterfaceBody> ::=
+    <xFunctionStmt> <xFunctionInterfaceRange>
+  | <xSubroutineStmt> <xSubroutineInterfaceRange>
+  ;
+<xFunctionInterfaceRange> ::=
+    <xSubprogramInterfaceBody> <xEndFunctionStmt>
+  | <xEndFunctionStmt>
+  ;
+<xSubroutineInterfaceRange> ::=
+    <xSubprogramInterfaceBody> <xEndSubroutineStmt>
+  | <xEndSubroutineStmt>
+  ;
+<xSubprogramInterfaceBody> ::=
+    <xSpecificationPartConstruct>
+  | <xSubprogramInterfaceBody> <xSpecificationPartConstruct>
+  ;
+
+# R1206
+<xModuleProcedureStmt> ::=
+  <xLblDef> T_MODULE T_PROCEDURE <xProcedureNameList> T_EOS
+  ;
+<xProcedureNameList> ::=
+    <xProcedureName>
+  | <xProcedureNameList> T_COMMA <xProcedureName>
+  ;
+<xProcedureName> ::= T_IDENT
+  ;
+
+# R1207
+<xGenericSpec> ::=
+    T_OPERATOR T_LPAREN <xDefinedOperator> T_RPAREN
+  | T_ASSIGNMENT T_LPAREN T_EQUALS T_RPAREN
+  ;
+
+# R1208
+<xExternalStmt> ::=
+    <xLblDef> T_EXTERNAL <xExternalNameList> T_EOS
+  | <xLblDef> T_EXTERNAL T_COLON T_COLON <xExternalNameList> T_EOS
+  ;
+<xExternalNameList> ::=
+    <xExternalName>
+  | <xExternalNameList> T_COMMA <xExternalName>
+  ;
+
+# R1209
+<xIntrinsicStmt> ::=
+    <xLblDef> T_INTRINSIC <xIntrinsicList> T_EOS
+  | <xLblDef> T_INTRINSIC T_COLON T_COLON <xIntrinsicList> T_EOS
+  ;
+<xIntrinsicList> ::=
+    <xIntrinsicProcedureName>
+  | <xIntrinsicList> T_COMMA <xIntrinsicProcedureName>
+  ;
+
+# R1210
+<xFunctionReference> ::=
+    <xName> T_LPAREN T_RPAREN
+  | <xName> T_LPAREN <xFunctionArgList> T_RPAREN
+  ;
+
+# R1211
+<xCallStmt> ::=
+    <xLblDef> T_CALL <xSubroutineNameUse> T_EOS
+  | <xLblDef> T_CALL <xSubroutineNameUse> T_LPAREN <xSubroutineArgList> T_RPAREN T_EOS
+  ;
+<xSubroutineArgList> ::=
+    empty
+  | <xSubroutineArg>
+  | <xSubroutineArgList> T_COMMA <xSubroutineArg>
+  ;
+
+# R1212
+# Functions initially recognized as arrays resolved semantically
+<xFunctionArgList> ::=
+    <xFunctionArg>
+  | <xFunctionArgList> T_COMMA <xFunctionArg>
+  | <xSectionSubscriptList> T_COMMA <xFunctionArg>
+  ;
+<xFunctionArg> ::= <xName> T_EQUALS <xExpr>
+  ;
+
+#dirk rossow added T_HCON
+<xSubroutineArg> ::=
+    <xExpr>
+  | T_ASTERISK <xLblRef>
+  | <xName> T_EQUALS <xExpr>
+  | <xName> T_EQUALS T_ASTERISK <xLblRef>
+  | T_HCON
+  | <xName> T_EQUALS T_HCON
+  ;
+
+# R1213 chain rule deleted
+
+# R1214 chain rule deleted
+
+# R1215 chain rule deleted
+
+# R1216 see high level synta<x>
+
+# R1217 chain rule deleted
+%type Token
+<xFunctionStmt> ::=
+  <xLblDef> <xFunctionPrefix> <xFunctionName> T_LPAREN <xFunctionPars> T_RPAREN [ T_RESULT T_LPAREN <xName> T_RPAREN ] T_EOS {: return $3; :}
+  | <xLblDef> <xFunctionPrefix> <xFunctionName> %error T_EOS {: return $3; :}
+  ; 
+
+<xFunctionPars> ::=
+    empty
+  | <xFunctionPar>
+  | <xFunctionPars> T_COMMA <xFunctionPar>
+  ;
+<xFunctionPar> ::= <xDummyArgName>
+  ;
+
+# R1218
+<xFunctionPrefix> ::=
+    T_FUNCTION
+  | <xPrefixSpecList> T_FUNCTION
+  ;
+<xPrefixSpecList> ::=
+    <xPrefixSpec>
+  | <xPrefixSpecList> <xPrefixSpec>
+  ;
+
+# R1219
+<xPrefixSpec> ::=
+    <xTypeSpec> 
+  | T_RECURSIVE
+  | T_PURE
+  | T_ELEMENTAL
+  ;
+
+# R1220
+<xEndFunctionStmt> ::=
+    <xLblDef> T_END T_EOS
+  | <xLblDef> T_ENDFUNCTION [ <xEndName> ] T_EOS
+  | <xLblDef> T_END T_FUNCTION [ <xEndName> ] T_EOS
+  ;
+
+# R1221 see high level synta<x>
+
+# R1222
+%type Token
+<xSubroutineStmt> ::=
+  <xLblDef> <xSubroutinePrefix> <xSubroutineName> [ T_LPAREN <xSubroutinePars> T_RPAREN ] T_EOS {: return $3; :}
+  | <xLblDef> <xSubroutinePrefix> <xSubroutineName> %error T_EOS
+  ;
+<xSubroutinePrefix> ::=
+    T_SUBROUTINE
+  | <xPrefixSpecList> T_SUBROUTINE
+  ;
+<xSubroutinePars> ::=
+    empty
+  | <xSubroutinePar>
+  | <xSubroutinePars> T_COMMA <xSubroutinePar>
+  ;
+
+# R1223
+<xSubroutinePar> ::=
+    <xDummyArgName>
+  | T_ASTERISK
+  ;
+
+# R1224
+<xEndSubroutineStmt> ::=
+    <xLblDef> T_END T_EOS
+  | <xLblDef> T_ENDSUBROUTINE [ <xEndName> ] T_EOS
+  | <xLblDef> T_END T_SUBROUTINE [ <xEndName> ] T_EOS
+  ;
+
+# R1225 - JO - Macro substituted
+<xEntryStmt> ::=
+  <xLblDef> T_ENTRY <xEntryName> [ T_LPAREN <xSubroutinePars> T_RPAREN ] T_EOS
+  ;
+#  <xLblDef> T_ENTRY <xEntryName> T_LPAREN <xSubroutinePars> T_RPAREN 
+#    T_RESULT T_LPAREN <xName> T_RPAREN T_EOS ;
+
+# R1226
+<xReturnStmt> ::=
+    <xLblDef> T_RETURN T_EOS
+  | <xLblDef> T_RETURN <xExpr> T_EOS
+  ;
+
+# R1227
+<xContainsStmt> ::=
+  <xLblDef> T_CONTAINS T_EOS
+  ;
+
+# R1228
+# This may turn out to be an assignment statement, but the form given here
+# allows for name analysis in the case that it actually IS a statement
+# function definition;
+<xStmtFunctionStmt> ::= <xLblDef> <xName> <xStmtFunctionRange>
+  ;
+<xStmtFunctionRange> ::= T_LPAREN T_RPAREN T_EQUALS <xExpr> T_EOS
+  ;
+<xStmtFunctionRange> ::= T_LPAREN <xSFDummyArgNameList> T_RPAREN T_EQUALS <xExpr> T_EOS
+  ;
+<xSFDummyArgNameList> ::=
+    <xSFDummyArgName>
+  | <xSFDummyArgNameList> T_COMMA <xSFDummyArgName>
+  ;
+
+<< Section: Additional Rules >>
+
+# Nonterminal symbols that are not defined in the standard
+<xArrayName> ::= T_IDENT
+  ;
+%type Token
+<xBlockDataName> ::= T_IDENT {: return $1; :}
+  ;
+<xCommonBlockName> ::= T_IDENT
+  ;
+<xComponentName> ::= T_IDENT
+  ;
+<xDummyArgName> ::= T_IDENT
+  ;
+<xEndName> ::= T_IDENT
+  ;
+<xEntryName> ::= T_IDENT
+  ;
+<xExternalName> ::= T_IDENT
+  ;
+%type Token
+<xFunctionName> ::= T_IDENT {: return $1; :}
+  ;
+<xGenericName> ::= T_IDENT
+  ;
+<T_xImpliedDoVariable> ::= T_IDENT
+  ;
+<xIntrinsicProcedureName> ::= T_IDENT
+  ;
+%type Token
+<xModuleName> ::= T_IDENT {: return $1; :}
+  ;
+<xNamelistGroupName> ::= T_IDENT
+  ;
+<xObjectName> ::= T_IDENT
+  ;
+%type Token
+<xProgramName> ::= T_IDENT {: return $1; :}
+  ;
+[xSFDummyArgName] <xSFDummyArgName> ::= <xName>
+  ; # JO - Was T_IDENT but caused r/r conflict
+# JO - $
+#<xSFVarName> ::= T_IDENT $T_COMMA $T_RPAREN ;
+[xSFVarName] <xSFVarName> ::= <xName>
+  ; # JO - Was T_IDENT but caused r/r conflict
+%type Token
+<xSubroutineName> ::= T_IDENT {: return $1; :}
+  ;
+<xSubroutineNameUse> ::= T_IDENT
+  ;
+<xTypeName> ::= T_IDENT
+  ;
+<xUseName> ::= T_IDENT
+  ;
+
+<xLblDef> ::=
+    empty
+  | <xLabel>
+  ;
+
+<< Section: Deleted Features >>
+
+#/***** DELETED FEATURES *****/
+#
+#/* Real and double precision do variables */
+#
+## R821
+#/* Punt on this as it involves introducing more complicated
+#* conditional compilation features in main standard
+#*/
+#
+## R822
+#/* Punt on this as it involves introducing more complicated
+#* conditional compilation features in main standard
+#*/
+#
+## R921
+#/* Punt on this as it involves introducing more complicated
+#* conditional compilation features in main standard
+#*/
+#
+# R216
+<xActionStmt> ::=
+    <xAssignStmt>
+  | <xAssignedGotoStmt>
+  | <xPauseStmt>
+  ;
+
+#/* Pause statement */
+<xPauseStmt> ::=
+    <xLblDef> T_PAUSE T_EOS
+  | <xLblDef> T_PAUSE T_ICON T_EOS
+  | <xLblDef> T_PAUSE T_SCON T_EOS
+  ;
+
+#/* Assign Statement */
+<xAssignStmt> ::=
+  <xLblDef> T_ASSIGN <xLblRef> T_TO <xVariableName> T_EOS
+  ;
+
+#/* Assigned GOTO Statement */
+<xAssignedGotoStmt> ::=
+    <xLblDef> <GoToKw> <xVariableName> T_EOS
+  | <xLblDef> <GoToKw> <xVariableName> T_LPAREN <xLblRefList> T_RPAREN T_EOS
+  | <xLblDef> <GoToKw> <xVariableComma> T_LPAREN <xLblRefList> T_RPAREN T_EOS
+  ;
+<xVariableComma> ::= <xVariableName> T_COMMA
+  ;
+
+#/* H edit descriptor */
+#
+## R305
+#<xConstant> ::=
+#  <xHcon> ;
+#
+## R1003
+#<xEditElement> ::=
+#  <xHcon> ;
+#
+## R1212
+#<xSubroutineArg> ::=
+#  <xHcon> |
+#  <xName> T_EQUALS <xHcon> ;

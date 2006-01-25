@@ -2,7 +2,7 @@ package org.eclipse.photran.internal.ui.editor;
 
 import java.util.HashSet;
 
-import org.eclipse.photran.internal.core.f95parser.Terminal;
+import org.eclipse.photran.internal.core.f95modelparser.Terminal;
 
 /**
  * @author nchen

@@ -6,9 +6,7 @@ import org.eclipse.cdt.core.model.IParent;
 import org.eclipse.cdt.core.model.ISourceReference;
 import org.eclipse.cdt.internal.core.model.Parent;
 import org.eclipse.cdt.internal.core.model.SourceManipulation;
-import org.eclipse.photran.internal.core.f95parser.ParseTreeNode;
-import org.eclipse.photran.internal.core.f95parser.ParseTreeSearcher;
-import org.eclipse.photran.internal.core.f95parser.Token;
+import org.eclipse.photran.internal.core.f95modelparser.Token;
 import org.eclipse.photran.modelicons.ModelIconsPlugin;
 
 /**

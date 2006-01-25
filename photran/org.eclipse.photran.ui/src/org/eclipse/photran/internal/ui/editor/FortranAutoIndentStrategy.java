@@ -14,13 +14,9 @@ package org.eclipse.photran.internal.ui.editor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy;
 import org.eclipse.jface.text.DocumentCommand;
+import org.eclipse.jface.text.IAutoIndentStrategy;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.ITypedRegion;
-import org.eclipse.photran.internal.core.f95parser.Terminal;
 import org.eclipse.photran.internal.ui.preferences.FortranEditorPreferencePage;
-
-import org.eclipse.cdt.ui.CUIPlugin;
 
 /**
  * Auto indent strategy sensitive to brackets.
