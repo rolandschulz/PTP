@@ -47,6 +47,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.JFaceColors;
 
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IFindReplaceTarget;
 import org.eclipse.jface.text.IFindReplaceTargetExtension;
 import org.eclipse.jface.text.IFindReplaceTargetExtension3;
@@ -56,11 +57,15 @@ import org.eclipse.jface.text.TextUtilities;
 
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contentassist.ContentAssistHandler;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.IFindReplaceTargetExtension2;
+import org.eclipse.ui.texteditor.ITextEditor;
+
+import org.eclipse.ui.texteditor.IDocumentProvider;
 
 
 /**
@@ -191,6 +196,7 @@ class ReplaceDialog extends Dialog {
 	 */
 	private boolean fGiveFocusToFindField= true;
 	
+	private IWorkbenchPart fActiveEditor;	/* editor associated with action delegate */
 	private String[] fConstants;	/* list of constant work items */
 	private int fTargetIndex;		/* current index into fConstants */
 
@@ -198,14 +204,15 @@ class ReplaceDialog extends Dialog {
 	 * Creates a new dialog with the given shell as parent.
 	 * @param parentShell the parent shell
 	 */
-	public ReplaceDialog(Shell parentShell, String[] constants) {
-		super(parentShell);
+	public ReplaceDialog(IWorkbenchPart activeEditor, String[] constants) {
+		super(activeEditor.getSite().getShell());
 		
 		// initialize instance variables (CER)
 		
 		fParentShell= null;
 		fTarget= null;
 		
+		fActiveEditor = activeEditor;
 		fConstants = constants;
 		fTargetIndex = 0;
 
@@ -920,14 +927,51 @@ class ReplaceDialog extends Dialog {
 	 * Locates the next replacement in the text of the target.
 	 */
 	private void performSeekNextTarget() {
+		if (fActiveEditor == null || !(fActiveEditor instanceof ITextEditor)) {
+			//	|| !(fActiveEditor instanceof IDocumentProvider)) {
+			return;
+		}
+				
 		if (fTargetIndex < fConstants.length) {
+			ITextEditor editor = (ITextEditor) fActiveEditor;
 			String target = fConstants[fTargetIndex];
-			int start = 2 + target.indexOf('=');
-			String in = target.substring(start, target.length() - 1);
+			String[] elements = target.split(":");
+			int line = Integer.decode(elements[0]).intValue() - 1;
+			int column = Integer.decode(elements[1]).intValue() - 1;
+			int length = Integer.decode(elements[2]).intValue() - column;
+			
+			try {
+				int offset = editor.getDocumentProvider().getDocument(editor.getEditorInput()).getLineOffset(line);
+				editor.selectAndReveal(offset + column, length);
+			} catch (BadLocationException e) {
+				return;
+			}
+		
+			String in = elements[3].substring(8, elements[3].length() - 1);
 			fFindField.setText(in);
 			fReplaceField.setText(in + "D0");
 			fTargetIndex += 1;
 		}
+
+/*****
+			IRegion scope;
+			if (fOldScope == null) {
+				Point lineSelection= extensionTarget.getLineSelection();
+				scope= new Region(lineSelection.x, lineSelection.y);
+			} else {
+				scope= fOldScope;
+				fOldScope= null;
+			}
+
+			int offset= scope.getOffset();
+			
+			extensionTarget.setSelection(offset, 0);
+			extensionTarget.setScope(scope);
+		} else {
+			fOldScope= extensionTarget.getScope();
+			extensionTarget.setScope(null);
+		}
+*****/
 	}
 
 	/**

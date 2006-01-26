@@ -95,7 +95,7 @@ public class ConstantReplacementEditorActionDelegate implements IEditorActionDel
                 {
                     public void run()
                     {
-                    	 ReplaceDialog dialog = new ReplaceDialog(activeEditor.getSite().getShell(), constants);
+                    	 ReplaceDialog dialog = new ReplaceDialog(activeEditor, constants);
                         //ReplaceDialog dialog = new ReplaceDialog(activeEditor.getSite().getShell());
                 		 dialog.open();
 
