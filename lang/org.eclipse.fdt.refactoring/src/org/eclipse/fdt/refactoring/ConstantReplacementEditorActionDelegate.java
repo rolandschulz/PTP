@@ -47,11 +47,11 @@ public class ConstantReplacementEditorActionDelegate implements IEditorActionDel
 
     public void run(IAction action)
     {
-        Job job = new Job("Extract Interface")
+        Job job = new Job("Constant Replacement")
         {
             protected IStatus run(IProgressMonitor monitor)
             {
-                monitor.beginTask("Extracting C interop interface; please wait...", IProgressMonitor.UNKNOWN);
+                monitor.beginTask("Running constant replacement refactoring; please wait...", IProgressMonitor.UNKNOWN);
                 try
                 {
                 	   FortranProcessor processor = new FortranProcessor();
