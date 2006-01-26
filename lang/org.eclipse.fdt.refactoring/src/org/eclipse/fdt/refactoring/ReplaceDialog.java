@@ -191,8 +191,8 @@ class ReplaceDialog extends Dialog {
 	 */
 	private boolean fGiveFocusToFindField= true;
 	
-	private String[] fConstants;
-
+	private String[] fConstants;	/* list of constant work items */
+	private int fTargetIndex;		/* current index into fConstants */
 
 	/**
 	 * Creates a new dialog with the given shell as parent.
@@ -207,6 +207,7 @@ class ReplaceDialog extends Dialog {
 		fTarget= null;
 		
 		fConstants = constants;
+		fTargetIndex = 0;
 
 		fDialogPositionInit= null;
 		fFindHistory= new ArrayList(HISTORY_SIZE - 1);
@@ -256,12 +257,8 @@ class ReplaceDialog extends Dialog {
 		fFindField.addModifyListener(fFindModifyListener);
 		updateCombo(fReplaceField, fReplaceHistory);
 
-		// get find string
-		initFindStringFromSelection();
-		int start = 2 + fConstants[0].indexOf('=');
-		String in = fConstants[0].substring(start, fConstants[0].length() - 1);
-		fFindField.setText(in);
-		fReplaceField.setText(in + "D0");
+		// get replacement target
+		performSeekNextTarget();
 
 		// set dialog position
 		if (fDialogPositionInit != null)
@@ -287,7 +284,7 @@ class ReplaceDialog extends Dialog {
 
 		fFindNextButton= makeButton(panel, FindReplace_FindNextButton_label, 102, true, new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				performSearch();
+				performSeekNextTarget();
 				updateFindHistory();
 				fFindNextButton.setFocus();
 			}
@@ -920,6 +917,20 @@ class ReplaceDialog extends Dialog {
 	}
 
 	/**
+	 * Locates the next replacement in the text of the target.
+	 */
+	private void performSeekNextTarget() {
+		if (fTargetIndex < fConstants.length) {
+			String target = fConstants[fTargetIndex];
+			int start = 2 + target.indexOf('=');
+			String in = target.substring(start, target.length() - 1);
+			fFindField.setText(in);
+			fReplaceField.setText(in + "D0");
+			fTargetIndex += 1;
+		}
+	}
+
+	/**
 	 * Locates the user's findString in the text of the target.
 	 *
 	 * @param mustInitIncrementalBaseLocation <code>true</code> if base location must be initialized
@@ -1060,7 +1071,7 @@ class ReplaceDialog extends Dialog {
 
 //			fWholeWordCheckBox.setEnabled(isWord(str) && !isRegExSearchAvailableAndChecked());
 
-			fFindNextButton.setEnabled(enable && findString);
+			fFindNextButton.setEnabled(true);
 			fReplaceSelectionButton.setEnabled(!disableReplace && enable && isEditable() && selection);
 			fReplaceFindButton.setEnabled(!disableReplace && enable && isEditable() && findString && selection);
 			fReplaceAllButton.setEnabled(enable && isEditable() && findString);
