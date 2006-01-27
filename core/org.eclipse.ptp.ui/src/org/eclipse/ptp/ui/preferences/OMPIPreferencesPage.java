@@ -19,7 +19,11 @@
 package org.eclipse.ptp.ui.preferences;
 
 import java.io.File;
+import java.net.URL;
+import java.util.Properties;
 
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.debug.internal.ui.SWTUtil;
 import org.eclipse.jface.preference.FieldEditor;
@@ -52,17 +56,10 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 {
 	public static final String EMPTY_STRING = "";
 
-	protected Text ortedPathText = null;
-	protected Text ortedArgsText = null;
-	protected Text ortedFullText = null;
 	protected Text orteServerText = null;
 
 	protected Button browseButton = null;
-	protected Button browseButton2 = null;
 
-	private String defaultOrtedArgs = "--scope public --seed --persistent";
-	private String ortedArgs = EMPTY_STRING;
-	private String ortedFile = EMPTY_STRING;
 	private String orteServerFile = EMPTY_STRING;
 
 	private boolean loading = true;
@@ -77,19 +74,14 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 			Object source = e.getSource();
 			if (source == browseButton)
 				handlePathBrowseButtonSelected();
-			else if (source == browseButton2)
-				handlePathBrowseButtonSelected2();
 			else
 				updatePreferencePage();
 		}
 
 		public void modifyText(ModifyEvent evt) {
 			Object source = evt.getSource();
-			if(!loading && (source == ortedPathText || source == orteServerText))
+			if(!loading && source == orteServerText)
 				updatePreferencePage();
-			else if(source == ortedArgsText) {
-				ortedFullText.setText(ortedPathText.getText()+" "+ortedArgsText.getText());
-			}
 		}
 
 		public void propertyChange(PropertyChangeEvent event) {
@@ -118,51 +110,6 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 
 	private void createORTEdContents(Composite parent)
 	{
-		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
-		aGroup.setLayout(createGridLayout(1, true, 10, 10));
-		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
-		aGroup.setText(CoreMessages.getResourceString("OMPIPreferencesPage.group_orted"));
-		
-		Label ortedComment = new Label(aGroup, SWT.WRAP);
-		ortedComment.setText("Enter the path to the Open Runtime Environment Daemon (ORTEd).");
-		ortedComment = new Label(aGroup, SWT.WRAP);
-		ortedComment.setText("PTP will take care of starting and stopping this as necessary to interface to the ORTE.");
-		
-		Composite ortedFilecomposite = new Composite(aGroup, SWT.NONE);
-		ortedFilecomposite.setLayout(createGridLayout(3, false, 0, 0));
-		ortedFilecomposite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-
-		new Label(ortedFilecomposite, SWT.NONE).setText(CoreMessages
-				.getResourceString("OMPIPreferencesPage.ortedFile_text"));
-		ortedPathText = new Text(ortedFilecomposite, SWT.SINGLE | SWT.BORDER);
-		ortedPathText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		ortedPathText.addModifyListener(listener);
-		browseButton = SWTUtil.createPushButton(ortedFilecomposite, CoreMessages
-				.getResourceString("PTPPreferencesPage.browseButton"), null);
-		browseButton.addSelectionListener(listener);
-		
-		Composite ortedArgs = new Composite(aGroup, SWT.NONE);
-		ortedArgs.setLayout(createGridLayout(2, false, 0, 0));
-		ortedArgs.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-		
-		new Label(ortedArgs, SWT.NONE).setText(CoreMessages
-				.getResourceString("OMPIPreferencesPage.ortedArgs_text"));
-		ortedArgsText = new Text(ortedArgs, SWT.SINGLE | SWT.BORDER);
-		ortedArgsText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		ortedArgsText.addModifyListener(listener);
-		
-		Composite ortedFull = new Composite(aGroup, SWT.NONE);
-		ortedFull.setLayout(createGridLayout(2, false, 0, 0));
-		ortedFull.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
-		
-		new Label(ortedFull, SWT.NONE).setText(CoreMessages
-				.getResourceString("OMPIPreferencesPage.ortedFull_text"));
-		ortedFullText = new Text(ortedFull, SWT.READ_ONLY | SWT.SINGLE | SWT.BORDER);
-		ortedFullText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		ortedFullText.addModifyListener(listener);
-		ortedFullText.setText(ortedPathText.getText()+" "+ortedArgsText.getText());
-		
-		
 		Group bGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		bGroup.setLayout(createGridLayout(1, true, 10, 10));
 		bGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
@@ -179,18 +126,14 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		orteServerText = new Text(orteserver, SWT.SINGLE | SWT.BORDER);
 		orteServerText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		orteServerText.addModifyListener(listener);
-		browseButton2 = SWTUtil.createPushButton(orteserver, CoreMessages
+		browseButton = SWTUtil.createPushButton(orteserver, CoreMessages
 				.getResourceString("PTPPreferencesPage.browseButton"), null);
-		browseButton2.addSelectionListener(listener);
+		browseButton.addSelectionListener(listener);
 	}
 
 	protected void defaultSetting() 
 	{
 		orteServerText.setText(orteServerFile);
-		
-		ortedPathText.setText(ortedFile);
-		ortedArgsText.setText(ortedArgs);
-		ortedFullText.setText(ortedPathText.getText()+" "+ortedArgsText.getText());
 	}
 	
 	private void loadSaved()
@@ -198,13 +141,58 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		
 		orteServerFile = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
-		orteServerText.setText(orteServerFile);
+		/* if they don't have the orte_server path set, let's try and give them a default that might help */
+		if(orteServerFile.equals("")) {
+			boolean found_orte_server = false;
+			
+			URL url = Platform.find(Platform.getBundle(PTPCorePlugin.PLUGIN_ID), new Path("/"));
 
-		ortedFile = preferences.getString(PreferenceConstants.ORTE_ORTED_PATH);
-		ortedPathText.setText(ortedFile);
-		ortedArgs = preferences.getString(PreferenceConstants.ORTE_ORTED_ARGS);
-		if(ortedArgs.equals("")) ortedArgs = defaultOrtedArgs;
-		ortedArgsText.setText(ortedArgs);
+			if (url != null) {
+				try {
+					File path = new File(Platform.asLocalURL(url).getPath());
+					String ipath = path.getAbsolutePath();
+					System.out.println("Plugin install dir = '"+ipath+"'");
+					
+					/* org.eclipse.ptp.orte.linux.x86_64_1.0.0
+					   org.eclipse.ptp.orte.$(OS).$(ARCH)_$(VERSION) */
+					String ptp_version = (String)PTPCorePlugin.getDefault().getBundle().getHeaders().get("Bundle-Version");
+					System.out.println("PTP Version = "+ptp_version);
+					Properties p = System.getProperties();
+					String os = p.getProperty("osgi.os");
+					String arch = p.getProperty("osgi.arch");
+					System.out.println("osgi.os = "+os);
+					System.out.println("osgi.arch = "+arch);
+					if(os != null && arch != null && ptp_version != null) {
+						String combo = "org.eclipse.ptp.core."+os+"."+arch+"_"+ptp_version;
+						System.out.println("Searching for directory: "+combo);
+						int idx = ipath.indexOf(combo);
+						/* if we found it */
+						if(idx > 0) {
+							String ipath2 = ipath.substring(0, idx) + "org.eclipse.ptp.orte."+os+"."+arch+"_"+ptp_version+"/orte_server";
+							File f = new File(ipath2);
+							if(f.exists()) {
+								orteServerFile = ipath2;
+								found_orte_server = true;
+							}
+						}
+					}
+					
+					if(!found_orte_server) {
+						int idx = ipath.indexOf("org.eclipse.ptp.core");
+						String ipath2 = ipath.substring(0, idx) + "org.eclipse.ptp.orte/orte_server";
+						System.out.println("Searching for : "+ipath2);
+						File f = new File(ipath2);
+						if(f.exists()) {
+							found_orte_server = true;
+						}
+						orteServerFile = ipath2;
+					}
+				} catch(Exception e) { 
+				}
+			}
+        }
+		
+		orteServerText.setText(orteServerFile);
 	}
 
 	public void init(IWorkbench workbench) 
@@ -224,8 +212,6 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 
 	private void store() 
 	{
-		ortedFile = ortedPathText.getText();
-		ortedArgs = ortedArgsText.getText();
 		orteServerFile = orteServerText.getText();
 	}
 
@@ -235,8 +221,6 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		Preferences preferences = PTPCorePlugin.getDefault()
 				.getPluginPreferences();
 
-		preferences.setValue(PreferenceConstants.ORTE_ORTED_PATH, ortedFile);
-		preferences.setValue(PreferenceConstants.ORTE_ORTED_ARGS, ortedArgs);
 		preferences.setValue(PreferenceConstants.ORTE_SERVER_PATH, orteServerFile);
 
 		PTPCorePlugin.getDefault().savePluginPreferences();
@@ -248,24 +232,6 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 	 * Show a dialog that lets the user select a file
 	 */
 	protected void handlePathBrowseButtonSelected() 
-	{
-		FileDialog dialog = new FileDialog(getShell());
-		dialog.setText(CoreMessages
-				.getResourceString("OMPIPreferencesPage.Select_ORTEd_FILE"));
-		String correctPath = getFieldContent(ortedPathText.getText());
-		if (correctPath != null) {
-			File path = new File(correctPath);
-			if (path.exists())
-				dialog.setFilterPath(path.isFile() ? correctPath : path
-						.getParent());
-		}
-
-		String selectedPath = dialog.open();
-		if (selectedPath != null)
-			ortedPathText.setText(selectedPath);
-	}
-	
-	protected void handlePathBrowseButtonSelected2() 
 	{
 		FileDialog dialog = new FileDialog(getShell());
 		dialog.setText(CoreMessages
@@ -285,24 +251,7 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 
 	protected boolean isValidORTEdSetting() 
 	{
-		String name = getFieldContent(ortedPathText.getText());
-		if (name == null) {
-			setErrorMessage(CoreMessages
-					.getResourceString("OMPIPreferencesPage.Incorrect_ORTEd_file"));
-			//setValid(false);
-			//return false;
-		}
-		else {
-			File path = new File(name);
-			if (!path.exists() || !path.isFile()) {
-				setErrorMessage(CoreMessages
-					.getResourceString("OMPIPreferencesPage.Incorrect_ORTEd_file"));
-				//setValid(false);
-				//return false;
-			}
-		}
-		
-		name = getFieldContent(orteServerText.getText());
+		String name = getFieldContent(orteServerText.getText());
 		if (name == null) {
 			setErrorMessage(CoreMessages
 					.getResourceString("OMPIPreferencesPage.Incorrect_server_file"));
