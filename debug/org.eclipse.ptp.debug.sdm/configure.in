@@ -78,12 +78,8 @@ AC_CHECK_FUNCS(gethostname select strdup strstr strtoul sigset sighold sigrelse)
 
 dnl Open MPI
 AC_PATH_PROG(OMPI_INFO, ompi_info, no)
-if test "$ac_cv_path_OMPI_INFO" != no; then
-	AC_PATH_PROG(MPIRUN, mpirun, no)
-	if test "$ac_cv_path_MPIRUN" != no ; then
-		AC_DEFINE(OMPI,1,[Enable Open MPI support.])
-		AC_DEFINE_UNQUOTED(MPIRUN, "$ac_cv_path_MPIRUN", [Location of mpirun command.])
-	fi
+if test "$ac_cv_path_OMPI_INFO" = no; then
+	AC_MSG_ERROR([SDM currently requires Open MPI to be installed.])
 fi
 
 AC_CONFIG_FILES([Makefile])
