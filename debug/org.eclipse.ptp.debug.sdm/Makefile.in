@@ -16,8 +16,7 @@
 
 
 
-
-SOURCES = $(libdbgclnt_a_SOURCES) $(libdbgutils_a_SOURCES) $(libmi_a_SOURCES) $(libproxyclnt_a_SOURCES) $(libproxysvr_a_SOURCES) $(libutils_a_SOURCES) $(sdm_SOURCES) $(test_mi_SOURCES) $(test_proxy_SOURCES) $(test_proxy_rev_SOURCES)
+SOURCES = $(libdbgclnt_a_SOURCES) $(libdbgutils_a_SOURCES) $(libmi_a_SOURCES) $(sdm_SOURCES) $(test_mi_SOURCES) $(test_proxy_SOURCES) $(test_proxy_rev_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -64,8 +63,8 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(libdir)" \
-	"$(DESTDIR)$(bindir)" "$(DESTDIR)$(includedir)"
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
+	"$(DESTDIR)$(includedir)"
 libLIBRARIES_INSTALL = $(INSTALL_DATA)
 LIBRARIES = $(lib_LIBRARIES)
 ARFLAGS = cru
@@ -104,33 +103,6 @@ am_libmi_a_OBJECTS = src/mi/libmi_a-MIParser.$(OBJEXT) \
 	src/mi/libmi_a-MIError.$(OBJEXT) \
 	src/mi/libmi_a-MISession.$(OBJEXT)
 libmi_a_OBJECTS = $(am_libmi_a_OBJECTS)
-libproxyclnt_a_AR = $(AR) $(ARFLAGS)
-libproxyclnt_a_LIBADD =
-am_libproxyclnt_a_OBJECTS = src/proxy/libproxyclnt_a-proxy.$(OBJEXT) \
-	src/proxy/libproxyclnt_a-proxy_clnt.$(OBJEXT) \
-	src/proxy/libproxyclnt_a-proxy_tcp.$(OBJEXT) \
-	src/proxy/libproxyclnt_a-proxy_tcp_clnt.$(OBJEXT) \
-	src/proxy/libproxyclnt_a-proxy_event.$(OBJEXT)
-libproxyclnt_a_OBJECTS = $(am_libproxyclnt_a_OBJECTS)
-libproxysvr_a_AR = $(AR) $(ARFLAGS)
-libproxysvr_a_LIBADD =
-am_libproxysvr_a_OBJECTS = src/proxy/libproxysvr_a-proxy.$(OBJEXT) \
-	src/proxy/libproxysvr_a-proxy_svr.$(OBJEXT) \
-	src/proxy/libproxysvr_a-proxy_tcp.$(OBJEXT) \
-	src/proxy/libproxysvr_a-proxy_tcp_svr.$(OBJEXT) \
-	src/proxy/libproxysvr_a-proxy_event.$(OBJEXT)
-libproxysvr_a_OBJECTS = $(am_libproxysvr_a_OBJECTS)
-libutils_a_AR = $(AR) $(ARFLAGS)
-libutils_a_LIBADD =
-am_libutils_a_OBJECTS = src/utils/libutils_a-bitset.$(OBJEXT) \
-	src/utils/libutils_a-args.$(OBJEXT) \
-	src/utils/libutils_a-list.$(OBJEXT) \
-	src/utils/libutils_a-hash.$(OBJEXT) \
-	src/utils/libutils_a-handler.$(OBJEXT) \
-	src/utils/libutils_a-compat.$(OBJEXT)
-libutils_a_OBJECTS = $(am_libutils_a_OBJECTS)
-libLTLIBRARIES_INSTALL = $(INSTALL)
-LTLIBRARIES = $(lib_LTLIBRARIES)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_sdm_OBJECTS = src/client/sdm-startup.$(OBJEXT) \
@@ -142,22 +114,22 @@ am_sdm_OBJECTS = src/client/sdm-startup.$(OBJEXT) \
 	src/server/sdm-backend.$(OBJEXT) \
 	src/server/sdm-gdbmi_backend.$(OBJEXT)
 sdm_OBJECTS = $(am_sdm_OBJECTS)
-sdm_DEPENDENCIES = libproxysvr.a libdbgutils.a libutils.a libmi.a \
-	libaif/libaif.a
+sdm_DEPENDENCIES = $(PROXY)/libproxysvr.a libdbgutils.a \
+	$(UTILS)/libutils.a libmi.a libaif/libaif.a
 am_test_mi_OBJECTS = src/mi/test_mi-test_mi.$(OBJEXT)
 test_mi_OBJECTS = $(am_test_mi_OBJECTS)
-test_mi_DEPENDENCIES = libmi.a libutils.a
+test_mi_DEPENDENCIES = libmi.a $(UTILS)/libutils.a
 am_test_proxy_OBJECTS = src/test/test_proxy-test_proxy.$(OBJEXT) \
 	src/test/test_proxy-test_proxy_clnt.$(OBJEXT)
 test_proxy_OBJECTS = $(am_test_proxy_OBJECTS)
-test_proxy_DEPENDENCIES = libdbgclnt.a libproxyclnt.a libdbgutils.a \
-	libutils.a libaif/libaif.a
+test_proxy_DEPENDENCIES = libdbgclnt.a $(PROXY)/libproxyclnt.a \
+	libdbgutils.a $(UTILS)/libutils.a libaif/libaif.a
 am_test_proxy_rev_OBJECTS =  \
 	src/test/test_proxy_rev-test_proxy_rev.$(OBJEXT) \
 	src/test/test_proxy_rev-test_proxy_clnt.$(OBJEXT)
 test_proxy_rev_OBJECTS = $(am_test_proxy_rev_OBJECTS)
-test_proxy_rev_DEPENDENCIES = libdbgclnt.a libproxyclnt.a \
-	libdbgutils.a libutils.a libaif/libaif.a
+test_proxy_rev_DEPENDENCIES = libdbgclnt.a $(PROXY)/libproxyclnt.a \
+	libdbgutils.a $(UTILS)/libutils.a libaif/libaif.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -170,15 +142,11 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link --tag=CC $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libdbgclnt_a_SOURCES) $(libdbgutils_a_SOURCES) \
-	$(libmi_a_SOURCES) $(libproxyclnt_a_SOURCES) \
-	$(libproxysvr_a_SOURCES) $(libutils_a_SOURCES) $(sdm_SOURCES) \
-	$(test_mi_SOURCES) $(test_proxy_SOURCES) \
-	$(test_proxy_rev_SOURCES)
+	$(libmi_a_SOURCES) $(sdm_SOURCES) $(test_mi_SOURCES) \
+	$(test_proxy_SOURCES) $(test_proxy_rev_SOURCES)
 DIST_SOURCES = $(libdbgclnt_a_SOURCES) $(libdbgutils_a_SOURCES) \
-	$(libmi_a_SOURCES) $(libproxyclnt_a_SOURCES) \
-	$(libproxysvr_a_SOURCES) $(libutils_a_SOURCES) $(sdm_SOURCES) \
-	$(test_mi_SOURCES) $(test_proxy_SOURCES) \
-	$(test_proxy_rev_SOURCES)
+	$(libmi_a_SOURCES) $(sdm_SOURCES) $(test_mi_SOURCES) \
+	$(test_proxy_SOURCES) $(test_proxy_rev_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -302,7 +270,9 @@ sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-SUBDIRS = libaif
+PROXY = ../org.eclipse.ptp.proxy
+UTILS = ../org.eclipse.ptp.utils
+SUBDIRS = libaif $(PROXY) $(UTILS)
 sdm_SOURCES = src/client/startup.c\
 						src/client/client.c \
 						src/client/client_cmds.c \
@@ -312,51 +282,34 @@ sdm_SOURCES = src/client/startup.c\
 						src/server/backend.c \
 						src/server/gdbmi_backend.c
 
-sdm_CFLAGS = -I./include -I./libaif -I./src/mi $(AM_CFLAGS)
-sdm_LDADD = libproxysvr.a libdbgutils.a libutils.a libmi.a libaif/libaif.a
+sdm_CFLAGS = -I./include -I./libaif -I./src/mi -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS)
+sdm_LDADD = $(PROXY)/libproxysvr.a libdbgutils.a $(UTILS)/libutils.a libmi.a libaif/libaif.a
 test_proxy_SOURCES = src/test/test_proxy.c \
 						src/test/test_proxy_clnt.c
 
-test_proxy_CFLAGS = -I./include -I./libaif $(AM_CFLAGS) -g
+test_proxy_CFLAGS = -I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
 test_proxy_LDFLAGS = -g
-test_proxy_LDADD = libdbgclnt.a libproxyclnt.a libdbgutils.a libutils.a libaif/libaif.a
+test_proxy_LDADD = libdbgclnt.a $(PROXY)/libproxyclnt.a libdbgutils.a $(UTILS)/libutils.a libaif/libaif.a
 test_proxy_rev_SOURCES = src/test/test_proxy_rev.c \
 						src/test/test_proxy_clnt.c
 
-test_proxy_rev_CFLAGS = -I./include -I./libaif $(AM_CFLAGS) -g
+test_proxy_rev_CFLAGS = -I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
 test_proxy_rev_LDFLAGS = -g
-test_proxy_rev_LDADD = libdbgclnt.a libproxyclnt.a libdbgutils.a libutils.a libaif/libaif.a
+test_proxy_rev_LDADD = libdbgclnt.a $(PROXY)/libproxyclnt.a libdbgutils.a $(UTILS)/libutils.a libaif/libaif.a
 test_mi_SOURCES = src/mi/test_mi.c
-test_mi_CFLAGS = -I./include -I./src/mi $(AM_CFLAGS) -g
+test_mi_CFLAGS = -I./include -I./src/mi -I$(UTILS)/include $(AM_CFLAGS) -g
 test_mi_LDFLAGS = -g
-test_mi_LDADD = libmi.a libutils.a
-include_HEADERS = include/breakpoint.h include/dbg.h include/location.h include/bitset.h include/stackframe.h
-lib_LTLIBRARIES = 
-lib_LIBRARIES = libdbgclnt.a libproxyclnt.a libproxysvr.a libdbgutils.a \
-						libmi.a libutils.a
-
+test_mi_LDADD = libmi.a $(UTILS)/libutils.a
+include_HEADERS = include/breakpoint.h include/dbg.h include/location.h include/stackframe.h
+lib_LIBRARIES = libdbgclnt.a libdbgutils.a libmi.a
 libdbgclnt_a_SOURCES = src/client/client_interface.c 
-libdbgclnt_a_CFLAGS = -I./include  -I./libaif $(AM_CFLAGS) -g
-libproxyclnt_a_SOURCES = src/proxy/proxy.c \
-						src/proxy/proxy_clnt.c \
-						src/proxy/proxy_tcp.c \
-						src/proxy/proxy_tcp_clnt.c \
-						src/proxy/proxy_event.c
-
-libproxyclnt_a_CFLAGS = -I./include $(AM_CFLAGS) -g
-libproxysvr_a_SOURCES = src/proxy/proxy.c \
-						src/proxy/proxy_svr.c \
-						src/proxy/proxy_tcp.c \
-						src/proxy/proxy_tcp_svr.c \
-						src/proxy/proxy_event.c
-
-libproxysvr_a_CFLAGS = -I./include -I./libaif $(AM_CFLAGS) -g
+libdbgclnt_a_CFLAGS = -I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
 libdbgutils_a_SOURCES = src/utils/error.c \
 						src/utils/breakpoint.c \
 						src/utils/stackframe.c \
 						src/utils/event.c
 
-libdbgutils_a_CFLAGS = -I./include -I./libaif $(AM_CFLAGS) -g
+libdbgutils_a_CFLAGS = -I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
 libmi_a_SOURCES = src/mi/MIParser.c \
 						src/mi/MIOOBRecord.c \
 						src/mi/MIOutput.c \
@@ -378,15 +331,7 @@ libmi_a_SOURCES = src/mi/MIParser.c \
 						src/mi/MIError.c \
 						src/mi/MISession.c
 
-libmi_a_CFLAGS = -I./include $(AM_CFLAGS) -g 
-libutils_a_SOURCES = src/utils/bitset.c \
-						src/utils/args.c \
-						src/utils/list.c \
-						src/utils/hash.c \
-						src/utils/handler.c \
-						src/utils/compat.c
-
-libutils_a_CFLAGS = -I./include $(AM_CFLAGS) -g 
+libmi_a_CFLAGS = -I./include -I$(UTILS)/include $(AM_CFLAGS) -g 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -552,83 +497,6 @@ libmi.a: $(libmi_a_OBJECTS) $(libmi_a_DEPENDENCIES)
 	-rm -f libmi.a
 	$(libmi_a_AR) libmi.a $(libmi_a_OBJECTS) $(libmi_a_LIBADD)
 	$(RANLIB) libmi.a
-src/proxy/$(am__dirstamp):
-	@$(mkdir_p) src/proxy
-	@: > src/proxy/$(am__dirstamp)
-src/proxy/$(DEPDIR)/$(am__dirstamp):
-	@$(mkdir_p) src/proxy/$(DEPDIR)
-	@: > src/proxy/$(DEPDIR)/$(am__dirstamp)
-src/proxy/libproxyclnt_a-proxy.$(OBJEXT): src/proxy/$(am__dirstamp) \
-	src/proxy/$(DEPDIR)/$(am__dirstamp)
-src/proxy/libproxyclnt_a-proxy_clnt.$(OBJEXT):  \
-	src/proxy/$(am__dirstamp) src/proxy/$(DEPDIR)/$(am__dirstamp)
-src/proxy/libproxyclnt_a-proxy_tcp.$(OBJEXT):  \
-	src/proxy/$(am__dirstamp) src/proxy/$(DEPDIR)/$(am__dirstamp)
-src/proxy/libproxyclnt_a-proxy_tcp_clnt.$(OBJEXT):  \
-	src/proxy/$(am__dirstamp) src/proxy/$(DEPDIR)/$(am__dirstamp)
-src/proxy/libproxyclnt_a-proxy_event.$(OBJEXT):  \
-	src/proxy/$(am__dirstamp) src/proxy/$(DEPDIR)/$(am__dirstamp)
-libproxyclnt.a: $(libproxyclnt_a_OBJECTS) $(libproxyclnt_a_DEPENDENCIES) 
-	-rm -f libproxyclnt.a
-	$(libproxyclnt_a_AR) libproxyclnt.a $(libproxyclnt_a_OBJECTS) $(libproxyclnt_a_LIBADD)
-	$(RANLIB) libproxyclnt.a
-src/proxy/libproxysvr_a-proxy.$(OBJEXT): src/proxy/$(am__dirstamp) \
-	src/proxy/$(DEPDIR)/$(am__dirstamp)
-src/proxy/libproxysvr_a-proxy_svr.$(OBJEXT):  \
-	src/proxy/$(am__dirstamp) src/proxy/$(DEPDIR)/$(am__dirstamp)
-src/proxy/libproxysvr_a-proxy_tcp.$(OBJEXT):  \
-	src/proxy/$(am__dirstamp) src/proxy/$(DEPDIR)/$(am__dirstamp)
-src/proxy/libproxysvr_a-proxy_tcp_svr.$(OBJEXT):  \
-	src/proxy/$(am__dirstamp) src/proxy/$(DEPDIR)/$(am__dirstamp)
-src/proxy/libproxysvr_a-proxy_event.$(OBJEXT):  \
-	src/proxy/$(am__dirstamp) src/proxy/$(DEPDIR)/$(am__dirstamp)
-libproxysvr.a: $(libproxysvr_a_OBJECTS) $(libproxysvr_a_DEPENDENCIES) 
-	-rm -f libproxysvr.a
-	$(libproxysvr_a_AR) libproxysvr.a $(libproxysvr_a_OBJECTS) $(libproxysvr_a_LIBADD)
-	$(RANLIB) libproxysvr.a
-src/utils/libutils_a-bitset.$(OBJEXT): src/utils/$(am__dirstamp) \
-	src/utils/$(DEPDIR)/$(am__dirstamp)
-src/utils/libutils_a-args.$(OBJEXT): src/utils/$(am__dirstamp) \
-	src/utils/$(DEPDIR)/$(am__dirstamp)
-src/utils/libutils_a-list.$(OBJEXT): src/utils/$(am__dirstamp) \
-	src/utils/$(DEPDIR)/$(am__dirstamp)
-src/utils/libutils_a-hash.$(OBJEXT): src/utils/$(am__dirstamp) \
-	src/utils/$(DEPDIR)/$(am__dirstamp)
-src/utils/libutils_a-handler.$(OBJEXT): src/utils/$(am__dirstamp) \
-	src/utils/$(DEPDIR)/$(am__dirstamp)
-src/utils/libutils_a-compat.$(OBJEXT): src/utils/$(am__dirstamp) \
-	src/utils/$(DEPDIR)/$(am__dirstamp)
-libutils.a: $(libutils_a_OBJECTS) $(libutils_a_DEPENDENCIES) 
-	-rm -f libutils.a
-	$(libutils_a_AR) libutils.a $(libutils_a_OBJECTS) $(libutils_a_LIBADD)
-	$(RANLIB) libutils.a
-install-libLTLIBRARIES: $(lib_LTLIBRARIES)
-	@$(NORMAL_INSTALL)
-	test -z "$(libdir)" || $(mkdir_p) "$(DESTDIR)$(libdir)"
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  if test -f $$p; then \
-	    f=$(am__strip_dir) \
-	    echo " $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(libdir)/$$f'"; \
-	    $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(libdir)/$$f"; \
-	  else :; fi; \
-	done
-
-uninstall-libLTLIBRARIES:
-	@$(NORMAL_UNINSTALL)
-	@set -x; list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  p=$(am__strip_dir) \
-	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$p'"; \
-	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$p"; \
-	done
-
-clean-libLTLIBRARIES:
-	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
-	  test "$$dir" != "$$p" || dir=.; \
-	  echo "rm -f \"$${dir}/so_locations\""; \
-	  rm -f "$${dir}/so_locations"; \
-	done
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
@@ -736,16 +604,6 @@ mostlyclean-compile:
 	-rm -f src/mi/libmi_a-MIVar.$(OBJEXT)
 	-rm -f src/mi/libmi_a-MIVarCommand.$(OBJEXT)
 	-rm -f src/mi/test_mi-test_mi.$(OBJEXT)
-	-rm -f src/proxy/libproxyclnt_a-proxy.$(OBJEXT)
-	-rm -f src/proxy/libproxyclnt_a-proxy_clnt.$(OBJEXT)
-	-rm -f src/proxy/libproxyclnt_a-proxy_event.$(OBJEXT)
-	-rm -f src/proxy/libproxyclnt_a-proxy_tcp.$(OBJEXT)
-	-rm -f src/proxy/libproxyclnt_a-proxy_tcp_clnt.$(OBJEXT)
-	-rm -f src/proxy/libproxysvr_a-proxy.$(OBJEXT)
-	-rm -f src/proxy/libproxysvr_a-proxy_event.$(OBJEXT)
-	-rm -f src/proxy/libproxysvr_a-proxy_svr.$(OBJEXT)
-	-rm -f src/proxy/libproxysvr_a-proxy_tcp.$(OBJEXT)
-	-rm -f src/proxy/libproxysvr_a-proxy_tcp_svr.$(OBJEXT)
 	-rm -f src/server/sdm-backend.$(OBJEXT)
 	-rm -f src/server/sdm-gdbmi_backend.$(OBJEXT)
 	-rm -f src/server/sdm-server.$(OBJEXT)
@@ -758,12 +616,6 @@ mostlyclean-compile:
 	-rm -f src/utils/libdbgutils_a-error.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-event.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-stackframe.$(OBJEXT)
-	-rm -f src/utils/libutils_a-args.$(OBJEXT)
-	-rm -f src/utils/libutils_a-bitset.$(OBJEXT)
-	-rm -f src/utils/libutils_a-compat.$(OBJEXT)
-	-rm -f src/utils/libutils_a-handler.$(OBJEXT)
-	-rm -f src/utils/libutils_a-hash.$(OBJEXT)
-	-rm -f src/utils/libutils_a-list.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -794,16 +646,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIVar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/libmi_a-MIVarCommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mi/$(DEPDIR)/test_mi-test_mi.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/proxy/$(DEPDIR)/libproxyclnt_a-proxy.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_clnt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_event.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp_clnt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/proxy/$(DEPDIR)/libproxysvr_a-proxy.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/proxy/$(DEPDIR)/libproxysvr_a-proxy_event.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/proxy/$(DEPDIR)/libproxysvr_a-proxy_svr.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp_svr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/server/$(DEPDIR)/sdm-backend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/server/$(DEPDIR)/sdm-gdbmi_backend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/server/$(DEPDIR)/sdm-server.Po@am__quote@
@@ -816,12 +658,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-error.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-event.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-stackframe.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libutils_a-args.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libutils_a-bitset.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libutils_a-compat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libutils_a-handler.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libutils_a-hash.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libutils_a-list.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`; \
@@ -1196,230 +1032,6 @@ src/mi/libmi_a-MISession.obj: src/mi/MISession.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/mi/MISession.c' object='src/mi/libmi_a-MISession.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -c -o src/mi/libmi_a-MISession.obj `if test -f 'src/mi/MISession.c'; then $(CYGPATH_W) 'src/mi/MISession.c'; else $(CYGPATH_W) '$(srcdir)/src/mi/MISession.c'; fi`
-
-src/proxy/libproxyclnt_a-proxy.o: src/proxy/proxy.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxyclnt_a-proxy.o -MD -MP -MF "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy.Tpo" -c -o src/proxy/libproxyclnt_a-proxy.o `test -f 'src/proxy/proxy.c' || echo '$(srcdir)/'`src/proxy/proxy.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy.Tpo" "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy.c' object='src/proxy/libproxyclnt_a-proxy.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxyclnt_a-proxy.o `test -f 'src/proxy/proxy.c' || echo '$(srcdir)/'`src/proxy/proxy.c
-
-src/proxy/libproxyclnt_a-proxy.obj: src/proxy/proxy.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxyclnt_a-proxy.obj -MD -MP -MF "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy.Tpo" -c -o src/proxy/libproxyclnt_a-proxy.obj `if test -f 'src/proxy/proxy.c'; then $(CYGPATH_W) 'src/proxy/proxy.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy.Tpo" "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy.c' object='src/proxy/libproxyclnt_a-proxy.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxyclnt_a-proxy.obj `if test -f 'src/proxy/proxy.c'; then $(CYGPATH_W) 'src/proxy/proxy.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy.c'; fi`
-
-src/proxy/libproxyclnt_a-proxy_clnt.o: src/proxy/proxy_clnt.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxyclnt_a-proxy_clnt.o -MD -MP -MF "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_clnt.Tpo" -c -o src/proxy/libproxyclnt_a-proxy_clnt.o `test -f 'src/proxy/proxy_clnt.c' || echo '$(srcdir)/'`src/proxy/proxy_clnt.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_clnt.Tpo" "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_clnt.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_clnt.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy_clnt.c' object='src/proxy/libproxyclnt_a-proxy_clnt.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxyclnt_a-proxy_clnt.o `test -f 'src/proxy/proxy_clnt.c' || echo '$(srcdir)/'`src/proxy/proxy_clnt.c
-
-src/proxy/libproxyclnt_a-proxy_clnt.obj: src/proxy/proxy_clnt.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxyclnt_a-proxy_clnt.obj -MD -MP -MF "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_clnt.Tpo" -c -o src/proxy/libproxyclnt_a-proxy_clnt.obj `if test -f 'src/proxy/proxy_clnt.c'; then $(CYGPATH_W) 'src/proxy/proxy_clnt.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy_clnt.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_clnt.Tpo" "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_clnt.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_clnt.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy_clnt.c' object='src/proxy/libproxyclnt_a-proxy_clnt.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxyclnt_a-proxy_clnt.obj `if test -f 'src/proxy/proxy_clnt.c'; then $(CYGPATH_W) 'src/proxy/proxy_clnt.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy_clnt.c'; fi`
-
-src/proxy/libproxyclnt_a-proxy_tcp.o: src/proxy/proxy_tcp.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxyclnt_a-proxy_tcp.o -MD -MP -MF "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp.Tpo" -c -o src/proxy/libproxyclnt_a-proxy_tcp.o `test -f 'src/proxy/proxy_tcp.c' || echo '$(srcdir)/'`src/proxy/proxy_tcp.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp.Tpo" "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy_tcp.c' object='src/proxy/libproxyclnt_a-proxy_tcp.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxyclnt_a-proxy_tcp.o `test -f 'src/proxy/proxy_tcp.c' || echo '$(srcdir)/'`src/proxy/proxy_tcp.c
-
-src/proxy/libproxyclnt_a-proxy_tcp.obj: src/proxy/proxy_tcp.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxyclnt_a-proxy_tcp.obj -MD -MP -MF "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp.Tpo" -c -o src/proxy/libproxyclnt_a-proxy_tcp.obj `if test -f 'src/proxy/proxy_tcp.c'; then $(CYGPATH_W) 'src/proxy/proxy_tcp.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy_tcp.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp.Tpo" "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy_tcp.c' object='src/proxy/libproxyclnt_a-proxy_tcp.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxyclnt_a-proxy_tcp.obj `if test -f 'src/proxy/proxy_tcp.c'; then $(CYGPATH_W) 'src/proxy/proxy_tcp.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy_tcp.c'; fi`
-
-src/proxy/libproxyclnt_a-proxy_tcp_clnt.o: src/proxy/proxy_tcp_clnt.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxyclnt_a-proxy_tcp_clnt.o -MD -MP -MF "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp_clnt.Tpo" -c -o src/proxy/libproxyclnt_a-proxy_tcp_clnt.o `test -f 'src/proxy/proxy_tcp_clnt.c' || echo '$(srcdir)/'`src/proxy/proxy_tcp_clnt.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp_clnt.Tpo" "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp_clnt.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp_clnt.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy_tcp_clnt.c' object='src/proxy/libproxyclnt_a-proxy_tcp_clnt.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxyclnt_a-proxy_tcp_clnt.o `test -f 'src/proxy/proxy_tcp_clnt.c' || echo '$(srcdir)/'`src/proxy/proxy_tcp_clnt.c
-
-src/proxy/libproxyclnt_a-proxy_tcp_clnt.obj: src/proxy/proxy_tcp_clnt.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxyclnt_a-proxy_tcp_clnt.obj -MD -MP -MF "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp_clnt.Tpo" -c -o src/proxy/libproxyclnt_a-proxy_tcp_clnt.obj `if test -f 'src/proxy/proxy_tcp_clnt.c'; then $(CYGPATH_W) 'src/proxy/proxy_tcp_clnt.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy_tcp_clnt.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp_clnt.Tpo" "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp_clnt.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_tcp_clnt.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy_tcp_clnt.c' object='src/proxy/libproxyclnt_a-proxy_tcp_clnt.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxyclnt_a-proxy_tcp_clnt.obj `if test -f 'src/proxy/proxy_tcp_clnt.c'; then $(CYGPATH_W) 'src/proxy/proxy_tcp_clnt.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy_tcp_clnt.c'; fi`
-
-src/proxy/libproxyclnt_a-proxy_event.o: src/proxy/proxy_event.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxyclnt_a-proxy_event.o -MD -MP -MF "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_event.Tpo" -c -o src/proxy/libproxyclnt_a-proxy_event.o `test -f 'src/proxy/proxy_event.c' || echo '$(srcdir)/'`src/proxy/proxy_event.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_event.Tpo" "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_event.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_event.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy_event.c' object='src/proxy/libproxyclnt_a-proxy_event.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxyclnt_a-proxy_event.o `test -f 'src/proxy/proxy_event.c' || echo '$(srcdir)/'`src/proxy/proxy_event.c
-
-src/proxy/libproxyclnt_a-proxy_event.obj: src/proxy/proxy_event.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxyclnt_a-proxy_event.obj -MD -MP -MF "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_event.Tpo" -c -o src/proxy/libproxyclnt_a-proxy_event.obj `if test -f 'src/proxy/proxy_event.c'; then $(CYGPATH_W) 'src/proxy/proxy_event.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy_event.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_event.Tpo" "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_event.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxyclnt_a-proxy_event.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy_event.c' object='src/proxy/libproxyclnt_a-proxy_event.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxyclnt_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxyclnt_a-proxy_event.obj `if test -f 'src/proxy/proxy_event.c'; then $(CYGPATH_W) 'src/proxy/proxy_event.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy_event.c'; fi`
-
-src/proxy/libproxysvr_a-proxy.o: src/proxy/proxy.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxysvr_a-proxy.o -MD -MP -MF "src/proxy/$(DEPDIR)/libproxysvr_a-proxy.Tpo" -c -o src/proxy/libproxysvr_a-proxy.o `test -f 'src/proxy/proxy.c' || echo '$(srcdir)/'`src/proxy/proxy.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy.Tpo" "src/proxy/$(DEPDIR)/libproxysvr_a-proxy.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy.c' object='src/proxy/libproxysvr_a-proxy.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxysvr_a-proxy.o `test -f 'src/proxy/proxy.c' || echo '$(srcdir)/'`src/proxy/proxy.c
-
-src/proxy/libproxysvr_a-proxy.obj: src/proxy/proxy.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxysvr_a-proxy.obj -MD -MP -MF "src/proxy/$(DEPDIR)/libproxysvr_a-proxy.Tpo" -c -o src/proxy/libproxysvr_a-proxy.obj `if test -f 'src/proxy/proxy.c'; then $(CYGPATH_W) 'src/proxy/proxy.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy.Tpo" "src/proxy/$(DEPDIR)/libproxysvr_a-proxy.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy.c' object='src/proxy/libproxysvr_a-proxy.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxysvr_a-proxy.obj `if test -f 'src/proxy/proxy.c'; then $(CYGPATH_W) 'src/proxy/proxy.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy.c'; fi`
-
-src/proxy/libproxysvr_a-proxy_svr.o: src/proxy/proxy_svr.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxysvr_a-proxy_svr.o -MD -MP -MF "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_svr.Tpo" -c -o src/proxy/libproxysvr_a-proxy_svr.o `test -f 'src/proxy/proxy_svr.c' || echo '$(srcdir)/'`src/proxy/proxy_svr.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_svr.Tpo" "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_svr.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_svr.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy_svr.c' object='src/proxy/libproxysvr_a-proxy_svr.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxysvr_a-proxy_svr.o `test -f 'src/proxy/proxy_svr.c' || echo '$(srcdir)/'`src/proxy/proxy_svr.c
-
-src/proxy/libproxysvr_a-proxy_svr.obj: src/proxy/proxy_svr.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxysvr_a-proxy_svr.obj -MD -MP -MF "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_svr.Tpo" -c -o src/proxy/libproxysvr_a-proxy_svr.obj `if test -f 'src/proxy/proxy_svr.c'; then $(CYGPATH_W) 'src/proxy/proxy_svr.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy_svr.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_svr.Tpo" "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_svr.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_svr.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy_svr.c' object='src/proxy/libproxysvr_a-proxy_svr.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxysvr_a-proxy_svr.obj `if test -f 'src/proxy/proxy_svr.c'; then $(CYGPATH_W) 'src/proxy/proxy_svr.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy_svr.c'; fi`
-
-src/proxy/libproxysvr_a-proxy_tcp.o: src/proxy/proxy_tcp.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxysvr_a-proxy_tcp.o -MD -MP -MF "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp.Tpo" -c -o src/proxy/libproxysvr_a-proxy_tcp.o `test -f 'src/proxy/proxy_tcp.c' || echo '$(srcdir)/'`src/proxy/proxy_tcp.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp.Tpo" "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy_tcp.c' object='src/proxy/libproxysvr_a-proxy_tcp.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxysvr_a-proxy_tcp.o `test -f 'src/proxy/proxy_tcp.c' || echo '$(srcdir)/'`src/proxy/proxy_tcp.c
-
-src/proxy/libproxysvr_a-proxy_tcp.obj: src/proxy/proxy_tcp.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxysvr_a-proxy_tcp.obj -MD -MP -MF "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp.Tpo" -c -o src/proxy/libproxysvr_a-proxy_tcp.obj `if test -f 'src/proxy/proxy_tcp.c'; then $(CYGPATH_W) 'src/proxy/proxy_tcp.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy_tcp.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp.Tpo" "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy_tcp.c' object='src/proxy/libproxysvr_a-proxy_tcp.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxysvr_a-proxy_tcp.obj `if test -f 'src/proxy/proxy_tcp.c'; then $(CYGPATH_W) 'src/proxy/proxy_tcp.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy_tcp.c'; fi`
-
-src/proxy/libproxysvr_a-proxy_tcp_svr.o: src/proxy/proxy_tcp_svr.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxysvr_a-proxy_tcp_svr.o -MD -MP -MF "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp_svr.Tpo" -c -o src/proxy/libproxysvr_a-proxy_tcp_svr.o `test -f 'src/proxy/proxy_tcp_svr.c' || echo '$(srcdir)/'`src/proxy/proxy_tcp_svr.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp_svr.Tpo" "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp_svr.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp_svr.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy_tcp_svr.c' object='src/proxy/libproxysvr_a-proxy_tcp_svr.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxysvr_a-proxy_tcp_svr.o `test -f 'src/proxy/proxy_tcp_svr.c' || echo '$(srcdir)/'`src/proxy/proxy_tcp_svr.c
-
-src/proxy/libproxysvr_a-proxy_tcp_svr.obj: src/proxy/proxy_tcp_svr.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxysvr_a-proxy_tcp_svr.obj -MD -MP -MF "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp_svr.Tpo" -c -o src/proxy/libproxysvr_a-proxy_tcp_svr.obj `if test -f 'src/proxy/proxy_tcp_svr.c'; then $(CYGPATH_W) 'src/proxy/proxy_tcp_svr.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy_tcp_svr.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp_svr.Tpo" "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp_svr.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_tcp_svr.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy_tcp_svr.c' object='src/proxy/libproxysvr_a-proxy_tcp_svr.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxysvr_a-proxy_tcp_svr.obj `if test -f 'src/proxy/proxy_tcp_svr.c'; then $(CYGPATH_W) 'src/proxy/proxy_tcp_svr.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy_tcp_svr.c'; fi`
-
-src/proxy/libproxysvr_a-proxy_event.o: src/proxy/proxy_event.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxysvr_a-proxy_event.o -MD -MP -MF "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_event.Tpo" -c -o src/proxy/libproxysvr_a-proxy_event.o `test -f 'src/proxy/proxy_event.c' || echo '$(srcdir)/'`src/proxy/proxy_event.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_event.Tpo" "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_event.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_event.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy_event.c' object='src/proxy/libproxysvr_a-proxy_event.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxysvr_a-proxy_event.o `test -f 'src/proxy/proxy_event.c' || echo '$(srcdir)/'`src/proxy/proxy_event.c
-
-src/proxy/libproxysvr_a-proxy_event.obj: src/proxy/proxy_event.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -MT src/proxy/libproxysvr_a-proxy_event.obj -MD -MP -MF "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_event.Tpo" -c -o src/proxy/libproxysvr_a-proxy_event.obj `if test -f 'src/proxy/proxy_event.c'; then $(CYGPATH_W) 'src/proxy/proxy_event.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy_event.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_event.Tpo" "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_event.Po"; else rm -f "src/proxy/$(DEPDIR)/libproxysvr_a-proxy_event.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/proxy/proxy_event.c' object='src/proxy/libproxysvr_a-proxy_event.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libproxysvr_a_CFLAGS) $(CFLAGS) -c -o src/proxy/libproxysvr_a-proxy_event.obj `if test -f 'src/proxy/proxy_event.c'; then $(CYGPATH_W) 'src/proxy/proxy_event.c'; else $(CYGPATH_W) '$(srcdir)/src/proxy/proxy_event.c'; fi`
-
-src/utils/libutils_a-bitset.o: src/utils/bitset.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libutils_a-bitset.o -MD -MP -MF "src/utils/$(DEPDIR)/libutils_a-bitset.Tpo" -c -o src/utils/libutils_a-bitset.o `test -f 'src/utils/bitset.c' || echo '$(srcdir)/'`src/utils/bitset.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/libutils_a-bitset.Tpo" "src/utils/$(DEPDIR)/libutils_a-bitset.Po"; else rm -f "src/utils/$(DEPDIR)/libutils_a-bitset.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/bitset.c' object='src/utils/libutils_a-bitset.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libutils_a-bitset.o `test -f 'src/utils/bitset.c' || echo '$(srcdir)/'`src/utils/bitset.c
-
-src/utils/libutils_a-bitset.obj: src/utils/bitset.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libutils_a-bitset.obj -MD -MP -MF "src/utils/$(DEPDIR)/libutils_a-bitset.Tpo" -c -o src/utils/libutils_a-bitset.obj `if test -f 'src/utils/bitset.c'; then $(CYGPATH_W) 'src/utils/bitset.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/bitset.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/libutils_a-bitset.Tpo" "src/utils/$(DEPDIR)/libutils_a-bitset.Po"; else rm -f "src/utils/$(DEPDIR)/libutils_a-bitset.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/bitset.c' object='src/utils/libutils_a-bitset.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libutils_a-bitset.obj `if test -f 'src/utils/bitset.c'; then $(CYGPATH_W) 'src/utils/bitset.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/bitset.c'; fi`
-
-src/utils/libutils_a-args.o: src/utils/args.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libutils_a-args.o -MD -MP -MF "src/utils/$(DEPDIR)/libutils_a-args.Tpo" -c -o src/utils/libutils_a-args.o `test -f 'src/utils/args.c' || echo '$(srcdir)/'`src/utils/args.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/libutils_a-args.Tpo" "src/utils/$(DEPDIR)/libutils_a-args.Po"; else rm -f "src/utils/$(DEPDIR)/libutils_a-args.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/args.c' object='src/utils/libutils_a-args.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libutils_a-args.o `test -f 'src/utils/args.c' || echo '$(srcdir)/'`src/utils/args.c
-
-src/utils/libutils_a-args.obj: src/utils/args.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libutils_a-args.obj -MD -MP -MF "src/utils/$(DEPDIR)/libutils_a-args.Tpo" -c -o src/utils/libutils_a-args.obj `if test -f 'src/utils/args.c'; then $(CYGPATH_W) 'src/utils/args.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/args.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/libutils_a-args.Tpo" "src/utils/$(DEPDIR)/libutils_a-args.Po"; else rm -f "src/utils/$(DEPDIR)/libutils_a-args.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/args.c' object='src/utils/libutils_a-args.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libutils_a-args.obj `if test -f 'src/utils/args.c'; then $(CYGPATH_W) 'src/utils/args.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/args.c'; fi`
-
-src/utils/libutils_a-list.o: src/utils/list.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libutils_a-list.o -MD -MP -MF "src/utils/$(DEPDIR)/libutils_a-list.Tpo" -c -o src/utils/libutils_a-list.o `test -f 'src/utils/list.c' || echo '$(srcdir)/'`src/utils/list.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/libutils_a-list.Tpo" "src/utils/$(DEPDIR)/libutils_a-list.Po"; else rm -f "src/utils/$(DEPDIR)/libutils_a-list.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/list.c' object='src/utils/libutils_a-list.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libutils_a-list.o `test -f 'src/utils/list.c' || echo '$(srcdir)/'`src/utils/list.c
-
-src/utils/libutils_a-list.obj: src/utils/list.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libutils_a-list.obj -MD -MP -MF "src/utils/$(DEPDIR)/libutils_a-list.Tpo" -c -o src/utils/libutils_a-list.obj `if test -f 'src/utils/list.c'; then $(CYGPATH_W) 'src/utils/list.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/list.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/libutils_a-list.Tpo" "src/utils/$(DEPDIR)/libutils_a-list.Po"; else rm -f "src/utils/$(DEPDIR)/libutils_a-list.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/list.c' object='src/utils/libutils_a-list.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libutils_a-list.obj `if test -f 'src/utils/list.c'; then $(CYGPATH_W) 'src/utils/list.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/list.c'; fi`
-
-src/utils/libutils_a-hash.o: src/utils/hash.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libutils_a-hash.o -MD -MP -MF "src/utils/$(DEPDIR)/libutils_a-hash.Tpo" -c -o src/utils/libutils_a-hash.o `test -f 'src/utils/hash.c' || echo '$(srcdir)/'`src/utils/hash.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/libutils_a-hash.Tpo" "src/utils/$(DEPDIR)/libutils_a-hash.Po"; else rm -f "src/utils/$(DEPDIR)/libutils_a-hash.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/hash.c' object='src/utils/libutils_a-hash.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libutils_a-hash.o `test -f 'src/utils/hash.c' || echo '$(srcdir)/'`src/utils/hash.c
-
-src/utils/libutils_a-hash.obj: src/utils/hash.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libutils_a-hash.obj -MD -MP -MF "src/utils/$(DEPDIR)/libutils_a-hash.Tpo" -c -o src/utils/libutils_a-hash.obj `if test -f 'src/utils/hash.c'; then $(CYGPATH_W) 'src/utils/hash.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/hash.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/libutils_a-hash.Tpo" "src/utils/$(DEPDIR)/libutils_a-hash.Po"; else rm -f "src/utils/$(DEPDIR)/libutils_a-hash.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/hash.c' object='src/utils/libutils_a-hash.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libutils_a-hash.obj `if test -f 'src/utils/hash.c'; then $(CYGPATH_W) 'src/utils/hash.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/hash.c'; fi`
-
-src/utils/libutils_a-handler.o: src/utils/handler.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libutils_a-handler.o -MD -MP -MF "src/utils/$(DEPDIR)/libutils_a-handler.Tpo" -c -o src/utils/libutils_a-handler.o `test -f 'src/utils/handler.c' || echo '$(srcdir)/'`src/utils/handler.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/libutils_a-handler.Tpo" "src/utils/$(DEPDIR)/libutils_a-handler.Po"; else rm -f "src/utils/$(DEPDIR)/libutils_a-handler.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/handler.c' object='src/utils/libutils_a-handler.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libutils_a-handler.o `test -f 'src/utils/handler.c' || echo '$(srcdir)/'`src/utils/handler.c
-
-src/utils/libutils_a-handler.obj: src/utils/handler.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libutils_a-handler.obj -MD -MP -MF "src/utils/$(DEPDIR)/libutils_a-handler.Tpo" -c -o src/utils/libutils_a-handler.obj `if test -f 'src/utils/handler.c'; then $(CYGPATH_W) 'src/utils/handler.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/handler.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/libutils_a-handler.Tpo" "src/utils/$(DEPDIR)/libutils_a-handler.Po"; else rm -f "src/utils/$(DEPDIR)/libutils_a-handler.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/handler.c' object='src/utils/libutils_a-handler.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libutils_a-handler.obj `if test -f 'src/utils/handler.c'; then $(CYGPATH_W) 'src/utils/handler.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/handler.c'; fi`
-
-src/utils/libutils_a-compat.o: src/utils/compat.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libutils_a-compat.o -MD -MP -MF "src/utils/$(DEPDIR)/libutils_a-compat.Tpo" -c -o src/utils/libutils_a-compat.o `test -f 'src/utils/compat.c' || echo '$(srcdir)/'`src/utils/compat.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/libutils_a-compat.Tpo" "src/utils/$(DEPDIR)/libutils_a-compat.Po"; else rm -f "src/utils/$(DEPDIR)/libutils_a-compat.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/compat.c' object='src/utils/libutils_a-compat.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libutils_a-compat.o `test -f 'src/utils/compat.c' || echo '$(srcdir)/'`src/utils/compat.c
-
-src/utils/libutils_a-compat.obj: src/utils/compat.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libutils_a-compat.obj -MD -MP -MF "src/utils/$(DEPDIR)/libutils_a-compat.Tpo" -c -o src/utils/libutils_a-compat.obj `if test -f 'src/utils/compat.c'; then $(CYGPATH_W) 'src/utils/compat.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/compat.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/libutils_a-compat.Tpo" "src/utils/$(DEPDIR)/libutils_a-compat.Po"; else rm -f "src/utils/$(DEPDIR)/libutils_a-compat.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/compat.c' object='src/utils/libutils_a-compat.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libutils_a-compat.obj `if test -f 'src/utils/compat.c'; then $(CYGPATH_W) 'src/utils/compat.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/compat.c'; fi`
 
 src/client/sdm-startup.o: src/client/startup.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sdm_CFLAGS) $(CFLAGS) -MT src/client/sdm-startup.o -MD -MP -MF "src/client/$(DEPDIR)/sdm-startup.Tpo" -c -o src/client/sdm-startup.o `test -f 'src/client/startup.c' || echo '$(srcdir)/'`src/client/startup.c; \
@@ -1894,13 +1506,10 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(PROGRAMS) $(HEADERS) \
-		config.h
-install-binPROGRAMS: install-libLTLIBRARIES
-
+all-am: Makefile $(LIBRARIES) $(PROGRAMS) $(HEADERS) config.h
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(includedir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-recursive
@@ -1924,8 +1533,6 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-rm -f src/server/$(DEPDIR)/$(am__dirstamp)
-	-rm -f src/proxy/$(am__dirstamp)
-	-rm -f src/proxy/$(DEPDIR)/$(am__dirstamp)
 	-rm -f src/server/$(am__dirstamp)
 	-rm -f src/mi/$(am__dirstamp)
 	-rm -f src/test/$(DEPDIR)/$(am__dirstamp)
@@ -1942,11 +1549,11 @@ maintainer-clean-generic:
 clean: clean-recursive
 
 clean-am: clean-binPROGRAMS clean-generic clean-libLIBRARIES \
-	clean-libLTLIBRARIES clean-libtool mostlyclean-am
+	clean-libtool mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf src/client/$(DEPDIR) src/mi/$(DEPDIR) src/proxy/$(DEPDIR) src/server/$(DEPDIR) src/test/$(DEPDIR) src/utils/$(DEPDIR)
+	-rm -rf src/client/$(DEPDIR) src/mi/$(DEPDIR) src/server/$(DEPDIR) src/test/$(DEPDIR) src/utils/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-libtool distclean-tags
@@ -1963,8 +1570,7 @@ info-am:
 
 install-data-am: install-includeHEADERS
 
-install-exec-am: install-binPROGRAMS install-libLIBRARIES \
-	install-libLTLIBRARIES
+install-exec-am: install-binPROGRAMS install-libLIBRARIES
 
 install-info: install-info-recursive
 
@@ -1975,7 +1581,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf src/client/$(DEPDIR) src/mi/$(DEPDIR) src/proxy/$(DEPDIR) src/server/$(DEPDIR) src/test/$(DEPDIR) src/utils/$(DEPDIR)
+	-rm -rf src/client/$(DEPDIR) src/mi/$(DEPDIR) src/server/$(DEPDIR) src/test/$(DEPDIR) src/utils/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -1993,35 +1599,30 @@ ps: ps-recursive
 ps-am:
 
 uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
-	uninstall-info-am uninstall-libLIBRARIES \
-	uninstall-libLTLIBRARIES
+	uninstall-info-am uninstall-libLIBRARIES
 
 uninstall-info: uninstall-info-recursive
 
 .PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am am--refresh check \
 	check-am clean clean-binPROGRAMS clean-generic \
-	clean-libLIBRARIES clean-libLTLIBRARIES clean-libtool \
-	clean-recursive ctags ctags-recursive dist dist-all dist-bzip2 \
-	dist-gzip dist-shar dist-tarZ dist-zip distcheck distclean \
-	distclean-compile distclean-generic distclean-hdr \
-	distclean-libtool distclean-recursive distclean-tags \
-	distcleancheck distdir distuninstallcheck dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-exec install-exec-am \
+	clean-libLIBRARIES clean-libtool clean-recursive ctags \
+	ctags-recursive dist dist-all dist-bzip2 dist-gzip dist-shar \
+	dist-tarZ dist-zip distcheck distclean distclean-compile \
+	distclean-generic distclean-hdr distclean-libtool \
+	distclean-recursive distclean-tags distcleancheck distdir \
+	distuninstallcheck dvi dvi-am html html-am info info-am \
+	install install-am install-binPROGRAMS install-data \
+	install-data-am install-exec install-exec-am \
 	install-includeHEADERS install-info install-info-am \
-	install-libLIBRARIES install-libLTLIBRARIES install-man \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	maintainer-clean-recursive mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool mostlyclean-recursive \
-	pdf pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
+	install-libLIBRARIES install-man install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic maintainer-clean-recursive \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
+	tags tags-recursive uninstall uninstall-am \
 	uninstall-binPROGRAMS uninstall-includeHEADERS \
-	uninstall-info-am uninstall-libLIBRARIES \
-	uninstall-libLTLIBRARIES
+	uninstall-info-am uninstall-libLIBRARIES
 
-@PTPDBGJNI_TRUE@	lib_LTLIBRARIES += libptp_dbg_jni.la
-@PTPDBGJNI_TRUE@	libptp_dbg_jni_la_SOURCES = jni/dbg_jni.c
-@PTPDBGJNI_TRUE@	libptp_dbg_jni_la_CFLAGS = $(AM_CFLAGS)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

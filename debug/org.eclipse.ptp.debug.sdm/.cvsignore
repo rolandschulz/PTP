@@ -13,3 +13,4 @@ config.h
 sdm
 .gdb_history
 test_*
+config.status

@@ -87,5 +87,5 @@ if test "$ac_cv_path_OMPI_INFO" != no; then
 fi
 
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_SUBDIRS([bitvector libaif])
+AC_CONFIG_SUBDIRS([bitvector libaif ../org.eclipse.ptp.proxy ../org.eclipse.ptp.utils])
 AC_OUTPUT
