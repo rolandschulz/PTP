@@ -1,6 +1,7 @@
 #include <getopt.h>
 #include <proxy.h>
 #include <proxy_tcp.h>
+#include <proxy_event.h>
 #include <handler.h>
 #include "orte_config.h"
 #include <stdbool.h>
@@ -60,6 +61,7 @@
 
 int ORTEIsShutdown(void);
 int ORTEQuit(void);
+int ORTEInit(void);
 
 int ORTEStartDaemon(char **);
 int ORTERun(char **);
