@@ -91,23 +91,6 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		String proxyPath = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
 		System.out.println("ORTE_SERVER path = '"+proxyPath+"'");
-		String orted_path = preferences.getString(PreferenceConstants.ORTE_ORTED_PATH);
-		System.out.println("ORTED path = '"+orted_path+"'");
-		
-		if(proxyPath.equals("") || orted_path.equals("")) {
-			final Display display = Display.getDefault();
-			display.syncExec(new Runnable() {
-				public void run() {
-					Shell s = display.getActiveShell();
-					System.out.println("SHELL = "+s);
-					if(s != null)
-						new OMPIPrefsDialog(s).open();
-				}
-			});
-		}
-		
-		proxyPath = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
-		System.out.println("ORTE_SERVER path = '"+proxyPath+"'");
 		if(proxyPath.equals("")) {
 			String err = "Could not start the ORTE server.  Check the "+
 				"PTP/Open RTE preferences page and be certain that the path and arguments "+
@@ -123,26 +106,6 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 
 			PTPCorePlugin.getDefault().savePluginPreferences();
 			
-			return false;
-		}
-
-		orted_path = preferences.getString(PreferenceConstants.ORTE_ORTED_PATH);
-		System.out.println("ORTED path = '"+orted_path+"'");
-		if(orted_path.equals("")) {
-			String err = "Some error occurred trying to spawn the ORTEd (ORTE daemon).  Check the "+
-				"PTP/Open RTE preferences page and be certain that the path and arguments "+
-				"are correct.  Defaulting to Simulation Mode.";
-			System.err.println(err);
-			CoreUtils.showErrorDialog("ORTEd Start Failure", err, null);
-			
-			int MSI = MonitoringSystemChoices.SIMULATED;
-			int CSI = ControlSystemChoices.SIMULATED;
-							
-			preferences.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSI);
-			preferences.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSI);
-
-			PTPCorePlugin.getDefault().savePluginPreferences();
-		
 			return false;
 		}
 
@@ -194,32 +157,9 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 			System.exit(1);
 		}
 		
-		String ompi_bin_path = orted_path.substring(0, orted_path.lastIndexOf("/"));
-		
-		String orted_args = preferences.getString(PreferenceConstants.ORTE_ORTED_ARGS);
-		String orted_full = orted_path + " " + orted_args;
-		System.out.println("ORTED = "+orted_full);
-		/* start the orted */
-		String[] split_args = orted_args.split("\\s");
-		for (int x=0; x<split_args.length; x++)
-	         System.out.println("["+x+"] = "+split_args[x]);
-		String[] split_path = orted_path.split("\\/");
-		for(int x=0; x<split_path.length; x++)
-			System.out.println("["+x+"] = "+split_path[x]);
-
-		String str_arg, arg_array_as_string;
-		
-		arg_array_as_string = new String("");
-		
-		for(int i=0; i<split_args.length; i++) {
-			arg_array_as_string = arg_array_as_string + " " + split_args[i];
-		}
-	
-		str_arg = ompi_bin_path + " " + orted_path + "  " + split_path[split_path.length - 1] + arg_array_as_string;
-		
 		try {
 			setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_OK);
-			sendCommand("STARTDAEMON", str_arg);
+			sendCommand("STARTDAEMON");
 			waitForRuntimeEvent();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
