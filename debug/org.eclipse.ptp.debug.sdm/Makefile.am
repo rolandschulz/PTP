@@ -1,4 +1,6 @@
-SUBDIRS = libaif
+PROXY =					../org.eclipse.ptp.proxy
+UTILS =					../org.eclipse.ptp.utils
+SUBDIRS =				libaif $(PROXY) $(UTILS)
 
 bin_PROGRAMS =			sdm test_proxy test_proxy_rev test_mi
 
@@ -11,61 +13,39 @@ sdm_SOURCES =			src/client/startup.c\
 						src/server/backend.c \
 						src/server/gdbmi_backend.c
 					
-sdm_CFLAGS =				-I./include -I./libaif -I./src/mi $(AM_CFLAGS)
-sdm_LDADD =				libproxysvr.a libdbgutils.a libutils.a libmi.a libaif/libaif.a
+sdm_CFLAGS =				-I./include -I./libaif -I./src/mi -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS)
+sdm_LDADD =				$(PROXY)/libproxysvr.a libdbgutils.a $(UTILS)/libutils.a libmi.a libaif/libaif.a
 
 test_proxy_SOURCES =		src/test/test_proxy.c \
 						src/test/test_proxy_clnt.c
-test_proxy_CFLAGS =		-I./include -I./libaif $(AM_CFLAGS) -g
+test_proxy_CFLAGS =		-I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
 test_proxy_LDFLAGS = 		-g
-test_proxy_LDADD =		libdbgclnt.a libproxyclnt.a libdbgutils.a libutils.a libaif/libaif.a
+test_proxy_LDADD =		libdbgclnt.a $(PROXY)/libproxyclnt.a libdbgutils.a $(UTILS)/libutils.a libaif/libaif.a
 
 test_proxy_rev_SOURCES =	src/test/test_proxy_rev.c \
 						src/test/test_proxy_clnt.c
-test_proxy_rev_CFLAGS =	-I./include -I./libaif $(AM_CFLAGS) -g
+test_proxy_rev_CFLAGS =	-I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
 test_proxy_rev_LDFLAGS = 	-g
-test_proxy_rev_LDADD =	libdbgclnt.a libproxyclnt.a libdbgutils.a libutils.a libaif/libaif.a
+test_proxy_rev_LDADD =	libdbgclnt.a $(PROXY)/libproxyclnt.a libdbgutils.a $(UTILS)/libutils.a libaif/libaif.a
 
 test_mi_SOURCES =		src/mi/test_mi.c
-test_mi_CFLAGS =			-I./include -I./src/mi $(AM_CFLAGS) -g
+test_mi_CFLAGS =			-I./include -I./src/mi -I$(UTILS)/include $(AM_CFLAGS) -g
 test_mi_LDFLAGS = 		-g
-test_mi_LDADD =			libmi.a libutils.a
+test_mi_LDADD =			libmi.a $(UTILS)/libutils.a
 
-include_HEADERS =		include/breakpoint.h include/dbg.h include/location.h include/bitset.h include/stackframe.h
+include_HEADERS =		include/breakpoint.h include/dbg.h include/location.h include/stackframe.h
 
-lib_LTLIBRARIES =
-if PTPDBGJNI
-	lib_LTLIBRARIES += libptp_dbg_jni.la
-	libptp_dbg_jni_la_SOURCES = jni/dbg_jni.c
-	libptp_dbg_jni_la_CFLAGS = $(AM_CFLAGS)
-endif
-
-lib_LIBRARIES =			libdbgclnt.a libproxyclnt.a libproxysvr.a libdbgutils.a \
-						libmi.a libutils.a
+lib_LIBRARIES =			libdbgclnt.a libdbgutils.a libmi.a
 
 libdbgclnt_a_SOURCES =	src/client/client_interface.c 
-libdbgclnt_a_CFLAGS =		-I./include  -I./libaif $(AM_CFLAGS) -g
-
-libproxyclnt_a_SOURCES =	src/proxy/proxy.c \
-						src/proxy/proxy_clnt.c \
-						src/proxy/proxy_tcp.c \
-						src/proxy/proxy_tcp_clnt.c \
-						src/proxy/proxy_event.c
-libproxyclnt_a_CFLAGS =	-I./include $(AM_CFLAGS) -g
-
-libproxysvr_a_SOURCES =	src/proxy/proxy.c \
-						src/proxy/proxy_svr.c \
-						src/proxy/proxy_tcp.c \
-						src/proxy/proxy_tcp_svr.c \
-						src/proxy/proxy_event.c
-libproxysvr_a_CFLAGS =	-I./include -I./libaif $(AM_CFLAGS) -g
+libdbgclnt_a_CFLAGS =		-I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
 
 libdbgutils_a_SOURCES =	src/utils/error.c \
 						src/utils/breakpoint.c \
 						src/utils/stackframe.c \
 						src/utils/event.c
 						
-libdbgutils_a_CFLAGS =	-I./include -I./libaif $(AM_CFLAGS) -g
+libdbgutils_a_CFLAGS =	-I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
 
 libmi_a_SOURCES =		src/mi/MIParser.c \
 						src/mi/MIOOBRecord.c \
@@ -88,13 +68,4 @@ libmi_a_SOURCES =		src/mi/MIParser.c \
 						src/mi/MIError.c \
 						src/mi/MISession.c
 						
-libmi_a_CFLAGS =			-I./include $(AM_CFLAGS) -g 
-
-libutils_a_SOURCES =		src/utils/bitset.c \
-						src/utils/args.c \
-						src/utils/list.c \
-						src/utils/hash.c \
-						src/utils/handler.c \
-						src/utils/compat.c
-						
-libutils_a_CFLAGS =		-I./include $(AM_CFLAGS) -g 
+libmi_a_CFLAGS =			-I./include -I$(UTILS)/include $(AM_CFLAGS) -g 
