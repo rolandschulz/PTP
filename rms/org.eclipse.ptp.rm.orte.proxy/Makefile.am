@@ -1,5 +1,6 @@
 PROXY =					../org.eclipse.ptp.proxy
 UTILS =					../org.eclipse.ptp.utils
+SUBDIRS =				$(PROXY) $(UTILS)
 
 bin_PROGRAMS =			orte_server
 

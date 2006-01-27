@@ -1,2 +1,8 @@
 orte_server
 .deps
+stamp-h1
+libtool
+config.status
+Makefile
+config.h
+.libs
