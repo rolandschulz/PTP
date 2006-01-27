@@ -1,3 +1,24 @@
+/******************************************************************************
+ * Copyright (c) 2005 The Regents of the University of California. 
+ * This material was produced under U.S. Government contract W-7405-ENG-36 
+ * for Los Alamos National Laboratory, which is operated by the University 
+ * of California for the U.S. Department of Energy. The U.S. Government has 
+ * rights to use, reproduce, and distribute this software. NEITHER THE 
+ * GOVERNMENT NOR THE UNIVERSITY MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR 
+ * ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified 
+ * to produce derivative works, such modified software should be clearly 
+ * marked, so as not to confuse it with the version available from LANL.
+ * 
+ * Additionally, this program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * LA-CC 04-115
+ ******************************************************************************/
+ 
+#include "config.h"
+
 #include <getopt.h>
 #include <proxy.h>
 #include <proxy_tcp.h>
@@ -7,6 +28,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <list.h>
+#include <args.h>
 #include <grp.h>
 #include <pwd.h>
 
@@ -30,7 +52,8 @@
 #include "threads/condition.h"
 #include "tools/orted/orted.h"
 
-#define DEFAULT_PROXY		"tcp"
+#define DEFAULT_PROXY			"tcp"
+#define DEFAULT_ORTED_ARGS	"orted --scope public --seed --persistent"
 
 #define RTEV_OFFSET				200
 #define RTEV_OK					RTEV_OFFSET + 0
@@ -71,16 +94,9 @@ int ORTEGetProcessAttribute(char **);
 int ORTEGetNodes(char **);
 int ORTEGetNodeAttribute(char **);
 /*
-int ORTERun(char **);
 int OMPIGetJobs(char **);
-int OMPIGetProcesses(char **);
-int OMPIGetProcessAttribute(char **);
 int OMPIGetMachines(char **);
-int OMPIGetNodes(char **);
-int OMPIGetNodeAttribute(char **);
 int OMPIGetNodemachineID(char **);
-
-
 */
 
 struct debug_job {
@@ -133,18 +149,12 @@ static proxy_svr_commands command_tab[] = {
 	{"GETPATTR",	   	ORTEGetProcessAttribute},
 	{"GETNODES",		ORTEGetNodes},
 	{"GETNATTR",		ORTEGetNodeAttribute},
-	{NULL,			NULL},
 	/*
-	{"RUN",			ORTERun},
 	{"GETJOBS",		OMPIGetJobs},
-	{"GETPROCS",		OMPIGetProcesses},
-	
 	{"GETMACHS",		OMPIGetMachines},
-	{"GETNODES",		OMPIGetNodes},
-	{"GETNATTR",		OMPIGetNodeAttribute},
 	{"GETNMID",		OMPIGetNodemachineID},
-	{NULL,			NULL}
 	*/
+	{NULL,			NULL},
 };
 
 static struct option longopts[] = {
@@ -190,12 +200,13 @@ ORTECheckErrorCode(int type, int rc)
 }
 
 //jstring jompi_bin_path, jstring jorted_path, jstring jorted_bin, jobjectArray array
-int ORTEStartDaemon(char **args)
+int
+ORTEStartDaemon(char **args)
 {
 	int ret;
 	char *res;
 	
-	printf("StartDaemon()\n"); fflush(stdout);
+	printf("StartDaemon(%s %s)\n", ORTED, DEFAULT_ORTED_ARGS); fflush(stdout);
 	
 	switch(orted_pid = fork()) {
 		case -1:
@@ -209,108 +220,15 @@ int ORTEStartDaemon(char **args)
 		/* child */
 		case 0:
 			{
-				int i, len, orted_args_len;
-				char *ompi_bin_path, *orted_path, *orted_bin;
-				char **orted_args;
-				char *user_path, *user_path_new;
-				
-				i=0;
-	
-				/* run through the array real fast and figure out how many elements are in it - before the NULLs start */
-				while(args[i] != NULL) i++;
-	
-				len = i;
-				//printf("\tARRAY is %d elements long.\n", len);
-	
-				orted_args_len = len - 4;
-				if(orted_args_len < 0) {
-					res = ORTEErrorStr(RTEV_ERROR_ORTE_INIT, "Not enough arguments sent!");
-					proxy_svr_event_callback(orte_proxy, res);
-
-					printf("\t%s\n", res);
-		
-					return 1;
-				}
-
-				/* we need 'len + 2' args for len args, 1 for NULL
-				 * termination, and 1 preface for the program name
-				 * (argv[0] essentially) */
-				orted_args = (char **)malloc((orted_args_len+2) * sizeof(char*));
-	
-				/* zero the array out, takes care of the last NULL as well */
-				for(i=0; i<orted_args_len+2; i++) orted_args[i] = NULL;
-	
-				i = 1;
-				while(args[i] != NULL) {
-					//printf("ARG %d = %s\n", i, args[i]);
-	
-					/* ompi_bin_path */
-					if(i == 1)  {
-						ompi_bin_path = strdup(args[i]);
-					}
-					/* orted_path */
-					else if(i == 2) {
-						orted_path = strdup(args[i]);
-					}
-					/* orted_bin */
-					else if(i == 3) {
-						orted_bin = strdup(args[i]);
-					}
-					/* general args */
-					else {
-						/* first arg - fill up the bin before this arg though */
-						if(i == 4) {
-							orted_args[0] = strdup(orted_bin);
-						}
-						orted_args[i-3] = strdup(args[i]);
-					}
-					i++;
-				}
-				
-//				printf("ORTED_PATH = '%s' \n", orted_path);
-				for(i=0; i<orted_args_len+2; i++) {
-		    			if(orted_args[i] != NULL) 
-		    				printf("[C] #%d = '%s'\n", i, orted_args[i]);
-		    			else
-						printf("[C] #%d = NULL\n", i);
-		    			fflush(stdout);
-				}
-				
-				user_path = getenv("PATH");
-				//printf("Original user's PATH: %s\n", user_path);
-				asprintf(&user_path_new, "%s:%s", ompi_bin_path, user_path);
-				setenv("PATH", user_path_new, 1);
-				user_path = getenv("PATH");
-				//printf("New user's PATH (temporarily) after prepending "
-				//  "OMPI bin: %s\n", user_path);
-
-				/* we don't have to (in fact, we're not supposed to) free the pointer returned
-				 * by getenv().  the function just points into an internal structure that we
-				 * shouldn't be free()ing - so here we just free the other ones we allocced. */
-				free(user_path_new);
+				char **orted_args = Str2Args(DEFAULT_ORTED_ARGS);
 				
 				/* spawn the daemon */
 				printf("Starting execv now!\n"); fflush(stdout);
 				errno = 0;
-//				ret = execv("/bin/echo", orted_args);
-				ret = execv(orted_path, orted_args);
-				/*
-				printf("ORTED_PATH = '%s'\n", orted_path);
-				{
-					char *cmd[] = { "orted", "--scope", "public", "--seed", "--persistent", (char *)0 };
-					ret = execv(orted_path, cmd);
-				}
-				*/
-				//printf("Line below execv - ret = %d.\n", ret); fflush(stdout);
-				//printf("Error: %s\n", strerror(errno));
 
-				free(orted_path);
-				free(orted_bin);
-				free(ompi_bin_path);
-				for(i=0; i<orted_args_len + 1; i++) {
-		    			free(orted_args[i]);
-				}
-				free(orted_args);
+				ret = execv(ORTED, orted_args);
+
+				FreeArgs(orted_args);
 			}
 			break;
 	    /* parent */

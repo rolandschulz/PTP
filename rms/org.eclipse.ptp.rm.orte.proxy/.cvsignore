@@ -6,3 +6,4 @@ config.status
 Makefile
 config.h
 .libs
+autom4te.cache
