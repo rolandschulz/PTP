@@ -5,10 +5,10 @@ AC_PREREQ(2.50)
 
 AC_INIT(org.eclipse.ptp.proxy, 1.0.0)
 AC_CONFIG_SRCDIR(src/proxy.c)
+AC_CONFIG_HEADERS(config.h)
 
 AM_INIT_AUTOMAKE
 
-AC_CONFIG_HEADER(config.h)
 AC_CANONICAL_BUILD
 
 CFLAGS="$CFLAGS -Wall"
