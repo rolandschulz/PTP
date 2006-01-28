@@ -866,8 +866,21 @@ ORTERun(char **args)
 		}
 	}
 	
+	if (access(exec_path, X_OK) < 0) {
+		printf("ERROR exec_path = '%s' not found\n", exec_path); fflush(stdout);
+		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_ORTE_RUN, strerror(errno)));
+		return PROXY_RES_OK;
+	}
+	
 	if (debug) {
 		printf("DeBUG!\n"); fflush(stdout);
+		
+		if (access(debug_exec_path, X_OK) < 0) {
+			printf("ERROR debug_exec_path = '%s' not found\n", debug_exec_path); fflush(stdout);
+			proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_ORTE_RUN, strerror(errno)));
+			return PROXY_RES_OK;
+		}
+		
 		debug_argc++;
 		debug_args = (char **)malloc((debug_argc+1) * sizeof(char *));
 		debug_args[0] = debug_exec_path;
