@@ -4,3 +4,4 @@ libtool
 config.status
 Makefile
 config.h
+autom4te.cache

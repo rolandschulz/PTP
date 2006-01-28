@@ -1507,6 +1507,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+          ac_config_headers="$ac_config_headers config.h"
+
 
 am__api_version="1.9"
 ac_aux_dir=
@@ -1945,8 +1947,6 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 
 
 
-
-          ac_config_headers="$ac_config_headers config.h"
 
 # Make sure we can run config.sub.
 $ac_config_sub sun4 >/dev/null 2>&1 ||
