@@ -29,6 +29,7 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.internal.ui.actions.ChangeSetAction;
 import org.eclipse.ptp.internal.ui.actions.CreateSetAction;
 import org.eclipse.ptp.internal.ui.actions.DeleteSetAction;
+import org.eclipse.ptp.internal.ui.actions.DisplayRulerAction;
 import org.eclipse.ptp.internal.ui.actions.RemoveElementAction;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.IPTPUIConstants;
@@ -111,6 +112,8 @@ public abstract class AbstractParallelSetView extends AbstractParallelElementVie
 		manager.add(new Separator(IPTPUIConstants.IUIEMPTYGROUP));
 		manager.add(new Separator(IPTPUIConstants.IUICHANGESETGROUP));
 		manager.add(new ChangeSetAction(this));
+		manager.add(new Separator(IPTPUIConstants.IUIVIEWGROUP));
+		manager.add(new DisplayRulerAction(this));
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}

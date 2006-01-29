@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.ui.preferences;
 
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.swt.SWT;
@@ -37,8 +37,8 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 	
 	public PTPViewerPreferencesPage() {
 		super();
-		setDescription(PreferenceMessages.getString("PTPViewerPreferencesPage.desc"));
 		setPreferenceStore(PTPUIPlugin.getDefault().getPreferenceStore());
+		setDescription(PreferenceMessages.getString("PTPViewerPreferencesPage.desc"));
 	}
 	
 	protected Control createContents(Composite parent) {
@@ -64,12 +64,12 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 		showRulerButton = createCheckButton(comp, PreferenceMessages.getString("PTPViewerPreferencesPage.displayRuler"));
 	}
 	protected void defaultSetting() {
-		Preferences preferences = PTPUIPlugin.getDefault().getPluginPreferences();
-		preferences.setDefault(IPTPUIConstants.SHOW_RULER, true);
+		IPreferenceStore store = getPreferenceStore();
+		store.setDefault(IPTPUIConstants.SHOW_RULER, true);
 	}
 	public void performDefaults() { 
-		Preferences preferences = PTPUIPlugin.getDefault().getPluginPreferences();
-		showRulerButton.setSelection(preferences.getBoolean(IPTPUIConstants.SHOW_RULER));
+		IPreferenceStore store = getPreferenceStore();
+		showRulerButton.setSelection(store.getBoolean(IPTPUIConstants.SHOW_RULER));
 		super.performDefaults();
 	}
 	public boolean performOk() {
@@ -80,11 +80,11 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 	}
 	
 	protected void setValues() {
-		Preferences preferences = PTPUIPlugin.getDefault().getPluginPreferences();
-		showRulerButton.setSelection(preferences.getBoolean(IPTPUIConstants.SHOW_RULER));
+		IPreferenceStore store = getPreferenceStore();
+		showRulerButton.setSelection(store.getBoolean(IPTPUIConstants.SHOW_RULER));
 	}
 	protected void storeValues() {
-		Preferences preferences = PTPUIPlugin.getDefault().getPluginPreferences();
-		preferences.setValue(IPTPUIConstants.SHOW_RULER, showRulerButton.getSelection());
+		IPreferenceStore store = getPreferenceStore();
+		store.setValue(IPTPUIConstants.SHOW_RULER, showRulerButton.getSelection());
 	}
 }
