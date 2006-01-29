@@ -20,5 +20,4 @@
             id="org.eclipse.ptp.debug.external.ui.SDMPreferencePage">
       </page>
    </extension>
-
 </plugin>

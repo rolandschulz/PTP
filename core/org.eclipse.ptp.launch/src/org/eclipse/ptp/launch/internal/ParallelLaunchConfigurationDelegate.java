@@ -35,12 +35,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.PTPCorePlugin;
@@ -50,6 +50,7 @@ import org.eclipse.ptp.debug.core.IPDebugConfiguration;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.core.launch.PLaunch;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.internal.ui.LaunchMessages;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
 
@@ -163,9 +164,9 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				monitor.subTask("Configuring debug setting");
-				Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
-				String dbgPath = preferences.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE);
-				String dbgArgs = preferences.getString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS);
+				IPreferenceStore store = PTPDebugUIPlugin.getDefault().getPreferenceStore();
+				String dbgPath = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE);
+				String dbgArgs = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS);
 
 				verifyDebuggerPath(dbgPath);
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);

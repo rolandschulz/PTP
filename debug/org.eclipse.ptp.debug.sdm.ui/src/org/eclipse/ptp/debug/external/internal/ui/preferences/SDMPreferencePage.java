@@ -19,13 +19,10 @@
 package org.eclipse.ptp.debug.external.internal.ui.preferences;
 
 import java.io.File;
-import java.net.URL;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.ui.preferences.AbstractPerferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -64,6 +61,7 @@ public class SDMPreferencePage extends AbstractPerferencePage {
     
 	public SDMPreferencePage() {
 		super();
+		setPreferenceStore(PTPDebugUIPlugin.getDefault().getPreferenceStore());
 		setDescription(PreferenceMessages.getString("SDMPreferencePage.desc"));
 	}
 	
@@ -82,7 +80,6 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 		composite.setLayoutData(data);
 		createSpacer(composite, 1);
 		createSDMSetting(composite);
-		defaultSetting();
 		setValues();
 		return composite;
 	}
@@ -105,42 +102,21 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 		sdmArgsText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		sdmArgsText.addModifyListener(listener);
 	}
-	protected void defaultSetting() {		
-		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
-		URL url = Platform.find(Platform.getBundle(PTPDebugCorePlugin.PLUGIN_ID), new Path("/"));
-		if (url != null) {
-			try {
-				File path = new File(Platform.asLocalURL(url).getPath());
-				String ipath = path.getAbsolutePath();
-				int idx = ipath.indexOf(PTPDebugCorePlugin.PLUGIN_ID);
-				String ipath2 = ipath.substring(0, idx) + "org.eclipse.ptp.debug.sdm/sdm";
-				preferences.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_FILE, ipath2);
-				preferences.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_FILE, ipath2);
-			} catch(Exception e) { 
-			}
-		}
-		preferences.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS, IPDebugConstants.PREF_DEFAULT_DEUBGGER_ARGS);
-		preferences.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS, IPDebugConstants.PREF_DEFAULT_DEUBGGER_ARGS);
-	}
 	public void performDefaults() { 
-		//IPreferenceStore store = getPreferenceStore();
-		defaultSetting();
-		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
-		sdmPathText.setText(preferences.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE));
-		sdmArgsText.setText(preferences.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS));
+		IPreferenceStore store = getPreferenceStore();
+		sdmPathText.setText(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE));
+		sdmArgsText.setText(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS));
 		super.performDefaults();
 	}
 	protected void setValues() {
-		//IPreferenceStore store = getPreferenceStore();
-		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
-		sdmPathText.setText(preferences.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE));
-		sdmArgsText.setText(preferences.getString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS));
+		IPreferenceStore store = getPreferenceStore();
+		sdmPathText.setText(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE));
+		sdmArgsText.setText(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS));
 	}	
 	protected void storeValues() {
-		//IPreferenceStore store = getPreferenceStore();
-		Preferences preferences = PTPDebugCorePlugin.getDefault().getPluginPreferences();
-		preferences.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_FILE, sdmPathText.getText());
-		preferences.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS, sdmArgsText.getText());
+		IPreferenceStore store = getPreferenceStore();
+		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_FILE, sdmPathText.getText());
+		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS, sdmArgsText.getText());
 	}
 	
     public void propertyChange(PropertyChangeEvent event) {
@@ -148,10 +124,9 @@ public class SDMPreferencePage extends AbstractPerferencePage {
     }	
 	public boolean performOk() {
 		storeValues();
-		PTPDebugCorePlugin.getDefault().savePluginPreferences();
+		PTPDebugUIPlugin.getDefault().savePluginPreferences();
 		return true;
-	}
-
+	}			
 	public boolean isValid() {
 		setErrorMessage(null);
 		setMessage(null);
@@ -174,5 +149,5 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 		if (filePath != null) {
 			sdmPathText.setText(filePath);
 		}
-	}
+	}	
 }
