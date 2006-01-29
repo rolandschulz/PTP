@@ -38,8 +38,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -59,6 +57,7 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 	protected Text orteServerText = null;
 
 	protected Button browseButton = null;
+	protected Button fManualButton = null;
 
 	private String orteServerFile = EMPTY_STRING;
 
@@ -98,7 +97,7 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		composite.setLayout(createGridLayout(1, true, 0, 0));
 		composite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 
-		createORTEdContents(composite);
+		createORTEContents(composite);
 
 		loading = true;
 		loadSaved();
@@ -108,7 +107,7 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		return composite;
 	}
 
-	private void createORTEdContents(Composite parent)
+	private void createORTEContents(Composite parent)
 	{
 		Group bGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		bGroup.setLayout(createGridLayout(1, true, 10, 10));
@@ -129,8 +128,20 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 		browseButton = SWTUtil.createPushButton(orteserver, CoreMessages
 				.getResourceString("PTPPreferencesPage.browseButton"), null);
 		browseButton.addSelectionListener(listener);
-	}
+		
+		fManualButton = createCheckButton(parent, CoreMessages.getResourceString("OMPIPreferencesPage.manual"));
 
+	}
+	protected Button createCheckButton(Composite parent, String label) {
+		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
+	}
+	protected Button createButton(Composite parent, String label, int type) {
+		Button button = new Button(parent, type);
+		button.setText(label);
+		GridData data = new GridData();
+		button.setLayoutData(data);
+		return button;
+	}
 	protected void defaultSetting() 
 	{
 		orteServerText.setText(orteServerFile);
@@ -193,6 +204,7 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
         }
 		
 		orteServerText.setText(orteServerFile);
+		fManualButton.setSelection(preferences.getBoolean(PreferenceConstants.ORTE_LAUNCH_MANUALLY));
 	}
 
 	public void init(IWorkbench workbench) 
@@ -222,6 +234,7 @@ public class OMPIPreferencesPage extends PreferencePage implements IWorkbenchPre
 				.getPluginPreferences();
 
 		preferences.setValue(PreferenceConstants.ORTE_SERVER_PATH, orteServerFile);
+		preferences.setValue(PreferenceConstants.ORTE_LAUNCH_MANUALLY, fManualButton.getSelection());
 
 		PTPCorePlugin.getDefault().savePluginPreferences();
 
