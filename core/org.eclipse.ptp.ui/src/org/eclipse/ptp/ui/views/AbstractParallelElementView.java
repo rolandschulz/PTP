@@ -192,14 +192,23 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			doubleClick(canvas.getElement(index));
 		}
 	}
-	public void preferenceUpdated() {
+	public void setDisplayRuler(final boolean showRuler) {
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				updateView(null);
 				if (!canvas.isDisposed()) {
-					canvas.setDisplayRuler(PTPUIPlugin.getDefault().getPluginPreferences().getBoolean(IPTPUIConstants.SHOW_RULER));
+					canvas.setDisplayRuler(showRuler);
 				}
 			}
 		});
+	}
+	public boolean isDisplayRuler() {
+		if (!canvas.isDisposed()) {
+			return canvas.isDisplayRuler();
+		}
+		return false;
+	}
+	public void preferenceUpdated() {
+		//setDisplayRuler(PTPUIPlugin.getDefault().getPluginPreferences().getBoolean(IPTPUIConstants.SHOW_RULER));
 	}
 }

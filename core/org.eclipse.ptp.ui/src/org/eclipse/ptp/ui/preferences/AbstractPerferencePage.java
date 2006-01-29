@@ -42,9 +42,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 public abstract class AbstractPerferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 	protected IWorkbench fWorkbench;
 	
-	public AbstractPerferencePage() {
-		super();
-	}
 	public void init(IWorkbench workbench) {
 		fWorkbench = workbench;
 	}
@@ -129,6 +126,6 @@ public abstract class AbstractPerferencePage extends PreferencePage implements I
 		return (IWorkbenchPage[])pages.toArray(new IWorkbenchPage[0]);
 	}   
 
-protected abstract void storeValues();
+	protected abstract void storeValues();
 	protected abstract void setValues();
 }
