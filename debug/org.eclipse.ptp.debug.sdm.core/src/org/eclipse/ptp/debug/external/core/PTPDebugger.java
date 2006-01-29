@@ -52,6 +52,8 @@ public class PTPDebugger implements IPTPDebugger {
 	public IPCDISession createDebuggerSession(IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException {
 		IPJob job = launch.getPJob();
 		debugger.initialize(job);
-		return new Session(debugger, job, launch, exe, monitor);
+		Session session = new Session(debugger, job, launch, exe);
+		session.start(monitor);
+		return session;
 	}
 }

@@ -18,12 +18,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.cdi;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 
 public interface IPCDISession extends ICommonActions {
+	public void start(IProgressMonitor monitor) throws CoreException;
+	
 	IPCDITarget[] getTargets();
 	void setAttribute(String key, String value);
 	String getAttribute(String key);
