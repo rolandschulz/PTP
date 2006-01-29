@@ -74,15 +74,13 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 	IPLaunch launch = null;
 	IBinaryObject file;
 	
-	public Session(IAbstractDebugger debugger, IPJob job, IPLaunch launch, IBinaryObject file, IProgressMonitor monitor) throws CoreException {
+	public Session(IAbstractDebugger debugger, IPJob job, IPLaunch launch, IBinaryObject file) throws CoreException {
 		this.debugger = debugger;
 		this.job = job;
 		this.launch = launch;
 		this.file = file;
 		commonSetup();
 		job.setAttribute(PreferenceConstants.JOB_DEBUG_SESSION, this);
-		
-		start(monitor);
 	}
 	private void commonSetup() {
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
@@ -124,7 +122,7 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 	public IBinaryObject getBinaryFile() {
 		return file;
 	}
-	private void start(IProgressMonitor monitor) throws CoreException {
+	public void start(IProgressMonitor monitor) throws CoreException {
 		IWorkspaceRunnable r = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor m) throws CoreException {
 				m.beginTask("", 3);
