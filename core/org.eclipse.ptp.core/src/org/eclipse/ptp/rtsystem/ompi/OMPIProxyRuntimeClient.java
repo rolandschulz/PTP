@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.BitSet;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.ControlSystemChoices;
 import org.eclipse.ptp.core.IModelManager;
@@ -85,7 +87,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		return ((ProxyRuntimeNodeAttributeEvent)event).getValues();
 	}
 	
-	public boolean startup() {
+	public boolean startup(IProgressMonitor monitor) {
 		System.out.println("OMPIProxyRuntimeClient - firing up proxy, waiting for connecting.  Please wait!  This can take a minute . . .");
 		
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
@@ -114,6 +116,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 			setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_CONNECTED);
 			sessionCreate();
 			if (preferences.getBoolean(PreferenceConstants.ORTE_LAUNCH_MANUALLY)) {
+				monitor.subTask("Waiting for manual lauch of orte_server on port "+getSessionPort()+"...");
 			} else {
 				Thread runThread = new Thread("Proxy Server Thread") {
 					public void run() {
@@ -153,7 +156,10 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 			}
 			
 			System.out.println("Waiting on accept.");
-			waitForRuntimeEvent();
+			if (waitForRuntimeEvent(monitor) == null) {
+				sessionFinish();
+				return false;
+			}
 		} catch (IOException e) {
 			System.err.println("Exception starting up proxy. :(");
 			System.exit(1);
@@ -188,23 +194,34 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		waitEvents.set(eventID);
 		waitEvents.set(IProxyRuntimeEvent.EVENT_RUNTIME_ERROR); // always check for errors
 	}
-	
-	private synchronized IProxyRuntimeEvent waitForRuntimeEvent() throws IOException {
+
+	private IProxyRuntimeEvent waitForRuntimeEvent() throws IOException {
+		return waitForRuntimeEvent(null);
+	}
+
+	private synchronized IProxyRuntimeEvent waitForRuntimeEvent(IProgressMonitor monitor) throws IOException {
     		IProxyRuntimeEvent event = null;
     		
-    		try {
-        		System.out.println("OMPIProxyRuntimeClient waiting on " + waitEvents.toString());
-        		while (this.events.isEmpty())
-        			wait();
-        		System.out.println("OMPIProxyRuntimeClient awoke!");
-        		event = (IProxyRuntimeEvent) this.events.removeItem();
-        		if (event instanceof ProxyRuntimeErrorEvent) {
-        	   		waitEvents.clear();
-        			throw new IOException(((ProxyRuntimeErrorEvent)event).getErrorMessage());
+    		System.out.println("OMPIProxyRuntimeClient waiting on " + waitEvents.toString());
+    		while (this.events.isEmpty()) {
+        		try {
+        			wait(500);
+        		} catch (InterruptedException e) {
         		}
-    		} catch (InterruptedException e) {
-        		// TODO Auto-generated catch block
-        		e.printStackTrace();
+        		if (monitor != null && monitor.isCanceled()) {
+        			return null;
+        		}
+    		}
+    		System.out.println("OMPIProxyRuntimeClient awoke!");
+    		try {
+    			event = (IProxyRuntimeEvent) this.events.removeItem();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    		if (event instanceof ProxyRuntimeErrorEvent) {
+    	   		waitEvents.clear();
+    			throw new IOException(((ProxyRuntimeErrorEvent)event).getErrorMessage());
     		}
     		
     		waitEvents.clear();

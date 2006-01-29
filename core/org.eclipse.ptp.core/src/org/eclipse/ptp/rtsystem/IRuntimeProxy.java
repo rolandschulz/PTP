@@ -19,7 +19,9 @@
 
 package org.eclipse.ptp.rtsystem;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 public interface IRuntimeProxy {
-	public boolean startup();
+	public boolean startup(IProgressMonitor monitor);
 	public void shutdown();
 }

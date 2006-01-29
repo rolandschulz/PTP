@@ -201,15 +201,11 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				runtimeProxy = new OMPIProxyRuntimeClient(this);
 				monitor.worked(10);
 				
-				if(runtimeProxy != null && !runtimeProxy.startup()) {
-					runtimeProxy = null;
-					Preferences p = PTPCorePlugin.getDefault().getPluginPreferences();
-					int MSChoiceID = p.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
-					int CSChoiceID = p.getInt(PreferenceConstants.CONTROL_SYSTEM_SELECTION);
-					monitoringSystem = null;
-					controlSystem = null;
-					refreshRuntimeSystems(CSChoiceID, MSChoiceID, new SubProgressMonitor(monitor, 50));				
-					return;
+				if(!runtimeProxy.startup(monitor)) {
+					if (monitor.isCanceled()) {
+						throw new CoreException(Status.CANCEL_STATUS);
+					}
+					throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Failed to start OMPI proxy runtime.", null));
 				}
 				monitor.subTask("Starting OMPI monitoring system...");
 				monitoringSystem = new OMPIMonitoringSystem((OMPIProxyRuntimeClient)runtimeProxy);
@@ -220,8 +216,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			}
 			else {
 				throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Invalid monitoring/control system selected.  Set using the PTP preferences page.", null));
-				//CoreUtils.showErrorDialog("Runtime System Error", "Invalid monitoring/control system selected.  Set using the PTP preferences page.", null);
-				//return;
 			}
 	
 			universe = new PUniverse();
