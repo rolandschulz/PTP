@@ -7,8 +7,11 @@
    <!-- preferences //-->
    <extension
          point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.ptp.debug.internal.ui.PDebugUIPreferenceInitializer"/>
+      <initializer
+            class="org.eclipse.ptp.debug.internal.ui.preferences.PreferenceInitializer">
+      </initializer>
    </extension>
+   
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
