@@ -113,42 +113,44 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		try {
 			setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_CONNECTED);
 			sessionCreate();
-			
-			Thread runThread = new Thread("Proxy Server Thread") {
-				public void run() {
-					String cmd;
-					
-					Runtime rt = Runtime.getRuntime ();
-					
-					cmd = proxyPath2 + " --port="+getSessionPort();
-					
-					System.out.println("RUNNING PROXY SERVER COMMAND: '"+cmd+"'");
-					
-					try {
-						Process process = rt.exec(cmd);
-						InputStreamReader reader = new InputStreamReader (process.getErrorStream());
-						BufferedReader buf_reader = new BufferedReader (reader);
+			if (preferences.getBoolean(PreferenceConstants.ORTE_LAUNCH_MANUALLY)) {
+			} else {
+				Thread runThread = new Thread("Proxy Server Thread") {
+					public void run() {
+						String cmd;
 						
-						String line = buf_reader.readLine();
-						if (line != null) {
-							CoreUtils.showErrorDialog("Running Proxy Server", line, null);
+						Runtime rt = Runtime.getRuntime ();
+						
+						cmd = proxyPath2 + " --port="+getSessionPort();
+						
+						System.out.println("RUNNING PROXY SERVER COMMAND: '"+cmd+"'");
+						
+						try {
+							Process process = rt.exec(cmd);
+							InputStreamReader reader = new InputStreamReader (process.getErrorStream());
+							BufferedReader buf_reader = new BufferedReader (reader);
+							
+							String line = buf_reader.readLine();
+							if (line != null) {
+								CoreUtils.showErrorDialog("Running Proxy Server", line, null);
+							}
+							/*
+							String line;
+							while ((line = buf_reader.readLine ()) != null) {
+								System.out.println ("ORTE PROXY SERVER: "+line);
+							}
+							*/
+						} catch(IOException e) {
+							String err;
+							err = "Error running proxy server with command: '"+cmd+"'.";
+							e.printStackTrace();
+							System.out.println(err);
+							CoreUtils.showErrorDialog("Running Proxy Server", err, null);
 						}
-						/*
-						String line;
-						while ((line = buf_reader.readLine ()) != null) {
-							System.out.println ("ORTE PROXY SERVER: "+line);
-						}
-						*/
-					} catch(IOException e) {
-						String err;
-						err = "Error running proxy server with command: '"+cmd+"'.";
-						e.printStackTrace();
-						System.out.println(err);
-						CoreUtils.showErrorDialog("Running Proxy Server", err, null);
 					}
-				}
-			};
-			runThread.start();
+				};
+				runThread.start();
+			}
 			
 			System.out.println("Waiting on accept.");
 			waitForRuntimeEvent();
