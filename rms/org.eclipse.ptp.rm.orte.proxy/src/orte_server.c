@@ -16,21 +16,33 @@
  * 
  * LA-CC 04-115
  ******************************************************************************/
- 
+
+#include "orte_config.h" 
+
+/*
+ * Need to undef these if we include
+ * two config.h files
+ */
+#undef PACKAGE_BUGREPORT
+#undef PACKAGE_NAME
+#undef PACKAGE_STRING
+#undef PACKAGE_TARNAME
+#undef PACKAGE_VERSION
 #include "config.h"
 
 #include <getopt.h>
+#include <unistd.h>
+#include <grp.h>
+#include <pwd.h>
+#include <stdbool.h>
+#include <errno.h>
+
 #include <proxy.h>
 #include <proxy_tcp.h>
 #include <proxy_event.h>
 #include <handler.h>
-#include "orte_config.h"
-#include <stdbool.h>
-#include <errno.h>
 #include <list.h>
 #include <args.h>
-#include <grp.h>
-#include <pwd.h>
 
 #include "include/orte_constants.h"
 #include "mca/errmgr/errmgr.h"
