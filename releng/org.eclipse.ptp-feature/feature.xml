@@ -21,8 +21,24 @@
    <requires>
       <import plugin="org.eclipse.cdt.debug.core"/>
       <import plugin="org.eclipse.cdt.ui"/>
-      <import plugin="org.eclipse.cdt.debug.ui"/>
       <import plugin="org.eclipse.cdt.managedbuilder.core"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.debug.core"/>
+      <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="org.eclipse.search"/>
+      <import plugin="org.eclipse.ui.console"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.ui.forms"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.cdt.debug.mi.core"/>
+      <import plugin="org.eclipse.cdt.launch"/>
+      <import plugin="org.eclipse.cdt.debug.mi.ui"/>
+      <import plugin="org.eclipse.help"/>
    </requires>
 
    <plugin
@@ -34,13 +50,6 @@
 
    <plugin
          id="org.eclipse.ptp.debug.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.debug.external"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -62,6 +71,26 @@
 
    <plugin
          id="org.eclipse.ptp.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.ptp.debug.external.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.debug.external.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.help"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
