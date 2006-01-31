@@ -30,6 +30,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.core.IModelManager;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
+import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.PTPUIPlugin;
@@ -178,16 +179,24 @@ public abstract class AbstractUIManager implements IManager {
 		return (job == null || job.isAllStop());
 	}
 	public IPJob findJob(String job_name) {
-		return modelManager.getUniverse().findJobByName(job_name);
+		IPUniverse universe = modelManager.getUniverse();
+		if (universe == null)
+			return null;
+		return universe.findJobByName(job_name);
 	}
 	public IPJob findJobById(String job_id) {
-		IPElement element = modelManager.getUniverse().findChild(job_id);
+		IPUniverse universe = modelManager.getUniverse();
+		if (universe == null)
+			return null;
+		IPElement element = universe.findChild(job_id);
 		if (element instanceof IPJob)
 			return (IPJob) element;
 		return null;
 	}
 	public void removeJob(IPJob job) {
-		modelManager.getUniverse().deleteJob(job);
+		IPUniverse universe = modelManager.getUniverse();
+		if (universe != null)
+			universe.deleteJob(job);
 	}
 	public void removeAllStoppedJobs() {
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
@@ -195,14 +204,17 @@ public abstract class AbstractUIManager implements IManager {
 				if (pmonitor == null)
 					pmonitor = new NullProgressMonitor();
 				try {
-					IPJob[] jobs = modelManager.getUniverse().getJobs();
-					pmonitor.beginTask("Removing stopped jobs...", jobs.length);
-					for (int i = 0; i < jobs.length; i++) {
-						if (pmonitor.isCanceled())
-							throw new InvocationTargetException(new Exception("Cancelled by user"));
-						if (jobs[i].isAllStop())
-							removeJob(jobs[i]);
-						pmonitor.worked(1);
+					IPUniverse universe = modelManager.getUniverse();
+					if (universe != null) {
+						IPJob[] jobs = universe.getJobs();
+						pmonitor.beginTask("Removing stopped jobs...", jobs.length);
+						for (int i = 0; i < jobs.length; i++) {
+							if (pmonitor.isCanceled())
+								throw new InvocationTargetException(new Exception("Cancelled by user"));
+							if (jobs[i].isAllStop())
+								removeJob(jobs[i]);
+							pmonitor.worked(1);
+						}
 					}
 				} finally {
 					pmonitor.done();
@@ -219,7 +231,11 @@ public abstract class AbstractUIManager implements IManager {
 		}
 	}
 	public boolean hasStoppedJob() {
-		IPJob[] jobs = modelManager.getUniverse().getJobs();
+		IPUniverse universe = modelManager.getUniverse();
+		if (universe == null)
+			return false;
+		
+		IPJob[] jobs = universe.getJobs();
 		for (int i = 0; i < jobs.length; i++) {
 			if (jobs[i].isAllStop())
 				return true;
