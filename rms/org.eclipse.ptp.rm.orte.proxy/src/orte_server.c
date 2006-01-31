@@ -37,6 +37,9 @@
 #include <stdbool.h>
 #include <errno.h>
 
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include <proxy.h>
 #include <proxy_tcp.h>
 #include <proxy_event.h>
@@ -362,7 +365,7 @@ bproc_notify_callback(orte_gpr_notify_data_t *data, void *cbdata)
 int 
 ORTE_Subscribe_Bproc(void)
 {
-	int i, rc, ret;
+	int i, rc;
 	orte_gpr_subscription_t sub, *subs;
 	orte_gpr_value_t value, *values;
 	
@@ -808,7 +811,7 @@ debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_co
 	for (i = 0; i < argc; i++) {
 		debug_context[0]->argv[i] = strdup(argv[i]);
 	}
-	asprintf(&debug_context[0]->argv[i++], "--jobid=%d", app_jobid);
+	asprintf(&debug_context[0]->argv[i++], "--jobid=%d", (int)app_jobid);
 	debug_context[0]->argv[i++] = NULL;
 	debug_context[0]->argc = i;
 
@@ -940,7 +943,7 @@ ORTERun(char **args)
 
 	printf("NEW JOBID = %d\n", (int)jobid); fflush(stdout);
 	
-	asprintf(&res, "%d %d", RTEV_NEWJOB, jobid);
+	asprintf(&res, "%d %d", RTEV_NEWJOB, (int)jobid);
 	printf("res = '%s'\n", res); fflush(stdout);
 	proxy_svr_event_callback(orte_proxy, res);
 
@@ -979,7 +982,7 @@ static void iof_callback(
          * src_name->vpid = processID */
         //write(STDOUT_FILENO, data, count);
         proxy_cstring_to_str(line, &str);
-        asprintf(&res, "%d %d %d %s", RTEV_PROCOUT, src_name->jobid, src_name->vpid, str);
+        asprintf(&res, "%d %d %d %s", RTEV_PROCOUT, (int)src_name->jobid, (int)src_name->vpid, str);
         proxy_svr_event_callback(orte_proxy, res);
         free(res);
         free(str);
