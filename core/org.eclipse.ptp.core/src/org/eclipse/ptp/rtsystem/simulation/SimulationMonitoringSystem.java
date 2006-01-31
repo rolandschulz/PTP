@@ -24,19 +24,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
-import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.internal.core.CoreUtils;
 import org.eclipse.ptp.rtsystem.IMonitoringSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
-import org.eclipse.swt.widgets.Display;
 
 public class SimulationMonitoringSystem implements IMonitoringSystem {
 	protected List listeners = new ArrayList(2);
@@ -58,17 +53,13 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 		int prefNumMachines = preferences.getInt(PreferenceConstants.SIMULATION_NUM_MACHINES);
 		System.out.println("User selected "+prefNumMachines+" simulated machines.");
 		if(prefNumMachines < 1) {
-			int i = 1;
-			preferences.setValue(PreferenceConstants.SIMULATION_NUM_MACHINES, i);
-			i = 256;
-			preferences.setValue(PreferenceConstants.SIMULATION_MACHINE_NODE_PREFIX + "0", i);
+			preferences.setValue(PreferenceConstants.SIMULATION_NUM_MACHINES, 1);
+			preferences.setValue(PreferenceConstants.SIMULATION_MACHINE_NODE_PREFIX + "0", 256);
 			prefNumMachines = 1;
 
 			PTPCorePlugin.getDefault().savePluginPreferences();
 
-			CoreUtils.showWarningDialog(Display.getDefault().getActiveShell(), "Default Simulation Num Machines Set",
-				"No existing / invalid number of machines to to simulate detected.  Default "+
-				"number of machines set to 1.  Set using the PTP preferences -> simulation page.", CoreUtils.ASYNC);
+			PTPCorePlugin.errorDialog("Default Simulation Num Machines Sete", "No existing / invalid number of machines to to simulate detected.  Default " + "number of machines set to 1.  Set using the PTP preferences -> simulation page.", null);
 			numNodes = new int[1];
 			numNodes[0] = 256;
 		}

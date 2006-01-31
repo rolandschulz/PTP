@@ -19,10 +19,8 @@
 package org.eclipse.ptp.internal.core;
 
 import java.util.HashMap;
-
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.IDGenerator;
 import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.search.ui.ISearchPageScoreComputer;
@@ -136,8 +134,9 @@ public abstract class PElement extends PlatformObject implements IPElement, Comp
 	}
 
 	public int computeScore(String pageId, Object element) {
-		if (!CoreUtils.PTP_SEARCHPAGE_ID.equals(pageId))
-			return ISearchPageScoreComputer.UNKNOWN;
+		//FIXME
+		//if (!CoreUtils.PTP_SEARCHPAGE_ID.equals(pageId))
+			//return ISearchPageScoreComputer.UNKNOWN;
 
 		if (element instanceof IPElement)
 			return 90;

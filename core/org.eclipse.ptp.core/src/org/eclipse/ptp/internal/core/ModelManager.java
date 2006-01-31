@@ -55,7 +55,6 @@ import org.eclipse.ptp.rtsystem.ompi.OMPIMonitoringSystem;
 import org.eclipse.ptp.rtsystem.ompi.OMPIProxyRuntimeClient;
 import org.eclipse.ptp.rtsystem.simulation.SimulationControlSystem;
 import org.eclipse.ptp.rtsystem.simulation.SimulationMonitoringSystem;
-import org.eclipse.swt.widgets.Display;
 
 public class ModelManager implements IModelManager, IRuntimeListener {
 	protected List listeners = new ArrayList(2);
@@ -103,22 +102,15 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		System.out.println("Your Control System Choice: '"+CSChoice+"'");
 		System.out.println("Your Monitoring System Choice: '"+MSChoice+"'");
 		
-		if(ControlSystemChoices.getCSArrayIndexByID(CSChoiceID) == -1 ||
-		   MonitoringSystemChoices.getMSArrayIndexByID(MSChoiceID) == -1)
-		{
-			Preferences p = PTPCorePlugin.getDefault().getPluginPreferences();
-
+		if(ControlSystemChoices.getCSArrayIndexByID(CSChoiceID) == -1 || MonitoringSystemChoices.getMSArrayIndexByID(MSChoiceID) == -1) {
 			int MSI = MonitoringSystemChoices.ORTE;
 			int CSI = ControlSystemChoices.ORTE;
-				
+			Preferences p = PTPCorePlugin.getDefault().getPluginPreferences();
 			p.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSI);
 			p.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSI);
-
 			PTPCorePlugin.getDefault().savePluginPreferences();
 
-			CoreUtils.showWarningDialog(Display.getDefault().getActiveShell(), "Default Runtime System Set",
-				"No existing / invalid control or monitoring system detected.  "+
-				"Default systems set to Open Runtime Environment (ORTE).  To change, use the Window->Preferences->PTP preferences page.", CoreUtils.ASYNC);
+			PTPCorePlugin.errorDialog("Default Runtime System Set", "No existing / invalid control or monitoring system detected.  " + "Default systems set to Open Runtime Environment (ORTE).  To change, use the Window->Preferences->PTP preferences page.", null);
 			
 			MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
 			MSChoice = MonitoringSystemChoices.getMSNameByID(MSChoiceID);
@@ -128,7 +120,6 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			System.out.println("Your Control System Choice: '"+CSChoice+"'");
 			System.out.println("Your Monitoring System Choice: '"+MSChoice+"'");
 		}
-
 		//refreshRuntimeSystems(CSChoiceID, MSChoiceID);
 	}
 	
@@ -239,7 +230,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			currentControlSystem = controlSystemID;
 			currentMonitoringSystem = monitoringSystemID;
 		} finally {
-			monitor.done();
+			if (!monitor.isCanceled())
+				monitor.done();
 		}
 	}
 

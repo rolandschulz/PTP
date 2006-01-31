@@ -19,7 +19,7 @@
 
 package org.eclipse.ptp.rtsystem.ompi;
 
-import org.eclipse.ptp.internal.core.CoreUtils;
+import org.eclipse.ptp.core.PTPCorePlugin;
 
 public class OMPIJNIBroker {
 	
@@ -100,7 +100,7 @@ public class OMPIJNIBroker {
         				"-Djava.library.path=[home directory]/[eclipse workspace]/org.eclipse.ptp.core/ompi";
         		System.err.println(str);
         		System.out.println(e);
-        		CoreUtils.showErrorDialog("Dynamic Library Load Failed", str, null);
+        		PTPCorePlugin.errorDialog("Dynamic Library Load Failed", str, e);
         		successful_load = false;
         }
 	}
