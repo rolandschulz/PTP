@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.BitSet;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.ControlSystemChoices;
@@ -24,8 +23,6 @@ import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNodeAttributeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeNodesEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessAttributeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessesEvent;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRuntimeProxy, IProxyRuntimeEventListener {
 	protected Queue events = new Queue();
@@ -120,16 +117,11 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 			} else {
 				Thread runThread = new Thread("Proxy Server Thread") {
 					public void run() {
-						String cmd;
-						
-						Runtime rt = Runtime.getRuntime ();
-						
-						cmd = proxyPath2 + " --port="+getSessionPort();
-						
+						String cmd = proxyPath2 + " --port="+getSessionPort();
 						System.out.println("RUNNING PROXY SERVER COMMAND: '"+cmd+"'");
 						
 						try {
-							Process process = rt.exec(cmd);
+							Process process = Runtime.getRuntime ().exec(cmd);
 							InputStreamReader reader = new InputStreamReader (process.getErrorStream());
 							BufferedReader buf_reader = new BufferedReader (reader);
 							
@@ -137,17 +129,8 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 							if (line != null) {
 								CoreUtils.showErrorDialog("Running Proxy Server", line, null);
 							}
-							/*
-							String line;
-							while ((line = buf_reader.readLine ()) != null) {
-								System.out.println ("ORTE PROXY SERVER: "+line);
-							}
-							*/
 						} catch(IOException e) {
-							String err;
-							err = "Error running proxy server with command: '"+cmd+"'.";
-							e.printStackTrace();
-							System.out.println(err);
+							String err = "Error running proxy server with command: '"+cmd+"'.";
 							CoreUtils.showErrorDialog("Running Proxy Server", err, null);
 						}
 					}
@@ -162,7 +145,12 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 			}
 		} catch (IOException e) {
 			System.err.println("Exception starting up proxy. :(");
-			System.exit(1);
+			try {
+				sessionFinish();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			return false;
 		}
 		
 		try {
@@ -170,10 +158,13 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 			sendCommand("STARTDAEMON");
 			waitForRuntimeEvent();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			try {
+				sessionFinish();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			return false;
 		}
-		
 		return true;
 	}
 
