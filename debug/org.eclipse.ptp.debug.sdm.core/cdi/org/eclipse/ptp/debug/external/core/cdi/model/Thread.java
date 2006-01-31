@@ -138,11 +138,7 @@ public class Thread extends PObject implements IPCDIThread {
 	}
 	public IPCDIStackFrame[] getStackFrames(int low, int high) throws PCDIException {
 		if (currentFrames == null || currentFrames.size() < high) {
-			try {
-				getStackFrames();
-			} catch (PCDIException e) {
-				throw new PCDIException(e.getMessage());
-			}
+			getStackFrames();
 		}
 		List list = ((high - low + 1) <= currentFrames.size()) ? currentFrames.subList(low, high + 1) : currentFrames;
 		return (IPCDIStackFrame[])list.toArray(noStack);
