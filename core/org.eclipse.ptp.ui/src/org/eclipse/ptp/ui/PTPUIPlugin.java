@@ -42,6 +42,7 @@ import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.internal.ui.JobManager;
 import org.eclipse.ptp.internal.ui.MachineManager;
 import org.eclipse.ptp.ui.preferences.IPreferencesListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -212,11 +213,40 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	}
 	
 	/***** LOG *****/
+	public static void log(String msg) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, msg, null));
+	}
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
 	}
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e));
+	}
+	public static Display getDisplay() {
+		Display display= Display.getCurrent();
+		if (display == null) {
+			display= Display.getDefault();
+		}
+		return display;		
+	}		
+	public static void errorDialog(Shell shell, String title, String message, Throwable t) {
+		IStatus status;
+		if (t instanceof CoreException) {
+			status = ((CoreException)t).getStatus();
+		} else {
+			status = new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Error within PTP UI: ", t);
+			log(status);	
+		}
+		errorDialog(shell, title, message, status);
+	}
+	public static void errorDialog(Shell shell, String title, IStatus s) {
+		errorDialog(shell, title, s.getMessage(), s);
+	}
+	public static void errorDialog(Shell shell, String title, String message, IStatus s) {
+		if (s != null && message != null && message.equals(s.getMessage()))
+			message = null;
+
+		ErrorDialog.openError(shell, title, message, s);
 	}
 
 	public void refreshRuntimeSystem(boolean queue, boolean force) {
