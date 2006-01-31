@@ -127,11 +127,13 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 							
 							String line = buf_reader.readLine();
 							if (line != null) {
-								CoreUtils.showErrorDialog("Running Proxy Server", line, null);
+								PTPCorePlugin.log(line);
+								//CoreUtils.showErrorDialog("Running Proxy Server", line, null);
 							}
 						} catch(IOException e) {
-							String err = "Error running proxy server with command: '"+cmd+"'.";
-							CoreUtils.showErrorDialog("Running Proxy Server", err, null);
+							PTPCorePlugin.log(e);
+							//String err = "Error running proxy server with command: '"+cmd+"'.";
+							//CoreUtils.showErrorDialog("Running Proxy Server", err, null);
 						}
 					}
 				};
