@@ -19,6 +19,7 @@
 package org.eclipse.ptp.ui.views;
 
 import java.util.Iterator;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ptp.ui.IManager;
@@ -88,7 +89,6 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		canvas.setImageProvider(this);
 		canvas.setToolTipProvider(this);
 		canvas.addActionListener(this);
-		canvas.setDisplayRuler(PTPUIPlugin.getDefault().getPluginPreferences().getBoolean(IPTPUIConstants.SHOW_RULER));
 		PTPUIPlugin.getDefault().addPreferenceListener(this);
 		return composite;
 	}
@@ -195,10 +195,10 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	public void setDisplayRuler(final boolean showRuler) {
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				updateView(null);
 				if (!canvas.isDisposed()) {
 					canvas.setDisplayRuler(showRuler);
 				}
+				updateView(null);
 			}
 		});
 	}
@@ -209,6 +209,17 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		return false;
 	}
 	public void preferenceUpdated() {
-		//setDisplayRuler(PTPUIPlugin.getDefault().getPluginPreferences().getBoolean(IPTPUIConstants.SHOW_RULER));
+		getDisplay().asyncExec(new Runnable() {
+			public void run() {
+				if (!canvas.isDisposed()) {
+					IPreferenceStore store = PTPUIPlugin.getDefault().getPreferenceStore();
+					canvas.setIconSpace(store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_X), store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_Y));
+					canvas.setIconSize(store.getInt(IPTPUIConstants.VIEW_ICON_WIDTH), store.getInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
+					canvas.setTooltipTimeout(store.getLong(IPTPUIConstants.VIEW_TOOLTIP));
+					canvas.resetCanvas();
+				}
+				updateView(null);
+			}
+		});
 	}
 }

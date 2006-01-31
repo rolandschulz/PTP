@@ -209,12 +209,12 @@ public class ParallelJobView extends AbstractParallelSetView {
 		buffer.append(" Task ID: " + proc.getTaskId());
 		buffer.append("\n");
 		buffer.append(" Process ID: " + proc.getPid());
-		IElementSet[] groups = setManager.getSetsWithElement(element.getID());
-		if (groups.length > 1)
-			buffer.append("\n Group: ");
-		for (int i = 1; i < groups.length; i++) {
-			buffer.append(groups[i].getID());
-			if (i < groups.length - 1)
+		IElementSet[] sets = setManager.getSetsWithElement(element.getID());
+		if (sets.length > 1)
+			buffer.append("\n Set: ");
+		for (int i = 1; i < sets.length; i++) {
+			buffer.append(sets[i].getID());
+			if (i < sets.length - 1)
 				buffer.append(",");
 		}
 		// buffer.append("\nStatus: " + getJobManager().getProcessStatusText(proc));
