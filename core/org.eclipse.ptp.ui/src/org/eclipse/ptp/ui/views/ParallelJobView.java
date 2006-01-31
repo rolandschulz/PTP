@@ -305,6 +305,8 @@ public class ParallelJobView extends AbstractParallelSetView {
 	}
 	public void monitoringSystemChangeEvent(Object object) {
 		System.out.println("------------ job monitoringSystemChangeEvent");
+		manager.clear();
+		initialView();
 		refresh();
 	}
 	public void execStatusChangeEvent(Object object) {

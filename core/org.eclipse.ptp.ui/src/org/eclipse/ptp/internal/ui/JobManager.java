@@ -42,7 +42,7 @@ import org.eclipse.ptp.ui.model.internal.ElementHandler;
  * 
  */
 public class JobManager extends AbstractUIManager implements IProcessListener {
-	protected Map jobList = null;
+	protected Map jobList = new HashMap();
 	protected String cur_job_id = EMPTY_ID;
 	protected List jobChangeListeners = new ArrayList();
 
@@ -75,7 +75,6 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	public void clear() {
 		if (jobList != null) {
 			jobList.clear();
-			jobList = null;
 		}
 	}
 	public IPJob[] getJobs() {
@@ -172,11 +171,8 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		}
 	}
 	public String initial() {
-		if (jobList == null)
-			jobList = new HashMap();
-
-		String last_job_id = EMPTY_ID;
 		IPJob[] jobs = getJobs();
+		String last_job_id = EMPTY_ID;
 		if (jobs.length > 0) {
 			// focus on last job
 			last_job_id = jobs[jobs.length - 1].getIDString();
@@ -224,5 +220,10 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 	}
 	public void terminateAll(String job_id) throws CoreException {
 		modelManager.abortJob(getName(job_id));
+	}
+	
+	public void removeJob(IPJob job) {
+		jobList.remove(job.getIDString());
+		super.removeJob(job);
 	}
 }
