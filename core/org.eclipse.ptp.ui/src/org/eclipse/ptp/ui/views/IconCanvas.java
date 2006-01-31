@@ -1354,7 +1354,7 @@ public class IconCanvas extends Canvas {
 		}
 		if (hoverTimer != null) {
 			hoverTimer.cancel();
-			hoverTimer.purge();
+			//hoverTimer.purge();
 			hoverTimer = null;
 		}
 	}	
