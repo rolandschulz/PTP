@@ -40,7 +40,6 @@ import org.eclipse.ptp.core.NodeEvent;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.ProcessEvent;
-import org.eclipse.ptp.internal.core.CoreUtils;
 import org.eclipse.ptp.internal.core.OutputTextFile;
 import org.eclipse.ptp.internal.core.PElement;
 import org.eclipse.ptp.internal.core.PElementInfo;
@@ -413,8 +412,9 @@ public class SimProcess extends Process implements IPProcess, IPElement, Compara
 		return 0;
 	}
 	public int computeScore(String pageId, Object element) {
-		if (!CoreUtils.PTP_SEARCHPAGE_ID.equals(pageId))
-			return ISearchPageScoreComputer.UNKNOWN;
+		//FIXME
+		//if (!CoreUtils.PTP_SEARCHPAGE_ID.equals(pageId))
+			//return ISearchPageScoreComputer.UNKNOWN;
 		if (element instanceof IPElement)
 			return 90;
 		return ISearchPageScoreComputer.LOWEST;

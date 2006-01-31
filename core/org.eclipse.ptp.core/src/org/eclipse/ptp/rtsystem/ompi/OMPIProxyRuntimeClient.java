@@ -12,7 +12,6 @@ import org.eclipse.ptp.core.MonitoringSystemChoices;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.Queue;
-import org.eclipse.ptp.internal.core.CoreUtils;
 import org.eclipse.ptp.rtsystem.IRuntimeProxy;
 import org.eclipse.ptp.rtsystem.proxy.ProxyRuntimeClient;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
@@ -84,7 +83,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		return ((ProxyRuntimeNodeAttributeEvent)event).getValues();
 	}
 	
-	public boolean startup(IProgressMonitor monitor) {
+	public boolean startup(final IProgressMonitor monitor) {
 		System.out.println("OMPIProxyRuntimeClient - firing up proxy, waiting for connecting.  Please wait!  This can take a minute . . .");
 		
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
@@ -95,7 +94,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 				"PTP/Open RTE preferences page and be certain that the path and arguments "+
 				"are correct.  Defaulting to Simulation Mode.";
 			System.err.println(err);
-			CoreUtils.showErrorDialog("ORTE Server Start Failure", err, null);
+			PTPCorePlugin.errorDialog("ORTE Server Start Failure", err, null);
 
 			int MSI = MonitoringSystemChoices.SIMULATED;
 			int CSI = ControlSystemChoices.SIMULATED;
@@ -127,13 +126,16 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 							
 							String line = buf_reader.readLine();
 							if (line != null) {
-								PTPCorePlugin.log(line);
-								//CoreUtils.showErrorDialog("Running Proxy Server", line, null);
+								PTPCorePlugin.errorDialog("Running Proxy Server", line, null);
+								if (monitor != null) {
+									monitor.setCanceled(true);
+								}
 							}
 						} catch(IOException e) {
-							PTPCorePlugin.log(e);
-							//String err = "Error running proxy server with command: '"+cmd+"'.";
-							//CoreUtils.showErrorDialog("Running Proxy Server", err, null);
+							PTPCorePlugin.errorDialog("Running Proxy Server", null, e);
+							if (monitor != null) {
+								monitor.setCanceled(true);
+							}
 						}
 					}
 				};
@@ -141,29 +143,17 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 			}
 			
 			System.out.println("Waiting on accept.");
-			if (waitForRuntimeEvent(monitor) == null) {
-				sessionFinish();
-				return false;
-			}
+			waitForRuntimeEvent(monitor);
+
+			setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_OK);
+			sendCommand("STARTDAEMON");
+			waitForRuntimeEvent();
 		} catch (IOException e) {
 			System.err.println("Exception starting up proxy. :(");
 			try {
 				sessionFinish();
 			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			return false;
-		}
-		
-		try {
-			setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_OK);
-			sendCommand("STARTDAEMON");
-			waitForRuntimeEvent();
-		} catch (IOException e) {
-			try {
-				sessionFinish();
-			} catch (IOException e1) {
-				e1.printStackTrace();
+				PTPCorePlugin.log(e1);
 			}
 			return false;
 		}
@@ -179,7 +169,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 			System.out.println("OMPIProxyRuntimeClient shut down.");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			PTPCorePlugin.log(e);
 		}
 	}	
 
@@ -193,33 +183,31 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 	}
 
 	private synchronized IProxyRuntimeEvent waitForRuntimeEvent(IProgressMonitor monitor) throws IOException {
-    		IProxyRuntimeEvent event = null;
-    		
-    		System.out.println("OMPIProxyRuntimeClient waiting on " + waitEvents.toString());
-    		while (this.events.isEmpty()) {
-        		try {
-        			wait(500);
-        		} catch (InterruptedException e) {
-        		}
-        		if (monitor != null && monitor.isCanceled()) {
-        			return null;
-        		}
-    		}
-    		System.out.println("OMPIProxyRuntimeClient awoke!");
+		IProxyRuntimeEvent event = null;
+		
+		System.out.println("OMPIProxyRuntimeClient waiting on " + waitEvents.toString());
+		while (this.events.isEmpty()) {
     		try {
-    			event = (IProxyRuntimeEvent) this.events.removeItem();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    		if (event instanceof ProxyRuntimeErrorEvent) {
-    	   		waitEvents.clear();
-    			throw new IOException(((ProxyRuntimeErrorEvent)event).getErrorMessage());
+    			wait(500);
+    		} catch (InterruptedException e) {
     		}
-    		
-    		waitEvents.clear();
- 
-    		return event;
+    		if (monitor != null && monitor.isCanceled()) {
+    			throw new IOException("Cancelled by user");
+    		}
+		}
+		System.out.println("OMPIProxyRuntimeClient awoke!");
+		try {
+			event = (IProxyRuntimeEvent) this.events.removeItem();
+		} catch (InterruptedException e) {
+			waitEvents.clear();
+			throw new IOException(e.getMessage());
+		}
+   		if (event instanceof ProxyRuntimeErrorEvent) {
+   	   		waitEvents.clear();
+   			throw new IOException(((ProxyRuntimeErrorEvent)event).getErrorMessage());
+   		}
+   		waitEvents.clear();
+   		return event;
 	}
 
 	/*

@@ -20,39 +20,18 @@
 package org.eclipse.ptp.rtsystem.ompi;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
-import java.util.Set;
 import java.util.Vector;
-
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.ptp.core.AttributeConstants;
-import org.eclipse.ptp.core.ControlSystemChoices;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
-import org.eclipse.ptp.core.MonitoringSystemChoices;
-import org.eclipse.ptp.core.PTPCorePlugin;
-import org.eclipse.ptp.core.PreferenceConstants;
-import org.eclipse.ptp.core.proxy.event.IProxyEvent;
-import org.eclipse.ptp.core.proxy.event.IProxyEventListener;
-import org.eclipse.ptp.core.proxy.event.ProxyConnectedEvent;
-import org.eclipse.ptp.core.util.BitList;
-import org.eclipse.ptp.internal.core.CoreUtils;
-import org.eclipse.ptp.internal.core.PJob;
 import org.eclipse.ptp.rtsystem.IControlSystem;
 import org.eclipse.ptp.rtsystem.IRuntimeListener;
 import org.eclipse.ptp.rtsystem.JobRunConfiguration;
-import org.eclipse.ptp.rtsystem.NamedEntity;
 import org.eclipse.ptp.rtsystem.RuntimeEvent;
-import org.eclipse.ptp.rtsystem.proxy.ProxyRuntimeClient;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.IProxyRuntimeEventListener;
-import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeErrorEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeJobStateEvent;
 import org.eclipse.ptp.rtsystem.proxy.event.ProxyRuntimeProcessOutputEvent;
 

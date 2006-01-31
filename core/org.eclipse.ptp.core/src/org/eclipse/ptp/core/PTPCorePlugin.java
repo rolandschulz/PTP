@@ -20,9 +20,12 @@ package org.eclipse.ptp.core;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.ptp.internal.core.ModelManager;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -158,7 +161,39 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, "Internal Error", e));
 	}
-	
+	public static Display getDisplay() {
+		Display display= Display.getCurrent();
+		if (display == null) {
+			display= Display.getDefault();
+		}
+		return display;		
+	}		
+	public static void errorDialog(final String title, final String message, final Throwable t) {
+		getDisplay().syncExec(new Runnable() {
+			public void run() {
+				errorDialog(getDisplay().getActiveShell(), title, message, t);
+			}
+		});
+	}
+	public static void errorDialog(Shell shell, String title, String message, Throwable t) {
+		IStatus status;
+		if (t instanceof CoreException) {
+			status = ((CoreException)t).getStatus();
+		} else {
+			status = new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, "Error within PTP Core: ", t);
+			log(status);	
+		}
+		errorDialog(shell, title, message, status);
+	}
+	public static void errorDialog(Shell shell, String title, IStatus s) {
+		errorDialog(shell, title, s.getMessage(), s);
+	}
+	public static void errorDialog(Shell shell, String title, String message, IStatus s) {
+		if (s != null && message != null && message.equals(s.getMessage()))
+			message = null;
+
+		ErrorDialog.openError(shell, title, message, s);
+	}
 
 	/*
 	public void addPerspectiveListener(final IPerspectiveListener perspectiveListener) {
