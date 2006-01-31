@@ -48,11 +48,11 @@ public class FortranProcessor
     public Map parseForModel(InputStream inputStream, String filename, Boolean isFixedForm, TranslationUnit tu) throws Exception
     {
         boolean isFixedFormB = isFixedForm == null ? hasFixedFormFileExtension(filename) : isFixedForm.booleanValue();
-        long startTime = System.currentTimeMillis();
+        //long startTime = System.currentTimeMillis();
         Parser parser = new Parser();
         Map/*<FortranElement, FortranElementInfo>*/ newElements = (Map)parse(inputStream, filename, isFixedFormB, parser, BuildModelParserAction.getInstance());
-        long endTime = System.currentTimeMillis();
-        System.out.println("Parse time for " + filename + ": " + (endTime - startTime) + " ms");
+        //long endTime = System.currentTimeMillis();
+        //System.out.println("Parse time for " + filename + ": " + (endTime - startTime) + " ms");
         return newElements;
     }
 
