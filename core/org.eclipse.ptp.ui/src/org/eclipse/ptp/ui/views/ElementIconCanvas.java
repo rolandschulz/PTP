@@ -20,6 +20,9 @@ package org.eclipse.ptp.ui.views;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ptp.ui.IPTPUIConstants;
+import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementSet;
 import org.eclipse.swt.widgets.Composite;
@@ -33,6 +36,10 @@ public class ElementIconCanvas extends IconCanvas {
 
 	public ElementIconCanvas(AbstractParallelElementView view, Composite parent, int style) {
 		super(parent, style);
+		IPreferenceStore store = PTPUIPlugin.getDefault().getPreferenceStore();
+		setIconSpace(store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_X), store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_Y));
+		setIconSize(store.getInt(IPTPUIConstants.VIEW_ICON_WIDTH), store.getInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
+		setTooltipTimeout(store.getLong(IPTPUIConstants.VIEW_TOOLTIP));
 	}
 	public void dispose() {
 		super.dispose();

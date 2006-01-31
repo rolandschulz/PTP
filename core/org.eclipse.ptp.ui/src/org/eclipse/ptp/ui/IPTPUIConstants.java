@@ -69,5 +69,14 @@ public interface IPTPUIConstants {
 	public static final int STATUS_CODE_ERROR = 10002;
 	
 	//preferences
-	public static final String SHOW_RULER = "showRuler";
+	public static final String VIEW_ICON_SPACING_X = "icon_spacing_x";
+	public static final String VIEW_ICON_SPACING_Y = "icon_spacing_y";
+	public static final String VIEW_ICON_WIDTH = "icon_width";
+	public static final String VIEW_ICON_HEIGHT = "icon_height";
+	public static final String VIEW_TOOLTIP = "tooltip";
+	public static final int DEFAULT_VIEW_ICON_SPACING_X = 4;
+	public static final int DEFAULT_VIEW_ICON_SPACING_Y = 4;
+	public static final int DEFAULT_VIEW_ICON_WIDTH = 16;
+	public static final int DEFAULT_VIEW_ICON_HEIGHT = 16;
+	public static final long DEFAULT_VIEW_TOOLTIP = 5000;
 }

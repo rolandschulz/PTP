@@ -216,12 +216,12 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		//buffer.append(" Node name: " + node.getAttrib(AttributeConstants.ATTRIB_NODE_NAME));
 		//buffer.append(" (ID: "+node.getNodeNumber()+")");
 		buffer.append(" "+node.getAttrib(AttributeConstants.ATTRIB_NODE_NAME));
-		IElementSet[] groups = setManager.getSetsWithElement(element.getID());
-		if (groups.length > 1)
-			buffer.append("\n Group: ");
-		for (int i = 1; i < groups.length; i++) {
-			buffer.append(groups[i].getID());
-			if (i < groups.length - 1)
+		IElementSet[] sets = setManager.getSetsWithElement(element.getID());
+		if (sets.length > 1)
+			buffer.append("\n Set: ");
+		for (int i = 1; i < sets.length; i++) {
+			buffer.append(sets[i].getID());
+			if (i < sets.length - 1)
 				buffer.append(",");
 		}
 		// buffer.append("\nStatus: " + getMachineManager().getNodeStatusText(node));

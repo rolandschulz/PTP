@@ -22,23 +22,96 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 
 /**
  * @author Clement chu
  * 
  */
 public class PTPViewerPreferencesPage extends AbstractPerferencePage {
-	private Button showRulerButton = null;
+	private IconIntFieldEditor iconSpacingXField = null;
+	private IconIntFieldEditor iconSpacingYField = null;
+	private IconIntFieldEditor iconWidthField = null;
+	private IconIntFieldEditor iconHeightField = null;
+	private IconIntFieldEditor toolTipField = null;
+	
+	private class IconIntFieldEditor {
+		private int textLimit = 5;
+		private String labelText = null;
+		private int min = 0;
+		private int max = 10;
+		private Text textField = null;		
+		private String msg = "";
+		
+		IconIntFieldEditor(String labelText, int min, int max, Composite parent) {
+			this.labelText = labelText;
+			this.min = min;
+			this.max = max;
+			createControl(parent);
+		}
+		protected void createControl(Composite parent) {
+			doFillIntoGrid(parent);
+		}
+		protected void doFillIntoGrid(Composite parent) {
+			new Label(parent, SWT.LEFT).setText(labelText);
+            
+			textField = new Text(parent, SWT.SINGLE | SWT.BORDER);
+            textField.setFont(parent.getFont());
+            textField.setTextLimit(textLimit);
+            textField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        	textField.addModifyListener(new ModifyListener() {
+        		public void modifyText(ModifyEvent e) {
+        			PTPViewerPreferencesPage.this.isValid();
+        		}	        		
+        	});
+			
+			new Label(parent, SWT.RIGHT).setText("(" + min + "-" + max + ")");
+		}
+	    public void setValue(int value) {
+	        if (textField != null) {
+	        	textField.setText(String.valueOf(value));
+	        }
+	    }
+	    public int getValue() {
+	    	try {
+	    		return Integer.parseInt(textField.getText());
+	    	} catch (NumberFormatException e) {
+	    		return 0;
+	    	}
+	    }
+	    public void setErrorMessage(String msg) {
+	    	this.msg = msg;
+	    }
+	    public String getErrorMessage() {
+	    	return msg;
+	    }
+	    public boolean isValid() {
+	    	setErrorMessage("");
+	    	try {
+	    		int value = Integer.parseInt(textField.getText());
+	    		if (value < min || value > max) {
+	    			setErrorMessage("Value must be in the range of (" + min + "-" + max + ")");
+	    			return false;
+	    		}
+	    	} catch (NumberFormatException e) {
+	    		setErrorMessage("Value must be integer: " + e.getMessage());
+	    		return false;
+	    	}
+	    	return true;
+	    }
+	}
 	
 	public PTPViewerPreferencesPage() {
 		super();
 		setPreferenceStore(PTPUIPlugin.getDefault().getPreferenceStore());
-		setDescription(PreferenceMessages.getString("PTPViewerPreferencesPage.desc"));
+		setDescription(PreferenceMessages.getString("PTPViewerPreferencePage.desc"));
 	}
 	
 	protected Control createContents(Composite parent) {
@@ -55,21 +128,29 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 		composite.setLayoutData(data);
 		createSpacer(composite, 1);
 		createViewSettingPreferences(composite);
-		defaultSetting();
 		setValues();
 		return composite;
 	}
 	protected void createViewSettingPreferences(Composite parent) {
-		Composite comp = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PTPViewerPreferencesPage.genName"));
-		showRulerButton = createCheckButton(comp, PreferenceMessages.getString("PTPViewerPreferencesPage.displayRuler"));
-	}
-	protected void defaultSetting() {
-		IPreferenceStore store = getPreferenceStore();
-		store.setDefault(IPTPUIConstants.SHOW_RULER, true);
+		Composite group = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PTPViewerPreferencesPage.iconName"));
+		Composite compIcon = createComposite(group, 3);
+
+		iconSpacingXField = new IconIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_spacing_x"), 1, 10, compIcon);
+		iconSpacingYField = new IconIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_spacing_y"), 1, 10, compIcon);
+
+		iconWidthField = new IconIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_width"), 12, 100, compIcon);
+		iconHeightField = new IconIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.icon_height"), 12, 100, compIcon);
+		
+		Composite compToolTip = createComposite(parent, 3);
+		toolTipField = new IconIntFieldEditor(PreferenceMessages.getString("PTPViewerPreferencesPage.tooltip"), 1000, 10000, compToolTip);
 	}
 	public void performDefaults() { 
 		IPreferenceStore store = getPreferenceStore();
-		showRulerButton.setSelection(store.getBoolean(IPTPUIConstants.SHOW_RULER));
+		iconSpacingXField.setValue(store.getDefaultInt(IPTPUIConstants.VIEW_ICON_SPACING_X));
+		iconSpacingYField.setValue(store.getDefaultInt(IPTPUIConstants.VIEW_ICON_SPACING_Y));
+		iconWidthField.setValue(store.getDefaultInt(IPTPUIConstants.VIEW_ICON_WIDTH));
+		iconHeightField.setValue(store.getDefaultInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
+		toolTipField.setValue((int)store.getDefaultLong(IPTPUIConstants.VIEW_TOOLTIP));
 		super.performDefaults();
 	}
 	public boolean performOk() {
@@ -81,10 +162,44 @@ public class PTPViewerPreferencesPage extends AbstractPerferencePage {
 	
 	protected void setValues() {
 		IPreferenceStore store = getPreferenceStore();
-		showRulerButton.setSelection(store.getBoolean(IPTPUIConstants.SHOW_RULER));
+		iconSpacingXField.setValue(store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_X));
+		iconSpacingYField.setValue(store.getInt(IPTPUIConstants.VIEW_ICON_SPACING_Y));
+		iconWidthField.setValue(store.getInt(IPTPUIConstants.VIEW_ICON_WIDTH));
+		iconHeightField.setValue(store.getInt(IPTPUIConstants.VIEW_ICON_HEIGHT));
+		toolTipField.setValue((int)store.getLong(IPTPUIConstants.VIEW_TOOLTIP));
 	}
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
-		store.setValue(IPTPUIConstants.SHOW_RULER, showRulerButton.getSelection());
+		store.setValue(IPTPUIConstants.VIEW_ICON_SPACING_X, iconSpacingXField.getValue());
+		store.setValue(IPTPUIConstants.VIEW_ICON_SPACING_Y, iconSpacingYField.getValue());
+		store.setValue(IPTPUIConstants.VIEW_ICON_WIDTH, iconWidthField.getValue());
+		store.setValue(IPTPUIConstants.VIEW_ICON_HEIGHT, iconHeightField.getValue());
+		store.setValue(IPTPUIConstants.VIEW_TOOLTIP, (long)toolTipField.getValue());
 	}
+	
+	public boolean isValid() {
+		setErrorMessage(null);
+		setMessage(null);
+		if (!iconSpacingXField.isValid()) {
+			setErrorMessage(iconSpacingXField.getErrorMessage());
+			return false;
+		}
+		if (!iconSpacingYField.isValid()) {
+			setErrorMessage(iconSpacingYField.getErrorMessage());
+			return false;
+		}
+		if (!iconWidthField.isValid()) {
+			setErrorMessage(iconWidthField.getErrorMessage());
+			return false;
+		}
+		if (!iconHeightField.isValid()) {
+			setErrorMessage(iconHeightField.getErrorMessage());
+			return false;
+		}
+		if (!toolTipField.isValid()) {
+			setErrorMessage(toolTipField.getErrorMessage());
+			return false;
+		}
+		return true;
+	}	
 }

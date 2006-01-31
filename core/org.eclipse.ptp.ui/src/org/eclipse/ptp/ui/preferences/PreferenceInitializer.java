@@ -16,30 +16,25 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.internal.ui.actions;
+package org.eclipse.ptp.ui.preferences;
 
-import org.eclipse.jface.action.IAction;
-import org.eclipse.ptp.ui.actions.ParallelAction;
-import org.eclipse.ptp.ui.model.IElement;
-import org.eclipse.ptp.ui.views.AbstractParallelElementView;
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ptp.ui.IPTPUIConstants;
+import org.eclipse.ptp.ui.PTPUIPlugin;
 
 /**
  * @author Clement chu
  * 
  */
-public class DisplayRulerAction extends ParallelAction {
-	public static final String name = "Show ruler";
-	private boolean checked = false;
-	
-	public DisplayRulerAction(AbstractParallelElementView view) {
-		super(name, IAction.AS_CHECK_BOX, view);
-		setEnabled(view.getCurrentID().length()>0);
-		checked = view.isDisplayRuler();
-		setChecked(checked);
-	}
-	
-	public void run(IElement[] elements) {}
-	public void run() {
-		getViewPart().setDisplayRuler(!checked);
+public class PreferenceInitializer extends AbstractPreferenceInitializer {
+
+	public void initializeDefaultPreferences() {
+		IPreferenceStore store = PTPUIPlugin.getDefault().getPreferenceStore();
+		store.setDefault(IPTPUIConstants.VIEW_ICON_SPACING_X, IPTPUIConstants.DEFAULT_VIEW_ICON_SPACING_X);
+		store.setDefault(IPTPUIConstants.VIEW_ICON_SPACING_Y, IPTPUIConstants.DEFAULT_VIEW_ICON_SPACING_Y);
+		store.setDefault(IPTPUIConstants.VIEW_ICON_WIDTH, IPTPUIConstants.DEFAULT_VIEW_ICON_WIDTH);
+		store.setDefault(IPTPUIConstants.VIEW_ICON_HEIGHT, IPTPUIConstants.DEFAULT_VIEW_ICON_HEIGHT);
+		store.setDefault(IPTPUIConstants.VIEW_TOOLTIP, IPTPUIConstants.DEFAULT_VIEW_TOOLTIP);
 	}
 }

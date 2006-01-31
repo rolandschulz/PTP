@@ -281,12 +281,23 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 		public void done(IJobChangeEvent event) {
 			synchronized (jobList) {
 				Job job = event.getJob();
-				jobList.remove(job);
-				job.removeJobChangeListener(this);
-				if (jobList.size() > 0) {
-					//when finished a job, run another if there are more jobs
-					job = (Job)jobList.get(0);
-					job.schedule();
+				if (!job.getResult().isOK()) {
+					//remove all jobs if the previous result is not ok
+					for (Iterator i=jobList.iterator(); i.hasNext();) {
+						job = (Job)i.next();
+						job.cancel();
+						job.removeJobChangeListener(this);
+					}
+					jobList.clear();
+				}
+				else {
+					jobList.remove(job);
+					job.removeJobChangeListener(this);
+					if (jobList.size() > 0) {
+						//when finished a job, run another if there are more jobs
+						job = (Job)jobList.get(0);
+						job.schedule();
+					}
 				}
 			}
 		}

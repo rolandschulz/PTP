@@ -71,6 +71,12 @@
             category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.ptp.ui.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
    
 <!-- add buttons to editor action toolbar //-->
    <extension

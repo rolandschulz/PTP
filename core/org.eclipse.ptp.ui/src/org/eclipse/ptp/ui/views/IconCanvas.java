@@ -25,6 +25,8 @@ import java.util.BitSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
@@ -77,7 +79,8 @@ public class IconCanvas extends Canvas {
 	// tooltip
 	protected Shell toolTipShell = null;
 	protected Label toolTipLabel = null;
-	protected final int TOOLTIP_TIME = 10000;
+	protected long tooltip_timeout = 10000;
+	private Timer hoverTimer = null;
 	// key and listener
 	protected Hashtable keyActionMap = new Hashtable();
 	protected Listener listener = null;
@@ -173,7 +176,7 @@ public class IconCanvas extends Canvas {
 			}
 		}
 	}
-	private void resetCanvas() {
+	public void resetCanvas() {
 		checkWidget();
 		current_top_row = -1;
 		actualScrollStart_y = 0;
@@ -216,7 +219,6 @@ public class IconCanvas extends Canvas {
 		}
 		this.e_spacing_x = e_spacing_x;
 		this.e_spacing_y = e_spacing_y;
-		resetCanvas();
 	}
 	public void setIconSize(int e_width, int e_height) {
 		if (e_width <= 0 || e_height <= 0) {
@@ -224,7 +226,12 @@ public class IconCanvas extends Canvas {
 		}
 		this.e_height = e_height;
 		this.e_width = e_width;
-		resetCanvas();
+	}
+	public void setTooltipTimeout(long timeout) {
+		if (timeout <= 0) {
+			SWT.error(SWT.ERROR_NULL_ARGUMENT);
+		}
+		tooltip_timeout = timeout;
 	}
 	public int getTotalElements() {
 		return total_elements;
@@ -1323,16 +1330,39 @@ public class IconCanvas extends Canvas {
 			setCursor(new Cursor(getDisplay(), SWT.CURSOR_HAND));
 			showToolTip(index, event.x, event.y);
 			if (toolTipShell != null) {
-				getDisplay().timerExec(TOOLTIP_TIME, new Runnable() {
+				getHoverTimer().schedule(new TimerTask() {
 					public void run() {
-						hideToolTip();
+						getDisplay().asyncExec(new Runnable() {
+							public void run() {
+								hideToolTip();								
+							}
+						});
 					}
-				});
+				}, tooltip_timeout);
 			}
 		} else {
 			setCursor(null);
 			hideToolTip();
 		}
+	}
+	protected void hideToolTip() {
+		if (toolTipShell != null) {
+			toolTipLabel.dispose();
+			toolTipShell.dispose();
+			toolTipLabel = null;
+			toolTipShell = null;
+		}
+		if (hoverTimer != null) {
+			hoverTimer.cancel();
+			hoverTimer.purge();
+			hoverTimer = null;
+		}
+	}	
+	private Timer getHoverTimer() {
+		if (hoverTimer == null) {
+			hoverTimer = new Timer();
+		}
+		return hoverTimer;
 	}
 	protected void resetInfo() {
 		hideToolTip();
@@ -1524,14 +1554,6 @@ public class IconCanvas extends Canvas {
 		}
 		toolTipShell.setLocation(getViewActualLocation(this, null, display_x, display_y));
 		toolTipShell.setVisible(true);
-	}
-	protected void hideToolTip() {
-		if (toolTipShell != null) {
-			toolTipLabel.dispose();
-			toolTipShell.dispose();
-			toolTipLabel = null;
-			toolTipShell = null;
-		}
 	}
 	protected Point getViewActualLocation(Control from, Control to, int mx, int my) {
 		Point mappedpt = getDisplay().map(from, to, 0, 0);
