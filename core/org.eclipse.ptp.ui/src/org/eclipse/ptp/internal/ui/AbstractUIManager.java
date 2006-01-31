@@ -195,8 +195,9 @@ public abstract class AbstractUIManager implements IManager {
 	}
 	public void removeJob(IPJob job) {
 		IPUniverse universe = modelManager.getUniverse();
-		if (universe != null)
+		if (universe != null) {
 			universe.deleteJob(job);
+		}
 	}
 	public void removeAllStoppedJobs() {
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {

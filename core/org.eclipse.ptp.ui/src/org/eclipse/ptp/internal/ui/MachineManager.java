@@ -39,7 +39,7 @@ import org.eclipse.ptp.ui.model.internal.ElementHandler;
  * 
  */
 public class MachineManager extends AbstractUIManager implements INodeListener {
-	private Map machineList = null;
+	private Map machineList = new HashMap();
 	protected String cur_machine_id = EMPTY_ID;
 
 	public void shutdown() {
@@ -62,7 +62,6 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 	public void clear() {
 		if (machineList != null) {
 			machineList.clear();
-			machineList = null;
 		}
 	}
 	public IPMachine[] getMachines() {
@@ -201,9 +200,6 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 		}
 	}
 	public String initial() {
-		if (machineList == null)
-			machineList = new HashMap();
-
 		IPMachine[] macs = getMachines();
 		if (macs.length > 0) {
 			cur_machine_id = macs[0].getIDString();
