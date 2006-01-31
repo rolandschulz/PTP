@@ -323,7 +323,7 @@ public final class FortranPartitionScanner implements IDocumentPartitioner {
 			e.printStackTrace();
 		} catch (Exception e1) {
 			// Ignore lexer exceptions (e.g., unterminated string constant)
-			e1.printStackTrace();
+			//e1.printStackTrace();
 		}
 
 		// Is there a gap between the last token and the end of the document?
