@@ -163,13 +163,15 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	}
 	
 	/***** LOG *****/
+	public static void log(String msg) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, msg, null));
+	}
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
 	}
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e));
 	}
-	
 	public static void errorDialog(Shell shell, String title, Throwable t) {
 		errorDialog(shell, title, t.getMessage(), t);
 	}
