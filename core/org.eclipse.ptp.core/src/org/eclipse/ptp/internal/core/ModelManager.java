@@ -202,8 +202,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				monitor.worked(10);
 				
 				if(!runtimeProxy.startup(monitor)) {
+					runtimeProxy = null;
 					if (monitor.isCanceled()) {
-						runtimeProxy = null;
 						throw new CoreException(Status.CANCEL_STATUS);
 					}
 					throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Failed to start OMPI proxy runtime.", null));
