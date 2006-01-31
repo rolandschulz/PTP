@@ -127,9 +127,6 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 							String line = buf_reader.readLine();
 							if (line != null) {
 								PTPCorePlugin.errorDialog("Running Proxy Server", line, null);
-								if (monitor != null) {
-									monitor.setCanceled(true);
-								}
 							}
 						} catch(IOException e) {
 							PTPCorePlugin.errorDialog("Running Proxy Server", null, e);
@@ -139,6 +136,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 						}
 					}
 				};
+				runThread.setDaemon(true);
 				runThread.start();
 			}
 			
