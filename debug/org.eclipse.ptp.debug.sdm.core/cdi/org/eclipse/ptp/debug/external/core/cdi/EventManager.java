@@ -33,6 +33,7 @@ import org.eclipse.ptp.debug.core.cdi.event.IPCDIEventListener;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIExitedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDIResumedEvent;
 import org.eclipse.ptp.debug.core.cdi.event.IPCDISuspendedEvent;
+import org.eclipse.ptp.debug.external.core.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.cdi.model.Thread;
 
@@ -118,7 +119,7 @@ public class EventManager extends SessionObject implements IPCDIEventManager, Ob
 					cthread.getCurrentStackFrame();
 				}
 			} catch (PCDIException e1) {
-				e1.printStackTrace();
+				PTPDebugExternalPlugin.log(e1);
 			}
 			/**
 			 * TODO not quite important
