@@ -20,6 +20,8 @@ package org.eclipse.ptp.core;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.internal.core.ModelManager;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
@@ -147,6 +149,16 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		}
 		return null;
 	}
+	public static void log(String msg) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, msg, null));
+	}
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
+	}
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, "Internal Error", e));
+	}
+	
 
 	/*
 	public void addPerspectiveListener(final IPerspectiveListener perspectiveListener) {
