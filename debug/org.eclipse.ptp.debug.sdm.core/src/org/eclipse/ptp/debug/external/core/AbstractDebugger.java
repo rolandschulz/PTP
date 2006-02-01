@@ -217,6 +217,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		fireEvent(new InferiorSignaledEvent(getSession(), tasks, locator));
 	}
 	public void handleErrorEvent(BitList tasks, String errMsg, int errCode) {
+		System.err.println("----- debugger error: " + errMsg);
 		if (errCode == IPCDIErrorEvent.DBG_FATAL) {
 			tasks = ((Session)session).createBitList();
 		}
