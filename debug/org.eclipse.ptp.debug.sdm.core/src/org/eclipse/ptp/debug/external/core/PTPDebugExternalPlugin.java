@@ -146,6 +146,9 @@ public class PTPDebugExternalPlugin extends Plugin {
 	}
 	
 	/***** LOG *****/
+	public static void log(String message) {
+		getDefault().getLog().log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, message, null));
+	}
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
 	}
