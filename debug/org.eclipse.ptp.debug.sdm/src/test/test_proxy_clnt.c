@@ -27,7 +27,8 @@
 
 int 			completed;
 int			fatal;
-bitset *		procs_outstanding;
+bitset *		procs_outstanding = NULL;
+bitset *		sess_procs = NULL;
 
 void
 event_callback(dbg_event *e, void *data)
@@ -35,12 +36,16 @@ event_callback(dbg_event *e, void *data)
 	stackframe *	f;
 	char *		s;
 	
+	printf("in event callback\n");
+	
 	if (e == NULL) {
 		printf("got null event!\n");
 		return;
 	}
 	
 	if (e->procs != NULL) {
+		if (sess_procs == NULL)
+			sess_procs = bitset_copy(e->procs);
 		s = bitset_to_set(e->procs);
 		printf("%s ", s);
 		free(s);
@@ -94,7 +99,7 @@ event_callback(dbg_event *e, void *data)
 		break;
 	}
 
-	if (e->procs != NULL) {
+	if (e->procs != NULL && procs_outstanding != NULL) {
 		bitset_invert(e->procs);
 		bitset_andeq(procs_outstanding, e->procs);
 		if (!bitset_isempty(procs_outstanding))
@@ -109,6 +114,8 @@ wait_for_event(session *s, bitset *p)
 {
 	completed = 0;
 	fatal = 0;
+
+	printf("entering wait_for_event...\n");
 	
 	if (p != NULL)
 		procs_outstanding = bitset_copy(p);
@@ -120,8 +127,10 @@ wait_for_event(session *s, bitset *p)
 		}
 	}
 	
-	if (p != NULL)	
+	if (p != NULL) {
 		bitset_free(procs_outstanding);
+		procs_outstanding = NULL;
+	}
 		
 	/*
 	 * Check a fatal error hasn't ocurred
@@ -144,41 +153,19 @@ int
 do_test(session *s, char *exe)
 {
 	bitset *		p1;
-	bitset *		p2;
 	int			bpid = 54;
 	
-	p1 = bitset_new(s->sess_procs);
-	bitset_invert(p1);
-	p2 = bitset_new(s->sess_procs);
-	bitset_set(p2, 0);
-	
-	if (DbgStartSession(s, "", "yyy", NULL) < 0) {
+	if (DbgStartSession(s, "/tmp", exe, NULL) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
-	if (wait_for_event(s, p1) < 0) {
-		cleanup_and_exit(s, p1);
+	if (wait_for_event(s, NULL) < 0) {
+		cleanup_and_exit(s, NULL);
 	}
+	
+	p1 = sess_procs;
 		
-	if (DbgStartSession(s, "", exe, NULL) < 0) {
-		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
-		return 1;
-	}
-	wait_for_event(s, p1);
-
-	if (DbgSetLineBreakpoint(s, p1, bpid++, "yyy.c", 6) < 0) {
-		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
-		return 1;
-	}
-	wait_for_event(s, p1);
-	
-	if (DbgSetLineBreakpoint(s, p1, bpid++, "xxx.c", 99) < 0) {
-		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
-		return 1;
-	}
-	wait_for_event(s, p1);
-	
-	if (DbgSetLineBreakpoint(s, p1, bpid, "xxx.c", 14) < 0) {
+	if (DbgSetLineBreakpoint(s, p1, bpid++, "xxx.c", 17) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
@@ -207,12 +194,6 @@ do_test(session *s, char *exe)
 		return 1;
 	}
 	wait_for_event(s, p1);
-	
-	if (DbgStep(s, p2, 1, 0) < 0) {
-		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
-		return 1;
-	}
-	wait_for_event(s, p2);
 	
 	if (DbgEvaluateExpression(s, p1, "a") < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
@@ -226,42 +207,6 @@ do_test(session *s, char *exe)
 	}
 	wait_for_event(s, p1);
 	
-	if (DbgDeleteBreakpoint(s, p1, bpid++) < 0) {
-		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
-		return 1;
-	}
-	wait_for_event(s, p1);
-		
-	if (DbgSetFuncBreakpoint(s, p1, bpid++, "xxx.c", "b") < 0) {
-		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
-		return 1;
-	}
-	wait_for_event(s, p1);
-	
-	if (DbgGo(s, p1) < 0) {
-		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
-		return 1;
-	}
-	wait_for_event(s, p1);
-	
-	if (DbgListStackframes(s, p1, 1) < 0) {
-		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
-		return 1;
-	}
-	wait_for_event(s, p1);
-	
-	if (DbgListStackframes(s, p1, 0) < 0) {
-		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
-		return 1;
-	}
-	wait_for_event(s, p1);
-	
-	if (DbgGo(s, p1) < 0) {
-		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
-		return 1;
-	}
-	wait_for_event(s, p1);
-
 	if (DbgQuit(s) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
