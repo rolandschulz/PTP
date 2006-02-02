@@ -121,12 +121,34 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 						
 						try {
 							Process process = Runtime.getRuntime().exec(cmd);
-							BufferedReader buf_reader = new BufferedReader (new InputStreamReader(process.getErrorStream()));
+							final BufferedReader err_reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+							final BufferedReader out_reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+							new Thread(new Runnable() {
+								public void run() {
+									try {
+										String output;
+										while ((output = out_reader.readLine()) != null) {
+											System.out.println("++++++++++ orte_server: " + output);
+										}
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+								}
+							}, "Program output Thread").start();
 							
-							String line;
-							while ((line = buf_reader.readLine()) != null) {
-								PTPCorePlugin.log(line);
-							}
+							new Thread(new Runnable() {
+								public void run() {
+									try {
+										String line;
+										while ((line = err_reader.readLine()) != null) {
+											PTPCorePlugin.log(line);
+										}
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+								}
+							}, "Error output Thread").start();
 						} catch(IOException e) {
 							PTPCorePlugin.errorDialog("Running Proxy Server", null, e);
 							if (monitor != null) {
