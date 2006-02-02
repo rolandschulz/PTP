@@ -85,7 +85,7 @@ static int
 proxy_tcp_clnt_init(proxy_clnt *pc, void **data, char *attr, va_list ap)
 {
 	int					port;
-	char *				host;
+	char *				host = NULL;
 	proxy_tcp_conn *		conn;
 	
 	while (attr != NULL) {
@@ -100,7 +100,8 @@ proxy_tcp_clnt_init(proxy_clnt *pc, void **data, char *attr, va_list ap)
 	proxy_tcp_create_conn(&conn);
 	
 	conn->clnt = pc;
-	conn->host = strdup(host);
+	if (host != NULL)
+		conn->host = strdup(host);
 	conn->port = port;
 
 	*data = (void *)conn;
@@ -210,7 +211,7 @@ proxy_tcp_clnt_create(proxy_clnt *pc)
 	conn->port = (int) ntohs(sname.sin_port);
 	
 	if (pc->proxy->handler_funcs->regfile != NULL)
-		pc->proxy->handler_funcs->regfile(sd, READ_FILE_HANDLER, proxy_tcp_clnt_accept, (void *)conn);
+		pc->proxy->handler_funcs->regfile(sd, READ_FILE_HANDLER, proxy_tcp_clnt_accept, (void *)pc);
 	
 	return PROXY_RES_OK;
 }
@@ -221,7 +222,8 @@ proxy_tcp_clnt_accept(int fd, void *data)
 	SOCKET					ns;
 	socklen_t				fromlen;
 	struct sockaddr			addr;
-	proxy_tcp_conn *			conn = (proxy_tcp_conn *)data;
+	proxy_clnt *			pc = (proxy_clnt *)data;
+	proxy_tcp_conn *			conn = (proxy_tcp_conn *)pc->clnt_data;
 	
 	fromlen = sizeof(addr);
 	ns = accept(fd, &addr, &fromlen);
@@ -240,6 +242,12 @@ proxy_tcp_clnt_accept(int fd, void *data)
 	
 	conn->sess_sock = ns;
 	conn->connected++;
+	
+	if (pc->clnt_helper_funcs->eventhandler != NULL) {
+		proxy_event *ev = new_proxy_event(PROXY_EV_CONNECTED);
+		pc->clnt_helper_funcs->eventhandler(ev, pc->clnt_helper_funcs->eventdata);
+		free_proxy_event(ev);
+	}
 
 	if (conn->clnt->proxy->handler_funcs->regfile != NULL)
 		conn->clnt->proxy->handler_funcs->regfile(ns, READ_FILE_HANDLER, proxy_tcp_clnt_recv_msgs, (void *)conn);
@@ -259,7 +267,7 @@ proxy_tcp_clnt_progress(proxy_clnt *pc)
 	if ((res = proxy_tcp_get_msg(conn, &result)) <= 0)
 		return res;
 	
-	if (pc->	clnt_helper_funcs->eventhandler == NULL)
+	if (pc->clnt_helper_funcs->eventhandler == NULL)
 		return PROXY_RES_OK;
 	
 	if (proxy_str_to_event(result, &ev) < 0) {
