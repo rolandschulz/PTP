@@ -33,7 +33,7 @@ bitset_new(int nbits)
 	b = malloc(sizeof(bitset));
 	
 	b->bs_nbits = nbits;
-	b->bs_size = BIT_INDEX(nbits) + 1;
+	b->bs_size = BIT_INDEX(nbits-1) + 1;
 	b->bs_bits = (bits *)malloc(SIZE_TO_BYTES(b->bs_size));
 	memset(b->bs_bits, 0, SIZE_TO_BYTES(b->bs_size));
 	
