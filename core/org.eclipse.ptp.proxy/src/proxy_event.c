@@ -144,6 +144,10 @@ proxy_event_to_str(proxy_event *e, char **result)
  		asprintf(result, "%d %d %s", e->event, e->error_code, str);
 		break;
 		
+	case PROXY_EV_CONNECTED:
+ 		asprintf(result, "%d", e->event);
+		break;
+		
 	default:
 		res = -1;
 		break;
@@ -240,6 +244,10 @@ proxy_str_to_event(char *str, proxy_event **ev)
 		FreeArgs(args);
 		break;
 		
+	case PROXY_EV_CONNECTED:
+		e = new_proxy_event(PROXY_EV_CONNECTED);
+		break;
+	
 	default:
 		goto error_out;
 	}
