@@ -134,7 +134,7 @@ server(int client_task_id, int my_task_id, int job_id, dbg_backend *dbgr)
 	//char **args;
 	char **env = NULL;
 	
-	printf("starting server on [%d]\n", my_task_id);
+	printf("starting server on [%d]\n", my_task_id); fflush(stdout);
 	
 	if (job_id >= 0) {
 		env = (char **)malloc(4 * sizeof(char **));
