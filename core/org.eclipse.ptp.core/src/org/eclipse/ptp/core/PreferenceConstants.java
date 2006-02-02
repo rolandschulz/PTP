@@ -20,7 +20,7 @@ package org.eclipse.ptp.core;
 
 public interface PreferenceConstants {
 	public static final String SET_ROOT_ID = "Root";
-	public static final String JOB_DEBUG_SESSION = "debug_session";
+	//public static final String JOB_DEBUG_SESSION = "debug_session";
 	public static final String JOB_DEBUG_DIR = "debug_dir";
 	public static final String JOB_APP = "app";
 	public static final String JOB_WORK_DIR = "work_dir";
