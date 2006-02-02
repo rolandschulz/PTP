@@ -92,8 +92,8 @@ import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * @author clement chu
@@ -211,7 +211,8 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		return getDebugSession(job);
 	}
 	public IPCDISession getDebugSession(IPJob job) {
-		return (IPCDISession) job.getAttribute(PreferenceConstants.JOB_DEBUG_SESSION);
+		return debugModel.getPCDISession(job);
+		//return (IPCDISession) job.getAttribute(PreferenceConstants.JOB_DEBUG_SESSION);
 	}
 	public int convertToInt(String id) {
 		return Integer.parseInt(id);
@@ -371,57 +372,61 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 		final IElementHandler elementHandler = getElementHandler(job_id);
 		if (elementHandler == null)
 			return;
-		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
-			public void run(IProgressMonitor monitor) throws CoreException {
-				new Job("Removing registered processes") {
-					protected IStatus run(IProgressMonitor pmonitor) {
-						IPCDISession session = getDebugSession(job_id);
-						if (session == null)
-							return Status.CANCEL_STATUS;
-						IElement[] registerElements = elementHandler.getRegisteredElements();
-						for (int i = 0; i < registerElements.length; i++) {
-							IPProcess proc = findProcess(job_id, registerElements[i].getID());
-							if (proc != null)
-								unregisterProcess(session, proc, false);
-						}
-						return Status.OK_STATUS;
+		Job uiJob = new Job("Removing registered processes") {
+			protected IStatus run(IProgressMonitor pmonitor) {
+				IPCDISession session = getDebugSession(job_id);
+				if (session == null)
+					return Status.CANCEL_STATUS;
+				IElement[] registerElements = elementHandler.getRegisteredElements();
+				pmonitor.beginTask("Removing registering processes....", registerElements.length);
+				for (int i = 0; i < registerElements.length; i++) {
+					IPProcess proc = findProcess(job_id, registerElements[i].getID());
+					if (proc != null) {
+						unregisterProcess(session, proc, false);
 					}
-				}.schedule();
+					pmonitor.worked(1);
+				}
+				pmonitor.done();
+				return Status.OK_STATUS;
 			}
 		};
-		ResourcesPlugin.getWorkspace().run(runnable, null);
+		uiJob.setPriority(Job.INTERACTIVE);
+		PlatformUI.getWorkbench().getProgressService().showInDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), uiJob);
+		uiJob.schedule();
 	}
 	public void updateRegisterUnRegisterElements(final IElementSet curSet, final IElementSet preSet, final String job_id) throws CoreException {
 		final IElementHandler elementHandler = getElementHandler(job_id);
 		if (elementHandler == null)
 			return;
-		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
-			public void run(IProgressMonitor monitor) throws CoreException {
-				new Job("Updating registered/unregistered processes") {
-					protected IStatus run(IProgressMonitor pmonitor) {
-						IPCDISession session = getDebugSession(job_id);
-						if (session == null)
-							return Status.CANCEL_STATUS;
-						IElement[] registerElements = elementHandler.getRegisteredElements();
-						for (int i = 0; i < registerElements.length; i++) {
-							if (curSet.contains(registerElements[i].getID())) {
-								if (curSet.isRootSet() || (preSet != null && !curSet.equals(preSet) && !preSet.contains(registerElements[i].getID()))) {
-									IPProcess proc = findProcess(job_id, registerElements[i].getID());
-									if (proc != null)
-										registerProcess(session, proc, false);
-								}
-							} else {
-								IPProcess proc = findProcess(job_id, registerElements[i].getID());
-								if (proc != null)
-									unregisterProcess(session, proc, false);
-							}
+		Job uiJob = new Job("Updating registered/unregistered processes") {
+			protected IStatus run(IProgressMonitor pmonitor) {
+				IPCDISession session = getDebugSession(job_id);
+				if (session == null)
+					return Status.CANCEL_STATUS;
+				
+				IElement[] registerElements = elementHandler.getRegisteredElements();
+				pmonitor.beginTask("Registering process....", registerElements.length);
+				for (int i = 0; i<registerElements.length; i++) {
+					if (curSet.contains(registerElements[i].getID())) {
+						if (curSet.isRootSet() || (preSet != null && !curSet.equals(preSet) && !preSet.contains(registerElements[i].getID()))) {
+							IPProcess proc = findProcess(job_id, registerElements[i].getID());
+							if (proc != null)
+								registerProcess(session, proc, false);
 						}
-						return Status.OK_STATUS;
+					} else {
+						IPProcess proc = findProcess(job_id, registerElements[i].getID());
+						if (proc != null)
+							unregisterProcess(session, proc, false);
 					}
-				}.schedule();
+					pmonitor.worked(1);
+				}
+				pmonitor.done();
+				return Status.OK_STATUS;
 			}
 		};
-		ResourcesPlugin.getWorkspace().run(runnable, null);
+		uiJob.setPriority(Job.INTERACTIVE);
+		PlatformUI.getWorkbench().getProgressService().showInDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), uiJob);
+		uiJob.schedule();
 	}
 	public void changeSetEvent(IElementSet curSet, IElementSet preSet) {
 		if (curSet == null)
@@ -491,12 +496,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	public void handleDebugEvents(final IPCDIEvent[] events) {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
-				new Job("Update Events") {
-					protected IStatus run(IProgressMonitor pmonitor) {
-						handleDebugEvents(events, pmonitor);
-						return Status.OK_STATUS;
-					}
-				}.schedule();
+				handleDebugEvents(events, monitor);
 			}
 		};
 		try {
@@ -548,8 +548,12 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					try {
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses(), false);
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses(), true);
-					} catch (CoreException e) {
-						PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
+					} catch (final CoreException e) {
+						PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+							public void run() {
+								PTPDebugUIPlugin.errorDialog("Error", e);
+							}
+						});
 					}
 				}
 				fireSuspendEvent(job, event.getAllProcesses());
@@ -564,8 +568,12 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					try {
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses(), false);
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses(), true);
-					} catch (CoreException e) {
-						PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
+					} catch (final CoreException e) {
+						PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+							public void run() {
+								PTPDebugUIPlugin.errorDialog("Error", e);
+							}
+						});
 					}
 				}
 				// System.out.println("-------------------- end stepping ------------------------");
@@ -574,8 +582,12 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			} else if (event instanceof InferiorResumedEvent) {
 				try {
 					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses());
-				} catch (CoreException e) {
-					PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
+				} catch (final CoreException e) {
+					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							PTPDebugUIPlugin.errorDialog("Error", e);
+						}
+					});
 				}
 				// System.out.println("-------------------- resume ------------------------");
 				// annotationMgr.printBitList(event.getAllProcesses().toBitList());
@@ -583,8 +595,12 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			} else if (event instanceof InferiorExitedEvent) {
 				try {
 					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses());
-				} catch (CoreException e) {
-					PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
+				} catch (final CoreException e) {
+					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							PTPDebugUIPlugin.errorDialog("Error", e);
+						}
+					});
 				}
 				// System.out.println("-------------------- terminate ------------------------");
 				// annotationMgr.printBitList(event.getAllProcesses());
@@ -592,16 +608,20 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 			} else if (event instanceof ErrorEvent) {
 				try {
 					annotationMgr.removeAnnotation(job.getIDString(), event.getAllProcesses());
-				} catch (CoreException e) {
-					PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
+				} catch (final CoreException e) {
+					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							PTPDebugUIPlugin.errorDialog("Error", e);
+						}
+					});
 				}
 				final ErrorEvent errEvent = (ErrorEvent)event;
 				int errCode = errEvent.getErrorCode();
 				if (errCode == ErrorEvent.DBG_ERROR || errCode == ErrorEvent.DBG_FATAL) {
-					Display.getDefault().asyncExec(new Runnable() {
+					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
 						public void run() {
 							IPCDIErrorInfo info = (IPCDIErrorInfo)errEvent.getReason();
-							PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", new Exception("Error: " + info.getMessage() + " on tasks: "+ errEvent.getAllProcesses().toString()));						
+							PTPDebugUIPlugin.errorDialog("Error", new Exception("Error: " + info.getMessage() + " on tasks: "+ errEvent.getAllProcesses().toString()));
 						}
 					});
 				}
@@ -616,8 +636,12 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					try {
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllUnregisteredProcesses(), false);
 						annotationMgr.addAnnotation(job.getIDString(), fileName, lineNumber, event.getAllRegisteredProcesses(), true);
-					} catch (CoreException e) {
-						PTPDebugUIPlugin.errorDialog(PTPDebugUIPlugin.getActiveWorkbenchShell(), "Error", "Cannot display annotation marker on editor", e);
+					} catch (final CoreException e) {
+						PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
+							public void run() {
+								PTPDebugUIPlugin.errorDialog("Error", e);
+							}
+						});
 					}
 				}
 				// System.out.println("-------------------- suspend ------------------------");
