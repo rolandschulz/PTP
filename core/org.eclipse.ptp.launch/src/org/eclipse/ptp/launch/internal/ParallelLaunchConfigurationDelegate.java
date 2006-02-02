@@ -140,7 +140,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			monitor = new NullProgressMonitor();
 		}
 		monitor.beginTask("",  250);
-		monitor.setTaskName(MessageFormat.format("{0}...", new String[] { "Launching " + configuration.getName() }));
+		monitor.setTaskName(MessageFormat.format("{0} . . .", new String[] { "Launching " + configuration.getName() }));
 		if (monitor.isCanceled()) {
 			return;
 		}
@@ -163,7 +163,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			}
 			
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				monitor.subTask("Configuring debug setting");
+				monitor.subTask("Configuring debug setting . . .");
 				IPreferenceStore store = PTPDebugUIPlugin.getDefault().getPreferenceStore();
 				String dbgPath = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE);
 				String dbgArgs = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS);
@@ -178,7 +178,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			}
 			monitor.worked(10);
 			
-			monitor.subTask("Starting the job");
+			monitor.subTask("Starting the job . . .");
 			job = getLaunchManager().run(launch, workDirectory, null, jrunconfig, new SubProgressMonitor(monitor, 150));
 			job.setAttribute(PreferenceConstants.JOB_APP, exePath.lastSegment());
 			job.setAttribute(PreferenceConstants.JOB_WORK_DIR, exePath.removeLastSegments(1).toString());
@@ -188,7 +188,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			pLaunch.setPJob(job);
 			
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				monitor.setTaskName("Starting the debugger...");
+				monitor.setTaskName("Starting the debugger . . .");
 				job.setAttribute(PreferenceConstants.JOB_DEBUG_DIR, exePath.removeLastSegments(1).toOSString());
 				PTPDebugCorePlugin.getDebugModel().createDebuggerSession(debugger, pLaunch, exeFile, new SubProgressMonitor(monitor, 40));
 				monitor.worked(10);

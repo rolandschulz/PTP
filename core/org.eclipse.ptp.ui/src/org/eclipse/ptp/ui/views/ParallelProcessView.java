@@ -138,8 +138,12 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 		statusContainer.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 3));
 		statusLabel = toolkit.createLabel(statusContainer, null);
 		statusLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		/*
 		dynamicLabel = toolkit.createLabel(statusContainer, null);
 		dynamicLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		*/
+		
 		detailsSection.setClient(detailsContainer);
 	}
 	protected void outputSection() {
@@ -169,10 +173,13 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 			jobLabel.setText("Job: " + process.getJob().getJobNumber());
 			pidLabel.setText("PID: " + process.getPid());
 			statusLabel.setText("Status: " + process.getStatus());
+			
+			/*
 			if (process.getExitCode() != null)
 				dynamicLabel.setText("Exit code: " + process.getExitCode());
 			else if (process.getSignalName() != null)
 				dynamicLabel.setText("Signal name: " + process.getSignalName());
+			*/
 			// String[] outputs = process.getOutputs();
 			// for (int i=0; i<outputs.length; i++)
 			// outputText.append(outputs[i] + "\n");
@@ -195,12 +202,16 @@ public class ParallelProcessView extends AbstractTextEditor implements IProcessL
 				case IProcessEvent.STATUS_CHANGE_TYPE:
 					statusLabel.setText("Status: " + event.getInput());
 					break;
+				
+					/*
 				case IProcessEvent.STATUS_EXIT_TYPE:
 					dynamicLabel.setText(EXITCODE_TEXT + event.getInput());
 					break;
 				case IProcessEvent.STATUS_SIGNALNAME_TYPE:
 					dynamicLabel.setText(SIGNALNAME_TEXT + event.getInput());
 					break;
+					*/
+					
 				case IProcessEvent.ADD_OUTPUT_TYPE:
 					outputText.append(event.getInput());
 					break;			
