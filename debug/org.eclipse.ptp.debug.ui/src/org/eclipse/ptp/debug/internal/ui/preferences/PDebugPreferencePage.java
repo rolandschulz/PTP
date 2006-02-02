@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.internal.ui.preferences;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -31,6 +32,8 @@ import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.ui.preferences.AbstractPerferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -74,6 +77,15 @@ public class PDebugPreferencePage extends AbstractPerferencePage {
 		Composite comp = createGroupComposite(parent, 1, false, PreferenceMessages.getString("PDebugPreferencePage.default1"));
 		fPathsButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.default2"));
 		fRegisteredProcessButton = createCheckButton(comp, PreferenceMessages.getString("PDebugPreferencePage.registerProcess"));
+		fRegisteredProcessButton.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetSelected(SelectionEvent e) {
+				boolean isChecked = fRegisteredProcessButton.getSelection();
+				if (!isChecked) {
+					MessageDialog.openWarning(getShell(), PreferenceMessages.getString("PDebugPreferencePage.warningTitle1"), PreferenceMessages.getString("PDebugPreferencePage.warning1"));
+				}
+			}
+		});
 	}
 	public void performDefaults() { 
 		IPreferenceStore store = getPreferenceStore();

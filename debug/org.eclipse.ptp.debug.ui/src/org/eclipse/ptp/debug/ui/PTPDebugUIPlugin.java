@@ -172,6 +172,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IPTPUIConstants.INTERNAL_ERROR, "Internal Error", e));
 	}
+	public static void errorDialog(String title, Throwable t) {
+		errorDialog(getActiveWorkbenchShell(), title, t.getMessage(), t);
+	}
 	public static void errorDialog(Shell shell, String title, Throwable t) {
 		errorDialog(shell, title, t.getMessage(), t);
 	}
