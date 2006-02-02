@@ -100,7 +100,7 @@ client(int svr_num, int task_id, char *proxy, char *host, int port)
 	
 	if (DbgClntInit(svr_num, proxy, &handler_funcs, &helper_funcs, command_tab) != DBGRES_OK ||
 			DbgClntCreateSession(svr_num, host, port) != DBGRES_OK) {
-		fprintf(stderr, "%s\n", DbgGetErrorStr());
+		fprintf(stderr, "%s\n", DbgGetErrorStr()); fflush(stderr);
 		DbgClntQuit(); //TODO fixme!
 		DbgClntProgress();
 		return;

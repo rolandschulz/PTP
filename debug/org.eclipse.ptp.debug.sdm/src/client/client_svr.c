@@ -157,7 +157,7 @@ ClntSendCommand(bitset *procs, char *str, void *data)
 	}
 
 	if (r == NULL) {	
-		printf("creating new request for %s\n", bitset_to_set(procs));
+		printf("creating new request for %s\n", bitset_to_set(procs)); fflush(stdout);
 		r = (active_request *)malloc(sizeof(active_request));
 		r->procs = bitset_copy(procs);
 		r->data = data;
@@ -219,8 +219,7 @@ ClntProgressCmds(void)
 	/*
 	 * Check for completed sends
 	 */
-	count = bitset_size(sending_procs);
-	if (count > 0) {
+	if (!bitset_isempty(sending_procs)) {
 		if (MPI_Testsome(num_servers, send_requests, &completed, pids, stats) != MPI_SUCCESS) {
 			printf("error in testsome\n");
 			return -1;
@@ -290,7 +289,7 @@ ClntProgressCmds(void)
 				 */
 				if ((e = HashSearch(r->events, hdr[0])) == NULL) {
 					if (DbgStrToEvent(reply_buf, &e) < 0) {
-						fprintf(stderr, "Bad protocol: conversion to event failed! <%s>\n", reply_buf);
+						fprintf(stderr, "Bad protocol: conversion to event failed! <%s>\n", reply_buf); fflush(stderr);
 					} else {
 						e->procs = bitset_new(num_servers);
 						HashInsert(r->events, hdr[0], (void *)e);

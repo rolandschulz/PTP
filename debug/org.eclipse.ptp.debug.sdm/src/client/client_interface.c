@@ -57,15 +57,16 @@ session_event_handler(void *event, void *data)
 	proxy_event *pe = (proxy_event *)event;
 	session *	s = (session *)data;
 	
-	if (pe->event == PROXY_EV_OK) {
+	switch (pe->event) {
+	case PROXY_EV_OK:
 		if (DbgStrToEvent(pe->event_data, &de) < 0) {
 			de = NewDbgEvent(DBGEV_ERROR);
 			de->error_code = DBGERR_PROXY_PROTO;
 			de->error_msg = strdup("");
-		} else if (de->event == DBGEV_INIT) {
-			s->sess_procs = de->num_servers;
 		}
-	} else {
+		break;
+
+	case PROXY_EV_ERROR:
 		de = NewDbgEvent(DBGEV_ERROR);
 		
 		switch (pe->error_code) {
@@ -79,6 +80,11 @@ session_event_handler(void *event, void *data)
 			de->error_msg = strdup(pe->error_msg);
 			break;
 		}
+		break;
+
+	case PROXY_EV_CONNECTED:
+		de = NewDbgEvent(DBGEV_OK);
+		break;
 	}
 	
 	if (s->sess_event_handler != NULL)
@@ -95,7 +101,7 @@ DbgInit(session **sess, char *name, char *attr, ...)
 	int			res;
 	session *	s;
 	
-	s = malloc(sizeof(session));
+	s = (session *)malloc(sizeof(session));
 	
 	clnt_helper_funcs.eventdata = (void *)s;
 	
@@ -109,6 +115,7 @@ DbgInit(session **sess, char *name, char *attr, ...)
 	}
 	
 	s->sess_event_handler = NULL;
+	*sess = s;
 	
 	return 0;
 }
