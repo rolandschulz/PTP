@@ -152,23 +152,23 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	
 	public void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID, IProgressMonitor monitor) throws CoreException {
 		try {
-			monitor.beginTask("Refreshing runtime system...", 200);
+			monitor.beginTask("Refreshing runtime system . . .", 200);
 			/*
 			 * Shutdown runtime if it is already active
 			 */
 			System.out.println("SHUTTING DOWN CONTROL/MONITORING/PROXY systems where appropriate");
 			if (controlSystem != null) {
-				monitor.subTask("Shutting down control system...");
+				monitor.subTask("Shutting down control system . . .");
 				controlSystem.shutdown();
 				monitor.worked(10);
 			}
 			if (monitoringSystem != null) {
-				monitor.subTask("Shutting down monitor system...");
+				monitor.subTask("Shutting down monitor system . . .");
 				monitoringSystem.shutdown();
 				monitor.worked(10);
 			}
 			if (runtimeProxy != null) {
-				monitor.subTask("Shutting down runtime proxy...");
+				monitor.subTask("Shutting down runtime proxy . . .");
 				runtimeProxy.shutdown();
 				monitor.worked(10);
 			}
@@ -179,7 +179,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	
 			if(monitoringSystemID == MonitoringSystemChoices.SIMULATED && controlSystemID == ControlSystemChoices.SIMULATED) {
 				/* load up the control and monitoring systems for the simulation */
-				monitor.subTask("Starting simulation...");
+				monitor.subTask("Starting simulation . . .");
 				monitoringSystem = new SimulationMonitoringSystem();
 				monitor.worked(10);
 				controlSystem = new SimulationControlSystem();
@@ -188,7 +188,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			}
 			else if(monitoringSystemID == MonitoringSystemChoices.ORTE && controlSystemID == ControlSystemChoices.ORTE) {
 				/* load up the control and monitoring systems for OMPI */
-				monitor.subTask("Starting OMPI proxy runtime...");
+				monitor.subTask("Starting OMPI proxy runtime . . .");
 				runtimeProxy = new OMPIProxyRuntimeClient(this);
 				monitor.worked(10);
 				
@@ -199,10 +199,10 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					}
 					throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Failed to start OMPI proxy runtime.", null));
 				}
-				monitor.subTask("Starting OMPI monitoring system...");
+				monitor.subTask("Starting OMPI monitoring system . . .");
 				monitoringSystem = new OMPIMonitoringSystem((OMPIProxyRuntimeClient)runtimeProxy);
 				monitor.worked(10);
-				monitor.subTask("Starting OMPI control system...");
+				monitor.subTask("Starting OMPI control system . . .");
 				controlSystem = new OMPIControlSystem((OMPIProxyRuntimeClient)runtimeProxy);
 				monitor.worked(10);
 			}
@@ -211,14 +211,14 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			}
 	
 			universe = new PUniverse();
-			monitor.subTask("Starting up monitor system...");
+			monitor.subTask("Starting up monitor system . . .");
 			monitoringSystem.startup();
 			monitor.worked(10);
-			monitor.subTask("Starting up control system...");
+			monitor.subTask("Starting up control system . . .");
 			controlSystem.startup();
 			monitor.worked(10);
 			try {
-				monitor.subTask("Setup the monitoring system...");
+				monitor.subTask("Setting up the monitoring system . . .");
 				setupMS(new SubProgressMonitor(monitor, 150));
 			} catch (CoreException e) {
 				universe.removeChildren();
@@ -240,7 +240,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		String[] ne = monitoringSystem.getMachines();		
 		monitor.beginTask("", ne.length * 2);
 		for (int i = 0; i < ne.length; i++) {
-			monitor.setTaskName("Creating machines...");
+			monitor.setTaskName("Creating machines . . .");
 			if (monitor.isCanceled()) {
 				throw new CoreException(Status.CANCEL_STATUS);
 			}
@@ -257,7 +257,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 			IProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
 			subMonitor.beginTask("", ne2.length);
-			subMonitor.setTaskName("Creating nodes...");
+			subMonitor.setTaskName("Creating nodes . . .");
 			if(monitoringSystem instanceof OMPIMonitoringSystem) {
 				int num_attribs = 5;
 				String[] attribs = monitoringSystem.getAllNodesAttributes(mac,
@@ -347,7 +347,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		ne = controlSystem.getJobs();
 		if(ne != null) {
 			for (int i = 0; i < ne.length; i++) {
-				monitor.setTaskName("Creating jobs...");
+				monitor.setTaskName("Creating jobs . . .");
 				if (monitor.isCanceled()) {
 					throw new CoreException(Status.CANCEL_STATUS);
 				}
@@ -364,7 +364,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				String[] ne2 = controlSystem.getProcesses(job);
 				IProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
 				subMonitor.beginTask("", ne2.length);
-				subMonitor.setTaskName("Creating processes...");
+				subMonitor.setTaskName("Creating processes . . .");
 				for (int j = 0; j < ne2.length; j++) {		
 					if (subMonitor.isCanceled()) {
 						throw new CoreException(Status.CANCEL_STATUS);
@@ -406,7 +406,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			System.out.println("*** attribs["+i+"] = "+attribs[i]);
 		
 		monitor.beginTask("", numProcs);
-		monitor.setTaskName("Initialing the processes...");
+		monitor.setTaskName("Initialing the processes . . .");
 		for (int i = 0; i < numProcs; i++) {
 			if (monitor.isCanceled()) {
 				throw new CoreException(Status.CANCEL_STATUS);
@@ -759,7 +759,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		}
 		
 		monitor.beginTask("", numProcesses);
-		monitor.setTaskName("Creating processes....");
+		monitor.setTaskName("Creating processes . . .");
 		/* we know that we succeeded, so we can create this many procs in the job.  we just
 		 * need to run getProcsStatusForNewJob() to fill in the status later
 		 */
@@ -771,7 +771,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		
 		try {
 			monitor.internalWorked(0);
-			monitor.subTask("Setting process status...");
+			monitor.subTask("Setting process status . . .");
 			getProcsStatusForNewJob(jobName, job, new SubProgressMonitor(monitor, numProcesses));
 		} catch (CoreException e) {
 			controlSystem.terminateJob(job);

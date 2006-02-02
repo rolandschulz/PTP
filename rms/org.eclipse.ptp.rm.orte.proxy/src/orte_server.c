@@ -56,6 +56,8 @@
 #include "mca/base/base.h"
 #include "mca/errmgr/errmgr.h"
 #include "mca/rml/rml.h"
+#include "mca/rmgr/base/base.h"
+#include "opal/util/output.h"
 
 #ifdef HAVE_SYS_BPROC_H
 #include "orte/mca/soh/bproc/soh_bproc.h"
@@ -989,12 +991,104 @@ static void iof_callback(
     }
 }
 
+struct orte_job_record {
+	struct orte_job_record *next;
+	orte_jobid_t jobid;
+};
+
+struct orte_job_record *head = NULL;
+
+int 
+orte_job_record_started(orte_jobid_t jobid)
+{
+	struct orte_job_record *cur = NULL;
+	if(head == NULL) return 0;
+	
+	cur = head;
+	
+	while(cur != NULL) {
+		if(cur->jobid == jobid) return 1;
+		cur = cur->next;
+	}
+	
+	return 0; /* guess we didn't find it and we're at the end */
+}
+
+void
+orte_job_record_start(orte_jobid_t jobid)
+{
+	struct orte_job_record *cur = NULL;
+	struct orte_job_record *tmp = NULL;
+	int	rc;
+	orte_process_name_t *	name;
+	
+	/* if this is the first, we need to set it up */
+	if(head == NULL) {
+		head = (struct orte_job_record *)malloc(sizeof(struct orte_job_record));
+		head->next = NULL;
+	}
+	cur = head;
+	/* run to the end */
+	while(cur->next != NULL) cur = cur->next;
+	/* now we know 'cur' is the tail */
+	tmp = (struct orte_job_record*)malloc(sizeof(struct orte_job_record));
+	cur->next = tmp;
+	tmp->next = NULL;
+	tmp->jobid = jobid;
+	
+	/* register the IO forwarding callback */
+	if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
+		ORTE_ERROR_LOG(rc);
+        	return;
+    	}
+    	
+    	printf("name = '%s'\n", (char *)name); fflush(stdout);
+            	
+	if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT, iof_callback, NULL))) {                
+		opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
+    	}
+    	if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR, iof_callback, NULL))) {                
+        	opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
+    	}
+}
+
+void
+orte_job_record_end(orte_jobid_t jobid)
+{
+	struct orte_job_record *cur = NULL;
+	struct orte_job_record *prev = NULL;
+	int	rc;
+	orte_process_name_t *	name;
+	if(head == NULL) return; /* umm, we have nothing */
+	
+	cur = head;
+	while(cur != NULL) {
+		if(cur->jobid == jobid) {
+			/* ok we found it, we need to move the pointer behind us */
+			prev->next = cur->next; /* parent's next is our next */
+			/* now free cur */
+			free(cur);
+			
+			if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
+             	ORTE_ERROR_LOG(rc);
+                	return;
+            	}
+            	printf("name = %s\n", (char *)name); fflush(stdout);
+			if (ORTE_SUCCESS != (rc = orte_iof.iof_unsubscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR))) {                
+				opal_output(0, "[%s:%d] orte_iof.iof_unsubscribed failed\n", __FILE__, __LINE__);
+			}
+			
+			return;
+		}
+		prev = cur;
+		cur = cur->next;
+	}
+}
+
 static void
 job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 {
 	char *				res;
-	int					rc;
-	orte_process_name_t *	name;
 	
 	printf("JOB STATE CALLBACK!\n"); fflush(stdout);
 		
@@ -1008,30 +1102,33 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 	switch(state) {
 		case ORTE_PROC_STATE_INIT:
 			printf("    state = ORTE_PROC_STATE_INIT\n");
-			if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
-                ORTE_ERROR_LOG(rc);
-                break;
-            	}
-            	printf("name = '%s'\n", (char *)name); fflush(stdout);
-            	
-			if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDOUT, iof_callback, NULL))) {                
-				opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
-            	}
-            	if (ORTE_SUCCESS != (rc = orte_iof.iof_subscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR, iof_callback, NULL))) {                
-                	opal_output(0, "[%s:%d] orte_iof.iof_subscribed failed\n", __FILE__, __LINE__);
-           	}
+			if(!orte_job_record_started(jobid)) {
+				orte_job_record_start(jobid);
+			}
 			break;
 		case ORTE_PROC_STATE_LAUNCHED:
 			printf("    state = ORTE_PROC_STATE_LAUNCHED\n");
+			if(!orte_job_record_started(jobid)) {
+				orte_job_record_start(jobid);
+			}
 			break;
 		case ORTE_PROC_STATE_AT_STG1:
 			printf("    state = ORTE_PROC_STATE_AT_STG1\n");
+			if(!orte_job_record_started(jobid)) {
+				orte_job_record_start(jobid);
+			}
 			break;
 		case ORTE_PROC_STATE_AT_STG2:
 			printf("    state = ORTE_PROC_STATE_AT_STG2\n");
+			if(!orte_job_record_started(jobid)) {
+				orte_job_record_start(jobid);
+			}
 			break;
 		case ORTE_PROC_STATE_RUNNING:
 			printf("    state = ORTE_PROC_STATE_RUNNING\n");
+			if(!orte_job_record_started(jobid)) {
+				orte_job_record_start(jobid);
+			}
 			break;
 		case ORTE_PROC_STATE_AT_STG3:
 			printf("    state = ORTE_PROC_STATE_AT_STG3\n");
@@ -1041,13 +1138,8 @@ job_state_callback(orte_jobid_t jobid, orte_proc_state_t state)
 			break;
 		case ORTE_PROC_STATE_TERMINATED:
 			printf("    state = ORTE_PROC_STATE_TERMINATED\n");
-			if (ORTE_SUCCESS != (rc = orte_ns.create_process_name(&name, 0, jobid, 0))) {
-                ORTE_ERROR_LOG(rc);
-                break;
-            	}
-            	printf("name = %s\n", (char *)name); fflush(stdout);
-			if (ORTE_SUCCESS != (rc = orte_iof.iof_unsubscribe(name, ORTE_NS_CMP_JOBID, ORTE_IOF_STDERR))) {                
-				opal_output(0, "[%s:%d] orte_iof.iof_unsubscribed failed\n", __FILE__, __LINE__);
+			if(orte_job_record_started(jobid)) {
+				orte_job_record_end(jobid);
 			}
 			break;
 		case ORTE_PROC_STATE_ABORTED:
