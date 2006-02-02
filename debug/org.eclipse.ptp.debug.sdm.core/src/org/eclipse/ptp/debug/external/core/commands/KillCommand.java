@@ -27,8 +27,15 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * 
  */
 public class KillCommand extends AbstractDebugCommand {
-	public KillCommand(BitList tasks) throws PCDIException {
+	private boolean sendEvent = true;
+	
+	public KillCommand(BitList tasks, boolean sendEvent) {
 		super(tasks, false, true);
+		this.sendEvent = sendEvent;
+	}
+
+	public KillCommand(BitList tasks) {
+		this(tasks, true);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterTerminateTasks(tasks);
@@ -40,7 +47,9 @@ public class KillCommand extends AbstractDebugCommand {
 	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
 		if (waitForReturn()) {
 			if (result.equals(OK)) {
-				debugger.handleProcessTerminatedEvent(tasks);
+				if (sendEvent) {
+					debugger.handleProcessTerminatedEvent(tasks);
+				}
 				return;
 			}
 		}

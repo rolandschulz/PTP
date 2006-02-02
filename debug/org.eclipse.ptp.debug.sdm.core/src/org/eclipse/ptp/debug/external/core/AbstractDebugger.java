@@ -68,9 +68,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		IPJob job = launch.getPJob();
 		initialize(job);
 		session = new Session(this, job, launch, exe);
-		session.start(monitor);
 		return session;
-	}
+	}	
 	
 	public void postCommand(IDebugCommand command) {
 		commandQueue.addCommand(command);
@@ -100,7 +99,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		postCommandAndWait(new StartDebuggerCommand(job));
 	}
 	
-	public final void exit() throws CoreException {
+	public final void exit(boolean ignored) throws CoreException {
 		stopDebugger();
 		isExited = true;
 		if (!eventThread.equals(Thread.currentThread())) {			
@@ -115,7 +114,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		deleteObservers();
 		commandQueue.setTerminated();
 		//make sure all processes are finished
-		if (!isJobFinished()) {
+		if (!ignored && !isJobFinished()) {
 			setJobFinished(getSession().createBitList(), IPProcess.EXITED);
 		}
 	}
@@ -143,7 +142,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			getProcess(tasks[i]).setStatus(state);
 		}
 	}
-	public synchronized final void fireEvent(final IPCDIEvent event) {
+	public synchronized final void fireEvent(final IPCDIEvent event) {		
 		if (event != null) {
 			//FIXME - add item here or??
 			eventQueue.addItem(event);

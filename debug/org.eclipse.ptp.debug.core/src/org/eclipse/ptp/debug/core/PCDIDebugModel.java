@@ -60,6 +60,7 @@ import org.eclipse.ptp.debug.internal.core.model.PSession;
 public class PCDIDebugModel {
 	private Map jobSets = new HashMap();
 	private List jobListeners = new ArrayList();
+	private Map sessions = new HashMap();
 
 	public void addLaunchListener(IPLaunchListener listener) {
 		if (!jobListeners.contains(listener))
@@ -74,13 +75,45 @@ public class PCDIDebugModel {
 			((IPLaunchListener)i.next()).handleLaunchEvent(event);
 		}
 	}
-	public void shutdonw() {
+	public void shutdown() {
+		for (Iterator i=sessions.values().iterator(); i.hasNext();) {
+			IPSession pSession = (IPSession)i.next();
+			if (pSession != null) {
+				pSession.getPCDISession().shutdown(true);
+				if (!pSession.getJob().isAllStop()) {
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}			
+		}
+		sessions.clear();
 		jobSets.clear();
 		jobListeners.clear();
 	}
+	public void shutdownSession(IPJob job) {
+		if (job != null) {
+			IPSession pSession = (IPSession)sessions.remove(job);
+			if (pSession != null) {
+				pSession.getPCDISession().shutdown();
+			}
+		}
+	}
+	public IPCDISession getPCDISession(IPJob job) {
+		IPSession pSession = (IPSession)sessions.get(job);
+		if (pSession != null) {
+			return pSession.getPCDISession();
+		}
+		return null;
+	}
 	
 	public IPSession createDebuggerSession(IAbstractDebugger debugger, IPLaunch launch, IBinaryObject exe, IProgressMonitor monitor) throws CoreException {
-		return new PSession(debugger.createDebuggerSession(launch, exe, monitor));
+		IPSession pSession = new PSession(debugger.createDebuggerSession(launch, exe, monitor));
+		sessions.put(pSession.getJob(), pSession);
+		pSession.getPCDISession().start(monitor);
+		return pSession;
 	}
 	
 	public static String getPluginIdentifier() {
@@ -259,13 +292,6 @@ public class PCDIDebugModel {
 			}
 		};
 		ResourcesPlugin.getWorkspace().run(runnable, null);
-	}
-	public void shutdownSession(IPJob job) {
-		if (job != null) {
-			IPCDISession session = (IPCDISession)job.getAttribute(PreferenceConstants.JOB_DEBUG_SESSION);
-			DebugPlugin.getDefault().getLaunchManager().removeLaunch(session.getLaunch());
-			session.shutdown();
-		}
 	}
 	public void newJob(String job_id, int totalTasks) throws CoreException {
 		BitList rootTasks = new BitList(totalTasks);

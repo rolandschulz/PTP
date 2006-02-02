@@ -34,7 +34,6 @@ import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.core.PreferenceConstants;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -80,7 +79,7 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 		this.launch = launch;
 		this.file = file;
 		commonSetup();
-		job.setAttribute(PreferenceConstants.JOB_DEBUG_SESSION, this);
+		//job.setAttribute(PreferenceConstants.JOB_DEBUG_SESSION, this);
 	}
 	private void commonSetup() {
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
@@ -97,11 +96,16 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 	}
 	
 	public void shutdown() {
+		shutdown(false);
+	}
+	public void shutdown(boolean ignore) {
 		try {
-			debugger.exit();
+			debugger.exit(ignore);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
+		
+		DebugPlugin.getDefault().getLaunchManager().removeLaunch(launch);
 		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
 		variableManager.shutdown();
 		expressionManager.shutdown();

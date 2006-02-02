@@ -165,6 +165,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	public void stop(BundleContext context) throws Exception {
 		//disposeBreakpointListenersList();
 		//resetBreakpointsInstallCount();
+		debugModel.shutdown();
 		disposeCommonSourceLookupDirector();
 		super.stop(context);
 	}

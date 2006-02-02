@@ -27,8 +27,14 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * 
  */
 public class StopDebuggerCommand extends AbstractDebugCommand {
-	public StopDebuggerCommand() {
+	private boolean sendEvent = true;
+	
+	public StopDebuggerCommand(boolean sendEvent) {
 		super(null, false, true);
+		this.sendEvent = sendEvent;
+	}
+	public StopDebuggerCommand() {
+		this(true);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		try {
@@ -41,7 +47,9 @@ public class StopDebuggerCommand extends AbstractDebugCommand {
 	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
 		if (waitForReturn()) {
 			if (result.equals(OK)) {
-				debugger.handleStopDebuggerEvent();
+				if (sendEvent) {
+					debugger.handleStopDebuggerEvent();
+				}
 				return;
 			}
 		}
