@@ -99,7 +99,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		postCommandAndWait(new StartDebuggerCommand(job));
 	}
 	
-	public final void exit(boolean ignored) throws CoreException {
+	public final void exit() throws CoreException {
 		stopDebugger();
 		isExited = true;
 		if (!eventThread.equals(Thread.currentThread())) {			
@@ -114,8 +114,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		deleteObservers();
 		commandQueue.setTerminated();
 		//make sure all processes are finished
-		if (!ignored && !isJobFinished()) {
-			setJobFinished(getSession().createBitList(), IPProcess.EXITED);
+		if (session != null && !isJobFinished()) {
+			setJobFinished(session.createBitList(), IPProcess.EXITED);
 		}
 	}
 	public final IPCDISession getSession() {
