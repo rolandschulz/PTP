@@ -79,9 +79,12 @@ public class PCDIDebugModel {
 		for (Iterator i=sessions.values().iterator(); i.hasNext();) {
 			IPSession pSession = (IPSession)i.next();
 			if (pSession != null) {
-				pSession.getPCDISession().shutdown(true);
-				if (!pSession.getJob().isAllStop()) {
+				IPJob job = pSession.getJob();
+				if(!job.isAllStop()) {
+					job.removeAllProcesses();
+					pSession.getPCDISession().shutdown();
 					try {
+						System.out.println("-----PCDODebugModel - waiting debugger to stop");
 						Thread.sleep(2000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();

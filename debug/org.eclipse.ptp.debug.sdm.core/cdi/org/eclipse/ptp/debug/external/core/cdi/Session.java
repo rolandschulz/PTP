@@ -96,11 +96,8 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 	}
 	
 	public void shutdown() {
-		shutdown(false);
-	}
-	public void shutdown(boolean ignore) {
 		try {
-			debugger.exit(ignore);
+			debugger.exit();
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
