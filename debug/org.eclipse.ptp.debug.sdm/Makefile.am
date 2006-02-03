@@ -43,7 +43,8 @@ libdbgclnt_a_CFLAGS =		-I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/incl
 libdbgutils_a_SOURCES =	src/utils/error.c \
 						src/utils/breakpoint.c \
 						src/utils/stackframe.c \
-						src/utils/event.c
+						src/utils/event.c \
+						src/utils/itimer.c
 						
 libdbgutils_a_CFLAGS =	-I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
 

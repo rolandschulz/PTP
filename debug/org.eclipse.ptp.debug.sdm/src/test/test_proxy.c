@@ -19,13 +19,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "dbg.h"
 #include "proxy.h"
 #include "proxy_tcp.h"
 #include "bitset.h"
 
-extern int do_test(session *, char *);
+extern int do_test(session *, char *, char *);
 extern void	event_callback(dbg_event *, void *);
 extern int	wait_for_event(session *, bitset *);
 
@@ -33,6 +34,7 @@ int
 main(int argc, char *argv[])
 {
 	session *	s;
+	char *		dir;
 	char *		exe;
 	char *		host = "localhost";
 	
@@ -41,6 +43,7 @@ main(int argc, char *argv[])
 		return 1;
 	}
 	
+	dir = getcwd(NULL, 0);
 	exe = argv[1];
 	
 	if (argc > 2)
@@ -60,6 +63,6 @@ main(int argc, char *argv[])
 
 	wait_for_event(s, NULL);
 
-	return do_test(s, exe);
+	return do_test(s, dir, exe);
 }
 

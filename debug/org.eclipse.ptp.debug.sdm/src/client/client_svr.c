@@ -42,6 +42,7 @@
 #include "bitset.h"
 #include "list.h"
 #include "hash.h"
+#include "itimer.h"
 
 /*
  * A request represents an asynchronous send/receive transaction between the client
@@ -64,6 +65,7 @@ static MPI_Request *	send_requests;
 static int *			pids;
 static MPI_Status *	stats;
 static void			(*cmd_completed_callback)(dbg_event *, void *);
+static itimer *		send_timer = NULL;
 
 void 
 send_completed(Hash *h, void *data)
@@ -139,6 +141,8 @@ ClntSendCommand(bitset *procs, char *str, void *data)
 		return -1;
 	}
 
+	send_timer = itimer_start("send");
+	
 	bitset_free(p);
 	
 	/*
@@ -181,6 +185,8 @@ ClntSendCommand(bitset *procs, char *str, void *data)
 		}
 	}
 
+	itimer_mark(send_timer, "posted");
+	
 	return 0;
 }
 
@@ -230,6 +236,10 @@ ClntProgressCmds(void)
 			bitset_set(receiving_procs, pids[i]);
 			free(send_bufs[pids[i]]);
 		}
+	} else if (send_timer != NULL) {
+		itimer_finish(send_timer);
+		itimer_free(send_timer);
+		send_timer = NULL;
 	}
 	
 	/*

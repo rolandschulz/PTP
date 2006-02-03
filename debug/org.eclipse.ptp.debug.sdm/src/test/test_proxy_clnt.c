@@ -24,6 +24,7 @@
 #include "proxy.h"
 #include "proxy_tcp.h"
 #include "bitset.h"
+#include "itimer.h"
 
 int 			completed;
 int			fatal;
@@ -150,18 +151,23 @@ cleanup_and_exit(session *s, bitset *p)
 }
 
 int
-do_test(session *s, char *exe)
+do_test(session *s, char *dir, char *exe)
 {
 	bitset *		p1;
 	int			bpid = 54;
+	itimer *		t;
 	
-	if (DbgStartSession(s, "/tmp", exe, NULL) < 0) {
+	t = itimer_start("debug");
+	
+	if (DbgStartSession(s, dir, exe, NULL) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
 	if (wait_for_event(s, NULL) < 0) {
 		cleanup_and_exit(s, NULL);
 	}
+	
+	itimer_mark(t, "launch");
 	
 	p1 = sess_procs;
 		
@@ -171,17 +177,23 @@ do_test(session *s, char *exe)
 	}
 	wait_for_event(s, p1);
 	
+	itimer_mark(t, "breakpoint");
+	
 	if (DbgGo(s, p1) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
 	wait_for_event(s, p1);
 	
+	itimer_mark(t, "suspend");
+		
 	if (DbgListStackframes(s, p1, 0) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
 	wait_for_event(s, p1);
+
+	itimer_mark(t, "where");
 	
 	if (DbgStep(s, p1, 1, 0) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
@@ -189,30 +201,41 @@ do_test(session *s, char *exe)
 	}
 	wait_for_event(s, p1);
 	
+	itimer_mark(t, "step");
+
 	if (DbgStep(s, p1, 1, 0) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
 	wait_for_event(s, p1);
 	
+	itimer_mark(t, "step");
+
 	if (DbgEvaluateExpression(s, p1, "a") < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
 	wait_for_event(s, p1);
 	
+	itimer_mark(t, "evaluate");
+
 	if (DbgListStackframes(s, p1, 1) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
 	wait_for_event(s, p1);
 	
+	itimer_mark(t, "where");
+
 	if (DbgQuit(s) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
 		return 1;
 	}
 	wait_for_event(s, p1);
 
+	itimer_finish(t);
+	itimer_free(t);
+	
 	exit(0);
 }
 
