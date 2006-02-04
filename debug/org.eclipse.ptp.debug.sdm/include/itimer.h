@@ -22,17 +22,34 @@
 
 #include <sys/time.h>
 
-struct itimer {
-	char *			label;
-	struct timeval	start;
-	struct timeval	mark;
-	struct timeval	finish;
-};
-typedef struct itimer	itimer;
+#define MAX_MARKS	100
 
-extern itimer *	itimer_start(char *label);
+struct it_mark {
+	long		elapsed;
+	char *	label;
+};
+typedef struct it_mark	it_mark;
+
+struct itimer {
+	int				running;
+	int				mark_cnt;
+	char *			label;
+	char *			mark_label;
+	long				elapsed;
+	long				total_elapsed;
+	struct timeval	start;
+	struct timeval	last_mark;
+	struct timeval	stop;
+	it_mark			marks[MAX_MARKS];
+};
+typedef struct itimer		itimer;
+
+extern itimer *	itimer_new(char *label);
+extern void		itimer_start(itimer *t);
 extern void		itimer_mark(itimer *t, char *msg);
-extern void		itimer_finish(itimer *t);
+extern void		itimer_stop(itimer *t);
+extern void		itimer_reset(itimer *t);
 extern void		itimer_free(itimer *t);
+extern void		itimer_print(itimer *t);
 
 #endif /* _ITIMER_H_*/

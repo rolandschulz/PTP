@@ -24,7 +24,7 @@
 #include "itimer.h"
 
 itimer *	
-itimer_start(char *label) 
+itimer_new(char *label) 
 {
 	static int	id = 0;
 	itimer *		t = (itimer *)malloc(sizeof(itimer));
@@ -33,51 +33,94 @@ itimer_start(char *label)
 		t->label = strdup(label);
 	else
 		asprintf(&t->label, "timer_%d\n", id++);
-		
-	if (gettimeofday(&t->start, NULL) < 0)
-		return NULL;
-	
-	t->mark.tv_sec = t->start.tv_sec;
-	t->mark.tv_usec = t->start.tv_usec;
 
-	printf("++++ %s: started at %ld+%ld\n", t->label, (long)t->start.tv_sec, (long)t->start.tv_usec); fflush(stdout);
-	
+	t->running = 0;
+	t->total_elapsed = 0;
+	t->mark_cnt = 0;
 	return t;
+}
+
+void
+itimer_start(itimer *t)
+{
+	if (t->running) {
+		printf("warning: attempt to start a running timer\n"); fflush(stdout);
+		return;
+	}
+		
+	(void)gettimeofday(&t->start, NULL);
+
+	t->last_mark.tv_sec = t->start.tv_sec;
+	t->last_mark.tv_usec = t->start.tv_usec;
+	t->running = 1;
+	t->elapsed = 0;
+}
+
+void
+itimer_reset(itimer *t)
+{
+	t->running = 0;
+	t->elapsed = 0;
+	t->total_elapsed = 0;
+}
+
+void
+itimer_print(itimer *t)
+{
+	int i;
+	
+	printf("++++ %s: started at %ld+%ld\n", t->label, (long)t->start.tv_sec, (long)t->start.tv_usec); fflush(stdout);
+	for (i = 0; i < t->mark_cnt; i++)
+		printf("++++ %s: \"%s\" mark time is %ld ms\n", t->label, t->marks[i].label, t->marks[i].elapsed); fflush(stdout);	
+	if (t->elapsed > 0)
+		printf("++++ %s: last elapsed time is %ld ms\n", t->label, t->elapsed); fflush(stdout);
+	if (t->total_elapsed > 0)
+		printf("++++ %s: total elapsed time is %ld ms\n", t->label, t->total_elapsed); fflush(stdout);
 }
 
 void	
 itimer_mark(itimer *t, char *msg) 
 {
-	long				e;
 	struct timeval	mark;
 	
+	if (t->mark_cnt == MAX_MARKS)
+		return;
+		
 	(void)gettimeofday(&mark, NULL);
 	
-	e = ((long)mark.tv_sec * 1000 + (long)mark.tv_usec / 1000) - ((long)t->mark.tv_sec * 1000 + (long)t->mark.tv_usec / 1000);
+	t->marks[t->mark_cnt].elapsed = ((long)mark.tv_sec * 1000 + (long)mark.tv_usec / 1000) 
+		- ((long)t->last_mark.tv_sec * 1000 + (long)t->last_mark.tv_usec / 1000);
 	
-	printf("++++ %s [%s]: elapsed time is %ld ms\n", t->label, msg, e); fflush(stdout);
+	t->marks[t->mark_cnt].label = strdup(msg);
 	
-	t->mark.tv_sec = mark.tv_sec;
-	t->mark.tv_usec = mark.tv_usec;
+	t->last_mark.tv_sec = mark.tv_sec;
+	t->last_mark.tv_usec = mark.tv_usec;
+	t->mark_cnt++;
 }
 
 void
-itimer_finish(itimer *t) 
+itimer_stop(itimer *t)
 {
-	long		e;
+	if (!t->running) {
+		printf("warning: attempt to stop a stopped timer\n"); fflush(stdout);
+		return;
+	}
+		
+	(void)gettimeofday(&t->stop, NULL);
 	
-	(void)gettimeofday(&t->finish, NULL);
-	
-	e = ((long)t->finish.tv_sec * 1000 + (long)t->finish.tv_usec / 1000) 
+	t->elapsed = ((long)t->stop.tv_sec * 1000 + (long)t->stop.tv_usec / 1000) 
 		- ((long)t->start.tv_sec * 1000 + (long)t->start.tv_usec / 1000);
-	
-	printf("++++ %s: total elapsed time is %ld ms\n", t->label, e ); fflush(stdout);
+	t->total_elapsed += t->elapsed;
+	t->running = 0;
 }
 
 void
 itimer_free(itimer *t) 
 {
+	int i;
 	if (t->label != NULL)
 		free(t->label);
+	for (i = 0; i < t->mark_cnt; i++)
+		free(t->marks[i].label);	
 	free(t);
 }
