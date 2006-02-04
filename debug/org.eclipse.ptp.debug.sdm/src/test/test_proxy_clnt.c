@@ -157,7 +157,8 @@ do_test(session *s, char *dir, char *exe)
 	int			bpid = 54;
 	itimer *		t;
 	
-	t = itimer_start("debug");
+	t = itimer_new("debug");
+	itimer_start(t);
 	
 	if (DbgStartSession(s, dir, exe, NULL) < 0) {
 		fprintf(stderr, "error: %s\n", DbgGetErrorStr());
@@ -233,7 +234,8 @@ do_test(session *s, char *dir, char *exe)
 	}
 	wait_for_event(s, p1);
 
-	itimer_finish(t);
+	itimer_stop(t);
+	itimer_print(t);
 	itimer_free(t);
 	
 	exit(0);
