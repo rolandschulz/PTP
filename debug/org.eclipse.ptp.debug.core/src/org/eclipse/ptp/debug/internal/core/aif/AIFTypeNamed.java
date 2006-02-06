@@ -19,25 +19,27 @@
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeReference;
+import org.eclipse.ptp.debug.core.aif.IAIFType;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeNamed;
 
 /**
  * @author Clement chu
  * 
  */
-public class AIFTypeReference extends AIFType implements IAIFTypeReference {
-	private String name;
-	//>name/
-	public AIFTypeReference(String name) {
+public class AIFTypeNamed extends TypeDerived implements IAIFTypeNamed {
+	private String name = null;
+	
+	//%0/{s|a=is4,b=^>0/;;;}
+	public AIFTypeNamed(String name, IAIFType basetype) {
+		super(basetype);
 		this.name = name;
 	}
 	public String getName() {
 		return name;
 	}
-	public int sizeof() {
-		return AIFFactory.NO_SIZE;
-	}	
+	
 	public String toString() {
-		return AIFFactory.FDS_REFERENCE + getName() + AIFFactory.FDS_REFERENCE_END;
-	}
+		return AIFFactory.FDS_NAMED + getName() + AIFFactory.FDS_NAMED_END + getBaseType().toString();
+	}	
 }
+

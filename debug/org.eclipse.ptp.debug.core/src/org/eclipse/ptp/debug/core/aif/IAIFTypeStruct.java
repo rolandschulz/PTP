@@ -21,6 +21,4 @@ package org.eclipse.ptp.debug.core.aif;
  * @author Clement chu
  * 
  */
-public interface IAIFTypeStruct extends ITypeAggregate {
-	
-}
+public interface IAIFTypeStruct extends ITypeAggregate {}

@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeStruct;
 
 public class AIFTypeStruct extends TypeAggregate implements IAIFTypeStruct {	
@@ -29,5 +30,10 @@ public class AIFTypeStruct extends TypeAggregate implements IAIFTypeStruct {
 	}
 	public String toString() {
 		return AIFFactory.FDS_STRUCT + super.toString() + AIFFactory.FDS_STRUCT_END;
+	}
+	public static void main(String[] args) {
+		IAIFType testType = AIFFactory.getAIFType("{structName|floatnumber=f4,intnumber=is4,tStr22={testStruct|aFloat=f4,intNum=is4;;;},shortnumber=is2;;;}");
+		System.out.println("----: " + testType);
+		System.out.println("----: " + testType.sizeof());
 	}
 }

@@ -19,12 +19,13 @@
 package org.eclipse.ptp.debug.internal.core.aif;
 
 import org.eclipse.ptp.debug.core.aif.AIFException;
+import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 
 public class AIFValueUnknown extends AIFValue {
 	public AIFValueUnknown(IAIFType type) {
 		super(type);
-		size = 0;
+		size = AIFFactory.NO_SIZE;
 	}
 	protected void parse(byte[] data) {}
 	
