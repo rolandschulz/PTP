@@ -28,6 +28,7 @@ import org.eclipse.ptp.debug.internal.core.aif.AIFTypeFloat;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeFunction;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeIncomplete;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeInt;
+import org.eclipse.ptp.debug.internal.core.aif.AIFTypeNamed;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypePointer;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeReference;
 import org.eclipse.ptp.debug.internal.core.aif.AIFTypeString;
@@ -64,6 +65,7 @@ public class AIFFactory {
 	public static final char FDS_UNION = '(';
 	public static final char FDS_VOID = 'v';
 	public static final char FDS_REFERENCE = '>';
+	public static final char FDS_NAMED = '%';
 
 	public static final int FDS_FLOAT_SIZE_POS = 1;
 	public static final int FDS_VOID_SIZE_POS = 1;
@@ -84,9 +86,11 @@ public class AIFFactory {
 	public static final String FDS_CLASS_END = "}";
 	public static final String FDS_UNION_END = ")";
 	public static final String FDS_ENUM_END =  ">";
-	public static final String FDS_FUNC_END =  "/";
-	public static final String FDS_REF_END = "/";
+	public static final String FDS_FUNCTION_END =  "/";
+	public static final String FDS_REFERENCE_END = "/";
+	public static final String FDS_NAMED_END = "/";
 	
+	public static final int NO_SIZE = 0;
 	public static final int SIZE_BOOL = 1;
 	public static final int SIZE_CHAR = 1;
 	public static final int SIZE_FLOAT = 4;
@@ -159,9 +163,12 @@ public class AIFFactory {
 	public static String extractFormat(String fmt, int start_pos, int end_pos) {
 		return fmt.substring(start_pos, end_pos);
 	}
-	public static int getEndPos(String fmt, String regex) {
+	public static int getEndPosFromLast(String fmt, String regex) {
 		return fmt.lastIndexOf(regex);
 	}
+	public static int getEndPosFromStart(String fmt, String regex) {
+		return fmt.indexOf(regex);
+	}	
 	
 	public static IAIFType getAIFType(String fmt) {
 		if (fmt == null || fmt.length() == 0) {
@@ -189,32 +196,32 @@ public class AIFFactory {
 			return new AIFTypeBool();
 		case FDS_ENUM:
 			System.out.println("        ======= enum: " + fmt);
-			int enum_end_pos = getEndPos(fmt, FDS_ENUM_END);
+			int enum_end_pos = getEndPosFromLast(fmt, FDS_ENUM_END);
 			String enum_type = fmt.substring(enum_end_pos+FDS_ENUM_END.length());
 			return new AIFTypeEnum(extractFormat(fmt, 1, enum_end_pos), getAIFType(enum_type));
 		case FDS_FUNCTION:
 			System.out.println("        ======= function: " + fmt);
-			int func_end_pos = getEndPos(fmt, FDS_FUNC_END);
-			String func_type = fmt.substring(func_end_pos+FDS_FUNC_END.length());
+			int func_end_pos = getEndPosFromLast(fmt, FDS_FUNCTION_END);
+			String func_type = fmt.substring(func_end_pos+FDS_FUNCTION_END.length());
 			return new AIFTypeFunction(extractFormat(fmt, 1, func_end_pos), getAIFType(func_type));
 		case FDS_STRUCT:
-			int struct_end_pos = getEndPos(fmt, FDS_STRUCT_END);
+			int struct_end_pos = getEndPosFromLast(fmt, FDS_STRUCT_END);
 			if (fmt.length() == struct_end_pos + FDS_STRUCT_END.length()) {
 				System.out.println("        ======= struct " + fmt);
 				return new AIFTypeStruct(extractFormat(fmt, 1, struct_end_pos));
 			}
 			else {
-				struct_end_pos = getEndPos(fmt, FDS_CLASS_END);
+				struct_end_pos = getEndPosFromLast(fmt, FDS_CLASS_END);
 				System.out.println("        ======= class " + fmt);
 				return new AIFTypeClass(extractFormat(fmt, 1, struct_end_pos));
 			}
 		case FDS_UNION:
 			System.out.println("        ======= union: " + fmt);
-			int union_end_pos = getEndPos(fmt, FDS_UNION_END);
+			int union_end_pos = getEndPosFromLast(fmt, FDS_UNION_END);
 			return new AIFTypeUnion(extractFormat(fmt, 1, union_end_pos));
 		case FDS_REFERENCE:
 			System.out.println("        ======= reference: " + fmt);
-			int ref_end_pos = getEndPos(fmt, FDS_REF_END);
+			int ref_end_pos = getEndPosFromStart(fmt, FDS_REFERENCE_END);
 			return new AIFTypeReference(extractFormat(fmt, 1, ref_end_pos));
 		case FDS_POINTER:
 			System.out.println("        ======= pointer: " + fmt);
@@ -225,8 +232,12 @@ public class AIFFactory {
 			return new AIFTypeVoid(void_size);
 		case FDS_ARRAY:
 			System.out.println("        ======= array: " + fmt);
-			int array_end_pos = getEndPos(fmt, SIGN_CLOSE)+1;
+			int array_end_pos = getEndPosFromLast(fmt, SIGN_CLOSE)+1;
 			return new AIFTypeArray(extractFormat(fmt, 0, array_end_pos), getAIFType(fmt.substring(array_end_pos)));
+		case FDS_NAMED:
+			System.out.println("        ======= named: " + fmt);
+			int named_end_pos = getEndPosFromStart(fmt, FDS_NAMED_END);
+			return new AIFTypeNamed(extractFormat(fmt, 1, named_end_pos), getAIFType(fmt.substring(named_end_pos+1)));
 		default:
 			System.out.println("        ======= unknown: " + fmt);
 			return new AIFTypeIncomplete();

@@ -27,7 +27,7 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueReference;
  * @author Clement chu
  * 
  */
-public class AIFValueReference extends ValueDerived implements IAIFValueReference {
+public class AIFValueReference extends AIFValue implements IAIFValueReference {
 	public AIFValueReference(IAIFTypeReference type, byte[] data) {
 		super(type);
 		parse(data);

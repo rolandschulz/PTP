@@ -19,15 +19,23 @@
 
 package org.eclipse.ptp.debug.internal.core.aif;
 
+import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
 
 public class AIFTypePointer extends TypeDerived implements IAIFTypePointer {
 	//char*: ^c
+	//^%0/{s|a=is4,b=^>0/;;;}
 	public AIFTypePointer(IAIFType basetype) {
 		super(basetype);
 	}
 	public String toString() {
-		return "^" + super.toString();
+		return AIFFactory.FDS_POINTER + super.toString();
+	}
+	
+	public static void main(String[] args) {
+		IAIFType testType = AIFFactory.getAIFType("^%0/{s|a=is4,b=^>0/;;;}");
+		System.out.println("----: " + testType);
+		System.out.println("----: " + testType.sizeof());
 	}
 }

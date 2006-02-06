@@ -16,28 +16,12 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.aif;
-
-import org.eclipse.ptp.debug.core.aif.AIFFactory;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeReference;
-
+package org.eclipse.ptp.debug.core.aif;
 /**
  * @author Clement chu
  * 
  */
-public class AIFTypeReference extends AIFType implements IAIFTypeReference {
-	private String name;
-	//>name/
-	public AIFTypeReference(String name) {
-		this.name = name;
-	}
-	public String getName() {
-		return name;
-	}
-	public int sizeof() {
-		return AIFFactory.NO_SIZE;
-	}	
-	public String toString() {
-		return AIFFactory.FDS_REFERENCE + getName() + AIFFactory.FDS_REFERENCE_END;
-	}
+public interface IAIFTypeNamed extends ITypeDerived {
+	public String getName();
 }
+
