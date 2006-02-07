@@ -27,27 +27,29 @@
 #include "MIEvent.h"
 
 struct MISession {
-	int			in_fd; /* GDB input */
-	int			out_fd; /* GDB output */
-	int			pid;
-	int			exited;
-	int			exit_status;
-	MICommand *	command;
-	List *		send_queue;
-	char *		gdb_path;
-	void			(*event_callback)(MIEvent *);
-	void			(*cmd_callback)(MIResultRecord *);
-	void			(*exec_callback)(char *, List *);
-	void			(*status_callback)(char *, List *);
-	void			(*notify_callback)(char *, List *);
-	void			(*console_callback)(char *);
-	void			(*log_callback)(char *);
-	void			(*target_callback)(char *);	
+	int				in_fd; /* GDB input */
+	int				out_fd; /* GDB output */
+	int				pid;
+	int				exited;
+	int				exit_status;
+	MICommand *		command;
+	List *			send_queue;
+	char *			gdb_path;
+	struct timeval	select_timeout;
+	void				(*event_callback)(MIEvent *);
+	void				(*cmd_callback)(MIResultRecord *);
+	void				(*exec_callback)(char *, List *);
+	void				(*status_callback)(char *, List *);
+	void				(*notify_callback)(char *, List *);
+	void				(*console_callback)(char *);
+	void				(*log_callback)(char *);
+	void				(*target_callback)(char *);	
 };
 typedef struct MISession	MISession;
 
 extern MISession *MISessionNew(void);
 extern void MISessionFree(MISession *sess);
+extern void MISessionSetTimeout(MISession *sess, long sec, long usec);
 extern int MISessionStartLocal(MISession *sess, char *);
 extern void MISessionRegisterEventCallback(MISession *sess, void (*callback)(MIEvent *));
 extern void MISessionRegisterCommandCallback(MISession *sess, void (*callback)(MIResultRecord *));

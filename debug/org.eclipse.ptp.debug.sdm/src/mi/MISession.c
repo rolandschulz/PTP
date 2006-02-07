@@ -37,7 +37,7 @@
 #include "MIResult.h"
 
 static List *			MISessionList = NULL;
-static struct timeval		MISessionSelectTimeout = {0, 1000};
+static struct timeval		MISessionDefaultSelectTimeout = {0, 1000};
 
 static void DoOOBCallbacks(MISession *sess, List *oobs);
 static void HandleChild(int sig);
@@ -65,6 +65,7 @@ MISessionNew(void)
 	sess->console_callback = NULL;
 	sess->log_callback = NULL;
 	sess->target_callback = NULL;
+	sess->select_timeout = MISessionDefaultSelectTimeout;
 
 	if (MISessionList == NULL)
 		MISessionList = NewList();
@@ -98,6 +99,13 @@ HandleChild(int sig)
 			}
 		}
 	}
+}
+
+void
+MISessionSetTimeout(MISession *sess, long sec, long usec)
+{
+	sess->select_timeout.tv_sec = sec;
+	sess->select_timeout.tv_usec = usec;
 }
 
 int
@@ -478,7 +486,7 @@ MISessionProgress(MISession *sess)
 	
 	MISessionGetFds(sess, &nfds, &rfds, &wfds, NULL);
 	
-	n = select(nfds, &rfds, &wfds, NULL, &MISessionSelectTimeout);
+	n = select(nfds, &rfds, &wfds, NULL, &sess->select_timeout);
 	
 	if (n == 0)
 		return 0;
