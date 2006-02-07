@@ -23,6 +23,8 @@
  * certainly be running in different processes.
  */
 
+#include <config.h>
+
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -82,7 +84,8 @@ proxy_tcp_svr_event_callback(void *ev_data, void *data)
 		return;
 	}
 
-printf("SVR reply <%s>\n", str);	
+	DEBUG_PRINT("SVR reply <%s>\n", str);
+	
 	(void)proxy_tcp_send_msg(conn, str, strlen(str));
 	free(str);
 }
@@ -323,7 +326,7 @@ proxy_tcp_svr_dispatch(proxy_tcp_conn *conn, char *msg)
 	proxy_event *		e;
 	proxy_svr_commands * cmd;
 	
-printf("SVR received <%s>\n", msg);
+	DEBUG_PRINT("SVR received <%s>\n", msg);
 
 	if (proxy_tcp_svr_shutdown) {
 		e = new_proxy_event(PROXY_EV_ERROR);
