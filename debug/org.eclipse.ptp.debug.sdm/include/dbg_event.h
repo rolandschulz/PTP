@@ -27,6 +27,9 @@
 #include "bitset.h"
 #include "list.h"
 
+#define DBG_EV_WAITALL	0
+#define DBG_EV_WAITSOME	1
+
 #define DBG_EV_OFFSET		100
 #define DBGEV_BPHIT		DBG_EV_OFFSET + 0
 #define DBGEV_SIGNAL		DBG_EV_OFFSET + 1

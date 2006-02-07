@@ -45,6 +45,8 @@
 
 //#define DEBUG
 
+#define MI_TIMEOUT_MS		10000
+
 struct bpentry {
 	int local;
 	int remote;
@@ -56,7 +58,6 @@ struct bpmap {
 	struct bpentry *	maps;
 };
 
-static struct timeval	SELECT_TIMEOUT = { 0, 1000 };
 static MISession *	DebugSession;
 static dbg_event *	LastEvent;
 static void			(*EventCallback)(dbg_event *, void *);
@@ -400,6 +401,8 @@ GDBMIStartSession(char *gdb_path, char *dir, char *prog, char *args, char **env)
 	
 	sess = MISessionNew();
 	
+	MISessionSetTimeout(sess, 0, MI_TIMEOUT_MS);
+	
 	MISessionSetGDBPath(sess, gdb_path);
 	
 	if (MISessionStartLocal(sess, prog) < 0) {
@@ -434,15 +437,13 @@ GDBMIStartSession(char *gdb_path, char *dir, char *prog, char *args, char **env)
  * TODO: Deal with errors
  * 
  * @return	-1	server shutdown
+ * 			1	event callback
  * 			0	completed operation
  */
 static int	
 GDBMIProgress(void)
 {
-	//fd_set			fds;
 	int				res = 0;
-	//struct timeval	tv;
-	//mi_output		*o;
 
 	/*
 	 * Check for existing events
@@ -450,11 +451,11 @@ GDBMIProgress(void)
 	if (LastEvent != NULL) {
 		if (EventCallback != NULL) {
 			EventCallback(LastEvent, EventCallbackData);
+			res = 1;
 		}
 			
 		if (ServerExit && LastEvent->event == DBGEV_OK) {
 			if (DebugSession != NULL) {
-				//mi_disconnect(MIHandle);
 				DebugSession = NULL;
 			}
 			res = -1;
@@ -462,65 +463,21 @@ GDBMIProgress(void)
 			
 		FreeDbgEvent(LastEvent);
 		LastEvent = NULL;
-		
 		return res;
 	}
 	
 	if (DebugSession == NULL)
 		return 0;
-	/*
-	FD_ZERO(&fds);
-	FD_SET(MIHandle->from_gdb[0], &fds);
-	tv = SELECT_TIMEOUT;
-
-	for ( ;; ) {
-		res = select(MIHandle->from_gdb[0]+1, &fds, NULL, NULL, &tv);
-	
-		switch (res) {
-		case INVALID_SOCKET:
-			if ( errno == EINTR )
-				continue;
-		
-			mi_disconnect(MIHandle);
-			MIHandle = NULL;
-		
-			DbgSetError(DBGERR_SYSTEM, strerror(errno));
-			return 0;
-		
-		case 0:
-			return 0;
-		
-		default:
-			break;
-		}
-	
-		break;
-	}*/
 	
 	MISessionProgress(DebugSession);
 	
-	/*
-	mi_set_time_out(MIHandle, 0, 100000);
-	mi_set_time_out_cb(MIHandle, timeout_cb, NULL);
-
-	o = mi_get_response_blk(MIHandle);
-
-	mi_set_time_out(MIHandle, MI_DEFAULT_TIME_OUT, 0);
-	mi_set_time_out_cb(MIHandle, NULL, NULL);
-
-	if (o == NULL) {
-		if (mi_error == MI_GDB_TIME_OUT)
-			mi_error = MI_OK;
-		return 0;
-	}
-*/
-
 	/*
 	 * Do any extra async functions. We can call gdbmi safely here
 	 */
 	if (AsyncFunc != NULL) {
 		AsyncFunc(AsyncFuncData);
 		AsyncFunc = NULL;
+		return 1;
 	}
 
 	return 0;

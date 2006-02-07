@@ -25,7 +25,7 @@
 
 void ClntRegisterCallback(void (*)(dbg_event *, void *));
 void ClntInit(int);
-int ClntSendCommand(bitset *, char *, char *);
+int ClntSendCommand(bitset *, int, char *, char *);
 int ClntSendInterrupt(bitset *);
 int ClntProgressCmds(void);
 

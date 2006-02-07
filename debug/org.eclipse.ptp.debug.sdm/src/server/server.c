@@ -10,6 +10,8 @@
  * task ids.
  */
 
+#include <config.h>
+
 #ifdef __gnu_linux__
 #define _GNU_SOURCE
 #endif /* __gnu_linux__ */
@@ -24,6 +26,8 @@
 #include "proxy.h"
 #include "proxy_tcp.h"
 
+static int	TaskID;
+
 extern int	svr_init(dbg_backend *, void (*)(dbg_event *, void *), void *, char **);
 extern int	svr_dispatch(dbg_backend *, char *);
 extern int	svr_progress(dbg_backend *);
@@ -36,7 +40,7 @@ event_callback(dbg_event *e, void *data)
 	int		len;
 	char *	reply_buf;
 	unsigned int	hdr[2];
-		
+	
 	if (DbgEventToStr(e, &reply_buf) < 0)
 		reply_buf = strdup("ERROR");
 	
@@ -44,9 +48,13 @@ event_callback(dbg_event *e, void *data)
 
 	hdr[0] = HashCompute(reply_buf, len);
 	hdr[1] = len;
+
+	DEBUG_PRINT("SVR[%d] about to send reply <(%d,%d),%s>\n", TaskID, hdr[0], hdr[1], reply_buf);
 	
 	MPI_Send(hdr, 2, MPI_UNSIGNED, task_id, 0, MPI_COMM_WORLD);
 	MPI_Send(reply_buf, strlen(reply_buf), MPI_CHAR, task_id, 0, MPI_COMM_WORLD);
+	
+	DEBUG_PRINT("SVR[%d] send complete\n", TaskID);
 	
 	free(reply_buf);
 }
@@ -59,7 +67,7 @@ event_callback(dbg_event *e, void *data)
  * 			-1 for other errors
  */
 static int
-do_commands(dbg_backend *dbgr, int client_task_id, int my_task_id)
+do_commands(dbg_backend *dbgr, int client_task_id)
 {
 	int			len;
 	int			flag;
@@ -79,13 +87,16 @@ do_commands(dbg_backend *dbgr, int client_task_id, int my_task_id)
 		MPI_Recv(cmd_buf, len, MPI_CHAR, client_task_id, TAG_NORMAL, MPI_COMM_WORLD, &stat);
 		cmd_buf[len] = '\0';
 	
+		DEBUG_PRINT("SVR[%d] received normal command <%s>\n", TaskID, cmd_buf);
 		ret = svr_dispatch(dbgr, cmd_buf);
 		
 		free(cmd_buf);
 	} else {
 		MPI_Recv(NULL, 0, MPI_CHAR, client_task_id, TAG_INTERRUPT, MPI_COMM_WORLD, &stat);
+		DEBUG_PRINT("SVR[%d] received interrupt\n", TaskID);
 		ret = svr_interrupt(dbgr);
 	}
+
 	return ret;
 }
 
@@ -134,7 +145,7 @@ server(int client_task_id, int my_task_id, int job_id, dbg_backend *dbgr)
 	//char **args;
 	char **env = NULL;
 	
-	printf("starting server on [%d]\n", my_task_id); fflush(stdout);
+	DEBUG_PRINT("starting server on [%d]\n", my_task_id);
 	
 	if (job_id >= 0) {
 		env = (char **)malloc(4 * sizeof(char **));
@@ -149,12 +160,14 @@ server(int client_task_id, int my_task_id, int job_id, dbg_backend *dbgr)
 	//initalize_low();
 	
 	//signal = start_inferior(&args, &status);
-	srand(my_task_id);
+	//srand(my_task_id);
+	
+	TaskID = my_task_id;
 	
 	svr_init(dbgr, event_callback, (void *)&client_task_id, env);
 	
 	for (;;) {
-		do_commands(dbgr, client_task_id, my_task_id);
+		do_commands(dbgr, client_task_id);
 		if (svr_progress(dbgr) < 0)
 			break;
 	}

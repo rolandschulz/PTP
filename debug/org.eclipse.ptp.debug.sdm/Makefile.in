@@ -79,7 +79,8 @@ libdbgutils_a_LIBADD =
 am_libdbgutils_a_OBJECTS = src/utils/libdbgutils_a-error.$(OBJEXT) \
 	src/utils/libdbgutils_a-breakpoint.$(OBJEXT) \
 	src/utils/libdbgutils_a-stackframe.$(OBJEXT) \
-	src/utils/libdbgutils_a-event.$(OBJEXT)
+	src/utils/libdbgutils_a-event.$(OBJEXT) \
+	src/utils/libdbgutils_a-itimer.$(OBJEXT)
 libdbgutils_a_OBJECTS = $(am_libdbgutils_a_OBJECTS)
 libmi_a_AR = $(AR) $(ARFLAGS)
 libmi_a_LIBADD =
@@ -209,7 +210,6 @@ LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
-MPIRUN = @MPIRUN@
 OBJEXT = @OBJEXT@
 OMPI_INFO = @OMPI_INFO@
 PACKAGE = @PACKAGE@
@@ -307,7 +307,8 @@ libdbgclnt_a_CFLAGS = -I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/inclu
 libdbgutils_a_SOURCES = src/utils/error.c \
 						src/utils/breakpoint.c \
 						src/utils/stackframe.c \
-						src/utils/event.c
+						src/utils/event.c \
+						src/utils/itimer.c
 
 libdbgutils_a_CFLAGS = -I./include -I./libaif -I$(PROXY)/include -I$(UTILS)/include $(AM_CFLAGS) -g
 libmi_a_SOURCES = src/mi/MIParser.c \
@@ -442,6 +443,8 @@ src/utils/libdbgutils_a-breakpoint.$(OBJEXT):  \
 src/utils/libdbgutils_a-stackframe.$(OBJEXT):  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libdbgutils_a-event.$(OBJEXT): src/utils/$(am__dirstamp) \
+	src/utils/$(DEPDIR)/$(am__dirstamp)
+src/utils/libdbgutils_a-itimer.$(OBJEXT): src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 libdbgutils.a: $(libdbgutils_a_OBJECTS) $(libdbgutils_a_DEPENDENCIES) 
 	-rm -f libdbgutils.a
@@ -615,6 +618,7 @@ mostlyclean-compile:
 	-rm -f src/utils/libdbgutils_a-breakpoint.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-error.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-event.$(OBJEXT)
+	-rm -f src/utils/libdbgutils_a-itimer.$(OBJEXT)
 	-rm -f src/utils/libdbgutils_a-stackframe.$(OBJEXT)
 
 distclean-compile:
@@ -657,6 +661,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-breakpoint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-error.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-event.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-itimer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libdbgutils_a-stackframe.Po@am__quote@
 
 .c.o:
@@ -752,6 +757,20 @@ src/utils/libdbgutils_a-event.obj: src/utils/event.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/event.c' object='src/utils/libdbgutils_a-event.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libdbgutils_a-event.obj `if test -f 'src/utils/event.c'; then $(CYGPATH_W) 'src/utils/event.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/event.c'; fi`
+
+src/utils/libdbgutils_a-itimer.o: src/utils/itimer.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libdbgutils_a-itimer.o -MD -MP -MF "src/utils/$(DEPDIR)/libdbgutils_a-itimer.Tpo" -c -o src/utils/libdbgutils_a-itimer.o `test -f 'src/utils/itimer.c' || echo '$(srcdir)/'`src/utils/itimer.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/libdbgutils_a-itimer.Tpo" "src/utils/$(DEPDIR)/libdbgutils_a-itimer.Po"; else rm -f "src/utils/$(DEPDIR)/libdbgutils_a-itimer.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/itimer.c' object='src/utils/libdbgutils_a-itimer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libdbgutils_a-itimer.o `test -f 'src/utils/itimer.c' || echo '$(srcdir)/'`src/utils/itimer.c
+
+src/utils/libdbgutils_a-itimer.obj: src/utils/itimer.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -MT src/utils/libdbgutils_a-itimer.obj -MD -MP -MF "src/utils/$(DEPDIR)/libdbgutils_a-itimer.Tpo" -c -o src/utils/libdbgutils_a-itimer.obj `if test -f 'src/utils/itimer.c'; then $(CYGPATH_W) 'src/utils/itimer.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/itimer.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/utils/$(DEPDIR)/libdbgutils_a-itimer.Tpo" "src/utils/$(DEPDIR)/libdbgutils_a-itimer.Po"; else rm -f "src/utils/$(DEPDIR)/libdbgutils_a-itimer.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utils/itimer.c' object='src/utils/libdbgutils_a-itimer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdbgutils_a_CFLAGS) $(CFLAGS) -c -o src/utils/libdbgutils_a-itimer.obj `if test -f 'src/utils/itimer.c'; then $(CYGPATH_W) 'src/utils/itimer.c'; else $(CYGPATH_W) '$(srcdir)/src/utils/itimer.c'; fi`
 
 src/mi/libmi_a-MIParser.o: src/mi/MIParser.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmi_a_CFLAGS) $(CFLAGS) -MT src/mi/libmi_a-MIParser.o -MD -MP -MF "src/mi/$(DEPDIR)/libmi_a-MIParser.Tpo" -c -o src/mi/libmi_a-MIParser.o `test -f 'src/mi/MIParser.c' || echo '$(srcdir)/'`src/mi/MIParser.c; \
