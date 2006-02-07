@@ -22,7 +22,6 @@ package org.eclipse.ptp.debug.core.aif;
  * @author Clement chu
  * 
  */
-public interface IAIFValueReference extends IAIFValue {
-	public IAIFValue referenceValue() throws AIFException;
+public interface IAIFValueReference extends IValueParent {
+	String getName();
 }
-

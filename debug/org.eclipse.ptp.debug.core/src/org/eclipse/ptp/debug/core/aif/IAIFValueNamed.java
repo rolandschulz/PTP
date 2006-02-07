@@ -22,10 +22,8 @@ package org.eclipse.ptp.debug.core.aif;
  * @author Clement chu
  * 
  */
-public interface IAIFValueFloat extends IValueParent {
-	public boolean isFloat();
-	public boolean isDouble();
-	public double doubleValue() throws AIFException;
-	public float floatValue() throws AIFException;	
+public interface IAIFValueNamed extends IValueDerived {
+	IAIFValue getValue();
+	String getName();
 }
 

@@ -27,7 +27,6 @@ package org.eclipse.ptp.debug.core.aif;
 public interface IAIFValueArray extends IValueDerived {
 	public int getCurrentDimensionPosition();
 	public int getCurrentPosition();
-	public IAIFValueArray getParent();
 	public Object[] getValues();
 	public Object[] getCurrentValues() throws AIFException;
 	public boolean hasMoreDimension(Object[] objs);

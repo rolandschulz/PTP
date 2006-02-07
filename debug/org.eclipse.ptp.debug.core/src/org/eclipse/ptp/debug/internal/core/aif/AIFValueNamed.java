@@ -16,16 +16,45 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.aif;
+package org.eclipse.ptp.debug.internal.core.aif;
+
+import org.eclipse.ptp.debug.core.aif.AIFException;
+import org.eclipse.ptp.debug.core.aif.AIFFactory;
+import org.eclipse.ptp.debug.core.aif.IAIFTypeNamed;
+import org.eclipse.ptp.debug.core.aif.IAIFValue;
+import org.eclipse.ptp.debug.core.aif.IAIFValueNamed;
+import org.eclipse.ptp.debug.core.aif.IValueParent;
 
 /**
  * @author Clement chu
  * 
  */
-public interface IAIFValueFloat extends IValueParent {
-	public boolean isFloat();
-	public boolean isDouble();
-	public double doubleValue() throws AIFException;
-	public float floatValue() throws AIFException;	
+public class AIFValueNamed extends ValueDerived implements IAIFValueNamed {
+	IAIFValue value;
+	String name;
+	
+	public AIFValueNamed(IValueParent parent, IAIFTypeNamed type, byte[] data) {
+		super(parent, type);
+		parse(data);
+		this.name = type.getName();
+	}
+	public int getChildrenNumber() throws AIFException {
+		return value.getChildrenNumber();
+	}
+	
+	public String getValueString() throws AIFException {
+		if (result == null) {
+			result = value.getValueString();
+		}
+		return result;
+	}	
+	protected void parse(byte[] data) {
+		value = AIFFactory.getAIFValue(this, ((IAIFTypeNamed)type).getBaseType(), data);
+	}	
+	public IAIFValue getValue() {
+		return value;
+	}
+	public String getName() {
+		return name;
+	}
 }
-

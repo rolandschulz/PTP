@@ -30,7 +30,7 @@ public class AIF implements IAIF {
 	
 	public AIF(String fds, byte[] data) {
 		aifType = AIFFactory.getAIFType(fds);
-		aifValue = AIFFactory.getAIFValue(aifType, data);
+		aifValue = AIFFactory.getAIFValue(null, aifType, data);
 	}
 	public AIF(String fds, byte[] data, String desc) {
 		this(fds, data);

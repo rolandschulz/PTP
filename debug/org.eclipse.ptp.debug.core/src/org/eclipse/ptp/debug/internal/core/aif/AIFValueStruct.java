@@ -20,13 +20,14 @@ package org.eclipse.ptp.debug.internal.core.aif;
 
 import org.eclipse.ptp.debug.core.aif.IAIFTypeStruct;
 import org.eclipse.ptp.debug.core.aif.IAIFValueStruct;
+import org.eclipse.ptp.debug.core.aif.IValueParent;
 
 /**
  * @author Clement chu
  * 
  */
 public class AIFValueStruct extends ValueAggregate implements IAIFValueStruct {
-	public AIFValueStruct(IAIFTypeStruct type, byte[] data) {
-		super(type, data);
+	public AIFValueStruct(IValueParent parent, IAIFTypeStruct type, byte[] data) {
+		super(parent, type, data);
 	}
 }

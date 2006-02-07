@@ -31,6 +31,8 @@ import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
+import org.eclipse.ptp.debug.core.aif.IAIFValuePointer;
+import org.eclipse.ptp.debug.core.aif.IAIFValueReference;
 import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
 import org.eclipse.ptp.debug.core.aif.IValueAggregate;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -179,22 +181,44 @@ public class VariableManager extends Manager {
 		}
 		return null;
 	}
-	public IPCDIVariable[] getVariables(VariableDescriptor varDesc) throws PCDIException {
-		IAIFValue parrentValue = varDesc.getAIF().getValue();
-		
-		if (parrentValue instanceof IValueAggregate) {
-			IValueAggregate parentAggrValue = (IValueAggregate)parrentValue;
-			ITypeAggregate parentAggrType = (ITypeAggregate)parentAggrValue.getType();
-			try {
-				int length = parentAggrValue.getChildrenNumber();
-				IPCDIVariable[] vars = new IPCDIVariable[length];			
-				for (int i=0; i<length; i++) {
-					IAIF newAIF = new AIF(parentAggrType.getType(i), parentAggrValue.getValue(i));
-					vars[i] = createVariable(createVariableDescriptor(varDesc, newAIF, parentAggrType.getField(i), false));				
+	private IPCDIVariable[] getVariables(IValueAggregate aggrValue, VariableDescriptor varDesc) throws PCDIException {
+		ITypeAggregate aggrType = (ITypeAggregate)aggrValue.getType();
+		try {
+			int length = aggrValue.getChildrenNumber();
+			IPCDIVariable[] vars = new IPCDIVariable[length];			
+			for (int i=0; i<length; i++) {
+				IAIF newAIF = null;
+				IAIFValue aifValue = aggrValue.getValue(i);
+				if (aifValue instanceof IAIFValueReference) {
+					IAIFValue parentValue = ((IAIFValueReference)aifValue).getParent();
+					if (parentValue == null) {
+						newAIF = new AIF(AIFFactory.UNKNOWNTYPE, AIFFactory.UNKNOWNVALUE);
+					}
+					else {
+						newAIF = new AIF(parentValue.getType(), parentValue);
+					}
 				}
-				return vars;
-			} catch (AIFException e) {
-				throw new PCDIException(e);
+				else {
+					newAIF = new AIF(aifValue.getType(), aggrValue.getValue(i));
+				}
+				vars[i] = createVariable(createVariableDescriptor(varDesc, newAIF, aggrType.getField(i), false));				
+			}
+			return vars;
+		} catch (AIFException e) {
+			throw new PCDIException(e);
+		}
+	}
+	public IPCDIVariable[] getVariables(VariableDescriptor varDesc) throws PCDIException {
+		IAIFValue parentValue = varDesc.getAIF().getValue();
+		
+		if (parentValue instanceof IValueAggregate) {
+			return getVariables((IValueAggregate)parentValue, varDesc);
+		}
+		else if (parentValue instanceof IAIFValuePointer) {
+			IAIFValuePointer valuePointer = (IAIFValuePointer)parentValue;
+			IAIFValue aifValue = valuePointer.getValue();
+			if (aifValue instanceof IValueAggregate) {
+				return getVariables((IValueAggregate)aifValue, varDesc);
 			}
 		}
 		return new IPCDIVariable[0];

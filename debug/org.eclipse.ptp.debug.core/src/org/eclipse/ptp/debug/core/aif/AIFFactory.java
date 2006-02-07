@@ -38,10 +38,13 @@ import org.eclipse.ptp.debug.internal.core.aif.AIFTypeVoid;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueArray;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueBool;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueChar;
+import org.eclipse.ptp.debug.internal.core.aif.AIFValueClass;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueEnum;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueFloat;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueInt;
+import org.eclipse.ptp.debug.internal.core.aif.AIFValueNamed;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValuePointer;
+import org.eclipse.ptp.debug.internal.core.aif.AIFValueReference;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueString;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueStruct;
 import org.eclipse.ptp.debug.internal.core.aif.AIFValueUnion;
@@ -100,8 +103,8 @@ public class AIFFactory {
 	public static final IAIFType UNKNOWNTYPE = new AIFTypeIncomplete();
 	public static final IAIFValue UNKNOWNVALUE = new AIFValueUnknown(UNKNOWNTYPE);
 		
-	public static IAIFValue getAIFValue(IAIFType type, byte[] data) {
-		if (data == null || data.length == 0) {
+	public static IAIFValue getAIFValue(IValueParent parent, IAIFType type, byte[] data) {
+		if (data == null || data.length < 0) {
 			return new AIFValueUnknown(type);
 		}
 		if (type instanceof IAIFTypeChar) {
@@ -116,23 +119,25 @@ public class AIFFactory {
 			return new AIFValueBool((IAIFTypeBool)type, data);
 		} else if (type instanceof IAIFTypeArray) {
 			return new AIFValueArray((IAIFTypeArray)type, data);
-		} else if (type instanceof IAIFTypePointer) {
-			return new AIFValuePointer((IAIFTypePointer)type, data);
-		} else if (type instanceof IAIFTypeStruct) {
-			return new AIFValueStruct((IAIFTypeStruct)type, data);			
-		} else if (type instanceof IAIFTypeUnion) {
-			return new AIFValueUnion((IAIFTypeUnion)type, data);
 		} else if (type instanceof IAIFTypeEnum) {
 			return new AIFValueEnum((IAIFTypeEnum)type, data);		
-		/*
+		} else if (type instanceof IAIFTypePointer) {
+			return new AIFValuePointer(parent, (IAIFTypePointer)type, data);
+		} else if (type instanceof IAIFTypeNamed) {
+			return new AIFValueNamed(parent, (IAIFTypeNamed)type, data);
+		} else if (type instanceof IAIFTypeReference) {
+			return new AIFValueReference(parent, (IAIFTypeReference)type, data);
+		} else if (type instanceof IAIFTypeStruct) {
+			return new AIFValueStruct(parent, (IAIFTypeStruct)type, data);			
+		} else if (type instanceof IAIFTypeUnion) {
+			return new AIFValueUnion(parent, (IAIFTypeUnion)type, data);
 		} else if (type instanceof IAIFTypeClass) {
-			return new AIFValueClass((IAIFTypeClass)type, data);
+			return new AIFValueClass(parent, (IAIFTypeClass)type, data);
+		/*
 		} else if (type instanceof IAIFTypeFunction) {
 			return new AIFValueFunction((IAIFTypeFunction)type, data);			
 		} else if (type instanceof IAIFTypeVoid) {
 			return new AIFValueVoid((IAIFTypeVoid)type, data);
-		} else if (type instanceof IAIFTypeReference) {
-			return new AIFValueReference((IAIFTypeReference)type, data);
 		*/				
 		} else {//AIFTypeUnknown
 			return new AIFValueUnknown(type);	

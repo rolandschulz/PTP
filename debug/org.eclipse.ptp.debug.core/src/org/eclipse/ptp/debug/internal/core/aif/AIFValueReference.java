@@ -20,66 +20,46 @@ package org.eclipse.ptp.debug.internal.core.aif;
 
 import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeReference;
-import org.eclipse.ptp.debug.core.aif.IAIFValue;
+import org.eclipse.ptp.debug.core.aif.IAIFValueNamed;
 import org.eclipse.ptp.debug.core.aif.IAIFValueReference;
+import org.eclipse.ptp.debug.core.aif.IValueParent;
 
 /**
  * @author Clement chu
  * 
  */
-public class AIFValueReference extends AIFValue implements IAIFValueReference {
-	public AIFValueReference(IAIFTypeReference type, byte[] data) {
-		super(type);
+public class AIFValueReference extends ValueParent implements IAIFValueReference {
+	private String name = null;
+	
+	public AIFValueReference(IValueParent parent, IAIFTypeReference type, byte[] data) {
+		super(parent, type);
 		parse(data);
+		this.name = type.getName();
+	}
+	public String getName() {
+		return name;
 	}
 	protected void parse(byte[] data) {
 		size = data.length;
 	}
 	public String getValueString() throws AIFException {
 		if (result == null) {
-			result = String.valueOf("");
+			result = (getParent()==null)?"unknown value":getName();
 		}
-		return null;
+		return result;
 	}
-	public IAIFValue referenceValue() throws AIFException {
-		IAIFValue value = null;
-		/*
-		IAIFTypeReference rt = (IAIFTypeReference)getType();
-		IAIFType t = rt.getComponentType();
-		if (t instanceof IAIFTypeBool) {
-			value = new AIFValueBool(t);
-		} else if (t instanceof IAIFTypeChar) {
-			value = new AIFValueChar(t);
-		} else if (t instanceof IAIFTypeWChar) {
-			value = new AIFValueWChar(t);
-		} else if (t instanceof IAIFTypeShort) {
-			value = new AIFValueShort(t);
-		} else if (t instanceof IAIFTypeInt) {
-			value = new AIFValueInt(t);
-		} else if (t instanceof IAIFTypeLong) {
-			value = new AIFValueLong(t);
-		} else if (t instanceof IAIFTypeLongLong) {
-			value = new AIFValueLongLong(t);
-		} else if (t instanceof IAIFTypeEnum) {
-			value = new AIFValueEnum(t);
-		} else if (t instanceof IAIFTypeFloat) {
-			value = new AIFValueFloat(t);
-		} else if (t instanceof IAIFTypeDouble) {
-			value = new AIFValueDouble(t);
-		} else if (t instanceof IAIFTypeFunction) {
-			value = new AIFValueFunction(t);
-		} else if (t instanceof IAIFTypePointer) {
-			value = new AIFValuePointer(t);
-//		} else if (t instanceof ICDIReferenceType) {
-//			value = new ReferenceValue(getVariable());
-		} else if (t instanceof IAIFTypeArray) {
-			value = new AIFValueArray(t);			
-		} else if (t instanceof IAIFTypeStruct) {
-			value = new AIFValueStruct(t);
-		} else {
-			value = new AIFValueUnknown(t);
+	public IValueParent getParent() {
+		if (parent instanceof IAIFValueNamed) {
+			if (((IAIFValueNamed)parent).getName().equals(getName())) {
+				return parent.getParent();
+			}
 		}
-		*/
-		return value;		
+
+		if (parent == null) {
+			return null;
+		}
+		
+		parent = parent.getParent();
+		return getParent();
 	}
 }

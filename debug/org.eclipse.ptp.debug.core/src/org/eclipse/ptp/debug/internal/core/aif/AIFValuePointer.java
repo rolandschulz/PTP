@@ -23,7 +23,9 @@ import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
+import org.eclipse.ptp.debug.core.aif.IAIFValueNamed;
 import org.eclipse.ptp.debug.core.aif.IAIFValuePointer;
+import org.eclipse.ptp.debug.core.aif.IValueParent;
 
 /**
  * @author Clement chu
@@ -33,10 +35,14 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 	int marker = 0;
 	IAIFValue value;
 	
-	public AIFValuePointer(IAIFTypePointer type, byte[] data) {
-		super(type);
+	public AIFValuePointer(IValueParent parent, IAIFTypePointer type, byte[] data) {
+		super(parent, type);
 		parse(data);
 	}
+	public int getChildrenNumber() throws AIFException {
+		return value.getChildrenNumber();
+	}
+	
 	public String getValueString() throws AIFException {
 		if (result == null) {
 			result = value.getValueString();
@@ -44,16 +50,17 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 		return result;
 	}
 	protected void parse(byte[] data) {
+System.err.println("------- total: " + data.length);
 		marker = data[0];
 		IAIFTypePointer pType = (IAIFTypePointer)type;
-		System.out.println("--------------- marker: " + marker);
+System.err.println("--------------- marker: " + marker);
 		switch (marker) {
 		case 0:
 			value = AIFFactory.UNKNOWNVALUE;
 			break;
 		case 1:
 			byte[] newByte = createByteArray(data, 1, data.length-1);
-			value = AIFFactory.getAIFValue(pType.getBaseType(), newByte);
+			value = AIFFactory.getAIFValue(this, pType.getBaseType(), newByte);
 			break;
 		case 2:
 			break;
@@ -64,10 +71,17 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 			break;
 		}
 		size = value.sizeof();
-		System.out.println("--------------- pointer value: " + value.toString());
+System.err.println("--------------- pointer value: " + value.toString());
 	}
 	
 	public BigInteger pointerValue() throws AIFException {
 		return ValueIntegral.bigIntegerValue(getValueString());
+	}
+	
+	public IAIFValue getValue() {
+		if (value instanceof IAIFValueNamed) {
+			return ((IAIFValueNamed)value).getValue();
+		}
+		return value;
 	}
 }

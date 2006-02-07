@@ -44,6 +44,6 @@ public class AIFValueEnum extends ValueIntegral implements IAIFValueEnum {
 	protected void parse(byte[] data) {
 		size = data.length;
 		IAIFTypeEnum pType = (IAIFTypeEnum)type;
-		value = AIFFactory.getAIFValue(pType.getBaseType(), data);
+		value = AIFFactory.getAIFValue(null, pType.getBaseType(), data);
 	}
 }

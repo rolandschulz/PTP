@@ -16,16 +16,30 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.core.aif;
+package org.eclipse.ptp.debug.internal.core.aif;
+
+import org.eclipse.ptp.debug.core.aif.IAIFType;
+import org.eclipse.ptp.debug.core.aif.IValueParent;
 
 /**
  * @author Clement chu
  * 
  */
-public interface IAIFValueFloat extends IValueParent {
-	public boolean isFloat();
-	public boolean isDouble();
-	public double doubleValue() throws AIFException;
-	public float floatValue() throws AIFException;	
+public abstract class ValueParent extends AIFValue implements IValueParent {
+	protected IValueParent parent;
+	
+	public ValueParent(IAIFType type) {
+		this(null, type);
+	}
+	public ValueParent(IValueParent parent, IAIFType type) {
+		super(type);
+		this.parent = parent;
+	}	
+	public void setParent(IValueParent parent) {
+		this.parent = parent;
+	}
+	public IValueParent getParent() {
+		return parent;
+	}
 }
 

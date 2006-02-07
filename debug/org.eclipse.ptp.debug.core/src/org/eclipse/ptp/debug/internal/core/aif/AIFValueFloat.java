@@ -28,7 +28,7 @@ import org.eclipse.ptp.debug.core.aif.IAIFValueFloat;
  * @author Clement chu
  * 
  */
-public class AIFValueFloat extends AIFValue implements IAIFValueFloat {
+public class AIFValueFloat extends ValueParent implements IAIFValueFloat {
 	ByteBuffer byteBuffer;
 	
 	public AIFValueFloat(IAIFTypeFloat type, byte[] data) {
