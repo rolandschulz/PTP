@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.internal.core.ModelManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -195,6 +196,21 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		ErrorDialog.openError(shell, title, message, s);
 	}
 
+	public static void warningDialog(final String title, final String message) {
+		getDisplay().syncExec(new Runnable() {
+			public void run() {
+				MessageDialog.openWarning(getDisplay().getActiveShell(), title, message);
+			}
+		});
+		
+	}
+	public static void informationDialog(final String title, final String message) {
+		getDisplay().syncExec(new Runnable() {
+			public void run() {
+				MessageDialog.openInformation(getDisplay().getActiveShell(), title, message);
+			}
+		});
+	}
 	/*
 	public void addPerspectiveListener(final IPerspectiveListener perspectiveListener) {
 		IWorkbenchWindow workBenchWindow = PTPCorePlugin.getActiveWorkbenchWindow();
