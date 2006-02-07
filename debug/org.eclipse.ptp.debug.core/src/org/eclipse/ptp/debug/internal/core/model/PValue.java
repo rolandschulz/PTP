@@ -140,7 +140,7 @@ public class PValue extends AbstractPValue {
 			((AbstractPVariable) it.next()).dispose();
 		}
 	}
-	private String processUnderlyingValue(IAIFValue aifValue) throws AIFException {
+	protected String processUnderlyingValue(IAIFValue aifValue) throws AIFException {
 		if (aifValue != null) {
 			if (aifValue instanceof IAIFValueChar)
 				return getCharValueString((IAIFValueChar) aifValue);
@@ -151,7 +151,7 @@ public class PValue extends AbstractPValue {
 			else if (aifValue instanceof IAIFValuePointer)
 				return getPointerValueString((IAIFValuePointer) aifValue);
 			else if (aifValue instanceof IAIFValueReference)
-				return processUnderlyingValue(((IAIFValueReference) aifValue).referenceValue());
+				return processUnderlyingValue(((IAIFValueReference) aifValue).getParent());
 			else if (aifValue instanceof IAIFValueString)
 				return getWCharValueString((IAIFValueString) aifValue);
 			else

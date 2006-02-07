@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.internal.core.aif;
 import org.eclipse.ptp.debug.core.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFTypeNamed;
+import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
 
 /**
  * @author Clement chu
@@ -40,6 +41,13 @@ public class AIFTypeNamed extends TypeDerived implements IAIFTypeNamed {
 	
 	public String toString() {
 		return AIFFactory.FDS_NAMED + getName() + AIFFactory.FDS_NAMED_END + getBaseType().toString();
-	}	
+	}
+	
+	public String getField(int index) {
+		if (basetype instanceof ITypeAggregate) {
+			return ((ITypeAggregate)basetype).getField(index);
+		}
+		return null;
+	}
 }
 

@@ -35,21 +35,17 @@ public class AIFValueArray extends ValueDerived implements IAIFValueArray {
 	private Object[] values;
 	private int current_dimension_position = 0;
 	private int current_position = 0;
-	private IAIFValueArray parentArray;
 
-	public AIFValueArray(IAIFValueArray parsentArray, int current_pos) {
-		super((IAIFTypeArray)parsentArray.getType());
-		this.parentArray = parsentArray;
+	public AIFValueArray(IAIFValueArray parentArray, int current_pos) {
+		super((IAIFTypeArray)parentArray.getType());
+		setParent(parentArray);
 		current_dimension_position = parentArray.getCurrentDimensionPosition()+1;
 		current_position = current_pos;
 	}
 	public AIFValueArray(IAIFTypeArray type, byte[] data) {
 		super(type);
 		parse(data);
-		parentArray = this;
-	}
-	public IAIFValueArray getParent() {
-		return parentArray;
+		setParent(this);
 	}
 	public int getChildrenNumber() throws AIFException {
 		return getCurrentValues().length;
@@ -91,15 +87,20 @@ public class AIFValueArray extends ValueDerived implements IAIFValueArray {
 					}
 					dst[h] = dataBuf.get();
 				}
-				innerValues[j] = AIFFactory.getAIFValue(baseType, dst);
+				innerValues[j] = AIFFactory.getAIFValue(null, baseType, dst);
 				size += ((IAIFValue)innerValues[j]).sizeof(); 
 			}
 		}
 		return innerValues;
 	}
 	public Object[] getValues() {
-		if (values == null)
-			return parentArray.getValues();
+		if (values == null) {
+			IAIFValue tmpValue = getParent();
+			if (tmpValue instanceof IAIFValueArray) {
+				return ((IAIFValueArray)tmpValue).getValues();
+			}
+			return new Object[0];
+		}
 		return values;
 	}
 	private String getString() {
@@ -132,8 +133,12 @@ public class AIFValueArray extends ValueDerived implements IAIFValueArray {
 		if (current_dimension_position == 0)
 			return getValues();
 		
-		Object[] objs = getParent().getCurrentValues();
-		return (Object[])objs[current_position];
+		IAIFValue tmpValue = getParent();
+		if (tmpValue instanceof IAIFValueArray) {
+			Object[] objs = ((IAIFValueArray)tmpValue).getCurrentValues();
+			return (Object[])objs[current_position];
+		}
+		return new Object[0];
 	}
 	public boolean hasMoreDimension(Object[] objs) {
 		if (objs.length == 0)

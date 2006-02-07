@@ -24,7 +24,8 @@ import java.math.BigInteger;
  * @author Clement chu
  * 
  */
-public interface IAIFValuePointer extends IValueDerived {
+public interface IAIFValuePointer extends IValueParent {
 	BigInteger pointerValue() throws AIFException;
+	IAIFValue getValue();
 }
 

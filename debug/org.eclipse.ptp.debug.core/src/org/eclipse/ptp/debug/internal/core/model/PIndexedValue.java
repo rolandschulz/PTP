@@ -21,7 +21,9 @@ package org.eclipse.ptp.debug.internal.core.model;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IIndexedValue;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.ptp.debug.core.aif.AIFException;
 import org.eclipse.ptp.debug.core.aif.IAIF;
+import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueArray;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIVariable;
@@ -174,5 +176,9 @@ public class PIndexedValue extends AbstractPValue implements IIndexedValue {
 	}
 	private int getSize0() {
 		return fSize;
+	}
+	
+	protected String processUnderlyingValue(IAIFValue aifValue) throws AIFException {
+		return aifValue.getValueString();
 	}
 }

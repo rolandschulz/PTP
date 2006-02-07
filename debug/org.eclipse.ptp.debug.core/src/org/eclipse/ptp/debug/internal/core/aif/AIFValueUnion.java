@@ -24,14 +24,15 @@ import org.eclipse.ptp.debug.core.aif.IAIFTypeUnion;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.IAIFValueUnion;
 import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
+import org.eclipse.ptp.debug.core.aif.IValueParent;
 
 /**
  * @author Clement chu
  * 
  */
 public class AIFValueUnion extends ValueAggregate implements IAIFValueUnion {
-	public AIFValueUnion(IAIFTypeUnion type, byte[] data) {
-		super(type, data);
+	public AIFValueUnion(IValueParent parent, IAIFTypeUnion type, byte[] data) {
+		super(parent, type, data);
 	}
 	
 	protected void parse(byte[] data) {
@@ -41,7 +42,7 @@ public class AIFValueUnion extends ValueAggregate implements IAIFValueUnion {
 		for (int i=0; i<length; i++) {
 			IAIFType aifType = typeAggregate.getType(i);
 			byte[] newData = createByteArray(data, (size - aifType.sizeof()), aifType.sizeof());
-			IAIFValue val = AIFFactory.getAIFValue(aifType, newData);
+			IAIFValue val = AIFFactory.getAIFValue(this, aifType, newData);
 			values.add(val);
 		}
 	}	

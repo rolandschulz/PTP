@@ -20,14 +20,18 @@ package org.eclipse.ptp.debug.internal.core.aif;
 
 import org.eclipse.ptp.debug.core.aif.ITypeDerived;
 import org.eclipse.ptp.debug.core.aif.IValueDerived;
+import org.eclipse.ptp.debug.core.aif.IValueParent;
 
 /**
  * @author Clement chu
  * 
  */
-public abstract class ValueDerived extends AIFValue implements IValueDerived {
+public abstract class ValueDerived extends ValueParent implements IValueDerived {
 	public ValueDerived(ITypeDerived type) {
 		super(type);
+	}
+	public ValueDerived(IValueParent parent, ITypeDerived type) {
+		super(parent, type);
 	}
 }
 

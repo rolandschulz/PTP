@@ -26,19 +26,20 @@ import org.eclipse.ptp.debug.core.aif.IAIFType;
 import org.eclipse.ptp.debug.core.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.aif.ITypeAggregate;
 import org.eclipse.ptp.debug.core.aif.IValueAggregate;
+import org.eclipse.ptp.debug.core.aif.IValueParent;
 
 /**
  * @author Clement chu
  * 
  */
-public abstract class ValueAggregate extends AIFValue implements IValueAggregate {
+public abstract class ValueAggregate extends ValueParent implements IValueAggregate {
 	protected List values = new ArrayList();
 	
-	public ValueAggregate(ITypeAggregate type, byte[] data) {
-		super(type);
+	public ValueAggregate(IValueParent parent, ITypeAggregate type, byte[] data) {
+		super(parent, type);
 		parse(data);
 	}
-
+	
 	public int getChildrenNumber() throws AIFException {
 		return values.size();
 	}
@@ -49,7 +50,7 @@ public abstract class ValueAggregate extends AIFValue implements IValueAggregate
 		for (int i=0; i<length; i++) {
 			IAIFType aifType = typeAggregate.getType(i);
 			byte[] newData = createByteArray(data, from, aifType.sizeof());
-			IAIFValue val = AIFFactory.getAIFValue(aifType, newData);
+			IAIFValue val = AIFFactory.getAIFValue(this, aifType, newData);
 			values.add(val);
 			from += val.sizeof();
 		}
