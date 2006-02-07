@@ -141,7 +141,7 @@ DbgClntStartSession(char **args)
 	char *	cmd;
 	
 	asprintf(&cmd, "%s %s \"%s\" \"%s\"", DBG_STARTSESSION_CMD, args[1], args[2], args[3]);
-	res = ClntSendCommand(dbg_procs, cmd, NULL);
+	res = ClntSendCommand(dbg_procs, DBG_EV_WAITALL, cmd, NULL);
 	free(cmd);
 	return res;
 }
@@ -163,7 +163,7 @@ DbgClntSetLineBreakpoint(char **args)
 	}
 	
 	asprintf(&cmd, "%s %s \"%s\" %s", DBG_SETLINEBREAKPOINT_CMD, args[2], args[3], args[4]);
-	res = ClntSendCommand(set, cmd, NULL);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
 	
 	free(cmd);
 	bitset_free(set);
@@ -185,7 +185,7 @@ DbgClntSetFuncBreakpoint(char **args)
 	}
 
 	asprintf(&cmd, "%s %s \"%s\" \"%s\"", DBG_SETFUNCBREAKPOINT_CMD, args[2], args[3], args[4]);
-	res = ClntSendCommand(set, cmd, NULL);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
 	
 	free(cmd);
 	bitset_free(set);
@@ -207,7 +207,7 @@ DbgClntDeleteBreakpoint(char **args)
 	}
 	
 	asprintf(&cmd, "%s %s", DBG_DELETEBREAKPOINT_CMD, args[2]);
-	res = ClntSendCommand(set, cmd, NULL);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
 	
 	free(cmd);
 	bitset_free(set);
@@ -230,7 +230,7 @@ DbgClntGo(char **args)
 		return DBGRES_ERR;
 	}
 	
-	res = ClntSendCommand(set, DBG_GO_CMD, NULL);
+	res = ClntSendCommand(set, DBG_EV_WAITSOME, DBG_GO_CMD, NULL);
 	
 	bitset_free(set);
 		
@@ -251,7 +251,7 @@ DbgClntStep(char **args)
 	}
 	
 	asprintf(&cmd, "%s %s %s", DBG_STEP_CMD, args[2], args[3]);
-	res = ClntSendCommand(set, cmd, NULL);
+	res = ClntSendCommand(set, DBG_EV_WAITSOME, cmd, NULL);
 	
 	free(cmd);
 	bitset_free(set);
@@ -271,7 +271,7 @@ DbgClntTerminate(char **args)
 		return DBGRES_ERR;
 	}
 	
-	res = ClntSendCommand(set, DBG_TERMINATE_CMD, NULL);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, DBG_TERMINATE_CMD, NULL);
 	
 	bitset_free(set);
 	
@@ -314,7 +314,7 @@ DbgClntListStackframes(char **args)
 	}
 	
 	asprintf(&cmd, "%s %s", DBG_LISTSTACKFRAMES_CMD, args[2]);
-	res = ClntSendCommand(set, cmd, NULL);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
 	
 	free(cmd);
 	bitset_free(set);
@@ -336,7 +336,7 @@ DbgClntSetCurrentStackframe(char **args)
 	}
 	
 	asprintf(&cmd, "%s %s", DBG_SETCURRENTSTACKFRAME_CMD, args[2]);
-	res = ClntSendCommand(set, cmd, NULL);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
 	
 	free(cmd);
 	bitset_free(set);
@@ -361,7 +361,7 @@ DbgClntEvaluateExpression(char **args)
 	}
 	
 	asprintf(&cmd, "%s \"%s\"", DBG_EVALUATEEXPRESSION_CMD, args[2]);
-	res = ClntSendCommand(set, cmd, NULL);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
 	
 	free(cmd);
 	bitset_free(set);
@@ -383,7 +383,7 @@ DbgClntGetType(char **args)
 	}
 	
 	asprintf(&cmd, "%s \"%s\"", DBG_GETTYPE_CMD, args[2]);
-	res = ClntSendCommand(set, cmd, NULL);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
 	
 	free(cmd);
 	bitset_free(set);
@@ -403,7 +403,7 @@ DbgClntListLocalVariables(char **args)
 		return DBGRES_ERR;
 	}
 	
-	res = ClntSendCommand(set, DBG_LISTLOCALVARIABLES_CMD, NULL);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, DBG_LISTLOCALVARIABLES_CMD, NULL);
 	
 	bitset_free(set);
 	
@@ -424,7 +424,7 @@ DbgClntListArguments(char **args)
 	}
 	
 	asprintf(&cmd, "%s %s", DBG_LISTARGUMENTS_CMD, args[2]);
-	res = ClntSendCommand(set, cmd, NULL);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
 	
 	free(cmd);
 	bitset_free(set);
@@ -444,7 +444,7 @@ DbgClntListGlobalVariables(char **args)
 		return DBGRES_ERR;
 	}
 	
-	res = ClntSendCommand(set, DBG_LISTGLOBALVARIABLES_CMD, NULL);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, DBG_LISTGLOBALVARIABLES_CMD, NULL);
 	
 	bitset_free(set);
 	
@@ -456,7 +456,7 @@ DbgClntQuit(void)
 {
 	dbg_shutdown = SHUTDOWN_STARTED;
 	
-	return ClntSendCommand(dbg_procs, "QUI", NULL);
+	return ClntSendCommand(dbg_procs, DBG_EV_WAITALL, "QUI", NULL);
 }
 
 /*

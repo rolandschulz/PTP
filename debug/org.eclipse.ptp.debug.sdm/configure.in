@@ -82,6 +82,13 @@ if test "$ac_cv_path_OMPI_INFO" = no; then
 	AC_MSG_ERROR([SDM currently requires Open MPI to be installed.])
 fi
 
+AH_VERBATIM([DEBUG],
+[#ifdef DEBUG
+#define DEBUG_PRINT(format, ...)	printf(format, __VA_ARGS__); fflush(stdout)
+#else /* DEBUG */
+#define DEBUG_PRINT(format, ...)
+#endif /* DEBUG */])
+
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_SUBDIRS([bitvector libaif ../org.eclipse.ptp.proxy ../org.eclipse.ptp.utils])
 AC_OUTPUT
