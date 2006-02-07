@@ -32,6 +32,8 @@
 
 #include <config.h>
 
+#include <sys/time.h>
+
 #include <mpi.h>
 #include <stdlib.h>
 #include <string.h>
