@@ -202,7 +202,6 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 				MessageDialog.openWarning(getDisplay().getActiveShell(), title, message);
 			}
 		});
-		
 	}
 	public static void informationDialog(final String title, final String message) {
 		getDisplay().syncExec(new Runnable() {
