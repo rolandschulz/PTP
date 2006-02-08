@@ -1,10 +1,16 @@
 package org.eclipse.ptp.rtsystem.ompi;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.BitSet;
+import java.util.Properties;
+
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.ptp.core.ControlSystemChoices;
 import org.eclipse.ptp.core.IModelManager;
@@ -89,22 +95,81 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		Preferences preferences = PTPCorePlugin.getDefault().getPluginPreferences();
 		String proxyPath = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
 		System.out.println("ORTE_SERVER path = '"+proxyPath+"'");
+		/* if the orte_server path is unset, let's try and find it for them */
 		if(proxyPath.equals("")) {
-			String err = "Could not start the ORTE server.  Check the "+
-				"PTP/Open RTE preferences page and be certain that the path and arguments "+
-				"are correct.  Defaulting to Simulation Mode.";
-			System.err.println(err);
-			PTPCorePlugin.errorDialog("ORTE Server Start Failure", err, null);
-
-			int MSI = MonitoringSystemChoices.SIMULATED;
-			int CSI = ControlSystemChoices.SIMULATED;
-							
-			preferences.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSI);
-			preferences.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSI);
-
-			PTPCorePlugin.getDefault().savePluginPreferences();
+			/* if they don't have the orte_server path set, let's try and give them a default that might help */
+			boolean found_orte_server = false;
 			
-			return false;
+			URL url = Platform.find(Platform.getBundle(PTPCorePlugin.PLUGIN_ID), new Path("/"));
+			String ipath2, ipath3;
+			ipath2 = new String("");
+			ipath3 = new String("");
+
+			if (url != null) {
+				try {
+					File path = new File(Platform.asLocalURL(url).getPath());
+					String ipath = path.getAbsolutePath();
+					System.out.println("Plugin install dir = '"+ipath+"'");
+					
+					/* org.eclipse.ptp.orte.linux.x86_64_1.0.0
+					   org.eclipse.ptp.orte.$(OS).$(ARCH)_$(VERSION) */
+					String ptp_version = (String)PTPCorePlugin.getDefault().getBundle().getHeaders().get("Bundle-Version");
+					System.out.println("PTP Version = "+ptp_version);
+					Properties p = System.getProperties();
+					String os = p.getProperty("osgi.os");
+					String arch = p.getProperty("osgi.arch");
+					System.out.println("osgi.os = "+os);
+					System.out.println("osgi.arch = "+arch);
+					/* OK, we might have it . . . */
+					if(os != null && arch != null && ptp_version != null) {
+						String combo = "org.eclipse.ptp.core."+os+"."+arch+"_"+ptp_version;
+						System.out.println("Searching for directory: "+combo);
+						int idx = ipath.indexOf(combo);
+						/* if we found it */
+						if(idx > 0) {
+							ipath2 = ipath.substring(0, idx) + "org.eclipse.ptp.orte."+os+"."+arch+"_"+ptp_version+"/orte_server";
+							System.out.println("Searching for "+ipath2);
+							File f = new File(ipath2);
+							if(f.exists()) {
+								preferences.setValue(PreferenceConstants.ORTE_SERVER_PATH, ipath2);
+								found_orte_server = true;
+							}
+						}
+						else ipath2 = combo;
+					}
+					
+					if(!found_orte_server) {
+						int idx = ipath.indexOf("org.eclipse.ptp.core");
+						ipath3 = ipath.substring(0, idx) + "org.eclipse.ptp.orte/orte_server";
+						System.out.println("Searching for "+ipath3);
+						File f = new File(ipath3);
+						if(f.exists()) {
+							preferences.setValue(PreferenceConstants.ORTE_SERVER_PATH, ipath3);
+							found_orte_server = true;
+						}
+					}
+				} catch(Exception e) { 	}
+			}
+			
+			/* OK we checked everywhere we knew, send them to the Simulator instead */
+			if(!found_orte_server) {
+				String err = "Could not start the ORTE server.  Check the "+
+					"PTP/Open RTE preferences page and be certain that the path and arguments "+
+					"are correct.  Checked for 'orte_server' in locations '"+ipath2+"' and '"+
+					ipath3+"'.  Defaulting to Simulation Mode.";
+				System.err.println(err);
+				PTPCorePlugin.errorDialog("ORTE Server Start Failure", err, null);
+
+				int MSI = MonitoringSystemChoices.SIMULATED;
+				int CSI = ControlSystemChoices.SIMULATED;
+								
+				preferences.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSI);
+				preferences.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSI);
+
+				PTPCorePlugin.getDefault().savePluginPreferences();
+				
+				return false;
+			}
 		}
 
 		final String proxyPath2 = preferences.getString(PreferenceConstants.ORTE_SERVER_PATH);
