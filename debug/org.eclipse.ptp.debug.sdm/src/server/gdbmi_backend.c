@@ -71,7 +71,7 @@ static void *		AsyncFuncData;
 static int	SetAndCheckBreak(int, char *);
 static int	GetStackframes(int, List **);
 static int	GetAIFVar(char *, AIF **, char **);
-static AIF *	ConvertVarToAIF(char *, MIVar *);
+static AIF *	ConvertVarToAIF(char *, MIVar *, int);
 
 static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIProgress(void);
@@ -1155,24 +1155,37 @@ static char* GetModifierType(char* original_type) {
 }
 
 static AIF *
-CreateStruct(MIVar *var)
+CreateStruct(MIVar *var, int named)
 {
 	int		i;
 	MIVar *	v;
 	AIF *	a;
 	AIF *	ac;
+	named++;
 	
 	if (var->type[6] == ' ' && var->type[7] != '{')
 		a = EmptyStructToAIF(&var->type[7]);
 	else
 		a = EmptyStructToAIF(NULL);
-	
+
 	for ( i = 0 ; i < var->numchild ; i++ )
 	{
 		v = var->children[i];
-		if ( (ac = ConvertVarToAIF(v->exp, v)) == NULL ) {
-			AIFFree(a);
-			return NULL;
+		//check whether child contains parent
+		if (strcmp(var->type, v->type) == 0 && strcmp(var->name, v->name)) {
+			if ((ac = ReferenceAIF(named)) == NULL) {
+				AIFFree(a);
+				return NULL;
+			}
+			if (FDSType(AIF_FORMAT(a)) != AIF_NAME) {
+				a = NameAIF(a, named);
+			}
+		}
+		else {
+			if ( (ac = ConvertVarToAIF(v->exp, v, named)) == NULL ) {
+				AIFFree(a);
+				return NULL;
+			}
 		}
 		AIFAddFieldToStruct(a, v->exp, ac);
 	}
@@ -1180,7 +1193,7 @@ CreateStruct(MIVar *var)
 }
 
 static AIF *
-CreateUnion(MIVar *var)
+CreateUnion(MIVar *var, int named)
 {
 	int		i;
 	MIVar *	v;
@@ -1195,7 +1208,7 @@ CreateUnion(MIVar *var)
 	for ( i = 0 ; i < var->numchild ; i++ )
 	{
 		v = var->children[i];
-		if ( (ac = ConvertVarToAIF(v->exp, v)) == NULL ) {
+		if ( (ac = ConvertVarToAIF(v->exp, v, named)) == NULL ) {
 			AIFFree(a);
 			return NULL;
 		}
@@ -1212,7 +1225,7 @@ CreateUnion(MIVar *var)
 }
 
 static AIF *
-CreateArray(MIVar *var)
+CreateArray(MIVar *var, int named)
 {
 	int		i;
 	MIVar *	v;
@@ -1221,7 +1234,7 @@ CreateArray(MIVar *var)
 
 	for (i = 0; i < var->numchild; i++) {
 		v = var->children[i];
-		if ((ac = ConvertVarToAIF(v->exp, v)) == NULL) {
+		if ((ac = ConvertVarToAIF(v->exp, v, named)) == NULL) {
 			return NULL;
 		}
 		if (a == NULL)
@@ -1234,7 +1247,7 @@ CreateArray(MIVar *var)
 }
 
 static AIF *
-ConvertVarToAIF(char *exp, MIVar *var)
+ConvertVarToAIF(char *exp, MIVar *var, int named)
 {
 	AIF *		a;
 	MICommand *	cmd;
@@ -1263,16 +1276,16 @@ ConvertVarToAIF(char *exp, MIVar *var)
 		switch ( var->type[strlen(var->type) - 1] )
 		{
 		case ']': /* array */
-			a = CreateArray(var);
+			a = CreateArray(var, named);
 			break;
 
 		case '*': /* pointer */
 			if (strncmp(var->type, "struct", 6) == 0) {
-				a = CreateStruct(var);
+				a = CreateStruct(var, named);
 			} else if (strncmp(var->type, "union", 5) == 0) {
-				a = CreateUnion(var);
+				a = CreateUnion(var, named);
 			} else {
-				a = ConvertVarToAIF(var->children[0]->exp, var->children[0]);
+				a = ConvertVarToAIF(var->children[0]->exp, var->children[0], named);
 			}
 			if (a != NULL)
 				a = PointerToAIF(a);
@@ -1280,15 +1293,14 @@ ConvertVarToAIF(char *exp, MIVar *var)
 						
 		default:
 			if (strncmp(var->type, "struct", 6) == 0) { /* struct */
-				a = CreateStruct(var);
+				a = CreateStruct(var, named);
 			} else if (strncmp(var->type, "union", 5) == 0) {
-				a = CreateUnion(var);
+				a = CreateUnion(var, named);
 			} else {
 				DbgSetError(DBGERR_DEBUGGER, "type not supported (yet)");
 				return NULL;
 			}
 		}
-		
 	}
 
 	return a;
@@ -1365,7 +1377,7 @@ GetAIFVar(char *var, AIF **val, char **type)
 	
 	MICommandFree(cmd);
 
-	if ( (res = ConvertVarToAIF(var, mivar)) == NULL ) {
+	if ( (res = ConvertVarToAIF(var, mivar, 0)) == NULL ) {
 		return DBGRES_ERR;
 	}
 
