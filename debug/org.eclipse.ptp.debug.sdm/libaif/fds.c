@@ -2352,7 +2352,7 @@ _fds_skip_data(char **fds, char **data)
 	{
 	case AIF_REFERENCE:
 		fmt = _fds_lookup(fds); // need a temporary copy
-		_fds_skip_data(&fmt, data);
+//		_fds_skip_data(&fmt, data);
 		return;
 
 	case AIF_POINTER:
