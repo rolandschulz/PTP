@@ -48,7 +48,7 @@ public abstract class ValueAggregate extends ValueParent implements IValueAggreg
 		int length = typeAggregate.getNumberOfChildren();
 		int from = 0;
 		for (int i=0; i<length; i++) {
-			IAIFType aifType = typeAggregate.getType(i);
+			IAIFType aifType = typeAggregate.getType(i);			
 			byte[] newData = createByteArray(data, from, aifType.sizeof());
 			IAIFValue val = AIFFactory.getAIFValue(this, aifType, newData);
 			values.add(val);
