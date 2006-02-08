@@ -77,21 +77,20 @@ public abstract class TypeAggregate extends AIFType implements ITypeAggregate {
 		return fmt.substring(pos+1);
 	}
 	protected String parseType(String fmt) {
-		int pos = 0;
-		switch (fmt.charAt(0)) {
-		case AIFFactory.FDS_STRUCT:
-			pos = getSeperatePosition(fmt, AIFFactory.FDS_STRUCT_END);
-			if (pos == -1) {
-				pos = getSeperatePosition(fmt, AIFFactory.FDS_CLASS_END);
+		int pos = getSeperatePosition(fmt);
+		if (pos > -1) {
+			String tmp_fmt = fmt.substring(0, pos);
+			if (tmp_fmt.indexOf(AIFFactory.FDS_STRUCT) > -1) {
+				pos = getSeperatePosition(fmt, AIFFactory.FDS_STRUCT_END);
+				if (pos == -1) {
+					pos = getSeperatePosition(fmt, AIFFactory.FDS_CLASS_END);
+				}
 			}
-			break;
-		case AIFFactory.FDS_UNION:
-			pos = getSeperatePosition(fmt, AIFFactory.FDS_UNION_END);
-			break;
-		default:
-			pos = getSeperatePosition(fmt);
-			break;
+			else if (tmp_fmt.indexOf(AIFFactory.FDS_UNION) > -1) {
+				pos = getSeperatePosition(fmt, AIFFactory.FDS_UNION_END);
+			}
 		}
+
 		if (pos == -1) {
 			pos = fmt.length();
 		}
