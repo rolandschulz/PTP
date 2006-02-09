@@ -301,8 +301,6 @@ AsyncStop(void *data)
 		return DBGRES_ERR;
 	}
 
-	MIEventFree(evt);
-
 	if (EventCallback != NULL)
 		EventCallback(e, EventCallbackData);
 		
@@ -554,7 +552,6 @@ SetAndCheckBreak(int bpid, char *where)
 
 	bpts = MIBreakpointGetBreakInsertInfo(cmd);
 
-	
 	MICommandFree(cmd);
 			
 	if (bpts == NULL) {
