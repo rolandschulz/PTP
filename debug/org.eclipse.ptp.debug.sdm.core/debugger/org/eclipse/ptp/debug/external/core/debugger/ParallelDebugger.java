@@ -293,13 +293,13 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 		System.out.println("got debug event: " + e.toString());
 		switch (e.getEventID()) {
 		case IProxyDebugEvent.EVENT_DBG_OK:
-			completeCommand(IDebugCommand.OK);
+			completeCommand(e.getBitSet(), IDebugCommand.OK);
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_INIT:
 			numServers = ((ProxyDebugInitEvent)e).getNumServers();
 			System.out.println("num servers = " + numServers);
-			completeCommand(IDebugCommand.OK);
+			completeCommand(e.getBitSet(), IDebugCommand.OK);
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_BPHIT:
@@ -316,7 +316,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			
 		case IProxyDebugEvent.EVENT_DBG_BPSET:
 			ProxyDebugBreakpointSetEvent bpEvt = (ProxyDebugBreakpointSetEvent)e;
-			completeCommand(bpEvt.getBreakpoint());
+			completeCommand(e.getBitSet(), bpEvt.getBreakpoint());
 			//updateBreakpointInfo(bpEvt.getBreakpointId(), e.getBitSet(), bpEvt.getBreakpoint());
 			break;
 			
@@ -325,18 +325,18 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			
 			IPProcess[] frameProcs = getProcesses(e.getBitSet());
 			if (frameProcs.length > 0) {
-				completeCommand(convertFrames(frameProcs[0], frameEvent.getFrames()));
+				completeCommand(e.getBitSet(), convertFrames(frameProcs[0], frameEvent.getFrames()));
 			}
 			break;
 
 		case IProxyDebugEvent.EVENT_DBG_TYPE:
 			ProxyDebugTypeEvent type = (ProxyDebugTypeEvent)e;
-			completeCommand(type.getType());
+			completeCommand(e.getBitSet(), type.getType());
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_DATA:
 			ProxyDebugDataEvent data = (ProxyDebugDataEvent)e;
-			completeCommand(data.getData());			
+			completeCommand(e.getBitSet(), data.getData());
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_VARS:
@@ -358,7 +358,7 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 					varList.add(var);
 				}
 			}
-			completeCommand((IPCDILocalVariable[])varList.toArray(new IPCDILocalVariable[0]));			
+			completeCommand(e.getBitSet(), (IPCDILocalVariable[])varList.toArray(new IPCDILocalVariable[0]));			
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_ARGS:
@@ -380,25 +380,24 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 					argList.add(arg);
 				}
 			}
-			completeCommand((IPCDIArgument[]) argList.toArray(new IPCDIArgument[0]));			
+			completeCommand(e.getBitSet(), (IPCDIArgument[]) argList.toArray(new IPCDIArgument[0]));			
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_EXIT:
 			System.out.println("======================= EVENT_DBG_EXIT ====================");
 			handleProcessTerminatedEvent(e.getBitSet());
-			//fireEvent(new InferiorExitedEvent(getSession(), e.getBitSet()));
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_SIGNAL:
 			ProxyDebugSignalEvent sigEvent = (ProxyDebugSignalEvent)e;
-			handleProcessSignaledEvent(e.getBitSet(), sigEvent.getLocator());
-			//fireEvent(new InferiorSignaledEvent(getSession(), e.getBitSet(), sigEvent.getLocator()));
+			completeCommand(e.getBitSet(), sigEvent.getLocator());
+			//handleProcessSignaledEvent(e.getBitSet(), sigEvent.getLocator());
 			break;
 			
 		case IProxyDebugEvent.EVENT_DBG_ERROR:
-			System.out.println("======================= EVENT_DBG_ERROR ====================");
+			System.err.println("======================= EVENT_DBG_ERROR ====================");
 			ProxyDebugErrorEvent errEvent = (ProxyDebugErrorEvent)e;
-			completeCommand(null);
+			completeCommand(e.getBitSet(), null);
 			int code = errEvent.getErrorCode();
 			if (code == IParallelDebuggerConstants.DBGERR_DEBUGGER || code == IParallelDebuggerConstants.DBGERR_NOFILEDIR || code == IParallelDebuggerConstants.DBGERR_CHDIR) {
 				code = IPCDIErrorEvent.DBG_FATAL;
@@ -407,8 +406,6 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 				code = IPCDIErrorEvent.DBG_ERROR;
 			}
 			handleErrorEvent(e.getBitSet(), errEvent.getErrorMessage(), code);
-			//fireEvent(new ErrorEvent(getSession(), e.getBitSet(), "Internal debugger error"));
-			//fireEvent(new InferiorExitedEvent(getSession(), e.getBitSet()));
 			break;
 		}
 	}

@@ -56,9 +56,12 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 	public Object getReturn() {
 		return result;
 	}
-	public void setReturn(Object result) {
+	public void setReturn(BitList tasks, Object result) {
 		synchronized (lock) {
 			this.result = result;
+			if (tasks != null) {
+				this.tasks = tasks;
+			}
 			lock.notifyAll();
 		}
 	}
@@ -84,10 +87,34 @@ public abstract class AbstractDebugCommand implements IDebugCommand {
 		}
 	}
 	
+	public void cancelWaiting() {
+		synchronized (lock) {
+			waitForReturn = false;
+			lock.notifyAll();
+		}
+	}
+	
 	public void flush() {
 		synchronized (lock) {
 			isFlush = true;
 			lock.notifyAll();
 		}
 	}
+	
+	/**
+	 * 
+	 * @param obj compared object
+	 * @return 0 means equals, otherwise not equals
+	 */
+	public int compareTo(Object obj) {
+		if (obj instanceof IDebugCommand) {
+			if (!getName().equals(((IDebugCommand) obj).getName()))
+				return -1;
+			
+			BitList cpyTasks = getTasks().copy();
+			cpyTasks.andNot(((IDebugCommand) obj).getTasks());
+			return cpyTasks.isEmpty()?0:-1;
+		}
+		return -1;
+	}	
 }

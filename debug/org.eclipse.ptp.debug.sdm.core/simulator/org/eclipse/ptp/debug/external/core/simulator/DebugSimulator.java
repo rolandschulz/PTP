@@ -58,7 +58,7 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 	DQueue debuggerOutput = null;
 
 	public void connection() {
-		completeCommand(IDebugCommand.OK);
+		completeCommand(null, IDebugCommand.OK);
 	}
 	
 	public void getAIFValue(BitList tasks, String expr) throws PCDIException {

@@ -18,6 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.external.core.commands;
 
+import org.eclipse.cdt.debug.core.cdi.ICDILocator;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -28,13 +29,26 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  */
 public class HaltCommand extends AbstractDebugCommand {
 	public HaltCommand(BitList tasks) {
-		super(tasks, true, false);
+		super(tasks, false, true);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterSuspendTasks(tasks);
 		if (!tasks.isEmpty()) {
 			debugger.halt(tasks);
+			waitFinish(debugger);
 		}
+		else {
+			cancelWaiting();
+		}
+	}
+	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
+		if (waitForReturn()) {
+			if (result instanceof ICDILocator) {
+				debugger.handleProcessSignaledEvent(tasks, (ICDILocator)result);
+				return;
+			}
+		}
+		throw new PCDIException("Cannot terminate tasks: " + tasks.toString());		
 	}
 	public String getName() {
 		return "Halt"; 
