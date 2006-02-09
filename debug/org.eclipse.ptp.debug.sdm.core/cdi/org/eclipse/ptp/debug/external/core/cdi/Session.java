@@ -249,7 +249,7 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 		return tasks;
 	}
 	public int getTotalProcesses() {
-		return job.size();
+		return job.totalProcesses();
 	}
 
 	public void breakpointAdded(IBreakpoint breakpoint) {
