@@ -421,11 +421,8 @@ DoOOBCallbacks(MISession *sess, List *oobs)
 						if (strcmp(res->variable, "reason") == 0) {
 							val = res->value;
 							if (val->type == MIValueTypeConst) {
-								if (sess->event_callback) {
-									MIEvent *evt = MIEventCreateStoppedEvent(val->cstring, oob->results);
-									sess->event_callback(evt);
-									MIEventFree(evt);
-								}
+								if (sess->event_callback)
+									sess->event_callback(MIEventCreateStoppedEvent(val->cstring, oob->results));
 							}
 						}
 					}
