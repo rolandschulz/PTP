@@ -301,6 +301,8 @@ AsyncStop(void *data)
 		return DBGRES_ERR;
 	}
 
+	MIEventFree(evt);
+	
 	if (EventCallback != NULL)
 		EventCallback(e, EventCallbackData);
 		
