@@ -142,9 +142,9 @@ MISessionStartLocal(MISession *sess, char *prog)
 		close(p2[1]);
 		
 		if (prog == NULL)
-			execlp(sess->gdb_path, "gdb", "-q", "-i", "mi", NULL);
+			execlp(sess->gdb_path, "gdb", "-q", "-tty", "/dev/null", "-i", "mi", NULL);
 		else
-			execlp(sess->gdb_path, "gdb", "-q", "-i", "mi", prog, NULL);
+			execlp(sess->gdb_path, "gdb", "-q", "-tty", "/dev/null", "-i", "mi", prog, NULL);
 		
 		exit(1);
 	
@@ -352,9 +352,17 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 		&& FD_ISSET(sess->in_fd, wfds))
 	{
 		sess->command = (MICommand *)RemoveFirst(sess->send_queue);
+#ifdef __gnu_linux__
+		if (strcmp(sess->command->command, "-exec-interrupt") == 0) {
+			kill(sess->pid, SIGINT);
+		} else if (WriteCommand(sess->in_fd, MICommandToString(sess->command)) < 0) {
+			sess->in_fd = -1;
+		}
+#else /* __gnu_linux__ */
 		if (WriteCommand(sess->in_fd, MICommandToString(sess->command)) < 0) {
 			sess->in_fd = -1;
 		}
+#endif /* __gnu_linux */
 	}
 
 	if (sess->out_fd != -1 && FD_ISSET(sess->out_fd, rfds)) {
@@ -364,9 +372,14 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 		}
 		
 		output = MIParse(str);	
-				
-		if (output->oobs != NULL)
+			
+		if (output->oobs != NULL) {
+#ifdef __gnu_linux__
+			if (strcmp(sess->command->command, "-exec-interrupt") == 0)
+				sess->command->completed = 1;
+#endif /* __gnu_linux__ */	
 			DoOOBCallbacks(sess, output->oobs);
+		}
 			
 		if (output->rr != NULL) {
 			sess->command->completed = 1;
@@ -374,9 +387,11 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 			if (sess->command->callback != NULL)
 				sess->command->callback(output->rr);
 			output->rr = NULL; /* Freed by MICommandFree() */
-			sess->command = NULL;
 		}
-		
+
+		if (sess->command->completed)
+			sess->command = NULL;
+
 		MIOutputFree(output);
 	}
 }
