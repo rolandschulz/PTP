@@ -375,7 +375,7 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 			
 		if (output->oobs != NULL) {
 #ifdef __gnu_linux__
-			if (strcmp(sess->command->command, "-exec-interrupt") == 0)
+			if (sess->command != NULL && strcmp(sess->command->command, "-exec-interrupt") == 0)
 				sess->command->completed = 1;
 #endif /* __gnu_linux__ */	
 			DoOOBCallbacks(sess, output->oobs);
@@ -389,7 +389,7 @@ MISessionProcessCommandsAndResponses(MISession *sess, fd_set *rfds, fd_set *wfds
 			output->rr = NULL; /* Freed by MICommandFree() */
 		}
 
-		if (sess->command->completed)
+		if (sess->command != NULL && sess->command->completed)
 			sess->command = NULL;
 
 		MIOutputFree(output);
@@ -421,8 +421,11 @@ DoOOBCallbacks(MISession *sess, List *oobs)
 						if (strcmp(res->variable, "reason") == 0) {
 							val = res->value;
 							if (val->type == MIValueTypeConst) {
-								if (sess->event_callback)
-									sess->event_callback(MIEventCreateStoppedEvent(val->cstring, oob->results));
+								if (sess->event_callback) {
+									MIEvent *evt = MIEventCreateStoppedEvent(val->cstring, oob->results);
+									sess->event_callback(evt);
+									MIEventFree(evt);
+								}
 							}
 						}
 					}
