@@ -127,7 +127,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 						int idx = ipath.indexOf(combo);
 						/* if we found it */
 						if(idx > 0) {
-							ipath2 = ipath.substring(0, idx) + "org.eclipse.ptp.orte."+os+"."+arch+"_"+ptp_version+"/orte_server";
+							ipath2 = ipath.substring(0, idx) + "org.eclipse.ptp.orte."+os+"."+arch+"_"+ptp_version+"/bin/orte_server";
 							System.out.println("Searching for "+ipath2);
 							File f = new File(ipath2);
 							if(f.exists()) {
