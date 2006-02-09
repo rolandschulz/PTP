@@ -25,16 +25,17 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  * @author Clement chu
  * 
  */
-public interface IDebugCommand {
+public interface IDebugCommand extends Comparable {
 	public static final String OK = "OK";
 	
 	public BitList getTasks();
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException;
 	public boolean isWaitForReturn();
 	public Object getReturn();
-	public void setReturn(Object result);
+	public void setReturn(BitList tasks, Object result);
 	public boolean waitForReturn();
 	public boolean canInterrupt();
+	public void cancelWaiting();
 	
 	public void flush();
 	
