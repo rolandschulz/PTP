@@ -319,7 +319,7 @@ public class PCDIDebugModel {
 	}
 	public BitList getTasks(String job_id, String set_id) throws CoreException {
 		JobSet jobSet = getJobSet(job_id);
-		return jobSet.getTasks(set_id);
+		return jobSet.getTasks(set_id).copy();
 	}
 	public void deleteJob(String job_id) {
 		getJobSet(job_id).clearAllSets();
