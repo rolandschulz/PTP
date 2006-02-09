@@ -78,8 +78,8 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		postCommand(command);
 		command.waitForReturn();
 	}
-	public void completeCommand(Object result) {
-		commandQueue.setCommandReturn(result);
+	public void completeCommand(BitList tasks, Object result) {
+		commandQueue.setCommandReturn(tasks, result);
 	}
 
 	public final void initialize(IPJob job) throws CoreException {
@@ -160,7 +160,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 					postCommand(new StopDebuggerCommand());
 				}
 			} else if (event instanceof IPCDISuspendedEvent) {
-				setSuspendTasks(true, tasks);				
+				setSuspendTasks(true, tasks);
 				setProcessStatus(tasks.toArray(), IPProcess.STOPPED);
 			}
 			//eventQueue.addItem(event);
@@ -216,7 +216,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		fireEvent(new InferiorSignaledEvent(getSession(), tasks, locator));
 	}
 	public void handleErrorEvent(BitList tasks, String errMsg, int errCode) {
-		System.err.println("----- debugger error: " + errMsg);
+		System.err.println("----- debugger error: " + errMsg + " ------------");
 		if (errCode == IPCDIErrorEvent.DBG_FATAL) {
 			tasks = ((Session)session).createBitList();
 		}
@@ -285,5 +285,5 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 			suspendedTasks = addTasks(suspendedTasks, tasks);			
 		else
 			removeTasks(suspendedTasks, tasks);
-	}
+	}	
 }

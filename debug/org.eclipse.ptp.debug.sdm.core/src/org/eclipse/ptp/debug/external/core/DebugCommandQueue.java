@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.external.core;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.IDebugCommand;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
@@ -60,7 +61,7 @@ public class DebugCommandQueue extends Thread {
 					//System.out.println("************ ERROR in DebugCommandQueue -- wait for return, cmd: " + currentCommand);
 				//}
 			} catch (PCDIException e) {
-				debugger.handleErrorEvent(currentCommand.getTasks(), "Err on execute " + currentCommand.getName() + " command, err: " + e.getMessage(), IPCDIErrorEvent.DBG_ERROR);
+				debugger.handleErrorEvent(currentCommand.getTasks(), "Executing " + currentCommand.getName() + " command problem - " + e.getMessage(), IPCDIErrorEvent.DBG_ERROR);
 				//System.out.println("************ ERROR in DebugCommandQueue -- execCommand, cmd: " + currentCommand + ", err: " + e.getMessage());
 			} finally {
 				currentCommand = null;
@@ -87,9 +88,9 @@ public class DebugCommandQueue extends Thread {
 	}
 	public void addCommand(IDebugCommand command) {
 		synchronized (queue) {
-			if (!queue.contains(command)) {
+			if (!contains(command)) {
 				if (command.canInterrupt() && currentCommand != null) {
-					setCommandReturn(null);
+					setCommandReturn(null, null);
 					try {
 						//To make sure all events fired via AsbtractDebugger, so wait 0.5 sec here
 						queue.wait(500);
@@ -99,9 +100,18 @@ public class DebugCommandQueue extends Thread {
 				queue.notifyAll();
 			}
 			else {
-				debugger.handleErrorEvent(command.getTasks(), "Duplicate in " + command.getName() + " command", IPCDIErrorEvent.DBG_WARNING);
-				//System.out.println("************ ERROR in DebugCommandQueue -- duplicate, cmd: " + currentCommand);
+				//debugger.handleErrorEvent(command.getTasks(), "Duplicate in " + command.getName() + " command", IPCDIErrorEvent.DBG_WARNING);
+				System.err.println("************ ERROR in DebugCommandQueue -- duplicate, cmd: " + currentCommand);
 			}
+		}
+	}
+	private boolean contains(IDebugCommand command) {
+		synchronized (queue) {
+			int size = queue.size();
+			if (size > 0) {
+				return (((IDebugCommand)queue.get(size-1)).compareTo(command) == 0);
+			}
+			return false;
 		}
 	}
 	public void flushCommands() {
@@ -113,7 +123,7 @@ public class DebugCommandQueue extends Thread {
 			queue.clear();
 		}
 	}
-	public void setCommandReturn(Object result) {
+	public void setCommandReturn(BitList tasks, Object result) {
 		synchronized (queue) {
 			if (currentCommand != null) {
 				if (result == null) {
@@ -121,14 +131,15 @@ public class DebugCommandQueue extends Thread {
 					currentCommand.flush();
 				}
 				else {
-					currentCommand.setReturn(result);
+					currentCommand.setReturn(tasks, result);
 				}
 			}
 		}
 	}
 	public void cleanup() {
 		synchronized (queue) {
-			queue.clear();
+			//queue.clear();
+			flushCommands();
 		}
 	}
 }

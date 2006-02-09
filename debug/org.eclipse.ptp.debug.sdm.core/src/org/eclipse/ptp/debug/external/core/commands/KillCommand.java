@@ -43,6 +43,9 @@ public class KillCommand extends AbstractDebugCommand {
 			debugger.kill(tasks);
 			waitFinish(debugger);
 		}
+		else {
+			cancelWaiting();
+		}
 	}
 	public void waitFinish(IAbstractDebugger debugger) throws PCDIException {
 		if (waitForReturn()) {

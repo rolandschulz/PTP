@@ -28,7 +28,7 @@ import org.eclipse.ptp.debug.core.cdi.PCDIException;
  */
 public class GoCommand extends AbstractDebugCommand {
 	public GoCommand(BitList tasks) {
-		super(tasks, true, false);
+		super(tasks, false, false);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
 		debugger.filterRunningTasks(tasks);
