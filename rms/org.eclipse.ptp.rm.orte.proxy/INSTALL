@@ -1,10 +1,11 @@
 #!/bin/sh
 
-ARCH = `uname -p | sed -e 's/powerpc/ppc/' -e 's/ppc64/ppc/' -e 's/i.86/x86/'`
-OS = `uname -s | sed -e 's/Darwin/macosx/' -e 's/Linux/linux/'`
-INSTALL_DIR = ../org.eclipse.ptp.orte.$(OS).$(ARCH)/bin
+export ARCH=`uname -p | sed -e 's/powerpc/ppc/' -e 's/ppc64/ppc/' -e 's/i.86/x86/'`
+export OS=`uname -s | sed -e 's/Darwin/macosx/' -e 's/Linux/linux/'`
+export INSTALL_DIR=../org.eclipse.ptp.orte.$OS.$ARCH/bin
 
-cp orte_server $(INSTALL_DIR)
-chmod 755 $(INSTALL_DIR)/orte_server
+echo "Copying orte_server to $INSTALL_DIR . . ."
+cp orte_server $INSTALL_DIR
+chmod 755 $INSTALL_DIR/orte_server
 
 exit 0
