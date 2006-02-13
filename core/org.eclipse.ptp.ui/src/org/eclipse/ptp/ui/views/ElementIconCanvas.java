@@ -21,6 +21,7 @@ package org.eclipse.ptp.ui.views;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ptp.internal.ui.views.IconCanvas;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.model.IElement;

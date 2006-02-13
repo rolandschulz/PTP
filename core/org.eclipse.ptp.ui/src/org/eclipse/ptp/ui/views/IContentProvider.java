@@ -17,15 +17,12 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.ui.views;
-
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-
 /**
  * @author Clement chu
- *
+ * 
  */
-public interface IImageProvider {
-	public Image getStatusIcon(Object obj, boolean isSelected);
-	public void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int width, int height);
+public interface IContentProvider {
+	public Object getObject(int index);
+	public String getRulerIndex(Object obj, int index);
 }
+

@@ -232,10 +232,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 	public void handleLaunchEvent(IPLaunchEvent event) {
 		IPJob job = event.getJob();
 		if (event instanceof PLaunchStartedEvent) {
-			//make sure the jobList is added all the jobs
-			if (size() == 0)
-				initial();
-			
+			addJob(job);			
 			getDebugSession(job).getEventManager().addEventListener(this);
 			defaultRegister(getDebugSession(job));
 		} else if (event instanceof PDebugTargetRegisterEvent) {

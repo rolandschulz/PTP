@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.views;
+package org.eclipse.ptp.internal.ui.views;
 
 import java.io.File;
 import java.net.URL;
@@ -28,6 +28,10 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ptp.ui.views.IContentProvider;
+import org.eclipse.ptp.ui.views.IIconCanvasActionListener;
+import org.eclipse.ptp.ui.views.IImageProvider;
+import org.eclipse.ptp.ui.views.IToolTipProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.accessibility.Accessible;
@@ -67,6 +71,7 @@ public class IconCanvas extends Canvas {
 	protected List actionListeners = new ArrayList();
 	protected IToolTipProvider toolTipProvider = null;
 	protected IImageProvider imageProvider = null;
+	protected IContentProvider contentProvider = null;
 	// default element info
 	protected int e_offset_x = 5;
 	protected int e_offset_y = 5;
@@ -189,11 +194,23 @@ public class IconCanvas extends Canvas {
 		calculateVerticalScrollBar();
 		redraw();
 	}
+	public IToolTipProvider getToolTipProvider() {
+		return toolTipProvider;
+	}
 	public void setToolTipProvider(IToolTipProvider toolTipProvider) {
 		this.toolTipProvider = toolTipProvider;
 	}
+	public IImageProvider getImageProvider() {
+		return imageProvider;
+	}
 	public void setImageProvider(IImageProvider imageProvider) {
 		this.imageProvider = imageProvider;
+	}
+	public IContentProvider getContentProvider() {
+		return contentProvider;
+	}
+	public void setContentProvider(IContentProvider contentProvider) {
+		this.contentProvider = contentProvider;
 	}
 	public void setTotal(int total) {
 		if (total < 0) {
@@ -1123,23 +1140,23 @@ public class IconCanvas extends Canvas {
 		}
 		return true;
 	}
-	protected void selectElement(int index) {
+	public void selectElement(int index) {
 		if (isSelected(index)) {
 			selectedElements.clear(index);
 		} else {
 			selectedElements.set(index);
 		}
 	}
-	protected boolean isSelected(int index) {
+	public boolean isSelected(int index) {
 		return selectedElements.get(index);
 	}
-	protected void clearSelection(int index) {
+	public void clearSelection(int index) {
 		selectedElements.clear(index);
 	}
-	protected void selectElements(int from_index, int to_index) {
+	public void selectElements(int from_index, int to_index) {
 		selectElements(from_index, to_index, false);
 	}
-	protected void selectElements(int from_index, int to_index, boolean checkStatus) {
+	public void selectElements(int from_index, int to_index, boolean checkStatus) {
 		for (int index = from_index; index < to_index + 1; index++) {
 			if (checkStatus)
 				selectElement(index);
@@ -1168,12 +1185,13 @@ public class IconCanvas extends Canvas {
 			for (int col_count = col_start; col_count < col_end; col_count++) {
 				int index = findSelectedIndex(row_count, col_count);
 				if (index > -1 && index < total) {
+					Object obj = getObject(index);
 					int x_loc = e_offset_x + ((col_count) * getElementWidth());
 					int y_loc = e_offset_y + ((row_count) * getElementHeight()) - verticalScrollOffset;
 					if (col_count == 0 && isDisplayRuler()) {
-						drawIndex(newGC, String.valueOf(index), y_loc);
+						drawIndex(newGC, obj, index, y_loc);
 					}
-					drawImage(newGC, index, x_loc, y_loc, (selectedElements.get(index) || tempSelectedElements.get(index)));
+					drawImage(newGC, obj, x_loc, y_loc, (selectedElements.get(index) || tempSelectedElements.get(index)));
 				}
 			}
 		}
@@ -1187,17 +1205,18 @@ public class IconCanvas extends Canvas {
 		}
 		clearMargin(gc, getBackground());
 	}
-	protected void drawIndex(GC gc, String text, int y_loc) {
+	protected void drawIndex(GC gc, Object obj, int index, int y_loc) {
+		String text = contentProvider.getRulerIndex(obj, index);
 		Point text_size = gc.stringExtent(text);
 		int align =  e_offset_x - e_spacing_x - text_size.x;
 		int valign = y_loc + e_height/2 - text_size.y/2 ;
 		gc.drawText(text, align, valign);
 	}
-	protected void drawImage(GC gc, int index, int x_loc, int y_loc, boolean isSelected) {
-		Image statusImage = getStatusIcon(index, isSelected);
+	protected void drawImage(GC gc, Object obj, int x_loc, int y_loc, boolean isSelected) {
+		Image statusImage = getStatusIcon(obj, isSelected);
 		if (statusImage != null) {
 			gc.drawImage(statusImage, x_loc, y_loc);
-			drawSpecial(index, gc, x_loc, y_loc, e_width, e_height);
+			drawSpecial(obj, gc, x_loc, y_loc, e_width, e_height);
 		}
 	}
 	private void drawSelection(GC gc) {
@@ -1529,7 +1548,7 @@ public class IconCanvas extends Canvas {
 			toolTipLabel.setForeground(tooltip_color_fg);
 			toolTipLabel.setBackground(tooltip_color_bg);
 		}
-		toolTipLabel.setText(getToolTipText(index));
+		toolTipLabel.setText(getToolTipText(getObject(index)));
 		Point l_size = toolTipLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		l_size.x += 2;
 		l_size.y += 2;
@@ -1569,19 +1588,26 @@ public class IconCanvas extends Canvas {
 		}
 		return retValue;
 	}
-	protected String getToolTipText(int index) {
+	protected String getToolTipText(Object obj) {
 		if (toolTipProvider == null)
 			return "";
-		return toolTipProvider.getToolTipText(index);
+		return toolTipProvider.getToolTip(obj);
 	}
-	protected Image getStatusIcon(int index, boolean isSelected) {
+	protected Object getObject(int index) {
+		if (contentProvider == null) {
+			return null;
+		}
+		return contentProvider.getObject(index);
+	}
+
+	protected Image getStatusIcon(Object obj, boolean isSelected) {
 		if (imageProvider == null)
 			return null;
-		return imageProvider.getStatusIcon(index, isSelected);
+		return imageProvider.getStatusIcon(obj, isSelected);
 	}
-	protected void drawSpecial(int index, GC gc, int x_loc, int y_loc, int width, int height) {
+	protected void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int width, int height) {
 		if (imageProvider != null) {
-			imageProvider.drawSpecial(index, gc, x_loc, y_loc, width, height);
+			imageProvider.drawSpecial(obj, gc, x_loc, y_loc, width, height);
 		}
 	}
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
@@ -1613,16 +1639,24 @@ public class IconCanvas extends Canvas {
 		final Image selectedImage = ImageDescriptor.createFromURL(selectedlURL).createImage();
         
         IconCanvas iconCanvas = new IconCanvas(shell, SWT.NONE);
+        iconCanvas.setContentProvider(new IContentProvider() {
+        	public Object getObject(int index) {
+        		return new Integer(index);
+        	}
+        	public String getRulerIndex(Object obj, int index) {
+        		return String.valueOf(index);
+        	}
+        });
         iconCanvas.setImageProvider(new IImageProvider() {
-        	public Image getStatusIcon(int index, boolean isSelected) {
+        	public Image getStatusIcon(Object obj, boolean isSelected) {
         		return isSelected?selectedImage:normalImage;
         	}
-        	public void drawSpecial(int index, GC gc, int x_loc, int y_loc, int width, int height) {
+        	public void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int width, int height) {
         	}
         });
         iconCanvas.setToolTipProvider(new IToolTipProvider() {
-        	public String getToolTipText(int index) {
-        		return " The element: " + index;
+        	public String getToolTip(Object obj) {
+        		return " The element: " + obj.toString();
         	}
         });
         iconCanvas.setTotal(totalImage);

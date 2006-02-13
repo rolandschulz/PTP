@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Composite;
  * @author clement chu
  * 
  */
-public abstract class AbstractParallelElementView extends AbstractParallelView implements IPaintListener, IIconCanvasActionListener, IToolTipProvider, IImageProvider, IPreferencesListener {
+public abstract class AbstractParallelElementView extends AbstractParallelView implements IPaintListener, IIconCanvasActionListener, IToolTipProvider, IImageProvider, IContentProvider, IPreferencesListener {
 	protected IManager manager = null;
 	// Set
 	protected IElementSet cur_element_set = null;
@@ -86,6 +86,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		composite.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		canvas = new ElementIconCanvas(this, composite, SWT.NONE);
+		canvas.setContentProvider(this);
 		canvas.setImageProvider(this);
 		canvas.setToolTipProvider(this);
 		canvas.addActionListener(this);
@@ -159,6 +160,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	protected abstract void doubleClick(IElement element);
 	protected abstract void updateView(Object condition);
 	protected abstract Image getImage(int index1, int index2);
+	protected abstract String getToolTipText(Object obj);
+	protected abstract Object convertElementObject(IElement element);
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * Paint Listener
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
@@ -166,18 +169,39 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		refresh(condition);
 	}
 	/*******************************************************************************************************************************************************************************************************************************************************************************************************
+	 * IContentProvider
+	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	public Object getObject(int index) {
+		if (canvas != null && manager != null) {
+			return canvas.getElement(index);
+		}
+		return null;
+	}
+	public String getRulerIndex(Object obj, int index) {
+		return String.valueOf(index);
+	}
+	/*******************************************************************************************************************************************************************************************************************************************************************************************************
+	 * IToolTipProvider
+	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
+	public String getToolTip(Object obj) {
+		if (obj instanceof IElement) {			
+			return getToolTipText(convertElementObject((IElement)obj));
+		}
+		return "";
+	}	
+	/*******************************************************************************************************************************************************************************************************************************************************************************************************
 	 * Image Provider
 	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	public Image getStatusIcon(int index, boolean isSelected) {
-		if (cur_element_set == null)
-			return null;
-		int status = manager.getStatus(canvas.getElement(index).getID());
-		return getImage(status, isSelected ? 1 : 0);
+	public Image getStatusIcon(Object obj, boolean isSelected) {
+		if (cur_element_set != null && obj instanceof IElement) {
+			int status = manager.getStatus((IElement)obj);
+			return getImage(status, isSelected ? 1 : 0);
+		}
+		return null;
 	}
-	public void drawSpecial(int index, GC gc, int x_loc, int y_loc, int width, int height) {
-		if (cur_element_set != null) {
-			IElement element = canvas.getElement(index);
-			if (element.isRegistered()) {
+	public void drawSpecial(Object obj, GC gc, int x_loc, int y_loc, int width, int height) {
+		if (cur_element_set != null && obj instanceof IElement) {
+			if (((IElement)obj).isRegistered()) {
 				gc.setForeground(registerColor);
 				gc.drawRectangle(x_loc, y_loc, width, height);
 				gc.setForeground(canvas.getForeground());

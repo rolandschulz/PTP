@@ -16,7 +16,7 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.model.internal;
+package org.eclipse.ptp.internal.ui.model;
 
 import java.util.ArrayList;
 import java.util.Iterator;
