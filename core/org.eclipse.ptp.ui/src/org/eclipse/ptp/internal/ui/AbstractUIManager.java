@@ -32,6 +32,7 @@ import org.eclipse.ptp.core.IPElement;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.internal.ui.model.ElementSet;
 import org.eclipse.ptp.ui.IManager;
 import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.ui.listeners.IPaintListener;
@@ -39,7 +40,6 @@ import org.eclipse.ptp.ui.listeners.ISetListener;
 import org.eclipse.ptp.ui.model.IElement;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.model.internal.ElementSet;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -243,4 +243,7 @@ public abstract class AbstractUIManager implements IManager {
 		}
 		return false;
 	}
+	public int getStatus(IElement element) {
+		return getStatus(element.getID());
+	}		
 }

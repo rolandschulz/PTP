@@ -30,12 +30,12 @@ import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
 import org.eclipse.ptp.core.IProcessEvent;
 import org.eclipse.ptp.core.IProcessListener;
+import org.eclipse.ptp.internal.ui.model.Element;
+import org.eclipse.ptp.internal.ui.model.ElementHandler;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.listeners.IJobChangeListener;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.model.internal.Element;
-import org.eclipse.ptp.ui.model.internal.ElementHandler;
 
 /**
  * @author Clement chu
@@ -157,6 +157,9 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 		return element.getElementName();
 	}
 	public void addJob(IPJob job) {
+		if (jobList.containsKey(job.getIDString()))
+			return;
+
 		IPProcess[] pProcesses = job.getSortedProcesses();
 		int total_element = pProcesses.length;
 		if (total_element > 0) {
@@ -177,8 +180,7 @@ public class JobManager extends AbstractUIManager implements IProcessListener {
 			// focus on last job
 			last_job_id = jobs[jobs.length - 1].getIDString();
 			for (int j = 0; j < jobs.length; j++) {
-				if (!jobList.containsKey(jobs[j].getIDString()))
-					addJob(jobs[j]);
+				addJob(jobs[j]);
 			}
 			setCurrentSetId(IElementHandler.SET_ROOT_ID);
 		}

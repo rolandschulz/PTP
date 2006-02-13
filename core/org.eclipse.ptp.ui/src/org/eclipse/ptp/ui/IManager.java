@@ -72,5 +72,6 @@ public interface IManager {
 	public boolean hasStoppedJob();	
 	
 	//image
+	public int getStatus(IElement element);
 	public int getStatus(String id);
 }

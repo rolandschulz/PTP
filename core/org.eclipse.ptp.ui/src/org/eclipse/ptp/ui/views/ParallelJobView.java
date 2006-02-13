@@ -101,7 +101,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 		}
 	}
 	protected void initialElement() {
-		manager.initial();
+		changeJob(manager.initial());
 	}
 	protected void initialView() {
 		initialElement();
@@ -195,21 +195,29 @@ public class ParallelJobView extends AbstractParallelSetView {
 	public void doubleClick(IElement element) {
 		openProcessViewer(((JobManager) manager).findProcess(getCurrentID(), element.getID()));
 	}
-	public String getToolTipText(int index) {
-		IElementHandler setManager = getCurrentElementHandler();
-		if (setManager == null || cur_element_set == null)
-			return " Unknown element";
-		IElement element = cur_element_set.get(index);
+	protected Object convertElementObject(IElement element) {
 		if (element == null)
+			return null;
+		
+		return ((JobManager) manager).findProcess(getCurrentID(), element.getID());
+	}
+	public String getRulerIndex(Object obj, int index) {
+		if (obj instanceof IElement) {
+			return ((IElement)obj).getName();
+		}
+		return super.getRulerIndex(obj, index);
+	}
+	public String getToolTipText(Object obj) {
+		IElementHandler setManager = getCurrentElementHandler();
+		if (obj == null || !(obj instanceof IPProcess) || setManager == null || cur_element_set == null)
 			return " Unknown element";
-		IPProcess proc = ((JobManager) manager).findProcess(getCurrentID(), element.getID());
-		if (proc == null)
-			return " Unknown process";
+
+		IPProcess proc = (IPProcess)obj;
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(" Task ID: " + proc.getTaskId());
 		buffer.append("\n");
 		buffer.append(" Process ID: " + proc.getPid());
-		IElementSet[] sets = setManager.getSetsWithElement(element.getID());
+		IElementSet[] sets = setManager.getSetsWithElement(proc.getIDString());
 		if (sets.length > 1)
 			buffer.append("\n Set: ");
 		for (int i = 1; i < sets.length; i++) {
@@ -236,6 +244,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 	public void changeJob(final String job_id) {
 		getDisplay().syncExec(new Runnable() {
 			public void run() {
+				jobTableViewer.refresh(true);
 				IPJob job = manager.findJobById(job_id);
 				changeJob(job);
 				jobTableViewer.setSelection(job == null ? new StructuredSelection() : new StructuredSelection(job));
@@ -277,6 +286,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 	public void run(final String arg) {
 		System.out.println("------------ job run: " + arg);
 		initialView();
+		/*
 		getDisplay().syncExec(new Runnable() {
 			public void run() {
 				jobTableViewer.refresh(true);
@@ -285,6 +295,7 @@ public class ParallelJobView extends AbstractParallelSetView {
 				changeJob(job);
 			}
 		});
+		*/
 		refresh();
 	}
 	public void start() {

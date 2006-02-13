@@ -28,6 +28,5 @@ Export-Package: org.eclipse.ptp.internal.ui,
  org.eclipse.ptp.ui.actions,
  org.eclipse.ptp.ui.listeners,
  org.eclipse.ptp.ui.model,
- org.eclipse.ptp.ui.model.internal,
  org.eclipse.ptp.ui.preferences,
  org.eclipse.ptp.ui.views

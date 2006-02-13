@@ -196,19 +196,27 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		}
 		elementHandler.removeAllRegisterElements();
 	}
-	/*******************************************************************************************************************************************************************************************************************************************************************************************************
-	 * IToolTipProvider
-	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	public String getToolTipText(int index) {
-		IElementHandler setManager = getCurrentElementHandler();
-		if (setManager == null || cur_element_set == null)
-			return " Unknown element";
-		IElement element = cur_element_set.get(index);
+	protected Object convertElementObject(IElement element) {
 		if (element == null)
+			return null;
+		
+		return ((MachineManager) manager).findNode(getCurrentID(), element.getID());
+	}
+	public String getRulerIndex(Object obj, int index) {
+		if (obj instanceof IElement) {
+			Object nodeObj = convertElementObject((IElement)obj);
+			if (nodeObj instanceof IPNode) {
+				return ((IPNode)nodeObj).getNodeNumber();
+			}
+		}
+		return super.getRulerIndex(obj, index);
+	}	
+	public String getToolTipText(Object obj) {
+		IElementHandler setManager = getCurrentElementHandler();
+		if (obj == null || !(obj instanceof IPNode) || setManager == null || cur_element_set == null)
 			return " Unknown element";
-		IPNode node = ((MachineManager) manager).findNode(getCurrentID(), element.getID());
-		if (node == null)
-			return " Unknown node";
+
+		IPNode node = (IPNode)obj;
 		StringBuffer buffer = new StringBuffer();
 		//buffer.append(" Node ID: " + node.getNodeNumber());
 		//buffer.append("\n");
@@ -216,7 +224,7 @@ public class ParallelMachineView extends AbstractParallelSetView {
 		//buffer.append(" Node name: " + node.getAttrib(AttributeConstants.ATTRIB_NODE_NAME));
 		//buffer.append(" (ID: "+node.getNodeNumber()+")");
 		buffer.append(" "+node.getAttrib(AttributeConstants.ATTRIB_NODE_NAME));
-		IElementSet[] sets = setManager.getSetsWithElement(element.getID());
+		IElementSet[] sets = setManager.getSetsWithElement(node.getIDString());
 		if (sets.length > 1)
 			buffer.append("\n Set: ");
 		for (int i = 1; i < sets.length; i++) {

@@ -22,5 +22,5 @@ package org.eclipse.ptp.ui.views;
  *
  */
 public interface IToolTipProvider {
-	public String getToolTipText(int index);
+	public String getToolTip(Object obj);
 }

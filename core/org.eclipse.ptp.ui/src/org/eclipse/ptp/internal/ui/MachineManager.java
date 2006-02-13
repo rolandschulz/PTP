@@ -28,11 +28,11 @@ import org.eclipse.ptp.core.IPMachine;
 import org.eclipse.ptp.core.IPNode;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.IPUniverse;
+import org.eclipse.ptp.internal.ui.model.Element;
+import org.eclipse.ptp.internal.ui.model.ElementHandler;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ptp.ui.model.IElementHandler;
 import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.model.internal.Element;
-import org.eclipse.ptp.ui.model.internal.ElementHandler;
 
 /**
  * @author clement chu
@@ -186,6 +186,9 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 		return element.getElementName();
 	}
 	public void addMachine(IPMachine mac) {
+		if (machineList.containsKey(mac.getIDString()))
+			return;
+
 		IPNode[] pNodes = mac.getSortedNodes();
 		int total_element = pNodes.length;
 		if (total_element > 0) {
@@ -205,8 +208,7 @@ public class MachineManager extends AbstractUIManager implements INodeListener {
 			cur_machine_id = macs[0].getIDString();
 			for (int j = 0; j < macs.length; j++) {
 				//System.out.println("testing -- " + macs[j] + ", " + macs[j].getID());
-				if (!machineList.containsKey(macs[j].getIDString()))
-					addMachine(macs[j]);
+				addMachine(macs[j]);
 			}
 			setCurrentSetId(IElementHandler.SET_ROOT_ID);
 		}
