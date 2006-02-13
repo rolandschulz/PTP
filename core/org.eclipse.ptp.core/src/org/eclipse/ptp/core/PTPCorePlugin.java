@@ -18,10 +18,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.core;
 
+import java.io.File;
+import java.net.URL;
 import java.util.MissingResourceException;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -224,4 +229,51 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		}
 	}
 	*/
+	public String locateFragmentFile(String fragment, String file) {
+		String	filePath = null;
+		URL		url = Platform.find(Platform.getBundle(PTPCorePlugin.PLUGIN_ID), new Path("/"));
+
+		if (url != null) {
+			try {
+				File path = new File(Platform.asLocalURL(url).getPath());
+				String ipath = path.getAbsolutePath();
+				System.out.println("Plugin install dir = '"+ipath+"'");
+				
+				/* org.eclipse.ptp.orte.linux.x86_64_1.0.0
+				   org.eclipse.ptp.orte.$(OS).$(ARCH)_$(VERSION) */
+				String ptp_version = (String)getDefault().getBundle().getHeaders().get("Bundle-Version");
+				System.out.println("PTP Version = "+ptp_version);
+				Properties p = System.getProperties();
+				String os = p.getProperty("osgi.os");
+				String arch = p.getProperty("osgi.arch");
+				System.out.println("osgi.os = "+os);
+				System.out.println("osgi.arch = "+arch);
+				if(os != null && arch != null && ptp_version != null) {
+					String combo = PLUGIN_ID+"."+os+"."+arch+"_"+ptp_version;
+					System.out.println("Searching for directory: "+combo);
+					int idx = ipath.indexOf(combo);
+					/* if we found it */
+					if(idx > 0) {
+						String ipath2 = ipath.substring(0, idx)+fragment+"."+os+"."+arch+"_"+ptp_version+"/"+file;
+						File f = new File(ipath2);
+						if(f.exists()) {
+							filePath = ipath2;
+						}
+					}
+				}
+				
+				if(filePath == null) {
+					int idx = ipath.indexOf(PLUGIN_ID);
+					String ipath2 = ipath.substring(0, idx) + fragment+"/"+file;
+					System.out.println("Searching for : "+ipath2);
+					File f = new File(ipath2);
+					if(f.exists()) {
+						filePath = ipath2;
+					}
+				}
+			} catch(Exception e) { 
+			}
+		}
+		return filePath;
+	}
 }
