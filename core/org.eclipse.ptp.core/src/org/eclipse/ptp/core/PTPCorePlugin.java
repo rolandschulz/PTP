@@ -254,7 +254,7 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 					int idx = ipath.indexOf(combo);
 					/* if we found it */
 					if(idx > 0) {
-						String ipath2 = ipath.substring(0, idx)+fragment+"."+os+"."+arch+"_"+ptp_version+"/"+file;
+						String ipath2 = ipath.substring(0, idx)+fragment+"."+os+"."+arch+"_"+ptp_version+"/bin/"+file;
 						File f = new File(ipath2);
 						if(f.exists()) {
 							filePath = ipath2;
