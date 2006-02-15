@@ -36,9 +36,6 @@
 /* Enable Open MPI support. */
 #undef OMPI
 
-/* Location of orted command. */
-#undef ORTED
-
 /* Name of package */
 #undef PACKAGE
 
