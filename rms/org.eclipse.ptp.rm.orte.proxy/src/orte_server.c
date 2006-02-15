@@ -222,7 +222,7 @@ ORTEStartDaemon(char **args)
 	int ret;
 	char *res;
 	
-	printf("StartDaemon(%s %s)\n", ORTED, DEFAULT_ORTED_ARGS); fflush(stdout);
+	printf("StartDaemon(orted %s)\n", DEFAULT_ORTED_ARGS); fflush(stdout);
 	
 	switch(orted_pid = fork()) {
 		case -1:
@@ -242,7 +242,7 @@ ORTEStartDaemon(char **args)
 				printf("Starting execv now!\n"); fflush(stdout);
 				errno = 0;
 
-				ret = execv(ORTED, orted_args);
+				ret = execvp("orted", orted_args);
 
 				FreeArgs(orted_args);
 			}
