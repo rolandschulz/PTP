@@ -618,7 +618,7 @@ public class UIDebugManager extends JobManager implements ISetListener, IBreakpo
 					PTPDebugUIPlugin.getDisplay().asyncExec(new Runnable() {
 						public void run() {
 							IPCDIErrorInfo info = (IPCDIErrorInfo)errEvent.getReason();
-							PTPDebugUIPlugin.errorDialog("Error", new Exception("Error: " + info.getMessage() + " on tasks: "+ errEvent.getAllProcesses().toString()));
+							PTPDebugUIPlugin.errorDialog("Error", new Exception(info.getMessage() + " on tasks: "+ errEvent.getAllProcesses().toString()));
 						}
 					});
 				}

@@ -287,6 +287,44 @@
                id="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesAction">
          </action>
       </objectContribution>
+      <!-- variable start -->
+      <objectContribution
+			objectClass="org.eclipse.ptp.debug.core.model.IPVariable"
+            id="org.eclipse.ptp.debug.ui.PVariableActions">
+         <action
+               label="%AddPVariableAction.label"
+               helpContextId="ptp_variable_action_context"
+               class="org.eclipse.ptp.debug.internal.ui.actions.AddPVariableActionDelegate"
+               enablesFor="1"
+               id="org.eclipse.ptp.debug.internal.ui.actions.AddPVariableActionDelegate">
+         </action>
+         <action
+               label="%RemovePVariableAction.label"
+               helpContextId="ptp_variable_action_context"
+               class="org.eclipse.ptp.debug.internal.ui.actions.RemovePVariableActionDelegate"
+               enablesFor="1"
+               id="org.eclipse.ptp.debug.internal.ui.actions.RemovePVariableActionDelegate">
+         </action>
+      </objectContribution>
+      <viewerContribution
+            targetID="org.eclipse.debug.ui.VariableView"
+            id="org.eclipse.debug.ui.variablesView.popupMenu">
+         <action
+               helpContextId="remove_all_ptp_variable_action_context"
+               enablesFor="*"
+               label="%RemoveAllPVariableAction.label"
+               tooltip="%RemoveAllPVariableAction.tooltip"
+               class="org.eclipse.ptp.debug.internal.ui.actions.RemoveAllPVariableActionDelegate"
+               menubarPath="additions"
+               id="org.eclipse.ptp.debug.internal.ui.actions.RemoveAllPVariableActionDelegate">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.ptp.debug.ui"/>
+            </enablement>
+         </action>
+      </viewerContribution>
+      <!-- variable end -->            
    </extension>
 
    <extension

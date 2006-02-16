@@ -16,11 +16,22 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.views;
+package org.eclipse.ptp.debug.internal.ui.actions;
+
+import org.eclipse.jface.action.IAction;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ui.IViewActionDelegate;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.actions.ActionDelegate;
+
 /**
  * @author Clement chu
- *
+ * 
  */
-public interface IToolTipProvider {
-	public String toolTipText(Object obj);
+public class RemoveAllPVariableActionDelegate extends ActionDelegate implements IViewActionDelegate {
+	public void init(IViewPart view) {
+	}
+	public void run(IAction action) {
+		PTPDebugCorePlugin.getPVariableManager().removeAllVariables();
+	}
 }

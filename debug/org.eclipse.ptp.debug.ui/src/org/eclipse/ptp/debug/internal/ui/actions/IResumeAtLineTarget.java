@@ -6,6 +6,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchPart;
 
 public interface IResumeAtLineTarget {	
-	public void resumeAtLine( IWorkbenchPart part, ISelection selection, ISuspendResume target ) throws CoreException;
-	public boolean canResumeAtLine( IWorkbenchPart part, ISelection selection, ISuspendResume target );
+	public void resumeAtLine(IWorkbenchPart part, ISelection selection, ISuspendResume target) throws CoreException;
+	public boolean canResumeAtLine(IWorkbenchPart part, ISelection selection, ISuspendResume target);
 }
