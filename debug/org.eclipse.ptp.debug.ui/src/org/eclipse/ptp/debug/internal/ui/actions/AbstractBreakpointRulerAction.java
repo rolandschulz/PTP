@@ -30,7 +30,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IVerticalRulerInfo;
-import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -48,8 +48,7 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 	private IBreakpoint breakpoint;
 
 	protected IBreakpoint determineBreakpoint() {
-		//TODO need to change back PTPDebugUIPlugin to PTPDebugCorePlugin
-		IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(PTPDebugUIPlugin.getUniqueIdentifier());
+		IBreakpoint[] breakpoints = PTPDebugCorePlugin.getDebugModel().getPBreakpoints();
 		for(int i = 0; i < breakpoints.length; i++) {
 			IBreakpoint breakpoint = breakpoints[i];
 			if (breakpoint instanceof ILineBreakpoint) {
