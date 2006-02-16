@@ -28,14 +28,11 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
  * 
  */
 public class SetLineBreakpointCommand extends AbstractBreakpointCommand {
-	private IPCDILineBreakpoint lineBpt = null;
-	
 	public SetLineBreakpointCommand(BitList tasks, IPCDILineBreakpoint lineBpt) {
-		super(tasks);
-		this.lineBpt = lineBpt;
+		super(tasks, lineBpt);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
-		debugger.setLineBreakpoint(tasks, lineBpt);
+		debugger.setLineBreakpoint(tasks, (IPCDILineBreakpoint)cdiBpt);
 	}
 	public String getName() {
 		return "Set line breakpoint"; 

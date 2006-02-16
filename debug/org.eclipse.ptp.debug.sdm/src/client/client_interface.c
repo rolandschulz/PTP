@@ -174,6 +174,38 @@ DbgDeleteBreakpoint(session *s, bitset *set, int bpid)
 	return res;
 }
 
+int 
+DbgEnableBreakpoint(session *s, bitset *set, int bpid)
+{
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_ENABLEBREAKPOINT_CMD, DBG_ENABLEBREAKPOINT_FMT, set_str, bpid);
+	free(set_str);
+	return res;
+}
+
+int 
+DbgDisableBreakpoint(session *s, bitset *set, int bpid)
+{
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_DISABLEBREAKPOINT_CMD, DBG_DISABLEBREAKPOINT_FMT, set_str, bpid);
+	free(set_str);
+	return res;
+}
+
+int 
+DbgConditionBreakpoint(session *s, bitset *set, int bpid, char *expr)
+{
+	int		res;
+	char *	set_str = bitset_to_str(set);
+	
+	res = proxy_clnt_sendcmd(s->sess_proxy, DBG_CONDITIONBREAKPOINT_CMD, DBG_CONDITIONBREAKPOINT_FMT, set_str, bpid, expr);
+	free(set_str);
+	return res;
+}
 /*
  * Process control operations
  */

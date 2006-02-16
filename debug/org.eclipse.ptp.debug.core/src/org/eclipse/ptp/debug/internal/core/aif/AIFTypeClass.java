@@ -27,7 +27,7 @@ public class AIFTypeClass extends TypeAggregate implements IAIFTypeClass {
 		super(format);
 	}
 	public String toString() {
-		return AIFFactory.FDS_STRUCT + super.toString() + AIFFactory.FDS_CLASS_END;
+		return AIFFactory.FDS_STRUCT_CLASS + super.toString() + AIFFactory.FDS_CLASS_END;
 	}
 	
 	/*

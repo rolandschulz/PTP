@@ -80,7 +80,7 @@ public abstract class TypeAggregate extends AIFType implements ITypeAggregate {
 		int pos = getSeperatePosition(fmt);
 		if (pos > -1) {
 			String tmp_fmt = fmt.substring(0, pos);
-			if (tmp_fmt.indexOf(AIFFactory.FDS_STRUCT) > -1) {
+			if (tmp_fmt.indexOf(AIFFactory.FDS_STRUCT_CLASS) > -1) {
 				pos = getSeperatePosition(fmt, AIFFactory.FDS_STRUCT_END);
 				if (pos == -1) {
 					pos = getSeperatePosition(fmt, AIFFactory.FDS_CLASS_END);

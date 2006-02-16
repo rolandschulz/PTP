@@ -25,12 +25,16 @@ import org.eclipse.cdt.debug.core.cdi.ICDIAddressLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.cdt.debug.core.cdi.ICDIFunctionLocation;
 import org.eclipse.cdt.debug.core.cdi.ICDILineLocation;
+import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.IBreakpointsListener;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
@@ -42,9 +46,11 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILineBreakpoint;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDILocation;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIWatchpoint;
+import org.eclipse.ptp.debug.core.model.IPAddressBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPFunctionBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
+import org.eclipse.ptp.debug.core.model.IPWatchpoint;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLookupDirector;
 import org.eclipse.ptp.debug.external.core.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.core.cdi.breakpoints.AddressBreakpoint;
@@ -57,13 +63,15 @@ import org.eclipse.ptp.debug.external.core.cdi.model.FunctionLocation;
 import org.eclipse.ptp.debug.external.core.cdi.model.LineLocation;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
 import org.eclipse.ptp.debug.external.core.commands.AbstractBreakpointCommand;
+import org.eclipse.ptp.debug.external.core.commands.ConditionBreakpointCommand;
 import org.eclipse.ptp.debug.external.core.commands.DeleteBreakpointCommand;
+import org.eclipse.ptp.debug.external.core.commands.DisableBreakpointCommand;
+import org.eclipse.ptp.debug.external.core.commands.EnableBreakpointCommand;
 import org.eclipse.ptp.debug.external.core.commands.SetFunctionBreakpointCommand;
 import org.eclipse.ptp.debug.external.core.commands.SetLineBreakpointCommand;
 
-public class BreakpointManager extends Manager {
+public class BreakpointManager extends Manager implements IBreakpointsListener {
 	public static IPCDIBreakpoint[] EMPTY_BREAKPOINTS = {};
-
 	Map breakMap = new HashMap();
 	Map cdiBbreakMap = new HashMap();
 	Map cdiBreakIDMap = new HashMap();
@@ -72,24 +80,26 @@ public class BreakpointManager extends Manager {
 	public BreakpointManager(Session session) {
 		super(session, false);
 		allowInterrupt = true;
+		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
 	}
 	public void shutdown() {
 		breakMap.clear();
 		cdiBbreakMap.clear();
 		cdiBreakIDMap.clear();
+		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
 	}
 	private void addBreakpoint(IPBreakpoint bpt, IPCDIBreakpoint cdiBpt) {
 		breakMap.put(bpt, cdiBpt);
 		cdiBbreakMap.put(cdiBpt, bpt);
-		cdiBreakIDMap.put(new Integer(cdiBpt.getBreakpointId()), cdiBpt);		
+		cdiBreakIDMap.put(new Integer(cdiBpt.getBreakpointId()), cdiBpt);
 	}
 	private void removeBreakpoint(IPBreakpoint bpt) {
-		IPCDIBreakpoint cdiBpt = (IPCDIBreakpoint)breakMap.remove(bpt);
+		IPCDIBreakpoint cdiBpt = (IPCDIBreakpoint) breakMap.remove(bpt);
 		cdiBbreakMap.remove(cdiBpt);
 		cdiBreakIDMap.remove(new Integer(cdiBpt.getBreakpointId()));
 	}
 	public IPBreakpoint findBreakpoint(IPCDIBreakpoint cdiBpt) {
-		return (IPBreakpoint)cdiBbreakMap.get(cdiBpt);
+		return (IPBreakpoint) cdiBbreakMap.get(cdiBpt);
 	}
 	public IPBreakpoint findBreakpoint(int bpid) {
 		IPCDIBreakpoint cdiBpt = findCDIBreakpoint(bpid);
@@ -99,63 +109,108 @@ public class BreakpointManager extends Manager {
 		return null;
 	}
 	public IPCDIBreakpoint findCDIBreakpoint(IPBreakpoint bpt) {
-		return (IPCDIBreakpoint)breakMap.get(bpt);
+		return (IPCDIBreakpoint) breakMap.get(bpt);
 	}
 	public IPCDIBreakpoint findCDIBreakpoint(int bpid) {
-		return (IPCDIBreakpoint)cdiBreakIDMap.get(new Integer(bpid));
+		return (IPCDIBreakpoint) cdiBreakIDMap.get(new Integer(bpid));
+	}
+	public void setConditionBreakpoint(String job_id, IPBreakpoint bpt) throws CoreException {
+		deleteBreakpoint(job_id, bpt);
+		setBreakpoint(job_id, bpt);
+	}
+	public void setEnableBreakpoint(String job_id, IPBreakpoint bpt) throws CoreException {
+		BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(job_id, bpt.getSetId());
+		if (breakMap.containsKey(bpt)) {
+			IPCDIBreakpoint cdiBpt = findCDIBreakpoint(bpt);
+			boolean isEnable = bpt.isEnabled();
+			AbstractBreakpointCommand command = isEnable?getEnableBreakpointCommand(tasks, cdiBpt):getDisableBreakpointCommand(tasks, cdiBpt);
+			Session session = (Session) getSession();
+			session.getDebugger().postCommandAndWait(command);
+			cdiBpt.setEnabled(isEnable);
+		}
 	}
 	public void deleteBreakpoint(String job_id, IPBreakpoint bpt) throws CoreException {
 		BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(job_id, bpt.getSetId());
 		if (breakMap.containsKey(bpt)) {
 			IPCDIBreakpoint cdiBpt = findCDIBreakpoint(bpt);
 			AbstractBreakpointCommand command = getDeleteBreakpointCommand(tasks, cdiBpt);
-			Session session = (Session)getSession();
+			Session session = (Session) getSession();
 			session.getDebugger().postCommandAndWait(command);
 			removeBreakpoint(bpt);
 		}
 	}
 	public void setBreakpoint(String job_id, IPBreakpoint bpt) throws CoreException {
 		BitList tasks = PTPDebugCorePlugin.getDebugModel().getTasks(job_id, bpt.getSetId());
-		IPCDILocation location = getLocation(bpt);
-		try {
-			setLocationBreakpointOnSession(bpt, location, null, bpt.isEnabled(), tasks);
-		} catch (PCDIException e) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));			
+		IPCDIBreakpoint cdiBpt = null;
+		if (bpt instanceof IPLineBreakpoint) {
+			cdiBpt = setLocationBreakpoint(tasks, (IPLineBreakpoint)bpt);
+		} else if (bpt instanceof IPWatchpoint) {
+			cdiBpt = setWatchPoint(tasks, (IPWatchpoint)bpt);
+		} else {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, "This is not ptp breakpoint supported", null));
 		}
-	}	
-	public void setInitialBreakpoints() throws CoreException{
-		String job_id = ((Session)getSession()).getJob().getIDString();
+
+		if (cdiBpt != null) {
+			if (!breakMap.containsKey(bpt)) {
+				addBreakpoint(bpt, cdiBpt);
+			}			
+		}
+	}
+	private IPCDIBreakpoint setLocationBreakpoint(BitList tasks, IPLineBreakpoint bpt) throws CoreException {
+		IPCDILocation location = getLocation(bpt);
+		ICDICondition condition = getCondition(bpt);
+		try {
+			return setLocationBreakpointOnSession(bpt, location, condition, bpt.isEnabled(), tasks);
+		} catch (PCDIException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+		}		
+	}
+	private IPCDIBreakpoint setWatchPoint(BitList tasks, IPWatchpoint bpt) throws CoreException {
+		int accessType = 0;
+		accessType |= (bpt.isWriteType()) ? IPCDIWatchpoint.WRITE : 0;
+		accessType |= (bpt.isReadType()) ? IPCDIWatchpoint.READ : 0;
+		String expression = bpt.getExpression();		
+		ICDICondition condition = getCondition(bpt);
+		try {
+			return setWatchpoint(tasks, IPCDIBreakpoint.REGULAR, accessType, expression, condition);
+		} catch (PCDIException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
+		}
+	}
+	public void setInitialBreakpoints() throws CoreException {
+		String job_id = ((Session) getSession()).getJob().getIDString();
 		IPBreakpoint[] bpts = PTPDebugCorePlugin.getDebugModel().findPBreakpointsByJob(job_id, true);
 		for (int i = 0; i < bpts.length; i++) {
 			setBreakpoint(job_id, bpts[i]);
 		}
 	}
+	private ICDICondition getCondition(IPBreakpoint breakpoint) throws CoreException {
+		return createCondition(breakpoint.getIgnoreCount(), breakpoint.getCondition(), null);
+	}
 	private IPCDILocation getLocation(IPBreakpoint bpt) throws CoreException {
 		IPath path = convertPath(bpt.getSourceHandle());
 		if (bpt instanceof IPLineBreakpoint) {
-			return createLineLocation(path.lastSegment(), ((IPLineBreakpoint)bpt).getLineNumber());
-		}
-		else if (bpt instanceof IPFunctionBreakpoint) {
-			return createFunctionLocation(path.lastSegment(), ((IPFunctionBreakpoint)bpt).getFunction());
+			return createLineLocation(path.lastSegment(), ((IPLineBreakpoint) bpt).getLineNumber());
+		} else if (bpt instanceof IPFunctionBreakpoint) {
+			return createFunctionLocation(path.lastSegment(), ((IPFunctionBreakpoint) bpt).getFunction());
 		}
 		return null;
 	}
-	private void setLocationBreakpointOnSession(final IPBreakpoint bpt, final IPCDILocation location, final ICDICondition condition, final boolean enabled, final BitList tasks) throws PCDIException {
+	private IPCDIBreakpoint setLocationBreakpointOnSession(IPLineBreakpoint bpt, IPCDILocation location, ICDICondition condition, boolean enabled, BitList tasks) throws PCDIException {
 		IPCDIBreakpoint cdiBpt = null;
-		if (bpt instanceof IPLineBreakpoint) {
-			cdiBpt = createLineBreakpoint(tasks, IPCDIBreakpoint.REGULAR, (ICDILineLocation) location, condition, enabled);
-		} else if (bpt instanceof IPFunctionBreakpoint) {
+		if (bpt instanceof IPFunctionBreakpoint) {
 			cdiBpt = createFunctionBreakpoint(tasks, IPCDIBreakpoint.REGULAR, (ICDIFunctionLocation) location, condition, enabled);
+		} else if (bpt instanceof IPAddressBreakpoint) {
+			cdiBpt = createAddressBreakpoint(tasks, IPCDIBreakpoint.REGULAR, (ICDIAddressLocation) location, condition, enabled);
+		} else {
+			cdiBpt = createLineBreakpoint(tasks, IPCDIBreakpoint.REGULAR, (ICDILineLocation) location, condition, enabled);
 		}
-		cdiBpt = setBreakpointCommand(tasks, cdiBpt);
-		if (!breakMap.containsKey(bpt)) {
-			addBreakpoint(bpt, cdiBpt);
-		}
+		return setBreakpointCommand(tasks, cdiBpt);
 	}
 	private IPath convertPath(String sourceHandle) {
 		IPath path = null;
 		if (Path.EMPTY.isValidPath(sourceHandle)) {
-			ISourceLocator sl = ((Session)getSession()).getLaunch().getSourceLocator();
+			ISourceLocator sl = ((Session) getSession()).getLaunch().getSourceLocator();
 			if (sl instanceof IPSourceLookupDirector) {
 				path = ((IPSourceLookupDirector) sl).getCompilationPath(sourceHandle);
 			}
@@ -177,7 +232,7 @@ public class BreakpointManager extends Manager {
 			}
 			cdiBpt = setBreakpointCommand(tasks, cdiBpt);
 		} catch (PCDIException e) {
-			throw new DebugException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));			
+			throw new DebugException(new Status(IStatus.ERROR, PTPDebugExternalPlugin.getUniqueIdentifier(), IStatus.ERROR, e.getMessage(), null));
 		}
 		cdiBreakIDMap.put(new Integer(cdiBpt.getBreakpointId()), cdiBpt);
 	}
@@ -199,7 +254,6 @@ public class BreakpointManager extends Manager {
 		cdiBreakIDMap.put(new Integer(cdiBpt.getBreakpointId()), cdiBpt);
 		return cdiAddrBpt;
 	}
-	
 	public IPCDIWatchpoint setWatchpoint(BitList tasks, int type, int watchType, String expression, ICDICondition condition) throws PCDIException {
 		try {
 			// Check if this an address watchpoint, and add a '*'
@@ -210,38 +264,33 @@ public class BreakpointManager extends Manager {
 		}
 		Watchpoint bkpt = new Watchpoint(expression, type, watchType, condition);
 		setWatchpoint(tasks, bkpt);
-
 		// Fire a created Event.
 		throw new PCDIException("Not implement - setWatchpoint");
-		//return bkpt;
+		// return bkpt;
 	}
 	public void setWatchpoint(BitList tasks, Watchpoint watchpoint) throws PCDIException {
 		/*
-		Session session = (Session)getSession();
-		boolean access = watchpoint.isReadType() && watchpoint.isWriteType();
-		boolean read = ! watchpoint.isWriteType() && watchpoint.isReadType();
-		String expression = watchpoint.getWatchExpression();
-		*/
-		//TODO - implement set watch point
-		//session.getDebugger().setWatchpoint(tasks, access, read, expression);
+		 * Session session = (Session)getSession(); boolean access = watchpoint.isReadType() && watchpoint.isWriteType(); boolean read = ! watchpoint.isWriteType() && watchpoint.isReadType(); String
+		 * expression = watchpoint.getWatchExpression();
+		 */
+		// TODO - implement set watch point
+		// session.getDebugger().setWatchpoint(tasks, access, read, expression);
 		throw new PCDIException("Not implement yet - setWatchpoint");
 	}
-
 	public IPCDIExceptionpoint setExceptionpoint(BitList tasks, String clazz, boolean stopOnThrow, boolean stopOnCatch) throws PCDIException {
 		if (!stopOnThrow && !stopOnCatch) {
 			throw new PCDIException("Must suspend on throw or catch");
 		}
-		//Exceptionpoint excp = new Exceptionpoint(tasks, clazz, stopOnThrow, stopOnCatch, null);
-		//TODO - implement set exception point
-		//session.getDebugger().setExceptionpoint(watchpoint.getTasks(), access, read, expression);
-		//session.getDebugger().fireEvent(new BreakpointCreatedEvent(session, bkpt.getTasks()));
+		// Exceptionpoint excp = new Exceptionpoint(tasks, clazz, stopOnThrow, stopOnCatch, null);
+		// TODO - implement set exception point
+		// session.getDebugger().setExceptionpoint(watchpoint.getTasks(), access, read, expression);
+		// session.getDebugger().fireEvent(new BreakpointCreatedEvent(session, bkpt.getTasks()));
 		throw new PCDIException("Not implement yet - setExceptionpoint");
-		//return excp;
+		// return excp;
 	}
-	
-	public void setBreakpointPending(BitList tasks, boolean set) throws PCDIException { 
-		//TODO - implement set setBreakpointPending
-		//session.getDebugger().setBreakpointPending(watchpoint.getTasks(), access, read, expression);
+	public void setBreakpointPending(BitList tasks, boolean set) throws PCDIException {
+		// TODO - implement set setBreakpointPending
+		// session.getDebugger().setBreakpointPending(watchpoint.getTasks(), access, read, expression);
 		throw new PCDIException("Not implement yet - setBreakpointPending");
 	}
 	public Condition createCondition(int ignoreCount, String expression, String[] tids) {
@@ -259,38 +308,26 @@ public class BreakpointManager extends Manager {
 	public void update(Target target) throws PCDIException {
 		if (target == null)
 			throw new PCDIException("No target");
-		
-		//TODO - dunno what implement here
+		// TODO - dunno what implement here
 		throw new PCDIException("Not implement yet -- BreakpointManager: update");
 	}
-
 	public void setCondition(Breakpoint breakpoint, ICDICondition newCondition) throws PCDIException {
-		//Target target = (Target)breakpoint.getTarget();
+		// Target target = (Target)breakpoint.getTarget();
 		throw new PCDIException("Not implement yet -- BreakpointManager: setCondition");
 	}
-	public void disableBreakpoint(Breakpoint breakpoint) throws PCDIException {
-		//Target target = (Target)breakpoint.getTarget();
-		throw new PCDIException("Not implement yet -- BreakpointManager: disableBreakpoint");
-	}
-	public void enableBreakpoint(Breakpoint breakpoint) throws PCDIException {
-		//Target target = (Target)breakpoint.getTarget();
-		throw new PCDIException("Not implement yet -- BreakpointManager: enableBreakpoint");
-	}
-
-	/** create breakpoint **/
-	private IPCDILineBreakpoint createLineBreakpoint(BitList tasks, int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws PCDIException {		
+	/** create breakpoint * */
+	private IPCDILineBreakpoint createLineBreakpoint(BitList tasks, int type, ICDILineLocation location, ICDICondition condition, boolean deferred) throws PCDIException {
 		return new LineBreakpoint(type, location, condition);
 	}
-	private IPCDIFunctionBreakpoint createFunctionBreakpoint(BitList tasks, int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws PCDIException {		
+	private IPCDIFunctionBreakpoint createFunctionBreakpoint(BitList tasks, int type, ICDIFunctionLocation location, ICDICondition condition, boolean deferred) throws PCDIException {
 		return new FunctionBreakpoint(type, location, condition);
 	}
-	private IPCDIAddressBreakpoint createAddressBreakpoint(BitList tasks, int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws PCDIException {		
+	private IPCDIAddressBreakpoint createAddressBreakpoint(BitList tasks, int type, ICDIAddressLocation location, ICDICondition condition, boolean deferred) throws PCDIException {
 		return new AddressBreakpoint(type, location, condition);
 	}
-	
-	/** command **/
+	/** command * */
 	private IPCDIBreakpoint setBreakpointCommand(BitList tasks, IPCDIBreakpoint bkpt) throws PCDIException {
-		Session session = (Session)getSession();
+		Session session = (Session) getSession();
 		AbstractBreakpointCommand command = getSetBreakpointCommand(tasks, bkpt);
 		if (command != null) {
 			session.getDebugger().postCommand(command);
@@ -303,16 +340,107 @@ public class BreakpointManager extends Manager {
 	private AbstractBreakpointCommand getSetBreakpointCommand(BitList tasks, IPCDIBreakpoint bkpt) {
 		if (bkpt instanceof IPCDILineBreakpoint) {
 			return new SetLineBreakpointCommand(tasks, (IPCDILineBreakpoint) bkpt);
-		}
-		else if (bkpt instanceof IPCDIFunctionBreakpoint) {
+		} else if (bkpt instanceof IPCDIFunctionBreakpoint) {
 			return new SetFunctionBreakpointCommand(tasks, (IPCDIFunctionBreakpoint) bkpt);
-		}
-		else if (bkpt instanceof IPCDIAddressBreakpoint) {
-			
+		} else if (bkpt instanceof IPCDIAddressBreakpoint) {
 		}
 		return null;
 	}
 	private AbstractBreakpointCommand getDeleteBreakpointCommand(BitList tasks, IPCDIBreakpoint bkpt) {
 		return new DeleteBreakpointCommand(tasks, bkpt);
+	}
+	private AbstractBreakpointCommand getEnableBreakpointCommand(BitList tasks, IPCDIBreakpoint bkpt) {
+		return new EnableBreakpointCommand(tasks, bkpt);
+	}
+	private AbstractBreakpointCommand getDisableBreakpointCommand(BitList tasks, IPCDIBreakpoint bkpt) {
+		return new DisableBreakpointCommand(tasks, bkpt);
+	}
+	private AbstractBreakpointCommand getConditionBreakpointCommand(BitList tasks, IPCDIBreakpoint bkpt, String expr) {
+		return new ConditionBreakpointCommand(tasks, bkpt, expr);
+	}
+	/***************************************************************************************************************************************************************************************************
+	 * Breakpoint listener
+	 **************************************************************************************************************************************************************************************************/
+	public void breakpointsAdded(IBreakpoint[] breakpoints){
+		synchronized (breakMap) {
+			for (int i=0; i<breakpoints.length; ++i) {
+				if (breakpoints[i] instanceof IPBreakpoint) {
+					String job_id = getSession().getJob().getIDString();
+					try {
+						String bp_job_id = ((IPBreakpoint)breakpoints[i]).getJobId(); 
+						if (bp_job_id.equals(job_id) || bp_job_id.equals(IPBreakpoint.GLOBAL)) {
+							setBreakpoint(job_id, (IPBreakpoint)breakpoints[i]);
+						}
+					} catch (CoreException e) {
+						PTPDebugExternalPlugin.log(e.getStatus());
+					}
+				}
+			}
+		}
+	}
+	public void breakpointsChanged(IBreakpoint[] breakpoints, IMarkerDelta[] deltas) {
+		synchronized (breakMap) {
+			for (int i=0; i<breakpoints.length; ++i) {
+				if (breakpoints[i] instanceof IPBreakpoint) {
+					IPBreakpoint breakpoint = (IPBreakpoint)breakpoints[i];
+					String job_id = getSession().getJob().getIDString();
+					try {
+						String bp_job_id = ((IPBreakpoint)breakpoints[i]).getJobId(); 
+						if (bp_job_id.equals(job_id) || bp_job_id.equals(IPBreakpoint.GLOBAL)) {
+							IPCDIBreakpoint cdiBpt = findCDIBreakpoint(breakpoint);
+							if (cdiBpt == null) {
+								continue;
+							}
+
+							ICDICondition condition0 = null;
+							int ignoreCount = breakpoint.getIgnoreCount();
+							int oldIgnoreCount = (deltas != null)?deltas[i].getAttribute(IPBreakpoint.IGNORE_COUNT, 0):ignoreCount;
+							String condition = breakpoint.getCondition();
+							String oldCondition = (deltas != null)?deltas[i].getAttribute(IPBreakpoint.CONDITION, ""):condition;
+
+							Boolean enabled0 = null;
+							boolean enabled = breakpoint.isEnabled();
+							boolean oldEnabled = (deltas[i] != null)?deltas[i].getAttribute(IBreakpoint.ENABLED, true):enabled;
+							if (enabled != oldEnabled && enabled != cdiBpt.isEnabled()) {
+								enabled0 = (enabled)?Boolean.TRUE:Boolean.FALSE;
+							}
+							if (ignoreCount != oldIgnoreCount || condition.compareTo(oldCondition) != 0) {
+								ICDICondition cdiCondition = createCondition(ignoreCount, condition, null);
+								if (!cdiCondition.equals(cdiBpt.getCondition())) {
+									condition0 = cdiCondition;
+								}
+							}
+							if (enabled0 != null) {
+								setEnableBreakpoint(job_id, breakpoint);
+							}
+							if (condition0 != null) {
+								setConditionBreakpoint(job_id, breakpoint);
+							}
+						}
+					} catch (CoreException e) {
+						PTPDebugExternalPlugin.log(e.getStatus());
+					} catch(PCDIException e1) {
+						PTPDebugExternalPlugin.log(e1);
+					}
+				}
+			}
+		}
+	}
+	public void breakpointsRemoved(IBreakpoint[] breakpoints, IMarkerDelta[] deltas) {
+		synchronized (breakMap) {
+			for (int i=0; i<breakpoints.length; ++i) {
+				if (breakpoints[i] instanceof IPBreakpoint) {
+					String job_id = getSession().getJob().getIDString();
+					try {
+						String bp_job_id = ((IPBreakpoint)breakpoints[i]).getJobId(); 
+						if (bp_job_id.equals(job_id) || bp_job_id.equals(IPBreakpoint.GLOBAL)) {
+							deleteBreakpoint(job_id, (IPBreakpoint)breakpoints[i]);
+						}
+					} catch (CoreException e) {
+						PTPDebugExternalPlugin.log(e.getStatus());
+					}
+				}
+			}
+		}
 	}	
 }

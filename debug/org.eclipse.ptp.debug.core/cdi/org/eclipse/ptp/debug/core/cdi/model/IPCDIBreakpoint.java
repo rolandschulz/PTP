@@ -34,9 +34,9 @@ public interface IPCDIBreakpoint extends IPCDIObject {
 	boolean isTemporary();
 	boolean isHardware();
 	boolean isEnabled() throws PCDIException;
-	void setEnabled(boolean enabled) throws PCDIException;
+	void setEnabled(boolean enabled);
 	ICDICondition getCondition() throws PCDIException;
-	void setCondition(ICDICondition condition) throws PCDIException;
+	void setCondition(ICDICondition condition);
 	int getBreakpointId();	
 	void setBreakpointId(int bpid);
 }

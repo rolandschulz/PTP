@@ -20,7 +20,7 @@
 #include "MIString.h"
 
 MICommand *
-MIBreakInsert(int isTemporary, int isHardware, char *condition, int ignoreCount, char *line, int tid)
+MIBreakInsert(int isTemporary, int isHardware, char *condition, int ignoreCount, char *where, int tid)
 {
 	MICommand *	cmd;
 	
@@ -41,7 +41,7 @@ MIBreakInsert(int isTemporary, int isHardware, char *condition, int ignoreCount,
 		MICommandAddOption(cmd, "-p", MIIntToCString(tid));
 	}
 	
-	MICommandAddOption(cmd, line, NULL);
+	MICommandAddOption(cmd, where, NULL);
 	
 	return cmd;
 }
@@ -58,5 +58,49 @@ MIBreakDelete(int nbps, int *bpids)
 		MICommandAddOption(cmd, MIIntToCString(bpids[i]), NULL);
 	}
 	
+	return cmd;
+}
+
+MICommand *
+MIBreakDisable(int nbps, int *bpids)
+{
+	int 		i;
+	MICommand *	cmd;
+	
+	cmd = MICommandNew("-break-disable", MIResultRecordDONE);
+	
+	for (i = 0; i < nbps; i++) {
+		MICommandAddOption(cmd, MIIntToCString(bpids[i]), NULL);
+	}
+	
+	return cmd;
+}
+
+MICommand *
+MIBreakEnable(int nbps, int *bpids)
+{
+	int 		i;
+	MICommand *	cmd;
+	
+	cmd = MICommandNew("-break-enable", MIResultRecordDONE);
+	
+	for (i = 0; i < nbps; i++) {
+		MICommandAddOption(cmd, MIIntToCString(bpids[i]), NULL);
+	}
+	
+	return cmd;
+}
+
+MICommand *
+MIBreakCondition(int nbps, int *bpids, char *expr)
+{
+	int 		i;
+	MICommand *	cmd;
+	
+	cmd = MICommandNew("-break-condition", MIResultRecordDONE);
+	
+	for (i = 0; i < nbps; i++) {
+		MICommandAddOption(cmd, MIIntToCString(bpids[i]), expr);
+	}	
 	return cmd;
 }

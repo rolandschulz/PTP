@@ -32,7 +32,6 @@ import org.eclipse.ptp.debug.core.aif.IValueParent;
  * 
  */
 public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
-	int marker = 0;
 	IAIFValue value;
 	
 	public AIFValuePointer(IValueParent parent, IAIFTypePointer type, byte[] data) {
@@ -51,7 +50,7 @@ public class AIFValuePointer extends ValueDerived implements IAIFValuePointer {
 	}
 	protected void parse(byte[] data) {
 System.err.println("------- total: " + data.length);
-		marker = data[0];
+		int marker = data[0];
 		IAIFTypePointer pType = (IAIFTypePointer)type;
 System.err.println("--------------- marker: " + marker);
 		switch (marker) {
@@ -60,7 +59,7 @@ System.err.println("--------------- marker: " + marker);
 			break;
 		case 1:
 			byte[] newByte = createByteArray(data, 1, data.length-1);
-			value = AIFFactory.getAIFValue(this, pType.getBaseType(), newByte);
+			value = AIFFactory.getAIFValue(getParent(), pType.getBaseType(), newByte);
 			break;
 		case 2:
 			break;

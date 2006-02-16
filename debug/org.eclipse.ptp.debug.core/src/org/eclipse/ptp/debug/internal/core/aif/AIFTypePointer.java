@@ -25,8 +25,8 @@ import org.eclipse.ptp.debug.core.aif.IAIFTypePointer;
 
 public class AIFTypePointer extends TypeDerived implements IAIFTypePointer {
 	//char*: ^c
-	//^%0/{s|a=is4,b=^>0/;;;}
-	//^%1/{s1 *|a=f8,b=^%2/{s *|a=f8,b=>2/;;;},c=>1/;;;}
+	//^%1/{s1 *|a=is4,b=^>1/,c=^>1/;;;}
+	//^%1/{s1 *|a=f8,b=^%2/{s *|a=f8,b=^>2/;;;},c=^>1/;;;}
 	public AIFTypePointer(IAIFType basetype) {
 		super(basetype);
 	}
@@ -38,7 +38,7 @@ public class AIFTypePointer extends TypeDerived implements IAIFTypePointer {
 	}	
 	
 	public static void main(String[] args) {
-		IAIFType testType = AIFFactory.getAIFType("^%1/{s1 *|a=f8,b=^%2/{s *|a=f8,b=>2/;;;},c=>1/;;;}");
+		IAIFType testType = AIFFactory.getAIFType("^%1/{s1 *|a=is4,b=^>1/,c=^>1/;;;}");
 		System.out.println("----: " + testType);
 		System.out.println("----: " + testType.sizeof());
 	}

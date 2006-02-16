@@ -161,8 +161,8 @@ DbgClntSetLineBreakpoint(char **args)
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
 	}
-	
-	asprintf(&cmd, "%s %s \"%s\" %s", DBG_SETLINEBREAKPOINT_CMD, args[2], args[3], args[4]);
+
+	asprintf(&cmd, "%s %s %s %s \"%s\" %s \"%s\" %s %s", DBG_SETLINEBREAKPOINT_CMD, args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
 	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
 	
 	free(cmd);
@@ -178,13 +178,14 @@ DbgClntSetFuncBreakpoint(char **args)
 	char *		cmd;
 	bitset *		set; 
 
+
 	set = str_to_bitset(args[1]);
 	if (set == NULL) {
 		DbgSetError(DBGERR_PROCSET, NULL);
 		return DBGRES_ERR;
 	}
 
-	asprintf(&cmd, "%s %s \"%s\" \"%s\"", DBG_SETFUNCBREAKPOINT_CMD, args[2], args[3], args[4]);
+	asprintf(&cmd, "%s %s %s %s \"%s\" \"%s\" \"%s\" %s %s", DBG_SETFUNCBREAKPOINT_CMD, args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
 	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
 	
 	free(cmd);
@@ -215,6 +216,71 @@ DbgClntDeleteBreakpoint(char **args)
 	return res;
 }
 
+int 
+DbgClntEnableBreakpoint(char **args)
+{
+	int			res;
+	char *		cmd;
+	bitset *		set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	asprintf(&cmd, "%s %s", DBG_ENABLEBREAKPOINT_CMD, args[2]);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	
+	free(cmd);
+	bitset_free(set);
+		
+	return res;
+}
+
+int 
+DbgClntDisableBreakpoint(char **args)
+{
+	int			res;
+	char *		cmd;
+	bitset *		set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	asprintf(&cmd, "%s %s", DBG_DISABLEBREAKPOINT_CMD, args[2]);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	
+	free(cmd);
+	bitset_free(set);
+		
+	return res;
+}
+
+int 
+DbgClntConditionBreakpoint(char **args)
+{
+	int			res;
+	char *		cmd;
+	bitset *		set; 
+
+	set = str_to_bitset(args[1]);
+	if (set == NULL) {
+		DbgSetError(DBGERR_PROCSET, NULL);
+		return DBGRES_ERR;
+	}
+	
+	asprintf(&cmd, "%s %s \"%s\"", DBG_CONDITIONBREAKPOINT_CMD, args[2], args[3]);
+	res = ClntSendCommand(set, DBG_EV_WAITALL, cmd, NULL);
+	
+	free(cmd);
+	bitset_free(set);
+		
+	return res;
+}
 /*
  * Process control operations
  */

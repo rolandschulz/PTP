@@ -35,9 +35,11 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.ptp.debug.core.model.IPVariableManager;
 import org.eclipse.ptp.debug.core.sourcelookup.IPSourceLocation;
 import org.eclipse.ptp.debug.internal.core.IPDebugInternalConstants;
 import org.eclipse.ptp.debug.internal.core.PDebugConfiguration;
+import org.eclipse.ptp.debug.internal.core.PVariableManager;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.CommonSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.PSourceLookupDirector;
 import org.eclipse.ptp.debug.internal.core.sourcelookup.SourceUtils;
@@ -53,6 +55,7 @@ public class PTPDebugCorePlugin extends Plugin {
 	//private ListenerList fBreakpointListeners;
 	private CommonSourceLookupDirector fCommonSourceLookupDirector;
 	private static PCDIDebugModel debugModel = null;
+	private static IPVariableManager variableManager = null;
 
 	public PTPDebugCorePlugin() {
 		super();
@@ -154,9 +157,13 @@ public class PTPDebugCorePlugin extends Plugin {
 	public static PCDIDebugModel getDebugModel() {
 		return debugModel;
 	}
+	public static IPVariableManager getPVariableManager() {
+		return variableManager;
+	}
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		debugModel = new PCDIDebugModel();
+		variableManager = new PVariableManager(debugModel);
 		initializeCommonSourceLookupDirector();
 		//createBreakpointListenersList();
 		//resetBreakpointsInstallCount();

@@ -16,24 +16,20 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.aif;
+package org.eclipse.ptp.debug.core.model;
 
-import org.eclipse.ptp.debug.core.aif.AIFFactory;
-import org.eclipse.ptp.debug.core.aif.IAIFType;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeStruct;
+import org.eclipse.ptp.core.IPJob;
 
-public class AIFTypeStruct extends TypeAggregate implements IAIFTypeStruct {	
-	//only base type: {structName|floatnumber=f4,intnumber=is4,shortnumber=is2,longnumber=is4,doubleumber=f8;;;}
-	//complex type: {structName|floatnumber=f4,intnumber=is4,tStr22={testStruct|aFloat=f4,intNum=is4;;;},shortnumber=is2;;;}
-	public AIFTypeStruct(String format) {
-		super(format);
-	}
-	public String toString() {
-		return AIFFactory.FDS_STRUCT_CLASS + super.toString() + AIFFactory.FDS_STRUCT_END;
-	}
-	public static void main(String[] args) {
-		IAIFType testType = AIFFactory.getAIFType("{structName|floatnumber=f4,intnumber=is4,tStr22={testStruct|aFloat=f4,intNum=is4;;;},shortnumber=is2;;;}");
-		System.out.println("----: " + testType);
-		System.out.println("----: " + testType.sizeof());
-	}
+/**
+ * @author Clement chu
+ * 
+ */
+public interface IPVariableManager {
+	public void addVariable(String variable_name);
+	public void removeVariable(String variable_name);
+	public String[] getVariables();
+	public void removeAllVariables();
+	public void shutdown();
+	public String getValues(IPJob job, int taskID);
 }
+

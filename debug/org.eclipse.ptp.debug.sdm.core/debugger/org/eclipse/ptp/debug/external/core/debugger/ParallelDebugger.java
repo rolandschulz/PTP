@@ -21,6 +21,7 @@ package org.eclipse.ptp.debug.external.core.debugger;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -201,14 +202,16 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 	}
 	public void setLineBreakpoint(BitList tasks, IPCDILineBreakpoint bpt) throws PCDIException {
 		try {
-			proxy.debugSetLineBreakpoint(tasks, newBreakpointId(), bpt.getLocator().getFile(), bpt.getLocator().getLineNumber());
+			ICDICondition condition = bpt.getCondition();
+			proxy.debugSetLineBreakpoint(tasks, newBreakpointId(), bpt.isTemporary(), bpt.isHardware(), bpt.getLocator().getFile(), bpt.getLocator().getLineNumber(), (condition!=null?condition.getExpression():""), (condition!=null?condition.getIgnoreCount():0), 0);
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
 		}
 	}
 	public void setFunctionBreakpoint(BitList tasks, IPCDIFunctionBreakpoint bpt) throws PCDIException {
 		try {
-			proxy.debugSetFuncBreakpoint(tasks, newBreakpointId(), bpt.getLocator().getFile(), bpt.getLocator().getFunction());
+			ICDICondition condition = bpt.getCondition();
+			proxy.debugSetFuncBreakpoint(tasks, newBreakpointId(), bpt.isTemporary(), bpt.isHardware(), bpt.getLocator().getFile(), bpt.getLocator().getFunction(), (condition!=null?condition.getExpression():""), (condition!=null?condition.getIgnoreCount():0), 0);
 		} catch (IOException e) {
 			throw new PCDIException(e.getMessage());
 		}
@@ -220,6 +223,29 @@ public class ParallelDebugger extends AbstractDebugger implements IDebugger, IPr
 			throw new PCDIException(e.getMessage());
 		}
 	}
+	public void enableBreakpoint(BitList tasks, int bpid) throws PCDIException {
+		try {
+			proxy.debugEnableBreakpoint(tasks, bpid);
+		} catch (IOException e) {
+			throw new PCDIException(e.getMessage());
+		}
+	}
+	public void disableBreakpoint(BitList tasks, int bpid) throws PCDIException {
+		try {
+			proxy.debugDisableBreakpoint(tasks, bpid);
+		} catch (IOException e) {
+			throw new PCDIException(e.getMessage());
+		}
+	}
+	public void conditionBreakpoint(BitList tasks, int bpid, String expr) throws PCDIException {
+		try {
+			proxy.debugConditionBreakpoint(tasks, bpid, expr);
+		} catch (IOException e) {
+			throw new PCDIException(e.getMessage());
+		}
+	}
+	
+	
 	/**
 	 * list stack frames for first process in procs
 	 */

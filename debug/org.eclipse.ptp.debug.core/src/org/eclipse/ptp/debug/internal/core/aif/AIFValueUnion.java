@@ -42,7 +42,7 @@ public class AIFValueUnion extends ValueAggregate implements IAIFValueUnion {
 		for (int i=0; i<length; i++) {
 			IAIFType aifType = typeAggregate.getType(i);
 			byte[] newData = createByteArray(data, (size - aifType.sizeof()), aifType.sizeof());
-			IAIFValue val = AIFFactory.getAIFValue(this, aifType, newData);
+			IAIFValue val = AIFFactory.getAIFValue(getParent(), aifType, newData);
 			values.add(val);
 		}
 	}	
