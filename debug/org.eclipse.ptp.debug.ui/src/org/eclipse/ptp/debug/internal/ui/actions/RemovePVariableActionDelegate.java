@@ -16,11 +16,23 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.ui.views;
+package org.eclipse.ptp.debug.internal.ui.actions;
+
+import org.eclipse.debug.core.DebugException;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.model.IPVariable;
+import org.eclipse.ptp.debug.core.model.IPVariableManager;
+
 /**
  * @author Clement chu
- *
+ * 
  */
-public interface IToolTipProvider {
-	public String toolTipText(Object obj);
+public class RemovePVariableActionDelegate extends PVariableActionDelegate {
+	protected void doAction(IPVariable[] vars) throws DebugException {
+		IPVariableManager variableManager = PTPDebugCorePlugin.getPVariableManager();
+		for(int i=0; i<vars.length; i++) {
+			variableManager.removeVariable(vars[i].getName());
+		}		
+	}
 }
+

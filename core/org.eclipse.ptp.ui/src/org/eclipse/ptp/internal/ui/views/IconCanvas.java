@@ -1591,7 +1591,7 @@ public class IconCanvas extends Canvas {
 	protected String getToolTipText(Object obj) {
 		if (toolTipProvider == null)
 			return "";
-		return toolTipProvider.getToolTip(obj);
+		return toolTipProvider.toolTipText(obj);
 	}
 	protected Object getObject(int index) {
 		if (contentProvider == null) {
@@ -1655,7 +1655,7 @@ public class IconCanvas extends Canvas {
         	}
         });
         iconCanvas.setToolTipProvider(new IToolTipProvider() {
-        	public String getToolTip(Object obj) {
+        	public String toolTipText(Object obj) {
         		return " The element: " + obj.toString();
         	}
         });

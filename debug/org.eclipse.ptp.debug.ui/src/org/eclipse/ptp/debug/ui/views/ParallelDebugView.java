@@ -26,6 +26,7 @@ import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPProcess;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.internal.ui.UIDebugManager;
 import org.eclipse.ptp.debug.internal.ui.actions.RegisterAction;
 import org.eclipse.ptp.debug.internal.ui.actions.ResumeAction;
@@ -132,31 +133,16 @@ public class ParallelDebugView extends ParallelJobView implements IDebugActionUp
 			PTPDebugUIPlugin.errorDialog(getViewSite().getShell(), "Error", e.getStatus());
 		}
 	}
-	public String getToolTipText(int index) {
-		IElementHandler setManager = getCurrentElementHandler();
-		if (setManager == null || cur_element_set == null)
-			return " Unknown element";
-		IElement element = cur_element_set.get(index);
-		if (element == null)
-			return " Unknown element";
-		IPProcess proc = ((UIDebugManager) manager).findProcess(getCurrentID(), element.getID());
-		if (proc == null)
-			return " Unknow process";
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(" Task ID: " + proc.getTaskId());
-		buffer.append("\n");
-		buffer.append(" Process ID: " + proc.getPid());
-		IElementSet[] groups = setManager.getSetsWithElement(element.getID());
-		if (groups.length > 1)
-			buffer.append("\n Group: ");
-		for (int i = 1; i < groups.length; i++) {
-			buffer.append(groups[i].getID());
-			if (i < groups.length - 1)
-				buffer.append(",");
+	public String getToolTipText(Object obj) {
+		String tooltip = super.getToolTipText(obj);
+		IPJob job = ((UIDebugManager) manager).findJobById(getCurrentID());
+		String variableText = PTPDebugCorePlugin.getPVariableManager().getValues(job, ((IPProcess)obj).getTaskId());
+		if (variableText != null && variableText.length() > 0) {
+			tooltip += "\n" + variableText;
 		}
-		// buffer.append("\nStatus: " + getUIDebugManager().getProcessStatusText(proc));
-		return buffer.toString();
+		return tooltip;
 	}
+	
 	public void registerElement(IElement element) throws CoreException {
 		if (element.isRegistered())
 			((UIDebugManager) manager).unregisterElements(new IElement[] { element });

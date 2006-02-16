@@ -18,16 +18,21 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.actions;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.model.IPVariable;
+import org.eclipse.ptp.debug.core.model.IPVariableManager;
 
 /**
  * @author Clement chu
- *
+ * 
  */
-public interface IJumpToLine {
-	public boolean canJumpToLine(IFile file, int lineNumber);
-	public void jumpToLine(IFile file, int lineNumber) throws DebugException;
-	public boolean canJumpToLine(String fileName, int lineNumber);
-	public void jumpToLine(String fileName, int lineNumber) throws DebugException;
+public class AddPVariableActionDelegate extends PVariableActionDelegate {
+	protected void doAction(IPVariable[] vars) throws DebugException {
+		IPVariableManager variableManager = PTPDebugCorePlugin.getPVariableManager();
+		for(int i=0; i<vars.length; i++) {
+			variableManager.addVariable(vars[i].getName());
+		}		
+	}
 }
+

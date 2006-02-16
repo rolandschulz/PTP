@@ -33,6 +33,7 @@ import org.eclipse.debug.ui.actions.IRunToLineTarget;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ptp.debug.core.model.IRunToLine;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.ui.IPTPUIConstants;
 import org.eclipse.ui.IEditorInput;

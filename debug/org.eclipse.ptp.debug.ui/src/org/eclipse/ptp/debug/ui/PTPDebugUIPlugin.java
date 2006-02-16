@@ -188,6 +188,9 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 		}
 		errorDialog(shell, title, message, status);
 	}
+	public static void errorDialog(String title, IStatus s) {
+		errorDialog(getActiveWorkbenchShell(), title, s.getMessage(), s);
+	}
 	public static void errorDialog(Shell shell, String title, IStatus s) {
 		errorDialog(shell, title, s.getMessage(), s);
 	}
