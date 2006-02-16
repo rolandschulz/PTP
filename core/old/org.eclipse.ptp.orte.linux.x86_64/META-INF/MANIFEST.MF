@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Linux x86_64 ORTE Fragment
-Bundle-SymbolicName: org.eclipse.ptp.orte.linux.ppc
+Bundle-SymbolicName: org.eclipse.ptp.orte.linux.x86_64
 Bundle-Version: 1.0.0
 Fragment-Host: org.eclipse.ptp.core;bundle-version="1.0.0"
 Bundle-Localization: plugin
