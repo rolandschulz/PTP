@@ -321,7 +321,7 @@ FDSDataSize(char *fds, char *data)
         char * tmp1 = fds;
         char * tmp2 = data;
 
-	ResetAIFError();
+		ResetAIFError();
 
         _fds_skip_data(&tmp1, &tmp2);
 
@@ -2352,7 +2352,7 @@ _fds_skip_data(char **fds, char **data)
 	{
 	case AIF_REFERENCE:
 		fmt = _fds_lookup(fds); // need a temporary copy
-//		_fds_skip_data(&fmt, data);
+		_fds_skip_data(&fmt, data);
 		return;
 
 	case AIF_POINTER:
