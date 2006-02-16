@@ -39,7 +39,7 @@ public abstract class ValueParent extends AIFValue implements IValueParent {
 		this.parent = parent;
 	}
 	public IValueParent getParent() {
-		return parent;
+		return (parent==null)?this:parent;
 	}
 }
 

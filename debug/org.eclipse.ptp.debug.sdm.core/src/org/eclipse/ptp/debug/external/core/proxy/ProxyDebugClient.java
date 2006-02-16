@@ -35,18 +35,30 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		sendCommand("INI", dir + " \""+ prog + "\" \"" + args + "\"");
 	}
 	
-	public void debugSetLineBreakpoint(BitList procs, int bpid, String file, int line) throws IOException {
-		sendCommand("SLB", procs, bpid + " \"" + file + "\" " + line);
+	public void debugSetLineBreakpoint(BitList procs, int bpid, boolean isTemporary, boolean isHardware, String file, int line, String expression, int ignoreCount, int tid) throws IOException {
+		sendCommand("SLB", procs, bpid + " " + (isTemporary?1:0) + " " + (isHardware?1:0) + " \"" + file + "\" " + line + " \"" + expression + "\" " + ignoreCount + " " + tid);
 	}
 	
-	public void debugSetFuncBreakpoint(BitList procs, int bpid, String file, String func) throws IOException {
-		sendCommand("SFB", procs, bpid + " \"" + file + "\" \"" + func + "\"");
+	public void debugSetFuncBreakpoint(BitList procs, int bpid, boolean isTemporary, boolean isHardware, String file, String func, String expression, int ignoreCount, int tid) throws IOException {
+		sendCommand("SFB", procs, bpid + " " + (isTemporary?0:0) + " " + (isHardware?1:0) + " \"" + file + "\" \"" + func + "\" \"" + expression + "\" " + ignoreCount + " " + tid);
 	}
 	
 	public void debugDeleteBreakpoint(BitList procs, int bpid) throws IOException {
 		sendCommand("DBP", procs, Integer.toString(bpid));
 	}
-	
+
+	public void debugEnableBreakpoint(BitList procs, int bpid) throws IOException {
+		sendCommand("EAB", procs, Integer.toString(bpid));
+	}
+
+	public void debugDisableBreakpoint(BitList procs, int bpid) throws IOException {
+		sendCommand("DAB", procs, Integer.toString(bpid));
+	}
+
+	public void debugConditionBreakpoint(BitList procs, int bpid, String expr) throws IOException {
+		sendCommand("CBP", procs, Integer.toString(bpid) + " \"" + expr + "\"");
+	}
+
 	public void debugGo(BitList procs) throws IOException {
 		sendCommand("GOP", procs);
 	}

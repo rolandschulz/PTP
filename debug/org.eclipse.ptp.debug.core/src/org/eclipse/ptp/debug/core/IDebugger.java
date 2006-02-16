@@ -81,4 +81,7 @@ public interface IDebugger {
 	public void setLineBreakpoint(BitList tasks, IPCDILineBreakpoint bpt) throws PCDIException;
 	public void setFunctionBreakpoint(BitList tasks, IPCDIFunctionBreakpoint bpt) throws PCDIException;
 	public void deleteBreakpoint(BitList tasks, int bpid) throws PCDIException;
+	public void enableBreakpoint(BitList tasks, int bpid) throws PCDIException;
+	public void disableBreakpoint(BitList tasks, int bpid) throws PCDIException;
+	public void conditionBreakpoint(BitList tasks, int bpid, String expr) throws PCDIException;
 }

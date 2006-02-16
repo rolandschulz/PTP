@@ -31,6 +31,9 @@ public class AIFTypeReference extends AIFType implements IAIFTypeReference {
 	public AIFTypeReference(String name) {
 		this.name = name;
 	}
+	public char type() {
+		return AIFFactory.FDS_REFERENCE;
+	}
 	public String getName() {
 		return name;
 	}

@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryObject;
-import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -30,13 +29,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.IBreakpointListener;
-import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.core.IPJob;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.util.BitList;
 import org.eclipse.ptp.debug.core.IAbstractDebugger;
 import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
+import org.eclipse.ptp.debug.core.aif.IAIF;
 import org.eclipse.ptp.debug.core.cdi.IPCDIEventManager;
 import org.eclipse.ptp.debug.core.cdi.IPCDISession;
 import org.eclipse.ptp.debug.core.cdi.IPCDISessionConfiguration;
@@ -44,9 +42,9 @@ import org.eclipse.ptp.debug.core.cdi.IPCDISessionObject;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDITarget;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
-import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.external.core.PTPDebugExternalPlugin;
 import org.eclipse.ptp.debug.external.core.cdi.model.Target;
+import org.eclipse.ptp.debug.external.core.commands.GetAIFCommand;
 import org.eclipse.ptp.debug.external.core.commands.GoCommand;
 import org.eclipse.ptp.debug.external.core.commands.HaltCommand;
 import org.eclipse.ptp.debug.external.core.commands.KillCommand;
@@ -58,7 +56,7 @@ import org.eclipse.ptp.debug.external.core.commands.StepOverCommand;
  * @author Clement chu
  *
  */
-public class Session implements IPCDISession, IPCDISessionObject, IBreakpointListener {
+public class Session implements IPCDISession, IPCDISessionObject {
 	public final static Target[] EMPTY_TARGETS = {};
 	Properties props;
 	ProcessManager processManager;
@@ -82,7 +80,6 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 		//job.setAttribute(PreferenceConstants.JOB_DEBUG_SESSION, this);
 	}
 	private void commonSetup() {
-		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
 		props = new Properties();
 		setConfiguration(new SessionConfiguration(this));
 		processManager = new ProcessManager(this);
@@ -103,7 +100,6 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 		}
 		
 		DebugPlugin.getDefault().getLaunchManager().removeLaunch(launch);
-		DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
 		variableManager.shutdown();
 		expressionManager.shutdown();
 		breakpointManager.shutdown();
@@ -252,33 +248,6 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 		return job.totalProcesses();
 	}
 
-	public void breakpointAdded(IBreakpoint breakpoint) {
-		if (breakpoint instanceof IPBreakpoint) {
-			String job_id = getJob().getIDString();
-			try {
-				String bp_job_id = ((IPBreakpoint)breakpoint).getJobId(); 
-				if (bp_job_id.equals(job_id) || bp_job_id.equals(IPBreakpoint.GLOBAL)) {
-					getBreakpointManager().setBreakpoint(job_id, (IPBreakpoint)breakpoint);
-				}
-			} catch (CoreException e) {
-			}
-		}
-	}
-	public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
-		// TODO Auto-generated method stub
-	}
-	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
-		if (breakpoint instanceof IPBreakpoint) {
-			String job_id = getJob().getIDString();
-			try {
-				String bp_job_id = ((IPBreakpoint)breakpoint).getJobId(); 
-				if (bp_job_id.equals(job_id) || bp_job_id.equals(IPBreakpoint.GLOBAL)) {
-					getBreakpointManager().deleteBreakpoint(job_id, (IPBreakpoint)breakpoint);
-				}
-			} catch (CoreException e) {
-			}
-		}
-	}
 	public void terminate() throws PCDIException {
 		stop(createBitList());
 	}
@@ -300,4 +269,12 @@ public class Session implements IPCDISession, IPCDISessionObject, IBreakpointLis
 	public void steppingReturn(BitList tasks) throws PCDIException {
 		getDebugger().postCommand(new StepFinishCommand(tasks));
 	}
+	public IAIF getExpressionValue(BitList tasks, String variable) throws PCDIException {
+		GetAIFCommand command = new GetAIFCommand(tasks, variable);
+		getDebugger().postCommand(command);
+		return command.getAIF();
+	}
+	public IAIF getExpressionValue(int task_id, String variable) throws PCDIException {
+		return getExpressionValue(createBitList(task_id), variable);
+	}	
 }

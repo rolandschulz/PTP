@@ -311,6 +311,16 @@ public class DebugSimulator extends AbstractDebugger implements IDebugger, Obser
 	public void deleteBreakpoint(BitList tasks, int bpid) throws PCDIException {
 	// TODO Auto-generated method stub
 	}
+	public void enableBreakpoint(BitList tasks, int bpid) throws PCDIException {
+		
+	}
+	public void disableBreakpoint(BitList tasks, int bpid) throws PCDIException {
+		
+	}
+	public void conditionBreakpoint(BitList tasks, int bpid, String expr) throws PCDIException {
+		
+	}
+	
 	// FIXME: from clement....each time only one process??
 	/*
 	 * Do not worry about this method, this method is only peculiar to this DebugSimulator

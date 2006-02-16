@@ -68,7 +68,7 @@ static struct bpmap	BPMap = { 0, 0, NULL };
 static int			(*AsyncFunc)(void *) = NULL;
 static void *		AsyncFuncData;
 
-static int	SetAndCheckBreak(int, char *);
+static int	SetAndCheckBreak(int, int, int, char *, char *, int, int);
 static int	GetStackframes(int, List **);
 static int	GetAIFVar(char *, AIF **, char **);
 static AIF *	ConvertVarToAIF(char *, MIVar *, int);
@@ -77,9 +77,12 @@ static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIProgress(void);
 static int	GDBMIInterrupt(void);
 static int	GDBMIStartSession(char *, char *, char *, char *, char **);
-static int	GDBMISetLineBreakpoint(int, char *, int);
-static int	GDBMISetFuncBreakpoint(int, char *, char *);
+static int	GDBMISetLineBreakpoint(int, int, int, char *, int, char*, int, int);
+static int	GDBMISetFuncBreakpoint(int, int, int, char *, char *, char*, int, int);
 static int	GDBMIDeleteBreakpoint(int);
+static int	GDBMIEnableBreakpoint(int);
+static int	GDBMIDisableBreakpoint(int);
+static int	GDBMIConditionBreakpoint(int, char *expr);
 static int	GDBMIGo(void);
 static int	GDBMIStep(int, int);
 static int	GDBMITerminate(void);
@@ -94,6 +97,9 @@ static int	GDBMIGetGlobalVariables(void);
 static int	GDBMIQuit(void);
 
 static char* GetModifierType(char *);
+static AIF* CreateNamed(AIF*, int);
+static AIF* CreateReference(char *, int);
+
 
 dbg_backend_funcs	GDBMIBackend =
 {
@@ -104,6 +110,9 @@ dbg_backend_funcs	GDBMIBackend =
 	GDBMISetLineBreakpoint,
 	GDBMISetFuncBreakpoint,
 	GDBMIDeleteBreakpoint,
+	GDBMIEnableBreakpoint,
+	GDBMIDisableBreakpoint,
+	GDBMIConditionBreakpoint,
 	GDBMIGo,
 	GDBMIStep,
 	GDBMITerminate,
@@ -487,19 +496,19 @@ GDBMIProgress(void)
 ** Set breakpoint at specified line.
 */
 static int
-GDBMISetLineBreakpoint(int bpid, char *file, int line)
+GDBMISetLineBreakpoint(int bpid, int isTemp, int isHard, char *file, int line, char *condition, int ignoreCount, int tid)
 {
 	int		res;
 	char *	where;
 
 	CHECK_SESSION()
 
-	if ( file == NULL || *file == '\0' )
+	if (file == NULL || *file == '\0')
 		asprintf(&where, "%d", line);
 	else
 		asprintf(&where, "%s:%d", file, line);
 
-	res = SetAndCheckBreak(bpid, where);
+	res = SetAndCheckBreak(bpid, isTemp, isHard, where, condition, ignoreCount, tid);
 	
 	free(where);
 	
@@ -510,20 +519,20 @@ GDBMISetLineBreakpoint(int bpid, char *file, int line)
 ** Set breakpoint at start of specified function.
 */
 static int
-GDBMISetFuncBreakpoint(int bpid, char *file, char *func)
+GDBMISetFuncBreakpoint(int bpid, int isTemp, int isHard, char *file, char *func, char *condition, int ignoreCount, int tid)
 {
 	int		res;
 	char *	where;
 
 	CHECK_SESSION()
 
-	if ( file == NULL || *file == '\0' )
+	if (file == NULL || *file == '\0')
 		asprintf(&where, "%s", func);
 	else
 		asprintf(&where, "%s:%s", file, func);
-
-	res = SetAndCheckBreak(bpid, where);
-	
+		
+	res = SetAndCheckBreak(bpid, isTemp, isHard, where, condition, ignoreCount, tid);
+		
 	free(where);
 	
 	return res;
@@ -535,15 +544,18 @@ GDBMISetFuncBreakpoint(int bpid, char *file, char *func)
 ** id in bid. Adds to breakpoint list if necessary.
 */
 static int
-SetAndCheckBreak(int bpid, char *where)
+SetAndCheckBreak(int bpid, int isTemp, int isHard, char *where, char *condition, int ignoreCount, int tid)
 {
 	dbg_event *		e;
 	MIBreakpoint *	bpt;
 	MICommand *		cmd;
 	List *			bpts;
-	breakpoint *		bp;
+	breakpoint *	bp;
 
-	cmd = MIBreakInsert(0, 0, NULL, 0, where, 0);
+	if (condition != NULL && strlen(condition) == 0)
+		condition = NULL;
+		
+	cmd = MIBreakInsert(isTemp, isHard, condition, ignoreCount, where, tid);
 	SendCommandWait(DebugSession, cmd);
 	
 	if (!MICommandResultOK(cmd)) {
@@ -622,6 +634,99 @@ GDBMIDeleteBreakpoint(int bpid)
 
 	SaveEvent(NewDbgEvent(DBGEV_OK));
 
+	return DBGRES_OK;
+}
+
+/*
+** Enable a breakpoint.
+*/
+static int
+GDBMIEnableBreakpoint(int bpid)
+{
+	int			lbpid;
+	char *		bpstr;
+	MICommand *	cmd;
+	
+	CHECK_SESSION()
+
+	if ((lbpid = RemoteToLocalBP(bpid)) < 0) {
+		asprintf(&bpstr, "%d", bpid);
+		DbgSetError(DBGERR_NOBP, bpstr);
+		free(bpstr);
+		return DBGRES_ERR;
+	}
+	
+	cmd = MIBreakEnable(1, &lbpid);
+	SendCommandWait(DebugSession, cmd);
+	
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return DBGRES_ERR;
+	}
+	SaveEvent(NewDbgEvent(DBGEV_OK));
+	return DBGRES_OK;
+}
+
+/*
+** Disable a breakpoint.
+*/
+static int
+GDBMIDisableBreakpoint(int bpid)
+{
+	int			lbpid;
+	char *		bpstr;
+	MICommand *	cmd;
+	
+	CHECK_SESSION()
+
+	if ((lbpid = RemoteToLocalBP(bpid)) < 0) {
+		asprintf(&bpstr, "%d", bpid);
+		DbgSetError(DBGERR_NOBP, bpstr);
+		free(bpstr);
+		return DBGRES_ERR;
+	}
+	
+	cmd = MIBreakDisable(1, &lbpid);
+	SendCommandWait(DebugSession, cmd);
+	
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return DBGRES_ERR;
+	}
+	SaveEvent(NewDbgEvent(DBGEV_OK));
+	return DBGRES_OK;
+}
+
+/*
+** Condition a breakpoint.
+*/
+static int
+GDBMIConditionBreakpoint(int bpid, char *expr)
+{
+	int			lbpid;
+	char *		bpstr;
+	MICommand *	cmd;
+	
+	CHECK_SESSION()
+
+	if ((lbpid = RemoteToLocalBP(bpid)) < 0) {
+		asprintf(&bpstr, "%d", bpid);
+		DbgSetError(DBGERR_NOBP, bpstr);
+		free(bpstr);
+		return DBGRES_ERR;
+	}
+	
+	cmd = MIBreakCondition(1, &lbpid, expr);
+	SendCommandWait(DebugSession, cmd);
+	
+	if (!MICommandResultOK(cmd)) {
+		DbgSetError(DBGERR_DEBUGGER, GetLastErrorStr());
+		MICommandFree(cmd);
+		return DBGRES_ERR;
+	}
+	SaveEvent(NewDbgEvent(DBGEV_OK));
 	return DBGRES_OK;
 }
 
@@ -1172,13 +1277,11 @@ CreateStruct(MIVar *var, int named)
 		v = var->children[i];
 		//check whether child contains parent
 		if (strcmp(var->type, v->type) == 0 && strcmp(var->name, v->name)) {
-			if ((ac = ReferenceAIF(named)) == NULL) {
+			if ((ac = CreateReference(var->type, named)) == NULL) {
 				AIFFree(a);
 				return NULL;
 			}
-			if (FDSType(AIF_FORMAT(a)) != AIF_NAME) {
-				a = NameAIF(a, named);
-			}
+			a = CreateNamed(a, named);
 		}
 		else {
 			if ( (ac = ConvertVarToAIF(v->exp, v, named)) == NULL ) {
@@ -1186,7 +1289,9 @@ CreateStruct(MIVar *var, int named)
 				return NULL;
 			}
 		}
+fprintf(stderr, "=============== adding field ==========\n");
 		AIFAddFieldToStruct(a, v->exp, ac);
+fprintf(stderr, "=============== added field ==========\n");
 	}
 	return a;
 }
@@ -1198,6 +1303,7 @@ CreateUnion(MIVar *var, int named)
 	MIVar *	v;
 	AIF *	a;
 	AIF *	ac;
+	named++;
 
 	if (var->type[6] == ' ' && var->type[7] != '{')
 		a = EmptyUnionToAIF(&var->type[7]);
@@ -1207,9 +1313,19 @@ CreateUnion(MIVar *var, int named)
 	for ( i = 0 ; i < var->numchild ; i++ )
 	{
 		v = var->children[i];
-		if ( (ac = ConvertVarToAIF(v->exp, v, named)) == NULL ) {
-			AIFFree(a);
-			return NULL;
+		//check whether child contains parent
+		if (strcmp(var->type, v->type) == 0 && strcmp(var->name, v->name)) {
+			if ((ac = CreateReference(var->type, named)) == NULL) {
+				AIFFree(a);
+				return NULL;
+			}
+			a = CreateNamed(a, named);
+		}
+		else {
+			if ( (ac = ConvertVarToAIF(v->exp, v, named)) == NULL ) {
+				AIFFree(a);
+				return NULL;
+			}
 		}
 		AIFAddFieldToUnion(a, v->exp, AIF_FORMAT(ac));
 		
@@ -1220,6 +1336,24 @@ CreateUnion(MIVar *var, int named)
 			AIFSetUnion(a, v->exp, ac);
 	}
 	
+	return a;
+}
+
+static AIF* CreateNamed(AIF *a, int named) {
+	if (FDSType(AIF_FORMAT(a)) != AIF_NAME) {
+		return NameAIF(a, named);
+	}
+	return a;
+}
+
+static AIF* CreateReference(char *type, int named) {
+	AIF * a = NULL;
+	a = ReferenceAIF(named);
+	if (type[strlen(type) - 1] == '*') {
+		if (a != NULL) {
+			return PointerToAIF(a);
+		}
+	}
 	return a;
 }
 

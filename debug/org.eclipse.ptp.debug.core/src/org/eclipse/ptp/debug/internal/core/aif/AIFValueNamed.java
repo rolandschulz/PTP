@@ -35,8 +35,8 @@ public class AIFValueNamed extends ValueDerived implements IAIFValueNamed {
 	
 	public AIFValueNamed(IValueParent parent, IAIFTypeNamed type, byte[] data) {
 		super(parent, type);
-		parse(data);
 		this.name = type.getName();
+		parse(data);
 	}
 	public int getChildrenNumber() throws AIFException {
 		return value.getChildrenNumber();

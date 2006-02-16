@@ -19,6 +19,7 @@
 package org.eclipse.ptp.debug.core.cdi;
 
 import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.aif.IAIF;
 
 /**
  * @author Clement chu
@@ -31,5 +32,7 @@ public interface ICommonActions {
 	public void steppingInto(BitList tasks) throws PCDIException;
 	public void steppingOver(BitList tasks) throws PCDIException;
 	public void steppingReturn(BitList tasks) throws PCDIException;
+	public IAIF getExpressionValue(BitList tasks, String variable) throws PCDIException;
+	public IAIF getExpressionValue(int task_id, String variable) throws PCDIException;
 }
 

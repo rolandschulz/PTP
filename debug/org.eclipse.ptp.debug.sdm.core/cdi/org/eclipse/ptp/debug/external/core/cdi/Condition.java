@@ -20,7 +20,10 @@ package org.eclipse.ptp.debug.external.core.cdi;
 
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 
-
+/**
+ * @author Clement chu
+ * 
+ */
 public class Condition implements ICDICondition {
 	int ignoreCount;
 	String expression;
@@ -31,18 +34,25 @@ public class Condition implements ICDICondition {
 		expression = (exp == null) ? new String() : exp;
 		tids = (ids == null) ? new String[0] : ids;
 	}
+
 	public int getIgnoreCount() {
 		return ignoreCount;
 	}
+
 	public String getExpression() {
 		return expression;
 	}
+
 	public String[] getThreadIds() {
 		return tids;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public boolean equals(ICDICondition obj) {
 		if (obj instanceof Condition) {
-			Condition cond = (Condition) obj;
+			Condition cond = (Condition)obj;
 			if (cond.getIgnoreCount() != this.getIgnoreCount())
 				return false;
 			if (cond.getExpression().compareTo(this.getExpression()) != 0)

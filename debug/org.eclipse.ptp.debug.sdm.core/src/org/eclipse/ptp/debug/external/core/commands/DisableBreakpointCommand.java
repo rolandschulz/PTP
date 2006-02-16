@@ -16,24 +16,33 @@
  * 
  * LA-CC 04-115
  *******************************************************************************/
-package org.eclipse.ptp.debug.internal.core.aif;
+package org.eclipse.ptp.debug.external.core.commands;
 
-import org.eclipse.ptp.debug.core.aif.AIFFactory;
-import org.eclipse.ptp.debug.core.aif.IAIFType;
-import org.eclipse.ptp.debug.core.aif.IAIFTypeStruct;
+import org.eclipse.ptp.core.util.BitList;
+import org.eclipse.ptp.debug.core.IAbstractDebugger;
+import org.eclipse.ptp.debug.core.cdi.PCDIException;
+import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
 
-public class AIFTypeStruct extends TypeAggregate implements IAIFTypeStruct {	
-	//only base type: {structName|floatnumber=f4,intnumber=is4,shortnumber=is2,longnumber=is4,doubleumber=f8;;;}
-	//complex type: {structName|floatnumber=f4,intnumber=is4,tStr22={testStruct|aFloat=f4,intNum=is4;;;},shortnumber=is2;;;}
-	public AIFTypeStruct(String format) {
-		super(format);
+/**
+ * @author Clement chu
+ * 
+ */
+public class DisableBreakpointCommand extends AbstractBreakpointCommand{
+	public DisableBreakpointCommand(BitList tasks, IPCDIBreakpoint cdiBpt) {
+		super(tasks, cdiBpt);
 	}
-	public String toString() {
-		return AIFFactory.FDS_STRUCT_CLASS + super.toString() + AIFFactory.FDS_STRUCT_END;
+	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
+		debugger.disableBreakpoint(tasks, ((IPCDIBreakpoint)cdiBpt).getBreakpointId());
 	}
-	public static void main(String[] args) {
-		IAIFType testType = AIFFactory.getAIFType("{structName|floatnumber=f4,intnumber=is4,tStr22={testStruct|aFloat=f4,intNum=is4;;;},shortnumber=is2;;;}");
-		System.out.println("----: " + testType);
-		System.out.println("----: " + testType.sizeof());
+	public void deleteBreakpoints() throws PCDIException {
+		if (waitForReturn()) {
+			if (result.equals(OK)) {
+				return;
+			}
+		}
+		throw new PCDIException("Breakpoint cannot be disabled in " + tasks.toString());
+	}	
+	public String getName() {
+		return "Disable breakpoint"; 
 	}
 }

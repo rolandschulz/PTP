@@ -28,14 +28,11 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIFunctionBreakpoint;
  * 
  */
 public class SetFunctionBreakpointCommand extends AbstractBreakpointCommand {
-	private IPCDIFunctionBreakpoint funcBpt = null;
-	
 	public SetFunctionBreakpointCommand(BitList tasks, IPCDIFunctionBreakpoint funcBpt) {
-		super(tasks);
-		this.funcBpt = funcBpt;
+		super(tasks, funcBpt);
 	}
 	public void execCommand(IAbstractDebugger debugger) throws PCDIException {
-		debugger.setFunctionBreakpoint(tasks, funcBpt);
+		debugger.setFunctionBreakpoint(tasks, (IPCDIFunctionBreakpoint)cdiBpt);
 	}
 	public String getName() {
 		return "Set function breakpoint"; 

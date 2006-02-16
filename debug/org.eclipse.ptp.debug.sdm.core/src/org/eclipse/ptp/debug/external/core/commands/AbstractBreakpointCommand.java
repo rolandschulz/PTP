@@ -27,8 +27,11 @@ import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
  * 
  */
 public abstract class AbstractBreakpointCommand extends AbstractDebugCommand {
-	public AbstractBreakpointCommand(BitList tasks) {
+	IPCDIBreakpoint cdiBpt;
+	
+	public AbstractBreakpointCommand(BitList tasks, IPCDIBreakpoint cdiBpt) {
 		super(tasks, false, true);
+		this.cdiBpt = cdiBpt;
 	}
 	public IPCDIBreakpoint getBreakpoint() {
 		if (waitForReturn()) {

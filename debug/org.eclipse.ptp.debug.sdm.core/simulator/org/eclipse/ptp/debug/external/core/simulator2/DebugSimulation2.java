@@ -269,6 +269,16 @@ public class DebugSimulation2 extends AbstractDebugger implements IDebugger, Obs
 			}
 		}).start();
 	}
+	public void enableBreakpoint(BitList tasks, int bpid) throws PCDIException {
+		//TODO
+	}
+	public void disableBreakpoint(BitList tasks, int bpid) throws PCDIException {
+		//TODO
+	}
+	public void conditionBreakpoint(BitList tasks, int bpid, String expr) throws PCDIException {
+		//TODO
+	}
+	
 	//current support main function breakpoint only
 	public void setFunctionBreakpoint(final BitList tasks, final IPCDIFunctionBreakpoint bpt) throws PCDIException {
 		new Thread(new Runnable() {

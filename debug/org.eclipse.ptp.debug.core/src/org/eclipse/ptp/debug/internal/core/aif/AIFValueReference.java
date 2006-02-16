@@ -44,7 +44,7 @@ public class AIFValueReference extends ValueParent implements IAIFValueReference
 	}
 	public String getValueString() throws AIFException {
 		if (result == null) {
-			result = (getParent()==null)?"unknown value":getName();
+			result = (getParent()==null)?"unknown value":"ref: " + getName();
 		}
 		return result;
 	}
@@ -53,12 +53,11 @@ public class AIFValueReference extends ValueParent implements IAIFValueReference
 			if (((IAIFValueNamed)parent).getName().equals(getName())) {
 				return parent.getParent();
 			}
-		}
-
+		}		
 		if (parent == null) {
 			return null;
 		}
-		
+
 		parent = parent.getParent();
 		return getParent();
 	}

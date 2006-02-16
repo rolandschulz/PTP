@@ -193,6 +193,7 @@ public abstract class AbstractDebugger extends Observable implements IAbstractDe
 		eventQueue.addItem(new DebuggerExitedEvent(getSession(), new BitList(0)));
 		getSession().shutdown();
 	}
+	//not used breakpoint created event
 	public void handleBreakpointCreatedEvent(BitList tasks) {
 		fireEvent(new BreakpointCreatedEvent(getSession(), tasks));		
 	}

@@ -21,9 +21,7 @@ package org.eclipse.ptp.debug.external.core.cdi.breakpoints;
 import org.eclipse.cdt.debug.core.cdi.ICDICondition;
 import org.eclipse.ptp.debug.core.cdi.PCDIException;
 import org.eclipse.ptp.debug.core.cdi.model.IPCDIBreakpoint;
-import org.eclipse.ptp.debug.external.core.cdi.BreakpointManager;
-import org.eclipse.ptp.debug.external.core.cdi.Session;
-import org.eclipse.ptp.debug.external.core.cdi.model.Condition;
+import org.eclipse.ptp.debug.external.core.cdi.Condition;
 import org.eclipse.ptp.debug.external.core.cdi.model.PObject;
 
 /**
@@ -62,28 +60,12 @@ public abstract class Breakpoint extends PObject implements IPCDIBreakpoint {
 	public boolean isTemporary() {
 		return (type == IPCDIBreakpoint.TEMPORARY);
 	}
-	public void setCondition(ICDICondition newCondition) throws PCDIException {
-		Session session = (Session)getTarget().getSession();
-		BreakpointManager mgr = session.getBreakpointManager();
-		mgr.setCondition(this, newCondition);
-		setCondition0(newCondition);
-	}
-	public void setCondition0(ICDICondition newCondition) {
+	public void setCondition(ICDICondition newCondition) {
 		condition = newCondition;
 	}
-	public void setEnabled(boolean on) throws PCDIException {
-		Session session = (Session)getTarget().getSession();
-		BreakpointManager mgr = session.getBreakpointManager();
-		if (on == false && isEnabled() == true) { 
-			mgr.disableBreakpoint(this);
-		} else if (on == true && isEnabled() == false) {
-			mgr.enableBreakpoint(this);
-		}
-	}
-	public void setEnabled0(boolean on) {
+	public void setEnabled(boolean on) {
 		enable = on;
 	}
-
 	public int getBreakpointId() {
 		return bpid;
 	}

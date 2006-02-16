@@ -41,6 +41,9 @@ static int svr_start_session(dbg_backend *, char **);
 static int svr_setlinebreakpoint(dbg_backend *, char **);
 static int svr_setfuncbreakpoint(dbg_backend *, char **);
 static int svr_deletebreakpoint(dbg_backend *, char **);
+static int svr_enablebreakpoint(dbg_backend *, char **);
+static int svr_disablebreakpoint(dbg_backend *, char **);
+static int svr_conditionbreakpoint(dbg_backend *, char **);
 static int svr_go(dbg_backend *, char **);
 static int svr_step(dbg_backend *, char **);
 static int svr_terminate(dbg_backend *, char **);
@@ -59,16 +62,19 @@ static svr_cmd svr_cmd_tab[] =
 	{DBG_SETLINEBREAKPOINT_CMD,		svr_setlinebreakpoint},
 	{DBG_SETFUNCBREAKPOINT_CMD,		svr_setfuncbreakpoint},
 	{DBG_DELETEBREAKPOINT_CMD,		svr_deletebreakpoint},
-	{DBG_GO_CMD,						svr_go},
+	{DBG_ENABLEBREAKPOINT_CMD,		svr_enablebreakpoint},
+	{DBG_DISABLEBREAKPOINT_CMD,		svr_disablebreakpoint},
+	{DBG_CONDITIONBREAKPOINT_CMD,	svr_conditionbreakpoint},
+	{DBG_GO_CMD,					svr_go},
 	{DBG_STEP_CMD,					svr_step},
 	{DBG_TERMINATE_CMD,				svr_terminate},
-	{DBG_LISTSTACKFRAMES_CMD,			svr_liststackframes},
+	{DBG_LISTSTACKFRAMES_CMD,		svr_liststackframes},
 	{DBG_SETCURRENTSTACKFRAME_CMD,	svr_setcurrentstackframe},
-	{DBG_EVALUATEEXPRESSION_CMD,		svr_evaluateexpression},
+	{DBG_EVALUATEEXPRESSION_CMD,	svr_evaluateexpression},
 	{DBG_GETTYPE_CMD,				svr_gettype},
-	{DBG_LISTLOCALVARIABLES_CMD,		svr_listlocalvariables},
+	{DBG_LISTLOCALVARIABLES_CMD,	svr_listlocalvariables},
 	{DBG_LISTARGUMENTS_CMD,			svr_listarguments},
-	{DBG_LISTGLOBALVARIABLES_CMD,		svr_listglobalvariables},
+	{DBG_LISTGLOBALVARIABLES_CMD,	svr_listglobalvariables},
 	{"QUI",							svr_quit},
 };
 
@@ -146,19 +152,37 @@ svr_start_session(dbg_backend *db, char **args)
 static int 
 svr_setlinebreakpoint(dbg_backend *db, char **args)
 {
-	return db->db_funcs->setlinebreakpoint(atoi(args[1]), args[2], atoi(args[3]));
+	return db->db_funcs->setlinebreakpoint(atoi(args[1]), atoi(args[2]), atoi(args[3]), args[4], atoi(args[5]), args[6], atoi(args[7]), atoi(args[8]));
 }
 
 static int 
 svr_setfuncbreakpoint(dbg_backend *db, char **args)
 {
-	return db->db_funcs->setfuncbreakpoint(atoi(args[1]), args[2], args[3]);
+	return db->db_funcs->setfuncbreakpoint(atoi(args[1]), atoi(args[2]), atoi(args[3]), args[4], args[5], args[6], atoi(args[7]), atoi(args[8]));
 }
 
 static int 
 svr_deletebreakpoint(dbg_backend *db, char **args)
 {
 	return db->db_funcs->deletebreakpoint(atoi(args[1]));
+}
+
+static int 
+svr_enablebreakpoint(dbg_backend *db, char **args)
+{
+	return db->db_funcs->enablebreakpoint(atoi(args[1]));
+}
+
+static int 
+svr_disablebreakpoint(dbg_backend *db, char **args)
+{
+	return db->db_funcs->disablebreakpoint(atoi(args[1]));
+}
+
+static int 
+svr_conditionbreakpoint(dbg_backend *db, char **args)
+{
+	return db->db_funcs->conditionbreakpoint(atoi(args[1]), args[2]);
 }
 
 static int 

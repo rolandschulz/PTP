@@ -64,7 +64,7 @@ public class AIFFactory {
 	public static final char FDS_INT = 'i';
 	public static final char FDS_POINTER = '^';
 	public static final char FDS_STRING = 's';
-	public static final char FDS_STRUCT = '{';
+	public static final char FDS_STRUCT_CLASS = '{';
 	public static final char FDS_UNION = '(';
 	public static final char FDS_VOID = 'v';
 	public static final char FDS_REFERENCE = '>';
@@ -209,7 +209,7 @@ public class AIFFactory {
 			int func_end_pos = getEndPosFromLast(fmt, FDS_FUNCTION_END);
 			String func_type = fmt.substring(func_end_pos+FDS_FUNCTION_END.length());
 			return new AIFTypeFunction(extractFormat(fmt, 1, func_end_pos), getAIFType(func_type));
-		case FDS_STRUCT:
+		case FDS_STRUCT_CLASS: //struct or class
 			int struct_end_pos = getEndPosFromLast(fmt, FDS_STRUCT_END);
 			if (fmt.length() == struct_end_pos + FDS_STRUCT_END.length()) {
 				System.out.println("        ======= struct " + fmt);
