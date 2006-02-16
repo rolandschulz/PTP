@@ -110,7 +110,8 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			p.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSI);
 			PTPCorePlugin.getDefault().savePluginPreferences();
 
-			PTPCorePlugin.errorDialog("Default Runtime System Set", "No previous (or invalid) control or monitoring system selected.\n\nDefault systems set to Open Runtime Environment (ORTE).  To change, use the Window->Preferences->PTP preferences page.", null);
+			//PTPCorePlugin.errorDialog("Default Runtime System Set", "No previous (or invalid) control or monitoring system selected.\n\nDefault systems set to Open Runtime Environment (ORTE).  To change, use the Window->Preferences->PTP preferences page.", null);
+			System.err.println("No previous (or invalid) control or monitoring system selected.\n\nDefault systems set to Open Runtime Environment (ORTE).  To change, use the Window->Preferences->PTP preferences page.");
 			
 			MSChoiceID = preferences.getInt(PreferenceConstants.MONITORING_SYSTEM_SELECTION);
 			MSChoice = MonitoringSystemChoices.getMSNameByID(MSChoiceID);
@@ -197,13 +198,18 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					if (monitor.isCanceled()) {
 						throw new CoreException(Status.CANCEL_STATUS);
 					}
-					PTPCorePlugin.errorDialog("Failed to start OMPI proxy runtime",
-						"There was an error starting the OMPI proxy runtime.  The path to 'orte_server' or 'orted' "+
-						"may have been incorrect.  The 'orted' binary MUST be in your PATH to be found by 'orte_server'.  "+
-						"Try checking the console log or error logs for more detailed information.\n\nDefaulting to "+
-						"Simulation mode.  To change this, use the PTP preferences page.", null);
+					//PTPCorePlugin.errorDialog("Failed to start OMPI proxy runtime",
+					//	"There was an error starting the OMPI proxy runtime.  The path to 'orte_server' or 'orted' "+
+					//	"may have been incorrect.  The 'orted' binary MUST be in your PATH to be found by 'orte_server'.  "+
+					//	"Try checking the console log or error logs for more detailed information.\n\nDefaulting to "+
+					//	"Simulation mode.  To change this, use the PTP preferences page.", null);
 					refreshRuntimeSystems(ControlSystemChoices.SIMULATED, MonitoringSystemChoices.SIMULATED, monitor);
-					throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, "Failed to start OMPI proxy runtime.", null));
+					throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
+							"There was an error starting the OMPI proxy runtime.  The path to 'orte_server' or 'orted' "+
+							"may have been incorrect.  The 'orted' binary MUST be in your PATH to be found by 'orte_server'.  "+
+							"Try checking the console log or error logs for more detailed information.\n\nDefaulting to "+
+							"Simulation mode.  To change this, use the PTP preferences page.", 
+							null));
 				}
 				monitor.subTask("Starting OMPI monitoring system...");
 				monitoringSystem = new OMPIMonitoringSystem((OMPIProxyRuntimeClient)runtimeProxy);
