@@ -105,7 +105,7 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 					"File not found in the fragment directory or developer directories.  "+
 					"Defaulting to Simulation Mode.";
 				System.err.println(err);
-				PTPCorePlugin.errorDialog("ORTE Server Start Failure", err, null);
+				//PTPCorePlugin.errorDialog("ORTE Server Start Failure", err, null);
 
 				int MSI = MonitoringSystemChoices.SIMULATED;
 				int CSI = ControlSystemChoices.SIMULATED;
