@@ -3,5 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: MacOSX PPC ORTE SDM Fragment
 Bundle-SymbolicName: org.eclipse.ptp.debug.sdm.orte.macosx.ppc
 Bundle-Version: 1.0.0
-Fragment-Host: org.eclipse.ptp.debug.core;bundle-version="[1.0.0,2.0.0)"
+Fragment-Host: org.eclipse.ptp.debug.core;bundle-version="1.0.0"
 Bundle-Localization: plugin
+Bundle-Vendor: Eclipse.org
