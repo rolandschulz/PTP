@@ -21,8 +21,8 @@ package org.eclipse.ptp.debug.external.internal.ui.preferences;
 import java.io.File;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
+import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.ui.preferences.AbstractPerferencePage;
 import org.eclipse.swt.SWT;
@@ -111,11 +111,7 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 	}
 	protected void setValues() {
 		IPreferenceStore store = getPreferenceStore();
-		String debuggerFile = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE);
-		if(debuggerFile.equals("")) {
-			debuggerFile = PTPCorePlugin.getDefault().locateFragmentFile("org.eclipse.ptp.debug.sdm", "sdm");
-        }
-		sdmPathText.setText(debuggerFile);
+		sdmPathText.setText(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE));
 		sdmArgsText.setText(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS));
 	}	
 	protected void storeValues() {

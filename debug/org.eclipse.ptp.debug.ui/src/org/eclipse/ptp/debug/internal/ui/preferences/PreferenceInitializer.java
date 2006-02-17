@@ -37,17 +37,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = PTPDebugUIPlugin.getDefault().getPreferenceStore();
-		URL url = Platform.find(Platform.getBundle(PTPDebugCorePlugin.PLUGIN_ID), new Path("/"));
-		if (url != null) {
-			try {
-				File path = new File(Platform.asLocalURL(url).getPath());
-				String ipath = path.getAbsolutePath();
-				int idx = ipath.indexOf(PTPDebugCorePlugin.PLUGIN_ID);
-				String ipath2 = ipath.substring(0, idx) + "org.eclipse.ptp.debug.sdm/sdm";
-				store.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_FILE, ipath2);
-			} catch(IOException e) { 
-			}
-		}
+
+		String debuggerFile = PTPDebugCorePlugin.getDefault().locateFragmentFile("bin", "sdm");
+		if (debuggerFile != null)
+			store.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_FILE, debuggerFile);
+ 
 		store.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS, IPDebugConstants.PREF_DEFAULT_DEUBGGER_ARGS);
 		
 		store.setDefault(IPDebugConstants.PREF_SHOW_FULL_PATHS, false);
