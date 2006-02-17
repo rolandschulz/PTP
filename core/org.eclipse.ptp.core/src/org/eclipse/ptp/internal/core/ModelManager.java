@@ -152,6 +152,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 	}
 	
 	public void refreshRuntimeSystems(int controlSystemID, int monitoringSystemID, IProgressMonitor monitor) throws CoreException {
+		System.err.println("refreshRuntimeSystems");
 		try {
 			monitor.beginTask("Refreshing runtime system...", 200);
 			/*
@@ -161,16 +162,19 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			if (controlSystem != null) {
 				monitor.subTask("Shutting down control system...");
 				controlSystem.shutdown();
+				controlSystem = null;
 				monitor.worked(10);
 			}
 			if (monitoringSystem != null) {
 				monitor.subTask("Shutting down monitor system...");
 				monitoringSystem.shutdown();
+				monitoringSystem = null;
 				monitor.worked(10);
 			}
 			if (runtimeProxy != null) {
 				monitor.subTask("Shutting down runtime proxy...");
 				runtimeProxy.shutdown();
+				runtimeProxy = null;
 				monitor.worked(10);
 			}
 			if (monitor.isCanceled()) {
@@ -194,6 +198,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 				monitor.worked(10);
 				
 				if(!runtimeProxy.startup(monitor)) {
+					System.err.println("Failed to start up the proxy runtime.");
 					runtimeProxy = null;
 					if (monitor.isCanceled()) {
 						throw new CoreException(Status.CANCEL_STATUS);
@@ -203,7 +208,16 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					//	"may have been incorrect.  The 'orted' binary MUST be in your PATH to be found by 'orte_server'.  "+
 					//	"Try checking the console log or error logs for more detailed information.\n\nDefaulting to "+
 					//	"Simulation mode.  To change this, use the PTP preferences page.", null);
-					refreshRuntimeSystems(ControlSystemChoices.SIMULATED, MonitoringSystemChoices.SIMULATED, monitor);
+					int MSI = MonitoringSystemChoices.SIMULATED;
+					int CSI = ControlSystemChoices.SIMULATED;
+					Preferences p = PTPCorePlugin.getDefault().getPluginPreferences();
+					p.setValue(PreferenceConstants.MONITORING_SYSTEM_SELECTION, MSI);
+					p.setValue(PreferenceConstants.CONTROL_SYSTEM_SELECTION, CSI);
+					PTPCorePlugin.getDefault().savePluginPreferences();
+					if(!(monitoringSystem instanceof SimulationMonitoringSystem) || 
+					   !(controlSystem instanceof SimulationControlSystem)) {
+						refreshRuntimeSystems(ControlSystemChoices.SIMULATED, MonitoringSystemChoices.SIMULATED, monitor);
+					}
 					throw new CoreException(new Status(IStatus.ERROR, PTPCorePlugin.getUniqueIdentifier(), IStatus.ERROR, 
 							"There was an error starting the OMPI proxy runtime.  The path to 'orte_server' or 'orted' "+
 							"may have been incorrect.  The 'orted' binary MUST be in your PATH to be found by 'orte_server'.  "+

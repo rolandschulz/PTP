@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 public class PTPCorePlugin extends AbstractUIPlugin {
@@ -230,62 +231,113 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 	}
 	*/
 	public String locateFragmentFile(String fragment, String file) {
-		String	filePath = null;
-		URL		url = Platform.find(Platform.getBundle(PTPCorePlugin.PLUGIN_ID), new Path("/"));
-
-		if (url != null) {
+		
+		
+		Bundle[] frags = Platform.getFragments(Platform.getBundle(PTPCorePlugin.PLUGIN_ID));
+		String os = Platform.getOS();
+		String arch = Platform.getOSArch();
+		String os_arch = os+"."+arch;
+		System.out.println("OS = '"+os+"', Architecture = '"+arch+"', OS_ARCH combo = '"+os_arch+"'");
+		String ptp_version = (String)getDefault().getBundle().getHeaders().get("Bundle-Version");
+		System.out.println("PTP Version = "+ptp_version);
+		
+		for(int i=0; i<frags.length; i++) {
+			Bundle frag = frags[i];
+			URL path = frag.getEntry("/");
 			try {
-				File path = new File(Platform.asLocalURL(url).getPath());
-				String ipath = path.getAbsolutePath();
-				System.out.println("Plugin install dir = '"+ipath+"'");
+				URL local_path = Platform.asLocalURL(path);
+				String str_path = local_path.getPath();
+				System.out.println("Fragment "+i+" path: '"+str_path+"'");
 				
-				/* org.eclipse.ptp.orte.linux.x86_64_1.0.0
-				   org.eclipse.ptp.orte.$(OS).$(ARCH)_$(VERSION) */
-				String ptp_version = (String)getDefault().getBundle().getHeaders().get("Bundle-Version");
-				System.out.println("PTP Version = "+ptp_version);
-				Properties p = System.getProperties();
-				String os = p.getProperty("osgi.os");
-				String arch = p.getProperty("osgi.arch");
-				System.out.println("osgi.os = "+os);
-				System.out.println("osgi.arch = "+arch);
-				if(os != null && arch != null && ptp_version != null) {
-					String combo = PLUGIN_ID;
-					System.out.println("[1] Searching for plug-in directory: "+combo);
-					int idx = ipath.indexOf(combo);
-					/* if we found it */
-					if(idx > 0) {
-						String ipath2 = ipath.substring(0, idx)+fragment+"."+os+"."+arch+"_"+ptp_version+"/bin/"+file;
-						System.out.println("[2] Searching for '"+file+"' in: "+ipath2);
-						File f = new File(ipath2);
-						if(f.exists()) {
-							filePath = ipath2;
-							System.out.println("\tFOUND HERE!");
-						}
-						else {
-							ipath2 = ipath.substring(0, idx)+fragment+"."+os+"."+arch+"/bin/"+file;
-							System.out.println("[3] Searching for '"+file+"' in: "+ipath2);
-							f = new File(ipath2);
-							if(f.exists()) {
-								filePath = ipath2;
-								System.out.println("\tFOUND HERE!");
-							}
-						}
-					}
-				}
-				
-				if(filePath == null) {
-					int idx = ipath.indexOf(PLUGIN_ID);
-					String ipath2 = ipath.substring(0, idx) + fragment+"/"+file;
-					System.out.println("[4] Searching for: "+ipath2);
-					File f = new File(ipath2);
+				/* OK so now we know where the absolute path of this fragment is -
+				 * but is this the fragment for the machine we're running on?
+				 */
+				int idx = str_path.indexOf(os_arch);
+				if(idx > 0) {
+					/* found it!  This is the right fragment for our OS & arch */
+					System.out.println("\tCorrect fragment for our OS & arch");
+					/*
+					String file_path = str_path + "bin/"+file;
+					System.out.println("\tStep 1: Searching for file in '"+file_path+"'");
+					File f = new File(file_path);
 					if(f.exists()) {
-						filePath = ipath2;
-						System.out.println("\tFOUND HERE!");
+						System.out.println("\t\t**** FOUND IT!");
+						return file_path;
+					}
+					*/
+					String file_path = str_path + "bin/"+file;
+					System.out.println("\tSearching for file in '"+file_path+"'");
+					File f = new File(file_path);
+					if(f.exists()) {
+						System.out.println("\t\t**** FOUND IT!");
+						return file_path;
 					}
 				}
-			} catch(Exception e) { 
-			}
+
+			} catch(Exception e) { }
 		}
-		return filePath;
+		
+		/* guess we never found it.... */
+		return null;
+		
+		
+		
+//		String	filePath = null;
+//		URL		url = Platform.find(Platform.getBundle(PTPCorePlugin.PLUGIN_ID), new Path("/"));
+//
+//		if (url != null) {
+//			try {
+//				File path = new File(Platform.asLocalURL(url).getPath());
+//				String ipath = path.getAbsolutePath();
+//				System.out.println("Plugin install dir = '"+ipath+"'");
+//				
+//				/* org.eclipse.ptp.orte.linux.x86_64_1.0.0
+//				   org.eclipse.ptp.orte.$(OS).$(ARCH)_$(VERSION) */
+//				String ptp_version = (String)getDefault().getBundle().getHeaders().get("Bundle-Version");
+//				System.out.println("PTP Version = "+ptp_version);
+//				Properties p = System.getProperties();
+//				String os = p.getProperty("osgi.os");
+//				String arch = p.getProperty("osgi.arch");
+//				System.out.println("osgi.os = "+os);
+//				System.out.println("osgi.arch = "+arch);
+//				if(os != null && arch != null && ptp_version != null) {
+//					String combo = PLUGIN_ID;
+//					System.out.println("[1] Searching for plug-in directory: "+combo);
+//					int idx = ipath.indexOf(combo);
+//					/* if we found it */
+//					if(idx > 0) {
+//						String ipath2 = ipath.substring(0, idx)+fragment+"."+os+"."+arch+"_"+ptp_version+"/bin/"+file;
+//						System.out.println("[2] Searching for '"+file+"' in: "+ipath2);
+//						File f = new File(ipath2);
+//						if(f.exists()) {
+//							filePath = ipath2;
+//							System.out.println("\tFOUND HERE!");
+//						}
+//						else {
+//							ipath2 = ipath.substring(0, idx)+fragment+"."+os+"."+arch+"/bin/"+file;
+//							System.out.println("[3] Searching for '"+file+"' in: "+ipath2);
+//							f = new File(ipath2);
+//							if(f.exists()) {
+//								filePath = ipath2;
+//								System.out.println("\tFOUND HERE!");
+//							}
+//						}
+//					}
+//				}
+//				
+//				if(filePath == null) {
+//					int idx = ipath.indexOf(PLUGIN_ID);
+//					String ipath2 = ipath.substring(0, idx) + fragment+"/"+file;
+//					System.out.println("[4] Searching for: "+ipath2);
+//					File f = new File(ipath2);
+//					if(f.exists()) {
+//						filePath = ipath2;
+//						System.out.println("\tFOUND HERE!");
+//					}
+//				}
+//			} catch(Exception e) { 
+//			}
+//		}
+//		return filePath;
 	}
 }

@@ -59,7 +59,7 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 
 			PTPCorePlugin.getDefault().savePluginPreferences();
 
-			System.err.println("Noo existing / invalid number of machines to to simulate detected.  Default " + "number of machines set to 1.  Set using the PTP preferences -> simulation page.");
+			System.err.println("No existing / invalid number of machines to to simulate detected.  Default " + "number of machines set to 1.  Set using the PTP preferences -> simulation page.");
 			numNodes = new int[1];
 			numNodes[0] = 256;
 		}
