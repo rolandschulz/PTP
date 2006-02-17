@@ -249,15 +249,26 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 				System.out.println("osgi.os = "+os);
 				System.out.println("osgi.arch = "+arch);
 				if(os != null && arch != null && ptp_version != null) {
-					String combo = PLUGIN_ID+"."+os+"."+arch+"_"+ptp_version;
-					System.out.println("Searching for directory: "+combo);
+					String combo = PLUGIN_ID;
+					System.out.println("[1] Searching for plug-in directory: "+combo);
 					int idx = ipath.indexOf(combo);
 					/* if we found it */
 					if(idx > 0) {
 						String ipath2 = ipath.substring(0, idx)+fragment+"."+os+"."+arch+"_"+ptp_version+"/bin/"+file;
+						System.out.println("[2] Searching for '"+file+"' in: "+ipath2);
 						File f = new File(ipath2);
 						if(f.exists()) {
 							filePath = ipath2;
+							System.out.println("\tFOUND HERE!");
+						}
+						else {
+							ipath2 = ipath.substring(0, idx)+fragment+"."+os+"."+arch+"/bin/"+file;
+							System.out.println("[3] Searching for '"+file+"' in: "+ipath2);
+							f = new File(ipath2);
+							if(f.exists()) {
+								filePath = ipath2;
+								System.out.println("\tFOUND HERE!");
+							}
 						}
 					}
 				}
@@ -265,10 +276,11 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 				if(filePath == null) {
 					int idx = ipath.indexOf(PLUGIN_ID);
 					String ipath2 = ipath.substring(0, idx) + fragment+"/"+file;
-					System.out.println("Searching for : "+ipath2);
+					System.out.println("[4] Searching for: "+ipath2);
 					File f = new File(ipath2);
 					if(f.exists()) {
 						filePath = ipath2;
+						System.out.println("\tFOUND HERE!");
 					}
 				}
 			} catch(Exception e) { 
