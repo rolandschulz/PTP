@@ -241,13 +241,18 @@ public class PTPCorePlugin extends AbstractUIPlugin {
 		String ptp_version = (String)getDefault().getBundle().getHeaders().get("Bundle-Version");
 		System.out.println("PTP Version = "+ptp_version);
 		
+		System.out.println("All Found Fragments:");
+		for(int i=0; i<frags.length; i++) {
+			System.out.println("\t"+frags[i].toString());
+		}
+		
 		for(int i=0; i<frags.length; i++) {
 			Bundle frag = frags[i];
 			URL path = frag.getEntry("/");
 			try {
 				URL local_path = Platform.asLocalURL(path);
 				String str_path = local_path.getPath();
-				System.out.println("Fragment "+i+" path: '"+str_path+"'");
+				System.out.println("Testing fragment "+(i+1)+" with this OS/arch - path: '"+str_path+"'");
 				
 				/* OK so now we know where the absolute path of this fragment is -
 				 * but is this the fragment for the machine we're running on?
