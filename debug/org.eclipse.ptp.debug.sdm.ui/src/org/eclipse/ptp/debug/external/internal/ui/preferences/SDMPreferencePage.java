@@ -22,7 +22,6 @@ import java.io.File;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
-import org.eclipse.ptp.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.ui.preferences.AbstractPerferencePage;
 import org.eclipse.swt.SWT;
@@ -33,6 +32,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
@@ -45,17 +45,21 @@ import org.eclipse.swt.widgets.Text;
  */
 public class SDMPreferencePage extends AbstractPerferencePage {
 	private Text sdmPathText = null;
-	private Text sdmArgsText = null;
+	private Text sdmHostText = null;
+	private Text sdmBackendPathText = null;
+	private Combo sdmBackendCombo = null;
 	private Button sdmPathButton = null;
 	
     protected class WidgetListener extends SelectionAdapter implements ModifyListener {
    		public void widgetSelected(SelectionEvent e) {
-    		Object source = e.getSource();
-        if (source == sdmPathButton)
-       		handleSDMButtonSelected();
+   			Object source = e.getSource();
+   			if (source == sdmPathButton)
+   				handleSDMButtonSelected();
+   			else if (source == sdmBackendCombo)
+   				handleSDMComboSelected();
    		}
 	    public void modifyText(ModifyEvent e) {
-    		setValid(isValid());        	
+	    		setValid(isValid());        	
 	    }
     }
     protected WidgetListener listener = new WidgetListener();
@@ -63,7 +67,7 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 	public SDMPreferencePage() {
 		super();
 		setPreferenceStore(PTPDebugUIPlugin.getDefault().getPreferenceStore());
-		setDescription(PreferenceMessages.getString("SDMPreferencePage.desc"));
+		setDescription(PreferenceMessages.getString("SDMPreferencePage.sdm_desc"));
 	}
 	
 	protected Control createContents(Composite parent) {
@@ -88,40 +92,56 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 		Composite group = createGroupComposite(parent, 1, false, PreferenceMessages.getString("SDMPreferencePage.sdm_group"));
 		Composite comp = createComposite(group, 3);
 
-		new Label(comp, SWT.NONE).setText(PreferenceMessages.getString("SDMPreferencePage.sdm_selection"));
+		new Label(comp, SWT.NONE).setText(PreferenceMessages.getString("SDMPreferencePage.sdm_host"));
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		sdmHostText = new Text(comp, SWT.SINGLE | SWT.BORDER);
+		sdmHostText.setLayoutData(gd);
+		sdmHostText.addModifyListener(listener);
+		
+		new Label(comp, SWT.NONE).setText(PreferenceMessages.getString("SDMPreferencePage.sdm_backend"));
+		sdmBackendCombo = new Combo(comp, SWT.READ_ONLY);
+		sdmBackendCombo.setLayoutData(gd);
+		sdmBackendCombo.setItems(IPDebugConstants.DEBUGGER_BACKENDS);
+		sdmBackendCombo.addSelectionListener(listener);
 
+		new Label(comp, SWT.NONE).setText(PreferenceMessages.getString("SDMPreferencePage.sdm_backend_path"));
+		sdmBackendPathText = new Text(comp, SWT.SINGLE | SWT.BORDER);
+		sdmBackendPathText.setLayoutData(gd);
+		sdmBackendPathText.addModifyListener(listener);
+		
+		new Label(comp, SWT.NONE).setText(PreferenceMessages.getString("SDMPreferencePage.sdm_selection"));
 		sdmPathText = new Text(comp, SWT.SINGLE | SWT.BORDER);
 		sdmPathText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		sdmPathText.addModifyListener(listener);
-		
+		sdmPathText.addModifyListener(listener);		
 		sdmPathButton = createButton(comp, PreferenceMessages.getString("SDMPreferencePage.browse_1"), SWT.PUSH);
 		sdmPathButton.addSelectionListener(listener);
-
-		new Label(comp, SWT.NONE).setText(PreferenceMessages.getString("SDMPreferencePage.sdm_arguments"));
-
-		sdmArgsText = new Text(comp, SWT.SINGLE | SWT.BORDER);
-		sdmArgsText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		sdmArgsText.addModifyListener(listener);
 	}
 	public void performDefaults() { 
 		IPreferenceStore store = getPreferenceStore();
 		sdmPathText.setText(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE));
-		sdmArgsText.setText(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS));
+		sdmHostText.setText(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_HOST));
+		sdmBackendCombo.select(sdmBackendCombo.indexOf(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND)));
+		sdmBackendPathText.setText(store.getDefaultString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH));
 		super.performDefaults();
 	}
 	protected void setValues() {
 		IPreferenceStore store = getPreferenceStore();
 		sdmPathText.setText(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE));
-		sdmArgsText.setText(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS));
+		sdmHostText.setText(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_HOST));
+		sdmBackendCombo.select(sdmBackendCombo.indexOf(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND)));
+		sdmBackendPathText.setText(store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH));
 	}	
 	protected void storeValues() {
 		IPreferenceStore store = getPreferenceStore();
 		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_FILE, sdmPathText.getText());
-		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS, sdmArgsText.getText());
+		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_HOST, sdmHostText.getText());
+		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND, sdmBackendCombo.getItem(sdmBackendCombo.getSelectionIndex()));
+		store.setValue(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH, sdmBackendPathText.getText());
 	}
 	
     public void propertyChange(PropertyChangeEvent event) {
-    	setValid(isValid());
+    		setValid(isValid());
     }	
 	public boolean performOk() {
 		storeValues();
@@ -150,5 +170,8 @@ public class SDMPreferencePage extends AbstractPerferencePage {
 		if (filePath != null) {
 			sdmPathText.setText(filePath);
 		}
-	}	
+	}
+	
+	private void handleSDMComboSelected() {
+	}
 }
