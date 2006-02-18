@@ -21,7 +21,7 @@ package org.eclipse.ptp.launch.internal.ui;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.ptp.launch.ui.PArgumentTab;
+import org.eclipse.ptp.launch.ui.PArgumentsTab;
 import org.eclipse.ptp.launch.ui.PCommonTab;
 import org.eclipse.ptp.launch.ui.PDebuggerTab;
 import org.eclipse.ptp.launch.ui.PMainTab;
@@ -34,7 +34,7 @@ public class ParallelLaunchConfigurationTabGroup extends AbstractLaunchConfigura
     public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
         ILaunchConfigurationTab tabs[] = {
                 new PMainTab(), 
-                new PArgumentTab(),
+                new PArgumentsTab(),
                 new ParallelTab(),
                 //new CEnvironmentTab(), 
                 new PDebuggerTab(false),
