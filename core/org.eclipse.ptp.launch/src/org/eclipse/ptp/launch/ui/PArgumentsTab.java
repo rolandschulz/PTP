@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Text;
 /**
  *
  */
-public class PArgumentTab extends PLaunchConfigurationTab {
+public class PArgumentsTab extends PLaunchConfigurationTab {
     protected Text argumentText = null;
     
     protected WorkingDirectoryBlock workingDirectoryBlock = new WorkingDirectoryBlock(); 
@@ -70,7 +70,7 @@ public class PArgumentTab extends PLaunchConfigurationTab {
                 
 		Label programArgumentLabel = new Label(parallelComp, SWT.NONE);
 		programArgumentLabel.setLayoutData(spanGridData(-1, 2));
-		programArgumentLabel.setText(LaunchMessages.getResourceString("ArgumentTab.Parallel_Program_Arguments"));
+		programArgumentLabel.setText(LaunchMessages.getResourceString("ArgumentsTab.Parallel_Program_Arguments"));
 		argumentText = new Text(parallelComp, SWT.MULTI | SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
 		GridData gd = spanGridData(GridData.FILL_HORIZONTAL, 2);
 		gd.heightHint = 40;
@@ -126,7 +126,7 @@ public class PArgumentTab extends PLaunchConfigurationTab {
      * @see ILaunchConfigurationTab#getName()
      */
     public String getName() {
-        return LaunchMessages.getResourceString("ArgumentTab.Argument");
+        return LaunchMessages.getResourceString("ArgumentsTab.Arguments");
     }
 
     /**
@@ -141,7 +141,7 @@ public class PArgumentTab extends PLaunchConfigurationTab {
      * @see ILaunchConfigurationTab#getImage()
      */
     public Image getImage() {
-        return LaunchImages.getImage(LaunchImages.IMG_ARGUMENT_TAB);
+        return LaunchImages.getImage(LaunchImages.IMG_ARGUMENTS_TAB);
     }    
     
     /**
