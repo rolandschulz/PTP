@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
@@ -107,16 +108,17 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	protected JobRunConfiguration getJobRunConfiguration(ILaunchConfiguration configuration) throws CoreException
 	{
 		IFile programFile = getProgramFile(configuration);
-		String nprocs_str, nprocpnode_str, firstnode_str, machineName;
-		
-		machineName = getMachineName(configuration);
-		//path = programFile.getLocation().toString();
-		nprocs_str = getNumberOfProcesses(configuration);
-		nprocpnode_str = getNumberOfProcessesPerNode(configuration);
-		firstnode_str = getFirstNodeNumber(configuration);
-		
-		int nprocs, nprocpnode, firstnode;
-		nprocs = nprocpnode = firstnode = -1;
+		String nprocs_str = getNumberOfProcesses(configuration);
+		String nprocpnode_str = getNumberOfProcessesPerNode(configuration);
+		String firstnode_str = getFirstNodeNumber(configuration);
+		String machineName = getMachineName(configuration);	
+		String[] args = getProgramParameters(configuration);
+		String[] env =  DebugPlugin.getDefault().getLaunchManager().getEnvironment(configuration);
+		String dir = vertifyWorkDirectory(configuration);
+
+		int nprocs = -1;
+		int nprocpnode = -1;
+		int firstnode = -1;
 		
 		try {
 			nprocs = (new Integer(nprocs_str)).intValue();
@@ -125,33 +127,27 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		}
 		catch(NumberFormatException e) {}
 		
-		JobRunConfiguration jrc = new JobRunConfiguration(programFile.getLocation().toString(), machineName, nprocs, nprocpnode, firstnode);
-		
-		return jrc;
+		return new JobRunConfiguration(programFile.getLocation().toString(), machineName, nprocs, nprocpnode, firstnode, args, env, dir);
 	}
 	
-	protected String[] verifyArgument(ILaunchConfiguration configuration) throws CoreException {
-		return getProgramParameters(configuration);
-	}
-	 
-    protected File vertifyWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
+   protected String vertifyWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
         String workPath = getWorkDirectory(configuration);
         if (workPath == null) {
 			IProject project = verifyProject(configuration);
 			if (project != null)
-				return project.getLocation().toFile();
+				return project.getLocation().toOSString();
 		} else {
 			IPath path = new Path(workPath);
 			if (path.isAbsolute()) {
 				File dir = new File(path.toOSString());
 				if (dir.isDirectory())
-					return dir;
+					return path.toOSString();
 
 				abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Working_directory_does_not_exist"), new FileNotFoundException(LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Application_path_not_found", path.toOSString())), IStatus.INFO);
 			} else {
 				IResource res = getWorkspaceRoot().findMember(path);
 				if (res instanceof IContainer && res.exists())
-					return res.getLocation().toFile();
+					return res.getLocation().toOSString();
 
 				abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Working_directory_does_not_exist"), new FileNotFoundException(LaunchMessages.getFormattedResourceString("AbstractParallelLaunchConfigurationDelegate.Application_path_not_found", path.toOSString())), IStatus.INFO);
 			}

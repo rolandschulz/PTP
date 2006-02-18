@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.core;
 
-import java.io.File;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -742,7 +741,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 
 	//protected IPJob myjob = null;
 
-	public IPJob run(final ILaunch launch, File workingDirectory, String[] envp, final JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException {
+	public IPJob run(final ILaunch launch, final JobRunConfiguration jobRunConfig, IProgressMonitor monitor) throws CoreException {
 		monitor.setTaskName("Creating the job...");
 		int jobID = controlSystem.run(jobRunConfig);
 		if (jobID < 0)

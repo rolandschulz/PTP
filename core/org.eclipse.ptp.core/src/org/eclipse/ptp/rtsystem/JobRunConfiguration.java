@@ -25,17 +25,23 @@ public class JobRunConfiguration {
 	protected int numberOfProcesses;
 	protected int numberOfProcessesPerNode;
 	protected int firstNodeNumber;
+	protected String workingDir;
+	protected String[] arguments;
+	protected String[] environment;
 	protected String debuggerPath;
 	protected String[] debuggerArgs;
 	protected boolean isDebugJob;
 	
-	public JobRunConfiguration(String p, String mn, int np, int npp, int fn)
+	public JobRunConfiguration(String exe, String machine, int nprocs, int npernode, int first, String[] args, String[] env, String dir)
 	{
-		pathToExec = p;
-		machineName = mn;
-		numberOfProcesses = np;
-		numberOfProcessesPerNode = npp;
-		firstNodeNumber = fn;
+		pathToExec = exe;
+		machineName = machine;
+		numberOfProcesses = nprocs;
+		numberOfProcessesPerNode = npernode;
+		firstNodeNumber = first;
+		workingDir = dir;
+		arguments = args;
+		environment = env;
 		isDebugJob = false;
 		debuggerPath = null;
 		debuggerArgs = null;
@@ -65,7 +71,22 @@ public class JobRunConfiguration {
 	{
 		return firstNodeNumber;
 	}
-	
+
+	public String getWorkingDir()
+	{
+		return workingDir;
+	}
+
+	public String[] getArguments()
+	{
+		return arguments;
+	}
+
+	public String[] getEnvironment()
+	{
+		return environment;
+	}
+
 	public String getDebuggerPath()
 	{
 		return debuggerPath;
