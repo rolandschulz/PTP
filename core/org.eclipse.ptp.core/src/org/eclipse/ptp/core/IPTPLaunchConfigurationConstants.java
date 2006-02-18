@@ -58,6 +58,20 @@ public interface IPTPLaunchConfigurationConstants {
 	public static final String ATTR_WORK_DIRECTORY = PTP_LAUNCH_ID + ".WORK_DIRECTORY_ATTR";
 
 	/**
+	 * Launch configuration attribute key. The value is a boolean specifying
+	 * whether the current enviroment should be inherited when the application
+	 * is launched.
+	 */
+	public static final String ATTR_PROGRAM_ENVIROMENT_INHERIT = PTP_LAUNCH_ID + ".ENVIRONMENT_INHERIT"; //$NON-NLS-1$
+
+	/**
+	 * Launch configuration attribute key. The value is a Map specifying the
+	 * environment to use when launching a C/C++ application.
+	 * 
+	 */
+	public static final String ATTR_PROGRAM_ENVIROMENT_MAP = PTP_LAUNCH_ID + ".ENVIRONMENT_MAP"; //$NON-NLS-1$
+	
+	/**
 	 * Launch configuration attribute key. The value is the platform string of
 	 * the launch configuration
 	 */
