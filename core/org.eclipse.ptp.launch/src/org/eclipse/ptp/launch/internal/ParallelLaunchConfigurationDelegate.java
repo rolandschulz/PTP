@@ -37,6 +37,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
@@ -153,8 +154,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 		try {
 			// done the verification phase
 			JobRunConfiguration jrunconfig = getJobRunConfiguration(configuration);
-			String[] args = verifyArgument(configuration);
-			File workDirectory = vertifyWorkDirectory(configuration);
 			/* Assuming we have parsed the configuration */
 			IPath exePath = verifyProgramPath(configuration);
 			IProject project = verifyProject(configuration);
@@ -183,10 +182,10 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			monitor.worked(10);
 			
 			monitor.subTask("Starting the job . . .");
-			job = getLaunchManager().run(launch, workDirectory, null, jrunconfig, new SubProgressMonitor(monitor, 150));
+			job = getLaunchManager().run(launch, jrunconfig, new SubProgressMonitor(monitor, 150));
 			job.setAttribute(PreferenceConstants.JOB_APP, exePath.lastSegment());
 			job.setAttribute(PreferenceConstants.JOB_WORK_DIR, exePath.removeLastSegments(1).toString());
-			job.setAttribute(PreferenceConstants.JOB_ARGS, args);
+			job.setAttribute(PreferenceConstants.JOB_ARGS, jrunconfig.getArguments());
 			
 			PLaunch pLaunch = (PLaunch) launch;
 			pLaunch.setPJob(job);

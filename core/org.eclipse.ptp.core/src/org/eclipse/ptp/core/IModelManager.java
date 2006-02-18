@@ -56,7 +56,7 @@ public interface IModelManager {
 	public void removeParallelLaunchListener(IParallelModelListener listener);
 	public int getCurrentState();
 	public void abortJob(String jobName) throws CoreException;
-	public IPJob run(ILaunch launch, File workingDirectory, String[] envp, JobRunConfiguration jobRunConfig, IProgressMonitor pm) throws CoreException;
+	public IPJob run(ILaunch launch, JobRunConfiguration jobRunConfig, IProgressMonitor pm) throws CoreException;
 	public void setPTPConfiguration(ILaunchConfiguration config);
 	public ILaunchConfiguration getPTPConfiguration();
 }
