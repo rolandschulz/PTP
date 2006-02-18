@@ -98,24 +98,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 
 	protected String[] getProgramParameters(ILaunchConfiguration configuration) throws CoreException {
 		List arguments = new ArrayList();
-		String temp = getNumberOfProcesses(configuration);
-		if (temp == null) 
-		    abort(LaunchMessages.getResourceString("AbstractParallelLaunchConfigurationDelegate.Number_of_process_not_specified"), null, IStatus.INFO);
-		
-		arguments.add(NUM_PROC);		
-		arguments.add(temp);
-		//arguments.add(HYPHEN + getCommunication(configuration));
-		temp = getNumberOfProcessesPerNode(configuration);
-		if (temp != null  && !temp.equals("0")) {
-			arguments.add(PROC_PER_NODE);		
-		    arguments.add(temp);
-		}
-		temp = getFirstNodeNumber(configuration);
-		if (temp != null  && !temp.equals("0")) {
-			arguments.add(START_NODE);		
-		    arguments.add(temp);
-		}
-		
+		String temp = getArgument(configuration);
+		if (temp != null && temp.length() > 0) 
+			arguments.add(temp);
 		return (String[]) arguments.toArray(new String[arguments.size()]);
 	}
 	
@@ -146,19 +131,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	}
 	
 	protected String[] verifyArgument(ILaunchConfiguration configuration) throws CoreException {
-		IFile programFile = getProgramFile(configuration);
-		String[] arguments = getProgramParameters(configuration);
-		List cmdLine = new ArrayList(arguments.length);
-		cmdLine.addAll(Arrays.asList(arguments));
-		cmdLine.add(PROG_NAME);
-		
-		cmdLine.add(programFile.getLocation().toString());
-		
-		String temp = getArgument(configuration);
-		if (temp != null && temp.length() > 0) 
-		    cmdLine.add(temp);
-		
-		return (String[]) cmdLine.toArray(new String[cmdLine.size()]);
+		return getProgramParameters(configuration);
 	}
 	 
     protected File vertifyWorkDirectory(ILaunchConfiguration configuration) throws CoreException {

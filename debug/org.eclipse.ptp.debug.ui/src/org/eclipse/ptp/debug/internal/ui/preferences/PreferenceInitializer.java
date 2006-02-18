@@ -18,11 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.internal.ui.preferences;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.debug.core.IPDebugConstants;
@@ -42,7 +37,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		if (debuggerFile != null)
 			store.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_FILE, debuggerFile);
  
-		store.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS, IPDebugConstants.PREF_DEFAULT_DEUBGGER_ARGS);
+		store.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_HOST, IPDebugConstants.PREF_DEFAULT_DEUBGGER_HOST);
+		store.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND, IPDebugConstants.DEBUGGER_BACKENDS[IPDebugConstants.PREF_DEFAULT_DEDUGGER_BACKEND_INDEX]);
+		store.setDefault(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH, IPDebugConstants.PREF_DEFAULT_DEDUGGER_BACKEND_PATH);
 		
 		store.setDefault(IPDebugConstants.PREF_SHOW_FULL_PATHS, false);
 		store.setDefault(IPDebugConstants.PREF_PTP_DEBUG_REGISTER_PROC_0, true);

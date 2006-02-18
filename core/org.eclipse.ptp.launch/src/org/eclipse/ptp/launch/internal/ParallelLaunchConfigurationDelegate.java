@@ -165,13 +165,17 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 				monitor.subTask("Configuring debug setting . . .");
 				IPreferenceStore store = PTPDebugUIPlugin.getDefault().getPreferenceStore();
-				String dbgPath = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE);
-				String dbgArgs = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_ARGS);
+				String dbgFile = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_FILE);
+				String dbgArgs = "--host=" + store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_HOST);
+				dbgArgs += " --debugger=" + store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND);
+				String dbgPath = store.getString(IPDebugConstants.PREF_PTP_DEBUGGER_BACKEND_PATH);
+				if (dbgPath.length() > 0)
+					dbgArgs += " --debugger_path="+dbgPath;
 
-				verifyDebuggerPath(dbgPath);
+				verifyDebuggerPath(dbgFile);
 				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
 				debugger = debugConfig.createDebugger();
-				jrunconfig.setDebuggerPath(dbgPath);
+				jrunconfig.setDebuggerPath(dbgFile);
 				dbgArgs += " --port=" + debugger.getDebuggerPort();
 				jrunconfig.setDebuggerArgs(dbgArgs);
 				jrunconfig.setDebug();

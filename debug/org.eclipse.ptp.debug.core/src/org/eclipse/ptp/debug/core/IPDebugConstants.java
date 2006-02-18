@@ -62,12 +62,27 @@ public interface IPDebugConstants {
 	public static final String PREF_PTP_DEBUGGER_FILE = PLUGIN_ID + ".pDebug.debugger_file";
 
 	/**
-	 * Default arguments for the sdm
+	 * Host for the sdm client
 	 */
-	public static final String PREF_PTP_DEBUGGER_ARGS = PLUGIN_ID + ".pDebug.debugger_args";
-	public static final String PREF_DEFAULT_DEUBGGER_ARGS = "--host=localhost --debugger=gdb-mi";
+	public static final String PREF_PTP_DEBUGGER_HOST = PLUGIN_ID + ".pDebug.debugger_host";
+	public static final String PREF_DEFAULT_DEUBGGER_HOST = "localhost";
 
+	/**
+	 * Debugger backend
+	 */
+	public static final String PREF_PTP_DEBUGGER_BACKEND = PLUGIN_ID + ".pDebug.debugger_backend";
+	public static final int PREF_DEFAULT_DEDUGGER_BACKEND_INDEX = 0;
+		
+	public static final String[] DEBUGGER_BACKENDS = new String[] {
+		"gdb-mi"
+	};
 	
+	/**
+	 * Path to backend debugger
+	 */
+	public static final String PREF_PTP_DEBUGGER_BACKEND_PATH = PLUGIN_ID + ".pDebug.debugger_backend_path";
+	public static final String PREF_DEFAULT_DEDUGGER_BACKEND_PATH = "";
+
 	public static final String PREF_SHOW_FULL_PATHS = PLUGIN_ID + ".pDebug.show_full_paths";
 
 	public static final String PREF_PTP_DEBUGGER = PLUGIN_ID + ".pDebug.debuggers";
