@@ -322,6 +322,9 @@ static int
 proxy_tcp_svr_dispatch(proxy_tcp_conn *conn, char *msg)
 {
 	int					res;
+	int					i;
+	int					argc;
+	char *				p;
 	char **				args;
 	proxy_event *		e;
 	proxy_svr_commands * cmd;
@@ -335,8 +338,27 @@ proxy_tcp_svr_dispatch(proxy_tcp_conn *conn, char *msg)
 		proxy_tcp_svr_event_callback(e, (void *)conn);
 	}
 	
-	args = Str2Args(msg);
+	/*
+	 * Convert msg into an array of arguments
+	 * Convert each argument from proxy str to a cstring (apart from first)
+	 */
+	for (argc = 1, p = msg; *p != '\0';)
+		if (*p++ == ' ')
+			argc++;
+			
+	args = (char **)malloc((argc + 1) * sizeof(char *));
 
+	for (i = 0; i < argc; i++) {
+		if ((p = strsep(&msg, " ")) == NULL)
+			break;
+		if (i == 0)
+			args[i] = strdup(p);
+		else
+			proxy_str_to_cstring(p, &args[i]);
+	}
+		
+	args[i] = NULL;
+                               
 	if (strcmp(args[0], PROXY_QUIT_CMD) == 0)
 		res = proxy_tcp_svr_quit(conn->svr->svr_helper_funcs, args);
 	else {
@@ -348,7 +370,10 @@ proxy_tcp_svr_dispatch(proxy_tcp_conn *conn, char *msg)
 		}
 	}
 	
-	FreeArgs(args);
+	for (i = 0; i < argc; i++)
+		free(args[i]);
+		
+	free(args);
 	
 	return 0;
 }
