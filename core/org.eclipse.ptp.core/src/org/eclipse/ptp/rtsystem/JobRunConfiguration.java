@@ -20,6 +20,7 @@
 package org.eclipse.ptp.rtsystem;
 
 public class JobRunConfiguration {
+	protected String execName;
 	protected String pathToExec;
 	protected String machineName;
 	protected int numberOfProcesses;
@@ -32,9 +33,10 @@ public class JobRunConfiguration {
 	protected String[] debuggerArgs;
 	protected boolean isDebugJob;
 	
-	public JobRunConfiguration(String exe, String machine, int nprocs, int npernode, int first, String[] args, String[] env, String dir)
+	public JobRunConfiguration(String exe, String exePath, String machine, int nprocs, int npernode, int first, String[] args, String[] env, String dir)
 	{
-		pathToExec = exe;
+		execName = exe;
+		pathToExec = exePath;
 		machineName = machine;
 		numberOfProcesses = nprocs;
 		numberOfProcessesPerNode = npernode;
@@ -45,6 +47,11 @@ public class JobRunConfiguration {
 		isDebugJob = false;
 		debuggerPath = null;
 		debuggerArgs = null;
+	}
+	
+	public String getExecName()
+	{
+		return execName;
 	}
 	
 	public String getPathToExec()
@@ -119,11 +126,13 @@ public class JobRunConfiguration {
 	
 	public String toString()
 	{
-		return "path:\t\t"+pathToExec+"\n"+
-		       "machineName:\t"+machineName+"\n"+
-		       "#procs:\t\t"+numberOfProcesses+"\n"+
-		       "#proc/node:\t"+numberOfProcessesPerNode+"\n"+
-		       "firstNode#:\t"+firstNodeNumber+"\n"+
-		       "isDebug?\t\t"+isDebugJob;
+		return "name:\t\t"+execName+"\n"+
+				"path:\t\t"+pathToExec+"\n"+
+				"cwd:\t\t"+workingDir+"\n"+
+				"machineName:\t"+machineName+"\n"+
+				"#procs:\t\t"+numberOfProcesses+"\n"+
+				"#proc/node:\t"+numberOfProcessesPerNode+"\n"+
+				"firstNode#:\t"+firstNodeNumber+"\n"+
+				"isDebug?\t\t"+isDebugJob;
 	}
 }
