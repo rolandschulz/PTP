@@ -63,6 +63,9 @@ extern MICommand *MIExecInterrupt(void);
  */
 extern MICommand *MIBreakInsert(int isTemporary, int isHardware, char *condition, int ignoreCount, char *line, int tid);
 extern MICommand *MIBreakDelete(int nbps, int *bpids);
+extern MICommand *MIBreakDisable(int nbps, int *bpids);
+extern MICommand *MIBreakEnable(int nbps, int *bpids);
+extern MICommand *MIBreakCondition(int nbps, int *bpids, char *expr);
 
 /*
  * -stack-* commands
