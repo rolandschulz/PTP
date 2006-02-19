@@ -127,7 +127,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		}
 		catch(NumberFormatException e) {}
 		
-		return new JobRunConfiguration(programFile.getLocation().toString(), machineName, nprocs, nprocpnode, firstnode, args, env, dir);
+		return new JobRunConfiguration(programFile.getLocation().lastSegment().toString(), 
+				programFile.getLocation().removeLastSegments(1).toOSString(), 
+				machineName, nprocs, nprocpnode, firstnode, args, env, dir);
 	}
 	
    protected String vertifyWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
