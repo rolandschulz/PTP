@@ -76,7 +76,7 @@ static AIF *	ConvertVarToAIF(char *, MIVar *, int);
 static int	GDBMIInit(void (*)(dbg_event *, void *), void *);
 static int	GDBMIProgress(void);
 static int	GDBMIInterrupt(void);
-static int	GDBMIStartSession(char *, char *, char *, char *, char **);
+static int	GDBMIStartSession(char *, char *, char *, char **, char **);
 static int	GDBMISetLineBreakpoint(int, int, int, char *, int, char*, int, int);
 static int	GDBMISetFuncBreakpoint(int, int, int, char *, char *, char*, int, int);
 static int	GDBMIDeleteBreakpoint(int);
@@ -376,7 +376,7 @@ SendCommandWait(MISession *sess, MICommand *cmd)
  * Start GDB session
  */	
 static int
-GDBMIStartSession(char *gdb_path, char *dir, char *prog, char *args, char **env)
+GDBMIStartSession(char *gdb_path, char *dir, char *prog, char **args, char **env)
 {
 	char **		e;
 	struct stat	st;

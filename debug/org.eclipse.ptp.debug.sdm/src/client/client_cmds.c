@@ -139,8 +139,17 @@ DbgClntStartSession(char **args)
 {
 	int		res;
 	char *	cmd;
+	char *	buf;
+	char **	ap;
 	
-	asprintf(&cmd, "%s %s \"%s\" \"%s\"", DBG_STARTSESSION_CMD, args[1], args[2], args[3]);
+	asprintf(&cmd, "%s %s \"%s\"", DBG_STARTSESSION_CMD, args[1], args[2]);
+	
+	for (ap = &args[3]; *ap != NULL; ap++) {
+		asprintf(&buf, "%s %s", cmd, *ap);
+		free(cmd);
+		cmd = buf;
+	}
+	
 	res = ClntSendCommand(dbg_procs, DBG_EV_WAITALL, cmd, NULL);
 	free(cmd);
 	return res;
