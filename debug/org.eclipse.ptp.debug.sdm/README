@@ -11,3 +11,25 @@ It comprises the following components:
 
 3. A JNI library for interfacing Java applications to the proxy client. This allows applications like Eclipse to control
    the debug framework, respond to events, etc.
+   
+Basic Installation
+==================
+
+The simplest way to compile this package is:
+
+  1. At the top level, run './configure' to create the Makefiles.
+
+  2. Type `make' to build the package.
+
+  3. You can remove the program binaries and object files from the
+     source code directory by typing `make clean'.
+
+If you modify Makefile.am and wish to regenerate the Makefile.in and
+configure scripts:
+
+  1. Make sure you have the latest versions of 'automake' and 
+     'libtool' (at this time it is 1.9.6 and 1.5.20 respectively). 
+     They can be obtained from ftp.gnu.org if necessary.
+     
+  2. Run 'autogen.sh' which will build the various configure scripts.
+  
