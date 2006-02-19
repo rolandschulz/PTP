@@ -269,9 +269,8 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 		return "";
 	}
 
-	public String[] getNodeAttributes(IPNode node, String attribString) {
+	public String[] getNodeAttributes(IPNode node, String[] attribs) {
 		String nodeName = node.getElementName();
-		String[] attribs = attribString.split(" ");
 		String[] retstr = new String[attribs.length];
 		
 		for(int i=0; i<attribs.length; i++) {
@@ -299,14 +298,13 @@ public class SimulationMonitoringSystem implements IMonitoringSystem {
 		return retstr;
 	}
 	
-	public String[] getAllNodesAttributes(IPMachine machine, String attribString) {
+	public String[] getAllNodesAttributes(IPMachine machine, String[] attribs) {
 		IPNode[] nodes = machine.getSortedNodes();
-		String[] attribs = attribString.split(" ");
 		
 		String[] allvals = new String[attribs.length * nodes.length];
 		
 		for(int i=0; i<nodes.length; i++) {
-			String[] nvals = getNodeAttributes(nodes[i], attribString);
+			String[] nvals = getNodeAttributes(nodes[i], attribs);
 			
 			for(int j=0; j<nvals.length; j++) {
 				allvals[(i * nvals.length) + j] = new String(nvals[j]);

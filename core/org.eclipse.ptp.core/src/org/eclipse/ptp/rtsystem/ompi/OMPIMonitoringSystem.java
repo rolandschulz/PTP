@@ -124,7 +124,7 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
 		return "machine0";
 	}
 
-	public String[] getNodeAttributes(IPNode node, String attribs) {
+	public String[] getNodeAttributes(IPNode node, String[] attribs) {
 		System.out.println("ORTE Monitoring System: getNodeAttribute(" + node.getElementName() + ", "
 				+ attribs + ") called");
 		IPMachine machine = node.getMachine();
@@ -155,13 +155,13 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
 		return values;
 	}
 	
-	public String[] getAllNodesAttributes(IPMachine machine, String attribString) {
+	public String[] getAllNodesAttributes(IPMachine machine, String[] attribs) {
 		int machID = machine.getMachineNumberInt();
 		
 		String[] values = null;
 		
 		try {
-			values = proxy.getAllNodesAttributesBlocking(machID, attribString);
+			values = proxy.getAllNodesAttributesBlocking(machID, attribs);
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
@@ -173,8 +173,6 @@ public class OMPIMonitoringSystem implements IMonitoringSystem, IProxyRuntimeEve
 			
 			int nlen = nodes.length;
 			if(nodes == null || nodes.length == 0) nlen = 1;
-			
-			String[] attribs = attribString.split(" ");
 			
 			values = new String[attribs.length * nlen];
 			

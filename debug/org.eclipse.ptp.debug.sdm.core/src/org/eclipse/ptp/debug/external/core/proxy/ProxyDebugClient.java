@@ -31,16 +31,36 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 		super();
 	}
 
-	public void debugStartSession(String dir, String prog, String args) throws IOException {
-		sendCommand("INI", dir + " \""+ prog + "\" \"" + args + "\"");
+	public void debugStartSession(String dir, String prog, String[] args) throws IOException {
+		sendCommand("INI", dir, prog, args);
 	}
 	
 	public void debugSetLineBreakpoint(BitList procs, int bpid, boolean isTemporary, boolean isHardware, String file, int line, String expression, int ignoreCount, int tid) throws IOException {
-		sendCommand("SLB", procs, bpid + " " + (isTemporary?1:0) + " " + (isHardware?1:0) + " \"" + file + "\" " + line + " \"" + expression + "\" " + ignoreCount + " " + tid);
+		String[] args = new String[] {
+			Integer.toString(bpid),
+			Integer.toString(isTemporary?1:0),
+			Integer.toString(isHardware?1:0),
+			file,
+			Integer.toString(line),
+			expression,
+			Integer.toString(ignoreCount),
+			Integer.toString(tid)
+		};
+		sendCommand("SLB", procs, args);
 	}
 	
 	public void debugSetFuncBreakpoint(BitList procs, int bpid, boolean isTemporary, boolean isHardware, String file, String func, String expression, int ignoreCount, int tid) throws IOException {
-		sendCommand("SFB", procs, bpid + " " + (isTemporary?0:0) + " " + (isHardware?1:0) + " \"" + file + "\" \"" + func + "\" \"" + expression + "\" " + ignoreCount + " " + tid);
+		String[] args = new String[] {
+			Integer.toString(bpid),
+			Integer.toString(isTemporary?0:0),
+			Integer.toString(isHardware?1:0),
+			file,
+			func,
+			expression,
+			Integer.toString(ignoreCount),
+			Integer.toString(tid)
+		};
+		sendCommand("SFB", procs, args);
 	}
 	
 	public void debugDeleteBreakpoint(BitList procs, int bpid) throws IOException {
@@ -56,7 +76,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	}
 
 	public void debugConditionBreakpoint(BitList procs, int bpid, String expr) throws IOException {
-		sendCommand("CBP", procs, Integer.toString(bpid) + " \"" + expr + "\"");
+		sendCommand("CBP", procs, Integer.toString(bpid), expr);
 	}
 
 	public void debugGo(BitList procs) throws IOException {
@@ -64,7 +84,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	}
 	
 	public void debugStep(BitList procs, int count, int type) throws IOException {
-		sendCommand("STP", procs, count + " " + type);
+		sendCommand("STP", procs, Integer.toString(count), Integer.toString(type));
 	}
 	
 	public void debugTerminate(BitList procs) throws IOException {
@@ -84,11 +104,11 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	}
 
 	public void debugEvaluateExpression(BitList procs, String expr) throws IOException {
-		sendCommand("EEX", procs, "\""+ expr + "\"");
+		sendCommand("EEX", procs, expr);
 	}
 
 	public void debugGetType(BitList procs, String expr) throws IOException {
-		sendCommand("TYP", procs, "\""+ expr + "\"");
+		sendCommand("TYP", procs, expr);
 	}
 
 	public void debugListLocalVariables(BitList procs) throws IOException {

@@ -126,6 +126,26 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		argList.add("firstNodeNumber");
 		argList.add(Integer.toString(jobRunConfig.getFirstNodeNumber()));
 		
+		String dir = jobRunConfig.getWorkingDir();
+		if (dir != null) {
+			argList.add("workingDir");
+			argList.add(dir);
+		}
+		String[] args = jobRunConfig.getArguments();
+		if (args != null) {
+			for (int i = 0; i < args.length; i++) {
+				argList.add("progArg");
+				argList.add(args[i]);
+			}
+		}
+		String[] env = jobRunConfig.getEnvironment();
+		if (env != null) {
+			for (int i = 0; i < env.length; i++) {
+				argList.add("progEnv");
+				argList.add(env[i]);
+			}
+		}
+		
 		if (jobRunConfig.isDebug()) {
 			argList.add("debuggerPath");
 			argList.add(jobRunConfig.getDebuggerPath());
@@ -208,7 +228,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		return ne;
 	}
 	
-	public String[] getAllProcessesAttributes(IPJob job, String attribs)
+	public String[] getAllProcessesAttributes(IPJob job, String[] attribs)
 	{
 		String[] values = null;
 		
@@ -222,7 +242,7 @@ public class OMPIControlSystem implements IControlSystem, IProxyRuntimeEventList
 		return values;
 	}
 	
-	public String[] getProcessAttributes(IPProcess proc, String attrib)
+	public String[] getProcessAttributes(IPProcess proc, String[] attrib)
 	{
 		String[] values = null;
 		

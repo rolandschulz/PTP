@@ -66,6 +66,26 @@ public abstract class AbstractProxyClient {
 		return String.valueOf(res);
 	}
 	
+	public static String encodeString(String str) {
+		if (str == null || str.length() == 0)
+			return "1:00";
+		
+		byte[] b = str.getBytes();
+		String res = str.length()*2+1 + ":";
+		for (int i = 0; i < b.length; i++) {
+			if (b[i] < 10)
+				res += "0";
+			res += Integer.toHexString((int)b[i]);
+		}
+		
+		return res + "00";
+	}
+	
+	protected String encodeBitSet(BitList set) {
+		String lenStr = Integer.toHexString(set.size());
+		return lenStr + ":" + set.toString();
+	}
+
 	protected void sendCommand(String cmd) throws IOException {
 		if (sessConnected) {
 			String buf = encodeLength(cmd.length()) + " " + cmd;
@@ -74,15 +94,43 @@ public abstract class AbstractProxyClient {
 		}
 	}
 
-	protected String encodeBitSet(BitList set) {
-		String lenStr = Integer.toHexString(set.size());
-		return lenStr + ":" + set.toString();
+	protected void sendCommand(String cmd, String arg1) throws IOException {
+		this.sendCommand(cmd + " " + encodeString(arg1));
 	}
-	
-	protected void sendCommand(String cmd, String args) throws IOException {
-		this.sendCommand(cmd + " " + args);
+
+	protected void sendCommand(String cmd, String arg1, String arg2) throws IOException {
+		this.sendCommand(cmd + " " + encodeString(arg1) + " " + encodeString(arg2));
 	}
-	
+
+	protected void sendCommand(String cmd, String arg1, String arg2, String arg3) throws IOException {
+		this.sendCommand(cmd + " " + encodeString(arg1) + " " + encodeString(arg2) + " " + encodeString(arg3));
+	}
+
+	protected void sendCommand(String cmd, String[] args) throws IOException {
+		for (int i = 0; i < args.length; i++)
+			cmd += " " + encodeString(args[i]);
+		
+		this.sendCommand(cmd);
+	}
+
+	protected void sendCommand(String cmd, String arg1, String[] args) throws IOException {
+		cmd += " " + encodeString(arg1);
+		
+		for (int i = 0; i < args.length; i++)
+			cmd += " " + encodeString(args[i]);
+		
+		this.sendCommand(cmd);
+	}
+
+	protected void sendCommand(String cmd, String arg1, String arg2, String[] args) throws IOException {
+		cmd += " " + encodeString(arg1) + " " + encodeString(arg2);
+		
+		for (int i = 0; i < args.length; i++)
+			cmd += " " + encodeString(args[i]);
+		
+		this.sendCommand(cmd);
+	}
+
 	public void addEventListener(IProxyEventListener listener) {
 		synchronized (listeners) {
 			listeners.add(listener);
