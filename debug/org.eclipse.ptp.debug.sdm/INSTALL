@@ -1,23 +1,12 @@
-PTP Scalable Debug Manager
+#!/bin/sh
 
-Basic Installation
-==================
+export RUNTIME=orte
+export ARCH=`uname -p | sed -e 's/powerpc/ppc/' -e 's/ppc64/ppc/' -e 's/i.86/x86/'`
+export OS=`uname -s | sed -e 's/Darwin/macosx/' -e 's/Linux/linux/'`
+export INSTALL_DIR=../org.eclipse.ptp.debug.sdm.$RUNTIME.$OS.$ARCH/bin
 
-The simplest way to compile this package is:
+echo "Copying orte_server to $INSTALL_DIR . . ."
+cp sdm $INSTALL_DIR/sdm
+chmod 755 $INSTALL_DIR/sdm
 
-  1. At the top level, run './configure' to create the Makefiles.
-
-  2. Type `make' to build the package.
-
-  3. You can remove the program binaries and object files from the
-     source code directory by typing `make clean'.
-
-If you modify Makefile.am and wish to regenerate the Makefile.in and
-configure scripts:
-
-  1. Make sure you have the latest versions of 'automake' and 
-     'libtool' (at this time it is 1.9.6 and 1.5.20 respectively). 
-     They can be obtained from ftp.gnu.org if necessary.
-     
-  2. Run 'autogen.sh' which will build the various configure scripts.
-    
+exit 0
