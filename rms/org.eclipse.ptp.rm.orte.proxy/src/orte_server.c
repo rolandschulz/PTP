@@ -58,6 +58,7 @@
 #include "mca/rml/rml.h"
 #include "mca/rmgr/base/base.h"
 #include "opal/util/output.h"
+#include "opal/util/path.h"
 
 #ifdef HAVE_SYS_BPROC_H
 #include "orte/mca/soh/bproc/soh_bproc.h"
@@ -841,32 +842,43 @@ debug_spawn(char *debug_path, int argc, char **argv, orte_app_context_t** app_co
 int
 ORTERun(char **args)
 {
-	int					rc; 
+	int					rc;
 	int					i;
 	int					a;
-	int					num_procs;
+	int					num_procs = 0;
 	int					debug = 0;
 	int					num_apps;
+	int					num_args = 0;
+	int					num_env = 0;
 	int					debug_argc = 0;
-	char					pgm_name[128];
-	char					cwd[128];
-	char *				c;
 	char *				res;
-	char *				exec_path;
+	char *				full_path;
+	char	 *				pgm_name = NULL;
+	char	 *				cwd = NULL;
+	char *				exec_path = NULL;
 	char *				debug_exec_path;
 	char **				debug_args;
+	char **				env = NULL;
 	orte_app_context_t **	apps;
 	orte_jobid_t			jobid = ORTE_JOBID_MAX;
 
 	for (i = 1; args[i] != NULL; i += 2) {
-		if (strcmp(args[i], "pathToExecutable") == 0) {
+		if (strcmp(args[i], "execName") == 0) {
+			pgm_name = args[i+1];
+		} else if (strcmp(args[i], "pathToExec") == 0) {
 			exec_path = args[i+1];
-		} else if (strcmp(args[i], "numberOfProcesses") == 0) {
+		} else if (strcmp(args[i], "numOfProcs") == 0) {
 			num_procs = atoi(args[i+1]);
-		} else if (strcmp(args[i], "numberOfProcessesPerNode") == 0) {
+		} else if (strcmp(args[i], "procsPerNode") == 0) {
 			// not yet
-		} else if (strcmp(args[i], "firstNodeNumber") == 0) {
+		} else if (strcmp(args[i], "firstNodeNum") == 0) {
 			// not yet
+		} else if (strcmp(args[i], "workingDir") == 0) {
+			cwd = args[i+1];
+		} else if (strcmp(args[i], "progArg") == 0) {
+			num_args++;
+		} else if (strcmp(args[i], "progEnv") == 0) {
+			num_env++;
 		} else if (strcmp(args[i], "debuggerPath") == 0) {
 			debug_exec_path = args[i+1];
 			debug = 1;
@@ -875,8 +887,56 @@ ORTERun(char **args)
 		}
 	}
 	
-	if (access(exec_path, X_OK) < 0) {
-		printf("ERROR exec_path = '%s' not found\n", exec_path); fflush(stdout);
+	/*
+	 * Do some checking first
+	 */
+	 
+	if (pgm_name == NULL) {
+		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_ORTE_RUN, "Must specify a program name"));
+		return PROXY_RES_OK;
+	}
+	
+	if (num_procs <= 0) {
+		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_ORTE_RUN, "Invalid number of processes"));
+		return PROXY_RES_OK;
+	}
+	
+	/*
+	 * Must specify a working directory. For local launches, this is normally the project directory. For
+	 * remote launches, it will probably be the user's home directory.
+	 */
+	if (cwd == NULL) {
+		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_ORTE_RUN, "Must specify a working directory"));
+		return PROXY_RES_OK;
+	}
+		
+	/*
+	 * Get supplied environment. It is used to locate executable if necessary.
+	 */
+	
+	if (num_env > 0) {
+		env = (char **)malloc((num_env + 1) * sizeof(char *));
+		for (a = 0, i = 1; args[i] != NULL; i += 2) {
+			if (strcmp(args[i], "progEnv") == 0)
+				env[a++] = strdup(args[i+1]);
+		}
+		env[a] = NULL;
+	}
+		
+	/*
+	 * If no path is specified, then try to locate execuable.
+	 */		
+	if (exec_path == NULL) {
+		full_path = opal_path_findv(pgm_name, 0, env, cwd);
+		if (full_path == NULL) {
+			proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_ORTE_RUN, "Executuable not found"));
+			return PROXY_RES_OK;
+		}
+	} else {
+		asprintf(&full_path, "%s/%s", exec_path, pgm_name);
+	}
+	
+	if (access(full_path, X_OK) < 0) {
 		proxy_svr_event_callback(orte_proxy, ORTEErrorStr(RTEV_ERROR_ORTE_RUN, strerror(errno)));
 		return PROXY_RES_OK;
 	}
@@ -900,11 +960,6 @@ ORTERun(char **args)
 		}
 		debug_args[a] = NULL;
 	}
-	
-	c = rindex(exec_path, '/');
-	strncpy(pgm_name, c + 1, strlen(c));
-	strncpy(cwd, exec_path, c - exec_path + 1);
-	cwd[c-exec_path+1] = '\0';
 
 	/* hard coded test for spawning just 1 job (JOB not PROCESSES!) */
 	num_apps = 1;
@@ -913,19 +968,25 @@ ORTERun(char **args)
 	apps = malloc(sizeof(orte_app_context_t *) * num_apps);
 	apps[0] = OBJ_NEW(orte_app_context_t);
 	apps[0]->num_procs = num_procs;
-	apps[0]->app = strdup(exec_path);
+	apps[0]->app = full_path;
 	apps[0]->cwd = strdup(cwd);
 	/* no special environment variables */
-	apps[0]->num_env = 0;
-	apps[0]->env = NULL;
+	apps[0]->num_env = num_env;
+	apps[0]->env = env;
 	/* no special mapping of processes to nodes */
 	apps[0]->num_map = 0;
 	apps[0]->map_data = NULL;
 	/* setup argv */
-	apps[0]->argv = (char **)malloc((2) * sizeof(char *));
+	apps[0]->argv = (char **)malloc((num_args + 2) * sizeof(char *));
 	apps[0]->argv[0] = strdup(pgm_name);
-	apps[0]->argv[1] = NULL;
-	apps[0]->argc = 1;
+	if (num_args > 0) {
+		for (a = 1, i = 1; args[i] != NULL; i += 2) {
+			if (strcmp(args[i], "progArg") == 0)
+				apps[0]->argv[a++] = strdup(args[i+1]);
+		}
+	}
+	apps[0]->argv[num_args+1] = NULL;
+	apps[0]->argc = num_args + 1;
 	
 	printf("(debug ? %d) Spawning %d processes of job '%s'\n", debug, (int)apps[0]->num_procs, apps[0]->app);
 	printf("\tprogram name '%s'\n", apps[0]->argv[0]);
