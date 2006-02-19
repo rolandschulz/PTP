@@ -57,9 +57,9 @@ public interface IMonitoringSystem {
 	 */
 	public String getNodeMachineName(String nodeName);
 	
-	public String[] getAllNodesAttributes(IPMachine machine, String attrib);
+	public String[] getAllNodesAttributes(IPMachine machine, String[] attribs);
 
-	public String[] getNodeAttributes(IPNode node, String attrib);
+	public String[] getNodeAttributes(IPNode node, String[] attribs);
 
 	/* event stuff */
 	public void addRuntimeListener(IRuntimeListener listener);

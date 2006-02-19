@@ -54,14 +54,14 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		return ((ProxyRuntimeProcessesEvent)event).getNumProcs();
 	}
 	
-	public String[] getProcessAttributesBlocking(int jobID, int procID, String keys) throws IOException {
+	public String[] getProcessAttributesBlocking(int jobID, int procID, String[] keys) throws IOException {
 		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_PROCATTR);
 		getProcessAttribute(jobID, procID, keys);
 		IProxyRuntimeEvent event = waitForRuntimeEvent();
 		return ((ProxyRuntimeProcessAttributeEvent)event).getValues();
 	}
 	
-	public String[] getAllProcessesAttribuesBlocking(int jobID, String keys) throws IOException {
+	public String[] getAllProcessesAttribuesBlocking(int jobID, String[] keys) throws IOException {
 		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_PROCATTR);
 		getProcessAttribute(jobID, -1, keys);
 		IProxyRuntimeEvent event = waitForRuntimeEvent();
@@ -75,14 +75,14 @@ public class OMPIProxyRuntimeClient extends ProxyRuntimeClient implements IRunti
 		return ((ProxyRuntimeNodesEvent)event).getNumNodes();
 	}
 	
-	public String[] getNodeAttributesBlocking(int machID, int nodeID, String keys) throws IOException {
+	public String[] getNodeAttributesBlocking(int machID, int nodeID, String[] keys) throws IOException {
 		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_NODEATTR);
 		getNodeAttribute(machID, nodeID, keys);
 		IProxyRuntimeEvent event = waitForRuntimeEvent();
 		return ((ProxyRuntimeNodeAttributeEvent)event).getValues();
 	}
 	
-	public String[] getAllNodesAttributesBlocking(int machID, String keys) throws IOException {
+	public String[] getAllNodesAttributesBlocking(int machID, String[] keys) throws IOException {
 		setWaitEvent(IProxyRuntimeEvent.EVENT_RUNTIME_NODEATTR);
 		getNodeAttribute(machID, -1, keys);
 		IProxyRuntimeEvent event = waitForRuntimeEvent();

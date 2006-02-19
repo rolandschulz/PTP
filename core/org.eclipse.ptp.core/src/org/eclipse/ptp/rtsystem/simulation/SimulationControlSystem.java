@@ -271,16 +271,14 @@ public class SimulationControlSystem implements IControlSystem {
 		return "-1";
 	}
 	
-	public String[] getAllProcessesAttributes(IPJob job, String attribString)
+	public String[] getAllProcessesAttributes(IPJob job, String[] attribs)
 	{
 		IPProcess[] procs = job.getSortedProcesses();
-		
-		String[] attribs = attribString.split(" ");
 		
 		String[] allvals = new String[attribs.length * procs.length];
 		
 		for(int i=0; i<procs.length; i++) {
-			String[] pvals = getProcessAttributes(procs[i], attribString);
+			String[] pvals = getProcessAttributes(procs[i], attribs);
 			
 			for(int j=0; j<pvals.length; j++) {
 				allvals[(i * pvals.length) + j] = new String(pvals[j]);
@@ -290,14 +288,9 @@ public class SimulationControlSystem implements IControlSystem {
 		return allvals;
 	}
 	
-	public String[] getProcessAttributes(IPProcess proc, String attribString)
+	public String[] getProcessAttributes(IPProcess proc, String[] attribs)
 	{
 		String procName = proc.getElementName();
-		
-		String[] attribs = attribString.split(" ");
-		
-		System.out.println("JAVA OMPI: getProcessAttribute(" + procName + ", "
-				+ attribString + ") called");
 		
 		String[] retstr = new String[attribs.length];
 

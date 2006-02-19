@@ -285,12 +285,14 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 			subMonitor.setTaskName("Creating nodes...");
 			if(monitoringSystem instanceof OMPIMonitoringSystem) {
 				int num_attribs = 5;
-				String[] attribs = monitoringSystem.getAllNodesAttributes(mac,
-						AttributeConstants.ATTRIB_NODE_NAME + " "
-								+ AttributeConstants.ATTRIB_NODE_USER + " "
-								+ AttributeConstants.ATTRIB_NODE_GROUP + " "
-								+ AttributeConstants.ATTRIB_NODE_STATE + " "
-								+ AttributeConstants.ATTRIB_NODE_MODE);
+				String[] keys = new String[] {
+					AttributeConstants.ATTRIB_NODE_NAME,
+					AttributeConstants.ATTRIB_NODE_USER,
+					AttributeConstants.ATTRIB_NODE_GROUP,
+					AttributeConstants.ATTRIB_NODE_STATE,
+					AttributeConstants.ATTRIB_NODE_MODE
+				};
+				String[] attribs = monitoringSystem.getAllNodesAttributes(mac, keys);
 				if (attribs == null || attribs.length == 0) {
 					return;
 				}
@@ -355,15 +357,15 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 					//System.out.println("node "+j);
 					PNode node = new PNode(mac, ne2[j], ""+j+"", j);
 					node.setAttrib(AttributeConstants.ATTRIB_NODE_NAME, 
-							monitoringSystem.getNodeAttributes(node, AttributeConstants.ATTRIB_NODE_NAME)[0]);
+							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_NAME})[0]);
 					node.setAttrib(AttributeConstants.ATTRIB_NODE_USER, 
-							monitoringSystem.getNodeAttributes(node, AttributeConstants.ATTRIB_NODE_USER)[0]);
+							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_USER})[0]);
 					node.setAttrib(AttributeConstants.ATTRIB_NODE_GROUP, 
-							monitoringSystem.getNodeAttributes(node, AttributeConstants.ATTRIB_NODE_GROUP)[0]);
+							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_GROUP})[0]);
 					node.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, 
-							monitoringSystem.getNodeAttributes(node, AttributeConstants.ATTRIB_NODE_STATE)[0]);
+							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_STATE})[0]);
 					node.setAttrib(AttributeConstants.ATTRIB_NODE_MODE, 
-							monitoringSystem.getNodeAttributes(node, AttributeConstants.ATTRIB_NODE_MODE)[0]);
+							monitoringSystem.getNodeAttributes(node, new String[] {AttributeConstants.ATTRIB_NODE_MODE})[0]);
 					
 					mac.addChild(node);
 				}
@@ -426,7 +428,11 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		System.out.println("getProcsStatusForNewJob:" + nejob + " - #procs = " + numProcs);
 		
 		int num_attribs = 2;
-		String[] attribs = controlSystem.getAllProcessesAttributes(job, AttributeConstants.ATTRIB_PROCESS_PID + " " + AttributeConstants.ATTRIB_PROCESS_NODE_NAME);
+		String[] keys = new String[] {
+			AttributeConstants.ATTRIB_PROCESS_PID,
+			AttributeConstants.ATTRIB_PROCESS_NODE_NAME
+		};
+		String[] attribs = controlSystem.getAllProcessesAttributes(job, keys);
 		for(int i=0; i<attribs.length; i++) 
 			System.out.println("*** attribs["+i+"] = "+attribs[i]);
 		
@@ -521,7 +527,7 @@ public class ModelManager implements IModelManager, IRuntimeListener {
 		/* so let's find which node this is */
 		IPNode n = universe.findNodeByName(ne);
 		if (n != null) {
-			n.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, monitoringSystem.getNodeAttributes(n, AttributeConstants.ATTRIB_NODE_STATE));
+			n.setAttrib(AttributeConstants.ATTRIB_NODE_STATE, monitoringSystem.getNodeAttributes(n, new String[] {AttributeConstants.ATTRIB_NODE_STATE}));
 			fireEvent(n, EVENT_SYS_STATUS_CHANGE);
 		}
 	}

@@ -59,11 +59,22 @@ public abstract class AbstractProxyDebugClient extends AbstractProxyClient imple
 		this.sendCommand(cmd, setStr);
 	}
 	
-	protected void sendCommand(String cmd, BitList set, String args) throws IOException {
+	protected void sendCommand(String cmd, BitList set, String arg1) throws IOException {
 		String setStr = encodeBitSet(set);
-		this.sendCommand(cmd, setStr + " " + args);
+		this.sendCommand(cmd, setStr, arg1);
 	}
 
+
+	protected void sendCommand(String cmd, BitList set, String arg1, String arg2) throws IOException {
+		String setStr = encodeBitSet(set);
+		this.sendCommand(cmd, setStr, arg1, arg2);
+	}
+
+	protected void sendCommand(String cmd, BitList set, String[] args) throws IOException {
+		String setStr = encodeBitSet(set);
+		this.sendCommand(cmd, setStr, args);
+	}
+	
 	public void addEventListener(IProxyDebugEventListener listener) {
 		listeners.add(listener);
 	}

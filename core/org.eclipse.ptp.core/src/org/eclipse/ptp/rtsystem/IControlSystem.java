@@ -76,11 +76,11 @@ public interface IControlSystem {
 	 * proc1attrib0 ...]
 	 * 
 	 * @param job the job to get process attributes from
-	 * @param attribs the attribute String where attributes are space separated
+	 * @param array of attribs to fetch
 	 * @return an array of the attribute values for each process
 	 * @see org.eclipse.ptp.core.AttributeConstants
 	 */
-	public String[] getAllProcessesAttributes(IPJob job, String attribs);
+	public String[] getAllProcessesAttributes(IPJob job, String[] attribs);
 	
 	/**
 	 * Gets the specified attributes for a specific process in a specific job.  The
@@ -89,10 +89,10 @@ public interface IControlSystem {
 	 * return array's length is equal to the number of attributes requested.
 	 * 
 	 * @param proc the process contained in the job to get the process attributes from
-	 * @param attribs the attribute String where attributes are space separated
+	 * @param array of attribs to fetch
 	 * @return an array of the attribute values
 	 */
-	public String[] getProcessAttributes(IPProcess proc, String attribs);
+	public String[] getProcessAttributes(IPProcess proc, String[] attribs);
 
 	/**
 	 * Adds a listener to the control system.  The control system may fire {@link RuntimeEvent}s

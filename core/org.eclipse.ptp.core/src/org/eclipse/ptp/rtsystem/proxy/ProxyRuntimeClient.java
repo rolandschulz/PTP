@@ -31,13 +31,7 @@ public class ProxyRuntimeClient extends AbstractProxyRuntimeClient {
     }
 
 	public void run(String[] args) throws IOException {
-		String runArgs = "";
-		for (int i = 0; i < args.length; i++) {
-			if (i > 0)
-				runArgs += " ";
-			runArgs += args[i];
-		}
-		sendCommand("RUN", runArgs);
+		sendCommand("RUN", args);
 	}
 	
 	public void terminateJob(int jobId) throws IOException {
@@ -52,12 +46,12 @@ public class ProxyRuntimeClient extends AbstractProxyRuntimeClient {
 		sendCommand("GETPROCS", Integer.toString(jobId));
 	}
 	
-	public void getProcessAttribute(int jobId, int procId, String keys) throws IOException {
-		sendCommand("GETPATTR", Integer.toString(jobId) + " " + Integer.toString(procId) + " " + keys);
+	public void getProcessAttribute(int jobId, int procId, String[] keys) throws IOException {
+		sendCommand("GETPATTR", Integer.toString(jobId), Integer.toString(procId), keys);
 	}
 	
-	public void getNodeAttribute(int machID, int nodeID, String keys) throws IOException {
-		sendCommand("GETNATTR", Integer.toString(machID) + " " + Integer.toString(nodeID) + " " + keys);
+	public void getNodeAttribute(int machID, int nodeID, String[] keys) throws IOException {
+		sendCommand("GETNATTR", Integer.toString(machID), Integer.toString(nodeID), keys);
 	}
 	
 	public void getMachines() throws IOException {
